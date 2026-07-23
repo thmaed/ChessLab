@@ -1,0 +1,600 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 70;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B7F78CF4A0C842D79D164931 /* ChessKitEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 678E3CE58F244D95A5BDD765 /* ChessKitEngine */; };
+		F69740317DA442B4A58BAD99 /* ChessKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3DE236CC84514D2D9F36A9FE /* ChessKit */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4FCCA5FBED794522B2FCC220 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5625A5157FBC48528193F71B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 51405F5149AB490EB5C9AD85;
+			remoteInfo = ChessLab;
+		};
+		A1540A42B75B4FAD8A501522 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5625A5157FBC48528193F71B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 51405F5149AB490EB5C9AD85;
+			remoteInfo = ChessLab;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0558AD0B73974786AAA982AF /* ChessLab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChessLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DCE75956E83746B897ECE109 /* ChessLabUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChessLabUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F5B5CC8CC9724ABDB65BFD9A /* ChessLabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChessLabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		11A14EC29ACB49BD983060A3 /* ChessLab */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ChessLab; sourceTree = "<group>"; };
+		214B3D5B62DE4DEF9FFB5730 /* ChessLabUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ChessLabUITests; sourceTree = "<group>"; };
+		B521C50684074516AD83BECE /* ChessLabTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ChessLabTests; sourceTree = "<group>"; };
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A9C6D03A694C445D875071D7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F3DA1088BCB1480FA195DFF6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F69740317DA442B4A58BAD99 /* ChessKit in Frameworks */,
+				B7F78CF4A0C842D79D164931 /* ChessKitEngine in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F882AF0341B1415CA0E0071B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		40D432D46DF142A38448265D /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				0558AD0B73974786AAA982AF /* ChessLab.app */,
+				F5B5CC8CC9724ABDB65BFD9A /* ChessLabTests.xctest */,
+				DCE75956E83746B897ECE109 /* ChessLabUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C7E0E02E3DB7406BB9E08936 = {
+			isa = PBXGroup;
+			children = (
+				11A14EC29ACB49BD983060A3 /* ChessLab */,
+				B521C50684074516AD83BECE /* ChessLabTests */,
+				214B3D5B62DE4DEF9FFB5730 /* ChessLabUITests */,
+				40D432D46DF142A38448265D /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		51405F5149AB490EB5C9AD85 /* ChessLab */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 187530EC65A44649856B8E0D /* Build configuration list for PBXNativeTarget "ChessLab" */;
+			buildPhases = (
+				8430D6C67D9C4AFB90CD38AB /* Sources */,
+				F3DA1088BCB1480FA195DFF6 /* Frameworks */,
+				F99CAE6F9D9C45109AAE35F1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				11A14EC29ACB49BD983060A3 /* ChessLab */,
+			);
+			name = ChessLab;
+			packageProductDependencies = (
+				3DE236CC84514D2D9F36A9FE /* ChessKit */,
+				678E3CE58F244D95A5BDD765 /* ChessKitEngine */,
+			);
+			productName = ChessLab;
+			productReference = 0558AD0B73974786AAA982AF /* ChessLab.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9002F2377430484FAB303498 /* ChessLabUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2FA9396DB3154A1C9B16BCD0 /* Build configuration list for PBXNativeTarget "ChessLabUITests" */;
+			buildPhases = (
+				B65AF11E0C0648A29E47E1A9 /* Sources */,
+				A9C6D03A694C445D875071D7 /* Frameworks */,
+				D0565D2602F442F2A48086D9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E045C2E37ABF41C5B049AD4F /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				214B3D5B62DE4DEF9FFB5730 /* ChessLabUITests */,
+			);
+			name = ChessLabUITests;
+			packageProductDependencies = (
+			);
+			productName = ChessLabUITests;
+			productReference = DCE75956E83746B897ECE109 /* ChessLabUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		F63D1E2CB3D34FE785A7D672 /* ChessLabTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 46C4DFB269FC43E68168220D /* Build configuration list for PBXNativeTarget "ChessLabTests" */;
+			buildPhases = (
+				903530A802764829AEDE9D95 /* Sources */,
+				F882AF0341B1415CA0E0071B /* Frameworks */,
+				D38B3ED9746C42B4AA16C1E1 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4EEF31342B004FCAAF2F4CEB /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				B521C50684074516AD83BECE /* ChessLabTests */,
+			);
+			name = ChessLabTests;
+			packageProductDependencies = (
+			);
+			productName = ChessLabTests;
+			productReference = F5B5CC8CC9724ABDB65BFD9A /* ChessLabTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5625A5157FBC48528193F71B /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2660;
+				LastUpgradeCheck = 2660;
+				TargetAttributes = {
+					51405F5149AB490EB5C9AD85 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					9002F2377430484FAB303498 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 51405F5149AB490EB5C9AD85;
+					};
+					F63D1E2CB3D34FE785A7D672 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = 51405F5149AB490EB5C9AD85;
+					};
+				};
+			};
+			buildConfigurationList = 5EBAE83C1A674529B5A48941 /* Build configuration list for PBXProject "ChessLab" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = fr;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				fr,
+				Base,
+				en,
+			);
+			mainGroup = C7E0E02E3DB7406BB9E08936;
+			packageReferences = (
+				575CEAF21CA747398E0D7D8B /* XCRemoteSwiftPackageReference "chesskit-swift" */,
+				7C8405E150B24303B3CF98EB /* XCRemoteSwiftPackageReference "chesskit-engine" */,
+			);
+			productRefGroup = 40D432D46DF142A38448265D /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				51405F5149AB490EB5C9AD85 /* ChessLab */,
+				F63D1E2CB3D34FE785A7D672 /* ChessLabTests */,
+				9002F2377430484FAB303498 /* ChessLabUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D0565D2602F442F2A48086D9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D38B3ED9746C42B4AA16C1E1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F99CAE6F9D9C45109AAE35F1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8430D6C67D9C4AFB90CD38AB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		903530A802764829AEDE9D95 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B65AF11E0C0648A29E47E1A9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4EEF31342B004FCAAF2F4CEB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 51405F5149AB490EB5C9AD85 /* ChessLab */;
+			targetProxy = 4FCCA5FBED794522B2FCC220 /* PBXContainerItemProxy */;
+		};
+		E045C2E37ABF41C5B049AD4F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 51405F5149AB490EB5C9AD85 /* ChessLab */;
+			targetProxy = A1540A42B75B4FAD8A501522 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		2B94D6FC0D274FD59FE222AC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chesslab.ChessLabUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ChessLab;
+			};
+			name = Release;
+		};
+		4218725CEA7446B69F037BFD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 3N3BN259H6;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		4EBF7D9335F54342A11DFD21 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chesslab.ChessLabTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ChessLab.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ChessLab";
+			};
+			name = Debug;
+		};
+		591BACC1C8FF42E595FF941E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.strategy-games";
+				INFOPLIST_KEY_NSCameraUsageDescription = "The camera is used to scan a chessboard (screen or real board viewed from above).";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chesslab.ChessLab;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		84D41A5B97144A3592CF2DF2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chesslab.ChessLabUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = ChessLab;
+			};
+			name = Debug;
+		};
+		863CF3DC38094DE98AEFFF79 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3N3BN259H6;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.strategy-games";
+				INFOPLIST_KEY_NSCameraUsageDescription = "The camera is used to scan a chessboard (screen or real board viewed from above).";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 1.0.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chesslab.ChessLab;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		B806C028520B4F65AD226A3A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 3N3BN259H6;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C9B64F5997164380B977ADFC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chesslab.ChessLabTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ChessLab.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ChessLab";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		187530EC65A44649856B8E0D /* Build configuration list for PBXNativeTarget "ChessLab" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				591BACC1C8FF42E595FF941E /* Debug */,
+				863CF3DC38094DE98AEFFF79 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2FA9396DB3154A1C9B16BCD0 /* Build configuration list for PBXNativeTarget "ChessLabUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				84D41A5B97144A3592CF2DF2 /* Debug */,
+				2B94D6FC0D274FD59FE222AC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		46C4DFB269FC43E68168220D /* Build configuration list for PBXNativeTarget "ChessLabTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4EBF7D9335F54342A11DFD21 /* Debug */,
+				C9B64F5997164380B977ADFC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5EBAE83C1A674529B5A48941 /* Build configuration list for PBXProject "ChessLab" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4218725CEA7446B69F037BFD /* Debug */,
+				B806C028520B4F65AD226A3A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		575CEAF21CA747398E0D7D8B /* XCRemoteSwiftPackageReference "chesskit-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/chesskit-app/chesskit-swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.17.0;
+			};
+		};
+		7C8405E150B24303B3CF98EB /* XCRemoteSwiftPackageReference "chesskit-engine" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/chesskit-app/chesskit-engine";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.7.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		3DE236CC84514D2D9F36A9FE /* ChessKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 575CEAF21CA747398E0D7D8B /* XCRemoteSwiftPackageReference "chesskit-swift" */;
+			productName = ChessKit;
+		};
+		678E3CE58F244D95A5BDD765 /* ChessKitEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7C8405E150B24303B3CF98EB /* XCRemoteSwiftPackageReference "chesskit-engine" */;
+			productName = ChessKitEngine;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 5625A5157FBC48528193F71B /* Project object */;
+}

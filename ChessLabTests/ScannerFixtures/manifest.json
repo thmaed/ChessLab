@@ -1,0 +1,24 @@
+[
+  {
+    "file": "chesscom_endgame_rook.png",
+    "source": "screenshot",
+    "rotation": 0,
+    "fen": "5rk1/P7/2R5/5P1p/8/4b3/6K1/8",
+    "minCorrectSquares": 64
+  },
+  {
+    "file": "chesscom_endgame_pawns.png",
+    "source": "screenshot",
+    "rotation": 0,
+    "fen": "3r4/6k1/P1R3p1/4p2p/3bP3/6P1/5PK1/8",
+    "minCorrectSquares": 63,
+    "maxSilentlyWrong": 1
+  },
+  {
+    "file": "chesslab_ipad_opening.png",
+    "source": "screenshot",
+    "rotation": 0,
+    "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR",
+    "minCorrectSquares": 64
+  }
+]

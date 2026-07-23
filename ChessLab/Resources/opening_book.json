@@ -1,0 +1,638 @@
+{
+  "roots": [
+    {
+      "san": "e4",
+      "weight": 45,
+      "children": [
+        {
+          "san": "e5",
+          "weight": 40,
+          "children": [
+            {
+              "san": "Nf3",
+              "weight": 100,
+              "children": [
+                {
+                  "san": "Nc6",
+                  "weight": 70,
+                  "children": [
+                    {
+                      "san": "Bb5",
+                      "weight": 55,
+                      "children": [
+                        {
+                          "san": "a6",
+                          "weight": 70,
+                          "children": [
+                            {
+                              "san": "Ba4",
+                              "weight": 100,
+                              "children": [
+                                {
+                                  "san": "Nf6",
+                                  "weight": 100,
+                                  "children": [
+                                    { "san": "O-O", "weight": 100, "children": [] }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "san": "Nf6",
+                          "weight": 30,
+                          "isMainLine": false,
+                          "children": [
+                            { "san": "O-O", "weight": 100, "children": [
+                              { "san": "Nxe4", "weight": 100, "isMainLine": false, "children": [] }
+                            ] }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "san": "Bc4",
+                      "weight": 45,
+                      "children": [
+                        {
+                          "san": "Bc5",
+                          "weight": 100,
+                          "children": [
+                            {
+                              "san": "c3",
+                              "weight": 100,
+                              "children": [
+                                {
+                                  "san": "Nf6",
+                                  "weight": 100,
+                                  "children": [
+                                    { "san": "d3", "weight": 100, "children": [] }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "san": "Nf6",
+                  "weight": 20,
+                  "isMainLine": false,
+                  "children": [
+                    { "san": "Nxe5", "weight": 100, "children": [
+                      { "san": "d6", "weight": 100, "children": [] }
+                    ] }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "c5",
+          "weight": 35,
+          "children": [
+            {
+              "san": "Nf3",
+              "weight": 100,
+              "children": [
+                {
+                  "san": "d6",
+                  "weight": 55,
+                  "children": [
+                    {
+                      "san": "d4",
+                      "weight": 100,
+                      "children": [
+                        {
+                          "san": "cxd4",
+                          "weight": 100,
+                          "children": [
+                            {
+                              "san": "Nxd4",
+                              "weight": 100,
+                              "children": [
+                                {
+                                  "san": "Nf6",
+                                  "weight": 100,
+                                  "children": [
+                                    {
+                                      "san": "Nc3",
+                                      "weight": 100,
+                                      "children": [
+                                        { "san": "a6", "weight": 100, "children": [] }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "san": "Nc6",
+                  "weight": 45,
+                  "children": [
+                    {
+                      "san": "d4",
+                      "weight": 70,
+                      "children": [
+                        {
+                          "san": "cxd4",
+                          "weight": 100,
+                          "children": [
+                            {
+                              "san": "Nxd4",
+                              "weight": 100,
+                              "children": [
+                                {
+                                  "san": "Nf6",
+                                  "weight": 100,
+                                  "children": [
+                                    {
+                                      "san": "Nc3",
+                                      "weight": 100,
+                                      "children": [
+                                        { "san": "e5", "weight": 100, "isMainLine": false, "children": [] }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "san": "Bb5",
+                      "weight": 30,
+                      "isMainLine": false,
+                      "children": [
+                        { "san": "g6", "weight": 100, "children": [] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "e6",
+          "weight": 20,
+          "children": [
+            {
+              "san": "d4",
+              "weight": 100,
+              "children": [
+                {
+                  "san": "d5",
+                  "weight": 100,
+                  "children": [
+                    {
+                      "san": "Nc3",
+                      "weight": 65,
+                      "children": [
+                        { "san": "Bb4", "weight": 100, "children": [] }
+                      ]
+                    },
+                    {
+                      "san": "e5",
+                      "weight": 35,
+                      "children": [
+                        { "san": "c5", "weight": 100, "children": [] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "c6",
+          "weight": 20,
+          "children": [
+            {
+              "san": "d4",
+              "weight": 100,
+              "children": [
+                {
+                  "san": "d5",
+                  "weight": 100,
+                  "children": [
+                    {
+                      "san": "Nc3",
+                      "weight": 65,
+                      "children": [
+                        {
+                          "san": "dxe4",
+                          "weight": 100,
+                          "children": [
+                            {
+                              "san": "Nxe4",
+                              "weight": 100,
+                              "children": [
+                                { "san": "Bf5", "weight": 100, "children": [] }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "san": "e5",
+                      "weight": 35,
+                      "children": [
+                        { "san": "Bf5", "weight": 100, "children": [] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "d5",
+          "weight": 8,
+          "isMainLine": false,
+          "children": [
+            {
+              "san": "exd5",
+              "weight": 100,
+              "children": [
+                {
+                  "san": "Qxd5",
+                  "weight": 100,
+                  "children": [
+                    {
+                      "san": "Nc3",
+                      "weight": 100,
+                      "children": [
+                        { "san": "Qa5", "weight": 100, "children": [] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "g6",
+          "weight": 7,
+          "isMainLine": false,
+          "children": [
+            {
+              "san": "d4",
+              "weight": 100,
+              "children": [
+                { "san": "Bg7", "weight": 100, "children": [] }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "san": "d4",
+      "weight": 35,
+      "children": [
+        {
+          "san": "d5",
+          "weight": 40,
+          "children": [
+            {
+              "san": "c4",
+              "weight": 100,
+              "children": [
+                {
+                  "san": "e6",
+                  "weight": 55,
+                  "children": [
+                    {
+                      "san": "Nc3",
+                      "weight": 100,
+                      "children": [
+                        {
+                          "san": "Nf6",
+                          "weight": 100,
+                          "children": [
+                            {
+                              "san": "Bg5",
+                              "weight": 100,
+                              "children": [
+                                {
+                                  "san": "Be7",
+                                  "weight": 100,
+                                  "children": [
+                                    { "san": "e3", "weight": 100, "children": [] }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "san": "c6",
+                  "weight": 45,
+                  "children": [
+                    {
+                      "san": "Nf3",
+                      "weight": 100,
+                      "children": [
+                        {
+                          "san": "Nf6",
+                          "weight": 100,
+                          "children": [
+                            {
+                              "san": "Nc3",
+                              "weight": 100,
+                              "children": [
+                                { "san": "dxc4", "weight": 100, "children": [] }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "Nf6",
+          "weight": 45,
+          "children": [
+            {
+              "san": "c4",
+              "weight": 80,
+              "children": [
+                {
+                  "san": "g6",
+                  "weight": 55,
+                  "children": [
+                    {
+                      "san": "Nc3",
+                      "weight": 100,
+                      "children": [
+                        {
+                          "san": "Bg7",
+                          "weight": 55,
+                          "children": [
+                            {
+                              "san": "e4",
+                              "weight": 100,
+                              "children": [
+                                {
+                                  "san": "d6",
+                                  "weight": 100,
+                                  "children": [
+                                    {
+                                      "san": "Nf3",
+                                      "weight": 100,
+                                      "children": [
+                                        { "san": "O-O", "weight": 100, "children": [] }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "san": "d5",
+                          "weight": 45,
+                          "children": [
+                            {
+                              "san": "cxd5",
+                              "weight": 100,
+                              "children": [
+                                {
+                                  "san": "Nxd5",
+                                  "weight": 100,
+                                  "children": [
+                                    { "san": "e4", "weight": 100, "children": [] }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "san": "e6",
+                  "weight": 45,
+                  "children": [
+                    {
+                      "san": "Nc3",
+                      "weight": 60,
+                      "children": [
+                        {
+                          "san": "Bb4",
+                          "weight": 100,
+                          "children": [
+                            {
+                              "san": "e3",
+                              "weight": 100,
+                              "children": [
+                                {
+                                  "san": "O-O",
+                                  "weight": 100,
+                                  "children": [
+                                    { "san": "Bd3", "weight": 100, "children": [] }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "san": "Nf3",
+                      "weight": 40,
+                      "isMainLine": false,
+                      "children": [
+                        {
+                          "san": "b6",
+                          "weight": 100,
+                          "children": [
+                            {
+                              "san": "g3",
+                              "weight": 100,
+                              "children": [
+                                {
+                                  "san": "Bb7",
+                                  "weight": 100,
+                                  "children": [
+                                    { "san": "Bg2", "weight": 100, "children": [] }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "san": "Nf3",
+              "weight": 20,
+              "isMainLine": false,
+              "children": [
+                {
+                  "san": "g6",
+                  "weight": 100,
+                  "children": [
+                    {
+                      "san": "c4",
+                      "weight": 100,
+                      "children": [
+                        { "san": "Bg7", "weight": 100, "children": [] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "f5",
+          "weight": 5,
+          "isMainLine": false,
+          "children": [
+            {
+              "san": "g3",
+              "weight": 100,
+              "children": [
+                { "san": "Nf6", "weight": 100, "children": [] }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "san": "c4",
+      "weight": 12,
+      "children": [
+        {
+          "san": "e5",
+          "weight": 45,
+          "children": [
+            {
+              "san": "Nc3",
+              "weight": 100,
+              "children": [
+                {
+                  "san": "Nf6",
+                  "weight": 100,
+                  "children": [
+                    {
+                      "san": "Nf3",
+                      "weight": 100,
+                      "children": [
+                        { "san": "Nc6", "weight": 100, "children": [] }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "Nf6",
+          "weight": 35,
+          "children": [
+            {
+              "san": "Nc3",
+              "weight": 100,
+              "children": [
+                { "san": "e5", "weight": 100, "isMainLine": false, "children": [] }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "c5",
+          "weight": 20,
+          "isMainLine": false,
+          "children": [
+            {
+              "san": "Nf3",
+              "weight": 100,
+              "children": [
+                { "san": "Nf6", "weight": 100, "children": [] }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "san": "Nf3",
+      "weight": 8,
+      "children": [
+        {
+          "san": "d5",
+          "weight": 55,
+          "children": [
+            {
+              "san": "g3",
+              "weight": 100,
+              "children": [
+                {
+                  "san": "Nf6",
+                  "weight": 100,
+                  "children": [
+                    { "san": "Bg2", "weight": 100, "children": [] }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "san": "Nf6",
+          "weight": 45,
+          "children": [
+            {
+              "san": "c4",
+              "weight": 100,
+              "isMainLine": false,
+              "children": [
+                { "san": "g6", "weight": 100, "children": [] }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

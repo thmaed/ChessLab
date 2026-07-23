@@ -1,0 +1,35 @@
+{
+  "sourceLanguage" : "fr",
+  "strings" : {
+    "CFBundleName" : {
+      "comment" : "Bundle name",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "ChessLab"
+          }
+        }
+      }
+    },
+    "NSCameraUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The camera is used to scan a chessboard (screen or real board viewed from above)."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'appareil photo sert à scanner un échiquier (écran ou plateau réel vu du dessus)."
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
