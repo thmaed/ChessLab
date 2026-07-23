@@ -294,6 +294,12 @@ struct AnalysisView: View {
             .keyboardShortcut(.space, modifiers: [])
             .accessibilityLabel(viewModel.isAutoplaying ? "Arrêter la lecture" : "Lire la partie")
             .accessibilityIdentifier("autoplay")
+
+            // Jouer le meilleur coup du moteur : déroule la meilleure ligne
+            // coup par coup depuis une position (scan, FEN, éditeur). Teinté
+            // accent car c'est l'action « intelligente » de l'écran.
+            bestMoveButton
+
             Spacer()
             if viewModel.isClassifying, let progress = viewModel.classificationProgress {
                 HStack(spacing: 6) {
@@ -367,6 +373,31 @@ struct AnalysisView: View {
         // Gain → émeraude ; perte → la teinte de la pastille (elle encode déjà
         // la gravité : jaune imprécision, orange erreur, rouge gaffe).
         return delta > 0 ? Theme.accent : quality.tint
+    }
+
+    /// « Jouer le meilleur coup » : bouton accentué qui avance d'un demi-coup
+    /// le long de la meilleure ligne du moteur. ⌘→ en raccourci iPad.
+    private var bestMoveButton: some View {
+        Button {
+            viewModel.playBestMove()
+        } label: {
+            Image(systemName: "sparkles")
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(viewModel.canPlayBestMove ? Theme.background : Theme.textTertiary)
+                .frame(width: 44, height: 44)
+                .background(
+                    viewModel.canPlayBestMove
+                        ? AnyShapeStyle(Theme.accentGradient)
+                        : AnyShapeStyle(Theme.surface),
+                    in: Circle()
+                )
+                .overlay(Circle().strokeBorder(Theme.stroke, lineWidth: 1))
+        }
+        .buttonStyle(.pressable)
+        .disabled(!viewModel.canPlayBestMove)
+        .keyboardShortcut(.rightArrow, modifiers: .command)
+        .accessibilityLabel("Jouer le meilleur coup")
+        .accessibilityIdentifier("playBestMove")
     }
 
     private func navButton(_ systemImage: String, disabled: Bool, action: @escaping () -> Void) -> some View {

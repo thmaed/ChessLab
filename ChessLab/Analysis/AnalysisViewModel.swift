@@ -149,6 +149,13 @@ final class AnalysisViewModel {
     private(set) var currentEvalMate: Int?
     private var liveAnalysisTask: Task<Void, Never>?
 
+    /// LAN du meilleur coup (rang 1) de l'analyse en continu de la position
+    /// AFFICHÉE, suffixe de promotion compris (« e7e8q »). Alimente le bouton
+    /// « Jouer le meilleur coup » qui déroule la meilleure ligne demi-coup par
+    /// demi-coup depuis une position (scan, FEN, éditeur). `nil` tant qu'aucun
+    /// coup n'est calculé, et sur une position terminale (mat/pat : pas de pv).
+    private(set) var bestLiveMoveLAN: String?
+
     /// File sérielle pour tout ce qui touche au moteur (analyse en continu,
     /// classification de fond) — même discipline que ``PlayViewModel``.
     private var engineQueue: Task<Void, Never> = Task {}
@@ -505,6 +512,9 @@ final class AnalysisViewModel {
     private func clearArrows() {
         hintMoves = []
         threatMove = nil
+        // Le meilleur coup vaut pour la position AFFICHÉE : une navigation le
+        // périme aussitôt, la nouvelle analyse le recalcule.
+        bestLiveMoveLAN = nil
     }
 
     /// « Il fallait jouer ça » : le meilleur coup de la position PRÉCÉDENTE,
@@ -576,8 +586,22 @@ final class AnalysisViewModel {
         // temps affichées » du rapport. `clearArrows()` existait depuis le
         // début pour ça et n'était appelé nulle part.
         clearArrows()
+
+        // L'analyse en continu D'ABORD, et TOUJOURS : c'est elle qui donne, à
+        // chaque demi-coup, le meilleur coup du camp au trait et l'évaluation.
         startLiveAnalysis()
-        ensureEvaluatedLazily(at: currentIndex)
+
+        // La classification à la volée (noter le coup joué) ne s'ajoute qu'EN
+        // REVUE d'une partie. En EXPLORATION d'une position (scan, FEN,
+        // éditeur), elle ne ferait que voler le temps moteur à l'analyse en
+        // continu — elle arrêtait celle-ci pour classer, si bien que le
+        // meilleur coup ne se rafraîchissait plus après le 1er demi-coup
+        // (le bug « seul le premier demi-coup fonctionne »). Noter un coup
+        // que le moteur vient de désigner comme le meilleur n'a de toute façon
+        // aucun sens ; l'éval, elle, vient de l'analyse en continu ci-dessus.
+        if isGameReview {
+            ensureEvaluatedLazily(at: currentIndex)
+        }
     }
 
     // MARK: Menace de l'adversaire (Lot 5.G)
@@ -726,34 +750,96 @@ final class AnalysisViewModel {
         afterNavigate()
     }
 
+    // MARK: Dérouler la meilleure ligne (« Jouer le meilleur coup »)
+
+    /// Vrai quand l'analyse en continu tient un meilleur coup JOUABLE sur la
+    /// position affichée — condition d'activation du bouton « Jouer le
+    /// meilleur coup ». Faux tant que rien n'est calculé et sur une position
+    /// terminale (mat/pat), où le moteur ne propose plus de coup.
+    var canPlayBestMove: Bool {
+        bestMoveSquares != nil
+    }
+
+    /// Cases (départ, arrivée) du meilleur coup courant, revalidées contre la
+    /// position affichée — `nil` si le LAN est absent, mal formé, ou périmé
+    /// (ne correspond plus au trait/à un coup légal).
+    private var bestMoveSquares: (from: Square, to: Square)? {
+        guard let lan = bestLiveMoveLAN, lan.count >= 4 else { return nil }
+        let from = Square(String(lan.prefix(2)))
+        let to = Square(String(lan.dropFirst(2).prefix(2)))
+        guard board.position.piece(at: from)?.color == board.position.sideToMove,
+              board.canMove(pieceAt: from, to: to)
+        else { return nil }
+        return (from, to)
+    }
+
+    /// Joue le meilleur coup du moteur sur la position affichée et avance d'un
+    /// demi-coup. L'analyse en continu repart aussitôt sur la nouvelle position
+    /// et propose le meilleur coup du camp adverse : tap après tap, on déroule
+    /// la meilleure ligne « coup par coup, le meilleur de chaque côté » — ce
+    /// qui manquait pour explorer une position scannée/FEN sans rejouer chaque
+    /// coup à la main.
+    ///
+    /// La pièce de promotion est lue DANS le LAN du moteur (5e caractère, dame
+    /// par défaut) : c'est le moteur qui choisit, on ne dérange pas
+    /// l'utilisateur avec le sélecteur.
+    func playBestMove() {
+        stopAutoplay()
+        guard let lan = bestLiveMoveLAN, let squares = bestMoveSquares else { return }
+
+        var scratch = board
+        guard let move = scratch.move(pieceAt: squares.from, to: squares.to) else { return }
+        clearSelection()
+
+        if case .promotion = scratch.state {
+            commit(move: scratch.completePromotion(of: move, to: Self.promotionKind(fromLAN: lan)))
+        } else {
+            commit(move: move)
+        }
+    }
+
+    /// Pièce de promotion encodée dans un LAN moteur (« e7e8q » → dame). Dame
+    /// par défaut si le suffixe est absent ou non reconnu — le choix quasi
+    /// universel, et de toute façon celui du moteur dans l'écrasante majorité.
+    private static func promotionKind(fromLAN lan: String) -> Piece.Kind {
+        switch lan.dropFirst(4).first {
+        case "n": return .knight
+        case "b": return .bishop
+        case "r": return .rook
+        default: return .queen
+        }
+    }
+
     // MARK: Analyse en continu (MultiPV = 3) de la position affichée
 
     /// Contrairement à l'indice du mode Jouer, toujours active dès qu'une
     /// position est affichée — pas de bascule utilisateur, voir le brief
     /// ("Analyse live : éval + barre d'avantage... MultiPV = 3").
     private func startLiveAnalysis() {
-        // La menace AVANT l'analyse en continu, et ce n'est pas un détail :
-        // l'analyse en continu tourne en `go infinite`, qui ne se termine
-        // jamais tout seul. Enfilée derrière elle, la recherche de menace
-        // attendrait une fin qui ne vient pas (même interblocage que celui
-        // documenté dans `setupEngine`). Devant, elle dure 200 ms et rend la
-        // main.
-        //
-        // Ici plutôt que dans `afterNavigate` : l'analyse en continu démarre
-        // aussi à l'ouverture de l'écran et au retour dessus, sans qu'on ait
-        // navigué. La menace ne s'affichait donc jamais tant qu'on n'avait pas
-        // changé de coup (vu à la capture).
+        // ⚠️ ORDRE CRITIQUE. Le flux de réponses de ChessKitEngine est à
+        // ITÉRATEUR UNIQUE : deux `for await` qui le consomment EN MÊME TEMPS
+        // se volent les réponses, et l'un termine l'itérateur sous les pieds
+        // de l'autre. On DOIT donc arrêter l'analyse en continu PRÉCÉDENTE —
+        // une tâche non structurée qui itère encore le flux — AVANT tout
+        // nouveau consommateur, la recherche de MENACE comprise (elle itère
+        // le flux elle aussi). L'arrêt était auparavant enfilé DERRIÈRE la
+        // menace : celle-ci iterait donc le flux pendant que l'ancienne
+        // analyse tournait encore — d'où « le meilleur coup ne se rafraîchit
+        // qu'au tout premier demi-coup » (au 1er coup il n'y a pas d'ancienne
+        // analyse, moteur frais, donc pas de conflit ; ensuite si).
+        enqueueEngineWork { [weak self] in await self?.stopLiveAnalysisIfNeeded() }
+
+        // La menace AVANT l'analyse en continu : cette dernière tourne en
+        // recherche bornée qui ne rend la main qu'à sa fin, la menace (200 ms)
+        // doit donc passer devant. Elle est maintenant SÉRIALISÉE derrière
+        // l'arrêt ci-dessus, plus aucun itérateur concurrent.
         computeThreat()
 
         enqueueEngineWork { [weak self] in
+            // Plus de `stopLiveAnalysisIfNeeded` ici : déjà fait en tête de
+            // file, avant la menace. On garde le contrôle `isTornDown` : la
+            // menace a pu s'exécuter juste après un `handleViewDisappear`.
             guard let self, let engine = self.engine, !self.isTornDown else { return }
-            await self.stopLiveAnalysisIfNeeded()
-            // L'écran a pu disparaître pendant l'attente ci-dessus — ou même
-            // avant que ce maillon ne démarre, auquel cas le `stop` HORS file
-            // de `handleViewDisappear` s'est exécuté AVANT lui et n'a rien
-            // arrêté. Sans ce second contrôle, on lancerait ici une analyse
-            // infinie orpheline que plus rien n'arrêterait.
-            guard !self.isTornDown else { return }
 
             let fen = self.board.position.fen
             let mover = self.board.position.sideToMove
@@ -785,7 +871,7 @@ final class AnalysisViewModel {
                 var lanByRank: [Int: String] = [:]
                 var scoreByRank: [Int: Double] = [:]
 
-                for await response in await engine.responseStream {
+                readLoop: for await response in await engine.responseStream {
                     switch response {
                     case let .info(info):
                         // `isLiveAnalyzing` est un drapeau PARTAGÉ du view
@@ -802,7 +888,10 @@ final class AnalysisViewModel {
                         // Même discipline que ``computeThreat()`` : la
                         // position analysée par CETTE tâche est capturée, et
                         // rien n'est écrit si l'écran en montre une autre.
-                        guard self.isLiveAnalyzing, self.board.position.fen == fen else { break }
+                        // `break readLoop` (labellisé) et non `break` : ce
+                        // dernier ne sortait que du `switch`, la boucle
+                        // continuait à consommer le flux d'une position périmée.
+                        guard self.isLiveAnalyzing, self.board.position.fen == fen else { break readLoop }
                         if let depth = info.depth {
                             self.liveDepth = depth
                         }
@@ -822,6 +911,9 @@ final class AnalysisViewModel {
                             } else if let cp = info.score?.cp {
                                 scoreByRank[rank] = cp
                             }
+                            // Le meilleur coup JOUABLE (rang 1), LAN complet
+                            // avec promotion — sert « Jouer le meilleur coup ».
+                            if rank == 1 { self.bestLiveMoveLAN = firstMove }
                             self.hintMoves = HintMoveBuilder.build(lanByRank: lanByRank, scoreByRank: scoreByRank)
                         }
                     case .bestmove:
