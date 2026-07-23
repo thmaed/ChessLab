@@ -12,14 +12,9 @@ import SwiftUI
 /// tuiles directes.
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
-    /// Sur iPad (classe régulière), la grille des modes passe de
-    /// « autant de colonnes de 160 pt que la largeur permet » (5-6 sur un
-    /// iPad, pour seulement 6 tuiles — une unique rangée courte perdue en
-    /// haut d'un grand écran) à un nombre de colonnes FIXE, avec des tuiles
-    /// plus grandes (voir ``ModeCard``) : la grille occupe une place
-    /// proportionnée à l'écran au lieu de s'étaler en une bande fine.
-    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var resumableGame: ResumableGame?
+    /// Bilan de progression compact du panneau iPad — recalculé à l'apparition.
+    @State private var progressSummary: ProgressionSummary?
     @State private var path = NavigationPath()
     /// Relais de la barre de menus macOS — voir ``MenuCommands``.
     @State private var menuCommands = MenuCommands.shared
@@ -131,47 +126,16 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack(path: $path) {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
-                    homeHeader
-
-                    if seedingState.isSeeding {
-                        seedingBanner
-                    }
-
-                    if let resumableGame {
-                        resumeBanner(resumableGame)
-                    }
-
-                    VStack(alignment: .leading, spacing: 14) {
-                        sectionHeader("Modes")
-                        LazyVGrid(columns: modeGridColumns, spacing: 14) {
-                            ModeCard(title: "Contre Stockfish", subtitle: "Force, cadence, aides", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
-                                path.append(Route.newGame)
-                            }
-                            ModeCard(title: "Deux joueurs", subtitle: "Sur le même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true) {
-                                path.append(Route.twoPlayerSetup)
-                            }
-                            ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true) {
-                                path.append(Route.puzzleQueue)
-                            }
-                            ModeCard(title: "Ouvertures", subtitle: "Répertoires PGN", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true) {
-                                path.append(Route.repertoireList)
-                            }
-                            ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true) {
-                                path.append(Route.analysisEntry)
-                            }
-                            ModeCard(title: "Laboratoire", subtitle: "Stockfish vs Stockfish", systemImage: "flask", tint: Theme.rose, isEnabled: true) {
-                                path.append(Route.labSetup(startFEN: nil))
-                            }
-                        }
-                    }
-
-                    if !recentGames.isEmpty {
-                        recentGamesSection
-                    }
+            GeometryReader { geo in
+                // La LARGEUR réelle décide, pas `horizontalSizeClass` : ce
+                // dernier peut être `.compact` sur iPad selon le contexte
+                // (multitâche, mode fenêtré), et on veut deux zones dès qu'il y
+                // a la place (modes + panneau de 340 pt).
+                if geo.size.width >= 720 {
+                    iPadHome
+                } else {
+                    iPhoneHome
                 }
-                .padding(20)
             }
             .appBackground()
             .scrollContentBackground(.hidden)
@@ -375,6 +339,7 @@ struct HomeView: View {
             }
             .onAppear {
                 refreshResumableGame()
+                loadProgressSummary()
                 // Préchargement (ponctuel, au tout premier lancement) de la
                 // bibliothèque Lichess : lancé en TÂCHE DE FOND par le
                 // seeder — n'occupe jamais le fil principal.
@@ -427,18 +392,147 @@ struct HomeView: View {
         }
     }
 
+    // MARK: Dispositions iPhone / iPad
+
+    /// iPhone : tout défile dans une seule colonne (inchangé).
+    private var iPhoneHome: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                homeHeader
+                if seedingState.isSeeding { seedingBanner }
+                if let resumableGame { resumeBanner(resumableGame) }
+                modesSection(minTile: 160)
+                if !recentGames.isEmpty { recentGamesSection }
+            }
+            .padding(20)
+        }
+    }
+
+    /// iPad : deux zones. À gauche les modes ; à droite un panneau de suivi
+    /// (reprise, progression, parties récentes) — sans quoi la moitié basse du
+    /// grand écran restait vide.
+    private var iPadHome: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                homeHeader
+                if seedingState.isSeeding { seedingBanner }
+                HStack(alignment: .top, spacing: 22) {
+                    modesSection(minTile: 200)
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
+                    VStack(spacing: 16) {
+                        if let resumableGame { resumeBanner(resumableGame) }
+                        homeProgressCard
+                        if !recentGames.isEmpty { recentGamesSection }
+                    }
+                    .frame(width: 340)
+                }
+            }
+            .padding(24)
+        }
+    }
+
     // MARK: Grille des modes
 
-    /// iPhone (classe compacte) : inchangé, colonnes adaptatives de 160 pt
-    /// mini — donne 2 colonnes sur un iPhone, ce qui fonctionnait déjà bien.
-    /// iPad (classe régulière) : 3 colonnes FIXES plutôt qu'adaptatives —
-    /// sans quoi la même règle en tire 5 ou 6 pour les 6 tuiles existantes,
-    /// qui s'étalent alors sur une seule rangée fine tout en haut de l'écran.
-    private var modeGridColumns: [GridItem] {
-        if horizontalSizeClass == .regular {
-            return Array(repeating: GridItem(.flexible(), spacing: 14), count: 3)
+    /// `minTile` : largeur mini d'une tuile — 160 en pleine largeur (iPhone),
+    /// 200 dans la colonne gauche plus étroite de l'iPad.
+    private func modesSection(minTile: CGFloat) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            sectionHeader("Modes")
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: minTile), spacing: 14)], spacing: 14) {
+                ModeCard(title: "Contre Stockfish", subtitle: "Force, cadence, aides", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
+                    path.append(Route.newGame)
+                }
+                ModeCard(title: "Deux joueurs", subtitle: "Sur le même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true) {
+                    path.append(Route.twoPlayerSetup)
+                }
+                ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true) {
+                    path.append(Route.puzzleQueue)
+                }
+                ModeCard(title: "Ouvertures", subtitle: "Répertoires PGN", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true) {
+                    path.append(Route.repertoireList)
+                }
+                ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true) {
+                    path.append(Route.analysisEntry)
+                }
+                ModeCard(title: "Laboratoire", subtitle: "Stockfish vs Stockfish", systemImage: "flask", tint: Theme.rose, isEnabled: true) {
+                    path.append(Route.labSetup(startFEN: nil))
+                }
+            }
         }
-        return [GridItem(.adaptive(minimum: 160), spacing: 14)]
+    }
+
+    // MARK: Carte Progression (panneau iPad)
+
+    /// Aperçu compact du tableau de bord, tout le panneau étant un bouton vers
+    /// l'écran complet. Réutilise ``ProgressionSummary`` (pur) et le même
+    /// chargement filtré que ``ProgressionView`` — jamais toute la table Puzzle.
+    private var homeProgressCard: some View {
+        Button { path.append(Route.progression) } label: {
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(spacing: 10) {
+                    IconBadge(systemImage: "chart.bar.xaxis", tint: Theme.accent, size: 30)
+                    Text("Progression")
+                        .font(.headline)
+                        .foregroundStyle(Theme.textPrimary)
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.textTertiary)
+                }
+
+                if let summary = progressSummary, summary.hasAnyData {
+                    HStack(spacing: 10) {
+                        if summary.engineGames > 0 {
+                            progressStat("\(summary.engineWins)–\(summary.engineDraws)–\(summary.engineLosses)", "V–N–D")
+                        }
+                        if let rate = summary.puzzleSuccessRate {
+                            progressStat("\(Int((rate * 100).rounded())) %", "Puzzles")
+                        }
+                    }
+                    if let best = summary.bestWinElo {
+                        Label("Meilleure victoire ~\(best) Elo", systemImage: "trophy.fill")
+                            .font(.caption)
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                } else {
+                    Text("Jouez une partie ou résolvez des puzzles pour voir votre progression.")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cardStyle()
+        }
+        .buttonStyle(.pressable)
+        .accessibilityIdentifier("homeProgressCard")
+    }
+
+    private func progressStat(_ value: String, _ label: LocalizedStringKey) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.title3.weight(.bold).monospacedDigit())
+                .foregroundStyle(Theme.accent)
+            Text(label)
+                .font(.caption2)
+                .foregroundStyle(Theme.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
+        .background(Theme.surfaceElevated.opacity(0.5), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+    }
+
+    /// Recharge le bilan compact — même discipline que ``ProgressionView`` :
+    /// petite table de parties chargée entière, puzzles filtrés sur ceux
+    /// réellement tentés (jamais les dizaines de milliers de la bibliothèque).
+    private func loadProgressSummary() {
+        let games = (try? modelContext.fetch(FetchDescriptor<GameRecord>())) ?? []
+        var attempted = FetchDescriptor<Puzzle>(predicate: #Predicate { puzzle in
+            (puzzle.successCount ?? 0) > 0 || (puzzle.failureCount ?? 0) > 0
+        })
+        attempted.propertiesToFetch = [\.successCount, \.failureCount, \.themeRaw, \.rating]
+        let puzzles = (try? modelContext.fetch(attempted)) ?? []
+        progressSummary = ProgressionSummary.compute(games: games, puzzles: puzzles)
     }
 
     // MARK: En-tête & résumé
