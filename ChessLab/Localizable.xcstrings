@@ -9511,6 +9511,16 @@
         }
       }
     },
+    "Traitement de l'image en cours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing image"
+          }
+        }
+      }
+    },
     "Traitement de l'image…" : {
       "localizations" : {
         "en" : {
