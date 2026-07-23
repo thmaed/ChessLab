@@ -1,36 +1,6 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
-    "Amateur" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Amateur"
-          }
-        }
-      }
-    },
-    "Joueur de club" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Club player"
-          }
-        }
-      }
-    },
-    "Expert et +" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Expert and up"
-          }
-        }
-      }
-    },
     "" : {
 
     },
@@ -791,6 +761,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Amar"
+          }
+        }
+      }
+    },
+    "Amateur" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Amateur"
           }
         }
       }
@@ -3682,6 +3662,16 @@
         }
       }
     },
+    "Expert et +" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expert and up"
+          }
+        }
+      }
+    },
     "Exporter le PGN" : {
       "localizations" : {
         "en" : {
@@ -4755,6 +4745,26 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jouer cette position"
+          }
+        }
+      }
+    },
+    "Jouer le meilleur coup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the best move"
+          }
+        }
+      }
+    },
+    "Joueur de club" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Club player"
           }
         }
       }
