@@ -1,7 +1,17 @@
-# ChessLab 1.0.1 — release notes
+# ChessLab 1.0.2 — release notes
 
 ## What's new
 
+- **Analysis — follow the best line move by move.** From any position (a scan,
+  a FEN, the editor), a "Play the best move" button walks Stockfish's best line
+  one half-move at a time: play a move and the engine immediately shows the best
+  moves for the other side, and so on. This also fixes a bug where, from a
+  starting position, the best moves stopped refreshing after the very first
+  half-move.
+- **Scanner — processing indicator.** Reading a photo or screenshot takes a few
+  seconds; a spinner now shows that the app is working instead of looking
+  frozen. The processing also runs off the main thread, so the interface stays
+  responsive.
 - **Progress** — a new dashboard, reachable from the home screen, that brings
   together what you've accomplished: your record against Stockfish (wins,
   draws, losses, highest Elo beaten, results by opponent level) and puzzles
