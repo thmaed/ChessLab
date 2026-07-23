@@ -9511,6 +9511,22 @@
         }
       }
     },
+    "Traitement de l'image…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Processing image…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traitement de l'image…"
+          }
+        }
+      }
+    },
     "Trompowsky Attack" : {
       "extractionState" : "stale",
       "localizations" : {

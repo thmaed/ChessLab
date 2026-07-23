@@ -34,6 +34,12 @@ struct ScannerView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .animation(Theme.gentle, value: vm.stage)
+        // Le traitement de l'image (détection, redressement, reconnaissance)
+        // prend quelques secondes : un voile + indicateur d'activité dit que
+        // ça travaille, plutôt qu'un écran figé qu'on croit planté. Le calcul
+        // tourne HORS fil principal (voir ``ScannerViewModel``), donc
+        // l'indicateur s'anime vraiment.
+        .overlay { processingOverlay }
         .onAppear {
             // Porte dérobée des tests UI : les sélecteurs système sont hors
             // process, donc intestables. Sans l'argument de lancement, rien
@@ -43,7 +49,7 @@ struct ScannerView: View {
             // et `load` détecte déjà le plateau en s'appuyant dessus.
             if let testSource = ScanTestImage.requestedSource { vm.forcedSource = testSource }
             if let testImage = ScanTestImage.image(), vm.image == nil {
-                vm.load(testImage)
+                Task { await vm.load(testImage) }
             }
         }
     }
@@ -106,7 +112,7 @@ struct ScannerView: View {
                         // même `ScannerEntryLabel` que les entrées ci-dessus.
                         // Le compromis (invite de collage d'iOS possible) est
                         // documenté dans ``ScannerViewModel/loadFromPasteboard()``.
-                        Button { vm.loadFromPasteboard() } label: {
+                        Button { Task { await vm.loadFromPasteboard() } } label: {
                             ScannerEntryLabel(
                                 title: "Coller", systemImage: "doc.on.clipboard.fill",
                                 tint: Theme.violet
@@ -134,7 +140,7 @@ struct ScannerView: View {
         // cible étroite qu'il faudrait viser.
         .dropDestination(for: Data.self) { items, _ in
             guard let data = items.first else { return false }
-            vm.loadFromDropped(data: data)
+            Task { await vm.loadFromDropped(data: data) }
             return true
         }
         .photosPickerAccessoryVisibility(.hidden, edges: .bottom)
@@ -142,17 +148,40 @@ struct ScannerView: View {
             guard let item else { return }
             Task {
                 if let data = try? await item.loadTransferable(type: Data.self) {
-                    vm.loadFromDropped(data: data)
+                    await vm.loadFromDropped(data: data)
                 }
                 photoItem = nil
             }
         }
         .fullScreenCover(isPresented: $showCamera) {
-            CameraPicker { image in vm.load(image) }
+            CameraPicker { image in Task { await vm.load(image) } }
                 .ignoresSafeArea()
         }
         .fileImporter(isPresented: $showFileImporter, allowedContentTypes: [.image], allowsMultipleSelection: false) { result in
-            vm.loadFromFile(result)
+            Task { await vm.loadFromFile(result) }
+        }
+    }
+
+    @ViewBuilder
+    private var processingOverlay: some View {
+        if vm.isProcessing {
+            ZStack {
+                Color.black.opacity(0.45).ignoresSafeArea()
+                VStack(spacing: 14) {
+                    ProgressView()
+                        .controlSize(.large)
+                        .tint(Theme.accent)
+                    Text("Traitement de l'image…")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Theme.textPrimary)
+                }
+                .padding(28)
+                .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Theme.stroke, lineWidth: 1))
+            }
+            .transition(.opacity)
+            .accessibilityIdentifier("scanProcessing")
+            .accessibilityLabel(Text("Traitement de l'image en cours"))
         }
     }
 
@@ -167,7 +196,7 @@ struct ScannerView: View {
                     quad: Binding(get: { vm.quad }, set: { vm.quad = $0 }),
                     wasDetectedAutomatically: vm.wasDetectedAutomatically
                 ) {
-                    vm.confirmCrop()
+                    Task { await vm.confirmCrop() }
                 }
 
                 if let errorMessage = vm.errorMessage {
