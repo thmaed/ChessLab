@@ -84,4 +84,19 @@ La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fo
   - **Uniformisation** « Ordinateur » au lieu de « Stockfish » côté joueur (adversaire, indicateurs, réglages, nom stocké, catalogue fr/en). Conservé : attribution légale (licences) et aide (qui explique le moteur), à la demande.
   - **Deux joueurs & Puzzles** adaptés au grand écran : Puzzles en deux colonnes (plateau | infos) en paysage régulier ; plateau de Deux joueurs borné pour tenir en hauteur (ne débordait plus).
   - **Menus macOS** complétés : Ouvertures ⇧⌘O, Laboratoire ⇧⌘L, Progression ⇧⌘R. Nav coup par coup gardée en raccourcis par écran (design existant).
-  - **Prochaine étape suggérée** : Axe B (association de fichiers .pgn/.fen, export diagramme) ou Axe C (synchro iCloud, terrain déjà prêt).
+- 24/07/2026 — **Axe C entamé : synchronisation iCloud (optionnelle)** livrée côté code/config :
+  - Entitlement `ChessLab.entitlements` (CloudKit + conteneur `iCloud.com.chesslab.ChessLab`), câblé `CODE_SIGN_ENTITLEMENTS` sur les deux configs. Build simulateur signé OK.
+  - Toggle « Synchroniser via iCloud » dans Réglages (off par défaut, effet au prochain lancement). Modèles vérifiés CloudKit-compatibles.
+  - Aide (module iCloud) + catalogue fr/en + doc App Store Connect (METADATA : réseau/confidentialité/export nuancés) + RELEASE_NOTES-1.1.0.
+  - **⚠️ Reste à faire côté iCloud** : (1) provisionner le conteneur — automatique à la 1re compilation *device* via la signature d'équipe ; (2) **tester la synchro réelle sur 2 appareils** (non vérifiable en simulateur).
+
+---
+
+## ⏸️ Pause — reprise prévue ~31/07/2026
+
+**Fait à ce jour** : Axe A complet (NavigationSplitView, renommage « Ordinateur », plateau bord à bord iPad, adaptation Deux joueurs/Puzzles, menus Mac) + Axe C entamé (synchro iCloud, à tester sur device).
+
+**Reprise — options par ordre de valeur** :
+1. **Thèmes de plateau & pièces** (Axe D) — 100 % local, gain visuel rapide, valorise les 71 jeux de pièces déjà collectés pour le YOLO.
+2. Finir l'**Axe C** : tester la synchro iCloud sur device, puis bibliothèque de parties (recherche/tags) ou tablebases Syzygy.
+3. **Axe B** : association de fichiers .pgn/.fen (ouvrir depuis Fichiers/Finder), export diagramme.
