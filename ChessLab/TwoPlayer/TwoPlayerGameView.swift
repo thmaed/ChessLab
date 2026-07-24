@@ -11,6 +11,9 @@ struct TwoPlayerGameView: View {
     var onRematch: (TwoPlayerGameSettings) -> Void = { _ in }
 
     @Environment(\.scenePhase) private var scenePhase
+    /// Sur iPad/Mac (classe régulière), le plateau est BORNÉ pour tenir dans
+    /// la hauteur : un carré pleine largeur y déborderait sous les HUD.
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
     @State private var showResignConfirmation = false
@@ -21,7 +24,7 @@ struct TwoPlayerGameView: View {
         VStack(spacing: 0) {
             topZone
 
-            board
+            boardArea
 
             VStack(spacing: 14) {
                 hud(for: bottomColor)
@@ -161,6 +164,22 @@ struct TwoPlayerGameView: View {
     }
 
     // MARK: Plateau
+
+    /// iPhone : plateau pleine largeur (le carré tient toujours en hauteur en
+    /// portrait). iPad/Mac : borné à l'espace offert (`aspectRatio` + priorité
+    /// de mise en page), il prend la hauteur laissée par les HUD et se centre,
+    /// au lieu de déborder l'écran en paysage.
+    @ViewBuilder
+    private var boardArea: some View {
+        if horizontalSizeClass == .regular {
+            board
+                .aspectRatio(1, contentMode: .fit)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .layoutPriority(1)
+        } else {
+            board
+        }
+    }
 
     private var board: some View {
         ChessBoardView(

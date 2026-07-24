@@ -11,34 +11,23 @@ struct PuzzleSolveView: View {
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
+    /// iPad plein écran & Mac en paysage : deux colonnes (plateau | infos).
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
-        VStack(spacing: 14) {
-            header
-
-            GeometryReader { geometry in
-                let side = min(geometry.size.width, geometry.size.height)
-                board
-                    .frame(width: side, height: side)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            }
-            .aspectRatio(1, contentMode: .fit)
-            .padding(.horizontal, 16)
-
-            if viewModel.isFinished {
-                resultCard
-            } else {
-                VStack(spacing: 12) {
-                    attemptsIndicator
-                    if viewModel.hintMoves.isEmpty {
-                        hintButton
+        Group {
+            if horizontalSizeClass == .regular {
+                GeometryReader { geo in
+                    if geo.size.width > geo.size.height {
+                        wideLayout
+                    } else {
+                        singleColumn
                     }
                 }
+            } else {
+                singleColumn
             }
-            Spacer(minLength: 0)
         }
-        .padding(.top, 12)
-        .padding(.bottom, 12)
         .appBackground()
         .navigationTitle("Puzzle")
         .navigationBarTitleDisplayMode(.inline)
@@ -51,6 +40,71 @@ struct PuzzleSolveView: View {
             // suivant, rejouant l'animation).
             if viewModel.isFinished, viewModel.isSolved {
                 CelebrationView()
+            }
+        }
+    }
+
+    // MARK: Dispositions
+
+    /// iPhone, et iPad en portrait : une colonne, plateau carré au centre.
+    private var singleColumn: some View {
+        VStack(spacing: 14) {
+            header
+            boardSquare
+                .padding(.horizontal, 16)
+            puzzleControls
+            Spacer(minLength: 0)
+        }
+        .padding(.top, 12)
+        .padding(.bottom, 12)
+    }
+
+    /// iPad plein écran & Mac en paysage : plateau à gauche (toute la hauteur),
+    /// consigne + essais + indice/résultat dans une colonne de droite — sinon
+    /// le plateau carré laissait toute la moitié droite de l'écran vide.
+    private var wideLayout: some View {
+        HStack(alignment: .center, spacing: 0) {
+            boardSquare
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.vertical, 6)
+                .padding(.leading, 6)
+
+            ScrollView {
+                VStack(spacing: 18) {
+                    header
+                    puzzleControls
+                }
+                .frame(maxWidth: .infinity)
+                .padding(24)
+            }
+            .frame(width: 360)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    /// Plateau carré, borné au plus petit côté de la place offerte.
+    private var boardSquare: some View {
+        GeometryReader { geometry in
+            let side = min(geometry.size.width, geometry.size.height)
+            board
+                .frame(width: side, height: side)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .aspectRatio(1, contentMode: .fit)
+    }
+
+    /// Sous le plateau (portrait) ou dans la colonne de droite (paysage) :
+    /// résultat une fois fini, sinon compteur d'essais et bouton d'indice.
+    @ViewBuilder
+    private var puzzleControls: some View {
+        if viewModel.isFinished {
+            resultCard
+        } else {
+            VStack(spacing: 12) {
+                attemptsIndicator
+                if viewModel.hintMoves.isEmpty {
+                    hintButton
+                }
             }
         }
     }
