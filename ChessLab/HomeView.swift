@@ -12,6 +12,13 @@ import SwiftUI
 /// tuiles directes.
 struct HomeView: View {
     @Environment(\.modelContext) private var modelContext
+    /// Décide de l'ossature : `.regular` (iPad plein écran, Mac) → barre
+    /// latérale + détail (``NavigationSplitView``) ; `.compact` (iPhone, iPad
+    /// en multitâche étroit) → pile + grille de modes, inchangée.
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// Mode sélectionné dans la barre latérale (iPad/Mac). `nil` = tableau de
+    /// bord d'accueil (reprise, progression, parties récentes).
+    @State private var sidebarSelection: SidebarItem?
     @State private var resumableGame: ResumableGame?
     /// Bilan de progression compact du panneau iPad — recalculé à l'apparition.
     @State private var progressSummary: ProgressionSummary?
@@ -68,21 +75,38 @@ struct HomeView: View {
         case licenses
     }
 
+    /// Entrées de la barre latérale iPad/Mac. Chacune enracine la colonne de
+    /// détail sur l'écran d'entrée du mode correspondant (voir ``detailRoot``).
+    enum SidebarItem: Hashable {
+        case vsEngine, twoPlayer, puzzles, openings, analysis, laboratory
+        case progression, settings, help
+    }
+
     /// Ouvre une destination demandée par la barre de menus. On repart de
     /// l'ACCUEIL plutôt que d'empiler : un menu déclenché depuis le fond
     /// d'une partie doit mener à l'écran demandé, pas l'enterrer sous trois
     /// niveaux dont on ne ressort qu'à coups de « retour ».
     private func open(_ destination: MenuDestination) {
-        path = NavigationPath()
+        let item: SidebarItem
+        let route: Route
         switch destination {
-        case .newGame: path.append(Route.newGame)
-        case .twoPlayer: path.append(Route.twoPlayerSetup)
-        case .analysis: path.append(Route.analysisEntry)
-        case .puzzles: path.append(Route.puzzleQueue)
-        case .openings: path.append(Route.repertoireList)
-        case .laboratory: path.append(Route.labSetup(startFEN: nil))
-        case .settings: path.append(Route.settings)
-        case .help: path.append(Route.help)
+        case .newGame: item = .vsEngine; route = .newGame
+        case .twoPlayer: item = .twoPlayer; route = .twoPlayerSetup
+        case .analysis: item = .analysis; route = .analysisEntry
+        case .puzzles: item = .puzzles; route = .puzzleQueue
+        case .openings: item = .openings; route = .repertoireList
+        case .laboratory: item = .laboratory; route = .labSetup(startFEN: nil)
+        case .settings: item = .settings; route = .settings
+        case .help: item = .help; route = .help
+        }
+        // iPad/Mac : sélectionner le mode dans la barre latérale (la colonne
+        // de détail s'enracine dessus). iPhone : empiler l'entrée sur la pile.
+        if horizontalSizeClass == .regular {
+            sidebarSelection = item
+            path = NavigationPath()
+        } else {
+            path = NavigationPath()
+            path.append(route)
         }
     }
 
@@ -125,53 +149,168 @@ struct HomeView: View {
     }
 
     var body: some View {
-        NavigationStack(path: $path) {
-            GeometryReader { geo in
-                // La LARGEUR réelle décide, pas `horizontalSizeClass` : ce
-                // dernier peut être `.compact` sur iPad selon le contexte
-                // (multitâche, mode fenêtré), et on veut deux zones dès qu'il y
-                // a la place (modes + panneau de 340 pt).
-                if geo.size.width >= 720 {
-                    iPadHome
-                } else {
-                    iPhoneHome
-                }
+        Group {
+            if horizontalSizeClass == .regular {
+                splitBody
+            } else {
+                stackBody
             }
-            .appBackground()
-            .scrollContentBackground(.hidden)
-            .background(engineInstanceMarker)
-            // Le titre système « ChessLab » (grand titre iOS brut) est
-            // remplacé par le header maison ``homeHeader`` dans le contenu :
-            // wordmark + pastille-logo, bien plus identitaire qu'un
-            // `navigationTitle`. La barre ne garde que le bouton Réglages,
-            // fond transparent.
-            .navigationTitle("")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbarBackground(.hidden, for: .navigationBar)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    HStack(spacing: 10) {
-                        toolbarCircleButton(
-                            "chart.bar.xaxis", label: "Progression",
-                            identifier: "openProgression"
-                        ) { path.append(Route.progression) }
-                        toolbarCircleButton(
-                            "gearshape.fill", label: "Réglages",
-                            identifier: "openSettings"
-                        ) { path.append(Route.settings) }
+        }
+        .onChange(of: menuCommands.requested) { _, destination in
+            guard let destination else { return }
+            menuCommands.requested = nil
+            open(destination)
+        }
+        .onAppear {
+            refreshResumableGame()
+            loadProgressSummary()
+            // Préchargement (ponctuel, au tout premier lancement) de la
+            // bibliothèque Lichess : lancé en TÂCHE DE FOND par le seeder —
+            // n'occupe jamais le fil principal.
+            PuzzleLibrarySeeder.seedIfNeeded(container: modelContext.container)
+        }
+    }
+
+    // MARK: Ossature iPhone (pile + grille)
+
+    /// iPhone (et iPad en multitâche étroit) : pile classique, grille de modes
+    /// en racine — le header maison remplace le grand titre système.
+    private var stackBody: some View {
+        NavigationStack(path: $path) {
+            iPhoneHome
+                .appBackground()
+                .scrollContentBackground(.hidden)
+                .background(engineInstanceMarker)
+                .navigationTitle("")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(.hidden, for: .navigationBar)
+                .toolbar {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        HStack(spacing: 10) {
+                            toolbarCircleButton(
+                                "chart.bar.xaxis", label: "Progression",
+                                identifier: "openProgression"
+                            ) { path.append(Route.progression) }
+                            toolbarCircleButton(
+                                "gearshape.fill", label: "Réglages",
+                                identifier: "openSettings"
+                            ) { path.append(Route.settings) }
+                        }
                     }
                 }
+                .navigationDestination(for: Route.self) { destination(for: $0) }
+        }
+    }
+
+    // MARK: Ossature iPad / Mac (barre latérale + détail)
+
+    /// iPad plein écran & Mac : barre latérale des modes (+ suivi) et une
+    /// colonne de détail qui enracine le mode choisi et empile son flux. La
+    /// grille de tuiles laisse place à une navigation persistante, mieux
+    /// adaptée au grand écran (Axe A de la roadmap v2).
+    private var splitBody: some View {
+        NavigationSplitView {
+            sidebar
+        } detail: {
+            NavigationStack(path: $path) {
+                detailRoot
+                    .appBackground()
+                    .scrollContentBackground(.hidden)
+                    .navigationDestination(for: Route.self) { destination(for: $0) }
             }
-            .onChange(of: menuCommands.requested) { _, destination in
-                guard let destination else { return }
-                menuCommands.requested = nil
-                open(destination)
+        }
+        .navigationSplitViewStyle(.balanced)
+    }
+
+    private var sidebar: some View {
+        List(selection: $sidebarSelection) {
+            Section("Modes") {
+                sidebarLabel(.vsEngine, "Contre l'ordinateur", "cpu", Theme.accent)
+                sidebarLabel(.twoPlayer, "Deux joueurs", "person.2.fill", Theme.info)
+                sidebarLabel(.puzzles, "Puzzles", "puzzlepiece.fill", Theme.violet)
+                sidebarLabel(.openings, "Ouvertures", "books.vertical.fill", Theme.warning)
+                sidebarLabel(.analysis, "Analyser", "chart.xyaxis.line", Theme.teal)
+                sidebarLabel(.laboratory, "Laboratoire", "flask", Theme.rose)
             }
-            .navigationDestination(for: Route.self) { route in
+            Section("Suivi") {
+                sidebarLabel(.progression, "Progression", "chart.bar.xaxis", Theme.accent)
+                sidebarLabel(.settings, "Réglages", "gearshape.fill", Theme.textSecondary)
+                sidebarLabel(.help, "Aide", "questionmark.circle", Theme.textSecondary)
+            }
+        }
+        .scrollContentBackground(.hidden)
+        .background(Theme.background)
+        .background(engineInstanceMarker)
+        .navigationTitle("ChessLab")
+        // Changer de mode repart d'un flux neuf (la pile de détail est vidée) :
+        // sélectionner « Puzzles » depuis une analyse ne doit pas laisser les
+        // écrans d'analyse empilés dessous.
+        .onChange(of: sidebarSelection) { _, _ in path = NavigationPath() }
+    }
+
+    private func sidebarLabel(
+        _ item: SidebarItem, _ title: LocalizedStringKey, _ icon: String, _ tint: Color
+    ) -> some View {
+        Label {
+            Text(title)
+        } icon: {
+            Image(systemName: icon).foregroundStyle(tint)
+        }
+        .tag(item)
+    }
+
+    /// Racine de la colonne de détail selon la sélection — réutilise le mapping
+    /// ``destination(for:)`` (l'écran d'entrée de chaque mode), ou le tableau de
+    /// bord d'accueil quand rien n'est sélectionné.
+    @ViewBuilder
+    private var detailRoot: some View {
+        switch sidebarSelection {
+        case .vsEngine: destination(for: .newGame)
+        case .twoPlayer: destination(for: .twoPlayerSetup)
+        case .puzzles: destination(for: .puzzleQueue)
+        case .openings: destination(for: .repertoireList)
+        case .analysis: destination(for: .analysisEntry)
+        case .laboratory: destination(for: .labSetup(startFEN: nil))
+        case .progression: destination(for: .progression)
+        case .settings: destination(for: .settings)
+        case .help: destination(for: .help)
+        case nil: iPadDashboard
+        }
+    }
+
+    /// Tableau de bord d'accueil (colonne de détail, aucune sélection) :
+    /// reprise, progression, parties récentes — borné en largeur pour rester
+    /// lisible sur un très grand écran.
+    private var iPadDashboard: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 22) {
+                homeHeader
+                if seedingState.isSeeding { seedingBanner }
+                if let resumableGame { resumeBanner(resumableGame) }
+                homeProgressCard
+                if !recentGames.isEmpty { recentGamesSection }
+            }
+            .padding(28)
+            .frame(maxWidth: 680, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .center)
+        }
+        .appBackground()
+        .scrollContentBackground(.hidden)
+    }
+
+    /// Mapping route → écran, PARTAGÉ par la pile iPhone et la colonne de
+    /// détail iPad/Mac (``NavigationSplitView``) : une seule source de vérité
+    /// pour la navigation, quelle que soit l'ossature.
+    @ViewBuilder
+    private func destination(for route: Route) -> some View {
                 switch route {
                 case .newGame:
                     NewGameSetupView { settings in
-                        path.removeLast()
+                        // Remplace l'écran de réglages par la partie. En pile
+                        // (iPhone) il est empilé ; en racine de détail (iPad) la
+                        // pile est vide — d'où la garde, sinon `removeLast`
+                        // plante sur une pile vide.
+                        if !path.isEmpty { path.removeLast() }
                         path.append(Route.activeGame(settings))
                     }
 
@@ -204,7 +343,7 @@ struct HomeView: View {
 
                 case .twoPlayerSetup:
                     TwoPlayerSetupView { settings in
-                        path.removeLast()
+                        if !path.isEmpty { path.removeLast() }
                         path.append(Route.activeTwoPlayerGame(settings))
                     }
 
@@ -336,16 +475,6 @@ struct HomeView: View {
                 case .licenses:
                     LicensesView()
                 }
-            }
-            .onAppear {
-                refreshResumableGame()
-                loadProgressSummary()
-                // Préchargement (ponctuel, au tout premier lancement) de la
-                // bibliothèque Lichess : lancé en TÂCHE DE FOND par le
-                // seeder — n'occupe jamais le fil principal.
-                PuzzleLibrarySeeder.seedIfNeeded(container: modelContext.container)
-            }
-        }
     }
 
     /// Réglages pour "Jouer / Continuer contre Stockfish depuis cette
@@ -405,29 +534,6 @@ struct HomeView: View {
                 if !recentGames.isEmpty { recentGamesSection }
             }
             .padding(20)
-        }
-    }
-
-    /// iPad : deux zones. À gauche les modes ; à droite un panneau de suivi
-    /// (reprise, progression, parties récentes) — sans quoi la moitié basse du
-    /// grand écran restait vide.
-    private var iPadHome: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
-                homeHeader
-                if seedingState.isSeeding { seedingBanner }
-                HStack(alignment: .top, spacing: 22) {
-                    modesSection(minTile: 200)
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
-                    VStack(spacing: 16) {
-                        if let resumableGame { resumeBanner(resumableGame) }
-                        homeProgressCard
-                        if !recentGames.isEmpty { recentGamesSection }
-                    }
-                    .frame(width: 340)
-                }
-            }
-            .padding(24)
         }
     }
 
