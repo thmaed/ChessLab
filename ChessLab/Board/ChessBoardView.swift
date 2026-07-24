@@ -47,6 +47,11 @@ struct ChessBoardView: View {
     var onRejectedAnimationEnd: () -> Void = {}
     let onTapSquare: (Square) -> Void
     let onDropPiece: (Square, Square) -> Void
+    /// Optionnel : taper une flèche de MEILLEUR coup (`.best`) la joue —
+    /// utilisé par l'Analyse pour explorer un candidat d'un geste. `nil`
+    /// ailleurs : les flèches restent alors décoratives (pas de capture de tap,
+    /// le plateau reste entièrement jouable au tap-tap).
+    var onTapArrow: ((HintMove) -> Void)? = nil
 
     /// Un essai raté à signaler. Le `id` (nonce fourni par le VM) garantit
     /// que deux essais identiques (mêmes cases) redéclenchent l'animation.
@@ -116,6 +121,11 @@ struct ChessBoardView: View {
                 }
 
                 ForEach(hintMoves.sorted { $0.rank > $1.rank }) { hint in
+                    // Seules les flèches de MEILLEUR coup sont cliquables, et
+                    // seulement si un handler est fourni : la menace (rouge) et
+                    // la flèche rétrospective restent décoratives, et partout
+                    // ailleurs le plateau garde son tap-tap intact.
+                    let tappable = onTapArrow != nil && hint.kind == .best
                     ArrowShape(
                         from: centerPoint(of: hint.from, squareSize: squareSize),
                         to: centerPoint(of: hint.to, squareSize: squareSize),
@@ -123,7 +133,8 @@ struct ChessBoardView: View {
                     )
                     .fill(hint.color)
                     .shadow(color: hint.color.opacity(0.6), radius: hint.rank == 1 ? 4 : 0)
-                    .allowsHitTesting(false)
+                    .allowsHitTesting(tappable)
+                    .onTapGesture { onTapArrow?(hint) }
                 }
 
                 if let rejectAnim, let piece = board.position.piece(at: rejectAnim.from) {

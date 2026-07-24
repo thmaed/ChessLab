@@ -43,6 +43,21 @@ final class AnalysisStepThroughUITests: XCTestCase {
         followBestLine(app, halfMoves: 4)
     }
 
+    /// Taper un coup candidat dans la liste le joue (exploration d'une variante,
+    /// pas seulement le meilleur).
+    @MainActor
+    func testPlayingACandidateFromTheList() throws {
+        let app = launchInAnalysis(fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1")
+        let moveCount = app.otherElements["analysisMoveCount"]
+        XCTAssertTrue(moveCount.waitForExistence(timeout: 5))
+
+        let candidate = app.buttons["candidate_1"]
+        XCTAssertTrue(candidate.waitForExistence(timeout: 15), "la liste des candidats doit apparaître")
+        candidate.tap()
+        XCTAssertTrue(waitForValue(moveCount, equals: "1", timeout: 10),
+                      "jouer un candidat doit avancer d'un demi-coup")
+    }
+
     // MARK: Helpers
 
     @MainActor

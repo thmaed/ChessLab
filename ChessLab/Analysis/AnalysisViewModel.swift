@@ -156,6 +156,28 @@ final class AnalysisViewModel {
     /// coup n'est calculé, et sur une position terminale (mat/pat : pas de pv).
     private(set) var bestLiveMoveLAN: String?
 
+    /// Un coup candidat de l'analyse en continu (jusqu'à 3, rang 1 = meilleur),
+    /// prêt pour la LISTE cliquable et les flèches cliquables : on peut jouer
+    /// n'importe lequel pour explorer sa variante, pas seulement le meilleur.
+    struct Candidate: Identifiable, Equatable {
+        let rank: Int
+        let from: Square
+        let to: Square
+        /// LAN complet (promotion comprise) — sert à jouer le coup.
+        let lan: String
+        /// Notation algébrique du coup dans la position affichée (« Cf3 »).
+        let san: String
+        /// Évaluation compacte APRÈS ce coup, point de vue des Blancs
+        /// (« +0,3 », « −1,2 », « M5 »).
+        let eval: String
+        var id: Int { rank }
+    }
+
+    /// Les coups candidats de la position affichée (analyse en continu, jusqu'à
+    /// 3). Vide en revue de partie (les flèches y viennent du cache) et sur une
+    /// position terminale.
+    private(set) var candidateMoves: [Candidate] = []
+
     /// File sérielle pour tout ce qui touche au moteur (analyse en continu,
     /// classification de fond) — même discipline que ``PlayViewModel``.
     private var engineQueue: Task<Void, Never> = Task {}
@@ -512,9 +534,54 @@ final class AnalysisViewModel {
     private func clearArrows() {
         hintMoves = []
         threatMove = nil
-        // Le meilleur coup vaut pour la position AFFICHÉE : une navigation le
-        // périme aussitôt, la nouvelle analyse le recalcule.
+        // Meilleur coup et candidats valent pour la position AFFICHÉE : une
+        // navigation les périme aussitôt, la nouvelle analyse les recalcule.
         bestLiveMoveLAN = nil
+        candidateMoves = []
+    }
+
+    /// Construit les coups candidats (SAN + éval POV Blancs) depuis les LAN et
+    /// scores par rang de l'analyse en continu.
+    private func buildCandidates(
+        lanByRank: [Int: String], scoreByRank: [Int: Double], mover: Piece.Color
+    ) -> [Candidate] {
+        (1...3).compactMap { rank -> Candidate? in
+            guard let lan = lanByRank[rank], lan.count >= 4,
+                  let score = scoreByRank[rank] else { return nil }
+            let from = Square(String(lan.prefix(2)))
+            let to = Square(String(lan.dropFirst(2).prefix(2)))
+            return Candidate(
+                rank: rank, from: from, to: to, lan: lan,
+                san: sanForLAN(lan) ?? SANFormatter.display("\(from.notation)\(to.notation)"),
+                eval: Self.evalLabel(score: score, moverIsWhite: mover == .white)
+            )
+        }
+    }
+
+    /// Notation algébrique d'un coup LAN dans la position AFFICHÉE — `nil` si le
+    /// coup n'y est pas jouable (candidat périmé).
+    private func sanForLAN(_ lan: String) -> String? {
+        guard lan.count >= 4 else { return nil }
+        let from = Square(String(lan.prefix(2)))
+        let to = Square(String(lan.dropFirst(2).prefix(2)))
+        var scratch = board
+        guard scratch.canMove(pieceAt: from, to: to),
+              let move = scratch.move(pieceAt: from, to: to) else { return nil }
+        return move.san
+    }
+
+    /// Éval compacte POV Blancs. `scoreByRank` est POV du TRAIT (convention
+    /// UCI) et encode un mat en ~±10 000 (voir la boucle live) : on repasse au
+    /// point de vue des Blancs puis on formate en pions ou en « M<n> ».
+    private static func evalLabel(score: Double, moverIsWhite: Bool) -> String {
+        let white = moverIsWhite ? score : -score
+        if abs(white) >= 9000 {
+            let mateIn = max(1, Int((10_000 - abs(white)).rounded()))
+            return white > 0 ? "M\(mateIn)" : "−M\(mateIn)"
+        }
+        let pawns = white / 100
+        let sign = pawns > 0 ? "+" : (pawns < 0 ? "−" : "")
+        return "\(sign)\(String(format: "%.1f", abs(pawns)))"
     }
 
     /// « Il fallait jouer ça » : le meilleur coup de la position PRÉCÉDENTE,
@@ -784,11 +851,29 @@ final class AnalysisViewModel {
     /// par défaut) : c'est le moteur qui choisit, on ne dérange pas
     /// l'utilisateur avec le sélecteur.
     func playBestMove() {
+        guard let lan = bestLiveMoveLAN else { return }
+        playMove(lan: lan)
+    }
+
+    /// Joue un coup candidat (liste ou flèche cliquable) pour explorer sa
+    /// variante — même mécanique que « Jouer le meilleur coup », coup au choix.
+    func playCandidate(_ candidate: Candidate) {
+        playMove(lan: candidate.lan)
+    }
+
+    /// Joue un coup désigné par son LAN et avance d'un demi-coup. Revalide
+    /// contre la position affichée (candidat périmé ignoré) et gère la
+    /// promotion depuis le LAN du moteur (5e caractère, dame par défaut).
+    private func playMove(lan: String) {
         stopAutoplay()
-        guard let lan = bestLiveMoveLAN, let squares = bestMoveSquares else { return }
+        guard lan.count >= 4 else { return }
+        let from = Square(String(lan.prefix(2)))
+        let to = Square(String(lan.dropFirst(2).prefix(2)))
+        guard board.position.piece(at: from)?.color == board.position.sideToMove,
+              board.canMove(pieceAt: from, to: to) else { return }
 
         var scratch = board
-        guard let move = scratch.move(pieceAt: squares.from, to: squares.to) else { return }
+        guard let move = scratch.move(pieceAt: from, to: to) else { return }
         clearSelection()
 
         if case .promotion = scratch.state {
@@ -915,6 +1000,7 @@ final class AnalysisViewModel {
                             // avec promotion — sert « Jouer le meilleur coup ».
                             if rank == 1 { self.bestLiveMoveLAN = firstMove }
                             self.hintMoves = HintMoveBuilder.build(lanByRank: lanByRank, scoreByRank: scoreByRank)
+                            self.candidateMoves = self.buildCandidates(lanByRank: lanByRank, scoreByRank: scoreByRank, mover: mover)
                         }
                     case .bestmove:
                         self.isLiveAnalyzing = false

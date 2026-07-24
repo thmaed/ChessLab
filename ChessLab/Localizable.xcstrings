@@ -4717,6 +4717,22 @@
         }
       }
     },
+    "Jouer %@, évaluation %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play %1$@, evaluation %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouer %1$@, évaluation %2$@"
+          }
+        }
+      }
+    },
     "Jouer à partir d'ici" : {
       "localizations" : {
         "en" : {
@@ -4827,6 +4843,9 @@
           }
         }
       }
+    },
+    "Jouez une partie ou résolvez des puzzles pour voir votre progression." : {
+
     },
     "Jouez, analysez, progressez." : {
       "localizations" : {
@@ -5833,6 +5852,9 @@
           }
         }
       }
+    },
+    "Meilleure victoire ~%lld Elo" : {
+
     },
     "Mexican Defense" : {
       "extractionState" : "stale",
@@ -9732,6 +9754,9 @@
           }
         }
       }
+    },
+    "V–N–D" : {
+
     },
     "Valencia Opening" : {
       "extractionState" : "stale",

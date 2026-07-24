@@ -140,6 +140,7 @@ struct AnalysisView: View {
                 VStack(spacing: 14) {
                     EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
                     navigationBar
+                    candidatesBar
                     coachBar
                 }
                 .padding(.horizontal, 16)
@@ -165,6 +166,7 @@ struct AnalysisView: View {
                         .frame(width: boardSide, height: boardSide)
                     EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
                     navigationBar
+                    candidatesBar
                     coachBar
                 }
                 .frame(width: boardSide)
@@ -203,7 +205,16 @@ struct AnalysisView: View {
                 showCoordinates: true,
                 draggableColor: viewModel.board.position.sideToMove,
                 onTapSquare: { viewModel.selectSquare($0) },
-                onDropPiece: { viewModel.attemptMove(from: $0, to: $1) }
+                onDropPiece: { viewModel.attemptMove(from: $0, to: $1) },
+                onTapArrow: { hint in
+                    // Taper une flèche candidate joue ce coup (LAN exact retrouvé
+                    // sur le candidat correspondant, promotion comprise).
+                    if let candidate = viewModel.candidateMoves.first(
+                        where: { $0.from == hint.from && $0.to == hint.to }
+                    ) {
+                        viewModel.playCandidate(candidate)
+                    }
+                }
             )
         }
     }
@@ -308,6 +319,48 @@ struct AnalysisView: View {
                         .font(.caption2)
                         .foregroundStyle(Theme.textTertiary)
                 }
+            }
+        }
+    }
+
+    /// Coups candidats de la position (analyse en continu) : les 3 meilleurs,
+    /// notation + éval, chacun cliquable pour jouer/explorer cette variante —
+    /// pas seulement le meilleur. Complète la flèche/le bouton « meilleur
+    /// coup » ; les flèches du plateau sont elles aussi cliquables.
+    @ViewBuilder
+    private var candidatesBar: some View {
+        if !viewModel.candidateMoves.isEmpty {
+            HStack(spacing: 8) {
+                ForEach(viewModel.candidateMoves) { candidate in
+                    Button {
+                        viewModel.playCandidate(candidate)
+                    } label: {
+                        HStack(spacing: 6) {
+                            Text(SANFormatter.display(candidate.san))
+                                .font(.subheadline.weight(candidate.rank == 1 ? .bold : .medium))
+                                .foregroundStyle(Theme.textPrimary)
+                            Text(candidate.eval)
+                                .font(.caption.monospacedDigit())
+                                .foregroundStyle(Theme.textSecondary)
+                        }
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 7)
+                        .background(
+                            candidate.rank == 1 ? AnyShapeStyle(Theme.accent.opacity(0.16)) : AnyShapeStyle(Theme.surface),
+                            in: Capsule()
+                        )
+                        .overlay(
+                            Capsule().strokeBorder(
+                                candidate.rank == 1 ? Theme.accent.opacity(0.5) : Theme.stroke,
+                                lineWidth: 1
+                            )
+                        )
+                    }
+                    .buttonStyle(.pressable)
+                    .accessibilityIdentifier("candidate_\(candidate.rank)")
+                    .accessibilityLabel(Text("Jouer \(SANFormatter.display(candidate.san)), évaluation \(candidate.eval)"))
+                }
+                Spacer(minLength: 0)
             }
         }
     }
