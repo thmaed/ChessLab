@@ -21,8 +21,8 @@ final class ThermalBadgeUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings", "-simulateThermalState", thermalState]
         app.launch()
 
-        XCTAssertTrue(app.buttons["Contre Stockfish"].waitForExistence(timeout: 5))
-        app.buttons["Contre Stockfish"].tap()
+        XCTAssertTrue(app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5))
+        app.buttons["Contre l'ordinateur"].tap()
         XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
         app.buttons["Commencer"].tap()
         XCTAssertTrue(app.otherElements["square_e2"].waitForExistence(timeout: 15))

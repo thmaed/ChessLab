@@ -24,8 +24,8 @@ final class TapToMoveUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["Contre Stockfish"].waitForExistence(timeout: 5))
-        app.buttons["Contre Stockfish"].tap()
+        XCTAssertTrue(app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5))
+        app.buttons["Contre l'ordinateur"].tap()
         XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
         app.buttons["Commencer"].tap()
         XCTAssertTrue(app.otherElements["square_e2"].waitForExistence(timeout: 15))
@@ -96,8 +96,8 @@ final class TapToCaptureUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["Contre Stockfish"].waitForExistence(timeout: 5))
-        app.buttons["Contre Stockfish"].tap()
+        XCTAssertTrue(app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5))
+        app.buttons["Contre l'ordinateur"].tap()
 
         // Position choisie pour qu'une capture soit disponible AU PREMIER coup
         // des Blancs : e4 prend d5. Sans FEN imposée, la réponse du moteur

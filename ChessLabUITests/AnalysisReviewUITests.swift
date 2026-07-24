@@ -17,7 +17,7 @@ final class AnalysisReviewUITests: XCTestCase {
         app.launch()
 
         // Jouer un coup puis abandonner : la plus courte partie analysable.
-        app.buttons["Contre Stockfish"].tap()
+        app.buttons["Contre l'ordinateur"].tap()
         XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
         app.buttons["Commencer"].tap()
         XCTAssertTrue(app.otherElements["square_e2"].waitForExistence(timeout: 15))
@@ -34,7 +34,7 @@ final class AnalysisReviewUITests: XCTestCase {
         confirm.tap()
         RunLoop.current.run(until: Date().addingTimeInterval(2))
 
-        while app.navigationBars.buttons.firstMatch.exists, !app.buttons["Contre Stockfish"].exists {
+        while app.navigationBars.buttons.firstMatch.exists, !app.buttons["Contre l'ordinateur"].exists {
             app.navigationBars.buttons.firstMatch.tap()
             RunLoop.current.run(until: Date().addingTimeInterval(0.4))
         }

@@ -43,7 +43,7 @@ final class AppStoreScreenshotUITests: XCTestCase {
         RunLoop.current.run(until: Date().addingTimeInterval(0.5))
         save(app.screenshot(), folder: folder, name: "01-accueil")
 
-        let playButtonLabel = appleLanguageCode == "fr" ? "Contre Stockfish" : "Against Stockfish"
+        let playButtonLabel = appleLanguageCode == "fr" ? "Contre l'ordinateur" : "Against the computer"
         let startButtonLabel = appleLanguageCode == "fr" ? "Commencer" : "Start"
         XCTAssertTrue(app.buttons[playButtonLabel].waitForExistence(timeout: 5))
         app.buttons[playButtonLabel].tap()

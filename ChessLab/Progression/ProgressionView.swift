@@ -47,7 +47,7 @@ struct ProgressionView: View {
     @ViewBuilder
     private func engineCard(_ summary: ProgressionSummary) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-            cardHeader("Contre Stockfish", systemImage: "cpu", tint: Theme.accent)
+            cardHeader("Contre l'ordinateur", systemImage: "cpu", tint: Theme.accent)
 
             HStack(spacing: 10) {
                 statTile("\(summary.engineWins)", "Victoires", tint: Theme.accent)

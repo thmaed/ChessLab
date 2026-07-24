@@ -23,7 +23,7 @@ final class HelpRouteUITests: XCTestCase {
 
         // Une carte de module apparaît.
         XCTAssertTrue(
-            app.staticTexts["Contre Stockfish"].waitForExistence(timeout: 5),
+            app.staticTexts["Contre l'ordinateur"].waitForExistence(timeout: 5),
             "l'aide doit décrire les modules"
         )
     }

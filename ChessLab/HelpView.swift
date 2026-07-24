@@ -18,7 +18,7 @@ struct HelpView: View {
     private let modules: [Module] = [
         .init(
             icon: "cpu", tint: Theme.accent,
-            title: "Contre Stockfish",
+            title: "Contre l'ordinateur",
             body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse."
         ),
         .init(

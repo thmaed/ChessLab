@@ -22,8 +22,8 @@ final class EngineRecoveryUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings", "-simulateEngineFailure", "1"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["Contre Stockfish"].waitForExistence(timeout: 5))
-        app.buttons["Contre Stockfish"].tap()
+        XCTAssertTrue(app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5))
+        app.buttons["Contre l'ordinateur"].tap()
         XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
         app.buttons["Commencer"].tap()
 

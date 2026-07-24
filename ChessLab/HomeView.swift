@@ -4,9 +4,9 @@ import SwiftUI
 
 /// Accueil : cartes de mode + reprise de la dernière activité.
 ///
-/// "Contre Stockfish", "Deux joueurs", "Analyser", "Ouvertures" et
+/// "Contre l'ordinateur", "Deux joueurs", "Analyser", "Ouvertures" et
 /// "Puzzles" sont actifs ; seul "Laboratoire" reste désactivé en
-/// attendant son tour. "Contre Stockfish"/"Deux joueurs" menaient à un
+/// attendant son tour. "Contre l'ordinateur"/"Deux joueurs" menaient à un
 /// écran de choix intermédiaire (``PlayModeChoiceView``) jusqu'à ce
 /// qu'un retour utilisateur le juge superflu — ce sont maintenant deux
 /// tuiles directes.
@@ -545,7 +545,7 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Modes")
             LazyVGrid(columns: [GridItem(.adaptive(minimum: minTile), spacing: 14)], spacing: 14) {
-                ModeCard(title: "Contre Stockfish", subtitle: "Force, cadence, aides", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
+                ModeCard(title: "Contre l'ordinateur", subtitle: "Force, cadence, aides", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
                     path.append(Route.newGame)
                 }
                 ModeCard(title: "Deux joueurs", subtitle: "Sur le même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true) {
@@ -804,7 +804,7 @@ struct HomeView: View {
     /// dans le modèle ; on les localise à l'affichage.
     private func recentGameTitle(_ game: GameRecord) -> String {
         if game.mode == .vsEngine {
-            return LocalizationController.string("Contre Stockfish")
+            return LocalizationController.string("Contre l'ordinateur")
         }
         let white = localizedPlayerName(game.whiteName) ?? LocalizationController.string("Blancs")
         let black = localizedPlayerName(game.blackName) ?? LocalizationController.string("Noirs")

@@ -51,7 +51,7 @@ final class EngineLeakUITests: XCTestCase {
 
     @MainActor
     private func visitPlay(_ app: XCUIApplication) throws {
-        app.buttons["Contre Stockfish"].tap()
+        app.buttons["Contre l'ordinateur"].tap()
         XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
         app.buttons["Commencer"].tap()
 
@@ -64,7 +64,7 @@ final class EngineLeakUITests: XCTestCase {
         RunLoop.current.run(until: Date().addingTimeInterval(4))
 
         app.navigationBars.buttons.firstMatch.tap()
-        XCTAssertTrue(app.buttons["Contre Stockfish"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 10))
     }
 
     @MainActor
@@ -103,7 +103,7 @@ final class EngineLeakUITests: XCTestCase {
         app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(app.buttons["Position FEN"].waitForExistence(timeout: 10))
         app.navigationBars.buttons.firstMatch.tap()
-        XCTAssertTrue(app.buttons["Contre Stockfish"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 10))
     }
 
     // MARK: Lecture du marqueur

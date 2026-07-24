@@ -27,8 +27,8 @@ final class ChessLabUITests: XCTestCase {
     @MainActor
     func testMoveWhileHintAnalyzingDoesNotDeadlock() throws {
         let app = launchApp()
-        _ = app.buttons["Contre Stockfish"].waitForExistence(timeout: 5)
-        app.buttons["Contre Stockfish"].tap()
+        _ = app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5)
+        app.buttons["Contre l'ordinateur"].tap()
         _ = app.buttons["Commencer"].waitForExistence(timeout: 5)
         app.buttons["Commencer"].tap()
 
@@ -63,8 +63,8 @@ final class ChessLabUITests: XCTestCase {
     @MainActor
     func testSettingsArePersistedBetweenGames() throws {
         var app = launchApp()
-        _ = app.buttons["Contre Stockfish"].waitForExistence(timeout: 5)
-        app.buttons["Contre Stockfish"].tap()
+        _ = app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5)
+        app.buttons["Contre l'ordinateur"].tap()
         _ = app.buttons["Commencer"].waitForExistence(timeout: 5)
         // La cadence se choisit en deux temps depuis le 18/07/2026 : la
         // famille, puis la cadence dans cette famille.
@@ -78,8 +78,8 @@ final class ChessLabUITests: XCTestCase {
         // Relance SANS l'argument de réinitialisation.
         app = XCUIApplication()
         app.launch()
-        _ = app.buttons["Contre Stockfish"].waitForExistence(timeout: 5)
-        app.buttons["Contre Stockfish"].tap()
+        _ = app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5)
+        app.buttons["Contre l'ordinateur"].tap()
         _ = app.buttons["Commencer"].waitForExistence(timeout: 5)
         XCTAssertTrue(app.buttons["3+2"].isSelected, "La cadence 3+2 choisie précédemment doit être mémorisée")
     }
@@ -88,7 +88,7 @@ final class ChessLabUITests: XCTestCase {
     func testPlayAGameMove() throws {
         let app = launchApp()
 
-        let vsEngineCard = app.buttons["Contre Stockfish"]
+        let vsEngineCard = app.buttons["Contre l'ordinateur"]
         XCTAssertTrue(vsEngineCard.waitForExistence(timeout: 5))
         vsEngineCard.tap()
 
@@ -137,8 +137,8 @@ final class ChessLabUITests: XCTestCase {
     @MainActor
     func testLayoutScreenshots() throws {
         let app = launchApp()
-        _ = app.buttons["Contre Stockfish"].waitForExistence(timeout: 5)
-        app.buttons["Contre Stockfish"].tap()
+        _ = app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5)
+        app.buttons["Contre l'ordinateur"].tap()
         _ = app.buttons["Commencer"].waitForExistence(timeout: 5)
 
         // Cadence "3+0" (blitz) + barre d'évaluation, pour vérifier

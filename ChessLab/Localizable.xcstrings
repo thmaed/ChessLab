@@ -1207,6 +1207,7 @@
       }
     },
     "Aucune" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2632,18 +2633,18 @@
         }
       }
     },
-    "Contre Stockfish" : {
+    "Contre l'ordinateur" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Against Stockfish"
+            "value" : "Against the computer"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Contre Stockfish"
+            "value" : "Contre l'ordinateur"
           }
         }
       }
@@ -7368,6 +7369,7 @@
       }
     },
     "Prise en passant" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
