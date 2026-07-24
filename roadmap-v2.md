@@ -1,0 +1,78 @@
+# ChessLab — Roadmap v2
+
+Analyse fraîche (24/07/2026), après suppression des anciens fichiers roadmap.
+Ancrée dans le code réel, pas générique.
+
+## État des lieux (vérifié dans le code)
+
+- **Plateformes** : iPhone + iPad + **Mac (Catalyst, macOS 15)** déjà actifs (`SUPPORTS_MACCATALYST = YES`, `TARGETED_DEVICE_FAMILY = "1,2"`). L'axe macOS est du **polissage**, pas de la création.
+- **Navigation** : `NavigationStack` partout, **`NavigationSplitView` = 0 fichier**. Layout « téléphone » agrandi, sans barre latérale — le plus gros gisement iPad/Mac.
+- **Adaptation grand écran inégale** : Play et Analyse s'adaptent (HStack, plateau borné) ; **Deux joueurs et Puzzles = 0 adaptation**.
+- **Offline intégral** : aucun `URLSession` dans tout le code. Puzzles Lichess **embarqués** (`lichess_puzzles.json`, CC0).
+- **iCloud** : `GameRecord`/`Puzzle` **CloudKit-ready**, synchro **désactivée** (stub `CloudSyncSettingsStore`, pas d'entitlement). Terrain prêt.
+- **Mac** : barre de menus + raccourcis **partiels** (⌘N, ⌘O, ⇧⌘P, ⌘,…).
+- **Modes existants** : Play vs Stockfish, Deux joueurs, Puzzles (Lichess + génération depuis parties), Ouvertures (répertoires PGN), Analyse (PGN/FEN/scan, classification, précision, courbe d'éval), Laboratoire (Elo A/B + IC), Scanner YOLO, Progression, éditeur de position.
+
+---
+
+## Axe A — Interface iPad (structurel, plus gros levier) 🔥
+
+| Item | Impact | Effort | Statut |
+|---|---|---|---|
+| **`NavigationSplitView`** (barre latérale modes → détail) comme ossature | Élevé | Moyen-élevé | ⏳ en cours |
+| Adapter **Deux joueurs & Puzzles** au grand écran (plateau + panneau latéral) | Élevé | Moyen | ⏳ |
+| Multi-colonnes Analyse (plateau + coups + courbe simultanés) | Moyen | Moyen | ⏳ |
+| Multi-fenêtres / Stage Manager (analyse en nouvelle fenêtre) | Moyen | Moyen | ⏳ |
+| Pointeur/trackpad : survol des cases, menus contextuels | Moyen | Faible | ⏳ |
+
+La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fondateur.
+
+## Axe B — Version macOS (polir le Catalyst existant)
+
+| Item | Impact | Effort |
+|---|---|---|
+| Compléter menus + raccourcis (nav coups ⌘←/→, retourner plateau, tous les modes) | Élevé | Faible |
+| Association `.pgn`/`.fen` (ouvrir depuis Finder/Files, glisser sur le Dock) | Élevé | Moyen |
+| Gestion de fenêtre (taille mini, restauration, une fenêtre par partie) | Moyen | Faible-moyen |
+| Export diagramme (image/PDF), impression feuille de partie | Moyen | Moyen |
+
+## Axe C — Fonctionnalités
+
+| Item | Impact | Effort | Offline |
+|---|---|---|---|
+| **Synchro iCloud optionnelle** (parties/puzzles/progression) | Élevé | Faible-moyen | Off par défaut, iCloud perso |
+| Tablebases Syzygy embarquées (3-4-5 pièces) | Élevé | Moyen-élevé | Bundle volumineux à arbitrer |
+| Bibliothèque de parties (recherche/filtre/tags, import PGN multi) | Élevé | Moyen | Oui |
+| Entraînement de répertoire (répétition espacée, sortie de répertoire) | Élevé | Moyen | Oui |
+| Puzzles approfondis (rating Glicko, streak, puzzle du jour, re-test) | Moyen-élevé | Moyen | Oui |
+| Annotations persistantes (commentaires, flèches, export PGN annoté) | Moyen | Moyen | Oui |
+| Widgets + App Intents/Siri (puzzle du jour, reprendre la partie) | Moyen | Faible-moyen | Oui |
+
+## Axe D — UX
+
+| Item | Impact | Effort |
+|---|---|---|
+| Thèmes de plateau & pièces (recycler les **71 jeux de pièces** du YOLO) | Élevé | Faible-moyen |
+| Prémouvements en Play | Élevé | Moyen |
+| Onboarding premier lancement | Moyen | Faible |
+| Flèches/cercles à main levée sur le plateau | Moyen | Moyen |
+| Accessibilité approfondie (VoiceOver plateau, daltonisme, Dynamic Type) | Moyen | Moyen |
+
+## Axe E — Fondations techniques (habilitantes)
+
+- **`NavigationSplitView`** : socle iPad/Mac (Axe A).
+- **Architecture document-based** pour les parties → active Files + multi-fenêtres + association fichiers.
+- **Limite moteur connue** : ChessKitEngine détourne le `stdout` global (un seul Stockfish par processus) → l'analyse multi-moteurs parallèle est **bloquée**. À documenter avant tout projet qui la suppose.
+
+---
+
+## Séquencement
+
+1. **Fondation** : `NavigationSplitView` + adapter Deux joueurs/Puzzles au grand écran.
+2. **Gains rapides** : menus/raccourcis Mac, thèmes plateau/pièces, synchro iCloud.
+3. **Différenciation** : bibliothèque de parties, entraînement de répertoire, tablebases.
+4. **Finitions** : widgets/App Intents, annotations, prémouvements, accessibilité.
+
+## Journal d'avancement
+
+- 24/07/2026 — Roadmap v2 créée. Démarrage Axe A (`NavigationSplitView` + fondations).
