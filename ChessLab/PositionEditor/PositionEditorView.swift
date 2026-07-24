@@ -121,7 +121,6 @@ struct PositionEditorView<Header: View>: View {
                 errorsBanner
                 sideToMoveSection
                 castlingSection
-                enPassantSection
                 fenSection
                 exitActions
             }
@@ -406,39 +405,6 @@ struct PositionEditorView<Header: View>: View {
                     ForEach(Array(castlings.enumerated()), id: \.offset) { _, row in
                         ChipButton(label: row.label, systemImage: nil, isSelected: row.isOn.wrappedValue) {
                             row.isOn.wrappedValue.toggle()
-                        }
-                    }
-                }
-                Spacer(minLength: 0)
-            }
-            .padding(.vertical, 4)
-        }
-    }
-
-    /// Prise en passant CONDENSÉE : une chip par colonne possible (+ « Aucune »).
-    /// Aucune prise possible → section masquée : c'est le cas le plus fréquent,
-    /// autant ne pas occuper l'écran avec un message « rien ici ».
-    @ViewBuilder
-    private var enPassantSection: some View {
-        let files = vm.availableEnPassantFiles
-        if !files.isEmpty {
-            HStack(spacing: 8) {
-                Text("Prise en passant")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Theme.textSecondary)
-                    .textCase(.uppercase)
-                    .tracking(0.4)
-                FlowLayout(spacing: 8, lineSpacing: 8) {
-                    ChipButton(label: "Aucune", systemImage: nil, isSelected: vm.enPassantFile == nil) {
-                        vm.enPassantFile = nil
-                    }
-                    ForEach(files, id: \.self) { file in
-                        ChipButton(
-                            label: "\(file.rawValue)\(vm.enPassantRank)",
-                            systemImage: nil,
-                            isSelected: vm.enPassantFile == file
-                        ) {
-                            vm.enPassantFile = file
                         }
                     }
                 }
