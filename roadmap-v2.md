@@ -89,6 +89,11 @@ La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fo
   - Toggle « Synchroniser via iCloud » dans Réglages (off par défaut, effet au prochain lancement). Modèles vérifiés CloudKit-compatibles.
   - Aide (module iCloud) + catalogue fr/en + doc App Store Connect (METADATA : réseau/confidentialité/export nuancés) + RELEASE_NOTES-1.1.0.
   - **⚠️ Reste à faire côté iCloud** : (1) provisionner le conteneur — automatique à la 1re compilation *device* via la signature d'équipe ; (2) **tester la synchro réelle sur 2 appareils** (non vérifiable en simulateur).
+- 24/07/2026 (soir) — **Correctifs après premier essai réel de la synchro** :
+  - Ajout du mode d'arrière-plan **`remote-notification`** (Info.plist à la racine, fusionné avec le plist généré) — SwiftData+CloudKit l'exige pour les push silencieux ; sans lui, faute « BUG IN CLIENT OF CLOUDKIT ». Corrigé, vérifié.
+  - **🔴 PROBLÈME DE CONCEPTION à traiter en priorité** : activer la synchro pousse **toute la bibliothèque de puzzles Lichess embarquée (~100k `Puzzle`)** vers l'iCloud de l'utilisateur → `CKError 429 Request Rate Limited`, iCloud rempli de données identiques sur chaque appareil. Cette bibliothèque ne doit JAMAIS être synchronisée ; seules les données UTILISATEUR (parties, et à terme la *progression* puzzle) le doivent.
+    - **Correctif visé** : sortir la bibliothèque embarquée du store synchronisé — soit deux `ModelConfiguration` (parties en CloudKit, `Puzzle` local-only), soit séparer « bibliothèque » (local) et « progression » (synchronisée). ATTENTION : changer la disposition du store demande une **migration** des `GameRecord` existants (sinon perte de données) — à concevoir soigneusement, pas dans la précipitation.
+    - **En attendant** : garder la synchro **désactivée** pour ne pas remplir l'iCloud de la bibliothèque de puzzles.
 
 ---
 
