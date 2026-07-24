@@ -41,18 +41,39 @@ struct BoardTheme: Identifiable, Equatable {
         coordinateColor: Color.black.opacity(0.45)
     )
 
-    static let slate = BoardTheme(
-        id: "slate",
-        label: "Ardoise",
-        lightSquare: Color(red: 0.80, green: 0.82, blue: 0.85),
-        darkSquare: Color(red: 0.35, green: 0.40, blue: 0.46),
-        lastMoveLight: Color(red: 0.55, green: 0.75, blue: 0.95).opacity(0.85),
-        lastMoveDark: Color(red: 0.25, green: 0.50, blue: 0.75).opacity(0.85),
+    /// L'autre standard universel, tonalité froide (proche du bleu Lichess).
+    static let blue = BoardTheme(
+        id: "blue",
+        label: "Bleu",
+        lightSquare: Color(red: 0.86, green: 0.89, blue: 0.92),
+        darkSquare: Color(red: 0.42, green: 0.55, blue: 0.69),
+        lastMoveLight: Color(red: 0.62, green: 0.82, blue: 0.96).opacity(0.85),
+        lastMoveDark: Color(red: 0.28, green: 0.52, blue: 0.78).opacity(0.85),
         checkColor: Color.red.opacity(0.75),
-        selectedColor: Color.orange.opacity(0.35),
+        selectedColor: Color.orange.opacity(0.38),
         legalDotColor: Color.black.opacity(0.28),
         coordinateColor: Color.black.opacity(0.45)
     )
 
-    static let all: [BoardTheme] = [.classic, .walnut, .slate]
+    /// Accessibilité : contraste de luminance renforcé entre les cases (utile
+    /// à tous, en particulier en basse vision) et surbrillances qui ne
+    /// reposent PAS sur la distinction rouge/vert (sûres pour le daltonisme) —
+    /// dernier coup en ambre, sélection en bleu vif.
+    static let contrast = BoardTheme(
+        id: "contrast",
+        label: "Contraste élevé",
+        lightSquare: Color(red: 0.96, green: 0.96, blue: 0.93),
+        darkSquare: Color(red: 0.20, green: 0.24, blue: 0.31),
+        lastMoveLight: Color(red: 0.99, green: 0.85, blue: 0.32).opacity(0.90),
+        lastMoveDark: Color(red: 0.85, green: 0.66, blue: 0.12).opacity(0.90),
+        checkColor: Color(red: 0.95, green: 0.24, blue: 0.30).opacity(0.85),
+        selectedColor: Color(red: 0.20, green: 0.55, blue: 0.98).opacity(0.45),
+        legalDotColor: Color(red: 0.45, green: 0.45, blue: 0.45).opacity(0.65),
+        coordinateColor: Color.black.opacity(0.55)
+    )
+
+    /// Volontairement COURT et curé : chaque thème a un rôle (vert familier,
+    /// bleu froid, bois chaleureux, contraste accessible) plutôt qu'« une
+    /// couleur de plus ». Chaque jeu de pièces doit rester lisible sur chacun.
+    static let all: [BoardTheme] = [.classic, .blue, .walnut, .contrast]
 }

@@ -20,6 +20,7 @@ struct SettingsView: View {
             VStack(alignment: .leading, spacing: 20) {
                 languageSection
                 boardThemeSection
+                pieceSetSection
                 notationSection
                 feedbackSection
                 syncSection
@@ -70,44 +71,93 @@ struct SettingsView: View {
         }
     }
 
+    /// Chaque thème est prévisualisé avec les pièces RÉELLES du jeu courant, sur
+    /// ses propres couleurs de cases : on voit le couple plateau + pièces, pas
+    /// juste une pastille de couleur.
     private var boardThemeSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Thème du plateau")
-            VStack(spacing: 10) {
-                ForEach(BoardTheme.all) { theme in
-                    Button {
-                        settings.boardThemeID = theme.id
-                    } label: {
-                        HStack(spacing: 12) {
-                            themeSwatch(theme)
-                            Text(LocalizedStringKey(theme.label))
-                                .font(.body.weight(.medium))
-                                .foregroundStyle(Theme.textPrimary)
-                            Spacer()
-                            if settings.boardThemeID == theme.id {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Theme.accent)
-                            }
-                        }
-                        .padding(.vertical, 6)
-                        .contentShape(Rectangle())
+            VStack(spacing: 8) {
+                ForEach(Array(BoardTheme.all.enumerated()), id: \.element.id) { index, theme in
+                    Button { settings.boardThemeID = theme.id } label: {
+                        selectableRow(
+                            preview: piecePreview(theme: theme, setPrefix: settings.pieceSet.assetPrefix),
+                            label: theme.label,
+                            isSelected: settings.boardThemeID == theme.id
+                        )
                     }
                     .buttonStyle(.plain)
+                    .accessibilityIdentifier("boardTheme_\(theme.id)")
+                    if index != BoardTheme.all.count - 1 { Divider().overlay(Theme.stroke) }
                 }
             }
             .cardStyle()
         }
     }
 
-    private func themeSwatch(_ theme: BoardTheme) -> some View {
-        HStack(spacing: 0) {
-            ForEach(0..<4, id: \.self) { i in
-                Rectangle().fill(i.isMultiple(of: 2) ? theme.lightSquare : theme.darkSquare)
+    /// Chaque jeu de pièces est prévisualisé avec ses pièces réelles, posées
+    /// sur le thème de plateau COURANT — trois styles curés (classique,
+    /// moderne, contrasté), tous sous licence libre (voir Licences).
+    private var pieceSetSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Jeu de pièces")
+            VStack(spacing: 8) {
+                ForEach(Array(PieceSet.all.enumerated()), id: \.element.id) { index, set in
+                    Button { settings.pieceSetID = set.id } label: {
+                        selectableRow(
+                            preview: piecePreview(theme: settings.boardTheme, setPrefix: set.assetPrefix),
+                            label: set.label,
+                            isSelected: settings.pieceSetID == set.id
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("pieceSet_\(set.id)")
+                    if index != PieceSet.all.count - 1 { Divider().overlay(Theme.stroke) }
+                }
+            }
+            .cardStyle()
+        }
+    }
+
+    /// Ligne commune aux deux sélecteurs : aperçu à gauche, libellé, coche.
+    private func selectableRow(preview: some View, label: String, isSelected: Bool) -> some View {
+        HStack(spacing: 14) {
+            preview
+            Text(LocalizedStringKey(label))
+                .font(.body.weight(.medium))
+                .foregroundStyle(Theme.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            Spacer()
+            if isSelected {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(Theme.accent)
             }
         }
-        .frame(width: 44, height: 22)
-        .clipShape(RoundedRectangle(cornerRadius: 5))
-        .overlay(RoundedRectangle(cornerRadius: 5).strokeBorder(Theme.stroke, lineWidth: 1))
+        .padding(.vertical, 6)
+        .contentShape(Rectangle())
+    }
+
+    /// Bandeau d'aperçu : quelques pièces réelles (`<prefix>_wK`…) posées sur
+    /// des cases alternées aux couleurs du thème. Charge directement les assets
+    /// (pas de `Piece` à construire) et sert plateau ET jeu de pièces.
+    private func piecePreview(theme: BoardTheme, setPrefix: String) -> some View {
+        let samples = ["wK", "wQ", "wN", "bK", "bQ", "bN"]
+        return HStack(spacing: 0) {
+            ForEach(Array(samples.enumerated()), id: \.offset) { i, name in
+                ZStack {
+                    Rectangle().fill(i.isMultiple(of: 2) ? theme.lightSquare : theme.darkSquare)
+                    Image("\(setPrefix)_\(name)")
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .padding(3)
+                        .shadow(color: .black.opacity(0.3), radius: 1, x: 0, y: 0.5)
+                }
+                .frame(width: 30, height: 30)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 7))
+        .overlay(RoundedRectangle(cornerRadius: 7).strokeBorder(Theme.stroke, lineWidth: 1))
     }
 
     private var feedbackSection: some View {

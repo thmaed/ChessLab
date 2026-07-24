@@ -16,6 +16,7 @@ final class AppSettings {
     private enum Keys {
         static let analysisArrowMode = "settings.analysisArrowMode"
         static let boardThemeID = "settings.boardThemeID"
+        static let pieceSetID = "settings.pieceSetID"
         static let soundsEnabled = "settings.soundsEnabled"
         static let hapticsEnabled = "settings.hapticsEnabled"
         static let pieceNotation = "settings.pieceNotation"
@@ -70,6 +71,11 @@ final class AppSettings {
         didSet { UserDefaults.standard.set(boardThemeID, forKey: Keys.boardThemeID) }
     }
 
+    /// Jeu de pièces affiché — global et persistant, comme le thème de plateau.
+    var pieceSetID: String {
+        didSet { UserDefaults.standard.set(pieceSetID, forKey: Keys.pieceSetID) }
+    }
+
     var soundsEnabled: Bool {
         didSet { UserDefaults.standard.set(soundsEnabled, forKey: Keys.soundsEnabled) }
     }
@@ -101,6 +107,7 @@ final class AppSettings {
     private init() {
         let defaults = UserDefaults.standard
         boardThemeID = defaults.string(forKey: Keys.boardThemeID) ?? BoardTheme.classic.id
+        pieceSetID = defaults.string(forKey: Keys.pieceSetID) ?? PieceSet.classic.id
         // `object(forKey:)` distingue « absent » (→ activé par défaut) de
         // « explicitement false ».
         soundsEnabled = (defaults.object(forKey: Keys.soundsEnabled) as? Bool) ?? true
@@ -123,5 +130,10 @@ final class AppSettings {
     /// inconnu, ex. thème retiré dans une future version).
     var boardTheme: BoardTheme {
         BoardTheme.all.first { $0.id == boardThemeID } ?? .classic
+    }
+
+    /// Jeu de pièces résolu (retombe sur le jeu classique si l'id est inconnu).
+    var pieceSet: PieceSet {
+        PieceSet.all.first { $0.id == pieceSetID } ?? .classic
     }
 }

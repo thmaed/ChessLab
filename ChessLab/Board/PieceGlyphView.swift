@@ -3,9 +3,10 @@ import SwiftUI
 
 /// Représentation visuelle d'une pièce.
 ///
-/// Set vectoriel "cburnett" (licence CC BY-SA 3.0, Colin M.L. Burnett —
-/// voir README pour l'attribution complète), embarqué en SVG dans
-/// `Assets.xcassets/Pieces`. Rendu net à toutes les tailles.
+/// Pièces vectorielles (SVG dans `Assets.xcassets/Pieces`), rendues nettes à
+/// toutes les tailles. Le JEU affiché suit ``AppSettings/pieceSet`` (défaut :
+/// cburnett, CC BY-SA 3.0) ; ``overrideSet`` force un jeu précis pour l'aperçu
+/// du sélecteur. Attributions dans ``LicensesView``.
 struct PieceGlyphView: View {
     let piece: Piece
     /// Contour optionnel : une silhouette de cette couleur, légèrement
@@ -13,6 +14,10 @@ struct PieceGlyphView: View {
     /// Utilisé pour les pièces NOIRES capturées, sinon invisibles sur le
     /// fond sombre du bandeau des prises.
     var outline: Color? = nil
+    /// Force un jeu de pièces (aperçu du sélecteur) ; sinon suit le réglage.
+    var overrideSet: PieceSet? = nil
+
+    @State private var appSettings = AppSettings.shared
 
     var body: some View {
         ZStack {
@@ -37,6 +42,7 @@ struct PieceGlyphView: View {
     }
 
     private var assetName: String {
+        let prefix = (overrideSet ?? appSettings.pieceSet).assetPrefix
         let color = piece.color == .white ? "w" : "b"
         let kind: String
         switch piece.kind {
@@ -47,6 +53,6 @@ struct PieceGlyphView: View {
         case .knight: kind = "N"
         case .pawn: kind = "P"
         }
-        return "piece_\(color)\(kind)"
+        return "\(prefix)_\(color)\(kind)"
     }
 }

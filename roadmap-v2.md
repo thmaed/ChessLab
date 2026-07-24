@@ -92,6 +92,12 @@ La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fo
 
 ---
 
+- 24/07/2026 — **Axe D entamé : thèmes de plateau & jeux de pièces**.
+  - Plateaux : 4 curés (Classique/vert, Bleu, Noyer/bois, Contraste élevé/accessibilité). « Ardoise » retiré (repli automatique sur Classique).
+  - Jeux de pièces : 3 (cburnett/Classique déjà là + maestro/Moderne + merida/Contrasté, SVG Lichess importés dans `Assets.xcassets/Pieces`). `PieceSet` + `AppSettings.pieceSetID` + `PieceGlyphView` paramétré.
+  - Réglages : sélecteurs avec **aperçu des vraies pièces** sur cases colorées (vérifié à l'écran). Attribution ajoutée dans LicensesView.
+  - **⚠️ AVANT PUBLICATION** : confirmer la licence EXACTE de `maestro` et `merida` dans `github.com/lichess-org/lila` → `public/piece/COPYING.md`, et compléter l'attribution auteur si nécessaire. L'app étant déjà GPLv3 (Stockfish), les jeux GPL/CC sont compatibles ; ne PAS ajouter de jeu à licence restrictive (surtout jamais les `cc_*` = chess.com).
+
 ## ⏸️ Pause — reprise prévue ~31/07/2026
 
 **Fait à ce jour** : Axe A complet (NavigationSplitView, renommage « Ordinateur », plateau bord à bord iPad, adaptation Deux joueurs/Puzzles, menus Mac) + Axe C entamé (synchro iCloud, à tester sur device).

@@ -49,6 +49,13 @@ struct LicensesView: View {
             url: URL(string: "https://commons.wikimedia.org/wiki/User:Cburnett")
         ),
         .init(
+            icon: "crown.fill", tint: Theme.warning,
+            name: "Jeux de pièces « maestro » et « merida »",
+            license: "Licences libres (Lichess)",
+            body: "Deux jeux de pièces vectorielles issus de la collection open source de Lichess, compatibles avec la licence GPLv3 de l'app.",
+            url: URL(string: "https://github.com/lichess-org/lila/tree/master/public/piece")
+        ),
+        .init(
             icon: "puzzlepiece.fill", tint: Theme.violet,
             name: "Base de puzzles Lichess",
             license: "Domaine public (CC0)",
