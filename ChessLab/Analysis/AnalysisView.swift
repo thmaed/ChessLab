@@ -257,7 +257,7 @@ struct AnalysisView: View {
         guard viewModel.isLiveAnalyzing, let depth = viewModel.liveDepth else {
             return String(localized: "Moteur en attente")
         }
-        return String(localized: "Stockfish calcule — \(depth) coups d'avance")
+        return String(localized: "L'ordinateur calcule — \(depth) coups d'avance")
     }
 
     @ViewBuilder
@@ -545,7 +545,7 @@ struct AnalysisView: View {
     private var engineUnavailableBanner: some View {
         if viewModel.isEngineUnavailable {
             EngineUnavailableBanner(
-                message: "Stockfish n'a pas démarré : ni évaluation ni classification. La partie reste navigable.",
+                message: "L'ordinateur n'a pas démarré : ni évaluation ni classification. La partie reste navigable.",
                 isRetrying: viewModel.isRetryingEngine
             ) {
                 viewModel.retryEngine()

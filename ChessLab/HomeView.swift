@@ -560,7 +560,7 @@ struct HomeView: View {
                 ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true) {
                     path.append(Route.analysisEntry)
                 }
-                ModeCard(title: "Laboratoire", subtitle: "Stockfish vs Stockfish", systemImage: "flask", tint: Theme.rose, isEnabled: true) {
+                ModeCard(title: "Laboratoire", subtitle: "L'ordinateur contre lui-même", systemImage: "flask", tint: Theme.rose, isEnabled: true) {
                     path.append(Route.labSetup(startFEN: nil))
                 }
             }
@@ -819,6 +819,9 @@ struct HomeView: View {
         case "Vous": return LocalizationController.string("Vous")
         case "Blancs": return LocalizationController.string("Blancs")
         case "Noirs": return LocalizationController.string("Noirs")
+        // « Stockfish » : nom stocké par les parties antérieures au renommage —
+        // affiché « Ordinateur » comme les nouvelles, pour l'uniformité.
+        case "Ordinateur", "Stockfish": return LocalizationController.string("Ordinateur")
         default: return stored
         }
     }

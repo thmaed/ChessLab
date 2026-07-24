@@ -949,7 +949,7 @@ final class PlayViewModel {
     /// pas la pièce bouger, il faut lui dire ce que l'adversaire a joué.
     private func announceMove(_ move: Move) {
         guard UIAccessibility.isVoiceOverRunning else { return }
-        let who = move.piece.color == engineColor ? "Stockfish" : "Vous"
+        let who = move.piece.color == engineColor ? "Ordinateur" : "Vous"
         UIAccessibility.post(
             notification: .announcement,
             argument: "\(who) : \(MoveNarration.describe(san: move.san))"

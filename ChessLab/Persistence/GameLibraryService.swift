@@ -19,8 +19,8 @@ enum GameLibraryService {
         record.pgn = PGNExport.pgn(for: game)
         record.resultRaw = outcome.pgnResult
         record.outcomeReasonRaw = outcome.reason.storageLabel
-        record.whiteName = userColor == .white ? "Vous" : "Stockfish"
-        record.blackName = userColor == .black ? "Vous" : "Stockfish"
+        record.whiteName = userColor == .white ? "Vous" : "Ordinateur"
+        record.blackName = userColor == .black ? "Vous" : "Ordinateur"
         record.engineColorRaw = engineColor.rawValue
         record.engineEloApprox = Int(strength.sliderValue)
         record.moveCount = GameRecord.plyCount(of: game)

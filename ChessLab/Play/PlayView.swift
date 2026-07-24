@@ -292,7 +292,7 @@ struct PlayView: View {
         let opponent = viewModel.userColor.opposite
         let captured = viewModel.capturedMaterial
         return PlayerRowView(
-            name: "Stockfish",
+            name: "Ordinateur",
             color: opponent,
             isActive: viewModel.outcome == nil && viewModel.board.position.sideToMove == opponent,
             captured: captured.captures(by: opponent),
@@ -453,7 +453,7 @@ struct PlayView: View {
     private var engineUnavailableBanner: some View {
         if viewModel.isEngineUnavailable {
             EngineUnavailableBanner(
-                message: "Stockfish n'a pas démarré : il ne jouera pas.",
+                message: "L'ordinateur n'a pas démarré : il ne jouera pas.",
                 isRetrying: viewModel.isRetryingEngine
             ) {
                 viewModel.retryEngine()

@@ -239,7 +239,7 @@ struct NewGameSetupView: View {
                         ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled)
                         ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled)
                         ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar)
-                        ToggleRow(label: "Stockfish peut abandonner s'il est perdu", isOn: $engineResignationEnabled)
+                        ToggleRow(label: "L'ordinateur peut abandonner s'il est perdu", isOn: $engineResignationEnabled)
                         Text(effectiveTimeControl.hasClock ? "Reprise de coup indisponible avec pendule." : "Parcourez la partie avec la barre sous le plateau ; sans pendule, « Reprendre ici » relance depuis le coup consulté.")
                             .font(.caption)
                             .foregroundStyle(Theme.textTertiary)

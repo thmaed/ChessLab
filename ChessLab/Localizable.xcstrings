@@ -2601,18 +2601,18 @@
         }
       }
     },
-    "Continuer contre Stockfish depuis ici" : {
+    "Continuer contre l'ordinateur depuis ici" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continue against Stockfish from here"
+            "value" : "Continue against the computer from here"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Continuer contre Stockfish depuis ici"
+            "value" : "Continuer contre l'ordinateur depuis ici"
           }
         }
       }
@@ -4835,12 +4835,12 @@
         }
       }
     },
-    "Jouez une partie contre Stockfish ou résolvez quelques puzzles : votre progression apparaîtra ici." : {
+    "Jouez une partie contre l'ordinateur ou résolvez quelques puzzles : votre progression apparaîtra ici." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Play a game against Stockfish or solve a few puzzles: your progress will appear here."
+            "value" : "Play a game against the computer or solve a few puzzles: your progress will appear here."
           }
         }
       }
@@ -9057,37 +9057,66 @@
         }
       }
     },
-    "Stockfish calcule — %lld coups d'avance" : {
-
-    },
-    "Stockfish peut abandonner s'il est perdu" : {
+    "Ordinateur" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stockfish may resign when losing"
+            "value" : "Computer"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stockfish peut abandonner s'il est perdu"
+            "value" : "Ordinateur"
           }
         }
       }
     },
-    "Stockfish vs Stockfish" : {
+    "L'ordinateur calcule — %lld coups d'avance" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stockfish vs Stockfish"
+            "value" : "The computer is calculating — %lld moves ahead"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stockfish vs Stockfish"
+            "value" : "L'ordinateur calcule — %lld coups d'avance"
+          }
+        }
+      }
+    },
+    "L'ordinateur peut abandonner s'il est perdu" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The computer may resign when losing"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'ordinateur peut abandonner s'il est perdu"
+          }
+        }
+      }
+    },
+    "L'ordinateur contre lui-même" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The computer against itself"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'ordinateur contre lui-même"
           }
         }
       }

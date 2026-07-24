@@ -27,8 +27,8 @@ struct ProgressionSummaryTests {
         record.modeRaw = GameRecordMode.vsEngine.rawValue
         record.resultRaw = result
         record.engineColorRaw = userColor.opposite.rawValue
-        record.whiteName = userColor == .white ? "Vous" : "Stockfish"
-        record.blackName = userColor == .black ? "Vous" : "Stockfish"
+        record.whiteName = userColor == .white ? "Vous" : "Ordinateur"
+        record.blackName = userColor == .black ? "Vous" : "Ordinateur"
         record.engineEloApprox = elo
         return record
     }

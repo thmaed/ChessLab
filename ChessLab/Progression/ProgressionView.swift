@@ -228,7 +228,7 @@ struct ProgressionView: View {
             Text("Rien à afficher pour l'instant")
                 .font(.headline)
                 .foregroundStyle(Theme.textPrimary)
-            Text("Jouez une partie contre Stockfish ou résolvez quelques puzzles : votre progression apparaîtra ici.")
+            Text("Jouez une partie contre l'ordinateur ou résolvez quelques puzzles : votre progression apparaîtra ici.")
                 .font(.subheadline)
                 .foregroundStyle(Theme.textSecondary)
                 .multilineTextAlignment(.center)

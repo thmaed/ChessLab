@@ -184,7 +184,7 @@ struct OpeningLineTrainingView: View {
                 // vraie partie) : capsule teintée violet + icône moteur, à ne
                 // pas confondre avec le vert « Rejouer » du haut.
                 Button { onContinueVsStockfish(resultingFEN) } label: {
-                    Label("Continuer contre Stockfish depuis ici", systemImage: "cpu")
+                    Label("Continuer contre l'ordinateur depuis ici", systemImage: "cpu")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Theme.violet)
                         .lineLimit(1)
