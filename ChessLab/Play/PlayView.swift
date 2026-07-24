@@ -157,6 +157,11 @@ struct PlayView: View {
             ThermalBadge()
             topClock
             board
+                // BORD À BORD : annule la marge horizontale du conteneur pour
+                // le seul plateau (même principe qu'en iPhone), qui touche
+                // alors les deux bords de l'écran — chaque point de largeur est
+                // un point sur les 64 cases.
+                .padding(.horizontal, -20)
                 // Le plateau se sert en PREMIER, la liste prend ce qui reste.
                 // Sans cette priorité, deux vues gourmandes en hauteur (le
                 // plateau et le défilement des coups) se partagent l'espace à
@@ -200,29 +205,33 @@ struct PlayView: View {
     /// autrement il dépasse l'écran et pousse pendules et contrôles sous le
     /// pli (finding #6, déjà corrigé une fois).
     private func iPadWideLayout(size: CGSize) -> some View {
-        HStack(alignment: .top, spacing: 24) {
-            VStack(spacing: 10) {
+        HStack(alignment: .center, spacing: 0) {
+            // Colonne plateau, BORD À BORD : elle touche les bords haut, bas et
+            // gauche de l'écran ; seules les fines lignes joueurs le bordent.
+            // C'est le seul élément dont chaque point de taille compte (64
+            // cases), d'où la marge réduite au strict minimum, contrairement à
+            // la colonne de droite qui reste un panneau confortablement margé.
+            VStack(spacing: 6) {
                 ThermalBadge()
                 topClock
                 board
-                    // Même principe qu'en portrait : le plateau se sert en
-                    // premier et prend toute la hauteur laissée par les
-                    // pendules. Aucune constante à deviner ici — l'ancienne
-                    // version soustrayait une hauteur de « chrome » estimée à
-                    // la main, qui bornait le plateau à 58 % de la largeur.
+                    // Le plateau se sert en premier et prend toute la hauteur
+                    // laissée par les pendules.
                     .layoutPriority(1)
                 bottomClock
-                if viewModel.settings.showEvalBar {
-                    EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
-                }
             }
-            // Le plateau étant carré, il ne dépassera jamais la hauteur
-            // disponible : inutile d'offrir à cette colonne plus de largeur
-            // que ça, autant la donner au panneau de droite.
-            .frame(maxWidth: size.height)
+            // Carré, donc borné à la hauteur : au-delà il déborderait
+            // verticalement. Toute la largeur restante va au panneau de droite.
+            .frame(maxWidth: size.height, maxHeight: .infinity)
+            .padding(.vertical, 6)
 
+            // Colonne droite : barre d'éval (sortie de la colonne plateau pour
+            // lui rendre sa hauteur), actions, transport et liste des coups.
             ScrollView {
                 VStack(spacing: 16) {
+                    if viewModel.settings.showEvalBar {
+                        EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
+                    }
                     if viewModel.outcome == nil {
                         actionBar(showMoveList: false)
                     } else {
@@ -232,9 +241,9 @@ struct PlayView: View {
                     movesSection
                 }
                 .frame(maxWidth: .infinity)
+                .padding(20)
             }
         }
-        .padding(24)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
