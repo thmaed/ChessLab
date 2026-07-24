@@ -82,24 +82,42 @@ struct ChessLabApp: App {
     /// dans cet environnement. Voir PROGRESS.md.
     private static func makeModelContainer() -> ModelContainer {
         let schema = Schema([GameRecord.self, Puzzle.self])
-        let configuration = ModelConfiguration(
-            schema: schema,
+
+        // Deux stores SÉPARÉS, et non un seul :
+        // - « Games » (parties de l'utilisateur) : synchronisable via iCloud.
+        // - « Puzzles » (bibliothèque Lichess EMBARQUÉE + progression) :
+        //   local-only, JAMAIS synchronisé. Dans un store commun, activer
+        //   CloudKit poussait les ~100 000 puzzles embarqués — identiques sur
+        //   chaque appareil — vers l'iCloud de l'utilisateur (CKError 429,
+        //   throttling, quota gaspillé). `GameRecord` et `Puzzle` sont
+        //   indépendants (aucune relation croisée), la séparation est valide.
+        //   La bibliothèque se re-seed depuis le bundle si le store est neuf.
+        let gamesConfig = ModelConfiguration(
+            "Games",
+            schema: Schema([GameRecord.self]),
             isStoredInMemoryOnly: false,
             cloudKitDatabase: CloudSyncSettingsStore.isEnabled ? .automatic : .none
         )
+        let puzzlesConfig = ModelConfiguration(
+            "Puzzles",
+            schema: Schema([Puzzle.self]),
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .none
+        )
+        let configurations = [gamesConfig, puzzlesConfig]
 
         // 1) Tentative normale.
-        if let container = try? ModelContainer(for: schema, configurations: [configuration]) {
+        if let container = try? ModelContainer(for: schema, configurations: configurations) {
             return container
         }
         // 2) Store local illisible (migration interrompue, corruption, disque
         //    plein) : plutôt qu'une boucle de crash définitive au lancement,
-        //    on détruit et on recrée le store local. Les données critiques
+        //    on détruit et on recrée les stores locaux. Les données critiques
         //    (parties en cours) vivent dans les autosaves JSON ; la
         //    bibliothèque de puzzles se re-seed ; seuls GameRecord /
         //    répertoires / progression SRS seraient perdus.
         destroyLocalStore()
-        if let container = try? ModelContainer(for: schema, configurations: [configuration]) {
+        if let container = try? ModelContainer(for: schema, configurations: configurations) {
             return container
         }
         // 3) Dernier recours : conteneur en mémoire — session dégradée
@@ -112,15 +130,19 @@ struct ChessLabApp: App {
         }
     }
 
-    /// Supprime les fichiers du store SwiftData local (le nom par défaut est
-    /// `default.store`, plus ses journaux WAL/SHM).
+    /// Supprime les fichiers des stores SwiftData locaux (les deux stores
+    /// nommés « Games »/« Puzzles », plus leurs journaux WAL/SHM). L'ancien
+    /// store combiné « default » est aussi purgé : orphelin depuis la
+    /// séparation, il ne sert plus à rien.
     private static func destroyLocalStore() {
         let fileManager = FileManager.default
         guard let appSupport = try? fileManager.url(
             for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false
         ) else { return }
-        for name in ["default.store", "default.store-shm", "default.store-wal"] {
-            try? fileManager.removeItem(at: appSupport.appendingPathComponent(name))
+        for base in ["Games.store", "Puzzles.store", "default.store"] {
+            for suffix in ["", "-shm", "-wal"] {
+                try? fileManager.removeItem(at: appSupport.appendingPathComponent(base + suffix))
+            }
         }
     }
 }

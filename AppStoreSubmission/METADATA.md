@@ -76,10 +76,10 @@ CONÇU POUR IPAD
 MultiPV), clavier et trackpad pris en charge, portrait et paysage soignés.
 
 SYNCHRONISATION iCLOUD (optionnelle)
-Activez la synchronisation iCloud dans les Réglages pour que vos parties,
-puzzles et progression suivent tous vos appareils, via votre iCloud privé.
-Aucun compte à créer, aucun serveur ChessLab. Désactivée par défaut :
-l'app fonctionne entièrement hors ligne.
+Activez la synchronisation iCloud dans les Réglages pour que vos parties
+suivent tous vos appareils, via votre iCloud privé. Aucun compte à créer,
+aucun serveur ChessLab. Désactivée par défaut : l'app fonctionne
+entièrement hors ligne.
 
 VIE PRIVÉE
 Hors ligne par défaut : aucun serveur ChessLab, aucune mesure d'audience,
@@ -163,9 +163,9 @@ Full-size board with move list, graph and MultiPV visible at once, keyboard
 and trackpad support, polished portrait and landscape layouts.
 
 iCLOUD SYNC (optional)
-Turn on iCloud sync in Settings so your games, puzzles and progress follow
-you across all your devices, via your private iCloud. No account to create,
-no ChessLab server. Off by default: the app works fully offline.
+Turn on iCloud sync in Settings so your games follow you across all your
+devices, via your private iCloud. No account to create, no ChessLab server.
+Off by default: the app works fully offline.
 
 PRIVACY
 Offline by default: no ChessLab server, no analytics, no ads. Your games
@@ -292,9 +292,9 @@ recognition pipeline.
 NETWORK: ChessLab has no first-party or third-party backend — no ChessLab
 server, no API, no analytics, no ads. The ONLY network activity is an
 optional iCloud sync, which is OFF by default. When a user turns it on
-(Settings → Sync), SwiftData/CloudKit syncs their games, puzzles and
-progress through the user's OWN private iCloud database (CloudKit private
-database). No data is shared with the developer, so the App Privacy answer
+(Settings → Sync), SwiftData/CloudKit syncs their games through the user's
+OWN private iCloud database (CloudKit private database). The bundled puzzle
+library stays local (never synced). No data is shared with the developer, so the App Privacy answer
 remains "Data Not Collected". With sync disabled — the default — the app
 makes no network calls at all.
 

@@ -189,7 +189,7 @@ struct SettingsView: View {
                 Toggle("Synchroniser via iCloud", isOn: $cloudSyncEnabled)
                     .tint(Theme.accent)
                     .foregroundStyle(Theme.textPrimary)
-                Text("Vos parties, puzzles et progression suivent vos appareils via votre iCloud privé. Désactivée par défaut ; l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement.")
+                Text("Vos parties suivent tous vos appareils via votre iCloud privé. Désactivée par défaut ; l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)

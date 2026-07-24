@@ -630,6 +630,22 @@
         }
       }
     },
+    "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn it on in Settings so your games follow you across all your devices via your private iCloud — no account to create, no third-party server. Off by default: the app works fully offline. Changes take effect on next launch."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement."
+          }
+        }
+      }
+    },
     "Aide" : {
       "localizations" : {
         "en" : {
@@ -1754,6 +1770,22 @@
         }
       }
     },
+    "Bleu" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blue"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bleu"
+          }
+        }
+      }
+    },
     "Blumenfeld Countergambit" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2320,86 +2352,6 @@
         }
       }
     },
-    "Bleu" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Blue"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bleu"
-          }
-        }
-      }
-    },
-    "Contraste élevé" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "High contrast"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Contraste élevé"
-          }
-        }
-      }
-    },
-    "Contrasté" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bold"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Contrasté"
-          }
-        }
-      }
-    },
-    "Jeu de pièces" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Piece set"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jeu de pièces"
-          }
-        }
-      }
-    },
-    "Moderne" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modern"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moderne"
-          }
-        }
-      }
-    },
     "Classiques" : {
       "localizations" : {
         "en" : {
@@ -2709,6 +2661,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Continuer la partie"
+          }
+        }
+      }
+    },
+    "Contrasté" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bold"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contrasté"
+          }
+        }
+      }
+    },
+    "Contraste élevé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "High contrast"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contraste élevé"
           }
         }
       }
@@ -3158,6 +3142,9 @@
       }
     },
     "Dernière partie" : {
+
+    },
+    "Deux jeux de pièces vectorielles issus de la collection open source de Lichess, compatibles avec la licence GPLv3 de l'app." : {
 
     },
     "Deux joueurs" : {
@@ -4766,6 +4753,22 @@
         }
       }
     },
+    "Jeu de pièces" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Piece set"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeu de pièces"
+          }
+        }
+      }
+    },
     "Jeu de pièces vectorielles par Colin M. L. Burnett, le même que Wikipédia et Lichess. Attribution requise, partage dans les mêmes conditions." : {
       "localizations" : {
         "en" : {
@@ -4781,6 +4784,9 @@
           }
         }
       }
+    },
+    "Jeux de pièces « maestro » et « merida »" : {
+
     },
     "Jouer" : {
       "localizations" : {
@@ -5335,38 +5341,6 @@
         }
       }
     },
-    "Synchronisation iCloud" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "iCloud Sync"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Synchronisation iCloud"
-          }
-        }
-      }
-    },
-    "Activez-la dans les Réglages pour que vos parties, puzzles et progression suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Turn it on in Settings so your games, puzzles and progress follow you across all your devices via your private iCloud — no account to create, no third-party server. Off by default: the app works fully offline. Changes take effect on next launch."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Activez-la dans les Réglages pour que vos parties, puzzles et progression suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement."
-          }
-        }
-      }
-    },
     "Langue du système" : {
       "localizations" : {
         "en" : {
@@ -5739,6 +5713,9 @@
           }
         }
       }
+    },
+    "Licences libres (Lichess)" : {
+
     },
     "Lien ou identifiant d'une étude publique" : {
       "extractionState" : "stale",
@@ -6130,6 +6107,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Défense moderne"
+          }
+        }
+      }
+    },
+    "Moderne" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modern"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moderne"
           }
         }
       }
@@ -9233,54 +9226,6 @@
         }
       }
     },
-    "Synchronisation" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sync"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Synchronisation"
-          }
-        }
-      }
-    },
-    "Synchroniser via iCloud" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sync via iCloud"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Synchroniser via iCloud"
-          }
-        }
-      }
-    },
-    "Vos parties, puzzles et progression suivent vos appareils via votre iCloud privé. Désactivée par défaut ; l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your games, puzzles and progress follow you across devices via your private iCloud. Off by default; the app works fully offline. Changes take effect on next launch."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vos parties, puzzles et progression suivent vos appareils via votre iCloud privé. Désactivée par défaut ; l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement."
-          }
-        }
-      }
-    },
     "Stockfish, ChessKit, pièces, puzzles." : {
       "localizations" : {
         "en" : {
@@ -9344,6 +9289,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sur le même appareil"
+          }
+        }
+      }
+    },
+    "Synchronisation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation"
+          }
+        }
+      }
+    },
+    "Synchronisation iCloud" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud Sync"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchronisation iCloud"
+          }
+        }
+      }
+    },
+    "Synchroniser via iCloud" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync via iCloud"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Synchroniser via iCloud"
           }
         }
       }
@@ -10139,6 +10132,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voir tout"
+          }
+        }
+      }
+    },
+    "Vos parties suivent tous vos appareils via votre iCloud privé. Désactivée par défaut ; l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your games follow you across all your devices via your private iCloud. Off by default; the app works fully offline. Changes take effect on next launch."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos parties suivent tous vos appareils via votre iCloud privé. Désactivée par défaut ; l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement."
           }
         }
       }
