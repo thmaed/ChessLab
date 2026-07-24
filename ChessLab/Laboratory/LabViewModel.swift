@@ -16,6 +16,15 @@ import os
 final class LabViewModel {
     private static let watchdogLogger = Logger(subsystem: "ChessLab", category: "engine-watchdog")
 
+    #if DEBUG
+    /// Audit du décompte : une ligne par partie terminée (résultat, raison,
+    /// couleur de A, éval finale POV blancs) + un AVERTISSEMENT si le résultat
+    /// contredit l'éval finale. Le Labo n'affiche que des stats agrégées ;
+    /// impossible sinon de vérifier après coup qu'un gain des blancs est bien
+    /// crédité aux blancs, la série enchaînant trop vite pour l'œil.
+    private static let resultLogger = Logger(subsystem: "ChessLab", category: "lab-results")
+    #endif
+
     let settings: LabGameSettings
 
     /// Plateau de la partie en cours (affiché en direct).
@@ -300,6 +309,27 @@ final class LabViewModel {
         // atteint : vraie nulle « partie trop longue » (à distinguer d'un
         // raté moteur, déjà renvoyé en `.interrupted` plus haut).
         let finalEnd = end ?? GameEnd(pgnResult: "1/2-1/2", reasonLabel: "Partie trop longue")
+
+        #if DEBUG
+        // Audit du décompte. `finalWhiteEval` est POV blancs (la même échelle
+        // que la barre). Sur une fin DÉCISIVE, résultat et éval finale sont
+        // posés au même demi-coup et doivent avoir le même signe : un « 1-0 »
+        // (blancs) avec une éval finale nettement négative — ou l'inverse —
+        // serait l'inversion suspectée (« barre blanche mais point aux noirs »).
+        let finalWhiteEval = whiteEvalHistory.last ?? 0
+        Self.resultLogger.debug(
+            "Partie \(gameIndex, privacy: .public) → \(finalEnd.pgnResult, privacy: .public) (\(finalEnd.reasonLabel, privacy: .public)) | A=\(aWhite ? "Blancs" : "Noirs", privacy: .public) | éval finale blancs=\(finalWhiteEval, privacy: .public)"
+        )
+        let resultsContradictEval =
+            (finalEnd.pgnResult == "1-0" && finalWhiteEval <= -200)
+            || (finalEnd.pgnResult == "0-1" && finalWhiteEval >= 200)
+        if resultsContradictEval {
+            Self.resultLogger.warning(
+                "⚠️ INCOHÉRENCE décompte : résultat \(finalEnd.pgnResult, privacy: .public) mais éval finale blancs=\(finalWhiteEval, privacy: .public)"
+            )
+        }
+        #endif
+
         completed.append(
             LabCompletedGame(
                 index: gameIndex,
