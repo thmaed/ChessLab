@@ -76,3 +76,9 @@ La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fo
 ## Journal d'avancement
 
 - 24/07/2026 — Roadmap v2 créée. Démarrage Axe A (`NavigationSplitView` + fondations).
+- 24/07/2026 — **Axe A, socle livré** :
+  - `NavigationSplitView` iPad/Mac (barre latérale + détail), iPhone garde sa grille en pile. Chemin stack vérifié (tests UI iPhone verts), split-view vérifié (rendu + sélection de mode → détail).
+  - Renommage « Contre Stockfish » → « Contre l'ordinateur » (UI + catalogue fr/en + ~10 fichiers de test).
+  - Échiquier **bord à bord** sur iPad en Play (paysage : plateau pleine hauteur, éval en colonne droite ; portrait : pleine largeur). Vérifié sur iPad Pro 13″.
+  - **Reste Axe A** : adapter Deux joueurs & Puzzles au grand écran ; compléter menus/raccourcis Mac.
+  - **À trancher** : le libellé adversaire en partie affiche encore « Stockfish » (label, indicateur « Stockfish calcule », réglage « peut abandonner », crédits). Le généraliser en « Ordinateur » ou le garder comme identité du moteur ?
