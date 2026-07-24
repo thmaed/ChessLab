@@ -96,6 +96,7 @@ struct HomeView: View {
         case .puzzles: item = .puzzles; route = .puzzleQueue
         case .openings: item = .openings; route = .repertoireList
         case .laboratory: item = .laboratory; route = .labSetup(startFEN: nil)
+        case .progression: item = .progression; route = .progression
         case .settings: item = .settings; route = .settings
         case .help: item = .help; route = .help
         }

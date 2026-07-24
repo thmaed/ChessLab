@@ -14,6 +14,7 @@ enum MenuDestination: Hashable {
     case puzzles
     case openings
     case laboratory
+    case progression
     case settings
     case help
 }
@@ -56,7 +57,14 @@ struct ChessLabCommands: Commands {
             Button("Puzzles") { MenuCommands.shared.request(.puzzles) }
                 .keyboardShortcut("p", modifiers: [.command, .shift])
             Button("Ouvertures") { MenuCommands.shared.request(.openings) }
+                .keyboardShortcut("o", modifiers: [.command, .shift])
             Button("Laboratoire") { MenuCommands.shared.request(.laboratory) }
+                .keyboardShortcut("l", modifiers: [.command, .shift])
+
+            Divider()
+
+            Button("Progression") { MenuCommands.shared.request(.progression) }
+                .keyboardShortcut("r", modifiers: [.command, .shift])
         }
 
         // ⌘, — la convention Mac, absente jusqu'ici.
