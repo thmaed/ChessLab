@@ -131,48 +131,58 @@ final class LabViewModel {
         // Passe par le moniteur thermique comme les autres modes : une série
         // tourne plusieurs minutes d'affilée, c'est précisément le cas où
         // l'appareil chauffe et où s'obstiner à pleins threads ralentit tout.
-        await controller.start(
+        //
+        // Succès VÉRIFIÉ, contrairement à avant : `computeBestMove` écrit vers
+        // le moteur, et écrire dans un moteur qui n'a pas démarré (NNUE absent,
+        // mémoire) segfaute ChessKitEngine. Play et Analyse gardaient déjà ce
+        // cas ; le Laboratoire fonçait dans la boucle et faisait planter l'app.
+        // On saute la série plutôt que d'écrire dans un moteur mort.
+        let started = await controller.start(
             threads: ThermalMonitor.shared.threads(preferred: AppSettings.recommendedEngineThreads),
             hashMB: AppSettings.engineHashMB, multipv: 1
         )
 
-        // Budget d'essais : une partie interrompue par un raté moteur n'est
-        // PAS enregistrée (sinon elle fausserait les stats en fausse nulle),
-        // elle est simplement rejouée — `completed.count` n'ayant pas avancé,
-        // la boucle repart sur le même index. Le budget borne le nombre total
-        // de tentatives pour éviter une boucle infinie si le moteur ne répond
-        // plus (cas catastrophique : la série s'arrête proprement, sans
-        // fausse partie).
-        let maxAttempts = settings.gameCount * 2 + 4
-        var attempts = 0
-        while completed.count < settings.gameCount, attempts < maxAttempts, !Task.isCancelled {
-            attempts += 1
-            let outcome = await playOneGame(engine: controller, gameIndex: completed.count)
-            if Task.isCancelled { break }
+        if started {
+            // Budget d'essais : une partie interrompue par un raté moteur n'est
+            // PAS enregistrée (sinon elle fausserait les stats en fausse nulle),
+            // elle est simplement rejouée — `completed.count` n'ayant pas avancé,
+            // la boucle repart sur le même index. Le budget borne le nombre total
+            // de tentatives pour éviter une boucle infinie si le moteur ne répond
+            // plus (cas catastrophique : la série s'arrête proprement, sans
+            // fausse partie).
+            let maxAttempts = settings.gameCount * 2 + 4
+            var attempts = 0
+            while completed.count < settings.gameCount, attempts < maxAttempts, !Task.isCancelled {
+                attempts += 1
+                let outcome = await playOneGame(engine: controller, gameIndex: completed.count)
+                if Task.isCancelled { break }
 
-            switch outcome {
-            case .completed:
-                currentGameIndex = completed.count
-                progressPoints = LabStats.progression(of: completed)
-                LabAutosaveStore.save(LabSeriesState(settings: settings, completed: completed, savedAt: Date()))
-            case .interrupted:
-                // Raté moteur (aucun coup rendu à l'échéance, ou coup
-                // inapplicable) : la partie n'est pas enregistrée et sera
-                // rejouée — sur une instance REDÉMARRÉE. Rejouer sur un
-                // moteur resté muet brûlerait tout le budget d'essais, à
-                // ~9 s d'attente la tentative. `os_log` et surtout pas
-                // `print` : stdout est le canal UCI de ChessKitEngine.
-                Self.watchdogLogger.warning(
-                    "Partie \(self.completed.count) interrompue (moteur muet ?) — redémarrage puis nouvelle tentative"
-                )
-                await controller.restart(
-                    coreCount: EngineController.coreCount(
-                        forThreads: ThermalMonitor.shared.threads(preferred: AppSettings.recommendedEngineThreads)
-                    ),
-                    multipv: 1,
-                    setupCommands: [.setoption(id: "Hash", value: "\(AppSettings.engineHashMB)")]
-                )
+                switch outcome {
+                case .completed:
+                    currentGameIndex = completed.count
+                    progressPoints = LabStats.progression(of: completed)
+                    LabAutosaveStore.save(LabSeriesState(settings: settings, completed: completed, savedAt: Date()))
+                case .interrupted:
+                    // Raté moteur (aucun coup rendu à l'échéance, ou coup
+                    // inapplicable) : la partie n'est pas enregistrée et sera
+                    // rejouée — sur une instance REDÉMARRÉE. Rejouer sur un
+                    // moteur resté muet brûlerait tout le budget d'essais, à
+                    // ~9 s d'attente la tentative. `os_log` et surtout pas
+                    // `print` : stdout est le canal UCI de ChessKitEngine.
+                    Self.watchdogLogger.warning(
+                        "Partie \(self.completed.count) interrompue (moteur muet ?) — redémarrage puis nouvelle tentative"
+                    )
+                    await controller.restart(
+                        coreCount: EngineController.coreCount(
+                            forThreads: ThermalMonitor.shared.threads(preferred: AppSettings.recommendedEngineThreads)
+                        ),
+                        multipv: 1,
+                        setupCommands: [.setoption(id: "Hash", value: "\(AppSettings.engineHashMB)")]
+                    )
+                }
             }
+        } else {
+            Self.watchdogLogger.warning("Moteur indisponible au démarrage de la série Laboratoire — série non lancée")
         }
 
         await controller.stop()

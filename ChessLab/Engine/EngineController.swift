@@ -251,6 +251,13 @@ actor EngineController {
     func computeBestMove(
         fen: String, setupCommands: [EngineCommand], movetimeMs: Int?, depth: Int?
     ) async -> (lan: String, moverCp: Int?)? {
+        // Moteur jamais démarré ou déjà arrêté : écrire dedans SEGFAUTE
+        // ChessKitEngine (voir ``send(_:)``). Le seul appelant (le Laboratoire)
+        // ne vérifiait pas le succès de `start()` — un échec de démarrage
+        // (NNUE absent, mémoire) menait donc tout droit ici, dans un moteur
+        // mort. On rend `nil` (traité comme un raté → la série redémarre
+        // l'instance) plutôt que de tuer le processus.
+        guard await engine.isRunning else { return nil }
         ensureReader()
         latestMoverCp = nil
         requestID &+= 1
@@ -347,11 +354,14 @@ actor EngineController {
         guard id == requestID, pendingContinuation != nil else { return }
         staleBestmovesToDiscard += 1
         resolve(with: nil)
-        await engine.send(command: .stop)
+        // Via la garde `send(_:)` : le moteur a pu mourir pendant la recherche
+        // (c'est précisément pourquoi elle traîne), et un `.stop` brut vers un
+        // moteur arrêté segfaute ChessKitEngine.
+        await send(.stop)
     }
 
     private func forceStopIfPending(_ id: Int) async {
         guard id == requestID, pendingContinuation != nil else { return }
-        await engine.send(command: .stop)
+        await send(.stop)
     }
 }
