@@ -75,9 +75,17 @@ CONÇU POUR IPAD
 Échiquier grand format et panneaux visibles simultanément (coups, courbe,
 MultiPV), clavier et trackpad pris en charge, portrait et paysage soignés.
 
+SYNCHRONISATION iCLOUD (optionnelle)
+Activez la synchronisation iCloud dans les Réglages pour que vos parties,
+puzzles et progression suivent tous vos appareils, via votre iCloud privé.
+Aucun compte à créer, aucun serveur ChessLab. Désactivée par défaut :
+l'app fonctionne entièrement hors ligne.
+
 VIE PRIVÉE
-100 % local : aucun compte, aucun serveur, aucune mesure d'audience, aucune
-publicité. Vos parties et réglages restent sur votre appareil. Bilingue
+Hors ligne par défaut : aucun serveur ChessLab, aucune mesure d'audience,
+aucune publicité. Vos parties et réglages restent sur votre appareil. La
+synchronisation iCloud, si vous l'activez, utilise votre propre iCloud
+privé — vos données ne sont jamais partagées avec le développeur. Bilingue
 français/anglais.
 
 ChessLab intègre le moteur Stockfish (licence GPLv3) et les pièces
@@ -154,9 +162,16 @@ BUILT FOR IPAD
 Full-size board with move list, graph and MultiPV visible at once, keyboard
 and trackpad support, polished portrait and landscape layouts.
 
+iCLOUD SYNC (optional)
+Turn on iCloud sync in Settings so your games, puzzles and progress follow
+you across all your devices, via your private iCloud. No account to create,
+no ChessLab server. Off by default: the app works fully offline.
+
 PRIVACY
-100% local: no account, no server, no analytics, no ads. Your games and
-settings stay on your device. Fully bilingual, French and English.
+Offline by default: no ChessLab server, no analytics, no ads. Your games
+and settings stay on your device. iCloud sync, if you enable it, uses your
+own private iCloud — your data is never shared with the developer. Fully
+bilingual, French and English.
 
 ChessLab embeds the Stockfish engine (GPLv3 license) and the cburnett
 vector piece set (CC BY-SA) — full source code and license notices are
@@ -188,12 +203,11 @@ available from within the app (Settings → Licenses).
 
 ### Export compliance (chiffrement)
 `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO` est déjà réglé dans le
-projet. L'app ne fait plus aucun appel réseau (la seule fonctionnalité qui
-en faisait un, l'import d'étude Lichess, a été retirée du code le
-21/07/2026, voir plus bas — `URLSession` n'apparaît donc plus nulle part
-dans la base). App Store Connect ne devrait plus poser la question à
-chaque build ; si elle apparaît malgré tout, répondre : aucune
-cryptographie, exempté.
+projet. L'app n'implémente aucune cryptographie propre. La seule activité
+réseau possible, la synchronisation iCloud (optionnelle, désactivée par
+défaut), passe par CloudKit — chiffrement standard fourni par le système
+Apple, donc **exempté** au sens de l'export compliance. Si App Store Connect
+pose la question : aucune cryptographie propriétaire, exempté.
 
 ### App Privacy (étiquette de confidentialité)
 Réponse à la question « Collectez-vous des données ? » : **Non**.
@@ -201,8 +215,12 @@ Aucun SDK tiers d'analytics, de publicité ou de suivi n'est intégré (les
 deux seules dépendances sont ChessKit et ChessKitEngine, qui tournent
 localement — vérifié dans `Package.resolved`). Le champ « scan de l'appareil
 photo » sert uniquement à la reconnaissance locale d'une position, jamais à
-un envoi réseau. Résultat attendu dans le questionnaire App Store Connect :
-« Data Not Collected » pour toutes les catégories.
+un envoi réseau. La synchronisation iCloud (optionnelle) stocke les données
+dans l'iCloud **privé** de l'utilisateur (base CloudKit privée), à laquelle
+le développeur n'a aucun accès : Apple ne considère pas cela comme une
+collecte de données par le développeur. Résultat attendu dans le
+questionnaire App Store Connect : « Data Not Collected » pour toutes les
+catégories.
 
 ### Classification par âge
 Le nouveau questionnaire d'âge (contenu, pas de violence, pas de contenu
@@ -271,10 +289,14 @@ diagram image copied to the clipboard, or the "Import a file" entry
 (visible on Mac Catalyst) — both skip the camera and exercise the same
 recognition pipeline.
 
-NETWORK: ChessLab makes no network calls at all. There is no server, no
-API, nothing sent or received over the network in any screen. This is
-reflected in the App Privacy answers ("Data Not Collected") and in
-PrivacyInfo.xcprivacy.
+NETWORK: ChessLab has no first-party or third-party backend — no ChessLab
+server, no API, no analytics, no ads. The ONLY network activity is an
+optional iCloud sync, which is OFF by default. When a user turns it on
+(Settings → Sync), SwiftData/CloudKit syncs their games, puzzles and
+progress through the user's OWN private iCloud database (CloudKit private
+database). No data is shared with the developer, so the App Privacy answer
+remains "Data Not Collected". With sync disabled — the default — the app
+makes no network calls at all.
 
 ENGINE LICENSE (GPLv3): ChessLab embeds the Stockfish chess engine via the
 open-source wrapper ChessKitEngine (https://github.com/chesskit-app/chesskit-engine).

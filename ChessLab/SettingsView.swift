@@ -10,6 +10,10 @@ struct SettingsView: View {
     var onOpenLicenses: () -> Void = {}
 
     @Bindable private var settings = AppSettings.shared
+    /// Lie le toggle à la MÊME clé UserDefaults que ``CloudSyncSettingsStore``
+    /// (`cloudKitSyncEnabled`), que ``ChessLabApp`` relit au lancement pour
+    /// construire le `ModelContainer` en `.automatic` (iCloud) ou `.none`.
+    @AppStorage("cloudKitSyncEnabled") private var cloudSyncEnabled = false
 
     var body: some View {
         ScrollView {
@@ -18,6 +22,7 @@ struct SettingsView: View {
                 boardThemeSection
                 notationSection
                 feedbackSection
+                syncSection
                 helpSection
                 licensesSection
             }
@@ -115,6 +120,31 @@ struct SettingsView: View {
             }
             .tint(Theme.accent)
             .foregroundStyle(Theme.textPrimary)
+            .cardStyle()
+        }
+    }
+
+    /// Synchronisation iCloud (optionnelle, désactivée par défaut).
+    ///
+    /// Bascule la clé `cloudKitSyncEnabled` que ``ChessLabApp`` lit au
+    /// lancement : le `ModelContainer` ne peut pas changer de base à chaud,
+    /// d'où la mention « au prochain lancement ». Utilise l'iCloud PRIVÉ de
+    /// l'utilisateur (aucun serveur ChessLab, aucun compte à créer) ; l'app
+    /// reste entièrement fonctionnelle hors ligne, la synchro n'est qu'une
+    /// couche en plus.
+    private var syncSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Synchronisation")
+            VStack(alignment: .leading, spacing: 8) {
+                Toggle("Synchroniser via iCloud", isOn: $cloudSyncEnabled)
+                    .tint(Theme.accent)
+                    .foregroundStyle(Theme.textPrimary)
+                Text("Vos parties, puzzles et progression suivent vos appareils via votre iCloud privé. Désactivée par défaut ; l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement.")
+                    .font(.caption)
+                    .foregroundStyle(Theme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle()
         }
     }

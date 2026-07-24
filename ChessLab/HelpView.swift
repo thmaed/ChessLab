@@ -54,7 +54,12 @@ struct HelpView: View {
         .init(
             icon: "gearshape.fill", tint: Theme.textSecondary,
             title: "Réglages",
-            body: "Langue de l'interface (français, anglais, ou celle du système), thème du plateau, notation des pièces (française R D T F C ou anglaise), et réglages avancés du moteur (threads, mémoire)."
+            body: "Langue de l'interface (français, anglais, ou celle du système), thème du plateau, notation des pièces (française R D T F C ou anglaise), et synchronisation iCloud."
+        ),
+        .init(
+            icon: "icloud", tint: Theme.info,
+            title: "Synchronisation iCloud",
+            body: "Activez-la dans les Réglages pour que vos parties, puzzles et progression suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement."
         ),
     ]
 
