@@ -80,5 +80,8 @@ La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fo
   - `NavigationSplitView` iPad/Mac (barre latérale + détail), iPhone garde sa grille en pile. Chemin stack vérifié (tests UI iPhone verts), split-view vérifié (rendu + sélection de mode → détail).
   - Renommage « Contre Stockfish » → « Contre l'ordinateur » (UI + catalogue fr/en + ~10 fichiers de test).
   - Échiquier **bord à bord** sur iPad en Play (paysage : plateau pleine hauteur, éval en colonne droite ; portrait : pleine largeur). Vérifié sur iPad Pro 13″.
-  - **Reste Axe A** : adapter Deux joueurs & Puzzles au grand écran ; compléter menus/raccourcis Mac.
-  - **À trancher** : le libellé adversaire en partie affiche encore « Stockfish » (label, indicateur « Stockfish calcule », réglage « peut abandonner », crédits). Le généraliser en « Ordinateur » ou le garder comme identité du moteur ?
+- 24/07/2026 — **Axe A terminé** :
+  - **Uniformisation** « Ordinateur » au lieu de « Stockfish » côté joueur (adversaire, indicateurs, réglages, nom stocké, catalogue fr/en). Conservé : attribution légale (licences) et aide (qui explique le moteur), à la demande.
+  - **Deux joueurs & Puzzles** adaptés au grand écran : Puzzles en deux colonnes (plateau | infos) en paysage régulier ; plateau de Deux joueurs borné pour tenir en hauteur (ne débordait plus).
+  - **Menus macOS** complétés : Ouvertures ⇧⌘O, Laboratoire ⇧⌘L, Progression ⇧⌘R. Nav coup par coup gardée en raccourcis par écran (design existant).
+  - **Prochaine étape suggérée** : Axe B (association de fichiers .pgn/.fen, export diagramme) ou Axe C (synchro iCloud, terrain déjà prêt).
