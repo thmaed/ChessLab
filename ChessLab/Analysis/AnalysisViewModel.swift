@@ -450,7 +450,13 @@ final class AnalysisViewModel {
             return
         }
         guard engine != nil, !isClassifying, !isLiveAnalyzing, liveAnalysisTask == nil else { return }
-        startLiveAnalysis()
+        // En REVUE, ne PAS relancer d'analyse en continu au retour sur l'écran :
+        // le cache suffit, le moteur reste au repos. En exploration, si.
+        if isGameReview {
+            showCachedEval(at: currentIndex)
+        } else {
+            startLiveAnalysis()
+        }
     }
 
     // MARK: Navigation dans l'arbre
@@ -654,21 +660,36 @@ final class AnalysisViewModel {
         // début pour ça et n'était appelé nulle part.
         clearArrows()
 
-        // L'analyse en continu D'ABORD, et TOUJOURS : c'est elle qui donne, à
-        // chaque demi-coup, le meilleur coup du camp au trait et l'évaluation.
-        startLiveAnalysis()
-
-        // La classification à la volée (noter le coup joué) ne s'ajoute qu'EN
-        // REVUE d'une partie. En EXPLORATION d'une position (scan, FEN,
-        // éditeur), elle ne ferait que voler le temps moteur à l'analyse en
-        // continu — elle arrêtait celle-ci pour classer, si bien que le
-        // meilleur coup ne se rafraîchissait plus après le 1er demi-coup
-        // (le bug « seul le premier demi-coup fonctionne »). Noter un coup
-        // que le moteur vient de désigner comme le meilleur n'a de toute façon
-        // aucun sens ; l'éval, elle, vient de l'analyse en continu ci-dessus.
         if isGameReview {
+            // REVUE d'une partie : l'analyse a DÉJÀ été calculée (classification
+            // de fond). Naviguer ne relance donc RIEN — l'évaluation et les
+            // flèches (vertes de revue, rétrospective) sont lues dans le cache,
+            // le moteur reste au repos. C'est le « le moteur ne recommence pas
+            // à recalculer à chaque coup ». Une position pas encore évaluée
+            // (variante jouée, ou coup que la classification n'a pas encore
+            // atteint) est classée UNE fois par ``ensureEvaluatedLazily`` —
+            // sans jamais rallumer l'analyse en continu.
+            showCachedEval(at: currentIndex)
             ensureEvaluatedLazily(at: currentIndex)
+        } else {
+            // EXPLORATION d'une position (scan, FEN, éditeur) : aucune
+            // classification préalable. L'analyse en continu est la SEULE
+            // source d'évaluation et de flèches — elle recalcule donc bien la
+            // nouvelle position à chaque coup joué, c'est voulu.
+            startLiveAnalysis()
         }
+    }
+
+    /// Affiche l'évaluation MISE EN CACHE d'une position (revue de partie),
+    /// instantanément et sans toucher au moteur. `pawns` est déjà du point de
+    /// vue des Blancs, borné ±10 (un mat forcé y vaut ±10, on l'affiche alors
+    /// comme un gros avantage plutôt qu'en « M<n> » — détail acceptable en
+    /// revue). Ne fait rien si la position n'est pas encore évaluée.
+    private func showCachedEval(at index: MoveTree.Index) {
+        guard let cached = evalCache[index] else { return }
+        currentEvalCp = Int((cached.pawns * 100).rounded())
+        currentEvalMate = nil
+        liveDepth = nil
     }
 
     // MARK: Menace de l'adversaire (Lot 5.G)
@@ -1133,11 +1154,17 @@ final class AnalysisViewModel {
             self.isClassifying = false
             self.classificationProgress = nil
             self.refreshDerivedData()
-            // Moteur déclaré indisponible en cours de route : inutile de lancer
-            // une analyse en continu sur une instance morte — la bannière est
-            // levée, « Réessayer » relancera tout.
+            // Moteur déclaré indisponible en cours de route : inutile de faire
+            // quoi que ce soit sur une instance morte — la bannière est levée,
+            // « Réessayer » relancera tout.
             guard !self.isTornDown, !self.isEngineUnavailable else { return }
-            self.startLiveAnalysis()
+            // Classification TERMINÉE : en REVUE, l'analyse s'ARRÊTE ici. La
+            // navigation lira le cache (éval + flèches), le moteur reste au
+            // repos — plus de recalcul à chaque coup. On se contente d'afficher
+            // l'éval en cache de la position courante. (L'EXPLORATION d'une
+            // position sans coups a démarré l'analyse en continu plus haut et
+            // n'atteint jamais cette ligne.)
+            self.showCachedEval(at: self.currentIndex)
         }
     }
 
@@ -1164,7 +1191,10 @@ final class AnalysisViewModel {
             // Nœud isolé (action utilisateur) : rafraîchir AUSSITÔT — plus de
             // refresh dans `classifyNode` (voir tâche 2 / la boucle Phase 2).
             self.refreshDerivedData()
-            self.startLiveAnalysis()
+            // Montre l'éval fraîchement calculée SANS rallumer l'analyse en
+            // continu : en revue, classer une variante ne doit pas remettre le
+            // moteur à tourner en boucle sur chaque position.
+            self.showCachedEval(at: self.currentIndex)
         }
     }
 
@@ -1321,7 +1351,12 @@ final class AnalysisViewModel {
     /// de livre ne sont de toute façon pas blâmés (classés « théorie »).
     private func baseNodeBudget(at index: MoveTree.Index) -> Int {
         let inBook = EcoOpeningLookup.isInBook(sanPath(to: index), in: EcoOpeningLoader.bookLines)
-        return inBook ? 80_000 : 300_000
+        // 250 k (au lieu de 300 k) : classification sensiblement plus rapide à
+        // la fin d'une partie, pour une profondeur à peine moindre (≈17-19 au
+        // lieu de 18-20 sur iPhone récent) — toujours au-dessus du seuil où la
+        // détection de gaffes reste fiable. La table de hachage persiste d'une
+        // position à l'autre (même instance moteur), ce qui amortit encore.
+        return inBook ? 80_000 : 250_000
     }
 
     private func evaluatePosition(at index: MoveTree.Index, engine: EngineController) async -> CachedEval? {
