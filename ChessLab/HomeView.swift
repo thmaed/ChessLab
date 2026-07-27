@@ -164,6 +164,10 @@ struct HomeView: View {
         }
         .onAppear {
             refreshResumableGame()
+            // Fusionne la progression puzzles synchronisée (autres appareils)
+            // dans les Puzzle locaux AVANT de calculer le bilan — voir
+            // ``PuzzleProgressSync``. No-op si rien n'est encore synchronisé.
+            PuzzleProgressSync.reconcile(in: modelContext)
             loadProgressSummary()
             // Préchargement (ponctuel, au tout premier lancement) de la
             // bibliothèque Lichess : lancé en TÂCHE DE FOND par le seeder —

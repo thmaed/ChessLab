@@ -275,6 +275,9 @@ struct ProgressionView: View {
     // MARK: Chargement
 
     private func load() {
+        // Fusionne d'abord la progression puzzles synchronisée (autres
+        // appareils) dans les Puzzle locaux, pour que le bilan la reflète.
+        PuzzleProgressSync.reconcile(in: modelContext)
         // Parties : petite table, chargement complet sans risque.
         let games = (try? modelContext.fetch(FetchDescriptor<GameRecord>())) ?? []
 

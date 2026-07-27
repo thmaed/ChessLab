@@ -49,7 +49,7 @@ struct PuzzleLibrarySeederTests {
         UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
 
         let schema = Schema([Puzzle.self])
-        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
 
         PuzzleLibrarySeeder.seedSynchronously(container: container)
 
@@ -68,7 +68,7 @@ struct PuzzleLibrarySeederTests {
         UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
 
         let schema = Schema([Puzzle.self])
-        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
 
         PuzzleLibrarySeeder.seedSynchronously(container: container)
         // Simule un second appel avant que le marqueur `UserDefaults`
@@ -95,7 +95,7 @@ struct PuzzleLibrarySeederTests {
         UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
 
         let schema = Schema([Puzzle.self])
-        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
         let context = ModelContext(container)
 
         // Deux "anciens" puzzles bibliothèque hors nouvel échantillon :

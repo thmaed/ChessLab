@@ -360,5 +360,9 @@ final class PuzzleSolveViewModel {
         puzzle.successCount = (puzzle.successCount ?? 0) + (success ? 1 : 0)
         puzzle.failureCount = (puzzle.failureCount ?? 0) + (success ? 0 : 1)
         try? modelContext.save()
+        // Recopie la progression vers son miroir SYNCHRONISÉ (iCloud) : la
+        // bibliothèque reste locale, seule cette progression personnelle suit
+        // les appareils (voir ``PuzzleProgressSync``).
+        PuzzleProgressSync.mirror(puzzle, in: modelContext)
     }
 }

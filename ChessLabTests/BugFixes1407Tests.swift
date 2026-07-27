@@ -17,7 +17,7 @@ struct BugFixes1407Tests {
     private static func inMemoryContext() throws -> ModelContext {
         let schema = Schema([GameRecord.self, Puzzle.self])
         let container = try ModelContainer(
-            for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+            for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         )
         return ModelContext(container)
     }

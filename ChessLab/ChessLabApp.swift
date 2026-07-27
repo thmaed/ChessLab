@@ -81,20 +81,23 @@ struct ChessLabApp: App {
     /// interactive/réseau qu'on ne peut pas fiabiliser via `xcodebuild` seul
     /// dans cet environnement. Voir PROGRESS.md.
     private static func makeModelContainer() -> ModelContainer {
-        let schema = Schema([GameRecord.self, Puzzle.self])
+        let schema = Schema([GameRecord.self, Puzzle.self, PuzzleProgress.self])
 
         // Deux stores SÉPARÉS, et non un seul :
-        // - « Games » (parties de l'utilisateur) : synchronisable via iCloud.
-        // - « Puzzles » (bibliothèque Lichess EMBARQUÉE + progression) :
-        //   local-only, JAMAIS synchronisé. Dans un store commun, activer
-        //   CloudKit poussait les ~100 000 puzzles embarqués — identiques sur
-        //   chaque appareil — vers l'iCloud de l'utilisateur (CKError 429,
-        //   throttling, quota gaspillé). `GameRecord` et `Puzzle` sont
-        //   indépendants (aucune relation croisée), la séparation est valide.
-        //   La bibliothèque se re-seed depuis le bundle si le store est neuf.
+        // - « Games » (parties de l'utilisateur + PROGRESSION puzzles) :
+        //   synchronisable via iCloud. `PuzzleProgress` est petit (quelques
+        //   centaines d'entrées personnelles) et voyage donc sans souci.
+        // - « Puzzles » (bibliothèque Lichess EMBARQUÉE) : local-only, JAMAIS
+        //   synchronisé. Dans un store commun, activer CloudKit poussait les
+        //   ~100 000 puzzles embarqués — identiques sur chaque appareil — vers
+        //   l'iCloud de l'utilisateur (CKError 429, throttling, quota gaspillé).
+        //   Les modèles sont indépendants (aucune relation croisée), la
+        //   séparation est valide. La bibliothèque se re-seed depuis le bundle
+        //   si le store est neuf ; ``PuzzleProgressSync`` réinjecte la
+        //   progression synchronisée dans les `Puzzle` locaux.
         let gamesConfig = ModelConfiguration(
             "Games",
-            schema: Schema([GameRecord.self]),
+            schema: Schema([GameRecord.self, PuzzleProgress.self]),
             isStoredInMemoryOnly: false,
             cloudKitDatabase: CloudSyncSettingsStore.isEnabled ? .automatic : .none
         )
@@ -122,7 +125,12 @@ struct ChessLabApp: App {
         }
         // 3) Dernier recours : conteneur en mémoire — session dégradée
         //    (rien n'est persisté) mais pas de crash.
-        let memoryConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+        // `cloudKitDatabase: .none` : session dégradée PUREMENT locale — avec
+        // l'entitlement iCloud, un défaut `.automatic` tenterait CloudKit sur
+        // un store en mémoire et crasherait ce dernier recours.
+        let memoryConfiguration = ModelConfiguration(
+            schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none
+        )
         do {
             return try ModelContainer(for: schema, configurations: [memoryConfiguration])
         } catch {

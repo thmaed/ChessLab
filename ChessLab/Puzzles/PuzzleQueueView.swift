@@ -194,6 +194,10 @@ struct PuzzleQueueView: View {
     /// (avant le préchargement, ou un bundle cassé) ? Pas de comptage par
     /// filtre ici — voir le commentaire d'en-tête.
     private func refresh() {
+        // Fusionne la progression synchronisée (dueDate, compteurs) avant de
+        // lire la file et les stats — sinon un puzzle déjà résolu ailleurs
+        // pourrait être re-servi ici. Voir ``PuzzleProgressSync``.
+        PuzzleProgressSync.reconcile(in: modelContext)
         let totalDescriptor = FetchDescriptor<Puzzle>()
         hasAnyPuzzle = ((try? modelContext.fetchCount(totalDescriptor)) ?? 0) > 0
 
