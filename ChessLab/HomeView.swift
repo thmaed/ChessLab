@@ -170,6 +170,19 @@ struct HomeView: View {
             // n'occupe jamais le fil principal.
             PuzzleLibrarySeeder.seedIfNeeded(container: modelContext.container)
         }
+        // Retour à l'accueil (pile vidée) — y compris par le bouton retour
+        // SYSTÈME, qui ne passe PAS par les closures `onExit`. Sans ce
+        // rafraîchissement, `resumableGame` gardait un instantané figé : la
+        // reprise rouvrait une partie périmée avec un mauvais nombre de coups,
+        // alors que l'autosave sur disque était pourtant à jour. On recharge
+        // donc la reprise ET le bilan de progression (une partie vient
+        // peut-être de se terminer).
+        .onChange(of: path) { _, newPath in
+            if newPath.isEmpty {
+                refreshResumableGame()
+                loadProgressSummary()
+            }
+        }
     }
 
     // MARK: Ossature iPhone (pile + grille)
@@ -900,6 +913,7 @@ struct HomeView: View {
             .glow(Theme.accent, radius: 11)
         }
         .buttonStyle(.pressable)
+        .accessibilityIdentifier("resumeGame")
     }
 }
 
