@@ -225,6 +225,38 @@ struct HomeView: View {
 
     private var sidebar: some View {
         List(selection: $sidebarSelection) {
+            // Reprise EN HAUT et PERSISTANTE (au-dessus des modes) : sur iPad,
+            // le tableau de bord de détail disparaît dès qu'on choisit un mode ;
+            // la reprise, elle, doit rester accessible quoi qu'on regarde.
+            if let resumableGame {
+                Section {
+                    Button {
+                        // Vide la pile de détail puis montre la partie reprise
+                        // (indépendant du mode éventuellement sélectionné).
+                        path = NavigationPath()
+                        switch resumableGame {
+                        case let .vsEngine(autosave): path.append(Route.resumedGame(autosave))
+                        case let .twoPlayer(autosave): path.append(Route.resumedTwoPlayerGame(autosave))
+                        }
+                    } label: {
+                        Label {
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("Reprendre la partie en cours")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(Theme.textPrimary)
+                                Text("\(resumableGame.moveCount) coup(s) joué(s)")
+                                    .font(.caption)
+                                    .foregroundStyle(Theme.textSecondary)
+                            }
+                        } icon: {
+                            Image(systemName: "play.circle.fill")
+                                .foregroundStyle(Theme.accent)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("resumeGame")
+                }
+            }
             Section("Modes") {
                 sidebarLabel(.vsEngine, "Contre l'ordinateur", "cpu", Theme.accent)
                 sidebarLabel(.twoPlayer, "Deux joueurs", "person.2.fill", Theme.info)
@@ -287,7 +319,8 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 22) {
                 homeHeader
                 if seedingState.isSeeding { seedingBanner }
-                if let resumableGame { resumeBanner(resumableGame) }
+                // La reprise vit désormais en HAUT de la barre latérale
+                // (persistante) — voir `sidebar` — pour ne pas doublonner ici.
                 homeProgressCard
                 if !recentGames.isEmpty { recentGamesSection }
             }
