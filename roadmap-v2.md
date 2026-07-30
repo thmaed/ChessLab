@@ -101,13 +101,20 @@ La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fo
   - Jeux de pièces : 3 (cburnett/Classique déjà là + maestro/Moderne + merida/Contrasté, SVG Lichess importés dans `Assets.xcassets/Pieces`). `PieceSet` + `AppSettings.pieceSetID` + `PieceGlyphView` paramétré.
   - Réglages : sélecteurs avec **aperçu des vraies pièces** sur cases colorées (vérifié à l'écran). Attribution ajoutée dans LicensesView.
   - **⚠️ AVANT PUBLICATION** : confirmer la licence EXACTE de `maestro` et `merida` dans `github.com/lichess-org/lila` → `public/piece/COPYING.md`, et compléter l'attribution auteur si nécessaire. L'app étant déjà GPLv3 (Stockfish), les jeux GPL/CC sont compatibles ; ne PAS ajouter de jeu à licence restrictive (surtout jamais les `cc_*` = chess.com).
+    - **✅ RÉSOLU (30/07/2026)** : `maestro` était CC BY-NC-SA 4.0 (NON commercial → incompatible GPLv3), remplacé par `chessnut` (Apache 2.0). `merida` = GPLv2+ (OK). Voir le journal du 30/07.
+
+- 30/07/2026 — **Consolidation vers la publication 1.1** (4 lots) :
+  - **Licences pièces réglées** : la confirmation (COPYING.md officiel de lila) a révélé que **`maestro` est en CC BY-NC-SA 4.0** (clause NON commerciale, **incompatible GPLv3**). Retiré et **remplacé par `chessnut` (Apache 2.0)**, même créneau « Moderne ». `merida` confirmé **GPLv2+** (conservé). LicensesView + METADATA corrigés (3 jeux, tous compatibles GPLv3). Le ⚠️ licences ci-dessus est donc **levé**.
+  - **Axe A — pointeur/trackpad FAIT** : anneau de survol sous le pointeur sur la case (iPad trackpad/souris, Mac), couleur adaptée à la case, inerte au doigt. Reste de l'Axe A : **multi-fenêtres/Stage Manager** (seul item non fait) et menus contextuels approfondis.
+  - **Axe C — bibliothèque de parties FAITE** : recherche (joueurs + étiquettes), filtres mode (Ordinateur/Deux joueurs/Importées) et résultat (Gagnées/Nulles/Perdues), **étiquettes** libres (`GameRecord.tagsCSV`, éditeur + filtre), **import PGN multi-parties** (`GameLibraryService.importPGNCollection`, en-têtes via ChessKit `Game.tags`, mode `.imported`). Tests : 3 dédiés + suite complète 343/54 verte.
+  - **Release 1.1.0 prête** : `MARKETING_VERSION` 1.1.0, build 2, RELEASE_NOTES + METADATA à jour, build Release vérifié. **Reste l'étape manuelle** : archive + upload App Store Connect (signature device).
 
 ## ⏸️ Pause — reprise prévue ~31/07/2026
 
-**Fait à ce jour** : Axe A (socle iPad complet — NavigationSplitView, renommage « Ordinateur », plateau bord à bord iPad, adaptation Deux joueurs/Puzzles, Analyse multi-colonnes, menus Mac ; **restent 2 items de finition** : multi-fenêtres/Stage Manager et pointeur/trackpad/hover) + **synchro iCloud validée sur 2 appareils réels (30/07/2026)** — parties + progression puzzle synchronisées et vérifiées fonctionnelles.
+**Fait à ce jour** : Axe A (socle iPad + pointeur/trackpad ; **reste multi-fenêtres/Stage Manager**), **synchro iCloud validée sur 2 appareils** (parties + progression puzzle), **Axe C bibliothèque de parties complète** (recherche/filtres/tags/import PGN multi), **Axe D thèmes** (licences réglées : cburnett/chessnut/merida), **release 1.1.0 prête à archiver**.
 
 **Reprise — options par ordre de valeur** :
-1. **Thèmes de plateau & pièces** (Axe D) — 100 % local, gain visuel rapide, valorise les 71 jeux de pièces déjà collectés pour le YOLO. ⚠️ confirmer licences `maestro`/`merida` avant publication.
-2. Suite de l'**Axe C** : bibliothèque de parties (recherche/tags/import PGN multi — meilleur rapport valeur/effort, brique `GameRecord` déjà là) ou tablebases Syzygy (arbitrer la taille du bundle).
-3. **Axe A — finition** : pointeur/trackpad (hover cases, menus contextuels — rapide) puis multi-fenêtres/Stage Manager.
+1. **Publier la 1.1** : archive + upload App Store Connect (étape manuelle, signature device) — tout le reste est prêt.
+2. Suite de l'**Axe C** : tablebases Syzygy (arbitrer la taille du bundle), entraînement de répertoire, puzzles approfondis (streak, puzzle du jour), annotations persistantes, widgets/App Intents.
+3. **Axe A — finition** : multi-fenêtres/Stage Manager (dernier item).
 4. **Axe B** : association de fichiers .pgn/.fen (ouvrir depuis Fichiers/Finder), export diagramme.
