@@ -12,15 +12,25 @@
 - **"Against the computer".** The opponent is now called "the computer" instead
   of "Stockfish" throughout the interface — clearer for players who don't know
   the engine by name. Stockfish is still credited in Help and Licenses.
-- **iCloud sync (optional).** Turn it on in Settings so your games, puzzles and
-  progress follow you across your devices, via your own private iCloud. No
-  account to create, no ChessLab server. Off by default — the app works fully
-  offline.
+- **iCloud sync (optional).** Turn it on in Settings so your saved games and
+  your puzzle progress follow you across your devices, via your own private
+  iCloud. No account to create, no ChessLab server. Off by default — the app
+  works fully offline. (The built-in puzzle library stays on-device; only your
+  personal progress travels.)
+- **Board & piece themes.** Choose among four board colours (Classic, Blue,
+  Walnut, High-contrast) and three piece sets (Classic, Modern, Bold), with a
+  live preview right in Settings.
+- **Pointer & trackpad.** On iPad (with a trackpad or mouse) and Mac, the square
+  under the pointer is now highlighted as you hover the board.
 - **Mac menus.** Every mode now has a keyboard shortcut (Openings ⇧⌘O,
   Laboratory ⇧⌘L), and Progress joined the menu (⇧⌘R).
 
 ## Under the hood
 
+- Faster post-game analysis: once every move is evaluated, review navigation is
+  served from the cache and the engine stays idle instead of recomputing on each
+  step — while analysing a specific position still runs live.
+- Reliable "Resume game" after leaving via the system back button.
 - Engine lifecycle hardening: a crash on Laboratory startup (writing to an
   engine that failed to launch) is fixed, and watchdog stops now go through the
   same safety guard as every other engine write.

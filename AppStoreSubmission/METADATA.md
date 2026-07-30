@@ -88,9 +88,10 @@ synchronisation iCloud, si vous l'activez, utilise votre propre iCloud
 privé — vos données ne sont jamais partagées avec le développeur. Bilingue
 français/anglais.
 
-ChessLab intègre le moteur Stockfish (licence GPLv3) et les pièces
-vectorielles cburnett (CC BY-SA) — code source complet et mentions de
-licence disponibles depuis l'app (Réglages → Licences).
+ChessLab intègre le moteur Stockfish (licence GPLv3) et des jeux de pièces
+vectorielles libres — cburnett (GPLv2+/CC BY-SA), chessnut (Apache 2.0) et
+merida (GPLv2+). Code source complet et mentions de licence disponibles
+depuis l'app (Réglages → Licences).
 ```
 
 ---
@@ -173,9 +174,10 @@ and settings stay on your device. iCloud sync, if you enable it, uses your
 own private iCloud — your data is never shared with the developer. Fully
 bilingual, French and English.
 
-ChessLab embeds the Stockfish engine (GPLv3 license) and the cburnett
-vector piece set (CC BY-SA) — full source code and license notices are
-available from within the app (Settings → Licenses).
+ChessLab embeds the Stockfish engine (GPLv3 license) and free vector piece
+sets — cburnett (GPLv2+/CC BY-SA), chessnut (Apache 2.0) and merida
+(GPLv2+). Full source code and license notices are available from within
+the app (Settings → Licenses).
 ```
 
 ---
@@ -245,9 +247,10 @@ Réponses déduites du code (vérifié, pas deviné) :
 - **Captions** : non applicable, pas de contenu audio/vidéo narratif.
 
 ### Version et build
-`MARKETING_VERSION = 1.0`, `CURRENT_PROJECT_VERSION = 1` — adaptés à une
-première soumission ; incrémenter `CURRENT_PROJECT_VERSION` à chaque
-nouveau build renvoyé à Apple (même version marketing).
+`MARKETING_VERSION = 1.1.0`, `CURRENT_PROJECT_VERSION = 2` — voir
+`RELEASE_NOTES-1.1.0.md` pour les nouveautés. Incrémenter
+`CURRENT_PROJECT_VERSION` à chaque nouveau build renvoyé à Apple (même
+version marketing).
 
 ---
 
@@ -305,9 +308,10 @@ so the ChessLab binary as a whole is a GPLv3 derivative work. To comply,
 the complete source code of the app — matching this submitted build — is
 published publicly at https://github.com/thmaed/ChessLab. Copyright and
 license notices for all third-party components (Stockfish/GPLv3, ChessKit
-& ChessKitEngine/MIT, the cburnett chess piece set/CC BY-SA 3.0, the
-Lichess puzzle database/CC0) are also shown in-app under Settings →
-Licenses.
+& ChessKitEngine/MIT, the chess piece sets cburnett/GPLv2+ & CC BY-SA 3.0,
+chessnut/Apache 2.0 and merida/GPLv2+, the Lichess puzzle database/CC0) are
+also shown in-app under Settings → Licenses. All embedded piece sets are
+free/open-source and license-compatible with the app's GPLv3.
 
 No in-app purchases, no ads, no user-generated content shared publicly,
 no multiplayer/online play.
