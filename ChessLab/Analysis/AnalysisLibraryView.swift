@@ -15,6 +15,8 @@ struct AnalysisLibraryView: View {
     @State private var searchText = ""
     @State private var modeFilter: GameRecordMode?
     @State private var resultFilter: ResultFilter = .all
+    @State private var tagFilter: String?
+    @State private var editingRecord: GameRecord?
 
     /// Résultat du point de vue de l'utilisateur. N'a de sens que face à
     /// l'ordinateur (le côté « Vous » est identifiable) ; en deux joueurs,
@@ -24,14 +26,31 @@ struct AnalysisLibraryView: View {
         case all, wins, draws, losses
     }
 
+    /// Toutes les étiquettes utilisées dans la bibliothèque, dédoublonnées
+    /// (insensible à la casse) et triées — pour la barre de filtre par tag.
+    private var allTags: [String] {
+        var seen = Set<String>()
+        var result: [String] = []
+        for record in records {
+            for tag in record.tags where seen.insert(tag.lowercased()).inserted {
+                result.append(tag)
+            }
+        }
+        return result.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+    }
+
     private var filteredRecords: [GameRecord] {
         let query = searchText.trimmingCharacters(in: .whitespaces).lowercased()
         return records.filter { record in
             if let modeFilter, record.mode != modeFilter { return false }
             if resultFilter != .all, userResult(record) != resultFilter { return false }
+            if let tagFilter, !record.tags.contains(where: { $0.lowercased() == tagFilter.lowercased() }) {
+                return false
+            }
             if query.isEmpty { return true }
-            let haystack = [record.whiteName, record.blackName, record.resultRaw]
-                .compactMap { $0?.lowercased() }
+            let haystack = ([record.whiteName, record.blackName, record.resultRaw].compactMap { $0 }
+                + record.tags)
+                .map { $0.lowercased() }
                 .joined(separator: " ")
             return haystack.contains(query)
         }
@@ -66,12 +85,19 @@ struct AnalysisLibraryView: View {
                                     recordRow(record)
                                 }
                                 .buttonStyle(.pressable)
+                                .contextMenu {
+                                    Button {
+                                        editingRecord = record
+                                    } label: {
+                                        Label("Modifier les étiquettes", systemImage: "tag")
+                                    }
+                                }
                             }
                         }
                     }
                     .padding(20)
                 }
-                .searchable(text: $searchText, prompt: "Rechercher un joueur")
+                .searchable(text: $searchText, prompt: "Rechercher un joueur ou une étiquette")
             }
         }
         .appBackground()
@@ -83,6 +109,17 @@ struct AnalysisLibraryView: View {
         // on le reconstruit depuis leur PGN, une seule fois, pour que la
         // bibliothèque existante ne reste pas muette sur sa longueur.
         .task { GameRecord.backfillMoveCounts(in: modelContext) }
+        .sheet(item: $editingRecord) { record in
+            GameTagsEditorSheet(initialTags: record.tags, suggestions: allTags) { newTags in
+                record.tags = newTags
+                try? modelContext.save()
+                // Un tag qui vient de disparaître ne doit pas laisser un
+                // filtre actif fantôme.
+                if let tagFilter, !allTags.contains(where: { $0.lowercased() == tagFilter.lowercased() }) {
+                    self.tagFilter = nil
+                }
+            }
+        }
     }
 
     // MARK: Filtres
@@ -116,6 +153,20 @@ struct AnalysisLibraryView: View {
                     }
                     FilterChip(label: "Perdues", icon: "flag.slash", tint: Theme.info, isSelected: resultFilter == .losses) {
                         resultFilter = (resultFilter == .losses) ? .all : .losses
+                    }
+                }
+            }
+            if !allTags.isEmpty {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        FilterChip(label: "Toutes étiquettes", icon: "tag", tint: Theme.violet, isSelected: tagFilter == nil) {
+                            tagFilter = nil
+                        }
+                        ForEach(allTags, id: \.self) { tag in
+                            FilterChip(label: LocalizedStringKey(tag), tint: Theme.violet, isSelected: tagFilter?.lowercased() == tag.lowercased()) {
+                                tagFilter = (tagFilter?.lowercased() == tag.lowercased()) ? nil : tag
+                            }
+                        }
                     }
                 }
             }
@@ -165,6 +216,19 @@ struct AnalysisLibraryView: View {
                             .font(.caption)
                             .foregroundStyle(Theme.textTertiary)
                     }
+                }
+                if !record.tags.isEmpty {
+                    WrapLayout(spacing: 6, lineSpacing: 6) {
+                        ForEach(record.tags, id: \.self) { tag in
+                            Text(tag)
+                                .font(.caption2.weight(.medium))
+                                .foregroundStyle(Theme.violet)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(Theme.violet.opacity(0.14), in: Capsule())
+                        }
+                    }
+                    .padding(.top, 2)
                 }
             }
             Spacer()

@@ -18,7 +18,7 @@ enum GameRecordMode: String, Codable {
 /// arrive avec le mode Analyser, étape 3) : on se contente de persister
 /// dès maintenant pour que cette étape future ait de vraies données.
 @Model
-final class GameRecord {
+final class GameRecord: Identifiable {
     var id: UUID = UUID()
     var modeRaw: String? = GameRecordMode.vsEngine.rawValue
     /// Partie complète (coups + résultat) au format PGN.
@@ -43,10 +43,37 @@ final class GameRecord {
     /// ce champ ; ``GameRecord/backfillMoveCounts(in:)`` les rattrape.
     var moveCount: Int?
 
+    /// Étiquettes libres posées par l'utilisateur, stockées en une seule
+    /// chaîne séparée par des virgules (« ouverture,à revoir »).
+    ///
+    /// Un `String?` plutôt qu'un `[String]` : c'est le type le plus sûr pour
+    /// un store synchronisé CloudKit (aucune transformation d'array à gérer),
+    /// dans l'esprit « plat et optionnel » de ce modèle. L'accès se fait par
+    /// ``tags`` qui découpe/recolle.
+    var tagsCSV: String?
+
     init() {}
 
     var mode: GameRecordMode {
         GameRecordMode(rawValue: modeRaw ?? "") ?? .vsEngine
+    }
+
+    /// Étiquettes normalisées (rognées, sans doublon, ordre conservé). En
+    /// écriture : recolle en CSV, `nil` si vide.
+    var tags: [String] {
+        get {
+            (tagsCSV ?? "")
+                .split(separator: ",")
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty }
+        }
+        set {
+            var seen = Set<String>()
+            let cleaned = newValue
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+                .filter { !$0.isEmpty && seen.insert($0.lowercased()).inserted }
+            tagsCSV = cleaned.isEmpty ? nil : cleaned.joined(separator: ",")
+        }
     }
 
     /// Compte les demi-coups de la ligne principale d'une partie.
