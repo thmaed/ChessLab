@@ -15,13 +15,15 @@ struct PieceSet: Identifiable, Equatable {
 
     var assetPrefix: String { id }
 
-    /// Le jeu d'origine (Colin M.L. Burnett, CC BY-SA 3.0), déjà embarqué sous
+    /// Le jeu d'origine (Colin M.L. Burnett, GPLv2+), déjà embarqué sous
     /// les noms `piece_*` — d'où un id « piece » qui diffère du libellé.
     static let classic = PieceSet(id: "piece", label: "Classique")
-    /// Jeu épuré et moderne (Lichess « maestro »).
-    static let maestro = PieceSet(id: "maestro", label: "Moderne")
-    /// Jeu au trait marqué, plus contrasté (Lichess « merida »).
+    /// Jeu épuré et moderne (Lichess « chessnut », Apache 2.0). A remplacé
+    /// « maestro », dont la licence CC BY-NC-SA (non commerciale) était
+    /// incompatible avec la GPLv3 de l'app — voir ``LicensesView``.
+    static let chessnut = PieceSet(id: "chessnut", label: "Moderne")
+    /// Jeu au trait marqué, plus contrasté (Lichess « merida », GPLv2+).
     static let merida = PieceSet(id: "merida", label: "Contrasté")
 
-    static let all: [PieceSet] = [.classic, .maestro, .merida]
+    static let all: [PieceSet] = [.classic, .chessnut, .merida]
 }

@@ -50,10 +50,17 @@ struct LicensesView: View {
         ),
         .init(
             icon: "crown.fill", tint: Theme.warning,
-            name: "Jeux de pièces « maestro » et « merida »",
-            license: "Licences libres (Lichess)",
-            body: "Deux jeux de pièces vectorielles issus de la collection open source de Lichess, compatibles avec la licence GPLv3 de l'app.",
-            url: URL(string: "https://github.com/lichess-org/lila/tree/master/public/piece")
+            name: "Jeu de pièces « chessnut »",
+            license: "Licence Apache 2.0",
+            body: "Jeu de pièces vectorielles moderne par Alexis Luengas, issu de la collection open source de Lichess. Compatible avec la licence GPLv3 de l'app.",
+            url: URL(string: "https://github.com/LexLuengas/chessnut-pieces")
+        ),
+        .init(
+            icon: "crown.fill", tint: Theme.warning,
+            name: "Jeu de pièces « merida »",
+            license: "Licence GPLv2+",
+            body: "Jeu de pièces vectorielles par Armando Hernandez Marroquin, issu de la collection open source de Lichess. Compatible avec la licence GPLv3 de l'app.",
+            url: URL(string: "https://github.com/lichess-org/lila/tree/master/public/piece/merida")
         ),
         .init(
             icon: "puzzlepiece.fill", tint: Theme.violet,
