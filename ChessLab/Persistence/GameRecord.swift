@@ -6,6 +6,8 @@ import SwiftData
 enum GameRecordMode: String, Codable {
     case vsEngine
     case twoHuman
+    /// Partie importée depuis un PGN externe (base, export d'un autre outil).
+    case imported
 }
 
 /// Une partie terminée, conservée en bibliothèque. Modèle volontairement

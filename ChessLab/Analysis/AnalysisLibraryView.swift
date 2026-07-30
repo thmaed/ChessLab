@@ -138,6 +138,11 @@ struct AnalysisLibraryView: View {
                     FilterChip(label: "Deux joueurs", icon: "person.2.fill", tint: Theme.accent, isSelected: modeFilter == .twoHuman) {
                         modeFilter = (modeFilter == .twoHuman) ? nil : .twoHuman
                     }
+                    if records.contains(where: { $0.mode == .imported }) {
+                        FilterChip(label: "Importées", icon: "square.and.arrow.down", tint: Theme.accent, isSelected: modeFilter == .imported) {
+                            modeFilter = (modeFilter == .imported) ? nil : .imported
+                        }
+                    }
                 }
             }
             ScrollView(.horizontal, showsIndicators: false) {

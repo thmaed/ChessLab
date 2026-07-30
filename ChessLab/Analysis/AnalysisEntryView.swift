@@ -11,6 +11,7 @@ struct AnalysisEntryView: View {
     let onOpenPositionEditor: () -> Void
     let onOpenScanner: () -> Void
 
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \GameRecord.playedAt, order: .reverse) private var records: [GameRecord]
 
     @State private var pastedPGN = ""
@@ -18,8 +19,10 @@ struct AnalysisEntryView: View {
     @State private var fenText = ""
     @State private var showFENSheet = false
     @State private var showFileImporter = false
+    @State private var showLibraryImporter = false
     @State private var importError: String?
     @State private var showOtherSources = false
+    @State private var libraryImportSummary: String?
 
     private var lastGamePGN: String? {
         guard let pgn = records.first?.pgn, !pgn.isEmpty else { return nil }
@@ -66,6 +69,9 @@ struct AnalysisEntryView: View {
                     entryCard(title: "Importer un fichier", subtitle: "Fichier .pgn", systemImage: "doc.badge.plus", tint: Theme.teal) {
                         showFileImporter = true
                     }
+                    entryCard(title: "Importer des parties", subtitle: "Base .pgn (plusieurs parties) → bibliothèque", systemImage: "square.and.arrow.down.on.square", tint: Theme.warning) {
+                        showLibraryImporter = true
+                    }
                     entryCard(title: "Position FEN", subtitle: "Analyser depuis une position donnée", systemImage: "square.grid.3x3", tint: Theme.violet) {
                         importError = nil
                         fenText = ""
@@ -111,6 +117,21 @@ struct AnalysisEntryView: View {
             allowsMultipleSelection: false
         ) { result in
             handleFileImport(result)
+        }
+        .fileImporter(
+            isPresented: $showLibraryImporter,
+            allowedContentTypes: [UTType(filenameExtension: "pgn") ?? .plainText, .plainText],
+            allowsMultipleSelection: true
+        ) { result in
+            handleLibraryImport(result)
+        }
+        .alert("Import terminé", isPresented: Binding(
+            get: { libraryImportSummary != nil },
+            set: { if !$0 { libraryImportSummary = nil } }
+        )) {
+            Button("OK", role: .cancel) { libraryImportSummary = nil }
+        } message: {
+            Text(libraryImportSummary ?? "")
         }
     }
 
@@ -215,5 +236,32 @@ struct AnalysisEntryView: View {
             return
         }
         validate(pgn: text)
+    }
+
+    /// Importe UNE OU PLUSIEURS bases .pgn d'un coup dans la bibliothèque
+    /// (toutes les parties de chaque fichier), puis annonce le total. À la
+    /// différence de « Importer un fichier » (qui ouvre la première partie
+    /// pour l'analyser), ceci range tout sans rien ouvrir.
+    private func handleLibraryImport(_ result: Result<[URL], Error>) {
+        guard case let .success(urls) = result, !urls.isEmpty else { return }
+        var imported = 0
+        var skipped = 0
+        var unreadable = 0
+        for url in urls {
+            let accessed = url.startAccessingSecurityScopedResource()
+            defer { if accessed { url.stopAccessingSecurityScopedResource() } }
+            guard let data = try? Data(contentsOf: url), let text = String(data: data, encoding: .utf8) else {
+                unreadable += 1
+                continue
+            }
+            let outcome = GameLibraryService.importPGNCollection(text: text, in: modelContext)
+            imported += outcome.imported
+            skipped += outcome.skipped
+        }
+
+        var lines = ["\(imported) partie(s) importée(s) dans la bibliothèque."]
+        if skipped > 0 { lines.append("\(skipped) bloc(s) PGN illisible(s) ignoré(s).") }
+        if unreadable > 0 { lines.append("\(unreadable) fichier(s) illisible(s).") }
+        libraryImportSummary = lines.joined(separator: "\n")
     }
 }
