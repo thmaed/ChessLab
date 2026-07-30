@@ -88,7 +88,7 @@ La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fo
   - Entitlement `ChessLab.entitlements` (CloudKit + conteneur `iCloud.com.chesslab.ChessLab`), câblé `CODE_SIGN_ENTITLEMENTS` sur les deux configs. Build simulateur signé OK.
   - Toggle « Synchroniser via iCloud » dans Réglages (off par défaut, effet au prochain lancement). Modèles vérifiés CloudKit-compatibles.
   - Aide (module iCloud) + catalogue fr/en + doc App Store Connect (METADATA : réseau/confidentialité/export nuancés) + RELEASE_NOTES-1.1.0.
-  - **⚠️ Reste à faire côté iCloud** : (1) provisionner le conteneur — automatique à la 1re compilation *device* via la signature d'équipe ; (2) **tester la synchro réelle sur 2 appareils** (non vérifiable en simulateur).
+  - **✅ VALIDÉ (30/07/2026)** : synchro réelle **testée sur 2 appareils** — parties et progression puzzle se synchronisent correctement. Conteneur CloudKit provisionné à la 1re compilation device. L'Axe C côté synchro est donc bouclé et prouvé.
 - 24/07/2026 (soir) — **Correctifs après premier essai réel de la synchro** :
   - Ajout du mode d'arrière-plan **`remote-notification`** (Info.plist à la racine, fusionné avec le plist généré) — SwiftData+CloudKit l'exige pour les push silencieux ; sans lui, faute « BUG IN CLIENT OF CLOUDKIT ». Corrigé, vérifié.
   - **✅ CORRIGÉ (même jour)** : le store est désormais **séparé en deux** (`ChessLabApp.makeModelContainer`) — `Games` (parties, synchronisable iCloud) et `Puzzles` (bibliothèque embarquée + progression, **local-only, jamais synchronisé**). Fini le flood des 100k puzzles / CKError 429 : seules les parties partent en iCloud. Sur décision de l'utilisateur, **pas de migration** — les parties/puzzles locaux existants sont réinitialisés (la bibliothèque se re-seed depuis le bundle). Vérifié : l'app lance sans crash, accueil rendu (les deux stores requêtés séparément). Textes (Réglages/Aide/METADATA) corrigés : seules les **parties** se synchronisent.
@@ -104,9 +104,10 @@ La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fo
 
 ## ⏸️ Pause — reprise prévue ~31/07/2026
 
-**Fait à ce jour** : Axe A complet (NavigationSplitView, renommage « Ordinateur », plateau bord à bord iPad, adaptation Deux joueurs/Puzzles, menus Mac) + Axe C entamé (synchro iCloud, à tester sur device).
+**Fait à ce jour** : Axe A (socle iPad complet — NavigationSplitView, renommage « Ordinateur », plateau bord à bord iPad, adaptation Deux joueurs/Puzzles, Analyse multi-colonnes, menus Mac ; **restent 2 items de finition** : multi-fenêtres/Stage Manager et pointeur/trackpad/hover) + **synchro iCloud validée sur 2 appareils réels (30/07/2026)** — parties + progression puzzle synchronisées et vérifiées fonctionnelles.
 
 **Reprise — options par ordre de valeur** :
-1. **Thèmes de plateau & pièces** (Axe D) — 100 % local, gain visuel rapide, valorise les 71 jeux de pièces déjà collectés pour le YOLO.
-2. Finir l'**Axe C** : tester la synchro iCloud sur device, puis bibliothèque de parties (recherche/tags) ou tablebases Syzygy.
-3. **Axe B** : association de fichiers .pgn/.fen (ouvrir depuis Fichiers/Finder), export diagramme.
+1. **Thèmes de plateau & pièces** (Axe D) — 100 % local, gain visuel rapide, valorise les 71 jeux de pièces déjà collectés pour le YOLO. ⚠️ confirmer licences `maestro`/`merida` avant publication.
+2. Suite de l'**Axe C** : bibliothèque de parties (recherche/tags/import PGN multi — meilleur rapport valeur/effort, brique `GameRecord` déjà là) ou tablebases Syzygy (arbitrer la taille du bundle).
+3. **Axe A — finition** : pointeur/trackpad (hover cases, menus contextuels — rapide) puis multi-fenêtres/Stage Manager.
+4. **Axe B** : association de fichiers .pgn/.fen (ouvrir depuis Fichiers/Finder), export diagramme.
