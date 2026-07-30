@@ -63,6 +63,11 @@ struct ChessBoardView: View {
 
     @State private var dragState: DragState?
 
+    // MARK: Survol (pointeur/trackpad — iPad & Mac)
+    /// Case sous le pointeur. Reste `nil` au doigt : `onHover` ne se déclenche
+    /// qu'avec un pointeur (souris/trackpad). Purement visuel.
+    @State private var hoveredSquare: Square?
+
     // MARK: Animation de rejet (essai raté)
     @State private var rejectAnim: RejectedMove?
     @State private var rejectArrived = false
@@ -100,6 +105,7 @@ struct ChessBoardView: View {
             ZStack(alignment: .topLeading) {
                 squaresGrid(squareSize: squareSize)
                 highlightsLayer(squareSize: squareSize)
+                hoverLayer(squareSize: squareSize)
 
                 if showCoordinates {
                     coordinatesLayer(squareSize: squareSize)
@@ -265,9 +271,34 @@ struct ChessBoardView: View {
                             }
                             .accessibilityIdentifier("square_\(sq.notation)")
                             .accessibilityLabel(accessibilityLabel(for: sq))
+                            .onHover { hovering in
+                                guard interactionEnabled else { return }
+                                if hovering { hoveredSquare = sq }
+                                else if hoveredSquare == sq { hoveredSquare = nil }
+                            }
                     }
                 }
             }
+        }
+    }
+
+    /// Anneau discret sous le pointeur (iPad avec trackpad/souris, Mac
+    /// Catalyst). La couleur s'adapte à la case pour rester visible sur tous
+    /// les thèmes de plateau : sombre sur case claire, clair sur case foncée.
+    /// Masqué pendant un glissement (le pointeur porte alors la pièce).
+    @ViewBuilder
+    private func hoverLayer(squareSize: CGFloat) -> some View {
+        if interactionEnabled, let hoveredSquare, dragState == nil {
+            let onLight = hoveredSquare.color == .light
+            Rectangle()
+                .strokeBorder(
+                    onLight ? Color.black.opacity(0.35) : Color.white.opacity(0.55),
+                    lineWidth: max(2, squareSize * 0.045)
+                )
+                .frame(width: squareSize, height: squareSize)
+                .position(centerPoint(of: hoveredSquare, squareSize: squareSize))
+                .allowsHitTesting(false)
+                .animation(.easeOut(duration: 0.12), value: hoveredSquare)
         }
     }
 
@@ -380,6 +411,14 @@ struct ChessBoardView: View {
                 // seul le glisser fonctionnait — il part d'une pièce à soi.
                 // Invisible sur un déplacement vers une case vide.
                 .allowsHitTesting(isDraggable(piece))
+                // Une pièce glissable est au-dessus de sa case et capterait le
+                // survol : on relaie le hover depuis le glyphe pour que
+                // l'anneau apparaisse aussi sous ses propres pièces.
+                .onHover { hovering in
+                    guard interactionEnabled, isDraggable(piece) else { return }
+                    if hovering { hoveredSquare = piece.square }
+                    else if hoveredSquare == piece.square { hoveredSquare = nil }
+                }
         }
     }
 
