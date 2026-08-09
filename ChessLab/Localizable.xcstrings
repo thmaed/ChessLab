@@ -2467,6 +2467,9 @@
         }
       }
     },
+    "Coller / saisir" : {
+
+    },
     "Coller un PGN" : {
       "localizations" : {
         "en" : {
@@ -2499,6 +2502,9 @@
           }
         }
       }
+    },
+    "Collez ou importez un **FEN** ou un **PGN** (la position finale du PGN est utilisée). Toutes les parties de la série partiront de cette position." : {
+
     },
     "Commencer" : {
       "localizations" : {
@@ -3364,6 +3370,9 @@
     "Éditer le jeu" : {
 
     },
+    "Éditeur" : {
+
+    },
     "Éditeur de position" : {
       "localizations" : {
         "en" : {
@@ -3838,6 +3847,9 @@
           }
         }
       }
+    },
+    "FEN ou PGN invalide" : {
+
     },
     "Fermer" : {
       "localizations" : {
@@ -7527,6 +7539,9 @@
         }
       }
     },
+    "Position personnalisée" : {
+
+    },
     "Position personnalisée (FEN)" : {
       "localizations" : {
         "en" : {
@@ -9731,6 +9746,7 @@
       }
     },
     "Toutes les parties de la série partiront de cette position." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
