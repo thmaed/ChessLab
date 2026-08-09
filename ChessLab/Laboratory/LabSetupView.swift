@@ -1,4 +1,6 @@
+import ChessKit
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Configuration d'une série Laboratoire (Stockfish contre Stockfish).
 /// Propose de reprendre une série interrompue si une sauvegarde existe.
@@ -13,6 +15,15 @@ struct LabSetupView: View {
     @State private var fenError = false
     @State private var showPositionEditor = false
     @State private var showScanner = false
+    @State private var showTextImport = false
+    @State private var importText = ""
+    @State private var importError: String?
+    @State private var showFileImporter = false
+    /// Note affichée quand la position vient d'un PGN (« position finale… »).
+    @State private var sourceNote: String?
+    @State private var appSettings = AppSettings.shared
+
+    private var boardTheme: BoardTheme { appSettings.boardTheme }
 
     /// - parameter startFEN: position imposée à l'ouverture (venue de
     ///   l'éditeur ou du scanner) ; sinon on reprend celle des réglages
@@ -81,39 +92,10 @@ struct LabSetupView: View {
                 // réglait : la fonctionnalité était inatteignable.
                 SettingsSection(title: "Départ", systemImage: "flag.fill", tint: Theme.rose) {
                     VStack(alignment: .leading, spacing: 12) {
-                        ToggleRow(label: "Position personnalisée (FEN)", isOn: $useCustomFEN.animation())
+                        ToggleRow(label: "Position personnalisée", isOn: $useCustomFEN.animation())
 
                         if useCustomFEN {
-                            TextField("Position de départ (FEN)", text: $fenText, prompt: Text("rnbqkbnr/pppppppp/…").foregroundStyle(Theme.textTertiary))
-                                .labelsHidden()
-                                .font(.system(.footnote, design: .monospaced))
-                                .foregroundStyle(Theme.textPrimary)
-                                .textInputAutocapitalization(.never)
-                                .autocorrectionDisabled()
-                                .onChange(of: fenText) { fenError = false }
-                                .padding(10)
-                                .background(Theme.surfaceElevated, in: Theme.controlShape)
-                                .overlay(Theme.controlShape.strokeBorder(fenError ? Theme.danger : Theme.stroke, lineWidth: 1))
-
-                            if fenError {
-                                Label("FEN invalide", systemImage: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(Theme.danger)
-                                    .font(.caption)
-                            }
-
-                            HStack(spacing: 8) {
-                                ChipButton(label: "Ouvrir l'éditeur", systemImage: "square.and.pencil", isSelected: false) {
-                                    showPositionEditor = true
-                                }
-                                ChipButton(label: "Scanner", systemImage: "camera.viewfinder", isSelected: false) {
-                                    showScanner = true
-                                }
-                                .accessibilityIdentifier("scanLabStartPosition")
-                            }
-
-                            Text("Toutes les parties de la série partiront de cette position.")
-                                .font(.caption)
-                                .foregroundStyle(Theme.textTertiary)
+                            customPositionEditor
                         }
                     }
                 }
@@ -196,6 +178,142 @@ struct LabSetupView: View {
         .sheet(isPresented: $showScanner) {
             scannerSheet
         }
+        .sheet(isPresented: $showTextImport) {
+            textImportSheet
+        }
+        .fileImporter(
+            isPresented: $showFileImporter,
+            allowedContentTypes: [
+                UTType(filenameExtension: "pgn") ?? .plainText,
+                UTType(filenameExtension: "fen") ?? .plainText,
+                .plainText
+            ],
+            allowsMultipleSelection: false
+        ) { result in
+            handleFileImport(result)
+        }
+    }
+
+    // MARK: Position de départ personnalisée (FEN ou PGN)
+
+    /// Éditeur de position de départ : aperçu du plateau, champ FEN, et
+    /// quatre sources — coller/saisir (FEN **ou** PGN), importer un fichier
+    /// (.pgn/.fen), éditeur, scanner. Un PGN est ramené à sa position finale.
+    @ViewBuilder
+    private var customPositionEditor: some View {
+        let trimmed = fenText.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        // Aperçu : confirme d'un coup d'œil la position qui servira de départ.
+        if let position = Position(fen: trimmed) {
+            ChessBoardView(
+                board: Board(position: position),
+                orientation: .white,
+                theme: boardTheme,
+                selectedSquare: nil,
+                legalTargetSquares: [],
+                lastMove: nil,
+                hintMoves: [],
+                interactionEnabled: false,
+                showCoordinates: false,
+                onTapSquare: { _ in },
+                onDropPiece: { _, _ in }
+            )
+            .frame(maxWidth: 200)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.vertical, 4)
+        }
+
+        TextField("Position de départ (FEN)", text: $fenText, prompt: Text("rnbqkbnr/pppppppp/…").foregroundStyle(Theme.textTertiary))
+            .labelsHidden()
+            .font(.system(.footnote, design: .monospaced))
+            .foregroundStyle(Theme.textPrimary)
+            .textInputAutocapitalization(.never)
+            .autocorrectionDisabled()
+            .onChange(of: fenText) { fenError = false; sourceNote = nil }
+            .padding(10)
+            .background(Theme.surfaceElevated, in: Theme.controlShape)
+            .overlay(Theme.controlShape.strokeBorder(fenError ? Theme.danger : Theme.stroke, lineWidth: 1))
+
+        if fenError {
+            Label("FEN ou PGN invalide", systemImage: "exclamationmark.triangle.fill")
+                .foregroundStyle(Theme.danger)
+                .font(.caption)
+        } else if let sourceNote {
+            Label(sourceNote, systemImage: "text.badge.checkmark")
+                .foregroundStyle(Theme.accent)
+                .font(.caption)
+        }
+
+        WrapLayout(spacing: 8, lineSpacing: 8) {
+            ChipButton(label: "Coller / saisir", systemImage: "doc.on.clipboard", isSelected: false) {
+                importText = ""
+                importError = nil
+                showTextImport = true
+            }
+            ChipButton(label: "Importer un fichier", systemImage: "doc.badge.plus", isSelected: false) {
+                showFileImporter = true
+            }
+            ChipButton(label: "Éditeur", systemImage: "square.and.pencil", isSelected: false) {
+                showPositionEditor = true
+            }
+            ChipButton(label: "Scanner", systemImage: "camera.viewfinder", isSelected: false) {
+                showScanner = true
+            }
+            .accessibilityIdentifier("scanLabStartPosition")
+        }
+
+        Text("Collez ou importez un **FEN** ou un **PGN** (la position finale du PGN est utilisée). Toutes les parties de la série partiront de cette position.")
+            .font(.caption)
+            .foregroundStyle(Theme.textTertiary)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    /// Feuille « coller / saisir » : accepte un FEN **ou** un PGN (auto-détecté).
+    private var textImportSheet: some View {
+        TextImportSheet(
+            title: "Coller un PGN ou un FEN",
+            text: $importText,
+            errorMessage: importError,
+            placeholder: "1. e4 e5 2. Nf3 …   ou   rnbqkbnr/pppppppp/…",
+            confirmLabel: "Utiliser la position"
+        ) {
+            if applyResolved(importText) {
+                showTextImport = false
+            } else {
+                importError = "Ni un FEN ni un PGN reconnaissable."
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+
+    private func handleFileImport(_ result: Result<[URL], Error>) {
+        guard case let .success(urls) = result, let url = urls.first else { return }
+        let accessed = url.startAccessingSecurityScopedResource()
+        defer { if accessed { url.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: url),
+              let text = String(data: data, encoding: .utf8),
+              applyResolved(text) else {
+            fenError = true
+            return
+        }
+    }
+
+    /// Reconnaît un **FEN** ou un **PGN** dans `text` et pose la position de
+    /// départ (`fenText`). Un PGN est ramené à la FEN de sa position finale.
+    /// Retourne `false` si rien d'exploitable.
+    @discardableResult
+    private func applyResolved(_ text: String) -> Bool {
+        guard let resolved = LabStartPosition.resolve(text) else { return false }
+        fenText = resolved.fen
+        fenError = false
+        if resolved.fromPGN {
+            sourceNote = resolved.plies > 0
+                ? "Position après \(resolved.plies) demi-coup\(resolved.plies > 1 ? "s" : "") d'un PGN"
+                : "Position de départ d'un PGN"
+        } else {
+            sourceNote = nil
+        }
+        return true
     }
 
     /// Même garde que l'écran Jouer : un FEN illégal ne doit JAMAIS atteindre
@@ -264,6 +382,7 @@ struct LabSetupView: View {
     private func setStartFEN(_ fen: String) {
         fenText = fen
         fenError = false
+        sourceNote = nil
     }
 
     // MARK: Sous-vues
