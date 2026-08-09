@@ -1,0 +1,8 @@
+# Données générées et cache réseau : JAMAIS embarquées dans la cible iOS,
+# jamais committées. Les fichiers finaux sont copiés à la main dans
+# ChessLab/Resources/openings/ au jalon d'intégration.
+out/
+.cache/
+__pycache__/
+*.pyc
+.venv/
