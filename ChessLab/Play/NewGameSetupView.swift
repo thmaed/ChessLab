@@ -106,7 +106,7 @@ struct NewGameSetupView: View {
                             Spacer()
                         }
 
-                        Slider(value: $eloSlider, in: EngineStrength.playSliderRange, step: 10)
+                        Slider(value: $eloSlider, in: EngineStrength.playSliderRange, step: 50)
                             .tint(Theme.accent)
 
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {

@@ -102,10 +102,11 @@ struct EnginePreset: Identifiable, Equatable {
         strength == .maximum ? label : "\(label) (\(Int(strength.sliderValue)))"
     }
 
-    /// Échelle du mode Jouer, jusqu'au **maximum de Stockfish**. Les marches
-    /// du bas (1000, 1400) resserrent l'écart là où l'on progresse vraiment ;
-    /// celles du haut (Super-GM, Élite, Maximum) laissent qui le veut se
-    /// mesurer à la pleine puissance du moteur.
+    /// Préréglages rapides du mode Jouer. S'arrêtent à « Grand Maître » (2500) :
+    /// au-delà, le curseur libre monte jusqu'au maximum de Stockfish, mais sans
+    /// bouton dédié — ces niveaux ne se jouent pas, ils se subissent. Les
+    /// marches du bas (1000, 1400) resserrent l'écart là où l'on progresse
+    /// vraiment.
     static let all: [EnginePreset] = [
         .init(id: "e800", label: "Grand débutant", strength: EngineStrength(sliderValue: 800)),
         .init(id: "e1000", label: "Débutant", strength: EngineStrength(sliderValue: 1000)),
@@ -115,8 +116,5 @@ struct EnginePreset: Identifiable, Equatable {
         .init(id: "e2000", label: "Avancé / Expert", strength: .limited(elo: 2000)),
         .init(id: "e2300", label: "Maître national", strength: .limited(elo: 2300)),
         .init(id: "e2500", label: "Grand Maître", strength: .limited(elo: 2500)),
-        .init(id: "e2700", label: "Super Grand Maître", strength: .limited(elo: 2700)),
-        .init(id: "e2850", label: "Élite mondiale", strength: .limited(elo: 2850)),
-        .init(id: "max", label: "Maximum", strength: .maximum),
     ]
 }
