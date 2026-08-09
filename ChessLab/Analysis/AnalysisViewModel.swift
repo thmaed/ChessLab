@@ -1128,11 +1128,32 @@ final class AnalysisViewModel {
             // de la tâche 2 : le rafraîchissement dérivé est COALESCÉ ici plutôt
             // que relancé après chaque nœud (il rendait la boucle quadratique
             // sur le MainActor).
-            for (done, index) in movesToClassify.enumerated() {
+            // Classification par PRIORITÉ à la position REGARDÉE. Au lieu de
+            // suivre bêtement l'ordre des coups, chaque tour classe d'abord la
+            // position actuellement affichée si elle ne l'est pas encore. Sa
+            // flèche verte — et la rétrospective « il fallait jouer ça », qui lit
+            // le PARENT, évalué par le même appel (``classifyNode`` évalue parent
+            // ET enfant) — apparaît ainsi après UNE recherche, sans attendre que
+            // la passe de fond l'atteigne dans l'ordre.
+            //
+            // 🐛 « les flèches vertes ne s'affichent pas au bon moment » : en
+            // sautant au coup 30 pendant que le fond en était au coup 5, la
+            // flèche ne venait qu'une fois les 25 coups intermédiaires classés.
+            // Désormais le coup 30 passe en tête de file dès qu'on le regarde.
+            var remaining = movesToClassify
+            var remainingSet = Set(movesToClassify)
+            let total = movesToClassify.count
+            var done = 0
+
+            while !remaining.isEmpty {
                 // Écran quitté en cours de route : on abandonne la
                 // classification restante plutôt que de continuer à faire
                 // chercher Stockfish pour un écran que plus personne ne regarde.
                 if self.isTornDown { break }
+
+                let viewed = self.currentIndex
+                let index = remainingSet.contains(viewed) ? viewed : remaining[0]
+
                 await self.classifyNode(index, engine: engine)
 
                 // Moteur muet pendant ce nœud : redémarrage automatique, puis
@@ -1147,8 +1168,18 @@ final class AnalysisViewModel {
                         break
                     }
                 }
-                if done % 4 == 3 { self.refreshDerivedData() }
-                self.classificationProgress = (done: done + 1, total: movesToClassify.count)
+
+                remainingSet.remove(index)
+                if let position = remaining.firstIndex(of: index) {
+                    remaining.remove(at: position)
+                }
+                done += 1
+                // Rafraîchit AUSSITÔT quand on vient de classer la position
+                // REGARDÉE (sa flèche doit apparaître sans délai) ; sinon on
+                // coalesce (un refresh tous les 4 nœuds) pour ne pas marteler le
+                // MainActor pendant la passe de fond.
+                if index == viewed || done % 4 == 0 { self.refreshDerivedData() }
+                self.classificationProgress = (done: done, total: total)
             }
 
             self.isClassifying = false
