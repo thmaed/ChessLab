@@ -6,3 +6,5 @@ out/
 __pycache__/
 *.pyc
 .venv/
+# Fichiers de travail d'édition des commentaires (export/import comments.py).
+*.csv
