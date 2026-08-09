@@ -24,7 +24,7 @@ struct LicensesView: View {
             icon: "cpu", tint: Theme.accent,
             name: "Stockfish",
             license: "Licence GPLv3",
-            body: "Moteur d'échecs, intégré via ChessKitEngine. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer.",
+            body: "Moteur d'échecs (Stockfish 17), compilé depuis ses sources C++ directement dans l'app. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer.",
             url: URL(string: "https://stockfishchess.org")
         ),
         .init(
@@ -36,10 +36,10 @@ struct LicensesView: View {
         ),
         .init(
             icon: "shippingbox.fill", tint: Theme.teal,
-            name: "ChessKit & ChessKitEngine",
+            name: "ChessKit",
             license: "Licence MIT",
-            body: "Règles du jeu (FEN/PGN/SAN) et intégration UCI de Stockfish. Le wrapper lui-même est sous licence MIT ; seul le Stockfish qu'il embarque est sous GPLv3.",
-            url: URL(string: "https://github.com/chesskit-app")
+            body: "Règles du jeu (FEN/PGN/SAN). Bibliothèque Swift sous licence MIT.",
+            url: URL(string: "https://github.com/chesskit-app/chesskit-swift")
         ),
         .init(
             icon: "crown.fill", tint: Theme.warning,

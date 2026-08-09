@@ -103,6 +103,13 @@ La bascule `NavigationSplitView` conditionne presque tout iPad/Mac : chantier fo
   - **⚠️ AVANT PUBLICATION** : confirmer la licence EXACTE de `maestro` et `merida` dans `github.com/lichess-org/lila` → `public/piece/COPYING.md`, et compléter l'attribution auteur si nécessaire. L'app étant déjà GPLv3 (Stockfish), les jeux GPL/CC sont compatibles ; ne PAS ajouter de jeu à licence restrictive (surtout jamais les `cc_*` = chess.com).
     - **✅ RÉSOLU (30/07/2026)** : `maestro` était CC BY-NC-SA 4.0 (NON commercial → incompatible GPLv3), remplacé par `chessnut` (Apache 2.0). `merida` = GPLv2+ (OK). Voir le journal du 30/07.
 
+- 09/08/2026 — **Refonte de l'intégration Stockfish** (perf + freezes) :
+  - Constat : ChessKitEngine 0.7.0 compilait SF17 **sans les chemins SIMD ARM** (NNUE en scalaire → 2-4× trop lent sur A13+), embarquait **25 Mo de lc0 inutiles**, et parsait la sortie moteur **sur le thread principal** (`readInBackgroundAndNotify` sur le run loop principal) → freezes sous le flot d'`info`.
+  - **Package local `Vendor/CStockfish`** : Stockfish 17 vendorisé, compilé avec **USE_NEON=8 + USE_POPCNT + -O3 -DNDEBUG** (dotprod volontairement écarté : planterait A10/A11), **sans lc0**. Transport propre (shim C++) : redirige `std::cin/std::cout` du C++ et exécute la boucle UCI sur un **thread dédié** — plus de parsing sur le thread principal, plus de `dup2` sur le fd du process (donc plus de SIGPIPE).
+  - **ChessKitEngine RETIRÉ** du projet. `EngineController` réécrit sur `CStockfishKit` (API publique inchangée → aucun appelant modifié). Réseau NNUE trouvé via `binaryPath = <bundle>/stockfish`.
+  - Vérifié : package testé isolément (cycle UCI réel), app compile, moteur tourne à l'exécution (test UI « contre l'ordinateur » vert), suite 343/54 verte, 0 crash.
+  - **Reste possible (non fait)** : mesurer le gain NPS réel sur appareil ; envisager dotprod avec dispatch runtime ; réduire les threads aux cœurs perf sur petits appareils ; petit net sur ≤4 Go.
+
 - 30/07/2026 — **Consolidation vers la publication 1.1** (4 lots) :
   - **Licences pièces réglées** : la confirmation (COPYING.md officiel de lila) a révélé que **`maestro` est en CC BY-NC-SA 4.0** (clause NON commerciale, **incompatible GPLv3**). Retiré et **remplacé par `chessnut` (Apache 2.0)**, même créneau « Moderne ». `merida` confirmé **GPLv2+** (conservé). LicensesView + METADATA corrigés (3 jeux, tous compatibles GPLv3). Le ⚠️ licences ci-dessus est donc **levé**.
   - **Axe A — pointeur/trackpad FAIT** : anneau de survol sous le pointeur sur la case (iPad trackpad/souris, Mac), couleur adaptée à la case, inerte au doigt. Reste de l'Axe A : **multi-fenêtres/Stage Manager** (seul item non fait) et menus contextuels approfondis.
