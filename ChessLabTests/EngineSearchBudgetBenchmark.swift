@@ -1,4 +1,4 @@
-import ChessKitEngine
+import CStockfishKit
 import Foundation
 import os
 import Testing
@@ -126,7 +126,7 @@ struct EngineSearchBudgetBenchmark {
     /// classification.
     @Test(.enabled(if: EngineSearchBudgetBenchmark.isEnabled))
     func depthReachedPerTimeBudget() async {
-        let controller = EngineController(type: .stockfish)
+        let controller = EngineController()
         let started = await controller.start(
             threads: ThermalMonitor.shared.threads(preferred: AppSettings.recommendedEngineThreads),
             hashMB: AppSettings.engineHashMB,
@@ -178,7 +178,7 @@ struct EngineSearchBudgetBenchmark {
 
     @Test(.enabled(if: EngineSearchBudgetBenchmark.isEnabled))
     func singleThreadAloneDoesNotStall() async {
-        let controller = EngineController(type: .stockfish)
+        let controller = EngineController()
         guard await controller.start(
             threads: 1, hashMB: AppSettings.engineHashMB, multipv: 2
         ) else {

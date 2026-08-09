@@ -1,4 +1,4 @@
-import ChessKitEngine
+import CStockfishKit
 import Foundation
 import Testing
 @testable import ChessLab
@@ -87,7 +87,7 @@ struct EngineOptionsTests {
     func aRealEngineStartsWithTheRequestedOptionsAndStillPlays() async throws {
         // Borne large : sous la charge d'une suite, le réseau NNUE de 78 Mo
         // met bien plus que les 5 s de l'app à se charger.
-        let controller = EngineController(type: .stockfish, startTimeoutMs: 60_000)
+        let controller = EngineController(startTimeoutMs: 60_000)
         defer { Task { await controller.stop() } }
 
         let started = await controller.start(threads: 2, hashMB: AppSettings.engineHashMB, multipv: 1)

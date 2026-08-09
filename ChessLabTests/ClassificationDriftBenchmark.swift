@@ -1,5 +1,5 @@
 import ChessKit
-import ChessKitEngine
+import CStockfishKit
 import Foundation
 import os
 import Testing
@@ -127,7 +127,7 @@ struct ClassificationDriftBenchmark {
 
     @Test(.enabled(if: ClassificationDriftBenchmark.isEnabled))
     func driftBetweenTimeAndNodeBudgets() async {
-        let controller = EngineController(type: .stockfish)
+        let controller = EngineController()
         let started = await controller.start(
             threads: ThermalMonitor.shared.threads(preferred: AppSettings.recommendedEngineThreads),
             hashMB: AppSettings.engineHashMB,

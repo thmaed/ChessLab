@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		B7F78CF4A0C842D79D164931 /* ChessKitEngine in Frameworks */ = {isa = PBXBuildFile; productRef = 678E3CE58F244D95A5BDD765 /* ChessKitEngine */; };
 		F69740317DA442B4A58BAD99 /* ChessKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3DE236CC84514D2D9F36A9FE /* ChessKit */; };
+		CD00CD00CD00CD00CD00CD03 /* CStockfishKit in Frameworks */ = {isa = PBXBuildFile; productRef = CD00CD00CD00CD00CD00CD02 /* CStockfishKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,7 +53,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F69740317DA442B4A58BAD99 /* ChessKit in Frameworks */,
-				B7F78CF4A0C842D79D164931 /* ChessKitEngine in Frameworks */,
+				CD00CD00CD00CD00CD00CD03 /* CStockfishKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,7 +108,7 @@
 			name = ChessLab;
 			packageProductDependencies = (
 				3DE236CC84514D2D9F36A9FE /* ChessKit */,
-				678E3CE58F244D95A5BDD765 /* ChessKitEngine */,
+				CD00CD00CD00CD00CD00CD02 /* CStockfishKit */,
 			);
 			productName = ChessLab;
 			productReference = 0558AD0B73974786AAA982AF /* ChessLab.app */;
@@ -195,7 +195,7 @@
 			mainGroup = C7E0E02E3DB7406BB9E08936;
 			packageReferences = (
 				575CEAF21CA747398E0D7D8B /* XCRemoteSwiftPackageReference "chesskit-swift" */,
-				7C8405E150B24303B3CF98EB /* XCRemoteSwiftPackageReference "chesskit-engine" */,
+				CD00CD00CD00CD00CD00CD01 /* XCLocalSwiftPackageReference "Vendor/CStockfish" */,
 			);
 			productRefGroup = 40D432D46DF142A38448265D /* Products */;
 			projectDirPath = "";
@@ -568,6 +568,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		CD00CD00CD00CD00CD00CD01 /* XCLocalSwiftPackageReference "Vendor/CStockfish" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "Vendor/CStockfish";
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		575CEAF21CA747398E0D7D8B /* XCRemoteSwiftPackageReference "chesskit-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -575,14 +582,6 @@
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 0.17.0;
-			};
-		};
-		7C8405E150B24303B3CF98EB /* XCRemoteSwiftPackageReference "chesskit-engine" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/chesskit-app/chesskit-engine";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.7.0;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
@@ -593,10 +592,10 @@
 			package = 575CEAF21CA747398E0D7D8B /* XCRemoteSwiftPackageReference "chesskit-swift" */;
 			productName = ChessKit;
 		};
-		678E3CE58F244D95A5BDD765 /* ChessKitEngine */ = {
+		CD00CD00CD00CD00CD00CD02 /* CStockfishKit */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 7C8405E150B24303B3CF98EB /* XCRemoteSwiftPackageReference "chesskit-engine" */;
-			productName = ChessKitEngine;
+			package = CD00CD00CD00CD00CD00CD01 /* XCLocalSwiftPackageReference "Vendor/CStockfish" */;
+			productName = CStockfishKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

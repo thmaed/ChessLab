@@ -1,5 +1,5 @@
 import ChessKit
-import ChessKitEngine
+import CStockfishKit
 import Foundation
 import os
 
@@ -135,7 +135,7 @@ final class LabViewModel {
     // MARK: Boucle de série
 
     private func runSeries() async {
-        let controller = EngineController(type: .stockfish)
+        let controller = EngineController()
         engine = controller
         // Passe par le moniteur thermique comme les autres modes : une série
         // tourne plusieurs minutes d'affilée, c'est précisément le cas où

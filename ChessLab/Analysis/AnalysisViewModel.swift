@@ -1,5 +1,5 @@
 import ChessKit
-import ChessKitEngine
+import CStockfishKit
 import Foundation
 import Observation
 import os
@@ -269,7 +269,7 @@ final class AnalysisViewModel {
     /// l'écran restait muet — ni éval, ni flèches, ni classification, sans la
     /// moindre explication (voir ``PlayViewModel/startEngine()``).
     private func startEngine() async -> Bool {
-        let controller = EngineController(type: .stockfish)
+        let controller = EngineController()
 
         guard await controller.start(
             threads: ThermalMonitor.shared.threads(preferred: AppSettings.recommendedEngineThreads),

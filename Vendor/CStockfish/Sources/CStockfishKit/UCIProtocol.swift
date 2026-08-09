@@ -79,9 +79,12 @@ public enum EngineResponse: Equatable, Sendable {
         /// l'autre). L'INTERPRÉTATION (mat = ±10000, priorité au mat) reste
         /// côté app (`EngineScore`).
         public struct Score: Equatable, Sendable {
-            public var cp: Int?
+            // Types alignés sur ce que l'app attend (comme ChessKitEngine) :
+            // `cp` en Double (affecté à des `[Int: Double]`, lu via `Int(cp)`),
+            // `mate` en Int (affecté directement à des `Int?`).
+            public var cp: Double?
             public var mate: Int?
-            public init(cp: Int? = nil, mate: Int? = nil) {
+            public init(cp: Double? = nil, mate: Int? = nil) {
                 self.cp = cp
                 self.mate = mate
             }
@@ -128,9 +131,11 @@ public enum EngineResponse: Equatable, Sendable {
                 // lowerbound/upperbound (ignorés).
                 if i + 2 < tokens.count {
                     let kind = tokens[i + 1]
-                    let value = Int(tokens[i + 2])
-                    if kind == "cp" { info.score = Info.Score(cp: value, mate: nil) }
-                    else if kind == "mate" { info.score = Info.Score(cp: nil, mate: value) }
+                    if kind == "cp" {
+                        info.score = Info.Score(cp: Double(tokens[i + 2]), mate: nil)
+                    } else if kind == "mate" {
+                        info.score = Info.Score(cp: nil, mate: Int(tokens[i + 2]))
+                    }
                 }
                 i += 3
             case "pv":

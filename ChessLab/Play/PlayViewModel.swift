@@ -1,5 +1,5 @@
 import ChessKit
-import ChessKitEngine
+import CStockfishKit
 import Foundation
 import Observation
 import os
@@ -308,7 +308,7 @@ final class PlayViewModel {
     ///   donnerait donc un écran d'apparence normale où le moteur ne jouerait
     ///   jamais.
     private func startEngine() async -> Bool {
-        let controller = EngineController(type: .stockfish)
+        let controller = EngineController()
 
         // MultiPV reste à 1 par défaut : les requêtes rapides (gaffe,
         // barre d'éval, coup du moteur) n'en ont pas besoin. Il est monté

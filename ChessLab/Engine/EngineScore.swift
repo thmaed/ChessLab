@@ -1,4 +1,4 @@
-import ChessKitEngine
+import CStockfishKit
 
 /// Lecture du score d'une ligne `info` du moteur (Lot 6.B).
 ///

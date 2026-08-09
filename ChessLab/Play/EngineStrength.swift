@@ -1,4 +1,4 @@
-import ChessKitEngine
+import CStockfishKit
 
 /// Réglage de la force du moteur pour le mode Jouer.
 ///

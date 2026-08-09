@@ -1,4 +1,4 @@
-import ChessKitEngine
+import CStockfishKit
 import Testing
 @testable import ChessLab
 

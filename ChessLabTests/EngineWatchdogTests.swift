@@ -1,4 +1,4 @@
-import ChessKitEngine
+import CStockfishKit
 import Testing
 @testable import ChessLab
 
@@ -70,7 +70,7 @@ struct EngineWatchdogTests {
     /// c'est le contrat qui permet aux appelants d'ignorer le retour sans
     /// risquer un blocage.
     @Test func synchronizeOnANeverStartedEngineReturnsFalse() async {
-        let controller = EngineController(type: .stockfish)
+        let controller = EngineController()
         let clock = ContinuousClock()
         let start = clock.now
 
