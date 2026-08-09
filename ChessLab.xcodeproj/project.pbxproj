@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		F69740317DA442B4A58BAD99 /* ChessKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3DE236CC84514D2D9F36A9FE /* ChessKit */; };
 		CD00CD00CD00CD00CD00CD03 /* CStockfishKit in Frameworks */ = {isa = PBXBuildFile; productRef = CD00CD00CD00CD00CD00CD02 /* CStockfishKit */; };
+		F69740317DA442B4A58BAD99 /* ChessKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3DE236CC84514D2D9F36A9FE /* ChessKit */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -571,7 +571,7 @@
 /* Begin XCLocalSwiftPackageReference section */
 		CD00CD00CD00CD00CD00CD01 /* XCLocalSwiftPackageReference "Vendor/CStockfish" */ = {
 			isa = XCLocalSwiftPackageReference;
-			relativePath = "Vendor/CStockfish";
+			relativePath = Vendor/CStockfish;
 		};
 /* End XCLocalSwiftPackageReference section */
 

@@ -27,6 +27,11 @@
 
 ## Under the hood
 
+- Rebuilt chess engine integration: Stockfish is now compiled from source with
+  ARM SIMD (NEON) optimizations and driven off the main thread. Result: much
+  faster analysis and no more interface stutter while the engine thinks,
+  especially on older devices. Engine strength and settings are tuned to each
+  device — deeper analysis on recent hardware, lighter on older phones.
 - Faster post-game analysis: once every move is evaluated, review navigation is
   served from the cache and the engine stays idle instead of recomputing on each
   step — while analysing a specific position still runs live.

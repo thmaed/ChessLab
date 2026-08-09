@@ -11,19 +11,13 @@ struct ChessLabApp: App {
     #endif
 
     init() {
-        // Ignorer SIGPIPE au tout début, avant qu'un moteur ne démarre.
-        //
-        // ChessKitEngine parle à Stockfish par un `write()` BRUT sur un tuyau
-        // (`EngineMessenger.sendCommand:`), sans `F_SETNOSIGPIPE`. Quand le
-        // process Stockfish a quitté (tout arrêt de moteur envoie `quit`, qui
-        // ferme le tuyau) et qu'un envoi tardif ou concurrent le frappe encore
-        // — la lib ferme le tuyau sous un verrou DIFFÉRENT de celui des envois,
-        // ils ne s'excluent pas — `write()` lève SIGPIPE, dont l'action par
-        // défaut TUE le process : « Terminated due to signal 13 » en quittant
-        // l'Analyse. En l'ignorant, `write()` échoue proprement (`EPIPE`) au
-        // lieu de tuer l'app — la commande perdue est sans conséquence, le
-        // moteur étant de toute façon en train de s'arrêter. Correctif standard
-        // pour tout code faisant de l'I/O sur pipe qu'on ne peut pas modifier.
+        // Ignorer SIGPIPE, par précaution. Le moteur vendorisé
+        // (``CStockfishKit``) ne communique plus par un tuyau POSIX — il pousse
+        // les commandes dans une file en mémoire et redirige les `streambuf`
+        // C++, donc il ne peut plus lever SIGPIPE (contrairement à
+        // ChessKitEngine, dont le `write()` brut sur pipe tuait l'app par
+        // « signal 13 » à l'arrêt d'un moteur). On garde la garde : elle est
+        // sans coût et protège tout futur code faisant de l'I/O sur pipe.
         signal(SIGPIPE, SIG_IGN)
 
         // Toucher le singleton AVANT tout rendu : son init applique la langue
