@@ -7,6 +7,7 @@ import SwiftUI
 /// valide le modèle et la donnée sans logique d'entraînement.
 struct OpeningExplorerView: View {
     @Bindable var viewModel: OpeningExplorerViewModel
+    var onLearn: () -> Void = {}
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
@@ -32,6 +33,7 @@ struct OpeningExplorerView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 14) {
+                    Button(action: onLearn) { Image(systemName: "graduationcap") }
                     Button { viewModel.back() } label: { Image(systemName: "arrow.uturn.backward") }
                         .disabled(!viewModel.canGoBack)
                     Button { viewModel.reset() } label: { Image(systemName: "house") }
@@ -245,12 +247,13 @@ struct OpeningExplorerView: View {
 /// une seule fois avec l'index de transpositions embarqué.
 struct OpeningExplorerHost: View {
     let courseID: String
+    var onLearn: () -> Void = {}
     @State private var viewModel: OpeningExplorerViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                OpeningExplorerView(viewModel: viewModel)
+                OpeningExplorerView(viewModel: viewModel, onLearn: onLearn)
             } else {
                 ContentUnavailableView("Cours indisponible", systemImage: "questionmark.folder")
                     .appBackground()

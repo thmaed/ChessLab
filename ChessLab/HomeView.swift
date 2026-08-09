@@ -68,6 +68,7 @@ struct HomeView: View {
         /// ``OpeningsGraphFeature`` — voir J6.
         case openingExplorerPicker
         case openingExplorerCourse(String)
+        case openingLearnCourse(String)
         /// Réglages Labo, éventuellement pré-remplis avec une position de
         /// départ venue de l'éditeur ou du scanner.
         case labSetup(startFEN: String?)
@@ -498,7 +499,16 @@ struct HomeView: View {
                     }
 
                 case let .openingExplorerCourse(courseID):
-                    OpeningExplorerHost(courseID: courseID)
+                    OpeningExplorerHost(courseID: courseID) {
+                        path.append(Route.openingLearnCourse(courseID))
+                    }
+
+                case let .openingLearnCourse(courseID):
+                    OpeningLearnHost(courseID: courseID) {
+                        path.removeLast()
+                    } onContinueVsStockfish: { fen in
+                        path.append(Route.continueVsStockfish(fen))
+                    }
 
                 case let .activeOpeningLine(entry, color):
                     OpeningLineTrainingHost(entry: entry, color: color) {
