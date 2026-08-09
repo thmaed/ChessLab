@@ -44,8 +44,12 @@ final class AppSettings {
     /// deux cœurs à l'interface et au système, et on plafonne à 4 : au-delà,
     /// sur mobile, le gain de force est mangé par la chaleur et la batterie.
     /// ``ThermalMonitor/threads(preferred:)`` rabote encore quand ça chauffe.
+    /// Sur les seuls cœurs PERFORMANCE (voir ``DevicePerformance``). L'ancienne
+    /// formule `cœurs − 2` mettait des threads sur les cœurs « efficacité »
+    /// (p. ex. 4 threads sur iPhone 11, dont 2 sur des cœurs lents) : chaleur
+    /// et throttling pour rien.
     nonisolated static var recommendedEngineThreads: Int {
-        max(1, min(4, ProcessInfo.processInfo.activeProcessorCount - 2))
+        DevicePerformance.recommendedThreads
     }
 
     /// Table de transposition des moteurs interactifs (analyse live, mode
@@ -62,10 +66,11 @@ final class AppSettings {
     }
 
     /// Profondeur cible de l'analyse en continu. `go infinite` ne s'arrêtait
-    /// jamais tout seul (cœurs à 100 % tant que la position restait affichée).
-    /// Au-delà de ~22, l'éval et les flèches ne bougent plus à l'œil : on borne,
-    /// le moteur passe en idle, la navigation relance une recherche neuve.
-    nonisolated static let liveAnalysisDepth = 22
+    /// jamais tout seul (cœurs à 100 % tant que la position restait affichée) :
+    /// on borne, le moteur passe en idle, la navigation relance une recherche
+    /// neuve. Adaptée à l'appareil (``DevicePerformance/liveDepth``) : plus
+    /// profonde sur matériel moderne, plus sobre en bas de gamme.
+    nonisolated static var liveAnalysisDepth: Int { DevicePerformance.liveDepth }
 
     var boardThemeID: String {
         didSet { UserDefaults.standard.set(boardThemeID, forKey: Keys.boardThemeID) }

@@ -36,20 +36,20 @@ struct EngineOptionsTests {
 
     // MARK: Réglages DÉDUITS
 
-    /// Threads et mémoire ne sont plus demandés à l'utilisateur (18/07/2026) :
-    /// la bonne valeur dépend de l'appareil, et aucune valeur figée n'est
-    /// juste des deux côtés — 4 threads étouffent un appareil à deux cœurs,
-    /// 2 brident un iPhone récent.
-    @Test func threadsAreDerivedFromTheDeviceAndLeaveHeadroom() {
+    /// Threads dérivés de l'appareil : les cœurs PERFORMANCE seulement
+    /// (``DevicePerformance``), plafonnés à 4. Ne met plus de threads sur les
+    /// cœurs « efficacité » (l'ancienne formule `cœurs − 2` le faisait, d'où
+    /// 4 threads dont 2 lents sur iPhone 11).
+    @Test func threadsAreDerivedFromThePerformanceCores() {
         let threads = AppSettings.recommendedEngineThreads
-        let cores = ProcessInfo.processInfo.activeProcessorCount
 
         #expect(threads >= 1, "il faut toujours au moins un thread")
         #expect(threads <= 4, "au-delà, sur mobile, le gain part en chaleur")
         #expect(
-            threads <= max(1, cores - 2),
-            "deux cœurs doivent rester à l'interface et au système"
+            threads <= DevicePerformance.performanceCores,
+            "on ne vise que les cœurs performance"
         )
+        #expect(threads == max(1, min(4, DevicePerformance.performanceCores)))
     }
 
     @Test func theTranspositionTableIsSizedToTheDeviceRAM() {

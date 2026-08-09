@@ -1351,12 +1351,13 @@ final class AnalysisViewModel {
     /// de livre ne sont de toute façon pas blâmés (classés « théorie »).
     private func baseNodeBudget(at index: MoveTree.Index) -> Int {
         let inBook = EcoOpeningLookup.isInBook(sanPath(to: index), in: EcoOpeningLoader.bookLines)
-        // 250 k (au lieu de 300 k) : classification sensiblement plus rapide à
-        // la fin d'une partie, pour une profondeur à peine moindre (≈17-19 au
-        // lieu de 18-20 sur iPhone récent) — toujours au-dessus du seuil où la
-        // détection de gaffes reste fiable. La table de hachage persiste d'une
-        // position à l'autre (même instance moteur), ce qui amortit encore.
-        return inBook ? 80_000 : 250_000
+        // Ouverture (théorie) : positions calmes, budget réduit. Sinon, budget
+        // ADAPTÉ À L'APPAREIL (``DevicePerformance``) : plus profond sur
+        // matériel moderne, plus sobre en bas de gamme. Le moteur recompilé
+        // (NEON) atteint ces budgets bien plus vite, ce qui autorise plus de
+        // profondeur sans exploser le temps total. La table de hachage persiste
+        // d'une position à l'autre (même instance), ce qui amortit encore.
+        return inBook ? 80_000 : DevicePerformance.classificationNodeBudget
     }
 
     private func evaluatePosition(at index: MoveTree.Index, engine: EngineController) async -> CachedEval? {
@@ -1427,7 +1428,7 @@ final class AnalysisViewModel {
     /// plus de Grand coup, sans que rien ne le signale.
     private func rankedEval(
         fen: String, engine: EngineController,
-        nodes: Int = 300_000, capMs: Int = 1_500, multipv: Int
+        nodes: Int = 300_000, capMs: Int = DevicePerformance.classificationCapMs, multipv: Int
     ) async -> [Int: (lan: String, pv: [String], cp: Int)] {
         // Barrière AVANT la recherche : jette les `info` en retard de la
         // recherche précédente, qui fausseraient ce classement — voir
