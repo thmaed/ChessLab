@@ -41,51 +41,59 @@ struct PuzzleQueueView: View {
                     description: Text("Analysez une partie avec des erreurs pour créer des puzzles (menu \"...\" du mode Analyser).")
                 )
             } else {
-                VStack(alignment: .leading, spacing: 24) {
-                    filterGroup(title: "Niveau") {
-                        FilterChip(label: "Tous", tint: Theme.accent, isSelected: selectedDifficulty == nil) {
-                            selectedDifficulty = nil
-                        }
-                        ForEach(DifficultyTier.allCases, id: \.self) { tier in
-                            FilterChip(
-                                label: LocalizedStringKey(tier.label),
-                                icon: "cellularbars",
-                                iconVariableValue: tier.gaugeValue,
-                                tint: Theme.accent,
-                                isSelected: selectedDifficulty == tier
-                            ) {
-                                selectedDifficulty = (selectedDifficulty == tier) ? nil : tier
+                // Filtres DÉFILANTS + pied épinglé (« Commencer » toujours
+                // accessible). Sur grand écran, le `ScrollView` occupe toute la
+                // hauteur et pousse le pied en bas comme avant ; sur petit écran
+                // (SE…), les filtres défilent au lieu d'être tassés/rognés.
+                VStack(spacing: 0) {
+                    ScrollView {
+                        VStack(alignment: .leading, spacing: 24) {
+                            filterGroup(title: "Niveau") {
+                                FilterChip(label: "Tous", tint: Theme.accent, isSelected: selectedDifficulty == nil) {
+                                    selectedDifficulty = nil
+                                }
+                                ForEach(DifficultyTier.allCases, id: \.self) { tier in
+                                    FilterChip(
+                                        label: LocalizedStringKey(tier.label),
+                                        icon: "cellularbars",
+                                        iconVariableValue: tier.gaugeValue,
+                                        tint: Theme.accent,
+                                        isSelected: selectedDifficulty == tier
+                                    ) {
+                                        selectedDifficulty = (selectedDifficulty == tier) ? nil : tier
+                                    }
+                                }
+                            }
+
+                            filterGroup(title: "Phase") {
+                                FilterChip(label: "Toutes", tint: Theme.info, isSelected: selectedPhase == nil) {
+                                    selectedPhase = nil
+                                }
+                                ForEach(GamePhase.allCases, id: \.self) { phase in
+                                    FilterChip(label: LocalizedStringKey(phase.label), icon: phase.icon, tint: Theme.info, isSelected: selectedPhase == phase) {
+                                        selectedPhase = (selectedPhase == phase) ? nil : phase
+                                    }
+                                }
+                            }
+
+                            filterGroup(title: "Type de puzzle") {
+                                FilterChip(label: "Tous", tint: Theme.warning, isSelected: selectedTheme == nil) {
+                                    selectedTheme = nil
+                                }
+                                ForEach(PuzzleTheme.allCases, id: \.self) { theme in
+                                    FilterChip(label: LocalizedStringKey(chipLabel(for: theme)), icon: theme.icon, tint: Theme.warning, isSelected: selectedTheme == theme) {
+                                        selectedTheme = (selectedTheme == theme) ? nil : theme
+                                    }
+                                }
+                            }
+
+                            if let stats, stats.successRate != nil {
+                                statsCard(stats)
                             }
                         }
+                        .padding(20)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-
-                    filterGroup(title: "Phase") {
-                        FilterChip(label: "Toutes", tint: Theme.info, isSelected: selectedPhase == nil) {
-                            selectedPhase = nil
-                        }
-                        ForEach(GamePhase.allCases, id: \.self) { phase in
-                            FilterChip(label: LocalizedStringKey(phase.label), icon: phase.icon, tint: Theme.info, isSelected: selectedPhase == phase) {
-                                selectedPhase = (selectedPhase == phase) ? nil : phase
-                            }
-                        }
-                    }
-
-                    filterGroup(title: "Type de puzzle") {
-                        FilterChip(label: "Tous", tint: Theme.warning, isSelected: selectedTheme == nil) {
-                            selectedTheme = nil
-                        }
-                        ForEach(PuzzleTheme.allCases, id: \.self) { theme in
-                            FilterChip(label: LocalizedStringKey(chipLabel(for: theme)), icon: theme.icon, tint: Theme.warning, isSelected: selectedTheme == theme) {
-                                selectedTheme = (selectedTheme == theme) ? nil : theme
-                            }
-                        }
-                    }
-
-                    if let stats, stats.successRate != nil {
-                        statsCard(stats)
-                    }
-
-                    Spacer(minLength: 0)
 
                     VStack(spacing: 10) {
                         Text(selectionSummary)
@@ -94,8 +102,18 @@ struct PuzzleQueueView: View {
                             .frame(maxWidth: .infinity)
                         startSessionButton
                     }
+                    .padding(.horizontal, 20)
+                    .padding(.top, 12)
+                    .padding(.bottom, 20)
+                    .background(Theme.background)
+                    // Fin liseré haut : sépare le pied du contenu qui défile
+                    // dessous, sans ombre lourde.
+                    .overlay(alignment: .top) {
+                        Rectangle()
+                            .fill(Theme.stroke)
+                            .frame(height: 1)
+                    }
                 }
-                .padding(20)
             }
         }
         .appBackground()
