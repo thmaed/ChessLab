@@ -75,7 +75,10 @@ struct ChessLabApp: App {
     /// interactive/réseau qu'on ne peut pas fiabiliser via `xcodebuild` seul
     /// dans cet environnement. Voir PROGRESS.md.
     private static func makeModelContainer() -> ModelContainer {
-        let schema = Schema([GameRecord.self, Puzzle.self, PuzzleProgress.self])
+        let schema = Schema([
+            GameRecord.self, Puzzle.self, PuzzleProgress.self,
+            OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self,
+        ])
 
         // Deux stores SÉPARÉS, et non un seul :
         // - « Games » (parties de l'utilisateur + PROGRESSION puzzles) :
@@ -89,9 +92,19 @@ struct ChessLabApp: App {
         //   séparation est valide. La bibliothèque se re-seed depuis le bundle
         //   si le store est neuf ; ``PuzzleProgressSync`` réinjecte la
         //   progression synchronisée dans les `Puzzle` locaux.
+        // Progression des ouvertures (``OpeningPositionProgress`` /
+        // ``OpeningReviewLog`` / ``RepertoireMembership``) : même store « Games »
+        // synchronisé que les parties et la progression puzzle — on ÉTEND la
+        // pile existante plutôt que d'en créer une seconde. Indexée par FEN
+        // normalisée, granulaire (une entrée par position) pour éviter les
+        // conflits d'écriture massifs. Ajout ADDITIF (nouveaux types, aucune
+        // propriété requise) : migration SwiftData légère et sans risque.
         let gamesConfig = ModelConfiguration(
             "Games",
-            schema: Schema([GameRecord.self, PuzzleProgress.self]),
+            schema: Schema([
+                GameRecord.self, PuzzleProgress.self,
+                OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self,
+            ]),
             isStoredInMemoryOnly: false,
             cloudKitDatabase: CloudSyncSettingsStore.isEnabled ? .automatic : .none
         )
