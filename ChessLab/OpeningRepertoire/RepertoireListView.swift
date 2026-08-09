@@ -15,6 +15,10 @@ import SwiftUI
 struct RepertoireListView: View {
     /// Va directement à l'échiquier, ligne entière.
     let onStartLibraryLine: (OpeningLibraryEntry, Piece.Color) -> Void
+    /// Ouvre le nouvel Explorer en graphe (aperçu) — présenté seulement quand
+    /// ``OpeningsGraphFeature/isActive`` (drapeau off par défaut) : la
+    /// bibliothèque linéaire reste l'expérience par défaut, extension additive.
+    var onOpenExplorer: () -> Void = {}
 
     var body: some View {
         OpeningLibraryView(onStartLine: onStartLibraryLine)
@@ -23,5 +27,15 @@ struct RepertoireListView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.background, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)
+            .toolbar {
+                if OpeningsGraphFeature.isActive {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(action: onOpenExplorer) {
+                            Label("Explorateur", systemImage: "safari")
+                        }
+                        .tint(Theme.accent)
+                    }
+                }
+            }
     }
 }

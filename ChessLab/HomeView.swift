@@ -64,6 +64,10 @@ struct HomeView: View {
         case activePuzzleSession(PuzzleSessionFilter)
         case repertoireList
         case activeOpeningLine(OpeningLibraryEntry, Piece.Color)
+        /// Nouveau module en graphe (mode Explorer), gardé par
+        /// ``OpeningsGraphFeature`` — voir J6.
+        case openingExplorerPicker
+        case openingExplorerCourse(String)
         /// Réglages Labo, éventuellement pré-remplis avec une position de
         /// départ venue de l'éditeur ou du scanner.
         case labSetup(startFEN: String?)
@@ -484,7 +488,17 @@ struct HomeView: View {
                 case .repertoireList:
                     RepertoireListView { entry, color in
                         path.append(Route.activeOpeningLine(entry, color))
+                    } onOpenExplorer: {
+                        path.append(Route.openingExplorerPicker)
                     }
+
+                case .openingExplorerPicker:
+                    OpeningCoursePickerView { courseID in
+                        path.append(Route.openingExplorerCourse(courseID))
+                    }
+
+                case let .openingExplorerCourse(courseID):
+                    OpeningExplorerHost(courseID: courseID)
 
                 case let .activeOpeningLine(entry, color):
                     OpeningLineTrainingHost(entry: entry, color: color) {

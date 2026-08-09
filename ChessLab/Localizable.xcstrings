@@ -1,22 +1,6 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
-    "Votre progression d'entraînement (puzzles et ouvertures) est synchronisée de la même façon." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your training progress (puzzles and openings) syncs the same way."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Votre progression d'entraînement (puzzles et ouvertures) est synchronisée de la même façon."
-          }
-        }
-      }
-    },
     "" : {
 
     },
@@ -166,6 +150,9 @@
           }
         }
       }
+    },
+    "%@ positions" : {
+
     },
     "%@ pour %@" : {
       "localizations" : {
@@ -1055,6 +1042,9 @@
         }
       }
     },
+    "Aperçu" : {
+
+    },
     "Appareil chaud — moteur bridé" : {
       "localizations" : {
         "en" : {
@@ -1103,6 +1093,9 @@
           }
         }
       }
+    },
+    "Approfondis cette ouverture en régénérant les données." : {
+
     },
     "Ardoise" : {
       "extractionState" : "stale",
@@ -2400,6 +2393,9 @@
         }
       }
     },
+    "Clé" : {
+
+    },
     "Clemenz Opening" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2870,6 +2866,9 @@
       }
     },
     "Courbe d'évaluation" : {
+
+    },
+    "Cours indisponible" : {
 
     },
     "Creepy Crawly Formation" : {
@@ -3783,6 +3782,12 @@
         }
       }
     },
+    "Explorateur" : {
+
+    },
+    "Explorateur d'ouvertures" : {
+
+    },
     "Exporter le PGN" : {
       "localizations" : {
         "en" : {
@@ -3899,6 +3904,9 @@
         }
       }
     },
+    "Fin de la ligne connue" : {
+
+    },
     "Finale" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3917,6 +3925,9 @@
       }
     },
     "Flèches du moteur" : {
+
+    },
+    "Fonctionnalité en cours de développement : explore librement les variantes d'une ouverture, avec statistiques par coup. Le contenu s'enrichira au fil des mises à jour." : {
 
     },
     "Force du moteur" : {
@@ -7268,6 +7279,9 @@
         }
       }
     },
+    "Piège" : {
+
+    },
     "Pioche dans le livre d'ouvertures" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8134,6 +8148,9 @@
         }
       }
     },
+    "Réfutation" : {
+
+    },
     "Réglages" : {
       "localizations" : {
         "en" : {
@@ -8271,6 +8288,9 @@
         }
       }
     },
+    "Répertoire blanc" : {
+
+    },
     "Répertoire des Blancs" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8304,6 +8324,9 @@
           }
         }
       }
+    },
+    "Répertoire noir" : {
+
     },
     "Répertoire vide" : {
       "extractionState" : "stale",
@@ -9852,6 +9875,9 @@
         }
       }
     },
+    "Transpositions" : {
+
+    },
     "Trompowsky Attack" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -10274,6 +10300,22 @@
         }
       }
     },
+    "Votre progression d'entraînement (puzzles et ouvertures) est synchronisée de la même façon." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your training progress (puzzles and openings) syncs the same way."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre progression d'entraînement (puzzles et ouvertures) est synchronisée de la même façon."
+          }
+        }
+      }
+    },
     "Vous" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -10339,6 +10381,12 @@
           }
         }
       }
+    },
+    "Vue des blancs" : {
+
+    },
+    "Vue des noirs" : {
+
     },
     "Vulture Defense" : {
       "extractionState" : "stale",

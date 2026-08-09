@@ -14,6 +14,9 @@ struct SettingsView: View {
     /// (`cloudKitSyncEnabled`), que ``ChessLabApp`` relit au lancement pour
     /// construire le `ModelContainer` en `.automatic` (iCloud) ou `.none`.
     @AppStorage("cloudKitSyncEnabled") private var cloudSyncEnabled = false
+    /// Drapeau LOCAL du nouvel explorateur d'ouvertures en graphe (aperçu),
+    /// même clé que ``OpeningsGraphFeature`` — off par défaut.
+    @AppStorage("openingsGraphEnabled") private var openingsGraphEnabled = false
 
     var body: some View {
         ScrollView {
@@ -24,6 +27,7 @@ struct SettingsView: View {
                 notationSection
                 feedbackSection
                 syncSection
+                if OpeningsGraphFeature.hasBundledCourses { previewSection }
                 helpSection
                 licensesSection
             }
@@ -194,6 +198,27 @@ struct SettingsView: View {
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
                 Text("Votre progression d'entraînement (puzzles et ouvertures) est synchronisée de la même façon.")
+                    .font(.caption)
+                    .foregroundStyle(Theme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cardStyle()
+        }
+    }
+
+    /// Aperçu (déploiement progressif) : le nouvel explorateur d'ouvertures en
+    /// graphe. Off par défaut ; l'onglet Ouvertures garde la bibliothèque
+    /// existante tant que ce n'est pas activé. Un bouton « Explorateur »
+    /// apparaît alors dans l'onglet Ouvertures.
+    private var previewSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Aperçu")
+            VStack(alignment: .leading, spacing: 8) {
+                Toggle("Explorateur d'ouvertures", isOn: $openingsGraphEnabled)
+                    .tint(Theme.accent)
+                    .foregroundStyle(Theme.textPrimary)
+                Text("Fonctionnalité en cours de développement : explore librement les variantes d'une ouverture, avec statistiques par coup. Le contenu s'enrichira au fil des mises à jour.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
