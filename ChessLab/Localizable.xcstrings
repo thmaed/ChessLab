@@ -1,6 +1,22 @@
 {
   "sourceLanguage" : "fr",
   "strings" : {
+    "Votre progression d'entraînement (puzzles et ouvertures) est synchronisée de la même façon." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your training progress (puzzles and openings) syncs the same way."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Votre progression d'entraînement (puzzles et ouvertures) est synchronisée de la même façon."
+          }
+        }
+      }
+    },
     "" : {
 
     },

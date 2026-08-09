@@ -193,6 +193,10 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
+                Text("Votre progression d'entraînement (puzzles et ouvertures) est synchronisée de la même façon.")
+                    .font(.caption)
+                    .foregroundStyle(Theme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle()
