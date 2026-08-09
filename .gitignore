@@ -34,3 +34,6 @@ scripts/yolo/__pycache__/
 
 # Jeux de pièces (dont chess.com PROPRIÉTAIRES) : entraînement local, jamais livré ni redistribué.
 scripts/yolo/piece-sets/
+
+# Build du package moteur vendorisé
+Vendor/CStockfish/.build/
