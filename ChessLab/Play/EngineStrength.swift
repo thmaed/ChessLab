@@ -16,10 +16,10 @@ enum EngineStrength: Equatable {
     /// Plage complète (Laboratoire) : jusqu'à la pleine puissance, qui est
     /// tout l'intérêt de faire s'affronter deux moteurs.
     static let sliderRange: ClosedRange<Double> = 800...3190
-    /// Plage du mode **Jouer**, plafonnée à 2500 : au-delà, on ne propose plus
-    /// un adversaire, on propose une défaite. Le Laboratoire, lui, garde la
-    /// plage complète.
-    static let playSliderRange: ClosedRange<Double> = 800...2500
+    /// Plage du mode **Jouer** : désormais la plage COMPLÈTE, jusqu'au maximum
+    /// de Stockfish (3190 = `UCI_Elo` max ⇒ `.maximum`, pleine puissance). On
+    /// laisse le joueur monter aussi haut qu'il veut, quitte à se faire écraser.
+    static let playSliderRange: ClosedRange<Double> = 800...3190
     static let ratedMinimum = 1320
 
     /// Construit un réglage à partir d'une valeur de slider continue.
@@ -102,11 +102,10 @@ struct EnginePreset: Identifiable, Equatable {
         strength == .maximum ? label : "\(label) (\(Int(strength.sliderValue)))"
     }
 
-    /// Échelle du mode Jouer. Plus de « Élite mondiale » (2800) ni de
-    /// « Maximum » : ces deux-là ne se jouent pas, ils se subissent. Les deux
-    /// marches ajoutées en bas (1000 et 1400) resserrent au contraire l'écart
-    /// là où l'on progresse vraiment — entre le grand débutant et le joueur de
-    /// club, l'ancienne échelle sautait de 800 à 1200 puis à 1600.
+    /// Échelle du mode Jouer, jusqu'au **maximum de Stockfish**. Les marches
+    /// du bas (1000, 1400) resserrent l'écart là où l'on progresse vraiment ;
+    /// celles du haut (Super-GM, Élite, Maximum) laissent qui le veut se
+    /// mesurer à la pleine puissance du moteur.
     static let all: [EnginePreset] = [
         .init(id: "e800", label: "Grand débutant", strength: EngineStrength(sliderValue: 800)),
         .init(id: "e1000", label: "Débutant", strength: EngineStrength(sliderValue: 1000)),
@@ -116,5 +115,8 @@ struct EnginePreset: Identifiable, Equatable {
         .init(id: "e2000", label: "Avancé / Expert", strength: .limited(elo: 2000)),
         .init(id: "e2300", label: "Maître national", strength: .limited(elo: 2300)),
         .init(id: "e2500", label: "Grand Maître", strength: .limited(elo: 2500)),
+        .init(id: "e2700", label: "Super Grand Maître", strength: .limited(elo: 2700)),
+        .init(id: "e2850", label: "Élite mondiale", strength: .limited(elo: 2850)),
+        .init(id: "max", label: "Maximum", strength: .maximum),
     ]
 }
