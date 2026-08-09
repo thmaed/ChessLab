@@ -63,6 +63,31 @@ struct PuzzleLibrarySeederTests {
         UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
     }
 
+    /// 🐛 Régression « Aucun puzzle » : après la séparation des stores
+    /// (Games / Puzzles), le marqueur "déjà semé" restait posé alors que le
+    /// nouveau store `Puzzle` était VIDE — la garde court-circuitait le
+    /// rechargement. ``needsSeeding`` doit revalider le marqueur contre l'état
+    /// réel du store.
+    @MainActor
+    @Test func reSeedsWhenMarkerIsSetButStoreIsEmpty() throws {
+        let schema = Schema([Puzzle.self])
+        let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
+
+        // Marqueur posé (seeding antérieur) MAIS store VIDE → re-seeding requis.
+        #expect(PuzzleLibrarySeeder.needsSeeding(container: container, alreadySeeded: true))
+
+        // Store non vide → plus besoin, même marqueur posé.
+        let context = ModelContext(container)
+        let puzzle = Puzzle()
+        puzzle.externalID = "abc"
+        context.insert(puzzle)
+        try context.save()
+        #expect(!PuzzleLibrarySeeder.needsSeeding(container: container, alreadySeeded: true))
+
+        // Sans marqueur : on seede toujours (mise à niveau de version V3→V4).
+        #expect(PuzzleLibrarySeeder.needsSeeding(container: container, alreadySeeded: false))
+    }
+
     @MainActor
     @Test func seedingTwiceDoesNotDuplicatePuzzles() throws {
         UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")

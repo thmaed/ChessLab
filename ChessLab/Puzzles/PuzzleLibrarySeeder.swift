@@ -42,8 +42,9 @@ enum PuzzleLibrarySeeder {
     /// observable expose la progression pour le bandeau d'accueil.
     @MainActor
     static func seedIfNeeded(container: ModelContainer) {
-        guard !UserDefaults.standard.bool(forKey: seededKey) else { return }
         guard !PuzzleSeedingState.shared.isSeeding else { return }
+        let alreadySeeded = UserDefaults.standard.bool(forKey: seededKey)
+        guard needsSeeding(container: container, alreadySeeded: alreadySeeded) else { return }
 
         PuzzleSeedingState.shared.begin()
         Task.detached(priority: .utility) {
@@ -55,6 +56,25 @@ enum PuzzleLibrarySeeder {
                 PuzzleSeedingState.shared.end()
             }
         }
+    }
+
+    /// Faut-il (re)précharger ? Vrai si :
+    /// - la version courante n'a jamais été seedée (`alreadySeeded == false`,
+    ///   ex. mise à niveau V3→V4), OU
+    /// - le marqueur EST posé mais le store est **vide**.
+    ///
+    /// 🐛 Le second cas est le bug « Aucun puzzle » : la séparation des stores
+    /// (Games / Puzzles) a recréé un store `Puzzle` VIDE, mais le marqueur
+    /// `UserDefaults` d'un seeding antérieur restait à `true` — la garde
+    /// court-circuitait alors le rechargement et la bibliothèque restait vide.
+    /// On revalide donc le marqueur contre l'état RÉEL du store (un simple
+    /// `COUNT`, indexé, négligeable même à ~75 000 lignes, et seulement quand
+    /// le marqueur est posé).
+    @MainActor
+    static func needsSeeding(container: ModelContainer, alreadySeeded: Bool) -> Bool {
+        guard alreadySeeded else { return true }
+        let count = (try? ModelContext(container).fetchCount(FetchDescriptor<Puzzle>())) ?? 0
+        return count == 0
     }
 
     /// Effectue le préchargement sur un contexte dédié au `container` donné
