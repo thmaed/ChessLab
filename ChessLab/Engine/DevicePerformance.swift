@@ -41,37 +41,40 @@ enum DevicePerformance {
         return .low
     }()
 
-    /// Budget de NŒUDS d'une position de classification (hors ouverture). Plus
-    /// grand = analyse plus profonde. Le moteur recompilé (NEON) atteint ces
-    /// budgets bien plus vite qu'avant, ce qui laisse la place à plus de
-    /// profondeur sans exploser le temps total (cible ~30-60 s / partie).
+    /// Budget de NŒUDS d'une position de classification (hors ouverture).
+    ///
+    /// Volontairement MODÉRÉ, orienté VITESSE : la revue d'une partie doit
+    /// passer tous les coups en ~20-50 s puis s'arrêter (le moteur recompilé
+    /// NEON atteint une profondeur suffisante — ~18-20 — dans ce budget, ce
+    /// qui suffit amplement à classer les coups et détecter les gaffes). On ne
+    /// cherche PAS la profondeur maximale : au-delà, ça consomme sans rien
+    /// apporter à la classification (retour utilisateur du 09/08).
     static var classificationNodeBudget: Int {
         switch tier {
-        case .low: return 220_000
-        case .mid: return 380_000
-        case .high: return 550_000
+        case .low: return 180_000
+        case .mid: return 240_000
+        case .high: return 300_000
         }
     }
 
     /// Plafond de TEMPS par position (filet de sécurité quand une position est
-    /// dure et que le débit chute) : plus large sur appareil rapide pour ne pas
-    /// écrêter le budget de nœuds plus ambitieux.
+    /// dure et que le débit chute). Serré pour garder la passe rapide.
     static var classificationCapMs: Int {
         switch tier {
-        case .low: return 1_600
-        case .mid: return 2_200
-        case .high: return 2_800
+        case .low: return 1_200
+        case .mid: return 1_400
+        case .high: return 1_600
         }
     }
 
-    /// Profondeur cible de l'analyse en continu (position affichée). Plus
-    /// profonde sur appareil moderne : éval et flèches plus fiables sans que
-    /// l'utilisateur attende.
+    /// Profondeur cible de l'analyse en continu (EXPLORATION d'une position
+    /// FEN/scan uniquement — jamais en revue de partie). Modérée pour ne pas
+    /// faire chauffer inutilement.
     static var liveDepth: Int {
         switch tier {
-        case .low: return 20
-        case .mid: return 24
-        case .high: return 26
+        case .low: return 18
+        case .mid: return 20
+        case .high: return 22
         }
     }
 }

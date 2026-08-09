@@ -922,6 +922,16 @@ final class AnalysisViewModel {
     /// position est affichée — pas de bascule utilisateur, voir le brief
     /// ("Analyse live : éval + barre d'avantage... MultiPV = 3").
     private func startLiveAnalysis() {
+        // GARANTIE : en REVUE d'une partie, on ne lance JAMAIS l'analyse en
+        // continu (profonde). La revue se contente du cache de la
+        // classification ; le moteur reste au repos une fois la passe finie.
+        // Ce garde-fou rend IMPOSSIBLE tout départ en « analyse profonde »
+        // quand on revoit une partie — quelle que soit la voie d'appel (course
+        // de cycle de vie à l'ouverture, reprise après génération de puzzles,
+        // etc.). L'analyse en continu ne sert qu'à EXPLORER une position
+        // (FEN/scan/éditeur, `isGameReview == false`).
+        guard !isGameReview else { return }
+
         // ⚠️ ORDRE CRITIQUE. Le flux de réponses de ChessKitEngine est à
         // ITÉRATEUR UNIQUE : deux `for await` qui le consomment EN MÊME TEMPS
         // se volent les réponses, et l'un termine l'itérateur sous les pieds
@@ -1119,41 +1129,20 @@ final class AnalysisViewModel {
             self.isClassifying = true
             self.classificationProgress = (done: 0, total: movesToClassify.count)
 
-            // Moteur PARTAGÉ, threads inchangés (le pool de moteurs mono-thread
-            // décrit dans tune-analysis.md n'est PAS réalisable avec
-            // ChessKitEngine : chaque instance détourne le `stdout`/`stdin`
-            // GLOBAL du processus via `dup2`, donc deux moteurs qui cherchent
-            // en même temps se corrompent — voir le compte-rendu. On garde donc
-            // le comportement de classification existant, avec le seul gain sûr
-            // de la tâche 2 : le rafraîchissement dérivé est COALESCÉ ici plutôt
-            // que relancé après chaque nœud (il rendait la boucle quadratique
-            // sur le MainActor).
-            // Classification par PRIORITÉ à la position REGARDÉE. Au lieu de
-            // suivre bêtement l'ordre des coups, chaque tour classe d'abord la
-            // position actuellement affichée si elle ne l'est pas encore. Sa
-            // flèche verte — et la rétrospective « il fallait jouer ça », qui lit
-            // le PARENT, évalué par le même appel (``classifyNode`` évalue parent
-            // ET enfant) — apparaît ainsi après UNE recherche, sans attendre que
-            // la passe de fond l'atteigne dans l'ordre.
+            // Classification SÉQUENTIELLE, « à la suite » : tous les coups sont
+            // classés dans l'ORDRE, du premier au dernier. C'est ce que
+            // l'utilisateur attend d'une revue — la passe avance visiblement
+            // coup par coup et met tout en cache, puis s'arrête (le moteur ne
+            // recalcule plus rien ensuite, voir `afterNavigate`/`startLiveAnalysis`).
             //
-            // 🐛 « les flèches vertes ne s'affichent pas au bon moment » : en
-            // sautant au coup 30 pendant que le fond en était au coup 5, la
-            // flèche ne venait qu'une fois les 25 coups intermédiaires classés.
-            // Désormais le coup 30 passe en tête de file dès qu'on le regarde.
-            var remaining = movesToClassify
-            var remainingSet = Set(movesToClassify)
-            let total = movesToClassify.count
-            var done = 0
-
-            while !remaining.isEmpty {
+            // Le rafraîchissement dérivé est COALESCÉ (un tous les 4 nœuds)
+            // plutôt que relancé après chaque nœud, qui rendait la boucle
+            // quadratique sur le MainActor.
+            for (done, index) in movesToClassify.enumerated() {
                 // Écran quitté en cours de route : on abandonne la
                 // classification restante plutôt que de continuer à faire
                 // chercher Stockfish pour un écran que plus personne ne regarde.
                 if self.isTornDown { break }
-
-                let viewed = self.currentIndex
-                let index = remainingSet.contains(viewed) ? viewed : remaining[0]
-
                 await self.classifyNode(index, engine: engine)
 
                 // Moteur muet pendant ce nœud : redémarrage automatique, puis
@@ -1168,18 +1157,8 @@ final class AnalysisViewModel {
                         break
                     }
                 }
-
-                remainingSet.remove(index)
-                if let position = remaining.firstIndex(of: index) {
-                    remaining.remove(at: position)
-                }
-                done += 1
-                // Rafraîchit AUSSITÔT quand on vient de classer la position
-                // REGARDÉE (sa flèche doit apparaître sans délai) ; sinon on
-                // coalesce (un refresh tous les 4 nœuds) pour ne pas marteler le
-                // MainActor pendant la passe de fond.
-                if index == viewed || done % 4 == 0 { self.refreshDerivedData() }
-                self.classificationProgress = (done: done, total: total)
+                if done % 4 == 3 { self.refreshDerivedData() }
+                self.classificationProgress = (done: done + 1, total: movesToClassify.count)
             }
 
             self.isClassifying = false
