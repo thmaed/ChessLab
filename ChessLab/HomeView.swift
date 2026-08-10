@@ -81,6 +81,7 @@ struct HomeView: View {
         case settings
         case help
         case licenses
+        case openingsSources
     }
 
     /// Entrées de la barre latérale iPad/Mac. Chacune enracine la colonne de
@@ -557,7 +558,8 @@ struct HomeView: View {
                     // ne fait que remonter l'intention.
                     SettingsView(
                         onOpenHelp: { path.append(Route.help) },
-                        onOpenLicenses: { path.append(Route.licenses) }
+                        onOpenLicenses: { path.append(Route.licenses) },
+                        onOpenSources: { path.append(Route.openingsSources) }
                     )
 
                 case .progression:
@@ -572,6 +574,9 @@ struct HomeView: View {
 
                 case .licenses:
                     LicensesView()
+
+                case .openingsSources:
+                    SourcesView()
                 }
     }
 

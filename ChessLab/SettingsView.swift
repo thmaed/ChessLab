@@ -1,3 +1,4 @@
+import CloudKit
 import SwiftUI
 
 /// Écran de réglages transversaux : thème de plateau **global et
@@ -8,7 +9,10 @@ struct SettingsView: View {
     var onOpenHelp: () -> Void = {}
     /// Ouvre les licences des composants tiers.
     var onOpenLicenses: () -> Void = {}
+    /// Ouvre l'écran « Sources » des ouvertures.
+    var onOpenSources: () -> Void = {}
 
+    @Environment(\.modelContext) private var modelContext
     @Bindable private var settings = AppSettings.shared
     /// Lie le toggle à la MÊME clé UserDefaults que ``CloudSyncSettingsStore``
     /// (`cloudKitSyncEnabled`), que ``ChessLabApp`` relit au lancement pour
@@ -17,6 +21,10 @@ struct SettingsView: View {
     /// Drapeau LOCAL du nouvel explorateur d'ouvertures en graphe (aperçu),
     /// même clé que ``OpeningsGraphFeature`` — off par défaut.
     @AppStorage("openingsGraphEnabled") private var openingsGraphEnabled = false
+    /// Horodatage de la dernière vérification/fusion locale (pour l'affichage).
+    @AppStorage("openingsLastReconcileAt") private var lastReconcileAt = 0.0
+    /// État du compte iCloud (chargé à l'apparition).
+    @State private var iCloudStatus: CKAccountStatus?
 
     var body: some View {
         ScrollView {
@@ -201,10 +209,54 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
+
+                if cloudSyncEnabled {
+                    Divider().overlay(Theme.stroke)
+                    syncStatusRow
+                    if lastReconcileAt > 0 {
+                        Text("Dernière vérification : \(Date(timeIntervalSince1970: lastReconcileAt).formatted(.relative(presentation: .named)))")
+                            .font(.caption2).foregroundStyle(Theme.textTertiary)
+                    }
+                    Button(action: forceSync) {
+                        Label("Synchroniser maintenant", systemImage: "arrow.triangle.2.circlepath")
+                            .font(.caption.weight(.semibold)).foregroundStyle(Theme.accent)
+                    }
+                    .buttonStyle(.pressable)
+                    .padding(.top, 2)
+                }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle()
         }
+        .task {
+            iCloudStatus = try? await CKContainer(identifier: "iCloud.com.chesslab.ChessLab").accountStatus()
+        }
+    }
+
+    /// État du compte iCloud, message clair si l'utilisateur n'est pas connecté.
+    private var syncStatusRow: some View {
+        let connected = iCloudStatus == .available
+        let (icon, tint, text): (String, Color, LocalizedStringKey) = switch iCloudStatus {
+        case .available: ("checkmark.icloud", Theme.accent, "Compte iCloud connecté")
+        case nil: ("icloud", Theme.textTertiary, "Vérification du compte iCloud…")
+        default: ("exclamationmark.icloud", Theme.warning, "Non connecté à iCloud — la synchro est en pause")
+        }
+        return HStack(spacing: 8) {
+            Image(systemName: icon).foregroundStyle(tint)
+            Text(text).font(.caption).foregroundStyle(connected ? Theme.textSecondary : Theme.warning)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
+        }
+    }
+
+    /// Réconcilie localement (fusionne l'état synchronisé arrivé des autres
+    /// appareils et pousse les changements en attente via la sauvegarde). La
+    /// synchro CloudKit elle-même reste automatique et opaque.
+    private func forceSync() {
+        PuzzleProgressSync.reconcile(in: modelContext)
+        OpeningProgressSync.reconcile(in: modelContext)
+        lastReconcileAt = Date().timeIntervalSince1970
+        Haptics.move()
     }
 
     /// Aperçu (déploiement progressif) : le nouvel explorateur d'ouvertures en
@@ -222,6 +274,16 @@ struct SettingsView: View {
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
+                Button(action: onOpenSources) {
+                    HStack(spacing: 6) {
+                        Label("Sources des données", systemImage: "text.book.closed")
+                            .font(.caption.weight(.semibold)).foregroundStyle(Theme.info)
+                        Spacer()
+                        Image(systemName: "chevron.right").font(.caption2).foregroundStyle(Theme.textTertiary)
+                    }
+                }
+                .buttonStyle(.pressable)
+                .padding(.top, 2)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle()

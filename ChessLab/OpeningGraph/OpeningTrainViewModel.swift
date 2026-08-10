@@ -50,11 +50,19 @@ final class OpeningTrainViewModel {
     private(set) var currentComment: String?
     private(set) var usedHint = false
 
-    /// Charge les cours depuis le bundle embarqué.
+    /// Charge les cours depuis le bundle embarqué. Les modes quotidien/difficiles
+    /// se LIMITENT au répertoire personnel s'il en existe un (priorisation des
+    /// révisions) ; `fullLine` ne charge que le cours ciblé.
     convenience init(mode: Mode, context: ModelContext, newLimit: Int = 20, now: Date = Date()) {
         var loaded: [String: OpeningCourse] = [:]
-        for entry in OpeningCourseLoader.catalog {
-            if let course = OpeningCourseLoader.course(id: entry.id) { loaded[entry.id] = course }
+        if case let .fullLine(courseID) = mode {
+            if let course = OpeningCourseLoader.course(id: courseID) { loaded[courseID] = course }
+        } else {
+            let repertoire = RepertoireStore.memberIDs(in: context)
+            for entry in OpeningCourseLoader.catalog {
+                if !repertoire.isEmpty && !repertoire.contains(entry.id) { continue }
+                if let course = OpeningCourseLoader.course(id: entry.id) { loaded[entry.id] = course }
+            }
         }
         self.init(mode: mode, context: context, courses: loaded, newLimit: newLimit, now: now)
     }
