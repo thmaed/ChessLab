@@ -18,9 +18,6 @@ struct SettingsView: View {
     /// (`cloudKitSyncEnabled`), que ``ChessLabApp`` relit au lancement pour
     /// construire le `ModelContainer` en `.automatic` (iCloud) ou `.none`.
     @AppStorage("cloudKitSyncEnabled") private var cloudSyncEnabled = false
-    /// Drapeau LOCAL du nouvel explorateur d'ouvertures en graphe (aperçu),
-    /// même clé que ``OpeningsGraphFeature`` — off par défaut.
-    @AppStorage("openingsGraphEnabled") private var openingsGraphEnabled = false
     /// Horodatage de la dernière vérification/fusion locale (pour l'affichage).
     @AppStorage("openingsLastReconcileAt") private var lastReconcileAt = 0.0
     /// État du compte iCloud (chargé à l'apparition).
@@ -259,18 +256,14 @@ struct SettingsView: View {
         Haptics.move()
     }
 
-    /// Aperçu (déploiement progressif) : le nouvel explorateur d'ouvertures en
-    /// graphe. Off par défaut ; l'onglet Ouvertures garde la bibliothèque
-    /// existante tant que ce n'est pas activé. Un bouton « Explorateur »
-    /// apparaît alors dans l'onglet Ouvertures.
+    /// Module d'ouvertures en graphe : accessible via le bouton « Explorateur »
+    /// (boussole) de l'onglet Ouvertures. Cette section explique et crédite les
+    /// sources des données.
     private var previewSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("Aperçu")
+            sectionTitle("Ouvertures")
             VStack(alignment: .leading, spacing: 8) {
-                Toggle("Explorateur d'ouvertures", isOn: $openingsGraphEnabled)
-                    .tint(Theme.accent)
-                    .foregroundStyle(Theme.textPrimary)
-                Text("Fonctionnalité en cours de développement : explore librement les variantes d'une ouverture, avec statistiques par coup. Le contenu s'enrichira au fil des mises à jour.")
+                Text("Explore, apprends et entraîne tes ouvertures depuis le bouton « Explorateur » (🧭) de l'onglet Ouvertures : navigation dans les variantes, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)

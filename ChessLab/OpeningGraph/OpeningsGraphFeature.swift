@@ -1,29 +1,17 @@
 import Foundation
 
-/// Drapeau de fonctionnalité LOCAL du nouveau module d'ouvertures en graphe.
+/// Disponibilité du module d'ouvertures en graphe (Explorer / Apprendre /
+/// Entraîner).
 ///
-/// Permet de livrer le modèle, la donnée et la synchro (J2-J5) AVANT l'UI
-/// complète (Explorer / Apprendre / Entraîner, J6-J8) : tant qu'il est faux,
-/// l'onglet « Ouvertures » garde EXACTEMENT la bibliothèque linéaire existante
-/// (149 familles ``OpeningLibraryEntry``) — aucune régression, coexistence
-/// additive. Faux par défaut ; bascule via `UserDefaults`. Aucune UI ne
-/// l'expose encore : c'est un interrupteur de développement / déploiement
-/// progressif, pas un réglage utilisateur.
-///
-/// - important: même activé, le module ne doit s'afficher que si des cours sont
-///   réellement embarqués et décodables (``isActive``) — sinon on retombe
-///   silencieusement sur la bibliothèque linéaire.
+/// Historiquement gardé par un drapeau d'aperçu (off par défaut), il est
+/// désormais VISIBLE PAR DÉFAUT (décision du 10/08/2026) : le bouton
+/// « Explorateur » apparaît dans l'onglet Ouvertures dès que des cours sont
+/// embarqués. La bibliothèque linéaire (149 familles ``OpeningLibraryEntry``)
+/// reste l'expérience par défaut de l'onglet ; le module graphe s'y ajoute.
 enum OpeningsGraphFeature {
-    private static let key = "openingsGraphEnabled"
-
-    static var isEnabled: Bool {
-        get { UserDefaults.standard.bool(forKey: key) }
-        set { UserDefaults.standard.set(newValue, forKey: key) }
-    }
-
     /// Des cours sont-ils embarqués (catalogue non vide) ?
     static var hasBundledCourses: Bool { !OpeningCourseLoader.catalog.isEmpty }
 
     /// Le module graphe doit-il être proposé dans l'UI ?
-    static var isActive: Bool { isEnabled && hasBundledCourses }
+    static var isActive: Bool { hasBundledCourses }
 }
