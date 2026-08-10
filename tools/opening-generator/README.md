@@ -23,7 +23,7 @@ python3 generate.py --only scandinavian,italian-game,anti-sicilians   # le pilot
 python3 generate.py                               # tout le catalogue
 python3 generate.py --resume                      # reprend, saute ce qui existe déjà
 python3 generate.py --dry-run                     # n'utilise QUE le cache (aucune requête)
-python3 generate.py --stockfish /opt/homebrew/bin/stockfish   # + évals & détection de pièges
+python3 generate.py --stockfish "$(which stockfish)"          # + évals & détection de pièges (optionnel)
 ```
 
 Sortie dans `out/` : `out/openings/<id>.json` (un fichier par ouverture) +
@@ -44,7 +44,9 @@ sont copiés à la main dans `ChessLab/Resources/openings/` au jalon d'intégrat
   **Double pondération** conservée : maîtres (théoriquement correct) ET club
   1400-2000 (ce que le joueur affronte vraiment).
 - **Évaluations** : Stockfish local (optionnel, `--stockfish`), en batch, pour
-  annoter les coups et repérer les pièges (chute d'évaluation).
+  annoter les coups et repérer les pièges (chute d'évaluation). Installe-le via
+  `brew install stockfish` puis `--stockfish "$(which stockfish)"`. Chemin
+  absent/faux → on prévient et on génère SANS évaluations (jamais d'échec).
 
 Ces mentions doivent apparaître dans l'écran « Sources » de l'app (jalon J9).
 

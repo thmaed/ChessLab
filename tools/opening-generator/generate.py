@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import shutil
 import sys
 from dataclasses import replace
 from pathlib import Path
@@ -31,6 +33,26 @@ from openings import ALL, by_id
 from validate import validate_course
 
 HERE = Path(__file__).resolve().parent
+
+
+def make_evaluator(path, depth):
+    """Crée l'évaluateur Stockfish, ou retombe PROPREMENT sur aucun évaluateur.
+
+    Les évaluations sont OPTIONNELLES : un chemin absent/faux ne doit jamais
+    faire échouer la génération. On accepte aussi un simple nom (« stockfish »)
+    résolu via le PATH."""
+    if not path:
+        return NullEvaluator()
+    resolved = path if os.path.isfile(path) else shutil.which(path)
+    if not resolved or not os.path.isfile(resolved):
+        print(f"⚠ Stockfish introuvable à « {path} » — génération SANS évaluations.")
+        print("  Installe-le (brew install stockfish) puis passe --stockfish \"$(which stockfish)\".")
+        return NullEvaluator()
+    try:
+        return StockfishEvaluator(resolved, depth=depth)
+    except Exception as exc:  # noqa: BLE001
+        print(f"⚠ Stockfish n'a pas démarré ({exc}) — génération SANS évaluations.")
+        return NullEvaluator()
 
 
 def parse_args(argv):
@@ -95,7 +117,7 @@ def main(argv=None) -> int:
         cache_dir=cache_dir / "explorer", speeds=args.speeds, ratings=args.ratings,
         min_delay=args.min_delay, moves=args.moves, dry_run=args.dry_run,
     )
-    evaluator = StockfishEvaluator(args.stockfish, depth=args.stockfish_depth) if args.stockfish else NullEvaluator()
+    evaluator = make_evaluator(args.stockfish, args.stockfish_depth)
 
     catalog: list[CatalogEntry] = []
     report_rows = []
