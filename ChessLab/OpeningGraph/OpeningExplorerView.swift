@@ -8,6 +8,7 @@ import SwiftUI
 struct OpeningExplorerView: View {
     @Bindable var viewModel: OpeningExplorerViewModel
     var onLearn: () -> Void = {}
+    var onTrain: () -> Void = {}
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
@@ -34,6 +35,7 @@ struct OpeningExplorerView: View {
             ToolbarItem(placement: .topBarTrailing) {
                 HStack(spacing: 14) {
                     Button(action: onLearn) { Image(systemName: "graduationcap") }
+                    Button(action: onTrain) { Image(systemName: "figure.strengthtraining.traditional") }
                     Button { viewModel.back() } label: { Image(systemName: "arrow.uturn.backward") }
                         .disabled(!viewModel.canGoBack)
                     Button { viewModel.reset() } label: { Image(systemName: "house") }
@@ -248,12 +250,13 @@ struct OpeningExplorerView: View {
 struct OpeningExplorerHost: View {
     let courseID: String
     var onLearn: () -> Void = {}
+    var onTrain: () -> Void = {}
     @State private var viewModel: OpeningExplorerViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                OpeningExplorerView(viewModel: viewModel, onLearn: onLearn)
+                OpeningExplorerView(viewModel: viewModel, onLearn: onLearn, onTrain: onTrain)
             } else {
                 ContentUnavailableView("Cours indisponible", systemImage: "questionmark.folder")
                     .appBackground()

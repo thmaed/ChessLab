@@ -69,6 +69,9 @@ struct HomeView: View {
         case openingExplorerPicker
         case openingExplorerCourse(String)
         case openingLearnCourse(String)
+        case openingTrainDaily
+        case openingTrainHardest
+        case openingTrainLine(String)
         /// Réglages Labo, éventuellement pré-remplis avec une position de
         /// départ venue de l'éditeur ou du scanner.
         case labSetup(startFEN: String?)
@@ -496,11 +499,17 @@ struct HomeView: View {
                 case .openingExplorerPicker:
                     OpeningCoursePickerView { courseID in
                         path.append(Route.openingExplorerCourse(courseID))
+                    } onTrainDaily: {
+                        path.append(Route.openingTrainDaily)
+                    } onTrainHardest: {
+                        path.append(Route.openingTrainHardest)
                     }
 
                 case let .openingExplorerCourse(courseID):
                     OpeningExplorerHost(courseID: courseID) {
                         path.append(Route.openingLearnCourse(courseID))
+                    } onTrain: {
+                        path.append(Route.openingTrainLine(courseID))
                     }
 
                 case let .openingLearnCourse(courseID):
@@ -509,6 +518,15 @@ struct HomeView: View {
                     } onContinueVsStockfish: { fen in
                         path.append(Route.continueVsStockfish(fen))
                     }
+
+                case .openingTrainDaily:
+                    OpeningTrainHost(mode: .daily) { path.removeLast() }
+
+                case .openingTrainHardest:
+                    OpeningTrainHost(mode: .hardest) { path.removeLast() }
+
+                case let .openingTrainLine(courseID):
+                    OpeningTrainHost(mode: .fullLine(courseID: courseID)) { path.removeLast() }
 
                 case let .activeOpeningLine(entry, color):
                     OpeningLineTrainingHost(entry: entry, color: color) {

@@ -59,8 +59,9 @@ final class OpeningLearnViewModel {
     }
 
     /// Suit les arêtes `mainLine` (à défaut, la plus jouée en club) depuis la
-    /// racine, en évitant les cycles de transposition.
-    static func mainLine(of course: OpeningCourse) -> (edges: [MoveEdge], fromKeys: [String]) {
+    /// racine, en évitant les cycles de transposition. `nonisolated` : pure,
+    /// réutilisée par ``OpeningTrainingQueue`` (contexte non-isolé).
+    nonisolated static func mainLine(of course: OpeningCourse) -> (edges: [MoveEdge], fromKeys: [String]) {
         var edges: [MoveEdge] = []
         var fromKeys: [String] = []
         var key = course.rootFEN
