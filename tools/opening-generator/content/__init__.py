@@ -1,7 +1,68 @@
 """Contenu d'ouvertures rédigé à la main (specs bilingues), compilé par
 ``author.py``. Ajouter une ouverture = créer un module et l'ajouter à COURSES."""
-from . import scandinavian
+from . import (
+    alekhine_defense,
+    anti_sicilians,
+    blackmar_diemer,
+    caro_kann,
+    catalan_opening,
+    dutch_defense,
+    english_opening,
+    englund_gambit,
+    french_defense,
+    gruenfeld_defense,
+    italian_game,
+    kings_gambit,
+    kings_indian,
+    latvian_gambit,
+    london_system,
+    nimzo_indian,
+    petrov_defense,
+    pirc_defense,
+    queens_gambit_accepted,
+    queens_gambit_declined,
+    ruy_lopez,
+    scandinavian,
+    scotch_game,
+    sicilian_dragon,
+    sicilian_najdorf,
+    slav_defense,
+    stafford_gambit,
+    vienna_game,
+)
 
 COURSES = [
+    # Blancs — 1.e4
+    italian_game.COURSE,
+    ruy_lopez.COURSE,
+    scotch_game.COURSE,
+    vienna_game.COURSE,
+    kings_gambit.COURSE,
+    # Réponses noires à 1.e4
+    sicilian_najdorf.COURSE,
+    sicilian_dragon.COURSE,
+    anti_sicilians.COURSE,
+    french_defense.COURSE,
+    caro_kann.COURSE,
     scandinavian.COURSE,
+    pirc_defense.COURSE,
+    alekhine_defense.COURSE,
+    petrov_defense.COURSE,
+    # Blancs — 1.d4 et systèmes
+    london_system.COURSE,
+    queens_gambit_declined.COURSE,
+    queens_gambit_accepted.COURSE,
+    slav_defense.COURSE,
+    catalan_opening.COURSE,
+    english_opening.COURSE,
+    # Réponses noires à 1.d4
+    kings_indian.COURSE,
+    nimzo_indian.COURSE,
+    gruenfeld_defense.COURSE,
+    dutch_defense.COURSE,
+    # Pièges et gambits de club
+    stafford_gambit.COURSE,
+    englund_gambit.COURSE,
+    blackmar_diemer.COURSE,
+    latvian_gambit.COURSE,
 ]

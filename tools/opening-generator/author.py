@@ -168,7 +168,11 @@ def main(argv=None) -> int:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     for spec in specs:
-        course = build_course(spec)
+        try:
+            course = build_course(spec)
+        except Exception as exc:  # noqa: BLE001 - une ouverture ratée n'arrête pas le lot
+            print(f"  ! {spec['id']:<22} erreur de construction : {exc}")
+            continue
         course_dict = course.to_dict()
         issues = validate_course(course_dict)
         if issues:
