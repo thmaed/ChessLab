@@ -29,8 +29,9 @@ enum OpeningFENKey {
     static func key(for position: Position) -> String {
         let fields = position.fen.split(separator: " ", omittingEmptySubsequences: false).map(String.init)
         guard fields.count >= 4 else { return position.fen }
+        let castling = canonicalCastling(field: fields[2], position: position)
         let ep = canonicalEnPassant(field: fields[3], position: position)
-        return "\(fields[0]) \(fields[1]) \(fields[2]) \(ep)"
+        return "\(fields[0]) \(fields[1]) \(castling) \(ep)"
     }
 
     /// Normalise une FEN quelconque (4 à 6 champs) en clé canonique, ou `nil`
@@ -61,6 +62,34 @@ enum OpeningFENKey {
         let hasBlackKing = position.pieces.contains { $0.kind == .king && $0.color == .black }
         guard hasWhiteKing, hasBlackKing else { return nil }
         return position
+    }
+
+    /// Canonicalise le champ des roques : on ne garde un droit que si le roi ET
+    /// la tour concernés sont TOUJOURS sur leur case d'origine.
+    ///
+    /// - important: ChessKit conserve à tort un droit de roque quand la tour
+    ///   concernée est CAPTURÉE sur sa case initiale (ex. …Txa8 : les Noirs
+    ///   gardent « q » alors que la tour a8 n'existe plus). `python-chess`, lui,
+    ///   retire le droit — d'où une divergence de clé qui casserait la fusion
+    ///   des transpositions et la navigation du lecteur. On filtre donc chaque
+    ///   droit déjà émis par ChessKit sur la présence réelle des pièces : on ne
+    ///   fait que RETIRER un droit fantôme, jamais en accorder un (le filtre est
+    ///   borné par le champ ChessKit, qui retire bien les droits quand roi/tour
+    ///   se DÉPLACENT). Sémantique alignée sur `board.fen()` de python-chess.
+    private static func canonicalCastling(field: String, position: Position) -> String {
+        guard field != "-" else { return "-" }
+        func present(_ kind: Piece.Kind, _ color: Piece.Color, at squareName: String) -> Bool {
+            guard let piece = position.piece(at: Square(squareName)) else { return false }
+            return piece.kind == kind && piece.color == color
+        }
+        let whiteKingHome = present(.king, .white, at: "e1")
+        let blackKingHome = present(.king, .black, at: "e8")
+        var result = ""
+        if field.contains("K"), whiteKingHome, present(.rook, .white, at: "h1") { result += "K" }
+        if field.contains("Q"), whiteKingHome, present(.rook, .white, at: "a1") { result += "Q" }
+        if field.contains("k"), blackKingHome, present(.rook, .black, at: "h8") { result += "k" }
+        if field.contains("q"), blackKingHome, present(.rook, .black, at: "a8") { result += "q" }
+        return result.isEmpty ? "-" : result
     }
 
     /// Retourne le champ e.p. tel quel s'il correspond à une prise réellement

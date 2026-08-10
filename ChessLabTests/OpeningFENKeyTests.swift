@@ -80,4 +80,16 @@ struct OpeningFENKeyTests {
         let result = OpeningCourseValidator.resultingKey(afterUCI: "e5f6", from: fromKey)
         #expect(result?.hasSuffix(" -") == true) // plus de case e.p. fantôme après exf6
     }
+
+    /// Capturer une tour sur sa case initiale retire le droit de roque
+    /// correspondant — ChessKit le conserve à tort, la clé doit le corriger
+    /// pour coïncider avec `python-chess` (sinon la navigation casse).
+    @Test func castlingRightDroppedWhenHomeRookIsCaptured() {
+        // Position de gambit dame accepté (…a6/…b5) juste avant Txa8.
+        let fen = "rn1qkbnr/1bp1pppp/8/1p6/2pP4/4PN2/1P3PPP/RNBQKB1R w KQkq -"
+        let result = OpeningCourseValidator.resultingKey(afterUCI: "a1a8", from: fen)
+        // Txa8 : les Blancs perdent « Q » (tour a1 partie) et les Noirs « q »
+        // (tour a8 capturée) — il ne reste que « Kk ».
+        #expect(result == "Rn1qkbnr/1bp1pppp/8/1p6/2pP4/4PN2/1P3PPP/1NBQKB1R b Kk -")
+    }
 }
