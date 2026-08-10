@@ -666,7 +666,7 @@ struct HomeView: View {
                 ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true) {
                     path.append(Route.puzzleQueue)
                 }
-                ModeCard(title: "Ouvertures", subtitle: "Répertoires PGN", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true) {
+                ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings") {
                     path.append(Route.repertoireList)
                 }
                 ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true) {
@@ -1230,6 +1230,7 @@ private struct ModeCard: View {
     let systemImage: String
     var tint: Color = Theme.accent
     let isEnabled: Bool
+    var accessibilityID: String? = nil
     let action: () -> Void
 
     /// Sur iPad (classe régulière), la tuile grandit avec la grille à 3
@@ -1309,6 +1310,7 @@ private struct ModeCard: View {
         .disabled(!isEnabled)
         .opacity(isEnabled ? 1 : 0.6)
         .accessibilityLabel(Text(title))
+        .accessibilityIdentifier(accessibilityID ?? "")
     }
 }
 

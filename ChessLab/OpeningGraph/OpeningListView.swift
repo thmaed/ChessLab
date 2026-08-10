@@ -67,6 +67,7 @@ struct OpeningListView: View {
             ForEach(items, id: \.id) { entry in
                 Button { onSelect(entry.id) } label: { row(entry) }
                     .listRowBackground(Theme.surface)
+                    .accessibilityIdentifier("opening_\(entry.id)")
             }
         } header: {
             Text(title).foregroundStyle(Theme.textSecondary)

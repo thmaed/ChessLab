@@ -151,9 +151,6 @@
         }
       }
     },
-    "%@ positions" : {
-
-    },
     "%@ pour %@" : {
       "localizations" : {
         "en" : {
@@ -198,6 +195,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld"
+          }
+        }
+      }
+    },
+    "%lld / %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
           }
         }
       }
@@ -256,6 +263,22 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "%1$lld %% d'échecs sur %2$lld"
+          }
+        }
+      }
+    },
+    "%lld à revoir" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld to review"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld à revoir"
           }
         }
       }
@@ -361,7 +384,6 @@
       }
     },
     "%lld position(s) à réviser" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -373,6 +395,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld position(s) à réviser"
+          }
+        }
+      }
+    },
+    "%lld position(s) à revoir" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld position(s) to review"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld position(s) à revoir"
+          }
+        }
+      }
+    },
+    "%lld position(s) révisée(s)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld position(s) reviewed."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld position(s) révisée(s)."
           }
         }
       }
@@ -472,6 +526,9 @@
           }
         }
       }
+    },
+    "À jour" : {
+
     },
     "À propos" : {
       "localizations" : {
@@ -683,6 +740,9 @@
           }
         }
       }
+    },
+    "Ajouter au répertoire" : {
+
     },
     "Ajouter des coups au répertoire" : {
       "extractionState" : "stale",
@@ -1042,7 +1102,7 @@
         }
       }
     },
-    "Aperçu" : {
+    "API Lichess Opening Explorer : parties de maîtres et parties en ligne filtrées par niveau (≈1400-2000). Popularité et scores des coups." : {
 
     },
     "Appareil chaud — moteur bridé" : {
@@ -1093,6 +1153,12 @@
           }
         }
       }
+    },
+    "Apprendre" : {
+
+    },
+    "Apprends et révise tes ouvertures" : {
+
     },
     "Approfondis cette ouverture en régénérant les données." : {
 
@@ -1251,6 +1317,9 @@
         }
       }
     },
+    "Aucune donnée d'ouverture n'est téléchargée à l'usage : tout fonctionne hors ligne." : {
+
+    },
     "Aucune étiquette. Ajoutez-en pour retrouver et regrouper vos parties (ex. « ouverture », « à revoir »)." : {
 
     },
@@ -1305,6 +1374,22 @@
         }
       }
     },
+    "Aucune position due pour l'instant. Explore ou apprends une ouverture pour remplir ta file." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No positions due right now. Explore or learn an opening to fill your queue."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune position due pour l'instant. Explore ou apprends une ouverture pour remplir ta file."
+          }
+        }
+      }
+    },
     "Aucune prise en passant possible dans cette position." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1335,6 +1420,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Défense australienne"
+          }
+        }
+      }
+    },
+    "Autres coups à ce stade" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other moves here"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres coups à ce stade"
+          }
+        }
+      }
+    },
+    "Autres coups possibles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other possible moves"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autres coups possibles"
           }
         }
       }
@@ -1604,6 +1721,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bibliothèques, jeux de données et assets tiers utilisés par ChessLab."
+          }
+        }
+      }
+    },
+    "Bien" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Good"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bien"
           }
         }
       }
@@ -2274,6 +2407,22 @@
         }
       }
     },
+    "Chapitre terminé !" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chapter complete!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chapitre terminé !"
+          }
+        }
+      }
+    },
     "Chaque mode de ChessLab en bref." : {
       "localizations" : {
         "en" : {
@@ -2394,7 +2543,20 @@
       }
     },
     "Clé" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Key"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clé"
+          }
+        }
+      }
     },
     "Clemenz Opening" : {
       "extractionState" : "stale",
@@ -2568,6 +2730,9 @@
           }
         }
       }
+    },
+    "Compte iCloud connecté" : {
+
     },
     "Confirmé" : {
       "extractionState" : "stale",
@@ -2849,6 +3014,9 @@
         }
       }
     },
+    "Coups et statistiques" : {
+
+    },
     "Coups joués" : {
       "localizations" : {
         "en" : {
@@ -2869,7 +3037,20 @@
 
     },
     "Cours indisponible" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Course unavailable"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cours indisponible"
+          }
+        }
+      }
     },
     "Creepy Crawly Formation" : {
       "extractionState" : "stale",
@@ -3184,6 +3365,9 @@
     "Dernière partie" : {
 
     },
+    "Dernière vérification : %@" : {
+
+    },
     "Deux joueurs" : {
       "localizations" : {
         "en" : {
@@ -3212,6 +3396,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Deux personnes jouent sur le même appareil. Le mode « table » retourne les pièces pour rester lisible face à face. La partie terminée s'enregistre dans la bibliothèque."
+          }
+        }
+      }
+    },
+    "Difficile" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hard"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Difficile"
           }
         }
       }
@@ -3485,6 +3685,22 @@
         }
       }
     },
+    "Encore" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Again"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Encore"
+          }
+        }
+      }
+    },
     "Enfilade" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3619,6 +3835,9 @@
         }
       }
     },
+    "Entraînement" : {
+
+    },
     "Entraînement du jour" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3635,6 +3854,9 @@
           }
         }
       }
+    },
+    "Entraîner" : {
+
     },
     "Équilibre" : {
 
@@ -3722,6 +3944,9 @@
         }
       }
     },
+    "Évaluations" : {
+
+    },
     "ex. Blancs — Italienne" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3783,9 +4008,22 @@
       }
     },
     "Explorateur" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explorer"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explorateur"
+          }
+        }
+      }
     },
-    "Explorateur d'ouvertures" : {
+    "Explore, apprends et entraîne tes ouvertures depuis le bouton « Explorateur » (🧭) de l'onglet Ouvertures : navigation dans les variantes, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour." : {
 
     },
     "Exporter le PGN" : {
@@ -3816,6 +4054,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Face à face (pivote)"
+          }
+        }
+      }
+    },
+    "Facile" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Easy"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Facile"
           }
         }
       }
@@ -3905,7 +4159,36 @@
       }
     },
     "Fin de la ligne connue" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End of the known line"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin de la ligne connue"
+          }
+        }
+      }
+    },
+    "Fin de la ligne. Reviens en arrière pour explorer une variante." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "End of the line. Go back to explore a variation."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fin de la ligne. Reviens en arrière pour explorer une variante."
+          }
+        }
+      }
     },
     "Finale" : {
       "extractionState" : "stale",
@@ -3925,9 +4208,6 @@
       }
     },
     "Flèches du moteur" : {
-
-    },
-    "Fonctionnalité en cours de développement : explore librement les variantes d'une ouverture, avec statistiques par coup. Le contenu s'enrichira au fil des mises à jour." : {
 
     },
     "Force du moteur" : {
@@ -4822,6 +5102,9 @@
         }
       }
     },
+    "Jeu de données public lichess-org/chess-openings (domaine public). Sert à nommer chaque position atteinte." : {
+
+    },
     "Jeu de pièces" : {
       "localizations" : {
         "en" : {
@@ -5486,6 +5769,22 @@
         }
       }
     },
+    "Le coup était %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The move was %@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le coup était %@"
+          }
+        }
+      }
+    },
     "Le meilleur" : {
       "localizations" : {
         "en" : {
@@ -5664,6 +5963,9 @@
         }
       }
     },
+    "Les nœuds les plus ratés" : {
+
+    },
     "les noirs" : {
       "localizations" : {
         "en" : {
@@ -5695,6 +5997,9 @@
           }
         }
       }
+    },
+    "Les ouvertures sont pré-générées à partir de sources ouvertes, puis embarquées. Les coups et statistiques sont des faits ; les explications, quand elles existent, sont rédigées à la main." : {
+
     },
     "Les parties terminées (mode Jouer et Deux joueurs) apparaîtront ici." : {
       "localizations" : {
@@ -5811,6 +6116,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Lien ou identifiant d'une étude publique"
+          }
+        }
+      }
+    },
+    "Ligne complète, sans filet" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Full line, no net"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligne complète, sans filet"
           }
         }
       }
@@ -6332,6 +6653,9 @@
         }
       }
     },
+    "Moteur Stockfish, en amont, pour annoter les coups critiques et repérer les pièges." : {
+
+    },
     "Moteurs" : {
       "localizations" : {
         "en" : {
@@ -6524,6 +6848,12 @@
           }
         }
       }
+    },
+    "Noms et codes ECO" : {
+
+    },
+    "Non connecté à iCloud — la synchro est en pause" : {
+
     },
     "Notation des coups" : {
       "localizations" : {
@@ -6806,6 +7136,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture"
+          }
+        }
+      }
+    },
+    "Ouverture indisponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opening unavailable"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouverture indisponible"
           }
         }
       }
@@ -7280,7 +7626,20 @@
       }
     },
     "Piège" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trap"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Piège"
+          }
+        }
+      }
     },
     "Pioche dans le livre d'ouvertures" : {
       "extractionState" : "stale",
@@ -7588,6 +7947,22 @@
         }
       }
     },
+    "Positions difficiles" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hard positions"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Positions difficiles"
+          }
+        }
+      }
+    },
     "Positions maîtrisées" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7601,6 +7976,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Positions maîtrisées"
+          }
+        }
+      }
+    },
+    "Pourquoi pas autre chose ?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Why not something else?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pourquoi pas autre chose ?"
+          }
+        }
+      }
+    },
+    "Précédent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Précédent"
           }
         }
       }
@@ -8149,7 +8556,20 @@
       }
     },
     "Réfutation" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Refutation"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réfutation"
+          }
+        }
+      }
     },
     "Réglages" : {
       "localizations" : {
@@ -8289,7 +8709,20 @@
       }
     },
     "Répertoire blanc" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "White repertoire"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Répertoire blanc"
+          }
+        }
+      }
     },
     "Répertoire des Blancs" : {
       "extractionState" : "stale",
@@ -8326,7 +8759,20 @@
       }
     },
     "Répertoire noir" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Black repertoire"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Répertoire noir"
+          }
+        }
+      }
     },
     "Répertoire vide" : {
       "extractionState" : "stale",
@@ -8346,6 +8792,7 @@
       }
     },
     "Répertoires PGN" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8576,6 +9023,9 @@
         }
       }
     },
+    "Retirer du répertoire" : {
+
+    },
     "Retour" : {
       "localizations" : {
         "en" : {
@@ -8620,6 +9070,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Retourner le plateau"
+          }
+        }
+      }
+    },
+    "Retrouvez le coup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find the move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retrouvez le coup"
           }
         }
       }
@@ -8684,7 +9150,6 @@
       }
     },
     "Réviser" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8696,6 +9161,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réviser"
+          }
+        }
+      }
+    },
+    "Réviser aujourd'hui" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Review today"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réviser aujourd'hui"
           }
         }
       }
@@ -8713,6 +9194,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réviser ce répertoire"
+          }
+        }
+      }
+    },
+    "Révision du jour" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's review"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Révision du jour"
+          }
+        }
+      }
+    },
+    "Revoir la ligne" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replay the line"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Revoir la ligne"
           }
         }
       }
@@ -8740,6 +9253,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nothing to show yet"
+          }
+        }
+      }
+    },
+    "Rien à réviser" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nothing to review"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rien à réviser"
           }
         }
       }
@@ -9044,6 +9573,22 @@
         }
       }
     },
+    "Séance terminée !" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session complete!"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Séance terminée !"
+          }
+        }
+      }
+    },
     "Section" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9276,6 +9821,38 @@
         }
       }
     },
+    "Sources" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sources"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sources"
+          }
+        }
+      }
+    },
+    "Sources des données" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data sources"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sources des données"
+          }
+        }
+      }
+    },
     "St. George Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9326,6 +9903,9 @@
         }
       }
     },
+    "Statistiques indisponibles sur ce pilote — elles apparaîtront après régénération." : {
+
+    },
     "Stockfish" : {
       "localizations" : {
         "en" : {
@@ -9370,6 +9950,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Style"
+          }
+        }
+      }
+    },
+    "Suivant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suivant"
           }
         }
       }
@@ -9443,6 +10039,9 @@
           }
         }
       }
+    },
+    "Synchroniser maintenant" : {
+
     },
     "Synchroniser via iCloud" : {
       "localizations" : {
@@ -10160,6 +10759,9 @@
         }
       }
     },
+    "Vérification du compte iCloud…" : {
+
+    },
     "Vérifier la position" : {
       "localizations" : {
         "en" : {
@@ -10382,6 +10984,38 @@
         }
       }
     },
+    "Vous jouez les blancs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You play White"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous jouez les blancs"
+          }
+        }
+      }
+    },
+    "Vous jouez les noirs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You play Black"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous jouez les noirs"
+          }
+        }
+      }
+    },
     "Vue des blancs" : {
 
     },
@@ -10520,6 +11154,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Zukertort"
+          }
+        }
+      }
+    },
+    "Retrouvez le meilleur coup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find the best move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retrouvez le meilleur coup"
           }
         }
       }

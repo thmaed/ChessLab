@@ -165,6 +165,7 @@ struct OpeningReaderView: View {
             .buttonStyle(.pressable)
             .disabled(!viewModel.canGoBack)
             .opacity(viewModel.canGoBack ? 1 : 0.4)
+            .accessibilityIdentifier("reader_prev")
 
             Button { withAnimation(Theme.spring) { viewModel.next() } } label: {
                 Label("Suivant", systemImage: "chevron.right")
@@ -177,6 +178,7 @@ struct OpeningReaderView: View {
             .buttonStyle(.pressable)
             .disabled(viewModel.isEnd)
             .opacity(viewModel.isEnd ? 0.4 : 1)
+            .accessibilityIdentifier("reader_next")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 12)

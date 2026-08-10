@@ -132,10 +132,16 @@ def _measure_depth(course_dict: dict) -> int:
     return best
 
 
-def rebuild_catalog(out_dir: Path) -> list[dict]:
-    """Reconstruit opening_catalog.json en scannant TOUS les cours du dossier."""
+def rebuild_catalog(out_dir: Path, order: list[str] | None = None) -> list[dict]:
+    """Reconstruit opening_catalog.json en scannant TOUS les cours du dossier.
+
+    `order` (ids) impose l'ordre d'affichage pédagogique (1.e4 blanc, réponses à
+    1.e4, 1.d4, etc.) ; les cours hors liste passent en fin, par ordre alpha.
+    """
+    rank = {cid: i for i, cid in enumerate(order or [])}
+    paths = sorted(out_dir.glob("*.json"), key=lambda p: (rank.get(p.stem, len(rank)), p.stem))
     entries = []
-    for path in sorted(out_dir.glob("*.json")):
+    for path in paths:
         if path.name == "opening_catalog.json":
             continue
         course = json.loads(path.read_text())
@@ -185,7 +191,7 @@ def main(argv=None) -> int:
         commented = sum(1 for n in course_dict["positions"].values() for e in n["moves"] if e.get("comment"))
         print(f"  ✓ {spec['id']:<22} {stats['positions']:>4} positions, prof {stats['depth']:>2}, {commented} commentaires")
 
-    catalog = rebuild_catalog(out_dir)
+    catalog = rebuild_catalog(out_dir, order=[c["id"] for c in content.COURSES])
     print(f"\nCatalogue reconstruit : {len(catalog)} cours dans {out_dir}")
     return 0
 
