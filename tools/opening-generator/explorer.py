@@ -30,6 +30,10 @@ import chess
 MASTERS_URL = "https://explorer.lichess.ovh/masters"
 LICHESS_URL = "https://explorer.lichess.ovh/lichess"
 
+# Lichess demande un User-Agent descriptif ; sans lui, les requêtes
+# `python-requests` par défaut peuvent être bloquées (403) par leur CDN.
+DEFAULT_USER_AGENT = "ChessLab-opening-generator/1.0 (offline data build; contact via App Store)"
+
 
 class ExplorerError(Exception):
     pass
@@ -45,6 +49,7 @@ class LichessExplorer:
         max_retries: int = 6,
         moves: int = 12,
         dry_run: bool = False,
+        user_agent: str = DEFAULT_USER_AGENT,
     ):
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -58,6 +63,19 @@ class LichessExplorer:
         self.failed: list[dict] = []
         self.request_count = 0
         self.cache_hits = 0
+        self._first_failure_reported = False
+
+        # Session avec User-Agent descriptif (cf. DEFAULT_USER_AGENT).
+        self.session = requests.Session()
+        self.session.headers.update({"User-Agent": user_agent, "Accept": "application/json"})
+
+    def probe(self) -> tuple:
+        """Requête de diagnostic unique (position de départ) → (status, extrait)."""
+        try:
+            resp = self.session.get(MASTERS_URL, params={"fen": chess.Board().fen(), "moves": 1}, timeout=30)
+            return resp.status_code, resp.text[:400]
+        except requests.RequestException as exc:  # noqa: BLE001
+            return None, f"erreur réseau: {exc}"
 
     # -- API publique ------------------------------------------------------
 
@@ -101,37 +119,62 @@ class LichessExplorer:
         return data
 
     def _request_with_backoff(self, url: str, params: dict, board: chess.Board) -> Optional[dict]:
+        last_status = None
+        last_body = ""
+        last_reason = "inconnu"
         for attempt in range(self.max_retries):
             self._respect_min_delay()
             try:
-                resp = requests.get(url, params=params, timeout=30)
+                resp = self.session.get(url, params=params, timeout=30)
             except requests.RequestException as exc:
-                self._sleep_backoff(attempt, reason=str(exc))
+                last_reason = f"réseau: {exc}"
+                self._sleep_backoff(attempt, reason=last_reason)
                 continue
 
             self.request_count += 1
+            last_status = resp.status_code
+            last_body = resp.text[:200].replace("\n", " ")
             if resp.status_code == 200:
                 try:
                     return resp.json()
                 except ValueError:
                     # 200 mais corps non-JSON (page d'erreur d'un proxy, HTML…) :
                     # on retente plutôt que de crasher tout le lot.
-                    self._sleep_backoff(attempt, reason="réponse non-JSON")
+                    last_reason = "réponse non-JSON"
+                    self._sleep_backoff(attempt, reason=last_reason)
                     continue
             if resp.status_code == 429:
                 # Respecte Retry-After s'il est fourni, sinon backoff exponentiel.
+                last_reason = "429 (rate limit)"
                 retry_after = resp.headers.get("Retry-After")
                 delay = float(retry_after) if retry_after else (2 ** attempt) * self.min_delay
                 time.sleep(min(delay, 120))
                 continue
             if resp.status_code in (500, 502, 503, 504):
-                self._sleep_backoff(attempt, reason=f"HTTP {resp.status_code}")
+                last_reason = f"HTTP {resp.status_code}"
+                self._sleep_backoff(attempt, reason=last_reason)
                 continue
-            # Autre erreur : on abandonne cette position.
+            # Autre erreur (403, 400, 404…) : inutile de retenter.
+            last_reason = f"HTTP {resp.status_code}"
             break
 
-        self.failed.append({"fen": normalize_fen(board), "url": url})
+        self._report_first_failure(url, last_status, last_body, last_reason)
+        self.failed.append({"fen": normalize_fen(board), "url": url, "status": last_status, "reason": last_reason})
         return None
+
+    def _report_first_failure(self, url: str, status, body: str, reason: str) -> None:
+        """Affiche UNE fois le détail du premier échec — pour diagnostiquer
+        (403 CDN, 429 persistant, réseau…) au lieu de deviner."""
+        if self._first_failure_reported:
+            return
+        self._first_failure_reported = True
+        import sys
+        print(f"\n⚠ Premier échec API : {reason} sur {url}", file=sys.stderr)
+        if body:
+            print(f"  Réponse : {body}", file=sys.stderr)
+        print(f"  User-Agent : {self.session.headers.get('User-Agent')}", file=sys.stderr)
+        print("  Pistes : 403 → blocage CDN (User-Agent) ; 429 → augmente --min-delay ;"
+              " réseau → pare-feu/VPN.\n", file=sys.stderr)
 
     def _respect_min_delay(self) -> None:
         elapsed = time.monotonic() - self._last_request_at
