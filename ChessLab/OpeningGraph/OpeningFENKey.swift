@@ -75,16 +75,23 @@ enum OpeningFENKey {
     }
 
     /// Vrai si un pion du camp au trait peut légalement capturer en passant sur
-    /// `target`. On s'appuie sur la génération de coups légaux publique de
-    /// ChessKit (qui inclut bien la prise en passant) : une case e.p. figure
-    /// dans les cibles légales d'un pion uniquement en tant que prise e.p. (la
-    /// case est vide et un pion ne s'y déplace pas autrement).
+    /// `target`.
+    ///
+    /// - important: la case e.p. d'une position légitime est TOUJOURS vide (le
+    ///   pion preneur s'y déplace) ; et un pion ne l'atteint que par une prise
+    ///   DIAGONALE. On exige donc case vide + pion sur une AUTRE colonne, sinon
+    ///   un champ e.p. périmé pointant sur une case désormais occupée (ex. juste
+    ///   après une prise e.p.) ferait passer une prise normale (…gxf6) pour une
+    ///   prise en passant. Sans ces gardes, la clé retiendrait une case e.p.
+    ///   fantôme et divergerait de `python-chess` côté générateur.
     private static func hasLegalEnPassant(target: Square, position: Position) -> Bool {
+        guard position.piece(at: target) == nil else { return false }
         let board = Board(position: position)
         let mover = position.sideToMove
         for square in Square.allCases {
             guard let piece = position.piece(at: square),
-                  piece.color == mover, piece.kind == .pawn
+                  piece.color == mover, piece.kind == .pawn,
+                  square.file != target.file
             else { continue }
             if board.legalMoves(forPieceAt: square).contains(target) { return true }
         }

@@ -1,5 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Partie italienne (1.e4 e5 2.Cf3 Cc6 3.Fc4) — répertoire BLANC."""
+"""Partie italienne (1.e4 e5 2.Cf3 Cc6 3.Fc4) — répertoire BLANC.
+
+Arbre approfondi : Giuoco Pianissimo (plan moderne), Giuoco Piano classique,
+Deux Cavaliers (Ca5, Fritz, Ulvestad, Fried Liver), Traxler, Evans, hongroise,
+gambit italien. Lignes vérifiées (Wikipédia).
+"""
 
 
 def c(fr, en):
@@ -13,31 +18,47 @@ COURSE = {
     "level": "club",
     "eco": ["C50", "C59"],
     "summary": c(
-        "Le fou file en c4 et vise f7 : développement rapide, idées claires, mais un venin réel avec l'attaque des Deux Cavaliers et le gambit Evans.",
-        "The bishop goes to c4 and eyes f7: quick development, clear ideas — yet real venom in the Two Knights and the Evans Gambit.",
+        "Le fou file en c4 et vise f7. Deux mondes en un : le Giuoco Pianissimo, lent et positionnel, et l'univers tactique des Deux Cavaliers (Fried Liver, Traxler) et du gambit Evans.",
+        "The bishop goes to c4 and eyes f7. Two worlds in one: the slow, positional Giuoco Pianissimo, and the tactical universe of the Two Knights (Fried Liver, Traxler) and the Evans Gambit.",
     ),
     "lines": [
-        # Giuoco Pianissimo (le grand classique moderne)
+        # 1) Giuoco Pianissimo — plan moderne (ligne principale)
         {
             "chapter": {"id": "pianissimo", "title": c("Giuoco Pianissimo", "Giuoco Pianissimo")},
             "moves": [
                 "e4", "e5", "Nf3", "Nc6",
                 {"san": "Bc4", "comment": c("Le fou italien : il presse f7, le point faible du camp noir.",
-                                            "The Italian bishop: it presses f7, the soft spot in Black's camp.")},
+                                            "The Italian bishop: it presses f7, Black's soft spot.")},
                 {"san": "Bc5", "eco": "Italian Game: Giuoco Piano",
                  "comment": c("Le Giuoco Piano : les fous se font face, la partie sera de manœuvre.",
                               "The Giuoco Piano: the bishops face off; a manoeuvring game lies ahead.")},
-                {"san": "c3", "comment": c("On prépare d4 pour bâtir un grand centre.",
-                                           "Preparing d4 to build a big centre.")},
+                {"san": "c3", "comment": c("On prépare d4 et une case de repli en c2 pour le fou.",
+                                           "Preparing d4 and a c2 retreat for the bishop.")},
                 "Nf6",
-                {"san": "d3", "comment": c("Le plan moderne, lent mais solide : d3, puis Cbd2-f1-g3 et une attaque à venir.",
-                                           "The modern, slow-but-solid plan: d3, then Nbd2-f1-g3 and a coming attack.")},
-                "d6", "O-O", "O-O",
+                {"san": "d3", "comment": c("Le plan moderne : d3, puis le grand voyage Cbd2-f1-g3 et une attaque à l'aile roi.",
+                                           "The modern plan: d3, then the famous Nbd2-f1-g3 tour and a kingside attack.")},
+                "d6", "O-O", "O-O", "Re1",
+                {"san": "a6", "comment": c("Chacun prépare l'expansion à l'aile dame (…b5 / a4).",
+                                           "Each side prepares queenside expansion (…b5 / a4).")},
+                "a4", "Ba7", "h3", "h6", "Nbd2", "Be6",
             ],
         },
-        # Deux Cavaliers + Fried Liver
+        # 2) Giuoco Piano classique — 5.d4
         {
-            "chapter": {"id": "two-knights", "title": c("Défense des Deux Cavaliers", "Two Knights Defense")},
+            "chapter": {"id": "classical", "title": c("Giuoco Piano classique — 5.d4", "Classical Giuoco Piano — 5.d4")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "Bc4", "Bc5", "c3", "Nf6",
+                {"san": "d4", "comment": c("La rupture classique : on ouvre le centre au lieu du plan lent d3.",
+                                           "The classical break: opening the centre instead of the slow d3 plan.")},
+                "exd4", "cxd4", "Bb4+",
+                {"san": "Nc3", "comment": c("L'Attaque Møller : on offre un pion pour un développement et une initiative fulgurants.",
+                                            "The Møller Attack: offering a pawn for rapid development and initiative.")},
+                "Nxe4", "O-O", "Bxc3", "d5",
+            ],
+        },
+        # 3) Deux Cavaliers — 4...d5 5.exd5 Ca5 (principale)
+        {
+            "chapter": {"id": "two-knights", "title": c("Deux Cavaliers — 5…Ca5", "Two Knights — 5…Na5")},
             "moves": [
                 "e4", "e5", "Nf3", "Nc6", "Bc4",
                 {"san": "Nf6", "eco": "Italian Game: Two Knights Defense",
@@ -45,16 +66,36 @@ COURSE = {
                               "The Two Knights: instead of …Bc5, Black hits e4. Things get sharp.")},
                 {"san": "Ng5", "comment": c("Le coup agressif : on attaque f7 immédiatement.",
                                             "The aggressive move: hitting f7 at once.")},
-                {"san": "d5", "comment": c("La seule bonne défense : contre-attaque plutôt que défendre f7.",
+                {"san": "d5", "comment": c("La seule bonne défense : contre-attaquer plutôt que défendre f7.",
                                            "The only good defence: counterattack rather than defend f7.")},
                 "exd5",
-                {"san": "Na5", "comment": c("La ligne principale : le cavalier attaque le fou c4, les Noirs sacrifient un pion pour l'initiative.",
+                {"san": "Na5", "comment": c("La ligne principale : le cavalier chasse le fou c4 ; les Noirs sacrifient un pion pour l'initiative.",
                                             "The main line: the knight hits the c4 bishop; Black gives a pawn for the initiative.")},
-                "Bb5+", "c6", "dxc6", "bxc6",
-                {"san": "Be2", "comment": c("Le fou recule ; les Noirs ont une compensation réelle mais les Blancs tiennent le pion.",
-                                            "The bishop retreats; Black has real compensation but White keeps the pawn.")},
+                "Bb5+", "c6", "dxc6", "bxc6", "Be2", "h6", "Nf3", "e4", "Ne5", "Bd6",
             ],
         },
+        # 4) Deux Cavaliers — 5...Cd4 (Fritz) et 5...b5 (Ulvestad)
+        {
+            "chapter": {"id": "fritz-ulvestad", "title": c("Deux Cavaliers — Fritz & Ulvestad", "Two Knights — Fritz & Ulvestad")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "Bc4", "Nf6", "Ng5", "d5", "exd5",
+                {"san": "Nd4", "role": "sideline", "eco": "Italian Game: Two Knights, Fritz Variation",
+                 "comment": c("La Fritz : plus tranchante que …Ca5, elle vise une attaque directe.",
+                              "The Fritz: sharper than …Na5, aiming for a direct attack.")},
+                "c3", "b5", "Bf1", "Nxd5",
+            ],
+        },
+        {
+            "chapter": {"id": "fritz-ulvestad", "title": c("Deux Cavaliers — Fritz & Ulvestad", "Two Knights — Fritz & Ulvestad")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "Bc4", "Nf6", "Ng5", "d5", "exd5",
+                {"san": "b5", "role": "sideline", "eco": "Italian Game: Two Knights, Ulvestad Variation",
+                 "comment": c("L'Ulvestad : …b5 repousse le fou avant de récupérer d5. Très pointue.",
+                              "The Ulvestad: …b5 kicks the bishop before regaining d5. Very sharp.")},
+                "Bf1", "Nd4", "c3", "Nxd5",
+            ],
+        },
+        # 5) Fried Liver
         {
             "chapter": {"id": "fried-liver", "title": c("Attaque Fried Liver", "Fried Liver Attack")},
             "moves": [
@@ -64,24 +105,57 @@ COURSE = {
                               "Recapturing on d5 is risky: it allows the Fried Liver sacrifice.")},
                 {"san": "Nxf7", "role": "trap", "critical": True,
                  "eco": "Italian Game: Fried Liver Attack",
-                 "comment": c("Le sacrifice Fried Liver ! Le roi noir est traîné dehors ; l'attaque blanche est très dangereuse en pratique.",
-                              "The Fried Liver sacrifice! Black's king is dragged out; White's attack is very dangerous in practice.")},
-                "Kxf7", "Qf3+", "Ke6", "Nc3",
+                 "comment": c("Le sacrifice Fried Liver ! Le roi noir est traîné dehors ; l'attaque est très dangereuse en pratique.",
+                              "The Fried Liver sacrifice! Black's king is dragged out; the attack is very dangerous in practice.")},
+                "Kxf7", "Qf3+", "Ke6", "Nc3", "Nb4",
             ],
         },
-        # Gambit Evans
+        # 6) Traxler / Wilkes-Barre
+        {
+            "chapter": {"id": "traxler", "title": c("Contre-attaque Traxler — 4…Fc5", "Traxler Counterattack — 4…Bc5")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "Bc4", "Nf6", "Ng5",
+                {"san": "Bc5", "role": "trap", "critical": True,
+                 "eco": "Italian Game: Two Knights, Traxler Variation",
+                 "comment": c("Le Traxler : les Noirs ignorent la menace sur f7 et attaquent f2 en retour ! Chaos garanti.",
+                              "The Traxler: Black ignores the f7 threat and hits f2 in return! Guaranteed chaos.")},
+                {"san": "Nxf7", "comment": c("Prendre f7 mène aux complications les plus folles ; Fxf7+ est la voie plus sûre.",
+                                             "Taking f7 leads to the wildest complications; Bxf7+ is the safer route.")},
+                "Bxf2+", "Kxf2", "Nxe4+", "Kg1", "Qh4",
+            ],
+        },
+        # 7) Gambit Evans
         {
             "chapter": {"id": "evans", "title": c("Gambit Evans", "Evans Gambit")},
             "moves": [
                 "e4", "e5", "Nf3", "Nc6", "Bc4", "Bc5",
                 {"san": "b4", "role": "trap", "critical": True,
                  "eco": "Italian Game: Evans Gambit",
-                 "comment": c("Le Gambit Evans : un pion pour arracher le fou de c5 et lancer un développement fulgurant.",
-                              "The Evans Gambit: a pawn to deflect the c5 bishop and unleash rapid development.")},
-                "Bxb4", "c3", "Ba5",
-                {"san": "d4", "comment": c("On ouvre le centre pendant que les Noirs sont en retard : compensation classique.",
-                                           "Opening the centre while Black lags behind: classic compensation.")},
-                "exd4", "O-O",
+                 "comment": c("Le Gambit Evans : un pion pour dévier le fou c5 et déchaîner le développement.",
+                              "The Evans Gambit: a pawn to deflect the c5 bishop and unleash development.")},
+                "Bxb4", "c3", "Ba5", "d4", "exd4", "O-O", "dxc3", "Qb3", "Qf6",
+            ],
+        },
+        # 8) Défense hongroise
+        {
+            "chapter": {"id": "hungarian", "title": c("Défense hongroise — 3…Fe7", "Hungarian Defense — 3…Be7")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "Bc4",
+                {"san": "Be7", "eco": "Hungarian Defense",
+                 "comment": c("La hongroise : un choix modeste et solide pour éviter tout le venin tactique.",
+                              "The Hungarian: a modest, solid choice to sidestep all the tactical venom.")},
+                "d4", "exd4", "Nxd4", "Nf6", "Nc3", "O-O",
+            ],
+        },
+        # 9) Gambit italien / écossais
+        {
+            "chapter": {"id": "italian-gambit", "title": c("Gambit italien — 4.d4", "Italian Gambit — 4.d4")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "Bc4", "Bc5",
+                {"san": "d4", "role": "sideline",
+                 "comment": c("On ouvre le centre tout de suite : jeu ouvert, souvent transposé au gambit écossais.",
+                              "Opening the centre at once: open play, often transposing to the Scotch Gambit.")},
+                "exd4", "c3", "dxc3", "Nxc3", "d6",
             ],
         },
     ],

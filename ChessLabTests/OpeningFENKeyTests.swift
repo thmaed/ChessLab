@@ -63,4 +63,21 @@ struct OpeningFENKeyTests {
         #expect(!key.contains("e3"))
         #expect(key.hasSuffix(" -"))
     }
+
+    /// Régression : après une PRISE en passant, la case e.p. (désormais occupée
+    /// par le pion preneur) ne doit pas être retenue — même si un pion adverse
+    /// peut la reprendre normalement (…gxf6). C'est le chemin exact du
+    /// validateur (reconstruit une position depuis une clé à case e.p., puis
+    /// rejoue) qui divergeait de python-chess. Cf. la viennoise 1.e4 e6 2.e5 f5.
+    @Test func phantomEnPassantStrippedAfterCapture() {
+        var board = Board(position: .standard)
+        for (from, to) in [("e2", "e4"), ("e7", "e6"), ("e4", "e5"), ("f7", "f5")] {
+            _ = board.move(pieceAt: Square(from), to: Square(to))
+        }
+        let fromKey = OpeningFENKey.key(for: board.position)
+        #expect(fromKey.hasSuffix(" f6"))   // case e.p. légitime avant la prise
+
+        let result = OpeningCourseValidator.resultingKey(afterUCI: "e5f6", from: fromKey)
+        #expect(result?.hasSuffix(" -") == true) // plus de case e.p. fantôme après exf6
+    }
 }
