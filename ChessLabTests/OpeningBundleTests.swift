@@ -47,4 +47,17 @@ struct OpeningBundleTests {
     @Test func featureIsGatedButCoursesAreBundled() {
         #expect(OpeningsGraphFeature.hasBundledCourses)
     }
+
+    /// Le contenu rédigé à la main porte des commentaires BILINGUES : au moins
+    /// une arête validée a un texte français distinct de l'anglais, et les deux
+    /// se résolvent — preuve du bout en bout (bundle → décodage → résolution).
+    @Test func bundledCommentsResolveInBothLanguages() throws {
+        let course = try #require(OpeningCourseLoader.course(id: "scandinavian"))
+        let edges = course.positions.values.flatMap(\.moves)
+        let bilingual = edges.first { edge in
+            guard let fr = edge.displayableComment("fr"), let en = edge.displayableComment("en") else { return false }
+            return fr != en
+        }
+        #expect(bilingual != nil, "au moins un commentaire validé avec fr ≠ en")
+    }
 }
