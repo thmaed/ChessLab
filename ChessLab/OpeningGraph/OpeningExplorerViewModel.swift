@@ -30,6 +30,7 @@ final class OpeningExplorerViewModel {
     private(set) var currentKey: String
     private(set) var lastMove: Move?
     var base: ExplorerBase = .club
+    private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
 
     /// Pile de navigation (position précédente + plateau + dernier coup).
     private var history: [(key: String, board: Board, lastMove: Move?)] = []
@@ -46,7 +47,7 @@ final class OpeningExplorerViewModel {
 
     var currentNode: PositionNode? { course.node(at: currentKey) }
     var ecoName: String? { currentNode?.ecoName }
-    var plan: String? { currentNode?.plan }
+    var plan: String? { currentNode?.plan?.resolved(languageCode) }
     var keySquares: [String] { currentNode?.keySquares ?? [] }
 
     /// Coups jouables depuis la position, triés par popularité de la base

@@ -52,6 +52,48 @@ enum OpeningCommentStatus: String, Codable, Hashable, Sendable {
     case validated
 }
 
+/// Texte BILINGUE (français / anglais) porté par la DONNÉE d'ouverture — les
+/// commentaires, plans et résumés sont rédigés dans les deux langues et résolus
+/// à l'exécution selon la langue de l'app (``AppLanguage/resolvedCode``).
+///
+/// Décodage souple : accepte soit un objet `{"fr": "...", "en": "..."}`, soit
+/// une simple chaîne (appliquée aux deux langues) — pratique pour l'ébauche.
+struct LocalizedText: Codable, Hashable, Sendable {
+    var fr: String?
+    var en: String?
+
+    init(fr: String? = nil, en: String? = nil) {
+        self.fr = fr
+        self.en = en
+    }
+
+    /// Même texte dans les deux langues (utilitaire d'écriture/tests).
+    static func both(_ text: String) -> LocalizedText { LocalizedText(fr: text, en: text) }
+
+    enum CodingKeys: String, CodingKey { case fr, en }
+
+    init(from decoder: Decoder) throws {
+        if let single = try? decoder.singleValueContainer().decode(String.self) {
+            fr = single
+            en = single
+            return
+        }
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        fr = try container.decodeIfPresent(String.self, forKey: .fr)
+        en = try container.decodeIfPresent(String.self, forKey: .en)
+    }
+
+    /// Texte pour un code langue (« fr »/« en »), avec repli sur l'autre langue,
+    /// puis `nil` si les deux sont vides.
+    func resolved(_ code: String) -> String? {
+        let primary = code == "fr" ? fr : en
+        let fallback = code == "fr" ? en : fr
+        if let primary, !primary.isEmpty { return primary }
+        if let fallback, !fallback.isEmpty { return fallback }
+        return nil
+    }
+}
+
 /// Une arête du graphe : un coup jouable depuis un ``PositionNode`` vers un
 /// autre nœud (`toFEN`, clé FEN normalisée d'arrivée).
 ///
@@ -83,8 +125,8 @@ struct MoveEdge: Codable, Hashable, Sendable {
     var scoreBlack: Double?
     /// Évaluation moteur en centipions (point de vue des Blancs).
     var eval: Double?
-    /// Explication pédagogique — peut rester vide/absente.
-    var comment: String?
+    /// Explication pédagogique BILINGUE — peut rester vide/absente.
+    var comment: LocalizedText?
     private var commentStatus_: String?
     private var isCritical_: Bool?
 
@@ -105,14 +147,17 @@ struct MoveEdge: Codable, Hashable, Sendable {
     var isCritical: Bool { isCritical_ ?? false }
 
     /// Le commentaire n'est AFFICHABLE comme définitif que s'il est
-    /// explicitement `validated` ET non vide. Tout le reste (absent, brouillon,
-    /// statut inconnu) reste masqué — on ne présente jamais un brouillon comme
-    /// de la théorie sûre.
-    var displayableComment: String? {
-        guard commentStatus_ == OpeningCommentStatus.validated.rawValue,
-              let comment, !comment.isEmpty
-        else { return nil }
-        return comment
+    /// explicitement `validated`, résolu dans la langue demandée (« fr »/« en »,
+    /// repli sur l'autre). Tout le reste (absent, brouillon, statut inconnu)
+    /// reste masqué — on ne présente jamais un brouillon comme de la théorie sûre.
+    func displayableComment(_ code: String) -> String? {
+        guard commentStatus_ == OpeningCommentStatus.validated.rawValue else { return nil }
+        return comment?.resolved(code)
+    }
+
+    /// Version bilingue brute d'un commentaire validé (résolution différée).
+    var validatedComment: LocalizedText? {
+        commentStatus_ == OpeningCommentStatus.validated.rawValue ? comment : nil
     }
 
     init(
@@ -120,7 +165,7 @@ struct MoveEdge: Codable, Hashable, Sendable {
         gamesMasters: Int? = nil, popularityMasters: Double? = nil,
         gamesClub: Int? = nil, popularityClub: Double? = nil,
         scoreWhite: Double? = nil, scoreDraw: Double? = nil, scoreBlack: Double? = nil,
-        eval: Double? = nil, comment: String? = nil,
+        eval: Double? = nil, comment: LocalizedText? = nil,
         commentStatus: OpeningCommentStatus? = nil, isCritical: Bool = false
     ) {
         self.san = san
@@ -152,8 +197,8 @@ struct PositionNode: Codable, Hashable, Sendable {
     /// Nom de la variante atteinte à ce point (ex. « Scandinave, variante
     /// Mieses-Kotroc ») — facultatif.
     var ecoName: String?
-    /// Plan typique dans cette structure — facultatif, rédigé à la main.
-    var plan: String?
+    /// Plan typique dans cette structure — bilingue, facultatif, rédigé à la main.
+    var plan: LocalizedText?
     /// Cases à surligner (ex. [« d5 », « e5 »]) — facultatif.
     var keySquares: [String]?
     private var moves_: [MoveEdge]?
@@ -177,7 +222,7 @@ struct PositionNode: Codable, Hashable, Sendable {
 
     init(
         fen: String, sideToMove: OpeningSide? = nil, ecoName: String? = nil,
-        plan: String? = nil, keySquares: [String]? = nil, moves: [MoveEdge] = []
+        plan: LocalizedText? = nil, keySquares: [String]? = nil, moves: [MoveEdge] = []
     ) {
         self.fen = fen
         self.sideToMove_ = sideToMove
@@ -193,13 +238,13 @@ struct PositionNode: Codable, Hashable, Sendable {
 /// référence des nœuds du graphe par leur FEN.
 struct OpeningChapter: Codable, Hashable, Sendable, Identifiable {
     let id: String
-    var title: String
-    var summary: String?
+    var title: LocalizedText
+    var summary: LocalizedText?
     /// FEN (normalisées) des positions couvertes par ce chapitre, dans l'ordre
     /// pédagogique. Chacune doit exister dans ``OpeningCourse/positions``.
     var positionFENs: [String]
 
-    init(id: String, title: String, summary: String? = nil, positionFENs: [String] = []) {
+    init(id: String, title: LocalizedText, summary: LocalizedText? = nil, positionFENs: [String] = []) {
         self.id = id
         self.title = title
         self.summary = summary
@@ -222,7 +267,7 @@ struct OpeningCourse: Codable, Identifiable, Hashable, Sendable {
     var eco: [String]?
     private var side_: OpeningSide?
     private var level_: String?
-    var summary: String?
+    var summary: LocalizedText?
     /// FEN normalisée de la position de départ du cours (souvent la position
     /// initiale, mais pas forcément pour un cours « côté noir »).
     let rootFEN: String
@@ -251,7 +296,7 @@ struct OpeningCourse: Codable, Identifiable, Hashable, Sendable {
     init(
         schemaVersion: Int? = OpeningSchema.currentVersion, id: String, name: String,
         eco: [String]? = nil, side: OpeningSide = .white, level: OpeningLevel = .club,
-        summary: String? = nil, rootFEN: String, chapters: [OpeningChapter]? = nil,
+        summary: LocalizedText? = nil, rootFEN: String, chapters: [OpeningChapter]? = nil,
         positions: [String: PositionNode]
     ) {
         self.schemaVersion = schemaVersion

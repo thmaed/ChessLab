@@ -34,6 +34,7 @@ final class OpeningTrainViewModel {
     private let context: ModelContext
     private var courses: [String: OpeningCourse] = [:]
     private var rng = SystemRandomNumberGenerator()
+    private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
 
     private(set) var queue: [TrainCard] = []
     private(set) var index = 0
@@ -208,7 +209,7 @@ final class OpeningTrainViewModel {
         if move.lan == card.expectedUCI {
             board = scratch
             lastMove = move
-            if let comment = card.comment { currentComment = comment }
+            if let comment = card.comment?.resolved(languageCode) { currentComment = comment }
             playOpponentContext(for: card)
             phase = .correct
             Haptics.move()
@@ -238,7 +239,7 @@ final class OpeningTrainViewModel {
             board = applied.board
             lastMove = applied.move
         }
-        if let comment = card.comment { currentComment = comment }
+        if let comment = card.comment?.resolved(languageCode) { currentComment = comment }
     }
 
     private func arrow(for uci: String) -> HintMove {

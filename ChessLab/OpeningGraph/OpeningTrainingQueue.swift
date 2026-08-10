@@ -8,7 +8,7 @@ struct TrainCard: Equatable, Hashable {
     let fenKey: String
     let expectedUCI: String
     let expectedSAN: String
-    let comment: String?
+    let comment: LocalizedText?
 }
 
 /// Instantané de la progression d'une position, pour bâtir la file sans
@@ -34,7 +34,7 @@ enum OpeningTrainingQueue {
             else { continue }
             cards.append(TrainCard(
                 courseID: course.id, fenKey: key,
-                expectedUCI: main.uci, expectedSAN: main.san, comment: main.displayableComment
+                expectedUCI: main.uci, expectedSAN: main.san, comment: main.validatedComment
             ))
         }
         return cards
@@ -50,7 +50,7 @@ enum OpeningTrainingQueue {
             guard side == course.side.color else { continue }
             cards.append(TrainCard(
                 courseID: course.id, fenKey: fromKey,
-                expectedUCI: edge.uci, expectedSAN: edge.san, comment: edge.displayableComment
+                expectedUCI: edge.uci, expectedSAN: edge.san, comment: edge.validatedComment
             ))
         }
         return cards

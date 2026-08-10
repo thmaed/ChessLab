@@ -12,7 +12,7 @@ struct OpeningLearnViewModelTests {
     }
 
     /// Cours à une arête (e4) côté blancs, avec commentaire paramétrable.
-    private func singleMoveCourse(comment: String?, status: OpeningCommentStatus?) -> OpeningCourse {
+    private func singleMoveCourse(comment: LocalizedText?, status: OpeningCommentStatus?) -> OpeningCourse {
         let root = OpeningFENKey.key(for: .standard)
         let k1 = key(after: [("e2", "e4")])
         let e4 = MoveEdge(san: "e4", uci: "e2e4", toFEN: k1, role: .mainLine,
@@ -104,7 +104,7 @@ struct OpeningLearnViewModelTests {
 
     @Test func validatedCommentIsShownAfterPlaying() {
         let vm = try! #require(OpeningLearnViewModel(
-            course: singleMoveCourse(comment: "Contrôle le centre.", status: .validated)
+            course: singleMoveCourse(comment: .both("Contrôle le centre."), status: .validated)
         ))
         vm.attemptMove(from: Square("e2"), to: Square("e4"))
         #expect(vm.currentComment == "Contrôle le centre.")
@@ -112,7 +112,7 @@ struct OpeningLearnViewModelTests {
 
     @Test func draftCommentIsNeverShown() {
         let vm = try! #require(OpeningLearnViewModel(
-            course: singleMoveCourse(comment: "Brouillon à relire.", status: .draft)
+            course: singleMoveCourse(comment: .both("Brouillon à relire."), status: .draft)
         ))
         vm.attemptMove(from: Square("e2"), to: Square("e4"))
         #expect(vm.currentComment == nil)

@@ -22,7 +22,7 @@ struct OpeningGraphModelTests {
         "K0": {
           "fen": "K0",
           "moves": [
-            {"san":"e4","uci":"e2e4","toFEN":"K1","role":"mainLine","comment":"Contrôle le centre.","commentStatus":"validated","isCritical":true},
+            {"san":"e4","uci":"e2e4","toFEN":"K1","role":"mainLine","comment":{"fr":"Contrôle le centre.","en":"Controls the center."},"commentStatus":"validated","isCritical":true},
             {"san":"d4","uci":"d2d4","toFEN":"K1b","role":"chelou-inconnu","comment":"Brouillon à relire.","commentStatus":"draft"}
           ]
         },
@@ -48,13 +48,14 @@ struct OpeningGraphModelTests {
         let main = root.moves[0]
         #expect(main.role == .mainLine)
         #expect(main.isCritical)
-        #expect(main.displayableComment == "Contrôle le centre.")
+        #expect(main.displayableComment("fr") == "Contrôle le centre.")
+        #expect(main.displayableComment("en") == "Controls the center.")
 
         let side = root.moves[1]
         #expect(side.role == .sideline)             // rôle inconnu → repli
         #expect(side.isCritical == false)           // absent → défaut
-        #expect(side.displayableComment == nil)     // brouillon jamais affiché
-        #expect(side.comment == "Brouillon à relire.")
+        #expect(side.displayableComment("fr") == nil)     // brouillon jamais affiché
+        #expect(side.comment?.resolved("fr") == "Brouillon à relire.")
 
         // Nœud sans clé "moves" → aucune arête (feuille).
         #expect(course.node(at: "K1b")?.moves.isEmpty == true)

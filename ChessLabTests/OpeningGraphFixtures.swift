@@ -36,7 +36,7 @@ enum OpeningGraphFixtures {
         for key in order {
             positions[key] = PositionNode(fen: key, moves: edgesByKey[key] ?? [])
         }
-        let chapter = OpeningChapter(id: "main", title: "Ligne principale", positionFENs: order)
+        let chapter = OpeningChapter(id: "main", title: .both("Ligne principale"), positionFENs: order)
         return OpeningCourse(
             id: id, name: name, side: side, rootFEN: rootKey, chapters: [chapter], positions: positions
         )

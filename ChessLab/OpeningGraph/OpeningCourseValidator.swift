@@ -57,7 +57,7 @@ enum OpeningCourseValidator {
             for fen in chapter.positionFENs where course.positions[fen] == nil {
                 issues.append(Issue(
                     kind: .chapterPositionMissing,
-                    detail: "chapitre « \(chapter.title) » → position absente : \(fen)"
+                    detail: "chapitre « \(chapter.title.resolved("fr") ?? chapter.id) » → position absente : \(fen)"
                 ))
             }
         }

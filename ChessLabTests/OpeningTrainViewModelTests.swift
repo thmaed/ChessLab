@@ -30,7 +30,7 @@ struct OpeningTrainViewModelTests {
         var b = Board(position: .standard); _ = b.move(pieceAt: Square("e2"), to: Square("e4"))
         let k1 = OpeningFENKey.key(for: b.position)
         let e4 = MoveEdge(san: "e4", uci: "e2e4", toFEN: k1, role: .mainLine,
-                          comment: "Contrôle le centre.", commentStatus: .validated)
+                          comment: .both("Contrôle le centre."), commentStatus: .validated)
         return OpeningCourse(id: "c", name: "C", side: .white, rootFEN: root,
                              positions: [root: PositionNode(fen: root, moves: [e4]), k1: PositionNode(fen: k1)])
     }

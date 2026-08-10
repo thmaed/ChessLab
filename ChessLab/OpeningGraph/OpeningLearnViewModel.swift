@@ -19,6 +19,8 @@ final class OpeningLearnViewModel {
     let course: OpeningCourse
     let color: Piece.Color
     let orientation: Piece.Color
+    /// Langue courante de l'app pour résoudre les textes bilingues.
+    private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
 
     /// Ligne principale : suite d'arêtes `mainLine` depuis la racine, et clé du
     /// nœud AVANT chaque arête (pour retrouver les alternatives/plans).
@@ -94,8 +96,8 @@ final class OpeningLearnViewModel {
         return node.moves.filter { $0.uci != expected.uci }
     }
 
-    var plan: String? { currentNode?.plan }
-    var chapterTitle: String { course.chapters?.first?.title ?? course.name }
+    var plan: String? { currentNode?.plan?.resolved(languageCode) }
+    var chapterTitle: String { course.chapters?.first?.title.resolved(languageCode) ?? course.name }
     var progressText: String { "Coup \(currentStep) sur \(edges.count)" }
     var totalPlies: Int { edges.count }
 
@@ -222,7 +224,7 @@ final class OpeningLearnViewModel {
         attemptsRemaining = 3
         showAlternatives = false
         Haptics.move()
-        if let comment = edge.displayableComment { currentComment = comment }
+        if let comment = edge.displayableComment(languageCode) { currentComment = comment }
         currentStep += 1
         if currentStep >= edges.count {
             isLineComplete = true
@@ -258,7 +260,7 @@ final class OpeningLearnViewModel {
         while currentStep < edges.count, board.position.sideToMove != color {
             let edge = edges[currentStep]
             applyMove(at: currentStep)
-            if let comment = edge.displayableComment { currentComment = comment }
+            if let comment = edge.displayableComment(languageCode) { currentComment = comment }
             currentStep += 1
         }
         if currentStep >= edges.count { isLineComplete = true }
@@ -278,7 +280,7 @@ final class OpeningLearnViewModel {
         guard currentStep < edges.count else { return }
         let edge = edges[currentStep]
         applyMove(at: currentStep)
-        if let comment = edge.displayableComment { currentComment = comment }
+        if let comment = edge.displayableComment(languageCode) { currentComment = comment }
         Haptics.move()
         currentStep += 1
         if currentStep >= edges.count {
