@@ -142,7 +142,7 @@ def rebuild_catalog(out_dir: Path) -> list[dict]:
         entries.append(CatalogEntry(
             id=course["id"], name=course["name"],
             side=course.get("side", "white"), level=course.get("level", "club"),
-            eco=course.get("eco"), summary=None,
+            eco=course.get("eco"), summary=course.get("summary"),
             positionCount=len(course.get("positions", {})),
             maxDepth=_measure_depth(course),
         ).to_dict())

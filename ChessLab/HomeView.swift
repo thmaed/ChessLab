@@ -64,8 +64,10 @@ struct HomeView: View {
         case activePuzzleSession(PuzzleSessionFilter)
         case repertoireList
         case activeOpeningLine(OpeningLibraryEntry, Piece.Color)
-        /// Nouveau module en graphe (mode Explorer), gardé par
-        /// ``OpeningsGraphFeature`` — voir J6.
+        /// Module d'ouvertures en graphe : lecteur pas-à-pas (principal) +
+        /// entraînement. L'ancien Explorer/Apprendre reste défini mais n'est
+        /// plus atteint depuis le flux principal.
+        case openingReader(String)
         case openingExplorerPicker
         case openingExplorerCourse(String)
         case openingLearnCourse(String)
@@ -491,10 +493,17 @@ struct HomeView: View {
                     }
 
                 case .repertoireList:
-                    RepertoireListView { entry, color in
-                        path.append(Route.activeOpeningLine(entry, color))
-                    } onOpenExplorer: {
-                        path.append(Route.openingExplorerPicker)
+                    OpeningListView { courseID in
+                        path.append(Route.openingReader(courseID))
+                    } onReview: {
+                        path.append(Route.openingTrainDaily)
+                    }
+
+                case let .openingReader(courseID):
+                    OpeningReaderHost(courseID: courseID) {
+                        path.removeLast()
+                    } onTrain: {
+                        path.append(Route.openingTrainLine(courseID))
                     }
 
                 case .openingExplorerPicker:

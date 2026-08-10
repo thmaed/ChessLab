@@ -322,7 +322,7 @@ struct OpeningCatalogEntry: Codable, Identifiable, Hashable, Sendable {
     var eco: [String]?
     private var side_: OpeningSide?
     private var level_: String?
-    var summary: String?
+    var summary: LocalizedText?
     /// Nombre de positions du graphe (pour l'affichage « couverture »).
     var positionCount: Int?
     /// Profondeur max en demi-coups (indicatif).
