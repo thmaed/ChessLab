@@ -1,4 +1,5 @@
 import ChessKit
+import SwiftUI
 
 /// Une ligne suggérée par le moteur (indice du mode Jouer, ou flèches
 /// MultiPV en continu du mode Analyser), classée par rang (1 = meilleur
@@ -29,6 +30,11 @@ struct HintMove: Identifiable, Equatable {
     /// `.best` par défaut : tous les appelants existants suggèrent des coups
     /// à JOUER, seul le mode Analyser produit des menaces.
     var kind: Kind = .best
+
+    /// Teinte EXPLICITE de la flèche, quand l'appelant veut une couleur propre
+    /// à ce coup (lecteur d'ouvertures : une couleur par coup jouable, reliée à
+    /// la pastille de la ligne). `nil` = couleur dérivée de `kind`/`strength`.
+    var tint: Color? = nil
 
     /// Identité COMPOSITE (rang + cases), et non le seul rang : plusieurs
     /// flèches peuvent partager le même rang (ex. deux coups qui se valent en

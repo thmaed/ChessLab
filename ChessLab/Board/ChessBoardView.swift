@@ -570,6 +570,9 @@ struct ChessBoardView: View {
 /// meilleur, plus sa flèche est foncée et large.
 extension HintMove {
     var color: Color {
+        // Teinte explicite (lecteur d'ouvertures : une couleur par coup) : elle
+        // prime sur la couleur dérivée de `kind`/`strength`.
+        if let tint { return tint }
         // La MENACE est rouge translucide (Lot 5.G) : elle ne se confond pas
         // avec les flèches de coups à jouer, qui restent en niveaux de gris.
         // C'est ce que l'adversaire ferait si on lui laissait la main — pas

@@ -20,7 +20,7 @@ struct OpeningReaderView: View {
                         .padding(.horizontal, 16)
                     if !viewModel.playedSANs.isEmpty { moveTrail }
                     explanationCard
-                    if !viewModel.variations.isEmpty { variationsSection }
+                    movesSection
                     Spacer(minLength: 8)
                 }
                 .padding(.vertical, 12)
@@ -48,7 +48,7 @@ struct OpeningReaderView: View {
             selectedSquare: nil,
             legalTargetSquares: [],
             lastMove: viewModel.lastMove,
-            hintMoves: [],
+            hintMoves: arrows,
             interactionEnabled: false,
             showCoordinates: true,
             draggableColor: .white,
@@ -106,31 +106,99 @@ struct OpeningReaderView: View {
         }
     }
 
-    /// « Autres coups » : les variantes jouables à cette position.
-    private var variationsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Autres coups à ce stade")
-                .font(.caption.weight(.semibold)).foregroundStyle(Theme.textTertiary)
-                .textCase(.uppercase).tracking(0.4)
-                .padding(.horizontal, 4)
-            ForEach(viewModel.variations, id: \.uci) { edge in
-                Button { viewModel.play(edge) } label: {
-                    HStack(spacing: 10) {
-                        Text(edge.san).font(.subheadline.weight(.semibold).monospaced())
-                            .foregroundStyle(Theme.textPrimary).frame(minWidth: 46, alignment: .leading)
-                        if edge.role == .trap { tag("Piège", Theme.danger) }
-                        if edge.role == .inaccuracy { tag("Imprécision", Theme.warning) }
-                        Spacer()
-                        Image(systemName: "arrow.turn.down.right").font(.caption).foregroundStyle(Theme.textTertiary)
-                    }
-                    .padding(.vertical, 9).padding(.horizontal, 12)
-                    .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(Theme.stroke, lineWidth: 1))
-                }
-                .buttonStyle(.pressable)
+    // MARK: Coups jouables (flèches colorées ↔ pastilles)
+
+    /// Un coup jouable et SA couleur — la même sur la flèche du plateau et sur
+    /// le fond de sa ligne, pour qu'on relie l'un à l'autre d'un coup d'œil.
+    private struct ColoredMove: Identifiable {
+        let edge: MoveEdge
+        let color: Color
+        var id: String { edge.uci }
+    }
+
+    /// Palette des variantes « neutres » (hors piège/imprécision), choisie pour
+    /// rester distincte du vert du coup recommandé et du rouge/orange sémantiques.
+    private static let variationPalette: [Color] = [.blue, .purple, .pink, .indigo, .cyan]
+
+    /// Coups jouables colorés : le coup à venir en vert (recommandé), les pièges
+    /// en rouge, les imprécisions en orange, les autres variantes cyclant la palette.
+    private var coloredMoves: [ColoredMove] {
+        var neutral = 0
+        return viewModel.candidates.enumerated().map { index, edge in
+            let color: Color
+            if index == 0 {
+                color = Theme.accent
+            } else if edge.role == .trap {
+                color = Theme.danger
+            } else if edge.role == .inaccuracy {
+                color = Theme.warning
+            } else {
+                color = Self.variationPalette[neutral % Self.variationPalette.count]
+                neutral += 1
             }
+            return ColoredMove(edge: edge, color: color)
         }
-        .padding(.horizontal, 16)
+    }
+
+    /// Une flèche par coup jouable, teintée comme sa pastille. Le coup à venir
+    /// est plus épais et dessiné au-dessus (rang 1 = ombré, posé en dernier).
+    private var arrows: [HintMove] {
+        coloredMoves.enumerated().compactMap { index, item in
+            let uci = item.edge.uci
+            guard uci.count >= 4 else { return nil }
+            return HintMove(
+                rank: index == 0 ? 1 : 2,
+                from: Square(String(uci.prefix(2))),
+                to: Square(String(uci.dropFirst(2).prefix(2))),
+                strength: index == 0 ? 1.0 : 0.45,
+                tint: item.color
+            )
+        }
+    }
+
+    /// « Coup à venir » (le coup recommandé) + « Autres coups » (les variantes),
+    /// chaque ligne teintée de la couleur de sa flèche.
+    @ViewBuilder
+    private var movesSection: some View {
+        let moves = coloredMoves
+        if !moves.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                sectionHeader("Coup à venir")
+                moveRow(moves[0])
+                if moves.count > 1 {
+                    sectionHeader("Autres coups à ce stade").padding(.top, 6)
+                    ForEach(moves.dropFirst()) { moveRow($0) }
+                }
+            }
+            .padding(.horizontal, 16)
+        }
+    }
+
+    private func sectionHeader(_ text: LocalizedStringKey) -> some View {
+        Text(text)
+            .font(.caption.weight(.semibold)).foregroundStyle(Theme.textTertiary)
+            .textCase(.uppercase).tracking(0.4)
+            .padding(.horizontal, 4)
+    }
+
+    private func moveRow(_ item: ColoredMove) -> some View {
+        Button { viewModel.play(item.edge) } label: {
+            HStack(spacing: 10) {
+                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                    .fill(item.color)
+                    .frame(width: 14, height: 14)
+                Text(item.edge.san).font(.subheadline.weight(.semibold).monospaced())
+                    .foregroundStyle(Theme.textPrimary).frame(minWidth: 44, alignment: .leading)
+                if item.edge.role == .trap { tag("Piège", Theme.danger) }
+                if item.edge.role == .inaccuracy { tag("Imprécision", Theme.warning) }
+                Spacer()
+                Image(systemName: "arrow.turn.down.right").font(.caption).foregroundStyle(Theme.textTertiary)
+            }
+            .padding(.vertical, 10).padding(.horizontal, 12)
+            .background(item.color.opacity(0.14), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(item.color.opacity(0.5), lineWidth: 1))
+        }
+        .buttonStyle(.pressable)
     }
 
     private func tag(_ text: LocalizedStringKey, _ color: Color) -> some View {
