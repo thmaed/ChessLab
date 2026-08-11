@@ -271,8 +271,9 @@ the app's core value: depth and quality normally found in paid or
 subscription chess apps, given away for free as a passion project. It
 bundles six modes:
 
-1. Play vs Stockfish — adjustable engine strength (Elo ~900 to ~3190),
-   clocks, hints, blunder warnings, opening book.
+1. Play vs the computer (powered by the embedded Stockfish engine) —
+   adjustable strength (Elo ~900 to ~3190), clocks, hints, risky-move
+   warnings, opening book.
 2. Two Players — local pass-and-play on a single device.
 3. Analyze — full game/position analysis with Stockfish: move-by-move
    classification, evaluation graph, best-move/threat arrows.
@@ -298,9 +299,11 @@ recognition pipeline.
 NETWORK: ChessLab has no first-party or third-party backend — no ChessLab
 server, no API, no analytics, no ads. The ONLY network activity is an
 optional iCloud sync, which is OFF by default. When a user turns it on
-(Settings → Sync), SwiftData/CloudKit syncs their games through the user's
-OWN private iCloud database (CloudKit private database). The bundled puzzle
-library stays local (never synced). No data is shared with the developer, so the App Privacy answer
+(Settings → Sync), SwiftData/CloudKit syncs their own data — saved games,
+puzzle progress, and opening-training progress — through the user's OWN
+private iCloud database (CloudKit private database). The bundled content
+(the 100,000+ puzzle library and the 58 opening courses) stays local and is
+never synced. No data is shared with the developer, so the App Privacy answer
 remains "Data Not Collected". With sync disabled — the default — the app
 makes no network calls at all.
 
