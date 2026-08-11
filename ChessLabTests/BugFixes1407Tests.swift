@@ -256,8 +256,38 @@ struct BugFixes1407Tests {
     }
 
     @Test func blunderAlertReportsACentipawnDropOnlyBeyondTheThreshold() {
+        // Près de l'équilibre, un plongeon de ~200 cp (≈ 18 pts de proba de
+        // gain) dépasse le seuil et reste rapporté en pions.
         #expect(PlayViewModel.blunderSeverity(before: (cp: 50, mate: nil), after: (cp: 200, mate: nil)) == .centipawns(250))
         #expect(PlayViewModel.blunderSeverity(before: (cp: 50, mate: nil), after: (cp: 100, mate: nil)) == nil)
+    }
+
+    // MARK: Alerte « coup risqué » — décision en probabilité de gain (Couches A & B)
+
+    @Test func riskyMoveAlertIgnoresACentipawnDropThatKeepsYouWinning() {
+        // COUCHE A : perdre 200 cp en écrasant (+8 → +6, soit ~95 % → ~90 %)
+        // ne change quasi rien à l'issue → PLUS d'alerte, là où le seuil brut
+        // en centipions se déclenchait bêtement.
+        #expect(PlayViewModel.blunderSeverity(before: (cp: 800, mate: nil), after: (cp: -600, mate: nil)) == nil)
+    }
+
+    @Test func riskyMoveAlertFiresForTheSameDropNearEquality() {
+        // COUCHE A : le MÊME écart de 200 cp, mais au voisinage de 0.00
+        // (~50 % → ~32 %), fait bien basculer la position → alerte.
+        #expect(PlayViewModel.blunderSeverity(before: (cp: 0, mate: nil), after: (cp: 200, mate: nil)) == .centipawns(200))
+    }
+
+    @Test func riskyMoveAlertStaysSilentInAnAlreadyLostPosition() {
+        // COUCHE B (plancher) : déjà largement moins bien avant le coup
+        // (~19 %) → un coup de plus vers le fond n'est pas « risqué », c'est
+        // une partie perdue. Pas de harcèlement.
+        #expect(PlayViewModel.blunderSeverity(before: (cp: -400, mate: nil), after: (cp: 1100, mate: nil)) == nil)
+    }
+
+    @Test func riskyMoveAlertStaysSilentWhenStillClearlyWinningAfterward() {
+        // COUCHE B (plafond) : dilapider un peu d'avance mais rester nettement
+        // gagnant (~96 % → ~80 %) ne vaut pas une proposition de reprise.
+        #expect(PlayViewModel.blunderSeverity(before: (cp: 950, mate: nil), after: (cp: -377, mate: nil)) == nil)
     }
 
     // MARK: Bug n°15 — flèches de solution : identifiants uniques

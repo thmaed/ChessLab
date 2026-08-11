@@ -622,9 +622,27 @@ final class PlayViewModel {
         return Self.blunderSeverity(before: b, after: a)
     }
 
+    /// COUCHE A — seuil de PERTE de probabilité de gain (en points de %), pas
+    /// de centipions bruts : perdre 2 pions à +8 ne change presque rien, à
+    /// l'équilibre c'est décisif. Même échelle (sigmoïde Lichess) que le
+    /// classement post-partie — ce qui prévient PENDANT = ce qui sera étiqueté
+    /// « gaffe » APRÈS.
+    static let riskyMoveWinLossThreshold = 15.0
+    /// COUCHE B (évitabilité, plancher) — sous cette proba de gain AVANT le
+    /// coup, la partie est déjà largement compromise : un coup de plus vers le
+    /// fond n'est pas un « coup risqué » actionnable. Pendant, côté centipions,
+    /// du garde anti-mat plus haut.
+    static let contestedFloor = 25.0
+    /// COUCHE B (évitabilité, plafond) — au-dessus de cette proba de gain APRÈS
+    /// le coup, la partie reste clairement gagnée : inutile de proposer de
+    /// reprendre un coup qui conserve l'avantage.
+    static let contestedCeiling = 75.0
+
     /// Décision pure, isolée de la recherche moteur pour être testable telle
     /// quelle. `before` est du point de vue de celui qui joue, `after` de
-    /// celui de l'adversaire (nouveau trait).
+    /// celui de l'adversaire (nouveau trait). `b` est déjà l'éval du MEILLEUR
+    /// coup (le score d'une position = sa valeur sous le meilleur jeu), donc la
+    /// perte se mesure d'emblée par rapport à l'optimum.
     static func blunderSeverity(
         before b: (cp: Int, mate: Int?), after a: (cp: Int, mate: Int?)
     ) -> PendingBlunderWarning.Severity? {
@@ -644,10 +662,22 @@ final class PlayViewModel {
             if let mateA = a.mate, mateA < 0 { return nil }
             return .missedMate
         }
-        // Cas normal en centipions.
-        let drop = b.cp - (-a.cp)
-        guard drop >= 200 else { return nil }
-        return .centipawns(drop)
+        // COUCHE A — décision sur la perte de PROBABILITÉ DE GAIN (POV du
+        // joueur). `-a.cp` ramène l'éval de la position obtenue (POV adverse)
+        // au point de vue du joueur.
+        let winBefore = EvalConversion.winPercentage(cp: b.cp)
+        let winAfter = EvalConversion.winPercentage(cp: -a.cp)
+        let loss = winBefore - winAfter
+
+        // COUCHE B — n'alerter que dans une position VIVE : ni déjà largement
+        // perdue avant le coup, ni encore clairement gagnée après.
+        guard winBefore > contestedFloor, winAfter < contestedCeiling else { return nil }
+
+        guard loss >= riskyMoveWinLossThreshold else { return nil }
+
+        // Le MESSAGE reste en pions (plus parlant qu'un « % de proba de
+        // gain ») : perte réelle en centipions par rapport au meilleur coup.
+        return .centipawns(b.cp - (-a.cp))
     }
 
     /// Évaluation rapide d'une position : score en centipions ET mat en N
