@@ -11360,6 +11360,74 @@
           }
         }
       }
+    },
+    "Sicilian Defense: Sveshnikov" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Sveshnikov"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : Sveshnikov"
+          }
+        }
+      }
+    },
+    "Sicilian Defense: Taimanov" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Taimanov"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : Taimanov"
+          }
+        }
+      }
+    },
+    "Sicilian Defense: Kan" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Kan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : Kan"
+          }
+        }
+      }
+    },
+    "Sicilian Defense: Scheveningen" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Scheveningen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : Scheveningen"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
