@@ -34,6 +34,7 @@ from . import (
     ruy_lopez,
     scandinavian,
     scotch_game,
+    sicilian_classical,
     sicilian_dragon,
     sicilian_najdorf,
     slav_defense,
@@ -52,6 +53,7 @@ COURSES = [
     # Réponses noires à 1.e4
     sicilian_najdorf.COURSE,
     sicilian_dragon.COURSE,
+    sicilian_classical.COURSE,
     anti_sicilians.COURSE,
     french_defense.COURSE,
     caro_kann.COURSE,

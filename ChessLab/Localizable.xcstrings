@@ -11343,6 +11343,23 @@
           }
         }
       }
+    },
+    "Sicilian Defense: Classical" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Classical"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : classique"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
