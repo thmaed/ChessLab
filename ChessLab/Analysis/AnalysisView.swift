@@ -154,34 +154,77 @@ struct AnalysisView: View {
         }
     }
 
-    /// iPad : deux colonnes, plateau **borné** (comme le mode Jouer, finding
-    /// #6) — plateau + éval + navigation à gauche, panneau d'analyse
-    /// (coups/courbe/en-tête) défilant à droite.
+    /// iPad : deux colonnes en PAYSAGE (large), une seule colonne verticale en
+    /// PORTRAIT (haut). Le portrait côte-à-côte laissait la moitié basse vide et
+    /// écrasait le panneau de droite (texte « précision » empilé, coups tronqués).
     private var iPadLayout: some View {
         GeometryReader { geo in
-            let boardSide = min(geo.size.width * 0.55, geo.size.height - 48)
-            HStack(alignment: .top, spacing: 24) {
-                VStack(spacing: 12) {
-                    board
-                        .frame(width: boardSide, height: boardSide)
-                    EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
-                    navigationBar
-                    candidatesBar
-                    coachBar
-                }
-                .frame(width: boardSide)
-
-                ScrollView {
-                    VStack(spacing: 16) {
-                        openingHeader
-                        analysisPanel
-                    }
-                    .frame(maxWidth: .infinity)
-                }
+            if geo.size.height > geo.size.width {
+                iPadPortraitBody(geo)
+            } else {
+                iPadLandscapeBody(geo)
             }
-            .padding(24)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
+    }
+
+    /// Paysage : plateau borné + éval/navigation à gauche, panneau d'analyse
+    /// (en-tête, courbe, coups) défilant à droite.
+    private func iPadLandscapeBody(_ geo: GeometryProxy) -> some View {
+        let boardSide = min(geo.size.width * 0.55, geo.size.height - 48)
+        return HStack(alignment: .top, spacing: 24) {
+            VStack(spacing: 12) {
+                board
+                    .frame(width: boardSide, height: boardSide)
+                EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
+                navigationBar
+                candidatesBar
+                coachBar
+            }
+            .frame(width: boardSide)
+
+            ScrollView {
+                VStack(spacing: 16) {
+                    openingHeader
+                    analysisPanel
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    /// Portrait : une colonne verticale centrée. Plateau (plus grand qu'avant)
+    /// + éval/navigation FIXES en haut, puis le panneau d'analyse qui REMPLIT
+    /// toute la hauteur restante (il défile si besoin) — ainsi plus de moitié
+    /// basse vide, et le panneau occupe toute la largeur de la colonne (fini la
+    /// carte « précision » écrasée en vertical et les coups tronqués).
+    private func iPadPortraitBody(_ geo: GeometryProxy) -> some View {
+        let boardSide = min(geo.size.width - 40, geo.size.height * 0.5)
+        return VStack(spacing: 14) {
+            openingHeader
+            board
+                .frame(width: boardSide)
+            EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
+            navigationBar
+            candidatesBar
+            coachBar
+            // Le panneau récupère TOUTE la hauteur restante (défile au besoin) :
+            // c'est ce qui supprime le vide en bas.
+            ScrollView {
+                analysisPanel
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 2)
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        // maxWidth (et non width fixe) borne la colonne à la largeur du plateau
+        // TOUT EN laissant maxHeight étirer la pile — sans quoi le ScrollView ne
+        // remplirait pas la hauteur.
+        .frame(maxWidth: boardSide, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
     }
 
     // MARK: Sous-vues
