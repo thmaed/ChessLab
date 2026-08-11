@@ -8,8 +8,10 @@ from . import (
     birds_opening,
     bishops_opening,
     blackmar_diemer,
+    albin_countergambit,
     caro_kann,
     catalan_opening,
+    chigorin_defense,
     colle_system,
     dutch_defense,
     english_opening,
@@ -47,6 +49,7 @@ from . import (
     stafford_gambit,
     torre_attack,
     trompowsky,
+    veresov_attack,
     vienna_game,
 )
 
@@ -76,6 +79,8 @@ COURSES = [
     london_system.COURSE,
     queens_gambit_declined.COURSE,
     queens_gambit_accepted.COURSE,
+    chigorin_defense.COURSE,
+    albin_countergambit.COURSE,
     slav_defense.COURSE,
     catalan_opening.COURSE,
     english_opening.COURSE,
@@ -89,6 +94,7 @@ COURSES = [
     modern_benoni.COURSE,
     # Systèmes et ouvertures de flanc
     trompowsky.COURSE,
+    veresov_attack.COURSE,
     torre_attack.COURSE,
     colle_system.COURSE,
     reti_opening.COURSE,

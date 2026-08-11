@@ -11428,6 +11428,57 @@
           }
         }
       }
+    },
+    "Chigorin Defense" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chigorin Defense"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense Chigorine"
+          }
+        }
+      }
+    },
+    "Albin Countergambit" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albin Countergambit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contre-gambit Albin"
+          }
+        }
+      }
+    },
+    "Veresov Attack" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veresov Attack"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attaque Veresov"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
