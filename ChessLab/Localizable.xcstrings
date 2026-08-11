@@ -761,6 +761,23 @@
         }
       }
     },
+    "Albin Countergambit" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Albin Countergambit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contre-gambit Albin"
+          }
+        }
+      }
+    },
     "Aléatoire" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1098,6 +1115,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuler"
+          }
+        }
+      }
+    },
+    "Anti-Sicilians" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-Sicilians"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Anti-siciliennes"
           }
         }
       }
@@ -1726,6 +1760,7 @@
       }
     },
     "Bien" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1796,6 +1831,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bird Opening"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouverture Bird"
+          }
+        }
+      }
+    },
+    "Bird's Opening" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bird's Opening"
           }
         },
         "fr" : {
@@ -2070,6 +2122,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Brillant"
+          }
+        }
+      }
+    },
+    "Budapest Gambit" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Budapest Gambit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gambit Budapest"
           }
         }
       }
@@ -2475,6 +2544,23 @@
         }
       }
     },
+    "Chigorin Defense" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chigorin Defense"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense Chigorine"
+          }
+        }
+      }
+    },
     "Choisir…" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2832,6 +2918,22 @@
         }
       }
     },
+    "Continuer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer"
+          }
+        }
+      }
+    },
     "Continuer contre l'ordinateur depuis ici" : {
       "localizations" : {
         "en" : {
@@ -2962,6 +3064,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Coup"
+          }
+        }
+      }
+    },
+    "Coup à venir" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coup à venir"
           }
         }
       }
@@ -3401,6 +3519,7 @@
       }
     },
     "Difficile" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3686,6 +3805,7 @@
       }
     },
     "Encore" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4059,6 +4179,7 @@
       }
     },
     "Facile" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6496,6 +6617,23 @@
         }
       }
     },
+    "Modern Benoni" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modern Benoni"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Benoni moderne"
+          }
+        }
+      }
+    },
     "Modern Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7222,6 +7360,23 @@
         }
       }
     },
+    "Owen's Defense" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owen's Defense"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense Owen"
+          }
+        }
+      }
+    },
     "Paleface Attack" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7437,6 +7592,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Petit roque noir (O-O)"
+          }
+        }
+      }
+    },
+    "Petrov Defense" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Petrov Defense"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense Petrov"
           }
         }
       }
@@ -9090,6 +9262,23 @@
         }
       }
     },
+    "Retrouvez le meilleur coup" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find the best move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retrouvez le meilleur coup"
+          }
+        }
+      }
+    },
     "Réussite" : {
       "localizations" : {
         "en" : {
@@ -9150,6 +9339,7 @@
       }
     },
     "Réviser" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -9403,6 +9593,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partie espagnole"
+          }
+        }
+      }
+    },
+    "S'entraîner" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Practice"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "S'entraîner"
           }
         }
       }
@@ -9722,6 +9928,125 @@
         }
       }
     },
+    "Sicilian Defense: Classical" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Classical"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : classique"
+          }
+        }
+      }
+    },
+    "Sicilian Defense: Dragon" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Dragon"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : dragon"
+          }
+        }
+      }
+    },
+    "Sicilian Defense: Kan" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Kan"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : Kan"
+          }
+        }
+      }
+    },
+    "Sicilian Defense: Najdorf" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Najdorf"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : Najdorf"
+          }
+        }
+      }
+    },
+    "Sicilian Defense: Scheveningen" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Scheveningen"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : Scheveningen"
+          }
+        }
+      }
+    },
+    "Sicilian Defense: Sveshnikov" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Sveshnikov"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : Sveshnikov"
+          }
+        }
+      }
+    },
+    "Sicilian Defense: Taimanov" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sicilian Defense: Taimanov"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense sicilienne : Taimanov"
+          }
+        }
+      }
+    },
     "Slav Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9866,6 +10191,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Défense Saint-Georges"
+          }
+        }
+      }
+    },
+    "Stafford Gambit" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stafford Gambit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gambit Stafford"
           }
         }
       }
@@ -10759,6 +11101,23 @@
         }
       }
     },
+    "Veresov Attack" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veresov Attack"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attaque Veresov"
+          }
+        }
+      }
+    },
     "Vérification du compte iCloud…" : {
 
     },
@@ -10985,6 +11344,7 @@
       }
     },
     "Vous jouez les blancs" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -11001,6 +11361,7 @@
       }
     },
     "Vous jouez les noirs" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -11154,362 +11515,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Zukertort"
-          }
-        }
-      }
-    },
-    "Retrouvez le meilleur coup" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Find the best move"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Retrouvez le meilleur coup"
-          }
-        }
-      }
-    },
-    "Sicilian Defense: Najdorf" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sicilian Defense: Najdorf"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense sicilienne : Najdorf"
-          }
-        }
-      }
-    },
-    "Sicilian Defense: Dragon" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sicilian Defense: Dragon"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense sicilienne : dragon"
-          }
-        }
-      }
-    },
-    "Anti-Sicilians" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anti-Sicilians"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Anti-siciliennes"
-          }
-        }
-      }
-    },
-    "Petrov Defense" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Petrov Defense"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense Petrov"
-          }
-        }
-      }
-    },
-    "Modern Benoni" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modern Benoni"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Benoni moderne"
-          }
-        }
-      }
-    },
-    "Bird's Opening" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bird's Opening"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ouverture Bird"
-          }
-        }
-      }
-    },
-    "Stafford Gambit" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stafford Gambit"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gambit Stafford"
-          }
-        }
-      }
-    },
-    "Continuer" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continuer"
-          }
-        }
-      }
-    },
-    "S'entraîner" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Practice"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "S'entraîner"
-          }
-        }
-      }
-    },
-    "Coup à venir" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Next move"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coup à venir"
-          }
-        }
-      }
-    },
-    "Sicilian Defense: Classical" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sicilian Defense: Classical"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense sicilienne : classique"
-          }
-        }
-      }
-    },
-    "Sicilian Defense: Sveshnikov" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sicilian Defense: Sveshnikov"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense sicilienne : Sveshnikov"
-          }
-        }
-      }
-    },
-    "Sicilian Defense: Taimanov" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sicilian Defense: Taimanov"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense sicilienne : Taimanov"
-          }
-        }
-      }
-    },
-    "Sicilian Defense: Kan" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sicilian Defense: Kan"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense sicilienne : Kan"
-          }
-        }
-      }
-    },
-    "Sicilian Defense: Scheveningen" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sicilian Defense: Scheveningen"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense sicilienne : Scheveningen"
-          }
-        }
-      }
-    },
-    "Chigorin Defense" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chigorin Defense"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense Chigorine"
-          }
-        }
-      }
-    },
-    "Albin Countergambit" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Albin Countergambit"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Contre-gambit Albin"
-          }
-        }
-      }
-    },
-    "Veresov Attack" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Veresov Attack"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Attaque Veresov"
-          }
-        }
-      }
-    },
-    "Budapest Gambit" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Budapest Gambit"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Gambit Budapest"
-          }
-        }
-      }
-    },
-    "Owen's Defense" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Owen's Defense"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense Owen"
           }
         }
       }
