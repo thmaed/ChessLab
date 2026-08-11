@@ -11479,6 +11479,23 @@
           }
         }
       }
+    },
+    "Budapest Gambit" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Budapest Gambit"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gambit Budapest"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
