@@ -33,6 +33,13 @@ final class LocalizationController {
         return bundle.localizedString(forKey: frenchKey, value: frenchKey, table: nil)
     }
 
+    /// Version FORMAT : la clé française porte des spécificateurs (`%lld`, `%@`…).
+    /// On récupère le gabarit traduit puis on injecte les arguments — même
+    /// respect du choix in-app que ``string(_:)``.
+    static func string(_ frenchKey: String, _ arguments: CVarArg...) -> String {
+        String(format: string(frenchKey), arguments: arguments)
+    }
+
     private static nonisolated(unsafe) var installed = false
 
     private static func installOverrideOnce() {

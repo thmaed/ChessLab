@@ -199,16 +199,6 @@
         }
       }
     },
-    "%lld / %lld" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "new",
-            "value" : "%1$lld / %2$lld"
-          }
-        }
-      }
-    },
     "%lld / %lld parties jouées" : {
       "localizations" : {
         "en" : {
@@ -315,6 +305,22 @@
         }
       }
     },
+    "%lld coup(s) joué(s)." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld move(s) played."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld coup(s) joué(s)."
+          }
+        }
+      }
+    },
     "%lld coups" : {
       "localizations" : {
         "en" : {
@@ -416,6 +422,7 @@
       }
     },
     "%lld position(s) révisée(s)." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -574,6 +581,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "À travailler"
+          }
+        }
+      }
+    },
+    "À vous de jouer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "À vous de jouer"
           }
         }
       }
@@ -1409,6 +1432,7 @@
       }
     },
     "Aucune position due pour l'instant. Explore ou apprends une ouverture pour remplir ta file." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1420,6 +1444,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune position due pour l'instant. Explore ou apprends une ouverture pour remplir ta file."
+          }
+        }
+      }
+    },
+    "Aucune position due pour l'instant. Ouvre une ouverture et entraîne-la pour remplir ta file." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No positions due right now. Open an opening and train it to fill your queue."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune position due pour l'instant. Ouvre une ouverture et entraîne-la pour remplir ta file."
           }
         }
       }
@@ -1624,7 +1664,20 @@
       }
     },
     "Base .pgn (plusieurs parties) → bibliothèque" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".pgn database (multiple games) → library"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Base .pgn (plusieurs parties) → bibliothèque"
+          }
+        }
+      }
     },
     "Base de puzzles Lichess" : {
       "localizations" : {
@@ -2799,7 +2852,20 @@
       }
     },
     "Composer une position sur le plateau" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Compose a position on the board"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Composer une position sur le plateau"
+          }
+        }
+      }
     },
     "Composez une position à la main sur le plateau, ou scannez-la depuis une capture d'écran, la photo d'un écran, ou un plateau réel vu du dessus. Un écran de confirmation vous laisse corriger la lecture avant de jouer ou d'analyser la position." : {
       "localizations" : {
@@ -3481,7 +3547,20 @@
       }
     },
     "Dernière partie" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last game"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dernière partie"
+          }
+        }
+      }
     },
     "Dernière vérification : %@" : {
 
@@ -3977,6 +4056,22 @@
     },
     "Entraîner" : {
 
+    },
+    "Entraîner la ligne" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Train the line"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entraîner la ligne"
+          }
+        }
+      }
     },
     "Équilibre" : {
 
@@ -4941,7 +5036,20 @@
       }
     },
     "Importer des parties" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import games"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importer des parties"
+          }
+        }
+      }
     },
     "Importer un fichier" : {
       "localizations" : {
@@ -5334,6 +5442,22 @@
         }
       }
     },
+    "Jouer la variante" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the sideline"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouer la variante"
+          }
+        }
+      }
+    },
     "Jouer le meilleur coup" : {
       "localizations" : {
         "en" : {
@@ -5652,6 +5776,22 @@
         }
       }
     },
+    "L'adversaire joue…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opponent is playing…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'adversaire joue…"
+          }
+        }
+      }
+    },
     "L'intégration de Stockfish fait de ChessLab, dans son ensemble, une œuvre dérivée sous GPLv3. Le code source, correspondant au binaire distribué, est publié ici." : {
       "localizations" : {
         "en" : {
@@ -5891,6 +6031,7 @@
       }
     },
     "Le coup était %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6242,6 +6383,7 @@
       }
     },
     "Ligne complète, sans filet" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6773,7 +6915,21 @@
       }
     },
     "Moteur en attente" : {
-
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engine idle"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moteur en attente"
+          }
+        }
+      }
     },
     "Moteur indisponible" : {
       "localizations" : {
@@ -8679,6 +8835,22 @@
         }
       }
     },
+    "Recommencer" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restart"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommencer"
+          }
+        }
+      }
+    },
     "Réessayer" : {
       "localizations" : {
         "en" : {
@@ -9032,7 +9204,20 @@
       }
     },
     "Reprendre l'analyse là où elle s'est arrêtée" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume analysis where you left off"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprendre l'analyse là où elle s'est arrêtée"
+          }
+        }
+      }
     },
     "Reprendre la partie en cours" : {
       "localizations" : {
@@ -9178,6 +9363,22 @@
         }
       }
     },
+    "Rester sur la principale" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stay on the main line"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rester sur la principale"
+          }
+        }
+      }
+    },
     "Réti Opening" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -9247,6 +9448,7 @@
       }
     },
     "Retrouvez le coup" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {

@@ -73,17 +73,17 @@ struct EvalBarView: View {
     /// les noirs », « position égale »).
     private var accessibilityValue: String {
         let side = advantage == .white
-            ? String(localized: "les blancs")
-            : String(localized: "les noirs")
+            ? LocalizationController.string("les blancs")
+            : LocalizationController.string("les noirs")
         if let evalMate {
-            return String(localized: "mat en \(abs(evalMate)) pour \(side)")
+            return LocalizationController.string("mat en %lld pour %@", abs(evalMate), side)
         }
-        guard advantage != .equal, let evalCp else { return String(localized: "position égale") }
+        guard advantage != .equal, let evalCp else { return LocalizationController.string("position égale") }
         // Le nombre se formate à part : « %.1f » est du formatage numérique,
         // pas de la langue, et une phrase traduisible ne doit pas transporter
         // des spécificateurs de format que le traducteur risque de casser.
         let amount = String(format: "%.1f", abs(Double(evalCp)) / 100)
-        return String(localized: "\(amount) pour \(side)")
+        return LocalizationController.string("%@ pour %@", amount, side)
     }
 
     /// `nil` en cas d'égalité : aucun score n'est alors affiché.

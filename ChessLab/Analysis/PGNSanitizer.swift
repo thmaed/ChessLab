@@ -9,10 +9,25 @@ import Foundation
 /// Lichess ; centralisées ici, elles protègent aussi « Coller un PGN » et
 /// « Importer un fichier ». Voir instructions.md §A5.
 enum PGNSanitizer {
-    /// Nettoyage complet d'une partie unique : aplatit les lignes vides
-    /// surnuméraires puis retire un éventuel commentaire d'introduction.
+    /// Nettoyage complet d'une partie unique : normalise les caractères de
+    /// copier-coller (fins de ligne Windows, BOM, espaces insécables), aplatit
+    /// les lignes vides surnuméraires, puis retire un commentaire d'introduction.
     static func sanitize(_ pgn: String) -> String {
-        stripLeadingComment(collapseExtraBlankLines(pgn))
+        stripLeadingComment(collapseExtraBlankLines(normalizeWhitespace(pgn)))
+    }
+
+    /// Normalise ce qu'un copier-coller (web, Windows) glisse et qui fait
+    /// ÉCHOUER `PGNParser` : `\r\n`/`\r` (fins de ligne Windows) → `\n`, BOM de
+    /// tête retiré, et espaces insécables/fins → espace normal.
+    static func normalizeWhitespace(_ pgn: String) -> String {
+        var text = pgn
+        if text.hasPrefix("\u{FEFF}") { text.removeFirst() }
+        return text
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+            .replacingOccurrences(of: "\u{00A0}", with: " ")   // insécable
+            .replacingOccurrences(of: "\u{202F}", with: " ")   // fine insécable
+            .replacingOccurrences(of: "\u{2009}", with: " ")   // fine
     }
 
     /// Retire un commentaire `{ … }` placé AVANT le premier coup — pourtant
@@ -55,7 +70,7 @@ enum PGNSanitizer {
     /// Découpe un texte multi-parties : chaque nouvelle partie recommence
     /// par une paire de crochets `[Event …]`.
     static func splitIntoGames(_ pgnText: String) -> [String] {
-        let lines = pgnText.components(separatedBy: "\n")
+        let lines = normalizeWhitespace(pgnText).components(separatedBy: "\n")
         var games: [String] = []
         var current: [String] = []
         for line in lines {

@@ -67,16 +67,16 @@ enum MoveQuality: String, CaseIterable, Hashable {
     /// Libellé parlé et affiché en clair — « ?? » ne se prononce pas.
     var label: String {
         switch self {
-        case .brilliant: String(localized: "Brillant")
-        case .great: String(localized: "Grand coup")
-        case .best: String(localized: "Le meilleur")
-        case .excellent: String(localized: "Excellent")
-        case .good: String(localized: "Bon coup")
-        case .book: String(localized: "Théorie")
-        case .inaccuracy: String(localized: "Imprécision")
-        case .mistake: String(localized: "Erreur")
-        case .miss: String(localized: "Occasion manquée")
-        case .blunder: String(localized: "Gaffe")
+        case .brilliant: LocalizationController.string("Brillant")
+        case .great: LocalizationController.string("Grand coup")
+        case .best: LocalizationController.string("Le meilleur")
+        case .excellent: LocalizationController.string("Excellent")
+        case .good: LocalizationController.string("Bon coup")
+        case .book: LocalizationController.string("Théorie")
+        case .inaccuracy: LocalizationController.string("Imprécision")
+        case .mistake: LocalizationController.string("Erreur")
+        case .miss: LocalizationController.string("Occasion manquée")
+        case .blunder: LocalizationController.string("Gaffe")
         }
     }
 

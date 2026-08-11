@@ -296,11 +296,11 @@ struct AnalysisView: View {
     /// « Stockfish calcule — 18 coups d'avance » plutôt que « profondeur 18 » :
     /// la profondeur EST un nombre de demi-coups explorés, autant le dire.
     private var engineStatusText: String {
-        if viewModel.isEngineUnavailable { return String(localized: "Moteur indisponible") }
+        if viewModel.isEngineUnavailable { return LocalizationController.string("Moteur indisponible") }
         guard viewModel.isLiveAnalyzing, let depth = viewModel.liveDepth else {
-            return String(localized: "Moteur en attente")
+            return LocalizationController.string("Moteur en attente")
         }
-        return String(localized: "L'ordinateur calcule — \(depth) coups d'avance")
+        return LocalizationController.string("L'ordinateur calcule — %lld coups d'avance", depth)
     }
 
     @ViewBuilder

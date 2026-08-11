@@ -128,7 +128,7 @@ struct PuzzleQueueView: View {
     /// raccourci en "Découverte" ici seulement (le libellé complet reste
     /// utilisé sur l'écran de résolution, où il a la place).
     private func chipLabel(for theme: PuzzleTheme) -> String {
-        theme == .discoveredAttack ? String(localized: "Découverte") : theme.label
+        theme == .discoveredAttack ? LocalizationController.string("Découverte") : theme.label
     }
 
     private var selectionSummary: String {
