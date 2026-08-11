@@ -11752,6 +11752,86 @@
           }
         }
       }
+    },
+    "Nouveautés depuis la 1.0" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's new since 1.0"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveautés depuis la 1.0"
+          }
+        }
+      }
+    },
+    "Depuis la 1.0, ChessLab a beaucoup évolué :\n\n• Ouvertures entièrement repensées : un lecteur guidé coup par coup, 58 ouvertures rédigées à la main et bilingues, des flèches colorées (coup recommandé, pièges, autres coups) et un entraînement en répétition espacée qui se règle tout seul.\n• iPad & Mac : interface à barre latérale, échiquier bord à bord, raccourcis clavier et survol au trackpad.\n• Synchronisation iCloud optionnelle : parties, puzzles et ouvertures suivent vos appareils, sans compte ni serveur tiers.\n• Analyse : suivez la meilleure ligne de Stockfish un demi-coup à la fois ; alerte « coup risqué » plus juste.\n• Progrès : un tableau de bord depuis l'accueil, avec un set de puzzles ciblé sur vos thèmes faibles.\n• Scanner plus fiable, moteur Stockfish recompilé (plus rapide et sans saccade), et nouveaux thèmes de plateau et de pièces." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Since 1.0, ChessLab has come a long way:\n\n• Openings completely rebuilt: a guided move-by-move reader, 58 hand-written bilingual openings, colored arrows (recommended move, traps, other moves) and spaced-repetition training that runs itself.\n• iPad & Mac: a sidebar interface, an edge-to-edge board, keyboard shortcuts and trackpad hover.\n• Optional iCloud sync: games, puzzles and openings follow you across devices, with no account or third-party server.\n• Analyze: follow Stockfish's best line one half-move at a time; a smarter \"risky move\" warning.\n• Progress: a home-screen dashboard, with a puzzle set targeted at your weak themes.\n• More reliable scanner, Stockfish recompiled (faster and stutter-free), and new board and piece themes."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Depuis la 1.0, ChessLab a beaucoup évolué :\n\n• Ouvertures entièrement repensées : un lecteur guidé coup par coup, 58 ouvertures rédigées à la main et bilingues, des flèches colorées (coup recommandé, pièges, autres coups) et un entraînement en répétition espacée qui se règle tout seul.\n• iPad & Mac : interface à barre latérale, échiquier bord à bord, raccourcis clavier et survol au trackpad.\n• Synchronisation iCloud optionnelle : parties, puzzles et ouvertures suivent vos appareils, sans compte ni serveur tiers.\n• Analyse : suivez la meilleure ligne de Stockfish un demi-coup à la fois ; alerte « coup risqué » plus juste.\n• Progrès : un tableau de bord depuis l'accueil, avec un set de puzzles ciblé sur vos thèmes faibles.\n• Scanner plus fiable, moteur Stockfish recompilé (plus rapide et sans saccade), et nouveaux thèmes de plateau et de pièces."
+          }
+        }
+      }
+    },
+    "Progrès" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progrès"
+          }
+        }
+      }
+    },
+    "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A dashboard from the home screen: your record against the computer (wins, draws, losses) and your puzzle stats by theme. One tap on a weak theme builds a targeted puzzle set to work on it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler."
+          }
+        }
+      }
+    },
+    "Progressez sur 58 ouvertures rédigées à la main et bilingues, aux grandes lignes vérifiées. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Work through 58 hand-written, bilingual openings with verified main lines. A guided reader steps move by move, explains each move and offers the other playable moves; colored arrows flag the recommended move, traps and inaccuracies. Train them with spaced repetition — the app schedules your reviews for you — and find your progress on all your devices via iCloud."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progressez sur 58 ouvertures rédigées à la main et bilingues, aux grandes lignes vérifiées. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

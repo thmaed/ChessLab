@@ -17,6 +17,11 @@ struct HelpView: View {
 
     private let modules: [Module] = [
         .init(
+            icon: "sparkles", tint: Theme.accent,
+            title: "Nouveautés depuis la 1.0",
+            body: "Depuis la 1.0, ChessLab a beaucoup évolué :\n\n• Ouvertures entièrement repensées : un lecteur guidé coup par coup, 58 ouvertures rédigées à la main et bilingues, des flèches colorées (coup recommandé, pièges, autres coups) et un entraînement en répétition espacée qui se règle tout seul.\n• iPad & Mac : interface à barre latérale, échiquier bord à bord, raccourcis clavier et survol au trackpad.\n• Synchronisation iCloud optionnelle : parties, puzzles et ouvertures suivent vos appareils, sans compte ni serveur tiers.\n• Analyse : suivez la meilleure ligne de Stockfish un demi-coup à la fois ; alerte « coup risqué » plus juste.\n• Progrès : un tableau de bord depuis l'accueil, avec un set de puzzles ciblé sur vos thèmes faibles.\n• Scanner plus fiable, moteur Stockfish recompilé (plus rapide et sans saccade), et nouveaux thèmes de plateau et de pièces."
+        ),
+        .init(
             icon: "cpu", tint: Theme.accent,
             title: "Contre l'ordinateur",
             body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse."
@@ -32,9 +37,14 @@ struct HelpView: View {
             body: "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles."
         ),
         .init(
+            icon: "chart.bar.fill", tint: Theme.rose,
+            title: "Progrès",
+            body: "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler."
+        ),
+        .init(
             icon: "books.vertical.fill", tint: Theme.warning,
             title: "Ouvertures",
-            body: "Construisez des répertoires d'ouvertures : importez un PGN annoté ou ajoutez les coups un à un. Entraînez-les ensuite en répétition espacée — l'app vous interroge sur le coup prévu et signale quand vous vous en écartez."
+            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, aux grandes lignes vérifiées. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud."
         ),
         .init(
             icon: "chart.xyaxis.line", tint: Theme.teal,
