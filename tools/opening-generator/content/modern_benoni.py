@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Benoni moderne (1.d4 Cf6 2.c4 c5 3.d5 e6) — répertoire NOIR."""
+"""Benoni moderne (1.d4 Cf6 2.c4 c5 3.d5 e6) — répertoire NOIR.
+
+Arbre approfondi : ligne classique (Ce2/Cd2-c4), attaque Taimanov 7.f4 Fb5+,
+fianchetto (g3), et la ligne moderne 7.h3. Lignes vérifiées.
+"""
 
 
 def c(fr, en):
@@ -17,6 +21,7 @@ COURSE = {
         "Deliberate imbalance: White's centre versus Black's queenside majority and a biting g7 bishop. Tactical, risky, but full of counterplay with …b5.",
     ),
     "lines": [
+        # 1) Ligne classique
         {
             "chapter": {"id": "classical", "title": c("Ligne classique", "Classical Main Line")},
             "moves": [
@@ -27,8 +32,10 @@ COURSE = {
                  "comment": c("On attaque d5 pour ouvrir la colonne e et fixer la structure caractéristique.",
                               "Striking d5 to open the e-file and fix the signature structure.")},
                 "Nc3", "exd5", "cxd5", "d6", "e4", "g6", "Nf3", "Bg7", "Be2", "O-O", "O-O", "Re8",
+                "Nd2", "Na6", "f3", "Nc7", "a4", "b6", "Nc4", "Ba6",
             ],
         },
+        # 2) Attaque Taimanov — 7.f4 Fb5+
         {
             "chapter": {"id": "taimanov", "title": c("Attaque Taimanov — 7.f4 Fb5+", "Taimanov — 7.f4 Bb5+")},
             "moves": [
@@ -38,16 +45,27 @@ COURSE = {
                 "Bg7",
                 {"san": "Bb5+", "comment": c("L'échec précis avant d'installer le centre. …Cfd7 est la réponse principale.",
                                              "The precise check before setting up the centre. …Nfd7 is the main reply.")},
-                "Nfd7",
+                "Nfd7", "a4", "O-O", "Nf3", "Na6", "O-O", "Nc7", "Be2", "b6",
             ],
         },
+        # 3) Variante du fianchetto — g3
         {
             "chapter": {"id": "fianchetto", "title": c("Variante du fianchetto — g3", "Fianchetto Variation — g3")},
             "moves": [
                 "d4", "Nf6", "c4", "c5", "d5", "e6", "Nc3", "exd5", "cxd5", "d6", "Nf3", "g6",
                 {"san": "g3", "comment": c("Le fianchetto : jeu plus calme et positionnel, le fou g2 surveille d5 et b7.",
                                            "The fianchetto: calmer, positional play; the g2 bishop watches d5 and b7.")},
-                "Bg7", "Bg2", "O-O", "O-O", "Re8",
+                "Bg7", "Bg2", "O-O", "O-O", "Re8", "Nd2", "Na6", "h3", "Nc7", "a4", "b6", "Nc4", "Ba6",
+            ],
+        },
+        # 4) Ligne moderne — 7.h3
+        {
+            "chapter": {"id": "modern-h3", "title": c("Ligne moderne — 7.h3", "Modern Line — 7.h3")},
+            "moves": [
+                "d4", "Nf6", "c4", "c5", "d5", "e6", "Nc3", "exd5", "cxd5", "d6", "e4", "g6",
+                {"san": "h3", "comment": c("La ligne moderne : h3 coupe …Fg4 et prépare Fd3, Cf3 en gardant tout solide.",
+                                           "The modern line: h3 takes away …Bg4 and prepares Bd3, Nf3 while keeping everything solid.")},
+                "a6", "a4", "Bg7", "Bd3", "O-O", "Nf3", "Nbd7", "O-O", "Re8",
             ],
         },
     ],
