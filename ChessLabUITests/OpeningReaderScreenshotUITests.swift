@@ -16,9 +16,15 @@ final class OpeningReaderScreenshotUITests: XCTestCase {
         openings.tap()
         capture(app, "01-list-en")
 
-        // Ouvre la Partie italienne
+        // Ouvre la Partie italienne. La liste est triée alphabétiquement, donc
+        // l'entrée peut être sous la ligne de flottaison : on défile jusqu'à elle.
         let italian = app.buttons["opening_italian-game"]
         XCTAssertTrue(italian.waitForExistence(timeout: 10))
+        var scrolls = 0
+        while !italian.isHittable && scrolls < 8 {
+            app.swipeUp()
+            scrolls += 1
+        }
         italian.tap()
         capture(app, "02-reader-start-en")
 

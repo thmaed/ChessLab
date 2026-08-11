@@ -114,15 +114,17 @@ final class OpeningTrainViewModel {
     var allowsHints: Bool { if case .fullLine = mode { return false } else { return true } }
     var isUserTurn: Bool { phase == .awaiting && pendingPromotion == nil }
 
-    /// Notes proposées à l'utilisateur selon la phase (un indice utilisé plafonne
-    /// une bonne réponse à « Difficile »).
-    var ratingOptions: [FSRSRating] {
-        switch phase {
-        case .correct: return usedHint ? [.hard] : [.hard, .good, .easy]
-        case .wrong: return [.again]
-        default: return []
-        }
+    /// Note FSRS AUTO-DÉRIVÉE de la performance (plus de notation manuelle, qui
+    /// déroutait) : erreur → Encore (revu bientôt), indice utilisé → Difficile,
+    /// réussite nette → Bien. La planification espacée reste identique, mais
+    /// invisible : l'utilisateur clique juste « Continuer ».
+    var autoRating: FSRSRating {
+        if phase == .wrong { return .again }
+        return usedHint ? .hard : .good
     }
+
+    /// Enregistre la note auto-dérivée et enchaîne la carte suivante.
+    func advance() { grade(autoRating) }
 
     // MARK: Chargement de carte
 

@@ -107,9 +107,9 @@ struct OpeningTrainView: View {
                     Text("Le coup était \(card.expectedSAN)")
                         .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.danger)
                 }
-                ratingButtons
+                continueButton(title: "Continuer")
             case .correct:
-                ratingButtons
+                continueButton(title: "Continuer")
             default:
                 EmptyView()
             }
@@ -117,42 +117,18 @@ struct OpeningTrainView: View {
         .padding(.horizontal, 16)
     }
 
-    private var ratingButtons: some View {
-        HStack(spacing: 8) {
-            ForEach(viewModel.ratingOptions, id: \.self) { rating in
-                Button { viewModel.grade(rating) } label: {
-                    Text(label(for: rating))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(rating == .good ? Theme.background : color(for: rating))
-                        .frame(maxWidth: .infinity).padding(.vertical, 12)
-                        .background(background(for: rating), in: Capsule())
-                        .overlay(Capsule().strokeBorder(color(for: rating).opacity(0.4), lineWidth: rating == .good ? 0 : 1))
-                }
-                .buttonStyle(.pressable)
-            }
+    /// Une seule action : la note FSRS est déduite automatiquement de la
+    /// performance (voir `OpeningTrainViewModel.autoRating`), plus de choix
+    /// manuel Encore/Difficile/Bien/Facile.
+    private func continueButton(title: LocalizedStringKey) -> some View {
+        Button { viewModel.advance() } label: {
+            Text(title)
+                .font(.subheadline.weight(.bold)).foregroundStyle(Theme.background)
+                .frame(maxWidth: .infinity).padding(.vertical, 14)
+                .background(Theme.accentGradient, in: Capsule())
+                .glow(Theme.accent, radius: 8)
         }
-    }
-
-    private func label(for rating: FSRSRating) -> LocalizedStringKey {
-        switch rating {
-        case .again: "Encore"
-        case .hard: "Difficile"
-        case .good: "Bien"
-        case .easy: "Facile"
-        }
-    }
-
-    private func color(for rating: FSRSRating) -> Color {
-        switch rating {
-        case .again: Theme.danger
-        case .hard: Theme.warning
-        case .good: Theme.accent
-        case .easy: Theme.info
-        }
-    }
-
-    private func background(for rating: FSRSRating) -> AnyShapeStyle {
-        rating == .good ? AnyShapeStyle(Theme.accentGradient) : AnyShapeStyle(color(for: rating).opacity(0.14))
+        .buttonStyle(.pressable)
     }
 
     private func commentCard(_ comment: String) -> some View {

@@ -15,9 +15,19 @@ struct OpeningListView: View {
     @State private var dueCount = 0
 
     private var entries: [OpeningCatalogEntry] { OpeningCourseLoader.catalog }
-    private var white: [OpeningCatalogEntry] { entries.filter { $0.side == .white } }
-    private var black: [OpeningCatalogEntry] { entries.filter { $0.side == .black } }
+    private var white: [OpeningCatalogEntry] { sortedByName(entries.filter { $0.side == .white }) }
+    private var black: [OpeningCatalogEntry] { sortedByName(entries.filter { $0.side == .black }) }
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
+
+    /// Nom affiché (traduit dans la langue de l'app via le bundle redirigé).
+    private func displayName(_ entry: OpeningCatalogEntry) -> String {
+        Bundle.main.localizedString(forKey: entry.name, value: entry.name, table: nil)
+    }
+
+    /// Tri alphabétique par nom affiché (accents pris en compte).
+    private func sortedByName(_ items: [OpeningCatalogEntry]) -> [OpeningCatalogEntry] {
+        items.sorted { displayName($0).localizedStandardCompare(displayName($1)) == .orderedAscending }
+    }
 
     var body: some View {
         List {

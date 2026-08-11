@@ -15,7 +15,6 @@ struct OpeningReaderView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 14) {
-                    header
                     board
                         .aspectRatio(1, contentMode: .fit)
                         .padding(.horizontal, 16)
@@ -35,22 +34,10 @@ struct OpeningReaderView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button { onTrain() } label: { Label("Réviser", systemImage: "checklist") }
+                Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
                     .tint(Theme.accent)
             }
         }
-    }
-
-    private var header: some View {
-        VStack(spacing: 3) {
-            if let name = viewModel.positionName {
-                Text(name).font(.subheadline.weight(.semibold)).foregroundStyle(Theme.textPrimary)
-                    .multilineTextAlignment(.center)
-            }
-            Text(viewModel.orientation == .white ? "Vous jouez les blancs" : "Vous jouez les noirs")
-                .font(.caption2.weight(.medium)).foregroundStyle(Theme.textTertiary)
-        }
-        .padding(.horizontal, 20)
     }
 
     private var board: some View {
@@ -127,7 +114,7 @@ struct OpeningReaderView: View {
                 .textCase(.uppercase).tracking(0.4)
                 .padding(.horizontal, 4)
             ForEach(viewModel.variations, id: \.uci) { edge in
-                Button { withAnimation(Theme.spring) { viewModel.play(edge) } } label: {
+                Button { viewModel.play(edge) } label: {
                     HStack(spacing: 10) {
                         Text(edge.san).font(.subheadline.weight(.semibold).monospaced())
                             .foregroundStyle(Theme.textPrimary).frame(minWidth: 46, alignment: .leading)
@@ -155,7 +142,7 @@ struct OpeningReaderView: View {
     /// Barre du bas : Précédent / Suivant, l'action centrale du lecteur.
     private var controlBar: some View {
         HStack(spacing: 12) {
-            Button { withAnimation(Theme.spring) { viewModel.back() } } label: {
+            Button { viewModel.back() } label: {
                 Label("Précédent", systemImage: "chevron.left")
                     .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.textPrimary)
                     .frame(maxWidth: .infinity).padding(.vertical, 14)
@@ -167,7 +154,7 @@ struct OpeningReaderView: View {
             .opacity(viewModel.canGoBack ? 1 : 0.4)
             .accessibilityIdentifier("reader_prev")
 
-            Button { withAnimation(Theme.spring) { viewModel.next() } } label: {
+            Button { viewModel.next() } label: {
                 Label("Suivant", systemImage: "chevron.right")
                     .labelStyle(.titleAndIcon)
                     .font(.subheadline.weight(.bold)).foregroundStyle(Theme.background)

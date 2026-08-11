@@ -56,9 +56,9 @@ struct OpeningTrainViewModelTests {
         model.attemptMove(from: Square("e2"), to: Square("e4"))
         #expect(model.phase == .correct)
         #expect(model.currentComment == "Contrôle le centre.")
-        #expect(model.ratingOptions == [.hard, .good, .easy])
+        #expect(model.autoRating == .good)                         // réussite nette → Bien
 
-        model.grade(.good)
+        model.advance()
         #expect(model.reviewedCount == 1)
         #expect(model.phase == .complete)
 
@@ -77,10 +77,10 @@ struct OpeningTrainViewModelTests {
 
         model.attemptMove(from: Square("d2"), to: Square("d4"))   // mauvais coup
         #expect(model.phase == .wrong)
-        #expect(model.ratingOptions == [.again])
+        #expect(model.autoRating == .again)                        // erreur → Encore
         #expect(!model.hintMoves.isEmpty)                          // bon coup révélé
 
-        model.grade(.again)
+        model.advance()
         let progress = try #require(OpeningProgressStore.progress(forFEN: card.fenKey, in: context))
         #expect(progress.reps == 1)
         #expect(progress.stateRaw == FSRSState.learning.rawValue)  // « again » sur une neuve → learning
@@ -94,7 +94,7 @@ struct OpeningTrainViewModelTests {
         #expect(model.usedHint)
         model.attemptMove(from: Square("e2"), to: Square("e4"))
         #expect(model.phase == .correct)
-        #expect(model.ratingOptions == [.hard])                    // Facile/Bien retirés
+        #expect(model.autoRating == .hard)                         // indice utilisé → Difficile
     }
 
     @Test func fullLineModeDisablesHints() throws {
