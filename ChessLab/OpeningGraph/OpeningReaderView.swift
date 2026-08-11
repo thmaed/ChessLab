@@ -116,9 +116,15 @@ struct OpeningReaderView: View {
         var id: String { edge.uci }
     }
 
-    /// Palette des variantes « neutres » (hors piège/imprécision), choisie pour
-    /// rester distincte du vert du coup recommandé et du rouge/orange sémantiques.
-    private static let variationPalette: [Color] = [.blue, .purple, .pink, .indigo, .cyan]
+    /// Palette des variantes « neutres » (hors piège/imprécision) : une famille
+    /// de teintes PROCHES (bleu clair → indigo), pour l'uniformité tout en
+    /// restant distincte du vert (recommandé) et du rouge/orange (à risque).
+    private static let variationPalette: [Color] = [
+        Color(red: 0.353, green: 0.651, blue: 1.000),   // #5AA6FF bleu clair
+        Color(red: 0.294, green: 0.518, blue: 0.949),   // #4B84F2 bleu
+        Color(red: 0.290, green: 0.388, blue: 0.878),   // #4A63E0 bleu-indigo
+        Color(red: 0.294, green: 0.310, blue: 0.788),   // #4B4FC9 indigo
+    ]
 
     /// Coups jouables colorés : le coup à venir en vert (recommandé), les pièges
     /// en rouge, les imprécisions en orange, les autres variantes cyclant la palette.
