@@ -16,6 +16,7 @@ from . import (
     chigorin_defense,
     colle_system,
     dutch_defense,
+    elephant_gambit,
     english_opening,
     englund_gambit,
     four_knights,
@@ -33,6 +34,7 @@ from . import (
     nimzo_larsen,
     nimzowitsch_defense,
     old_indian,
+    owens_defense,
     petrov_defense,
     philidor_defense,
     pirc_defense,
@@ -84,6 +86,7 @@ COURSES = [
     alekhine_defense.COURSE,
     petrov_defense.COURSE,
     nimzowitsch_defense.COURSE,
+    owens_defense.COURSE,
     # Blancs — 1.d4 et systèmes
     london_system.COURSE,
     queens_gambit_declined.COURSE,
@@ -123,4 +126,5 @@ COURSES = [
     englund_gambit.COURSE,
     blackmar_diemer.COURSE,
     latvian_gambit.COURSE,
+    elephant_gambit.COURSE,
 ]

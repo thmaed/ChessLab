@@ -11496,6 +11496,23 @@
           }
         }
       }
+    },
+    "Owen's Defense" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Owen's Defense"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense Owen"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
