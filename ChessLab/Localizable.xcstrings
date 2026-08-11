@@ -11720,6 +11720,38 @@
           }
         }
       }
+    },
+    "Coup précédent" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Previous move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coup précédent"
+          }
+        }
+      }
+    },
+    "Coup suivant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coup suivant"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

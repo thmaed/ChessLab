@@ -104,8 +104,7 @@ struct PlayView: View {
                 EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
             }
             if viewModel.outcome == nil {
-                transportBar
-                actionBar(showMoveList: true)
+                controlBar(showMoveList: true)
             } else {
                 gameOverPanel
             }
@@ -174,8 +173,7 @@ struct PlayView: View {
                 EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
             }
             if viewModel.outcome == nil {
-                transportBar
-                actionBar(showMoveList: false)
+                controlBar(showMoveList: false)
             } else {
                 gameOverPanel
             }
@@ -233,11 +231,10 @@ struct PlayView: View {
                         EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
                     }
                     if viewModel.outcome == nil {
-                        actionBar(showMoveList: false)
+                        controlBar(showMoveList: false)
                     } else {
                         gameOverPanel
                     }
-                    transportBar
                     movesSection
                 }
                 .frame(maxWidth: .infinity)
@@ -315,11 +312,51 @@ struct PlayView: View {
         )
     }
 
-    /// Rangée d'actions unique. Le « retour en arrière » N'EST PLUS ici : il
-    /// fait doublon avec la barre de transport (chevrons + « Reprendre ici »),
-    /// qui est désormais le seul mécanisme pour revenir sur un coup.
-    private func actionBar(showMoveList: Bool) -> some View {
-        HStack(spacing: 12) {
+    /// Rangée de contrôle UNIQUE, sur une seule ligne : à gauche la navigation
+    /// (précédent / suivant) et, en consultation, « Reprendre ici » ; à droite
+    /// les actions (indice, nulle, abandon).
+    ///
+    /// L'ancienne barre de transport — sauts début/fin **et** curseur — a été
+    /// retirée : deux chevrons suffisent à parcourir la partie coup par coup, et
+    /// « Coups joués » (iPhone) reste le moyen de sauter directement à un coup.
+    private func controlBar(showMoveList: Bool) -> some View {
+        let hasMoves = viewModel.totalPlies > 0
+        return HStack(spacing: 10) {
+            controlButton(
+                "chevron.left",
+                label: "Coup précédent",
+                disabled: !hasMoves || viewModel.displayedPly == 0
+            ) {
+                viewModel.reviewPrevious()
+            }
+            // Raccourcis clavier iPad : ←/→ parcourent la partie, comme avant.
+            .keyboardShortcut(.leftArrow, modifiers: [])
+            controlButton(
+                "chevron.right",
+                label: "Coup suivant",
+                disabled: !hasMoves || viewModel.displayedPly >= viewModel.totalPlies
+            ) {
+                viewModel.reviewNext()
+            }
+            .keyboardShortcut(.rightArrow, modifiers: [])
+
+            // « Reprendre ici » n'apparaît qu'en consultation d'un coup passé —
+            // c'est aussi le signe visible qu'on n'est plus sur la position vive.
+            if viewModel.isReviewing, viewModel.canResumeFromReview {
+                Button { showResumeConfirmation = true } label: {
+                    Text("Reprendre ici")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.background)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Theme.accent, in: Capsule())
+                }
+                .buttonStyle(.pressable)
+                .transition(.opacity)
+            }
+
+            Spacer()
+
             controlButton(
                 "lightbulb.fill",
                 label: viewModel.hintsWanted ? "Arrêter l'indice" : "Indice",
@@ -329,12 +366,12 @@ struct PlayView: View {
             ) {
                 viewModel.toggleHint()
             }
-            if showMoveList {
+            // « Coups joués » et « Reprendre ici » ne coexistent jamais : en
+            // consultation, la reprise prend la place de la liste, si bien que
+            // la rangée tient sur UNE ligne même sur les iPhone étroits.
+            if showMoveList, !viewModel.isReviewing {
                 controlButton("list.bullet", label: "Coups joués", disabled: false) { showPanelSheet = true }
             }
-
-            Spacer()
-
             controlButton(text: "½", label: "Proposer nulle", tint: Theme.info, disabled: viewModel.outcome != nil || viewModel.isEngineThinking) {
                 showDrawConfirmation = true
             }
@@ -342,6 +379,7 @@ struct PlayView: View {
                 showResignConfirmation = true
             }
         }
+        .animation(Theme.gentle, value: viewModel.isReviewing)
     }
 
 
@@ -371,78 +409,6 @@ struct PlayView: View {
         .buttonStyle(.pressable)
         .disabled(disabled)
         .accessibilityLabel(label)
-    }
-
-    /// Barre de transport : parcourir la partie en lecture seule (début /
-    /// précédent / curseur / suivant / direct) et, hors pendule, reprendre
-    /// la partie depuis la position consultée.
-    /// Barre de transport : **seul** mécanisme de retour en arrière (le
-    /// bouton « Reprendre » a été retiré, il en faisait doublon). Toujours
-    /// présente et à hauteur constante — même sans coup joué, ses boutons
-    /// sont simplement désactivés — pour que le plateau au-dessus ne
-    /// rétrécisse pas à l'apparition/disparition de cette barre.
-    private var transportBar: some View {
-        let hasMoves = viewModel.totalPlies > 0
-        return VStack(spacing: 8) {
-            HStack(spacing: 8) {
-                navIconButton("backward.end.fill", disabled: !hasMoves || viewModel.displayedPly == 0) { viewModel.reviewToStart() }
-                navIconButton("chevron.left", disabled: !hasMoves || viewModel.displayedPly == 0) { viewModel.reviewPrevious() }
-                    // Raccourcis clavier iPad (Lot 4.A) : ←/→ parcourent la
-                    // consultation, comme sur l'écran Analyser.
-                    .keyboardShortcut(.leftArrow, modifiers: [])
-                Slider(
-                    value: Binding(
-                        get: { Double(viewModel.displayedPly) },
-                        set: { viewModel.review(toPly: Int($0.rounded())) }
-                    ),
-                    in: 0...Double(max(viewModel.totalPlies, 1)),
-                    step: 1
-                )
-                .tint(viewModel.isReviewing ? Theme.warning : Theme.accent)
-                .disabled(!hasMoves)
-                navIconButton("chevron.right", disabled: !hasMoves || viewModel.displayedPly >= viewModel.totalPlies) { viewModel.reviewNext() }
-                    .keyboardShortcut(.rightArrow, modifiers: [])
-                navIconButton("forward.end.fill", disabled: !viewModel.isReviewing) { viewModel.reviewToLive() }
-            }
-
-            if viewModel.isReviewing {
-                HStack(spacing: 8) {
-                    Label("Consultation — coup \(viewModel.displayedPly)/\(viewModel.totalPlies)", systemImage: "eye")
-                        .font(.caption.weight(.medium))
-                        .foregroundStyle(Theme.warning)
-                    Spacer()
-                    if viewModel.canResumeFromReview {
-                        Button { showResumeConfirmation = true } label: {
-                            Text("Reprendre ici")
-                                .font(.caption.weight(.semibold))
-                                .foregroundStyle(Theme.background)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(Theme.accent, in: Capsule())
-                        }
-                        .buttonStyle(.pressable)
-                    }
-                }
-                .transition(.opacity)
-            }
-        }
-        .animation(Theme.gentle, value: viewModel.isReviewing)
-    }
-
-    private func navIconButton(_ systemImage: String, disabled: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.system(size: 14, weight: .medium))
-                .foregroundStyle(disabled ? Theme.textTertiary : Theme.textPrimary)
-                // 44 pt : le minimum des Human Interface Guidelines. Ces
-                // boutons faisaient 40 — assez pour être vus, trop peu pour
-                // être visés de façon fiable.
-                .frame(width: 44, height: 44)
-                .background(Theme.surface, in: Circle())
-                .overlay(Circle().strokeBorder(Theme.stroke, lineWidth: 1))
-        }
-        .buttonStyle(.pressable)
-        .disabled(disabled)
     }
 
     /// Sans ce signalement, un échec de démarrage de Stockfish donnait un
