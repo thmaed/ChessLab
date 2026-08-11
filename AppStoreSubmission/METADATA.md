@@ -25,8 +25,8 @@ stockfish,tactique,ouverture,puzzle,gambit,fen,pgn,elo,entrainement,scanner,anal
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
 ```
-Analysez vos parties, scannez un échiquier, entraînez-vous sur 149
-familles d'ouvertures et 100 000+ puzzles, affrontez Stockfish — 100% local.
+Analysez vos parties, scannez un échiquier, entraînez-vous sur 58 ouvertures
+commentées et 100 000+ puzzles, affrontez l'ordinateur — 100% local.
 ```
 
 **Description** (4000 car. max) :
@@ -51,9 +51,10 @@ d'évaluation, flèches du meilleur coup et de la menace adverse, lecture
 automatique. Entrée par PGN, FEN, éditeur de position ou scanner photo.
 
 OUVERTURES
-Parcourez l'intégralité des 149 familles ECO, classées par style
-(classique, hypermoderne, système, irrégulière), choisissez votre camp et
-entraînez-vous à jouer chaque ligne jusqu'au bout.
+Choisissez une ouverture et avancez coup par coup : chaque coup est
+expliqué, les variantes sont proposées, et des flèches colorées relient le
+plateau à la liste des coups. 58 ouvertures rédigées à la main (bilingues),
+avec un entraînement en répétition espacée simplifié pour les mémoriser.
 
 PUZZLES
 Plus de 100 000 problèmes tactiques issus de la base Lichess, filtrables
@@ -115,8 +116,8 @@ stockfish,tactics,openings,puzzle,gambit,fen,pgn,elo,training,scanner,analysis,o
 
 **Promotional text** (170 char. max):
 ```
-Analyze your games, scan a chessboard, train on 149 opening families and
-100,000+ puzzles, take on Stockfish — fully offline, no ads.
+Analyze your games, scan a chessboard, train on 58 annotated openings and
+100,000+ puzzles, take on the computer — fully offline, no ads.
 ```
 
 **Description** (4000 char. max):
@@ -141,9 +142,10 @@ move and opponent-threat arrows, and auto-play through the moves. Import by
 PGN, FEN, position editor, or photo scanner.
 
 OPENINGS
-Browse the complete set of 149 ECO families, tagged by style (classical,
-hypermodern, system, irregular), pick your side, and drill each line move
-by move.
+Pick an opening and step through it move by move: every move is explained,
+the alternatives are offered, and colored arrows link the board to the move
+list. 58 hand-written openings (bilingual), with simplified spaced-repetition
+training to memorize them.
 
 PUZZLES
 Over 100,000 tactics puzzles from the Lichess database, filterable by
@@ -214,8 +216,8 @@ pose la question : aucune cryptographie propriétaire, exempté.
 ### App Privacy (étiquette de confidentialité)
 Réponse à la question « Collectez-vous des données ? » : **Non**.
 Aucun SDK tiers d'analytics, de publicité ou de suivi n'est intégré (les
-deux seules dépendances sont ChessKit et ChessKitEngine, qui tournent
-localement — vérifié dans `Package.resolved`). Le champ « scan de l'appareil
+seules dépendances tierces sont ChessKit et le moteur Stockfish vendorisé,
+qui tournent entièrement localement). Le champ « scan de l'appareil
 photo » sert uniquement à la reconnaissance locale d'une position, jamais à
 un envoi réseau. La synchronisation iCloud (optionnelle) stocke les données
 dans l'iCloud **privé** de l'utilisateur (base CloudKit privée), à laquelle
@@ -247,8 +249,9 @@ Réponses déduites du code (vérifié, pas deviné) :
 - **Captions** : non applicable, pas de contenu audio/vidéo narratif.
 
 ### Version et build
-`MARKETING_VERSION = 1.1.0`, `CURRENT_PROJECT_VERSION = 2` — voir
-`RELEASE_NOTES-1.1.0.md` pour les nouveautés. Incrémenter
+`MARKETING_VERSION = 1.2.0` — voir `RELEASE_NOTES-1.2.0.md` pour les
+nouveautés (regroupe les changements des 1.0.2 et 1.1.0). Penser à régler
+`MARKETING_VERSION = 1.2.0` dans le projet, et à incrémenter
 `CURRENT_PROJECT_VERSION` à chaque nouveau build renvoyé à Apple (même
 version marketing).
 
@@ -273,8 +276,8 @@ bundles six modes:
 2. Two Players — local pass-and-play on a single device.
 3. Analyze — full game/position analysis with Stockfish: move-by-move
    classification, evaluation graph, best-move/threat arrows.
-4. Openings — the complete set of 149 ECO opening families tagged by
-   style, drill each line move by move.
+4. Openings — 58 hand-written, annotated openings; step through each one
+   move by move, with variations and simplified spaced-repetition training.
 5. Puzzles — over 100,000 tactics puzzles from the Lichess database, plus
    puzzles auto-generated from the user's own mistakes in Analyze.
 6. Laboratory — engine-vs-engine testing to compare Stockfish
@@ -301,14 +304,14 @@ library stays local (never synced). No data is shared with the developer, so the
 remains "Data Not Collected". With sync disabled — the default — the app
 makes no network calls at all.
 
-ENGINE LICENSE (GPLv3): ChessLab embeds the Stockfish chess engine via the
-open-source wrapper ChessKitEngine (https://github.com/chesskit-app/chesskit-engine).
-ChessKitEngine itself is MIT-licensed, but it compiles Stockfish's sources,
-so the ChessLab binary as a whole is a GPLv3 derivative work. To comply,
-the complete source code of the app — matching this submitted build — is
-published publicly at https://github.com/thmaed/ChessLab. Copyright and
-license notices for all third-party components (Stockfish/GPLv3, ChessKit
-& ChessKitEngine/MIT, the chess piece sets cburnett/GPLv2+ & CC BY-SA 3.0,
+ENGINE LICENSE (GPLv3): ChessLab embeds the Stockfish chess engine,
+compiled from its own sources and bundled directly into the app (with ARM
+NEON optimizations). Because Stockfish is GPLv3, the ChessLab binary as a
+whole is a GPLv3 derivative work. To comply, the complete source code of the
+app — matching this submitted build — is published publicly at
+https://github.com/thmaed/ChessLab. Copyright and license notices for all
+third-party components (Stockfish/GPLv3, ChessKit/MIT, the chess piece sets
+cburnett/GPLv2+ & CC BY-SA 3.0,
 chessnut/Apache 2.0 and merida/GPLv2+, the Lichess puzzle database/CC0) are
 also shown in-app under Settings → Licenses. All embedded piece sets are
 free/open-source and license-compatible with the app's GPLv3.

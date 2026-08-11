@@ -18,8 +18,8 @@ ou décision qui n'appartient qu'à toi).
       réglé dans les build settings (Debug + Release). L'app n'utilise que
       HTTPS standard (import Lichess), aucune cryptographie propriétaire.
 - [x] **Écran Licences** (`ChessLab/LicensesView.swift`, accessible depuis
-      Réglages → « Licences ») : mentions Stockfish (GPLv3), ChessKit /
-      ChessKitEngine (MIT), pièces cburnett (CC BY-SA 3.0), base de
+      Réglages → « Licences ») : mentions Stockfish (GPLv3, vendorisé),
+      ChessKit (MIT), pièces cburnett (CC BY-SA 3.0), base de
       puzzles Lichess (CC0), réseaux NNUE, et lien vers le code source de
       l'app. Traduit FR/EN dans `Localizable.xcstrings`.
 - [x] **Signature de Release nettoyée** : un `CODE_SIGN_IDENTITY = "Apple
