@@ -2,9 +2,10 @@ import ChessKit
 import SwiftUI
 import SwiftData
 
-/// Mode ENTRAÎNER : plateau où l'utilisateur retrouve le coup de sa position,
-/// note sa performance (FSRS), et enchaîne la file du jour. Correction immédiate
-/// sur erreur.
+/// Mode ENTRAÎNER — « ligne guidée » : plateau continu, l'utilisateur joue son
+/// camp, l'adversaire répond tout seul. Historique des coups, commentaire au fil
+/// des coups, et sur une variante on demande s'il faut la jouer ou rester sur la
+/// principale. Voir ``OpeningTrainViewModel``.
 struct OpeningTrainView: View {
     @Bindable var viewModel: OpeningTrainViewModel
     let onExit: () -> Void
@@ -13,7 +14,7 @@ struct OpeningTrainView: View {
     private var boardTheme: BoardTheme { appSettings.boardTheme }
 
     var body: some View {
-        VStack(spacing: 14) {
+        VStack(spacing: 12) {
             header
             switch viewModel.phase {
             case .empty:
@@ -24,6 +25,7 @@ struct OpeningTrainView: View {
                 board
                     .aspectRatio(1, contentMode: .fit)
                     .padding(.horizontal, 16)
+                if !viewModel.playedSANs.isEmpty { moveTrail }
                 bottomArea
             }
             Spacer(minLength: 0)
@@ -37,32 +39,45 @@ struct OpeningTrainView: View {
         .overlay { promotionOverlay }
     }
 
+    // MARK: En-tête
+
     private var header: some View {
-        VStack(spacing: 6) {
+        VStack(spacing: 4) {
             Text(modeTitle)
-                .font(.caption.weight(.bold)).foregroundStyle(Theme.accent).textCase(.uppercase)
+                .font(.caption.weight(.bold)).foregroundStyle(Theme.accent).textCase(.uppercase).tracking(0.4)
             if viewModel.phase != .empty && viewModel.phase != .complete {
-                HStack(spacing: 8) {
-                    Text(viewModel.orientation == .white ? "Trait aux blancs" : "Trait aux noirs")
-                        .font(.headline).foregroundStyle(Theme.textPrimary)
-                }
-                ProgressView(value: Double(viewModel.reviewedCount), total: Double(max(viewModel.total, 1)))
-                    .tint(Theme.accent)
-                    .frame(maxWidth: 220)
-                Text("\(viewModel.reviewedCount) / \(viewModel.total)")
-                    .font(.caption2.weight(.medium).monospaced()).foregroundStyle(Theme.textTertiary)
+                Text(LocalizedStringKey(viewModel.courseName))
+                    .font(.headline).foregroundStyle(Theme.textPrimary)
+                    .multilineTextAlignment(.center)
+                statusLine
             }
         }
         .padding(.horizontal, 20)
+    }
+
+    @ViewBuilder
+    private var statusLine: some View {
+        switch viewModel.phase {
+        case .awaiting:
+            Label("À vous de jouer", systemImage: "hand.point.up.left.fill")
+                .font(.caption.weight(.semibold)).foregroundStyle(Theme.accent)
+        case .opponentMoving:
+            Text("L'adversaire joue…")
+                .font(.caption.weight(.medium)).foregroundStyle(Theme.textTertiary)
+        default:
+            EmptyView()
+        }
     }
 
     private var modeTitle: LocalizedStringKey {
         switch viewModel.mode {
         case .daily: "Révision du jour"
         case .hardest: "Positions difficiles"
-        case .fullLine: "Ligne complète, sans filet"
+        case .fullLine: "Entraîner la ligne"
         }
     }
+
+    // MARK: Plateau + historique
 
     private var board: some View {
         ChessBoardView(
@@ -75,41 +90,62 @@ struct OpeningTrainView: View {
             hintMoves: viewModel.hintMoves,
             interactionEnabled: viewModel.isUserTurn,
             showCoordinates: true,
-            draggableColor: viewModel.board.position.sideToMove,
+            draggableColor: viewModel.orientation,
             onTapSquare: { viewModel.selectSquare($0) },
             onDropPiece: { viewModel.attemptMove(from: $0, to: $1) }
         )
     }
 
+    /// Fil des coups joués (affichage seul), le dernier mis en évidence.
+    private var moveTrail: some View {
+        ScrollViewReader { proxy in
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(Array(viewModel.playedSANs.enumerated()), id: \.offset) { index, san in
+                        let isCurrent = index == viewModel.playedSANs.count - 1
+                        Text(trailLabel(index: index, san: san))
+                            .font(.caption.weight(.semibold).monospaced())
+                            .foregroundStyle(isCurrent ? Theme.background : Theme.textSecondary)
+                            .padding(.horizontal, 8).padding(.vertical, 4)
+                            .background(isCurrent ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Theme.surface),
+                                        in: Capsule())
+                            .id(index)
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+            .onChange(of: viewModel.playedSANs.count) { _, count in
+                withAnimation(.easeOut(duration: 0.2)) { proxy.scrollTo(count - 1, anchor: .trailing) }
+            }
+        }
+    }
+
+    private func trailLabel(index: Int, san: String) -> String {
+        index % 2 == 0 ? "\(index / 2 + 1). \(san)" : san
+    }
+
+    // MARK: Bas de l'écran (selon la phase)
+
     @ViewBuilder
     private var bottomArea: some View {
         VStack(spacing: 12) {
-            if let comment = viewModel.currentComment, !comment.isEmpty, viewModel.phase != .awaiting {
+            if let comment = viewModel.currentComment, !comment.isEmpty {
                 commentCard(comment)
             }
             switch viewModel.phase {
             case .awaiting:
-                VStack(spacing: 10) {
-                    Text("Retrouvez le coup").font(.subheadline).foregroundStyle(Theme.textSecondary)
-                    if viewModel.allowsHints {
-                        Button { viewModel.showHint() } label: {
-                            Label("Indice", systemImage: "lightbulb")
-                                .font(.caption.weight(.semibold)).foregroundStyle(Theme.textSecondary)
-                                .padding(.horizontal, 14).padding(.vertical, 7)
-                                .background(Theme.surfaceElevated, in: Capsule())
-                                .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
-                        }
-                        .buttonStyle(.pressable)
-                    }
+                Button { viewModel.showHint() } label: {
+                    Label("Indice", systemImage: "lightbulb")
+                        .font(.caption.weight(.semibold)).foregroundStyle(Theme.textSecondary)
+                        .padding(.horizontal, 14).padding(.vertical, 7)
+                        .background(Theme.surfaceElevated, in: Capsule())
+                        .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
                 }
+                .buttonStyle(.pressable)
+            case .variation:
+                variationPrompt
             case .wrong:
-                if let card = viewModel.currentCard {
-                    Text("Le coup était \(card.expectedSAN)")
-                        .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.danger)
-                }
-                continueButton(title: "Continuer")
-            case .correct:
-                continueButton(title: "Continuer")
+                wrongControls
             default:
                 EmptyView()
             }
@@ -117,18 +153,67 @@ struct OpeningTrainView: View {
         .padding(.horizontal, 16)
     }
 
-    /// Une seule action : la note FSRS est déduite automatiquement de la
-    /// performance (voir `OpeningTrainViewModel.autoRating`), plus de choix
-    /// manuel Encore/Difficile/Bien/Facile.
-    private func continueButton(title: LocalizedStringKey) -> some View {
-        Button { viewModel.advance() } label: {
-            Text(title)
+    private var variationPrompt: some View {
+        VStack(spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
+                Image(systemName: "arrow.triangle.branch").foregroundStyle(Theme.info)
+                Text(variationMessage)
+                    .font(.subheadline).foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+            }
+            .cardStyle()
+            HStack(spacing: 10) {
+                Button { viewModel.keepMainLine() } label: {
+                    Text("Rester sur la principale")
+                        .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.textPrimary)
+                        .frame(maxWidth: .infinity).padding(.vertical, 12)
+                        .background(Theme.surface, in: Capsule())
+                        .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
+                }
+                .buttonStyle(.pressable)
+                Button { viewModel.playVariation() } label: {
+                    Text("Jouer la variante")
+                        .font(.subheadline.weight(.bold)).foregroundStyle(Theme.background)
+                        .frame(maxWidth: .infinity).padding(.vertical, 12)
+                        .background(Theme.accentGradient, in: Capsule())
+                        .glow(Theme.accent, radius: 6)
+                }
+                .buttonStyle(.pressable)
+            }
+        }
+    }
+
+    private var variationMessage: String {
+        let played = viewModel.variationPlayedSAN ?? "?"
+        let main = viewModel.variationMainSAN ?? "?"
+        let fr = AppSettings.shared.appLanguage.resolvedCode == "fr"
+        return fr
+            ? "« \(played) » est une variante du répertoire — la ligne principale est \(main). Que veux-tu faire ?"
+            : "“\(played)” is a repertoire sideline — the main line is \(main). What would you like to do?"
+    }
+
+    @ViewBuilder
+    private var wrongControls: some View {
+        if let correct = viewModel.wrongCorrectSAN {
+            Text(wrongMessage(correct))
+                .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.danger)
+                .multilineTextAlignment(.center)
+        }
+        Button { viewModel.continueAfterWrong() } label: {
+            Text("Continuer")
                 .font(.subheadline.weight(.bold)).foregroundStyle(Theme.background)
                 .frame(maxWidth: .infinity).padding(.vertical, 14)
                 .background(Theme.accentGradient, in: Capsule())
                 .glow(Theme.accent, radius: 8)
         }
         .buttonStyle(.pressable)
+    }
+
+    private func wrongMessage(_ correct: String) -> String {
+        AppSettings.shared.appLanguage.resolvedCode == "fr"
+            ? "Le bon coup était \(correct)."
+            : "The right move was \(correct)."
     }
 
     private func commentCard(_ comment: String) -> some View {
@@ -141,11 +226,13 @@ struct OpeningTrainView: View {
         .cardStyle()
     }
 
+    // MARK: États de fin
+
     private var emptyState: some View {
         VStack(spacing: 12) {
             Image(systemName: "checkmark.seal").font(.largeTitle).foregroundStyle(Theme.accent)
             Text("Rien à réviser").font(.title3.bold()).foregroundStyle(Theme.textPrimary)
-            Text("Aucune position due pour l'instant. Explore ou apprends une ouverture pour remplir ta file.")
+            Text("Aucune position due pour l'instant. Ouvre une ouverture et entraîne-la pour remplir ta file.")
                 .font(.subheadline).foregroundStyle(Theme.textTertiary).multilineTextAlignment(.center)
             backButton
         }
@@ -156,9 +243,25 @@ struct OpeningTrainView: View {
         VStack(spacing: 12) {
             Image(systemName: "party.popper").font(.largeTitle).foregroundStyle(Theme.accent)
             Text("Séance terminée !").font(.title3.bold()).foregroundStyle(Theme.textPrimary)
-            Text("\(viewModel.reviewedCount) position(s) révisée(s).")
+            Text("\(viewModel.reviewedCount) coup(s) joué(s).")
                 .font(.subheadline).foregroundStyle(Theme.textSecondary)
-            backButton
+            HStack(spacing: 12) {
+                Button { viewModel.restart() } label: {
+                    Label("Recommencer", systemImage: "arrow.clockwise")
+                        .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.textPrimary)
+                        .padding(.horizontal, 20).padding(.vertical, 12)
+                        .background(Theme.surface, in: Capsule())
+                        .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
+                }
+                .buttonStyle(.pressable)
+                Button(action: onExit) {
+                    Text("Retour").font(.subheadline.weight(.semibold)).foregroundStyle(Theme.background)
+                        .padding(.horizontal, 24).padding(.vertical, 12)
+                        .background(Theme.accentGradient, in: Capsule())
+                }
+                .buttonStyle(.pressable)
+            }
+            .padding(.top, 4)
         }
         .padding(24)
         .overlay { CelebrationView() }

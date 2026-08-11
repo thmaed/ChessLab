@@ -3,16 +3,20 @@ import Foundation
 import Observation
 import SwiftData
 
-/// Mode ENTRAÎNER : répétition espacée FSRS, l'unité étant la POSITION. Une file
-/// quotidienne présente les positions dues (+ un quota de neuves) ; l'utilisateur
-/// retrouve le coup, note sa performance, et la position est replanifiée puis
-/// SYNCHRONISÉE (``OpeningProgressStore`` → store « Games » iCloud).
+/// Mode ENTRAÎNER — « ligne guidée » : on parcourt une ouverture sur UN seul
+/// échiquier continu (comme le lecteur), sauf que c'est l'utilisateur qui joue
+/// SON camp ; l'adversaire répond tout seul, sur la ligne principale de la
+/// branche courante.
 ///
-/// - La riposte adverse (contexte après une bonne réponse) est pondérée par la
-///   fréquence club (``OpeningOpponent``), jamais uniforme.
-/// - Erreur → correction immédiate + explication, replanifiée au plus tôt (Again).
-/// - Modes : quotidien, positions difficiles uniquement, ligne complète « sans
-///   filet » (pas d'indice).
+/// - Coup principal → accepté, l'adversaire enchaîne, on continue (pas de clic).
+/// - Variante du répertoire → l'utilisateur CHOISIT : la jouer, ou rester sur
+///   la principale (``pendingVariation`` / ``playVariation`` / ``keepMainLine``).
+/// - Coup hors répertoire → erreur : flèche du bon coup + commentaire, puis
+///   ``continueAfterWrong`` joue le bon coup et poursuit.
+///
+/// La répétition espacée FSRS reste EN COULISSE : chaque position jouée est
+/// notée automatiquement (``OpeningProgressStore`` → store « Games » iCloud),
+/// planification inchangée. Modes : quotidien, positions difficiles, une ligne.
 @Observable
 @MainActor
 final class OpeningTrainViewModel {
@@ -23,75 +27,111 @@ final class OpeningTrainViewModel {
     }
 
     enum Phase: Equatable {
-        case awaiting          // l'utilisateur doit jouer
-        case correct           // bonne réponse : choix de la note
-        case wrong             // mauvaise réponse : correction affichée
-        case complete          // file épuisée
-        case empty             // rien à réviser
+        case awaiting          // à l'utilisateur de jouer
+        case opponentMoving    // l'adversaire va répondre (auto)
+        case variation         // l'utilisateur a joué une variante : à lui de choisir
+        case wrong             // coup hors répertoire : correction affichée
+        case complete          // séance terminée
+        case empty             // rien à entraîner
     }
 
     let mode: Mode
     private let context: ModelContext
-    private var courses: [String: OpeningCourse] = [:]
-    private var rng = SystemRandomNumberGenerator()
+    private let synchronousOpponent: Bool
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
 
-    private(set) var queue: [TrainCard] = []
-    private(set) var index = 0
+    // Séance : suite de cours (ouvertures) à parcourir.
+    private var sessionCourses: [OpeningCourse] = []
+    private var courseIndex = 0
+    private(set) var course: OpeningCourse?
+
+    // Marche du graphe sur un plateau continu.
+    private(set) var board: Board
+    private(set) var orientation: Piece.Color = .white
+    private(set) var currentKey: String = ""
+    private(set) var lastMove: Move?
+    private(set) var playedSANs: [String] = []
+    private(set) var currentComment: String?
+
+    var selectedSquare: Square?
+    var legalTargetSquares: [Square] = []
+    var pendingPromotion: PendingPromotion?
+    private(set) var hintMoves: [HintMove] = []
+    private(set) var usedHint = false
+
     private(set) var phase: Phase = .awaiting
     private(set) var reviewedCount = 0
 
-    private(set) var board: Board
-    private(set) var orientation: Piece.Color = .white
-    var selectedSquare: Square?
-    var legalTargetSquares: [Square] = []
-    private(set) var lastMove: Move?
-    var pendingPromotion: PendingPromotion?
-    var hintMoves: [HintMove] = []
-    private(set) var currentComment: String?
-    private(set) var usedHint = false
+    // Variante en attente de choix ; coup correct à rejouer après une erreur.
+    private var pendingVariation: (played: MoveEdge, main: MoveEdge)?
+    private var wrongMainEdge: MoveEdge?
+    var variationPlayedSAN: String? { pendingVariation?.played.san }
+    var variationMainSAN: String? { pendingVariation?.main.san }
+    var wrongCorrectSAN: String? { wrongMainEdge?.san }
 
-    /// Charge les cours depuis le bundle embarqué. Les modes quotidien/difficiles
-    /// se LIMITENT au répertoire personnel s'il en existe un (priorisation des
-    /// révisions) ; `fullLine` ne charge que le cours ciblé.
+    private var opponentToken = 0
+
+    var courseName: String { course?.name ?? "" }
+    var isUserTurn: Bool { phase == .awaiting && pendingPromotion == nil }
+
+    // MARK: Init
+
     convenience init(mode: Mode, context: ModelContext, newLimit: Int = 20, now: Date = Date()) {
         var loaded: [String: OpeningCourse] = [:]
         if case let .fullLine(courseID) = mode {
-            if let course = OpeningCourseLoader.course(id: courseID) { loaded[courseID] = course }
+            if let c = OpeningCourseLoader.course(id: courseID) { loaded[courseID] = c }
         } else {
             let repertoire = RepertoireStore.memberIDs(in: context)
             for entry in OpeningCourseLoader.catalog {
                 if !repertoire.isEmpty && !repertoire.contains(entry.id) { continue }
-                if let course = OpeningCourseLoader.course(id: entry.id) { loaded[entry.id] = course }
+                if let c = OpeningCourseLoader.course(id: entry.id) { loaded[entry.id] = c }
             }
         }
         self.init(mode: mode, context: context, courses: loaded, newLimit: newLimit, now: now)
     }
 
-    /// Init désigné (cours injectés) — testable sans bundle.
-    init(mode: Mode, context: ModelContext, courses: [String: OpeningCourse], newLimit: Int = 20, now: Date = Date()) {
+    /// Init désigné (cours injectés) — testable sans bundle. `synchronousOpponent`
+    /// joue la riposte adverse immédiatement (sans délai) pour les tests.
+    init(
+        mode: Mode, context: ModelContext, courses: [String: OpeningCourse],
+        newLimit: Int = 20, now: Date = Date(), synchronousOpponent: Bool = false
+    ) {
         self.mode = mode
         self.context = context
-        self.courses = courses
+        self.synchronousOpponent = synchronousOpponent
         self.board = Board(position: .standard)
 
-        // Tire d'abord l'état synchronisé (autres appareils) avant de bâtir la file.
         OpeningProgressSync.reconcile(in: context)
-        buildQueue(newLimit: newLimit, now: now)
-        loadCurrentCard()
+        sessionCourses = Self.buildSession(mode: mode, courses: courses, context: context, newLimit: newLimit, now: now)
+        if let first = sessionCourses.first {
+            startCourse(first)
+        } else {
+            phase = .empty
+        }
     }
 
-    private func buildQueue(newLimit: Int, now: Date) {
-        let snapshots = Self.snapshots(in: context)
+    /// Suite de cours à parcourir : la ligne ciblée en `fullLine`, sinon les
+    /// ouvertures (du répertoire) qui ont des positions dues / difficiles, par
+    /// ordre d'urgence et plafonnées.
+    private static func buildSession(
+        mode: Mode, courses: [String: OpeningCourse], context: ModelContext, newLimit: Int, now: Date
+    ) -> [OpeningCourse] {
         switch mode {
-        case .daily:
-            let cards = courses.values.flatMap { OpeningTrainingQueue.trainableCards(of: $0) }
-            queue = OpeningTrainingQueue.dailyQueue(cards: cards, progress: snapshots, now: now, newLimit: newLimit)
-        case .hardest:
-            let cards = courses.values.flatMap { OpeningTrainingQueue.trainableCards(of: $0) }
-            queue = OpeningTrainingQueue.hardestQueue(cards: cards, progress: snapshots)
-        case let .fullLine(courseID):
-            queue = courses[courseID].map { OpeningTrainingQueue.lineCards(of: $0) } ?? []
+        case let .fullLine(id):
+            return courses[id].map { [$0] } ?? []
+        case .daily, .hardest:
+            let snapshots = snapshots(in: context)
+            let allCards = courses.values.flatMap { OpeningTrainingQueue.trainableCards(of: $0) }
+            let queue: [TrainCard] = {
+                if case .daily = mode {
+                    return OpeningTrainingQueue.dailyQueue(cards: allCards, progress: snapshots, now: now, newLimit: newLimit)
+                }
+                return OpeningTrainingQueue.hardestQueue(cards: allCards, progress: snapshots)
+            }()
+            var seen = Set<String>()
+            var ids: [String] = []
+            for card in queue where seen.insert(card.courseID).inserted { ids.append(card.courseID) }
+            return ids.prefix(8).compactMap { courses[$0] }
         }
     }
 
@@ -106,42 +146,94 @@ final class OpeningTrainViewModel {
         return map
     }
 
-    // MARK: État dérivé
+    // MARK: Marche du graphe
 
-    var currentCard: TrainCard? { index < queue.count ? queue[index] : nil }
-    var total: Int { queue.count }
-    var remaining: Int { max(0, queue.count - index) }
-    var allowsHints: Bool { if case .fullLine = mode { return false } else { return true } }
-    var isUserTurn: Bool { phase == .awaiting && pendingPromotion == nil }
-
-    /// Note FSRS AUTO-DÉRIVÉE de la performance (plus de notation manuelle, qui
-    /// déroutait) : erreur → Encore (revu bientôt), indice utilisé → Difficile,
-    /// réussite nette → Bien. La planification espacée reste identique, mais
-    /// invisible : l'utilisateur clique juste « Continuer ».
-    var autoRating: FSRSRating {
-        if phase == .wrong { return .again }
-        return usedHint ? .hard : .good
+    /// Coups jouables à `key`, ligne principale d'abord puis par popularité club.
+    private func candidates(at key: String) -> [MoveEdge] {
+        (course?.node(at: key)?.moves ?? []).sorted { a, b in
+            if (a.role == .mainLine) != (b.role == .mainLine) { return a.role == .mainLine }
+            return (a.popularityClub ?? 0) > (b.popularityClub ?? 0)
+        }
     }
 
-    /// Enregistre la note auto-dérivée et enchaîne la carte suivante.
-    func advance() { grade(autoRating) }
+    private var mainEdge: MoveEdge? { candidates(at: currentKey).first }
 
-    // MARK: Chargement de carte
+    private func startCourse(_ c: OpeningCourse) {
+        course = c
+        orientation = c.side.color
+        board = Board(position: OpeningFENKey.position(from: c.rootFEN) ?? .standard)
+        currentKey = c.rootFEN
+        playedSANs = []
+        lastMove = nil
+        currentComment = c.summary?.resolved(languageCode)
+        clearTurnState()
+        advanceTurn()
+    }
 
-    private func loadCurrentCard() {
+    private func clearTurnState() {
         clearSelection()
         hintMoves = []
         usedHint = false
-        currentComment = nil
-        lastMove = nil
+        pendingVariation = nil
+        wrongMainEdge = nil
         pendingPromotion = nil
-        guard let card = currentCard else {
-            phase = queue.isEmpty ? .empty : .complete
+    }
+
+    /// Détermine à qui de jouer à `currentKey` et enchaîne : fin de ligne →
+    /// cours suivant ; trait à l'utilisateur → on attend ; sinon l'adversaire joue.
+    private func advanceTurn() {
+        if candidates(at: currentKey).isEmpty {
+            nextCourseOrComplete()
             return
         }
-        orientation = courses[card.courseID]?.side.color ?? .white
-        board = Board(position: OpeningFENKey.position(from: card.fenKey) ?? .standard)
-        phase = .awaiting
+        if board.position.sideToMove == orientation {
+            phase = .awaiting
+        } else {
+            phase = .opponentMoving
+            if synchronousOpponent {
+                performOpponentMove()
+            } else {
+                scheduleOpponentMove()
+            }
+        }
+    }
+
+    private func scheduleOpponentMove() {
+        opponentToken += 1
+        let token = opponentToken
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.55) { [weak self] in
+            guard let self, self.opponentToken == token, self.phase == .opponentMoving else { return }
+            self.performOpponentMove()
+        }
+    }
+
+    private func performOpponentMove() {
+        guard let edge = mainEdge else { nextCourseOrComplete(); return }
+        apply(edge, isUser: false)
+        advanceTurn()
+    }
+
+    private func nextCourseOrComplete() {
+        courseIndex += 1
+        if courseIndex < sessionCourses.count {
+            startCourse(sessionCourses[courseIndex])
+        } else {
+            phase = .complete
+        }
+    }
+
+    /// Applique une arête au plateau continu et affiche le commentaire du coup
+    /// (le « 1 demi-coup après » : le commentaire suit le coup joué).
+    private func apply(_ edge: MoveEdge, isUser: Bool) {
+        guard let applied = OpeningExplorerViewModel.apply(uci: edge.uci, to: board) else { return }
+        board = applied.board
+        lastMove = applied.move
+        currentKey = edge.toFEN
+        currentComment = edge.displayableComment(languageCode)
+        playedSANs.append(edge.san)
+        hintMoves = []
+        if isUser { reviewedCount += 1 }
+        Haptics.move()
     }
 
     // MARK: Interaction
@@ -187,7 +279,7 @@ final class OpeningTrainViewModel {
             pendingPromotion = PendingPromotion(scratch: scratch, move: move)
             return
         }
-        evaluate(scratch: scratch, move: move)
+        evaluate(uci: move.lan)
     }
 
     func completePromotion(to kind: Piece.Kind) {
@@ -195,71 +287,95 @@ final class OpeningTrainViewModel {
         pendingPromotion = nil
         var scratch = pending.scratch
         let move = scratch.completePromotion(of: pending.move, to: kind)
-        evaluate(scratch: scratch, move: move)
+        evaluate(uci: move.lan)
     }
 
     func cancelPromotion() { pendingPromotion = nil }
 
-    func showHint() {
-        guard isUserTurn, allowsHints, let card = currentCard, card.expectedUCI.count >= 4 else { return }
-        usedHint = true
-        hintMoves = [arrow(for: card.expectedUCI)]
-    }
-
-    private func evaluate(scratch: Board, move: Move) {
-        guard let card = currentCard else { return }
-        if move.lan == card.expectedUCI {
-            board = scratch
-            lastMove = move
-            if let comment = card.comment?.resolved(languageCode) { currentComment = comment }
-            playOpponentContext(for: card)
-            phase = .correct
-            Haptics.move()
+    /// Classe le coup joué : principal, variante, ou hors répertoire.
+    private func evaluate(uci: String) {
+        let cands = candidates(at: currentKey)
+        guard let main = cands.first else { return }
+        if let edge = cands.first(where: { $0.uci == uci }) {
+            if edge.uci == main.uci {
+                recordReview(usedHint ? .hard : .good)
+                apply(edge, isUser: true)
+                advanceTurn()
+            } else {
+                // Variante valide : on demande à l'utilisateur.
+                pendingVariation = (played: edge, main: main)
+                phase = .variation
+            }
         } else {
-            revealCorrect(card)
+            // Hors répertoire → erreur : on montre le bon coup, on ne l'applique
+            // pas encore (le plateau reste sur la position).
+            recordReview(.again)
+            wrongMainEdge = main
+            hintMoves = [arrow(for: main.uci)]
+            currentComment = main.displayableComment(languageCode)
             phase = .wrong
             Haptics.illegal()
         }
     }
 
-    /// Après une bonne réponse, joue une riposte adverse PONDÉRÉE (contexte).
-    private func playOpponentContext(for card: TrainCard) {
-        guard let course = courses[card.courseID] else { return }
-        let key = OpeningFENKey.key(for: board.position)
-        guard let node = course.node(at: key), !node.moves.isEmpty,
-              let reply = OpeningOpponent.weightedReply(from: node, using: &rng),
-              let applied = OpeningExplorerViewModel.apply(uci: reply.uci, to: board)
-        else { return }
-        board = applied.board
-        lastMove = applied.move
+    /// « Jouer la variante » : on suit cette branche.
+    func playVariation() {
+        guard let pv = pendingVariation else { return }
+        recordReview(usedHint ? .hard : .good)
+        pendingVariation = nil
+        apply(pv.played, isUser: true)
+        advanceTurn()
     }
 
-    /// Sur une erreur, révèle le bon coup (flèche + application) et son commentaire.
-    private func revealCorrect(_ card: TrainCard) {
-        hintMoves = [arrow(for: card.expectedUCI)]
-        if let applied = OpeningExplorerViewModel.apply(uci: card.expectedUCI, to: board) {
-            board = applied.board
-            lastMove = applied.move
+    /// « Rester sur la principale » : on joue le coup principal à la place et on
+    /// note que la variante était aussi jouable.
+    func keepMainLine() {
+        guard let pv = pendingVariation else { return }
+        recordReview(usedHint ? .hard : .good)
+        let alt = pv.played.san
+        pendingVariation = nil
+        apply(pv.main, isUser: true)
+        let note = languageCode == "fr" ? "Aussi jouable : \(alt)." : "Also playable: \(alt)."
+        currentComment = [note, currentComment].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
+        advanceTurn()
+    }
+
+    /// Après une erreur : on joue le bon coup et on poursuit la ligne.
+    func continueAfterWrong() {
+        guard let main = wrongMainEdge else { return }
+        wrongMainEdge = nil
+        apply(main, isUser: true)
+        advanceTurn()
+    }
+
+    func showHint() {
+        guard isUserTurn, let main = mainEdge else { return }
+        usedHint = true
+        hintMoves = [arrow(for: main.uci)]
+    }
+
+    /// Recommence la séance depuis le début.
+    func restart() {
+        courseIndex = 0
+        reviewedCount = 0
+        if let first = sessionCourses.first {
+            startCourse(first)
+        } else {
+            phase = .empty
         }
-        if let comment = card.comment?.resolved(languageCode) { currentComment = comment }
+    }
+
+    // MARK: Progression FSRS
+
+    /// Note FSRS auto-dérivée : erreur → Encore, indice → Difficile, sinon Bien.
+    /// Enregistre pour la position OÙ l'utilisateur devait jouer (`currentKey`).
+    private func recordReview(_ rating: FSRSRating) {
+        var effective = rating
+        if usedHint, effective.rawValue > FSRSRating.hard.rawValue { effective = .hard }
+        OpeningProgressStore.recordReview(fenKey: currentKey, rating: effective, in: context)
     }
 
     private func arrow(for uci: String) -> HintMove {
         HintMove(rank: 1, from: Square(String(uci.prefix(2))), to: Square(String(uci.dropFirst(2).prefix(2))), strength: 1)
-    }
-
-    // MARK: Notation / progression
-
-    /// Enregistre la note FSRS (replanifie + journalise + synchronise) et passe
-    /// à la carte suivante.
-    func grade(_ rating: FSRSRating) {
-        guard let card = currentCard, phase == .correct || phase == .wrong else { return }
-        var effective = rating
-        // Un indice utilisé plafonne une réussite à « Difficile ».
-        if usedHint, rating.rawValue > FSRSRating.hard.rawValue { effective = .hard }
-        OpeningProgressStore.recordReview(fenKey: card.fenKey, rating: effective, in: context)
-        reviewedCount += 1
-        index += 1
-        loadCurrentCard()
     }
 }

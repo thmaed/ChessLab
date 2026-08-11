@@ -24,7 +24,9 @@ struct OpeningTrainViewModelTests {
         return context
     }
 
-    /// Cours à une seule carte : blancs au trait à la racine, coup attendu e4.
+    private var rootKey: String { OpeningFENKey.key(for: .standard) }
+
+    /// Cours à un coup : blancs au trait à la racine, coup attendu e4, puis feuille.
     private func singleCardCourse() -> OpeningCourse {
         let root = OpeningFENKey.key(for: .standard)
         var b = Board(position: .standard); _ = b.move(pieceAt: Square("e2"), to: Square("e4"))
@@ -35,53 +37,69 @@ struct OpeningTrainViewModelTests {
                              positions: [root: PositionNode(fen: root, moves: [e4]), k1: PositionNode(fen: k1)])
     }
 
-    private func vm(_ mode: OpeningTrainViewModel.Mode = .daily, _ context: ModelContext, course: OpeningCourse) -> OpeningTrainViewModel {
-        OpeningTrainViewModel(mode: mode, context: context, courses: ["c": course])
+    /// Racine avec DEUX coups : principale e4, variante d4.
+    private func branchingCourse() -> OpeningCourse {
+        let root = OpeningFENKey.key(for: .standard)
+        var be = Board(position: .standard); _ = be.move(pieceAt: Square("e2"), to: Square("e4"))
+        let kE = OpeningFENKey.key(for: be.position)
+        var bd = Board(position: .standard); _ = bd.move(pieceAt: Square("d2"), to: Square("d4"))
+        let kD = OpeningFENKey.key(for: bd.position)
+        let e4 = MoveEdge(san: "e4", uci: "e2e4", toFEN: kE, role: .mainLine)
+        let d4 = MoveEdge(san: "d4", uci: "d2d4", toFEN: kD, role: .sideline)
+        return OpeningCourse(id: "c", name: "C", side: .white, rootFEN: root,
+                             positions: [root: PositionNode(fen: root, moves: [e4, d4]),
+                                         kE: PositionNode(fen: kE), kD: PositionNode(fen: kD)])
     }
 
-    @Test func dailyQueueCountsNewPositions() throws {
+    private func vm(_ mode: OpeningTrainViewModel.Mode = .daily, _ context: ModelContext, course: OpeningCourse) -> OpeningTrainViewModel {
+        OpeningTrainViewModel(mode: mode, context: context, courses: ["c": course], synchronousOpponent: true)
+    }
+
+    private func lastLogRating(in context: ModelContext, fen: String) throws -> Int? {
+        let logs = try context.fetch(FetchDescriptor<OpeningReviewLog>())
+        return logs.first(where: { $0.fenKey == fen })?.ratingRaw
+    }
+
+    @Test func dailySessionStartsAwaitingOnACourse() throws {
         let context = try makeContext()
         let course = OpeningGraphFixtures.linearCourse(id: "c", name: "Italienne", sans: ["e4", "e5", "Nf3", "Nc6", "Bc4"], side: .white)
         let model = vm(.daily, context, course: course)
-        #expect(model.total == 3)          // 3 positions blanches neuves
-        #expect(model.phase == .awaiting)
+        #expect(model.phase == .awaiting)          // trait aux blancs à la racine
+        #expect(model.courseName == "Italienne")
     }
 
-    @Test func correctMoveThenGoodRecordsAndAdvances() throws {
+    @Test func correctMoveRecordsGoodAndFlows() throws {
         let context = try makeContext()
-        let course = singleCardCourse()
-        let model = vm(.daily, context, course: course)
-        let card = try #require(model.currentCard)
+        let model = vm(.daily, context, course: singleCardCourse())
 
         model.attemptMove(from: Square("e2"), to: Square("e4"))
-        #expect(model.phase == .correct)
-        #expect(model.currentComment == "Contrôle le centre.")
-        #expect(model.autoRating == .good)                         // réussite nette → Bien
-
-        model.advance()
-        #expect(model.reviewedCount == 1)
+        // Un seul coup dans le cours → la ligne se termine tout de suite (auto-avance).
         #expect(model.phase == .complete)
+        #expect(model.reviewedCount == 1)
+        #expect(model.currentComment == "Contrôle le centre.")   // commentaire du coup joué
+        #expect(model.playedSANs == ["e4"])
 
-        // Progression enregistrée ET journalisée (donc synchronisable).
-        let progress = try #require(OpeningProgressStore.progress(forFEN: card.fenKey, in: context))
+        let progress = try #require(OpeningProgressStore.progress(forFEN: rootKey, in: context))
         #expect(progress.reps == 1)
         #expect(progress.dueDate != nil)
-        #expect(try context.fetchCount(FetchDescriptor<OpeningReviewLog>()) == 1)
+        #expect(try lastLogRating(in: context, fen: rootKey) == FSRSRating.good.rawValue)
     }
 
     @Test func wrongMoveShowsCorrectionAndRecordsAgain() throws {
         let context = try makeContext()
-        let course = singleCardCourse()
-        let model = vm(.daily, context, course: course)
-        let card = try #require(model.currentCard)
+        let model = vm(.daily, context, course: singleCardCourse())
 
-        model.attemptMove(from: Square("d2"), to: Square("d4"))   // mauvais coup
+        model.attemptMove(from: Square("d2"), to: Square("d4"))   // coup hors répertoire
         #expect(model.phase == .wrong)
-        #expect(model.autoRating == .again)                        // erreur → Encore
-        #expect(!model.hintMoves.isEmpty)                          // bon coup révélé
+        #expect(model.wrongCorrectSAN == "e4")                    // le bon coup est révélé
+        #expect(!model.hintMoves.isEmpty)                          // flèche du bon coup
+        #expect(try lastLogRating(in: context, fen: rootKey) == FSRSRating.again.rawValue)
 
-        model.advance()
-        let progress = try #require(OpeningProgressStore.progress(forFEN: card.fenKey, in: context))
+        model.continueAfterWrong()                                // joue e4 et poursuit
+        #expect(model.playedSANs == ["e4"])
+        #expect(model.phase == .complete)
+
+        let progress = try #require(OpeningProgressStore.progress(forFEN: rootKey, in: context))
         #expect(progress.reps == 1)
         #expect(progress.stateRaw == FSRSState.learning.rawValue)  // « again » sur une neuve → learning
     }
@@ -92,18 +110,53 @@ struct OpeningTrainViewModelTests {
 
         model.showHint()
         #expect(model.usedHint)
-        model.attemptMove(from: Square("e2"), to: Square("e4"))
-        #expect(model.phase == .correct)
-        #expect(model.autoRating == .hard)                         // indice utilisé → Difficile
+        #expect(!model.hintMoves.isEmpty)
+        model.attemptMove(from: Square("e2"), to: Square("e4"))    // juste, MAIS indice utilisé
+        #expect(model.phase == .complete)
+        #expect(try lastLogRating(in: context, fen: rootKey) == FSRSRating.hard.rawValue)
     }
 
-    @Test func fullLineModeDisablesHints() throws {
+    @Test func variationPromptThenPlayVariation() throws {
         let context = try makeContext()
-        let course = OpeningGraphFixtures.linearCourse(id: "c", name: "Italienne", sans: ["e4", "e5", "Nf3"], side: .white)
-        let model = OpeningTrainViewModel(mode: .fullLine(courseID: "c"), context: context, courses: ["c": course])
-        #expect(!model.allowsHints)
-        model.showHint()
-        #expect(!model.usedHint)   // sans filet : l'indice ne fait rien
+        let model = OpeningTrainViewModel(mode: .fullLine(courseID: "c"), context: context,
+                                          courses: ["c": branchingCourse()], synchronousOpponent: true)
+        model.attemptMove(from: Square("d2"), to: Square("d4"))    // variante
+        #expect(model.phase == .variation)
+        #expect(model.variationPlayedSAN == "d4")
+        #expect(model.variationMainSAN == "e4")
+
+        model.playVariation()
+        #expect(model.playedSANs == ["d4"])                        // on a suivi la variante
+        #expect(model.phase == .complete)
+    }
+
+    @Test func variationKeepMainLinePlaysMainAndNotes() throws {
+        let context = try makeContext()
+        let model = OpeningTrainViewModel(mode: .fullLine(courseID: "c"), context: context,
+                                          courses: ["c": branchingCourse()], synchronousOpponent: true)
+        model.attemptMove(from: Square("d2"), to: Square("d4"))    // variante
+        #expect(model.phase == .variation)
+
+        model.keepMainLine()
+        #expect(model.playedSANs == ["e4"])                        // on a joué la principale
+        #expect(model.currentComment?.contains("d4") == true)      // note « aussi jouable : d4 »
+        #expect(model.phase == .complete)
+    }
+
+    @Test func opponentAutoPlaysBetweenUserMoves() throws {
+        let context = try makeContext()
+        let course = OpeningGraphFixtures.linearCourse(id: "c", name: "Ligne", sans: ["e4", "e5", "Nf3"], side: .white)
+        let model = OpeningTrainViewModel(mode: .fullLine(courseID: "c"), context: context,
+                                          courses: ["c": course], synchronousOpponent: true)
+
+        model.attemptMove(from: Square("e2"), to: Square("e4"))    // notre coup
+        // La riposte adverse (e5) est jouée automatiquement, puis c'est de nouveau à nous.
+        #expect(model.playedSANs == ["e4", "e5"])
+        #expect(model.phase == .awaiting)
+
+        model.attemptMove(from: Square("g1"), to: Square("f3"))    // notre 2e coup → fin de ligne
+        #expect(model.playedSANs == ["e4", "e5", "Nf3"])
+        #expect(model.phase == .complete)
     }
 
     @Test func emptyWhenNoTrainablePositions() throws {
@@ -113,7 +166,6 @@ struct OpeningTrainViewModelTests {
         let course = OpeningCourse(id: "c", name: "C", side: .black, rootFEN: root,
                                    positions: [root: PositionNode(fen: root)])
         let model = OpeningTrainViewModel(mode: .daily, context: context, courses: ["c": course])
-        #expect(model.total == 0)
         #expect(model.phase == .empty)
     }
 }
