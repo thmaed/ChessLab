@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Gambit Stafford (1.e4 e5 2.Cf3 Cf6 3.Cxe5 Cc6) — répertoire NOIR (piège)."""
+"""Gambit Stafford (1.e4 e5 2.Cf3 Cf6 3.Cxe5 Cc6) — répertoire NOIR.
+
+Une arme de blitz : objectivement douteuse, mais bourrée de pièges. Ligne
+principale d'attaque + le piège classique qui gagne la dame. Lignes vérifiées.
+"""
 
 
 def c(fr, en):
@@ -13,40 +17,33 @@ COURSE = {
     "level": "club",
     "eco": ["C42"],
     "summary": c(
-        "Douteux mais redoutable en partie rapide : un pion pour un développement fou et une nuée de pièges à f2/e4. À jouer en connaissant les combinaisons.",
-        "Objectively dubious but deadly in blitz: a pawn for wild development and a swarm of f2/e4 traps. Play it knowing the combinations.",
+        "Un gambit surprise dans la Petrov : on rend un pion pour un développement fou et des pièges mortels sur f2 et e4. Douteux au fond, redoutable en blitz.",
+        "A surprise gambit in the Petrov: give back a pawn for wild development and deadly traps on f2 and e4. Dubious at heart, lethal in blitz.",
     ),
     "lines": [
         {
-            "chapter": {"id": "main", "title": c("Idée principale", "Main idea")},
+            "chapter": {"id": "main", "title": c("Attaque principale", "Main attack")},
             "moves": [
                 "e4", "e5", "Nf3", "Nf6",
-                {"san": "Nxe5", "comment": c("Les Blancs prennent le pion offert…",
-                                             "White grabs the offered pawn…")},
-                {"san": "Nc6", "eco": "Russian Game: Stafford Gambit", "critical": True,
-                 "comment": c("Le gambit Stafford ! On sacrifie e5 pour un développement explosif et des menaces sur f2 et e4.",
-                              "The Stafford Gambit! Sacrificing e5 for explosive development and threats on f2 and e4.")},
-                "Nxc6", "dxc6",
-                {"san": "d3", "comment": c("Le développement le plus sain pour les Blancs — mais il reste des pièges partout.",
-                                           "White's soundest setup — yet traps lurk everywhere.")},
-                {"san": "Bc5", "comment": c("Le fou vise f2 ; suivront …Cg4, …Dd4 ou …Fg4 avec une attaque directe.",
-                                            "The bishop eyes f2; …Ng4, …Qd4 or …Bg4 follow with a direct attack.")},
+                {"san": "Nxe5", "comment": c("Les Blancs prennent e5 ; la réponse Stafford est le surprenant …Cc6.",
+                                             "White grabs e5; the Stafford reply is the surprising …Nc6.")},
+                {"san": "Nc6", "eco": "Russian Game: Stafford Gambit",
+                 "comment": c("Le coup Stafford : on offre un pion pour ramener le cavalier et développer à toute vitesse.",
+                              "The Stafford move: offer a pawn to bring the knight back and develop at top speed.")},
+                "Nxc6", "dxc6", "d3", "Bc5",
+                {"san": "Nc3", "comment": c("La bonne défense : on protège e4 (sinon …Cxe4 déclenche la combinaison sur f2).",
+                                            "The correct defence: guard e4 (otherwise …Nxe4 unleashes the f2 combination).")},
+                "Ng4", "Be3", "Bxe3", "fxe3", "Qh4+", "g3", "Qf6", "Qe2", "Ne5",
             ],
         },
         {
-            "chapter": {"id": "trap", "title": c("Le piège …Cxe4 / …Fxf2+", "The …Nxe4 / …Bxf2+ trap")},
+            "chapter": {"id": "trap", "title": c("Piège — Fg5 ?", "Trap — Bg5?")},
             "moves": [
                 "e4", "e5", "Nf3", "Nf6", "Nxe5", "Nc6", "Nxc6", "dxc6", "d3", "Bc5",
-                {"san": "Bg5", "role": "inaccuracy", "critical": True,
-                 "comment": c("Un développement naturel… et fatal : il autorise la combinaison type du Stafford.",
-                              "A natural developing move… and a fatal one: it allows the Stafford's signature combination.")},
-                {"san": "Nxe4", "role": "trap", "critical": True,
-                 "comment": c("Le coup à connaître ! Le cavalier se sacrifie pour ouvrir la voie à …Fxf2+.",
-                              "The move to know! The knight sacrifices itself to open the way for …Bxf2+.")},
-                "dxe4",
-                {"san": "Bxf2+", "comment": c("L'estocade : après Rxf2, …Dxd1 gagne la dame.",
-                                              "The finishing blow: after Kxf2, …Qxd1 wins the queen.")},
-                "Kxf2", "Qxd1",
+                {"san": "Bg5", "role": "trap",
+                 "comment": c("Le clouage naturel… mais fatal : il tombe sur une combinaison qui gagne la dame.",
+                              "The natural pin… but fatal: it runs into a combination that wins the queen.")},
+                "Nxe4", "dxe4", "Bxf2+", "Kxf2", "Qxd1",
             ],
         },
     ],

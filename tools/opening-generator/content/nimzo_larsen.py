@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-"""Attaque Nimzowitsch-Larsen (1.b3) — répertoire BLANC."""
+"""Attaque Nimzo-Larsen (1.b3) — répertoire BLANC.
+
+Arbre : contre …e5, contre …d5, contre …Cf6/…g6. Lignes vérifiées.
+"""
 
 
 def c(fr, en):
@@ -13,26 +16,32 @@ COURSE = {
     "level": "club",
     "eco": ["A01"],
     "summary": c(
-        "Hypermoderne : le fou dame se fianchette en b2 et rayonne sur la grande diagonale vers e5 et g7. Ouverture de flanc originale, dépaysante pour l'adversaire.",
-        "Hypermodern: the queen's bishop fianchettoes to b2, raking the long diagonal toward e5 and g7. An original flank opening that takes opponents out of book.",
+        "1.b3 : le fou dame se fianchette en b2 et vise le centre et le roque adverse sur la grande diagonale. Peu théorique, très logique, souvent piégeur.",
+        "1.b3: the queen's bishop fianchettoes to b2 and eyes the centre and Black's king along the long diagonal. Little theory, very logical, often tricky.",
     ),
     "lines": [
         {
-            "chapter": {"id": "vs-e5", "title": c("Contre 1…e5", "Against 1…e5")},
+            "chapter": {"id": "vs-e5", "title": c("Contre …e5", "vs …e5")},
             "moves": [
                 {"san": "b3", "eco": "Nimzo-Larsen Attack",
-                 "comment": c("Le fianchetto dame : le fou b2 vise déjà e5 et la grande diagonale.",
-                              "The queenside fianchetto: the b2 bishop already eyes e5 and the long diagonal.")},
-                "e5", "Bb2",
-                {"san": "Nc6", "comment": c("Les Noirs défendent e5 ; les Blancs le pressent par Cf3 puis e3, Fb5.",
-                                            "Black defends e5; White presses it with Nf3, then e3 and Bb5.")},
-                "e3", "Nf6", "Bb5", "Bd6", "Nf3", "Qe7",
+                 "comment": c("Le fou ira en b2 : toute la stratégie tourne autour de la grande diagonale a1-h8.",
+                              "The bishop heads for b2: the whole strategy revolves around the a1-h8 diagonal.")},
+                "e5", "Bb2", "Nc6", "e3", "Nf6",
+                {"san": "Bb5", "comment": c("On presse c6 pour saper le défenseur de e5, cible du fou b2.",
+                                            "Pressing c6 to undermine the defender of e5, the b2 bishop's target.")},
+                "Bd6", "Nf3", "Qe7", "d3", "a6", "Bxc6", "dxc6", "Nbd2", "O-O",
             ],
         },
         {
-            "chapter": {"id": "vs-d5", "title": c("Contre 1…d5", "Against 1…d5")},
+            "chapter": {"id": "vs-d5", "title": c("Contre …d5", "vs …d5")},
             "moves": [
-                "b3", "d5", "Bb2", "Nf6", "e3", "e6", "Nf3", "Be7", "c4", "O-O",
+                "b3", "d5", "Bb2", "Nf6", "e3", "e6", "Nf3", "Be7", "c4", "O-O", "Nc3", "c5", "cxd5", "Nxd5", "Nxd5", "exd5", "Be2", "Nc6",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-nf6", "title": c("Contre …Cf6/…g6", "vs …Nf6/…g6")},
+            "moves": [
+                "b3", "Nf6", "Bb2", "g6", "Nf3", "Bg7", "e3", "O-O", "Be2", "d6", "O-O", "e5", "c4", "Nbd7",
             ],
         },
     ],

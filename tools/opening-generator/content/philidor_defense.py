@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Défense Philidor (1.e4 e5 2.Cf3 d6) — répertoire NOIR."""
+"""Défense Philidor (1.e4 e5 2.Cf3 d6) — répertoire NOIR.
+
+Arbre : système Hanham (…Cbd7/…Fe7), variante de l'échange (…exd4), et
+l'hybride Philidor-Pirc (…exd4 …g6). Lignes vérifiées.
+"""
 
 
 def c(fr, en):
@@ -13,29 +17,32 @@ COURSE = {
     "level": "club",
     "eco": ["C41"],
     "summary": c(
-        "Solide et compacte : les Noirs soutiennent e5 par …d6 et visent une structure ramassée (…Cbd7, …Fe7, …c6). Peu d'espace, mais très peu de faiblesses.",
-        "Solid and compact: Black supports e5 with …d6 and aims for a tight setup (…Nbd7, …Be7, …c6). Little space, but very few weaknesses.",
+        "Solide et discrète : les Noirs soutiennent e5 par …d6 au lieu de …Cc6. Peu d'espace, mais une position sans faiblesse et des plans clairs (…c6, …Fe7, …0-0).",
+        "Solid and quiet: Black supports e5 with …d6 instead of …Nc6. Little space, but a weakness-free position with clear plans (…c6, …Be7, …0-0).",
     ),
     "lines": [
         {
-            "chapter": {"id": "hanham", "title": c("Système Hanham — 3…Cf6", "Hanham System — 3…Nf6")},
+            "chapter": {"id": "hanham", "title": c("Système Hanham", "Hanham System")},
             "moves": [
-                "e4", "e5", "Nf3", "d6",
-                {"san": "d4", "comment": c("Les Blancs frappent le centre ; l'ordre des coups noir est essentiel.",
-                                           "White strikes the centre; Black's move order matters.")},
-                {"san": "Nf6", "eco": "Philidor Defense: Hanham Variation",
-                 "comment": c("L'ordre moderne : on garde la tension avant de rentrer dans le set-up Hanham.",
-                              "The modern order: keep the tension before entering the Hanham setup.")},
-                "Nc3", "Nbd7", "Bc4", "Be7", "O-O", "O-O", "a4", "c6",
+                "e4", "e5", "Nf3", "d6", "d4", "Nf6", "Nc3", "Nbd7", "Bc4", "Be7", "O-O", "O-O",
+                {"san": "a4", "comment": c("Les Blancs freinent …b5 ; les Noirs manœuvrent tranquillement derrière leur petit centre.",
+                                           "White restrains …b5; Black manoeuvres calmly behind the small centre.")},
+                "c6", "h3", "Qc7", "Qe2", "b6", "Rd1", "Bb7",
             ],
         },
         {
-            "chapter": {"id": "exchange", "title": c("3…exd4", "3…exd4")},
+            "chapter": {"id": "exchange", "title": c("Variante de l'échange", "Exchange Variation")},
             "moves": [
-                "e4", "e5", "Nf3", "d6", "d4", "exd4",
-                {"san": "Nxd4", "comment": c("Après l'échange, les Noirs jouent solide : …Cf6, …Fe7, roque, sans faiblesse.",
-                                             "After the trade, Black plays solidly: …Nf6, …Be7, castle, no weaknesses.")},
-                "Nf6", "Nc3", "Be7", "Be2", "O-O",
+                "e4", "e5", "Nf3", "d6", "d4",
+                {"san": "exd4", "comment": c("On échange au centre pour un jeu simple et solide, sans souci d'espace.",
+                                             "Trade in the centre for simple, solid play, free of space worries.")},
+                "Nxd4", "Nf6", "Nc3", "Be7", "Be2", "O-O", "O-O", "Re8", "h3", "Bf8", "Bf4", "Nbd7", "Qd2", "a6",
+            ],
+        },
+        {
+            "chapter": {"id": "pirc-hybrid", "title": c("Hybride Philidor-Pirc — …g6", "Philidor-Pirc hybrid — …g6")},
+            "moves": [
+                "e4", "e5", "Nf3", "d6", "d4", "exd4", "Nxd4", "g6", "Nc3", "Bg7", "Be3", "Nf6", "f3", "O-O", "Qd2", "Re8",
             ],
         },
     ],

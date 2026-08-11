@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
-"""Ouverture Bird (1.f4) — répertoire BLANC."""
+"""Ouverture Bird (1.f4) — répertoire BLANC.
+
+Arbre : classique (hollandaise inversée, attaque Fe1-h4), gambit From 1…e5,
+et l'installation solide contre …e6. Lignes vérifiées.
+"""
 
 
 def c(fr, en):
@@ -13,31 +17,32 @@ COURSE = {
     "level": "club",
     "eco": ["A02", "A03"],
     "summary": c(
-        "Une sicilienne inversée : 1.f4 contrôle e5 et vise une attaque à l'aile roi. Attention au contre-gambit From, à connaître absolument.",
-        "A reversed Sicilian: 1.f4 controls e5 and aims for a kingside attack. Beware From's Gambit — a must-know.",
+        "1.f4 : une hollandaise avec les Blancs, un temps en plus. On contrôle e5, on fianchette ou on installe un Stonewall, puis on attaque le roque adverse.",
+        "1.f4: a Dutch with White, a tempo up. Control e5, fianchetto or set up a Stonewall, then attack the enemy king.",
     ),
     "lines": [
         {
-            "chapter": {"id": "classical", "title": c("Bird classique — 1…d5", "Classical Bird — 1…d5")},
+            "chapter": {"id": "classical", "title": c("Classique — hollandaise inversée", "Classical — reversed Dutch")},
             "moves": [
-                {"san": "f4", "eco": "Bird Opening",
-                 "comment": c("On prend e5 sous contrôle et on prépare un fianchetto ou une structure Stonewall.",
-                              "Control e5 and prepare a fianchetto or a Stonewall structure.")},
-                "d5", "Nf3", "Nf6", "e3", "g6", "Be2", "Bg7", "O-O", "O-O",
+                {"san": "f4", "eco": "Bird's Opening",
+                 "comment": c("On prend d'emblée le contrôle de e5 : c'est une hollandaise avec un temps de plus.",
+                              "Grab control of e5 at once: it's a Dutch a tempo up.")},
+                "d5", "Nf3", "Nf6", "e3", "g6", "Be2", "Bg7", "O-O", "O-O", "d3", "c5", "Nbd2", "Nc6", "Qe1", "b6", "Qh4", "Bb7",
             ],
         },
         {
-            "chapter": {"id": "from", "title": c("Contre-gambit From — 1…e5", "From's Gambit — 1…e5")},
+            "chapter": {"id": "from", "title": c("Gambit From — 1…e5", "From's Gambit — 1…e5")},
             "moves": [
                 "f4",
-                {"san": "e5", "role": "trap", "critical": True,
-                 "eco": "Bird Opening: From's Gambit",
-                 "comment": c("Le contre-gambit From : un pion pour une attaque immédiate. À NE PAS prendre à la légère.",
-                              "From's Gambit: a pawn for an immediate attack. NOT to be taken lightly.")},
-                "fxe5", "d6", "exd6", "Bxd6",
-                {"san": "Nf3", "comment": c("Le coup vital : Cf3 empêche le mat …Dh4+ et …Dxf2. Sans lui, les Blancs se font massacrer.",
-                                            "The vital move: Nf3 stops the …Qh4+ and …Qxf2 mate. Without it, White gets crushed.")},
-                "g5",
+                {"san": "e5", "comment": c("Le gambit From : un pion pour l'attaque. La bonne voie est de rendre le pion et de finir bien placé.",
+                                           "From's Gambit: a pawn for attack. The right path is to return the pawn and end up well placed.")},
+                "fxe5", "d6", "exd6", "Bxd6", "Nf3", "g5", "d4", "g4", "Ne5", "Bxe5", "dxe5", "Qxd1+", "Kxd1", "Nc6",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-e6", "title": c("Installation solide contre …e6", "Solid setup vs …e6")},
+            "moves": [
+                "f4", "d5", "Nf3", "Nf6", "e3", "e6", "b3", "Be7", "Bb2", "O-O", "Be2", "c5", "O-O", "Nc6",
             ],
         },
     ],
