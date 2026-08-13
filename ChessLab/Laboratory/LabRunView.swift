@@ -138,6 +138,10 @@ struct LabRunView: View {
                     .font(.caption2)
                     .foregroundStyle(Theme.textSecondary)
                     .lineLimit(1)
+                    // La VALEUR avait déjà son facteur de réduction, pas le
+                    // libellé : il se coupait net dans une tuile de 89 pt
+                    // (62 en Display Zoom) — Lot 3.5.
+                    .minimumScaleFactor(0.7)
             }
             Spacer(minLength: 0)
         }
@@ -181,7 +185,9 @@ struct LabRunView: View {
                 }
                 .frame(height: 16)
                 .clipShape(Capsule())
-                HStack(spacing: 14) {
+                // Repli plutôt que compression : la légende réclame ~235 pt
+                // et n'avait aucune borne (Lot 3.5).
+                FlowLayout(spacing: 14, lineSpacing: 6) {
                     legendDot(Theme.accent, "Gagnées \(stats.winsA)")
                     legendDot(Theme.textTertiary, "Nulles \(stats.draws)")
                     legendDot(Theme.danger, "Perdues \(stats.winsB)")

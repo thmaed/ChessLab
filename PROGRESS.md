@@ -3814,3 +3814,144 @@ Ces deux échecs préexistants ne sont **pas** traités ici : hors du périmètr
 des lots demandés, et les diagnostiquer supposerait de démêler un changement
 antérieur non documenté. Ils sont signalés, avec la preuve qu'ils ne viennent
 pas de ce chantier.
+
+## Lot 3 — débordements de largeur sur iPhone (2026-08-13)
+
+### Fait
+
+- **`FlowLayout` corrigé, `WrapLayout` supprimé** (3.4). Les deux étaient
+  dupliqués à l'identique et portaient les deux mêmes défauts :
+  `sizeThatFits(.unspecified)` demandait la largeur idéale **sur une seule
+  ligne** (un texte de puce ne pouvait donc ni se replier ni se tronquer), et
+  la condition de retour à la ligne exigeait `x > minX`, si bien qu'une puce
+  plus large que le conteneur était posée en début de ligne et débordait sans
+  filet. Désormais la largeur proposée aux enfants est **bornée à la ligne**
+  et toute mesure y est écrêtée. `WrapLayout` est un simple `typealias` :
+  une implémentation, une correction. Couvre les **8 sites d'appel**, dont les
+  étiquettes saisies par l'utilisateur d'`AnalysisLibraryView`.
+- **Sélecteur de promotion** (3.1) : tuiles à part égale de la largeur
+  offerte, glyphe borné à 56 pt au lieu d'être figé, libellé en `lineLimit(1)`
+  + `minimumScaleFactor`, carte plafonnée à 420 pt avec une marge de sécurité.
+  **Et le bug de localisation corrigé** : `choices` portait des `String`, donc
+  `Text(_: String)` — « Dame / Tour / Fou / Cavalier » restaient en français
+  en anglais alors que les traductions existaient déjà au catalogue.
+- **Barre de navigation d'*Analyser*** (3.2) : l'indicateur de classification
+  renonce à du contenu au lieu de pousser les boutons dehors — `ViewThatFits`
+  choisit entre la phrase complète, le compteur seul, puis le rouet seul. La
+  barre porte 268 pt incompressibles de boutons ; il restait ~75 pt utiles sur
+  iPhone SE pour un libellé qui en réclame ~125.
+- **Bandeau des pièces capturées** (3.3) : le chevauchement se resserre quand
+  les prises s'accumulent (9 → 7 → 5 pt). Toutes les pièces restent visibles,
+  là où un écrêtage en aurait escamoté.
+- **Rangées sur-remplies** (3.5) : les trios de puces de `NewGameSetupView` et
+  `PositionEditorView` passent en `FlowLayout` (ils réclamaient ~323 et
+  ~326 pt pour 303 disponibles) ; la légende du laboratoire aussi ; le libellé
+  de `statTile` reçoit le `minimumScaleFactor` qui manquait.
+- **`HelpView`** (3.6) : `UIScreen.main.bounds.width * 0.6` consommé en
+  `.frame(width:)` — une largeur DURE calculée sur l'écran physique — devient
+  un `containerRelativeFrame`, qui suit la fenêtre. En Slide Over sur iPad
+  (fenêtre 320, écran 1 024) l'image réclamait 670 pt, soit 420 hors cadre, et
+  la valeur ne s'invalidait jamais au redimensionnement.
+- **Icône décorative des tuiles d'accueil** : masquée à l'accessibilité, et
+  fond écrêté (VoiceOver n'annonce plus « person.2.fill »).
+
+### Vérifié — mesuré sur iPhone SE (375 pt), taille par défaut ET AX5
+
+`DynamicTypeOverflowUITests` parcourt les écrans d'entrée aux deux tailles.
+Après correction, **plus aucun débordement** sur *nouvelle partie*, *deux
+joueurs* et *puzzles* — y compris en **AX5**, où les puces débordaient
+jusqu'à ~190 pt hors écran.
+
+Sélecteur de promotion, avant → après (iPhone SE, français) :
+
+| | Avant | Après |
+|---|---|---|
+| Tuile « Dame » | 17,5 → 93,5 (76 pt figés) | 32,0 → 101,0 (69 pt, partagés) |
+| Carte | 380 pt rigides, 2,5 pt hors écran de chaque côté | dans les marges, compressible |
+
+### L'artefact de l'accueil : mesuré, compris, assumé
+
+Le détecteur signalait deux tuiles de la grille (17,5 et 6,5 pt « dehors »).
+La mesure des six tuiles tranche : **rien n'est coupé à l'écran**.
+
+| Tuile | Largeur annoncée | Symbole |
+|---|---|---|
+| Contre l'ordinateur | 174,5 | `cpu` |
+| **Deux joueurs** | **198,0** | `person.2.fill` |
+| Puzzles | 196,5 | `puzzlepiece.fill` |
+| **Ouvertures** | **187,0** | `books.vertical.fill` |
+| Analyser | 178,5 | `chart.xyaxis.line` |
+| Laboratoire | 173,0 | `flask` |
+
+Les colonnes, elles, sont régulières (x=20 et x=194,5, pas de 174,5 = 160,5 de
+carte + 14 d'espacement) et le contenu tient dedans (« Sur le même appareil »
+va de 210,5 à 339, exactement dans les marges). La largeur annoncée **varie
+avec le symbole** : c'est la grande icône décorative du fond, visuellement
+écrêtée par le `clipShape` de la carte, que SwiftUI continue de compter dans
+la géométrie remontée à l'accessibilité.
+
+**Trois tentatives de correction n'ont rien changé à la mesure**, au
+demi-point près : `accessibilityHidden(true)` sur l'image puis sur tout le
+fond, `clipped()`, et un `frame` explicite sur le glyphe. Le test du Lot 5
+exclut donc ces éléments **sur preuve**, exclusion argumentée dans le code —
+plutôt qu'un seuil de tolérance, qui aurait aussi laissé passer de vrais
+débordements. Les deux corrections d'accessibilité sont conservées ; le
+`frame` explicite, sans effet mesurable, a été retiré.
+
+### Non traité dans ce lot
+
+- Le **Dynamic Type des gabarits figés** (boutons 44/46/56, aperçus 30×30,
+  glyphes de prises 15 pt) reste globalement non traité : aucun
+  `@ScaledMetric` dans le projet, et les 29 `.font(.system(size:))` ne
+  grossissent toujours pas. Les écrans mesurés ne débordent plus en AX5, mais
+  l'incohérence « moitié du texte qui scale, moitié qui ne scale pas »
+  demeure — chantier de fond, pas un correctif de largeur.
+- **Display Zoom (320 pt)** : toujours pas reproductible par argument de
+  lancement, donc jamais mesuré.
+- Les rangées 3.5 restantes (`AnalysisView.candidatesBar`, `PuzzleSolveView`,
+  `SettingsView.piecePreview`, `GameSummaryView.categoryRow`,
+  `OpeningExplorerView.moveRow`, `AnalysisLibraryView`) n'ont **pas** été
+  retouchées : elles tronquent leur texte plutôt que de sortir de l'écran, et
+  aucune n'a été signalée par le détecteur aux deux tailles mesurées.
+
+## Lot 4 — revue iPad : les deux défauts francs (2026-08-13)
+
+Le Lot 0 ayant **infirmé** le diagnostic 4.1 (l'accueil iPad en portrait
+montre bien ses six modes, la barre latérale étant affichée par défaut sur
+iPadOS 26.5), ce lot se concentre sur les deux débordements réels.
+
+### Fait
+
+- **`AnalysisView` en paysage (4.2)** — la réserve de hauteur devinée
+  (`geo.size.height - 48`) est supprimée. Sous le plateau, la colonne empile
+  le badge d'analyse (26), la barre d'éval (20), la navigation (44), les
+  candidats (~34), la barre coach (~40), leurs espacements et 24 pt de marge
+  haut et bas : de l'ordre de **270 pt, pas 48**. La colonne n'étant pas dans
+  un `ScrollView`, le débordement était franc et irrécupérable — la barre
+  coach passait sous le bord de l'écran. Le plateau se sert désormais en
+  premier via `layoutPriority(1)` et les barres à hauteur fixe prennent ce qui
+  reste : **plus aucune constante de chrome soustraite à la main**, exactement
+  le remède déjà appliqué à `PlayView` (voir « Revue UX — disposition iPad »).
+- **`OpeningReaderView` (4.4)** — plafond de 520 pt sur le côté du plateau. Un
+  carré `.aspectRatio(1, .fit)` dans un `ScrollView` **vertical** ne se résout
+  que contre la largeur, la hauteur y étant illimitée : sur une colonne de
+  détail iPad le plateau atteignait ~1 014 pt dans un viewport de ~870, et le
+  fil de coups, la carte d'explication et la liste démarraient **sous le
+  pli** — alors que l'explication est la raison d'être de cet écran.
+
+### Non traité, et pourquoi
+
+- **4.3 (répartition de la largeur sur grand écran)**, **4.5 (feuilles
+  modales inadaptées)** et le reste de 4.1 (absence de `navigationTitle` sur
+  `detailRoot`) : ce sont des travaux de **conception**, pas des correctifs de
+  débordement — panneau puzzle fixé à 360 pt, `TwoPlayerGameView` sans
+  disposition à deux colonnes, écrans d'entrée sans plafond de largeur,
+  scanner et éditeur de position présentés en form sheet. Les toucher sans
+  pouvoir juger le rendu (le simulateur ne permet pas de vérifier une
+  disposition paysage à la capture — piège documenté) reviendrait à déplacer
+  des chiffres à l'aveugle.
+- **Les deux correctifs ci-dessus n'ont pas pu être vérifiés à l'exécution**
+  en paysage iPad, pour la même raison. Ils suppriment l'un et l'autre une
+  constante devinée au profit d'une règle de priorité de disposition, ce qui
+  est structurellement plus sûr — mais c'est une correction *par
+  construction*, pas une mesure.

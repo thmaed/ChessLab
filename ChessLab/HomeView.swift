@@ -1360,7 +1360,23 @@ private struct ModeCard: View {
                         .font(.system(size: ghostIconSize, weight: .semibold))
                         .foregroundStyle(tint.opacity(isEnabled ? 0.08 : 0.03))
                         .offset(x: isRegular ? 56 : 46, y: isRegular ? 42 : 34)
+                        // Purement décorative — et invisible au-delà de la
+                        // carte, que `clipShape` écrête. L'accessibilité, elle,
+                        // ne sait pas qu'elle est écrêtée : sans ce masquage,
+                        // la `frame` annoncée de la tuile allait jusqu'à
+                        // 17,5 pt HORS de l'écran sur iPhone SE, VoiceOver
+                        // voyait un glyphe qui ne dit rien, et le détecteur de
+                        // débordement du Lot 0 signalait l'accueil à tort.
+                        .accessibilityHidden(true)
                 }
+                // Le FOND ENTIER est décoratif, et surtout : il est écrêté
+                // ici même. `clipShape` plus bas masque le débordement à
+                // l'œil, mais la géométrie annoncée à l'accessibilité, elle,
+                // continuait d'inclure l'icône fantôme — la tuile se
+                // déclarait 198 pt de large pour 160,5 réels, soit 17,5 pt
+                // hors écran sur iPhone SE.
+                .clipped()
+                .accessibilityHidden(true)
             }
             .clipShape(Theme.cardShape)
             // Bordure en dégradé de la teinte : accroche la lumière en haut

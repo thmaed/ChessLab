@@ -114,10 +114,20 @@ struct HelpView: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// Largeur de la photo de l'auteur : 60 % de l'écran (le prompt), pas de
-    /// la carte — sinon elle rétrécit avec les marges au lieu de rester une
-    /// proportion stable de l'appareil.
-    private var authorImageWidth: CGFloat { UIScreen.main.bounds.width * 0.6 }
+    /// Largeur de la photo de l'auteur : 60 % de la **fenêtre**.
+    ///
+    /// C'était 60 % de `UIScreen.main.bounds`, consommé en `.frame(width:)`,
+    /// donc une largeur DURE calculée sur l'écran physique — jamais sur la
+    /// fenêtre. Sur iPhone portrait ça passait (marge d'environ 22 pt), mais
+    /// en **Slide Over** sur iPad (fenêtre de 320 pt, écran de 1 024) l'image
+    /// réclamait 670 pt : 420 pt hors cadre, et la valeur ne s'invalidait
+    /// jamais au redimensionnement. `UIScreen.main` est par ailleurs déprécié
+    /// depuis iOS 16.
+    ///
+    /// Le bon modèle était déjà dans le dépôt : ``AppBackground`` mesure la
+    /// **vue**. On fait pareil, avec un `containerRelativeFrame`, qui suit la
+    /// fenêtre et se réévalue à chaque redimensionnement.
+    private static let authorImageWidthFraction: CGFloat = 0.6
 
     /// Largeur de la colonne icône + espacement du `moduleCard` — reprise ici
     /// pour aligner la photo sous le même retrait que le titre et le texte.
@@ -145,7 +155,9 @@ struct HelpView: View {
                 Image("Author")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: authorImageWidth)
+                    .containerRelativeFrame(.horizontal) { width, _ in
+                        width * Self.authorImageWidthFraction
+                    }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
             }
         }

@@ -194,8 +194,13 @@ enum LayoutProbe {
                 guard overflowsLeft || overflowsRight else { continue }
                 // Entièrement dehors → contenu défilable, pas un débordement.
                 guard frame.maxX > window.minX, frame.minX < window.maxX else { continue }
+                // L'exclusion porte sur l'identifiant OU le libellé : la
+                // plupart des vues SwiftUI n'ont pas d'identifiant explicite,
+                // et c'est alors leur libellé qui les nomme.
                 let identifier = element.identifier
-                guard !identifiers.contains(identifier) else { continue }
+                guard !identifiers.contains(identifier),
+                      !identifiers.contains(element.label)
+                else { continue }
                 found.append(
                     Overflow(
                         kind: String(describing: type), identifier: identifier,

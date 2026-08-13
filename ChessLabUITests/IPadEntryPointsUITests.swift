@@ -37,6 +37,46 @@ final class IPadEntryPointsUITests: XCTestCase {
         XCUIDevice.shared.orientation = .portrait
     }
 
+    /// Géométrie des SIX tuiles de la grille d'accueil.
+    ///
+    /// Deux d'entre elles se déclarent plus larges que leur colonne, et
+    /// toujours des mêmes 17,5 et 6,5 pt — insensibles à tout ce qu'on fait
+    /// au fond décoratif. Ce relevé sert à trancher : est-ce la grille qui
+    /// déborde vraiment, ou une `frame` d'accessibilité qui ment ?
+    @MainActor
+    func testReportModeTileFrames() throws {
+        XCUIDevice.shared.orientation = .portrait
+        let app = XCUIApplication()
+        app.launchArguments += ["-resetPlaySettings"]
+        app.launch()
+        _ = app.staticTexts["ChessLab"].waitForExistence(timeout: 15)
+
+        let window = app.frame
+        for mode in Self.modes {
+            let button = app.buttons[mode]
+            guard button.exists else { continue }
+            print(
+                String(
+                    format: "TILE|%@|x=[%.1f…%.1f] largeur=%.1f|y=[%.1f…%.1f]|fenêtre=%.0f",
+                    mode, button.frame.minX, button.frame.maxX, button.frame.width,
+                    button.frame.minY, button.frame.maxY, window.width
+                )
+            )
+        }
+        // Et les textes qu'elles contiennent : si c'est le TITRE qui déborde,
+        // il le dira lui-même.
+        for label in ["Deux joueurs", "Ouvertures", "Sur le même appareil"] {
+            let text = app.staticTexts[label]
+            guard text.exists else { continue }
+            print(
+                String(
+                    format: "TILE-TEXT|%@|x=[%.1f…%.1f] largeur=%.1f",
+                    label, text.frame.minX, text.frame.maxX, text.frame.width
+                )
+            )
+        }
+    }
+
     @MainActor
     private func report(_ app: XCUIApplication, device: String, orientation: String) {
         let window = app.frame

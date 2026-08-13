@@ -84,7 +84,11 @@ struct NewGameSetupView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 SettingsSection(title: "Couleur", systemImage: "circle.lefthalf.filled", tint: Theme.accent) {
-                    HStack(spacing: 8) {
+                    // FlowLayout et non HStack : en français les trois
+                    // puces réclament ~323 pt pour 303 disponibles à 375, et
+                    // 248 en Display Zoom. Elles passent maintenant à la ligne
+                    // au lieu d'être comprimées (Lot 3.5).
+                    FlowLayout(spacing: 8, lineSpacing: 8) {
                         ForEach(PlayerColorChoice.allCases) { choice in
                             ChipButton(
                                 label: LocalizedStringKey(choice.label),

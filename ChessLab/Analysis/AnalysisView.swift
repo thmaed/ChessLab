@@ -170,17 +170,36 @@ struct AnalysisView: View {
     /// Paysage : plateau borné + éval/navigation à gauche, panneau d'analyse
     /// (en-tête, courbe, coups) défilant à droite.
     private func iPadLandscapeBody(_ geo: GeometryProxy) -> some View {
-        let boardSide = min(geo.size.width * 0.55, geo.size.height - 48)
         return HStack(alignment: .top, spacing: 24) {
+            // AUCUNE constante de chrome soustraite à la main. La version
+            // d'origine bornait le plateau à `geo.size.height - 48`, alors que
+            // la colonne empile sous lui le badge d'analyse (26), la barre
+            // d'éval (20), la navigation (44), les candidats (~34), la barre
+            // coach (~40), leurs espacements et 24 pt de marge haut et bas —
+            // de l'ordre de **270 pt, pas 48**. La colonne n'étant pas dans un
+            // `ScrollView`, le débordement était franc et irrécupérable : la
+            // barre coach passait sous le bord de l'écran (iPad mini paysage,
+            // iPad Pro 13" sidebar repliée, Stage Manager en fenêtre basse,
+            // Catalyst à sa taille minimale de 820 pt).
+            //
+            // Même remède que ``PlayView`` (voir PROGRESS.md, « Revue UX —
+            // disposition iPad ») : le plateau se sert en PREMIER via
+            // `layoutPriority`, les barres à hauteur fixe prennent ce qui
+            // reste, et plus aucun chiffre deviné ne peut mentir quand une
+            // police ou une marge bouge.
             VStack(spacing: 12) {
                 board
-                    .frame(width: boardSide, height: boardSide)
+                    .layoutPriority(1)
                 EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
                 navigationBar
                 candidatesBar
                 coachBar
             }
-            .frame(width: boardSide)
+            // Carré : la colonne ne peut pas être plus large que haute, sinon
+            // le plateau déborderait verticalement. La largeur reste par
+            // ailleurs bornée à ~55 % de la fenêtre pour laisser au panneau
+            // d'analyse de quoi être lisible.
+            .frame(maxWidth: min(geo.size.width * 0.55, geo.size.height), maxHeight: .infinity)
 
             ScrollView {
                 VStack(spacing: 16) {
@@ -356,12 +375,7 @@ struct AnalysisView: View {
 
             Spacer()
             if viewModel.isClassifying, let progress = viewModel.classificationProgress {
-                HStack(spacing: 6) {
-                    ProgressView().tint(Theme.textSecondary).scaleEffect(0.6)
-                    Text("Analyse : coup \(progress.done)/\(progress.total)")
-                        .font(.caption2)
-                        .foregroundStyle(Theme.textTertiary)
-                }
+                classificationIndicator(progress)
             }
         }
     }
@@ -494,6 +508,47 @@ struct AnalysisView: View {
         .keyboardShortcut(.rightArrow, modifiers: .command)
         .accessibilityLabel("Jouer le meilleur coup")
         .accessibilityIdentifier("playBestMove")
+    }
+
+    /// Indicateur de classification, qui **renonce à du contenu** plutôt que
+    /// de pousser les boutons de transport hors de l'écran (Lot 3.2).
+    ///
+    /// La barre porte cinq boutons de 44 pt et leurs espacements, soit 268 pt
+    /// incompressibles ; il reste environ 75 pt utiles sur un iPhone SE, et
+    /// à peine 20 en Display Zoom — alors que « Analyse : coup 12/40 » en
+    /// réclame ~125. Le libellé était donc écrasé jusqu'à une lettre. Et ce
+    /// n'est pas un cas rare : la classification démarre à l'ouverture de
+    /// n'importe quel PGN et dure des dizaines de secondes.
+    ///
+    /// `ViewThatFits` choisit la première version qui tient : phrase complète,
+    /// puis compteur seul, puis le seul rouet. Aucune de ces étapes ne ment
+    /// sur l'état — l'analyse tourne, et ça se voit.
+    private func classificationIndicator(
+        _ progress: (done: Int, total: Int)
+    ) -> some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 6) {
+                classificationSpinner
+                Text("Analyse : coup \(progress.done)/\(progress.total)")
+                    .font(.caption2)
+                    .foregroundStyle(Theme.textTertiary)
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+            HStack(spacing: 6) {
+                classificationSpinner
+                Text("\(progress.done)/\(progress.total)")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(Theme.textTertiary)
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+            classificationSpinner
+        }
+    }
+
+    private var classificationSpinner: some View {
+        ProgressView().tint(Theme.textSecondary).scaleEffect(0.6)
     }
 
     private func navButton(_ systemImage: String, disabled: Bool, action: @escaping () -> Void) -> some View {

@@ -148,52 +148,6 @@ struct GameTagsEditorSheet: View {
     }
 }
 
-/// Petit layout « flow » : place ses enfants en ligne et passe à la suivante
-/// quand la largeur est dépassée. Suffisant pour des capsules d'étiquettes.
-struct WrapLayout: Layout {
-    var spacing: CGFloat = 8
-    var lineSpacing: CGFloat = 8
-
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let maxWidth = proposal.width ?? .infinity
-        var x: CGFloat = 0
-        var y: CGFloat = 0
-        var lineHeight: CGFloat = 0
-        var maxRowWidth: CGFloat = 0
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if x > 0 && x + size.width > maxWidth {
-                maxRowWidth = max(maxRowWidth, x - spacing)
-                x = 0
-                y += lineHeight + lineSpacing
-                lineHeight = 0
-            }
-            x += size.width + spacing
-            lineHeight = max(lineHeight, size.height)
-        }
-        maxRowWidth = max(maxRowWidth, x - spacing)
-        let width = proposal.width ?? max(0, maxRowWidth)
-        return CGSize(width: width, height: y + lineHeight)
-    }
-
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let maxWidth = bounds.width
-        var x: CGFloat = 0
-        var y: CGFloat = 0
-        var lineHeight: CGFloat = 0
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if x > 0 && x + size.width > maxWidth {
-                x = 0
-                y += lineHeight + lineSpacing
-                lineHeight = 0
-            }
-            subview.place(
-                at: CGPoint(x: bounds.minX + x, y: bounds.minY + y),
-                proposal: ProposedViewSize(size)
-            )
-            x += size.width + spacing
-            lineHeight = max(lineHeight, size.height)
-        }
-    }
-}
+// `WrapLayout` vivait ici, dupliqué à l'identique de ``FlowLayout`` et
+// porteur des deux mêmes défauts de largeur (Lot 3.4). C'est désormais un
+// alias de `FlowLayout` (voir `Theme.swift`) : une seule implémentation.

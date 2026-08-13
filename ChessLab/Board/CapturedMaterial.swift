@@ -66,7 +66,26 @@ struct CapturedTrayView: View {
     var advantage: Int = 0
 
     private let glyph: CGFloat = 15
-    private let overlap: CGFloat = 9
+
+    /// Chevauchement des pièces d'un même type, **resserré quand elles sont
+    /// nombreuses** (Lot 3.3).
+    ///
+    /// Chaque groupe avait une largeur strictement fixe, donc le bandeau ne se
+    /// compressait jamais : au maximum (15 prises) il réclamait ~201 pt
+    /// incompressibles, sur une rangée qui doit aussi loger le nom du joueur
+    /// — saisi par l'utilisateur en mode deux joueurs, et sans aucune limite
+    /// de longueur — et la pendule.
+    ///
+    /// Resserrer le chevauchement garde **toutes** les pièces visibles, là où
+    /// un `clipped()` en aurait escamoté en silence : c'est le même bandeau,
+    /// simplement plus dense quand la partie l'exige.
+    private var overlap: CGFloat {
+        switch kinds.count {
+        case ..<6: 9
+        case ..<10: 7
+        default: 5
+        }
+    }
 
     var body: some View {
         HStack(spacing: 3) {

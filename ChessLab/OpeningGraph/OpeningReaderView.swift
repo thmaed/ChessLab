@@ -17,6 +17,18 @@ struct OpeningReaderView: View {
                 VStack(spacing: 14) {
                     board
                         .aspectRatio(1, contentMode: .fit)
+                        // Plafond de côté (Lot 4.4). Un carré dans un
+                        // `ScrollView` VERTICAL ne se résout que contre la
+                        // largeur — la hauteur y est illimitée. Sur la colonne
+                        // de détail d'un iPad, le plateau atteignait ~1 014 pt
+                        // dans un viewport d'environ 870 : le fil de coups, la
+                        // carte d'explication et la liste démarraient SOUS LE
+                        // PLI, alors que l'explication est la raison d'être de
+                        // cet écran. Le plafond garde le plateau confortable
+                        // sur iPhone (où la largeur reste inférieure) tout en
+                        // laissant le contenu visible sur grand écran.
+                        .frame(maxWidth: 520)
+                        .frame(maxWidth: .infinity)
                         .padding(.horizontal, 16)
                     if !viewModel.playedSANs.isEmpty { moveTrail }
                     explanationCard

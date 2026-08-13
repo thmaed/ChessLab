@@ -309,48 +309,105 @@ struct FilterChip: View {
 /// Enchaîne ses enfants horizontalement en revenant à la ligne quand la
 /// largeur disponible est dépassée — utilisé pour des groupes de chips
 /// compacts (cadences, préréglages…) plutôt qu'une liste verticale.
+///
+/// ## Deux défauts corrigés (Lot 3.4)
+///
+/// La version d'origine interrogeait ses enfants avec
+/// `sizeThatFits(.unspecified)`, c'est-à-dire leur **largeur idéale sur une
+/// seule ligne** : le texte d'une puce ne pouvait donc jamais revenir à la
+/// ligne ni être tronqué. Et sa condition de retour à la ligne exigeait
+/// `x > bounds.minX` : une puce **plus large que le conteneur** était posée
+/// en début de ligne et débordait franchement, sans qu'aucun mécanisme ne la
+/// rattrape. Les deux se combinaient sur les étiquettes SAISIES PAR
+/// L'UTILISATEUR (`AnalysisLibraryView`), qui débordaient dès ~40 caractères
+/// **à taille de texte normale**, et sur n'importe quelle puce en taille
+/// d'accessibilité.
+///
+/// Désormais : la largeur proposée aux enfants est **bornée à la ligne**, et
+/// toute largeur mesurée est écrêtée à cette même borne. Un élément trop
+/// large occupe sa ligne entière et se débrouille avec — il se replie ou se
+/// tronque, mais ne sort plus de l'écran.
+///
+/// La hauteur retournée est celle des lignes réellement occupées, et la
+/// largeur celle de la plus longue — le conteneur ne réserve plus toute la
+/// largeur disponible pour deux puces (cosmétique sur iPhone, visible sur
+/// iPad).
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8
     var lineSpacing: CGFloat = 8
 
+    /// Une ligne calculée : les tailles retenues et leur position en x.
+    private struct Line {
+        var items: [(index: Int, size: CGSize, x: CGFloat)] = []
+        var height: CGFloat = 0
+        var width: CGFloat = 0
+    }
+
+    /// Répartition commune à la mesure et au placement — sans quoi les deux
+    /// interrogeraient les enfants séparément, avec le risque de diverger.
+    private func lines(subviews: Subviews, maxWidth: CGFloat) -> [Line] {
+        // Proposer la largeur de ligne (et non `.unspecified`) : c'est ce qui
+        // autorise un `Text` à se replier ou à se tronquer.
+        let proposal = ProposedViewSize(
+            width: maxWidth.isFinite ? maxWidth : nil, height: nil
+        )
+        var result: [Line] = []
+        var current = Line()
+        var x: CGFloat = 0
+
+        for index in subviews.indices {
+            var size = subviews[index].sizeThatFits(proposal)
+            // Écrêtage : un enfant qui réclame plus que la ligne (image à
+            // largeur fixe, texte insécable) est ramené à la ligne.
+            size.width = min(size.width, maxWidth)
+
+            // Tolérance d'un demi-point : sans elle, un enfant mesuré à la
+            // largeur exacte de la ligne provoquerait un retour à la ligne
+            // parasite sur un arrondi de rendu.
+            if !current.items.isEmpty, x + size.width > maxWidth + 0.5 {
+                current.width = x - spacing
+                result.append(current)
+                current = Line()
+                x = 0
+            }
+            current.items.append((index, size, x))
+            x += size.width + spacing
+            current.height = max(current.height, size.height)
+        }
+        if !current.items.isEmpty {
+            current.width = x - spacing
+            result.append(current)
+        }
+        return result
+    }
+
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let maxWidth = proposal.width ?? .infinity
-        var x: CGFloat = 0
-        var y: CGFloat = 0
-        var lineHeight: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if x > 0, x + size.width > maxWidth {
-                x = 0
-                y += lineHeight + lineSpacing
-                lineHeight = 0
-            }
-            x += size.width + spacing
-            lineHeight = max(lineHeight, size.height)
-        }
-
-        return CGSize(width: maxWidth.isFinite ? maxWidth : x, height: y + lineHeight)
+        let lines = lines(subviews: subviews, maxWidth: maxWidth)
+        guard !lines.isEmpty else { return .zero }
+        let height = lines.reduce(0) { $0 + $1.height } + lineSpacing * CGFloat(lines.count - 1)
+        return CGSize(width: lines.map(\.width).max() ?? 0, height: height)
     }
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        var x = bounds.minX
         var y = bounds.minY
-        var lineHeight: CGFloat = 0
-
-        for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
-            if x > bounds.minX, x + size.width > bounds.maxX {
-                x = bounds.minX
-                y += lineHeight + lineSpacing
-                lineHeight = 0
+        for line in lines(subviews: subviews, maxWidth: bounds.width) {
+            for item in line.items {
+                subviews[item.index].place(
+                    at: CGPoint(x: bounds.minX + item.x, y: y),
+                    proposal: ProposedViewSize(item.size)
+                )
             }
-            subview.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
-            x += size.width + spacing
-            lineHeight = max(lineHeight, size.height)
+            y += line.height + lineSpacing
         }
     }
 }
+
+/// Ancien jumeau de ``FlowLayout``, dupliqué à l'identique dans
+/// `GameTagsEditorSheet` — et porteur des deux mêmes défauts. Conservé comme
+/// simple alias pour ne pas réécrire ses sites d'appel : une seule
+/// implémentation, donc une seule correction à maintenir.
+typealias WrapLayout = FlowLayout
 
 // MARK: - Célébration
 

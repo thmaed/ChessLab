@@ -161,7 +161,9 @@ struct PositionEditorView<Header: View>: View {
     }
 
     private var boardActions: some View {
-        HStack(spacing: 8) {
+        // Même raison que les puces de couleur de ``NewGameSetupView`` :
+        // ~326 pt réclamés pour 303 disponibles (Lot 3.5).
+        FlowLayout(spacing: 8, lineSpacing: 8) {
             ChipButton(label: "Standard", systemImage: "arrow.counterclockwise", isSelected: false) {
                 withAnimation(Theme.gentle) { vm.resetToStandard() }
             }
