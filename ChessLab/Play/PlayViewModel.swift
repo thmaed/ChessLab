@@ -210,7 +210,15 @@ final class PlayViewModel {
         // joué n'a rien à faire dans la bibliothèque.
         outcome = GameOutcome.ofStartingPosition(board.position)
 
-        AutosaveStore.clearPlay()
+        // PAS d'`AutosaveStore.clearPlay()` ici. Un initialiseur qui efface
+        // une sauvegarde sur disque est un piège : toute reconstruction de la
+        // vue détruit des données. Et la vue EST reconstruite — la bascule de
+        // classe de taille (rotation d'un iPhone Plus/Pro Max, Split View sur
+        // iPad) détruit le sous-arbre, `path` survit, la route est
+        // ré-instanciée, un nouveau view model naît… et effaçait la partie
+        // que « Reprendre » aurait permis de retrouver. L'effacement vit
+        // maintenant là où il a du sens : l'intention explicite de démarrer
+        // une nouvelle partie (voir ``HomeView/startNewGame(_:)``).
         wireClock()
         enqueueEngineWork { await self.setupEngine() }
     }
@@ -944,6 +952,13 @@ final class PlayViewModel {
     /// Stockfish continuerait de chercher indéfiniment en arrière-plan.
     func handleViewDisappear() {
         interruptHintAnalysisIfNeeded()
+        // Mémorise qu'il y avait bien un moteur à libérer : c'est la SEULE
+        // condition qui autorise ``handleViewAppear()`` à en redemander un.
+        // Sans ce drapeau, un échec de démarrage (moteur jamais obtenu) était
+        // suivi d'une reprise automatique au premier `onAppear`, qui masquait
+        // la bannière « Moteur indisponible » et court-circuitait le bouton
+        // « Réessayer » — `EngineRecoveryUITests` l'a attrapé.
+        wasEngineReleasedOnDisappear = (engine != nil)
         // Libère Stockfish en quittant l'écran, y compris une partie NON
         // terminée (bouton retour) : sans ça le moteur survivait jusqu'à la
         // libération du view model, et enchaîner sur Analyser faisait coexister
@@ -951,6 +966,51 @@ final class PlayViewModel {
         // mémoire (Lot 6.A). Le cas « partie terminée » était déjà couvert par
         // le `didSet` d'`outcome` ; celui-ci manquait. Idempotent.
         releaseEngine()
+    }
+
+    /// À appeler quand l'écran de jeu (ré)apparaît alors que le view model,
+    /// lui, a survécu.
+    ///
+    /// Deux situations produisent exactement ça :
+    /// - la **bascule d'ossature** (rotation d'un iPhone Plus/Pro Max, Split
+    ///   View sur iPad) : le sous-arbre est détruit et reconstruit, mais le
+    ///   view model vit désormais dans le ``SessionStore`` ;
+    /// - **empiler puis dépiler** un écran par-dessus la partie (« Analyser »
+    ///   depuis la partie, puis retour) — `NavigationStack` envoie bien un
+    ///   `onDisappear` à la vue recouverte.
+    ///
+    /// Dans les deux cas, ``handleViewDisappear()`` a libéré Stockfish. Sans
+    /// cette reprise, la partie s'affichait intacte mais l'adversaire ne
+    /// jouait plus jamais : un écran d'apparence normale, définitivement muet.
+    /// Même remède que ``AnalysisViewModel/handleViewAppear()``.
+    func handleViewAppear() {
+        // UNIQUEMENT après un aller-retour d'écran : jamais après un échec de
+        // démarrage, où l'utilisateur doit voir la bannière et décider de
+        // réessayer. Même discipline que ``AnalysisViewModel``.
+        guard wasEngineReleasedOnDisappear else { return }
+        wasEngineReleasedOnDisappear = false
+        guard outcome == nil, engine == nil else { return }
+        enqueueEngineWork { await self.resumeEngineAfterReappearing() }
+    }
+
+    /// Vrai entre un ``handleViewDisappear()`` qui a effectivement libéré
+    /// Stockfish et le ``handleViewAppear()`` qui le rend.
+    private var wasEngineReleasedOnDisappear = false
+
+    /// Redémarre le moteur au milieu d'une partie déjà commencée.
+    ///
+    /// Ne réutilise pas ``setupEngine()`` : celui-ci ne demande un coup que si
+    /// `moveLog.isEmpty` (garde anti-doublon propre à la reprise d'une
+    /// autosauvegarde). Ici le journal n'est jamais vide, et c'est peut-être
+    /// justement au moteur de jouer — il faut donc le lui demander.
+    private func resumeEngineAfterReappearing() async {
+        guard outcome == nil, engine == nil else { return }
+        guard await startEngine() else { return }
+        if board.position.sideToMove == engineColor {
+            await requestEngineMove()
+        } else if settings.showEvalBar {
+            await updateEvalBar()
+        }
     }
 
     // MARK: Cycle de vie de l'app (pendule en arrière-plan)

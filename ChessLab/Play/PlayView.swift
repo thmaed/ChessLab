@@ -63,6 +63,10 @@ struct PlayView: View {
             showResumeConfirmation: $showResumeConfirmation,
             showDrawConfirmation: $showDrawConfirmation
         ))
+        // Le couple appear/disappear, et pas seulement `disappear` : le view
+        // model survit désormais à la reconstruction de la vue (bascule
+        // d'ossature), il faut donc lui rendre son moteur au retour.
+        .onAppear { viewModel.handleViewAppear() }
         .onDisappear { viewModel.handleViewDisappear() }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {

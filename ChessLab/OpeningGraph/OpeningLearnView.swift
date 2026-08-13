@@ -232,9 +232,12 @@ struct OpeningLearnView: View {
 /// Héberge le mode Apprendre : construit le ViewModel une seule fois.
 struct OpeningLearnHost: View {
     let courseID: String
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
     let onContinueVsStockfish: (String) -> Void
 
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: OpeningLearnViewModel?
 
     var body: some View {
@@ -246,8 +249,11 @@ struct OpeningLearnHost: View {
             }
         }
         .onAppear {
-            guard viewModel == nil, let course = OpeningCourseLoader.course(id: courseID) else { return }
-            viewModel = OpeningLearnViewModel(course: course)
+            guard viewModel == nil else { return }
+            viewModel = sessionStore.value(for: sessionKey) {
+                guard let course = OpeningCourseLoader.course(id: courseID) else { return nil }
+                return OpeningLearnViewModel(course: course)
+            }
         }
     }
 }

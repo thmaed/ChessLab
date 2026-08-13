@@ -295,8 +295,11 @@ struct OpeningTrainView: View {
 /// lire/écrire la progression synchronisée).
 struct OpeningTrainHost: View {
     let mode: OpeningTrainViewModel.Mode
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: OpeningTrainViewModel?
 
     var body: some View {
@@ -309,7 +312,9 @@ struct OpeningTrainHost: View {
         }
         .onAppear {
             if viewModel == nil {
-                viewModel = OpeningTrainViewModel(mode: mode, context: modelContext)
+                viewModel = sessionStore.value(for: sessionKey) {
+                    OpeningTrainViewModel(mode: mode, context: modelContext)
+                }
             }
         }
     }

@@ -3670,3 +3670,147 @@ harnais**, pas de l'app. Une ligne de barre latérale est remontée par
 XCUITest en `staticText`, pas en `button` ni en `cell` — l'assistant de
 navigation cherchait les deux mauvaises formes. Corrigé dans
 `LayoutTraitsUITests`. À retenir pour tous les tests iPad à venir.
+
+## Lot 1 — la partie ne se perd plus au changement de classe de taille (2026-08-13)
+
+Le seul point de **perte de données utilisateur** de l'audit. Confirmé, et
+plus grave que décrit : le Lot 0 a montré que les iPhone Plus et Pro Max
+basculent en classe `.regular` **en paysage**, donc qu'une simple rotation
+suffisait à détruire la partie en cours et son autosauvegarde.
+
+### Fait
+
+- **`AutosaveStore.clearPlay()` / `clearTwoPlayer()` sortis des
+  initialiseurs** (`PlayViewModel`, `TwoPlayerViewModel`). Un initialiseur
+  qui efface un fichier est un piège : toute reconstruction de vue détruit
+  des données. L'effacement vit désormais à l'intention explicite, dans
+  `HomeView.startNewGame(_:)` / `startNewTwoPlayerGame(_:)`, par où passent
+  **tous** les départs de partie (nouvelle partie, position d'éditeur, scan,
+  « jouer depuis ici » de l'analyse, revanche).
+- **`SessionStore`** (nouveau) : coffre des view models de session, détenu
+  par `HomeView` — donc au-dessus du `if/else` d'ossature. Les douze hôtes
+  gardent un `@State` local, mais seulement comme miroir de rendu :
+  reconstruit, il est re-rempli depuis le coffre avec la **même** instance.
+  Vidé quand la pile de navigation redevient vide (retour à l'accueil), pour
+  ne pas laisser un Stockfish survivre à son écran.
+- **`PlayView` gagne son `onAppear`** → `PlayViewModel.handleViewAppear()`,
+  qui redemande un moteur si la partie continue. Sans lui, le correctif
+  ci-dessus aurait produit pire que le mal : une partie intacte à l'écran
+  mais un adversaire définitivement muet, `handleViewDisappear()` ayant
+  libéré Stockfish à la destruction du sous-arbre.
+- **`SkeletonOverride`** (Debug, `-skeletonToggle`) : bascule d'ossature à la
+  demande, pour rendre la panne reproductible en test.
+
+### Décisions d'architecture
+
+- **Le coffre est clé par la ROUTE** (`String(describing: route)`), pas par
+  une dérivation par type de charge utile : la route EST l'identité de
+  l'écran. Deux analyses de PGN différents ont des routes différentes, donc
+  des sessions distinctes ; une revanche aux réglages identiques a la même
+  clé — d'où `SessionStore.remove(_:)`, appelé au départ d'une partie neuve,
+  sans quoi la « nouvelle » partie rouvrait l'ancienne position.
+- **Douze hôtes, pas sept.** L'audit en listait sept ; il en manquait cinq —
+  `TwoPlayerResumedGameHost`, et les quatre du module `OpeningGraph`
+  (`OpeningReaderHost`, `OpeningExplorerHost`, `OpeningLearnHost`,
+  `OpeningTrainHost`). Tous câblés.
+- **Le correctif (a) seul n'aurait pas suffi**, et le (b) seul non plus :
+  (a) sauve la sauvegarde, (b) sauve l'état vivant (analyse, puzzle,
+  laboratoire, ouvertures) que (a) ne couvre pas. Les deux sont livrés,
+  comme demandé.
+- **Bascule de test plutôt que rotation** : la rotation d'un Plus/Pro Max
+  marche, mais le Lot 2 verrouille l'iPhone en portrait — un test fondé sur
+  elle mourrait au lot suivant. Split View et Stage Manager, eux, ne se
+  pilotent pas depuis XCUITest. On force donc la valeur d'environnement que
+  lit `HomeView`. **Limite assumée** : c'est bien le mécanisme de la panne
+  (le `_ConditionalContent` détruit sa branche sortante), mais ce n'est pas
+  une vraie rotation — rien ne reproduit ici le changement de taille de
+  fenêtre.
+
+### Vérifié
+
+- `SkeletonSwitchUITests` : deux tests, **rouges avant correction, verts
+  après** — vérifié en remisant les correctifs applicatifs et en rejouant la
+  même suite :
+
+  | Test | Avant | Après |
+  |---|---|---|
+  | `testGameSurvivesSizeClassSwitch` (`moveCount` inchangé) | ❌ | ✅ |
+  | `testAutosaveSurvivesSizeClassSwitch` (« Reprendre » toujours offert) | ❌ | ✅ |
+
+- **Point connexe `sidebarSelection` / `path` : CONFIRMÉ, et mesuré.**
+  `testReportSidebarAndPathCoherence` part de « Puzzles » ouvert depuis la
+  grille iPhone, bascule, puis appuie sur retour :
+
+  | Étape | Écran |
+  |---|---|
+  | avant bascule | Puzzles |
+  | après bascule | Puzzles (l'écran, lui, est préservé) |
+  | après « retour » | *(barre sans titre)* — le tableau de bord iPad |
+
+  Le retour ne ramène donc pas à l'écran d'où l'on venait, mais au tableau
+  de bord — qui ne pose ni `navigationTitle` ni `toolbar`, d'où une barre
+  vide. Symptôme exactement conforme au diagnostic.
+
+  **Non corrigé dans ce lot, volontairement.** Le remède demande de
+  réconcilier les deux représentations à la bascule, donc d'insérer une
+  route en TÊTE de pile — ce que `NavigationPath` ne permet pas (append et
+  removeLast seulement). Il faut passer la pile en `[Route]` typé, un
+  changement qui touche la trentaine de sites de navigation. Le faire à la
+  va-vite ici produirait un défaut pire : synchroniser `sidebarSelection`
+  sans retirer l'entrée correspondante de la pile afficherait l'écran
+  d'entrée **deux fois** (racine de détail + empilé). C'est un chantier à
+  part entière ; la perte de données, elle, est traitée.
+
+## Lot 2 — iPhone verrouillé en portrait (2026-08-13)
+
+### Fait
+
+- `ChessLab.xcodeproj/project.pbxproj`, **Debug ET Release** :
+  `INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait`.
+  La clé `_iPad` reste inchangée — quatre orientations, comme exigé par le
+  multitâche (l'app ne pose pas `UIRequiresFullScreen`, Split View en dépend).
+- `OrientationLockUITests` : l'iPhone reste portrait malgré une demande de
+  rotation ; l'iPad, lui, doit continuer de tourner (les deux tests
+  s'auto-excluent selon l'idiome).
+
+### Décisions d'architecture
+
+- Le paysage iPhone n'était adapté **nulle part** — `verticalSizeClass` n'est
+  lu dans aucun fichier, et les seuls `GeometryReader` qui comparent largeur
+  et hauteur sont enfermés dans des branches `.regular`, inatteignables sur
+  iPhone standard. Le verrou fait donc disparaître une classe de bugs entière
+  plutôt que de la rustiner ; le vrai layout paysage reste un chantier à part.
+- **Effet de bord bienvenu sur le Lot 1** : le verrou rend le déclencheur de
+  rotation inatteignable sur iPhone Plus / Pro Max. Il ne dispense pas du
+  correctif — l'iPad reste exposé via Split View, Slide Over et Stage Manager,
+  et c'est précisément pourquoi le test du Lot 1 ne repose pas sur la
+  rotation.
+
+### Vérifié
+
+- `testIPhoneStaysPortraitAfterRotationRequest` : vert sur iPhone 16 — la
+  fenêtre garde exactement ses dimensions après `XCUIDevice.orientation =
+  .landscapeLeft`.
+- **Mac Catalyst** : ces clés `INFOPLIST_KEY_UISupportedInterfaceOrientations*`
+  ne s'appliquent qu'à iOS/iPadOS ; Catalyst gère ses fenêtres par
+  `windowScene.sizeRestrictions` (plancher de 820 pt posé dans
+  `MenuCommands.swift`). Vérifié par lecture, **pas par exécution** : aucune
+  destination macOS n'a été compilée dans cette session.
+- Aucun test UI existant ne dépendait du paysage (grep : zéro `XCUIDevice` /
+  `orientation` avant ce chantier).
+
+### Suite UI complète après les lots 1 et 2 (iPhone 16, iOS 26.5)
+
+**26 tests verts, 3 échecs** au premier passage, puis **28 verts, 2 échecs**
+après correction :
+
+| Test | Cause | État |
+|---|---|---|
+| `EngineRecoveryUITests` | **Régression de ma part** : `handleViewAppear()` relançait le moteur même après un ÉCHEC de démarrage, masquant la bannière « Moteur indisponible » et court-circuitant « Réessayer ». Corrigé par un drapeau `wasEngineReleasedOnDisappear` — la reprise n'a lieu qu'après un aller-retour d'écran, jamais après un échec. | ✅ réparé |
+| `KeyboardShortcutsUITests` | **Préexistant** — vérifié en remisant tous mes correctifs applicatifs : échoue à l'identique. | ❌ préexistant |
+| `ScannerFlowUITests` | **Préexistant** — idem (« dame blanche » introuvable sur l'écran de confirmation). | ❌ préexistant |
+
+Ces deux échecs préexistants ne sont **pas** traités ici : hors du périmètre
+des lots demandés, et les diagnostiquer supposerait de démêler un changement
+antérieur non documenté. Ils sont signalés, avec la preuve qu'ils ne viennent
+pas de ce chantier.

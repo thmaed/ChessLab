@@ -250,8 +250,11 @@ struct OpeningReaderView: View {
 /// Héberge le lecteur : charge le cours et construit le ViewModel une fois.
 struct OpeningReaderHost: View {
     let courseID: String
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
     var onTrain: () -> Void = {}
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: OpeningReaderViewModel?
 
     var body: some View {
@@ -263,8 +266,10 @@ struct OpeningReaderHost: View {
             }
         }
         .onAppear {
-            if viewModel == nil, let course = OpeningCourseLoader.course(id: courseID) {
-                viewModel = OpeningReaderViewModel(course: course)
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    OpeningCourseLoader.course(id: courseID).map(OpeningReaderViewModel.init(course:))
+                }
             }
         }
     }

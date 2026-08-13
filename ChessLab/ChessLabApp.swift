@@ -50,11 +50,18 @@ struct ChessLabApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
-                .preferredColorScheme(.dark)
                 // Traits réels de la fenêtre (classes de taille, taille,
                 // encoches) exposés aux tests de mise en page — et affichés
                 // à l'écran avec `-showTraits`. Voir ``LayoutTraitsProbe``.
+                //
+                // Posée AVANT la bascule d'ossature, donc à l'intérieur : la
+                // sonde rapporte ainsi la classe effectivement vue par
+                // `HomeView`, surcharge de test comprise.
                 .layoutTraitsProbe()
+                // Bascule d'ossature à la demande (`-skeletonToggle`), pour
+                // tester la survie de la partie — voir ``SkeletonOverride``.
+                .skeletonOverride()
+                .preferredColorScheme(.dark)
                 // `Text` dépend de la locale de l'environnement : la changer
                 // force SwiftUI à re-rendre chaque `Text`, qui re-résout alors
                 // sa clé via le bundle détourné (langue in-app). On NE force

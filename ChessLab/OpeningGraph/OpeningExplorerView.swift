@@ -249,8 +249,11 @@ struct OpeningExplorerView: View {
 /// une seule fois avec l'index de transpositions embarqué.
 struct OpeningExplorerHost: View {
     let courseID: String
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     var onLearn: () -> Void = {}
     var onTrain: () -> Void = {}
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: OpeningExplorerViewModel?
 
     var body: some View {
@@ -263,9 +266,12 @@ struct OpeningExplorerHost: View {
             }
         }
         .onAppear {
-            guard viewModel == nil, let course = OpeningCourseLoader.course(id: courseID) else { return }
-            viewModel = OpeningExplorerViewModel(course: course) { fen in
-                OpeningTranspositionIndex.bundled.courses(for: fen, excluding: courseID)
+            guard viewModel == nil else { return }
+            viewModel = sessionStore.value(for: sessionKey) {
+                guard let course = OpeningCourseLoader.course(id: courseID) else { return nil }
+                return OpeningExplorerViewModel(course: course) { fen in
+                    OpeningTranspositionIndex.bundled.courses(for: fen, excluding: courseID)
+                }
             }
         }
     }

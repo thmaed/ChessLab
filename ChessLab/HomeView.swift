@@ -23,6 +23,10 @@ struct HomeView: View {
     /// Bilan de progression compact du panneau iPad — recalculé à l'apparition.
     @State private var progressSummary: ProgressionSummary?
     @State private var path = NavigationPath()
+    /// View models des écrans de session, détenus ICI — donc au-dessus du
+    /// `if/else` d'ossature, qui détruirait sinon tout le sous-arbre et la
+    /// partie en cours avec lui. Voir ``SessionStore``.
+    @State private var sessionStore = SessionStore()
     /// Relais de la barre de menus macOS — voir ``MenuCommands``.
     @State private var menuCommands = MenuCommands.shared
 
@@ -168,6 +172,9 @@ struct HomeView: View {
                 stackBody
             }
         }
+        // Injecté AUTOUR du `Group`, donc au-dessus de la branche : le coffre
+        // appartient à `HomeView`, que la bascule d'ossature n'atteint pas.
+        .environment(\.sessionStore, sessionStore)
         .onChange(of: menuCommands.requested) { _, destination in
             guard let destination else { return }
             menuCommands.requested = nil
@@ -199,6 +206,12 @@ struct HomeView: View {
         // peut-être de se terminer).
         .onChange(of: path) { _, newPath in
             if newPath.isEmpty {
+                // Retour à l'accueil : plus aucun écran de session n'est
+                // monté, donc plus aucun view model à garder. Sans ce vidage,
+                // un `PlayViewModel` survivrait à son écran — et avec lui un
+                // Stockfish qui cherche derrière l'interface (c'est ce que
+                // surveille `EngineLeakUITests`).
+                sessionStore.clear()
                 refreshResumableGame()
                 loadProgressSummary()
             }
@@ -377,19 +390,18 @@ struct HomeView: View {
                         // (iPhone) il est empilé ; en racine de détail (iPad) la
                         // pile est vide — d'où la garde, sinon `removeLast`
                         // plante sur une pile vide.
-                        if !path.isEmpty { path.removeLast() }
-                        path.append(Route.activeGame(settings))
+                        startNewGame(settings, replacingCurrent: true)
                     }
 
                 case let .continueVsStockfish(fen):
                     // Même écran que « Nouvelle partie », pré-rempli avec la
                     // position atteinte : le joueur règle l'Elo puis lance.
                     NewGameSetupView(initialFEN: fen) { settings in
-                        path.append(Route.activeGame(settings))
+                        startNewGame(settings)
                     }
 
                 case let .activeGame(settings):
-                    ActiveGameHost(settings: settings) {
+                    ActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
                         path = NavigationPath()
                         refreshResumableGame()
                     } onAnalyze: { pgn in
@@ -399,7 +411,7 @@ struct HomeView: View {
                     }
 
                 case let .resumedGame(autosave):
-                    ResumedGameHost(autosave: autosave) {
+                    ResumedGameHost(autosave: autosave, sessionKey: sessionKey(for: route)) {
                         path = NavigationPath()
                         refreshResumableGame()
                     } onAnalyze: { pgn in
@@ -410,12 +422,11 @@ struct HomeView: View {
 
                 case .twoPlayerSetup:
                     TwoPlayerSetupView { settings in
-                        if !path.isEmpty { path.removeLast() }
-                        path.append(Route.activeTwoPlayerGame(settings))
+                        startNewTwoPlayerGame(settings, replacingCurrent: true)
                     }
 
                 case let .activeTwoPlayerGame(settings):
-                    TwoPlayerActiveGameHost(settings: settings) {
+                    TwoPlayerActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
                         path = NavigationPath()
                         refreshResumableGame()
                     } onAnalyze: { pgn in
@@ -425,7 +436,7 @@ struct HomeView: View {
                     }
 
                 case let .resumedTwoPlayerGame(autosave):
-                    TwoPlayerResumedGameHost(autosave: autosave) {
+                    TwoPlayerResumedGameHost(autosave: autosave, sessionKey: sessionKey(for: route)) {
                         path = NavigationPath()
                         refreshResumableGame()
                     } onAnalyze: { pgn in
@@ -451,8 +462,8 @@ struct HomeView: View {
                     }
 
                 case let .activeAnalysis(source):
-                    AnalysisHost(source: source) { fen in
-                        path.append(Route.activeGame(playFromPosition(fen)))
+                    AnalysisHost(source: source, sessionKey: sessionKey(for: route)) { fen in
+                        startNewGame(playFromPosition(fen))
                     }
 
                 case let .positionEditor(initialFEN):
@@ -462,7 +473,7 @@ struct HomeView: View {
                     PositionEditorView(
                         initialFEN: initialFEN,
                         exit: .standalone(
-                            onPlay: { fen in path.append(Route.activeGame(playFromPosition(fen))) },
+                            onPlay: { fen in startNewGame(playFromPosition(fen)) },
                             onAnalyze: { fen in path.append(Route.activeAnalysis(.fen(fen))) },
                             onUseAsLabStart: { fen in path.append(Route.labSetup(startFEN: fen)) }
                         )
@@ -474,7 +485,7 @@ struct HomeView: View {
                     // invalide) : aucune position illégale n'atteint le moteur.
                     ScannerView(
                         exit: .standalone(
-                            onPlay: { fen in path.append(Route.activeGame(playFromPosition(fen))) },
+                            onPlay: { fen in startNewGame(playFromPosition(fen)) },
                             onAnalyze: { fen in path.append(Route.activeAnalysis(.fen(fen))) },
                             onUseAsLabStart: { fen in path.append(Route.labSetup(startFEN: fen)) }
                         )
@@ -486,7 +497,7 @@ struct HomeView: View {
                     }
 
                 case let .activePuzzleSession(filter):
-                    PuzzleSessionHost(filter: filter) {
+                    PuzzleSessionHost(filter: filter, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
                     } onViewSourceGame: { pgn in
                         path.append(Route.activeAnalysis(.pgn(pgn)))
@@ -500,7 +511,7 @@ struct HomeView: View {
                     }
 
                 case let .openingReader(courseID):
-                    OpeningReaderHost(courseID: courseID) {
+                    OpeningReaderHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
                     } onTrain: {
                         path.append(Route.openingTrainLine(courseID))
@@ -516,30 +527,32 @@ struct HomeView: View {
                     }
 
                 case let .openingExplorerCourse(courseID):
-                    OpeningExplorerHost(courseID: courseID) {
+                    OpeningExplorerHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
                         path.append(Route.openingLearnCourse(courseID))
                     } onTrain: {
                         path.append(Route.openingTrainLine(courseID))
                     }
 
                 case let .openingLearnCourse(courseID):
-                    OpeningLearnHost(courseID: courseID) {
+                    OpeningLearnHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
                     } onContinueVsStockfish: { fen in
                         path.append(Route.continueVsStockfish(fen))
                     }
 
                 case .openingTrainDaily:
-                    OpeningTrainHost(mode: .daily) { path.removeLast() }
+                    OpeningTrainHost(mode: .daily, sessionKey: sessionKey(for: route)) { path.removeLast() }
 
                 case .openingTrainHardest:
-                    OpeningTrainHost(mode: .hardest) { path.removeLast() }
+                    OpeningTrainHost(mode: .hardest, sessionKey: sessionKey(for: route)) { path.removeLast() }
 
                 case let .openingTrainLine(courseID):
-                    OpeningTrainHost(mode: .fullLine(courseID: courseID)) { path.removeLast() }
+                    OpeningTrainHost(
+                        mode: .fullLine(courseID: courseID), sessionKey: sessionKey(for: route)
+                    ) { path.removeLast() }
 
                 case let .activeOpeningLine(entry, color):
-                    OpeningLineTrainingHost(entry: entry, color: color) {
+                    OpeningLineTrainingHost(entry: entry, color: color, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
                     } onContinueVsStockfish: { fen in
                         path.append(Route.continueVsStockfish(fen))
@@ -553,12 +566,12 @@ struct HomeView: View {
                     }
 
                 case let .activeLab(settings):
-                    LabHost(settings: settings, resumeState: nil) {
+                    LabHost(settings: settings, resumeState: nil, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
                     }
 
                 case let .resumedLab(state):
-                    LabHost(settings: nil, resumeState: state) {
+                    LabHost(settings: nil, resumeState: state, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
                     }
 
@@ -598,14 +611,46 @@ struct HomeView: View {
     /// des Noirs.
     /// Revanche : remplace la partie courante en haut de la pile par une
     /// nouvelle (nouvel hôte paresseux → nouveau `PlayViewModel`).
-    private func rematch(with settings: PlayGameSettings) {
-        if !path.isEmpty { path.removeLast() }
+    /// Clé de session d'une route — voir ``SessionStore``.
+    ///
+    /// La route EST l'identité de l'écran : même route, même partie. Deux
+    /// analyses de PGN différents ont des routes différentes, donc des
+    /// sessions distinctes. Une seule fonction pour les douze hôtes, plutôt
+    /// qu'une dérivation par type de charge utile.
+    private func sessionKey(for route: Route) -> String {
+        String(describing: route)
+    }
+
+    /// Démarrer une NOUVELLE partie contre l'ordinateur.
+    ///
+    /// C'est ICI, à l'intention explicite de l'utilisateur, que
+    /// l'autosauvegarde précédente est effacée — et non dans
+    /// `PlayViewModel.init`, où toute reconstruction de vue la détruisait
+    /// (voir ``SessionStore``). Tous les points de départ passent par cette
+    /// porte : nouvelle partie, position d'éditeur, scan, analyse, revanche.
+    private func startNewGame(_ settings: PlayGameSettings, replacingCurrent: Bool = false) {
+        AutosaveStore.clearPlay()
+        sessionStore.remove(sessionKey(for: .activeGame(settings)))
+        if replacingCurrent, !path.isEmpty { path.removeLast() }
         path.append(Route.activeGame(settings))
     }
 
-    private func twoPlayerRematch(with settings: TwoPlayerGameSettings) {
-        if !path.isEmpty { path.removeLast() }
+    /// Idem pour le mode deux joueurs.
+    private func startNewTwoPlayerGame(
+        _ settings: TwoPlayerGameSettings, replacingCurrent: Bool = false
+    ) {
+        AutosaveStore.clearTwoPlayer()
+        sessionStore.remove(sessionKey(for: .activeTwoPlayerGame(settings)))
+        if replacingCurrent, !path.isEmpty { path.removeLast() }
         path.append(Route.activeTwoPlayerGame(settings))
+    }
+
+    private func rematch(with settings: PlayGameSettings) {
+        startNewGame(settings, replacingCurrent: true)
+    }
+
+    private func twoPlayerRematch(with settings: TwoPlayerGameSettings) {
+        startNewTwoPlayerGame(settings, replacingCurrent: true)
     }
 
     private func playFromPosition(_ fen: String) -> PlayGameSettings {
@@ -996,10 +1041,13 @@ struct HomeView: View {
 /// paresseusement via `.onAppear`, comme `ResumedGameHost` ci-dessous.
 private struct ActiveGameHost: View {
     let settings: PlayGameSettings
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (PlayGameSettings) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PlayViewModel?
 
     var body: some View {
@@ -1012,7 +1060,9 @@ private struct ActiveGameHost: View {
         }
         .onAppear {
             if viewModel == nil {
-                viewModel = PlayViewModel(settings: settings, modelContext: modelContext)
+                viewModel = sessionStore.value(for: sessionKey) {
+                    PlayViewModel(settings: settings, modelContext: modelContext)
+                }
             }
         }
     }
@@ -1022,10 +1072,13 @@ private struct ActiveGameHost: View {
 /// seule fois à l'apparition de cette vue.
 private struct ResumedGameHost: View {
     let autosave: PlayGameAutosave
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (PlayGameSettings) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PlayViewModel?
 
     var body: some View {
@@ -1042,7 +1095,9 @@ private struct ResumedGameHost: View {
         }
         .onAppear {
             if viewModel == nil {
-                viewModel = PlayViewModel(resuming: autosave, modelContext: modelContext)
+                viewModel = sessionStore.value(for: sessionKey) {
+                    PlayViewModel(resuming: autosave, modelContext: modelContext)
+                }
             }
         }
     }
@@ -1054,10 +1109,13 @@ private struct ResumedGameHost: View {
 /// process moteur ici, donc moins critique).
 private struct TwoPlayerActiveGameHost: View {
     let settings: TwoPlayerGameSettings
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (TwoPlayerGameSettings) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: TwoPlayerViewModel?
 
     var body: some View {
@@ -1070,7 +1128,9 @@ private struct TwoPlayerActiveGameHost: View {
         }
         .onAppear {
             if viewModel == nil {
-                viewModel = TwoPlayerViewModel(settings: settings, modelContext: modelContext)
+                viewModel = sessionStore.value(for: sessionKey) {
+                    TwoPlayerViewModel(settings: settings, modelContext: modelContext)
+                }
             }
         }
     }
@@ -1079,10 +1139,13 @@ private struct TwoPlayerActiveGameHost: View {
 /// Héberge un `TwoPlayerViewModel` restauré depuis l'autosauvegarde.
 private struct TwoPlayerResumedGameHost: View {
     let autosave: TwoPlayerGameAutosave
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (TwoPlayerGameSettings) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: TwoPlayerViewModel?
 
     var body: some View {
@@ -1099,7 +1162,9 @@ private struct TwoPlayerResumedGameHost: View {
         }
         .onAppear {
             if viewModel == nil {
-                viewModel = TwoPlayerViewModel(resuming: autosave, modelContext: modelContext)
+                viewModel = sessionStore.value(for: sessionKey) {
+                    TwoPlayerViewModel(resuming: autosave, modelContext: modelContext)
+                }
             }
         }
     }
@@ -1111,7 +1176,10 @@ private struct TwoPlayerResumedGameHost: View {
 /// que celui du mode Jouer).
 private struct AnalysisHost: View {
     let source: AnalysisSource
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onPlayFromHere: (String) -> Void
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: AnalysisViewModel?
 
     var body: some View {
@@ -1124,7 +1192,7 @@ private struct AnalysisHost: View {
         }
         .onAppear {
             if viewModel == nil {
-                viewModel = AnalysisViewModel(source: source)
+                viewModel = sessionStore.value(for: sessionKey) { AnalysisViewModel(source: source) }
             }
         }
     }
@@ -1136,9 +1204,12 @@ private struct AnalysisHost: View {
 /// un selon le filtre, au fil des "Nouveau puzzle".
 private struct PuzzleSessionHost: View {
     let filter: PuzzleSessionFilter
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
     let onViewSourceGame: (String) -> Void
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PuzzleSolveViewModel?
     @State private var hasAttemptedLoad = false
 
@@ -1161,7 +1232,9 @@ private struct PuzzleSessionHost: View {
         }
         .onAppear {
             if viewModel == nil, !hasAttemptedLoad {
-                viewModel = PuzzleSolveViewModel(filter: filter, modelContext: modelContext)
+                viewModel = sessionStore.value(for: sessionKey) {
+                    PuzzleSolveViewModel(filter: filter, modelContext: modelContext)
+                }
                 hasAttemptedLoad = true
             }
         }
@@ -1175,8 +1248,11 @@ private struct PuzzleSessionHost: View {
 private struct OpeningLineTrainingHost: View {
     let entry: OpeningLibraryEntry
     let color: Piece.Color
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
     let onContinueVsStockfish: (String) -> Void
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: OpeningLineTrainingViewModel?
 
     var body: some View {
@@ -1189,7 +1265,9 @@ private struct OpeningLineTrainingHost: View {
         }
         .onAppear {
             if viewModel == nil {
-                viewModel = OpeningLineTrainingViewModel(entry: entry, color: color)
+                viewModel = sessionStore.value(for: sessionKey) {
+                    OpeningLineTrainingViewModel(entry: entry, color: color)
+                }
             }
         }
     }
@@ -1201,7 +1279,10 @@ private struct OpeningLineTrainingHost: View {
 private struct LabHost: View {
     let settings: LabGameSettings?
     let resumeState: LabSeriesState?
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
     let onExit: () -> Void
+    @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: LabViewModel?
 
     var body: some View {
@@ -1214,10 +1295,10 @@ private struct LabHost: View {
         }
         .onAppear {
             if viewModel == nil {
-                if let resumeState {
-                    viewModel = LabViewModel(resuming: resumeState)
-                } else if let settings {
-                    viewModel = LabViewModel(settings: settings)
+                viewModel = sessionStore.value(for: sessionKey) {
+                    if let resumeState { return LabViewModel(resuming: resumeState) }
+                    if let settings { return LabViewModel(settings: settings) }
+                    return nil
                 }
             }
         }

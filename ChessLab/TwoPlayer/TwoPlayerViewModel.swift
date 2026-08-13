@@ -73,7 +73,10 @@ final class TwoPlayerViewModel {
         currentIndex = newGame.startingIndex
         clock = settings.timeControl.hasClock ? GameClock(control: settings.timeControl) : nil
 
-        AutosaveStore.clearTwoPlayer()
+        // Voir ``PlayViewModel/init(settings:modelContext:)`` : effacer une
+        // sauvegarde depuis un initialiseur détruit la partie de
+        // l'utilisateur à la moindre reconstruction de vue. L'effacement a
+        // lieu à l'intention explicite « nouvelle partie ».
         wireClock()
     }
 
