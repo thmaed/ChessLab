@@ -77,9 +77,16 @@ struct GameClockStartTests {
         // d'essai moteur tournent en parallèle), le réveil du test peut
         // précéder le premier tick — on mesurait alors l'ordre
         // d'ordonnancement, pas le comportement de la pendule.
+        // Fenêtre LARGE, et c'est nécessaire : quand la suite complète tourne,
+        // les bancs d'essai moteur monopolisent le `MainActor` pendant des
+        // dizaines de secondes d'affilée. Mesuré : ce test a mis 172 s à
+        // s'exécuter, sans que la tâche de la pendule obtienne un seul tour
+        // dans une fenêtre de 10 s. La boucle sort dès la première décrue —
+        // elle ne coûte donc rien sur une machine au repos (< 1 s).
         var later = initial
-        let deadline = Date().addingTimeInterval(10)
+        let deadline = Date().addingTimeInterval(120)
         while later >= initial, Date() < deadline {
+            await Task.yield()
             try await Task.sleep(nanoseconds: 200_000_000)
             later = try #require(viewModel.clock?.whiteRemaining)
         }

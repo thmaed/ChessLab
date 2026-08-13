@@ -4142,11 +4142,17 @@ joueur. `PlayViewModel.handleViewAppear()` (déjà présent) et un nouveau
 (« le temps des Blancs décroît AVANT le premier coup »). Sans le correctif,
 **2 échouent** ; avec, les 5 passent.
 
-*Piège de test rencontré* : la première version lisait la pendule juste après
-un `sleep` unique. La pendule décompte depuis sa propre tâche, sur le même
-acteur que le test — quand d'autres suites saturent le `MainActor`, le réveil
-du test peut précéder le premier tick. On mesurait l'ordonnancement, pas le
-comportement. Remplacé par une attente active bornée.
+*Piège de test rencontré, deux fois* : la première version lisait la pendule
+juste après un `sleep` unique. La pendule décompte depuis sa propre tâche, sur
+le même acteur que le test — quand d'autres suites saturent le `MainActor`, le
+réveil du test peut précéder le premier tick. On mesurait l'ordonnancement, pas
+le comportement. Remplacé par une attente active… dont la fenêtre de 10 s s'est
+révélée **encore trop courte** quand la suite complète tourne : les bancs
+d'essai moteur monopolisent l'acteur, et ce test a mis **170 s** à s'exécuter
+sans qu'un seul tick passe dans sa fenêtre. Fenêtre portée à 120 s ; elle sort
+dès la première décrue, donc ne coûte rien sur une machine au repos.
+
+**Suite unitaire complète : 444 tests, 74 suites, 0 échec.**
 
 ### Lot 3 — Le PGN exporté perdait sa position de départ
 
