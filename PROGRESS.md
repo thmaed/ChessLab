@@ -4039,8 +4039,11 @@ que masquée par un rouge sans diagnostic.
 
 ### Non fait
 
-- **Captures App Store** non régénérées. Elles restent supprimées dans l'arbre
-  de travail (suppression antérieure à ce chantier).
+- **Captures App Store régénérées** : 16 fichiers (accueil, Ouvertures,
+  lecteur, partie) × français/anglais × iPhone 16 Pro Max (`iphone-6.9`) et
+  iPad Pro 13" (`ipad-13`). Les anciennes étaient périmées (libellés « Contre
+  Stockfish », « Répertoires PGN ») et avaient été supprimées avant ce
+  chantier ; les nouvelles reflètent l'interface corrigée.
 - **Mac Catalyst** : aucune destination macOS compilée de toute la session.
   Le plancher de fenêtre à 820 pt et l'insensibilité de Catalyst aux clés
   `INFOPLIST_KEY_UISupportedInterfaceOrientations*` sont vérifiés **par
