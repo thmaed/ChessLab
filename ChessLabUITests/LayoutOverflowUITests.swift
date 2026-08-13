@@ -30,12 +30,14 @@ final class LayoutOverflowUITests: XCTestCase {
     func testPromotionPickerFitsOnScreen() throws {
         let app = launchApp()
         // Mesuré là où la contrainte mord : un écran de 375 pt. Sur iPad la
-        // largeur est surabondante — et surtout, le chemin ne fonctionne PAS
-        // là-bas : les deux taps (a7 puis a8) sont bien synthétisés, mais le
-        // sélecteur ne s'ouvre jamais. Promotion cassée dans *Analyser* sur
-        // iPad, ou simple différence de disposition ? Non tranché, faute de
-        // budget — signalé dans `PROGRESS.md` comme question ouverte plutôt
-        // que masqué par un test qui échouerait sans qu'on sache pourquoi.
+        // largeur est surabondante, la mesure n'y apprend rien.
+        //
+        // Ce chemin y est par ailleurs INSTABLE, mesuré : il passe sur iPad
+        // Pro 11" et 13", et échoue sur iPad **mini** — les deux taps (a7 puis
+        // a8) sont bien synthétisés, mais le sélecteur ne s'ouvre jamais.
+        // Cause non déterminée (défaut propre au mini ? simple lenteur ?),
+        // consignée dans `PROGRESS.md` comme question ouverte plutôt que
+        // laissée en rouge sans diagnostic.
         let traits = try LayoutProbe.traits(in: app, waitingForLandscape: false)
         try XCTSkipUnless(
             traits.horizontalSizeClass == "compact",

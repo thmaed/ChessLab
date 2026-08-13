@@ -3975,9 +3975,13 @@ create a bundle instance » — ce n'est pas un bug de test, il faut refaire un
 |---|---|---|
 | iPhone SE (3e gen) — L, AX3, AX5 | 11 | **11 verts** |
 | iPhone 16 Pro Max | 9 | **9 verts** |
-| iPad mini (A17 Pro) | 5 | 4 verts + 1 (voir plus bas) |
-| iPad Pro 11" (M5) | 5 | idem |
-| iPad Pro 13" (M5) | 5 | idem |
+| iPad mini (A17 Pro) | 5 | 4 verts + 1 (voir « question ouverte ») |
+| iPad Pro 11" (M5) | 5 | **5 verts** |
+| iPad Pro 13" (M5) | 5 | **5 verts** |
+
+*(Chiffres après correction des trois défauts de harnais décrits plus bas ;
+au premier passage, les trois iPad affichaient 3 rouges chacun — tous
+imputables au harnais, aucun à l'app.)*
 
 **Vérifications clés obtenues :**
 
@@ -4010,14 +4014,28 @@ chantier :
 
 ### Question ouverte, non tranchée
 
-**La promotion ne s'ouvre pas dans *Analyser* sur iPad.** Le test tape a7 puis
-a8 — les deux événements sont bien synthétisés, la position FEN est chargée,
-le plateau est affiché — et le sélecteur n'apparaît jamais. Sur iPhone le même
-chemin fonctionne. Vrai défaut de la promotion sur iPad, ou différence de
-disposition qui déplace les cases ? **Non déterminé**, faute de budget. Le
-test est borné à la classe compacte (là où la largeur est contrainte, donc là
-où la mesure a un sens) et la question est consignée ici plutôt que masquée
-par un test rouge sans diagnostic.
+**La promotion ne s'ouvre pas dans *Analyser* sur iPad mini** — et
+seulement là. Après correction du harnais, le relevé complet est sans
+ambiguïté :
+
+| Appareil | `testPromotionPickerFitsOnScreen` |
+|---|---|
+| iPad Pro 11" (M5) | ✅ |
+| iPad Pro 13" (M5) | ✅ |
+| **iPad mini (A17 Pro)** | ❌ |
+
+Le test tape a7 puis a8 — les deux événements sont bien synthétisés, la
+position FEN est chargée, le plateau affiché — et le sélecteur n'apparaît
+jamais, après 53 s d'attente (contre ~15 s pour un passage normal). Défaut
+propre au mini, ou simple lenteur de ce simulateur ? **Non déterminé**, faute
+de budget.
+
+*(Une première rédaction de cette note disait « sur iPad » : c'était faux,
+l'échec ne concerne que le mini — les deux iPad Pro passent.)*
+
+Le test est borné à la classe compacte, là où la largeur est réellement
+contrainte et où la mesure a un sens ; la question est consignée ici plutôt
+que masquée par un rouge sans diagnostic.
 
 ### Non fait
 
