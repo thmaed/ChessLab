@@ -44,6 +44,9 @@ struct TwoPlayerGameView: View {
         .padding(.top, 6)
         .padding(.bottom, 12)
         .appBackground()
+        // Le décompte démarre à l'APPARITION, pas à l'init : voir
+        // ``TwoPlayerViewModel/handleViewAppear()``.
+        .onAppear { viewModel.handleViewAppear() }
         .navigationTitle("Deux joueurs")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)

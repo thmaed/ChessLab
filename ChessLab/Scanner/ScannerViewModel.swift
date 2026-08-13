@@ -235,8 +235,13 @@ final class ScannerViewModel {
         image: CGImage, quad: BoardQuad, source: ScanSource,
         sideToMove: Piece.Color, templates: TemplateSquareClassifier
     ) async -> ScanResult? {
-        guard let rows = BoardRectifier.rectifyAndSlice(image, quad: quad),
-              let rectified = BoardRectifier.rectify(image, quad: quad)
+        // UN seul redressement. `rectifyAndSlice` fait déjà le `rectify` : le
+        // couple appelé ici en payait deux — deux `CIPerspectiveCorrection` et
+        // deux redimensionnements en 800×800 par scan, sur le chemin le plus
+        // lent de la fonctionnalité, celui où l'utilisateur attend devant un
+        // indicateur d'activité.
+        guard let rectified = BoardRectifier.rectify(image, quad: quad),
+              let rows = BoardRectifier.slice(rectified)
         else { return nil }
 
         let scan: BoardScanReading

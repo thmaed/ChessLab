@@ -984,6 +984,7 @@ final class PlayViewModel {
     /// jouait plus jamais : un écran d'apparence normale, définitivement muet.
     /// Même remède que ``AnalysisViewModel/handleViewAppear()``.
     func handleViewAppear() {
+        startClockIfGameHasNotBegun()
         // UNIQUEMENT après un aller-retour d'écran : jamais après un échec de
         // démarrage, où l'utilisateur doit voir la bannière et décider de
         // réessayer. Même discipline que ``AnalysisViewModel``.
@@ -996,6 +997,31 @@ final class PlayViewModel {
     /// Vrai entre un ``handleViewDisappear()`` qui a effectivement libéré
     /// Stockfish et le ``handleViewAppear()`` qui le rend.
     private var wasEngineReleasedOnDisappear = false
+
+    /// Lance le décompte à l'ouverture d'une partie neuve.
+    ///
+    /// La pendule était créée à l'`init` mais **jamais démarrée** : `startTurn`
+    /// n'était appelé qu'au premier `commit` et à la reprise d'une
+    /// autosauvegarde. Le camp au trait jouait donc son premier coup **hors du
+    /// temps**, l'affichage restait figé sur le temps initial, et si le moteur
+    /// avait les Blancs sa réflexion n'était pas décomptée non plus. Le
+    /// commentaire de la reprise qualifiait déjà ce comportement de bug
+    /// « répétable à volonté » — la nouvelle partie avait exactement le même.
+    ///
+    /// Démarré à l'APPARITION de la vue, pas à l'`init` : entre la
+    /// construction du view model et le premier pixel affiché il peut
+    /// s'écouler quelques centaines de millisecondes, et les décompter serait
+    /// voler du temps au joueur.
+    ///
+    /// `moveLog.isEmpty` borne l'effet à l'ouverture : un retour sur l'écran en
+    /// cours de partie ne redémarre rien (la pendule tourne déjà, ou elle est
+    /// suspendue pour une raison qui lui appartient).
+    private func startClockIfGameHasNotBegun() {
+        guard let clock, outcome == nil, moveLog.isEmpty, !clock.isRunning else { return }
+        // Sans `previousMover` : aucun incrément n'est crédité, personne n'a
+        // encore joué.
+        clock.startTurn(for: board.position.sideToMove)
+    }
 
     /// Redémarre le moteur au milieu d'une partie déjà commencée.
     ///

@@ -517,15 +517,28 @@ final class AnalysisViewModel {
         }
     }
 
+    /// Génération de lecture automatique — voir ``startAutoplay()``.
+    private var autoplayGeneration = 0
+
     private func startAutoplay() {
         guard canGoNext else { return }
+        autoplayGeneration &+= 1
+        let generation = autoplayGeneration
         autoplayTask = Task { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .seconds(1))
                 guard !Task.isCancelled, let self, self.canGoNext else { break }
                 self.advance()
             }
-            self?.autoplayTask = nil
+            // Ne remettre le suivi à zéro que si c'est bien CETTE tâche qui est
+            // enregistrée. Sans le jeton, deux appuis rapprochés sur ⏯ (stop
+            // puis start avant que l'ancienne tâche ne se réveille de son
+            // `Task.sleep`) faisaient annuler par l'ancienne le suivi de la
+            // NOUVELLE : `isAutoplaying` repassait à faux alors que la partie
+            // continuait de se dérouler, et `stopAutoplay()` n'avait plus rien
+            // à annuler — lecture inarrêtable jusqu'à la fin de la ligne.
+            guard let self, self.autoplayGeneration == generation else { return }
+            self.autoplayTask = nil
         }
     }
 
@@ -1744,6 +1757,15 @@ final class AnalysisViewModel {
 
     // MARK: Export / "Jouer à partir d'ici"
 
-    var exportedPGN: String { game.pgn }
+    /// PGN **rechargeable** : passe par ``PGNExport``, qui ajoute
+    /// `[SetUp "1"]` / `[FEN …]` quand la partie ne démarre pas de la position
+    /// standard.
+    ///
+    /// `game.pgn` seul les omet. Pour une session ouverte sur une **FEN**
+    /// (scan, éditeur de position, « Position FEN »), le PGN produit rejouait
+    /// donc ses coups depuis la position standard une fois rechargé — et cette
+    /// valeur alimente à la fois le partage et le `sourceGamePGN` des puzzles
+    /// générés, qui héritaient du même défaut.
+    var exportedPGN: String { PGNExport.pgn(for: game) }
     var currentFEN: String { board.position.fen }
 }

@@ -121,6 +121,15 @@ final class TwoPlayerViewModel {
         }
     }
 
+    /// Démarre le décompte à l'ouverture d'une partie neuve — voir
+    /// ``PlayViewModel/startClockIfGameHasNotBegun()`` pour le détail du bug :
+    /// la pendule était créée sans jamais être lancée, et le premier coup se
+    /// jouait hors du temps.
+    func handleViewAppear() {
+        guard let clock, outcome == nil, moveLog.isEmpty, !clock.isRunning else { return }
+        clock.startTurn(for: board.position.sideToMove)
+    }
+
     private func wireClock() {
         clock?.onFlagFall = { [weak self] color in
             self?.handleFlagFall(color)

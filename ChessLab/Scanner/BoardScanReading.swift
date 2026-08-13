@@ -18,11 +18,17 @@ enum BoardReadingRotation: Int, CaseIterable, Identifiable {
 
     var degrees: Int { rawValue * 90 }
 
-    /// Les seules orientations plausibles pour une source donnée.
-    static func candidates(for source: ScanSource) -> [BoardReadingRotation] {
-        // Un diagramme numérique a toujours les Blancs en bas OU en haut :
-        // deux orientations, jamais quatre (le plateau réel, seul cas à quatre,
-        // n'existe plus — voir ``ScanSource``).
+    /// Les seules orientations plausibles.
+    ///
+    /// Un diagramme numérique a toujours les Blancs en bas OU en haut : deux
+    /// orientations, jamais quatre (le plateau réel photographié de biais,
+    /// seul cas à quatre, n'existe plus — voir ``ScanSource``).
+    ///
+    /// - note: le paramètre `source` a été **retiré**. Il était ignoré, et une
+    ///   signature qui prend une source laisse croire à un comportement par
+    ///   source qui n'existe pas. S'il faut un jour distinguer les cas, c'est
+    ///   au moment de le rétablir qu'on saura quoi en faire.
+    static var candidates: [BoardReadingRotation] {
         [.none, .half]
     }
 
@@ -117,7 +123,7 @@ struct BoardScanReading {
     /// LÉGALE tranche la question ; sinon on retient celle dont les pions
     /// sont le mieux placés, et l'utilisateur garde la main.
     func suggestedRotation(sideToMove: Piece.Color = .white) -> BoardReadingRotation {
-        let candidates = BoardReadingRotation.candidates(for: source)
+        let candidates = BoardReadingRotation.candidates
 
         let legal = candidates.filter { rotation in
             FENValidator.isLegal(fen(rotation: rotation, sideToMove: sideToMove))

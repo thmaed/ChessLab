@@ -124,12 +124,15 @@ std::mutex gLifecycleMutex;
 
 extern "C" {
 
-void cstockfish_start(const char *binaryPath,
-                      cstockfish_output_callback callback,
-                      void *context) {
+int cstockfish_start(const char *binaryPath,
+                     cstockfish_output_callback callback,
+                     void *context) {
     std::lock_guard<std::mutex> lock(gLifecycleMutex);
     if (gRunning) {
-        return;
+        // Le process est DÉJÀ pris. On le dit à l'appelant au lieu de sortir
+        // en silence : reconfigurer `gOutput` ici détournerait la sortie du
+        // propriétaire actuel vers le nouveau venu, ce qui est pire.
+        return -1;
     }
 
     gOutput.configure(callback, context);
@@ -145,6 +148,7 @@ void cstockfish_start(const char *binaryPath,
         _main(1, argv);
     });
     gRunning = true;
+    return 0;
 }
 
 void cstockfish_send(const char *command) {

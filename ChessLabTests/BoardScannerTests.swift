@@ -121,8 +121,9 @@ struct BoardScannerTests {
     }
 
     @Test func digitalSourcesOnlyConsiderTwoOrientations() {
-        #expect(BoardReadingRotation.candidates(for: .screenshot) == [.none, .half])
-        #expect(BoardReadingRotation.candidates(for: .screenPhoto) == [.none, .half])
+        // Le paramètre `source` a été retiré : il était ignoré, et la
+        // signature laissait croire à un comportement par source (Lot 5.3).
+        #expect(BoardReadingRotation.candidates == [.none, .half])
     }
 
     @Test func rotatingAGridFourTimesReturnsIt() {

@@ -28,6 +28,13 @@ final class EngineLeakUITests: XCTestCase {
 
         try visitPlay(app)
         try visitAnalysis(app)
+        // Le Laboratoire manquait au parcours — alors que l'en-tête de ce
+        // fichier le documente depuis toujours. C'est pourtant le SEUL écran
+        // qui emprunte `computeBestMove`, donc `ensureMoveReader`, donc le
+        // lecteur permanent qui retenait le contrôleur à vie : la fuite tenait
+        // debout précisément parce que le test qui devait l'attraper ne
+        // passait pas par là.
+        try visitLaboratory(app)
 
         // Le compte est repris à l'accueil, une fois tous les écrans quittés.
         let created = createdCount(marker)
@@ -104,6 +111,50 @@ final class EngineLeakUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Position FEN"].waitForExistence(timeout: 10))
         app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 10))
+    }
+
+    /// Laboratoire : une série d'UNE partie à réflexion courte suffit — ce
+    /// qu'on traque n'est pas la durée mais le fait qu'un `computeBestMove` ait
+    /// eu lieu, donc qu'un lecteur de coups ait été installé.
+    @MainActor
+    private func visitLaboratory(_ app: XCUIApplication) throws {
+        guard tapEntry(app, "Laboratoire") else {
+            XCTFail("le Laboratoire doit être atteignable depuis l'accueil")
+            return
+        }
+        let start = app.buttons["Lancer"]
+        XCTAssertTrue(start.waitForExistence(timeout: 10), "l'écran de réglages du Labo doit s'ouvrir")
+        start.tap()
+
+        // Laisser la série démarrer et jouer quelques coups : un moteur qui n'a
+        // jamais cherché ne fuit pas de la même façon.
+        RunLoop.current.run(until: Date().addingTimeInterval(8))
+
+        // Deux écrans à remonter : la série est empilée SUR les réglages du
+        // Labo (comme l'analyse l'est sur son écran d'entrée).
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(
+            app.buttons["Lancer"].waitForExistence(timeout: 15),
+            "retour aux réglages du Laboratoire"
+        )
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(
+            app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 15),
+            "retour à l'accueil après le Laboratoire"
+        )
+    }
+
+    @MainActor
+    private func tapEntry(_ app: XCUIApplication, _ label: String) -> Bool {
+        for candidate in [app.buttons[label], app.cells[label], app.staticTexts[label]] {
+            guard candidate.waitForExistence(timeout: 5) else { continue }
+            for _ in 0..<4 {
+                if candidate.isHittable { candidate.tap(); return true }
+                app.swipeUp()
+                RunLoop.current.run(until: Date().addingTimeInterval(0.4))
+            }
+        }
+        return false
     }
 
     // MARK: Lecture du marqueur

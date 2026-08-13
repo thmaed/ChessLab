@@ -68,9 +68,21 @@ enum OpeningTrainingQueue {
         var due: [(card: TrainCard, date: Date)] = []
         var fresh: [TrainCard] = []
         for card in cards where seen.insert(card.fenKey).inserted {
-            if let snap = progress[card.fenKey] {
-                if let date = snap.dueDate, date <= now { due.append((card, date)) }
+            guard let snap = progress[card.fenKey] else {
+                fresh.append(card)
+                continue
+            }
+            if let date = snap.dueDate {
+                if date <= now { due.append((card, date)) }
             } else {
+                // Enregistrement SANS échéance : la position n'était ni « due »
+                // ni « neuve », donc elle disparaissait définitivement de la
+                // file, en silence. Inatteignable tant que seul `recordReview`
+                // crée des enregistrements — mais `ensureProgress` est
+                // `@discardableResult` et visible dans tout le module, et
+                // `firstSeenAt` suggère une création « à la première
+                // présentation » : le jour où quelqu'un l'appelle, la position
+                // se volatilise. On la traite comme neuve, ce qu'elle est.
                 fresh.append(card)
             }
         }

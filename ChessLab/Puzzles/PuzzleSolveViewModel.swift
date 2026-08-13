@@ -41,6 +41,9 @@ final class PuzzleSolveViewModel {
     /// l'ancien puzzle s'appliquait alors au plateau du SUIVANT (coup fantôme,
     /// puzzle rendu insoluble) dès qu'il s'y trouvait légal.
     private var revealTask: Task<Void, Never>?
+    /// Riposte adverse différée — suivie pour pouvoir l'annuler au puzzle
+    /// suivant, exactement comme ``revealTask``.
+    private var forcedReplyTask: Task<Void, Never>?
 
     private(set) var currentStep = 0
     private(set) var attemptsRemaining = 3
@@ -95,6 +98,7 @@ final class PuzzleSolveViewModel {
         // Avant toute chose : une révélation de solution encore en attente
         // jouerait son coup sur le plateau du puzzle qu'on charge ici.
         revealTask?.cancel()
+        forcedReplyTask?.cancel()
         revealTask = nil
         nextPuzzle = nil
         sessionIndex += 1
@@ -254,8 +258,15 @@ final class PuzzleSolveViewModel {
         guard currentStep < solutionMoves.count else { return }
         let lan = solutionMoves[currentStep]
         isAutoPlaying = true
-        Task { [weak self] in
+        // Tâche SUIVIE, comme `revealTask` : sans ça, la riposte différée de
+        // l'ancien puzzle se jouait sur le plateau du nouveau dès que
+        // l'enchaînement changerait. Latent aujourd'hui (« Nouveau puzzle »
+        // n'apparaît qu'après `finish`), mais le même piège a déjà été corrigé
+        // une fois à côté — autant ne pas le laisser en embuscade.
+        forcedReplyTask?.cancel()
+        forcedReplyTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: UInt64.random(in: 400_000_000...700_000_000))
+            guard !Task.isCancelled else { return }
             self?.applyForcedMove(lan: lan)
         }
     }

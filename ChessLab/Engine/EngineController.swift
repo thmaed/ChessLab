@@ -46,6 +46,19 @@ actor EngineController {
     }
 
     deinit {
+        // Rendre le process, même si personne n'a appelé `stop()` (chemin
+        // d'erreur, écran détruit brutalement). Sans ça : `cstockfish_stop()`
+        // jamais appelé → le drapeau global reste vrai → tous les écrans
+        // suivants héritent d'un moteur qu'ils ne possèdent pas, jusqu'au kill
+        // de l'app. Pire, le thread moteur continuait d'appeler le callback
+        // avec un `Unmanaged.passUnretained` vers un objet désalloué —
+        // use-after-free hors de toute pile Swift lisible.
+        //
+        // `stop()` de ``StockfishEngine`` est idempotent et ne coupe le process
+        // que si CETTE instance le possède.
+        engine.stop()
+        readerTask?.cancel()
+        moveReaderTask?.cancel()
         EngineInstanceCounter.shared.didRelease()
     }
 
@@ -101,7 +114,22 @@ actor EngineController {
 
         uciOk = false
         if !engine.isRunning {
-            engine.start(binaryPath: Self.enginePath)
+            // Le process moteur est UNIQUE (Stockfish a un état statique). Il
+            // peut encore appartenir à l'écran précédent : les libérations sont
+            // asynchrones et personne ne les attend — `PlayViewModel` fait
+            // `Task { await engine.stop() }` en partant, pendant que l'écran
+            // suivant construit déjà son contrôleur.
+            //
+            // On ATTEND donc sa libération, au lieu de l'ancien comportement où
+            // `cstockfish_start` sortait en silence : l'instance se croyait
+            // démarrée, ne recevait aucune ligne (le callback pointait toujours
+            // la précédente), échouait sur le délai de 5 s avec une bannière
+            // « Moteur indisponible » indiscernable d'une panne NNUE — et
+            // envoyait quand même ses commandes dans le moteur de l'autre écran.
+            guard await acquireEngineProcess() else {
+                didFailToStart = true
+                return false
+            }
         }
         startReader()
 
@@ -165,6 +193,22 @@ actor EngineController {
     @discardableResult
     func synchronize(timeoutMs: Int = 5000) async -> Bool {
         guard engine.isRunning else { return false }
+        // `responseStream` est un `AsyncStream` à **consommateur unique**.
+        // Deux tâches suspendues dans `next()` sur le même flux ne se « volent »
+        // pas des réponses comme le disaient les commentaires de l'app : la
+        // bibliothèque standard lève un `fatalError` (« attempt to await next()
+        // on more than one task »). C'est un crash immédiat, pas une
+        // dégradation.
+        //
+        // L'invariant reposait entièrement sur la discipline d'une file
+        // sérielle, plus quelques appels HORS file. On le rend au moins
+        // vérifiable : le lecteur permanent du Laboratoire est un consommateur
+        // à lui seul, donc `synchronize()` ne doit jamais être appelé pendant
+        // qu'il vit.
+        assert(
+            moveReaderTask == nil,
+            "synchronize() consomme responseStream alors que le lecteur de coups le consomme déjà : deux `next()` concurrents = fatalError du stdlib"
+        )
         await sendRaw(.isready)
         let outcome = await EngineWatchdog.run(deadlineMs: timeoutMs) {
             for await response in self.responseStream {
@@ -180,6 +224,29 @@ actor EngineController {
         engine.stop()
         readerTask?.cancel()
         readerTask = nil
+        // Le lecteur du Laboratoire aussi : c'est LUI qui faisait fuiter le
+        // contrôleur. `ensureMoveReader` crée une tâche qui itère le flux parsé
+        // sans fin ; tant qu'elle vit, elle retient l'instance, donc `deinit`
+        // n'arrive jamais et `EngineInstanceCounter.didRelease()` non plus —
+        // une instance « vivante » de plus à chaque passage au Laboratoire, et
+        // pour toujours.
+        moveReaderTask?.cancel()
+        moveReaderTask = nil
+    }
+
+    /// Attend que le process moteur se libère, puis le prend.
+    ///
+    /// Borné : au-delà, mieux vaut une bannière honnête qu'une attente sans
+    /// fin. Le cas normal se résout en quelques dizaines de millisecondes (le
+    /// temps du `quit` + join de l'écran précédent).
+    private func acquireEngineProcess(timeoutMs: Int = 4000) async -> Bool {
+        var attemptsLeft = max(timeoutMs / 50, 1)
+        while true {
+            if engine.start(binaryPath: Self.enginePath) { return true }
+            guard attemptsLeft > 0 else { return false }
+            attemptsLeft -= 1
+            try? await Task.sleep(nanoseconds: 50_000_000)
+        }
     }
 
     /// Relance l'instance après une panne : `stop` → nouvelle instance →
@@ -189,6 +256,8 @@ actor EngineController {
         engine.stop()
         readerTask?.cancel()
         readerTask = nil
+        moveReaderTask?.cancel()
+        moveReaderTask = nil
         resolve(with: nil)
         staleBestmovesToDiscard = 0
         latestMoverCp = nil
@@ -237,6 +306,13 @@ actor EngineController {
         return await withCheckedContinuation { continuation in
             if let orphaned = pendingContinuation {
                 pendingContinuation = nil
+                // Invalider AUSSI la recherche abandonnée (comme le fait
+                // `hardStopIfPending`) : sans ce compteur, son `bestmove`
+                // tardif — calculé pour la position PRÉCÉDENTE — venait
+                // résoudre la nouvelle continuation. Illégal, la partie du
+                // Laboratoire s'interrompait sans explication ; légal, il
+                // passait pour le bon coup.
+                staleBestmovesToDiscard += 1
                 orphaned.resume(returning: nil)
             }
             pendingContinuation = continuation
@@ -255,8 +331,12 @@ actor EngineController {
     private func ensureMoveReader() {
         guard moveReaderTask == nil else { return }
         moveReaderTask = Task { [weak self] in
-            guard let self else { return }
-            for await response in await self.responseStream {
+            guard let stream = await self?.responseStream else { return }
+            // `self` repris FAIBLEMENT à chaque tour, jamais capturé fort pour
+            // la durée de la boucle : sinon la tâche retient le contrôleur, le
+            // contrôleur retient la tâche, et le cycle survit à l'écran.
+            for await response in stream {
+                guard let self else { return }
                 await self.handle(response)
             }
         }

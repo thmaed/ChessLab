@@ -11,6 +11,21 @@ import Foundation
 /// fausse sur la donnée la plus douloureuse à perdre. Une montée en FSRS-6
 /// reste possible plus tard sans toucher au stockage.
 ///
+/// ## Pas de « learning steps » — décision assumée
+///
+/// Les implémentations de référence enveloppent l'algorithme de *pas
+/// d'apprentissage* (quelques minutes) : une carte ratée revient dans la
+/// SESSION. Ici, `intervalDays` a un plancher d'**un jour** — un « again »
+/// replanifie donc la position à **demain**, jamais dans la séance en cours.
+///
+/// Assumé, et non oublié. Ajouter une file de reprise intra-session change la
+/// nature de l'entraînement (durée d'une séance, sensation de progression,
+/// et le nombre de positions réellement vues par jour) : c'est une décision de
+/// produit, pas une correction de bug. Elle se ferait au niveau de
+/// ``OpeningTrainingQueue``, **sans toucher au stockage** — l'état FSRS n'a pas
+/// besoin d'évoluer pour ça. En attendant, le comportement est celui-ci :
+/// **une position ratée revient le lendemain.**
+///
 /// L'unité de révision est la POSITION (clé FEN normalisée), pas la ligne.
 /// L'état (`stability`, `difficulty`, `reps`, `lapses`, `lastReview`, `due`,
 /// `state`) est stocké BRUT dans notre propre `@Model`

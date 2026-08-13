@@ -4058,3 +4058,167 @@ que masquée par un rouge sans diagnostic.
 Deux échecs **préexistants** subsistent (`KeyboardShortcutsUITests`,
 `ScannerFlowUITests`), démontrés indépendants de ce chantier en rejouant sans
 aucun de mes correctifs applicatifs. Ils ne sont pas traités : hors périmètre.
+
+## Revue statique — bugs moteur, pendule, PGN, tâches, scanner (2026-08-13)
+
+Chantier `PROMPT-bugs.md` : une revue statique (lecture seule, sans build ni
+simulateur) avait listé des défauts à confirmer. Tous les diagnostics traités
+ci-dessous ont été **confirmés** à la lecture du code, et deux d'entre eux
+prouvés à l'exécution par un test rouge avant / vert après.
+
+### Lot 1 — Moteur : état global, instances mortes, fuite
+
+**Le fond du problème : `isRunning` était GLOBAL.** `cstockfish_start` sortait
+en silence quand `gRunning` était vrai, **sans reconfigurer le callback**. Une
+seconde instance créée pendant que la première se libérait — et les libérations
+sont asynchrones, personne ne les attend (`Task { await engine.stop() }` au
+départ d'un écran pendant que le suivant construit déjà son contrôleur) —
+se croyait donc démarrée, ne recevait aucune ligne, échouait sur le délai de
+5 s avec une bannière « Moteur indisponible » indiscernable d'une panne NNUE,
+**et envoyait quand même ses commandes** dans le moteur de l'autre écran.
+
+Correctifs :
+
+- `cstockfish_start` **rend un code** (`0` / `-1` si le process est pris) au
+  lieu de sortir en silence. Reconfigurer `gOutput` à la place aurait détourné
+  la sortie du propriétaire légitime vers le nouveau venu : pire.
+- `StockfishEngine` gagne un `didStart` **par instance** : `isRunning` vaut
+  désormais « j'ai démarré ET le process tourne ». Et `stop()` ne coupe le
+  process **que si cette instance le possède** — sans cette garde, l'instance
+  fantôme tuait le moteur de l'écran réellement actif en se libérant.
+- `EngineController.start()` **attend** la libération (par tentatives, borné à
+  4 s) au lieu de faire comme si de rien n'était. Au-delà, il échoue
+  honnêtement.
+- **Fuite (1.2)** : `ensureMoveReader` — chemin **exclusif au Laboratoire** —
+  installait une tâche qui itère le flux parsé sans fin et capturait `self`
+  FORT pendant l'itération. Ni `stop()` ni `deinit` ne l'annulaient : cycle de
+  rétention, `deinit` jamais appelé, une instance « vivante » de plus **à
+  chaque passage au Laboratoire**, définitivement. `self` est maintenant repris
+  faiblement à chaque tour, et la tâche est annulée par `stop()` et `restart()`.
+- **`deinit` (1.3)** rend le process : `engine.stop()` (idempotent, et sans
+  effet si l'instance n'est pas propriétaire) plus l'annulation des lecteurs.
+  Sans ça, une libération hors `stop()` laissait `gRunning` vrai pour tous les
+  écrans suivants, et le thread moteur continuait d'appeler un callback pointant
+  un objet désalloué — use-after-free.
+- **Recherches croisées (1.4)** : abandonner une recherche incrémente désormais
+  `staleBestmovesToDiscard`, comme le fait `hardStopIfPending`. Sans ce
+  compteur, le `bestmove` tardif de la position PRÉCÉDENTE venait résoudre la
+  nouvelle continuation — coup illégal (partie du Labo interrompue sans
+  explication) ou, pire, coup légal accepté pour le bon.
+- **Consommateur unique (1.5)** : le commentaire du dépôt parlait de réponses
+  « volées » ; c'est en réalité un `fatalError` du stdlib (« attempt to await
+  next() on more than one task »), donc un crash. L'invariant devient
+  **vérifiable** : `synchronize()` assère en DEBUG qu'aucun lecteur de coups
+  n'est installé. Le multiplexeur reste la vraie solution, non retenue ici
+  (refonte du contrôleur, hors périmètre d'une correction de bug).
+
+**Vérifié — rouge avant / vert après.** `EngineLeakUITests` traverse enfin le
+**Laboratoire** : son en-tête documentait ce parcours depuis toujours, mais le
+test n'appelait que `visitPlay` et `visitAnalysis`. La fuite tenait debout
+précisément parce que le test censé l'attraper ne passait pas par là.
+
+| | Instances vivantes au retour à l'accueil |
+|---|---|
+| Sans les correctifs | **1** (sur 3 créées) ❌ |
+| Avec | **0** ✅ |
+
+### Lot 2 — La pendule ne décomptait pas le premier coup
+
+`startTurn` n'était appelé qu'au premier `commit` et à la reprise d'une
+autosauvegarde ; les `init` de partie neuve créaient la `GameClock` **sans la
+démarrer**. Le camp au trait jouait donc son premier coup **hors du temps**,
+l'affichage restait figé, et contre Stockfish aux Blancs la réflexion du moteur
+n'était pas décomptée. Le commentaire de la reprise qualifiait déjà ce
+comportement de bug « répétable à volonté » : la partie neuve avait le même.
+
+**Décision : démarrage à l'APPARITION de la vue**, pas à l'`init`. Entre la
+construction du view model et le premier pixel affiché il peut s'écouler
+quelques centaines de millisecondes ; les décompter reviendrait à les voler au
+joueur. `PlayViewModel.handleViewAppear()` (déjà présent) et un nouveau
+`TwoPlayerViewModel.handleViewAppear()` s'en chargent, bornés à
+`moveLog.isEmpty` pour qu'un simple retour sur l'écran ne relance rien.
+
+**Vérifié** : `GameClockStartTests` — 5 tests, dont celui exigé par le Lot 0.3
+(« le temps des Blancs décroît AVANT le premier coup »). Sans le correctif,
+**2 échouent** ; avec, les 5 passent.
+
+*Piège de test rencontré* : la première version lisait la pendule juste après
+un `sleep` unique. La pendule décompte depuis sa propre tâche, sur le même
+acteur que le test — quand d'autres suites saturent le `MainActor`, le réveil
+du test peut précéder le premier tick. On mesurait l'ordonnancement, pas le
+comportement. Remplacé par une attente active bornée.
+
+### Lot 3 — Le PGN exporté perdait sa position de départ
+
+`AnalysisViewModel.exportedPGN` valait `game.pgn`, **contournant** `PGNExport`
+— qui existe précisément pour émettre `[SetUp "1"]` / `[FEN …]`. Pour une
+session ouverte sur une FEN (scan, éditeur, « Position FEN »), le PGN partagé,
+rechargé, rejouait ses coups depuis la position **standard**. La même valeur
+alimentait le `sourceGamePGN` des puzzles générés.
+
+`PGNExport` a été rendu robuste au passage : il préfixait `"[SetUp…]\n[FEN…]\n\n"`,
+ce qui n'était correct **que parce que** les parties de l'app n'ont aujourd'hui
+aucun tag. Au premier tag (nom des joueurs, `Result`, ou un PGN importé), le
+préfixe créait une **troisième section** et `PGNParser` levait
+`.tooManyLineBreaks` — PGN irrécupérable. Les tags s'insèrent désormais **dans**
+la section de tags. Trois tests couvrent les trois cas (FEN, position standard,
+partie déjà taguée).
+
+### Lot 4 — Tâches non annulables
+
+- **Lecture automatique (Analyse)** : la tâche remettait `autoplayTask = nil`
+  en sortie de boucle sans vérifier que c'était bien *elle* l'enregistrée. Deux
+  appuis rapprochés sur ⏯ et l'ancienne tâche annulait le suivi de la
+  **nouvelle** : `isAutoplaying` repassait à faux pendant que la partie
+  continuait de se dérouler, et `stopAutoplay()` n'avait plus rien à annuler —
+  lecture inarrêtable. Corrigé par un jeton de génération.
+- **Riposte de puzzle** : tâche différée non suivie, alors que le même piège
+  avait déjà été corrigé pour `revealTask` juste à côté. Latent aujourd'hui,
+  mais tout changement d'enchaînement aurait rejoué le coup adverse de
+  l'ancien puzzle sur le plateau du nouveau. Suivie et annulée dans
+  `loadNextPuzzle()`.
+
+### Lot 5 — Scanner
+
+- **Redressement calculé deux fois** : `rectifyAndSlice` fait déjà le
+  `rectify`, et l'appelant demandait les deux — soit deux
+  `CIPerspectiveCorrection` et deux redimensionnements 800×800 par scan, sur le
+  chemin où l'utilisateur attend devant un indicateur d'activité. Remplacé par
+  `rectify` + `slice`.
+- **Paramètre mort** : `BoardReadingRotation.candidates(for:)` ignorait
+  `source`. Le paramètre est **retiré** plutôt que documenté : une signature
+  qui prend une source laisse croire à un comportement par source qui n'existe
+  pas.
+- **5.2 (lignes extrêmes de la grille) NON traité** : le diagnostic est exact à
+  la lecture (`edgeProfile` laisse `profile[0]` et `profile[side-1]` à zéro,
+  donc le couple pas/phase est choisi sur 7 lignes au lieu de 9), mais le
+  corriger sans mesurer sur les fixtures reviendrait à changer un algorithme de
+  recalage « au pixel près » à l'aveugle. À faire avec la comparaison
+  avant/après demandée.
+
+### Lot 6 — Répétition espacée
+
+- **6.1 corrigé** : une position ayant un enregistrement **sans** `dueDate`
+  n'était ni « due » ni « neuve » — elle disparaissait de la file, en silence.
+  Inatteignable aujourd'hui (seul `recordReview` crée des enregistrements),
+  mais `ensureProgress` est `@discardableResult` et visible dans tout le
+  module. Traitée comme neuve, avec deux tests.
+- **6.2 — décision : on assume, et on le documente.** FSRS-5 est correctement
+  implémenté, mais `intervalDays` plancher à 1 jour : une position ratée
+  revient **demain**, pas dans la session. Ajouter des *learning steps*
+  changerait la nature de l'entraînement (durée de séance, nombre de positions
+  vues par jour) — c'est une décision de produit, pas une correction de bug.
+  Le comportement est désormais écrit noir sur blanc en tête de `FSRS.swift`,
+  avec l'endroit où l'implémenter le jour venu (`OpeningTrainingQueue`, sans
+  toucher au stockage).
+
+### Non fait
+
+- **Journal UCI en DEBUG (Lot 0.2)** non ajouté : les deux bugs qu'il devait
+  départager (1.1 et 1.2) ont été confirmés autrement — le premier par lecture
+  du shim (`if (gRunning) return;` sans reconfiguration du callback, sans
+  ambiguïté possible), le second par le test de fuite, rouge puis vert. Un
+  journal n'aurait rien prouvé de plus.
+- **Lot 5.2** (voir ci-dessus).
+- Le **multiplexeur** du Lot 1.5 : l'invariant est rendu vérifiable, pas
+  supprimé.

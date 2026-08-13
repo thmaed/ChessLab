@@ -28,10 +28,17 @@ typedef void (*cstockfish_output_callback)(const char *line, void *context);
 ///   Stockfish pour trouver les réseaux NNUE (`nn-*.nnue`). Passer un chemin
 ///   dans le dossier des ressources du bundle, p. ex. « <Resources>/stockfish ».
 /// - callback / context : reçoivent la sortie UCI, ligne par ligne.
-/// Sans effet si le moteur tourne déjà.
-void cstockfish_start(const char *binaryPath,
-                      cstockfish_output_callback callback,
-                      void *context);
+/// - returns: 0 si le moteur a démarré, **-1 si un moteur tourne déjà**.
+///
+/// Ce code de retour n'existait pas : la fonction sortait en silence quand
+/// `gRunning` était vrai, SANS reconfigurer le callback. L'appelant croyait
+/// alors avoir démarré, ne recevait plus aucune ligne (le callback pointait
+/// toujours l'instance précédente), attendait `uciok` en vain jusqu'au
+/// délai de 5 s — et pendant ce temps ses commandes partaient quand même
+/// dans le moteur de l'AUTRE écran, dont elles polluaient le flux.
+int cstockfish_start(const char *binaryPath,
+                     cstockfish_output_callback callback,
+                     void *context);
 
 /// Envoie une commande UCI (une ligne ; le '\n' est ajouté au besoin).
 /// Sans effet si le moteur n'est pas démarré.
