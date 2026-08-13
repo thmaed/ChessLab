@@ -51,6 +51,10 @@ struct ChessLabApp: App {
         WindowGroup {
             HomeView()
                 .preferredColorScheme(.dark)
+                // Traits réels de la fenêtre (classes de taille, taille,
+                // encoches) exposés aux tests de mise en page — et affichés
+                // à l'écran avec `-showTraits`. Voir ``LayoutTraitsProbe``.
+                .layoutTraitsProbe()
                 // `Text` dépend de la locale de l'environnement : la changer
                 // force SwiftUI à re-rendre chaque `Text`, qui re-résout alors
                 // sa clé via le bundle détourné (langue in-app). On NE force

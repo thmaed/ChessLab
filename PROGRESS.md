@@ -3432,3 +3432,241 @@ de support déposées dans `docs/`) — détail dans `AppStoreSubmission/`.
 
 **330 tests / 53 suites verts** (348/54 moins les 18 tests du service
 Lichess supprimé).
+
+## Lot 0 — instrumentation et mesure des traits de mise en page (2026-08-13)
+
+Point de départ : deux remontées utilisateur (écrans qui dépassent en
+largeur sur iPhone ; échiquier minuscule en paysage) et un audit **statique**
+qui n'avait pu être validé à l'exécution. Ce lot ne corrige rien : il pose
+l'instrumentation et **mesure**, pour que les lots suivants s'appuient sur
+des relevés plutôt que sur des hauteurs de chrome estimées.
+
+### Fait
+
+- **`ChessLab/LayoutTraitsProbe.swift`** — sonde `#if DEBUG` posée sur la
+  racine (`ChessLabApp`). Elle expose les traits réels de la fenêtre dans un
+  marqueur d'accessibilité `layoutTraits` (`h`, `v`, taille fenêtre, taille
+  de zone sûre, encoches, `dynamicTypeSize`), et affiche la même chose en
+  surimpression avec l'argument de lancement `-showTraits`. Hors Debug,
+  `layoutTraitsProbe()` ne fait rien — rien de tout cela n'existe dans le
+  binaire livré.
+- **`ChessLabUITests/LayoutProbe.swift`** — harnais de mesure :
+  - lecture/analyse des traits (`LayoutTraits`), avec attente active de
+    l'orientation demandée (une rotation n'est pas instantanée : sans ça on
+    mesure encore la fenêtre d'avant) ;
+  - `boardRect(in:)` — rectangle du plateau par **union des `frame` de
+    `square_a8` et `square_h1`**, sans instrumenter le code applicatif ;
+  - `horizontalOverflows(in:)` — détecteur générique : parcourt les
+    descendants et signale tout élément coupé par un bord de la fenêtre.
+- **`ChessLabUITests/LayoutTraitsUITests.swift`** — relevés (traits,
+  géométrie du plateau, inventaire des débordements), imprimés sous forme
+  `TRAITS|…` / `BOARD|…` / `OVERFLOW|…` et récupérés dans la sortie
+  `xcodebuild`.
+- **`ChessLabUITests/LayoutOverflowUITests.swift`** — les tests de
+  non-régression du Lot 5, écrits **avant** les correctifs pour constater
+  leur échec (sélecteur de promotion, plateau ≥ 80 % de la largeur utile,
+  détecteur sur accueil et sur *Jouer*).
+
+### Décisions d'architecture
+
+- **Le marqueur va en `.background`, jamais en `.overlay`.** Posé en
+  superposition, son élément d'accessibilité pleine fenêtre devient le
+  premier touché au point de frappe : XCUITest déclare alors « Not
+  hittable » **tous** les boutons de l'écran, et `ResumeGameUITests` est
+  tombé ainsi. `allowsHitTesting(false)` n'y change rien — c'est la
+  hiérarchie d'accessibilité, pas le hit-testing SwiftUI, que consulte le
+  pilote de test. Même parti pris que le marqueur `engineInstances` existant.
+  La surimpression *visible*, elle, reste au-dessus, mais seulement sous
+  `-showTraits` (mode d'inspection manuelle, jamais piloté par les tests).
+- **`GeometryReader` SANS `ignoresSafeArea`.** Mesuré : avec
+  `.ignoresSafeArea()`, la vue possède tout l'écran et les encoches sont
+  rapportées **à zéro** (iPhone SE : 375×667 avec des insets nuls, alors que
+  la barre d'état en occupe 20). Sans, `geo.size` est la zone sûre et
+  `geo.safeAreaInsets` les vraies encoches ; la taille de fenêtre se
+  reconstitue par addition. C'est cette forme qui donne les deux
+  informations.
+- **Le détecteur ignore les éléments ENTIÈREMENT hors cadre.** Un
+  `ScrollView(.horizontal)` — le bon patron, déjà en place dans
+  `MoveStripView`, `AnalysisLibraryView`, `OpeningReaderView` — pousse
+  légitimement du contenu hors de la fenêtre. Ce qu'on traque, c'est
+  l'élément **coupé** : partiellement visible, tranché par le bord. Les
+  conteneurs (`.other`) sont exclus du parcours : leur largeur ne dit rien de
+  ce que l'utilisateur voit couper ; les cases du plateau, qui sont des
+  `.other`, se mesurent séparément par `boardRect(in:)`.
+- **Compiler depuis `/tmp`** (rappel) : le dépôt est sous `~/Desktop`
+  synchronisé iCloud, où `xcodebuild` se bloque. Piège rencontré en plus
+  cette fois : `-destination 'generic/platform=iOS Simulator'` compile aussi
+  **x86_64**, que le Stockfish vendorisé (NEON) refuse — viser une
+  destination concrète, ou `ARCHS=arm64`.
+
+### Vérifié — classes de taille réelles (iOS 26.5, simulateur)
+
+Fenêtre = zone sûre + encoches. Encoches notées haut/gauche/bas/droite.
+
+| Appareil | Orientation | h / v | Fenêtre | Zone sûre | Encoches |
+|---|---|---|---|---|---|
+| iPhone SE (3e gen) | portrait | compact / regular | 375×667 | 375×647 | 20/0/0/0 |
+| iPhone SE (3e gen) | paysage | compact / compact | 667×375 | 667×375 | 0/0/0/0 |
+| iPhone 16 | portrait | compact / regular | 393×852 | 393×759 | 59/0/34/0 |
+| iPhone 16 | paysage | compact / compact | 852×393 | 734×373 | 0/59/20/59 |
+| iPhone 16 Pro | portrait | compact / regular | 402×874 | 402×778 | 62/0/34/0 |
+| iPhone 16 Pro | paysage | compact / compact | 874×402 | 750×382 | 0/62/20/62 |
+| **iPhone 16 Plus** | portrait | compact / regular | 430×932 | 430×839 | 59/0/34/0 |
+| **iPhone 16 Plus** | paysage | **regular** / compact | 932×430 | 814×410 | 0/59/20/59 |
+| **iPhone 16 Pro Max** | portrait | compact / regular | 440×956 | 440×860 | 62/0/34/0 |
+| **iPhone 16 Pro Max** | paysage | **regular** / compact | 956×440 | 832×420 | 0/62/20/62 |
+| iPad mini (A17 Pro) | portrait | regular / regular | 744×1133 | 744×1081 | 32/0/20/0 |
+| iPad mini (A17 Pro) | paysage | regular / regular | 1133×744 | 1133×692 | 32/0/20/0 |
+| iPad Pro 11" (M5) | portrait | regular / regular | 834×1210 | 834×1158 | 32/0/20/0 |
+| iPad Pro 11" (M5) | paysage | regular / regular | 1210×834 | 1210×782 | 32/0/20/0 |
+| iPad Pro 13" (M5) | portrait | regular / regular | 1032×1376 | 1032×1324 | 32/0/20/0 |
+| iPad Pro 13" (M5) | paysage | regular / regular | 1376×1032 | 1376×980 | 32/0/20/0 |
+
+**L'hypothèse de l'audit est CONFIRMÉE** : iPhone **Plus** et **Pro Max**
+rapportent `horizontalSizeClass == .regular` en paysage, contrairement à
+iPhone SE / 16 / 16 Pro qui restent `.compact`. Ces deux modèles basculent
+donc sur l'ossature iPad (`splitBody`) **à la simple rotation** — le
+déclencheur de perte de partie du Lot 1 est atteignable sans multitâche, sur
+deux modèles grand public. Ce n'est plus un scénario iPad exotique.
+
+Deux relevés secondaires utiles pour la suite :
+
+- en paysage, la zone sûre d'un iPhone perd **118 à 124 pt de largeur** en
+  encoches latérales (734 utiles sur 852 pour un iPhone 16) — l'estimation
+  « ~734 pt inutilisés » de l'audit tombe juste ;
+- les iPad ne changent **jamais** de classe de taille par rotation (toujours
+  `regular/regular`) : leur exposition au Lot 1 passe exclusivement par
+  Split View / Slide Over / Stage Manager.
+
+### Vérifications statiques de l'audit
+
+| Affirmation | Verdict | Mesure |
+|---|---|---|
+| `verticalSizeClass` lu dans aucun fichier | confirmé | 0 occurrence |
+| Aucun `@ScaledMetric` / `dynamicTypeSize` / `sizeCategory` | confirmé | 0 occurrence |
+| 21 `.font(.system(size:))` figées | nuancé | **29** aujourd'hui |
+| 11 écrans affichent un échiquier | confirmé | 11 fichiers appellent `ChessBoardView(` (+ `PositionEditorView`, qui a son propre plateau) |
+| Aucun `XCUIDevice`/`orientation` dans `ChessLabUITests/` | confirmé | 0 occurrence avant ce lot |
+| Orientations iPhone déclarées en Debug ET Release | confirmé | pbxproj : `Portrait LandscapeLeft LandscapeRight` aux deux ; clé `_iPad` = 4 orientations |
+| 782 clés, 92 sans traduction anglaise | nuancé | **796 clés, 85 sans `en`** — conclusion inchangée : le pire cas de largeur est le français dans les deux langues |
+| `PromotionPickerView` : 380 pt rigides | confirmé (calcul) | 4×(10+56+10) + 3×12 + 2×20 |
+| `Text(choice.label)` non localisant | confirmé | `choices` est un `[String]` → `Text(_: String)` |
+| `FlowLayout` et `WrapLayout` portent le même défaut | confirmé | `sizeThatFits(.unspecified)` + garde `x > minX` dans les deux |
+| 7 hôtes de view model détruits par la bascule | nuancé | **8** — `TwoPlayerResumedGameHost` manquait à la liste |
+| `AutosaveStore.clearPlay()` appelé depuis l'`init` | confirmé | `PlayViewModel.init(settings:)`, `TwoPlayerViewModel.init(settings:)` |
+| `.onChange(of: sidebarSelection)` posé sur `sidebar` | confirmé | `HomeView.swift:314` — jamais exécuté en compact |
+| `modesSection` appelée seulement depuis `iPhoneHome` | confirmé | un seul site (`:645`) ; le commentaire de `ModeCard` référence un `modeGridColumns` **qui n'existe plus** |
+| `ModeCard` déborde verticalement en AX3+ | nuancé | hauteur figée confirmée (132/168), mais titre et sous-titre ont déjà `lineLimit(2)` + `minimumScaleFactor` → troncature attendue plutôt que débordement ; reste à mesurer |
+| `LabRunView.statTile` : `lineLimit(1)` sans `minimumScaleFactor` | nuancé | la valeur a `minimumScaleFactor(0.7)` ; seul le libellé `caption2` en est dépourvu |
+| `PuzzleSolveView:80` inatteignable sur iPhone | confirmé | dans `wideLayout`, gardé par `.regular` **et** `width > height` |
+| `HelpView` : largeur dure depuis `UIScreen.main.bounds` | confirmé | `authorImageWidth` |
+| `AnalysisView:173` : `min(width*0.55, height - 48)` | confirmé | tel quel |
+
+### Non vérifié à ce stade
+
+- **Display Zoom** (le plancher de 320 pt) : non reproductible par argument
+  de lancement, donc jamais mesuré — les chiffres « à 320 pt » de l'audit
+  restent des calculs.
+- **Split View / Slide Over / Stage Manager** : non pilotables depuis
+  XCUITest. L'exposition iPad au Lot 1 reste donc démontrée par le code, pas
+  par la mesure — d'où le besoin, au Lot 1, d'un moyen déterministe de
+  provoquer la bascule de classe de taille.
+- **Mac Catalyst** : aucune destination macOS testée dans ce lot.
+- **Dynamic Type** : relevés faits à la taille `large` uniquement ; les
+  tailles accessibilité viendront avec les tests du Lot 3.
+
+### Vérifié — le harnais 0.2 à l'épreuve
+
+Premier passage sur iPhone SE (375 pt, français, taille de texte par
+défaut) et iPhone 16 :
+
+| Mesure | Résultat |
+|---|---|
+| Plateau, portrait iPhone SE | côté **375 pt** = **100 %** de la largeur utile |
+| Plateau, portrait iPhone 16 | côté **393 pt** = **100 %** de la largeur utile |
+| Détecteur sur *Jouer* (début de partie) | aucun débordement |
+| Détecteur sur l'accueil | **4 signalements** (voir ci-dessous) |
+| Sélecteur de promotion, tuiles | 17,5→93,5 / 105,5→181,5 / 193,5→269,5 / 281,5→357,5 dans une fenêtre 0→375 |
+
+**Le portrait iPhone est excellent et le reste** : le plateau occupe la
+largeur entière (`PlayView` annule sa marge pour le seul plateau). Le
+garde-fou du Lot 5.3 (≥ 80 %) a donc une marge confortable.
+
+**3.1 — sélecteur de promotion : diagnostic NUANCÉ, sévérité à revoir.**
+L'arithmétique de l'audit est juste (4×76 + 3×12 + 2×20 = **380 pt**, et
+380 > 375), mais la conséquence annoncée ne se reproduit pas : à taille de
+texte par défaut, **aucune tuile n'est coupée** — les quatre boutons tiennent
+entre 17,5 et 357,5 pt. Ce qui dépasse, ce sont les **2,5 pt de fond de carte
+de chaque côté** (la carte de 380 pt centrée dans 375). Le symptôme réel est
+un liseré arrondi rogné, pas des « boutons rognés ». Le défaut de fond reste
+à corriger (largeur rigide incompressible, et surtout explosion aux tailles
+d'accessibilité), mais ce n'est pas le 🔴 critique annoncé, et ce **n'est
+probablement pas** la remontée utilisateur n°1.
+
+Conséquence pour le harnais : le détecteur ne l'attrape pas, puisqu'il exclut
+les conteneurs `.other` — dont les fonds de carte. Le test du Lot 5.2 devra
+donc mesurer la **carte** du sélecteur (identifiant d'accessibilité à
+ajouter), pas seulement ses tuiles.
+
+**Découverte NON prévue par l'audit — l'accueil déborde sur iPhone SE.** Le
+détecteur signale les tuiles « Deux joueurs » (17,5 pt dehors) et
+« Ouvertures » (6,5 pt dehors) de la grille des modes. Vérification
+arithmétique : la grille place bien la 2e colonne à x=194,5 pour une tuile
+de 160,5 pt (fin à 355 pt, correcte) — **c'est la grande icône décorative
+« fantôme » de `ModeCard`** (`Image(systemName:)` en 96 pt, `offset(x: 46)`)
+qui étend la `frame` d'accessibilité jusqu'à 392,5 pt. Elle est **visuellement
+écrêtée** par le `.clipShape` de la carte, mais l'accessibilité, elle, ne
+sait pas qu'elle est écrêtée.
+
+C'est donc un **faux positif à l'écran** — mais un **vrai défaut
+d'accessibilité** : cette icône purement décorative n'a rien à faire dans la
+hiérarchie (VoiceOver la voit, et elle fausse la géométrie annoncée aux
+outils). À corriger au Lot 3 par `accessibilityHidden(true)`, ce qui rendra
+du même coup le détecteur exploitable sur l'accueil.
+
+**3.3 — bandeau de pièces capturées : non reproduit à ce stade**, et pour une
+raison simple : au début de partie le bandeau est vide. Le mesurer demande
+une partie avec une dizaine de prises — à faire au Lot 3.
+
+### Incident d'infrastructure, sans rapport avec le code
+
+Un des relevés (`testReportBoardGeometry` sur iPhone SE) est tombé avec
+« Test crashed with signal term ». Diagnostic : c'est **`SimRenderServer`**
+(le serveur de rendu du simulateur) qui a crashé — rapport dans
+`~/Library/Logs/DiagnosticReports/`, à l'horodatage exact — vraisemblablement
+parce que plusieurs simulateurs tournaient de front. La même mesure obtenue
+par un autre chemin (`BOARD-RATIO` du test de débordement) est cohérente.
+À retenir : **ne pas lire un « signal term » comme un bug de l'app** sans
+avoir regardé les rapports de crash de l'hôte.
+
+### Vérifié — 4.1 : l'accueil iPad en portrait est INFIRMÉ
+
+Le relevé du plateau sur iPad Pro 11" a d'abord échoué faute de trouver
+« Contre l'ordinateur » à l'écran, ce qui ressemblait à une confirmation
+spectaculaire du diagnostic 4.1 (« plus aucun point d'entrée vers les modes
+en portrait »). Vérification faite (`IPadEntryPointsUITests`, qui exige une
+`frame` non vide **et** dans la fenêtre, pas la simple existence dans la
+hiérarchie) : c'est l'inverse.
+
+| Appareil | Orientation | Modes atteignables | Position des lignes |
+|---|---|---|---|
+| iPad Pro 11" | portrait | **6/6** | x=26→314 dans une fenêtre de 834 pt, y=130→442 |
+| iPad Pro 11" | paysage | **6/6** | idem, fenêtre 1210 pt |
+| iPhone 16 | portrait | 6/6 | grille de tuiles |
+
+Sur **iPadOS 26.5, la barre latérale est affichée par défaut en portrait**
+(le bouton de la barre d'outils propose « Masquer la barre latérale », donc
+elle est visible) : les six modes sont atteignables dès le lancement, dans
+les deux orientations. La prémisse de l'audit — « en portrait, iPadOS masque
+la sidebar par défaut » — ne tient pas sur cette version.
+
+Ce qui reste vrai du diagnostic : la grille `modesSection` n'existe
+effectivement que dans l'ossature iPhone, et `detailRoot` ne pose ni
+`navigationTitle` ni `toolbar`. Mais l'écran n'est pas « sans issue », et la
+priorité du Lot 4 baisse d'autant.
+
+Le vrai enseignement est ailleurs : **l'échec initial venait de mon propre
+harnais**, pas de l'app. Une ligne de barre latérale est remontée par
+XCUITest en `staticText`, pas en `button` ni en `cell` — l'assistant de
+navigation cherchait les deux mauvaises formes. Corrigé dans
+`LayoutTraitsUITests`. À retenir pour tous les tests iPad à venir.
