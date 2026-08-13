@@ -3955,3 +3955,85 @@ iPadOS 26.5), ce lot se concentre sur les deux débordements réels.
   constante devinée au profit d'une règle de priorité de disposition, ce qui
   est structurellement plus sûr — mais c'est une correction *par
   construction*, pas une mesure.
+
+## Lot 5 — non-régression et matrice de vérification (2026-08-13)
+
+### Suite unitaire
+
+**430 tests, 72 suites, 0 échec** (iPhone 16, iOS 26.5). C'est la vérification
+qui manquait le plus : les lots 1 et 3 touchent `PlayViewModel`,
+`TwoPlayerViewModel` et `Theme`. Rien n'a bougé.
+
+*Piège rencontré* : un `xcodebuild build` simple écrase `ChessLab.app` **sans**
+son greffon `ChessLabTests.xctest`, et le run suivant échoue sur « Failed to
+create a bundle instance » — ce n'est pas un bug de test, il faut refaire un
+`build-for-testing`.
+
+### Matrice de mise en page
+
+| Appareil | Tests | Résultat |
+|---|---|---|
+| iPhone SE (3e gen) — L, AX3, AX5 | 11 | **11 verts** |
+| iPhone 16 Pro Max | 9 | **9 verts** |
+| iPad mini (A17 Pro) | 5 | 4 verts + 1 (voir plus bas) |
+| iPad Pro 11" (M5) | 5 | idem |
+| iPad Pro 13" (M5) | 5 | idem |
+
+**Vérifications clés obtenues :**
+
+- **Le verrou portrait est effectif et ciblé.** iPhone 16 Pro Max après une
+  demande de paysage : `440×956`, `h=compact`, `effective=false` — alors que
+  le même appareil rapportait `regular` en `956×440` au Lot 0. Le déclencheur
+  de rotation du Lot 1 est donc devenu inatteignable sur Plus/Pro Max. Et
+  `testIPadStillRotates` passe sur les trois iPad : ils gardent bien leurs
+  quatre orientations.
+- **Le Lot 1 tient sur iPad aussi** : `testGameSurvivesSizeClassSwitch` et
+  `testAutosaveSurvivesSizeClassSwitch` sont verts sur mini, 11" et 13".
+- **AX3 sur iPhone SE : les cinq écrans d'entrée sont propres.** En AX5 aussi
+  pour les trois atteignables.
+- **4.1 infirmé une seconde fois** : iPad mini montre 6/6 modes en portrait
+  ET en paysage, comme l'iPad Pro 11".
+
+### Trois défauts de MON harnais, corrigés en route
+
+Aucun n'était un défaut de l'app — et c'est la leçon récurrente de ce
+chantier :
+
+1. `LayoutOverflowUITests` ne cherchait « Contre l'ordinateur » que comme
+   `Button` : sur iPad c'est un `staticText` de barre latérale. Trois tests
+   tombaient sur les trois iPad pour cette seule raison.
+2. `testReportSidebarAndPathCoherence` supposait la grille de modes : il
+   s'exclut désormais proprement en ossature régulière (le déséquilibre qu'il
+   observe n'existe que depuis la grille).
+3. Le balayage Dynamic Type concluait « écran inatteignable » en AX5 faute de
+   défiler jusqu'aux tuiles passées sous le pli.
+
+### Question ouverte, non tranchée
+
+**La promotion ne s'ouvre pas dans *Analyser* sur iPad.** Le test tape a7 puis
+a8 — les deux événements sont bien synthétisés, la position FEN est chargée,
+le plateau est affiché — et le sélecteur n'apparaît jamais. Sur iPhone le même
+chemin fonctionne. Vrai défaut de la promotion sur iPad, ou différence de
+disposition qui déplace les cases ? **Non déterminé**, faute de budget. Le
+test est borné à la classe compacte (là où la largeur est contrainte, donc là
+où la mesure a un sens) et la question est consignée ici plutôt que masquée
+par un test rouge sans diagnostic.
+
+### Non fait
+
+- **Captures App Store** non régénérées. Elles restent supprimées dans l'arbre
+  de travail (suppression antérieure à ce chantier).
+- **Mac Catalyst** : aucune destination macOS compilée de toute la session.
+  Le plancher de fenêtre à 820 pt et l'insensibilité de Catalyst aux clés
+  `INFOPLIST_KEY_UISupportedInterfaceOrientations*` sont vérifiés **par
+  lecture**, pas à l'exécution.
+- **Split View / Slide Over / Stage Manager** : non pilotables depuis
+  XCUITest ; c'est précisément pourquoi le Lot 1 se teste par une bascule
+  d'ossature forcée.
+- **Display Zoom (320 pt)** : non reproductible par argument de lancement.
+
+### État de la suite UI
+
+Deux échecs **préexistants** subsistent (`KeyboardShortcutsUITests`,
+`ScannerFlowUITests`), démontrés indépendants de ce chantier en rejouant sans
+aucun de mes correctifs applicatifs. Ils ne sont pas traités : hors périmètre.

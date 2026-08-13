@@ -32,6 +32,14 @@ final class DynamicTypeOverflowUITests: XCTestCase {
         try sweep(contentSize: nil, tag: "L")
     }
 
+    /// AX3 en plus d'AX5 : la matrice du prompt l'exige sur iPhone SE, et
+    /// c'est la taille où beaucoup de gabarits craquent en premier — AX5 est
+    /// si grand que certaines vues basculent sur d'autres dispositions.
+    @MainActor
+    func testReportOverflowsAtAX3() throws {
+        try sweep(contentSize: "UICTContentSizeCategoryAccessibilityL", tag: "AX3")
+    }
+
     @MainActor
     func testReportOverflowsAtAX5() throws {
         try sweep(contentSize: "UICTContentSizeCategoryAccessibilityXXXL", tag: "AX5")

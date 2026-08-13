@@ -105,10 +105,15 @@ final class SkeletonSwitchUITests: XCTestCase {
     func testReportSidebarAndPathCoherence() throws {
         let app = launchApp()
 
-        // Depuis la grille iPhone : la file de puzzles est empilée sur `path`,
-        // sans que `sidebarSelection` soit touché.
+        // Depuis la GRILLE iPhone : la file de puzzles est empilée sur `path`,
+        // sans que `sidebarSelection` soit touché. C'est précisément ce
+        // déséquilibre qu'on observe — il n'existe donc pas dans l'ossature
+        // iPad, où la barre latérale est la seule porte d'entrée.
         let puzzles = app.buttons["Puzzles"]
-        XCTAssertTrue(puzzles.waitForExistence(timeout: 15))
+        try XCTSkipUnless(
+            puzzles.waitForExistence(timeout: 15),
+            "Diagnostic propre à la grille de modes (ossature compacte)"
+        )
         puzzles.tap()
         RunLoop.current.run(until: Date().addingTimeInterval(1.5))
         print("COHERENCE|avant|titre=\(navigationTitle(app))")
