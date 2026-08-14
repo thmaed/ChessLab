@@ -4463,6 +4463,64 @@ dans le code de production. Le seul fait visuel qui aurait pu casser en
 silence — le **sens** de la levée du fantôme en mode Table — a été extrait en
 `ChessBoardView.dragLiftOffset(squareSize:rotated:)` et couvert par un test.
 
+## Le tap-tap était devenu plus exigeant que le glisser (2026-08-14)
+
+Retour d'usage immédiatement après le chantier précédent : « ça coince des
+fois, j'ai de la peine à cliquer sur la case d'arrivée — le déplacement
+fonctionne bien ». **Asymétrie introduite par ce chantier même** : le
+rattrapage vers la cible légale la plus proche n'avait été branché que sur le
+GLISSER. Le tap-tap, lui, restait au point près.
+
+### Ce que la mesure a dit — et ce qu'elle a démenti
+
+Deux causes étaient plausibles. Une seule tient.
+
+**Démentie : la dérive du doigt.** L'hypothèse de départ était que la case
+d'arrivée, case NUE de la grille, n'a qu'un geste de tap — sans le
+`DragGesture(minimumDistance: 0)` ni le repli à 12 pt dont bénéficie une pièce,
+donc sans rien pour rattraper un tap qui glisse. Mesuré : un tap qui dérive de
+**0,3 case** sur la case d'arrivée joue déjà le coup. La tolérance native
+suffit largement. Hypothèse abandonnée, et avec elle le correctif risqué
+qu'elle appelait — poser un `DragGesture` sur les 64 cases, alors que le
+plateau est **dans un `ScrollView`** sur l'écran d'analyse iPhone : le
+défilement démarré depuis le plateau en aurait fait les frais.
+
+**Confirmée : l'absence de rattrapage.** Le même point, à 0,6 case du centre de
+e4 (donc géométriquement dans e5), joue e2-e4 **en glissant** et **rien du
+tout** en tapant. Le geste lent et posé était devenu le plus exigeant des deux.
+
+### Le correctif
+
+`SpatialTapGesture` remplace `onTapGesture` sur les cases : il rend le POINT
+touché, et non seulement la case. Un geste de TAP ne capte pas le défilement,
+contrairement à un `DragGesture` — la contrainte du `ScrollView` est donc
+respectée sans compromis.
+
+Le rattrapage ne s'applique qu'aux cases qui, sans lui, **ne feraient rien
+d'utile** :
+
+- une cible légale tapée directement est jouée telle quelle ;
+- la case sélectionnée reste le geste de désélection ;
+- une pièce à soi intercepte le tap avant la grille — elle porte son propre
+  geste — donc changer de sélection n'est jamais concerné.
+
+Reste la case morte tapée pendant qu'une pièce est sélectionnée, qui ne
+provoquait qu'une désélection : c'est là, et là seulement, qu'on regarde s'il y
+avait une cible légale dans le rayon. Le rayon, la garde d'ambiguïté et la
+propriété de sûreté sont ceux de ``BoardGeometry`` — un seul résolveur pour les
+deux gestes, ce qui était l'objet du chantier.
+
+### Vérifié
+
+- `TapPrecisionUITests` — 3 tests. `testATapJustPastTheDestinationSquareStillPlaysTheMove`
+  était **rouge avant, vert après**. Les deux autres sont les filets : le tap
+  tremblé (qui marchait déjà — le test le fige) et le tap propre + le tap
+  franchement ailleurs, qui doit toujours désélectionner sans rien jouer.
+- **11 verts / 0 rouge** avec `TapToMoveUITests`, `TapToCaptureUITests` et
+  `DragPrecisionUITests` : les deux gestes se partagent désormais le résolveur,
+  aucun des deux n'a régressé.
+- **Suite unitaire : 466 tests, 77 suites, 0 échec.**
+
 ## La revue d'analyse qui n'avait jamais lieu (2026-08-14)
 
 Signalé en usage réel : « je viens de finir une partie, et quand j'ai cliqué

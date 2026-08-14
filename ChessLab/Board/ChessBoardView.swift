@@ -312,10 +312,24 @@ struct ChessBoardView: View {
                             .fill(sq.color == .light ? theme.lightSquare : theme.darkSquare)
                             .frame(width: squareSize, height: squareSize)
                             .contentShape(Rectangle())
-                            .onTapGesture {
-                                guard interactionEnabled else { return }
-                                onTapSquare(sq)
-                            }
+                            // `SpatialTapGesture` et non `onTapGesture` : il
+                            // faut le POINT touché, pas seulement la case, pour
+                            // appliquer au tap-tap le même rattrapage qu'au
+                            // glisser. Un geste de tap ne capte pas le
+                            // défilement, contrairement à un `DragGesture` —
+                            // le plateau est dans un `ScrollView` sur l'écran
+                            // d'analyse iPhone.
+                            .gesture(
+                                SpatialTapGesture(coordinateSpace: .named("board"))
+                                    .onEnded { value in
+                                        guard interactionEnabled else { return }
+                                        onTapSquare(
+                                            tappedSquare(
+                                                at: value.location, fallback: sq, squareSize: squareSize
+                                            )
+                                        )
+                                    }
+                            )
                             .accessibilityIdentifier("square_\(sq.notation)")
                             .accessibilityLabel(accessibilityLabel(for: sq))
                             .onHover { hovering in
@@ -327,6 +341,40 @@ struct ChessBoardView: View {
                 }
             }
         }
+    }
+
+    /// Case réellement visée par un tap, rattrapage compris.
+    ///
+    /// 🐛 Signalé en usage réel : « ça coince des fois, j'ai de la peine à
+    /// cliquer sur la case d'arrivée — le déplacement fonctionne bien ». Le
+    /// rattrapage vers la cible légale la plus proche n'avait été branché que
+    /// sur le GLISSER : le tap-tap, lui, restait au point près. Mesuré : le
+    /// même relâchement à 0,6 case du centre de e4 jouait e2-e4 en glissant et
+    /// **rien du tout** en tapant. Le tap-tap était donc devenu le geste le
+    /// plus exigeant des deux, ce qui est exactement l'inverse de ce qu'on
+    /// attend du geste « lent et posé ».
+    ///
+    /// Mesuré aussi, et écarté : la dérive du doigt n'était PAS en cause — un
+    /// tap qui glisse de 0,3 case sur la case d'arrivée jouait déjà le coup,
+    /// la tolérance de `SpatialTapGesture` suffisant largement.
+    ///
+    /// Le rattrapage ne s'applique qu'aux cases qui, sans lui, **ne feraient
+    /// rien d'utile** :
+    /// - une cible légale tapée directement est jouée telle quelle ;
+    /// - la case sélectionnée reste le geste de désélection ;
+    /// - une pièce à soi intercepte le tap avant la grille (elle porte son
+    ///   propre geste), donc changer de sélection n'est jamais concerné.
+    ///
+    /// Reste le cas d'une case morte pendant qu'une pièce est sélectionnée,
+    /// qui ne provoquait qu'une désélection : c'est là, et là seulement, que
+    /// l'on regarde s'il y avait une cible légale tout près.
+    private func tappedSquare(at location: CGPoint, fallback sq: Square, squareSize: CGFloat) -> Square {
+        guard let selectedSquare, sq != selectedSquare,
+              !legalTargetSquares.contains(sq),
+              let snapped = geometry(squareSize: squareSize)
+                  .resolve(point: location, legalTargets: legalTargetSquares)
+        else { return sq }
+        return snapped
     }
 
     /// Anneau discret sous le pointeur (iPad avec trackpad/souris, Mac
