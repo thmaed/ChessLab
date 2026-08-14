@@ -4299,6 +4299,170 @@ et les assertions de comportement, eux, survivent.
   Store et balayage Dynamic Type, lancés à la demande.
 - **Suite unitaire : 444 tests, 74 suites, 0 échec.**
 
+## Précision du glisser-déposer (2026-08-14)
+
+Le plateau découpait le point de relâchement au trait près : sur une case de
+~46 pt (iPhone), relâcher 1 pt au-delà de la frontière jouait la case voisine,
+ou plus souvent rien du tout. Et pendant le geste, **rien n'était annoncé** —
+le joueur découvrait le résultat après coup.
+
+### Fait
+
+**Un résolveur unique, extrait dans un type valeur.** Toute la géométrie du
+plateau vivait dans des méthodes **privées d'une `View`**, donc intestable ; on
+n'y accédait qu'en passant par XCUITest, qui tape au centre exact des cases et
+ne prouve donc rien sur la précision. `BoardGeometry` reprend la conversion
+case ↔ point et ajoute `resolve(point:legalTargets:)`, dans l'ordre :
+
+1. hors plateau au-delà d'une **marge de grâce** d'une demi-case → annulation ;
+2. si la case géométrique est elle-même une cible légale, elle est retenue
+   **telle quelle** — viser juste donne exactement le comportement d'avant, au
+   point près ;
+3. sinon, la cible légale dont le centre est le plus proche, dans un rayon de
+   `0,85 × case` ;
+4. si les deux meilleures sont indiscernables (< `0,15 × case` d'écart) →
+   annulation.
+
+**`square(at:squareSize:)` a disparu, et c'était un bug.** Il bornait les
+coordonnées (`min(7, max(0, …))`) : relâcher très à gauche du plateau, à la
+hauteur de a4, résolvait sur a4 et **jouait un coup jamais visé**. Son
+remplaçant rend `nil` au-delà de la marge de grâce. C'est le seul défaut de
+correction du lot ; le reste est du confort.
+
+**La cible visée est annoncée en direct** (`dropTargetLayer`) : un remplissage
+plein de `theme.selectedColor`, plus un liseré de la même teinte pour la
+distinguer de la case de départ. Couche placée **au-dessus des pièces** — sur
+une capture, un marqueur dessous serait masqué par la pièce adverse.
+
+**Les pastilles de coups légaux suivent la pièce tirée**, plus la sélection.
+Glisser une pièce non sélectionnée n'en affichait aucune.
+
+**Le fantôme est soulevé** : agrandi de 20 %, décalé de 0,4 case hors de la
+zone de contact. Le décalage suit `allPiecesRotated`, sinon il part vers le bas
+pour le joueur d'en face en mode Table.
+
+### Décisions d'architecture
+
+**Le rayon est plafonné à `0,85 × case`, pas davantage.** La demi-diagonale
+d'une case vaut `0,707 × case` : en dessous, un rayon ne couvrirait même pas
+les coins de la case visée — il ne servirait à rien. Au-dessus de `1,0`, un
+relâchement **centré sur une case adjacente** serait capté. `0,85` laisse
+~18 pt de rattrapage au-delà du bord de la cible sur iPhone.
+
+**L'ambiguïté annule au lieu de deviner.** Deux cibles légales quasi
+équidistantes : le résolveur ne tranche pas. Mieux vaut redemander le geste que
+jouer un coup non voulu — c'est la même logique que la marge de grâce, prise
+dans l'autre sens.
+
+**La case de départ est comparée sur la case *géométrique*, jamais sur la
+sortie du résolveur.** Le piège n'est pas théorique : relâcher sur le bord haut
+de e2 donne géométriquement e2, qui n'est **pas** une cible légale (aucun coup
+ne va d'une case à elle-même) ; le rattrapage s'activerait donc, et le centre
+de e3 n'est qu'à une demi-case — dans le rayon. Le geste de renoncement
+jouerait un coup. Ordre figé par `theResolverAloneWouldSnapAwayFromTheOriginSquare`.
+
+**La zone d'annulation n'a pas été élargie.** Elle reste la case de départ
+exacte, conformément à la règle produit : annuler ne coûte rien, mais ne doit
+pas non plus manger de surface utile du plateau.
+
+**Les coups légaux sont calculés une fois par geste**, pas à chaque image — le
+résolveur tourne à 60-120 Hz pour un ensemble constant. Le cache n'est réutilisé
+que s'il appartient bien à la case tirée : un second doigt posé ailleurs pendant
+le geste hériterait sinon des cibles de la première pièce.
+
+**Comparaisons sur les carrés des distances** dans la boucle (jusqu'à 27 cibles
+pour une dame au centre) ; les deux seules racines carrées du calcul servent la
+garde d'ambiguïté, une fois par relâchement.
+
+### L'arbitrage *Puzzles*, tranché et borné
+
+Le risque connu : dans *Puzzles*, un coup légal mais faux consomme un essai.
+Avant, un relâchement maladroit tombant sur une case **illégale** ne coûtait
+rien ; avec le rattrapage, il peut désormais devenir un coup joué.
+
+Trois bornes le rendent acceptable, et deux tests les figent :
+
+1. **le résolveur ne peut choisir que parmi les cibles légales de la pièce
+   tirée** — il ne peut donc jamais inventer un coup, seulement retenir celui
+   dont le joueur était le plus proche, c'est-à-dire celui qu'il visait
+   (`theResolverOnlyEverReturnsALegalTargetOrNothing`, balayage exhaustif au
+   quart de case, deux orientations) ;
+2. **le rattrapage ne franchit pas une case entière** : relâcher au centre
+   exact d'une case annule, même si une cible légale est sa voisine directe
+   (`theSnapNeverReachesAcrossAWholeSquare`) ;
+3. **la teinte de cible dit en direct ce qui sera joué**, donc l'erreur est
+   corrigeable avant de lever le doigt. Le rattrapage sans cet affichage aurait
+   été inacceptable ; c'est un couple, pas deux améliorations séparées.
+
+Le cas net : le joueur visait la bonne case et l'a manquée de peu. Avant, son
+coup était perdu et il recommençait ; maintenant il est joué. Dans un puzzle
+c'est le plus souvent le **bon** coup qui était en train de se perdre.
+
+### Vérifié
+
+- **`BoardGeometryTests` — 18 tests** : centres des 64 cases aux deux
+  orientations, frontières au centième de point, primauté de la case
+  géométrique, rattrapage vers la seule voisine légale, refus de voler le coup
+  au profit d'une case illégale, ambiguïté, vainqueur net, marge de grâce,
+  **régression du bornage** (`aFarAwayDropAlignedOnALegalEdgeSquareCancels`),
+  propriété de sûreté, plafond du rattrapage, sens de la levée du fantôme des
+  deux côtés de la table.
+- **`DragPrecisionUITests` — 5 tests**, le câblage dans l'app réelle : une
+  erreur de branchement laisserait la suite unitaire entièrement verte. Tous
+  les points de relâchement sont calculés à partir de la **taille de case
+  mesurée**, jamais en points en dur. Le plus utile est
+  `testADropJustPastTheTargetSquareStillPlaysTheMove` : il relâche
+  géométriquement **dans e5** et attend le coup e2-e4 — rouge avant ce
+  chantier, vert après.
+- **Suite unitaire : 464 tests, 76 suites, 0 échec** (contre 447 en référence
+  avant le chantier), lancée seule.
+- **Suite UI : 35 tests, 0 échec** — identique à la référence d'avant le
+  chantier, plus les 5 nouveaux tests de glissement (**8 verts / 0 rouge** avec
+  `TapToMoveUITests` et `TapToCaptureUITests`, qui protègent le chemin tap-tap
+  que l'ordre des branches de `onEnded` aurait pu casser).
+
+### Trois défauts de MON harnais, corrigés en route
+
+Aucun ne signalait un défaut de l'app ; tous trois auraient pu être lus comme
+tels.
+
+1. **FEN de promotion impossible.** Le premier essai plaçait le roi noir en e8
+   et le pion blanc en e7. Un pion ne capture pas devant lui : e8 ne figurait
+   dans aucune cible légale, le test ne pouvait qu'échouer. Roi déplacé en h8,
+   et **assertion de garde ajoutée** sur `square_e7` — si la saisie de position
+   personnalisée cesse un jour de fonctionner, l'échec pointera là plutôt que
+   sur un sélecteur absent.
+2. **`app.otherElements["promotionPicker"]` ne matche jamais.** Mesuré : ni par
+   glissement ni par tap-tap. L'identifiant est posé sur un conteneur que
+   SwiftUI n'expose pas comme élément d'accessibilité à part entière. Les
+   tuiles, elles, sont de vrais boutons — c'est d'ailleurs par
+   `app.buttons["Dame"]` que `LayoutOverflowUITests` procédait déjà.
+3. **Deux `xcodebuild test` simultanés font échouer la pendule.** En lançant la
+   suite unitaire et une suite UI en parallèle sur deux simulateurs,
+   `whiteTimeDecreasesBeforeTheFirstMove` a épuisé sa fenêtre de 120 s sans un
+   seul tic, et les simulateurs ont fini en `Mach error -308 (server died)`.
+   Relancé seul : **0,336 s, vert**. La fenêtre du test n'est pas en cause ;
+   c'est le parallélisme qui l'est. Sur cette machine, les suites se lancent en
+   séquence.
+
+### Non fait, et pourquoi
+
+**Aucun mécanisme de confirmation.** Un coup joué est joué : ni annulation
+proposée, ni « êtes-vous sûr ». C'est la règle produit, et le rattrapage la
+respecte en annulant au moindre doute plutôt qu'en demandant.
+
+**La lisibilité de la teinte n'a pas été revalidée** pour le daltonisme ni le
+contraste : `selectedColor` est déjà la teinte de sélection des quatre thèmes,
+déjà validée, déjà affichée sur toutes les cases y compris la première rangée.
+Le seul ajout est un liseré de la même couleur, qui ne peut que la rendre plus
+saillante.
+
+**Pas de capture d'écran en cours de glissement.** Les gestes XCUITest sont
+atomiques : impossible de photographier l'état intermédiaire sans échafaudage
+dans le code de production. Le seul fait visuel qui aurait pu casser en
+silence — le **sens** de la levée du fantôme en mode Table — a été extrait en
+`ChessBoardView.dragLiftOffset(squareSize:rotated:)` et couvert par un test.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-14)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque

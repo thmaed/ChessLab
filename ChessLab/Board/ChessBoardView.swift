@@ -94,7 +94,30 @@ struct ChessBoardView: View {
 
     private struct DragState {
         let square: Square
+        /// Cibles légales de la pièce tirée, calculées **une seule fois** au
+        /// début du geste. Le résolveur est appelé à chaque image du
+        /// glissement : régénérer les coups légaux à 60-120 Hz serait gaspillé
+        /// pour un ensemble constant — la pièce tirée ne change pas.
+        ///
+        /// Vient de `board.legalMoves(forPieceAt:)`, **jamais** de
+        /// ``legalTargetSquares`` : ce dernier suit la SÉLECTION, or un
+        /// glissement ne sélectionne rien.
+        let legalTargets: [Square]
         var location: CGPoint
+        /// Case que le relâchement jouerait, telle qu'annoncée au joueur par
+        /// ``dropTargetLayer(squareSize:)``.
+        ///
+        /// Rangée ICI plutôt que dans un second `@State` : `location` change
+        /// déjà à chaque image, donc le plateau se redessine de toute façon.
+        /// Un `@State` séparé doublerait les invalidations SwiftUI — et
+        /// réécrire une valeur identique dans un `@State` réévalue quand même
+        /// le `body`, ce qui se paie sur une vue à 64 cases et 6 couches.
+        var resolvedTarget: Square?
+    }
+
+    /// Géométrie courante — voir ``BoardGeometry``.
+    private func geometry(squareSize: CGFloat) -> BoardGeometry {
+        BoardGeometry(squareSize: squareSize, orientation: orientation)
     }
 
     var body: some View {
@@ -112,6 +135,9 @@ struct ChessBoardView: View {
                 }
 
                 piecesLayer(squareSize: squareSize)
+                // Au-DESSUS des pièces : sur une case occupée (capture), un
+                // marqueur placé dessous serait masqué par la pièce adverse.
+                dropTargetLayer(squareSize: squareSize)
                 qualityBadgeLayer(squareSize: squareSize)
 
                 if let slidingMove, let piece = board.position.piece(at: slidingMove.end) {
@@ -163,11 +189,32 @@ struct ChessBoardView: View {
                 }
 
                 if let dragState, let piece = board.position.piece(at: dragState.square) {
+                    // Fantôme SOULEVÉ : agrandi et décalé hors de la zone de
+                    // contact, sinon le doigt le masque entièrement — c'est
+                    // toute la pièce qu'on ne voit plus au moment où l'on vise.
+                    //
+                    // ⚠️ Le décalage suit ``pieceRotation`` : en mode Table du
+                    // jeu à deux, `allPiecesRotated` tourne les glyphes de 180°
+                    // sans bouger la géométrie. Un « vers le haut » codé en dur
+                    // partirait vers le BAS pour le joueur assis en face.
+                    //
+                    // La RÉSOLUTION, elle, reste fondée sur le doigt et non sur
+                    // le centre du fantôme décalé (comme chess.com) : la teinte
+                    // de cible est la vérité affichée, on ne mélange pas les
+                    // deux références.
                     PieceGlyphView(piece: piece)
                         .frame(width: squareSize, height: squareSize)
                         .rotationEffect(pieceRotation)
-                        .position(dragState.location)
+                        .scaleEffect(Self.dragLiftScale)
+                        .position(
+                            x: dragState.location.x,
+                            y: dragState.location.y
+                                + Self.dragLiftOffset(squareSize: squareSize, rotated: allPiecesRotated)
+                        )
                         .allowsHitTesting(false)
+                        // Ombre INCHANGÉE : l'agrandissement est gratuit, une
+                        // ombre ou un halo de plus serait du GPU redessiné à
+                        // chaque image.
                         .shadow(radius: 6)
                 }
             }
@@ -302,6 +349,46 @@ struct ChessBoardView: View {
         }
     }
 
+    /// Case que le relâchement jouerait, pendant un glissement au doigt.
+    ///
+    /// C'est le **garde-fou du rattrapage** : celui-ci choisit une case à la
+    /// place du joueur, ceci lui permet de voir ce choix et de se corriger
+    /// AVANT de relâcher. L'un ne va pas sans l'autre.
+    ///
+    /// Un **remplissage**, pas un liseré fin : le liseré de ``hoverLayer``
+    /// (~2 pt) a été dessiné pour un pointeur sur iPad/Mac, où rien n'occulte
+    /// l'écran. Sous un doigt — et la main masque tout ce qui est sous le point
+    /// de contact, en particulier sur les deux premières rangées — 2 pt sont à
+    /// la limite du perceptible.
+    ///
+    /// Teinte : ``BoardTheme/selectedColor``, déjà présente dans les quatre
+    /// thèmes et déjà validée pour le contraste (thème `contrast` compris).
+    /// Aucune couleur nouvelle, donc rien à revalider côté daltonisme. La
+    /// cible reçoit le remplissage **ET** un liseré de la même teinte, pour se
+    /// distinguer de la case de départ sélectionnée, qui n'a que le
+    /// remplissage.
+    ///
+    /// Couche dédiée plutôt que de lever la condition `dragState == nil` de
+    /// ``hoverLayer`` : celle-ci sert le pointeur iPad/Mac, la contourner
+    /// risquerait un double marqueur.
+    @ViewBuilder
+    private func dropTargetLayer(squareSize: CGFloat) -> some View {
+        if let dragState, let target = dragState.resolvedTarget {
+            Rectangle()
+                .fill(theme.selectedColor)
+                .overlay(
+                    Rectangle().strokeBorder(theme.selectedColor, lineWidth: max(3, squareSize * 0.08))
+                )
+                .frame(width: squareSize, height: squareSize)
+                .position(centerPoint(of: target, squareSize: squareSize))
+                .allowsHitTesting(false)
+                // Animation sur le CHANGEMENT DE CASE seulement, jamais sur la
+                // position du doigt : un ressort par image empilerait du
+                // travail d'animation pour rien.
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.1), value: target)
+        }
+    }
+
     @ViewBuilder
     private func highlightsLayer(squareSize: CGFloat) -> some View {
         ZStack(alignment: .topLeading) {
@@ -321,7 +408,20 @@ struct ChessBoardView: View {
                     .position(centerPoint(of: checkSquare, squareSize: squareSize))
             }
 
-            ForEach(legalTargetSquares, id: \.self) { target in
+            // Pendant un glissement, les pastilles suivent la pièce TIRÉE, pas
+            // la sélection : glisser une pièce non sélectionnée n'affichait
+            // sinon aucune pastille (`legalTargetSquares` suit la sélection),
+            // et le joueur ne voyait que sa pièce.
+            //
+            // Une seule source à la fois : si la pièce glissée était aussi la
+            // case sélectionnée, les deux ensembles seraient identiques et les
+            // pastilles se dessineraient deux fois.
+            //
+            // Bénéfice décisif au-delà du confort : ça rend LISIBLE chaque
+            // annulation silencieuse. Zéro pastille = cette pièce ne peut pas
+            // bouger ; aucune pastille près du doigt = relâcher ici ne fera
+            // rien. Sans ça, l'annulation peut passer pour un bug.
+            ForEach(dragState?.legalTargets ?? legalTargetSquares, id: \.self) { target in
                 legalDot(target, squareSize: squareSize)
             }
         }
@@ -456,16 +556,52 @@ struct ChessBoardView: View {
     /// pas jouer.
     private static let tapSlop: CGFloat = 12
 
+    /// Grossissement et hauteur de levée du fantôme de glissement, en fraction
+    /// de case. Purement visuel : la case visée reste celle du doigt.
+    private static let dragLiftScale: CGFloat = 1.2
+    private static let dragLiftRatio: CGFloat = 0.4
+
+    /// Décalage vertical du fantôme, en points d'écran.
+    ///
+    /// Extrait de la vue **uniquement pour être testable** : le signe dépend de
+    /// ``allPiecesRotated``, et une inversion collerait le fantôme SOUS le
+    /// doigt du joueur d'en face (mode Table du jeu à deux) — c'est-à-dire
+    /// exactement le défaut que la levée corrige, mais pour un seul des deux
+    /// joueurs. Une capture d'écran de test ne le dirait pas : elle est prise
+    /// hors glissement.
+    static func dragLiftOffset(squareSize: CGFloat, rotated: Bool) -> CGFloat {
+        // Rotated : les glyphes sont tournés de 180°, le « haut » du joueur est
+        // le BAS de l'écran. Le fantôme doit donc descendre pour s'éloigner de
+        // sa main.
+        rotated ? squareSize * dragLiftRatio : -squareSize * dragLiftRatio
+    }
+
     private func dragGesture(for square: Square, squareSize: CGFloat) -> some Gesture {
-        DragGesture(minimumDistance: 0, coordinateSpace: .named("board"))
+        let geometry = geometry(squareSize: squareSize)
+        return DragGesture(minimumDistance: 0, coordinateSpace: .named("board"))
             .onChanged { value in
-                dragState = DragState(square: square, location: value.location)
+                // `minimumDistance: 0` fait entrer ici dès le toucher : la
+                // transition `nil` → non-nil est donc le vrai début du geste,
+                // et le seul endroit où calculer les coups légaux.
+                // Le cache n'est réutilisé que s'il appartient bien à CETTE
+                // pièce : un second doigt posé sur une autre case pendant le
+                // geste hériterait sinon des cibles de la première.
+                let cached = dragState?.square == square ? dragState?.legalTargets : nil
+                let targets = cached ?? board.legalMoves(forPieceAt: square)
+                dragState = DragState(
+                    square: square,
+                    legalTargets: targets,
+                    location: value.location,
+                    // Ce que le relâchement jouerait, annoncé en direct.
+                    resolvedTarget: geometry.resolve(point: value.location, legalTargets: targets)
+                )
             }
             .onEnded { value in
                 defer { dragState = nil }
 
                 let distance = hypot(value.translation.width, value.translation.height)
-                let target = self.square(at: value.location, squareSize: squareSize)
+                // Case GÉOMÉTRIQUE, pas résolue : voir le piège ci-dessous.
+                let geometricTarget = geometry.geometricSquare(at: value.location)
 
                 // Un relâchement sur la case de DÉPART est un tap, quelle que
                 // soit la distance parcourue : aucun coup ne va d'une case à
@@ -480,9 +616,23 @@ struct ChessBoardView: View {
                 // tap-tap et il fallait la glisser. Aléatoire par nature (ça
                 // dépendait du tremblement), donc invisible en test : XCUITest
                 // tape au pixel près.
-                if target == square || distance < Self.tapSlop {
+                //
+                // ⚠️ La comparaison porte sur la case GÉOMÉTRIQUE, jamais sur
+                // la sortie du résolveur. Sinon le geste de renoncement
+                // jouerait un coup : relâcher sur le bord haut de e2 donne
+                // géométriquement e2, qui n'est pas une cible légale (aucun
+                // coup ne va d'une case à elle-même), donc le rattrapage
+                // s'activerait et le centre de e3 n'est qu'à 0,5 case — dans
+                // le rayon. Snap sur e3, coup joué, alors que le joueur
+                // renonçait. Voir `BoardGeometryTests`.
+                if geometricTarget == square || distance < Self.tapSlop {
                     onTapSquare(square)
-                } else {
+                } else if let target = geometry.resolve(
+                    point: value.location,
+                    legalTargets: dragState?.square == square
+                        ? (dragState?.legalTargets ?? [])
+                        : board.legalMoves(forPieceAt: square)
+                ) {
                     // Coup joué au drag : la pièce a déjà suivi le doigt,
                     // pas d'animation de glissement. Le drapeau est consommé
                     // au prochain changement de `lastMove` ; réinitialisé à
@@ -493,46 +643,35 @@ struct ChessBoardView: View {
                         suppressNextSlide = false
                     }
                 }
+                // Résolveur à `nil` : **annulation silencieuse**. On ne joue
+                // rien, on ne prévient de rien, et surtout on ne touche pas à
+                // la sélection — renoncer doit rester gratuit. C'est aussi ce
+                // qui supprime le `Haptics.illegal()` qui punissait un raté de
+                // 2 pt : la vue n'émet plus de coup illégal par cette voie.
+                // L'absence de teinte de cible avait déjà dit au joueur que
+                // relâcher ici ne ferait rien.
             }
     }
 
     // MARK: Coordonnées <-> géométrie
 
+    // La géométrie vit dans ``BoardGeometry`` — type valeur testable, alors
+    // que ces méthodes, privées d'une `View`, ne l'étaient pas. On délègue au
+    // lieu d'en garder une seconde copie : deux implémentations de la même
+    // grille finiraient par diverger.
+    //
+    // `square(at:squareSize:)` a DISPARU : il bornait les coordonnées
+    // (`min(7, max(0, …))`), si bien qu'un relâchement loin du plateau
+    // résolvait sur la case de bord la plus proche et pouvait jouer un coup
+    // jamais visé. Son remplaçant, `BoardGeometry.geometricSquare(at:)`, rend
+    // `nil` au-delà d'une marge de grâce d'une demi-case.
+
     private func square(row: Int, col: Int) -> Square {
-        let file: Int
-        let rank: Int
-        if orientation == .white {
-            file = col
-            rank = 7 - row
-        } else {
-            file = 7 - col
-            rank = row
-        }
-        return Square(rawValue: rank * 8 + file) ?? .a1
-    }
-
-    private func square(at point: CGPoint, squareSize: CGFloat) -> Square {
-        let col = min(7, max(0, Int(point.x / squareSize)))
-        let row = min(7, max(0, Int(point.y / squareSize)))
-        return square(row: row, col: col)
-    }
-
-    private func gridPosition(of sq: Square) -> (row: Int, col: Int) {
-        let file = sq.file.number - 1
-        let rank = sq.rank.value - 1
-        if orientation == .white {
-            return (row: 7 - rank, col: file)
-        } else {
-            return (row: rank, col: 7 - file)
-        }
+        geometry(squareSize: 1).square(row: row, col: col)
     }
 
     private func centerPoint(of sq: Square, squareSize: CGFloat) -> CGPoint {
-        let (row, col) = gridPosition(of: sq)
-        return CGPoint(
-            x: CGFloat(col) * squareSize + squareSize / 2,
-            y: CGFloat(row) * squareSize + squareSize / 2
-        )
+        geometry(squareSize: squareSize).centerPoint(of: sq)
     }
 
     private func accessibilityLabel(for sq: Square) -> String {
