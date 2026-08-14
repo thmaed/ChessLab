@@ -4291,3 +4291,10 @@ le catalogue de traductions.
 présence d'un bandeau se périme à la première refonte d'habillage, et le
 signale par un échec qui ressemble à un bug. Les identifiants d'accessibilité
 et les assertions de comportement, eux, survivent.
+
+### État des suites après ces deux réparations
+
+- **Suite UI : 35 tests, 0 échec** (iPhone 16, iOS 26.5) — entièrement verte
+  pour la première fois depuis le début de ces chantiers. Hors captures App
+  Store et balayage Dynamic Type, lancés à la demande.
+- **Suite unitaire : 444 tests, 74 suites, 0 échec.**
