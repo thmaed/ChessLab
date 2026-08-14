@@ -2397,7 +2397,6 @@
       }
     },
     "Cavalier" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3357,7 +3356,6 @@
       }
     },
     "Dame" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4525,7 +4523,6 @@
       }
     },
     "Fou" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -10883,7 +10880,6 @@
       }
     },
     "Tour" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
