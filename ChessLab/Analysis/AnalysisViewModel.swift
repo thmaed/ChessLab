@@ -452,11 +452,52 @@ final class AnalysisViewModel {
         guard engine != nil, !isClassifying, !isLiveAnalyzing, liveAnalysisTask == nil else { return }
         // En REVUE, ne PAS relancer d'analyse en continu au retour sur l'écran :
         // le cache suffit, le moteur reste au repos. En exploration, si.
-        if isGameReview {
+        guard isGameReview else {
+            startLiveAnalysis()
+            return
+        }
+        // 🐛 Revue INCOMPLÈTE : la reprendre, sinon plus personne ne la
+        // redemandera jamais.
+        //
+        // Bug rapporté le 14/08/2026 — « analyse ouverte après une partie :
+        // ni graphique, ni coups pré-calculés, et *Moteur en attente*
+        // affiché », intermittent. `classifyMainLine()` est mis en FILE
+        // derrière le démarrage du moteur (~1 s, réseau NNUE de 78 Mo) et son
+        // maillon commence par `guard !isTornDown`. Un écran marqué disparu
+        // pendant cette seconde-là voyait donc sa classification abandonnée en
+        // silence — puis rien ne la relançait : la reprise par `setupEngine()`
+        // ci-dessus ne vaut que si le moteur avait été LIBÉRÉ en partant, ce
+        // qui n'est pas le cas quand il n'était pas encore créé. Le moteur
+        // restant bien vivant, aucune bannière ne prévenait : l'écran affichait
+        // « Moteur en attente » pour toujours.
+        //
+        // Couvre du même coup l'écran quitté EN COURS de revue : la boucle sort
+        // sur `isTornDown` et laissait la partie à moitié classée, courbe
+        // tronquée, définitivement.
+        //
+        // Sûr à rappeler : `classifyNode` ignore les nœuds déjà en cache, donc
+        // une reprise ne recalcule que ce qui manque. Le test porte sur ce qui
+        // MANQUE, pas sur un simple drapeau : c'est la seule question qui
+        // compte pour l'utilisateur.
+        if isEngineUnavailable || isMainLineFullyClassified {
             showCachedEval(at: currentIndex)
         } else {
-            startLiveAnalysis()
+            classifyMainLine()
         }
+    }
+
+    /// Vrai quand chaque coup de la ligne principale porte son évaluation.
+    ///
+    /// Volontairement fondé sur les DONNÉES et non sur un drapeau de
+    /// progression : un drapeau ment dès que la classification s'interrompt
+    /// sans le remettre à zéro, ce qui est précisément le cas ici.
+    private var isMainLineFullyClassified: Bool {
+        var index = game.startingIndex
+        while game.moves.hasIndex(after: index) {
+            index = game.moves.index(after: index)
+            if moveEvaluations[index] == nil { return false }
+        }
+        return true
     }
 
     // MARK: Navigation dans l'arbre
@@ -1117,9 +1158,23 @@ final class AnalysisViewModel {
     /// de classification + précision par joueur (voir
     /// ``accuracyByColor``). Les variantes ne sont classifiées qu'à la
     /// volée, dès qu'on y navigue (``ensureEvaluatedLazily``).
+    /// Vrai entre la mise en FILE d'une classification et son démarrage réel.
+    ///
+    /// ``isClassifying`` ne suffit pas à empêcher les doublons : il ne passe à
+    /// vrai qu'une fois le maillon ARRIVÉ à son tour, soit ~1 s plus tard (le
+    /// démarrage du moteur le précède). Pendant cette seconde, un second
+    /// `onAppear` — SwiftUI en émet parfois deux — en enfilerait une deuxième,
+    /// qui ne recalculerait rien (tout serait en cache) mais ferait clignoter
+    /// la barre de progression.
+    private var isClassificationPending = false
+
     private func classifyMainLine() {
+        guard !isClassificationPending else { return }
+        isClassificationPending = true
         enqueueEngineWork { [weak self] in
-            guard let self, let engine = self.engine, !self.isTornDown else { return }
+            guard let self else { return }
+            self.isClassificationPending = false
+            guard let engine = self.engine, !self.isTornDown else { return }
             await self.stopLiveAnalysisIfNeeded()
             guard !self.isTornDown else { return }
 
