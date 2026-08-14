@@ -102,6 +102,19 @@ enum BoardGridFinder {
     ///
     /// - parameter alongColumns: `true` pour un profil en x (lignes
     ///   verticales), `false` pour un profil en y.
+    /// - note: **Les deux lignes extrêmes du profil restent à zéro**, et c'est
+    ///   assumé après mesure (Lot 5.2 de `PROMPT-bugs.md`). La boucle va de 1 à
+    ///   `side-2` : le score d'une grille somme 9 lignes dont les deux extrêmes
+    ///   ne contribuent donc rien, et le couple (pas, phase) se choisit sur 7
+    ///   lignes intérieures. Le diagnostic est exact — mais calculer une
+    ///   dérivée décentrée aux bords a été essayé et **n'a rien changé** :
+    ///   écarts identiques au centième près sur les trois cadrages mesurés
+    ///   (parfait 0,00 ; large 1,71 ; serré 6,00 en colonnes et 14,52 en
+    ///   lignes). L'erreur du cadrage serré vient d'ailleurs — les lignes
+    ///   extrêmes y tombent HORS de l'image, où `sample` rend zéro par
+    ///   construction, quoi que contienne le profil. Le correctif a donc été
+    ///   retiré : on ne remue pas un algorithme calibré « au pixel près » pour
+    ///   un gain nul. Voir ``BoardGridEdgeBiasTests``, qui fige ces mesures.
     static func edgeProfile(_ luminance: [Double], side: Int, alongColumns: Bool) -> [Double] {
         var profile = [Double](repeating: 0, count: side)
         var gradients = [Double](repeating: 0, count: side)

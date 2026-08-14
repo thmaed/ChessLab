@@ -4195,12 +4195,27 @@ partie déjà taguée).
   `source`. Le paramètre est **retiré** plutôt que documenté : une signature
   qui prend une source laisse croire à un comportement par source qui n'existe
   pas.
-- **5.2 (lignes extrêmes de la grille) NON traité** : le diagnostic est exact à
-  la lecture (`edgeProfile` laisse `profile[0]` et `profile[side-1]` à zéro,
-  donc le couple pas/phase est choisi sur 7 lignes au lieu de 9), mais le
-  corriger sans mesurer sur les fixtures reviendrait à changer un algorithme de
-  recalage « au pixel près » à l'aveugle. À faire avec la comparaison
-  avant/après demandée.
+- **5.2 — mesuré, et la mesure a tranché contre le correctif.** Le diagnostic
+  est exact à la lecture (`edgeProfile` laisse `profile[0]` et `profile[side-1]`
+  à zéro, donc le couple pas/phase se choisit sur 7 lignes au lieu de 9). La
+  dérivée décentrée aux bords a donc été implémentée, puis **retirée** : elle
+  ne change **rien**, au centième de pixel près.
+
+  | Cadrage | Écart max avant | après |
+  |---|---|---|
+  | parfait | 0,00 / 0,00 | 0,00 / 0,00 |
+  | large (14 px de marge) | 1,71 / 1,71 | 1,71 / 1,71 |
+  | serré (6 px rognés) | 6,00 / **14,52** | 6,00 / **14,52** |
+
+  L'erreur du cadrage serré — la seule vraiment gênante, 14,5 px là où
+  l'en-tête du module juge 2,5 px suffisants à faire chuter la reconnaissance —
+  vient donc **d'ailleurs** : les lignes extrêmes y tombent hors de l'image, où
+  `sample` rend zéro par construction, quoi que contienne le profil. On ne
+  remue pas un algorithme calibré au pixel près pour un gain nul : le code
+  d'origine reste, avec la mesure consignée en tête de fonction, et
+  `BoardGridEdgeBiasTests` fige les trois valeurs pour qu'une régression se
+  voie. Le vrai chantier — le cadrage serré — a maintenant sa référence
+  chiffrée.
 
 ### Lot 6 — Répétition espacée
 
@@ -4218,6 +4233,14 @@ partie déjà taguée).
   avec l'endroit où l'implémenter le jour venu (`OpeningTrainingQueue`, sans
   toucher au stockage).
 
+### Vérification finale après les correctifs moteur
+
+Les changements de cycle de vie du moteur étant les plus risqués de la
+session, la suite UI complète a été rejouée : **33 verts / 2 rouges**, les
+deux rouges étant les échecs préexistants déjà démontrés indépendants
+(`KeyboardShortcutsUITests`, `ScannerFlowUITests`). Suite unitaire : **444
+tests, 74 suites, 0 échec.**
+
 ### Non fait
 
 - **Journal UCI en DEBUG (Lot 0.2)** non ajouté : les deux bugs qu'il devait
@@ -4225,6 +4248,5 @@ partie déjà taguée).
   du shim (`if (gRunning) return;` sans reconfiguration du callback, sans
   ambiguïté possible), le second par le test de fuite, rouge puis vert. Un
   journal n'aurait rien prouvé de plus.
-- **Lot 5.2** (voir ci-dessus).
 - Le **multiplexeur** du Lot 1.5 : l'invariant est rendu vérifiable, pas
   supprimé.
