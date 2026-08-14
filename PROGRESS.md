@@ -4250,3 +4250,44 @@ tests, 74 suites, 0 échec.**
   journal n'aurait rien prouvé de plus.
 - Le **multiplexeur** du Lot 1.5 : l'invariant est rendu vérifiable, pas
   supprimé.
+
+## Les deux échecs UI « préexistants » : c'était de la pourriture de test (2026-08-14)
+
+Les deux tests que les chantiers précédents avaient constatés rouges — et
+démontrés indépendants de leurs correctifs — sont désormais réparés. **Ni l'un
+ni l'autre ne signalait un bug de l'app** : dans les deux cas, un écran avait
+évolué et le test ne l'avait pas suivi.
+
+### `KeyboardShortcutsUITests`
+
+Il attendait un `StaticText` commençant par « Consultation ». Ce bandeau a été
+retiré de l'écran *Jouer* par la refonte « contrôles simplifiés — une seule
+rangée » (commit `e70d869`, antérieur à ces chantiers) : c'est désormais le
+bouton « Reprendre ici » qui signale qu'on n'est plus sur la position vive, et
+le libellé « Consultation — coup X/Y » ne subsiste que dans *Deux joueurs*.
+
+Réécrit pour asserter le **comportement** plutôt que le chrome : après deux ←,
+le plateau doit être revenu à la position de départ (e4 vide, pion en e2), et
+→ doit le ramener en avant. Une refonte d'habillage ne le cassera plus ; une
+flèche qui cesse de naviguer, si.
+
+### `ScannerFlowUITests`
+
+Deux changements cumulés, tous deux antérieurs :
+
+1. la palette de pièces est maintenant **repliée** derrière « Éditer le jeu »
+   (refonte condensée de l'éditeur) — le test tapait un bouton qui n'est plus
+   visible d'emblée ;
+2. les boutons de palette ont reçu des identifiants (`palette_wQ`…), et **dès
+   qu'un élément en porte un, XCUITest ne résout plus la requête par
+   libellé** : `app.buttons["dame blanche"]` ne matche plus rien, la recherche
+   portant sur les identifiants.
+
+Le test déploie donc la section puis cible `palette_wQ`. L'identifiant a de
+plus l'avantage d'être indépendant de la langue, alors que le libellé passe par
+le catalogue de traductions.
+
+**Leçon commune** : un test UI qui s'accroche à un libellé visible ou à la
+présence d'un bandeau se périme à la première refonte d'habillage, et le
+signale par un échec qui ressemble à un bug. Les identifiants d'accessibilité
+et les assertions de comportement, eux, survivent.

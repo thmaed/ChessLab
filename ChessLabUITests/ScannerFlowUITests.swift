@@ -48,7 +48,27 @@ final class ScannerFlowUITests: XCTestCase {
 
         // Correction manuelle possible (le fallback du prompt) : poser une
         // dame blanche en d4, puis l'effacer.
-        app.buttons["dame blanche"].tap()
+        //
+        // DEUX changements de l'écran avaient mis ce test en échec, tous deux
+        // antérieurs à ce chantier :
+        //
+        // 1. la palette est maintenant REPLIÉE derrière « Éditer le jeu »
+        //    (refonte condensée de l'éditeur) : replié, l'écran ne montre que
+        //    la position et les réglages qui comptent après une
+        //    reconnaissance, pas l'outillage de composition ;
+        // 2. les boutons de palette ont reçu des identifiants
+        //    (`palette_wQ`…), et dès qu'un élément en porte un, XCUITest ne
+        //    résout plus `app.buttons["dame blanche"]` — la requête porte sur
+        //    les identifiants. L'identifiant a de plus l'avantage d'être
+        //    indépendant de la langue, alors que le libellé est traduit
+        //    (`PieceNaming.french` passe par le catalogue).
+        let disclosure = app.buttons["editGameDisclosure"]
+        XCTAssertTrue(disclosure.waitForExistence(timeout: 5), "l'en-tête « Éditer le jeu » doit être présent")
+        disclosure.tap()
+
+        let whiteQueen = app.buttons["palette_wQ"]
+        XCTAssertTrue(whiteQueen.waitForExistence(timeout: 5), "la palette doit se déployer")
+        whiteQueen.tap()
         app.otherElements["square_d4"].tap()
         XCTAssertEqual(app.otherElements["square_d4"].label, "d4, dame blanche")
         app.otherElements["square_d4"].tap()
