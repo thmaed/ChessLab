@@ -4463,6 +4463,85 @@ dans le code de production. Le seul fait visuel qui aurait pu casser en
 silence — le **sens** de la levée du fantôme en mode Table — a été extrait en
 `ChessBoardView.dragLiftOffset(squareSize:rotated:)` et couvert par un test.
 
+## La revue d'analyse qui n'avait jamais lieu (2026-08-14)
+
+Signalé en usage réel : « je viens de finir une partie, et quand j'ai cliqué
+sur analyse, l'app ne m'a pas affiché le graphique et n'a pas pré-calculé tous
+les coups ; à la place le message *Moteur en attente* était affiché ».
+**Intermittent** — la partie suivante a fonctionné.
+
+### Le défaut
+
+`classifyMainLine()` n'est pas appelée directement : elle est mise en **file**
+moteur par `setupEngine()`, donc **derrière** le démarrage de Stockfish — ~1 s,
+le temps de charger le réseau NNUE de 78 Mo. Son maillon commence par
+`guard !self.isTornDown`.
+
+Si l'écran est marqué disparu pendant cette seconde-là, la classification est
+**abandonnée en silence**. Et plus rien ne la redemande jamais :
+
+- la reprise de `handleViewAppear()` ne repasse par `setupEngine()` que si le
+  moteur avait été **libéré** en partant. Ici il ne l'était pas — il n'existait
+  pas encore quand la disparition a été signalée, et la tâche de libération
+  sort sur `guard let engine = self.engine` sans rien marquer ;
+- la branche de revue de `handleViewAppear()` se contentait d'un
+  `showCachedEval(at:)`, c'est-à-dire de lire un cache **vide**.
+
+Le moteur reste bien vivant, donc `isEngineUnavailable` reste faux et **aucune
+bannière ne prévient**. L'écran affiche « Moteur en attente » — le libellé du
+badge quand le moteur ne calcule rien — indéfiniment. C'est exactement le
+symptôme rapporté, et son caractère intermittent découle de la largeur de la
+fenêtre : il faut que l'événement de disparition tombe dans cette seconde-là.
+
+Le même trou laissait une revue **quittée en cours de route** définitivement à
+moitié faite, courbe d'évaluation tronquée comprise : la boucle sort sur
+`isTornDown`, et le retour sur l'écran ne reprenait rien.
+
+### Le correctif
+
+`handleViewAppear()` décide désormais sur les **données**, pas sur un drapeau :
+si la ligne principale n'est pas entièrement classée et que le moteur n'est pas
+déclaré indisponible, la revue est **relancée**. `classifyNode` ignorant les
+nœuds déjà en cache, une reprise ne recalcule que ce qui manque.
+
+Un drapeau de progression aurait menti : `isClassifying` est remis à faux par
+la sortie de boucle, précisément dans le cas qu'il faut détecter.
+
+Ajout d'un garde `isClassificationPending` : `isClassifying` ne passe à vrai
+qu'une fois le maillon **arrivé à son tour**, une seconde plus tard. Sans lui,
+un second `onAppear` — SwiftUI en émet parfois deux — enfilait une seconde
+classification qui ne recalculait rien mais faisait clignoter la barre de
+progression.
+
+### Ce qui n'a PAS été touché, et pourquoi
+
+Le garde `isTornDown` reste tel quel. Il protège d'un vrai désastre, documenté
+plus haut : une classification poursuivie sur un écran mort, suivie d'un
+`go infinite` que plus rien n'arrêterait — moteur et view model retenus jusqu'au
+kill de l'app. Le défaut n'était pas d'abandonner, c'était de ne jamais
+reprendre.
+
+### Vérifié
+
+`AnalysisReviewRestartTests` — 2 tests à **moteur réel**, donc gated par
+`ENGINE_INTEGRATION=1` comme les autres tests d'intégration moteur du dépôt.
+
+- `aReviewSkippedWhileTheScreenWasAwayIsRestartedOnReturn` reproduit la fenêtre
+  de façon déterministe : `handleViewDisappear()` est appelé alors que `engine`
+  est encore `nil`. **Rouge avant** — zéro coup classé 90 s après le retour sur
+  l'écran, moteur vivant, aucune bannière. **Vert après**, en 12 s.
+- `aReviewLeftHalfwayIsResumedOnReturn` couvre l'écran quitté en cours de revue.
+  Première version écrite sur une partie de 4 coups : elle passait **sans rien
+  prouver**, la revue se terminant avant qu'on ait le temps de quitter l'écran.
+  Réécrite sur 20 coups, avec un `#require` qui échoue si la revue s'est
+  terminée trop tôt — la reproduction ne peut plus se dégrader en silence.
+- **Suite unitaire complète : 466 tests, 77 suites, 0 échec.**
+
+Non reproduit en conditions réelles : je n'ai pas provoqué l'événement de
+disparition dans l'app elle-même. Ce qui est établi, c'est que ce chemin produit
+exactement le symptôme décrit et que rien ne l'en sortait ; si le déclencheur
+réel avait été autre, le symptôme se reproduira et il faudra chercher ailleurs.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-14)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque
