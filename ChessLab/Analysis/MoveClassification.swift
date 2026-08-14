@@ -183,17 +183,138 @@ enum MoveClassifier {
     }
 }
 
-/// Précision globale (%) d'un joueur sur une partie, dérivée de la
-/// moyenne des pertes de probabilité de gain sur ses coups — formule
-/// inspirée de celle popularisée par Lichess (non spécifiée telle quelle
-/// dans le brief, choix documenté ici) : une perte moyenne nulle donne
-/// 100%, une perte moyenne importante fait chuter le score de façon non
-/// linéaire (les grosses gaffes isolées punissent plus qu'elles ne
-/// devraient en moyenne simple).
+/// Précision (%) d'un joueur sur une partie.
+///
+/// ## Pourquoi le calcul a changé le 14/08/2026
+///
+/// La version d'origine appliquait la courbe de Lichess à la **moyenne des
+/// pertes**, puis s'arrêtait là. Signalé en usage : « j'arrive régulièrement à
+/// 92-94 % alors que je devrais être autour de 80 % », et « les coups de fin de
+/// partie ont aussi tendance à augmenter artificiellement le score ».
+///
+/// Le second point explique le premier, et le calcul le confirme. Partie de
+/// club typique — 1 gaffe (25 pts de perte), 2 erreurs (12), 3 imprécisions
+/// (7), 34 coups sains (1) :
+///
+/// - sur 40 coups, perte moyenne 2,60 → **89,0 %** ;
+/// - avec 20 coups de finition dans une position déjà gagnée, où toute perte
+///   est nulle, la moyenne tombe à 1,73 → **92,5 %**.
+///
+/// Rien dans la partie n'a été mieux joué ; le dénominateur a simplement
+/// grossi de vingt coups qui ne pouvaient rien perdre. **Une moyenne simple
+/// traite « ne rien lâcher dans une position gagnée » comme un exploit.**
+///
+/// ## Ce qui change, et ce qui ne change pas
+///
+/// **La courbe ne change pas.** C'est celle popularisée par Lichess, déjà en
+/// place et déjà éprouvée, et elle reste appliquée à une **moyenne des
+/// pertes** — pas aux pertes coup par coup.
+///
+/// Ce dernier point a été tranché par la mesure, contre l'intuition. Passer à
+/// « une précision par coup, puis moyenne » — la méthode complète de Lichess —
+/// a été essayé et **rejeté** : la courbe étant convexe, l'inégalité de Jensen
+/// rend cette agrégation *plus généreuse*, et la partie de club témoin est
+/// remontée à **93,3 %** au lieu des 92,5 % qu'on cherchait à faire baisser.
+/// Même en tempérant par une moyenne harmonique.
+///
+/// **Ce qui change, c'est la moyenne.** Elle est désormais pondérée par la
+/// **volatilité** de la position : l'écart-type des probabilités de gain sur
+/// une fenêtre glissante. Un coup joué dans une position qui bouge encore
+/// compte pleinement ; un coup joué dans une position morte ne compte
+/// presque pas.
+///
+/// Ça règle les deux plaintes d'un seul mécanisme :
+///
+/// - la traîne de fin de partie cesse de gonfler le score, puisqu'elle
+///   n'entre plus au dénominateur qu'à hauteur de son poids plancher ;
+/// - une gaffe est par définition un grand écart de probabilité de gain, donc
+///   une forte volatilité, donc un **poids élevé** : elle ne peut plus être
+///   noyée sous vingt coups anodins. La sévérité vient du même mécanisme que
+///   l'anti-dilution, sans second barème à accorder.
 enum AccuracyScore {
+
+    /// La courbe, appliquée à une perte moyenne. Inchangée depuis l'origine.
     static func accuracy(averageWinPercentLoss: Double) -> Double {
         guard averageWinPercentLoss > 0 else { return 100 }
         let raw = 103.1668 * exp(-0.04354 * averageWinPercentLoss) - 3.1669
         return min(100, max(0, raw))
+    }
+
+    /// Au-delà de cet écart au nul, la partie est tenue pour **jouée** : à
+    /// 90/10, plus aucun coup raisonnable ne peut faire bouger grand-chose.
+    static let decidedMargin: Double = 40
+
+    /// Ce que pèse un coup joué dans une position déjà pliée, par rapport au
+    /// même coup joué dans une partie encore ouverte.
+    ///
+    /// Pas zéro : il faut encore ne pas tout gâcher, et un coup qui perdrait
+    /// vraiment la partie gagnée aurait une perte énorme, donc compterait
+    /// malgré ce coefficient. Mais vingt coups de finition ne doivent pas
+    /// peser autant que vingt coups de milieu de partie.
+    static let decidedStake: Double = 0.05
+
+    /// Poids d'un coup : **ce qui bougeait** × **ce qui était en jeu**.
+    ///
+    /// - parameter whiteWinPercents: probabilités de gain POV BLANCS le long
+    ///   de la partie, **position de départ comprise** — il en faut donc une
+    ///   de plus que de coups.
+    ///
+    /// La volatilité seule ne suffisait pas, mesuré : avec un simple plancher,
+    /// vingt coups de finition pèsent encore assez pour regonfler le score de
+    /// 14 points. Il manquait la notion d'ENJEU — une position figée à 99 %
+    /// n'est pas seulement calme, elle ne décide plus de rien.
+    ///
+    /// Plage de volatilité **resserrée à `[1 ; 3]`**, et c'est un arbitrage
+    /// mesuré : avec la plage large de Lichester (`[0,5 ; 12]`), les six
+    /// mauvais coups d'une partie de club captaient les trois quarts du poids
+    /// et le score tombait à 68 % — le calcul ne notait plus que les pires
+    /// moments. « Un moment critique compte jusqu'à trois fois un coup
+    /// tranquille » est le compromis retenu.
+    static func moveWeights(whiteWinPercents: [Double]) -> [Double] {
+        let moveCount = max(whiteWinPercents.count - 1, 0)
+        guard moveCount > 0 else { return [] }
+        // Fenêtre proportionnelle à la longueur de la partie, bornée : trop
+        // courte elle ne mesure rien, trop longue elle lisse justement ce
+        // qu'on cherche à voir.
+        let windowSize = max(2, min(8, moveCount / 10))
+        return (0..<moveCount).map { moveIndex in
+            let end = moveIndex + 1
+            let start = max(0, end - windowSize + 1)
+            let deviation = standardDeviation(Array(whiteWinPercents[start...end]))
+            let volatility = min(3, max(1, deviation / 4))
+
+            // Pliée AVANT **et** APRÈS : un coup qui fait basculer la partie
+            // d'équilibrée à gagnée engageait tout, et doit compter plein.
+            let decidedness = min(
+                abs(whiteWinPercents[end - 1] - 50), abs(whiteWinPercents[end] - 50)
+            )
+            return volatility * (decidedness >= decidedMargin ? decidedStake : 1)
+        }
+    }
+
+    /// Précision d'un joueur sur une partie.
+    ///
+    /// - parameter winPercentLosses: pertes de probabilité de gain des coups
+    ///   **de ce joueur**, dans l'ordre.
+    /// - parameter weights: leurs poids de volatilité, même ordre.
+    static func accuracy(winPercentLosses: [Double], weights: [Double]) -> Double? {
+        guard !winPercentLosses.isEmpty, weights.count == winPercentLosses.count else { return nil }
+
+        let weightSum = weights.reduce(0, +)
+        guard weightSum > 0 else {
+            return accuracy(
+                averageWinPercentLoss: winPercentLosses.reduce(0, +) / Double(winPercentLosses.count)
+            )
+        }
+
+        let weightedLoss = zip(winPercentLosses, weights).reduce(0) { $0 + $1.0 * $1.1 } / weightSum
+        return accuracy(averageWinPercentLoss: weightedLoss)
+    }
+
+    private static func standardDeviation(_ values: [Double]) -> Double {
+        guard values.count > 1 else { return 0 }
+        let mean = values.reduce(0, +) / Double(values.count)
+        let variance = values.reduce(0) { $0 + ($1 - mean) * ($1 - mean) } / Double(values.count)
+        return variance.squareRoot()
     }
 }

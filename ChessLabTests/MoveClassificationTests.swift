@@ -237,16 +237,9 @@ struct MoveClassificationTests {
     }
 
     // MARK: AccuracyScore
-
-    @Test func accuracyIsPerfectWithNoLoss() {
-        #expect(AccuracyScore.accuracy(averageWinPercentLoss: 0) == 100)
-    }
-
-    @Test func accuracyDecreasesWithLoss() {
-        let small = AccuracyScore.accuracy(averageWinPercentLoss: 2)
-        let large = AccuracyScore.accuracy(averageWinPercentLoss: 20)
-        #expect(small < 100)
-        #expect(large < small)
-        #expect(large >= 0)
-    }
+    //
+    // `accuracy(averageWinPercentLoss:)` a été remplacée le 14/08/2026 par
+    // `moveAccuracy(winPercentLoss:)` + agrégation pondérée : la moyenne
+    // simple des pertes gonflait le score des parties à longue finition.
+    // Le détail — et les chiffres — sont dans `AccuracyScoreTests`.
 }

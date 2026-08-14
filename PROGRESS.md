@@ -4463,6 +4463,97 @@ dans le code de production. Le seul fait visuel qui aurait pu casser en
 silence — le **sens** de la levée du fantôme en mode Table — a été extrait en
 `ChessBoardView.dragLiftOffset(squareSize:rotated:)` et couvert par un test.
 
+## Le score de précision était trop généreux (2026-08-14)
+
+Signalé en usage : « dans le module d'analyse, je trouve que le score de
+précision est trop généreux si je compare avec chess.com — j'arrive
+régulièrement à 92-94 % alors que je devrais être autour de 80 % », puis, dans
+la foulée, « les coups de fin de partie ont aussi tendance à augmenter
+artificiellement le score ».
+
+**La seconde remarque explique la première**, et le calcul le confirme avant
+toute modification de code. Partie de club témoin — 1 gaffe (25 points de
+perte), 2 erreurs (12), 3 imprécisions (7), 34 coups sains (1) :
+
+- sur 40 coups, perte moyenne 2,60 → **89,0 %** ;
+- prolongée de 20 coups de finition dans une position déjà gagnée, où toute
+  perte est nulle, la moyenne tombe à 1,73 → **92,5 %**.
+
+Rien n'a été mieux joué : le dénominateur a grossi de vingt coups qui ne
+pouvaient rien perdre. Une moyenne simple traite « ne rien lâcher dans une
+position gagnée » comme un exploit.
+
+### Deux pistes écartées par la mesure
+
+**Le budget du moteur.** Une évaluation trop courte sous-estimerait
+mécaniquement les pertes. Vérifié : 300 000 nœuds atteignent la profondeur
+18-20, comparable à ce qu'annonce chess.com. Ce n'est pas le maillon faible.
+
+**La méthode complète de Lichess** — une précision par coup, puis moyenne
+pondérée et moyenne harmonique — a été implémentée, mesurée, puis **retirée**.
+La courbe étant convexe, l'inégalité de Jensen rend cette agrégation *plus
+généreuse* : la partie témoin est remontée à **93,3 %**, au-dessus des 92,5 %
+qu'on cherchait à faire baisser. La moyenne harmonique ne compensait pas.
+
+Au passage, le premier jeu d'essai était vicié : la courbe d'évaluation y était
+inventée indépendamment des pertes, si bien que la pondération de volatilité
+n'avait rien à mesurer et que les tests « passaient » sans rien prouver. Une
+gaffe **doit** se voir dans la courbe — c'est la définition d'une gaffe. Les
+tests dérivent désormais la courbe des pertes.
+
+### Ce qui a été retenu
+
+La courbe ne bouge pas, et reste appliquée à une **moyenne** des pertes — c'est
+le sens strict, celui que Jensen favorise. Ce qui change, c'est la moyenne :
+elle est **pondérée**, et le poids d'un coup est le produit de deux facteurs.
+
+1. **Ce qui bougeait** — l'écart-type des probabilités de gain sur une fenêtre
+   glissante, ramené à `[1 ; 3]`. Plage volontairement resserrée : avec celle
+   de Lichess (`[0,5 ; 12]`), les six mauvais coups de la partie témoin
+   captaient les trois quarts du poids et le score tombait à **68 %** — le
+   calcul ne notait plus que les pires moments. « Un moment critique compte
+   jusqu'à trois fois un coup tranquille » est le compromis retenu.
+2. **Ce qui était en jeu** — au-delà de 90/10, la partie est tenue pour jouée
+   et le coup ne pèse plus que 5 %. La volatilité seule ne suffisait pas :
+   mesuré, avec un simple plancher, vingt coups de finition regonflaient encore
+   le score de **14 points**. Une position figée à 99 % n'est pas seulement
+   calme, elle ne décide plus de rien.
+
+Le coup qui **fait** basculer la partie garde son poids plein : la position
+n'est tenue pour jouée que si elle l'était avant *et* après.
+
+Ce second facteur règle du même coup la sévérité : une gaffe est par définition
+un grand écart de probabilité de gain, donc une forte volatilité, donc un poids
+élevé. Elle ne peut plus être noyée sous vingt coups anodins — sans qu'il ait
+fallu accorder un second barème.
+
+### Vérifié
+
+`AccuracyScoreTests` — 13 tests, **sans moteur** : tout porte sur l'agrégation,
+et chaque chiffre est reproductible à la calculette.
+
+| | ancienne méthode | nouvelle |
+|---|---|---|
+| Partie de club témoin | **92,50 %** | **83,72 %** |
+| Gonflement par 20 coups de finition | +3,50 pts | **+0,97 pt** |
+| Gaffe unique / même perte étalée | 95,60 / 95,60 | **89,36 / 95,60** |
+
+La dernière ligne est la plus parlante : l'ancienne moyenne simple ne pouvait
+**pas** distinguer une gaffe unique d'une perte diluée sur quarante coups —
+même somme, même nombre de coups, même score au point près.
+
+**Suite unitaire : 477 tests, 78 suites, 0 échec.**
+
+### Calibrage restant, à trancher sur des parties réelles
+
+Les 83,72 % du témoin tombent dans la zone attendue, mais le témoin est
+**synthétique** : c'est un profil de pertes choisi à la main, pas une partie
+jouée. La plage `[1 ; 3]` et le seuil 90/10 sont des arbitrages, documentés
+comme tels et regroupés en constantes nommées (`decidedMargin`,
+`decidedStake`). Le juge de paix reste une partie réelle réanalysée et comparée
+à son score chess.com — c'est la seule vérité terrain disponible, et elle est
+du côté de l'utilisateur.
+
 ## Le tap-tap était devenu plus exigeant que le glisser (2026-08-14)
 
 Retour d'usage immédiatement après le chantier précédent : « ça coince des

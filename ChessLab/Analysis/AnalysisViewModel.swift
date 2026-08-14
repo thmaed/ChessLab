@@ -1684,23 +1684,47 @@ final class AnalysisViewModel {
     /// ligne principale (voir ``AccuracyScore``). Se complète
     /// progressivement pendant la classification de fond.
     private func computeAccuracyByColor() -> [Piece.Color: Double] {
-        var lossesByColor: [Piece.Color: [Double]] = [:]
+        // Deux séries parallèles, l'ordre des coups étant ce qui porte
+        // l'information : la précision de chaque coup, et la probabilité de
+        // gain POV BLANCS de chaque position — c'est sur cette dernière que
+        // se calcule la volatilité, donc le poids des coups.
+        //
+        // La position de DÉPART ouvre la série : sans elle, le premier coup
+        // n'aurait pas de « avant » et sa fenêtre serait décalée d'un cran.
+        var whiteWinPercents: [Double] = []
+        var movers: [Piece.Color] = []
+        var losses: [Double] = []
+
         var idx = game.startingIndex
         while game.moves.hasIndex(after: idx) {
             let parentIdx = idx
             idx = game.moves.index(after: idx)
-            guard let evaluation = moveEvaluations[idx] else { continue }
-            guard let evalBefore = evalCache[parentIdx] else { continue }
+            guard let evaluation = moveEvaluations[idx], let evalBefore = evalCache[parentIdx] else { continue }
+            if whiteWinPercents.isEmpty { whiteWinPercents.append(evalBefore.winPercent) }
+
             let mover = idx.color
             let beforeMoverPOV = mover == .white ? evalBefore.winPercent : 100 - evalBefore.winPercent
-            let loss = max(0, beforeMoverPOV - evaluation.winPercentAfterMover)
-            lossesByColor[mover, default: []].append(loss)
+
+            whiteWinPercents.append(
+                mover == .white ? evaluation.winPercentAfterMover : 100 - evaluation.winPercentAfterMover
+            )
+            movers.append(mover)
+            losses.append(max(0, beforeMoverPOV - evaluation.winPercentAfterMover))
         }
-        return lossesByColor.compactMapValues { losses in
-            guard !losses.isEmpty else { return nil }
-            let average = losses.reduce(0, +) / Double(losses.count)
-            return AccuracyScore.accuracy(averageWinPercentLoss: average)
+
+        let weights = AccuracyScore.moveWeights(whiteWinPercents: whiteWinPercents)
+        guard weights.count == losses.count else { return [:] }
+
+        var result: [Piece.Color: Double] = [:]
+        for color in [Piece.Color.white, .black] {
+            let indices = movers.indices.filter { movers[$0] == color }
+            guard !indices.isEmpty else { continue }
+            result[color] = AccuracyScore.accuracy(
+                winPercentLosses: indices.map { losses[$0] },
+                weights: indices.map { weights[$0] }
+            )
         }
+        return result
     }
 
     // MARK: Courbe d'évaluation
