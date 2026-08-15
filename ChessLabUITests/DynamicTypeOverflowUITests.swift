@@ -105,6 +105,17 @@ final class DynamicTypeOverflowUITests: XCTestCase {
         RunLoop.current.run(until: Date().addingTimeInterval(0.8))
     }
 
+    /// Le balayage ne masque RIEN — c'est un diagnostic, pas un verdict — mais
+    /// il **nomme** les artefacts déjà instruits.
+    ///
+    /// Sans ce marquage, l'artefact de géométrie des tuiles de l'accueil
+    /// (voir ``LayoutProbe/homeModeTileArtifacts``) ressort à chaque balayage
+    /// comme un défaut neuf : c'est ce qui l'a fait consigner une deuxième
+    /// fois dans `PROGRESS.md` le 15/08, avec l'idée fausse que les deux
+    /// sondes ne mesuraient pas la même chose — elles appellent pourtant
+    /// toutes deux ``LayoutProbe/horizontalOverflows(in:tolerance:ignoring:)``,
+    /// aux mêmes types près. Un lecteur voit désormais la différence dans la
+    /// sortie elle-même.
     @MainActor
     private func report(_ app: XCUIApplication, screen: String, tag: String, device: String) {
         let overflows = LayoutProbe.horizontalOverflows(in: app)
@@ -113,7 +124,10 @@ final class DynamicTypeOverflowUITests: XCTestCase {
             return
         }
         for overflow in overflows.prefix(8) {
-            print("OVERFLOW|\(device)|\(tag)|\(screen)|\(overflow)")
+            let known = LayoutProbe.homeModeTileArtifacts.contains(overflow.identifier)
+                || LayoutProbe.homeModeTileArtifacts.contains(overflow.label)
+            let note = known ? " [ARTEFACT CONNU — fond décoratif, rien n'est coupé]" : ""
+            print("OVERFLOW|\(device)|\(tag)|\(screen)|\(overflow)\(note)")
         }
     }
 }

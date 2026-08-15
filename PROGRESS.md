@@ -5388,17 +5388,68 @@ joueurs, écrans d'entrée sans plafond de largeur. Le simulateur ne permet pas
 de juger un rendu paysage à la capture (piège documenté) : sans un vrai iPad,
 ce serait déplacer des chiffres au hasard.
 
-### 7. La tuile « Deux joueurs » déborde de 10,7 pt — NOUVEAU (15/08)
+### ✅ 7. La tuile « Deux joueurs » déborde de 10,7 pt — FAUX POSITIF, tranché le 15/08 au soir
 
-Relevé par le balayage Dynamic Type, **à toutes les tailles de texte, y compris
-la taille L par défaut** : la tuile sort de 10,7 pt à droite
-(`x=[208,0…412,7]` pour une fenêtre de 402 pt sur iPhone 17). Étranger à
-Dynamic Type, donc, et antérieur au chantier du 15/08.
+**Le relevé était exact, son interprétation était fausse.** La tuile ne
+déborde pas : c'est l'artefact de géométrie du fond décoratif, déjà instruit
+et écarté sur preuves dans `LayoutOverflowUITests`, redécouvert par le
+balayage parce que rien ne le signalait comme connu.
 
-Point d'attention : `LayoutOverflowUITests.testNoOverflowOnHomeScreen` passe
-malgré tout, parce que `LayoutProbe` ne parcourt pas les mêmes types
-d'éléments. **Les deux sondes ne sont pas d'accord**, et c'est celle du
-balayage Dynamic Type qu'il faut croire — la corriger fait partie du travail.
+Ce que dit la mesure refaite sur iPhone 17 (`DynamicTypeOverflowUITests`,
+taille L) — c'est le détail des TYPES qui tranche, et il manquait au relevé
+d'origine :
+
+```
+accueil | .image  « person.2.fill » x=[208,0…412,7] → 10,7 pt dehors
+accueil | .button « Deux joueurs »  x=[208,0…412,7] → 10,7 pt dehors
+```
+
+Deux éléments, **frames identiques**, et **aucun `.staticText`**. Le contenu
+de la carte tient donc à l'intérieur — vérifié directement depuis :
+`TILE-TEXT|Deux joueurs|x=[224,0…317,7]`, quand la carte va de 208 à 382.
+L'arithmétique de la grille confirme le reste : fenêtre 402, marges de 20,
+deux colonnes de 174 → la colonne droite commence à x=208, valeur relevée.
+Les 30,7 pt en trop sont le glyphe `person.2.fill` du fond, écrêté à l'œil par
+`clipShape` mais compté dans la géométrie annoncée à l'accessibilité.
+
+#### La correction erronée que ce point demandait
+
+L'entrée du 15/08 affirmait que « `LayoutProbe` ne parcourt pas les mêmes types
+d'éléments ». **C'est faux** : les deux tests appellent le même
+`LayoutProbe.horizontalOverflows`, donc les mêmes `inspectedTypes`. La seule
+différence était un argument — le garde-fou passait `ignoring:`, le balayage
+non. Croire l'une des deux sondes contre l'autre n'avait donc pas de sens.
+
+#### Le vrai défaut, lui, existait — et il est corrigé
+
+L'exclusion portait sur le **libellé, tous types confondus**. Or « Deux
+joueurs » nomme à la fois le bouton (artefact) et le `Text` du titre à
+l'intérieur : un titre réellement coupé aurait été mis sous silence avec
+l'artefact. Trois changements :
+
+1. `LayoutProbe.neverExcludedTypes` — une exclusion ne s'applique plus jamais
+   à un type porteur de texte (`.staticText`, `.textField`, `.textView`…).
+   `testNoOverflowOnHomeScreen` mesure donc désormais réellement les textes des
+   tuiles, et **passe toujours** : ils tiennent.
+2. `LayoutProbe.homeModeTileArtifacts` — la liste d'exclusion devient une
+   source unique, partagée par le garde-fou et le balayage, avec la
+   démonstration chiffrée en commentaire.
+3. Le balayage **marque** l'artefact au lieu de le taire :
+   `[ARTEFACT CONNU — fond décoratif, rien n'est coupé]`. C'est ce qui évitera
+   qu'il soit consigné comme un défaut neuf une troisième fois.
+
+Nouveau test `testHomeTileTextsAreMeasuredNotExcluded` : il prouve que
+l'exclusion ne couvre que les conteneurs. *Piège rencontré* : sa première
+version exigeait un élément unique par libellé et échouait — l'arbre
+d'accessibilité expose le même texte jusqu'à cinq fois. Il mesure maintenant
+toutes les occurrences.
+
+**Ce qui reste ouvert** : la géométrie annoncée reste fausse, et quatre
+tentatives de correction côté SwiftUI ont échoué (`accessibilityHidden` sur
+l'image puis sur tout le fond, `clipped()`, `frame` explicite sur le glyphe).
+`clipped()` s'applique au `ZStack`, dont la frame est déjà gonflée par le
+glyphe — d'où le no-op. Sans effet utilisateur mesurable, ce n'est pas une
+priorité ; c'est documenté pour qui rouvrirait le sujet.
 
 ### 7 bis. Répertoires d'ouvertures écrits par l'utilisateur — NOUVEAU (15/08)
 
@@ -5419,9 +5470,37 @@ Découpage naturel, du plus utile au plus coûteux :
 
 Les 58 cours restent des arbres quasi linéaires (3 191 positions pour 3 135
 arêtes après les corrections du 15/08 — le ratio n'a pas bougé). La chaîne
-Explorer Lichess existe et n'a jamais servi ; elle est **bloquée par un 401
-nginx** depuis cet environnement, à retester depuis un Terminal ordinaire :
-`curl -A "ChessLab" "https://explorer.lichess.ovh/masters?play=e2e4"`.
+Explorer Lichess existe et n'a jamais servi : elle est **bloquée par un 401
+nginx**.
+
+**Correction du 15/08 au soir** : l'hypothèse « c'est cet environnement, à
+retester depuis un Terminal ordinaire » est **démentie par la mesure**. Le
+réseau fonctionne, et Lichess aussi — c'est l'explorer, et lui seul, qui
+refuse :
+
+| Requête | Réponse |
+|---|---|
+| `lichess.org`, `database.lichess.org`, `api.chess.com`, `wikipedia.org` | **200** |
+| `tablebase.lichess.ovh` — même domaine que l'explorer | **200** |
+| `explorer.lichess.ovh/masters` **et** `explorer.lichess.org/masters` | **401** |
+| idem avec UA navigateur, UA de contact, sans UA, avec `Authorization: Bearer` | **401**, corps identique (172 octets, nginx) |
+| `OPTIONS` sur le même chemin | **204** |
+| racine du service | **301** |
+
+Donc : ni un blocage de domaine côté bac à sable (le tablebase passe sur le
+même domaine), ni un mauvais nom d'hôte (`explorer.lichess.org` est bien le
+nom documenté dans la spec OpenAPI de Lichess — et refuse pareil), ni un
+User-Agent, ni un jeton manquant (un `Bearer` ne change rien, et `explorer.py`
+n'a de toute façon aucun support de jeton). Le préflight CORS passe mais les
+requêtes de données sont refusées à la porte nginx.
+
+Reste à distinguer un blocage d'IP d'un changement de politique côté Lichess,
+ce qui ne peut pas se faire d'ici. **Vérification à faire dans un navigateur**
+sur `https://explorer.lichess.org/masters?play=e2e4` : du JSON → le blocage est
+propre à la sortie réseau des outils ; le même 401 → le point est bloqué côté
+Lichess, et la voie de repli est `database.lichess.org` (qui répond 200) en
+dumps hors ligne, plus lourds mais sans dépendance réseau.
+
 À enchaîner obligatoirement avec `audit.py`, dont l'avertissement restant
 (Blackmar 8…h6) dit déjà où la couverture manque.
 

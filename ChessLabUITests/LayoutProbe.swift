@@ -166,6 +166,53 @@ enum LayoutProbe {
         .pageIndicator, .checkBox, .radioButton, .toggle, .link, .picker, .pickerWheel,
     ]
 
+    /// Types sur lesquels une exclusion ne s'applique JAMAIS.
+    ///
+    /// Un texte coupé est toujours un vrai défaut, et il partage son libellé
+    /// avec le conteneur qui le porte : « Deux joueurs » nomme à la fois le
+    /// bouton de la tuile (dont la géométrie annoncée est un artefact connu,
+    /// voir ``homeModeTileArtifacts``) et le `Text` du titre à l'intérieur.
+    /// Exclure par libellé sans regarder le type faisait taire les deux — donc
+    /// aurait masqué un vrai débordement du titre derrière un faux.
+    static let neverExcludedTypes: Set<XCUIElement.ElementType> = [
+        .staticText, .textField, .secureTextField, .textView,
+    ]
+
+    /// Artefact de géométrie des six tuiles de mode de l'accueil — **source
+    /// unique**, partagée par le garde-fou (`LayoutOverflowUITests`) et par le
+    /// balayage de diagnostic (`DynamicTypeOverflowUITests`).
+    ///
+    /// ## Ce que c'est
+    ///
+    /// Le détecteur signale ces tuiles (10,7 pt sur iPhone 17, jusqu'à 17,5 pt
+    /// sur iPhone SE), mais **rien n'est coupé à l'écran** :
+    ///
+    /// - les colonnes sont régulières et conformes au calcul de la grille
+    ///   (fenêtre 402, marges de 20, deux colonnes de 174 → la colonne droite
+    ///   commence à x=208, valeur relevée) ;
+    /// - seuls `.image` et `.button` sont signalés, **jamais un `.staticText`**
+    ///   — le titre et le sous-titre tiennent dans la carte ;
+    /// - la largeur annoncée varie avec le symbole, et seules les tuiles aux
+    ///   symboles larges (`person.2.fill`, `books.vertical.fill`) dépassent.
+    ///
+    /// La cause est la grande icône décorative « fantôme » du fond
+    /// (`HomeView.ModeCard`), visuellement écrêtée par `clipShape` mais incluse
+    /// dans la géométrie annoncée à l'accessibilité — qui ne tient pas compte
+    /// de l'écrêtage. Quatre corrections ont été tentées sans faire bouger la
+    /// mesure d'un demi-point : `accessibilityHidden(true)` sur l'image puis
+    /// sur tout le fond, `clipped()`, et un `frame` explicite sur le glyphe.
+    ///
+    /// L'exclusion est donc assumée et argumentée, plutôt que noyée sous un
+    /// seuil de tolérance qui aurait aussi laissé passer de vrais
+    /// débordements. Elle ne peut RIEN masquer de textuel : voir
+    /// ``neverExcludedTypes``.
+    static let homeModeTileArtifacts: Set<String> = [
+        "Contre l'ordinateur", "Deux joueurs", "Puzzles",
+        "Ouvertures", "Analyser", "Laboratoire", "mode_openings",
+        "cpu", "person.2.fill", "puzzlepiece.fill",
+        "books.vertical.fill", "chart.xyaxis.line", "flask",
+    ]
+
     /// Parcourt les descendants de `app` et retourne ceux qui sortent de la
     /// fenêtre par un côté.
     ///
@@ -196,11 +243,15 @@ enum LayoutProbe {
                 guard frame.maxX > window.minX, frame.minX < window.maxX else { continue }
                 // L'exclusion porte sur l'identifiant OU le libellé : la
                 // plupart des vues SwiftUI n'ont pas d'identifiant explicite,
-                // et c'est alors leur libellé qui les nomme.
+                // et c'est alors leur libellé qui les nomme. Elle ne s'applique
+                // jamais à un type porteur de texte (``neverExcludedTypes``) :
+                // un libellé exclu nomme le conteneur ET le texte qu'il
+                // contient, et seul le premier est un artefact.
                 let identifier = element.identifier
-                guard !identifiers.contains(identifier),
-                      !identifiers.contains(element.label)
-                else { continue }
+                if !neverExcludedTypes.contains(type),
+                   identifiers.contains(identifier) || identifiers.contains(element.label) {
+                    continue
+                }
                 found.append(
                     Overflow(
                         kind: String(describing: type), identifier: identifier,

@@ -99,49 +99,69 @@ final class LayoutOverflowUITests: XCTestCase {
 
     // MARK: 5.1 — Détecteur générique sur les écrans principaux
 
-    /// Les six tuiles de mode sont exclues, sur preuve — voir ci-dessous.
-    private static let decorativeHomeTiles: Set<String> = [
-        "Contre l'ordinateur", "Deux joueurs", "Puzzles",
-        "Ouvertures", "Analyser", "Laboratoire", "mode_openings",
-        "cpu", "person.2.fill", "puzzlepiece.fill",
-        "books.vertical.fill", "chart.xyaxis.line", "flask",
-    ]
-
     /// L'accueil, hors artefact documenté.
     ///
-    /// ## Pourquoi les tuiles sont exclues
+    /// L'exclusion des six tuiles de mode vit désormais dans
+    /// ``LayoutProbe/homeModeTileArtifacts`` — source unique, partagée avec le
+    /// balayage de diagnostic, qui la documente et l'argumente. Elle ne peut
+    /// masquer aucun texte coupé : ``LayoutProbe/neverExcludedTypes`` interdit
+    /// d'exclure un `.staticText`, quel que soit son libellé.
     ///
-    /// Le détecteur les signale (jusqu'à 17,5 pt « dehors »), mais la mesure
-    /// montre que **rien n'est coupé à l'écran** :
-    ///
-    /// - les colonnes sont régulières — les tuiles commencent à x=20 et
-    ///   x=194,5, soit un pas de 174,5 pt (160,5 de carte + 14 d'espacement),
-    ///   exactement ce que calcule la grille ;
-    /// - leur CONTENU est bien à l'intérieur : « Sur le même appareil »
-    ///   s'étend de 210,5 à 339, dans les marges de la carte (210,5 → 339) ;
-    /// - seules les tuiles aux symboles LARGES (`person.2.fill`,
-    ///   `books.vertical.fill`) sont signalées, et leur largeur annoncée varie
-    ///   avec le symbole (173 à 198 pt pour une carte de 160,5).
-    ///
-    /// C'est donc la grande icône décorative « fantôme » du fond qui gonfle la
-    /// `frame` remontée par l'accessibilité. Elle est **visuellement écrêtée**
-    /// par le `clipShape` de la carte ; SwiftUI n'en tient pas compte pour la
-    /// géométrie annoncée. Trois tentatives de correction sont restées sans
-    /// effet sur la mesure : `accessibilityHidden(true)` sur l'image puis sur
-    /// tout le fond, `clipped()`, et un `frame` explicite sur le glyphe — les
-    /// valeurs n'ont pas bougé d'un demi-point.
-    ///
-    /// L'exclusion est donc assumée et argumentée, plutôt que masquée par un
-    /// seuil de tolérance qui aurait aussi laissé passer de vrais
-    /// débordements. Les deux premières corrections sont conservées : elles
-    /// évitent que VoiceOver annonce un glyphe décoratif.
+    /// Les deux `accessibilityHidden(true)` de `ModeCard` sont conservés même
+    /// s'ils ne changent pas la mesure : ils évitent que VoiceOver annonce un
+    /// glyphe décoratif.
     @MainActor
     func testNoOverflowOnHomeScreen() throws {
         let app = launchApp()
         XCTAssertTrue(app.staticTexts["ChessLab"].waitForExistence(timeout: 10))
         LayoutProbe.assertNoHorizontalOverflow(
-            in: app, context: "accueil", ignoring: Self.decorativeHomeTiles
+            in: app, context: "accueil", ignoring: LayoutProbe.homeModeTileArtifacts
         )
+    }
+
+    /// Le garde-fou du garde-fou : prouve que l'exclusion ci-dessus ne porte
+    /// que sur la géométrie annoncée des CONTENEURS, et que les textes des
+    /// tuiles restent réellement mesurés.
+    ///
+    /// Sans lui, rien ne distinguerait « le titre tient dans la carte » de
+    /// « le titre est exclu par son libellé » — c'est exactement la confusion
+    /// qui a fait consigner l'artefact comme un défaut le 15/08.
+    @MainActor
+    func testHomeTileTextsAreMeasuredNotExcluded() throws {
+        let app = launchApp()
+        XCTAssertTrue(app.staticTexts["ChessLab"].waitForExistence(timeout: 10))
+
+        // Le libellé est dans la liste d'exclusion ; le `Text` qui le porte
+        // doit malgré tout être inspecté, donc visible du détecteur.
+        XCTAssertTrue(
+            app.staticTexts["Deux joueurs"].firstMatch.waitForExistence(timeout: 5),
+            "le titre de tuile doit être un élément mesurable"
+        )
+
+        let window = app.frame
+        for label in ["Contre l'ordinateur", "Deux joueurs", "Puzzles", "Analyser"] {
+            // TOUTES les occurrences, pas la première : un même libellé est
+            // porté par plusieurs éléments de l'arbre d'accessibilité, et
+            // exiger l'unicité faisait échouer le test sur un défaut du
+            // harnais — pas de l'app.
+            let matches = app.staticTexts.matching(identifier: label)
+                .allElementsBoundByAccessibilityElement
+            XCTAssertFalse(matches.isEmpty, "aucun texte « \(label) » mesurable sur l'accueil")
+            for (index, text) in matches.enumerated() {
+                let frame = text.frame
+                guard frame.width > 0, frame.height > 0 else { continue }
+                print(
+                    String(
+                        format: "TILE-TEXT|%@|#%d|x=[%.1f…%.1f]|fenêtre=[%.1f…%.1f]",
+                        label, index, frame.minX, frame.maxX, window.minX, window.maxX
+                    )
+                )
+                XCTAssertLessThanOrEqual(
+                    frame.maxX, window.maxX + 0.5,
+                    "le texte « \(label) » sort de la fenêtre — un vrai débordement, pas l'artefact du fond"
+                )
+            }
+        }
     }
 
     @MainActor
