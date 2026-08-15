@@ -5362,10 +5362,13 @@ Découpage naturel, du plus utile au plus coûteux :
 
 ### 7 ter. Approfondir les cours livrés via `generate.py` — NOUVEAU (15/08)
 
-Les 58 cours sont des arbres quasi linéaires (3 123 positions, 3 067 arêtes).
-La chaîne Explorer Lichess existe et n'a jamais servi. À enchaîner
-obligatoirement avec `audit.py`, dont les avertissements listent déjà les
-positions où l'adversaire a une meilleure défense que celle couverte.
+Les 58 cours restent des arbres quasi linéaires (3 191 positions pour 3 135
+arêtes après les corrections du 15/08 — le ratio n'a pas bougé). La chaîne
+Explorer Lichess existe et n'a jamais servi ; elle est **bloquée par un 401
+nginx** depuis cet environnement, à retester depuis un Terminal ordinaire :
+`curl -A "ChessLab" "https://explorer.lichess.ovh/masters?play=e2e4"`.
+À enchaîner obligatoirement avec `audit.py`, dont l'avertissement restant
+(Blackmar 8…h6) dit déjà où la couverture manque.
 
 ### 8. Chantier I, niveau 3 — l'explication POSITIONNELLE
 
