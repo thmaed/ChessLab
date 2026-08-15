@@ -1,8 +1,9 @@
 # Checklist de soumission App Store — ChessLab
 
-État au 21/07/2026. Coché = fait par ce lot de préparation ou déjà en
-place. Non coché = reste une action utilisateur (compte, App Store Connect,
-ou décision qui n'appartient qu'à toi).
+État au 21/07/2026, **révisé le 15/08/2026** (chemin du dépôt, et la section
+« modèle `Repertoire` » devenue obsolète). Coché = fait par ce lot de
+préparation ou déjà en place. Non coché = reste une action utilisateur
+(compte, App Store Connect, ou décision qui n'appartient qu'à toi).
 
 ## Fait dans ce lot
 
@@ -127,12 +128,14 @@ redimensionnement de fenêtre).
       contact, informations bancaires/fiscales si l'app devient payante.
 - [ ] **Remplir le copyright** dans `METADATA.md` avec le nom légal exact
       du compte Apple Developer (je ne le connais pas).
-- [ ] **Product ▸ Archive** depuis Xcode (PAS depuis la copie `/tmp` —
-      archive la vraie copie sous `~/Desktop/Devl/ChessLab`, en acceptant
-      la lenteur due à iCloud, ou déplace le dépôt hors du Bureau comme
-      déjà suggéré) puis Distribute App ▸ App Store Connect. C'est à ce
-      moment que Xcode crée/choisit le certificat de distribution et le
-      profil de provisionnement.
+- [ ] **Product ▸ Archive** depuis Xcode (PAS depuis une copie de build
+      dans `/tmp` — archive le vrai dépôt, désormais sous
+      `~/Developer/ChessLab`) puis Distribute App ▸ App Store Connect.
+      C'est à ce moment que Xcode crée/choisit le certificat de
+      distribution et le profil de provisionnement.
+      *(Mis à jour le 15/08/2026 : le dépôt était auparavant sous
+      `~/Desktop/Devl/ChessLab`, où la synchro iCloud du Bureau ralentissait
+      l'archivage. Le déplacement recommandé a été fait.)*
 - [ ] **Uploader les captures d'écran** : celles générées ici couvrent le
       minimum obligatoire (1 par taille requise). Envisage d'en ajouter
       2-4 de plus par taille (Analyse, Puzzles, Ouvertures…) pour une
@@ -157,18 +160,33 @@ App Store, vaut mieux soit retravailler cette mise en page, soit choisir
 une autre capture (Analyse ou Jouer, qui remplissent mieux l'écran) comme
 image de tête.
 
-## Découverte en marge, non traitée : le modèle `Repertoire` n'a plus AUCUN créateur
+## ✅ Résolu : le modèle `Repertoire` sans créateur (relevé le 21/07, obsolète depuis)
 
-En retirant le code mort ci-dessus, remarqué que même les écrans encore
-BRANCHÉS (`RepertoireQueueView`, `RepertoireTrainingHost`,
-`RepertoireItemGenerator`) reposent sur l'existence d'un objet
-`Repertoire` en base — et que plus rien, nulle part dans le code actuel,
-n'en crée un (`grep` ne trouve aucun site d'instanciation, seulement des
-lectures via `FetchDescriptor<Repertoire>`). Sur une installation
-fraîche, la table `Repertoire` reste donc vide indéfiniment, et tout le
-pipeline de révision espacée des répertoires personnels — pas juste
-l'écran que je viens de retirer — est en pratique inatteignable. Non
-traité ici : c'est plus large que la demande initiale (une mention à
-enlever), et j'ai pu manquer un mécanisme de création que je n'ai pas vu.
-À vérifier de ton côté avant de décrire cette fonctionnalité dans une
-future mise à jour de la fiche App Store.
+**Constat d'origine (21/07/2026)** : les écrans encore branchés
+(`RepertoireQueueView`, `RepertoireTrainingHost`, `RepertoireItemGenerator`)
+lisaient un objet `Repertoire` en base que plus rien ne créait — la table
+restait vide indéfiniment, et tout le pipeline de révision espacée des
+répertoires personnels était inatteignable.
+
+**Depuis, l'architecture a changé et le problème n'existe plus.** Le type
+`Repertoire` et les trois vues ci-dessus ont été retirés du projet (`grep` ne
+trouve plus aucune occurrence). Le répertoire personnel repose désormais sur
+deux mécanismes qui ont, eux, de vrais sites de création :
+
+- `RepertoireMembership`, marquage des cours que l'utilisateur déclare siens,
+  créé par `RepertoireStore.toggle(courseID:side:in:)`
+  (`ChessLab/OpeningGraph/RepertoireStore.swift`) ;
+- `UserOpeningStore` (`ChessLab/OpeningGraph/UserOpeningStore.swift`), pour les
+  répertoires **apportés** par l'utilisateur — import PGN et partage de fichier
+  livrés le 15/08/2026, stockés en JSON dans `Documents/UserOpenings/` au format
+  exact des cours embarqués.
+
+La progression vit à part, dans `OpeningPositionProgress`, indexée par FEN
+normalisée : un cours importé hérite immédiatement de ce que l'utilisateur sait
+déjà des positions qu'il contient.
+
+**Conséquence pour la fiche App Store** : la fonctionnalité est réellement
+atteignable et peut être décrite. Un seul morceau reste absent — l'éditeur
+d'arbre dans l'app (voir le point 7 bis de `PROGRESS.md`) — donc ne pas
+promettre la *création* d'un répertoire à la main dans la description ;
+l'import et le partage, eux, sont bien là.
