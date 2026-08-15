@@ -20,7 +20,7 @@ struct OpeningCoursePickerView: View {
     @State private var dailyCount = 0
     @State private var hardestCount = 0
 
-    private var entries: [OpeningCatalogEntry] { OpeningCourseLoader.catalog }
+    private var entries: [OpeningCatalogEntry] { OpeningCatalog.all }
     private var white: [OpeningCatalogEntry] { entries.filter { $0.side == .white } }
     private var black: [OpeningCatalogEntry] { entries.filter { $0.side == .black } }
 
@@ -48,7 +48,7 @@ struct OpeningCoursePickerView: View {
         var newCoverage: [String: OpeningCoverage] = [:]
         var relevant: [OpeningCourse] = []
         for entry in entries {
-            guard let course = OpeningCourseLoader.course(id: entry.id) else { continue }
+            guard let course = OpeningCatalog.course(id: entry.id) else { continue }
             newCoverage[entry.id] = OpeningCoverage.compute(course: course, progress: snapshots)
             if repertoire.isEmpty || repertoire.contains(entry.id) { relevant.append(course) }
         }

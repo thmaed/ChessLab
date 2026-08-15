@@ -79,12 +79,12 @@ final class OpeningTrainViewModel {
     convenience init(mode: Mode, context: ModelContext, newLimit: Int = 20, now: Date = Date()) {
         var loaded: [String: OpeningCourse] = [:]
         if case let .fullLine(courseID) = mode {
-            if let c = OpeningCourseLoader.course(id: courseID) { loaded[courseID] = c }
+            if let c = OpeningCatalog.course(id: courseID) { loaded[courseID] = c }
         } else {
             let repertoire = RepertoireStore.memberIDs(in: context)
-            for entry in OpeningCourseLoader.catalog {
+            for entry in OpeningCatalog.all {
                 if !repertoire.isEmpty && !repertoire.contains(entry.id) { continue }
-                if let c = OpeningCourseLoader.course(id: entry.id) { loaded[entry.id] = c }
+                if let c = OpeningCatalog.course(id: entry.id) { loaded[entry.id] = c }
             }
         }
         self.init(mode: mode, context: context, courses: loaded, newLimit: newLimit, now: now)

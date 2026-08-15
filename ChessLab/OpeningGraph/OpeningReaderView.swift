@@ -312,7 +312,7 @@ struct OpeningReaderHost: View {
         .onAppear {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
-                    OpeningCourseLoader.course(id: courseID).map(OpeningReaderViewModel.init(course:))
+                    OpeningCatalog.course(id: courseID).map(OpeningReaderViewModel.init(course:))
                 }
             }
         }

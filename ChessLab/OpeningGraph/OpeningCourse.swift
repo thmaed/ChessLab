@@ -337,6 +337,45 @@ struct OpeningCatalogEntry: Codable, Identifiable, Hashable, Sendable {
 
     var side: OpeningSide { side_ ?? .white }
     var level: OpeningLevel { level_.flatMap(OpeningLevel.init(rawValue:)) ?? .club }
+
+    /// Ligne de catalogue DÉRIVÉE d'un cours complet.
+    ///
+    /// Les cours embarqués ont un index pré-calculé (`opening_catalog.json`) ;
+    /// ceux qu'apporte l'utilisateur n'en ont pas — leur fichier EST le cours.
+    /// Cette dérivation évite d'inventer un second format d'index rien que pour
+    /// eux. Elle est dans ce fichier parce que `side_`/`level_` y sont privés.
+    init(_ course: OpeningCourse) {
+        id = course.id
+        name = course.name
+        eco = course.eco
+        side_ = course.side
+        level_ = course.level.rawValue
+        summary = course.summary
+        positionCount = course.positions.count
+        maxDepth = Self.depth(of: course)
+    }
+
+    /// Profondeur en demi-coups depuis la racine (parcours en largeur : le
+    /// graphe peut contenir des cycles par transposition, un parcours naïf en
+    /// profondeur ne terminerait pas).
+    private static func depth(of course: OpeningCourse) -> Int {
+        var seen: Set<String> = [course.rootFEN]
+        var frontier = [course.rootFEN]
+        var depth = 0
+        while !frontier.isEmpty {
+            var next: [String] = []
+            for fen in frontier {
+                for edge in course.positions[fen]?.moves ?? [] where !seen.contains(edge.toFEN) {
+                    seen.insert(edge.toFEN)
+                    next.append(edge.toFEN)
+                }
+            }
+            if next.isEmpty { break }
+            depth += 1
+            frontier = next
+        }
+        return depth
+    }
 }
 
 /// Charge les cours d'ouverture embarqués — un fichier par cours (chargement
@@ -384,5 +423,30 @@ enum OpeningCourseLoader {
     /// tout appelant qui a déjà les octets (pas de dépendance au bundle).
     static func decodeCourse(from data: Data) throws -> OpeningCourse {
         try JSONDecoder().decode(OpeningCourse.self, from: data)
+    }
+}
+
+/// Les cours DISPONIBLES : ceux du bundle plus ceux qu'a apportés
+/// l'utilisateur (voir ``UserOpeningStore``). C'est ce que doit consulter toute
+/// l'interface — ``OpeningCourseLoader`` reste, lui, strictement le bundle.
+///
+/// Isolé sur l'acteur principal parce que le magasin utilisateur l'est (il est
+/// observable et se rafraîchit après un import) ; toutes les vues et les view
+/// models du module y sont déjà.
+@MainActor
+enum OpeningCatalog {
+    /// Le catalogue complet. Les cours importés passent EN TÊTE : ce sont ceux
+    /// que l'utilisateur a choisi d'ajouter, ils ne doivent pas se perdre au
+    /// milieu de cinquante-huit ouvertures livrées.
+    static var all: [OpeningCatalogEntry] {
+        UserOpeningStore.shared.catalog + OpeningCourseLoader.catalog
+    }
+
+    /// Charge un cours, quelle que soit sa provenance.
+    static func course(id: String) -> OpeningCourse? {
+        if UserOpeningStore.isUserCourse(id: id) {
+            return UserOpeningStore.shared.course(id: id)
+        }
+        return OpeningCourseLoader.course(id: id)
     }
 }

@@ -268,7 +268,7 @@ struct OpeningExplorerHost: View {
         .onAppear {
             guard viewModel == nil else { return }
             viewModel = sessionStore.value(for: sessionKey) {
-                guard let course = OpeningCourseLoader.course(id: courseID) else { return nil }
+                guard let course = OpeningCatalog.course(id: courseID) else { return nil }
                 return OpeningExplorerViewModel(course: course) { fen in
                     OpeningTranspositionIndex.bundled.courses(for: fen, excluding: courseID)
                 }

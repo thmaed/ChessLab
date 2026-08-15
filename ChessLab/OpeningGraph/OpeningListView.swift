@@ -13,10 +13,26 @@ struct OpeningListView: View {
 
     @Environment(\.modelContext) private var modelContext
     @State private var dueCount = 0
+    /// Observé : la liste se rafraîchit d'elle-même après un import.
+    @State private var store = UserOpeningStore.shared
+    @State private var showImport = false
+    @State private var pendingDeletion: OpeningCatalogEntry?
 
-    private var entries: [OpeningCatalogEntry] { OpeningCourseLoader.catalog }
-    private var white: [OpeningCatalogEntry] { sortedByName(entries.filter { $0.side == .white }) }
-    private var black: [OpeningCatalogEntry] { sortedByName(entries.filter { $0.side == .black }) }
+    private var entries: [OpeningCatalogEntry] { OpeningCatalog.all }
+    /// Les répertoires de l'utilisateur ont leur SECTION, en tête.
+    ///
+    /// Rangés alphabétiquement au milieu des cinquante-huit ouvertures
+    /// livrées, ils étaient introuvables : après un import, on retombait sur
+    /// une liste identique à la précédente et rien ne disait que ça avait
+    /// marché. Ce qu'on a apporté soi-même se trouve d'abord.
+    private var mine: [OpeningCatalogEntry] {
+        sortedByName(entries.filter { UserOpeningStore.isUserCourse(id: $0.id) })
+    }
+    private var bundled: [OpeningCatalogEntry] {
+        entries.filter { !UserOpeningStore.isUserCourse(id: $0.id) }
+    }
+    private var white: [OpeningCatalogEntry] { sortedByName(bundled.filter { $0.side == .white }) }
+    private var black: [OpeningCatalogEntry] { sortedByName(bundled.filter { $0.side == .black }) }
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
 
     /// Nom affiché (traduit dans la langue de l'app via le bundle redirigé).
@@ -32,6 +48,7 @@ struct OpeningListView: View {
     var body: some View {
         List {
             if dueCount > 0 { reviewSection }
+            if !mine.isEmpty { section("Mes répertoires", mine) }
             if !white.isEmpty { section("Répertoire blanc", white) }
             if !black.isEmpty { section("Répertoire noir", black) }
         }
@@ -42,6 +59,33 @@ struct OpeningListView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { showImport = true } label: {
+                    Label("Ajouter un répertoire", systemImage: "plus")
+                }
+                .tint(Theme.accent)
+                .accessibilityIdentifier("opening_add")
+            }
+        }
+        .sheet(isPresented: $showImport) {
+            OpeningImportSheet { _ in }
+        }
+        .confirmationDialog(
+            "Supprimer ce répertoire ?",
+            isPresented: Binding(get: { pendingDeletion != nil }, set: { if !$0 { pendingDeletion = nil } }),
+            titleVisibility: .visible
+        ) {
+            Button("Supprimer", role: .destructive) {
+                if let pendingDeletion { store.delete(id: pendingDeletion.id) }
+                pendingDeletion = nil
+            }
+            Button("Annuler", role: .cancel) { pendingDeletion = nil }
+        } message: {
+            // Dire ce qui SURVIT évite l'hésitation : ce qu'on a mémorisé est
+            // attaché aux positions, pas au fichier.
+            Text("Le fichier est supprimé de cet appareil. Votre progression sur ces positions est conservée.")
+        }
         .onAppear(perform: refresh)
     }
 
@@ -78,17 +122,44 @@ struct OpeningListView: View {
                 Button { onSelect(entry.id) } label: { row(entry) }
                     .listRowBackground(Theme.surface)
                     .accessibilityIdentifier("opening_\(entry.id)")
+                    .swipeActions(edge: .trailing) { swipeActions(entry) }
             }
         } header: {
             Text(title).foregroundStyle(Theme.textSecondary)
         }
     }
 
+    /// Partager et supprimer — sur les répertoires PERSONNELS seulement : les
+    /// cours livrés avec l'app ne s'effacent pas, et les partager reviendrait à
+    /// redistribuer le contenu de l'app.
+    @ViewBuilder
+    private func swipeActions(_ entry: OpeningCatalogEntry) -> some View {
+        if UserOpeningStore.isUserCourse(id: entry.id) {
+            Button(role: .destructive) {
+                pendingDeletion = entry
+            } label: {
+                Label("Supprimer", systemImage: "trash")
+            }
+            if let url = store.fileURL(for: entry.id) {
+                ShareLink(item: url) { Label("Partager", systemImage: "square.and.arrow.up") }
+                    .tint(Theme.accent)
+            }
+        }
+    }
+
     private func row(_ entry: OpeningCatalogEntry) -> some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 3) {
-                Text(LocalizedStringKey(entry.name))
-                    .font(.body.weight(.semibold)).foregroundStyle(Theme.textPrimary)
+                HStack(spacing: 6) {
+                    Text(LocalizedStringKey(entry.name))
+                        .font(.body.weight(.semibold)).foregroundStyle(Theme.textPrimary)
+                    if UserOpeningStore.isUserCourse(id: entry.id) {
+                        Text("Perso")
+                            .font(.caption2.weight(.bold)).foregroundStyle(Theme.accent)
+                            .padding(.horizontal, 6).padding(.vertical, 2)
+                            .background(Theme.accent.opacity(0.16), in: Capsule())
+                    }
+                }
                 if let summary = entry.summary?.resolved(languageCode) {
                     Text(summary).font(.caption).foregroundStyle(Theme.textTertiary)
                         .lineLimit(2).fixedSize(horizontal: false, vertical: true)

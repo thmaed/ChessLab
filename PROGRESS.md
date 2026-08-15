@@ -5219,6 +5219,87 @@ finition. Reporté sciemment, inscrit ci-dessous.
   bord à bord (`padding(.horizontal, -12)` qui annule la marge du conteneur),
   donc exactement large comme l'écran. Rien à corriger.
 
+## Répertoires personnels — import PGN, partage, suppression ✅ (2026-08-15)
+
+Réponse à la demande de Nils (« que les utilisateurs puissent écrire leur base
+d'ouvertures dans l'app… et se la partager »). Ce lot fait l'import et le
+partage ; l'éditeur d'arbre dans l'app reste à faire, et reste facultatif.
+
+### Pourquoi c'était petit
+
+Deux choses, découvertes avant d'écrire quoi que ce soit, rendent ce lot court :
+
+1. **`ChessKit.PGNParser` sait déjà lire les variantes.** Les parenthèses
+   deviennent un `MoveTree` branchu (`Game.moves`, `Game.positions`,
+   `history(for:)`). La partie réputée pénible — parser un répertoire
+   arborescent — était déjà faite, et pas par nous.
+2. **Tout l'aval est indexé par FEN normalisée, pas par identifiant de cours.**
+   FSRS, fusion des transpositions, lecteur, entraîneur : un cours importé y
+   entre sans qu'une seule ligne change. C'est le pari architectural du jalon J2
+   qui paie ici — et c'est aussi pourquoi la progression d'une position apprise
+   dans un cours livré vaut immédiatement dans un répertoire importé.
+
+### Fait
+
+- **`OpeningPGNImporter`** — PGN → `OpeningCourse`. Pur, sans disque ni UI.
+  Une partie par chapitre (le tag `Event`, qui porte le nom du chapitre dans une
+  étude Lichess exportée) ; les variantes deviennent des arêtes alternatives ;
+  les positions communes FUSIONNENT, ce qui transforme un empilement d'arbres
+  PGN en vrai graphe. Les annotations de l'auteur suivent : `?`/`??` → rôle
+  `trap`, `?!` → `inaccuracy`, donc les pastilles du lecteur sans ressaisie.
+  Chaque arête est vérifiée par `OpeningCourseValidator.resultingKey` AVANT
+  d'être créée : un coup que ChessKit tokenise mais qui ne rejoue pas est
+  compté et écarté, jamais transformé en arête invalide.
+- **`UserOpeningStore`** — un JSON par répertoire dans `Documents/UserOpenings/`,
+  au format EXACT des cours embarqués. C'est ce choix qui rend le partage
+  gratuit : exporter, c'est donner le fichier ; importer, c'est le même
+  décodeur qu'au démarrage. **Aucun serveur, aucun compte.** Identifiants
+  préfixés `user-` (jamais de collision avec les 58 livrés). Tout cours passe
+  le validateur d'intégrité AVANT écriture — la porte utilisateur n'est pas
+  plus permissive que celle du bundle.
+- **`OpeningCatalog`** — façade qui réunit bundle + utilisateur. Les huit sites
+  d'appel de l'interface y passent ; `OpeningCourseLoader` reste strictement le
+  bundle. `OpeningTranspositionIndex.bundled` et
+  `OpeningsGraphFeature.hasBundledCourses` restent volontairement sur le bundle
+  seul (l'index est un `static let` construit une fois : y mêler des cours qui
+  arrivent après serait faux).
+- **UI** — bouton « + » dans Ouvertures, feuille d'import (coller, `PasteButton`,
+  ou ouvrir un `.pgn`/`.json`), choix du camp étudié (le seul renseignement
+  qu'un PGN ne porte pas), `ShareLink` et suppression par glissement sur les
+  répertoires personnels uniquement.
+- **Section « Mes répertoires » en tête de liste.** Trouvé par le test de bout
+  en bout : rangé alphabétiquement au milieu de cinquante-huit ouvertures, un
+  répertoire fraîchement importé était introuvable — après l'import on retombait
+  sur une liste d'apparence identique, sans rien qui dise que ça avait marché.
+- Le dialogue de suppression dit ce qui SURVIT (« votre progression sur ces
+  positions est conservée ») : elle est attachée aux positions, pas au fichier.
+
+### Vérifié
+
+- **14 tests unitaires** (`OpeningPGNImporterTests`, `UserOpeningStoreTests`) :
+  variantes → branches, transpositions fusionnées (deux arêtes vers un seul
+  nœud), annotations → rôles, commentaires affichables, multi-parties →
+  chapitres, graphe incohérent refusé, et l'**aller-retour export → import**,
+  qui est le vrai test du partage : le fichier écrit est exactement celui qu'un
+  ami relira.
+- **1 test UI de bout en bout** (`OpeningImportUITests`) : « + » → coller un PGN
+  avec variante → la liste se rafraîchit seule → le cours s'ouvre dans le MÊME
+  lecteur que les cours livrés → suppression.
+- Suite complète verte, build propre.
+
+### Reste (volontairement)
+
+- **Éditeur d'arbre dans l'app** (ajouter/supprimer une variante, commenter) —
+  3-4 lots. Facultatif tant que l'import existe : on écrit dans Lichess Studies
+  et on importe.
+- **Synchronisation iCloud des fichiers de cours** : la progression se
+  synchronise déjà (elle est dans le store « Games »), le FICHIER du répertoire
+  non — il reste sur l'appareil où on l'a importé. Le partage manuel comble en
+  attendant.
+- **Droits d'auteur** : Nils parle d'un livre de 300 pages. L'import personnel
+  ne pose pas de question ; la redistribution entre utilisateurs, si. À trancher
+  avant d'aller vers quoi que ce soit de centralisé.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-15)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque
@@ -5271,12 +5352,13 @@ réponse qui passe à l'échelle sur la profondeur du contenu : 58 cours écrits
 la main ne rattraperont jamais un livre de 300 pages sur la seule Scandinave.
 
 Découpage naturel, du plus utile au plus coûteux :
-1. **Import PGN** d'un répertoire dans le graphe FEN existant — le moteur FSRS,
-   les transpositions et l'entraînement fonctionnent déjà, il n'y a que
-   l'alimentation à ouvrir. C'est 80 % de la valeur.
+1. ~~**Import PGN** d'un répertoire dans le graphe FEN existant~~ — **FAIT le
+   15/08**, voir la section « Répertoires personnels » plus haut.
 2. **Éditeur d'arbre** dans l'app (ajouter/supprimer une variante, commenter).
-3. **Partage** : export/import d'un fichier de cours (aucun serveur, ça tient
-   dans une pièce jointe) avant d'envisager quoi que ce soit de centralisé.
+   Seul morceau restant, et facultatif tant que l'import existe.
+3. ~~**Partage** : export/import d'un fichier de cours~~ — **FAIT le 15/08**
+   (`ShareLink` sur le JSON du cours, aucun serveur). Reste à trancher la
+   question des droits d'auteur avant tout dispositif centralisé.
 
 ### 7 ter. Approfondir les cours livrés via `generate.py` — NOUVEAU (15/08)
 
