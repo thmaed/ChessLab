@@ -4799,6 +4799,48 @@ chrome devinée, et la phrase ne peut structurellement pas repousser le plateau
   `LayoutOverflowUITests` et `DynamicTypeOverflowUITests` (AX3 et AX5 compris) —
   **12 tests, 0 échec.**
 
+## La promotion sur iPad mini : question close, l'app n'a jamais été en cause (2026-08-15)
+
+Point 1 de la liste « Reste à faire » — le seul dont l'impact utilisateur était
+**inconnu**, donc le premier traité.
+
+### Ce qu'on cherchait
+
+`testPromotionPickerFitsOnScreen` était rouge sur iPad mini et vert sur les deux
+iPad Pro. Le sélecteur de promotion ne s'ouvrait jamais après 53 s. Soit un
+utilisateur d'iPad mini ne pouvait pas promouvoir un pion en analysant, soit
+c'était un artefact du test.
+
+### La réponse : artefact de test
+
+Un test dédié — `PromotionUITests`, qui ne mesure rien et vérifie seulement que
+le sélecteur **s'ouvre** — a été rejoué sur trois états du dépôt, sur le même
+simulateur iPad mini (A17 Pro) :
+
+| Commit | Date | `testPromotionPickerOpensInAnalysis` |
+|---|---|---|
+| `4dd031e` — **le commit où le relevé a été consigné** | 14/08 07:32 | ✅ |
+| `a4c51f3` — avant le rattrapage du tap-tap | 14/08 18:45 | ✅ |
+| `8fb563f` — état courant | 15/08 | ✅ |
+
+Les cadres relevés sont identiques aux trois états (`a7` en
+`[318,5 ; 181,5 ; 49,5×50]`, `a8` juste au-dessus, tous deux `atteignable=oui`).
+
+L'hypothèse « c'est la précision du tap qui a corrigé ça » est donc **infirmée
+par la mesure** : le chemin passe déjà avant ces commits. **L'app n'a jamais été
+cassée sur iPad mini**, et aucun utilisateur n'a jamais été touché.
+
+### Ce qui reste, et qui vaut mieux qu'un diagnostic
+
+Le mécanisme exact de l'ancien faux rouge n'est pas élucidé — il n'existe plus
+et ne se reproduit sur aucun des trois états. Chercher plus loin coûterait du
+temps de machine pour une réponse sans conséquence.
+
+Ce qui compte est acquis : la promotion dans *Analyser* a désormais un test
+**sur toutes les classes de taille**, là où `LayoutOverflowUITests` se borne à
+la classe compacte (il mesure une largeur, ce qui n'a de sens que là). La
+question ne peut plus se rouvrir en silence.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-14)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque
