@@ -5300,6 +5300,61 @@ Deux choses, découvertes avant d'écrire quoi que ce soit, rendent ce lot court
   ne pose pas de question ; la redistribution entre utilisateurs, si. À trancher
   avant d'aller vers quoi que ce soit de centralisé.
 
+## Version 1.4.0 — aide, bouton d'accueil, métadonnées App Store ✅ (2026-08-15)
+
+### La 1.3 n'a jamais été soumise
+
+Constat fait en préparant la 1.4, et il change le contenu du texte « Nouveautés » :
+le dernier build envoyé à Apple est le **build 3 de la 1.2** (commit `a211763`).
+Le 1.3.0 / build 5 a été préparé puis laissé de côté. Les utilisateurs passent
+donc **directement de 1.2 à 1.4**, et le texte des nouveautés couvre les deux
+lots — sinon personne ne verrait jamais ce qui a été fait pour la 1.3.
+
+- `MARKETING_VERSION = 1.4.0`, `CURRENT_PROJECT_VERSION = 6` aux deux
+  configurations de la cible applicative (les cibles de test restent en 1.2.0/3,
+  sans effet sur la soumission).
+- `AppStoreSubmission/RELEASE_NOTES-1.4.0.md` créé — il manquait : METADATA
+  renvoyait à un `RELEASE_NOTES-1.3.0.md` qui n'a jamais existé.
+- **Description App Store complétée** (FR + EN) : la 1.4 ajoute une
+  fonctionnalité annoncée (importer et partager ses répertoires), la description
+  ne pouvait pas rester muette dessus. C'est le premier de ces lots où la
+  description elle-même change.
+
+### Aide : un bouton coloré sur l'accueil, et la question du partage traitée
+
+L'aide était enterrée dans les Réglages. Personne ne va chercher un mode
+d'emploi là, et l'import/partage de répertoires est précisément la chose qu'on
+ne devine pas. Bouton rond **teinté** en tête de la barre d'outils d'accueil,
+à gauche de Progression et Réglages — `toolbarCircleButton` prend un `tint`
+optionnel, réservé à ce seul bouton pour qu'il se remarque sans le chercher.
+
+Identifiant `openHelpFromHome`, **distinct** du `openHelp` des Réglages : deux
+boutons de même nom dans l'arbre d'accessibilité rendraient les tests ambigus.
+
+Nouvelle carte d'aide **« Vos répertoires et le partage »**, qui répond aux
+questions qu'un fichier partagé soulève vraiment :
+- comment ajouter le sien (PGN, variantes conservées, camp à indiquer) ;
+- comment le partager (glissement → Partager, un fichier, aucun compte) ;
+- **ce qui est partagé et ce qui ne l'est pas** : le fichier contient les coups
+  et les commentaires, jamais la progression ; à l'inverse un répertoire importé
+  profite aussitôt de ce qu'on sait déjà des positions ;
+- ce que fait la suppression (le fichier part, la progression reste) ;
+- qu'un répertoire importé **ne suit pas la synchro iCloud** ;
+- **les droits d'auteur** : saisir un livre pour soi est une chose, le
+  rediffuser en est une autre. Dit à l'utilisateur, pas seulement dans PROGRESS.
+
+Cartes « Nouveautés », « Ouvertures » et « Puzzles » mises à jour ; traductions
+anglaises fournies pour les six chaînes nouvelles ou modifiées.
+
+### Vérifié
+- `HelpRouteUITests` couvre les DEUX chemins (accueil et Réglages) ; le nouveau
+  test exige que la carte du partage soit là.
+- Capture de l'accueil relue : le bouton est bien teinté, à côté de Progression.
+- ⚠️ **Piège rencontré** : la copie de build dans `/tmp` avait pris la place du
+  répertoire courant, et les `rsync ./ …` sont devenus des no-op silencieux —
+  les tests tournaient sur un arbre périmé sans que rien ne l'indique. Toujours
+  donner un chemin ABSOLU à `rsync` dans ce dépôt.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-15)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque

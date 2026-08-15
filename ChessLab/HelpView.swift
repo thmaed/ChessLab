@@ -18,8 +18,8 @@ struct HelpView: View {
     private let modules: [Module] = [
         .init(
             icon: "sparkles", tint: Theme.accent,
-            title: "Nouveautés depuis la 1.0",
-            body: "Depuis la 1.0, ChessLab a beaucoup évolué :\n\n• Ouvertures entièrement repensées : un lecteur guidé coup par coup, 58 ouvertures rédigées à la main et bilingues, des flèches colorées (coup recommandé, pièges, autres coups) et un entraînement en répétition espacée qui se règle tout seul.\n• iPad & Mac : interface à barre latérale, échiquier bord à bord, raccourcis clavier et survol au trackpad.\n• Synchronisation iCloud optionnelle : parties, puzzles et ouvertures suivent vos appareils, sans compte ni serveur tiers.\n• Analyse : suivez la meilleure ligne de Stockfish un demi-coup à la fois ; alerte « coup risqué » plus juste.\n• Progrès : un tableau de bord depuis l'accueil, avec un set de puzzles ciblé sur vos thèmes faibles.\n• Scanner plus fiable, moteur Stockfish recompilé (plus rapide et sans saccade), et nouveaux thèmes de plateau et de pièces."
+            title: "Nouveautés de la version 1.4",
+            body: "• Vos propres répertoires : importez vos ouvertures au format PGN, variantes comprises, entraînez-les comme les autres et partagez-les par simple fichier (voir la carte « Vos répertoires et le partage »).\n• Les 58 ouvertures livrées ont été relues au moteur : quinze coups fautifs corrigés, quatre défenses manquantes ajoutées. Chaque coup est désormais rejoué sous Stockfish avant d'être publié.\n• Puzzles : un seul essai par défaut, comme un vrai exercice de calcul. Les trois essais restent disponibles dans les Réglages.\n• Lecteur d'ouvertures : l'échiquier reste à l'écran pendant qu'on lit les coups. Sur iPad en paysage, plateau à gauche et explications à droite.\n• L'échiquier répond mieux au doigt : relâcher un peu à côté joue quand même le coup.\n• L'analyse explique POURQUOI un coup est une erreur, en nommant le motif tactique.\n• Score de précision recalibré, revue d'analyse qui reprend toute seule, pendule qui décompte dès le premier coup."
         ),
         .init(
             icon: "cpu", tint: Theme.accent,
@@ -34,7 +34,7 @@ struct HelpView: View {
         .init(
             icon: "puzzlepiece.fill", tint: Theme.violet,
             title: "Puzzles",
-            body: "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles."
+            body: "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles."
         ),
         .init(
             icon: "chart.bar.fill", tint: Theme.rose,
@@ -44,7 +44,12 @@ struct HelpView: View {
         .init(
             icon: "books.vertical.fill", tint: Theme.warning,
             title: "Ouvertures",
-            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, aux grandes lignes vérifiées. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud."
+            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud."
+        ),
+        .init(
+            icon: "square.and.arrow.up", tint: Theme.warning,
+            title: "Vos répertoires et le partage",
+            body: "AJOUTER LE VÔTRE\nDans Ouvertures, touchez « + » en haut à droite. Collez un PGN, ou ouvrez un fichier .pgn : les variantes entre parenthèses sont conservées, vous obtenez donc l'arbre complet et pas seulement la ligne principale. Indiquez le camp que vous étudiez — c'est le seul renseignement qu'un PGN ne contient pas. Vos annotations suivent : ? et ?? deviennent des pièges signalés, ?! des imprécisions, et vos commentaires s'affichent sous le plateau.\n\nLE PARTAGER\nGlissez vers la gauche sur un de vos répertoires, puis « Partager » : l'app envoie un simple fichier, par AirDrop, Messages, Fichiers ou ce que vous voulez. Celui qui le reçoit fait « + » puis « Ouvrir un fichier ». Il n'y a ni compte à créer, ni serveur ChessLab : le fichier EST le répertoire, et il ne passe que par où vous l'envoyez.\n\nCE QUI EST PARTAGÉ, ET CE QUI NE L'EST PAS\nLe fichier contient les coups, vos commentaires et vos annotations. Il ne contient PAS votre progression : ce que vous avez mémorisé reste chez vous. À l'inverse, un répertoire que vous importez profite tout de suite de ce que vous savez déjà des positions qu'il contient, même apprises dans une ouverture livrée avec l'app — la mémorisation est attachée aux positions, pas aux fichiers.\n\nSUPPRIMER\nGlissez vers la gauche, « Supprimer ». Le fichier quitte cet appareil ; votre progression sur ces positions est conservée. Les 58 ouvertures livrées, elles, ne peuvent être ni supprimées ni partagées.\n\nBON À SAVOIR\nUn répertoire importé reste sur l'appareil où vous l'avez importé : il ne suit pas la synchronisation iCloud (votre progression, si). Pour l'avoir sur un autre de vos appareils, partagez-vous le fichier à vous-même.\n\nET LES DROITS D'AUTEUR\nLe contenu d'un livre ou d'un cours payant appartient à son auteur. Le saisir pour votre usage personnel est une chose ; le rediffuser en est une autre. Partagez ce que vous avez écrit, ou ce que vous avez le droit de partager."
         ),
         .init(
             icon: "chart.xyaxis.line", tint: Theme.teal,

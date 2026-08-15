@@ -234,6 +234,19 @@ struct HomeView: View {
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
                         HStack(spacing: 10) {
+                            // Coloré, à côté de Progression : l'aide explique
+                            // des choses qu'on ne devine pas (import et partage
+                            // de répertoires, portée de la synchro iCloud) et
+                            // elle était enterrée dans les Réglages, où
+                            // personne ne va chercher un mode d'emploi.
+                            toolbarCircleButton(
+                                "questionmark.circle.fill", label: "Aide",
+                                // Identifiant DISTINCT de celui des Réglages
+                                // (`openHelp`) : deux boutons de même nom dans
+                                // l'arbre d'accessibilité rendraient les tests
+                                // ambigus, et l'ambiguïté se paierait un jour.
+                                identifier: "openHelpFromHome", tint: Theme.accent
+                            ) { path.append(Route.help) }
                             toolbarCircleButton(
                                 "chart.bar.xaxis", label: "Progression",
                                 identifier: "openProgression"
@@ -880,19 +893,27 @@ struct HomeView: View {
         }
     }
 
-    /// Bouton rond de barre d'outils (Progression, Réglages) — style commun
-    /// pour que les deux icônes de l'accueil restent visuellement sœurs.
+    /// Bouton rond de barre d'outils (Aide, Progression, Réglages) — style
+    /// commun pour que les icônes de l'accueil restent visuellement sœurs.
+    ///
+    /// `tint` non nul = bouton MIS EN AVANT : teinte sur le glyphe, le fond et
+    /// le liseré. Réservé à l'aide, le seul des trois qu'il faut remarquer sans
+    /// le chercher.
     private func toolbarCircleButton(
         _ systemImage: String, label: LocalizedStringKey,
-        identifier: String, action: @escaping () -> Void
+        identifier: String, tint: Color? = nil, action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             Image(systemName: systemImage)
                 .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(Theme.textSecondary)
+                .foregroundStyle(tint ?? Theme.textSecondary)
                 .frame(width: 34, height: 34)
-                .background(Theme.surfaceElevated.opacity(0.92), in: Circle())
-                .overlay(Circle().strokeBorder(Theme.stroke, lineWidth: 1))
+                .background(
+                    tint.map { AnyShapeStyle($0.opacity(0.16)) }
+                        ?? AnyShapeStyle(Theme.surfaceElevated.opacity(0.92)),
+                    in: Circle()
+                )
+                .overlay(Circle().strokeBorder(tint?.opacity(0.5) ?? Theme.stroke, lineWidth: 1))
         }
         .buttonStyle(.pressable)
         .accessibilityLabel(label)
