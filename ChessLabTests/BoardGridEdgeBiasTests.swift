@@ -25,13 +25,28 @@ import UIKit
 /// | large (14 px de marge) | 1,71 / 1,71 | 1,71 / 1,71 |
 /// | serré (6 px rognés) | 6,00 / **14,52** | 6,00 / **14,52** |
 ///
-/// L'erreur du cadrage serré vient donc d'ailleurs : les lignes extrêmes y
-/// tombent **hors de l'image**, où `sample` rend zéro par construction — quoi
-/// que contienne le profil. C'est la mesure qui gagne : le code d'origine
-/// reste, et ces tests figent sa précision pour qu'une régression se voie.
+/// L'erreur du cadrage serré venait donc d'ailleurs.
 ///
-/// Ils **impriment** l'écart (`GRID-BIAS|…`) en plus de l'asserter : le jour
-/// où quelqu'un s'attaquera vraiment au cadrage serré, il aura sa référence.
+/// ## Le cadrage serré, tranché le 15/08/2026
+///
+/// Elle venait du **garde** de `BoardGridFinder.lines(from:scale:)`, qui
+/// exigeait que les 9 lignes tiennent dans l'image : sur un plateau de 800 px
+/// rogné de 6, la vraie grille a un pas de 100 et une phase de −6, et les deux
+/// conditions du garde étaient contradictoires. La bonne réponse n'était pas
+/// mal notée, elle était **hors concours** — la recherche se rabattait sur un
+/// pas ≤ 98,75, soit une dizaine de pixels d'erreur cumulée.
+///
+/// Le garde est devenu un quorum de lignes visibles. Résultat, en rangées :
+/// **14,52 px → 6,00**.
+///
+/// Et ces 6 px restants ne sont plus une erreur de grille : ce sont exactement
+/// les deux lignes extrêmes, qui tombent hors de l'image et que `grid(in:)`
+/// ramène au bord. L'écart des **7 lignes intérieures** — celles qui découpent
+/// réellement les vignettes — tombe à zéro. C'est ce que mesure
+/// `interiorDeviation`, et c'est lui qui porte l'assertion serrée.
+///
+/// Ces tests **impriment** l'écart (`GRID-BIAS|…`) en plus de l'asserter :
+/// la mesure documente mieux que le verdict.
 @MainActor
 struct BoardGridEdgeBiasTests {
 
@@ -49,6 +64,16 @@ struct BoardGridEdgeBiasTests {
         (0...8).map { abs(found[$0] - (expectedStart + Double($0) * step)) }.max() ?? .infinity
     }
 
+    /// Même écart, mais sur les **7 lignes intérieures** seulement.
+    ///
+    /// Quand le plateau déborde de l'image, ses deux lignes extrêmes n'y sont
+    /// tout simplement pas, et `BoardGridFinder.grid(in:)` les ramène au bord.
+    /// Les compter dans l'écart mesure alors le bornage, pas le recalage — or
+    /// ce sont les lignes intérieures qui découpent les vignettes.
+    private func interiorDeviation(_ found: [Double], expectedStart: Double, step: Double) -> Double {
+        (1...7).map { abs(found[$0] - (expectedStart + Double($0) * step)) }.max() ?? .infinity
+    }
+
     /// Cas 1 — cadrage au pixel près. Les lignes extrêmes tombent exactement
     /// sur `0` et `side`, donc là où le profil est aveugle.
     @Test func perfectCropDeviation() throws {
@@ -57,10 +82,17 @@ struct BoardGridEdgeBiasTests {
 
         let columns = maximumDeviation(grid.columns, expectedStart: 0, step: 100)
         let rows = maximumDeviation(grid.rows, expectedStart: 0, step: 100)
-        print(String(format: "GRID-BIAS|cadrage-parfait|colonnes=%.2f|lignes=%.2f", columns, rows))
+        print(String(
+            format: "GRID-BIAS|cadrage-parfait|colonnes=%.2f|lignes=%.2f|intérieur=%.2f/%.2f",
+            columns, rows,
+            interiorDeviation(grid.columns, expectedStart: 0, step: 100),
+            interiorDeviation(grid.rows, expectedStart: 0, step: 100)
+        ))
 
-        #expect(columns < 4)
-        #expect(rows < 4)
+        // Sous les 2,5 px que l'en-tête de ``BoardGridFinder`` donne pour seuil
+        // de décrochage de la reconnaissance.
+        #expect(columns < 2.5)
+        #expect(rows < 2.5)
     }
 
     /// Cas 2 — le cas réel : plateau de 800 px inséré à 14 px dans une toile de
@@ -86,15 +118,21 @@ struct BoardGridEdgeBiasTests {
         let grid = BoardGridFinder.grid(in: padded)
         let columns = maximumDeviation(grid.columns, expectedStart: inset, step: 100)
         let rows = maximumDeviation(grid.rows, expectedStart: inset, step: 100)
-        print(String(format: "GRID-BIAS|cadrage-large|colonnes=%.2f|lignes=%.2f", columns, rows))
+        print(String(
+            format: "GRID-BIAS|cadrage-large|colonnes=%.2f|lignes=%.2f|intérieur=%.2f/%.2f",
+            columns, rows,
+            interiorDeviation(grid.columns, expectedStart: inset, step: 100),
+            interiorDeviation(grid.rows, expectedStart: inset, step: 100)
+        ))
 
-        #expect(columns < 5)
-        #expect(rows < 5)
+        #expect(columns < 2.5)
+        #expect(rows < 2.5)
     }
 
     /// Cas 3 — cadrage TROP SERRÉ : on rogne 6 px de chaque côté, si bien que
     /// les lignes extrêmes du plateau sortent de l'image. C'est le cas que la
-    /// revue soupçonne d'être mal servi par un profil aveugle aux bords.
+    /// revue soupçonnait d'être mal servi par un profil aveugle aux bords, et
+    /// qui venait en réalité du garde de `lines(from:scale:)` (voir l'en-tête).
     @Test func tightCropDeviation() throws {
         let crop = 6.0
         let board = try board()
@@ -107,11 +145,25 @@ struct BoardGridEdgeBiasTests {
         // vraie est à -6, la dernière à 794.
         let columns = maximumDeviation(grid.columns, expectedStart: -crop, step: 100)
         let rows = maximumDeviation(grid.rows, expectedStart: -crop, step: 100)
-        print(String(format: "GRID-BIAS|cadrage-serre|colonnes=%.2f|lignes=%.2f", columns, rows))
+        let innerColumns = interiorDeviation(grid.columns, expectedStart: -crop, step: 100)
+        let innerRows = interiorDeviation(grid.rows, expectedStart: -crop, step: 100)
+        print(String(
+            format: "GRID-BIAS|cadrage-serre|colonnes=%.2f|lignes=%.2f|intérieur=%.2f/%.2f",
+            columns, rows, innerColumns, innerRows
+        ))
 
-        // Pas d'assertion serrée ici : ce cas sert de MESURE comparative.
-        // L'exigence est seulement que le recalage ne parte pas en vrille.
-        #expect(columns < 60)
-        #expect(rows < 60)
+        // Les 7 lignes INTÉRIEURES sont celles qui découpent les vignettes :
+        // c'est sur elles que porte l'exigence, et elle est serrée. L'en-tête
+        // de `BoardGridFinder` juge 2,5 px suffisants à faire chuter la
+        // reconnaissance — le seuil est donc calé en dessous.
+        #expect(innerColumns < 2)
+        #expect(innerRows < 2)
+
+        // Les deux lignes extrêmes, elles, sont hors de l'image et ramenées au
+        // bord : leur écart ne peut pas descendre sous la valeur du rognage.
+        // On vérifie seulement qu'il ne la DÉPASSE pas, ce qui signalerait un
+        // recalage parti en vrille.
+        #expect(columns <= crop + 1)
+        #expect(rows <= crop + 1)
     }
 }

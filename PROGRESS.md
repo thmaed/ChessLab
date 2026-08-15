@@ -4841,6 +4841,86 @@ Ce qui compte est acquis : la promotion dans *Analyser* a désormais un test
 la classe compacte (il mesure une largeur, ce qui n'a de sens que là). La
 question ne peut plus se rouvrir en silence.
 
+## Le cadrage serré du scanner : la bonne grille était hors concours (2026-08-15)
+
+Point 2 de la liste. Une capture rognée au plus juste sortait avec **14,5 px**
+d'erreur de grille, alors que l'en-tête de `BoardGridFinder` juge 2,5 px
+suffisants à faire chuter la reconnaissance.
+
+### Le défaut, en une ligne
+
+`lines(from:scale:)` exigeait que les 9 lignes tiennent dans l'image :
+`phase >= -1` **et** `phase + period * 8 <= side + 1`.
+
+Sur le cas de référence — plateau de 800 px rogné de 6 px, donc image de 788 px,
+vraie grille de pas 100 et de phase −6 — la première condition impose
+`phase ≥ −1` et la seconde `phase ≤ −11`. Elles sont **contradictoires** : aucun
+pas de 100 n'était admissible. La recherche se rabattait sur `period ≤ 98,75`,
+soit 1,25 px d'erreur par case et une dizaine de pixels au bout de la grille.
+
+**La bonne réponse n'était pas mal notée : elle était hors concours.** C'est
+pourquoi corriger le profil des bords n'avait rien donné — le diagnostic
+précédent cherchait au bon endroit une cause qui était ailleurs.
+
+### Trois correctifs, chacun révélé par le précédent
+
+1. **Le garde devient un quorum.** Une grille a le droit de déborder ; il suffit
+   que 7 de ses 9 lignes tombent dans l'image. Le score reste une SOMME et non
+   une moyenne, délibérément : une ligne hors champ rapporte zéro, donc déborder
+   coûte des points. Une moyenne rendrait le débordement gratuit et une grille
+   pourrait gagner en poussant dehors ses deux lignes les plus faibles.
+   → rangées 14,52 → 2,58.
+
+2. **La recherche s'affine.** Il restait 2,58 px, et c'était la
+   **quantification** : 25 pas sur ±12 % donnent 0,985 px de résolution, et le
+   vrai pas (100 pour un idéal de 98,5) tombe entre deux crans. L'erreur est
+   petite par case et s'ACCUMULE sur sept. Deux passes d'affinage autour du
+   meilleur couple, chacune divisant le pas par 12 : résolution finale 0,007 px,
+   pour ~17 000 interpolations là où le profil en fait déjà 600 000.
+
+3. **Les ex æquo se tranchent vers la grille la plus simple.** L'affinage a
+   révélé un biais que la quantification masquait : `edgeProfile` calcule
+   `|L(x+1) − L(x−1)|`, donc un bord franc en `x` allume `x−1` ET `x`. Toutes
+   les phases de ce plateau de deux pixels marquent le même score, et la passe
+   fine s'y posait n'importe où — un plateau **parfaitement cadré** ressortait
+   décalé de 1,10 px, et `BoardRectifier` en tirait des vignettes de 97 px à un
+   bout et 96 px à l'autre, alors que l'égalité de leurs tailles est un
+   invariant (`slicedSquaresAreSquareAndTrimmedOfTheirNeighbours`, rouge).
+   D'où la règle : **à score égal, on garde la grille la plus proche de
+   l'hypothèse uniforme**. Quand l'image ne distingue pas deux grilles, on ne
+   s'éloigne pas du découpage naïf sans raison ; quand elle les distingue, le
+   score tranche seul.
+
+C'est aussi l'explication rétrospective du « la dérivée décentrée ne change
+rien » consigné en août : c'était vrai, mais parce que la quantification de la
+recherche masquait le biais de bord — pas parce qu'il n'existait pas.
+
+### Vérifié
+
+Écart maximal des 9 lignes, et des **7 lignes intérieures** — celles qui
+découpent réellement les vignettes, les deux extrêmes étant hors image et
+ramenées au bord par `grid(in:)` :
+
+| Cadrage | avant | après | intérieur après |
+|---|---|---|---|
+| parfait | 0,00 / 0,00 | **0,00 / 0,00** | 0,00 / 0,00 |
+| large (14 px de marge) | 1,71 / 1,71 | **0,99 / 0,99** | 0,87 / 0,87 |
+| serré (6 px rognés) | 6,00 / **14,52** | **6,00 / 6,00** | **0,96 / 0,96** |
+
+Les 6,00 restants du cadrage serré ne sont plus une erreur de recalage : ce sont
+exactement les deux lignes hors image, ramenées au bord. L'intérieur est à
+0,96 px, très en dessous du seuil de 2,5.
+
+**Aucun cadrage n'est dégradé, tous sont sous le seuil.**
+
+- `BoardGridEdgeBiasTests` porte désormais une assertion SERRÉE sur les lignes
+  intérieures du cadrage serré (< 2 px, contre « < 60, ne pas partir en
+  vrille »), et 2,5 px sur les deux autres cadrages.
+- **Suite unitaire : 497 tests, 80 suites, 0 échec** — dont tout le pipeline
+  scanner (`BoardScannerTests`, `ScannerFixtureTests`,
+  `RealisticScreenshotScanTests`, `BoardRectifierTests`).
+- `ScannerFlowUITests`, signalé comme échec préexistant le 14/08, **passe**.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-14)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque
