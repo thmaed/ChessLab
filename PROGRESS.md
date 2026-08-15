@@ -5040,48 +5040,22 @@ sondes ne sont pas d'accord, et c'est la première qu'il faudra croire. À trait
 séparément — ce n'est ni un problème de taille de texte, ni un des quatre points
 de la liste.
 
-## Reste à faire, par ordre de valeur (état au 2026-08-14)
+## Reste à faire, par ordre de valeur (état au 2026-08-15)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque
-point a été **écarté sciemment**, pas oublié — la raison est donnée.
+point restant a été **écarté sciemment**, pas oublié — la raison est donnée.
 
-### 1. La promotion sur iPad mini — le seul dont l'impact utilisateur est inconnu
+### ✅ 1 à 4 — traités le 15/08/2026
 
-Sur iPad **mini uniquement**, taper a7 puis a8 dans *Analyser* n'ouvre pas le
-sélecteur de promotion ; sur iPad Pro 11" et 13", le même chemin fonctionne
-(mesuré). Les deux taps sont bien synthétisés, la position FEN est chargée, le
-plateau affiché. Soit un vrai défaut — un utilisateur d'iPad mini ne peut pas
-promouvoir un pion en analysant —, soit un artefact de test. **C'est le seul
-point de la liste où l'on ignore si des utilisateurs sont touchés.** Coût
-faible. À faire en premier.
+Les quatre premiers points de la liste du 14/08 sont faits ; chacun a sa section
+détaillée plus haut dans ce fichier.
 
-### 2. Le cadrage serré du scanner
-
-14,5 px d'erreur de grille sur une photo rognée trop juste, alors que l'en-tête
-de `BoardGridFinder` juge 2,5 px suffisants à faire chuter la reconnaissance.
-Cause identifiée : les lignes extrêmes tombent **hors de l'image**, où `sample`
-rend zéro par construction — ce n'est donc pas le profil des bords qu'il faut
-corriger (essayé, sans effet, voir plus haut) mais la façon dont une grille
-peut déborder de l'image. `BoardGridEdgeBiasTests` fournit le chiffre de
-référence pour juger tout correctif.
-
-### 3. Feuilles modales iPad (Lot 4.5) — fonctionnel, et spécifiable
-
-Le scanner complet est présenté en `sheet` sans `presentationDetents` ni
-`presentationSizing` : sur iPad, une form sheet d'environ 540×620 doit
-accueillir `BoardCropView` et son cadrage à **4 poignées**, le geste de
-précision le moins adapté à une petite fenêtre. Et `PositionEditorView` en form
-sheet a un plateau plafonné à 460 pt : le bouton « Utiliser cette position »
-n'est **jamais visible à l'ouverture**. Contrairement au reste du Lot 4, ce
-n'est pas du goût — `fullScreenCover` contre `sheet` se tranche objectivement.
-
-### 4. Dynamic Type des gabarits figés — conformité, pas réparation
-
-Aucun `@ScaledMetric` dans le projet ; boutons 44/46/56 pt et aperçus 30 pt
-figés alors que le texte qu'ils contiennent monte jusqu'à AX5, et 29
-`.font(.system(size:))` qui ne scalent pas du tout. Dans une même rangée, une
-moitié du texte grandit et l'autre non — non conforme aux HIG. **Mais** aucun
-écran mesuré ne déborde plus en AX5 : c'est de la qualité, pas une panne.
+| # | Point | Verdict |
+|---|---|---|
+| 1 | Promotion sur iPad mini | **Aucun défaut** — vert sur les trois états du dépôt, y compris le commit du relevé. Artefact de l'ancien test. Couvert désormais par `PromotionUITests`. |
+| 2 | Cadrage serré du scanner | **Corrigé** — la bonne grille était hors concours (garde contradictoire). Rangées 14,52 px → 6,00, lignes intérieures 0,96. |
+| 3 | Feuilles modales iPad | **Corrigé** — `presentationSizing(.page)`. Le bouton de validation de l'éditeur passe de « atteignable=non » à « oui ». |
+| 4 | Dynamic Type des gabarits figés | **Corrigé pour les 4 sites qui le méritaient** — les 25 autres sont des SF Symbols en cadre fixe ou des tailles dérivées du plateau, qui ne doivent pas scaler. |
 
 ### 5. Refonte `NavigationPath` → `[Route]` — valeur moyenne, risque élevé
 
@@ -5098,3 +5072,23 @@ Panneau puzzle fixé à 360 pt, pas de disposition à deux colonnes en deux
 joueurs, écrans d'entrée sans plafond de largeur. Le simulateur ne permet pas
 de juger un rendu paysage à la capture (piège documenté) : sans un vrai iPad,
 ce serait déplacer des chiffres au hasard.
+
+### 7. La tuile « Deux joueurs » déborde de 10,7 pt — NOUVEAU (15/08)
+
+Relevé par le balayage Dynamic Type, **à toutes les tailles de texte, y compris
+la taille L par défaut** : la tuile sort de 10,7 pt à droite
+(`x=[208,0…412,7]` pour une fenêtre de 402 pt sur iPhone 17). Étranger à
+Dynamic Type, donc, et antérieur au chantier du 15/08.
+
+Point d'attention : `LayoutOverflowUITests.testNoOverflowOnHomeScreen` passe
+malgré tout, parce que `LayoutProbe` ne parcourt pas les mêmes types
+d'éléments. **Les deux sondes ne sont pas d'accord**, et c'est celle du
+balayage Dynamic Type qu'il faut croire — la corriger fait partie du travail.
+
+### 8. Chantier I, niveau 3 — l'explication POSITIONNELLE
+
+Le « pourquoi » traite aujourd'hui le matériel et les motifs tactiques. Restent
+les coups qui ne perdent rien mais abandonnent une case, ouvrent une colonne à
+l'adversaire, isolent un pion, échangent le bon fou. Détectable par comparaison
+de traits de structure avant/après. C'est là que ça devient rare — ce n'est pas
+là que ça devient utile en premier.
