@@ -4921,6 +4921,55 @@ exactement les deux lignes hors image, ramenées au bord. L'intérieur est à
   `RealisticScreenshotScanTests`, `BoardRectifierTests`).
 - `ScannerFlowUITests`, signalé comme échec préexistant le 14/08, **passe**.
 
+## Feuilles modales iPad (Lot 4.5) : le bouton était bien sous le pli (2026-08-15)
+
+Point 3 de la liste. Une `.sheet` sans consigne s'ouvre en **form sheet**
+(~540×620) sur iPad. Deux écrans y étaient à l'étroit : le scanner, dont le
+recadrage à quatre poignées est le geste le moins adapté à une petite fenêtre,
+et l'éditeur de position, dont le plateau est plafonné à 460 pt.
+
+### Mesuré avant de corriger
+
+iPad mini (A17 Pro), portrait, fenêtre 744×1133, sur l'éditeur ouvert depuis
+*Contre l'ordinateur* :
+
+| | bouton « Utiliser cette position » | atteignable |
+|---|---|---|
+| avant | `y=[1022,0…1070,5]` | **non** |
+| après | `y=[827,5…876,0]` | **oui** |
+
+C'est exactement le symptôme consigné : le bouton de validation **n'était jamais
+visible à l'ouverture**. Il fallait défiler pour le trouver, sans rien qui
+l'indique.
+
+Pour le scanner, la feuille passe d'un bandeau centré (`Annuler` en `y=250,5`,
+soit une feuille de ~620 pt centrée sur 1133) à une feuille qui part du bord
+haut (`y=56,0`).
+
+### Le correctif : `presentationSizing(.page)`, pas `fullScreenCover`
+
+Quatre sites (`NewGameSetupView` et `LabSetupView`, éditeur et scanner). Le
+choix se justifie :
+
+- **sans effet sur iPhone**, où `presentationSizing` ne s'applique pas — le
+  parcours compact n'est pas touché du tout ;
+- **le glissement de fermeture est préservé**, contrairement à un
+  `fullScreenCover` qui aurait forcé le passage par « Annuler ».
+
+### Un piège de test, corrigé en route
+
+La première version du test du scanner mesurait la **largeur** de la feuille et
+passait **aussi sans le correctif** : sur un iPad mini en portrait, une form
+sheet fait déjà 540 pt sur 744, soit plus de la moitié. C'est la HAUTEUR qui
+distingue les deux présentations. L'assertion a été recalée dessus, et le test
+vérifié rouge-avant/vert-après pour de bon.
+
+### Vérifié
+
+`IPadSheetSizingUITests` — 2 tests, iPad mini. **Rouge avant, vert après** sur
+les deux, la mesure étant imprimée (`FEUILLE|…`) même quand le test passe. Le
+test se saute proprement sur iPhone, où la form sheet n'existe pas.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-14)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque

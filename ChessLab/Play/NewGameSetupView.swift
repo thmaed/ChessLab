@@ -264,11 +264,19 @@ struct NewGameSetupView: View {
                     .tint(Theme.accent)
             }
         }
+        // `.page` et non la taille par défaut : sur iPad, une feuille sans
+        // consigne s'ouvre en FORM SHEET (~540×620), et c'est trop petit pour
+        // les deux écrans ci-dessous — le recadrage à quatre poignées du
+        // scanner y perd la précision qui fait tout son intérêt, et l'éditeur
+        // de position, dont le plateau est plafonné à 460 pt, y cachait son
+        // bouton de validation sous le pli. Sans effet sur iPhone, où
+        // `presentationSizing` ne s'applique pas : le geste de fermeture par
+        // glissement est préservé, contrairement à un `fullScreenCover`.
         .sheet(isPresented: $showPositionEditor) {
-            positionEditorSheet
+            positionEditorSheet.presentationSizing(.page)
         }
         .sheet(isPresented: $showScanner) {
-            scannerSheet
+            scannerSheet.presentationSizing(.page)
         }
     }
 
