@@ -213,6 +213,12 @@ final class AnalysisViewModel {
         /// flèche verte de REVUE quand il est presque aussi bon que le premier
         /// (voir ``reviewArrows``). `nil` s'il n'y a pas de 2e choix.
         var secondBestLan: String? = nil
+        /// Variante principale du moteur à cette position (LAN), tronquée à ce
+        /// que ``MoveExplainer`` sait lire. Sur la position d'APRÈS un coup,
+        /// c'est la RÉFUTATION : ce que l'adversaire va en faire, donc la
+        /// matière première du « pourquoi ». Gratuite — `rankedEval` la
+        /// renvoie déjà, elle était simplement jetée.
+        var pv: [String] = []
     }
     private var evalCache: [MoveTree.Index: CachedEval] = [:]
 
@@ -678,6 +684,19 @@ final class AnalysisViewModel {
         if let quality = moveEvaluations[currentIndex]?.quality { return quality }
         guard let assessment = game.moves[currentIndex]?.assessment else { return nil }
         return MoveQuality(assessment)
+    }
+
+    /// POURQUOI le coup affiché était mauvais — la phrase, pas l'étiquette.
+    ///
+    /// `nil` pour tout coup sain, et pour les fautes dont la réfutation ne dit
+    /// rien de nommable : le bandeau coach n'affiche alors pas de seconde
+    /// ligne, ce qui est le comportement voulu et non un manque à combler.
+    ///
+    /// Pas de repli sur les annotations d'un PGN importé, contrairement à
+    /// ``lastMoveQuality`` : un « ?? » écrit par quelqu'un d'autre dit qu'il y
+    /// a faute, jamais laquelle.
+    var lastMoveExplanation: MoveExplanation? {
+        moveEvaluations[currentIndex]?.explanation
     }
 
     /// Case où poser la pastille : l'arrivée du coup joué.
@@ -1317,7 +1336,17 @@ final class AnalysisViewModel {
             isForced: legalMoveCount(at: parentIndex) == 1
         ))
 
-        moveEvaluations[index] = AnalysisMoveEvaluation(winPercentAfterMover: winPercentAfterMover, quality: quality)
+        moveEvaluations[index] = AnalysisMoveEvaluation(
+            winPercentAfterMover: winPercentAfterMover,
+            quality: quality,
+            // Seulement les fautes : un bon coup n'a rien à expliquer, et la
+            // variante d'après un bon coup raconte la suite de la partie, pas
+            // une punition. `evalAfter.pv` est la réponse du moteur À CE
+            // COUP — la réfutation, déjà payée par l'évaluation ci-dessus.
+            explanation: quality.isFault
+                ? explanation(at: index, refutationLANs: evalAfter.pv)
+                : nil
+        )
         if let assessment = quality.pgnAssessment {
             game.annotate(moveAt: index, assessment: assessment)
         }
@@ -1325,6 +1354,21 @@ final class AnalysisViewModel {
         // CHAQUE nœud rendait la classification quadratique sur le MainActor. La
         // boucle de masse (Phase 2) le coalesce ; le nœud isolé
         // (``ensureEvaluatedLazily``) le fait aussitôt.
+    }
+
+    /// Le « pourquoi » d'un coup, à partir de la variante que le moteur
+    /// enchaîne sur la position d'après.
+    ///
+    /// Purement local : aucun appel moteur supplémentaire — la variante est
+    /// déjà en cache —, donc le coût d'explication d'une revue de quarante
+    /// coups est celui de quarante rejeux de douze demi-coups sur un plateau.
+    private func explanation(
+        at index: MoveTree.Index, refutationLANs: [String]
+    ) -> MoveExplanation? {
+        guard let position = game.positions[index] else { return nil }
+        return MoveExplainer.explain(
+            .init(positionAfterMove: position, refutationLANs: refutationLANs)
+        )
     }
 
     /// Le meilleur coup disponible (celui qu'on a pu RATER) est-il une
@@ -1415,7 +1459,10 @@ final class AnalysisViewModel {
             pawns: min(10, max(-10, Double(cpWhite) / 100)),
             bestLan: best.lan,
             gapToSecondBest: gap,
-            secondBestLan: rankedDict[2]?.lan
+            secondBestLan: rankedDict[2]?.lan,
+            // Tronquée à la source : le cache garde une entrée par nœud d'une
+            // partie entière, et rien au-delà ne sera jamais lu.
+            pv: Array(best.pv.prefix(MoveExplainer.maxPlies))
         )
     }
 

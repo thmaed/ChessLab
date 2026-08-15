@@ -4691,6 +4691,114 @@ disparition dans l'app elle-même. Ce qui est établi, c'est que ce chemin produ
 exactement le symptôme décrit et que rien ne l'en sortait ; si le déclencheur
 réel avait été autre, le symptôme se reproduira et il faudra chercher ailleurs.
 
+## Chantier I — « le pourquoi » (2026-08-15)
+
+Premier des trois chantiers de l'analyse produit du 15/08. Le constat de
+départ : le bandeau coach sait dire « e5 — Erreur, −12 % », donc **combien** un
+coup coûte, et n'a jamais su dire **ce qui le punit**. L'utilisateur apprend
+qu'il a eu tort, pas ce qu'il n'a pas vu, et rejouera le même coup dans trois
+parties. Toute la valeur pédagogique est dans le pourquoi.
+
+### La matière première était déjà payée
+
+`rankedEval` renvoie la **variante principale** du moteur pour chaque rang, et
+`makeCachedEval` la jetait. Or sur la position d'APRÈS un coup — que la
+classification évalue de toute façon —, cette variante est exactement la
+**réfutation** : ce que l'adversaire va faire du coup joué.
+
+Le chantier ne coûte donc **aucune recherche moteur supplémentaire**. Expliquer
+une revue de quarante coups, c'est quarante rejeux de douze demi-coups sur un
+plateau.
+
+### Ce qui a été construit
+
+`TacticalMotifDetector` (pur) reconnaît le motif d'UN coup à partir du plateau
+d'après : mat (et mat du couloir), fourchette — royale comprise, le roi nommé
+en premier —, échec à la découverte, clouage, pièce en prise.
+
+`MoveExplainer` (pur) rejoue la réfutation et en tire le motif, le coût
+matériel et la phrase. Deux pièges y sont traités, tous deux mesurés :
+
+- **le matériel se lit au dernier point CALME de la ligne**, pas au dernier
+  demi-coup. Une variante coupée juste après une prise annoncerait une perte de
+  dame que la reprise du demi-coup suivant efface. Quand aucun point calme
+  n'existe, on se rabat sur le dernier demi-coup et le chiffre est surévalué —
+  comportement figé par un test plutôt que laissé implicite ;
+- **le mat fait taire le décompte matériel.** « Mat en 2. Vous perdez
+  3 points. » n'a aucun sens.
+
+### Aucun modèle de langage, et c'est le point
+
+Un modèle qui commente une position invente des motifs qui n'y sont pas. Ici
+tout est **rejoué sur un plateau** : le motif est prouvé par la ligne du
+moteur, ou il n'est pas nommé. L'explicateur rend `nil` chaque fois que la
+ligne ne dit rien d'exploitable — mieux vaut se taire que meubler. Dans une app
+d'apprentissage, une explication fausse s'apprend aussi bien qu'une vraie.
+
+### Les phrases se construisent à la LECTURE
+
+L'explication est mise en cache pour toute la session ; un changement de langue
+en cours de route doit la retraduire, pas la laisser figée. `sentence(notation:)`
+est donc pure et appelée au rendu, sur le modèle de `SANFormatter.display`.
+
+Deux contorsions de français assumées : tournure **nominale** pour le clouage
+(« clouage de votre cavalier devant votre roi ») parce que « votre tour est
+clouée » demanderait un accord en genre qu'un gabarit à trous ne sait pas
+faire ; et la pièce qui démasque n'est **pas nommée** dans l'échec à la
+découverte, pour la même raison (« son fou » / « sa tour ») — la flèche du
+plateau la montre déjà.
+
+### L'interface : `ViewThatFits`, pas un `if`
+
+La seconde ligne du bandeau coach est exactement le genre d'ajout qui l'avait
+déjà fait passer sous le bord de l'écran (colonne gauche de l'iPad en paysage,
+qui n'est pas dans un `ScrollView` — voir plus haut « Revue UX — disposition
+iPad »).
+
+La barre est donc rendue par `ViewThatFits(in: .vertical)` : la version à deux
+lignes n'est retenue que si elle TIENT dans la hauteur proposée, sinon on
+retombe sur la barre d'une ligne d'hier, à l'identique. Aucune constante de
+chrome devinée, et la phrase ne peut structurellement pas repousser le plateau
+— elle prend la place restante ou elle s'efface.
+
+### Ce qui n'a PAS été touché, et pourquoi
+
+- **`PuzzleThemeDetector` n'est pas fusionné** dans le nouveau détecteur, bien
+  que les deux fassent un travail voisin. Il étiquette une bibliothèque de
+  puzzles **déjà en base** : changer son verdict rétiquetterait des puzzles
+  existants. La fusion se fera quand elle sera l'objet du chantier.
+- **Seules les fautes sont expliquées** (`quality.isFault`). La variante
+  d'après un bon coup raconte la suite de la partie, pas une punition.
+- **Pas de repli sur les annotations d'un PGN importé**, contrairement à
+  `lastMoveQuality` : un « ?? » écrit par quelqu'un d'autre dit qu'il y a
+  faute, jamais laquelle.
+- **Le niveau 3 (positionnel)** — les coups qui ne perdent rien mais abandonnent
+  une case, ouvrent une colonne, isolent un pion — reste à faire. C'est là que
+  ça devient rare ; ce n'est pas là que ça devient utile en premier.
+
+### Vérifié
+
+- `TacticalMotifDetectorTests` et `MoveExplanationTests` — **20 tests**. Chaque
+  motif a son test de reconnaissance ET son test de NON-reconnaissance :
+  l'échange pris pour une pièce en prise, l'échec direct pris pour une
+  découverte, le roi en échec pris pour une pièce clouée, l'attaque simple
+  prise pour une fourchette. Les variantes sont écrites à la main, donc les
+  tests ne dépendent ni de Stockfish ni de sa profondeur.
+- `CoachExplanationUITests` — parcours réel, moteur réel : mat du berger importé
+  en PGN, navigation sur la gaffe `3...Cf6`. L'app affiche
+  **« Dxf7# : et c'est mat. »**
+- **Mesures de mise en page** (frames d'accessibilité, jamais de captures — le
+  piège du paysage au simulateur est documenté plus haut) :
+  - iPhone 17 portrait : bandeau `y=[689,3…750,7]`, hauteur **61,3 pt**,
+    fenêtre 874 pt ;
+  - iPad mini **paysage** — le cas qui avait cassé : bandeau
+    `y=[624,0…685,5]`, hauteur **61,5 pt**, fenêtre 744 pt. La version à deux
+    lignes y tient, avec 58 pt de marge. Aucun débordement horizontal.
+- **Suite unitaire : 497 tests, 80 suites, 0 échec.**
+- UI de non-régression : `AnalysisReviewUITests`, `AnalysisStepThroughUITests`,
+  `LayoutOverflowUITests` et `DynamicTypeOverflowUITests` (AX3 et AX5 compris) —
+  **12 tests, 0 échec.**
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-14)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque

@@ -429,6 +429,35 @@ struct AnalysisView: View {
     @ViewBuilder
     private var coachBar: some View {
         if let quality = viewModel.lastMoveQuality, let move = viewModel.lastMove {
+            // ``ViewThatFits`` et non un `if` : la colonne de gauche de l'iPad
+            // en PAYSAGE n'est pas dans un `ScrollView` (voir
+            // ``iPadLandscapeBody``), et c'est précisément là que la barre
+            // coach était déjà passée sous le bord de l'écran une fois. Une
+            // seconde ligne posée sans filet rouvrirait ce trou.
+            //
+            // Ici, la version à deux lignes n'est retenue que si elle TIENT
+            // dans la hauteur proposée ; sinon on retombe sur la barre d'hier,
+            // à l'octet près. Aucune constante de chrome devinée, et la phrase
+            // ne peut pas repousser le plateau : elle prend la place restante
+            // ou elle s'efface.
+            ViewThatFits(in: .vertical) {
+                coachCard(quality: quality, move: move, explanation: viewModel.lastMoveExplanation)
+                coachCard(quality: quality, move: move, explanation: nil)
+            }
+            .transition(.opacity)
+            .animation(Theme.gentle, value: quality)
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("coachBar")
+        }
+    }
+
+    /// La carte du bandeau coach. `explanation` à `nil` rend EXACTEMENT la
+    /// barre d'une ligne d'avant ce chantier — c'est ce qui en fait un repli
+    /// sûr pour ``ViewThatFits``.
+    private func coachCard(
+        quality: MoveQuality, move: Move, explanation: MoveExplanation?
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 10) {
                 MoveQualityBadgeView(quality: quality, squareSize: 56)
 
@@ -457,15 +486,25 @@ struct AnalysisView: View {
                         .lineLimit(1)
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            .background(Theme.surface, in: Theme.controlShape)
-            .overlay(Theme.controlShape.strokeBorder(quality.tint.opacity(0.45), lineWidth: 1))
-            .transition(.opacity)
-            .animation(Theme.gentle, value: quality)
-            .accessibilityElement(children: .combine)
-            .accessibilityIdentifier("coachBar")
+
+            if let explanation {
+                // LE contenu du chantier : ce qui punit le coup, en toutes
+                // lettres. Deux lignes au plus — au-delà ce n'est plus une
+                // explication, c'est un paragraphe, et la place vient du
+                // plateau.
+                Text(explanation.sentence)
+                    .font(.footnote)
+                    .foregroundStyle(Theme.textPrimary)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .accessibilityIdentifier("coachExplanation")
+            }
         }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(Theme.surface, in: Theme.controlShape)
+        .overlay(Theme.controlShape.strokeBorder(quality.tint.opacity(0.45), lineWidth: 1))
     }
 
     /// Sous ½ point de % le coup est neutre (« ≈ 0 % ») : afficher « −0 % »
