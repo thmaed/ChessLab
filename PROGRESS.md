@@ -5107,11 +5107,35 @@ manquée (Scheveningen …b5, qui perd la tour a8) : la contre-mesure à profond
 parent/enfant à profondeur 18 laissait passer. C'est la raison d'être des deux
 passes.
 
-**État final : `audit.py` sort 0 — aucune gaffe enseignée sur les 58 cours**,
-et 7 lacunes de couverture répertoriées en avertissement (Londres …Ca6,
-Blackmar …h6, Stafford dxe4, Est-indienne Cge2, Letton Cc4, Englund Cc3,
-Colle …Cd7 — à chaque fois l'adversaire a une meilleure défense que celle
-couverte). Elles ne mentent à personne : elles disent où approfondir.
+**État : `audit.py` sort 0 — aucune gaffe enseignée sur les 58 cours.**
+
+### 1 bis. Seconde passe — les lacunes de couverture, et deux faux positifs
+
+Les 7 avertissements de la première passe se sont révélés être trois choses
+différentes, et deux d'entre elles étaient des défauts de MON outil :
+
+- **Faux positif « le meilleur coup est déjà à côté »** (Englund 5.Cc3) : la
+  position proposait DEUX arêtes, Cc3 et Fd2, et Fd2 est justement le meilleur.
+  Le lecteur voit les deux ; il n'y a rien à combler. `audit.py` regarde
+  désormais les coups FRÈRES — mais seulement pour l'adversaire : de notre côté,
+  une alternative perdante reste perdante même à côté du bon coup.
+- **Faux positif « déjà perdu »** (Englund 6.Dd2, Stafford dxe4) : au fond d'un
+  piège, l'adversaire perd quoi qu'il joue (−5,64 contre −3,96). Signaler qu'il
+  aurait pu perdre plus proprement n'apprend rien. Filtre à −3,00.
+- **Vraies lacunes, comblées** — 4 branches ajoutées, calculées au moteur :
+
+| ouverture | ce qui manquait | pourquoi ça comptait |
+|---|---|---|
+| london-system | 5…Cd5 après 5.Cb5 | le chapitre ne montrait que 5…Ca6, qui perd — on croyait le piège gagnant par force. Il ne l'est pas : 5…Cd5 tient par répétition |
+| colle-system | 10…Cxe5 | le sacrifice grec ne marche que si les Noirs reculent en d7. S'ils prennent, les Blancs sont un pion de moins et sans attaque |
+| latvian-gambit | 6.Fh5+ | la réfutation qui gagne la qualité par force — à connaître AVANT de jouer le Letton, pas après |
+| kings-indian | 11.h4 | plus fort que Cge2, et …Fxg4 ne marche plus |
+
+**Reste 1 avertissement, assumé** : Blackmar-Diemer 8…h6, où le moteur préfère
+8…Fb4 (−1,87 contre +0,80). Non comblé volontairement — la suite que propose le
+moteur passe par un Th3 que je ne peux pas présenter comme de la théorie, et
+8…h6 est bien le coup principal des sources. C'est une vraie lacune, elle est
+inscrite ici plutôt que masquée par une ligne inventée.
 
 ### 2. « L'architecture est très bonne mais le contenu est plutôt mauvais »
 
@@ -5175,10 +5199,21 @@ finition. Reporté sciemment, inscrit ci-dessous.
 - Stockfish 17 compilé depuis `Vendor/CStockfish` pour l'audit (le paquet Swift
   n'expose pas de binaire ; il suffit de rétablir `main.cpp` depuis `_main.cpp`,
   que le Makefile amont attend et que la vendorisation avait renommé).
-- **Non vérifié à la capture** : les deux corrections d'interface (plateau ancré,
-  essai unique) compilent et passent les tests, mais n'ont pas été relues sur un
-  iPhone 11 — aucun simulateur de ce modèle n'est installé ici (famille 17 et
-  SE 3 uniquement).
+- **Vérifié sur la géométrie iPhone 11** (simulateur créé à la main :
+  `xcrun simctl create "iPhone 11 (test)" …SimDeviceType.iPhone-11 …iOS-26-5`,
+  le type d'appareil existe encore même si aucun simulateur n'est installé par
+  défaut). `OpeningReaderScreenshotUITests` y passe et la capture montre le
+  plateau entier, le fil des coups, la carte d'explication et la barre
+  Précédent/Suivant simultanément à l'écran.
+- **Défaut de test trouvé au passage** : `OpeningReaderScreenshotUITests`
+  échouait sur écran court. Il exigeait l'existence de la cellule « Italian
+  Game » AVANT de faire défiler, or la liste est paresseuse : sur iPhone 11 la
+  cellule n'est même pas construite au départ. Le défilement passe avant
+  l'assertion. Invisible sur la famille iPhone 17, où tout tient à l'écran.
+- **Verrou ajouté** : `OpeningBlunderRegressionTests` — les 15 positions
+  corrigées et les 3 pièges annotés sont relus DEPUIS LE BUNDLE à chaque
+  `xcodebuild test`. La correction vivait dans `content/*.py`, hors cible iOS :
+  rien n'empêchait un `author.py` de la faire disparaître sans bruit.
 - Les trois captures « plateau coupé sur les bords » du testeur sont des
   **recadrages** : en mode Jouer et Analyser le plateau est volontairement de
   bord à bord (`padding(.horizontal, -12)` qui annule la marge du conteneur),

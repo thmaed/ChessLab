@@ -58,6 +58,22 @@ COURSE = {
                 "fxg4", "Ncxe4", "Nxe4", "Nxe4",
             ],
         },
+        # 11.h4 — le vrai test du Sämisch avec g4. Cge2 laissait …Fxg4 ;
+        # ici les Blancs poussent d'abord et les Noirs doivent bloquer.
+        {
+            "chapter": {"id": "saemisch", "title": c("Variante Sämisch — 5.f3", "Sämisch — 5.f3")},
+            "moves": [
+                "d4", "Nf6", "c4", "g6", "Nc3", "Bg7", "e4", "d6", "f3", "O-O", "Be3", "e5", "d5", "c6",
+                "Qd2", "cxd5", "cxd5", "Nbd7", "g4", "Nc5",
+                {"san": "h4", "critical": True,
+                 "comment": c("Plus fort que Cge2 : les Blancs poussent AVANT de développer, et …Fxg4 ne marche plus.",
+                              "Stronger than Nge2: White pushes BEFORE developing, and …Bxg4 no longer works.")},
+                {"san": "h5",
+                 "comment": c("Il faut bloquer : laisser h4-h5 ouvrir la colonne h serait fatal au roque.",
+                              "Black must block: letting h4-h5 open the h-file would be fatal to the king.")},
+                "g5", "Ne8", "b4", "Nd7",
+            ],
+        },
         # 3) Fianchetto — 5.g3
         {
             "chapter": {"id": "fianchetto", "title": c("Variante du fianchetto — 5.g3", "Fianchetto — 5.g3")},

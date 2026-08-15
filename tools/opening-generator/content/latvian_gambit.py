@@ -40,6 +40,24 @@ COURSE = {
                 "e4", "Ne5", "Nf6", "Be2", "d6", "Nc4", "Bxf5",
             ],
         },
+        # La réfutation que les Blancs ont à disposition au 6e coup. Sans elle
+        # le chapitre ne montrait que 6.Cc4, le coup qui laisse les Noirs bien.
+        {
+            "chapter": {"id": "exf5", "title": c("3.exf5 — la ligne principale", "3.exf5 — the main line")},
+            "moves": [
+                "e4", "e5", "Nf3", "f5", "exf5", "e4", "Ne5", "Nf6", "Be2", "d6",
+                {"san": "Bh5+", "role": "trap", "critical": True,
+                 "comment": c("Le coup désagréable, à connaître AVANT de jouer le Letton : l'échec en h5 gagne la qualité par force.",
+                              "The unpleasant move, to know BEFORE playing the Latvian: the h5 check wins the exchange by force.")},
+                {"san": "Ke7",
+                 "comment": c("Forcé — …Cxh5 permet Cf7 et le roi noir ne s'en sort pas mieux.",
+                              "Forced — …Nxh5 allows Nf7 and the black king fares no better.")},
+                "Nf7", "Qe8", "d4", "Nxh5",
+                {"san": "Nxh8",
+                 "comment": c("La qualité tombe. Le Letton reste jouable en blitz, pas contre quelqu'un qui connaît cette ligne.",
+                              "The exchange drops. The Latvian stays playable in blitz, not against someone who knows this line.")},
+            ],
+        },
         {
             "chapter": {"id": "bc4", "title": c("3.Fc4 — le plus tranchant", "3.Bc4 — the sharpest")},
             "moves": [

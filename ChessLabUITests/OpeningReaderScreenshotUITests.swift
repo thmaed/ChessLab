@@ -18,13 +18,18 @@ final class OpeningReaderScreenshotUITests: XCTestCase {
 
         // Ouvre la Partie italienne. La liste est triée alphabétiquement, donc
         // l'entrée peut être sous la ligne de flottaison : on défile jusqu'à elle.
+        //
+        // On défile AVANT d'exiger son existence : la liste est paresseuse, et
+        // sur un écran court (iPhone 11 et plus petits) la cellule n'est même
+        // pas construite au départ — `waitForExistence` échouait donc avant
+        // que la moindre boucle de défilement n'ait eu lieu.
         let italian = app.buttons["opening_italian-game"]
-        XCTAssertTrue(italian.waitForExistence(timeout: 10))
         var scrolls = 0
-        while !italian.isHittable && scrolls < 8 {
+        while !(italian.exists && italian.isHittable) && scrolls < 12 {
             app.swipeUp()
             scrolls += 1
         }
+        XCTAssertTrue(italian.waitForExistence(timeout: 10))
         italian.tap()
         capture(app, "02-reader-start-en")
 

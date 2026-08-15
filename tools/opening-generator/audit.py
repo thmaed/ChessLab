@@ -45,6 +45,9 @@ DEFAULT_DIR = HERE.parent.parent / "ChessLab" / "Resources" / "openings"
 # Rôles qui ASSUMENT un mauvais coup : c'est la leçon, pas une erreur.
 EXCUSED_ROLES = {"trap", "inaccuracy"}
 
+# Au-delà, la position est perdue quoi qu'on joue (en centipions).
+LOST_CP = 300
+
 # Sacrifices VOULUS, nommés et commentés dans le contenu : le moteur les
 # condamnera toujours, c'est la définition d'un gambit. Chaque entrée est une
 # décision d'auteur, pas un tapis sous lequel balayer — d'où la raison écrite.
@@ -155,7 +158,12 @@ def suspects(courses, cache, threshold) -> list:
                 mover = "white" if key.split(" ")[1] == "w" else "black"
                 out.append({"course": course_id, "fen": key, "san": edge["san"],
                             "role": edge.get("role"), "own": mover == side,
-                            "terminal": not course["positions"][edge["toFEN"]]["moves"]})
+                            "terminal": not course["positions"][edge["toFEN"]]["moves"],
+                            # Les coups FRÈRES depuis la même position : si le
+                            # meilleur coup est déjà proposé à côté, la variante
+                            # sous-optimale n'est pas une lacune, c'est une
+                            # alternative — le lecteur voit les deux.
+                            "siblings": [m["san"] for m in node["moves"]]})
     return out
 
 
@@ -187,12 +195,24 @@ def verify(engine, rows, depth, threshold) -> list:
         book_cp = book["score"].pov(board.turn).score(mate_score=100000)
         if best_cp - book_cp < threshold:
             continue
+        best_san = board.san(best["pv"][0]) if best.get("pv") else None
+        # Coup de l'adversaire dont le MEILLEUR est déjà couvert par un coup
+        # frère : la position propose les deux, il n'y a rien à combler. Ne
+        # vaut que pour l'adversaire — de notre côté, une alternative perdante
+        # reste une alternative perdante, même à côté du bon coup.
+        if not row["own"] and not row["terminal"] and best_san in row["siblings"]:
+            continue
+        # Adversaire DÉJÀ PERDU même en jouant au mieux (fond d'un piège) : on
+        # ne « couvre » pas une défense qui ne sauve rien. Signaler que le
+        # vaincu aurait pu perdre plus proprement n'apprend rien à personne.
+        if not row["own"] and not row["terminal"] and best_cp < -LOST_CP:
+            continue
         scratch = board.copy()
         refutation = []
         for mv in book.get("pv", [])[:6]:
             refutation.append(scratch.san(mv))
             scratch.push(mv)
-        confirmed.append({**row, "best": board.san(best["pv"][0]) if best.get("pv") else None,
+        confirmed.append({**row, "best": best_san,
                           "best_cp": best_cp, "book_cp": book_cp, "loss": best_cp - book_cp,
                           "refutation": " ".join(refutation)})
         print(f"  {i}/{len(rows)}", file=sys.stderr)

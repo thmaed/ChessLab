@@ -38,6 +38,22 @@ COURSE = {
                 "Kxf6",
             ],
         },
+        # Ce que font les Noirs quand ils ne coopèrent pas : sans cette branche,
+        # le chapitre laissait croire que le sacrifice grec arrive toujours.
+        {
+            "chapter": {"id": "colle", "title": c("Colle-Koltanowski — c3", "Colle-Koltanowski — c3")},
+            "moves": [
+                "d4", "d5", "Nf3", "Nf6", "e3", "e6", "Bd3", "c5", "c3", "Nc6", "Nbd2", "Bd6", "O-O", "O-O",
+                "dxc5", "Bxc5", "e4", "Qc7", "e5",
+                {"san": "Nxe5", "critical": True,
+                 "comment": c("La bonne réponse : on prend le pion e5 au lieu de reculer en d7, et le sacrifice grec n'a jamais lieu.",
+                              "The right answer: take the e5 pawn instead of retreating to d7, and the Greek gift never happens.")},
+                "Nxe5", "Qxe5", "Nb3",
+                {"san": "Bb6",
+                 "comment": c("Il faut le savoir : contre cette défense les Blancs n'ont pas d'attaque, seulement un pion de moins. Le Colle mise sur …Cd7.",
+                              "Worth knowing: against this defence White has no attack, just a pawn less. The Colle is betting on …Nd7.")},
+            ],
+        },
         {
             "chapter": {"id": "zukertort", "title": c("Colle-Zukertort — b3", "Colle-Zukertort — b3")},
             "moves": [
