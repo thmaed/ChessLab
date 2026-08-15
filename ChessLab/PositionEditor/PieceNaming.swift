@@ -36,6 +36,25 @@ enum PieceNaming {
         }
     }
 
+    /// Le type en MINUSCULES, pour une pièce citée au milieu d'une phrase
+    /// (« votre cavalier était en prise »). Clés distinctes de
+    /// ``frenchKind(_:)`` : en français la casse ne se décide pas au rendu, et
+    /// l'anglais capitalise ses titres différemment de son texte courant.
+    ///
+    /// Localisé comme le reste — un mot laissé en français au milieu d'une
+    /// phrase anglaise se voit plus qu'un écran entier mal traduit.
+    static func frenchKindLowercase(_ kind: Piece.Kind) -> String {
+        let key = switch kind {
+        case .king: "roi"
+        case .queen: "dame"
+        case .rook: "tour"
+        case .bishop: "fou"
+        case .knight: "cavalier"
+        case .pawn: "pion"
+        }
+        return LocalizationController.string(key)
+    }
+
     /// Le seul type, sans couleur — clé du catalogue (la palette de complétion
     /// du scanner la passe à un `Text`, qui la localise). La palette est déjà
     /// filtrée à une couleur connue : répéter la couleur n'apporterait rien.
