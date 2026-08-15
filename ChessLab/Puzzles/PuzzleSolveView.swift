@@ -231,14 +231,17 @@ struct PuzzleSolveView: View {
         )
     }
 
+    /// Autant de pastilles que d'essais accordés — une seule dans le régime par
+    /// défaut, où l'intitulé le dit franchement plutôt que d'afficher un
+    /// compteur à un cran.
     private var attemptsIndicator: some View {
         HStack(spacing: 8) {
-            Text("Essais")
+            Text(viewModel.allowedAttempts == 1 ? "Un seul essai" : "Essais")
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(Theme.textTertiary)
                 .textCase(.uppercase)
                 .tracking(0.4)
-            ForEach(0..<3, id: \.self) { i in
+            ForEach(0..<viewModel.allowedAttempts, id: \.self) { i in
                 Circle()
                     .fill(i < viewModel.attemptsRemaining ? Theme.accent : Color.white.opacity(0.12))
                     .frame(width: 9, height: 9)

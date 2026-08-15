@@ -4139,6 +4139,70 @@
         }
       }
     },
+    "1 essai" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 attempt"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1 essai"
+          }
+        }
+      }
+    },
+    "3 essais" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 attempts"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "3 essais"
+          }
+        }
+      }
+    },
+    "Avec un seul essai, on calcule la variante jusqu'au bout avant de jouer — c'est tout l'intérêt de l'exercice. Trois essais laissent chercher en tâtonnant." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "With a single attempt you work the line out to the end before playing — that is the whole point of the exercise. Three attempts let you search by trial and error."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec un seul essai, on calcule la variante jusqu'au bout avant de jouer — c'est tout l'intérêt de l'exercice. Trois essais laissent chercher en tâtonnant."
+          }
+        }
+      }
+    },
+    "Un seul essai" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One attempt only"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un seul essai"
+          }
+        }
+      }
+    },
     "Essais" : {
       "localizations" : {
         "en" : {

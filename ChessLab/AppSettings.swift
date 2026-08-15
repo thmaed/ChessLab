@@ -21,7 +21,22 @@ final class AppSettings {
         static let hapticsEnabled = "settings.hapticsEnabled"
         static let pieceNotation = "settings.pieceNotation"
         static let appLanguage = "settings.appLanguage"
+        static let puzzleAttempts = "settings.puzzleAttempts"
     }
+
+    /// Essais accordés par puzzle, avant que la solution ne soit fléchée.
+    ///
+    /// UN SEUL par défaut. Trois invitaient à tenter un coup « pour voir »,
+    /// exactement l'inverse de ce qu'un puzzle entraîne : on doit calculer la
+    /// variante jusqu'au bout AVANT de poser la pièce (retour d'un testeur
+    /// classé, 15/08/2026). Le filet à trois essais reste disponible dans les
+    /// réglages pour qui débute et préfère chercher en tâtonnant.
+    var puzzleAttempts: Int {
+        didSet { UserDefaults.standard.set(puzzleAttempts, forKey: Keys.puzzleAttempts) }
+    }
+
+    /// Les deux régimes proposés — un essai (par défaut) ou trois.
+    nonisolated static let puzzleAttemptChoices = [1, 3]
 
     /// Valeurs proposées par les réglages avancés (prompt : « Threads 2 (max 4
     /// selon appareil) », Hash 64 ou 128 Mo).
@@ -117,6 +132,12 @@ final class AppSettings {
         // « explicitement false ».
         soundsEnabled = (defaults.object(forKey: Keys.soundsEnabled) as? Bool) ?? true
         hapticsEnabled = (defaults.object(forKey: Keys.hapticsEnabled) as? Bool) ?? true
+
+        // Borné : une valeur hors liste (fichier de préférences trafiqué,
+        // réglage retiré dans une future version) ne doit pas rendre un puzzle
+        // insoluble ou infini.
+        let storedAttempts = (defaults.object(forKey: Keys.puzzleAttempts) as? Int) ?? 1
+        puzzleAttempts = Self.puzzleAttemptChoices.contains(storedAttempts) ? storedAttempts : 1
 
         analysisArrowMode = defaults.string(forKey: Keys.analysisArrowMode)
             .flatMap(ArrowMode.init(rawValue:)) ?? .best

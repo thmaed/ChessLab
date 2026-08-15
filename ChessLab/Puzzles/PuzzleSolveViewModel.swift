@@ -5,8 +5,10 @@ import SwiftData
 
 /// Résout un puzzle : "Trouvez mieux que dans la partie", validation
 /// coup par coup contre la séquence stockée, riposte adverse
-/// automatique, échec après 3 essais → solution fléchée. Met à jour la
-/// répétition espacée (SM-2) du puzzle sur résolution (succès ou échec).
+/// automatique, échec une fois les essais épuisés (voir
+/// ``AppSettings/puzzleAttempts``, un seul par défaut) → solution fléchée.
+/// Met à jour la répétition espacée (SM-2) du puzzle sur résolution (succès
+/// ou échec).
 @Observable
 @MainActor
 final class PuzzleSolveViewModel {
@@ -35,7 +37,7 @@ final class PuzzleSolveViewModel {
     /// montrer l'erreur puis l'annuler. `nil` hors animation.
     private(set) var rejectedMove: ChessBoardView.RejectedMove?
     private var rejectNonce = 0
-    /// Tâche différée qui joue le coup révélé 0,5 s après le 3e échec (voir
+    /// Tâche différée qui joue le coup révélé 0,5 s après le dernier échec (voir
     /// ``revealSolution()``) — suivie pour pouvoir l'ANNULER : « Nouveau
     /// puzzle » est déjà proposé pendant ce délai, et le coup révélé de
     /// l'ancien puzzle s'appliquait alors au plateau du SUIVANT (coup fantôme,
@@ -46,7 +48,11 @@ final class PuzzleSolveViewModel {
     private var forcedReplyTask: Task<Void, Never>?
 
     private(set) var currentStep = 0
-    private(set) var attemptsRemaining = 3
+    /// Essais accordés à CE puzzle — figé à son ouverture d'après
+    /// ``AppSettings/puzzleAttempts``, pour qu'un changement de réglage en
+    /// cours de résolution ne modifie pas le puzzle sous les doigts.
+    private(set) var allowedAttempts = AppSettings.shared.puzzleAttempts
+    private(set) var attemptsRemaining = AppSettings.shared.puzzleAttempts
     private(set) var isSolved = false
     private(set) var isFailed = false
     /// Vrai pendant le court délai avant la riposte adverse automatique —
@@ -113,7 +119,8 @@ final class PuzzleSolveViewModel {
         lastMove = nil
         pendingPromotion = nil
         currentStep = 0
-        attemptsRemaining = 3
+        allowedAttempts = AppSettings.shared.puzzleAttempts
+        attemptsRemaining = allowedAttempts
         isSolved = false
         isFailed = false
         isAutoPlaying = false

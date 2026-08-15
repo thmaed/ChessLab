@@ -30,6 +30,7 @@ struct SettingsView: View {
                 boardThemeSection
                 pieceSetSection
                 notationSection
+                puzzleSection
                 feedbackSection
                 syncSection
                 if OpeningsGraphFeature.hasBundledCourses { previewSection }
@@ -307,6 +308,34 @@ struct SettingsView: View {
                 // export qui ne suit pas l'affichage a l'air d'un bug tant
                 // qu'on n'a pas expliqué que c'est le standard.
                 Text("Le PGN exporté reste en notation anglaise — c'est le standard, lisible par tous les autres logiciels.")
+                    .font(.caption)
+                    .foregroundStyle(Theme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cardStyle()
+        }
+    }
+
+    /// Essais par puzzle. Un seul par défaut : trois essais poussaient à
+    /// « tenter un coup pour voir », alors qu'un puzzle s'entraîne en calculant
+    /// la variante jusqu'au bout avant de poser la pièce.
+    private var puzzleSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Puzzles")
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    ForEach(AppSettings.puzzleAttemptChoices, id: \.self) { count in
+                        ChipButton(
+                            label: count == 1 ? "1 essai" : "3 essais", systemImage: nil,
+                            isSelected: settings.puzzleAttempts == count
+                        ) {
+                            settings.puzzleAttempts = count
+                        }
+                        .accessibilityIdentifier("puzzle_attempts_\(count)")
+                    }
+                }
+                Text("Avec un seul essai, on calcule la variante jusqu'au bout avant de jouer — c'est tout l'intérêt de l'exercice. Trois essais laissent chercher en tâtonnant.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
