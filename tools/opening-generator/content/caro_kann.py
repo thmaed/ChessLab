@@ -3,7 +3,7 @@
 
 Arbre approfondi : Classique 4…Ff5 (grande ligne jusqu'au roque opposé) et
 4…Cd7 (Karpov), Avance, attaque Panov, Échange, Fantaisie 3.f3, Deux Cavaliers
-2.Cc3 & Cf3. Lignes vérifiées (Wikipédia + lichess).
+2.Cc3 & Cf3. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -104,7 +104,15 @@ COURSE = {
                 {"san": "f3", "eco": "Caro-Kann Defense: Fantasy Variation",
                  "comment": c("La Fantaisie : les Blancs soutiennent e4 à tout prix. Frapper le centre est la bonne réaction.",
                               "The Fantasy: White props up e4 at all costs. Striking the centre is the right reaction.")},
-                "e6", "Nc3", "Bb4", "a3", "Bxc3+", "bxc3", "dxe4", "fxe4", "e5",
+                "e6", "Nc3", "Bb4", "a3", "Bxc3+", "bxc3", "dxe4", "fxe4",
+                {"san": "Qh4+", "critical": True,
+                 "comment": c("La punition de 3.f3 : la case h4 est ouverte et le roi blanc n'a plus de refuge.",
+                              "The punishment for 3.f3: h4 is open and the white king has nowhere to hide.")},
+                "Ke2", "Qxe4+", "Kf2",
+                {"san": "Qh4+",
+                 "comment": c("Un pion de plus et un roi blanc à l'air libre : les Noirs sont nettement mieux.",
+                              "A pawn up and the white king out in the open: Black is clearly better.")},
+                "g3",
             ],
         },
         # 7) Deux Cavaliers — 2.Cc3 & 3.Cf3

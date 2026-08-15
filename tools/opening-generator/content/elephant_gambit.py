@@ -2,7 +2,7 @@
 """Gambit de l'éléphant (1.e4 e5 2.Cf3 d5) — NOIR.
 
 Un gambit rare et provocant : …d5 d'entrée pour ouvrir le jeu. Douteux au fond
-mais désarçonnant. Arbre : 3.exd5 Fd6 et 3.exd5 e4. Lignes vérifiées.
+mais désarçonnant. Arbre : 3.exd5 Fd6 et 3.exd5 e4. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

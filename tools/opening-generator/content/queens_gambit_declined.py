@@ -2,7 +2,7 @@
 """Gambit dame refusé (1.d4 d5 2.c4 e6) — répertoire BLANC.
 
 Arbre approfondi : Orthodoxe/Tartakower, variante de l'échange (attaque de
-minorité), variante Lasker, Cambridge Springs. Lignes vérifiées (Wikipédia).
+minorité), variante Lasker, Cambridge Springs. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

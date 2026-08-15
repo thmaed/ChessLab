@@ -3,7 +3,7 @@
 
 Arbre approfondi : Winawer (pion empoisonné 7.Dg4 Dc7 et 7…0-0), Avance
 (6.a3 et gambit Milner-Barry), Tarrasch (3…c5 ouverte et 3…Cf6 fermée),
-Classique (Steinitz 4.e5 et 4.Fg5), Rubinstein 3…dxe4, Échange. Lignes vérifiées.
+Classique (Steinitz 4.e5 et 4.Fg5), Rubinstein 3…dxe4, Échange. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

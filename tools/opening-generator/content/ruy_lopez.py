@@ -2,7 +2,7 @@
 """Partie espagnole / Ruy Lopez (1.e4 e5 2.Cf3 Cc6 3.Fb5) — répertoire BLANC.
 
 Arbre approfondi : fermée (Breyer), Marshall, ouverte, échange, berlinoise,
-Schliemann, Steinitz moderne. Lignes vérifiées (Wikipédia).
+Schliemann, Steinitz moderne. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

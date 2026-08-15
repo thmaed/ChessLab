@@ -2,7 +2,7 @@
 """Défense hollandaise (1.d4 f5) — répertoire NOIR.
 
 Arbre approfondi : Leningrad, Stonewall (moderne), Classique (Ilyin-Zhenevsky),
-anti-hollandaise 2.Fg5, gambit Staunton 2.e4. Lignes vérifiées.
+anti-hollandaise 2.Fg5, gambit Staunton 2.e4. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

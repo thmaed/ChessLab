@@ -2,7 +2,7 @@
 """Défense Grünfeld (1.d4 Cf6 2.c4 g6 3.Cc3 d5) — répertoire NOIR.
 
 Arbre approfondi : variante de l'échange (grand centre → cible), Système russe
-4.Cf3+Db3, Fianchetto (5.g3), et le système 4.Ff4. Lignes vérifiées.
+4.Cf3+Db3, Fianchetto (5.g3), et le système 4.Ff4. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

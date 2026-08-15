@@ -3,7 +3,7 @@
 
 On rend un pion pour un coin de pion avancé en d4, très gênant, et une attaque
 rapide. Arbre : principale 3.dxe5 d4 4.Cf3, le piège de Lasker (4.e3??), et la
-ligne 5.a3. Lignes vérifiées (Wikipédia + lichess).
+ligne 5.a3. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -44,7 +44,10 @@ COURSE = {
                 {"san": "e3", "role": "trap", "critical": True,
                  "comment": c("Le coup naturel… mais perdant : ouvrir en e3 tombe dans le célèbre piège de Lasker.",
                               "The natural move… but losing: opening with e3 walks into the famous Lasker Trap.")},
-                "Bb4+", "Bd2", "dxe3", "Bxb4",
+                "Bb4+", "Bd2", "dxe3",
+                {"san": "Bxb4", "role": "trap",
+                 "comment": c("La seconde erreur, la fatale : reprendre le fou laisse le pion e3 filer. fxe3 était obligatoire.",
+                              "The second mistake, the fatal one: recapturing the bishop lets the e3 pawn run. fxe3 was forced.")},
                 {"san": "exf2+", "comment": c("Le pion file : échec, et la sous-promotion suit.",
                                               "The pawn races on: check, and the underpromotion follows.")},
                 "Ke2",

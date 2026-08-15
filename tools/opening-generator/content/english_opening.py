@@ -2,7 +2,7 @@
 """Anglaise (1.c4) — répertoire BLANC.
 
 Arbre approfondi : Sicilienne inversée 1…e5 (dragon inversé), Symétrique 1…c5
-(avec la rupture d4), et l'attaque Mikenas 2.Cc3 e6 3.e4. Lignes vérifiées.
+(avec la rupture d4), et l'attaque Mikenas 2.Cc3 e6 3.e4. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

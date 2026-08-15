@@ -2,7 +2,7 @@
 """Gambit letton (1.e4 e5 2.Cf3 f5) — répertoire NOIR.
 
 Une sicilienne inversée ultra-agressive et douteuse : contre-attaque immédiate.
-Arbre : 3.Cxe5 (principale), 3.exf5, 3.Fc4 (le plus tranchant). Lignes vérifiées.
+Arbre : 3.Cxe5 (principale), 3.exf5, 3.Fc4 (le plus tranchant). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

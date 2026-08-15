@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Attaque Nimzo-Larsen (1.b3) — répertoire BLANC.
 
-Arbre : contre …e5, contre …d5, contre …Cf6/…g6. Lignes vérifiées.
+Arbre : contre …e5, contre …d5, contre …Cf6/…g6. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

@@ -2,7 +2,7 @@
 """Attaque Veresov (1.d4 Cf6 2.Cc3 d5 3.Fg5) — répertoire BLANC.
 
 La « Trompowsky du cavalier c3 » : peu de théorie, un clouage sur f6 et souvent
-la poussée e4. Arbre : 3…Cbd7 4.f3 (agressive), 3…Ff5, 3…c6. Lignes vérifiées.
+la poussée e4. Arbre : 3…Cbd7 4.f3 (agressive), 3…Ff5, 3…c6. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

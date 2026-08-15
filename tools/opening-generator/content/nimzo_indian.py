@@ -2,7 +2,7 @@
 """Nimzo-indienne et Ouest-indienne (1.d4 Cf6 2.c4 e6) — répertoire NOIR.
 
 Arbre approfondi : Rubinstein 4.e3, Classique 4.Dc2, Sämisch 4.a3, 4.f3, et
-l'Ouest-indienne 3.Cf3 b6. Lignes vérifiées (Wikipédia + lichess).
+l'Ouest-indienne 3.Cf3 b6. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

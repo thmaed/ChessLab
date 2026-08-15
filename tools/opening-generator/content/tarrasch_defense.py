@@ -3,7 +3,7 @@
 
 On accepte un pion dame isolé contre une activité de pièces maximale et un jeu
 facile à comprendre. Arbre : fianchetto principal, gambit Schara-Hennig
-(4…cxd4), et l'avance …c4. Lignes vérifiées (Wikipédia + lichess).
+(4…cxd4), et l'avance …c4. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

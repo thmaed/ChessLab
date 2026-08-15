@@ -2,7 +2,7 @@
 """Partie du centre & gambit danois (1.e4 e5 2.d4 exd4) — répertoire BLANC.
 
 Ouvrir le centre d'entrée : 3.Dxd4 (partie du centre, Dame en e3 et grand roque)
-ou 3.c3 (gambit danois, deux pions pour une attaque fulgurante). Lignes vérifiées.
+ou 3.c3 (gambit danois, deux pions pour une attaque fulgurante). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

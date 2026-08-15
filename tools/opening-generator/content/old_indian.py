@@ -3,7 +3,7 @@
 
 La version solide et sans fianchetto de l'est-indienne : …d6 et …e5, un jeu de
 manœuvre à la Tchigorine des indiennes. Arbre : 3.Cc3 e5 4.Cf3, l'échange
-4.dxe5, et 3.Cf3 Fg4. Lignes vérifiées (Wikipédia + lichess).
+4.dxe5, et 3.Cf3 Fg4. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

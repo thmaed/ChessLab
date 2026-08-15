@@ -2,7 +2,7 @@
 """Défense Pirc (1.e4 d6 2.d4 Cf6 3.Cc3 g6) — répertoire NOIR.
 
 Arbre approfondi : Classique 4.Cf3, Attaque autrichienne 4.f4 (5…0-0 et la
-contre-attaque 5…c5), Attaque 150 (4.Fe3), Byrne (4.Fg5). Lignes vérifiées.
+contre-attaque 5…c5), Attaque 150 (4.Fe3), Byrne (4.Fg5). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

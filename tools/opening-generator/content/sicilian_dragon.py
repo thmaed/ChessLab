@@ -3,7 +3,7 @@
 
 Arbre approfondi : Attaque yougoslave (Soltis 9.Fc4, la rupture …d5, Dragon
 chinois …Tb8), Classique 6.Fe2, Levenfish 6.f4, dragon accélérée et étau
-Maroczy 5.c4. Lignes vérifiées (Wikipédia + lichess).
+Maroczy 5.c4. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -125,7 +125,14 @@ COURSE = {
                 {"san": "e5", "role": "trap",
                  "comment": c("7.e5 ! Le cavalier f6 est attaqué et la grande diagonale se retourne contre les Noirs.",
                               "7.e5! The f6-knight is hit and the long diagonal turns against Black.")},
-                "dxe5", "fxe5", "Nd5", "Bc4", "Nb6",
+                "dxe5", "fxe5",
+                {"san": "Nd5", "role": "inaccuracy",
+                 "comment": c("Le réflexe — centraliser — aggrave le cas : Fb5+ ! suit et le roi noir ne roquera plus. …Cfd7 était le moindre mal.",
+                              "The reflex — centralise — makes it worse: Bb5+! follows and the black king will never castle. …Nfd7 was the lesser evil.")},
+                {"san": "Bb5+", "role": "trap",
+                 "comment": c("La sanction : échec avant tout. Voilà pourquoi …Fg7 attend son tour dans la Levenfish.",
+                              "The punishment: check first. This is why …Bg7 waits its turn against the Levenfish.")},
+                "Kf8", "O-O",
             ],
         },
         # 6) Dragon accélérée

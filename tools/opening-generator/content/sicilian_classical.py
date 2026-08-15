@@ -3,7 +3,7 @@
 
 Les deux cavaliers sortent naturellement (…Cc6, …Cf6) sans le pion …a6 (Najdorf)
 ni …g6 (Dragon). Arbre : attaque Richter-Rauzer 6.Fg5 (principale), Boleslavsky
-6.Fe2 e5, attaque Velimirovic 6.Fc4, attaque anglaise 6.Fe3 Cg4. Lignes vérifiées.
+6.Fe2 e5, attaque Velimirovic 6.Fc4, attaque anglaise 6.Fe3 Cg4. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -73,7 +73,11 @@ COURSE = {
                                             "The English Attack (Qd2, 0-0-0, g4). Here …Ng4 harasses the bishop at once.")},
                 {"san": "Ng4", "comment": c("On chasse le fou e3 et on prépare …g5/…Fg7 : jeu hypermoderne et pointu.",
                                             "Kick the e3 bishop and prepare …g5/…Bg7: sharp, hypermodern play.")},
-                "Bg5", "h6", "Bh4", "g5", "Bg3", "Bg7", "h3", "Nge5",
+                "Bg5", "h6", "Bh4", "g5", "Bg3", "Bg7", "h3",
+                {"san": "Bxd4", "critical": True,
+                 "comment": c("On donne le cavalier g4 pour emporter celui de d4 : après hxg4, …Da5 cloue c3 et les Noirs prennent l'initiative.",
+                              "Give up the g4 knight to take the d4 one: after hxg4, …Qa5 pins c3 and Black seizes the initiative.")},
+                "hxg4", "Qa5", "Rb1", "Be6",
             ],
         },
     ],

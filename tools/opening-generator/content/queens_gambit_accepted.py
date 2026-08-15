@@ -2,7 +2,7 @@
 """Gambit dame accepté (1.d4 d5 2.c4 dxc4) — répertoire BLANC.
 
 Arbre approfondi : ligne principale 3.Cf3 (pion isolé), variante centrale 3.e4,
-et la tentative …a6/…b5 pour garder le pion (réfutée). Lignes vérifiées.
+et la tentative …a6/…b5 pour garder le pion (réfutée). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

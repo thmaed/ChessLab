@@ -2,7 +2,7 @@
 """Défense Bogo-indienne (1.d4 Cf6 2.c4 e6 3.Cf3 Fb4+) — NOIR.
 
 Quand les Blancs jouent 3.Cf3 (pas de Cc3), l'échec …Fb4+ garde l'esprit
-Nimzo. Arbre : 4.Fd2 De7 (principale), 4.Cbd2 b6, 4.Fd2 a5. Lignes vérifiées.
+Nimzo. Arbre : 4.Fd2 De7 (principale), 4.Cbd2 b6, 4.Fd2 a5. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -53,7 +53,11 @@ COURSE = {
                 "d4", "Nf6", "c4", "e6", "Nf3", "Bb4+", "Bd2",
                 {"san": "a5", "comment": c("On soutient le fou en b4 (contre a3) pour le garder cloueur plus longtemps.",
                                            "Prop up the b4 bishop (against a3) to keep it pinning longer.")},
-                "g3", "O-O", "Bg2", "d6", "O-O", "Nbd7", "Qc2", "e5",
+                "g3", "O-O", "Bg2", "d6", "O-O",
+                {"san": "Bd7",
+                 "comment": c("On développe SANS lâcher le fou b4 : …Cbd7 d'abord permet Fc1 et le clouage tombe pour rien.",
+                              "Develop WITHOUT letting the b4 bishop go: …Nbd7 first allows Bc1 and the pin falls apart for nothing.")},
+                "Bg5", "a4",
             ],
         },
     ],

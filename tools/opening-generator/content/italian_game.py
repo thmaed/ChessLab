@@ -3,7 +3,7 @@
 
 Arbre approfondi : Giuoco Pianissimo (plan moderne), Giuoco Piano classique,
 Deux Cavaliers (Ca5, Fritz, Ulvestad, Fried Liver), Traxler, Evans, hongroise,
-gambit italien. Lignes vérifiées (Wikipédia).
+gambit italien. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

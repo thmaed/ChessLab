@@ -2,7 +2,7 @@
 """Gambit Blackmar-Diemer (1.d4 d5 2.e4 dxe4 3.Cc3 Cf6 4.f3) — répertoire BLANC.
 
 Arbre : Bogoljubow (4…exf3 5…g6), Teichmann (5…Ff5), gambit Ryder (5.Dxf3).
-Lignes vérifiées (Wikipédia + lichess).
+Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -31,7 +31,11 @@ COURSE = {
                 "Nc3", "Nf6", "f3", "exf3", "Nxf3", "g6", "Bc4", "Bg7", "O-O", "O-O",
                 {"san": "Qe1", "comment": c("La manœuvre-clé : la dame file en h4 pour attaquer le roque avec Fh6 et Ce5.",
                                             "The key manoeuvre: the queen swings to h4 to attack the king with Bh6 and Ne5.")},
-                "Nc6", "Qh4", "Bg4", "Be3", "Nd5",
+                "Nc6", "Qh4", "Bg4", "Be3",
+                {"san": "e6",
+                 "comment": c("Les Noirs bouchent d5 et tiennent. À ce stade le pion ne revient pas : le gambit se joue pour l'initiative, pas pour l'égalité matérielle.",
+                              "Black plugs d5 and holds. The pawn does not come back here: the gambit is played for the initiative, not to be materially level.")},
+                "Ne5", "Bf5", "Nxc6", "bxc6",
             ],
         },
         {

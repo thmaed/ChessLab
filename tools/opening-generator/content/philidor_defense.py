@@ -2,7 +2,7 @@
 """Défense Philidor (1.e4 e5 2.Cf3 d6) — répertoire NOIR.
 
 Arbre : système Hanham (…Cbd7/…Fe7), variante de l'échange (…exd4), et
-l'hybride Philidor-Pirc (…exd4 …g6). Lignes vérifiées.
+l'hybride Philidor-Pirc (…exd4 …g6). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

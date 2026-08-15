@@ -2,7 +2,7 @@
 """Système Londres (1.d4 + Ff4) + Jobava Londres — répertoire BLANC.
 
 Arbre approfondi : Londres contre …d5 (plan Ce5 + attaque), Jobava 2.Cc3,
-contre le fianchetto …g6, et contre …c5 (avec le piège …Db6). Lignes vérifiées.
+contre le fianchetto …g6, et contre …c5 (avec le piège …Db6). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -38,7 +38,11 @@ COURSE = {
                 "O-O", "Bd3", "b6",
                 {"san": "Ne5", "comment": c("Le cavalier s'installe sur son avant-poste : c'est le pivot de l'attaque londonienne.",
                                             "The knight lands on its outpost: the pivot of the London attack.")},
-                "Bb7", "f4", "Ne4",
+                "Bb7", "f4",
+                {"san": "Ne7",
+                 "comment": c("Les Noirs réorientent vers f5 pour contester g3 : c'est la bonne défense, …Ce4 f4 laisse le fou b7 muet après l'échange.",
+                              "Black reroutes to f5 to challenge g3: that's the right defence — …Ne4 leaves the b7 bishop mute after the trade.")},
+                "Qf3", "Nf5", "Bf2",
             ],
         },
         # 2) Jobava Londres — 2.Cc3
@@ -89,7 +93,11 @@ COURSE = {
                 {"san": "Nb5", "role": "trap",
                  "comment": c("La réfutation : Cb5 menace Cc7+ fourchette, et la dame en b2 manque de cases. À éviter côté noir !",
                               "The refutation: Nb5 threatens the Nc7+ fork, and the b2-queen is short of squares. Avoid it as Black!")},
-                "Na6", "Rb1", "Qxa2", "Ra1",
+                "Na6",
+                {"san": "a3", "critical": True,
+                 "comment": c("Le vrai coup : a3 ferme la case a2 AVANT Tb1. Joué dans l'autre ordre, 6.Tb1 Dxa2 et la dame s'échappe.",
+                              "The real move: a3 shuts the a2 square BEFORE Rb1. In the other order, 6.Rb1 Qxa2 and the queen slips away.")},
+                "Nd5", "Rb1", "Qa2", "c4",
             ],
         },
     ],

@@ -2,7 +2,7 @@
 """Attaque est-indienne / KIA (Cf3, g3, Fg2, 0-0, d3, e4) — répertoire BLANC.
 
 Arbre : contre la Française (…e6/…d5), contre …d5, contre la Sicilienne (…c5).
-Lignes vérifiées (Wikipédia + lichess).
+Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -33,7 +33,11 @@ COURSE = {
         {
             "chapter": {"id": "vs-d5", "title": c("Contre …d5", "vs …d5")},
             "moves": [
-                "Nf3", "d5", "g3", "Nf6", "Bg2", "e6", "O-O", "Be7", "d3", "O-O", "Nbd2", "c5", "e4", "Nc6", "Re1", "Qc7", "e5", "Nd7", "Nf1", "b5",
+                "Nf3", "d5", "g3", "Nf6", "Bg2", "e6", "O-O", "Be7", "d3", "O-O", "Nbd2", "c5", "e4", "Nc6", "Re1", "Qc7", "e5", "Nd7",
+                {"san": "Qe2", "critical": True,
+                 "comment": c("Il faut d'abord surdéfendre e5 : 10.Cf1 tout de suite perd le pion sur …Cdxe5 !, la dame c7 appuyant la prise.",
+                              "e5 must be over-defended first: 10.Nf1 at once drops the pawn to …Ndxe5!, backed up by the c7 queen.")},
+                "b5", "Nf1", "a5",
             ],
         },
         {

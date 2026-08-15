@@ -2,7 +2,7 @@
 """Catalane (1.d4 Cf6 2.c4 e6 3.g3) — répertoire BLANC.
 
 Arbre approfondi : Catalane fermée, Catalane ouverte (…dxc4 avec …a6), et la
-reprise immédiate 5.Da4+. Lignes vérifiées (Wikipédia + lichess).
+reprise immédiate 5.Da4+. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

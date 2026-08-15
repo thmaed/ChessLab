@@ -2,7 +2,7 @@
 """Ouverture Ponziani (1.e4 e5 2.Cf3 Cc6 3.c3) — répertoire BLANC.
 
 Une des plus vieilles ouvertures : c3 prépare d4 pour un grand centre. Peu
-jouée, donc piégeuse. Arbre : 3…Cf6 et 3…d5. Lignes vérifiées.
+jouée, donc piégeuse. Arbre : 3…Cf6 et 3…d5. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

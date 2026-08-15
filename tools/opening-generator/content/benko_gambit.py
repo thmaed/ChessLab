@@ -2,7 +2,7 @@
 """Gambit Benko / Volga (1.d4 Cf6 2.c4 c5 3.d5 b5) — répertoire NOIR.
 
 Arbre approfondi : accepté (fianchetto), accepté avec la marche du roi 7.e4,
-refusé 4.Cf3, refusé 4.a4 (Sosonko). Lignes vérifiées (Wikipédia + lichess).
+refusé 4.Cf3, refusé 4.a4 (Sosonko). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

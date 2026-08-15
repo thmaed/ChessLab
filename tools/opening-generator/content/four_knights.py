@@ -2,7 +2,7 @@
 """Partie des Quatre Cavaliers (1.e4 e5 2.Cf3 Cc6 3.Cc3 Cf6) — répertoire BLANC.
 
 Arbre : espagnole des Quatre Cavaliers (4.Fb5, dégommage Metger), écossaise
-des Quatre Cavaliers (4.d4), gambit Halloween (4.Cxe5). Lignes vérifiées.
+des Quatre Cavaliers (4.d4), gambit Halloween (4.Cxe5). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

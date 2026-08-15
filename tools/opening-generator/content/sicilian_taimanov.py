@@ -3,7 +3,7 @@
 
 Souple et solide : …e6 + …Cc6, en gardant …Db6/…Fb4/…a6 en réserve. Arbre :
 5.Cc3 Dc7 (Bastrikov, attaque anglaise), 5.Cb5 d6 (étau Maroczy), 5.Cc3 a6
-classique. Lignes vérifiées (Wikipédia + lichess).
+classique. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

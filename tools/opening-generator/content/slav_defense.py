@@ -2,7 +2,7 @@
 """Slave et semi-slave (1.d4 d5 2.c4 c6) — répertoire BLANC (jouer CONTRE).
 
 Arbre approfondi : Slave pure 4…dxc4 5.a4 Ff5, Slave d'échange, semi-slave
-Meran, et l'anti-Meran / Botvinnik 5.Fg5. Lignes vérifiées (Wikipédia + lichess).
+Meran, et l'anti-Meran / Botvinnik 5.Fg5. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

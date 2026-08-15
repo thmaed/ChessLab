@@ -3,7 +3,7 @@
 
 Arbre approfondi : ligne principale 3.Cxe5 (jusqu'au milieu de jeu symétrique),
 attaque Steinitz 3.d4, attaque Nimzowitsch 5.Cc3, et le piège de l'ordre des
-coups 3…Cxe4?!. Lignes vérifiées (Wikipédia + lichess).
+coups 3…Cxe4?!. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

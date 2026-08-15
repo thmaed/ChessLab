@@ -2,7 +2,7 @@
 """Défense moderne (1.e4 g6 2.d4 Fg7) — répertoire NOIR.
 
 Arbre : Modern de Tiger (…a6 …b5), Autrichienne (f4), système Gurgenidze
-(…c6 …d5). Lignes vérifiées (Wikipédia + lichess).
+(…c6 …d5). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

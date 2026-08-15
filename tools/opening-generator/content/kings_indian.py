@@ -2,7 +2,7 @@
 """Est-indienne (1.d4 Cf6 2.c4 g6 3.Cc3 Fg7) — répertoire NOIR.
 
 Arbre approfondi : Classique / Mar del Plata (course aux ailes), Sämisch 5.f3,
-Fianchetto 5.g3, Quatre Pions 5.f4, Averbakh 5.Fe2+Fg5. Lignes vérifiées.
+Fianchetto 5.g3, Quatre Pions 5.f4, Averbakh 5.Fe2+Fg5. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -51,7 +51,11 @@ COURSE = {
                 {"san": "f3", "eco": "King's Indian Defense: Sämisch Variation",
                  "comment": c("Le Sämisch : centre bétonné, roque long possible. Les Noirs frappent par …e5 ou …c5.",
                               "The Sämisch: a rock-solid centre, long castling in view. Black hits with …e5 or …c5.")},
-                "O-O", "Be3", "e5", "d5", "c6", "Qd2", "cxd5", "cxd5", "Nbd7", "g4", "Nc5", "Nge2", "a5",
+                "O-O", "Be3", "e5", "d5", "c6", "Qd2", "cxd5", "cxd5", "Nbd7", "g4", "Nc5", "Nge2",
+                {"san": "Bxg4", "critical": True,
+                 "comment": c("Le sacrifice de démolition : le pion g4 est le pilier du centre blanc. Après fxg4, …Ccxe4 récupère tout et le roi blanc reste nu.",
+                              "The demolition sacrifice: the g4 pawn props up White's whole centre. After fxg4, …Ncxe4 wins everything back and the white king is left bare.")},
+                "fxg4", "Ncxe4", "Nxe4", "Nxe4",
             ],
         },
         # 3) Fianchetto — 5.g3

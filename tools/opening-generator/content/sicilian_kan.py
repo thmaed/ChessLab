@@ -3,7 +3,7 @@
 
 La plus flexible des siciliennes : …a6 tôt, on retarde …Cc6 et …d6 pour garder
 une structure caméléon. Arbre : 5.Fd3 (principale), 5.c4 (étau Maroczy),
-5.Cc3 b5 (hérisson). Lignes vérifiées (Wikipédia + lichess).
+5.Cc3 b5 (hérisson). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

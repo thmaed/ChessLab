@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Attaque Trompowsky (1.d4 Cf6 2.Fg5) — répertoire BLANC.
 
-Arbre : 2…Ce4, 2…e6, 2…c5, 2…d5. Lignes vérifiées (Wikipédia + lichess).
+Arbre : 2…Ce4, 2…e6, 2…c5, 2…d5. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

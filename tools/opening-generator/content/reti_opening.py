@@ -3,7 +3,7 @@
 
 Une ouverture de flanc hypermoderne : on attaque d5 de loin, souvent avec un
 (double) fianchetto. Arbre : 2…d4 (avance), 2…dxc4 (accepté), 2…c6 (Réti-Slave
-double fianchetto). Lignes vérifiées (Wikipédia + lichess).
+double fianchetto). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

@@ -3,7 +3,7 @@
 
 Le pari …e5 : les Noirs acceptent un trou en d5 pour une activité de pièces
 énorme. Arbre : ligne principale 6.Cdb5 d6 7.Fg5, la variante 7.Cd5, et la
-Kalashnikov (4…e5 sans …Cf6). Lignes vérifiées (Wikipédia + lichess).
+Kalashnikov (4…e5 sans …Cf6). Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

@@ -2,7 +2,7 @@
 """Benoni moderne (1.d4 Cf6 2.c4 c5 3.d5 e6) — répertoire NOIR.
 
 Arbre approfondi : ligne classique (Ce2/Cd2-c4), attaque Taimanov 7.f4 Fb5+,
-fianchetto (g3), et la ligne moderne 7.h3. Lignes vérifiées.
+fianchetto (g3), et la ligne moderne 7.h3. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

@@ -3,7 +3,7 @@
 
 On offre e5 pour un développement rapide et des pièces actives ; le cavalier
 récupère le pion depuis g4 ou e4. Arbre : Rubinstein 3.dxe5 Cg4 4.Cf3, la
-critique 4.Ff4, et la Fajarowicz 3…Ce4. Lignes vérifiées (Wikipédia + lichess).
+critique 4.Ff4, et la Fajarowicz 3…Ce4. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

@@ -3,7 +3,7 @@
 
 Le « petit centre » …e6/…d6 : élastique et solide, prêt à se détendre par …d5
 ou …e5. Arbre : Classique 6.Fe2, attaque Keres 6.g4, et 6.f4 (roques opposés).
-Lignes vérifiées (Wikipédia + lichess).
+Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -52,7 +52,11 @@ COURSE = {
                 "e4", "c5", "Nf3", "e6", "d4", "cxd4", "Nxd4", "Nf6", "Nc3", "d6",
                 {"san": "f4", "comment": c("Le centre e4+f4 vise e5 et f5 ; suivi de Df3 et 0-0-0, c'est la course aux ailes.",
                                            "The e4+f4 centre eyes e5 and f5; with Qf3 and 0-0-0 it becomes a race on the wings.")},
-                "Nc6", "Be3", "Be7", "Qf3", "O-O", "O-O-O", "Nxd4", "Bxd4", "b5",
+                "Nc6", "Be3", "Be7", "Qf3", "O-O", "O-O-O", "Nxd4", "Bxd4",
+                {"san": "Qa5", "critical": True,
+                 "comment": c("La dame sort AVANT …b5 : la poussée immédiate perd la tour a8 après Fxf6 gxf6 puis e5.",
+                              "The queen comes out BEFORE …b5: the immediate push drops the a8 rook to Bxf6 gxf6 and e5.")},
+                "e5", "dxe5", "Bxe5", "Nd7",
             ],
         },
     ],

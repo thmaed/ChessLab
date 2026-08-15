@@ -2,7 +2,7 @@
 """Ouverture Bird (1.f4) — répertoire BLANC.
 
 Arbre : classique (hollandaise inversée, attaque Fe1-h4), gambit From 1…e5,
-et l'installation solide contre …e6. Lignes vérifiées.
+et l'installation solide contre …e6. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

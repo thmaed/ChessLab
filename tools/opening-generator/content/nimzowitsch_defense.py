@@ -2,7 +2,7 @@
 """Défense Nimzowitsch (1.e4 Cc6) — NOIR.
 
 Provocante et hypermoderne : …Cc6 dès le 1er coup, on invite d4-d5 pour attaquer
-le centre à revers. Arbre : 2.d4 d5 3.Cc3 et 2.d4 d5 3.e5. Lignes vérifiées.
+le centre à revers. Arbre : 2.d4 d5 3.Cc3 et 2.d4 d5 3.e5. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

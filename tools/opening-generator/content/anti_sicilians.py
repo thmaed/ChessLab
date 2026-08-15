@@ -3,7 +3,7 @@
 
 Ce que le joueur de club affronte VRAIMENT face à la sicilienne : Alapin
 (2…d5 et 2…Cf6), Rossolimo (…g6 et …e6), Moscou (…Fd7 et …Cd7), Grand Prix,
-gambit Smith-Morra, sicilienne fermée, gambit de l'aile. Lignes vérifiées.
+gambit Smith-Morra, sicilienne fermée, gambit de l'aile. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
@@ -118,7 +118,11 @@ COURSE = {
                 "e6", "O-O", "a6",
                 {"san": "Qe2", "comment": c("Contre la pression sur e5/d5, la formation …a6, …Cf6, …Fe7, …0-0 tient bon.",
                                             "Against the pressure on e5/d5, the …a6, …Nf6, …Be7, …0-0 formation holds firm.")},
-                "Nf6", "Rd1", "Be7",
+                "Nf6", "Rd1",
+                {"san": "Qc7", "critical": True,
+                 "comment": c("La dame AVANT le fou : …Fe7 tout de suite laisse e5 ! et les Blancs récupèrent tout avec intérêt.",
+                              "The queen BEFORE the bishop: …Be7 at once allows e5! and White gets everything back with interest.")},
+                "Bf4", "Be7", "Rac1", "O-O",
             ],
         },
         # 8) Attaque Grand Prix — 4…Fg7 5.Fb5

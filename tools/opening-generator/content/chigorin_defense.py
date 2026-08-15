@@ -3,7 +3,7 @@
 
 Combative et anti-positionnelle : …Cc6 met la pression sur d4 et prépare …e5,
 au prix d'un jeu de pièces plutôt que de pions. Arbre : 3.Cc3, 3.cxd5, 3.Cf3.
-Lignes vérifiées (Wikipédia + lichess).
+Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

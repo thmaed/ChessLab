@@ -3,7 +3,7 @@
 
 Arbre approfondi : Attaque anglaise 6.Fe3 (contre …e5 et …e6), ligne principale
 6.Fg5 (6…Fe7 et le Pion empoisonné 6…Db6), Classique 6.Fe2, Fischer-Sozin
-6.Fc4, Fianchetto 6.g3, Adams 6.h3. Lignes vérifiées (Wikipédia + lichess).
+6.Fc4, Fianchetto 6.g3, Adams 6.h3. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

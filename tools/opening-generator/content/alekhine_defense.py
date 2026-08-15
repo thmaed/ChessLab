@@ -2,7 +2,7 @@
 """Défense Alekhine (1.e4 Cf6) — répertoire NOIR.
 
 Arbre approfondi : Moderne 4.Cf3 (4…Fg4 et 4…g6), Attaque des Quatre Pions,
-Échange, variante de chasse 4.c5. Lignes vérifiées (Wikipédia + lichess).
+Échange, variante de chasse 4.c5. Lignes passées à l'audit moteur (`audit.py`).
 """
 
 

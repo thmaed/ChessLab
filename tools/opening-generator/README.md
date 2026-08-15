@@ -14,6 +14,53 @@ cd tools/opening-generator
 python3 -m pip install -r requirements.txt   # python-chess, requests
 ```
 
+## Deux chaînes, et une seule alimente l'app
+
+C'est la source de confusion à connaître avant de toucher quoi que ce soit :
+
+| chaîne | entrée | sortie | réseau |
+|---|---|---|---|
+| **`author.py`** | `content/<ouverture>.py`, écrit à la main | `ChessLab/Resources/openings/` — **ce que l'app embarque** | aucun |
+| `generate.py` | API Lichess Explorer | `out/openings/` — jamais copié tel quel | oui |
+
+Les 58 cours embarqués sortent **tous** de `author.py`, donc de variantes
+tapées à la main. `generate.py` (exploration statistique, branchement,
+transpositions) reste inutilisé pour la production : d'où des cours en
+arborescence quasi linéaire, sans les défenses alternatives réelles.
+
+```bash
+python3 author.py                       # (ré)écrit les 58 cours embarqués
+python3 author.py --only scandinavian
+```
+
+## L'audit moteur est OBLIGATOIRE après toute modification de contenu
+
+`validate.py` ne contrôle que l'intégrité du graphe : un coup peut être
+parfaitement légal et parfaitement stupide. Des gaffes sont passées comme ça
+jusqu'aux testeurs (…Cd5 qui perd une pièce dans le Blackmar-Diemer, …Db4 qui
+laisse une tour gratuite dans l'Englund). `audit.py` rejoue chaque arête sous
+Stockfish et refuse celles qui perdent :
+
+```bash
+python3 author.py && python3 audit.py --stockfish "$(which stockfish)"
+```
+
+Deux niveaux, parce que les deux fautes n'ont pas la même gravité :
+
+- **erreur (sortie ≠ 0)** — un coup de NOTRE répertoire qui perd ≥ 1,50, ou une
+  fin de chapitre qui perd : dans les deux cas on enseigne une faute, ou on
+  laisse la variante s'achever sur une gaffe inexpliquée.
+- **avertissement** — un coup de l'ADVERSAIRE en milieu de ligne qui n'est pas
+  le meilleur : on ne ment pas, mais on ne couvre pas sa meilleure défense.
+  Lacune de couverture, à combler en approfondissant (`--strict` pour bloquer
+  là-dessus aussi).
+
+Un mauvais coup VOLONTAIRE — le piège qu'on veut montrer — s'annote
+`"role": "trap"` ou `"inaccuracy"` dans le contenu : l'app l'affiche alors avec
+sa pastille et l'audit le laisse passer. Les gambits nommés, que le moteur
+condamnera toujours, sont listés dans `WAIVERS` en tête d'`audit.py`, avec leur
+raison écrite.
+
 ## Utilisation
 
 ```bash

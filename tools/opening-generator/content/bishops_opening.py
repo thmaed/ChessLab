@@ -2,7 +2,7 @@
 """Partie du Fou (1.e4 e5 2.Fc4) — répertoire BLANC.
 
 Arbre : 2…Cf6 (avec d3), 2…Fc5 (c3+d4), et le gambit Urusov 2…Cf6 3.d4.
-Lignes vérifiées (Wikipédia + lichess).
+Lignes passées à l'audit moteur (`audit.py`).
 """
 
 
