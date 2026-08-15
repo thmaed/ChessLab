@@ -5040,6 +5040,150 @@ sondes ne sont pas d'accord, et c'est la première qu'il faudra croire. À trait
 séparément — ce n'est ni un problème de taille de texte, ni un des quatre points
 de la liste.
 
+## Retour testeur externe (Nils, ~1800 Elo, iPhone 11) — 2026-08-15
+
+Premier retour d'un joueur classé sur une version installée. Quatre points, dont
+un qui met en cause la crédibilité de tout un mode.
+
+### 1. « Cette base de données d'ouvertures semble douteuse » — LE point dur
+
+Il envoie deux captures : Blackmar-Diemer, dernier coup de la variante
+**…Cd5 qui perd une pièce** ; gambit Englund, **…Db4 qui laisse une tour
+gratuite en a1** (…Dxa1+ gagnait). Il a raison sur les deux.
+
+**Cause.** `validate.py` ne vérifiait que l'intégrité du graphe — légalité,
+clés FEN, arêtes non orphelines. Rien ne vérifiait la QUALITÉ ÉCHIQUÉENNE. Un
+coup absurde mais légal passait, et les docstrings de 52 fichiers de contenu
+affirmaient « Lignes vérifiées » sans que rien ne l'ait jamais vérifié.
+
+**Constat de l'audit** (Stockfish 17, prof. 18 en balayage, 24 en contre-mesure,
+3 067 arêtes) : **32 coups perdant ≥ 1,50**, dont 10 en FIN de chapitre. Le
+défaut se concentrait là — une variante s'achevait sur une gaffe, ce qui est
+exactement ce qu'un lecteur remarque en premier.
+
+**Corrigé — 15 lignes réécrites**, chaque remplacement calculé coup par coup au
+moteur :
+
+| ouverture | avant | après |
+|---|---|---|
+| englund-gambit | 8…Db4 (−2,12) | **8…Dxa1+** (+5,67), puis Cd1 Dxa2 |
+| englund-gambit | 5…Dxb2 (−2,20) | **5…Dxf4**, jusqu'à Cxa8 (cavalier enfermé) |
+| blackmar-diemer | 10…Cd5 (−4,35) | **10…e6**, Ce5 Ff5 Cxc6 bxc6 |
+| scandinavian | 5…Cxd5 (−4,72) | **5…Fg4 !** d'abord — le fou d7 bouchait la colonne d |
+| caro-kann (Fantaisie) | 7…e5 (−1,33) | **7…Dh4+ !** Re2 Dxe4+ Rf2 Dh4+ |
+| anti-sicilians (Smith-Morra) | 9…Fe7 (−2,24) | **9…Dc7** avant le fou (sinon e5 !) |
+| kings-indian (Sämisch) | 11…a5 (−1,72) | **11…Fxg4 !** sacrifice de démolition |
+| bogo-indian | 7…Cbd7 (−2,19) | **7…Fd7**, sans lâcher le fou b4 |
+| colle (Koltanowski) | 11.De2 (−1,80) | **11.Fxh7+ !** le sacrifice grec, raison d'être du système |
+| colle (Zukertort) | 9.Cd2 (−1,60 après …b6) | **9.f4 avant Cd2** — l'autre ordre perd d4 |
+| london (principale) | 10…Ce4 (−1,52) | **10…Ce7** vers f5 |
+| london (piège Cb5) | 6.Tb1 (+0,21) | **6.a3 !** (+3,10) ferme a2 avant Tb1 |
+| kings-indian-attack | 10.Cf1 (perd e5) | **10.De2** d'abord, puis Cf1 |
+| sicilian-classical | 10…Cge5 (−0,06) | **10…Fxd4 !** (+1,57) |
+| sicilian-scheveningen | 10…b5 (−3,51) | **10…Da5** — …b5 perdait la tour a8 |
+
+Et 4 coups adverses volontairement perdants, qui étaient présentés comme
+normaux, portent désormais `role: "trap"` — l'app les affiche avec la pastille
+« Piège » (Englund 6.Fc3, Albin 6.Fxb4 du piège de Lasker, Stafford 6.Cc3,
+Levenfish …Cd5). Le commentaire du Stafford affirmait même que 6.Cc3 était
+« la bonne défense » : c'est faux, seul 6.Fe2 tient, et c'est dit maintenant.
+
+**Garde-fou permanent : `tools/opening-generator/audit.py`.** Rejoue chaque
+arête sous Stockfish et sort en erreur si un coup perd ≥ 1,50 sans annotation.
+Deux niveaux, parce que les deux fautes ne se valent pas :
+- **erreur (bloquant)** — coup de NOTRE répertoire qui perd, ou fin de chapitre
+  qui perd : on enseigne une faute, ou on laisse la variante finir sur une
+  gaffe. C'est le défaut remonté par le testeur, et il ne peut plus passer.
+- **avertissement** — coup de l'ADVERSAIRE en milieu de ligne qui n'est pas le
+  meilleur : on ne ment à personne, mais on ne couvre pas sa meilleure défense.
+  Lacune de couverture, pas mensonge. `--strict` bloque aussi là-dessus.
+
+À enchaîner systématiquement : `python3 author.py && python3 audit.py
+--stockfish "$(which stockfish)"`. Documenté dans le README du générateur.
+
+Le garde-fou a d'ailleurs trouvé une 15e gaffe que mon premier balayage avait
+manquée (Scheveningen …b5, qui perd la tour a8) : la contre-mesure à profondeur
+24, faite DEPUIS LA MÊME POSITION via `root_moves`, voit ce que la comparaison
+parent/enfant à profondeur 18 laissait passer. C'est la raison d'être des deux
+passes.
+
+**État final : `audit.py` sort 0 — aucune gaffe enseignée sur les 58 cours**,
+et 7 lacunes de couverture répertoriées en avertissement (Londres …Ca6,
+Blackmar …h6, Stafford dxe4, Est-indienne Cge2, Letton Cc4, Englund Cc3,
+Colle …Cd7 — à chaque fois l'adversaire a une meilleure défense que celle
+couverte). Elles ne mentent à personne : elles disent où approfondir.
+
+### 2. « L'architecture est très bonne mais le contenu est plutôt mauvais »
+
+Mesuré, et il a encore raison : les 58 cours totalisent **3 123 positions pour
+3 067 arêtes** — soit des arbres quasi LINÉAIRES (une arête par position). La
+Scandinave a 79 positions ; il dit connaître « 10× plus de coups théoriques que
+ceux montrés, rien que de tête », et avoir un livre de 300 pages sur cette seule
+ouverture.
+
+**Cause structurelle trouvée** : `generate.py`, la chaîne qui interroge
+l'Explorer Lichess et construit un vrai graphe branchu avec transpositions,
+**n'a jamais servi à la production** (son cache `.cache/explorer` est vide, son
+`out/` ne contient que des stubs de 3 à 6 positions). Les 58 cours embarqués
+sortent tous d'`author.py`, c'est-à-dire de variantes tapées à la main. Les deux
+chaînes sont maintenant décrites côte à côte dans le README, parce que rien ne
+le disait et que c'est la clé du sujet.
+
+C'est la piste d'approfondissement : lancer `generate.py` par-dessus les lignes
+écrites à la main donnerait les défenses alternatives réelles — et l'audit
+ci-dessus devient alors indispensable, puisque les branches à faible fréquence
+d'une base 1400-1800 contiennent forcément des mauvais coups.
+
+### 3. Trois essais par puzzle — corrigé
+
+« Le but d'un puzzle c'est de réfléchir jusqu'à ce qu'on ait calculé la variante
+jusqu'au bout, pas de tenter un coup sans trop savoir pourquoi. » Argument
+juste. **Un seul essai par défaut** ; les trois essais restent disponibles dans
+Réglages → Puzzles pour qui préfère chercher en tâtonnant. L'indicateur affiche
+« UN SEUL ESSAI » plutôt qu'un compteur à un cran.
+
+### 4. Le lecteur d'ouvertures oblige à faire défiler — corrigé
+
+« Quand il y a beaucoup de coups, les derniers apparaissent bas, il faut
+scroller et on ne voit plus l'échiquier. » Le plateau était DANS le
+`ScrollView` : dès qu'une position offrait plusieurs variantes, lire la liste
+sortait la position de l'écran — alors qu'on lit les coups en REGARDANT la
+position. Le plateau est désormais **ancré**, seul le panneau texte défile, et
+il est plafonné à la moitié de la hauteur utile. Bonus : disposition paysage
+(plateau à gauche, lecture à droite) pour l'iPad.
+
+### 5. L'abandon du moteur — rien à faire
+
+« Très curieuse » se lit ici comme « intrigante » : il enchaîne sur l'intérêt de
+voir quand l'ordinateur se considère perdu. Le comportement est déjà
+désactivable (Nouvelle partie → « L'ordinateur peut abandonner s'il est
+perdu »), seuil à −8,00 sur trois coups consécutifs. Aucun changement.
+
+### 6. Répertoires écrits par l'utilisateur, et partagés — non fait, gros morceau
+
+Sa proposition : que chacun saisisse SES ouvertures dans l'app et les mémorise
+avec le moteur FSRS existant, puis puisse les partager. C'est la bonne réponse
+au point 2 — et c'est un chantier entier (éditeur d'arbre, import PGN, stockage,
+puis un dos serveur ou un format d'échange de fichier pour le partage), pas une
+finition. Reporté sciemment, inscrit ci-dessous.
+
+### Vérifié
+
+- `audit.py` **vert** : 0 gaffe enseignée, 58 cours, 3 107 arêtes, seuil 1,50.
+- `xcodebuild build` propre ; `xcodebuild test` (`ChessLabTests`) vert sur
+  simulateur iPhone 17.
+- Stockfish 17 compilé depuis `Vendor/CStockfish` pour l'audit (le paquet Swift
+  n'expose pas de binaire ; il suffit de rétablir `main.cpp` depuis `_main.cpp`,
+  que le Makefile amont attend et que la vendorisation avait renommé).
+- **Non vérifié à la capture** : les deux corrections d'interface (plateau ancré,
+  essai unique) compilent et passent les tests, mais n'ont pas été relues sur un
+  iPhone 11 — aucun simulateur de ce modèle n'est installé ici (famille 17 et
+  SE 3 uniquement).
+- Les trois captures « plateau coupé sur les bords » du testeur sont des
+  **recadrages** : en mode Jouer et Analyser le plateau est volontairement de
+  bord à bord (`padding(.horizontal, -12)` qui annule la marge du conteneur),
+  donc exactement large comme l'écran. Rien à corriger.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-15)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque
@@ -5084,6 +5228,27 @@ Point d'attention : `LayoutOverflowUITests.testNoOverflowOnHomeScreen` passe
 malgré tout, parce que `LayoutProbe` ne parcourt pas les mêmes types
 d'éléments. **Les deux sondes ne sont pas d'accord**, et c'est celle du
 balayage Dynamic Type qu'il faut croire — la corriger fait partie du travail.
+
+### 7 bis. Répertoires d'ouvertures écrits par l'utilisateur — NOUVEAU (15/08)
+
+Demandé par le testeur externe (voir plus haut, point 6), et c'est la seule
+réponse qui passe à l'échelle sur la profondeur du contenu : 58 cours écrits à
+la main ne rattraperont jamais un livre de 300 pages sur la seule Scandinave.
+
+Découpage naturel, du plus utile au plus coûteux :
+1. **Import PGN** d'un répertoire dans le graphe FEN existant — le moteur FSRS,
+   les transpositions et l'entraînement fonctionnent déjà, il n'y a que
+   l'alimentation à ouvrir. C'est 80 % de la valeur.
+2. **Éditeur d'arbre** dans l'app (ajouter/supprimer une variante, commenter).
+3. **Partage** : export/import d'un fichier de cours (aucun serveur, ça tient
+   dans une pièce jointe) avant d'envisager quoi que ce soit de centralisé.
+
+### 7 ter. Approfondir les cours livrés via `generate.py` — NOUVEAU (15/08)
+
+Les 58 cours sont des arbres quasi linéaires (3 123 positions, 3 067 arêtes).
+La chaîne Explorer Lichess existe et n'a jamais servi. À enchaîner
+obligatoirement avec `audit.py`, dont les avertissements listent déjà les
+positions où l'adversaire a une meilleure défense que celle couverte.
 
 ### 8. Chantier I, niveau 3 — l'explication POSITIONNELLE
 

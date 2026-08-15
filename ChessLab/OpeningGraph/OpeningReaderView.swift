@@ -12,32 +12,17 @@ struct OpeningReaderView: View {
     private var boardTheme: BoardTheme { appSettings.boardTheme }
 
     var body: some View {
-        VStack(spacing: 0) {
-            ScrollView {
-                VStack(spacing: 14) {
-                    board
-                        .aspectRatio(1, contentMode: .fit)
-                        // Plafond de côté (Lot 4.4). Un carré dans un
-                        // `ScrollView` VERTICAL ne se résout que contre la
-                        // largeur — la hauteur y est illimitée. Sur la colonne
-                        // de détail d'un iPad, le plateau atteignait ~1 014 pt
-                        // dans un viewport d'environ 870 : le fil de coups, la
-                        // carte d'explication et la liste démarraient SOUS LE
-                        // PLI, alors que l'explication est la raison d'être de
-                        // cet écran. Le plafond garde le plateau confortable
-                        // sur iPhone (où la largeur reste inférieure) tout en
-                        // laissant le contenu visible sur grand écran.
-                        .frame(maxWidth: 520)
-                        .frame(maxWidth: .infinity)
-                        .padding(.horizontal, 16)
-                    if !viewModel.playedSANs.isEmpty { moveTrail }
-                    explanationCard
-                    movesSection
-                    Spacer(minLength: 8)
-                }
-                .padding(.vertical, 12)
+        // Le plateau est ANCRÉ, seul le texte défile. Auparavant tout était
+        // dans un même `ScrollView` : dès qu'une position offrait plusieurs
+        // variantes, la liste passait sous le pli et il fallait faire défiler
+        // — ce qui sortait l'échiquier de l'écran, alors qu'on lit justement
+        // les coups EN REGARDANT la position (retour testeur, 15/08).
+        GeometryReader { geo in
+            if geo.size.width > geo.size.height * 1.1 {
+                wideLayout(size: geo.size)
+            } else {
+                tallLayout(size: geo.size)
             }
-            controlBar
         }
         .appBackground()
         .navigationTitle(LocalizedStringKey(viewModel.course.name))
@@ -49,6 +34,53 @@ struct OpeningReaderView: View {
                 Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
                     .tint(Theme.accent)
             }
+        }
+    }
+
+    // MARK: Dispositions
+
+    /// Portrait : plateau ancré en haut, panneau défilant en dessous, barre de
+    /// transport en bas. Le plateau ne prend jamais plus de la moitié de la
+    /// hauteur utile, sinon il ne resterait rien pour le coup à venir.
+    private func tallLayout(size: CGSize) -> some View {
+        let side = min(size.width - 32, size.height * 0.5, 520)
+        return VStack(spacing: 0) {
+            board
+                .frame(width: side, height: side)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 8)
+            scrollingPanel
+            controlBar
+        }
+    }
+
+    /// Paysage (iPad, ou iPhone couché) : plateau à gauche, lecture à droite.
+    /// Un plateau plafonné à la hauteur laisserait sinon la moitié de l'écran
+    /// vide à côté.
+    private func wideLayout(size: CGSize) -> some View {
+        let side = min(size.height - 24, size.width * 0.5, 560)
+        return HStack(spacing: 0) {
+            board
+                .frame(width: side, height: side)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack(spacing: 0) {
+                scrollingPanel
+                controlBar
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    /// La partie qui défile : fil des coups, explication, coups jouables.
+    private var scrollingPanel: some View {
+        ScrollView {
+            VStack(spacing: 14) {
+                if !viewModel.playedSANs.isEmpty { moveTrail }
+                explanationCard
+                movesSection
+                Spacer(minLength: 8)
+            }
+            .padding(.vertical, 12)
         }
     }
 
