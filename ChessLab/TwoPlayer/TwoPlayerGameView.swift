@@ -290,7 +290,10 @@ struct TwoPlayerGameView: View {
                 Image(systemName: systemImage)
                 Text(label)
             }
-            .font(.system(size: 15, weight: .medium))
+            // Un libellé de bouton se LIT : il doit suivre Dynamic Type. La
+            // capsule qui l'entoure n'a pas de hauteur figée (des marges, pas
+            // un `frame`), donc elle grandit avec lui — pas de plafond ici.
+            .scaledSystemFont(size: 15, relativeTo: .subheadline, weight: .medium)
             .foregroundStyle(disabled ? Theme.textTertiary : tint)
             .padding(.horizontal, 16)
             .padding(.vertical, 10)

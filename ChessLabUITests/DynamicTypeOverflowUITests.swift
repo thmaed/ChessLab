@@ -64,6 +64,10 @@ final class DynamicTypeOverflowUITests: XCTestCase {
             ("Puzzles", "puzzles"),
             ("Analyser", "analyser"),
             ("Laboratoire", "laboratoire"),
+            // Ajouté le 15/08 : c'est le seul écran qui affiche un nombre en
+            // TRÈS grand (le taux de réussite, 40 pt). Depuis qu'il suit
+            // Dynamic Type, il doit être balayé comme les autres.
+            ("Progression", "progression"),
         ] {
             guard tapEntry(app, label: label) else {
                 print("OVERFLOW|\(device)|\(tag)|\(screen)|ÉCRAN INATTEIGNABLE")

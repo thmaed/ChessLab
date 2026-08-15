@@ -80,16 +80,30 @@ struct GameSummaryView: View {
                     .lineLimit(1)
             }
 
+            // Le chiffre suit Dynamic Type comme le « % » qui le suit : il
+            // était figé à 40 pt à côté d'un `.headline` qui, lui, grossissait
+            // — la moitié de la même ligne bougeait, l'autre non. Plafonné à
+            // 1,5× : à AX5 un 40 pt sans bride donnerait un 100 pt qui
+            // chasserait le reste de la carte.
             if let accuracy = side.accuracy {
-                Text("\(Int(accuracy.rounded()))")
-                    .font(.system(size: 40, weight: .heavy, design: .rounded).monospacedDigit())
-                    .foregroundStyle(Theme.textPrimary)
-                    + Text(" %")
-                    .font(.headline.weight(.bold))
-                    .foregroundStyle(Theme.textSecondary)
+                (
+                    Text("\(Int(accuracy.rounded()))")
+                        .foregroundStyle(Theme.textPrimary)
+                        + Text(" %")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(Theme.textSecondary)
+                )
+                .scaledSystemFont(
+                    size: 40, relativeTo: .largeTitle,
+                    weight: .heavy, design: .rounded, maximumScale: 1.5
+                )
+                .monospacedDigit()
             } else {
                 Text(verbatim: "—")
-                    .font(.system(size: 40, weight: .heavy, design: .rounded))
+                    .scaledSystemFont(
+                        size: 40, relativeTo: .largeTitle,
+                        weight: .heavy, design: .rounded, maximumScale: 1.5
+                    )
                     .foregroundStyle(Theme.textTertiary)
             }
 

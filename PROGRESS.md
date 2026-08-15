@@ -4970,6 +4970,76 @@ vérifié rouge-avant/vert-après pour de bon.
 les deux, la mesure étant imprimée (`FEUILLE|…`) même quand le test passe. Le
 test se saute proprement sur iPhone, où la form sheet n'existe pas.
 
+## Dynamic Type : le décompte de 29 était un faux chiffre (2026-08-15)
+
+Point 4 de la liste, qui annonçait « 29 `.font(.system(size:))` qui ne scalent
+pas du tout ». Le chiffre est exact, sa lecture ne l'était pas : **la très
+grande majorité de ces 29 sites ne DOIT pas scaler.**
+
+### Ce que le décompte mélangeait
+
+En les regardant un par un, ils se rangent en trois familles :
+
+1. **Des SF Symbols dans un cadre de contrôle fixe** — `Image(systemName:)` à
+   15 pt dans un `.frame(width: 44, height: 44)`, à 17 pt dans un cercle de
+   46 pt, à 11 pt dans un carré de 22 pt. C'est le gros du lot. Un glyphe est
+   dimensionné pour SON contrôle : le faire grossir dans un cadre qui ne bouge
+   pas ne l'agrandit pas, ça le rogne. Les figer est la pratique correcte.
+2. **Des tailles dérivées de la géométrie du plateau** — `squareSize * 0,2`
+   pour les coordonnées, `side * 0,5` dans l'éditeur, `size * 0,42` pour les
+   pastilles de qualité. Ce n'est pas de la typographie, c'est du dessin : ces
+   tailles doivent suivre le plateau, jamais le réglage de texte.
+3. **Du vrai texte que l'utilisateur lit** — et il n'y en a que **quatre**.
+
+### Les quatre, et pourquoi ce sont les bons
+
+Le symptôme décrit — « dans une même rangée, une moitié du texte grandit et
+l'autre non » — se lisait littéralement dans deux d'entre eux :
+
+- `GameSummaryView` : `Text("87")` figé à 40 pt **concaténé** avec `Text(" %")`
+  en `.headline`, qui scale. À AX5, le « % » rattrapait le nombre ;
+- `HomeView` : le nom « ChessLab » figé à 32 pt, juste au-dessus d'un
+  `.subheadline` qui grossissait — à AX5 le sous-titre rattrapait le titre ;
+- `ProgressionView` : le taux de réussite, 40 pt figés ;
+- `TwoPlayerGameView` : le libellé d'un bouton, 15 pt figés — un libellé se lit,
+  et sa capsule n'a pas de hauteur figée (des marges, pas un `frame`), donc
+  elle grandit avec lui.
+
+### Le mécanisme
+
+`Font.system(size:)` ne scale pas, et la seule voie officielle est
+`@ScaledMetric`, qui ne s'utilise que dans une vue. D'où `ScaledSystemFont`, un
+modificateur qui le porte : le point d'appel reste une ligne. Sa documentation
+énonce ce qu'il ne faut **pas** y passer — les deux familles ci-dessus — pour
+que le prochain lecteur ne refasse pas la lecture hâtive du décompte.
+
+Les trois chiffres affichés en très grand sont **plafonnés** (1,4× pour le nom,
+1,5× pour les nombres) : à AX5, un 40 pt sans bride donnerait un 100 pt qui
+chasserait le reste de la carte. Le plafond garde la réponse à Dynamic Type —
+le chiffre grossit bel et bien — sans faire exploser la mise en page.
+
+### Vérifié
+
+- Balayage `DynamicTypeOverflowUITests` à L, AX3 et AX5 : **aucun débordement
+  nouveau**, sur aucun écran.
+- L'écran **Progression a été ajouté au balayage** : c'est le seul qui affiche
+  un nombre en très grand, il devait être couvert dès lors qu'il scale.
+  `progression|aucun` à AX5.
+- **Suite unitaire : 497 tests, 80 suites, 0 échec.**
+
+### Trouvé au passage, NON corrigé
+
+Le balayage signale un débordement de **10,7 pt** sur la tuile « Deux joueurs »
+de l'accueil (`x=[208,0…412,7]` pour une fenêtre de 402 pt sur iPhone 17). Il
+est présent **à toutes les tailles de texte, y compris la taille L par défaut**,
+donc étranger à Dynamic Type — et antérieur à ce chantier.
+
+À noter : `LayoutOverflowUITests.testNoOverflowOnHomeScreen` passe malgré tout,
+parce que `LayoutProbe` ne parcourt pas les mêmes types d'éléments. Les deux
+sondes ne sont pas d'accord, et c'est la première qu'il faudra croire. À traiter
+séparément — ce n'est ni un problème de taille de texte, ni un des quatre points
+de la liste.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-14)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque

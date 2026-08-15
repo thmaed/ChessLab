@@ -847,7 +847,14 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 2) {
                 (Text(verbatim: "Chess").foregroundStyle(Theme.textPrimary)
                     + Text(verbatim: "Lab").foregroundStyle(Theme.accentGradient))
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    // Le nom était figé à 32 pt juste au-dessus d'un
+                    // `.subheadline` qui, lui, grossissait : à AX5 le
+                    // sous-titre rattrapait le titre. Plafonné à 1,4× — un
+                    // en-tête d'accueil doit rester un en-tête.
+                    .scaledSystemFont(
+                        size: 32, relativeTo: .largeTitle,
+                        weight: .bold, design: .rounded, maximumScale: 1.4
+                    )
                     .kerning(0.2)
                     .accessibilityLabel(Text(verbatim: "ChessLab"))
 

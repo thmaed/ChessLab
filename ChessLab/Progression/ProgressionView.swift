@@ -108,7 +108,13 @@ struct ProgressionView: View {
 
             HStack(alignment: .firstTextBaseline) {
                 Text(summary.puzzleSuccessRate.map { "\(Int(($0 * 100).rounded())) %" } ?? "—")
-                    .font(.system(size: 40, weight: .bold).monospacedDigit())
+                    // Même bride que le chiffre de précision du bilan de
+                    // partie : il suit Dynamic Type, plafonné à 1,5×.
+                    .scaledSystemFont(
+                        size: 40, relativeTo: .largeTitle,
+                        weight: .bold, maximumScale: 1.5
+                    )
+                    .monospacedDigit()
                     .foregroundStyle(Theme.violet)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("de réussite")
