@@ -1,8 +1,90 @@
 # Métadonnées App Store Connect — ChessLab
 
+**Version courante : 1.3.0** (build 5). Voir `RELEASE_NOTES-1.3.0.md` pour le
+détail complet des changements depuis la 1.2.
+
 Tout ce qui suit est à copier-coller directement dans les champs
 correspondants d'App Store Connect. Les limites de caractères d'Apple sont
 respectées (vérifiées).
+
+> **Pour une mise à jour**, seuls trois champs demandent une action : le champ
+> **Nouveautés de cette version** (ci-dessous, obligatoire), le **texte
+> promotionnel** si vous voulez le rafraîchir, et le numéro de build. Nom,
+> sous-titre, mots-clés, description et catégories restent valables tels quels :
+> la 1.3 ne change aucun mode ni aucune fonctionnalité annoncée.
+
+---
+
+## Nouveautés de cette version — 1.3 (4000 car. max)
+
+C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur
+final : ce qu'il va sentir, pas ce qui a été refactorisé.
+
+### Français (1 471 car. — limite 4 000)
+
+```
+L'ÉCHIQUIER RÉPOND ENFIN AU DOIGT
+Relâcher une pièce un peu à côté de la case visée joue quand même le coup,
+comme sur les grands sites d'échecs. La case visée s'allume pendant que vous
+glissez, les points des coups possibles suivent la pièce que vous tenez, et
+la pièce se soulève au lieu de rester cachée sous le doigt. Le clic-clic
+bénéficie de la même tolérance. Renoncer reste gratuit : relâcher sur la case
+de départ n'annule rien d'autre que le geste.
+
+ANALYSE PLUS JUSTE
+Le score de précision ne se laisse plus gonfler par les coups de fin de
+partie joués dans une position déjà gagnée : chaque coup compte désormais
+selon ce qui était réellement en jeu. Une analyse quittée trop vite pouvait
+rester bloquée sur « Moteur en attente », sans courbe ni coups classés — elle
+reprend maintenant toute seule, là où elle s'était arrêtée.
+
+JOUER
+Contrôles réunis en une seule rangée. L'alerte « coup risqué » raisonne en
+probabilité de gain au lieu d'un seuil brut : elle prévient quand la partie
+bascule vraiment, et se tait quand elle est déjà jouée. La pendule décompte
+dès le premier coup.
+
+MISE EN PAGE
+iPhone verrouillé en portrait, où l'échiquier reste grand. Plus aucun
+débordement horizontal, y compris en taille de texte maximale. Sur iPad, une
+partie en cours survit au passage en Split View.
+
+CORRECTIONS
+Import PGN depuis le web, position de départ conservée à l'export, traductions
+anglaises complétées, et deux écrans ne peuvent plus se disputer le moteur.
+```
+
+### English (1 326 char. — 4,000 limit)
+
+```
+THE BOARD FINALLY ANSWERS YOUR FINGER
+Releasing a piece slightly off the intended square still plays the move, the
+way the major chess sites do. The target square lights up while you drag, the
+legal move dots follow the piece you are holding, and the piece lifts instead
+of hiding under your finger. Tap-to-move gets the same tolerance. Backing out
+stays free: releasing on the starting square cancels nothing but the gesture.
+
+FAIRER ANALYSIS
+The accuracy score is no longer inflated by endgame moves played in an
+already-won position: every move now counts for what was actually at stake.
+An analysis left too quickly could stay stuck on "Engine idle" with no graph
+and no classified moves — it now resumes on its own, right where it stopped.
+
+PLAY
+Controls merged into a single row. The "risky move" warning now reasons in win
+probability instead of a raw threshold: it speaks up when the game really
+turns, and stays quiet once it is decided. The clock counts from the first
+move.
+
+LAYOUT
+iPhone locked to portrait, where the board stays large. No horizontal overflow
+left, even at the largest text size. On iPad, a game in progress survives
+switching to Split View.
+
+FIXES
+PGN import from the web, starting position preserved on export, English
+translations completed, and two screens can no longer fight over the engine.
+```
 
 ---
 
@@ -249,11 +331,48 @@ Réponses déduites du code (vérifié, pas deviné) :
 - **Captions** : non applicable, pas de contenu audio/vidéo narratif.
 
 ### Version et build
-`MARKETING_VERSION = 1.2.0` — voir `RELEASE_NOTES-1.2.0.md` pour les
-nouveautés (regroupe les changements des 1.0.2 et 1.1.0). Penser à régler
-`MARKETING_VERSION = 1.2.0` dans le projet, et à incrémenter
-`CURRENT_PROJECT_VERSION` à chaque nouveau build renvoyé à Apple (même
-version marketing).
+
+**1.3.0, build 5** — nouveautés dans `RELEASE_NOTES-1.3.0.md`, et le texte
+prêt à coller est la section « Nouveautés de cette version » en haut de ce
+fichier.
+
+Vérifié dans `ChessLab.xcodeproj/project.pbxproj` : la cible applicative
+(`com.chesslab.ChessLab`) porte bien `MARKETING_VERSION = 1.3.0` et
+`CURRENT_PROJECT_VERSION = 5` **aux deux configurations**, Debug et Release.
+
+Les cibles de TEST (`ChessLabTests`, `ChessLabUITests`) sont restées en
+`1.2.0` / build 3. **Sans effet sur la soumission** : leurs bundles ne sont pas
+livrés. À aligner un jour par propreté, pas avant d'expédier.
+
+Incrémenter `CURRENT_PROJECT_VERSION` à chaque nouveau build renvoyé à Apple,
+même version marketing.
+
+### ⚠️ À FAIRE AVANT DE SOUMETTRE — pousser le code source
+
+Les notes réviseurs (plus bas) affirment que « the complete source code of the
+app — **matching this submitted build** — is published publicly at
+github.com/thmaed/ChessLab ». Ce n'est pas une formule de style : Stockfish
+étant GPLv3, le binaire ChessLab est une œuvre dérivée GPLv3, et la
+publication du code correspondant est une **obligation de licence**, pas un
+argument commercial.
+
+Vérifier donc, juste avant d'archiver :
+
+```
+git status -sb        # doit indiquer 'main...origin/main' sans 'ahead'
+git push origin main
+```
+
+Au 14/08/2026, `main` porte **5 commits non poussés** — tout le contenu de la
+1.3. Soumettre sans pousser publierait un binaire dont les sources annoncées ne
+correspondent pas.
+
+### Historique des versions
+- **1.3.0** — finition : échiquier tolérant au doigt, score de précision
+  recalibré, revue d'analyse fiabilisée, iPhone en portrait
+  (`RELEASE_NOTES-1.3.0.md`).
+- **1.2.0** — Ouvertures repensées, interface iPad/Mac, synchro iCloud
+  (`RELEASE_NOTES-1.2.0.md`, regroupe 1.0.2 et 1.1.0).
 
 ---
 
