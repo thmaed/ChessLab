@@ -584,9 +584,26 @@ struct ChessBoardView: View {
             PieceGlyphView(piece: piece)
                 .frame(width: squareSize, height: squareSize)
                 .rotationEffect(pieceRotation)
-                .animation(.easeInOut(duration: 0.35), value: allPiecesRotated)
-                .position(centerPoint(of: piece.square, squareSize: squareSize))
                 .opacity((dragState?.square == piece.square || slidingMove?.end == piece.square || rejectAnim?.from == piece.square) ? 0 : 1)
+                // ⚠️ ORDRE CRITIQUE : geste et hit-testing AVANT `.position`.
+                //
+                // 🐛 Bug corrigé (iPhone XS Max / iOS 18) : `.position()` rend
+                // une vue qui occupe TOUT l'espace offert et y place l'enfant.
+                // Tout modificateur posé APRÈS s'applique donc à une vue de la
+                // taille du plateau entier, pas de la case. Chacune des 16
+                // pièces jouables portait ainsi un geste couvrant les 64 cases,
+                // empilés dans le `ForEach` — et la DERNIÈRE gagnait le
+                // hit-testing pour tout le plateau. Cette dernière est h2 dans
+                // l'ordre de `position.pieces`, d'où le symptôme relevé sur
+                // appareil : « seule la colonne H répond », puis h4 une fois le
+                // pion avancé.
+                //
+                // Invisible en iOS 26, qui ne laisse plus la zone vide d'une
+                // vue positionnée capter le toucher — et invisible en test, nos
+                // simulateurs n'ayant que ce runtime. Le code ne doit pas
+                // dépendre de cette différence : borner le geste à la case est
+                // vrai dans les deux cas.
+                .contentShape(Rectangle())
                 .gesture(isDraggable(piece) ? dragGesture(for: piece.square, squareSize: squareSize) : nil)
                 // Une pièce SANS geste doit être transparente au toucher.
                 // Sinon son glyphe, dessiné au-dessus de la grille, avale le
@@ -600,6 +617,8 @@ struct ChessBoardView: View {
                 // seul le glisser fonctionnait — il part d'une pièce à soi.
                 // Invisible sur un déplacement vers une case vide.
                 .allowsHitTesting(isDraggable(piece))
+                .position(centerPoint(of: piece.square, squareSize: squareSize))
+                .animation(.easeInOut(duration: 0.35), value: allPiecesRotated)
                 // Une pièce glissable est au-dessus de sa case et capterait le
                 // survol : on relaie le hover depuis le glyphe pour que
                 // l'anneau apparaisse aussi sous ses propres pièces.
