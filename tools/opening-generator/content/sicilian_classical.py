@@ -51,7 +51,14 @@ COURSE = {
                                             "The quiet development; Black grabs the centre with the Boleslavsky …e5.")},
                 {"san": "e5", "comment": c("…e5 gagne de l'espace au prix du trou en d5 — le pari stratégique de Boleslavsky.",
                                            "…e5 grabs space at the cost of the d5 hole — Boleslavsky's strategic bet.")},
-                "Nb3", "Be7", "O-O", "O-O", "Be3", "Be6", "Nd5", "Bxd5", "exd5", "Nb8", "c4", "Nbd7",
+                "Nb3", "Be7", "O-O", "O-O", "Be3", "Be6",
+                {"san": "Nd5",
+                 "comment": c("Le saut naturel dans le trou d5 — mais il laisse e4 sans défense, et c'est là que la ligne enseignée jusqu'ici se trompait.",
+                              "The natural leap into the d5 hole — but it leaves e4 undefended, and that is where the line taught until now went wrong.")},
+                {"san": "Nxe4", "critical": True,
+                 "comment": c("LE coup : on prend le pion. Échanger d'abord en d5 (…Fxd5) donne aux Blancs un centre confortable et coûte plus d'un point et demi.",
+                              "THE move: take the pawn. Trading on d5 first (…Bxd5) hands White a comfortable centre and costs over a point and a half.")},
+                "c4", "Nf6", "Qd2", "Re8",
             ],
         },
         # 3) Attaque Velimirovic — 6.Fc4
@@ -78,6 +85,22 @@ COURSE = {
                  "comment": c("On donne le cavalier g4 pour emporter celui de d4 : après hxg4, …Da5 cloue c3 et les Noirs prennent l'initiative.",
                               "Give up the g4 knight to take the d4 one: after hxg4, …Qa5 pins c3 and Black seizes the initiative.")},
                 "hxg4", "Qa5", "Rb1", "Be6",
+            ],
+        },
+
+        # ── Le fou en c4 (16/08) ──────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 — la sortie précoce", "2.Bc4 — the early bishop")},
+            "moves": [
+                "e4", "c5",
+                {"san": "Bc4",
+                 "comment": c("Le cours suppose la Sicilienne ouverte. Ici les Blancs l'évitent, et rien ne répondait à ce coup.",
+                              "The course assumes the Open Sicilian. Here White avoids it, and nothing answered this move."),
+                 "critical": True},
+                {"san": "e6", "critical": True,
+                 "comment": c("On coupe la diagonale avant tout : contre une sortie précoce du fou, c'est la réponse universelle.",
+                              "Cut the diagonal first: against an early bishop sortie, that's the universal answer.")},
+                "Nf3", "Nf6", "Qe2", "Nc6", "c3", "d5",
             ],
         },
     ],

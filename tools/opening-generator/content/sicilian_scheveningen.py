@@ -59,5 +59,22 @@ COURSE = {
                 "e5", "dxe5", "Bxe5", "Nd7",
             ],
         },
+
+        # ── Le fou en c4 (16/08) ──────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 et 3.Fc4", "2.Bc4 and 3.Bc4")},
+            "moves": [
+                "e4", "c5",
+                {"san": "Bc4",
+                 "comment": c("Sans 3.d4, il n'y aura pas de Scheveningue. Le fou vise f7, mais sans centre l'attaque reste une intention.",
+                              "Without 3.d4 there will be no Scheveningen. The bishop eyes f7, but with no centre the attack stays an intention."),
+                 "critical": True},
+                "e6", "Nf3", "a6", "O-O",
+                {"san": "d5", "critical": True,
+                 "comment": c("La rupture centrale, et elle est ici gratuite : le fou c4 est attaqué au moment même où l'on ouvre le jeu.",
+                              "The central break, and here it comes for free: the c4 bishop is attacked at the very moment we open the position.")},
+                "exd5", "exd5",
+            ],
+        },
     ],
 }

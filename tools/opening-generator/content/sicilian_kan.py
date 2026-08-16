@@ -55,5 +55,39 @@ COURSE = {
                 "Bd3", "Bb7", "O-O", "Nf6", "Qe2", "d6",
             ],
         },
+
+        # ── Le fou en c4, qui empêche la Sicilienne ouverte (16/08) ───────────
+        #
+        # Toutes les Siciliennes de ce répertoire supposent 2.Cf3 puis 3.d4.
+        # Les sorties précoces du fou en c4 l'évitent, et aucun cours ne les
+        # traitait. Le remède est le même partout — …e6 coupe la diagonale et
+        # prépare …d5 — mais il fallait l'écrire.
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 et 3.Fc4", "2.Bc4 and 3.Bc4")},
+            "moves": [
+                "e4", "c5",
+                {"san": "Bc4",
+                 "comment": c("Le fou sort avant tout, en visant f7. Sans centre pour l'appuyer, l'attaque n'arrivera jamais.",
+                              "The bishop develops first, eyeing f7. With no centre behind it, the attack never comes."),
+                 "critical": True},
+                {"san": "e6", "critical": True,
+                 "comment": c("On coupe la diagonale et l'on prépare …d5. Le fou c4 devra bouger une seconde fois — deux temps perdus pour les Blancs.",
+                              "We cut the diagonal and prepare …d5. The c4 bishop must move again — two tempi lost for White.")},
+                "Nf3", "Nf6", "Qe2", "a6", "d3", "b5",
+                {"san": "Bb3",
+                 "comment": c("Le fou recule, et notre expansion à l'aile dame est gratuite : c'est exactement le jeu qu'une Sicilienne cherche.",
+                              "The bishop retreats and our queenside expansion is free: precisely the kind of play a Sicilian wants.")},
+            ],
+        },
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 et 3.Fc4", "2.Bc4 and 3.Bc4")},
+            "moves": [
+                "e4", "c5", "Nf3", "e6",
+                {"san": "Bc4",
+                 "comment": c("Une partie sur sept après 2…e6. Même traitement : on développe, on pousse …b5, et le fou perd son temps.",
+                              "One game in seven after 2…e6. Same treatment: develop, play …b5, and the bishop loses time.")},
+                "Nf6", "Qe2", "a6", "Bb3", "b5", "d3",
+            ],
+        },
     ],
 }

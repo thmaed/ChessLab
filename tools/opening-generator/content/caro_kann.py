@@ -128,5 +128,38 @@ COURSE = {
                 "h3", "Bxf3", "Qxf3", "Nf6", "d3", "e6", "g3", "Bc5",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-nf3", "title": c("2.Cf3 — sans d4", "2.Nf3 — without d4")},
+            "moves": [
+                "e4", "c6",
+                {"san": "Nf3",
+                 "comment": c("Près d'un tiers des parties, et le cours partait de 2.d4. Les Blancs évitent la théorie de la Caro-Kann en gardant le centre souple.",
+                              "Nearly a third of games, and the course started from 2.d4. White dodges Caro-Kann theory by keeping the centre flexible."),
+                 "critical": True},
+                {"san": "d5",
+                 "comment": c("On joue notre coup quand même. Sans pion en d4, les Blancs ne peuvent pas soutenir e4 durablement.",
+                              "We play our move anyway. With no pawn on d4, White cannot support e4 for long.")},
+                "Nc3", "dxe4", "Nxe4", "Nf6",
+                {"san": "Qe2",
+                 "comment": c("Le petit piège de la position : après …Cxe4, la dame reprend en clouant. Prendre reste correct — il faut juste savoir ce qui vient.",
+                              "The small trap here: after …Nxe4 the queen recaptures with a pin. Taking is still right — you just need to know what follows.")},
+                "Nxe4", "Qxe4",
+            ],
+        },
+        {
+            "chapter": {"id": "advance-bd3", "title": c("Avance — 4.Fd3", "Advance — 4.Bd3")},
+            "moves": [
+                "e4", "c6", "d4", "d5", "e5", "Bf5",
+                {"san": "Bd3",
+                 "comment": c("Un quart des parties après …Ff5 : les Blancs proposent l'échange du fou que nous venons de sortir.",
+                              "A quarter of games after …Bf5: White offers to trade the bishop we've just developed.")},
+                {"san": "Bxd3", "critical": True,
+                 "comment": c("On accepte sans regret. Tout l'intérêt de la Caro-Kann est d'avoir sorti ce fou AVANT …e6 ; l'échanger contre son homologue actif est une bonne affaire.",
+                              "We accept without regret. The whole point of the Caro-Kann is developing this bishop BEFORE …e6; trading it for its active counterpart is a good deal.")},
+                "Qxd3", "e6", "Nf3", "c5", "c3", "Nc6",
+            ],
+        },
     ],
 }
