@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftData
 
 /// Répertoires d'ouverture APPORTÉS par l'utilisateur : importés d'un PGN,
 /// reçus d'un ami, écrits ailleurs puis versés ici.
@@ -32,9 +33,51 @@ final class UserOpeningStore {
     /// Cours déjà décodés (le graphe complet coûte cher à relire).
     private var cache: [String: OpeningCourse] = [:]
 
+    /// Base synchronisée. Injectée une fois au lancement par ``ChessLabApp``
+    /// — le store est un singleton atteint depuis des endroits statiques
+    /// (``OpeningCourseLoader``), il ne peut pas recevoir un contexte à chaque
+    /// appel.
+    private var context: ModelContext?
+
     init(directory: URL? = UserOpeningStore.defaultDirectory()) {
         self.directory = directory
         reload()
+    }
+
+    /// Branche la base, migre les fichiers existants, puis relit tout.
+    ///
+    /// Tant que ceci n'est pas appelé, le store continue de lire les fichiers :
+    /// aucun écran ne se retrouve vide si l'initialisation échoue.
+    func attach(context: ModelContext) {
+        self.context = context
+        migrateLegacyFilesIfNeeded()
+        reload()
+    }
+
+    /// Reprend les répertoires laissés en fichiers par les versions
+    /// précédentes.
+    ///
+    /// Les fichiers ne sont PAS supprimés : ils deviennent une sauvegarde
+    /// locale muette. Effacer les données d'un utilisateur au premier
+    /// lancement d'une mise à jour, sur la foi d'une migration qu'on n'a pas
+    /// encore vue réussir, serait le pire moment pour se tromper.
+    private func migrateLegacyFilesIfNeeded() {
+        guard let context, let directory else { return }
+        let existing = Set((try? context.fetch(FetchDescriptor<UserOpeningRecord>()))?.map(\.id) ?? [])
+        guard let files = try? FileManager.default.contentsOfDirectory(
+            at: directory, includingPropertiesForKeys: nil
+        ) else { return }
+
+        var migrated = 0
+        for url in files where url.pathExtension == "json" {
+            guard let data = try? Data(contentsOf: url),
+                  let course = try? OpeningCourseLoader.decodeCourse(from: data),
+                  !existing.contains(course.id)
+            else { continue }
+            context.insert(UserOpeningRecord(id: course.id, name: course.name, payload: data))
+            migrated += 1
+        }
+        if migrated > 0 { try? context.save() }
     }
 
     static func isUserCourse(id: String) -> Bool { id.hasPrefix(identifierPrefix) }
@@ -56,6 +99,18 @@ final class UserOpeningStore {
     /// fatal — même discipline défensive que le chargeur des cours embarqués.
     func reload() {
         cache = [:]
+        if let context {
+            let records = (try? context.fetch(FetchDescriptor<UserOpeningRecord>())) ?? []
+            catalog = records
+                .compactMap { record -> OpeningCatalogEntry? in
+                    guard let course = record.course else { return nil }
+                    cache[course.id] = course
+                    return OpeningCatalogEntry(course)
+                }
+                .sorted { $0.name.localizedStandardCompare($1.name) == .orderedAscending }
+            return
+        }
+        // Repli : base pas encore branchée.
         guard let directory,
               let files = try? FileManager.default.contentsOfDirectory(
                 at: directory, includingPropertiesForKeys: nil
@@ -81,10 +136,33 @@ final class UserOpeningStore {
         return course
     }
 
-    /// URL du fichier d'un cours — c'est elle qu'on passe à `ShareLink`.
+    /// URL du fichier d'un cours — emplacement HÉRITÉ, conservé pour la
+    /// migration et le repli.
     func fileURL(for id: String) -> URL? {
         guard Self.isUserCourse(id: id), let directory else { return nil }
         return directory.appending(path: "\(id).json")
+    }
+
+    /// Fichier à PARTAGER, écrit à la demande dans le dossier temporaire.
+    ///
+    /// Le répertoire vit désormais en base ; le fichier n'est plus la vérité
+    /// mais reste le format d'échange — c'est lui qu'on envoie par AirDrop ou
+    /// Messages, et c'est ce qui garde le partage sans compte ni serveur.
+    ///
+    /// Nommé d'après le TITRE du répertoire et non son identifiant : celui qui
+    /// le reçoit voit « Ma Scandinave.pgn.json » plutôt qu'un UUID.
+    func exportFileURL(for id: String) -> URL? {
+        guard let course = course(id: id) else { return nil }
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.withoutEscapingSlashes]
+        guard let data = try? encoder.encode(course) else { return nil }
+        let safeName = course.name
+            .components(separatedBy: CharacterSet(charactersIn: "/\\:?%*|\"<>"))
+            .joined(separator: "-")
+        let url = FileManager.default.temporaryDirectory
+            .appending(path: "\(safeName.isEmpty ? id : safeName).json")
+        guard (try? data.write(to: url, options: .atomic)) != nil else { return nil }
+        return url
     }
 
     // MARK: Écriture
@@ -115,13 +193,35 @@ final class UserOpeningStore {
         guard issues.isEmpty else {
             throw StoreError.invalidCourse(issues.map(\.description))
         }
-        guard let url = fileURL(for: course.id) else { throw StoreError.noStorage }
-        do {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = [.withoutEscapingSlashes]
-            try encoder.encode(course).write(to: url, options: .atomic)
-        } catch {
-            throw StoreError.writeFailed(error.localizedDescription)
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.withoutEscapingSlashes]
+        guard let data = try? encoder.encode(course) else {
+            throw StoreError.writeFailed("encodage impossible")
+        }
+
+        if let context {
+            let id = course.id
+            var descriptor = FetchDescriptor<UserOpeningRecord>(
+                predicate: #Predicate { $0.id == id }
+            )
+            descriptor.fetchLimit = 1
+            if let existing = try? context.fetch(descriptor).first {
+                existing.name = course.name
+                existing.payload = data
+                existing.updatedAt = Date()
+            } else {
+                context.insert(UserOpeningRecord(id: course.id, name: course.name, payload: data))
+            }
+            do { try context.save() } catch {
+                throw StoreError.writeFailed(error.localizedDescription)
+            }
+        } else {
+            guard let url = fileURL(for: course.id) else { throw StoreError.noStorage }
+            do {
+                try data.write(to: url, options: .atomic)
+            } catch {
+                throw StoreError.writeFailed(error.localizedDescription)
+            }
         }
         cache[course.id] = course
         let entry = OpeningCatalogEntry(course)
@@ -135,8 +235,19 @@ final class UserOpeningStore {
     /// pas par cours, et l'utilisateur qui réimporte le même répertoire (ou en
     /// rencontre les positions ailleurs) retrouve ce qu'il savait.
     func delete(id: String) {
-        guard let url = fileURL(for: id) else { return }
-        try? FileManager.default.removeItem(at: url)
+        if let context {
+            var descriptor = FetchDescriptor<UserOpeningRecord>(
+                predicate: #Predicate { $0.id == id }
+            )
+            descriptor.fetchLimit = 1
+            if let record = try? context.fetch(descriptor).first {
+                context.delete(record)
+                try? context.save()
+            }
+        }
+        // Le fichier hérité part aussi, sans quoi la migration le ferait
+        // revenir au prochain lancement.
+        if let url = fileURL(for: id) { try? FileManager.default.removeItem(at: url) }
         cache[id] = nil
         catalog.removeAll { $0.id == id }
     }

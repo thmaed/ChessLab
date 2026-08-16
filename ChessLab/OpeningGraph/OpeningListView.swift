@@ -162,7 +162,7 @@ struct OpeningListView: View {
             } label: {
                 Label("Modifier le répertoire", systemImage: "pencil")
             }
-            if let url = store.fileURL(for: entry.id) {
+            if let url = store.exportFileURL(for: entry.id) {
                 ShareLink(item: url) { Label("Partager", systemImage: "square.and.arrow.up") }
             }
             Divider()
@@ -193,7 +193,7 @@ struct OpeningListView: View {
             } label: {
                 Label("Supprimer", systemImage: "trash")
             }
-            if let url = store.fileURL(for: entry.id) {
+            if let url = store.exportFileURL(for: entry.id) {
                 ShareLink(item: url) { Label("Partager", systemImage: "square.and.arrow.up") }
                     .tint(Theme.accent)
             }

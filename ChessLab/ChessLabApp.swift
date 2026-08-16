@@ -50,6 +50,16 @@ struct ChessLabApp: App {
     var body: some Scene {
         WindowGroup {
             HomeView()
+
+                .task {
+
+                    // Répertoires personnels : la base remplace les fichiers, et
+
+                    // reprend au passage ceux des versions précédentes.
+
+                    UserOpeningStore.shared.attach(context: modelContainer.mainContext)
+
+                }
                 // Traits réels de la fenêtre (classes de taille, taille,
                 // encoches) exposés aux tests de mise en page — et affichés
                 // à l'écran avec `-showTraits`. Voir ``LayoutTraitsProbe``.
@@ -88,8 +98,7 @@ struct ChessLabApp: App {
     private static func makeModelContainer() -> ModelContainer {
         let schema = Schema([
             GameRecord.self, Puzzle.self, PuzzleProgress.self,
-            OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self,
-        ])
+            OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self, UserOpeningRecord.self,])
 
         // Deux stores SÉPARÉS, et non un seul :
         // - « Games » (parties de l'utilisateur + PROGRESSION puzzles) :
@@ -115,6 +124,10 @@ struct ChessLabApp: App {
             schema: Schema([
                 GameRecord.self, PuzzleProgress.self,
                 OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self,
+                // Répertoires personnels : ajout ADDITIF au store synchronisé.
+                // Ils vivaient en fichiers locaux et ne suivaient donc aucun
+                // appareil — ce que l'aide devait avouer à l'utilisateur.
+                UserOpeningRecord.self,
             ]),
             isStoredInMemoryOnly: false,
             cloudKitDatabase: CloudSyncSettingsStore.isEnabled ? .automatic : .none
