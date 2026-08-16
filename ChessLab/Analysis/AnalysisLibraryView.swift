@@ -17,6 +17,9 @@ struct AnalysisLibraryView: View {
     @State private var resultFilter: ResultFilter = .all
     @State private var tagFilter: String?
     @State private var editingRecord: GameRecord?
+    /// Partie dont la suppression attend confirmation. Une bibliothèque est
+    /// un travail accumulé : on ne l'ampute jamais sur un geste isolé.
+    @State private var pendingDeletion: GameRecord?
 
     /// Résultat du point de vue de l'utilisateur. N'a de sens que face à
     /// l'ordinateur (le côté « Vous » est identifiable) ; en deux joueurs,
@@ -91,6 +94,11 @@ struct AnalysisLibraryView: View {
                                     } label: {
                                         Label("Modifier les étiquettes", systemImage: "tag")
                                     }
+                                    Button(role: .destructive) {
+                                        pendingDeletion = record
+                                    } label: {
+                                        Label("Supprimer la partie", systemImage: "trash")
+                                    }
                                 }
                             }
                         }
@@ -109,6 +117,24 @@ struct AnalysisLibraryView: View {
         // on le reconstruit depuis leur PGN, une seule fois, pour que la
         // bibliothèque existante ne reste pas muette sur sa longueur.
         .task { GameRecord.backfillMoveCounts(in: modelContext) }
+        .confirmationDialog(
+            "Supprimer cette partie ?",
+            isPresented: Binding(
+                get: { pendingDeletion != nil },
+                set: { if !$0 { pendingDeletion = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Supprimer", role: .destructive) {
+                if let pendingDeletion {
+                    GameLibraryService.delete(pendingDeletion, in: modelContext)
+                }
+                pendingDeletion = nil
+            }
+            Button("Annuler", role: .cancel) { pendingDeletion = nil }
+        } message: {
+            Text("La partie sera retirée de la bibliothèque. Cette action est définitive.")
+        }
         .sheet(item: $editingRecord) { record in
             GameTagsEditorSheet(initialTags: record.tags, suggestions: allTags) { newTags in
                 record.tags = newTags

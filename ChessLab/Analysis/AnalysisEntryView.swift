@@ -14,12 +14,19 @@ struct AnalysisEntryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \GameRecord.playedAt, order: .reverse) private var records: [GameRecord]
 
-    @State private var pastedPGN = ""
-    @State private var showPasteSheet = false
-    @State private var fenText = ""
-    @State private var showFENSheet = false
-    @State private var showFileImporter = false
-    @State private var showLibraryImporter = false
+    /// Une seule zone de saisie pour le PGN ET la FEN : le format est
+    /// reconnu tout seul (voir ``validate(text:)``). Deux entrées séparées
+    /// obligeaient l'utilisateur à savoir NOMMER ce qu'il avait dans le
+    /// presse-papiers avant de pouvoir le coller.
+    @State private var importText = ""
+    @State private var showTextSheet = false
+
+    /// 🐛 Bug corrigé : il y avait DEUX `.fileImporter` sur cette vue, chacun
+    /// avec son booléen. SwiftUI n'en présente qu'un — celui déclaré en
+    /// dernier — et « Importer un fichier » ne s'ouvrait donc jamais. Un seul
+    /// importeur, dont le MODE dit quoi faire du résultat.
+    private enum FileImportMode { case analyse, library }
+    @State private var fileImportMode: FileImportMode?
     @State private var importError: String?
     @State private var showOtherSources = false
     @State private var libraryImportSummary: String?
@@ -61,21 +68,17 @@ struct AnalysisEntryView: View {
                 disclosureCard
 
                 if showOtherSources {
-                    entryCard(title: "Coller un PGN", subtitle: "Depuis le presse-papiers ou saisi", systemImage: "doc.on.clipboard", tint: Theme.info) {
+                    entryCard(title: "Analyser PGN / FEN", subtitle: "Collez une partie ou une position — le format est reconnu tout seul", systemImage: "doc.on.clipboard", tint: Theme.info) {
                         importError = nil
-                        pastedPGN = ""
-                        showPasteSheet = true
+                        importText = ""
+                        showTextSheet = true
                     }
-                    entryCard(title: "Importer un fichier", subtitle: "Fichier .pgn", systemImage: "doc.badge.plus", tint: Theme.teal) {
-                        showFileImporter = true
+                    entryCard(title: "Importer un fichier", subtitle: "Fichier .pgn ou .fen", systemImage: "doc.badge.plus", tint: Theme.teal) {
+                        importError = nil
+                        fileImportMode = .analyse
                     }
                     entryCard(title: "Importer des parties", subtitle: "Base .pgn (plusieurs parties) → bibliothèque", systemImage: "square.and.arrow.down.on.square", tint: Theme.warning) {
-                        showLibraryImporter = true
-                    }
-                    entryCard(title: "Position FEN", subtitle: "Analyser depuis une position donnée", systemImage: "square.grid.3x3", tint: Theme.violet) {
-                        importError = nil
-                        fenText = ""
-                        showFENSheet = true
+                        fileImportMode = .library
                     }
                     entryCard(
                         title: "Éditeur de position", subtitle: "Composer une position sur le plateau",
@@ -93,37 +96,33 @@ struct AnalysisEntryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .sheet(isPresented: $showPasteSheet) {
+        .sheet(isPresented: $showTextSheet) {
             TextImportSheet(
-                title: "Coller un PGN", text: $pastedPGN, errorMessage: importError,
-                placeholder: "1. e4 e5 2. Nf3 …", confirmLabel: "Lancer l'analyse"
+                title: "Analyser PGN / FEN", text: $importText, errorMessage: importError,
+                placeholder: "1. e4 e5 2. Cf3 …\n\nou\n\nrnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+                confirmLabel: "Lancer l'analyse"
             ) {
-                validate(pgn: pastedPGN)
-            }
-            .preferredColorScheme(.dark)
-        }
-        .sheet(isPresented: $showFENSheet) {
-            TextImportSheet(
-                title: "Position FEN", text: $fenText, errorMessage: importError,
-                placeholder: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", confirmLabel: "Lancer l'analyse"
-            ) {
-                validate(fen: fenText)
+                validate(text: importText)
             }
             .preferredColorScheme(.dark)
         }
         .fileImporter(
-            isPresented: $showFileImporter,
-            allowedContentTypes: [UTType(filenameExtension: "pgn") ?? .plainText, .plainText],
-            allowsMultipleSelection: false
+            isPresented: Binding(
+                get: { fileImportMode != nil },
+                set: { if !$0 { fileImportMode = nil } }
+            ),
+            allowedContentTypes: [
+                UTType(filenameExtension: "pgn") ?? .plainText,
+                UTType(filenameExtension: "fen") ?? .plainText,
+                .plainText,
+            ],
+            allowsMultipleSelection: fileImportMode == .library
         ) { result in
-            handleFileImport(result)
-        }
-        .fileImporter(
-            isPresented: $showLibraryImporter,
-            allowedContentTypes: [UTType(filenameExtension: "pgn") ?? .plainText, .plainText],
-            allowsMultipleSelection: true
-        ) { result in
-            handleLibraryImport(result)
+            switch fileImportMode {
+            case .library: handleLibraryImport(result)
+            default: handleFileImport(result)
+            }
+            fileImportMode = nil
         }
         .alert("Import terminé", isPresented: Binding(
             get: { libraryImportSummary != nil },
@@ -194,39 +193,61 @@ struct AnalysisEntryView: View {
         .accessibilityLabel(title)
     }
 
-    private func validate(pgn: String) {
-        let trimmed = pgn.trimmingCharacters(in: .whitespacesAndNewlines)
+    /// Reconnaît le format puis lance l'analyse.
+    ///
+    /// L'ordre n'est pas arbitraire : on essaie la FEN EN PREMIER parce que
+    /// son validateur est strict — six champs, un placement de pièces
+    /// cohérent — alors qu'un lecteur de PGN est permissif et accepterait une
+    /// FEN comme un texte de coups vide. Dans l'autre sens, aucune ambiguïté :
+    /// un PGN n'est jamais une FEN valide, et un PGN qui CONTIENT une balise
+    /// `[FEN "…"]` échoue au validateur (le texte entier n'est pas une FEN) et
+    /// part donc du bon côté.
+    private func validate(text: String) {
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            importError = "Collez ou saisissez un PGN."
+            importError = "Collez une partie (PGN) ou une position (FEN)."
             return
         }
-        // Assainit (lignes vides multiples, commentaire d'intro) et, pour un
-        // texte multi-parties (base .pgn, export multi-chapitres), retient la
-        // première partie plutôt que d'échouer en bloc — voir §A5.
+        if FENValidator.errors(in: trimmed).isEmpty {
+            importError = nil
+            showTextSheet = false
+            onSelect(.fen(trimmed))
+            return
+        }
         let games = PGNSanitizer.splitIntoGames(trimmed)
         let candidate = PGNSanitizer.sanitize(games.first ?? trimmed)
-        guard (try? Game(pgn: candidate)) != nil else {
-            importError = "Ce PGN n'a pas pu être lu — vérifiez sa syntaxe."
+        if (try? Game(pgn: candidate)) != nil {
+            importError = nil
+            showTextSheet = false
+            onSelect(.pgn(candidate))
             return
         }
-        importError = nil
-        showPasteSheet = false
-        onSelect(.pgn(candidate))
+        // Le message nomme les DEUX formats : l'utilisateur ne sait pas
+        // forcément lequel il a collé, et c'est justement le but de cet écran.
+        // Si le texte RESSEMBLE à une FEN, on rend l'erreur précise du
+        // validateur plutôt qu'un refus générique.
+        if looksLikeFEN(trimmed), let detail = FENValidator.errors(in: trimmed).first {
+            importError = detail
+        } else {
+            importError = "Ce texte n'a pu être lu ni comme une partie (PGN) ni comme une position (FEN)."
+        }
     }
 
-    private func validate(fen: String) {
-        let trimmed = fen.trimmingCharacters(in: .whitespacesAndNewlines)
-        let errors = FENValidator.errors(in: trimmed)
-        guard errors.isEmpty else {
-            importError = errors.first
-            return
-        }
-        importError = nil
-        showFENSheet = false
-        onSelect(.fen(trimmed))
+    /// Un texte d'une seule ligne dont le premier champ contient des « / » :
+    /// c'est une FEN mal formée, pas un PGN. Sert uniquement à choisir le
+    /// message d'erreur.
+    private func looksLikeFEN(_ text: String) -> Bool {
+        guard !text.contains("\n"), let first = text.split(separator: " ").first else { return false }
+        return first.contains("/")
     }
 
     private func handleFileImport(_ result: Result<[URL], Error>) {
+        // L'échec était avalé en silence : l'écran ne bougeait pas et rien
+        // n'expliquait pourquoi.
+        if case let .failure(error) = result {
+            importError = "Import impossible : \(error.localizedDescription)"
+            return
+        }
         guard case let .success(urls) = result, let url = urls.first else { return }
         let accessed = url.startAccessingSecurityScopedResource()
         defer { if accessed { url.stopAccessingSecurityScopedResource() } }
@@ -235,7 +256,9 @@ struct AnalysisEntryView: View {
             importError = "Impossible de lire ce fichier."
             return
         }
-        validate(pgn: text)
+        // Même détection que la saisie : un fichier contenant une FEN
+        // s'analyse aussi bien qu'un .pgn.
+        validate(text: text)
     }
 
     /// Importe UNE OU PLUSIEURS bases .pgn d'un coup dans la bibliothèque
@@ -246,6 +269,7 @@ struct AnalysisEntryView: View {
         guard case let .success(urls) = result, !urls.isEmpty else { return }
         var imported = 0
         var skipped = 0
+        var duplicates = 0
         var unreadable = 0
         for url in urls {
             let accessed = url.startAccessingSecurityScopedResource()
@@ -257,9 +281,13 @@ struct AnalysisEntryView: View {
             let outcome = GameLibraryService.importPGNCollection(text: text, in: modelContext)
             imported += outcome.imported
             skipped += outcome.skipped
+            duplicates += outcome.duplicates
         }
 
         var lines = ["\(imported) partie(s) importée(s) dans la bibliothèque."]
+        if duplicates > 0 {
+            lines.append("\(duplicates) partie(s) déjà présente(s), non réimportée(s).")
+        }
         if skipped > 0 { lines.append("\(skipped) bloc(s) PGN illisible(s) ignoré(s).") }
         if unreadable > 0 { lines.append("\(unreadable) fichier(s) illisible(s).") }
         libraryImportSummary = lines.joined(separator: "\n")

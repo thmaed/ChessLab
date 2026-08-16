@@ -31,7 +31,54 @@ enum GameLibraryService {
     /// Résultat d'un import PGN multi-parties.
     struct ImportOutcome {
         var imported: Int
+        /// Blocs ILLISIBLES — un PGN qu'on n'a pas su décoder.
         var skipped: Int
+        /// Parties déjà présentes, écartées sans être réimportées.
+        var duplicates: Int = 0
+    }
+
+    /// Signature d'une partie, pour reconnaître un doublon.
+    ///
+    /// Fondée sur les COUPS et les deux joueurs, jamais sur le texte brut : le
+    /// même PGN exporté par deux sites diffère par ses balises, ses
+    /// commentaires et ses espaces, et une comparaison textuelle ne
+    /// reconnaîtrait rien.
+    ///
+    /// Les joueurs entrent dans la signature à dessein. Les coups seuls
+    /// suffiraient à reconnaître un ré-import, mais deux parties DIFFÉRENTES
+    /// peuvent partager leur suite de coups (une nulle courte, une miniature
+    /// connue) : les écarter à tort ferait perdre des parties à
+    /// l'utilisateur, ce qui est bien pire que laisser passer un doublon.
+    static func signature(ofPGN pgn: String) -> String? {
+        guard let game = try? Game(pgn: PGNSanitizer.sanitize(pgn)) else { return nil }
+        let moves = movetext(of: pgn)
+        guard !moves.isEmpty else { return nil }
+        let white = game.tags.white.trimmingCharacters(in: .whitespaces).lowercased()
+        let black = game.tags.black.trimmingCharacters(in: .whitespaces).lowercased()
+        return "\(white)|\(black)|\(moves)"
+    }
+
+    /// Suite de coups NORMALISÉE : balises, commentaires, variantes, numéros
+    /// de coup et résultat retirés, espaces réduits. C'est ce qui reste
+    /// identique d'un export à l'autre.
+    static func movetext(of pgn: String) -> String {
+        var text = pgn
+        // Balises d'en-tête, une par ligne.
+        text = text.replacingOccurrences(
+            of: "\\[[^\\]]*\\]", with: " ", options: .regularExpression
+        )
+        // Commentaires { … } et variantes ( … ).
+        text = text.replacingOccurrences(of: "\\{[^}]*\\}", with: " ", options: .regularExpression)
+        text = text.replacingOccurrences(of: "\\([^)]*\\)", with: " ", options: .regularExpression)
+        // Numéros de coup (« 12. », « 12... ») et annotations ($1, !, ?).
+        text = text.replacingOccurrences(of: "\\d+\\.(\\.\\.)?", with: " ", options: .regularExpression)
+        text = text.replacingOccurrences(of: "\\$\\d+", with: " ", options: .regularExpression)
+        text = text.replacingOccurrences(of: "[!?]+", with: "", options: .regularExpression)
+        // Résultat final.
+        for token in ["1-0", "0-1", "1/2-1/2", "*"] {
+            text = text.replacingOccurrences(of: token, with: " ")
+        }
+        return text.split(whereSeparator: \.isWhitespace).joined(separator: " ")
     }
 
     /// Importe DANS la bibliothèque toutes les parties lisibles d'un texte PGN
@@ -45,12 +92,25 @@ enum GameLibraryService {
         let blocks = PGNSanitizer.splitIntoGames(text)
         var imported = 0
         var skipped = 0
+        var duplicates = 0
+
+        // Signatures DÉJÀ en bibliothèque, calculées une seule fois. Le même
+        // ensemble reçoit ensuite celles du lot en cours : réimporter un
+        // fichier qui contient deux fois la même partie n'en range qu'une.
+        let existing = (try? context.fetch(FetchDescriptor<GameRecord>())) ?? []
+        var seen = Set(existing.compactMap { $0.pgn.flatMap(Self.signature(ofPGN:)) })
 
         for block in blocks {
             let candidate = PGNSanitizer.sanitize(block)
             guard !candidate.isEmpty, let game = try? Game(pgn: candidate) else {
                 skipped += 1
                 continue
+            }
+            if let signature = Self.signature(ofPGN: candidate) {
+                guard seen.insert(signature).inserted else {
+                    duplicates += 1
+                    continue
+                }
             }
             let record = GameRecord()
             record.modeRaw = GameRecordMode.imported.rawValue
@@ -69,7 +129,14 @@ enum GameLibraryService {
             imported += 1
         }
         if imported > 0 { try? context.save() }
-        return ImportOutcome(imported: imported, skipped: skipped)
+        return ImportOutcome(imported: imported, skipped: skipped, duplicates: duplicates)
+    }
+
+    /// Retire une partie de la bibliothèque. La suppression est définitive :
+    /// c'est l'appelant qui demande confirmation.
+    static func delete(_ record: GameRecord, in context: ModelContext) {
+        context.delete(record)
+        try? context.save()
     }
 
     /// Décode une date PGN « YYYY.MM.DD » (les champs inconnus valent « ?? »).
