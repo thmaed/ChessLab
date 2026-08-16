@@ -48,6 +48,12 @@ from fen import board_from_key, side_to_move
 
 DEFAULT_COURSES = Path(__file__).resolve().parents[2] / "ChessLab" / "Resources" / "openings"
 
+# Jusqu'à ce demi-coup inclus, un coup adverse non traité relève de la PORTÉE
+# du cours, pas d'un trou : c'est lui qui décide de quelle ouverture on parle.
+# Répertoire noir → le 1er coup blanc (racine, demi-coup 0) ; répertoire blanc
+# → la 1re réponse noire (demi-coup 1). Une seule constante couvre les deux.
+SCOPE_PLY = 1
+
 
 def parse_args(argv):
     p = argparse.ArgumentParser(description="Lacunes de couverture des cours d'ouverture")
@@ -112,13 +118,15 @@ def audit_course(path: Path, explorer: LichessExplorer, args) -> dict:
     gaps = []
     seen = set()
     queried = 0
-    # File d'attente : (clé de position, probabilité d'y arriver).
-    queue = deque([(root, 1.0)])
+    # File d'attente : (clé de position, probabilité d'y arriver, demi-coups
+    # depuis la racine). La profondeur sert à reconnaître le coup adverse qui
+    # CHOISIT l'ouverture — voir `SCOPE_PLY`.
+    queue = deque([(root, 1.0, 0)])
     # Une position atteinte par deux chemins cumule ses probabilités ; on la
     # traite au premier passage et on ignore les suivants — sous-estimation
     # assumée, très inférieure au bruit des arrondis de l'Explorer.
     while queue:
-        key, reach = queue.popleft()
+        key, reach, ply = queue.popleft()
         if key in seen or reach < args.min_reach:
             continue
         seen.add(key)
@@ -133,17 +141,7 @@ def audit_course(path: Path, explorer: LichessExplorer, args) -> dict:
             # rien reprocher et sans dépenser une requête.
             for m in course_moves:
                 if m.get("toFEN"):
-                    queue.append((m["toFEN"], reach))
-            continue
-
-        # La position de DÉPART n'a pas de lacune : un répertoire répond à un
-        # premier coup choisi (la Scandinave répond à 1.e4), et tout le reste
-        # relève d'un autre cours, pas d'un trou dans celui-ci. Sans cette
-        # exception, chaque cours signale « 1.d4, 25 % » en tête de liste.
-        if key == root:
-            for m in course_moves:
-                if m.get("toFEN"):
-                    queue.append((m["toFEN"], reach))
+                    queue.append((m["toFEN"], reach, ply + 1))
             continue
 
         # Camp adverse : c'est ici, et seulement ici, qu'une lacune existe.
@@ -158,12 +156,19 @@ def audit_course(path: Path, explorer: LichessExplorer, args) -> dict:
         if not shares:
             continue
 
-        # Deux natures très différentes, qu'il ne faut pas mélanger :
+        # Trois natures très différentes, qu'il ne faut pas mélanger :
+        # - « portée » : le coup adverse qui CHOISIT l'ouverture. Contre 1…d5,
+        #   un Trompowsky (1.d4 Cf6 2.Fg5) n'existe pas — c'est un autre cours,
+        #   pas un trou dans celui-ci. Même raison que pour la position de
+        #   départ d'un répertoire noir, décalée d'un demi-coup ;
         # - « trou » : le cours CONTINUE par d'autres coups mais ignore
         #   celui-ci — l'élève suit sa leçon et tombe dans le vide ;
         # - « fin » : le cours s'arrête là, ce qui est un choix d'auteur
         #   légitime. L'étendre a de la valeur, mais ce n'est pas un défaut.
-        kind = "trou" if covered else "fin"
+        if ply <= SCOPE_PLY:
+            kind = "portée"
+        else:
+            kind = "trou" if covered else "fin"
         for uci, info in shares.items():
             if uci in covered:
                 continue
@@ -187,8 +192,12 @@ def audit_course(path: Path, explorer: LichessExplorer, args) -> dict:
             to_fen = m.get("toFEN")
             if not to_fen:
                 continue
-            share = shares.get(uci, {}).get("share", 0.0)
-            queue.append((to_fen, reach * share))
+            # Dans la zone de PORTÉE, la probabilité reste 1 : le rapport dit
+            # « sachant qu'on joue bien cette ouverture », sinon tout serait
+            # pondéré par la fréquence de 1.e4 et les cours deviendraient
+            # incomparables entre eux.
+            share = 1.0 if ply <= SCOPE_PLY else shares.get(uci, {}).get("share", 0.0)
+            queue.append((to_fen, reach * share, ply + 1))
 
     gaps.sort(key=lambda g: g["priority"], reverse=True)
     holes = [g for g in gaps if g["kind"] == "trou"]
@@ -201,6 +210,7 @@ def audit_course(path: Path, explorer: LichessExplorer, args) -> dict:
         "gaps": gaps,
         "holes": holes,
         "endings": [g for g in gaps if g["kind"] == "fin"],
+        "scope": [g for g in gaps if g["kind"] == "portée"],
     }
 
 
