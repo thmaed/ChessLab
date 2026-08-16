@@ -67,28 +67,33 @@ raison écrite.
 
 Le paquet Swift vendorisé n'expose pas d'exécutable, et son point d'entrée est
 renommé `_main` pour cohabiter avec celui de l'app. Le Makefile amont attend un
-`main`. Il faut donc en fabriquer un — puis **tout retirer du paquet** :
+`main`. Il faut donc en fabriquer un, compiler, puis **tout retirer du
+paquet** :
 
 ```bash
 cd Vendor/CStockfish/Sources/CStockfish/stockfish
-chmod u+w . 2>/dev/null
-printf '#include "_main.h"\nint main(int argc, char* argv[]) { return _main(argc, argv); }\n' > main.cpp
-make -j8 build ARCH=apple-silicon
-mv stockfish ../../../../../tools/opening-generator/bin/stockfish   # HORS du paquet
-rm -f main.cpp *.o .depend                                          # arbre restauré
+chmod -R u+w .
+{ cat _main.cpp; printf '\nint main(int argc, char* argv[]) { return _main(argc, argv); }\n'; } > main.cpp
+make -j8 ARCH=apple-silicon COMP=clang all
+mv stockfish ../../../../../tools/opening-generator/bin/stockfish
+rm -f main.cpp *.o .depend
 ```
 
-⚠️ **Les trois dernières lignes ne sont pas facultatives.** Laisser `main.cpp`
-dans `Sources/` casse la compilation de l'app, de deux façons à la fois :
-SwiftPM voit un fichier `main` et requalifie `CStockfish` en cible
-**exécutable**, et le binaire final porte **deux définitions de `_main`** —
-« duplicate symbol for architecture arm64 ». Constaté en cassant le build le
-16/08/2026. Le binaire vit donc dans `tools/opening-generator/bin/`, gitignoré,
-et le paquet vendorisé reste tel qu'il est livré.
+Trois pièges, tous rencontrés :
 
-*Autre piège* : les sources vendorisées sont en **lecture seule**, et une
-écriture refusée passe inaperçue si la commande tourne en arrière-plan — d'où le
-`chmod`.
+- **`main.cpp` doit contenir la FONCTION, pas seulement un pont.** `_main.cpp`
+  n'est pas dans les `SRCS` du Makefile : un fichier qui se contente d'appeler
+  `_main` ne relie rien (« Undefined symbols : _main »). D'où le `cat`.
+- **`make build` échoue sur la cible `net`**, qui appelle `../scripts/net.sh`,
+  absent de l'arbre vendorisé. Les réseaux étant déjà là, on vise `all`.
+- **Les dernières lignes ne sont pas facultatives.** Laisser `main.cpp` dans
+  `Sources/` casse la compilation de l'app : SwiftPM voit un fichier `main` et
+  requalifie `CStockfish` en cible **exécutable**, et `_main` se retrouve
+  défini deux fois (« duplicate symbol for architecture arm64 »).
+
+Le binaire vit dans `tools/opening-generator/bin/`, gitignoré. En Mach-O le
+symbole `main` s'écrit `_main` : « Undefined symbol _main » désigne donc
+l'absence de `main`, pas celle de la fonction `_main`.
 
 ### Jeton Lichess — obligatoire depuis 2026
 

@@ -24,7 +24,7 @@ struct LicensesView: View {
             icon: "cpu", tint: Theme.accent,
             name: "Stockfish",
             license: "Licence GPLv3",
-            body: "Moteur d'échecs (Stockfish 17), compilé depuis ses sources C++ directement dans l'app. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer.",
+            body: "Moteur d'échecs (Stockfish 17.1), compilé depuis ses sources C++ directement dans l'app. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer.",
             url: URL(string: "https://stockfishchess.org")
         ),
         .init(

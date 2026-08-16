@@ -35,7 +35,7 @@ final class EngineSmokeTests: XCTestCase {
 
     func testFullUCICycleProducesABestMove() async throws {
         let netExists = FileManager.default.fileExists(
-            atPath: resourcesDir + "/nn-1111cefa1111.nnue"
+            atPath: resourcesDir + "/nn-1c0000000000.nnue"
         )
         try XCTSkipUnless(netExists, "Réseau NNUE introuvable dans \(resourcesDir)")
 

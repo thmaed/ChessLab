@@ -7445,7 +7445,7 @@
         }
       }
     },
-    "Moteur d'échecs (Stockfish 17), compilé depuis ses sources C++ directement dans l'app. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer." : {
+    "Moteur d'échecs (Stockfish 17.1), compilé depuis ses sources C++ directement dans l'app. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer." : {
 
     },
     "Moteur d'échecs, intégré via ChessKitEngine. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer." : {

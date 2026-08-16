@@ -5419,6 +5419,62 @@ le commentaire qui documentait le piège. Il vérifie maintenant l'USAGE.
 **nécessaire**, et un appareil iOS 18 doit rester dans la boucle tant que la
 cible de déploiement n'est pas remontée.
 
+## Stockfish 17.1 remplace la 17 ✅ (2026-08-16)
+
+### Pourquoi la 17.1 et pas la 18
+
+La 18 existe (publiée le 31/01/2026) et l'intégration ne posait aucun problème :
+le shim ne touche **aucune API interne** de Stockfish, il redirige l'entrée/
+sortie et parle UCI en texte. Changer de version est un remplacement de
+sources, pas un portage.
+
+Ce qui a tranché, c'est le **poids du réseau NNUE** :
+
+| version | gros réseau | poids | publiée |
+|---|---|---|---|
+| 17 (précédente) | `nn-1111cefa1111` | 71 Mo | 06/09/2024 |
+| **17.1 (retenue)** | `nn-1c0000000000` | **71 Mo** | 30/03/2025 |
+| 18 | `nn-c288c895ea92` | **104 Mo** | 31/01/2026 |
+
+Les ressources pèsent 94 Mo ; la 18 les porterait à ~127 Mo, soit +33 Mo pour
+l'utilisateur et un rapprochement net du seuil au-delà duquel iOS exige le
+Wi-Fi. Pour une app dont l'argument est « tout est hors ligne », c'est cher.
+La 17.1 apporte dix-huit mois de progrès **à taille identique** : le gain est
+gratuit, la 18 se paie en mégaoctets.
+
+### Ce qui a changé
+
+- sources vendorisées remplacées par `sf_17.1` (le fichier `history.h` est
+  nouveau), point d'entrée renommé `main` → `_main` comme le faisait la
+  vendorisation d'origine ;
+- `nn-1c0000000000.nnue` remplace `nn-1111cefa1111.nnue` dans
+  `ChessLab/Resources/`. Le PETIT réseau est inchangé entre les deux versions ;
+- écran Licences, catalogue de traduction, README, `Package.swift` et le test
+  de fumée du paquet (qui vérifie la présence du réseau **par son nom**) ;
+- version de l'app 1.4.0 → **1.5.0**, build 7.
+
+### Pièges de la reconstruction du binaire d'audit
+
+Deux, tous deux rencontrés :
+
+1. **La cible `net` du Makefile 17.1 appelle `../scripts/net.sh`**, absent de
+   l'arbre vendorisé (le script vit à la racine du dépôt amont, pas dans
+   `src/`). Les réseaux étant déjà présents, on compile par `make all` sans
+   passer par `net`.
+2. **`_main.cpp` n'est pas dans les `SRCS`** : un `main.cpp` qui se contente
+   d'appeler `_main` ne relie rien. Il doit contenir la fonction ET le pont —
+   c'est-à-dire une copie de `_main.cpp` suivie de `int main(...) { return
+   _main(...); }`.
+
+Procédure complète dans le README du générateur.
+
+### Vérifié
+
+- `xcodebuild build` vert ; binaire d'audit annonce « Stockfish 17.1 » en UCI ;
+- **audit complet des 58 cours rejoué sous 17.1** — changer de moteur change
+  les évaluations, une ligne acceptée à 1,40 hier peut franchir le seuil
+  aujourd'hui. C'est la vérification qui compte, pas la compilation.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-15)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque

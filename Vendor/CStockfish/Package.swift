@@ -1,7 +1,7 @@
 // swift-tools-version: 6.0
 import PackageDescription
 
-// Stockfish 17 vendorisé et compilé DANS le projet, avec les bons paramètres
+// Stockfish 17.1 vendorisé et compilé DANS le projet, avec les bons paramètres
 // d'optimisation — ce que le package tiers ne permettait pas de régler :
 //
 //  • USE_NEON / USE_POPCNT : chemins SIMD ARM de l'inférence NNUE. Sans eux,

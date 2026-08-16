@@ -37,11 +37,11 @@ Voir [Copying.txt de Stockfish](https://github.com/official-stockfish/Stockfish/
 
 ## Réseaux de neurones (NNUE)
 
-Stockfish 17 nécessite des fichiers de réseau NNUE pour évaluer les
+Stockfish 17.1 nécessite des fichiers de réseau NNUE pour évaluer les
 positions ; `ChessKitEngine` ne les embarque pas (taille du paquet).
 Ils sont donc téléchargés et bundlés manuellement dans
 `ChessLab/Resources/` :
-- `nn-1111cefa1111.nnue` — réseau principal
+- `nn-1c0000000000.nnue` — réseau principal
 - `nn-37f18f62d772.nnue` — réseau small (finales)
 
 Source : https://tests.stockfishchess.org (réseaux officiels Stockfish).
