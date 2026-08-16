@@ -21,6 +21,13 @@ struct AnalysisLibraryView: View {
     /// un travail accumulé : on ne l'ampute jamais sur un geste isolé.
     @State private var pendingDeletion: GameRecord?
 
+    /// Mode SÉLECTION : taper une ligne ne l'ouvre plus, elle la coche. Deux
+    /// modes plutôt qu'une case permanente sur chaque ligne — la bibliothèque
+    /// sert à ouvrir une partie dix fois pour une fois qu'on en supprime.
+    @State private var isSelecting = false
+    @State private var selection: Set<PersistentIdentifier> = []
+    @State private var confirmBatchDeletion = false
+
     /// Résultat du point de vue de l'utilisateur. N'a de sens que face à
     /// l'ordinateur (le côté « Vous » est identifiable) ; en deux joueurs,
     /// seules les nulles sont classables, les parties décisives restent
@@ -82,12 +89,30 @@ struct AnalysisLibraryView: View {
                         } else {
                             ForEach(filteredRecords) { record in
                                 Button {
-                                    guard let pgn = record.pgn, !pgn.isEmpty else { return }
-                                    onSelect(.pgn(pgn))
+                                    if isSelecting {
+                                        toggle(record)
+                                    } else {
+                                        guard let pgn = record.pgn, !pgn.isEmpty else { return }
+                                        onSelect(.pgn(pgn))
+                                    }
                                 } label: {
-                                    recordRow(record)
+                                    HStack(spacing: 10) {
+                                        if isSelecting {
+                                            Image(systemName: selection.contains(record.persistentModelID)
+                                                  ? "checkmark.circle.fill" : "circle")
+                                                .font(.title3)
+                                                .foregroundStyle(selection.contains(record.persistentModelID)
+                                                                 ? Theme.accent : Theme.textTertiary)
+                                                .accessibilityHidden(true)
+                                        }
+                                        recordRow(record)
+                                    }
                                 }
                                 .buttonStyle(.pressable)
+                                .accessibilityAddTraits(
+                                    isSelecting && selection.contains(record.persistentModelID)
+                                        ? .isSelected : []
+                                )
                                 .contextMenu {
                                     Button {
                                         editingRecord = record
@@ -113,6 +138,33 @@ struct AnalysisLibraryView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            if !records.isEmpty {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button(isSelecting ? "Terminé" : "Sélectionner") {
+                        isSelecting.toggle()
+                        selection.removeAll()
+                    }
+                    .tint(Theme.accent)
+                    .accessibilityIdentifier("toggleSelection")
+                }
+            }
+        }
+        .safeAreaInset(edge: .bottom) {
+            if isSelecting { selectionBar }
+        }
+        .confirmationDialog(
+            selection.count == 1
+                ? "Supprimer cette partie ?"
+                : "Supprimer \(selection.count) parties ?",
+            isPresented: $confirmBatchDeletion,
+            titleVisibility: .visible
+        ) {
+            Button("Supprimer", role: .destructive) { deleteSelection() }
+            Button("Annuler", role: .cancel) {}
+        } message: {
+            Text("Cette action est définitive.")
+        }
         // Les parties enregistrées AVANT l'ajout de `moveCount` n'en ont pas :
         // on le reconstruit depuis leur PGN, une seule fois, pour que la
         // bibliothèque existante ne reste pas muette sur sa longueur.
@@ -208,6 +260,60 @@ struct AnalysisLibraryView: View {
     /// Classe une partie du point de vue de l'utilisateur. « Vous » est stocké
     /// littéralement par ``GameLibraryService`` (indépendant de la langue),
     /// donc identifiable. Deux joueurs : nulle si nulle, sinon neutre.
+    /// Barre d'action du mode sélection : ancrée en bas, toujours visible,
+    /// pour ne pas obliger à remonter après avoir coché en fin de liste.
+    private var selectionBar: some View {
+        HStack(spacing: 12) {
+            Button(allFilteredSelected ? "Tout décocher" : "Tout sélectionner") {
+                if allFilteredSelected {
+                    selection.subtract(filteredRecords.map(\.persistentModelID))
+                } else {
+                    selection.formUnion(filteredRecords.map(\.persistentModelID))
+                }
+            }
+            .font(.subheadline)
+            .tint(Theme.accent)
+
+            Spacer()
+
+            Button(role: .destructive) {
+                confirmBatchDeletion = true
+            } label: {
+                Label(
+                    selection.isEmpty ? "Supprimer" : "Supprimer (\(selection.count))",
+                    systemImage: "trash"
+                )
+                .font(.subheadline.weight(.semibold))
+            }
+            .disabled(selection.isEmpty)
+            .opacity(selection.isEmpty ? 0.4 : 1)
+            .accessibilityIdentifier("deleteSelection")
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(.ultraThinMaterial)
+    }
+
+    /// « Tout sélectionner » porte sur ce qui est AFFICHÉ, pas sur toute la
+    /// bibliothèque : cocher en aveugle des parties masquées par un filtre
+    /// serait le meilleur moyen d'en supprimer sans le vouloir.
+    private var allFilteredSelected: Bool {
+        !filteredRecords.isEmpty
+            && filteredRecords.allSatisfy { selection.contains($0.persistentModelID) }
+    }
+
+    private func toggle(_ record: GameRecord) {
+        let id = record.persistentModelID
+        if selection.contains(id) { selection.remove(id) } else { selection.insert(id) }
+    }
+
+    private func deleteSelection() {
+        let targets = records.filter { selection.contains($0.persistentModelID) }
+        GameLibraryService.delete(targets, in: modelContext)
+        selection.removeAll()
+        isSelecting = false
+    }
+
     private func userResult(_ record: GameRecord) -> ResultFilter {
         guard let result = record.resultRaw else { return .all }
         if result == "1/2-1/2" { return .draws }

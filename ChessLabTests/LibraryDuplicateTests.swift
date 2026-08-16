@@ -101,6 +101,43 @@ struct LibraryDuplicateTests {
         #expect(stored.count == 1)
     }
 
+    /// La suppression groupée : une seule sauvegarde, et seules les parties
+    /// visées partent.
+    @Test func batchDeleteRemovesOnlyTheSelectedGames() throws {
+        let container = try ModelContainer(
+            for: GameRecord.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let context = ModelContext(container)
+
+        // Trois parties distinctes : mêmes coups, joueurs différents.
+        for names in [("Alice", "Bob"), ("Carole", "David"), ("Eve", "Frank")] {
+            let pgn = scholars
+                .replacingOccurrences(of: "Alice", with: names.0)
+                .replacingOccurrences(of: "Bob", with: names.1)
+            GameLibraryService.importPGNCollection(text: pgn, in: context)
+        }
+        var stored = try context.fetch(FetchDescriptor<GameRecord>())
+        #expect(stored.count == 3)
+
+        let removed = GameLibraryService.delete(Array(stored.prefix(2)), in: context)
+        #expect(removed == 2)
+
+        stored = try context.fetch(FetchDescriptor<GameRecord>())
+        #expect(stored.count == 1)
+    }
+
+    @Test func batchDeleteOfNothingIsHarmless() throws {
+        let container = try ModelContainer(
+            for: GameRecord.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let context = ModelContext(container)
+        GameLibraryService.importPGNCollection(text: scholars, in: context)
+        #expect(GameLibraryService.delete([], in: context) == 0)
+        #expect(try context.fetch(FetchDescriptor<GameRecord>()).count == 1)
+    }
+
     @Test func deleteRemovesTheGame() throws {
         let container = try ModelContainer(
             for: GameRecord.self,

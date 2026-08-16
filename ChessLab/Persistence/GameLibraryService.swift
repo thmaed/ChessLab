@@ -135,8 +135,20 @@ enum GameLibraryService {
     /// Retire une partie de la bibliothèque. La suppression est définitive :
     /// c'est l'appelant qui demande confirmation.
     static func delete(_ record: GameRecord, in context: ModelContext) {
-        context.delete(record)
+        delete([record], in: context)
+    }
+
+    /// Retire PLUSIEURS parties d'un coup, avec une seule sauvegarde.
+    ///
+    /// Une sauvegarde par partie sur une sélection de cinquante ferait
+    /// cinquante écritures disque et autant de notifications à l'interface,
+    /// qui se redessinerait à chaque suppression.
+    @discardableResult
+    static func delete(_ records: [GameRecord], in context: ModelContext) -> Int {
+        guard !records.isEmpty else { return 0 }
+        for record in records { context.delete(record) }
         try? context.save()
+        return records.count
     }
 
     /// Décode une date PGN « YYYY.MM.DD » (les champs inconnus valent « ?? »).

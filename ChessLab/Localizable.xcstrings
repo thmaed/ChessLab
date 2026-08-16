@@ -1263,6 +1263,7 @@
       }
     },
     "Analyser depuis une position donnée" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1293,6 +1294,9 @@
           }
         }
       }
+    },
+    "Analyser PGN / FEN" : {
+
     },
     "Analyser…" : {
 
@@ -3155,6 +3159,7 @@
 
     },
     "Coller un PGN" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3205,6 +3210,9 @@
           }
         }
       }
+    },
+    "Collez une partie ou une position — le format est reconnu tout seul" : {
+
     },
     "Commencer" : {
       "localizations" : {
@@ -3990,6 +3998,7 @@
       }
     },
     "Depuis le presse-papiers ou saisi" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4834,6 +4843,7 @@
       }
     },
     "Fichier .pgn" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4848,6 +4858,9 @@
           }
         }
       }
+    },
+    "Fichier .pgn ou .fen" : {
+
     },
     "Fichier illisible." : {
       "localizations" : {
@@ -6397,6 +6410,9 @@
           }
         }
       }
+    },
+    "La partie sera retirée de la bibliothèque. Cette action est définitive." : {
+
     },
     "Laboratoire" : {
       "localizations" : {
@@ -8921,6 +8937,7 @@
       }
     },
     "Position FEN" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -11368,6 +11385,12 @@
           }
         }
       }
+    },
+    "Supprimer cette partie ?" : {
+
+    },
+    "Supprimer la partie" : {
+
     },
     "Sur cette partie" : {
 
