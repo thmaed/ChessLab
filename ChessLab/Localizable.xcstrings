@@ -2856,6 +2856,9 @@
         }
       }
     },
+    "Cette action est définitive." : {
+
+    },
     "Changer" : {
       "localizations" : {
         "en" : {
@@ -10832,6 +10835,9 @@
         }
       }
     },
+    "Sélectionner" : {
+
+    },
     "Semi-Slav Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -11367,7 +11373,13 @@
         }
       }
     },
+    "Supprimer (%lld)" : {
+
+    },
     "Supprimer %@" : {
+
+    },
+    "Supprimer %lld parties ?" : {
 
     },
     "Supprimer ce répertoire ?" : {
@@ -11577,6 +11589,9 @@
         }
       }
     },
+    "Terminé" : {
+
+    },
     "Terminer" : {
 
     },
@@ -11769,6 +11784,9 @@
     "Tous résultats" : {
 
     },
+    "Tout décocher" : {
+
+    },
     "Tout est à jour — belle régularité 👏" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -11785,6 +11803,9 @@
           }
         }
       }
+    },
+    "Tout sélectionner" : {
+
     },
     "Toutes" : {
       "localizations" : {

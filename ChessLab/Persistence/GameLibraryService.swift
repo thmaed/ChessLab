@@ -50,7 +50,7 @@ enum GameLibraryService {
     /// connue) : les écarter à tort ferait perdre des parties à
     /// l'utilisateur, ce qui est bien pire que laisser passer un doublon.
     static func signature(ofPGN pgn: String) -> String? {
-        guard let game = try? Game(pgn: PGNSanitizer.sanitize(pgn)) else { return nil }
+        guard let game = PGNLoader.game(from: pgn) else { return nil }
         let moves = movetext(of: pgn)
         guard !moves.isEmpty else { return nil }
         let white = game.tags.white.trimmingCharacters(in: .whitespaces).lowercased()
@@ -102,7 +102,10 @@ enum GameLibraryService {
 
         for block in blocks {
             let candidate = PGNSanitizer.sanitize(block)
-            guard !candidate.isEmpty, let game = try? Game(pgn: candidate) else {
+            // PGNLoader et non `Game(pgn:)` : ChessKit refuse des parties
+            // légales (prise en passant, roque avec échec) et elles seraient
+            // comptées « illisibles » puis perdues sans bruit.
+            guard !candidate.isEmpty, let game = PGNLoader.game(from: candidate) else {
                 skipped += 1
                 continue
             }

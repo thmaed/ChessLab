@@ -1,0 +1,72 @@
+[Event "CSG"]
+[Date "2026.03.07"]
+[White "Jorel, Martin"]
+[Black "Gauthey, Nils"]
+[Result "1-0"]
+
+1. d4 h6 2. e4 g5 3. Nc3 Bg7 4. Be3 d6 5. Qd2 Nc6 6. O-O-O a6 7. f3 b5 8. h4 Bb7 9. hxg5 hxg5 10. Rxh8 Bxh8 11. g4 b4 12. Nd5 a5 13. Qh2 Bg7 14. Qh7 Kf8 15. Bxg5 Nxd4 16. Nf4 Be5 17. Bc4 Qe8 18. Ng6+ 1-0
+
+[Event "CSE"]
+[Date "2026.04.18"]
+[White "Gauthey, Nils"]
+[Black "Cornee, Marius"]
+[Result "1-0"]
+
+1. e4 e6 2. c4 d5 3. cxd5 exd5 4. exd5 Nf6 5. Bb5+ Nbd7 6. Nc3 Bd6 7. Nge2 O-O 8. O-O a6 9. Bc4 Ne5 10. d3 Nfg4 11. f4 Bc5+ 12. d4 Nxc4 13. Qd3 Bd6 14. Qxc4 f5 15. h3 Nf6 16. Bd2 b5 17. Qb3 Bb7 18. a3 Qe8 19. Rae1 Qf7 20. Nc1 Rae8 21. Nd3 Ne4 22. Nxe4 fxe4 23. Ne5 Qxd5 24. Qe3 c5 25. Bc3 b4 26. axb4 cxb4 27. Bd2 a5 28. b3 Bc7 29. Bc1 Bb6 30. Bb2 Rc8 31. Nc4 Rxc4 32. bxc4 Qxc4 33. Rc1 Qd5 34. Kh1 a4 35. Ba1 Rd8 36. Rfd1 Rd7 37. Rb1 Qd6 38. Qd2 b3 39. Bc3 Bc7 40. Ra1 Qc6 41. d5 Qc5 42. Qd4 Qd6 43. Qxe4 Re7 44. Be5 Qf6 45. Qxa4 Rxe5 46. fxe5 Qxe5 47. Kg1 Bb6+ 48. Kf1 b2 49. Rab1 Qf5+ 50. Ke2 Qe5+ 51. Kd3 Qf5+ 52. Kc3 Qe5+ 53. Kb3 Bxd5+ 54. Rxd5 Qxd5+ 55. Qc4 Qxc4+ 56. Kxc4 Bc7 57. Rxb2 Be5 58. Rb7 h6 59. Kd5 Bf6 60. Ke6 Kh7 61. Kf7 h5 62. Rb6 Be5 63. Rb5 Bf4 64. Rxh5+ Bh6 65. g4 g6 66. Rh4 1-0
+
+[Event "CSG"]
+[Date "2025.11.15"]
+[White "Gauthey, Nils"]
+[Black "Aurelien"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 Nc6 3. d4 exd4 4. Nxd4 Bc5 5. Be3 Nxd4 6. Bxd4 Bxd4 7. Qxd4 Nf6 8. e5 Qe7 9. Be2 c5 10. exf6 Qxe2+ 11. Kxe2 cxd4 12. fxg7 Rg8 13. Rd1 d5 14. Rxd4 Be6 15. Nd2 Rc8 16. c3 Rxg7 17. g3 Rg5 18. Nf1 Ke7 19. Ne3 b5 20. a4 a6 21. axb5 axb5 22. Ra5 Rb8 23. Rb4 Bd7 24. Ra6 Rbg8 25. Rd4 Re5 26. Rxd5 Rgg5 27. Rd4 b4 28. Ra7 1-0
+
+[Event "CSG"]
+[Date "2025.11.15"]
+[White "Gauthey, Nils"]
+[Black "George"]
+[Result "0-1"]
+
+1. e4 c5 2. c3 d5 3. exd5 Nf6 4. Qa4+ Bd7 5. Qb3 b5 6. Bxb5 Nxd5 7. Qxd5 Bxb5 8. Qxa8 Qd3 9. Qxb8+ Kd7 10. Qxa7+ Kc6 11. Kd1 Qf1+ 12. Kc2 Bd3+ 13. Kb3 c4+ 14. Kb4 e5+ 15. Ka5 Bd6 16. Na3 Qxf2 17. Qxf2 0-1
+
+[Event "CSE"]
+[Date "2025.04.05"]
+[White "Gauthey, Nils"]
+[Black "Dreyer, Nicolas"]
+[Result "1/2-1/2"]
+
+1. e4 d6 2. d4 Nf6 3. Nc3 e5 4. dxe5 dxe5 5. Qxd8+ Kxd8 6. Bg5 Be6 7. O-O-O+ Kc8 8. Nf3 Nbd7 9. Nd2 c6 10. Bc4 h6 11. Bxe6 fxe6 12. Bh4 Kc7 13. f3 Bc5 14. Na4 Bd4 15. c3 Be3 16. b3 g5 17. Bg3 Nh5 18. Nb2 Nxg3 19. hxg3 h5 20. Nc4 Bf2 21. Nf1 Bc5 22. b4 Be7 23. Nfe3 b5 24. Na5 g4 25. fxg4 Bg5 26. Rde1 hxg4 27. Rxh8 Rxh8 28. Kd1 Nf6 29. Nf1 Nd7 30. Nb3 Kb6 31. Ke2 c5 32. Rd1 Rd8 33. Nxc5 Nxc5 34. bxc5+ Kxc5 35. Rxd8 Bxd8 36. Kd3 b4 37. c4 a5 38. Ne3 a4 39. Nxg4 b3 40. axb3 axb3 41. Kc3 b2 42. Kxb2 Kd4 43. Kb3 Kxe4 44. Kb4 Be7+ 45. Kc3 Kf5 46. Nf2 e4 47. Kd4 e5+ 48. Ke3 Bc5+ 49. Ke2 Bd4 50. Ke1 e3 51. Nd1 Ke4 52. Ke2 Bc5 53. g4 Kf4 54. g5 Kxg5 55. Nxe3 Kf4 56. Nc2 Ke4 57. Ne1 Kd4 58. Kf3 e4+ 59. Kf4 Bd6+ 60. Kf5 Bg3 61. Nc2+ Kxc4 62. Kxe4 Kc5 63. Ne3 Kc6 64. Nf5 Be1 65. Ke5 Bd2 66. g4 Kd7 67. Ng3 Ke8 68. Nh5 Kf7 69. Kf5 Bc1 70. Nf4 1/2-1/2
+
+[Event "CSE"]
+[Date "2025.09.13"]
+[White "Ungureanu, Emil"]
+[Black "Gauthey, Nils"]
+[Result "*"]
+
+1. e4 d5 2. exd5 Qxd5 3. Nc3 Qa5 4. Nf3 Nf6 5. h3 Bf5 6. d3 e6 7. Bd2 Nbd7 8. a3 c5 9. Be2 Qb6 10. Na4 Qc6 11. c4 Bd6 12. O-O O-O 13. Nh2 Bxd3 14. Bxd3 Bxh2+ 15. Kxh2 Qd6+ 16. Bf4 Qxf4+ 17. g3 Qd4 18. Qc2 Ne5 19. Rad1 Nxd3 20. Rxd3 Qe5 21. Nc3 Rfd8 22. Rfd1 Rxd3 23. Qxd3 h6 24. b4 cxb4 25. axb4 Rc8 26. Rd2 a6 27. Re2 Qc7 28. Ne4 Qxc4 29. Nxf6+ gxf6 30. Qe3 Kh7 31. Rb2 f5 32. Rb3 Qf1 33. g4 Rc2 34. Kg3 Qg1+ 35. Kf3 Qh1+ 36. Kg3 Qg1+ 37. Kf3 fxg4+ 38. hxg4 Qh1+ 39. Kg3 Qg1+ 40. Kf3 Qd1+ 41. Kg3 Rc4 42. f3 Qd6+ 43. f4 Rxb4 44. Rd3 Qb6 45. Qe1 Qb5 46. Qe3 a5 47. Rc3 a4 48. Qd2 Rb2 49. Qd4 Qe2 50. f5 Qe1+ 51. Kf4 e5+ 52. Qxe5 Rf2+ *
+
+[Event "Championnat interne"]
+[Date "2025.02.27"]
+[White "Page, Didier"]
+[Black "Gauthey, Nils"]
+[Result "*"]
+
+1. d4 Nf6 2. c4 g6 3. Nc3 d5 4. Nf3 Bg7 5. e3 O-O 6. cxd5 Nxd5 7. Bc4 Be6 8. Qb3 Nxc3 9. Bxe6 fxe6 10. Qxe6+ Kh8 11. bxc3 Rf6 12. Qe4 c5 13. Ba3 Qa5 14. Bxc5 Qxc3+ 15. Ke2 Nc6 16. Rhc1 Qa5 17. a3 b6 18. Bb4 Qb5+ 19. Ke1 Rd8 20. Rab1 Qa4 21. Ng5 Rdf8 22. Ne6 Rc8 23. d5 a5 24. dxc6 axb4 25. Nxg7 Rfxc6 26. Rxc6 Qxc6 27. Qxc6 Rxc6 28. Rxb4 Kxg7 29. Kd2 Kf6 30. Kd3 Ke5 31. Rc4 Rf6 *
+
+[Event "CSE"]
+[Date "2026.03.14"]
+[White "Ranieri, Pierpaolo"]
+[Black "Gauthey, Nils"]
+[Result "1/2-1/2"]
+
+1. d4 f5 2. Nf3 Nf6 3. g3 d6 4. Bg2 Nbd7 5. O-O e5 6. dxe5 dxe5 7. Ng5 Bd6 8. Nc3 h6 9. Nf3 O-O 10. Nb5 Bc5 11. Nh4 a6 12. Nc3 Nb6 13. Ng6 Qxd1 14. Rxd1 Re8 15. Nd5 Nbxd5 16. Bxd5+ Nxd5 17. Rxd5 Bd4 18. e3 Be6 19. Ra5 b6 20. Ra3 Bc5 21. Rc3 Bd7 22. a3 Kf7 23. b4 Bd6 24. Nh4 e4 25. f4 g5 26. Ng2 a5 27. Rb1 axb4 28. axb4 b5 29. Ne1 Be6 30. Ra3 Rxa3 31. Bxa3 Ra8 32. Bc1 Be7 33. c3 Bf6 34. Bb2 Bc4 35. Ra1 Rd8 36. Rc1 gxf4 37. gxf4 Rg8+ 38. Ng2 Rd8 39. Ne1 Rg8+ 40. Ng2 h5 41. Kf2 h4 42. h3 Rg3 43. Rd1 Ke6 44. Rh1 Rg8 45. Rd1 Be2 46. Rg1 Bh5 47. Ra1 Rg3 48. Ra6+ Ke7 49. Rc6 Bf3 50. Ne1 Rxh3 51. Nxf3 exf3 52. Ba3 Rh2+ 53. Kxf3 Ra2 54. Rxc7+ Kd6 55. Rf7 Bxc3 56. Rxf5 Rxa3 57. Rxb5 Bd4 58. Kg4 Bxe3 59. Kxh4 Bxf4 60. Kg4 Bd2 61. Rb8 Kc7 62. Rb5 Rb3 63. Rc5+ Kb6 64. Rc4 Bxb4 65. Kf5 Kb5 66. Re4 Kc6 67. Ke6 Bc5 68. Re2 Rb7 69. Rc2 Re7+ 70. Kf6 Re1 71. Kf5 Kd5 72. Rd2+ Bd4 73. Rd3 Rf1+ 74. Kg4 Ke4 75. Ra3 Rf7 76. Ra5 Rg7+ 77. Rg5 Rh7 78. Ra5 Rh6 79. Rb5 Ra6 80. Kg5 Ra7 81. Kg4 Re7 82. Ra5 Rc7 83. Rb5 Bc5 84. Kg5 Rc6 85. Ra5 Be3+ 86. Kg4 Rg6+ 87. Kh5 Rg8 88. Ra4+ Kf3 89. Rb4 Rg5+ 90. Kh4 Rg6 91. Rb5 Ra6 92. Rf5+ Bf4 93. Rb5 Bd2 94. Rf5+ Ke4 95. Rf8 Rh6+ 96. Kg4 Rg6+ 97. Kh4 Bf4 98. Ra8 Bc1 99. Rf8 Bb2 100. Kh5 Rg1 101. Re8+ Kf5 102. Kh4 Ba3 103. Re2 Bc5 104. Kh3 Kf4 105. Rc2 Rg3+ 106. Kh2 Bg1+ 107. Kh1 Kf3 1/2-1/2
+
+[Event "CSE"]
+[Site "Geneve"]
+[Date "2026.05.08"]
+[White "De Gregorio"]
+[Black "Gauthey, Nils"]
+[Result "1/2-1/2"]
+
+1. d4 f5 2. g3 Nf6 3. Bg2 g6 4. c4 Bg7 5. Nc3 O-O 6. Nh3 c5 7. d5 e5 8. dxe6 dxe6 9. O-O Nc6 10. Nf4 Qe7 11. Nd3 Bd7 12. Bg5 h6 13. Bxf6 Bxf6 14. Nxc5 Be8 15. Nxe6 Rf7 16. Nf4 Kh7 17. Nfd5 Qc5 18. Nxf6+ Rxf6 19. Qd5 Qf8 20. Qb5 Rb8 21. Rad1 f4 22. Qb3 Na5 23. Qc2 fxg3 24. hxg3 Nxc4 25. b3 Ne5 26. Nd5 Rf5 27. Qc7+ Bd7 28. Ne3 Rh5 29. g4 Rc8 30. Qd6 Rg5 31. Qxf8 Rxf8 32. f3 h5 33. gxh5 gxh5 34. Kh2 Rfg8 35. f4 Ng4+ 36. Nxg4 Rxg4 37. Bh3 R4g7 38. Rg1 Re8 39. Rxg7+ Kxg7 40. Rd2 Re3 41. Bg2 b6 42. Bf3 Be6 43. Kg2 h4 44. Rd3 Rxd3 45. exd3 Kf6 46. Kf2 Bh3 47. Bb7 Be6 48. Kf3 Kf5 49. Be4+ Kf6 50. d4 Bh3 51. d5 Bd7 52. Ke3 a5 53. a3 Bg4 54. Bf3 Bf5 55. Be4 Bg4 56. Bf3 Bf5 57. Be4 Bg4 1/2-1/2

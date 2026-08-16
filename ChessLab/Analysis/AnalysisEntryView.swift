@@ -26,7 +26,15 @@ struct AnalysisEntryView: View {
     /// dernier — et « Importer un fichier » ne s'ouvrait donc jamais. Un seul
     /// importeur, dont le MODE dit quoi faire du résultat.
     private enum FileImportMode { case analyse, library }
-    @State private var fileImportMode: FileImportMode?
+    /// 🐛 Bug corrigé : le mode vivait dans l'`Optional` qui pilotait aussi la
+    /// présentation. À la fermeture du sélecteur, SwiftUI remet `isPresented`
+    /// à `false`, ce qui EFFAÇAIT le mode — et le gestionnaire, appelé
+    /// ensuite, lisait `nil` et retombait sur l'import simple. Un fichier
+    /// destiné à la bibliothèque partait donc dans l'analyse, sans rien
+    /// importer et sans rien dire. Deux états distincts : la présentation, et
+    /// le mode, que la fermeture ne touche pas.
+    @State private var fileImportMode: FileImportMode = .analyse
+    @State private var showFileImporter = false
     @State private var importError: String?
     @State private var showOtherSources = false
     @State private var libraryImportSummary: String?
@@ -76,9 +84,11 @@ struct AnalysisEntryView: View {
                     entryCard(title: "Importer un fichier", subtitle: "Fichier .pgn ou .fen", systemImage: "doc.badge.plus", tint: Theme.teal) {
                         importError = nil
                         fileImportMode = .analyse
+                        showFileImporter = true
                     }
                     entryCard(title: "Importer des parties", subtitle: "Base .pgn (plusieurs parties) → bibliothèque", systemImage: "square.and.arrow.down.on.square", tint: Theme.warning) {
                         fileImportMode = .library
+                        showFileImporter = true
                     }
                     entryCard(
                         title: "Éditeur de position", subtitle: "Composer une position sur le plateau",
@@ -107,10 +117,7 @@ struct AnalysisEntryView: View {
             .preferredColorScheme(.dark)
         }
         .fileImporter(
-            isPresented: Binding(
-                get: { fileImportMode != nil },
-                set: { if !$0 { fileImportMode = nil } }
-            ),
+            isPresented: $showFileImporter,
             allowedContentTypes: [
                 UTType(filenameExtension: "pgn") ?? .plainText,
                 UTType(filenameExtension: "fen") ?? .plainText,
@@ -120,9 +127,8 @@ struct AnalysisEntryView: View {
         ) { result in
             switch fileImportMode {
             case .library: handleLibraryImport(result)
-            default: handleFileImport(result)
+            case .analyse: handleFileImport(result)
             }
-            fileImportMode = nil
         }
         .alert("Import terminé", isPresented: Binding(
             get: { libraryImportSummary != nil },
@@ -216,7 +222,7 @@ struct AnalysisEntryView: View {
         }
         let games = PGNSanitizer.splitIntoGames(trimmed)
         let candidate = PGNSanitizer.sanitize(games.first ?? trimmed)
-        if (try? Game(pgn: candidate)) != nil {
+        if PGNLoader.game(from: candidate) != nil {
             importError = nil
             showTextSheet = false
             onSelect(.pgn(candidate))

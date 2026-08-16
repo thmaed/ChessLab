@@ -12,7 +12,8 @@ enum PGNSanitizer {
     /// Nettoyage complet d'une partie unique : normalise les caractères de
     /// copier-coller (fins de ligne Windows, BOM, espaces insécables), aplatit
     /// les lignes vides surnuméraires, puis retire un commentaire d'introduction.
-    static func sanitize(_ pgn: String) -> String {
+    static func sanitizeRaw(_ pgn: String) -> String {
+        // Voir `stripCastlingCheckMarkers` : ChessKit refuse « O-O-O+ ».
         stripLeadingComment(collapseExtraBlankLines(normalizeWhitespace(pgn)))
     }
 
@@ -69,6 +70,29 @@ enum PGNSanitizer {
 
     /// Découpe un texte multi-parties : chaque nouvelle partie recommence
     /// par une paire de crochets `[Event …]`.
+    /// Retire le marqueur d'échec/mat APRÈS un roque — `O-O+`, `O-O-O+`,
+    /// `O-O#`, `O-O-O#`.
+    ///
+    /// 🐛 ChessKit refuse ces coups : `Move(san: "O-O-O+")` rend `nil` alors
+    /// que `Move(san: "O-O-O")` passe, et qu'un échec ordinaire (`Qxf7#`) est
+    /// lu sans problème. Le marqueur est purement décoratif — il décrit une
+    /// conséquence du coup, pas le coup — donc le retirer ne change rien à la
+    /// partie rejouée.
+    ///
+    /// Trouvé sur un vrai fichier de tournoi : une partie sur neuf refusée
+    /// pour ce seul caractère.
+    static func stripCastlingCheckMarkers(_ text: String) -> String {
+        text.replacingOccurrences(
+            of: "(O-O(-O)?)[+#]", with: "$1", options: .regularExpression
+        )
+    }
+
+    /// Assainissement complet : nettoyage historique PUIS retrait des
+    /// marqueurs d'échec sur les roques.
+    static func sanitize(_ text: String) -> String {
+        stripCastlingCheckMarkers(sanitizeRaw(text))
+    }
+
     static func splitIntoGames(_ pgnText: String) -> [String] {
         let lines = normalizeWhitespace(pgnText).components(separatedBy: "\n")
         var games: [String] = []
