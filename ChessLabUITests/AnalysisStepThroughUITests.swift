@@ -69,8 +69,8 @@ final class AnalysisStepThroughUITests: XCTestCase {
         app.buttons["Analyser"].tap()
         XCTAssertTrue(app.buttons["Autres sources"].waitForExistence(timeout: 5))
         app.buttons["Autres sources"].tap()
-        XCTAssertTrue(app.buttons["Position FEN"].waitForExistence(timeout: 5))
-        app.buttons["Position FEN"].tap()
+        XCTAssertTrue(app.buttons["Analyser PGN / FEN"].waitForExistence(timeout: 5))
+        app.buttons["Analyser PGN / FEN"].tap()
 
         let field = app.textViews.firstMatch
         XCTAssertTrue(field.waitForExistence(timeout: 5))

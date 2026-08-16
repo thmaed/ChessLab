@@ -77,8 +77,8 @@ final class PromotionUITests: XCTestCase {
         }
         XCTAssertTrue(app.buttons["Autres sources"].waitForExistence(timeout: 10))
         app.buttons["Autres sources"].tap()
-        XCTAssertTrue(app.buttons["Position FEN"].waitForExistence(timeout: 10))
-        app.buttons["Position FEN"].tap()
+        XCTAssertTrue(app.buttons["Analyser PGN / FEN"].waitForExistence(timeout: 10))
+        app.buttons["Analyser PGN / FEN"].tap()
 
         let field = app.textViews.firstMatch
         XCTAssertTrue(field.waitForExistence(timeout: 10))

@@ -77,13 +77,13 @@ final class EngineLeakUITests: XCTestCase {
     @MainActor
     private func visitAnalysis(_ app: XCUIApplication) throws {
         app.buttons["Analyser"].tap()
-        // « Position FEN » vit sous « Autres sources » : le menu met en avant
+        // « Analyser PGN / FEN » vit sous « Autres sources » : le menu met en avant
         // les chemins courts (scanner, bibliothèque) et replie ce qui demande
         // de fournir un texte.
         XCTAssertTrue(app.buttons["Autres sources"].waitForExistence(timeout: 5))
         app.buttons["Autres sources"].tap()
-        XCTAssertTrue(app.buttons["Position FEN"].waitForExistence(timeout: 5))
-        app.buttons["Position FEN"].tap()
+        XCTAssertTrue(app.buttons["Analyser PGN / FEN"].waitForExistence(timeout: 5))
+        app.buttons["Analyser PGN / FEN"].tap()
 
         let field = app.textViews.firstMatch
         XCTAssertTrue(field.waitForExistence(timeout: 5))
@@ -108,7 +108,7 @@ final class EngineLeakUITests: XCTestCase {
         // Retour à l'accueil : deux écrans à remonter (analyse → entrée →
         // accueil), en laissant la navigation se poser entre les deux.
         app.navigationBars.buttons.firstMatch.tap()
-        XCTAssertTrue(app.buttons["Position FEN"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["Analyser PGN / FEN"].waitForExistence(timeout: 10))
         app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 10))
     }

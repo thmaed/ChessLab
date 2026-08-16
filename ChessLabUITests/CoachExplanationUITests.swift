@@ -110,8 +110,8 @@ final class CoachExplanationUITests: XCTestCase {
 
         XCTAssertTrue(app.buttons["Autres sources"].waitForExistence(timeout: 10))
         app.buttons["Autres sources"].tap()
-        XCTAssertTrue(app.buttons["Coller un PGN"].waitForExistence(timeout: 10))
-        app.buttons["Coller un PGN"].tap()
+        XCTAssertTrue(app.buttons["Analyser PGN / FEN"].waitForExistence(timeout: 10))
+        app.buttons["Analyser PGN / FEN"].tap()
 
         let field = app.textViews.firstMatch
         XCTAssertTrue(field.waitForExistence(timeout: 10))
