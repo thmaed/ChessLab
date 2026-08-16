@@ -89,5 +89,40 @@ COURSE = {
                 "Nd5", "Nc3", "e6", "Nxd5", "exd5", "d4", "d6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-nc3", "title": c("2.Cc3 — les Blancs refusent la chasse", "2.Nc3 — White declines the chase")},
+            "moves": [
+                "e4", "Nf6",
+                {"san": "Nc3",
+                 "comment": c("Un tiers des parties. Les Blancs refusent de pousser e5 et donc de jouer l'Alekhine : plus de cavalier chassé, plus de contre-attaque.",
+                              "A third of games. White declines to push e5 and therefore to play the Alekhine at all: no knight chased, no counterattack."),
+                 "critical": True},
+                {"san": "d5",
+                 "comment": c("La réponse qui remet du jeu : on frappe e4 au centre plutôt que de subir un développement tranquille.",
+                              "The reply that restores play: we hit e4 in the centre rather than endure a quiet development."),
+                 "critical": True},
+                "exd5", "Nxd5", "d4", "Nxc3", "bxc3",
+                {"san": "c5",
+                 "comment": c("Pions doublés blancs contre centre large : on attaque d4 tout de suite, c'est la faiblesse durable de cette structure.",
+                              "White's doubled pawns against a broad centre: we hit d4 at once — the lasting weakness of this structure.")},
+            ],
+        },
+        {
+            "chapter": {"id": "four-pawns", "title": c("Attaque des quatre pions — 5.d4", "Four Pawns Attack — 5.d4")},
+            "moves": [
+                "e4", "Nf6", "e5", "Nd5", "c4", "Nb6", "d4",
+                {"san": "d6",
+                 "comment": c("Trois Noirs sur cinq jouent ce coup ici, et le chapitre continuait autrement. Il faut frapper le centre AVANT qu'il ne se solidifie.",
+                              "Three Black players in five play this here, and the chapter went elsewhere. Strike the centre BEFORE it solidifies."),
+                 "critical": True},
+                "exd6", "cxd6", "Be2", "g6",
+                {"san": "h3",
+                 "comment": c("Les Blancs empêchent …Fg4. Sans cette précaution, le clouage rendrait d4 indéfendable.",
+                              "White stops …Bg4. Without that precaution, the pin would make d4 indefensible.")},
+                "Bg7",
+            ],
+        },
     ],
 }

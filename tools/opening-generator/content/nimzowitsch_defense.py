@@ -45,5 +45,43 @@ COURSE = {
                 "Bf5", "Ne2", "e6", "Ng3", "Bg6", "h4", "h5",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-nf3", "title": c("2.Cf3 — le coup le plus fréquent", "2.Nf3 — the most common move")},
+            "moves": [
+                "e4", "Nc6",
+                {"san": "Nf3",
+                 "comment": c("LE trou principal du cours : quatre parties sur dix, et aucune réponse. L'élève sortait du répertoire au deuxième coup.",
+                              "The course's main hole: four games in ten, and no answer at all. The student left the repertoire at move two."),
+                 "critical": True},
+                {"san": "e5",
+                 "comment": c("On transpose volontairement dans un jeu ouvert : avec le cavalier déjà en c6, c'est une partie italienne ou espagnole ordinaire, terrain connu.",
+                              "We deliberately transpose into an open game: with the knight already on c6, it's an ordinary Italian or Ruy Lopez — familiar ground."),
+                 "critical": True},
+                "Bc4", "Nf6",
+                {"san": "Ng5",
+                 "comment": c("Les Deux Cavaliers. À connaître : la réponse est …d5, et surtout PAS …Cxd5 ensuite.",
+                              "The Two Knights. Know this: the reply is …d5, and definitely NOT …Nxd5 afterwards.")},
+                "d5", "exd5",
+                {"san": "Na5", "critical": True,
+                 "comment": c("La bonne défense. Reprendre en d5 perd sur Cxf7 — c'est le piège que tout joueur de 4.Cg5 espère.",
+                              "The right defence. Recapturing on d5 loses to Nxf7 — the trap every 4.Ng5 player is hoping for.")},
+            ],
+        },
+        {
+            "chapter": {"id": "vs-d4", "title": c("2.d4 d5 — la ligne principale", "2.d4 d5 — the main line")},
+            "moves": [
+                "e4", "Nc6", "d4", "d5",
+                {"san": "exd5",
+                 "comment": c("Plus d'un quart des parties après …d5, et le cours n'y répondait pas.",
+                              "Over a quarter of games after …d5, and the course had no reply.")},
+                {"san": "Qxd5",
+                 "comment": c("On reprend à la dame : le cavalier c6 la défend déjà, et Cc3 ne gagne donc pas de temps comme dans la Scandinave.",
+                              "We recapture with the queen: the c6 knight already guards her, so Nc3 gains no tempo as it would in the Scandinavian."),
+                 "critical": True},
+                "Ne2", "Nf6", "Nbc3", "Qa5", "Be3",
+            ],
+        },
     ],
 }

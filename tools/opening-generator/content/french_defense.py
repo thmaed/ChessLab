@@ -150,5 +150,25 @@ COURSE = {
                 "exd5", "Nf3", "Nf6", "Bd3", "Bd6", "O-O", "O-O", "Bg5", "Bg4", "Nbd2", "Nbd7",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-nf3", "title": c("2.Cf3 — les Blancs évitent d4", "2.Nf3 — White avoids d4")},
+            "moves": [
+                "e4", "e6",
+                {"san": "Nf3",
+                 "comment": c("Près d'un tiers des parties, et le cours partait toujours de 2.d4. Les Blancs gardent le centre souple, souvent pour éviter la théorie française.",
+                              "Nearly a third of games, and the course always started from 2.d4. White keeps the centre flexible, often to dodge French theory."),
+                 "critical": True},
+                {"san": "d5",
+                 "comment": c("On joue notre coup quand même : sans pion en d4, la poussée e5 nous laisse un jeu confortable.",
+                              "We play our move anyway: with no pawn on d4, the e5 push leaves us comfortable.")},
+                "e5", "c5", "c3", "Nc6", "d4",
+                {"san": "Bd7",
+                 "comment": c("Le fou sort AVANT que …c4 ne ferme la position : c'est la nuance qui distingue cet ordre de la Française classique, où il reste souvent enfermé.",
+                              "The bishop develops BEFORE …c4 closes things: that's the nuance separating this move order from the classical French, where it often stays shut in."),
+                 "critical": True},
+            ],
+        },
     ],
 }
