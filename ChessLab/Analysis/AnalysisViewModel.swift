@@ -1310,8 +1310,33 @@ final class AnalysisViewModel {
         else { return }
 
         let mover = index.color
-        let winPercentBeforeMover = mover == .white ? evalBefore.winPercent : 100 - evalBefore.winPercent
-        let winPercentAfterMover = mover == .white ? evalAfter.winPercent : 100 - evalAfter.winPercent
+        var before = evalBefore
+        var after = evalAfter
+        var winPercentBeforeMover = mover == .white ? before.winPercent : 100 - before.winPercent
+        var winPercentAfterMover = mover == .white ? after.winPercent : 100 - after.winPercent
+
+        // Affinage AU FIL DE L'EAU : si le verdict hésite, on approfondit ICI,
+        // avant d'afficher quoi que ce soit. Le coup ne reçoit donc jamais
+        // d'étiquette qu'on lui retirerait ensuite — une classification
+        // révisée sous les yeux du lecteur détruirait la confiance qu'on
+        // cherche précisément à gagner.
+        //
+        // En surchauffe, on renonce à l'affinage plutôt qu'à la passe de base :
+        // mieux vaut tous les coups classés normalement que la moitié classés
+        // finement.
+        if !ThermalMonitor.shared.isThrottling,
+           isBorderline(loss: max(0.0, winPercentBeforeMover - winPercentAfterMover)) {
+            if let deeperBefore = await refinedEval(at: parentIndex, engine: engine) {
+                before = deeperBefore
+                winPercentBeforeMover = mover == .white
+                    ? deeperBefore.winPercent : 100 - deeperBefore.winPercent
+            }
+            if let deeperAfter = await refinedEval(at: index, engine: engine) {
+                after = deeperAfter
+                winPercentAfterMover = mover == .white
+                    ? deeperAfter.winPercent : 100 - deeperAfter.winPercent
+            }
+        }
 
         let isSacrifice = boardAt(index)
             .map { MoveClassifier.involvesSacrifice(move: move, boardAfterMove: $0) } ?? false
@@ -1327,12 +1352,12 @@ final class AnalysisViewModel {
             winPercentAfter: winPercentAfterMover,
             // `gapToSecondBest` est déjà POV du trait à la position
             // parente, c'est-à-dire POV du joueur de CE coup.
-            isBestMove: evalBefore.bestLan == move.lan,
-            gapToSecondBest: evalBefore.gapToSecondBest,
+            isBestMove: before.bestLan == move.lan,
+            gapToSecondBest: before.gapToSecondBest,
             isBook: EcoOpeningLookup.isInBook(sanPath(to: index), in: EcoOpeningLoader.bookLines),
             isSacrifice: isSacrifice,
             sacrificeImmediatelyRecaptured: MoveClassifier.isImmediatelyRecaptured(move, byNext: nextMove),
-            bestMoveWasTactical: bestMoveIsTactical(lan: evalBefore.bestLan, at: parentIndex),
+            bestMoveWasTactical: bestMoveIsTactical(lan: before.bestLan, at: parentIndex),
             isForced: legalMoveCount(at: parentIndex) == 1
         ))
 
@@ -1344,7 +1369,7 @@ final class AnalysisViewModel {
             // une punition. `evalAfter.pv` est la réponse du moteur À CE
             // COUP — la réfutation, déjà payée par l'évaluation ci-dessus.
             explanation: quality.isFault
-                ? explanation(at: index, refutationLANs: evalAfter.pv)
+                ? explanation(at: index, refutationLANs: after.pv)
                 : nil
         )
         if let assessment = quality.pgnAssessment {
@@ -1485,6 +1510,75 @@ final class AnalysisViewModel {
         return inBook ? 80_000 : DevicePerformance.classificationNodeBudget
     }
 
+    // MARK: Affinage des verdicts limites
+
+    /// Demi-largeur de la bande d'incertitude, en points de probabilité de
+    /// gain, autour des seuils qui DÉCLENCHENT un signalement.
+    ///
+    /// Mesuré sur neuf parties de tournoi (887 coups, quatre budgets, ~25
+    /// milliards de nœuds) : à 300 000 nœuds, **4,62 %** des coups reçoivent
+    /// un verdict qu'un budget 33 fois supérieur contredirait — un coup sur
+    /// 22 passe à tort de « signalé » à « non signalé » ou l'inverse.
+    ///
+    /// Augmenter le budget PARTOUT serait un mauvais calcul : dix fois plus
+    /// d'effort ne ramène ce chiffre qu'à 1,69 %. Les erreurs ne sont pas
+    /// réparties au hasard, elles se concentrent autour des seuils — dépenser
+    /// du calcul sur un coup qui perd 40 points ne sert à rien, c'est une
+    /// faute à n'importe quelle profondeur.
+    ///
+    /// Avec cette bande, 14,9 % des coups sont recalculés, 85 % des erreurs
+    /// disparaissent, et il reste **0,68 %** de désaccords — soit MIEUX qu'un
+    /// budget dix fois plus grand appliqué partout, pour un quart du coût.
+    private static let refinementBand = 2.0
+
+    /// Budget de la seconde recherche. Lancée sur la MÊME position sans
+    /// réinitialiser le moteur : la table de transposition du premier passage
+    /// est conservée, donc le surcoût réel est inférieur au rapport des
+    /// budgets.
+    private static let refinementNodes = 3_000_000
+
+    /// Seuils de signalement — les seuls qui comptent. Franchir la frontière
+    /// Excellent/Bon coup ne change rien pour le lecteur : les deux sont bons.
+    private static var refinementThresholds: [Double] {
+        [
+            MoveClassifier.inaccuracyThreshold,
+            MoveClassifier.mistakeThreshold,
+            MoveClassifier.blunderThreshold,
+        ]
+    }
+
+    /// Ce verdict est-il trop proche d'une frontière pour être tranché au
+    /// budget de base ?
+    private func isBorderline(loss: Double) -> Bool {
+        Self.refinementThresholds.contains { abs(loss - $0) <= Self.refinementBand }
+    }
+
+    /// Recalcule une position avec le budget d'affinage, en ÉCRASANT le cache.
+    ///
+    /// Le cache est mis à jour à dessein : la position vaudra ce verdict-là
+    /// pour le reste de la session, et une navigation ultérieure ne doit pas
+    /// retomber sur l'évaluation grossière.
+    private func refinedEval(
+        at index: MoveTree.Index, engine: EngineController
+    ) async -> CachedEval? {
+        guard let position = game.positions[index] else { return nil }
+        if terminalCachedEval(at: index) != nil { return evalCache[index] }
+        let ranked = await rankedEval(
+            fen: position.fen, engine: engine,
+            nodes: Self.refinementNodes,
+            // Plafond PROPRE : celui de la passe de base tronquerait la
+            // recherche approfondie au point de la rendre inutile — on aurait
+            // payé l'attente sans gagner la précision.
+            capMs: DevicePerformance.refinementCapMs,
+            multipv: 2
+        )
+        guard let refined = makeCachedEval(rankedDict: ranked, sideToMove: position.sideToMove) else {
+            return nil
+        }
+        evalCache[index] = refined
+        return refined
+    }
+
     private func evaluatePosition(at index: MoveTree.Index, engine: EngineController) async -> CachedEval? {
         if let cached = evalCache[index] { return cached }
         guard let position = game.positions[index] else { return nil }
@@ -1534,7 +1628,14 @@ final class AnalysisViewModel {
     ///
     /// Relevé à `nodes 300000` (iPhone 17 Pro, Release) : ~600-750 ms en
     /// milieu de partie à 4 threads, 229 ms sur finale, ~2,4 s à 1 seul
-    /// thread. Le plafond `capMs` ne mord donc qu'en régime dégradé, ce qui
+    /// thread.
+    ///
+    /// ⚠️ **Correction du 16/08/2026.** Ce commentaire affirmait que ce budget
+    /// atteignait « la profondeur 18-20 ». Mesuré sur neuf parties de tournoi
+    /// réelles (887 coups), la profondeur médiane est **15**, avec un minimum
+    /// de 9 en milieu de partie encombré. La mesure d'origine devait porter
+    /// sur des positions favorables. C'est ce qui a motivé l'affinage des
+    /// verdicts limites — voir ``refinementBand``. Le plafond `capMs` ne mord donc qu'en régime dégradé, ce qui
     /// est exactement son rôle : on accepte d'y perdre la reproductibilité
     /// plutôt que de laisser une analyse s'éterniser.
     ///

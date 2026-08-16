@@ -59,6 +59,12 @@ enum DevicePerformance {
 
     /// Plafond de TEMPS par position (filet de sécurité quand une position est
     /// dure et que le débit chute). Serré pour garder la passe rapide.
+    /// Plafond de la recherche d'AFFINAGE (seconde passe sur un verdict
+    /// limite). Plus large que celui de la passe de base : appliquer le même
+    /// tronquerait la recherche approfondie au point de la rendre inutile —
+    /// on paierait l'attente sans gagner la précision.
+    static var refinementCapMs: Int { classificationCapMs * 4 }
+
     static var classificationCapMs: Int {
         switch tier {
         case .low: return 1_200
