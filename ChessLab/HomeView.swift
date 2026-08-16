@@ -72,6 +72,8 @@ struct HomeView: View {
         /// entraînement. L'ancien Explorer/Apprendre reste défini mais n'est
         /// plus atteint depuis le flux principal.
         case openingReader(String)
+        /// Éditeur d'arbre — répertoires PERSONNELS seulement (`user-…`).
+        case openingEditor(String)
         case openingExplorerPicker
         case openingExplorerCourse(String)
         case openingLearnCourse(String)
@@ -521,6 +523,13 @@ struct HomeView: View {
                         path.append(Route.openingReader(courseID))
                     } onReview: {
                         path.append(Route.openingTrainDaily)
+                    } onEdit: { courseID in
+                        path.append(Route.openingEditor(courseID))
+                    }
+
+                case let .openingEditor(courseID):
+                    OpeningEditorHost(courseID: courseID) {
+                        path.removeLast()
                     }
 
                 case let .openingReader(courseID):

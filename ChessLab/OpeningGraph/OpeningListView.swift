@@ -10,6 +10,8 @@ struct OpeningListView: View {
     let onSelect: (String) -> Void
     /// Lance la révision espacée du jour.
     var onReview: () -> Void = {}
+    /// Ouvre l'ÉDITEUR d'arbre — répertoires personnels seulement.
+    var onEdit: (String) -> Void = { _ in }
 
     @Environment(\.modelContext) private var modelContext
     @State private var dueCount = 0
@@ -144,6 +146,14 @@ struct OpeningListView: View {
                 ShareLink(item: url) { Label("Partager", systemImage: "square.and.arrow.up") }
                     .tint(Theme.accent)
             }
+            // Réservé aux répertoires PERSONNELS : les cours embarqués sont
+            // livrés avec l'app et se remplaceraient à la mise à jour suivante.
+            Button {
+                onEdit(entry.id)
+            } label: {
+                Label("Modifier", systemImage: "pencil")
+            }
+            .tint(Theme.info)
         }
     }
 
