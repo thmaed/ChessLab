@@ -1444,6 +1444,22 @@ final class PlayViewModel {
     var isReviewing: Bool { reviewPly != nil }
     /// Plateau à AFFICHER (position consultée si en consultation, sinon vivant).
     var displayedBoard: Board { reviewBoard ?? board }
+
+    // MARK: Export
+
+    /// FEN de la position AFFICHÉE — celle que le joueur a sous les yeux, y
+    /// compris s'il est en train de revoir un coup antérieur. Exporter la
+    /// position courante alors qu'il en regarde une autre serait un piège.
+    var displayedFEN: String { displayedBoard.position.fen }
+
+    /// PGN rechargeable de la partie en cours, en-têtes comprises.
+    var exportedPGN: String { PGNExport.pgn(for: game) }
+
+    /// Y a-t-il une PARTIE à exporter ? Avant le premier coup il n'y en a pas,
+    /// et `PGNExport` rend une chaîne vide : proposer « copier la partie »
+    /// remplirait alors le presse-papiers de rien, sans rien dire. La
+    /// POSITION, elle, s'exporte dès le départ — elle existe toujours.
+    var hasGameToExport: Bool { !moveLog.isEmpty }
     var displayedLastMove: Move? {
         guard let reviewPly else { return lastMove }
         return reviewPly > 0 ? moveLog[reviewPly - 1] : nil

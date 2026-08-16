@@ -13,6 +13,7 @@ struct PlayView: View {
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
     @State private var showPanelSheet = false
+    @State private var copiedMessage: String?
     @State private var showResignConfirmation = false
     @State private var showResumeConfirmation = false
     @State private var showDrawConfirmation = false
@@ -42,7 +43,8 @@ struct PlayView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                exportMenu
                 Menu {
                     ForEach(BoardTheme.all) { theme in
                         Button(LocalizedStringKey(theme.label)) { appSettings.boardThemeID = theme.id }
@@ -52,6 +54,17 @@ struct PlayView: View {
                         .foregroundStyle(Theme.textSecondary)
                 }
             }
+        }
+        .alert(
+            "Copié",
+            isPresented: Binding(
+                get: { copiedMessage != nil },
+                set: { if !$0 { copiedMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) { copiedMessage = nil }
+        } message: {
+            Text(copiedMessage ?? "")
         }
         .overlay(alignment: .top) { engineUnavailableBanner }
         .overlay { promotionOverlay }
@@ -271,6 +284,50 @@ struct PlayView: View {
     }
 
     // MARK: Sous-vues
+
+    /// Export de la partie en cours.
+    ///
+    /// Un MENU et non un bouton unique : « exporter sa position » recouvre
+    /// deux besoins distincts et l'app ne peut pas deviner lequel — la FEN
+    /// pour reprendre CETTE position ailleurs (analyse, forum, autre app), le
+    /// PGN pour garder la partie entière. Les deux sont copiables d'un geste,
+    /// et partageables si l'on veut sortir de l'app.
+    ///
+    /// Ce qui est exporté est la position AFFICHÉE : si le joueur revoit un
+    /// coup antérieur, c'est celle-là qu'il a sous les yeux, et donc celle
+    /// qu'il croit exporter.
+    @ViewBuilder
+    private var exportMenu: some View {
+        Menu {
+            Button {
+                UIPasteboard.general.string = viewModel.displayedFEN
+                copiedMessage = LocalizationController.string("Position (FEN) copiée dans le presse-papiers.")
+            } label: {
+                Label("Copier la position (FEN)", systemImage: "square.grid.3x3")
+            }
+            Button {
+                UIPasteboard.general.string = viewModel.exportedPGN
+                copiedMessage = LocalizationController.string("Partie (PGN) copiée dans le presse-papiers.")
+            } label: {
+                Label("Copier la partie (PGN)", systemImage: "doc.on.doc")
+            }
+            .disabled(!viewModel.hasGameToExport)
+            Divider()
+            ShareLink(item: viewModel.displayedFEN) {
+                Label("Partager la position", systemImage: "square.and.arrow.up")
+            }
+            if viewModel.hasGameToExport {
+                ShareLink(item: viewModel.exportedPGN) {
+                    Label("Partager la partie", systemImage: "square.and.arrow.up.on.square")
+                }
+            }
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+                .foregroundStyle(Theme.textSecondary)
+        }
+        .accessibilityLabel("Exporter")
+        .accessibilityIdentifier("exportGame")
+    }
 
     private var board: some View {
         ChessBoardView(
