@@ -45,5 +45,21 @@ COURSE = {
                 "Qe2", "Nf6", "Nc3", "Be7", "Nxe4", "Nxe4", "Qxe4", "O-O",
             ],
         },
+
+        # ── Quand les Blancs déclinent (16/08) ────────────────────────────────
+        {
+            "chapter": {"id": "vs-nxe5", "title": c("3.Cxe5 — la réfutation calme", "3.Nxe5 — the calm refutation")},
+            "moves": [
+                "e4", "e5", "Nf3", "d5",
+                {"san": "Nxe5",
+                 "comment": c("Le coup le plus solide des Blancs, joué une fois sur cinq, et le cours partait de 3.exd5. Ils prennent le pion et rendent le nôtre inutile.",
+                              "White's most solid move, played in one game in five, and the course started from 3.exd5. They take the pawn and make ours pointless."),
+                 "critical": True},
+                {"san": "dxe4",
+                 "comment": c("On récupère au centre. La position reste jouable mais l'initiative promise par le gambit n'est plus là : c'est le prix d'un refus propre.",
+                              "We recapture in the centre. The position stays playable, but the initiative the gambit promised is gone — the price of a clean decline.")},
+                "Bc4", "Nh6", "d4", "Nd7", "Nxd7", "Bxd7",
+            ],
+        },
     ],
 }

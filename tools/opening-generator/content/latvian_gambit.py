@@ -67,5 +67,35 @@ COURSE = {
                 "fxe4", "Nxe5", "Qg5", "d4", "Qxg2", "Qh5+", "g6", "Bf7+", "Kd8", "Bxg6", "Qxh1+",
             ],
         },
+
+        # ── Quand les Blancs déclinent (16/08) ────────────────────────────────
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 — le gambit n'a pas lieu", "2.Bc4 — the gambit never happens")},
+            "moves": [
+                "e4", "e5",
+                {"san": "Bc4",
+                 "comment": c("Le Letton suppose 2.Cf3 : sans cavalier en f3, …f5 n'attaquerait rien et affaiblirait le roque pour rien.",
+                              "The Latvian assumes 2.Nf3: with no knight on f3, …f5 would attack nothing and weaken the king for nothing."),
+                 "critical": True},
+                {"san": "Nf6",
+                 "comment": c("On développe sainement. Un joueur de gambit doit savoir reconnaître les positions où son arme ne s'applique pas.",
+                              "We develop soundly. A gambit player must recognise the positions where the weapon simply doesn't apply.")},
+                "d3", "c6", "Nf3", "d5", "Bb3", "a5",
+            ],
+        },
+        {
+            "chapter": {"id": "main-nd4", "title": c("Ligne principale — 4.Cd4", "Main line — 4.Nd4")},
+            "moves": [
+                "e4", "e5", "Nf3", "f5", "exf5", "e4",
+                {"san": "Nd4",
+                 "comment": c("Le coup le plus fréquent ici — près d'une partie sur deux — et le chapitre continuait autrement.",
+                              "The most common move here — nearly one game in two — and the chapter went elsewhere."),
+                 "critical": True},
+                {"san": "Qf6", "role": "inaccuracy",
+                 "comment": c("La suite naturelle du gambit, mais soyons francs : après Cb5 puis De2, les Noirs perdent le roque et restent sous pression. Le Letton est une arme de surprise, pas une ligne saine — à jouer en connaissance de cause.",
+                              "The gambit's natural follow-up, but let's be honest: after Nb5 and Qe2, Black loses castling rights and stays under pressure. The Latvian is a surprise weapon, not a sound line — play it knowing that.")},
+                "Nb5", "Qe5", "Qe2", "Kd8",
+            ],
+        },
     ],
 }

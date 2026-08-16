@@ -70,5 +70,35 @@ COURSE = {
                               "The a8 knight is trapped: …b6 and …Bb7 round it up. Material is level and the position playable.")},
             ],
         },
+
+        # ── Quand les Blancs déclinent (16/08) ────────────────────────────────
+        {
+            "chapter": {"id": "declined-d5", "title": c("2.d5 — les Blancs poussent", "2.d5 — White pushes past")},
+            "moves": [
+                "d4", "e5",
+                {"san": "d5",
+                 "comment": c("Les Blancs refusent le pion et ferment le centre. Le gambit n'existe plus : il faut jouer la position, pas l'idée.",
+                              "White declines the pawn and closes the centre. The gambit is gone: play the position, not the idea."),
+                 "critical": True},
+                {"san": "Bc5",
+                 "comment": c("Le fou prend la diagonale la plus active pendant que le centre est bloqué — c'est ce qui reste de l'esprit du gambit.",
+                              "The bishop takes the most active diagonal while the centre is blocked — what remains of the gambit's spirit.")},
+                "Nf3", "d6", "e4", "Ne7", "Bd3", "O-O",
+            ],
+        },
+        {
+            "chapter": {"id": "main-nc3", "title": c("Ligne principale — 5.Cc3", "Main line — 5.Nc3")},
+            "moves": [
+                "d4", "e5", "dxe5", "Nc6", "Nf3", "Qe7",
+                {"san": "Nc3",
+                 "comment": c("Un Blanc sur cinq développe ainsi plutôt que de tenir le pion. Reprendre en e5 est correct mais coûte l'initiative : c'est le prix du gambit refusé proprement.",
+                              "One White player in five develops like this rather than clinging to the pawn. Recapturing on e5 is sound but costs the initiative — the price of a cleanly declined gambit."),
+                 "critical": True},
+                {"san": "Nxe5", "role": "inaccuracy",
+                 "comment": c("On récupère le matériel, mais l'échange en f3 abîme notre propre développement. À connaître : ici le gambit ne rapporte plus rien, il faut jouer une position égale et patienter.",
+                              "We regain the material, but the f3 trade damages our own development. Know this: here the gambit yields nothing, and you must play a level position patiently.")},
+                "Bf4", "Nxf3+", "gxf3", "c6",
+            ],
+        },
     ],
 }

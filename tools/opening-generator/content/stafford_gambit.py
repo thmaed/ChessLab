@@ -47,5 +47,36 @@ COURSE = {
                 "Nxe4", "dxe4", "Bxf2+", "Kxf2", "Qxd1",
             ],
         },
+
+        # ── Quand les Blancs refusent le gambit (16/08) ───────────────────────
+        #
+        # Le Stafford EST 1.e4 e5 2.Cf3 Cf6 3.Cxe5 Cc6. Si les Blancs ne
+        # prennent pas en e5, il n'existe pas — et c'est le cas d'une partie
+        # sur deux. Le cours n'en disait rien.
+        {
+            "chapter": {"id": "declined-nc3", "title": c("3.Cc3 — les Quatre Cavaliers", "3.Nc3 — the Four Knights")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nf6",
+                {"san": "Nc3",
+                 "comment": c("Un tiers des parties. Pas de prise en e5, donc pas de Stafford : on joue les Quatre Cavaliers, sainement.",
+                              "A third of games. No capture on e5, so no Stafford: we play the Four Knights, soundly."),
+                 "critical": True},
+                "Nc6", "Bb5", "Bb4", "O-O", "O-O", "d3", "d6",
+            ],
+        },
+        {
+            "chapter": {"id": "declined-bc4", "title": c("3.Fc4 — vers les Deux Cavaliers", "3.Bc4 — into the Two Knights")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nf6",
+                {"san": "Bc4",
+                 "comment": c("Près d'une partie sur cinq. Ici, contrairement à la ligne du gambit, …Cxe4 est parfaitement jouable.",
+                              "Nearly one game in five. Here, unlike in the gambit line, …Nxe4 is perfectly playable."),
+                 "critical": True},
+                {"san": "Nxe4", "critical": True,
+                 "comment": c("On prend : le cavalier reculera en c5 avec un temps, et la position est saine. Un joueur de Stafford aime ce genre de jeu.",
+                              "We take: the knight will drop back to c5 with tempo, and the position is sound. A Stafford player enjoys this kind of game.")},
+                "d3", "Nc5", "Nc3", "c6", "Nxe5", "d5",
+            ],
+        },
     ],
 }

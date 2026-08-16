@@ -176,5 +176,35 @@ COURSE = {
                 "e5", "Nde2", "Be7", "g4", "b5", "Ng3", "Nbd7",
             ],
         },
+
+        # ── Le fou en c4, qui empêche la Sicilienne ouverte (16/08) ───────────
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 et 3.Fc4", "2.Bc4 and 3.Bc4")},
+            "moves": [
+                "e4", "c5",
+                {"san": "Bc4",
+                 "comment": c("La Najdorf suppose 2.Cf3 et 3.d4. Ici les Blancs l'évitent d'entrée, et rien ne répondait à ce coup.",
+                              "The Najdorf assumes 2.Nf3 and 3.d4. Here White sidesteps it immediately, and nothing answered this move."),
+                 "critical": True},
+                "e6", "Nf3", "a6", "O-O",
+                {"san": "d5", "critical": True,
+                 "comment": c("La rupture au moment où elle attaque le fou : …a6 puis …d5 est le plan type contre toutes ces sorties précoces.",
+                              "The break at the moment it hits the bishop: …a6 then …d5 is the standard plan against all these early sorties.")},
+                "exd5", "exd5",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 et 3.Fc4", "2.Bc4 and 3.Bc4")},
+            "moves": [
+                "e4", "c5", "Nf3", "d6",
+                {"san": "Bc4",
+                 "comment": c("Une partie sur cinq après 2…d6. Ici …e6 enfermerait notre fou : on développe d'abord et l'on attend d4.",
+                              "One game in five after 2…d6. Here …e6 would shut in our bishop: we develop first and wait for d4.")},
+                "Nf6", "Nc3", "e6", "O-O", "Be7", "d4", "cxd4",
+                {"san": "Nxd4",
+                 "comment": c("Et la Najdorf finit par arriver, à un ordre près — le fou blanc étant en c4 plutôt qu'en e2, ce qui invite …Ca5 et …b5.",
+                              "And the Najdorf arrives after all, a move order apart — with White's bishop on c4 rather than e2, which invites …Na5 and …b5.")},
+            ],
+        },
     ],
 }
