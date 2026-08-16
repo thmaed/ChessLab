@@ -165,5 +165,41 @@ COURSE = {
                 "Qd2", "Nxd4", "Bxd4", "Bc6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        #
+        # Les deux entrées manquantes sont des SORTIES DE FOU précoces, que le
+        # cours ignorait parce qu'il partait toujours de l'Ouverte. Un
+        # dragonnier les rencontre pourtant une partie sur cinq.
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 et 3.Fc4", "2.Bc4 and 3.Bc4")},
+            "moves": [
+                "e4", "c5",
+                {"san": "Bc4",
+                 "comment": c("Les Blancs sortent le fou avant tout, en espérant une attaque sur f7. Sans centre, elle n'arrivera jamais.",
+                              "White develops the bishop first, hoping for an f7 attack. Without a centre, it never comes."),
+                 "critical": True},
+                {"san": "e6",
+                 "comment": c("On coupe la diagonale et on prépare …d5. Le fou c4 devra bouger une seconde fois.",
+                              "We cut the diagonal and prepare …d5. The c4 bishop will have to move again.")},
+                "Nf3", "Nf6", "Qe2", "Nc6", "c3",
+                {"san": "d5",
+                 "comment": c("La rupture qui règle la partie : le centre s'ouvre au moment où nous sommes mieux développés.",
+                              "The break that settles it: the centre opens exactly when we're the better developed side.")},
+            ],
+        },
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 et 3.Fc4", "2.Bc4 and 3.Bc4")},
+            "moves": [
+                "e4", "c5", "Nf3", "d6",
+                {"san": "Bc4",
+                 "comment": c("Une partie sur cinq après 2…d6. Ici on ne peut plus jouer …e6 sans enfermer le fou : on développe et on attend d4.",
+                              "One game in five after 2…d6. Here …e6 would shut in our bishop: we develop and wait for d4.")},
+                "Nf6", "Nc3", "Bd7", "d4", "cxd4", "Nxd4",
+                {"san": "g6",
+                 "comment": c("Et le Dragon est là, avec un temps de plus pour nous : le fou blanc est en c4 plutôt qu'en e2, ce qui invite …Tc8 et …Ca5.",
+                              "And there's the Dragon, with a spare tempo for us: White's bishop sits on c4 rather than e2, which invites …Rc8 and …Na5.")},
+            ],
+        },
     ],
 }

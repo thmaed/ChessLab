@@ -49,5 +49,42 @@ COURSE = {
                 "exd4", "Nf3", "Nc6", "e5", "d5", "Bb5", "Ne4", "Nxd4", "Bc5",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "two-knights", "title": c("2…Cc6 — vers les Deux Cavaliers", "2…Nc6 — into the Two Knights")},
+            "moves": [
+                "e4", "e5", "Bc4",
+                {"san": "Nc6",
+                 "comment": c("Un tiers des parties, et le cours partait de …Cf6 ou …Fc5. Le coup le plus naturel n'était pas traité.",
+                              "A third of games, and the course started from …Nf6 or …Bc5. The most natural move was untreated."),
+                 "critical": True},
+                "Nf3", "Nf6",
+                {"san": "Ng5",
+                 "comment": c("On bascule dans les Deux Cavaliers, la ligne la plus tranchante : f7 est attaqué deux fois.",
+                              "We switch into the Two Knights, the sharpest line: f7 is hit twice."),
+                 "critical": True},
+                "d5", "exd5",
+                {"san": "Na5",
+                 "comment": c("La bonne défense. Reprendre en d5 perdrait sur Cxf7 — c'est le piège que tout joueur de 3.Cg5 attend.",
+                              "The right defence. Recapturing on d5 would lose to Nxf7 — the trap every 3.Ng5 player is hoping for.")},
+                "Bb5+", "Bd7",
+            ],
+        },
+        {
+            "chapter": {"id": "main", "title": c("2…Cf6 — 3.d3", "2…Nf6 — 3.d3")},
+            "moves": [
+                "e4", "e5", "Bc4", "Nf6", "d3",
+                {"san": "Bc5",
+                 "comment": c("Plus d'un tiers des parties après 3.d3, et le chapitre continuait autrement. Position symétrique, jeu lent : ce sont les plans qui décident.",
+                              "Over a third of games after 3.d3, and the chapter went elsewhere. A symmetrical position and slow play: plans decide."),
+                 "critical": True},
+                "Nf3", "O-O", "O-O", "d6", "c3",
+                {"san": "Bg4",
+                 "comment": c("Les Noirs clouent avant qu'on joue Cbd2. On répond Fg5 : le clouage vaut aussi pour eux.",
+                              "Black pins before we get Nbd2 in. We answer Bg5: the pin cuts both ways.")},
+                "Bg5", "Nbd7",
+            ],
+        },
     ],
 }

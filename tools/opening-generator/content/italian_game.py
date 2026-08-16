@@ -158,5 +158,42 @@ COURSE = {
                 "exd4", "c3", "dxc3", "Nxc3", "d6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-philidor", "title": c("2…d6 — la Philidor", "2…d6 — the Philidor")},
+            "moves": [
+                "e4", "e5", "Nf3",
+                {"san": "d6",
+                 "comment": c("Les Noirs défendent e5 avec un pion et refusent tout le débat. Un cours de 1.e4 e5 doit y répondre : c'est une entrée, pas une variante.",
+                              "Black defends e5 with a pawn and declines the whole debate. A 1.e4 e5 course must answer it: this is an entry point, not a sideline."),
+                 "critical": True},
+                {"san": "d4",
+                 "comment": c("On frappe immédiatement. La Philidor est solide mais étroite : lui laisser le temps de respirer serait lui rendre service.",
+                              "Strike at once. The Philidor is solid but cramped: giving it time to breathe would be doing it a favour.")},
+                "Nd7", "Bd3", "Ngf6", "O-O", "Be7", "Nc3",
+                {"san": "O-O",
+                 "comment": c("Les Noirs sont sains mais sans espace ni contre-jeu. Notre plan est simple : Te1, a4, et l'étouffement.",
+                              "Black is sound but has neither space nor counterplay. Our plan is simple: Re1, a4, and squeeze.")},
+            ],
+        },
+        {
+            "chapter": {"id": "vs-petrov", "title": c("2…Cf6 — la Petroff", "2…Nf6 — the Petrov")},
+            "moves": [
+                "e4", "e5", "Nf3",
+                {"san": "Nf6",
+                 "comment": c("La Petroff : au lieu de défendre e5, les Noirs attaquent e4. Réputée aride, elle est fréquente et le cours n'en disait rien.",
+                              "The Petrov: instead of defending e5, Black attacks e4. Reputedly dry, it's common — and the course said nothing about it."),
+                 "critical": True},
+                {"san": "Nxe5",
+                 "comment": c("On prend. La reprise immédiate …Cxe4 est l'erreur classique : Dе2 gagne alors la dame ou une pièce après l'échec à la découverte.",
+                              "We take. The immediate …Nxe4 is the classic blunder: Qe2 then wins the queen or a piece via the discovered check.")},
+                "d6",
+                {"san": "Nf3",
+                 "comment": c("Le cavalier rentre — jamais Cxf7, qui ne donne que deux pions pour une pièce.",
+                              "The knight retreats — never Nxf7, which gives only two pawns for a piece.")},
+                "Nxe4", "d4", "d5", "Bd3", "Be7",
+            ],
+        },
     ],
 }

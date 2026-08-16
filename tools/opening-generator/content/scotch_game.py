@@ -73,5 +73,24 @@ COURSE = {
                 "Nf6", "e5", "d5", "Bb5", "Ne4", "Nxd4", "Bc5",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-philidor", "title": c("2…d6 — la Philidor", "2…d6 — the Philidor")},
+            "moves": [
+                "e4", "e5", "Nf3",
+                {"san": "d6",
+                 "comment": c("Les Noirs défendent e5 avec un pion et refusent tout le débat. Un cours de 1.e4 e5 doit y répondre : c'est une entrée, pas une variante.",
+                              "Black defends e5 with a pawn and declines the whole debate. A 1.e4 e5 course must answer it: this is an entry point, not a sideline."),
+                 "critical": True},
+                {"san": "d4",
+                 "comment": c("On frappe immédiatement. La Philidor est solide mais étroite : lui laisser le temps de respirer serait lui rendre service.",
+                              "Strike at once. The Philidor is solid but cramped: giving it time to breathe would be doing it a favour.")},
+                "Nd7", "Bd3", "Ngf6", "O-O", "Be7", "Nc3",
+                {"san": "O-O",
+                 "comment": c("Les Noirs sont sains mais sans espace ni contre-jeu. Notre plan est simple : Te1, a4, et l'étouffement.",
+                              "Black is sound but has neither space nor counterplay. Our plan is simple: Re1, a4, and squeeze.")},
+            ],
+        },
     ],
 }
