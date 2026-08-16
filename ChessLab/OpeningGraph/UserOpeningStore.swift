@@ -54,15 +54,27 @@ final class UserOpeningStore {
         reload()
     }
 
+    /// Drapeau de migration, par APPAREIL.
+    private static let migratedKey = "userOpenings.migratedToDatabase"
+
     /// Reprend les répertoires laissés en fichiers par les versions
-    /// précédentes.
+    /// précédentes — **une seule fois par appareil**.
     ///
     /// Les fichiers ne sont PAS supprimés : ils deviennent une sauvegarde
     /// locale muette. Effacer les données d'un utilisateur au premier
     /// lancement d'une mise à jour, sur la foi d'une migration qu'on n'a pas
     /// encore vue réussir, serait le pire moment pour se tromper.
+    ///
+    /// 🐛 Le drapeau n'est pas un détail : sans lui, la migration rejouait à
+    /// chaque lancement, et un répertoire SUPPRIMÉ sur un autre appareil
+    /// revenait d'entre les morts. La suppression se propageait bien, puis le
+    /// fichier local — resté là comme sauvegarde — la défaisait au démarrage
+    /// suivant, et le répertoire se resynchronisait vers l'appareil où on
+    /// venait de l'effacer.
     private func migrateLegacyFilesIfNeeded() {
         guard let context, let directory else { return }
+        guard !UserDefaults.standard.bool(forKey: Self.migratedKey) else { return }
+        defer { UserDefaults.standard.set(true, forKey: Self.migratedKey) }
         let existing = Set((try? context.fetch(FetchDescriptor<UserOpeningRecord>()))?.map(\.id) ?? [])
         guard let files = try? FileManager.default.contentsOfDirectory(
             at: directory, includingPropertiesForKeys: nil
@@ -100,7 +112,9 @@ final class UserOpeningStore {
     func reload() {
         cache = [:]
         if let context {
-            let records = (try? context.fetch(FetchDescriptor<UserOpeningRecord>())) ?? []
+            let records = deduplicated(
+                (try? context.fetch(FetchDescriptor<UserOpeningRecord>())) ?? []
+            )
             catalog = records
                 .compactMap { record -> OpeningCatalogEntry? in
                     guard let course = record.course else { return nil }
@@ -131,6 +145,11 @@ final class UserOpeningStore {
 
     func course(id: String) -> OpeningCourse? {
         if let cached = cache[id] { return cached }
+        // 🐛 Une fois la base branchée, elle est la SEULE vérité. Retomber sur
+        // le fichier local ressuscitait un répertoire supprimé sur un autre
+        // appareil : la base disait « effacé », le fichier répondait quand
+        // même. Les fichiers ne sont plus qu'une sauvegarde de migration.
+        guard context == nil else { return nil }
         guard let url = fileURL(for: id), let course = decodeCourse(at: url) else { return nil }
         cache[id] = course
         return course
@@ -274,6 +293,36 @@ final class UserOpeningStore {
             eco: course.eco, side: course.side, level: course.level, summary: course.summary,
             rootFEN: course.rootFEN, chapters: course.chapters, positions: course.positions
         )
+    }
+
+    /// Écarte les doublons d'identifiant, en gardant le plus récent.
+    ///
+    /// 🐛 Deux appareils qui possédaient le MÊME répertoire en fichier avant
+    /// la mise à jour l'ont chacun migré de leur côté : deux enregistrements
+    /// portant le même identifiant de cours se retrouvent alors en base, et le
+    /// répertoire apparaît en double. CloudKit interdisant les contraintes
+    /// d'unicité, le ménage se fait ici — une fois, au chargement.
+    private func deduplicated(_ records: [UserOpeningRecord]) -> [UserOpeningRecord] {
+        var best: [String: UserOpeningRecord] = [:]
+        var extras: [UserOpeningRecord] = []
+        for record in records {
+            if let kept = best[record.id] {
+                // Le plus récent gagne ; l'autre part.
+                if record.updatedAt > kept.updatedAt {
+                    best[record.id] = record
+                    extras.append(kept)
+                } else {
+                    extras.append(record)
+                }
+            } else {
+                best[record.id] = record
+            }
+        }
+        if !extras.isEmpty, let context {
+            for extra in extras { context.delete(extra) }
+            try? context.save()
+        }
+        return Array(best.values)
     }
 
     private func decodeCourse(at url: URL) -> OpeningCourse? {

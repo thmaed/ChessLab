@@ -81,6 +81,71 @@ struct UserOpeningSyncTests {
         #expect(records.first?.name == "Après")
     }
 
+    /// LE test de ce lot : un répertoire supprimé sur un AUTRE appareil ne
+    /// doit pas revenir d'entre les morts au lancement suivant.
+    ///
+    /// La suppression se propage bien par CloudKit ; c'est le fichier local,
+    /// resté là comme sauvegarde, qui la défaisait — la migration le
+    /// réimportait, et le répertoire se resynchronisait vers l'appareil où on
+    /// venait de l'effacer.
+    @Test func aRepertoireDeletedElsewhereDoesNotComeBack() throws {
+        UserDefaults.standard.removeObject(forKey: "userOpenings.migratedToDatabase")
+        let directory = FileManager.default.temporaryDirectory
+            .appending(path: "userOpenings-\(UUID().uuidString)")
+        try FileManager.default.createDirectory(at: directory, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: directory) }
+
+        let course = sampleCourse(id: "user-ghost", name: "Fantôme")
+        try JSONEncoder().encode(course).write(to: directory.appending(path: "user-ghost.json"))
+
+        let context = try makeContext()
+        let store = UserOpeningStore(directory: directory)
+        store.attach(context: context)
+        #expect(store.course(id: "user-ghost") != nil, "la migration doit d'abord l'importer")
+
+        // Suppression venue d'un autre appareil : l'enregistrement disparaît
+        // de la base, mais le fichier local reste (on ne l'a pas effacé ici).
+        for record in try context.fetch(FetchDescriptor<UserOpeningRecord>()) {
+            context.delete(record)
+        }
+        try context.save()
+
+        // Lancement suivant.
+        store.attach(context: context)
+        #expect(try context.fetch(FetchDescriptor<UserOpeningRecord>()).isEmpty,
+                "le fichier local ne doit pas ressusciter un répertoire supprimé ailleurs")
+        #expect(store.course(id: "user-ghost") == nil)
+    }
+
+    /// Deux appareils qui possédaient le même répertoire en fichier l'ont
+    /// chacun migré : la base contient deux entrées de même identifiant, et le
+    /// répertoire apparaîtrait en double. La plus récente est gardée.
+    @Test func duplicateRecordsAreCollapsed() throws {
+        let context = try makeContext()
+        let store = UserOpeningStore(directory: nil)
+        let course = sampleCourse(id: "user-dup", name: "Ancien")
+        let data = try JSONEncoder().encode(course)
+
+        context.insert(UserOpeningRecord(
+            id: "user-dup", name: "Ancien", payload: data,
+            updatedAt: Date(timeIntervalSince1970: 1_000)
+        ))
+        let newer = try JSONEncoder().encode(
+            OpeningCourseEditor.rename(course, to: "Récent")
+        )
+        context.insert(UserOpeningRecord(
+            id: "user-dup", name: "Récent", payload: newer,
+            updatedAt: Date(timeIntervalSince1970: 2_000)
+        ))
+        try context.save()
+
+        store.attach(context: context)
+
+        #expect(store.catalog.filter { $0.id == "user-dup" }.count == 1)
+        #expect(store.catalog.first { $0.id == "user-dup" }?.name == "Récent")
+        #expect(try context.fetch(FetchDescriptor<UserOpeningRecord>()).count == 1)
+    }
+
     /// LE test : les répertoires laissés en fichiers par les versions
     /// précédentes doivent entrer en base au premier lancement.
     @Test func legacyFilesAreMigrated() throws {
@@ -93,6 +158,7 @@ struct UserOpeningSyncTests {
         let data = try JSONEncoder().encode(course)
         try data.write(to: directory.appending(path: "user-legacy.json"))
 
+        UserDefaults.standard.removeObject(forKey: "userOpenings.migratedToDatabase")
         let context = try makeContext()
         let store = UserOpeningStore(directory: directory)
         store.attach(context: context)
