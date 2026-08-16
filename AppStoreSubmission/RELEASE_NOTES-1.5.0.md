@@ -14,16 +14,39 @@ tous les écrans de jeu. L'échiquier s'affichait normalement mais restait
 inerte. C'est corrigé, et l'app est désormais vérifiée sur appareil réel en
 iOS 18 comme en iOS 26.
 
-**Les cours d'ouverture beaucoup plus complets**
+**Les 58 cours d'ouverture, tous revus**
 
 Vos adversaires ne jouent pas toujours le coup prévu par la leçon. Nous avons
 mesuré, position par position, ce que les joueurs de club jouent réellement, et
 comblé les réponses manquantes — en commençant par celles qui arrivent le plus
-souvent. Plusieurs cours répondent maintenant à des coups qui apparaissent dans
-une partie sur trois et qui n'étaient traités nulle part.
+souvent. **Près de 900 positions ont été ajoutées**, dans les 58 cours.
+
+Un exemple parmi d'autres : tous les répertoires noirs contre 1.d4 supposaient
+que les Blancs enchaînent 2.c4. En club, une partie sur six voit 2.Ff4, la
+London — et le cours s'arrêtait là. Vous sortiez de votre répertoire au
+deuxième coup, avant même que l'ouverture choisie ait pu apparaître. C'est
+comblé, tout comme la Philidor et la Petroff face à 1.e4 e5.
+
+Là où l'ouverture ne survit pas au coup de l'adversaire, le cours le dit
+franchement plutôt que de faire semblant : sans c4, un gambit Budapest ou Benko
+n'est plus un gambit, et mieux vaut l'apprendre dans la leçon que devant
+l'échiquier.
 
 Chaque variante ajoutée a été vérifiée par le moteur : aucune ligne n'enseigne
 un coup qui perd.
+
+**Des verdicts d'analyse plus sûrs**
+
+Un coup jugé « Imprécision » plutôt que « Erreur » à quelques dixièmes près,
+c'est un verdict que vous lisez et retenez. Nous avons mesuré sur des parties
+de tournoi réelles la fréquence de ces basculements : environ un coup sur 22
+recevait une étiquette qu'une analyse plus profonde aurait contredite.
+
+Désormais, quand un verdict tombe près d'une frontière, ChessLab reprend la
+position avec dix fois plus d'effort avant de trancher. Les erreurs
+d'étiquetage baissent de 85 %. L'analyse d'une partie demande un peu plus de
+temps ; sur un appareil lent ou déjà chaud, ce supplément est abandonné plutôt
+que de vous faire attendre.
 
 **Analyser : plus simple**
 
@@ -62,15 +85,37 @@ On iOS 18, no piece responded to touch — neither tap nor drag, on every playin
 screen. The board looked perfectly normal but was inert. This is fixed, and the
 app is now verified on real devices running iOS 18 as well as iOS 26.
 
-**Much more complete opening courses**
+**All 58 opening courses revised**
 
 Your opponents don't always play the move the lesson expects. We measured,
 position by position, what club players actually play, and filled in the
-missing replies — starting with the ones that come up most often. Several
-courses now answer moves that occur in one game out of three and were covered
-nowhere.
+missing replies — starting with the ones that come up most often. **Nearly 900
+positions have been added**, across all 58 courses.
+
+One example among many: every Black repertoire against 1.d4 assumed White would
+follow with 2.c4. In club play, one game in six sees 2.Bf4, the London — and
+the course stopped there. You left your repertoire on move two, before the
+opening you chose could even appear. That gap is filled, as are the Philidor
+and the Petroff against 1.e4 e5.
+
+Where an opening simply doesn't survive the opponent's move, the course now
+says so plainly instead of pretending otherwise: without c4, a Budapest or
+Benko Gambit is no longer a gambit, and it is better to learn that in the
+lesson than at the board.
 
 Every added line was verified by the engine: no course teaches a losing move.
+
+**More reliable analysis verdicts**
+
+A move called “Inaccuracy” rather than “Mistake” by a few tenths is still a
+verdict you read and remember. We measured how often those flips happen on real
+tournament games: about one move in 22 carried a label that deeper analysis
+would have contradicted.
+
+Now, whenever a verdict lands near a boundary, ChessLab re-examines the
+position with ten times the effort before deciding. Mislabelled moves drop by
+85%. Analysing a game takes a little longer; on a slow or already-warm device
+that extra work is dropped rather than keeping you waiting.
 
 **Analyse: simpler**
 
@@ -107,7 +152,19 @@ Stockfish 17.1 replaces Stockfish 17. Sharper analysis, same app size.
   travers de 330 tests verts parce que tous les runtimes installés sont en
   iOS 26. Voir `PROGRESS.md`, section « Le plateau injouable en iOS 18 ».
 - **Le moteur change, donc les évaluations changent.** L'audit complet des 58
-  cours a été rejoué sous 17.1 avant publication.
+  cours a été rejoué sous 17.1 avant publication : aucune gaffe enseignée.
+- **L'analyse est environ trois fois plus lente** qu'en 1.4.0 sur les parties
+  qui contiennent des verdicts limites (×2,95 mesuré sur 887 coups). C'est le
+  prix assumé de l'affinage. Deux garde-fous : la seconde passe est abandonnée
+  si l'appareil est en régulation thermique, et plafonnée en temps par
+  position. Si des retours signalent une attente excessive, le levier est la
+  bande d'affinage (`refinementBand`) : la ramener à ±1 rend le coût à ×1,96 et
+  conserve 59 % du bénéfice — la courbe mesurée est dans le code.
+- **Argument de vente à ne pas surestimer.** Le ratio arêtes/positions des
+  cours reste à 0,99 : ce sont des lignes, pas des arbres touffus. La campagne
+  a supprimé les sorties de répertoire au deuxième coup, pas transformé les
+  cours en encyclopédies. Le dire ainsi évite une déception au premier
+  utilisateur fort.
 - **Taille de l'app inchangée** : le réseau NNUE de la 17.1 pèse 71 Mo, comme
   celui de la 17. C'est ce qui a fait préférer la 17.1 à la 18, dont le réseau
   pèse 104 Mo (+33 Mo pour l'utilisateur, et le seuil de téléchargement
