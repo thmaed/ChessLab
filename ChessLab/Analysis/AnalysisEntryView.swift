@@ -163,8 +163,11 @@ struct AnalysisEntryView: View {
                     .fill(Theme.accentGradient)
                     .frame(width: 18, height: 3)
                 Text("Autres sources")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Theme.textSecondary)
+                    // Plus grand et plus clair que les en-têtes de section
+                    // ordinaires : celui-ci est CLIQUABLE, il doit se
+                    // distinguer d'un simple titre décoratif.
+                    .font(.callout.weight(.bold))
+                    .foregroundStyle(Theme.textPrimary)
                     .textCase(.uppercase)
                     .tracking(0.5)
                     // Le filet est élastique, pas le titre : sans cela il se

@@ -739,6 +739,9 @@
         }
       }
     },
+    "4" : {
+
+    },
     "a gagné" : {
       "localizations" : {
         "en" : {
@@ -3983,6 +3986,9 @@
         }
       }
     },
+    "Déplier quatre options" : {
+
+    },
     "Depuis la 1.0, ChessLab a beaucoup évolué :\n\n• Ouvertures entièrement repensées : un lecteur guidé coup par coup, 58 ouvertures rédigées à la main et bilingues, des flèches colorées (coup recommandé, pièges, autres coups) et un entraînement en répétition espacée qui se règle tout seul.\n• iPad & Mac : interface à barre latérale, échiquier bord à bord, raccourcis clavier et survol au trackpad.\n• Synchronisation iCloud optionnelle : parties, puzzles et ouvertures suivent vos appareils, sans compte ni serveur tiers.\n• Analyse : suivez la meilleure ligne de Stockfish un demi-coup à la fois ; alerte « coup risqué » plus juste.\n• Progrès : un tableau de bord depuis l'accueil, avec un set de puzzles ciblé sur vos thèmes faibles.\n• Scanner plus fiable, moteur Stockfish recompilé (plus rapide et sans saccade), et nouveaux thèmes de plateau et de pièces." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5605,6 +5611,9 @@
           }
         }
       }
+    },
+    "Importer un fichier PGN" : {
+
     },
     "Importer un PGN" : {
       "extractionState" : "stale",
@@ -8488,6 +8497,7 @@
       }
     },
     "PGN, position FEN, éditeur" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -9955,6 +9965,9 @@
         }
       }
     },
+    "Replier" : {
+
+    },
     "Reprendre" : {
 
     },
@@ -10835,7 +10848,7 @@
         }
       }
     },
-    "Sélectionner" : {
+    "Sélectionner des parties" : {
 
     },
     "Semi-Slav Defense" : {
@@ -11589,10 +11602,10 @@
         }
       }
     },
-    "Terminé" : {
+    "Terminer" : {
 
     },
-    "Terminer" : {
+    "Terminer la sélection" : {
 
     },
     "Thème %@" : {
