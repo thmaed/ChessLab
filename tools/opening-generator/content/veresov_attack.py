@@ -55,5 +55,41 @@ COURSE = {
                 "h6", "Bh4", "Qb6", "Rb1", "e6", "Nf3", "Bd6", "Bd3", "Nbd7",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        #
+        # Le moteur propose e4 sur les deux positions — une Pirc ou une
+        # Française. Ce serait quitter la Veresov, qui EST 3.Fg5. On garde le
+        # système ; les deux lignes sont saines.
+        {
+            "chapter": {"id": "vs-g6", "title": c("2…g6 — le fianchetto", "2…g6 — the fianchetto")},
+            "moves": [
+                "d4", "Nf6", "Nc3",
+                {"san": "g6",
+                 "comment": c("Plus d'un quart des parties, et le cours partait de …d5. Les Noirs vont au fianchetto avant de se déterminer au centre.",
+                              "Over a quarter of games, and the course started from …d5. Black fianchettoes before committing in the centre."),
+                 "critical": True},
+                {"san": "Bg5",
+                 "comment": c("Le coup du système, sans se laisser détourner : le fou cloue le cavalier qui garde d5 et e4.",
+                              "The system move, undistracted: the bishop pins the knight that guards d5 and e4."),
+                 "critical": True},
+                "d5", "e3", "Bg7", "Nf3", "O-O", "Be2",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-e6", "title": c("2…e6 — l'installation française", "2…e6 — the French setup")},
+            "moves": [
+                "d4", "Nf6", "Nc3",
+                {"san": "e6",
+                 "comment": c("Un quart des parties. Les Noirs gardent …d5 en réserve et surveillent e4.",
+                              "A quarter of games. Black keeps …d5 in reserve and watches e4.")},
+                "Bg5", "Be7", "Nf3", "d5",
+                {"san": "Bxf6",
+                 "comment": c("On échange volontairement : sans le cavalier f6, e4 devient possible et notre centre prend toute la place.",
+                              "We trade deliberately: without the f6 knight, e4 becomes possible and our centre takes over."),
+                 "critical": True},
+                "Bxf6", "e4",
+            ],
+        },
     ],
 }

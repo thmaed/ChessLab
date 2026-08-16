@@ -52,5 +52,42 @@ COURSE = {
                 "Qxf6", "e4", "d6", "Nc3", "g6", "Qd2", "Bg7", "O-O-O", "Nd7",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-d5", "title": c("2…d5 — l'ordre classique", "2…d5 — the classical order")},
+            "moves": [
+                "d4", "Nf6", "Nf3",
+                {"san": "d5",
+                 "comment": c("Un quart des parties, et le cours partait de …e6 ou …g6. Le moteur suggère c4 — mais ce serait jouer un Gambit Dame, pas une Torre.",
+                              "A quarter of games, and the course started from …e6 or …g6. The engine suggests c4 — but that would be a Queen's Gambit, not a Torre."),
+                 "critical": True},
+                {"san": "Bg5",
+                 "comment": c("Le fou sort, comme toujours dans la Torre. C'est ce qui rend le système jouable sans mémoriser de théorie.",
+                              "The bishop comes out, as always in the Torre. That's what makes the system playable without memorising theory.")},
+                {"san": "Ne4",
+                 "comment": c("La réponse la plus incisive : les Noirs attaquent le fou au lieu de subir le clouage.",
+                              "The sharpest reply: Black hits the bishop instead of enduring the pin.")},
+                {"san": "Bf4",
+                 "comment": c("Le fou glisse en f4 et reste actif — l'échanger en h4 ou le rendre en e3 serait renoncer à l'idée.",
+                              "The bishop slides to f4 and stays active — trading on h4 or dropping back to e3 would abandon the idea.")},
+                "c5", "Nbd2", "cxd4", "Nxd4",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-g6", "title": c("Contre le fianchetto", "vs the fianchetto")},
+            "moves": [
+                "d4", "Nf6", "Nf3", "g6", "Bg5", "Bg7", "Nbd2", "O-O",
+                {"san": "c3",
+                 "comment": c("La moitié des Noirs roquent ici et le chapitre continuait autrement. c3 soutient d4 et prépare e4 : le plan de la Torre en trois coups.",
+                              "Half of Black players castle here and the chapter went elsewhere. c3 supports d4 and prepares e4: the Torre plan in three moves."),
+                 "critical": True},
+                "h6", "Bh4", "c5",
+                {"san": "Bxf6",
+                 "comment": c("On échange au bon moment : le fou g7 perd son vis-à-vis et la grande diagonale se referme sur lui.",
+                              "We trade at the right moment: the g7 bishop loses its counterpart and the long diagonal closes on it.")},
+                "Bxf6", "Ne4",
+            ],
+        },
     ],
 }

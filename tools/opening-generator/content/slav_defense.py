@@ -72,5 +72,36 @@ COURSE = {
                 "h6", "Bh4", "dxc4", "e4", "g5", "Bg3", "b5", "Be2", "Bb7",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        #
+        # Comme pour ses deux cours frères (Gambit Dame accepté et refusé), les
+        # plus gros trous de la Slave sont les AUTRES réponses à 2.c4. On nomme
+        # la bifurcation au lieu de recopier un répertoire entier.
+        {
+            "chapter": {"id": "sisters", "title": c("Si les Noirs ne jouent pas …c6", "If Black doesn't play …c6")},
+            "moves": [
+                "d4", "d5", "c4",
+                {"san": "e6",
+                 "comment": c("Le Gambit Dame refusé — un quart des parties. Différence essentielle avec la Slave : le fou c8 est maintenant enfermé, et tout le plan noir en découle.",
+                              "The Queen's Gambit Declined — a quarter of games. The key difference from the Slav: the c8 bishop is now shut in, and Black's whole plan follows from that."),
+                 "critical": True},
+                "Nc3", "Nf6", "Bg5", "c5", "cxd5", "cxd4", "Qxd4",
+            ],
+        },
+        {
+            "chapter": {"id": "sisters", "title": c("Si les Noirs ne jouent pas …c6", "If Black doesn't play …c6")},
+            "moves": [
+                "d4", "d5", "c4",
+                {"san": "dxc4",
+                 "comment": c("Le Gambit Dame accepté. Les Noirs ne garderont pas le pion ; l'enjeu est de le reprendre sans perdre de temps.",
+                              "The Queen's Gambit Accepted. Black won't keep the pawn; the point is to take it back without losing time.")},
+                {"san": "e4",
+                 "comment": c("La version ambitieuse : on prend tout le centre plutôt que de récupérer le pion tout de suite.",
+                              "The ambitious version: take the whole centre rather than regaining the pawn at once."),
+                 "critical": True},
+                "e5", "Nf3", "Bb4+", "Bd2", "Bxd2+", "Nbxd2",
+            ],
+        },
     ],
 }
