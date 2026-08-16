@@ -78,5 +78,38 @@ COURSE = {
                 "g3", "Bb7", "Bg2", "Be7", "O-O", "O-O", "Nc3", "Ne4", "Qc2", "Nxc3", "Qxc3", "c5",
             ],
         },
+
+        # ── Quand les Blancs ne jouent pas c4 (16/08) ─────────────────────────
+        #
+        # La Nimzo EST 1.d4 Cf6 2.c4 e6 3.Cc3 Fb4. Sans c4, le clouage n'a plus
+        # d'objet : il n'y a pas de cavalier c3 à immobiliser.
+        {
+            "chapter": {"id": "vs-london", "title": c("Contre la London — 2.Ff4", "vs the London — 2.Bf4")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Bf4",
+                 "comment": c("Une partie sur six. Pas de c4, donc pas de Nimzo : le clouage …Fb4 n'aurait personne à clouer.",
+                              "One game in six. No c4, so no Nimzo: the …Bb4 pin would have nothing to pin."),
+                 "critical": True},
+                "e6", "Nf3", "c5", "e3", "d5", "c3",
+                {"san": "Qb6", "critical": True,
+                 "comment": c("Le coup qui met la London mal à l'aise : la dame attaque b2, que le fou parti en f4 ne défend plus. C'est le même esprit que la Nimzo — gêner avant de développer.",
+                              "The move that makes the London uncomfortable: the queen hits b2, which the bishop — gone to f4 — no longer defends. Same spirit as the Nimzo: annoy before developing.")},
+            ],
+        },
+        {
+            "chapter": {"id": "vs-nf3", "title": c("Contre 2.Cf3", "vs 2.Nf3")},
+            "moves": [
+                "d4", "Nf6", "Nf3",
+                {"san": "d5",
+                 "comment": c("On garde toutes les options : si c4 vient, la Nimzo redevient possible par …e6 ; sinon on a une bonne structure de Gambit Dame.",
+                              "We keep every option: if c4 comes, the Nimzo is back on via …e6; otherwise we have a sound Queen's Gambit structure.")},
+                "c4",
+                {"san": "dxc4",
+                 "comment": c("Prendre est correct ici : sans cavalier en c3, les Blancs mettront un temps de plus à récupérer le pion.",
+                              "Taking is correct here: with no knight on c3, White needs an extra tempo to regain the pawn.")},
+                "e3", "e6", "Bxc4", "a6",
+            ],
+        },
     ],
 }

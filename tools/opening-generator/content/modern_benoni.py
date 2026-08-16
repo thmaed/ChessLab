@@ -68,5 +68,28 @@ COURSE = {
                 "a6", "a4", "Bg7", "Bd3", "O-O", "Nf3", "Nbd7", "O-O", "Re8",
             ],
         },
+
+        # ── Sans c4, il n'y a pas de Benoni (16/08) ───────────────────────────
+        {
+            "chapter": {"id": "no-c4", "title": c("Si les Blancs ne jouent pas c4", "If White doesn't play c4")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Bf4",
+                 "comment": c("Le Benoni moderne suppose 2.c4 c5 3.d5 : sans c4, les Blancs ne pousseront pas d5 et la structure à chaîne de pions n'apparaîtra jamais.",
+                              "The Modern Benoni assumes 2.c4 c5 3.d5: without c4, White won't push d5 and the pawn-chain structure never appears."),
+                 "critical": True},
+                "e6", "e3", "d5", "Nf3", "c5", "c3", "Nc6",
+            ],
+        },
+        {
+            "chapter": {"id": "no-c4", "title": c("Si les Blancs ne jouent pas c4", "If White doesn't play c4")},
+            "moves": [
+                "d4", "Nf6", "Nf3",
+                {"san": "d5",
+                 "comment": c("Sans c4, …c5 ne mène à rien : on bâtit une structure classique et l'on attend. Si c4 vient plus tard, le Benoni redevient possible.",
+                              "Without c4, …c5 leads nowhere: we build a classical structure and wait. If c4 comes later, the Benoni is back on.")},
+                "c4", "e6", "cxd5", "exd5", "Nc3", "c6",
+            ],
+        },
     ],
 }

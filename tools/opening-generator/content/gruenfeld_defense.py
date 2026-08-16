@@ -66,5 +66,31 @@ COURSE = {
                 "Bg7", "e3", "c5", "dxc5", "Qa5", "Rc1", "dxc4", "Bxc4", "O-O", "Nf3", "Qxc5",
             ],
         },
+
+        # ── Quand les Blancs ne jouent pas c4 (16/08) ─────────────────────────
+        {
+            "chapter": {"id": "vs-london", "title": c("Contre la London — 2.Ff4", "vs the London — 2.Bf4")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Bf4",
+                 "comment": c("Une partie sur six, et le cours partait de 2.c4. La Grünfeld suppose un centre blanc à démolir : sans c4, il n'y en a pas.",
+                              "One game in six, and the course started from 2.c4. The Grünfeld assumes a White centre to demolish: without c4 there is none."),
+                 "critical": True},
+                {"san": "d5",
+                 "comment": c("On occupe plutôt que de contre-attaquer. C'est un renversement de plan assumé : contre un système, on prend l'espace.",
+                              "We occupy rather than counterattack. A deliberate change of plan: against a system, take the space.")},
+                "e3", "e6", "Nf3", "c5", "c4", "Nc6",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-nf3", "title": c("Contre 2.Cf3", "vs 2.Nf3")},
+            "moves": [
+                "d4", "Nf6", "Nf3",
+                {"san": "d5",
+                 "comment": c("…d5 avant …g6 : si c4 arrive, on transpose dans une Grünfeld d'échange par …g6 ; sinon on a une structure saine.",
+                              "…d5 before …g6: if c4 arrives we transpose into an Exchange Grünfeld via …g6; otherwise we have a sound structure.")},
+                "c4", "e6", "Nc3", "c5", "cxd5", "cxd4", "Qxd4",
+            ],
+        },
     ],
 }
