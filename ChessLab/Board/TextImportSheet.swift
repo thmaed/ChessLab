@@ -4,19 +4,24 @@ import SwiftUI
 /// d'erreur inline — réutilisée par tout import textuel (Analyser,
 /// Ouvertures…). Extraite d'`AnalysisEntryView` à sa deuxième
 /// utilisation.
-struct TextImportSheet: View {
+struct TextImportSheet<Accessory: View>: View {
     let title: String
     @Binding var text: String
     let errorMessage: String?
     let placeholder: String
     let confirmLabel: String
     let onConfirm: () -> Void
+    /// Contenu OPTIONNEL glissé sous la zone de texte — une option propre à
+    /// l'appelant (ajouter à la bibliothèque, choisir un camp…). Vide par
+    /// défaut, pour que les usages existants ne changent pas.
+    @ViewBuilder let accessory: Accessory
 
     @Environment(\.dismiss) private var dismiss
 
     init(
         title: String, text: Binding<String>, errorMessage: String?, placeholder: String,
-        confirmLabel: String = "Importer", onConfirm: @escaping () -> Void
+        confirmLabel: String = "Importer", onConfirm: @escaping () -> Void,
+        @ViewBuilder accessory: () -> Accessory = { EmptyView() }
     ) {
         self.title = title
         _text = text
@@ -24,6 +29,7 @@ struct TextImportSheet: View {
         self.placeholder = placeholder
         self.confirmLabel = confirmLabel
         self.onConfirm = onConfirm
+        self.accessory = accessory()
     }
 
     var body: some View {
@@ -55,6 +61,8 @@ struct TextImportSheet: View {
                         .font(.caption)
                         .foregroundStyle(Theme.textTertiary)
                 }
+
+                accessory
 
                 if let errorMessage {
                     Text(errorMessage)

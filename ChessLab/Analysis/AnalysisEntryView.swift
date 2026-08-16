@@ -20,6 +20,10 @@ struct AnalysisEntryView: View {
     /// presse-papiers avant de pouvoir le coller.
     @State private var importText = ""
     @State private var showTextSheet = false
+    /// « Ajouter aussi à la bibliothèque » : l'analyse reste le geste par
+    /// défaut — c'est l'écran Analyser — et le rangement devient une option
+    /// qu'on coche, jamais une conséquence surprise.
+    @State private var alsoImportToLibrary = false
 
     /// 🐛 Bug corrigé : il y avait DEUX `.fileImporter` sur cette vue, chacun
     /// avec son booléen. SwiftUI n'en présente qu'un — celui déclaré en
@@ -113,6 +117,19 @@ struct AnalysisEntryView: View {
                 confirmLabel: "Lancer l'analyse"
             ) {
                 validate(text: importText)
+            } accessory: {
+                Toggle(isOn: $alsoImportToLibrary) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Ajouter aussi à la bibliothèque")
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.textPrimary)
+                        Text("Sans effet sur une position FEN — la bibliothèque range des parties.")
+                            .font(.caption2)
+                            .foregroundStyle(Theme.textTertiary)
+                    }
+                }
+                .tint(Theme.accent)
+                .accessibilityIdentifier("alsoImportToLibrary")
             }
             .preferredColorScheme(.dark)
         }
@@ -253,6 +270,16 @@ struct AnalysisEntryView: View {
         let games = PGNSanitizer.splitIntoGames(trimmed)
         let candidate = PGNSanitizer.sanitize(games.first ?? trimmed)
         if PGNLoader.game(from: candidate) != nil {
+            // L'analyse ouvre la PREMIÈRE partie ; le rangement, lui, prend
+            // TOUT le texte. Un fichier de neuf parties collé ici s'analyse
+            // par la première et se range en entier — c'est ce qu'on attend
+            // des deux gestes, et ils ne se contredisent pas.
+            if alsoImportToLibrary {
+                let outcome = GameLibraryService.importPGNCollection(
+                    text: trimmed, in: modelContext
+                )
+                libraryImportSummary = summary(of: outcome)
+            }
             importError = nil
             showTextSheet = false
             onSelect(.pgn(candidate))
@@ -301,6 +328,16 @@ struct AnalysisEntryView: View {
     /// (toutes les parties de chaque fichier), puis annonce le total. À la
     /// différence de « Importer un fichier » (qui ouvre la première partie
     /// pour l'analyser), ceci range tout sans rien ouvrir.
+    /// Compte rendu commun aux deux chemins d'import.
+    private func summary(of outcome: GameLibraryService.ImportOutcome) -> String {
+        var lines = ["\(outcome.imported) partie(s) ajoutée(s) à la bibliothèque."]
+        if outcome.duplicates > 0 {
+            lines.append("\(outcome.duplicates) déjà présente(s), non réimportée(s).")
+        }
+        if outcome.skipped > 0 { lines.append("\(outcome.skipped) bloc(s) PGN illisible(s).") }
+        return lines.joined(separator: "\n")
+    }
+
     private func handleLibraryImport(_ result: Result<[URL], Error>) {
         guard case let .success(urls) = result, !urls.isEmpty else { return }
         var imported = 0
