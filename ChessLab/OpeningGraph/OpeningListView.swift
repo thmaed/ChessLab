@@ -88,7 +88,10 @@ struct OpeningListView: View {
             // attaché aux positions, pas au fichier.
             Text("Le fichier est supprimé de cet appareil. Votre progression sur ces positions est conservée.")
         }
-        .onAppear(perform: refresh)
+        .onAppear {
+            UserOpeningSeeder.seedIfRequested()
+            refresh()
+        }
     }
 
     private func refresh() {

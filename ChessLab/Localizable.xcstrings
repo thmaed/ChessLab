@@ -937,6 +937,9 @@
         }
       }
     },
+    "Actions du répertoire" : {
+
+    },
     "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement." : {
       "localizations" : {
         "en" : {
@@ -989,6 +992,9 @@
       }
     },
     "Ajouter au répertoire" : {
+
+    },
+    "Ajouter aussi à la bibliothèque" : {
 
     },
     "Ajouter des coups au répertoire" : {
@@ -3485,7 +3491,16 @@
         }
       }
     },
+    "Copié" : {
+
+    },
     "Copier" : {
+
+    },
+    "Copier la partie (PGN)" : {
+
+    },
+    "Copier la position (FEN)" : {
 
     },
     "Copier la position FEN" : {
@@ -4732,6 +4747,9 @@
       }
     },
     "Explore, apprends et entraîne tes ouvertures depuis le bouton « Explorateur » (🧭) de l'onglet Ouvertures : navigation dans les variantes, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour." : {
+
+    },
+    "Exporter" : {
 
     },
     "Exporter le PGN" : {
@@ -7404,6 +7422,9 @@
     "Modifier" : {
 
     },
+    "Modifier le répertoire" : {
+
+    },
     "Modifier les étiquettes" : {
 
     },
@@ -8251,6 +8272,12 @@
           }
         }
       }
+    },
+    "Partager la partie" : {
+
+    },
+    "Partager la position" : {
+
     },
     "Partie" : {
       "localizations" : {
@@ -10665,6 +10692,9 @@
           }
         }
       }
+    },
+    "Sans effet sur une position FEN — la bibliothèque range des parties." : {
+
     },
     "Sans limite" : {
       "extractionState" : "stale",
