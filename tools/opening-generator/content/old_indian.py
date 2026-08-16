@@ -56,5 +56,27 @@ COURSE = {
                 "Nc3", "Nbd7", "e4", "e5", "Be2", "Be7", "O-O", "O-O",
             ],
         },
+
+        # ── Quand les Blancs ne jouent pas c4 (16/08) ─────────────────────────
+        {
+            "chapter": {"id": "vs-london", "title": c("Contre la London — 2.Ff4", "vs the London — 2.Bf4")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Bf4",
+                 "comment": c("Une partie sur six. L'Est-Indienne ancienne se joue …d6 et …e5 ; contre la London, …d5 est plus net, le fou f4 n'ayant plus de cible.",
+                              "One game in six. The Old Indian plays …d6 and …e5; against the London, …d5 is cleaner — the f4 bishop has no target left."),
+                 "critical": True},
+                "d5", "e3", "c5", "Nc3", "cxd4", "exd4", "a6",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-nf3", "title": c("Contre 2.Cf3", "vs 2.Nf3")},
+            "moves": [
+                "d4", "Nf6", "Nf3", "e6", "c4", "d5", "cxd5", "exd5", "Nc3",
+                {"san": "Bb4",
+                 "comment": c("Le clouage reste disponible : on est passé d'une Est-Indienne ancienne à une Nimzo par transposition, ce qui est un bon échange.",
+                              "The pin is still available: we've slipped from an Old Indian into a Nimzo by transposition, which is a good trade.")},
+            ],
+        },
     ],
 }

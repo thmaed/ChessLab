@@ -92,5 +92,21 @@ COURSE = {
                 "Bg7", "Qd2", "c6", "f3", "b5", "O-O-O", "Nbd7", "Bh6", "Bxh6", "Qxh6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-bd3", "title": c("4.Fd3 — l'installation tranquille", "4.Bd3 — the quiet setup")},
+            "moves": [
+                "e4", "d6", "d4", "Nf6",
+                {"san": "Bd3",
+                 "comment": c("Une partie sur cinq, et le cours n'en parlait pas. Les Blancs renoncent à Cc3 et bâtissent sans hâte.",
+                              "One game in five, and the course didn't mention it. White forgoes Nc3 and builds without hurry."),
+                 "critical": True},
+                {"san": "e5", "critical": True,
+                 "comment": c("Puisqu'ils ne pressent pas, on conteste le centre TOUT DE SUITE — la Pirc n'a d'intérêt que si le centre blanc finit par céder.",
+                              "Since they aren't pressing, we contest the centre AT ONCE — the Pirc is only worth playing if White's centre eventually gives.")},
+                "Nf3", "exd4", "Nxd4", "g6", "Bg5", "h6", "Bh4",
+            ],
+        },
     ],
 }

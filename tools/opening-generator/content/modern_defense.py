@@ -48,5 +48,34 @@ COURSE = {
                 "d5", "e5", "h5", "Nf3", "Bg4",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-nf3", "title": c("2.Cf3 — sans d4", "2.Nf3 — without d4")},
+            "moves": [
+                "e4", "g6",
+                {"san": "Nf3",
+                 "comment": c("Plus d'un quart des parties, et le cours partait de 2.d4. Les Blancs gardent le centre souple pour éviter notre contre-attaque.",
+                              "Over a quarter of games, and the course started from 2.d4. White keeps the centre flexible to dodge our counterattack."),
+                 "critical": True},
+                {"san": "c5", "critical": True,
+                 "comment": c("On frappe avant qu'ils n'installent d4 : c'est une Sicilienne avec le fianchetto déjà décidé, terrain favorable pour nous.",
+                              "We strike before they establish d4: it becomes a Sicilian with the fianchetto already decided — favourable ground for us.")},
+                "d4", "cxd4", "Qxd4", "Nf6", "e5", "Nc6",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-nf3-late", "title": c("3.Cf3 — le développement lent", "3.Nf3 — slow development")},
+            "moves": [
+                "e4", "g6", "d4", "Bg7",
+                {"san": "Nf3",
+                 "comment": c("Près de quatre parties sur dix ici, et le chapitre continuait autrement. Sans Cc3, les Blancs renoncent à l'attaque directe.",
+                              "Nearly four games in ten here, and the chapter went elsewhere. Without Nc3, White gives up on the direct attack.")},
+                "d6", "Nc3", "Nf6", "Bg5", "h6", "Bf4",
+                {"san": "c5",
+                 "comment": c("La rupture au bon moment : le fou f4 ne défend plus d4 et la colonne c s'ouvre pour nous.",
+                              "The break at the right moment: the f4 bishop no longer guards d4 and the c-file opens for us.")},
+            ],
+        },
     ],
 }
