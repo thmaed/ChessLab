@@ -146,9 +146,17 @@ redimensionnement de fenêtre).
       collectée).
 - [ ] **Remplir le questionnaire de classification d'âge** (voir
       `METADATA.md` — tout à « aucun » → 4+).
-- [ ] **TestFlight** (recommandé avant soumission) : envoyer le premier
-      build à un groupe de test interne pour vérifier qu'il s'installe et
-      tourne sur un vrai appareil, pas seulement en simulateur.
+- [ ] **TestFlight — NÉCESSAIRE, pas recommandé** (mis à jour le 16/08/2026) :
+      envoyer le build à un groupe de test interne et l'essayer sur un vrai
+      appareil. **Dont un appareil en iOS 18** tant que la cible de déploiement
+      reste à 18.0.
+      *Pourquoi ce n'est plus optionnel* : un défaut rendait le plateau
+      totalement injouable en iOS 18 — aucune pièce ne répondait, sur tous les
+      écrans — alors que les 330+ tests étaient verts. Tous les runtimes
+      installés sont en iOS 26, où le défaut est invisible : deux versions
+      majeures d'écart avec la cible, jamais exercées. Trouvé par un essai sur
+      iPhone, pas par la suite de tests. Voir `PROGRESS.md`, section
+      « Le plateau injouable en iOS 18 ».
 
 ## Point d'attention indépendant (pas bloquant)
 

@@ -130,24 +130,29 @@ struct BoardCropView: View {
     private func handles(transform: ImageDisplayTransform) -> some View {
         ForEach(Corner.allCases, id: \.self) { corner in
             let position = transform.toView(point(for: corner))
+            let diameter: CGFloat = draggedCorner == corner ? 46 : 34
 
             Circle()
                 .fill(outlineColor.opacity(0.28))
                 .overlay(Circle().strokeBorder(outlineColor, lineWidth: 2))
-                .frame(width: draggedCorner == corner ? 46 : 34)
+                .frame(width: diameter)
                 // Cible tactile confortable, indépendante du disque affiché.
                 .contentShape(Circle().inset(by: -12))
-                // ⚠️ ORDRE CRITIQUE : le geste AVANT `.position` — même piège
-                // que ``ChessBoardView/piecesLayer(squareSize:)``, où il rendait
-                // le plateau injouable en iOS 18. Une vue positionnée occupe
-                // tout l'espace offert : posé après, ce geste couvrirait toute
-                // l'image, les quatre poignées s'empileraient, et la dernière
-                // de `Corner.allCases` répondrait partout. Non signalé jusqu'ici
-                // faute d'avoir scanné un plateau depuis un iOS 18.
                 .gesture(dragGesture(for: corner, transform: transform))
                 .accessibilityIdentifier("cropHandle_\(identifier(for: corner))")
                 .accessibilityLabel(label(for: corner))
-                .position(position)
+                // ⚠️ `.offset` et NON `.position` — même piège que
+                // ``ChessBoardView/piecesLayer(squareSize:)``, où il rendait le
+                // plateau injouable en iOS 18. `.position` fabrique un
+                // conteneur de la taille de TOUTE l'image ; les quatre poignées
+                // s'empilaient, et la dernière de `Corner.allCases`
+                // interceptait partout. `.offset` laisse la vue à sa taille de
+                // poignée. Le `ZStack` parent est aligné `.topLeading`, d'où le
+                // demi-diamètre retranché pour retomber sur le centre voulu.
+                //
+                // Non signalé jusqu'ici faute d'avoir scanné un plateau depuis
+                // un iOS 18.
+                .offset(x: position.x - diameter / 2, y: position.y - diameter / 2)
         }
     }
 

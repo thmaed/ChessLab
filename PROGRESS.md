@@ -5355,6 +5355,70 @@ anglaises fournies pour les six chaînes nouvelles ou modifiées.
   les tests tournaient sur un arbre périmé sans que rien ne l'indique. Toujours
   donner un chemin ABSOLU à `rsync` dans ce dépôt.
 
+## Le plateau injouable en iOS 18 — `.position` contre `.offset` ✅ (2026-08-16)
+
+Signalé sur **iPhone 11 et iPhone XS Max, tous deux en iOS 18** : aucune pièce
+ne répond, ni au tap ni au glisser, sur les quatre écrans. Le même iPhone 11
+passé en iOS 26 fonctionne parfaitement.
+
+### La cause
+
+Dans `ChessBoardView.piecesLayer`, chaque pièce était placée par
+`.position(centerPoint(of:))`.
+
+**`.position` est un modificateur de MISE EN PAGE** : il rend une vue qui occupe
+tout l'espace offert et y place l'enfant au point demandé. Chaque pièce
+fabriquait donc un conteneur **de la taille du plateau entier**, et ces 32
+conteneurs s'empilaient dans le `ForEach`. En iOS 18, c'est le conteneur du
+dessus qui intercepte le toucher sur toute la surface.
+
+D'où un symptôme trompeur : « seule la colonne H répond ». Ce n'était pas une
+colonne, c'était **une seule pièce** — h2, la dernière de `position.pieces`,
+puis h4 une fois le pion avancé. Le journal de diagnostic ne montre jamais
+autre chose.
+
+### La correction, et la fausse piste qui a précédé
+
+**Première tentative, insuffisante** : déplacer le geste AVANT `.position`.
+Rejetée par l'appareil, symptôme inchangé — le conteneur pleine surface existe
+toujours, et c'est lui le problème, pas l'endroit où le geste est accroché.
+
+**Correction retenue** : `.offset` au lieu de `.position`. C'est un
+modificateur de RENDU : la vue garde sa taille d'une case et le hit-testing
+suit le décalage. Plus aucun conteneur pleine surface. Le `ZStack` étant
+aligné `.topLeading`, un demi-carreau est retranché au centre de la case
+(`originOffset`).
+
+Deuxième occurrence corrigée dans `BoardCropView` : quatre poignées de
+recadrage, même construction, donc la dernière de `Corner.allCases` aurait
+répondu sur toute l'image. Jamais signalée faute d'avoir scanné un plateau
+depuis un iOS 18.
+
+**Vérifié sur l'appareil** (iPhone XS Max, iOS 18) : le plateau répond
+normalement. C'est la seule validation qui compte — voir ci-dessous.
+
+### Deux angles morts de la vérification, comblés
+
+1. **Aucun test ne vérifiait qu'une case est ATTEIGNABLE**, seulement qu'elle
+   existe. Or une case injoignable existe dans l'arbre d'accessibilité et
+   s'affiche normalement. `BoardHitTestUITests` exige désormais `isHittable`
+   sur trois cases, à cinq tailles de texte.
+2. **Tous les runtimes installés sont en iOS 26**, alors que la cible de
+   déploiement est **iOS 18.0** : deux versions majeures jamais exercées. Ce
+   défaut y est totalement invisible, donc aucun test d'interface ne pouvait
+   l'attraper ici. `PositionedGestureOrderTests` relit les SOURCES et échoue si
+   une vue interactive est placée par `.position` — seule forme de test qui
+   tienne sur ce genre de défaut.
+
+*Piège rencontré* : ce garde-fou a d'abord vérifié la mauvaise chose (un ORDRE,
+c'est-à-dire précisément la correction qui ne marche pas), et s'est ancré sur
+le commentaire qui documentait le piège. Il vérifie maintenant l'USAGE.
+
+**Conséquence pour la soumission** : l'étape TestFlight de
+`AppStoreSubmission/CHECKLIST.md` est notée « recommandée ». Elle est
+**nécessaire**, et un appareil iOS 18 doit rester dans la boucle tant que la
+cible de déploiement n'est pas remontée.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-15)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque

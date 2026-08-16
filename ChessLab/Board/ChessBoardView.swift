@@ -63,15 +63,6 @@ struct ChessBoardView: View {
 
     @State private var dragState: DragState?
 
-    #if DEBUG
-    // ⚠️ TEMPORAIRE — diagnostic du plateau inerte en iOS 18. Ces compteurs
-    // s'affichent SUR le plateau : ils répondent sans console et sans
-    // débogueur attaché, ce qui est justement l'ambiguïté qu'on cherche à
-    // lever. À retirer avec `BoardTouchLog` une fois la cause trouvée.
-    @State private var touchCountSquares = 0
-    @State private var touchCountPieces = 0
-    @State private var lastTouchDetail = "aucun toucher"
-    #endif
 
     // MARK: Survol (pointeur/trackpad — iPad & Mac)
     /// Case sous le pointeur. Reste `nil` au doigt : `onHover` ne se déclenche
@@ -125,24 +116,6 @@ struct ChessBoardView: View {
         var resolvedTarget: Square?
     }
 
-    #if DEBUG
-    /// ⚠️ TEMPORAIRE — voir les compteurs plus haut. Transparent au toucher :
-    /// il ne doit rien changer au comportement qu'il mesure.
-    private var touchDiagnosticBadge: some View {
-        VStack(spacing: 1) {
-            Text("cases \(touchCountSquares)  ·  pièces \(touchCountPieces)")
-                .font(.system(size: 11, weight: .bold, design: .monospaced))
-            Text(lastTouchDetail)
-                .font(.system(size: 9, design: .monospaced))
-        }
-        .foregroundStyle(.white)
-        .padding(.horizontal, 8).padding(.vertical, 4)
-        .background(.black.opacity(0.75), in: RoundedRectangle(cornerRadius: 6))
-        .padding(.top, 4)
-        .allowsHitTesting(false)
-        .accessibilityHidden(true)
-    }
-    #endif
 
     /// Géométrie courante — voir ``BoardGeometry``.
     private func geometry(squareSize: CGFloat) -> BoardGeometry {
@@ -253,9 +226,6 @@ struct ChessBoardView: View {
             // (pas de coins arrondis qui rogneraient une pièce en cours de
             // glissement près du bord).
             .overlay(Rectangle().strokeBorder(Color.black.opacity(0.28), lineWidth: 1))
-            #if DEBUG
-            .overlay(alignment: .top) { touchDiagnosticBadge }
-            #endif
             .shadow(color: .black.opacity(0.38), radius: 16, x: 0, y: 8)
             .coordinateSpace(name: "board")
             .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
@@ -354,15 +324,6 @@ struct ChessBoardView: View {
                             .gesture(
                                 SpatialTapGesture(coordinateSpace: .named("board"))
                                     .onEnded { value in
-                                        #if DEBUG
-                                        touchCountSquares += 1
-                                        lastTouchDetail = "case \(sq.notation) · interaction=\(interactionEnabled)"
-                                        #endif
-                                        BoardTouchLog.record(
-                                            "tap-case", square: sq,
-                                            detail: "point=(\(Int(value.location.x)),\(Int(value.location.y))) "
-                                                + "interaction=\(interactionEnabled)"
-                                        )
                                         guard interactionEnabled else { return }
                                         onTapSquare(
                                             tappedSquare(
@@ -585,24 +546,29 @@ struct ChessBoardView: View {
                 .frame(width: squareSize, height: squareSize)
                 .rotationEffect(pieceRotation)
                 .opacity((dragState?.square == piece.square || slidingMove?.end == piece.square || rejectAnim?.from == piece.square) ? 0 : 1)
-                // ⚠️ ORDRE CRITIQUE : geste et hit-testing AVANT `.position`.
+                // ⚠️ `.offset` et NON `.position` — la distinction porte tout
+                // le comportement tactile de cette couche.
                 //
-                // 🐛 Bug corrigé (iPhone XS Max / iOS 18) : `.position()` rend
-                // une vue qui occupe TOUT l'espace offert et y place l'enfant.
-                // Tout modificateur posé APRÈS s'applique donc à une vue de la
-                // taille du plateau entier, pas de la case. Chacune des 16
-                // pièces jouables portait ainsi un geste couvrant les 64 cases,
-                // empilés dans le `ForEach` — et la DERNIÈRE gagnait le
-                // hit-testing pour tout le plateau. Cette dernière est h2 dans
-                // l'ordre de `position.pieces`, d'où le symptôme relevé sur
-                // appareil : « seule la colonne H répond », puis h4 une fois le
-                // pion avancé.
+                // 🐛 Bug corrigé (iPhone XS Max / iOS 18) : le plateau était
+                // injouable, seule la colonne H répondait — en réalité une
+                // seule pièce, h2, la dernière de `position.pieces`, puis h4
+                // une fois le pion avancé.
+                //
+                // `.position()` est un modificateur de MISE EN PAGE : il rend
+                // une vue qui occupe tout l'espace offert et y place l'enfant.
+                // Chaque pièce fabriquait donc un conteneur de la taille du
+                // plateau entier, et ces 32 conteneurs s'empilaient. Déplacer
+                // simplement le geste avant `.position` ne suffit pas — essayé,
+                // sans effet : le conteneur reste, et c'est LUI qui intercepte
+                // en iOS 18.
+                //
+                // `.offset` est un modificateur de RENDU : la vue garde sa
+                // taille d'une case, et le hit-testing suit le décalage. Plus
+                // aucun conteneur pleine surface, donc plus rien à intercepter.
                 //
                 // Invisible en iOS 26, qui ne laisse plus la zone vide d'une
                 // vue positionnée capter le toucher — et invisible en test, nos
-                // simulateurs n'ayant que ce runtime. Le code ne doit pas
-                // dépendre de cette différence : borner le geste à la case est
-                // vrai dans les deux cas.
+                // simulateurs n'ayant que ce runtime.
                 .contentShape(Rectangle())
                 .gesture(isDraggable(piece) ? dragGesture(for: piece.square, squareSize: squareSize) : nil)
                 // Une pièce SANS geste doit être transparente au toucher.
@@ -617,7 +583,7 @@ struct ChessBoardView: View {
                 // seul le glisser fonctionnait — il part d'une pièce à soi.
                 // Invisible sur un déplacement vers une case vide.
                 .allowsHitTesting(isDraggable(piece))
-                .position(centerPoint(of: piece.square, squareSize: squareSize))
+                .offset(originOffset(of: piece.square, squareSize: squareSize))
                 .animation(.easeInOut(duration: 0.35), value: allPiecesRotated)
                 // Une pièce glissable est au-dessus de sa case et capterait le
                 // survol : on relaie le hover depuis le glyphe pour que
@@ -688,16 +654,6 @@ struct ChessBoardView: View {
         let geometry = geometry(squareSize: squareSize)
         return DragGesture(minimumDistance: 0, coordinateSpace: .named("board"))
             .onChanged { value in
-                #if DEBUG
-                if dragState == nil {
-                    touchCountPieces += 1
-                    lastTouchDetail = "pièce \(square.notation) · interaction=\(interactionEnabled)"
-                }
-                #endif
-                BoardTouchLog.recordOnce(
-                    "debut-geste-piece", square: square,
-                    detail: "interaction=\(interactionEnabled) draggable=\(draggableColor.map(String.init(describing:)) ?? "toutes")"
-                )
                 // `minimumDistance: 0` fait entrer ici dès le toucher : la
                 // transition `nil` → non-nil est donc le vrai début du geste,
                 // et le seul endroit où calculer les coups légaux.
@@ -715,7 +671,7 @@ struct ChessBoardView: View {
                 )
             }
             .onEnded { value in
-                defer { dragState = nil; BoardTouchLog.resetThrottle() }
+                defer { dragState = nil }
 
                 let distance = hypot(value.translation.width, value.translation.height)
                 // Case GÉOMÉTRIQUE, pas résolue : voir le piège ci-dessous.
@@ -743,10 +699,6 @@ struct ChessBoardView: View {
                 // s'activerait et le centre de e3 n'est qu'à 0,5 case — dans
                 // le rayon. Snap sur e3, coup joué, alors que le joueur
                 // renonçait. Voir `BoardGeometryTests`.
-                BoardTouchLog.record(
-                    "fin-geste-piece", square: square,
-                    detail: "distance=\(Int(distance)) geo=\(geometricTarget?.notation ?? "nil")"
-                )
                 if geometricTarget == square || distance < Self.tapSlop {
                     onTapSquare(square)
                 } else if let target = geometry.resolve(
@@ -794,6 +746,18 @@ struct ChessBoardView: View {
 
     private func centerPoint(of sq: Square, squareSize: CGFloat) -> CGPoint {
         geometry(squareSize: squareSize).centerPoint(of: sq)
+    }
+
+    /// Décalage du coin HAUT-GAUCHE d'une case depuis l'origine du plateau.
+    ///
+    /// Permet de placer une vue déjà dimensionnée à la case avec `.offset`
+    /// plutôt qu'avec `.position` : le `ZStack` étant aligné `.topLeading`, une
+    /// vue non décalée se trouve déjà sur a8 (ou h1 si le plateau est
+    /// retourné). Voir le commentaire de ``piecesLayer(squareSize:)`` pour ce
+    /// que cette différence change au toucher.
+    private func originOffset(of sq: Square, squareSize: CGFloat) -> CGSize {
+        let center = centerPoint(of: sq, squareSize: squareSize)
+        return CGSize(width: center.x - squareSize / 2, height: center.y - squareSize / 2)
     }
 
     private func accessibilityLabel(for sq: Square) -> String {

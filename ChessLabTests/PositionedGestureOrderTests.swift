@@ -43,43 +43,64 @@ struct PositionedGestureOrderTests {
     /// Modificateurs qui n'ont de sens que bornés à l'élément lui-même.
     private static let interactive = [".gesture(", ".onTapGesture", ".simultaneousGesture(", ".highPriorityGesture("]
 
-    @Test func noGestureIsAttachedAfterPosition() throws {
+    /// Une CHAÎNE de modificateurs : la ligne d'ancrage et les lignes
+    /// suivantes qui commencent par « . ». Commentaires et lignes vides ne
+    /// l'interrompent pas.
+    private static func chains(in contents: String) -> [(line: Int, body: [String])] {
+        let lines = contents.components(separatedBy: .newlines)
+        var result: [(Int, [String])] = []
+        var index = 0
+        while index < lines.count {
+            let trimmed = lines[index].trimmingCharacters(in: .whitespaces)
+            guard !trimmed.hasPrefix("//"), !trimmed.isEmpty, !trimmed.hasPrefix(".") else {
+                index += 1
+                continue
+            }
+            var body = [trimmed]
+            var cursor = index + 1
+            while cursor < lines.count {
+                let next = lines[cursor].trimmingCharacters(in: .whitespaces)
+                if next.isEmpty || next.hasPrefix("//") { cursor += 1; continue }
+                guard next.hasPrefix(".") else { break }
+                body.append(next)
+                cursor += 1
+            }
+            if body.count > 1 { result.append((index + 1, body)) }
+            index = max(cursor, index + 1)
+        }
+        return result
+    }
+
+    /// L'invariant n'est pas un ORDRE mais un USAGE : une vue qui doit recevoir
+    /// le toucher ne se place pas avec `.position`, quel que soit l'endroit où
+    /// le geste est accroché.
+    ///
+    /// Déplacer simplement le geste avant `.position` ne corrige rien — essayé
+    /// sur l'appareil, sans effet : le conteneur pleine surface existe toujours
+    /// et c'est lui qui intercepte. `.offset` est la forme correcte.
+    @Test func noInteractiveViewIsPlacedWithPosition() throws {
         let files = Self.swiftFiles()
         #expect(!files.isEmpty, "les sources doivent être trouvables depuis #filePath")
 
         var offenders: [String] = []
         for file in files {
             guard let contents = try? String(contentsOf: file, encoding: .utf8) else { continue }
-            let lines = contents.components(separatedBy: .newlines)
-
-            for (index, line) in lines.enumerated() {
-                // Un COMMENTAIRE qui parle de `.position()` n'est pas un appel —
-                // et ce fichier-ci, comme celui du plateau, en contient
-                // justement pour documenter le piège.
-                let anchor = line.trimmingCharacters(in: .whitespaces)
-                guard !anchor.hasPrefix("//"), anchor.contains(".position(") else { continue }
-                // On regarde la suite IMMÉDIATE de la chaîne de modificateurs :
-                // une ligne qui commence par « . » la poursuit. Un commentaire
-                // ou une ligne vide ne l'interrompt pas ; autre chose, si.
-                for next in lines.dropFirst(index + 1) {
-                    let trimmed = next.trimmingCharacters(in: .whitespaces)
-                    if trimmed.isEmpty || trimmed.hasPrefix("//") { continue }
-                    guard trimmed.hasPrefix(".") else { break }
-                    if Self.interactive.contains(where: trimmed.hasPrefix) {
-                        offenders.append(
-                            "\(file.lastPathComponent):\(index + 1) — \(trimmed.prefix(60))"
-                        )
-                        break
-                    }
-                }
+            for chain in Self.chains(in: contents) {
+                let positions = chain.body.filter { $0.hasPrefix(".position(") }
+                guard !positions.isEmpty else { continue }
+                guard chain.body.contains(where: { line in
+                    Self.interactive.contains(where: line.hasPrefix)
+                }) else { continue }
+                offenders.append("\(file.lastPathComponent):\(chain.line)")
             }
         }
 
         #expect(
             offenders.isEmpty,
             """
-            Geste posé après `.position(…)` — il couvrira tout le conteneur, \
-            pas l'élément visé (plateau injouable en iOS 18) :
+            Vue interactive placée avec `.position(…)` : le conteneur qu'il \
+            fabrique occupe toute la surface et intercepte le toucher en \
+            iOS 18. Utiliser `.offset(…)`, qui laisse la vue à sa taille.
             \(offenders.joined(separator: "\n"))
             """
         )
