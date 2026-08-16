@@ -17,10 +17,30 @@ struct OpeningListView: View {
     @State private var dueCount = 0
     /// Observé : la liste se rafraîchit d'elle-même après un import.
     @State private var store = UserOpeningStore.shared
+
+    /// Les répertoires personnels tels que la BASE les voit.
+    ///
+    /// 🐛 Sans cette requête, l'écran ne voyait jamais arriver les répertoires
+    /// créés sur un autre appareil : `store.catalog` est un tableau mis en
+    /// cache, recalculé par `reload()` seulement, et CloudKit ne prévient
+    /// personne. On synchronisait donc pour rien.
+    ///
+    /// `@Query` fait le lien : SwiftData réévalue la vue quand des
+    /// enregistrements arrivent, et on relit le catalogue à ce moment-là.
+    @Query private var userRecords: [UserOpeningRecord]
     @State private var showImport = false
     @State private var pendingDeletion: OpeningCatalogEntry?
 
     private var entries: [OpeningCatalogEntry] { OpeningCatalog.all }
+
+    /// Empreinte de ce que contient la base : identifiants et dates de
+    /// modification.
+    private var recordsSignature: String {
+        userRecords
+            .map { "\($0.id)@\(Int($0.updatedAt.timeIntervalSince1970))" }
+            .sorted()
+            .joined(separator: "|")
+    }
     /// Les répertoires de l'utilisateur ont leur SECTION, en tête.
     ///
     /// Rangés alphabétiquement au milieu des cinquante-huit ouvertures
@@ -92,6 +112,10 @@ struct OpeningListView: View {
             UserOpeningSeeder.seedIfRequested()
             refresh()
         }
+        // La signature couvre l'ARRIVÉE d'un répertoire comme sa modification
+        // (renommage, variante ajoutée sur l'autre appareil) : un simple
+        // compte manquerait les secondes.
+        .onChange(of: recordsSignature) { _, _ in store.reload() }
     }
 
     private func refresh() {
