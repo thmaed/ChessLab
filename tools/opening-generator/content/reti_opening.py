@@ -57,5 +57,36 @@ COURSE = {
                 "Nf6", "Bg2", "Bf5", "O-O", "e6", "b3", "Be7", "Bb2", "O-O", "d3", "h6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-e6", "title": c("2…e6 — la défense solide", "2…e6 — the solid defence")},
+            "moves": [
+                "Nf3", "d5", "c4",
+                {"san": "e6",
+                 "comment": c("Les Noirs soutiennent d5 sans se découvrir. Le cours partait de …d4 ou …c6 : c'est la réponse la plus sobre, et elle manquait.",
+                              "Black supports d5 without committing. The course started from …d4 or …c6: this is the soberest reply, and it was missing."),
+                 "critical": True},
+                {"san": "d4",
+                 "comment": c("Transposition assumée vers un jeu de pions dames. Le Réti n'est pas une religion : quand les Noirs jouent solidement, on prend le centre.",
+                              "A deliberate transposition into a queen's pawn game. The Réti is no religion: when Black plays solidly, we take the centre.")},
+                "Nf6", "Nc3", "c5", "cxd5", "cxd4", "Qxd4",
+            ],
+        },
+        {
+            "chapter": {"id": "advance", "title": c("2…d4 — le pion avancé", "2…d4 — the advanced pawn")},
+            "moves": [
+                "Nf3", "d5", "c4", "d4", "g3",
+                {"san": "c5",
+                 "comment": c("Plus d'un Noir sur deux soutient son pion ici, et le chapitre continuait autrement. Ils bâtissent un coin de pions qu'il faudra saper, pas attaquer de front.",
+                              "More than half of Black players support the pawn here, and the chapter went elsewhere. They build a pawn wedge that must be undermined, not stormed."),
+                 "critical": True},
+                "Bg2", "Nc6", "e3",
+                {"san": "e5",
+                 "comment": c("Les Noirs tiennent le centre. Notre plan : exd4, puis pression sur la colonne e et sur le pion d4 devenu isolé.",
+                              "Black holds the centre. Our plan: exd4, then pressure down the e-file and against the now isolated d4 pawn.")},
+                "d3", "Nf6", "O-O",
+            ],
+        },
     ],
 }

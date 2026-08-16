@@ -77,5 +77,42 @@ COURSE = {
                 "Qxe4", "d6", "d4", "dxe5", "dxe5", "Nc6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-nc3", "title": c("3.Cc3 — les Quatre Cavaliers", "3.Nc3 — the Four Knights")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nf6",
+                {"san": "Nc3",
+                 "comment": c("Un tiers des parties, et le cours partait de 3.Cxe5. Les Blancs refusent le débat de la Petroff et proposent les Quatre Cavaliers.",
+                              "A third of games, and the course started from 3.Nxe5. White declines the Petrov debate and offers the Four Knights."),
+                 "critical": True},
+                {"san": "Nc6",
+                 "comment": c("On accepte : la symétrie ne fait pas peur, et un joueur de Petroff cherche justement des positions saines et équilibrées.",
+                              "We accept: symmetry holds no fear, and a Petrov player is looking for exactly this — sound, balanced positions.")},
+                "Bb5", "Bb4", "O-O", "O-O", "Bxc6",
+                {"san": "dxc6",
+                 "comment": c("On reprend vers le centre : les pions doublés ouvrent la colonne d et libèrent le fou c8. La paire de fous compense largement.",
+                              "Recapture towards the centre: the doubled pawns open the d-file and free the c8 bishop. The bishop pair more than compensates.")},
+            ],
+        },
+        {
+            "chapter": {"id": "vs-bc4", "title": c("3.Fc4 — vers les Deux Cavaliers", "3.Bc4 — into the Two Knights")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nf6",
+                {"san": "Bc4",
+                 "comment": c("Presque une partie sur cinq. Le coup n'est pas dangereux, mais il faut savoir que …Cxe4 est ici parfaitement jouable.",
+                              "Nearly one game in five. Not dangerous, but you must know that …Nxe4 is perfectly playable here."),
+                 "critical": True},
+                {"san": "Nxe4", "critical": True,
+                 "comment": c("On prend. Contrairement à la ligne 3.Cxe5, aucune fourchette de dame ne menace : le cavalier e4 est défendu par le pion d5 à venir.",
+                              "We take. Unlike the 3.Nxe5 line, no queen fork looms: the e4 knight will be held by the coming …d5.")},
+                "d3", "Nf6", "Nxe5",
+                {"san": "d5",
+                 "comment": c("Le coup libérateur : on attaque le fou c4 et l'on récupère le pion avec une position parfaitement saine.",
+                              "The freeing move: we hit the c4 bishop and regain the pawn with a completely sound position.")},
+                "Bb3", "Bd6",
+            ],
+        },
     ],
 }

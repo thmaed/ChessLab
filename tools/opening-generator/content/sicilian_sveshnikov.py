@@ -64,5 +64,43 @@ COURSE = {
                 "Be7", "N1c3", "a6", "Na3", "Be6", "Be2", "Nf6", "O-O", "O-O",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        #
+        # Le Sveshnikov suppose la Sicilienne OUVERTE (2.Cf3 Cc6 3.d4). Les
+        # sorties précoces du fou en c4 l'empêchent : on ne les combat pas avec
+        # les idées du Sveshnikov, on les traite pour ce qu'elles sont.
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 — la sortie précoce", "2.Bc4 — the early bishop")},
+            "moves": [
+                "e4", "c5",
+                {"san": "Bc4",
+                 "comment": c("Sans d4, il n'y aura pas de Sveshnikov. Le fou vise f7 mais, sans centre pour l'appuyer, l'attaque n'arrivera jamais.",
+                              "With no d4 there will be no Sveshnikov. The bishop eyes f7 but, with no centre behind it, the attack never comes."),
+                 "critical": True},
+                {"san": "e6",
+                 "comment": c("On coupe la diagonale et l'on prépare …d5. Le fou c4 devra bouger une seconde fois.",
+                              "We cut the diagonal and prepare …d5. The c4 bishop will have to move again.")},
+                "Nf3", "Nf6", "Nc3", "a6",
+                {"san": "e5",
+                 "comment": c("Les Blancs poussent pour gagner de l'espace ; après …d5 le pion e5 devient une faiblesse à long terme.",
+                              "White pushes for space; after …d5 the e5 pawn becomes a long-term weakness.")},
+                "d5",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-bc4", "title": c("2.Fc4 — la sortie précoce", "2.Bc4 — the early bishop")},
+            "moves": [
+                "e4", "c5", "Nf3", "Nc6",
+                {"san": "Bc4",
+                 "comment": c("Une partie sur cinq après 2…Cc6. Même traitement : …e6 d'abord, le fou perdra son temps.",
+                              "One game in five after 2…Nc6. Same treatment: …e6 first, and the bishop will lose time.")},
+                "e6", "Nc3", "Nf6",
+                {"san": "Bb5",
+                 "comment": c("Le fou déménage déjà. On répond …Dc7 pour surdéfendre c6 et préparer le développement sans concession.",
+                              "The bishop is already relocating. We answer …Qc7 to over-defend c6 and develop without concessions.")},
+                "Qc7", "d3", "d6",
+            ],
+        },
     ],
 }
