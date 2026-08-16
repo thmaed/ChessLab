@@ -45,14 +45,26 @@ final class CoachExplanationUITests: XCTestCase {
     @MainActor
     func testTheCoachBarStaysOnScreenInLandscape() throws {
         let app = launchOnTheBlunder()
-        let coachBar = app.descendants(matching: .any).matching(identifier: "coachBar").firstMatch
-        XCTAssertTrue(coachBar.waitForExistence(timeout: 90), "le bandeau coach doit exister")
 
+        // La condition de saut vient AVANT l'attente du bandeau, et l'ordre
+        // compte. Sur iPhone ce test ne mesure rien — il se saute — mais il
+        // attendait d'abord jusqu'à 90 s l'apparition du bandeau, uniquement
+        // pour le jeter. Le 16/08 cette attente a fini par expirer alors que
+        // les cinq classes tournaient d'affilée : le bandeau met ~5 s seul et
+        // avait dépassé 90 s sous charge. Un échec rouge pour une mesure qui
+        // n'aurait de toute façon pas eu lieu.
+        //
+        // Aucune couverture n'est perdue : l'existence du bandeau en portrait
+        // est vérifiée par ``testTheCoachExplainsABlunderAndStaysOnScreen``,
+        // qui tourne sur le même appareil.
         let traits = try LayoutProbe.traits(in: app)
         try XCTSkipUnless(
             traits.horizontalSizeClass == "regular",
             "L'iPhone est verrouillé en portrait : la mesure paysage n'a de sens que sur iPad"
         )
+
+        let coachBar = app.descendants(matching: .any).matching(identifier: "coachBar").firstMatch
+        XCTAssertTrue(coachBar.waitForExistence(timeout: 90), "le bandeau coach doit exister")
 
         XCUIDevice.shared.orientation = .landscapeLeft
         defer { XCUIDevice.shared.orientation = .portrait }
