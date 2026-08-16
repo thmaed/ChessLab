@@ -65,24 +65,30 @@ raison écrite.
 
 ### Reconstruire le binaire Stockfish (pour `audit.py` et `suggest.py`)
 
-Le paquet Swift vendorisé n'expose pas d'exécutable, et le point d'entrée y est
-renommé `_main` pour cohabiter avec celui de l'app. Le Makefile amont, lui,
-attend un `main`. D'où ces trois lignes, à rejouer quand le binaire manque :
+Le paquet Swift vendorisé n'expose pas d'exécutable, et son point d'entrée est
+renommé `_main` pour cohabiter avec celui de l'app. Le Makefile amont attend un
+`main`. Il faut donc en fabriquer un — puis **tout retirer du paquet** :
 
 ```bash
 cd Vendor/CStockfish/Sources/CStockfish/stockfish
-chmod u+w main.cpp 2>/dev/null; cp -f _main.cpp main.cpp && chmod u+w main.cpp
-printf '\nint main(int argc, char* argv[]) { return _main(argc, argv); }\n' >> main.cpp
+chmod u+w . 2>/dev/null
+printf '#include "_main.h"\nint main(int argc, char* argv[]) { return _main(argc, argv); }\n' > main.cpp
 make -j8 build ARCH=apple-silicon
+mv stockfish ../../../../../tools/opening-generator/bin/stockfish   # HORS du paquet
+rm -f main.cpp *.o .depend                                          # arbre restauré
 ```
 
-*Pièges rencontrés* : les sources vendorisées sont en **lecture seule**, et une
-écriture refusée passe inaperçue si la commande tourne en arrière-plan — d'où le
-`chmod`. Par ailleurs `_main.cpp` n'est PAS dans les `SRCS` du Makefile : c'est
-bien `main.cpp` qu'il faut produire, et y ajouter un `main` de pont plutôt que
-de renommer la fonction, puisque `_main` reste appelé par l'app.
+⚠️ **Les trois dernières lignes ne sont pas facultatives.** Laisser `main.cpp`
+dans `Sources/` casse la compilation de l'app, de deux façons à la fois :
+SwiftPM voit un fichier `main` et requalifie `CStockfish` en cible
+**exécutable**, et le binaire final porte **deux définitions de `_main`** —
+« duplicate symbol for architecture arm64 ». Constaté en cassant le build le
+16/08/2026. Le binaire vit donc dans `tools/opening-generator/bin/`, gitignoré,
+et le paquet vendorisé reste tel qu'il est livré.
 
-Le binaire, les objets et `main.cpp` sont gitignorés.
+*Autre piège* : les sources vendorisées sont en **lecture seule**, et une
+écriture refusée passe inaperçue si la commande tourne en arrière-plan — d'où le
+`chmod`.
 
 ### Jeton Lichess — obligatoire depuis 2026
 

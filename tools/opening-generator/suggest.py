@@ -27,8 +27,9 @@ from pathlib import Path
 import chess
 import chess.engine
 
-DEFAULT_ENGINE = Path(__file__).resolve().parents[2] / "Vendor" / "CStockfish" / \
-    "Sources" / "CStockfish" / "stockfish" / "stockfish"
+# Le binaire vit ICI, hors du paquet vendorisé : y laisser quoi que ce soit
+# d'étranger casse la compilation de l'app (voir le README).
+DEFAULT_ENGINE = Path(__file__).resolve().parent / "bin" / "stockfish"
 
 
 def parse_args(argv):

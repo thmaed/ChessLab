@@ -46,5 +46,4 @@ Vendor/CStockfish/.build/
 Vendor/CStockfish/Sources/CStockfish/stockfish/*.o
 Vendor/CStockfish/Sources/CStockfish/stockfish/.depend
 Vendor/CStockfish/Sources/CStockfish/stockfish/main.cpp
-Vendor/CStockfish/Sources/CStockfish/stockfish/stockfish
-Vendor/CStockfish/Sources/CStockfish/stockfish/*.nnue
+tools/opening-generator/bin/
