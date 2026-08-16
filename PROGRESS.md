@@ -5475,6 +5475,78 @@ Procédure complète dans le README du générateur.
   les évaluations, une ligne acceptée à 1,40 hier peut franchir le seuil
   aujourd'hui. C'est la vérification qui compte, pas la compilation.
 
+## Campagne de contenu — les 58 cours ✅ (2026-08-16)
+
+Réponse au point 2 de Nils (« l'architecture est très bonne mais le contenu est
+plutôt mauvais »), menée sur la base du classement de `coverage.py`.
+
+| | Avant | Après |
+|---|---|---|
+| Positions | 3 191 | **4 074** (+883) |
+| Coups commentés | 484 | **759** (+275) |
+| Cours retravaillés | — | **58 / 58** |
+
+### Ce que le classement a révélé, et qu'aucune relecture n'aurait trouvé
+
+Le travail cours par cours n'aurait jamais montré ces motifs : ils
+n'apparaissent qu'en comparant les 58 entre eux.
+
+1. **Tous les répertoires NOIRS contre 1.d4 ont le même trou n°1 : la
+   London.** Est-Indienne, Grünfeld, Nimzo, Benoni, Benko, Tarrasch, Albin,
+   Tchigorine, Bogo, Budapest, Est-Indienne ancienne — chacun suppose que les
+   Blancs jouent 2.c4. En club, ils jouent 2.Ff4 une partie sur six, et 2.Cf3
+   autant. L'élève sortait de son répertoire **au deuxième coup**, avant que
+   l'ouverture qu'il a choisie ait pu exister.
+
+2. **Tous les répertoires 1.e4 e5 ignoraient 2…d6 (Philidor) et 2…Cf6
+   (Petroff).** Ce ne sont pas des variantes oubliées mais des ENTRÉES :
+   l'adversaire refuse le débat au deuxième coup.
+
+3. **Toutes les Siciliennes ignoraient les sorties précoces du fou en c4**,
+   qui empêchent justement la Sicilienne ouverte dont elles dépendent.
+
+4. **Les trois cours frères du Gambit Dame** — accepté, refusé, Slave —
+   ignoraient chacun les réponses que les deux autres traitent.
+
+### Deux natures de contenu écrites
+
+- **Des variantes** là où l'ouverture survit : la Tarrasch garde …c5 contre la
+  London, la Nimzo garde …Db6 (même esprit : gêner avant de développer).
+- **Des mises au point de PORTÉE** là où elle n'existe plus : sans c4, le
+  Budapest, le Benko et l'Albin ne sont pas des gambits mais des pions donnés.
+  Le Stafford suppose 3.Cxe5, le Letton 2.Cf3, l'Éléphant 3.exd5. Le dire vaut
+  mieux que laisser chercher un coup qui n'a plus de sens.
+
+### L'arbitrage qui a gouverné toute la campagne
+
+**Le meilleur coup du moteur n'est pas toujours le bon coup du RÉPERTOIRE.**
+Sur la London, la Roi-Indienne d'attaque, le Colle, la Veresov, la Torre,
+Stockfish propose systématiquement le coup qui QUITTE le système — 3.e4 au
+lieu de 3.Ff4, d4 au lieu de d3, c4 au lieu de e3. À chaque fois c'est
+objectivement le meilleur coup, et à chaque fois c'est la mauvaise réponse
+pour un élève venu apprendre ce système précis. Suivre le moteur aveuglément
+aurait produit des répertoires qui se contredisent : irréprochables et
+inutilisables. Le raisonnement est écrit dans les fichiers, pas seulement dans
+les commits, pour que personne ne « corrige » plus tard en relançant Stockfish.
+
+### Une gaffe enseignée trouvée en chemin
+
+Sicilienne classique, ligne Boleslavsky : après 10.Cd5 le cours enseignait
+10…Fxd5 (perte 1,65) là où 10…Cxe4 gagne un pion. Elle avait passé l'audit
+complet du soir — arête « suspecte » dont la contre-mesure à profondeur 24
+avait tranché d'un cheveu — et n'est ressortie que sur un lot plus petit, où
+l'ordre d'exploration change. Cas limite, mais un cas limite à 1,65 sur un
+seuil de 1,50 reste un coup qui perd un pion et demi, présenté comme la ligne
+principale. C'est exactement le défaut que le testeur avait relevé en août.
+
+### Ce qui n'a PAS changé, et qu'il faut dire
+
+Le ratio arêtes/positions reste à 0,99. Les cours sont mieux reliés et n'ont
+plus de trou béant, mais ils demeurent des LIGNES, pas des arbres touffus. Le
+reproche de fond de Nils — « je connais dix fois plus de coups théoriques que
+ceux montrés » — n'est levé qu'en partie. Ce qui a réellement changé, c'est
+qu'on ne sort plus du répertoire au deuxième coup.
+
 ## Reste à faire, par ordre de valeur (état au 2026-08-15)
 
 Classé par rapport valeur/risque, pas par ordre des prompts d'origine. Chaque
