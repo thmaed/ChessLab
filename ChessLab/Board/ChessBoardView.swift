@@ -322,6 +322,11 @@ struct ChessBoardView: View {
                             .gesture(
                                 SpatialTapGesture(coordinateSpace: .named("board"))
                                     .onEnded { value in
+                                        BoardTouchLog.record(
+                                            "tap-case", square: sq,
+                                            detail: "point=(\(Int(value.location.x)),\(Int(value.location.y))) "
+                                                + "interaction=\(interactionEnabled)"
+                                        )
                                         guard interactionEnabled else { return }
                                         onTapSquare(
                                             tappedSquare(
@@ -628,6 +633,10 @@ struct ChessBoardView: View {
         let geometry = geometry(squareSize: squareSize)
         return DragGesture(minimumDistance: 0, coordinateSpace: .named("board"))
             .onChanged { value in
+                BoardTouchLog.recordOnce(
+                    "debut-geste-piece", square: square,
+                    detail: "interaction=\(interactionEnabled) draggable=\(draggableColor.map(String.init(describing:)) ?? "toutes")"
+                )
                 // `minimumDistance: 0` fait entrer ici dès le toucher : la
                 // transition `nil` → non-nil est donc le vrai début du geste,
                 // et le seul endroit où calculer les coups légaux.
@@ -645,7 +654,7 @@ struct ChessBoardView: View {
                 )
             }
             .onEnded { value in
-                defer { dragState = nil }
+                defer { dragState = nil; BoardTouchLog.resetThrottle() }
 
                 let distance = hypot(value.translation.width, value.translation.height)
                 // Case GÉOMÉTRIQUE, pas résolue : voir le piège ci-dessous.
@@ -673,6 +682,10 @@ struct ChessBoardView: View {
                 // s'activerait et le centre de e3 n'est qu'à 0,5 case — dans
                 // le rayon. Snap sur e3, coup joué, alors que le joueur
                 // renonçait. Voir `BoardGeometryTests`.
+                BoardTouchLog.record(
+                    "fin-geste-piece", square: square,
+                    detail: "distance=\(Int(distance)) geo=\(geometricTarget?.notation ?? "nil")"
+                )
                 if geometricTarget == square || distance < Self.tapSlop {
                     onTapSquare(square)
                 } else if let target = geometry.resolve(
