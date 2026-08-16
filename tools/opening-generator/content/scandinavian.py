@@ -235,5 +235,78 @@ COURSE = {
                 "Bf5",
             ],
         },
+
+        # ── 3.Cc3 après 2…Cf6 (trou de couverture n°1, 38 % des parties) ──────
+        {
+            "chapter": {"id": "nf6-nc3", "title": c("2…Cf6 — 3.Cc3", "2…Nf6 — 3.Nc3")},
+            "moves": [
+                "e4", "d5", "exd5",
+                "Nf6",
+                {"san": "Nc3",
+                 "comment": c("Les Blancs défendent le pion d5 avec une pièce au lieu de le pousser. C'est leur coup le plus fréquent ici, et il change la nature de la partie : le pion va tomber, mais la structure blanche aussi.",
+                              "White defends the d5 pawn with a piece rather than pushing. It's their most common move here, and it changes the nature of the game: the pawn will fall, but so will White's structure."),
+                 "critical": True},
+                {"san": "Nxd5",
+                 "comment": c("On reprend enfin, et le cavalier se retrouve superbement centralisé — attaqué par rien.",
+                              "Now we recapture, and the knight sits beautifully centralised — attacked by nothing.")},
+                "Nf3",
+                {"san": "Nxc3",
+                 "comment": c("L'échange qui donne son sens à la variante : les Blancs vont devoir reprendre avec un pion.",
+                              "The trade that gives the line its point: White will have to recapture with a pawn.")},
+                {"san": "bxc3",
+                 "comment": c("Pions doublés en c2-c3. En échange les Blancs tiennent un centre large et la colonne b ouverte : la position est équilibrée, pas gagnée.",
+                              "Doubled pawns on c2-c3. In return White holds a broad centre and the open b-file: the position is balanced, not won.")},
+                {"san": "g6",
+                 "comment": c("Le fou ira en g7 mordre sur ce centre et sur les pions doublés. C'est le plan naturel des Noirs ici.",
+                              "The bishop heads for g7 to bite at that centre and those doubled pawns. That's Black's natural plan here."),
+                 "critical": True},
+            ],
+        },
+
+        # ── 4.Cf3 avant d4 (trous n°2, 3 et 4 : le MÊME défaut d'ordre) ───────
+        #
+        # Les trois retraites de dame subissent la même chose : les Blancs
+        # jouent Cf3 avant d4. Le relevé de couverture les comptait comme trois
+        # trous distincts (46 %, 42 % et 36 % des parties) ; ce n'en est qu'un,
+        # et il se raconte une fois. Le graphe étant indexé par FEN, chaque
+        # ligne REJOINT ensuite le chapitre existant sans le dupliquer.
+        {
+            "chapter": {"id": "nf3-order", "title": c("4.Cf3 avant d4", "4.Nf3 before d4")},
+            "moves": [
+                "e4", "d5", "exd5", "Qxd5", "Nc3", "Qd6",
+                {"san": "Nf3",
+                 "comment": c("Très fréquent, et déroutant si l'on a appris la ligne dans l'autre ordre : les Blancs développent le cavalier AVANT de pousser d4.",
+                              "Very common, and disorienting if you learned the line in the other order: White develops the knight BEFORE playing d4."),
+                 "critical": True},
+                {"san": "Nf6",
+                 "comment": c("On développe soi aussi, sans se laisser distraire.",
+                              "We develop too, without being distracted.")},
+                {"san": "d4",
+                 "comment": c("Et voilà : c'est exactement la position du chapitre « Moderne — 3…Dd6 », atteinte par un autre chemin. Rien de nouveau à apprendre, il fallait juste ne pas paniquer.",
+                              "And there it is: exactly the position from the “Modern — 3…Qd6” chapter, reached by another route. Nothing new to learn — you just had to keep your nerve.")},
+            ],
+        },
+        {
+            "chapter": {"id": "nf3-order", "title": c("4.Cf3 avant d4", "4.Nf3 before d4")},
+            "moves": [
+                "e4", "d5", "exd5", "Qxd5", "Nc3", "Qd8", "Nf3",
+                {"san": "Bf5",
+                 "comment": c("Même principe que dans tout le répertoire : le fou de cases blanches sort AVANT …e6, sinon il reste enfermé pour la partie.",
+                              "Same principle as everywhere in this repertoire: the light-squared bishop comes out BEFORE …e6, or it stays shut in for the game.")},
+                "d4",
+                {"san": "Nf6",
+                 "comment": c("On rejoint « Autres retraites de dame ». L'ordre des Blancs n'a rien changé au plan.",
+                              "We rejoin “Other queen retreats”. White's move order changed nothing about the plan.")},
+            ],
+        },
+        {
+            "chapter": {"id": "nf3-order", "title": c("4.Cf3 avant d4", "4.Nf3 before d4")},
+            "moves": [
+                "e4", "d5", "exd5", "Qxd5", "Nc3", "Qa5", "Nf3", "Nf6", "d4",
+                {"san": "c6",
+                 "comment": c("Et l'on retombe sur la ligne principale, celle de la case de repli en c7/d8. Trois ordres différents, une seule position à connaître.",
+                              "And we land back in the main line, the one with the c7/d8 retreat square. Three different move orders, a single position to know.")},
+            ],
+        },
     ],
 }
