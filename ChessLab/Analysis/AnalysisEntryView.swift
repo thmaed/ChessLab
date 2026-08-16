@@ -143,31 +143,58 @@ struct AnalysisEntryView: View {
     /// En-tête repliable des sources « à fournir ». Un bouton plutôt qu'un
     /// `DisclosureGroup` : celui-ci impose son propre chevron et ses marges,
     /// et jurerait avec les cartes qui l'entourent.
+    /// En-tête de SECTION dépliante, et non carte de destination.
+    ///
+    /// Les cartes de cet écran mènent quelque part : elles portent une
+    /// pastille d'icône et un fond, elles annoncent un départ. « Autres
+    /// sources » ne mène nulle part — elle DÉPLIE le reste de la liste. Lui
+    /// donner l'allure d'une destination promettait un écran qui n'existe pas.
+    ///
+    /// D'où la reprise du vocabulaire des en-têtes de section de l'app
+    /// (`HomeView.sectionHeader`) : capsule d'accent, titre en petites
+    /// capitales, filet de séparation. Le chevron pivote pour dire l'état, et
+    /// le compte des options annonce ce qu'on va trouver.
     private var disclosureCard: some View {
         Button {
             showOtherSources.toggle()
         } label: {
-            HStack(spacing: 14) {
-                IconBadge(systemImage: "square.and.pencil", tint: Theme.teal, size: 44)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Autres sources")
-                        .font(.headline)
-                        .foregroundStyle(Theme.textPrimary)
-                    Text("PGN, position FEN, éditeur")
-                        .font(.caption)
-                        .foregroundStyle(Theme.textSecondary)
-                }
-                Spacer()
+            HStack(spacing: 8) {
+                Capsule()
+                    .fill(Theme.accentGradient)
+                    .frame(width: 18, height: 3)
+                Text("Autres sources")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.textSecondary)
+                    .textCase(.uppercase)
+                    .tracking(0.5)
+                    // Le filet est élastique, pas le titre : sans cela il se
+                    // coupait en deux lignes pour laisser de la place au trait.
+                    .fixedSize(horizontal: true, vertical: false)
+                Text("4")
+                    .fixedSize()
+                    .font(.caption2.weight(.bold).monospacedDigit())
+                    .foregroundStyle(Theme.textTertiary)
+                    .padding(.horizontal, 6).padding(.vertical, 1)
+                    .background(Theme.surface, in: Capsule())
+                // Le filet occupe l'espace libre : il relie le titre au
+                // chevron et marque la coupure avec ce qui précède.
+                Rectangle()
+                    .fill(Theme.stroke)
+                    .frame(height: 1)
+                    .frame(maxWidth: .infinity)
                 Image(systemName: "chevron.down")
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(Theme.textTertiary)
                     .rotationEffect(.degrees(showOtherSources ? 0 : -90))
             }
-            .cardStyle()
+            .padding(.top, 6)
+            .contentShape(Rectangle())
         }
-        .buttonStyle(.pressable)
+        .buttonStyle(.plain)
         .accessibilityIdentifier("analysisOtherSources")
         .accessibilityLabel(Text("Autres sources"))
+        .accessibilityHint(Text(showOtherSources ? "Replier" : "Déplier quatre options"))
+        .accessibilityAddTraits(.isButton)
     }
 
     private func entryCard(

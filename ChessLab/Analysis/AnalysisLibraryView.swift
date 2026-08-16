@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Liste des parties enregistrées (mode Jouer et Deux joueurs), avec
 /// recherche (noms des joueurs) et filtres par mode et par résultat. Les
@@ -27,6 +28,11 @@ struct AnalysisLibraryView: View {
     @State private var isSelecting = false
     @State private var selection: Set<PersistentIdentifier> = []
     @State private var confirmBatchDeletion = false
+
+    /// Import de parties DEPUIS la bibliothèque : c'est là qu'on pense à
+    /// ajouter des parties, pas dans l'écran d'entrée de l'Analyse.
+    @State private var showImporter = false
+    @State private var importSummary: String?
 
     /// Résultat du point de vue de l'utilisateur. N'a de sens que face à
     /// l'ordinateur (le côté « Vous » est identifiable) ; en deux joueurs,
@@ -69,11 +75,17 @@ struct AnalysisLibraryView: View {
     var body: some View {
         Group {
             if records.isEmpty {
-                ContentUnavailableView(
-                    "Aucune partie enregistrée",
-                    systemImage: "books.vertical",
-                    description: Text("Les parties terminées (mode Jouer et Deux joueurs) apparaîtront ici.")
-                )
+                ContentUnavailableView {
+                    Label("Aucune partie enregistrée", systemImage: "books.vertical")
+                } description: {
+                    Text("Les parties terminées (mode Jouer et Deux joueurs) apparaîtront ici.")
+                } actions: {
+                    // Une bibliothèque vide est justement le moment où l'on
+                    // veut importer : ne pas obliger à trouver l'icône.
+                    Button("Importer un fichier PGN") { showImporter = true }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Theme.accent)
+                }
             } else {
                 ScrollView {
                     LazyVStack(spacing: 10) {
@@ -139,16 +151,54 @@ struct AnalysisLibraryView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            if !records.isEmpty {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button(isSelecting ? "Terminé" : "Sélectionner") {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                // Icônes et non libellés : deux boutons texte en haut à droite
+                // ne tiennent pas sur un iPhone étroit, et « Sélectionner »
+                // tronqué ne dit plus rien.
+                Button {
+                    showImporter = true
+                } label: {
+                    Image(systemName: "square.and.arrow.down")
+                }
+                .tint(Theme.accent)
+                .accessibilityLabel("Importer des parties")
+                .accessibilityIdentifier("importGames")
+
+                if !records.isEmpty {
+                    Button {
                         isSelecting.toggle()
                         selection.removeAll()
+                    } label: {
+                        // L'icône CHANGE avec l'état : une coche pleine dit
+                        // « terminer », la liste à cocher dit « choisir ».
+                        Image(systemName: isSelecting
+                              ? "checkmark.circle.fill" : "checklist")
                     }
                     .tint(Theme.accent)
+                    .accessibilityLabel(isSelecting ? "Terminer la sélection" : "Sélectionner des parties")
                     .accessibilityIdentifier("toggleSelection")
                 }
             }
+        }
+        .fileImporter(
+            isPresented: $showImporter,
+            allowedContentTypes: [
+                UTType(filenameExtension: "pgn") ?? .plainText, .plainText,
+            ],
+            allowsMultipleSelection: true
+        ) { result in
+            handleImport(result)
+        }
+        .alert(
+            "Import terminé",
+            isPresented: Binding(
+                get: { importSummary != nil },
+                set: { if !$0 { importSummary = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) { importSummary = nil }
+        } message: {
+            Text(importSummary ?? "")
         }
         .safeAreaInset(edge: .bottom) {
             if isSelecting { selectionBar }
@@ -300,6 +350,40 @@ struct AnalysisLibraryView: View {
     private var allFilteredSelected: Bool {
         !filteredRecords.isEmpty
             && filteredRecords.allSatisfy { selection.contains($0.persistentModelID) }
+    }
+
+    /// Importe une ou plusieurs bases `.pgn`. Le compte rendu distingue les
+    /// trois issues — rangées, déjà présentes, illisibles — parce qu'un
+    /// « 0 importée » sans explication laisse croire à une panne alors que le
+    /// fichier était peut-être déjà entièrement en bibliothèque.
+    private func handleImport(_ result: Result<[URL], Error>) {
+        if case let .failure(error) = result {
+            importSummary = "Import impossible : \(error.localizedDescription)"
+            return
+        }
+        guard case let .success(urls) = result, !urls.isEmpty else { return }
+
+        var imported = 0, duplicates = 0, skipped = 0, unreadable = 0
+        for url in urls {
+            let accessed = url.startAccessingSecurityScopedResource()
+            defer { if accessed { url.stopAccessingSecurityScopedResource() } }
+            guard let data = try? Data(contentsOf: url),
+                  let text = String(data: data, encoding: .utf8)
+            else {
+                unreadable += 1
+                continue
+            }
+            let outcome = GameLibraryService.importPGNCollection(text: text, in: modelContext)
+            imported += outcome.imported
+            duplicates += outcome.duplicates
+            skipped += outcome.skipped
+        }
+
+        var lines = ["\(imported) partie(s) ajoutée(s)."]
+        if duplicates > 0 { lines.append("\(duplicates) déjà présente(s), non réimportée(s).") }
+        if skipped > 0 { lines.append("\(skipped) bloc(s) PGN illisible(s).") }
+        if unreadable > 0 { lines.append("\(unreadable) fichier(s) illisible(s).") }
+        importSummary = lines.joined(separator: "\n")
     }
 
     private func toggle(_ record: GameRecord) {
