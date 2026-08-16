@@ -121,14 +121,62 @@ struct OpeningListView: View {
     private func section(_ title: LocalizedStringKey, _ items: [OpeningCatalogEntry]) -> some View {
         Section {
             ForEach(items, id: \.id) { entry in
-                Button { onSelect(entry.id) } label: { row(entry) }
-                    .listRowBackground(Theme.surface)
-                    .accessibilityIdentifier("opening_\(entry.id)")
-                    .swipeActions(edge: .trailing) { swipeActions(entry) }
+                // Le bouton d'ouverture et le menu d'actions sont FRÈRES, pas
+                // imbriqués : un `Menu` posé dans le label d'un `Button` ne
+                // reçoit jamais ses propres taps, le bouton extérieur les
+                // avale.
+                HStack(spacing: 4) {
+                    Button { onSelect(entry.id) } label: { row(entry) }
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("opening_\(entry.id)")
+                    if UserOpeningStore.isUserCourse(id: entry.id) {
+                        actionsMenu(entry)
+                    }
+                }
+                .listRowBackground(Theme.surface)
+                // Le balayage reste, en RACCOURCI pour qui le connaît. Il ne
+                // peut plus être le seul chemin : sur une ligne qui est
+                // elle-même un bouton, le geste entre en concurrence avec le
+                // tap et se déclenche mal — d'autant qu'il faut aller chercher
+                // trois actions.
+                .swipeActions(edge: .trailing) { swipeActions(entry) }
             }
         } header: {
             Text(title).foregroundStyle(Theme.textSecondary)
         }
+    }
+
+    /// Actions d'un répertoire personnel, TOUJOURS VISIBLES.
+    ///
+    /// Une fonctionnalité qui demande de deviner qu'il faut balayer une ligne
+    /// n'existe pas vraiment : c'est ce qui rendait l'éditeur d'arbre
+    /// introuvable.
+    @ViewBuilder
+    private func actionsMenu(_ entry: OpeningCatalogEntry) -> some View {
+        Menu {
+            Button {
+                onEdit(entry.id)
+            } label: {
+                Label("Modifier le répertoire", systemImage: "pencil")
+            }
+            if let url = store.fileURL(for: entry.id) {
+                ShareLink(item: url) { Label("Partager", systemImage: "square.and.arrow.up") }
+            }
+            Divider()
+            Button(role: .destructive) {
+                pendingDeletion = entry
+            } label: {
+                Label("Supprimer", systemImage: "trash")
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+                .font(.title3)
+                .foregroundStyle(Theme.textSecondary)
+                .frame(width: 40, height: 40)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel("Actions du répertoire")
+        .accessibilityIdentifier("openingActions_\(entry.id)")
     }
 
     /// Partager et supprimer — sur les répertoires PERSONNELS seulement : les

@@ -14,6 +14,11 @@ struct OpeningImportSheet: View {
 
     @Environment(\.dismiss) private var dismiss
     @State private var name = ""
+    /// Vrai tant que l'utilisateur n'a pas touché au champ : on peut alors
+    /// continuer à le remplir tout seul depuis le PGN. Dès qu'il écrit, on
+    /// n'y touche plus — rien de plus agaçant qu'un champ qui se réécrit sous
+    /// les doigts.
+    @State private var nameEditedByUser = false
     @State private var side: OpeningSide = .white
     @State private var pgn = ""
     @State private var errorMessage: String?
@@ -96,6 +101,7 @@ struct OpeningImportSheet: View {
         VStack(alignment: .leading, spacing: 6) {
             fieldLabel("Nom")
             TextField("Nom du répertoire", text: $name)
+                .onChange(of: name) { _, _ in nameEditedByUser = true }
                 .textFieldStyle(.plain)
                 .foregroundStyle(Theme.textPrimary)
                 .padding(12)
@@ -123,6 +129,16 @@ struct OpeningImportSheet: View {
         VStack(alignment: .leading, spacing: 6) {
             fieldLabel("PGN")
             TextEditor(text: $pgn)
+                // Un PGN COLLÉ doit remplir le nom comme un fichier importé :
+                // l'information est dans le texte, la réclamer serait la faire
+                // ressaisir.
+                .onChange(of: pgn) { _, newValue in
+                    guard !nameEditedByUser else { return }
+                    if let suggested = OpeningPGNImporter.suggestedName(fromPGN: newValue) {
+                        name = suggested
+                        nameEditedByUser = false
+                    }
+                }
                 .font(.footnote.monospaced())
                 .foregroundStyle(Theme.textPrimary)
                 .scrollContentBackground(.hidden)
@@ -207,8 +223,15 @@ struct OpeningImportSheet: View {
             return
         }
         pgn = text
-        if name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            name = url.deletingPathExtension().lastPathComponent
+        // Le nom vient du PGN quand il en porte un ; le nom de fichier n'est
+        // qu'un dernier recours, souvent un identifiant illisible.
+        if !nameEditedByUser || name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let suggested = OpeningPGNImporter.suggestedName(fromPGN: text)
+                ?? url.deletingPathExtension().lastPathComponent
+            name = suggested
+            // Renseigné par nous, pas par l'utilisateur : un PGN suivant peut
+            // encore le remplacer.
+            nameEditedByUser = false
         }
     }
 }

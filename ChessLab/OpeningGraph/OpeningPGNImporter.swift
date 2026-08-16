@@ -53,6 +53,51 @@ enum OpeningPGNImporter {
     ///   - name: nom du cours affiché dans la liste.
     ///   - side: camp étudié — décide de quel côté l'entraînement interroge.
     ///   - id: identifiant du cours (voir ``UserOpeningStore/newIdentifier()``).
+    /// Nom du répertoire DÉDUIT du PGN, quand le fichier en porte un.
+    ///
+    /// Un répertoire exporté depuis une étude Lichess arrive avec
+    /// `[Event "Nom de l'étude: Nom du chapitre"]` — c'est le nom que
+    /// l'utilisateur a lui-même donné, et c'est celui qu'il attend. Le
+    /// réclamer à la main alors qu'il est écrit dans le fichier revient à
+    /// faire ressaisir une information déjà là.
+    ///
+    /// Ordre de préférence, du plus spécifique au plus général :
+    /// 1. `[Opening]` — quand il existe, il nomme exactement l'ouverture ;
+    /// 2. `[Event]`, tronqué avant le « : » qui sépare l'étude du chapitre —
+    ///    un répertoire est l'étude entière, pas son premier chapitre ;
+    /// 3. `[White]` s'il ne s'agit pas d'un nom de personne évident.
+    ///
+    /// Rend `nil` plutôt qu'un nom vide ou générique : « Event » vaut « ? »
+    /// dans bien des exports, et proposer « ? » serait pire que rien.
+    static func suggestedName(fromPGN pgn: String) -> String? {
+        func tag(_ key: String) -> String? {
+            let pattern = "\\[\(key)\\s+\"([^\"]*)\""
+            guard let range = pgn.range(of: pattern, options: .regularExpression) else { return nil }
+            let line = String(pgn[range])
+            guard let open = line.firstIndex(of: "\""),
+                  let close = line.lastIndex(of: "\""), open < close
+            else { return nil }
+            let value = String(line[line.index(after: open)..<close])
+                .trimmingCharacters(in: .whitespaces)
+            // « ? » est la valeur « inconnue » du format PGN, et « Event » un
+            // reste d'export paresseux : ni l'un ni l'autre n'est un nom.
+            let rejected = ["", "?", "Event", "event", "Study", "Chapter"]
+            return rejected.contains(value) ? nil : value
+        }
+
+        if let opening = tag("Opening") { return opening }
+        if let event = tag("Event") {
+            // « Mon répertoire: Chapitre 1 » → « Mon répertoire ».
+            if let colon = event.firstIndex(of: ":") {
+                let study = String(event[event.startIndex..<colon])
+                    .trimmingCharacters(in: .whitespaces)
+                if !study.isEmpty { return study }
+            }
+            return event
+        }
+        return nil
+    }
+
     static func course(
         fromPGN pgn: String, name: String, side: OpeningSide, id: String
     ) throws -> Result {
