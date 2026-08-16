@@ -5466,12 +5466,58 @@ Découpage naturel, du plus utile au plus coûteux :
    (`ShareLink` sur le JSON du cours, aucun serveur). Reste à trancher la
    question des droits d'auteur avant tout dispositif centralisé.
 
-### 7 ter. Approfondir les cours livrés via `generate.py` — NOUVEAU (15/08)
+### ✅ 7 ter. Approfondir les cours — DÉBLOQUÉ et RÉORIENTÉ (16/08)
 
-Les 58 cours restent des arbres quasi linéaires (3 191 positions pour 3 135
-arêtes après les corrections du 15/08 — le ratio n'a pas bougé). La chaîne
-Explorer Lichess existe et n'a jamais servi : elle est **bloquée par un 401
-nginx**.
+**La prémisse du point était fausse.** Les 58 cours ne sont pas quasi linéaires
+parce que la chaîne Explorer était cassée : ils sont **écrits à la main** dans
+`content/*.py` et compilés par `author.py`, sans réseau. Ce sont des lignes
+d'enseignement, avec chapitres, résumés et 484 commentaires bilingues.
+`generate.py` est une chaîne **parallèle**, statistique, qui n'a jamais
+alimenté l'app — d'où la confusion.
+
+Mesuré sur un pilote (Scandinave, jeton en place) :
+
+| | Livré | Régénéré par l'Explorer |
+|---|---|---|
+| Positions | 81 | 434 (×5,4) |
+| Ratio arêtes/positions | 0,988 — ligne droite | 1,058 — vraies branches |
+| Coups commentés | 33 | **0** |
+| Poids (58 cours) | 1,3 Mo | ~10 Mo |
+
+Régénérer aurait donc échangé la pédagogie contre un extrait de base de
+données. **Décision (validée) : l'Explorer sert d'informateur, pas de
+générateur.**
+
+`coverage.py` (nouveau) pose la question inverse : parmi ce que le joueur va
+réellement affronter, qu'est-ce que le cours laisse sans réponse ? Il ne
+modifie aucun cours, il classe le travail d'écriture. Deux choix portent tout :
+une lacune n'existe que sur un **coup adverse** (un répertoire prescrit les
+siens), et la priorité est **« probabilité d'arriver là × fréquence du coup
+manquant »**.
+
+Trois faux positifs écartés après les avoir vus dans la sortie : la position de
+départ, le coup qui **choisit** l'ouverture (`SCOPE_PLY` — contre 1…d5 un
+Trompowsky n'existe pas), et les fins de ligne, comptées à part.
+
+**Résultat sur les 58 cours** — 1 292 requêtes, aucun échec :
+- **1 115 trous** au seuil de 10 % ;
+- **la moitié de la dette tient dans 123 trous**, soit 11 % du total : c'est là
+  que les heures d'écriture rapportent ;
+- dette la plus lourde : `london-system` (2,36), `scandinavian` (2,11),
+  `nimzo-larsen` (2,02) ;
+- trous les plus coûteux : `1.e4 Cc6 2.Cf3` (Nimzowitsch, 41 %), `1.d4 f5 2.c4`
+  (Hollandaise, 36 %), `1.c4 Cf6 2.Cc3 g6` (Anglaise, 35 %).
+
+Rapport lisible (lignes en notation algébrique, pas en FEN) :
+<https://claude.ai/code/artifact/69827531-9ea4-425f-9bdf-d3bea7fac199>
+
+**La suite est de l'écriture**, dans `content/*.py`, en descendant le
+classement. Relancer `coverage.py` après coup met la dette à jour — c'est la
+mesure d'avancement.
+
+#### L'accès à l'API (résolu le 16/08)
+
+La chaîne Explorer était **bloquée par un 401 nginx**.
 
 **Correction du 15/08 au soir** : l'hypothèse « c'est cet environnement, à
 retester depuis un Terminal ordinaire » est **démentie par la mesure**. Le
