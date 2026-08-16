@@ -56,5 +56,39 @@ COURSE = {
                 "Nbd7", "Qxc4", "a6", "Qc2", "c5", "Nf3", "b6", "O-O", "Bb7",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-g6", "title": c("2…g6 — le fianchetto", "2…g6 — the fianchetto")},
+            "moves": [
+                "d4", "Nf6", "c4",
+                {"san": "g6",
+                 "comment": c("Près d'un tiers des parties, et le cours partait de …e6. Sans …e6, la Catalane n'existe pas : les Noirs vont vers une Grünfeld ou une Est-Indienne.",
+                              "Nearly a third of games, and the course started from …e6. Without …e6 there is no Catalan: Black is heading for a Grünfeld or King's Indian."),
+                 "critical": True},
+                {"san": "Nc3",
+                 "comment": c("On sort du plan catalan et l'on occupe le centre : le fianchetto g3 n'aurait plus de cible sur la grande diagonale.",
+                              "We leave the Catalan plan and take the centre: the g3 fianchetto would have no target left on the long diagonal.")},
+                "d5",
+                {"san": "Qb3", "critical": True,
+                 "comment": c("La pression sur d5 avant le roque adverse — l'idée qui donne le ton, et qui rappelle celle de la Catalane sans en avoir la structure.",
+                              "Pressure on d5 before Black castles — the idea that sets the tone, echoing the Catalan without sharing its structure.")},
+                "dxc4", "Qxc4", "c6", "Nf3",
+            ],
+        },
+        {
+            "chapter": {"id": "bogo-check", "title": c("4…Fb4+ — l'échec intercalé", "4…Bb4+ — the interposed check")},
+            "moves": [
+                "d4", "Nf6", "c4", "e6", "g3",
+                {"san": "Bb4+",
+                 "comment": c("Un Noir sur cinq donne cet échec avant tout. C'est une Bogo-Indienne greffée sur notre ordre de coups.",
+                              "One Black player in five gives this check first. It's a Bogo-Indian grafted onto our move order.")},
+                {"san": "Bd2",
+                 "comment": c("On interpose le fou plutôt que le cavalier : après l'échange, notre fou reprend la diagonale et le fianchetto garde tout son sens.",
+                              "Interpose the bishop rather than the knight: after the trade our bishop takes the diagonal and the fianchetto keeps its point."),
+                 "critical": True},
+                "a5", "Nf3", "d5", "a3", "Be7",
+            ],
+        },
     ],
 }

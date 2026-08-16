@@ -59,5 +59,25 @@ COURSE = {
                 "exf6", "e3", "Bd6", "c4", "dxc4", "Bxc4", "O-O", "Nc3", "Nc6", "Nge2", "Re8",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-g6", "title": c("2…g6 — le fianchetto", "2…g6 — the fianchetto")},
+            "moves": [
+                "d4", "Nf6", "Bg5",
+                {"san": "g6",
+                 "comment": c("Un Noir sur six part au fianchetto plutôt que de contester le fou. Le cours n'en parlait pas.",
+                              "One Black player in six fianchettoes rather than challenging the bishop. The course didn't mention it."),
+                 "critical": True},
+                {"san": "Bxf6", "critical": True,
+                 "comment": c("On échange TOUT DE SUITE : c'est le seul moment où l'échange abîme vraiment la structure noire, et le fou g7 futur perdra son vis-à-vis.",
+                              "Trade AT ONCE: this is the only moment when the exchange truly damages Black's structure, and the future g7 bishop loses its counterpart."),
+                 "critical": True},
+                {"san": "exf6",
+                 "comment": c("Reprendre du pion e ouvre la colonne e et garde le centre ; …gxf6 abîmerait le roque à venir.",
+                              "Recapturing with the e-pawn opens the e-file and keeps the centre; …gxf6 would wreck the coming castled position.")},
+                "c4", "d5", "cxd5", "Qxd5", "Nc3",
+            ],
+        },
     ],
 }
