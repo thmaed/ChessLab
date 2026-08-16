@@ -22,7 +22,9 @@ enum UserOpeningSeeder {
             side: .white,
             id: UserOpeningStore.newIdentifier()
         ) else { return }
-        try? store.save(result.course)
+        // `_ =` explicite : `@discardableResult` ne traverse pas le `try?`,
+        // qui rend un Optional dont personne ne se sert.
+        _ = try? store.save(result.course)
     }
     #else
     @MainActor

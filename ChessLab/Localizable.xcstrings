@@ -3258,6 +3258,9 @@
         }
       }
     },
+    "commenter" : {
+
+    },
     "Commenter %@" : {
 
     },
@@ -5943,6 +5946,9 @@
           }
         }
       }
+    },
+    "Joue un autre coup sur l'échiquier pour ajouter une variante." : {
+
     },
     "Joue un coup sur l'échiquier pour l'ajouter à ton répertoire." : {
 
@@ -11447,6 +11453,9 @@
     "Supprimer la partie" : {
 
     },
+    "supprimer la variante" : {
+
+    },
     "Sur cette partie" : {
 
     },
@@ -11631,9 +11640,6 @@
           }
         }
       }
-    },
-    "Terminer" : {
-
     },
     "Terminer la sélection" : {
 
