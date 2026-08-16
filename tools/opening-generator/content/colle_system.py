@@ -73,5 +73,54 @@ COURSE = {
                 "d4", "Nf6", "Nf3", "g6", "e3", "Bg7", "Bd3", "O-O", "O-O", "d6", "c3", "Nbd7", "Nbd2", "e5",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        #
+        # Sur les trois positions, le moteur propose c4 — un Gambit Dame. Ce
+        # n'est pas le sujet : le Colle se joue avec e3, Fd3 et c3. On garde le
+        # système, vérifié sain.
+        {
+            "chapter": {"id": "colle", "title": c("Colle-Koltanowski — c3", "Colle-Koltanowski — c3")},
+            "moves": [
+                "d4", "Nf6", "Nf3",
+                {"san": "d5",
+                 "comment": c("L'ordre le plus courant, et le cours partait de 1.d4 d5. Rien ne change : le Colle se monte toujours de la même façon.",
+                              "The most common order, and the course started from 1.d4 d5. Nothing changes: the Colle is always built the same way."),
+                 "critical": True},
+                {"san": "e3",
+                 "comment": c("Le coup du système. Modeste en apparence, il prépare Fd3, c3, Cbd2 et la poussée e4 au bon moment.",
+                              "The system move. Modest-looking, it prepares Bd3, c3, Nbd2 and the e4 break at the right moment.")},
+                "e6", "Bd3", "c5", "c3", "Nc6", "Nbd2",
+            ],
+        },
+        {
+            "chapter": {"id": "colle", "title": c("Colle-Koltanowski — c3", "Colle-Koltanowski — c3")},
+            "moves": [
+                "d4", "Nf6", "Nf3",
+                {"san": "e6",
+                 "comment": c("Même chose avec …e6 d'abord : un joueur de Colle n'a pas à s'en soucier.",
+                              "Same with …e6 first: a Colle player needn't worry about it.")},
+                "e3", "d5", "Bd3", "c5", "c3", "Nc6", "Nbd2",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-nc6", "title": c("Contre …Cc6", "vs …Nc6")},
+            "moves": [
+                "d4", "d5", "Nf3",
+                {"san": "Nc6",
+                 "comment": c("Le cavalier avant les pions : les Noirs préparent …Fg4 pour échanger le défenseur de e5.",
+                              "Knight before pawns: Black prepares …Bg4 to trade off the defender of e5."),
+                 "critical": True},
+                "e3",
+                {"san": "Bg4",
+                 "comment": c("Le clouage annoncé. Il ne faut pas le subir passivement.",
+                              "The announced pin. Don't just put up with it.")},
+                {"san": "Bb5",
+                 "comment": c("On répond par une pression symétrique sur c6, et le clouage noir perd son sel : leur cavalier est attaqué avant le nôtre.",
+                              "We answer with mirrored pressure on c6, and Black's pin loses its sting: their knight is hit before ours."),
+                 "critical": True},
+                "e6", "Nbd2", "Ne7", "h3",
+            ],
+        },
     ],
 }
