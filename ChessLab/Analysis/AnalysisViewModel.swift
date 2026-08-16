@@ -1528,13 +1528,32 @@ final class AnalysisViewModel {
     ///
     /// Avec cette bande, 14,9 % des coups sont recalculés, 85 % des erreurs
     /// disparaissent, et il reste **0,68 %** de désaccords — soit MIEUX qu'un
-    /// budget dix fois plus grand appliqué partout, pour un quart du coût.
+    /// budget dix fois plus grand appliqué partout, pour un quart du coût
+    /// (×2,95 mesuré, contre ×11,4 pour tout approfondir).
+    ///
+    /// La bande a été choisie sur cette courbe, chronomètre en main :
+    ///
+    ///     ±1,0 → ×1,96   59 % des erreurs corrigées   il reste 1,92 %
+    ///     ±1,5 → ×2,42   73 %                         il reste 1,24 %
+    ///     ±2,0 → ×2,95   85 %                         il reste 0,68 %   ← ici
+    ///     ±3,0 → ×3,81   93 %                         il reste 0,34 %
+    ///
+    /// Au-delà de ±2 on paie surtout des recalculs qui confirment le verdict.
     private static let refinementBand = 2.0
 
-    /// Budget de la seconde recherche. Lancée sur la MÊME position sans
-    /// réinitialiser le moteur : la table de transposition du premier passage
-    /// est conservée, donc le surcoût réel est inférieur au rapport des
-    /// budgets.
+    /// Budget de la seconde recherche.
+    ///
+    /// ⚠️ **Hypothèse réfutée par la mesure (16/08/2026).** On lisait ici que
+    /// la seconde recherche, lancée sur la MÊME position sans réinitialiser le
+    /// moteur, hériterait de la table de transposition et coûterait donc MOINS
+    /// que le rapport des budgets (×10). Chronométré sur les 887 coups des
+    /// neuf parties : un coup affiné coûte **×13,1** un coup de base
+    /// (3 093 ms contre 236 ms, deux recherches à chaque fois). La table
+    /// n'offre aucune remise — la recherche profonde élargit l'arbre et le
+    /// débit en nœuds baisse plus vite que la table ne fait gagner.
+    ///
+    /// Le bilan reste bon (×2,95 au total contre ×11,4 pour tout approfondir),
+    /// mais il vaut par le CIBLAGE, pas par une remise qui n'existe pas.
     private static let refinementNodes = 3_000_000
 
     /// Seuils de signalement — les seuls qui comptent. Franchir la frontière
