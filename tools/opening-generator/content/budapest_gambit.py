@@ -56,5 +56,26 @@ COURSE = {
                 "Nd2", "Nc5", "Ngf3", "Nc6", "g3", "Qe7", "Bg2", "g6",
             ],
         },
+
+        # ── Quand le gambit n'est pas possible (16/08) ────────────────────────
+        #
+        # Le Budapest EST 1.d4 Cf6 2.c4 e5. Sans c4, il n'existe pas : le
+        # signaler vaut mieux que laisser l'élève chercher un coup qui n'a plus
+        # de sens.
+        {
+            "chapter": {"id": "no-c4", "title": c("Si les Blancs ne jouent pas c4", "If White doesn't play c4")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Nf3",
+                 "comment": c("Pas de c4, donc pas de Budapest : …e5 ne serait plus un gambit mais une faute. On développe normalement et l'on attend c4.",
+                              "No c4, so no Budapest: …e5 would no longer be a gambit but a mistake. We develop normally and wait for c4."),
+                 "critical": True},
+                "e6", "c4",
+                {"san": "d5",
+                 "comment": c("c4 est arrivé trop tard pour le gambit — on est dans un Gambit Dame refusé, position saine et parfaitement jouable.",
+                              "c4 came too late for the gambit — we're in a Queen's Gambit Declined, a sound and perfectly playable position.")},
+                "Bg5", "dxc4", "Qa4+", "Nbd7",
+            ],
+        },
     ],
 }

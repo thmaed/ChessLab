@@ -60,5 +60,41 @@ COURSE = {
                 "Bg5", "a4",
             ],
         },
+
+        # ── 3.Cc3 : ce n'est plus une Bogo-Indienne (16/08) ───────────────────
+        #
+        # Deux Blancs sur trois jouent 3.Cc3 ici, et le cours partait de 3.Cf3.
+        # Or la Bogo EST 3.Cf3 Fb4+ : contre 3.Cc3, le clouage donne une
+        # Nimzo-Indienne, qui est une autre ouverture. On le dit, et on donne
+        # de quoi ne pas être perdu.
+        {
+            "chapter": {"id": "vs-nc3", "title": c("3.Cc3 — vers la Nimzo-Indienne", "3.Nc3 — into the Nimzo-Indian")},
+            "moves": [
+                "d4", "Nf6", "c4", "e6",
+                {"san": "Nc3",
+                 "comment": c("Le coup le plus fréquent — deux parties sur trois — et le cours n'en parlait pas. La Bogo suppose 3.Cf3 ; ici le cavalier va en c3.",
+                              "The most common move — two games in three — and the course didn't mention it. The Bogo assumes 3.Nf3; here the knight goes to c3."),
+                 "critical": True},
+                {"san": "Bb4",
+                 "comment": c("Le même clouage, mais il porte maintenant un autre nom : c'est la Nimzo-Indienne. Bonne nouvelle pour un joueur de Bogo — l'idée est identique, seule la théorie change.",
+                              "The same pin, but it now has another name: the Nimzo-Indian. Good news for a Bogo player — the idea is identical, only the theory differs."),
+                 "critical": True},
+                "g3", "d5", "Nf3", "O-O", "Bg2", "Nc6",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-london", "title": c("Contre la London — 2.Ff4", "vs the London — 2.Bf4")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Bf4",
+                 "comment": c("Sans c4, il n'y a ni Bogo ni Nimzo : on joue une position saine avec les repères d'un joueur de …e6.",
+                              "Without c4 there is no Bogo and no Nimzo: we play a sound position with the landmarks of an …e6 player.")},
+                "d5", "e3", "c5", "c3",
+                {"san": "Qb6", "critical": True,
+                 "comment": c("Le coup qui met la London mal à l'aise : la dame attaque b2, que le fou parti en f4 ne défend plus.",
+                              "The move that makes the London uncomfortable: the queen hits b2, which the bishop — gone to f4 — no longer defends.")},
+                "Qb3", "c4",
+            ],
+        },
     ],
 }

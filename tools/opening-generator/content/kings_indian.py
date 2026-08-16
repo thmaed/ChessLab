@@ -104,5 +104,43 @@ COURSE = {
                 "c5", "d5", "e6", "Qd2", "exd5", "exd5", "Re8",
             ],
         },
+
+        # ── Quand les Blancs ne jouent pas c4 (16/08) ─────────────────────────
+        #
+        # Trou n°1 de TOUS les répertoires noirs contre 1.d4 : le cours suppose
+        # 2.c4, et en club les Blancs jouent la London ou 2.Cf3. L'élève sort
+        # du répertoire au DEUXIÈME coup.
+        {
+            "chapter": {"id": "vs-london", "title": c("Contre la London — 2.Ff4", "vs the London — 2.Bf4")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Bf4",
+                 "comment": c("La London, croisée dans une partie sur six. Le moteur conseille …d5, mais on est venu jouer l'Est-Indienne : le fianchetto reste parfaitement jouable.",
+                              "The London, met in one game in six. The engine prefers …d5, but we came to play the King's Indian: the fianchetto is perfectly sound."),
+                 "critical": True},
+                {"san": "g6",
+                 "comment": c("On garde notre installation. Face à la London, elle a même un atout : le fou f4 n'a plus de cible et devra reculer devant …Ch5.",
+                              "We keep our setup. Against the London it even has a plus: the f4 bishop has no target and must retreat once …Nh5 comes.")},
+                "Nf3", "Bg7", "Nbd2",
+                {"san": "Nh5", "critical": True,
+                 "comment": c("LE coup à connaître : on chasse le bon fou blanc. S'il va en g3, …Cxg3 lui double les pions ; s'il tient en e5, …f6 le déloge.",
+                              "THE move to know: we hunt White's good bishop. If it goes to g3, …Nxg3 doubles the pawns; if it holds e5, …f6 evicts it.")},
+                "Be5", "f6", "Bg3", "d6",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-nf3", "title": c("Contre 2.Cf3", "vs 2.Nf3")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Nf3",
+                 "comment": c("Les Blancs retardent c4. Sans réponse ici, le répertoire tombe une partie sur six.",
+                              "White delays c4. With no answer here, the repertoire fails in one game out of six.")},
+                "g6", "c4",
+                {"san": "Bg7",
+                 "comment": c("Et c4 finit par arriver : on est revenu dans l'Est-Indienne par un autre ordre. Il fallait simplement ne pas se laisser dérouter.",
+                              "And c4 arrives after all: we're back in the King's Indian by another route. You just had to keep your nerve.")},
+                "Qd3", "O-O", "e4", "d6",
+            ],
+        },
     ],
 }

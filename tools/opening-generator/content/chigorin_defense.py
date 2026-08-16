@@ -56,5 +56,25 @@ COURSE = {
                 "cxd5", "Bxf3", "gxf3", "Qxd5", "e3", "e5", "Nc3", "Bb4",
             ],
         },
+
+        # ── Quand les Blancs ne jouent pas c4 (16/08) ─────────────────────────
+        {
+            "chapter": {"id": "vs-london", "title": c("Contre la London — 2.Ff4", "vs the London — 2.Bf4")},
+            "moves": [
+                "d4", "d5",
+                {"san": "Bf4",
+                 "comment": c("Une partie sur cinq, et le cours partait de 2.c4. La Tchigorine garde pourtant tout son sens ici.",
+                              "One game in five, and the course started from 2.c4. The Chigorin still makes full sense here."),
+                 "critical": True},
+                {"san": "Nf6",
+                 "comment": c("On développe d'abord ; …Cc6 vient ensuite, quand le fou f4 sera déjà engagé.",
+                              "Develop first; …Nc6 comes next, once the f4 bishop is already committed.")},
+                "e3", "c5", "Nc3",
+                {"san": "Bg4", "critical": True,
+                 "comment": c("L'idée maîtresse de la Tchigorine : on cloue le défenseur de d4 au lieu de bâtir un centre de pions. Le jeu de pièces avant tout.",
+                              "The Chigorin's core idea: pin the defender of d4 instead of building a pawn centre. Pieces before pawns.")},
+                "Be2", "cxd4", "exd4",
+            ],
+        },
     ],
 }
