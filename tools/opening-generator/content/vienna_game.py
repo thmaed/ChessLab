@@ -56,5 +56,37 @@ COURSE = {
                 "exf4", "Nf3", "g5", "d4", "g4", "Bxf4", "gxf3", "Qxf3",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vienna-gambit", "title": c("Gambit viennois — 3.f4", "Vienna Gambit — 3.f4")},
+            "moves": [
+                "e4", "e5", "Nc3", "Nf6", "f4",
+                {"san": "exf4",
+                 "comment": c("Accepter est le coup principal — près de quatre Noirs sur dix — et le chapitre partait de …d5.",
+                              "Accepting is the main move — nearly four Black players in ten — and the chapter started from …d5."),
+                 "critical": True},
+                {"san": "e5",
+                 "comment": c("Le coup qui donne son sens au gambit : le pion chasse le cavalier avant qu'il ne s'installe, et la colonne f s'ouvrira pour notre tour.",
+                              "The move that justifies the gambit: the pawn kicks the knight before it settles, and the f-file will open for our rook."),
+                 "critical": True},
+                "Ng8", "Nf3", "d6", "d4", "dxe5", "Bb5+",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-d6", "title": c("2…d6 — l'installation Philidor", "2…d6 — the Philidor setup")},
+            "moves": [
+                "e4", "e5", "Nc3",
+                {"san": "d6",
+                 "comment": c("Les Noirs bâtissent une Philidor. On peut immédiatement liquider au centre et gagner l'échange de dames dans de bonnes conditions.",
+                              "Black builds a Philidor. We can liquidate in the centre at once and trade queens on favourable terms.")},
+                "d4", "Nf6", "dxe5", "dxe5",
+                {"san": "Qxd8+",
+                 "comment": c("On échange volontairement les dames : le roi noir perd le roque, et une finale légèrement meilleure vaut mieux qu'une attaque imaginaire.",
+                              "We deliberately trade queens: Black's king loses castling rights, and a slightly better endgame beats an imaginary attack."),
+                 "critical": True},
+                "Kxd8", "Nf3", "Bd6",
+            ],
+        },
     ],
 }

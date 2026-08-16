@@ -56,5 +56,42 @@ COURSE = {
                 "Qxd4", "Be3", "Qg4", "Qf2", "e5", "h3", "Qb4",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "teichmann", "title": c("Défense Teichmann — 5…Fg4", "Teichmann Defence — 5…Bg4")},
+            "moves": [
+                "d4", "d5", "e4", "dxe4", "Nc3", "Nf6", "f3", "exf3", "Nxf3",
+                {"san": "Bg4",
+                 "comment": c("La défense la plus jouée contre le gambit — près d'une partie sur deux — et la seule que le cours ne traitait pas. Les Noirs clouent le cavalier qui garde d4.",
+                              "The most played defence against the gambit — nearly one game in two — and the only one the course didn't cover. Black pins the knight guarding d4."),
+                 "critical": True},
+                {"san": "h3",
+                 "comment": c("On pose la question tout de suite. Reculer en h5 laisse g4 gagner un temps de plus.",
+                              "Ask the question immediately. Retreating to h5 lets g4 gain another tempo.")},
+                "Bh5", "g4", "Bg6",
+                {"san": "Ne5",
+                 "comment": c("Le cavalier saute sur son avant-poste avec gain de temps : voilà la compensation du pion, en pièces actives et non en calculs.",
+                              "The knight jumps to its outpost with tempo: there's the compensation for the pawn — active pieces, not calculations."),
+                 "critical": True},
+            ],
+        },
+        {
+            "chapter": {"id": "ryder", "title": c("Gambit Ryder — 5.Dxf3", "Ryder Gambit — 5.Qxf3")},
+            "moves": [
+                "d4", "d5", "e4", "dxe4", "Nc3", "Nf6", "f3", "exf3",
+                {"san": "Qxf3", "role": "trap",
+                 "comment": c("Le gambit Ryder : on sacrifie un SECOND pion pour une attaque immédiate. Objectivement douteux, redoutable en pratique — et le cours n'en disait rien.",
+                              "The Ryder Gambit: a SECOND pawn sacrificed for immediate attack. Objectively dubious, fearsome in practice — and the course said nothing about it."),
+                 "critical": True},
+                {"san": "e6",
+                 "comment": c("La défense saine : les Noirs ferment la diagonale et rendent le matériel s'il le faut.",
+                              "The sound defence: Black shuts the diagonal and gives material back if needed.")},
+                "Bf4", "Nc6", "O-O-O",
+                {"san": "Bd6",
+                 "comment": c("À connaître des deux côtés : avec un jeu précis les Noirs tiennent, et notre attaque doit venir vite ou pas du tout.",
+                              "Know it from both sides: with accurate play Black holds, and our attack must come fast or not at all.")},
+            ],
+        },
     ],
 }

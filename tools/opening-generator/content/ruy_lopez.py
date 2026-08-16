@@ -119,5 +119,36 @@ COURSE = {
                 "c3", "Nf6", "d4", "Bd7",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "steinitz", "title": c("Défense Steinitz — 3…d6", "Steinitz Defence — 3…d6")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "Bb5",
+                {"san": "d6",
+                 "comment": c("Un quart des parties après 3.Fb5, et le cours partait de …a6. La Steinitz est solide, passive, et parfaitement jouable en club.",
+                              "A quarter of games after 3.Bb5, and the course started from …a6. The Steinitz is solid, passive, and perfectly playable at club level."),
+                 "critical": True},
+                {"san": "O-O",
+                 "comment": c("On roque sans se presser. Le pion e4 n'est pas vraiment en prise : …Cxe4 perd sur Te1 et d4.",
+                              "We castle without hurry. The e4 pawn isn't really hanging: …Nxe4 loses to Re1 and d4.")},
+                "Bd7", "c3", "a6", "Ba4", "Nf6", "Re1",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-philidor", "title": c("2…d6 — la Philidor", "2…d6 — the Philidor")},
+            "moves": [
+                "e4", "e5", "Nf3",
+                {"san": "d6",
+                 "comment": c("L'adversaire refuse l'Espagnole dès le deuxième coup. Sans réponse ici, tout le répertoire tombe une partie sur six.",
+                              "The opponent declines the Ruy Lopez at move two. With no answer here, the whole repertoire fails in one game out of six."),
+                 "critical": True},
+                "d4", "Nf6", "Nc3", "Nc6",
+                {"san": "d5",
+                 "comment": c("On ferme le centre au moment où le cavalier c6 doit reculer : les Noirs manquent d'espace, nous avons le plan.",
+                              "We close the centre exactly when the c6 knight must retreat: Black lacks space, we have the plan.")},
+                "Ne7", "a4",
+            ],
+        },
     ],
 }
