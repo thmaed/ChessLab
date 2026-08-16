@@ -44,5 +44,36 @@ COURSE = {
                 "Qa4", "f6", "Bb5", "Ne7", "exd5", "Qxd5", "d4", "e4",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-bc5", "title": c("3…Fc5 — le développement naturel", "3…Bc5 — natural development")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "c3",
+                {"san": "Bc5",
+                 "comment": c("Plus d'un quart des parties, et le cours partait de …Cf6 ou …d5. Le fou en c5 s'oppose à d4 — mais c3 a préparé exactement cela.",
+                              "Over a quarter of games, and the course started from …Nf6 or …d5. The bishop on c5 opposes d4 — but c3 prepared precisely that."),
+                 "critical": True},
+                {"san": "d4",
+                 "comment": c("On pousse quand même. C'est la raison d'être du Ponziani : bâtir le centre avec un temps préparé.",
+                              "We push anyway. That's the Ponziani's whole point: building the centre with a prepared tempo.")},
+                "exd4", "cxd4", "Bb4+", "Nc3", "d5", "exd5",
+            ],
+        },
+        {
+            "chapter": {"id": "main", "title": c("Ligne principale — 3…Cf6", "Main line — 3…Nf6")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "c3", "Nf6", "d4",
+                {"san": "exd4",
+                 "comment": c("Sept Noirs sur dix prennent ici. Le cours continuait autrement et laissait donc l'élève seul dans la ligne la plus jouée.",
+                              "Seven Black players in ten take here. The course went elsewhere, leaving the student alone in the most played line."),
+                 "critical": True},
+                {"san": "e5",
+                 "comment": c("On avance plutôt que de reprendre : le cavalier f6 doit fuir et nous gagnons le temps qui paie le pion.",
+                              "Push rather than recapture: the f6 knight must run, and we gain the tempo that pays for the pawn."),
+                 "critical": True},
+                "Nd5", "cxd4", "Bb4+", "Nbd2", "d6", "a3",
+            ],
+        },
     ],
 }

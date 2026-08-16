@@ -79,5 +79,37 @@ COURSE = {
                 "fxe4", "Nc3", "Nf6", "Bg5", "g6", "f3", "exf3", "Nxf3", "Bg7", "Bd3", "d6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-c4", "title": c("2.c4 — la ligne principale", "2.c4 — the main line")},
+            "moves": [
+                "d4", "f5",
+                {"san": "c4",
+                 "comment": c("Le deuxième coup le plus joué au monde contre la Hollandaise, et le cours ne le traitait pas. Sans réponse ici, le répertoire tombe une partie sur trois.",
+                              "The most played second move against the Dutch, and the course didn't cover it. With no answer here, the repertoire fails in one game out of three."),
+                 "critical": True},
+                "Nf6", "g3", "e6", "Bg2",
+                {"san": "d5",
+                 "comment": c("On choisit la Hollandaise « pierre-de-taille » : structure fermée, plan clair, et le fou g2 mord sur du granit.",
+                              "We choose the Stonewall: a closed structure, a clear plan, and the g2 bishop bites on granite."),
+                 "critical": True},
+                "Nf3", "Be7", "Nc3",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-bf4", "title": c("2.Ff4 — la London contre la Hollandaise", "2.Bf4 — the London vs the Dutch")},
+            "moves": [
+                "d4", "f5",
+                {"san": "Bf4",
+                 "comment": c("Une partie sur cinq : les Blancs sortent le fou avant e3 pour éviter de l'enfermer.",
+                              "One game in five: White develops the bishop before e3 to avoid shutting it in.")},
+                "e6", "e3", "Nf6", "Nf3",
+                {"san": "b6",
+                 "comment": c("Le fianchetto de dame est la bonne méthode ici : il surveille e4 et prépare …Fe7 puis le roque, sans rien affaiblir.",
+                              "The queenside fianchetto is the right method here: it watches e4 and prepares …Be7 and castling, weakening nothing.")},
+                "Be2", "Bb7", "c4",
+            ],
+        },
     ],
 }
