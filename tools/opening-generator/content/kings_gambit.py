@@ -97,5 +97,53 @@ COURSE = {
                 "Nf3", "d6", "Nc3", "Nf6", "Bc4", "Nc6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "declined-nc6", "title": c("Refusé — 2…Cc6", "Declined — 2…Nc6")},
+            "moves": [
+                "e4", "e5", "f4",
+                {"san": "Nc6",
+                 "comment": c("Un Noir sur cinq développe au lieu de prendre ou de contre-attaquer. Le cours ne traitait ni ce coup ni …d6.",
+                              "One Black player in five develops rather than taking or counter-attacking. The course covered neither this nor …d6."),
+                 "critical": True},
+                "Nf3", "d6",
+                {"san": "Bb5",
+                 "comment": c("On cloue le défenseur de e5 avant de résoudre la tension : c'est l'ordre qui donne l'avantage.",
+                              "Pin the defender of e5 before resolving the tension: that move order is what gives the edge.")},
+                "exf4", "d4", "g5", "d5",
+            ],
+        },
+        {
+            "chapter": {"id": "declined-d6", "title": c("Refusé — 2…d6", "Declined — 2…d6")},
+            "moves": [
+                "e4", "e5", "f4",
+                {"san": "d6",
+                 "comment": c("La façon la plus solide de refuser : les Noirs consolident e5 et attendent.",
+                              "The most solid way to decline: Black shores up e5 and waits.")},
+                {"san": "d3",
+                 "comment": c("On ne force rien. La position devient une partie de pions rois où notre f4 gagne de l'espace sans rien concéder.",
+                              "No forcing. It becomes a king's pawn game where our f4 gains space without conceding anything.")},
+                "g6", "Be2",
+                {"san": "Qh4+", "role": "inaccuracy",
+                 "comment": c("L'échec réflexe. Après g3, la dame aura perdu deux temps et notre développement sera en avance.",
+                              "The reflex check. After g3, the queen has lost two tempi and our development is ahead.")},
+                "g3", "Qe7", "Be3",
+            ],
+        },
+        {
+            "chapter": {"id": "kieseritzky", "title": c("Gambit Kieseritzky — 3…g5", "Kieseritzky Gambit — 3…g5")},
+            "moves": [
+                "e4", "e5", "f4", "exf4", "Nf3",
+                {"san": "d6",
+                 "comment": c("La défense moderne du gambit accepté : au lieu de tenir le pion par …g5, les Noirs rendent et développent.",
+                              "The modern defence in the accepted gambit: instead of clinging with …g5, Black gives back and develops."),
+                 "critical": True},
+                "d4", "g5", "h4", "g4", "Ng1",
+                {"san": "Bh6",
+                 "comment": c("Le cavalier est retourné en g1 — humiliant mais correct : il repartira par e2 et le centre blanc vaut le temps perdu.",
+                              "The knight is back on g1 — humiliating but correct: it will re-emerge via e2, and White's centre is worth the lost time.")},
+            ],
+        },
     ],
 }

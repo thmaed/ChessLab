@@ -49,5 +49,50 @@ COURSE = {
                 "Nxe5", "d4", "Nc6", "d5", "Ne5", "f4", "Ng6", "e5", "Ng8", "d6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "italian-four-knights", "title": c("4…Fc5 — la Quatre Cavaliers italienne", "4…Bc5 — the Italian Four Knights")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "Nc3",
+                {"san": "Bc5",
+                 "comment": c("Plus d'un quart des parties, et le cours n'en parlait pas. Le fou en c5 laisse une faiblesse : le pion e5 n'a plus qu'un défenseur.",
+                              "More than a quarter of games, and the course didn't mention it. The bishop on c5 leaves a weakness: the e5 pawn has only one defender."),
+                 "critical": True},
+                {"san": "Nxe5", "critical": True,
+                 "comment": c("La fourchette classique : on prend, et si …Cxe5 alors d4 récupère la pièce en attaquant fou et cavalier à la fois.",
+                              "The classic fork trick: we take, and if …Nxe5 then d4 regains the piece, hitting bishop and knight at once.")},
+                "Nxe5", "d4",
+                {"san": "Bd6",
+                 "comment": c("Le seul coup : reculer en b6 ou b4 perdrait sur d5 ou dxe5.",
+                              "The only move: retreating to b6 or b4 would lose to d5 or dxe5.")},
+                "dxe5", "Bxe5", "Bd3",
+            ],
+        },
+        {
+            "chapter": {"id": "philidor-order", "title": c("2…d6 — l'ordre Philidor", "2…d6 — the Philidor order")},
+            "moves": [
+                "e4", "e5", "Nf3",
+                {"san": "d6",
+                 "comment": c("Les Noirs évitent la Quatre Cavaliers en défendant e5 par un pion. Le cours n'avait aucune réponse.",
+                              "Black sidesteps the Four Knights by defending e5 with a pawn. The course had no answer.")},
+                {"san": "d4",
+                 "comment": c("On frappe tout de suite : la Philidor souffre de son manque d'espace, et c'est là qu'il faut le lui rappeler.",
+                              "Strike at once: the Philidor suffers from a lack of space, and this is the moment to remind it.")},
+                "exd4", "Nxd4", "Nf6", "Bd3", "Bd7", "Nc3", "Be7",
+            ],
+        },
+        # La réfutation du gambit Halloween. Le chapitre laissait croire au
+        # sacrifice sans dire ce qui l'arrête ; c'est précisément le reproche
+        # que le testeur faisait au reste du répertoire.
+        {
+            "chapter": {"id": "halloween", "title": c("Gambit Halloween — 4.Cxe5", "Halloween Gambit — 4.Nxe5")},
+            "moves": [
+                "e4", "e5", "Nf3", "Nc6", "Nc3", "Nf6", "Nxe5", "Nxe5", "d4",
+                {"san": "Ng6", "critical": True, "role": "trap",
+                 "comment": c("LE coup qui réfute le gambit, joué par près d'un Noir sur deux. Le cavalier recule là où d4-d5 ne l'attaque plus. À connaître avant de se lancer : le Halloween est une arme de surprise, pas une ligne saine.",
+                              "THE move that refutes the gambit, played by nearly half of Black players. The knight retreats where d4-d5 no longer hits it. Know this before you leap: the Halloween is a surprise weapon, not a sound line.")},
+            ],
+        },
     ],
 }

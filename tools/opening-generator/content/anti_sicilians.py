@@ -163,5 +163,49 @@ COURSE = {
                 "exd5", "Qxd5", "Nf3", "e5", "axb4", "Bxb4",
             ],
         },
+
+        # ── Quand les Blancs jouent la Sicilienne OUVERTE (16/08) ─────────────
+        #
+        # Le relevé de couverture désigne 3.d4 comme le plus gros « trou » du
+        # cours (51 % des parties). C'en est un au sens statistique, pas au sens
+        # pédagogique : ce cours enseigne les DÉVIATIONS, et 3.d4 est la ligne
+        # principale, traitée par les cours Sicilienne dédiés. Le combler
+        # reviendrait à recopier un répertoire entier ici. On dit où l'on est,
+        # et on renvoie — c'est ce qui manquait vraiment.
+        {
+            "chapter": {"id": "open-sicilian", "title": c("Si les Blancs jouent d4", "If White plays d4")},
+            "moves": [
+                "e4", "c5", "Nf3",
+                {"san": "d6",
+                 "comment": c("Un ordre de coups courant, qui laisse toutes les options ouvertes.",
+                              "A common move order that keeps every option open.")},
+                {"san": "d4",
+                 "comment": c("Les Blancs refusent les déviations et entrent dans la Sicilienne ouverte : ce cours-ci s'arrête là. Les lignes qui suivent sont celles des cours Dragon, Najdorf et Scheveningue.",
+                              "White declines the sidelines and enters the Open Sicilian: this course stops here. What follows belongs to the Dragon, Najdorf and Scheveningen courses."),
+                 "critical": True},
+                "cxd4", "Nxd4",
+                {"san": "Nf6",
+                 "comment": c("Position de départ de toute la Sicilienne ouverte. Si tu joues la Sicilienne pour de bon, c'est ce carrefour qu'il faut travailler ensuite.",
+                              "The starting point of the whole Open Sicilian. If you play the Sicilian seriously, this is the junction to study next.")},
+            ],
+        },
+        {
+            "chapter": {"id": "bc4", "title": c("2.Fc4 — la sortie précoce", "2.Bc4 — the early bishop")},
+            "moves": [
+                "e4", "c5",
+                {"san": "Bc4",
+                 "comment": c("Vu dans une partie sur huit en club : les Blancs sortent le fou avant tout. C'est jouable, mais sans mordant.",
+                              "Seen in one club game in eight: White develops the bishop first. Playable, but toothless."),
+                 "critical": True},
+                {"san": "e6",
+                 "comment": c("La réfutation positionnelle : …e6 prépare …d5 et le fou c4 devra bouger une seconde fois.",
+                              "The positional refutation: …e6 prepares …d5 and the c4 bishop will have to move a second time.")},
+                "Nf3", "Nf6", "Qe2", "Nc6",
+                {"san": "Bb5",
+                 "comment": c("Le fou déménage déjà — deux temps perdus. Les Noirs égalisent sans effort.",
+                              "The bishop is already relocating — two tempi gone. Black equalises without effort.")},
+                "Nd4",
+            ],
+        },
     ],
 }
