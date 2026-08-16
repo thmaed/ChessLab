@@ -63,6 +63,29 @@ raison écrite.
 
 ## Utilisation
 
+### Jeton Lichess — obligatoire depuis 2026
+
+L'Opening Explorer n'accepte plus les requêtes anonymes : sans jeton, **toute**
+requête de données répond `401 Authorization Required`. Vérifié le 15/08/2026
+depuis trois sorties réseau différentes, sur les deux noms d'hôte, avec et sans
+User-Agent descriptif ; la spec OpenAPI de Lichess déclare bien
+`security: OAuth2: []` sur ces routes, même si l'exemple `curl` de sa
+description n'a pas suivi.
+
+Créer un jeton (gratuit, **aucune permission à cocher** — il ne sert qu'à
+s'identifier) sur <https://lichess.org/account/oauth/token>, puis :
+
+```bash
+export LICHESS_TOKEN=lip_xxxxxxxxxxxx
+```
+
+Le jeton se lit dans l'environnement (`LICHESS_TOKEN`, ou `LICHESS_API_TOKEN`)
+et **jamais** en argument de ligne de commande : un argument finit dans
+l'historique du shell et dans la liste des processus. `generate.py` refuse de
+démarrer sans lui, avant même de charger les noms ECO — sinon le lot tournerait
+une heure pour ne produire que du vide. Seul `--dry-run` s'en passe, puisqu'il
+ne sort pas sur le réseau.
+
 ```bash
 python3 generate.py --selftest                    # auto-test hors ligne (aucun réseau)
 python3 generate.py --only scandinavian           # une ouverture
@@ -86,8 +109,10 @@ sont copiés à la main dans `ChessLab/Resources/openings/` au jalon d'intégrat
   atteintes (`ecoName`). Téléchargé et mis en cache automatiquement, ou fourni
   via `--chess-openings-dir`.
 - **Coups réels & statistiques** : [API Lichess Opening Explorer](https://lichess.org/api#tag/Opening-Explorer)
-  — `explorer.lichess.ovh/masters` (parties de maîtres) et
-  `explorer.lichess.ovh/lichess` (parties en ligne, filtrées par tranche Elo).
+  — `explorer.lichess.org/masters` (parties de maîtres) et
+  `explorer.lichess.org/lichess` (parties en ligne, filtrées par tranche Elo).
+  Noms d'hôte **documentés** ; les anciens `.ovh` répondent encore, à
+  l'identique. Jeton OAuth requis, voir « Utilisation » ci-dessus.
   **Double pondération** conservée : maîtres (théoriquement correct) ET club
   1400-2000 (ce que le joueur affronte vraiment).
 - **Évaluations** : Stockfish local (optionnel, `--stockfish`), en batch, pour

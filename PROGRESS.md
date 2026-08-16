@@ -5494,12 +5494,39 @@ User-Agent, ni un jeton manquant (un `Bearer` ne change rien, et `explorer.py`
 n'a de toute façon aucun support de jeton). Le préflight CORS passe mais les
 requêtes de données sont refusées à la porte nginx.
 
-Reste à distinguer un blocage d'IP d'un changement de politique côté Lichess,
-ce qui ne peut pas se faire d'ici. **Vérification à faire dans un navigateur**
-sur `https://explorer.lichess.org/masters?play=e2e4` : du JSON → le blocage est
-propre à la sortie réseau des outils ; le même 401 → le point est bloqué côté
-Lichess, et la voie de repli est `database.lichess.org` (qui répond 200) en
-dumps hors ligne, plus lourds mais sans dépendance réseau.
+**Cause trouvée le 16/08 : l'API n'est plus anonyme.** Le navigateur de
+l'utilisateur reçoit le même 401 (donc ce n'est pas la sortie réseau des
+outils), et une requête émise depuis l'infrastructure Anthropic — une troisième
+adresse, sans rapport — reçoit également 401 : ce n'est donc pas non plus un
+blocage d'IP. La spec OpenAPI de Lichess le déclare explicitement :
+
+```yaml
+# doc/specs/tags/openingexplorer/masters.yaml
+security:
+  - OAuth2: []
+```
+
+L'exemple `curl` sans authentification qui figure encore dans la description de
+cette même page est périmé ; le comportement observé suit la spec.
+
+**Corrigé dans la chaîne** (`explorer.py`, `generate.py`, README) :
+- jeton OAuth lu dans `LICHESS_TOKEN` (ou `LICHESS_API_TOKEN`) et envoyé en
+  `Authorization: Bearer`. Jamais en argument de ligne de commande — cela finit
+  dans l'historique du shell et dans la liste des processus ;
+- `generate.py` refuse de démarrer sans jeton, **avant** de charger les noms ECO
+  et Stockfish : sinon le lot tourne longtemps pour ne produire que du vide.
+  `--dry-run` reste utilisable sans jeton, puisqu'il ne sort pas sur le réseau ;
+- le 401 a désormais un diagnostic dédié, qui distingue « aucun jeton envoyé »
+  de « jeton envoyé et refusé », au lieu des cinq pistes génériques dont quatre
+  étaient hors sujet ;
+- noms d'hôte passés à `explorer.lichess.org` (ceux de la spec).
+
+**Ce qui reste à vérifier, et qui demande le jeton** : qu'un jeton *valide*
+débloque bien l'accès. Un jeton bidon reçoit le même 401 nginx que l'absence de
+jeton — le refus a lieu à la porte, pas dans l'application — donc la preuve ne
+peut venir que d'un vrai jeton. Si même un jeton valide échouait, la voie de
+repli reste `database.lichess.org` (qui répond 200) en dumps hors ligne, plus
+lourds mais sans dépendance réseau.
 
 À enchaîner obligatoirement avec `audit.py`, dont l'avertissement restant
 (Blackmar 8…h6) dit déjà où la couverture manque.

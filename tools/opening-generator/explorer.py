@@ -1,9 +1,29 @@
-"""Client de l'API publique Lichess Opening Explorer, robuste au rate limiting.
+"""Client de l'API Lichess Opening Explorer, robuste au rate limiting.
 
 Deux bases (double pondération du brief) :
-- masters  → https://explorer.lichess.ovh/masters  (théoriquement correct)
-- lichess  → https://explorer.lichess.ovh/lichess  (parties en ligne, filtrées
+- masters  → https://explorer.lichess.org/masters  (théoriquement correct)
+- lichess  → https://explorer.lichess.org/lichess  (parties en ligne, filtrées
              par tranche Elo — ce que le joueur affronte VRAIMENT en club)
+
+## L'API n'est plus anonyme (constaté le 15/08/2026)
+
+Elle l'était quand ce module a été écrit ; elle ne l'est plus. Sans jeton,
+TOUTE requête de données répond `401 Authorization Required` (page nginx de
+172 octets), et c'est bien la politique de l'API, pas un incident local :
+vérifié depuis trois sorties réseau différentes, avec et sans User-Agent
+descriptif, sur les deux noms d'hôte (`.ovh` historique et `.org` documenté).
+La spec OpenAPI de Lichess le déclare noir sur blanc — `security: OAuth2: []`
+sur `openingExplorerMaster` — même si l'exemple `curl` de la description, lui,
+n'a pas été mis à jour.
+
+Le jeton se crée gratuitement sur <https://lichess.org/account/oauth/token>
+(aucune permission particulière n'est nécessaire : il sert à s'identifier).
+Il se fournit par la variable d'environnement `LICHESS_TOKEN`, jamais en
+argument de ligne de commande — un argument finit dans l'historique du shell
+et dans les journaux de processus.
+
+Note : le tablebase (`tablebase.lichess.ovh`) reste anonyme, lui. Ne pas
+conclure d'un service à l'autre.
 
 Robustesse (l'API a connu indisponibilités et 429 agressifs) :
 - Cache DISQUE de chaque réponse, indexé par (endpoint, FEN normalisée, params).
@@ -18,6 +38,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import time
 from pathlib import Path
 from typing import Optional
@@ -27,16 +48,38 @@ import requests
 from fen import normalize_fen
 import chess
 
-MASTERS_URL = "https://explorer.lichess.ovh/masters"
-LICHESS_URL = "https://explorer.lichess.ovh/lichess"
+# Nom d'hôte documenté par la spec OpenAPI. L'ancien `explorer.lichess.ovh`
+# répond encore, à l'identique — 401 dans les deux cas sans jeton.
+MASTERS_URL = "https://explorer.lichess.org/masters"
+LICHESS_URL = "https://explorer.lichess.org/lichess"
 
 # Lichess demande un User-Agent descriptif ; sans lui, les requêtes
 # `python-requests` par défaut peuvent être bloquées (403) par leur CDN.
 DEFAULT_USER_AGENT = "ChessLab-opening-generator/1.0 (offline data build; contact via App Store)"
 
+# Variable d'environnement portant le jeton OAuth (cf. docstring du module).
+TOKEN_ENV_VARS = ("LICHESS_TOKEN", "LICHESS_API_TOKEN")
+
+TOKEN_HELP = (
+    "L'Opening Explorer exige un jeton OAuth depuis 2026 : sans lui, toute\n"
+    "  requête répond 401. Créer un jeton (gratuit, aucune permission à cocher)\n"
+    "  sur https://lichess.org/account/oauth/token puis :\n"
+    "      export LICHESS_TOKEN=lip_xxxxxxxxxxxx\n"
+    "  Le jeton ne se passe PAS en argument de ligne de commande."
+)
+
 
 class ExplorerError(Exception):
     pass
+
+
+def token_from_environment() -> Optional[str]:
+    """Jeton OAuth lu dans l'environnement, ou `None`."""
+    for name in TOKEN_ENV_VARS:
+        value = os.environ.get(name, "").strip()
+        if value:
+            return value
+    return None
 
 
 class LichessExplorer:
@@ -50,6 +93,7 @@ class LichessExplorer:
         moves: int = 12,
         dry_run: bool = False,
         user_agent: str = DEFAULT_USER_AGENT,
+        token: Optional[str] = None,
     ):
         self.cache_dir = Path(cache_dir)
         self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -68,6 +112,13 @@ class LichessExplorer:
         # Session avec User-Agent descriptif (cf. DEFAULT_USER_AGENT).
         self.session = requests.Session()
         self.session.headers.update({"User-Agent": user_agent, "Accept": "application/json"})
+
+        # Jeton OAuth : explicite, sinon environnement. Absent en `--dry-run`,
+        # c'est sans conséquence : rien ne sort sur le réseau.
+        self.token = token or token_from_environment()
+        self.has_token = bool(self.token)
+        if self.token:
+            self.session.headers["Authorization"] = f"Bearer {self.token}"
 
     def probe(self) -> tuple:
         """Requête de diagnostic unique (position de départ) → (status, extrait)."""
@@ -164,7 +215,7 @@ class LichessExplorer:
 
     def _report_first_failure(self, url: str, status, body: str, reason: str) -> None:
         """Affiche UNE fois le détail du premier échec — pour diagnostiquer
-        (403 CDN, 429 persistant, réseau…) au lieu de deviner."""
+        (401 sans jeton, 403 CDN, 429 persistant, réseau…) au lieu de deviner."""
         if self._first_failure_reported:
             return
         self._first_failure_reported = True
@@ -173,6 +224,17 @@ class LichessExplorer:
         if body:
             print(f"  Réponse : {body}", file=sys.stderr)
         print(f"  User-Agent : {self.session.headers.get('User-Agent')}", file=sys.stderr)
+        # Le 401 a une cause unique et une seule solution : le dire, plutôt que
+        # de laisser chercher parmi cinq pistes dont quatre sont hors sujet.
+        if status == 401:
+            if self.has_token:
+                print("  Un jeton EST envoyé, et il est refusé : vérifie qu'il n'a pas été\n"
+                      "  révoqué ou mal copié (https://lichess.org/account/oauth/token).",
+                      file=sys.stderr)
+            else:
+                print(f"  AUCUN jeton n'est envoyé. {TOKEN_HELP}", file=sys.stderr)
+            print("", file=sys.stderr)
+            return
         print("  Pistes : 403 → blocage CDN (User-Agent) ; 429 → augmente --min-delay ;"
               " réseau → pare-feu/VPN.\n", file=sys.stderr)
 

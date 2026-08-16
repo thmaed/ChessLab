@@ -27,7 +27,7 @@ from pathlib import Path
 from builder import PROFILES, build_course, course_stats
 from eco import EcoNames
 from evaluator import NullEvaluator, StockfishEvaluator
-from explorer import LichessExplorer
+from explorer import TOKEN_HELP, LichessExplorer, token_from_environment
 from models import CatalogEntry
 from openings import ALL, by_id
 from validate import validate_course
@@ -109,6 +109,14 @@ def main(argv=None) -> int:
     if args.only:
         ids = [s.strip() for s in args.only.split(",") if s.strip()]
         selected = [o for o in (by_id(i) for i in ids) if o]
+
+    # Échouer AVANT de charger les noms ECO, Stockfish et 58 ouvertures : sans
+    # jeton, chaque requête répondra 401 et le lot ne produirait que du vide.
+    if not args.dry_run and not token_from_environment():
+        print(f"\n✗ Aucun jeton Lichess. {TOKEN_HELP}\n"
+              "  (ou relance avec --dry-run pour travailler sur le cache seul)",
+              file=sys.stderr)
+        return 2
 
     print(f"Chargement des noms ECO (lichess-org/chess-openings)…")
     eco = EcoNames.load(cache_dir / "eco", Path(args.chess_openings_dir) if args.chess_openings_dir else None)
