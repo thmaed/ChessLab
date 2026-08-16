@@ -69,5 +69,36 @@ COURSE = {
                 "Nd2", "Bb4", "Qc2", "O-O", "Bh4", "c5",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "sisters", "title": c("Si les Noirs prennent ou jouent …c6", "If Black takes or plays …c6")},
+            "moves": [
+                "d4", "d5", "c4",
+                {"san": "dxc4",
+                 "comment": c("Le Gambit Dame ACCEPTÉ, un quart des parties. Les Noirs ne tiendront pas le pion : notre jeu consiste à le reprendre au bon moment.",
+                              "The Queen's Gambit ACCEPTED, a quarter of games. Black can't hold the pawn: our game is to take it back at the right moment."),
+                 "critical": True},
+                {"san": "e3",
+                 "comment": c("Sans hâte. Fxc4 viendra quand le fou pourra s'y installer sans perdre de temps.",
+                              "No hurry. Bxc4 comes when the bishop can settle there without losing time.")},
+                "e6", "Bxc4", "c5", "Nf3", "Nf6", "O-O",
+            ],
+        },
+        {
+            "chapter": {"id": "sisters", "title": c("Si les Noirs prennent ou jouent …c6", "If Black takes or plays …c6")},
+            "moves": [
+                "d4", "d5", "c4",
+                {"san": "c6",
+                 "comment": c("La Slave. Elle a son cours ; l'essentiel est de ne pas la confondre avec le Refusé, car le fou c8 y reste libre.",
+                              "The Slav. It has its own course; the key is not to confuse it with the Declined, because the c8 bishop stays free.")},
+                "Nf3", "dxc4",
+                {"san": "a4",
+                 "comment": c("Le coup à connaître : on empêche …b5 de tenir le pion. Sans lui, les Noirs gardent le gain matériel.",
+                              "The move to know: it stops …b5 from holding the pawn. Without it, Black keeps the material."),
+                 "critical": True},
+                "e6", "e3", "b5", "axb5",
+            ],
+        },
     ],
 }

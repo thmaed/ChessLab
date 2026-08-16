@@ -48,5 +48,41 @@ COURSE = {
                 "Bxd5", "Nf6", "Bxf7+", "Kxf7", "Qxd8", "Bb4+", "Qd2", "Bxd2+", "Nxd2",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        {
+            "chapter": {"id": "vs-d6", "title": c("4…d6 — l'installation solide", "4…d6 — the solid setup")},
+            "moves": [
+                "e4", "e5", "d4", "exd4", "Qxd4", "Nc6", "Qe3",
+                {"san": "d6",
+                 "comment": c("La réponse la plus fréquente, et le cours partait d'ailleurs. Les Noirs ouvrent leur fou et attendent.",
+                              "The most common reply, and the course started elsewhere. Black frees the bishop and waits."),
+                 "critical": True},
+                {"san": "Bd2",
+                 "comment": c("Le fou prépare le grand roque : c'est tout le sel de la Partie du Centre, sinon la sortie précoce de la dame ne rapporte rien.",
+                              "The bishop prepares long castling: that's the whole point of the Centre Game — otherwise the early queen sortie gains nothing.")},
+                "Nf6", "Nc3", "Be7", "O-O-O",
+                {"san": "O-O",
+                 "comment": c("Rois opposés. On attaque par g4-h4 pendant qu'ils cherchent encore leur plan.",
+                              "Opposite castling. We attack with g4-h4 while they're still looking for a plan.")},
+            ],
+        },
+        {
+            "chapter": {"id": "vs-b6", "title": c("4…b6 — le fianchetto", "4…b6 — the fianchetto")},
+            "moves": [
+                "e4", "e5", "d4", "exd4", "Qxd4", "Nc6", "Qe3",
+                {"san": "b6",
+                 "comment": c("Une partie sur cinq : les Noirs veulent …Fa6 pour échanger le fou f1 et empêcher le roque.",
+                              "One game in five: Black wants …Ba6 to trade the f1 bishop and stop us castling.")},
+                "Nc3",
+                {"san": "Nb4",
+                 "comment": c("Le cavalier vise c2 et d3. On ne panique pas : la dame se déplace, et le cavalier b4 finira mal placé.",
+                              "The knight eyes c2 and d3. Don't panic: the queen steps aside and the b4 knight ends up misplaced.")},
+                "Qe2", "Ba6", "Qd1", "Bxf1", "Kxf1",
+                {"san": "Bc5",
+                 "comment": c("Nous avons perdu le roque, eux la paire de fous et deux temps. Le compte est en notre faveur.",
+                              "We've lost castling rights; they've lost the bishop pair and two tempi. The balance favours us.")},
+            ],
+        },
     ],
 }

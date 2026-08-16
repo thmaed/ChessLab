@@ -64,5 +64,38 @@ COURSE = {
                 "Bb7", "axb5", "axb5", "Rxa8", "Bxa8", "b3", "cxb3", "Qxb3",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        #
+        # Ce cours part de 2…dxc4. Ses deux plus gros trous sont les DEUX AUTRES
+        # réponses au Gambit Dame — …e6 et …c6 — qui ont chacune leur cours.
+        # On ne les recopie pas : on dit où l'on arrive.
+        {
+            "chapter": {"id": "sisters", "title": c("Si les Noirs ne prennent pas", "If Black doesn't take")},
+            "moves": [
+                "d4", "d5", "c4",
+                {"san": "e6",
+                 "comment": c("Le Gambit Dame REFUSÉ, joué dans un quart des parties. Ce n'est pas notre sujet ici — le cours dédié le traite — mais il faut savoir le reconnaître.",
+                              "The Queen's Gambit DECLINED, played in a quarter of games. Not our subject here — its own course covers it — but you must recognise it."),
+                 "critical": True},
+                {"san": "Nc3",
+                 "comment": c("Le coup naturel. Si …Fb4, c'est la Ragozine ; si …Cf6, la position classique du Refusé.",
+                              "The natural move. If …Bb4, that's the Ragozin; if …Nf6, the classical Declined position.")},
+                "Bb4", "Qa4+", "Nc6", "e3", "Nf6",
+            ],
+        },
+        {
+            "chapter": {"id": "sisters", "title": c("Si les Noirs ne prennent pas", "If Black doesn't take")},
+            "moves": [
+                "d4", "d5", "c4",
+                {"san": "c6",
+                 "comment": c("La Slave : les Noirs soutiennent d5 par un pion sans enfermer leur fou. Cours dédié également.",
+                              "The Slav: Black supports d5 with a pawn without shutting in the bishop. It too has its own course.")},
+                "Nf3", "Nf6", "Nc3", "e6", "e3", "Nbd7", "Bd3",
+                {"san": "dxc4",
+                 "comment": c("Et l'on retombe sur NOTRE sujet, avec un temps de plus : la Slave qui prend en c4 devient un Gambit Dame accepté retardé.",
+                              "And we're back to OUR subject, a tempo up: a Slav that takes on c4 becomes a delayed Queen's Gambit Accepted.")},
+            ],
+        },
     ],
 }
