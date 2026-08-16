@@ -37,3 +37,14 @@ scripts/yolo/piece-sets/
 
 # Build du package moteur vendorisé
 Vendor/CStockfish/.build/
+
+# Binaire Stockfish construit à la main pour `audit.py` et `suggest.py` :
+# objets, dépendances, réseaux NNUE et exécutable. Le point d'entrée `main.cpp`
+# est lui aussi généré (copie de `_main.cpp` plus un `main` de pont) — voir le
+# README du générateur. Rien de tout cela ne doit entrer dans le dépôt : c'est
+# reconstructible, et l'exécutable pèse 80 Mo.
+Vendor/CStockfish/Sources/CStockfish/stockfish/*.o
+Vendor/CStockfish/Sources/CStockfish/stockfish/.depend
+Vendor/CStockfish/Sources/CStockfish/stockfish/main.cpp
+Vendor/CStockfish/Sources/CStockfish/stockfish/stockfish
+Vendor/CStockfish/Sources/CStockfish/stockfish/*.nnue

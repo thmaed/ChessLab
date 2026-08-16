@@ -63,6 +63,27 @@ raison écrite.
 
 ## Utilisation
 
+### Reconstruire le binaire Stockfish (pour `audit.py` et `suggest.py`)
+
+Le paquet Swift vendorisé n'expose pas d'exécutable, et le point d'entrée y est
+renommé `_main` pour cohabiter avec celui de l'app. Le Makefile amont, lui,
+attend un `main`. D'où ces trois lignes, à rejouer quand le binaire manque :
+
+```bash
+cd Vendor/CStockfish/Sources/CStockfish/stockfish
+chmod u+w main.cpp 2>/dev/null; cp -f _main.cpp main.cpp && chmod u+w main.cpp
+printf '\nint main(int argc, char* argv[]) { return _main(argc, argv); }\n' >> main.cpp
+make -j8 build ARCH=apple-silicon
+```
+
+*Pièges rencontrés* : les sources vendorisées sont en **lecture seule**, et une
+écriture refusée passe inaperçue si la commande tourne en arrière-plan — d'où le
+`chmod`. Par ailleurs `_main.cpp` n'est PAS dans les `SRCS` du Makefile : c'est
+bien `main.cpp` qu'il faut produire, et y ajouter un `main` de pont plutôt que
+de renommer la fonction, puisque `_main` reste appelé par l'app.
+
+Le binaire, les objets et `main.cpp` sont gitignorés.
+
 ### Jeton Lichess — obligatoire depuis 2026
 
 L'Opening Explorer n'accepte plus les requêtes anonymes : sans jeton, **toute**
