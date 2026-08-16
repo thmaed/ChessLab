@@ -67,6 +67,19 @@ final class OpeningEditorViewModel {
         clearSelection()
     }
 
+    /// Coup que « Suivant » jouerait : la LIGNE PRINCIPALE si elle est
+    /// marquée, sinon le premier coup écrit. Dans un arbre, « suivant » est
+    /// ambigu dès qu'il y a une bifurcation ; on suit la ligne principale et
+    /// la liste reste là pour choisir une autre branche.
+    var nextEdge: MoveEdge? {
+        moves.first { $0.role == .mainLine } ?? moves.first
+    }
+
+    func forward() {
+        guard let nextEdge else { return }
+        enter(nextEdge)
+    }
+
     func back() {
         guard !trail.isEmpty else { return }
         trail.removeLast()

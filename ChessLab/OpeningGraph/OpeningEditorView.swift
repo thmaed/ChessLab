@@ -263,6 +263,16 @@ struct OpeningEditorView: View {
         .padding(.horizontal, 16)
     }
 
+    /// Navigation SYMÉTRIQUE : reculer et avancer.
+    ///
+    /// La barre portait « Précédent » et « Terminer » — or « Terminer » fait
+    /// exactement ce que fait la flèche de retour de la barre de navigation,
+    /// c'est-à-dire sortir. Un bouton en double occupait la place de celui qui
+    /// manquait : on pouvait reculer dans les coups, mais avancer demandait
+    /// d'aller taper une ligne dans la liste.
+    ///
+    /// « Suivant » suit la ligne principale ; la liste reste le moyen de
+    /// prendre une autre branche.
     private var controlBar: some View {
         HStack(spacing: 12) {
             Button { viewModel.back() } label: {
@@ -272,13 +282,26 @@ struct OpeningEditorView: View {
             .buttonStyle(.pressable)
             .disabled(viewModel.isAtRoot)
             .opacity(viewModel.isAtRoot ? 0.4 : 1)
+            .accessibilityIdentifier("editorBack")
 
-            Button { onExit() } label: {
-                Label("Terminer", systemImage: "checkmark")
-                    .frame(maxWidth: .infinity)
+            Button { viewModel.forward() } label: {
+                HStack(spacing: 6) {
+                    Text("Suivant")
+                    // Le coup à venir est nommé : dans un arbre, « suivant »
+                    // ne dit pas OÙ l'on va.
+                    if let san = viewModel.nextEdge?.san {
+                        Text(san)
+                            .font(.subheadline.monospaced().weight(.semibold))
+                            .foregroundStyle(Theme.accent)
+                    }
+                    Image(systemName: "chevron.right")
+                }
+                .frame(maxWidth: .infinity)
             }
             .buttonStyle(.pressable)
-            .accessibilityIdentifier("finishEditing")
+            .disabled(viewModel.nextEdge == nil)
+            .opacity(viewModel.nextEdge == nil ? 0.4 : 1)
+            .accessibilityIdentifier("editorForward")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
