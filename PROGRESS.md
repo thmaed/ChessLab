@@ -5475,6 +5475,36 @@ Procédure complète dans le README du générateur.
   les évaluations, une ligne acceptée à 1,40 hier peut franchir le seuil
   aujourd'hui. C'est la vérification qui compte, pas la compilation.
 
+## Dix tests rouges que la campagne de contenu avait masqués (16/08)
+
+Première suite complète depuis la fusion du menu Analyser : **10 échecs**.
+Neuf venaient de ce chantier-là — « Position FEN » et « Coller un PGN » ont
+fusionné en « Analyser PGN / FEN », et cinq classes de tests cherchaient
+encore les anciens boutons. La régression avait plusieurs heures.
+
+**Pourquoi elle est passée inaperçue.** La campagne de contenu ne touche pas
+au code Swift, donc je n'ai pas relancé la suite entre les commits. Le
+raisonnement est faux : ce n'est pas le commit courant qui casse quelque
+chose, c'est le précédent qui n'a jamais été vérifié. Un changement de
+libellé VISIBLE doit déclencher un passage sur les tests d'interface, seuls à
+viser les libellés par leur texte.
+
+**Le dixième échec était d'une autre nature** — et j'ai d'abord accusé la
+mauvaise cause. Le bandeau coach en paysage expirait à 90 s ; comme je venais
+de mesurer un affinage ×3, j'ai soupçonné mon propre ralentissement. Mesure
+isolée : le bandeau apparaît en **5 s**. L'échec ne survenait que sous la
+charge des cinq classes enchaînées.
+
+Le vrai défaut était l'ordre des instructions : sur iPhone ce test se saute
+faute d'iPad, mais il attendait d'abord le bandeau jusqu'à 90 s pour le jeter
+ensuite. **Une mesure qui n'aura pas lieu ne doit pas pouvoir échouer.** La
+condition de saut est passée avant l'attente ; aucune couverture perdue (le
+test frère vérifie le bandeau en portrait), et la classe est passée de 402 s à
+312 s.
+
+État après correction : **560 tests unitaires en 90 suites + 63 tests
+d'interface, 0 échec.**
+
 ## Campagne de contenu — les 58 cours ✅ (2026-08-16)
 
 Réponse au point 2 de Nils (« l'architecture est très bonne mais le contenu est
