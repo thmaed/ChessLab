@@ -63,6 +63,16 @@ struct ChessBoardView: View {
 
     @State private var dragState: DragState?
 
+    #if DEBUG
+    // ⚠️ TEMPORAIRE — diagnostic du plateau inerte en iOS 18. Ces compteurs
+    // s'affichent SUR le plateau : ils répondent sans console et sans
+    // débogueur attaché, ce qui est justement l'ambiguïté qu'on cherche à
+    // lever. À retirer avec `BoardTouchLog` une fois la cause trouvée.
+    @State private var touchCountSquares = 0
+    @State private var touchCountPieces = 0
+    @State private var lastTouchDetail = "aucun toucher"
+    #endif
+
     // MARK: Survol (pointeur/trackpad — iPad & Mac)
     /// Case sous le pointeur. Reste `nil` au doigt : `onHover` ne se déclenche
     /// qu'avec un pointeur (souris/trackpad). Purement visuel.
@@ -114,6 +124,25 @@ struct ChessBoardView: View {
         /// le `body`, ce qui se paie sur une vue à 64 cases et 6 couches.
         var resolvedTarget: Square?
     }
+
+    #if DEBUG
+    /// ⚠️ TEMPORAIRE — voir les compteurs plus haut. Transparent au toucher :
+    /// il ne doit rien changer au comportement qu'il mesure.
+    private var touchDiagnosticBadge: some View {
+        VStack(spacing: 1) {
+            Text("cases \(touchCountSquares)  ·  pièces \(touchCountPieces)")
+                .font(.system(size: 11, weight: .bold, design: .monospaced))
+            Text(lastTouchDetail)
+                .font(.system(size: 9, design: .monospaced))
+        }
+        .foregroundStyle(.white)
+        .padding(.horizontal, 8).padding(.vertical, 4)
+        .background(.black.opacity(0.75), in: RoundedRectangle(cornerRadius: 6))
+        .padding(.top, 4)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+    #endif
 
     /// Géométrie courante — voir ``BoardGeometry``.
     private func geometry(squareSize: CGFloat) -> BoardGeometry {
@@ -224,6 +253,9 @@ struct ChessBoardView: View {
             // (pas de coins arrondis qui rogneraient une pièce en cours de
             // glissement près du bord).
             .overlay(Rectangle().strokeBorder(Color.black.opacity(0.28), lineWidth: 1))
+            #if DEBUG
+            .overlay(alignment: .top) { touchDiagnosticBadge }
+            #endif
             .shadow(color: .black.opacity(0.38), radius: 16, x: 0, y: 8)
             .coordinateSpace(name: "board")
             .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
@@ -322,6 +354,10 @@ struct ChessBoardView: View {
                             .gesture(
                                 SpatialTapGesture(coordinateSpace: .named("board"))
                                     .onEnded { value in
+                                        #if DEBUG
+                                        touchCountSquares += 1
+                                        lastTouchDetail = "case \(sq.notation) · interaction=\(interactionEnabled)"
+                                        #endif
                                         BoardTouchLog.record(
                                             "tap-case", square: sq,
                                             detail: "point=(\(Int(value.location.x)),\(Int(value.location.y))) "
@@ -633,6 +669,12 @@ struct ChessBoardView: View {
         let geometry = geometry(squareSize: squareSize)
         return DragGesture(minimumDistance: 0, coordinateSpace: .named("board"))
             .onChanged { value in
+                #if DEBUG
+                if dragState == nil {
+                    touchCountPieces += 1
+                    lastTouchDetail = "pièce \(square.notation) · interaction=\(interactionEnabled)"
+                }
+                #endif
                 BoardTouchLog.recordOnce(
                     "debut-geste-piece", square: square,
                     detail: "interaction=\(interactionEnabled) draggable=\(draggableColor.map(String.init(describing:)) ?? "toutes")"
