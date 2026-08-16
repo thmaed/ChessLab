@@ -46,5 +46,62 @@ COURSE = {
                 "e4", "c5", "Nf3", "Nc6", "d3", "g6", "g3", "Bg7", "Bg2", "e5", "O-O", "Nge7", "Nbd2", "O-O", "a3", "d6",
             ],
         },
+
+        # ── Trous comblés le 16/08 ────────────────────────────────────────────
+        #
+        # Sur ces trois positions le moteur propose d4 — c'est-à-dire une
+        # Sicilienne ouverte ou une Anglaise. Ce serait quitter le système que
+        # l'élève est venu apprendre. On garde d3 et le fianchetto : c'est le
+        # sujet du cours, et c'est parfaitement sain.
+        {
+            "chapter": {"id": "vs-sicilian", "title": c("Contre la Sicilienne — …c5", "vs the Sicilian — …c5")},
+            "moves": [
+                "e4", "c5", "Nf3",
+                {"san": "d6",
+                 "comment": c("Près d'un Sicilien sur trois joue …d6 avant de sortir le cavalier, et le chapitre partait de …Cc6.",
+                              "Nearly one Sicilian player in three plays …d6 before developing the knight, and the chapter started from …Nc6."),
+                 "critical": True},
+                {"san": "d3",
+                 "comment": c("Le coup du système : on renonce à d4 et à toute théorie sicilienne. La partie se jouera sur nos termes.",
+                              "The system move: we give up d4 and all Sicilian theory. The game will be played on our terms.")},
+                "Nf6", "g3", "g6", "Bg2", "Bg7", "O-O",
+                {"san": "Nc6",
+                 "comment": c("Structure symétrique, mais c'est nous qui connaissons le plan : Cbd2, Te1, e5 puis Cf1-h2-g4.",
+                              "A symmetrical structure — but we're the ones who know the plan: Nbd2, Re1, e5, then Nf1-h2-g4.")},
+            ],
+        },
+        {
+            "chapter": {"id": "vs-d5", "title": c("Contre …d5", "vs …d5")},
+            "moves": [
+                "Nf3", "d5", "g3",
+                {"san": "Nc6",
+                 "comment": c("Les Noirs préparent …e5 pour prendre le centre avant nous. Le chapitre ne voyait que …Cf6.",
+                              "Black prepares …e5 to seize the centre first. The chapter only saw …Nf6."),
+                 "critical": True},
+                {"san": "Bg2",
+                 "comment": c("On ne s'en émeut pas : le fou file en g2 et prendra le pion d5 pour cible dès qu'il avancera.",
+                              "No cause for alarm: the bishop heads to g2 and will target the d5 pawn as soon as it advances.")},
+                "e5", "d3", "Be6", "O-O", "Qd7",
+                {"san": "e4",
+                 "comment": c("Le moment du système : on frappe d5 au centre. Après l'échange, le fou g2 respire enfin.",
+                              "The system's moment: we hit d5 in the centre. After the trade, the g2 bishop breathes at last."),
+                 "critical": True},
+                "dxe4", "dxe4",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-d5", "title": c("Contre …d5", "vs …d5")},
+            "moves": [
+                "Nf3", "d5", "g3",
+                {"san": "c5",
+                 "comment": c("L'ordre le plus fréquent après …Cc6, et lui non plus n'était pas traité.",
+                              "The next most common order after …Nc6, and it wasn't covered either.")},
+                "Bg2", "Nf6", "O-O", "e6", "d4",
+                {"san": "cxd4",
+                 "comment": c("Ici, exceptionnellement, d4 est le bon coup : les Noirs ont déjà engagé …c5 et …e6, la structure est celle d'une Catalane, pas d'un système où l'on temporise.",
+                              "Here, exceptionally, d4 is right: Black has already committed to …c5 and …e6, and the structure is a Catalan one, not a system where we bide our time.")},
+                "Nxd4", "e5",
+            ],
+        },
     ],
 }
