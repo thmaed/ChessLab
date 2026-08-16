@@ -159,21 +159,31 @@ struct OpeningEditorView: View {
         index % 2 == 0 ? "\(index / 2 + 1). \(san)" : san
     }
 
-    /// La consigne remplace le vide : sur une position sans suite, un écran
-    /// muet laisserait croire que l'éditeur ne fait rien.
-    @ViewBuilder
+    /// La consigne est PERMANENTE.
+    ///
+    /// 🐛 Elle ne s'affichait que sur une position sans suite. Dès qu'un coup
+    /// existait, elle disparaissait et l'écran ressemblait à une liste en
+    /// lecture seule : l'utilisateur a demandé si l'éditeur « ne servait qu'à
+    /// renommer ou supprimer ». L'ajout est pourtant le geste CENTRAL, et il
+    /// n'a pas de bouton — on joue le coup. Un geste sans bouton doit être
+    /// annoncé, sinon il n'existe pas.
+    ///
+    /// Le ton change avec le contexte : invitation quand la position est
+    /// vierge, rappel discret ensuite.
     private var hint: some View {
-        if viewModel.moves.isEmpty {
-            HStack(alignment: .top, spacing: 10) {
-                Image(systemName: "hand.tap.fill").foregroundStyle(Theme.accent)
-                Text("Joue un coup sur l'échiquier pour l'ajouter à ton répertoire.")
-                    .font(.subheadline).foregroundStyle(Theme.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 0)
-            }
-            .cardStyle()
-            .padding(.horizontal, 16)
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: "hand.tap.fill")
+                .foregroundStyle(Theme.accent)
+            Text(viewModel.moves.isEmpty
+                 ? "Joue un coup sur l'échiquier pour l'ajouter à ton répertoire."
+                 : "Joue un autre coup sur l'échiquier pour ajouter une variante.")
+                .font(.subheadline)
+                .foregroundStyle(viewModel.moves.isEmpty ? Theme.textSecondary : Theme.textTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
         }
+        .cardStyle()
+        .padding(.horizontal, 16)
     }
 
     private var movesSection: some View {
@@ -188,6 +198,22 @@ struct OpeningEditorView: View {
                     .foregroundStyle(Theme.textTertiary)
             }
             .padding(.horizontal, 16)
+
+            // Ce que font les deux icônes de chaque ligne. Une bulle et une
+            // corbeille se devinent, mais « commenter » ne se devine pas comme
+            // « écrire ce que l'élève lira pendant sa révision ».
+            if !viewModel.moves.isEmpty {
+                HStack(spacing: 6) {
+                    Image(systemName: "text.bubble").foregroundStyle(Theme.accent)
+                    Text("commenter").foregroundStyle(Theme.textTertiary)
+                    Image(systemName: "trash").foregroundStyle(Theme.danger)
+                        .padding(.leading, 8)
+                    Text("supprimer la variante").foregroundStyle(Theme.textTertiary)
+                    Spacer()
+                }
+                .font(.caption2)
+                .padding(.horizontal, 16)
+            }
 
             ForEach(viewModel.moves, id: \.uci) { edge in
                 moveRow(edge)
