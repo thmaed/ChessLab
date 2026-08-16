@@ -67,5 +67,35 @@ COURSE = {
                 "b4", "Nbd2", "d6", "e4", "g6", "Ngf3", "Bg7", "Bd3", "O-O", "O-O",
             ],
         },
+
+        # ── Sans c4, il n'y a pas de gambit Benko (16/08) ─────────────────────
+        {
+            "chapter": {"id": "no-c4", "title": c("Si les Blancs ne jouent pas c4", "If White doesn't play c4")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Bf4",
+                 "comment": c("La London. Le Benko suppose 2.c4 c5 3.d5 b5 : sans le pion c4, il n'y a rien à saper et le sacrifice n'a plus d'objet.",
+                              "The London. The Benko assumes 2.c4 c5 3.d5 b5: with no c4 pawn there is nothing to undermine, and the sacrifice loses its point."),
+                 "critical": True},
+                "d5", "e3", "e6", "Nd2",
+                {"san": "Bd6",
+                 "comment": c("On échange le bon fou blanc. À défaut de gambit, on joue la structure — et c'est la bonne façon de traiter la London.",
+                              "We trade White's good bishop. No gambit available, so we play the structure — and that's the right way to meet the London.")},
+                "Bg3", "O-O", "c3",
+            ],
+        },
+        {
+            "chapter": {"id": "no-c4", "title": c("Si les Blancs ne jouent pas c4", "If White doesn't play c4")},
+            "moves": [
+                "d4", "Nf6",
+                {"san": "Nf3",
+                 "comment": c("Les Blancs retardent c4. On développe sans se découvrir : si c4 vient plus tard, le Benko redevient possible.",
+                              "White delays c4. We develop without committing: if c4 comes later, the Benko is back on.")},
+                "d5", "Bf4", "e6", "e3", "Bd6",
+                {"san": "Ne5",
+                 "comment": c("Le cavalier prend son avant-poste. On répond par …O-O puis …c5, et la partie redevient une lutte de structures ordinaire.",
+                              "The knight takes its outpost. We answer …O-O then …c5, and the game becomes an ordinary structural fight.")},
+            ],
+        },
     ],
 }

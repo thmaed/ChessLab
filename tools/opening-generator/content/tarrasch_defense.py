@@ -56,5 +56,38 @@ COURSE = {
                 "Bg2", "Bb4", "O-O", "Nge7", "Ne5", "Bxc3", "bxc3", "O-O",
             ],
         },
+
+        # ── Quand les Blancs ne jouent pas c4 (16/08) ─────────────────────────
+        #
+        # La Tarrasch est l'une des rares défenses dont l'IDÉE survit sans c4 :
+        # …c5 frappe le centre quel que soit le système adverse.
+        {
+            "chapter": {"id": "vs-london", "title": c("Contre la London — 2.Ff4", "vs the London — 2.Bf4")},
+            "moves": [
+                "d4", "d5",
+                {"san": "Bf4",
+                 "comment": c("Une partie sur cinq, et le cours partait de 2.c4. Bonne nouvelle : notre coup ne change pas.",
+                              "One game in five, and the course started from 2.c4. Good news: our move doesn't change."),
+                 "critical": True},
+                {"san": "c5", "critical": True,
+                 "comment": c("Le coup de la Tarrasch, et il vaut ici aussi : on frappe d4 tout de suite, et le fou parti en f4 ne défend plus b2.",
+                              "The Tarrasch move, and it works here too: we hit d4 at once, and the bishop — gone to f4 — no longer defends b2.")},
+                "e3", "Nc6", "Nf3", "Nf6",
+                {"san": "Bb5",
+                 "comment": c("Les Blancs clouent le défenseur de c5. On échange au centre et l'on obtient le pion isolé actif qui est l'âme de la Tarrasch.",
+                              "White pins the defender of c5. We trade in the centre and get the active isolated pawn that is the soul of the Tarrasch.")},
+                "cxd4", "exd4",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-nf3", "title": c("Contre 2.Cf3", "vs 2.Nf3")},
+            "moves": [
+                "d4", "d5", "Nf3", "e6", "Bf4",
+                {"san": "Bd6",
+                 "comment": c("On propose l'échange du bon fou blanc : s'il l'accepte, notre structure s'améliore ; s'il recule en g3, il aura perdu un temps.",
+                              "We offer to trade White's good bishop: accept and our structure improves, retreat to g3 and a tempo is gone.")},
+                "Bg3", "Nf6", "e3", "c5",
+            ],
+        },
     ],
 }

@@ -66,5 +66,30 @@ COURSE = {
                 "a5", "Nbd2", "Nge7", "g3", "Ng6", "Bg2", "Ngxe5",
             ],
         },
+
+        # ── Sans c4, il n'y a pas de contre-gambit (16/08) ────────────────────
+        #
+        # L'Albin EST 1.d4 d5 2.c4 e5. Contre la London ou 2.Cf3, le sacrifice
+        # n'existe pas : le dire vaut mieux que laisser chercher un coup qui
+        # n'a plus de sens.
+        {
+            "chapter": {"id": "no-c4", "title": c("Si les Blancs ne jouent pas c4", "If White doesn't play c4")},
+            "moves": [
+                "d4", "d5",
+                {"san": "Bf4",
+                 "comment": c("La London. Pas de c4, donc pas d'Albin : …e5 ne serait plus un gambit mais un pion donné pour rien.",
+                              "The London. No c4, so no Albin: …e5 would no longer be a gambit but a pawn given away."),
+                 "critical": True},
+                {"san": "c5",
+                 "comment": c("Le même esprit que le contre-gambit — frapper d4 sans attendre — mais avec un coup sain.",
+                              "The same spirit as the countergambit — hit d4 without delay — but with a sound move."),
+                 "critical": True},
+                "e3", "Nc6", "Nf3",
+                {"san": "Bg4",
+                 "comment": c("On cloue le défenseur de d4. C'est la méthode contre tous les systèmes qui bâtissent ce pion sans le soutenir par c3 assez tôt.",
+                              "We pin the defender of d4. That's the method against every system that builds this pawn without supporting it with c3 in time.")},
+                "c3", "cxd4", "exd4",
+            ],
+        },
     ],
 }
