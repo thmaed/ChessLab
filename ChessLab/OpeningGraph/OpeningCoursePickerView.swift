@@ -20,7 +20,10 @@ struct OpeningCoursePickerView: View {
     @State private var dailyCount = 0
     @State private var hardestCount = 0
 
-    private var entries: [OpeningCatalogEntry] { OpeningCatalog.all }
+    // Les finales ont leur propre écran : l'explorateur d'ouvertures ne les
+    // liste pas (défensif — ce flux est aujourd'hui inatteignable, voir
+    // bug18aout.md).
+    private var entries: [OpeningCatalogEntry] { OpeningCatalog.all.filter { !$0.isEndgame } }
     private var white: [OpeningCatalogEntry] { entries.filter { $0.side == .white } }
     private var black: [OpeningCatalogEntry] { entries.filter { $0.side == .black } }
 

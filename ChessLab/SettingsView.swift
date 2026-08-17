@@ -264,7 +264,7 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Ouvertures")
             VStack(alignment: .leading, spacing: 8) {
-                Text("Explore, apprends et entraîne tes ouvertures depuis le bouton « Explorateur » (🧭) de l'onglet Ouvertures : navigation dans les variantes, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour.")
+                Text("Explore, apprends et entraîne tes ouvertures depuis l'onglet Ouvertures : lecteur pas à pas, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)

@@ -18,8 +18,8 @@ struct HelpView: View {
     private let modules: [Module] = [
         .init(
             icon: "sparkles", tint: Theme.accent,
-            title: "Nouveautés de la version 1.4",
-            body: "• Vos propres répertoires : importez vos ouvertures au format PGN, variantes comprises, entraînez-les comme les autres et partagez-les par simple fichier (voir la carte « Vos répertoires et le partage »).\n• Les 58 ouvertures livrées ont été relues au moteur : quinze coups fautifs corrigés, quatre défenses manquantes ajoutées. Chaque coup est désormais rejoué sous Stockfish avant d'être publié.\n• Puzzles : un seul essai par défaut, comme un vrai exercice de calcul. Les trois essais restent disponibles dans les Réglages.\n• Lecteur d'ouvertures : l'échiquier reste à l'écran pendant qu'on lit les coups. Sur iPad en paysage, plateau à gauche et explications à droite.\n• L'échiquier répond mieux au doigt : relâcher un peu à côté joue quand même le coup.\n• L'analyse explique POURQUOI un coup est une erreur, en nommant le motif tactique.\n• Score de précision recalibré, revue d'analyse qui reprend toute seule, pendule qui décompte dès le premier coup."
+            title: "Nouveautés de la version 1.5",
+            body: "• Le module Finales : douze cours prouvés par table de finales — opposition, Lucena, Philidor, mats élémentaires, étude de Réti…\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées, dont les réponses aux coups les plus joués en club (London, Philidor, Petroff).\n• Les analyses sont conservées sur l'appareil : une partie déjà analysée se rouvre classifiée, instantanément.\n• Les moments critiques (brillant, gaffe, occasion manquée…) s'affichent sur la courbe d'évaluation.\n• Les modes se parlent : depuis une partie, envoyez la position vers l'analyse ou le Laboratoire — la partie vous attend au retour, pendule en pause.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier répondait au doigt sur la seule colonne h."
         ),
         .init(
             icon: "cpu", tint: Theme.accent,
