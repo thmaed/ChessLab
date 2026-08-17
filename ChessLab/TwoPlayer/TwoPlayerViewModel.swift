@@ -126,9 +126,31 @@ final class TwoPlayerViewModel {
     /// la pendule était créée sans jamais être lancée, et le premier coup se
     /// jouait hors du temps.
     func handleViewAppear() {
+        // Rend son temps à la partie recouverte — voir ``handleViewDisappear()``.
+        if clockPausedForDisappear {
+            clockPausedForDisappear = false
+            if outcome == nil {
+                clock?.startTurn(for: board.position.sideToMove)
+            }
+            return
+        }
         guard let clock, outcome == nil, moveLog.isEmpty, !clock.isRunning else { return }
         clock.startTurn(for: board.position.sideToMove)
     }
+
+    /// Le menu d'export peut empiler l'analyse ou le Laboratoire PAR-DESSUS
+    /// la partie : sans cette pause, la pendule continuait de s'écouler
+    /// derrière l'écran ajouté — jusqu'à la chute du drapeau, invisible.
+    /// Même mécanique que le passage en arrière-plan.
+    func handleViewDisappear() {
+        guard let clock, outcome == nil, clock.isRunning else { return }
+        clock.pause()
+        clockPausedForDisappear = true
+    }
+
+    /// Vrai entre un ``handleViewDisappear()`` qui a mis la pendule en pause
+    /// et le ``handleViewAppear()`` qui la relance.
+    private var clockPausedForDisappear = false
 
     private func wireClock() {
         clock?.onFlagFall = { [weak self] color in
@@ -213,6 +235,18 @@ final class TwoPlayerViewModel {
     }
     var totalPlies: Int { moveLog.count }
     var displayedPly: Int { reviewPly ?? moveLog.count }
+
+    // MARK: Export — même contrat que ``PlayViewModel``
+
+    /// FEN de la position AFFICHÉE : en consultation, celle sous les yeux.
+    var displayedFEN: String { displayedBoard.position.fen }
+
+    /// PGN rechargeable de la partie en cours, en-têtes comprises.
+    var exportedPGN: String { PGNExport.pgn(for: game) }
+
+    /// Avant le premier coup il n'y a pas de partie à exporter — la
+    /// POSITION, elle, s'exporte toujours.
+    var hasGameToExport: Bool { !moveLog.isEmpty }
 
     /// Reprise possible hors pendule (les deux joueurs reviennent en
     /// arrière d'un commun accord) et pas déjà sur le dernier coup.

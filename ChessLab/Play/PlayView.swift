@@ -7,11 +7,22 @@ struct PlayView: View {
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (PlayGameSettings) -> Void = { _ in }
+    /// Ouvre l'analyse sur la position AFFICHÉE (FEN) — sans attendre la fin
+    /// de partie, contrairement à `onAnalyze` qui porte le PGN complet.
+    var onAnalyzePosition: (String) -> Void = { _ in }
+    /// Ouvre le Laboratoire pré-rempli avec la position affichée : deux
+    /// moteurs y rejouent la position en série.
+    var onOpenLab: (String) -> Void = { _ in }
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
+    /// Liaison manuelle : `AppSettings` est un singleton `@Observable`, pas
+    /// une propriété `@Bindable` de la vue.
+    private var boardThemeSelection: Binding<String> {
+        Binding(get: { appSettings.boardThemeID }, set: { appSettings.boardThemeID = $0 })
+    }
     @State private var showPanelSheet = false
     @State private var copiedMessage: String?
     @State private var showResignConfirmation = false
@@ -46,13 +57,19 @@ struct PlayView: View {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 exportMenu
                 Menu {
-                    ForEach(BoardTheme.all) { theme in
-                        Button(LocalizedStringKey(theme.label)) { appSettings.boardThemeID = theme.id }
+                    // `Picker` et non des `Button` : le thème COURANT porte
+                    // sa coche — avant, le menu ne disait pas lequel était
+                    // actif et il fallait essayer pour voir.
+                    Picker("Thème du plateau", selection: boardThemeSelection) {
+                        ForEach(BoardTheme.all) { theme in
+                            Text(LocalizedStringKey(theme.label)).tag(theme.id)
+                        }
                     }
                 } label: {
                     Image(systemName: "paintpalette")
                         .foregroundStyle(Theme.textSecondary)
                 }
+                .accessibilityLabel("Thème du plateau")
             }
         }
         .alert(
@@ -285,7 +302,7 @@ struct PlayView: View {
 
     // MARK: Sous-vues
 
-    /// Export de la partie en cours.
+    /// Export de la partie en cours — et PASSERELLES vers les autres modes.
     ///
     /// Un MENU et non un bouton unique : « exporter sa position » recouvre
     /// deux besoins distincts et l'app ne peut pas deviner lequel — la FEN
@@ -293,12 +310,29 @@ struct PlayView: View {
     /// PGN pour garder la partie entière. Les deux sont copiables d'un geste,
     /// et partageables si l'on veut sortir de l'app.
     ///
+    /// La section « Continuer ailleurs » évite le détour copier → accueil →
+    /// mode → coller : la position part DIRECTEMENT vers l'analyse ou le
+    /// Laboratoire, et la partie reste en dessous dans la pile — le retour
+    /// la retrouve telle quelle.
+    ///
     /// Ce qui est exporté est la position AFFICHÉE : si le joueur revoit un
     /// coup antérieur, c'est celle-là qu'il a sous les yeux, et donc celle
     /// qu'il croit exporter.
     @ViewBuilder
     private var exportMenu: some View {
         Menu {
+            Section("Continuer ailleurs") {
+                Button {
+                    onAnalyzePosition(viewModel.displayedFEN)
+                } label: {
+                    Label("Analyser cette position", systemImage: "chart.xyaxis.line")
+                }
+                Button {
+                    onOpenLab(viewModel.displayedFEN)
+                } label: {
+                    Label("Continuer au Laboratoire", systemImage: "flask")
+                }
+            }
             Button {
                 UIPasteboard.general.string = viewModel.displayedFEN
                 copiedMessage = LocalizationController.string("Position (FEN) copiée dans le presse-papiers.")

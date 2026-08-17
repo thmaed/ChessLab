@@ -423,6 +423,12 @@ struct HomeView: View {
                         path.append(Route.activeAnalysis(.pgn(pgn)))
                     } onRematch: { newSettings in
                         rematch(with: newSettings)
+                    } onAnalyzePosition: { fen in
+                        // EMPILÉ au-dessus de la partie, qui reste vivante en
+                        // dessous : le retour la retrouve telle quelle.
+                        path.append(Route.activeAnalysis(.fen(fen)))
+                    } onOpenLab: { fen in
+                        path.append(Route.labSetup(startFEN: fen))
                     }
 
                 case let .resumedGame(autosave):
@@ -433,6 +439,10 @@ struct HomeView: View {
                         path.append(Route.activeAnalysis(.pgn(pgn)))
                     } onRematch: { newSettings in
                         rematch(with: newSettings)
+                    } onAnalyzePosition: { fen in
+                        path.append(Route.activeAnalysis(.fen(fen)))
+                    } onOpenLab: { fen in
+                        path.append(Route.labSetup(startFEN: fen))
                     }
 
                 case .twoPlayerSetup:
@@ -448,6 +458,10 @@ struct HomeView: View {
                         path.append(Route.activeAnalysis(.pgn(pgn)))
                     } onRematch: { newSettings in
                         twoPlayerRematch(with: newSettings)
+                    } onAnalyzePosition: { fen in
+                        path.append(Route.activeAnalysis(.fen(fen)))
+                    } onOpenLab: { fen in
+                        path.append(Route.labSetup(startFEN: fen))
                     }
 
                 case let .resumedTwoPlayerGame(autosave):
@@ -458,6 +472,10 @@ struct HomeView: View {
                         path.append(Route.activeAnalysis(.pgn(pgn)))
                     } onRematch: { newSettings in
                         twoPlayerRematch(with: newSettings)
+                    } onAnalyzePosition: { fen in
+                        path.append(Route.activeAnalysis(.fen(fen)))
+                    } onOpenLab: { fen in
+                        path.append(Route.labSetup(startFEN: fen))
                     }
 
                 case .analysisEntry:
@@ -479,6 +497,8 @@ struct HomeView: View {
                 case let .activeAnalysis(source):
                     AnalysisHost(source: source, sessionKey: sessionKey(for: route)) { fen in
                         startNewGame(playFromPosition(fen))
+                    } onOpenLab: { fen in
+                        path.append(Route.labSetup(startFEN: fen))
                     }
 
                 case let .positionEditor(initialFEN):
@@ -590,11 +610,15 @@ struct HomeView: View {
                 case let .activeLab(settings):
                     LabHost(settings: settings, resumeState: nil, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
+                    } onAnalyze: { pgn in
+                        path.append(Route.activeAnalysis(.pgn(pgn)))
                     }
 
                 case let .resumedLab(state):
                     LabHost(settings: nil, resumeState: state, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
+                    } onAnalyze: { pgn in
+                        path.append(Route.activeAnalysis(.pgn(pgn)))
                     }
 
                 case .settings:
@@ -967,12 +991,10 @@ struct HomeView: View {
                     .foregroundStyle(Theme.textPrimary)
                     .lineLimit(1)
                 HStack(spacing: 8) {
-                    Text(game.resultRaw ?? "?")
-                        .font(.caption2.monospaced().weight(.bold))
-                        .foregroundStyle(Theme.background)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Theme.accent, in: Capsule())
+                    // La MÊME pastille que la bibliothèque (ivoire/ardoise) :
+                    // l'accueil affichait « 1/2-1/2 » sur fond émeraude, un
+                    // second langage pour la même information.
+                    GameResultPill(raw: game.resultRaw)
                     if let date = game.playedAt {
                         Text(date, style: .date)
                             .font(.caption)
@@ -1083,6 +1105,9 @@ private struct ActiveGameHost: View {
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (PlayGameSettings) -> Void = { _ in }
+    /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
+    var onAnalyzePosition: (String) -> Void = { _ in }
+    var onOpenLab: (String) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PlayViewModel?
@@ -1090,7 +1115,10 @@ private struct ActiveGameHost: View {
     var body: some View {
         Group {
             if let viewModel {
-                PlayView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze, onRematch: onRematch)
+                PlayView(
+                    viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
+                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab
+                )
             } else {
                 Color.clear
             }
@@ -1114,6 +1142,9 @@ private struct ResumedGameHost: View {
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (PlayGameSettings) -> Void = { _ in }
+    /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
+    var onAnalyzePosition: (String) -> Void = { _ in }
+    var onOpenLab: (String) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PlayViewModel?
@@ -1121,7 +1152,10 @@ private struct ResumedGameHost: View {
     var body: some View {
         Group {
             if let viewModel {
-                PlayView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze, onRematch: onRematch)
+                PlayView(
+                    viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
+                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab
+                )
             } else {
                 ContentUnavailableView(
                     "Reprise impossible",
@@ -1151,6 +1185,9 @@ private struct TwoPlayerActiveGameHost: View {
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (TwoPlayerGameSettings) -> Void = { _ in }
+    /// Passerelles « Continuer ailleurs » du menu d'export — voir ``TwoPlayerGameView``.
+    var onAnalyzePosition: (String) -> Void = { _ in }
+    var onOpenLab: (String) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: TwoPlayerViewModel?
@@ -1158,7 +1195,10 @@ private struct TwoPlayerActiveGameHost: View {
     var body: some View {
         Group {
             if let viewModel {
-                TwoPlayerGameView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze, onRematch: onRematch)
+                TwoPlayerGameView(
+                    viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
+                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab
+                )
             } else {
                 Color.clear
             }
@@ -1181,6 +1221,9 @@ private struct TwoPlayerResumedGameHost: View {
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (TwoPlayerGameSettings) -> Void = { _ in }
+    /// Passerelles « Continuer ailleurs » du menu d'export — voir ``TwoPlayerGameView``.
+    var onAnalyzePosition: (String) -> Void = { _ in }
+    var onOpenLab: (String) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: TwoPlayerViewModel?
@@ -1188,7 +1231,10 @@ private struct TwoPlayerResumedGameHost: View {
     var body: some View {
         Group {
             if let viewModel {
-                TwoPlayerGameView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze, onRematch: onRematch)
+                TwoPlayerGameView(
+                    viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
+                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab
+                )
             } else {
                 ContentUnavailableView(
                     "Reprise impossible",
@@ -1216,13 +1262,14 @@ private struct AnalysisHost: View {
     /// Identité de session — voir ``SessionStore``.
     let sessionKey: String
     let onPlayFromHere: (String) -> Void
+    var onOpenLab: (String) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: AnalysisViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                AnalysisView(viewModel: viewModel, onPlayFromHere: onPlayFromHere)
+                AnalysisView(viewModel: viewModel, onPlayFromHere: onPlayFromHere, onOpenLab: onOpenLab)
             } else {
                 Color.clear
             }
@@ -1319,13 +1366,14 @@ private struct LabHost: View {
     /// Identité de session — voir ``SessionStore``.
     let sessionKey: String
     let onExit: () -> Void
+    var onAnalyze: (String) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: LabViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                LabRunView(viewModel: viewModel, onExit: onExit)
+                LabRunView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze)
             } else {
                 Color.clear
             }

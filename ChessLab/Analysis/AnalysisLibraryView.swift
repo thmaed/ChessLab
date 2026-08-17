@@ -412,122 +412,9 @@ struct AnalysisLibraryView: View {
 
     // MARK: Ligne
 
-    /// Pastille de RÉSULTAT : elle RESSEMBLE au camp qui a gagné.
-    ///
-    /// Ivoire quand les Blancs l'emportent, ardoise quand ce sont les Noirs,
-    /// mi-partie pour la nulle, contour vide quand il n'y a pas de résultat.
-    /// Aucune convention à apprendre — un joueur d'échecs lit ça d'instinct —
-    /// et ça reste vrai en noir et blanc.
-    ///
-    /// Deux réglages qui comptent :
-    /// - l'ivoire est ADOUCI (et non le blanc du texte) : en blanc pur la
-    ///   pastille devenait l'élément le plus lumineux de la ligne et criait
-    ///   plus fort que le nom des joueurs ;
-    /// - l'ardoise porte un liseré clair, sans quoi elle disparaîtrait dans le
-    ///   fond de la carte, lui-même sombre.
-    ///
-    /// La couleur ne porte jamais seule : le texte reste lisible dans la
-    /// pastille et VoiceOver annonce « Victoire des Blancs » — sinon
-    /// l'information s'évanouit pour un daltonien comme pour un non-voyant.
-    private enum ResultStyle {
-        case white, black, draw, unknown
-
-        static func of(_ raw: String?) -> ResultStyle {
-            switch raw {
-            case "1-0": .white
-            case "0-1": .black
-            case "1/2-1/2", "1/2": .draw
-            default: .unknown
-            }
-        }
-
-        var label: String {
-            switch self {
-            case .white: "1-0"
-            case .black: "0-1"
-            // « 1/2-1/2 » est deux fois plus large que les autres et
-            // déformait l'alignement des lignes sans rien apprendre de plus.
-            case .draw: "1/2"
-            case .unknown: "?"
-            }
-        }
-    }
-
-    /// Ivoire de la pièce claire — pas le blanc du texte.
-    private static let ivory = Color(red: 0.898, green: 0.882, blue: 0.839)
-    /// Ardoise de la pièce sombre, plus claire que le fond de carte pour
-    /// rester une forme et non un trou.
-    private static let slate = Color(red: 0.110, green: 0.133, blue: 0.180)
-
-    @ViewBuilder
-    private func resultPill(_ raw: String?) -> some View {
-        let style = ResultStyle.of(raw)
-        Text(style.label)
-            .font(.caption2.monospaced().weight(.bold))
-            .foregroundStyle(pillForeground(style))
-            .padding(.horizontal, 6)
-            .padding(.vertical, 2)
-            // Largeur commune : sans elle, « 1/2 » et « ? » rétrécissent la
-            // pastille et les dates ne s'alignent plus d'une ligne à l'autre.
-            .frame(minWidth: 34)
-            .background { pillBackground(style) }
-            .overlay {
-                // Le liseré n'est utile qu'aux fonds sombres ou absents.
-                if style != .white {
-                    Capsule().strokeBorder(Color.white.opacity(0.22), lineWidth: 1)
-                }
-            }
-            .clipShape(Capsule())
-            .accessibilityLabel(Self.resultDescription(raw))
-    }
-
-    private func pillForeground(_ style: ResultStyle) -> Color {
-        switch style {
-        case .white: Theme.background
-        case .black: Theme.textPrimary
-        // Sur une pastille mi-ivoire mi-ardoise, ni le clair ni le sombre ne
-        // tiennent partout : le texte reste blanc et l'ivoire est assez
-        // atténué de son côté pour qu'il se lise.
-        case .draw: Theme.textPrimary
-        case .unknown: Theme.textSecondary
-        }
-    }
-
-    @ViewBuilder
-    private func pillBackground(_ style: ResultStyle) -> some View {
-        switch style {
-        case .white:
-            Capsule().fill(Self.ivory)
-        case .black:
-            Capsule().fill(Self.slate)
-        case .draw:
-            // Partagée, littéralement : la moitié gauche revient aux Blancs.
-            Capsule().fill(
-                LinearGradient(
-                    stops: [
-                        .init(color: Self.ivory.opacity(0.55), location: 0),
-                        .init(color: Self.ivory.opacity(0.55), location: 0.5),
-                        .init(color: Self.slate, location: 0.5),
-                        .init(color: Self.slate, location: 1),
-                    ],
-                    startPoint: .leading, endPoint: .trailing
-                )
-            )
-        case .unknown:
-            // Pas de résultat, pas de remplissage.
-            Color.clear
-        }
-    }
-
-    /// Ce que VoiceOver annonce : « 1-0 » ne se dit pas.
-    static func resultDescription(_ raw: String?) -> String {
-        switch raw {
-        case "1-0": return LocalizationController.string("Victoire des Blancs")
-        case "0-1": return LocalizationController.string("Victoire des Noirs")
-        case "1/2-1/2", "1/2": return LocalizationController.string("Partie nulle")
-        default: return LocalizationController.string("Résultat inconnu")
-        }
-    }
+    // La pastille de résultat vit désormais dans ``GameResultPill`` : le même
+    // composant sert ici et sur l'accueil, qui montrait les mêmes parties
+    // avec une pastille émeraude uniforme.
 
     private func recordRow(_ record: GameRecord) -> some View {
         HStack(spacing: 14) {
@@ -538,7 +425,7 @@ struct AnalysisLibraryView: View {
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Theme.textPrimary)
                 HStack(spacing: 8) {
-                    resultPill(record.resultRaw)
+                    GameResultPill(raw: record.resultRaw)
                     if let date = record.playedAt {
                         // Date ET heure : deux parties du même jour ne se
                         // distinguaient pas l'une de l'autre. `.formatted`

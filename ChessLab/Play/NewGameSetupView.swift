@@ -609,3 +609,62 @@ struct ToggleRow: View {
         .tint(Theme.accent)
     }
 }
+
+/// Rangée d'option EXCLUSIVE : icône, titre, description, coche.
+///
+/// Pour les choix « un parmi n » dont une capsule ne dit pas assez — un chip
+/// n'a pas la place d'expliquer ce que le choix implique, et finissait en
+/// parenthèses télégraphiques (« Table (icônes retournées) »). Ici le titre
+/// nomme, la légende explique, et le choix courant se voit à la coche ET au
+/// liseré, sans inverser les couleurs de toute la rangée.
+struct OptionRow: View {
+    let title: LocalizedStringKey
+    let caption: LocalizedStringKey
+    let systemImage: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(isSelected ? Theme.accent : Theme.textSecondary)
+                    .frame(width: 34, height: 34)
+                    .background(
+                        isSelected ? Theme.accent.opacity(0.16) : Theme.surfaceElevated,
+                        in: RoundedRectangle(cornerRadius: 9, style: .continuous)
+                    )
+                    .accessibilityHidden(true)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text(caption)
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
+                    .font(.system(size: 20))
+                    .foregroundStyle(isSelected ? Theme.accent : Theme.textTertiary.opacity(0.5))
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(
+                isSelected ? Theme.accent.opacity(0.07) : Theme.surfaceElevated.opacity(0.5),
+                in: RoundedRectangle(cornerRadius: 12, style: .continuous)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(isSelected ? Theme.accent.opacity(0.5) : Theme.stroke, lineWidth: 1)
+            )
+        }
+        .buttonStyle(.pressable)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+}

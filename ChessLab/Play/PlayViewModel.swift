@@ -966,6 +966,17 @@ final class PlayViewModel {
         // mémoire (Lot 6.A). Le cas « partie terminée » était déjà couvert par
         // le `didSet` d'`outcome` ; celui-ci manquait. Idempotent.
         releaseEngine()
+        // La PENDULE aussi : depuis que le menu d'export empile l'analyse ou
+        // le Laboratoire PAR-DESSUS une partie en cours, un écran peut
+        // recouvrir une partie à la pendule. Sans cette pause, le temps
+        // continuait de s'écouler derrière — jusqu'à la chute du drapeau,
+        // hors de l'écran. Même mécanique que le passage en arrière-plan ;
+        // lors d'une simple bascule d'ossature (rotation), la pause dure le
+        // temps de la reconstruction, personne ne la voit.
+        if let clock, outcome == nil, clock.isRunning {
+            clock.pause()
+            clockPausedForDisappear = true
+        }
     }
 
     /// À appeler quand l'écran de jeu (ré)apparaît alors que le view model,
@@ -984,7 +995,18 @@ final class PlayViewModel {
     /// jouait plus jamais : un écran d'apparence normale, définitivement muet.
     /// Même remède que ``AnalysisViewModel/handleViewAppear()``.
     func handleViewAppear() {
-        startClockIfGameHasNotBegun()
+        // Rend son temps à la partie recouverte : voir ``handleViewDisappear()``.
+        // AVANT `startClockIfGameHasNotBegun`, qui verrait sinon une pendule à
+        // l'arrêt sur journal vide et relancerait le tour une seconde fois.
+        if clockPausedForDisappear {
+            clockPausedForDisappear = false
+            if outcome == nil {
+                // Sans `previousMover` : aucun incrément n'est crédité.
+                clock?.startTurn(for: board.position.sideToMove)
+            }
+        } else {
+            startClockIfGameHasNotBegun()
+        }
         // UNIQUEMENT après un aller-retour d'écran : jamais après un échec de
         // démarrage, où l'utilisateur doit voir la bannière et décider de
         // réessayer. Même discipline que ``AnalysisViewModel``.
@@ -993,6 +1015,10 @@ final class PlayViewModel {
         guard outcome == nil, engine == nil else { return }
         enqueueEngineWork { await self.resumeEngineAfterReappearing() }
     }
+
+    /// Vrai entre un ``handleViewDisappear()`` qui a mis la pendule en pause
+    /// et le ``handleViewAppear()`` qui la relance.
+    private var clockPausedForDisappear = false
 
     /// Vrai entre un ``handleViewDisappear()`` qui a effectivement libéré
     /// Stockfish et le ``handleViewAppear()`` qui le rend.

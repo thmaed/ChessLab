@@ -24,7 +24,7 @@ struct HelpView: View {
         .init(
             icon: "cpu", tint: Theme.accent,
             title: "Contre l'ordinateur",
-            body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse."
+            body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse ou le Laboratoire — la partie vous attend au retour."
         ),
         .init(
             icon: "person.2.fill", tint: Theme.info,
@@ -59,7 +59,7 @@ struct HelpView: View {
         .init(
             icon: "flask", tint: Theme.rose,
             title: "Laboratoire",
-            body: "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats."
+            body: "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse (« Continuer au Laboratoire ») : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse."
         ),
         .init(
             icon: "camera.viewfinder", tint: Theme.accent,

@@ -70,6 +70,20 @@ Vous pouvez maintenant modifier un répertoire importé directement dans l'app :
 jouez un coup sur l'échiquier pour l'ajouter, retirez une variante, écrivez
 votre propre commentaire.
 
+**Les modes se parlent**
+
+Depuis une partie en cours — contre l'ordinateur ou à deux — le menu d'export
+envoie la position affichée directement vers l'analyse ou le Laboratoire, sans
+copier-coller. Votre partie vous attend au retour, pendule en pause. Depuis
+l'analyse, « Continuer au Laboratoire » fait jouer la position par deux
+moteurs ; en fin de série au Laboratoire, un bouton ouvre la dernière partie
+dans l'analyse.
+
+Et partout, les sélecteurs disent où vous en êtes : le thème de plateau actif
+porte sa coche, le mode d'orientation « Deux joueurs » explique chaque choix
+en toutes lettres, et les parties récentes de l'accueil affichent le résultat
+aux couleurs de l'échiquier, comme la bibliothèque.
+
 **Moteur mis à jour**
 
 Stockfish 17.1 remplace Stockfish 17. Analyse plus fine, à taille d'app
@@ -137,6 +151,19 @@ confirmation).
 
 You can now edit an imported repertoire right in the app: play a move on the
 board to add it, remove a line, write your own comment.
+
+**The modes talk to each other**
+
+From a game in progress — against the computer or two-player — the export menu
+sends the displayed position straight to analysis or the Laboratory, no
+copy-paste. Your game is waiting when you come back, clock paused. From
+analysis, "Continue in the Laboratory" has two engines play the position out;
+when a Laboratory series ends, one tap opens the last game in analysis.
+
+And selectors now tell you where you stand: the active board theme carries its
+checkmark, the two-player orientation modes explain each choice in plain
+words, and recent games on the home screen show their result in chessboard
+colours, matching the library.
 
 **Engine updated**
 

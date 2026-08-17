@@ -9,6 +9,10 @@ struct TwoPlayerGameView: View {
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     var onRematch: (TwoPlayerGameSettings) -> Void = { _ in }
+    /// Passerelles vers les autres modes, sur la position AFFICHÉE — même
+    /// contrat que ``PlayView``.
+    var onAnalyzePosition: (String) -> Void = { _ in }
+    var onOpenLab: (String) -> Void = { _ in }
 
     @Environment(\.scenePhase) private var scenePhase
     /// Sur iPad/Mac (classe régulière), le plateau est BORNÉ pour tenir dans
@@ -19,6 +23,7 @@ struct TwoPlayerGameView: View {
     @State private var showResignConfirmation = false
     @State private var showDrawConfirmation = false
     @State private var showResumeConfirmation = false
+    @State private var copiedMessage: String?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -45,12 +50,29 @@ struct TwoPlayerGameView: View {
         .padding(.bottom, 12)
         .appBackground()
         // Le décompte démarre à l'APPARITION, pas à l'init : voir
-        // ``TwoPlayerViewModel/handleViewAppear()``.
+        // ``TwoPlayerViewModel/handleViewAppear()``. Le couple avec
+        // `onDisappear` met la pendule en pause quand un écran empilé par le
+        // menu d'export recouvre la partie.
         .onAppear { viewModel.handleViewAppear() }
+        .onDisappear { viewModel.handleViewDisappear() }
         .navigationTitle("Deux joueurs")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) { exportMenu }
+        }
+        .alert(
+            "Copié",
+            isPresented: Binding(
+                get: { copiedMessage != nil },
+                set: { if !$0 { copiedMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) { copiedMessage = nil }
+        } message: {
+            Text(copiedMessage ?? "")
+        }
         .overlay { promotionOverlay }
         .overlay { gameOverOverlay }
         .confirmationDialog(
@@ -90,6 +112,60 @@ struct TwoPlayerGameView: View {
                 break
             }
         }
+    }
+
+    // MARK: Export & passerelles
+
+    /// Même menu que ``PlayView`` : copier/partager la position (FEN) ou la
+    /// partie (PGN), et continuer ailleurs — analyse ou Laboratoire — sans
+    /// passer par le presse-papiers. La partie reste dans la pile : le
+    /// retour la retrouve telle quelle.
+    ///
+    /// L'évaluation reste masquée À L'ÉCRAN pendant la partie ; ouvrir
+    /// l'analyse est un choix explicite des joueurs, au même titre que
+    /// copier la FEN vers une autre app l'a toujours permis.
+    private var exportMenu: some View {
+        Menu {
+            Section("Continuer ailleurs") {
+                Button {
+                    onAnalyzePosition(viewModel.displayedFEN)
+                } label: {
+                    Label("Analyser cette position", systemImage: "chart.xyaxis.line")
+                }
+                Button {
+                    onOpenLab(viewModel.displayedFEN)
+                } label: {
+                    Label("Continuer au Laboratoire", systemImage: "flask")
+                }
+            }
+            Button {
+                UIPasteboard.general.string = viewModel.displayedFEN
+                copiedMessage = LocalizationController.string("Position (FEN) copiée dans le presse-papiers.")
+            } label: {
+                Label("Copier la position (FEN)", systemImage: "square.grid.3x3")
+            }
+            Button {
+                UIPasteboard.general.string = viewModel.exportedPGN
+                copiedMessage = LocalizationController.string("Partie (PGN) copiée dans le presse-papiers.")
+            } label: {
+                Label("Copier la partie (PGN)", systemImage: "doc.on.doc")
+            }
+            .disabled(!viewModel.hasGameToExport)
+            Divider()
+            ShareLink(item: viewModel.displayedFEN) {
+                Label("Partager la position", systemImage: "square.and.arrow.up")
+            }
+            if viewModel.hasGameToExport {
+                ShareLink(item: viewModel.exportedPGN) {
+                    Label("Partager la partie", systemImage: "square.and.arrow.up.on.square")
+                }
+            }
+        } label: {
+            Image(systemName: "square.and.arrow.up")
+                .foregroundStyle(Theme.textSecondary)
+        }
+        .accessibilityLabel("Exporter")
+        .accessibilityIdentifier("exportGame")
     }
 
     // MARK: Orientation / HUD

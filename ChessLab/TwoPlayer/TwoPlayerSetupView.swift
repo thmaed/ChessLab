@@ -49,24 +49,31 @@ struct TwoPlayerSetupView: View {
                 }
 
                 SettingsSection(title: "Orientation du plateau", systemImage: "rectangle.portrait.rotate", tint: Theme.info) {
-                    FlowLayout(spacing: 8) {
-                        ChipButton(
-                            label: "Face à face (pivote)",
+                    // Des rangées d'option, pas des chips : le choix engage
+                    // toute la partie et les libellés en parenthèses
+                    // (« Table (icônes retournées) ») n'expliquaient rien.
+                    // Ici chaque option dit ce qu'elle fait.
+                    VStack(spacing: 8) {
+                        OptionRow(
+                            title: "Face à face",
+                            caption: "Le plateau pivote vers le joueur au trait — on se passe l'appareil.",
                             systemImage: "arrow.triangle.2.circlepath",
                             isSelected: rotationMode == .faceToFace
                         ) {
                             rotationMode = .faceToFace
                         }
-                        ChipButton(
-                            label: "Côte à côte (fixe)",
-                            systemImage: nil,
+                        OptionRow(
+                            title: "Côte à côte",
+                            caption: "Le plateau ne bouge pas — vous regardez du même côté.",
+                            systemImage: "person.2.fill",
                             isSelected: rotationMode == .fixed
                         ) {
                             rotationMode = .fixed
                         }
-                        ChipButton(
-                            label: "Table (icônes retournées)",
-                            systemImage: nil,
+                        OptionRow(
+                            title: "Autour d'une table",
+                            caption: "Appareil posé à plat : nom, pendule et boutons d'en face sont retournés.",
+                            systemImage: "table.furniture",
                             isSelected: rotationMode == .tabletop
                         ) {
                             rotationMode = .tabletop

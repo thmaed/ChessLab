@@ -9,11 +9,20 @@ import SwiftUI
 struct AnalysisView: View {
     @Bindable var viewModel: AnalysisViewModel
     let onPlayFromHere: (String) -> Void
+    /// Ouvre le Laboratoire pré-rempli avec la position affichée — le
+    /// pendant de « Jouer à partir d'ici », pour regarder deux moteurs
+    /// trancher la position au lieu de la jouer soi-même.
+    var onOpenLab: (String) -> Void = { _ in }
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.modelContext) private var modelContext
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
+    /// Liaison manuelle : `AppSettings` est un singleton `@Observable`, pas
+    /// une propriété `@Bindable` de la vue.
+    private var boardThemeSelection: Binding<String> {
+        Binding(get: { appSettings.boardThemeID }, set: { appSettings.boardThemeID = $0 })
+    }
     @State private var boardOrientation: Piece.Color = .white
     @State private var showExportSheet = false
     @State private var showSummarySheet = false
@@ -42,6 +51,9 @@ struct AnalysisView: View {
                     Button("Jouer à partir d'ici", systemImage: "play.fill") {
                         onPlayFromHere(viewModel.currentFEN)
                     }
+                    Button("Continuer au Laboratoire", systemImage: "flask") {
+                        onOpenLab(viewModel.currentFEN)
+                    }
                     Button("Exporter le PGN", systemImage: "square.and.arrow.up") {
                         showExportSheet = true
                     }
@@ -49,10 +61,14 @@ struct AnalysisView: View {
                         generatePuzzles()
                     }
                     .disabled(viewModel.isClassifying || isGeneratingPuzzles)
+                    // `Picker` et non des `Button` : le réglage COURANT porte
+                    // sa coche — avant, ces deux sous-menus ne disaient pas
+                    // lequel était actif.
                     Menu("Flèches du moteur") {
-                        ForEach(ArrowMode.allCases) { mode in
-                            Button(LocalizedStringKey(mode.label), systemImage: mode.systemImage) {
-                                viewModel.arrowMode = mode
+                        Picker("Flèches du moteur", selection: $viewModel.arrowMode) {
+                            ForEach(ArrowMode.allCases) { mode in
+                                Label(LocalizedStringKey(mode.label), systemImage: mode.systemImage)
+                                    .tag(mode)
                             }
                         }
                     }
@@ -61,8 +77,10 @@ struct AnalysisView: View {
                     }
                     .keyboardShortcut("f", modifiers: .command)
                     Menu("Thème du plateau") {
-                        ForEach(BoardTheme.all) { theme in
-                            Button(LocalizedStringKey(theme.label)) { appSettings.boardThemeID = theme.id }
+                        Picker("Thème du plateau", selection: boardThemeSelection) {
+                            ForEach(BoardTheme.all) { theme in
+                                Text(LocalizedStringKey(theme.label)).tag(theme.id)
+                            }
                         }
                     }
                 } label: {

@@ -112,6 +112,41 @@ struct GameClockStartTests {
         #expect(afterSecondAppear <= afterFirstAppear)
     }
 
+    // MARK: Partie recouverte par un autre écran
+
+    /// Depuis que le menu d'export empile l'analyse ou le Laboratoire
+    /// PAR-DESSUS une partie en cours, la pendule doit se mettre en pause
+    /// quand la vue disparaît — sinon le temps s'écoule derrière l'écran
+    /// ajouté, jusqu'à la chute du drapeau, invisible.
+    @Test func coveringTheGamePausesTheClock() throws {
+        let settings = Self.blitzSettings()
+        let viewModel = TwoPlayerViewModel(settings: settings, modelContext: try Self.inMemoryContext())
+        viewModel.handleViewAppear()
+        #expect(viewModel.clock?.isRunning == true)
+
+        // Un écran empilé recouvre la partie : `onDisappear`.
+        viewModel.handleViewDisappear()
+        #expect(viewModel.clock?.isRunning == false, "la pendule d'une partie recouverte ne décompte pas")
+
+        // Retour sur la partie : le décompte reprend, pour le camp au trait.
+        viewModel.handleViewAppear()
+        #expect(viewModel.clock?.isRunning == true, "le retour rend son temps à la partie")
+    }
+
+    @Test func coveringAFinishedGameDoesNotRestartItsClock() throws {
+        let settings = Self.blitzSettings()
+        let viewModel = TwoPlayerViewModel(settings: settings, modelContext: try Self.inMemoryContext())
+        viewModel.handleViewAppear()
+
+        // La partie se termine (abandon) PUIS l'écran est recouvert et
+        // retrouvé : rien ne doit relancer la pendule d'une partie finie.
+        viewModel.resign(.white)
+        viewModel.handleViewDisappear()
+        viewModel.handleViewAppear()
+
+        #expect(viewModel.clock?.isRunning != true, "une partie terminée ne redémarre pas sa pendule")
+    }
+
     // MARK: Sans cadence
 
     @Test func noClockMeansNothingToStart() throws {

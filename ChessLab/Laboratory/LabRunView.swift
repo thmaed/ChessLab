@@ -9,6 +9,10 @@ import UIKit
 struct LabRunView: View {
     @Bindable var viewModel: LabViewModel
     let onExit: () -> Void
+    /// Ouvre l'analyse sur le PGN d'une partie de la série : ce que les
+    /// moteurs viennent de jouer est exactement le genre de partie qu'on a
+    /// envie de décortiquer coup par coup.
+    var onAnalyze: (String) -> Void = { _ in }
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
@@ -284,6 +288,15 @@ struct LabRunView: View {
                     }
                 }
             } else {
+                // La dernière partie est celle qu'on vient de regarder se
+                // jouer — un tap l'ouvre dans l'analyse, coups classés et
+                // moteur en continu, au lieu d'exporter le PGN pour le
+                // recoller ailleurs.
+                if let last = viewModel.completed.last {
+                    controlButton("Analyser la dernière partie", icon: "chart.xyaxis.line") {
+                        onAnalyze(LabExport.pgn([last], settings: viewModel.settings))
+                    }
+                }
                 HStack(spacing: 10) {
                     controlButton("PGN", icon: "square.and.arrow.up") { exportPGN() }
                     controlButton("CSV", icon: "tablecells") { exportCSV() }
