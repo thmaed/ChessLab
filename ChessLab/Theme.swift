@@ -33,6 +33,9 @@ enum Theme {
     static let violet = Color(red: 0.62, green: 0.51, blue: 0.96)
     static let rose = Color(red: 0.96, green: 0.46, blue: 0.62)
     static let teal = accentSecondary
+    /// Or des Finales — plus cuivré que `warning` (les deux voisinent sur
+    /// l'accueil : Ouvertures ambre, Finales or rosé).
+    static let gold = Color(red: 0.91, green: 0.62, blue: 0.34)
 
     // MARK: Texte
 

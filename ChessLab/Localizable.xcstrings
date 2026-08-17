@@ -13007,6 +13007,358 @@
           }
         }
       }
+    },
+    "The Opposition" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Opposition"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'opposition"
+          }
+        }
+      }
+    },
+    "The Rule of the Square" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Rule of the Square"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La règle du carré"
+          }
+        }
+      }
+    },
+    "The Rook's Pawn Exception" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Rook's Pawn Exception"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'exception du pion-tour"
+          }
+        }
+      }
+    },
+    "The Lucena Position" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Lucena Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La position de Lucena"
+          }
+        }
+      }
+    },
+    "The Philidor Position" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Philidor Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La position de Philidor"
+          }
+        }
+      }
+    },
+    "Queen vs 7th-Rank Pawn" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs 7th-Rank Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre pion en 7e"
+          }
+        }
+      }
+    },
+    "Queen vs Bishop's Pawn" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Bishop's Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre pion-fou"
+          }
+        }
+      }
+    },
+    "The Rook Mate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Rook Mate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mat à la tour"
+          }
+        }
+      }
+    },
+    "The Queen Mate" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Queen Mate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mat à la dame"
+          }
+        }
+      }
+    },
+    "The Pawn Breakthrough" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Pawn Breakthrough"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La percée"
+          }
+        }
+      }
+    },
+    "The Réti Study" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Réti Study"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'étude de Réti"
+          }
+        }
+      }
+    },
+    "Finales" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endgames"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales"
+          }
+        }
+      }
+    },
+    "Lucena, Philidor, opposition — prouvées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lucena, Philidor, opposition — proven"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lucena, Philidor, opposition — prouvées"
+          }
+        }
+      }
+    },
+    "Finales de pions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pawn endings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales de pions"
+          }
+        }
+      }
+    },
+    "Finales de tours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook endings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales de tours"
+          }
+        }
+      }
+    },
+    "Finales de dames" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen endings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales de dames"
+          }
+        }
+      }
+    },
+    "Mats élémentaires" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elementary mates"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mats élémentaires"
+          }
+        }
+      }
+    },
+    "Études célèbres" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Famous studies"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Études célèbres"
+          }
+        }
+      }
+    },
+    "Avancé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avancé"
+          }
+        }
+      }
+    },
+    "Chaque ligne de ces cours est vérifiée par table de finales (Syzygy) : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every line in these courses is verified against endgame tablebases (Syzygy): no taught move gives up the win, no recommended defence loses the draw."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque ligne de ces cours est vérifiée par table de finales (Syzygy) : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle."
+          }
+        }
+      }
+    },
+    "Rook vs Pawn" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre pion"
+          }
+        }
+      }
+    },
+    "Douze cours pour convertir vos finales : opposition, règle du carré, percée, Lucena, Philidor, tour contre pion, dame contre pion, mats élémentaires, étude de Réti. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twelve courses to convert your endings: opposition, rule of the square, breakthrough, Lucena, Philidor, rook vs pawn, queen vs pawn, elementary mates, the Réti study. Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up the win, no recommended defence loses the draw. Spaced repetition and iCloud sync, like the openings."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Douze cours pour convertir vos finales : opposition, règle du carré, percée, Lucena, Philidor, tour contre pion, dame contre pion, mats élémentaires, étude de Réti. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchronisation iCloud, comme les ouvertures."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

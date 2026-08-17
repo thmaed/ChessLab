@@ -5475,6 +5475,38 @@ Procédure complète dans le README du générateur.
   les évaluations, une ligne acceptée à 1,40 hier peut franchir le seuil
   aujourd'hui. C'est la vérification qui compte, pas la compilation.
 
+## Le module Finales — construit en un jour sous oracle (17/08)
+
+Demande du matin : « une étude approfondie d'un nouveau module pour les
+Finales… un véritable coach ». Étude ET construction le jour même — le
+détail des décisions est dans `docs/ETUDE-FINALES.md`.
+
+**L'architecture en une phrase** : les finales sont des cours d'ouvertures
+qui partent d'une autre position — même JSON, même lecteur, même répétition
+espacée, même synchro iCloud ; un champ `kind` les sépare dans le catalogue,
+un écran `EndgameListView` les groupe par famille, une tuile « Finales »
+les sert.
+
+**La garantie qui change tout** : jusqu'à 7 pièces, la tablebase Syzygy
+donne le verdict EXACT. `audit_endgames.py` prouve donc que chaque coup
+enseigné préserve son verdict théorique — pas « évalué +2,3 », PROUVÉ.
+Douze cours, 300 positions, 152 coups commentés FR+EN, zéro coup faux.
+
+**Cinq dogmes corrigés par l'oracle pendant l'écriture** — la raison d'être
+de la méthode « aucune ligne de mémoire » :
+
+1. la racine « évidente » de l'opposition était nulle ;
+2. mon premier mat donnait la dame en prise (bis repetita de la Teichmann) ;
+3. Philidor : la tour passive tient dans notre position — dogme nuancé ;
+4. dame contre pion-fou : le fameux Ka1 « du coin » PERD joué trop tôt, la
+   vraie ressource est la promotion-échange c1=D ;
+5. la meilleure défense contre la vis sans fin est d1=C, cavalier du
+   désespoir — enseigné, réfutation comprise.
+
+**Reste à faire (module Finales)** : la coupure du roi (tours), le mat aux
+deux fous, et — v2 — l'entraînement libre arbitré (jouer n'importe quel coup
+qui préserve le verdict, pas seulement celui de la leçon).
+
 ## Dix tests rouges que la campagne de contenu avait masqués (16/08)
 
 Première suite complète depuis la fusion du menu Analyser : **10 échecs**.

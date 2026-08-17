@@ -268,6 +268,13 @@ struct OpeningCourse: Codable, Identifiable, Hashable, Sendable {
     private var side_: OpeningSide?
     private var level_: String?
     var summary: LocalizedText?
+    /// Nature du cours : absent = ouverture, `"endgame"` = finale. Les 58
+    /// cours d'ouvertures ne portent pas ce champ — le décodage défensif en
+    /// fait des ouvertures, rien ne change pour eux.
+    var kind: String?
+    /// Famille de finales (pawns|rooks|queens|mates|practical) — le critère
+    /// de regroupement de l'écran Finales.
+    var family: String?
     /// FEN normalisée de la position de départ du cours (souvent la position
     /// initiale, mais pas forcément pour un cours « côté noir »).
     let rootFEN: String
@@ -279,13 +286,14 @@ struct OpeningCourse: Codable, Identifiable, Hashable, Sendable {
         case schemaVersion, id, name, eco
         case side_ = "side"
         case level_ = "level"
-        case summary, rootFEN, chapters, positions
+        case summary, kind, family, rootFEN, chapters, positions
     }
 
     /// Perspective d'étude (défaut : blancs).
     var side: OpeningSide { side_ ?? .white }
     /// Niveau (défaut : club).
     var level: OpeningLevel { level_.flatMap(OpeningLevel.init(rawValue:)) ?? .club }
+    var isEndgame: Bool { kind == "endgame" }
 
     func node(at fen: String) -> PositionNode? { positions[fen] }
     var rootNode: PositionNode? { positions[rootFEN] }
@@ -323,6 +331,10 @@ struct OpeningCatalogEntry: Codable, Identifiable, Hashable, Sendable {
     private var side_: OpeningSide?
     private var level_: String?
     var summary: LocalizedText?
+    /// Nature du cours : absent = ouverture, `"endgame"` = finale.
+    var kind: String?
+    /// Famille de finales — voir ``OpeningCourse/family``.
+    var family: String?
     /// Nombre de positions du graphe (pour l'affichage « couverture »).
     var positionCount: Int?
     /// Profondeur max en demi-coups (indicatif).
@@ -332,11 +344,12 @@ struct OpeningCatalogEntry: Codable, Identifiable, Hashable, Sendable {
         case id, name, eco
         case side_ = "side"
         case level_ = "level"
-        case summary, positionCount, maxDepth
+        case summary, kind, family, positionCount, maxDepth
     }
 
     var side: OpeningSide { side_ ?? .white }
     var level: OpeningLevel { level_.flatMap(OpeningLevel.init(rawValue:)) ?? .club }
+    var isEndgame: Bool { kind == "endgame" }
 
     /// Ligne de catalogue DÉRIVÉE d'un cours complet.
     ///
@@ -351,6 +364,8 @@ struct OpeningCatalogEntry: Codable, Identifiable, Hashable, Sendable {
         side_ = course.side
         level_ = course.level.rawValue
         summary = course.summary
+        kind = course.kind
+        family = course.family
         positionCount = course.positions.count
         maxDepth = Self.depth(of: course)
     }

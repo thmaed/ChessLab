@@ -51,7 +51,9 @@ struct OpeningListView: View {
         sortedByName(entries.filter { UserOpeningStore.isUserCourse(id: $0.id) })
     }
     private var bundled: [OpeningCatalogEntry] {
-        entries.filter { !UserOpeningStore.isUserCourse(id: $0.id) }
+        // Les FINALES vivent dans le même catalogue mais ont leur propre
+        // écran : ici, uniquement les ouvertures.
+        entries.filter { !UserOpeningStore.isUserCourse(id: $0.id) && !$0.isEndgame }
     }
     private var white: [OpeningCatalogEntry] { sortedByName(bundled.filter { $0.side == .white }) }
     private var black: [OpeningCatalogEntry] { sortedByName(bundled.filter { $0.side == .black }) }

@@ -67,6 +67,9 @@ struct HomeView: View {
         case puzzleQueue
         case activePuzzleSession(PuzzleSessionFilter)
         case repertoireList
+        /// Module Finales : mêmes routes lecteur/entraîneur que les
+        /// ouvertures, seule la LISTE est propre au module.
+        case endgameList
         case activeOpeningLine(OpeningLibraryEntry, Piece.Color)
         /// Module d'ouvertures en graphe : lecteur pas-à-pas (principal) +
         /// entraînement. L'ancien Explorer/Apprendre reste défini mais n'est
@@ -95,7 +98,7 @@ struct HomeView: View {
     /// Entrées de la barre latérale iPad/Mac. Chacune enracine la colonne de
     /// détail sur l'écran d'entrée du mode correspondant (voir ``detailRoot``).
     enum SidebarItem: Hashable {
-        case vsEngine, twoPlayer, puzzles, openings, analysis, laboratory
+        case vsEngine, twoPlayer, puzzles, openings, endgames, analysis, laboratory
         case progression, settings, help
     }
 
@@ -323,6 +326,7 @@ struct HomeView: View {
                 sidebarLabel(.twoPlayer, "Deux joueurs", "person.2.fill", Theme.info)
                 sidebarLabel(.puzzles, "Puzzles", "puzzlepiece.fill", Theme.violet)
                 sidebarLabel(.openings, "Ouvertures", "books.vertical.fill", Theme.warning)
+                sidebarLabel(.endgames, "Finales", "crown.fill", Theme.gold)
                 sidebarLabel(.analysis, "Analyser", "chart.xyaxis.line", Theme.teal)
                 sidebarLabel(.laboratory, "Laboratoire", "flask", Theme.rose)
             }
@@ -363,6 +367,7 @@ struct HomeView: View {
         case .twoPlayer: destination(for: .twoPlayerSetup)
         case .puzzles: destination(for: .puzzleQueue)
         case .openings: destination(for: .repertoireList)
+        case .endgames: destination(for: .endgameList)
         case .analysis: destination(for: .analysisEntry)
         case .laboratory: destination(for: .labSetup(startFEN: nil))
         case .progression: destination(for: .progression)
@@ -545,6 +550,13 @@ struct HomeView: View {
                         path.append(Route.openingTrainDaily)
                     } onEdit: { courseID in
                         path.append(Route.openingEditor(courseID))
+                    }
+
+                case .endgameList:
+                    EndgameListView { courseID in
+                        path.append(Route.openingReader(courseID))
+                    } onReview: {
+                        path.append(Route.openingTrainDaily)
                     }
 
                 case let .openingEditor(courseID):
@@ -759,6 +771,9 @@ struct HomeView: View {
                 }
                 ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings") {
                     path.append(Route.repertoireList)
+                }
+                ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames") {
+                    path.append(Route.endgameList)
                 }
                 ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true) {
                     path.append(Route.analysisEntry)

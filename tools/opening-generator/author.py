@@ -44,7 +44,9 @@ def build_course(spec: dict) -> OpeningCourse:
     edges_by_key: dict[str, dict[str, MoveEdge]] = {}
     chapters: dict[str, OpeningChapter] = {}
 
-    root_key = normalize_fen(chess.Board())
+    # Une FINALE part d'une position arbitraire ; une ouverture, du départ.
+    root_board = chess.Board(spec["rootFEN"]) if spec.get("rootFEN") else chess.Board()
+    root_key = normalize_fen(root_board)
 
     def ensure(key: str) -> PositionNode:
         node = positions.get(key)
@@ -57,7 +59,7 @@ def build_course(spec: dict) -> OpeningCourse:
 
     for line_index, line in enumerate(spec["lines"]):
         is_main = line_index == 0
-        board = chess.Board()
+        board = root_board.copy()
         cur_key = root_key
 
         chapter = None
@@ -112,6 +114,7 @@ def build_course(spec: dict) -> OpeningCourse:
         id=spec["id"], name=spec["name"], rootFEN=root_key,
         side=spec["side"], level=spec.get("level", "club"),
         eco=spec.get("eco"), summary=spec.get("summary"),
+        kind=spec.get("kind"), family=spec.get("family"),
         chapters=list(chapters.values()), positions=positions,
     )
 
@@ -130,6 +133,38 @@ def _measure_depth(course_dict: dict) -> int:
                 seen[edge["toFEN"]] = seen[key] + 1
                 queue.append(edge["toFEN"])
     return best
+
+
+ENRICHMENT_KEYS = (
+    "gamesClub", "popularityClub", "scoreWhite", "scoreDraw", "scoreBlack",
+    "gamesMasters", "popularityMasters", "eval",
+)
+
+
+def _merge_enrichment(existing_path: Path, course_dict: dict) -> None:
+    """Recopie les champs d'enrichissement de l'ancien fichier vers le
+    nouveau graphe, arête par arête ((FEN, uci) inchangés = mêmes chiffres).
+    Les arêtes nouvelles restent nues : `enrich.py --only` les complètera."""
+    if not existing_path.exists():
+        return
+    try:
+        old = json.loads(existing_path.read_text())
+    except Exception:
+        return
+    stats = {}
+    for key, node in old.get("positions", {}).items():
+        for edge in node.get("moves", []):
+            payload = {k: edge[k] for k in ENRICHMENT_KEYS if k in edge}
+            if payload:
+                stats[(key, edge["uci"])] = payload
+    if not stats:
+        return
+    for key, node in course_dict["positions"].items():
+        for edge in node["moves"]:
+            payload = stats.get((key, edge["uci"]))
+            if payload:
+                for k, v in payload.items():
+                    edge.setdefault(k, v)
 
 
 def rebuild_catalog(out_dir: Path, order: list[str] | None = None) -> list[dict]:
@@ -151,6 +186,7 @@ def rebuild_catalog(out_dir: Path, order: list[str] | None = None) -> list[dict]
             eco=course.get("eco"), summary=course.get("summary"),
             positionCount=len(course.get("positions", {})),
             maxDepth=_measure_depth(course),
+            kind=course.get("kind"), family=course.get("family"),
         ).to_dict())
     (out_dir / "opening_catalog.json").write_text(
         json.dumps(entries, ensure_ascii=False, separators=(",", ":"))
@@ -165,7 +201,15 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
 
     import content
-    specs = content.COURSES
+    all_specs = list(content.COURSES)
+    # Les finales vivent dans leur propre paquet ; absent tant que le module
+    # n'est pas construit, d'où l'import tolérant.
+    try:
+        import content_endgames
+        all_specs += list(content_endgames.COURSES)
+    except ImportError:
+        pass
+    specs = all_specs
     if args.only:
         wanted = {s.strip() for s in args.only.split(",")}
         specs = [s for s in specs if s["id"] in wanted]
@@ -184,6 +228,12 @@ def main(argv=None) -> int:
         if issues:
             print(f"  ! {spec['id']} : intégrité ({len(issues)}) {issues[:3]}")
             continue
+        # PRÉSERVER l'enrichissement (stats Lichess, évals) du fichier
+        # existant : régénérer un cours l'effaçait — d'abord sur le seul
+        # Blackmar-Diemer (16/08), puis sur les 58 d'un coup (17/08, ce
+        # correctif). Les stats vivent par arête (FEN d'origine + uci) ; le
+        # contenu rédigé prime, les chiffres suivent.
+        _merge_enrichment(out_dir / f"{spec['id']}.json", course_dict)
         (out_dir / f"{spec['id']}.json").write_text(
             json.dumps(course_dict, ensure_ascii=False, separators=(",", ":"))
         )
@@ -191,7 +241,10 @@ def main(argv=None) -> int:
         commented = sum(1 for n in course_dict["positions"].values() for e in n["moves"] if e.get("comment"))
         print(f"  ✓ {spec['id']:<22} {stats['positions']:>4} positions, prof {stats['depth']:>2}, {commented} commentaires")
 
-    catalog = rebuild_catalog(out_dir, order=[c["id"] for c in content.COURSES])
+    # L'ordre pédagogique vient de la liste COMPLÈTE, pas du filtre --only :
+    # sinon une régénération partielle rétrogradait tous les autres cours en
+    # fin de catalogue.
+    catalog = rebuild_catalog(out_dir, order=[c["id"] for c in all_specs])
     print(f"\nCatalogue reconstruit : {len(catalog)} cours dans {out_dir}")
     return 0
 

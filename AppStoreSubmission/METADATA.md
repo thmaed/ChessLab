@@ -151,8 +151,8 @@ stockfish,tactique,ouverture,puzzle,gambit,fen,pgn,elo,entrainement,scanner,anal
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
 ```
-Analysez vos parties, scannez un échiquier, entraînez-vous sur 58 ouvertures
-commentées et 100 000+ puzzles, affrontez l'ordinateur — 100% local.
+Analysez vos parties, scannez un échiquier : 58 ouvertures, 12 finales
+prouvées, 100 000+ puzzles, l'ordinateur en face — 100% local.
 ```
 
 **Description** (4000 car. max) :
@@ -179,7 +179,8 @@ automatique. Entrée par PGN, FEN, éditeur de position ou scanner photo.
 OUVERTURES
 Choisissez une ouverture et avancez coup par coup : chaque coup est
 expliqué, les variantes sont proposées, et des flèches colorées relient le
-plateau à la liste des coups. 58 ouvertures rédigées à la main (bilingues),
+plateau à la liste des coups. 58 ouvertures et 12 finales rédigées à la main
+(bilingues) — chaque finale vérifiée par table de finales,
 toutes relues au moteur, avec un entraînement en répétition espacée simplifié
 pour les mémoriser.
 

@@ -109,6 +109,11 @@ class OpeningCourse:
     level: str = "club"
     eco: Optional[list] = None
     summary: Optional[str] = None
+    # Finales : "endgame" (absent = ouverture, les 58 cours existants ne
+    # changent pas d'un octet) et famille de regroupement
+    # (pawns|rooks|queens|minor|mates|practical).
+    kind: Optional[str] = None
+    family: Optional[str] = None
     chapters: list = field(default_factory=list)   # list[OpeningChapter]
     positions: dict = field(default_factory=dict)  # key -> PositionNode
 
@@ -121,6 +126,8 @@ class OpeningCourse:
             "side": self.side,
             "level": self.level,
             "summary": self.summary,
+            "kind": self.kind,
+            "family": self.family,
             "rootFEN": self.rootFEN,
         })
         d["chapters"] = [c.to_dict() for c in self.chapters]
@@ -138,6 +145,8 @@ class CatalogEntry:
     summary: Optional[str]
     positionCount: int
     maxDepth: int
+    kind: Optional[str] = None
+    family: Optional[str] = None
 
     def to_dict(self) -> dict:
         return _compact({
@@ -147,6 +156,8 @@ class CatalogEntry:
             "side": self.side,
             "level": self.level,
             "summary": self.summary,
+            "kind": self.kind,
+            "family": self.family,
             "positionCount": self.positionCount,
             "maxDepth": self.maxDepth,
         })

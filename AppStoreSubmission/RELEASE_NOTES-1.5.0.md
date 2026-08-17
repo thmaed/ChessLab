@@ -21,32 +21,24 @@ mesuré, position par position, ce que les joueurs de club jouent réellement, e
 comblé les réponses manquantes — en commençant par celles qui arrivent le plus
 souvent. **Près de 900 positions ont été ajoutées**, dans les 58 cours.
 
-Un exemple parmi d'autres : tous les répertoires noirs contre 1.d4 supposaient
-que les Blancs enchaînent 2.c4. En club, une partie sur six voit 2.Ff4, la
-London — et le cours s'arrêtait là. Vous sortiez de votre répertoire au
-deuxième coup, avant même que l'ouverture choisie ait pu apparaître. C'est
-comblé, tout comme la Philidor et la Petroff face à 1.e4 e5.
+Un exemple : tous les répertoires noirs contre 1.d4 supposaient 2.c4. En
+club, une partie sur six voit 2.Ff4, la London — et le cours s'arrêtait là :
+vous sortiez du répertoire au deuxième coup. C'est comblé, comme la Philidor
+et la Petroff face à 1.e4 e5.
 
-Là où l'ouverture ne survit pas au coup de l'adversaire, le cours le dit
-franchement plutôt que de faire semblant : sans c4, un gambit Budapest ou Benko
-n'est plus un gambit, et mieux vaut l'apprendre dans la leçon que devant
-l'échiquier.
-
+Là où l'ouverture ne survit pas au coup adverse, le cours le dit franchement.
 Chaque variante ajoutée a été vérifiée par le moteur : aucune ligne n'enseigne
 un coup qui perd.
 
 **Des verdicts d'analyse plus sûrs**
 
-Un coup jugé « Imprécision » plutôt que « Erreur » à quelques dixièmes près,
-c'est un verdict que vous lisez et retenez. Nous avons mesuré sur des parties
-de tournoi réelles la fréquence de ces basculements : environ un coup sur 22
-recevait une étiquette qu'une analyse plus profonde aurait contredite.
-
-Désormais, quand un verdict tombe près d'une frontière, ChessLab reprend la
-position avec dix fois plus d'effort avant de trancher. Les erreurs
-d'étiquetage baissent de 85 %. L'analyse d'une partie demande un peu plus de
-temps ; sur un appareil lent ou déjà chaud, ce supplément est abandonné plutôt
-que de vous faire attendre.
+Sur des parties de tournoi réelles, environ un coup sur 22 recevait une
+étiquette (« Imprécision », « Erreur »…) qu'une analyse plus profonde aurait
+contredite. Désormais, quand un verdict tombe près d'une frontière, ChessLab
+reprend la position avec dix fois plus d'effort avant de trancher : ces
+erreurs baissent de 85 %. L'analyse prend un peu plus de temps ; sur un
+appareil lent ou déjà chaud, le supplément est abandonné plutôt que de vous
+faire attendre.
 
 **Analyser : plus simple**
 
@@ -69,6 +61,20 @@ en-têtes et d'autres commentaires. Et vous pouvez enfin supprimer une partie
 Vous pouvez maintenant modifier un répertoire importé directement dans l'app :
 jouez un coup sur l'échiquier pour l'ajouter, retirez une variante, écrivez
 votre propre commentaire.
+
+**Nouveau : le module Finales**
+
+Douze cours pour enfin convertir vos finales : l'opposition, la règle du
+carré, la percée, Lucena, Philidor, tour contre pion, dame contre pion (et
+son exception), les mats élémentaires et l'étude de Réti. Groupés par
+famille, commentés coup par coup, avec les pièges classiques — le pat du
+zèle, l'échange qui perd — signalés là où on les commet.
+
+Leur particularité : chaque ligne est vérifiée par table de finales, le
+verdict mathématique exact. Aucun coup enseigné ne lâche le gain, aucune
+défense proposée ne perd la nulle — une garantie qu'aucun livre ne peut
+donner. Et comme les ouvertures : révision espacée, entraînement, synchro
+iCloud.
 
 **Les modes se parlent**
 
@@ -113,23 +119,17 @@ opening you chose could even appear. That gap is filled, as are the Philidor
 and the Petroff against 1.e4 e5.
 
 Where an opening simply doesn't survive the opponent's move, the course now
-says so plainly instead of pretending otherwise: without c4, a Budapest or
-Benko Gambit is no longer a gambit, and it is better to learn that in the
-lesson than at the board.
-
-Every added line was verified by the engine: no course teaches a losing move.
+says so plainly. Every added line was verified by the engine: no course
+teaches a losing move.
 
 **More reliable analysis verdicts**
 
-A move called “Inaccuracy” rather than “Mistake” by a few tenths is still a
-verdict you read and remember. We measured how often those flips happen on real
-tournament games: about one move in 22 carried a label that deeper analysis
-would have contradicted.
-
-Now, whenever a verdict lands near a boundary, ChessLab re-examines the
-position with ten times the effort before deciding. Mislabelled moves drop by
-85%. Analysing a game takes a little longer; on a slow or already-warm device
-that extra work is dropped rather than keeping you waiting.
+On real tournament games, about one move in 22 carried a label
+(“Inaccuracy”, “Mistake”…) that deeper analysis would have contradicted. Now,
+whenever a verdict lands near a boundary, ChessLab re-examines the position
+with ten times the effort before deciding: those errors drop by 85%. Analysis
+takes a little longer; on a slow or already-warm device the extra work is
+dropped rather than keeping you waiting.
 
 **Analyse: simpler**
 
@@ -151,6 +151,19 @@ confirmation).
 
 You can now edit an imported repertoire right in the app: play a move on the
 board to add it, remove a line, write your own comment.
+
+**New: the Endgames module**
+
+Twelve courses to finally convert your endings: the opposition, the rule of
+the square, the breakthrough, Lucena, Philidor, rook vs pawn, queen vs pawn
+(and its exception), the elementary mates and the Réti study. Grouped by
+family, annotated move by move, with the classic pitfalls — the eager
+stalemate, the losing trade — flagged right where they happen.
+
+Their distinctive feature: every line is verified against endgame
+tablebases, the exact mathematical verdict. No taught move gives up a win,
+no recommended defence loses a draw — a guarantee no book can offer. And
+like the openings: spaced repetition, training, iCloud sync.
 
 **The modes talk to each other**
 

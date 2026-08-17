@@ -132,12 +132,54 @@ défenses que l'adversaire joue VRAIMENT + les pièges (pat !) marqués
 ## Risques notés
 
 - **La répétition espacée mélange ouvertures et finales** dans la file « à
-  réviser » du jour : acceptable (c'est même souhaitable, une séance mixte),
-  mais l'écran Ouvertures ne doit compter que les siennes — vérifié à
-  l'implémentation.
+  réviser » du jour. Décision d'implémentation : ASSUMÉ tel quel — les deux
+  écrans affichent le même compte et ouvrent la même séance, parce que le
+  bouton « Réviser » lance réellement la file mixte. Compter séparément
+  aurait promis deux séances qui n'existent pas. À revoir si la file devient
+  filtrable par module.
 - **`normalize_fen` écrase les compteurs de coups** : sans conséquence ici
   (aucun cours ne repose sur la règle des 50 coups), noté pour mémoire.
 - **Le pat** : dans les finales de dame contre pion et de mats élémentaires,
   la faute typique de l'élève est le pat. La tablebase les attrape
   (catégorie `draw` sur un coup du camp fort) — c'est précisément le genre
   de variante qu'il faut ENSEIGNER, marquée piège.
+
+
+---
+
+## Bilan de construction (17/08, journée)
+
+L'étude ci-dessus a été exécutée le jour même. État livré :
+
+- **11 cours**, 278 positions, 138 coups commentés (FR+EN), dans les cinq
+  familles prévues — la « coupure du roi » et « tour contre pion » restent au
+  backlog, le socle couvre déjà pions/tours/dames/mats/études.
+- **Outillage** : `tablebase.py` (client oracle, cache), `verify_line.py`
+  (écriture sous contrôle), `derive_optimal.py` (squelettes DTM),
+  `audit_endgames.py` (preuve par tablebase, moteur au-delà de 7 pièces).
+- **App** : champ `kind`/`family` bout en bout, écran `EndgameListView`
+  groupé par famille, tuile « Finales » (accueil + barre latérale iPad),
+  lecteur/entraîneur/synchro hérités sans modification.
+
+### Ce que l'oracle a corrigé pendant l'écriture — la méthode vaut le contenu
+
+1. **La racine « évidente » de l'opposition était NULLE** (rois d6/d4 en
+   opposition directe, trait aux Blancs) : le roi n'atteint pas les cases
+   clés. La racine retenue (Ke6/Kd4) n'a qu'UN coup gagnant — Ke4.
+2. **Mon premier « mat » de l'opposition donnait la dame en prise** (Qg7??
+   avec le roi à d6). Le cours s'arrête désormais à la promotion.
+3. **Philidor : la tour passive tient** dans notre position après e6 — le
+   dogme « passif = perdu » est plus nuancé que les manuels ; on enseigne la
+   méthode comme LA défense qui tient partout, sans mentir sur le reste.
+4. **Dame contre pion-fou : le fameux Ka1 « du coin » PERD** joué trop tôt
+   (la dame reroute par c1 et prend c2 avec échec) ; la vraie ressource est
+   la promotion-échange c1=D. Le pat de la légende n'existe que si
+   l'attaquant gobe le pion — enseigné comme piège pour LUI.
+5. **La meilleure défense contre la vis sans fin est d1=C**, sous-promotion
+   cavalier du désespoir — c'est la tablebase qui le dit, on l'enseigne donc,
+   réfutation comprise.
+
+Cinq découvertes en un jour d'écriture : aucun de ces cinq points n'aurait
+survécu à une rédaction de mémoire, et deux au moins auraient enseigné une
+faute. La règle « chaque ligne sous l'oracle » n'est pas un luxe de
+processus, c'est ce qui sépare ce module d'un livre recopié.
