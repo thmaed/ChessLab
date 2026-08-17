@@ -52,6 +52,9 @@ enum AnalysisEvalStore {
         var gapToSecondBest: Double?
         var secondBestLan: String?
         var pv: [String] = []
+        /// Éval issue de la recherche d'affinage — rechargée, elle garde son
+        /// statut et ne sera jamais réapprofondie.
+        var isRefined: Bool? = nil
     }
 
     struct MoveVerdict: Codable {

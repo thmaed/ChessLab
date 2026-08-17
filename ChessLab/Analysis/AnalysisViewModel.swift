@@ -219,6 +219,12 @@ final class AnalysisViewModel {
         /// matière première du « pourquoi ». Gratuite — `rankedEval` la
         /// renvoie déjà, elle était simplement jetée.
         var pv: [String] = []
+        /// Vrai si cette éval vient de la recherche d'AFFINAGE (3M nœuds).
+        /// La garde anti-double-paiement en dépend : l'enfant du coup n est
+        /// le parent du coup n+1, et quand les deux coups sont limites la
+        /// position du milieu était approfondie DEUX fois (mesuré : c'est
+        /// l'écart entre le x2,95 du chronométrage et le x2,73 réel).
+        var isRefined: Bool = false
     }
     private var evalCache: [MoveTree.Index: CachedEval] = [:]
 
@@ -248,7 +254,8 @@ final class AnalysisViewModel {
                 evalCache[index] = CachedEval(
                     winPercent: dto.winPercent, pawns: dto.pawns,
                     bestLan: dto.bestLan, gapToSecondBest: dto.gapToSecondBest,
-                    secondBestLan: dto.secondBestLan, pv: dto.pv
+                    secondBestLan: dto.secondBestLan, pv: dto.pv,
+                    isRefined: dto.isRefined ?? false
                 )
             }
             if ply > 0, let dto = snapshot.verdicts[ply],
@@ -279,7 +286,8 @@ final class AnalysisViewModel {
                 snapshot.evals[ply] = AnalysisEvalStore.PositionEval(
                     winPercent: cached.winPercent, pawns: cached.pawns,
                     bestLan: cached.bestLan, gapToSecondBest: cached.gapToSecondBest,
-                    secondBestLan: cached.secondBestLan, pv: cached.pv
+                    secondBestLan: cached.secondBestLan, pv: cached.pv,
+                    isRefined: cached.isRefined
                 )
             }
             if ply > 0, let evaluation = moveEvaluations[index] {
@@ -1435,12 +1443,33 @@ final class AnalysisViewModel {
         // finement.
         if !ThermalMonitor.shared.isThrottling,
            isBorderline(loss: max(0.0, winPercentBeforeMover - winPercentAfterMover)) {
-            if let deeperBefore = await refinedEval(at: parentIndex, engine: engine) {
+            // Les closures donnent à la règle d'arrêt la DISTANCE du verdict
+            // provisoire à la frontière la plus proche : pendant la recherche
+            // du parent, l'éval de l'enfant est celle déjà connue, et
+            // réciproquement (rafraîchie si le parent vient d'être affiné).
+            let isWhite = mover == .white
+            let afterForParent = winPercentAfterMover
+            if let deeperBefore = await refinedEval(
+                at: parentIndex, engine: engine,
+                lossDistance: { whiteWinPercent in
+                    let beforeMover = isWhite ? whiteWinPercent : 100 - whiteWinPercent
+                    return Self.distanceToNearestThreshold(
+                        loss: max(0.0, beforeMover - afterForParent))
+                }
+            ) {
                 before = deeperBefore
                 winPercentBeforeMover = mover == .white
                     ? deeperBefore.winPercent : 100 - deeperBefore.winPercent
             }
-            if let deeperAfter = await refinedEval(at: index, engine: engine) {
+            let beforeForChild = winPercentBeforeMover
+            if let deeperAfter = await refinedEval(
+                at: index, engine: engine,
+                lossDistance: { whiteWinPercent in
+                    let afterMover = isWhite ? whiteWinPercent : 100 - whiteWinPercent
+                    return Self.distanceToNearestThreshold(
+                        loss: max(0.0, beforeForChild - afterMover))
+                }
+            ) {
                 after = deeperAfter
                 winPercentAfterMover = mover == .white
                     ? deeperAfter.winPercent : 100 - deeperAfter.winPercent
@@ -1635,10 +1664,14 @@ final class AnalysisViewModel {
     /// du calcul sur un coup qui perd 40 points ne sert à rien, c'est une
     /// faute à n'importe quelle profondeur.
     ///
-    /// Avec cette bande, 14,9 % des coups sont recalculés, 85 % des erreurs
-    /// disparaissent, et il reste **0,68 %** de désaccords — soit MIEUX qu'un
-    /// budget dix fois plus grand appliqué partout, pour un quart du coût
-    /// (×2,95 mesuré, contre ×11,4 pour tout approfondir).
+    /// Avec cette bande, 14,9 % des coups sont recalculés. ⚠️ **Correction du
+    /// 18/08** : le premier calcul supposait qu'un coup recalculé était
+    /// corrigé — faux. Rejoué honnêtement sur les 887 coups : il reste
+    /// **1,92 %** de désaccords (sur 4,62 % sans affinage, soit −59 %), dont
+    /// 7 où 3M reste en désaccord avec 10M et 4 où 3M INTRODUIT le
+    /// désaccord — les budgets intermédiaires ne sont pas monotones. Le coût
+    /// mesuré ×2,95 tombe à ×2,73 avec la garde anti-double-affinage, puis
+    /// ≈ ×2,2 avec l'arrêt anticipé (voir ``RefinementStopRule``).
     ///
     /// La bande a été choisie sur cette courbe, chronomètre en main :
     ///
@@ -1681,16 +1714,37 @@ final class AnalysisViewModel {
         Self.refinementThresholds.contains { abs(loss - $0) <= Self.refinementBand }
     }
 
+    /// Distance d'une perte à la frontière de signalement la plus proche —
+    /// ce que la règle d'arrêt anticipé compare à sa marge de sécurité.
+    static func distanceToNearestThreshold(loss: Double) -> Double {
+        refinementThresholds.map { abs(loss - $0) }.min() ?? .infinity
+    }
+
     /// Recalcule une position avec le budget d'affinage, en ÉCRASANT le cache.
     ///
     /// Le cache est mis à jour à dessein : la position vaudra ce verdict-là
     /// pour le reste de la session, et une navigation ultérieure ne doit pas
     /// retomber sur l'évaluation grossière.
     private func refinedEval(
-        at index: MoveTree.Index, engine: EngineController
+        at index: MoveTree.Index, engine: EngineController,
+        lossDistance: @escaping (Double) -> Double
     ) async -> CachedEval? {
         guard let position = game.positions[index] else { return nil }
         if terminalCachedEval(at: index) != nil { return evalCache[index] }
+        // DÉJÀ affiné (comme parent du coup précédent, ou l'inverse) : le
+        // travail est fait, ne pas le repayer.
+        if let cached = evalCache[index], cached.isRefined { return cached }
+
+        // ARRÊT ANTICIPÉ (étude du 18/08) : la recherche de 3M nœuds est
+        // arrêtée dès qu'elle a tranché — éval stable sur plusieurs
+        // profondeurs ET verdict loin de toute frontière. 47 % des affinages
+        // étaient déjà stables à 1M nœuds : autant d'arrêts au tiers du
+        // coût, dans le MÊME arbre, sans redémarrage.
+        let sideIsWhite = position.sideToMove == .white
+        let box = RefinementStopBox()
+        // Le plancher suit le même facteur thermique que le budget lui-même.
+        box.rule.nodesFloor = max(1, Int(1_000_000 * ThermalMonitor.shared.nodeFactor))
+
         let ranked = await rankedEval(
             fen: position.fen, engine: engine,
             nodes: Self.refinementNodes,
@@ -1698,13 +1752,28 @@ final class AnalysisViewModel {
             // recherche approfondie au point de la rendre inutile — on aurait
             // payé l'attente sans gagner la précision.
             capMs: DevicePerformance.refinementCapMs,
-            multipv: 2
+            multipv: 2,
+            onDepth: { depth, nodes, cp in
+                let mover = EvalConversion.winPercentage(cp: cp)
+                let white = sideIsWhite ? mover : 100 - mover
+                return box.rule.shouldStop(
+                    depth: depth, nodes: nodes,
+                    winPercent: white, lossDistance: lossDistance(white)
+                )
+            }
         )
-        guard let refined = makeCachedEval(rankedDict: ranked, sideToMove: position.sideToMove) else {
+        guard var refined = makeCachedEval(rankedDict: ranked, sideToMove: position.sideToMove) else {
             return nil
         }
+        refined.isRefined = true
         evalCache[index] = refined
         return refined
+    }
+
+    /// Boîte de référence pour muter la règle d'arrêt depuis la closure
+    /// `@Sendable` de consommation du flux moteur.
+    private final class RefinementStopBox: @unchecked Sendable {
+        var rule = RefinementStopRule()
     }
 
     private func evaluatePosition(at index: MoveTree.Index, engine: EngineController) async -> CachedEval? {
@@ -1782,7 +1851,11 @@ final class AnalysisViewModel {
     /// plus de Grand coup, sans que rien ne le signale.
     private func rankedEval(
         fen: String, engine: EngineController,
-        nodes: Int = 300_000, capMs: Int = DevicePerformance.classificationCapMs, multipv: Int
+        nodes: Int = 300_000, capMs: Int = DevicePerformance.classificationCapMs, multipv: Int,
+        /// Appelé à chaque `info` scoré de la PV n°1 ; retourner `true`
+        /// envoie `stop` — la recherche rend alors son `bestmove` avec l'éval
+        /// courante. Sert UNIQUEMENT à l'affinage (arrêt anticipé).
+        onDepth: ((_ depth: Int, _ nodes: Int?, _ cp: Int) -> Bool)? = nil
     ) async -> [Int: (lan: String, pv: [String], cp: Int)] {
         // Barrière AVANT la recherche : jette les `info` en retard de la
         // recherche précédente, qui fausseraient ce classement — voir
@@ -1800,6 +1873,7 @@ final class AnalysisViewModel {
 
         let outcome = await EngineWatchdog.run(deadlineMs: capMs + EngineWatchdog.graceMs) {
             var result: [Int: (lan: String, pv: [String], cp: Int)] = [:]
+            var stopSent = false
             for await response in await engine.responseStream {
                 switch response {
                 case let .info(info):
@@ -1813,6 +1887,13 @@ final class AnalysisViewModel {
                         break
                     }
                     result[rank] = (lan: firstMove, pv: pv, cp: cp)
+                    // Arrêt anticipé : un seul `stop`, puis on laisse le
+                    // `bestmove` clore la boucle normalement.
+                    if !stopSent, rank == 1, let onDepth, let depth = info.depth,
+                       onDepth(depth, info.nodes, cp) {
+                        stopSent = true
+                        await engine.send(.stop)
+                    }
                 case .bestmove:
                     return result
                 default:
