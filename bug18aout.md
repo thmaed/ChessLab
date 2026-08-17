@@ -1,8 +1,15 @@
 # Revue de code du 18 août — propositions à arbitrer
 
-*Revue approfondie démarrée le 17/08 à 23 h 15 comme demandé. Ce fichier ne
-contient QUE ce qui mérite ton arbitrage : tout ce qui était sûr a été corrigé
-directement (voir les commits de la nuit). Trié par importance.*
+*Revue approfondie menée en deux passes dans la nuit du 17 au 18/08. Passe 1
+(23 h 15) : constructions à crash, concurrence, cycles de vie, intégration
+Finales, textes périmés, clés UserDefaults, erreurs avalées. Passe 2 (minuit) :
+pendule, puzzles, lecteur d'ouvertures, scanner, et une passe statique —
+ZÉRO avertissement compilateur dans le code de l'app. La porte de régression
+(suite complète, unitaires + 64 UI) est verte.*
+
+*Ce fichier ne contient QUE ce qui mérite ton arbitrage : tout ce qui était
+sûr a été corrigé directement (voir les commits de la nuit). Trié par
+importance.*
 
 ---
 
