@@ -22,7 +22,9 @@ enum LabStartPosition {
         // Sinon, on tente le PGN (première partie d'un éventuel multi-parties),
         // et on remonte sa position finale.
         let candidate = PGNSanitizer.sanitize(PGNSanitizer.splitIntoGames(trimmed).first ?? trimmed)
-        guard !candidate.isEmpty, let game = try? Game(pgn: candidate) else { return nil }
+        // PGNLoader : même robustesse que la bibliothèque et l'analyse — un
+        // PGN avec prise en passant doit pouvoir donner sa position finale.
+        guard !candidate.isEmpty, let game = PGNLoader.game(from: candidate) else { return nil }
 
         var index = game.startingIndex
         var plies = 0

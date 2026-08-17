@@ -106,7 +106,7 @@ final class GameRecord: Identifiable {
 
         var changed = false
         for record in pending {
-            guard let pgn = record.pgn, !pgn.isEmpty, let game = try? Game(pgn: pgn) else { continue }
+            guard let pgn = record.pgn, !pgn.isEmpty, let game = PGNLoader.game(from: pgn) else { continue }
             record.moveCount = plyCount(of: game)
             changed = true
         }

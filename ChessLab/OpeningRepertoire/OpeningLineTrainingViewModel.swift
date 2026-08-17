@@ -54,7 +54,7 @@ final class OpeningLineTrainingViewModel {
     /// `nil` si le PGN de l'entrée ne contient aucun coup (ne devrait pas
     /// arriver pour une entrée embarquée valide, mais reste défensif).
     init?(entry: OpeningLibraryEntry, color: Piece.Color) {
-        guard let game = try? Game(pgn: entry.pgn) else { return nil }
+        guard let game = PGNLoader.game(from: entry.pgn) else { return nil }
 
         var collected: [(san: String, lan: String)] = []
         var index = game.startingIndex

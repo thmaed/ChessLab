@@ -1292,6 +1292,22 @@
         }
       }
     },
+    "Analyser la dernière partie" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analyse the last game"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analyser la dernière partie"
+          }
+        }
+      }
+    },
     "Analyser la partie" : {
       "localizations" : {
         "en" : {
@@ -1460,6 +1476,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appareil photo"
+          }
+        }
+      }
+    },
+    "Appareil posé à plat : nom, pendule et boutons d'en face sont retournés." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Device laid flat: the far player's name, clock and buttons are flipped."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appareil posé à plat : nom, pendule et boutons d'en face sont retournés."
           }
         }
       }
@@ -1784,6 +1816,22 @@
         }
       }
     },
+    "Autour d'une table" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Across a table"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autour d'une table"
+          }
+        }
+      }
+    },
     "Autres coups à ce stade" : {
       "localizations" : {
         "en" : {
@@ -1862,6 +1910,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aux Noirs"
+          }
+        }
+      }
+    },
+    "Avancé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Advanced"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avancé"
           }
         }
       }
@@ -2936,6 +3000,22 @@
         }
       }
     },
+    "Chaque ligne de ces cours est vérifiée par table de finales (Syzygy) : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every line in these courses is verified against endgame tablebases (Syzygy): no taught move gives up the win, no recommended defence loses the draw."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque ligne de ces cours est vérifiée par table de finales (Syzygy) : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle."
+          }
+        }
+      }
+    },
     "Chaque mode de ChessLab en bref." : {
       "localizations" : {
         "en" : {
@@ -3418,6 +3498,38 @@
         }
       }
     },
+    "Continuer ailleurs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue elsewhere"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer ailleurs"
+          }
+        }
+      }
+    },
+    "Continuer au Laboratoire" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continue in the Laboratory"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer au Laboratoire"
+          }
+        }
+      }
+    },
     "Continuer contre l'ordinateur depuis ici" : {
       "localizations" : {
         "en" : {
@@ -3552,7 +3664,24 @@
     "Copier la position FEN" : {
 
     },
+    "Côte à côte" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Side by side"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Côte à côte"
+          }
+        }
+      }
+    },
     "Côte à côte (fixe)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4185,6 +4314,22 @@
         }
       }
     },
+    "Douze cours pour convertir vos finales : opposition, règle du carré, percée, Lucena, Philidor, tour contre pion, dame contre pion, mats élémentaires, étude de Réti. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Twelve courses to convert your endings: opposition, rule of the square, breakthrough, Lucena, Philidor, rook vs pawn, queen vs pawn, elementary mates, the Réti study. Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up the win, no recommended defence loses the draw. Spaced repetition and iCloud sync, like the openings."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Douze cours pour convertir vos finales : opposition, règle du carré, percée, Lucena, Philidor, tour contre pion, dame contre pion, mats élémentaires, étude de Réti. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchronisation iCloud, comme les ouvertures."
+          }
+        }
+      }
+    },
     "Dresden Opening" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4681,6 +4826,22 @@
     "Étiquettes" : {
 
     },
+    "Études célèbres" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Famous studies"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Études célèbres"
+          }
+        }
+      }
+    },
     "Éval" : {
       "localizations" : {
         "en" : {
@@ -4827,7 +4988,24 @@
         }
       }
     },
+    "Face à face" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face to face"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face à face"
+          }
+        }
+      }
+    },
     "Face à face (pivote)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4856,6 +5034,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Facile"
+          }
+        }
+      }
+    },
+    "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse (« Continuer au Laboratoire ») : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pit two Stockfish instances against each other over a series of games to compare settings. Statistics, estimated Elo gap with confidence interval, progression chart and result distribution. You can also get here from a game or an analysis (“Continue in the Laboratory”): the series then starts from your position. Once the series is over, one tap opens the last game in analysis."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse (« Continuer au Laboratoire ») : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse."
           }
         }
       }
@@ -4993,6 +5187,70 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Finale"
+          }
+        }
+      }
+    },
+    "Finales" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endgames"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales"
+          }
+        }
+      }
+    },
+    "Finales de dames" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen endings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales de dames"
+          }
+        }
+      }
+    },
+    "Finales de pions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pawn endings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales de pions"
+          }
+        }
+      }
+    },
+    "Finales de tours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook endings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales de tours"
           }
         }
       }
@@ -6136,6 +6394,22 @@
         }
       }
     },
+    "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse ou le Laboratoire — la partie vous attend au retour." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play a game against the Stockfish engine. Set your colour, the opponent's strength (Elo), the time control, and the aids: hint (best-move arrows), risky-move warning and evaluation bar. After the game, one button takes you straight to analysis. During a game, the export menu (top right) sends the displayed position to analysis or the Laboratory — your game is waiting when you come back."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse ou le Laboratoire — la partie vous attend au retour."
+          }
+        }
+      }
+    },
     "Jouez une partie ou résolvez des puzzles pour voir votre progression." : {
 
     },
@@ -6762,6 +7036,38 @@
         }
       }
     },
+    "Le plateau ne bouge pas — vous regardez du même côté." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The board stays put — you both look from the same side."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le plateau ne bouge pas — vous regardez du même côté."
+          }
+        }
+      }
+    },
+    "Le plateau pivote vers le joueur au trait — on se passe l'appareil." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The board rotates towards the player to move — pass the device around."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le plateau pivote vers le joueur au trait — on se passe l'appareil."
+          }
+        }
+      }
+    },
     "Le presse-papiers ne contient pas d'image." : {
       "localizations" : {
         "en" : {
@@ -7165,6 +7471,22 @@
         }
       }
     },
+    "Lucena, Philidor, opposition — prouvées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lucena, Philidor, opposition — proven"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lucena, Philidor, opposition — prouvées"
+          }
+        }
+      }
+    },
     "Maître national" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7244,6 +7566,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "matériel insuffisant"
+          }
+        }
+      }
+    },
+    "Mats élémentaires" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elementary mates"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mats élémentaires"
           }
         }
       }
@@ -8351,6 +8689,22 @@
         }
       }
     },
+    "Partie (PGN) copiée dans le presse-papiers." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game (PGN) copied to the clipboard."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partie (PGN) copiée dans le presse-papiers."
+          }
+        }
+      }
+    },
     "Partie %lld / %lld" : {
       "localizations" : {
         "en" : {
@@ -9000,6 +9354,22 @@
     "Position" : {
 
     },
+    "Position (FEN) copiée dans le presse-papiers." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position (FEN) copied to the clipboard."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position (FEN) copiée dans le presse-papiers."
+          }
+        }
+      }
+    },
     "Position de départ (FEN)" : {
       "localizations" : {
         "en" : {
@@ -9401,6 +9771,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Que scannez-vous ?"
+          }
+        }
+      }
+    },
+    "Queen vs 7th-Rank Pawn" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs 7th-Rank Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre pion en 7e"
+          }
+        }
+      }
+    },
+    "Queen vs Bishop's Pawn" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Bishop's Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre pion-fou"
           }
         }
       }
@@ -10666,6 +11070,23 @@
         }
       }
     },
+    "Rook vs Pawn" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre pion"
+          }
+        }
+      }
+    },
     "Roques" : {
       "localizations" : {
         "en" : {
@@ -11593,6 +12014,7 @@
       }
     },
     "Table (icônes retournées)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -11693,6 +12115,159 @@
     },
     "Terminer la sélection" : {
 
+    },
+    "The Lucena Position" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Lucena Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La position de Lucena"
+          }
+        }
+      }
+    },
+    "The Opposition" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Opposition"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'opposition"
+          }
+        }
+      }
+    },
+    "The Pawn Breakthrough" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Pawn Breakthrough"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La percée"
+          }
+        }
+      }
+    },
+    "The Philidor Position" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Philidor Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La position de Philidor"
+          }
+        }
+      }
+    },
+    "The Queen Mate" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Queen Mate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mat à la dame"
+          }
+        }
+      }
+    },
+    "The Réti Study" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Réti Study"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'étude de Réti"
+          }
+        }
+      }
+    },
+    "The Rook Mate" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Rook Mate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mat à la tour"
+          }
+        }
+      }
+    },
+    "The Rook's Pawn Exception" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Rook's Pawn Exception"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'exception du pion-tour"
+          }
+        }
+      }
+    },
+    "The Rule of the Square" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Rule of the Square"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La règle du carré"
+          }
+        }
+      }
     },
     "Thème %@" : {
       "extractionState" : "stale",
@@ -12796,566 +13371,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Zukertort"
-          }
-        }
-      }
-    },
-    "Continuer ailleurs" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue elsewhere"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continuer ailleurs"
-          }
-        }
-      }
-    },
-    "Continuer au Laboratoire" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue in the Laboratory"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continuer au Laboratoire"
-          }
-        }
-      }
-    },
-    "Analyser la dernière partie" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Analyse the last game"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Analyser la dernière partie"
-          }
-        }
-      }
-    },
-    "Face à face" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Face to face"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Face à face"
-          }
-        }
-      }
-    },
-    "Le plateau pivote vers le joueur au trait — on se passe l'appareil." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The board rotates towards the player to move — pass the device around."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le plateau pivote vers le joueur au trait — on se passe l'appareil."
-          }
-        }
-      }
-    },
-    "Côte à côte" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Side by side"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Côte à côte"
-          }
-        }
-      }
-    },
-    "Le plateau ne bouge pas — vous regardez du même côté." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The board stays put — you both look from the same side."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le plateau ne bouge pas — vous regardez du même côté."
-          }
-        }
-      }
-    },
-    "Autour d'une table" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Across a table"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autour d'une table"
-          }
-        }
-      }
-    },
-    "Appareil posé à plat : nom, pendule et boutons d'en face sont retournés." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Device laid flat: the far player's name, clock and buttons are flipped."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appareil posé à plat : nom, pendule et boutons d'en face sont retournés."
-          }
-        }
-      }
-    },
-    "Position (FEN) copiée dans le presse-papiers." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Position (FEN) copied to the clipboard."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Position (FEN) copiée dans le presse-papiers."
-          }
-        }
-      }
-    },
-    "Partie (PGN) copiée dans le presse-papiers." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Game (PGN) copied to the clipboard."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partie (PGN) copiée dans le presse-papiers."
-          }
-        }
-      }
-    },
-    "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse ou le Laboratoire — la partie vous attend au retour." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play a game against the Stockfish engine. Set your colour, the opponent's strength (Elo), the time control, and the aids: hint (best-move arrows), risky-move warning and evaluation bar. After the game, one button takes you straight to analysis. During a game, the export menu (top right) sends the displayed position to analysis or the Laboratory — your game is waiting when you come back."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse ou le Laboratoire — la partie vous attend au retour."
-          }
-        }
-      }
-    },
-    "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse (« Continuer au Laboratoire ») : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pit two Stockfish instances against each other over a series of games to compare settings. Statistics, estimated Elo gap with confidence interval, progression chart and result distribution. You can also get here from a game or an analysis (“Continue in the Laboratory”): the series then starts from your position. Once the series is over, one tap opens the last game in analysis."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse (« Continuer au Laboratoire ») : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse."
-          }
-        }
-      }
-    },
-    "The Opposition" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Opposition"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'opposition"
-          }
-        }
-      }
-    },
-    "The Rule of the Square" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Rule of the Square"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La règle du carré"
-          }
-        }
-      }
-    },
-    "The Rook's Pawn Exception" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Rook's Pawn Exception"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'exception du pion-tour"
-          }
-        }
-      }
-    },
-    "The Lucena Position" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Lucena Position"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La position de Lucena"
-          }
-        }
-      }
-    },
-    "The Philidor Position" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Philidor Position"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La position de Philidor"
-          }
-        }
-      }
-    },
-    "Queen vs 7th-Rank Pawn" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen vs 7th-Rank Pawn"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dame contre pion en 7e"
-          }
-        }
-      }
-    },
-    "Queen vs Bishop's Pawn" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen vs Bishop's Pawn"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dame contre pion-fou"
-          }
-        }
-      }
-    },
-    "The Rook Mate" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Rook Mate"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le mat à la tour"
-          }
-        }
-      }
-    },
-    "The Queen Mate" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Queen Mate"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le mat à la dame"
-          }
-        }
-      }
-    },
-    "The Pawn Breakthrough" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Pawn Breakthrough"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La percée"
-          }
-        }
-      }
-    },
-    "The Réti Study" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Réti Study"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'étude de Réti"
-          }
-        }
-      }
-    },
-    "Finales" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Endgames"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finales"
-          }
-        }
-      }
-    },
-    "Lucena, Philidor, opposition — prouvées" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lucena, Philidor, opposition — proven"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lucena, Philidor, opposition — prouvées"
-          }
-        }
-      }
-    },
-    "Finales de pions" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pawn endings"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finales de pions"
-          }
-        }
-      }
-    },
-    "Finales de tours" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook endings"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finales de tours"
-          }
-        }
-      }
-    },
-    "Finales de dames" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen endings"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finales de dames"
-          }
-        }
-      }
-    },
-    "Mats élémentaires" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elementary mates"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mats élémentaires"
-          }
-        }
-      }
-    },
-    "Études célèbres" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Famous studies"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Études célèbres"
-          }
-        }
-      }
-    },
-    "Avancé" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Advanced"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Avancé"
-          }
-        }
-      }
-    },
-    "Chaque ligne de ces cours est vérifiée par table de finales (Syzygy) : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Every line in these courses is verified against endgame tablebases (Syzygy): no taught move gives up the win, no recommended defence loses the draw."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chaque ligne de ces cours est vérifiée par table de finales (Syzygy) : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle."
-          }
-        }
-      }
-    },
-    "Rook vs Pawn" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook vs Pawn"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour contre pion"
-          }
-        }
-      }
-    },
-    "Douze cours pour convertir vos finales : opposition, règle du carré, percée, Lucena, Philidor, tour contre pion, dame contre pion, mats élémentaires, étude de Réti. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Twelve courses to convert your endings: opposition, rule of the square, breakthrough, Lucena, Philidor, rook vs pawn, queen vs pawn, elementary mates, the Réti study. Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up the win, no recommended defence loses the draw. Spaced repetition and iCloud sync, like the openings."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Douze cours pour convertir vos finales : opposition, règle du carré, percée, Lucena, Philidor, tour contre pion, dame contre pion, mats élémentaires, étude de Réti. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchronisation iCloud, comme les ouvertures."
           }
         }
       }

@@ -222,6 +222,92 @@ final class AnalysisViewModel {
     }
     private var evalCache: [MoveTree.Index: CachedEval] = [:]
 
+    // MARK: Persistance de l'analyse (voir ``AnalysisEvalStore``)
+
+    /// Clé disque de la partie en cours de revue — `nil` hors revue.
+    private var persistenceKey: String?
+    /// Nombre de verdicts déjà sauvés : évite de réécrire un fichier
+    /// identique à chaque passage de `handleViewDisappear`.
+    private var persistedVerdictCount = 0
+
+    /// Les index de la ligne principale, dans l'ordre (0 = départ).
+    private var mainLineIndices: [MoveTree.Index] {
+        var indices = [game.startingIndex]
+        var idx = game.startingIndex
+        while game.moves.hasIndex(after: idx) {
+            idx = game.moves.index(after: idx)
+            indices.append(idx)
+        }
+        return indices
+    }
+
+    /// Recharge évals et verdicts d'un instantané disque dans les caches.
+    private func restore(_ snapshot: AnalysisEvalStore.Snapshot) {
+        for (ply, index) in mainLineIndices.enumerated() {
+            if let dto = snapshot.evals[ply] {
+                evalCache[index] = CachedEval(
+                    winPercent: dto.winPercent, pawns: dto.pawns,
+                    bestLan: dto.bestLan, gapToSecondBest: dto.gapToSecondBest,
+                    secondBestLan: dto.secondBestLan, pv: dto.pv
+                )
+            }
+            if ply > 0, let dto = snapshot.verdicts[ply],
+               let quality = MoveQuality(rawValue: dto.quality) {
+                var explanation: MoveExplanation?
+                if let expl = dto.explanation {
+                    explanation = MoveExplanation(
+                        motif: AnalysisEvalStore.motif(from: expl.motif),
+                        materialLoss: expl.materialLoss,
+                        refutationSAN: expl.refutationSAN
+                    )
+                }
+                moveEvaluations[index] = AnalysisMoveEvaluation(
+                    winPercentAfterMover: dto.winPercentAfterMover,
+                    quality: quality,
+                    explanation: explanation
+                )
+            }
+        }
+        persistedVerdictCount = moveEvaluations.count
+    }
+
+    /// Photographie les caches de la ligne principale.
+    private func makeSnapshot() -> AnalysisEvalStore.Snapshot {
+        var snapshot = AnalysisEvalStore.Snapshot()
+        for (ply, index) in mainLineIndices.enumerated() {
+            if let cached = evalCache[index] {
+                snapshot.evals[ply] = AnalysisEvalStore.PositionEval(
+                    winPercent: cached.winPercent, pawns: cached.pawns,
+                    bestLan: cached.bestLan, gapToSecondBest: cached.gapToSecondBest,
+                    secondBestLan: cached.secondBestLan, pv: cached.pv
+                )
+            }
+            if ply > 0, let evaluation = moveEvaluations[index] {
+                snapshot.verdicts[ply] = AnalysisEvalStore.MoveVerdict(
+                    winPercentAfterMover: evaluation.winPercentAfterMover,
+                    quality: evaluation.quality.rawValue,
+                    explanation: evaluation.explanation.map {
+                        AnalysisEvalStore.Explanation(
+                            motif: AnalysisEvalStore.motifDTO($0.motif),
+                            materialLoss: $0.materialLoss,
+                            refutationSAN: $0.refutationSAN
+                        )
+                    }
+                )
+            }
+        }
+        return snapshot
+    }
+
+    /// Sauve si de nouveaux verdicts existent depuis la dernière écriture —
+    /// y compris une classification PARTIELLE (écran quitté en cours de
+    /// route) : au prochain chargement, la revue reprendra où elle en était.
+    private func persistAnalysisIfNeeded() {
+        guard let key = persistenceKey, moveEvaluations.count > persistedVerdictCount else { return }
+        AnalysisEvalStore.save(makeSnapshot(), key: key)
+        persistedVerdictCount = moveEvaluations.count
+    }
+
     // MARK: Ouverture (ECO)
 
     private(set) var openingName: EcoOpening?
@@ -232,7 +318,14 @@ final class AnalysisViewModel {
         let newGame: Game
         switch source {
         case let .pgn(pgn):
-            newGame = (try? Game(pgn: pgn)) ?? Game()
+            // PGNLoader et non `Game(pgn:)` brut : le parseur ChessKit refuse
+            // des parties légales (prise en passant, roque avec échec…) que la
+            // bibliothèque, elle, avait importées via PGNLoader. Le même texte
+            // passait donc l'import puis arrivait ICI sur un plateau VIDE —
+            // « Aucun coup joué », sans un mot d'erreur (rapport du 17/08).
+            // L'entrée de l'analyse doit être au moins aussi robuste que celle
+            // de la bibliothèque qui l'alimente.
+            newGame = PGNLoader.game(from: pgn) ?? Game()
         case let .fen(fen):
             newGame = Position(fen: fen).map { Game(startingWith: $0) } ?? Game()
         case .blank:
@@ -249,6 +342,17 @@ final class AnalysisViewModel {
             if case .pgn = source { return newGame.moves.hasIndex(after: startIndex) }
             return false
         }()
+        // Analyse DÉJÀ FAITE ? Le cache disque la restitue entière — évals,
+        // verdicts, explications — avant même que le moteur démarre : la
+        // partie s'ouvre classifiée, `classifyNode` saute les nœuds connus,
+        // et seul l'affinage de la position affichée repart. Demande du
+        // 17/08 : « ne pas avoir à refaire les analyses au rechargement ».
+        if isGameReview {
+            persistenceKey = AnalysisEvalStore.key(for: newGame)
+            if let key = persistenceKey, let snapshot = AnalysisEvalStore.load(key: key) {
+                restore(snapshot)
+            }
+        }
         refreshDerivedData()
 
         enqueueEngineWork { [weak self] in await self?.setupEngine() }
@@ -424,6 +528,10 @@ final class AnalysisViewModel {
         // Sans ça, la lecture continuerait de dérouler la partie derrière
         // l'écran disparu, en relançant une analyse à chaque coup.
         stopAutoplay()
+        // Une classification interrompue n'est pas perdue : ce qui est déjà
+        // classé part sur le disque, la revue reprendra là au prochain
+        // chargement.
+        persistAnalysisIfNeeded()
         Task { [weak self] in
             guard let self else { return }
             // Stoppe la recherche live (tâche hors file, bornée) et attend son
@@ -1251,6 +1359,7 @@ final class AnalysisViewModel {
             self.isClassifying = false
             self.classificationProgress = nil
             self.refreshDerivedData()
+            self.persistAnalysisIfNeeded()
             // Moteur déclaré indisponible en cours de route : inutile de faire
             // quoi que ce soit sur une instance morte — la bannière est levée,
             // « Réessayer » relancera tout.
@@ -1901,6 +2010,10 @@ final class AnalysisViewModel {
         let ply: Int
         /// POV Blancs, bornée ±10 (mat = ±10).
         let pawns: Double
+        /// Qualité du coup menant à ce point (nil tant que la classification
+        /// n'est pas passée) — la courbe en tire ses pastilles de moments
+        /// critiques.
+        var quality: MoveQuality?
     }
 
     /// Ply de la position affichée, pour situer le curseur sur la courbe.
@@ -1924,7 +2037,10 @@ final class AnalysisViewModel {
             idx = game.moves.index(after: idx)
             ply += 1
             guard let cached = evalCache[idx] else { break }
-            points.append(EvalCurvePoint(id: idx, ply: ply, pawns: cached.pawns))
+            points.append(EvalCurvePoint(
+                id: idx, ply: ply, pawns: cached.pawns,
+                quality: moveEvaluations[idx]?.quality
+            ))
         }
         return points
     }

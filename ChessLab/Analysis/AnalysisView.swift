@@ -870,6 +870,19 @@ private struct EvalCurveView: View {
                     .interpolationMethod(.monotone)
             }
 
+            // Les MOMENTS CRITIQUES, épinglés sur la courbe : brillant,
+            // grand coup, occasion manquée, erreur, gaffe. Petites pastilles
+            // volontairement — elles disent OÙ regarder, la liste de coups
+            // dit quoi. Le halo sombre les détache de l'aire colorée.
+            ForEach(points.filter { $0.quality?.marksCriticalPhase == true }) { point in
+                PointMark(x: .value("Coup", point.ply), y: .value("Éval", point.pawns))
+                    .foregroundStyle(Theme.background)
+                    .symbolSize(64)
+                PointMark(x: .value("Coup", point.ply), y: .value("Éval", point.pawns))
+                    .foregroundStyle(point.quality?.tint ?? Theme.textSecondary)
+                    .symbolSize(30)
+            }
+
             // Ligne d'équilibre, discrète mais présente : sans elle, une
             // aire signée n'a pas de repère.
             RuleMark(y: .value("Équilibre", 0))

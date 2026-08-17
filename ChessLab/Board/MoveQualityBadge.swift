@@ -23,6 +23,17 @@ enum MoveQuality: String, CaseIterable, Hashable {
     case miss        // ✕  — occasion manquée : la victoire était là
     case blunder     // ??
 
+    /// Les catégories qui MARQUENT la courbe d'évaluation : les moments où
+    /// la partie a basculé (ou aurait pu). Les coups simplement bons n'y
+    /// figurent pas — une courbe criblée de pastilles ne montrerait plus
+    /// rien, et c'est le décrochage qu'on cherche du regard.
+    var marksCriticalPhase: Bool {
+        switch self {
+        case .brilliant, .great, .miss, .mistake, .blunder: true
+        case .best, .excellent, .good, .book, .inaccuracy: false
+        }
+    }
+
     /// Ce que la pastille dessine : un symbole texte (les NAG se
     /// reconnaissent au premier regard) ou un glyphe SF Symbol quand la
     /// notation d'échecs n'a pas de signe pour la catégorie.

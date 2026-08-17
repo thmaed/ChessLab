@@ -119,7 +119,11 @@ enum OpeningPGNImporter {
         var firstError: String?
 
         for (offset, text) in games.enumerated() {
-            guard let game = try? Game(pgn: text) else {
+            // PGNLoader : quand ChessKit lit la partie, les VARIANTES sont
+            // conservées (même chemin qu'avant) ; quand il la refuse à tort,
+            // la reconstruction sauve au moins la ligne principale au lieu de
+            // rejeter le répertoire entier.
+            guard let game = PGNLoader.game(from: text) else {
                 skippedGames += 1
                 if firstError == nil { firstError = shortDescription(of: text) }
                 continue
