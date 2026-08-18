@@ -13740,6 +13740,22 @@
         }
       }
     },
+    "Which Piece to Capture?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which Piece to Capture?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cavalier ou fou : lequel prendre ?"
+          }
+        }
+      }
+    },
     "Corresponding Squares" : {
       "localizations" : {
         "en" : {

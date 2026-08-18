@@ -5922,8 +5922,22 @@ comme prévu.
 
 46 cours de finales, catalogue à 104.
 
-**Reste à faire** (mis à jour, 46 cours de finales, catalogue à 104) :
-environ 44 items du catalogue de référence restent à couvrir.
+**Cavalier ou fou : lequel prendre ?** livrée ensuite — sourcée ChessBase
+(« The Wrong Bishop »), une position-test trouvée en cherchant un exemple
+de manœuvre de diversion sourcée : le roi blanc touche à la fois le
+cavalier et le fou noirs, mais ne peut en prendre qu'un. Racine à 5 pièces.
+Contre-intuitif : prendre le fou — de la bonne couleur pour la case de
+promotion h8, ce qui semblait favoriser les noirs — PERD, alors que prendre
+le cavalier tient la nulle. La raison n'est pas la couleur de la pièce
+laissée en jeu mais la vitesse du roi blanc : après `Kxc5`, il colle sa
+route à celle du pion et arrive PILE à temps pour croquer la dame la
+seconde où elle apparaît (`Kxh1`) ; après `Kxe5`, le cavalier gagne un
+tempo par échec (`Ne6+`) que le roi ne rattrape jamais.
+
+47 cours de finales, catalogue à 105.
+
+**Reste à faire** (mis à jour, 47 cours de finales, catalogue à 105) :
+environ 43 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini
