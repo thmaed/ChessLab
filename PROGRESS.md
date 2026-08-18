@@ -6569,3 +6569,52 @@ Audit propre : `✓ Chaque coup enseigné préserve son verdict théorique`.
 63 cours de finales au catalogue (121 au total). `Localizable.xcstrings` :
 1 entrée ajoutée chirurgicalement après « The Active King in a Rook Ending »
 (17 lignes, JSON valide re-vérifié).
+
+## Le sélecteur rapide reprend la partie en cours, partout (18/08)
+
+Demande : depuis un mode de jeu (lecteur d'ouverture/finale, puzzle en
+cours, partie contre le moteur, partie à deux joueurs), passer à un autre
+mode via le sélecteur rapide doit reprendre la position AFFICHÉE, pas
+repartir d'une partie neuve — cohérent partout dans l'app. Les écrans de
+LISTE/FILE (Puzzles, Ouvertures, Finales — pas de position unique à
+reprendre) restent volontairement neufs.
+
+**Ce qui manquait** : `OpeningReaderView` (lecteur, ouvertures ET finales)
+envoyait déjà le FEN affiché vers « Contre l'ordinateur » mais PAS vers
+Laboratoire ni Deux joueurs (`onOpenLab`/`onOpenTwoPlayer` en `() -> Void`,
+sans position). Même trou dans `PuzzleSolveView` (les trois destinations),
+et dans `PlayView` côté Deux joueurs uniquement (Laboratoire fonctionnait
+déjà). `TwoPlayerGameView`, lui, était déjà correct des deux côtés — pas
+touché.
+
+**Le blocage réel** : `TwoPlayerGameSettings` n'avait tout simplement AUCUN
+support de position de départ personnalisée (contrairement à
+`PlayGameSettings`) — « pas prévu pour ce mode », disait le commentaire
+d'origine. Ajouté `startFEN: String?` + `startingPosition`, même contrat
+que côté Jouer, non persisté (`TwoPlayerSettingsStore.save` l'efface, comme
+`PlaySettingsStore`). `TwoPlayerSetupView` gagne un `initialFEN` (titre
+« Continuer la partie » quand fourni, comme `NewGameSetupView`).
+`Route.twoPlayerSetup` reste la route NEUVE ; une nouvelle route miroir,
+`Route.continueTwoPlayer(String)`, porte la position — même schéma que
+`Route.newGame` / `Route.continueVsStockfish(String)` côté moteur.
+
+Vérifié : chaque écran capture désormais son FEN affiché dans la closure
+passée à `QuickSwitchMenu` (celui-ci reste volontairement sans paramètre —
+c'est l'appelant qui capture), et le route jusqu'à l'écran de réglages
+correspondant. Compilation propre ; suite complète relancée pour
+confirmer (voir entrée suivante si un souci apparaît).
+
+## Deux joueurs : noms par défaut traduits, pas figés en français (18/08)
+
+`TwoPlayerGameSettings.whiteName`/`blackName` valaient littéralement
+`"Blancs"`/`"Noirs"` — un utilisateur anglophone les voyait tels quels,
+dans les champs pré-remplis ET dans les messages VoiceOver. Les clés
+existaient déjà dans `Localizable.xcstrings` avec leurs traductions
+(`"Blancs"` → `"White"`, `"Noirs"` → `"Black"`) : seul le point d'usage ne
+passait pas par `LocalizationController.string(...)`. Corrigé aux quatre
+endroits où la valeur littérale servait de DONNÉE (pas juste de libellé de
+champ, déjà correctement localisé via `LocalizedStringKey`) : le repli
+« champ vide » de `TwoPlayerSetupView.start()`, le pré-remplissage au tout
+premier lancement (aucun réglage sauvegardé), l'annonce VoiceOver de
+`TwoPlayerViewModel.announceMove`, et le suffixe « (Blancs)/(Noirs) » du
+dialogue d'abandon.

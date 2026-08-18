@@ -13,9 +13,10 @@ struct PlayView: View {
     /// Ouvre le Laboratoire pré-rempli avec la position affichée : deux
     /// moteurs y rejouent la position en série.
     var onOpenLab: (String) -> Void = { _ in }
-    /// Bascule vers Deux joueurs (réglages neufs — cette partie contre le
-    /// moteur reste dans la pile, comme pour le Laboratoire ci-dessus).
-    var onOpenTwoPlayer: () -> Void = {}
+    /// Bascule vers Deux joueurs EN REPRENANT la position affichée (cette
+    /// partie contre le moteur reste dans la pile, comme pour le Laboratoire
+    /// ci-dessus).
+    var onOpenTwoPlayer: (String) -> Void = { _ in }
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
@@ -335,7 +336,9 @@ struct PlayView: View {
                 } label: {
                     Label("Continuer au Laboratoire", systemImage: "flask")
                 }
-                Button(action: onOpenTwoPlayer) {
+                Button {
+                    onOpenTwoPlayer(viewModel.displayedFEN)
+                } label: {
                     Label("Deux joueurs", systemImage: "person.2.fill")
                 }
             }

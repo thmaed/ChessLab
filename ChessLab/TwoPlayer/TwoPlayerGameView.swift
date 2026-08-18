@@ -83,8 +83,8 @@ struct TwoPlayerGameView: View {
             isPresented: $showResignConfirmation,
             titleVisibility: .visible
         ) {
-            Button("\(viewModel.settings.whiteName) (Blancs)", role: .destructive) { viewModel.resign(.white) }
-            Button("\(viewModel.settings.blackName) (Noirs)", role: .destructive) { viewModel.resign(.black) }
+            Button("\(viewModel.settings.whiteName) (\(LocalizationController.string("Blancs")))", role: .destructive) { viewModel.resign(.white) }
+            Button("\(viewModel.settings.blackName) (\(LocalizationController.string("Noirs")))", role: .destructive) { viewModel.resign(.black) }
             Button("Annuler", role: .cancel) {}
         }
         .confirmationDialog(

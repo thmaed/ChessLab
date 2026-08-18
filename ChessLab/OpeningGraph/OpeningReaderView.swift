@@ -13,11 +13,17 @@ struct OpeningReaderView: View {
     /// Continue la partie CONTRE STOCKFISH depuis la position affichée :
     /// l'écran de réglages s'ouvre pré-rempli (l'utilisateur choisit l'Elo).
     var onContinueVsStockfish: (String) -> Void = { _ in }
-    var onOpenLab: () -> Void = {}
-    var onOpenTwoPlayer: () -> Void = {}
+    var onOpenLab: (String) -> Void = { _ in }
+    var onOpenTwoPlayer: (String) -> Void = { _ in }
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
+
+    /// FEN complète (6 champs) : la clé du graphe n'a que 4 champs, les
+    /// écrans de réglages attendent une FEN standard.
+    private var currentFEN: String {
+        OpeningFENKey.position(from: viewModel.currentKey)?.fen ?? viewModel.currentKey
+    }
 
     var body: some View {
         // Le plateau est ANCRÉ, seul le texte défile. Auparavant tout était
@@ -42,15 +48,9 @@ struct OpeningReaderView: View {
                 Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
                     .tint(Theme.accent)
                 QuickSwitchMenu(
-                    onOpenLab: onOpenLab,
-                    onPlayVsEngine: {
-                        // FEN complète (6 champs) : la clé du graphe n'a que 4
-                        // champs, l'écran de réglages attend une FEN standard.
-                        let fen = OpeningFENKey.position(from: viewModel.currentKey)?.fen
-                            ?? viewModel.currentKey
-                        onContinueVsStockfish(fen)
-                    },
-                    onOpenTwoPlayer: onOpenTwoPlayer
+                    onOpenLab: { onOpenLab(currentFEN) },
+                    onPlayVsEngine: { onContinueVsStockfish(currentFEN) },
+                    onOpenTwoPlayer: { onOpenTwoPlayer(currentFEN) }
                 )
             }
         }
@@ -318,8 +318,8 @@ struct OpeningReaderHost: View {
     let onExit: () -> Void
     var onTrain: () -> Void = {}
     var onContinueVsStockfish: (String) -> Void = { _ in }
-    var onOpenLab: () -> Void = {}
-    var onOpenTwoPlayer: () -> Void = {}
+    var onOpenLab: (String) -> Void = { _ in }
+    var onOpenTwoPlayer: (String) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: OpeningReaderViewModel?
 

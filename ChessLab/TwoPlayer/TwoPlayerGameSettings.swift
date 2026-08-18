@@ -1,11 +1,16 @@
+import ChessKit
 import Foundation
 
 /// Réglages choisis avant une partie "deux humains sur le même appareil".
 ///
-/// Volontairement plus simple que ``PlayGameSettings`` : pas de position
-/// personnalisée (le prompt ne le prévoit que pour "Contre Stockfish"),
-/// pas de reprise de coup (non mentionné pour ce mode — esprit "feuille
-/// de partie du club", fidélité à ce qui a été réellement joué).
+/// Volontairement plus simple que ``PlayGameSettings`` : pas de reprise de
+/// coup (non mentionné pour ce mode — esprit "feuille de partie du club",
+/// fidélité à ce qui a été réellement joué). La position de départ, elle,
+/// PEUT être personnalisée — pas via un champ FEN dans l'écran de réglages
+/// (pas demandé ici), mais parce que le raccourci de changement de mode
+/// doit pouvoir reprendre la position affichée ailleurs (lecteur
+/// d'ouverture/finale, partie contre le moteur) plutôt que de toujours
+/// repartir de zéro.
 struct TwoPlayerGameSettings: Codable, Equatable, Hashable {
     enum RotationMode: String, Codable {
         /// Le plateau pivote à 180° après chaque coup (les deux joueurs
@@ -27,12 +32,23 @@ struct TwoPlayerGameSettings: Codable, Equatable, Hashable {
     /// Utilisés uniquement quand `timeControlID == "custom"`.
     var customMinutes: Int = 15
     var customIncrementSeconds: Int = 0
+    /// Position de départ imposée (venue d'un autre mode) — voir
+    /// ``PlayGameSettings/startFEN``, même contrat.
+    var startFEN: String?
 
     var timeControl: TimeControl {
         if timeControlID == "custom" {
             return .custom(minutes: customMinutes, incrementSeconds: customIncrementSeconds)
         }
         return TimeControl.presets.first { $0.id == timeControlID } ?? .none
+    }
+
+    var startingPosition: Position {
+        if let startFEN, let position = Position(fen: startFEN) {
+            position
+        } else {
+            .standard
+        }
     }
 
     static let `default` = TwoPlayerGameSettings()
@@ -43,11 +59,15 @@ struct TwoPlayerGameSettings: Codable, Equatable, Hashable {
 /// ``PlaySettingsStore``. Contrairement au FEN personnalisé du mode
 /// Jouer, les noms des joueurs SONT ici persistés par défaut : deux
 /// joueurs récurrents (club) rejoueront probablement sous les mêmes noms.
+/// Le FEN de départ, lui, n'est PAS mémorisé — même raison que
+/// ``PlaySettingsStore`` : un choix ponctuel, pas une préférence durable.
 enum TwoPlayerSettingsStore {
     private static let key = "lastTwoPlayerGameSettings"
 
     static func save(_ settings: TwoPlayerGameSettings) {
-        guard let data = try? JSONEncoder().encode(settings) else { return }
+        var toStore = settings
+        toStore.startFEN = nil
+        guard let data = try? JSONEncoder().encode(toStore) else { return }
         UserDefaults.standard.set(data, forKey: key)
     }
 

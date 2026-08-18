@@ -8,9 +8,9 @@ struct PuzzleSolveView: View {
     @Bindable var viewModel: PuzzleSolveViewModel
     let onExit: () -> Void
     let onViewSourceGame: (String) -> Void
-    var onOpenLab: () -> Void = {}
-    var onPlayVsEngine: () -> Void = {}
-    var onOpenTwoPlayer: () -> Void = {}
+    var onOpenLab: (String) -> Void = { _ in }
+    var onPlayVsEngine: (String) -> Void = { _ in }
+    var onOpenTwoPlayer: (String) -> Void = { _ in }
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
@@ -39,7 +39,9 @@ struct PuzzleSolveView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 QuickSwitchMenu(
-                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                    onOpenLab: { onOpenLab(viewModel.currentFEN) },
+                    onPlayVsEngine: { onPlayVsEngine(viewModel.currentFEN) },
+                    onOpenTwoPlayer: { onOpenTwoPlayer(viewModel.currentFEN) }
                 )
             }
         }

@@ -61,12 +61,13 @@ final class TwoPlayerViewModel {
 
     // MARK: Initialisation
 
-    /// Démarre une nouvelle partie (position standard uniquement).
+    /// Démarre une nouvelle partie — position standard, ou celle imposée par
+    /// ``TwoPlayerGameSettings/startFEN`` (reprise depuis un autre mode).
     init(settings: TwoPlayerGameSettings, modelContext: ModelContext) {
         self.settings = settings
         self.modelContext = modelContext
 
-        let startPosition = Position.standard
+        let startPosition = settings.startingPosition
         board = Board(position: startPosition)
         let newGame = Game(startingWith: startPosition)
         game = newGame
@@ -380,7 +381,7 @@ final class TwoPlayerViewModel {
 
     private func announceMove(_ move: Move) {
         guard UIAccessibility.isVoiceOverRunning else { return }
-        let who = move.piece.color == .white ? "Blancs" : "Noirs"
+        let who = move.piece.color == .white ? LocalizationController.string("Blancs") : LocalizationController.string("Noirs")
         UIAccessibility.post(
             notification: .announcement,
             argument: "\(who) : \(MoveNarration.describe(san: move.san))"

@@ -3,6 +3,11 @@ import SwiftUI
 /// Écran de configuration d'une partie "deux humains sur le même appareil".
 struct TwoPlayerSetupView: View {
     let onStart: (TwoPlayerGameSettings) -> Void
+    /// Position de départ imposée — reprise depuis un autre mode (lecteur
+    /// d'ouverture/finale, partie contre le moteur) via le sélecteur rapide.
+    /// `nil` : partie neuve, position standard, comme avant.
+    private let initialFEN: String?
+    private let navigationTitleKey: LocalizedStringKey
 
     @State private var whiteName: String
     @State private var blackName: String
@@ -14,12 +19,21 @@ struct TwoPlayerSetupView: View {
     /// Famille de cadence affichée — voir `NewGameSetupView`.
     @State private var timeCategory: TimeControlCategory
 
-    init(onStart: @escaping (TwoPlayerGameSettings) -> Void) {
+    init(initialFEN: String? = nil, onStart: @escaping (TwoPlayerGameSettings) -> Void) {
         self.onStart = onStart
-        let saved = TwoPlayerSettingsStore.load() ?? .default
+        self.initialFEN = initialFEN
+        self.navigationTitleKey = initialFEN == nil ? "Deux joueurs" : "Continuer la partie"
+        // Pas de réglages sauvegardés (tout premier lancement) : le défaut du
+        // modèle est câblé en français ("Blancs"/"Noirs") — on le traduit
+        // dans la langue active plutôt que de le montrer tel quel à un
+        // utilisateur anglophone. Un nom déjà sauvegardé, lui, reste
+        // intouché : c'est ce que la personne a réellement tapé (ou choisi
+        // de garder) une fois.
+        let stored = TwoPlayerSettingsStore.load()
+        let saved = stored ?? .default
 
-        _whiteName = State(initialValue: saved.whiteName)
-        _blackName = State(initialValue: saved.blackName)
+        _whiteName = State(initialValue: stored == nil ? LocalizationController.string("Blancs") : saved.whiteName)
+        _blackName = State(initialValue: stored == nil ? LocalizationController.string("Noirs") : saved.blackName)
         _rotationMode = State(initialValue: saved.rotationMode)
         _isCustomTimeControlSelected = State(initialValue: saved.timeControlID == "custom")
         _timeControl = State(initialValue: TimeControl.presets.first { $0.id == saved.timeControlID } ?? .none)
@@ -129,7 +143,7 @@ struct TwoPlayerSetupView: View {
             .padding(.bottom, 20)
         }
         .appBackground()
-        .navigationTitle("Deux joueurs")
+        .navigationTitle(navigationTitleKey)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
@@ -208,12 +222,13 @@ struct TwoPlayerSetupView: View {
 
     private func start() {
         let settings = TwoPlayerGameSettings(
-            whiteName: whiteName.trimmingCharacters(in: .whitespaces).isEmpty ? "Blancs" : whiteName,
-            blackName: blackName.trimmingCharacters(in: .whitespaces).isEmpty ? "Noirs" : blackName,
+            whiteName: whiteName.trimmingCharacters(in: .whitespaces).isEmpty ? LocalizationController.string("Blancs") : whiteName,
+            blackName: blackName.trimmingCharacters(in: .whitespaces).isEmpty ? LocalizationController.string("Noirs") : blackName,
             rotationMode: rotationMode,
             timeControlID: effectiveTimeControl.id,
             customMinutes: customMinutes,
-            customIncrementSeconds: customIncrement
+            customIncrementSeconds: customIncrement,
+            startFEN: initialFEN
         )
         TwoPlayerSettingsStore.save(settings)
         onStart(settings)

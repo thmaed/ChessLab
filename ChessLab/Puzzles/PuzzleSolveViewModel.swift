@@ -28,6 +28,10 @@ final class PuzzleSolveViewModel {
     private(set) var board: Board
     private(set) var orientation: Piece.Color
 
+    /// La position AFFICHÉE (pas forcément le FEN de départ du puzzle : un
+    /// coup a pu être joué) — pour « Continuer ailleurs », voir ``PlayViewModel/displayedFEN``.
+    var currentFEN: String { board.position.fen }
+
     var selectedSquare: Square?
     var legalTargetSquares: [Square] = []
     private(set) var lastMove: Move?
