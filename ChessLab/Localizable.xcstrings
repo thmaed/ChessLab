@@ -13708,6 +13708,22 @@
         }
       }
     },
+    "Rook vs Bishop" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Bishop"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre fou"
+          }
+        }
+      }
+    },
     "Déséquilibres matériels" : {
       "localizations" : {
         "en" : {

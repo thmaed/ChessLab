@@ -5646,12 +5646,30 @@ pas une omniscience.
 
 28 cours de finales, catalogue à 86.
 
+**Tour contre fou, deuxième tentative** — repris une deuxième fois après un
+premier abandon documenté plus haut. Nouvelle racine plus resserrée
+(6kb/8/6K1/8/8/8/8/3R4 b) : l'oracle donne bien « perte » pour les noirs,
+mais `derive_optimal.py` révèle pourquoi — le roi noir est déjà acculé
+contre le roi blanc adjacent (g6), et la ligne optimale force le roi à
+abandonner son fou pour que la tour le CAPTURE gratuitement (`Rxh8`). C'est
+le même défaut de construction (pièce non défendue) déjà attrapé deux fois
+sur les fous de même couleur cette session — pas une démonstration du
+« mauvais coin ». Cours livré quand même, mais SANS la théorie du coin :
+juste ce qui est solidement prouvé, à savoir que tour contre fou seul, sans
+pion et roi défenseur groupé, est nulle — comme cavalier contre tour. La
+nuance de couleur de coin reste hors de portée de cette méthode ; il
+faudrait une position où le coin change le verdict à matériel et
+distances égales, pas une position déjà quasi tranchée par ailleurs.
+
+29 cours de finales, catalogue à 87.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
-**Reste à faire** : environ 70 items du catalogue de référence restent à
-couvrir — nouvelle famille « cavaliers », « fou contre cavalier » et
-« déséquilibres matériels » (T+F, T+C, D contre pièces…) à créer côté Swift ;
+**Reste à faire** : environ 60 items du catalogue de référence restent à
+couvrir — la famille « fou contre cavalier » (4 items, aucun cours encore) et
+le reste des « déséquilibres matériels » (T+F, T+C, D contre pièces…) restent
+les familles les moins couvertes ;
 plusieurs positions demandent encore une recherche sourcée avant de pouvoir
 être dérivées (Centurini, Grigoriev, Lasker, cases conjuguées — la théorie
 la plus dense de tout l'échiquier) ; les thèmes transversaux (zugzwang,
