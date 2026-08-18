@@ -5,7 +5,7 @@ import Foundation
 ///
 /// ## D'où vient cette règle
 ///
-/// Étude du 18/08 (`docs/ETUDE-AFFINAGE-TROIS-NIVEAUX.md`) : une cascade de
+/// Étude du 18/08 (simulée sur 887 coups réels, quatre budgets) : une cascade de
 /// recherches 300 k → 1 M → 3 M est DOMINÉE par le système actuel, parce que
 /// chaque redémarrage repaie l'arbre entier (mesuré ×13, pas ×10). Mais 47 %
 /// des affinages étaient déjà stables à 1 M nœuds : la même économie

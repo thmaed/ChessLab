@@ -113,9 +113,10 @@ d'échecs consécutifs) remplace les 21 sites ; variante de fond pour le seeder
 ## 5. ✅ RÉGLÉ (18/08) — Le PDF de Nils est supprimé
 
 Tu as tranché : plus utile. `AppStoreSubmission/ChessLab-analyse-moteur.pdf`
-est retiré du dépôt (l'historique git le garde si besoin). Les chiffres
-honnêtes (1,92 %) restent documentés dans le code et dans
-`docs/ETUDE-AFFINAGE-TROIS-NIVEAUX.md`.
+est retiré du dépôt (l'historique git le garde si besoin), tout comme
+l'étude d'affinage une fois sa recommandation implémentée. Les chiffres
+honnêtes (1,92 %) restent documentés dans le code (`refinementBand`,
+`RefinementStopRule`).
 
 ## 6. L'arrêt anticipé mérite une mesure SUR APPAREIL
 
