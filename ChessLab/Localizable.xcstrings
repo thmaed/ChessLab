@@ -13804,6 +13804,22 @@
         }
       }
     },
+    "The Outside Passed Pawn" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Outside Passed Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pion passé éloigné"
+          }
+        }
+      }
+    },
     "Grigoriev's Study — the Only King Move" : {
       "localizations" : {
         "en" : {
@@ -14012,6 +14028,38 @@
         }
       }
     },
+    "The Cochrane Defence" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Cochrane Defence"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La défense Cochrane"
+          }
+        }
+      }
+    },
+    "The Second-Rank Defence" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Second-Rank Defence"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La défense de la 2e rangée"
+          }
+        }
+      }
+    },
     "Rook vs Rook and Knight" : {
       "localizations" : {
         "en" : {
@@ -14136,6 +14184,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fou contre deux pions séparés"
+          }
+        }
+      }
+    },
+    "Centurini — the Right Square" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centurini — the Right Square"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centurini — la bonne case"
           }
         }
       }

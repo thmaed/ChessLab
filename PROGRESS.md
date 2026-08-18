@@ -5990,8 +5990,66 @@ retombées sur une simple nulle, sans le récit tranché espéré.
 
 51 cours de finales, catalogue à 109.
 
-**Reste à faire** (mis à jour, 51 cours de finales, catalogue à 109) :
-environ 39 items du catalogue de référence restent à couvrir.
+**Centurini, enfin résolu — quatrième tentative.** Le principe manquait
+toujours d'une position exacte après trois essais infructueux, jusqu'à ce
+qu'une recherche finisse par livrer la règle précise du maître italien :
+« nulle si le roi défenseur atteint, devant le pion, une case qui N'EST
+PAS de la couleur du fou ». Construite à partir de cette règle plutôt que
+d'un diagramme copié — et un premier essai s'est révélé faux (fou et pion
+contre roi NU au lieu de fou et pion contre FOU de même couleur, gagné
+haut la main par les blancs) avant de corriger en ajoutant le second fou.
+Racine à 5 pièces, confirmée nulle. Piège trouvé en explorant : un repli
+qui semble prudent (`Ka8??`) abandonne justement LA case qui faisait toute
+la forteresse.
+
+**Incident JSON, corrigé** : l'entrée servant de repère pour cette
+insertion se trouvait être la toute dernière du fichier (sans virgule de
+fin) — l'insertion standard y a cassé le JSON deux fois de suite (virgule
+manquante, puis virgule surnuméraire). Détecté immédiatement par la
+vérification systématique, corrigé à la main les deux fois avant de
+continuer. La discipline de vérification a encore fonctionné comme prévu.
+
+52 cours de finales, catalogue à 110.
+
+**La défense Cochrane** livrée dans la foulée, deuxième cours du même
+cycle groupé — sourcée John Cochrane : contre tour et fou, la tour
+défenseur cloue le fou adverse contre son propre roi sur une colonne
+centrale, rois à bonne distance. Racine à 5 pièces. Trouvaille amusante en
+construisant : la tour noire peut même croquer la tour blanche pour
+simplifier (`Rxa1`) sans rien perdre — tour contre fou seul est déjà
+connu nul (`eg-rook-vs-bishop`), un deuxième lien concret entre deux cours
+de la session. Piège trouvé en explorant : lâcher la colonne d pour
+chasser la tour blanche (`Rb1??`) libère le fou du clouage, et la tour
+noire tombe aussitôt avec échec.
+
+53 cours de finales, catalogue à 111.
+
+**La défense de la 2e rangée** livrée dans la foulée, troisième cours du
+même cycle groupé — deuxième grande méthode connue contre tour et fou, à
+côté du clouage Cochrane déjà livré : la tour défenseur reste sur sa
+propre 7e rangée, hors de portée du roi adverse, sans jamais avoir besoin
+d'aller y voir de plus près. Racine à 5 pièces, construite sur le principe
+documenté (Atalik-Norri 1997, van Wely-Carlsen 2007 cités comme exemples
+pratiques) plutôt que sur l'une de ces parties précises. Piège trouvé en
+explorant : quitter la rangée pour approcher le roi blanc (`Rd7??`) amène
+la tour directement à portée — `Kxd7` la croque sans effort.
+
+54 cours de finales, catalogue à 112.
+
+**Le pion passé éloigné** livrée dans la foulée, quatrième cours du même
+cycle groupé — technique classique du leurre : un pion passé isolé loin
+du reste force le roi adverse à s'en occuper seul, pendant que l'autre
+roi traverse tout l'échiquier. Racine à 7 pièces — première fois cette
+session que l'oracle renvoie un verdict sans DTM numérique (`dtm: None`)
+alors que le verdict lui-même reste fiable ; `verify_line.py` continue de
+fonctionner normalement puisqu'il ne dépend que de la préservation du
+verdict, pas du chiffre. Aucun piège trouvé cette fois : la position est
+robuste, cours à un seul chapitre.
+
+55 cours de finales, catalogue à 113.
+
+**Reste à faire** (mis à jour, 55 cours de finales, catalogue à 113) :
+environ 35 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini
