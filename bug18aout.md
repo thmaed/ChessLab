@@ -73,17 +73,12 @@ d'échecs consécutifs) remplace les 21 sites ; variante de fond pour le seeder
 (le succès de fond ne blanchit pas l'ardoise) ; bannière d'accueil à partir du
 2e échec — la même qui avoue la session en mémoire du §3. Trois tests.
 
-## 5. Le PDF de Nils porte encore les chiffres optimistes
+## 5. ✅ RÉGLÉ (18/08) — Le PDF de Nils est supprimé
 
-**Constat.** L'étude du 18/08 a corrigé le résidu d'affinage (1,92 % réel
-contre 0,68 % annoncé — l'ancien calcul supposait qu'un coup recalculé était
-corrigé). Le code est corrigé, `AppStoreSubmission/ChessLab-analyse-moteur.pdf`
-non.
-
-**Proposition** : régénérer le PDF avec la section corrigée AVANT de
-l'envoyer à Nils (10 min, scripts prêts). Pas fait cette nuit : tu as
-peut-être déjà envoyé la version actuelle, auquel cas mieux vaut un erratum
-qu'une substitution silencieuse — dis-moi.
+Tu as tranché : plus utile. `AppStoreSubmission/ChessLab-analyse-moteur.pdf`
+est retiré du dépôt (l'historique git le garde si besoin). Les chiffres
+honnêtes (1,92 %) restent documentés dans le code et dans
+`docs/ETUDE-AFFINAGE-TROIS-NIVEAUX.md`.
 
 ## 6. L'arrêt anticipé mérite une mesure SUR APPAREIL
 
