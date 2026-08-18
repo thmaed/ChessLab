@@ -25,11 +25,12 @@ struct EndgameListView: View {
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
 
     /// L'ordre pédagogique des familles — du pion (tout part de là) aux études.
-    private static let familyOrder = ["pawns", "rooks", "queens", "mates", "practical"]
+    private static let familyOrder = ["pawns", "rooks", "bishops", "queens", "mates", "practical"]
 
     private static let familyTitles: [String: LocalizedStringKey] = [
         "pawns": "Finales de pions",
         "rooks": "Finales de tours",
+        "bishops": "Finales de fous",
         "queens": "Finales de dames",
         "mates": "Mats élémentaires",
         "practical": "Études célèbres",
@@ -38,6 +39,7 @@ struct EndgameListView: View {
     private static let familyIcons: [String: (name: String, tint: Color)] = [
         "pawns": ("arrow.up.square.fill", Theme.accent),
         "rooks": ("building.columns.fill", Theme.info),
+        "bishops": ("triangle.fill", Theme.teal),
         "queens": ("crown.fill", Theme.violet),
         "mates": ("flag.checkered", Theme.warning),
         "practical": ("sparkles", Theme.rose),

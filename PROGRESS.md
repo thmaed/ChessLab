@@ -5505,9 +5505,53 @@ de la méthode « aucune ligne de mémoire » :
 5. la meilleure défense contre la vis sans fin est d1=C, cavalier du
    désespoir — enseigné, réfutation comprise.
 
-**Reste à faire (module Finales)** : la coupure du roi (tours), le mat aux
-deux fous, et — v2 — l'entraînement libre arbitré (jouer n'importe quel coup
-qui préserve le verdict, pas seulement celui de la leçon).
+## Extension du module Finales — 19 cours, recherche croisée (18/08)
+
+Demande : couvrir un catalogue de référence (~90 finales nommées, calqué sur
+un plan de cours type Silman/Dvoretsky) en s'appuyant aussi sur ce qui se
+trouve en ligne — Wikipédia, Lichess Practice — pour situer les positions
+canoniques, l'oracle tranchant ensuite chaque coup comme toujours.
+
+**Huit cours ajoutés** : Saavedra (sous-promotion tour, 1895 — sourcé
+Wikipédia : Fenton-Potter 1875, Barbier, découverte du prêtre espagnol en
+mai 1895), Vančura (pion-tour + tour de flanc, 1924), le trébuchet (racine
+introuvable dans aucune source en ligne vérifiable — trouvée par recherche
+SYSTÉMATIQUE de toutes les paires de rois à distance de cavalier, jusqu'à
+isoler les deux seules qui donnent une vraie perte des DEUX côtés selon qui
+a le trait), la défense du petit côté (Tarrasch 1906), dame contre tour
+(technique de Philidor, 14 coups sans un échec gratuit), le mauvais fou
+(fou + pion-tour de la mauvaise couleur — nouvelle famille « fous »), la
+coupure verticale du roi.
+
+**Ce que la recherche a corrigé avant même l'oracle** : ma première tentative
+de trébuchet, construite de mémoire sur une description approximative
+trouvée en ligne, ÉTAIT DÉJÀ FAUSSE géométriquement (les rois avaient une
+case de rechange, donc aucune vraie zugzwang) — repérée par la recherche
+systématique avant même d'interroger la tablebase. Et la « règle des cinq »
+pour la coupure de tour, largement citée en ligne, ne tient pas telle
+quelle : un cas limite (4+1=5, censé nulle) s'est révélé gagné à l'oracle.
+
+**Contrainte d'architecture découverte en écrivant** : un cours a UNE seule
+racine — un chapitre ne peut pas repartir d'une position aux pièces
+différentes (l'autre camp au trait, un fou sur une autre case). Les trois
+comparatifs prévus (trébuchet côté noir, grand côté de la défense, bon fou)
+sont donc restés en PROSE dans les commentaires plutôt qu'en lignes
+rejouables — plus honnête qu'une ligne bricolée qui ne serait pas la même
+position.
+
+19 cours de finales au total, 0 problème à l'audit tablebase.
+
+**Reste à faire** : environ 70 items du catalogue de référence restent à
+couvrir — nouvelle famille « cavaliers », « fou contre cavalier » et
+« déséquilibres matériels » (T+F, T+C, D contre pièces…) à créer côté Swift ;
+plusieurs positions demandent encore une recherche sourcée avant de pouvoir
+être dérivées (Centurini, Grigoriev, Lasker, cases conjuguées — la théorie
+la plus dense de tout l'échiquier) ; les thèmes transversaux (zugzwang,
+forteresses, principe des deux faiblesses…) seront traités en galeries
+multi-positions plutôt qu'en une racine chacun. Et toujours : le mat aux
+deux fous, et — v2 — l'entraînement libre arbitré par tablebase, embarquée
+en sous-sélection WDL (~15-25 Mo, lisible nativement par Stockfish via
+SyzygyPath) plutôt que les tables complètes (940 Mo, écartées).
 
 ## Dix tests rouges que la campagne de contenu avait masqués (16/08)
 
