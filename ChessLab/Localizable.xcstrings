@@ -274,6 +274,7 @@
       }
     },
     "%@ · %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -428,6 +429,7 @@
       }
     },
     "%lld à revoir" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -560,6 +562,7 @@
       }
     },
     "%lld position(s) à réviser" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -675,7 +678,11 @@
         }
       }
     },
+    "• Le module Finales : douze cours prouvés par table de finales — opposition, Lucena, Philidor, mats élémentaires, étude de Réti…\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées, dont les réponses aux coups les plus joués en club (London, Philidor, Petroff).\n• Les analyses sont conservées sur l'appareil : une partie déjà analysée se rouvre classifiée, instantanément.\n• Les moments critiques (brillant, gaffe, occasion manquée…) s'affichent sur la courbe d'évaluation.\n• Les modes se parlent : depuis une partie, envoyez la position vers l'analyse ou le Laboratoire — la partie vous attend au retour, pendule en pause.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier répondait au doigt sur la seule colonne h." : {
+
+    },
     "• Vos propres répertoires : importez vos ouvertures au format PGN, variantes comprises, entraînez-les comme les autres et partagez-les par simple fichier (voir la carte « Vos répertoires et le partage »).\n• Les 58 ouvertures livrées ont été relues au moteur : quinze coups fautifs corrigés, quatre défenses manquantes ajoutées. Chaque coup est désormais rejoué sous Stockfish avant d'être publié.\n• Puzzles : un seul essai par défaut, comme un vrai exercice de calcul. Les trois essais restent disponibles dans les Réglages.\n• Lecteur d'ouvertures : l'échiquier reste à l'écran pendant qu'on lit les coups. Sur iPad en paysage, plateau à gauche et explications à droite.\n• L'échiquier répond mieux au doigt : relâcher un peu à côté joue quand même le coup.\n• L'analyse explique POURQUOI un coup est une erreur, en nommant le motif tactique.\n• Score de précision recalibré, revue d'analyse qui reprend toute seule, pendule qui décompte dès le premier coup." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -758,9 +765,6 @@
         }
       }
     },
-    "À jour" : {
-
-    },
     "À propos" : {
       "localizations" : {
         "en" : {
@@ -778,6 +782,7 @@
       }
     },
     "À système" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -990,9 +995,6 @@
           }
         }
       }
-    },
-    "Ajouter au répertoire" : {
-
     },
     "Ajouter aussi à la bibliothèque" : {
 
@@ -1513,13 +1515,7 @@
         }
       }
     },
-    "Apprendre" : {
-
-    },
     "Apprends et révise tes ouvertures" : {
-
-    },
-    "Approfondis cette ouverture en régénérant les données." : {
 
     },
     "Ardoise" : {
@@ -1699,6 +1695,7 @@
 
     },
     "Aucune ouverture" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1849,6 +1846,7 @@
       }
     },
     "Autres coups possibles" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2579,6 +2577,7 @@
       }
     },
     "Camp" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2763,6 +2762,7 @@
       }
     },
     "Catégorie" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2985,6 +2985,7 @@
       }
     },
     "Chapitre terminé !" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3137,6 +3138,7 @@
       }
     },
     "Classiques" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3153,6 +3155,7 @@
       }
     },
     "Clé" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3531,6 +3534,7 @@
       }
     },
     "Continuer contre l'ordinateur depuis ici" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -3851,6 +3855,7 @@
 
     },
     "Cours indisponible" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4733,9 +4738,6 @@
         }
       }
     },
-    "Entraînement" : {
-
-    },
     "Entraînement du jour" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4808,6 +4810,7 @@
       }
     },
     "Essayez une autre catégorie." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4938,6 +4941,7 @@
       }
     },
     "Explorateur" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -4953,7 +4957,7 @@
         }
       }
     },
-    "Explore, apprends et entraîne tes ouvertures depuis le bouton « Explorateur » (🧭) de l'onglet Ouvertures : navigation dans les variantes, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour." : {
+    "Explore, apprends et entraîne tes ouvertures depuis l'onglet Ouvertures : lecteur pas à pas, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour." : {
 
     },
     "Exporter" : {
@@ -5143,6 +5147,7 @@
       }
     },
     "Fin de la ligne connue" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5780,6 +5785,7 @@
       }
     },
     "Hypermodernes" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5843,6 +5849,19 @@
           }
         }
       }
+    },
+    "Import : %lld/%lld parties…" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Import : %1$lld/%2$lld parties…"
+          }
+        }
+      }
+    },
+    "Import en cours…" : {
+
     },
     "Import terminé" : {
 
@@ -6149,6 +6168,7 @@
       }
     },
     "Irrégulières" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6311,6 +6331,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jouer cette position"
+          }
+        }
+      }
+    },
+    "Jouer contre l'ordinateur d'ici" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the computer from here"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouer contre l'ordinateur d'ici"
           }
         }
       }
@@ -6725,6 +6761,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "L'ordinateur peut abandonner s'il est perdu"
+          }
+        }
+      }
+    },
+    "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The database could not be opened — your existing data is intact. Restart the app to try again."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer."
           }
         }
       }
@@ -7149,9 +7201,6 @@
         }
       }
     },
-    "Les nœuds les plus ratés" : {
-
-    },
     "les noirs" : {
       "localizations" : {
         "en" : {
@@ -7324,6 +7373,7 @@
       }
     },
     "Ligne terminée !" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8182,6 +8232,7 @@
       }
     },
     "Nouveautés de la version 1.4" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8196,6 +8247,9 @@
           }
         }
       }
+    },
+    "Nouveautés de la version 1.5" : {
+
     },
     "Nouveautés depuis la 1.0" : {
       "extractionState" : "stale",
@@ -9472,6 +9526,7 @@
       }
     },
     "Pourquoi pas autre chose ?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -10066,6 +10121,7 @@
 
     },
     "Rechercher une ouverture" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -10146,6 +10202,7 @@
       }
     },
     "Réfutation" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -10233,6 +10290,7 @@
 
     },
     "Rejouer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -10700,9 +10758,6 @@
         }
       }
     },
-    "Retirer du répertoire" : {
-
-    },
     "Retour" : {
       "localizations" : {
         "en" : {
@@ -10911,6 +10966,7 @@
       }
     },
     "Revoir la ligne" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -11457,6 +11513,22 @@
         }
       }
     },
+    "Session sans enregistrement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session without saving"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session sans enregistrement"
+          }
+        }
+      }
+    },
     "Sicilian Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -11791,9 +11863,6 @@
         }
       }
     },
-    "Statistiques indisponibles sur ce pilote — elles apparaîtront après régénération." : {
-
-    },
     "Stockage indisponible sur cet appareil." : {
       "localizations" : {
         "en" : {
@@ -11843,6 +11912,7 @@
       }
     },
     "Style" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -12607,9 +12677,6 @@
         }
       }
     },
-    "Transpositions" : {
-
-    },
     "Trompowsky Attack" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -12960,6 +13027,22 @@
         }
       }
     },
+    "Vérifiez l'espace disque. Vos dernières actions risquent d'être perdues." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your free disk space. Your latest actions may be lost."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez l'espace disque. Vos dernières actions risquent d'être perdues."
+          }
+        }
+      }
+    },
     "Victoires" : {
       "localizations" : {
         "en" : {
@@ -13048,6 +13131,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voir tout"
+          }
+        }
+      }
+    },
+    "Vos données ne s'enregistrent plus" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data is no longer being saved"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos données ne s'enregistrent plus"
           }
         }
       }
@@ -13233,12 +13332,6 @@
         }
       }
     },
-    "Vue des blancs" : {
-
-    },
-    "Vue des noirs" : {
-
-    },
     "Vulture Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -13371,70 +13464,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Zukertort"
-          }
-        }
-      }
-    },
-    "Session sans enregistrement" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Session without saving"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Session sans enregistrement"
-          }
-        }
-      }
-    },
-    "Vos données ne s'enregistrent plus" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your data is no longer being saved"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vos données ne s'enregistrent plus"
-          }
-        }
-      }
-    },
-    "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The database could not be opened — your existing data is intact. Restart the app to try again."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer."
-          }
-        }
-      }
-    },
-    "Vérifiez l'espace disque. Vos dernières actions risquent d'être perdues." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Check your free disk space. Your latest actions may be lost."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vérifiez l'espace disque. Vos dernières actions risquent d'être perdues."
           }
         }
       }

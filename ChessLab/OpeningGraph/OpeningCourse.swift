@@ -2,7 +2,7 @@ import ChessKit
 import Foundation
 
 /// Version du schéma des cours d'ouverture embarqués (le NOUVEAU modèle en
-/// graphe, distinct des 149 familles linéaires ``OpeningLibraryEntry`` qui
+/// graphe, distinct des 149 familles linéaires (``OpeningTheoryEntry``) qui
 /// restent en place pendant la bascule progressive).
 ///
 /// Incrémentée à chaque changement de format non rétro-compatible. La

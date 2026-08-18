@@ -13,7 +13,7 @@ importance.*
 
 ---
 
-## 1. Flux « Explorateur » mort — le brief pour décider (détaillé le 18/08)
+## 1. ✅ FAIT (arbitré : option A, le 18/08) — Flux Explorateur supprimé
 
 **L'inventaire exact, mesuré.** Il y a en réalité DEUX sous-flux morts, pas
 un :
@@ -60,8 +60,14 @@ Garder le code mort. Coût récurrent démontré : chaque évolution du modèle
 doit maintenir des écrans invisibles (le champ `kind` d'hier, le filtre
 d'avant-hier).
 
-**Ma recommandation : A.** Un mot de toi (« A », « B » ou « C ») et je
-l'exécute.
+**Exécuté (option A)** : « Jouer contre l'ordinateur d'ici » vit désormais
+dans le LECTEUR (précieux pour les Finales) ; `mainLine` a déménagé dans la
+file d'entraînement ; les neuf fichiers morts et leurs cinq routes sont
+supprimés (≈ −1 750 lignes nettes). Le compilateur a rattrapé une dépendance
+que l'inventaire avait ratée : les PGN des 149 familles nourrissent la
+détection « coup de théorie » de l'analyse — la DONNÉE reste, servie par un
+chargeur minimal (`OpeningTheoryLibrary`), avec ses tests. 567 tests
+unitaires + les 5 tests UI du périmètre : verts.
 
 ## 2. ✅ FAIT (arbitré le 18/08 au matin) — File de révision
 

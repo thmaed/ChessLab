@@ -252,7 +252,7 @@ struct IconBadge: View {
 
 /// Groupe de filtre étiqueté : titre en petites capitales suivi de ses
 /// chips en retour à la ligne automatique — même gabarit pour tout écran
-/// de sélection par facettes (``PuzzleQueueView``, ``OpeningLibraryView``).
+/// de sélection par facettes (``PuzzleQueueView``).
 func filterGroup(title: LocalizedStringKey, @ViewBuilder chips: () -> some View) -> some View {
     VStack(alignment: .leading, spacing: 12) {
         Text(title)

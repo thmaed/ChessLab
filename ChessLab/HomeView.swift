@@ -72,18 +72,13 @@ struct HomeView: View {
         /// Module Finales : mêmes routes lecteur/entraîneur que les
         /// ouvertures, seule la LISTE est propre au module.
         case endgameList
-        case activeOpeningLine(OpeningLibraryEntry, Piece.Color)
         /// Module d'ouvertures en graphe : lecteur pas-à-pas (principal) +
-        /// entraînement. L'ancien Explorer/Apprendre reste défini mais n'est
-        /// plus atteint depuis le flux principal.
+        /// entraînement. (L'ancien flux Explorer/Apprendre a été supprimé le
+        /// 18/08 — bug18aout §1, option A.)
         case openingReader(String)
         /// Éditeur d'arbre — répertoires PERSONNELS seulement (`user-…`).
         case openingEditor(String)
-        case openingExplorerPicker
-        case openingExplorerCourse(String)
-        case openingLearnCourse(String)
         case openingTrainDaily
-        case openingTrainHardest
         case openingTrainLine(String)
         /// Réglages Labo, éventuellement pré-remplis avec une position de
         /// départ venue de l'éditeur ou du scanner.
@@ -576,27 +571,6 @@ struct HomeView: View {
                         path.removeLast()
                     } onTrain: {
                         path.append(Route.openingTrainLine(courseID))
-                    }
-
-                case .openingExplorerPicker:
-                    OpeningCoursePickerView { courseID in
-                        path.append(Route.openingExplorerCourse(courseID))
-                    } onTrainDaily: {
-                        path.append(Route.openingTrainDaily)
-                    } onTrainHardest: {
-                        path.append(Route.openingTrainHardest)
-                    }
-
-                case let .openingExplorerCourse(courseID):
-                    OpeningExplorerHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
-                        path.append(Route.openingLearnCourse(courseID))
-                    } onTrain: {
-                        path.append(Route.openingTrainLine(courseID))
-                    }
-
-                case let .openingLearnCourse(courseID):
-                    OpeningLearnHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
-                        path.removeLast()
                     } onContinueVsStockfish: { fen in
                         path.append(Route.continueVsStockfish(fen))
                     }
@@ -604,20 +578,10 @@ struct HomeView: View {
                 case .openingTrainDaily:
                     OpeningTrainHost(mode: .daily, sessionKey: sessionKey(for: route)) { path.removeLast() }
 
-                case .openingTrainHardest:
-                    OpeningTrainHost(mode: .hardest, sessionKey: sessionKey(for: route)) { path.removeLast() }
-
                 case let .openingTrainLine(courseID):
                     OpeningTrainHost(
                         mode: .fullLine(courseID: courseID), sessionKey: sessionKey(for: route)
                     ) { path.removeLast() }
-
-                case let .activeOpeningLine(entry, color):
-                    OpeningLineTrainingHost(entry: entry, color: color, sessionKey: sessionKey(for: route)) {
-                        path.removeLast()
-                    } onContinueVsStockfish: { fen in
-                        path.append(Route.continueVsStockfish(fen))
-                    }
 
                 case let .labSetup(startFEN):
                     LabSetupView(startFEN: startFEN) { settings in
@@ -1376,37 +1340,6 @@ private struct PuzzleSessionHost: View {
     }
 }
 
-
-/// Héberge un `OpeningLineTrainingViewModel` créé une seule fois — une
-/// ligne de bibliothèque ne persiste rien (pas de répétition espacée,
-/// voir ``OpeningLineTrainingViewModel``).
-private struct OpeningLineTrainingHost: View {
-    let entry: OpeningLibraryEntry
-    let color: Piece.Color
-    /// Identité de session — voir ``SessionStore``.
-    let sessionKey: String
-    let onExit: () -> Void
-    let onContinueVsStockfish: (String) -> Void
-    @Environment(\.sessionStore) private var sessionStore
-    @State private var viewModel: OpeningLineTrainingViewModel?
-
-    var body: some View {
-        Group {
-            if let viewModel {
-                OpeningLineTrainingView(viewModel: viewModel, onExit: onExit, onContinueVsStockfish: onContinueVsStockfish)
-            } else {
-                Color.clear
-            }
-        }
-        .onAppear {
-            if viewModel == nil {
-                viewModel = sessionStore.value(for: sessionKey) {
-                    OpeningLineTrainingViewModel(entry: entry, color: color)
-                }
-            }
-        }
-    }
-}
 
 /// Héberge un `LabViewModel` créé une seule fois (nouvelle série ou reprise),
 /// même discipline de construction paresseuse que les autres hôtes — le

@@ -68,22 +68,6 @@ struct BugFixes1407Tests {
 
     // MARK: Bug n°19 — même garde dans les modes d'entraînement
 
-    @Test func openingLineTrainingIgnoresADragOfTheOpponentPiece() throws {
-        let entry = OpeningLibraryEntry(
-            family: "Test", category: "C",
-            pgn: "1. e4 1... e5 2. Nf3", hasBlack: true
-        )
-        let viewModel = try #require(OpeningLineTrainingViewModel(entry: entry, color: .white))
-
-        // Pièce noire alors que c'est aux blancs : ne doit PAS coûter un essai.
-        viewModel.attemptMove(from: Square("e7"), to: Square("e5"))
-
-        #expect(viewModel.attemptsRemaining == 3)
-        #expect(viewModel.currentStep == 0)
-    }
-
-    // MARK: Bug n°4 — partie reprise : la pendule doit repartir
-
     @Test func resumedTwoPlayerGameRestartsTheClockForTheSideToMove() throws {
         var settings = TwoPlayerGameSettings.default
         settings.timeControlID = TimeControl.blitz5_0.id

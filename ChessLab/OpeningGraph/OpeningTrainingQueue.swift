@@ -24,6 +24,29 @@ struct OpeningProgressSnapshot {
 /// Le ViewModel fournit les cours et un instantané de progression par FEN.
 enum OpeningTrainingQueue {
 
+    /// La LIGNE PRINCIPALE d'un cours : rôle `mainLine` d'abord, popularité
+    /// sinon, bornée et protégée des cycles de transposition.
+    ///
+    /// Vivait dans `OpeningLearnViewModel` — supprimé le 18/08 avec le flux
+    /// Explorateur (bug18aout §1, option A) : la file d'entraînement était
+    /// son dernier consommateur vivant.
+    static func mainLine(of course: OpeningCourse) -> (edges: [MoveEdge], fromKeys: [String]) {
+        var edges: [MoveEdge] = []
+        var fromKeys: [String] = []
+        var key = course.rootFEN
+        var visited: Set<String> = []
+        while let node = course.node(at: key), !node.moves.isEmpty, !visited.contains(key), edges.count < 60 {
+            visited.insert(key)
+            let edge = node.moves.first { $0.role == .mainLine }
+                ?? node.moves.max(by: { ($0.popularityClub ?? 0) < ($1.popularityClub ?? 0) })
+            guard let edge else { break }
+            edges.append(edge)
+            fromKeys.append(key)
+            key = edge.toFEN
+        }
+        return (edges, fromKeys)
+    }
+
     /// Toutes les positions entraînables d'un cours : au trait du camp d'étude
     /// ET dotées d'un coup de ligne principale (la « bonne réponse »).
     static func trainableCards(of course: OpeningCourse) -> [TrainCard] {
@@ -43,7 +66,7 @@ enum OpeningTrainingQueue {
     /// Positions entraînables d'un cours DANS L'ORDRE de la ligne principale
     /// (pour le mode « ligne complète sans filet »).
     static func lineCards(of course: OpeningCourse) -> [TrainCard] {
-        let line = OpeningLearnViewModel.mainLine(of: course)
+        let line = mainLine(of: course)
         var cards: [TrainCard] = []
         for (edge, fromKey) in zip(line.edges, line.fromKeys) {
             let side = OpeningFENKey.position(from: fromKey)?.sideToMove

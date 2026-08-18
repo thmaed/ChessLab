@@ -36,7 +36,7 @@ enum EcoOpeningLoader {
     /// ``EcoOpeningLookup``. `eco` vide : ces lignes servent la PROFONDEUR,
     /// pas le nom (que ``standard`` fournit avec son code).
     private static func libraryLines() -> [EcoOpening] {
-        OpeningLibraryLoader.standard.map { entry in
+        OpeningTheoryLibrary.standard.map { entry in
             EcoOpening(eco: "", name: entry.family, moves: sanMoves(fromPGN: entry.pgn))
         }
     }

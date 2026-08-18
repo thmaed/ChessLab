@@ -86,7 +86,7 @@ enum OpeningCourseValidator {
     /// Rejoue un coup UCI depuis une FEN et retourne la clé normalisée de la
     /// position obtenue, ou `nil` si le coup est illégal/illisible. Gère la
     /// promotion (5ᵉ caractère UCI, défaut dame), même mécanique que
-    /// ``OpeningLineTrainingViewModel``.
+    /// l'ancien entraîneur de lignes (supprimé le 18/08).
     static func resultingKey(afterUCI uci: String, from fen: String) -> String? {
         guard uci.count >= 4, let position = OpeningFENKey.position(from: fen) else { return nil }
         let start = Square(String(uci.prefix(2)))

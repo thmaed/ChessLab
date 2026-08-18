@@ -3,10 +3,16 @@ import SwiftUI
 
 /// Lecteur d'ouverture : échiquier + « Précédent / Suivant », l'explication du
 /// coup, le fil des coups, et les variantes. Simple et guidé.
+// (« Continuer contre Stockfish » : sauvé du flux Explorateur supprimé —
+// bug18aout §1, option A. Lire la Lucena puis la GAGNER contre le moteur,
+// c'est le vrai test, surtout pour les Finales.)
 struct OpeningReaderView: View {
     @Bindable var viewModel: OpeningReaderViewModel
     let onExit: () -> Void
     var onTrain: () -> Void = {}
+    /// Continue la partie CONTRE STOCKFISH depuis la position affichée :
+    /// l'écran de réglages s'ouvre pré-rempli (l'utilisateur choisit l'Elo).
+    var onContinueVsStockfish: (String) -> Void = { _ in }
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
@@ -30,7 +36,17 @@ struct OpeningReaderView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
+            ToolbarItemGroup(placement: .topBarTrailing) {
+                Button {
+                    // FEN complète (6 champs) : la clé du graphe n'a que 4
+                    // champs, l'écran de réglages attend une FEN standard.
+                    let fen = OpeningFENKey.position(from: viewModel.currentKey)?.fen
+                        ?? viewModel.currentKey
+                    onContinueVsStockfish(fen)
+                } label: {
+                    Label("Jouer contre l'ordinateur d'ici", systemImage: "cpu")
+                }
+                .accessibilityIdentifier("reader_playFromHere")
                 Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
                     .tint(Theme.accent)
             }
@@ -298,13 +314,17 @@ struct OpeningReaderHost: View {
     let sessionKey: String
     let onExit: () -> Void
     var onTrain: () -> Void = {}
+    var onContinueVsStockfish: (String) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: OpeningReaderViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                OpeningReaderView(viewModel: viewModel, onExit: onExit, onTrain: onTrain)
+                OpeningReaderView(
+                    viewModel: viewModel, onExit: onExit, onTrain: onTrain,
+                    onContinueVsStockfish: onContinueVsStockfish
+                )
             } else {
                 ContentUnavailableView("Ouverture indisponible", systemImage: "questionmark.folder").appBackground()
             }
