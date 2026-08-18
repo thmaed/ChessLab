@@ -13,24 +13,55 @@ importance.*
 
 ---
 
-## 1. Le flux « Explorateur » d'ouvertures est mort — le supprimer ?
+## 1. Flux « Explorateur » mort — le brief pour décider (détaillé le 18/08)
 
-**Constat.** Personne ne pousse la route `openingExplorerPicker` : tout le
-sous-flux Explorateur → Explorer → Apprendre (3 routes, 3 hôtes,
-`OpeningCoursePickerView`, `OpeningExplorerView`, `OpeningLearnView`,
-~1 500 lignes avec leurs view models) est inatteignable depuis l'interface.
-Le commentaire de `HomeView` le dit d'ailleurs : « l'ancien Explorer/Apprendre
-reste défini mais n'est plus atteint depuis le flux principal ».
+**L'inventaire exact, mesuré.** Il y a en réalité DEUX sous-flux morts, pas
+un :
 
-**Déjà corrigé (sûr)** : le texte des Réglages qui envoyait l'utilisateur vers
-le bouton « Explorateur (🧭) » — un bouton qui n'existe plus ; et le filtre
-des finales dans le sélecteur, au cas où le flux serait ranimé.
+| Sous-flux | Écrans | Lignes | Atteignable ? |
+|---|---|---|---|
+| Explorateur → Explorer → Apprendre | `OpeningCoursePickerView` (181), `OpeningExplorerView` (278), `OpeningLearnView` (259) | ~720 + hôtes/routes | Non — personne ne pousse `openingExplorerPicker` |
+| Ancienne bibliothèque de lignes | `OpeningLibraryView`, `OpeningLineTrainingView` | ~400 + hôtes/routes | Non — personne ne pousse `activeOpeningLine` |
 
-**Proposition (à arbitrer)** : supprimer le sous-flux entier, OU le rebrancher
-quelque part. « Continuer contre Stockfish » depuis `OpeningLearnView` est une
-fonctionnalité que le lecteur actuel n'offre pas — si tu y tiens, elle
-mériterait d'être portée dans le lecteur plutôt que de garder trois écrans
-morts. Je n'ai pas tranché seul : c'est 1 500 lignes et un choix de produit.
+**Ce qui doit RESTER quoi qu'on décide** (partagé avec le flux vivant) :
+`OpeningExplorerViewModel.apply(uci:to:)` sert au lecteur ET à l'entraîneur ;
+`OpeningLearnViewModel.mainLine(of:)` sert à la file d'entraînement. Le reste
+de ces deux view models (~350 lignes) ne sert qu'aux écrans morts.
+
+**Ce que les écrans morts ont d'unique** : « Continuer contre Stockfish »
+depuis une position de cours — jouer la suite de la ligne contre le moteur,
+à SA force réglée. Le lecteur vivant ne l'offre pas, et c'est objectivement
+une bonne idée pédagogique (surtout pour les FINALES : lire la Lucena puis la
+GAGNER contre Stockfish, c'est le vrai test).
+
+### Option A — Supprimer, en sauvant l'idée (ma recommandation)
+
+1. Porter « Continuer contre Stockfish » dans le LECTEUR (bouton de barre :
+   la position courante part vers `Route.continueVsStockfish`, l'écran de
+   réglages existe déjà) — ~30 lignes, gros gain pour les finales.
+2. Extraire `mainLine(of:)` vers `OpeningTrainingQueue`, garder
+   `OpeningExplorerViewModel` (partagé).
+3. Supprimer les 4 écrans morts, leurs hôtes et leurs 5 routes.
+
+Bilan : **≈ −1 300 lignes**, une fonctionnalité sauvée et mise là où les
+utilisateurs passent, plus aucun écran fantôme à maintenir (ils ont déjà
+coûté deux correctifs « au cas où » cette semaine).
+
+### Option B — Réanimer l'Explorateur
+
+Rebrancher le sélecteur depuis Ouvertures (bouton boussole) et assumer DEUX
+façons d'apprendre le même cours (lecteur guidé + explorateur libre).
+Coût : 1-2 jours de réconciliation UX, et le risque de confusion que la
+simplification de l'app (ta demande d'hier) cherchait justement à éviter.
+
+### Option C — Statu quo
+
+Garder le code mort. Coût récurrent démontré : chaque évolution du modèle
+doit maintenir des écrans invisibles (le champ `kind` d'hier, le filtre
+d'avant-hier).
+
+**Ma recommandation : A.** Un mot de toi (« A », « B » ou « C ») et je
+l'exécute.
 
 ## 2. ✅ FAIT (arbitré le 18/08 au matin) — File de révision
 
