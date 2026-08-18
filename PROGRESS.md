@@ -5798,18 +5798,38 @@ la marche de roi qui faisait le travail disparaît avec lui.
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
-**Reste à faire** : environ 60 items du catalogue de référence restent à
-couvrir — la catégorie « fou contre cavalier » (2 sur 4 items couverts) et
-le reste des « déséquilibres matériels » (T+F, T+C, D contre pièces…) restent
-les familles les moins couvertes ;
-plusieurs positions demandent encore une recherche sourcée avant de pouvoir
-être dérivées (Centurini, Grigoriev, Lasker, cases conjuguées — la théorie
-la plus dense de tout l'échiquier) ; les thèmes transversaux (zugzwang,
-forteresses, principe des deux faiblesses…) seront traités en galeries
-multi-positions plutôt qu'en une racine chacun. Et toujours : le mat aux
-deux fous, et — v2 — l'entraînement libre arbitré par tablebase, embarquée
-en sous-sélection WDL (~15-25 Mo, lisible nativement par Stockfish via
-SyzygyPath) plutôt que les tables complètes (940 Mo, écartées).
+**Reste à faire** (mis à jour, 38 cours de finales, catalogue à 96) :
+environ 52 items du catalogue de référence restent à couvrir.
+
+- **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
+  `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini
+  reste ouvert (fou contre pions passés dans les finales de fous, jamais
+  nommément sourcé — `same_color_bishops` couvre une forteresse générique
+  du même esprit, sans porter le nom).
+- **Lasker (Lasker-Reichhelm, Fine #70) tenté et bloqué** : position source
+  exacte trouvée (`8/k7/3p4/p2P1p2/P2P1P2/8/8/K7`), mais 8 pièces réparties
+  sur les DEUX ailes — l'oracle en ligne répond `unknown`, le même plafond
+  déjà rencontré cette session sur les configurations tour+pions à 9 pièces.
+  Resterait possible en mode « vérifié moteur » (comme la percée), pas en
+  vérité tablebase telle quelle.
+- **Fou contre cavalier, les deux derniers items** (Fischer-Taimanov 1971,
+  Karpov-Kasparov 1984) tentés et reportés : ce sont des parties réelles à
+  matériel TOUR+fou/cavalier (pas fou/cavalier seuls), sur des dizaines de
+  coups avec de nombreux pions des deux ailes — bien au-delà de la fenêtre
+  tablebase, et le risque de mal transcrire une position précise à partir
+  d'une partie complète est réel. Les 2 items déjà livrés (Hall, Sam Loyd)
+  couvrent le cœur de la théorie fou-contre-cavalier ; ces deux-là
+  resteraient pour une session dédiée à l'analyse de parties complètes.
+- Le reste des « déséquilibres matériels » (T+F, T+C, D contre pièces…)
+  reste la famille la moins couverte après « fou contre cavalier ».
+- Les thèmes transversaux (zugzwang, forteresses, principe des deux
+  faiblesses…) seront traités en galeries multi-positions plutôt qu'en une
+  racine chacun — format encore à concevoir, rien de commencé.
+
+Et toujours : le mat aux deux fous, et — v2 — l'entraînement libre arbitré
+par tablebase, embarquée en sous-sélection WDL (~15-25 Mo, lisible
+nativement par Stockfish via SyzygyPath) plutôt que les tables complètes
+(940 Mo, écartées).
 
 ## Dix tests rouges que la campagne de contenu avait masqués (16/08)
 
