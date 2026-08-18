@@ -6468,3 +6468,60 @@ les coups qui ne perdent rien mais abandonnent une case, ouvrent une colonne à
 l'adversaire, isolent un pion, échangent le bon fou. Détectable par comparaison
 de traits de structure avant/après. C'est là que ça devient rare — ce n'est pas
 là que ça devient utile en premier.
+
+## Module Finales — nouvelle famille « Thèmes transversaux », 4 cours (18/08)
+
+Neuvième famille ajoutée au module (`themes` / « Thèmes transversaux »,
+icône ampoule) pour des principes qui traversent les familles matérielles
+existantes plutôt que d'appartenir à l'une d'elles. Quatre cours, tous
+construits depuis zéro et vérifiés à l'oracle (aucune étude sourcée retrouvée
+avec assez de certitude pour être citée honnêtement — voir plus bas pour la
+recherche tentée) :
+
+- **`eg-theme-two-weaknesses`** — le principe des deux faiblesses
+  (Capablanca) : roi+3 pions blancs (a5 passé, f3) contre roi+1 pion noir
+  (f6). Le pion a occupe le roi noir à lui seul ; pendant ce temps le pion f
+  avance sans opposition. Deux chapitres montrent les deux choix noirs
+  possibles (courir vers a5, ou garder f6) : dans les deux cas c'est
+  l'AUTRE faiblesse qui tombe. Racine à 5 pièces.
+- **`eg-theme-domination`** — dame contre cavalier en a8. Qd8+ couvre à la
+  fois l'échec, b6 ET c7 (diagonale a5-d8) : le cavalier n'a strictement
+  aucune case, la domination au sens plein. Un second chapitre (Qa4, attaque
+  la même pièce mais ne couvre ni b6 ni c7) montre la différence entre
+  « attaquer » et « dominer » — le cavalier s'échappe même avec un échec au
+  passage (Nc7+). Racine à 4 pièces.
+- **`eg-theme-stalemate-resource`** — dame contre tour, Noirs objectivement
+  perdus. La tour attaque la dame (Rb7) ; Qxb7 semble gratuit mais verrouille
+  g7 ET h7 par la 7e rangée pendant que le roi blanc tient g8 — pat, sans
+  échec. Un second chapitre montre la parade (toute autre case de dame que
+  b7 gagne normalement). Volontairement distinct de Saavedra (sous-promotion)
+  et de « Tour contre Fou — le bon coin » (forteresse à boucle), déjà au
+  catalogue. Racine à 4 pièces.
+- **`eg-theme-active-king`** — même matériel, mêmes pions, même tour dans
+  les deux chapitres d'une finale tour+pions ; seule différence : Ke3
+  (gagnant) contre Ke2 (nul), une case d'écart. Racine à 7 pièces : le
+  serveur ne fournit pas le DTM exact à cette taille, mais la catégorie
+  gain/nulle reste prouvée sur chaque coup. Volontairement une finale de
+  PIÈCES, pas une course de rois pure comme Grigoriev (déjà au catalogue).
+
+**Recherche tentée pour la domination** : Troitzky, Kubbel et Kasparyan ont
+tous composé sur le thème « cavalier dominé », mais aucune recherche n'a
+retrouvé de FEN exacte assez sourcée pour la citer sans risque de fabriquer
+une référence — le cours est donc honnêtement étiqueté construction, comme
+plusieurs des 58 cours déjà au catalogue.
+
+**Un bug de racine attrapé par `author.py` lui-même** : la première version
+de `two_weaknesses.py` utilisait encore la racine à 7 pièces abandonnée en
+cours de conception (2 pions par camp, f7+g7 vs f2+g2) au lieu de la racine
+à 5 pièces réellement vérifiée à l'oracle (f6 vs f3) — `illegal san: 'Kxf6'`
+à la compilation, corrigé avant tout audit. Rappel utile : copier-coller la
+mauvaise racine entre deux tentatives de construction est une catégorie
+d'erreur à part entière, distincte d'une ligne fausse.
+
+62 cours de finales au catalogue. Audit propre sur les 4 nouveaux :
+`✓ Chaque coup enseigné préserve son verdict théorique (tablebase)`. Une
+seule ligne informative (non bloquante) : le `Qxb7` piège de
+`eg-theme-stalemate-resource` est signalé « défense sous-optimale » côté
+adversaire, exactement l'effet recherché. `Localizable.xcstrings` : 4
+entrées ajoutées chirurgicalement (68 lignes, JSON valide re-vérifié après
+coup).

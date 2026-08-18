@@ -13053,6 +13053,74 @@
         }
       }
     },
+    "The Principle of Two Weaknesses" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Principle of Two Weaknesses"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le principe des deux faiblesses"
+          }
+        }
+      }
+    },
+    "Domination — the Knight With No Square" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Domination — the Knight With No Square"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La domination — le cavalier sans case"
+          }
+        }
+      }
+    },
+    "Stalemate as a Resource — the Rook's Last Trick" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stalemate as a Resource — the Rook's Last Trick"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pat comme ressource — le dernier tour de la tour"
+          }
+        }
+      }
+    },
+    "The Active King in a Rook Ending" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Active King in a Rook Ending"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le roi actif dans une finale de tours"
+          }
+        }
+      }
+    },
     "The Trebuchet" : {
       "extractionState" : "stale",
       "localizations" : {
