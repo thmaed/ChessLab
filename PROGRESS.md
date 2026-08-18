@@ -5611,6 +5611,14 @@ mémoire n'aurait jamais surprise.
 
 24 cours de finales, catalogue à 82.
 
+**Tour contre cavalier** livré ensuite : nouvelle famille « Déséquilibres
+matériels ». Sans pion, une tour ne bat PAS un cavalier seul — vérifié
+depuis plusieurs racines, y compris un cavalier délibérément séparé de son
+roi (toujours nulle : les cavaliers ont trop de ressources d'évasion). Utile
+autant pour ne pas se battre pour rien que pour ne pas résigner trop tôt.
+
+25 cours de finales, catalogue à 83.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 

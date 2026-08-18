@@ -13691,6 +13691,38 @@
           }
         }
       }
+    },
+    "Rook vs Knight" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre cavalier"
+          }
+        }
+      }
+    },
+    "Déséquilibres matériels" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Material imbalances"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déséquilibres matériels"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
