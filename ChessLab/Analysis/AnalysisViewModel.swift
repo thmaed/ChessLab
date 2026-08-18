@@ -1440,8 +1440,25 @@ final class AnalysisViewModel {
         //
         // En surchauffe, on renonce à l'affinage plutôt qu'à la passe de base :
         // mieux vaut tous les coups classés normalement que la moitié classés
-        // finement.
-        if !ThermalMonitor.shared.isThrottling,
+        // finement. Même renoncement en MODE ÉCONOMIE D'ÉNERGIE — mais sans
+        // toucher au budget de base, contrairement au chemin thermique : la
+        // surchauffe est rare et transitoire, le mode économie est un état
+        // banal (activé à 20 % de batterie) où dégrader AUSSI la passe de
+        // base se paierait trop souvent. L'affinage est l'essentiel du
+        // surcoût de la revue (≈ ×2,2) : c'est lui qu'on sacrifie, les
+        // verdicts de base restent pleins.
+        //
+        // Un coup de THÉORIE sera classé .book, un coup FORCÉ .best, quelle
+        // que soit l'éval (voir ``MoveClassifier/classify(_:)``) : affiner
+        // leur verdict serait payer jusqu'à 2 × 3M nœuds pour une étiquette
+        // qui n'en tient pas compte. Calculés ICI, avant l'affinage, et
+        // réutilisés dans l'`Input` plus bas.
+        let isBook = EcoOpeningLookup.isInBook(sanPath(to: index), in: EcoOpeningLoader.bookLines)
+        let isForced = legalMoveCount(at: parentIndex) == 1
+
+        if !isBook, !isForced,
+           !ThermalMonitor.shared.isThrottling,
+           !ProcessInfo.processInfo.isLowPowerModeEnabled,
            isBorderline(loss: max(0.0, winPercentBeforeMover - winPercentAfterMover)) {
             // Les closures donnent à la règle d'arrêt la DISTANCE du verdict
             // provisoire à la frontière la plus proche : pendant la recherche
@@ -1461,18 +1478,26 @@ final class AnalysisViewModel {
                 winPercentBeforeMover = mover == .white
                     ? deeperBefore.winPercent : 100 - deeperBefore.winPercent
             }
-            let beforeForChild = winPercentBeforeMover
-            if let deeperAfter = await refinedEval(
-                at: index, engine: engine,
-                lossDistance: { whiteWinPercent in
-                    let afterMover = isWhite ? whiteWinPercent : 100 - whiteWinPercent
-                    return Self.distanceToNearestThreshold(
-                        loss: max(0.0, beforeForChild - afterMover))
+            // RE-TEST entre les deux affinages : si celui du parent a déjà
+            // sorti la perte de la bande d'hésitation, l'enfant n'a plus rien
+            // à trancher — on s'épargne au moins son plancher d'1M nœuds. La
+            // paire mixte qui en résulte (parent affiné, enfant au budget de
+            // base) est déjà un état normal du système : c'est exactement ce
+            // que produit la garde anti-double-affinage dans l'autre sens.
+            if isBorderline(loss: max(0.0, winPercentBeforeMover - winPercentAfterMover)) {
+                let beforeForChild = winPercentBeforeMover
+                if let deeperAfter = await refinedEval(
+                    at: index, engine: engine,
+                    lossDistance: { whiteWinPercent in
+                        let afterMover = isWhite ? whiteWinPercent : 100 - whiteWinPercent
+                        return Self.distanceToNearestThreshold(
+                            loss: max(0.0, beforeForChild - afterMover))
+                    }
+                ) {
+                    after = deeperAfter
+                    winPercentAfterMover = mover == .white
+                        ? deeperAfter.winPercent : 100 - deeperAfter.winPercent
                 }
-            ) {
-                after = deeperAfter
-                winPercentAfterMover = mover == .white
-                    ? deeperAfter.winPercent : 100 - deeperAfter.winPercent
             }
         }
 
@@ -1492,11 +1517,11 @@ final class AnalysisViewModel {
             // parente, c'est-à-dire POV du joueur de CE coup.
             isBestMove: before.bestLan == move.lan,
             gapToSecondBest: before.gapToSecondBest,
-            isBook: EcoOpeningLookup.isInBook(sanPath(to: index), in: EcoOpeningLoader.bookLines),
+            isBook: isBook,
             isSacrifice: isSacrifice,
             sacrificeImmediatelyRecaptured: MoveClassifier.isImmediatelyRecaptured(move, byNext: nextMove),
             bestMoveWasTactical: bestMoveIsTactical(lan: before.bestLan, at: parentIndex),
-            isForced: legalMoveCount(at: parentIndex) == 1
+            isForced: isForced
         ))
 
         moveEvaluations[index] = AnalysisMoveEvaluation(
