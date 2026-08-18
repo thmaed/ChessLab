@@ -13788,6 +13788,22 @@
         }
       }
     },
+    "Queen vs Rook and Knight" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Rook and Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre tour et cavalier"
+          }
+        }
+      }
+    },
     "Queen vs Rook's Pawn — the Corner Draw" : {
       "localizations" : {
         "en" : {

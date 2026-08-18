@@ -5861,8 +5861,19 @@ que la bonne (`Ke6??` au lieu de `Kf8`) abandonne la protection de la tour
 
 **Le catalogue franchit les 100 cours** (42 finales + 58 ouvertures).
 
-**Reste à faire** (mis à jour, 42 cours de finales, catalogue à 100) :
-environ 48 items du catalogue de référence restent à couvrir.
+**Dame contre tour et cavalier** livrée en miroir immédiat — même
+construction que contre tour et fou. Fait notable : ce triangle-ci est
+encore PLUS solide. Depuis la racine, aucune tentative blanche testée par
+l'oracle ne trouve de faille, et après l'échec initial, les SIX réponses
+noires possibles tiennent toutes la nulle (contre une seule pour le fou,
+où `Ke6??` perdait). Le cavalier couvre des cases que le fou, prisonnier
+d'une seule couleur, ne peut jamais défendre — cours à un seul chapitre,
+aucun piège authentique trouvé malgré la recherche.
+
+43 cours de finales, catalogue à 101.
+
+**Reste à faire** (mis à jour, 43 cours de finales, catalogue à 101) :
+environ 47 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini
