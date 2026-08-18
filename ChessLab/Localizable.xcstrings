@@ -13772,6 +13772,22 @@
         }
       }
     },
+    "Rook and Wrong Rook's Pawn vs Bishop" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook and Wrong Rook's Pawn vs Bishop"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour et mauvais pion-tour contre fou"
+          }
+        }
+      }
+    },
     "Bishop vs Knight — the Long Diagonal" : {
       "localizations" : {
         "en" : {

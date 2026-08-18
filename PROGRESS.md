@@ -5759,6 +5759,17 @@ la défende — `Kxa2` la reprend gratuitement.
 
 35 cours de finales, catalogue à 93.
 
+**Tour et mauvais pion-tour contre fou** livrée ensuite — sourcée Fine &
+Benko (Basic Chess Endings, position de Berger citée par Wikipédia
+« Wrong rook pawn ») : la forteresse du mauvais pion-tour, déjà connue
+contre un fou seul (`eg-wrong-bishop`), résiste identique même quand
+l'attaquant a une TOUR ENTIÈRE de plus. Racine à 5 pièces. Trouvaille en
+explorant : offrir carrément la tour (`Rh7+`, non défendue) et la voir
+prise (`Kxh7`) transpose EXACTEMENT dans la forteresse du fou seul déjà
+au catalogue — un lien concret entre deux cours plutôt qu'une coïncidence.
+
+36 cours de finales, catalogue à 94.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
