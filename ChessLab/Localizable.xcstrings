@@ -2275,6 +2275,57 @@
         }
       }
     },
+    "Bishop vs Knight — Sam Loyd's Fortress" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bishop vs Knight — Sam Loyd's Fortress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fou contre cavalier — la forteresse de Sam Loyd"
+          }
+        }
+      }
+    },
+    "Bishop vs Knight — the Long Diagonal" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bishop vs Knight — the Long Diagonal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fou contre cavalier — la longue diagonale"
+          }
+        }
+      }
+    },
+    "Bishop vs Two Separated Pawns" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bishop vs Two Separated Pawns"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fou contre deux pions séparés"
+          }
+        }
+      }
+    },
     "Bishop's Opening" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2933,6 +2984,23 @@
         }
       }
     },
+    "Centurini — the Right Square" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centurini — the Right Square"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centurini — la bonne case"
+          }
+        }
+      }
+    },
     "Cette action est définitive." : {
 
     },
@@ -2967,6 +3035,9 @@
           }
         }
       }
+    },
+    "Changer de mode" : {
+
     },
     "Chapitre %d" : {
       "localizations" : {
@@ -3419,6 +3490,40 @@
         }
       }
     },
+    "Connected Passers on the 6th Rank vs Rook" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected Passers on the 6th Rank vs Rook"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pions liés en 6e contre tour"
+          }
+        }
+      }
+    },
+    "Connected Passers vs Rook" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected Passers vs Rook"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deux pions liés contre tour"
+          }
+        }
+      }
+    },
     "Construire" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -3667,6 +3772,23 @@
     },
     "Copier la position FEN" : {
 
+    },
+    "Corresponding Squares" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corresponding Squares"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cases conjuguées"
+          }
+        }
+      }
     },
     "Côte à côte" : {
       "localizations" : {
@@ -3940,6 +4062,23 @@
     },
     "CSV" : {
 
+    },
+    "Cut Off Before You Push" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cut Off Before You Push"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couper avant de pousser"
+          }
+        }
+      }
     },
     "Czech Defense" : {
       "extractionState" : "stale",
@@ -4236,6 +4375,22 @@
     },
     "Dernière vérification : %@" : {
 
+    },
+    "Déséquilibres matériels" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Material imbalances"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déséquilibres matériels"
+          }
+        }
+      }
     },
     "Deux joueurs" : {
       "localizations" : {
@@ -5212,6 +5367,22 @@
         }
       }
     },
+    "Finales de cavaliers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight endings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales de cavaliers"
+          }
+        }
+      }
+    },
     "Finales de dames" : {
       "localizations" : {
         "en" : {
@@ -5224,6 +5395,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Finales de dames"
+          }
+        }
+      }
+    },
+    "Finales de fous" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bishop endings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales de fous"
           }
         }
       }
@@ -5480,6 +5667,23 @@
         }
       }
     },
+    "Frontal Defence" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frontal Defence"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense frontale"
+          }
+        }
+      }
+    },
     "Gaffe" : {
       "localizations" : {
         "en" : {
@@ -5661,6 +5865,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Grand roque noir (O-O-O)"
+          }
+        }
+      }
+    },
+    "Grigoriev's Study — the Only King Move" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grigoriev's Study — the Only King Move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Étude de Grigoriev — le seul coup de roi"
           }
         }
       }
@@ -6681,6 +6902,74 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture du pion roi"
+          }
+        }
+      }
+    },
+    "Kingside Pawn Majority" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kingside Pawn Majority"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Majorité de pions à l'aile roi"
+          }
+        }
+      }
+    },
+    "Knight and Pawn vs Knight" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight and Pawn vs Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cavalier et pion contre cavalier"
+          }
+        }
+      }
+    },
+    "Knight vs Pawns on Both Wings" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight vs Pawns on Both Wings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pions sur les deux ailes contre cavalier"
+          }
+        }
+      }
+    },
+    "Knight vs Two Separated Pawns" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight vs Two Separated Pawns"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cavalier contre deux pions séparés"
           }
         }
       }
@@ -9864,6 +10153,108 @@
         }
       }
     },
+    "Queen vs Rook" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Rook"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre tour"
+          }
+        }
+      }
+    },
+    "Queen vs Rook and Bishop" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Rook and Bishop"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre tour et fou"
+          }
+        }
+      }
+    },
+    "Queen vs Rook and Knight" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Rook and Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre tour et cavalier"
+          }
+        }
+      }
+    },
+    "Queen vs Rook and Pawn — the Fortress" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Rook and Pawn — the Fortress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre tour et pion — la forteresse"
+          }
+        }
+      }
+    },
+    "Queen vs Rook's Pawn — the Corner Draw" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Rook's Pawn — the Corner Draw"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre pion-tour en 7e — la nulle du coin"
+          }
+        }
+      }
+    },
+    "Queen vs Two Rooks" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Two Rooks"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre deux tours"
+          }
+        }
+      }
+    },
     "Queen's Gambit" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -11126,6 +11517,108 @@
         }
       }
     },
+    "Rook and Pawn vs Knight" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook and Pawn vs Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour et pion contre cavalier"
+          }
+        }
+      }
+    },
+    "Rook and Two Connected Pawns vs Rook" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook and Two Connected Pawns vs Rook"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour et deux pions liés contre tour"
+          }
+        }
+      }
+    },
+    "Rook and Wrong Rook's Pawn vs Bishop" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook and Wrong Rook's Pawn vs Bishop"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour et mauvais pion-tour contre fou"
+          }
+        }
+      }
+    },
+    "Rook vs Bishop" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Bishop"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre fou"
+          }
+        }
+      }
+    },
+    "Rook vs Bishop — the Safe Corner" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Bishop — the Safe Corner"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre fou — le bon coin"
+          }
+        }
+      }
+    },
+    "Rook vs Knight" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre cavalier"
+          }
+        }
+      }
+    },
     "Rook vs Pawn" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -11139,6 +11632,40 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tour contre pion"
+          }
+        }
+      }
+    },
+    "Rook vs Rook and Bishop — the Szén Position" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Rook and Bishop — the Szén Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre tour et fou — la position de Szén"
+          }
+        }
+      }
+    },
+    "Rook vs Rook and Knight" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Rook and Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre tour et cavalier"
           }
         }
       }
@@ -11222,6 +11749,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sacrifice"
+          }
+        }
+      }
+    },
+    "Same-Coloured Bishops: Fortress" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same-Coloured Bishops: Fortress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fous de même couleur : la forteresse"
           }
         }
       }
@@ -11525,6 +12069,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Session sans enregistrement"
+          }
+        }
+      }
+    },
+    "Short-Side Defence" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Short-Side Defence"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La défense du petit côté"
           }
         }
       }
@@ -12186,6 +12747,74 @@
     "Terminer la sélection" : {
 
     },
+    "The Cochrane Defence" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Cochrane Defence"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La défense Cochrane"
+          }
+        }
+      }
+    },
+    "The Flaw in Bahr's Rule" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Flaw in Bahr's Rule"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La faille de la règle de Bahr"
+          }
+        }
+      }
+    },
+    "The Horwitz-Kling Fortress That Isn't" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Horwitz-Kling Fortress That Isn't"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La forteresse de Horwitz-Kling qui n'existe pas"
+          }
+        }
+      }
+    },
+    "The Karstedt Fortress" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Karstedt Fortress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La forteresse de Karstedt"
+          }
+        }
+      }
+    },
     "The Lucena Position" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -12220,6 +12849,23 @@
         }
       }
     },
+    "The Outside Passed Pawn" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Outside Passed Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pion passé éloigné"
+          }
+        }
+      }
+    },
     "The Pawn Breakthrough" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -12250,6 +12896,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La position de Philidor"
+          }
+        }
+      }
+    },
+    "The Protected Passed Pawn" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Protected Passed Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pion passé protégé"
           }
         }
       }
@@ -12335,6 +12998,125 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La règle du carré"
+          }
+        }
+      }
+    },
+    "The Saavedra Position" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Saavedra Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La position de Saavedra"
+          }
+        }
+      }
+    },
+    "The Second-Rank Defence" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Second-Rank Defence"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La défense de la 2e rangée"
+          }
+        }
+      }
+    },
+    "The Tarrasch Rule's Famous Exception" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Tarrasch Rule's Famous Exception"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'exception célèbre à la règle de Tarrasch"
+          }
+        }
+      }
+    },
+    "The Trebuchet" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Trebuchet"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le trébuchet"
+          }
+        }
+      }
+    },
+    "The Vancura Position" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Vancura Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La position de Vančura"
+          }
+        }
+      }
+    },
+    "The Vertical Cut-Off" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Vertical Cut-Off"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La coupure verticale"
+          }
+        }
+      }
+    },
+    "The Wrong Bishop" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Wrong Bishop"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mauvais fou"
           }
         }
       }
@@ -12677,6 +13459,23 @@
         }
       }
     },
+    "Triangulation" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triangulation"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triangulation"
+          }
+        }
+      }
+    },
     "Trompowsky Attack" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -12739,6 +13538,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trouvez mieux que %@"
+          }
+        }
+      }
+    },
+    "Two Knights vs Pawn" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two Knights vs Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deux cavaliers contre un pion"
           }
         }
       }
@@ -13400,6 +14216,23 @@
         }
       }
     },
+    "Which Piece to Capture?" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Which Piece to Capture?"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cavalier ou fou : lequel prendre ?"
+          }
+        }
+      }
+    },
     "Yusupov-Rubinstein System" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -13464,758 +14297,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Zukertort"
-          }
-        }
-      }
-    },
-    "The Vancura Position" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Vancura Position"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La position de Vančura"
-          }
-        }
-      }
-    },
-    "The Saavedra Position" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Saavedra Position"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La position de Saavedra"
-          }
-        }
-      }
-    },
-    "The Trebuchet" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Trebuchet"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le trébuchet"
-          }
-        }
-      }
-    },
-    "Short-Side Defence" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Short-Side Defence"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La défense du petit côté"
-          }
-        }
-      }
-    },
-    "Queen vs Rook" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen vs Rook"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dame contre tour"
-          }
-        }
-      }
-    },
-    "The Wrong Bishop" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Wrong Bishop"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le mauvais fou"
-          }
-        }
-      }
-    },
-    "The Vertical Cut-Off" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Vertical Cut-Off"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La coupure verticale"
-          }
-        }
-      }
-    },
-    "Finales de fous" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bishop endings"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finales de fous"
-          }
-        }
-      }
-    },
-    "Triangulation" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Triangulation"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Triangulation"
-          }
-        }
-      }
-    },
-    "Knight and Pawn vs Knight" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Knight and Pawn vs Knight"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cavalier et pion contre cavalier"
-          }
-        }
-      }
-    },
-    "Knight vs Pawns on Both Wings" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Knight vs Pawns on Both Wings"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pions sur les deux ailes contre cavalier"
-          }
-        }
-      }
-    },
-    "Finales de cavaliers" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Knight endings"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Finales de cavaliers"
-          }
-        }
-      }
-    },
-    "Connected Passers vs Rook" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connected Passers vs Rook"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deux pions liés contre tour"
-          }
-        }
-      }
-    },
-    "The Protected Passed Pawn" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Protected Passed Pawn"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le pion passé protégé"
-          }
-        }
-      }
-    },
-    "Kingside Pawn Majority" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Kingside Pawn Majority"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Majorité de pions à l'aile roi"
-          }
-        }
-      }
-    },
-    "Rook vs Knight" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook vs Knight"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour contre cavalier"
-          }
-        }
-      }
-    },
-    "Frontal Defence" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Frontal Defence"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Défense frontale"
-          }
-        }
-      }
-    },
-    "Connected Passers on the 6th Rank vs Rook" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connected Passers on the 6th Rank vs Rook"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pions liés en 6e contre tour"
-          }
-        }
-      }
-    },
-    "Which Piece to Capture?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Which Piece to Capture?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cavalier ou fou : lequel prendre ?"
-          }
-        }
-      }
-    },
-    "Two Knights vs Pawn" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Two Knights vs Pawn"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deux cavaliers contre un pion"
-          }
-        }
-      }
-    },
-    "The Karstedt Fortress" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Karstedt Fortress"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La forteresse de Karstedt"
-          }
-        }
-      }
-    },
-    "Corresponding Squares" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Corresponding Squares"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cases conjuguées"
-          }
-        }
-      }
-    },
-    "The Outside Passed Pawn" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Outside Passed Pawn"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le pion passé éloigné"
-          }
-        }
-      }
-    },
-    "Grigoriev's Study — the Only King Move" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Grigoriev's Study — the Only King Move"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Étude de Grigoriev — le seul coup de roi"
-          }
-        }
-      }
-    },
-    "Queen vs Rook and Pawn — the Fortress" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen vs Rook and Pawn — the Fortress"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dame contre tour et pion — la forteresse"
-          }
-        }
-      }
-    },
-    "Queen vs Two Rooks" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen vs Two Rooks"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dame contre deux tours"
-          }
-        }
-      }
-    },
-    "Queen vs Rook and Bishop" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen vs Rook and Bishop"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dame contre tour et fou"
-          }
-        }
-      }
-    },
-    "Queen vs Rook and Knight" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen vs Rook and Knight"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dame contre tour et cavalier"
-          }
-        }
-      }
-    },
-    "Queen vs Rook's Pawn — the Corner Draw" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen vs Rook's Pawn — the Corner Draw"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dame contre pion-tour en 7e — la nulle du coin"
-          }
-        }
-      }
-    },
-    "Rook vs Bishop" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook vs Bishop"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour contre fou"
-          }
-        }
-      }
-    },
-    "Rook vs Bishop — the Safe Corner" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook vs Bishop — the Safe Corner"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour contre fou — le bon coin"
-          }
-        }
-      }
-    },
-    "Rook and Wrong Rook's Pawn vs Bishop" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook and Wrong Rook's Pawn vs Bishop"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour et mauvais pion-tour contre fou"
-          }
-        }
-      }
-    },
-    "Rook and Pawn vs Knight" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook and Pawn vs Knight"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour et pion contre cavalier"
-          }
-        }
-      }
-    },
-    "Cut Off Before You Push" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cut Off Before You Push"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Couper avant de pousser"
-          }
-        }
-      }
-    },
-    "Rook and Two Connected Pawns vs Rook" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook and Two Connected Pawns vs Rook"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour et deux pions liés contre tour"
-          }
-        }
-      }
-    },
-    "Rook vs Rook and Bishop — the Szén Position" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook vs Rook and Bishop — the Szén Position"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour contre tour et fou — la position de Szén"
-          }
-        }
-      }
-    },
-    "The Cochrane Defence" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Cochrane Defence"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La défense Cochrane"
-          }
-        }
-      }
-    },
-    "The Second-Rank Defence" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Second-Rank Defence"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La défense de la 2e rangée"
-          }
-        }
-      }
-    },
-    "Rook vs Rook and Knight" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook vs Rook and Knight"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour contre tour et cavalier"
-          }
-        }
-      }
-    },
-    "Bishop vs Knight — the Long Diagonal" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bishop vs Knight — the Long Diagonal"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fou contre cavalier — la longue diagonale"
-          }
-        }
-      }
-    },
-    "Bishop vs Knight — Sam Loyd's Fortress" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bishop vs Knight — Sam Loyd's Fortress"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fou contre cavalier — la forteresse de Sam Loyd"
-          }
-        }
-      }
-    },
-    "The Tarrasch Rule's Famous Exception" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Tarrasch Rule's Famous Exception"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'exception célèbre à la règle de Tarrasch"
-          }
-        }
-      }
-    },
-    "Déséquilibres matériels" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Material imbalances"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Déséquilibres matériels"
-          }
-        }
-      }
-    },
-    "Knight vs Two Separated Pawns" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Knight vs Two Separated Pawns"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cavalier contre deux pions séparés"
-          }
-        }
-      }
-    },
-    "Same-Coloured Bishops: Fortress" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Same-Coloured Bishops: Fortress"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fous de même couleur : la forteresse"
-          }
-        }
-      }
-    },
-    "Bishop vs Two Separated Pawns" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bishop vs Two Separated Pawns"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Fou contre deux pions séparés"
-          }
-        }
-      }
-    },
-    "Centurini — the Right Square" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Centurini — the Right Square"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Centurini — la bonne case"
           }
         }
       }

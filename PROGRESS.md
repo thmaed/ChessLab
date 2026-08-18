@@ -6063,8 +6063,34 @@ de croquer l'un des deux pions et tenir la nulle avec l'autre.
 
 56 cours de finales, catalogue à 114.
 
-**Reste à faire** (mis à jour, 56 cours de finales, catalogue à 114) :
-environ 34 items du catalogue de référence restent à couvrir.
+**La faille de la règle de Bahr** livrée ensuite — sourcée ARVES
+(Francesco Santelli, « The flaw in Bahr's rule »), dans le même esprit que
+Neustadtl-Porges documenté plus haut : une règle classique corrigée par
+l'oracle. La règle de Bahr prétend que trois conditions réunies (pions-
+tours bloqués, roi attaquant collé à son pion, roi défenseur devant)
+suffisent à gagner. Racine à 5 pièces : confirmé faux — nulle, les blancs
+au trait. Fait vérifié en prime, non joué mais noté : la MÊME position
+avec les NOIRS au trait est gagnée pour les blancs (« manœuvre de John
+Crum ») — un cas net où le trait seul renverse tout le verdict, sans
+qu'aucune des trois conditions de la règle ne change.
+
+57 cours de finales, catalogue à 115.
+
+**La forteresse de Horwitz-Kling qui n'existe pas** livrée dans la foulée
+— deuxième « règle corrigée par tablebase » de la session : Horwitz et
+Kling pensaient en 1851 qu'une forteresse défensive existait pour deux
+fous contre cavalier. Il n'y en a pas — gain général, confirmé jusqu'à
+78 coups. Racine à 5 pièces, mais dtm 127 : la technique la plus longue
+rencontrée cette session, largement au-delà de ce qu'une ligne complète
+pourrait montrer utilement. Cours délibérément réduit au strict minimum —
+seulement la décision de départ (`Kd3!` gagne, `Bc2??` ne fait que la
+nulle) — plutôt que de forcer une ligne de 63 coups qui n'apprendrait
+rien de plus que « suivez l'oracle ».
+
+58 cours de finales, catalogue à 116.
+
+**Reste à faire** (mis à jour, 58 cours de finales, catalogue à 116) :
+environ 32 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini
