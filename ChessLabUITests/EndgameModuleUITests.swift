@@ -28,8 +28,19 @@ final class EndgameModuleUITests: XCTestCase {
             sidebarRow.tap()
         }
 
-        // La liste groupée : la Lucena est dans « Finales de tours ».
+        // La liste groupée : la Lucena est dans « Finales de tours », mais la
+        // famille « Finales de pions » qui précède a grandi avec le
+        // catalogue — la ligne est maintenant hors du premier écran. Une
+        // `List` SwiftUI ne matérialise pas les lignes hors-écran pour
+        // l'accessibilité, il faut donc faire défiler pour l'atteindre
+        // (même parade que ``RecentGamesUITests``/``AnalysisReviewUITests``).
         let lucena = app.buttons["endgame_eg-lucena"]
+        var scrollTries = 0
+        while !lucena.exists, scrollTries < 12 {
+            app.swipeUp()
+            RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+            scrollTries += 1
+        }
         XCTAssertTrue(lucena.waitForExistence(timeout: 10), "le cours Lucena doit être listé")
         // La section des familles existe (l'en-tête est du texte statique).
         XCTAssertTrue(app.staticTexts["Finales de tours"].exists

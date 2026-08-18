@@ -6618,3 +6618,19 @@ champ, déjà correctement localisé via `LocalizedStringKey`) : le repli
 premier lancement (aucun réglage sauvegardé), l'annonce VoiceOver de
 `TwoPlayerViewModel.announceMove`, et le suffixe « (Blancs)/(Noirs) » du
 dialogue d'abandon.
+
+## Le bug Lucena, résolu : c'était le test, pas l'app (18/08)
+
+Suite du signalement précédent (« bug UI pré-existant isolé »). En reprenant
+l'investigation : la famille « Finales de pions », qui précède « Finales de
+tours » dans la liste, compte désormais 12 cours — la ligne Lucena se
+retrouve à la ~14e ligne affichée (après l'en-tête pions, ses 12 lignes, et
+l'en-tête tours). Une `List` SwiftUI ne matérialise pas les lignes trop
+loin hors-écran dans l'arbre d'accessibilité : `waitForExistence` du test
+attendait un élément que rien ne rendait encore.
+
+**Pas un bug de l'app** — les données et l'écran sont corrects, seul le
+test ne défilait jamais. Corrigé par la même parade déjà utilisée dans
+`RecentGamesUITests`/`AnalysisReviewUITests` : une boucle `swipeUp` bornée
+(12 essais) avant `waitForExistence`. Vérifié isolément (passe en 22 s),
+puis suite complète relancée pour confirmer l'absence d'autre régression.
