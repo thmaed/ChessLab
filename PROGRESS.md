@@ -5808,11 +5808,24 @@ coup. La marge entre forteresse et mat tenait à une seule case de tour.
 
 39 cours de finales, catalogue à 97.
 
+**Tour et cavalier contre tour** livrée en miroir immédiat — là où le fou
+l'emporte en général sur une tour seule (avec des exceptions comme Szén),
+le cavalier ne l'emporte PRESQUE JAMAIS : il manque la portée nécessaire
+pour aider sa tour à construire un filet de mat. Vérifié depuis une
+position neutre : les VINGT coups blancs légaux à la racine retombent tous
+sur la même nulle — y compris une ligne où les noirs gagnent le cavalier
+purement et simplement (`Rxa4`), sans que le résultat change d'un iota. Pas
+de piège trouvé cette fois : la position est trop uniformément nulle pour
+qu'aucun coup blanc ne dégrade quoi que ce soit — cours à un seul chapitre,
+comme les autres forteresses « pièce en plus qui ne suffit pas ».
+
+40 cours de finales, catalogue à 98.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
-**Reste à faire** (mis à jour, 39 cours de finales, catalogue à 97) :
-environ 51 items du catalogue de référence restent à couvrir.
+**Reste à faire** (mis à jour, 40 cours de finales, catalogue à 98) :
+environ 50 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini
@@ -5833,10 +5846,11 @@ environ 51 items du catalogue de référence restent à couvrir.
   d'une partie complète est réel. Les 2 items déjà livrés (Hall, Sam Loyd)
   couvrent le cœur de la théorie fou-contre-cavalier ; ces deux-là
   resteraient pour une session dédiée à l'analyse de parties complètes.
-- **Tour et fou contre tour est FAIT** (`eg-rook-vs-rook-and-bishop`,
-  position de Szén) — retiré de la liste. Le reste des « déséquilibres
-  matériels » (T+C contre T, D contre pièces…) reste la famille la moins
-  couverte après « fou contre cavalier ».
+- **Tour et fou contre tour, et tour et cavalier contre tour sont FAITS**
+  (`eg-rook-vs-rook-and-bishop`, position de Szén ; `eg-rook-vs-rook-and-knight`)
+  — retirés de la liste. Le reste des « déséquilibres matériels » (dame
+  contre tour+fou/cavalier, dame contre deux pièces mineures…) reste la
+  famille la moins couverte après « fou contre cavalier ».
 - Les thèmes transversaux (zugzwang, forteresses, principe des deux
   faiblesses…) seront traités en galeries multi-positions plutôt qu'en une
   racine chacun — format encore à concevoir, rien de commencé.

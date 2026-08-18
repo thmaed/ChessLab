@@ -13836,6 +13836,22 @@
         }
       }
     },
+    "Rook vs Rook and Knight" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Rook and Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre tour et cavalier"
+          }
+        }
+      }
+    },
     "Bishop vs Knight — the Long Diagonal" : {
       "localizations" : {
         "en" : {
