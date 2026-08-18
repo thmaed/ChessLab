@@ -13755,6 +13755,22 @@
           }
         }
       }
+    },
+    "Bishop vs Two Separated Pawns" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bishop vs Two Separated Pawns"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fou contre deux pions séparés"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

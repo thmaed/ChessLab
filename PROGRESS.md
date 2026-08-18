@@ -5637,6 +5637,15 @@ de départ.
 
 27 cours de finales, catalogue à 85.
 
+**Fou contre deux pions séparés** livré ensuite, même seuil de rang (5e
+tient, 6e perd) que la version cavalier — avec une asymétrie propre au fou,
+révélée par l'oracle : SEUL h7 gagne à la racine, pas a7, alors même que le
+fou d4 semblait couvrir la diagonale des deux ailes. Il ne couvre en réalité
+qu'UN sens de fuite à la fois — la portée en ligne droite d'un fou n'est
+pas une omniscience.
+
+28 cours de finales, catalogue à 86.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
