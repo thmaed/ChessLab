@@ -5897,8 +5897,33 @@ victoire dans toutes les tentatives testées à la racine.
 
 45 cours de finales, catalogue à 103.
 
-**Reste à faire** (mis à jour, 45 cours de finales, catalogue à 103) :
-environ 45 items du catalogue de référence restent à couvrir.
+**Recherches en parallèle** (première fois cette session, à la demande de
+l'utilisateur) : quatre requêtes web lancées simultanément plutôt qu'une
+par une. Deux pistes mortes de plus (Centurini et « cavalier deux ailes » :
+principes généraux trouvés, aucune position exacte sourcée ; Lasker-
+Tarrasch 1914 : référence introuvable sur la page Wikipédia de Lasker).
+Une piste payante : « tour seule contre pions liés » cite un seuil précis
+— 6e rangée bat la tour, 5e rangée la tour tient — repris directement du
+principe plutôt que d'une partie précise, et confirmé à l'oracle à
+condition d'égaliser l'implication des DEUX rois (mon premier essai, roi
+défenseur proche de l'action et roi attaquant loin, faussait la
+comparaison : il faut les deux rois symétriquement hors-jeu pour isoler
+l'effet du rang). **Pions liés en 6e contre tour** livrée : le seuil se
+vérifie à la lettre, et perdre un seul tempo (`Kc1??` avant de pousser)
+suffit à laisser le roi noir revenir à temps et inverser tout le verdict.
+
+**Incident mineur, corrigé** : une insertion de localisation a ponctuellement
+produit un diff de 638 lignes au lieu des ~16 attendues (flûté, cause non
+identifiée — probablement une écriture concurrente pendant que le fichier
+était relu). Détecté immédiatement par la vérification systématique du
+diff après chaque édition, annulé (`git checkout`), refait à l'identique :
+diff propre au deuxième essai. La discipline de vérification a fonctionné
+comme prévu.
+
+46 cours de finales, catalogue à 104.
+
+**Reste à faire** (mis à jour, 46 cours de finales, catalogue à 104) :
+environ 44 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini

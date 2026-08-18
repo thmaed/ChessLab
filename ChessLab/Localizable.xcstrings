@@ -13724,6 +13724,22 @@
         }
       }
     },
+    "Connected Passers on the 6th Rank vs Rook" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected Passers on the 6th Rank vs Rook"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pions liés en 6e contre tour"
+          }
+        }
+      }
+    },
     "Corresponding Squares" : {
       "localizations" : {
         "en" : {
