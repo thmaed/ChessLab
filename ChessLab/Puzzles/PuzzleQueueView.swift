@@ -17,6 +17,9 @@ struct PuzzleQueueView: View {
     /// ``PuzzleSolveViewModel``, qui tire les puzzles un à un tant que
     /// l'utilisateur enchaîne.
     let onStartSession: (PuzzleSessionFilter) -> Void
+    var onOpenLab: () -> Void = {}
+    var onPlayVsEngine: () -> Void = {}
+    var onOpenTwoPlayer: () -> Void = {}
 
     @Environment(\.modelContext) private var modelContext
 
@@ -121,6 +124,13 @@ struct PuzzleQueueView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                QuickSwitchMenu(
+                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                )
+            }
+        }
         .onAppear { refresh() }
     }
 

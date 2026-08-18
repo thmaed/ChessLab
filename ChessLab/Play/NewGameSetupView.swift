@@ -11,6 +11,8 @@ import SwiftUI
 /// aux derniers réglages.
 struct NewGameSetupView: View {
     let onStart: (PlayGameSettings) -> Void
+    var onOpenLab: () -> Void = {}
+    var onOpenTwoPlayer: () -> Void = {}
     /// Titre de barre : « Nouvelle partie » par défaut, « Continuer la partie »
     /// quand on prolonge une position existante.
     private let navigationTitleKey: LocalizedStringKey
@@ -45,8 +47,13 @@ struct NewGameSetupView: View {
     ///   Stockfish »). Quand elle est fournie, la case « Position personnalisée »
     ///   est cochée, le champ FEN pré-rempli, et le camp au trait dans la FEN
     ///   devient celui de l'utilisateur — l'autre est joué par le moteur.
-    init(initialFEN: String? = nil, onStart: @escaping (PlayGameSettings) -> Void) {
+    init(
+        initialFEN: String? = nil, onStart: @escaping (PlayGameSettings) -> Void,
+        onOpenLab: @escaping () -> Void = {}, onOpenTwoPlayer: @escaping () -> Void = {}
+    ) {
         self.onStart = onStart
+        self.onOpenLab = onOpenLab
+        self.onOpenTwoPlayer = onOpenTwoPlayer
         self.navigationTitleKey = initialFEN == nil ? "Nouvelle partie" : "Continuer la partie"
         let saved = PlaySettingsStore.load() ?? .default
 
@@ -262,6 +269,12 @@ struct NewGameSetupView: View {
                 Button("Commencer") { start() }
                     .fontWeight(.semibold)
                     .tint(Theme.accent)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                QuickSwitchMenu(
+                    excluding: .vsEngine,
+                    onOpenLab: onOpenLab, onPlayVsEngine: {}, onOpenTwoPlayer: onOpenTwoPlayer
+                )
             }
         }
         // `.page` et non la taille par défaut : sur iPad, une feuille sans

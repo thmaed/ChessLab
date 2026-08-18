@@ -12,6 +12,9 @@ struct OpeningListView: View {
     var onReview: () -> Void = {}
     /// Ouvre l'ÉDITEUR d'arbre — répertoires personnels seulement.
     var onEdit: (String) -> Void = { _ in }
+    var onOpenLab: () -> Void = {}
+    var onPlayVsEngine: () -> Void = {}
+    var onOpenTwoPlayer: () -> Void = {}
 
     @Environment(\.modelContext) private var modelContext
     @State private var dueCount = 0
@@ -90,6 +93,11 @@ struct OpeningListView: View {
                 }
                 .tint(Theme.accent)
                 .accessibilityIdentifier("opening_add")
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                QuickSwitchMenu(
+                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                )
             }
         }
         .sheet(isPresented: $showImport) {

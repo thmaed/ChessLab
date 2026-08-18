@@ -13,6 +13,8 @@ struct OpeningReaderView: View {
     /// Continue la partie CONTRE STOCKFISH depuis la position affichée :
     /// l'écran de réglages s'ouvre pré-rempli (l'utilisateur choisit l'Elo).
     var onContinueVsStockfish: (String) -> Void = { _ in }
+    var onOpenLab: () -> Void = {}
+    var onOpenTwoPlayer: () -> Void = {}
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
@@ -46,9 +48,14 @@ struct OpeningReaderView: View {
                 } label: {
                     Label("Jouer contre l'ordinateur d'ici", systemImage: "cpu")
                 }
+                .tint(Theme.accent)
                 .accessibilityIdentifier("reader_playFromHere")
                 Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
                     .tint(Theme.accent)
+                QuickSwitchMenu(
+                    excluding: .vsEngine,
+                    onOpenLab: onOpenLab, onPlayVsEngine: {}, onOpenTwoPlayer: onOpenTwoPlayer
+                )
             }
         }
     }
@@ -315,6 +322,8 @@ struct OpeningReaderHost: View {
     let onExit: () -> Void
     var onTrain: () -> Void = {}
     var onContinueVsStockfish: (String) -> Void = { _ in }
+    var onOpenLab: () -> Void = {}
+    var onOpenTwoPlayer: () -> Void = {}
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: OpeningReaderViewModel?
 
@@ -323,7 +332,8 @@ struct OpeningReaderHost: View {
             if let viewModel {
                 OpeningReaderView(
                     viewModel: viewModel, onExit: onExit, onTrain: onTrain,
-                    onContinueVsStockfish: onContinueVsStockfish
+                    onContinueVsStockfish: onContinueVsStockfish,
+                    onOpenLab: onOpenLab, onOpenTwoPlayer: onOpenTwoPlayer
                 )
             } else {
                 ContentUnavailableView("Ouverture indisponible", systemImage: "questionmark.folder").appBackground()

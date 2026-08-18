@@ -17,6 +17,9 @@ struct EndgameListView: View {
     let onSelect: (String) -> Void
     /// Lance la révision espacée du jour.
     var onReview: () -> Void = {}
+    var onOpenLab: () -> Void = {}
+    var onPlayVsEngine: () -> Void = {}
+    var onOpenTwoPlayer: () -> Void = {}
 
     @Environment(\.modelContext) private var modelContext
     @State private var dueCount = 0
@@ -67,6 +70,13 @@ struct EndgameListView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                QuickSwitchMenu(
+                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                )
+            }
+        }
         .onAppear { refresh() }
     }
 

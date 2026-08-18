@@ -413,6 +413,10 @@ struct HomeView: View {
                         // pile est vide — d'où la garde, sinon `removeLast`
                         // plante sur une pile vide.
                         startNewGame(settings, replacingCurrent: true)
+                    } onOpenLab: {
+                        path.append(Route.labSetup(startFEN: nil))
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
                     }
 
                 case let .continueVsStockfish(fen):
@@ -420,6 +424,10 @@ struct HomeView: View {
                     // position atteinte : le joueur règle l'Elo puis lance.
                     NewGameSetupView(initialFEN: fen) { settings in
                         startNewGame(settings)
+                    } onOpenLab: {
+                        path.append(Route.labSetup(startFEN: nil))
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
                     }
 
                 case let .activeGame(settings):
@@ -436,6 +444,8 @@ struct HomeView: View {
                         path.append(Route.activeAnalysis(.fen(fen)))
                     } onOpenLab: { fen in
                         path.append(Route.labSetup(startFEN: fen))
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
                     }
 
                 case let .resumedGame(autosave):
@@ -450,11 +460,17 @@ struct HomeView: View {
                         path.append(Route.activeAnalysis(.fen(fen)))
                     } onOpenLab: { fen in
                         path.append(Route.labSetup(startFEN: fen))
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
                     }
 
                 case .twoPlayerSetup:
                     TwoPlayerSetupView { settings in
                         startNewTwoPlayerGame(settings, replacingCurrent: true)
+                    } onOpenLab: {
+                        path.append(Route.labSetup(startFEN: nil))
+                    } onPlayVsEngine: {
+                        path.append(Route.newGame)
                     }
 
                 case let .activeTwoPlayerGame(settings):
@@ -469,6 +485,8 @@ struct HomeView: View {
                         path.append(Route.activeAnalysis(.fen(fen)))
                     } onOpenLab: { fen in
                         path.append(Route.labSetup(startFEN: fen))
+                    } onPlayVsEngine: { fen in
+                        path.append(Route.continueVsStockfish(fen))
                     }
 
                 case let .resumedTwoPlayerGame(autosave):
@@ -483,6 +501,8 @@ struct HomeView: View {
                         path.append(Route.activeAnalysis(.fen(fen)))
                     } onOpenLab: { fen in
                         path.append(Route.labSetup(startFEN: fen))
+                    } onPlayVsEngine: { fen in
+                        path.append(Route.continueVsStockfish(fen))
                     }
 
                 case .analysisEntry:
@@ -536,6 +556,12 @@ struct HomeView: View {
                 case .puzzleQueue:
                     PuzzleQueueView { filter in
                         path.append(Route.activePuzzleSession(filter))
+                    } onOpenLab: {
+                        path.append(Route.labSetup(startFEN: nil))
+                    } onPlayVsEngine: {
+                        path.append(Route.newGame)
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
                     }
 
                 case let .activePuzzleSession(filter):
@@ -543,6 +569,12 @@ struct HomeView: View {
                         path.removeLast()
                     } onViewSourceGame: { pgn in
                         path.append(Route.activeAnalysis(.pgn(pgn)))
+                    } onOpenLab: {
+                        path.append(Route.labSetup(startFEN: nil))
+                    } onPlayVsEngine: {
+                        path.append(Route.newGame)
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
                     }
 
                 case .repertoireList:
@@ -552,6 +584,12 @@ struct HomeView: View {
                         path.append(Route.openingTrainDaily)
                     } onEdit: { courseID in
                         path.append(Route.openingEditor(courseID))
+                    } onOpenLab: {
+                        path.append(Route.labSetup(startFEN: nil))
+                    } onPlayVsEngine: {
+                        path.append(Route.newGame)
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
                     }
 
                 case .endgameList:
@@ -559,6 +597,12 @@ struct HomeView: View {
                         path.append(Route.openingReader(courseID))
                     } onReview: {
                         path.append(Route.openingTrainDaily)
+                    } onOpenLab: {
+                        path.append(Route.labSetup(startFEN: nil))
+                    } onPlayVsEngine: {
+                        path.append(Route.newGame)
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
                     }
 
                 case let .openingEditor(courseID):
@@ -573,6 +617,10 @@ struct HomeView: View {
                         path.append(Route.openingTrainLine(courseID))
                     } onContinueVsStockfish: { fen in
                         path.append(Route.continueVsStockfish(fen))
+                    } onOpenLab: {
+                        path.append(Route.labSetup(startFEN: nil))
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
                     }
 
                 case .openingTrainDaily:
@@ -1123,6 +1171,7 @@ private struct ActiveGameHost: View {
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
+    var onOpenTwoPlayer: () -> Void = {}
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PlayViewModel?
@@ -1132,7 +1181,8 @@ private struct ActiveGameHost: View {
             if let viewModel {
                 PlayView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab
+                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
+                    onOpenTwoPlayer: onOpenTwoPlayer
                 )
             } else {
                 Color.clear
@@ -1160,6 +1210,7 @@ private struct ResumedGameHost: View {
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
+    var onOpenTwoPlayer: () -> Void = {}
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PlayViewModel?
@@ -1169,7 +1220,8 @@ private struct ResumedGameHost: View {
             if let viewModel {
                 PlayView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab
+                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
+                    onOpenTwoPlayer: onOpenTwoPlayer
                 )
             } else {
                 ContentUnavailableView(
@@ -1203,6 +1255,7 @@ private struct TwoPlayerActiveGameHost: View {
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``TwoPlayerGameView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
+    var onPlayVsEngine: (String) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: TwoPlayerViewModel?
@@ -1212,7 +1265,8 @@ private struct TwoPlayerActiveGameHost: View {
             if let viewModel {
                 TwoPlayerGameView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab
+                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
+                    onPlayVsEngine: onPlayVsEngine
                 )
             } else {
                 Color.clear
@@ -1239,6 +1293,7 @@ private struct TwoPlayerResumedGameHost: View {
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``TwoPlayerGameView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
+    var onPlayVsEngine: (String) -> Void = { _ in }
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: TwoPlayerViewModel?
@@ -1248,7 +1303,8 @@ private struct TwoPlayerResumedGameHost: View {
             if let viewModel {
                 TwoPlayerGameView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab
+                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
+                    onPlayVsEngine: onPlayVsEngine
                 )
             } else {
                 ContentUnavailableView(
@@ -1307,6 +1363,9 @@ private struct PuzzleSessionHost: View {
     let sessionKey: String
     let onExit: () -> Void
     let onViewSourceGame: (String) -> Void
+    var onOpenLab: () -> Void = {}
+    var onPlayVsEngine: () -> Void = {}
+    var onOpenTwoPlayer: () -> Void = {}
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PuzzleSolveViewModel?
@@ -1315,7 +1374,10 @@ private struct PuzzleSessionHost: View {
     var body: some View {
         Group {
             if let viewModel {
-                PuzzleSolveView(viewModel: viewModel, onExit: onExit, onViewSourceGame: onViewSourceGame)
+                PuzzleSolveView(
+                    viewModel: viewModel, onExit: onExit, onViewSourceGame: onViewSourceGame,
+                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                )
             } else if hasAttemptedLoad {
                 // Défensif : le bouton de lancement n'apparaît que si le
                 // compte filtré est non nul, mais l'état a pu changer

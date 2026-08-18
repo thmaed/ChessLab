@@ -8,6 +8,9 @@ struct PuzzleSolveView: View {
     @Bindable var viewModel: PuzzleSolveViewModel
     let onExit: () -> Void
     let onViewSourceGame: (String) -> Void
+    var onOpenLab: () -> Void = {}
+    var onPlayVsEngine: () -> Void = {}
+    var onOpenTwoPlayer: () -> Void = {}
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
@@ -33,6 +36,13 @@ struct PuzzleSolveView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                QuickSwitchMenu(
+                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                )
+            }
+        }
         .overlay { promotionOverlay }
         .overlay {
             // Confettis par-dessus tout l'écran à la résolution (une seule

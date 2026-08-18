@@ -13,6 +13,9 @@ struct TwoPlayerGameView: View {
     /// contrat que ``PlayView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
+    /// Bascule vers « Contre l'ordinateur », réglages pré-remplis avec la
+    /// position affichée — même logique que le Laboratoire ci-dessus.
+    var onPlayVsEngine: (String) -> Void = { _ in }
 
     @Environment(\.scenePhase) private var scenePhase
     /// Sur iPad/Mac (classe régulière), le plateau est BORNÉ pour tenir dans
@@ -136,6 +139,11 @@ struct TwoPlayerGameView: View {
                     onOpenLab(viewModel.displayedFEN)
                 } label: {
                     Label("Continuer au Laboratoire", systemImage: "flask")
+                }
+                Button {
+                    onPlayVsEngine(viewModel.displayedFEN)
+                } label: {
+                    Label("Contre l'ordinateur", systemImage: "cpu")
                 }
             }
             Button {
