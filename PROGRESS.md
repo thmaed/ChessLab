@@ -5746,6 +5746,19 @@ la tour (`Re6??`) l'abandonne sans défense, `Qxe6` la croque aussitôt.
 
 34 cours de finales, catalogue à 92.
 
+**Dame contre pion-tour en 7e** livrée ensuite — l'exception du coin,
+sourcée Wikipédia (« Queen versus pawn endgame ») : un pion CENTRAL en 2e
+rangée perd toujours contre la dame seule, mais un pion-TOUR ne perd pas
+forcément si le roi attaquant est trop loin. Racine à 4 pièces : le roi
+noir navette entre b1 et b2 pendant que la dame donne échec depuis d2 puis
+d1, et la ligne source revient à la lettre sur une position déjà vue deux
+coups plus tôt — boucle parfaite, vérifiée coup par coup. Piège naturel :
+prendre le pion avec échec (`Qxa2+??`) semble gagner du matériel, mais la
+dame atterrit à côté du roi noir sans que son propre roi (encore loin) ne
+la défende — `Kxa2` la reprend gratuitement.
+
+35 cours de finales, catalogue à 93.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 

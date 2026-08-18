@@ -13724,6 +13724,22 @@
         }
       }
     },
+    "Queen vs Rook's Pawn — the Corner Draw" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Rook's Pawn — the Corner Draw"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre pion-tour en 7e — la nulle du coin"
+          }
+        }
+      }
+    },
     "Rook vs Bishop" : {
       "localizations" : {
         "en" : {
