@@ -5543,10 +5543,40 @@ position.
 
 **Suite immédiate (même soir)** : triangulation (Wikipédia, position
 Kd5+Pb6+Pc5 vs Kd7+Pb7 — le triangle Ke5-Kd4-Kd5 restitue EXACTEMENT la
-position de départ trait inversé, vérifié coup par coup) et cavalier + pion
+position de départ trait inversé, vérifié coup par coup), cavalier + pion
 contre cavalier (nouvelle famille « Cavaliers » : pousser tout de suite si
 le défenseur est loin, forteresse d'un blocus déjà en place — les deux
-vérités contraires que cette finale enseigne).
+vérités contraires que cette finale enseigne), et deux pions liés contre
+tour (même paire de pions, un seul rang de différence — gagné en 6e, nulle
+en 5e : une tour ne peut viser qu'un pion à la fois).
+
+22 cours de finales, catalogue à 80. 0 problème à l'audit.
+
+**Trois pistes tentées et ABANDONNÉES cette session, honnêtement notées** —
+la discipline « aucune ligne de mémoire » vaut aussi dans l'autre sens :
+mieux vaut ne rien publier qu'une leçon bricolée sur une contre-vérification
+qui ne prouve pas ce qu'elle prétend.
+
+- **Cavalier contre pion-tour en 7e** : le piège découvert en testant — un
+  cavalier SEUL contre roi+pion ne peut jamais gagner (matériel insuffisant
+  pour mater une fois le pion arrêté), donc « gagné/nul » n'y a pas de sens
+  sans une pièce supplémentaire. La vraie question (le cavalier arrive-t-il
+  à temps sur les cases clés f8/g5 ?) demande une construction plus soignée
+  que je n'ai pas eu le temps de finir proprement.
+- **Tour contre fou, bon/mauvais coin** : la théorie du « mauvais coin »
+  (roi défenseur dans le coin de la couleur du fou = filets de mat
+  spécifiques) est une affaire de TACTIQUE LOCALE — une position déjà
+  resserrée — et non une propriété de la position lointaine que j'ai testée
+  (qui donne « nulle » des deux côtés, sans surprise : Tour+Roi contre
+  Fou+Roi sans pion est un nul classique quel que soit le coin, à cette
+  distance). Nécessite de partir d'une position de mat déjà en construction,
+  pas d'une position de départ générique.
+- **Cases clés (isolé de l'opposition)** : chevauche trop le cours
+  « L'opposition » existant pour justifier un cours à part sans une racine
+  qui isole vraiment le concept — pas trouvée à temps.
+
+Ces trois-là restent au programme, marqués comme nécessitant une session de
+recherche dédiée plutôt qu'une suite rapide.
 
 **Reste à faire** : environ 70 items du catalogue de référence restent à
 couvrir — nouvelle famille « cavaliers », « fou contre cavalier » et

@@ -13643,6 +13643,22 @@
           }
         }
       }
+    },
+    "Connected Passers vs Rook" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected Passers vs Rook"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deux pions liés contre tour"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
