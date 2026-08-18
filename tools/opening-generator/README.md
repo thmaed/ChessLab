@@ -135,6 +135,22 @@ sont copiés à la main dans `ChessLab/Resources/openings/` au jalon d'intégrat
 
 ## Sources et licences
 
+### Finales (module du 17/08/2026)
+
+Trois sources, trois usages distincts — c'est la ligne de défense si la
+question des droits se pose :
+
+1. **Positions canoniques** (Lucena ~1634, Philidor 1749, étude de Réti
+   1921…) : des FAITS vieux de décennies ou de siècles, le canon que tout
+   manuel partage — pas des œuvres protégées.
+2. **Tablebase Lichess/Syzygy** : des faits calculés (gain/nulle/perte,
+   DTM). Oracle d'audit et générateur de défenses optimales, côté outillage
+   uniquement (aucun appel réseau depuis l'app).
+3. **Textes des manuels** (Dvoretsky, de la Villa…) : JAMAIS repris — le
+   texte d'un livre appartient à son auteur. Tous les commentaires sont
+   rédigés pour l'app, en français et en anglais.
+
+
 - **Noms & codes ECO** : jeu de données public
   [`lichess-org/chess-openings`](https://github.com/lichess-org/chess-openings)
   (`a.tsv`..`e.tsv`), **domaine public**. Sert uniquement à nommer les positions

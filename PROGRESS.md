@@ -5479,7 +5479,9 @@ Procédure complète dans le README du générateur.
 
 Demande du matin : « une étude approfondie d'un nouveau module pour les
 Finales… un véritable coach ». Étude ET construction le jour même — le
-détail des décisions est dans `docs/ETUDE-FINALES.md`.
+détail des sources et licences est dans le README du générateur ;
+l'étude de décision complète vit dans l'historique git (docs/ETUDE-FINALES.md,
+supprimée le 18/08 une fois exécutée).
 
 **L'architecture en une phrase** : les finales sont des cours d'ouvertures
 qui partent d'une autre position — même JSON, même lecteur, même répétition
