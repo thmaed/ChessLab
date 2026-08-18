@@ -6525,3 +6525,28 @@ seule ligne informative (non bloquante) : le `Qxb7` piège de
 adversaire, exactement l'effet recherché. `Localizable.xcstrings` : 4
 entrées ajoutées chirurgicalement (68 lignes, JSON valide re-vérifié après
 coup).
+
+## Bug UI pré-existant trouvé (et isolé, pas corrigé) : `testEndgameTileLeadsToLucenaInTheReader` (18/08)
+
+Suite complète après le lot navigation + thèmes transversaux : un seul
+échec, `EndgameModuleUITests.testEndgameTileLeadsToLucenaInTheReader()` —
+après un tap sur la tuile Finales, le bouton `endgame_eg-lucena` n'apparaît
+jamais dans la liste.
+
+**Ce n'est PAS une régression de cette session.** Démarche de preuve :
+1. Reproductible deux fois de suite sur un simulateur fraîchement effacé
+   (`simctl erase`) — écarte un état de simulateur périmé.
+2. Reproductible à l'IDENTIQUE avec `git stash -u` (donc TOUT le travail du
+   jour de côté, code strictement égal à `origin/main`) — écarte toute
+   cause dans la navigation, le filtre Progression ou les cours de finales
+   ajoutés aujourd'hui.
+3. Le catalogue embarqué dans le `.app` compilé contient bien `eg-lucena`
+   (famille `rooks`, vérifié en extrayant `opening_catalog.json` du bundle
+   construit) — écarte un souci de données.
+
+Cause réelle non identifiée — pas d'investigation plus poussée faite
+aujourd'hui (hors périmètre du travail demandé). À noter : au passage,
+deux simulateurs « iPhone 17 » strictement homonymes coexistaient
+(`76B18A38…` et `6D6D634E…`), ce qui rend `-destination
+'platform=iOS Simulator,name=iPhone 17'` ambigu — les deux ont été
+effacés ; utiliser l'UDID explicite si l'ambiguïté revient.
