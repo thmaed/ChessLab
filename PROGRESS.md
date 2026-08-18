@@ -5729,6 +5729,23 @@ sans la trouver.
 
 33 cours de finales, catalogue à 91.
 
+**Point de contrôle** : audit complet (`audit_endgames.py` sans `--only`)
+relancé sur les 33 cours de finales après cette rafale d'ajouts — 974
+requêtes tablebase, toutes en cache, 0 nouvelle régression. Le seul signal
+est une note informative déjà connue sur `eg-queen-vs-bishop-pawn`
+(défense sous-optimale volontairement montrée), pas une erreur.
+
+**Dame contre tour ET pion** livrée ensuite — sourcée Müller & Lamprecht
+(« Fundamental Chess Endings ») via Wikipédia (« Queen versus rook
+endgame ») plutôt qu'inventée : un pion ordinaire (pas un pion-tour) en 2e
+rangée, collé au roi et à la tour, ferme une forteresse que la dame seule ne
+perce jamais tant que la tour navette sur la 3e rangée. Racine à 5 pièces,
+ligne source (`1.Rg3 Ke4 2.Re3+ Kf4 3.Rg3 Qc6+ 4.Kg1`) confirmée coup par
+coup. Piège naturel trouvé en explorant : quitter la 3e rangée pour activer
+la tour (`Re6??`) l'abandonne sans défense, `Qxe6` la croque aussitôt.
+
+34 cours de finales, catalogue à 92.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 

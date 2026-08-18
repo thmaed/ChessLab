@@ -13708,6 +13708,22 @@
         }
       }
     },
+    "Queen vs Rook and Pawn — the Fortress" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Rook and Pawn — the Fortress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre tour et pion — la forteresse"
+          }
+        }
+      }
+    },
     "Rook vs Bishop" : {
       "localizations" : {
         "en" : {
