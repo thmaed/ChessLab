@@ -13724,6 +13724,22 @@
         }
       }
     },
+    "Rook vs Bishop — the Safe Corner" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Bishop — the Safe Corner"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre fou — le bon coin"
+          }
+        }
+      }
+    },
     "Bishop vs Knight — the Long Diagonal" : {
       "localizations" : {
         "en" : {

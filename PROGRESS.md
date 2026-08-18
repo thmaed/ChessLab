@@ -5712,6 +5712,23 @@ construction.
 
 32 cours de finales, catalogue à 90.
 
+**Tour contre fou, troisième tentative — enfin la vraie théorie du coin**
+livrée dans la foulée. Les deux essais précédents avaient buté sur des
+pièces non défendues (documenté deux fois plus haut) ; cette fois la
+position vient directement de Wikipédia (page « Fortress (chess) »,
+exemple « rook vs bishop fortress ») plutôt que d'une construction maison :
+roi et fou noirs dans le coin de la couleur OPPOSÉE à celle du fou. L'oracle
+confirme quelque chose de plus fort qu'une simple nulle — la tour ne peut
+MÊME PAS gagner le fou par la force : `Rxg8+?? Kxg8` rend la tour dans la
+foulée (le roi blanc sur g6 ne défend pas g8), et une ligne complète
+(`Rc1 Be6 Rc8+ Bg8`) revient à la lettre sur la position de départ, boucle
+parfaite. Bonus trouvé en explorant : `Kh6??` livre un pat immédiat — le
+fou, cloué sur la 8e rangée entre la tour et son propre roi, ne peut plus
+bouger du tout. La leçon que les deux tentatives précédentes cherchaient
+sans la trouver.
+
+33 cours de finales, catalogue à 91.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
