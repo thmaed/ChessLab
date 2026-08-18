@@ -33,6 +33,9 @@ struct AnalysisLibraryView: View {
     /// ajouter des parties, pas dans l'écran d'entrée de l'Analyse.
     @State private var showImporter = false
     @State private var importSummary: String?
+    /// Import de fond en cours : (fait, total) pour l'indicateur. `nil` au
+    /// repos. Les fichiers sont LUS avant le détachement (portée sécurité).
+    @State private var importProgress: (done: Int, total: Int)?
 
     /// Résultat du point de vue de l'utilisateur. N'a de sens que face à
     /// l'ordinateur (le côté « Vous » est identifiable) ; en deux joueurs,
@@ -146,6 +149,27 @@ struct AnalysisLibraryView: View {
             }
         }
         .appBackground()
+        .overlay(alignment: .bottom) {
+            if let progress = importProgress {
+                HStack(spacing: 10) {
+                    ProgressView().tint(Theme.accent)
+                    Text(progress.total > 0
+                         ? "Import : \(progress.done)/\(progress.total) parties…"
+                         : "Import en cours…")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .monospacedDigit()
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(Theme.surfaceElevated, in: Capsule())
+                .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
+                .padding(.bottom, 18)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .accessibilityIdentifier("libraryImportProgress")
+            }
+        }
+        .animation(Theme.gentle, value: importProgress != nil)
         .navigationTitle("Bibliothèque")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
@@ -366,7 +390,12 @@ struct AnalysisLibraryView: View {
         }
         guard case let .success(urls) = result, !urls.isEmpty else { return }
 
-        var imported = 0, duplicates = 0, skipped = 0, unreadable = 0
+        // LECTURE sur place (la portée sécurité des URLs ne survit pas au
+        // détachement), PARSING en tâche de fond : c'est lui qui gelait
+        // l'interface plusieurs secondes sur une base de milliers de parties
+        // (bug18aout §7, arbitré le 18/08).
+        var texts: [String] = []
+        var unreadable = 0
         for url in urls {
             let accessed = url.startAccessingSecurityScopedResource()
             defer { if accessed { url.stopAccessingSecurityScopedResource() } }
@@ -376,17 +405,33 @@ struct AnalysisLibraryView: View {
                 unreadable += 1
                 continue
             }
-            let outcome = GameLibraryService.importPGNCollection(text: text, in: modelContext)
-            imported += outcome.imported
-            duplicates += outcome.duplicates
-            skipped += outcome.skipped
+            texts.append(text)
         }
 
-        var lines = ["\(imported) partie(s) ajoutée(s)."]
-        if duplicates > 0 { lines.append("\(duplicates) déjà présente(s), non réimportée(s).") }
-        if skipped > 0 { lines.append("\(skipped) bloc(s) PGN illisible(s).") }
-        if unreadable > 0 { lines.append("\(unreadable) fichier(s) illisible(s).") }
-        importSummary = lines.joined(separator: "\n")
+        let container = modelContext.container
+        let failedFiles = unreadable
+        importProgress = (0, 0)
+        Task {
+            var imported = 0, duplicates = 0, skipped = 0
+            for text in texts {
+                let outcome = await GameLibraryService.importPGNCollection(
+                    text: text, container: container,
+                    onProgress: { done, total in
+                        Task { @MainActor in importProgress = (done, total) }
+                    }
+                )
+                imported += outcome.imported
+                duplicates += outcome.duplicates
+                skipped += outcome.skipped
+            }
+            importProgress = nil
+
+            var lines = ["\(imported) partie(s) ajoutée(s)."]
+            if duplicates > 0 { lines.append("\(duplicates) déjà présente(s), non réimportée(s).") }
+            if skipped > 0 { lines.append("\(skipped) bloc(s) PGN illisible(s).") }
+            if failedFiles > 0 { lines.append("\(failedFiles) fichier(s) illisible(s).") }
+            importSummary = lines.joined(separator: "\n")
+        }
     }
 
     private func toggle(_ record: GameRecord) {

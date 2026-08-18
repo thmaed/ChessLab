@@ -90,18 +90,19 @@ d'arrêts). À vérifier sur ton iPhone à l'usage ; si les arrêts longs resten
 gênants, le levier suivant est `stableTransitionsRequired: 2 → 1` (je ne l'ai
 pas fait : conservateur d'abord).
 
-## 7. Import d'un très gros PGN : tout se fait sur le fil principal
+## 7. ✅ FAIT (arbitré le 18/08) — Import de gros PGN en tâche de fond
 
 **Constat.** « Coller un PGN » et « Importer des parties » parsent et
 dédupliquent sur le MainActor. Neuf parties : imperceptible. Une base de
 5 000 parties collée ou importée : interface figée plusieurs secondes
 (découpage + signature anti-doublons par partie). Aucun crash — juste un gel.
 
-**Proposition** : passer `importPGNCollection` en tâche de fond avec un
-indicateur de progression (la bannière « Préparation de la bibliothèque… » de
-l'accueil existe déjà pour les puzzles, même patron). Non fait : toucher au
-threading d'un import qui marche mérite ton accord et une passe de tests
-dédiée.
+**Arbitré et implémenté** : `importPGNCollection(text:container:onProgress:)`
+travaille détaché sur un contexte propre (même conteneur) ; les fichiers sont
+lus AVANT le détachement (portée sécurité). Les trois points d'appel sont
+asynchrones — la bibliothèque affiche « Import : X/Y parties… » en capsule
+bas d'écran, et « coller + ajouter » ouvre l'analyse sans attendre le
+rangement. 18 tests d'import verts.
 
 ## Corrigé directement cette nuit (pour mémoire)
 

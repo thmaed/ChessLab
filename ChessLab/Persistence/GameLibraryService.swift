@@ -49,7 +49,7 @@ enum GameLibraryService {
     /// peuvent partager leur suite de coups (une nulle courte, une miniature
     /// connue) : les écarter à tort ferait perdre des parties à
     /// l'utilisateur, ce qui est bien pire que laisser passer un doublon.
-    static func signature(ofPGN pgn: String) -> String? {
+    nonisolated static func signature(ofPGN pgn: String) -> String? {
         guard let game = PGNLoader.game(from: pgn) else { return nil }
         let moves = movetext(of: pgn)
         guard !moves.isEmpty else { return nil }
@@ -61,7 +61,7 @@ enum GameLibraryService {
     /// Suite de coups NORMALISÉE : balises, commentaires, variantes, numéros
     /// de coup et résultat retirés, espaces réduits. C'est ce qui reste
     /// identique d'un export à l'autre.
-    static func movetext(of pgn: String) -> String {
+    nonisolated static func movetext(of pgn: String) -> String {
         var text = pgn
         // Balises d'en-tête, une par ligne.
         text = text.replacingOccurrences(
@@ -88,7 +88,25 @@ enum GameLibraryService {
     /// illisibles sont comptés dans `skipped` plutôt que de faire échouer tout
     /// l'import. Une seule sauvegarde à la fin.
     @discardableResult
-    static func importPGNCollection(text: String, in context: ModelContext) -> ImportOutcome {
+    /// Import en TÂCHE DE FOND (bug18aout §7, arbitré le 18/08) : le parsing
+    /// et la déduplication d'une grosse base (des milliers de parties)
+    /// gelaient le fil principal plusieurs secondes. Ici : contexte propre
+    /// sur le même conteneur, travail détaché, progression relayée pour
+    /// l'indicateur — l'interface reste vivante pendant tout l'import.
+    nonisolated static func importPGNCollection(
+        text: String, container: ModelContainer,
+        onProgress: (@Sendable (Int, Int) -> Void)? = nil
+    ) async -> ImportOutcome {
+        await Task.detached(priority: .userInitiated) {
+            let context = ModelContext(container)
+            return importPGNCollection(text: text, in: context, onProgress: onProgress)
+        }.value
+    }
+
+    nonisolated static func importPGNCollection(
+        text: String, in context: ModelContext,
+        onProgress: (@Sendable (Int, Int) -> Void)? = nil
+    ) -> ImportOutcome {
         let blocks = PGNSanitizer.splitIntoGames(text)
         var imported = 0
         var skipped = 0
@@ -100,7 +118,8 @@ enum GameLibraryService {
         let existing = (try? context.fetch(FetchDescriptor<GameRecord>())) ?? []
         var seen = Set(existing.compactMap { $0.pgn.flatMap(Self.signature(ofPGN:)) })
 
-        for block in blocks {
+        for (blockIndex, block) in blocks.enumerated() {
+            onProgress?(blockIndex + 1, blocks.count)
             let candidate = PGNSanitizer.sanitize(block)
             // PGNLoader et non `Game(pgn:)` : ChessKit refuse des parties
             // légales (prise en passant, roque avec échec) et elles seraient
@@ -131,7 +150,8 @@ enum GameLibraryService {
             context.insert(record)
             imported += 1
         }
-        if imported > 0 { PersistenceLog.save(context) }
+        // Variante de fond : l'import peut tourner hors du MainActor.
+        if imported > 0 { PersistenceLog.saveInBackground(context) }
         return ImportOutcome(imported: imported, skipped: skipped, duplicates: duplicates)
     }
 
@@ -157,7 +177,7 @@ enum GameLibraryService {
     /// Décode une date PGN « YYYY.MM.DD » (les champs inconnus valent « ?? »).
     /// Retourne `nil` si l'année n'est pas exploitable — l'appelant retombe
     /// alors sur la date du jour.
-    private static func parsePGNDate(_ raw: String) -> Date? {
+    private nonisolated static func parsePGNDate(_ raw: String) -> Date? {
         let parts = raw.split(separator: ".", omittingEmptySubsequences: false)
         guard parts.count >= 1, let year = Int(parts[0]), year > 1000 else { return nil }
         var components = DateComponents()

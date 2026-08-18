@@ -275,10 +275,16 @@ struct AnalysisEntryView: View {
             // par la première et se range en entier — c'est ce qu'on attend
             // des deux gestes, et ils ne se contredisent pas.
             if alsoImportToLibrary {
-                let outcome = GameLibraryService.importPGNCollection(
-                    text: trimmed, in: modelContext
-                )
-                libraryImportSummary = summary(of: outcome)
+                // En FOND : l'analyse s'ouvre tout de suite, le rangement
+                // suit — sur une base de milliers de parties, il gelait
+                // l'écran plusieurs secondes (bug18aout §7).
+                let container = modelContext.container
+                Task {
+                    let outcome = await GameLibraryService.importPGNCollection(
+                        text: trimmed, container: container
+                    )
+                    libraryImportSummary = summary(of: outcome)
+                }
             }
             importError = nil
             showTextSheet = false
@@ -340,9 +346,7 @@ struct AnalysisEntryView: View {
 
     private func handleLibraryImport(_ result: Result<[URL], Error>) {
         guard case let .success(urls) = result, !urls.isEmpty else { return }
-        var imported = 0
-        var skipped = 0
-        var duplicates = 0
+        var texts: [String] = []
         var unreadable = 0
         for url in urls {
             let accessed = url.startAccessingSecurityScopedResource()
@@ -351,18 +355,30 @@ struct AnalysisEntryView: View {
                 unreadable += 1
                 continue
             }
-            let outcome = GameLibraryService.importPGNCollection(text: text, in: modelContext)
-            imported += outcome.imported
-            skipped += outcome.skipped
-            duplicates += outcome.duplicates
+            texts.append(text)
         }
 
-        var lines = ["\(imported) partie(s) importée(s) dans la bibliothèque."]
-        if duplicates > 0 {
-            lines.append("\(duplicates) partie(s) déjà présente(s), non réimportée(s).")
+        // PARSING en fond (bug18aout §7) : lecture des fichiers faite
+        // ci-dessus, sous portée sécurité ; le reste ne gèle plus l'écran.
+        let container = modelContext.container
+        let failedFiles = unreadable
+        Task {
+            var imported = 0, skipped = 0, duplicates = 0
+            for text in texts {
+                let outcome = await GameLibraryService.importPGNCollection(
+                    text: text, container: container
+                )
+                imported += outcome.imported
+                skipped += outcome.skipped
+                duplicates += outcome.duplicates
+            }
+            var lines = ["\(imported) partie(s) importée(s) dans la bibliothèque."]
+            if duplicates > 0 {
+                lines.append("\(duplicates) partie(s) déjà présente(s), non réimportée(s).")
+            }
+            if skipped > 0 { lines.append("\(skipped) bloc(s) PGN illisible(s) ignoré(s).") }
+            if failedFiles > 0 { lines.append("\(failedFiles) fichier(s) illisible(s).") }
+            libraryImportSummary = lines.joined(separator: "\n")
         }
-        if skipped > 0 { lines.append("\(skipped) bloc(s) PGN illisible(s) ignoré(s).") }
-        if unreadable > 0 { lines.append("\(unreadable) fichier(s) illisible(s).") }
-        libraryImportSummary = lines.joined(separator: "\n")
     }
 }
