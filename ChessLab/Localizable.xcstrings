@@ -13659,6 +13659,22 @@
           }
         }
       }
+    },
+    "The Protected Passed Pawn" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Protected Passed Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pion passé protégé"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

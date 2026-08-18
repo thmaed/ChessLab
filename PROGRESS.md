@@ -5575,7 +5575,20 @@ qui ne prouve pas ce qu'elle prétend.
   « L'opposition » existant pour justifier un cours à part sans une racine
   qui isole vraiment le concept — pas trouvée à temps.
 
-Ces trois-là restent au programme, marqués comme nécessitant une session de
+**Quatrième piste tentée et abandonnée** : dame+pion contre dame (position
+réelle sourcée, Botvinnik-Ravinsky 1944) — vérifiée à l'oracle, DTM 98
+(près de 50 coups de conversion forcée). Trop long pour un chapitre
+d'enseignement cohérent sans une position de départ bien plus proche de la
+résolution, que je n'ai pas trouvée à temps. Confirme au passage la
+réputation de cette finale comme l'une des plus longues à convertir.
+
+**Pion passé protégé** livré à la place : un pion défendu par un autre est
+INTOUCHABLE — capturer le protecteur ou seulement s'en approcher perdent de
+la même façon, vérifié dans les deux cas.
+
+23 cours de finales, catalogue à 81.
+
+Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
 **Reste à faire** : environ 70 items du catalogue de référence restent à
