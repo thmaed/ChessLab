@@ -13756,6 +13756,22 @@
         }
       }
     },
+    "Two Knights vs Pawn" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two Knights vs Pawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deux cavaliers contre un pion"
+          }
+        }
+      }
+    },
     "Corresponding Squares" : {
       "localizations" : {
         "en" : {

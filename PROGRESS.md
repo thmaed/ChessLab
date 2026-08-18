@@ -5936,8 +5936,20 @@ tempo par échec (`Ne6+`) que le roi ne rattrape jamais.
 
 47 cours de finales, catalogue à 105.
 
-**Reste à faire** (mis à jour, 47 cours de finales, catalogue à 105) :
-environ 43 items du catalogue de référence restent à couvrir.
+**Deux cavaliers contre un pion** livrée ensuite — sourcée Rév. Horatio
+Bolton (1840), trouvée en cherchant la ligne de Troitzky. Deux cavaliers
+seuls ne peuvent JAMAIS forcer mat contre un roi nu — le pat guette
+toujours — mais un pion adverse fournit exactement le coup de réserve qui
+évite ce pat au bon moment, et le mat redevient possible. Racine à
+5 pièces, dtm 17 jusqu'au mat effectif (`Nf2#`), vérifié coup par coup.
+Piège trouvé en explorant : avancer le roi blanc sans avoir d'abord
+bloqué le pion (`Ke6??`) laisse au roi noir toute liberté de s'échapper
+vers lui — la nulle tient.
+
+48 cours de finales, catalogue à 106.
+
+**Reste à faire** (mis à jour, 48 cours de finales, catalogue à 106) :
+environ 42 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini
