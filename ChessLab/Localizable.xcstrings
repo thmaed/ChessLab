@@ -13708,6 +13708,22 @@
         }
       }
     },
+    "Corresponding Squares" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Corresponding Squares"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cases conjuguées"
+          }
+        }
+      }
+    },
     "Queen vs Rook and Pawn — the Fortress" : {
       "localizations" : {
         "en" : {

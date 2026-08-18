@@ -5770,6 +5770,19 @@ au catalogue — un lien concret entre deux cours plutôt qu'une coïncidence.
 
 36 cours de finales, catalogue à 94.
 
+**Cases conjuguées** livrée ensuite — sourcée France-Échecs (article
+« Cases conjuguées »), qui propose une miniature à 6 paires de cases
+correspondantes. Racine à 5 pièces : le roi blanc joue Kb3, et sur les SEPT
+coups noirs légaux, un seul (Kc5) tient la nulle — les six autres perdent,
+certains en plus de quarante coups sans rien qui le trahisse sur
+l'échiquier. C'est la même idée que l'opposition simple déjà couverte
+(`eg-opposition`), mais généralisée : au lieu d'une seule case en face,
+chaque case du roi attaquant a SA case de réponse propre, et une seule.
+Piège construit à partir de l'exploration elle-même : Kc6, aussi
+raisonnable que Kc5 en apparence, perd après Kc4.
+
+37 cours de finales, catalogue à 95.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
