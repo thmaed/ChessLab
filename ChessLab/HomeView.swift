@@ -76,6 +76,9 @@ struct HomeView: View {
         /// Module Finales : mêmes routes lecteur/entraîneur que les
         /// ouvertures, seule la LISTE est propre au module.
         case endgameList
+        /// Entraînement LIBRE d'une finale (arbitré au verdict) — porte
+        /// l'identifiant du cours.
+        case endgameFreeTrain(String)
         /// Module d'ouvertures en graphe : lecteur pas-à-pas (principal) +
         /// entraînement. (L'ancien flux Explorer/Apprendre a été supprimé le
         /// 18/08 — bug18aout §1, option A.)
@@ -604,6 +607,11 @@ struct HomeView: View {
                         path.append(Route.twoPlayerSetup)
                     }
 
+                case let .endgameFreeTrain(courseID):
+                    EndgameFreeTrainHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
+                        path.removeLast()
+                    }
+
                 case let .openingEditor(courseID):
                     OpeningEditorHost(courseID: courseID) {
                         path.removeLast()
@@ -620,6 +628,8 @@ struct HomeView: View {
                         path.append(Route.labSetup(startFEN: fen))
                     } onOpenTwoPlayer: { fen in
                         path.append(Route.continueTwoPlayer(fen))
+                    } onFreeTrain: {
+                        path.append(Route.endgameFreeTrain(courseID))
                     }
 
                 case .openingTrainDaily:
@@ -779,25 +789,25 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Modes")
             LazyVGrid(columns: [GridItem(.adaptive(minimum: minTile), spacing: 14)], spacing: 14) {
-                ModeCard(title: "Contre l'ordinateur", subtitle: "Force, cadence, aides", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
+                ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Force, cadence, aides", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
                     path.append(Route.newGame)
                 }
-                ModeCard(title: "Deux joueurs", subtitle: "Sur le même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true) {
+                ModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", subtitle: "Sur le même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true) {
                     path.append(Route.twoPlayerSetup)
                 }
-                ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true) {
+                ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", shortSubtitle: "Tactique et Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true) {
                     path.append(Route.puzzleQueue)
                 }
-                ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings") {
+                ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings") {
                     path.append(Route.repertoireList)
                 }
-                ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames") {
+                ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", shortSubtitle: "Techniques prouvées", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames") {
                     path.append(Route.endgameList)
                 }
-                ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true) {
+                ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", shortSubtitle: "PGN, FEN", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true) {
                     path.append(Route.analysisEntry)
                 }
-                ModeCard(title: "Laboratoire", subtitle: "L'ordinateur contre lui-même", systemImage: "flask", tint: Theme.rose, isEnabled: true) {
+                ModeCard(title: "Laboratoire", subtitle: "L'ordinateur contre lui-même", shortSubtitle: "Face à lui-même", systemImage: "flask", tint: Theme.rose, isEnabled: true) {
                     path.append(Route.labSetup(startFEN: nil))
                 }
             }
@@ -1437,7 +1447,16 @@ private struct LabHost: View {
 
 private struct ModeCard: View {
     let title: LocalizedStringKey
+    /// Variante COURTE du titre, pour les tuiles iPhone (2 colonnes,
+    /// ~160 pt) — `nil` quand le titre tient déjà (un seul mot). Sur iPad,
+    /// où la grille laisse largement la place, le titre complet reste
+    /// affiché : voir ``isRegular``.
+    var shortTitle: LocalizedStringKey?
     let subtitle: LocalizedStringKey?
+    /// Variante COURTE du sous-titre — même raison que ``shortTitle``, mais
+    /// pour la légende : plusieurs débordaient encore en points de
+    /// suspension malgré `minimumScaleFactor`.
+    var shortSubtitle: LocalizedStringKey?
     let systemImage: String
     var tint: Color = Theme.accent
     let isEnabled: Bool
@@ -1453,6 +1472,8 @@ private struct ModeCard: View {
     private var cardHeight: CGFloat { isRegular ? 168 : 132 }
     private var iconSize: CGFloat { isRegular ? 58 : 48 }
     private var ghostIconSize: CGFloat { isRegular ? 118 : 96 }
+    private var displayedTitle: LocalizedStringKey { isRegular ? title : (shortTitle ?? title) }
+    private var displayedSubtitle: LocalizedStringKey { isRegular ? (subtitle ?? "Bientôt") : (shortSubtitle ?? subtitle ?? "Bientôt") }
 
     var body: some View {
         Button(action: action) {
@@ -1464,13 +1485,13 @@ private struct ModeCard: View {
                 // `lineLimit` + `minimumScaleFactor` : la carte a une
                 // hauteur FIGÉE — aux tailles d'accessibilité XXL, un titre
                 // sans borne déborderait de la tuile.
-                Text(title)
+                Text(displayedTitle)
                     .font(isRegular ? .title3.weight(.semibold) : .headline)
                     .foregroundStyle(isEnabled ? Theme.textPrimary : Theme.textTertiary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
 
-                Text(subtitle ?? "Bientôt")
+                Text(displayedSubtitle)
                     .font(.callout)
                     .foregroundStyle(Theme.textSecondary)
                     .padding(.top, 2)

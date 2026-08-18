@@ -133,19 +133,31 @@ final class LayoutOverflowUITests: XCTestCase {
 
         // Le libellé est dans la liste d'exclusion ; le `Text` qui le porte
         // doit malgré tout être inspecté, donc visible du détecteur.
+        // Depuis les libellés COURTS (18/08), le texte affiché dépend de la
+        // classe de taille : « 2 joueurs » sur iPhone, « Deux joueurs » sur
+        // iPad — le test accepte l'une OU l'autre variante.
         XCTAssertTrue(
-            app.staticTexts["Deux joueurs"].firstMatch.waitForExistence(timeout: 5),
+            app.staticTexts["2 joueurs"].firstMatch.waitForExistence(timeout: 5)
+                || app.staticTexts["Deux joueurs"].firstMatch.exists,
             "le titre de tuile doit être un élément mesurable"
         )
 
         let window = app.frame
-        for label in ["Contre l'ordinateur", "Deux joueurs", "Puzzles", "Analyser"] {
+        for variants in [
+            ["Contre l'ordinateur", "Ordinateur"],
+            ["Deux joueurs", "2 joueurs"],
+            ["Puzzles"],
+            ["Analyser"],
+        ] {
             // TOUTES les occurrences, pas la première : un même libellé est
             // porté par plusieurs éléments de l'arbre d'accessibilité, et
             // exiger l'unicité faisait échouer le test sur un défaut du
             // harnais — pas de l'app.
-            let matches = app.staticTexts.matching(identifier: label)
-                .allElementsBoundByAccessibilityElement
+            let matches = variants.flatMap { label in
+                app.staticTexts.matching(identifier: label)
+                    .allElementsBoundByAccessibilityElement
+            }
+            let label = variants.joined(separator: " / ")
             XCTAssertFalse(matches.isEmpty, "aucun texte « \(label) » mesurable sur l'accueil")
             for (index, text) in matches.enumerated() {
                 let frame = text.frame

@@ -742,6 +742,22 @@
         }
       }
     },
+    "2 joueurs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 players"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 joueurs"
+          }
+        }
+      }
+    },
     "3 essais" : {
       "localizations" : {
         "en" : {
@@ -1529,6 +1545,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appliqué au prochain démarrage du moteur (nouvelle partie, analyse ou série)."
+          }
+        }
+      }
+    },
+    "Apprends et révise" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn and review"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apprends et révise"
           }
         }
       }
@@ -2677,6 +2709,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Camp étudié"
+          }
+        }
+      }
+    },
+    "Camp proche du maximum et moins de 0,5 s par coup : le temps court bride surtout le camp fort — l'écart réel sera plus petit que l'écart affiché." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "One side near maximum with under 0.5 s per move: short time mostly holds back the strong side — the real gap will be smaller than the displayed one."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camp proche du maximum et moins de 0,5 s par coup : le temps court bride surtout le camp fort — l'écart réel sera plus petit que l'écart affiché."
           }
         }
       }
@@ -5218,6 +5266,22 @@
         }
       }
     },
+    "Face à lui-même" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Self-play"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Face à lui-même"
+          }
+        }
+      }
+    },
     "Facile" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -6726,6 +6790,7 @@
       }
     },
     "Jusqu'à 5 s/coup — utile pour laisser respirer le moteur à Elo élevé." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7525,6 +7590,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les deux joueurs sont d'accord pour la nulle ?"
+          }
+        }
+      }
+    },
+    "Les Elo de Stockfish sont calibrés à ~2-3 s par coup : en dessous, les niveaux réels sont plus bas, surtout près du maximum. L'écart entre A et B reste comparatif." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stockfish's Elo ratings are calibrated at ~2-3 s per move: below that, the real levels run lower, especially near maximum. The gap between A and B stays comparative."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les Elo de Stockfish sont calibrés à ~2-3 s par coup : en dessous, les niveaux réels sont plus bas, surtout près du maximum. L'écart entre A et B reste comparatif."
           }
         }
       }
@@ -9295,6 +9376,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "PGN illisible : %@"
+          }
+        }
+      }
+    },
+    "PGN, FEN" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PGN, FEN"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PGN, FEN"
           }
         }
       }
@@ -12750,6 +12847,22 @@
         }
       }
     },
+    "Tactique et Lichess" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tactics and Lichess"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tactique et Lichess"
+          }
+        }
+      }
+    },
     "Tarrasch Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -12763,6 +12876,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Défense Tarrasch"
+          }
+        }
+      }
+    },
+    "Techniques prouvées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Proven techniques"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Techniques prouvées"
           }
         }
       }
