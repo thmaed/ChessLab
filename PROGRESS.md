@@ -6743,3 +6743,76 @@ et un mat court-circuite l'arbitre (chemin des règles), ce qui teste le
 mauvais flux. Et un « pat en un » n'en est un que si TOUTES les issues
 sont fermées — le premier essai laissait a7-a6 jouable. Vérifiées
 python-chess avant correction, comme le contenu des cours.
+
+## Huit cours de finales de plus, sous la même discipline (nuit du 18/08)
+
+Session autonome nocturne, même mandat que la veille : combler les vrais
+trous du catalogue de référence, chaque coup prouvé à la tablebase avant
+d'être écrit. Huit cours livrés, 71 finales au catalogue (129 au total).
+
+- **eg-philidor-rook-bishop** (déséquilibres) : la position de Philidor
+  1749, tour et fou contre tour — le pendant GAGNANT des trois défenses
+  déjà au catalogue. Sourcée Wikipédia, racine à 5 pièces, dtm 41 ; l'oracle
+  confirme que sur 23 coups blancs, SEUL 1.Tf8+ gagne, et que le naturel
+  1.Fc6?? tombe sur Td7+ ! et le pat (chapitre piège).
+- **eg-bishop-knight-mate** (mats) : le quatrième mat élémentaire, ligne
+  DTM-optimale de 39 demi-coups depuis le mauvais coin a8. La défense
+  optimale de la tablebase joue exactement la parade des manuels (courir
+  vers h1, l'autre mauvais coin) — la ligne montre la barrière de fou et
+  l'épaulement qui l'interceptent.
+- **eg-knight-vs-rook-pawn** (cavaliers) : reprise de la piste « cavalier
+  contre pion-tour » abandonnée précédemment (camp fort inversé). Cavalier
+  seul contre pion-tour en 6e : nulle — et l'oracle rend la danse c8-d6-b5
+  spectaculaire, UN seul coup sauveur à chaque attaque du roi. Piège
+  vérifié : Ce7?? (une case trop loin) fait basculer nulle → perte.
+- **eg-promotion-race-check** (pions) : course de pions 3 temps contre 3,
+  décidée par la géométrie des cases de promotion (roi noir sur la
+  diagonale a8-h1 : promotion avec échec, puis Dxg2 sur la même diagonale).
+  Un seul des huit coups blancs gagne (la poussée) ; le piège Rb6?? est le
+  miroir exact — c'est alors la promotion NOIRE qui tombe avec échec.
+  Première racine REJETÉE par l'oracle : le roi noir en e4 rattrapait le
+  pion a5 tout en gardant sa course (Rd5 ! à double usage) — corrigée en
+  reculant le pion d'un cran hors du carré.
+- **eg-wrong-bishop-win** (fous) : le pendant offensif du « mauvais fou » —
+  la forteresse exige d'ATTEINDRE le coin. Racine réglée au couteau : des
+  six coups de fou, seul Ff4 gagne (l'unique route en un temps vers la
+  diagonale-barrière b8-h2) ; la poussée naturelle a5?? laisse le roi noir
+  se glisser en a8 et reconstruit exactement la forteresse du cours jumeau.
+- **eg-queen-pawn-vs-queen** (dames) : l'item abandonné la veille
+  (Botvinnik-Ravinsky, dtm 98) trouvé sous forme enseignable — position de
+  manuel Müller & Lamprecht (FCE 9.12A, via Wikipédia), trait aux Blancs
+  gagné dtm 41, trait aux Noirs nulle (les deux vérifiés). Tout le
+  programme en 25 demi-coups : le parapluie (Rh6 derrière Dg6+pion h7),
+  les échecs blancs qui repositionnent avec tempo, la deuxième dame, la
+  double interposition. Piège Rh6?? prématuré, réfuté par Dh3 ! (clouage du
+  pion h5 contre le roi — pas un échec, un gel définitif).
+- **eg-rook-vs-connected-fifth** (tours) : miroir exact du cours « pions
+  liés en 6e » un rang plus tôt — le verdict ne retombe pas à la nulle, il
+  s'INVERSE (la tour gagne, dtm 35). Deux trouvailles d'oracle : après la
+  poussée e6, TOUS les coups de tour sur la colonne a perdent (c'est le
+  ROI qui réfute, la tour restant balayer la 8e) ; et Ta5, gagnant tant que
+  les pions sont en 5e, PERD un tempo plus tard — le piège du cours.
+- **eg-centurini-deflection** (fous) : le gain de Centurini — « deux
+  diagonales, dont une trop courte ». Principe sourcé (règles de 1856),
+  coordonnées introuvables en ligne (une transcription avec rois adjacents,
+  illégale) : position construite et vérifiée depuis zéro, dtm 19. La
+  mécanique célèbre sort seule de derive_optimal : Ra8 confisque a7 (seule
+  case d'attaque de la petite diagonale), Fb8 s'interpose, puis Fg3 rafle
+  la grande diagonale entière. Piège Ff4?? (échanger le gardien) : la prise
+  a lieu SUR la diagonale de garde, nulle sèche.
+
+**Abandonné en route, honnêtement** : la version « enchère pure » de la
+course de pions (racine e4/h5 : perdante — le roi noir servait la course ET
+la chasse) ; les racines dame+pion à pion g (nulles ou perdantes — mes
+premiers FEN omettaient… la dame blanche, l'oracle a rendu des verdicts de
+« dame contre pion » très instructifs sur ma propre étourderie) ; une racine
+Centurini avec Fe1 qui prenait le fou noir au premier coup (même défaut de
+pièce en prise que les fous de même couleur de la veille). La ligne
+Troitsky explicite reste non couverte : deux_knights_vs_pawn enseigne la
+phase finale, pas la frontière — un cours dédié demanderait d'enseigner un
+fragment de gain à dtm 70+, format non résolu ce soir.
+
+Audit final groupé des huit : « ✓ Chaque coup enseigné préserve son verdict
+théorique (tablebase) », 0 requête réseau (360 en cache).
+`Localizable.xcstrings` : 8 entrées FR ajoutées chirurgicalement d'un bloc
+après « The Bishop Pair Mate » (136 lignes, JSON revalidé, diff propre).

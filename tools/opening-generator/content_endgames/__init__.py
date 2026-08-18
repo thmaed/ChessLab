@@ -11,7 +11,7 @@ est dérivée sous l'oracle (`verify_line.py`) avant d'entrer ici, et
 verdict théorique. Une ligne de finale écrite de mémoire est une ligne fausse
 qui n'a pas encore été vérifiée.
 """
-from . import active_king, bishop_pair_mate, bishop_vs_knight_fortress, bishop_vs_knight_zugzwang, bahr_rule_flaw, bishop_vs_two_pawns, breakthrough, centurini_wrong_color, cochrane_defence, connected_passers_sixth_rank, connected_passers_vs_rook, corresponding_squares, domination, frontal_defence, grigoriev_king_race, horwitz_kling_flaw, karstedt_fortress, kingside_majority, knight_and_pawn, knight_two_wings, knight_vs_two_pawns, lucena, opposition, outside_passed_pawn, philidor, protected_passer, queen_mate, queen_vs_bishop_pawn, queen_vs_pawn, queen_vs_rook, queen_vs_rook_and_bishop, queen_vs_rook_and_knight, queen_vs_rook_pawn, queen_vs_rook_pawn_fortress, queen_vs_two_rooks, reti_study, right_capture, rook_and_pawn_vs_knight, rook_mate, rook_cutoff_tempo, rook_pawn_draw, rook_pawn_vs_rook_cutoff, rook_two_connected_pawns, rook_vs_bishop, rook_vs_bishop_safe_corner, rook_vs_knight, rook_vs_pawn, rook_vs_rook_and_bishop, rook_vs_rook_and_knight, rook_wrong_pawn_vs_bishop, saavedra, second_rank_defence, same_color_bishops, short_side_defence, square_rule, stalemate_resource, trebuchet, triangulation, two_knights_vs_pawn, two_weaknesses, vancura, vertical_cutoff, wrong_bishop
+from . import active_king, bishop_knight_mate, bishop_pair_mate, bishop_vs_knight_fortress, bishop_vs_knight_zugzwang, bahr_rule_flaw, bishop_vs_two_pawns, breakthrough, centurini_deflection, centurini_wrong_color, cochrane_defence, connected_passers_sixth_rank, connected_passers_vs_rook, corresponding_squares, domination, frontal_defence, grigoriev_king_race, horwitz_kling_flaw, karstedt_fortress, kingside_majority, knight_and_pawn, knight_two_wings, knight_vs_rook_pawn, knight_vs_two_pawns, lucena, opposition, outside_passed_pawn, philidor, philidor_rook_bishop, promotion_race_check, protected_passer, queen_mate, queen_pawn_vs_queen, queen_vs_bishop_pawn, queen_vs_pawn, queen_vs_rook, queen_vs_rook_and_bishop, queen_vs_rook_and_knight, queen_vs_rook_pawn, queen_vs_rook_pawn_fortress, queen_vs_two_rooks, reti_study, right_capture, rook_and_pawn_vs_knight, rook_mate, rook_cutoff_tempo, rook_pawn_draw, rook_pawn_vs_rook_cutoff, rook_two_connected_pawns, rook_vs_connected_fifth, rook_vs_bishop, rook_vs_bishop_safe_corner, rook_vs_knight, rook_vs_pawn, rook_vs_rook_and_bishop, rook_vs_rook_and_knight, rook_wrong_pawn_vs_bishop, saavedra, second_rank_defence, same_color_bishops, short_side_defence, square_rule, stalemate_resource, trebuchet, triangulation, two_knights_vs_pawn, two_weaknesses, vancura, vertical_cutoff, wrong_bishop, wrong_bishop_win
 
 COURSES = [
     opposition.COURSE,
@@ -77,4 +77,12 @@ COURSES = [
     stalemate_resource.COURSE,
     active_king.COURSE,
     bishop_pair_mate.COURSE,
+    philidor_rook_bishop.COURSE,
+    bishop_knight_mate.COURSE,
+    knight_vs_rook_pawn.COURSE,
+    promotion_race_check.COURSE,
+    wrong_bishop_win.COURSE,
+    queen_pawn_vs_queen.COURSE,
+    rook_vs_connected_fifth.COURSE,
+    centurini_deflection.COURSE,
 ]

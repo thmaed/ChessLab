@@ -13174,6 +13174,142 @@
         }
       }
     },
+    "Rook and Bishop vs Rook — Philidor's Win" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook and Bishop vs Rook — Philidor's Win"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour et fou contre tour — le gain de Philidor"
+          }
+        }
+      }
+    },
+    "The Bishop and Knight Mate" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Bishop and Knight Mate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mat au fou et au cavalier"
+          }
+        }
+      }
+    },
+    "Knight vs Rook's Pawn — the Lone Defender" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight vs Rook's Pawn — the Lone Defender"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cavalier contre pion-tour — le défenseur solitaire"
+          }
+        }
+      }
+    },
+    "The Promotion Race and the First Check" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Promotion Race and the First Check"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La course à la promotion et le premier échec"
+          }
+        }
+      }
+    },
+    "The Wrong Bishop That Wins" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Wrong Bishop That Wins"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mauvais fou qui gagne"
+          }
+        }
+      }
+    },
+    "Queen and Pawn vs Queen — the Umbrella" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen and Pawn vs Queen — the Umbrella"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame et pion contre dame — le parapluie"
+          }
+        }
+      }
+    },
+    "Connected Passers on the 5th — the Rook Strikes First" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected Passers on the 5th — the Rook Strikes First"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pions liés en 5e — la tour frappe la première"
+          }
+        }
+      }
+    },
+    "Centurini — Two Diagonals, One Too Short" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centurini — Two Diagonals, One Too Short"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centurini — deux diagonales, dont une trop courte"
+          }
+        }
+      }
+    },
     "The Cochrane Defence" : {
       "extractionState" : "stale",
       "localizations" : {
