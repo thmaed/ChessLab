@@ -5539,7 +5539,14 @@ sont donc restés en PROSE dans les commentaires plutôt qu'en lignes
 rejouables — plus honnête qu'une ligne bricolée qui ne serait pas la même
 position.
 
-19 cours de finales au total, 0 problème à l'audit tablebase.
+21 cours de finales au total, 0 problème à l'audit tablebase.
+
+**Suite immédiate (même soir)** : triangulation (Wikipédia, position
+Kd5+Pb6+Pc5 vs Kd7+Pb7 — le triangle Ke5-Kd4-Kd5 restitue EXACTEMENT la
+position de départ trait inversé, vérifié coup par coup) et cavalier + pion
+contre cavalier (nouvelle famille « Cavaliers » : pousser tout de suite si
+le défenseur est loin, forteresse d'un blocus déjà en place — les deux
+vérités contraires que cette finale enseigne).
 
 **Reste à faire** : environ 70 items du catalogue de référence restent à
 couvrir — nouvelle famille « cavaliers », « fou contre cavalier » et

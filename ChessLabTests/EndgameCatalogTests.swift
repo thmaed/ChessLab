@@ -20,7 +20,7 @@ struct EndgameCatalogTests {
     /// INVISIBLES (aucune section ne les afficherait). C'est le test qui
     /// transforme cet oubli silencieux en échec bruyant.
     @Test func everyEndgameFamilyHasAKnownSection() {
-        let known: Set<String> = ["pawns", "rooks", "bishops", "queens", "mates", "practical"]
+        let known: Set<String> = ["pawns", "rooks", "bishops", "knights", "queens", "mates", "practical"]
         for entry in endgames {
             #expect(entry.family.map(known.contains) == true,
                     "famille inconnue de l'écran Finales : \(entry.family ?? "nil") (\(entry.id))")

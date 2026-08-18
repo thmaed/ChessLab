@@ -13595,6 +13595,54 @@
           }
         }
       }
+    },
+    "Triangulation" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triangulation"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Triangulation"
+          }
+        }
+      }
+    },
+    "Knight and Pawn vs Knight" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight and Pawn vs Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cavalier et pion contre cavalier"
+          }
+        }
+      }
+    },
+    "Finales de cavaliers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight endings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finales de cavaliers"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
