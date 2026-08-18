@@ -5663,11 +5663,60 @@ distances égales, pas une position déjà quasi tranchée par ailleurs.
 
 29 cours de finales, catalogue à 87.
 
+**Fou contre cavalier** ouvert ensuite — première entrée de la catégorie que
+l'utilisateur avait nommée à part dans sa liste. Sourcée cette fois-ci via
+Wikipédia (page « Finale fou contre cavalier ») plutôt que construite à
+tâtons : l'étude de Hall (1988), fou + pion contre cavalier, 5 pièces,
+dtm 49 à la racine — largement dans la fenêtre tablebase. Le fou n'a rien à
+prouver par la force ; il maneuvre sur la longue diagonale pendant que le roi
+garde le pion, jusqu'à mettre le cavalier en zugzwang. Bonus offert par
+l'oracle lui-même : DEUX pièges naturels ressortent de l'exploration
+(`Kxe8??` gagne le cavalier mais abandonne la garde du pion — repris aussitôt ;
+`c7??` pousse trop tôt, le cavalier veille depuis e8 et le reprend), tous
+deux vérifiés comme changeant réellement le verdict (`role: "trap"`, aucun
+`fake_trap` signalé par `audit_endgames.py`). Rangé dans la famille « fous »
+plutôt que dans une nouvelle famille dédiée — une seule entrée ne justifie
+pas encore sa propre catégorie côté Swift.
+
+30 cours de finales, catalogue à 88.
+
+**Fou contre cavalier, deuxième pièce** livrée dans la foulée — même page
+Wikipédia, l'étude de Sam Loyd (1860) cette fois : pion noir à un pas de la
+promotion, cavalier en soutien, fou blanc seul en face. L'oracle est
+catégorique — TOUTE retraite de fou perd (`Bg2??`, la plus naturelle,
+retombe en perte en 16 coups), seul un sacrifice sur la case même de
+promotion (`Bh1!!`) tient la nulle : le roi noir n'a d'autre choix que de
+reprendre, et se retrouve emmuré dans le coin derrière son propre pion — le
+pion ne peut plus jamais avancer. Le roi blanc navigue ensuite entre f1 et
+f2 en forteresse permanente. Deuxième cours vérifié de la même page
+source dans la même soirée.
+
+31 cours de finales, catalogue à 89.
+
+**Tour derrière le pion passé (règle de Tarrasch)** livré ensuite — item qui
+avait déjà résisté une fois (ma première tentative gagnait quel que soit
+l'emplacement de la tour, matériel trop écrasant pour que le placement
+change quoi que ce soit). Deux racines artificielles ultérieures (pion
+seul, tours et rois loin de l'action) ont donné la même réponse plate :
+nulle quel que soit le coup, distance trop grande pour que le placement
+compte. Résolu en source, pas en construction : Wikipédia (page « Tarrasch
+rule ») cite Short-Yusupov 1984 comme exception classique, et l'oracle
+confirme au signe près — racine à 6 pièces, dtm 75, `Rh3` (la case « derrière
+le pion », donc la règle appliquée à la lettre) ne fait que la nulle, seul
+`Rf7` gagne. La leçon n'est pas la règle elle-même mais sa limite : il faut
+d'abord couper le roi adverse sur la 7e rangée, la tour ne rejoint la bonne
+case qu'ensuite, une fois le terrain gagné. Sourcé plutôt qu'inventé, pour
+la deuxième fois du chantier « fou contre cavalier » — la discipline
+web+oracle commence à payer sur les items qui avaient résisté à la pure
+construction.
+
+32 cours de finales, catalogue à 90.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
 **Reste à faire** : environ 60 items du catalogue de référence restent à
-couvrir — la famille « fou contre cavalier » (4 items, aucun cours encore) et
+couvrir — la catégorie « fou contre cavalier » (2 sur 4 items couverts) et
 le reste des « déséquilibres matériels » (T+F, T+C, D contre pièces…) restent
 les familles les moins couvertes ;
 plusieurs positions demandent encore une recherche sourcée avant de pouvoir

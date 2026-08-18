@@ -13724,6 +13724,54 @@
         }
       }
     },
+    "Bishop vs Knight — the Long Diagonal" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bishop vs Knight — the Long Diagonal"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fou contre cavalier — la longue diagonale"
+          }
+        }
+      }
+    },
+    "Bishop vs Knight — Sam Loyd's Fortress" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bishop vs Knight — Sam Loyd's Fortress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fou contre cavalier — la forteresse de Sam Loyd"
+          }
+        }
+      }
+    },
+    "The Tarrasch Rule's Famous Exception" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Tarrasch Rule's Famous Exception"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'exception célèbre à la règle de Tarrasch"
+          }
+        }
+      }
+    },
     "Déséquilibres matériels" : {
       "localizations" : {
         "en" : {
