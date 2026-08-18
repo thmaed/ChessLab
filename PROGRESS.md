@@ -5627,6 +5627,16 @@ temps de courir d'une aile à l'autre et tient la nulle.
 
 26 cours de finales, catalogue à 84.
 
+**Fous de même couleur : la forteresse** livré ensuite — deux tentatives de
+construction ont d'abord échoué (fou noir hors de propos placé sur une case
+attaquée par le pion ou le fou blanc, capture gratuite plutôt que vraie
+finale théorique), corrigées avant publication. La version retenue : roi
+défenseur devant le pion, fou de la même couleur à bonne distance — toute
+tentative blanche vérifiée retombe sur une répétition exacte de la position
+de départ.
+
+27 cours de finales, catalogue à 85.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 

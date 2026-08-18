@@ -13739,6 +13739,22 @@
           }
         }
       }
+    },
+    "Same-Coloured Bishops: Fortress" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Same-Coloured Bishops: Fortress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fous de même couleur : la forteresse"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
