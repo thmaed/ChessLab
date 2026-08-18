@@ -124,7 +124,7 @@ enum PuzzleLibrarySeeder {
 
             insertedSinceSave += 1
             if insertedSinceSave >= 2_000 {
-                try? context.save()
+                PersistenceLog.saveInBackground(context)
                 insertedSinceSave = 0
             }
         }
@@ -137,7 +137,7 @@ enum PuzzleLibrarySeeder {
             puzzle.phaseRaw = GamePhaseClassifier.classify(fen: puzzle.fen ?? "").rawValue
         }
 
-        try? context.save()
+        PersistenceLog.saveInBackground(context)
         return true
     }
 }

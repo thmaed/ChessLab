@@ -32,7 +32,7 @@ fonctionnalité que le lecteur actuel n'offre pas — si tu y tiens, elle
 mériterait d'être portée dans le lecteur plutôt que de garder trois écrans
 morts. Je n'ai pas tranché seul : c'est 1 500 lignes et un choix de produit.
 
-## 2. File de révision : le compte promet ce que la séance ne sert pas
+## 2. ✅ FAIT (arbitré le 18/08 au matin) — File de révision
 
 **Constat.** Le compteur « Réviser aujourd'hui » (Ouvertures ET Finales)
 compte TOUTES les positions dues. Mais la séance quotidienne, elle, se limite
@@ -42,13 +42,11 @@ lancera la séance… et les positions de finales dues n'y seront jamais servies
 Préexistant, mais AMPLIFIÉ par le module Finales (on entraîne une finale sans
 penser à l'« étoiler »).
 
-**Proposition** : soit compter uniquement les positions servables (cohérent
-mais le chiffre baisse « mystérieusement »), soit inclure TOUJOURS les cours
-où l'utilisateur a de la progression, répertoire ou pas (mon préféré : on
-révise ce qu'on a appris, l'étoile ne devrait filtrer que les cours jamais
-travaillés). Changement de comportement → ta décision.
+**Arbitré et implémenté** (commit `a0e869d`) : la progression prime sur
+l'étoile — `reviewableCourses(in:)`, deux tests. Résidu marginal noté au
+commit : une position d'un répertoire personnel SUPPRIMÉ reste comptée.
 
-## 3. Corruption du store SwiftData : destruction silencieuse
+## 3. ✅ FAIT (arbitré le 18/08 au matin) — Corruption du store
 
 **Constat** (`ChessLabApp.makeContainer`). Si le store local ne s'ouvre pas au
 lancement (migration interrompue, corruption… ou simple DISQUE PLEIN), l'app
@@ -57,21 +55,23 @@ locale perdus sans un mot. Le choix est documenté (« plutôt qu'une boucle de
 crash ») et la synchro iCloud atténue — mais un disque plein est un état
 TRANSITOIRE : détruire pour ça est disproportionné.
 
-**Proposition** : renommer le store en `Games.corrupt-2026…` au lieu de le
-supprimer (récupérable au support), et ne détruire qu'après échec sur un
-DEUXIÈME lancement. Touche au démarrage → pas fait sans ton feu vert.
+**Arbitré et implémenté** : premier échec → on ne touche à RIEN, session en
+mémoire (bannière l'avoue) ; deuxième échec consécutif → QUARANTAINE horodatée
+dans Application Support/StoreQuarantine (jamais de suppression, rotation à
+deux), puis store neuf. Compteur `container.openFailures` remis à zéro au
+premier succès.
 
-## 4. Vingt-et-un `try? context.save()` silencieux
+## 4. ✅ FAIT (arbitré le 18/08 au matin) — Sauvegardes silencieuses
 
 **Constat.** Les sauvegardes SwiftData avalent leurs erreurs partout (21
 sites). Un disque plein ou un conflit CloudKit passe inaperçu : l'utilisateur
 croit sa partie enregistrée. Aucun bug constaté — c'est le silence qui est le
 défaut.
 
-**Proposition** : un petit `PersistenceLog.save(context, origin:)` central qui
-tente, journalise l'échec (os_log) et lève une bannière discrète à partir du
-2e échec consécutif. Mécanique, mais 21 sites → je préfère ton accord sur le
-principe avant de toucher à toutes les écritures.
+**Arbitré et implémenté** : `PersistenceLog.save(_:origin:)` (os_log, compteur
+d'échecs consécutifs) remplace les 21 sites ; variante de fond pour le seeder
+(le succès de fond ne blanchit pas l'ardoise) ; bannière d'accueil à partir du
+2e échec — la même qui avoue la session en mémoire du §3. Trois tests.
 
 ## 5. Le PDF de Nils porte encore les chiffres optimistes
 

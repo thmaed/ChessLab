@@ -142,17 +142,27 @@ struct ChessLabApp: App {
 
         // 1) Tentative normale.
         if let container = try? ModelContainer(for: schema, configurations: configurations) {
+            UserDefaults.standard.removeObject(forKey: Self.openFailureKey)
             return container
         }
-        // 2) Store local illisible (migration interrompue, corruption, disque
-        //    plein) : plutôt qu'une boucle de crash définitive au lancement,
-        //    on détruit et on recrée les stores locaux. Les données critiques
-        //    (parties en cours) vivent dans les autosaves JSON ; la
-        //    bibliothèque de puzzles se re-seed ; seuls GameRecord /
-        //    répertoires / progression SRS seraient perdus.
-        destroyLocalStore()
-        if let container = try? ModelContainer(for: schema, configurations: configurations) {
-            return container
+        // 2) Store local illisible. Politique arbitrée le 18/08 (bug18aout §3),
+        //    en DEUX temps plutôt qu'une destruction immédiate :
+        //    - PREMIER échec : on ne touche à RIEN — un disque plein ou un
+        //      verrou transitoire ne justifie pas de perdre des données. La
+        //      session tourne en mémoire (dégradée) et on retentera au
+        //      prochain lancement.
+        //    - DEUXIÈME échec consécutif : le store est tenu pour corrompu.
+        //      Il est mis en QUARANTAINE (renommé, récupérable au support),
+        //      jamais supprimé, puis recréé à neuf. Parties en cours dans les
+        //      autosaves JSON ; bibliothèque de puzzles re-seedée.
+        let failures = UserDefaults.standard.integer(forKey: Self.openFailureKey)
+        UserDefaults.standard.set(failures + 1, forKey: Self.openFailureKey)
+        if failures >= 1 {
+            quarantineLocalStore()
+            if let container = try? ModelContainer(for: schema, configurations: configurations) {
+                UserDefaults.standard.removeObject(forKey: Self.openFailureKey)
+                return container
+            }
         }
         // 3) Dernier recours : conteneur en mémoire — session dégradée
         //    (rien n'est persisté) mais pas de crash.
@@ -163,7 +173,10 @@ struct ChessLabApp: App {
             schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none
         )
         do {
-            return try ModelContainer(for: schema, configurations: [memoryConfiguration])
+            let container = try ModelContainer(for: schema, configurations: [memoryConfiguration])
+            // La bannière de l'accueil doit avouer la session sans base.
+            SessionDegradation.isInMemory = true
+            return container
         } catch {
             fatalError("Impossible de créer même un conteneur en mémoire : \(error)")
         }
@@ -173,14 +186,44 @@ struct ChessLabApp: App {
     /// nommés « Games »/« Puzzles », plus leurs journaux WAL/SHM). L'ancien
     /// store combiné « default » est aussi purgé : orphelin depuis la
     /// séparation, il ne sert plus à rien.
-    private static func destroyLocalStore() {
+    /// Compte les échecs d'ouverture CONSÉCUTIFS du conteneur — remis à zéro
+    /// au premier succès. C'est lui qui sépare l'incident transitoire (disque
+    /// plein) de la corruption réelle.
+    static let openFailureKey = "container.openFailures"
+
+    /// Met les stores locaux en QUARANTAINE au lieu de les supprimer : un
+    /// dossier horodaté dans Application Support, récupérable au support.
+    /// Seules les deux quarantaines les plus récentes sont conservées.
+    private static func quarantineLocalStore() {
         let fileManager = FileManager.default
         guard let appSupport = try? fileManager.url(
             for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false
         ) else { return }
+
+        let stamp = ISO8601DateFormatter().string(from: Date())
+            .replacingOccurrences(of: ":", with: "-")
+        let quarantine = appSupport.appendingPathComponent("StoreQuarantine/\(stamp)", isDirectory: true)
+        try? fileManager.createDirectory(at: quarantine, withIntermediateDirectories: true)
+
         for base in ["Games.store", "Puzzles.store", "default.store"] {
             for suffix in ["", "-shm", "-wal"] {
-                try? fileManager.removeItem(at: appSupport.appendingPathComponent(base + suffix))
+                let name = base + suffix
+                let source = appSupport.appendingPathComponent(name)
+                guard fileManager.fileExists(atPath: source.path) else { continue }
+                // Déplacement, jamais suppression ; si le déplacement échoue
+                // (même volume, donc improbable), on préfère laisser le
+                // fichier en place et échouer à recréer plutôt que détruire.
+                try? fileManager.moveItem(at: source, to: quarantine.appendingPathComponent(name))
+            }
+        }
+
+        // Rotation : deux quarantaines suffisent au diagnostic.
+        let root = appSupport.appendingPathComponent("StoreQuarantine", isDirectory: true)
+        if let entries = try? fileManager.contentsOfDirectory(
+            at: root, includingPropertiesForKeys: nil
+        ), entries.count > 2 {
+            for url in entries.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }).dropLast(2) {
+                try? fileManager.removeItem(at: url)
             }
         }
     }

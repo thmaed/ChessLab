@@ -243,7 +243,7 @@ struct AnalysisLibraryView: View {
         .sheet(item: $editingRecord) { record in
             GameTagsEditorSheet(initialTags: record.tags, suggestions: allTags) { newTags in
                 record.tags = newTags
-                try? modelContext.save()
+                PersistenceLog.save(modelContext)
                 // Un tag qui vient de disparaître ne doit pas laisser un
                 // filtre actif fantôme.
                 if let tagFilter, !allTags.contains(where: { $0.lowercased() == tagFilter.lowercased() }) {

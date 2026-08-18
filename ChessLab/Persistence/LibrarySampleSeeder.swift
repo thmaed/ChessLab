@@ -54,7 +54,7 @@ enum LibrarySampleSeeder {
             record.moveCount = 6
             context.insert(record)
         }
-        try? context.save()
+        PersistenceLog.save(context)
     }
     #else
     @MainActor

@@ -40,7 +40,7 @@ enum OpeningProgressSync {
         let positionsChanged = reconcilePositions(scheduler: scheduler, in: context)
         let membershipsChanged = reconcileMemberships(in: context)
         if positionsChanged || membershipsChanged {
-            try? context.save()
+            PersistenceLog.save(context)
         }
     }
 

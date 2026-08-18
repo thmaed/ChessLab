@@ -13374,6 +13374,70 @@
           }
         }
       }
+    },
+    "Session sans enregistrement" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session without saving"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Session sans enregistrement"
+          }
+        }
+      }
+    },
+    "Vos données ne s'enregistrent plus" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your data is no longer being saved"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vos données ne s'enregistrent plus"
+          }
+        }
+      }
+    },
+    "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The database could not be opened — your existing data is intact. Restart the app to try again."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer."
+          }
+        }
+      }
+    },
+    "Vérifiez l'espace disque. Vos dernières actions risquent d'être perdues." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Check your free disk space. Your latest actions may be lost."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérifiez l'espace disque. Vos dernières actions risquent d'être perdues."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

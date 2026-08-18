@@ -158,7 +158,7 @@ enum OpeningProgressStore {
             stabilityAfter: outcome.stabilityAfter
         )
         context.insert(log)
-        try? context.save()
+        PersistenceLog.save(context)
         return progress
     }
 }

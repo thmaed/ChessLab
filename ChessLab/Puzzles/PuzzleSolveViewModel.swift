@@ -91,7 +91,7 @@ final class PuzzleSolveViewModel {
         // les puzzles jamais ouverts avant de répéter celui-ci.
         if puzzle.firstOpenedAt == nil {
             puzzle.firstOpenedAt = Date()
-            try? modelContext.save()
+            PersistenceLog.save(modelContext)
         }
     }
 
@@ -377,7 +377,7 @@ final class PuzzleSolveViewModel {
         puzzle.dueDate = SpacedRepetition.dueDate(for: next)
         puzzle.successCount = (puzzle.successCount ?? 0) + (success ? 1 : 0)
         puzzle.failureCount = (puzzle.failureCount ?? 0) + (success ? 0 : 1)
-        try? modelContext.save()
+        PersistenceLog.save(modelContext)
         // Recopie la progression vers son miroir SYNCHRONISÉ (iCloud) : la
         // bibliothèque reste locale, seule cette progression personnelle suit
         // les appareils (voir ``PuzzleProgressSync``).

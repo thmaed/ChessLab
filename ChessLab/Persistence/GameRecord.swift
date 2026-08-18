@@ -110,6 +110,6 @@ final class GameRecord: Identifiable {
             record.moveCount = plyCount(of: game)
             changed = true
         }
-        if changed { try? context.save() }
+        if changed { PersistenceLog.save(context) }
     }
 }

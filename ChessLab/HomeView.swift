@@ -31,6 +31,8 @@ struct HomeView: View {
     @State private var menuCommands = MenuCommands.shared
 
     @State private var seedingState = PuzzleSeedingState.shared
+    /// Santé de la persistance — la bannière « rien ne s'enregistre » en vit.
+    @State private var persistenceHealth = PersistenceHealth.shared
 
     /// Les dernières parties terminées, pour un accès direct à leur analyse
     /// depuis l'accueil. `fetchLimit` borné : un joueur peut accumuler des
@@ -186,6 +188,10 @@ struct HomeView: View {
             open(destination)
         }
         .onAppear {
+            // Le conteneur est-il retombé en mémoire au lancement ? Le
+            // drapeau est posé AVANT le MainActor (voir SessionDegradation),
+            // la bannière le lit ici.
+            if SessionDegradation.isInMemory { persistenceHealth.isDegradedSession = true }
             refreshResumableGame()
             // Fusionne la progression puzzles synchronisée (autres appareils)
             // dans les Puzzle locaux AVANT de calculer le bilan — voir
@@ -384,6 +390,7 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 homeHeader
+                if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 // La reprise vit désormais en HAUT de la barre latérale
                 // (persistante) — voir `sidebar` — pour ne pas doublonner ici.
@@ -743,6 +750,7 @@ struct HomeView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 homeHeader
+                if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 if let resumableGame { resumeBanner(resumableGame) }
                 modesSection(minTile: 160)
@@ -860,6 +868,34 @@ struct HomeView: View {
     }
 
     // MARK: En-tête & résumé
+
+    /// « Vos données ne s'enregistrent plus » — discrète mais franche.
+    /// Deux causes distinctes, deux textes : la base qui ne s'ouvre plus
+    /// (session en mémoire) et les enregistrements qui échouent en série
+    /// (disque plein, conflit) — voir ``PersistenceHealth``.
+    private var persistenceBanner: some View {
+        HStack(spacing: 14) {
+            IconBadge(systemImage: "exclamationmark.triangle.fill", tint: Theme.warning, size: 34)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(persistenceHealth.isDegradedSession
+                     ? "Session sans enregistrement"
+                     : "Vos données ne s'enregistrent plus")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                Text(persistenceHealth.isDegradedSession
+                     ? "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer."
+                     : "Vérifiez l'espace disque. Vos dernières actions risquent d'être perdues.")
+                    .font(.caption)
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .cardStyle()
+        .overlay(Theme.cardShape.strokeBorder(Theme.warning.opacity(0.35), lineWidth: 1))
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("persistenceBanner")
+    }
 
     private var seedingBanner: some View {
         HStack(spacing: 14) {

@@ -25,7 +25,7 @@ enum GameLibraryService {
         record.engineEloApprox = Int(strength.sliderValue)
         record.moveCount = GameRecord.plyCount(of: game)
         context.insert(record)
-        try? context.save()
+        PersistenceLog.save(context)
     }
 
     /// Résultat d'un import PGN multi-parties.
@@ -131,7 +131,7 @@ enum GameLibraryService {
             context.insert(record)
             imported += 1
         }
-        if imported > 0 { try? context.save() }
+        if imported > 0 { PersistenceLog.save(context) }
         return ImportOutcome(imported: imported, skipped: skipped, duplicates: duplicates)
     }
 
@@ -150,7 +150,7 @@ enum GameLibraryService {
     static func delete(_ records: [GameRecord], in context: ModelContext) -> Int {
         guard !records.isEmpty else { return 0 }
         for record in records { context.delete(record) }
-        try? context.save()
+        PersistenceLog.save(context)
         return records.count
     }
 
@@ -183,6 +183,6 @@ enum GameLibraryService {
         record.blackName = blackName
         record.moveCount = GameRecord.plyCount(of: game)
         context.insert(record)
-        try? context.save()
+        PersistenceLog.save(context)
     }
 }

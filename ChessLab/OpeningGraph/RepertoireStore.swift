@@ -31,11 +31,11 @@ enum RepertoireStore {
     static func toggle(courseID: String, side: OpeningSide, in context: ModelContext) -> Bool {
         if let existing = membership(courseID: courseID, in: context) {
             context.delete(existing)
-            try? context.save()
+            PersistenceLog.save(context)
             return false
         }
         context.insert(RepertoireMembership(courseID: courseID, sideRaw: side.rawValue, isFavorite: true))
-        try? context.save()
+        PersistenceLog.save(context)
         return true
     }
 }

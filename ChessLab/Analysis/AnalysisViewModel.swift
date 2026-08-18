@@ -2007,7 +2007,7 @@ final class AnalysisViewModel {
         }
 
         if created > 0 {
-            try? context.save()
+            PersistenceLog.save(context)
         }
         if !isEngineUnavailable {
             startLiveAnalysis()

@@ -89,7 +89,7 @@ final class UserOpeningStore {
             context.insert(UserOpeningRecord(id: course.id, name: course.name, payload: data))
             migrated += 1
         }
-        if migrated > 0 { try? context.save() }
+        if migrated > 0 { PersistenceLog.save(context) }
     }
 
     static func isUserCourse(id: String) -> Bool { id.hasPrefix(identifierPrefix) }
@@ -261,7 +261,7 @@ final class UserOpeningStore {
             descriptor.fetchLimit = 1
             if let record = try? context.fetch(descriptor).first {
                 context.delete(record)
-                try? context.save()
+                PersistenceLog.save(context)
             }
         }
         // Le fichier hérité part aussi, sans quoi la migration le ferait
@@ -320,7 +320,7 @@ final class UserOpeningStore {
         }
         if !extras.isEmpty, let context {
             for extra in extras { context.delete(extra) }
-            try? context.save()
+            PersistenceLog.save(context)
         }
         return Array(best.values)
     }

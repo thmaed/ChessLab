@@ -36,7 +36,7 @@ enum PuzzleProgressSync {
         record.dueDate = puzzle.dueDate
         record.firstOpenedAt = puzzle.firstOpenedAt
         record.updatedAt = Date()
-        try? context.save()
+        PersistenceLog.save(context)
     }
 
     /// Fusionne la progression synchronisée dans les `Puzzle` locaux. Ne
@@ -81,7 +81,7 @@ enum PuzzleProgressSync {
                 progress.updatedAt = Date()
             }
         }
-        try? context.save()
+        PersistenceLog.save(context)
     }
 
     // MARK: Fetch
