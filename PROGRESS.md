@@ -5948,8 +5948,22 @@ vers lui — la nulle tient.
 
 48 cours de finales, catalogue à 106.
 
-**Reste à faire** (mis à jour, 48 cours de finales, catalogue à 106) :
-environ 42 items du catalogue de référence restent à couvrir.
+**La forteresse de Karstedt, enfin résolue** — troisième tentative sur cet
+item après deux échecs déjà documentés plus haut (aucune source ne donnait
+le placement exact, une reconstruction à l'estime perdait en 13 coups).
+Une nouvelle recherche a fini par livrer les trois cases exactes du trio
+défenseur : roi h1, fou g2, cavalier e4 — la SEULE configuration connue où
+roi+fou+cavalier, sans un seul pion, tient la nulle contre une dame seule.
+Testée à l'oracle avec une dame attaquante placée à distance raisonnable
+(b5) : confirmé, racine à 5 pièces, draw. La clé structurelle : le fou sur
+g2 garde à la fois le roi ET le cavalier posté juste devant lui sur e4 —
+le bouger (`Bf1??`) abandonne le cavalier, `Qxe4` le croque aussitôt et la
+forteresse s'effondre.
+
+49 cours de finales, catalogue à 107.
+
+**Reste à faire** (mis à jour, 49 cours de finales, catalogue à 107) :
+environ 41 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini

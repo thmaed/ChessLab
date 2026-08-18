@@ -13772,6 +13772,22 @@
         }
       }
     },
+    "The Karstedt Fortress" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Karstedt Fortress"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La forteresse de Karstedt"
+          }
+        }
+      }
+    },
     "Corresponding Squares" : {
       "localizations" : {
         "en" : {
