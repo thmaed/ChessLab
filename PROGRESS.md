@@ -5885,8 +5885,20 @@ qu'aider le roi blanc à se rapprocher de son pion.
 
 44 cours de finales, catalogue à 102.
 
-**Reste à faire** (mis à jour, 44 cours de finales, catalogue à 102) :
-environ 46 items du catalogue de référence restent à couvrir.
+**Tour et pion contre cavalier** livrée ensuite — recherches infructueuses
+sur « majorité paralysée » (concept surtout illustré avec de nombreux
+pions, hors de portée tablebase, plus proche du thème stratégique que de
+la ligne forcée) et sur un exemple canonique d'échec perpétuel en dame+pion
+contre dame (aucune position isolée trouvée, seulement des parties
+complètes). Construite à la place, en position neutre comme les autres
+comparaisons de matériel de la session : un pion de plus suffit très
+généralement à la tour pour l'emporter sur un cavalier seul — vérifié,
+victoire dans toutes les tentatives testées à la racine.
+
+45 cours de finales, catalogue à 103.
+
+**Reste à faire** (mis à jour, 45 cours de finales, catalogue à 103) :
+environ 45 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini

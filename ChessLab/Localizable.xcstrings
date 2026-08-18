@@ -13884,6 +13884,22 @@
         }
       }
     },
+    "Rook and Pawn vs Knight" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook and Pawn vs Knight"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour et pion contre cavalier"
+          }
+        }
+      }
+    },
     "Rook vs Rook and Bishop — the Szén Position" : {
       "localizations" : {
         "en" : {
