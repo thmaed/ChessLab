@@ -6089,6 +6089,18 @@ rien de plus que « suivez l'oracle ».
 
 58 cours de finales, catalogue à 116.
 
+**Découverte de workflow** : le commit de ce lot a poussé un diff de
+`Localizable.xcstrings` bien plus large que prévu (1795 lignes touchées au
+lieu des ~32 attendues pour 2 cours). Vérifié après coup : JSON valide,
+tout le contenu intact — c'est une reformulation (ré-indentation, ré-
+ordonnancement) sans perte, pas une corruption. Déjà vu une fois plus tôt
+(incident noté alors comme un « flûte » isolé) ; cette deuxième occurrence,
+survenue APRÈS mon édition propre mais AVANT le commit — donc pendant l'un
+des `xcodebuild build` du cycle — suggère que ce n'est pas aléatoire :
+Xcode reformate probablement le catalogue de chaînes pendant la
+compilation elle-même. Contre-mesure adoptée : vérifier le diff de ce
+fichier juste avant chaque commit, pas seulement juste après l'édition.
+
 **Reste à faire** (mis à jour, 58 cours de finales, catalogue à 116) :
 environ 32 items du catalogue de référence restent à couvrir.
 
