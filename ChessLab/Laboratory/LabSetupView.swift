@@ -119,9 +119,23 @@ struct LabSetupView: View {
                                 in: 50...5000, step: 50
                             )
                             .tint(Theme.accent)
-                            Text("Jusqu'à 5 s/coup — utile pour laisser respirer le moteur à Elo élevé.")
+                            // Le fait de calibration qui rend les étiquettes
+                            // honnêtes : l'échelle UCI_Elo de Stockfish est
+                            // calée sur ~2-3 s par coup (cadence 120s+1s,
+                            // ancrage CCRL 40/4). Un camp BRIDÉ y est peu
+                            // sensible (le bridage domine) ; « Maximum », lui,
+                            // n'a QUE le temps comme force.
+                            Text("Les Elo de Stockfish sont calibrés à ~2-3 s par coup : en dessous, les niveaux réels sont plus bas, surtout près du maximum. L'écart entre A et B reste comparatif.")
                                 .font(.caption2)
                                 .foregroundStyle(Theme.textTertiary)
+                            if showsShortTimeStrengthWarning {
+                                Label(
+                                    "Camp proche du maximum et moins de 0,5 s par coup : le temps court bride surtout le camp fort — l'écart réel sera plus petit que l'écart affiché.",
+                                    systemImage: "exclamationmark.triangle.fill"
+                                )
+                                .font(.caption2)
+                                .foregroundStyle(Theme.warning)
+                            }
                         }
 
                         VStack(alignment: .leading, spacing: 8) {
@@ -393,6 +407,16 @@ struct LabSetupView: View {
     /// « 850 ms » sous 1 s, « 2,5 s » au-delà.
     private func movetimeLabel(_ ms: Int) -> String {
         ms < 1000 ? "\(ms) ms" : String(format: "%.1f s", Double(ms) / 1000)
+    }
+
+    /// LE cas où l'écart affiché ment : un camp à peu près illimité (dès
+    /// ~2800, le bridage `UCI_Elo` pèse peu ; à 3190 il n'existe plus) tire
+    /// TOUTE sa force du temps de réflexion — un temps court le bride, lui,
+    /// et pas son adversaire bridé par l'Elo. Sous 0,5 s/coup, l'écart réel
+    /// se compresse nettement par rapport à l'écart affiché.
+    private var showsShortTimeStrengthWarning: Bool {
+        settings.movetimeMs < 500
+            && max(settings.sideAEloSlider, settings.sideBEloSlider) >= 2800
     }
 
     /// Un moteur sur trois lignes serrées : identité + force sur la même
