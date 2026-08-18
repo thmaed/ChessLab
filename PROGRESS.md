@@ -5837,8 +5837,21 @@ mais cette fois sans savoir SI la vraie position source évite ce piège ou
 si ma reconstruction était simplement incomplète. Abandonné plutôt que
 publié à faible confiance.
 
-**Reste à faire** (mis à jour, 40 cours de finales, catalogue à 98) :
-environ 50 items du catalogue de référence restent à couvrir.
+**Dame contre deux tours** livrée ensuite — construite (pas sourcée sur une
+partie précise) à partir du principe général documenté (Dvoretsky, Fine &
+Benko) : sans pion, deux tours coordonnées tiennent la nulle contre la
+dame, À CONDITION de se défendre mutuellement. Racine à 4 pièces, testée
+neutre : confirmé à l'oracle. Trouvaille de construction, pas cherchée au
+départ : `Kf8` (rester sur la 8e rangée) bloque la coordination des deux
+tours et perd une tour gratuitement à `Qxa8+` ; `Kg7` (quitter la rangée)
+la préserve. Et si la dame croque quand même une fois la rangée dégagée
+(`Qxa8??`), l'autre tour reprend aussitôt (`Rxa8`) — la coordination paie
+exactement comme annoncé.
+
+41 cours de finales, catalogue à 99.
+
+**Reste à faire** (mis à jour, 41 cours de finales, catalogue à 99) :
+environ 49 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini

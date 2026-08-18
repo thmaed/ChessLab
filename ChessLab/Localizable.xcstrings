@@ -13756,6 +13756,22 @@
         }
       }
     },
+    "Queen vs Two Rooks" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Two Rooks"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre deux tours"
+          }
+        }
+      }
+    },
     "Queen vs Rook's Pawn — the Corner Draw" : {
       "localizations" : {
         "en" : {
