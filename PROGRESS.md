@@ -5850,8 +5850,19 @@ exactement comme annoncé.
 
 41 cours de finales, catalogue à 99.
 
-**Reste à faire** (mis à jour, 41 cours de finales, catalogue à 99) :
-environ 49 items du catalogue de référence restent à couvrir.
+**Dame contre tour et fou** livrée ensuite — même principe de construction
+que dame-contre-deux-tours : sans pion, la dame l'emporte en général contre
+tour+fou en séparant les pièces noires par échecs à distance jusqu'au
+zugzwang, sauf si roi-tour-fou restent groupés en triangle, chacun
+protégeant un autre. Racine à 5 pièces, testée neutre, confirmée à l'oracle.
+Piège trouvé en explorant : une case de roi qui semble tout aussi défendable
+que la bonne (`Ke6??` au lieu de `Kf8`) abandonne la protection de la tour
+— deux échecs plus tard, `Qxg8` la croque hors de portée.
+
+**Le catalogue franchit les 100 cours** (42 finales + 58 ouvertures).
+
+**Reste à faire** (mis à jour, 42 cours de finales, catalogue à 100) :
+environ 48 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini

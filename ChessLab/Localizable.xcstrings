@@ -13772,6 +13772,22 @@
         }
       }
     },
+    "Queen vs Rook and Bishop" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen vs Rook and Bishop"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame contre tour et fou"
+          }
+        }
+      }
+    },
     "Queen vs Rook's Pawn — the Corner Draw" : {
       "localizations" : {
         "en" : {
