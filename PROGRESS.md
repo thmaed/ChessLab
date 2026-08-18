@@ -5821,8 +5821,21 @@ comme les autres forteresses « pièce en plus qui ne suffit pas ».
 
 40 cours de finales, catalogue à 98.
 
-Ces items restent au programme, marqués comme nécessitant une session de
-recherche dédiée plutôt qu'une suite rapide.
+**Point de contrôle final de cette rafale** : audit complet relancé
+(`audit_endgames.py` sans `--only`) — 1046 requêtes tablebase, toutes en
+cache, 0 régression sur les 40 cours.
+
+**Forteresse de Karstedt (1903, dame contre fou+cavalier) tentée et
+abandonnée** : la structure générale est documentée (fou b2, cavalier d4,
+barrage sur a3-b3-c3-c2-c1, roi défenseur au coin), mais aucune source
+trouvée ne donne le placement EXACT des pièces attaquantes ni la défense
+du cavalier. Une reconstruction à vue (roi et dame blancs placés à
+l'estime) a été testée à l'oracle — et perd en 13 coups, `Qxd4+` croquant
+le cavalier non défendu tout net. Même défaut de construction déjà
+rencontré deux fois cette session (pièce hors de propos, non défendue) —
+mais cette fois sans savoir SI la vraie position source évite ce piège ou
+si ma reconstruction était simplement incomplète. Abandonné plutôt que
+publié à faible confiance.
 
 **Reste à faire** (mis à jour, 40 cours de finales, catalogue à 98) :
 environ 50 items du catalogue de référence restent à couvrir.
