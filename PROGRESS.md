@@ -5619,6 +5619,14 @@ autant pour ne pas se battre pour rien que pour ne pas résigner trop tôt.
 
 25 cours de finales, catalogue à 83.
 
+**Cavalier contre deux pions séparés** livré ensuite : même paire de pions
+que pour « majorité à l'aile roi », même logique de seuil de rang — sur la
+6e, le cavalier ne peut être qu'à un endroit à la fois et un des deux pions
+passe toujours ; sur la 5e (un rang plus tôt), posté au centre, il a le
+temps de courir d'une aile à l'autre et tient la nulle.
+
+26 cours de finales, catalogue à 84.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 

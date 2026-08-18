@@ -13723,6 +13723,22 @@
           }
         }
       }
+    },
+    "Knight vs Two Separated Pawns" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight vs Two Separated Pawns"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cavalier contre deux pions séparés"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
