@@ -5783,6 +5783,18 @@ raisonnable que Kc5 en apparence, perd après Kc4.
 
 37 cours de finales, catalogue à 95.
 
+**Étude de Grigoriev** livrée ensuite — sourcée via l'analyse d'Elkies
+(« Endgame Explorations 9 »), une étude primée à La Stratégie. Racine à
+5 pièces, mais dtm 61 : la technique la plus longue vérifiée dans tout le
+module cette session. Quatre coups blancs se ressemblent à la racine
+(pousser le pion e de deux façons, ranger le roi sur g2 ou h2) — un SEUL
+(`Kg3`) gagne, les trois autres ne font que la nulle. Piège construit à
+partir de l'exploration : pousser `e4+` tout de suite semble créer un pion
+passé sans attendre, mais le roi noir le reprend aussitôt (`Kxe4`) et toute
+la marche de roi qui faisait le travail disparaît avec lui.
+
+38 cours de finales, catalogue à 96.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
