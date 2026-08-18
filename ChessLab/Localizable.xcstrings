@@ -13820,6 +13820,22 @@
         }
       }
     },
+    "Rook vs Rook and Bishop — the Szén Position" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook vs Rook and Bishop — the Szén Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour contre tour et fou — la position de Szén"
+          }
+        }
+      }
+    },
     "Bishop vs Knight — the Long Diagonal" : {
       "localizations" : {
         "en" : {

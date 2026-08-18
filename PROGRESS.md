@@ -5795,11 +5795,24 @@ la marche de roi qui faisait le travail disparaît avec lui.
 
 38 cours de finales, catalogue à 96.
 
+**Tour et fou contre tour** livrée ensuite — première entrée des
+« déséquilibres matériels » lourds, sourcée Wikipédia (« Rook and bishop
+versus rook endgame »), position de Szén : contrairement à l'intuition
+« matériel en plus = gagnant », la tour et le fou ne gagnent PAS toujours
+contre une tour seule. Racine à 5 pièces, position réellement tenue quatre
+fois de suite dans une vraie partie (Pintér-Razuvayev, 1982) avant la
+nulle. Piège trouvé en explorant : après la manœuvre correcte du fou noir,
+la tour blanche a plusieurs cases sûres (e7, etc.) mais une case tout aussi
+plausible (`Ra7??`) abandonne la colonne b — `Rb1#`, mat immédiat en un
+coup. La marge entre forteresse et mat tenait à une seule case de tour.
+
+39 cours de finales, catalogue à 97.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
-**Reste à faire** (mis à jour, 38 cours de finales, catalogue à 96) :
-environ 52 items du catalogue de référence restent à couvrir.
+**Reste à faire** (mis à jour, 39 cours de finales, catalogue à 97) :
+environ 51 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini
@@ -5820,8 +5833,10 @@ environ 52 items du catalogue de référence restent à couvrir.
   d'une partie complète est réel. Les 2 items déjà livrés (Hall, Sam Loyd)
   couvrent le cœur de la théorie fou-contre-cavalier ; ces deux-là
   resteraient pour une session dédiée à l'analyse de parties complètes.
-- Le reste des « déséquilibres matériels » (T+F, T+C, D contre pièces…)
-  reste la famille la moins couverte après « fou contre cavalier ».
+- **Tour et fou contre tour est FAIT** (`eg-rook-vs-rook-and-bishop`,
+  position de Szén) — retiré de la liste. Le reste des « déséquilibres
+  matériels » (T+C contre T, D contre pièces…) reste la famille la moins
+  couverte après « fou contre cavalier ».
 - Les thèmes transversaux (zugzwang, forteresses, principe des deux
   faiblesses…) seront traités en galeries multi-positions plutôt qu'en une
   racine chacun — format encore à concevoir, rien de commencé.
