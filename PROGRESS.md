@@ -6048,8 +6048,23 @@ robuste, cours à un seul chapitre.
 
 55 cours de finales, catalogue à 113.
 
-**Reste à faire** (mis à jour, 55 cours de finales, catalogue à 113) :
-environ 35 items du catalogue de référence restent à couvrir.
+**Pions sur les deux ailes contre cavalier** livrée ensuite — item de la
+liste initiale enfin traité, construit sur le principe documenté (le
+cavalier a une portée trop courte pour défendre les deux ailes à la fois)
+plutôt que sourcé sur une partie précise. Piste parallèle explorée sans
+succès : la manœuvre de Prokeš (tour qui tient la nulle contre deux pions
+liés avancés par un sacrifice de qualité) — aucune source ne donne la
+position exacte de l'étude de 1939, et une reconstruction à l'estime
+n'a pas été tentée pour éviter un nouveau risque de construction erronée
+comme documenté plusieurs fois cette session. Racine à 5 pièces : un pion
+de chaque aile, déjà avancés, contre un cavalier seul — pousser
+immédiatement gagne, perdre un tempo (`Kd1??`) laisse au cavalier le temps
+de croquer l'un des deux pions et tenir la nulle avec l'autre.
+
+56 cours de finales, catalogue à 114.
+
+**Reste à faire** (mis à jour, 56 cours de finales, catalogue à 114) :
+environ 34 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini

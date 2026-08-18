@@ -13628,6 +13628,22 @@
         }
       }
     },
+    "Knight vs Pawns on Both Wings" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight vs Pawns on Both Wings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pions sur les deux ailes contre cavalier"
+          }
+        }
+      }
+    },
     "Finales de cavaliers" : {
       "localizations" : {
         "en" : {
