@@ -5872,8 +5872,21 @@ aucun piège authentique trouvé malgré la recherche.
 
 43 cours de finales, catalogue à 101.
 
-**Reste à faire** (mis à jour, 43 cours de finales, catalogue à 101) :
-environ 47 items du catalogue de référence restent à couvrir.
+**Défense frontale** livrée ensuite — sourcée Wikipédia (« Rook and pawn
+versus rook endgame ») : quand le roi défenseur est coupé du pion et ne
+peut rejoindre la position de Philidor à temps, la tour se contente
+d'attendre sur la rangée de promotion, peu importe la colonne, prête à
+croquer le pion dès son arrivée. Racine à 5 pièces. Ligne complète et
+satisfaisante : la tour quitte même la rangée pour harceler le pion par le
+flanc en chemin (`Rc6`), puis revient juste à temps (`Rc8`) avant la
+promotion. Piège trouvé en explorant : l'échec par-derrière — souvent LA
+ressource clé dans ces finales — donné trop tôt (`Rb3+??`) ne fait
+qu'aider le roi blanc à se rapprocher de son pion.
+
+44 cours de finales, catalogue à 102.
+
+**Reste à faire** (mis à jour, 44 cours de finales, catalogue à 102) :
+environ 46 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini

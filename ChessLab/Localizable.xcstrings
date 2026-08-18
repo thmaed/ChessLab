@@ -13708,6 +13708,22 @@
         }
       }
     },
+    "Frontal Defence" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Frontal Defence"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Défense frontale"
+          }
+        }
+      }
+    },
     "Corresponding Squares" : {
       "localizations" : {
         "en" : {
