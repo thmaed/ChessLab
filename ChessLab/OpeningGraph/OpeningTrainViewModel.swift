@@ -81,13 +81,36 @@ final class OpeningTrainViewModel {
         if case let .fullLine(courseID) = mode {
             if let c = OpeningCatalog.course(id: courseID) { loaded[courseID] = c }
         } else {
-            let repertoire = RepertoireStore.memberIDs(in: context)
-            for entry in OpeningCatalog.all {
-                if !repertoire.isEmpty && !repertoire.contains(entry.id) { continue }
-                if let c = OpeningCatalog.course(id: entry.id) { loaded[entry.id] = c }
-            }
+            loaded = Self.reviewableCourses(in: context)
         }
         self.init(mode: mode, context: context, courses: loaded, newLimit: newLimit, now: now)
+    }
+
+    /// Les cours que la séance quotidienne a le droit de servir.
+    ///
+    /// L'étoile du répertoire ne filtre que les cours JAMAIS travaillés : un
+    /// cours où l'utilisateur a de la progression est TOUJOURS servi, membre
+    /// ou pas. Sans cela (bug18aout.md §2, arbitré le 18/08), entraîner la
+    /// Lucena avec trois ouvertures étoilées gonflait le compteur « à
+    /// revoir » de positions que la séance ne servait jamais — on révise ce
+    /// qu'on a appris.
+    static func reviewableCourses(in context: ModelContext) -> [String: OpeningCourse] {
+        var loaded: [String: OpeningCourse] = [:]
+        let repertoire = RepertoireStore.memberIDs(in: context)
+        let trainedFENs: Set<String> = repertoire.isEmpty
+            ? []  // pas de filtre → pas besoin de l'intersection
+            : Set(snapshots(in: context).filter { $0.value.reps > 0 }.keys)
+        for entry in OpeningCatalog.all {
+            guard let c = OpeningCatalog.course(id: entry.id) else { continue }
+            if !repertoire.isEmpty && !repertoire.contains(entry.id) {
+                // Une seule position déjà travaillée suffit : la progression
+                // est attachée aux POSITIONS, et une transposition entraînée
+                // ailleurs y ouvre droit aussi.
+                guard c.positions.keys.contains(where: trainedFENs.contains) else { continue }
+            }
+            loaded[entry.id] = c
+        }
+        return loaded
     }
 
     /// Init désigné (cours injectés) — testable sans bundle. `synchronousOpponent`

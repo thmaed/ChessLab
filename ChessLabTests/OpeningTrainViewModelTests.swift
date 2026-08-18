@@ -168,4 +168,43 @@ struct OpeningTrainViewModelTests {
         let model = OpeningTrainViewModel(mode: .daily, context: context, courses: ["c": course])
         #expect(model.phase == .empty)
     }
+
+    // MARK: Arbitrage du 18/08 (bug18aout §2) — la progression prime sur l'étoile
+
+    /// Un répertoire étoilé ne doit pas priver de révision un cours déjà
+    /// TRAVAILLÉ : la Lucena entraînée hier reste servie même si seuls trois
+    /// cours d'ouvertures portent l'étoile.
+    @Test func aTrainedCourseIsServedEvenOutsideTheRepertoire() throws {
+        let context = try makeContext()
+
+        // Un cours du catalogue RÉEL, hors répertoire, avec une position due.
+        let lucena = try #require(OpeningCatalog.course(id: "eg-lucena"))
+        let someKey = try #require(lucena.positions.keys.first)
+        let progress = OpeningPositionProgress(fenKey: someKey)
+        progress.reps = 3
+        progress.dueDate = Date(timeIntervalSinceNow: -3600)
+        context.insert(progress)
+
+        // Et un répertoire NON VIDE qui ne le contient pas.
+        context.insert(RepertoireMembership(courseID: "italian-game", sideRaw: "white", isFavorite: true))
+        try context.save()
+
+        let served = OpeningTrainViewModel.reviewableCourses(in: context)
+        #expect(served.keys.contains("eg-lucena"),
+                "le cours travaillé doit être servi malgré l'étoile ailleurs")
+        #expect(served.keys.contains("italian-game"),
+                "le cours étoilé reste servi, évidemment")
+    }
+
+    /// L'étoile continue de filtrer les cours JAMAIS travaillés.
+    @Test func anUntouchedCourseStaysFilteredByTheRepertoire() throws {
+        let context = try makeContext()
+        context.insert(RepertoireMembership(courseID: "italian-game", sideRaw: "white", isFavorite: true))
+        try context.save()
+
+        let served = OpeningTrainViewModel.reviewableCourses(in: context)
+        #expect(!served.keys.contains("eg-lucena"),
+                "sans progression ni étoile, un cours n'entre pas dans la séance")
+    }
+
 }
