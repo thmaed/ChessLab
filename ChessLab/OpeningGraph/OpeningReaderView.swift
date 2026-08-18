@@ -39,22 +39,18 @@ struct OpeningReaderView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
-                Button {
-                    // FEN complète (6 champs) : la clé du graphe n'a que 4
-                    // champs, l'écran de réglages attend une FEN standard.
-                    let fen = OpeningFENKey.position(from: viewModel.currentKey)?.fen
-                        ?? viewModel.currentKey
-                    onContinueVsStockfish(fen)
-                } label: {
-                    Label("Jouer contre l'ordinateur d'ici", systemImage: "cpu")
-                }
-                .tint(Theme.accent)
-                .accessibilityIdentifier("reader_playFromHere")
                 Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
                     .tint(Theme.accent)
                 QuickSwitchMenu(
-                    excluding: .vsEngine,
-                    onOpenLab: onOpenLab, onPlayVsEngine: {}, onOpenTwoPlayer: onOpenTwoPlayer
+                    onOpenLab: onOpenLab,
+                    onPlayVsEngine: {
+                        // FEN complète (6 champs) : la clé du graphe n'a que 4
+                        // champs, l'écran de réglages attend une FEN standard.
+                        let fen = OpeningFENKey.position(from: viewModel.currentKey)?.fen
+                            ?? viewModel.currentKey
+                        onContinueVsStockfish(fen)
+                    },
+                    onOpenTwoPlayer: onOpenTwoPlayer
                 )
             }
         }

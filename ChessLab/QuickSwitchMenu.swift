@@ -40,6 +40,7 @@ struct QuickSwitchMenu: View {
         } label: {
             Label("Changer de mode", systemImage: "square.grid.2x2")
         }
+        .tint(Theme.violet)
         .accessibilityIdentifier("quickSwitchMenu")
     }
 }

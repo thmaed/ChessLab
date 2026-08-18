@@ -10,19 +10,57 @@ import SwiftUI
 ///   ``PuzzleQueueView``, un `FetchDescriptor` filtré laisse SQLite ne
 ///   remonter que les puzzles réellement TENTÉS. Les `GameRecord`, eux,
 ///   forment une petite table : un chargement complet est sans danger.
+
+/// Fenêtre temporelle du bilan « Contre l'ordinateur » — chaque
+/// ``GameRecord`` porte un ``GameRecord/playedAt`` réel, donc un filtre par
+/// date y est honnête. Les puzzles, eux, ne stockent que des compteurs
+/// CUMULÉS (voir la note sur ``ProgressionSummary``) : pas de date par
+/// tentative, donc pas de filtre là — mieux vaut ne rien proposer qu'une
+/// fausse fenêtre temporelle.
+enum ProgressionTimeRange: String, CaseIterable, Identifiable {
+    case last7Days, last30Days, allTime
+
+    var id: String { rawValue }
+
+    var label: LocalizedStringKey {
+        switch self {
+        case .last7Days: "7 jours"
+        case .last30Days: "30 jours"
+        case .allTime: "Tout"
+        }
+    }
+
+    /// `nil` = pas de borne (tout l'historique).
+    var cutoff: Date? {
+        switch self {
+        case .last7Days: Calendar.current.date(byAdding: .day, value: -7, to: Date())
+        case .last30Days: Calendar.current.date(byAdding: .day, value: -30, to: Date())
+        case .allTime: nil
+        }
+    }
+}
+
 struct ProgressionView: View {
     @Environment(\.modelContext) private var modelContext
-    @State private var summary: ProgressionSummary?
+    @State private var allGames: [GameRecord] = []
+    @State private var puzzles: [Puzzle] = []
+    @State private var timeRange: ProgressionTimeRange = .allTime
 
     /// Passe une session de puzzles filtrée sur le thème le plus faible —
     /// branché par l'hôte de navigation. No-op par défaut (aperçus/tests).
     var onTrainTheme: (PuzzleTheme) -> Void = { _ in }
 
+    private var summary: ProgressionSummary {
+        let cutoff = timeRange.cutoff
+        let games = cutoff.map { bound in allGames.filter { ($0.playedAt ?? .distantPast) >= bound } } ?? allGames
+        return ProgressionSummary.compute(games: games, puzzles: puzzles)
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                if let summary, summary.hasAnyData {
-                    if summary.engineGames > 0 {
+                if summary.hasAnyData || !allGames.isEmpty {
+                    if !allGames.isEmpty {
                         engineCard(summary)
                     }
                     if summary.puzzleAttempts > 0 {
@@ -48,6 +86,24 @@ struct ProgressionView: View {
     private func engineCard(_ summary: ProgressionSummary) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             cardHeader("Contre l'ordinateur", systemImage: "cpu", tint: Theme.accent)
+
+            HStack(spacing: 8) {
+                ForEach(ProgressionTimeRange.allCases) { range in
+                    FilterChip(
+                        label: range.label, tint: Theme.accent,
+                        isSelected: timeRange == range
+                    ) {
+                        timeRange = range
+                    }
+                }
+            }
+            .accessibilityIdentifier("progressionTimeRange")
+
+            if summary.engineGames == 0 {
+                Text("Aucune partie sur cette période.")
+                    .font(.caption)
+                    .foregroundStyle(Theme.textTertiary)
+            }
 
             HStack(spacing: 10) {
                 statTile("\(summary.engineWins)", "Victoires", tint: Theme.accent)
@@ -284,16 +340,17 @@ struct ProgressionView: View {
         // Fusionne d'abord la progression puzzles synchronisée (autres
         // appareils) dans les Puzzle locaux, pour que le bilan la reflète.
         PuzzleProgressSync.reconcile(in: modelContext)
-        // Parties : petite table, chargement complet sans risque.
-        let games = (try? modelContext.fetch(FetchDescriptor<GameRecord>())) ?? []
+        // Parties : petite table, chargement complet sans risque. `playedAt`
+        // reste chargée (pas dans `propertiesToFetch` réduit, contrairement
+        // aux puzzles ci-dessous) : c'est elle qui alimente le sélecteur de
+        // période ci-dessus.
+        allGames = (try? modelContext.fetch(FetchDescriptor<GameRecord>())) ?? []
 
         // Puzzles : UNIQUEMENT ceux tentés (voir l'avertissement d'en-tête).
         var attempted = FetchDescriptor<Puzzle>(predicate: #Predicate { puzzle in
             (puzzle.successCount ?? 0) > 0 || (puzzle.failureCount ?? 0) > 0
         })
         attempted.propertiesToFetch = [\.successCount, \.failureCount, \.themeRaw, \.rating]
-        let puzzles = (try? modelContext.fetch(attempted)) ?? []
-
-        summary = ProgressionSummary.compute(games: games, puzzles: puzzles)
+        puzzles = (try? modelContext.fetch(attempted)) ?? []
     }
 }

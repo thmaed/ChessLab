@@ -3,8 +3,6 @@ import SwiftUI
 /// Écran de configuration d'une partie "deux humains sur le même appareil".
 struct TwoPlayerSetupView: View {
     let onStart: (TwoPlayerGameSettings) -> Void
-    var onOpenLab: () -> Void = {}
-    var onPlayVsEngine: () -> Void = {}
 
     @State private var whiteName: String
     @State private var blackName: String
@@ -16,13 +14,8 @@ struct TwoPlayerSetupView: View {
     /// Famille de cadence affichée — voir `NewGameSetupView`.
     @State private var timeCategory: TimeControlCategory
 
-    init(
-        onStart: @escaping (TwoPlayerGameSettings) -> Void,
-        onOpenLab: @escaping () -> Void = {}, onPlayVsEngine: @escaping () -> Void = {}
-    ) {
+    init(onStart: @escaping (TwoPlayerGameSettings) -> Void) {
         self.onStart = onStart
-        self.onOpenLab = onOpenLab
-        self.onPlayVsEngine = onPlayVsEngine
         let saved = TwoPlayerSettingsStore.load() ?? .default
 
         _whiteName = State(initialValue: saved.whiteName)
@@ -144,12 +137,6 @@ struct TwoPlayerSetupView: View {
                 Button("Commencer") { start() }
                     .fontWeight(.semibold)
                     .tint(Theme.accent)
-            }
-            ToolbarItem(placement: .topBarTrailing) {
-                QuickSwitchMenu(
-                    excluding: .twoPlayer,
-                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: {}
-                )
             }
         }
     }

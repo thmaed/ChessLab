@@ -413,10 +413,6 @@ struct HomeView: View {
                         // pile est vide — d'où la garde, sinon `removeLast`
                         // plante sur une pile vide.
                         startNewGame(settings, replacingCurrent: true)
-                    } onOpenLab: {
-                        path.append(Route.labSetup(startFEN: nil))
-                    } onOpenTwoPlayer: {
-                        path.append(Route.twoPlayerSetup)
                     }
 
                 case let .continueVsStockfish(fen):
@@ -424,10 +420,6 @@ struct HomeView: View {
                     // position atteinte : le joueur règle l'Elo puis lance.
                     NewGameSetupView(initialFEN: fen) { settings in
                         startNewGame(settings)
-                    } onOpenLab: {
-                        path.append(Route.labSetup(startFEN: nil))
-                    } onOpenTwoPlayer: {
-                        path.append(Route.twoPlayerSetup)
                     }
 
                 case let .activeGame(settings):
@@ -467,10 +459,6 @@ struct HomeView: View {
                 case .twoPlayerSetup:
                     TwoPlayerSetupView { settings in
                         startNewTwoPlayerGame(settings, replacingCurrent: true)
-                    } onOpenLab: {
-                        path.append(Route.labSetup(startFEN: nil))
-                    } onPlayVsEngine: {
-                        path.append(Route.newGame)
                     }
 
                 case let .activeTwoPlayerGame(settings):
