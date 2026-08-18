@@ -13675,6 +13675,22 @@
           }
         }
       }
+    },
+    "Kingside Pawn Majority" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kingside Pawn Majority"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Majorité de pions à l'aile roi"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

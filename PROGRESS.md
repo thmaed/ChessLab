@@ -5588,6 +5588,29 @@ la même façon, vérifié dans les deux cas.
 
 23 cours de finales, catalogue à 81.
 
+**Découverte méthodologique en cherchant « 3 contre 2 même aile »** : les
+finales tour+pions DES DEUX côtés (majorités de pions à plusieurs) dépassent
+presque toujours 8 pièces (2 rois + 2 tours + 5 pions et plus), hors de
+portée de l'oracle en ligne — vérifié en reproduisant l'échec deux fois de
+suite pour écarter un accident réseau. L'app annonce « ≤ 7 pièces » et je
+n'ai PAS touché à ce chiffre : une position à 8 pièces a répondu une fois
+correctement pendant les tests, mais rien ne garantit que ce comportement
+est officiellement supporté par le service Lichess (dont la documentation
+publique parle de tables 7 pièces) — mieux vaut une garantie prudente que
+respectée à la lettre qu'une promesse optimiste qui casserait un jour sans
+prévenir. « 3 contre 2 » et « 4 contre 3 même aile » restent donc HORS de
+portée de la preuve tablebase telle quelle ; ils resteraient possibles en
+mode « vérifié moteur » (comme la percée l'a été), à décider séparément.
+
+**Cours livré à la place, dans le même esprit et à 7 pièces pile** : deux
+pions contre un à l'aile roi. Trouvaille inattendue de l'oracle : GARDER
+les tours ne fait que la nulle — la seule voie vers le gain est d'échanger
+tout de suite pour laisser la majorité parler en finale de pions pure.
+Contre-intuitif, et exactement le genre de leçon qu'une ligne écrite de
+mémoire n'aurait jamais surprise.
+
+24 cours de finales, catalogue à 82.
+
 Ces items restent au programme, marqués comme nécessitant une session de
 recherche dédiée plutôt qu'une suite rapide.
 
