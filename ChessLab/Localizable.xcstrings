@@ -13467,6 +13467,38 @@
           }
         }
       }
+    },
+    "The Vancura Position" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Vancura Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La position de Vančura"
+          }
+        }
+      }
+    },
+    "The Saavedra Position" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Saavedra Position"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La position de Saavedra"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

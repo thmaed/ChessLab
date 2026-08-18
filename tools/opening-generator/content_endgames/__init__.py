@@ -11,7 +11,7 @@ est dérivée sous l'oracle (`verify_line.py`) avant d'entrer ici, et
 verdict théorique. Une ligne de finale écrite de mémoire est une ligne fausse
 qui n'a pas encore été vérifiée.
 """
-from . import breakthrough, lucena, opposition, philidor, queen_mate, queen_vs_bishop_pawn, queen_vs_pawn, reti_study, rook_mate, rook_pawn_draw, rook_vs_pawn, square_rule
+from . import breakthrough, lucena, opposition, philidor, queen_mate, queen_vs_bishop_pawn, queen_vs_pawn, reti_study, rook_mate, rook_pawn_draw, rook_vs_pawn, saavedra, square_rule, vancura
 
 COURSES = [
     opposition.COURSE,
@@ -26,4 +26,6 @@ COURSES = [
     queen_mate.COURSE,
     breakthrough.COURSE,
     reti_study.COURSE,
+    vancura.COURSE,
+    saavedra.COURSE,
 ]
