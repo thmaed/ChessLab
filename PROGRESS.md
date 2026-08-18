@@ -5962,8 +5962,36 @@ forteresse s'effondre.
 
 49 cours de finales, catalogue à 107.
 
-**Reste à faire** (mis à jour, 49 cours de finales, catalogue à 107) :
-environ 41 items du catalogue de référence restent à couvrir.
+**Rythme accéléré à la demande de l'utilisateur** : recherche et
+construction groupées avant le cycle de build/test (le vrai goulot,
+~7-8 min par cycle), plutôt qu'un cycle complet par cours.
+
+**Couper avant de pousser** livrée ensuite — sourcée Chéron. Racine à
+5 pièces, dtm 89 (technique complète très longue), mais la décision qui
+compte tient en un seul coup : couper le roi noir sur la 3e rangée
+(`Re3`) AVANT de songer à avancer le pion. Piège trouvé en explorant :
+pousser tout de suite (`c4??`) sans couper laisse le pion sans défense,
+repris avec échec. Ligne principale raccourcie honnêtement : après
+`Rxc3+ Kxc3`, la position retombe sur la finale élémentaire roi+tour
+contre roi déjà connue, pas la peine de rejouer les 89 coups.
+
+50 cours de finales, catalogue à 108.
+
+**Tour et deux pions liés contre tour** livrée dans la foulée, deuxième
+cours du même cycle groupé — construction générique (comme les autres
+comparaisons de matériel de la session) plutôt que sourcée : deux pions
+passés et liés déjà avancés (5e/6e rangée) battent une tour seule, quasi
+sans exception. Vérifié depuis une position neutre à 6 pièces : la
+plupart des dix coups blancs testés à la racine gagnent — la tour adverse
+ne peut jamais surveiller les deux cases de promotion à la fois. Tentative
+parallèle sur « cavalier + 2 pions contre tour » abandonnée : deux
+constructions différentes (pions en 5e, pions liés avancés) sont
+retombées sur une simple nulle, sans le récit tranché espéré.
+
+51 cours de finales, catalogue à 109.
+
+**Reste à faire** (mis à jour, 51 cours de finales, catalogue à 109) :
+environ 39 items du catalogue de référence restent à couvrir.
 
 - **Cases conjuguées et Grigoriev sont FAITS** (`eg-corresponding-squares`,
   `eg-grigoriev-king-race`) — retirés de la liste « à sourcer ». Centurini

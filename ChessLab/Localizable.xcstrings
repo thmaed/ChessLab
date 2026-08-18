@@ -13964,6 +13964,38 @@
         }
       }
     },
+    "Cut Off Before You Push" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cut Off Before You Push"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couper avant de pousser"
+          }
+        }
+      }
+    },
+    "Rook and Two Connected Pawns vs Rook" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook and Two Connected Pawns vs Rook"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour et deux pions liés contre tour"
+          }
+        }
+      }
+    },
     "Rook vs Rook and Bishop — the Szén Position" : {
       "localizations" : {
         "en" : {
