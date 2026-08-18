@@ -290,7 +290,18 @@
         }
       }
     },
+    "%@ (%@)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ (%2$@)"
+          }
+        }
+      }
+    },
     "%@ (Blancs)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -307,6 +318,7 @@
       }
     },
     "%@ (Noirs)" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -747,6 +759,12 @@
       }
     },
     "4" : {
+
+    },
+    "7 jours" : {
+
+    },
+    "30 jours" : {
 
     },
     "a gagné" : {
@@ -1728,6 +1746,9 @@
       }
     },
     "Aucune partie ne correspond à la recherche ou aux filtres." : {
+
+    },
+    "Aucune partie sur cette période." : {
 
     },
     "Aucune pendule : les deux camps jouent sans contrainte de temps." : {
@@ -4457,6 +4478,23 @@
         }
       }
     },
+    "Domination — the Knight With No Square" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Domination — the Knight With No Square"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La domination — le cavalier sans case"
+          }
+        }
+      }
+    },
     "Döry Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -6557,6 +6595,7 @@
       }
     },
     "Jouer contre l'ordinateur d'ici" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -12391,6 +12430,23 @@
         }
       }
     },
+    "Stalemate as a Resource — the Rook's Last Trick" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stalemate as a Resource — the Rook's Last Trick"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pat comme ressource — le dernier tour de la tour"
+          }
+        }
+      }
+    },
     "Standard" : {
       "localizations" : {
         "en" : {
@@ -12747,6 +12803,40 @@
     "Terminer la sélection" : {
 
     },
+    "The Active King in a Rook Ending" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Active King in a Rook Ending"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le roi actif dans une finale de tours"
+          }
+        }
+      }
+    },
+    "The Bishop Pair Mate" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Bishop Pair Mate"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mat aux deux fous"
+          }
+        }
+      }
+    },
     "The Cochrane Defence" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -12896,6 +12986,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La position de Philidor"
+          }
+        }
+      }
+    },
+    "The Principle of Two Weaknesses" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Principle of Two Weaknesses"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le principe des deux faiblesses"
           }
         }
       }
@@ -13053,74 +13160,6 @@
         }
       }
     },
-    "The Principle of Two Weaknesses" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Principle of Two Weaknesses"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le principe des deux faiblesses"
-          }
-        }
-      }
-    },
-    "Domination — the Knight With No Square" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Domination — the Knight With No Square"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La domination — le cavalier sans case"
-          }
-        }
-      }
-    },
-    "Stalemate as a Resource — the Rook's Last Trick" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stalemate as a Resource — the Rook's Last Trick"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le pat comme ressource — le dernier tour de la tour"
-          }
-        }
-      }
-    },
-    "The Active King in a Rook Ending" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Active King in a Rook Ending"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le roi actif dans une finale de tours"
-          }
-        }
-      }
-    },
     "The Trebuchet" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -13221,6 +13260,9 @@
           }
         }
       }
+    },
+    "Thèmes transversaux" : {
+
     },
     "Théorie" : {
       "localizations" : {
@@ -13376,6 +13418,9 @@
       }
     },
     "Tous résultats" : {
+
+    },
+    "Tout" : {
 
     },
     "Tout décocher" : {

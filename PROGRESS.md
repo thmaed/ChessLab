@@ -6550,3 +6550,22 @@ deux simulateurs « iPhone 17 » strictement homonymes coexistaient
 (`76B18A38…` et `6D6D634E…`), ce qui rend `-destination
 'platform=iOS Simulator,name=iPhone 17'` ambigu — les deux ont été
 effacés ; utiliser l'UDID explicite si l'ambiguïté revient.
+
+## Le mat aux deux fous — troisième mat élémentaire (18/08)
+
+Item du « reste à faire » depuis la livraison initiale du module (17/08).
+`eg-bishop-pair-mate`, famille `mates`, racine à 4 pièces
+(`8/8/8/4k3/8/8/4K3/2B2B2 w`) : roi et deux fous de couleurs opposées, roi
+noir centralisé pour un test exigeant. Même méthode que `rook_mate.py` :
+ligne ENTIÈREMENT dérivée par `derive_optimal.py` (29 demi-coups, DTM
+exact), puis annotée pour raconter la technique — la « barrière diagonale »
+des deux fous qui avance case par case, exactement comme la tour rétrécit
+sa boîte, jusqu'à ce que le roi blanc vienne porter le coup final. Un point
+signalé explicitement dans les commentaires : contrairement au mat fou +
+cavalier, N'IMPORTE QUEL coin ou case de bord convient ici (les deux fous
+couvrent les deux couleurs de case) — pas de piège de « mauvais coin ».
+Audit propre : `✓ Chaque coup enseigné préserve son verdict théorique`.
+
+63 cours de finales au catalogue (121 au total). `Localizable.xcstrings` :
+1 entrée ajoutée chirurgicalement après « The Active King in a Rook Ending »
+(17 lignes, JSON valide re-vérifié).
