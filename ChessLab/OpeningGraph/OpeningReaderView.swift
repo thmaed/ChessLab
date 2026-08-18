@@ -15,6 +15,9 @@ struct OpeningReaderView: View {
     var onContinueVsStockfish: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }
+    /// Entraînement LIBRE (finales seulement) : conclure la position du cours
+    /// contre la meilleure défense, tout coup préservant le verdict accepté.
+    var onFreeTrain: () -> Void = {}
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
@@ -45,6 +48,13 @@ struct OpeningReaderView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
+                if viewModel.course.kind == "endgame" {
+                    Button { onFreeTrain() } label: {
+                        Label("Entraînement libre", systemImage: "target")
+                    }
+                    .tint(Theme.gold)
+                    .accessibilityIdentifier("reader_freeTrain")
+                }
                 Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
                     .tint(Theme.accent)
                 QuickSwitchMenu(
@@ -320,6 +330,7 @@ struct OpeningReaderHost: View {
     var onContinueVsStockfish: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }
+    var onFreeTrain: () -> Void = {}
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: OpeningReaderViewModel?
 
@@ -329,7 +340,8 @@ struct OpeningReaderHost: View {
                 OpeningReaderView(
                     viewModel: viewModel, onExit: onExit, onTrain: onTrain,
                     onContinueVsStockfish: onContinueVsStockfish,
-                    onOpenLab: onOpenLab, onOpenTwoPlayer: onOpenTwoPlayer
+                    onOpenLab: onOpenLab, onOpenTwoPlayer: onOpenTwoPlayer,
+                    onFreeTrain: onFreeTrain
                 )
             } else {
                 ContentUnavailableView("Ouverture indisponible", systemImage: "questionmark.folder").appBackground()

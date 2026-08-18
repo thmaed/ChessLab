@@ -10696,6 +10696,214 @@
         }
       }
     },
+    "gagnant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "winning"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gagnant"
+          }
+        }
+      }
+    },
+    "nulle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "drawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nulle"
+          }
+        }
+      }
+    },
+    "perdant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "losing"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "perdant"
+          }
+        }
+      }
+    },
+    "Entraînement libre" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free training"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entraînement libre"
+          }
+        }
+      }
+    },
+    "Verdict à tenir : " : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verdict to hold: "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verdict à tenir : "
+          }
+        }
+      }
+    },
+    "Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any move that preserves the verdict is accepted — engine-checked arbitration."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur."
+          }
+        }
+      }
+    },
+    "Arbitrage…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbitrating…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbitrage…"
+          }
+        }
+      }
+    },
+    "La défense réfléchit…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The defence is thinking…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La défense réfléchit…"
+          }
+        }
+      }
+    },
+    "Ce coup lâche le verdict : " : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This move lets the verdict slip: "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce coup lâche le verdict : "
+          }
+        }
+      }
+    },
+    "Jouer le meilleur coup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play the best move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouer le meilleur coup"
+          }
+        }
+      }
+    },
+    "Coups repris en route : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moves taken back along the way: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coups repris en route : %lld"
+          }
+        }
+      }
+    },
+    "Aucun coup repris — conversion propre." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No move taken back — a clean conversion."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun coup repris — conversion propre."
+          }
+        }
+      }
+    },
+    "L'arbitre et la défense reposent sur le moteur — relancez-le pour continuer." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Both the arbiter and the defence rely on the engine — restart it to continue."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'arbitre et la défense reposent sur le moteur — relancez-le pour continuer."
+          }
+        }
+      }
+    },
     "Réflexion par coup" : {
       "localizations" : {
         "en" : {

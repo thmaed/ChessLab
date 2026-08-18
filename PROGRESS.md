@@ -6634,3 +6634,112 @@ test ne défilait jamais. Corrigé par la même parade déjà utilisée dans
 `RecentGamesUITests`/`AnalysisReviewUITests` : une boucle `swipeUp` bornée
 (12 essais) avant `waitForExistence`. Vérifié isolément (passe en 22 s),
 puis suite complète relancée pour confirmer l'absence d'autre régression.
+
+## Accueil iPhone : libellés courts, iPad garde les longs (18/08)
+
+Signalé par l'utilisateur : les tuiles de l'accueil tronquaient sur iPhone
+(« Contre l'ordinat… »). `ModeCard` gagne `shortTitle`/`shortSubtitle`,
+servis uniquement en classe compacte — l'iPad (classe régulière, tuiles
+larges) garde les libellés complets. Sept tuiles retouchées côté compact ;
+la vérification a été VISUELLE (captures simulateur FR et EN, plus aucune
+troncature), pas seulement compilée. `VoiceOver` continue d'annoncer le
+titre COMPLET (l'`accessibilityLabel` utilise `title`, pas la variante).
+Au passage : « The computer against itself » raccourci en « Self-play »
+côté anglais.
+
+**Une leçon d'outillage payée cher** : pour vérifier la capture anglaise,
+`defaults write …ChessLab settings.appLanguage english` a été écrit sur LE
+simulateur qui sert aussi aux tests — la suite suivante a échoué presque
+entière (~60 tests UI cherchant des libellés français). Réglé par
+`simctl erase` et relance. Règle : toute pollution manuelle d'un simulateur
+de test (defaults, langue, état d'app) doit être effacée avant la suite
+suivante — ou faite sur un AUTRE simulateur.
+
+## Moteur d'analyse : trois économies sans toucher au calibrage (18/08)
+
+Audit à la demande de l'utilisateur (« les tests de seuil consomment-ils
+trop ? ») : le détecteur de zone limite est gratuit (arithmétique pure),
+mais la relecture a trouvé deux gaspillages réels + un trou d'énergie.
+Implémentés tous les trois, AUCUN ne touche les nombres calibrés (bande ±2,
+budgets 300k/3M, plancher 1M inchangés) :
+
+1. **Gardes `isBook`/`isForced` avant l'affinage** (`classifyNode`) : un
+   coup de théorie sera classé `.book` et un coup forcé `.best` quelle que
+   soit l'éval — les affiner payait jusqu'à 2×3M nœuds pour une étiquette
+   qui n'en tient pas compte. Les deux drapeaux, déjà nécessaires à
+   l'`Input`, sont simplement calculés AVANT le bloc d'affinage.
+2. **Re-test de la bande entre les deux affinages** : si l'affinage du
+   parent sort la perte de la zone d'hésitation, celui de l'enfant (≥ 1M de
+   plancher) n'est plus payé. La paire mixte qui en résulte est déjà un
+   état normal du système (garde anti-double-affinage, sens inverse).
+3. **Mode économie d'énergie iOS** : `isLowPowerModeEnabled` saute
+   l'affinage comme la surchauffe le fait déjà — mais SANS diviser le
+   budget de base par deux, contrairement au chemin thermique : la
+   surchauffe est rare et transitoire, le mode économie est un état banal
+   (20 % de batterie) où dégrader aussi la base se paierait trop souvent.
+   Arbitrage assumé : verdicts de base pleins, pas d'affinage, et ils
+   restent en cache comme les verdicts « à chaud » thermiques.
+
+## Labo : le duo Elo × temps par coup, documenté à l'écran (18/08)
+
+Question de l'utilisateur : « un temps trop bas ne limite-t-il pas l'Elo ? »
+Réponse sourcée (doc officielle Stockfish) : l'échelle `UCI_Elo` est
+calibrée à la cadence 120s+1s (~2-3 s par coup), ancrage CCRL 40/4. Un camp
+BRIDÉ y est peu sensible (le bridage probabiliste domine le temps) ; le
+niveau « Maximum » (3190 ⇒ aucun bridage) tire TOUTE sa force du temps —
+c'est le seul cas où l'écart affiché ment vraiment à temps court, en se
+comprimant. Sous 1320, le temps est déjà ignoré (profondeur plafonnée).
+
+Deux retouches dans `LabSetupView`, aucune mécanique changée :
+- la note sous le curseur de réflexion énonce le fait de calibration (et
+  que l'écart A-B reste comparatif entre deux camps bridés) ;
+- un avertissement ciblé apparaît quand un camp ≥ 2800 rencontre moins de
+  0,5 s/coup — LE cas trompeur. Pas de couplage automatique temps↔Elo :
+  le mode rapide à 150 ms est ce qui rend une série de 100 parties
+  regardable, on informe sans contraindre.
+
+## Entraînement libre v2 — l'arbitrage au verdict, livré arbitré moteur (nuit du 18/08)
+
+Le dernier gros morceau du module Finales : jusqu'ici l'entraîneur guidé
+n'acceptait que LE coup de la leçon ; le mode LIBRE accepte tout coup qui
+préserve le verdict théorique, et reprend ceux qui le lâchent (« gagnant →
+nulle »), meilleur coup de l'arbitre en correction. Écran accessible depuis
+le lecteur d'une finale (bouton cible, doré), `Route.endgameFreeTrain`.
+
+**L'estimation de l'étude était fausse d'un ordre de grandeur.** Le plan
+initial (« sous-sélection WDL ~15-25 Mo ») a été chiffré cette nuit contre
+l'index réel du miroir Lichess : la fermeture captures+promotions des
+racines des cours fait 377,8 Mo de fichiers `.rtbw` ; même réduite aux
+seules configurations APPARAISSANT dans les cours, 177,3 Mo (les gros
+postes sont les tables pièce+pion : KRPvKR seule — la Lucena ! — pèse
+15,6 Mo). Embarquer 177 Mo est une décision produit, pas un détail
+technique ; et l'app n'a par ailleurs AUCUN appel réseau aujourd'hui —
+introduire le premier (sondage en ligne) en est une autre. Les deux sont
+donc DIFFÉRÉES explicitement.
+
+**Ce qui est livré à la place** : un protocole `EndgameVerdictJudging`
+(la couture où un fournisseur EXACT se branchera — tables embarquées ou
+en ligne, le jour où la décision produit est prise) avec une seule
+implémentation ce soir : le moteur plein pot, 500 ms par question, seuil
+±250 cp identique à celui de l'audit >7 pièces. L'UI dit « arbitrage
+vérifié moteur » — VÉRIFIÉ, pas prouvé, la nuance maison reste visible.
+Le pat depuis une position gagnante est arbitré par les RÈGLES, sans
+moteur (le cas d'école de la dame trop gourmande).
+
+Mécanique : baseline recalculée à chaque tour utilisateur (préchargée
+pendant la réflexion adverse), coup fautif JAMAIS commité (le plateau ne
+bouge pas, on réessaie), compteur de reprises affiché au bilan final —
+« conversion propre » seulement quand il est à zéro. Une amélioration de
+verdict est acceptée sans félicitation : sous jeu optimal c'est
+impossible, donc c'est l'arbitre qui se corrige, pas l'utilisateur qui
+brille. Pas de FSRS ici (voulu) : une conversion libre n'est pas une
+carte de révision. 9 tests unitaires sur fournisseurs factices (verdicts
+scriptés par FEN, défense scriptée) : acceptation, reprise, correction,
+mat/pat par les règles, point de vue d'un cours côté noir.
+
+Trois positions de test corrigées en route, leçon utile : dans une
+position de test « dame contre roi », le coup naturel est souvent MAT —
+et un mat court-circuite l'arbitre (chemin des règles), ce qui teste le
+mauvais flux. Et un « pat en un » n'en est un que si TOUTES les issues
+sont fermées — le premier essai laissait a7-a6 jouable. Vérifiées
+python-chess avant correction, comme le contenu des cours.
