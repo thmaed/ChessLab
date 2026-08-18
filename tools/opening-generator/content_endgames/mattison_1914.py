@@ -1,0 +1,135 @@
+# -*- coding: utf-8 -*-
+"""Le fou aux deux vies (Hermanis Matisons, 1914) — deux sacrifices de fou pour un couronnement.
+
+FEN exacte reprise du PGN d'une étude Lichess consacrée à « Herman Mattison,
+1914 » (parution : Rigasche Rundschau) et validée par l'oracle : 1.Fe3+ est
+l'UNIQUE gain à la position initiale, et 4.Rf4 l'unique gain au moment décisif
+— même les quatre promotions n'y font que nulle. Chaque branche, pièges
+compris, est un verdict de tablebase.
+"""
+
+
+def c(fr, en):
+    return {"fr": fr, "en": en}
+
+
+COURSE = {
+    "id": "eg-mattison-1914",
+    "name": "Mattison's Twice-Sold Bishop (1914)",
+    "side": "white",
+    "kind": "endgame",
+    "family": "practical",
+    "level": "advanced",
+    "rootFEN": "8/k7/4P3/4K3/5B2/P7/8/r7 w - - 0 1",
+    "summary": c(
+        "Matisons, 1914 : un pion blanc à deux pas de la promotion, une tour noire qui connaît tous les chemins pour l'arrêter — par-devant, par-derrière, par enfilade. Le fou blanc les bouche TOUS, l'un après l'autre, en se vendant deux fois. L'étude préférée de ceux qui aiment les pièces à plusieurs vies.",
+        "Matisons, 1914: a white pawn two steps from promotion, a black rook that knows every road to stop it — from the front, from behind, by skewer. The white bishop blocks them ALL, one after another, selling itself twice along the way. A favourite study of everyone who likes pieces with several lives.",
+    ),
+    "lines": [
+        {
+            "chapter": {"id": "main", "title": c("Les deux vies du fou", "The bishop's two lives")},
+            "moves": [
+                {"san": "Be3+",
+                 "comment": c("L'unique gain — et pas pour l'échec : le fou vient BOUCHER la colonne e. Le direct 1.e7? se heurte à …Te1+! puis …Txe7 (voir le piège) ; désormais cet échec-là n'existe plus.",
+                              "The only win — and not for the check's sake: the bishop comes to PLUG the e-file. The direct 1.e7? runs into …Re1+! and …Rxe7 (see the trap); from now on that check no longer exists."),
+                 "critical": True},
+                {"san": "Kb7"},
+                {"san": "e7",
+                 "comment": c("Maintenant oui. La tour ne peut plus arrêter le pion par-derrière… sur cette colonne-là.",
+                              "Now yes. The rook can no longer stop the pawn from behind… on that file, at least.")},
+                {"san": "Rxa3",
+                 "comment": c("Double idée : rafler un pion, et surtout attaquer le fou e3 le long de la troisième rangée — s'il bouge sans réfléchir, …Ta8-e8 ou …Te3 reprend le contrôle du pion.",
+                              "A double idea: grab a pawn, and above all attack the e3-bishop along the third rank — if it moves thoughtlessly, …Ra8-e8 or …Re3 regains control of the pawn.")},
+                {"san": "Ba7",
+                 "comment": c("Première vente du fou, et quel comptoir : il se met EN PRISE du roi pour couper la colonne a ! La route a3-a8-e8 est fermée ; et le prendre coûte le temps décisif : 3…Kxa7 4.e8=D et la tour arrive trop tard.",
+                              "The bishop's first sale, and what a counter: it puts itself EN PRISE to the king to cut the a-file! The a3-a8-e8 road is closed; and taking costs the decisive tempo: 3…Kxa7 4.e8=Q and the rook is too late."),
+                 "critical": True},
+                {"san": "Ra1",
+                 "comment": c("La tour change d'étage : par en bas, elle menace …Te1+ — le fou a quitté e3, la colonne est rouverte.",
+                              "The rook switches floors: from below it threatens …Re1+ — the bishop left e3, the file is open again."),
+                },
+                {"san": "Kf4",
+                 "comment": c("L'unique gain, à nouveau — ici même les quatre promotions n'obtiennent que la nulle (e8=D? Tf1+! et l'enfilade e1-e8 ramasse la dame). Le roi marche À LA RENCONTRE de l'échec annoncé.",
+                              "The only win, once more — here even all four promotions merely draw (e8=Q? Rf1+! and the e1-e8 skewer scoops the queen). The king walks TOWARD the announced check."),
+                 "critical": True},
+                {"san": "Rf1+",
+                 "comment": c("L'échec vient quand même…",
+                              "The check comes anyway…")},
+                {"san": "Bf2",
+                 "comment": c("…et le fou se vend une seconde fois, en travers ! La tour doit prendre : sinon le fou garde e1 et le pion couronne tranquillement.",
+                              "…and the bishop sells itself a second time, crosswise! The rook must take: otherwise the bishop keeps e1 covered and the pawn queens in peace."),
+                 "critical": True},
+                {"san": "Rxf2+"},
+                {"san": "Ke3",
+                 "comment": c("Voilà le vrai prix du fou : ce temps-ci. Le roi attaque la tour…",
+                              "Here is the bishop's real price: this tempo. The king attacks the rook…")},
+                {"san": "Rf1"},
+                {"san": "Ke2",
+                 "comment": c("…et encore. Chassée deux fois, la tour n'aura jamais le temps de revenir sur la colonne e.",
+                              "…and again. Harried twice, the rook will never find time to return to the e-file."),
+                 "critical": True},
+                {"san": "Rf5"},
+                {"san": "e8=Q",
+                 "comment": c("Couronnement. Dame contre tour est un gain connu — voir le cours « Dame contre tour ». Le fou, lui, est mort deux fois pour ce diagramme : en a7 pour couper une colonne, en f2 pour acheter deux temps.",
+                              "Coronation. Queen against rook is a known win — see the “Queen vs Rook” course. The bishop died twice for this diagram: on a7 to cut a file, on f2 to buy two tempi."),
+                 "critical": True},
+            ],
+        },
+        {
+            "chapter": {"id": "rush", "title": c("Le pion trop pressé", "The pawn in a hurry")},
+            "moves": [
+                {"san": "e7", "role": "trap",
+                 "comment": c("Un temps trop tôt : la colonne e est encore ouverte.",
+                              "One tempo too soon: the e-file is still open."),
+                 "critical": True},
+                {"san": "Re1+",
+                 "comment": c("L'échec intermédiaire fait tout le travail :",
+                              "The zwischenschach does all the work:")},
+                {"san": "Kd6"},
+                {"san": "Rxe7",
+                 "comment": c("La tour se donne pour le pion — le BON échange :",
+                              "The rook gives itself for the pawn — the RIGHT trade:")},
+                {"san": "Kxe7",
+                 "comment": c("…car il reste fou de cases noires et pion a — dont la case de promotion a8 est BLANCHE. Le mauvais fou ! Le roi noir campe en a8-a7 : nulle de livre (voir « Le mauvais fou »).",
+                              "…because what remains is a dark-squared bishop and the a-pawn — whose promotion square a8 is LIGHT. The wrong bishop! The black king camps on a8-a7: a book draw (see “The Wrong Bishop”).")},
+            ],
+        },
+        {
+            "chapter": {"id": "defend-bishop", "title": c("Défendre le fou attaqué", "Defending the attacked bishop")},
+            "moves": [
+                "Be3+", "Kb7", "e7", "Rxa3",
+                {"san": "Ke4", "role": "trap",
+                 "comment": c("Le fou e3 est attaqué : le défendre avec le roi — quoi de plus solide ? Mais l'étude ne se joue pas sur CETTE rangée :",
+                              "The e3-bishop hangs: defending it with the king — what could be sounder? But the study is not decided on THAT rank:"),
+                 "critical": True},
+                {"san": "Ra8",
+                 "comment": c("…la tour file DERRIÈRE : a8 puis e8, et le pion est cueilli sur sa case de couronnement. Nulle. Seul 3.Fa7!!, qui bouche cette route-là au prix du fou, gagnait.",
+                              "…the rook slips BEHIND: a8 then e8, and the pawn is picked off on its own coronation square. Draw. Only 3.Ba7!!, plugging that road at the bishop's expense, won.")},
+            ],
+        },
+        {
+            "chapter": {"id": "wrong-king", "title": c("Le roi qui fuit les échecs", "The king who flees the checks")},
+            "moves": [
+                "Be3+", "Kb7", "e7", "Rxa3", "Ba7", "Ra1",
+                {"san": "Ke4", "role": "trap",
+                 "comment": c("…Te1+ menace : s'éloigner de la tour semble prudent. C'est l'inverse de la solution — et le gain s'évapore :",
+                              "…Re1+ looms: stepping away from the rook looks prudent. It is the exact opposite of the solution — and the win evaporates:"),
+                 "critical": True},
+                {"san": "Kxa7",
+                 "comment": c("Maintenant les Noirs PEUVENT s'offrir le fou : le temps que cela coûte, le roi blanc ne sait plus le facturer.",
+                              "Now Black CAN afford the bishop: White no longer knows how to charge for the tempo it costs.")},
+                {"san": "e8=Q", "role": "trap",
+                 "comment": c("Et la promotion rêvée perd même la partie :",
+                              "And the dreamt-of promotion even loses the game:"),
+                 "critical": True},
+                {"san": "Re1+",
+                 "comment": c("L'enfilade e1-e8 — celle que 4.Rf4! désamorçait en marchant vers elle :",
+                              "The e1-e8 skewer — the very one 4.Kf4! defused by walking toward it:")},
+                {"san": "Kd5"},
+                {"san": "Rxe8",
+                 "comment": c("La dame naît et meurt sur la même case ; tour contre roi nu, les NOIRS gagnent. Toute l'étude en négatif : sans le fou et sans le bon roi, chaque route de la tour redevient ouverte.",
+                              "The queen is born and dies on the same square; rook against bare king, BLACK wins. The whole study in negative: without the bishop and the right king, every one of the rook's roads reopens.")},
+            ],
+        },
+    ],
+}

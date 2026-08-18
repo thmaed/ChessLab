@@ -5971,6 +5971,23 @@
         }
       }
     },
+    "Grigoriev's March to h8 (1930)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grigoriev's March to h8 (1930)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La marche vers h8 (Grigoriev, 1930)"
+          }
+        }
+      }
+    },
     "Grigoriev's Study — the Only King Move" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7078,6 +7095,23 @@
         }
       }
     },
+    "Kubbel's Passing Pawn (1927)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kubbel's Passing Pawn (1927)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le pion qui passe outre (Kubbel, 1927)"
+          }
+        }
+      }
+    },
     "L'adversaire joue…" : {
       "localizations" : {
         "en" : {
@@ -7313,6 +7347,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Spéciale simultanée Lasker"
+          }
+        }
+      }
+    },
+    "Lasker's Ladder (1890)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lasker's Ladder (1890)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'échelle de Lasker (1890)"
           }
         }
       }
@@ -8041,6 +8092,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mats élémentaires"
+          }
+        }
+      }
+    },
+    "Mattison's Twice-Sold Bishop (1914)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mattison's Twice-Sold Bishop (1914)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le fou aux deux vies (Mattison, 1914)"
           }
         }
       }
@@ -11760,6 +11828,23 @@
         }
       }
     },
+    "Rinck's Domination (1920)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rinck's Domination (1920)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La domination de Rinck (1920)"
+          }
+        }
+      }
+    },
     "rnbqkbnr/pppppppp/…" : {
       "localizations" : {
         "en" : {
@@ -14058,6 +14143,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Triangulation"
+          }
+        }
+      }
+    },
+    "Troitsky's Knight Errand (1906)" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Troitsky's Knight Errand (1906)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La tournée du cavalier (Troïtski, 1906)"
           }
         }
       }

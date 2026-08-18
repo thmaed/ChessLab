@@ -6816,3 +6816,53 @@ Audit final groupé des huit : « ✓ Chaque coup enseigné préserve son verdic
 théorique (tablebase) », 0 requête réseau (360 en cache).
 `Localizable.xcstrings` : 8 entrées FR ajoutées chirurgicalement d'un bloc
 après « The Bishop Pair Mate » (136 lignes, JSON revalidé, diff propre).
+
+## Six études célèbres pour la famille « practical » (nuit du 18/08)
+
+Troisième session de contenu de la nuit, mandat resserré : la famille
+« Études célèbres » ne comptait que 2 cours (Réti, Saavedra) sur 71
+finales. Six études authentiques livrées — compositeur et année vérifiés,
+position exacte sourcée, chaque demi-coup passé à la tablebase AVANT
+écriture. 77 finales au catalogue (135 cours au total).
+
+- **eg-lasker-ladder** (Lasker 1890, 6 pièces) : l'escalier roi+tour,
+  sourcé ARVES (« Ballet dancing »). L'oracle confirme l'étude au-delà de
+  l'espéré : 1.Kb8 est le SEUL des 14 coups qui gagne, la descente
+  historique est la ligne DTM-optimale exacte, et Txh2 annule aux DEUX
+  moments naturels — pour deux raisons différentes (roi sur c8 ; tour
+  quittant la garde de c7 → …Txc7 !). Deux chapitres pièges en découlent.
+- **eg-grigoriev-h8** (Grigoriev 1930, 5 pièces) : la marche a8→h8→d3,
+  35 demi-coups tous vérifiés. Diagramme LU depuis le GIF de l'article
+  d'Elkies (ACJ) + solution commentée. Pièges prouvés : 1.b4? nulle,
+  1.Kb8? b4! (et 2.c4?? b3 PERD), 2.Ka7? b4! 3.c4 pat, miroir cassé
+  9…Kh6? 10.c5.
+- **eg-troitsky-1906** (Troïtski 1906, 7 pièces) : cage h1-h3, tournée du
+  cavalier, sacrifice Cf3!. Position+clé sourcées ARVES ; 1.Cg2 unique
+  gain, les deux prises naturelles (Cxg4?, gxh4?) annulent — chacune son
+  chapitre. Branche …h5 couverte (le manège mange les trois pions).
+- **eg-mattison-1914** (Matisons 1914, 6 pièces) : FEN exacte du PGN d'une
+  étude Lichess dédiée. Fe3+! (bouche la colonne e), Fa7!! (coupe la route
+  a8-e8), Ff2! (dévie la tour) ; l'oracle ajoute que 4.Kf4 est unique —
+  les QUATRE promotions n'y font que nulle — et que dans le piège du roi
+  fuyard, 5.e8=D perd même la partie (enfilade e1-e8).
+- **eg-rinck-1920** (Rinck 1920, 6 pièces) : domination, sourcée Wikipédia
+  (La Stratégie 1920). 1.Cd2 unique gain, les 14 réponses de la tour
+  perdent — fourchettes d5/e6 en chapitres, fin sur fou+cavalier (renvoi
+  au cours du mat).
+- **eg-kubbel-1927** (Kubbel 1927, 7 pièces) : pions seuls, sourcé ARVES.
+  1.a6!! unique gain sur dix coups légaux (axb6? nulle, les six coups de
+  roi et même b4 PERDENT). Course des dames : nées le même coup, seule
+  celle d'a8 a l'échec (Dd5+/Dd3!/b3+!) — la jumelle de b8 bute sur les
+  pions noirs, nulle prouvée, chapitre contraste.
+
+**Abandonné en route, honnêtement** : Behting 1906 (position exacte
+trouvée… à 9 pièces, hors oracle) ; les Kubbel 1921/1922 célèbres (8
+pièces) ; la chasse Kubbel 1925 h3→a3 (solution narrée partout, position
+exacte introuvable en quatre recherches — pas de reconstruction signée
+Kubbel) ; Prokeš reste mort, conformément à la consigne.
+
+Audit groupé des six : « ✓ Chaque coup enseigné préserve son verdict
+théorique (tablebase) », 212 requêtes, toutes en cache (la vérification
+préalable avait déjà tout payé). `author.py` complet repassé (135 cours).
+`Localizable.xcstrings` : 6 entrées FR en blocs de 17 lignes après une
+entrée complète (102 lignes, `json.load` revalidé).
