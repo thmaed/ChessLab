@@ -30,7 +30,14 @@ final class OpeningReaderViewModel {
 
     init(course: OpeningCourse) {
         self.course = course
-        self.orientation = course.side.color
+        // OUVERTURES : le plateau se lit du côté qu'on étudie (répertoire
+        // noir ⇒ noirs en bas), comme partout ailleurs dans l'app.
+        // FINALES : toujours la rangée 1 en bas, convention des diagrammes
+        // de livre — 27 des 77 cours ont pour héros le camp noir (défenses,
+        // forteresses) et s'affichaient inversés, ce qui déroutait plus que
+        // ça n'aidait (retour utilisateur du 19/08). L'ENTRAÎNEMENT, lui,
+        // garde le camp joué en bas : on y JOUE, on ne lit plus.
+        self.orientation = course.kind == "endgame" ? .white : course.side.color
         self.board = Board(position: OpeningFENKey.position(from: course.rootFEN) ?? .standard)
         self.currentKey = course.rootFEN
         self.currentComment = course.summary?.resolved(AppSettings.shared.appLanguage.resolvedCode)
