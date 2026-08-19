@@ -19,12 +19,12 @@ struct HelpView: View {
         .init(
             icon: "sparkles", tint: Theme.accent,
             title: "Nouveautés de la version 1.5",
-            body: "• Le module Finales : douze cours prouvés par table de finales — opposition, Lucena, Philidor, mats élémentaires, étude de Réti…\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées, dont les réponses aux coups les plus joués en club (London, Philidor, Petroff).\n• Les analyses sont conservées sur l'appareil : une partie déjà analysée se rouvre classifiée, instantanément.\n• Les moments critiques (brillant, gaffe, occasion manquée…) s'affichent sur la courbe d'évaluation.\n• Les modes se parlent : depuis une partie, envoyez la position vers l'analyse ou le Laboratoire — la partie vous attend au retour, pendule en pause.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier répondait au doigt sur la seule colonne h."
+            body: "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours."
         ),
         .init(
             icon: "cpu", tint: Theme.accent,
             title: "Contre l'ordinateur",
-            body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse ou le Laboratoire — la partie vous attend au retour."
+            body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
         ),
         .init(
             icon: "person.2.fill", tint: Theme.info,
@@ -34,22 +34,22 @@ struct HelpView: View {
         .init(
             icon: "puzzlepiece.fill", tint: Theme.violet,
             title: "Puzzles",
-            body: "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles."
+            body: "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs."
         ),
         .init(
             icon: "chart.bar.fill", tint: Theme.rose,
             title: "Progrès",
-            body: "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler."
+            body: "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler."
         ),
         .init(
             icon: "books.vertical.fill", tint: Theme.warning,
             title: "Ouvertures",
-            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud."
+            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
         ),
         .init(
             icon: "crown.fill", tint: Theme.gold,
             title: "Finales",
-            body: "Douze cours pour convertir vos finales : opposition, règle du carré, percée, Lucena, Philidor, tour contre pion, dame contre pion, mats élémentaires, étude de Réti. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchronisation iCloud, comme les ouvertures."
+            body: "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
         ),
         .init(
             icon: "square.and.arrow.up", tint: Theme.warning,

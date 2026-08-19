@@ -1,9 +1,12 @@
 # Checklist de soumission App Store — ChessLab
 
-État au 21/07/2026, **révisé le 15/08/2026** (chemin du dépôt, et la section
-« modèle `Repertoire` » devenue obsolète). Coché = fait par ce lot de
-préparation ou déjà en place. Non coché = reste une action utilisateur
-(compte, App Store Connect, ou décision qui n'appartient qu'à toi).
+État au 21/07/2026, **révisé le 19/08/2026** (passage à la 1.5.0 build 7 :
+ni la 1.3 ni la 1.4 n'ont été soumises, tout leur contenu est documenté sous
+la 1.5 — voir `RELEASE_NOTES-1.5.0.md` et la section « Nouveautés » de
+`METADATA.md`, toutes deux réécrites en conséquence ; l'aide in-app a été
+mise à jour au même moment). Coché = fait par ce lot de préparation ou déjà
+en place. Non coché = reste une action utilisateur (compte, App Store
+Connect, ou décision qui n'appartient qu'à toi).
 
 ## Fait dans ce lot
 

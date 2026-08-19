@@ -1,4 +1,9 @@
-# ChessLab 1.4.0 (build 6)
+# ChessLab 1.4.0 (build 6) — JAMAIS SOUMISE, document historique
+
+> **Cette version n'a jamais été envoyée à Apple.** Son contenu est replié
+> dans la 1.5.0 (`RELEASE_NOTES-1.5.0.md`, section « Nouveautés » de
+> `METADATA.md`). Ce fichier est conservé tel quel comme trace du découpage
+> d'origine.
 
 Notes de version détaillées — pour le dépôt, pas pour App Store Connect. Le
 texte destiné aux utilisateurs est la section « Nouveautés de cette version »

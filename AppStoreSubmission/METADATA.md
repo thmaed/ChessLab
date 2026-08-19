@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 1.4.0** (build 6). Voir `RELEASE_NOTES-1.4.0.md` pour le
+**Version courante : 1.5.0** (build 7). Voir `RELEASE_NOTES-1.5.0.md` pour le
 détail complet des changements depuis la 1.2.
 
 Tout ce qui suit est à copier-coller directement dans les champs
@@ -8,126 +8,133 @@ correspondants d'App Store Connect. Les limites de caractères d'Apple sont
 respectées (vérifiées).
 
 > **Pour cette mise à jour**, quatre champs demandent une action : **Nouveautés
-> de cette version** (ci-dessous, obligatoire), le numéro de build, et — c'est
-> nouveau par rapport aux versions précédentes — la **description**, qui a été
-> complétée : la 1.4 ajoute une vraie fonctionnalité annoncée (importer et
-> partager ses propres répertoires d'ouvertures), et la description ne pouvait
-> pas rester muette dessus. Le **texte promotionnel** reste valable ; nom,
-> sous-titre, mots-clés et catégories aussi.
+> de cette version** (ci-dessous, obligatoire), le numéro de build, et la
+> **description**, qui a été complétée deux fois depuis la 1.2 : la 1.4 y a
+> ajouté les répertoires personnels (importer et partager les siens), la 1.5
+> doit y ajouter le module Finales — 77 cours prouvés par table de finales et
+> l'entraînement libre, l'argument le plus différenciant de l'app ; vérifier
+> le bloc « LE COIN DES FINALES » de la description ci-dessous avant de
+> coller. Le **texte promotionnel** reste valable ; nom, sous-titre,
+> mots-clés et catégories aussi.
 
 ---
 
-## Nouveautés de cette version — 1.4 (4000 car. max)
+## Nouveautés de cette version — 1.5 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur
 final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> **Ce texte couvre 1.2 → 1.4, pas seulement 1.4.** La 1.3 a été préparée mais
-> **jamais soumise** : le dernier incrément de build envoyé à Apple est le
-> build 3 de la 1.2 (commit `a211763`). Les utilisateurs passent donc
-> directement de la 1.2 à la 1.4, et les nouveautés de la 1.3 doivent leur être
-> annoncées ici.
+> **Ce texte couvre 1.2 → 1.5, pas seulement 1.5.** Ni la 1.3 ni la 1.4 n'ont
+> été soumises : le dernier build envoyé à Apple est le build 3 de la 1.2
+> (commit `a211763`). Les utilisateurs passent donc directement de la 1.2 à la
+> 1.5, et les nouveautés des 1.3 et 1.4 doivent leur être annoncées ici.
 
-### Français (2174 car. — limite 4 000)
+### Français (2500 car. — limite 4 000)
 
 ```
+NOUVEAU : LE MODULE FINALES — 77 COURS PROUVÉS
+De l'opposition à la Lucena, des forteresses aux études célèbres (Lasker,
+Troitsky, Kubbel…), 77 cours groupés en neuf familles pour enfin convertir
+vos finales. Chaque ligne est vérifiée par table de finales — le verdict
+mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense
+proposée ne perd la nulle. Révision espacée et synchro iCloud, comme les
+ouvertures.
+
+ENTRAÎNEMENT LIBRE DES FINALES
+Concluez la position contre la meilleure défense : tout coup qui préserve le
+verdict est accepté — pas seulement celui de la leçon. Un coup qui lâche le
+gain est repris, meilleur coup à l'appui, et « conversion propre » se mérite.
+
 VOS PROPRES RÉPERTOIRES D'OUVERTURES
-Importez un répertoire au format PGN — variantes comprises — et entraînez-le
-avec la répétition espacée de l'app. Partagez-le à qui vous voulez : un simple
-fichier suffit, sans compte ni serveur. Ce que vous avez déjà mémorisé sur une
-position compte immédiatement dans le répertoire importé.
+Importez un répertoire au format PGN — variantes comprises — entraînez-le en
+répétition espacée, modifiez-le dans l'app et partagez-le d'un simple
+fichier, sans compte ni serveur.
 
-LES 58 OUVERTURES RELUES AU MOTEUR
-Quinze coups fautifs ont été corrigés dans les lignes livrées, et quatre
-défenses manquantes ajoutées. Chaque coup du catalogue est désormais rejoué
-sous Stockfish avant publication : plus une seule variante ne peut se terminer
-sur une gaffe.
+LES 58 OUVERTURES COMPLÉTÉES ET RELUES
+Près de 900 positions ajoutées : les réponses que les joueurs de club jouent
+vraiment (la London contre les défenses au 1.d4, la Philidor, la Petroff…).
+Et chaque coup du catalogue est rejoué sous Stockfish avant publication.
 
-LECTEUR D'OUVERTURES
-L'échiquier reste à l'écran pendant qu'on lit les coups — seul le texte défile.
-Sur iPad en paysage, plateau à gauche et explications à droite.
+LES MODES SE PARLENT
+« Changer de mode » bascule vers le Laboratoire, l'ordinateur ou une partie à
+deux en emportant la position affichée — depuis un puzzle, un cours ou une
+partie. Le menu d'export envoie aussi la position vers l'analyse ; votre
+partie vous attend au retour.
+
+ANALYSE PLUS SÛRE ET PLUS JUSTE
+Les verdicts limites sont réexaminés avec dix fois plus d'effort avant
+d'être étiquetés : 85 % d'erreurs d'étiquette en moins. Le score de précision
+ne se laisse plus gonfler par les positions déjà gagnées, et l'app explique
+POURQUOI un coup est une erreur. « Analyser PGN / FEN » reconnaît tout seul
+ce que contient votre presse-papiers.
 
 PUZZLES
-Un seul essai par défaut, comme un vrai exercice de calcul : on cherche
-jusqu'au bout avant de poser la pièce. Les trois essais restent disponibles
-dans les Réglages.
+Un seul essai par défaut, comme un vrai exercice de calcul (trois essais
+disponibles dans les Réglages). Bilan par thème, et sets ciblés sur vos
+faiblesses depuis l'écran Progrès — désormais filtrable sur 7 ou 30 jours.
 
 L'ÉCHIQUIER RÉPOND ENFIN AU DOIGT
-Relâcher une pièce un peu à côté de la case visée joue quand même le coup. La
-case visée s'allume pendant que vous glissez et la pièce se soulève au lieu de
-rester cachée sous le doigt. Le clic-clic bénéficie de la même tolérance.
+Correctif majeur pour iOS 18, où aucune pièce ne répondait au toucher. Et
+partout : relâcher une pièce un peu à côté joue quand même le coup, la case
+visée s'allume pendant le glissement.
 
-ANALYSE PLUS JUSTE
-Le score de précision ne se laisse plus gonfler par les coups joués dans une
-position déjà gagnée. L'app explique maintenant POURQUOI un coup est une
-erreur, en nommant le motif tactique en jeu. Une analyse quittée trop vite
-reprend toute seule, là où elle s'était arrêtée.
-
-JOUER
-Contrôles réunis en une seule rangée. L'alerte « coup risqué » raisonne en
-probabilité de gain au lieu d'un seuil brut : elle prévient quand la partie
-bascule vraiment, et se tait quand elle est déjà jouée. La pendule décompte dès
-le premier coup.
-
-MISE EN PAGE
-iPhone verrouillé en portrait, où l'échiquier reste grand. Plus aucun
-débordement horizontal, y compris en taille de texte maximale. Sur iPad, le
-scanner et l'éditeur de position s'ouvrent en pleine page, et une partie en
-cours survit au passage en Split View.
-
-CORRECTIONS
-Import PGN depuis le web, position de départ conservée à l'export, cadrage du
-scanner, traductions anglaises complétées.
+ET AUSSI
+Stockfish 17.1. Bibliothèque sans doublons, suppression de parties. Lecteur
+d'ouvertures à plateau ancré. Aide accessible depuis l'accueil. iPhone en
+portrait, iPad en pleine page, plus aucun débordement de texte.
 ```
 
-### English (1978 char. — 4,000 limit)
+### English (2335 char. — 4,000 limit)
 
 ```
+NEW: THE ENDGAMES MODULE — 77 PROVEN COURSES
+From the opposition to the Lucena, from fortresses to famous studies
+(Lasker, Troitsky, Kubbel…), 77 courses in nine families to finally convert
+your endings. Every line is verified against endgame tablebases — the exact
+mathematical verdict: no taught move gives up a win, no recommended defence
+loses a draw. Spaced repetition and iCloud sync, like the openings.
+
+FREE ENDGAME TRAINING
+Finish the position against best defence: any move that preserves the
+verdict is accepted — not just the lesson's move. A move that lets the win
+slip is taken back, best move shown, and "clean conversion" has to be earned.
+
 YOUR OWN OPENING REPERTOIRES
-Import a repertoire as PGN — variations included — and drill it with the app's
-spaced repetition. Share it with anyone: a single file is enough, no account
-and no server. What you already know about a position counts immediately in
-the imported repertoire.
+Import a repertoire as PGN — variations included — drill it with spaced
+repetition, edit it in the app and share it as a single file, no account
+and no server.
 
-THE 58 OPENINGS REVIEWED BY THE ENGINE
-Fifteen faulty moves have been fixed in the bundled lines, and four missing
-defences added. Every move in the catalogue is now replayed under Stockfish
-before publication: no variation can end on a blunder any more.
+ALL 58 OPENINGS EXPANDED AND REVIEWED
+Nearly 900 positions added: the replies club players actually play (the
+London against 1.d4 defences, the Philidor, the Petroff…). And every move in
+the catalogue is replayed under Stockfish before release.
 
-OPENING READER
-The board stays on screen while you read the moves — only the text scrolls. On
-iPad in landscape, board on the left and explanations on the right.
+THE MODES TALK TO EACH OTHER
+"Switch mode" jumps to the Laboratory, the computer or a two-player game,
+carrying the displayed position along — from a puzzle, a course or a game.
+The export menu also sends the position to analysis; your game is waiting
+when you come back.
+
+SAFER, FAIRER ANALYSIS
+Borderline verdicts are re-examined with ten times the effort before being
+labelled: 85% fewer mislabels. The accuracy score is no longer inflated by
+already-won positions, and the app explains WHY a move is a mistake.
+"Analyse PGN / FEN" recognises what's in your clipboard by itself.
 
 PUZZLES
-One attempt by default, the way a calculation exercise should work: you work
-the line out before you move the piece. Three attempts remain available in
-Settings.
+One attempt by default, the way a calculation exercise should work (three
+attempts available in Settings). Reports by theme, and targeted sets on your
+weaknesses from the Progress screen — now filterable to 7 or 30 days.
 
 THE BOARD FINALLY ANSWERS YOUR FINGER
-Releasing a piece slightly off the intended square still plays the move. The
-target square lights up while you drag and the piece lifts instead of hiding
-under your finger. Tap-to-move gets the same tolerance.
+Major fix for iOS 18, where no piece responded to touch. And everywhere:
+releasing a piece slightly off-square still plays the move, and the target
+square lights up while you drag.
 
-FAIRER ANALYSIS
-The accuracy score is no longer inflated by moves played in an already-won
-position. The app now explains WHY a move is a mistake, naming the tactical
-motif at work. An analysis left too quickly resumes on its own, right where it
-stopped.
-
-PLAY
-Controls merged into a single row. The "risky move" warning now reasons in win
-probability instead of a raw threshold: it speaks up when the game really
-turns, and stays quiet once it is decided. The clock counts from the first
-move.
-
-LAYOUT
-iPhone locked to portrait, where the board stays large. No horizontal overflow
-left, even at the largest text size. On iPad, the scanner and position editor
-open full page, and a game in progress survives switching to Split View.
-
-FIXES
-PGN import from the web, starting position preserved on export, scanner
-framing, English translations completed.
+ALSO
+Stockfish 17.1. Duplicate-free library with game deletion. Opening reader
+with an anchored board. Help reachable from the home screen. iPhone in
+portrait, iPad full-page sheets, no text overflow anywhere.
 ```
 
 ---
@@ -151,7 +158,7 @@ stockfish,tactique,ouverture,puzzle,gambit,fen,pgn,elo,entrainement,scanner,anal
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
 ```
-Analysez vos parties, scannez un échiquier : 58 ouvertures, 12 finales
+Analysez vos parties, scannez un échiquier : 58 ouvertures, 77 finales
 prouvées, 100 000+ puzzles, l'ordinateur en face — 100% local.
 ```
 
@@ -179,10 +186,16 @@ automatique. Entrée par PGN, FEN, éditeur de position ou scanner photo.
 OUVERTURES
 Choisissez une ouverture et avancez coup par coup : chaque coup est
 expliqué, les variantes sont proposées, et des flèches colorées relient le
-plateau à la liste des coups. 58 ouvertures et 12 finales rédigées à la main
-(bilingues) — chaque finale vérifiée par table de finales,
-toutes relues au moteur, avec un entraînement en répétition espacée simplifié
-pour les mémoriser.
+plateau à la liste des coups. 58 ouvertures rédigées à la main (bilingues),
+toutes relues au moteur, avec un entraînement en répétition espacée
+simplifié pour les mémoriser.
+
+LE COIN DES FINALES
+77 cours prouvés par table de finales — le verdict mathématique exact :
+aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la
+nulle. Neuf familles, de l'opposition aux études célèbres. Et l'entraînement
+libre : concluez la position contre la meilleure défense, tout coup qui
+préserve le verdict est accepté — pas seulement celui de la leçon.
 
 VOS PROPRES RÉPERTOIRES
 Importez vos ouvertures au format PGN, variantes comprises, et entraînez-les
@@ -250,8 +263,8 @@ stockfish,tactics,openings,puzzle,gambit,fen,pgn,elo,training,scanner,analysis,o
 
 **Promotional text** (170 char. max):
 ```
-Analyze your games, scan a chessboard, train on 58 annotated openings and
-100,000+ puzzles, take on the computer — fully offline, no ads.
+Analyze your games, scan a chessboard: 58 openings, 77 proven endgames,
+100,000+ puzzles, the computer to beat — fully offline, no ads.
 ```
 
 **Description** (4000 char. max):
@@ -280,6 +293,13 @@ Pick an opening and step through it move by move: every move is explained,
 the alternatives are offered, and colored arrows link the board to the move
 list. 58 hand-written openings (bilingual), all reviewed by the engine, with
 simplified spaced-repetition training to memorize them.
+
+THE ENDGAME CORNER
+77 courses proven by endgame tablebases — the exact mathematical verdict:
+no taught move gives up a win, no recommended defence loses a draw. Nine
+families, from the opposition to famous studies. And free training: finish
+the position against best defence, where any move that preserves the
+verdict is accepted — not just the lesson's move.
 
 YOUR OWN REPERTOIRES
 Import your openings as PGN, variations included, and drill them with the same
@@ -389,19 +409,21 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**1.4.0, build 6** — nouveautés dans `RELEASE_NOTES-1.4.0.md`, et le texte
-prêt à coller est la section « Nouveautés de cette version » en haut de ce
-fichier.
+**1.5.0, build 7** — nouveautés détaillées dans `RELEASE_NOTES-1.5.0.md`, et
+le texte prêt à coller est la section « Nouveautés de cette version » en haut
+de ce fichier.
 
-Vérifié dans `ChessLab.xcodeproj/project.pbxproj` : la cible applicative
-(`com.chesslab.ChessLab`) porte bien `MARKETING_VERSION = 1.4.0` et
-`CURRENT_PROJECT_VERSION = 6` **aux deux configurations**, Debug et Release.
+Vérifié dans `ChessLab.xcodeproj/project.pbxproj` (19/08/2026) : la cible
+applicative (`com.chesslab.ChessLab`) porte bien `MARKETING_VERSION = 1.5.0`
+et `CURRENT_PROJECT_VERSION = 7` **aux deux configurations**, Debug et
+Release.
 
-⚠️ **La 1.3 n'a jamais été soumise.** Le dernier build envoyé à Apple est le
-build 3 de la 1.2 (commit `a211763`). Le build 5 / 1.3.0 a été préparé puis
-laissé de côté ; on saute directement à la 1.4. Les nouveautés de la 1.3 sont
-donc annoncées dans le texte « Nouveautés » de la 1.4 — sans quoi personne ne
-les verrait jamais.
+⚠️ **Ni la 1.3 ni la 1.4 n'ont été soumises.** Le dernier build envoyé à
+Apple reste le build 3 de la 1.2 (commit `a211763`). Le build 5 / 1.3.0 puis
+le build 6 / 1.4.0 ont été préparés puis dépassés par le rythme du
+développement ; on saute directement à la 1.5. Les nouveautés des 1.3 ET 1.4
+sont donc annoncées dans le texte « Nouveautés » de la 1.5 — sans quoi
+personne ne les verrait jamais.
 
 Les cibles de TEST (`ChessLabTests`, `ChessLabUITests`) sont restées en
 `1.2.0` / build 3. **Sans effet sur la soumission** : leurs bundles ne sont pas
@@ -426,16 +448,23 @@ git status -sb        # doit indiquer 'main...origin/main' sans 'ahead'
 git push origin main
 ```
 
-Au 15/08/2026, `main` porte **une vingtaine de commits non poussés** — tout le
-contenu des 1.3 et 1.4. Soumettre sans pousser publierait un binaire dont les
-sources annoncées ne correspondent pas. Relever le compte exact au moment de
-soumettre (`git log --oneline origin/main..HEAD | wc -l`) plutôt que de se fier
-à ce chiffre, qui vieillit à chaque commit.
+Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du
+18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de
+soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) :
+soumettre sans pousser publierait un binaire dont les sources annoncées ne
+correspondent pas.
 
 ### Historique des versions
-- **1.4.0** — répertoires d'ouvertures personnels (import PGN + partage par
-  fichier), les 58 ouvertures relues au moteur, un seul essai par puzzle,
-  lecteur d'ouvertures à plateau ancré (`RELEASE_NOTES-1.4.0.md`).
+- **1.5.0** — module Finales (77 cours prouvés par tablebase, 9 familles),
+  entraînement libre arbitré au verdict, correctif majeur iOS 18, ~900
+  positions ajoutées aux ouvertures, verdicts d'analyse affinés, sélecteur
+  « Changer de mode » avec reprise de position, Stockfish 17.1
+  (`RELEASE_NOTES-1.5.0.md` — couvre 1.2 → 1.5).
+- **1.4.0** — préparée, **jamais soumise** : répertoires d'ouvertures
+  personnels (import PGN + partage par fichier), les 58 ouvertures relues au
+  moteur, un seul essai par puzzle, lecteur d'ouvertures à plateau ancré
+  (`RELEASE_NOTES-1.4.0.md`, conservé comme document historique). Son contenu
+  est livré avec la 1.5.
 - **1.3.0** — préparée, **jamais soumise** : échiquier tolérant au doigt, score
   de précision recalibré, revue d'analyse fiabilisée, iPhone en portrait. Son
   contenu est livré avec la 1.4 ; aucune note de version distincte n'a été

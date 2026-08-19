@@ -6866,3 +6866,50 @@ théorique (tablebase) », 212 requêtes, toutes en cache (la vérification
 préalable avait déjà tout payé). `author.py` complet repassé (135 cours).
 `Localizable.xcstrings` : 6 entrées FR en blocs de 17 lignes après une
 entrée complète (102 lignes, `json.load` revalidé).
+
+## Version 1.5 : aide et dossier App Store réalignés, menu « S'entraîner » (19/08)
+
+Demande : tout documenter sous 1.5, puisque ni la 1.3 ni la 1.4 n'ont été
+soumises (dernier build chez Apple : le 3, en 1.2.0). Fait :
+
+- **Aide in-app** : six rubriques réécrites — Nouveautés 1.5 (couvre
+  1.2 → 1.5), Finales (77 cours, neuf familles, entraînement libre), Progrès
+  (filtre 7/30 jours), et la mention du sélecteur de mode dans Ordinateur,
+  Puzzles et Ouvertures. Traductions EN régénérées depuis la source Swift
+  (l'extraction lit les corps réels, pas une copie qui divergerait).
+- **AppStoreSubmission/** : `RELEASE_NOTES-1.5.0.md` réécrites (périmètre
+  1.2 → 1.5 explicite, module Finales à 77 cours, entraînement libre,
+  sélecteur de mode, contenu 1.4 replié — répertoires personnels, relecture
+  moteur, un essai par puzzle) ; `METADATA.md` : « Nouveautés » 1.5 FR
+  (2500 car.) / EN (2335 car.), descriptions FR/EN avec un bloc Finales
+  dédié, textes promo à « 77 finales prouvées », section version/build à
+  1.5.0 build 7 (vérifiée aux deux configurations du pbxproj), historique
+  des versions, note de push actualisée ; `CHECKLIST.md` révisée ;
+  `RELEASE_NOTES-1.4.0.md` bandeau « jamais soumise, document historique ».
+- **Menu « S'entraîner »** dans le lecteur des finales : retour utilisateur
+  du matin (« c'est quoi le bouton orange ? je vois pas son intérêt ») —
+  l'icône cible nue n'expliquait rien. Les deux modes d'entraînement
+  (ligne guidée, entraînement libre) vivent désormais dans UN menu aux
+  entrées nommées ; les ouvertures gardent leur bouton direct unique.
+  Aide, notes de version et chaînes accordées.
+
+Au passage, Xcode (ouvert pendant la nuit) avait re-trié le catalogue de
+chaînes et extrait les clés vides des nouvelles vues — vérifié
+non-destructif clé par clé (les 13 chaînes v2 et leurs EN intactes),
+conformément au comportement documenté le 18/08.
+
+## Finales : la rangée 1 toujours en bas dans le LECTEUR (19/08)
+
+Retour utilisateur : « elles sont des fois représentées inversées — mieux
+d'afficher la ligne 1 en bas ». Inventaire : 27 des 77 cours de finales ont
+pour héros le camp noir (défenses, forteresses — Philidor, Vancura,
+Cochrane…) et le lecteur orientait le plateau côté héros, comme pour les
+répertoires d'ouvertures : ces 27 diagrammes s'affichaient donc inversés
+par rapport à tous les livres de finales.
+
+Correctif dans `OpeningReaderViewModel` : pour un cours `kind == endgame`,
+l'orientation est TOUJOURS blancs en bas (convention des diagrammes) ; les
+ouvertures gardent le côté étudié en bas (un répertoire noir se lit noirs
+en bas, comme partout dans l'app). Les écrans d'ENTRAÎNEMENT (ligne guidée,
+entraînement libre) gardent le camp JOUÉ en bas : on y joue, on ne lit
+plus — même convention que Jouer contre l'ordinateur côté noir.

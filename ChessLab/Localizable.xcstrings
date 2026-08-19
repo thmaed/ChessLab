@@ -7,6 +7,9 @@
     " %" : {
 
     },
+    " → " : {
+
+    },
     "—" : {
       "localizations" : {
         "en" : {
@@ -1568,6 +1571,22 @@
     "Apprends et révise tes ouvertures" : {
 
     },
+    "Arbitrage…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbitrating…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arbitrage…"
+          }
+        }
+      }
+    },
     "Ardoise" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1649,6 +1668,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun coup joué"
+          }
+        }
+      }
+    },
+    "Aucun coup repris — conversion propre." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No move taken back — a clean conversion."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun coup repris — conversion propre."
           }
         }
       }
@@ -2965,6 +3000,22 @@
         }
       }
     },
+    "Ce coup lâche le verdict : " : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This move lets the verdict slip: "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ce coup lâche le verdict : "
+          }
+        }
+      }
+    },
     "Ce fichier mélange des positions de départ différentes : importez-les séparément." : {
       "localizations" : {
         "en" : {
@@ -3066,6 +3117,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Centurini — la bonne case"
+          }
+        }
+      }
+    },
+    "Centurini — Two Diagonals, One Too Short" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centurini — Two Diagonals, One Too Short"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Centurini — deux diagonales, dont une trop courte"
           }
         }
       }
@@ -3559,6 +3627,23 @@
         }
       }
     },
+    "Connected Passers on the 5th — the Rook Strikes First" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Connected Passers on the 5th — the Rook Strikes First"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pions liés en 5e — la tour frappe la première"
+          }
+        }
+      }
+    },
     "Connected Passers on the 6th Rank vs Rook" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4038,6 +4123,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Coups joués"
+          }
+        }
+      }
+    },
+    "Coups repris en route : %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moves taken back along the way: %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coups repris en route : %lld"
           }
         }
       }
@@ -4996,6 +5097,22 @@
         }
       }
     },
+    "Entraînement libre" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Free training"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Entraînement libre"
+          }
+        }
+      }
+    },
     "Entraîner" : {
 
     },
@@ -5798,6 +5915,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Gaffe"
+          }
+        }
+      }
+    },
+    "gagnant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "winning"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "gagnant"
           }
         }
       }
@@ -7078,6 +7211,23 @@
         }
       }
     },
+    "Knight vs Rook's Pawn — the Lone Defender" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knight vs Rook's Pawn — the Lone Defender"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cavalier contre pion-tour — le défenseur solitaire"
+          }
+        }
+      }
+    },
     "Knight vs Two Separated Pawns" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -7124,6 +7274,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "L'adversaire joue…"
+          }
+        }
+      }
+    },
+    "L'arbitre et la défense reposent sur le moteur — relancez-le pour continuer." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Both the arbiter and the defence rely on the engine — restart it to continue."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "L'arbitre et la défense reposent sur le moteur — relancez-le pour continuer."
           }
         }
       }
@@ -7204,6 +7370,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer."
+          }
+        }
+      }
+    },
+    "La défense réfléchit…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The defence is thinking…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La défense réfléchit…"
           }
         }
       }
@@ -8813,6 +8995,22 @@
         }
       }
     },
+    "nulle" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "drawn"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "nulle"
+          }
+        }
+      }
+    },
     "Nulle" : {
       "localizations" : {
         "en" : {
@@ -9308,6 +9506,22 @@
     },
     "Pause" : {
 
+    },
+    "perdant" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "losing"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "perdant"
+          }
+        }
+      }
     },
     "Perdues" : {
 
@@ -10323,6 +10537,23 @@
         }
       }
     },
+    "Queen and Pawn vs Queen — the Umbrella" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queen and Pawn vs Queen — the Umbrella"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dame et pion contre dame — le parapluie"
+          }
+        }
+      }
+    },
     "Queen vs 7th-Rank Pawn" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -10764,210 +10995,130 @@
         }
       }
     },
-    "gagnant" : {
+    "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "winning"
+            "value" : "• The Endgames module: 77 courses proven by tablebase, in nine families — from the opposition to the Lucena, from fortresses to famous studies (Lasker, Troitsky, Kubbel…).\n• Free endgame training: finish the position against best defence — any move that preserves the verdict is accepted, those that let it slip are taken back.\n• Your personal repertoires: PGN import with variations, sharing by simple file, built-in editor.\n• All 58 opening courses expanded: nearly 900 positions added (London, Philidor, Petroff…).\n• \"Switch mode\" (top right) jumps to the Laboratory, the computer or Two players, carrying the displayed position along.\n• More reliable analysis verdicts: borderline moves are re-examined with ten times the effort before being labelled.\n• Major fix for iOS 18: the board no longer responded to touch.\n• Progress: the record against the computer can be filtered to 7 or 30 days."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "gagnant"
+            "value" : "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours."
           }
         }
       }
     },
-    "nulle" : {
+    "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, l'entraînement LIBRE (bouton cible) vous fait conclure la position contre la meilleure défense : tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "drawn"
+            "value" : "77 courses to finally convert your endings, grouped by family: pawns, rooks, bishops, knights, imbalances, queens, elementary mates, famous studies (Réti, Saavedra, Lasker, Troitsky, Kubbel…) and cross-cutting themes (two weaknesses, domination, stalemate as a resource…). Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. From the reader, FREE training (target button) has you finish the position against best defence: any move that preserves the verdict is accepted, not just the lesson's move, and a move that lets it slip is taken back with the explanation. Spaced repetition and iCloud sync, like the openings."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "nulle"
+            "value" : "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, l'entraînement LIBRE (bouton cible) vous fait conclure la position contre la meilleure défense : tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
           }
         }
       }
     },
-    "perdant" : {
+    "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "losing"
+            "value" : "A dashboard reachable from the home screen: your record against the computer (wins, draws, losses) and your puzzle statistics by theme. The record against the computer can be filtered to the last 7 or 30 days, or the whole history. One tap on a weak theme and the app lines up a targeted puzzle set to work on it."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "perdant"
+            "value" : "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler."
           }
         }
       }
     },
-    "Entraînement libre" : {
+    "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Free training"
+            "value" : "Play a game against the Stockfish engine. Choose your colour, the opponent's strength (Elo), the time control, and the aids: hints (best-move arrows), a warning on risky moves and an evaluation bar. After the game, one button leads straight to analysis. During the game, the export menu (top right) sends the displayed position to analysis, the Laboratory or a two-player game — your game is waiting when you come back."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Entraînement libre"
+            "value" : "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
           }
         }
       }
     },
-    "Verdict à tenir : " : {
+    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verdict to hold: "
+            "value" : "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by level, game phase and theme. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Verdict à tenir : "
+            "value" : "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs."
           }
         }
       }
     },
-    "Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur." : {
+    "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Any move that preserves the verdict is accepted — engine-checked arbitration."
+            "value" : "Progress through 58 hand-written, bilingual openings, all engine-checked. A guided reader advances move by move, explains each move and offers the playable alternatives; coloured arrows flag the recommended move, traps and inaccuracies. Train them with spaced repetition — the app schedules your reviews by itself — and find your progress on all your devices via iCloud. From the reader, \"Switch mode\" sends the position you reached to the Laboratory, the computer or a two-player game."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur."
+            "value" : "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
           }
         }
       }
     },
-    "Arbitrage…" : {
+    "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Arbitrating…"
+            "value" : "77 courses to finally convert your endings, grouped by family: pawns, rooks, bishops, knights, imbalances, queens, elementary mates, famous studies (Réti, Saavedra, Lasker, Troitsky, Kubbel…) and cross-cutting themes (two weaknesses, domination, stalemate as a resource…). Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. From the reader, the \"Train\" menu offers the guided line OR free training — finish the position against best defence, where any move that preserves the verdict is accepted, not just the lesson's move, and a move that lets it slip is taken back with the explanation. Spaced repetition and iCloud sync, like the openings."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Arbitrage…"
+            "value" : "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
           }
         }
       }
     },
-    "La défense réfléchit…" : {
+    "Ligne guidée" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The defence is thinking…"
+            "value" : "Guided line"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La défense réfléchit…"
-          }
-        }
-      }
-    },
-    "Ce coup lâche le verdict : " : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This move lets the verdict slip: "
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ce coup lâche le verdict : "
-          }
-        }
-      }
-    },
-    "Jouer le meilleur coup" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play the best move"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jouer le meilleur coup"
-          }
-        }
-      }
-    },
-    "Coups repris en route : %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moves taken back along the way: %lld"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coups repris en route : %lld"
-          }
-        }
-      }
-    },
-    "Aucun coup repris — conversion propre." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No move taken back — a clean conversion."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucun coup repris — conversion propre."
-          }
-        }
-      }
-    },
-    "L'arbitre et la défense reposent sur le moteur — relancez-le pour continuer." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Both the arbiter and the defence rely on the engine — restart it to continue."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "L'arbitre et la défense reposent sur le moteur — relancez-le pour continuer."
+            "value" : "Ligne guidée"
           }
         }
       }
@@ -11093,7 +11244,6 @@
 
     },
     "Rejouer" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -11942,6 +12092,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "roi noir"
+          }
+        }
+      }
+    },
+    "Rook and Bishop vs Rook — Philidor's Win" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rook and Bishop vs Rook — Philidor's Win"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tour et fou contre tour — le gain de Philidor"
           }
         }
       }
@@ -13242,40 +13409,6 @@
         }
       }
     },
-    "The Bishop Pair Mate" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Bishop Pair Mate"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le mat aux deux fous"
-          }
-        }
-      }
-    },
-    "Rook and Bishop vs Rook — Philidor's Win" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rook and Bishop vs Rook — Philidor's Win"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tour et fou contre tour — le gain de Philidor"
-          }
-        }
-      }
-    },
     "The Bishop and Knight Mate" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -13293,104 +13426,19 @@
         }
       }
     },
-    "Knight vs Rook's Pawn — the Lone Defender" : {
+    "The Bishop Pair Mate" : {
       "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Knight vs Rook's Pawn — the Lone Defender"
+            "value" : "The Bishop Pair Mate"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cavalier contre pion-tour — le défenseur solitaire"
-          }
-        }
-      }
-    },
-    "The Promotion Race and the First Check" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Promotion Race and the First Check"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La course à la promotion et le premier échec"
-          }
-        }
-      }
-    },
-    "The Wrong Bishop That Wins" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The Wrong Bishop That Wins"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le mauvais fou qui gagne"
-          }
-        }
-      }
-    },
-    "Queen and Pawn vs Queen — the Umbrella" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Queen and Pawn vs Queen — the Umbrella"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dame et pion contre dame — le parapluie"
-          }
-        }
-      }
-    },
-    "Connected Passers on the 5th — the Rook Strikes First" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Connected Passers on the 5th — the Rook Strikes First"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pions liés en 5e — la tour frappe la première"
-          }
-        }
-      }
-    },
-    "Centurini — Two Diagonals, One Too Short" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Centurini — Two Diagonals, One Too Short"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Centurini — deux diagonales, dont une trop courte"
+            "value" : "Le mat aux deux fous"
           }
         }
       }
@@ -13561,6 +13609,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le principe des deux faiblesses"
+          }
+        }
+      }
+    },
+    "The Promotion Race and the First Check" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Promotion Race and the First Check"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La course à la promotion et le premier échec"
           }
         }
       }
@@ -13786,6 +13851,23 @@
         }
       }
     },
+    "The Wrong Bishop That Wins" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Wrong Bishop That Wins"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le mauvais fou qui gagne"
+          }
+        }
+      }
+    },
     "Thème %@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -13980,6 +14062,22 @@
     },
     "Tout" : {
 
+    },
+    "Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any move that preserves the verdict is accepted — engine-checked arbitration."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur."
+          }
+        }
+      }
     },
     "Tout décocher" : {
 
@@ -14491,6 +14589,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "variospeed67@gmail.com"
+          }
+        }
+      }
+    },
+    "Verdict à tenir : " : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verdict to hold: "
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verdict à tenir : "
           }
         }
       }

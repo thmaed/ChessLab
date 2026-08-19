@@ -48,15 +48,29 @@ struct OpeningReaderView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
+                // FINALES : deux façons de s'entraîner (réciter la ligne, ou
+                // conclure librement sous arbitrage) — un MENU aux entrées
+                // nommées, pas deux icônes nues côte à côte : retour
+                // utilisateur du 19/08, « je vois pas son intérêt » à propos
+                // de l'icône cible seule. Les ouvertures gardent le bouton
+                // direct, elles n'ont qu'un seul mode.
                 if viewModel.course.kind == "endgame" {
-                    Button { onFreeTrain() } label: {
-                        Label("Entraînement libre", systemImage: "target")
+                    Menu {
+                        Button { onTrain() } label: {
+                            Label("Ligne guidée", systemImage: "graduationcap.fill")
+                        }
+                        Button { onFreeTrain() } label: {
+                            Label("Entraînement libre", systemImage: "target")
+                        }
+                    } label: {
+                        Label("S'entraîner", systemImage: "graduationcap.fill")
                     }
-                    .tint(Theme.gold)
-                    .accessibilityIdentifier("reader_freeTrain")
-                }
-                Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
                     .tint(Theme.accent)
+                    .accessibilityIdentifier("reader_trainMenu")
+                } else {
+                    Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
+                        .tint(Theme.accent)
+                }
                 QuickSwitchMenu(
                     onOpenLab: { onOpenLab(currentFEN) },
                     onPlayVsEngine: { onContinueVsStockfish(currentFEN) },
