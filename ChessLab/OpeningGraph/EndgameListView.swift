@@ -23,6 +23,11 @@ struct EndgameListView: View {
 
     @Environment(\.modelContext) private var modelContext
     @State private var dueCount = 0
+    /// Filtres de tête de liste — 77 cours sur 9 familles, sans eux il faut
+    /// ~14 écrans de défilement pour atteindre les études (retour
+    /// utilisateur du 19/08). `nil` = tout montrer.
+    @State private var levelFilter: OpeningLevel?
+    @State private var familyFilter: String?
 
     private var entries: [OpeningCatalogEntry] { OpeningCatalog.all.filter(\.isEndgame) }
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
@@ -54,13 +59,40 @@ struct EndgameListView: View {
         "themes": ("lightbulb.fill", Theme.gold),
     ]
 
+    /// Libellés COURTS des familles pour les puces (les titres de section,
+    /// eux, gardent la forme longue « Finales de pions »).
+    private static let familyChipTitles: [String: LocalizedStringKey] = [
+        "pawns": "Pions", "rooks": "Tours", "bishops": "Fous",
+        "knights": "Cavaliers", "imbalances": "Déséquilibres",
+        "queens": "Dames", "mates": "Mats", "practical": "Études",
+        "themes": "Thèmes",
+    ]
+
+    private var filteredByLevel: [OpeningCatalogEntry] {
+        guard let levelFilter else { return entries }
+        return entries.filter { $0.level == levelFilter }
+    }
+
+    private var visibleFamilies: [String] {
+        Self.familyOrder.filter { family in
+            (familyFilter == nil || familyFilter == family)
+                && filteredByLevel.contains { $0.family == family }
+        }
+    }
+
     var body: some View {
         List {
+            filterBar
             if dueCount > 0 { reviewSection }
-            ForEach(Self.familyOrder, id: \.self) { family in
-                let items = entries.filter { $0.family == family }
-                if !items.isEmpty {
-                    section(family: family, items)
+            ForEach(visibleFamilies, id: \.self) { family in
+                section(family: family, filteredByLevel.filter { $0.family == family })
+            }
+            if visibleFamilies.isEmpty {
+                Section {
+                    Text("Aucun cours ne correspond aux filtres.")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textTertiary)
+                        .listRowBackground(Theme.surface)
                 }
             }
             provenFooter
@@ -85,10 +117,54 @@ struct EndgameListView: View {
     /// Même file de révision que les ouvertures : la mémorisation est
     /// attachée aux POSITIONS, une séance mêle naturellement les deux.
     private func refresh() {
-        OpeningProgressSync.reconcile(in: modelContext)
+        OpeningProgressSync.reconcileIfStale(in: modelContext)
         let now = Date()
         let snapshots = OpeningTrainViewModel.snapshots(in: modelContext)
         dueCount = snapshots.values.filter { $0.reps > 0 && ($0.dueDate ?? .distantFuture) <= now }.count
+    }
+
+    /// La barre de filtres : niveau (trois puces fixes) puis familles (neuf
+    /// puces, défilement horizontal) — le composant ``FilterChip`` maison,
+    /// même mécanique que la bibliothèque d'analyses. Re-taper une puce
+    /// active la désactive.
+    private var filterBar: some View {
+        Section {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    FilterChip(label: "Tous", tint: Theme.gold, isSelected: levelFilter == nil) {
+                        levelFilter = nil
+                    }
+                    FilterChip(label: "Club", tint: Theme.accent, isSelected: levelFilter == .club) {
+                        levelFilter = levelFilter == .club ? nil : .club
+                    }
+                    FilterChip(label: "Avancé", tint: Theme.warning, isSelected: levelFilter == .advanced) {
+                        levelFilter = levelFilter == .advanced ? nil : .advanced
+                    }
+                }
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(Self.familyOrder, id: \.self) { family in
+                            if let icon = Self.familyIcons[family] {
+                                FilterChip(
+                                    label: Self.familyChipTitles[family] ?? "",
+                                    icon: icon.name, tint: icon.tint,
+                                    isSelected: familyFilter == family
+                                ) {
+                                    familyFilter = familyFilter == family ? nil : family
+                                }
+                            }
+                        }
+                    }
+                    // Les capsules débordent d'un souffle de leur ScrollView
+                    // (lueur de sélection) : un liseré vertical évite l'écrêtage.
+                    .padding(.vertical, 2)
+                }
+            }
+            .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+            .listRowBackground(Color.clear)
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Filtres des finales")
+        }
     }
 
     private var reviewSection: some View {

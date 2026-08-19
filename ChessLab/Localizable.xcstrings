@@ -693,8 +693,21 @@
         }
       }
     },
-    "• Le module Finales : douze cours prouvés par table de finales — opposition, Lucena, Philidor, mats élémentaires, étude de Réti…\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées, dont les réponses aux coups les plus joués en club (London, Philidor, Petroff).\n• Les analyses sont conservées sur l'appareil : une partie déjà analysée se rouvre classifiée, instantanément.\n• Les moments critiques (brillant, gaffe, occasion manquée…) s'affichent sur la courbe d'évaluation.\n• Les modes se parlent : depuis une partie, envoyez la position vers l'analyse ou le Laboratoire — la partie vous attend au retour, pendule en pause.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier répondait au doigt sur la seule colonne h." : {
-
+    "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• The Endgames module: 77 courses proven by tablebase, in nine families — from the opposition to the Lucena, from fortresses to famous studies (Lasker, Troitsky, Kubbel…).\n• Free endgame training: finish the position against best defence — any move that preserves the verdict is accepted, those that let it slip are taken back.\n• Your personal repertoires: PGN import with variations, sharing by simple file, built-in editor.\n• All 58 opening courses expanded: nearly 900 positions added (London, Philidor, Petroff…).\n• \"Switch mode\" (top right) jumps to the Laboratory, the computer or Two players, carrying the displayed position along.\n• More reliable analysis verdicts: borderline moves are re-examined with ten times the effort before being labelled.\n• Major fix for iOS 18: the board no longer responded to touch.\n• Progress: the record against the computer can be filtered to 7 or 30 days."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours."
+          }
+        }
+      }
     },
     "• Vos propres répertoires : importez vos ouvertures au format PGN, variantes comprises, entraînez-les comme les autres et partagez-les par simple fichier (voir la carte « Vos répertoires et le partage »).\n• Les 58 ouvertures livrées ont été relues au moteur : quinze coups fautifs corrigés, quatre défenses manquantes ajoutées. Chaque coup est désormais rejoué sous Stockfish avant d'être publié.\n• Puzzles : un seul essai par défaut, comme un vrai exercice de calcul. Les trois essais restent disponibles dans les Réglages.\n• Lecteur d'ouvertures : l'échiquier reste à l'écran pendant qu'on lit les coups. Sur iPad en paysage, plateau à gauche et explications à droite.\n• L'échiquier répond mieux au doigt : relâcher un peu à côté joue quand même le coup.\n• L'analyse explique POURQUOI un coup est une erreur, en nommant le motif tactique.\n• Score de précision recalibré, revue d'analyse qui reprend toute seule, pendule qui décompte dès le premier coup." : {
       "extractionState" : "stale",
@@ -785,6 +798,39 @@
     },
     "30 jours" : {
 
+    },
+    "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, l'entraînement LIBRE (bouton cible) vous fait conclure la position contre la meilleure défense : tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "77 courses to finally convert your endings, grouped by family: pawns, rooks, bishops, knights, imbalances, queens, elementary mates, famous studies (Réti, Saavedra, Lasker, Troitsky, Kubbel…) and cross-cutting themes (two weaknesses, domination, stalemate as a resource…). Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. From the reader, FREE training (target button) has you finish the position against best defence: any move that preserves the verdict is accepted, not just the lesson's move, and a move that lets it slip is taken back with the explanation. Spaced repetition and iCloud sync, like the openings."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, l'entraînement LIBRE (bouton cible) vous fait conclure la position contre la meilleure défense : tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
+          }
+        }
+      }
+    },
+    "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "77 courses to finally convert your endings, grouped by family: pawns, rooks, bishops, knights, imbalances, queens, elementary mates, famous studies (Réti, Saavedra, Lasker, Troitsky, Kubbel…) and cross-cutting themes (two weaknesses, domination, stalemate as a resource…). Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. From the reader, the \"Train\" menu offers the guided line OR free training — finish the position against best defence, where any move that preserves the verdict is accepted, not just the lesson's move, and a move that lets it slip is taken back with the explanation. Spaced repetition and iCloud sync, like the openings."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
+          }
+        }
+      }
     },
     "a gagné" : {
       "localizations" : {
@@ -1684,6 +1730,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun coup repris — conversion propre."
+          }
+        }
+      }
+    },
+    "Aucun cours ne correspond aux filtres." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No course matches the filters."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun cours ne correspond aux filtres."
           }
         }
       }
@@ -3000,6 +3062,22 @@
         }
       }
     },
+    "Cavaliers" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Knights"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cavaliers"
+          }
+        }
+      }
+    },
     "Ce coup lâche le verdict : " : {
       "localizations" : {
         "en" : {
@@ -3409,6 +3487,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Clouage"
+          }
+        }
+      }
+    },
+    "Club" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Club"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Club"
           }
         }
       }
@@ -4334,6 +4428,22 @@
         }
       }
     },
+    "Dames" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Queens"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dames"
+          }
+        }
+      }
+    },
     "Danish Gambit" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4546,6 +4656,22 @@
     "Dernière vérification : %@" : {
 
     },
+    "Déséquilibres" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imbalances"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Déséquilibres"
+          }
+        }
+      }
+    },
     "Déséquilibres matériels" : {
       "localizations" : {
         "en" : {
@@ -4662,6 +4788,7 @@
       }
     },
     "Douze cours pour convertir vos finales : opposition, règle du carré, percée, Lucena, Philidor, tour contre pion, dame contre pion, mats élémentaires, étude de Réti. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5187,6 +5314,22 @@
     "Étiquettes" : {
 
     },
+    "Études" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Studies"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Études"
+          }
+        }
+      }
+    },
     "Études célèbres" : {
       "localizations" : {
         "en" : {
@@ -5520,6 +5663,38 @@
         }
       }
     },
+    "Filtres des finales" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Endgame filters"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtres des finales"
+          }
+        }
+      }
+    },
+    "Filtres des ouvertures" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opening filters"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtres des ouvertures"
+          }
+        }
+      }
+    },
     "Fin de la ligne connue" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5815,6 +5990,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fourchette"
+          }
+        }
+      }
+    },
+    "Fous" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bishops"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fous"
           }
         }
       }
@@ -6905,6 +7096,7 @@
       }
     },
     "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse ou le Laboratoire — la partie vous attend au retour." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -6916,6 +7108,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse ou le Laboratoire — la partie vous attend au retour."
+          }
+        }
+      }
+    },
+    "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play a game against the Stockfish engine. Choose your colour, the opponent's strength (Elo), the time control, and the aids: hints (best-move arrows), a warning on risky moves and an evaluation bar. After the game, one button leads straight to analysis. During the game, the export menu (top right) sends the displayed position to analysis, the Laboratory or a two-player game — your game is waiting when you come back."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
           }
         }
       }
@@ -8014,6 +8222,22 @@
         }
       }
     },
+    "Ligne guidée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Guided line"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ligne guidée"
+          }
+        }
+      }
+    },
     "Ligne terminée !" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8258,6 +8482,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "matériel insuffisant"
+          }
+        }
+      }
+    },
+    "Mats" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mates"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mats"
           }
         }
       }
@@ -9944,6 +10184,22 @@
         }
       }
     },
+    "Pions" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pawns"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pions"
+          }
+        }
+      }
+    },
     "Pirc Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -10348,6 +10604,7 @@
       }
     },
     "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -10359,6 +10616,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud."
+          }
+        }
+      }
+    },
+    "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress through 58 hand-written, bilingual openings, all engine-checked. A guided reader advances move by move, explains each move and offers the playable alternatives; coloured arrows flag the recommended move, traps and inaccuracies. Train them with spaced repetition — the app schedules your reviews by itself — and find your progress on all your devices via iCloud. From the reader, \"Switch mode\" sends the position you reached to the Laboratory, the computer or a two-player game."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
           }
         }
       }
@@ -10995,134 +11268,6 @@
         }
       }
     },
-    "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• The Endgames module: 77 courses proven by tablebase, in nine families — from the opposition to the Lucena, from fortresses to famous studies (Lasker, Troitsky, Kubbel…).\n• Free endgame training: finish the position against best defence — any move that preserves the verdict is accepted, those that let it slip are taken back.\n• Your personal repertoires: PGN import with variations, sharing by simple file, built-in editor.\n• All 58 opening courses expanded: nearly 900 positions added (London, Philidor, Petroff…).\n• \"Switch mode\" (top right) jumps to the Laboratory, the computer or Two players, carrying the displayed position along.\n• More reliable analysis verdicts: borderline moves are re-examined with ten times the effort before being labelled.\n• Major fix for iOS 18: the board no longer responded to touch.\n• Progress: the record against the computer can be filtered to 7 or 30 days."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours."
-          }
-        }
-      }
-    },
-    "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, l'entraînement LIBRE (bouton cible) vous fait conclure la position contre la meilleure défense : tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "77 courses to finally convert your endings, grouped by family: pawns, rooks, bishops, knights, imbalances, queens, elementary mates, famous studies (Réti, Saavedra, Lasker, Troitsky, Kubbel…) and cross-cutting themes (two weaknesses, domination, stalemate as a resource…). Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. From the reader, FREE training (target button) has you finish the position against best defence: any move that preserves the verdict is accepted, not just the lesson's move, and a move that lets it slip is taken back with the explanation. Spaced repetition and iCloud sync, like the openings."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, l'entraînement LIBRE (bouton cible) vous fait conclure la position contre la meilleure défense : tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
-          }
-        }
-      }
-    },
-    "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "A dashboard reachable from the home screen: your record against the computer (wins, draws, losses) and your puzzle statistics by theme. The record against the computer can be filtered to the last 7 or 30 days, or the whole history. One tap on a weak theme and the app lines up a targeted puzzle set to work on it."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler."
-          }
-        }
-      }
-    },
-    "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play a game against the Stockfish engine. Choose your colour, the opponent's strength (Elo), the time control, and the aids: hints (best-move arrows), a warning on risky moves and an evaluation bar. After the game, one button leads straight to analysis. During the game, the export menu (top right) sends the displayed position to analysis, the Laboratory or a two-player game — your game is waiting when you come back."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
-          }
-        }
-      }
-    },
-    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by level, game phase and theme. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs."
-          }
-        }
-      }
-    },
-    "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Progress through 58 hand-written, bilingual openings, all engine-checked. A guided reader advances move by move, explains each move and offers the playable alternatives; coloured arrows flag the recommended move, traps and inaccuracies. Train them with spaced repetition — the app schedules your reviews by itself — and find your progress on all your devices via iCloud. From the reader, \"Switch mode\" sends the position you reached to the Laboratory, the computer or a two-player game."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
-          }
-        }
-      }
-    },
-    "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "77 courses to finally convert your endings, grouped by family: pawns, rooks, bishops, knights, imbalances, queens, elementary mates, famous studies (Réti, Saavedra, Lasker, Troitsky, Kubbel…) and cross-cutting themes (two weaknesses, domination, stalemate as a resource…). Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. From the reader, the \"Train\" menu offers the guided line OR free training — finish the position against best defence, where any move that preserves the verdict is accepted, not just the lesson's move, and a move that lets it slip is taken back with the explanation. Spaced repetition and iCloud sync, like the openings."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
-          }
-        }
-      }
-    },
-    "Ligne guidée" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Guided line"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Ligne guidée"
-          }
-        }
-      }
-    },
     "Réflexion par coup" : {
       "localizations" : {
         "en" : {
@@ -11663,6 +11808,7 @@
       }
     },
     "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -11674,6 +11820,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles."
+          }
+        }
+      }
+    },
+    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by level, game phase and theme. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs."
           }
         }
       }
@@ -13901,6 +14063,22 @@
         }
       }
     },
+    "Thèmes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Themes"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thèmes"
+          }
+        }
+      }
+    },
     "Thèmes transversaux" : {
 
     },
@@ -14017,6 +14195,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "tour noire"
+          }
+        }
+      }
+    },
+    "Tours" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rooks"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tours"
           }
         }
       }
@@ -14412,6 +14606,7 @@
       }
     },
     "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -14423,6 +14618,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler."
+          }
+        }
+      }
+    },
+    "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A dashboard reachable from the home screen: your record against the computer (wins, draws, losses) and your puzzle statistics by theme. The record against the computer can be filtered to the last 7 or 30 days, or the whole history. One tap on a weak theme and the app lines up a targeted puzzle set to work on it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler."
           }
         }
       }

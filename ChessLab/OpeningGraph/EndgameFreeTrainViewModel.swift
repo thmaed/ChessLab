@@ -118,6 +118,12 @@ final class EndgameFreeTrainViewModel {
     /// repris, à la demande.
     private var bestLanAtBaseline: String?
 
+    /// Jeton d'ÉPOQUE : incrémenté à chaque arbitrage ET à chaque
+    /// redémarrage. Toute continuation (verdict, riposte) qui revient d'un
+    /// `await` vérifie qu'elle appartient encore à l'époque courante —
+    /// sinon un `restart()` pendant la réflexion de la défense laissait la
+    /// riposte de l'ANCIENNE partie s'appliquer à la nouvelle (revue du
+    /// 19/08).
     private var arbitrationToken = 0
 
     var userColor: Piece.Color { course.side.color }
@@ -256,7 +262,11 @@ final class EndgameFreeTrainViewModel {
         }
 
         commit(scratch: scratch, move: move)
-        await playOpponentReply()
+        // L'évaluation d'arbitrage a DÉJÀ calculé le meilleur coup du camp
+        // au trait dans cette position — c'est-à-dire la riposte de la
+        // défense : la rejouer épargne une seconde recherche identique
+        // (~500 ms par coup accepté, revue du 19/08).
+        await playOpponentReply(preferring: after.bestLan)
     }
 
     private func isDegradation(from before: EndgameVerdict, to after: EndgameVerdict) -> Bool {
@@ -327,18 +337,35 @@ final class EndgameFreeTrainViewModel {
         bestLanAtBaseline = nil
         clearSelection()
         pendingPromotion = nil
+        arbitrationToken &+= 1  // invalide toute continuation en vol
         phase = .preparing
         Task { await start() }
     }
 
     // MARK: Défense et cadence
 
-    private func playOpponentReply() async {
+    private func playOpponentReply(preferring preferredLan: String? = nil) async {
         phase = .opponentMoving
-        guard let lan = await opponent.reply(fen: board.position.fen) else {
-            phase = .unavailable
+        arbitrationToken &+= 1
+        let token = arbitrationToken
+        // Riposte déjà connue (meilleur coup de l'éval d'arbitrage) : on la
+        // joue sans reconsulter la défense. Si elle est absente ou
+        // inapplicable (prudence), le fournisseur reste la voie normale.
+        if let preferredLan, let move = applyLan(preferredLan) {
+            playedSANs.append(move.san)
+            lastMove = move
+            if let ended = GameOutcome.fromBoardState(board.state) {
+                finish(with: ended)
+                return
+            }
+            await refreshBaseline()
             return
         }
+        guard let lan = await opponent.reply(fen: board.position.fen) else {
+            if token == arbitrationToken { phase = .unavailable }
+            return
+        }
+        guard token == arbitrationToken else { return }
         guard let move = applyLan(lan) else {
             phase = .unavailable
             return
@@ -358,10 +385,13 @@ final class EndgameFreeTrainViewModel {
     /// une référence périmée.
     private func refreshBaseline() async {
         phase = .preparing
+        arbitrationToken &+= 1
+        let token = arbitrationToken
         guard let assessment = await judge.assess(fen: board.position.fen) else {
-            phase = .unavailable
+            if token == arbitrationToken { phase = .unavailable }
             return
         }
+        guard token == arbitrationToken else { return }
         let mover = board.position.sideToMove
         baselineVerdict = mover == userColor
             ? assessment.verdict : assessment.verdict.flipped

@@ -35,6 +35,10 @@ final class EngineLeakUITests: XCTestCase {
         // debout précisément parce que le test qui devait l'attraper ne
         // passait pas par là.
         try visitLaboratory(app)
+        // L'entraînement libre des finales (19/08) est le petit dernier des
+        // écrans à moteur : même exigence que les autres — son arbitre ne
+        // doit pas survivre au retour à l'accueil.
+        try visitFreeEndgameTraining(app)
 
         // Le compte est repris à l'accueil, une fois tous les écrans quittés.
         let created = createdCount(marker)
@@ -55,6 +59,31 @@ final class EngineLeakUITests: XCTestCase {
     }
 
     // MARK: Parcours
+
+    @MainActor
+    private func visitFreeEndgameTraining(_ app: XCUIApplication) throws {
+        app.buttons["mode_endgames"].tap()
+        let opposition = app.buttons["endgame_eg-opposition"]
+        XCTAssertTrue(opposition.waitForExistence(timeout: 10))
+        opposition.tap()
+        let trainMenu = app.buttons["reader_trainMenu"]
+        XCTAssertTrue(trainMenu.waitForExistence(timeout: 5))
+        trainMenu.tap()
+        let free = app.buttons["Entraînement libre"]
+        XCTAssertTrue(free.waitForExistence(timeout: 5))
+        free.tap()
+        // Le plateau du mode libre monte et l'arbitre (un moteur plein pot)
+        // démarre sa première évaluation : on le laisse réellement chercher.
+        XCTAssertTrue(app.otherElements["square_a1"].waitForExistence(timeout: 15))
+        RunLoop.current.run(until: Date().addingTimeInterval(4))
+        // Retour : écran libre → lecteur → liste → accueil.
+        app.navigationBars.buttons.firstMatch.tap()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+        app.navigationBars.buttons.firstMatch.tap()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 10))
+    }
 
     @MainActor
     private func visitPlay(_ app: XCUIApplication) throws {

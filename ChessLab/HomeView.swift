@@ -198,12 +198,12 @@ struct HomeView: View {
             // Fusionne la progression puzzles synchronisée (autres appareils)
             // dans les Puzzle locaux AVANT de calculer le bilan — voir
             // ``PuzzleProgressSync``. No-op si rien n'est encore synchronisé.
-            PuzzleProgressSync.reconcile(in: modelContext)
+            PuzzleProgressSync.reconcileIfStale(in: modelContext)
             // Fusionne de même la progression d'ouvertures synchronisée : dédup
             // des enregistrements par clé FEN et recalcul de l'état FSRS en
             // rejouant le journal fusionné — voir ``OpeningProgressSync``. No-op
             // tant que rien n'a été révisé.
-            OpeningProgressSync.reconcile(in: modelContext)
+            OpeningProgressSync.reconcileIfStale(in: modelContext)
             loadProgressSummary()
             // Préchargement (ponctuel, au tout premier lancement) de la
             // bibliothèque Lichess : lancé en TÂCHE DE FOND par le seeder —

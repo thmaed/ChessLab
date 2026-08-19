@@ -289,6 +289,12 @@ struct FilterChip: View {
                 Text(label)
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(isSelected ? Theme.background : Theme.textPrimary)
+                    // Une puce ne PASSE JAMAIS à la ligne : sur écran étroit,
+                    // « Blancs » devenait « Blan/cs » (retour utilisateur du
+                    // 19/08). C'est à l'écran hôte d'offrir un défilement
+                    // horizontal si la rangée déborde.
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
             }
             .padding(.horizontal, 13)
             .padding(.vertical, 8)

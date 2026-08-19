@@ -33,9 +33,11 @@ struct EndgameFreeTrainViewModelTests {
     /// Défense scriptée : rend les coups UCI dans l'ordre.
     final class FakeOpponent: EndgameOpponentMoving {
         var moves: [String]
+        private(set) var callCount = 0
         init(_ moves: [String] = []) { self.moves = moves }
         func reply(fen: String) async -> String? {
-            moves.isEmpty ? nil : moves.removeFirst()
+            callCount += 1
+            return moves.isEmpty ? nil : moves.removeFirst()
         }
     }
 
@@ -184,6 +186,26 @@ struct EndgameFreeTrainViewModelTests {
         // Le meilleur coup (Qg2) est sur l'échiquier, la défense a répondu.
         #expect(vm.playedSANs.first == "Qg2")
         #expect(vm.playedSANs.count == 2)
+        #expect(vm.phase == .awaiting)
+    }
+
+    @Test func theDefenceReusesTheArbitersBestLineWithoutASecondSearch() async {
+        let judge = FakeJudge()
+        let opponent = FakeOpponent(["zzzz"])  // sentinelle : ne doit JAMAIS servir
+        let vm = makeModel(judge: judge, opponent: opponent)
+
+        judge.fallback = EndgameAssessment(verdict: .win, bestLan: "g1g7")
+        await vm.start()
+
+        // L'éval d'arbitrage (POV défense) fournit la riposte Kh7 : elle est
+        // rejouée telle quelle — aucune seconde recherche.
+        judge.fallback = EndgameAssessment(verdict: .loss, bestLan: "h8h7")
+        guard let (scratch, move) = scratchAfter(vm, from: Square("g1"), to: Square("g2")) else { return }
+        await vm.arbitrate(scratch: scratch, move: move)
+
+        #expect(vm.playedSANs.count == 2)
+        #expect(vm.playedSANs.last == "Kh7")
+        #expect(opponent.callCount == 0)
         #expect(vm.phase == .awaiting)
     }
 

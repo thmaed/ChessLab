@@ -339,7 +339,7 @@ struct ProgressionView: View {
     private func load() {
         // Fusionne d'abord la progression puzzles synchronisée (autres
         // appareils) dans les Puzzle locaux, pour que le bilan la reflète.
-        PuzzleProgressSync.reconcile(in: modelContext)
+        PuzzleProgressSync.reconcileIfStale(in: modelContext)
         // Parties : petite table, chargement complet sans risque. `playedAt`
         // reste chargée (pas dans `propertiesToFetch` réduit, contrairement
         // aux puzzles ci-dessous) : c'est elle qui alimente le sélecteur de

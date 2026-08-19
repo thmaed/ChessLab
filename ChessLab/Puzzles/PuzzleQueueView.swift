@@ -225,7 +225,7 @@ struct PuzzleQueueView: View {
         // Fusionne la progression synchronisée (dueDate, compteurs) avant de
         // lire la file et les stats — sinon un puzzle déjà résolu ailleurs
         // pourrait être re-servi ici. Voir ``PuzzleProgressSync``.
-        PuzzleProgressSync.reconcile(in: modelContext)
+        PuzzleProgressSync.reconcileIfStale(in: modelContext)
         let totalDescriptor = FetchDescriptor<Puzzle>()
         hasAnyPuzzle = ((try? modelContext.fetchCount(totalDescriptor)) ?? 0) > 0
 

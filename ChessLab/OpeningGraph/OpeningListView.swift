@@ -33,6 +33,12 @@ struct OpeningListView: View {
     @Query private var userRecords: [UserOpeningRecord]
     @State private var showImport = false
     @State private var pendingDeletion: OpeningCatalogEntry?
+    /// Filtres de tête de liste — même mécanique que l'écran Finales (retour
+    /// utilisateur du 19/08). `nil` = tout montrer. Ne s'appliquent qu'aux
+    /// cours LIVRÉS : « Mes répertoires » reste toujours visible, c'est ce
+    /// que l'utilisateur a apporté lui-même.
+    @State private var levelFilter: OpeningLevel?
+    @State private var sideFilter: OpeningSide?
 
     private var entries: [OpeningCatalogEntry] { OpeningCatalog.all }
 
@@ -58,8 +64,14 @@ struct OpeningListView: View {
         // écran : ici, uniquement les ouvertures.
         entries.filter { !UserOpeningStore.isUserCourse(id: $0.id) && !$0.isEndgame }
     }
-    private var white: [OpeningCatalogEntry] { sortedByName(bundled.filter { $0.side == .white }) }
-    private var black: [OpeningCatalogEntry] { sortedByName(bundled.filter { $0.side == .black }) }
+    private var filteredBundled: [OpeningCatalogEntry] {
+        bundled.filter {
+            (levelFilter == nil || $0.level == levelFilter)
+                && (sideFilter == nil || $0.side == sideFilter)
+        }
+    }
+    private var white: [OpeningCatalogEntry] { sortedByName(filteredBundled.filter { $0.side == .white }) }
+    private var black: [OpeningCatalogEntry] { sortedByName(filteredBundled.filter { $0.side == .black }) }
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
 
     /// Nom affiché (traduit dans la langue de l'app via le bundle redirigé).
@@ -74,10 +86,19 @@ struct OpeningListView: View {
 
     var body: some View {
         List {
+            filterBar
             if dueCount > 0 { reviewSection }
             if !mine.isEmpty { section("Mes répertoires", mine) }
             if !white.isEmpty { section("Répertoire blanc", white) }
             if !black.isEmpty { section("Répertoire noir", black) }
+            if white.isEmpty, black.isEmpty {
+                Section {
+                    Text("Aucun cours ne correspond aux filtres.")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textTertiary)
+                        .listRowBackground(Theme.surface)
+                }
+            }
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
@@ -129,10 +150,83 @@ struct OpeningListView: View {
     }
 
     private func refresh() {
-        OpeningProgressSync.reconcile(in: modelContext)
+        OpeningProgressSync.reconcileIfStale(in: modelContext)
         let now = Date()
         let snapshots = OpeningTrainViewModel.snapshots(in: modelContext)
         dueCount = snapshots.values.filter { $0.reps > 0 && ($0.dueDate ?? .distantFuture) <= now }.count
+    }
+
+    /// Barre de filtres : camp puis niveau — mêmes ``FilterChip`` que
+    /// l'écran Finales, re-taper une puce active la désactive.
+    private var filterBar: some View {
+        Section {
+            // Défilement horizontal : cinq puces tiennent sur un iPhone
+            // standard, mais Display Zoom ou les grandes tailles de texte
+            // peuvent déborder — on glisse au lieu de casser la ligne.
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    FilterChip(label: "Tous", tint: Theme.gold, isSelected: sideFilter == nil && levelFilter == nil) {
+                        sideFilter = nil
+                        levelFilter = nil
+                    }
+                    // Des PIONS en grand plutôt que « Blancs »/« Noirs » : la
+                    // forme (pion évidé contre pion plein) porte la
+                    // distinction, et le glyphe est assez gros pour se lire
+                    // d'un coup d'œil (retours utilisateur du 19/08 — les
+                    // libellés cassaient la ligne, puis les rois étaient
+                    // illisibles à taille de texte).
+                    pieceChip("♙", selected: sideFilter == .white, a11y: "Répertoire blanc") {
+                        sideFilter = sideFilter == .white ? nil : .white
+                    }
+                    pieceChip("♟\u{FE0E}", selected: sideFilter == .black, a11y: "Répertoire noir") {
+                        sideFilter = sideFilter == .black ? nil : .black
+                    }
+                    FilterChip(label: "Club", tint: Theme.accent, isSelected: levelFilter == .club) {
+                        levelFilter = levelFilter == .club ? nil : .club
+                    }
+                    FilterChip(label: "Avancé", tint: Theme.warning, isSelected: levelFilter == .advanced) {
+                        levelFilter = levelFilter == .advanced ? nil : .advanced
+                    }
+                }
+                .padding(.vertical, 2)
+            }
+            .listRowInsets(EdgeInsets(top: 4, leading: 0, bottom: 4, trailing: 0))
+            .listRowBackground(Color.clear)
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel("Filtres des ouvertures")
+        }
+    }
+
+    /// Puce-pion : même capsule que ``FilterChip``, mais un glyphe d'échecs
+    /// à 26 pt (« au moins 2× » le texte des autres puces — demande du
+    /// 19/08). Le remplissage vertical est réduit pour que la capsule reste
+    /// à hauteur des voisines. `\u{FE0E}` sur le pion noir force le rendu
+    /// TEXTE : sans lui, U+265F bascule en émoji sur iOS.
+    private func pieceChip(
+        _ glyph: String, selected: Bool, a11y: LocalizedStringKey, action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Text(glyph)
+                .font(.system(size: 26))
+                .foregroundStyle(selected ? Theme.background : Theme.textPrimary)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 12)
+                .padding(.vertical, 1)
+                .background {
+                    if selected {
+                        Capsule().fill(Theme.tintGradient(Theme.textPrimary))
+                    } else {
+                        Capsule().fill(Theme.surfaceElevated)
+                    }
+                }
+                .overlay(Capsule().strokeBorder(selected ? Color.clear : Theme.stroke, lineWidth: 1))
+                .glow(Theme.textPrimary, radius: 8, isActive: selected)
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.pressable)
+        .accessibilityLabel(a11y)
+        .accessibilityAddTraits(selected ? [.isSelected] : [])
     }
 
     private var reviewSection: some View {

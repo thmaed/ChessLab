@@ -87,7 +87,12 @@ final class TwoPlayerViewModel {
         settings = autosave.settings
         self.modelContext = modelContext
 
-        let startPosition = Position.standard
+        // 🐛 Corrigé (revue du 19/08) : depuis que « Changer de mode » peut
+        // démarrer une partie à deux sur une position REPRISE (startFEN), la
+        // reprise d'autosauvegarde doit repartir de CETTE position — rejouer
+        // les coups depuis la position standard rendait la sauvegarde
+        // irrécupérable (« Reprise impossible »).
+        let startPosition = autosave.settings.startingPosition
         board = Board(position: startPosition)
         let newGame = Game(startingWith: startPosition)
         game = newGame
@@ -285,7 +290,7 @@ final class TwoPlayerViewModel {
     }
 
     private func boardAfter(plies: Int) -> Board {
-        var replayBoard = Board(position: .standard)
+        var replayBoard = Board(position: settings.startingPosition)
         for move in moveLog.prefix(plies) {
             guard let made = replayBoard.move(pieceAt: move.start, to: move.end) else { continue }
             if case .promotion = replayBoard.state, let promoted = move.promotedPiece {
@@ -298,7 +303,7 @@ final class TwoPlayerViewModel {
     /// Reconstruit la partie en ne gardant que `moves` (reprise depuis la
     /// position consultée) — même mécanique de rejeu que ``replay``.
     private func rebuild(moves: [Move]) {
-        let startPosition = Position.standard
+        let startPosition = settings.startingPosition
         var newBoard = Board(position: startPosition)
         var newGame = Game(startingWith: startPosition)
         var index = newGame.startingIndex

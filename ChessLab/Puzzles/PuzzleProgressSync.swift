@@ -42,6 +42,21 @@ enum PuzzleProgressSync {
     /// Fusionne la progression synchronisée dans les `Puzzle` locaux. Ne
     /// réécrit un `PuzzleProgress` que si le local était en avance (pour ne pas
     /// déclencher une resynchro iCloud inutile à chaque lancement).
+
+    /// Variante THROTTLÉE pour les apparitions d'écran : la réconciliation
+    /// complète recharge TOUS les journaux (revue du 19/08 — table sans
+    /// borne, 11 sites d'appel) ; la rejouer à chaque `onAppear` coûte de
+    /// plus en plus cher pour un résultat identique à quelques minutes
+    /// près. ``reconcile(in:)`` reste la voie des tests et des actions
+    /// explicites (activation d'iCloud, démarrage de séance).
+    @MainActor private static var lastThrottledRun: Date?
+    @MainActor
+    static func reconcileIfStale(in context: ModelContext, olderThan interval: TimeInterval = 300) {
+        if let last = lastThrottledRun, Date().timeIntervalSince(last) < interval { return }
+        lastThrottledRun = Date()
+        reconcile(in: context)
+    }
+
     static func reconcile(in context: ModelContext) {
         let allProgress = (try? context.fetch(FetchDescriptor<PuzzleProgress>())) ?? []
         guard !allProgress.isEmpty else { return }
