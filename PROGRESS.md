@@ -6913,3 +6913,112 @@ ouvertures gardent le côté étudié en bas (un répertoire noir se lit noirs
 en bas, comme partout dans l'app). Les écrans d'ENTRAÎNEMENT (ligne guidée,
 entraînement libre) gardent le camp JOUÉ en bas : on y joue, on ne lit
 plus — même convention que Jouer contre l'ordinateur côté noir.
+
+## Revue de code complète avant 1.5 (19/08, ~34 000 lignes hors Stockfish)
+
+Demandée par l'utilisateur avant soumission. Méthode : balayages par
+classes de défauts (force unwraps, @unchecked Sendable, tâches non
+annulées, cycles de rétention, try? silencieux, observateurs), puis
+lecture ciblée des cœurs à risque (moteur, pendule, autosaves, synchro,
+conteneur SwiftData, VMs récents). Les deux gros VMs (Jouer, Analyse —
+3 900 lignes) ont été inspectés au niveau cycle de vie/files sérielles,
+pas ligne à ligne : leur histoire d'incidents est documentée sur place et
+verrouillée par les suites.
+
+**Deux bugs trouvés et corrigés séance tenante :**
+1. **Reprise Deux joueurs depuis une position portée** : les trois chemins
+   de rejeu (`init?(resuming:)`, `boardAfter(plies:)`, `rebuild(moves:)`)
+   repartaient de la position STANDARD — toute partie démarrée via
+   « Changer de mode » sur une position reprise devenait irrécupérable
+   après un kill de l'app (« Reprise impossible »), et la navigation
+   d'historique rejouait sur le mauvais échiquier. Introduit la veille
+   avec startFEN. Corrigé (settings.startingPosition partout) +
+   `TwoPlayerResumeFromFENTests` (3 tests, racine Lucena).
+2. **Course au redémarrage de l'entraînement libre** : `restart()` pendant
+   la réflexion de la défense laissait la riposte de l'ANCIENNE partie
+   s'appliquer à la nouvelle (ou strander l'écran). Le jeton d'arbitrage
+   devient un jeton d'ÉPOQUE, incrémenté aussi par restart/riposte/
+   baseline ; toute continuation périmée s'abandonne au retour d'await.
+
+**Recommandations consignées, non traitées (choix assumé avant 1.5) :**
+- le tour anti-fuite moteur (`EngineLeakUITests`) ne visite pas encore
+  l'écran d'entraînement libre — à étendre ;
+- l'entraînement libre fait DEUX recherches par coup accepté (l'éval
+  d'arbitrage rend déjà le meilleur coup défensif de la même position :
+  ~500 ms gaspillées, réutilisable) — amélioration de fluidité à faire
+  hors fenêtre de soumission, elle change le contrat des faux des tests ;
+- `OpeningReviewLog` croît sans borne et est rechargé INTÉGRALEMENT à
+  chaque apparition d'écran (11 sites via reconcile) — repli/élagage ou
+  chargement incrémental à concevoir quand les compteurs grossiront.
+
+**Quitus explicite** (points contrôlés, rien à signaler) : cycle de vie
+moteur (compteur d'instances + files sérielles + watchdog + teardowns),
+pendule (throttling d'observation, weak self, pause/cancel), annulation
+des tâches longues (autoplay, reveal, hint, run de série), politique de
+persistance (quarantaine en deux temps, dernier recours mémoire avoué à
+l'écran), réconciliateurs de synchro (dédoublonnage, enregistrement
+canonique), discipline de localisation, autosaves à champs additifs.
+
+## Les trois recommandations de la revue, traitées à faible risque (19/08)
+
+Demande : « corriger sans prendre trop de risques ». Fait, avec la mesure
+du risque explicitée pour chacune :
+
+1. **Tour anti-fuite étendu** (risque nul : test seul) — le parcours
+   `EngineLeakUITests` visite désormais l'entraînement libre (lecteur →
+   menu S'entraîner → mode libre, moteur réellement démarré), avant
+   d'exiger zéro instance à l'accueil.
+2. **La défense réutilise la ligne de l'arbitre** (risque faible, contenu
+   dans le VM) : l'éval d'arbitrage rend déjà le meilleur coup du camp au
+   trait de la position atteinte — c'est la riposte, rejouée telle quelle
+   au lieu d'être recalculée (~500 ms gagnées par coup accepté). Repli
+   inchangé sur le fournisseur si le coup manque ou est inapplicable ;
+   les 9 tests existants passent tels quels, +1 test (le fournisseur
+   n'est PAS consulté quand la ligne est fournie).
+3. **Réconciliation throttlée aux apparitions d'écran** (l'élagage des
+   journaux, lui, attendra la 1.5.1 : les logs tardifs d'un autre
+   appareil font partie du contrat de rejeu, y toucher avant soumission
+   serait le vrai risque). Nouveau `reconcileIfStale(in:)` (5 min) dans
+   les deux réconciliateurs, utilisé par les 6 sites « onAppear »
+   (accueil ×2, listes ouvertures/finales, file de puzzles, Progrès) ;
+   `reconcile(in:)` intact pour les tests, les Réglages (action
+   explicite) et le démarrage de séance (fraîcheur requise).
+
+## Localisation EN complétée + plateaux iPad (nuit du 19/08)
+
+Deux chantiers surgis pendant la préparation des visuels 1.5 :
+
+1. **122 clés sans traduction anglaise.** Les sondes des vidéos EN ont
+   montré du français à l'écran (« Suivi », « parties jouées »,
+   « Position personnalisée », carte Progrès de l'accueil). Un balayage
+   du catalogue a révélé 122 clés sans `en` — dont l'aide des
+   répertoires personnels et les crédits. Toutes traduites (épissures
+   chirurgicales, `json.load` de contrôle, zéro clé restante). Registre
+   britannique aligné sur l'existant (« Analyse », « licence »,
+   « memorised »).
+2. **Échiquiers timbre-poste sur iPad** (retour utilisateur en direct,
+   22 h) : Laboratoire plafonné à 380 pt, lecteur Ouvertures/Finales à
+   520/560 pt — des largeurs d'iPhone. Corrigé : LabRunView calcule la
+   largeur du bloc éval+plateau d'après la taille visible (classe
+   régulière : jusqu'à 780 pt en gardant ~540 pt pour les cartes) ;
+   le lecteur passe à 62 % de hauteur (portrait) / 55 % de largeur
+   (paysage) sur grand panneau, iPhone inchangé. L'entraînement
+   (OpeningTrainView, EndgameFreeTrainView, puzzles) remplissait déjà.
+
+Conséquence : captures EN refaites sur build corrigé (iPhone valides —
+layouts compacts intacts —, iPad refaites), et les deux vidéos EN
+re-tournées. Le montage iPad utilise désormais `make_preview.swift`
+multi-segments (paires début/durée mises bout à bout) pour couper un
+temps mort au milieu de la prise sur un écran statique — raccord
+invisible, scénario complet du menu au Laboratoire en ≤ 30 s.
+
+**20/08 au matin : campagne close sur décision utilisateur.** Les 12
+captures EN sont finales (iPhone 1284×2778, iPad 2064×2752, barre d'état
+anglaise homogène « Thu Aug 20 », gros plateaux) ; les deux aperçus
+vidéo sont REPORTÉS à la prochaine version (« arrête les captures, on
+les fera sur la prochaine version ») — l'outillage reste prêt. Au
+passage, la capture 06 avait révélé un piège de List paresseuse (rangée
+« hittable » au bord, tap avalé, test « réussi » à 5 fichiers sur 6) :
+le test échoue désormais explicitement, et navigue par la puce de
+famille « Tours » (nouvel identifiant `endgameFamilyChip_<famille>`)
+au lieu de 20 swipes.
