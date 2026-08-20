@@ -50,21 +50,87 @@ final class AppStoreScreenshotUITests: XCTestCase {
             // La List SwiftUI est paresseuse : on défile jusqu'à l'italienne.
             let italian = app.buttons["opening_italian-game"]
             var scrolls = 0
-            while !italian.isHittable, scrolls < 14 {
-                app.swipeUp()
-                RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+            while !italian.isHittable, scrolls < 20 {
+                app.swipeUp(velocity: .slow)
+                RunLoop.current.run(until: Date().addingTimeInterval(0.45))
                 scrolls += 1
             }
             if italian.isHittable {
                 italian.tap()
                 let next = app.buttons["reader_next"]
-                if next.waitForExistence(timeout: 6) {
+                if !next.waitForExistence(timeout: 6) {
+                    // Le tap a pu rater (rangée au ras du bord, feuille par-
+                    // dessus…) : un cran de recentrage, puis UNE retentative.
+                    save(app.screenshot(), folder: folder, name: "03-debug-after-tap")
+                    app.swipeUp(velocity: .slow)
+                    RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+                    if italian.isHittable { italian.tap() }
+                    _ = next.waitForExistence(timeout: 6)
+                }
+                if next.exists {
                     // Jusqu'à une position à variantes (après 3.Fc4) : flèche verte
                     // (coup recommandé) + flèches bleues (autres coups).
                     for _ in 0..<5 where next.isEnabled { next.tap() }
                     RunLoop.current.run(until: Date().addingTimeInterval(0.5))
                     save(app.screenshot(), folder: folder, name: "03-lecteur")
+                } else {
+                    save(app.screenshot(), folder: folder, name: "03-debug-no-reader")
                 }
+            } else {
+                print("DIAG 03 : italian.exists=\(italian.exists) après défilements")
+                save(app.screenshot(), folder: folder, name: "03-debug-not-hittable")
+            }
+        }
+
+        // 05 & 06 — Finales : la liste groupée par familles (l'argument n° 1
+        // de la 1.5 : 77 cours prouvés), puis le lecteur sur la Lucena —
+        // rangée 1 en bas, pied « vérifié par table de finales » visible.
+        var back = 0
+        while !app.buttons["mode_endgames"].exists && !app.staticTexts[fr ? "Finales" : "Endgames"].firstMatch.isHittable, back < 4 {
+            if app.navigationBars.buttons.firstMatch.exists { app.navigationBars.buttons.firstMatch.tap() }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.4))
+            back += 1
+        }
+        if tapLabeled(app, fr ? "Finales" : "Endgames", id: "mode_endgames") {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+            save(app.screenshot(), folder: folder, name: "05-finales")
+            // Plutôt que 20 swipes dans une List paresseuse (rangée « hittable »
+            // en bord de zone dont le tap est avalé — cause des captures à 5/6
+            // du 19-20/08) : filtrer par famille avec la puce « Tours », la
+            // Lucena remonte en haut de liste. Petit défilement de secours.
+            let rooksChip = app.buttons["endgameFamilyChip_rooks"]
+            if rooksChip.waitForExistence(timeout: 4) { rooksChip.tap() }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+            let lucena = app.buttons["endgame_eg-lucena"]
+            var scrolls = 0
+            while !lucena.isHittable, scrolls < 6 {
+                app.swipeUp(velocity: .slow)
+                RunLoop.current.run(until: Date().addingTimeInterval(0.45))
+                scrolls += 1
+            }
+            if lucena.isHittable {
+                lucena.tap()
+                let next = app.buttons["reader_next"]
+                // Premier passage après redémarrage du simulateur : la poussée
+                // de navigation peut dépasser 6 s (déjà vu sur 03-lecteur).
+                // Re-taper une fois, délai rallongé — et si la capture reste
+                // impossible, ÉCHOUER : un « TEST SUCCEEDED » à 5 fichiers
+                // sur 6 est un mensonge (arrivé le 19/08, locale EN).
+                if !next.waitForExistence(timeout: 10), lucena.isHittable {
+                    lucena.tap()
+                    _ = next.waitForExistence(timeout: 10)
+                }
+                if next.exists {
+                    for _ in 0..<4 where next.isEnabled { next.tap() }
+                    RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+                    save(app.screenshot(), folder: folder, name: "06-finale-lecteur")
+                } else {
+                    save(app.screenshot(), folder: folder, name: "debug-06-lecteur-jamais-ouvert")
+                    XCTFail("lecteur Lucena jamais ouvert : capture 06-finale-lecteur impossible")
+                }
+            } else {
+                save(app.screenshot(), folder: folder, name: "debug-06-lucena-pas-hittable")
+                XCTFail("endgame_eg-lucena pas hittable après défilement : capture 06 impossible")
             }
         }
 
