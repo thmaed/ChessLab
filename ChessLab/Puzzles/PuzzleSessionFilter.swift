@@ -39,6 +39,29 @@ enum PuzzleSessionDrawer {
     static func drawNext(
         matching filter: PuzzleSessionFilter, excluding excludedID: UUID? = nil, in context: ModelContext
     ) -> Puzzle? {
+        // Mode déterministe (captures App Store) : SERVIR le puzzle Lichess
+        // 00008, inséré au besoin — le semis de la bibliothèque
+        // ÉCHANTILLONNE le fichier embarqué, aucun « premier par id » n'est
+        // donc stable d'une installation à l'autre (constaté sur trois
+        // prises : trois puzzles différents). Les parcours vidéo scriptés
+        // jouent sa solution connue (Re7 / Nc1 / Dxc1).
+        if CommandLine.arguments.contains("-uiTestDeterministicPuzzles") {
+            let wanted = "00008"
+            var pinned = FetchDescriptor<Puzzle>(predicate: #Predicate { $0.externalID == wanted })
+            pinned.fetchLimit = 1
+            if let existing = ((try? context.fetch(pinned)) ?? []).first { return existing }
+            let fixed = Puzzle()
+            fixed.externalID = wanted
+            fixed.fen = "r6k/pp2r2p/4Rp1Q/3p4/8/1N1P2b1/PqP3PP/7K w - - 0 25"
+            fixed.solutionLANs = ["e6e7", "b2b1", "b3c1", "b1c1", "h6c1"]
+            fixed.themeRaw = "hangingPiece"
+            fixed.rating = 1784
+            fixed.phaseRaw = "middlegame"
+            fixed.sourceRaw = "lichess"
+            context.insert(fixed)
+            try? context.save()
+            return fixed
+        }
         if let neverOpened = randomPick(matching: filter, neverOpenedOnly: true, excluding: excludedID, in: context) {
             return neverOpened
         }

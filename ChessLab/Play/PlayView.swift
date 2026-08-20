@@ -393,7 +393,11 @@ struct PlayView: View {
         let opponent = viewModel.userColor.opposite
         let captured = viewModel.capturedMaterial
         return PlayerRowView(
-            name: "Ordinateur",
+            // Localisé au point d'usage : la clé « Ordinateur » → « Computer »
+            // existait au catalogue mais la plaque collait le littéral
+            // français (même famille que Blancs/Noirs, revue du 19/08 —
+            // repéré sur la première vidéo App Store anglaise).
+            name: LocalizationController.string("Ordinateur"),
             color: opponent,
             isActive: viewModel.outcome == nil && viewModel.board.position.sideToMove == opponent,
             captured: captured.captures(by: opponent),

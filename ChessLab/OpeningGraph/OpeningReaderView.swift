@@ -85,8 +85,13 @@ struct OpeningReaderView: View {
     /// Portrait : plateau ancré en haut, panneau défilant en dessous, barre de
     /// transport en bas. Le plateau ne prend jamais plus de la moitié de la
     /// hauteur utile, sinon il ne resterait rien pour le coup à venir.
+    /// Sur un grand panneau (iPad), la moitié suffit largement au panneau de
+    /// lecture : le plateau peut monter à 62 % de la hauteur — plafonné à
+    /// 520 pt sur iPhone, il faisait timbre-poste (retour utilisateur 19/08).
     private func tallLayout(size: CGSize) -> some View {
-        let side = min(size.width - 32, size.height * 0.5, 520)
+        let side = size.width >= 700
+            ? min(size.width - 32, size.height * 0.62, 840)
+            : min(size.width - 32, size.height * 0.5, 520)
         return VStack(spacing: 0) {
             board
                 .frame(width: side, height: side)
@@ -99,9 +104,12 @@ struct OpeningReaderView: View {
 
     /// Paysage (iPad, ou iPhone couché) : plateau à gauche, lecture à droite.
     /// Un plateau plafonné à la hauteur laisserait sinon la moitié de l'écran
-    /// vide à côté.
+    /// vide à côté. Sur un grand panneau, 55 % de la largeur au plateau, le
+    /// panneau de lecture garde le reste.
     private func wideLayout(size: CGSize) -> some View {
-        let side = min(size.height - 24, size.width * 0.5, 560)
+        let side = size.width >= 1000
+            ? min(size.height - 24, size.width * 0.55, 800)
+            : min(size.height - 24, size.width * 0.5, 560)
         return HStack(spacing: 0) {
             board
                 .frame(width: side, height: side)

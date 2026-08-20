@@ -2,13 +2,34 @@
   "sourceLanguage" : "fr",
   "strings" : {
     "" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ""
+          }
+        }
+      }
     },
     " %" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " %"
+          }
+        }
+      }
     },
     " → " : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " → "
+          }
+        }
+      }
     },
     "—" : {
       "localizations" : {
@@ -295,6 +316,12 @@
     },
     "%@ (%@)" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ (%2$@)"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "new",
@@ -558,7 +585,14 @@
       }
     },
     "%lld partie(s) enregistrée(s)" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld game(s) saved"
+          }
+        }
+      }
     },
     "%lld pièce(s) à préciser — case %@, pièce %@." : {
       "localizations" : {
@@ -627,7 +661,14 @@
       }
     },
     "%lld positions" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld positions"
+          }
+        }
+      }
     },
     "%lld réussis sur %lld tentatives" : {
       "localizations" : {
@@ -791,13 +832,34 @@
       }
     },
     "4" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "4"
+          }
+        }
+      }
     },
     "7 jours" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "7 days"
+          }
+        }
+      }
     },
     "30 jours" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "30 days"
+          }
+        }
+      }
     },
     "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, l'entraînement LIBRE (bouton cible) vous fait conclure la position contre la meilleure défense : tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
       "extractionState" : "stale",
@@ -1026,7 +1088,14 @@
       }
     },
     "Actions du répertoire" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Repertoire actions"
+          }
+        }
+      }
     },
     "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement." : {
       "localizations" : {
@@ -1061,7 +1130,14 @@
       }
     },
     "Aide ChessLab" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChessLab Help"
+          }
+        }
+      }
     },
     "Aides" : {
       "localizations" : {
@@ -1080,7 +1156,14 @@
       }
     },
     "Ajouter aussi à la bibliothèque" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Also add to the library"
+          }
+        }
+      }
     },
     "Ajouter des coups au répertoire" : {
       "extractionState" : "stale",
@@ -1117,7 +1200,14 @@
       }
     },
     "AJOUTER LE VÔTRE\nDans Ouvertures, touchez « + » en haut à droite. Collez un PGN, ou ouvrez un fichier .pgn : les variantes entre parenthèses sont conservées, vous obtenez donc l'arbre complet et pas seulement la ligne principale. Indiquez le camp que vous étudiez — c'est le seul renseignement qu'un PGN ne contient pas. Vos annotations suivent : ? et ?? deviennent des pièges signalés, ?! des imprécisions, et vos commentaires s'affichent sous le plateau.\n\nLE PARTAGER\nGlissez vers la gauche sur un de vos répertoires, puis « Partager » : l'app envoie un simple fichier, par AirDrop, Messages, Fichiers ou ce que vous voulez. Celui qui le reçoit fait « + » puis « Ouvrir un fichier ». Il n'y a ni compte à créer, ni serveur ChessLab : le fichier EST le répertoire, et il ne passe que par où vous l'envoyez.\n\nCE QUI EST PARTAGÉ, ET CE QUI NE L'EST PAS\nLe fichier contient les coups, vos commentaires et vos annotations. Il ne contient PAS votre progression : ce que vous avez mémorisé reste chez vous. À l'inverse, un répertoire que vous importez profite tout de suite de ce que vous savez déjà des positions qu'il contient, même apprises dans une ouverture livrée avec l'app — la mémorisation est attachée aux positions, pas aux fichiers.\n\nSUPPRIMER\nGlissez vers la gauche, « Supprimer ». Le fichier quitte cet appareil ; votre progression sur ces positions est conservée. Les 58 ouvertures livrées, elles, ne peuvent être ni supprimées ni partagées.\n\nSUR TOUS VOS APPAREILS\nVos répertoires suivent la synchronisation iCloud, comme vos parties et votre progression : importé sur l'iPhone, un répertoire apparaît sur l'iPad. Activez la synchronisation dans les Réglages — elle est désactivée par défaut, l'app fonctionnant entièrement hors ligne.\n\nET LES DROITS D'AUTEUR\nLe contenu d'un livre ou d'un cours payant appartient à son auteur. Le saisir pour votre usage personnel est une chose ; le rediffuser en est une autre. Partagez ce que vous avez écrit, ou ce que vous avez le droit de partager." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ADD YOUR OWN\nIn Openings, tap “+” at the top right. Paste a PGN, or open a .pgn file: variations in parentheses are preserved, so you get the full tree and not just the main line. Say which side you are studying — that is the only piece of information a PGN does not contain. Your annotations carry over: ? and ?? become flagged traps, ?! inaccuracies, and your comments appear under the board.\n\nSHARING IT\nSwipe left on one of your repertoires, then “Share”: the app sends a plain file, via AirDrop, Messages, Files or whatever you like. The person receiving it taps “+” then “Open a file”. There is no account to create and no ChessLab server: the file IS the repertoire, and it only travels wherever you send it.\n\nWHAT IS SHARED, AND WHAT IS NOT\nThe file contains the moves, your comments and your annotations. It does NOT contain your progress: what you have memorised stays with you. Conversely, a repertoire you import immediately benefits from what you already know about the positions it contains, even if you learned them in an opening shipped with the app — memorisation is attached to positions, not files.\n\nDELETING\nSwipe left, then “Delete”. The file leaves this device; your progress on those positions is kept. The 58 built-in openings can be neither deleted nor shared.\n\nON ALL YOUR DEVICES\nYour repertoires follow iCloud sync, like your games and your progress: imported on the iPhone, a repertoire appears on the iPad. Turn on sync in Settings — it is off by default, as the app works entirely offline.\n\nAND COPYRIGHT\nThe content of a book or a paid course belongs to its author. Typing it in for your personal use is one thing; redistributing it is another. Share what you wrote, or what you have the right to share."
+          }
+        }
+      }
     },
     "Ajouter un répertoire" : {
       "localizations" : {
@@ -1410,10 +1500,24 @@
       }
     },
     "Analyser PGN / FEN" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analyse PGN / FEN"
+          }
+        }
+      }
     },
     "Analyser…" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Analyse…"
+          }
+        }
+      }
     },
     "Analysez une partie avec des erreurs pour créer des puzzles (menu \"...\" du mode Analyser)." : {
       "localizations" : {
@@ -1531,7 +1635,14 @@
       }
     },
     "API Lichess Opening Explorer : parties de maîtres et parties en ligne filtrées par niveau (≈1400-2000). Popularité et scores des coups." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lichess Opening Explorer API: master games and online games filtered by level (≈1400-2000). Move popularity and scores."
+          }
+        }
+      }
     },
     "Appareil chaud — moteur bridé" : {
       "localizations" : {
@@ -1615,7 +1726,14 @@
       }
     },
     "Apprends et révise tes ouvertures" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Learn and review your openings"
+          }
+        }
+      }
     },
     "Arbitrage…" : {
       "localizations" : {
@@ -1667,7 +1785,14 @@
       }
     },
     "Arrêter l'indice" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop the hint"
+          }
+        }
+      }
     },
     "Arrêter la lecture" : {
       "localizations" : {
@@ -1800,7 +1925,14 @@
       }
     },
     "Aucun résultat" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No results"
+          }
+        }
+      }
     },
     "Aucun texte à importer." : {
       "localizations" : {
@@ -1836,10 +1968,24 @@
       }
     },
     "Aucune donnée d'ouverture n'est téléchargée à l'usage : tout fonctionne hors ligne." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No opening data is downloaded at use: everything works offline."
+          }
+        }
+      }
     },
     "Aucune étiquette. Ajoutez-en pour retrouver et regrouper vos parties (ex. « ouverture », « à revoir »)." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No tags yet. Add some to find and group your games (e.g. “opening”, “to review”)."
+          }
+        }
+      }
     },
     "Aucune ouverture" : {
       "extractionState" : "stale",
@@ -1875,10 +2021,24 @@
       }
     },
     "Aucune partie ne correspond à la recherche ou aux filtres." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No game matches the search or filters."
+          }
+        }
+      }
     },
     "Aucune partie sur cette période." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No games in this period."
+          }
+        }
+      }
     },
     "Aucune pendule : les deux camps jouent sans contrainte de temps." : {
       "localizations" : {
@@ -3143,10 +3303,24 @@
       }
     },
     "Ce répertoire est introuvable." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This repertoire cannot be found."
+          }
+        }
+      }
     },
     "Ce texte s'affichera sous le coup %@ pendant la révision." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This text will appear under the move %@ during review."
+          }
+        }
+      }
     },
     "Center Game" : {
       "extractionState" : "stale",
@@ -3217,7 +3391,14 @@
       }
     },
     "Cette action est définitive." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This action is permanent."
+          }
+        }
+      }
     },
     "Changer" : {
       "localizations" : {
@@ -3252,7 +3433,14 @@
       }
     },
     "Changer de mode" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch mode"
+          }
+        }
+      }
     },
     "Chapitre %d" : {
       "localizations" : {
@@ -3320,7 +3508,14 @@
       }
     },
     "ChessKit" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ChessKit"
+          }
+        }
+      }
     },
     "ChessKit & ChessKitEngine" : {
       "extractionState" : "stale",
@@ -3557,7 +3752,14 @@
       }
     },
     "Coller / saisir" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste / type"
+          }
+        }
+      }
     },
     "Coller un PGN" : {
       "extractionState" : "stale",
@@ -3594,7 +3796,14 @@
       }
     },
     "Collez ou importez un **FEN** ou un **PGN** (la position finale du PGN est utilisée). Toutes les parties de la série partiront de cette position." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste or import a **FEN** or a **PGN** (the PGN's final position is used). Every game in the series will start from this position."
+          }
+        }
+      }
     },
     "Collez un PGN de répertoire (les variantes entre parenthèses sont conservées), ouvrez un fichier .pgn, ou recevez le répertoire qu'un ami vous a partagé." : {
       "localizations" : {
@@ -3613,7 +3822,14 @@
       }
     },
     "Collez une partie ou une position — le format est reconnu tout seul" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paste a game or a position — the format is detected automatically"
+          }
+        }
+      }
     },
     "Commencer" : {
       "localizations" : {
@@ -3648,10 +3864,24 @@
       }
     },
     "commenter" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "comment"
+          }
+        }
+      }
     },
     "Commenter %@" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Comment on %@"
+          }
+        }
+      }
     },
     "Composer une position sur le plateau" : {
       "localizations" : {
@@ -3686,7 +3916,14 @@
       }
     },
     "Compte iCloud connecté" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "iCloud account connected"
+          }
+        }
+      }
     },
     "Confirmé" : {
       "extractionState" : "stale",
@@ -3984,7 +4221,14 @@
       }
     },
     "Copier" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy"
+          }
+        }
+      }
     },
     "Copier la partie (PGN)" : {
       "localizations" : {
@@ -4019,7 +4263,14 @@
       }
     },
     "Copier la position FEN" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy FEN position"
+          }
+        }
+      }
     },
     "Corresponding Squares" : {
       "extractionState" : "stale",
@@ -4200,10 +4451,24 @@
       }
     },
     "Coups depuis cette position" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moves from this position"
+          }
+        }
+      }
     },
     "Coups et statistiques" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moves and statistics"
+          }
+        }
+      }
     },
     "Coups joués" : {
       "localizations" : {
@@ -4238,7 +4503,14 @@
       }
     },
     "Courbe d'évaluation" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evaluation graph"
+          }
+        }
+      }
     },
     "Cours indisponible" : {
       "extractionState" : "stale",
@@ -4325,7 +4597,14 @@
       }
     },
     "CSV" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CSV"
+          }
+        }
+      }
     },
     "Cut Off Before You Push" : {
       "extractionState" : "stale",
@@ -4566,7 +4845,14 @@
       }
     },
     "Déjà utilisées" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Already used"
+          }
+        }
+      }
     },
     "Départ" : {
       "localizations" : {
@@ -4601,7 +4887,14 @@
       }
     },
     "Déplier quatre options" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expand four options"
+          }
+        }
+      }
     },
     "Depuis la 1.0, ChessLab a beaucoup évolué :\n\n• Ouvertures entièrement repensées : un lecteur guidé coup par coup, 58 ouvertures rédigées à la main et bilingues, des flèches colorées (coup recommandé, pièges, autres coups) et un entraînement en répétition espacée qui se règle tout seul.\n• iPad & Mac : interface à barre latérale, échiquier bord à bord, raccourcis clavier et survol au trackpad.\n• Synchronisation iCloud optionnelle : parties, puzzles et ouvertures suivent vos appareils, sans compte ni serveur tiers.\n• Analyse : suivez la meilleure ligne de Stockfish un demi-coup à la fois ; alerte « coup risqué » plus juste.\n• Progrès : un tableau de bord depuis l'accueil, avec un set de puzzles ciblé sur vos thèmes faibles.\n• Scanner plus fiable, moteur Stockfish recompilé (plus rapide et sans saccade), et nouveaux thèmes de plateau et de pièces." : {
       "extractionState" : "stale",
@@ -4654,7 +4947,14 @@
       }
     },
     "Dernière vérification : %@" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Last check: %@"
+          }
+        }
+      }
     },
     "Déséquilibres" : {
       "localizations" : {
@@ -4954,10 +5254,24 @@
       }
     },
     "Éditer le jeu" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit the board"
+          }
+        }
+      }
     },
     "Éditeur" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editor"
+          }
+        }
+      }
     },
     "Éditeur de position" : {
       "localizations" : {
@@ -5241,7 +5555,14 @@
       }
     },
     "Entraîner" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Train"
+          }
+        }
+      }
     },
     "Entraîner la ligne" : {
       "localizations" : {
@@ -5260,7 +5581,14 @@
       }
     },
     "Équilibre" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Balance"
+          }
+        }
+      }
     },
     "Erreur" : {
       "localizations" : {
@@ -5312,7 +5640,14 @@
       }
     },
     "Étiquettes" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tags"
+          }
+        }
+      }
     },
     "Études" : {
       "localizations" : {
@@ -5379,7 +5714,14 @@
       }
     },
     "Évaluations" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evaluations"
+          }
+        }
+      }
     },
     "ex. Blancs — Italienne" : {
       "extractionState" : "stale",
@@ -5459,7 +5801,14 @@
       }
     },
     "Explore, apprends et entraîne tes ouvertures depuis l'onglet Ouvertures : lecteur pas à pas, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Explore, learn and train your openings from the Openings tab: step-by-step reader, active recall and spaced repetition. Content grows with updates."
+          }
+        }
+      }
     },
     "Exporter" : {
       "localizations" : {
@@ -5609,7 +5958,14 @@
       }
     },
     "FEN ou PGN invalide" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalid FEN or PGN"
+          }
+        }
+      }
     },
     "Fermer" : {
       "localizations" : {
@@ -5645,7 +6001,14 @@
       }
     },
     "Fichier .pgn ou .fen" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : ".pgn or .fen file"
+          }
+        }
+      }
     },
     "Fichier illisible." : {
       "localizations" : {
@@ -5842,7 +6205,14 @@
       }
     },
     "Flèches du moteur" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Engine arrows"
+          }
+        }
+      }
     },
     "Force du moteur" : {
       "localizations" : {
@@ -6127,7 +6497,14 @@
       }
     },
     "Gagnées" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Won"
+          }
+        }
+      }
     },
     "Gagnées %lld" : {
       "localizations" : {
@@ -6516,6 +6893,12 @@
     },
     "Import : %lld/%lld parties…" : {
       "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import: %lld/%lld games…"
+          }
+        },
         "fr" : {
           "stringUnit" : {
             "state" : "new",
@@ -6525,10 +6908,24 @@
       }
     },
     "Import en cours…" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Importing…"
+          }
+        }
+      }
     },
     "Import terminé" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import finished"
+          }
+        }
+      }
     },
     "Importé, mais %d partie(s) et %d coup(s) illisibles ont été ignorés." : {
       "localizations" : {
@@ -6547,7 +6944,14 @@
       }
     },
     "Importées" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Imported"
+          }
+        }
+      }
     },
     "Importer" : {
       "localizations" : {
@@ -6615,7 +7019,14 @@
       }
     },
     "Importer un fichier PGN" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Import a PGN file"
+          }
+        }
+      }
     },
     "Importer un PGN" : {
       "extractionState" : "stale",
@@ -6883,7 +7294,14 @@
       }
     },
     "Jeu de données public lichess-org/chess-openings (domaine public). Sert à nommer chaque position atteinte." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Public dataset lichess-org/chess-openings (public domain). Used to name every position reached."
+          }
+        }
+      }
     },
     "Jeu de pièces" : {
       "localizations" : {
@@ -6902,16 +7320,44 @@
       }
     },
     "Jeu de pièces « chessnut »" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“chessnut” piece set"
+          }
+        }
+      }
     },
     "Jeu de pièces « merida »" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "“merida” piece set"
+          }
+        }
+      }
     },
     "Jeu de pièces vectorielles moderne par Alexis Luengas, issu de la collection open source de Lichess. Compatible avec la licence GPLv3 de l'app." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modern vector piece set by Alexis Luengas, from Lichess's open-source collection. Compatible with the app's GPLv3 licence."
+          }
+        }
+      }
     },
     "Jeu de pièces vectorielles par Armando Hernandez Marroquin, issu de la collection open source de Lichess. Compatible avec la licence GPLv3 de l'app." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vector piece set by Armando Hernandez Marroquin, from Lichess's open-source collection. Compatible with the app's GPLv3 licence."
+          }
+        }
+      }
     },
     "Jeu de pièces vectorielles par Colin M. L. Burnett, le même que Wikipédia et Lichess. Attribution requise, partage dans les mêmes conditions." : {
       "localizations" : {
@@ -6930,10 +7376,24 @@
       }
     },
     "Joue un autre coup sur l'échiquier pour ajouter une variante." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play another move on the board to add a variation."
+          }
+        }
+      }
     },
     "Joue un coup sur l'échiquier pour l'ajouter à ton répertoire." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play a move on the board to add it to your repertoire."
+          }
+        }
+      }
     },
     "Jouer" : {
       "localizations" : {
@@ -7129,7 +7589,14 @@
       }
     },
     "Jouez une partie ou résolvez des puzzles pour voir votre progression." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play a game or solve puzzles to see your progress."
+          }
+        }
+      }
     },
     "Jouez, analysez, progressez." : {
       "localizations" : {
@@ -7615,7 +8082,14 @@
       }
     },
     "La partie sera retirée de la bibliothèque. Cette action est définitive." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The game will be removed from the library. This action is permanent."
+          }
+        }
+      }
     },
     "Laboratoire" : {
       "localizations" : {
@@ -8084,7 +8558,14 @@
       }
     },
     "Les ouvertures sont pré-générées à partir de sources ouvertes, puis embarquées. Les coups et statistiques sont des faits ; les explications, quand elles existent, sont rédigées à la main." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Openings are pre-generated from open sources, then bundled. Moves and statistics are facts; explanations, where they exist, are written by hand."
+          }
+        }
+      }
     },
     "Les parties terminées (mode Jouer et Deux joueurs) apparaîtront ici." : {
       "localizations" : {
@@ -8119,7 +8600,14 @@
       }
     },
     "Licence Apache 2.0" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apache 2.0 licence"
+          }
+        }
+      }
     },
     "Licence CC BY-SA 3.0" : {
       "localizations" : {
@@ -8138,7 +8626,14 @@
       }
     },
     "Licence GPLv2+" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GPLv2+ licence"
+          }
+        }
+      }
     },
     "Licence GPLv3" : {
       "localizations" : {
@@ -8562,10 +9057,24 @@
       }
     },
     "Meilleure victoire ~%lld Elo" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best win ~%lld Elo"
+          }
+        }
+      }
     },
     "Mes répertoires" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My repertoires"
+          }
+        }
+      }
     },
     "Mexican Defense" : {
       "extractionState" : "stale",
@@ -8734,16 +9243,44 @@
       }
     },
     "Modification impossible" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cannot edit"
+          }
+        }
+      }
     },
     "Modifier" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit"
+          }
+        }
+      }
     },
     "Modifier le répertoire" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit repertoire"
+          }
+        }
+      }
     },
     "Modifier les étiquettes" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Edit tags"
+          }
+        }
+      }
     },
     "Montevideo Defense" : {
       "extractionState" : "stale",
@@ -8812,7 +9349,14 @@
       }
     },
     "Moteur d'échecs (Stockfish 17.1), compilé depuis ses sources C++ directement dans l'app. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chess engine (Stockfish 17.1), compiled from its C++ sources directly into the app. This licence requires the complete ChessLab source code to be made available, which is published to comply."
+          }
+        }
+      }
     },
     "Moteur d'échecs, intégré via ChessKitEngine. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer." : {
       "extractionState" : "stale",
@@ -8865,7 +9409,14 @@
       }
     },
     "Moteur Stockfish, en amont, pour annoter les coups critiques et repérer les pièges." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stockfish engine, upstream, to annotate critical moves and spot traps."
+          }
+        }
+      }
     },
     "Moteurs" : {
       "localizations" : {
@@ -9076,10 +9627,24 @@
       }
     },
     "Noms et codes ECO" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ECO names and codes"
+          }
+        }
+      }
     },
     "Non connecté à iCloud — la synchro est en pause" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Not signed in to iCloud — sync is paused"
+          }
+        }
+      }
     },
     "Notation des coups" : {
       "localizations" : {
@@ -9148,7 +9713,14 @@
       }
     },
     "Nouveautés de la version 1.5" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's new in version 1.5"
+          }
+        }
+      }
     },
     "Nouveautés depuis la 1.0" : {
       "extractionState" : "stale",
@@ -9168,7 +9740,14 @@
       }
     },
     "Nouvelle étiquette" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "New tag"
+          }
+        }
+      }
     },
     "Nouvelle partie" : {
       "localizations" : {
@@ -9310,16 +9889,44 @@
       }
     },
     "O-O ⚪" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O-O ⚪"
+          }
+        }
+      }
     },
     "O-O ⚫" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O-O ⚫"
+          }
+        }
+      }
     },
     "O-O-O ⚪" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O-O-O ⚪"
+          }
+        }
+      }
     },
     "O-O-O ⚫" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "O-O-O ⚫"
+          }
+        }
+      }
     },
     "Occasion manquée" : {
       "localizations" : {
@@ -9691,7 +10298,14 @@
       }
     },
     "Partie à deux joueurs" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Two-player game"
+          }
+        }
+      }
     },
     "Partie nulle" : {
       "localizations" : {
@@ -9710,7 +10324,14 @@
       }
     },
     "parties jouées" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "games played"
+          }
+        }
+      }
     },
     "Parties récentes" : {
       "localizations" : {
@@ -9745,7 +10366,14 @@
       }
     },
     "Pause" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pause"
+          }
+        }
+      }
     },
     "perdant" : {
       "localizations" : {
@@ -9764,7 +10392,14 @@
       }
     },
     "Perdues" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lost"
+          }
+        }
+      }
     },
     "Perdues %lld" : {
       "localizations" : {
@@ -9884,7 +10519,14 @@
       }
     },
     "PGN" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PGN"
+          }
+        }
+      }
     },
     "PGN illisible : %@" : {
       "localizations" : {
@@ -10369,7 +11011,14 @@
       }
     },
     "Position" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position"
+          }
+        }
+      }
     },
     "Position (FEN) copiée dans le presse-papiers." : {
       "localizations" : {
@@ -10437,7 +11086,14 @@
       }
     },
     "Position personnalisée" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Custom position"
+          }
+        }
+      }
     },
     "Position personnalisée (FEN)" : {
       "localizations" : {
@@ -11217,7 +11873,14 @@
       }
     },
     "Rechercher un joueur ou une étiquette" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search for a player or tag"
+          }
+        }
+      }
     },
     "Rechercher une ouverture" : {
       "extractionState" : "stale",
@@ -11350,7 +12013,14 @@
       }
     },
     "Réglages…" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings…"
+          }
+        }
+      }
     },
     "règle des 50 coups" : {
       "localizations" : {
@@ -11386,7 +12056,14 @@
       }
     },
     "Règles du jeu (FEN/PGN/SAN). Bibliothèque Swift sous licence MIT." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game rules (FEN/PGN/SAN). Swift library under MIT licence."
+          }
+        }
+      }
     },
     "Rejouer" : {
       "localizations" : {
@@ -11422,10 +12099,24 @@
       }
     },
     "Renommer" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename"
+          }
+        }
+      }
     },
     "Renommer le répertoire" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rename repertoire"
+          }
+        }
+      }
     },
     "Répartition (A)" : {
       "localizations" : {
@@ -11609,10 +12300,24 @@
       }
     },
     "Replier" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapse"
+          }
+        }
+      }
     },
     "Reprendre" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resume"
+          }
+        }
+      }
     },
     "Reprendre depuis le coup %lld ?" : {
       "localizations" : {
@@ -12529,7 +13234,14 @@
       }
     },
     "Sans effet sur une position FEN — la bibliothèque range des parties." : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Has no effect on a FEN position — the library stores games."
+          }
+        }
+      }
     },
     "Sans limite" : {
       "extractionState" : "stale",
@@ -12714,7 +13426,14 @@
       }
     },
     "Sélectionner des parties" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select games"
+          }
+        }
+      }
     },
     "Semi-Slav Defense" : {
       "extractionState" : "stale",
@@ -13281,7 +14000,14 @@
       }
     },
     "Suivi" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tracking"
+          }
+        }
+      }
     },
     "Supprimer" : {
       "localizations" : {
@@ -13300,13 +14026,34 @@
       }
     },
     "Supprimer (%lld)" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete (%lld)"
+          }
+        }
+      }
     },
     "Supprimer %@" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete %@"
+          }
+        }
+      }
     },
     "Supprimer %lld parties ?" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete %lld games?"
+          }
+        }
+      }
     },
     "Supprimer ce répertoire ?" : {
       "localizations" : {
@@ -13325,16 +14072,44 @@
       }
     },
     "Supprimer cette partie ?" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete this game?"
+          }
+        }
+      }
     },
     "Supprimer la partie" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Delete game"
+          }
+        }
+      }
     },
     "supprimer la variante" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "delete the variation"
+          }
+        }
+      }
     },
     "Sur cette partie" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "On this game"
+          }
+        }
+      }
     },
     "Sur iPad, vous pouvez aussi déposer une image directement sur cet écran." : {
       "localizations" : {
@@ -13401,7 +14176,14 @@
       }
     },
     "Synchroniser maintenant" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sync now"
+          }
+        }
+      }
     },
     "Synchroniser via iCloud" : {
       "localizations" : {
@@ -13552,7 +14334,14 @@
       }
     },
     "Terminer la sélection" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Done selecting"
+          }
+        }
+      }
     },
     "The Active King in a Rook Ending" : {
       "extractionState" : "stale",
@@ -14080,7 +14869,14 @@
       }
     },
     "Thèmes transversaux" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cross-cutting themes"
+          }
+        }
+      }
     },
     "Théorie" : {
       "localizations" : {
@@ -14232,7 +15028,14 @@
       }
     },
     "Tous les modes" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All modes"
+          }
+        }
+      }
     },
     "Tous les puzzles, mélangés" : {
       "extractionState" : "stale",
@@ -14252,10 +15055,24 @@
       }
     },
     "Tous résultats" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All results"
+          }
+        }
+      }
     },
     "Tout" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All"
+          }
+        }
+      }
     },
     "Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur." : {
       "localizations" : {
@@ -14274,7 +15091,14 @@
       }
     },
     "Tout décocher" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deselect all"
+          }
+        }
+      }
     },
     "Tout est à jour — belle régularité 👏" : {
       "extractionState" : "stale",
@@ -14294,7 +15118,14 @@
       }
     },
     "Tout sélectionner" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Select all"
+          }
+        }
+      }
     },
     "Toutes" : {
       "localizations" : {
@@ -14313,7 +15144,14 @@
       }
     },
     "Toutes étiquettes" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "All tags"
+          }
+        }
+      }
     },
     "Toutes les cases ont été lues avec certitude — vérifiez tout de même." : {
       "localizations" : {
@@ -14719,7 +15557,14 @@
       }
     },
     "V–N–D" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "W–D–L"
+          }
+        }
+      }
     },
     "Valencia Opening" : {
       "extractionState" : "stale",
@@ -14838,7 +15683,14 @@
       }
     },
     "Vérification du compte iCloud…" : {
-
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Checking iCloud account…"
+          }
+        }
+      }
     },
     "Vérifier la position" : {
       "localizations" : {

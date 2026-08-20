@@ -17,26 +17,29 @@ struct LabRunView: View {
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
     @State private var shareItem: ShareItem?
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 18) {
-                // Le scénario qui chauffe le plus : des centaines de
-                // recherches d'affilée (Lot 2.C).
-                ThermalBadge()
-                progressCard
-                HStack(alignment: .center, spacing: 10) {
-                    LabVerticalEvalBar(evalCp: viewModel.currentEvalCp)
-                    board
+        GeometryReader { geo in
+            ScrollView {
+                VStack(spacing: 18) {
+                    // Le scénario qui chauffe le plus : des centaines de
+                    // recherches d'affilée (Lot 2.C).
+                    ThermalBadge()
+                    progressCard
+                    HStack(alignment: .center, spacing: 10) {
+                        LabVerticalEvalBar(evalCp: viewModel.currentEvalCp)
+                        board
+                    }
+                    .frame(maxWidth: boardBlockWidth(in: geo.size))
+                    .frame(maxWidth: .infinity)
+                    statsGrid
+                    progressChart
+                    resultDistribution
+                    controls
                 }
-                .frame(maxWidth: 380)
-                .frame(maxWidth: .infinity)
-                statsGrid
-                progressChart
-                resultDistribution
-                controls
+                .padding(20)
             }
-            .padding(20)
         }
         .appBackground()
         .navigationTitle("Laboratoire")
@@ -48,6 +51,17 @@ struct LabRunView: View {
         .sheet(item: $shareItem) { item in
             ShareSheet(items: [item.url])
         }
+    }
+
+    /// Largeur du bloc barre d'éval + plateau. Sur iPhone, 380 pt remplit
+    /// l'écran ; sur iPad ce même plafond laissait un timbre-poste au milieu
+    /// d'une page vide (retour utilisateur du 19/08). En classe régulière, on
+    /// prend la place disponible en gardant sous le plateau la hauteur des
+    /// cartes de statistiques et des contrôles (~540 pt) — au-delà, la page
+    /// défile et l'essentiel resterait hors écran.
+    private func boardBlockWidth(in size: CGSize) -> CGFloat {
+        guard horizontalSizeClass == .regular else { return 380 }
+        return max(380, min(size.width - 40, size.height - 540, 780))
     }
 
     // MARK: Progression

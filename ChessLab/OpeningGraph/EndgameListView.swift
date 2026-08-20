@@ -152,6 +152,7 @@ struct EndgameListView: View {
                                 ) {
                                     familyFilter = familyFilter == family ? nil : family
                                 }
+                                .accessibilityIdentifier("endgameFamilyChip_\(family)")
                             }
                         }
                     }
