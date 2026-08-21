@@ -7136,6 +7136,26 @@ cours scandinave). Le classement en sortait faussé. La clé à lire est `holes`
 que l'outil produit déjà filtrée. Dette réelle du catalogue : **41,58** sur
 1 475 trous, et non les 61,91 de ma première lecture.
 
+### Lot 2 — Scandinave (21/08)
+
+Quatre coups blancs les plus joués que le répertoire laissait sans réponse :
+4.Cxd5 après 3…Cf6 (63 % des parties à cet endroit), 4.De2 dans la ligne
+3…De5+, et 3.Cf3 dans les deux ordres (après …Cf6 comme après …Dxd5). Lignes
+au moteur (profondeur 24, deux candidats comparés à chaque fois), commentées
+FR+EN. Dette **1,70 → 1,35** (−20 %), positions 94 → 138, `audit.py` sans
+aucune gaffe enseignée.
+
+Le nombre de trous monte de 51 à 52 : combler une lacune en ouvre de plus
+petites derrière elle, plus profondes et moins souvent atteintes. C'est
+attendu, et c'est pourquoi la DETTE — pondérée par la probabilité d'arriver
+là — est la mesure, pas le compte de trous.
+
+Un piège du format au passage : les lignes de `content/*.py` sont LINÉAIRES.
+Une alternative à notre propre coup ne s'y insère pas comme un `role: trap`
+(qui, lui, marque un coup adverse joué dans la ligne) — la tentative a produit
+un « illegal san » à la compilation. L'avertissement a été replié dans le
+commentaire du coup concerné, ce qui le rend d'ailleurs plus lisible.
+
 **Assumé.** Le nouveau rapport post-lot ne trouve que 18 positions en cache
 (les positions nouvellement écrites n'y sont pas) : la dette résiduelle de 0,93
 est elle aussi un plancher. Une mesure complète demandera un jeton Lichess
