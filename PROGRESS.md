@@ -7156,6 +7156,15 @@ Une alternative à notre propre coup ne s'y insère pas comme un `role: trap`
 un « illegal san » à la compilation. L'avertissement a été replié dans le
 commentaire du coup concerné, ce qui le rend d'ailleurs plus lisible.
 
+### Lot 3 — Anglaise (21/08)
+
+Cinq trous, dont un très gros : après 1.c4 Cf6 2.Cc3 g6 3.d4, les Noirs jouent
+**…Fg7 trois fois sur quatre** — c'est LA réponse à l'Anglaise — et le cours ne
+connaissait que 3…d5. Les quatre autres sont les réponses au 2e coup après
+1.c4 c5 2.Cc3 (…Cf6, …e6, …d6) et la Sicilienne inversée 2…e5, là où le cours
+ne prévoyait que …Cc6. Dette **1,68 → 1,20** (−29 %), positions 78 → 132,
+`audit.py` sans aucune gaffe enseignée, 617 tests verts.
+
 **Assumé.** Le nouveau rapport post-lot ne trouve que 18 positions en cache
 (les positions nouvellement écrites n'y sont pas) : la dette résiduelle de 0,93
 est elle aussi un plancher. Une mesure complète demandera un jeton Lichess
