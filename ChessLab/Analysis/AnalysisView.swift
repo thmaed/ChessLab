@@ -100,7 +100,20 @@ struct AnalysisView: View {
                 .accessibilityValue("\(viewModel.moveListRows.count)")
         )
         .onAppear { viewModel.handleViewAppear() }
-        .onDisappear { viewModel.handleViewDisappear() }
+        .onDisappear {
+            viewModel.handleViewDisappear()
+            // Le bilan chiffré rejoint la partie enregistrée quand il est
+            // COMPLET (le view model s'en assure). À la sortie d'écran plutôt
+            // qu'à la fin de la classification : c'est le seul moment où l'on
+            // sait que plus rien ne va changer, et le contexte SwiftData vit
+            // ici, pas dans le view model.
+            viewModel.persistMetrics(in: modelContext)
+        }
+        .onChange(of: viewModel.isClassifying) { _, isClassifying in
+            // Fin de classification écran ouvert : on écrit sans attendre la
+            // sortie, pour que la bibliothèque montre la précision tout de suite.
+            if !isClassifying { viewModel.persistMetrics(in: modelContext) }
+        }
         .sheet(isPresented: $showExportSheet) {
             ShareSheet(items: [viewModel.exportedPGN])
                 .presentationDetents([.medium])

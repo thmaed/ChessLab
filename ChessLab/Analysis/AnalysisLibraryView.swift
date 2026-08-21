@@ -244,6 +244,7 @@ struct AnalysisLibraryView: View {
         // bibliothèque existante ne reste pas muette sur sa longueur.
         .task {
             GameRecord.backfillMoveCounts(in: modelContext)
+            GameRecord.backfillAnalysisKeys(in: modelContext)
             LibrarySampleSeeder.seedIfRequested(in: modelContext)
         }
         .confirmationDialog(

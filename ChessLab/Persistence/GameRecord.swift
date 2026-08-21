@@ -54,7 +54,81 @@ final class GameRecord: Identifiable {
     /// ``tags`` qui découpe/recolle.
     var tagsCSV: String?
 
+    // MARK: Métriques d'analyse
+    //
+    // Écrites une fois la ligne principale entièrement classée, pour que le
+    // bilan se rouvre sans tout recalculer et que la mesure du niveau ait une
+    // matière. Tous optionnels : migration additive, et `nil` veut dire « pas
+    // encore analysée », ce qui est l'état de la plupart des parties.
+
+    /// Empreinte canonique de la partie — position de départ et suite des
+    /// coups (voir ``AnalysisEvalStore/key(for:)``).
+    ///
+    /// C'est le seul lien entre une session d'analyse et la partie enregistrée :
+    /// l'écran d'analyse ne reçoit qu'un texte PGN, jamais une identité. La clé
+    /// porte la partie JOUÉE, pas sa mise en forme — deux PGN aux en-têtes
+    /// différents mais aux mêmes coups se retrouvent.
+    var analysisKey: String?
+    /// Version du barème ayant produit les chiffres ci-dessous
+    /// (``GameAnalysisMetrics/currentVersion``). Ne JAMAIS moyenner des
+    /// parties de versions différentes.
+    var analysisVersion: Int?
+    var whiteAccuracy: Double?
+    var blackAccuracy: Double?
+    /// Perte moyenne de probabilité de gain, hors théorie, non pondérée.
+    var whiteAverageLoss: Double?
+    var blackAverageLoss: Double?
+    /// Coups pris en compte, hors théorie.
+    var whiteClassifiedCount: Int?
+    var blackClassifiedCount: Int?
+    /// Coups de théorie reconnus, par camp.
+    var whiteBookCount: Int?
+    var blackBookCount: Int?
+
     init() {}
+
+    /// Recopie les métriques d'une analyse terminée. Rend `true` si quelque
+    /// chose a changé — l'appelant n'enregistre que dans ce cas.
+    @discardableResult
+    func apply(_ metrics: GameAnalysisMetrics, key: String?) -> Bool {
+        let unchanged = analysisVersion == metrics.version
+            && whiteAccuracy == metrics.white.accuracy
+            && blackAccuracy == metrics.black.accuracy
+            && whiteAverageLoss == metrics.white.averageLoss
+            && blackAverageLoss == metrics.black.averageLoss
+            && whiteClassifiedCount == metrics.white.classifiedCount
+            && blackClassifiedCount == metrics.black.classifiedCount
+            && (key == nil || analysisKey == key)
+        guard !unchanged else { return false }
+
+        if let key { analysisKey = key }
+        analysisVersion = metrics.version
+        whiteAccuracy = metrics.white.accuracy
+        blackAccuracy = metrics.black.accuracy
+        whiteAverageLoss = metrics.white.averageLoss
+        blackAverageLoss = metrics.black.averageLoss
+        whiteClassifiedCount = metrics.white.classifiedCount
+        blackClassifiedCount = metrics.black.classifiedCount
+        whiteBookCount = metrics.white.bookCount
+        blackBookCount = metrics.black.bookCount
+        return true
+    }
+
+    /// Les métriques relues, ou `nil` si la partie n'a jamais été analysée —
+    /// ou l'a été sous un barème périmé, auquel cas les chiffres ne valent
+    /// plus rien et il faut réanalyser.
+    var analysisMetrics: GameAnalysisMetrics? {
+        guard analysisVersion == GameAnalysisMetrics.currentVersion else { return nil }
+        return GameAnalysisMetrics(
+            white: .init(accuracy: whiteAccuracy, averageLoss: whiteAverageLoss,
+                         classifiedCount: whiteClassifiedCount ?? 0,
+                         bookCount: whiteBookCount ?? 0),
+            black: .init(accuracy: blackAccuracy, averageLoss: blackAverageLoss,
+                         classifiedCount: blackClassifiedCount ?? 0,
+                         bookCount: blackBookCount ?? 0),
+            version: GameAnalysisMetrics.currentVersion
+        )
+    }
 
     var mode: GameRecordMode {
         GameRecordMode(rawValue: modeRaw ?? "") ?? .vsEngine
@@ -108,6 +182,32 @@ final class GameRecord: Identifiable {
         for record in pending {
             guard let pgn = record.pgn, !pgn.isEmpty, let game = PGNLoader.game(from: pgn) else { continue }
             record.moveCount = plyCount(of: game)
+            changed = true
+        }
+        if changed { PersistenceLog.save(context) }
+    }
+
+    /// Donne son empreinte canonique à chaque partie enregistrée avant
+    /// l'existence de ce champ — sans quoi l'analyse ne saurait pas où déposer
+    /// son bilan pour les parties déjà en bibliothèque.
+    ///
+    /// Même patron que ``backfillMoveCounts(in:)`` : une passe, seulement sur
+    /// les parties concernées, et on n'enregistre que si quelque chose a
+    /// bougé. Un PGN illisible est simplement laissé de côté — il le restera
+    /// à la passe suivante, ce qui est sans conséquence.
+    @MainActor
+    static func backfillAnalysisKeys(in context: ModelContext) {
+        let descriptor = FetchDescriptor<GameRecord>(
+            predicate: #Predicate { $0.analysisKey == nil }
+        )
+        guard let pending = try? context.fetch(descriptor), !pending.isEmpty else { return }
+
+        var changed = false
+        for record in pending {
+            guard let pgn = record.pgn, !pgn.isEmpty, let game = PGNLoader.game(from: pgn),
+                  let key = AnalysisEvalStore.key(for: game)
+            else { continue }
+            record.analysisKey = key
             changed = true
         }
         if changed { PersistenceLog.save(context) }

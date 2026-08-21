@@ -69,6 +69,10 @@ def parse_args(argv):
     p.add_argument("--speeds", default="blitz,rapid,classical")
     p.add_argument("--min-delay", type=float, default=1.0)
     p.add_argument("--cache", default=".cache", help="dossier de cache (partagé avec generate.py)")
+    p.add_argument("--offline", action="store_true",
+                   help="n'utiliser QUE le cache local : aucune requête réseau, aucun jeton requis. "
+                        "Les positions absentes du cache sont traitées comme « donnée manquante », "
+                        "donc le rapport ne peut que SOUS-estimer la dette — jamais l'inverse.")
     p.add_argument("--json", help="écrit le rapport complet en JSON")
     p.add_argument("--max-positions", type=int, default=400,
                    help="garde-fou par cours, pour ne pas partir en requêtes sans fin")
@@ -246,8 +250,9 @@ def print_report(reports, threshold):
 def main(argv=None) -> int:
     args = parse_args(argv if argv is not None else sys.argv[1:])
 
-    if not token_from_environment():
+    if not args.offline and not token_from_environment():
         print(f"\n✗ Aucun jeton Lichess. {TOKEN_HELP}\n", file=sys.stderr)
+        print("  (ou relancer avec --offline pour n'exploiter que le cache local)\n", file=sys.stderr)
         return 2
 
     folder = Path(args.courses)
@@ -257,7 +262,7 @@ def main(argv=None) -> int:
 
     explorer = LichessExplorer(
         cache_dir=Path(args.cache) / "explorer", speeds=args.speeds,
-        ratings=args.ratings, min_delay=args.min_delay,
+        ratings=args.ratings, min_delay=args.min_delay, dry_run=args.offline,
     )
 
     reports = []

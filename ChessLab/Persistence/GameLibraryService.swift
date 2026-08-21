@@ -24,6 +24,9 @@ enum GameLibraryService {
         record.engineColorRaw = engineColor.rawValue
         record.engineEloApprox = Int(strength.sliderValue)
         record.moveCount = GameRecord.plyCount(of: game)
+        // Empreinte canonique : c'est par elle que l'analyse retrouvera
+        // cette partie pour y déposer son bilan chiffré.
+        record.analysisKey = AnalysisEvalStore.key(for: game)
         context.insert(record)
         PersistenceLog.save(context)
     }
@@ -147,6 +150,9 @@ enum GameLibraryService {
             record.resultRaw = (result.isEmpty || result == "*") ? nil : result
             record.playedAt = Self.parsePGNDate(game.tags.date) ?? Date()
             record.moveCount = GameRecord.plyCount(of: game)
+            // Empreinte canonique : c'est par elle que l'analyse retrouvera
+            // cette partie pour y déposer son bilan chiffré.
+            record.analysisKey = AnalysisEvalStore.key(for: game)
             context.insert(record)
             imported += 1
         }
@@ -202,6 +208,9 @@ enum GameLibraryService {
         record.whiteName = whiteName
         record.blackName = blackName
         record.moveCount = GameRecord.plyCount(of: game)
+        // Empreinte canonique : c'est par elle que l'analyse retrouvera
+        // cette partie pour y déposer son bilan chiffré.
+        record.analysisKey = AnalysisEvalStore.key(for: game)
         context.insert(record)
         PersistenceLog.save(context)
     }

@@ -7022,3 +7022,87 @@ passage, la capture 06 avait révélé un piège de List paresseuse (rangée
 le test échoue désormais explicitement, et navigue par la puce de
 famille « Tours » (nouvel identifiant `endgameFamilyChip_<famille>`)
 au lieu de 20 swipes.
+
+## Chantier B — synchronisation iCloud complète (20/08)
+
+**Fait.** B.2 : les réglages suivent iCloud via `NSUbiquitousKeyValueStore`
+(`SettingsCloudSync`), couche fine au-dessus des stores `UserDefaults`
+existants, qui restent la source lue par l'app. Liste BLANCHE de neuf clés —
+six préférences transversales et les trois blocs JSON de mode. Entitlement
+`ubiquity-kvstore-identifier` ajouté : il manquait, `NSUbiquitousKeyValueStore`
+ne fonctionne pas sans lui.
+
+B.1 était déjà livré le 16/08 (`UserOpeningRecord` en base synchronisée,
+migration des fichiers) — le plan était en retard sur le code. Trois manques
+comblés : le bug `kind`/`family`, la réconciliation par contenu, et
+l'observation de la synchro côté Finales.
+
+**Décisions.**
+- *Langue et sons restent locaux* (décision utilisateur du 20/08). Le `didSet`
+  de la langue reconstruit tout le bundle de localisation : une valeur poussée
+  d'un autre appareil rebasculerait l'interface en pleine session.
+- *Les états de machine ne voyagent pas*, par construction de la liste blanche :
+  marqueurs de migration et d'amorçage, compteur d'échecs d'ouverture du
+  conteneur, horodatage de réconciliation. Et le drapeau `cloudKitSyncEnabled`
+  lui-même : synchroniser l'interrupteur de la synchro, c'est se couper le
+  canal qui propage l'information au moment où on l'éteint quelque part.
+- *Au démarrage, le nuage gagne sur ce qu'il possède déjà, l'appareil comble
+  les manques.* C'est ce qui rend le premier appareil fondateur sans écraser un
+  compte déjà garni.
+- *La réconciliation des cours compare le GRAPHE, pas le fichier entier.* Un
+  renommage ne doit pas dédoubler un répertoire ; ajouter une variante, si.
+
+**Pièges.**
+- 🐛 `OpeningCourse.init` ne portait ni `kind` ni `family`, et c'est le SEUL
+  chemin de recopie d'un cours. Une finale partagée, renommée ou modifiée
+  redevenait donc une ouverture : elle quittait l'écran Finales et le lecteur
+  la retournait. Trois chemins corrigés, quatre tests de verrou.
+- L'empreinte de contenu doit canonicaliser l'ordre des clés JSON : `positions`
+  est un dictionnaire, l'encodeur ne trie pas, et deux appareils encodant le
+  même cours produisent des octets différents. Sans cela, toute copie passait
+  pour divergente.
+- Premier essai de réconciliation trop agressif : il forkait sur TOUTE
+  différence, donc un simple renommage créait un doublon. Le test existant
+  `duplicateRecordsAreCollapsed` l'a attrapé — il avait raison, la règle a été
+  resserrée au graphe.
+
+**Vérifié.** 604 tests verts (+17). La validation de bout en bout demande deux
+appareils réels : elle reste une checklist manuelle.
+
+## Chantier C.0 — métriques d'analyse persistées (20/08)
+
+**Fait.** Chaque partie entièrement classée dépose son bilan chiffré sur son
+`GameRecord` (champs additifs, optionnels) : précision par camp, **perte
+moyenne brute** hors théorie, coups classés, coups de théorie, version du
+barème. `GameAnalysisMetrics` fait le calcul — fonction pure, 12 tests sur des
+valeurs écrites à la main. Bénéfice collatéral attendu depuis l'étape 3 :
+l'analyse d'une partie déjà vue se relit au lieu de se recalculer.
+
+**Décisions.**
+- *La perte moyenne BRUTE en plus de la précision.* La précision est déjà une
+  moyenne de pertes, mais pondérée par la volatilité et écrasée par une
+  exponentielle — deux traitements qui servent la lisibilité d'un pourcentage,
+  pas la comparaison entre parties. La courbe « perte → Elo » a besoin de la
+  grandeur non transformée.
+- *La théorie ne compte pas.* Réciter dix coups de Najdorf ne dit rien du
+  niveau de personne : la perte y est nulle par construction. Les coups de
+  livre sont comptés à part, parce qu'un dénominateur qui fond mérite d'être
+  visible.
+- *Le lien partie ↔ analyse passe par une empreinte canonique*
+  (`analysisKey`, celle du cache disque) et non par une identité propagée :
+  l'écran d'analyse ne reçoit qu'un texte PGN, et douze sites de navigation
+  auraient dû changer. L'empreinte porte la partie JOUÉE, pas sa mise en forme.
+
+**Piège tranché (C.1, piège n° 1 du plan).** Le slider 800–3190 ne pilote pas
+`UCI_Elo` sur toute sa plage : sous 1320 — le plancher natif de Stockfish —
+c'est `Skill Level` (0→5) ET la profondeur (1→6) qui font le travail, l'Elo
+affiché n'étant qu'une étiquette. Une courbe calibrée en pilotant `UCI_Elo`
+directement mentirait sur tout le bas de l'échelle, là où l'estimation
+intéresse le plus. La campagne devra donc passer par le Laboratoire, par
+valeur de slider : `LabGameSettings` construit le même `EngineStrength` que le
+mode Jouer, le Laboratoire EST le produit. Documenté dans
+`tools/elo-calibration/README.md` avec le protocole complet.
+
+**Reste à faire.** C.1 (campagne de mesure), C.2 (`EloEstimator` + affichage),
+C.3 (validation humaine). Rien ne s'affiche tant que la courbe n'est pas
+mesurée : pas de chiffre non vérifié à l'écran.

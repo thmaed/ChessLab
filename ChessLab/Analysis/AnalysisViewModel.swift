@@ -2065,6 +2065,74 @@ final class AnalysisViewModel {
     /// Précision (%) par joueur, dérivée des coups déjà classifiés de la
     /// ligne principale (voir ``AccuracyScore``). Se complète
     /// progressivement pendant la classification de fond.
+    /// La ligne principale réduite à ce que les métriques regardent : qui a
+    /// joué, ce que le coup a coûté, et s'il était encore dans la théorie.
+    ///
+    /// Construite depuis les mêmes `moveEvaluations` que la précision, mais
+    /// SANS pondération : la perte brute est la grandeur comparable d'une
+    /// partie à l'autre (voir ``GameAnalysisMetrics``).
+    private func analysisMoveSeries() -> [GameAnalysisMetrics.Move] {
+        var moves: [GameAnalysisMetrics.Move] = []
+        var idx = game.startingIndex
+        while game.moves.hasIndex(after: idx) {
+            let parentIdx = idx
+            idx = game.moves.index(after: idx)
+            guard let evaluation = moveEvaluations[idx], let evalBefore = evalCache[parentIdx] else { continue }
+            let mover = idx.color
+            let beforeMoverPOV = mover == .white ? evalBefore.winPercent : 100 - evalBefore.winPercent
+            moves.append(GameAnalysisMetrics.Move(
+                mover: mover,
+                loss: max(0, beforeMoverPOV - evaluation.winPercentAfterMover),
+                isBook: evaluation.quality == .book
+            ))
+        }
+        return moves
+    }
+
+    /// Bilan chiffré de la partie, tel qu'il sera persisté. `nil` tant que la
+    /// ligne principale n'est pas entièrement classée : des métriques
+    /// partielles ne sont pas des métriques, elles sont un mensonge lisible.
+    var analysisMetrics: GameAnalysisMetrics? {
+        guard isGameReview, isMainLineFullyClassified else { return nil }
+        return GameAnalysisMetrics.compute(
+            moves: analysisMoveSeries(), accuracyByColor: accuracyByColor
+        )
+    }
+
+    /// Recopie le bilan dans la partie enregistrée correspondante.
+    ///
+    /// Le rapprochement se fait par ``AnalysisEvalStore/key(for:)`` — la même
+    /// empreinte que le cache disque, donc insensible aux en-têtes PGN. Une
+    /// partie ouverte depuis un fichier extérieur n'a pas d'enregistrement :
+    /// il n'y a alors rien à écrire, et ce n'est pas une erreur.
+    @discardableResult
+    func persistMetrics(in context: ModelContext) -> Bool {
+        guard let metrics = analysisMetrics, let key = persistenceKey else { return false }
+        guard let record = Self.record(matching: key, in: context) else { return false }
+        guard record.apply(metrics, key: key) else { return false }
+        PersistenceLog.save(context, origin: "analysisMetrics")
+        return true
+    }
+
+    /// Retrouve la partie enregistrée : par empreinte si elle en porte déjà
+    /// une, sinon en la calculant sur les PGN qui n'en ont pas encore (les
+    /// parties d'avant ce champ). La recherche par empreinte d'abord évite de
+    /// reparser toute la bibliothèque au cas courant.
+    private static func record(matching key: String, in context: ModelContext) -> GameRecord? {
+        var byKey = FetchDescriptor<GameRecord>(predicate: #Predicate { $0.analysisKey == key })
+        byKey.fetchLimit = 1
+        if let found = try? context.fetch(byKey).first { return found }
+
+        let unkeyed = FetchDescriptor<GameRecord>(predicate: #Predicate { $0.analysisKey == nil })
+        guard let candidates = try? context.fetch(unkeyed) else { return nil }
+        return candidates.first { candidate in
+            guard let text = candidate.pgn, !text.isEmpty,
+                  let parsed = PGNLoader.game(from: text)
+            else { return false }
+            return AnalysisEvalStore.key(for: parsed) == key
+        }
+    }
+
     private func computeAccuracyByColor() -> [Piece.Color: Double] {
         // Deux séries parallèles, l'ordre des coups étant ce qui porte
         // l'information : la précision de chaque coup, et la probabilité de
