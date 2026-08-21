@@ -7106,3 +7106,37 @@ mode Jouer, le Laboratoire EST le produit. Documenté dans
 **Reste à faire.** C.1 (campagne de mesure), C.2 (`EloEstimator` + affichage),
 C.3 (validation humaine). Rien ne s'affiche tant que la courbe n'est pas
 mesurée : pas de chiffre non vérifié à l'écran.
+
+## Chantier A — lot 1 : Nimzo-Larsen, la dette la plus lourde (21/08)
+
+**Fait.** Cinq trous comblés dans `nimzo-larsen`, le cours à la dette la plus
+lourde du catalogue (1,83) : les cinq réponses noires du 2e coup qu'aucun
+chapitre n'atteignait — …e6 et …d5 après 1.b3 Cf6 ; …d6 après 1.b3 e5 ; …c5 et
+…e6 après 1.b3 d5. Ensemble, elles représentent près de 90 % de ce que
+l'adversaire joue réellement là où le cours restait muet. Lignes calculées au
+moteur (`suggest.py`, profondeur 22, deux candidats comparés), commentées
+FR+EN, rejouées par `author.py`.
+
+**Mesure.** Dette 1,83 → **0,93** (−49 %), trous 37 → 31, positions 72 → 134.
+`audit.py` : 0 gaffe enseignée (seuil 150 cp, 62 positions évaluées, contre-
+mesure profondeur 24 déclenchée sur 0 arête suspecte). Verrou bundle
+`OpeningBlunderRegressionTests` vert.
+
+**Outillage.** `coverage.py` gagne un mode `--offline` : il n'exploite que le
+cache local (1 034 réponses Explorer déjà présentes), sans réseau ni jeton. Un
+trou trouvé hors ligne est un vrai trou ; une position absente du cache est
+traitée comme donnée manquante. **Le rapport ne peut donc que sous-estimer la
+dette, jamais l'inverse** — c'est le bon côté sur lequel se tromper pour une
+mesure d'avancement.
+
+**Piège de lecture (le mien).** J'ai d'abord classé les cours sur la clé
+`gaps` du rapport, qui agrège trois natures : `trou` (vraie lacune), `fin`
+(prolongement possible) et `portée` (coup hors sujet — répondre à 1.d4 dans un
+cours scandinave). Le classement en sortait faussé. La clé à lire est `holes`,
+que l'outil produit déjà filtrée. Dette réelle du catalogue : **41,58** sur
+1 475 trous, et non les 61,91 de ma première lecture.
+
+**Assumé.** Le nouveau rapport post-lot ne trouve que 18 positions en cache
+(les positions nouvellement écrites n'y sont pas) : la dette résiduelle de 0,93
+est elle aussi un plancher. Une mesure complète demandera un jeton Lichess
+valide — c'est le lot A.2, toujours ouvert.
