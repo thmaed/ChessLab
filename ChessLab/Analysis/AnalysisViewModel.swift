@@ -2071,7 +2071,7 @@ final class AnalysisViewModel {
     /// Construite depuis les mêmes `moveEvaluations` que la précision, mais
     /// SANS pondération : la perte brute est la grandeur comparable d'une
     /// partie à l'autre (voir ``GameAnalysisMetrics``).
-    private func analysisMoveSeries() -> [GameAnalysisMetrics.Move] {
+    func analysisMoveSeries() -> [GameAnalysisMetrics.Move] {
         var moves: [GameAnalysisMetrics.Move] = []
         var idx = game.startingIndex
         while game.moves.hasIndex(after: idx) {
@@ -2083,7 +2083,8 @@ final class AnalysisViewModel {
             moves.append(GameAnalysisMetrics.Move(
                 mover: mover,
                 loss: max(0, beforeMoverPOV - evaluation.winPercentAfterMover),
-                isBook: evaluation.quality == .book
+                isBook: evaluation.quality == .book,
+                winPercentBefore: beforeMoverPOV
             ))
         }
         return moves

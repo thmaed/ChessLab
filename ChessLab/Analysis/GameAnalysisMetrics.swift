@@ -55,11 +55,16 @@ struct GameAnalysisMetrics: Equatable, Sendable {
         /// Perte de probabilité de gain pour le joueur qui vient de jouer.
         let loss: Double
         let isBook: Bool
+        /// Probabilité de gain AVANT le coup, du point de vue du joueur au
+        /// trait. Sert à reconnaître les positions déjà tranchées, où presque
+        /// aucun coup ne coûte rien et où la moyenne se dilue.
+        let winPercentBefore: Double
 
-        init(mover: Piece.Color, loss: Double, isBook: Bool) {
+        init(mover: Piece.Color, loss: Double, isBook: Bool, winPercentBefore: Double = 50) {
             self.mover = mover
             self.loss = loss
             self.isBook = isBook
+            self.winPercentBefore = winPercentBefore
         }
     }
 

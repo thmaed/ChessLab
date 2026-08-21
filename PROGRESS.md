@@ -7160,3 +7160,56 @@ commentaire du coup concerné, ce qui le rend d'ailleurs plus lisible.
 (les positions nouvellement écrites n'y sont pas) : la dette résiduelle de 0,93
 est elle aussi un plancher. Une mesure complète demandera un jeton Lichess
 valide — c'est le lot A.2, toujours ouvert.
+
+## Chantier C — abandonné après mesure (21/08)
+
+**Décision.** L'estimation du niveau Elo par partie est abandonnée. Barre posée
+par l'utilisateur : ±100-150 Elo, sinon on ne le fait pas. Mesuré : ±699 Elo
+pour une partie, ±214 en moyennant dix. Le chantier s'arrête, et c'est un
+résultat — pas un renoncement.
+
+**Ce qui a été mesuré.** Deux pilotes (paliers 1100/1700/2300/2900, six parties
+chacun, jouées au Laboratoire par valeur de curseur puis repassées dans le
+pipeline d'analyse de production). Quatre statistiques candidates :
+
+| Statistique | Séparation 1100→1700 | 1 partie | 10 parties |
+|---|---|---|---|
+| Perte moyenne | d = 0,53 | ±699 | ±221 |
+| Précision affichée | d = 0,50 | ±677 | ±214 |
+| Perte hors positions tranchées | d = 0,87 (partiel) | — | — |
+| Part de coups fautifs | d = 0,18 (partiel) | — | — |
+
+Deux paliers distants de **600 Elo** sont indiscernables. Le chiffre à retenir
+est celui-là.
+
+**Pourquoi.** La dilution : les parties sont longues (jusqu'à 75 coups classés
+par camp à 1100), et une fois la position tranchée plus aucun coup ne coûte
+rien — des dizaines de coups triviaux noient les quelques décisions qui
+distinguent deux joueurs. Restreindre aux positions indécises n'y change presque
+rien : cela retire des coups faciles des DEUX côtés. Quant à la part de coups
+fautifs, elle est la pire des quatre, et c'est logique après coup : à budget
+égal, un moteur bridé à 1100 et un à 1700 se trompent aussi SOUVENT, c'est la
+GRAVITÉ qui diffère.
+
+Et ce n'est pas un problème d'échantillon : plus de parties resserrent la
+moyenne d'un palier, pas la dispersion d'une partie — qui est exactement ce
+qu'il aurait fallu annoncer.
+
+**Ce que le pilote a fait gagner.** 45 minutes de mesure au lieu de ~10 heures
+de campagne complète pour une courbe inutilisable. C'est l'argument pour
+toujours piloter avant d'industrialiser.
+
+**Conservé, parce que ça ressert.** Le harnais `EloCalibrationHarness` (séries
+au Laboratoire + repassage dans l'analyse) est l'instrument exact dont le
+chantier D a besoin pour mesurer la force effective d'un style (lot D.1.d) ;
+`discriminate.py` dit si une statistique sépare deux paliers ; `fit_curve.py`
+et les CSV bruts restent pour que la démonstration soit rejouable. Le lot C.0
+(métriques persistées sur `GameRecord`) reste aussi : il rend l'analyse d'une
+partie déjà vue relisible au lieu d'être recalculée — un point du backlog depuis
+l'étape 3 — et ne dépend pas de l'estimation abandonnée.
+
+**Piège méthodologique noté.** Ne jamais lancer d'audit moteur (`audit.py`,
+`suggest.py`) pendant une campagne de mesure : les deux Stockfish se disputent
+le processeur, le moteur du Laboratoire explore moins de nœuds dans ses 150 ms
+et la classification bute sur son plafond de temps. Les mesures seraient
+faussées SILENCIEUSEMENT.

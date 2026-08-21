@@ -1,98 +1,86 @@
-# Calibrage « perte moyenne → Elo estimé » (chantier C.1)
+# Estimation du niveau Elo — chantier ABANDONNÉ le 21/08/2026
 
-Ce dossier prépare la courbe qui permettra d'afficher, sous la précision d'une
-partie analysée, une phrase du genre « Niveau estimé de cette partie :
-~1450–1750 ». Tant que la courbe n'est pas mesurée, **rien ne s'affiche** :
-l'app ne montre pas de chiffre qu'elle n'a pas vérifié.
+**Ne pas relancer ce chantier sans lire ce qui suit.** Il a été mesuré, pas
+abandonné par lassitude : deux pilotes montrent que l'estimation visée n'est pas
+atteignable avec la précision exigée, et les mesures sont conservées ici pour
+que la démonstration soit rejouable.
 
-## Où en est le chantier
+## Ce qui était visé
 
-| Lot | État |
-|---|---|
-| C.0 — persister les métriques par partie | **fait** (20/08/2026) |
-| C.1 — campagne de calibrage | protocole écrit ci-dessous, campagne à mener |
-| C.2 — `EloEstimator` + affichage | à faire, après la courbe |
-| C.3 — validation humaine | à faire, avant de retirer la mention « bêta » |
+Afficher, sous la précision d'une partie analysée, une fourchette du genre
+« Niveau estimé de cette partie : ~1450–1750 », plus un estimé glissant dans
+l'écran Progrès. Barre produit fixée par l'utilisateur le 21/08 : **±100 à
+150 Elo, sinon on abandonne**.
 
-## Ce que C.0 a livré, et qui sert de matière première
+## Ce qui a été mesuré
 
-Chaque partie entièrement analysée porte désormais son bilan chiffré
-(`GameRecord`, champs additifs) :
+Deux pilotes, paliers 1100 / 1700 / 2300 / 2900, six parties par palier, jouées
+au Laboratoire **par valeur de curseur** (donc avec le mappage exact du mode
+Jouer) puis repassées dans le pipeline d'analyse de production, budgets et
+seuils inchangés. Mesures brutes dans `mesures/`.
 
-- `whiteAccuracy` / `blackAccuracy` — la précision affichée ;
-- `whiteAverageLoss` / `blackAverageLoss` — **la perte moyenne BRUTE** de
-  probabilité de gain, en points de pourcentage, non pondérée et **hors
-  théorie** : c'est la grandeur comparable d'une partie à l'autre, celle sur
-  laquelle la courbe s'ajuste ;
-- `whiteClassifiedCount` / `blackClassifiedCount` — les coups qui comptent ;
-- `whiteBookCount` / `blackBookCount` — les coups de théorie écartés ;
-- `analysisVersion` — la version du barème, **à ne jamais mélanger** ;
-- `analysisKey` — l'empreinte canonique de la partie (position de départ +
-  suite des coups), qui relie une session d'analyse à la partie enregistrée.
+Quatre statistiques candidates ont été éprouvées :
 
-Le calcul vit dans `GameAnalysisMetrics` : fonction pure, testée sur des
-valeurs écrites à la main (`GameAnalysisMetricsTests`).
+| Statistique | Séparation 1100→1700 | Fourchette 1 partie | Sur 10 parties |
+|---|---|---|---|
+| Perte moyenne | d = 0,53 | ±699 Elo | ±221 Elo |
+| Précision affichée | d = 0,50 | ±677 Elo | ±214 Elo |
+| Perte hors positions tranchées | d = 0,87 (partiel) | — | — |
+| Part de coups fautifs | d = 0,18 (partiel) | — | — |
 
-## Le piège n° 1 du plan, tranché
+Le *d* est l'écart entre deux paliers rapporté au bruit : en dessous de 1, les
+deux distributions se recouvrent largement. Ici, **deux paliers distants de
+600 Elo sont indiscernables** — 1100 et 1700 produisent presque les mêmes
+chiffres.
 
-> « Comment le slider 800–3190 du mode Jouer mappe-t-il la force réelle ? »
+## Pourquoi ça ne marche pas
 
-Vérifié dans `ChessLab/Play/EngineStrength.swift` : le mappage n'est **pas**
-linéaire, et il change de nature en cours de route.
+**La dilution.** Les parties du Laboratoire sont longues (jusqu'à 75 coups
+classés par camp au palier 1100). Une fois la position tranchée, plus aucun coup
+ne coûte rien à personne : des dizaines de coups triviaux noient les quelques
+décisions qui distinguent réellement deux joueurs. Restreindre la moyenne aux
+positions encore indécises n'y change presque rien (0,87 contre 0,78) : cela
+retire des coups faciles **des deux côtés** à la fois.
 
-| Plage du slider | Ce qui est réellement envoyé au moteur |
-|---|---|
-| ≥ 3190 | `UCI_LimitStrength=false`, `Skill Level=20` — pleine puissance |
-| 1320 … 3189 | `UCI_LimitStrength=true`, `UCI_Elo=<valeur>`, `Skill Level=20` |
-| 800 … 1319 | `UCI_LimitStrength=false`, `Skill Level` interpolé 0→5, **et profondeur plafonnée 1→6** |
+**La fréquence n'est pas le bon signal.** La part de coups fautifs est la pire
+des quatre (d = 0,18), et c'est logique après coup : à budget de recherche
+égal, un moteur bridé à 1100 et un à 1700 se trompent à des fréquences voisines
+— c'est la **gravité** de leurs erreurs qui diffère, pas leur nombre.
 
-Sous 1320, l'Elo affiché est donc une **étiquette**, pas un réglage : Stockfish
-n'accepte pas `UCI_Elo` plus bas, et c'est `Skill Level` + la profondeur qui
-font le travail. Une courbe calibrée en pilotant `UCI_Elo` directement
-mentirait sur tout le bas de l'échelle — exactement là où se trouvent les
-joueurs que l'estimation intéresse le plus.
+**Et ce n'est pas un problème d'échantillon.** Jouer 30 parties au lieu de 6
+resserrerait la moyenne de chaque palier, donc le centre de la courbe. Cela ne
+resserre pas la dispersion d'**une** partie, qui est précisément ce qu'il
+faudrait annoncer. Même l'estimé glissant sur dix parties reste à ±214 Elo,
+au-delà de la barre.
 
-**Conséquence pour la campagne** : les séries doivent être lancées **depuis le
-Laboratoire, par valeur de slider**, jamais en envoyant `UCI_Elo` à la main.
-C'est acquis sans effort — `LabGameSettings.sideAStrength` construit un
-`EngineStrength(sliderValue:)`, le même type et le même mappage que le mode
-Jouer. Le Laboratoire est donc, littéralement, le produit.
+## Ce qui reste, et pourquoi
 
-## Protocole de la campagne
+Rien n'est supprimé, parce que tout ressert ailleurs :
 
-1. **Séries.** Depuis le Laboratoire, une série par palier, **même valeur de
-   slider des deux côtés** : 800, 1100, 1400, 1700, 2000, 2300, 2600, 2900.
-   Au moins 30 parties par palier (60 pour les paliers sous 1320, dont la
-   dispersion est plus forte). Livre d'ouvertures activé des deux côtés, comme
-   en partie normale.
-2. **Classification.** Chaque partie passe ensuite par le pipeline d'analyse de
-   production **à l'identique** — mêmes budgets en nœuds, mêmes seuils, même
-   exclusion de la théorie. C'est la condition de validité : une courbe ajustée
-   sur des chiffres produits autrement ne décrit pas ce que l'app affichera.
-   En pratique, ouvrir chaque partie dans l'Analyste suffit : C.0 écrit les
-   métriques en fin de classification.
-3. **Extraction.** Exporter les `GameRecord` analysés en CSV (une ligne par
-   camp : palier, perte moyenne, coups classés, coups de théorie, précision,
-   version du barème).
-4. **Ajustement.** `fit_curve.py` (à écrire) : régression **monotone** de la
-   perte moyenne vers l'Elo — isotone ou logistique, jamais un polynôme libre
-   qui ondulerait. Écart-type par palier → demi-largeur de la fourchette.
-5. **Livrable.** La courbe figée en JSON versionné, embarquée dans
-   `Resources/`, plus les CSV bruts commités ici : sans les données, la courbe
-   n'est pas reproductible et le calibrage n'est qu'une affirmation de plus.
+- `ChessLabTests/EloCalibrationHarness.swift` — fait jouer des séries au
+  Laboratoire à un niveau donné puis les repasse dans le pipeline d'analyse.
+  C'est exactement l'instrument dont le **chantier D** a besoin pour mesurer la
+  force effective d'un style d'adversaire (lot D.1.d). Éteint par défaut, ne
+  s'allume que sur `CHESSLAB_CALIBRATION=1`.
+- `discriminate.py` — dit si une statistique sépare deux paliers, et traduit sa
+  dispersion en Elo. Réutilisable tel quel pour D.
+- `fit_curve.py` — ajustement monotone perte → Elo, avec ses garde-fous
+  (refus de mélanger deux barèmes, seuil de 15 coups classés).
+- `mesures/` — les CSV des deux pilotes. Sans eux, ce document ne serait
+  qu'une affirmation.
 
-## Pièges à ne pas rejouer
+Les métriques persistées par le lot **C.0** restent également en place
+(`GameRecord.whiteAverageLoss`, `analysisVersion`…) : elles rendent l'analyse
+d'une partie déjà vue relisible au lieu d'être recalculée, ce qui était un point
+du backlog depuis l'étape 3, et sont indépendantes de l'estimation abandonnée.
 
-- **Ne jamais moyenner deux versions de barème.** `analysisVersion` est là pour
-  filtrer. Elle se change en même temps que `AnalysisEvalStore.engineProfile`,
-  qui joue le même rôle pour le cache disque.
-- **Un moteur bridé ne se trompe pas comme un humain** : ses erreurs sont plus
-  uniformes, avec moins de gaffes isolées. La courbe issue de moteurs seuls est
-  donc à valider sur des parties humaines (C.3) avant de retirer la mention
-  « bêta ».
-- **Les parties courtes et les écrasements** produisent des pertes moyennes non
-  représentatives. Le seuil de 15 coups classés hors théorie les écarte ;
-  vérifier sur les CSV que la dispersion par palier reste exploitable, sinon
-  augmenter le nombre de parties plutôt que d'élargir le seuil.
-- **Après l'épisode Nils** : un chiffre douteux coûte plus cher que pas de
-  chiffre. La fourchette et le « bêta » ne sont pas négociables en v1.
+## Si quelqu'un veut réessayer un jour
+
+Ce qui n'a **pas** été testé, et qui serait la seule piste sérieuse : ne plus
+chercher à estimer un niveau à partir d'une moyenne, mais à partir de la
+**distribution des pertes sur les positions critiques uniquement** — celles où
+plusieurs coups raisonnables existent et où un seul tient. Cela suppose de
+détecter ces positions (écart entre le premier et le deuxième coup du moteur),
+donc un budget de recherche bien supérieur, et une campagne autrement plus
+longue. À ne lancer qu'avec une hypothèse précise et une barre de réussite
+posée d'avance — comme celle-ci.
