@@ -79,7 +79,7 @@ struct HelpView: View {
         .init(
             icon: "icloud", tint: Theme.info,
             title: "Synchronisation iCloud",
-            body: "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement."
+            body: "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement.\n\nCE QUI SUIT\nVos parties terminées, votre progression sur les ouvertures et les finales, vos répertoires personnels, et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens. Et votre partie EN COURS : elle reste là où vous la jouez. Deux appareils, deux parties commencées, il faudrait en sacrifier une — mieux vaut que chacune vous attende où vous l'avez laissée."
         ),
     ]
 

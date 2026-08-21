@@ -301,10 +301,18 @@ struct OpeningCourse: Codable, Identifiable, Hashable, Sendable {
     static func == (lhs: OpeningCourse, rhs: OpeningCourse) -> Bool { lhs.id == rhs.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
 
+    /// - Important: `kind` et `family` ont l'air facultatifs — ils ne le sont
+    ///   pas pour une FINALE. Cet init est le seul chemin de recopie d'un cours
+    ///   (ré-identification à l'import, application d'une édition) ; tant qu'il
+    ///   ne les portait pas, une finale partagée ou simplement modifiée
+    ///   redevenait silencieusement une ouverture : elle quittait l'écran
+    ///   Finales, réapparaissait dans les Ouvertures et changeait d'orientation
+    ///   dans le lecteur (corrigé le 20/08/2026, cf. `OpeningCourseKindTests`).
     init(
         schemaVersion: Int? = OpeningSchema.currentVersion, id: String, name: String,
         eco: [String]? = nil, side: OpeningSide = .white, level: OpeningLevel = .club,
-        summary: LocalizedText? = nil, rootFEN: String, chapters: [OpeningChapter]? = nil,
+        summary: LocalizedText? = nil, kind: String? = nil, family: String? = nil,
+        rootFEN: String, chapters: [OpeningChapter]? = nil,
         positions: [String: PositionNode]
     ) {
         self.schemaVersion = schemaVersion
@@ -314,6 +322,8 @@ struct OpeningCourse: Codable, Identifiable, Hashable, Sendable {
         self.side_ = side
         self.level_ = level.rawValue
         self.summary = summary
+        self.kind = kind
+        self.family = family
         self.rootFEN = rootFEN
         self.chapters = chapters
         self.positions = positions

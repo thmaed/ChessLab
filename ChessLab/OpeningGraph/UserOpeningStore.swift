@@ -291,38 +291,112 @@ final class UserOpeningStore {
         OpeningCourse(
             schemaVersion: course.schemaVersion, id: id, name: name ?? course.name,
             eco: course.eco, side: course.side, level: course.level, summary: course.summary,
+            kind: course.kind, family: course.family,
             rootFEN: course.rootFEN, chapters: course.chapters, positions: course.positions
         )
     }
 
-    /// Écarte les doublons d'identifiant, en gardant le plus récent.
+    /// Réconcilie les enregistrements partageant un même identifiant de cours.
     ///
     /// 🐛 Deux appareils qui possédaient le MÊME répertoire en fichier avant
     /// la mise à jour l'ont chacun migré de leur côté : deux enregistrements
     /// portant le même identifiant de cours se retrouvent alors en base, et le
     /// répertoire apparaît en double. CloudKit interdisant les contraintes
     /// d'unicité, le ménage se fait ici — une fois, au chargement.
+    ///
+    /// ## Pourquoi la date ne suffit pas, et pourquoi on ne compare pas tout
+    ///
+    /// Garder « le plus récent » et supprimer l'autre est juste tant que les
+    /// deux enregistrements portent le MÊME travail — le cas de la migration,
+    /// et celui d'un simple renommage fait sur un appareil. Mais si chacun a
+    /// ajouté des coups de son côté avant que la synchro ne les mette en
+    /// présence, en effacer un revient à perdre silencieusement ce que
+    /// quelqu'un a écrit.
+    ///
+    /// Ce qui tranche est donc le GRAPHE, pas le fichier entier : les coups,
+    /// les rôles et les commentaires. Renommer un répertoire ne doit pas le
+    /// dédoubler ; y ajouter une variante, si.
+    ///
+    /// - graphes identiques → le plus récent reste, l'autre part ;
+    /// - graphes différents → le plus récent devient canonique, et le divergent
+    ///   est RÉ-IDENTIFIÉ au lieu d'être détruit. Mieux vaut un doublon visible,
+    ///   que l'utilisateur arbitre, qu'une perte invisible.
     private func deduplicated(_ records: [UserOpeningRecord]) -> [UserOpeningRecord] {
-        var best: [String: UserOpeningRecord] = [:]
-        var extras: [UserOpeningRecord] = []
-        for record in records {
-            if let kept = best[record.id] {
-                // Le plus récent gagne ; l'autre part.
-                if record.updatedAt > kept.updatedAt {
-                    best[record.id] = record
-                    extras.append(kept)
+        var groups: [String: [UserOpeningRecord]] = [:]
+        for record in records { groups[record.id, default: []].append(record) }
+
+        var kept: [UserOpeningRecord] = []
+        var duplicates: [UserOpeningRecord] = []
+        var diverged: [UserOpeningRecord] = []
+
+        for group in groups.values {
+            guard group.count > 1 else {
+                kept.append(group[0])
+                continue
+            }
+            // Ordre stable : à dates égales, l'identifiant persistant départage,
+            // pour que deux appareils élisent le MÊME canonique.
+            let ranked = group.sorted {
+                $0.updatedAt == $1.updatedAt
+                    ? String(describing: $0.persistentModelID) < String(describing: $1.persistentModelID)
+                    : $0.updatedAt > $1.updatedAt
+            }
+            let canonical = ranked[0]
+            kept.append(canonical)
+            let canonicalFingerprint = Self.contentFingerprint(of: canonical.payload)
+            for other in ranked.dropFirst() {
+                if Self.contentFingerprint(of: other.payload) == canonicalFingerprint {
+                    duplicates.append(other)
                 } else {
-                    extras.append(record)
+                    diverged.append(other)
                 }
-            } else {
-                best[record.id] = record
             }
         }
-        if !extras.isEmpty, let context {
-            for extra in extras { context.delete(extra) }
-            PersistenceLog.save(context)
+
+        guard let context, !duplicates.isEmpty || !diverged.isEmpty else {
+            return kept + diverged
         }
-        return Array(best.values)
+        for duplicate in duplicates { context.delete(duplicate) }
+        for record in diverged { kept.append(reidentify(record, in: context)) }
+        PersistenceLog.save(context)
+        return kept
+    }
+
+    /// Empreinte du GRAPHE d'un cours — ses positions, donc les coups, les
+    /// rôles et les commentaires — à l'exclusion des métadonnées (nom, niveau).
+    ///
+    /// Insensible à l'ordre des clés JSON : `positions` est un dictionnaire et
+    /// l'encodeur ne trie pas ses clés, si bien que deux appareils encodant le
+    /// même cours ne produisent pas les mêmes octets. Comparer les blobs bruts
+    /// déclarerait donc divergentes deux copies identiques. On re-sérialise
+    /// clés triées avant de comparer ; si le JSON est illisible, on retombe sur
+    /// les octets bruts (deux illisibles différents ne seront pas fusionnés,
+    /// ce qui est le bon côté sur lequel se tromper).
+    static func contentFingerprint(of payload: Data) -> Data {
+        guard let object = try? JSONSerialization.jsonObject(with: payload) else { return payload }
+        let graph = (object as? [String: Any])?["positions"] ?? object
+        guard JSONSerialization.isValidJSONObject(graph),
+              let canonical = try? JSONSerialization.data(withJSONObject: graph, options: [.sortedKeys])
+        else { return payload }
+        return canonical
+    }
+
+    /// Donne une nouvelle identité à un enregistrement divergent, pour qu'il
+    /// cohabite avec le canonique au lieu de disparaître.
+    private func reidentify(_ record: UserOpeningRecord, in context: ModelContext) -> UserOpeningRecord {
+        let newID = Self.newIdentifier()
+        if let course = try? OpeningCourseLoader.decodeCourse(from: record.payload) {
+            let renamed = LocalizationController.string("%@ (autre appareil)", course.name)
+            let forked = rekeyed(course, to: newID, name: renamed)
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = [.withoutEscapingSlashes]
+            if let data = try? encoder.encode(forked) {
+                record.payload = data
+                record.name = renamed
+            }
+        }
+        record.id = newID
+        return record
     }
 
     private func decodeCourse(at url: URL) -> OpeningCourse? {

@@ -59,6 +59,16 @@ struct ChessLabApp: App {
 
                     UserOpeningStore.shared.attach(context: modelContainer.mainContext)
 
+                    // Réglages : le même interrupteur iCloud commande les
+                    // données et les préférences. La langue et les sons
+                    // restent propres à l'appareil (voir SettingsCloudSync).
+
+                    SettingsCloudSync.shared.start {
+
+                        AppSettings.shared.reloadSyncedValuesFromDefaults()
+
+                    }
+
                 }
                 // Traits réels de la fenêtre (classes de taille, taille,
                 // encoches) exposés aux tests de mise en page — et affichés

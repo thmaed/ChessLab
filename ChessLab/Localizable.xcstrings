@@ -314,6 +314,22 @@
         }
       }
     },
+    "%@ (autre appareil)" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (other device)"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ (autre appareil)"
+          }
+        }
+      }
+    },
     "%@ (%@)" : {
       "localizations" : {
         "en" : {
@@ -1093,6 +1109,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Repertoire actions"
+          }
+        }
+      }
+    },
+    "Activez-la dans les RÃ©glages pour que vos parties suivent tous vos appareils via votre iCloud privÃ© â aucun compte Ã  crÃ©er, aucun serveur tiers. DÃ©sactivÃ©e par dÃ©faut : l'app fonctionne entiÃ¨rement hors ligne. La modification prend effet au prochain lancement.\n\nCE QUI SUIT\nVos parties terminÃ©es, votre progression sur les ouvertures et les finales, vos rÃ©pertoires personnels, et vos prÃ©fÃ©rences â thÃ¨me de plateau, jeu de piÃ¨ces, notation, essais par puzzle, rÃ©glages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens. Et votre partie EN COURS : elle reste lÃ  oÃ¹ vous la jouez. Deux appareils, deux parties commencÃ©es, il faudrait en sacrifier une â mieux vaut que chacune vous attende oÃ¹ vous l'avez laissÃ©e." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Turn it on in Settings so your games follow you across all your devices via your private iCloud — no account to create, no third-party server. Off by default: the app works fully offline. Changes take effect on next launch.\n\nWHAT FOLLOWS YOU\nYour finished games, your progress on openings and endgames, your personal repertoires, and your preferences — board theme, piece set, notation, puzzle attempts, game settings.\n\nWHAT STAYS ON EACH DEVICE\nThe language and the sounds, so each device keeps its own. And your game IN PROGRESS: it stays where you play it. Two devices, two games started, and one would have to be sacrificed — better that each waits for you where you left it."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activez-la dans les RÃ©glages pour que vos parties suivent tous vos appareils via votre iCloud privÃ© â aucun compte Ã  crÃ©er, aucun serveur tiers. DÃ©sactivÃ©e par dÃ©faut : l'app fonctionne entiÃ¨rement hors ligne. La modification prend effet au prochain lancement.\n\nCE QUI SUIT\nVos parties terminÃ©es, votre progression sur les ouvertures et les finales, vos rÃ©pertoires personnels, et vos prÃ©fÃ©rences â thÃ¨me de plateau, jeu de piÃ¨ces, notation, essais par puzzle, rÃ©glages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens. Et votre partie EN COURS : elle reste lÃ  oÃ¹ vous la jouez. Deux appareils, deux parties commencÃ©es, il faudrait en sacrifier une â mieux vaut que chacune vous attende oÃ¹ vous l'avez laissÃ©e."
           }
         }
       }

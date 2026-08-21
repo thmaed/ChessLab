@@ -22,6 +22,12 @@ struct EndgameListView: View {
     var onOpenTwoPlayer: () -> Void = {}
 
     @Environment(\.modelContext) private var modelContext
+    /// Même lien que dans l'écran Ouvertures : le catalogue des cours
+    /// personnels est un CACHE, recalculé par `reload()` seulement, et
+    /// CloudKit ne prévient personne. Sans ce `@Query`, une finale personnelle
+    /// arrivée d'un autre appareil n'apparaissait ici qu'après un
+    /// rafraîchissement déclenché ailleurs (corrigé le 20/08/2026).
+    @Query private var userRecords: [UserOpeningRecord]
     @State private var dueCount = 0
     /// Filtres de tête de liste — 77 cours sur 9 familles, sans eux il faut
     /// ~14 écrans de défilement pour atteindre les études (retour
@@ -30,6 +36,15 @@ struct EndgameListView: View {
     @State private var familyFilter: String?
 
     private var entries: [OpeningCatalogEntry] { OpeningCatalog.all.filter(\.isEndgame) }
+
+    /// Empreinte de la base : couvre l'arrivée d'un cours comme sa
+    /// modification (un simple compte manquerait les secondes).
+    private var recordsSignature: String {
+        userRecords
+            .map { "\($0.id)@\(Int($0.updatedAt.timeIntervalSince1970))" }
+            .sorted()
+            .joined(separator: "|")
+    }
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
 
     /// L'ordre pédagogique des familles — du pion (tout part de là) aux études.
@@ -112,6 +127,7 @@ struct EndgameListView: View {
             }
         }
         .onAppear { refresh() }
+        .onChange(of: recordsSignature) { _, _ in UserOpeningStore.shared.reload() }
     }
 
     /// Même file de révision que les ouvertures : la mémorisation est

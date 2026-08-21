@@ -152,6 +152,38 @@ final class AppSettings {
         LocalizationController.apply(languageCode: appLanguage.resolvedCode)
     }
 
+    /// Relit les préférences depuis `UserDefaults` — appelé quand la synchro
+    /// iCloud vient d'y déposer des valeurs venues d'un autre appareil.
+    ///
+    /// N'assigne que ce qui a réellement CHANGÉ. Chaque `didSet` réécrit dans
+    /// `UserDefaults` (bénin), mais réassigner à l'identique ferait clignoter
+    /// l'interface pour rien. La langue et les sons ne sont volontairement pas
+    /// relus : ils ne voyagent pas (voir ``SettingsCloudSync``).
+    func reloadSyncedValuesFromDefaults() {
+        let defaults = UserDefaults.standard
+
+        let theme = defaults.string(forKey: Keys.boardThemeID) ?? BoardTheme.classic.id
+        if theme != boardThemeID { boardThemeID = theme }
+
+        let pieces = defaults.string(forKey: Keys.pieceSetID) ?? PieceSet.classic.id
+        if pieces != pieceSetID { pieceSetID = pieces }
+
+        let haptics = (defaults.object(forKey: Keys.hapticsEnabled) as? Bool) ?? true
+        if haptics != hapticsEnabled { hapticsEnabled = haptics }
+
+        let storedAttempts = (defaults.object(forKey: Keys.puzzleAttempts) as? Int) ?? 1
+        let attempts = Self.puzzleAttemptChoices.contains(storedAttempts) ? storedAttempts : 1
+        if attempts != puzzleAttempts { puzzleAttempts = attempts }
+
+        let arrows = defaults.string(forKey: Keys.analysisArrowMode)
+            .flatMap(ArrowMode.init(rawValue:)) ?? .best
+        if arrows != analysisArrowMode { analysisArrowMode = arrows }
+
+        let notation = defaults.string(forKey: Keys.pieceNotation)
+            .flatMap(PieceNotation.init(rawValue:)) ?? .french
+        if notation != pieceNotation { pieceNotation = notation }
+    }
+
     /// Thème de plateau résolu (retombe sur classique si l'id stocké est
     /// inconnu, ex. thème retiré dans une future version).
     var boardTheme: BoardTheme {

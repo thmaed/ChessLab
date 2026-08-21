@@ -129,6 +129,7 @@ enum OpeningCourseEditor {
         return OpeningCourse(
             schemaVersion: course.schemaVersion, id: course.id, name: trimmed,
             eco: course.eco, side: course.side, level: course.level, summary: course.summary,
+            kind: course.kind, family: course.family,
             rootFEN: course.rootFEN, chapters: course.chapters, positions: course.positions
         )
     }
@@ -235,8 +236,8 @@ private extension OpeningCourse {
     func replacing(positions: [String: PositionNode], chapters: [OpeningChapter]?) -> OpeningCourse {
         OpeningCourse(
             schemaVersion: schemaVersion, id: id, name: name, eco: eco, side: side,
-            level: level, summary: summary, rootFEN: rootFEN, chapters: chapters,
-            positions: positions
+            level: level, summary: summary, kind: kind, family: family,
+            rootFEN: rootFEN, chapters: chapters, positions: positions
         )
     }
 }
