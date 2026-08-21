@@ -7213,3 +7213,37 @@ l'étape 3 — et ne dépend pas de l'estimation abandonnée.
 le processeur, le moteur du Laboratoire explore moins de nœuds dans ses 150 ms
 et la classification bute sur son plafond de temps. Les mesures seraient
 faussées SILENCIEUSEMENT.
+
+## Chantier D — vérifications amont (21/08), avant toute ligne de code
+
+Trois faits établis sur pièces, dont deux corrigent le plan.
+
+**Stockfish n'a aucune personnalité.** `Contempt`, seul levier stylistique
+historique, a été RETIRÉ du moteur (commit `ed436a3`) : nous embarquons la
+17.1, il n'existe plus. Restent `Skill Level`, `UCI_LimitStrength` et
+`UCI_Elo`, qui règlent la force, pas le caractère. Les moteurs à personnalités
+(Komodo) sont propriétaires et non embarquables sous GPLv3. L'approche prévue
+en D.1 — MultiPV puis reclassement maison selon des traits — n'est donc pas un
+pis-aller faute de mieux : c'est la méthode standard, et il n'existe pas de
+raccourci.
+
+**Les poids Maia ne sont pas un problème de taille.** Mesurés, pas estimés :
+1,2 Mo par réseau. Trois paliers = 3,6 Mo, les neuf ≈ 11 Mo, face aux 71 Mo de
+NNUE déjà embarqués. Licence GPL v3, compatible avec l'app — le point bloquant
+n° 4 du gate tombe.
+
+**Mais lc0 n'est pas dans le projet, contrairement à ce qu'affirmait le plan.**
+La seule dépendance SPM est `chesskit-swift` (les règles du jeu) ; le moteur
+est un CStockfish vendorisé à la main dans `Vendor/`. Aucune trace de lc0 ni de
+Leela. D.2 ne consiste donc pas à activer quelque chose de dormant mais à
+vendoriser un second moteur C++ complet, compilé pour iOS. Requalifié : projet
+autonome précédé d'une étude de faisabilité, et non spike de deux jours.
+
+**Piste ouverte, non arbitrée : le niveau variable (D.3).** Moduler la force en
+cours de partie pour garder la rencontre disputée. Technique documentée
+(ajustement dynamique de difficulté ; *ChallengeMate*, Stanford, module
+profondeur et probabilité de gaffe selon l'état de la partie). Orthogonale à
+D.1 comme à D.2 — elle touche la force, pas le choix du coup — et de loin la
+moins chère des trois. Condition non négociable : un MODE NOMMÉ dont la
+promesse affichée est l'adaptation. Moduler en douce un réglage « Elo 1500 »
+ferait mentir le chiffre, exactement ce qu'on vient de refuser en fermant C.
