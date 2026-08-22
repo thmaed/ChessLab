@@ -7323,6 +7323,18 @@ moins chère des trois. Condition non négociable : un MODE NOMMÉ dont la
 promesse affichée est l'adaptation. Moduler en douce un réglage « Elo 1500 »
 ferait mentir le chiffre, exactement ce qu'on vient de refuser en fermant C.
 
+### Lot 8 — Bird (22/08)
+
+Cinq trous, dont deux dans le gambit From (…Fg4 et …Cf6 après 4.Cf3), et trois
+dans la Bird classique (…Cc6 après 3.e3, …e6 et …Ff5 après 2.Cf3).
+Dette **1,11 → 0,48** (−57 %, la plus forte baisse relative de la session),
+positions 68 → 111, audit sans gaffe.
+
+`whiteTimeDecreasesBeforeTheFirstMove` a échoué dans la passe complète, puis
+est repassé vert en isolation : c'est le flaky de pendule déjà documenté, pas
+une régression — un lot de contenu d'ouvertures n'a aucun rapport avec une
+horloge. Rejeu isolé systématique avant de conclure.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il
