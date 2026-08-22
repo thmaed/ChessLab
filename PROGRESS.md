@@ -7165,6 +7165,22 @@ connaissait que 3…d5. Les quatre autres sont les réponses au 2e coup après
 ne prévoyait que …Cc6. Dette **1,68 → 1,20** (−29 %), positions 78 → 132,
 `audit.py` sans aucune gaffe enseignée, 617 tests verts.
 
+### Lot 4 — Attaque Est-Indienne (22/08)
+
+Cinq trous : …c5 et …dxe4 dans la Française, …e6 dans la Sicilienne (Paulsen),
+…Cc6 après 1.Cf3 d5 2.g3 c5 3.Fg2, et …e6 après 2…Cc6 3.d3. Dette **1,58 →
+0,86** (−46 %), positions 86 → 139, `audit.py` sans gaffe, 617 tests verts.
+
+**Choix éditorial assumé, contre le moteur.** Sur deux de ces trous, Stockfish
+préfère quitter le système : après 1.e4 c5 2.Cf3 e6, il donne 3.d4 (Sicilienne
+ouverte) à +0,41 contre −0,07 pour 3.d3. Le cours garde d3. Un répertoire
+Attaque Est-Indienne qui bascule en Sicilienne ouverte n'est plus le même
+cours : son intérêt — peu de théorie, un plan qui se rejoue partie après
+partie — disparaît avec le système. La règle « prouvé, pas deviné » interdit
+d'enseigner une gaffe, elle n'oblige pas à jouer le premier choix du moteur
+quand un demi-pion se paie en identité de répertoire. L'audit reste le juge :
+0 gaffe enseignée.
+
 **Assumé.** Le nouveau rapport post-lot ne trouve que 18 positions en cache
 (les positions nouvellement écrites n'y sont pas) : la dette résiduelle de 0,93
 est elle aussi un plancher. Une mesure complète demandera un jeton Lichess
