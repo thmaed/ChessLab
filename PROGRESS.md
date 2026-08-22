@@ -7216,6 +7216,21 @@ EXACT depuis la racine du cours par parcours en largeur du graphe. Le graphe
 connaît le chemin, autant le lui demander. **À utiliser systématiquement** pour
 tout trou dont la position n'est pas au tout début d'une ligne.
 
+### Lot 7 — Anglaise, seconde passe (22/08)
+
+Cinq trous ouverts par le premier lot, chemins reconstruits par
+`path_to_hole.py`. Le plus lourd : le roque après 1.c4 Cf6 2.Cc3 g6 3.d4 Fg7
+4.e4 d6 5.Fe2, joué par **plus de quatre Noirs sur cinq** — de très loin le
+coup le plus fréquent de tout le répertoire. Les autres : …Cf6, …e6 et …d6
+après 1.c4 c5 2.Cc3 Cc6 3.g3, et …Cf6 dans la Sicilienne inversée.
+Dette **1,20 → 0,88** (−26 %), positions 132 → 180. Sur la session, l'Anglaise
+passe de 1,68 à 0,88.
+
+Un calcul a expiré à profondeur 22 sur la ligne la plus profonde (10 demi-coups
+depuis la position initiale) ; relancé à 20, il a abouti. À retenir pour les
+positions tardives : la profondeur a un coût qui explose avec le nombre de
+coups déjà joués.
+
 **Assumé.** Le nouveau rapport post-lot ne trouve que 18 positions en cache
 (les positions nouvellement écrites n'y sont pas) : la dette résiduelle de 0,93
 est elle aussi un plancher. Une mesure complète demandera un jeton Lichess
