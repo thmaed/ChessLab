@@ -7421,6 +7421,26 @@ accepté se croisent), et trois trous étaient communs. Le graphe étant indexé
 par FEN, chaque cours doit néanmoins les couvrir pour son propre ordre de
 coups : le contenu se répète, la couverture non.
 
+### Lots 19-20 — Gambit de l'éléphant et Espagnole (22/08)
+
+- **Gambit de l'éléphant** 0,80 → 0,37 (−53 %), positions 32 → 87.
+- **Espagnole** 0,78 → 0,51 (−34 %), positions 94 → 149, dont la défense
+  classique 3…Fc5, la variante d'échange et deux chapitres contre la Petroff
+  et la Philidor.
+
+**Le cas du gambit de l'éléphant mérite d'être noté.** Plusieurs lignes
+ajoutées finissent nettement en faveur des Blancs — jusqu'à −0,91. Ce n'est pas
+un défaut du contenu : c'est ce que vaut ce gambit. Le cours le dit désormais
+explicitement, y compris dans le commentaire du coup 4.d3 (« contre un
+adversaire qui joue simplement, le gambit ne donne rien de plus qu'un pion de
+moins ») et dans un nouveau chapitre où, faute de 2.Cf3, on bascule sur une
+défense saine — savoir renoncer à son arme favorite fait partie d'un
+répertoire.
+
+Enseigner une ouverture douteuse est légitime ; la présenter comme correcte ne
+l'est pas. `audit.py` vérifie qu'aucun coup n'est une gaffe, il n'a jamais
+prétendu que les lignes étaient bonnes.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il
