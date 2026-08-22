@@ -7181,6 +7181,21 @@ d'enseigner une gaffe, elle n'oblige pas à jouer le premier choix du moteur
 quand un demi-pion se paie en identité de répertoire. L'audit reste le juge :
 0 gaffe enseignée.
 
+### Lot 5 — London System (22/08)
+
+Cinq trous : …e6 et …Ff5 après 2.Ff4, …d6 contre …Cf6, le roque dans la ligne
+du fianchetto, et …e6 dans la London « Jobava » (3.Cc3). Dette **1,47 → 0,97**
+(−34 %), positions 101 → 152, 617 tests verts.
+
+`audit.py` a relevé **1 arête suspecte** au premier passage, blanchie par la
+contre-mesure à profondeur 24 — la double passe a fonctionné exactement comme
+prévu, et le verdict final est 0 gaffe enseignée.
+
+À noter : sur le trou Jobava, le moteur propose 4.Cb5, un saut de cavalier très
+concret. Contrairement au lot 4, ce n'est PAS une sortie de système : c'est
+l'idée maîtresse de la Jobava, et le cours couvrait déjà …a6, précisément le
+coup qui l'empêche. Retenu sans réserve.
+
 **Assumé.** Le nouveau rapport post-lot ne trouve que 18 positions en cache
 (les positions nouvellement écrites n'y sont pas) : la dette résiduelle de 0,93
 est elle aussi un plancher. Une mesure complète demandera un jeton Lichess
