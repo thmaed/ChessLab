@@ -7358,6 +7358,24 @@ par le graphe, demander la suite au moteur. Il ne rédige rien : les
 commentaires bilingues restent le seul vrai travail. Un lot passe de ~20
 commandes à deux.
 
+### Lots 11-12 — Italienne et Gambit du roi (22/08)
+
+- **Italienne** 0,91 → 0,64 (−30 %), positions 108 → 163. Deux nouveaux
+  chapitres : contre la Petroff et contre la Philidor. Le trou le plus
+  instructif est 3…Cc6 dans la Petroff après 3.Cxe5 — l'erreur classique que
+  deux Noirs sur cinq commettent (ils défendent le cavalier au lieu de le
+  chasser par …d6), et qui vaut +1,70 aux Blancs. Enseignée comme telle.
+- **Gambit du roi** 0,90 → 0,58 (−36 %), positions 83 → 127. **Trois des cinq
+  trous étaient à la même position** — après 3.Fc4, où le cours ne couvrait que
+  …Dh4+ : le chapitre du gambit du fou était quasi vide.
+
+**Note d'honnêteté sur le Gambit du roi.** Plusieurs lignes ajoutées finissent
+légèrement en faveur des Noirs (−0,26 à −0,61). C'est le gambit du roi : on
+offre un pion pour l'initiative, et le moteur ne s'y trompe pas. `audit.py`
+vérifie qu'aucun coup enseigné n'est une GAFFE (seuil 150 cp) ; il n'a jamais
+exigé que les lignes soient gagnantes, et il ne faut pas lui faire dire ça.
+Enseigner un gambit, c'est enseigner un pari assumé, pas une réfutation.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il

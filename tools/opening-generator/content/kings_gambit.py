@@ -145,5 +145,99 @@ COURSE = {
                               "The knight is back on g1 — humiliating but correct: it will re-emerge via e2, and White's centre is worth the lost time.")},
             ],
         },
+
+        # ── Trous comblés le 22/08 (coverage.py, dette 0,90). Trois des cinq
+        # trous sont à la MÊME position — après 3.Fc4, où le cours ne couvrait
+        # que …Dh4+ : le chapitre du gambit du fou était quasi vide.
+        #
+        # Note d'honnêteté : plusieurs de ces lignes finissent légèrement en
+        # faveur des Noirs. C'est le gambit du roi — on offre un pion pour
+        # l'initiative, et les tables de finales ne mentent pas. L'audit vérifie
+        # qu'aucune n'est une GAFFE ; il n'exige pas qu'elles soient gagnantes. ─
+        {
+            "chapter": {"id": "bishops-gambit", "title": c("Gambit du fou — 3.Fc4", "Bishop's Gambit — 3.Bc4")},
+            "moves": [
+                "e4", "e5", "f4", "exf4", "Bc4",
+                {"san": "d6",
+                 "comment": c("Le coup le plus sensé : les Noirs consolident avant de chercher …g5. Un joueur sur sept, et le cours ne prévoyait que l'échec …Dh4+.",
+                              "The soundest move: Black consolidates before going for …g5. One player in seven, and the course only planned for the check …Qh4+."),
+                 "critical": True},
+                {"san": "Nf3",
+                 "comment": c("On développe en couvrant h4 : plus d'échec à craindre, et le cavalier surveille g5 où les Noirs voudront pousser.",
+                              "We develop while covering h4: no more check to fear, and the knight watches g5, where Black wants to push."),
+                 "critical": True},
+                "h6", "d4", "g5", "h4", "Bg7", "Qd3", "Nc6", "Nc3", "g4",
+            ],
+        },
+        {
+            "chapter": {"id": "bishops-gambit", "title": c("Gambit du fou — 3.Fc4", "Bishop's Gambit — 3.Bc4")},
+            "moves": [
+                "e4", "e5", "f4", "exf4", "Bc4",
+                {"san": "Nf6",
+                 "comment": c("Les Noirs attaquent e4 au lieu de tenir le pion f4. C'est la façon moderne de traiter le gambit du fou, et le cours n'en disait rien.",
+                              "Black attacks e4 instead of clinging to the f4 pawn. The modern way to meet the Bishop's Gambit, and the course said nothing about it."),
+                 "critical": True},
+                {"san": "Nc3",
+                 "comment": c("On défend e4 par une pièce, sans bouger un pion : le centre reste intact et le développement continue.",
+                              "We defend e4 with a piece, without touching a pawn: the centre stays whole and development continues.")},
+                "Nc6", "Nf3", "Bb4", "O-O", "O-O", "d3",
+                {"san": "Bxc3",
+                 "comment": c("Les Noirs doublent nos pions pour tenir e4. Nous obtenons en échange la colonne b et deux fous face à un roi qui a perdu son pion f.",
+                              "Black doubles our pawns to hold e4. In exchange we get the b-file and two bishops against a king that has lost its f-pawn."),
+                 "critical": True},
+                "bxc3", "d5",
+            ],
+        },
+        {
+            "chapter": {"id": "bishops-gambit", "title": c("Gambit du fou — 3.Fc4", "Bishop's Gambit — 3.Bc4")},
+            "moves": [
+                "e4", "e5", "f4", "exf4", "Bc4",
+                {"san": "Nc6",
+                 "comment": c("Développement simple. Un joueur sur huit, absent du cours.",
+                              "Simple development. One player in eight, missing from the course."),
+                 "critical": True},
+                "d4",
+                {"san": "Qh4+",
+                 "comment": c("L'échec caractéristique du gambit du fou : il n'y a pas de cavalier en f3 pour le couvrir, et le roi blanc doit bouger. C'est le prix assumé de 3.Fc4.",
+                              "The check that defines the Bishop's Gambit: there is no knight on f3 to block it, and White's king must move. That is the accepted price of 3.Bc4."),
+                 "critical": True},
+                {"san": "Kf1",
+                 "comment": c("Le roi marche, et ce n'est pas une catastrophe : la tour h1 sortira par g1 une fois le pion g poussé, et les Noirs auront dépensé leur dame en sorties précoces.",
+                              "The king steps aside, and it is no disaster: the h1 rook will come out via g1 once the g-pawn moves, and Black will have spent their queen on early sorties.")},
+                "d6", "Nf3", "Bg4", "Nxh4", "Bxd1", "Nc3", "Bxc2",
+            ],
+        },
+        {
+            "chapter": {"id": "kings-knight", "title": c("Gambit accepté — 3.Cf3", "Accepted — 3.Nf3")},
+            "moves": [
+                "e4", "e5", "f4", "exf4", "Nf3",
+                {"san": "Nc6",
+                 "comment": c("Un Noir sur six développe avant de tenir le pion. Le cours ne prévoyait que …d5, …g5 et …d6.",
+                              "One Black player in six develops before holding the pawn. The course only planned for …d5, …g5 and …d6."),
+                 "critical": True},
+                "d4", "g5",
+                {"san": "d5",
+                 "comment": c("La poussée qui renverse tout : le pion attaque le cavalier c6 au moment précis où les Noirs se sont engagés à l'aile roi. La suite est forcée et il faut la connaître.",
+                              "The push that turns everything around: the pawn hits the c6 knight at the exact moment Black has committed on the kingside. What follows is forced and must be known."),
+                 "critical": True},
+                "g4", "dxc6", "gxf3", "Qxf3", "Qh4+", "g3", "fxg3",
+            ],
+        },
+        {
+            "chapter": {"id": "kings-knight", "title": c("Gambit accepté — 3.Cf3", "Accepted — 3.Nf3")},
+            "moves": [
+                "e4", "e5", "f4",
+                {"san": "Nc6",
+                 "comment": c("Les Noirs refusent le pion pour développer. Le cours ne voyait que la prise …exf4 et …d6.",
+                              "Black declines the pawn to develop. The course only saw the capture …exf4 and …d6."),
+                 "critical": True},
+                "Nf3",
+                {"san": "exf4",
+                 "comment": c("Ils acceptent finalement, un coup plus tard — et transposent dans la ligne précédente, où d4 puis d5 nous attendent.",
+                              "They accept after all, one move later — and transpose into the previous line, where d4 and then d5 are waiting."),
+                 "critical": True},
+                "d4", "g5", "d5", "g4", "dxc6", "gxf3", "Qxf3", "Qh4+", "g3", "fxg3",
+            ],
+        },
     ],
 }
