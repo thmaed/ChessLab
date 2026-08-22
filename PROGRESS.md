@@ -7322,3 +7322,108 @@ D.1 comme à D.2 — elle touche la force, pas le choix du coup — et de loin l
 moins chère des trois. Condition non négociable : un MODE NOMMÉ dont la
 promesse affichée est l'adaptation. Moduler en douce un réglage « Elo 1500 »
 ferait mentir le chiffre, exactement ce qu'on vient de refuser en fermant C.
+
+## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
+
+Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il
+contenait et qui n'existait NULLE PART ailleurs — le reste (chantiers A, B, C,
+et les vérifications amont de D) est déjà consigné dans les sections
+ci-dessus. Le fichier reste récupérable dans l'historique git si besoin.
+
+### D.1 — Styles heuristiques, conception retenue (non commencé)
+
+Rappel du fait établi le 21/08 : Stockfish n'a aucune option de personnalité,
+`Contempt` ayant été retiré du moteur. Reclasser soi-même des coups candidats
+est donc la seule méthode, pas un pis-aller.
+
+- **D.1.a — `StyleMoveSelector`, module PUR.** `requestEngineMove` passe en
+  MultiPV k=4 ; les candidats situés dans une fenêtre de tolérance par rapport
+  au meilleur (≈50 cp en agressif, 30 cp en solide, à caler) sont rejoués sur
+  un `Board` pour en extraire des traits, puis notés par style :
+  - *Agressif* : échecs, captures, coups vers la zone du roi adverse, poussées
+    côté roque adverse, sacrifices corrects bonifiés.
+  - *Solide* : roque tôt, développement sans capture, refus de créer pion
+    isolé ou doublé, maintien de la tension.
+  - *Équilibré* (défaut) : sélecteur court-circuité — zéro régression possible.
+  **Bénéfice croisé** : l'extracteur de traits de structure (pion isolé,
+  colonne ouverte…) est exactement la brique des futures explications
+  positionnelles. À écrire comme module partagé (`StructureTraits`), pas comme
+  un privé du sélecteur.
+- **D.1.b — Liste des styles** : Équilibré / Agressif / Solide. Trois
+  seulement en v1 : chaque style supplémentaire multiplie le travail de calage.
+- **D.1.c — Biais d'ouverture** : tags de style sur les nœuds
+  d'`opening_book.json` (gambits et lignes tranchantes → agressif ; systèmes
+  fermés → solide), multiplicateur de poids par style dans `OpeningBookEngine`.
+- **D.1.d — Calage de la force au Laboratoire** : pour chaque style, ≥ 100
+  parties style-ON contre style-OFF au même Elo ; `LabStats` donne l'écart Elo
+  et son intervalle. Écart < ~50 Elo ⇒ une ligne d'avertissement dans l'UI ;
+  plus grand ⇒ compensation documentée et re-mesurée. **Le harnais
+  `EloCalibrationHarness`, conservé du chantier C abandonné, est l'instrument
+  exact de ce lot.**
+- **D.1.e — UI** : sélecteur de style dans `NewGameSetupView` avec une phrase
+  par style ; `styleRaw` additif dans `PlayGameSettings` et l'autosave ;
+  l'écran de fin de partie mentionne le style joué.
+- **Piège à vérifier EN PREMIER** : l'interaction MultiPV × `UCI_LimitStrength`
+  dans un moteur bridé — les variantes secondaires peuvent être incohérentes.
+  Test de dérisquage : 20 positions, comparer la fenêtre de candidats bridé vs
+  plein pot. Si inutilisable, repli : recherche plein pot à budget réduit pour
+  la SÉLECTION, coup JOUÉ au niveau demandé.
+- **Critères d'acceptation** : `StyleMoveSelectorTests` verts (reconnaissance
+  ET non-reconnaissance par trait) ; série de calage commitée en CSV avec
+  l'écart Elo ; `EngineLeakUITests` inchangé ; et surtout l'alerte gaffe, les
+  indices et l'Analyste **prouvés insensibles au style** par test.
+
+### E — Scanner de vrais échiquiers (non commencé, bloqué)
+
+Étendre la reconnaissance — fiable aujourd'hui sur les diagrammes d'écran — aux
+photos de plateaux physiques. C'est un problème de **données** avant d'être un
+problème de code : le pipeline (BoardQuad, homographie, 64 vignettes, YOLO ×
+gabarits, garde-fous, confirmation obligatoire) existe déjà de bout en bout.
+
+- **E.1 — Le benchmark d'abord, préalable absolu, aucune ligne de modèle
+  avant.** Jeu de test réel, étiqueté, versionné : 200–300 photos, variées en
+  matériel (bois, plastique, vinyle de tournoi), sets, éclairages (jour, lampe,
+  contre-jour) et angles — **verticale d'abord**, puis 30–60°. Chaque photo :
+  FEN vérité terrain + les 4 coins. Sources : photos maison (**l'utilisateur
+  doit fournir 30–50 photos de ses propres plateaux — c'est le point de départ,
+  et le blocage actuel**), complétées par des jeux publics après vérification
+  de licence. `scripts/yolo/eval_real.py` : par photo, détection du
+  quadrilatère (IoU), précision par case et position exacte ; agrégats par
+  angle/éclairage/matériel. **E.1 se termine par la mesure du modèle ACTUEL sur
+  ce benchmark** : la baseline chiffrée, probablement mauvaise — c'est le but,
+  savoir d'où l'on part.
+- **E.2 — Générateur synthétique 3D.** Étendre le générateur 2D existant :
+  rendus Blender headless (dans `tools/`, hors app) de sets Staunton 3D sous
+  licence permissive vérifiée, textures bois/vinyle, éclairages et angles
+  aléatoires (centrés sur la verticale ±20° en v1), annotations automatiques.
+  Dizaines de milliers de plateaux. Domain randomization simple plutôt que
+  réalisme parfait.
+- **E.3 — Réentraînement + gate.** Entraînement hors-session (contrainte
+  d'environnement documentée quatre fois le 19/07). **Gate de promotion**,
+  industrialisation du processus qui a fait ses preuves avec le rejet de
+  l'époque-9 : un modèle doit À LA FOIS améliorer `eval_real.py` ET ne pas
+  dégrader le benchmark écrans existant. Échec à l'un des deux ⇒ rejet
+  documenté.
+- **E.4 — UX de capture guidée (verticale)** : overlay de cadrage carré,
+  indicateur d'horizontalité (CoreMotion), déclenchement assisté quand le
+  plateau remplit le gabarit. Réutilise le flux caméra existant. Confirmation
+  obligatoire inchangée. Libellé honnête sur la limite : « fonctionne mieux à
+  la verticale du plateau ».
+- **E.5 — Plus tard, sous gate renouvelé** : angles obliques libres,
+  occlusions partielles (main, pièces capturées en bord).
+- **Seuil de livraison proposé, à confirmer par la mesure** : ≥ 97 % de
+  précision par case et ≥ 60 % de positions exactes sur le benchmark vertical.
+  Avec la confirmation obligatoire, c'est une expérience « je corrige deux
+  cases » acceptable. Si la baseline en est loin, **le chantier continue sans
+  rien livrer** — l'app ne promet rien aujourd'hui sur les vrais plateaux, ne
+  pas promettre avant d'y être.
+
+### Hors périmètre, décisions toujours en vigueur
+
+- Tout appel réseau dans l'app (import Lichess/Chess.com, Explorer in-app,
+  partage centralisé) : jalon 2.0 délibéré.
+- Refonte `NavigationPath` → `[Route]` : remède potentiellement pire que le mal.
+- Synchro des autosaves de parties en cours : deux appareils, deux parties en
+  cours, aucune bonne réponse — documenté dans l'aide.
+- Régénération automatique des cours par l'Explorer Lichess : jamais
+  (décision du 16/08). L'Explorer est un informateur, pas un générateur.
