@@ -7376,6 +7376,22 @@ vérifie qu'aucun coup enseigné n'est une GAFFE (seuil 150 cp) ; il n'a jamais
 exigé que les lignes soient gagnantes, et il ne faut pas lui faire dire ça.
 Enseigner un gambit, c'est enseigner un pari assumé, pas une réfutation.
 
+### Lots 13-14 — Anti-siciliennes et Partie du centre (22/08)
+
+- **Anti-siciliennes** 0,89 → 0,56 (−37 %), positions 147 → 202.
+- **Partie du centre** 0,87 → 0,44 (−50 %), positions 47 → 102, avec deux
+  chapitres nourris : la ligne 3.Dxd4 (dont le grand roque, signature de
+  l'ouverture) et le gambit danois.
+
+**Un arbitrage de périmètre.** Le plus gros trou des anti-siciliennes était
+3.d4 — la sicilienne OUVERTE, jouée près d'une fois sur deux. Un cours dont le
+sujet est précisément d'y échapper ne peut pas la traiter : l'ouverte est un
+répertoire entier, et en donner une ligne unique donnerait l'illusion de la
+couvrir. Mais laisser la moitié des parties sans réponse n'est pas tenable non
+plus. Choix retenu : une **porte d'entrée** — quelques coups vers le Sveshnikov
+— avec un commentaire qui dit explicitement que ce n'est pas un traitement. Le
+lecteur n'est pas abandonné, et rien ne lui est promis qui ne soit tenu.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il
