@@ -7504,6 +7504,33 @@ Le Budapest ajoute un chapitre du même genre que le dragon et le Ponziani :
 sans c4, il n'y a pas de gambit, et un répertoire de gambit doit dire ce qu'on
 joue quand le gambit n'est pas disponible.
 
+### Correctif — les systèmes doivent être ceux qu'on trouve documentés (22/08)
+
+Consigne utilisateur : les deux arbitrages faits contre le moteur (garder e3 au
+Colle, d3 à l'Attaque Est-Indienne) sont VALIDÉS, à condition que les systèmes
+correspondent à leur forme documentée. Vérification faite plutôt que supposée.
+
+- **Attaque Est-Indienne : conforme.** Le `3.Cd2` puis `4.dxe4` que j'avais
+  écrit est exactement la forme standard — `Cd2` est joué précisément pour
+  éviter l'échange des dames après `3…dxe4`.
+- **Colle : un vrai défaut, corrigé.** J'avais écrit une branche dont le
+  coup-clé est **b3**, donc le Colle-**Zukertort**, mais classée dans le
+  chapitre « Colle-Koltanowski — c3 » — alors que le cours possède déjà un
+  chapitre Zukertort. Le commentaire disait lui-même « la version Zukertort »
+  à l'intérieur d'un chapitre Koltanowski. Branche reclassée, et surtout
+  **complétée jusqu'à Fb2** : sans le fou sur la grande diagonale, `b3` n'est
+  qu'un coup de pion perdu, et la branche montrait le prix du système sans en
+  montrer la contrepartie. L'ordre suit désormais la forme canonique — `b3`
+  AVANT le roque, pour n'avoir jamais à répondre à `…c4`.
+
+Contrôle ajouté et passé : aucune branche à coup-clé `b3` ne subsiste dans un
+chapitre Koltanowski, ni l'inverse.
+
+**Leçon.** Écrire une ligne saine ne suffit pas : elle doit être rangée sous le
+bon nom. Un lecteur qui révise le « Colle-Koltanowski » et tombe sur du b3
+n'apprend pas un système, il apprend une confusion — et l'audit moteur, qui ne
+juge que les coups, ne verra jamais ce défaut-là.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il

@@ -131,7 +131,7 @@ COURSE = {
         # Colle. Un système dont tout l'intérêt est de se rejouer à l'identique
         # ne survit pas à un basculement vers une ouverture théorique. ─────────
         {
-            "chapter": {"id": "colle", "title": c("Colle-Koltanowski — c3", "Colle-Koltanowski — c3")},
+            "chapter": {"id": "zukertort", "title": c("Colle-Zukertort — b3", "Colle-Zukertort — b3")},
             "moves": [
                 "d4", "d5", "Nf3",
                 {"san": "e6",
@@ -142,12 +142,17 @@ COURSE = {
                  "comment": c("Et non c4. C'est le choix qui définit ce répertoire : on renonce à l'avantage théorique du Gambit Dame pour une position qu'on rejoue à l'identique chaque partie.",
                               "And not c4. This is the choice that defines the repertoire: we give up the Queen's Gambit's theoretical edge for a position we replay identically every game."),
                  "critical": True},
-                "Nf6", "Bd3", "c5", "O-O", "a6",
+                "Nf6", "Bd3", "c5",
                 {"san": "b3",
-                 "comment": c("La version Zukertort : le fou part en b2 plutôt que le pion en c3. Contre …a6 et un centre noir mobile, la grande diagonale vaut mieux que le soutien de d4.",
-                              "The Zukertort version: the bishop goes to b2 rather than the pawn to c3. Against …a6 and a mobile black centre, the long diagonal is worth more than propping up d4."),
+                 "comment": c("On bascule sur le Zukertort : plutôt que de soutenir d4 par c3, le fou dame va rayonner en b2. C'est l'ordre standard du système — b3 AVANT le roque, pour ne pas avoir à répondre à …c4 qui chasserait le fou d3.",
+                              "We switch to the Zukertort: rather than propping up d4 with c3, the queen's bishop will rake from b2. This is the system's standard order — b3 BEFORE castling, so we never have to meet …c4 kicking the d3 bishop."),
                  "critical": True},
-                "cxd4", "exd4", "Nc6",
+                "Be7", "Nbd2", "O-O",
+                {"san": "Bb2",
+                 "comment": c("Le fou prend enfin la grande diagonale, celle qui vise le roque adverse. Sans lui, b3 n'aurait été qu'un coup de pion perdu — c'est cette case qui justifie tout le système.",
+                              "The bishop finally takes the long diagonal, the one aimed at Black's king. Without it, b3 would have been a wasted pawn move — this square is what justifies the whole system."),
+                 "critical": True},
+                "b6", "O-O", "cxd4", "exd4", "Ba6", "c4",
             ],
         },
         {
