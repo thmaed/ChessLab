@@ -7335,6 +7335,29 @@ est repassé vert en isolation : c'est le flaky de pendule déjà documenté, pa
 une régression — un lot de contenu d'ouvertures n'a aucun rapport avec une
 horloge. Rejeu isolé systématique avant de conclure.
 
+### Lots 9-10 — cours vierges : Colle et Écossaise (22/08)
+
+Changement de stratégie décidé après le lot 8 : la file n'ayant plus aucun
+cours au-dessus de 1,00, on privilégie les cours **jamais traités**, où le
+rendement reste bien meilleur (la Bird avait rendu −57 % en un lot, contre
+−26 % pour une troisième passe).
+
+- **Colle** 0,95 → 0,48 (−49 %), positions 70 → 122. Même arbitrage qu'à
+  l'Attaque Est-Indienne : le moteur propose systématiquement 3.c4 (Gambit
+  Dame), on garde e3 et le système. Un système dont tout l'intérêt est de se
+  rejouer à l'identique ne survit pas à un basculement vers une ouverture
+  théorique.
+- **Écossaise** 0,94 → 0,50 (−47 %), positions 53 → 108. Le trou principal
+  était 4…Cxd4, l'échange le plus joué de toute l'Écossaise (deux Noirs sur
+  cinq), absent du cours. Deux nouveaux chapitres au passage : contre la
+  Petroff et contre la Philidor, que le répertoire ignorait.
+
+**Outil ajouté : `prepare_lot.py`.** Il enchaîne ce qui était fait à la main à
+chaque lot — lire le rapport, écarter les faux positifs, reconstruire le chemin
+par le graphe, demander la suite au moteur. Il ne rédige rien : les
+commentaires bilingues restent le seul vrai travail. Un lot passe de ~20
+commandes à deux.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il
