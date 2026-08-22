@@ -7471,6 +7471,23 @@ le gambit est objectivement douteux, plusieurs lignes finissent légèrement en
 faveur des Noirs, et un chapitre entier explique qu'un gambit refusé se joue
 comme une bonne Française plutôt que d'être forcé.
 
+### Lots 25-26 — Ponziani et Sicilienne dragon (22/08)
+
+- **Ponziani** 0,73 → 0,42 (−43 %), positions 40 → 95.
+- **Sicilienne dragon** 0,68 → 0,41 (−40 %), positions 115 → 170.
+
+Le dragon révèle le même angle mort que le Ponziani, et il vaut d'être nommé :
+**le cours ne prévoyait que 3.d4**, c'est-à-dire uniquement le cas où
+l'adversaire coopère. Or une partie sur cinq n'atteint jamais le dragon parce
+que les Blancs jouent une anti-sicilienne (Rossolimo, Fc4, Alapin), et le
+lecteur se retrouvait alors sans la moindre indication dans une position qu'il
+n'avait jamais vue. Un chapitre entier « si les Blancs n'ouvrent pas » a été
+ajouté.
+
+Même chose au Ponziani : sans …Cc6, c3 ne sert à rien, et le cours ne
+prévoyait QUE …Cc6. Un cours de système doit dire ce qu'on fait quand le
+système ne s'applique pas — sinon il n'enseigne que la moitié des parties.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il

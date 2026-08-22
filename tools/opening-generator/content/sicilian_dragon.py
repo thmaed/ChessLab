@@ -201,5 +201,86 @@ COURSE = {
                               "And there's the Dragon, with a spare tempo for us: White's bishop sits on c4 rather than e2, which invites …Rc8 and …Na5.")},
             ],
         },
+
+        # ── Trous comblés le 22/08 (coverage.py, dette 0,68). Répertoire NOIR :
+        # les trous sont des coups BLANCS, et l'essentiel d'entre eux sont des
+        # ANTI-SICILIENNES — les Blancs refusent d'ouvrir, et le dragon ne peut
+        # alors pas voir le jour. Le cours ne prévoyait que 3.d4. ─────────────
+        {
+            "chapter": {"id": "vs-anti", "title": c("Si les Blancs n'ouvrent pas", "If White does not open up")},
+            "moves": [
+                "e4", "c5", "Nf3", "Nc6",
+                {"san": "Bc4",
+                 "comment": c("Un Blanc sur cinq sort le fou au lieu de jouer d4 : il n'y aura pas de dragon. Le cours ne prévoyait que 3.d4 — or c'est une partie sur cinq qui n'y arrive jamais.",
+                              "One White player in five develops the bishop instead of playing d4: there will be no Dragon. The course only planned for 3.d4 — yet one game in five never gets there."),
+                 "critical": True},
+                {"san": "Nf6",
+                 "comment": c("On attaque e4 immédiatement. Sans le grand centre blanc, le fianchetto du dragon n'a plus d'objet : on joue la position, pas le nom de l'ouverture.",
+                              "We hit e4 at once. Without White's big centre, the Dragon fianchetto has no purpose: we play the position, not the name of the opening."),
+                 "critical": True},
+                "e5", "Ng4", "Qe2", "f6", "exf6", "Nxf6", "Nc3", "e6", "Nd5",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-anti", "title": c("Si les Blancs n'ouvrent pas", "If White does not open up")},
+            "moves": [
+                "e4", "c5", "Nf3", "Nc6",
+                {"san": "Bb5",
+                 "comment": c("Le Rossolimo : les Blancs échangent en c6 pour abîmer notre structure avant même que le dragon n'existe. Un Blanc sur huit, absent du cours.",
+                              "The Rossolimo: White trades on c6 to damage our structure before the Dragon even exists. One White player in eight, missing from the course."),
+                 "critical": True},
+                {"san": "e6",
+                 "comment": c("On renonce au fianchetto : avec un pion en e6, l'échange en c6 perd son intérêt et notre cavalier g8 ira en e7 sans gêner personne.",
+                              "We give up the fianchetto: with a pawn on e6 the exchange on c6 loses its point, and our g8 knight goes to e7 without getting in the way."),
+                 "critical": True},
+                "O-O", "Nge7", "d4", "cxd4", "Nxd4", "Ng6", "Be3", "Be7", "f4",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-anti", "title": c("Si les Blancs n'ouvrent pas", "If White does not open up")},
+            "moves": [
+                "e4", "c5", "Nf3", "Nc6",
+                {"san": "c3",
+                 "comment": c("L'Alapin par transposition : les Blancs préparent d4 sans jamais permettre …cxd4 suivi de Cxd4. Un Blanc sur dix, et le cours ne l'avait pas prévu.",
+                              "The Alapin by transposition: White prepares d4 without ever allowing …cxd4 and Nxd4. One White player in ten, and the course had not planned for it."),
+                 "critical": True},
+                {"san": "d5",
+                 "comment": c("La réponse de principe : on frappe au centre avant que le grand centre blanc n'existe. Contre l'Alapin, attendre est toujours une erreur.",
+                              "The principled answer: we strike in the centre before White's big centre exists. Against the Alapin, waiting is always a mistake."),
+                 "critical": True},
+                "exd5", "Qxd5", "d4", "Nf6", "dxc5", "Qxd1+", "Kxd1", "Bf5", "Be3",
+            ],
+        },
+        {
+            "chapter": {"id": "dragon-main", "title": c("Dragon — ligne principale", "Dragon — main line")},
+            "moves": [
+                "e4", "c5", "Nf3", "Nc6", "d4", "cxd4", "Nxd4", "g6",
+                {"san": "Nxc6",
+                 "comment": c("Un Blanc sur cinq échange tout de suite, et le cours ne prévoyait que Cc3 et c4. Ils abîment notre structure avant que le fou g7 ne prenne la diagonale.",
+                              "One White player in five trades at once, and the course only planned for Nc3 and c4. They damage our structure before the g7 bishop takes the diagonal."),
+                 "critical": True},
+                {"san": "bxc6",
+                 "comment": c("On reprend du pion b : la colonne b s'ouvre pour notre tour, et le pion c6 soutiendra …d5. Ce qui ressemble à une faiblesse est notre plan.",
+                              "We recapture with the b-pawn: the b-file opens for our rook and the c6 pawn will support …d5. What looks like a weakness is our plan."),
+                 "critical": True},
+                "Bc4", "Bg7", "O-O", "Qa5", "Re1", "d6", "Nd2", "Nf6", "h3",
+            ],
+        },
+        {
+            "chapter": {"id": "dragon-main", "title": c("Dragon — ligne principale", "Dragon — main line")},
+            "moves": [
+                "e4", "c5", "Nf3", "d6", "d4", "cxd4", "Nxd4", "Nf6", "Nc3", "g6",
+                {"san": "Bg5",
+                 "comment": c("Le fou en g5 plutôt qu'en e3 : les Blancs visent le clouage avant le grand roque. Un Blanc sur six, et le cours ne prévoyait que Fe3, Fe2 et f4.",
+                              "The bishop to g5 rather than e3: White goes for the pin before castling long. One White player in six, and the course only planned for Be3, Be2 and f4."),
+                 "critical": True},
+                "Bg7", "f3", "Nc6", "Nb3",
+                {"san": "h6",
+                 "comment": c("On chasse le fou tout de suite : tant qu'il est en g5, notre cavalier f6 — le défenseur du roque — reste cloué et l'attaque blanche arrive un temps plus tôt.",
+                              "We evict the bishop at once: while it sits on g5 our f6 knight — the defender of our castled king — stays pinned and White's attack arrives a tempo earlier."),
+                 "critical": True},
+                "Be3", "Be6", "Qd2", "Rc8", "O-O-O",
+            ],
+        },
     ],
 }
