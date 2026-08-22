@@ -7488,6 +7488,22 @@ Même chose au Ponziani : sans …Cc6, c3 ne sert à rien, et le cours ne
 prévoyait QUE …Cc6. Un cours de système doit dire ce qu'on fait quand le
 système ne s'applique pas — sinon il n'enseigne que la moitié des parties.
 
+### Lots 27-28 — Gambit Budapest et Française (22/08)
+
+- **Budapest** 0,66 → 0,28 (−57 %), positions 44 → 99.
+- **Française** 0,60 → 0,29 (−51 %), positions 129 → 178.
+
+Le plus gros trou de la Française était un **ordre de coups**, pas une
+variante : après 1.e4 e6 2.Cf3 d5, deux Blancs sur trois échangent en d5 — et
+le cours ne prévoyait que 3.e5. La variante d'échange par cet ordre n'existait
+tout simplement pas, alors qu'elle représente la majorité des parties par cette
+voie. Un rappel utile : les trous ne sont pas seulement des coups oubliés, ce
+sont aussi des chemins oubliés vers des positions par ailleurs connues.
+
+Le Budapest ajoute un chapitre du même genre que le dragon et le Ponziani :
+sans c4, il n'y a pas de gambit, et un répertoire de gambit doit dire ce qu'on
+joue quand le gambit n'est pas disponible.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il
