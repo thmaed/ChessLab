@@ -14,7 +14,7 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> **Ce texte couvre 1.2 → 1.5, pas seulement 1.5.** Ni la 1.3 ni la 1.4 n'ont été soumises : le dernier build envoyé à Apple est le build 3 de la 1.2 (commit `a211763`). Les utilisateurs passent donc directement de la 1.2 à la 1.5, et les nouveautés des 1.3 et 1.4 doivent leur être annoncées ici.
+> ✅ **La 1.5.0 (build 7) a été SOUMISE ET VALIDÉE par Apple le 20/08/2026.** Elle est en ligne. Ce texte couvrait 1.2 → 1.5 : ni la 1.3 ni la 1.4 n'avaient été soumises, le build précédent en ligne étant le build 3 de la 1.2 (commit `a211763`), si bien que les utilisateurs sont passés directement de la 1.2 à la 1.5. Conservé tel quel comme document de la soumission effectuée. **Point de départ de la prochaine version : 1.5.0 build 7, en ligne.**
 
 ### Français (2500 car. — limite 4 000)
 
@@ -250,7 +250,7 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 Vérifié dans `ChessLab.xcodeproj/project.pbxproj` (19/08/2026) : la cible applicative (`com.chesslab.ChessLab`) porte bien `MARKETING_VERSION = 1.5.0` et `CURRENT_PROJECT_VERSION = 7` **aux deux configurations**, Debug et Release.
 
-⚠️ **Ni la 1.3 ni la 1.4 n'ont été soumises.** Le dernier build envoyé à Apple reste le build 3 de la 1.2 (commit `a211763`). Le build 5 / 1.3.0 puis le build 6 / 1.4.0 ont été préparés puis dépassés par le rythme du développement ; on saute directement à la 1.5. Les nouveautés des 1.3 ET 1.4 sont donc annoncées dans le texte « Nouveautés » de la 1.5 — sans quoi personne ne les verrait jamais.
+✅ **1.5.0 build 7 : soumise et validée le 20/08/2026, en ligne.** Elle succède directement au build 3 de la 1.2 (commit `a211763`) : ni la 1.3 ni la 1.4 n'avaient été soumises. Le build 5 / 1.3.0 puis le build 6 / 1.4.0 ont été préparés puis dépassés par le rythme du développement ; on saute directement à la 1.5. Les nouveautés des 1.3 ET 1.4 sont donc annoncées dans le texte « Nouveautés » de la 1.5 — sans quoi personne ne les verrait jamais.
 
 Les cibles de TEST (`ChessLabTests`, `ChessLabUITests`) sont restées en `1.2.0` / build 3. **Sans effet sur la soumission** : leurs bundles ne sont pas livrés. À aligner un jour par propreté, pas avant d'expédier.
 

@@ -7427,3 +7427,21 @@ gabarits, garde-fous, confirmation obligatoire) existe déjà de bout en bout.
   cours, aucune bonne réponse — documenté dans l'aide.
 - Régénération automatique des cours par l'Explorer Lichess : jamais
   (décision du 16/08). L'Explorer est un informateur, pas un générateur.
+
+## 1.5.0 build 7 : soumise et VALIDÉE par Apple le 20/08/2026
+
+Elle est en ligne. Elle succède directement au build 3 de la 1.2 : ni la 1.3 ni
+la 1.4 n'avaient été soumises, si bien que les utilisateurs ont reçu d'un coup
+tout ce qui a été construit depuis le 9 août — module Ouvertures, répertoires
+personnels, module Finales, entraînement libre, filtres, report de mode.
+
+C'est aussi la fin d'un décalage qui s'était creusé : entre le 30 juillet
+(dernière soumission réelle) et le 20 août, trois versions avaient été
+préparées et documentées sans jamais partir. La documentation de soumission
+l'affirmait encore ce matin — corrigé dans `METADATA.md` et
+`RELEASE_NOTES-1.5.0.md`, qui disaient le contraire de la réalité et auraient
+fait repartir la prochaine version d'une base fausse.
+
+**Point de départ de la prochaine version : 1.5.0 build 7, en ligne.** Tout ce
+qui a été livré depuis (chantiers B, C.0 et les lots de contenu A) est du
+matériau pour la 1.6.

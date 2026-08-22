@@ -2,7 +2,7 @@
 
 Notes DÉTAILLÉES pour le dépôt. Le texte à coller dans App Store Connect est la section « Nouveautés de cette version » de `METADATA.md` (limite 4 000 caractères).
 
-> **Ces notes couvrent 1.2 → 1.5.** Ni la 1.3 ni la 1.4 n'ont été soumises : le dernier build envoyé à Apple reste le build 3 de la 1.2 (commit `a211763`). Un utilisateur passe donc directement de la 1.2 à la 1.5 — tout le contenu des 1.3 (échiquier tolérant au doigt, précision recalibrée, le « pourquoi » des erreurs…) et 1.4 (répertoires personnels, relecture moteur des 58 cours, un essai par puzzle, plateau ancré) est replié ici et dans le texte « Nouveautés » de `METADATA.md`. Détail : ce fichier plus `RELEASE_NOTES-1.4.0.md`, conservé comme document historique.
+> ✅ **VERSION EN LIGNE : soumise et validée par Apple le 20/08/2026.** Ces notes couvrent 1.2 → 1.5 : ni la 1.3 ni la 1.4 n'avaient été soumises, le build précédent étant le build 3 de la 1.2 (commit `a211763`). Un utilisateur passe donc directement de la 1.2 à la 1.5 — tout le contenu des 1.3 (échiquier tolérant au doigt, précision recalibrée, le « pourquoi » des erreurs…) et 1.4 (répertoires personnels, relecture moteur des 58 cours, un essai par puzzle, plateau ancré) est replié ici et dans le texte « Nouveautés » de `METADATA.md`. Détail : ce fichier plus `RELEASE_NOTES-1.4.0.md`, conservé comme document historique.
 
 ---
 
