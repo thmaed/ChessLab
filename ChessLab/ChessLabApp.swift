@@ -153,6 +153,18 @@ struct ChessLabApp: App {
         // 1) Tentative normale.
         if let container = try? ModelContainer(for: schema, configurations: configurations) {
             UserDefaults.standard.removeObject(forKey: Self.openFailureKey)
+            // Ménage, une fois les stores nommés ouverts avec succès — donc
+            // seulement quand on est SÛR que la séparation Games/Puzzles est
+            // bien celle en vigueur. Voir ``LocalStoreMaintenance`` : l'ancien
+            // store combiné pesait 58 Mo de doublons jamais rouverts, et les
+            // quarantaines jusqu'à 240 Mo invisibles pour l'utilisateur.
+            if let appSupport = try? FileManager.default.url(
+                for: .applicationSupportDirectory, in: .userDomainMask,
+                appropriateFor: nil, create: false
+            ) {
+                LocalStoreMaintenance.purgeOrphanedDefaultStore(in: appSupport)
+                LocalStoreMaintenance.pruneQuarantines(in: appSupport)
+            }
             return container
         }
         // 2) Store local illisible. Politique arbitrée le 18/08 (bug18aout §3),
@@ -201,40 +213,13 @@ struct ChessLabApp: App {
     /// plein) de la corruption réelle.
     static let openFailureKey = "container.openFailures"
 
-    /// Met les stores locaux en QUARANTAINE au lieu de les supprimer : un
-    /// dossier horodaté dans Application Support, récupérable au support.
-    /// Seules les deux quarantaines les plus récentes sont conservées.
+    /// Met les stores locaux en QUARANTAINE au lieu de les supprimer.
+    /// La mécanique — et ses limites de taille et d'âge — vit dans
+    /// ``LocalStoreMaintenance``, pour être testable hors de l'app.
     private static func quarantineLocalStore() {
-        let fileManager = FileManager.default
-        guard let appSupport = try? fileManager.url(
+        guard let appSupport = try? FileManager.default.url(
             for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: false
         ) else { return }
-
-        let stamp = ISO8601DateFormatter().string(from: Date())
-            .replacingOccurrences(of: ":", with: "-")
-        let quarantine = appSupport.appendingPathComponent("StoreQuarantine/\(stamp)", isDirectory: true)
-        try? fileManager.createDirectory(at: quarantine, withIntermediateDirectories: true)
-
-        for base in ["Games.store", "Puzzles.store", "default.store"] {
-            for suffix in ["", "-shm", "-wal"] {
-                let name = base + suffix
-                let source = appSupport.appendingPathComponent(name)
-                guard fileManager.fileExists(atPath: source.path) else { continue }
-                // Déplacement, jamais suppression ; si le déplacement échoue
-                // (même volume, donc improbable), on préfère laisser le
-                // fichier en place et échouer à recréer plutôt que détruire.
-                try? fileManager.moveItem(at: source, to: quarantine.appendingPathComponent(name))
-            }
-        }
-
-        // Rotation : deux quarantaines suffisent au diagnostic.
-        let root = appSupport.appendingPathComponent("StoreQuarantine", isDirectory: true)
-        if let entries = try? fileManager.contentsOfDirectory(
-            at: root, includingPropertiesForKeys: nil
-        ), entries.count > 2 {
-            for url in entries.sorted(by: { $0.lastPathComponent < $1.lastPathComponent }).dropLast(2) {
-                try? fileManager.removeItem(at: url)
-            }
-        }
+        LocalStoreMaintenance.quarantineStores(in: appSupport)
     }
 }

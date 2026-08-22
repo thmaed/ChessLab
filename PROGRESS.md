@@ -7653,3 +7653,60 @@ fait repartir la prochaine version d'une base fausse.
 **Point de départ de la prochaine version : 1.5.0 build 7, en ligne.** Tout ce
 qui a été livré depuis (chantiers B, C.0 et les lots de contenu A) est du
 matériau pour la 1.6.
+
+## Stockage sur appareil : 388 Mo signalés, 328 d'accumulation (22/08)
+
+**Le signalement.** Un utilisateur rapporte 388 Mo de « Documents et données ».
+
+**La mesure, sur conteneurs RÉELS et non par estimation.** Une installation
+NEUVE du build courant pèse **60 Mo** : `Puzzles.store` 57,4 (106 094 puzzles
+insérés depuis 17,9 Mo de JSON, facteur ×3,2) et `Games.store` 0,1. L'app se
+comporte donc correctement sur un téléphone neuf — les 328 Mo restants étaient
+de l'accumulation historique.
+
+**Piège de méthode, attrapé de justesse.** Ma première mesure installait un
+binaire du 21 JUILLET traîné dans DerivedData. Elle m'a fait « découvrir » que
+l'app actuelle créait un `default.store` au lieu des stores nommés — un faux
+bug alarmant, entièrement dû à mon propre outil de mesure. Le contrôle qui a
+sauvé le rapport : le store fraîchement créé contenait des entités disparues
+(`ZREPERTOIRE`) et PAS les champs ajoutés la veille. **Vérifier la date du
+binaire avant de conclure quoi que ce soit d'une mesure sur simulateur.**
+
+**Les deux gisements, et leur correction (`LocalStoreMaintenance`).**
+
+1. **`default.store` — 58 Mo de déchet pur.** L'ancien store unique d'avant la
+   séparation Games/Puzzles : 106 094 puzzles en DOUBLE et des entités mortes.
+   Le code ne l'ouvrait jamais ; le seul chemin qui le mentionnait était la
+   quarantaine, qui ne s'exécute qu'après deux échecs consécutifs. Désormais
+   supprimé au démarrage — mais SEULEMENT si un store nommé existe, garde-fou
+   contre une future refonte qui reviendrait à un store unique.
+2. **`StoreQuarantine` — jusqu'à 240 Mo invisibles.** Chaque quarantaine
+   archivait les trois stores (~120 Mo) et la rotation en gardait deux, sans
+   limite d'âge ni moyen pour l'utilisateur de les voir. Désormais : une seule,
+   périmée à 14 jours, et **`Puzzles.store` n'y est plus archivé mais
+   supprimé** — 57 Mo régénérables depuis le bundle n'ont jamais rien
+   diagnostiqué. `Games.store`, qui porte les données réelles, reste archivé
+   intégralement.
+
+**Un détail qui a compté.** L'expiration se fondait d'abord sur la date de
+modification du fichier. Le test de bout en bout l'a démasqué : une quarantaine
+injectée survivait, sa mtime étant celle du jour. Or c'est exactement le cas
+d'un téléphone RESTAURÉ depuis une vieille sauvegarde — tous les fichiers y
+portent une date récente. L'âge se lit maintenant dans le NOM du dossier, qui
+est un horodatage ISO 8601 écrit à la mise en quarantaine, avec repli sur la
+mtime si le nom est illisible.
+
+**Vérifié.** 11 tests unitaires sur dossier jetable (dont les cas de travers :
+refus de purger sans preuve de séparation, nom illisible, dossier absent), et
+une mesure de bout en bout sur l'app réelle : conteneur **175 Mo → 60 Mo** au
+premier lancement. 628 tests verts.
+
+**Non traité, documenté pour plus tard.** `solutionLANs: [String]?` est
+sérialisé en bplist NSKeyedArchiver : une solution de 19 caractères utiles
+occupe 262 octets, soit 26,6 Mo — près de la moitié de la table des puzzles.
+Le passer en chaîne unique rendrait ~25 Mo pour un changement de schéma
+additif. `AnalysisCache/` est dans Application Support et non dans Caches :
+iOS ne peut donc jamais le purger sous pression, et il part dans les
+sauvegardes. Et `OpeningReviewLog` est append-only dans le store SYNCHRONISÉ,
+sans aucun élagage — inoffensif en local, coûteux dans CloudKit où chaque ligne
+porte un enregistrement système de 0,5 à 2 Ko.
