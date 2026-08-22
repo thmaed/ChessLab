@@ -7406,6 +7406,21 @@ quand il ne sait pas quoi faire. Ce sont les positions où un répertoire aide l
 plus, et celles que les cours écrits « par la théorie » oublient le plus
 souvent — la théorie ne s'intéresse qu'aux meilleurs coups.
 
+### Lots 17-18 — Slave et Gambit Dame accepté (22/08)
+
+- **Slave** 0,84 → 0,51 (−39 %), positions 78 → 133.
+- **Gambit Dame accepté** 0,83 → 0,44 (−47 %), positions 66 → 114.
+
+Le plus gros trou de tout le chantier jusqu'ici, tous cours confondus, était
+dans le second : après 1.d4 d5 2.c4 e6 3.Cc3, **plus d'un Noir sur deux** joue
+…Cf6, et le cours ne prévoyait que le clouage …Fb4. Un développement
+parfaitement banal, majoritaire, purement absent.
+
+Ces deux cours partagent plusieurs positions (Slave, gambit refusé, gambit
+accepté se croisent), et trois trous étaient communs. Le graphe étant indexé
+par FEN, chaque cours doit néanmoins les couvrir pour son propre ordre de
+coups : le contenu se répète, la couverture non.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il
