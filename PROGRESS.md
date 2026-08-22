@@ -7454,6 +7454,23 @@ adversaires qui se trompent — or un joueur sur trois développe simplement par
 …Fc5, et le lecteur se retrouvait alors sans plan. Les deux branches ajoutées
 enseignent le jeu de manœuvre, qui est le cas majoritaire.
 
+### Lots 23-24 — Philidor et Blackmar-Diemer (22/08)
+
+- **Philidor** 0,74 → 0,52 (−30 %), positions 62 → 112.
+- **Blackmar-Diemer** 0,73 → 0,38 (−48 %), positions 67 → 122.
+
+Un fil conducteur a émergé en écrivant la Philidor et mérite d'être conservé :
+la Philidor est une défense de NÉCESSITÉ, pas de principe. Dès que les Blancs
+renoncent à d4 — ce qu'ils font une fois sur trois dans les trous comblés —,
+…c5 devient le bon coup et la position se retourne. Les trois branches
+concernées le disent avec les mêmes mots, ce qui fait du cours autre chose
+qu'une liste de variantes.
+
+Même honnêteté que pour le gambit du roi et l'éléphant côté Blackmar-Diemer :
+le gambit est objectivement douteux, plusieurs lignes finissent légèrement en
+faveur des Noirs, et un chapitre entier explique qu'un gambit refusé se joue
+comme une bonne Française plutôt que d'être forcé.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il

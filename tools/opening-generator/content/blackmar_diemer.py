@@ -122,5 +122,85 @@ COURSE = {
                               "Know it from both sides: with accurate play Black holds, and our attack must come fast or not at all.")},
             ],
         },
+
+        # ── Trous comblés le 22/08 (coverage.py, dette 0,73). Répertoire BLANC.
+        # Le gambit Blackmar-Diemer est objectivement douteux : plusieurs de ces
+        # lignes finissent légèrement en faveur des Noirs. C'est le pari du
+        # gambit, et le cours le dit. ────────────────────────────────────────
+        {
+            "chapter": {"id": "declined", "title": c("Gambit refusé — 2…e6", "Declined — 2…e6")},
+            "moves": [
+                "d4", "d5", "e4",
+                {"san": "e6",
+                 "comment": c("Le refus le plus fréquent — un joueur sur dix — et le cours ne prévoyait QUE la prise …dxe4. Ils transposent vers une Française, où notre gambit n'existe plus.",
+                              "The most common decline — one player in ten — and the course only planned for the capture …dxe4. They steer into a French, where our gambit no longer exists."),
+                 "critical": True},
+                {"san": "Nc3",
+                 "comment": c("On joue la Française, et il faut l'accepter : proposer un gambit, c'est aussi accepter qu'on le refuse. Mieux vaut une bonne Française qu'un gambit forcé.",
+                              "We play the French, and that has to be accepted: offering a gambit means accepting it can be declined. A good French beats a forced gambit."),
+                 "critical": True},
+                "Nf6", "Bg5", "h6", "Bxf6", "Qxf6", "a3", "Qd8", "Bd3", "g6",
+            ],
+        },
+        {
+            "chapter": {"id": "accepted-main", "title": c("Gambit accepté — ligne principale", "Accepted — main line")},
+            "moves": [
+                "d4", "d5", "e4", "dxe4", "Nc3", "Nf6", "f3", "exf3", "Nxf3",
+                {"san": "e6",
+                 "comment": c("Près de trois Noirs sur dix ferment la diagonale plutôt que de sortir un fou, et le cours ne prévoyait que …g6, …Ff5 et …Fg4. C'est la défense la plus solide contre le gambit.",
+                              "Nearly three Black players in ten shut the diagonal rather than develop a bishop, and the course only planned for …g6, …Bf5 and …Bg4. It is the soundest defence to the gambit."),
+                 "critical": True},
+                {"san": "Bd3",
+                 "comment": c("On développe vers le roque adverse. Le pion en moins ne se récupère pas : il achète du temps et des lignes ouvertes, il faut donc jouer vite et vers le roi.",
+                              "We develop towards Black's king. The missing pawn does not come back: it buys time and open lines, so play must be fast and aimed at the king."),
+                 "critical": True},
+                "Be7", "Be3", "Nc6", "a3", "O-O", "h3", "a6", "O-O", "b5",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-bf5", "title": c("Contre 3…Ff5", "vs 3…Bf5")},
+            "moves": [
+                "d4", "d5", "e4", "dxe4", "Nc3",
+                {"san": "Bf5",
+                 "comment": c("Les Noirs sortent le fou avant de rendre le pion. Un joueur sur huit, et le cours ne voyait que …Cf6.",
+                              "Black develops the bishop before returning the pawn. One player in eight, and the course only saw …Nf6."),
+                 "critical": True},
+                {"san": "g4",
+                 "comment": c("Le coup brutal, et le bon : on chasse le fou avant qu'il ne s'installe, et le pion g4 participera à l'attaque plutôt que de rester en arrière.",
+                              "The brutal move, and the right one: we evict the bishop before it settles, and the g4 pawn will join the attack rather than sit at home."),
+                 "critical": True},
+                "Bg6", "Nge2", "e5", "Be3", "Bb4", "a3", "Ba5", "Ng3", "Bxc3+",
+            ],
+        },
+        {
+            "chapter": {"id": "vs-f5", "title": c("Contre 3…f5 — le contre-gambit", "vs 3…f5 — the countergambit")},
+            "moves": [
+                "d4", "d5", "e4", "dxe4", "Nc3",
+                {"san": "f5",
+                 "comment": c("Le contre-gambit : les Noirs bétonnent e4 avec un pion plutôt que de le rendre. Un joueur sur huit, absent du cours — et c'est la ligne où l'improvisation coûte le plus cher.",
+                              "The countergambit: Black cements e4 with a pawn instead of returning it. One player in eight, missing from the course — and the line where improvising costs the most."),
+                 "critical": True},
+                {"san": "f3",
+                 "comment": c("On frappe quand même. Après les échanges, leur pion e4 devient un pion f isolé et leur roque est définitivement affaibli : c'est le prix de …f5.",
+                              "We strike anyway. After the exchanges their e4 pawn becomes an isolated f-pawn and their kingside is permanently loose: the price of …f5."),
+                 "critical": True},
+                "Nf6", "fxe4", "fxe4", "Nge2", "Bf5", "Bg5", "e6", "Ng3", "Be7",
+            ],
+        },
+        {
+            "chapter": {"id": "accepted-main", "title": c("Gambit accepté — ligne principale", "Accepted — main line")},
+            "moves": [
+                "d4", "d5", "e4", "dxe4", "Nc3", "Nf6", "f3", "exf3", "Nxf3", "Bg4", "h3",
+                {"san": "Bxf3",
+                 "comment": c("Près d'un Noir sur deux échange plutôt que de reculer en h5, et le cours ne prévoyait que …Fh5. Ils nous donnent la paire de fous pour retirer notre meilleur attaquant.",
+                              "Nearly one Black player in two trades rather than retreat to h5, and the course only planned for …Bh5. They hand us the bishop pair to remove our best attacker."),
+                 "critical": True},
+                {"san": "Qxf3",
+                 "comment": c("La dame arrive sur la colonne f, face à f7. L'échange leur a coûté leur meilleure pièce mineure ET nous a placé la dame là où elle voulait aller.",
+                              "The queen lands on the f-file, facing f7. The trade cost them their best minor piece AND put our queen exactly where she wanted to be."),
+                 "critical": True},
+                "c6", "g4", "e6", "g5", "Nd5", "Bd3", "Be7", "h4", "Na6",
+            ],
+        },
     ],
 }
