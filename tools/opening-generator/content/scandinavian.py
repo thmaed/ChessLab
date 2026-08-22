@@ -386,5 +386,92 @@ COURSE = {
                 "e6", "Bf4", "Bd6", "Ne5",
             ],
         },
+
+        # ── Seconde passe du 22/08 : cinq trous plus profonds, tous à des
+        # positions que le premier lot venait d'ouvrir. Chemins RECONSTRUITS
+        # depuis le graphe (`path_to_hole.py`) et non lus à l'œil : trois des
+        # cinq séquences déduites à la main étaient fausses, et une ligne
+        # calculée pour la mauvaise position passe l'audit sans rien combler. ──
+        {
+            "chapter": {"id": "nf6", "title": c("3…Cf6 — la Scandinave moderne", "3…Nf6 — the Modern Scandinavian")},
+            "moves": [
+                "e4", "d5", "exd5", "Nf6", "Nc3", "Nxd5", "Nxd5", "Qxd5",
+                {"san": "Nf3",
+                 "comment": c("Une fois sur deux les Blancs développent avant de pousser d4 — le premier lot n'avait prévu que d4. La dame noire n'est pas chassée, on peut donc l'employer.",
+                              "Half the time White develops before pushing d4 — the first batch only planned for d4. Black's queen is not being chased, so we can put her to work."),
+                 "critical": True},
+                {"san": "Nc6",
+                 "comment": c("On développe en visant d4 : chaque pièce noire doit gêner cette poussée, sinon les Blancs prennent le centre gratuitement.",
+                              "We develop while eyeing d4: every black piece should hinder that push, otherwise White takes the centre for free.")},
+                "d4", "Bg4", "c4",
+                {"san": "Qf5",
+                 "comment": c("La dame trouve sa case : hors de portée des coups de tempo, et elle garde le clouage en g4 sous protection.",
+                              "The queen finds her square: out of reach of tempo moves, and she keeps the g4 pin protected."),
+                 "critical": True},
+                "Be2", "O-O-O", "Be3", "e6",
+            ],
+        },
+        {
+            "chapter": {"id": "qd8", "title": c("3…Dd8 — la retraite discrète", "3…Qd8 — the quiet retreat")},
+            "moves": [
+                "e4", "d5", "exd5", "Qxd5", "Nc3",
+                {"san": "Qd8",
+                 "comment": c("La retraite la plus modeste, et la plus solide : la dame rentre chez elle, les Blancs n'ont plus une seule cible et devront construire leur avantage à la main.",
+                              "The most modest retreat, and the soundest: the queen goes home, White has no target left and must build any advantage by hand."),
+                 "critical": True},
+                {"san": "Bc4",
+                 "comment": c("Le fou sort avant le cavalier : les Blancs visent f7 et gardent Cf3 ou d4 en réserve. Le cours ne connaissait que ces deux-là.",
+                              "The bishop before the knight: White eyes f7 and keeps Nf3 or d4 in reserve. The course only knew those two."),
+                 "critical": True},
+                {"san": "c5",
+                 "comment": c("On ne se laisse pas installer : puisque les Blancs ont retardé d4, on prend la case avant eux.",
+                              "We refuse to be squeezed: since White has delayed d4, we take the square first.")},
+                "Nf3", "Nc6", "Qe2", "e6", "O-O", "Be7", "d4", "cxd4", "Rd1",
+            ],
+        },
+        {
+            "chapter": {"id": "qd8", "title": c("3…Dd8 — la retraite discrète", "3…Qd8 — the quiet retreat")},
+            "moves": [
+                "e4", "d5", "exd5", "Qxd5", "Nc3", "Qd8", "Nf3", "Bf5",
+                {"san": "Bc4",
+                 "comment": c("Les Blancs pressent f7 pendant que notre fou est sorti de l'autre côté. C'est le moment délicat de cette ligne.",
+                              "White presses f7 while our bishop is out on the other side. This is the awkward moment of the line."),
+                 "critical": True},
+                {"san": "e6",
+                 "comment": c("On ferme la diagonale et on libère le fou roi. L'ordre compte : …e6 APRÈS avoir sorti le fou dame, jamais avant — c'est la règle de toute la Scandinave.",
+                              "We close the diagonal and free the king's bishop. The order matters: …e6 AFTER the queen's bishop is out, never before — the rule of the whole Scandinavian."),
+                 "critical": True},
+                "d4", "c6", "h3", "Nd7", "O-O", "Bd6", "Bg5", "Ngf6",
+            ],
+        },
+        {
+            "chapter": {"id": "mainline", "title": c("Ligne principale — 3…Da5", "Main line — 3…Qa5")},
+            "moves": [
+                "e4", "d5", "exd5", "Qxd5", "Nc3", "Qa5", "d4", "Nf6",
+                {"san": "Bd2",
+                 "comment": c("Le coup le plus joué ici — près d'une fois sur deux — et le cours n'avait que Cf3. Les Blancs préparent Cd5 en dégageant la case, tout en menaçant de gagner un temps sur notre dame.",
+                              "The most played move here — nearly half the time — and the course only had Nf3. White prepares Nd5 by clearing the square, while threatening to gain a tempo on our queen."),
+                 "critical": True},
+                {"san": "Bg4",
+                 "comment": c("On sort le fou avec une menace plutôt que de reculer la dame : le clouage sur f3 gêne d4 et gagne le temps que les Blancs voulaient nous prendre.",
+                              "We develop the bishop with a threat instead of retreating the queen: the pin on f3 hampers d4 and wins back the tempo White wanted from us."),
+                 "critical": True},
+                "f3", "Bd7", "f4", "a6", "Nf3", "Qb6", "Ne5", "e6",
+            ],
+        },
+        {
+            "chapter": {"id": "mainline", "title": c("Ligne principale — 3…Da5", "Main line — 3…Qa5")},
+            "moves": [
+                "e4", "d5", "exd5", "Qxd5", "Nc3", "Qe5+",
+                {"san": "Nge2",
+                 "comment": c("Le cavalier bloque l'échec par la case e2 plutôt que par le fou. Le cours prévoyait Fe2 et De2 ; celui-ci manquait.",
+                              "The knight blocks the check on e2 rather than the bishop. The course planned for Be2 and Qe2; this one was missing."),
+                 "critical": True},
+                {"san": "Nf6",
+                 "comment": c("On développe sans se soucier de la dame : elle reculera d'elle-même en a5 quand les Blancs la chasseront, et ce sera un coup utile.",
+                              "We develop without fussing over the queen: she will drop back to a5 when White chases her, and that will be a useful move.")},
+                "d4", "Qa5", "Nf4", "e6", "a3", "Be7", "Bc4", "O-O", "O-O",
+            ],
+        },
     ],
 }

@@ -7196,6 +7196,26 @@ concret. Contrairement au lot 4, ce n'est PAS une sortie de système : c'est
 l'idée maîtresse de la Jobava, et le cours couvrait déjà …a6, précisément le
 coup qui l'empêche. Retenu sans réserve.
 
+### Lot 6 — Scandinave, seconde passe (22/08)
+
+Cinq trous plus profonds, tous à des positions que le premier lot venait
+d'ouvrir : 5.Cf3 dans la ligne 3…Cf6, 4.Fc4 et 5.Fc4 contre la retraite 3…Dd8
+(nouveau chapitre), 5.Fd2 dans la ligne 3…Da5, et 4.Cge2 contre 3…De5+.
+Dette **1,35 → 0,95** (−30 %), positions 138 → 190. Sur la session complète, la
+Scandinave passe de 1,70 à 0,95.
+
+**Piège de méthode, attrapé de justesse.** J'ai d'abord déduit les séquences de
+coups en LISANT les FEN à l'œil : **trois sur cinq étaient fausses**. J'aurais
+calculé des lignes pour des positions qui n'étaient pas les trous — et rien ne
+l'aurait signalé, puisque ces lignes étaient parfaitement saines : `audit.py`
+aurait donné son feu vert, la dette n'aurait pas bougé, et le trou serait resté
+béant. Une erreur silencieuse, donc, du pire genre.
+
+Correction outillée plutôt que promise : `path_to_hole.py` reconstruit le chemin
+EXACT depuis la racine du cours par parcours en largeur du graphe. Le graphe
+connaît le chemin, autant le lui demander. **À utiliser systématiquement** pour
+tout trou dont la position n'est pas au tout début d'une ligne.
+
 **Assumé.** Le nouveau rapport post-lot ne trouve que 18 positions en cache
 (les positions nouvellement écrites n'y sont pas) : la dette résiduelle de 0,93
 est elle aussi un plancher. Une mesure complète demandera un jeton Lichess
