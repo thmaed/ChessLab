@@ -7392,6 +7392,20 @@ plus. Choix retenu : une **porte d'entrée** — quelques coups vers le Sveshnik
 — avec un commentaire qui dit explicitement que ce n'est pas un traitement. Le
 lecteur n'est pas abandonné, et rien ne lui est promis qui ne soit tenu.
 
+### Lots 15-16 — Ouverture du fou et Quatre Cavaliers (22/08)
+
+- **Ouverture du fou** 0,87 → 0,52 (−40 %), positions 60 → 115, dont le gambit
+  Urusov et une ligne tranquille en 4.d3.
+- **Quatre Cavaliers** 0,86 → 0,53 (−39 %), positions 64 → 119, avec les
+  versions espagnole et écossaise, et un chapitre contre la Petroff.
+
+Un motif revient dans ces deux lots et mérite d'être noté : le trou le plus
+fréquent est souvent un **coup d'attente** (…h6) ou une **simplification
+prématurée** (…Cxd4), c'est-à-dire précisément ce qu'un joueur de club joue
+quand il ne sait pas quoi faire. Ce sont les positions où un répertoire aide le
+plus, et celles que les cours écrits « par la théorie » oublient le plus
+souvent — la théorie ne s'intéresse qu'aux meilleurs coups.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il
