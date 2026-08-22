@@ -7441,6 +7441,19 @@ Enseigner une ouverture douteuse est légitime ; la présenter comme correcte ne
 l'est pas. `audit.py` vérifie qu'aucun coup n'est une gaffe, il n'a jamais
 prétendu que les lignes étaient bonnes.
 
+### Lots 21-22 — Gambit Dame refusé et Viennoise (22/08)
+
+- **Gambit Dame refusé** 0,79 → 0,48 (−39 %), positions 78 → 133, dont
+  l'attaque de minorité expliquée dans la variante d'échange.
+- **Viennoise** 0,78 → 0,39 (−49 %), positions 60 → 115.
+
+La Viennoise illustre un défaut de conception fréquent dans ces cours : après
+3.Fc4, le répertoire ne couvrait QUE …Cxe4, c'est-à-dire le piège. Un cours
+d'ouverture bâti autour de son piège n'apprend à jouer que contre les
+adversaires qui se trompent — or un joueur sur trois développe simplement par
+…Fc5, et le lecteur se retrouvait alors sans plan. Les deux branches ajoutées
+enseignent le jeu de manœuvre, qui est le cas majoritaire.
+
 ## Backlog vivant, repris de `plan-2008.md` avant sa suppression (22/08)
 
 Le plan d'évolution a été supprimé sur demande. Ce qui suit est ce qu'il
