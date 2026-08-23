@@ -7,6 +7,14 @@ import SwiftUI
 struct EvalBarView: View {
     let evalCp: Int?
     let evalMate: Int?
+    /// Épaisseur de la barre. 20 pt par défaut — la valeur historique, celle
+    /// des modes Jouer et Analyser où la barre est un élément à part entière.
+    /// Le lecteur Labs la veut FINE (le prompt) : elle y accompagne
+    /// l'échiquier au lieu de lui disputer la place.
+    var height: CGFloat = 20
+    /// Score écrit DANS la barre. À masquer sous ~14 pt : le chiffre n'y tient
+    /// plus, et l'écran hôte l'affiche alors à côté (voir ``OpeningLabsView``).
+    var showsLabel: Bool = true
 
     private enum Advantage { case white, black, equal }
 
@@ -29,7 +37,7 @@ struct EvalBarView: View {
                     .frame(width: 1)
                     .frame(maxWidth: .infinity, alignment: .center)
 
-                if let label {
+                if showsLabel, let label {
                     Text(label)
                         .font(.caption2.monospacedDigit().weight(.bold))
                         .foregroundStyle(advantage == .white ? Color.black : Color.white)
@@ -38,10 +46,12 @@ struct EvalBarView: View {
                 }
             }
         }
-        .frame(height: 20)
+        .frame(height: height)
         .clipShape(Capsule())
-        .overlay(Capsule().strokeBorder(Color.gray.opacity(0.55), lineWidth: 1.5))
-        .shadow(color: .black.opacity(0.25), radius: 4, y: 2)
+        // Liseré et ombre proportionnés : à 8 pt, un contour de 1,5 pt mange
+        // près de la moitié de la barre et la rend grise.
+        .overlay(Capsule().strokeBorder(Color.gray.opacity(0.55), lineWidth: height >= 14 ? 1.5 : 1))
+        .shadow(color: .black.opacity(0.25), radius: height >= 14 ? 4 : 2, y: height >= 14 ? 2 : 1)
         .accessibilityElement()
         .accessibilityLabel("Évaluation")
         .accessibilityValue(accessibilityValue)

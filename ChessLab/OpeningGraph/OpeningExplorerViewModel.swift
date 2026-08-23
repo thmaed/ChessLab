@@ -99,7 +99,13 @@ final class OpeningExplorerViewModel {
 
     /// Rejoue un coup UCI sur une COPIE du plateau (gère la promotion, défaut
     /// dame), même mécanique que le trainer linéaire.
-    static func apply(uci: String, to board: Board) -> (board: Board, move: Move)? {
+    ///
+    /// `nonisolated` : calcul PUR sur une copie du plateau, qui ne touche
+    /// aucun état de la classe. L'isolation `@MainActor` du view model n'avait
+    /// pas de raison de s'y appliquer, et elle empêchait de s'en servir depuis
+    /// du code non isolé (``OpeningMoveQuality``, qui juge les coups de l'index
+    /// hors de toute vue).
+    nonisolated static func apply(uci: String, to board: Board) -> (board: Board, move: Move)? {
         guard uci.count >= 4 else { return nil }
         let start = Square(String(uci.prefix(2)))
         let end = Square(String(uci.dropFirst(2).prefix(2)))

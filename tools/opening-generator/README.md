@@ -33,6 +33,46 @@ python3 author.py                       # (ré)écrit les 58 cours embarqués
 python3 author.py --only scandinavian
 ```
 
+## Une TROISIÈME chaîne : `labs.py`, la donnée du module « Ouvertures — Labs »
+
+`labs.py` ne touche pas aux cours. Il écrit **à côté** d'eux, dans
+`ChessLab/Resources/openings_labs/<id>.labs.json`, ce que le module Labs
+affiche pour chaque position :
+
+- les coups les plus joués par les **maîtres** (Lichess Opening Explorer,
+  base `masters`), avec parties, bilan et Elo moyen — les pourcentages, eux,
+  se calculent à l'affichage ;
+- les **trois meilleurs coups de Stockfish**, MultiPV 3 à profondeur fixe.
+
+Pourquoi à côté et non dedans : les cours sont la donnée d'un module en
+production, Labs est un aperçu ; et Labs veut TOUS les coups de maîtres de la
+position, là où `MoveEdge.gamesMasters` ne décrit que les arêtes curées du
+graphe. Ce ne sont pas les mêmes données. Détail complet dans
+`ChessLab/OpeningLabs/OpeningLabsData.swift`.
+
+```bash
+export LICHESS_TOKEN=lip_xxxx           # sinon : mode CACHE SEUL
+python3 labs.py --engine bin/stockfish --depth 20 --workers 4
+
+python3 labs.py --masters-only          # rattrape les maîtres, sans moteur
+python3 labs.py --engine-only           # moteur seul
+```
+
+Les deux passes sont **intégralement mises en cache sur disque** — le cache
+Explorer est partagé avec `generate.py`, celui du moteur est propre à `labs.py`
+(`.cache/labs_engine/`, indexé par FEN + profondeur + MultiPV). Relancer ne
+recalcule rien : c'est le mécanisme de reprise après interruption, et c'est ce
+qui rend `--masters-only` puis `--engine-only` sans danger.
+
+Ordres de grandeur mesurés (M2, 4 travailleurs, 4 980 positions distinctes
+pour les 58 ouvertures) : **~65 min** pour la passe moteur à profondeur 20,
+**~1 s par position** pour la passe maîtres (le délai poli entre requêtes
+Lichess domine, pas le réseau).
+
+Sans jeton, la passe maîtres n'échoue pas : elle lit le cache et laisse les
+positions absentes sans bloc `masters`. L'app le dit à l'écran au lieu
+d'inventer un chiffre.
+
 ## L'audit moteur est OBLIGATOIRE après toute modification de contenu
 
 `validate.py` ne contrôle que l'intégrité du graphe : un coup peut être

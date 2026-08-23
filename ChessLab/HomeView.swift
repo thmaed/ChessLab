@@ -31,6 +31,10 @@ struct HomeView: View {
     @State private var menuCommands = MenuCommands.shared
 
     @State private var seedingState = PuzzleSeedingState.shared
+    /// Observé pour l'aperçu Labs : basculer l'interrupteur des réglages doit
+    /// faire apparaître (ou disparaître) la tuile et l'entrée de barre
+    /// latérale immédiatement, sans relancer l'app.
+    @State private var appSettings = AppSettings.shared
     /// Santé de la persistance — la bannière « rien ne s'enregistre » en vit.
     @State private var persistenceHealth = PersistenceHealth.shared
 
@@ -85,6 +89,10 @@ struct HomeView: View {
         case openingReader(String)
         /// Éditeur d'arbre — répertoires PERSONNELS seulement (`user-…`).
         case openingEditor(String)
+        /// Module « Ouvertures — Labs » (aperçu, réglage ``AppSettings/openingsLabsEnabled``) :
+        /// choix de l'ouverture, puis lecteur avec index des lignes.
+        case labsOpeningList
+        case labsReader(String)
         case openingTrainDaily
         case openingTrainLine(String)
         /// Réglages Labo, éventuellement pré-remplis avec une position de
@@ -103,6 +111,7 @@ struct HomeView: View {
     /// détail sur l'écran d'entrée du mode correspondant (voir ``detailRoot``).
     enum SidebarItem: Hashable {
         case vsEngine, twoPlayer, puzzles, openings, endgames, analysis, laboratory
+        case openingsLabs
         case progression, settings, help
     }
 
@@ -334,6 +343,12 @@ struct HomeView: View {
                 sidebarLabel(.twoPlayer, "Deux joueurs", "person.2.fill", Theme.info)
                 sidebarLabel(.puzzles, "Puzzles", "puzzlepiece.fill", Theme.violet)
                 sidebarLabel(.openings, "Ouvertures", "books.vertical.fill", Theme.warning)
+                if showsOpeningsLabs {
+                    sidebarLabel(
+                        .openingsLabs, "Ouvertures — Labs", "chart.bar.doc.horizontal", Theme.teal,
+                        accessibilityID: "sidebar_openingsLabs"
+                    )
+                }
                 sidebarLabel(.endgames, "Finales", "crown.fill", Theme.gold)
                 sidebarLabel(.analysis, "Analyser", "chart.xyaxis.line", Theme.teal)
                 sidebarLabel(.laboratory, "Laboratoire", "flask", Theme.rose)
@@ -355,7 +370,8 @@ struct HomeView: View {
     }
 
     private func sidebarLabel(
-        _ item: SidebarItem, _ title: LocalizedStringKey, _ icon: String, _ tint: Color
+        _ item: SidebarItem, _ title: LocalizedStringKey, _ icon: String, _ tint: Color,
+        accessibilityID: String? = nil
     ) -> some View {
         Label {
             Text(title)
@@ -363,6 +379,10 @@ struct HomeView: View {
             Image(systemName: icon).foregroundStyle(tint)
         }
         .tag(item)
+        // Identifiant facultatif : les tests d'interface iPad n'ont pas de
+        // tuile à viser (la grille laisse place à la barre latérale) et un
+        // repérage par LIBELLÉ casserait au premier changement de langue.
+        .accessibilityIdentifier(accessibilityID ?? "")
     }
 
     /// Racine de la colonne de détail selon la sélection — réutilise le mapping
@@ -375,6 +395,11 @@ struct HomeView: View {
         case .twoPlayer: destination(for: .twoPlayerSetup)
         case .puzzles: destination(for: .puzzleQueue)
         case .openings: destination(for: .repertoireList)
+        // Aperçu éteint alors qu'il était sélectionné : on retombe sur le
+        // tableau de bord, sinon la colonne garderait un écran auquel plus
+        // aucune entrée de barre latérale ne mène.
+        case .openingsLabs where showsOpeningsLabs: destination(for: .labsOpeningList)
+        case .openingsLabs: iPadDashboard
         case .endgames: destination(for: .endgameList)
         case .analysis: destination(for: .analysisEntry)
         case .laboratory: destination(for: .labSetup(startFEN: nil))
@@ -612,6 +637,31 @@ struct HomeView: View {
                         path.removeLast()
                     }
 
+                case .labsOpeningList:
+                    OpeningLabsListView { courseID in
+                        path.append(Route.labsReader(courseID))
+                    } onOpenLab: {
+                        path.append(Route.labSetup(startFEN: nil))
+                    } onPlayVsEngine: {
+                        path.append(Route.newGame)
+                    } onOpenTwoPlayer: {
+                        path.append(Route.twoPlayerSetup)
+                    }
+
+                case let .labsReader(courseID):
+                    // Labs LIT ; l'entraînement reste celui du module en
+                    // production — un seul moteur de répétition espacée, une
+                    // seule progression (indexée par FEN normalisée).
+                    OpeningLabsHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
+                        path.removeLast()
+                    } onContinueVsStockfish: { fen in
+                        path.append(Route.continueVsStockfish(fen))
+                    } onOpenLab: { fen in
+                        path.append(Route.labSetup(startFEN: fen))
+                    } onOpenTwoPlayer: { fen in
+                        path.append(Route.continueTwoPlayer(fen))
+                    }
+
                 case let .openingEditor(courseID):
                     OpeningEditorHost(courseID: courseID) {
                         path.removeLast()
@@ -703,6 +753,12 @@ struct HomeView: View {
     /// analyses de PGN différents ont des routes différentes, donc des
     /// sessions distinctes. Une seule fonction pour les douze hôtes, plutôt
     /// qu'une dérivation par type de charge utile.
+    /// L'aperçu « Ouvertures — Labs » est-il visible ? L'interrupteur des
+    /// réglages ET la présence effective de cours — voir ``OpeningLabsFeature``.
+    private var showsOpeningsLabs: Bool {
+        appSettings.openingsLabsEnabled && OpeningLabsFeature.hasCourses
+    }
+
     private func sessionKey(for route: Route) -> String {
         String(describing: route)
     }
@@ -774,7 +830,7 @@ struct HomeView: View {
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 if let resumableGame { resumeBanner(resumableGame) }
-                modesSection(minTile: 160)
+                modesSection(minTile: ModeGridMetrics.minTileIPhone)
                 if !recentGames.isEmpty { recentGamesSection }
             }
             .padding(20)
@@ -783,12 +839,16 @@ struct HomeView: View {
 
     // MARK: Grille des modes
 
-    /// `minTile` : largeur mini d'une tuile — 160 en pleine largeur (iPhone),
-    /// 200 dans la colonne gauche plus étroite de l'iPad.
+    /// `minTile` : largeur mini d'une tuile, qui décide du nombre de colonnes
+    /// — voir ``ModeGridMetrics/minTileIPhone`` pour le choix de la valeur et
+    /// ce qu'elle garantit sur un écran de 320 pt.
     private func modesSection(minTile: CGFloat) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Modes")
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: minTile), spacing: 14)], spacing: 14) {
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: minTile), spacing: ModeGridMetrics.spacing)],
+                spacing: ModeGridMetrics.spacing
+            ) {
                 ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Force, cadence, aides", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
                     path.append(Route.newGame)
                 }
@@ -800,6 +860,15 @@ struct HomeView: View {
                 }
                 ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings") {
                     path.append(Route.repertoireList)
+                }
+                // Aperçu OPT-IN : la tuile n'existe que si l'interrupteur des
+                // réglages est allumé (``OpeningLabsFeature``). Elle s'insère
+                // juste après « Ouvertures » — c'est la même matière, lue
+                // autrement, pas un mode de plus au bout de la grille.
+                if showsOpeningsLabs {
+                    ModeCard(title: "Ouvertures — Labs", shortTitle: "Labs", subtitle: "Index des lignes, maîtres, Stockfish", shortSubtitle: "Lignes et maîtres", systemImage: "chart.bar.doc.horizontal", tint: Theme.teal, isEnabled: true, accessibilityID: "mode_openingsLabs") {
+                        path.append(Route.labsOpeningList)
+                    }
                 }
                 ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", shortSubtitle: "Techniques prouvées", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames") {
                     path.append(Route.endgameList)
@@ -1445,7 +1514,50 @@ private struct LabHost: View {
     }
 }
 
-private struct ModeCard: View {
+/// Géométrie de la grille des modes : une largeur mini de tuile décide du
+/// nombre de colonnes, donc de toute la physionomie de l'accueil.
+///
+/// Elle vit ici, hors de la vue, parce qu'un test doit pouvoir la vérifier aux
+/// largeurs que les simulateurs ne savent pas produire — même parti pris que
+/// ``BoardGeometry`` et ``PlayControlBar``.
+enum ModeGridMetrics {
+    /// Marge du contenu de l'accueil.
+    static let contentPadding: CGFloat = 20
+    /// Gouttière entre deux tuiles.
+    static let spacing: CGFloat = 14
+    /// L'écran le plus étroit à supporter : **iPhone 11 Pro en Zoom
+    /// d'affichage**, soit 320 × 693 pt pour un panneau de 1125 × 2436
+    /// (relevé sur l'appareil : `xcrun devicectl device info displays`).
+    static let narrowestScreen: CGFloat = 320
+
+    /// Largeur mini d'une tuile iPhone.
+    ///
+    /// **160 auparavant** : deux colonnes tenaient à 375 pt — 2 × 160 + 14 =
+    /// 334 pour 335 utiles, un point de marge — mais pas à 320, où l'accueil
+    /// tombait à UNE colonne et empilait les sept modes. À 132, deux colonnes
+    /// tiennent dès 316 pt d'écran.
+    ///
+    /// Rien ne change au-dessus : la grille adaptative n'ouvrirait une
+    /// troisième colonne qu'à partir de 3 × 132 + 2 × 14 = 424 pt utiles,
+    /// hors d'atteinte d'un iPhone en portrait (l'iPhone est verrouillé en
+    /// portrait depuis le Lot 2).
+    static let minTileIPhone: CGFloat = 132
+
+    /// Place utile pour les tuiles sur un écran de largeur `screen`.
+    static func usableWidth(screen: CGFloat) -> CGFloat {
+        screen - 2 * contentPadding
+    }
+
+    /// Vrai si `count` colonnes de `tile` points tiennent sur cet écran.
+    static func fits(columns count: Int, tile: CGFloat, screen: CGFloat) -> Bool {
+        CGFloat(count) * tile + CGFloat(count - 1) * spacing <= usableWidth(screen: screen)
+    }
+}
+
+/// Interne et non privée : les tests de mise en page en rendent une à la
+/// largeur d'un écran zoomé (320 pt), largeur qu'aucun simulateur iOS 26 ne
+/// sait produire — voir ``ModeGridMetrics`` et `HomeGridLayoutTests`.
+struct ModeCard: View {
     let title: LocalizedStringKey
     /// Variante COURTE du titre, pour les tuiles iPhone (2 colonnes,
     /// ~160 pt) — `nil` quand le titre tient déjà (un seul mot). Sur iPad,

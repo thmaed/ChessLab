@@ -7654,6 +7654,451 @@ fait repartir la prochaine version d'une base fausse.
 qui a été livré depuis (chantiers B, C.0 et les lots de contenu A) est du
 matériau pour la 1.6.
 
+## Le plateau qui débordait de l'écran : c'était la barre de contrôle (22/08)
+
+**Le signalement.** Nils envoie une capture ENTIÈRE — barre d'état, titre,
+barre du bas — où le plateau sort de l'écran d'une demi-colonne de chaque
+côté. iPhone 11 Pro, iOS 26.5.
+
+**Le faux coupable, et ce qui l'a démasqué.** Le plateau n'y est pour rien :
+sur la même capture, la pastille de « Ordinateur » est coupée à gauche, celle
+de « Vous » aussi, et dans la barre du bas le chevron gauche ET le drapeau
+sont rognés. **Tout est coupé symétriquement** — signature d'un conteneur plus
+large que l'écran, centré, et non d'un plateau mal dimensionné.
+
+**Le mécanisme.** `HStack(spacing: 10)` réserve ses écarts quoi qu'il arrive.
+La rangée de contrôle de `PlayView` porte six boutons de 46 pt figés et six
+écarts de 10 : **336 pt incompressibles**, mesurés à la décimale (voir plus
+bas), soit **360 pt avec la marge du conteneur**. En dessous, la pile devient
+plus large que l'écran et centre tous ses enfants à cheval sur les bords. Le
+plateau, qui reprend la largeur de la pile et y ajoute ses 24 pt de bord à
+bord, est simplement le plus visible des débordements.
+
+**La largeur de Nils : 320 pt.** L'iPhone 11 Pro fait 375×812 pt en natif,
+mais **320×693 en Zoom d'affichage**. 320 < 360 : débordement de 40 pt, 20 de
+chaque côté — soit une case de 45 pt, ce qui recoupe la géométrie mesurée sur
+sa capture.
+
+**Pourquoi personne ne l'avait vu.** C'était écrit ici même, au Lot 3 du
+13/08 : « Display Zoom (320 pt) : toujours pas reproductible par argument de
+lancement, donc jamais mesuré », et « Vérifié — mesuré sur iPhone SE
+(375 pt) ». `LayoutOverflowUITests.testNoOverflowOnPlayScreen` couvre pourtant
+le bon écran : il n'a jamais tourné sous 375 pt. Aucun simulateur iOS 26 ne
+descend à 320 — l'iPhone SE 1re génération, seul appareil de cette largeur,
+est refusé par le runtime 26.5 (vérifié).
+
+**Et la note du 15/08 était fausse.** « Les trois captures "plateau coupé sur
+les bords" du testeur sont des recadrages […] Rien à corriger » : le
+raisonnement — le plateau est volontairement bord à bord, donc exactement
+large comme l'écran — n'était juste qu'à 375 pt. Le testeur signalait déjà
+ceci.
+
+**La correction.** La rangée sort de `PlayView` dans un type mesurable,
+`PlayControlBar` — même parti pris que `BoardGeometry` : la géométrie qui pose
+problème vit dans un type qu'un test peut instancier. L'espacement fixe cède
+la place à un **écart élastique** (`Spacer(minLength: 0).frame(maxWidth: 10)`),
+qui est un plafond et non un plancher : 10 pt tant qu'il y a la place, 0 quand
+elle manque. Les boutons gardent leurs 46 pt — la cible tactile ne se négocie
+pas, c'est l'écart qui cède. La pastille « Reprendre ici », seul élément dont
+la largeur dépend d'un texte traduit, reçoit `minimumScaleFactor(0.7)`.
+
+**Mesuré, avant et après** (`PlayControlBarLayoutTests`, hors interface : on
+héberge la vraie vue et on lui propose les largeurs qu'aucun simulateur ne
+sait produire) :
+
+| | Avant | Après |
+|---|---|---|
+| Rangée, largeur incompressible | 336,0 pt | **276,0 pt** |
+| Écran minimal supporté | 360 pt | **300 pt** |
+| Écran *Jouer* entier proposé à 320 pt | réclame 440,0 pt | **tient** |
+| Rendu à 375 pt | — | inchangé (`BOARD-RATIO 1.000`, capture vérifiée) |
+
+**Ce que le test épingle en plus** : la largeur incompressible est désormais
+« les six boutons, et rien d'autre ». Le jour où un septième bouton arrive,
+`testIncompressibleWidthIsTheButtonsAlone` échoue — le message dit qu'il faut
+en retirer un, pas rétrécir la cible tactile.
+
+**Portée, mesurée et non supposée.** *Deux joueurs* passe à 320 pt (ses
+capsules à texte se compriment) — même harnais, test dédié. Les barres
+d'*Analyser* portent déjà un `ViewThatFits` depuis le Lot 3.2.
+
+**Vérifié.** `PlayControlBarLayoutTests` : 6 tests verts, et **rouges avant
+correction** (336 > 296) — la réplique fidèle de l'ancienne barre a été
+remise en place le temps de le prouver. `LayoutOverflowUITests` (6) et
+`KeyboardShortcutsUITests` (5) verts sur iPhone 11 Pro / iOS 26.5 : les
+raccourcis ←/→, déplacés avec la rangée, fonctionnent toujours.
+
+**L'instrument qui manquait, et qui existait.** Le Lot 3 avait renoncé faute
+de pouvoir reproduire le Zoom d'affichage. Deux choses apprises ce jour :
+
+1. **La largeur logique d'un appareil BRANCHÉ se lit sans rien installer** —
+   `xcrun devicectl device info displays --device <id>` rend
+   `bounds: (0, 0, 960, 2079)` et `pointScale: 3` pour l'iPhone de Nils, soit
+   **320 × 693 pt** pour un panneau natif de 1125 × 2436. Le Zoom d'affichage
+   se constate donc en une commande, en lecture seule, sans build ni profil de
+   provisionnement. C'est l'outil à sortir au prochain signalement de mise en
+   page : demander une capture, c'est deviner ; lire `displays`, c'est savoir.
+2. **La piste « piloter Réglages depuis XCUITest » est morte** : l'app Réglages
+   du simulateur n'a pas d'entrée « Luminosité et affichage » du tout (racine
+   vérifiée en entier : Général, Accessibilité, Appareil photo, Apple
+   Intelligence, Écran d'accueil, En veille, Recherche, Temps d'écran, Apps,
+   Code, Confidentialité, Développement, Game Center, iCloud). Il n'y a donc
+   rien à piloter, et le Zoom d'affichage restera hors de portée d'un test UI
+   sur simulateur.
+
+**Reste à faire.** Le garde-fou vit donc dans les tests unitaires — mesure de
+la vraie vue en `UIHostingController` aux largeurs qu'aucun simulateur ne sait
+produire — et non dans `LayoutOverflowUITests`. C'est une limite assumée, pas
+un oubli.
+
+## L'accueil à 320 pt : sept modes empilés, remis en deux colonnes (22/08)
+
+**Suite directe du défaut ci-dessus, trouvé sur la même capture.** Une fois le
+plateau réparé, l'accueil de Nils montrait toujours ses sept modes les uns
+SOUS les autres, là où tous les autres iPhone les rangent en deux colonnes.
+
+**La cause, du même genre : une largeur figée juste assez grande.**
+`GridItem(.adaptive(minimum: 160))` avec 20 pt de marge de chaque côté réclame
+2 × 160 + 14 = **334 pt pour 335 utiles à 375 pt** — un point de marge. À
+320 pt il n'en reste que 280 : la grille adaptative renonce et retombe à une
+colonne. Personne n'avait vu la marge d'un point, parce que personne n'avait
+mesuré sous 375.
+
+**La correction.** La géométrie de la grille sort de la vue dans
+`ModeGridMetrics` — même parti pris que `BoardGeometry` et `PlayControlBar` —
+et la largeur mini d'une tuile passe de **160 à 132 pt** : deux colonnes
+tiennent dès 316 pt d'écran. Rien ne change au-dessus, la grille adaptative
+n'ouvrirait une troisième colonne qu'à 424 pt utiles, hors d'atteinte d'un
+iPhone en portrait (verrouillé depuis le Lot 2).
+
+**Le compromis, regardé avant d'être accepté.** À 133 pt de large, la tuile
+garde ses 132 pt de haut figés : il n'y reste la place que d'UNE ligne de
+sous-titre, donc six sous-titres sur sept sont tronqués (« Force, cadenc… »).
+**Le rendu d'avant a été mis à côté pour comparer : à 375 pt, quatre sur sept
+le sont déjà.** La troncature est donc le registre existant du composant, pas
+une nouveauté ; les titres, eux, restent entiers aux deux largeurs. Deux
+colonnes tronquées valent mieux que sept tuiles empilées — mais si l'on veut
+mieux, le levier est la copie (`shortSubtitle` existe déjà pour ça), pas la
+géométrie.
+
+**L'instrument, à garder.** `ImageRenderer` rend n'importe quelle vue à
+n'importe quelle largeur, sans appareil ni simulateur :
+`HomeGridLayoutTests.testRenderGridPreviews` écrit les PNG de la grille à 320
+et 375 pt, plus le rendu d'avant. Inerte par défaut, activé par
+`CHESSLAB_RENDER_PREVIEWS=1`. Avec `devicectl … displays` (largeur réelle d'un
+appareil branché) et la mesure en `UIHostingController` (largeur réclamée par
+une vraie vue), c'est le troisième outil que ce signalement aura apporté — et
+ensemble ils couvrent enfin le trou du Lot 3.
+
+**Vérifié.** `HomeGridLayoutTests` : la hauteur rendue par `LazyVGrid` lui-même
+à 320 pt prouve les deux colonnes (c'est SwiftUI qui tranche, pas une
+arithmétique parallèle), et un garde-fou en sens inverse interdit une
+troisième colonne à 440 pt. `LayoutOverflowUITests` (5) vert, détecteur de
+débordement de l'accueil compris.
+
+## Chantier A, lots 29-31 : Scandinave, London, Nimzo-Larsen (nuit du 22-23/08)
+
+Deux lots menés d'affilée, et une leçon de méthode qui vaut plus que les deux.
+
+### Lot 29 — Scandinave : un seul thème, cinq ordres de coups
+
+Le rapport de couverture ne montrait pas 47 trous dispersés : **cinq des douze
+plus coûteux étaient le MÊME coup blanc** — Fc4, Fe2 ou Cf3 joué avant d4 —
+dans cinq ordres différents. Le club développe avant de pousser ; le cours ne
+prévoyait que la poussée. Six lignes écrites d'un coup, commentées FR+EN.
+
+**Un arbitrage contre le moteur, assumé.** Sur 3…Dd6 4.Cf3 Cf6 5.Fc4, le
+moteur classe 5…Cc6 en tête et 5…a6 cinquième, à 0,2 de pion. On enseigne
+**…a6** : ce chapitre annonce le système de Tiviakov (…a6, …b5, …Fb7), et
+changer de plan trois coups après l'avoir annoncé n'apprend rien à personne.
+Ailleurs, la règle du cours — « le fou de cases blanches sort AVANT …e6 » —
+coïncidait avec le moteur à 0,05 près, donc rien à arbitrer.
+
+**Mesuré** : positions 190 → 248, commentaires 66 → 86. La dette annoncée d'abord
+(0,95 → 0,67, −29 %) était une mesure HORS LIGNE des deux côtés — voir la
+section « Le biais de la mesure hors ligne » plus bas : la vraie baisse,
+mesurée en ligne avant ET après, est de **1,44 → 1,34, soit −6,7 %**. `audit.py` : 0 gaffe enseignée, 0 arête suspecte.
+Sur la session complète du 21-22/08, la Scandinave passe de **1,70 à 0,67**,
+soit **−61 %**.
+
+### Lot 30 — London : le piège du signe, et l'arbitrage qu'il a failli fausser
+
+Même méthode sur la London, redevenue la pire dette du catalogue (0,97). Cinq
+trous, dont **deux fois …Ff5** : le fou noir sort avant que le système soit
+posé.
+
+**L'erreur de lecture, attrapée à temps.** `suggest.py` rend son score
+**relatif au trait** (`score.pov(board.turn)`). En forçant un coup blanc pour
+le mesurer, on lit donc la position *les Noirs au trait* — et un `-0,30`
+signifie « les Noirs sont 0,30 moins bien », c'est-à-dire **les Blancs mieux**.
+Lu à l'envers, le tableau disait que le système Londres perdait 0,6 à 0,75 de
+pion et donnait l'avantage aux Noirs ; j'ai failli enseigner c4 partout sur
+cette base. Le vrai tableau après 1.d4 d5 2.Ff4 Cc6 3.e3 Ff5 :
+
+| coup | avantage blanc |
+|---|---|
+| 4.c4 — quitte le système | +0,44 |
+| **4.Fd3 — le système** | **+0,30** |
+| 4.Cf3 | +0,26 |
+| 4.c3 | +0,16 |
+
+0,14 de pion, pas 0,7. **On garde Fd3**, conformément à la règle posée pendant
+la campagne du 16/08 : le meilleur coup du moteur n'est pas toujours le bon
+coup du répertoire. Dans l'autre ordre (2…Cf6 3.e3 Ff5), l'écart tombe à 0,05
+— autant dire rien.
+
+**Un fait désagréable, écrit plutôt que masqué.** Jobava, 2.Cc3 e6 3.Ff4 Fb4 :
+le meilleur coup (4.Dd3) ne donne QUE l'égalité (−0,06), et les alternatives
+sont pires. Le commentaire du cours le dit franchement — mieux vaut le savoir
+avant la partie qu'après.
+
+**Un détail de rédaction, refusé.** Le moteur voulait 7.Fc4 puis 8.Fe2 dans la
+ligne …g6 : un fou qui fait l'aller-retour. On joue 7.Fe2 directement, pour
+0,08 de pion. Une ligne d'enseignement doit pouvoir se raconter.
+
+**Mesuré** : positions 152 → 200. Là encore le −35 % annoncé était hors ligne
+des deux côtés ; en ligne, **1,20 → 1,06, soit −12,3 %**.
+`audit.py` : 1 arête suspecte, contre-mesurée à la profondeur 24, 0 gaffe
+enseignée.
+
+### État du catalogue après les deux lots
+
+Trois lots au total cette nuit (29 Scandinave, 30 London, 31 Nimzo-Larsen),
+et une mesure EN LIGNE des trois, avant et après, une fois le jeton Explorer
+disponible :
+
+| cours | avant | après | écart |
+|---|---|---|---|
+| scandinavian | 1,44 · 84 trous | **1,34 · 91 trous** | −6,7 % |
+| london-system | 1,20 · 47 trous | **1,06 · 59 trous** | −12,3 % |
+| nimzo-larsen | 1,39 · 43 trous | **1,32 · 57 trous** | −5,1 % |
+
+## Le biais de la mesure hors ligne (23/08)
+
+**Le fait.** Un jeton Explorer a été fourni dans la nuit. Les mêmes cours,
+mesurés en ligne, portent une dette **environ deux fois** supérieure à celle
+que rendait `--offline` : 1,34 contre 0,67 pour la Scandinave, 1,06 contre
+0,63 pour la London.
+
+**Pourquoi ce n'est pas seulement une question de niveau.** Le Lot 1 du 21/08
+justifiait le mode hors ligne ainsi : « le rapport ne peut donc que
+sous-estimer la dette, jamais l'inverse — c'est le bon côté sur lequel se
+tromper pour une mesure d'avancement. » **Ce raisonnement est faux pour un
+écart.** Sous-estimer le NIVEAU est sans danger ; comparer deux
+sous-estimations ne l'est pas, parce que le biais n'est pas constant : chaque
+lot crée des positions neuves, absentes du cache par construction, dont les
+trous restent donc invisibles. Le biais grandit avec le travail fourni, et
+toujours dans le sens flatteur.
+
+**L'ampleur, mesurée.** Sur les trois lots de cette nuit, l'écart annoncé hors
+ligne était de −29 %, −35 % et (non publié) −33 % ; l'écart réel est de
+−6,7 %, −12,3 % et −5,1 %. **Le mode hors ligne a multiplié le progrès apparent
+par trois à cinq.**
+
+**Ce que ça implique pour le chantier A.** Les 28 lots des 21 et 22/08 ont tous
+été mesurés hors ligne, des deux côtés. Leurs baisses consignées — la
+Nimzo-Larsen « 1,83 → 0,93, −49 % » en tête — sont donc à lire comme des
+ordres de grandeur flatteurs, pas comme des mesures. Le contenu écrit, lui,
+reste bon : il a été calculé au moteur et passé à `audit.py`. C'est la
+comptabilité du progrès qui était optimiste, pas les lignes.
+
+**Règle pour la suite** : toute annonce de baisse de dette se mesure EN LIGNE,
+avant et après, sur la même version de l'outil. Le mode `--offline` reste utile
+pour CLASSER les cours entre eux à un instant donné (le biais y est à peu près
+le même partout), jamais pour mesurer un progrès.
+
+### Lot 31 — Nimzo-Larsen : une habitude du cours prise en défaut
+
+Cinq trous comblés, dont le plus fréquent du chapitre …e5 (47 % des parties à
+cet endroit, aucune réponse). Et une trouvaille qui vaut pour tout le cours :
+après 1.b3 e5 2.Fb2 Cc6 3.e3 Cf6 4.Fb5 d6, **le cours aurait joué Cf3 — il le
+joue douze fois ailleurs et n'a jamais joué Ce2 — et c'est une erreur ici** :
+avec le pion noir en e5, Cf3 invite …e4 avec tempo. Mesuré : **Ce2 +0,25,
+Cf3 −0,10**, un tiers de pion. L'habitude, pas le moteur, était fautive. Le
+commentaire du cours l'explique désormais, chiffres compris.
+
+`audit.py` : 0 arête suspecte, 0 gaffe enseignée, 188 positions.
+
+**Vérifié** : `OpeningBlunderRegressionTests` (2 tests, 15 cas) et
+`EcoOpeningLookupTests` verts depuis le bundle — 8 tests, 2 suites.
+
+**Piège d'outillage à retenir.** Un filtre `-only-testing` sur une suite
+**swift-testing** rapporte « TEST SUCCEEDED » avec *Executed 0 tests* si l'on
+ne lit que les lignes XCTest : le vrai verdict est dans les lignes `✔ Test run
+with N tests`. J'ai cru la suite verte une première fois alors qu'elle n'avait
+pas tourné.
+
+## Revue HIG complète de l'interface (nuit du 22/08)
+
+Demande : revoir l'UI avec la compétence `apple-hig` installée dans la journée.
+
+**Premier constat, méthodologique** : la compétence installée n'était qu'une
+**fiche de catalogue** — elle annonce le contenu et renvoie à l'amont sans rien
+embarquer. Le vrai matériel est `raintree-technology/hig-doctor`, 11 modules,
+~500 Ko de références HIG indexées. Installé, et c'est lui qui a servi.
+
+Ce qui suit est classé par **impact utilisateur × certitude**, et distingue ce
+qui est MESURÉ de ce qui relève du jugement.
+
+### A — Accessibilité : le gros morceau
+
+**A1. Le VoiceOver du plateau est monolingue français.** `ChessBoardView`
+(`accessibilityLabel(for:)`) renvoie « Case e4, cavalier blanc » en dur, et
+`MoveNarration` porte un dictionnaire `"N": "cavalier"` tout aussi figé.
+**Vérifié : aucune de ces chaînes n'est au catalogue** — les deux occurrences
+de « Case » dans `Localizable.xcstrings` concernent l'aide sur la prise en
+passant. Un anglophone qui active VoiceOver entend donc du français sur
+l'élément central de l'app. C'est exactement la famille du défaut corrigé le
+19/08 (« Ordinateur » collé en littéral malgré la clé existante), mais sur la
+couche la moins visible à l'œil — donc la moins susceptible d'être repérée.
+
+**A2. L'étiquette de case ne dit que la pièce, jamais l'état.** Ni
+« sélectionnée », ni « coup légal », ni « dernier coup », ni « roi en échec ».
+Or les cibles légales ne sont signalées QUE par une pastille colorée. HIG
+accessibility : *« Convey information with more than color alone »* et
+*« Describe your app's interface and content for VoiceOver »*. **Conséquence
+concrète : l'app n'est pas jouable en VoiceOver** — on peut lire le plateau,
+pas savoir où l'on a le droit d'aller. A1 et A2 se corrigent ensemble.
+
+**A3. Contraste — deux valeurs sous les seuils, mesurées sur `Theme.swift`.**
+
+| | ratio sur `background` | seuil | verdict |
+|---|---|---|---|
+| `textPrimary` (blanc 95 %) | 17,16:1 | 4,5 | OK |
+| `textSecondary` (blanc 58 %) | 6,81:1 | 4,5 | OK |
+| **`textTertiary`** (blanc 38 %) | **3,56:1** | 4,5 | **sous le seuil** (corps de texte) |
+| **`stroke`** (blanc 8 %) | **1,21:1** | 3,0 | **sous le seuil** (élément porteur de sens) |
+| `strokeStrong` (blanc 16 %) | 1,58:1 | 3,0 | sous le seuil |
+
+Les huit teintes (accent, danger, warning, info, violet, rose, gold, teal)
+sont toutes ≥ 5,80:1 — la palette de couleur est saine, c'est la palette de
+GRIS qui pèche. Correctifs chiffrés : `textTertiary` à blanc 50 % donne
+≈ 4,6:1 ; une bordure qui porte du sens (contour d'un bouton rond) demande
+blanc ~30 %.
+
+**A4. Dynamic Type : 29 tailles figées contre 6 mises à l'échelle.** Le helper
+`scaledSystemFont` existe et porte le `@ScaledMetric` — il n'est utilisé que
+six fois. Les glyphes de pièces, les pastilles de qualité et les boutons ronds
+ne grossissent pas. HIG typography : *« Increase the size of meaningful
+interface icons as font size increases »*. Déjà consigné au Lot 3 comme
+chantier de fond ; toujours ouvert, et désormais chiffré.
+
+**A5. Reduce Motion : deux usages, tous deux dans `ChessBoardView`.** Les
+animations `Theme.spring` / `Theme.gentle`, utilisées dans toute l'app, ne sont
+conditionnées nulle part. HIG motion : *« Make motion optional »*. Correctif
+peu risqué et centralisable, puisque toutes les animations passent par `Theme`.
+
+**A6. Ce qui va bien, et qu'il faut dire.** Les pastilles de qualité de coup
+portent un SYMBOLE (`!!`, `★`, `✓`, `✕`), pas seulement une couleur — le point
+le plus exposé au daltonisme est déjà traité. `EvalBarView` expose
+`accessibilityLabel` + `accessibilityValue`. 50 `accessibilityLabel`, 79
+identifiants de test, 27 `accessibilityElement`. Les flèches d'indice, elles,
+restent purement visuelles.
+
+### B — Mise en page et adaptabilité
+
+**B1. La leçon du jour, généralisée.** HIG layout liste explicitement
+*« External display support, **Display Zoom**, and resizable windows »* parmi
+les contextes à supporter. Deux défauts trouvés à 320 pt aujourd'hui (le
+plateau, puis l'accueil). Les autres écrans n'ont **jamais** été mesurés à
+cette largeur — sauf *Deux joueurs*, mesuré ce soir et conforme. Restent :
+Puzzles, Analyser, Ouvertures, Finales, Laboratoire, Réglages, Éditeur de
+position, Scanner. **C'est le lot n°1 de la suite**, et l'outillage existe
+maintenant pour le faire en série.
+
+**B2. Portrait verrouillé sur iPhone** — HIG iOS : *« Aim to support both
+portrait and landscape orientations »*. Déviation assumée au Lot 2, pour une
+raison solide (aucun layout paysage n'existait, `verticalSizeClass` n'était lu
+nulle part). À reverser un jour : un échiquier est précisément l'app où le
+paysage a du sens, et la disposition existe déjà côté iPad (plateau à gauche,
+lecture à droite).
+
+**B3. 90 `frame(maxWidth: .infinity)`** — HIG iOS : *« Avoid full-width
+buttons »*. La majorité sont des conteneurs, pas des boutons ; à trier au cas
+par cas, faible priorité.
+
+### C — Composants, conventions, écriture
+
+Rien de grave, et plusieurs bons points : **97 SF Symbols contre 4 images
+custom** ; 14 rôles `.destructive` déclarés sur les confirmations ; 15
+raccourcis clavier iPad ; 40 points d'haptique ; la barre d'état n'est jamais
+masquée. **La capitalisation des 53 libellés de bouton est uniforme** (capitale
+au premier mot seulement) — HIG : *« adopt capitalization rules, then apply
+them consistently »*, c'est fait.
+
+Seul point : `presentationDetents` n'est posé que sur 4 des 13 feuilles. Les
+autres s'ouvrent en pleine hauteur alors qu'un `.medium` laisserait voir la
+position derrière — HIG dialogs, sur les feuilles non modales.
+
+### D — Revue écran par écran (33 vues)
+
+**D1. Le composant `List` est quasi absent.** Trois usages dans toute l'app —
+la barre latérale iPad, la liste d'ouvertures, la liste de finales — contre 27
+fichiers qui bâtissent leurs listes en `ScrollView` + `VStack`. La conséquence
+se mesure : `swipeActions` / `onDelete` n'apparaissent que **deux fois** dans
+tout le projet. La bibliothèque de parties réimplémente à la main la sélection
+multiple (`Set<PersistentIdentifier>`, coche dessinée, trait `.isSelected`
+posé explicitement — c'est du travail soigné), mais **on ne peut pas supprimer
+une partie d'un balayage** : il faut d'abord entrer en mode sélection. HIG
+`lists-and-tables` donne le balayage, l'`EditMode`, la sémantique VoiceOver de
+rangée et la navigation clavier sans rien écrire. C'est le plus gros écart
+structurel de l'app — et le plus coûteux à reprendre, donc à décider, pas à
+faire dans la foulée.
+
+**D2. Le curseur de force n'a aucune étiquette d'accessibilité.**
+`NewGameSetupView` pose un `Slider(value:in:step:)` nu : ni
+`minimumValueLabel`, ni `accessibilityLabel`, ni `accessibilityValue` — et
+l'écran entier ne contient **aucun** `accessibilityLabel`. C'est le contrôle
+principal du mode principal, et en VoiceOver il s'annonce « 47 % » sans dire
+de quoi. Correctif de trois lignes.
+
+**D3. Rien n'accueille le nouvel utilisateur.** Zéro TipKit, zéro drapeau de
+premier lancement, aucune astuce contextuelle : sept modes sont posés d'un coup
+sur la grille d'accueil. L'app a pourtant une aide complète — mais rien ne la
+déclenche au moment où elle servirait. HIG `onboarding` recommande justement
+des astuces contextuelles plutôt qu'un tunnel d'accueil.
+
+**D4. « Vider » détruit la position sans confirmation ni annulation.** Dans
+l'éditeur, `clearBoard()` part directement du bouton. HIG `feedback` : prévenir
+avant une perte de données inattendue et irréversible. L'annulation n'existe
+nulle part ailleurs que dans le lecteur d'ouvertures (`OpeningReaderViewModel`).
+
+**D5. Les écrans vides sont majoritairement bons.** Plusieurs donnent la marche
+à suivre — « Ouvre une ouverture et entraîne-la pour remplir ta file »,
+« Ajoutez-en pour retrouver et regrouper vos parties ». Deux restent muets
+(« Aucun coup joué », « Aucune partie sur cette période »). Point mineur.
+
+**D6. Et ce qui est conforme, écran par écran.** Barre latérale iPad en
+`List(selection:)` — le bon composant ; barres d'outils en `ToolbarItemGroup` ;
+19 alertes/dialogues dont 14 avec rôle destructif ; 13 `ProgressView` répartis
+sur les attentes réelles (scanner, laboratoire, entraînement) ; aucun
+`pickerStyle` exotique ; le réglage de langue offre bien l'option « Langue du
+système », donc ne double pas le réglage système ; la barre d'état n'est jamais
+masquée.
+
+### Ce que la revue N'A PAS couvert
+
+Par honnêteté sur la portée : les modules `hig-technologies` et
+`hig-components-system` (widgets, complications, Siri, App Intents) n'ont pas
+été lus — l'app n'expose aucune de ces surfaces. Le volet macOS/Catalyst n'a
+été regardé que par les clés du projet, sans exécution. Et les huit écrans
+listés en B1 n'ont pas encore été MESURÉS à 320 pt : ils sont conformes en
+lecture, pas en mesure.
+
+### L'ordre dans lequel je traiterais tout ça
+
+1. **A1 + A2** — le plateau en VoiceOver, bilingue et avec son état. C'est le
+   seul point de la liste qui rend une fonction ENTIÈRE inaccessible, et c'est
+   deux fichiers.
+2. **A3** — deux constantes à changer dans `Theme.swift`, mesure à l'appui.
+3. **B1** — passer les huit écrans restants au harnais 320 pt.
+4. **A5** — Reduce Motion centralisé dans `Theme`.
+5. **D2** — l'étiquette du curseur de force : trois lignes, mode principal.
+6. **D4** — la confirmation sur « Vider ».
+7. **A4** — Dynamic Type des gabarits figés : le vrai chantier, à planifier.
+8. **D1** — le passage à `List` : à décider avant de faire, c'est une refonte.
+9. **D3** — les astuces contextuelles : décision produit.
+
 ## Stockage sur appareil : 388 Mo signalés, 328 d'accumulation (22/08)
 
 **Le signalement.** Un utilisateur rapporte 388 Mo de « Documents et données ».
@@ -7710,3 +8155,196 @@ iOS ne peut donc jamais le purger sous pression, et il part dans les
 sauvegardes. Et `OpeningReviewLog` est append-only dans le store SYNCHRONISÉ,
 sans aucun élagage — inoffensif en local, coûteux dans CloudKit où chaque ligne
 porte un enregistrement système de 0,5 à 2 Ko.
+
+## Module « Ouvertures — Labs » : la même théorie, disséquée (23/08) ✅
+
+Aperçu OPT-IN, éteint par défaut, qui ajoute une tuile d'accueil et une entrée
+de barre latérale sans rien retirer : le module Ouvertures en production reste
+l'expérience par défaut. Deux écrans, et une chaîne de données neuve.
+
+### Écran A — l'index des lignes, en ARBRE
+
+Refondu le 23/08 sur croquis de l'utilisateur. La première version listait un
+chapitre par carte, chacun repartant de la racine : « 1.e4 d5 2.exd5 ♛xd5 » se
+relisait douze fois avant d'arriver à ce qui distingue les variantes. L'index
+est maintenant un **arbre du graphe** — chaque coup écrit UNE SEULE FOIS :
+
+    1.e4 d5
+      ↳ 2.exd5
+          ○ 2…♛xd5
+              □ 3.♘c3
+                  ◇ 3…♛a5
+                      △ 4.d4 ♞f6
+                          ⬡ 5.♘f3 c6 6.♗c4 ♗f5 7.♗d2 e6
+                          ⬡ 5.♗d2 ♗g4 6.f3 ♟d7 …
+                      △ 4.♘f3 ♞f6              ← 4.Cf3 avant d4
+                      △ 4.b4 ?! ♛xb4 5.♖b1 …   ← Le gambit 4.b4
+                  ◇ 3…♛d6 …                    ← Moderne, 3…Dd6
+              □ 3.♘f3 ♗g4 …
+          ○ 2…♞f6 …                            ← 2…Cf6, l'ordre moderne
+      ↳ 2.e5 ?! ♗f5                            ← Les Blancs déclinent
+
+Notation **figurine** (le dessin de la pièce, pas sa lettre : la notation
+devient indépendante de la langue, ce qui compte sur un écran qui aligne des
+centaines de coups). L'index s'ouvre tout seul en entrant dans une ouverture et
+se rappelle par l'icône de la barre.
+
+**Chaque coup est un bouton** : taper le 7ᵉ coup du Fried Liver amène
+directement à cette position, fil des coups déjà rempli. C'est ce qui a dicté
+l'architecture du lecteur (voir plus bas).
+
+**Une rangée s'arrête à la première DÉVIATION**, et toutes les suites — la
+principale comprise — descendent d'un étage. Chaque rangée répond ainsi à une
+seule question : « à cette position, quels sont les choix ? ».
+
+Conséquence à assumer : dans un cours qui offre des alternatives dès le
+deuxième coup, les premières rangées ne portent qu'un ou deux coups. Ce n'est
+pas un défaut d'affichage, c'est l'arbre réel de l'ouverture. J'avais d'abord
+pris cet escalier pour un défaut et prolongé la ligne principale à plat
+par-dessus les déviations — l'utilisateur a corrigé : cela ment sur l'endroit
+où le choix se pose.
+
+**La ligne principale est dépliée AVANT ses alternatives.** 🐛 Sans cette
+priorité, une variante qui transpose plus loin dans la ligne principale
+réclamait la position avant elle, et c'était la ligne principale qui s'arrêtait
+sur un « transposition » — l'inverse de ce qu'on veut lire. Vérifié sur un cas
+construit, parce que c'est l'ORDRE D'EXPANSION qu'on veut prouver et qu'il ne
+se lit pas dans l'arbre fini : sur la donnée livrée, un rang 0 peut
+légitimement transposer vers une position dépliée bien plus tôt, ailleurs.
+
+**Un marqueur par ÉTAGE** (``BranchMarker``) : ↳ ○ □ ◇ △ ⬡, du bleu clair au
+violet, plus un rail vertical par niveau traversé. Forme ET couleur, pas l'une
+ou l'autre — la couleur seule ne se distingue pas en niveaux de gris ni pour un
+daltonien, la forme seule se confond à 8 pt. Le retrait est proportionnel à
+l'étage, plafonné à cinq niveaux dessinés ; le marqueur, lui, continue de
+distinguer au-delà.
+
+**Les transpositions ne sont dépliées qu'une fois.** La seconde arrivée s'arrête
+sur un repère « transposition » cliquable. Sans cette règle, des sous-arbres
+entiers apparaîtraient en double — exactement ce que l'arbre supprime — et un
+cycle ferait tourner la construction sans fin.
+
+**Les titres écrits à la main sont conservés**, posés sur la branche que leur
+chapitre OUVRE. Un chapitre est un chemin, l'arbre est fait de nœuds : il n'y a
+pas de correspondance directe. La règle retenue après essais sur la donnée
+réelle est celle du **point de divergence** — la première branche de sa colonne
+vertébrale qui n'est pas le coup principal de sa position. Elle donne, sans
+exception notable : Gambit Evans → 4.b4, Fried Liver → 6.♘xf7, Défense
+hongroise → 3…♗e7, Attaque Panov → 3.exd5, Karpov → 4…♞d7. Un chapitre qui ne
+quitte jamais la ligne principale n'obtient pas de titre, et c'est correct : la
+carte porte déjà le nom de l'ouverture, et c'est de lui qu'il parle.
+
+**Un seul marqueur par pastille : le verdict du moteur.** L'index portait trois
+pictogrammes concurrents (coup commenté, coup à mémoriser, rôle) ; sur une
+carte de cinquante coups, plus rien ne ressortait. Ne restent que cinq
+catégories — gaffe, erreur, imprécision, occasion manquée, coup brillant — en
+notation d'échecs (`??`, `?`, `?!`, `!!`), calculées à partir des évaluations
+pré-calculées du sidecar (``OpeningMoveQuality``). Mesure sur le catalogue :
+**97,2 % des coups ne portent aucune marque**, 166 imprécisions, 25 erreurs,
+7 gaffes, 2 coups brillants.
+
+Le contrôle qui valide toute la chaîne : sur le gambit **Englund**, le moteur
+retrouve seul 6.♗c3?? (gaffe) ET 6…♗b4! (brillant) — les deux coups du piège,
+indépendamment de ce que l'auteur du cours avait marqué. Chaque gaffe détectée
+coïncide d'ailleurs avec un coup que l'auteur avait étiqueté « piège ».
+
+### Écran B — le lecteur
+
+Échiquier ancré en haut (jamais dans le défilement : on lit les statistiques EN
+REGARDANT la position), flèches vertes/bleues du répertoire conservées, et une
+barre d'évaluation **fine** (7 pt) collée dessous, avec la profondeur du calcul
+en regard. En dessous, défilant — ou à droite si la fenêtre est plus large que
+haute, iPad et Mac compris : fil des coups, commentaire de l'auteur, coups du
+répertoire, **coups des maîtres avec leurs pourcentages**, et les **trois
+meilleurs coups de Stockfish**.
+
+**Aucun moteur ne tourne sur cet écran.** Tout est pré-calculé (voir la donnée).
+Un Stockfish embarqué donnerait les mêmes chiffres après plusieurs secondes,
+en chauffant l'appareil, et redémarrerait à chaque coup.
+
+**Labs LIT, il n'entraîne pas.** Un coup de maître hors répertoire s'affiche
+(c'est une information) mais n'est pas un bouton : il n'y aurait ni suite, ni
+commentaire, ni statistique derrière. L'entraînement en répétition espacée
+reste celui du module Ouvertures — un seul moteur FSRS, une seule progression.
+
+### La donnée : un SIDECAR, pas un champ de plus
+
+`ChessLab/Resources/openings_labs/<id>.labs.json`, écrit par
+`tools/opening-generator/labs.py`, indexé par la même FEN normalisée que le
+graphe. Trois raisons de ne pas enrichir les cours eux-mêmes :
+
+1. **Risque.** Y ajouter des champs fait porter une régression possible à un
+   module en production, pour un module en aperçu.
+2. **Ce n'est pas la même donnée.** `MoveEdge.gamesMasters` ne décrit que les
+   arêtes CURÉES du graphe ; Labs veut tous les coups de maîtres de la position.
+3. **Coût.** Chargement paresseux, un seul sidecar en mémoire, et rien du tout
+   pour qui n'allume pas l'aperçu.
+
+**Mesuré, chaîne complète exécutée.** 4 980 positions distinctes pour les 58
+ouvertures (5 727 entrées de cours, les transpositions fusionnent).
+
+- **Moteur** : MultiPV 3 à profondeur 20, **75 min** sur M2 à 4 travailleurs,
+  **100 % des positions couvertes**. Intégralement mis en cache disque —
+  relancer ne recalcule rien.
+- **Maîtres** : 61,8 % des positions étaient déjà dans le cache partagé avec
+  `generate.py` ; les 1 697 manquantes ont été rattrapées en 4 133 requêtes,
+  **zéro échec**. Résultat : **85,5 % des positions ont des parties de maîtres**,
+  et les 14,5 % restantes ont bien été interrogées — elles n'ont simplement
+  **aucune partie de tournoi**, ce qui est la réalité de la base et non un trou
+  à combler.
+- **Poids** : 58 fichiers, **2,6 Mo** ajoutés au bundle.
+
+**Sans jeton, la chaîne ne casse pas** : mode cache seul, les positions absentes
+n'ont pas de bloc `masters`, et l'app le DIT (« aucune partie de maître connue
+pour cette position ») au lieu d'inventer un chiffre.
+
+**Les pourcentages ne sont pas stockés.** Ils se dérivent des parties, et se
+rapportent au TOTAL de la position, pas à la somme des coups retenus : le
+générateur écarte la queue statistique (sous 0,5 %), et renormaliser sur les
+survivants afficherait 100 % là où il en manque cinq.
+
+### Trois choses apprises en chemin
+
+**Le bug qui masquait une variante entière.** L'identité d'une rangée était
+(demi-coup, coup) de son premier coup. Dans la scandinave, deux branches
+partent toutes deux de « 4…♞f6 » et ne divergent qu'au coup blanc suivant
+(5.d4 / 5.♗c4) : même identité, donc `ForEach` affichait la première DEUX FOIS
+et la variante 5.♗c4 disparaissait de l'index, en silence. Trouvé à la capture
+d'écran, pas au test. L'identité est désormais le CHEMIN complet, et deux tests
+la verrouillent — dont un qui balaie tout le catalogue.
+
+**La capture d'écran a trouvé ce que les tests ne cherchaient pas.** Ce bug-là,
+puis la troncature ci-dessous, puis le tronc coupé par une transposition : les
+trois ont été vus à l'œil sur une capture, jamais signalés par une assertion.
+Chacun a ensuite reçu son test de non-régression. Les tests disent que ce qu'on
+a pensé à vérifier tient ; ils ne disent pas ce que l'écran donne à lire.
+
+**La troncature en `FlowLayout`.** « ♞f6 » s'affichait « ♞… » : un `Text` posé
+à sa largeur idéale exacte se rabat sur l'ellipse à un arrondi de rendu près.
+`FilterChip` documentait déjà le piège (« Blancs » → « Blan/cs ») ; même
+remède, `.lineLimit(1)` + `.fixedSize(horizontal: true, vertical: false)`.
+
+### Vérifié
+
+54 tests unitaires neufs (notation figurine, arbre des lignes, verdicts du
+moteur, sidecar, lecteur), dont sept qui balaient la donnée RÉELLEMENT
+embarquée : tout chemin de l'arbre se rejoue dans le graphe, le tronc n'est
+jamais tronqué par une variante, aucun coup n'apparaît deux fois, tout
+identifiant est unique, l'arbre reste borné en rangées et en profondeur, toute
+position de sidecar existe dans son cours, tout coup du moteur est légal dans
+sa position. **682 tests verts au total**, plus 4 tests d'interface qui
+parcourent
+l'interrupteur, le saut depuis l'index, les trois sections du lecteur et la
+DISPOSITION (panneau sous le plateau en portrait, à droite en paysage — mesurée
+géométriquement, et ignorée sur iPhone où la cible est verrouillée en portrait).
+Passés sur iPhone 17 Pro ET iPad Pro 11", les deux ossatures d'accueil : la
+grille de tuiles et la barre latérale n'exposent pas le même point d'entrée.
+
+### Reste à faire
+
+- **Couverture maîtres partielle en profondeur** : une position de sous-variante
+  au 20ᵉ demi-coup n'a jamais été jouée en tournoi, et n'en aura jamais. C'est
+  la réalité de la base, pas un trou à combler.
+- **Les 58 sidecars pèsent quelques Mo** ajoutés au bundle. À surveiller au
+  prochain bilan de stockage — c'est de la donnée statique, jamais recopiée
+  dans le conteneur.

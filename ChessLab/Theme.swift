@@ -266,6 +266,46 @@ func filterGroup(title: LocalizedStringKey, @ViewBuilder chips: () -> some View)
     }
 }
 
+/// Puce-pion : même capsule que ``FilterChip``, mais un glyphe d'échecs à
+/// 26 pt (« au moins 2× » le texte des autres puces — demande du 19/08). Le
+/// remplissage vertical est réduit pour que la capsule reste à hauteur des
+/// voisines. `\u{FE0E}` sur le pion noir force le rendu TEXTE : sans lui,
+/// U+265F bascule en émoji sur iOS.
+///
+/// Partagée depuis le 23/08 entre l'écran Ouvertures et l'écran Labs : les
+/// deux proposent les mêmes filtres, ils doivent proposer la même puce.
+struct PieceFilterChip: View {
+    let glyph: String
+    let isSelected: Bool
+    let accessibilityLabel: LocalizedStringKey
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(glyph)
+                .font(.system(size: 26))
+                .foregroundStyle(isSelected ? Theme.background : Theme.textPrimary)
+                .lineLimit(1)
+                .fixedSize()
+                .padding(.horizontal, 12)
+                .padding(.vertical, 1)
+                .background {
+                    if isSelected {
+                        Capsule().fill(Theme.tintGradient(Theme.textPrimary))
+                    } else {
+                        Capsule().fill(Theme.surfaceElevated)
+                    }
+                }
+                .overlay(Capsule().strokeBorder(isSelected ? Color.clear : Theme.stroke, lineWidth: 1))
+                .glow(Theme.textPrimary, radius: 8, isActive: isSelected)
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.pressable)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
+    }
+}
+
 /// Chip capsule à bascule, teintée par groupe : icône dans la teinte du
 /// groupe au repos, fond dégradé de cette teinte une fois sélectionnée
 /// (même mécanique que ``ChipButton``, plus la couleur par section) —

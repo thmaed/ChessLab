@@ -175,10 +175,12 @@ struct OpeningListView: View {
                     // d'un coup d'œil (retours utilisateur du 19/08 — les
                     // libellés cassaient la ligne, puis les rois étaient
                     // illisibles à taille de texte).
-                    pieceChip("♙", selected: sideFilter == .white, a11y: "Répertoire blanc") {
+                    PieceFilterChip(glyph: "♙", isSelected: sideFilter == .white,
+                                    accessibilityLabel: "Répertoire blanc") {
                         sideFilter = sideFilter == .white ? nil : .white
                     }
-                    pieceChip("♟\u{FE0E}", selected: sideFilter == .black, a11y: "Répertoire noir") {
+                    PieceFilterChip(glyph: "♟\u{FE0E}", isSelected: sideFilter == .black,
+                                    accessibilityLabel: "Répertoire noir") {
                         sideFilter = sideFilter == .black ? nil : .black
                     }
                     FilterChip(label: "Club", tint: Theme.accent, isSelected: levelFilter == .club) {
@@ -195,38 +197,6 @@ struct OpeningListView: View {
             .accessibilityElement(children: .contain)
             .accessibilityLabel("Filtres des ouvertures")
         }
-    }
-
-    /// Puce-pion : même capsule que ``FilterChip``, mais un glyphe d'échecs
-    /// à 26 pt (« au moins 2× » le texte des autres puces — demande du
-    /// 19/08). Le remplissage vertical est réduit pour que la capsule reste
-    /// à hauteur des voisines. `\u{FE0E}` sur le pion noir force le rendu
-    /// TEXTE : sans lui, U+265F bascule en émoji sur iOS.
-    private func pieceChip(
-        _ glyph: String, selected: Bool, a11y: LocalizedStringKey, action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Text(glyph)
-                .font(.system(size: 26))
-                .foregroundStyle(selected ? Theme.background : Theme.textPrimary)
-                .lineLimit(1)
-                .fixedSize()
-                .padding(.horizontal, 12)
-                .padding(.vertical, 1)
-                .background {
-                    if selected {
-                        Capsule().fill(Theme.tintGradient(Theme.textPrimary))
-                    } else {
-                        Capsule().fill(Theme.surfaceElevated)
-                    }
-                }
-                .overlay(Capsule().strokeBorder(selected ? Color.clear : Theme.stroke, lineWidth: 1))
-                .glow(Theme.textPrimary, radius: 8, isActive: selected)
-                .contentShape(Capsule())
-        }
-        .buttonStyle(.pressable)
-        .accessibilityLabel(a11y)
-        .accessibilityAddTraits(selected ? [.isSelected] : [])
     }
 
     private var reviewSection: some View {

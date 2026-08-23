@@ -428,95 +428,25 @@ struct PlayView: View {
     /// retirée : deux chevrons suffisent à parcourir la partie coup par coup, et
     /// « Coups joués » (iPhone) reste le moyen de sauter directement à un coup.
     private func controlBar(showMoveList: Bool) -> some View {
-        let hasMoves = viewModel.totalPlies > 0
-        return HStack(spacing: 10) {
-            controlButton(
-                "chevron.left",
-                label: "Coup précédent",
-                disabled: !hasMoves || viewModel.displayedPly == 0
-            ) {
-                viewModel.reviewPrevious()
-            }
-            // Raccourcis clavier iPad : ←/→ parcourent la partie, comme avant.
-            .keyboardShortcut(.leftArrow, modifiers: [])
-            controlButton(
-                "chevron.right",
-                label: "Coup suivant",
-                disabled: !hasMoves || viewModel.displayedPly >= viewModel.totalPlies
-            ) {
-                viewModel.reviewNext()
-            }
-            .keyboardShortcut(.rightArrow, modifiers: [])
-
-            // « Reprendre ici » n'apparaît qu'en consultation d'un coup passé —
-            // c'est aussi le signe visible qu'on n'est plus sur la position vive.
-            if viewModel.isReviewing, viewModel.canResumeFromReview {
-                Button { showResumeConfirmation = true } label: {
-                    Text("Reprendre ici")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(Theme.background)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Theme.accent, in: Capsule())
-                }
-                .buttonStyle(.pressable)
-                .transition(.opacity)
-            }
-
-            Spacer()
-
-            controlButton(
-                "lightbulb.fill",
-                label: viewModel.hintsWanted ? "Arrêter l'indice" : "Indice",
-                tint: viewModel.hintsWanted ? Theme.accent : Theme.textPrimary,
-                highlighted: viewModel.hintsWanted,
-                disabled: !viewModel.settings.hintsEnabled || viewModel.outcome != nil
-            ) {
-                viewModel.toggleHint()
-            }
-            // « Coups joués » et « Reprendre ici » ne coexistent jamais : en
-            // consultation, la reprise prend la place de la liste, si bien que
-            // la rangée tient sur UNE ligne même sur les iPhone étroits.
-            if showMoveList, !viewModel.isReviewing {
-                controlButton("list.bullet", label: "Coups joués", disabled: false) { showPanelSheet = true }
-            }
-            controlButton(text: "½", label: "Proposer nulle", tint: Theme.info, disabled: viewModel.outcome != nil || viewModel.isEngineThinking) {
-                showDrawConfirmation = true
-            }
-            controlButton("flag.fill", label: "Abandonner", tint: Theme.danger, disabled: viewModel.outcome != nil) {
-                showResignConfirmation = true
-            }
-        }
-        .animation(Theme.gentle, value: viewModel.isReviewing)
-    }
-
-
-    private func controlButton(
-        _ systemImage: String? = nil,
-        text: String? = nil,
-        label: LocalizedStringKey,
-        tint: Color = Theme.textPrimary,
-        highlighted: Bool = false,
-        disabled: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Group {
-                if let text {
-                    Text(text).font(.system(size: 19, weight: .bold, design: .rounded))
-                } else if let systemImage {
-                    Image(systemName: systemImage).font(.system(size: 17, weight: .medium))
-                }
-            }
-            .foregroundStyle(disabled ? Theme.textTertiary : tint)
-            .frame(width: 46, height: 46)
-            .background(highlighted ? Theme.accent.opacity(0.16) : Theme.surface, in: Circle())
-            .overlay(Circle().strokeBorder(highlighted ? Theme.accent.opacity(0.5) : Theme.stroke, lineWidth: 1))
-            .glow(Theme.accent, radius: 7, isActive: highlighted)
-        }
-        .buttonStyle(.pressable)
-        .disabled(disabled)
-        .accessibilityLabel(label)
+        PlayControlBar(
+            hasMoves: viewModel.totalPlies > 0,
+            displayedPly: viewModel.displayedPly,
+            totalPlies: viewModel.totalPlies,
+            isReviewing: viewModel.isReviewing,
+            canResumeFromReview: viewModel.canResumeFromReview,
+            showMoveList: showMoveList,
+            hintsWanted: viewModel.hintsWanted,
+            hintsEnabled: viewModel.settings.hintsEnabled,
+            isFinished: viewModel.outcome != nil,
+            isEngineThinking: viewModel.isEngineThinking,
+            onPrevious: { viewModel.reviewPrevious() },
+            onNext: { viewModel.reviewNext() },
+            onResumeHere: { showResumeConfirmation = true },
+            onToggleHint: { viewModel.toggleHint() },
+            onShowMoveList: { showPanelSheet = true },
+            onOfferDraw: { showDrawConfirmation = true },
+            onResign: { showResignConfirmation = true }
+        )
     }
 
     /// Sans ce signalement, un échec de démarrage de Stockfish donnait un
