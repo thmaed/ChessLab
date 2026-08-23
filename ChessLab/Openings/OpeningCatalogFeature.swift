@@ -12,17 +12,14 @@ import Foundation
 /// donnée. Un réglage allumé sur une build sans sidecars ouvrirait un module
 /// à moitié vide.
 @MainActor
-enum OpeningLabsFeature {
+enum OpeningCatalogFeature {
     /// Des cours d'ouverture sont-ils embarqués ?
     static var hasCourses: Bool {
         OpeningCourseLoader.catalog.contains { !$0.isEndgame }
     }
 
-    /// Le module doit-il être proposé ?
-    static var isActive: Bool { AppSettings.shared.openingsLabsEnabled && hasCourses }
-
-    /// Les ouvertures que Labs présente : les cours livrés et ceux qu'a
-    /// importés l'utilisateur, les FINALES exclues.
+    /// Les ouvertures présentées : les cours livrés et ceux qu'a importés
+    /// l'utilisateur, les FINALES exclues.
     ///
     /// Une finale n'a ni index de lignes (pas de chapitres pédagogiques en
     /// variantes), ni statistiques de maîtres (une position de finale théorique

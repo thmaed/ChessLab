@@ -8348,3 +8348,118 @@ grille de tuiles et la barre latérale n'exposent pas le même point d'entrée.
 - **Les 58 sidecars pèsent quelques Mo** ajoutés au bundle. À surveiller au
   prochain bilan de stockage — c'est de la donnée statique, jamais recopiée
   dans le conteneur.
+
+## Ouvertures : le module Labs remplace l'ancien (23/08) ✅
+
+Décision de l'utilisateur après essai : le module en aperçu DEVIENT le module
+Ouvertures. L'ancien écran est supprimé, le nouveau reprend son nom, son icône
+(`books.vertical.fill`, teinte ambre) et **ses identifiants d'accessibilité** —
+c'est toujours « Ouvertures », les tests existants restent donc pertinents au
+lieu d'être réécrits.
+
+### L'écart, comblé point par point
+
+Recensé avant de supprimer quoi que ce soit, en comparant les deux écrans :
+
+| Ce que l'ancien module portait | Devenu |
+|---|---|
+| Import PGN / étude Lichess | Repris — **même feuille, même magasin** : un répertoire importé d'un côté était déjà visible de l'autre, il n'y a qu'une bibliothèque |
+| Filtres ♙ ♟ Club Avancé | Repris — la puce-pion devient un composant PARTAGÉ (``PieceFilterChip``) |
+| Sections « Mes répertoires » / blanc / noir | Reprises |
+| Modifier · Partager · Supprimer | Repris, par le menu « … » |
+| Entraîner une ligne | Repris (bouton chapeau du lecteur) |
+| `@Query` sur les répertoires | Repris — sans lui, un répertoire arrivé par iCloud n'apparaît jamais |
+| « Réviser aujourd'hui » | **Abandonné**, décision produit |
+
+### Ce que la bascule a coûté, et qu'il faut savoir
+
+**Le balayage a disparu.** La nouvelle liste est un `ScrollView`, pas une
+`List` : `swipeActions` n'y existe pas. Les trois actions passent par le menu
+« … », visible en permanence — ce que le code de l'ancien écran jugeait déjà
+préférable (« une fonctionnalité qui demande de deviner qu'il faut balayer une
+ligne n'existe pas vraiment »). L'aide, qui documentait le balayage, a été
+corrigée.
+
+**L'index s'ouvre en entrant dans une ouverture.** C'est l'écran d'entrée du
+module ; les parcours de test qui allaient droit au lecteur le referment.
+
+**🐛 La suppression a emporté un point d'appel invisible.** `UserOpeningSeeder`
+(le répertoire personnel de test, `-seedUserOpening`) n'était appelé QUE depuis
+`OpeningListView.onAppear`. Le supprimer laissait un seeder sans site d'appel —
+compilation verte, et deux tests d'interface qui ne trouvaient plus rien.
+Rattrapé par `OpeningEditorAccessUITests`, pas par le compilateur.
+
+**Le lecteur de l'ancien module SURVIT.** `OpeningReaderHost` sert aussi aux
+Finales : seule la liste a été supprimée. Idem pour `openingTrainDaily`, que
+l'écran Finales utilise encore — l'abandon de la révision quotidienne ne vaut
+que pour les Ouvertures.
+
+### L'interrupteur d'aperçu n'existe plus
+
+`AppSettings.openingsLabsEnabled` et la section « Aperçus » des réglages sont
+retirés : le module ne peut plus être éteint, puisqu'il n'y a plus rien
+derrière. `OpeningLabsFeature` se réduit au filtrage du catalogue.
+
+### Vérifié
+
+689 tests unitaires verts. Tests d'interface repassés sur iPhone 17 Pro et
+iPad Pro 11" : le module Ouvertures, l'import/ouverture/suppression d'un
+répertoire, l'accès à l'éditeur, les captures de localisation anglaise, les
+points d'entrée iPad et les débordements de mise en page.
+
+### Les noms remis d'aplomb (dans la foulée)
+
+Le vocabulaire du code disait encore l'histoire du module au lieu de dire ce
+qu'il fait. Renommages mécaniques, vérifiés par la suite complète :
+
+- `OpeningReaderView`/`ViewModel`/`Host` → **`EndgameReader*`**, et la route
+  `openingReader` → `endgameReader` : ce lecteur ne sert plus qu'aux Finales.
+  Les branchements « ouverture » qu'il porte encore sont DÉFENSIFS — le type de
+  données reste commun, et un cours mal étiqueté doit s'afficher proprement
+  plutôt que de s'orienter à l'envers.
+- Dossier `OpeningLabs/` → **`Openings/`**, et les noms libérés par le
+  renommage ci-dessus sont repris : `OpeningLabsListView` → `OpeningListView`,
+  `OpeningLabsView` → `OpeningReaderView`, `OpeningLabsHost` →
+  `OpeningReaderHost`, `OpeningLabsFeature` → `OpeningCatalogFeature`.
+- Les données : `LabsMasterMove` → `OpeningMasterMove`, `LabsEngineLine` →
+  `OpeningEngineLine`, `LabsPositionData` → `OpeningPositionStats`,
+  `OpeningLabsSidecar` → `OpeningStatsSidecar`.
+- Sur disque : `Resources/openings_labs/<id>.labs.json` →
+  `openings_stats/<id>.stats.json` ; `labs.py` → `opening_stats.py` ;
+  `audit_labs.py` → `audit_opening_stats.py`.
+- Les identifiants d'accessibilité `labs_*` → `opening_*`.
+
+Le risque de ce genre de passe est la référence manquée qui ne casse rien à la
+compilation : le chargeur de sidecar est DÉFENSIF, un chemin faux aurait donné
+un module silencieusement vide. Le filet existait —
+`OpeningStatsTests.everySidecarPositionExistsInItsCourse` exige
+`inspected > 0` — et l'audit de la donnée est repassé vert après coup.
+
+### L'index : des symboles arbitraires à un vrai arbre
+
+Retour utilisateur : « les symboles à gauche sont disparates ». Ils l'étaient.
+Six formes de deux alphabets différents — une flèche, puis cercle, carré,
+losange, triangle, hexagone — à poids et tailles optiques inégaux, pour encoder
+une profondeur que **le retrait et les rails encodaient déjà**. Un marqueur
+redondant, dans un vocabulaire arbitraire à apprendre.
+
+Remplacés par un vrai CONNECTEUR d'arbre (``TreeConnector``) : un rail par
+étage encore ouvert au-dessus, et un « └ » ou « ├ » à l'étage de la rangée,
+selon qu'elle ferme sa fratrie ou non. C'est ainsi que les vues arborescentes
+se dessinent depuis toujours, et cela a un mérite qu'aucun jeu de symboles
+n'a : **cela ne s'apprend pas**. Le trait MONTRE à quoi la ligne se rattache.
+
+Il a fallu pour cela que chaque nœud connaisse sa lignée (``Node/lineage`` :
+pour chaque étage traversé, l'ancêtre était-il le dernier de sa fratrie ?),
+calculée en une passe séparée — un nœud ne peut pas savoir s'il ferme sa
+fratrie pendant qu'on le construit, c'est son parent qui le sait.
+
+Deux détails qui décidaient du résultat : l'espacement entre rangées est passé
+à ZÉRO, l'air étant pris à l'intérieur de chacune, sinon les rails se coupaient
+d'une rangée à l'autre et l'arbre se lisait comme une série de tirets ; et le
+nom de variante est entré DANS la colonne des connecteurs, posé en dehors il
+ouvrait dans les rails un trou de sa propre hauteur.
+
+La couleur par étage reste, mais elle ne porte plus d'information — seulement
+une aide à suivre un étage du regard. La légende est passée de six symboles à
+une ligne.

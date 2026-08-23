@@ -66,6 +66,16 @@ enum OpeningLineTree {
         var ecoName: String?
         /// La branche s'arrête parce que la suite est déjà dépliée ailleurs.
         var isTransposition: Bool
+        /// Pour chaque étage traversé (1…`depth`), l'ancêtre de cet étage
+        /// était-il le DERNIER de sa fratrie ?
+        ///
+        /// C'est ce qui permet de dessiner un vrai arbre plutôt qu'une colonne
+        /// de marqueurs : un rail ne se prolonge sous une rangée que si la
+        /// branche de cet étage a encore des sœurs à venir, et le connecteur
+        /// de la rangée est un « └ » quand elle ferme sa fratrie, un « ├ »
+        /// sinon. Le dernier élément décrit la rangée elle-même.
+        var lineage: [Bool] = []
+
         /// Cette rangée est-elle SUR la ligne principale de l'ouverture ?
         ///
         /// Vrai pour la rangée de tête et pour toute descendance qui n'a pris
@@ -94,7 +104,7 @@ enum OpeningLineTree {
     ///   (voir ``OpeningMoveQuality``). Absent : aucun verdict affiché.
     static func build(
         course: OpeningCourse, languageCode: String = "fr",
-        sidecar: OpeningLabsSidecar? = nil
+        sidecar: OpeningStatsSidecar? = nil
     ) -> Node? {
         var expanded: Set<String> = [course.rootFEN]
         let run = expand(
@@ -109,6 +119,7 @@ enum OpeningLineTree {
             isTransposition: run.isTransposition, isOnMainLine: true, children: run.children
         )
         root = labelled(root, with: titles(for: course, in: root))
+        root = withLineage(root, inherited: [])
         if let sidecar { root = judged(root, sidecar: sidecar) }
         return root
     }
@@ -186,7 +197,7 @@ enum OpeningLineTree {
     }
 
     /// Ligne principale d'abord, puis par popularité club — même ordre que
-    /// ``OpeningLabsViewModel/candidates``.
+    /// ``OpeningReaderViewModel/candidates``.
     private static func ordered(_ edges: [MoveEdge]) -> [MoveEdge] {
         edges.sorted { a, b in
             if (a.role == .mainLine) != (b.role == .mainLine) { return a.role == .mainLine }
@@ -272,6 +283,21 @@ enum OpeningLineTree {
         return result
     }
 
+    /// Renseigne ``Node/lineage`` de proche en proche.
+    ///
+    /// Une passe SÉPARÉE, parce qu'un nœud ne peut pas savoir s'il est le
+    /// dernier de sa fratrie pendant qu'on le construit : c'est son parent qui
+    /// le sait, une fois tous ses enfants faits.
+    private static func withLineage(_ node: Node, inherited: [Bool]) -> Node {
+        var node = node
+        node.lineage = inherited
+        let lastIndex = node.children.count - 1
+        node.children = node.children.enumerated().map { index, child in
+            withLineage(child, inherited: inherited + [index == lastIndex])
+        }
+        return node
+    }
+
     private static func labelled(_ node: Node, with titles: [String: LocalizedText]) -> Node {
         var node = node
         if let head = node.moves.first, let title = titles[head.toFEN] {
@@ -290,7 +316,7 @@ enum OpeningLineTree {
     /// Le coup suivant est cherché dans le MÊME tronçon. Au bout d'un tronçon,
     /// la suite dépend de la branche qu'on prend : aucune n'est « le » coup
     /// suivant, et en choisir une au hasard fausserait le jugement.
-    private static func judged(_ node: Node, sidecar: OpeningLabsSidecar) -> Node {
+    private static func judged(_ node: Node, sidecar: OpeningStatsSidecar) -> Node {
         var node = node
         node.moves = node.moves.enumerated().map { index, move in
             var move = move

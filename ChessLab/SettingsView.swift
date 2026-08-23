@@ -34,7 +34,6 @@ struct SettingsView: View {
                 feedbackSection
                 syncSection
                 if OpeningsGraphFeature.hasBundledCourses { previewSection }
-                if OpeningLabsFeature.hasCourses { labsSection }
                 helpSection
                 licensesSection
             }
@@ -279,26 +278,6 @@ struct SettingsView: View {
                 }
                 .buttonStyle(.pressable)
                 .padding(.top, 2)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .cardStyle()
-        }
-    }
-
-    /// Aperçu « Ouvertures — Labs ». Une SECTION à part, et pas une ligne
-    /// dans « Ouvertures » : c'est un module entier qu'on allume, pas une
-    /// préférence d'affichage, et sa tuile apparaît sur l'accueil.
-    private var labsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("Aperçus")
-            VStack(alignment: .leading, spacing: 8) {
-                Toggle("Ouvertures — Labs", isOn: $settings.openingsLabsEnabled)
-                    .tint(Theme.teal)
-                    .accessibilityIdentifier("settings_openingsLabs")
-                Text("Une seconde lecture des mêmes ouvertures : l'index de toutes les lignes (chaque coup y est cliquable), les coups des maîtres avec leurs pourcentages, et les trois meilleurs coups de Stockfish calculés d'avance. Ajoute une tuile sur l'accueil ; ne remplace rien.")
-                    .font(.caption)
-                    .foregroundStyle(Theme.textTertiary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle()

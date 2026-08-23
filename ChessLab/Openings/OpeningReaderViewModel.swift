@@ -21,9 +21,9 @@ import SwiftUI
 /// instantané, et l'état reste par construction cohérent.
 @Observable
 @MainActor
-final class OpeningLabsViewModel {
+final class OpeningReaderViewModel {
     let course: OpeningCourse
-    let sidecar: OpeningLabsSidecar
+    let sidecar: OpeningStatsSidecar
     /// L'ARBRE des lignes, calculé une fois — c'est le contenu de l'écran A.
     let tree: OpeningLineTree.Node?
     /// L'arbre aplati en rangées, dans l'ordre de lecture.
@@ -61,7 +61,7 @@ final class OpeningLabsViewModel {
     private let rootBoard: Board
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
 
-    init(course: OpeningCourse, sidecar: OpeningLabsSidecar) {
+    init(course: OpeningCourse, sidecar: OpeningStatsSidecar) {
         self.course = course
         self.sidecar = sidecar
         self.orientation = course.side.color
@@ -131,14 +131,14 @@ final class OpeningLabsViewModel {
 
     // MARK: Données Labs
 
-    private var labsData: LabsPositionData? { sidecar.data(at: currentKey) }
+    private var labsData: OpeningPositionStats? { sidecar.data(at: currentKey) }
 
     /// Ce que jouent les maîtres ici — `nil` si aucune partie de maître n'est
     /// connue pour cette position (l'écran le dit plutôt que d'afficher zéro).
-    var masterStats: LabsMasterStats? { labsData?.masters }
+    var masterStats: OpeningMasterStats? { labsData?.masters }
 
     /// Les trois meilleurs coups du moteur, calculés d'avance.
-    var engineLines: [LabsEngineLine] { labsData?.engine ?? [] }
+    var engineLines: [OpeningEngineLine] { labsData?.engine ?? [] }
     var engineDepth: Int? { sidecar.engineDepth }
 
     /// Évaluation de la position en centipions, POINT DE VUE BLANC.

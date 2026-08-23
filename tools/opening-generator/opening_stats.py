@@ -1,20 +1,19 @@
-"""Génère les données SIDECAR du module « Ouvertures — Labs ».
+"""Génère les données SIDECAR affichées par le module Ouvertures.
 
-Le module Labs affiche, pour CHAQUE position d'un cours d'ouverture :
+L'écran d'ouverture affiche, pour CHAQUE position :
 - les coups les plus joués par les MAÎTRES dans cette position, avec leurs
   pourcentages et leur bilan (Opening Explorer de Lichess, base `masters`) ;
 - les trois meilleurs coups de STOCKFISH, calculés d'avance (MultiPV 3).
 
 Pourquoi un fichier À CÔTÉ plutôt que d'enrichir `openings/<id>.json` ?
 
-1. Les cours embarqués sont la donnée du module d'ouvertures EXISTANT, en
-   production. Y ajouter des champs, c'est risquer une régression sur un module
-   qui marche, pour un module en aperçu.
-2. Le lecteur Labs veut TOUS les coups de maîtres de la position — y compris
-   ceux que le cours ne retient pas — alors que `MoveEdge.gamesMasters` ne
-   décrit que les arêtes curées du graphe. Ce n'est pas la même donnée.
-3. Le sidecar se charge PARESSEUSEMENT et seulement si l'aperçu est activé :
-   un utilisateur qui n'allume pas Labs ne paie rien en mémoire.
+1. Les cours sont partagés avec les FINALES : y ajouter des champs ferait
+   porter une régression de décodage à un module que cette donnée ne concerne
+   pas.
+2. Le lecteur veut TOUS les coups de maîtres de la position — y compris ceux
+   que le cours ne retient pas — alors que `MoveEdge.gamesMasters` ne décrit
+   que les arêtes curées du graphe. Ce n'est pas la même donnée.
+3. Le sidecar se charge PARESSEUSEMENT, une ouverture à la fois.
 
 Clé d'indexation : la FEN normalisée (`fen.normalize_fen`), rigoureusement la
 même que le graphe et que `OpeningFENKey.swift` — les transpositions partagent
@@ -33,10 +32,10 @@ donc leur entrée, et le sidecar survit à une régénération des arbres.
 ## Usage
 
     export LICHESS_TOKEN=lip_xxxx      # facultatif — sinon cache seul
-    python3 labs.py --engine bin/stockfish --depth 20 --workers 4
+    python3 opening_stats.py --engine bin/stockfish --depth 20 --workers 4
 
-    python3 labs.py --masters-only     # top-up des maîtres, sans moteur
-    python3 labs.py --engine-only      # moteur seul
+    python3 opening_stats.py --masters-only   # top-up des maîtres, sans moteur
+    python3 opening_stats.py --engine-only    # moteur seul
 """
 from __future__ import annotations
 
@@ -58,9 +57,9 @@ SCHEMA_VERSION = 1
 
 ROOT = Path(__file__).resolve().parents[2]
 COURSES_DIR = ROOT / "ChessLab" / "Resources" / "openings"
-OUT_DIR = ROOT / "ChessLab" / "Resources" / "openings_labs"
+OUT_DIR = ROOT / "ChessLab" / "Resources" / "openings_stats"
 CACHE_DIR = Path(__file__).resolve().parent / ".cache"
-ENGINE_CACHE_DIR = CACHE_DIR / "labs_engine"
+ENGINE_CACHE_DIR = CACHE_DIR / "opening_stats_engine"
 
 # Coups de maîtres RETENUS par position. Au-delà de six, on affiche du bruit
 # statistique (des coups à 0,3 % joués deux fois) et on paie des octets pour.
@@ -330,7 +329,7 @@ def write_sidecars(
             "engineDepth": depth,
             "positions": positions,
         }
-        path = OUT_DIR / f"{course['id']}.labs.json"
+        path = OUT_DIR / f"{course['id']}.stats.json"
         # `separators` sans espaces : sur 58 fichiers et ~5 000 positions, les
         # espaces d'indentation pèsent plus que la lisibilité ne vaut — le
         # fichier est généré, jamais relu à la main.
@@ -410,7 +409,7 @@ def reload_existing(courses: list[dict], field: str) -> dict:
     (`--engine-only`/`--masters-only`) n'écrase pas le travail de l'autre."""
     out: dict = {}
     for course in courses:
-        path = OUT_DIR / f"{course['id']}.labs.json"
+        path = OUT_DIR / f"{course['id']}.stats.json"
         if not path.exists():
             continue
         try:

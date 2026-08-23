@@ -5,10 +5,10 @@ import Testing
 
 /// Le sidecar Labs : décodage DÉFENSIF, pourcentages honnêtes, et cohérence
 /// des fichiers réellement embarqués avec les cours qu'ils accompagnent.
-struct OpeningLabsDataTests {
+struct OpeningStatsTests {
 
-    private func decode(_ json: String) throws -> OpeningLabsSidecar {
-        try OpeningLabsLoader.decode(from: Data(json.utf8))
+    private func decode(_ json: String) throws -> OpeningStatsSidecar {
+        try OpeningStatsLoader.decode(from: Data(json.utf8))
     }
 
     // MARK: Décodage
@@ -95,11 +95,11 @@ struct OpeningLabsDataTests {
     /// renormaliser afficherait 100 % là où il manque des parties.
     @Test("Les parts se rapportent au total de la position")
     func sharesUseThePositionTotal() {
-        let stats = LabsMasterStats(
+        let stats = OpeningMasterStats(
             white: 50, draws: 30, black: 20,
             moves: [
-                LabsMasterMove(san: "e4", uci: "e2e4", games: 60, white: 30, draws: 20, black: 10),
-                LabsMasterMove(san: "d4", uci: "d2d4", games: 30, white: 15, draws: 8, black: 7),
+                OpeningMasterMove(san: "e4", uci: "e2e4", games: 60, white: 30, draws: 20, black: 10),
+                OpeningMasterMove(san: "d4", uci: "d2d4", games: 30, white: 15, draws: 8, black: 7),
             ]
         )
 
@@ -112,15 +112,15 @@ struct OpeningLabsDataTests {
 
     @Test("Le score des blancs compte la nulle pour une demi-partie")
     func whiteScoreCountsDrawsAsHalf() {
-        let move = LabsMasterMove(san: "e4", uci: "e2e4", games: 10, white: 4, draws: 2, black: 4)
+        let move = OpeningMasterMove(san: "e4", uci: "e2e4", games: 10, white: 4, draws: 2, black: 4)
         #expect(abs((move.whiteScore ?? 0) - 0.5) < 0.0001)
     }
 
     @Test("Une position sans partie ne produit aucune part")
     func anEmptyPositionYieldsNoShare() {
-        let stats = LabsMasterStats(white: 0, draws: 0, black: 0, moves: [])
+        let stats = OpeningMasterStats(white: 0, draws: 0, black: 0, moves: [])
         #expect(stats.totalGames == 0)
-        #expect(stats.share(of: LabsMasterMove(san: "e4", uci: "e2e4", games: 5, white: 5, draws: 0, black: 0)) == 0)
+        #expect(stats.share(of: OpeningMasterMove(san: "e4", uci: "e2e4", games: 5, white: 5, draws: 0, black: 0)) == 0)
     }
 
     // MARK: Les fichiers RÉELLEMENT embarqués
@@ -137,8 +137,8 @@ struct OpeningLabsDataTests {
         var covered = 0
         var inspected = 0
         for entry in entries {
-            let sidecar = OpeningLabsLoader.sidecar(id: entry.id)
-            OpeningLabsLoader.flush()
+            let sidecar = OpeningStatsLoader.sidecar(id: entry.id)
+            OpeningStatsLoader.flush()
             guard !sidecar.positions.isEmpty else { continue }
             inspected += 1
             let course = try #require(OpeningCourseLoader.course(id: entry.id))
@@ -161,10 +161,10 @@ struct OpeningLabsDataTests {
         // catalogue : la génération peut n'en avoir écrit qu'une partie, et le
         // test doit vérifier la donnée présente, pas échouer sur son absence
         // (ce que contrôle déjà `everySidecarPositionExistsInItsCourse`).
-        var found: (entry: OpeningCatalogEntry, sidecar: OpeningLabsSidecar)?
+        var found: (entry: OpeningCatalogEntry, sidecar: OpeningStatsSidecar)?
         for candidate in OpeningCourseLoader.catalog where !candidate.isEndgame {
-            let sidecar = OpeningLabsLoader.sidecar(id: candidate.id)
-            OpeningLabsLoader.flush()
+            let sidecar = OpeningStatsLoader.sidecar(id: candidate.id)
+            OpeningStatsLoader.flush()
             if !sidecar.positions.isEmpty {
                 found = (candidate, sidecar)
                 break

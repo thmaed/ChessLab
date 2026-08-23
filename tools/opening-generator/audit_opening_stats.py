@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Audit du module « Ouvertures — Labs » : les lignes sont-elles PRÊTES ?
+"""Audit du module Ouvertures : les lignes sont-elles PRÊTES ?
 
 `validate.py` contrôle l'intégrité du graphe, `audit.py` la qualité des coups
 sous Stockfish. Ni l'un ni l'autre ne répond à la question que pose l'écran
@@ -18,9 +18,9 @@ position n'est dépliée qu'une fois) et mesure, ouverture par ouverture :
 - **documentation** — rangées portant un commentaire validé ou un nom de
   variante, et titres de chapitre qui trouvent leur branche.
 
-    python3 audit_labs.py
-    python3 audit_labs.py --only scandinavian
-    python3 audit_labs.py --quiet     # seulement les anomalies
+    python3 audit_opening_stats.py
+    python3 audit_opening_stats.py --only scandinavian
+    python3 audit_opening_stats.py --quiet     # seulement les anomalies
 
 Sortie non nulle si une anomalie STRUCTURELLE subsiste (position inatteignable,
 absente de l'arbre, ou sans évaluation moteur) : utilisable comme étape
@@ -36,7 +36,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 COURSES = ROOT / "ChessLab" / "Resources" / "openings"
-SIDECARS = ROOT / "ChessLab" / "Resources" / "openings_labs"
+SIDECARS = ROOT / "ChessLab" / "Resources" / "openings_stats"
 
 
 def ordered(moves: list[dict]) -> list[dict]:
@@ -145,7 +145,7 @@ def audit(course: dict) -> dict:
     rows, expanded = build_tree(course)
     reach = reachable(course)
 
-    sidecar_path = SIDECARS / f"{course['id']}.labs.json"
+    sidecar_path = SIDECARS / f"{course['id']}.stats.json"
     sidecar = {}
     if sidecar_path.exists():
         sidecar = json.loads(sidecar_path.read_text()).get("positions", {})
@@ -184,7 +184,7 @@ def blocking(report: dict) -> list[str]:
     position que l'écran afficherait sans aucune évaluation."""
     issues = []
     if not report["hasSidecar"]:
-        issues.append("aucun sidecar Labs")
+        issues.append("aucun sidecar de statistiques")
     if report["unreachable"]:
         issues.append(f"{report['unreachable']} positions inatteignables depuis la racine")
     if report["missingFromTree"]:

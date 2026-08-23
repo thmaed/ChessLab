@@ -7,7 +7,7 @@ import Testing
 /// laisse jamais l'écran dans un état incohérent — c'est le seul risque
 /// sérieux d'un modèle sans pile d'annulation.
 @MainActor
-struct OpeningLabsViewModelTests {
+struct OpeningReaderViewModelTests {
 
     private func course() -> OpeningCourse {
         OpeningGraphFixtures.linearCourse(
@@ -15,11 +15,11 @@ struct OpeningLabsViewModelTests {
         )
     }
 
-    private func viewModel(sidecar: OpeningLabsSidecar? = nil) -> OpeningLabsViewModel {
+    private func viewModel(sidecar: OpeningStatsSidecar? = nil) -> OpeningReaderViewModel {
         let course = course()
-        return OpeningLabsViewModel(
+        return OpeningReaderViewModel(
             course: course,
-            sidecar: sidecar ?? OpeningLabsSidecar(id: course.id, positions: [:])
+            sidecar: sidecar ?? OpeningStatsSidecar(id: course.id, positions: [:])
         )
     }
 
@@ -133,21 +133,21 @@ struct OpeningLabsViewModelTests {
 
     // MARK: Données Labs
 
-    private func sidecar(for course: OpeningCourse) -> OpeningLabsSidecar {
+    private func sidecar(for course: OpeningCourse) -> OpeningStatsSidecar {
         // Position après 1.e4 : on lui attache des maîtres et un moteur.
         var board = Board(position: .standard)
         _ = board.move(pieceAt: Square("e2"), to: Square("e4"))
         let key = OpeningFENKey.key(for: board.position)
-        return OpeningLabsSidecar(
+        return OpeningStatsSidecar(
             id: course.id, engineDepth: 20,
-            positions: [key: LabsPositionData(
-                masters: LabsMasterStats(
+            positions: [key: OpeningPositionStats(
+                masters: OpeningMasterStats(
                     white: 40, draws: 30, black: 30,
-                    moves: [LabsMasterMove(san: "e5", uci: "e7e5", games: 50, white: 20, draws: 15, black: 15)]
+                    moves: [OpeningMasterMove(san: "e5", uci: "e7e5", games: 50, white: 20, draws: 15, black: 15)]
                 ),
                 engine: [
-                    LabsEngineLine(san: "e5", uci: "e7e5", cp: 30),
-                    LabsEngineLine(san: "c5", uci: "c7c5", cp: 24),
+                    OpeningEngineLine(san: "e5", uci: "e7e5", cp: 30),
+                    OpeningEngineLine(san: "c5", uci: "c7c5", cp: 24),
                 ]
             )]
         )
@@ -156,7 +156,7 @@ struct OpeningLabsViewModelTests {
     @Test("Maîtres et moteur suivent la position affichée")
     func mastersAndEngineFollowThePosition() {
         let course = course()
-        let vm = OpeningLabsViewModel(course: course, sidecar: sidecar(for: course))
+        let vm = OpeningReaderViewModel(course: course, sidecar: sidecar(for: course))
 
         #expect(vm.masterStats == nil, "rien à la racine dans ce sidecar")
         vm.next()
@@ -170,7 +170,7 @@ struct OpeningLabsViewModelTests {
     @Test("L'évaluation vient du moteur pré-calculé")
     func evalComesFromThePrecomputedEngine() {
         let course = course()
-        let vm = OpeningLabsViewModel(course: course, sidecar: sidecar(for: course))
+        let vm = OpeningReaderViewModel(course: course, sidecar: sidecar(for: course))
         vm.next()
 
         #expect(vm.evalCp == 30)
@@ -208,8 +208,8 @@ struct OpeningLabsViewModelTests {
         var orphans: [String] = []
         for entry in OpeningCourseLoader.catalog.prefix(20) where !entry.isEndgame {
             guard let course = OpeningCourseLoader.course(id: entry.id) else { continue }
-            let vm = OpeningLabsViewModel(
-                course: course, sidecar: OpeningLabsSidecar(id: entry.id, positions: [:])
+            let vm = OpeningReaderViewModel(
+                course: course, sidecar: OpeningStatsSidecar(id: entry.id, positions: [:])
             )
             for row in vm.rows where row.isTransposition {
                 found += 1
@@ -244,10 +244,10 @@ struct OpeningLabsViewModelTests {
     @Test("Les coups du répertoire portent le nom de leur variante")
     func repertoireMovesCarryTheirVariationName() throws {
         let course = try #require(OpeningCourseLoader.course(id: "italian-game"))
-        let vm = OpeningLabsViewModel(
-            course: course, sidecar: OpeningLabsLoader.sidecar(id: "italian-game")
+        let vm = OpeningReaderViewModel(
+            course: course, sidecar: OpeningStatsLoader.sidecar(id: "italian-game")
         )
-        OpeningLabsLoader.flush()
+        OpeningStatsLoader.flush()
 
         // 1.e4 e5 2.Cf3 Cc6 3.Fc4 : ici s'ouvrent le gambit Evans (4.b4), la
         // défense hongroise (3…Fe7) et les Deux Cavaliers.

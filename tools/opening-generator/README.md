@@ -33,10 +33,10 @@ python3 author.py                       # (ré)écrit les 58 cours embarqués
 python3 author.py --only scandinavian
 ```
 
-## Une TROISIÈME chaîne : `labs.py`, la donnée du module « Ouvertures — Labs »
+## Une TROISIÈME chaîne : `opening_stats.py`, les statistiques du module Ouvertures
 
-`labs.py` ne touche pas aux cours. Il écrit **à côté** d'eux, dans
-`ChessLab/Resources/openings_labs/<id>.labs.json`, ce que le module Labs
+`opening_stats.py` ne touche pas aux cours. Il écrit **à côté** d'eux, dans
+`ChessLab/Resources/openings_stats/<id>.stats.json`, ce que l'écran Ouvertures
 affiche pour chaque position :
 
 - les coups les plus joués par les **maîtres** (Lichess Opening Explorer,
@@ -44,23 +44,25 @@ affiche pour chaque position :
   se calculent à l'affichage ;
 - les **trois meilleurs coups de Stockfish**, MultiPV 3 à profondeur fixe.
 
-Pourquoi à côté et non dedans : les cours sont la donnée d'un module en
-production, Labs est un aperçu ; et Labs veut TOUS les coups de maîtres de la
+Pourquoi à côté et non dedans : l'écran veut TOUS les coups de maîtres de la
 position, là où `MoveEdge.gamesMasters` ne décrit que les arêtes curées du
-graphe. Ce ne sont pas les mêmes données. Détail complet dans
+graphe — ce ne sont pas les mêmes données. Et le sidecar se charge
+PARESSEUSEMENT, une ouverture à la fois. Détail complet dans
 `ChessLab/OpeningLabs/OpeningLabsData.swift`.
+
+L'audit de cette donnée se lance par `audit_opening_stats.py` (voir plus bas).
 
 ```bash
 export LICHESS_TOKEN=lip_xxxx           # sinon : mode CACHE SEUL
-python3 labs.py --engine bin/stockfish --depth 20 --workers 4
+python3 opening_stats.py --engine bin/stockfish --depth 20 --workers 4
 
-python3 labs.py --masters-only          # rattrape les maîtres, sans moteur
-python3 labs.py --engine-only           # moteur seul
+python3 opening_stats.py --masters-only          # rattrape les maîtres, sans moteur
+python3 opening_stats.py --engine-only           # moteur seul
 ```
 
 Les deux passes sont **intégralement mises en cache sur disque** — le cache
-Explorer est partagé avec `generate.py`, celui du moteur est propre à `labs.py`
-(`.cache/labs_engine/`, indexé par FEN + profondeur + MultiPV). Relancer ne
+Explorer est partagé avec `generate.py`, celui du moteur est propre à `opening_stats.py`
+(`.cache/opening_stats_engine/`, indexé par FEN + profondeur + MultiPV). Relancer ne
 recalcule rien : c'est le mécanisme de reprise après interruption, et c'est ce
 qui rend `--masters-only` puis `--engine-only` sans danger.
 

@@ -22,7 +22,6 @@ final class AppSettings {
         static let pieceNotation = "settings.pieceNotation"
         static let appLanguage = "settings.appLanguage"
         static let puzzleAttempts = "settings.puzzleAttempts"
-        static let openingsLabs = "settings.openingsLabsEnabled"
     }
 
     /// Essais accordés par puzzle, avant que la solution ne soit fléchée.
@@ -120,22 +119,6 @@ final class AppSettings {
         }
     }
 
-    /// Aperçu du module « Ouvertures — Labs » (index des lignes, coups des
-    /// maîtres, meilleurs coups pré-calculés).
-    ///
-    /// ÉTEINT par défaut, et c'est le point : le module d'ouvertures en
-    /// production reste l'expérience par défaut, Labs s'y ajoute pour qui va
-    /// le chercher dans les réglages. Sa tuile d'accueil et son entrée de
-    /// barre latérale suivent cet interrupteur (``OpeningLabsFeature``).
-    var openingsLabsEnabled: Bool {
-        didSet {
-            UserDefaults.standard.set(openingsLabsEnabled, forKey: Keys.openingsLabs)
-            // Le sidecar chargé n'a plus lieu d'occuper la mémoire quand on
-            // éteint l'aperçu.
-            if !openingsLabsEnabled { OpeningLabsLoader.flush() }
-        }
-    }
-
     /// Locale correspondant à la langue active — pour l'environnement SwiftUI
     /// (`Text` la suit ; complète le détournement de bundle pour le formatage
     /// des nombres et des dates).
@@ -155,14 +138,6 @@ final class AppSettings {
         // insoluble ou infini.
         let storedAttempts = (defaults.object(forKey: Keys.puzzleAttempts) as? Int) ?? 1
         puzzleAttempts = Self.puzzleAttemptChoices.contains(storedAttempts) ? storedAttempts : 1
-
-        // `bool(forKey:)` et non `object(forKey:) as? Bool` : le défaut est
-        // FAUX, il n'y a donc rien à distinguer entre « absent » et
-        // « explicitement faux » (contrairement aux sons ou aux haptiques, qui
-        // sont vrais par défaut). En prime, `bool(forKey:)` sait lire un
-        // « 1 » du domaine des arguments de lancement, ce dont les tests
-        // d'interface ont besoin pour allumer l'aperçu.
-        openingsLabsEnabled = defaults.bool(forKey: Keys.openingsLabs)
 
         analysisArrowMode = defaults.string(forKey: Keys.analysisArrowMode)
             .flatMap(ArrowMode.init(rawValue:)) ?? .best

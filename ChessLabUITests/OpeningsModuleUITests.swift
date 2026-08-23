@@ -7,11 +7,10 @@ import XCTest
 /// lancement (domaine `NSArgumentDomain` de `UserDefaults`), exactement comme
 /// `-settings.appLanguage` ailleurs dans cette suite. Le premier contrôle du
 /// test est donc aussi celui de l'interrupteur lui-même.
-final class OpeningLabsUITests: XCTestCase {
+final class OpeningsModuleUITests: XCTestCase {
 
-    private func launchWithLabs(enabled: Bool = true, contentSize: String? = nil) -> XCUIApplication {
+    private func launchWithLabs(contentSize: String? = nil) -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments += ["-settings.openingsLabsEnabled", enabled ? "1" : "0"]
         // Les tailles d'accessibilité se forcent AU LANCEMENT : il n'existe
         // pas d'API pour en changer en cours de route (cf.
         // `DynamicTypeOverflowUITests`).
@@ -29,7 +28,7 @@ final class OpeningLabsUITests: XCTestCase {
     /// du lecteur change (plateau à gauche, panneau à droite).
     @discardableResult
     private func openLabs(_ app: XCUIApplication) -> Bool {
-        let tile = app.buttons["mode_openingsLabs"]
+        let tile = app.buttons["mode_openings"]
         if tile.waitForExistence(timeout: 10) {
             tile.tap()
             return true
@@ -45,26 +44,25 @@ final class OpeningLabsUITests: XCTestCase {
     /// SwiftUI n'expose pas ses rangées comme des boutons, et l'identifiant
     /// posé sur le `Label` atterrit sur son texte.
     private func sidebarRow(_ app: XCUIApplication) -> XCUIElement {
-        app.staticTexts["sidebar_openingsLabs"]
+        app.staticTexts["sidebar_openings"]
     }
 
     /// Existe-t-il un point d'entrée vers Labs, dans l'une ou l'autre ossature ?
     private func labsEntryExists(_ app: XCUIApplication, timeout: TimeInterval) -> Bool {
-        app.buttons["mode_openingsLabs"].waitForExistence(timeout: timeout)
+        app.buttons["mode_openings"].waitForExistence(timeout: timeout)
             || sidebarRow(app).exists
     }
 
-    /// L'interrupteur COMMANDE la tuile : c'est tout le contrat de l'aperçu.
-    func testThePreviewToggleGovernsTheHomeTile() {
-        let off = launchWithLabs(enabled: false)
-        XCTAssertTrue(off.staticTexts["ChessLab"].waitForExistence(timeout: 15))
-        XCTAssertFalse(labsEntryExists(off, timeout: 3),
-                       "aperçu éteint : aucun point d'entrée Labs ne doit exister")
-        off.terminate()
-
-        let on = launchWithLabs()
-        XCTAssertTrue(labsEntryExists(on, timeout: 15),
-                      "aperçu allumé : le point d'entrée Labs doit apparaître")
+    /// Le module a un point d'entrée, dans l'une comme dans l'autre ossature.
+    ///
+    /// Il était opt-in derrière un interrupteur de réglages tant que l'ancien
+    /// module tenait la place ; depuis le 23/08 il EST le module Ouvertures,
+    /// et sa tuile est celle de l'accueil.
+    func testTheModuleHasAHomeEntryPoint() {
+        let app = launchWithLabs()
+        XCTAssertTrue(app.staticTexts["ChessLab"].waitForExistence(timeout: 15))
+        XCTAssertTrue(labsEntryExists(app, timeout: 15),
+                      "aucun point d'entrée vers les Ouvertures")
     }
 
     /// Le parcours du prompt : choisir une ouverture, arriver sur l'index des
@@ -78,7 +76,7 @@ final class OpeningLabsUITests: XCTestCase {
         // La liste est triée par nom et paresseuse : on défile jusqu'à
         // l'entrée voulue avant d'exiger son existence (même précaution que
         // `OpeningReaderScreenshotUITests`).
-        let entry = app.buttons["labsList_scandinavian"]
+        let entry = app.buttons["opening_scandinavian"]
         var scrolls = 0
         while !(entry.exists && entry.isHittable) && scrolls < 15 {
             app.swipeUp()
@@ -89,7 +87,7 @@ final class OpeningLabsUITests: XCTestCase {
 
         // L'index s'ouvre TOUT SEUL à l'arrivée — « au moment du choix du type
         // d'ouverture, je souhaite avoir un écran (index ouvertures) ».
-        let close = app.buttons["labsIndex_close"]
+        let close = app.buttons["openingIndex_close"]
         XCTAssertTrue(close.waitForExistence(timeout: 10),
                       "l'index doit s'ouvrir de lui-même en entrant dans l'ouverture")
         capture(app, "02-labs-index")
@@ -101,13 +99,13 @@ final class OpeningLabsUITests: XCTestCase {
         deepMove?.tap()
 
         // On a atterri sur le lecteur, à une position déjà avancée.
-        XCTAssertTrue(app.buttons["labs_prev"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.buttons["labs_prev"].isEnabled,
+        XCTAssertTrue(app.buttons["reader_prev"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["reader_prev"].isEnabled,
                       "« Précédent » actif : on n'est pas retombé sur la position de départ")
         capture(app, "03-labs-reader")
 
         // L'index se ROUVRE par l'icône de la barre d'outils.
-        let reopen = app.buttons["labs_openIndex"]
+        let reopen = app.buttons["opening_openIndex"]
         XCTAssertTrue(reopen.waitForExistence(timeout: 5))
         reopen.tap()
         XCTAssertTrue(close.waitForExistence(timeout: 10), "l'index doit pouvoir se rouvrir")
@@ -119,7 +117,7 @@ final class OpeningLabsUITests: XCTestCase {
         let app = launchWithLabs()
         XCTAssertTrue(openLabs(app), "aucun point d'entrée vers Labs")
 
-        let entry = app.buttons["labsList_scandinavian"]
+        let entry = app.buttons["opening_scandinavian"]
         var scrolls = 0
         while !(entry.exists && entry.isHittable) && scrolls < 15 {
             app.swipeUp()
@@ -128,22 +126,22 @@ final class OpeningLabsUITests: XCTestCase {
         XCTAssertTrue(entry.waitForExistence(timeout: 10))
         entry.tap()
 
-        let close = app.buttons["labsIndex_close"]
+        let close = app.buttons["openingIndex_close"]
         XCTAssertTrue(close.waitForExistence(timeout: 10))
         close.tap()
 
         // Position de départ : c'est celle qui a le plus de parties de maîtres.
         let masters = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'labs_master_'")
+            NSPredicate(format: "identifier BEGINSWITH 'opening_master_'")
         )
         let engine = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'labs_engine_'")
+            NSPredicate(format: "identifier BEGINSWITH 'opening_engine_'")
         )
         let repertoire = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'labs_repertoire_'")
+            NSPredicate(format: "identifier BEGINSWITH 'opening_repertoire_'")
         )
 
-        XCTAssertTrue(app.buttons["labs_next"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["reader_next"].waitForExistence(timeout: 10))
         XCTAssertGreaterThan(repertoire.count, 0, "les coups du répertoire manquent")
         XCTAssertGreaterThan(masters.count, 0, "les coups de maîtres manquent")
         XCTAssertLessThanOrEqual(engine.count, 3, "le prompt dit « maximum 3 » coups de Stockfish")
@@ -170,10 +168,10 @@ final class OpeningLabsUITests: XCTestCase {
         XCTAssertTrue(openLabs(app), "aucun point d'entrée vers Labs")
         openScandinavianReader(app)
 
-        let evalBar = app.otherElements["labs_evalBar"]
+        let evalBar = app.otherElements["opening_evalBar"]
         XCTAssertTrue(evalBar.waitForExistence(timeout: 10))
         let panelRow = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'labs_repertoire_'")
+            NSPredicate(format: "identifier BEGINSWITH 'opening_repertoire_'")
         ).firstMatch
         XCTAssertTrue(panelRow.waitForExistence(timeout: 10))
 
@@ -216,7 +214,7 @@ final class OpeningLabsUITests: XCTestCase {
         // long : la RECHERCHE est le chemin praticable. Elle n'est pas exposée
         // de la même façon selon l'ossature (barre de navigation sur iPad), on
         // se rabat donc sur le défilement — ce qu'un lecteur ferait aussi.
-        let entry = app.buttons["labsList_scandinavian"]
+        let entry = app.buttons["opening_scandinavian"]
         let field = app.searchFields.firstMatch
         if field.waitForExistence(timeout: 5) {
             field.tap()
@@ -232,7 +230,7 @@ final class OpeningLabsUITests: XCTestCase {
                       "l'ouverture reste inatteignable en AX5")
         entry.tap()
 
-        XCTAssertTrue(app.buttons["labsIndex_close"].waitForExistence(timeout: 10),
+        XCTAssertTrue(app.buttons["openingIndex_close"].waitForExistence(timeout: 10),
                       "l'index ne s'ouvre pas en AX5")
         capture(app, "08-labs-index-AX5")
 
@@ -249,7 +247,7 @@ final class OpeningLabsUITests: XCTestCase {
         XCTAssertLessThanOrEqual(scrolled, 1,
                                  "il faut \(scrolled) balayages pour atteindre l'arbre en AX5 : l'en-tête l'enterre")
         chip?.tap()
-        XCTAssertTrue(app.buttons["labs_next"].waitForExistence(timeout: 10),
+        XCTAssertTrue(app.buttons["reader_next"].waitForExistence(timeout: 10),
                       "le saut depuis l'index ne fonctionne plus en AX5")
         capture(app, "09-labs-reader-AX5")
     }
@@ -263,7 +261,7 @@ final class OpeningLabsUITests: XCTestCase {
     func testMoveChipsStayComfortablyTappable() throws {
         let app = launchWithLabs()
         XCTAssertTrue(openLabs(app))
-        let entry = app.buttons["labsList_scandinavian"]
+        let entry = app.buttons["opening_scandinavian"]
         var scrolls = 0
         while !(entry.exists && entry.isHittable) && scrolls < 15 {
             app.swipeUp()
@@ -271,10 +269,10 @@ final class OpeningLabsUITests: XCTestCase {
         }
         XCTAssertTrue(entry.waitForExistence(timeout: 10))
         entry.tap()
-        XCTAssertTrue(app.buttons["labsIndex_close"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.buttons["openingIndex_close"].waitForExistence(timeout: 10))
 
         let chips = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'labsIndex_move_'")
+            NSPredicate(format: "identifier BEGINSWITH 'openingIndex_move_'")
         )
         var measured = 0
         for index in 0..<min(chips.count, 25) {
@@ -293,7 +291,7 @@ final class OpeningLabsUITests: XCTestCase {
 
     /// Ouvre la scandinave dans le lecteur, index refermé.
     private func openScandinavianReader(_ app: XCUIApplication) {
-        let entry = app.buttons["labsList_scandinavian"]
+        let entry = app.buttons["opening_scandinavian"]
         var scrolls = 0
         while !(entry.exists && entry.isHittable) && scrolls < 15 {
             app.swipeUp()
@@ -301,16 +299,16 @@ final class OpeningLabsUITests: XCTestCase {
         }
         XCTAssertTrue(entry.waitForExistence(timeout: 10))
         entry.tap()
-        let close = app.buttons["labsIndex_close"]
+        let close = app.buttons["openingIndex_close"]
         XCTAssertTrue(close.waitForExistence(timeout: 10))
         close.tap()
     }
 
     /// Le premier coup de l'index dont le demi-coup atteint `minimumPly` —
-    /// l'identifiant porte ce numéro (`labsIndex_move_<ply>_<uci>`).
+    /// l'identifiant porte ce numéro (`openingIndex_move_<ply>_<uci>`).
     private func firstMoveChip(in app: XCUIApplication, minimumPly: Int) -> XCUIElement? {
         let chips = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'labsIndex_move_'")
+            NSPredicate(format: "identifier BEGINSWITH 'openingIndex_move_'")
         )
         // BORNÉ : l'arbre compte plusieurs centaines de pastilles, et les
         // interroger toutes prenait des minutes aux tailles d'accessibilité.

@@ -11,8 +11,10 @@ import SwiftUI
 /// Taper une ouverture ouvre le lecteur avec l'index des lignes DÉJÀ DÉPLIÉ —
 /// le prompt : « au moment du choix du type d'ouverture, je souhaite avoir un
 /// écran (index ouvertures) ».
-struct OpeningLabsListView: View {
+struct OpeningListView: View {
     let onSelect: (String) -> Void
+    /// Ouvre l'ÉDITEUR d'arbre — répertoires personnels seulement.
+    var onEdit: (String) -> Void = { _ in }
     var onOpenLab: () -> Void = {}
     var onPlayVsEngine: () -> Void = {}
     var onOpenTwoPlayer: () -> Void = {}
@@ -24,11 +26,29 @@ struct OpeningLabsListView: View {
     @State private var appSettings = AppSettings.shared
     /// Observé : la liste se rafraîchit d'elle-même après un import.
     @State private var store = UserOpeningStore.shared
+    @State private var pendingDeletion: OpeningCatalogEntry?
+
+    /// Les répertoires personnels tels que la BASE les voit.
+    ///
+    /// 🐛 Sans cette requête, l'écran ne voit jamais arriver les répertoires
+    /// créés sur un autre appareil : `store.catalog` est un tableau mis en
+    /// cache, recalculé par `reload()` seulement, et CloudKit ne prévient
+    /// personne. `@Query` fait le lien — SwiftData réévalue la vue quand des
+    /// enregistrements arrivent, et on relit le catalogue à ce moment-là.
+    @Query private var userRecords: [UserOpeningRecord]
+
+    /// Empreinte de ce que contient la base : identifiants et dates.
+    private var recordsSignature: String {
+        userRecords
+            .map { "\($0.id)@\(Int($0.updatedAt.timeIntervalSince1970))" }
+            .sorted()
+            .joined(separator: "|")
+    }
 
     private var languageCode: String { appSettings.appLanguage.resolvedCode }
 
     private var entries: [OpeningCatalogEntry] {
-        OpeningLabsFeature.catalog
+        OpeningCatalogFeature.catalog
             .filter { sideFilter == nil || $0.side == sideFilter }
             // Les répertoires IMPORTÉS échappent au filtre de niveau : ils
             // n'en portent pas de significatif (l'app leur met « club » par
@@ -36,14 +56,23 @@ struct OpeningLabsListView: View {
             // disparaître derrière un filtre qu'il n'a pas renseigné.
             .filter { levelFilter == nil || $0.level == levelFilter || UserOpeningStore.isUserCourse(id: $0.id) }
             .filter { matches($0, query: search) }
-            .sorted { sortKey($0) < sortKey($1) }
     }
 
-    /// Les répertoires PERSONNELS en tête : ce sont ceux que l'utilisateur a
-    /// choisi d'ajouter, ils ne doivent pas se perdre au milieu de
-    /// cinquante-huit ouvertures livrées.
-    private func sortKey(_ entry: OpeningCatalogEntry) -> String {
-        (UserOpeningStore.isUserCourse(id: entry.id) ? "0" : "1") + displayName(entry).lowercased()
+    private func sorted(_ items: [OpeningCatalogEntry]) -> [OpeningCatalogEntry] {
+        items.sorted { displayName($0).localizedStandardCompare(displayName($1)) == .orderedAscending }
+    }
+
+    /// Les répertoires PERSONNELS ont leur SECTION, en tête : rangés
+    /// alphabétiquement au milieu de cinquante-huit ouvertures livrées, ils
+    /// étaient introuvables, et rien ne disait qu'un import avait marché.
+    private var mine: [OpeningCatalogEntry] {
+        sorted(entries.filter { UserOpeningStore.isUserCourse(id: $0.id) })
+    }
+    private var white: [OpeningCatalogEntry] {
+        sorted(entries.filter { !UserOpeningStore.isUserCourse(id: $0.id) && $0.side == .white })
+    }
+    private var black: [OpeningCatalogEntry] {
+        sorted(entries.filter { !UserOpeningStore.isUserCourse(id: $0.id) && $0.side == .black })
     }
 
     /// Nom affiché (traduit via le bundle redirigé, comme l'écran Ouvertures).
@@ -72,14 +101,16 @@ struct OpeningLabsListView: View {
                     )
                     .padding(.top, 40)
                 } else {
-                    ForEach(entries) { row($0) }
+                    if !mine.isEmpty { section("Mes répertoires", mine) }
+                    if !white.isEmpty { section("Répertoire blanc", white) }
+                    if !black.isEmpty { section("Répertoire noir", black) }
                 }
             }
             .padding(16)
         }
         .searchable(text: $search, prompt: Text("Rechercher une ouverture ou un code ECO"))
         .appBackground()
-        .navigationTitle("Ouvertures — Labs")
+        .navigationTitle("Ouvertures")
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -89,7 +120,7 @@ struct OpeningLabsListView: View {
                     Label("Ajouter un répertoire", systemImage: "plus")
                 }
                 .tint(Theme.accent)
-                .accessibilityIdentifier("labsList_add")
+                .accessibilityIdentifier("opening_add")
             }
             ToolbarItem(placement: .topBarTrailing) {
                 QuickSwitchMenu(
@@ -98,6 +129,30 @@ struct OpeningLabsListView: View {
                     onOpenTwoPlayer: onOpenTwoPlayer
                 )
             }
+        }
+        .onAppear {
+            // Le répertoire personnel de test (`-seedUserOpening`) : sans lui,
+            // le menu d'actions et l'éditeur d'arbre ne se regardent qu'après
+            // avoir importé un PGN à la main, autrement dit jamais. Ce point
+            // d'appel vivait dans l'écran Ouvertures d'origine ; il suit ici.
+            UserOpeningSeeder.seedIfRequested()
+        }
+        .onChange(of: recordsSignature) { _, _ in store.reload() }
+        .confirmationDialog(
+            "Supprimer ce répertoire ?",
+            isPresented: Binding(
+                get: { pendingDeletion != nil },
+                set: { if !$0 { pendingDeletion = nil } }
+            ),
+            titleVisibility: .visible
+        ) {
+            Button("Supprimer", role: .destructive) {
+                if let pendingDeletion { store.delete(id: pendingDeletion.id) }
+                pendingDeletion = nil
+            }
+            Button("Annuler", role: .cancel) { pendingDeletion = nil }
+        } message: {
+            Text("Le fichier quitte cet appareil. Votre progression sur ces positions est conservée.")
         }
         .sheet(isPresented: $showImport) {
             // Même feuille d'import que l'écran Ouvertures — PGN collé,
@@ -110,7 +165,7 @@ struct OpeningLabsListView: View {
 
     private var intro: some View {
         HStack(alignment: .top, spacing: 12) {
-            IconBadge(systemImage: "chart.bar.doc.horizontal", tint: Theme.teal, size: 36)
+            IconBadge(systemImage: "books.vertical.fill", tint: Theme.warning, size: 36)
             VStack(alignment: .leading, spacing: 4) {
                 Text("Chaque position, disséquée")
                     .font(.subheadline.weight(.bold))
@@ -132,7 +187,7 @@ struct OpeningLabsListView: View {
     private var filterBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                FilterChip(label: "Tous", tint: Theme.gold,
+                FilterChip(label: "Tous", tint: Theme.warning,
                            isSelected: sideFilter == nil && levelFilter == nil) {
                     sideFilter = nil
                     levelFilter = nil
@@ -156,6 +211,53 @@ struct OpeningLabsListView: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Filtres des ouvertures")
+    }
+
+    @ViewBuilder
+    private func section(_ title: LocalizedStringKey, _ items: [OpeningCatalogEntry]) -> some View {
+        Text(title)
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(Theme.textSecondary)
+            .textCase(.uppercase).tracking(0.4)
+            .padding(.top, 6)
+        ForEach(items) { entry in
+            // Le bouton d'ouverture et le menu d'actions sont FRÈRES, pas
+            // imbriqués : un `Menu` posé dans le label d'un `Button` ne reçoit
+            // jamais ses propres taps, le bouton extérieur les avale.
+            HStack(spacing: 4) {
+                row(entry)
+                if UserOpeningStore.isUserCourse(id: entry.id) { actionsMenu(entry) }
+            }
+        }
+    }
+
+    /// Actions d'un répertoire personnel, TOUJOURS VISIBLES.
+    ///
+    /// Une fonctionnalité qui demande de deviner qu'il faut balayer une ligne
+    /// n'existe pas vraiment : c'est ce qui rendait l'éditeur d'arbre
+    /// introuvable dans l'écran qu'on remplace.
+    @ViewBuilder
+    private func actionsMenu(_ entry: OpeningCatalogEntry) -> some View {
+        Menu {
+            Button { onEdit(entry.id) } label: {
+                Label("Modifier le répertoire", systemImage: "pencil")
+            }
+            if let url = store.exportFileURL(for: entry.id) {
+                ShareLink(item: url) { Label("Partager", systemImage: "square.and.arrow.up") }
+            }
+            Divider()
+            Button(role: .destructive) { pendingDeletion = entry } label: {
+                Label("Supprimer", systemImage: "trash")
+            }
+        } label: {
+            Image(systemName: "ellipsis.circle")
+                .font(.title3)
+                .foregroundStyle(Theme.textSecondary)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel("Actions du répertoire")
+        .accessibilityIdentifier("openingActions_\(entry.id)")
     }
 
     private func row(_ entry: OpeningCatalogEntry) -> some View {
@@ -186,7 +288,9 @@ struct OpeningLabsListView: View {
                         .lineLimit(3)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                HStack(spacing: 8) {
+                // Les pastilles ne se coupant plus, la RANGÉE doit pouvoir
+                // passer à la ligne.
+                FlowLayout(spacing: 8, lineSpacing: 6) {
                     if UserOpeningStore.isUserCourse(id: entry.id) {
                         stat(LocalizationController.string("Mon répertoire"), "person.crop.circle")
                     }
@@ -206,7 +310,7 @@ struct OpeningLabsListView: View {
             .cardStyle(padding: 14)
         }
         .buttonStyle(.pressable)
-        .accessibilityIdentifier("labsList_\(entry.id)")
+        .accessibilityIdentifier("opening_\(entry.id)")
     }
 
     private func ecoLabel(_ entry: OpeningCatalogEntry) -> String? {
@@ -220,6 +324,11 @@ struct OpeningLabsListView: View {
         Label(text, systemImage: icon)
             .font(.caption2)
             .foregroundStyle(Theme.textTertiary)
+            // Une pastille ne se coupe JAMAIS en plein mot : « Blancs »
+            // devenait « Blanc/s » et « Mon répertoire » « Mon réper-/toire ».
+            // Même remède que ``FilterChip``, qui documente déjà ce piège.
+            .lineLimit(1)
+            .fixedSize(horizontal: true, vertical: false)
             .padding(.horizontal, 7).padding(.vertical, 3)
             .background(Theme.surfaceElevated.opacity(0.6), in: Capsule())
     }

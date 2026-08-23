@@ -31,7 +31,15 @@ final class OpeningReaderScreenshotUITests: XCTestCase {
         }
         XCTAssertTrue(italian.waitForExistence(timeout: 10))
         italian.tap()
-        capture(app, "02-reader-start-en")
+
+        // L'index des lignes s'ouvre de lui-même en entrant dans une
+        // ouverture (c'est l'écran d'entrée du module depuis le 23/08) : on
+        // le capture, puis on le referme pour atteindre le lecteur.
+        let closeIndex = app.buttons["openingIndex_close"]
+        XCTAssertTrue(closeIndex.waitForExistence(timeout: 10))
+        capture(app, "02-index-en")
+        closeIndex.tap()
+        capture(app, "03-reader-start-en")
 
         // Avance jusqu'à la fin de la ligne principale
         let next = app.buttons["reader_next"]
@@ -41,7 +49,7 @@ final class OpeningReaderScreenshotUITests: XCTestCase {
             next.tap()
             guardCount += 1
         }
-        capture(app, "03-reader-end-en")
+        capture(app, "04-reader-end-en")
     }
 
     private func capture(_ app: XCUIApplication, _ name: String) {

@@ -24,12 +24,14 @@ import SwiftUI
 /// ## Pourquoi aucun moteur ne tourne
 ///
 /// Les trois meilleurs coups et l'évaluation viennent du sidecar
-/// (``OpeningLabsSidecar``), calculés à profondeur 20 au moment de la
+/// (``OpeningStatsSidecar``), calculés à profondeur 20 au moment de la
 /// génération. Un Stockfish embarqué donnerait les mêmes chiffres après
 /// plusieurs secondes d'attente, en chauffant l'appareil, et redémarrerait à
 /// chaque coup. Ici, l'information est là avant que le doigt ne quitte l'écran.
-struct OpeningLabsView: View {
-    @Bindable var viewModel: OpeningLabsViewModel
+struct OpeningReaderView: View {
+    @Bindable var viewModel: OpeningReaderViewModel
+    /// Entraînement de la LIGNE affichée, en répétition espacée.
+    var onTrain: () -> Void = {}
     var onContinueVsStockfish: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }
@@ -49,6 +51,9 @@ struct OpeningLabsView: View {
         }
         .appBackground()
         .navigationTitle(LocalizedStringKey(viewModel.course.name))
+        // TROIS boutons de barre laissent peu de place au titre : `.inline`
+        // le tronque proprement plutôt que de bousculer les boutons, et le nom
+        // complet reste en tête de l'index, à un tap.
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
@@ -62,13 +67,15 @@ struct OpeningLabsView: View {
                     Label("Index des lignes", systemImage: "list.bullet.indent")
                 }
                 .tint(Theme.info)
-                .accessibilityIdentifier("labs_openIndex")
+                .accessibilityIdentifier("opening_openIndex")
 
-                // DEUX boutons de barre, pas trois : un troisième rognait le
-                // titre en « Défense scan… ». L'entraînement en répétition
-                // espacée reste celui du module Ouvertures, qui le porte déjà
-                // — Labs LIT, il ne double pas la progression.
-                // Débranchement conservé : Laboratoire / Ordinateur / Deux joueurs.
+                Button { onTrain() } label: {
+                    Label("S'entraîner", systemImage: "graduationcap.fill")
+                }
+                .tint(Theme.accent)
+                .accessibilityIdentifier("opening_train")
+
+                // Débranchement : Laboratoire / Ordinateur / Deux joueurs.
                 QuickSwitchMenu(
                     onOpenLab: { onOpenLab(viewModel.currentFEN) },
                     onPlayVsEngine: { onContinueVsStockfish(viewModel.currentFEN) },
@@ -188,8 +195,8 @@ struct OpeningLabsView: View {
         // Repère de MISE EN PAGE pour les tests d'interface : la barre est
         // collée sous le plateau, donc sa position dit de quel côté se trouve
         // le plateau par rapport au panneau (dessous en portrait, à gauche en
-        // paysage). Voir `OpeningLabsUITests`.
-        .accessibilityIdentifier("labs_evalBar")
+        // paysage). Voir `OpeningsModuleUITests`.
+        .accessibilityIdentifier("opening_evalBar")
     }
 
     private var evalText: String {
@@ -419,7 +426,7 @@ struct OpeningLabsView: View {
             )
         }
         .buttonStyle(.pressable)
-        .accessibilityIdentifier("labs_repertoire_\(item.edge.uci)")
+        .accessibilityIdentifier("opening_repertoire_\(item.edge.uci)")
         .accessibilityLabel(Text(repertoireAccessibility(item, name: name)))
     }
 
@@ -489,7 +496,7 @@ struct OpeningLabsView: View {
         }
     }
 
-    private func masterRow(_ move: LabsMasterMove, stats: LabsMasterStats) -> some View {
+    private func masterRow(_ move: OpeningMasterMove, stats: OpeningMasterStats) -> some View {
         let share = stats.share(of: move)
         let edge = viewModel.edge(forUCI: move.uci)
 
@@ -531,11 +538,11 @@ struct OpeningLabsView: View {
         }
         .buttonStyle(.pressable)
         .disabled(edge == nil)
-        .accessibilityIdentifier("labs_master_\(move.uci)")
+        .accessibilityIdentifier("opening_master_\(move.uci)")
         .accessibilityLabel(Text(masterAccessibility(move, share: share)))
     }
 
-    private func masterAccessibility(_ move: LabsMasterMove, share: Double) -> String {
+    private func masterAccessibility(_ move: OpeningMasterMove, share: Double) -> String {
         LocalizationController.string(
             "%@, %@ des parties de maîtres", FigurineSAN.spoken(move.san), percent(share)
         )
@@ -544,7 +551,7 @@ struct OpeningLabsView: View {
     /// Bilan du coup : blanc / nulle / noir, dans les couleurs des camps.
     /// FINE (2 pt) : c'est une indication de tendance, pas une mesure qu'on lit
     /// au dixième — et elle partage sa colonne avec le reste.
-    private func resultBar(_ move: LabsMasterMove) -> some View {
+    private func resultBar(_ move: OpeningMasterMove) -> some View {
         let total = max(1, move.games)
         return GeometryReader { geo in
             HStack(spacing: 0) {
@@ -584,7 +591,7 @@ struct OpeningLabsView: View {
         }
     }
 
-    private func engineRow(_ line: LabsEngineLine, rank: Int) -> some View {
+    private func engineRow(_ line: OpeningEngineLine, rank: Int) -> some View {
         let edge = viewModel.edge(forUCI: line.uci)
         return Button {
             if let edge { viewModel.play(edge) }
@@ -621,7 +628,7 @@ struct OpeningLabsView: View {
         }
         .buttonStyle(.pressable)
         .disabled(edge == nil)
-        .accessibilityIdentifier("labs_engine_\(line.uci)")
+        .accessibilityIdentifier("opening_engine_\(line.uci)")
     }
 
     /// Ce coup mène-t-il quelque part ?
@@ -640,13 +647,13 @@ struct OpeningLabsView: View {
 
     /// Score TOUJOURS du point de vue des blancs, comme la barre — deux
     /// conventions à l'écran, c'est une inversion de signe garantie.
-    private func engineScore(_ line: LabsEngineLine) -> String {
+    private func engineScore(_ line: OpeningEngineLine) -> String {
         if let mate = line.mate { return mate > 0 ? "M\(mate)" : "-M\(abs(mate))" }
         guard let cp = line.cp else { return "—" }
         return String(format: "%+.2f", Double(cp) / 100)
     }
 
-    private func engineTint(_ line: LabsEngineLine) -> Color {
+    private func engineTint(_ line: OpeningEngineLine) -> Color {
         if let mate = line.mate { return mate > 0 ? Theme.accent : Theme.danger }
         guard let cp = line.cp else { return Theme.textTertiary }
         if cp > 50 { return Theme.accent }
@@ -720,7 +727,7 @@ struct OpeningLabsView: View {
             .buttonStyle(.pressable)
             .disabled(!viewModel.canGoBack)
             .opacity(viewModel.canGoBack ? 1 : 0.4)
-            .accessibilityIdentifier("labs_prev")
+            .accessibilityIdentifier("reader_prev")
 
             Button { viewModel.next() } label: {
                 Label("Suivant", systemImage: "chevron.right")
@@ -734,7 +741,7 @@ struct OpeningLabsView: View {
             .buttonStyle(.pressable)
             .disabled(viewModel.isEnd)
             .opacity(viewModel.isEnd ? 0.4 : 1)
-            .accessibilityIdentifier("labs_next")
+            .accessibilityIdentifier("reader_next")
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
@@ -743,23 +750,24 @@ struct OpeningLabsView: View {
 }
 
 /// Héberge le lecteur Labs : charge le cours ET son sidecar une seule fois.
-struct OpeningLabsHost: View {
+struct OpeningReaderHost: View {
     let courseID: String
     /// Identité de session — voir ``SessionStore``.
     let sessionKey: String
     let onExit: () -> Void
+    var onTrain: () -> Void = {}
     var onContinueVsStockfish: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }
 
     @Environment(\.sessionStore) private var sessionStore
-    @State private var viewModel: OpeningLabsViewModel?
+    @State private var viewModel: OpeningReaderViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                OpeningLabsView(
-                    viewModel: viewModel,
+                OpeningReaderView(
+                    viewModel: viewModel, onTrain: onTrain,
                     onContinueVsStockfish: onContinueVsStockfish,
                     onOpenLab: onOpenLab, onOpenTwoPlayer: onOpenTwoPlayer
                 )
@@ -772,7 +780,7 @@ struct OpeningLabsHost: View {
             guard viewModel == nil else { return }
             viewModel = sessionStore.value(for: sessionKey) {
                 OpeningCatalog.course(id: courseID).map {
-                    OpeningLabsViewModel(course: $0, sidecar: OpeningLabsLoader.sidecar(id: courseID))
+                    OpeningReaderViewModel(course: $0, sidecar: OpeningStatsLoader.sidecar(id: courseID))
                 }
             }
         }

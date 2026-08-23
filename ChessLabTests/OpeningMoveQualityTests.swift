@@ -31,18 +31,18 @@ struct OpeningMoveQualityTests {
 
     /// Sidecar donnant à chaque position l'évaluation voulue (centipions, point
     /// de vue BLANC), et comme meilleur coup celui de la ligne.
-    private func sidecar(for course: OpeningCourse, evals: [Int]) -> OpeningLabsSidecar {
+    private func sidecar(for course: OpeningCourse, evals: [Int]) -> OpeningStatsSidecar {
         let keys = keys(of: course)
-        var positions: [String: LabsPositionData] = [:]
+        var positions: [String: OpeningPositionStats] = [:]
         for (index, key) in keys.enumerated() where index < evals.count {
             let best = course.node(at: key)?.moves.first
-            positions[key] = LabsPositionData(
+            positions[key] = OpeningPositionStats(
                 engine: [
-                    LabsEngineLine(san: best?.san ?? "—", uci: best?.uci ?? "0000", cp: evals[index]),
+                    OpeningEngineLine(san: best?.san ?? "—", uci: best?.uci ?? "0000", cp: evals[index]),
                 ]
             )
         }
-        return OpeningLabsSidecar(id: course.id, engineDepth: 20, positions: positions)
+        return OpeningStatsSidecar(id: course.id, engineDepth: 20, positions: positions)
     }
 
     private func qualities(evals: [Int]) -> [MoveQuality?] {
@@ -124,7 +124,7 @@ struct OpeningMoveQualityTests {
         // plus jugeable, le reste doit continuer de l'être.
         var positions = sidecar.positions
         positions.removeValue(forKey: course.rootFEN)
-        sidecar = OpeningLabsSidecar(id: course.id, engineDepth: 20, positions: positions)
+        sidecar = OpeningStatsSidecar(id: course.id, engineDepth: 20, positions: positions)
 
         let moves = OpeningLineTree.build(course: course, sidecar: sidecar)?.flattened.flatMap(\.moves) ?? []
         #expect(moves.first?.quality == nil, "sans position de départ, pas de verdict")
@@ -145,8 +145,8 @@ struct OpeningMoveQualityTests {
         var seen: Set<MoveQuality> = []
         for entry in OpeningCourseLoader.catalog where !entry.isEndgame {
             guard let course = OpeningCourseLoader.course(id: entry.id) else { continue }
-            let sidecar = OpeningLabsLoader.sidecar(id: entry.id)
-            OpeningLabsLoader.flush()
+            let sidecar = OpeningStatsLoader.sidecar(id: entry.id)
+            OpeningStatsLoader.flush()
             for row in OpeningLineTree.build(course: course, sidecar: sidecar)?.flattened ?? [] {
                 for move in row.moves {
                     total += 1
@@ -176,7 +176,7 @@ struct OpeningMoveQualityTests {
     @Test("Le piège de l'Englund est jugé comme tel")
     func theEnglundTrapIsJudgedAsSuch() throws {
         let course = try #require(OpeningCourseLoader.course(id: "englund-gambit"))
-        let sidecar = OpeningLabsLoader.sidecar(id: "englund-gambit")
+        let sidecar = OpeningStatsLoader.sidecar(id: "englund-gambit")
         try #require(!sidecar.positions.isEmpty, "sidecar Englund absent")
 
         let moves = OpeningLineTree.build(course: course, sidecar: sidecar)?.flattened.flatMap(\.moves) ?? []

@@ -13,7 +13,7 @@ struct EvalBarView: View {
     /// l'échiquier au lieu de lui disputer la place.
     var height: CGFloat = 20
     /// Score écrit DANS la barre. À masquer sous ~14 pt : le chiffre n'y tient
-    /// plus, et l'écran hôte l'affiche alors à côté (voir ``OpeningLabsView``).
+    /// plus, et l'écran hôte l'affiche alors à côté (voir ``OpeningReaderView``).
     var showsLabel: Bool = true
 
     private enum Advantage { case white, black, equal }

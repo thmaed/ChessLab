@@ -2,7 +2,7 @@ import ChessKit
 import Foundation
 import Observation
 
-/// LECTEUR d'ouverture : on avance coup par coup dans la ligne, on lit
+/// LECTEUR de FINALE : on avance coup par coup dans la ligne, on lit
 /// l'explication de chaque coup, et on voit les variantes à chaque position.
 /// C'est LE mode d'ouvertures — simple et guidé, façon livre interactif :
 /// « Suivant » suit la ligne principale, « Précédent » revient, et les autres
@@ -12,7 +12,7 @@ import Observation
 /// répétition espacée reste accessible à part.)
 @Observable
 @MainActor
-final class OpeningReaderViewModel {
+final class EndgameReaderViewModel {
     let course: OpeningCourse
     let orientation: Piece.Color
 

@@ -31,7 +31,7 @@ import SwiftUI
 /// Les coups du chemin COURANT sont surlignés dans tout l'arbre : rouvrir
 /// l'index en cours de lecture montre où l'on est et par où l'on est passé.
 struct OpeningIndexView: View {
-    @Bindable var viewModel: OpeningLabsViewModel
+    @Bindable var viewModel: OpeningReaderViewModel
     /// Saut demandé : le chemin à rejouer, puis fermeture de l'index.
     let onSelect: ([String]) -> Void
     let onClose: () -> Void
@@ -75,7 +75,7 @@ struct OpeningIndexView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Fermer", systemImage: "xmark", action: onClose)
-                        .accessibilityIdentifier("labsIndex_close")
+                        .accessibilityIdentifier("openingIndex_close")
                 }
             }
         }
@@ -136,7 +136,10 @@ struct OpeningIndexView: View {
     // MARK: L'arbre
 
     private func treeCard(_ proxy: ScrollViewProxy) -> some View {
-        VStack(alignment: .leading, spacing: 7) {
+        // Espacement NUL entre les rangées, l'air étant pris à l'intérieur de
+        // chacune : sinon les rails verticaux se coupent d'une rangée à
+        // l'autre et l'arbre se lit comme une série de tirets.
+        VStack(alignment: .leading, spacing: 0) {
             // Identité par RANG : les rangées sont une liste ordonnée qui ne se
             // réordonne jamais, et le rang est la seule clé dont l'unicité est
             // garantie sans reconstruire une chaîne par rangée à chaque rendu.
@@ -149,41 +152,64 @@ struct OpeningIndexView: View {
     }
 
     private func treeRow(_ row: OpeningLineTree.Node, proxy: ScrollViewProxy) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            if let title = row.chapterTitle?.resolved(languageCode) {
-                branchLabel(title, depth: row.depth, tint: BranchMarker.tint(for: row.depth))
-            } else if let eco = row.ecoName, row.depth > 0 {
-                branchLabel(eco, depth: row.depth, tint: Theme.textTertiary)
+        // Le nom de la branche est DANS la colonne des connecteurs, pas
+        // au-dessus : posé en dehors, il ouvrait dans les rails un trou de sa
+        // propre hauteur. Le coude vise donc sa ligne quand il y en a un, et
+        // la première rangée de pastilles sinon.
+        let label = row.chapterTitle?.resolved(languageCode)
+            ?? (row.depth > 0 ? row.ecoName : nil)
+
+        return HStack(alignment: .top, spacing: 0) {
+            // Un vrai ARBRE, dessiné comme on dessine les arbres : un rail par
+            // étage encore ouvert au-dessus, et un connecteur « └ » ou « ├ »
+            // à l'étage de la rangée.
+            //
+            // Il y avait ici six formes d'alphabets différents — une flèche,
+            // puis cercle, carré, losange, triangle, hexagone — à poids et
+            // tailles optiques inégaux, pour encoder une profondeur que le
+            // RETRAIT et les RAILS encodaient déjà. Un marqueur redondant,
+            // dans un vocabulaire arbitraire à apprendre. Le connecteur, lui,
+            // ne s'apprend pas : il montre à quoi la ligne se rattache.
+            ForEach(0..<row.depth, id: \.self) { level in
+                TreeConnector(
+                    isLast: row.lineage.indices.contains(level) ? row.lineage[level] : true,
+                    isElbow: level == row.depth - 1,
+                    // Le coude vise le MILIEU de ce que la rangée montre en
+                    // premier : 4 pt de marge + la moitié d'une pastille
+                    // (≈ 28 pt), ou + la moitié d'une ligne de `caption2`
+                    // (≈ 14 pt) quand la rangée porte un nom.
+                    elbowY: label == nil ? 18 : 11
+                )
+                .stroke(BranchMarker.tint(for: level + 1).opacity(0.55), lineWidth: 1.5)
+                .frame(width: Self.indentStep)
             }
 
-            HStack(alignment: .top, spacing: 0) {
-                // Rails de profondeur : de fins traits verticaux qui rattachent
-                // la branche à celle dont elle descend. Sans eux, à quatre
-                // niveaux, le retrait seul ne dit plus de qui on descend.
-                ForEach(0..<indentLevels(row.depth), id: \.self) { level in
-                    Rectangle()
-                        .fill(BranchMarker.tint(for: level + 1).opacity(0.22))
-                        .frame(width: 1)
-                        .frame(maxHeight: .infinity)
-                        .padding(.trailing, Self.indentStep - 1)
+            VStack(alignment: .leading, spacing: 3) {
+                if let label {
+                    Text(label)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(
+                            row.chapterTitle != nil
+                                ? BranchMarker.tint(for: row.depth) : Theme.textTertiary
+                        )
+                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                if row.depth > 0 {
-                    BranchMarker.icon(for: row.depth)
-                        .padding(.trailing, 5)
-                        .padding(.top, 4)
-                }
-                FlowLayout(spacing: 4, lineSpacing: 6) {
+                FlowLayout(spacing: 5, lineSpacing: 7) {
                     ForEach(Array(row.moves.enumerated()), id: \.element.id) { position, move in
                         moveChip(move, isFirstOfLine: position == 0, isOnMainLine: row.isOnMainLine)
                     }
                     if row.isTransposition { transpositionChip(for: row, proxy: proxy) }
                 }
             }
+            // L'air est porté par le CONTENU, pas par la rangée : appliqué à
+            // l'extérieur du `HStack`, il tombait hors des connecteurs, qui
+            // s'arrêtaient donc 4 pt avant le bord — huit points de trou entre
+            // deux rangées, et des rails en pointillés.
+            .padding(.vertical, 4)
+            .padding(.leading, row.depth > 0 ? 5 : 0)
         }
         .fixedSize(horizontal: false, vertical: true)
-        // Surbrillance du renvoi : elle déborde la rangée pour l'encadrer, et
-        // s'estompe d'elle-même.
-        .padding(.vertical, highlightedRowID == row.id ? 4 : 0)
         .background(
             RoundedRectangle(cornerRadius: 8, style: .continuous)
                 .fill(Theme.info.opacity(highlightedRowID == row.id ? 0.16 : 0))
@@ -191,26 +217,10 @@ struct OpeningIndexView: View {
         .animation(Theme.gentle, value: highlightedRowID)
     }
 
-    /// Le nom que porte une branche : titre de chapitre écrit à la main, ou à
-    /// défaut le nom de variante que la donnée connaît.
-    private func branchLabel(_ text: String, depth: Int, tint: Color) -> some View {
-        Text(text)
-            .font(.caption2.weight(.semibold))
-            .foregroundStyle(tint)
-            .lineLimit(2)
-            .padding(.leading, CGFloat(indentLevels(depth)) * Self.indentStep + 17)
-            .fixedSize(horizontal: false, vertical: true)
-    }
-
-    /// Retrait par étage. Assez pour se voir, assez peu pour qu'une branche de
-    /// profondeur 6 (le maximum du catalogue) garde de la place pour ses coups
-    /// sur un écran de 320 pt.
-    private static let indentStep: CGFloat = 11
-
-    /// Étages de retrait DESSINÉS. Plafonnés : au-delà, l'imbrication continue
-    /// mais le retrait ne creuse plus, sinon les coups finiraient écrasés
-    /// contre le bord droit. Le marqueur, lui, continue de distinguer.
-    private func indentLevels(_ depth: Int) -> Int { min(depth, 5) }
+    /// Largeur d'un étage de connecteur. Assez pour se voir, assez peu pour
+    /// qu'une branche de profondeur 6 (le maximum du catalogue) garde de la
+    /// place pour ses coups sur un écran de 320 pt.
+    private static let indentStep: CGFloat = 13
 
     /// « La suite est ailleurs » : la position a déjà été dépliée par un autre
     /// chemin. On le DIT plutôt que de couper en silence (on croirait la ligne
@@ -250,7 +260,7 @@ struct OpeningIndexView: View {
         }
         .buttonStyle(.pressable(scale: 0.9))
         .disabled(destination == nil)
-        .accessibilityIdentifier("labsIndex_transposition")
+        .accessibilityIdentifier("openingIndex_transposition")
         .accessibilityHint(Text("Aller à la ligne qui poursuit cette position"))
     }
 
@@ -314,7 +324,7 @@ struct OpeningIndexView: View {
         }
         .buttonStyle(.pressable(scale: 0.9))
         .accessibilityLabel(Text(accessibilityLabel(move)))
-        .accessibilityIdentifier("labsIndex_move_\(move.ply)_\(move.uci)")
+        .accessibilityIdentifier("openingIndex_move_\(move.ply)_\(move.uci)")
     }
 
     /// Le verdict du moteur, en notation d'échecs quand elle existe (« ?? »,
@@ -365,16 +375,14 @@ struct OpeningIndexView: View {
                 .foregroundStyle(Theme.textTertiary)
                 .textCase(.uppercase).tracking(0.4)
 
-            // Les étages RÉELLEMENT présents : une ouverture qui ne débranche
-            // que deux fois n'a pas besoin d'une légende à six symboles.
-            if presentDepths >= 1 {
-                ForEach(1...presentDepths, id: \.self) { depth in
-                    legendRow(
-                        BranchMarker.icon(for: depth),
-                        verbatim: LocalizationController.string("Débranchement, étage %lld", depth)
-                    )
-                }
-            }
+            // Plus de symboles à décoder : l'arbre se lit. Une seule ligne
+            // suffit à dire ce que le retrait signifie.
+            legendRow(
+                TreeConnector(isLast: true, isElbow: true, elbowY: 9)
+                    .stroke(BranchMarker.tint(for: 1).opacity(0.7), lineWidth: 1.5)
+                    .frame(width: 14, height: 18),
+                verbatim: LocalizationController.string("Variante : elle repart du coup indiqué")
+            )
             // Les verdicts RÉELLEMENT présents dans cette ouverture. Annoncer
             // « occasion manquée » alors qu'aucun coup n'en porte fait chercher
             // pour rien — et sur les 58 ouvertures, cette catégorie-là ne se
@@ -390,11 +398,6 @@ struct OpeningIndexView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .cardStyle(padding: 14)
-    }
-
-    /// Étage de débranchement le plus profond affiché.
-    private var presentDepths: Int {
-        min(viewModel.rows.map(\.depth).max() ?? 0, BranchMarker.levels)
     }
 
     /// Ordre de la légende : du plus glorieux au plus douloureux, comme
@@ -421,29 +424,19 @@ struct OpeningIndexView: View {
     }
 }
 
-/// Le marqueur d'un ÉTAGE de débranchement : une forme et une couleur par
-/// niveau, cohérentes dans tout l'arbre.
+/// La TEINTE d'un étage de débranchement.
 ///
-/// Forme ET couleur, pas l'une ou l'autre : la couleur seule ne se distingue
-/// pas en niveaux de gris ni pour un daltonien, la forme seule se confond à
-/// 8 pt. Ensemble, on retrouve un étage d'un coup d'œil en balayant l'écran —
-/// c'est ce qui permet de lire un arbre profond sans compter les retraits.
+/// Née comme un jeu de six symboles (flèche, cercle, carré, losange,
+/// triangle, hexagone) censés dire la profondeur. Ils la disaient mal : six
+/// formes d'alphabets différents, à poids et tailles optiques inégaux, pour
+/// une information que le retrait portait déjà. Depuis que l'arbre se dessine
+/// avec de vrais connecteurs (``TreeConnector``), il ne reste que la couleur —
+/// et elle n'est plus porteuse d'information, seulement une aide à suivre un
+/// étage du regard.
+///
+/// Famille FROIDE, du bleu clair au violet : elle ne doit jamais se confondre
+/// avec les verdicts du moteur, qui vont du jaune au rouge.
 enum BranchMarker {
-    /// Étages qui ont leur propre marqueur ; au-delà, on recycle (le catalogue
-    /// livré ne dépasse pas six).
-    static let levels = 6
-
-    private static let symbols = [
-        "arrow.turn.down.right",   // ↳ étage 1
-        "circle",                  // ○ étage 2
-        "square",                  // □ étage 3
-        "diamond",                 // ◇ étage 4
-        "triangle",                // △ étage 5
-        "hexagon",                 // ⬡ étage 6
-    ]
-
-    /// Teintes distinctes et non conflictuelles avec celles des verdicts
-    /// (jaune → rouge) : famille froide, du bleu clair au violet.
     private static let tints: [Color] = [
         Color(red: 0.353, green: 0.651, blue: 1.000),
         Color(red: 0.294, green: 0.518, blue: 0.949),
@@ -457,13 +450,43 @@ enum BranchMarker {
         guard depth >= 1 else { return Theme.textTertiary }
         return tints[(depth - 1) % tints.count]
     }
+}
 
-    @ViewBuilder
-    static func icon(for depth: Int) -> some View {
-        let index = max(0, depth - 1) % symbols.count
-        Image(systemName: symbols[index])
-            .font(.system(size: depth == 1 ? 10 : 8, weight: .semibold))
-            .foregroundStyle(tint(for: depth))
-            .accessibilityHidden(true)
+/// Un segment d'arbre : le rail vertical d'un étage encore ouvert, ou le
+/// connecteur « └ » / « ├ » de la rangée elle-même.
+///
+/// C'est la manière dont les vues arborescentes se dessinent depuis toujours,
+/// et elle a un mérite qu'aucun jeu de symboles n'a : elle ne s'apprend pas.
+/// Le trait MONTRE à quoi la ligne se rattache, et où la fratrie s'arrête.
+struct TreeConnector: Shape {
+    /// La branche de cet étage est-elle la DERNIÈRE de sa fratrie ? Le rail ne
+    /// se prolonge alors pas sous la rangée.
+    let isLast: Bool
+    /// Cet étage est-il celui de la rangée (« └ »/« ├ ») ou un simple rail
+    /// hérité d'un ancêtre ?
+    let isElbow: Bool
+
+    /// Hauteur à laquelle le trait horizontal rejoint la rangée.
+    ///
+    /// Elle DÉPEND de ce que la rangée montre en premier : le centre de sa
+    /// première ligne de pastilles, ou celui de son nom de variante quand elle
+    /// en porte un. Une rangée dont les coups se replient est haute ; brancher
+    /// au milieu de sa hauteur totale viserait le vide.
+    let elbowY: CGFloat
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let x = rect.midX
+        let y = min(elbowY, rect.maxY)
+        let stop = isElbow && isLast ? y : rect.maxY
+
+        path.move(to: CGPoint(x: x, y: rect.minY))
+        path.addLine(to: CGPoint(x: x, y: stop))
+
+        if isElbow {
+            path.move(to: CGPoint(x: x, y: y))
+            path.addLine(to: CGPoint(x: rect.maxX, y: y))
+        }
+        return path
     }
 }

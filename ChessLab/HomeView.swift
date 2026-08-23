@@ -31,10 +31,6 @@ struct HomeView: View {
     @State private var menuCommands = MenuCommands.shared
 
     @State private var seedingState = PuzzleSeedingState.shared
-    /// Observé pour l'aperçu Labs : basculer l'interrupteur des réglages doit
-    /// faire apparaître (ou disparaître) la tuile et l'entrée de barre
-    /// latérale immédiatement, sans relancer l'app.
-    @State private var appSettings = AppSettings.shared
     /// Santé de la persistance — la bannière « rien ne s'enregistre » en vit.
     @State private var persistenceHealth = PersistenceHealth.shared
 
@@ -76,23 +72,22 @@ struct HomeView: View {
         case scanner
         case puzzleQueue
         case activePuzzleSession(PuzzleSessionFilter)
-        case repertoireList
+        /// Liste des ouvertures — l'écran d'entrée du module.
+        case openingList
         /// Module Finales : mêmes routes lecteur/entraîneur que les
         /// ouvertures, seule la LISTE est propre au module.
         case endgameList
         /// Entraînement LIBRE d'une finale (arbitré au verdict) — porte
         /// l'identifiant du cours.
         case endgameFreeTrain(String)
-        /// Module d'ouvertures en graphe : lecteur pas-à-pas (principal) +
-        /// entraînement. (L'ancien flux Explorer/Apprendre a été supprimé le
-        /// 18/08 — bug18aout §1, option A.)
-        case openingReader(String)
+        /// Lecteur de FINALE, pas-à-pas. Les Ouvertures ont le leur
+        /// (``openingLabsReader``) depuis le 23/08.
+        case endgameReader(String)
         /// Éditeur d'arbre — répertoires PERSONNELS seulement (`user-…`).
         case openingEditor(String)
-        /// Module « Ouvertures — Labs » (aperçu, réglage ``AppSettings/openingsLabsEnabled``) :
-        /// choix de l'ouverture, puis lecteur avec index des lignes.
-        case labsOpeningList
-        case labsReader(String)
+        /// Lecteur d'une ouverture : index des lignes en arbre, coups des
+        /// maîtres, meilleurs coups du moteur.
+        case openingLabsReader(String)
         case openingTrainDaily
         case openingTrainLine(String)
         /// Réglages Labo, éventuellement pré-remplis avec une position de
@@ -111,7 +106,6 @@ struct HomeView: View {
     /// détail sur l'écran d'entrée du mode correspondant (voir ``detailRoot``).
     enum SidebarItem: Hashable {
         case vsEngine, twoPlayer, puzzles, openings, endgames, analysis, laboratory
-        case openingsLabs
         case progression, settings, help
     }
 
@@ -127,7 +121,7 @@ struct HomeView: View {
         case .twoPlayer: item = .twoPlayer; route = .twoPlayerSetup
         case .analysis: item = .analysis; route = .analysisEntry
         case .puzzles: item = .puzzles; route = .puzzleQueue
-        case .openings: item = .openings; route = .repertoireList
+        case .openings: item = .openings; route = .openingList
         case .laboratory: item = .laboratory; route = .labSetup(startFEN: nil)
         case .progression: item = .progression; route = .progression
         case .settings: item = .settings; route = .settings
@@ -342,13 +336,10 @@ struct HomeView: View {
                 sidebarLabel(.vsEngine, "Contre l'ordinateur", "cpu", Theme.accent)
                 sidebarLabel(.twoPlayer, "Deux joueurs", "person.2.fill", Theme.info)
                 sidebarLabel(.puzzles, "Puzzles", "puzzlepiece.fill", Theme.violet)
-                sidebarLabel(.openings, "Ouvertures", "books.vertical.fill", Theme.warning)
-                if showsOpeningsLabs {
-                    sidebarLabel(
-                        .openingsLabs, "Ouvertures — Labs", "chart.bar.doc.horizontal", Theme.teal,
-                        accessibilityID: "sidebar_openingsLabs"
-                    )
-                }
+                sidebarLabel(
+                    .openings, "Ouvertures", "books.vertical.fill", Theme.warning,
+                    accessibilityID: "sidebar_openings"
+                )
                 sidebarLabel(.endgames, "Finales", "crown.fill", Theme.gold)
                 sidebarLabel(.analysis, "Analyser", "chart.xyaxis.line", Theme.teal)
                 sidebarLabel(.laboratory, "Laboratoire", "flask", Theme.rose)
@@ -394,12 +385,7 @@ struct HomeView: View {
         case .vsEngine: destination(for: .newGame)
         case .twoPlayer: destination(for: .twoPlayerSetup)
         case .puzzles: destination(for: .puzzleQueue)
-        case .openings: destination(for: .repertoireList)
-        // Aperçu éteint alors qu'il était sélectionné : on retombe sur le
-        // tableau de bord, sinon la colonne garderait un écran auquel plus
-        // aucune entrée de barre latérale ne mène.
-        case .openingsLabs where showsOpeningsLabs: destination(for: .labsOpeningList)
-        case .openingsLabs: iPadDashboard
+        case .openings: destination(for: .openingList)
         case .endgames: destination(for: .endgameList)
         case .analysis: destination(for: .analysisEntry)
         case .laboratory: destination(for: .labSetup(startFEN: nil))
@@ -604,24 +590,9 @@ struct HomeView: View {
                         path.append(Route.continueTwoPlayer(fen))
                     }
 
-                case .repertoireList:
-                    OpeningListView { courseID in
-                        path.append(Route.openingReader(courseID))
-                    } onReview: {
-                        path.append(Route.openingTrainDaily)
-                    } onEdit: { courseID in
-                        path.append(Route.openingEditor(courseID))
-                    } onOpenLab: {
-                        path.append(Route.labSetup(startFEN: nil))
-                    } onPlayVsEngine: {
-                        path.append(Route.newGame)
-                    } onOpenTwoPlayer: {
-                        path.append(Route.twoPlayerSetup)
-                    }
-
                 case .endgameList:
                     EndgameListView { courseID in
-                        path.append(Route.openingReader(courseID))
+                        path.append(Route.endgameReader(courseID))
                     } onReview: {
                         path.append(Route.openingTrainDaily)
                     } onOpenLab: {
@@ -637,9 +608,11 @@ struct HomeView: View {
                         path.removeLast()
                     }
 
-                case .labsOpeningList:
-                    OpeningLabsListView { courseID in
-                        path.append(Route.labsReader(courseID))
+                case .openingList:
+                    OpeningListView { courseID in
+                        path.append(Route.openingLabsReader(courseID))
+                    } onEdit: { courseID in
+                        path.append(Route.openingEditor(courseID))
                     } onOpenLab: {
                         path.append(Route.labSetup(startFEN: nil))
                     } onPlayVsEngine: {
@@ -648,12 +621,11 @@ struct HomeView: View {
                         path.append(Route.twoPlayerSetup)
                     }
 
-                case let .labsReader(courseID):
-                    // Labs LIT ; l'entraînement reste celui du module en
-                    // production — un seul moteur de répétition espacée, une
-                    // seule progression (indexée par FEN normalisée).
-                    OpeningLabsHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
+                case let .openingLabsReader(courseID):
+                    OpeningReaderHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
+                    } onTrain: {
+                        path.append(Route.openingTrainLine(courseID))
                     } onContinueVsStockfish: { fen in
                         path.append(Route.continueVsStockfish(fen))
                     } onOpenLab: { fen in
@@ -667,8 +639,8 @@ struct HomeView: View {
                         path.removeLast()
                     }
 
-                case let .openingReader(courseID):
-                    OpeningReaderHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
+                case let .endgameReader(courseID):
+                    EndgameReaderHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
                     } onTrain: {
                         path.append(Route.openingTrainLine(courseID))
@@ -753,12 +725,6 @@ struct HomeView: View {
     /// analyses de PGN différents ont des routes différentes, donc des
     /// sessions distinctes. Une seule fonction pour les douze hôtes, plutôt
     /// qu'une dérivation par type de charge utile.
-    /// L'aperçu « Ouvertures — Labs » est-il visible ? L'interrupteur des
-    /// réglages ET la présence effective de cours — voir ``OpeningLabsFeature``.
-    private var showsOpeningsLabs: Bool {
-        appSettings.openingsLabsEnabled && OpeningLabsFeature.hasCourses
-    }
-
     private func sessionKey(for route: Route) -> String {
         String(describing: route)
     }
@@ -859,16 +825,7 @@ struct HomeView: View {
                     path.append(Route.puzzleQueue)
                 }
                 ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings") {
-                    path.append(Route.repertoireList)
-                }
-                // Aperçu OPT-IN : la tuile n'existe que si l'interrupteur des
-                // réglages est allumé (``OpeningLabsFeature``). Elle s'insère
-                // juste après « Ouvertures » — c'est la même matière, lue
-                // autrement, pas un mode de plus au bout de la grille.
-                if showsOpeningsLabs {
-                    ModeCard(title: "Ouvertures — Labs", shortTitle: "Labs", subtitle: "Index des lignes, maîtres, Stockfish", shortSubtitle: "Lignes et maîtres", systemImage: "chart.bar.doc.horizontal", tint: Theme.teal, isEnabled: true, accessibilityID: "mode_openingsLabs") {
-                        path.append(Route.labsOpeningList)
-                    }
+                    path.append(Route.openingList)
                 }
                 ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", shortSubtitle: "Techniques prouvées", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames") {
                     path.append(Route.endgameList)

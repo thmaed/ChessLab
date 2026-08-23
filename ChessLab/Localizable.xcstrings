@@ -1246,6 +1246,7 @@
       }
     },
     "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. La modification prend effet au prochain lancement.\n\nCE QUI SUIT\nVos parties terminées, votre progression sur les ouvertures et les finales, vos répertoires personnels, et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens. Et votre partie EN COURS : elle reste là où vous la jouez. Deux appareils, deux parties commencées, il faudrait en sacrifier une — mieux vaut que chacune vous attende où vous l'avez laissée." : {
+
     },
     "Aide" : {
       "localizations" : {
@@ -1334,6 +1335,7 @@
       }
     },
     "AJOUTER LE VÔTRE\nDans Ouvertures, touchez « + » en haut à droite. Collez un PGN, ou ouvrez un fichier .pgn : les variantes entre parenthèses sont conservées, vous obtenez donc l'arbre complet et pas seulement la ligne principale. Indiquez le camp que vous étudiez — c'est le seul renseignement qu'un PGN ne contient pas. Vos annotations suivent : ? et ?? deviennent des pièges signalés, ?! des imprécisions, et vos commentaires s'affichent sous le plateau.\n\nLE PARTAGER\nGlissez vers la gauche sur un de vos répertoires, puis « Partager » : l'app envoie un simple fichier, par AirDrop, Messages, Fichiers ou ce que vous voulez. Celui qui le reçoit fait « + » puis « Ouvrir un fichier ». Il n'y a ni compte à créer, ni serveur ChessLab : le fichier EST le répertoire, et il ne passe que par où vous l'envoyez.\n\nCE QUI EST PARTAGÉ, ET CE QUI NE L'EST PAS\nLe fichier contient les coups, vos commentaires et vos annotations. Il ne contient PAS votre progression : ce que vous avez mémorisé reste chez vous. À l'inverse, un répertoire que vous importez profite tout de suite de ce que vous savez déjà des positions qu'il contient, même apprises dans une ouverture livrée avec l'app — la mémorisation est attachée aux positions, pas aux fichiers.\n\nSUPPRIMER\nGlissez vers la gauche, « Supprimer ». Le fichier quitte cet appareil ; votre progression sur ces positions est conservée. Les 58 ouvertures livrées, elles, ne peuvent être ni supprimées ni partagées.\n\nSUR TOUS VOS APPAREILS\nVos répertoires suivent la synchronisation iCloud, comme vos parties et votre progression : importé sur l'iPhone, un répertoire apparaît sur l'iPad. Activez la synchronisation dans les Réglages — elle est désactivée par défaut, l'app fonctionnant entièrement hors ligne.\n\nET LES DROITS D'AUTEUR\nLe contenu d'un livre ou d'un cours payant appartient à son auteur. Le saisir pour votre usage personnel est une chose ; le rediffuser en est une autre. Partagez ce que vous avez écrit, ou ce que vous avez le droit de partager." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -1342,6 +1344,9 @@
           }
         }
       }
+    },
+    "AJOUTER LE VÔTRE\nDans Ouvertures, touchez « + » en haut à droite. Collez un PGN, ou ouvrez un fichier .pgn : les variantes entre parenthèses sont conservées, vous obtenez donc l'arbre complet et pas seulement la ligne principale. Indiquez le camp que vous étudiez — c'est le seul renseignement qu'un PGN ne contient pas. Vos annotations suivent : ? et ?? deviennent des pièges signalés, ?! des imprécisions, et vos commentaires s'affichent sous le plateau.\n\nLE PARTAGER\nTouchez le bouton « … » à droite d'un de vos répertoires, puis « Partager » : l'app envoie un simple fichier, par AirDrop, Messages, Fichiers ou ce que vous voulez. Celui qui le reçoit fait « + » puis « Ouvrir un fichier ». Il n'y a ni compte à créer, ni serveur ChessLab : le fichier EST le répertoire, et il ne passe que par où vous l'envoyez.\n\nCE QUI EST PARTAGÉ, ET CE QUI NE L'EST PAS\nLe fichier contient les coups, vos commentaires et vos annotations. Il ne contient PAS votre progression : ce que vous avez mémorisé reste chez vous. À l'inverse, un répertoire que vous importez profite tout de suite de ce que vous savez déjà des positions qu'il contient, même apprises dans une ouverture livrée avec l'app — la mémorisation est attachée aux positions, pas aux fichiers.\n\nSUPPRIMER\nLe même bouton « … », puis « Supprimer ». Le fichier quitte cet appareil ; votre progression sur ces positions est conservée. Les 58 ouvertures livrées, elles, ne peuvent être ni supprimées ni partagées.\n\nSUR TOUS VOS APPAREILS\nVos répertoires suivent la synchronisation iCloud, comme vos parties et votre progression : importé sur l'iPhone, un répertoire apparaît sur l'iPad. Activez la synchronisation dans les Réglages — elle est désactivée par défaut, l'app fonctionnant entièrement hors ligne.\n\nET LES DROITS D'AUTEUR\nLe contenu d'un livre ou d'un cours payant appartient à son auteur. Le saisir pour votre usage personnel est une chose ; le rediffuser en est une autre. Partagez ce que vous avez écrit, ou ce que vous avez le droit de partager." : {
+
     },
     "Ajouter un répertoire" : {
       "localizations" : {
@@ -1801,6 +1806,7 @@
       }
     },
     "Aperçus" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -5113,6 +5119,7 @@
       }
     },
     "Débranchement, étage %lld" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -7487,6 +7494,7 @@
       }
     },
     "Index des lignes, maîtres, Stockfish" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8600,6 +8608,7 @@
       }
     },
     "Labs" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8792,6 +8801,7 @@
       }
     },
     "Le fichier est supprimé de cet appareil. Votre progression sur ces positions est conservée." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8806,6 +8816,9 @@
           }
         }
       }
+    },
+    "Le fichier quitte cet appareil. Votre progression sur ces positions est conservée." : {
+
     },
     "Le meilleur" : {
       "localizations" : {
@@ -9292,6 +9305,7 @@
       }
     },
     "Lignes et maîtres" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -9843,6 +9857,7 @@
       }
     },
     "Modifier" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -9868,6 +9883,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Edit tags"
+          }
+        }
+      }
+    },
+    "Mon répertoire" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "My repertoire"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mon répertoire"
           }
         }
       }
@@ -10649,6 +10680,7 @@
       }
     },
     "Ouvertures — Labs" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -11040,6 +11072,7 @@
       }
     },
     "Perso" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -16210,6 +16243,7 @@
       }
     },
     "Une seconde lecture des mêmes ouvertures : l'index de toutes les lignes (chaque coup y est cliquable), les coups des maîtres avec leurs pourcentages, et les trois meilleurs coups de Stockfish calculés d'avance. Ajoute une tuile sur l'accueil ; ne remplace rien." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -16362,6 +16396,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Van't Kruijs"
+          }
+        }
+      }
+    },
+    "Variante : elle repart du coup indiqué" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variation: it resumes from the move shown"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variante : elle repart du coup indiqué"
           }
         }
       }
@@ -16912,22 +16962,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Zukertort"
-          }
-        }
-      }
-    },
-    "Mon répertoire" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "My repertoire"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Mon répertoire"
           }
         }
       }

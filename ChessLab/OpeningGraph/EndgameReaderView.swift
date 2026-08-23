@@ -1,13 +1,20 @@
 import ChessKit
 import SwiftUI
 
-/// Lecteur d'ouverture : échiquier + « Précédent / Suivant », l'explication du
+/// Lecteur de FINALE : échiquier + « Précédent / Suivant », l'explication du
 /// coup, le fil des coups, et les variantes. Simple et guidé.
+///
+/// Il a d'abord servi les deux modules. Depuis que les Ouvertures ont leur
+/// propre lecteur (``OpeningReaderView``, index des lignes en arbre, coups des
+/// maîtres, moteur pré-calculé), il ne sert plus qu'aux Finales — d'où son nom.
+/// Les branchements « ouverture » qu'il porte encore sont DÉFENSIFS : le type
+/// de données (``OpeningCourse``) reste commun aux deux modules, et un cours
+/// mal étiqueté doit s'afficher proprement plutôt que de s'orienter à l'envers.
 // (« Continuer contre Stockfish » : sauvé du flux Explorateur supprimé —
 // bug18aout §1, option A. Lire la Lucena puis la GAGNER contre le moteur,
 // c'est le vrai test, surtout pour les Finales.)
-struct OpeningReaderView: View {
-    @Bindable var viewModel: OpeningReaderViewModel
+struct EndgameReaderView: View {
+    @Bindable var viewModel: EndgameReaderViewModel
     let onExit: () -> Void
     var onTrain: () -> Void = {}
     /// Continue la partie CONTRE STOCKFISH depuis la position affichée :
@@ -343,7 +350,7 @@ struct OpeningReaderView: View {
 }
 
 /// Héberge le lecteur : charge le cours et construit le ViewModel une fois.
-struct OpeningReaderHost: View {
+struct EndgameReaderHost: View {
     let courseID: String
     /// Identité de session — voir ``SessionStore``.
     let sessionKey: String
@@ -354,12 +361,12 @@ struct OpeningReaderHost: View {
     var onOpenTwoPlayer: (String) -> Void = { _ in }
     var onFreeTrain: () -> Void = {}
     @Environment(\.sessionStore) private var sessionStore
-    @State private var viewModel: OpeningReaderViewModel?
+    @State private var viewModel: EndgameReaderViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                OpeningReaderView(
+                EndgameReaderView(
                     viewModel: viewModel, onExit: onExit, onTrain: onTrain,
                     onContinueVsStockfish: onContinueVsStockfish,
                     onOpenLab: onOpenLab, onOpenTwoPlayer: onOpenTwoPlayer,
@@ -372,7 +379,7 @@ struct OpeningReaderHost: View {
         .onAppear {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
-                    OpeningCatalog.course(id: courseID).map(OpeningReaderViewModel.init(course:))
+                    OpeningCatalog.course(id: courseID).map(EndgameReaderViewModel.init(course:))
                 }
             }
         }

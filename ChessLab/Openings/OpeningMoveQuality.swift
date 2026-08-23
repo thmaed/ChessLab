@@ -46,7 +46,7 @@ enum OpeningMoveQuality {
 
     /// Verdict affichable d'un coup, ou `nil` : donnée manquante, ou catégorie
     /// qui n'a pas sa place dans l'index.
-    static func classify(_ context: Context, sidecar: OpeningLabsSidecar) -> MoveQuality? {
+    static func classify(_ context: Context, sidecar: OpeningStatsSidecar) -> MoveQuality? {
         guard
             let before = sidecar.data(at: context.fromFEN)?.engine, !before.isEmpty,
             let after = sidecar.data(at: context.toFEN)?.engine.first,
@@ -96,7 +96,7 @@ enum OpeningMoveQuality {
     /// convention dans toute l'app) ; ``MoveClassifier`` attend, lui, le point
     /// de vue du joueur qui vient de jouer. C'est ici, et nulle part ailleurs,
     /// que le signe s'inverse.
-    private static func winPercent(_ line: LabsEngineLine, for color: Piece.Color) -> Double {
+    private static func winPercent(_ line: OpeningEngineLine, for color: Piece.Color) -> Double {
         let white: Double
         if let mate = line.mate {
             white = EvalConversion.winPercentage(mate: mate)

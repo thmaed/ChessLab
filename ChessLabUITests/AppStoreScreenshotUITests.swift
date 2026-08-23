@@ -57,6 +57,14 @@ final class AppStoreScreenshotUITests: XCTestCase {
             }
             if italian.isHittable {
                 italian.tap()
+                // L'index des lignes s'ouvre de lui-même : on le montre — il
+                // vaut d'être vu — puis on le referme pour le lecteur.
+                let closeIndex = app.buttons["openingIndex_close"]
+                if closeIndex.waitForExistence(timeout: 6) {
+                    RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+                    save(app.screenshot(), folder: folder, name: "03-index-lignes")
+                    closeIndex.tap()
+                }
                 let next = app.buttons["reader_next"]
                 if !next.waitForExistence(timeout: 6) {
                     // Le tap a pu rater (rangée au ras du bord, feuille par-
