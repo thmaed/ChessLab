@@ -1026,6 +1026,22 @@
         }
       }
     },
+    "Aucun cours ne correspond aux filtres ou à la recherche." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No course matches the filters or the search."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun cours ne correspond aux filtres ou à la recherche."
+          }
+        }
+      }
+    },
     "a gagné" : {
       "localizations" : {
         "en" : {
@@ -2093,22 +2109,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun coup repris — conversion propre."
-          }
-        }
-      }
-    },
-    "Aucun cours ne correspond aux filtres." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No course matches the filters."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucun cours ne correspond aux filtres."
           }
         }
       }
@@ -12861,6 +12861,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Search for a player or tag"
+          }
+        }
+      }
+    },
+    "Rechercher une finale" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Search for an endgame"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rechercher une finale"
           }
         }
       }

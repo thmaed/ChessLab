@@ -33,6 +33,7 @@ struct EndgameListView: View {
     /// ~14 écrans de défilement pour atteindre les études (retour
     /// utilisateur du 19/08). `nil` = tout montrer.
     @State private var levelFilter: OpeningLevel?
+    @State private var search = ""
     @State private var familyFilter: String?
 
     private var entries: [OpeningCatalogEntry] { OpeningCatalog.all.filter(\.isEndgame) }
@@ -84,8 +85,20 @@ struct EndgameListView: View {
     ]
 
     private var filteredByLevel: [OpeningCatalogEntry] {
-        guard let levelFilter else { return entries }
-        return entries.filter { $0.level == levelFilter }
+        let byLevel = levelFilter.map { l in entries.filter { $0.level == l } } ?? entries
+        return byLevel.filter { matches($0, query: search) }
+    }
+
+    /// Même recherche que la liste des ouvertures : nom affiché (traduit) ET
+    /// nom du catalogue (anglais) — « Lucena » se trouve dans les deux, mais
+    /// « pion passé » seulement en français et « outside » seulement en
+    /// anglais. Insensible à la casse et aux accents.
+    private func matches(_ entry: OpeningCatalogEntry, query: String) -> Bool {
+        let trimmed = query.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return true }
+        let localized = Bundle.main.localizedString(forKey: entry.name, value: entry.name, table: nil)
+        let haystack = "\(localized) \(entry.name)"
+        return haystack.range(of: trimmed, options: [.caseInsensitive, .diacriticInsensitive]) != nil
     }
 
     private var visibleFamilies: [String] {
@@ -104,7 +117,7 @@ struct EndgameListView: View {
             }
             if visibleFamilies.isEmpty {
                 Section {
-                    Text("Aucun cours ne correspond aux filtres.")
+                    Text("Aucun cours ne correspond aux filtres ou à la recherche.")
                         .font(.caption)
                         .foregroundStyle(Theme.textTertiary)
                         .listRowBackground(Theme.surface)
@@ -113,6 +126,7 @@ struct EndgameListView: View {
             provenFooter
         }
         .listStyle(.insetGrouped)
+        .searchable(text: $search, prompt: Text("Rechercher une finale"))
         .scrollContentBackground(.hidden)
         .appBackground()
         .navigationTitle("Finales")
