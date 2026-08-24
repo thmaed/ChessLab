@@ -54,23 +54,27 @@ def piece_count(key: str) -> int:
 
 
 def audit_course(course: dict, tb: Tablebase, engine=None) -> dict:
-    """Rapport d'un cours : {taught_breaks, weak_defenses, engine_checked, fake_traps}."""
+    """Rapport d'un cours : {taught_breaks, weak_defenses, engine_checked,
+    fake_traps, missed_wins, early_stops}."""
     side = course.get("side", "white")
-    report = {"taught_breaks": [], "weak_defenses": [], "engine_checked": [], "fake_traps": []}
+    report = {"taught_breaks": [], "weak_defenses": [], "engine_checked": [],
+              "fake_traps": [], "missed_wins": [], "early_stops": []}
 
     for key, node in course["positions"].items():
         edges = node.get("moves", [])
         if not edges:
+            _check_early_stop(key, side, tb, report)
             continue
         if piece_count(key) > 7:
+            mover_here = side_to_move(key)
             for edge in edges:
                 # Les pièges assument leur chute d'évaluation — comme côté
                 # tablebase. On les note sans les compter en échec.
-                excused = edge.get("role") in ("trap", "inaccuracy")
+                excused = edge.get("role") in ("trap", "inaccuracy") or mover_here != side
                 note = _engine_note(key, edge, engine)
                 if excused:
-                    note += " [piège assumé]" if "⚠" in note else ""
-                    note = note.replace("⚠", "piège :")
+                    note += " [assumé]" if "⚠" in note else ""
+                    note = note.replace("⚠", "signalé :")
                 report["engine_checked"].append(note)
             continue
 
@@ -105,12 +109,133 @@ def audit_course(course: dict, tb: Tablebase, engine=None) -> dict:
                 elif not preserved:
                     report["taught_breaks"].append(
                         f"{edge['san']} depuis {key} : {parent_verdict} → {verdict}")
+                else:
+                    _check_missed_win(key, edge, tb, report)
             else:
                 # L'adversaire qui joue moins bien que l'optimal : information.
                 if not preserved:
                     report["weak_defenses"].append(
                         f"{edge['san']} depuis {key} : l'adversaire concède {parent_verdict} → {verdict}")
     return report
+
+
+def _check_missed_win(key: str, edge: dict, tb: Tablebase, report: dict) -> None:
+    """Le cours enseigne-t-il un coup correct EN IGNORANT un gain immédiat ?
+
+    🐛 C'est le défaut qui a échappé à cet audit sur le pion passé éloigné : la
+    ligne faisait jouer 3.Re6 dans une position où a8=D promouvait sur-le-champ.
+    Le verdict était préservé — donc l'audit se taisait — mais la leçon perdait
+    tout son sens, puisque la technique enseignée n'était plus nécessaire.
+
+    On ne juge PAS la longueur : un coup un peu plus lent peut être plus
+    instructif, et c'est légitime. On ne signale que l'évidence ignorée — un mat
+    en un, ou une promotion en dame QUE L'ADVERSAIRE NE PEUT PAS REPRENDRE.
+
+    Cette dernière condition n'est pas un détail : une dame reprise au coup
+    suivant reste « gagnante » pour la tablebase, alors que c'est souvent le
+    coup thématique du cours (les pions liés qui se donnent l'un pour l'autre).
+    Sans elle, ce contrôle criait au loup sur la moitié des finales de pions.
+    """
+    board = board_from_key(key)
+    verdicts = tb.move_categories(key)
+    obvious = []
+    for move in board.legal_moves:
+        uci = move.uci()
+        if uci == edge["uci"]:
+            continue
+        if verdicts.get(uci) != "loss":       # ne gagne pas : sans intérêt
+            continue
+        san = board.san(move)
+        if san.endswith("#"):
+            obvious.append(san)
+            continue
+        if "=Q" not in san:
+            continue
+        after = board.copy()
+        after.push(move)
+        if any(after.is_capture(reply) and reply.to_square == move.to_square
+               for reply in after.legal_moves):
+            continue                          # dame reprise : pas une évidence
+        obvious.append(san)
+    if obvious:
+        report["missed_wins"].append(
+            f"{edge['san']} depuis {key} : ignore {', '.join(sorted(set(obvious))[:3])} "
+            f"qui gagne sur-le-champ")
+
+
+# Au-delà, une ligne qui s'arrête laisse l'élève sans la conversion.
+EARLY_STOP_DTM = 8
+
+
+def _check_early_stop(key: str, side: str, tb: Tablebase, report: dict) -> None:
+    """La ligne s'arrête-t-elle AVANT d'avoir montré le gain ?
+
+    Retour utilisateur sur la triangulation : « s'arrête trop tôt dans
+    l'évaluation des coups ». Le cours concluait « la conversion est désormais
+    mécanique » — une phrase facile à écrire, et que l'élève ne voit jamais.
+
+    On signale une feuille encore GAGNANTE pour le camp étudié, à plus de
+    `EARLY_STOP_DTM` coups du mat, ET où l'adversaire a encore du matériel.
+
+    Cette dernière condition fait toute la différence : une ligne qui s'achève
+    sur un roi nu a fini son travail, quel que soit le nombre de coups qui
+    restent — mater avec deux pions ou avec une tour est élémentaire, et
+    l'imposer allongerait tous les cours pour rien. Une ligne qui s'arrête
+    alors que l'adversaire a encore de quoi se battre, elle, laisse l'élève au
+    milieu du gué : c'est exactement ce que faisait la triangulation, qui
+    s'arrêtait sur « la conversion est mécanique » sans jamais la montrer.
+    """
+    if piece_count(key) > 7:
+        return
+    probe = tb.probe(key)
+    if not probe:
+        return
+    mover = side_to_move(key)
+    category = probe.get("category")
+    # Verdict du POINT DE VUE du camp étudié.
+    winning_for_side = (category == "win") if mover == side else (category == "loss")
+    if not winning_for_side:
+        return
+    placement = key.split(" ")[0]
+    if "Q" in placement or "q" in placement:
+        return
+    # L'adversaire a-t-il encore du matériel ? Roi nu = travail terminé.
+    #
+    # Le DÉFENSEUR est le camp qui n'est pas étudié — le trait n'entre pas
+    # dans la question. Une première version le déduisait du trait et se
+    # trompait de camp : elle comptait les pions de l'attaquant comme du
+    # matériel de défense, et signalait donc des lignes qui s'achevaient
+    # pourtant sur un roi nu.
+    defender_white = (side != "white")
+    defender_men = [ch for ch in placement
+                    if ch.isalpha() and (ch.isupper() == defender_white) and ch.upper() != "K"]
+    if not defender_men:
+        return
+    dtm = probe.get("dtm")
+    if dtm is None or abs(dtm) <= EARLY_STOP_DTM:
+        return
+    report["early_stops"].append(
+        f"{key} : la ligne s'arrête sur un gain encore à {abs(dtm)} coups du mat")
+
+
+def _band(cp: int) -> str:
+    """Le VERDICT pratique d'une évaluation : gain, nulle, ou perte.
+
+    Le contrôle moteur juge désormais comme le contrôle tablebase — « le
+    verdict a-t-il changé ? » — et non « combien de centipions ont été
+    perdus ? ». Motif : sur les positions à plus de sept pièces des finales,
+    l'évaluation est presque toujours un mat annoncé, et la valeur numérique
+    d'un mat n'a aucune stabilité. La MÊME arête du cours « percée » a été
+    notée +6502 → +9967 (OK), puis +8308 → +9970 (OK), puis +1344 → +1189
+    (⚠ perd 155 cp) sur trois exécutions du même audit : le verdict de l'outil
+    basculait d'un lancement à l'autre. Un garde-fou qui clignote est pire
+    qu'aucun garde-fou.
+    """
+    if cp >= ENGINE_WIN_CP:
+        return "gain"
+    if cp <= -ENGINE_WIN_CP:
+        return "perte"
+    return "nulle"
 
 
 def _engine_note(key: str, edge: dict, engine) -> str:
@@ -123,9 +248,10 @@ def _engine_note(key: str, edge: dict, engine) -> str:
     board.push(chess.Move.from_uci(edge["uci"]))
     after = engine.analyse(board, ce.Limit(depth=ENGINE_DEPTH))
     after_cp = -after["score"].pov(board.turn).score(mate_score=10000)
-    drop = before_cp - after_cp
-    status = "OK" if drop < 100 else f"⚠ perd {drop} cp"
-    return f"{edge['san']} depuis {key} : moteur d{ENGINE_DEPTH} {before_cp:+} → {after_cp:+} ({status})"
+    before_band, after_band = _band(before_cp), _band(after_cp)
+    status = "OK" if before_band == after_band else f"⚠ {before_band} → {after_band}"
+    return (f"{edge['san']} depuis {key} : moteur d{ENGINE_DEPTH} "
+            f"{before_cp:+} → {after_cp:+} ({status})")
 
 
 def main(argv=None) -> int:
@@ -144,6 +270,7 @@ def main(argv=None) -> int:
 
     wanted = {s.strip() for s in args.only.split(",")} if args.only else None
     failures = 0
+    warnings = 0
     audited = 0
     try:
         for path in sorted(Path(args.dir).glob("*.json")):
@@ -164,6 +291,12 @@ def main(argv=None) -> int:
             for line in report["fake_traps"]:
                 print(f"  ✗ FAUX PIÈGE : {line}")
                 failures += 1
+            for line in report["missed_wins"]:
+                print(f"  ⚠ GAIN IMMÉDIAT IGNORÉ : {line}")
+                warnings += 1
+            for line in report["early_stops"]:
+                print(f"  ⚠ LIGNE INTERROMPUE : {line}")
+                warnings += 1
             for line in report["weak_defenses"]:
                 print(f"  ℹ défense sous-optimale (voulue ?) : {line}")
             for line in report["engine_checked"]:
@@ -180,6 +313,12 @@ def main(argv=None) -> int:
         print(f"✗ {failures} problème(s) prouvé(s)")
         return 1
     print("✓ Chaque coup enseigné préserve son verdict théorique (tablebase).")
+    if warnings:
+        # PAS bloquant : ces deux contrôles jugent la pédagogie, pas la
+        # vérité. Un gain immédiat peut être délibérément écarté, une ligne
+        # peut s'arrêter là où l'auteur estime que l'élève sait finir. Mais ce
+        # doit être un CHOIX, et il doit se voir.
+        print(f"⚠ {warnings} avertissement(s) pédagogique(s) — à relire, non bloquants")
     return 0
 
 
