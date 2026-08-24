@@ -8622,3 +8622,49 @@ test garde le tout honnête en vérifiant que la flèche recouvre bel et bien
 l'emplacement — sans lui, les deux autres passeraient aussi bien s'il n'y avait
 aucun conflit à trancher. Avant correction, le pixel visé valait `[35, 31, 31]`
 (le gris de la flèche) au lieu de `[192, 57, 57]` (le rouge de la gaffe).
+
+## 24/08 — Laboratoire : les libellés disent enfin ce qu'ils mesurent
+
+« LOS », « écart Elo ±42 » : du vocabulaire de tournoi de moteurs. Exact,
+compact, et hermétique à qui ne l'a jamais croisé. Chaque tuile de statistique
+porte maintenant son explication et la donne sur demande, comme les deux
+en-têtes de section — la bande claire autour de la courbe de progression
+n'était légendée nulle part.
+
+### Une bulle qui ne s'installe pas
+
+Trois sorties, selon la façon dont elle est venue : l'appui MAINTENU la montre
+tant que le doigt reste posé, le toucher simple la laisse dix secondes, et le
+toucher suivant la referme (comportement natif de la bulle, son voile capte le
+geste). Dix secondes : de quoi parcourir deux courts paragraphes sans les
+apprendre par cœur. Plus court, la bulle s'arracherait en pleine lecture ; plus
+long, elle cesserait d'être de passage.
+
+### La mesure qui a rattrapé une régression
+
+Le picto « ? » était d'abord posé DANS la rangée de la tuile. Il coûtait 26 pt
+(14 de glyphe, 12 d'écart) — et une tuile n'offre que **62 pt** à son libellé
+sur un iPhone en Zoom d'affichage, quand « parties jouées » en réclame 74. Les
+SIX libellés se coupaient, sur tous les iPhone et pas seulement en Zoom. Rien
+ne le disait : les deux versions compilent aussi bien, et le facteur de
+réduction masque la coupe en la faisant passer pour un choix.
+
+Passé en incrustation d'angle, le picto ne coûte plus rien et la géométrie
+redevient celle d'avant, au point près. `LabStatTileLayoutTests` mesure les
+deux : que chaque libellé tient, et que la rangée ne vaut que son contenu.
+
+### Hygiène des chaînes
+
+Deux explications écrites en chaîne multiligne Swift ont vu leurs lignes se
+recoller EN GARDANT leur indentation — « la part verte         est ce que ».
+Compilation verte, app fonctionnelle, texte abîmé : rien ne regardait le texte.
+`LocalizedStringHygieneTests` le regarde maintenant, sur les chaînes RÉELLEMENT
+livrées (celles compilées dans le bundle) : aucun espace en double, aucun
+espace avant un saut de ligne. Mesuré sur les 1 104 chaînes du catalogue, les
+deux invariants tiennent — l'espace FINAL, lui, est laissé libre : cinq chaînes
+sont des préfixes destinés à être collés à une valeur.
+
+### Vérifié
+
+712 tests verts (698 swift-testing + 14 XCTest). 17 chaînes ajoutées au
+catalogue, traduites en anglais.

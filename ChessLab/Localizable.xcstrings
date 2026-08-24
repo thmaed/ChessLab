@@ -4940,6 +4940,22 @@
         }
       }
     },
+    "Coups par partie" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moves per game"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coups par partie"
+          }
+        }
+      }
+    },
     "Cut Off Before You Push" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8498,6 +8514,22 @@
         }
       }
     },
+    "LOS — Likelihood of Superiority" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LOS — Likelihood of Superiority"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LOS — Likelihood of Superiority"
+          }
+        }
+      }
+    },
     "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer." : {
       "localizations" : {
         "en" : {
@@ -8514,6 +8546,22 @@
         }
       }
     },
+    "La différence de force entre A et B, convertie du score en points Elo. Positive si A est devant.\n\nLe « ± » est la marge de l'intervalle de confiance à 95 % : la vraie valeur a 19 chances sur 20 de s'y trouver. Cette marge se resserre à mesure que les parties s'accumulent — c'est elle, et non l'écart lui-même, qui dit si la série a assez tourné." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The difference in strength between A and B, converted from the score into Elo points. Positive when A is ahead.\n\nThe “±” is the margin of the 95% confidence interval: the true value has 19 chances in 20 of falling inside it. That margin narrows as games accumulate — and it, not the difference itself, is what tells you whether the run has gone on long enough."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La différence de force entre A et B, convertie du score en points Elo. Positive si A est devant.\n\nLe « ± » est la marge de l'intervalle de confiance à 95 % : la vraie valeur a 19 chances sur 20 de s'y trouver. Cette marge se resserre à mesure que les parties s'accumulent — c'est elle, et non l'écart lui-même, qui dit si la série a assez tourné."
+          }
+        }
+      }
+    },
     "La défense réfléchit…" : {
       "localizations" : {
         "en" : {
@@ -8526,6 +8574,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La défense réfléchit…"
+          }
+        }
+      }
+    },
+    "La longueur moyenne des parties terminées, en coups complets (un coup = un demi-coup blanc plus un demi-coup noir).\n\nDes parties courtes vont souvent avec des gains nets ; des parties longues, avec des positions équilibrées ou des finales disputées." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The average length of finished games, in full moves (one move = a White half-move plus a Black half-move).\n\nShort games often go with clear-cut wins; long ones with balanced positions or hard-fought endgames."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La longueur moyenne des parties terminées, en coups complets (un coup = un demi-coup blanc plus un demi-coup noir).\n\nDes parties courtes vont souvent avec des gains nets ; des parties longues, avec des positions équilibrées ou des finales disputées."
+          }
+        }
+      }
+    },
+    "La même chose que « V · N · D », vue comme une barre : la part verte est ce que A a gagné, la grise les nulles, la rouge ce que B a gagné.\n\nUne bande grise très large signale des réglages trop proches pour se départager — ou un temps de réflexion trop court pour que la différence s'exprime." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The same thing as “W · D · L”, seen as a bar: the green part is what A won, the grey the draws, the red what B won.\n\nA very wide grey band means the settings are too close to tell apart — or that thinking time is too short for the difference to show."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La même chose que « V · N · D », vue comme une barre : la part verte est ce que A a gagné, la grise les nulles, la rouge ce que B a gagné.\n\nUne bande grise très large signale des réglages trop proches pour se départager — ou un temps de réflexion trop court pour que la différence s'exprime."
           }
         }
       }
@@ -8586,6 +8666,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "The game will be removed from the library. This action is permanent."
+          }
+        }
+      }
+    },
+    "La probabilité que A soit RÉELLEMENT plus fort que B, et non que l'écart observé vienne du hasard.\n\nElle ne se calcule que sur les parties décisives : les nulles n'y entrent pas. En dessous de 95 %, la série n'a pas encore tranché, même si l'écart Elo paraît net. À 50 %, les deux camps sont indiscernables." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The probability that A is GENUINELY stronger than B, rather than the observed gap being down to chance.\n\nIt is computed on decisive games only: draws play no part. Below 95%, the run has not settled the question yet, however clear the Elo difference looks. At 50%, the two sides are indistinguishable."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La probabilité que A soit RÉELLEMENT plus fort que B, et non que l'écart observé vienne du hasard.\n\nElle ne se calcule que sur les parties décisives : les nulles n'y entrent pas. En dessous de 95 %, la série n'a pas encore tranché, même si l'écart Elo paraît net. À 50 %, les deux camps sont indiscernables."
           }
         }
       }
@@ -8816,6 +8912,22 @@
         }
       }
     },
+    "Le détail des résultats, toujours du point de vue de A.\n\nLes nulles comptent pour une demi-victoire dans le score, mais elles sont ignorées par le LOS : elles ne disent rien sur qui est le plus fort." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The results in detail, always from A's point of view.\n\nDraws count as half a win in the score, but LOS ignores them: they say nothing about who is stronger."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le détail des résultats, toujours du point de vue de A.\n\nLes nulles comptent pour une demi-victoire dans le score, mais elles sont ignorées par le LOS : elles ne disent rien sur qui est le plus fort."
+          }
+        }
+      }
+    },
     "Le fichier est supprimé de cet appareil. Votre progression sur ces positions est conservée." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8933,6 +9045,22 @@
         }
       }
     },
+    "Le nombre de parties terminées, sur le total demandé au lancement de la série.\n\nLes statistiques ci-dessus se recalculent après chacune : elles sont volatiles au début et se stabilisent ensuite." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The number of finished games, out of the total requested when the run was started.\n\nThe statistics above are recalculated after each one: they swing wildly at first, then settle."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le nombre de parties terminées, sur le total demandé au lancement de la série.\n\nLes statistiques ci-dessus se recalculent après chacune : elles sont volatiles au début et se stabilisent ensuite."
+          }
+        }
+      }
+    },
     "Le plateau ne bouge pas — vous regardez du même côté." : {
       "localizations" : {
         "en" : {
@@ -8977,6 +9105,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le presse-papiers ne contient pas d'image."
+          }
+        }
+      }
+    },
+    "Le score de A recalculé après chaque partie, et non partie par partie : la courbe part donc de très haut ou de très bas, puis se calme.\n\nLa zone claire autour d'elle est l'intervalle de confiance à 95 %. Tant qu'elle chevauche la ligne des 50 %, la série n'a pas tranché. C'est le rétrécissement de cette bande qui dit quand s'arrêter." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A's score recalculated after every game, rather than game by game: the curve therefore starts very high or very low, then settles.\n\nThe pale area around it is the 95% confidence interval. As long as it overlaps the 50% line, the run has not settled anything. It is the narrowing of that band that tells you when to stop."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le score de A recalculé après chaque partie, et non partie par partie : la courbe part donc de très haut ou de très bas, puis se calme.\n\nLa zone claire autour d'elle est l'intervalle de confiance à 95 %. Tant qu'elle chevauche la ligne des 50 %, la série n'a pas tranché. C'est le rétrécissement de cette bande qui dit quand s'arrêter."
           }
         }
       }
@@ -9116,6 +9260,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les parties terminées (mode Jouer et Deux joueurs) apparaîtront ici."
+          }
+        }
+      }
+    },
+    "Les points marqués par le camp A, en pourcentage du maximum possible : un gain vaut 1 point, une nulle ½, une défaite 0.\n\n50 % veut dire que les deux réglages font jeu égal. C'est la mesure d'où tout le reste est déduit, écart Elo compris." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The points scored by side A, as a percentage of the maximum possible: a win is worth 1 point, a draw ½, a loss 0.\n\n50% means the two settings are evenly matched. This is the measure everything else is derived from, Elo difference included."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les points marqués par le camp A, en pourcentage du maximum possible : un gain vaut 1 point, une nulle ½, une défaite 0.\n\n50 % veut dire que les deux réglages font jeu égal. C'est la mesure d'où tout le reste est déduit, écart Elo compris."
           }
         }
       }
@@ -10989,6 +11149,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partie nulle"
+          }
+        }
+      }
+    },
+    "Parties jouées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Games played"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parties jouées"
           }
         }
       }
@@ -13917,6 +14093,22 @@
         }
       }
     },
+    "Répartition" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breakdown"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Répartition"
+          }
+        }
+      }
+    },
     "Rétablit les %lld coups écartés" : {
       "localizations" : {
         "en" : {
@@ -14105,6 +14297,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Score A"
+          }
+        }
+      }
+    },
+    "Score de A" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score for A"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score de A"
           }
         }
       }
@@ -14837,6 +15045,54 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete game"
+          }
+        }
+      }
+    },
+    "Touchez pour savoir ce que mesure cette statistique" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to find out what this statistic measures"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez pour savoir ce que mesure cette statistique"
+          }
+        }
+      }
+    },
+    "Touchez pour savoir ce que montre cette section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to find out what this section shows"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez pour savoir ce que montre cette section"
+          }
+        }
+      }
+    },
+    "Victoires · Nulles · Défaites" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wins · Draws · Losses"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Victoires · Nulles · Défaites"
           }
         }
       }
@@ -16994,6 +17250,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Zukertort"
+          }
+        }
+      }
+    },
+    "Écart Elo" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Elo difference"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Écart Elo"
           }
         }
       }

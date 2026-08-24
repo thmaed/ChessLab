@@ -119,55 +119,37 @@ struct LabRunView: View {
     private var statsGrid: some View {
         let stats = viewModel.stats
         return LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-            statTile(
+            LabStatTile(
                 value: stats.games > 0 ? "\(Int(stats.scorePercent.rounded()))%" : "—",
-                label: "score de A", icon: "percent", tint: Theme.accent
+                label: "score de A", icon: "percent", tint: Theme.accent,
+                explanation: .score
             )
-            statTile(
+            LabStatTile(
                 value: "\(stats.winsA)–\(stats.draws)–\(stats.winsB)",
-                label: "V · N · D (A)", icon: "chart.bar.fill", tint: Theme.info
+                label: "V · N · D (A)", icon: "chart.bar.fill", tint: Theme.info,
+                explanation: .winDrawLoss
             )
-            statTile(value: eloText(stats), label: LocalizedStringKey(eloCaption(stats)), icon: "arrow.up.arrow.down", tint: Theme.violet)
-            statTile(
+            LabStatTile(
+                value: eloText(stats), label: LocalizedStringKey(eloCaption(stats)),
+                icon: "arrow.up.arrow.down", tint: Theme.violet,
+                explanation: .elo
+            )
+            LabStatTile(
                 value: stats.winsA + stats.winsB > 0 ? "\(Int((stats.likelihoodOfSuperiority * 100).rounded()))%" : "—",
-                label: "LOS (A > B)", icon: "checkmark.seal", tint: Theme.teal
+                label: "LOS (A > B)", icon: "checkmark.seal", tint: Theme.teal,
+                explanation: .likelihoodOfSuperiority
             )
-            statTile(
+            LabStatTile(
                 value: stats.games > 0 ? "\(Int(stats.averageMoves.rounded()))" : "—",
-                label: "coups / partie", icon: "ruler", tint: Theme.warning
+                label: "coups / partie", icon: "ruler", tint: Theme.warning,
+                explanation: .movesPerGame
             )
-            statTile(
+            LabStatTile(
                 value: "\(stats.games)/\(viewModel.settings.gameCount)",
-                label: "parties jouées", icon: "flag.checkered", tint: Theme.rose
+                label: "parties jouées", icon: "flag.checkered", tint: Theme.rose,
+                explanation: .gamesPlayed
             )
         }
-    }
-
-    private func statTile(value: String, label: LocalizedStringKey, icon: String, tint: Color) -> some View {
-        HStack(spacing: 12) {
-            IconBadge(systemImage: icon, tint: tint, size: 36)
-            VStack(alignment: .leading, spacing: 1) {
-                Text(value)
-                    .font(.title3.bold().monospacedDigit())
-                    .foregroundStyle(Theme.textPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                Text(label)
-                    .font(.caption2)
-                    .foregroundStyle(Theme.textSecondary)
-                    .lineLimit(1)
-                    // La VALEUR avait déjà son facteur de réduction, pas le
-                    // libellé : il se coupait net dans une tuile de 89 pt
-                    // (62 en Display Zoom) — Lot 3.5.
-                    .minimumScaleFactor(0.7)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 12)
-        .frame(maxWidth: .infinity)
-        .background(Theme.cardGradient, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(Theme.stroke, lineWidth: 1))
     }
 
     private func eloText(_ stats: LabStats) -> String {
@@ -189,11 +171,7 @@ struct LabRunView: View {
         let stats = viewModel.stats
         if stats.games > 0 {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Répartition (A)")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(Theme.textSecondary)
-                    .textCase(.uppercase)
-                    .tracking(0.4)
+                LabSectionHeader(title: "Répartition (A)", explanation: .distribution)
                 GeometryReader { geo in
                     HStack(spacing: 2) {
                         segment(width: geo.size.width, count: stats.winsA, total: stats.games, color: Theme.accent)
@@ -243,11 +221,7 @@ struct LabRunView: View {
         let points = viewModel.progressPoints
         if points.count >= 2 {
             VStack(alignment: .leading, spacing: 10) {
-                Text("Progression de A")
-                    .font(.footnote.weight(.semibold))
-                    .foregroundStyle(Theme.textSecondary)
-                    .textCase(.uppercase)
-                    .tracking(0.4)
+                LabSectionHeader(title: "Progression de A", explanation: .progression)
                 Chart(points) { point in
                     AreaMark(
                         x: .value("Partie", point.game),
