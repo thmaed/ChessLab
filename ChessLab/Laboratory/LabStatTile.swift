@@ -136,6 +136,15 @@ struct LabStatTile: View {
             .accessibilityElement(children: .combine)
             .accessibilityAddTraits(.isButton)
             .accessibilityHint("Touchez pour savoir ce que mesure cette statistique")
+            // EXPLICITE : depuis que la tuile n'est plus un `Button` (il ne
+            // savait pas distinguer le toucher du maintien), le trait de
+            // bouton ne suffit plus à câbler le double-toucher VoiceOver sur
+            // le geste. Sans cette action, l'explication serait hors de portée
+            // pour qui navigue au lecteur d'écran.
+            .accessibilityAction {
+                openedByHold = false
+                showsExplanation = true
+            }
     }
 
     private var tile: some View {
@@ -231,6 +240,10 @@ struct LabSectionHeader: View {
             )
             .accessibilityAddTraits(.isButton)
             .accessibilityHint("Touchez pour savoir ce que montre cette section")
+            .accessibilityAction {
+                openedByHold = false
+                showsExplanation = true
+            }
     }
 
     private var header: some View {
