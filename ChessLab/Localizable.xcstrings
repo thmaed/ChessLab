@@ -833,6 +833,7 @@
       }
     },
     "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -844,6 +845,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours."
+          }
+        }
+      }
+    },
+    "• Ouvertures repensées : un index en arbre où chaque variante se lit sans doublon, et un tap sur n'importe quel coup ouvre la position.\n• Sous le plateau : les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish, et une barre d'évaluation.\n• Les 58 cours d'ouvertures complétés par une seconde passe : les réponses noires qui manquaient sont là.\n• Finales : « Pions électriques » ajoutée — 78 cours — et « pion passé éloigné » corrigé, sa position n'appelait pas la technique enseignée.\n• « Reprendre ici » agit au premier toucher : plus de confirmation, une annulation prend la place du bouton pendant quelques secondes.\n• « Changer de mode » : le même bouton violet sur tous les écrans, au lieu d'être caché dans les menus d'export.\n• Le thème du plateau se choisit dans les Réglages, et s'applique partout.\n• Laboratoire : touchez une statistique (LOS, écart Elo…) pour savoir ce qu'elle mesure.\n• L'app occupe 60 Mo au lieu de 175." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Openings rethought: a tree index where every variation reads without duplicates, and a tap on any move opens its position.\n• Below the board: the masters' moves with their percentages, Stockfish's three best moves, and an evaluation bar.\n• The 58 opening courses completed in a second pass: the missing Black replies are there.\n• Endgames: “Electric Pawns” added — 78 courses — and “the outside passed pawn” fixed, its position did not call for the technique it taught.\n• “Resume here” acts on the first tap: no more confirmation, an undo takes the button's place for a few seconds.\n• “Switch mode”: the same violet button on every screen, instead of being hidden inside export menus.\n• The board theme is chosen in Settings, and applies everywhere.\n• Laboratory: tap a statistic (LOS, Elo difference…) to find out what it measures.\n• The app takes 60 MB instead of 175."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "• Ouvertures repensées : un index en arbre où chaque variante se lit sans doublon, et un tap sur n'importe quel coup ouvre la position.\n• Sous le plateau : les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish, et une barre d'évaluation.\n• Les 58 cours d'ouvertures complétés par une seconde passe : les réponses noires qui manquaient sont là.\n• Finales : « Pions électriques » ajoutée — 78 cours — et « pion passé éloigné » corrigé, sa position n'appelait pas la technique enseignée.\n• « Reprendre ici » agit au premier toucher : plus de confirmation, une annulation prend la place du bouton pendant quelques secondes.\n• « Changer de mode » : le même bouton violet sur tous les écrans, au lieu d'être caché dans les menus d'export.\n• Le thème du plateau se choisit dans les Réglages, et s'applique partout.\n• Laboratoire : touchez une statistique (LOS, écart Elo…) pour savoir ce qu'elle mesure.\n• L'app occupe 60 Mo au lieu de 175."
           }
         }
       }
@@ -977,6 +994,7 @@
       }
     },
     "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -992,18 +1010,18 @@
         }
       }
     },
-    "Annuler la reprise" : {
+    "78 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Undo resume"
+            "value" : "78 courses to finally convert your endings, grouped by family: pawns, rooks, bishops, knights, imbalances, queens, elementary mates, famous studies (Réti, Saavedra, Lasker, Troitsky, Kubbel…) and cross-cutting themes (two weaknesses, domination, stalemate as a resource…). Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. From the reader, the \"Train\" menu offers the guided line OR free training — finish the position against best defence, where any move that preserves the verdict is accepted, not just the lesson's move, and a move that lets it slip is taken back with the explanation. Spaced repetition and iCloud sync, like the openings."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Annuler la reprise"
+            "value" : "78 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
           }
         }
       }
@@ -1800,6 +1818,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuler"
+          }
+        }
+      }
+    },
+    "Annuler la reprise" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo resume"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler la reprise"
           }
         }
       }
@@ -4359,38 +4393,6 @@
         }
       }
     },
-    "Continuer ailleurs" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue elsewhere"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continuer ailleurs"
-          }
-        }
-      }
-    },
-    "Continuer au Laboratoire" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continue in the Laboratory"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Continuer au Laboratoire"
-          }
-        }
-      }
-    },
     "Continuer contre l'ordinateur depuis ici" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4820,6 +4822,22 @@
         }
       }
     },
+    "Coups par partie" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moves per game"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coups par partie"
+          }
+        }
+      }
+    },
     "Coups repris en route : %lld" : {
       "localizations" : {
         "en" : {
@@ -4936,22 +4954,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "CSV"
-          }
-        }
-      }
-    },
-    "Coups par partie" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moves per game"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Coups par partie"
           }
         }
       }
@@ -5555,18 +5557,18 @@
         }
       }
     },
-    "Electric Pawns" : {
+    "Écart Elo" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Electric Pawns"
+            "value" : "Elo difference"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pions électriques"
+            "value" : "Écart Elo"
           }
         }
       }
@@ -5716,6 +5718,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Égalité"
+          }
+        }
+      }
+    },
+    "Electric Pawns" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Electric Pawns"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pions électriques"
           }
         }
       }
@@ -7891,22 +7910,6 @@
         }
       }
     },
-    "Jouer à partir d'ici" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Play from here"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Jouer à partir d'ici"
-          }
-        }
-      }
-    },
     "Jouer cette position" : {
       "localizations" : {
         "en" : {
@@ -8019,6 +8022,22 @@
         }
       }
     },
+    "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Play a game against the Stockfish engine. Choose your colour, the opponent's strength (Elo), the time control, and the aids: hints (best-move arrows), a warning on risky moves and an evaluation bar. After the game, one button leads straight to analysis. During the game, “Switch mode” (top right) sends the displayed position to analysis, the Laboratory or a two-player game — your game is waiting when you come back."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
+          }
+        }
+      }
+    },
     "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse ou le Laboratoire — la partie vous attend au retour." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8037,6 +8056,7 @@
       }
     },
     "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -8530,22 +8550,6 @@
         }
       }
     },
-    "LOS — Likelihood of Superiority" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LOS — Likelihood of Superiority"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "LOS — Likelihood of Superiority"
-          }
-        }
-      }
-    },
     "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer." : {
       "localizations" : {
         "en" : {
@@ -8558,22 +8562,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer."
-          }
-        }
-      }
-    },
-    "La différence de force entre A et B, convertie du score en points Elo. Positive si A est devant.\n\nLe « ± » est la marge de l'intervalle de confiance à 95 % : la vraie valeur a 19 chances sur 20 de s'y trouver. Cette marge se resserre à mesure que les parties s'accumulent — c'est elle, et non l'écart lui-même, qui dit si la série a assez tourné." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The difference in strength between A and B, converted from the score into Elo points. Positive when A is ahead.\n\nThe “±” is the margin of the 95% confidence interval: the true value has 19 chances in 20 of falling inside it. That margin narrows as games accumulate — and it, not the difference itself, is what tells you whether the run has gone on long enough."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La différence de force entre A et B, convertie du score en points Elo. Positive si A est devant.\n\nLe « ± » est la marge de l'intervalle de confiance à 95 % : la vraie valeur a 19 chances sur 20 de s'y trouver. Cette marge se resserre à mesure que les parties s'accumulent — c'est elle, et non l'écart lui-même, qui dit si la série a assez tourné."
           }
         }
       }
@@ -8594,34 +8582,18 @@
         }
       }
     },
-    "La longueur moyenne des parties terminées, en coups complets (un coup = un demi-coup blanc plus un demi-coup noir).\n\nDes parties courtes vont souvent avec des gains nets ; des parties longues, avec des positions équilibrées ou des finales disputées." : {
+    "La différence de force entre A et B, convertie du score en points Elo. Positive si A est devant.\n\nLe « ± » est la marge de l'intervalle de confiance à 95 % : la vraie valeur a 19 chances sur 20 de s'y trouver. Cette marge se resserre à mesure que les parties s'accumulent — c'est elle, et non l'écart lui-même, qui dit si la série a assez tourné." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The average length of finished games, in full moves (one move = a White half-move plus a Black half-move).\n\nShort games often go with clear-cut wins; long ones with balanced positions or hard-fought endgames."
+            "value" : "The difference in strength between A and B, converted from the score into Elo points. Positive when A is ahead.\n\nThe “±” is the margin of the 95% confidence interval: the true value has 19 chances in 20 of falling inside it. That margin narrows as games accumulate — and it, not the difference itself, is what tells you whether the run has gone on long enough."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "La longueur moyenne des parties terminées, en coups complets (un coup = un demi-coup blanc plus un demi-coup noir).\n\nDes parties courtes vont souvent avec des gains nets ; des parties longues, avec des positions équilibrées ou des finales disputées."
-          }
-        }
-      }
-    },
-    "La même chose que « V · N · D », vue comme une barre : la part verte est ce que A a gagné, la grise les nulles, la rouge ce que B a gagné.\n\nUne bande grise très large signale des réglages trop proches pour se départager — ou un temps de réflexion trop court pour que la différence s'exprime." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The same thing as “W · D · L”, seen as a bar: the green part is what A won, the grey the draws, the red what B won.\n\nA very wide grey band means the settings are too close to tell apart — or that thinking time is too short for the difference to show."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "La même chose que « V · N · D », vue comme une barre : la part verte est ce que A a gagné, la grise les nulles, la rouge ce que B a gagné.\n\nUne bande grise très large signale des réglages trop proches pour se départager — ou un temps de réflexion trop court pour que la différence s'exprime."
+            "value" : "La différence de force entre A et B, convertie du score en points Elo. Positive si A est devant.\n\nLe « ± » est la marge de l'intervalle de confiance à 95 % : la vraie valeur a 19 chances sur 20 de s'y trouver. Cette marge se resserre à mesure que les parties s'accumulent — c'est elle, et non l'écart lui-même, qui dit si la série a assez tourné."
           }
         }
       }
@@ -8656,6 +8628,38 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La ligne reprend d'une position antérieure"
+          }
+        }
+      }
+    },
+    "La longueur moyenne des parties terminées, en coups complets (un coup = un demi-coup blanc plus un demi-coup noir).\n\nDes parties courtes vont souvent avec des gains nets ; des parties longues, avec des positions équilibrées ou des finales disputées." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The average length of finished games, in full moves (one move = a White half-move plus a Black half-move).\n\nShort games often go with clear-cut wins; long ones with balanced positions or hard-fought endgames."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La longueur moyenne des parties terminées, en coups complets (un coup = un demi-coup blanc plus un demi-coup noir).\n\nDes parties courtes vont souvent avec des gains nets ; des parties longues, avec des positions équilibrées ou des finales disputées."
+          }
+        }
+      }
+    },
+    "La même chose que « V · N · D », vue comme une barre : la part verte est ce que A a gagné, la grise les nulles, la rouge ce que B a gagné.\n\nUne bande grise très large signale des réglages trop proches pour se départager — ou un temps de réflexion trop court pour que la différence s'exprime." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The same thing as “W · D · L”, seen as a bar: the green part is what A won, the grey the draws, the red what B won.\n\nA very wide grey band means the settings are too close to tell apart — or that thinking time is too short for the difference to show."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La même chose que « V · N · D », vue comme une barre : la part verte est ce que A a gagné, la grise les nulles, la rouge ce que B a gagné.\n\nUne bande grise très large signale des réglages trop proches pour se départager — ou un temps de réflexion trop court pour que la différence s'exprime."
           }
         }
       }
@@ -8811,7 +8815,24 @@
         }
       }
     },
+    "Langue de l'interface (français, anglais, ou celle du système), thème du plateau — choisi ici une fois pour tous les écrans —, notation des pièces (française R D T F C ou anglaise), et synchronisation iCloud." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Interface language (French, English, or the system one), board theme — chosen here once for every screen —, piece notation (French R D T F C or English), and iCloud sync."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Langue de l'interface (français, anglais, ou celle du système), thème du plateau — choisi ici une fois pour tous les écrans —, notation des pièces (française R D T F C ou anglaise), et synchronisation iCloud."
+          }
+        }
+      }
+    },
     "Langue de l'interface (français, anglais, ou celle du système), thème du plateau, notation des pièces (française R D T F C ou anglaise), et synchronisation iCloud." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -9045,22 +9066,6 @@
         }
       }
     },
-    "Le PGN exporté reste en notation anglaise — c'est le standard, lisible par tous les autres logiciels." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The exported PGN stays in English notation — the standard, readable by every other program."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le PGN exporté reste en notation anglaise — c'est le standard, lisible par tous les autres logiciels."
-          }
-        }
-      }
-    },
     "Le nombre de parties terminées, sur le total demandé au lancement de la série.\n\nLes statistiques ci-dessus se recalculent après chacune : elles sont volatiles au début et se stabilisent ensuite." : {
       "localizations" : {
         "en" : {
@@ -9073,6 +9078,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le nombre de parties terminées, sur le total demandé au lancement de la série.\n\nLes statistiques ci-dessus se recalculent après chacune : elles sont volatiles au début et se stabilisent ensuite."
+          }
+        }
+      }
+    },
+    "Le PGN exporté reste en notation anglaise — c'est le standard, lisible par tous les autres logiciels." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The exported PGN stays in English notation — the standard, readable by every other program."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le PGN exporté reste en notation anglaise — c'est le standard, lisible par tous les autres logiciels."
           }
         }
       }
@@ -9626,6 +9647,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Système de Londres, avec Fe2"
+          }
+        }
+      }
+    },
+    "LOS — Likelihood of Superiority" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LOS — Likelihood of Superiority"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LOS — Likelihood of Superiority"
           }
         }
       }
@@ -10510,11 +10547,28 @@
       }
     },
     "Nouveautés de la version 1.5" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "What's new in version 1.5"
+          }
+        }
+      }
+    },
+    "Nouveautés de la version 1.6" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "What's new in version 1.6"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveautés de la version 1.6"
           }
         }
       }
@@ -10955,22 +11009,6 @@
         }
       }
     },
-    "Partie reprise, %lld coups écartés. Annulation possible." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Game resumed, %lld moves discarded. You can undo."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Partie reprise, %lld coups écartés. Annulation possible."
-          }
-        }
-      }
-    },
     "p%lld" : {
       "localizations" : {
         "en" : {
@@ -11169,6 +11207,32 @@
         }
       }
     },
+    "Partie reprise, %lld coups écartés. Annulation possible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game resumed, %lld moves discarded. You can undo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partie reprise, %lld coups écartés. Annulation possible."
+          }
+        }
+      }
+    },
+    "parties jouées" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "games played"
+          }
+        }
+      }
+    },
     "Parties jouées" : {
       "localizations" : {
         "en" : {
@@ -11181,16 +11245,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Parties jouées"
-          }
-        }
-      }
-    },
-    "parties jouées" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "games played"
           }
         }
       }
@@ -12171,6 +12225,22 @@
         }
       }
     },
+    "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un index en arbre montre toutes les variantes sans doublon : touchez n'importe quel coup pour ouvrir sa position. Sous le plateau, les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish et une barre d'évaluation ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progress through 58 hand-written, bilingual openings, all engine-checked. A tree index shows every variation without duplicates: tap any move to open its position. Below the board, the masters' moves with their percentages, Stockfish's three best moves and an evaluation bar; coloured arrows flag the recommended move, traps and inaccuracies. Train them with spaced repetition — the app schedules your reviews by itself — and find your progress on all your devices via iCloud. From the reader, “Switch mode” sends the position you reached to the Laboratory, the computer or a two-player game."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un index en arbre montre toutes les variantes sans doublon : touchez n'importe quel coup pour ouvrir sa position. Sous le plateau, les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish et une barre d'évaluation ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
+          }
+        }
+      }
+    },
     "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -12189,6 +12259,7 @@
       }
     },
     "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -12843,22 +12914,6 @@
         }
       }
     },
-    "Reprise au coup %lld — %lld coups écartés" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resumed at move %lld — %lld moves discarded"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reprise au coup %lld — %lld coups écartés"
-          }
-        }
-      }
-    },
     "Réessayer" : {
       "localizations" : {
         "en" : {
@@ -13024,6 +13079,22 @@
         }
       }
     },
+    "Remerciements" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Acknowledgements"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Remerciements"
+          }
+        }
+      }
+    },
     "Remplace l'arbre de variantes actuel" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -13057,6 +13128,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rename repertoire"
+          }
+        }
+      }
+    },
+    "Répartition" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Breakdown"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Répartition"
           }
         }
       }
@@ -13341,6 +13428,22 @@
         }
       }
     },
+    "Reprise au coup %lld — %lld coups écartés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resumed at move %lld — %lld moves discarded"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprise au coup %lld — %lld coups écartés"
+          }
+        }
+      }
+    },
     "Reprise de coup indisponible avec pendule." : {
       "localizations" : {
         "en" : {
@@ -13483,6 +13586,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rester sur la principale"
+          }
+        }
+      }
+    },
+    "Rétablit les %lld coups écartés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restores the %lld discarded moves"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rétablit les %lld coups écartés"
           }
         }
       }
@@ -14109,38 +14228,6 @@
         }
       }
     },
-    "Répartition" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Breakdown"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Répartition"
-          }
-        }
-      }
-    },
-    "Rétablit les %lld coups écartés" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Restores the %lld discarded moves"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rétablit les %lld coups écartés"
-          }
-        }
-      }
-    },
     "S'entraîner" : {
       "localizations" : {
         "en" : {
@@ -14317,22 +14404,6 @@
         }
       }
     },
-    "Score de A" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Score for A"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Score de A"
-          }
-        }
-      }
-    },
     "score de A" : {
       "localizations" : {
         "en" : {
@@ -14345,6 +14416,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "score de A"
+          }
+        }
+      }
+    },
+    "Score de A" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score for A"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Score de A"
           }
         }
       }
@@ -15061,54 +15148,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Delete game"
-          }
-        }
-      }
-    },
-    "Touchez pour savoir ce que mesure cette statistique" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap to find out what this statistic measures"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Touchez pour savoir ce que mesure cette statistique"
-          }
-        }
-      }
-    },
-    "Touchez pour savoir ce que montre cette section" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tap to find out what this section shows"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Touchez pour savoir ce que montre cette section"
-          }
-        }
-      }
-    },
-    "Victoires · Nulles · Défaites" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Wins · Draws · Losses"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Victoires · Nulles · Défaites"
           }
         }
       }
@@ -15950,6 +15989,38 @@
         }
       }
     },
+    "Touchez pour savoir ce que mesure cette statistique" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to find out what this statistic measures"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez pour savoir ce que mesure cette statistique"
+          }
+        }
+      }
+    },
+    "Touchez pour savoir ce que montre cette section" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tap to find out what this section shows"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez pour savoir ce que montre cette section"
+          }
+        }
+      }
+    },
     "tour" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -16464,6 +16535,22 @@
         }
       }
     },
+    "Un grand merci à Nils Gauthey pour tout le travail accompli sur ChessLab. Ses relectures, ses corrections et ses idées ont fait progresser l'app dans son ensemble, et tout particulièrement la qualité des ouvertures et des finales : les lignes que vous étudiez ici lui doivent beaucoup." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Many thanks to Nils Gauthey for all the work he has put into ChessLab. His reviews, his corrections and his ideas moved the app forward as a whole, and above all the quality of the openings and the endgames: the lines you study here owe him a great deal."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un grand merci à Nils Gauthey pour tout le travail accompli sur ChessLab. Ses relectures, ses corrections et ses idées ont fait progresser l'app dans son ensemble, et tout particulièrement la qualité des ouvertures et des finales : les lignes que vous étudiez ici lui doivent beaucoup."
+          }
+        }
+      }
+    },
     "Un roque devient indisponible dès que son roi ou sa tour quitte sa case de départ." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -16834,6 +16921,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Wins"
+          }
+        }
+      }
+    },
+    "Victoires · Nulles · Défaites" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wins · Draws · Losses"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Victoires · Nulles · Défaites"
           }
         }
       }
@@ -17266,22 +17369,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouverture Zukertort"
-          }
-        }
-      }
-    },
-    "Écart Elo" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Elo difference"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Écart Elo"
           }
         }
       }

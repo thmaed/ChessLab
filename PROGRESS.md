@@ -8705,3 +8705,67 @@ Les deux pièges sont prouvés tels : l'audit vérifie qu'une arête marquée
 
 78 cours de finales audités, aucun coup enseigné ne casse son verdict
 théorique. 713 tests verts (699 swift-testing + 14 XCTest).
+
+## 24/08 — Barres d'outils : une capacité, une apparence
+
+### Ce qui n'allait pas
+
+« Continuer ailleurs » vivait sous DEUX apparences. Six écrans — Ouvertures,
+Finales, Puzzles — avaient le bouton violet ▦ ; les trois écrans de partie
+cachaient les MÊMES destinations dans une section d'un menu annoncé comme
+**Exporter** (icône de partage, grise), ou noyées dans un « … » avec le thème
+du plateau et le retournement de plateau. Rien ne laissait deviner qu'il
+s'agissait de la même chose.
+
+`QuickSwitchMenu` est désormais le seul accès, sur les neuf écrans concernés.
+Les menus d'export ne parlent plus que d'export.
+
+Deux défauts trouvés en chemin. *Analyser* proposait « Jouer à partir d'ici »
+sous `play.fill`, là où l'accueil et six écrans nomment ce mode « Contre
+l'ordinateur » sous `cpu` — même destination, deux noms, deux icônes. Et le
+paramètre `excluding` ne savait dire qu'une chose, « je suis ce mode-ci » : il
+ne pouvait pas décrire l'analyse, qui propose une partie contre l'ordinateur
+mais pas à deux. Les destinations se DÉCLARENT maintenant — chaque écran
+fournit les passerelles qui ont un sens chez lui.
+
+Libellés et icônes sont ceux des tuiles de l'accueil, dans le même ordre : le
+menu est un raccourci vers la grille, il en reprend les mots. Titre inchangé
+(« Changer de mode ») : c'est sous ce nom que l'aide le présente, à trois
+endroits. Trois chaînes devenues orphelines ont été retirées du catalogue —
+en demandant au COMPILATEUR lesquelles ne sont plus référencées, une recherche
+de texte confondant les commentaires avec les usages.
+
+### Thème du plateau, et couleurs de l'accueil
+
+Le sélecteur de thème quitte *Jouer* : changer l'apparence du plateau est un
+réglage, pas un geste de partie — et ce menu ne laissait pas deviner qu'il
+s'appliquait à TOUS les écrans, ce qu'il faisait pourtant. Il reste dans
+Réglages › Thème du plateau (vérifié avant de retirer l'accès).
+
+Progression et Réglages passent en couleur sur l'accueil. En le faisant :
+le même bouton n'avait pas la même teinte selon l'appareil — Progression était
+verte en barre latérale iPad et grise sur iPhone, l'Aide exactement l'inverse.
+Les deux surfaces sont alignées. On perd la mise en avant que le gris donnait
+à l'Aide ; c'est un choix assumé, consigné dans le code.
+
+### Aide
+
+Nouveautés 1.6 en huit lignes. Trois textes devenus faux corrigés : le menu
+d'export qui « envoie la position » (c'est « Changer de mode »), « 77 cours »
+de finales (78 depuis les Pions électriques), et la description des Ouvertures
+qui ignorait l'index en arbre, les coups des maîtres et Stockfish. Une carte
+**Remerciements** ferme l'aide.
+
+### Un faux plantage, dont j'étais la cause
+
+`BoardHitTestUITests/testBoardIsHittableAtAX3` — 15 s d'habitude — a mis 229 s
+et échoué, rapports de plantage à l'appui. Ces `.ips` ne montraient AUCUNE
+image ChessLab : seulement `_XCTestMain → exit → std::terminate`, la fin de
+session du harnais. Relancé SEUL sur le même build : 19,7 s, vert. J'avais
+lancé la suite unitaire en parallèle sur la même machine. La durée anormale
+était le signal ; le rapport de plantage, lui, était un leurre.
+
+### Vérifié
+
+699 tests unitaires verts, **72 tests d'interface verts** (5 ignorés), suite
+lancée seule.

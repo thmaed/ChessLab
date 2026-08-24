@@ -77,9 +77,9 @@ struct OpeningReaderView: View {
 
                 // Débranchement : Laboratoire / Ordinateur / Deux joueurs.
                 QuickSwitchMenu(
-                    onOpenLab: { onOpenLab(viewModel.currentFEN) },
                     onPlayVsEngine: { onContinueVsStockfish(viewModel.currentFEN) },
-                    onOpenTwoPlayer: { onOpenTwoPlayer(viewModel.currentFEN) }
+                    onOpenTwoPlayer: { onOpenTwoPlayer(viewModel.currentFEN) },
+                    onOpenLab: { onOpenLab(viewModel.currentFEN) }
                 )
             }
         }

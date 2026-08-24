@@ -122,7 +122,7 @@ struct EndgameListView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 QuickSwitchMenu(
-                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                    onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer, onOpenLab: onOpenLab
                 )
             }
         }

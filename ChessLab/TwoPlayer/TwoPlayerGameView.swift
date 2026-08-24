@@ -62,7 +62,14 @@ struct TwoPlayerGameView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) { exportMenu }
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                exportMenu
+                QuickSwitchMenu(
+                    onPlayVsEngine: { onPlayVsEngine(viewModel.displayedFEN) },
+                    onAnalyze: { onAnalyzePosition(viewModel.displayedFEN) },
+                    onOpenLab: { onOpenLab(viewModel.displayedFEN) }
+                )
+            }
         }
         .alert(
             "Copié",
@@ -117,24 +124,9 @@ struct TwoPlayerGameView: View {
     /// l'analyse est un choix explicite des joueurs, au même titre que
     /// copier la FEN vers une autre app l'a toujours permis.
     private var exportMenu: some View {
+        // Les passerelles vers les autres modes ont rejoint ``QuickSwitchMenu``
+        // (harmonisation du 24/08) : ce menu ne parle plus que d'export.
         Menu {
-            Section("Continuer ailleurs") {
-                Button {
-                    onAnalyzePosition(viewModel.displayedFEN)
-                } label: {
-                    Label("Analyser cette position", systemImage: "chart.xyaxis.line")
-                }
-                Button {
-                    onOpenLab(viewModel.displayedFEN)
-                } label: {
-                    Label("Continuer au Laboratoire", systemImage: "flask")
-                }
-                Button {
-                    onPlayVsEngine(viewModel.displayedFEN)
-                } label: {
-                    Label("Contre l'ordinateur", systemImage: "cpu")
-                }
-            }
             Button {
                 UIPasteboard.general.string = viewModel.displayedFEN
                 copiedMessage = LocalizationController.string("Position (FEN) copiée dans le presse-papiers.")

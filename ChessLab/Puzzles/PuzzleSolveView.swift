@@ -39,9 +39,9 @@ struct PuzzleSolveView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 QuickSwitchMenu(
-                    onOpenLab: { onOpenLab(viewModel.currentFEN) },
                     onPlayVsEngine: { onPlayVsEngine(viewModel.currentFEN) },
-                    onOpenTwoPlayer: { onOpenTwoPlayer(viewModel.currentFEN) }
+                    onOpenTwoPlayer: { onOpenTwoPlayer(viewModel.currentFEN) },
+                    onOpenLab: { onOpenLab(viewModel.currentFEN) }
                 )
             }
         }

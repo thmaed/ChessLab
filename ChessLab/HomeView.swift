@@ -265,11 +265,11 @@ struct HomeView: View {
                             ) { path.append(Route.help) }
                             toolbarCircleButton(
                                 "chart.bar.xaxis", label: "Progression",
-                                identifier: "openProgression"
+                                identifier: "openProgression", tint: Theme.info
                             ) { path.append(Route.progression) }
                             toolbarCircleButton(
                                 "gearshape.fill", label: "Réglages",
-                                identifier: "openSettings"
+                                identifier: "openSettings", tint: Theme.gold
                             ) { path.append(Route.settings) }
                         }
                     }
@@ -345,9 +345,12 @@ struct HomeView: View {
                 sidebarLabel(.laboratory, "Laboratoire", "flask", Theme.rose)
             }
             Section("Suivi") {
-                sidebarLabel(.progression, "Progression", "chart.bar.xaxis", Theme.accent)
-                sidebarLabel(.settings, "Réglages", "gearshape.fill", Theme.textSecondary)
-                sidebarLabel(.help, "Aide", "questionmark.circle", Theme.textSecondary)
+                // Mêmes teintes qu'en barre d'outils iPhone : le même bouton
+                // portait deux couleurs selon l'appareil — Progression était
+                // verte ici et grise là, l'aide l'inverse.
+                sidebarLabel(.progression, "Progression", "chart.bar.xaxis", Theme.info)
+                sidebarLabel(.settings, "Réglages", "gearshape.fill", Theme.gold)
+                sidebarLabel(.help, "Aide", "questionmark.circle", Theme.accent)
             }
         }
         .scrollContentBackground(.hidden)
@@ -1027,9 +1030,13 @@ struct HomeView: View {
     /// Bouton rond de barre d'outils (Aide, Progression, Réglages) — style
     /// commun pour que les icônes de l'accueil restent visuellement sœurs.
     ///
-    /// `tint` non nul = bouton MIS EN AVANT : teinte sur le glyphe, le fond et
-    /// le liseré. Réservé à l'aide, le seul des trois qu'il faut remarquer sans
-    /// le chercher.
+    /// `tint` non nul = teinte sur le glyphe, le fond et le liseré.
+    ///
+    /// Les trois boutons sont désormais colorés (24/08) : une couleur par
+    /// fonction — vert pour l'aide, bleu pour la progression (comme ses
+    /// courbes), doré pour les réglages. On perd la hiérarchie que le gris
+    /// donnait à l'aide ; c'est un choix assumé, l'accueil gagne en gaieté ce
+    /// qu'il perd en mise en avant, et les trois restent distincts entre eux.
     private func toolbarCircleButton(
         _ systemImage: String, label: LocalizedStringKey,
         identifier: String, tint: Color? = nil, action: @escaping () -> Void

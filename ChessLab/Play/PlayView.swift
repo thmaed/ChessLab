@@ -22,11 +22,6 @@ struct PlayView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
-    /// Liaison manuelle : `AppSettings` est un singleton `@Observable`, pas
-    /// une propriété `@Bindable` de la vue.
-    private var boardThemeSelection: Binding<String> {
-        Binding(get: { appSettings.boardThemeID }, set: { appSettings.boardThemeID = $0 })
-    }
     @State private var showPanelSheet = false
     @State private var copiedMessage: String?
     @State private var showResignConfirmation = false
@@ -57,22 +52,18 @@ struct PlayView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
+            // Pas de sélecteur de thème ici (retiré le 24/08) : changer
+            // l'apparence du plateau est un réglage, pas un geste de partie.
+            // Il vit dans Réglages › Thème du plateau, où il s'applique à
+            // TOUS les écrans d'un coup — ce que ce menu ne laissait pas
+            // deviner, alors que c'est exactement ce qu'il faisait.
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 exportMenu
-                Menu {
-                    // `Picker` et non des `Button` : le thème COURANT porte
-                    // sa coche — avant, le menu ne disait pas lequel était
-                    // actif et il fallait essayer pour voir.
-                    Picker("Thème du plateau", selection: boardThemeSelection) {
-                        ForEach(BoardTheme.all) { theme in
-                            Text(LocalizedStringKey(theme.label)).tag(theme.id)
-                        }
-                    }
-                } label: {
-                    Image(systemName: "paintpalette")
-                        .foregroundStyle(Theme.textSecondary)
-                }
-                .accessibilityLabel("Thème du plateau")
+                QuickSwitchMenu(
+                    onOpenTwoPlayer: { onOpenTwoPlayer(viewModel.displayedFEN) },
+                    onAnalyze: { onAnalyzePosition(viewModel.displayedFEN) },
+                    onOpenLab: { onOpenLab(viewModel.displayedFEN) }
+                )
             }
         }
         .alert(
@@ -322,24 +313,10 @@ struct PlayView: View {
     /// qu'il croit exporter.
     @ViewBuilder
     private var exportMenu: some View {
+        // Les passerelles vers les autres modes ne sont PLUS ici : elles ont
+        // rejoint ``QuickSwitchMenu``, comme sur les six autres écrans. Un
+        // menu annoncé « Exporter » ne parle plus que d'export.
         Menu {
-            Section("Continuer ailleurs") {
-                Button {
-                    onAnalyzePosition(viewModel.displayedFEN)
-                } label: {
-                    Label("Analyser cette position", systemImage: "chart.xyaxis.line")
-                }
-                Button {
-                    onOpenLab(viewModel.displayedFEN)
-                } label: {
-                    Label("Continuer au Laboratoire", systemImage: "flask")
-                }
-                Button {
-                    onOpenTwoPlayer(viewModel.displayedFEN)
-                } label: {
-                    Label("Deux joueurs", systemImage: "person.2.fill")
-                }
-            }
             Button {
                 UIPasteboard.general.string = viewModel.displayedFEN
                 copiedMessage = LocalizationController.string("Position (FEN) copiée dans le presse-papiers.")

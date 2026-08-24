@@ -43,16 +43,20 @@ struct AnalysisView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
+            // Les deux passerelles vers d'autres modes ont quitté ce menu pour
+            // ``QuickSwitchMenu`` (harmonisation du 24/08) : elles y voisinaient
+            // avec le thème du plateau et le retournement, sous une icône « … »
+            // qui ne laissait rien deviner. « Jouer à partir d'ici » portait de
+            // surcroît une icône `play.fill` là où l'accueil et les six autres
+            // écrans nomment ce mode « Contre l'ordinateur » sous `cpu`.
+            ToolbarItemGroup(placement: .navigationBarTrailing) {
+                QuickSwitchMenu(
+                    onPlayVsEngine: { onPlayFromHere(viewModel.currentFEN) },
+                    onOpenLab: { onOpenLab(viewModel.currentFEN) }
+                )
                 Menu {
                     Button("Bilan de la partie", systemImage: "chart.bar.xaxis") {
                         showSummarySheet = true
-                    }
-                    Button("Jouer à partir d'ici", systemImage: "play.fill") {
-                        onPlayFromHere(viewModel.currentFEN)
-                    }
-                    Button("Continuer au Laboratoire", systemImage: "flask") {
-                        onOpenLab(viewModel.currentFEN)
                     }
                     Button("Exporter le PGN", systemImage: "square.and.arrow.up") {
                         showExportSheet = true

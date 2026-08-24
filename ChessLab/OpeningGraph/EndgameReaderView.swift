@@ -79,9 +79,9 @@ struct EndgameReaderView: View {
                         .tint(Theme.accent)
                 }
                 QuickSwitchMenu(
-                    onOpenLab: { onOpenLab(currentFEN) },
                     onPlayVsEngine: { onContinueVsStockfish(currentFEN) },
-                    onOpenTwoPlayer: { onOpenTwoPlayer(currentFEN) }
+                    onOpenTwoPlayer: { onOpenTwoPlayer(currentFEN) },
+                    onOpenLab: { onOpenLab(currentFEN) }
                 )
             }
         }

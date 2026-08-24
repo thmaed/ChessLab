@@ -18,13 +18,13 @@ struct HelpView: View {
     private let modules: [Module] = [
         .init(
             icon: "sparkles", tint: Theme.accent,
-            title: "Nouveautés de la version 1.5",
-            body: "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours."
+            title: "Nouveautés de la version 1.6",
+            body: "• Ouvertures repensées : un index en arbre où chaque variante se lit sans doublon, et un tap sur n'importe quel coup ouvre la position.\n• Sous le plateau : les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish, et une barre d'évaluation.\n• Les 58 cours d'ouvertures complétés par une seconde passe : les réponses noires qui manquaient sont là.\n• Finales : « Pions électriques » ajoutée — 78 cours — et « pion passé éloigné » corrigé, sa position n'appelait pas la technique enseignée.\n• « Reprendre ici » agit au premier toucher : plus de confirmation, une annulation prend la place du bouton pendant quelques secondes.\n• « Changer de mode » : le même bouton violet sur tous les écrans, au lieu d'être caché dans les menus d'export.\n• Le thème du plateau se choisit dans les Réglages, et s'applique partout.\n• Laboratoire : touchez une statistique (LOS, écart Elo…) pour savoir ce qu'elle mesure.\n• L'app occupe 60 Mo au lieu de 175."
         ),
         .init(
             icon: "cpu", tint: Theme.accent,
             title: "Contre l'ordinateur",
-            body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, le menu d'export (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
+            body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
         ),
         .init(
             icon: "person.2.fill", tint: Theme.info,
@@ -44,12 +44,12 @@ struct HelpView: View {
         .init(
             icon: "books.vertical.fill", tint: Theme.warning,
             title: "Ouvertures",
-            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
+            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un index en arbre montre toutes les variantes sans doublon : touchez n'importe quel coup pour ouvrir sa position. Sous le plateau, les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish et une barre d'évaluation ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
         ),
         .init(
             icon: "crown.fill", tint: Theme.gold,
             title: "Finales",
-            body: "77 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
+            body: "78 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
         ),
         .init(
             icon: "square.and.arrow.up", tint: Theme.warning,
@@ -74,7 +74,7 @@ struct HelpView: View {
         .init(
             icon: "gearshape.fill", tint: Theme.textSecondary,
             title: "Réglages",
-            body: "Langue de l'interface (français, anglais, ou celle du système), thème du plateau, notation des pièces (française R D T F C ou anglaise), et synchronisation iCloud."
+            body: "Langue de l'interface (français, anglais, ou celle du système), thème du plateau — choisi ici une fois pour tous les écrans —, notation des pièces (française R D T F C ou anglaise), et synchronisation iCloud."
         ),
         .init(
             icon: "icloud", tint: Theme.info,
@@ -96,6 +96,7 @@ struct HelpView: View {
                 }
 
                 contactCard
+                thanksCard
             }
             .padding(20)
         }
@@ -169,6 +170,26 @@ struct HelpView: View {
                         width * Self.authorImageWidthFraction
                     }
                     .clipShape(RoundedRectangle(cornerRadius: 12))
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Dernière carte de l'aide, après le contact : ce que l'app doit à
+    /// quelqu'un d'autre que son développeur.
+    private var thanksCard: some View {
+        HStack(alignment: .top, spacing: 14) {
+            IconBadge(systemImage: "heart.fill", tint: Theme.rose, size: 42)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("Remerciements")
+                    .font(.headline)
+                    .foregroundStyle(Theme.textPrimary)
+                Text("Un grand merci à Nils Gauthey pour tout le travail accompli sur ChessLab. Ses relectures, ses corrections et ses idées ont fait progresser l'app dans son ensemble, et tout particulièrement la qualité des ouvertures et des finales : les lignes que vous étudiez ici lui doivent beaucoup.")
+                    .font(.callout)
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

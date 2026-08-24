@@ -124,9 +124,9 @@ struct OpeningListView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 QuickSwitchMenu(
-                    onOpenLab: onOpenLab,
                     onPlayVsEngine: onPlayVsEngine,
-                    onOpenTwoPlayer: onOpenTwoPlayer
+                    onOpenTwoPlayer: onOpenTwoPlayer,
+                    onOpenLab: onOpenLab
                 )
             }
         }
