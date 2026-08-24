@@ -8602,3 +8602,23 @@ Texte seul, elle tombe à 296,0 pt tout juste. Le test
 
 **696 tests unitaires verts** (689 + 7). Les deux chaînes de la feuille
 supprimée sont retirées du catalogue, les quatre nouvelles y sont traduites.
+
+## 24/08 — Analyse : la pastille passe devant la flèche
+
+La pastille de qualité (gaffe, coup brillant…) se pose sur la case d'ARRIVÉE du
+coup joué. C'est exactement là qu'une flèche du moteur commence ou se termine :
+elles se disputent les mêmes pixels, et l'ordre du `ZStack` faisait gagner la
+flèche. La pastille devenait illisible précisément quand elle compte le plus.
+
+Elle remonte d'un rang (`zIndex(1)`), le fantôme de glissement restant seul
+au-dessus d'elle (`zIndex(2)`) — la pièce qui suit le doigt ne doit rien avoir
+devant. Le rang plutôt qu'un déplacement dans la pile : la pastille doit rester
+collée au-dessus des pièces, même contrainte que le marqueur de dépôt.
+
+Un ordre d'empilement ne se lit dans aucune propriété — il se constate au
+rendu. `BoardBadgeStackingTests` dessine donc l'échiquier et lit les pixels :
+ajouter une flèche ne doit RIEN changer à ceux de la pastille. Un troisième
+test garde le tout honnête en vérifiant que la flèche recouvre bel et bien
+l'emplacement — sans lui, les deux autres passeraient aussi bien s'il n'y avait
+aucun conflit à trancher. Avant correction, le pixel visé valait `[35, 31, 31]`
+(le gris de la flèche) au lieu de `[192, 57, 57]` (le rouge de la gaffe).

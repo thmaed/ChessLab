@@ -140,7 +140,16 @@ struct ChessBoardView: View {
                 // Au-DESSUS des pièces : sur une case occupée (capture), un
                 // marqueur placé dessous serait masqué par la pièce adverse.
                 dropTargetLayer(squareSize: squareSize)
+                // Au-dessus des FLÈCHES aussi (`zIndex`), et pas seulement des
+                // pièces : en analyse, la flèche du meilleur coup part de la
+                // case qui vient d'être jouée et passait donc pile sur la
+                // pastille, qui n'était plus lisible là où elle compte le plus
+                // — sur une gaffe ou un coup brillant. L'ordre du ZStack ne
+                // suffit pas : la pastille doit rester COLLÉE au-dessus des
+                // pièces (c'est la même contrainte que `dropTargetLayer`),
+                // donc c'est le rang d'empilement qui la fait remonter.
                 qualityBadgeLayer(squareSize: squareSize)
+                    .zIndex(1)
 
                 if let slidingMove, let piece = board.position.piece(at: slidingMove.end) {
                     PieceGlyphView(piece: piece)
@@ -218,6 +227,9 @@ struct ChessBoardView: View {
                         // ombre ou un halo de plus serait du GPU redessiné à
                         // chaque image.
                         .shadow(radius: 6)
+                        // Au-dessus de TOUT, pastille comprise : la pièce
+                        // soulevée suit le doigt, rien ne doit passer devant.
+                        .zIndex(2)
                 }
             }
             .frame(width: side, height: side)
@@ -597,7 +609,8 @@ struct ChessBoardView: View {
     }
 
     /// Au-dessus des pièces (une pastille sous un glyphe ne se verrait pas)
-    /// et hors du test tactile : c'est un indicateur, pas un contrôle.
+    /// ET des flèches (voir le `zIndex` posé à l'appel), hors du test tactile :
+    /// c'est un indicateur, pas un contrôle.
     @ViewBuilder
     private func qualityBadgeLayer(squareSize: CGFloat) -> some View {
         if let qualityBadge {
