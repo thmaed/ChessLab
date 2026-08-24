@@ -301,6 +301,9 @@ private struct ExplanationBubbleModifier: ViewModifier {
     @Binding var isPresented: Bool
     @Binding var openedByHold: Bool
     let dynamicTypeSize: DynamicTypeSize
+    /// Instant d'ouverture par maintien — distingue un vrai relâchement d'un
+    /// toucher volé par la présentation de la bulle.
+    @State private var holdOpenedAt: Date?
 
     /// Le temps que la bulle reste seule à l'écran après un toucher simple.
     ///
@@ -321,12 +324,23 @@ private struct ExplanationBubbleModifier: ViewModifier {
             // deux gestes ne se recouvrent pas.
             .onLongPressGesture(minimumDuration: 0.3) {
                 openedByHold = true
+                holdOpenedAt = Date()
                 isPresented = true
             } onPressingChanged: { isPressing in
                 // Doigt levé : on ne referme QUE ce que le maintien a ouvert,
                 // sinon le relâchement d'un toucher simple fermerait la bulle
                 // dans la foulée de son ouverture.
-                if !isPressing, openedByHold {
+                guard !isPressing, openedByHold else { return }
+                // Présenter la bulle peut VOLER le toucher au geste : le
+                // système annule alors l'appui et ce rappel part avec
+                // `isPressing == false` le doigt encore posé — la bulle
+                // s'effacerait dans la foulée de son ouverture. Un
+                // « relâchement » dans la demi-seconde est donc traité comme
+                // ce vol : la bulle reste, et bascule sur la minuterie du
+                // toucher simple.
+                if let openedAt = holdOpenedAt, Date().timeIntervalSince(openedAt) < 0.5 {
+                    openedByHold = false
+                } else {
                     isPresented = false
                     openedByHold = false
                 }
@@ -338,10 +352,14 @@ private struct ExplanationBubbleModifier: ViewModifier {
                     // comprendre disparaît alors de l'écran.
                     .presentationCompactAdaptation(.popover)
                     .task {
-                        // Le maintien a sa propre fin — le doigt qui se lève.
-                        guard !openedByHold else { return }
                         try? await Task.sleep(for: Self.lifetime)
                         guard !Task.isCancelled else { return }
+                        // Jugé à l'ÉCHÉANCE et non à l'ouverture : un maintien
+                        // dont le toucher a été volé (voir plus haut) est
+                        // devenu entre-temps un toucher simple, et doit
+                        // expirer comme lui. Un VRAI maintien encore en cours
+                        // garde sa propre fin — le doigt qui se lève.
+                        guard !openedByHold else { return }
                         isPresented = false
                     }
             }

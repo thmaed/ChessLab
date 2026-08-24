@@ -309,7 +309,7 @@ struct TwoPlayerGameView: View {
                         }
                     }
                     .transition(.opacity)
-                } else if let undo = viewModel.resumeUndo {
+                } else if viewModel.outcome == nil, let undo = viewModel.resumeUndo {
                     // La reprise a eu lieu : au même endroit, de quoi la
                     // défaire pendant quelques secondes.
                     HStack(spacing: 8) {

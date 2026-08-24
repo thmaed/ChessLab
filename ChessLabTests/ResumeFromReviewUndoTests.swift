@@ -159,6 +159,43 @@ struct ResumeFromReviewUndoTests {
         #expect(vm.resumeUndo == nil)
     }
 
+    /// Revue du 24/08 : « Annuler la reprise » pouvait RESSUSCITER une partie
+    /// terminée. Un abandon ne se lit pas sur l'échiquier, et `rebuild`
+    /// recalcule `outcome` depuis la seule position : sans garde, annuler
+    /// après l'abandon effaçait le résultat enregistré.
+    @Test("Jouer : annuler la reprise ne ressuscite pas une partie abandonnée")
+    func playCancelDoesNotResurrectAResignedGame() throws {
+        let vm = try playGame()
+        vm.review(toPly: 3)
+        vm.resumeFromReview()
+        #expect(vm.resumeUndo != nil)
+
+        vm.userResigns()
+        #expect(vm.outcome != nil)
+
+        vm.cancelResumeFromReview()
+        #expect(vm.outcome != nil, "l'abandon doit survivre à l'annulation")
+        #expect(vm.totalPlies == 3, "la partie ne doit pas être reconstruite")
+    }
+
+    /// Même trou en Deux joueurs, avec la nulle par accord — elle non plus ne
+    /// se lit pas sur l'échiquier, et la partie finie est déjà ENREGISTRÉE :
+    /// la faire revivre l'inscrirait une seconde fois à la bibliothèque.
+    @Test("Deux joueurs : annuler la reprise ne rouvre pas une nulle convenue")
+    func twoPlayerCancelDoesNotReopenAnAgreedDraw() throws {
+        let vm = try twoPlayerGame()
+        vm.review(toPly: 3)
+        vm.resumeFromReview()
+        #expect(vm.resumeUndo != nil)
+
+        vm.agreeToDraw()
+        #expect(vm.outcome != nil)
+
+        vm.cancelResumeFromReview()
+        #expect(vm.outcome != nil, "la nulle convenue doit survivre à l'annulation")
+        #expect(vm.totalPlies == 3)
+    }
+
     /// Le garde-fou n'a pas sauté : la reprise reste refusée là où elle
     /// l'était déjà (avec pendule, partie finie, position vive).
     @Test("Jouer : les conditions de reprise sont inchangées")

@@ -1601,8 +1601,17 @@ final class PlayViewModel {
     /// Passe par la même reconstruction que la reprise elle-même : un coup
     /// que le moteur aurait joué entre-temps est donc écrasé, et non ajouté
     /// à la suite des coups rétablis.
+    /// Mêmes gardes que ``canTakeback`` : toute reconstruction les exige.
+    ///
+    /// `outcome == nil` — un abandon ou une nulle par accord ne se LISENT pas
+    /// sur l'échiquier, et `rebuild` recalcule `outcome` depuis la position :
+    /// annuler après la fin effacerait le résultat enregistré et ferait
+    /// revivre une partie finie. `!isEngineThinking` — annuler pendant une
+    /// recherche échangerait le plateau sous les pieds du moteur, dont le
+    /// coup (calculé pour la position tronquée) se commettrait sur la partie
+    /// restaurée s'il y est légal par coïncidence.
     func cancelResumeFromReview() {
-        guard let undo = resumeUndo else { return }
+        guard let undo = resumeUndo, outcome == nil, !isEngineThinking else { return }
         clearResumeUndo()
         restoreGame(moves: undo.moves)
     }

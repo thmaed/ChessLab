@@ -8769,3 +8769,58 @@ lancé la suite unitaire en parallèle sur la même machine. La durée anormale
 
 699 tests unitaires verts, **72 tests d'interface verts** (5 ignorés), suite
 lancée seule.
+
+## 24/08 — Revue de stabilisation : deux régressions de la veille, et un audit qui n'auditait pas
+
+Revue multi-agents sur le delta 62f7d95..HEAD (7 angles), chaque trouvaille
+vérifiée sur pièce avant verdict. Rapport complet déposé via l'outil de revue.
+
+### Corrigé
+
+**« Annuler la reprise » pouvait ressusciter une partie terminée.** Un abandon
+ou une nulle par accord ne se LISENT pas sur l'échiquier, et `rebuild`
+recalcule `outcome` depuis la seule position : reprendre → abandonner dans les
+8 s → annuler effaçait le résultat (déjà enregistré en bibliothèque côté Deux
+joueurs — la partie s'y serait inscrite une seconde fois). Gardes ajoutés dans
+les deux modes, pastille masquée en fin de partie, tests de régression prouvés
+en retirant le garde (outcome → nil sans lui).
+
+**Annuler pendant la réflexion du moteur échangeait le plateau sous la
+recherche.** `canTakeback` exige `!isEngineThinking` ; mon
+`cancelResumeFromReview` ne l'exigeait pas, alors que la reprise elle-même
+peut lancer une recherche — le coup calculé pour la position tronquée pouvait
+se commettre sur la partie restaurée s'il y était légal par coïncidence.
+
+**`_check_missed_win` gardait les coups PERDANTS.** `move_categories` parle du
+point de vue du joueur (« win » = ce coup gagne) ; le filtre testait
+`!= "loss"` — la convention de l'API brute. Le contrôle était un no-op
+silencieux pour le défaut même qu'il documente. Réparé, il a d'abord crié au
+loup sur trois mats (Db1# « ignorant » Dd2#) : un coup enseigné qui mate ou
+promeut est lui-même l'évidence, il est maintenant exempté. Reste UN vrai cas
+limite, assumé : la coupure verticale joue Tf7 avant d8=D (ligne DTM-optimale,
+le commentaire l'explique) — c'est le rôle des avertissements non bloquants.
+
+**`_check_early_stop` était aveugle aux 6-7 pièces** : l'API n'y donne pas de
+DTM (`null`), le contrôle rendait la main sans rien dire — repli sur le DTZ,
+filet à grosses mailles assumé. Il pliait aussi `cursed-win`/`maybe-win` en
+« pas un gain ». Et la sonde réseau part maintenant APRÈS les éliminations
+gratuites.
+
+**Moindres** : l'annonce VoiceOver de reprise manquait en Deux joueurs (copie
+divergée du mécanisme) ; l'aide du Laboratoire citait « Continuer au
+Laboratoire », libellé supprimé par l'harmonisation ; le maintien-pour-lire des
+bulles du Laboratoire résiste maintenant au vol de toucher par la présentation
+(un « relâchement » dans la demi-seconde bascule sur la minuterie du toucher).
+
+### Consigné sans agir (1.6.1)
+
+Le mécanisme ResumeUndo, le prédicat de recherche et le câblage VoiceOver des
+bulles sont chacun dupliqués — les copies ont déjà divergé une fois. À
+regrouper hors période de stabilisation. `RELEASE_NOTES-1.4.0.md` supprimé
+localement (pas par moi) alors que les notes 1.5.0 le disent conservé :
+décision utilisateur en attente.
+
+### Vérifié
+
+701 tests unitaires verts (2 régressions ajoutées, prouvées mordantes).
+78 finales auditées, verdicts intacts, 15 avertissements pédagogiques.

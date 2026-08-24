@@ -307,6 +307,16 @@ final class TwoPlayerViewModel {
         clearResumeUndo()
         rebuild(moves: Array(previous.prefix(keep)))
         guard discarded > 0 else { return }
+        // Sans feuille de confirmation, rien n'annonce plus la troncature à
+        // qui ne voit pas la liste raccourcir — même annonce qu'en mode Jouer.
+        if UIAccessibility.isVoiceOverRunning {
+            UIAccessibility.post(
+                notification: .announcement,
+                argument: LocalizationController.string(
+                    "Partie reprise, %lld coups écartés. Annulation possible.", discarded
+                )
+            )
+        }
         resumeUndo = ResumeUndo(moves: previous, discardedCount: discarded)
         resumeUndoTask = Task { [weak self] in
             try? await Task.sleep(for: TwoPlayerViewModel.resumeUndoDelay)
@@ -316,8 +326,13 @@ final class TwoPlayerViewModel {
     }
 
     /// Rétablit la partie telle qu'elle était avant la dernière reprise.
+    ///
+    /// `outcome == nil` : une nulle par accord ou un abandon ne se LISENT pas
+    /// sur l'échiquier, et `rebuild` recalcule `outcome` depuis la position —
+    /// annuler après la fin effacerait le résultat (déjà enregistré dans la
+    /// bibliothèque) et la partie, rejouée, s'y inscrirait une seconde fois.
     func cancelResumeFromReview() {
-        guard let undo = resumeUndo else { return }
+        guard let undo = resumeUndo, outcome == nil else { return }
         clearResumeUndo()
         rebuild(moves: undo.moves)
     }

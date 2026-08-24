@@ -136,6 +136,11 @@ def _check_missed_win(key: str, edge: dict, tb: Tablebase, report: dict) -> None
     coup thématique du cours (les pions liés qui se donnent l'un pour l'autre).
     Sans elle, ce contrôle criait au loup sur la moitié des finales de pions.
     """
+    # Un coup enseigné qui mate ou promeut EST l'évidence : il ne peut rien
+    # « ignorer ». Sans ce retrait, le premier passage du contrôle réparé
+    # criait au loup sur trois mats du catalogue — Db1# « ignorant » Dd2#.
+    if edge["san"].endswith("#") or "=Q" in edge["san"]:
+        return
     board = board_from_key(key)
     verdicts = tb.move_categories(key)
     obvious = []
@@ -143,7 +148,12 @@ def _check_missed_win(key: str, edge: dict, tb: Tablebase, report: dict) -> None
         uci = move.uci()
         if uci == edge["uci"]:
             continue
-        if verdicts.get(uci) != "loss":       # ne gagne pas : sans intérêt
+        # `move_categories` parle du POINT DE VUE DU JOUEUR : « win » = ce
+        # coup gagne. La première version testait `!= "loss"` — l'API brute
+        # parle, elle, du point de vue de l'adversaire — et gardait donc les
+        # coups PERDANTS : le contrôle était un no-op silencieux pour le
+        # défaut même qu'il documente (revue du 24/08).
+        if verdicts.get(uci) != "win":        # ne gagne pas : sans intérêt
             continue
         san = board.san(move)
         if san.endswith("#"):
@@ -187,17 +197,25 @@ def _check_early_stop(key: str, side: str, tb: Tablebase, report: dict) -> None:
     """
     if piece_count(key) > 7:
         return
+    # Les éliminations GRATUITES d'abord : la sonde coûte une lecture disque,
+    # voire une requête réseau throttlée — la plupart des feuilles finissent
+    # sur une promotion et sortent ici sans rien coûter.
+    placement = key.split(" ")[0]
+    if "Q" in placement or "q" in placement:
+        return
     probe = tb.probe(key)
     if not probe:
         return
     mover = side_to_move(key)
-    category = probe.get("category")
+    # Les catégories « cursed-win »/« maybe-win » SONT des gains (règle des
+    # 50 coups mise à part) : sans ce repli, les positions à 6-7 pièces
+    # passaient sous le radar.
+    category = {"cursed-win": "win", "maybe-win": "win",
+                "blessed-loss": "loss", "maybe-loss": "loss"}.get(
+        probe.get("category"), probe.get("category"))
     # Verdict du POINT DE VUE du camp étudié.
     winning_for_side = (category == "win") if mover == side else (category == "loss")
     if not winning_for_side:
-        return
-    placement = key.split(" ")[0]
-    if "Q" in placement or "q" in placement:
         return
     # L'adversaire a-t-il encore du matériel ? Roi nu = travail terminé.
     #
@@ -212,7 +230,21 @@ def _check_early_stop(key: str, side: str, tb: Tablebase, report: dict) -> None:
     if not defender_men:
         return
     dtm = probe.get("dtm")
-    if dtm is None or abs(dtm) <= EARLY_STOP_DTM:
+    if dtm is None:
+        # L'API ne donne pas de DTM aux positions à 6-7 pièces. Repli sur le
+        # DTZ (distance au prochain coup de pion / prise) : ce n'est PAS la
+        # distance au mat, mais un DTZ élevé prouve à lui seul que la
+        # conversion est loin — le cas inverse (DTZ court, mat lointain)
+        # échappe au contrôle, et c'est assumé : mieux vaut un filet à
+        # grosses mailles qu'un contrôle qui se tait sur toute la famille.
+        dtz = probe.get("dtz")
+        if dtz is None or abs(dtz) <= EARLY_STOP_DTM:
+            return
+        report["early_stops"].append(
+            f"{key} : la ligne s'arrête sur un gain encore à {abs(dtz)} coups "
+            f"de la prochaine conversion (DTZ, position sans DTM)")
+        return
+    if abs(dtm) <= EARLY_STOP_DTM:
         return
     report["early_stops"].append(
         f"{key} : la ligne s'arrête sur un gain encore à {abs(dtm)} coups du mat")

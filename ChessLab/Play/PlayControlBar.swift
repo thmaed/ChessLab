@@ -106,7 +106,10 @@ struct PlayControlBar: View {
             // Juste après la reprise, la même place accueille l'annulation :
             // le doigt est déjà là, le retour en arrière ne coûte qu'un geste
             // au même endroit. Elle s'efface d'elle-même au bout de 8 s.
-            if !isReviewing, let undoableResumeCount {
+            // `!isFinished` : après un abandon dans la fenêtre des 8 s, la
+            // pastille proposerait d'annuler la reprise d'une partie FINIE —
+            // le view model refuse désormais, la barre ne doit rien promettre.
+            if !isReviewing, !isFinished, let undoableResumeCount {
                 elasticGap
                 Button(action: onUndoResume) {
                     // Texte SEUL, comme « Reprendre ici » : une icône ajoutée

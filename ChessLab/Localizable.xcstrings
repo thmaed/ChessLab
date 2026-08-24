@@ -6326,22 +6326,6 @@
         }
       }
     },
-    "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse (« Continuer au Laboratoire ») : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pit two Stockfish instances against each other over a series of games to compare settings. Statistics, estimated Elo gap with confidence interval, progression chart and result distribution. You can also get here from a game or an analysis (“Continue in the Laboratory”): the series then starts from your position. Once the series is over, one tap opens the last game in analysis."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse (« Continuer au Laboratoire ») : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse."
-          }
-        }
-      }
-    },
     "FEN" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -6381,6 +6365,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invalid FEN or PGN"
+          }
+        }
+      }
+    },
+    "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse — « Changer de mode », puis « Laboratoire » : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pit two Stockfish instances against each other over a series of games to compare settings. Statistics, estimated Elo gap with confidence interval, progression chart and result distribution. You can also get here from a game or an analysis — “Switch mode”, then “Laboratory”: the series then starts from your position. Once the series is over, one tap opens the last game in analysis."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse — « Changer de mode », puis « Laboratoire » : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse."
           }
         }
       }
