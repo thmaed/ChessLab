@@ -18,11 +18,6 @@ struct AnalysisView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
-    /// Liaison manuelle : `AppSettings` est un singleton `@Observable`, pas
-    /// une propriété `@Bindable` de la vue.
-    private var boardThemeSelection: Binding<String> {
-        Binding(get: { appSettings.boardThemeID }, set: { appSettings.boardThemeID = $0 })
-    }
     @State private var boardOrientation: Piece.Color = .white
     @State private var showExportSheet = false
     @State private var showSummarySheet = false
@@ -80,13 +75,11 @@ struct AnalysisView: View {
                         boardOrientation = boardOrientation.opposite
                     }
                     .keyboardShortcut("f", modifiers: .command)
-                    Menu("Thème du plateau") {
-                        Picker("Thème du plateau", selection: boardThemeSelection) {
-                            ForEach(BoardTheme.all) { theme in
-                                Text(LocalizedStringKey(theme.label)).tag(theme.id)
-                            }
-                        }
-                    }
+                    // Pas de thème du plateau ici (retiré le 24/08, comme dans
+                    // Jouer) : c'est un réglage d'apparence valable pour TOUTE
+                    // l'app, pas une option d'analyse. Réglages › Thème du
+                    // plateau. « Retourner le plateau » reste, lui : il ne
+                    // concerne que cette partie-ci.
                 } label: {
                     Image(systemName: "ellipsis.circle")
                         .foregroundStyle(Theme.textSecondary)
