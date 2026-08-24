@@ -5555,6 +5555,22 @@
         }
       }
     },
+    "Electric Pawns" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Electric Pawns"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pions électriques"
+          }
+        }
+      }
+    },
     "écart Elo ±%@" : {
       "localizations" : {
         "en" : {

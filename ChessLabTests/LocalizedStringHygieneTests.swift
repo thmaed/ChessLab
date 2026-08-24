@@ -41,6 +41,27 @@ struct LocalizedStringHygieneTests {
         )
     }
 
+    /// Le nom d'un cours reste en ANGLAIS dans `opening_catalog.json` — c'est
+    /// `Localizable.xcstrings` qui le traduit. Un cours ajouté sans sa
+    /// traduction s'affiche donc en anglais au milieu de 135 titres français,
+    /// sans que rien ne le signale : le catalogue est valide, l'app démarre,
+    /// le cours fonctionne.
+    ///
+    /// C'est exactement ce qui est arrivé à « Electric Pawns », resté anglais
+    /// depuis son ajout le 24/08 jusqu'à ce qu'un lecteur le remarque.
+    @Test("Chaque nom de cours a sa traduction française")
+    func everyCourseNameIsTranslated() throws {
+        let strings = try Self.shippedFrenchStrings()
+        let names = OpeningCourseLoader.catalog.map(\.name)
+        try #require(names.count > 100, "catalogue anormalement petit : \(names.count)")
+
+        let untranslated = names.filter { strings[$0] == nil }
+        #expect(
+            untranslated.isEmpty,
+            "sans traduction, donc affiché en anglais : \(untranslated.sorted().joined(separator: " | "))"
+        )
+    }
+
     /// Ni espace juste avant un saut de ligne : même origine, même symptôme.
     ///
     /// Volontairement limité au saut de ligne. L'espace FINAL, lui, est un

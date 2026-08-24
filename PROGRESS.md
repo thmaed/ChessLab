@@ -8668,3 +8668,40 @@ sont des préfixes destinés à être collés à une valeur.
 
 712 tests verts (698 swift-testing + 14 XCTest). 17 chaînes ajoutées au
 catalogue, traduites en anglais.
+
+## 24/08 — Pions électriques : libellé français et thème développé
+
+### Le libellé
+
+Le nom d'un cours reste en ANGLAIS dans `opening_catalog.json` — c'est
+`Localizable.xcstrings` qui le traduit. « Electric Pawns » était le SEUL des
+136 cours sans sa traduction : ajouté le 24/08, il s'affichait en anglais au
+milieu de titres français. Rien ne le signalait, le catalogue étant valide.
+`LocalizedStringHygieneTests` vérifie désormais que chaque nom du catalogue a
+sa traduction ; retirer celle des pions électriques fait bien tomber le test.
+
+### Le thème, tel que la tablebase le décrit
+
+La finale était enseignée en une ligne : « le roi touche un pion, on lance
+l'autre ». C'est vrai depuis c5 — et FAUX depuis b5. L'oracle est net :
+
+- après 1…♚c4, SEUL `a4` gagne ; tout coup de roi annule ;
+- après 1…♚b5, c'est l'inverse : `a4+` ET `c4+` annulent (le roi noir touche
+  les deux cases), et il faut ATTENDRE avec le roi.
+
+La règle qui couvre les deux : ne jamais pousser un pion sur une case que le
+roi adverse contrôle déjà — et laisser le roi noir désigner lui-même, en
+s'approchant, lequel des deux ira à dame.
+
+Trois chapitres ajoutés : le miroir (1…♚b5 2.♔g2! ♚a4 3.c4!, où c'est le pion c
+qui fait dame), et deux pièges — pousser avec échec (1…♚b5 2.a4+?? ♚xa4) et
+vouloir sauver c3 (1…♚c4 2.♔g2?? ♚xc3, où `a4` arrive un temps trop tard). Le
+cours passe de 10 à 33 positions.
+
+Les deux pièges sont prouvés tels : l'audit vérifie qu'une arête marquée
+`trap` DÉGRADE réellement le verdict, sinon elle ment. `fake_traps` est vide.
+
+### Vérifié
+
+78 cours de finales audités, aucun coup enseigné ne casse son verdict
+théorique. 713 tests verts (699 swift-testing + 14 XCTest).
