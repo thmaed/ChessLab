@@ -33,6 +33,9 @@ struct PlayControlBar: View {
     let totalPlies: Int
     let isReviewing: Bool
     let canResumeFromReview: Bool
+    /// Nombre de coups écartés par la reprise qu'on peut encore annuler,
+    /// `nil` quand il n'y a rien à annuler. Pilote la pastille « Annuler ».
+    let undoableResumeCount: Int?
     /// « Coups joués » n'existe que dans la disposition iPhone : ailleurs, la
     /// liste est déjà à l'écran.
     let showMoveList: Bool
@@ -46,6 +49,7 @@ struct PlayControlBar: View {
     let onPrevious: () -> Void
     let onNext: () -> Void
     let onResumeHere: () -> Void
+    let onUndoResume: () -> Void
     let onToggleHint: () -> Void
     let onShowMoveList: () -> Void
     let onOfferDraw: () -> Void
@@ -99,6 +103,32 @@ struct PlayControlBar: View {
                 .transition(.opacity)
             }
 
+            // Juste après la reprise, la même place accueille l'annulation :
+            // le doigt est déjà là, le retour en arrière ne coûte qu'un geste
+            // au même endroit. Elle s'efface d'elle-même au bout de 8 s.
+            if !isReviewing, let undoableResumeCount {
+                elasticGap
+                Button(action: onUndoResume) {
+                    // Texte SEUL, comme « Reprendre ici » : une icône ajoutée
+                    // devant coûtait 17 pt incompressibles (image + écart), et
+                    // ces 17 pt suffisaient à faire déborder la rangée sur un
+                    // iPhone en Zoom d'affichage — mesuré, voir
+                    // `PlayControlBarLayoutTests`.
+                    Text("Annuler la reprise")
+                        .font(.caption.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .foregroundStyle(Theme.textPrimary)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Theme.surfaceElevated, in: Capsule())
+                        .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
+                }
+                .buttonStyle(.pressable)
+                .transition(.opacity)
+                .accessibilityHint("Rétablit les \(undoableResumeCount) coups écartés")
+            }
+
             Spacer(minLength: 0)
 
             controlButton(
@@ -109,10 +139,10 @@ struct PlayControlBar: View {
                 disabled: !hintsEnabled || isFinished,
                 action: onToggleHint
             )
-            // « Coups joués » et « Reprendre ici » ne coexistent jamais : en
-            // consultation, la reprise prend la place de la liste, si bien que
+            // « Coups joués » ne coexiste ni avec « Reprendre ici » ni avec
+            // « Annuler » : la pastille prend la place de la liste, si bien que
             // la rangée tient sur UNE ligne même sur les iPhone étroits.
-            if showMoveList, !isReviewing {
+            if showMoveList, !isReviewing, undoableResumeCount == nil {
                 elasticGap
                 controlButton(
                     "list.bullet",
@@ -139,6 +169,7 @@ struct PlayControlBar: View {
             )
         }
         .animation(Theme.gentle, value: isReviewing)
+        .animation(Theme.gentle, value: undoableResumeCount)
     }
 
     /// Écart de 10 pt **qui sait se réduire jusqu'à 0**.

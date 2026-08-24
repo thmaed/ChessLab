@@ -992,6 +992,22 @@
         }
       }
     },
+    "Annuler la reprise" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Undo resume"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler la reprise"
+          }
+        }
+      }
+    },
     "a gagné" : {
       "localizations" : {
         "en" : {
@@ -8998,22 +9014,6 @@
         }
       }
     },
-    "Les %lld coup(s) suivants seront effacés." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The next %lld move(s) will be erased."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les %lld coup(s) suivants seront effacés."
-          }
-        }
-      }
-    },
     "les blancs" : {
       "localizations" : {
         "en" : {
@@ -10775,6 +10775,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Défense Owen"
+          }
+        }
+      }
+    },
+    "Partie reprise, %lld coups écartés. Annulation possible." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Game resumed, %lld moves discarded. You can undo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Partie reprise, %lld coups écartés. Annulation possible."
           }
         }
       }
@@ -12635,6 +12651,22 @@
         }
       }
     },
+    "Reprise au coup %lld — %lld coups écartés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resumed at move %lld — %lld moves discarded"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprise au coup %lld — %lld coups écartés"
+          }
+        }
+      }
+    },
     "Réessayer" : {
       "localizations" : {
         "en" : {
@@ -13033,22 +13065,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Resume"
-          }
-        }
-      }
-    },
-    "Reprendre depuis le coup %lld ?" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Resume from move %lld?"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reprendre depuis le coup %lld ?"
           }
         }
       }
@@ -13897,6 +13913,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Partie espagnole"
+          }
+        }
+      }
+    },
+    "Rétablit les %lld coups écartés" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Restores the %lld discarded moves"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rétablit les %lld coups écartés"
           }
         }
       }

@@ -45,10 +45,11 @@ final class PlayControlBarLayoutTests: XCTestCase {
         PlayControlBar(
             hasMoves: true, displayedPly: 4, totalPlies: 4,
             isReviewing: false, canResumeFromReview: false,
+            undoableResumeCount: nil,
             showMoveList: true,
             hintsWanted: false, hintsEnabled: true,
             isFinished: false, isEngineThinking: false,
-            onPrevious: {}, onNext: {}, onResumeHere: {}, onToggleHint: {},
+            onPrevious: {}, onNext: {}, onResumeHere: {}, onUndoResume: {}, onToggleHint: {},
             onShowMoveList: {}, onOfferDraw: {}, onResign: {}
         )
     }
@@ -60,10 +61,28 @@ final class PlayControlBarLayoutTests: XCTestCase {
         PlayControlBar(
             hasMoves: true, displayedPly: 2, totalPlies: 4,
             isReviewing: true, canResumeFromReview: true,
+            undoableResumeCount: nil,
             showMoveList: true,
             hintsWanted: false, hintsEnabled: true,
             isFinished: false, isEngineThinking: false,
-            onPrevious: {}, onNext: {}, onResumeHere: {}, onToggleHint: {},
+            onPrevious: {}, onNext: {}, onResumeHere: {}, onUndoResume: {}, onToggleHint: {},
+            onShowMoveList: {}, onOfferDraw: {}, onResign: {}
+        )
+    }
+
+    /// Juste APRÈS la reprise : la consultation est finie, mais la pastille
+    /// « Annuler » occupe encore l'emplacement. Elle remplace « Coups joués »
+    /// exactement comme le faisait « Reprendre ici » — sans quoi la rangée
+    /// gagnerait une pastille et redéborderait sur un écran zoomé.
+    private func undoOfferedBar() -> PlayControlBar {
+        PlayControlBar(
+            hasMoves: true, displayedPly: 2, totalPlies: 2,
+            isReviewing: false, canResumeFromReview: false,
+            undoableResumeCount: 6,
+            showMoveList: true,
+            hintsWanted: false, hintsEnabled: true,
+            isFinished: false, isEngineThinking: false,
+            onPrevious: {}, onNext: {}, onResumeHere: {}, onUndoResume: {}, onToggleHint: {},
             onShowMoveList: {}, onOfferDraw: {}, onResign: {}
         )
     }
@@ -86,12 +105,22 @@ final class PlayControlBarLayoutTests: XCTestCase {
         XCTAssertLessThanOrEqual(width, usable, "La pastille « Reprendre ici » repousse la rangée hors écran.")
     }
 
+    /// L'annulation de reprise a ajouté une pastille à la rangée. Elle ne doit
+    /// coûter aucune largeur : elle remplace « Coups joués », comme « Reprendre
+    /// ici » juste avant elle.
+    func testUndoOfferedBarFitsOnAZoomedIPhone() {
+        let usable = Self.usableWidth(screen: Self.zoomedWidth)
+        let width = measuredWidth(undoOfferedBar(), proposing: usable)
+        XCTAssertLessThanOrEqual(width, usable, "La pastille « Annuler » repousse la rangée hors écran.")
+    }
+
     // MARK: Non-régression sur les largeurs déjà couvertes
 
     func testBarFitsAtStandardWidth() {
         let usable = Self.usableWidth(screen: Self.standardWidth)
         XCTAssertLessThanOrEqual(measuredWidth(liveBar(), proposing: usable), usable)
         XCTAssertLessThanOrEqual(measuredWidth(reviewingBar(), proposing: usable), usable)
+        XCTAssertLessThanOrEqual(measuredWidth(undoOfferedBar(), proposing: usable), usable)
     }
 
     // MARK: L'écran entier, pas seulement la barre

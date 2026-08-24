@@ -30,7 +30,6 @@ struct PlayView: View {
     @State private var showPanelSheet = false
     @State private var copiedMessage: String?
     @State private var showResignConfirmation = false
-    @State private var showResumeConfirmation = false
     @State private var showDrawConfirmation = false
 
     var body: some View {
@@ -94,7 +93,6 @@ struct PlayView: View {
         .modifier(GameDialogs(
             viewModel: viewModel,
             showResignConfirmation: $showResignConfirmation,
-            showResumeConfirmation: $showResumeConfirmation,
             showDrawConfirmation: $showDrawConfirmation
         ))
         // Le couple appear/disappear, et pas seulement `disappear` : le view
@@ -434,6 +432,7 @@ struct PlayView: View {
             totalPlies: viewModel.totalPlies,
             isReviewing: viewModel.isReviewing,
             canResumeFromReview: viewModel.canResumeFromReview,
+            undoableResumeCount: viewModel.resumeUndo?.discardedCount,
             showMoveList: showMoveList,
             hintsWanted: viewModel.hintsWanted,
             hintsEnabled: viewModel.settings.hintsEnabled,
@@ -441,7 +440,11 @@ struct PlayView: View {
             isEngineThinking: viewModel.isEngineThinking,
             onPrevious: { viewModel.reviewPrevious() },
             onNext: { viewModel.reviewNext() },
-            onResumeHere: { showResumeConfirmation = true },
+            // Reprise SANS confirmation : l'action est immédiate et
+            // l'annulation prend la place du bouton — voir
+            // ``PlayViewModel/ResumeUndo``.
+            onResumeHere: { viewModel.resumeFromReview() },
+            onUndoResume: { viewModel.cancelResumeFromReview() },
             onToggleHint: { viewModel.toggleHint() },
             onShowMoveList: { showPanelSheet = true },
             onOfferDraw: { showDrawConfirmation = true },
@@ -725,7 +728,6 @@ private struct MoveListView: View {
 private struct GameDialogs: ViewModifier {
     @Bindable var viewModel: PlayViewModel
     @Binding var showResignConfirmation: Bool
-    @Binding var showResumeConfirmation: Bool
     @Binding var showDrawConfirmation: Bool
 
     private var blunderBinding: Binding<Bool> {
@@ -771,16 +773,6 @@ private struct GameDialogs: ViewModifier {
             ) {
                 Button("Proposer nulle") { viewModel.offerDrawToEngine() }
                 Button("Annuler", role: .cancel) {}
-            }
-            .confirmationDialog(
-                "Reprendre depuis le coup \(viewModel.displayedPly) ?",
-                isPresented: $showResumeConfirmation,
-                titleVisibility: .visible
-            ) {
-                Button("Reprendre ici", role: .destructive) { viewModel.resumeFromReview() }
-                Button("Annuler", role: .cancel) {}
-            } message: {
-                Text("Les \(viewModel.totalPlies - viewModel.displayedPly) coup(s) suivants seront effacés.")
             }
     }
 }

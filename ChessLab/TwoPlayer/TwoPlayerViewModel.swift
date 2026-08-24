@@ -282,11 +282,50 @@ final class TwoPlayerViewModel {
         clearSelection()
     }
 
+    /// Ce que la partie contenait juste AVANT une « Reprendre ici » — même
+    /// parti pris qu'en mode *Jouer* : la reprise agit tout de suite, sans
+    /// feuille de confirmation, et reste défaisable d'un geste.
+    struct ResumeUndo {
+        let moves: [Move]
+        let discardedCount: Int
+    }
+
+    /// Offre d'annulation en cours, `nil` le reste du temps.
+    private(set) var resumeUndo: ResumeUndo?
+    private var resumeUndoTask: Task<Void, Never>?
+    private static let resumeUndoDelay: Duration = .seconds(8)
+
+    /// Reprend la partie depuis la position consultée, sans confirmation.
+    /// Les coups écartés restent récupérables par
+    /// ``cancelResumeFromReview()`` pendant quelques secondes.
     func resumeFromReview() {
         guard let reviewPly, canResumeFromReview else { return }
         let keep = reviewPly
+        let previous = moveLog
+        let discarded = previous.count - keep
         reviewToLive()
-        rebuild(moves: Array(moveLog.prefix(keep)))
+        clearResumeUndo()
+        rebuild(moves: Array(previous.prefix(keep)))
+        guard discarded > 0 else { return }
+        resumeUndo = ResumeUndo(moves: previous, discardedCount: discarded)
+        resumeUndoTask = Task { [weak self] in
+            try? await Task.sleep(for: TwoPlayerViewModel.resumeUndoDelay)
+            guard !Task.isCancelled else { return }
+            self?.resumeUndo = nil
+        }
+    }
+
+    /// Rétablit la partie telle qu'elle était avant la dernière reprise.
+    func cancelResumeFromReview() {
+        guard let undo = resumeUndo else { return }
+        clearResumeUndo()
+        rebuild(moves: undo.moves)
+    }
+
+    private func clearResumeUndo() {
+        resumeUndoTask?.cancel()
+        resumeUndoTask = nil
+        resumeUndo = nil
     }
 
     private func boardAfter(plies: Int) -> Board {
@@ -398,6 +437,8 @@ final class TwoPlayerViewModel {
         board = scratch
         currentIndex = game.make(move: move, from: currentIndex)
         moveLog.append(move)
+        // Les joueurs ont continué sur la ligne reprise : ils l'ont acceptée.
+        clearResumeUndo()
         lastMove = move
 
         playFeedback(for: move, state: board.state)

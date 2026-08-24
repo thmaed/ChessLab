@@ -1123,6 +1123,9 @@ final class PlayViewModel {
         clock?.startTurn(for: board.position.sideToMove, previousMover: previousMover)
 
         if move.piece.color == userColor {
+            // L'utilisateur a joué sur la ligne reprise : il l'a acceptée,
+            // l'offre d'annulation n'a plus de sens.
+            clearResumeUndo()
             checkForBlunderRetroactively(
                 before: positionBeforeMove,
                 after: scratch.position,
@@ -1437,8 +1440,21 @@ final class PlayViewModel {
     /// de `moveLog`, puis relance ce qu'il faut côté moteur — logique
     /// commune à ``takeback()`` (un coup) et ``takeback(toMoveIndex:)``
     /// (plusieurs coups d'un coup).
+    ///
+    /// Une reprise de coup rend caduque l'annulation d'une reprise
+    /// antérieure : les coups mis de côté ne correspondraient plus à la
+    /// partie qu'on vient de raccourcir une seconde fois.
     private func performTakeback(keeping count: Int) {
-        rebuild(moves: Array(moveLog.prefix(count)))
+        clearResumeUndo()
+        restoreGame(moves: Array(moveLog.prefix(count)))
+    }
+
+    /// Repose la partie sur exactement `moves`, puis remet en marche ce qui
+    /// dépend de la position (moteur, barre d'éval, indice, autosauvegarde).
+    /// Sert aussi bien à raccourcir la partie (reprise de coup) qu'à la
+    /// rallonger de nouveau (``cancelResumeFromReview()``).
+    private func restoreGame(moves: [Move]) {
+        rebuild(moves: moves)
         hintMoves = []
         hintDepth = nil
         interruptHintAnalysisIfNeeded()
@@ -1525,14 +1541,87 @@ final class PlayViewModel {
         clearSelection()
     }
 
+    // MARK: Reprise depuis la consultation
+
+    /// Ce que la partie contenait juste AVANT une « Reprendre ici ».
+    ///
+    /// La reprise demandait autrefois une confirmation en feuille modale,
+    /// soit un troisième geste après « choisir le coup » et « reprendre ici »
+    /// — pour une action que l'on peut parfaitement défaire. On applique donc
+    /// la recommandation d'Apple : agir tout de suite, et proposer d'annuler
+    /// (HIG, *Confirming actions* : préférer l'annulation à la confirmation
+    /// quand l'action est réversible).
+    struct ResumeUndo {
+        /// Les coups de la partie avant la troncature, dans l'ordre.
+        let moves: [Move]
+        /// Nombre de coups écartés — c'est ce qu'annonce l'étiquette.
+        let discardedCount: Int
+    }
+
+    /// Offre d'annulation en cours, `nil` le reste du temps. Pilote
+    /// l'affichage du bouton « Annuler » de la barre de contrôle.
+    private(set) var resumeUndo: ResumeUndo?
+
+    /// Minuterie qui retire l'offre au bout de ``resumeUndoDelay``.
+    private var resumeUndoTask: Task<Void, Never>?
+
+    /// Durée de l'offre. Assez longue pour lire l'étiquette et viser le
+    /// bouton sans se presser, assez courte pour que la barre de contrôle ne
+    /// reste pas encombrée.
+    private static let resumeUndoDelay: Duration = .seconds(8)
+
     /// Reprend la partie depuis la position consultée : ne garde que les
     /// `reviewPly` premiers coups (réutilise `performTakeback`, qui gère
-    /// relance moteur / barre d'éval / indice / autosave).
+    /// relance moteur / barre d'éval / indice / autosave). Agit SANS
+    /// confirmation ; les coups écartés restent récupérables par
+    /// ``cancelResumeFromReview()``.
     func resumeFromReview() {
         guard let reviewPly, canResumeFromReview else { return }
         let keep = reviewPly
+        let previous = moveLog
+        let discarded = previous.count - keep
         reviewToLive()
         performTakeback(keeping: keep)
+        guard discarded > 0 else { return }
+        offerResumeUndo(ResumeUndo(moves: previous, discardedCount: discarded))
+        // Sans feuille de confirmation, rien n'annonce plus la troncature à
+        // qui ne voit pas la liste raccourcir.
+        if UIAccessibility.isVoiceOverRunning {
+            UIAccessibility.post(
+                notification: .announcement,
+                argument: LocalizationController.string(
+                    "Partie reprise, %lld coups écartés. Annulation possible.", discarded
+                )
+            )
+        }
+    }
+
+    /// Rétablit la partie telle qu'elle était avant la dernière reprise.
+    ///
+    /// Passe par la même reconstruction que la reprise elle-même : un coup
+    /// que le moteur aurait joué entre-temps est donc écrasé, et non ajouté
+    /// à la suite des coups rétablis.
+    func cancelResumeFromReview() {
+        guard let undo = resumeUndo else { return }
+        clearResumeUndo()
+        restoreGame(moves: undo.moves)
+    }
+
+    private func offerResumeUndo(_ undo: ResumeUndo) {
+        resumeUndo = undo
+        resumeUndoTask = Task { [weak self] in
+            try? await Task.sleep(for: PlayViewModel.resumeUndoDelay)
+            guard !Task.isCancelled else { return }
+            self?.resumeUndo = nil
+        }
+    }
+
+    /// Retire l'offre d'annulation et sa minuterie. Appelé dès que la partie
+    /// repart pour de bon (coup de l'utilisateur, nouvelle reprise de coup).
+    private func clearResumeUndo() {
+        resumeUndoTask?.cancel()
+        resumeUndoTask = nil
+        resumeUndo = nil
     }
 
     /// Rejoue les `plies` premiers coups de `moveLog` sur un plateau neuf

@@ -8463,3 +8463,142 @@ ouvrait dans les rails un trou de sa propre hauteur.
 La couleur par étage reste, mais elle ne porte plus d'information — seulement
 une aide à suivre un étage du regard. La légende est passée de six symboles à
 une ligne.
+
+## Finales : une leçon fausse, une ligne tronquée, un audit qui clignotait (24/08) ✅
+
+### Le pion passé éloigné enseignait une technique dont sa position n'avait pas besoin
+
+Signalé par l'utilisateur : « le pion passé éloigné n'est pas juste — à revoir
+p.ex. en déplaçant le pion en a4 au lieu de a5 ». Il avait raison, et la preuve
+tient en deux lignes de tablebase — les pions de l'aile roi retirés :
+
+    8/4k3/8/P3K3/8/8/8/8 w   (pion a5, seul)  →  GAIN
+    8/4k3/8/4K3/P7/8/8/8 w   (pion a4, seul)  →  NULLE
+
+Depuis **a5, le pion promeut tout seul** : parti d'e7, le roi noir arrive un
+temps trop tard. Le « leurre », la traversée du roi, l'aile roi — tout cela
+était décoratif : la position se gagnait par 1.a6 2.a7 3.a8=D. Le cours faisait
+d'ailleurs jouer aux Noirs 2…Rc7, qui autorise la promotion immédiate, puis aux
+Blancs 3.Re6, qui l'ignore.
+
+Depuis **a4**, le roi noir arrête le pion : le gain ne peut plus venir que du
+thème. Nouvelle ligne, chaque coup tranché par l'oracle : `1.a5 Rd7 2.a6 Rc6
+3.a7 Rb7 4.Re6! Rxa7 5.Rf7 Rb6 6.Rxg7 Rc5 7.Rxh7`. Le pion ne menace jamais
+d'aller à dame — il achète quatre temps, et c'est exactement ce qu'il faut.
+(Détail au passage : le roi blanc ne peut pas passer par f6, que le pion g7
+contrôle ; f7 lui est ouvert. C'est ce qui rend le plan non trivial.)
+
+### La triangulation s'arrêtait sur une promesse
+
+« La conversion est désormais mécanique » — une phrase facile à écrire, et que
+l'élève ne voyait jamais. La ligne principale va maintenant jusqu'au mat
+(`16…bxc6 17.Rc7! c5 18.b7+ Ra7 19.b8=D+ Ra6 20.Db6#`), et un second chapitre
+montre l'autre défense (`16…Rb8 17.c7+ Ra8 18.c8=D#`).
+
+### Nouvelle finale : Pions électriques
+
+Position et définition fournies par l'utilisateur — un pion passé séparé d'un
+autre par UNE colonne, capable de bloquer le roi adverse par menace réciproque.
+`8/8/8/2k5/8/P1P5/8/7K b` : gain blanc, mat en 39 à la tablebase. La ligne
+montre le mécanisme en six coups : `1…Rc4 2.a4! Rxc3 3.a5 Rb4 4.a6 Rb5 5.a7
+Rb6 6.a8=D`. L'écart d'une colonne est le point exact — collés, un seul roi les
+arrête ; plus écartés, il n'a même plus à choisir.
+
+### L'audit ne voyait ni l'un ni l'autre — il voit maintenant
+
+Les 77 cours passaient l'audit tablebase, y compris le pion passé éloigné :
+tous ses coups préservaient bien leur verdict. Le défaut n'était pas dans les
+coups, il était dans la PRÉMISSE. Deux contrôles ajoutés, non bloquants parce
+qu'ils jugent la pédagogie et non la vérité :
+
+- **Gain immédiat ignoré** — le cours enseigne un coup correct alors qu'un mat
+  en un ou une promotion NON REPRENABLE gagne sur-le-champ. La condition « non
+  reprenable » n'est pas un détail : une dame reprise au coup suivant reste
+  « gagnante » pour la tablebase alors que c'est souvent le coup thématique
+  (les pions liés qui se donnent l'un pour l'autre). Sans elle, le contrôle
+  criait au loup sur la moitié des finales de pions.
+- **Ligne interrompue** — la ligne s'arrête sur un gain encore lointain ALORS
+  QUE l'adversaire a du matériel. La seconde condition fait tout : une ligne
+  qui s'achève sur un roi nu a fini son travail, et l'imposer allongerait tous
+  les cours pour rien.
+
+🐛 Ma première version de ce second contrôle déduisait le camp défenseur du
+TRAIT et se trompait de camp : elle comptait les pions de l'attaquant comme du
+matériel de défense. 28 avertissements sont retombés à 16 une fois corrigé.
+
+### Le garde-fou moteur clignotait
+
+Au-delà de sept pièces la tablebase se tait et l'audit se replie sur Stockfish.
+Il comparait des CENTIPIONS, avec un seuil de 100. Or ces positions sont
+presque toutes des mats annoncés, dont la valeur numérique n'a aucune
+stabilité : la MÊME arête du cours « percée » a été notée `+6502 → +9967 (OK)`,
+puis `+8308 → +9970 (OK)`, puis `+1344 → +1189 (⚠ perd 155 cp)` sur trois
+exécutions du même audit — et le code retour basculait avec elle. Un garde-fou
+qui clignote est pire qu'aucun garde-fou.
+
+Le contrôle moteur juge désormais comme le contrôle tablebase : le VERDICT
+a-t-il changé (gain / nulle / perte) ? Et, comme lui, il ne tient pour faute
+qu'un coup du camp ÉTUDIÉ — un coup adverse sous-optimal est signalé, pas
+sanctionné. Deux exécutions consécutives donnent maintenant des verdicts
+identiques.
+
+### Vérifié
+
+78 cours de finales audités, **aucun coup enseigné ne casse son verdict
+théorique**, 16 avertissements pédagogiques à relire (Lucena, Philidor et
+consorts s'arrêtent une fois la méthode acquise — c'est un choix, il est
+maintenant visible). 689 tests unitaires verts, tests d'interface Finales et
+Ouvertures verts.
+
+### Une erreur à signaler
+
+Mon commit `62f7d95` a emporté, via `git add -A`, une modification du fichier
+projet que je n'avais pas relue : `IPHONEOS_DEPLOYMENT_TARGET` de l'app était
+passé à **18.6** en cours de session, les cibles de TEST restant à 18.0 — ce
+qui est invalide, une cible de test ne pouvant pas être inférieure au module
+qu'elle importe. La compilation des tests s'en est trouvée bloquée. J'ai aligné
+les deux cibles de test sur 18.6 sans toucher à l'app, dont le passage à 18.6
+est une décision produit qui ne m'appartient pas.
+
+**Tranché le 24/08** : cible **18.0** partout, app comprise. Les 696 tests
+passent à cette cible.
+
+## 24/08 — « Reprendre ici » : annuler plutôt que confirmer
+
+### Le défaut signalé
+
+Reprendre la partie depuis un coup consulté demandait **trois gestes** :
+choisir le coup, toucher « Reprendre ici », puis confirmer dans une feuille
+modale. Le troisième interrompait le geste au moment précis où l'utilisateur
+avait déjà décidé.
+
+### Ce qui a été fait
+
+La feuille de confirmation est supprimée, des deux modes de partie (*Jouer* et
+*Deux joueurs*). La reprise agit au premier toucher, et **l'annulation prend la
+place exacte du bouton** qui vient d'être touché : le doigt est déjà là, le
+retour en arrière ne coûte qu'un geste au même endroit. L'offre s'efface d'
+elle-même au bout de 8 secondes, ou dès qu'un coup est joué sur la ligne
+reprise — l'avoir engagée, c'est l'avoir acceptée.
+
+C'est la recommandation d'Apple (*Confirming actions*) : quand l'action est
+réversible, agir puis offrir d'annuler vaut mieux que demander avant. Encore
+faut-il qu'elle le soit VRAIMENT — c'est la seule chose qui rende ce choix
+légitime, et c'est ce que mesurent les sept tests de
+`ResumeFromReviewUndoTests` : les coups écartés reviennent à l'identique,
+coups ET position, y compris si le moteur a répondu entre-temps (la
+reconstruction l'écrase, elle ne l'empile pas).
+
+### Une mesure qui a corrigé le dessin
+
+La pastille portait d'abord une icône « ↺ » devant son texte. Elle réclamait
+**312,7 pt** là où l'iPhone en Zoom d'affichage n'en offre que 296 : l'image et
+son écart de 5 pt sont incompressibles, contrairement au texte. La rangée
+serait redevenue plus large que l'écran — le défaut du 22/08, à l'identique.
+Texte seul, elle tombe à 296,0 pt tout juste. Le test
+`testUndoOfferedBarFitsOnAZoomedIPhone` fige la mesure.
+
+### Vérifié
+
+**696 tests unitaires verts** (689 + 7). Les deux chaînes de la feuille
+supprimée sont retirées du catalogue, les quatre nouvelles y sont traduites.

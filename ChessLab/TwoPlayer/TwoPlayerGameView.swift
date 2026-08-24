@@ -25,7 +25,6 @@ struct TwoPlayerGameView: View {
     private var boardTheme: BoardTheme { appSettings.boardTheme }
     @State private var showResignConfirmation = false
     @State private var showDrawConfirmation = false
-    @State private var showResumeConfirmation = false
     @State private var copiedMessage: String?
 
     var body: some View {
@@ -94,16 +93,6 @@ struct TwoPlayerGameView: View {
         ) {
             Button("Confirmer la nulle") { viewModel.agreeToDraw() }
             Button("Annuler", role: .cancel) {}
-        }
-        .confirmationDialog(
-            "Reprendre depuis le coup \(viewModel.displayedPly) ?",
-            isPresented: $showResumeConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("Reprendre ici", role: .destructive) { viewModel.resumeFromReview() }
-            Button("Annuler", role: .cancel) {}
-        } message: {
-            Text("Les \(viewModel.totalPlies - viewModel.displayedPly) coup(s) suivants seront effacés.")
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
@@ -316,7 +305,7 @@ struct TwoPlayerGameView: View {
                             .foregroundStyle(Theme.warning)
                         Spacer()
                         if viewModel.canResumeFromReview {
-                            Button { showResumeConfirmation = true } label: {
+                            Button { viewModel.resumeFromReview() } label: {
                                 Text("Reprendre ici")
                                     .font(.caption.weight(.semibold))
                                     .foregroundStyle(Theme.background)
@@ -328,9 +317,33 @@ struct TwoPlayerGameView: View {
                         }
                     }
                     .transition(.opacity)
+                } else if let undo = viewModel.resumeUndo {
+                    // La reprise a eu lieu : au même endroit, de quoi la
+                    // défaire pendant quelques secondes.
+                    HStack(spacing: 8) {
+                        Label("Reprise au coup \(viewModel.totalPlies) — \(undo.discardedCount) coups écartés",
+                              systemImage: "arrow.uturn.backward")
+                            .font(.caption.weight(.medium))
+                            .foregroundStyle(Theme.textSecondary)
+                            .lineLimit(2)
+                        Spacer(minLength: 0)
+                        Button { viewModel.cancelResumeFromReview() } label: {
+                            Text("Annuler")
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Theme.textPrimary)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(Theme.surfaceElevated, in: Capsule())
+                                .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
+                        }
+                        .buttonStyle(.pressable)
+                        .accessibilityLabel("Annuler la reprise")
+                    }
+                    .transition(.opacity)
                 }
             }
             .animation(Theme.gentle, value: viewModel.isReviewing)
+            .animation(Theme.gentle, value: viewModel.resumeUndo?.discardedCount)
         }
     }
 
