@@ -8976,3 +8976,69 @@ est affiché) est déjà celle que le premier test exerce de bout en bout.
 tournant dans le lot complet (274 s), verte relancée seule — flaky
 pré-existant et documenté dans son propre commentaire (contention du
 `MainActor` sous charge), sans rapport avec ce travail.
+
+## 25/08 — Correctif critique n°2 : le gel « l'ordinateur ne joue jamais »
+
+Deuxième signalement de l'utilisateur, précisé ensuite en « l'app freeze » (pas
+un plantage). Cause distincte du bug de session de la veille :
+`Chess960PlayViewModel.updateEvalBar()` appelait
+`EngineController.computeBestMove(...)` — l'API à LECTEUR PERMANENT, annotée
+dans son propre commentaire « (Laboratoire) », qui démarre
+`ensureMoveReader()` : une tâche de fond qui consomme `responseStream` POUR
+TOUJOURS. `requestEngineMove()` lit ce MÊME flux à la main, comme partout
+ailleurs dans l'app (`PlayViewModel` compris) — `responseStream` est un
+`AsyncStream` à consommateur UNIQUE, et `synchronize()` porte une assertion
+explicite contre la double-consommation : « deux `next()` concurrents =
+fatalError du stdlib ».
+
+Dès que la barre d'éval s'affiche une seule fois (au démarrage, si
+l'utilisateur joue les blancs — `start()` l'affiche AVANT le premier coup), le
+lecteur permanent reste vivant, et le premier `synchronize()` du coup moteur
+suivant heurte l'assertion. Sous débogueur (Xcode Run, le cas normal en
+développement), l'app semble GELÉE — c'est le process qui s'arrête sur le
+trap, pas un vrai blocage logique.
+
+Réparé en réécrivant `updateEvalBar()` sur le MÊME patron manuel que
+`requestEngineMove()` et que `PlayViewModel.updateEvalBar()` — synchronize,
+envoi de la position, lecture manuelle du flux sous `EngineWatchdog`, jamais
+`computeBestMove`.
+
+### Le test, et sa preuve
+
+`Chess960PlayViewModelTests.engineRepliesAfterFirstMoveWithEvalBarEnabled` —
+moteur RÉEL (pas `forceMove`) : c'est la communication moteur qui était en
+cause, aucun test mécanique ne pouvait la voir. Retiré le correctif pour
+vérifier que le test mord : il reproduit l'assertion À L'IDENTIQUE
+(`EngineController.swift:208`, `deux next() concurrents = fatalError du
+stdlib`), qui fait s'écrouler le PROCESS de test entier — le même signal que
+verrait l'utilisateur. Restauré, vert.
+
+Ce test rejoint la famille de fragilité déjà documentée
+(`GameClockStartTests`) : un vrai Stockfish, sous contention de la suite
+complète (bancs d'essai moteur inclus), peut dépasser une marge stricte —
+vert de façon fiable seul (2-3 s), marge élargie à 60 s par précaution.
+
+## 25/08 — Chess960 : le dernier coup se surligne, roque compris
+
+Demande de l'utilisateur : les cases jouées doivent apparaître en jaune comme
+en partie normale. `Chess960PlayView` passait `lastMove: nil` — jamais câblé
+depuis le lot 2.
+
+Le piège : le dialecte UCI du moteur (`e1h1`, roi-prend-tour) désigne, pour un
+roque, la case de la TOUR comme arrivée — la surligner telle quelle aurait
+montré une case où rien n'atterrit. `Chess960Game.displaySquares(forUCI:)`
+calculée AVANT `apply` (sur la position qui précède le coup) traduit ça vers
+la case RÉELLE du roi (g1/c1), la même convention que le roque classique
+ailleurs dans l'app — un seul champ `Move`, celui du roi, jamais celui de la
+tour. Un journal parallèle (`displaySquaresLog`) suit `uciLog`/`sanLog`,
+tronqué avec eux, recalculé par rejeu à la reconstruction — et
+`displayedLastMove` respecte la consultation, comme
+`PlayViewModel.displayedLastMove`.
+
+### Vérifié
+
+716 tests unitaires verts (2 nouveaux sur la surbrillance, dont le cas du
+roque). 72 tests d'interface Chess960 verts. Les deux suites, relancées
+SÉPARÉMENT — j'avais moi-même enfreint la leçon documentée hier en les
+lançant en parallèle, produisant un faux échec (« Executed 0 tests ») que j'ai
+identifié et écarté avant de conclure.

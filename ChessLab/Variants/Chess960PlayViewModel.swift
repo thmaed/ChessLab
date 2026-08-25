@@ -32,6 +32,11 @@ final class Chess960PlayViewModel {
     /// rejeu ; le SAN, parallèle, sert à l'affichage et au PGN.
     private(set) var uciLog: [String] = []
     private(set) var sanLog: [String] = []
+    /// Cases à surligner, un couple par coup — voir
+    /// ``Chess960Game/displaySquares(forUCI:)`` : pour un roque, l'arrivée
+    /// affichée est celle du ROI, pas le dialecte roi-prend-tour de l'UCI
+    /// moteur.
+    private var displaySquaresLog: [(from: Square, to: Square)] = []
     private(set) var outcome: GameOutcome?
     /// Occurrences de chaque position (clé : 4 champs Shredder) — la nulle
     /// par répétition vit ICI : le compteur interne de ChessKit ne survit pas
@@ -201,10 +206,12 @@ final class Chess960PlayViewModel {
     @discardableResult
     private func commit(uci: String) -> Bool {
         let previousMover = game.board.position.sideToMove
+        let squares = game.displaySquares(forUCI: uci)
         guard let san = game.apply(uci: uci) else { return false }
         clearResumeUndo(ifMoverIs: userColor, was: previousMover)
         uciLog.append(uci)
         sanLog.append(san)
+        if let squares { displaySquaresLog.append(squares) }
         playSound(for: san)
 
         let key = game.repetitionKey
@@ -344,16 +351,60 @@ final class Chess960PlayViewModel {
         _ = commit(uci: lan)
     }
 
+    /// Défaut corrigé le 25/08 : cette méthode appelait
+    /// ``EngineController/computeBestMove(fen:setupCommands:movetimeMs:depth:)``
+    /// — l'API à LECTEUR PERMANENT, réservée au Laboratoire (self-play en
+    /// continu). Elle démarre `ensureMoveReader()`, qui installe une tâche de
+    /// fond consommant `responseStream` POUR TOUJOURS ; ``requestEngineMove``
+    /// lit ce même flux À LA MAIN, comme partout ailleurs dans l'app —
+    /// `responseStream` est un `AsyncStream` à consommateur UNIQUE. Dès que
+    /// la barre d'éval s'affichait une seule fois (au démarrage, si l'utilisateur
+    /// joue les blancs), le lecteur permanent restait vivant, et le premier
+    /// `synchronize()` du coup moteur suivant heurtait l'assertion qui garde
+    /// précisément cette discipline (« deux `next()` concurrents =
+    /// fatalError du stdlib ») — silencieusement gelé hors débogueur, en
+    /// trappe DANS le débogueur : exactement le signalement du 25/08,
+    /// « après le premier coup blanc, l'ordinateur ne joue jamais ».
+    ///
+    /// Le remède : la MÊME lecture manuelle que ``requestEngineMove`` et que
+    /// ``PlayViewModel/updateEvalBar()``, jamais `computeBestMove`.
     private func updateEvalBar() async {
         guard outcome == nil else { return }
         await engine.synchronize()
+        let fen = game.shredderFEN
         let mover = game.board.position.sideToMove
-        guard let result = await engine.computeBestMove(
-            fen: game.shredderFEN, setupCommands: [], movetimeMs: 220, depth: nil
-        ) else { return }
-        if let cp = result.moverCp {
-            setEval(cp: cp, mate: nil, moverIsWhite: mover == .white)
+        await engine.send(.position(.fen(fen)))
+        await engine.send(.go(movetime: 220))
+
+        let search = await EngineWatchdog.run(deadlineMs: 220 + EngineWatchdog.graceMs) { [engine] in
+            var cp: Int?
+            var mate: Int?
+            for await response in await engine.responseStream {
+                switch response {
+                case let .info(info):
+                    guard (info.multipv ?? 1) == 1 else { break }
+                    if let m = info.score?.mate {
+                        mate = m; cp = nil
+                    } else if let c = info.score?.cp {
+                        cp = Int(c); mate = nil
+                    }
+                case .bestmove:
+                    return (cp: cp, mate: mate)
+                default:
+                    break
+                }
+            }
+            return (cp: cp, mate: mate)
         }
+
+        // Position obsolète (un coup a été joué pendant la recherche courte) :
+        // l'évaluation qui revient ne parle plus de la position affichée.
+        // Même convention que ``requestEngineMove`` : un score de mat sans
+        // `cp` n'est pas affiché — comportement PRÉEXISTANT, pas retouché ici.
+        guard case let .finished(result) = search, fen == game.shredderFEN,
+              let cp = result.cp
+        else { return }
+        setEval(cp: cp, mate: result.mate, moverIsWhite: mover == .white)
     }
 
     /// La barre parle TOUJOURS du point de vue des blancs.
@@ -477,12 +528,15 @@ final class Chess960PlayViewModel {
     private func rebuildFromLogs() {
         var rebuilt = Chess960Game(fen: startFEN)!
         var counts: [String: Int] = [rebuilt.repetitionKey: 1]
+        var squaresLog: [(from: Square, to: Square)] = []
         for uci in uciLog {
+            if let squares = rebuilt.displaySquares(forUCI: uci) { squaresLog.append(squares) }
             _ = rebuilt.apply(uci: uci)
             counts[rebuilt.repetitionKey, default: 0] += 1
         }
         game = rebuilt
         repetitionCounts = counts
+        displaySquaresLog = squaresLog
         outcome = nil
         clearSelection()
         currentEvalCp = nil
@@ -499,6 +553,20 @@ final class Chess960PlayViewModel {
         var replayed = Chess960Game(fen: startFEN)!
         for uci in uciLog.prefix(count) { _ = replayed.apply(uci: uci) }
         return replayed
+    }
+
+    /// Coup à surligner sur l'échiquier — celui qui mène à la position
+    /// affichée, consultation comprise (même convention que
+    /// ``PlayViewModel/displayedLastMove``). `piece` n'est utilisé nulle
+    /// part pour la surbrillance elle-même (seuls `start`/`end` comptent),
+    /// mais `Move` l'exige : on y met la pièce réellement arrivée sur la
+    /// case de destination.
+    var displayedLastMove: Move? {
+        let index = displayedPly
+        guard index > 0, index <= displaySquaresLog.count else { return nil }
+        let squares = displaySquaresLog[index - 1]
+        guard let piece = displayedBoard.position.piece(at: squares.to) else { return nil }
+        return Move(result: .move, piece: piece, start: squares.from, end: squares.to)
     }
 
     // MARK: Export

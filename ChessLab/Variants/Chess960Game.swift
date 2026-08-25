@@ -214,6 +214,28 @@ struct Chess960Game {
         return nil
     }
 
+    /// Cases à SURLIGNER pour le coup `uci` (à appeler AVANT `apply`, sur la
+    /// position qui le précède) — même convention que le reste de l'app pour
+    /// un roque : la case d'arrivée affichée est celle du ROI, jamais le
+    /// dialecte roi-prend-tour que parle l'UCI moteur (sans quoi la surbrillance
+    /// tomberait sur la case de la tour d'origine, où rien n'atterrit).
+    func displaySquares(forUCI uci: String) -> (from: Square, to: Square)? {
+        guard uci.count >= 4,
+              let from = Square(String(uci.prefix(2))) as Square?,
+              let to = Square(String(uci.dropFirst(2).prefix(2))) as Square?
+        else { return nil }
+
+        let mover = board.position.sideToMove
+        if let piece = board.position.piece(at: from), piece.kind == .king,
+           let target = board.position.piece(at: to), target.kind == .rook, target.color == mover {
+            let rank = backRank(of: mover)
+            let kingTarget = fileIndex(of: to) > fileIndex(of: from) ? 6 : 2
+            let displayEnd = Square("\(fileLetter(kingTarget, upper: false))\(rank + 1)")
+            return (from, displayEnd)
+        }
+        return (from, to)
+    }
+
     /// UCI (dialecte roi-prend-tour) d'un coup — surtout utile aux tests.
     func uciFor(_ move: Move) -> String {
         switch move {

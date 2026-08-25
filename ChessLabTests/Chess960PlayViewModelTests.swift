@@ -102,6 +102,90 @@ struct Chess960PlayViewModelTests {
         #expect(pgn.contains("1. e4 e5"))
     }
 
+    // MARK: Régression du 25/08 — moteur RÉEL
+
+    /// LE test qui aurait attrapé le défaut signalé : « après le premier
+    /// coup blanc, l'ordinateur ne joue jamais, l'app freeze ».
+    ///
+    /// Cause : ``Chess960PlayViewModel/updateEvalBar()`` appelait
+    /// `EngineController.computeBestMove`, l'API à LECTEUR PERMANENT réservée
+    /// au Laboratoire. Elle démarre une tâche de fond qui consomme
+    /// `responseStream` pour toujours ; ``requestEngineMove`` lit ce même
+    /// flux à la main, comme partout ailleurs — deux lecteurs sur un flux à
+    /// consommateur unique. Dès que la barre d'éval s'affiche une fois avant
+    /// le premier coup moteur (le cas où l'utilisateur joue les blancs :
+    /// `start()` l'affiche AVANT tout coup), le `synchronize()` du coup
+    /// moteur suivant heurte l'assertion qui garde cette discipline.
+    ///
+    /// Ce test utilise le moteur RÉEL (pas `forceMove`) : c'est précisément
+    /// la communication moteur qui était en cause, un test purement
+    /// mécanique ne pouvait pas la voir — comme les 6 tests ci-dessus, tous
+    /// verts, n'ont rien vu.
+    // Marge LARGE et pas resserrée : ce test démarre un vrai Stockfish, et
+    // quand la suite complète tourne, les bancs d'essai moteur (Classification
+    // Drift, Engine Search Budget) monopolisent le même process partagé — même
+    // constat, même remède que ``GameClockStartTests`` (voir son commentaire).
+    // Ce que ce test attrape n'a de toute façon pas besoin de délai précis :
+    // le défaut qu'il vise fait TRAPPER le process (assertion), pas juste
+    // traîner — un faux positif par lenteur serait bien pire qu'une marge
+    // généreuse.
+    @Test("Avec la barre d'éval activée, l'ordinateur répond après le premier coup")
+    func engineRepliesAfterFirstMoveWithEvalBarEnabled() async throws {
+        var settings = Chess960Settings()
+        settings.positionNumber = 518
+        settings.showEvalBar = true
+        let vm = Chess960PlayViewModel(settings: settings)
+        vm.start()
+
+        // Laisser le moteur démarrer et afficher l'éval initiale — c'est
+        // CE geste qui empoisonnait l'instance avant le correctif.
+        try await Task.sleep(for: .seconds(3))
+
+        vm.attemptUserMove(from: Square("e2"), to: Square("e4"))
+        try #require(vm.totalPlies >= 1, "le coup utilisateur doit tenir")
+
+        let deadline = Date().addingTimeInterval(60)
+        while Date() < deadline, vm.totalPlies < 2 {
+            try await Task.sleep(for: .milliseconds(200))
+        }
+        #expect(vm.totalPlies >= 2, "l'ordinateur n'a jamais répondu — moteur gelé")
+
+        vm.handleViewDisappear()
+    }
+
+    @Test("Le dernier coup se surligne, roque compris — sur la case RÉELLE du roi")
+    func lastMoveHighlightsTheKingsRealDestination() {
+        let vm = classicalGame()
+        play(["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"], on: vm)
+
+        // Coup ordinaire : les cases affichées sont celles de l'UCI.
+        var last = try! #require(vm.displayedLastMove)
+        #expect(last.start == Square("f8") && last.end == Square("c5"),
+                "dernier coup joué : Fc5 (par les noirs, depuis f8)")
+
+        // Roque : l'UCI moteur (dialecte roi-prend-tour) dit e1h1, mais la
+        // case AFFICHÉE doit être g1 — celle où le roi atterrit vraiment —
+        // pas h1, où se tenait la tour.
+        play(["e1h1"], on: vm)
+        last = try! #require(vm.displayedLastMove)
+        #expect(last.start == Square("e1"))
+        #expect(last.end == Square("g1"), "pas h1 (la tour) : g1, la case RÉELLE du roi")
+    }
+
+    @Test("La surbrillance suit la consultation, pas seulement le direct")
+    func lastMoveFollowsReviewNotJustLiveGame() {
+        let vm = classicalGame()
+        play(["e2e4", "e7e5", "g1f3"], on: vm)
+
+        vm.review(toPly: 1)
+        let reviewed = try! #require(vm.displayedLastMove)
+        #expect(reviewed.start == Square("e2") && reviewed.end == Square("e4"),
+                "en consultation du 1er coup, c'est LUI qu'on surligne, pas le dernier joué")
+
+        vm.review(toPly: 0)
+        #expect(vm.displayedLastMove == nil, "position de départ : rien à surligner")
+    }
+
     @Test("Le geste de roque du roi expose les cases des tours")
     func kingTargetsIncludeOwnRooks() {
         var settings = Chess960Settings()

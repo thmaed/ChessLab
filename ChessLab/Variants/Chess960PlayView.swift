@@ -98,7 +98,7 @@ struct Chess960PlayView: View {
                 theme: appSettings.boardTheme,
                 selectedSquare: viewModel.selectedSquare,
                 legalTargetSquares: viewModel.legalTargetSquares,
-                lastMove: nil,
+                lastMove: viewModel.displayedLastMove,
                 hintMoves: [],
                 interactionEnabled: viewModel.outcome == nil && !viewModel.isReviewing,
                 showCoordinates: true,
