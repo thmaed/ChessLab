@@ -7,6 +7,15 @@ import Testing
 /// journal de coups, fins de partie (dont la répétition, qui n'appartient
 /// qu'au view model — le compteur de ChessKit ne survit pas à un roque),
 /// consultation, « Reprendre ici » avec ses gardes du 24/08, export PGN.
+/// `.serialized` — PAS une précaution de confort, voir
+/// ``EngineSearchBudgetBenchmark`` : Swift Testing exécute les tests d'une
+/// suite en PARALLÈLE par défaut, et chaque test au moteur réel démarre son
+/// propre Stockfish ; `stdout`, le canal UCI, est une ressource GLOBALE au
+/// processus — deux moteurs concurrents se corrompent mutuellement. Constaté
+/// ici même le 25/08 : les trois tests au moteur réel de cette suite (le gel
+/// du 25/08, l'indice, l'alerte gaffe) échouaient TOUS quand Swift Testing
+/// les lançait en parallèle, alors que chacun passe seul.
+@Suite(.serialized)
 @MainActor
 struct Chess960PlayViewModelTests {
 
@@ -195,5 +204,74 @@ struct Chess960PlayViewModelTests {
         vm.selectSquare(Square("e1"))
         #expect(vm.legalTargetSquares.contains(Square("h1")),
                 "la tour h1 doit être une cible : c'est le geste roi-prend-tour")
+    }
+
+    // MARK: Indice et alerte gaffe — moteur RÉEL (25/08)
+
+    /// L'indice doit produire au moins une flèche vers un coup réellement
+    /// légal — moteur réel, rejoint la famille de fragilité déjà documentée
+    /// (contention de la suite complète, voir
+    /// ``engineRepliesAfterFirstMoveWithEvalBarEnabled``).
+    @Test("L'indice propose au moins un coup légal une fois activé")
+    func hintProducesAtLeastOneLegalMove() async throws {
+        var settings = Chess960Settings()
+        settings.positionNumber = 518
+        let vm = Chess960PlayViewModel(settings: settings)
+        vm.start()
+        try await Task.sleep(for: .seconds(1))
+
+        vm.toggleHint()
+        #expect(vm.hintsWanted)
+
+        let deadline = Date().addingTimeInterval(20)
+        while Date() < deadline, vm.hintMoves.isEmpty {
+            try await Task.sleep(for: .milliseconds(300))
+        }
+        try #require(!vm.hintMoves.isEmpty, "aucune flèche produite — indice gelé ou muet")
+        let best = try #require(vm.hintMoves.first { $0.rank == 1 })
+
+        // Le coup suggéré doit être LÉGAL : le sélectionner doit l'exposer
+        // parmi les cases cibles.
+        vm.selectSquare(best.from)
+        #expect(vm.legalTargetSquares.contains(best.to), "le coup suggéré doit être légal")
+
+        vm.handleViewDisappear()
+    }
+
+    /// L'alerte gaffe : 1.e4 g6 2.Dh5?? — la dame se pose sur une case
+    /// attaquée EN DIAGONALE par le pion g6 (gxh5 la gagne pour un pion),
+    /// un des hangs de dame les plus connus, mécaniquement certain.
+    @Test("L'alerte gaffe se déclenche sur une dame hors-jeu")
+    func blunderAlertFiresOnAHangingQueen() async throws {
+        var settings = Chess960Settings()
+        settings.positionNumber = 518
+        let vm = Chess960PlayViewModel(settings: settings)
+        vm.start()
+        try await Task.sleep(for: .seconds(1))
+
+        vm.forceMove(uci: "e2e4")
+        vm.forceMove(uci: "g7g6")
+        // Laisser la tâche moteur périmée — déclenchée par la transition vers
+        // les noirs après e2e4, avant que g7g6 (forcé juste après, SANS
+        // attente) n'ait eu la moindre chance d'être vue — DÉCOUVRIR qu'elle
+        // n'a plus lieu d'être : son garde (« c'est TOUJOURS aux noirs de
+        // jouer ? ») ne s'exécute qu'à SON tour sur la file sérielle, et sans
+        // ce répit, il tombe sur l'état final (après Dh5) plutôt que sur
+        // l'état intermédiaire (après g6) qui l'aurait neutralisé. Un test
+        // purement synchrone ratait cette fenêtre entièrement.
+        // La file sérielle doit d'abord vider TASK A (la vérification de
+        // gaffe, harmless, sur e2e4 lui-même — deux sondes moteur à ~300 ms
+        // chacune) avant que TASK B (la tâche moteur périmée) n'atteigne son
+        // propre garde. Marge large, mesurée insuffisante à 500 ms.
+        try await Task.sleep(for: .seconds(3))
+        vm.forceMove(uci: "d1h5")   // Dh5?? — gxh5 gagne la dame
+
+        let deadline = Date().addingTimeInterval(20)
+        while Date() < deadline, vm.pendingBlunderWarning == nil {
+            try await Task.sleep(for: .milliseconds(300))
+        }
+        #expect(vm.pendingBlunderWarning != nil, "aucune alerte sur une dame qui se fait prendre gratuitement")
+
+        vm.handleViewDisappear()
     }
 }

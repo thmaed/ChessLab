@@ -107,14 +107,19 @@ final class Chess960SessionUITests: XCTestCase {
         }
         XCTAssertGreaterThanOrEqual(Int(moveCount.value as? String ?? "") ?? 0, 1)
 
+        // Lu JUSTE avant le tap final, pas plus tôt : le moteur peut encore
+        // répondre pendant qu'on ouvre le menu (mesuré — quelques centaines
+        // de ms de gestes XCUITest suffisent), et une lecture antérieure
+        // deviendrait alors périmée avant même que le débranchement ait lieu.
+        _ = app.buttons["Changer de mode"].waitForExistence(timeout: 5)
+        app.buttons["Changer de mode"].tap()
+        _ = app.buttons["Deux joueurs"].waitForExistence(timeout: 3)
+
         let fenBefore = app.otherElements["chess960_fen"].value as? String
         XCTAssertNotNil(fenBefore)
         XCTAssertNotEqual(fenBefore, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w HAha - 0 1",
                           "le test lui-même doit avoir avancé la partie, sans quoi il ne prouve rien")
 
-        _ = app.buttons["Changer de mode"].waitForExistence(timeout: 5)
-        app.buttons["Changer de mode"].tap()
-        _ = app.buttons["Deux joueurs"].waitForExistence(timeout: 3)
         app.buttons["Deux joueurs"].tap()
 
         let twoPlayerFEN = app.otherElements["chess960_fen"]

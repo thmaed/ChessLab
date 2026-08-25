@@ -62,6 +62,16 @@ final class Chess960PlayViewModel {
     private(set) var currentEvalCp: Int?
     private(set) var currentEvalMate: Int?
 
+    // MARK: Indice — analyse ponctuelle, PAS continue (voir startHintAnalysis)
+
+    var hintMoves: [HintMove] = []
+    private(set) var hintsWanted = false
+    private(set) var isHintAnalyzing = false
+
+    // MARK: Alerte gaffe
+
+    var pendingBlunderWarning: PendingBlunderWarning?
+
     // MARK: Consultation
 
     private(set) var reviewPly: Int?
@@ -91,8 +101,11 @@ final class Chess960PlayViewModel {
         clock?.startTurn(for: .white)
         if game.board.position.sideToMove == engineColor {
             enqueueEngineWork { [weak self] in await self?.requestEngineMove() }
-        } else if settings.showEvalBar {
-            enqueueEngineWork { [weak self] in await self?.updateEvalBar() }
+        } else {
+            if settings.showEvalBar {
+                enqueueEngineWork { [weak self] in await self?.updateEvalBar() }
+            }
+            restartHintAnalysisIfWanted()
         }
     }
 
@@ -206,6 +219,7 @@ final class Chess960PlayViewModel {
     @discardableResult
     private func commit(uci: String) -> Bool {
         let previousMover = game.board.position.sideToMove
+        let beforeFEN = game.shredderFEN
         let squares = game.displaySquares(forUCI: uci)
         guard let san = game.apply(uci: uci) else { return false }
         clearResumeUndo(ifMoverIs: userColor, was: previousMover)
@@ -213,6 +227,7 @@ final class Chess960PlayViewModel {
         sanLog.append(san)
         if let squares { displaySquaresLog.append(squares) }
         playSound(for: san)
+        hintMoves = []
 
         let key = game.repetitionKey
         repetitionCounts[key, default: 0] += 1
@@ -226,10 +241,25 @@ final class Chess960PlayViewModel {
 
         clock?.startTurn(for: game.board.position.sideToMove, previousMover: previousMover)
 
+        // AVANT la réponse du moteur, pas après — même ordre que
+        // ``PlayViewModel/commit(scratch:move:)``. Inversé au premier jet,
+        // la réponse du moteur (enfilée sur la MÊME file sérielle) consommait
+        // le tour et faisait toujours échouer le garde de fraîcheur de la
+        // vérification (`atMoveCount == uciLog.count`) avant même qu'elle
+        // s'exécute — un défaut RÉEL, pas un artefact de test : l'alerte
+        // gaffe n'aurait presque jamais pu se déclencher en jeu normal.
+        // Attrapé par `blunderAlertFiresOnAHangingQueen`.
+        if previousMover == userColor {
+            checkForBlunderRetroactively(beforeFEN: beforeFEN, afterFEN: game.shredderFEN, atMoveCount: uciLog.count)
+        }
+
         if game.board.position.sideToMove == engineColor {
             enqueueEngineWork { [weak self] in await self?.requestEngineMove() }
-        } else if settings.showEvalBar {
-            enqueueEngineWork { [weak self] in await self?.updateEvalBar() }
+        } else {
+            if settings.showEvalBar {
+                enqueueEngineWork { [weak self] in await self?.updateEvalBar() }
+            }
+            restartHintAnalysisIfWanted()
         }
         return true
     }
@@ -422,6 +452,163 @@ final class Chess960PlayViewModel {
         return Int(min(max(base, 0.15), min(30, remaining / 4)) * 1000)
     }
 
+    // MARK: Indice
+
+    /// Analyse PONCTUELLE et BORNÉE (~1,5 s), pas continue comme
+    /// ``PlayViewModel/startHintAnalysis()``. Ce dernier tourne tant que
+    /// l'indice reste affiché, ce qui exige toute une machinerie
+    /// d'interruption (`isHintAnalyzing`, `hintTask`, `stopHintIfNeeded`,
+    /// `interruptHintAnalysisIfNeeded`) pour ne jamais laisser deux
+    /// consommateurs se disputer `responseStream` — exactement la classe de
+    /// défaut qui a gelé cette variante plus tôt aujourd'hui
+    /// (``updateEvalBar()``). Une salve BORNÉE encaisse le même risque sans
+    /// cette machinerie : elle passe par la file sérielle comme tout le
+    /// reste, se termine d'elle-même, et un résultat qui arrive après que la
+    /// position a changé est simplement jeté (garde `hintsWanted` /
+    /// `sideToMove` revérifiée après coup) plutôt qu'annulé activement.
+    /// Contrepartie assumée : les flèches n'affinent pas leur profondeur en
+    /// temps réel, elles apparaissent une fois, au bout d'~1,5 s.
+    private static let hintBudgetMs = 1500
+
+    func toggleHint() {
+        hintsWanted.toggle()
+        if hintsWanted {
+            enqueueEngineWork { [weak self] in await self?.startHintAnalysis() }
+        } else {
+            hintMoves = []
+        }
+    }
+
+    /// Relance l'indice sur la file sérielle si l'utilisateur l'avait
+    /// activé avant le coup qui vient d'être joué — même rôle que
+    /// ``PlayViewModel/restartHintAnalysisIfWanted()``.
+    private func restartHintAnalysisIfWanted() {
+        guard hintsWanted else { return }
+        enqueueEngineWork { [weak self] in await self?.startHintAnalysis() }
+    }
+
+    private func startHintAnalysis() async {
+        guard settings.hintsEnabled, hintsWanted, outcome == nil,
+              game.board.position.sideToMove == userColor
+        else { return }
+
+        isHintAnalyzing = true
+        defer { isHintAnalyzing = false }
+
+        let fen = game.shredderFEN
+        await engine.synchronize()
+        await engine.send(.setoption(id: "MultiPV", value: "3"))
+        await engine.send(.position(.fen(fen)))
+        await engine.send(.go(movetime: Self.hintBudgetMs))
+
+        let search = await EngineWatchdog.run(deadlineMs: Self.hintBudgetMs + EngineWatchdog.graceMs) { [engine] in
+            var lanByRank: [Int: String] = [:]
+            var scoreByRank: [Int: Double] = [:]
+            for await response in await engine.responseStream {
+                switch response {
+                case let .info(info):
+                    if let rank = info.multipv, let firstMove = info.pv?.first {
+                        lanByRank[rank] = firstMove
+                        if let mate = info.score?.mate {
+                            scoreByRank[rank] = mate > 0 ? 10_000 - Double(mate) : -10_000 - Double(mate)
+                        } else if let cp = info.score?.cp {
+                            scoreByRank[rank] = cp
+                        }
+                    }
+                case .bestmove:
+                    return (lanByRank, scoreByRank)
+                default:
+                    break
+                }
+            }
+            return (lanByRank, scoreByRank)
+        }
+        await engine.send(.setoption(id: "MultiPV", value: "1"))
+
+        // Résultat obsolète (position changée, indice redésactivé pendant la
+        // salve) : on le jette plutôt que de l'appliquer à l'aveugle.
+        guard case let .finished((lanByRank, scoreByRank)) = search,
+              hintsWanted, outcome == nil, fen == game.shredderFEN
+        else { return }
+
+        hintMoves = HintMoveBuilder.build(lanByRank: lanByRank, scoreByRank: scoreByRank)
+            .map(remappedForCastle)
+    }
+
+    /// Une flèche d'indice sur un roque parlerait, comme l'UCI moteur, du
+    /// roi qui « prend » sa tour — la case d'ARRIVÉE affichée doit être
+    /// celle où le roi atterrit VRAIMENT, même correction que
+    /// ``displayedLastMove``.
+    private func remappedForCastle(_ hint: HintMove) -> HintMove {
+        guard let squares = game.displaySquares(forUCI: hint.from.notation + hint.to.notation),
+              squares.to != hint.to
+        else { return hint }
+        return HintMove(rank: hint.rank, from: hint.from, to: squares.to, strength: hint.strength,
+                        kind: hint.kind, tint: hint.tint)
+    }
+
+    // MARK: Alerte gaffe (rétroactive)
+
+    private func checkForBlunderRetroactively(beforeFEN: String, afterFEN: String, atMoveCount: Int) {
+        guard settings.blunderAlertEnabled else { return }
+
+        enqueueEngineWork { [weak self] in
+            guard let self else { return }
+            guard let before = await self.quickScore(fen: beforeFEN),
+                  let after = await self.quickScore(fen: afterFEN)
+            else { return }
+
+            guard let severity = PlayViewModel.blunderSeverity(before: before, after: after) else { return }
+            guard atMoveCount == self.uciLog.count, self.outcome == nil, self.canTakeback else { return }
+            self.pendingBlunderWarning = PendingBlunderWarning(severity: severity)
+        }
+    }
+
+    func dismissBlunderWarning() {
+        pendingBlunderWarning = nil
+    }
+
+    /// Passe par la file sérielle plutôt que d'appeler `takeback()`
+    /// directement — même raison que ``PlayViewModel/takebackAfterBlunderWarning()``.
+    func takebackAfterBlunderWarning() {
+        pendingBlunderWarning = nil
+        enqueueEngineWork { [weak self] in self?.takeback() }
+    }
+
+    /// Même contrat que ``PlayViewModel``'s équivalent privé : score en
+    /// centipions ET mat en N éventuel, du point de vue du camp au trait.
+    private func quickScore(fen: String) async -> (cp: Int, mate: Int?)? {
+        await engine.synchronize()
+        await engine.send(.position(.fen(fen)))
+        await engine.send(.go(movetime: 300))
+
+        let outcome = await EngineWatchdog.run(deadlineMs: 300 + EngineWatchdog.graceMs) {
+            [engine] () -> (cp: Int, mate: Int?)? in
+            var cp: Int?
+            var mate: Int?
+            for await response in await engine.responseStream {
+                switch response {
+                case let .info(info):
+                    guard (info.multipv ?? 1) == 1 else { break }
+                    if let value = EngineScore.moverCentipawns(info) {
+                        cp = value
+                        mate = EngineScore.mateInMoves(info)
+                    }
+                case .bestmove:
+                    if let cp { return (cp, mate) }
+                    return nil
+                default:
+                    break
+                }
+            }
+            if let cp { return (cp, mate) }
+            return nil
+        }
+
+        guard case let .finished(score) = outcome else { return nil }
+        return score
+    }
+
     // MARK: Consultation & reprise — le pattern du 24/08
 
     func review(toPly ply: Int) {
@@ -538,14 +725,19 @@ final class Chess960PlayViewModel {
         repetitionCounts = counts
         displaySquaresLog = squaresLog
         outcome = nil
+        pendingBlunderWarning = nil
         clearSelection()
         currentEvalCp = nil
         currentEvalMate = nil
+        hintMoves = []
 
         if game.board.position.sideToMove == engineColor {
             enqueueEngineWork { [weak self] in await self?.requestEngineMove() }
-        } else if settings.showEvalBar {
-            enqueueEngineWork { [weak self] in await self?.updateEvalBar() }
+        } else {
+            if settings.showEvalBar {
+                enqueueEngineWork { [weak self] in await self?.updateEvalBar() }
+            }
+            restartHintAnalysisIfWanted()
         }
     }
 

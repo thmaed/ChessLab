@@ -9148,3 +9148,72 @@ débranchement — déterministe, indépendant de la vitesse du moteur.
 730 tests unitaires verts (9 nouveaux sur la mécanique à deux, sans moteur —
 donc sans la fragilité du test au moteur réel). Suite d'interface Chess960
 complète verte (6 tests, 3 fichiers).
+
+## 25/08 — Chess960 : indice et alerte gaffe, avec leurs interrupteurs
+
+Demande de l'utilisateur : porter l'indice et l'alerte gaffe dans Chess960,
+avec des réglages pour les activer ou désactiver.
+
+### L'indice, en salve bornée plutôt qu'en analyse continue
+
+`PlayViewModel.startHintAnalysis()` tourne TANT QUE l'indice reste affiché —
+ce qui exige toute une machinerie d'interruption (`isHintAnalyzing`,
+`hintTask`, `stopHintIfNeeded`, `interruptHintAnalysisIfNeeded`) pour ne
+jamais laisser deux consommateurs se disputer `responseStream`. C'est
+EXACTEMENT la classe de défaut qui a gelé cette variante plus tôt aujourd'hui
+(`updateEvalBar` appelant la mauvaise API). Plutôt que de répliquer cette
+machinerie à l'identique — risque jugé disproportionné après DEUX défauts du
+même genre dans la même journée — l'indice Chess960 est une analyse PONCTUELLE
+et BORNÉE (~1,5 s, MultiPV 3), passée par la file sérielle comme tout le
+reste, dont le résultat est simplement JETÉ s'il arrive après que la position
+a changé (garde `hintsWanted`/`sideToMove`/`shredderFEN` revérifiée après
+coup) plutôt qu'annulé activement. Contrepartie assumée : les flèches
+n'affinent pas leur profondeur en direct, elles apparaissent une fois, au
+bout d'~1,5 s.
+
+Les flèches de roque héritent du même piège que la surbrillance du dernier
+coup — corrigées par la même fonction, `Chess960Game.displaySquares(forUCI:)`.
+
+### Un vrai bug de production trouvé en écrivant le test
+
+`checkForBlunderRetroactively` enfilait la réponse du moteur AVANT elle-même,
+inversé par rapport à `PlayViewModel.commit()`. Conséquence en jeu normal :
+la réponse du moteur (même file sérielle) aurait presque TOUJOURS fait
+échouer le garde de fraîcheur de la vérification (« aucun autre coup joué
+depuis ») avant même qu'elle s'exécute — l'alerte n'aurait quasiment jamais pu
+se déclencher. Un test au moteur réel (dame hors-jeu, 1.e4 g6 2.Dh5??) l'a
+attrapé immédiatement ; corrigé en réordonnant, comme l'original.
+
+### La VRAIE cause de la fragilité « moteur réel » de toute la journée
+
+En écrivant ces tests, ils échouaient TOUS TROIS quand Swift Testing les
+lançait en parallèle (comportement par défaut d'une suite), alors que chacun
+passe seul. Ce n'était PAS de la contention générique — `EngineSearchBudgetBenchmark`
+documente déjà la cause exacte, mot pour mot : ChessKitEngine détourne
+`stdout` comme canal UCI, une ressource GLOBALE au processus ; deux Stockfish
+concurrents se corrompent mutuellement. `@Suite(.serialized)` sur
+`Chess960PlayViewModelTests` — absent jusqu'ici — règle intégralement le
+problème : la suite COMPLÈTE (732 tests) passe maintenant SANS AUCUN flake,
+alors qu'elle en portait un depuis le premier test au moteur réel de la
+journée. Chaque fragilité « contention de la suite complète » invoquée plus
+tôt aujourd'hui pour les tests Chess960 était donc CETTE cause précise, pas
+une vague lenteur — leçon qui aurait dû être appliquée dès le premier test au
+moteur réel de la session.
+
+### Ce que ça a coûté de tester l'alerte gaffe correctement
+
+Premier jet : trois `forceMove` synchrones (e4, g6, Dh5) sans le moindre
+`await` entre eux. La tâche moteur PÉRIMÉE — déclenchée par la transition
+vers les noirs après e4, avant que g6 (forcé juste après) n'ait eu la moindre
+chance d'être VUE par elle — ne découvre son garde-fou qu'à SON tour
+d'exécution sur la file, et retombait alors sur l'état FINAL (après Dh5,
+noirs au trait) plutôt que sur l'état intermédiaire qui l'aurait neutralisée :
+elle jouait gxh5 elle-même, avant que la vérification de gaffe n'ait sa
+chance. Corrigé en laissant explicitement à cette tâche périmée le temps de
+s'auto-neutraliser (`Task.sleep(3s)`, le temps que la vérification de gaffe
+d'e4 lui-même se termine) avant le coup qui compte.
+
+### Vérifié
+
+732 tests unitaires verts — SUITE COMPLÈTE, sans flake, la première fois de la
+journée. 6 tests d'interface Chess960 verts.

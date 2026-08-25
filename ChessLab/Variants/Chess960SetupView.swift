@@ -16,6 +16,8 @@ struct Chess960SetupView: View {
     @State private var customMinutes: Int
     @State private var customIncrement: Int
     @State private var showEvalBar: Bool
+    @State private var hintsEnabled: Bool
+    @State private var blunderAlertEnabled: Bool
     @State private var positionNumber: Int
     @State private var numberField: String
     /// La rangée AFFICHÉE — reflète `positionNumber` la plupart du temps,
@@ -49,6 +51,8 @@ struct Chess960SetupView: View {
         _customMinutes = State(initialValue: saved.customMinutes)
         _customIncrement = State(initialValue: saved.customIncrementSeconds)
         _showEvalBar = State(initialValue: saved.showEvalBar)
+        _hintsEnabled = State(initialValue: saved.hintsEnabled)
+        _blunderAlertEnabled = State(initialValue: saved.blunderAlertEnabled)
         _positionNumber = State(initialValue: saved.positionNumber)
         _numberField = State(initialValue: String(saved.positionNumber))
         _editableRank = State(initialValue: Chess960Position.backRank(number: saved.positionNumber) ?? Array("RNBQKBNR"))
@@ -92,10 +96,8 @@ struct Chess960SetupView: View {
                 SettingsSection(title: "Aides", systemImage: "lifepreserver", tint: Theme.accent) {
                     VStack(alignment: .leading, spacing: 10) {
                         ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar)
-                        Text("L'indice et l'alerte gaffe arriveront dans une prochaine version du mode.")
-                            .font(.caption)
-                            .foregroundStyle(Theme.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
+                        ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled)
+                        ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled)
                     }
                 }
             }
@@ -354,6 +356,8 @@ struct Chess960SetupView: View {
         settings.customMinutes = customMinutes
         settings.customIncrementSeconds = customIncrement
         settings.showEvalBar = showEvalBar
+        settings.hintsEnabled = hintsEnabled
+        settings.blunderAlertEnabled = blunderAlertEnabled
         settings.positionNumber = positionNumber
         Chess960SettingsStore.save(settings)
         onStart(settings)

@@ -77,6 +77,28 @@ final class Chess960SetupUITests: XCTestCase {
         XCTAssertEqual(numberField.value as? String, "518")
     }
 
+    /// L'indice et l'alerte gaffe (25/08) ont chacun leur interrupteur —
+    /// désactiver « Indice » doit désactiver le bouton correspondant dans la
+    /// partie elle-même, bout en bout depuis l'écran de réglages.
+    @MainActor
+    func testDisablingHintsDisablesTheHintButtonInGame() throws {
+        let app = launchApp()
+        openChess960Setup(app)
+
+        let hintsToggle = app.switches["Indice (flèches des meilleurs coups)"]
+        XCTAssertTrue(hintsToggle.waitForExistence(timeout: 5))
+        if (hintsToggle.value as? String) != "0" {
+            hintsToggle.tap()
+        }
+        XCTAssertEqual(hintsToggle.value as? String, "0")
+
+        app.buttons["chess960_start"].tap()
+
+        let hintButton = app.buttons["Indice"]
+        XCTAssertTrue(hintButton.waitForExistence(timeout: 5))
+        XCTAssertFalse(hintButton.isEnabled, "le bouton doit rester désactivé quand l'indice est désactivé dans les réglages")
+    }
+
     /// Le pavé numérique iOS n'a nativement AUCUNE touche de fermeture —
     /// signalé par l'utilisateur : impossible de le refermer une fois ouvert.
     /// « Terminé », posé sur la barre d'accessoires du clavier, doit le

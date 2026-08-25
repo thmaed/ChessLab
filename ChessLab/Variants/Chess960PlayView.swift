@@ -18,6 +18,13 @@ struct Chess960PlayView: View {
     @State private var copiedMessage: String?
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
+    private var blunderBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.pendingBlunderWarning != nil },
+            set: { if !$0 { viewModel.dismissBlunderWarning() } }
+        )
+    }
+
     var body: some View {
         GeometryReader { geo in
             VStack(spacing: 10) {
@@ -56,6 +63,16 @@ struct Chess960PlayView: View {
         ) {
             Button("Abandonner", role: .destructive) { viewModel.userResigns() }
             Button("Annuler", role: .cancel) {}
+        }
+        .alert(
+            "Coup risqué",
+            isPresented: blunderBinding,
+            presenting: viewModel.pendingBlunderWarning
+        ) { _ in
+            Button("Ignorer", role: .cancel) { viewModel.dismissBlunderWarning() }
+            Button("Reprendre le coup", role: .destructive) { viewModel.takebackAfterBlunderWarning() }
+        } message: { pending in
+            Text(pending.message)
         }
         .alert(
             "Copié",
@@ -107,7 +124,7 @@ struct Chess960PlayView: View {
                 selectedSquare: viewModel.selectedSquare,
                 legalTargetSquares: viewModel.legalTargetSquares,
                 lastMove: viewModel.displayedLastMove,
-                hintMoves: [],
+                hintMoves: viewModel.isReviewing ? [] : viewModel.hintMoves,
                 interactionEnabled: viewModel.outcome == nil && !viewModel.isReviewing,
                 showCoordinates: true,
                 draggableColor: viewModel.userColor,
@@ -163,15 +180,15 @@ struct Chess960PlayView: View {
             canResumeFromReview: viewModel.canResumeFromReview,
             undoableResumeCount: viewModel.resumeUndo?.discardedCount,
             showMoveList: false,
-            hintsWanted: false,
-            hintsEnabled: false,
+            hintsWanted: viewModel.hintsWanted,
+            hintsEnabled: viewModel.settings.hintsEnabled,
             isFinished: viewModel.outcome != nil,
             isEngineThinking: viewModel.isEngineThinking,
             onPrevious: { viewModel.reviewPrevious() },
             onNext: { viewModel.reviewNext() },
             onResumeHere: { viewModel.resumeFromReview() },
             onUndoResume: { viewModel.cancelResumeFromReview() },
-            onToggleHint: {},
+            onToggleHint: { viewModel.toggleHint() },
             onShowMoveList: {},
             onOfferDraw: {},
             onResign: { showResignConfirmation = true }

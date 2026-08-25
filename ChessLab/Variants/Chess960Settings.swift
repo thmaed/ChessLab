@@ -12,6 +12,8 @@ struct Chess960Settings: Codable, Equatable, Hashable {
     var customMinutes: Int = 15
     var customIncrementSeconds: Int = 0
     var showEvalBar: Bool = false
+    var hintsEnabled: Bool = true
+    var blunderAlertEnabled: Bool = true
     /// Dernier numéro de Scharnagl joué — c'est lui que « Rejouer la même »
     /// relance, et il est TOUJOURS affiché pendant la partie.
     var positionNumber: Int = 518
@@ -28,6 +30,8 @@ struct Chess960Settings: Codable, Equatable, Hashable {
         customMinutes = try container.decodeIfPresent(Int.self, forKey: .customMinutes) ?? fallback.customMinutes
         customIncrementSeconds = try container.decodeIfPresent(Int.self, forKey: .customIncrementSeconds) ?? fallback.customIncrementSeconds
         showEvalBar = try container.decodeIfPresent(Bool.self, forKey: .showEvalBar) ?? fallback.showEvalBar
+        hintsEnabled = try container.decodeIfPresent(Bool.self, forKey: .hintsEnabled) ?? fallback.hintsEnabled
+        blunderAlertEnabled = try container.decodeIfPresent(Bool.self, forKey: .blunderAlertEnabled) ?? fallback.blunderAlertEnabled
         positionNumber = try container.decodeIfPresent(Int.self, forKey: .positionNumber) ?? fallback.positionNumber
         if !(0...959).contains(positionNumber) { positionNumber = fallback.positionNumber }
     }
