@@ -8877,3 +8877,52 @@ convention que les captures App Store.
 lot 2 : la reconstruction de plateau qu'exige un roque remet à zéro le
 compteur de répétitions interne de ChessKit — la nulle par répétition d'une
 partie 960 devra vivre au niveau du view model.
+
+## 25/08 — Variantes, lot 2 : le Chess960 se joue
+
+La tuile **« Variantes »** (violette, dé) est sur l'accueil — grille iPhone et
+barre latérale iPad — et ouvre le hub « Variantes d'échecs », dont le Chess960
+est la première carte.
+
+### L'écran de réglages
+
+La grammaire de « Contre l'ordinateur » (sections, chips, curseur de force,
+familles de cadence), plus la section propre à la variante : position par
+tirage aléatoire OU par numéro de Scharnagl saisissable (0-959, champ validé,
+bordure rouge sinon), aperçu de la rangée blanche en glyphes de pièces, et la
+mention explicite que la 518 est la partie classique. Le dernier numéro est
+mémorisé (`Chess960SettingsStore`, décodage défensif champ à champ) — c'est le
+« rejouer la même ». Pas de livre (pas de théorie) ; indice et alerte gaffe
+annoncés « pour une prochaine version » DANS l'écran, plutôt que absents sans
+explication.
+
+### La partie
+
+`Chess960PlayViewModel` : un view model DÉDIÉ et volontairement petit (~450
+lignes contre 1 700), la légalité venant de la couche partagée du lot 1. Le
+journal est en UCI/SAN — pas en `Move` ChessKit, qu'un roque 960 ne sait pas
+représenter. Le moteur reçoit `UCI_Chess960` + FEN Shredder et rend le roque
+en roi-prend-tour, le dialecte exact de la couche. Le GESTE de roque à
+l'écran est le même que Lichess : toucher le roi montre ses tours comme
+cibles.
+
+Repris tels quels : ChessBoardView, PlayControlBar, GameClock, EngineStrength,
+EvalBarView, PromotionPickerView, sons. Le pattern « Reprendre ici » du 24/08
+est appliqué D'ORIGINE, gardes comprises (outcome, moteur en réflexion) — pas
+de dette à rattraper. La nulle par répétition vit dans le view model (clé = 4
+champs Shredder) : le compteur interne de ChessKit ne survit pas à la
+reconstruction qu'exige un roque. PGN exporté avec les tags
+`Variant "Chess960"` / `SetUp` / `FEN`.
+
+### Vérifié
+
+713 tests verts — 6 nouveaux sur la mécanique sans moteur : journaux SAN/UCI,
+répétition, reprise et annulation avec gardes, retrait de paire, tags PGN,
+cibles de roque. 19 chaînes traduites. Le tour moteur réel (Elo, pendule,
+`UCI_Chess960`) ne se teste qu'à la main : ajouté à la checklist du tour.
+
+### Restes assumés (lot 3 et « aides »)
+
+Débranchements (Deux joueurs → Laboratoire → Analyser), indice, alerte gaffe,
+autosauvegarde, surlignage du dernier coup après un roque (le `lastMove`
+ChessKit ne peut pas le représenter — l'échiquier ne surligne pas ce coup-là).

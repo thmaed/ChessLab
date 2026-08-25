@@ -93,6 +93,10 @@ struct HomeView: View {
         /// Réglages Labo, éventuellement pré-remplis avec une position de
         /// départ venue de l'éditeur ou du scanner.
         case labSetup(startFEN: String?)
+        /// Hub des variantes d'échecs, puis le Chess960 : réglages et partie.
+        case variantsHub
+        case chess960Setup
+        case activeChess960Game(Chess960Settings)
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
@@ -105,7 +109,7 @@ struct HomeView: View {
     /// Entrées de la barre latérale iPad/Mac. Chacune enracine la colonne de
     /// détail sur l'écran d'entrée du mode correspondant (voir ``detailRoot``).
     enum SidebarItem: Hashable {
-        case vsEngine, twoPlayer, puzzles, openings, endgames, analysis, laboratory
+        case vsEngine, twoPlayer, puzzles, openings, endgames, analysis, laboratory, variants
         case progression, settings, help
     }
 
@@ -343,6 +347,7 @@ struct HomeView: View {
                 sidebarLabel(.endgames, "Finales", "crown.fill", Theme.gold)
                 sidebarLabel(.analysis, "Analyser", "chart.xyaxis.line", Theme.teal)
                 sidebarLabel(.laboratory, "Laboratoire", "flask", Theme.rose)
+                sidebarLabel(.variants, "Variantes", "die.face.5.fill", Theme.violet, accessibilityID: "sidebar_variants")
             }
             Section("Suivi") {
                 // Mêmes teintes qu'en barre d'outils iPhone : le même bouton
@@ -392,6 +397,7 @@ struct HomeView: View {
         case .endgames: destination(for: .endgameList)
         case .analysis: destination(for: .analysisEntry)
         case .laboratory: destination(for: .labSetup(startFEN: nil))
+        case .variants: destination(for: .variantsHub)
         case .progression: destination(for: .progression)
         case .settings: destination(for: .settings)
         case .help: destination(for: .help)
@@ -568,6 +574,23 @@ struct HomeView: View {
                             onUseAsLabStart: { fen in path.append(Route.labSetup(startFEN: fen)) }
                         )
                     )
+
+                case .variantsHub:
+                    VariantsHubView {
+                        path.append(Route.chess960Setup)
+                    }
+
+                case .chess960Setup:
+                    Chess960SetupView { settings in
+                        path.append(Route.activeChess960Game(settings))
+                    }
+
+                case let .activeChess960Game(settings):
+                    Chess960PlayView(
+                        viewModel: Chess960PlayViewModel(settings: settings),
+                        onExit: { path.removeLast() }
+                    )
+                    .navigationBarBackButtonHidden(false)
 
                 case .puzzleQueue:
                     PuzzleQueueView { filter in
@@ -838,6 +861,9 @@ struct HomeView: View {
                 }
                 ModeCard(title: "Laboratoire", subtitle: "L'ordinateur contre lui-même", shortSubtitle: "Face à lui-même", systemImage: "flask", tint: Theme.rose, isEnabled: true) {
                     path.append(Route.labSetup(startFEN: nil))
+                }
+                ModeCard(title: "Variantes", subtitle: "Chess960 et autres façons de jouer", shortSubtitle: "Chess960 et plus", systemImage: "die.face.5.fill", tint: Theme.violet, isEnabled: true, accessibilityID: "mode_variants") {
+                    path.append(Route.variantsHub)
                 }
             }
         }

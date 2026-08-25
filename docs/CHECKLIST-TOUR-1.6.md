@@ -89,6 +89,20 @@ Reste : la pédagogie se juge en lisant.*
 | 6.3 | Carte Laboratoire | Elle dit « Changer de mode », puis « Laboratoire » — plus aucune mention de « Continuer au Laboratoire » |
 | 6.4 | Passer l'app en anglais (Réglages ▸ Langue) et rouvrir l'aide | Tout est traduit, remerciements compris |
 
+## 7. Chess960 (nouveau — si le build embarque le lot 2)
+
+*Déjà prouvé : les règles (perft 1,2 M nœuds contre python-chess), la
+mécanique de partie sans moteur. Reste : le moteur réel et le geste.*
+
+| # | Action | Attendu |
+|---|---|---|
+| 7.1 | Accueil ▸ tuile « Variantes » ▸ Chess960 ▸ « Aléatoire » puis Commencer | Une partie démarre sur la position tirée ; le n° est dans le titre |
+| 7.2 | Saisir 518 comme numéro | L'aperçu montre la rangée classique, et la partie est une partie normale |
+| 7.3 | Jouer jusqu'au roque : toucher le roi | Les cases de SES tours sont proposées ; toucher la tour exécute le roque (roi g/c, tour f/d) |
+| 7.4 | Laisser le moteur roquer (position où il le fera) | Son roque s'affiche O-O dans le ruban, la partie continue normalement |
+| 7.5 | Elo bas vs haut, avec pendule | Le moteur joue au niveau et au rythme attendus, la pendule décompte |
+| 7.6 | Exporter le PGN et l'importer sur Lichess (analyse) | Lichess le lit : variante 960, position de départ, roques compris |
+
 ## Décisions encore ouvertes (hors tour)
 
 - `AppStoreSubmission/RELEASE_NOTES-1.4.0.md` est supprimé dans l'arbre de

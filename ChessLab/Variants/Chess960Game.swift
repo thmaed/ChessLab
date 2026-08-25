@@ -172,6 +172,48 @@ struct Chess960Game {
         return apply(.ordinary(from: from, to: to, promotion: promotion))
     }
 
+    // MARK: État de partie
+
+    /// Le camp au trait est-il en échec ? (La couche, pas ChessKit : son
+    /// `Board.state` reste `.active` après tout init — voir `attacked`.)
+    var isInCheck: Bool {
+        let mover = board.position.sideToMove
+        return isCheck(placement: String(board.position.fen.split(separator: " ")[0]), on: mover)
+    }
+
+    /// Compteur des 50 coups (demi-coups depuis pion ou prise), lu du FEN.
+    var halfmoveClock: Int {
+        let fields = board.position.fen.split(separator: " ")
+        return fields.count > 4 ? Int(fields[4]) ?? 0 : 0
+    }
+
+    /// Clé de RÉPÉTITION : les quatre premiers champs du FEN Shredder —
+    /// position, trait, droits, en passant. Le compteur vit dans le view
+    /// model : la reconstruction qu'exige un roque remet à zéro celui de
+    /// ChessKit (documenté en tête de fichier).
+    var repetitionKey: String {
+        shredderFEN.split(separator: " ").prefix(4).joined(separator: " ")
+    }
+
+    /// Fin de partie « sur l'échiquier » : mat, pat, matériel insuffisant,
+    /// 50 coups. La répétition et le temps appartiennent au view model.
+    enum BoardEnd: Equatable {
+        case checkmate(winner: Piece.Color)
+        case stalemate
+        case insufficientMaterial
+        case fiftyMoves
+    }
+
+    var boardEnd: BoardEnd? {
+        let mover = board.position.sideToMove
+        if legalMoves().isEmpty {
+            return isInCheck ? .checkmate(winner: mover.opposite) : .stalemate
+        }
+        if board.position.hasInsufficientMaterial { return .insufficientMaterial }
+        if halfmoveClock >= 100 { return .fiftyMoves }
+        return nil
+    }
+
     /// UCI (dialecte roi-prend-tour) d'un coup — surtout utile aux tests.
     func uciFor(_ move: Move) -> String {
         switch move {
