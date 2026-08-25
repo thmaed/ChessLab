@@ -1,0 +1,345 @@
+[
+ {
+  "name": "start-397",
+  "fen": "qrnbnkbr/pppppppp/8/8/8/8/PPPPPPPP/QRNBNKBR w HBhb - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 8950
+  }
+ },
+ {
+  "name": "start-564",
+  "fen": "rbbnknrq/pppppppp/8/8/8/8/PPPPPPPP/RBBNKNRQ w GAga - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 9032
+  }
+ },
+ {
+  "name": "start-177",
+  "fen": "bnrbnkrq/pppppppp/8/8/8/8/PPPPPPPP/BNRBNKRQ w GCgc - 0 1",
+  "perft": {
+   "1": 21,
+   "2": 441,
+   "3": 10179
+  }
+ },
+ {
+  "name": "start-925",
+  "fen": "rkrbqnbn/pppppppp/8/8/8/8/PPPPPPPP/RKRBQNBN w CAca - 0 1",
+  "perft": {
+   "1": 19,
+   "2": 361,
+   "3": 7729
+  }
+ },
+ {
+  "name": "start-910",
+  "fen": "rkqrnbbn/pppppppp/8/8/8/8/PPPPPPPP/RKQRNBBN w DAda - 0 1",
+  "perft": {
+   "1": 19,
+   "2": 361,
+   "3": 7782
+  }
+ },
+ {
+  "name": "start-45",
+  "fen": "nnqbrkbr/pppppppp/8/8/8/8/PPPPPPPP/NNQBRKBR w HEhe - 0 1",
+  "perft": {
+   "1": 19,
+   "2": 361,
+   "3": 7710
+  }
+ },
+ {
+  "name": "start-298",
+  "fen": "qnrkbbrn/pppppppp/8/8/8/8/PPPPPPPP/QNRKBBRN w GCgc - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 8902
+  }
+ },
+ {
+  "name": "start-938",
+  "fen": "rkrnbbqn/pppppppp/8/8/8/8/PPPPPPPP/RKRNBBQN w CAca - 0 1",
+  "perft": {
+   "1": 19,
+   "2": 361,
+   "3": 7803
+  }
+ },
+ {
+  "name": "start-864",
+  "fen": "bbqrkrnn/pppppppp/8/8/8/8/PPPPPPPP/BBQRKRNN w FDfd - 0 1",
+  "perft": {
+   "1": 19,
+   "2": 361,
+   "3": 7706
+  }
+ },
+ {
+  "name": "start-792",
+  "fen": "rbqkbnrn/pppppppp/8/8/8/8/PPPPPPPP/RBQKBNRN w GAga - 0 1",
+  "perft": {
+   "1": 19,
+   "2": 361,
+   "3": 7746
+  }
+ },
+ {
+  "name": "start-841",
+  "fen": "rknbbrqn/pppppppp/8/8/8/8/PPPPPPPP/RKNBBRQN w FAfa - 0 1",
+  "perft": {
+   "1": 19,
+   "2": 361,
+   "3": 7784
+  }
+ },
+ {
+  "name": "start-538",
+  "fen": "rnkqbbnr/pppppppp/8/8/8/8/PPPPPPPP/RNKQBBNR w HAha - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 8944
+  }
+ },
+ {
+  "name": "start-732",
+  "fen": "rbknqnbr/pppppppp/8/8/8/8/PPPPPPPP/RBKNQNBR w HAha - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 9032
+  }
+ },
+ {
+  "name": "start-388",
+  "fen": "qbbrnnkr/pppppppp/8/8/8/8/PPPPPPPP/QBBRNNKR w HDhd - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 9024
+  }
+ },
+ {
+  "name": "start-779",
+  "fen": "qrknbrnb/pppppppp/8/8/8/8/PPPPPPPP/QRKNBRNB w FBfb - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 8934
+  }
+ },
+ {
+  "name": "start-316",
+  "fen": "nbqrkrbn/pppppppp/8/8/8/8/PPPPPPPP/NBQRKRBN w FDfd - 0 1",
+  "perft": {
+   "1": 18,
+   "2": 324,
+   "3": 6630
+  }
+ },
+ {
+  "name": "start-490",
+  "fen": "qrnkbbnr/pppppppp/8/8/8/8/PPPPPPPP/QRNKBBNR w HBhb - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 9000
+  }
+ },
+ {
+  "name": "start-492",
+  "fen": "qbrnknbr/pppppppp/8/8/8/8/PPPPPPPP/QBRNKNBR w HChc - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 9030
+  }
+ },
+ {
+  "name": "start-572",
+  "fen": "rbnknrbq/pppppppp/8/8/8/8/PPPPPPPP/RBNKNRBQ w FAfa - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 8990
+  }
+ },
+ {
+  "name": "start-319",
+  "fen": "nqrkrnbb/pppppppp/8/8/8/8/PPPPPPPP/NQRKRNBB w ECec - 0 1",
+  "perft": {
+   "1": 20,
+   "2": 400,
+   "3": 8908
+  }
+ },
+ {
+  "name": "start-538-d4",
+  "fen": "rnkqbbnr/pppppppp/8/8/8/8/PPPPPPPP/RNKQBBNR w HAha - 0 1",
+  "perft": {
+   "4": 199322
+  }
+ },
+ {
+  "name": "start-177-d4",
+  "fen": "bnrbnkrq/pppppppp/8/8/8/8/PPPPPPPP/BNRBNKRQ w GCgc - 0 1",
+  "perft": {
+   "4": 233585
+  }
+ },
+ {
+  "name": "start-864-d4",
+  "fen": "bbqrkrnn/pppppppp/8/8/8/8/PPPPPPPP/BBQRKRNN w FDfd - 0 1",
+  "perft": {
+   "4": 163770
+  }
+ },
+ {
+  "name": "start-45-d4",
+  "fen": "nnqbrkbr/pppppppp/8/8/8/8/PPPPPPPP/NNQBRKBR w HEhe - 0 1",
+  "perft": {
+   "4": 163874
+  }
+ },
+ {
+  "name": "midgame-0",
+  "fen": "nrqkbn1b/ppppp1rp/5p2/6p1/PPP5/4P3/2NP1PPP/1RQKBNRB w GBb - 0 6",
+  "perft": {
+   "1": 22,
+   "2": 504,
+   "3": 12086
+  }
+ },
+ {
+  "name": "midgame-1",
+  "fen": "nrkqbbr1/p1pp1p1p/1p4pn/4p3/3P3P/2P2NP1/PP1KPP1R/NR1QBB2 b b - 1 7",
+  "perft": {
+   "1": 28,
+   "2": 810,
+   "3": 23497
+  }
+ },
+ {
+  "name": "midgame-2",
+  "fen": "nrb1krnb/1p1p2p1/3qpp2/p1p4p/P3P1P1/3P1N2/1PP2P1P/NRBQKR1B w FBfb c6 0 8",
+  "perft": {
+   "1": 29,
+   "2": 828,
+   "3": 24322
+  }
+ },
+ {
+  "name": "midgame-3",
+  "fen": "brq1nbkr/1pppp1pp/p7/2n2p2/1P3P2/Q1N5/P1PPP1PP/BR2NBKR w HBhb f6 0 5",
+  "perft": {
+   "1": 29,
+   "2": 589,
+   "3": 18648
+  }
+ },
+ {
+  "name": "midgame-4",
+  "fen": "rk1rbbq1/pnpp1ppp/6n1/1p2p3/2P1P1P1/PP5B/3P1P1P/RKRNB1QN b CAa c3 0 6",
+  "perft": {
+   "1": 27,
+   "2": 647,
+   "3": 17921
+  }
+ },
+ {
+  "name": "midgame-5",
+  "fen": "n1knqr1b/1rp1p1pp/3p4/pp3p2/2bP4/1N5Q/PPP1PPPP/1RKN1RBB w FBf - 2 7",
+  "perft": {
+   "1": 30,
+   "2": 1028,
+   "3": 32038
+  }
+ },
+ {
+  "name": "midgame-6",
+  "fen": "nn1rqbkr/1b1ppN2/ppp2ppp/8/6P1/5K2/PPPPPP1P/N1BRQB1R w hd - 2 8",
+  "perft": {
+   "1": 28,
+   "2": 512,
+   "3": 13890
+  }
+ },
+ {
+  "name": "midgame-7",
+  "fen": "qbbnnrkr/pp1ppp2/8/2p3pp/3P4/2N1PN2/PPP2PPP/QBB2RKR w HFhf h6 0 5",
+  "perft": {
+   "1": 25,
+   "2": 738,
+   "3": 18500
+  }
+ },
+ {
+  "name": "midgame-8",
+  "fen": "rkrbbn1q/pppp1ppp/6n1/4p3/1P6/P4P2/2PPP1PP/RKRBBNQN w CAca - 1 4",
+  "perft": {
+   "1": 29,
+   "2": 618,
+   "3": 18406
+  }
+ },
+ {
+  "name": "midgame-9",
+  "fen": "bnqrknrb/2ppppp1/1p6/pP5p/8/8/PBPPPPPP/1NQRKNRB w GDgd a6 0 4",
+  "perft": {
+   "1": 26,
+   "2": 647,
+   "3": 16966
+  }
+ },
+ {
+  "name": "midgame-10",
+  "fen": "qb1rkrbn/1pp1pppp/pn1p4/8/P1P5/Q7/1P1PPPPP/1BNRKRBN b FDfd - 2 4",
+  "perft": {
+   "1": 24,
+   "2": 883,
+   "3": 21283
+  }
+ },
+ {
+  "name": "midgame-11",
+  "fen": "nqr1bknr/1ppp2p1/p3pb2/5p1p/P7/1P2P3/1QPP1PPP/N1RBBKNR w HChc - 1 7",
+  "perft": {
+   "1": 29,
+   "2": 839,
+   "3": 24719
+  }
+ },
+ {
+  "name": "midgame-12",
+  "fen": "nrb2bkr/1p2pppp/p2pn3/1qp5/7P/4PP2/PPPP2PR/NRBNQBK1 w Bhb c6 0 6",
+  "perft": {
+   "1": 27,
+   "2": 808,
+   "3": 22397
+  }
+ },
+ {
+  "name": "midgame-13",
+  "fen": "rnqbkrbn/p1p1pppp/8/3p4/1p6/NPP4P/P2PPPP1/R1QBKRBN b FAfa - 1 4",
+  "perft": {
+   "1": 27,
+   "2": 592,
+   "3": 16781
+  }
+ },
+ {
+  "name": "midgame-14",
+  "fen": "q1rnkrbb/p1p1pppp/2np4/1p6/5P2/7P/PPPPPNP1/QNR1KRBB w FCfc b6 0 4",
+  "perft": {
+   "1": 24,
+   "2": 552,
+   "3": 14445
+  }
+ }
+]

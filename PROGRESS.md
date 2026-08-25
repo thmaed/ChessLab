@@ -8824,3 +8824,56 @@ décision utilisateur en attente.
 
 701 tests unitaires verts (2 régressions ajoutées, prouvées mordantes).
 78 finales auditées, verdicts intacts, 15 avertissements pédagogiques.
+
+## 25/08 — Variantes, lot 1 : la couche de règles Chess960, prouvée par perft
+
+Décisions utilisateur (25/08) : tuile « Variantes », hub « Variantes
+d'échecs », première brique Chess960 dans le style de « Contre l'ordinateur »,
+position aléatoire + n° Scharnagl saisissable, ET les débranchements
+Laboratoire / Deux joueurs / Analyser au périmètre — d'où l'exigence
+structurante du lot : la couche de règles est PARTAGÉE, pas enfouie dans un
+view model de jeu.
+
+### Ce qui est livré
+
+`Chess960Position` (les 960 départs par numéro de Scharnagl, port fidèle de
+python-chess) et `Chess960Game` : coups ordinaires délégués à ChessKit — qui
+reçoit le FEN aux droits de roque VIDES, son parseur ignorant les lettres
+Shredder sans échouer —, roque « roi prend sa tour » validé et exécuté ici
+(chirurgie de FEN), droits par colonnes de tour, FEN Shredder pour le moteur,
+UCI au dialecte `UCI_Chess960`, SAN O-O/O-O-O avec suffixe d'échec et de mat.
+
+### L'oracle, et ce qu'il a attrapé
+
+python-chess (Chess960 natif) fait autorité ; le Swift se conforme. Fixtures à
+graine fixe (`gen_chess960_fixtures.py`) : les 960 FEN de départ, 40 parties
+biaisées vers le roque rejouées coup à coup (2 400 coups, SAN et FEN comparés
+après CHACUN), et 1,245 million de nœuds perft sur 39 positions.
+
+La campagne a démasqué un no-op silencieux qui aurait survécu à toute
+relecture : le test « case attaquée » lisait `Board.state` après un
+`Board(position:)` — or ChessKit rend `.active` À L'INIT, même roi en échec ;
+l'état n'est calculé qu'après un coup. Toutes les conditions d'attaque du
+roque étaient donc vides, et le perft n'a divergé que de +40 nœuds sur
+1,2 million (position 177, un roque autorisé sous échec) : aucun test à la
+main n'aurait vu ça. La détection d'attaque est maintenant écrite ici même
+(pièces clouées comprises — elles attaquent quand même), et c'est le perft qui
+la garantit.
+
+Divergence de convention résolue au passage : python-chess n'écrit la case en
+passant que si la prise est légale, ChessKit l'écrit toujours — fixtures
+regénérées en convention FIDE (`en_passant="fen"`).
+
+### Coût en routine
+
+Perft scindé : profondeurs 1-3 dans la suite verte (~90 s — c'est la
+profondeur 3 qui a attrapé le roque-sous-échec, elle reste), profondeur 4
+(1,1 M nœuds, ~3 min 30) à la demande via `CHESS960_PERFT_FULL=1`, même
+convention que les captures App Store.
+
+### Vérifié
+
+707 tests verts (6 nouveaux dont un conditionnel). Reste connu, assumé pour le
+lot 2 : la reconstruction de plateau qu'exige un roque remet à zéro le
+compteur de répétitions interne de ChessKit — la nulle par répétition d'une
+partie 960 devra vivre au niveau du view model.
