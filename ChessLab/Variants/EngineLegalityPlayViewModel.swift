@@ -255,7 +255,14 @@ final class EngineLegalityPlayViewModel {
             return false
         }
 
-        clearResumeUndo(ifMoverIs: userColor, was: previousMover)
+        // N'IMPORTE QUEL coup — y compris une réponse moteur — invalide
+        // l'offre d'annulation d'une reprise : la restreindre au seul coup
+        // utilisateur laissait l'offre active pendant qu'un coup moteur se
+        // jouait dans la foulée, et `cancelResumeFromReview()` réinjectait
+        // alors l'ancienne suite écartée SANS tenir compte de ce coup
+        // entretemps commité, désynchronisant les journaux. Trouvé lors de
+        // la revue du 25/08/2026.
+        clearResumeUndo()
 
         let isMate = query.legalMoves.isEmpty && query.inCheck
         let san = EngineLegalitySAN.build(
@@ -732,11 +739,6 @@ final class EngineLegalityPlayViewModel {
             guard !Task.isCancelled else { return }
             self?.resumeUndo = nil
         }
-    }
-
-    private func clearResumeUndo(ifMoverIs user: Piece.Color, was mover: Piece.Color) {
-        guard mover == user, resumeUndo != nil else { return }
-        clearResumeUndo()
     }
 
     private func clearResumeUndo() {

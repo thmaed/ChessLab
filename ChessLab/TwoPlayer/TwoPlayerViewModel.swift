@@ -426,6 +426,10 @@ final class TwoPlayerViewModel {
     func completePromotion(to kind: Piece.Kind) {
         guard let pending = pendingPromotion else { return }
         pendingPromotion = nil
+        // Le drapeau a pu tomber pendant que la fenêtre de promotion était
+        // ouverte : `commit` n'a pas son propre garde-fou, il faut
+        // l'empêcher de rejouer sur une partie déjà finie.
+        guard outcome == nil else { return }
 
         var scratch = pending.scratch
         let move = scratch.completePromotion(of: pending.move, to: kind)

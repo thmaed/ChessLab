@@ -110,7 +110,12 @@ final class VariantAnalysisViewModel {
     var totalPlies: Int { uciLog.count }
 
     func review(toPly ply: Int) {
-        let clamped = max(0, min(ply, totalPlies))
+        // Borné sur `fenLog.count - 1`, pas seulement `totalPlies` : une
+        // partie SOURCE corrompue (désync `uciLog`/`fenLog`) ne doit jamais
+        // faire planter `fenLog[displayedPly]` plus bas, même si le vrai
+        // correctif vit en amont, côté vue-modèle de partie. Trouvé lors de
+        // la revue du 25/08/2026.
+        let clamped = max(0, min(ply, totalPlies, fenLog.count - 1))
         guard clamped != displayedPly else { return }
         displayedPly = clamped
         // Aucun rejeu : `fenLog` couvre déjà CHAQUE position, la navigation
@@ -298,7 +303,10 @@ final class VariantAnalysisViewModel {
 
             var verdicts: [Int: AnalysisEvalStore.MoveVerdict] = [:]
 
-            for i in 0..<self.uciLog.count {
+            // `min(..., fenLog.count - 1)` : même garde-fou qu'en
+            // ``review(toPly:)`` — une partie SOURCE corrompue ne doit
+            // jamais faire indexer `fenLog` hors bornes ici non plus.
+            for i in 0..<min(self.uciLog.count, self.fenLog.count - 1) {
                 let ply = i + 1
                 guard let mover = Position(fen: self.fenLog[i])?.sideToMove else { break }
                 guard let before = await self.rankedEval(at: i) else { break }

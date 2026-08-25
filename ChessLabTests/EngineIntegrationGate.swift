@@ -69,7 +69,16 @@ final class EngineIntegrationGate {
     /// Le correctif : ATTENDRE, après le corps du test, que les DEUX moteurs
     /// se déclarent réellement inactifs (`isProcessBusy` — l'état C++ lui-même,
     /// pas une supposition sur le timing) avant de relâcher le verrou.
-    private func waitForBothEnginesToGoIdle(timeoutMs: Int = 5000) async {
+    ///
+    /// **Budget doublé le 25/08 (nuit)** : un budget qui abandonne
+    /// silencieusement défait tout l'intérêt de cette attente — observé en
+    /// suite COMPLÈTE (tests + interface) : `racingKingsEngineReplies()` a
+    /// échoué avec `isEngineUnavailable`, cohérent avec un verrou relâché
+    /// trop tôt pendant que l'ancien moteur finissait encore sa démolition
+    /// sous charge système lourde. Aligné sur
+    /// ``EngineController/acquireEngineProcess(timeoutMs:)``, doublé au même
+    /// moment pour la même raison.
+    private func waitForBothEnginesToGoIdle(timeoutMs: Int = 10000) async {
         let deadline = Date().addingTimeInterval(Double(timeoutMs) / 1000)
         while Date() < deadline,
               StockfishEngine.isProcessBusy || FairyStockfishEngine.isProcessBusy {

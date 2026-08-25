@@ -261,7 +261,15 @@ actor EngineController {
     /// que l'instance précédente ait fini de s'arrêter. Signalé par
     /// l'utilisateur : « Course des rois... moteur indisponible » —
     /// reproductible en changeant vite de variante Fairy-Stockfish.
-    private func acquireEngineProcess(timeoutMs: Int = 4000) async -> Bool {
+    ///
+    /// **Budget doublé le 25/08 (nuit)** : observé en suite COMPLÈTE (tests +
+    /// interface, ~45 min) — un moteur précédent a mis plus de 4 s à libérer
+    /// `isProcessBusy` sous charge système lourde, faisant échouer ce garde
+    /// alors que rien n'était réellement bloqué, juste lent. Le cas normal
+    /// reste des dizaines de ms ; ce budget ne coûte donc rien au cas normal,
+    /// seulement au cas déjà dégradé — cohérent avec l'hypothèse (jamais
+    /// confirmée autrement) derrière le signalement initial de l'utilisateur.
+    private func acquireEngineProcess(timeoutMs: Int = 8000) async -> Bool {
         var attemptsLeft = max(timeoutMs / 50, 1)
         while true {
             if !FairyStockfishEngine.isProcessBusy, !StockfishEngine.isProcessBusy,

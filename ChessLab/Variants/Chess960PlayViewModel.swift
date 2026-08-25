@@ -197,6 +197,9 @@ final class Chess960PlayViewModel {
     func completePromotion(to kind: Piece.Kind) {
         guard let pending = pendingPromotion else { return }
         pendingPromotion = nil
+        // La partie a pu se terminer pendant que la fenêtre de promotion
+        // était ouverte : `commit` n'a pas son propre garde-fou.
+        guard outcome == nil else { return }
         _ = commit(uci: pending.from.notation + pending.to.notation + kind.rawValue.lowercased())
     }
 
@@ -222,7 +225,14 @@ final class Chess960PlayViewModel {
         let beforeFEN = game.shredderFEN
         let squares = game.displaySquares(forUCI: uci)
         guard let san = game.apply(uci: uci) else { return false }
-        clearResumeUndo(ifMoverIs: userColor, was: previousMover)
+        // N'IMPORTE QUEL coup — y compris une réponse moteur — invalide
+        // l'offre d'annulation d'une reprise : la restreindre au seul coup
+        // utilisateur laissait l'offre active pendant qu'un coup moteur se
+        // jouait dans la foulée, et `cancelResumeFromReview()` réinjectait
+        // alors l'ancienne suite écartée SANS tenir compte de ce coup
+        // entretemps commité, désynchronisant les journaux. Trouvé lors de
+        // la revue du 25/08/2026.
+        clearResumeUndo()
         uciLog.append(uci)
         sanLog.append(san)
         if let squares { displaySquaresLog.append(squares) }
@@ -709,11 +719,6 @@ final class Chess960PlayViewModel {
             guard !Task.isCancelled else { return }
             self?.resumeUndo = nil
         }
-    }
-
-    private func clearResumeUndo(ifMoverIs user: Piece.Color, was mover: Piece.Color) {
-        guard mover == user, resumeUndo != nil else { return }
-        clearResumeUndo()
     }
 
     private func clearResumeUndo() {

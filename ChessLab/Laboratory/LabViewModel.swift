@@ -181,13 +181,21 @@ final class LabViewModel {
                     Self.watchdogLogger.warning(
                         "Partie \(self.completed.count) interrompue (moteur muet ?) — redémarrage puis nouvelle tentative"
                     )
-                    await controller.restart(
+                    let restarted = await controller.restart(
                         coreCount: EngineController.coreCount(
                             forThreads: ThermalMonitor.shared.threads(preferred: AppSettings.recommendedEngineThreads)
                         ),
                         multipv: 1,
                         setupCommands: [.setoption(id: "Hash", value: "\(AppSettings.engineHashMB)")]
                     )
+                    guard restarted else {
+                        // Un redémarrage raté laissait la boucle continuer sur un
+                        // moteur mort jusqu'à épuiser `maxAttempts` en silence — la
+                        // série s'arrêtait sans jamais l'annoncer. Trouvé lors de
+                        // la revue du 25/08/2026.
+                        Self.watchdogLogger.warning("Redémarrage du moteur impossible — série interrompue")
+                        break
+                    }
                 }
             }
         } else {

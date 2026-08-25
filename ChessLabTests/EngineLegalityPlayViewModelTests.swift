@@ -34,7 +34,14 @@ struct EngineLegalityPlayViewModelTests {
     // régression réelle. 0 échec en isolation à chaque mesure (4/4 en ~4 s).
     private func waitReady(_ vm: EngineLegalityPlayViewModel, timeout: TimeInterval = 600) async throws {
         let deadline = Date().addingTimeInterval(timeout)
-        while Date() < deadline, !vm.isPositionReady {
+        // Sortir dès `isEngineUnavailable` : un moteur qui a VRAIMENT
+        // abandonné (budget de `acquireEngineProcess` épuisé) ne deviendra
+        // jamais prêt — poursuivre à interroger `isPositionReady` jusqu'à
+        // `deadline` gaspillait les 600 s en pure perte à chaque échec de ce
+        // genre (observé en suite complète le 25/08 : le vrai signalement
+        // « Course des rois... moteur indisponible » de l'utilisateur, voir
+        // ``EngineController/acquireEngineProcess(timeoutMs:)``).
+        while Date() < deadline, !vm.isPositionReady, !vm.isEngineUnavailable {
             try await Task.sleep(for: .milliseconds(200))
         }
         try #require(vm.isPositionReady, "la position initiale n'a jamais été prête")

@@ -163,7 +163,12 @@ enum MoveClassifier {
     /// la reprise soit vraiment le meilleur coup adverse, juste qu'elle
     /// existe et serait rentable).
     static func involvesSacrifice(move: Move, boardAfterMove: Board) -> Bool {
-        let moverValue = pieceValue(move.piece.kind)
+        // Une promotion change la pièce arrivée sur la case — `move.piece`
+        // reste le PION qui a bougé (ChessKit), donc une dame qui se
+        // sacrifie juste après sa promotion ne comptait jusqu'ici que pour
+        // un pion (valeur 1), rendant `.brilliant` inatteignable pour ces
+        // coups. Trouvé lors de la revue du 25/08/2026.
+        let moverValue = pieceValue(move.promotedPiece?.kind ?? move.piece.kind)
         let gainedValue: Int
         switch move.result {
         case let .capture(captured): gainedValue = pieceValue(captured.kind)

@@ -245,7 +245,13 @@ actor FairyEngineController {
     /// couraient l'un contre l'autre exactement pareil, le garde initial ne
     /// couvrant que l'AUTRE type de moteur — signalé par l'utilisateur
     /// (« Course des rois... moteur indisponible »).
-    private func acquireEngineProcess(timeoutMs: Int = 4000) async -> Bool {
+    ///
+    /// **Budget doublé le 25/08 (nuit)** : voir le commentaire symétrique sur
+    /// ``EngineController/acquireEngineProcess(timeoutMs:)`` — observé en
+    /// suite de tests COMPLÈTE, un moteur précédent lent à libérer
+    /// `isProcessBusy` sous charge système faisait échouer ce garde pour un
+    /// simple ralentissement, pas un vrai blocage.
+    private func acquireEngineProcess(timeoutMs: Int = 8000) async -> Bool {
         var attemptsLeft = max(timeoutMs / 50, 1)
         while true {
             if !StockfishEngine.isProcessBusy, !FairyStockfishEngine.isProcessBusy,

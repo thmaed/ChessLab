@@ -566,6 +566,11 @@ final class PlayViewModel {
     func completePromotion(to kind: Piece.Kind) {
         guard let pending = pendingPromotion else { return }
         pendingPromotion = nil
+        // La partie a pu se terminer (pat des drapeaux, abandon...) pendant
+        // que la fenêtre de promotion était ouverte : `commit` n'a pas son
+        // propre garde-fou, il faut l'empêcher de rejouer sur une partie
+        // déjà finie. Trouvé lors de la revue du 25/08/2026.
+        guard outcome == nil else { return }
 
         var scratch = pending.scratch
         let move = scratch.completePromotion(of: pending.move, to: kind)
@@ -1122,10 +1127,17 @@ final class PlayViewModel {
 
         clock?.startTurn(for: board.position.sideToMove, previousMover: previousMover)
 
+        // N'IMPORTE QUEL coup joué sur la ligne reprise — y compris une
+        // réponse immédiate du moteur — invalide l'offre d'annulation :
+        // `cancelResumeFromReview()` réinjecte l'ancienne suite écartée SANS
+        // tenir compte d'un coup entretemps commité, ce qui désynchronise
+        // `uciLog`/`fenLog`/`moveLog`. Restreindre ce nettoyage au seul
+        // coup utilisateur (comme avant) laissait l'offre active pendant
+        // qu'un coup moteur se jouait dans la foulée. Trouvé lors de la
+        // revue du 25/08/2026.
+        clearResumeUndo()
+
         if move.piece.color == userColor {
-            // L'utilisateur a joué sur la ligne reprise : il l'a acceptée,
-            // l'offre d'annulation n'a plus de sens.
-            clearResumeUndo()
             checkForBlunderRetroactively(
                 before: positionBeforeMove,
                 after: scratch.position,
