@@ -83,4 +83,49 @@ final class Chess960SessionUITests: XCTestCase {
         let final = Int(moveCount.value as? String ?? "") ?? 0
         XCTAssertGreaterThanOrEqual(final, 1, "la partie a été réinitialisée après coup")
     }
+
+    /// Lot 3, premier débranchement (25/08) : « Changer de mode » → « Deux
+    /// joueurs » depuis une partie Chess960 doit ouvrir une partie à deux
+    /// SUR LA MÊME POSITION — pas la position de départ, celle où la partie
+    /// contre l'ordinateur en était restée.
+    ///
+    /// Comparaison de FEN, PAS d'un coup rejoué : le moteur répond souvent
+    /// avant même que le débranchement ait lieu (mesuré — l'écran affichait
+    /// déjà 1…e6 au moment du tap), donc présumer le nombre de demi-coups ou
+    /// le camp au trait serait racer contre un process externe. Le FEN, lui,
+    /// est la vérité du moment — peu importe QUAND il a été atteint.
+    @MainActor
+    func testSwitchingToTwoPlayerCarriesTheCurrentPosition() throws {
+        let app = launchApp()
+        openChess960(app)
+        pushWhiteKingPawn(app)   // e2-e4 : un coup qui distingue la position du départ
+
+        let moveCount = app.otherElements["chess960_moveCount"]
+        let deadline = Date().addingTimeInterval(5)
+        while Date() < deadline, Int(moveCount.value as? String ?? "") ?? 0 < 1 {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+        }
+        XCTAssertGreaterThanOrEqual(Int(moveCount.value as? String ?? "") ?? 0, 1)
+
+        let fenBefore = app.otherElements["chess960_fen"].value as? String
+        XCTAssertNotNil(fenBefore)
+        XCTAssertNotEqual(fenBefore, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w HAha - 0 1",
+                          "le test lui-même doit avoir avancé la partie, sans quoi il ne prouve rien")
+
+        _ = app.buttons["Changer de mode"].waitForExistence(timeout: 5)
+        app.buttons["Changer de mode"].tap()
+        _ = app.buttons["Deux joueurs"].waitForExistence(timeout: 3)
+        app.buttons["Deux joueurs"].tap()
+
+        let twoPlayerFEN = app.otherElements["chess960_fen"]
+        XCTAssertTrue(twoPlayerFEN.waitForExistence(timeout: 5))
+        XCTAssertEqual(twoPlayerFEN.value as? String, fenBefore,
+                       "la partie à deux doit reprendre EXACTEMENT la position affichée, quel que soit le nombre de coups déjà joués")
+
+        // Le journal de CET écran, lui, repart forcément à vide : c'est une
+        // partie neuve du point de vue de son propre historique, même si la
+        // position de départ ne l'est pas.
+        let twoPlayerCount = app.otherElements["chess960_twoPlayer_moveCount"]
+        XCTAssertEqual(twoPlayerCount.value as? String, "0")
+    }
 }

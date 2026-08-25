@@ -9105,3 +9105,46 @@ attend l'apparition de « Terminé », le touche, vérifie sa disparition — la
 preuve que le clavier se referme VRAIMENT, pas seulement que le bouton existe.
 721 tests unitaires verts (les deux échecs rencontrés en suite complète sont
 les fragilités déjà documentées — moteur réel, pendule — vertes isolément).
+
+## 25/08 — Variantes, lot 3 (1/3) : le débranchement « Deux joueurs »
+
+Premier des trois débranchements prévus (Deux joueurs → Laboratoire →
+Analyser), dans l'ordre du moins cher au plus gros.
+
+`Chess960TwoPlayerSettings` / `Chess960TwoPlayerViewModel` /
+`Chess960TwoPlayerView` : même plan que ``Chess960PlayViewModel`` (journal
+UCI/SAN, cases affichées, répétition, consultation, « Reprendre ici » avec
+annulation) MOINS tout le moteur, PLUS la rotation face-à-face/table de
+``TwoPlayerViewModel``. Duplication ASSUMÉE — même ordre que celle, déjà
+documentée, entre `PlayViewModel` et `TwoPlayerViewModel` : deux écrans, deux
+histoires de réglages, un seul mécanisme de jeu.
+
+`Chess960PlayView` gagne son bouton violet « Changer de mode » (jusqu'ici
+absent — seul l'export y vivait). Câblage par `SessionStore`, comme
+`.activeGame`/`.activeTwoPlayerGame` — la LEÇON du gel du 25/08 appliquée
+d'origine, pas de dette à rattraper.
+
+### Un test qui s'est trompé de coupable — et ce qu'il a fallu pour le voir
+
+Le premier jet du test de débranchement présumait qu'après 1.e4, c'était aux
+noirs de jouer — RACE PERDUE contre le moteur, qui répond en général sous la
+seconde : la position réellement affichée au moment du débranchement avait
+souvent DÉJÀ la réponse noire jouée. `print()` ne remonte pas dans les
+journaux `xcodebuild` ; il a fallu forcer un échec (`XCTFail` avec
+`app.debugDescription`) pour lire la VRAIE hiérarchie d'accessibilité à
+l'écran — qui montrait e6 occupé par un pion noir, e7 vide : le moteur avait
+déjà joué. Un test isolé au niveau du view model (sans UI) a confirmé la
+mécanique elle-même était correcte du premier coup — la faute était dans
+l'hypothèse du test, pas dans le code.
+
+Corrigé en comparant des FEN plutôt qu'en rejouant un coup dont la légalité
+dépend du nombre de demi-coups déjà écoulés : un marqueur `chess960_fen`
+(même convention que `chess960_moveCount`) expose la position affichée sur
+les DEUX écrans, et le test vérifie l'égalité stricte au moment du
+débranchement — déterministe, indépendant de la vitesse du moteur.
+
+### Vérifié
+
+730 tests unitaires verts (9 nouveaux sur la mécanique à deux, sans moteur —
+donc sans la fragilité du test au moteur réel). Suite d'interface Chess960
+complète verte (6 tests, 3 fichiers).

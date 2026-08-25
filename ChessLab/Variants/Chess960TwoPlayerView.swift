@@ -1,29 +1,29 @@
 import ChessKit
 import SwiftUI
 
-/// Écran de partie Chess960 — la structure de ``PlayView`` (plateau au
-/// centre, rangées joueurs, barre de contrôle unique, menu d'export et
-/// abandon), avec le numéro de Scharnagl toujours visible : c'est l'identité
-/// de la partie, et il se partage (« essaie la 356 »).
-struct Chess960PlayView: View {
-    @Bindable var viewModel: Chess960PlayViewModel
+/// Écran de partie Chess960 à deux humains — la structure de
+/// ``Chess960PlayView`` (rangées joueurs, plateau, barre de contrôle unique,
+/// ruban de coups), avec la rotation face-à-face de ``TwoPlayerGameView``.
+struct Chess960TwoPlayerView: View {
+    @Bindable var viewModel: Chess960TwoPlayerViewModel
     let onExit: () -> Void
-    /// Débranchement vers une partie à deux humains, sur la position
-    /// AFFICHÉE — même contrat que ``PlayView``. `nil` = pas encore câblé
-    /// (lots suivants pour Laboratoire et Analyser).
-    var onOpenTwoPlayer: (String) -> Void = { _ in }
 
     @State private var appSettings = AppSettings.shared
     @State private var showResignConfirmation = false
+    @State private var showDrawConfirmation = false
     @State private var copiedMessage: String?
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
+    private var topColor: Piece.Color { viewModel.orientation.opposite }
+    private var bottomColor: Piece.Color { viewModel.orientation }
+    private var isTabletopMode: Bool { viewModel.settings.rotationMode == .tabletop }
 
     var body: some View {
         GeometryReader { geo in
             VStack(spacing: 10) {
-                playerRow(for: viewModel.engineColor)
+                playerRow(for: topColor, atTop: true)
                 boardBlock(size: geo.size)
-                playerRow(for: viewModel.userColor)
+                playerRow(for: bottomColor, atTop: false)
                 if let outcome = viewModel.outcome {
                     outcomeBanner(outcome)
                 }
@@ -37,24 +37,34 @@ struct Chess960PlayView: View {
             .background(fenMarker)
         }
         .appBackground()
-        .navigationTitle("Chess960 · n° \(viewModel.settings.positionNumber)")
+        .navigationTitle("Deux joueurs — Chess960")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {
-            ToolbarItemGroup(placement: .navigationBarTrailing) {
-                exportMenu
-                QuickSwitchMenu(onOpenTwoPlayer: { onOpenTwoPlayer(viewModel.displayedFEN) })
-            }
+            ToolbarItem(placement: .navigationBarTrailing) { exportMenu }
         }
-        .onAppear { viewModel.start() }
+        .onAppear { viewModel.handleViewAppear() }
         .onDisappear { viewModel.handleViewDisappear() }
         .confirmationDialog(
-            "Abandonner la partie ?",
+            "Qui abandonne ?",
             isPresented: $showResignConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Abandonner", role: .destructive) { viewModel.userResigns() }
+            Button("\(viewModel.settings.whiteName) (\(LocalizationController.string("Blancs")))", role: .destructive) {
+                viewModel.resign(.white)
+            }
+            Button("\(viewModel.settings.blackName) (\(LocalizationController.string("Noirs")))", role: .destructive) {
+                viewModel.resign(.black)
+            }
+            Button("Annuler", role: .cancel) {}
+        }
+        .confirmationDialog(
+            "Les deux joueurs sont d'accord pour la nulle ?",
+            isPresented: $showDrawConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Confirmer la nulle") { viewModel.agreeToDraw() }
             Button("Annuler", role: .cancel) {}
         }
         .alert(
@@ -67,26 +77,10 @@ struct Chess960PlayView: View {
         }
         .overlay {
             if let pending = viewModel.pendingPromotion {
-                PromotionPickerView(color: viewModel.userColor) { kind in
+                PromotionPickerView(color: viewModel.displayedBoard.position.sideToMove) { kind in
                     _ = pending
                     viewModel.completePromotion(to: kind)
                 }
-            }
-        }
-        // AU-DESSUS de tout (`.overlay`, pas un frère de niveau supérieur) :
-        // un `if` de dernier niveau après une longue chaîne de modificateurs
-        // compile (le corps d'une vue est un ViewBuilder implicite) mais ne
-        // se superpose PAS au reste — sans conteneur explicite, SwiftUI n'a
-        // aucune règle d'empilement à appliquer. Défaut sans conséquence
-        // visible tant que le moteur démarre (cas normal), mais faux malgré
-        // tout : corrigé au passage du 25/08.
-        .overlay {
-            if viewModel.isEngineUnavailable {
-                EngineUnavailableBanner(
-                    message: "L'ordinateur n'a pas démarré : il ne jouera pas.",
-                    isRetrying: false,
-                    onRetry: {}
-                )
             }
         }
     }
@@ -95,46 +89,45 @@ struct Chess960PlayView: View {
 
     private func boardBlock(size: CGSize) -> some View {
         let side = min(size.width - 24, size.height * (dynamicTypeSize.isAccessibilitySize ? 0.5 : 0.62))
-        return VStack(spacing: 8) {
-            if viewModel.settings.showEvalBar {
-                EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
-                    .frame(width: side)
-            }
-            ChessBoardView(
-                board: viewModel.displayedBoard,
-                orientation: viewModel.userColor,
-                theme: appSettings.boardTheme,
-                selectedSquare: viewModel.selectedSquare,
-                legalTargetSquares: viewModel.legalTargetSquares,
-                lastMove: viewModel.displayedLastMove,
-                hintMoves: [],
-                interactionEnabled: viewModel.outcome == nil && !viewModel.isReviewing,
-                showCoordinates: true,
-                draggableColor: viewModel.userColor,
-                onTapSquare: { viewModel.selectSquare($0) },
-                onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) }
-            )
-            .frame(width: side, height: side)
-        }
+        return ChessBoardView(
+            board: viewModel.displayedBoard,
+            orientation: viewModel.orientation,
+            theme: appSettings.boardTheme,
+            selectedSquare: viewModel.selectedSquare,
+            legalTargetSquares: viewModel.legalTargetSquares,
+            lastMove: viewModel.displayedLastMove,
+            hintMoves: [],
+            interactionEnabled: viewModel.outcome == nil && !viewModel.isReviewing,
+            showCoordinates: true,
+            // Tous côté haut, aucune restriction — les DEUX camps sont
+            // « l'utilisateur », comme dans TwoPlayerGameView.
+            allPiecesRotated: isTabletopMode && !viewModel.isReviewing
+                && viewModel.displayedBoard.position.sideToMove == topColor,
+            draggableColor: nil,
+            onTapSquare: { viewModel.selectSquare($0) },
+            onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) }
+        )
+        .frame(width: side, height: side)
         .frame(maxWidth: .infinity)
     }
 
-    private func playerRow(for color: Piece.Color) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: color == viewModel.engineColor ? "cpu" : "person.fill")
+    private func playerRow(for color: Piece.Color, atTop: Bool) -> some View {
+        let name = color == .white ? viewModel.settings.whiteName : viewModel.settings.blackName
+        return HStack(spacing: 10) {
+            Image(systemName: "person.fill")
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(color == viewModel.engineColor ? Theme.accent : Theme.info)
-            Text(color == viewModel.engineColor
-                 ? LocalizationController.string("Ordinateur")
-                 : LocalizationController.string("Vous"))
+                .foregroundStyle(color == .white ? Theme.info : Theme.violet)
+            Text(name)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Theme.textPrimary)
-            if color == viewModel.engineColor, viewModel.isEngineThinking {
-                ProgressView().controlSize(.mini).tint(Theme.textSecondary)
-            }
+                // En mode table, le HUD du joueur du haut se lit à l'endroit
+                // depuis SA place, face à l'appareil — même logique que
+                // TwoPlayerGameView.
+                .rotationEffect(.degrees(isTabletopMode && atTop ? 180 : 0))
             Spacer()
             if let clock = viewModel.clock {
                 ClockLabel(clock: clock, color: color)
+                    .rotationEffect(.degrees(isTabletopMode && atTop ? 180 : 0))
             }
         }
         .padding(.horizontal, 12)
@@ -145,7 +138,7 @@ struct Chess960PlayView: View {
     private func outcomeBanner(_ outcome: GameOutcome) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "flag.checkered")
-            Text(outcome.summary(userColor: viewModel.userColor))
+            Text(outcome.summary(whiteName: viewModel.settings.whiteName, blackName: viewModel.settings.blackName))
                 .font(.subheadline.weight(.semibold))
         }
         .foregroundStyle(Theme.textPrimary)
@@ -166,19 +159,18 @@ struct Chess960PlayView: View {
             hintsWanted: false,
             hintsEnabled: false,
             isFinished: viewModel.outcome != nil,
-            isEngineThinking: viewModel.isEngineThinking,
+            isEngineThinking: false,
             onPrevious: { viewModel.reviewPrevious() },
             onNext: { viewModel.reviewNext() },
             onResumeHere: { viewModel.resumeFromReview() },
             onUndoResume: { viewModel.cancelResumeFromReview() },
             onToggleHint: {},
             onShowMoveList: {},
-            onOfferDraw: {},
+            onOfferDraw: { showDrawConfirmation = true },
             onResign: { showResignConfirmation = true }
         )
     }
 
-    /// Ruban des coups joués, défilant, dernier coup en tête de lecture.
     private var movesStrip: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
@@ -209,7 +201,7 @@ struct Chess960PlayView: View {
         }
     }
 
-    // MARK: Export — uniquement de l'export, comme partout depuis le 24/08
+    // MARK: Export
 
     private var exportMenu: some View {
         Menu {
@@ -238,23 +230,12 @@ struct Chess960PlayView: View {
         .accessibilityLabel("Exporter")
     }
 
-    /// Marqueur invisible exposant le nombre de coups joués, pour les tests
-    /// d'interface — même convention que ``PlayView/moveCountMarker``. C'est
-    /// lui qui prouve qu'un coup S'EST BIEN JOUÉ : le défaut du 25/08
-    /// (chaque rendu recréait le view model) remettait la partie à zéro sans
-    /// que rien à l'écran ne le crie — ni erreur, ni écran figé, juste un
-    /// coup qui semblait avaler.
     private var moveCountMarker: some View {
         Color.clear
-            .accessibilityIdentifier("chess960_moveCount")
+            .accessibilityIdentifier("chess960_twoPlayer_moveCount")
             .accessibilityValue("\(viewModel.totalPlies)")
     }
 
-    /// Le FEN affiché — pour les tests d'interface qui vérifient qu'un
-    /// débranchement (« Changer de mode ») emporte bien LA POSITION EXACTE,
-    /// sans présumer du nombre de demi-coups déjà joués (le moteur peut avoir
-    /// déjà répondu). Comparer deux FEN est déterministe ; rejouer un coup
-    /// supplémentaire pour le vérifier ne l'est pas.
     private var fenMarker: some View {
         Color.clear
             .accessibilityIdentifier("chess960_fen")
@@ -262,7 +243,6 @@ struct Chess960PlayView: View {
     }
 }
 
-/// Pendule d'un camp — lecture seule, rafraîchie par l'horloge observable.
 private struct ClockLabel: View {
     let clock: GameClock
     let color: Piece.Color

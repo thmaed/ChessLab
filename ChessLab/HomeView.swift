@@ -97,6 +97,12 @@ struct HomeView: View {
         case variantsHub
         case chess960Setup
         case activeChess960Game(Chess960Settings)
+        /// Débranchement « Deux joueurs » depuis une partie Chess960 —
+        /// la position affichée devient le départ d'une partie neuve, sans
+        /// écran de réglages intermédiaire (même esprit que
+        /// `continueTwoPlayer`, mais la variante n'a pas encore de réglages
+        /// à choisir : noms et cadence restent ceux par défaut).
+        case activeChess960TwoPlayerGame(Chess960TwoPlayerSettings)
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
@@ -588,6 +594,13 @@ struct HomeView: View {
                 case let .activeChess960Game(settings):
                     Chess960ActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
                         path = NavigationPath()
+                    } onOpenTwoPlayer: { fen in
+                        startNewChess960TwoPlayerGame(fromFEN: fen)
+                    }
+
+                case let .activeChess960TwoPlayerGame(settings):
+                    Chess960TwoPlayerActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
+                        path = NavigationPath()
                     }
 
                 case .puzzleQueue:
@@ -772,6 +785,17 @@ struct HomeView: View {
     private func startNewChess960Game(_ settings: Chess960Settings) {
         sessionStore.remove(sessionKey(for: .activeChess960Game(settings)))
         path.append(Route.activeChess960Game(settings))
+    }
+
+    /// Débranchement « Deux joueurs » depuis une partie Chess960 en cours :
+    /// pas d'écran de réglages, la position affichée EST le départ — les
+    /// deux noms restent les défauts (« Blancs »/« Noirs »), modifiables
+    /// nulle part pour l'instant (aucun écran de réglages Chess960 à deux
+    /// n'existe encore, ce mode n'étant atteignable que par débranchement).
+    private func startNewChess960TwoPlayerGame(fromFEN fen: String) {
+        let settings = Chess960TwoPlayerSettings(startFEN: fen)
+        sessionStore.remove(sessionKey(for: .activeChess960TwoPlayerGame(settings)))
+        path.append(Route.activeChess960TwoPlayerGame(settings))
     }
 
     /// Idem pour le mode deux joueurs.
@@ -1328,13 +1352,14 @@ private struct Chess960ActiveGameHost: View {
     let settings: Chess960Settings
     let sessionKey: String
     let onExit: () -> Void
+    var onOpenTwoPlayer: (String) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: Chess960PlayViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                Chess960PlayView(viewModel: viewModel, onExit: onExit)
+                Chess960PlayView(viewModel: viewModel, onExit: onExit, onOpenTwoPlayer: onOpenTwoPlayer)
             } else {
                 Color.clear
             }
@@ -1343,6 +1368,31 @@ private struct Chess960ActiveGameHost: View {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
                     Chess960PlayViewModel(settings: settings)
+                }
+            }
+        }
+    }
+}
+
+private struct Chess960TwoPlayerActiveGameHost: View {
+    let settings: Chess960TwoPlayerSettings
+    let sessionKey: String
+    let onExit: () -> Void
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: Chess960TwoPlayerViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                Chess960TwoPlayerView(viewModel: viewModel, onExit: onExit)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    Chess960TwoPlayerViewModel(settings: settings)
                 }
             }
         }
