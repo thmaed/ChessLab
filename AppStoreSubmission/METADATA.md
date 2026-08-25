@@ -1,81 +1,57 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 1.5.0** (build 7). Voir `RELEASE_NOTES-1.5.0.md` pour le détail complet des changements depuis la 1.2.
+**Version courante : 1.6.0** (build à fixer — voir « Version et build » plus bas). Voir `RELEASE_NOTES-1.6.0.md` pour le détail complet des changements depuis la 1.5.
 
 Tout ce qui suit est à copier-coller directement dans les champs correspondants d'App Store Connect. Les limites de caractères d'Apple sont respectées (vérifiées).
 
 > **Convention d'édition** : dans les blocs à coller, JAMAIS de retour à la ligne à l'intérieur d'un paragraphe — App Store Connect rend chaque saut de ligne tel quel, une césure à 78 colonnes hacherait le texte sur la fiche. Une ligne par paragraphe ; les titres EN CAPITALES gardent leur propre ligne.
 
-> **Pour cette mise à jour**, quatre champs demandent une action : **Nouveautés de cette version** (ci-dessous, obligatoire), le numéro de build, et la **description**, qui a été complétée deux fois depuis la 1.2 : la 1.4 y a ajouté les répertoires personnels (importer et partager les siens), la 1.5 doit y ajouter le module Finales — 77 cours prouvés par table de finales et l'entraînement libre, l'argument le plus différenciant de l'app ; vérifier le bloc « LE COIN DES FINALES » de la description ci-dessous avant de coller. Le **texte promotionnel** reste valable ; nom, sous-titre, mots-clés et catégories aussi.
+> **Pour cette mise à jour**, trois champs demandent une action : **Nouveautés de cette version** (ci-dessous, obligatoire), le numéro de build (voir « Version et build » — `CURRENT_PROJECT_VERSION` vaut `8.1` dans le projet, à corriger avant de soumettre), et la **description**, qui gagne un bloc VARIANTES (Chess960 + trois variantes Fairy-Stockfish) et voit son compte de cours de finales passer de 77 à 78 (« Pions électriques »). Le **texte promotionnel** est mis à jour pour le même compte ; nom, sous-titre, mots-clés et catégories restent valables.
 
 ---
 
-## Nouveautés de cette version — 1.5 (4000 car. max)
+## Nouveautés de cette version — 1.6 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> ✅ **La 1.5.0 (build 7) a été SOUMISE ET VALIDÉE par Apple le 20/08/2026.** Elle est en ligne. Ce texte couvrait 1.2 → 1.5 : ni la 1.3 ni la 1.4 n'avaient été soumises, le build précédent en ligne étant le build 3 de la 1.2 (commit `a211763`), si bien que les utilisateurs sont passés directement de la 1.2 à la 1.5. Conservé tel quel comme document de la soumission effectuée. **Point de départ de la prochaine version : 1.5.0 build 7, en ligne.**
+> ⏳ **Pas encore soumise.** Ce texte couvre 1.5 → 1.6 (20 → 25/08/2026). Point de départ : 1.5.0 build 7, en ligne depuis le 20/08/2026.
 
-### Français (2500 car. — limite 4 000)
+### Français (1456 car. — limite 4 000)
 
 ```
-NOUVEAU : LE MODULE FINALES — 77 COURS PROUVÉS
-De l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…), 77 cours groupés en neuf familles pour enfin convertir vos finales. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchro iCloud, comme les ouvertures.
+NOUVEAU : LE MODULE VARIANTES
+Chess960 (les échecs Fischer Random) rejoint l'app : position de départ aléatoire, choisie par numéro (0-959), ou composée vous-même. Jouez contre l'ordinateur ou à deux, avec une analyse de fin de partie complète, comme en mode « Jouer ». Trois variantes de plus, présentées en tuiles : Roi de la colline, Trois échecs et Horde — chacune contre l'ordinateur avec indice, alerte gaffe et barre d'évaluation.
 
-ENTRAÎNEMENT LIBRE DES FINALES
-Concluez la position contre la meilleure défense : tout coup qui préserve le verdict est accepté — pas seulement celui de la leçon. Un coup qui lâche le gain est repris, meilleur coup à l'appui, et « conversion propre » se mérite.
+OUVERTURES : UN NOUVEAU LECTEUR
+L'index devient un arbre des lignes : chaque coup n'apparaît qu'une fois. Sous un échiquier fixe : les coups joués par les maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish, et une barre d'évaluation — tout précalculé, jamais d'attente.
 
-VOS PROPRES RÉPERTOIRES D'OUVERTURES
-Importez un répertoire au format PGN — variantes comprises — entraînez-le en répétition espacée, modifiez-le dans l'app et partagez-le d'un simple fichier, sans compte ni serveur.
+FINALES : 78 COURS, ET UNE RECHERCHE
+« Pions électriques » rejoint le catalogue. Une leçon corrigée (le pion passé éloigné), et un champ de recherche par nom, comme dans Ouvertures.
 
-LES 58 OUVERTURES COMPLÉTÉES ET RELUES
-Près de 900 positions ajoutées : les réponses que les joueurs de club jouent vraiment (la London contre les défenses au 1.d4, la Philidor, la Petroff…). Et chaque coup du catalogue est rejoué sous Stockfish avant publication.
-
-LES MODES SE PARLENT
-« Changer de mode » bascule vers le Laboratoire, l'ordinateur ou une partie à deux en emportant la position affichée — depuis un puzzle, un cours ou une partie. Le menu d'export envoie aussi la position vers l'analyse ; votre partie vous attend au retour.
-
-ANALYSE PLUS SÛRE ET PLUS JUSTE
-Les verdicts limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés : 85 % d'erreurs d'étiquette en moins. Le score de précision ne se laisse plus gonfler par les positions déjà gagnées, et l'app explique POURQUOI un coup est une erreur. « Analyser PGN / FEN » reconnaît tout seul ce que contient votre presse-papiers.
-
-PUZZLES
-Un seul essai par défaut, comme un vrai exercice de calcul (trois essais disponibles dans les Réglages). Bilan par thème, et sets ciblés sur vos faiblesses depuis l'écran Progrès — désormais filtrable sur 7 ou 30 jours.
-
-L'ÉCHIQUIER RÉPOND ENFIN AU DOIGT
-Correctif majeur pour iOS 18, où aucune pièce ne répondait au toucher. Et partout : relâcher une pièce un peu à côté joue quand même le coup, la case visée s'allume pendant le glissement.
+LES MODES SE PARLENT, AU MÊME ENDROIT PARTOUT
+« Changer de mode » — qui bascule vers le Laboratoire, l'ordinateur ou une partie à deux en emportant la position affichée — a désormais la même apparence sur les neuf écrans concernés, au lieu d'être caché dans un menu d'export.
 
 ET AUSSI
-Stockfish 17.1. Bibliothèque sans doublons, suppression de parties. Lecteur d'ouvertures à plateau ancré. Aide accessible depuis l'accueil. iPhone en portrait, iPad en pleine page, plus aucun débordement de texte.
+Reprendre un coup consulté agit dès le premier appui, avec une annulation à disposition. Le thème du plateau ne se choisit plus que dans les Réglages. Le Laboratoire explique chaque statistique d'un tap. Et une installation neuve pèse 60 Mo au lieu de 175.
 ```
 
-### English (2335 char. — 4,000 limit)
+### English (1343 char. — 4,000 limit)
 
 ```
-NEW: THE ENDGAMES MODULE — 77 PROVEN COURSES
-From the opposition to the Lucena, from fortresses to famous studies (Lasker, Troitsky, Kubbel…), 77 courses in nine families to finally convert your endings. Every line is verified against endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. Spaced repetition and iCloud sync, like the openings.
+NEW: THE VARIANTS MODULE
+Chess960 (Fischer Random Chess) joins the app: a randomly drawn starting position, one chosen by number (0-959), or one you compose yourself. Play against the computer or two players, with a full post-game analysis, just like "Play" mode. Three more variants, in a tile-based hub: King of the Hill, Three-Check and Horde — each against the computer with hints, blunder alerts and an eval bar.
 
-FREE ENDGAME TRAINING
-Finish the position against best defence: any move that preserves the verdict is accepted — not just the lesson's move. A move that lets the win slip is taken back, best move shown, and "clean conversion" has to be earned.
+OPENINGS: A NEW READER
+The index becomes a tree of lines: every move appears only once. Under a fixed board: the moves masters actually played with their percentages, Stockfish's top three moves, and an eval bar — all precomputed, never a wait.
 
-YOUR OWN OPENING REPERTOIRES
-Import a repertoire as PGN — variations included — drill it with spaced repetition, edit it in the app and share it as a single file, no account and no server.
+ENDGAMES: 78 COURSES, AND A SEARCH FIELD
+"Electric Pawns" joins the catalogue. A fixed lesson (the distant passed pawn), and a search-by-name field, just like Openings.
 
-ALL 58 OPENINGS EXPANDED AND REVIEWED
-Nearly 900 positions added: the replies club players actually play (the London against 1.d4 defences, the Philidor, the Petroff…). And every move in the catalogue is replayed under Stockfish before release.
-
-THE MODES TALK TO EACH OTHER
-"Switch mode" jumps to the Laboratory, the computer or a two-player game, carrying the displayed position along — from a puzzle, a course or a game. The export menu also sends the position to analysis; your game is waiting when you come back.
-
-SAFER, FAIRER ANALYSIS
-Borderline verdicts are re-examined with ten times the effort before being labelled: 85% fewer mislabels. The accuracy score is no longer inflated by already-won positions, and the app explains WHY a move is a mistake. "Analyse PGN / FEN" recognises what's in your clipboard by itself.
-
-PUZZLES
-One attempt by default, the way a calculation exercise should work (three attempts available in Settings). Reports by theme, and targeted sets on your weaknesses from the Progress screen — now filterable to 7 or 30 days.
-
-THE BOARD FINALLY ANSWERS YOUR FINGER
-Major fix for iOS 18, where no piece responded to touch. And everywhere: releasing a piece slightly off-square still plays the move, and the target square lights up while you drag.
+THE MODES TALK TO EACH OTHER, THE SAME WAY EVERYWHERE
+"Switch mode" — which jumps to the Laboratory, the computer or a two-player game while carrying the displayed position along — now looks the same across all nine relevant screens, instead of being buried in an export menu.
 
 ALSO
-Stockfish 17.1. Duplicate-free library with game deletion. Opening reader with an anchored board. Help reachable from the home screen. iPhone in portrait, iPad full-page sheets, no text overflow anywhere.
+Resuming a reviewed move now acts on the first tap, with an undo available. The board theme is now chosen only in Settings. The Laboratory explains each statistic with a tap. And a fresh install now takes 60MB instead of 175.
 ```
 
 ---
@@ -99,7 +75,7 @@ stockfish,tactique,ouverture,puzzle,gambit,fen,pgn,elo,entrainement,scanner,anal
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
 ```
-Analysez vos parties, scannez un échiquier : 58 ouvertures, 77 finales prouvées, 100 000+ puzzles, l'ordinateur en face — 100% local.
+Analysez vos parties, scannez un échiquier : 58 ouvertures, 78 finales prouvées, Chess960 et 3 variantes, 100 000+ puzzles — 100% local.
 ```
 
 **Description** (4000 car. max) :
@@ -119,7 +95,10 @@ OUVERTURES
 Choisissez une ouverture et avancez coup par coup : chaque coup est expliqué, les variantes sont proposées, et des flèches colorées relient le plateau à la liste des coups. 58 ouvertures rédigées à la main (bilingues), toutes relues au moteur, avec un entraînement en répétition espacée simplifié pour les mémoriser.
 
 LE COIN DES FINALES
-77 cours prouvés par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Neuf familles, de l'opposition aux études célèbres. Et l'entraînement libre : concluez la position contre la meilleure défense, tout coup qui préserve le verdict est accepté — pas seulement celui de la leçon.
+78 cours prouvés par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Neuf familles, de l'opposition aux études célèbres. Et l'entraînement libre : concluez la position contre la meilleure défense, tout coup qui préserve le verdict est accepté — pas seulement celui de la leçon.
+
+VARIANTES
+Chess960 (les échecs Fischer Random) : position de départ aléatoire, choisie par numéro, ou composée soi-même, avec la même analyse de fin de partie qu'en mode « Jouer ». Trois variantes de plus contre l'ordinateur : Roi de la colline, Trois échecs et Horde.
 
 VOS PROPRES RÉPERTOIRES
 Importez vos ouvertures au format PGN, variantes comprises, et entraînez-les avec le même système. Partagez un répertoire par simple fichier — aucun compte, aucun serveur. Ce que vous avez déjà mémorisé sur une position vaut aussitôt dans le répertoire importé.
@@ -166,7 +145,7 @@ stockfish,tactics,openings,puzzle,gambit,fen,pgn,elo,training,scanner,analysis,o
 
 **Promotional text** (170 char. max):
 ```
-Analyze your games, scan a chessboard: 58 openings, 77 proven endgames, 100,000+ puzzles, the computer to beat — fully offline, no ads.
+Analyze your games, scan a chessboard: 58 openings, 78 proven endgames, Chess960 and 3 variants, 100,000+ puzzles — fully offline, no ads.
 ```
 
 **Description** (4000 char. max):
@@ -186,7 +165,10 @@ OPENINGS
 Pick an opening and step through it move by move: every move is explained, the alternatives are offered, and colored arrows link the board to the move list. 58 hand-written openings (bilingual), all reviewed by the engine, with simplified spaced-repetition training to memorize them.
 
 THE ENDGAME CORNER
-77 courses proven by endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. Nine families, from the opposition to famous studies. And free training: finish the position against best defence, where any move that preserves the verdict is accepted — not just the lesson's move.
+78 courses proven by endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. Nine families, from the opposition to famous studies. And free training: finish the position against best defence, where any move that preserves the verdict is accepted — not just the lesson's move.
+
+VARIANTS
+Chess960 (Fischer Random Chess): a randomly drawn starting position, one chosen by number, or one you compose yourself, with a full post-game analysis just like "Play" mode. Three more variants against the computer: King of the Hill, Three-Check and Horde.
 
 YOUR OWN REPERTOIRES
 Import your openings as PGN, variations included, and drill them with the same system. Share a repertoire as a single file — no account, no server. What you already know about a position counts right away in the imported repertoire.
@@ -246,11 +228,11 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**1.5.0, build 7** — nouveautés détaillées dans `RELEASE_NOTES-1.5.0.md`, et le texte prêt à coller est la section « Nouveautés de cette version » en haut de ce fichier.
+**1.6.0, build à corriger avant soumission** — nouveautés détaillées dans `RELEASE_NOTES-1.6.0.md`, et le texte prêt à coller est la section « Nouveautés de cette version » en haut de ce fichier.
 
-Vérifié dans `ChessLab.xcodeproj/project.pbxproj` (19/08/2026) : la cible applicative (`com.chesslab.ChessLab`) porte bien `MARKETING_VERSION = 1.5.0` et `CURRENT_PROJECT_VERSION = 7` **aux deux configurations**, Debug et Release.
+Vérifié dans `ChessLab.xcodeproj/project.pbxproj` (25/08/2026) : la cible applicative (`com.chesslab.ChessLab`) porte `MARKETING_VERSION = 1.6` aux deux configurations, Debug et Release — correct. Mais `CURRENT_PROJECT_VERSION = 8.1` **aux deux configurations**, ce qui n'est probablement pas volontaire : le dernier build réellement soumis était le 7 (1.5.0). App Store Connect exige un entier (ou une liste d'entiers séparés par des points) strictement supérieur au dernier build soumis — `8` conviendrait, `8.1` est à vérifier avant de soumettre.
 
-✅ **1.5.0 build 7 : soumise et validée le 20/08/2026, en ligne.** Elle succède directement au build 3 de la 1.2 (commit `a211763`) : ni la 1.3 ni la 1.4 n'avaient été soumises. Le build 5 / 1.3.0 puis le build 6 / 1.4.0 ont été préparés puis dépassés par le rythme du développement ; on saute directement à la 1.5. Les nouveautés des 1.3 ET 1.4 sont donc annoncées dans le texte « Nouveautés » de la 1.5 — sans quoi personne ne les verrait jamais.
+⏳ **1.6.0 : pas encore soumise.** Succède au build 7 de la 1.5.0, en ligne depuis le 20/08/2026.
 
 Les cibles de TEST (`ChessLabTests`, `ChessLabUITests`) sont restées en `1.2.0` / build 3. **Sans effet sur la soumission** : leurs bundles ne sont pas livrés. À aligner un jour par propreté, pas avant d'expédier.
 
@@ -270,6 +252,7 @@ git push origin main
 Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) : soumettre sans pousser publierait un binaire dont les sources annoncées ne correspondent pas.
 
 ### Historique des versions
+- **1.6.0** — pas encore soumise : module Variantes (Chess960 complet + trois variantes Fairy-Stockfish), nouveau lecteur d'Ouvertures en arbre, Finales à 78 cours avec recherche, « Changer de mode » uniformisé sur neuf écrans, stockage allégé (175 → 60 Mo) (`RELEASE_NOTES-1.6.0.md` — couvre 1.5 → 1.6).
 - **1.5.0** — module Finales (77 cours prouvés par tablebase, 9 familles), entraînement libre arbitré au verdict, correctif majeur iOS 18, ~900 positions ajoutées aux ouvertures, verdicts d'analyse affinés, sélecteur « Changer de mode » avec reprise de position, Stockfish 17.1 (`RELEASE_NOTES-1.5.0.md` — couvre 1.2 → 1.5).
 - **1.4.0** — préparée, **jamais soumise** : répertoires d'ouvertures personnels (import PGN + partage par fichier), les 58 ouvertures relues au moteur, un seul essai par puzzle, lecteur d'ouvertures à plateau ancré (`RELEASE_NOTES-1.4.0.md`, conservé comme document historique). Son contenu est livré avec la 1.5.
 - **1.3.0** — préparée, **jamais soumise** : échiquier tolérant au doigt, score de précision recalibré, revue d'analyse fiabilisée, iPhone en portrait. Son contenu est livré avec la 1.4 ; aucune note de version distincte n'a été rédigée.

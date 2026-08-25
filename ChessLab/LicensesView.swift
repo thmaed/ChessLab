@@ -5,8 +5,8 @@ import SwiftUI
 /// Existe pour deux raisons à la fois : honorer l'attribution requise par
 /// la licence CC BY-SA des pièces cburnett, et rendre visibles — donc
 /// difficiles à ignorer en revue — les mentions de copyright GPLv3 de
-/// Stockfish (voir le README, section licence, pour le détail des
-/// obligations). Écran volontairement séparé de ``HelpView`` : l'un
+/// Stockfish ET de Fairy-Stockfish (voir le README, section licence, pour
+/// le détail des obligations). Écran volontairement séparé de ``HelpView`` : l'un
 /// explique l'app, l'autre ce qu'elle embarque.
 struct LicensesView: View {
     private struct Entry: Identifiable {
@@ -26,6 +26,13 @@ struct LicensesView: View {
             license: "Licence GPLv3",
             body: "Moteur d'échecs (Stockfish 17.1), compilé depuis ses sources C++ directement dans l'app. Cette licence impose la mise à disposition du code source complet de ChessLab, publié pour s'y conformer.",
             url: URL(string: "https://stockfishchess.org")
+        ),
+        .init(
+            icon: "die.face.5.fill", tint: Theme.violet,
+            name: "Fairy-Stockfish",
+            license: "Licence GPLv3",
+            body: "Moteur d'échecs pour les variantes (Roi de la colline, Trois échecs, Horde), fork de Stockfish compilé depuis ses sources C++ directement dans l'app. Même obligation de licence : le code source complet de ChessLab est publié pour s'y conformer.",
+            url: URL(string: "https://fairy-stockfish.github.io")
         ),
         .init(
             icon: "chevron.left.forwardslash.chevron.right", tint: Theme.info,
