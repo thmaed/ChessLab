@@ -1,8 +1,11 @@
 import ChessKit
 
 /// Résultat final d'une partie du mode Jouer.
-struct GameOutcome: Equatable {
-    enum Reason: Equatable {
+struct GameOutcome: Equatable, Hashable {
+    /// `Hashable` : nécessaire pour voyager dans une `NavigationPath`
+    /// (``VariantAnalysisSeed``, qui porte l'issue déjà connue de la partie
+    /// jusqu'à l'écran d'analyse — voir son commentaire de tête).
+    enum Reason: Equatable, Hashable {
         case checkmate
         case draw(Board.State.DrawReason)
         case resignation

@@ -117,6 +117,10 @@ struct HomeView: View {
         /// confondre dans une même route.
         case engineLegalitySetup(String)
         case activeEngineLegalityGame(variantID: String, settings: FairyVariantSettings)
+        /// Analyse de fin de partie pour l'une des six variantes des lots A/B
+        /// — porte directement les journaux de la partie SOURCE, pas de PGN
+        /// intermédiaire (voir ``VariantAnalysisSeed``).
+        case activeVariantAnalysis(VariantAnalysisSeed)
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
@@ -620,6 +624,8 @@ struct HomeView: View {
                     if let variant = FairyVariant.all.first(where: { $0.id == variantID }) {
                         FairyVariantActiveGameHost(variant: variant, settings: settings, sessionKey: sessionKey(for: route)) {
                             path = NavigationPath()
+                        } onAnalyze: { seed in
+                            path.append(Route.activeVariantAnalysis(seed))
                         }
                     }
 
@@ -634,8 +640,13 @@ struct HomeView: View {
                     if let variant = EngineLegalityVariant.all.first(where: { $0.id == variantID }) {
                         EngineLegalityActiveGameHost(variant: variant, settings: settings, sessionKey: sessionKey(for: route)) {
                             path = NavigationPath()
+                        } onAnalyze: { seed in
+                            path.append(Route.activeVariantAnalysis(seed))
                         }
                     }
+
+                case let .activeVariantAnalysis(seed):
+                    VariantAnalysisActiveGameHost(seed: seed, sessionKey: sessionKey(for: route))
 
                 case let .activeChess960Game(settings):
                     Chess960ActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
@@ -1433,13 +1444,14 @@ private struct FairyVariantActiveGameHost: View {
     let settings: FairyVariantSettings
     let sessionKey: String
     let onExit: () -> Void
+    var onAnalyze: (VariantAnalysisSeed) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: FairyVariantPlayViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                FairyVariantPlayView(viewModel: viewModel, onExit: onExit)
+                FairyVariantPlayView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze)
             } else {
                 Color.clear
             }
@@ -1459,13 +1471,14 @@ private struct EngineLegalityActiveGameHost: View {
     let settings: FairyVariantSettings
     let sessionKey: String
     let onExit: () -> Void
+    var onAnalyze: (VariantAnalysisSeed) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: EngineLegalityPlayViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                EngineLegalityPlayView(viewModel: viewModel, onExit: onExit)
+                EngineLegalityPlayView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze)
             } else {
                 Color.clear
             }
@@ -1474,6 +1487,30 @@ private struct EngineLegalityActiveGameHost: View {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
                     EngineLegalityPlayViewModel(variant: variant, settings: settings)
+                }
+            }
+        }
+    }
+}
+
+private struct VariantAnalysisActiveGameHost: View {
+    let seed: VariantAnalysisSeed
+    let sessionKey: String
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: VariantAnalysisViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                VariantAnalysisView(viewModel: viewModel)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    VariantAnalysisViewModel(seed: seed)
                 }
             }
         }

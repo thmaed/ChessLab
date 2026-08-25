@@ -37,6 +37,12 @@ enum AnalysisEvalStore {
     /// la FEN de départ) ne permettrait de toute façon aucune collision avec
     /// une partie standard.
     static let chess960Profile = "SF17.1-Chess960/300k×1"
+    /// Profil de ``VariantAnalysisViewModel`` — les six variantes Fairy-
+    /// Stockfish (lots A et B) partagent un seul profil : la clé inclut déjà
+    /// la FEN de départ ET l'identifiant UCI de la variante n'a pas besoin
+    /// d'y figurer séparément, deux parties de variantes différentes ne
+    /// peuvent de toute façon jamais partager le même journal de coups.
+    static let variantsProfile = "Fairy14-Variants/300k×1"
     /// Nombre de parties conservées (LRU par date de modification).
     static let maxSnapshots = 300
 
@@ -106,9 +112,16 @@ enum AnalysisEvalStore {
 
     /// Même clé, pour un appelant qui n'a pas de ``Game`` ChessKit — le
     /// Chess960 rejoue sa ligne principale en UCI, pas via `MoveTree`.
-    static func key(startFEN: String, lans: [String]) -> String? {
+    ///
+    /// `variantID` : QUATRE des six variantes (Roi de la colline, Trois
+    /// échecs, Atomique, Antéchecs) partagent la position de départ
+    /// STANDARD — sans cet identifiant dans le matériau haché, deux parties
+    /// « 1.e4 e5 » de variantes DIFFÉRENTES produiraient la MÊME clé et
+    /// partageraient à tort classification/éval en cache.
+    static func key(startFEN: String, lans: [String], variantID: String? = nil) -> String? {
         guard !lans.isEmpty else { return nil }
-        let material = startFEN + "|" + lans.joined(separator: " ")
+        var material = startFEN + "|" + lans.joined(separator: " ")
+        if let variantID { material = variantID + "|" + material }
         let digest = SHA256.hash(data: Data(material.utf8))
         return digest.map { String(format: "%02x", $0) }.joined()
     }

@@ -9568,3 +9568,67 @@ Six livrées (les deux lots). Restent Crazyhouse et Canard (chiffrés, pas
 commencés — chacun de l'ampleur d'un module Chess960 complet) et
 Capablanca/Bughouse (exclus : plateau/pièces hors de portée de ChessKit
 pour l'un, réseau temps réel contraire au principe 100% local pour l'autre).
+
+## 25/08 — Variantes : un module d'analyse commun aux six variantes
+
+Suite directe du lot B : « Changer de mode » n'existait pas encore pour les
+six variantes du hub (Roi de la colline, Trois échecs, Horde, Course des
+rois, Antéchecs, Atomique) — seul Chess960 avait son analyse de fin de
+partie. Demande de suivi : la même chose partout.
+
+### Plus simple que Chess960, pas une extension de son code
+
+`Chess960AnalysisViewModel` charge une partie depuis un PGN EXPORTÉ puis
+RÉ-IMPORTÉ (`Chess960PGNParser`, nécessaire chez lui : `PGNLoader` standard
+ignore `[FEN]`/`[SetUp]` et code en dur la position de départ classique).
+Aucune des deux vues-modèles de partie de variante n'a ce problème : elles
+tiennent déjà `uciLog`/`sanLog`/`moveLog`/`fenLog` à jour à CHAQUE coup — le
+nouveau `VariantAnalysisViewModel` les reçoit directement
+(`VariantAnalysisSeed`), sans export ni parseur. Ajout nécessaire :
+`FairyVariantPlayViewModel` (lot A) ne tenait pas encore de `fenLog` — inutile
+pendant la partie (ChessKit rejoue localement), mais désormais tenu pour
+cette API commune avec le lot B, où il est, lui, indispensable (une capture
+Atomique vide des cases qu'aucun rejeu ChessKit ne pourrait deviner).
+
+Conséquence appréciable : la consultation d'un coup passé (`review(toPly:)`)
+n'a JAMAIS besoin de rejouer quoi que ce soit, contrairement à Chess960 —
+une simple lecture dans `fenLog`.
+
+### Un bug de classification trouvé au passage
+
+`EngineLegalityPlayViewModel.moveLog` construisait chaque `Move` ChessKit
+avec `result: .move` INCONDITIONNELLEMENT, même pour une vraie capture —
+suffisant pour le surlignage du dernier coup (seul usage jusqu'ici), mais
+`MoveClassifier.involvesSacrifice` lit justement `move.result` pour
+connaître la valeur reprise : chaque capture aurait été vue comme un pur don
+de matériel. Corrigé en détectant la capture (case d'arrivée occupée, ou
+prise en passant) au moment de construire le `Move`, même logique que
+``EngineLegalitySAN``.
+
+### Fin de partie : le résultat déjà connu, jamais re-deviné
+
+Chess960 déduit mat/pat de `Board.State` au moment de l'analyse. Les six
+variantes ont chacune leur propre condition de victoire (roi sur la
+colline, trois échecs, plus aucune pièce, roi en 8e rangée, plus de coup
+possible, roi explosé) — les reproduire dans l'analyse aurait dupliqué une
+logique déjà correcte. À la place, `outcome: GameOutcome?` voyage tel quel
+depuis la partie source jusqu'à l'analyse (`GameOutcome` rendu `Hashable`
+au passage, pour voyager dans la `NavigationPath` via `VariantAnalysisSeed`)
+et sert directement d'éval certaine pour le dernier coup, sans requête
+moteur.
+
+### Cache : un identifiant de variante ajouté à la clé
+
+`AnalysisEvalStore.key(startFEN:lans:)` ne hachait que la position de
+départ et la ligne de coups. Or QUATRE des six variantes (Roi de la
+colline, Trois échecs, Atomique, Antéchecs) partagent la position de départ
+STANDARD : deux parties « 1.e4 e5 » dans des variantes différentes
+auraient produit la MÊME clé et partagé à tort leur classification.
+`variantID` ajouté au matériau haché (paramètre optionnel, rétrocompatible
+avec Chess960 qui ne l'utilise pas).
+
+### Vérifié
+
+9 tests neufs (`VariantAnalysisViewModelTests`, dont classification/cache/
+collision de clé entre variantes, moteur réel pour les cas qui l'exigent),
+tous verts. 791 tests au total dans la suite.

@@ -24,15 +24,15 @@ struct EngineLegalityPlayViewModelTests {
         return EngineLegalityPlayViewModel(variant: variant, settings: settings)
     }
 
-    // 300 s, pas 20 : voir [[engine-test-suite-level-serialization]] — une
+    // 600 s, pas 20 : voir [[engine-test-suite-level-serialization]] — une
     // suite lancée SEULE prend une fraction de seconde à devenir prête, mais
-    // la suite complète (782 tests, moteurs réels concurrents entre suites
+    // la suite complète (790+ tests, moteurs réels concurrents entre suites
     // même chacune `.serialized`) peut saturer le MainActor bien au-delà
-    // d'une marge optimiste. Confirmé : 0 échec en isolation (4/4 en ~4 s),
-    // ENCORE un dépassement à 60 s puis 278 s réels observés en suite
-    // complète — la même classe de contention déjà documentée pour
-    // `GameClockStartTests` (120 s → 300 s), pas une régression réelle.
-    private func waitReady(_ vm: EngineLegalityPlayViewModel, timeout: TimeInterval = 300) async throws {
+    // d'une marge optimiste, et la marge nécessaire CROÎT avec la taille de
+    // la suite (60 s, puis 278 s, puis 406 s observés au fil des ajouts) —
+    // même classe que `GameClockStartTests` (120 s → 300 s), pas une
+    // régression réelle. 0 échec en isolation à chaque mesure (4/4 en ~4 s).
+    private func waitReady(_ vm: EngineLegalityPlayViewModel, timeout: TimeInterval = 600) async throws {
         let deadline = Date().addingTimeInterval(timeout)
         while Date() < deadline, !vm.isPositionReady {
             try await Task.sleep(for: .milliseconds(200))

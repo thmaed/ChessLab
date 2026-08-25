@@ -265,10 +265,30 @@ final class EngineLegalityPlayViewModel {
         uciLog = candidateLog
         sanLog.append(san)
         fenLog.append(query.fen)
-        if let piece = Position(fen: beforeFEN)?.piece(at: Square(String(uci.prefix(2)))) {
+        if let beforePosition = Position(fen: beforeFEN) {
             let from = Square(String(uci.prefix(2)))
             let to = Square(String(uci.dropFirst(2).prefix(2)))
-            moveLog.append(Move(result: .move, piece: piece, start: from, end: to))
+            if let piece = beforePosition.piece(at: from) {
+                // Case d'arrivée occupée (capture directe) OU pion en
+                // diagonale vers une case VIDE (prise en passant, la pièce
+                // prise n'est pas SUR la case d'arrivée) — même détection
+                // qu'``EngineLegalitySAN``. Sans ce marquage, `moveLog`
+                // disait TOUJOURS `.move`, jamais `.capture` : l'analyse
+                // (``MoveClassifier/involvesSacrifice``, qui lit
+                // `move.result` pour connaître la valeur reprise) aurait vu
+                // chaque capture comme un pur don de matériel.
+                let capturedAtTarget = beforePosition.piece(at: to)
+                let isEnPassant = piece.kind == .pawn && from.file != to.file && capturedAtTarget == nil
+                let result: Move.Result
+                if let capturedAtTarget {
+                    result = .capture(capturedAtTarget)
+                } else if isEnPassant {
+                    result = .capture(Piece(.pawn, color: piece.color.opposite, square: to))
+                } else {
+                    result = .move
+                }
+                moveLog.append(Move(result: result, piece: piece, start: from, end: to))
+            }
         }
         currentFEN = query.fen
         board = Board(position: Position(fen: query.fen)!)

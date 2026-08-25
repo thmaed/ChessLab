@@ -26,6 +26,12 @@ final class FairyVariantPlayViewModel {
     private(set) var uciLog: [String] = []
     private(set) var sanLog: [String] = []
     private(set) var moveLog: [Move] = []
+    /// FEN après CHAQUE coup, `fenLog[0]` = position de départ — pour rien
+    /// pendant la partie (ChessKit rejoue localement, voir le commentaire de
+    /// tête), mais lu directement par ``VariantAnalysisViewModel`` au lancement
+    /// de l'analyse : même API que ``EngineLegalityPlayViewModel/fenLog``, où
+    /// il est, lui, indispensable — pas de rejeu local possible côté moteur.
+    private(set) var fenLog: [String]
     private(set) var outcome: GameOutcome?
     /// Échecs infligés par chaque camp — Trois échecs seulement, ignoré
     /// sinon (mais toujours tenu à jour : coût négligeable).
@@ -75,6 +81,7 @@ final class FairyVariantPlayViewModel {
         engineColor = color.opposite
         startFEN = variant.startFEN
         board = Board(position: Position(fen: variant.startFEN)!)
+        fenLog = [variant.startFEN]
         clock = settings.timeControl.hasClock ? GameClock(control: settings.timeControl) : nil
 
         clock?.onFlagFall = { [weak self] color in
@@ -200,6 +207,7 @@ final class FairyVariantPlayViewModel {
         uciLog.append(uci)
         sanLog.append(move.san)
         moveLog.append(move)
+        fenLog.append(board.position.fen)
         playSound(for: move.san)
         hintMoves = []
 
@@ -638,16 +646,19 @@ final class FairyVariantPlayViewModel {
         var rebuilt = Board(position: Position(fen: startFEN)!)
         var counts: [Piece.Color: Int] = [.white: 0, .black: 0]
         var rebuiltMoves: [Move] = []
+        var rebuiltFens: [String] = [startFEN]
         for uci in uciLog {
             let mover = rebuilt.position.sideToMove
             guard let move = FairyVariant.apply(uci: uci, to: &rebuilt) else { break }
             rebuiltMoves.append(move)
+            rebuiltFens.append(rebuilt.position.fen)
             if case .check = rebuilt.state {
                 counts[mover, default: 0] += 1
             }
         }
         board = rebuilt
         moveLog = rebuiltMoves
+        fenLog = rebuiltFens
         checkCounts = counts
         outcome = nil
         pendingBlunderWarning = nil
