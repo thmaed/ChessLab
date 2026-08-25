@@ -34,7 +34,7 @@ struct HelpView: View {
         .init(
             icon: "die.face.5.fill", tint: Theme.violet,
             title: "Variantes",
-            body: "D'autres façons de jouer aux échecs, présentées en tuiles. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959), ou composée vous-même en échangeant les pièces de la première rangée — jeu contre l'ordinateur ou à deux, avec la même analyse de fin de partie qu'en mode « Jouer ». Trois variantes de plus, contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs (le troisième échec délivré gagne) et Horde (les Blancs n'ont que des pions). Indice, alerte gaffe et barre d'évaluation partout ; la force de l'ordinateur se règle comme ailleurs."
+            body: "D'autres façons de jouer aux échecs, présentées en tuiles. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959), ou composée vous-même en échangeant les pièces de la première rangée — jeu contre l'ordinateur ou à deux, avec la même analyse de fin de partie qu'en mode « Jouer ». Six variantes de plus, contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs (le troisième échec délivré gagne), Horde (les Blancs n'ont que des pions), Course des rois (le premier roi en 8e rangée gagne, sans jamais mettre l'adversaire en échec), Atomique (chaque capture fait exploser les cases voisines) et Antéchecs (but inversé : perdez toutes vos pièces, ou restez bloqué, pour gagner). Indice, alerte gaffe et barre d'évaluation partout ; la force de l'ordinateur se règle comme ailleurs."
         ),
         .init(
             icon: "puzzlepiece.fill", tint: Theme.violet,

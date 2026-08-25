@@ -1859,6 +1859,22 @@
         }
       }
     },
+    "Antéchecs" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antichess"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antéchecs"
+          }
+        }
+      }
+    },
     "Aperçus" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2038,6 +2054,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Arrêter la lecture"
+          }
+        }
+      }
+    },
+    "Atomique" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atomic"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Atomique"
           }
         }
       }
@@ -3696,6 +3728,22 @@
         }
       }
     },
+    "Chaque capture fait exploser les cases voisines" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Every capture blows up the surrounding squares"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chaque capture fait exploser les cases voisines"
+          }
+        }
+      }
+    },
     "Chaque ligne de ces cours est vérifiée par table de finales (Syzygy) : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle." : {
       "localizations" : {
         "en" : {
@@ -4789,6 +4837,38 @@
         }
       }
     },
+    "Course des rois" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Racing Kings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Course des rois"
+          }
+        }
+      }
+    },
+    "Course rois" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Racing Kings"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Course rois"
+          }
+        }
+      }
+    },
     "Creepy Crawly Formation" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -4971,18 +5051,18 @@
         }
       }
     },
-    "D'autres façons de jouer aux échecs, présentées en tuiles. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959), ou composée vous-même en échangeant les pièces de la première rangée — jeu contre l'ordinateur ou à deux, avec la même analyse de fin de partie qu'en mode « Jouer ». Trois variantes de plus, contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs (le troisième échec délivré gagne) et Horde (les Blancs n'ont que des pions). Indice, alerte gaffe et barre d'évaluation partout ; la force de l'ordinateur se règle comme ailleurs." : {
+    "D'autres façons de jouer aux échecs, présentées en tuiles. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959), ou composée vous-même en échangeant les pièces de la première rangée — jeu contre l'ordinateur ou à deux, avec la même analyse de fin de partie qu'en mode « Jouer ». Six variantes de plus, contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs (le troisième échec délivré gagne), Horde (les Blancs n'ont que des pions), Course des rois (le premier roi en 8e rangée gagne, sans jamais mettre l'adversaire en échec), Atomique (chaque capture fait exploser les cases voisines) et Antéchecs (but inversé : perdez toutes vos pièces, ou restez bloqué, pour gagner). Indice, alerte gaffe et barre d'évaluation partout ; la force de l'ordinateur se règle comme ailleurs." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Other ways to play chess, presented as tiles. Chess960 (Fischer Random): a randomly drawn starting position, chosen by number (0-959), or composed by hand by swapping pieces on the back rank — play against the computer or two players, with the same post-game analysis as \"Play\" mode. Three more variants, against the computer: King of the Hill (the first king to reach the centre wins), Three-Check (the third check delivered wins) and Horde (White has nothing but pawns). Hints, blunder alerts and an eval bar everywhere; the computer's strength is adjusted the same way as elsewhere."
+            "value" : "Other ways to play chess, presented as tiles. Chess960 (Fischer Random): a randomly drawn starting position, chosen by number (0-959), or composed by hand by swapping pieces on the back rank — play against the computer or two players, with the same post-game analysis as \"Play\" mode. Six more variants, against the computer: King of the Hill (the first king to reach the centre wins), Three-Check (the third check delivered wins), Horde (White has nothing but pawns), Racing Kings (the first king on the 8th rank wins, without ever checking the opponent), Atomic (every capture blows up the surrounding squares) and Antichess (reversed goal: lose all your pieces, or get stuck, to win). Hints, blunder alerts and an eval bar everywhere; the computer's strength is adjusted the same way as elsewhere."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "D'autres façons de jouer aux échecs, présentées en tuiles. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959), ou composée vous-même en échangeant les pièces de la première rangée — jeu contre l'ordinateur ou à deux, avec la même analyse de fin de partie qu'en mode « Jouer ». Trois variantes de plus, contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs (le troisième échec délivré gagne) et Horde (les Blancs n'ont que des pions). Indice, alerte gaffe et barre d'évaluation partout ; la force de l'ordinateur se règle comme ailleurs."
+            "value" : "D'autres façons de jouer aux échecs, présentées en tuiles. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959), ou composée vous-même en échangeant les pièces de la première rangée — jeu contre l'ordinateur ou à deux, avec la même analyse de fin de partie qu'en mode « Jouer ». Six variantes de plus, contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs (le troisième échec délivré gagne), Horde (les Blancs n'ont que des pions), Course des rois (le premier roi en 8e rangée gagne, sans jamais mettre l'adversaire en échec), Atomique (chaque capture fait exploser les cases voisines) et Antéchecs (but inversé : perdez toutes vos pièces, ou restez bloqué, pour gagner). Indice, alerte gaffe et barre d'évaluation partout ; la force de l'ordinateur se règle comme ailleurs."
           }
         }
       }
@@ -8617,6 +8697,22 @@
         }
       }
     },
+    "Le but est INVERSÉ : vous gagnez en perdant toutes vos pièces, ou en étant dans l'incapacité de jouer un coup. Capturer est OBLIGATOIRE dès que c'est possible — s'il existe plusieurs captures, vous choisissez laquelle. Il n'y a ni échec ni mat : le roi se capture comme n'importe quelle pièce, et le roque n'existe pas." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The goal is REVERSED: you win by losing all your pieces, or by being unable to make a move. Capturing is MANDATORY whenever possible — if several captures are available, you choose which. There is no check or checkmate: the king is captured like any other piece, and castling doesn't exist."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le but est INVERSÉ : vous gagnez en perdant toutes vos pièces, ou en étant dans l'incapacité de jouer un coup. Capturer est OBLIGATOIRE dès que c'est possible — s'il existe plusieurs captures, vous choisissez laquelle. Il n'y a ni échec ni mat : le roi se capture comme n'importe quelle pièce, et le roque n'existe pas."
+          }
+        }
+      }
+    },
     "Le coup était %@" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -8808,6 +8904,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le plateau pivote vers le joueur au trait — on se passe l'appareil."
+          }
+        }
+      }
+    },
+    "Le premier roi en 8e rangée gagne" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The first king on the 8th rank wins"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le premier roi en 8e rangée gagne"
           }
         }
       }
@@ -10946,12 +11058,44 @@
         }
       }
     },
+    "Pas de pions, pas de roque. Aucun coup n'a le droit de mettre le roi adverse en échec — sauf s'il gagne la partie sur-le-champ. Le but : amener votre roi sur la 8e rangée avant l'adversaire. Si les Blancs y arrivent les premiers, les Noirs ont EXACTEMENT un coup pour égaliser en y arrivant aussi — sinon les Blancs ont gagné." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No pawns, no castling. No move is allowed to check the opponent's king — unless it wins the game outright. The goal: bring your king to the 8th rank before your opponent. If White gets there first, Black has EXACTLY one move to also reach it and draw — otherwise White has won."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pas de pions, pas de roque. Aucun coup n'a le droit de mettre le roi adverse en échec — sauf s'il gagne la partie sur-le-champ. Le but : amener votre roi sur la 8e rangée avant l'adversaire. Si les Blancs y arrivent les premiers, les Noirs ont EXACTEMENT un coup pour égaliser en y arrivant aussi — sinon les Blancs ont gagné."
+          }
+        }
+      }
+    },
     "Pause" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pause"
+          }
+        }
+      }
+    },
+    "Perdez toutes vos pièces — ou restez bloqué — pour gagner" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lose all your pieces — or get stuck — to win"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Perdez toutes vos pièces — ou restez bloqué — pour gagner"
           }
         }
       }
@@ -13776,18 +13920,18 @@
         }
       }
     },
-    "Sans réseau de neurones dédié à ces trois variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal." : {
+    "Sans réseau de neurones dédié à ces six variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Without a network dedicated to these three variants: the engine plays with its classical evaluation here, a notch below normal mode."
+            "value" : "Without a network dedicated to these six variants: the engine plays with its classical evaluation here, a notch below normal mode."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sans réseau de neurones dédié à ces trois variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal."
+            "value" : "Sans réseau de neurones dédié à ces six variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal."
           }
         }
       }
@@ -15613,6 +15757,22 @@
         }
       }
     },
+    "Toute capture fait exploser la case d'arrivée : la pièce qui capture ET la pièce capturée disparaissent, ainsi que toute pièce SAUF les pions sur les huit cases voisines. La partie se termine dès qu'un roi explose — un coup qui ferait exploser votre PROPRE roi est interdit. Deux rois peuvent se toucher sans risque : aucun ne peut capturer l'autre sans se détruire lui-même." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Any capture blows up the destination square: the capturing piece AND the captured piece both disappear, along with every piece EXCEPT pawns on the eight surrounding squares. The game ends the moment a king explodes — a move that would blow up your OWN king is illegal. Two kings can safely touch: neither can capture the other without destroying itself."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toute capture fait exploser la case d'arrivée : la pièce qui capture ET la pièce capturée disparaissent, ainsi que toute pièce SAUF les pions sur les huit cases voisines. La partie se termine dès qu'un roi explose — un coup qui ferait exploser votre PROPRE roi est interdit. Deux rois peuvent se toucher sans risque : aucun ne peut capturer l'autre sans se détruire lui-même."
+          }
+        }
+      }
+    },
     "Toutes" : {
       "localizations" : {
         "en" : {
@@ -17217,6 +17377,22 @@
         }
       }
     },
+    "les deux rois arrivent ensemble" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "both kings arrive together"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "les deux rois arrivent ensemble"
+          }
+        }
+      }
+    },
     "les noirs" : {
       "localizations" : {
         "en" : {
@@ -17489,6 +17665,22 @@
         }
       }
     },
+    "plus aucun coup possible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no legal move left"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "plus aucun coup possible"
+          }
+        }
+      }
+    },
     "plus aucune pièce" : {
       "localizations" : {
         "en" : {
@@ -17604,6 +17796,22 @@
         }
       }
     },
+    "roi arrivé en 8e rangée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "king reached the 8th rank"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "roi arrivé en 8e rangée"
+          }
+        }
+      }
+    },
     "roi au centre" : {
       "localizations" : {
         "en" : {
@@ -17633,6 +17841,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "roi blanc"
+          }
+        }
+      }
+    },
+    "roi explosé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "king exploded"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "roi explosé"
           }
         }
       }

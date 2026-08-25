@@ -3,9 +3,10 @@ import SwiftUI
 
 /// Réglages d'une partie dans une variante Fairy-Stockfish — même grammaire
 /// que ``Chess960SetupView``, sans la section position (fixée par la
-/// variante). Un seul écran pour les trois : paramétré par ``FairyVariant``.
+/// variante). Un seul écran pour les SIX variantes des deux lots (voir
+/// ``PlayableVariant``) : paramétré par le protocole, pas par un type concret.
 struct FairyVariantSetupView: View {
-    let variant: FairyVariant
+    let variant: any PlayableVariant
     let onStart: (FairyVariantSettings) -> Void
 
     @State private var colorChoice: PlayerColorChoice
@@ -19,7 +20,7 @@ struct FairyVariantSetupView: View {
     @State private var hintsEnabled: Bool
     @State private var blunderAlertEnabled: Bool
 
-    init(variant: FairyVariant, onStart: @escaping (FairyVariantSettings) -> Void) {
+    init(variant: any PlayableVariant, onStart: @escaping (FairyVariantSettings) -> Void) {
         self.variant = variant
         self.onStart = onStart
         let saved = FairyVariantSettingsStore.load(for: variant.id) ?? FairyVariantSettings()

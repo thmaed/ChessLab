@@ -110,6 +110,13 @@ struct HomeView: View {
         /// réglages puis partie, même structure que Chess960.
         case fairyVariantSetup(String)
         case activeFairyVariantGame(variantID: String, settings: FairyVariantSettings)
+        /// Course des rois / Antéchecs / Atomique — Fairy-Stockfish y est
+        /// l'arbitre de légalité, pas seulement un conseiller (voir
+        /// ``EngineLegalityVariant``) ; réglages puis partie séparés du lot
+        /// ci-dessus, la vue-modèle de partie diffère trop pour les
+        /// confondre dans une même route.
+        case engineLegalitySetup(String)
+        case activeEngineLegalityGame(variantID: String, settings: FairyVariantSettings)
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
@@ -593,6 +600,8 @@ struct HomeView: View {
                         path.append(Route.chess960Setup)
                     } onOpenFairyVariant: { variant in
                         path.append(Route.fairyVariantSetup(variant.id))
+                    } onOpenEngineLegalityVariant: { variant in
+                        path.append(Route.engineLegalitySetup(variant.id))
                     }
 
                 case .chess960Setup:
@@ -610,6 +619,20 @@ struct HomeView: View {
                 case let .activeFairyVariantGame(variantID, settings):
                     if let variant = FairyVariant.all.first(where: { $0.id == variantID }) {
                         FairyVariantActiveGameHost(variant: variant, settings: settings, sessionKey: sessionKey(for: route)) {
+                            path = NavigationPath()
+                        }
+                    }
+
+                case let .engineLegalitySetup(variantID):
+                    if let variant = EngineLegalityVariant.all.first(where: { $0.id == variantID }) {
+                        FairyVariantSetupView(variant: variant) { settings in
+                            path.append(Route.activeEngineLegalityGame(variantID: variantID, settings: settings))
+                        }
+                    }
+
+                case let .activeEngineLegalityGame(variantID, settings):
+                    if let variant = EngineLegalityVariant.all.first(where: { $0.id == variantID }) {
+                        EngineLegalityActiveGameHost(variant: variant, settings: settings, sessionKey: sessionKey(for: route)) {
                             path = NavigationPath()
                         }
                     }
@@ -1425,6 +1448,32 @@ private struct FairyVariantActiveGameHost: View {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
                     FairyVariantPlayViewModel(variant: variant, settings: settings)
+                }
+            }
+        }
+    }
+}
+
+private struct EngineLegalityActiveGameHost: View {
+    let variant: EngineLegalityVariant
+    let settings: FairyVariantSettings
+    let sessionKey: String
+    let onExit: () -> Void
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: EngineLegalityPlayViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                EngineLegalityPlayView(viewModel: viewModel, onExit: onExit)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    EngineLegalityPlayViewModel(variant: variant, settings: settings)
                 }
             }
         }

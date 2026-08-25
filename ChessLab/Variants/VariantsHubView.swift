@@ -8,6 +8,7 @@ import SwiftUI
 struct VariantsHubView: View {
     let onOpenChess960: () -> Void
     let onOpenFairyVariant: (FairyVariant) -> Void
+    let onOpenEngineLegalityVariant: (EngineLegalityVariant) -> Void
 
     var body: some View {
         ScrollView {
@@ -44,9 +45,22 @@ struct VariantsHubView: View {
                             onOpenFairyVariant(variant)
                         }
                     }
+                    ForEach(EngineLegalityVariant.all, id: \.id) { variant in
+                        ModeCard(
+                            title: LocalizedStringKey(variant.displayName),
+                            shortTitle: LocalizedStringKey(variant.shortName),
+                            subtitle: LocalizedStringKey(variant.tagline),
+                            systemImage: variant.icon,
+                            tint: variant.tint,
+                            isEnabled: true,
+                            accessibilityID: "variant_\(variant.id)"
+                        ) {
+                            onOpenEngineLegalityVariant(variant)
+                        }
+                    }
                 }
 
-                Text("Sans réseau de neurones dédié à ces trois variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal.")
+                Text("Sans réseau de neurones dédié à ces six variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)

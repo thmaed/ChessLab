@@ -9484,3 +9484,87 @@ verts, dont les deux nouveaux `FairyVariantUITests` (hub à quatre tuiles,
 partie Roi de la colline jouable de bout en bout). Avant/après le correctif
 de course entre moteurs : 95 s/3 échecs → 18 s/0 échec sur le scénario
 reproduit isolément.
+
+## 25/08 — Variantes, lot B : Fairy-Stockfish devient l'arbitre — Course des rois, Antéchecs, Atomique
+
+Suite du lot A (Roi de la colline/Trois échecs/Horde) : ces trois-là ne
+changeaient que la condition de victoire, ChessKit restant l'arbitre de
+légalité. Course des rois (échec interdit), Antéchecs (capture obligatoire)
+et Atomique (explosions) changent la LÉGALITÉ elle-même — ChessKit seul ne
+suffit plus.
+
+### La décision d'architecture : déléguer, pas réimplémenter
+
+Plutôt que coder à la main les explosions Atomique, la capture obligatoire
+Antéchecs et la règle officielle du coup de grâce de Course des rois (« si
+les Blancs arrivent en 8e rangée en premier, les Noirs ont EXACTEMENT un
+coup pour égaliser en y arrivant aussi ») — trois sources d'erreurs
+réelles —, la légalité est déléguée à Fairy-Stockfish lui-même, moteur de
+référence déjà correct. Validé EMPIRIQUEMENT avant tout code réel (même
+discipline que le patch d'espace de noms du lot A) : deux commandes UCI
+suffisent, combinées en une seule requête
+(`FairyEngineController.queryPosition(startFEN:uciLog:)`) :
+
+- `go perft 1` énumère les coups légaux EXACTS de la position ;
+- `d` donne le FEN résultant et l'échec (`Checkers:`) — seule source fiable
+  du plateau pour l'Atomique, où une capture vide des cases (explosion)
+  qu'aucune règle ChessKit ne pourrait deviner seule.
+
+La fin de partie se déduit de ces deux réponses, jamais réimplémentée :
+liste de coups vide = partie finie (Course des rois : prouvé en LISANT le
+code source de Fairy-Stockfish, `position.cpp`/`is_immediate_game_end` —
+le coup de grâce y est déjà correctement implémenté) ; le camp bloqué
+GAGNE en Antéchecs (but inversé) ; en Atomique, un roi manquant du FEN
+tranche AVANT même de regarder les coups légaux.
+
+ChessKit garde un seul rôle : l'AFFICHAGE, en reconstruisant un `Board`
+depuis le FEN moteur — jamais pour statuer sur un coup. Conséquence : pas
+de SAN gratuit (ChessKit ne le fournit que pour un coup qu'il a lui-même
+joué) — reconstruit à la main (`EngineLegalitySAN`, désambiguïsation
+comprise) ; et la consultation d'un coup passé ne coûte RIEN au moteur,
+chaque FEN traversé étant mémorisé au fil de la partie (`fenLog`).
+
+Conséquence structurelle : appliquer un coup, même celui de l'utilisateur,
+devient TOUJOURS un aller-retour moteur — contrairement au lot A où
+ChessKit l'appliquait localement et instantanément. D'où un
+`EngineLegalityPlayViewModel` séparé de `FairyVariantPlayViewModel` (la
+mécanique de fond diffère trop pour les fusionner), mais un écran de
+réglages RÉUTILISÉ (`FairyVariantSetupView`, généralisé via un petit
+protocole `PlayableVariant` que les deux modèles de variante implémentent).
+
+### Deux vrais bugs de concurrence trouvés en écrivant les tests
+
+1. **Course sur l'acteur moteur.** L'alerte gaffe rétroactive
+   (`checkForBlunderRetroactively`) interroge le moteur via la file
+   `enqueueEngineWork` (fire-and-forget) ; appliquer un coup appelait,
+   lui, `engine.queryPosition` DIRECTEMENT, hors file — deux « captures de
+   lignes brutes » concurrentes sur le même `FairyEngineController` (qui
+   n'admet qu'un appelant à la fois) pouvaient se corrompre l'une l'autre.
+   Repéré non pas en raisonnant dans l'abstrait mais en traçant les FEN
+   reçus par un `print` temporaire : le même FEN revenait trois fois de
+   suite pour trois coups différents. Corrigé en faisant passer tout point
+   d'ENTRÉE (jamais les méthodes internes, sous peine d'auto-blocage) par
+   une variante de la file qui renvoie une valeur.
+2. **Sélection résiduelle.** `selectSquare(_:)` rendait la main tôt quand
+   la pièce touchée n'avait AUCUN coup légal (typique en Antéchecs : une
+   capture est obligatoire ailleurs) — mais laissait `selectedSquare`/
+   `legalTargetSquares` de la sélection PRÉCÉDENTE intacts, comme si la
+   nouvelle pièce héritait des coups de l'ancienne. Corrigé en affectant
+   toujours les deux propriétés, même à vide.
+
+### Vérifié
+
+782+ tests unitaires verts, dont 21 propres au lot B (`EngineLegalityVariantTests`/
+`EngineLegalitySANTests`, purs — aucun moteur —, et
+`EngineLegalityPlayViewModelTests`, moteur réel). Tests d'interface : hub à
+7 tuiles, partie Atomique jouable de bout en bout. Un seul échec observé en
+suite COMPLÈTE (mais 0 en isolation) : délai d'attente dépassé sous
+contention MainActor extrême — même classe déjà documentée pour
+`GameClockStartTests`, marge portée à 300 s par précaution.
+
+### Ce qui reste des dix variantes étudiées
+
+Six livrées (les deux lots). Restent Crazyhouse et Canard (chiffrés, pas
+commencés — chacun de l'ampleur d'un module Chess960 complet) et
+Capablanca/Bughouse (exclus : plateau/pièces hors de portée de ChessKit
+pour l'un, réseau temps réel contraire au principe 100% local pour l'autre).

@@ -14,6 +14,16 @@ struct GameOutcome: Equatable {
         case threeChecksDelivered
         /// Plus aucune pièce pour le camp aux pions — Horde (Fairy-Stockfish).
         case hordeExtinction
+        /// Roi arrivé le premier en 8e rangée — Course des rois.
+        case racingKingsGoal
+        /// Les deux rois arrivent en 8e rangée sur des coups consécutifs —
+        /// Course des rois : nulle, le coup de grâce a été utilisé.
+        case racingKingsDraw
+        /// Plus aucun coup légal — Antéchecs : le camp bloqué GAGNE, but
+        /// inversé (perdre ses pièces ou être immobilisé).
+        case antichessStuck
+        /// Un roi a explosé au contact d'une capture — Atomique.
+        case atomicKingExploded
     }
 
     /// `nil` si la partie est nulle.
@@ -44,6 +54,10 @@ struct GameOutcome: Equatable {
         case .kingOfTheHill: LocalizationController.string("roi au centre")
         case .threeChecksDelivered: LocalizationController.string("trois échecs infligés")
         case .hordeExtinction: LocalizationController.string("plus aucune pièce")
+        case .racingKingsGoal: LocalizationController.string("roi arrivé en 8e rangée")
+        case .racingKingsDraw: LocalizationController.string("les deux rois arrivent ensemble")
+        case .antichessStuck: LocalizationController.string("plus aucun coup possible")
+        case .atomicKingExploded: LocalizationController.string("roi explosé")
         }
     }
 
@@ -143,6 +157,10 @@ extension GameOutcome.Reason {
         case .kingOfTheHill: "kingOfTheHill"
         case .threeChecksDelivered: "threeChecksDelivered"
         case .hordeExtinction: "hordeExtinction"
+        case .racingKingsGoal: "racingKingsGoal"
+        case .racingKingsDraw: "racingKingsDraw"
+        case .antichessStuck: "antichessStuck"
+        case .atomicKingExploded: "atomicKingExploded"
         }
     }
 }

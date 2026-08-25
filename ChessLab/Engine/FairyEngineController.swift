@@ -76,6 +76,92 @@ actor FairyEngineController {
         if let response = EngineResponse(rawValue: line) {
             parsedContinuation.yield(response)
         }
+        if rawCapturing { rawLineBuffer.append(line) }
+    }
+
+    // MARK: Capture de lignes BRUTES — `go perft`/`d`, hors du dialecte
+    // `EngineCommand`/`EngineResponse` (Lot B des variantes : Fairy-Stockfish
+    // devient l'arbitre de LÉGALITÉ, pas seulement un conseiller — voir
+    // ``EngineLegalityVariant``. `EngineCommand` ne modélise que le sous-
+    // dialecte déjà utilisé par le Laboratoire/le jeu normal ; l'étendre pour
+    // deux commandes de diagnostic aurait touché un fichier PARTAGÉ avec
+    // ``EngineController`` pour un besoin propre à Fairy-Stockfish.
+
+    private var rawCapturing = false
+    private var rawLineBuffer: [String] = []
+
+    /// Envoie une commande UCI brute et récolte les lignes reçues jusqu'à ce
+    /// qu'une corresponde à `terminator` (incluse), borné à `timeoutMs`.
+    /// Un seul appelant à la fois — pas de garde de réentrance : les
+    /// méthodes qui l'utilisent (``legalMoves(startFEN:uciLog:)``,
+    /// ``positionAfter(startFEN:uciLog:)``) sont toujours attendues
+    /// séquentiellement par leur appelant, comme le reste de cet acteur.
+    private func captureRawLines(
+        sending raw: String, until terminator: @escaping (String) -> Bool, timeoutMs: Int = 4000
+    ) async -> [String] {
+        guard engine.isRunning else { return [] }
+        rawLineBuffer = []
+        rawCapturing = true
+        defer { rawCapturing = false }
+        engine.send(raw)
+        let deadline = Date().addingTimeInterval(Double(timeoutMs) / 1000)
+        while Date() < deadline {
+            if rawLineBuffer.contains(where: terminator) { break }
+            try? await Task.sleep(nanoseconds: 10_000_000)
+        }
+        return rawLineBuffer
+    }
+
+    /// Positionne l'engin sur `startFEN` + `uciLog`, puis énumère les coups
+    /// légaux via `go perft 1` — Fairy-Stockfish devient ainsi l'ARBITRE de
+    /// légalité (pas ChessKit) pour les variantes où la légalité elle-même
+    /// change (Course des rois, Antéchecs, Atomique). Format d'une ligne de
+    /// coup : `e2e4: 1` ; le compteur ne sert à rien ici, seul le préfixe
+    /// avant `:` est retenu. Liste VIDE : aucun coup légal — mat, pat, ou
+    /// (Antéchecs) plus aucune pièce, selon la variante.
+    struct PositionQuery {
+        let fen: String
+        let inCheck: Bool
+        let legalMoves: [String]
+    }
+
+    /// Positionne l'engin sur `startFEN` + `uciLog`, puis interroge `d`
+    /// (FEN résultant + échec) et `go perft 1` (coups légaux exacts) — une
+    /// seule commande `position`, envoyée une fois. `nil` : `d` sans FEN
+    /// dans le délai (position non trouvée).
+    ///
+    /// Le FEN de `d` est la seule source fiable de l'état du plateau pour
+    /// l'Atomique (une capture y fait exploser des cases que ChessKit ne
+    /// peut pas deviner tout seul) ; les coups légaux de `go perft 1` sont
+    /// l'ARBITRE de légalité pour Course des rois/Antéchecs/Atomique — voir
+    /// ``EngineLegalityVariant``.
+    func queryPosition(startFEN: String, uciLog: [String]) async -> PositionQuery? {
+        let positionCmd = uciLog.isEmpty
+            ? "position fen \(startFEN)"
+            : "position fen \(startFEN) moves \(uciLog.joined(separator: " "))"
+        engine.send(positionCmd)
+
+        let dLines = await captureRawLines(sending: "d", until: { $0.hasPrefix("Checkers:") })
+        guard let fenLine = dLines.first(where: { $0.hasPrefix("Fen: ") }) else { return nil }
+        let fen = String(fenLine.dropFirst("Fen: ".count))
+        let inCheck = dLines.first(where: { $0.hasPrefix("Checkers:") })
+            .map { $0.trimmingCharacters(in: .whitespaces) != "Checkers:" } ?? false
+
+        let perftLines = await captureRawLines(sending: "go perft 1", until: { $0.hasPrefix("Nodes searched") })
+        let legalMoves = perftLines.compactMap { line -> String? in
+            guard let colonIndex = line.firstIndex(of: ":") else { return nil }
+            let move = String(line[line.startIndex..<colonIndex])
+            // Une ligne de coup fait 4-5 caractères ("e2e4", "e7e8q") ; la
+            // ligne de résumé « Nodes searched: N » en a bien plus — sans
+            // cette borne haute, elle se glissait dans la liste comme un
+            // faux coup (trouvé en explorant Course des rois : un roi déjà
+            // arrivé donne ZÉRO coup réel, et "Nodes searched" restait seul).
+            guard (4...5).contains(move.count), move.first!.isLowercase, move.first!.isLetter
+            else { return nil }
+            return move
+        }
+
+        return PositionQuery(fen: fen, inCheck: inCheck, legalMoves: legalMoves)
     }
 
     // MARK: Démarrage
