@@ -52,18 +52,20 @@ struct Chess960AnalysisViewModelTests {
 
     @Test("L'analyse produit une évaluation et au moins une flèche")
     func analysisProducesAnEvalAndAtLeastOneArrow() async throws {
-        let pgn = classicalGamePGN(moves: ["e2e4", "e7e5", "g1f3"])
-        let vm = try #require(Chess960AnalysisViewModel(pgn: pgn))
-        vm.start()
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let pgn = classicalGamePGN(moves: ["e2e4", "e7e5", "g1f3"])
+            let vm = try #require(Chess960AnalysisViewModel(pgn: pgn))
+            vm.start()
 
-        let deadline = Date().addingTimeInterval(20)
-        while Date() < deadline, vm.currentEvalCp == nil && vm.currentEvalMate == nil {
-            try await Task.sleep(for: .milliseconds(300))
+            let deadline = Date().addingTimeInterval(20)
+            while Date() < deadline, vm.currentEvalCp == nil && vm.currentEvalMate == nil {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            #expect(vm.currentEvalCp != nil || vm.currentEvalMate != nil, "aucune évaluation produite")
+            #expect(!vm.hintMoves.isEmpty, "aucune flèche produite")
+
+            vm.handleViewDisappear()
         }
-        #expect(vm.currentEvalCp != nil || vm.currentEvalMate != nil, "aucune évaluation produite")
-        #expect(!vm.hintMoves.isEmpty, "aucune flèche produite")
-
-        vm.handleViewDisappear()
     }
 
     // MARK: Classification (pastilles) — moteur RÉEL, 25/08 second lot
@@ -73,73 +75,79 @@ struct Chess960AnalysisViewModelTests {
     /// `Move` ChessKit (voir ``Chess960AnalysisViewModel/chessKitMove(for:board:)``).
     @Test("La classification couvre toute la ligne, roque compris")
     func classificationCoversTheWholeMainLine() async throws {
-        let pgn = classicalGamePGN(moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5", "e1h1"])
-        let vm = try #require(Chess960AnalysisViewModel(pgn: pgn))
-        vm.start()
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let pgn = classicalGamePGN(moves: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5", "e1h1"])
+            let vm = try #require(Chess960AnalysisViewModel(pgn: pgn))
+            vm.start()
 
-        let deadline = Date().addingTimeInterval(60)
-        while Date() < deadline, vm.moveQuality.count < vm.totalPlies {
-            try await Task.sleep(for: .milliseconds(300))
+            let deadline = Date().addingTimeInterval(60)
+            while Date() < deadline, vm.moveQuality.count < vm.totalPlies {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            #expect(vm.moveQuality.count == vm.totalPlies, "chaque coup doit recevoir une qualité, y compris O-O")
+            #expect(vm.moveQuality[vm.totalPlies] != nil, "le roque final doit être classé")
+
+            vm.review(toPly: vm.totalPlies)
+            let badge = try #require(vm.qualityBadge)
+            #expect(badge.square == Square("g1"), "la pastille du roque se pose sur la case RÉELLE du roi")
+
+            vm.handleViewDisappear()
         }
-        #expect(vm.moveQuality.count == vm.totalPlies, "chaque coup doit recevoir une qualité, y compris O-O")
-        #expect(vm.moveQuality[vm.totalPlies] != nil, "le roque final doit être classé")
-
-        vm.review(toPly: vm.totalPlies)
-        let badge = try #require(vm.qualityBadge)
-        #expect(badge.square == Square("g1"), "la pastille du roque se pose sur la case RÉELLE du roi")
-
-        vm.handleViewDisappear()
     }
 
     /// 1.e4 g6 2.Dh5?? — la dame se pose sur une case attaquée par le pion
     /// g6 (gxh5 la gagne), même hang de dame que ``Chess960PlayViewModelTests``.
     @Test("Une dame hors-jeu se classe en faute")
     func aHangingQueenIsClassifiedAsAFault() async throws {
-        let pgn = classicalGamePGN(moves: ["e2e4", "g7g6", "d1h5"])
-        let vm = try #require(Chess960AnalysisViewModel(pgn: pgn))
-        vm.start()
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let pgn = classicalGamePGN(moves: ["e2e4", "g7g6", "d1h5"])
+            let vm = try #require(Chess960AnalysisViewModel(pgn: pgn))
+            vm.start()
 
-        let deadline = Date().addingTimeInterval(60)
-        while Date() < deadline, vm.moveQuality[3] == nil {
-            try await Task.sleep(for: .milliseconds(300))
+            let deadline = Date().addingTimeInterval(60)
+            while Date() < deadline, vm.moveQuality[3] == nil {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            let quality = try #require(vm.moveQuality[3])
+            #expect(quality.isFault, "Dh5?? doit être signalé comme une faute (\(quality))")
+
+            vm.handleViewDisappear()
         }
-        let quality = try #require(vm.moveQuality[3])
-        #expect(quality.isFault, "Dh5?? doit être signalé comme une faute (\(quality))")
-
-        vm.handleViewDisappear()
     }
 
     /// Une classification déjà calculée se recharge du cache — sans repasser
     /// par le moteur — au lieu de tout recalculer à chaque ouverture.
     @Test("La classification se met en cache entre deux ouvertures")
     func classificationIsCachedAcrossOpenings() async throws {
-        let pgn = classicalGamePGN(moves: ["e2e4", "e7e5"])
-        let startFEN = try #require(Chess960PGNParser.parse(pgn)).startFEN
-        let key = try #require(AnalysisEvalStore.key(startFEN: startFEN, lans: ["e2e4", "e7e5"]))
-        defer { try? FileManager.default.removeItem(at: AnalysisEvalStore.fileURL(for: key)) }
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let pgn = classicalGamePGN(moves: ["e2e4", "e7e5"])
+            let startFEN = try #require(Chess960PGNParser.parse(pgn)).startFEN
+            let key = try #require(AnalysisEvalStore.key(startFEN: startFEN, lans: ["e2e4", "e7e5"]))
+            defer { try? FileManager.default.removeItem(at: AnalysisEvalStore.fileURL(for: key)) }
 
-        let first = try #require(Chess960AnalysisViewModel(pgn: pgn))
-        first.start()
-        let firstDeadline = Date().addingTimeInterval(60)
-        while Date() < firstDeadline, first.moveQuality.count < first.totalPlies {
-            try await Task.sleep(for: .milliseconds(300))
+            let first = try #require(Chess960AnalysisViewModel(pgn: pgn))
+            first.start()
+            let firstDeadline = Date().addingTimeInterval(60)
+            while Date() < firstDeadline, first.moveQuality.count < first.totalPlies {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            #expect(first.moveQuality.count == first.totalPlies)
+            first.handleViewDisappear()
+
+            let second = try #require(Chess960AnalysisViewModel(pgn: pgn))
+            second.start()
+            // Le cache se lit en un seul passage de la file sérielle : quelques
+            // centaines de ms suffisent très largement, contre plusieurs
+            // secondes pour une VRAIE analyse à deux coups.
+            let cacheDeadline = Date().addingTimeInterval(5)
+            while Date() < cacheDeadline, second.moveQuality.count < second.totalPlies {
+                try await Task.sleep(for: .milliseconds(100))
+            }
+            #expect(second.moveQuality.count == second.totalPlies, "le cache doit fournir la classification quasi instantanément")
+            #expect(second.moveQuality == first.moveQuality)
+
+            second.handleViewDisappear()
         }
-        #expect(first.moveQuality.count == first.totalPlies)
-        first.handleViewDisappear()
-
-        let second = try #require(Chess960AnalysisViewModel(pgn: pgn))
-        second.start()
-        // Le cache se lit en un seul passage de la file sérielle : quelques
-        // centaines de ms suffisent très largement, contre plusieurs
-        // secondes pour une VRAIE analyse à deux coups.
-        let cacheDeadline = Date().addingTimeInterval(5)
-        while Date() < cacheDeadline, second.moveQuality.count < second.totalPlies {
-            try await Task.sleep(for: .milliseconds(100))
-        }
-        #expect(second.moveQuality.count == second.totalPlies, "le cache doit fournir la classification quasi instantanément")
-        #expect(second.moveQuality == first.moveQuality)
-
-        second.handleViewDisappear()
     }
 
     /// Une fois la ligne classée, se déplacer dans les coups déjà couverts
@@ -147,26 +155,28 @@ struct Chess960AnalysisViewModelTests {
     /// l'éval en cache DE FAÇON SYNCHRONE (pas de salve async à attendre).
     @Test("Naviguer dans une partie classée ne relance aucune analyse")
     func navigatingAClassifiedGameNeverReanalyzes() async throws {
-        let pgn = classicalGamePGN(moves: ["e2e4", "e7e5", "g1f3", "b8c6"])
-        let vm = try #require(Chess960AnalysisViewModel(pgn: pgn))
-        vm.start()
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let pgn = classicalGamePGN(moves: ["e2e4", "e7e5", "g1f3", "b8c6"])
+            let vm = try #require(Chess960AnalysisViewModel(pgn: pgn))
+            vm.start()
 
-        let deadline = Date().addingTimeInterval(60)
-        while Date() < deadline, vm.moveQuality.count < vm.totalPlies {
-            try await Task.sleep(for: .milliseconds(300))
+            let deadline = Date().addingTimeInterval(60)
+            while Date() < deadline, vm.moveQuality.count < vm.totalPlies {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            #expect(vm.moveQuality.count == vm.totalPlies)
+
+            for ply in 0...vm.totalPlies {
+                vm.review(toPly: ply)
+                // Synchrone : si ceci retombait sur ``refreshAnalysis()``, l'éval
+                // serait remise à `nil` en attendant une salve async, jamais
+                // disponible tout de suite après l'appel.
+                #expect(vm.currentEvalCp != nil || vm.currentEvalMate != nil,
+                         "coup \(ply) : l'éval doit venir du cache, pas d'une nouvelle salve")
+            }
+
+            vm.handleViewDisappear()
         }
-        #expect(vm.moveQuality.count == vm.totalPlies)
-
-        for ply in 0...vm.totalPlies {
-            vm.review(toPly: ply)
-            // Synchrone : si ceci retombait sur ``refreshAnalysis()``, l'éval
-            // serait remise à `nil` en attendant une salve async, jamais
-            // disponible tout de suite après l'appel.
-            #expect(vm.currentEvalCp != nil || vm.currentEvalMate != nil,
-                     "coup \(ply) : l'éval doit venir du cache, pas d'une nouvelle salve")
-        }
-
-        vm.handleViewDisappear()
     }
 
     @Test("L'export reconstruit un PGN rejouable par le même parseur")

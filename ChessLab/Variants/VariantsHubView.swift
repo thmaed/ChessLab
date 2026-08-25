@@ -1,10 +1,13 @@
 import SwiftUI
 
 /// Le hub des variantes d'échecs — l'écran qu'ouvre la tuile « Variantes »
-/// de l'accueil. Une carte par variante, dans la grammaire des tuiles de
-/// mode ; le Chess960 inaugure la liste, les suivantes s'ajouteront ici.
+/// de l'accueil. Une grille de tuiles ``ModeCard`` (le composant le plus
+/// abouti de l'accueil : icône fantôme, dégradé de bordure, flèche de
+/// lancement) — plus cohérent visuellement qu'une simple liste de lignes,
+/// et ça grandit bien à mesure que d'autres variantes s'ajoutent.
 struct VariantsHubView: View {
     let onOpenChess960: () -> Void
+    let onOpenFairyVariant: (FairyVariant) -> Void
 
     var body: some View {
         ScrollView {
@@ -14,33 +17,39 @@ struct VariantsHubView: View {
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Button(action: onOpenChess960) {
-                    HStack(alignment: .top, spacing: 14) {
-                        IconBadge(systemImage: "die.face.5.fill", tint: Theme.violet, size: 48)
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("Chess960")
-                                .font(.headline)
-                                .foregroundStyle(Theme.textPrimary)
-                            Text("Les pièces de la rangée de base sont mélangées — 960 départs possibles, zéro théorie à réciter, que de la compréhension. Aussi appelé « Fischer Random ».")
-                                .font(.callout)
-                                .foregroundStyle(Theme.textSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: ModeGridMetrics.minTileIPhone), spacing: ModeGridMetrics.spacing)],
+                    spacing: ModeGridMetrics.spacing
+                ) {
+                    ModeCard(
+                        title: "Chess960",
+                        subtitle: "960 départs, zéro théorie",
+                        shortSubtitle: "Zéro théorie",
+                        systemImage: "die.face.5.fill",
+                        tint: Theme.violet,
+                        isEnabled: true,
+                        accessibilityID: "variant_chess960",
+                        action: onOpenChess960
+                    )
+                    ForEach(FairyVariant.all) { variant in
+                        ModeCard(
+                            title: LocalizedStringKey(variant.displayName),
+                            shortTitle: LocalizedStringKey(variant.shortName),
+                            subtitle: LocalizedStringKey(variant.tagline),
+                            systemImage: variant.icon,
+                            tint: variant.tint,
+                            isEnabled: true,
+                            accessibilityID: "variant_\(variant.id)"
+                        ) {
+                            onOpenFairyVariant(variant)
                         }
-                        Spacer(minLength: 0)
-                        Image(systemName: "chevron.right")
-                            .font(.footnote.weight(.semibold))
-                            .foregroundStyle(Theme.textTertiary)
-                            .padding(.top, 4)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .cardStyle()
                 }
-                .buttonStyle(.pressable)
-                .accessibilityIdentifier("variant_chess960")
 
-                Text("D'autres variantes viendront s'installer ici.")
+                Text("Sans réseau de neurones dédié à ces trois variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(20)
         }

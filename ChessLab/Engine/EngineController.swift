@@ -1,3 +1,4 @@
+import CFairyStockfishKit
 import CStockfishKit
 import Foundation
 
@@ -239,10 +240,23 @@ actor EngineController {
     /// Borné : au-delà, mieux vaut une bannière honnête qu'une attente sans
     /// fin. Le cas normal se résout en quelques dizaines de millisecondes (le
     /// temps du `quit` + join de l'écran précédent).
+    ///
+    /// Vérifie AUSSI ``FairyStockfishEngine/isProcessBusy`` — pas seulement
+    /// le sien. `handleViewDisappear()` arrête un moteur via une tâche
+    /// DÉTACHÉE, jamais attendue (correct : `.onDisappear` ne peut pas
+    /// `await`). `std::cin`/`std::cout`, eux, sont des flux GLOBAUX AU
+    /// PROCESS que Stockfish ET Fairy-Stockfish redirigent chacun à leur
+    /// tour — si l'un démarre pendant que l'autre achève sa démolition en
+    /// tâche de fond, sa redirection écrase celle du nouveau venu EN PLEIN
+    /// MILIEU, qui n'entend plus jamais rien. Découvert le 25/08 en changeant
+    /// de variante (Chess960/normal ↔ Fairy-Stockfish) : un défaut réel, pas
+    /// seulement un artefact de test.
     private func acquireEngineProcess(timeoutMs: Int = 4000) async -> Bool {
         var attemptsLeft = max(timeoutMs / 50, 1)
         while true {
-            if engine.start(binaryPath: Self.enginePath) { return true }
+            if !FairyStockfishEngine.isProcessBusy, engine.start(binaryPath: Self.enginePath) {
+                return true
+            }
             guard attemptsLeft > 0 else { return false }
             attemptsLeft -= 1
             try? await Task.sleep(nanoseconds: 50_000_000)

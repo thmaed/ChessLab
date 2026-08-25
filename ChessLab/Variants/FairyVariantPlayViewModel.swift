@@ -3,45 +3,33 @@ import Foundation
 import Observation
 import UIKit
 
-/// Partie de Chess960 contre l'ordinateur.
-///
-/// Un view model DÉDIÉ et volontairement plus petit que ``PlayViewModel`` :
-/// la légalité vient de ``Chess960Game`` (couche partagée, prouvée par
-/// perft), et le journal de partie est en UCI/SAN — pas en `Move` ChessKit,
-/// qu'un roque 960 ne sait pas représenter. Les composants extraits, eux,
-/// sont repris tels quels : ``ChessBoardView``, ``PlayControlBar``,
-/// ``GameClock``, ``EngineStrength``, ``EvalBarView``.
-///
-/// Périmètre du lot 2 : couleur, force Elo, cadence avec pendule, barre
-/// d'évaluation, consultation + « Reprendre ici » avec annulation (le
-/// pattern du 24/08), reprise de coup, abandon, export FEN/PGN. Sans indice,
-/// alerte gaffe, livre (pas de théorie en 960) ni autosauvegarde — lots
-/// suivants, documentés dans le plan.
+/// Partie contre l'ordinateur dans une variante Fairy-Stockfish (Roi de la
+/// colline, Trois échecs, Horde) — un SEUL view model pour les trois : leur
+/// plateau et leurs coups restent ceux de ChessKit, seule la condition de
+/// victoire diffère (voir ``FairyVariant/specialOutcome(board:mover:checkCounts:)``).
+/// Structure calquée sur ``Chess960PlayViewModel`` (même discipline moteur,
+/// même pattern « Reprendre ici »), mais plus simple : pas de couche de
+/// règles à part, pas de dialecte de roque à corriger à l'affichage — un
+/// `Move` ChessKit ordinaire suffit partout.
 @Observable
 @MainActor
-final class Chess960PlayViewModel {
+final class FairyVariantPlayViewModel {
 
     // MARK: État de partie
 
-    let settings: Chess960Settings
+    let variant: FairyVariant
+    let settings: FairyVariantSettings
     let userColor: Piece.Color
     let engineColor: Piece.Color
 
-    private(set) var game: Chess960Game
-    /// Journal en UCI (dialecte roi-prend-tour) — la source de vérité du
-    /// rejeu ; le SAN, parallèle, sert à l'affichage et au PGN.
+    private(set) var board: Board
     private(set) var uciLog: [String] = []
     private(set) var sanLog: [String] = []
-    /// Cases à surligner, un couple par coup — voir
-    /// ``Chess960Game/displaySquares(forUCI:)`` : pour un roque, l'arrivée
-    /// affichée est celle du ROI, pas le dialecte roi-prend-tour de l'UCI
-    /// moteur.
-    private var displaySquaresLog: [(from: Square, to: Square)] = []
+    private(set) var moveLog: [Move] = []
     private(set) var outcome: GameOutcome?
-    /// Occurrences de chaque position (clé : 4 champs Shredder) — la nulle
-    /// par répétition vit ICI : le compteur interne de ChessKit ne survit pas
-    /// à la reconstruction qu'exige un roque.
-    private var repetitionCounts: [String: Int] = [:]
+    /// Échecs infligés par chaque camp — Trois échecs seulement, ignoré
+    /// sinon (mais toujours tenu à jour : coût négligeable).
+    private(set) var checkCounts: [Piece.Color: Int] = [.white: 0, .black: 0]
 
     let clock: GameClock?
     private let startFEN: String
@@ -55,14 +43,14 @@ final class Chess960PlayViewModel {
 
     // MARK: Moteur
 
-    private let engine = EngineController()
+    private let engine = FairyEngineController()
     private var engineQueue: Task<Void, Never> = Task {}
     private(set) var isEngineThinking = false
     private(set) var isEngineUnavailable = false
     private(set) var currentEvalCp: Int?
     private(set) var currentEvalMate: Int?
 
-    // MARK: Indice — analyse ponctuelle, PAS continue (voir startHintAnalysis)
+    // MARK: Indice — analyse ponctuelle, PAS continue (voir Chess960PlayViewModel)
 
     var hintMoves: [HintMove] = []
     private(set) var hintsWanted = false
@@ -75,21 +63,19 @@ final class Chess960PlayViewModel {
     // MARK: Consultation
 
     private(set) var reviewPly: Int?
-    private var reviewGame: Chess960Game?
+    private var reviewBoard: Board?
 
     // MARK: Cycle de vie
 
-    init(settings: Chess960Settings) {
+    init(variant: FairyVariant, settings: FairyVariantSettings) {
+        self.variant = variant
         self.settings = settings
         let color = settings.resolvedColorChoice.resolved()
         userColor = color
         engineColor = color.opposite
-        let fen = Chess960Position.startingFEN(number: settings.positionNumber)
-            ?? Chess960Position.startingFEN(number: 518)!
-        startFEN = fen
-        game = Chess960Game(fen: fen)!
+        startFEN = variant.startFEN
+        board = Board(position: Position(fen: variant.startFEN)!)
         clock = settings.timeControl.hasClock ? GameClock(control: settings.timeControl) : nil
-        repetitionCounts[game.repetitionKey] = 1
 
         clock?.onFlagFall = { [weak self] color in
             self?.handleFlagFall(color)
@@ -99,7 +85,7 @@ final class Chess960PlayViewModel {
     func start() {
         enqueueEngineWork { [weak self] in await self?.setupEngine() }
         clock?.startTurn(for: .white)
-        if game.board.position.sideToMove == engineColor {
+        if board.position.sideToMove == engineColor {
             enqueueEngineWork { [weak self] in await self?.requestEngineMove() }
         } else {
             if settings.showEvalBar {
@@ -117,24 +103,31 @@ final class Chess960PlayViewModel {
 
     // MARK: Affichage
 
-    var displayedGame: Chess960Game { reviewGame ?? game }
-    var displayedBoard: Board { displayedGame.board }
+    var displayedBoard: Board { reviewBoard ?? board }
     var totalPlies: Int { uciLog.count }
     var displayedPly: Int { reviewPly ?? uciLog.count }
     var isReviewing: Bool { reviewPly != nil }
 
-    /// Paires (n° de coup, blanc, noir?) pour la liste des coups.
     var numberedMoves: [(number: Int, white: String, black: String?)] {
         stride(from: 0, to: sanLog.count, by: 2).map { index in
             (index / 2 + 1, sanLog[index], index + 1 < sanLog.count ? sanLog[index + 1] : nil)
         }
     }
 
+    /// Coup à surligner — celui qui mène à la position affichée. Aucune
+    /// correction à faire (contrairement à Chess960) : le `Move` ChessKit
+    /// EST déjà la vérité affichée, roque compris.
+    var displayedLastMove: Move? {
+        let index = displayedPly
+        guard index > 0, index <= moveLog.count else { return nil }
+        return moveLog[index - 1]
+    }
+
     // MARK: Interaction utilisateur
 
     private var canUserAct: Bool {
         outcome == nil && pendingPromotion == nil && !isReviewing
-            && game.board.position.sideToMove == userColor
+            && board.position.sideToMove == userColor
     }
 
     func selectSquare(_ square: Square) {
@@ -143,43 +136,26 @@ final class Chess960PlayViewModel {
             attemptUserMove(from: selected, to: square)
             return
         }
-        guard let piece = game.board.position.piece(at: square), piece.color == userColor else {
+        guard let piece = board.position.piece(at: square), piece.color == userColor else {
             clearSelection()
             return
         }
         selectedSquare = square
-        legalTargetSquares = targets(for: square)
-    }
-
-    /// Destinations d'une pièce — pour le roi s'y ajoutent les cases de SES
-    /// tours d'origine : le geste de roque du 960 est « le roi prend sa
-    /// tour », comme sur Lichess et dans le dialecte UCI du moteur.
-    private func targets(for square: Square) -> [Square] {
-        var targets = game.board.legalMoves(forPieceAt: square)
-        if let piece = game.board.position.piece(at: square), piece.kind == .king {
-            for move in game.legalMoves() {
-                if case .castle = move,
-                   let rookSquare = Square(String(game.uciFor(move).dropFirst(2))) as Square? {
-                    targets.append(rookSquare)
-                }
-            }
-        }
-        return targets
+        legalTargetSquares = board.legalMoves(forPieceAt: square)
     }
 
     func attemptUserMove(from start: Square, to end: Square) {
         guard canUserAct, start != end,
-              game.board.position.piece(at: start)?.color == userColor
+              board.position.piece(at: start)?.color == userColor
         else {
             Haptics.illegal()
             clearSelection()
             return
         }
 
-        // Promotion : demander la pièce AVANT de jouer, comme en mode Jouer.
-        if let piece = game.board.position.piece(at: start), piece.kind == .pawn,
+        if let piece = board.position.piece(at: start), piece.kind == .pawn,
            end.notation.hasSuffix(userColor == .white ? "8" : "1"),
-           game.board.canMove(pieceAt: start, to: end) {
+           board.canMove(pieceAt: start, to: end) {
             pendingPromotion = PendingPromotion(from: start, to: end)
             clearSelection()
             return
@@ -207,9 +183,8 @@ final class Chess960PlayViewModel {
         legalTargetSquares = []
     }
 
-    /// Accès de TEST : joue un coup pour le camp au trait, quel qu'il soit,
-    /// sans passer par les gardes d'interaction. La suite de tests pilote les
-    /// deux camps — le moteur n'y est jamais démarré.
+    /// Accès de TEST : joue un coup pour le camp au trait, sans passer par
+    /// les gardes d'interaction — le moteur n'est jamais démarré.
     func forceMove(uci: String) {
         _ = commit(uci: uci)
     }
@@ -218,42 +193,38 @@ final class Chess960PlayViewModel {
 
     @discardableResult
     private func commit(uci: String) -> Bool {
-        let previousMover = game.board.position.sideToMove
-        let beforeFEN = game.shredderFEN
-        let squares = game.displaySquares(forUCI: uci)
-        guard let san = game.apply(uci: uci) else { return false }
+        let previousMover = board.position.sideToMove
+        let beforeFEN = board.position.fen
+        guard let move = FairyVariant.apply(uci: uci, to: &board) else { return false }
         clearResumeUndo(ifMoverIs: userColor, was: previousMover)
         uciLog.append(uci)
-        sanLog.append(san)
-        if let squares { displaySquaresLog.append(squares) }
-        playSound(for: san)
+        sanLog.append(move.san)
+        moveLog.append(move)
+        playSound(for: move.san)
         hintMoves = []
 
-        let key = game.repetitionKey
-        repetitionCounts[key, default: 0] += 1
+        if case .check = board.state {
+            checkCounts[previousMover, default: 0] += 1
+        }
 
-        if let end = detectOutcome(repetitions: repetitionCounts[key] ?? 1) {
+        if let end = detectOutcome(mover: previousMover) {
             outcome = end
             clock?.pause()
             Haptics.gameEnded()
             return true
         }
 
-        clock?.startTurn(for: game.board.position.sideToMove, previousMover: previousMover)
+        clock?.startTurn(for: board.position.sideToMove, previousMover: previousMover)
 
-        // AVANT la réponse du moteur, pas après — même ordre que
-        // ``PlayViewModel/commit(scratch:move:)``. Inversé au premier jet,
-        // la réponse du moteur (enfilée sur la MÊME file sérielle) consommait
-        // le tour et faisait toujours échouer le garde de fraîcheur de la
-        // vérification (`atMoveCount == uciLog.count`) avant même qu'elle
-        // s'exécute — un défaut RÉEL, pas un artefact de test : l'alerte
-        // gaffe n'aurait presque jamais pu se déclencher en jeu normal.
-        // Attrapé par `blunderAlertFiresOnAHangingQueen`.
+        // AVANT la réponse du moteur — même ordre que
+        // ``Chess960PlayViewModel/commit(uci:)`` (défaut réel trouvé le
+        // 25/08 : inversé, la réponse moteur consommait le tour avant que
+        // la vérification n'ait sa chance).
         if previousMover == userColor {
-            checkForBlunderRetroactively(beforeFEN: beforeFEN, afterFEN: game.shredderFEN, atMoveCount: uciLog.count)
+            checkForBlunderRetroactively(beforeFEN: beforeFEN, afterFEN: board.position.fen, atMoveCount: uciLog.count)
         }
 
-        if game.board.position.sideToMove == engineColor {
+        if board.position.sideToMove == engineColor {
             enqueueEngineWork { [weak self] in await self?.requestEngineMove() }
         } else {
             if settings.showEvalBar {
@@ -276,17 +247,13 @@ final class Chess960PlayViewModel {
         }
     }
 
-    private func detectOutcome(repetitions: Int) -> GameOutcome? {
-        if let end = game.boardEnd {
-            switch end {
-            case let .checkmate(winner): return GameOutcome(winner: winner, reason: .checkmate)
-            case .stalemate: return GameOutcome(winner: nil, reason: .draw(.stalemate))
-            case .insufficientMaterial: return GameOutcome(winner: nil, reason: .draw(.insufficientMaterial))
-            case .fiftyMoves: return GameOutcome(winner: nil, reason: .draw(.fiftyMoves))
-            }
+    /// Mat/pat/nulle standard D'ABORD (un mat reste un mat même sur la
+    /// colline), PUIS la condition propre à la variante.
+    private func detectOutcome(mover: Piece.Color) -> GameOutcome? {
+        if let standard = GameOutcome.fromBoardState(board.state) {
+            return standard
         }
-        if repetitions >= 3 { return GameOutcome(winner: nil, reason: .draw(.repetition)) }
-        return nil
+        return variant.specialOutcome(board: board, mover: mover, checkCounts: checkCounts)
     }
 
     private func handleFlagFall(_ color: Piece.Color) {
@@ -315,26 +282,22 @@ final class Chess960PlayViewModel {
 
     private func setupEngine() async {
         guard outcome == nil else { return }
-        guard await engine.start() else {
+        guard await engine.start(variant: variant.id) else {
             isEngineUnavailable = true
             return
         }
-        // LE réglage qui fait la variante : sous `UCI_Chess960`, Stockfish lit
-        // les droits Shredder et rend le roque en roi-prend-tour — le dialecte
-        // exact de `Chess960Game.apply(uci:)`.
-        await engine.send(.setoption(id: "UCI_Chess960", value: "true"))
         for command in settings.strength.setupCommands {
             await engine.send(command)
         }
     }
 
     private func requestEngineMove() async {
-        guard outcome == nil, game.board.position.sideToMove == engineColor else { return }
+        guard outcome == nil, board.position.sideToMove == engineColor else { return }
         isEngineThinking = true
         defer { isEngineThinking = false }
 
         await engine.synchronize()
-        await engine.send(.position(.fen(game.shredderFEN)))
+        await engine.send(.position(.fen(board.position.fen)))
 
         let mover = engineColor
         let budgetMs: Int
@@ -375,44 +338,26 @@ final class Chess960PlayViewModel {
             setEval(cp: cp, mate: result.mate, moverIsWhite: mover == .white)
         }
         guard let lan = result.lan, lan != "(none)", outcome == nil, !isReviewing else {
-            if outcome == nil, game.boardEnd != nil { outcome = detectOutcome(repetitions: 1) }
             return
         }
         _ = commit(uci: lan)
     }
 
-    /// Défaut corrigé le 25/08 : cette méthode appelait
-    /// ``EngineController/computeBestMove(fen:setupCommands:movetimeMs:depth:)``
-    /// — l'API à LECTEUR PERMANENT, réservée au Laboratoire (self-play en
-    /// continu). Elle démarre `ensureMoveReader()`, qui installe une tâche de
-    /// fond consommant `responseStream` POUR TOUJOURS ; ``requestEngineMove``
-    /// lit ce même flux À LA MAIN, comme partout ailleurs dans l'app —
-    /// `responseStream` est un `AsyncStream` à consommateur UNIQUE. Dès que
-    /// la barre d'éval s'affichait une seule fois (au démarrage, si l'utilisateur
-    /// joue les blancs), le lecteur permanent restait vivant, et le premier
-    /// `synchronize()` du coup moteur suivant heurtait l'assertion qui garde
-    /// précisément cette discipline (« deux `next()` concurrents =
-    /// fatalError du stdlib ») — silencieusement gelé hors débogueur, en
-    /// trappe DANS le débogueur : exactement le signalement du 25/08,
-    /// « après le premier coup blanc, l'ordinateur ne joue jamais ».
-    ///
-    /// Le remède : la MÊME lecture manuelle que ``requestEngineMove`` et que
-    /// ``PlayViewModel/updateEvalBar()``, jamais `computeBestMove`.
     private func updateEvalBar() async {
         guard outcome == nil else { return }
-        await refreshEvalBar(fen: game.shredderFEN, mover: game.board.position.sideToMove)
+        await refreshEvalBar(fen: board.position.fen, mover: board.position.sideToMove)
     }
 
-    /// Même salve, mais pour la position AFFICHÉE (consultation comprise) —
-    /// appelée par ``review(toPly:)``. Séparée de ``updateEvalBar()`` : celle
-    /// du direct se tait après une fin de partie (rien à évaluer, le coup
-    /// suivant n'existe pas), la consultation doit au contraire fonctionner
-    /// PARTICULIÈREMENT après la fin — c'est là qu'on revoit la partie.
+    /// Même salve, pour la position AFFICHÉE (consultation comprise) —
+    /// appelée par ``review(toPly:)``/``reviewToLive()``. Séparée
+    /// d'``updateEvalBar()`` : celle du direct se tait après une fin de
+    /// partie, la consultation doit au contraire fonctionner
+    /// PARTICULIÈREMENT après la fin.
     private func refreshDisplayedEvalBar() {
         guard settings.showEvalBar else { return }
         enqueueEngineWork { [weak self] in
             guard let self else { return }
-            await self.refreshEvalBar(fen: self.displayedGame.shredderFEN, mover: self.displayedGame.board.position.sideToMove)
+            await self.refreshEvalBar(fen: self.displayedBoard.position.fen, mover: self.displayedBoard.position.sideToMove)
         }
     }
 
@@ -442,19 +387,15 @@ final class Chess960PlayViewModel {
             return (cp: cp, mate: mate)
         }
 
-        // Position obsolète (un coup joué OU une navigation de consultation
-        // pendant la recherche courte) : comparée à la position AFFICHÉE,
-        // pas seulement la position live — sinon une salve lancée en
-        // consultation s'appliquerait à tort après un retour au direct.
-        // Même convention que ``requestEngineMove`` : un score de mat sans
-        // `cp` n'est pas affiché — comportement PRÉEXISTANT, pas retouché ici.
-        guard case let .finished(result) = search, fen == displayedGame.shredderFEN,
+        // Comparée à la position AFFICHÉE (pas seulement la position live) :
+        // une salve lancée en consultation ne doit pas s'appliquer à tort
+        // après un retour au direct, ni l'inverse.
+        guard case let .finished(result) = search, fen == displayedBoard.position.fen,
               let cp = result.cp
         else { return }
         setEval(cp: cp, mate: result.mate, moverIsWhite: mover == .white)
     }
 
-    /// La barre parle TOUJOURS du point de vue des blancs.
     private func setEval(cp: Int, mate: Int?, moverIsWhite: Bool) {
         guard settings.showEvalBar else { return }
         currentEvalCp = moverIsWhite ? cp : -cp
@@ -471,20 +412,6 @@ final class Chess960PlayViewModel {
 
     // MARK: Indice
 
-    /// Analyse PONCTUELLE et BORNÉE (~1,5 s), pas continue comme
-    /// ``PlayViewModel/startHintAnalysis()``. Ce dernier tourne tant que
-    /// l'indice reste affiché, ce qui exige toute une machinerie
-    /// d'interruption (`isHintAnalyzing`, `hintTask`, `stopHintIfNeeded`,
-    /// `interruptHintAnalysisIfNeeded`) pour ne jamais laisser deux
-    /// consommateurs se disputer `responseStream` — exactement la classe de
-    /// défaut qui a gelé cette variante plus tôt aujourd'hui
-    /// (``updateEvalBar()``). Une salve BORNÉE encaisse le même risque sans
-    /// cette machinerie : elle passe par la file sérielle comme tout le
-    /// reste, se termine d'elle-même, et un résultat qui arrive après que la
-    /// position a changé est simplement jeté (garde `hintsWanted` /
-    /// `sideToMove` revérifiée après coup) plutôt qu'annulé activement.
-    /// Contrepartie assumée : les flèches n'affinent pas leur profondeur en
-    /// temps réel, elles apparaissent une fois, au bout d'~1,5 s.
     private static let hintBudgetMs = 1500
 
     func toggleHint() {
@@ -496,9 +423,6 @@ final class Chess960PlayViewModel {
         }
     }
 
-    /// Relance l'indice sur la file sérielle si l'utilisateur l'avait
-    /// activé avant le coup qui vient d'être joué — même rôle que
-    /// ``PlayViewModel/restartHintAnalysisIfWanted()``.
     private func restartHintAnalysisIfWanted() {
         guard hintsWanted else { return }
         enqueueEngineWork { [weak self] in await self?.startHintAnalysis() }
@@ -506,13 +430,13 @@ final class Chess960PlayViewModel {
 
     private func startHintAnalysis() async {
         guard settings.hintsEnabled, hintsWanted, outcome == nil,
-              game.board.position.sideToMove == userColor
+              board.position.sideToMove == userColor
         else { return }
 
         isHintAnalyzing = true
         defer { isHintAnalyzing = false }
 
-        let fen = game.shredderFEN
+        let fen = board.position.fen
         await engine.synchronize()
         await engine.send(.setoption(id: "MultiPV", value: "3"))
         await engine.send(.position(.fen(fen)))
@@ -542,26 +466,11 @@ final class Chess960PlayViewModel {
         }
         await engine.send(.setoption(id: "MultiPV", value: "1"))
 
-        // Résultat obsolète (position changée, indice redésactivé pendant la
-        // salve) : on le jette plutôt que de l'appliquer à l'aveugle.
         guard case let .finished((lanByRank, scoreByRank)) = search,
-              hintsWanted, outcome == nil, fen == game.shredderFEN
+              hintsWanted, outcome == nil, fen == board.position.fen
         else { return }
 
         hintMoves = HintMoveBuilder.build(lanByRank: lanByRank, scoreByRank: scoreByRank)
-            .map(remappedForCastle)
-    }
-
-    /// Une flèche d'indice sur un roque parlerait, comme l'UCI moteur, du
-    /// roi qui « prend » sa tour — la case d'ARRIVÉE affichée doit être
-    /// celle où le roi atterrit VRAIMENT, même correction que
-    /// ``displayedLastMove``.
-    private func remappedForCastle(_ hint: HintMove) -> HintMove {
-        guard let squares = game.displaySquares(forUCI: hint.from.notation + hint.to.notation),
-              squares.to != hint.to
-        else { return hint }
-        return HintMove(rank: hint.rank, from: hint.from, to: squares.to, strength: hint.strength,
-                        kind: hint.kind, tint: hint.tint)
     }
 
     // MARK: Alerte gaffe (rétroactive)
@@ -585,15 +494,11 @@ final class Chess960PlayViewModel {
         pendingBlunderWarning = nil
     }
 
-    /// Passe par la file sérielle plutôt que d'appeler `takeback()`
-    /// directement — même raison que ``PlayViewModel/takebackAfterBlunderWarning()``.
     func takebackAfterBlunderWarning() {
         pendingBlunderWarning = nil
         enqueueEngineWork { [weak self] in self?.takeback() }
     }
 
-    /// Même contrat que ``PlayViewModel``'s équivalent privé : score en
-    /// centipions ET mat en N éventuel, du point de vue du camp au trait.
     private func quickScore(fen: String) async -> (cp: Int, mate: Int?)? {
         await engine.synchronize()
         await engine.send(.position(.fen(fen)))
@@ -626,7 +531,7 @@ final class Chess960PlayViewModel {
         return score
     }
 
-    // MARK: Consultation & reprise — le pattern du 24/08
+    // MARK: Consultation & reprise
 
     func review(toPly ply: Int) {
         let clamped = max(0, min(ply, uciLog.count))
@@ -635,7 +540,7 @@ final class Chess960PlayViewModel {
             return
         }
         reviewPly = clamped
-        reviewGame = replayed(prefix: clamped)
+        reviewBoard = replayed(prefix: clamped)
         clearSelection()
         refreshDisplayedEvalBar()
     }
@@ -645,7 +550,7 @@ final class Chess960PlayViewModel {
 
     func reviewToLive() {
         reviewPly = nil
-        reviewGame = nil
+        reviewBoard = nil
         clearSelection()
         refreshDisplayedEvalBar()
     }
@@ -656,7 +561,7 @@ final class Chess960PlayViewModel {
 
     func takeback() {
         guard canTakeback else { return }
-        let whiteJustMoved = game.board.position.sideToMove == .black
+        let whiteJustMoved = board.position.sideToMove == .black
         let moverWasEngine = (whiteJustMoved ? Piece.Color.white : .black) == engineColor
         let count = (moverWasEngine && uciLog.count >= 2) ? 2 : 1
         truncate(to: uciLog.count - count)
@@ -690,9 +595,6 @@ final class Chess960PlayViewModel {
         }
     }
 
-    /// Mêmes gardes que ``canTakeback`` — voir la revue du 24/08 : sans
-    /// `outcome == nil`, annuler ressuscitait une partie abandonnée ; sans
-    /// `!isEngineThinking`, le plateau changeait sous la recherche.
     func cancelResumeFromReview() {
         guard let undo = resumeUndo, outcome == nil, !isEngineThinking else { return }
         clearResumeUndo()
@@ -729,20 +631,24 @@ final class Chess960PlayViewModel {
         rebuildFromLogs()
     }
 
-    /// Reconstruit `game` et le compteur de répétitions depuis les journaux —
-    /// LE chemin commun de la reprise de coup et de l'annulation de reprise.
+    /// Reconstruit `board`, le journal des coups et le compteur d'échecs
+    /// depuis ``uciLog``/``sanLog`` — le chemin commun de la reprise de coup
+    /// et de l'annulation de reprise.
     private func rebuildFromLogs() {
-        var rebuilt = Chess960Game(fen: startFEN)!
-        var counts: [String: Int] = [rebuilt.repetitionKey: 1]
-        var squaresLog: [(from: Square, to: Square)] = []
+        var rebuilt = Board(position: Position(fen: startFEN)!)
+        var counts: [Piece.Color: Int] = [.white: 0, .black: 0]
+        var rebuiltMoves: [Move] = []
         for uci in uciLog {
-            if let squares = rebuilt.displaySquares(forUCI: uci) { squaresLog.append(squares) }
-            _ = rebuilt.apply(uci: uci)
-            counts[rebuilt.repetitionKey, default: 0] += 1
+            let mover = rebuilt.position.sideToMove
+            guard let move = FairyVariant.apply(uci: uci, to: &rebuilt) else { break }
+            rebuiltMoves.append(move)
+            if case .check = rebuilt.state {
+                counts[mover, default: 0] += 1
+            }
         }
-        game = rebuilt
-        repetitionCounts = counts
-        displaySquaresLog = squaresLog
+        board = rebuilt
+        moveLog = rebuiltMoves
+        checkCounts = counts
         outcome = nil
         pendingBlunderWarning = nil
         clearSelection()
@@ -750,7 +656,7 @@ final class Chess960PlayViewModel {
         currentEvalMate = nil
         hintMoves = []
 
-        if game.board.position.sideToMove == engineColor {
+        if board.position.sideToMove == engineColor {
             enqueueEngineWork { [weak self] in await self?.requestEngineMove() }
         } else {
             if settings.showEvalBar {
@@ -760,39 +666,30 @@ final class Chess960PlayViewModel {
         }
     }
 
-    private func replayed(prefix count: Int) -> Chess960Game {
-        var replayed = Chess960Game(fen: startFEN)!
-        for uci in uciLog.prefix(count) { _ = replayed.apply(uci: uci) }
+    private func replayed(prefix count: Int) -> Board {
+        var replayed = Board(position: Position(fen: startFEN)!)
+        for uci in uciLog.prefix(count) { _ = FairyVariant.apply(uci: uci, to: &replayed) }
         return replayed
-    }
-
-    /// Coup à surligner sur l'échiquier — celui qui mène à la position
-    /// affichée, consultation comprise (même convention que
-    /// ``PlayViewModel/displayedLastMove``). `piece` n'est utilisé nulle
-    /// part pour la surbrillance elle-même (seuls `start`/`end` comptent),
-    /// mais `Move` l'exige : on y met la pièce réellement arrivée sur la
-    /// case de destination.
-    var displayedLastMove: Move? {
-        let index = displayedPly
-        guard index > 0, index <= displaySquaresLog.count else { return nil }
-        let squares = displaySquaresLog[index - 1]
-        guard let piece = displayedBoard.position.piece(at: squares.to) else { return nil }
-        return Move(result: .move, piece: piece, start: squares.from, end: squares.to)
     }
 
     // MARK: Export
 
-    var displayedFEN: String { displayedGame.shredderFEN }
+    var displayedFEN: String { displayedBoard.position.fen }
 
-    /// PGN de la variante : tags `Variant`/`SetUp`/`FEN`, roque en O-O — le
-    /// format que Lichess et les autres logiciels 960 relisent.
+    /// PGN — tag `Variant` propre à Fairy-Stockfish (lu par Lichess et les
+    /// autres logiciels compatibles).
     var exportedPGN: String {
         var tags = [
-            "[Event \"ChessLab Chess960\"]",
-            "[Variant \"Chess960\"]",
-            "[SetUp \"1\"]",
-            "[FEN \"\(startFEN)\"]",
+            "[Event \"ChessLab \(variant.displayName)\"]",
+            "[Variant \"\(variant.id)\"]",
         ]
+        // Horde n'a pas la position de départ classique : le dire au format
+        // PGN standard (comme Chess960) pour qu'un lecteur externe la
+        // retrouve, plutôt que de supposer la position initiale usuelle.
+        if variant.id == FairyVariant.horde.id {
+            tags.append("[SetUp \"1\"]")
+            tags.append("[FEN \"\(startFEN)\"]")
+        }
         if let outcome {
             tags.append("[Result \"\(outcome.pgnResult)\"]")
         }

@@ -8,6 +8,12 @@ struct GameOutcome: Equatable {
         case resignation
         case timeout
         case drawByAgreement
+        /// Roi arrivé sur une case centrale — Roi de la colline (Fairy-Stockfish).
+        case kingOfTheHill
+        /// Trois échecs infligés au total — Trois échecs (Fairy-Stockfish).
+        case threeChecksDelivered
+        /// Plus aucune pièce pour le camp aux pions — Horde (Fairy-Stockfish).
+        case hordeExtinction
     }
 
     /// `nil` si la partie est nulle.
@@ -35,6 +41,9 @@ struct GameOutcome: Equatable {
         case .resignation: LocalizationController.string("abandon")
         case .timeout: LocalizationController.string("temps écoulé")
         case .drawByAgreement: LocalizationController.string("accord mutuel")
+        case .kingOfTheHill: LocalizationController.string("roi au centre")
+        case .threeChecksDelivered: LocalizationController.string("trois échecs infligés")
+        case .hordeExtinction: LocalizationController.string("plus aucune pièce")
         }
     }
 
@@ -131,6 +140,9 @@ extension GameOutcome.Reason {
         case .resignation: "resignation"
         case .timeout: "timeout"
         case .drawByAgreement: "drawByAgreement"
+        case .kingOfTheHill: "kingOfTheHill"
+        case .threeChecksDelivered: "threeChecksDelivered"
+        case .hordeExtinction: "hordeExtinction"
         }
     }
 }

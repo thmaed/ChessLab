@@ -642,6 +642,9 @@
         }
       }
     },
+    "%lld échecs sur 3" : {
+
+    },
     "%lld lignes" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -857,6 +860,9 @@
           }
         }
       }
+    },
+    "%lld/3" : {
+
     },
     "%lld%%" : {
       "localizations" : {
@@ -1099,6 +1105,9 @@
           }
         }
       }
+    },
+    "960 départs, zéro théorie" : {
+
     },
     "a gagné" : {
       "localizations" : {
@@ -5152,6 +5161,7 @@
       }
     },
     "D'autres variantes viendront s'installer ici." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -9485,6 +9495,9 @@
         }
       }
     },
+    "Les Elo sont calibrés pour la partie classique : sans réseau de neurones dédié à cette variante, le niveau réel peut différer." : {
+
+    },
     "les noirs" : {
       "localizations" : {
         "en" : {
@@ -9544,6 +9557,7 @@
       }
     },
     "Les pièces de la rangée de base sont mélangées — 960 départs possibles, zéro théorie à réciter, que de la compréhension. Aussi appelé « Fischer Random »." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -13342,6 +13356,9 @@
         }
       }
     },
+    "Règle" : {
+
+    },
     "règle des 50 coups" : {
       "localizations" : {
         "en" : {
@@ -14643,6 +14660,9 @@
           }
         }
       }
+    },
+    "Sans réseau de neurones dédié à ces trois variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal." : {
+
     },
     "Saragossa Opening" : {
       "extractionState" : "stale",
@@ -17695,6 +17715,9 @@
           }
         }
       }
+    },
+    "Zéro théorie" : {
+
     },
     "Zukertort Defense" : {
       "extractionState" : "stale",

@@ -140,26 +140,28 @@ struct Chess960PlayViewModelTests {
     // généreuse.
     @Test("Avec la barre d'éval activée, l'ordinateur répond après le premier coup")
     func engineRepliesAfterFirstMoveWithEvalBarEnabled() async throws {
-        var settings = Chess960Settings()
-        settings.positionNumber = 518
-        settings.showEvalBar = true
-        let vm = Chess960PlayViewModel(settings: settings)
-        vm.start()
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            var settings = Chess960Settings()
+            settings.positionNumber = 518
+            settings.showEvalBar = true
+            let vm = Chess960PlayViewModel(settings: settings)
+            vm.start()
 
-        // Laisser le moteur démarrer et afficher l'éval initiale — c'est
-        // CE geste qui empoisonnait l'instance avant le correctif.
-        try await Task.sleep(for: .seconds(3))
+            // Laisser le moteur démarrer et afficher l'éval initiale — c'est
+            // CE geste qui empoisonnait l'instance avant le correctif.
+            try await Task.sleep(for: .seconds(3))
 
-        vm.attemptUserMove(from: Square("e2"), to: Square("e4"))
-        try #require(vm.totalPlies >= 1, "le coup utilisateur doit tenir")
+            vm.attemptUserMove(from: Square("e2"), to: Square("e4"))
+            try #require(vm.totalPlies >= 1, "le coup utilisateur doit tenir")
 
-        let deadline = Date().addingTimeInterval(60)
-        while Date() < deadline, vm.totalPlies < 2 {
-            try await Task.sleep(for: .milliseconds(200))
+            let deadline = Date().addingTimeInterval(60)
+            while Date() < deadline, vm.totalPlies < 2 {
+                try await Task.sleep(for: .milliseconds(200))
+            }
+            #expect(vm.totalPlies >= 2, "l'ordinateur n'a jamais répondu — moteur gelé")
+
+            vm.handleViewDisappear()
         }
-        #expect(vm.totalPlies >= 2, "l'ordinateur n'a jamais répondu — moteur gelé")
-
-        vm.handleViewDisappear()
     }
 
     @Test("Le dernier coup se surligne, roque compris — sur la case RÉELLE du roi")
@@ -214,28 +216,30 @@ struct Chess960PlayViewModelTests {
     /// ``engineRepliesAfterFirstMoveWithEvalBarEnabled``).
     @Test("L'indice propose au moins un coup légal une fois activé")
     func hintProducesAtLeastOneLegalMove() async throws {
-        var settings = Chess960Settings()
-        settings.positionNumber = 518
-        let vm = Chess960PlayViewModel(settings: settings)
-        vm.start()
-        try await Task.sleep(for: .seconds(1))
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            var settings = Chess960Settings()
+            settings.positionNumber = 518
+            let vm = Chess960PlayViewModel(settings: settings)
+            vm.start()
+            try await Task.sleep(for: .seconds(1))
 
-        vm.toggleHint()
-        #expect(vm.hintsWanted)
+            vm.toggleHint()
+            #expect(vm.hintsWanted)
 
-        let deadline = Date().addingTimeInterval(20)
-        while Date() < deadline, vm.hintMoves.isEmpty {
-            try await Task.sleep(for: .milliseconds(300))
+            let deadline = Date().addingTimeInterval(20)
+            while Date() < deadline, vm.hintMoves.isEmpty {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            try #require(!vm.hintMoves.isEmpty, "aucune flèche produite — indice gelé ou muet")
+            let best = try #require(vm.hintMoves.first { $0.rank == 1 })
+
+            // Le coup suggéré doit être LÉGAL : le sélectionner doit l'exposer
+            // parmi les cases cibles.
+            vm.selectSquare(best.from)
+            #expect(vm.legalTargetSquares.contains(best.to), "le coup suggéré doit être légal")
+
+            vm.handleViewDisappear()
         }
-        try #require(!vm.hintMoves.isEmpty, "aucune flèche produite — indice gelé ou muet")
-        let best = try #require(vm.hintMoves.first { $0.rank == 1 })
-
-        // Le coup suggéré doit être LÉGAL : le sélectionner doit l'exposer
-        // parmi les cases cibles.
-        vm.selectSquare(best.from)
-        #expect(vm.legalTargetSquares.contains(best.to), "le coup suggéré doit être légal")
-
-        vm.handleViewDisappear()
     }
 
     /// L'alerte gaffe : 1.e4 g6 2.Dh5?? — la dame se pose sur une case
@@ -243,35 +247,84 @@ struct Chess960PlayViewModelTests {
     /// un des hangs de dame les plus connus, mécaniquement certain.
     @Test("L'alerte gaffe se déclenche sur une dame hors-jeu")
     func blunderAlertFiresOnAHangingQueen() async throws {
-        var settings = Chess960Settings()
-        settings.positionNumber = 518
-        let vm = Chess960PlayViewModel(settings: settings)
-        vm.start()
-        try await Task.sleep(for: .seconds(1))
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            var settings = Chess960Settings()
+            settings.positionNumber = 518
+            let vm = Chess960PlayViewModel(settings: settings)
+            vm.start()
+            try await Task.sleep(for: .seconds(1))
 
-        vm.forceMove(uci: "e2e4")
-        vm.forceMove(uci: "g7g6")
-        // Laisser la tâche moteur périmée — déclenchée par la transition vers
-        // les noirs après e2e4, avant que g7g6 (forcé juste après, SANS
-        // attente) n'ait eu la moindre chance d'être vue — DÉCOUVRIR qu'elle
-        // n'a plus lieu d'être : son garde (« c'est TOUJOURS aux noirs de
-        // jouer ? ») ne s'exécute qu'à SON tour sur la file sérielle, et sans
-        // ce répit, il tombe sur l'état final (après Dh5) plutôt que sur
-        // l'état intermédiaire (après g6) qui l'aurait neutralisé. Un test
-        // purement synchrone ratait cette fenêtre entièrement.
-        // La file sérielle doit d'abord vider TASK A (la vérification de
-        // gaffe, harmless, sur e2e4 lui-même — deux sondes moteur à ~300 ms
-        // chacune) avant que TASK B (la tâche moteur périmée) n'atteigne son
-        // propre garde. Marge large, mesurée insuffisante à 500 ms.
-        try await Task.sleep(for: .seconds(3))
-        vm.forceMove(uci: "d1h5")   // Dh5?? — gxh5 gagne la dame
+            vm.forceMove(uci: "e2e4")
+            vm.forceMove(uci: "g7g6")
+            // Laisser la tâche moteur périmée — déclenchée par la transition vers
+            // les noirs après e2e4, avant que g7g6 (forcé juste après, SANS
+            // attente) n'ait eu la moindre chance d'être vue — DÉCOUVRIR qu'elle
+            // n'a plus lieu d'être : son garde (« c'est TOUJOURS aux noirs de
+            // jouer ? ») ne s'exécute qu'à SON tour sur la file sérielle, et sans
+            // ce répit, il tombe sur l'état final (après Dh5) plutôt que sur
+            // l'état intermédiaire (après g6) qui l'aurait neutralisé. Un test
+            // purement synchrone ratait cette fenêtre entièrement.
+            // La file sérielle doit d'abord vider TASK A (la vérification de
+            // gaffe, harmless, sur e2e4 lui-même — deux sondes moteur à ~300 ms
+            // chacune) avant que TASK B (la tâche moteur périmée) n'atteigne son
+            // propre garde. Marge large, mesurée insuffisante à 500 ms.
+            try await Task.sleep(for: .seconds(3))
+            vm.forceMove(uci: "d1h5")   // Dh5?? — gxh5 gagne la dame
 
-        let deadline = Date().addingTimeInterval(20)
-        while Date() < deadline, vm.pendingBlunderWarning == nil {
-            try await Task.sleep(for: .milliseconds(300))
+            let deadline = Date().addingTimeInterval(20)
+            while Date() < deadline, vm.pendingBlunderWarning == nil {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            #expect(vm.pendingBlunderWarning != nil, "aucune alerte sur une dame qui se fait prendre gratuitement")
+
+            vm.handleViewDisappear()
         }
-        #expect(vm.pendingBlunderWarning != nil, "aucune alerte sur une dame qui se fait prendre gratuitement")
+    }
 
-        vm.handleViewDisappear()
+    @Test("La consultation d'un coup passé met à jour la barre d'éval")
+    func reviewRefreshesTheEvalBar() async throws {
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            // `start()` D'ABORD, PUIS le coup — jamais l'inverse : un
+            // `forceMove` avant `start()` enfile quand même une tentative de
+            // coup moteur (c'est au tour des Noirs après 1.e4), qui échoue
+            // au bout du délai de garde puisque rien ne tourne encore —
+            // consommant plusieurs secondes de file sérielle en pure perte
+            // avant même que `start()` n'ait sa chance.
+            var settings = Chess960Settings()
+            settings.positionNumber = 518
+            settings.showEvalBar = true
+            let vm = Chess960PlayViewModel(settings: settings)
+            vm.start()
+            try await Task.sleep(for: .seconds(1))
+
+            vm.attemptUserMove(from: Square("e2"), to: Square("e4"))
+            let repliedDeadline = Date().addingTimeInterval(30)
+            while Date() < repliedDeadline, vm.totalPlies < 2 {
+                try await Task.sleep(for: .milliseconds(200))
+            }
+            try #require(vm.totalPlies >= 2, "l'ordinateur n'a jamais répondu")
+
+            let liveDeadline = Date().addingTimeInterval(20)
+            while Date() < liveDeadline, vm.currentEvalCp == nil && vm.currentEvalMate == nil {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            let liveEval = try #require(vm.currentEvalCp, "aucune éval en direct (ou un mat, hors du cas visé ici)")
+
+            // 1.e4, Noirs pas encore répondu : une position TACTIQUEMENT
+            // différente de « après 1.e4 e5 2.Cf3 Cc6 » — si la consultation
+            // ne redéclenchait rien, l'éval resterait EXACTEMENT celle du
+            // direct, jamais recalculée.
+            vm.review(toPly: 1)
+            #expect(vm.isReviewing)
+
+            let reviewDeadline = Date().addingTimeInterval(20)
+            while Date() < reviewDeadline, vm.currentEvalCp == liveEval {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            #expect(vm.currentEvalCp != nil, "aucune éval après consultation d'un coup passé")
+            #expect(vm.currentEvalCp != liveEval, "l'éval doit refléter la position CONSULTÉE, pas être un résidu du direct")
+
+            vm.handleViewDisappear()
+        }
     }
 }

@@ -106,6 +106,10 @@ struct HomeView: View {
         /// Analyse de fin de partie Chess960 — porte le PGN complet
         /// (tags Variant/SetUp/FEN compris), pas juste la FEN finale.
         case activeChess960Analysis(String)
+        /// Roi de la colline / Trois échecs / Horde (Fairy-Stockfish) —
+        /// réglages puis partie, même structure que Chess960.
+        case fairyVariantSetup(String)
+        case activeFairyVariantGame(variantID: String, settings: FairyVariantSettings)
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
@@ -587,11 +591,27 @@ struct HomeView: View {
                 case .variantsHub:
                     VariantsHubView {
                         path.append(Route.chess960Setup)
+                    } onOpenFairyVariant: { variant in
+                        path.append(Route.fairyVariantSetup(variant.id))
                     }
 
                 case .chess960Setup:
                     Chess960SetupView { settings in
                         startNewChess960Game(settings)
+                    }
+
+                case let .fairyVariantSetup(variantID):
+                    if let variant = FairyVariant.all.first(where: { $0.id == variantID }) {
+                        FairyVariantSetupView(variant: variant) { settings in
+                            path.append(Route.activeFairyVariantGame(variantID: variantID, settings: settings))
+                        }
+                    }
+
+                case let .activeFairyVariantGame(variantID, settings):
+                    if let variant = FairyVariant.all.first(where: { $0.id == variantID }) {
+                        FairyVariantActiveGameHost(variant: variant, settings: settings, sessionKey: sessionKey(for: route)) {
+                            path = NavigationPath()
+                        }
                     }
 
                 case let .activeChess960Game(settings):
@@ -1379,6 +1399,32 @@ private struct Chess960ActiveGameHost: View {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
                     Chess960PlayViewModel(settings: settings)
+                }
+            }
+        }
+    }
+}
+
+private struct FairyVariantActiveGameHost: View {
+    let variant: FairyVariant
+    let settings: FairyVariantSettings
+    let sessionKey: String
+    let onExit: () -> Void
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: FairyVariantPlayViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                FairyVariantPlayView(viewModel: viewModel, onExit: onExit)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    FairyVariantPlayViewModel(variant: variant, settings: settings)
                 }
             }
         }

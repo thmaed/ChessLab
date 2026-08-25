@@ -9365,3 +9365,122 @@ de classer approximativement deux coups sans base de comparaison fiable.
 Chess960AnalysisViewModelTests : couverture de toute la ligne roque compris,
 dame hors-jeu classée en faute, cache entre deux ouvertures, navigation sans
 réanalyse). Tests d'interface Chess960/Analyse verts.
+
+## 25/08 — Variantes : Fairy-Stockfish rejoint Stockfish, trois nouvelles variantes jouables
+
+Étude à la demande de l'utilisateur de dix variantes candidates (Roi de la
+colline, Course des rois, Trois échecs, Horde, Atomique, Antéchecs,
+Crazyhouse, Canard, Capablanca, Bughouse), avec pour but de proposer indice
+et module d'analyse comme pour Chess960, SANS développement de module
+spécifique par variante quand c'est possible. Classement retenu : celles où
+le plateau et les pièces restent ceux de ChessKit ET où ChessKit reste seul
+arbitre de légalité (seule la condition de victoire change) sont quasi
+gratuites une fois le moteur en place ; celles où la LÉGALITÉ elle-même
+change (Course des rois, Antéchecs, Atomique) demandent une couche de règles
+dédiée, façon Chess960 ; Crazyhouse et Canard sont chiffrées à l'ampleur
+d'un module Chess960 complet (réserve/notation de dépôt pour l'un, pièce
+non représentable + blocage de trajectoire à reconstruire pour l'autre) ;
+Capablanca (10×8, pièces inconnues de ChessKit) et Bughouse (réseau 4
+joueurs, contraire au principe 100 % local de l'app) sont écartées.
+
+Décision explicite : premier lot **sans réseau NNUE**. Les gains publiés par
+Fairy-Stockfish sont réels (Roi de la colline +644 Elo, Horde +490, Trois
+échecs +200) mais chaque variante a besoin de SON PROPRE réseau — aucun
+partage possible, le nom de fichier doit correspondre à la variante — pour
+un poids de 20 à 40 Mo chacun ; pas jugé nécessaire pour une première passe,
+l'éval classique suffit à produire un adversaire crédible et des indices
+utiles. Revisitable variante par variante.
+
+### Vendoring : un second moteur, même famille de symboles C++
+
+`Vendor/CFairyStockfish` ajouté en miroir de `Vendor/CStockfish` (même
+Package.swift, mêmes réglages de build). Fairy-Stockfish est un FORK de
+Stockfish qui garde EXACTEMENT le même `namespace Stockfish` — lier les deux
+comme cibles SPM séparées dans le même exécutable échoue à l'édition de
+liens (`ld: duplicate symbol`), vérifié AVANT d'investir dans le vrai
+travail via une reproduction minimale à deux cibles. Corrigé par un patch de
+renommage ciblé sur les seules sources vendorisées (`namespace Stockfish` →
+`namespace FairyEngine`, `Stockfish::` → `FairyEngine::` — jamais un
+renommage aveugle, qui aurait aussi touché les en-têtes de copyright GPLv3 à
+préserver intacts). Point d'entrée renommé, symboles C publics préfixés
+`cfairystockfish_*`, tag `fairy_sf_14` pinné. Coût mesuré : +1,5 Mo sur
+l'exécutable en Release, sans réseau NNUE.
+
+### Architecture : ChessKit reste l'arbitre, Fairy-Stockfish ne fait qu'évaluer
+
+Contrairement à Chess960 (qui a besoin d'une couche de règles maison pour le
+roque « roi prend sa tour »), Roi de la colline / Trois échecs / Horde
+utilisent le `Board` et le `Move` ChessKit DIRECTEMENT, sans traduction :
+seule la condition de victoire diffère, vérifiée par
+`FairyVariant.specialOutcome(board:mover:checkCounts:)`, appelée APRÈS la
+détection standard mat/pat/nulle de `GameOutcome.fromBoardState(_:)`. Horde
+démarre sur un FEN asymétrique (Blancs = pions seuls, aucun roi) que
+ChessKit accepte sans réserve. Un seul `FairyVariantPlayViewModel` générique
+sert les trois variantes, paramétré par `FairyVariant` — pas trois vues-
+modèles séparées.
+
+`FairyEngineController` duplique `EngineController` plutôt que de le
+généraliser (une version paramétrée par acteur échouait à la compilation
+Swift 6 — « sending non-Sendable value » sur les vues-modèles `@MainActor` —
+et risquait de fragiliser le moteur normal, déjà stabilisé) ; plus léger que
+l'original (pas de lecteur permanent façon Laboratoire, qu'aucune variante
+n'utilise). Réutilise `EngineCommand`/`EngineResponse` de `CStockfishKit` tel
+quel — le parseur UCI est déjà agnostique du moteur.
+
+Hub reconstruit en grille de `ModeCard` (le composant tuile le plus abouti
+de l'accueil) plutôt qu'une liste, à la demande explicite de l'utilisateur
+(« fait quelque chose de joli »). Chaque écran de réglages affiche désormais
+le texte de règle DÉTAILLÉ de la variante (pas seulement l'accroche courte
+de la tuile), demande de suivi.
+
+### Le bug de fond : deux moteurs, un seul `std::cin`/`std::cout`
+
+Signalé par l'utilisateur : « en changeant de partie le moteur fairy-
+stockfish se plante de temps en temps ». Root-cause : `std::cin`/`std::cout`
+sont des objets C++ GLOBAUX AU PROCESSUS, partagés par les DEUX moteurs —
+`CStockfish` et `CFairyStockfish` redirigent chacun ces mêmes flux vers ses
+propres tampons au démarrage et les restaure à l'arrêt.
+`handleViewDisappear()` arrête le moteur sortant via une tâche détachée non
+attendue (`Task { await engine.stop() }` — correct, `.onDisappear` ne peut
+pas `await`), ce qui peut courir en parallèle du démarrage du moteur de
+l'écran SUIVANT : le nouveau moteur redirige les flux vers ses tampons, puis
+l'arrêt encore en vol de l'ancien restaure les flux sous ses pieds un
+instant après — le nouveau moteur lit alors dans le vide et ne répond
+jamais, indiscernable d'un crash. `acquireEngineProcess()` protégeait déjà
+contre cette course pour un même type de moteur (retenter/attendre son
+propre `isProcessBusy`) mais ignorait l'existence de l'AUTRE type.
+
+**Correctif au niveau de l'app**, pas seulement des tests :
+`acquireEngineProcess()` (dans `EngineController` ET
+`FairyEngineController`) vérifie désormais AUSSI le `isProcessBusy` du
+moteur frère avant de démarrer le sien, avec la même boucle de retentative
+déjà en place. Un mutex dédié aux tests
+(`ChessLabTests/EngineIntegrationGate.swift`, `@MainActor` — PAS un `actor`
+séparé, qui force les fermetures capturant des vues-modèles non-`Sendable` à
+franchir une frontière d'isolation et refuse de compiler) rend en plus les
+tests inter-suites déterministes, mais le vrai correctif est celui de
+production : les utilisateurs réels rencontrent cette course en changeant
+d'écran, jamais en lançant Swift Testing.
+
+### Effet de bord utile : la consultation d'un coup passé remet l'éval à jour
+
+Demande de suivi : pouvoir reprendre les coups AVEC l'évaluation en direct
+dans tous les modes Variantes, comme Chess960. En vérifiant, l'écart existait
+aussi en Chess960 depuis le lot 3 et n'avait jamais été remarqué :
+`review(toPly:)`/`reviewToLive()` ne redéclenchaient l'éval que pour la
+position EN DIRECT, jamais pour celle consultée. Corrigé dans les deux vues-
+modèles à l'identique : `updateEvalBar()` réduit à un simple relais vers
+`refreshEvalBar(fen:mover:)`, nouvelle `refreshDisplayedEvalBar()` appelée
+par les deux méthodes de consultation, test de péremption comparé à la
+position AFFICHÉE (`displayedGame.shredderFEN`) et non plus seulement au
+direct.
+
+### Vérifié
+
+761 tests unitaires en 116 suites, tous verts (dont `FairyVariantTests` —
+règles en isolation — et `FairyVariantPlayViewModelTests` — moteur réel, un
+test par variante, plus le test de consultation/éval). 9 tests d'interface
+verts, dont les deux nouveaux `FairyVariantUITests` (hub à quatre tuiles,
+partie Roi de la colline jouable de bout en bout). Avant/après le correctif
+de course entre moteurs : 95 s/3 échecs → 18 s/0 échec sur le scénario
+reproduit isolément.

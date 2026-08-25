@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2ED6801DCC7EEAFA63245706 /* CFairyStockfishKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1E56F3F3E8F36B001280F756 /* CFairyStockfishKit */; };
 		CD00CD00CD00CD00CD00CD03 /* CStockfishKit in Frameworks */ = {isa = PBXBuildFile; productRef = CD00CD00CD00CD00CD00CD02 /* CStockfishKit */; };
 		F69740317DA442B4A58BAD99 /* ChessKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3DE236CC84514D2D9F36A9FE /* ChessKit */; };
 /* End PBXBuildFile section */
@@ -54,6 +55,7 @@
 			files = (
 				F69740317DA442B4A58BAD99 /* ChessKit in Frameworks */,
 				CD00CD00CD00CD00CD00CD03 /* CStockfishKit in Frameworks */,
+				2ED6801DCC7EEAFA63245706 /* CFairyStockfishKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,6 +111,7 @@
 			packageProductDependencies = (
 				3DE236CC84514D2D9F36A9FE /* ChessKit */,
 				CD00CD00CD00CD00CD00CD02 /* CStockfishKit */,
+				1E56F3F3E8F36B001280F756 /* CFairyStockfishKit */,
 			);
 			productName = ChessLab;
 			productReference = 0558AD0B73974786AAA982AF /* ChessLab.app */;
@@ -196,6 +199,7 @@
 			packageReferences = (
 				575CEAF21CA747398E0D7D8B /* XCRemoteSwiftPackageReference "chesskit-swift" */,
 				CD00CD00CD00CD00CD00CD01 /* XCLocalSwiftPackageReference "Vendor/CStockfish" */,
+				F408CB9905D37A1218CD0947 /* XCLocalSwiftPackageReference "Vendor/CFairyStockfish" */,
 			);
 			productRefGroup = 40D432D46DF142A38448265D /* Products */;
 			projectDirPath = "";
@@ -575,6 +579,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Vendor/CStockfish;
 		};
+		F408CB9905D37A1218CD0947 /* XCLocalSwiftPackageReference "Vendor/CFairyStockfish" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Vendor/CFairyStockfish;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -589,6 +597,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		1E56F3F3E8F36B001280F756 /* CFairyStockfishKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F408CB9905D37A1218CD0947 /* XCLocalSwiftPackageReference "Vendor/CFairyStockfish" */;
+			productName = CFairyStockfishKit;
+		};
 		3DE236CC84514D2D9F36A9FE /* ChessKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 575CEAF21CA747398E0D7D8B /* XCRemoteSwiftPackageReference "chesskit-swift" */;
