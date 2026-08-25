@@ -12,6 +12,10 @@ struct Chess960PlayView: View {
     /// AFFICHÉE — même contrat que ``PlayView``. `nil` = pas encore câblé
     /// (lots suivants pour Laboratoire et Analyser).
     var onOpenTwoPlayer: (String) -> Void = { _ in }
+    /// Fin de partie → écran d'analyse, comme en mode « Jouer ». Porte le
+    /// PGN complet (tags Variant/SetUp/FEN compris), pas seulement la FEN
+    /// affichée : l'analyse doit rejouer TOUTE la partie, pas juste sa fin.
+    var onAnalyze: (String) -> Void = { _ in }
 
     @State private var appSettings = AppSettings.shared
     @State private var showResignConfirmation = false
@@ -31,9 +35,7 @@ struct Chess960PlayView: View {
                 playerRow(for: viewModel.engineColor)
                 boardBlock(size: geo.size)
                 playerRow(for: viewModel.userColor)
-                if let outcome = viewModel.outcome {
-                    outcomeBanner(outcome)
-                }
+                gameOverPanel
                 controlBar
                 movesStrip
             }
@@ -159,16 +161,56 @@ struct Chess960PlayView: View {
         .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
-    private func outcomeBanner(_ outcome: GameOutcome) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: "flag.checkered")
-            Text(outcome.summary(userColor: viewModel.userColor))
-                .font(.subheadline.weight(.semibold))
+    /// Bilan de fin de partie — même patron que ``PlayView/gameOverPanel``
+    /// (résultat, Accueil, Analyser), sans Revanche : relancer une partie
+    /// Chess960 repasse par le réglage de la position, pas par un simple
+    /// redémarrage.
+    @ViewBuilder
+    private var gameOverPanel: some View {
+        if let outcome = viewModel.outcome {
+            VStack(spacing: 12) {
+                HStack(spacing: 8) {
+                    Image(systemName: "flag.checkered")
+                        .font(.title2)
+                        .foregroundStyle(Theme.textSecondary)
+                    Text(outcome.summary(userColor: viewModel.userColor))
+                        .font(.headline)
+                        .foregroundStyle(Theme.textPrimary)
+                    Spacer(minLength: 0)
+                }
+                HStack(spacing: 10) {
+                    panelButton("Accueil", icon: "house.fill") { onExit() }
+                    panelButton("Analyser", icon: "chart.xyaxis.line", filled: true) {
+                        onAnalyze(viewModel.exportedPGN)
+                    }
+                }
+            }
+            .cardStyle()
+            .overlay(Theme.cardShape.strokeBorder(Theme.strokeStrong, lineWidth: 1))
+            .transition(.move(edge: .bottom).combined(with: .opacity))
         }
-        .foregroundStyle(Theme.textPrimary)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 10)
-        .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func panelButton(_ title: LocalizedStringKey, icon: String, filled: Bool = false, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 3) {
+                Image(systemName: icon).font(.system(size: 15, weight: .semibold))
+                Text(title).font(.caption2.weight(.semibold))
+            }
+            .foregroundStyle(filled ? Theme.background : Theme.textPrimary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background {
+                if filled {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.accentGradient)
+                } else {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.surface)
+                }
+            }
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(filled ? Color.clear : Theme.stroke, lineWidth: 1))
+            .glow(Theme.accent, radius: 8, isActive: filled)
+        }
+        .buttonStyle(.pressable)
     }
 
     private var controlBar: some View {

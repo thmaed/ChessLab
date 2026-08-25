@@ -7,6 +7,8 @@ import SwiftUI
 struct Chess960TwoPlayerView: View {
     @Bindable var viewModel: Chess960TwoPlayerViewModel
     let onExit: () -> Void
+    /// Fin de partie → écran d'analyse, comme en mode « Jouer ».
+    var onAnalyze: (String) -> Void = { _ in }
 
     @State private var appSettings = AppSettings.shared
     @State private var showResignConfirmation = false
@@ -24,9 +26,7 @@ struct Chess960TwoPlayerView: View {
                 playerRow(for: topColor, atTop: true)
                 boardBlock(size: geo.size)
                 playerRow(for: bottomColor, atTop: false)
-                if let outcome = viewModel.outcome {
-                    outcomeBanner(outcome)
-                }
+                gameOverPanel
                 controlBar
                 movesStrip
             }
@@ -135,16 +135,52 @@ struct Chess960TwoPlayerView: View {
         .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
-    private func outcomeBanner(_ outcome: GameOutcome) -> some View {
-        HStack(spacing: 8) {
-            Image(systemName: "flag.checkered")
-            Text(outcome.summary(whiteName: viewModel.settings.whiteName, blackName: viewModel.settings.blackName))
-                .font(.subheadline.weight(.semibold))
+    @ViewBuilder
+    private var gameOverPanel: some View {
+        if let outcome = viewModel.outcome {
+            VStack(spacing: 12) {
+                HStack(spacing: 8) {
+                    Image(systemName: "flag.checkered")
+                        .font(.title2)
+                        .foregroundStyle(Theme.textSecondary)
+                    Text(outcome.summary(whiteName: viewModel.settings.whiteName, blackName: viewModel.settings.blackName))
+                        .font(.headline)
+                        .foregroundStyle(Theme.textPrimary)
+                    Spacer(minLength: 0)
+                }
+                HStack(spacing: 10) {
+                    panelButton("Accueil", icon: "house.fill") { onExit() }
+                    panelButton("Analyser", icon: "chart.xyaxis.line", filled: true) {
+                        onAnalyze(viewModel.exportedPGN)
+                    }
+                }
+            }
+            .cardStyle()
+            .overlay(Theme.cardShape.strokeBorder(Theme.strokeStrong, lineWidth: 1))
+            .transition(.move(edge: .bottom).combined(with: .opacity))
         }
-        .foregroundStyle(Theme.textPrimary)
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 10)
-        .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private func panelButton(_ title: LocalizedStringKey, icon: String, filled: Bool = false, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            VStack(spacing: 3) {
+                Image(systemName: icon).font(.system(size: 15, weight: .semibold))
+                Text(title).font(.caption2.weight(.semibold))
+            }
+            .foregroundStyle(filled ? Theme.background : Theme.textPrimary)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 10)
+            .background {
+                if filled {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.accentGradient)
+                } else {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.surface)
+                }
+            }
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(filled ? Color.clear : Theme.stroke, lineWidth: 1))
+            .glow(Theme.accent, radius: 8, isActive: filled)
+        }
+        .buttonStyle(.pressable)
     }
 
     private var controlBar: some View {

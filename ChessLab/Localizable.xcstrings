@@ -535,22 +535,6 @@
         }
       }
     },
-    "%lld min" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld min"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld min"
-          }
-        }
-      }
-    },
     "%lld à revoir" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -661,6 +645,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld lignes"
+          }
+        }
+      }
+    },
+    "%lld min" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld min"
           }
         }
       }
@@ -816,6 +816,22 @@
         }
       }
     },
+    "%lld." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld."
+          }
+        }
+      }
+    },
     "%lld/%lld" : {
       "localizations" : {
         "en" : {
@@ -844,38 +860,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld%%"
-          }
-        }
-      }
-    },
-    "%lld." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld."
-          }
-        }
-      }
-    },
-    "0-959" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "0-959"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "0-959"
           }
         }
       }
@@ -958,6 +942,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "+%lld s"
+          }
+        }
+      }
+    },
+    "0-959" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0-959"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "0-959"
           }
         }
       }
@@ -1086,22 +1086,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "78 cours pour convertir vos finales, groupés par famille : pions, tours, fous, cavaliers, déséquilibres, dames, mats élémentaires, études célèbres (Réti, Saavedra, Lasker, Troitsky, Kubbel…) et thèmes transversaux (deux faiblesses, domination, pat comme ressource…). Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Depuis le lecteur, le menu « S'entraîner » propose la ligne guidée OU l'entraînement libre — conclure la position contre la meilleure défense, où tout coup qui préserve le verdict est accepté, pas seulement celui de la leçon, et un coup qui le lâche est repris avec l'explication. Révision espacée et synchronisation iCloud, comme les ouvertures."
-          }
-        }
-      }
-    },
-    "Aucun cours ne correspond aux filtres ou à la recherche." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No course matches the filters or the search."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucun cours ne correspond aux filtres ou à la recherche."
           }
         }
       }
@@ -1496,7 +1480,6 @@
       }
     },
     "Aléatoire" : {
-      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -2173,6 +2156,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun coup repris — conversion propre."
+          }
+        }
+      }
+    },
+    "Aucun cours ne correspond aux filtres ou à la recherche." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No course matches the filters or the search."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun cours ne correspond aux filtres ou à la recherche."
           }
         }
       }
@@ -3750,6 +3749,9 @@
         }
       }
     },
+    "Cette composition n'est pas une position Chess960 valide." : {
+
+    },
     "Changer" : {
       "localizations" : {
         "en" : {
@@ -3889,6 +3891,22 @@
         }
       }
     },
+    "Chess960 · n° %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chess960 · no. %lld"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chess960 · n° %lld"
+          }
+        }
+      }
+    },
     "Chess960 et autres façons de jouer" : {
       "localizations" : {
         "en" : {
@@ -3917,22 +3935,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chess960 et plus"
-          }
-        }
-      }
-    },
-    "Chess960 · n° %lld" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chess960 · no. %lld"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chess960 · n° %lld"
           }
         }
       }
@@ -5549,6 +5551,9 @@
         }
       }
     },
+    "Deux joueurs — Chess960" : {
+
+    },
     "Deux personnes jouent sur le même appareil. Le mode « table » retourne les pièces pour rester lisible face à face. La partie terminée s'enregistre dans la bibliothèque." : {
       "localizations" : {
         "en" : {
@@ -6486,6 +6491,22 @@
         }
       }
     },
+    "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse — « Changer de mode », puis « Laboratoire » : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pit two Stockfish instances against each other over a series of games to compare settings. Statistics, estimated Elo gap with confidence interval, progression chart and result distribution. You can also get here from a game or an analysis — “Switch mode”, then “Laboratory”: the series then starts from your position. Once the series is over, one tap opens the last game in analysis."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse — « Changer de mode », puis « Laboratoire » : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse."
+          }
+        }
+      }
+    },
     "FEN" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -6525,22 +6546,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invalid FEN or PGN"
-          }
-        }
-      }
-    },
-    "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse — « Changer de mode », puis « Laboratoire » : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pit two Stockfish instances against each other over a series of games to compare settings. Statistics, estimated Elo gap with confidence interval, progression chart and result distribution. You can also get here from a game or an analysis — “Switch mode”, then “Laboratory”: the series then starts from your position. Once the series is over, one tap opens the last game in analysis."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Faites s'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse — « Changer de mode », puis « Laboratoire » : la série démarre alors sur votre position. En fin de série, la dernière partie s'ouvre d'un tap dans l'analyse."
           }
         }
       }
@@ -7467,6 +7472,9 @@
           }
         }
       }
+    },
+    "Il manque un roi." : {
+
     },
     "Image" : {
       "localizations" : {
@@ -8647,6 +8655,7 @@
       }
     },
     "L'indice et l'alerte gaffe arriveront dans une prochaine version du mode." : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -9338,6 +9347,9 @@
         }
       }
     },
+    "Le roi doit rester entre les deux tours." : {
+
+    },
     "Le score de A recalculé après chaque partie, et non partie par partie : la courbe part donc de très haut ou de très bas, puis se calme.\n\nLa zone claire autour d'elle est l'intervalle de confiance à 95 %. Tant qu'elle chevauche la ligne des 50 %, la série n'a pas tranché. C'est le rétrécissement de cette bande qui dit quand s'arrêter." : {
       "localizations" : {
         "en" : {
@@ -9350,38 +9362,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le score de A recalculé après chaque partie, et non partie par partie : la courbe part donc de très haut ou de très bas, puis se calme.\n\nLa zone claire autour d'elle est l'intervalle de confiance à 95 %. Tant qu'elle chevauche la ligne des 50 %, la série n'a pas tranché. C'est le rétrécissement de cette bande qui dit quand s'arrêter."
-          }
-        }
-      }
-    },
-    "Les Elo de Stockfish sont calibrés pour la partie classique : en 960, sans théorie à réciter, le niveau réel peut différer légèrement." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stockfish's Elo levels are calibrated for the classical game: in 960, with no theory to recite, the real level may differ slightly."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les Elo de Stockfish sont calibrés pour la partie classique : en 960, sans théorie à réciter, le niveau réel peut différer légèrement."
-          }
-        }
-      }
-    },
-    "Les pièces de la rangée de base sont mélangées — 960 départs possibles, zéro théorie à réciter, que de la compréhension. Aussi appelé « Fischer Random »." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The back-rank pieces are shuffled — 960 possible starts, zero theory to recite, nothing but understanding. Also known as “Fischer Random”."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Les pièces de la rangée de base sont mélangées — 960 départs possibles, zéro théorie à réciter, que de la compréhension. Aussi appelé « Fischer Random »."
           }
         }
       }
@@ -9435,6 +9415,9 @@
         }
       }
     },
+    "Les deux fous doivent être sur des cases de couleurs différentes." : {
+
+    },
     "Les deux joueurs sont d'accord pour la nulle ?" : {
       "localizations" : {
         "en" : {
@@ -9463,6 +9446,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les Elo de Stockfish sont calibrés à ~2-3 s par coup : en dessous, les niveaux réels sont plus bas, surtout près du maximum. L'écart entre A et B reste comparatif."
+          }
+        }
+      }
+    },
+    "Les Elo de Stockfish sont calibrés pour la partie classique : en 960, sans théorie à réciter, le niveau réel peut différer légèrement." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stockfish's Elo levels are calibrated for the classical game: in 960, with no theory to recite, the real level may differ slightly."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les Elo de Stockfish sont calibrés pour la partie classique : en 960, sans théorie à réciter, le niveau réel peut différer légèrement."
           }
         }
       }
@@ -9521,6 +9520,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les parties terminées (mode Jouer et Deux joueurs) apparaîtront ici."
+          }
+        }
+      }
+    },
+    "Les pièces de la rangée de base sont mélangées — 960 départs possibles, zéro théorie à réciter, que de la compréhension. Aussi appelé « Fischer Random »." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The back-rank pieces are shuffled — 960 possible starts, zero theory to recite, nothing but understanding. Also known as “Fischer Random”."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les pièces de la rangée de base sont mélangées — 960 départs possibles, zéro théorie à réciter, que de la compréhension. Aussi appelé « Fischer Random »."
           }
         }
       }
@@ -10492,6 +10507,22 @@
         }
       }
     },
+    "n°" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "no."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "n°"
+          }
+        }
+      }
+    },
     "Neo-Grünfeld Defense" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -10889,22 +10920,6 @@
         }
       }
     },
-    "Numéro de position" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Position number"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Numéro de position"
-          }
-        }
-      }
-    },
     "nulle" : {
       "localizations" : {
         "en" : {
@@ -10975,6 +10990,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nulles %lld"
+          }
+        }
+      }
+    },
+    "Numéro de position" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position number"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Numéro de position"
           }
         }
       }
@@ -12177,22 +12208,6 @@
         }
       }
     },
-    "Position %lld sur 960 — la numérotation standard, la même que Lichess." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Position %lld of 960 — the standard numbering, the same as Lichess."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Position %lld sur 960 — la numérotation standard, la même que Lichess."
-          }
-        }
-      }
-    },
     "Position (FEN) copiée dans le presse-papiers." : {
       "localizations" : {
         "en" : {
@@ -12205,6 +12220,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Position (FEN) copiée dans le presse-papiers."
+          }
+        }
+      }
+    },
+    "Position %lld sur 960 — la numérotation standard, la même que Lichess." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position %lld of 960 — the standard numbering, the same as Lichess."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Position %lld sur 960 — la numérotation standard, la même que Lichess."
           }
         }
       }
@@ -15666,6 +15697,9 @@
         }
       }
     },
+    "Terminé" : {
+
+    },
     "Terminer la sélection" : {
       "localizations" : {
         "en" : {
@@ -16986,22 +17020,6 @@
         }
       }
     },
-    "Variantes" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Variants"
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Variantes"
-          }
-        }
-      }
-    },
     "V–N–D" : {
       "localizations" : {
         "en" : {
@@ -17112,6 +17130,22 @@
         }
       }
     },
+    "Variantes" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variants"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Variantes"
+          }
+        }
+      }
+    },
     "Variantes d'échecs" : {
       "localizations" : {
         "en" : {
@@ -17124,22 +17158,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Variantes d'échecs"
-          }
-        }
-      }
-    },
-    "n°" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "no."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "n°"
           }
         }
       }

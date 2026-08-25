@@ -9217,3 +9217,75 @@ d'e4 lui-même se termine) avant le coup qui compte.
 
 732 tests unitaires verts — SUITE COMPLÈTE, sans flake, la première fois de la
 journée. 6 tests d'interface Chess960 verts.
+
+## 25/08 — Chess960 : l'analyse de fin de partie, comme en mode « Jouer »
+
+Demande de l'utilisateur : « à la fin de la partie chess960 [...] l'analyse
+de la partie démarre comme sur le jeu normal ». Cadrage retenu après
+question posée (trois options soumises) : un écran d'analyse Chess960
+ALLÉGÉ — plateau, barre d'éval, flèches des meilleurs coups, navigation coup
+par coup, export — SANS classification (gaffe/imprécision/erreur), sans
+génération de puzzles, sans persistance en bibliothèque. `AnalysisViewModel`
+lui-même ne pouvait pas être réutilisé tel quel : il charge une partie via
+`Game(pgn:)`/`PGNLoader.reconstruct`, qui construisent tous deux un
+`Board(position: .standard)` et ignorent les tags `[FEN]`/`[SetUp]` — un PGN
+Chess960 s'y rechargerait depuis la position STANDARD, coups y compris (la
+logique de roque de ChessKit code en dur e1/e8/a1/h1).
+
+### `Chess960PGNParser` : le lecteur qu'il fallait pour fermer la boucle
+
+Nouveau parseur dédié, sans dépendre de ChessKit pour la reconstruction :
+lit `[FEN]`/`[SetUp]` à la main, puis fait rejouer chaque jeton SAN du
+movetext par `Chess960Game.legalMoves()` — en ESSAYANT chaque coup légal et
+en comparant le SAN produit par `Chess960Game.apply(_:)` au jeton attendu.
+Réutilise les seuls bouts VRAIMENT génériques de `PGNLoader`
+(`movetext(of:)`, `tags(of:)`), qui ne présument rien de la position de
+départ. Prouvé par aller-retour : exporter une partie Chess960 (roque
+compris) puis la reparser doit rendre exactement le même journal SAN/UCI.
+
+### `Chess960AnalysisViewModel` : la même discipline moteur que Chess960PlayViewModel
+
+Salve bornée (MultiPV 3, ~1,5 s) à chaque navigation, plutôt qu'une analyse
+continue — même arbitrage que l'indice de coup du 25/08 : éviter une
+QUATRIÈME classe de bug de flux à consommateur unique dans la même journée.
+Jeton de fraîcheur (`analysisToken`) pour ignorer un résultat périmé si la
+navigation a bougé plusieurs fois avant qu'une salve ne conclue — nécessaire
+ici précisément parce que l'écran d'analyse permet de naviguer BEAUCOUP plus
+vite qu'une partie en direct. Surbrillance du dernier coup et flèches de
+roque héritent de la même correction que Chess960PlayViewModel
+(`Chess960Game.displaySquares(forUCI:)` : la case RÉELLE du roi, pas celle
+où se tenait la tour dans le dialecte UCI roi-prend-tour).
+
+### Câblage : bilan de fin de partie → route → hôte SessionStore
+
+`Chess960PlayView` et `Chess960TwoPlayerView` gagnent un vrai `gameOverPanel`
+(Accueil / Analyser), remplaçant le simple bandeau de résultat — même
+patron visuel que `PlayView.gameOverPanel`, sans Revanche : relancer une
+partie Chess960 repasse par le réglage de la position, pas par un
+redémarrage à l'identique. « Analyser » porte le PGN COMPLET
+(`exportedPGN`, tags Variant/SetUp/FEN compris), pas la FEN affichée — même
+piège déjà documenté pour « Jouer à partir d'ici » : l'analyse doit rejouer
+TOUTE la partie. Nouvelle route `activeChess960Analysis(String)` + un
+`Chess960AnalysisActiveGameHost` construit paresseusement via `SessionStore`
+— même discipline que tous les autres écrans à moteur, non négociable
+depuis le bug de gel du 25/08 (construction inline dans `destination(for:)`).
+
+### La contention grandissante rattrape un test de pendule déjà fragile
+
+La suite complète (740 tests désormais, +8 pour ce lot) a fait échouer
+`GameClockStartTests.whiteTimeDecreasesBeforeTheFirstMove` — DÉJÀ identifié
+et déjà élargi une fois aujourd'hui (120 s) pour la même raison : les bancs
+d'essai moteur saturent le `MainActor` pendant la suite complète. Deux
+suites Chess960 RÉELLES de plus (jeu + analyse) ajoutent leur propre
+contention ; mesuré, un échec à 268,9 s AVEC la fenêtre de 120 s — signe
+qu'un seul `Task.sleep` affamé peut, à lui seul, dépasser tout le budget
+restant. Fenêtre réélargie à 300 s. Passe seul en quelques secondes : pas
+une régression de la pendule, un effet de bord attendu d'avoir ajouté deux
+suites au moteur réel de plus dans la même journée.
+
+### Vérifié
+
+740 tests unitaires verts — SUITE COMPLÈTE (unitaires ChessLabTests), sans
+échec. 7 tests d'interface Chess960 verts, dont le nouveau bout-en-bout :
+partie Chess960 → coup joué → abandon → « Analyser » → écran d'analyse
+affichant la partie effectivement rejouée.

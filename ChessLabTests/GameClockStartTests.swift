@@ -83,8 +83,14 @@ struct GameClockStartTests {
         // s'exécuter, sans que la tâche de la pendule obtienne un seul tour
         // dans une fenêtre de 10 s. La boucle sort dès la première décrue —
         // elle ne coûte donc rien sur une machine au repos (< 1 s).
+        // Élargie à nouveau le 25/08 (120 s → 300 s) : les deux nouvelles
+        // suites au moteur réel de Chess960 (``Chess960PlayViewModelTests``,
+        // ``Chess960AnalysisViewModelTests``) ajoutent leur propre contention
+        // sur la suite complète — mesuré, un échec à 268,9 s avec l'ancienne
+        // fenêtre de 120 s : un SEUL `Task.sleep` de la boucle, resté affamé
+        // au-delà du budget restant, peut à lui seul dépasser le total.
         var later = initial
-        let deadline = Date().addingTimeInterval(120)
+        let deadline = Date().addingTimeInterval(300)
         while later >= initial, Date() < deadline {
             await Task.yield()
             try await Task.sleep(nanoseconds: 200_000_000)

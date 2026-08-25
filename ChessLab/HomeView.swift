@@ -103,6 +103,9 @@ struct HomeView: View {
         /// `continueTwoPlayer`, mais la variante n'a pas encore de réglages
         /// à choisir : noms et cadence restent ceux par défaut).
         case activeChess960TwoPlayerGame(Chess960TwoPlayerSettings)
+        /// Analyse de fin de partie Chess960 — porte le PGN complet
+        /// (tags Variant/SetUp/FEN compris), pas juste la FEN finale.
+        case activeChess960Analysis(String)
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
@@ -596,12 +599,19 @@ struct HomeView: View {
                         path = NavigationPath()
                     } onOpenTwoPlayer: { fen in
                         startNewChess960TwoPlayerGame(fromFEN: fen)
+                    } onAnalyze: { pgn in
+                        path.append(Route.activeChess960Analysis(pgn))
                     }
 
                 case let .activeChess960TwoPlayerGame(settings):
                     Chess960TwoPlayerActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
                         path = NavigationPath()
+                    } onAnalyze: { pgn in
+                        path.append(Route.activeChess960Analysis(pgn))
                     }
+
+                case let .activeChess960Analysis(pgn):
+                    Chess960AnalysisActiveGameHost(pgn: pgn, sessionKey: sessionKey(for: route))
 
                 case .puzzleQueue:
                     PuzzleQueueView { filter in
@@ -1353,13 +1363,14 @@ private struct Chess960ActiveGameHost: View {
     let sessionKey: String
     let onExit: () -> Void
     var onOpenTwoPlayer: (String) -> Void = { _ in }
+    var onAnalyze: (String) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: Chess960PlayViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                Chess960PlayView(viewModel: viewModel, onExit: onExit, onOpenTwoPlayer: onOpenTwoPlayer)
+                Chess960PlayView(viewModel: viewModel, onExit: onExit, onOpenTwoPlayer: onOpenTwoPlayer, onAnalyze: onAnalyze)
             } else {
                 Color.clear
             }
@@ -1378,13 +1389,14 @@ private struct Chess960TwoPlayerActiveGameHost: View {
     let settings: Chess960TwoPlayerSettings
     let sessionKey: String
     let onExit: () -> Void
+    var onAnalyze: (String) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: Chess960TwoPlayerViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                Chess960TwoPlayerView(viewModel: viewModel, onExit: onExit)
+                Chess960TwoPlayerView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze)
             } else {
                 Color.clear
             }
@@ -1393,6 +1405,35 @@ private struct Chess960TwoPlayerActiveGameHost: View {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
                     Chess960TwoPlayerViewModel(settings: settings)
+                }
+            }
+        }
+    }
+}
+
+/// Héberge un `Chess960AnalysisViewModel` — même discipline paresseuse que
+/// ``AnalysisHost``. Construction ÉCHOUABLE (`init?(pgn:)`) : un PGN qui ne
+/// vient pas de ``Chess960PlayViewModel/exportedPGN`` ou de son homologue
+/// Deux joueurs ne devrait jamais échouer, mais l'écran reste vide plutôt que
+/// de planter si un jour une autre source lui passe un PGN invalide.
+private struct Chess960AnalysisActiveGameHost: View {
+    let pgn: String
+    let sessionKey: String
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: Chess960AnalysisViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                Chess960AnalysisView(viewModel: viewModel)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    Chess960AnalysisViewModel(pgn: pgn)
                 }
             }
         }
