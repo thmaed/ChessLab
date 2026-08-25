@@ -56,6 +56,39 @@ enum Chess960Position {
         return rank.compactMap(\.self)
     }
 
+    /// La rangée `rank` (8 lettres, a→h) respecte-t-elle les règles du
+    /// Chess960 ? Trois conditions, les mêmes que l'algorithme de Scharnagl
+    /// impose par construction — nécessaires ici parce qu'un agencement
+    /// composé À LA MAIN peut les violer :
+    /// - le ROI est strictement ENTRE les deux tours (sans quoi le roque tel
+    ///   que cette app le joue — « le roi prend sa tour » — perd son sens : on
+    ///   ne saurait plus quelle tour est « petit côté ») ;
+    /// - les deux FOUS sont sur des cases de couleurs DIFFÉRENTES (règle FIDE
+    ///   du Chess960, pas une contrainte technique de cette app) ;
+    /// - le jeu de pièces exact (2 tours, 2 cavaliers, 2 fous, 1 dame, 1 roi)
+    ///   — automatiquement vrai si `rank` est un RÉARRANGEMENT d'une rangée
+    ///   déjà légale (l'éditeur ne fait que permuter), mais vérifié quand
+    ///   même : la fonction doit rester correcte pour tout appelant.
+    static func isLegalBackRank(_ rank: [Character]) -> Bool {
+        guard rank.count == 8, rank.sorted() == Array("BBKNNQRR") else { return false }
+        guard let kingFile = rank.firstIndex(of: "K") else { return false }
+        let rookFiles = rank.indices.filter { rank[$0] == "R" }
+        guard rookFiles.count == 2, rookFiles[0] < kingFile, kingFile < rookFiles[1] else { return false }
+        let bishopFiles = rank.indices.filter { rank[$0] == "B" }
+        guard bishopFiles.count == 2 else { return false }
+        return bishopFiles[0].isMultiple(of: 2) != bishopFiles[1].isMultiple(of: 2)
+    }
+
+    /// Numéro de Scharnagl (0...959) dont la rangée de base est EXACTEMENT
+    /// `rank` — `nil` si elle n'est pas légale. Balayage linéaire : 960
+    /// positions, coût négligeable, et ça évite d'inverser l'algorithme de
+    /// génération pour un besoin qui ne se produit qu'au réglage d'une
+    /// partie, jamais en boucle chaude.
+    static func number(forBackRank rank: [Character]) -> Int? {
+        guard isLegalBackRank(rank) else { return nil }
+        return (0...959).first { backRank(number: $0) == rank }
+    }
+
     /// FEN Shredder complet de la position `number` : droits de roque en
     /// lettres de colonnes (ex. `HFhf`), le dialecte que parle Stockfish
     /// sous `UCI_Chess960`.

@@ -9042,3 +9042,46 @@ roque). 72 tests d'interface Chess960 verts. Les deux suites, relancées
 SÉPARÉMENT — j'avais moi-même enfreint la leçon documentée hier en les
 lançant en parallèle, produisant un faux échec (« Executed 0 tests ») que j'ai
 identifié et écarté avant de conclure.
+
+## 25/08 — Chess960 : composer soi-même la rangée de départ
+
+Demande de l'utilisateur : au-delà d'« Aléatoire », pouvoir choisir le numéro
+soi-même (déjà livré au lot 2 — le champ « n° 0-959 ») ET placer les pièces à
+la main, sans ouvrir un écran entier — juste la première rangée.
+
+### Le choix retenu
+
+La rangée d'APERÇU devient elle-même l'ÉDITEUR : toucher une case la
+sélectionne, en toucher une seconde échange les deux. Un échange PRÉSERVE
+TOUJOURS le jeu de pièces (2 tours, 2 cavaliers, 2 fous, 1 dame, 1 roi) — il
+n'y a donc jamais de sélecteur de pièce à ouvrir, ni de risque de composer un
+jeu incomplet. Restent deux règles du Chess960 qu'un échange PEUT encore
+briser : le roi doit rester strictement entre les deux tours (sans quoi le
+roque « le roi prend sa tour » ne saurait plus distinguer petit et grand
+côté), et les deux fous doivent rester sur des cases de couleurs différentes
+(règle FIDE, indépendante de cette app). Une composition qui les brise se
+voit — message explicite, « Commencer » désactivé — jamais silencieusement
+acceptée.
+
+`Chess960Position.isLegalBackRank(_:)` et `.number(forBackRank:)` (recherche
+inverse par balayage des 960 positions, coût négligeable et hors boucle
+chaude) vivent dans la couche de règles, pas dans l'écran : `positionNumber`
+reste synchronisé après chaque échange légal, et s'IMMOBILISE — sans jamais
+pointer vers une position que l'écran ne montre plus — dès qu'un échange rend
+l'arrangement invalide.
+
+### Vérifié
+
+- `Chess960RulesTests` : balayage EXHAUSTIF des 960 rangées engendrées —
+  chacune se déclare légale et se retrouve à son PROPRE numéro (l'aller-retour
+  génération → validation → recherche inverse ne perd personne) — plus quatre
+  cas nommés (roi hors intervalle, fous de même couleur, jeu de pièces
+  incomplet, la 518 retrouvée depuis RNBQKBNR composée à la main).
+- `Chess960SetupUITests` (nouveau fichier) : échanger le roi hors de
+  l'intervalle désactive « Commencer » et affiche l'avertissement ; rejouer le
+  même échange restaure exactement l'état précédent (une paire d'échanges est
+  sa propre inverse) ; un aller-retour neutre (deux cavaliers, indiscernables)
+  retrouve bien le n° 518 depuis l'écran réel, pas seulement en test unitaire.
+
+721 tests unitaires verts (5 nouveaux). Suite d'interface Chess960 complète
+verte (4 tests, 2 fichiers).

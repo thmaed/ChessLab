@@ -132,4 +132,56 @@ struct Chess960RulesTests {
         let game = try #require(Chess960Game(fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"))
         #expect(game.shredderFEN == "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w HAha - 0 1")
     }
+
+    // MARK: Éditeur manuel de rangée — validation et recherche inverse
+
+    /// Balaie les 960 arrangements engendrés par l'algorithme : chacun doit
+    /// se déclarer légal, et se retrouver EXACTEMENT à son propre numéro —
+    /// l'aller-retour génération → validation → recherche inverse ne doit
+    /// perdre personne en route.
+    @Test("Les 960 rangées engendrées sont toutes légales et se retrouvent")
+    func allGeneratedRanksAreLegalAndFindThemselves() {
+        for number in 0..<960 {
+            let rank = Chess960Position.backRank(number: number)!
+            #expect(Chess960Position.isLegalBackRank(rank), "n° \(number) : \(String(rank))")
+            #expect(Chess960Position.number(forBackRank: rank) == number, "n° \(number) : \(String(rank))")
+        }
+    }
+
+    /// Roi hors de l'intervalle des tours : le roque tel que l'app le joue
+    /// (« le roi prend sa tour ») ne saurait plus distinguer petit et grand
+    /// côté. Exemple concret : tours en a et b, roi en c — le roi n'est
+    /// entre AUCUNE paire de tours puisqu'il n'y en a qu'une de chaque côté.
+    @Test("Un roi qui n'est pas entre les deux tours est illégal")
+    func kingNotBetweenRooksIsIllegal() {
+        // R R K . . . . . — les deux tours sont TOUTES DEUX à gauche du roi.
+        let rank = Array("RRKBBQNN")
+        #expect(!Chess960Position.isLegalBackRank(rank))
+        #expect(Chess960Position.number(forBackRank: rank) == nil)
+    }
+
+    /// Fous sur des cases de MÊME couleur : viole la règle FIDE du Chess960,
+    /// indépendamment de toute contrainte technique de cette app.
+    @Test("Deux fous sur des cases de même couleur sont illégaux")
+    func bishopsOnSameColorAreIllegal() {
+        // Fous en a (index 0, pair) et c (index 2, même parité) : même
+        // couleur de case. Tours en e/h, roi en f : légalement entre elles.
+        let rank = Array("BNBQRKNR")
+        #expect(!Chess960Position.isLegalBackRank(rank))
+    }
+
+    /// Une pièce en double, une autre absente : la classique erreur d'un
+    /// jeu de pièces mal composé — indépendante des deux règles ci-dessus.
+    @Test("Un jeu de pièces incomplet est illégal")
+    func wrongPieceMultisetIsIllegal() {
+        let rank = Array("RNBQKBNN")   // deux cavaliers de trop, une tour en moins
+        #expect(!Chess960Position.isLegalBackRank(rank))
+    }
+
+    /// La 518 (partie classique) doit se retrouver — c'est la garantie que
+    /// n'importe quel joueur reconnaîtra en composant lui-même RNBQKBNR.
+    @Test("La rangée classique retrouve le numéro 518")
+    func classicalRankFindsNumber518() {
+        #expect(Chess960Position.number(forBackRank: Array("RNBQKBNR")) == 518)
+    }
 }
