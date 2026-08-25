@@ -76,4 +76,24 @@ final class Chess960SetupUITests: XCTestCase {
         XCTAssertTrue(numberField.waitForExistence(timeout: 3))
         XCTAssertEqual(numberField.value as? String, "518")
     }
+
+    /// Le pavé numérique iOS n'a nativement AUCUNE touche de fermeture —
+    /// signalé par l'utilisateur : impossible de le refermer une fois ouvert.
+    /// « Terminé », posé sur la barre d'accessoires du clavier, doit le
+    /// faire disparaître.
+    @MainActor
+    func testKeyboardDismissesViaDoneButton() throws {
+        let app = launchApp()
+        openChess960Setup(app)
+
+        let numberField = app.textFields["Numéro de position"]
+        XCTAssertTrue(numberField.waitForExistence(timeout: 3))
+        numberField.tap()
+
+        let doneButton = app.buttons["Terminé"]
+        XCTAssertTrue(doneButton.waitForExistence(timeout: 3), "aucune touche pour refermer le pavé numérique")
+        doneButton.tap()
+
+        XCTAssertFalse(doneButton.waitForExistence(timeout: 2), "le clavier (et sa barre) doit avoir disparu")
+    }
 }

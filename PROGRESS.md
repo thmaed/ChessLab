@@ -9085,3 +9085,23 @@ l'arrangement invalide.
 
 721 tests unitaires verts (5 nouveaux). Suite d'interface Chess960 complète
 verte (4 tests, 2 fichiers).
+
+## 25/08 — Chess960 : le pavé numérique du champ « n° » ne se refermait pas
+
+Signalé par l'utilisateur : taper un numéro de position ouvre le clavier
+numérique, qui n'a AUCUNE touche pour le refermer — contrairement au clavier
+alphabétique, le pavé `.numberPad` d'iOS n'a pas de touche Retour. C'était le
+premier champ numérique de toute l'app ; aucune convention existante à
+réutiliser.
+
+Ajouté : un `@FocusState`, et une barre d'accessoires du clavier
+(`ToolbarItemGroup(placement: .keyboard)`) portant un bouton « Terminé » qui
+retire le focus. C'est le patron standard d'iOS pour ce cas précis.
+
+### Vérifié
+
+`Chess960SetupUITests.testKeyboardDismissesViaDoneButton` : touche le champ,
+attend l'apparition de « Terminé », le touche, vérifie sa disparition — la
+preuve que le clavier se referme VRAIMENT, pas seulement que le bouton existe.
+721 tests unitaires verts (les deux échecs rencontrés en suite complète sont
+les fragilités déjà documentées — moteur réel, pendule — vertes isolément).

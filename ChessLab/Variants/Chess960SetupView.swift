@@ -28,6 +28,10 @@ struct Chess960SetupView: View {
     /// l'échange. Geste tap-tap, pas de glisser : même convention que le
     /// plateau lui-même.
     @State private var selectedFileForEdit: Int?
+    /// Le pavé numérique iOS n'a AUCUNE touche de fermeture (contrairement au
+    /// clavier alphabétique, avec « Terminé » sur Retour) : sans ce champ de
+    /// concentration, rien ne permet à l'utilisateur de le refermer.
+    @FocusState private var numberFieldFocused: Bool
 
     init(onStart: @escaping (Chess960Settings) -> Void) {
         self.onStart = onStart
@@ -110,6 +114,14 @@ struct Chess960SetupView: View {
                     .disabled(Chess960Position.number(forBackRank: editableRank) == nil)
                     .accessibilityIdentifier("chess960_start")
             }
+            // Le pavé numérique n'offre aucune touche de fermeture par
+            // lui-même : sans cette barre, il resterait ouvert tant que
+            // l'utilisateur ne touche pas ailleurs à l'aveugle.
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("Terminé") { numberFieldFocused = false }
+                    .fontWeight(.semibold)
+            }
         }
     }
 
@@ -129,6 +141,7 @@ struct Chess960SetupView: View {
                         .foregroundStyle(Theme.textSecondary)
                     TextField("0-959", text: $numberField)
                         .keyboardType(.numberPad)
+                        .focused($numberFieldFocused)
                         .textFieldStyle(.plain)
                         .font(.title3.weight(.bold).monospacedDigit())
                         .foregroundStyle(Theme.textPrimary)
