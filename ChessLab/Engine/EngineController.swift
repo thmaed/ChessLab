@@ -241,9 +241,10 @@ actor EngineController {
     /// fin. Le cas normal se résout en quelques dizaines de millisecondes (le
     /// temps du `quit` + join de l'écran précédent).
     ///
-    /// Vérifie AUSSI ``FairyStockfishEngine/isProcessBusy`` — pas seulement
-    /// le sien. `handleViewDisappear()` arrête un moteur via une tâche
-    /// DÉTACHÉE, jamais attendue (correct : `.onDisappear` ne peut pas
+    /// Vérifie ``FairyStockfishEngine/isProcessBusy`` (l'AUTRE type de
+    /// moteur) ET ``StockfishEngine/isProcessBusy`` (le SIEN) — pas
+    /// seulement l'autre. `handleViewDisappear()` arrête un moteur via une
+    /// tâche DÉTACHÉE, jamais attendue (correct : `.onDisappear` ne peut pas
     /// `await`). `std::cin`/`std::cout`, eux, sont des flux GLOBAUX AU
     /// PROCESS que Stockfish ET Fairy-Stockfish redirigent chacun à leur
     /// tour — si l'un démarre pendant que l'autre achève sa démolition en
@@ -251,10 +252,21 @@ actor EngineController {
     /// MILIEU, qui n'entend plus jamais rien. Découvert le 25/08 en changeant
     /// de variante (Chess960/normal ↔ Fairy-Stockfish) : un défaut réel, pas
     /// seulement un artefact de test.
+    ///
+    /// **Complété le 25/08 (soir)** : le garde-fou ne couvrait que l'AUTRE
+    /// type de moteur — deux écrans successifs du MÊME type (par exemple
+    /// Roi de la colline puis Course des rois, tous deux Fairy-Stockfish)
+    /// pouvaient courir l'un contre l'autre exactement pareil, puisque
+    /// `FairyStockfishEngine.start(binaryPath:)` n'attend jamais tout seul
+    /// que l'instance précédente ait fini de s'arrêter. Signalé par
+    /// l'utilisateur : « Course des rois... moteur indisponible » —
+    /// reproductible en changeant vite de variante Fairy-Stockfish.
     private func acquireEngineProcess(timeoutMs: Int = 4000) async -> Bool {
         var attemptsLeft = max(timeoutMs / 50, 1)
         while true {
-            if !FairyStockfishEngine.isProcessBusy, engine.start(binaryPath: Self.enginePath) {
+            if !FairyStockfishEngine.isProcessBusy, !StockfishEngine.isProcessBusy,
+               engine.start(binaryPath: Self.enginePath)
+            {
                 return true
             }
             guard attemptsLeft > 0 else { return false }

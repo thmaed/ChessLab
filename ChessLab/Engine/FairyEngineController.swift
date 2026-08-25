@@ -235,14 +235,22 @@ actor FairyEngineController {
         readerTask = nil
     }
 
-    /// Vérifie AUSSI ``StockfishEngine/isProcessBusy`` — voir le commentaire
-    /// symétrique sur ``EngineController/acquireEngineProcess(timeoutMs:)``,
-    /// qui documente le défaut réel (pas seulement un artefact de test)
-    /// trouvé le 25/08.
+    /// Vérifie ``StockfishEngine/isProcessBusy`` (l'AUTRE type de moteur) ET
+    /// ``FairyStockfishEngine/isProcessBusy`` (le SIEN) — voir le
+    /// commentaire symétrique sur
+    /// ``EngineController/acquireEngineProcess(timeoutMs:)``, qui documente
+    /// le défaut réel (pas seulement un artefact de test) trouvé le 25/08,
+    /// et son complément du soir même : deux écrans de variantes
+    /// Fairy-Stockfish successifs (ex. Roi de la colline → Course des rois)
+    /// couraient l'un contre l'autre exactement pareil, le garde initial ne
+    /// couvrant que l'AUTRE type de moteur — signalé par l'utilisateur
+    /// (« Course des rois... moteur indisponible »).
     private func acquireEngineProcess(timeoutMs: Int = 4000) async -> Bool {
         var attemptsLeft = max(timeoutMs / 50, 1)
         while true {
-            if !StockfishEngine.isProcessBusy, engine.start(binaryPath: Self.enginePath) {
+            if !StockfishEngine.isProcessBusy, !FairyStockfishEngine.isProcessBusy,
+               engine.start(binaryPath: Self.enginePath)
+            {
                 return true
             }
             guard attemptsLeft > 0 else { return false }
