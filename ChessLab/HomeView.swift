@@ -582,15 +582,13 @@ struct HomeView: View {
 
                 case .chess960Setup:
                     Chess960SetupView { settings in
-                        path.append(Route.activeChess960Game(settings))
+                        startNewChess960Game(settings)
                     }
 
                 case let .activeChess960Game(settings):
-                    Chess960PlayView(
-                        viewModel: Chess960PlayViewModel(settings: settings),
-                        onExit: { path.removeLast() }
-                    )
-                    .navigationBarBackButtonHidden(false)
+                    Chess960ActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
+                        path = NavigationPath()
+                    }
 
                 case .puzzleQueue:
                     PuzzleQueueView { filter in
@@ -767,6 +765,13 @@ struct HomeView: View {
         sessionStore.remove(sessionKey(for: .activeGame(settings)))
         if replacingCurrent, !path.isEmpty { path.removeLast() }
         path.append(Route.activeGame(settings))
+    }
+
+    /// Idem pour le Chess960 — pas d'autosauvegarde à purger ici (lot 2/3),
+    /// seulement la session éventuellement stagnante.
+    private func startNewChess960Game(_ settings: Chess960Settings) {
+        sessionStore.remove(sessionKey(for: .activeChess960Game(settings)))
+        path.append(Route.activeChess960Game(settings))
     }
 
     /// Idem pour le mode deux joueurs.
@@ -1313,6 +1318,37 @@ private struct ResumedGameHost: View {
 /// cette vue) pour une nouvelle partie — même discipline de construction
 /// paresseuse que ``ActiveGameHost``, par cohérence (pas d'effet de bord
 /// process moteur ici, donc moins critique).
+/// Voir ``ActiveGameHost`` : même remède, même raison — sans lui, chaque
+/// re-rendu de `HomeView` (donc chaque coup joué, puisqu'il mute l'état
+/// observé par la hiérarchie) reconstruisait un ``Chess960PlayViewModel``
+/// neuf et effaçait la partie en cours. C'est le défaut signalé le 25/08 :
+/// « je n'arrive pas à déplacer les pièces » — chaque coup se voyait
+/// aussitôt annulé par une réinitialisation silencieuse.
+private struct Chess960ActiveGameHost: View {
+    let settings: Chess960Settings
+    let sessionKey: String
+    let onExit: () -> Void
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: Chess960PlayViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                Chess960PlayView(viewModel: viewModel, onExit: onExit)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    Chess960PlayViewModel(settings: settings)
+                }
+            }
+        }
+    }
+}
+
 private struct TwoPlayerActiveGameHost: View {
     let settings: TwoPlayerGameSettings
     /// Identité de session — voir ``SessionStore``.

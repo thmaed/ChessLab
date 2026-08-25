@@ -29,6 +29,7 @@ struct Chess960PlayView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .background(moveCountMarker)
         }
         .appBackground()
         .navigationTitle("Chess960 · n° \(viewModel.settings.positionNumber)")
@@ -64,12 +65,21 @@ struct Chess960PlayView: View {
                 }
             }
         }
-        if viewModel.isEngineUnavailable {
-            EngineUnavailableBanner(
-                message: "L'ordinateur n'a pas démarré : il ne jouera pas.",
-                isRetrying: false,
-                onRetry: {}
-            )
+        // AU-DESSUS de tout (`.overlay`, pas un frère de niveau supérieur) :
+        // un `if` de dernier niveau après une longue chaîne de modificateurs
+        // compile (le corps d'une vue est un ViewBuilder implicite) mais ne
+        // se superpose PAS au reste — sans conteneur explicite, SwiftUI n'a
+        // aucune règle d'empilement à appliquer. Défaut sans conséquence
+        // visible tant que le moteur démarre (cas normal), mais faux malgré
+        // tout : corrigé au passage du 25/08.
+        .overlay {
+            if viewModel.isEngineUnavailable {
+                EngineUnavailableBanner(
+                    message: "L'ordinateur n'a pas démarré : il ne jouera pas.",
+                    isRetrying: false,
+                    onRetry: {}
+                )
+            }
         }
     }
 
@@ -218,6 +228,18 @@ struct Chess960PlayView: View {
                 .foregroundStyle(Theme.textSecondary)
         }
         .accessibilityLabel("Exporter")
+    }
+
+    /// Marqueur invisible exposant le nombre de coups joués, pour les tests
+    /// d'interface — même convention que ``PlayView/moveCountMarker``. C'est
+    /// lui qui prouve qu'un coup S'EST BIEN JOUÉ : le défaut du 25/08
+    /// (chaque rendu recréait le view model) remettait la partie à zéro sans
+    /// que rien à l'écran ne le crie — ni erreur, ni écran figé, juste un
+    /// coup qui semblait avaler.
+    private var moveCountMarker: some View {
+        Color.clear
+            .accessibilityIdentifier("chess960_moveCount")
+            .accessibilityValue("\(viewModel.totalPlies)")
     }
 }
 

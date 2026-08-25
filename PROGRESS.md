@@ -8926,3 +8926,53 @@ cibles de roque. 19 chaînes traduites. Le tour moteur réel (Elo, pendule,
 Débranchements (Deux joueurs → Laboratoire → Analyser), indice, alerte gaffe,
 autosauvegarde, surlignage du dernier coup après un roque (le `lastMove`
 ChessKit ne peut pas le représenter — l'échiquier ne surligne pas ce coup-là).
+
+## 25/08 — Correctif critique : Chess960 remettait chaque coup à zéro
+
+Signalé par l'utilisateur juste après la livraison du lot 2 : « je n'arrive
+pas à déplacer des pièces ». La cause n'était ni dans les règles (prouvées
+par perft), ni dans le view model (6 tests verts sur sa mécanique) — elle
+vivait dans `HomeView.destination(for:)`, qui construisait
+`Chess960PlayViewModel(settings: settings)` EN LIGNE au lieu de le confier au
+`SessionStore`, comme le font `.activeGame` et `.activeTwoPlayerGame` depuis
+le Lot 0. Chaque coup joué invalide l'état observé, `destination(for:)` est
+réévalué, et un view model NEUF remplaçait l'ancien : le coup qu'on venait de
+jouer disparaissait aussitôt sous une partie remise à zéro, sans erreur ni
+écran figé — juste un coup qui semblait avaler.
+
+`Chess960ActiveGameHost` répare la route, à l'identique des deux hôtes déjà
+en place. `startNewChess960Game` purge la session stagnante avant d'empiler
+la route — même sas que `startNewGame`/`startNewTwoPlayerGame`.
+
+Corrigé au passage : `Chess960PlayView.body` portait un `if` de dernier
+niveau après une longue chaîne de modificateurs (la bannière moteur
+indisponible) — compile, mais ne se superpose à rien sans conteneur explicite.
+Passé en `.overlay`.
+
+### Le test qui aurait dû exister
+
+Aucun test unitaire ne pouvait voir ce défaut : ils appellent le view model
+directement, court-circuitant précisément le chemin de routage où il vivait.
+`Chess960SessionUITests` navigue depuis l'accueil réel (Variantes → Chess960
+→ Commencer → coup) et lit un marqueur `chess960_moveCount` (même convention
+que `PlayView.moveCountMarker`). Premier jet du test : `== "1"` après un seul
+coup — trop strict, le moteur peut avoir déjà répondu au moment de la lecture
+(compteur à « 2 » d'entrée, coup utilisateur ET réponse moteur déjà commis) ;
+ce n'était pas le défaut, c'était juste un test qui présumait un moteur plus
+lent qu'il ne l'est. Réécrit pour ce qui compte réellement : le compteur ne
+retombe JAMAIS à 0 après avoir progressé.
+
+Un second test envisagé (quitter l'écran puis y revenir) présumait un chemin
+de reprise qui n'existe pas — « Commencer » relance toujours une partie
+neuve, par construction, comme en mode Jouer. Retiré plutôt que forcé à
+valider un comportement qui n'est pas censé exister ; la vraie protection de
+`SessionStore` (survivre à un rendu de `HomeView` PENDANT que l'écran actif
+est affiché) est déjà celle que le premier test exerce de bout en bout.
+
+### Vérifié
+
+713 tests unitaires verts, le test d'interface du défaut vert. Une suite
+`GameClockStartTests.whiteTimeDecreasesBeforeTheFirstMove` a échoué en
+tournant dans le lot complet (274 s), verte relancée seule — flaky
+pré-existant et documenté dans son propre commentaire (contention du
+`MainActor` sous charge), sans rapport avec ce travail.
