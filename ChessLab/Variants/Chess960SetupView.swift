@@ -121,6 +121,7 @@ struct Chess960SetupView: View {
                 Spacer()
                 Button("Terminé") { numberFieldFocused = false }
                     .fontWeight(.semibold)
+                    .tint(Theme.accent)
             }
         }
     }
