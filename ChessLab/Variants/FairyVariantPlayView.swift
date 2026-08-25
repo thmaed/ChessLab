@@ -125,9 +125,14 @@ struct FairyVariantPlayView: View {
 
     private func playerRow(for color: Piece.Color) -> some View {
         HStack(spacing: 10) {
+            // Décoratif : le texte juste après porte déjà l'information
+            // (« Ordinateur »/« Vous ») — sans ce masquage, VoiceOver
+            // annonçait le nom brut du symbole SF ("cpu") avant le libellé,
+            // un doublon confus plutôt qu'utile.
             Image(systemName: color == viewModel.engineColor ? "cpu" : "person.fill")
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(color == viewModel.engineColor ? variant.tint : Theme.info)
+                .accessibilityHidden(true)
             Text(color == viewModel.engineColor
                  ? LocalizationController.string("Ordinateur")
                  : LocalizationController.string("Vous"))
@@ -173,6 +178,7 @@ struct FairyVariantPlayView: View {
                     Image(systemName: "flag.checkered")
                         .font(.title2)
                         .foregroundStyle(Theme.textSecondary)
+                        .accessibilityHidden(true)
                     Text(outcome.summary(userColor: viewModel.userColor))
                         .font(.headline)
                         .foregroundStyle(Theme.textPrimary)

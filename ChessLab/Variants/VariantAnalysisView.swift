@@ -173,16 +173,24 @@ struct VariantAnalysisView: View {
 
     @ViewBuilder
     private func qualityGlyph(_ quality: MoveQuality) -> some View {
-        switch quality.icon {
-        case let .text(text):
-            Text(text)
-                .font(.caption2.weight(.heavy))
-                .foregroundStyle(quality.tint)
-        case let .symbol(name):
-            Image(systemName: name)
-                .font(.system(size: 9, weight: .bold))
-                .foregroundStyle(quality.tint)
+        // `.accessibilityLabel` explicite : sans lui, VoiceOver lit soit le
+        // texte brut du glyphe ("!!"), soit le nom du symbole SF ("star
+        // fill") — ni l'un ni l'autre ne dit « coup brillant »/« le
+        // meilleur ». Même patron que ``MoveQualityBadgeView`` (la pastille
+        // posée sur le plateau), qui l'a déjà.
+        Group {
+            switch quality.icon {
+            case let .text(text):
+                Text(text)
+                    .font(.caption2.weight(.heavy))
+                    .foregroundStyle(quality.tint)
+            case let .symbol(name):
+                Image(systemName: name)
+                    .font(.system(size: 9, weight: .bold))
+                    .foregroundStyle(quality.tint)
+            }
         }
+        .accessibilityLabel(Text(quality.label))
     }
 
     private var totalPliesMarker: some View {
