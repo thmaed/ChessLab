@@ -121,6 +121,11 @@ struct HomeView: View {
         /// — porte directement les journaux de la partie SOURCE, pas de PGN
         /// intermédiaire (voir ``VariantAnalysisSeed``).
         case activeVariantAnalysis(VariantAnalysisSeed)
+        /// Coup Volé — variante maison, réglages puis partie, hors des deux
+        /// familles ci-dessus (Stockfish standard, aucune option UCI de
+        /// variante ne correspond à son tour double).
+        case stolenMoveSetup
+        case activeStolenMoveGame(FairyVariantSettings)
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
@@ -606,6 +611,8 @@ struct HomeView: View {
                         path.append(Route.fairyVariantSetup(variant.id))
                     } onOpenEngineLegalityVariant: { variant in
                         path.append(Route.engineLegalitySetup(variant.id))
+                    } onOpenStolenMove: {
+                        path.append(Route.stolenMoveSetup)
                     }
 
                 case .chess960Setup:
@@ -647,6 +654,16 @@ struct HomeView: View {
 
                 case let .activeVariantAnalysis(seed):
                     VariantAnalysisActiveGameHost(seed: seed, sessionKey: sessionKey(for: route))
+
+                case .stolenMoveSetup:
+                    FairyVariantSetupView(variant: StolenMoveVariant.shared) { settings in
+                        path.append(Route.activeStolenMoveGame(settings))
+                    }
+
+                case let .activeStolenMoveGame(settings):
+                    StolenMoveActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
+                        path = NavigationPath()
+                    }
 
                 case let .activeChess960Game(settings):
                     Chess960ActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
@@ -1487,6 +1504,31 @@ private struct EngineLegalityActiveGameHost: View {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
                     EngineLegalityPlayViewModel(variant: variant, settings: settings)
+                }
+            }
+        }
+    }
+}
+
+private struct StolenMoveActiveGameHost: View {
+    let settings: FairyVariantSettings
+    let sessionKey: String
+    let onExit: () -> Void
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: StolenMovePlayViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                StolenMovePlayView(viewModel: viewModel, onExit: onExit)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    StolenMovePlayViewModel(settings: settings)
                 }
             }
         }

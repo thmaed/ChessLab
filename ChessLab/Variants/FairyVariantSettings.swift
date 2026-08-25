@@ -12,6 +12,10 @@ struct FairyVariantSettings: Codable, Equatable, Hashable {
     var showEvalBar: Bool = false
     var hintsEnabled: Bool = true
     var blunderAlertEnabled: Bool = true
+    /// Coup Volé UNIQUEMENT (ignoré par les six autres variantes, qui
+    /// partagent ce même type de réglages) — nombre de coups entre deux
+    /// jetons, voir ``StolenMoveVariant/tokenIntervalRange``.
+    var stolenMoveTokenInterval: Int = StolenMoveVariant.defaultTokenInterval
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -24,6 +28,7 @@ struct FairyVariantSettings: Codable, Equatable, Hashable {
         showEvalBar = try container.decodeIfPresent(Bool.self, forKey: .showEvalBar) ?? fallback.showEvalBar
         hintsEnabled = try container.decodeIfPresent(Bool.self, forKey: .hintsEnabled) ?? fallback.hintsEnabled
         blunderAlertEnabled = try container.decodeIfPresent(Bool.self, forKey: .blunderAlertEnabled) ?? fallback.blunderAlertEnabled
+        stolenMoveTokenInterval = try container.decodeIfPresent(Int.self, forKey: .stolenMoveTokenInterval) ?? fallback.stolenMoveTokenInterval
     }
 
     init() {}

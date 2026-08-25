@@ -19,6 +19,9 @@ struct FairyVariantSetupView: View {
     @State private var showEvalBar: Bool
     @State private var hintsEnabled: Bool
     @State private var blunderAlertEnabled: Bool
+    @State private var stolenMoveTokenInterval: Int
+
+    private var isStolenMove: Bool { variant.id == StolenMoveVariant.shared.id }
 
     init(variant: any PlayableVariant, onStart: @escaping (FairyVariantSettings) -> Void) {
         self.variant = variant
@@ -39,6 +42,10 @@ struct FairyVariantSetupView: View {
         _showEvalBar = State(initialValue: saved.showEvalBar)
         _hintsEnabled = State(initialValue: saved.hintsEnabled)
         _blunderAlertEnabled = State(initialValue: saved.blunderAlertEnabled)
+        _stolenMoveTokenInterval = State(initialValue: min(
+            max(saved.stolenMoveTokenInterval, StolenMoveVariant.tokenIntervalRange.lowerBound),
+            StolenMoveVariant.tokenIntervalRange.upperBound
+        ))
     }
 
     var body: some View {
@@ -67,14 +74,24 @@ struct FairyVariantSetupView: View {
                             .foregroundStyle(Theme.textPrimary)
                         Slider(value: $eloSlider, in: EngineStrength.playSliderRange, step: 50)
                             .tint(variant.tint)
-                        Text("Les Elo sont calibrés pour la partie classique : sans réseau de neurones dédié à cette variante, le niveau réel peut différer.")
-                            .font(.caption)
-                            .foregroundStyle(Theme.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
+                        // Coup Volé joue avec Stockfish STANDARD (aucune
+                        // option UCI de variante n'existe pour son tour
+                        // double) : le réseau NNUE habituel s'applique tel
+                        // quel, contrairement aux six autres variantes.
+                        if !isStolenMove {
+                            Text("Les Elo sont calibrés pour la partie classique : sans réseau de neurones dédié à cette variante, le niveau réel peut différer.")
+                                .font(.caption)
+                                .foregroundStyle(Theme.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
                 }
 
                 cadenceSection
+
+                if isStolenMove {
+                    stolenMoveSection
+                }
 
                 SettingsSection(title: "Aides", systemImage: "lifepreserver", tint: variant.tint) {
                     VStack(alignment: .leading, spacing: 10) {
@@ -158,6 +175,25 @@ struct FairyVariantSetupView: View {
         }
     }
 
+    // MARK: Coup Volé — cadence des jetons
+
+    private var stolenMoveSection: some View {
+        SettingsSection(title: "Jetons", systemImage: "bolt.badge.clock.fill", tint: variant.tint) {
+            VStack(alignment: .leading, spacing: 10) {
+                Stepper(
+                    LocalizationController.string("Un jeton tous les %lld coups", stolenMoveTokenInterval),
+                    value: $stolenMoveTokenInterval, in: StolenMoveVariant.tokenIntervalRange
+                )
+                .font(.subheadline)
+                .foregroundStyle(Theme.textPrimary)
+                Text("Plus l'intervalle est court, plus les tours doubles reviennent souvent.")
+                    .font(.caption)
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+
     private func select(_ category: TimeControlCategory) {
         timeCategory = category
         switch category {
@@ -186,6 +222,7 @@ struct FairyVariantSetupView: View {
         settings.showEvalBar = showEvalBar
         settings.hintsEnabled = hintsEnabled
         settings.blunderAlertEnabled = blunderAlertEnabled
+        settings.stolenMoveTokenInterval = stolenMoveTokenInterval
         FairyVariantSettingsStore.save(settings, for: variant.id)
         onStart(settings)
     }

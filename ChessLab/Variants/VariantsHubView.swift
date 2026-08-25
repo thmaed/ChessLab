@@ -9,6 +9,7 @@ struct VariantsHubView: View {
     let onOpenChess960: () -> Void
     let onOpenFairyVariant: (FairyVariant) -> Void
     let onOpenEngineLegalityVariant: (EngineLegalityVariant) -> Void
+    let onOpenStolenMove: () -> Void
 
     var body: some View {
         ScrollView {
@@ -58,9 +59,19 @@ struct VariantsHubView: View {
                             onOpenEngineLegalityVariant(variant)
                         }
                     }
+                    ModeCard(
+                        title: LocalizedStringKey(StolenMoveVariant.shared.displayName),
+                        shortTitle: LocalizedStringKey(StolenMoveVariant.shared.shortName),
+                        subtitle: LocalizedStringKey(StolenMoveVariant.shared.tagline),
+                        systemImage: StolenMoveVariant.shared.icon,
+                        tint: StolenMoveVariant.shared.tint,
+                        isEnabled: true,
+                        accessibilityID: "variant_\(StolenMoveVariant.shared.id)",
+                        action: onOpenStolenMove
+                    )
                 }
 
-                Text("Sans réseau de neurones dédié à ces six variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal.")
+                Text("Sans réseau de neurones dédié aux six premières : le moteur y joue avec son évaluation classique, un cran sous le mode normal. Coup Volé, lui, garde le moteur habituel — seul le déroulement du tour change.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)

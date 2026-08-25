@@ -960,6 +960,22 @@
         }
       }
     },
+    "2ᵉ coup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2nd move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2ᵉ coup"
+          }
+        }
+      }
+    },
     "3 essais" : {
       "localizations" : {
         "en" : {
@@ -4628,6 +4644,22 @@
         }
       }
     },
+    "Coup Volé" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stolen Move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coup Volé"
+          }
+        }
+      }
+    },
     "Coup commenté" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -5511,6 +5543,22 @@
         }
       }
     },
+    "Dépenser le jeton sur le prochain coup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Spend the token on the next move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dépenser le jeton sur le prochain coup"
+          }
+        }
+      }
+    },
     "Déplier quatre options" : {
       "localizations" : {
         "en" : {
@@ -5649,6 +5697,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "En pause"
+          }
+        }
+      }
+    },
+    "En train de jouer son second coup" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Currently playing their second move"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En train de jouer son second coup"
           }
         }
       }
@@ -7494,6 +7558,38 @@
         }
       }
     },
+    "Jeton disponible" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Token available"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jeton disponible"
+          }
+        }
+      }
+    },
+    "Jetons" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tokens"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jetons"
+          }
+        }
+      }
+    },
     "Jeu de données public lichess-org/chess-openings (domaine public). Sert à nommer chaque position atteinte." : {
       "localizations" : {
         "en" : {
@@ -8940,6 +9036,22 @@
         }
       }
     },
+    "Le prochain coup dépensera votre jeton — deux coups d'affilée." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your next move will spend your token — two moves in a row."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le prochain coup dépensera votre jeton — deux coups d'affilée."
+          }
+        }
+      }
+    },
     "Le roi doit rester entre les deux tours." : {
       "localizations" : {
         "en" : {
@@ -9172,6 +9284,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les règles sont celles du jeu classique, échec et mat compris. En plus, vous gagnez dès que vous avez mis le roi adverse en échec TROIS FOIS au cours de la partie — chaque échec compte, qu'il soit paré, capturé ou fui au coup suivant."
+          }
+        }
+      }
+    },
+    "Les règles sont celles du jeu classique. En plus : tous les 7 coups joués (réglable), vous gagnez un jeton — un seul en stock, le perdre en en gagnant un nouveau sans l'avoir dépensé. En le dépensant (hors échec), vous jouez deux coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The rules are those of classical chess. In addition: every 7 moves played (adjustable), you earn a token — only one in stock, lost if a new one is earned before it's spent. Spending it (outside of check) lets you play two moves in a row — unless the first one checks your opponent, in which case the turn stops there. An en passant capture made possible by the opponent's last move stays valid even if your first move of the double turn comes in between."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les règles sont celles du jeu classique. En plus : tous les 7 coups joués (réglable), vous gagnez un jeton — un seul en stock, le perdre en en gagnant un nouveau sans l'avoir dépensé. En le dépensant (hors échec), vous jouez deux coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale."
           }
         }
       }
@@ -11505,6 +11633,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Plus d'options"
+          }
+        }
+      }
+    },
+    "Plus l'intervalle est court, plus les tours doubles reviennent souvent." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The shorter the interval, the more often double turns come around."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Plus l'intervalle est court, plus les tours doubles reviennent souvent."
           }
         }
       }
@@ -13920,18 +14064,18 @@
         }
       }
     },
-    "Sans réseau de neurones dédié à ces six variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal." : {
+    "Sans réseau de neurones dédié aux six premières : le moteur y joue avec son évaluation classique, un cran sous le mode normal. Coup Volé, lui, garde le moteur habituel — seul le déroulement du tour change." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Without a network dedicated to these six variants: the engine plays with its classical evaluation here, a notch below normal mode."
+            "value" : "No dedicated network for the first six: the engine plays with its classical evaluation there, a notch below normal mode. Stolen Move, though, keeps the usual engine — only the turn structure changes."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Sans réseau de neurones dédié à ces six variantes : le moteur y joue avec son évaluation classique, un cran sous le mode normal."
+            "value" : "Sans réseau de neurones dédié aux six premières : le moteur y joue avec son évaluation classique, un cran sous le mode normal. Coup Volé, lui, garde le moteur habituel — seul le déroulement du tour change."
           }
         }
       }
@@ -16120,6 +16264,38 @@
         }
       }
     },
+    "Un jeton tous les %lld coups" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A token every %lld moves"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un jeton tous les %lld coups"
+          }
+        }
+      }
+    },
+    "Un jeton tous les 7 coups pour en jouer deux d'affilée" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "A token every 7 moves, to play two in a row"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un jeton tous les 7 coups pour en jouer deux d'affilée"
+          }
+        }
+      }
+    },
     "Un roque devient indisponible dès que son roi ou sa tour quitte sa case de départ." : {
       "extractionState" : "stale",
       "localizations" : {
@@ -16698,6 +16874,22 @@
           "stringUnit" : {
             "state" : "new",
             "value" : "Vous avez quitté votre répertoire au coup %1$lld — coup prévu : %2$@"
+          }
+        }
+      }
+    },
+    "Vous avez un jeton : dépensez-le pour jouer deux coups d'affilée." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You have a token: spend it to play two moves in a row."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vous avez un jeton : dépensez-le pour jouer deux coups d'affilée."
           }
         }
       }

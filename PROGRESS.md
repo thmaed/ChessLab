@@ -9632,3 +9632,153 @@ avec Chess960 qui ne l'utilise pas).
 9 tests neufs (`VariantAnalysisViewModelTests`, dont classification/cache/
 collision de clé entre variantes, moteur réel pour les cas qui l'exigent),
 tous verts. 791 tests au total dans la suite.
+
+## 25/08 — Revue complète du code, six agents en parallèle
+
+Suite du même enchaînement (module d'analyse, puis revue HIG — les deux
+au-dessus —, puis cette revue). Six agents indépendants, chacun scopé à un
+sous-système (partie/moteur, variantes, analyse, Laboratoire/tablebases,
+ouvertures, persistance/sync), consigne explicite : uniquement des bugs
+vérifiés avec preuve fichier:ligne, pas de style, recherche seule (aucune
+modification). Deux trouvailles à confiance HAUTE, corrigées ici ; le
+reste est trié ci-dessous.
+
+### Fenêtre de promotion ouverte pendant qu'une partie se termine ailleurs
+
+`completePromotion()` n'avait jamais de garde sur `outcome` dans
+`PlayViewModel`, `Chess960PlayViewModel`, `FairyVariantPlayViewModel` et
+`TwoPlayer/TwoPlayerViewModel` (seule `EngineLegalityPlayViewModel` l'avait
+déjà). Scénario concret : le drapeau tombe, ou l'ordinateur mate, pendant
+que l'utilisateur a encore la feuille de promotion ouverte — `commit()`
+n'a pas son propre garde-fou, donc taper une pièce à ce moment-là rejouait
+un coup sur une partie déjà finie (partie/horloge/persistance
+potentiellement corrompues). Ajouté partout, y compris dans
+`StolenMovePlayViewModel` tout neuf (même faille, trouvée en la
+construisant sur le même moule).
+
+### L'offre d'annulation d'une reprise survivait à une réponse moteur immédiate
+
+`resumeFromReview()` propose 8 secondes pour annuler une reprise (« repris,
+N coups écartés »). Le nettoyage de cette offre (`clearResumeUndo`) n'était
+déclenché QUE si le coup suivant venait de l'UTILISATEUR
+(`ifMoverIs: userColor`) — dans `PlayViewModel`, `Chess960PlayViewModel`,
+`FairyVariantPlayViewModel` et `EngineLegalityPlayViewModel`. Si la reprise
+retombait juste avant le trait de l'ordinateur, celui-ci répondait aussitôt
+SANS effacer l'offre. Annuler à ce moment-là réinjectait l'ancienne suite
+écartée par-dessus le coup moteur déjà commité — `uciLog`/`sanLog` et
+`fenLog`/`moveLog` désynchronisés, `rebuildFromLogs()` s'arrêtant en
+silence au premier coup illégal de la suite corrompue sans re-tronquer les
+journaux source. Un module d'analyse ouvert sur une telle partie aurait pu
+planter (`fenLog[displayedPly]` hors bornes). Corrigé en rendant le
+nettoyage inconditionnel — N'IMPORTE QUEL coup après une reprise invalide
+l'offre, pas seulement un coup utilisateur — dans les quatre vues-modèles
+ET dans `StolenMovePlayViewModel`. Garde-fou supplémentaire ajouté côté
+`VariantAnalysisViewModel` (bornage sur `fenLog.count - 1` en plus de
+`totalPlies`, à deux endroits) : une partie source malgré tout corrompue
+ne doit plus jamais faire planter l'analyse, même si le vrai correctif
+vit en amont.
+
+### Un pion promu ne comptait que pour un pion dans les sacrifices
+
+`MoveClassifier.involvesSacrifice` lisait `move.piece.kind` pour la valeur
+du coup joué — pour une promotion, ChessKit y laisse le PION (la pièce
+promue vit dans `move.promotedPiece`). Une dame fraîchement promue qui se
+sacrifie aussitôt ne valait donc qu'un point, rendant `.brilliant`
+inatteignable pour ce genre de coup. `move.promotedPiece?.kind ??
+move.piece.kind` corrige la valeur utilisée.
+
+### Un redémarrage moteur raté laissait le Laboratoire s'épuiser en silence
+
+`LabViewModel` : après une partie interrompue (moteur muet), le résultat
+de `controller.restart(...)` était ignoré. Un redémarrage qui échoue
+vraiment laissait la boucle retenter jusqu'à épuiser son budget de
+tentatives sur un moteur mort, sans jamais l'annoncer — la série
+s'arrêtait juste, sans erreur visible. Vérifié désormais ; un échec
+interrompt proprement la série (même traitement que « moteur indisponible
+au démarrage », juste au-dessus dans le même fichier).
+
+### Trié, non corrigé
+
+- **CI/variance du Laboratoire (`LabStats`)** : `scoreStandardError` divise
+  par `games` (variance de population) plutôt que `games - 1` (correction
+  de Bessel, non biaisée) — et peut s'effondrer sur un intervalle de
+  largeur nulle après un échantillon minuscule mais parfaitement
+  unilatéral (ex. 3 victoires sur 3). Les deux sont de vraies nuances
+  statistiques, mais changer la formule d'un outil de test de force déjà
+  utilisé est une décision de produit, pas une correction mécanique — laissé
+  tel quel, signalé ici pour arbitrage plutôt que tranché sans le
+  demander.
+- **`OpeningPGNImporter`** : perd les commentaires sur les coups transposés
+  dans un import multi-chapitres — plus bas risque, périmètre plus large
+  qu'une correction ponctuelle ne justifiait ici.
+- **CloudKit / conflit de payload entier** : latent, la sync n'est pas
+  encore activée — rien à corriger tant qu'elle ne l'est pas.
+- **`EngineController.restart()` réentrant** : risque non confirmé, fenêtre
+  étroite.
+- Tout le reste des six revues (FSRS, transposition ouvertures/finales,
+  fusion par rejeu du journal `OpeningProgressSync`, recherche par nom,
+  double détection de `GameOutcome`, verrou `engineQueue`, validation à un
+  essai des puzzles, reprise de série Laboratoire, orientation LOS,
+  désambiguïsation SAN, issues `EngineLegalityVariant`) confirmé correct
+  par les agents — rien à corriger.
+
+## 25/08 — Une 8e variante : Coup Volé
+
+Demandée avec ses règles complètes : tous les 7 coups (réglable 4-8 dans
+les réglages), 1 jeton ; le dépenser fait jouer deux coups d'affilée au
+même camp, sauf si le premier met échec (le tour s'arrête là) ; jamais
+plus d'un jeton en stock (le suivant écrase l'ancien, pas de cumul) ; la
+prise en passant rendue possible par le dernier coup adverse reste valable
+même si un coup du tour double s'intercale.
+
+### Échecs standard + une machine à état par-dessus, pas une variante Fairy-Stockfish
+
+Aucun moteur ne comprend « deux coups d'affilée » — impossible de
+déléguer à Fairy-Stockfish comme les six autres variantes du hub. À la
+place : échecs parfaitement standard (ChessKit arbitre, comme le lot A),
+`EngineController` ordinaire (Stockfish natif, AVEC son réseau NNUE —
+contrairement aux six autres, qui tournent sur l'évaluation classique de
+Fairy-Stockfish sans réseau dédié) plus une machine à état maison
+(`StolenMovePlayViewModel`) qui décide QUI doit vraiment jouer, par-dessus
+ce que ChessKit fait alterner tout seul. `effectiveMover` (le camp qui
+doit RÉELLEMENT jouer) diverge de `board.position.sideToMove` (ce que
+ChessKit croit) pendant tout le second coup d'un tour double.
+
+### Le second coup d'un tour double : un plateau jetable, jamais le vrai
+
+ChessKit fait alterner le trait après CHAQUE coup — aucune idée qu'un même
+camp puisse rejouer. Le premier coup d'un tour double se joue normalement.
+Pour le second, la légalité/l'interaction s'interrogent sur un plateau
+TEMPORAIRE reconstruit à la volée depuis le FEN courant, trait remis au
+bon camp — jamais stocké, jeté aussitôt. Une fois le second coup VRAIMENT
+joué sur ce plateau, ChessKit fait retomber le trait sur le vrai
+adversaire tout seul ; aucune remise à l'endroit n'est nécessaire après
+coup.
+
+### La prise en passant qui survit à un coup intercalé
+
+Un cas que ChessKit ne peut pas connaître : la prise en passant rendue
+possible par le DERNIER coup adverse doit rester valable même si le
+premier coup d'un tour double s'intercale (ChessKit l'aurait normalement
+effacée après ce premier coup, comme n'importe quel coup qui n'est pas la
+prise elle-même). `enPassantTargetAtTurnStart` mémorise la case AVANT le
+premier coup du tour, ré-injectée dans le plateau temporaire du second
+coup si ChessKit l'a effacée entre-temps.
+
+### Dépenser un jeton est un choix, pas un fait déductible du plateau
+
+`tokenSpendLog: [Bool]`, parallèle à `uciLog` — nécessaire pour rejouer
+l'économie de jetons de façon déterministe après une reprise/annulation :
+« ce coup a-t-il dépensé un jeton » ne se déduit d'aucun état du plateau
+seul, contrairement à tout le reste (position, échec, mat).
+
+### Vérifié
+
+11 tests neufs (`StolenMovePlayViewModelTests`) : jeton gagné au bon coup
+(intervalle par défaut et personnalisé), dépense qui enchaîne deux coups,
+échec sur le premier coup qui arrête le tour, impossible de dépenser en
+étant en échec, reprise qui ne retire qu'un seul coup du tour double,
+export PGN avec l'annotation `[jeton]`, prise en passant qui survit au
+coup intercalé (via le vrai chemin d'interaction, pas un raccourci de
+test) — plus deux tests moteur réel : réponse après le premier coup, et
+l'ordinateur qui dépense tout seul son jeton pour enchaîner deux coups.
