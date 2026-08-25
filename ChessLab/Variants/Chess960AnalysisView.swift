@@ -56,6 +56,7 @@ struct Chess960AnalysisView: View {
                 legalTargetSquares: [],
                 lastMove: viewModel.displayedLastMove,
                 hintMoves: viewModel.hintMoves,
+                qualityBadge: viewModel.qualityBadge,
                 interactionEnabled: false,
                 showCoordinates: true,
                 onTapSquare: { _ in },
@@ -73,7 +74,9 @@ struct Chess960AnalysisView: View {
             navButton("chevron.left", label: "Coup précédent") { viewModel.reviewPrevious() }
                 .disabled(viewModel.displayedPly == 0)
             Spacer(minLength: 0)
-            if viewModel.isAnalyzing {
+            if viewModel.isClassifying, let progress = viewModel.classificationProgress {
+                classificationIndicator(progress)
+            } else if viewModel.isAnalyzing {
                 ProgressView().controlSize(.small).tint(Theme.textSecondary)
             }
             Text("\(viewModel.displayedPly) / \(viewModel.totalPlies)")
@@ -90,6 +93,19 @@ struct Chess960AnalysisView: View {
         .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
+    /// Avancement de la classification de fond — même rendu compact que
+    /// ``AnalysisView/classificationIndicator(_:)``.
+    private func classificationIndicator(_ progress: (done: Int, total: Int)) -> some View {
+        HStack(spacing: 6) {
+            ProgressView().controlSize(.small).tint(Theme.textTertiary)
+            Text("\(progress.done)/\(progress.total)")
+                .font(.caption2.monospacedDigit())
+                .foregroundStyle(Theme.textTertiary)
+                .lineLimit(1)
+                .fixedSize()
+        }
+    }
+
     private func navButton(_ systemImage: String, label: LocalizedStringKey, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: systemImage)
@@ -101,41 +117,82 @@ struct Chess960AnalysisView: View {
         .accessibilityLabel(label)
     }
 
+    /// Numéro de la rangée (« N. blancs noirs ») qui contient `ply` — même
+    /// calcul que ``Chess960AnalysisViewModel/numberedMoves``.
+    private func rowNumber(forPly ply: Int) -> Int {
+        max(1, (ply + 1) / 2)
+    }
+
     private var movesList: some View {
-        ScrollView {
-            LazyVGrid(columns: [GridItem(.fixed(28)), GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
-                ForEach(viewModel.numberedMoves, id: \.number) { entry in
-                    Text("\(entry.number).")
-                        .foregroundStyle(Theme.textSecondary)
-                    moveButton(entry.white, ply: entry.number * 2 - 1)
-                    if let black = entry.black {
-                        moveButton(black, ply: entry.number * 2)
-                    } else {
-                        Color.clear
+        ScrollViewReader { proxy in
+            ScrollView {
+                LazyVGrid(columns: [GridItem(.fixed(28)), GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
+                    ForEach(viewModel.numberedMoves, id: \.number) { entry in
+                        Text("\(entry.number).")
+                            .foregroundStyle(Theme.textSecondary)
+                        moveButton(entry.white, ply: entry.number * 2 - 1)
+                        if let black = entry.black {
+                            moveButton(black, ply: entry.number * 2)
+                        } else {
+                            Color.clear
+                        }
                     }
                 }
+                .font(.subheadline.monospacedDigit())
+                .padding(10)
             }
-            .font(.subheadline.monospacedDigit())
-            .padding(10)
+            // Le ruban suit la navigation (précédent/suivant, tap sur un
+            // coup, fin de la classification qui ramène au premier coup) —
+            // sans quoi avancer dans une longue partie sort le coup affiché
+            // de l'écran sans que rien ne le suive.
+            .onChange(of: viewModel.displayedPly) { _, newPly in
+                withAnimation(Theme.gentle) {
+                    proxy.scrollTo(rowNumber(forPly: newPly), anchor: .center)
+                }
+            }
+            .onAppear { proxy.scrollTo(rowNumber(forPly: viewModel.displayedPly), anchor: .center) }
         }
         .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
     }
 
     private func moveButton(_ san: String, ply: Int) -> some View {
-        Button {
+        // Symbole seulement pour les catégories REMARQUABLES — même arbitrage
+        // que ``AnalysisView/chip(for:)`` : un ruban où chaque coup porte une
+        // icône ne met plus rien en relief.
+        let quality = viewModel.moveQuality[ply].flatMap { $0.showsInMoveList ? $0 : nil }
+        return Button {
             viewModel.review(toPly: ply)
         } label: {
-            Text(san)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.vertical, 3)
-                .padding(.horizontal, 6)
-                .background(
-                    viewModel.displayedPly == ply ? Theme.accent.opacity(0.22) : Color.clear,
-                    in: RoundedRectangle(cornerRadius: 6, style: .continuous)
-                )
-                .foregroundStyle(Theme.textPrimary)
+            HStack(spacing: 3) {
+                Text(san)
+                if let quality {
+                    qualityGlyph(quality)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.vertical, 3)
+            .padding(.horizontal, 6)
+            .background(
+                viewModel.displayedPly == ply ? Theme.accent.opacity(0.22) : Color.clear,
+                in: RoundedRectangle(cornerRadius: 6, style: .continuous)
+            )
+            .foregroundStyle(Theme.textPrimary)
         }
         .buttonStyle(.plain)
+    }
+
+    @ViewBuilder
+    private func qualityGlyph(_ quality: MoveQuality) -> some View {
+        switch quality.icon {
+        case let .text(text):
+            Text(text)
+                .font(.caption2.weight(.heavy))
+                .foregroundStyle(quality.tint)
+        case let .symbol(name):
+            Image(systemName: name)
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(quality.tint)
+        }
     }
 
     /// Preuve du round-trip pour les tests d'interface : le nombre de coups

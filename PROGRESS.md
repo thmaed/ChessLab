@@ -9289,3 +9289,79 @@ suites au moteur réel de plus dans la même journée.
 échec. 7 tests d'interface Chess960 verts, dont le nouveau bout-en-bout :
 partie Chess960 → coup joué → abandon → « Analyser » → écran d'analyse
 affichant la partie effectivement rejouée.
+
+## 25/08 — Chess960 : les pastilles de qualité, même style qu'en mode « Jouer »
+
+Demande de suivi de l'utilisateur : l'analyse de fin de partie Chess960 doit
+se comporter comme le mode normal — classer TOUS les coups d'entrée de jeu,
+avec un budget rapide, mis en cache, pastilles à l'appui — pas seulement une
+salve d'indice par pas de navigation. Étudié puis proposé (deux questions
+posées : bandeau coach oui/non, affinage ×10 oui/non) avant d'écrire du
+code ; réponses retenues : pastilles SEULES (pas de texte explicatif), et
+PAS d'affinage ×10 pour cette première version.
+
+### Le piège : `Chess960Game.Move` n'est pas `Move` (ChessKit)
+
+`Chess960Game.legalMoves() -> [Move]` renvoie un type MAISON (`enum Move {
+case ordinary(from:to:promotion:); case castle(kingSide:) }`), pas le
+`Move` ChessKit qu'attend `MoveClassifier` (`.piece`, `.result`, `.end`).
+Konversion écrite à la main (`chessKitMove(for:board:)`) : un coup ordinaire
+se traduit trivialement (pièce en `from`, capture si une pièce adverse
+occupe `to`) ; un roque rend `nil` — aucun `Move.Result` ChessKit ne
+représente le dialecte roi-prend-tour, et de toute façon un roque ne
+sacrifie jamais rien, donc `isSacrifice = false` sans perte d'information.
+
+### Réutilisé tel quel : `MoveClassifier`, `DevicePerformance`, `AnalysisEvalStore`
+
+Aucun de ces trois n'est standard-chess-spécifique dans son cœur — seul le
+livre d'ouvertures (`EcoOpeningLookup`) l'est, et il est simplement
+court-circuité (`isBook: false`, toujours). `AnalysisEvalStore.key(for:
+Game)` prenait un `Game` ChessKit ; extrait en `key(startFEN:lans:)`,
+réutilisable par un appelant qui rejoue sa ligne en UCI brut. Un second
+profil (`chess960Profile`) tient le cache Chess960 séparé de celui du mode
+normal dans le même fichier de cache — sans risque de collision de toute
+façon, la clé inclut déjà la FEN de départ.
+
+Non porté, assumé : `bestMoveWasTactical` (distingue « Occasion manquée » de
+« Gaffe/Erreur ») demanderait de rejouer le meilleur coup raté sur un
+plateau annexe pour vérifier s'il matait ou capturait — toujours `false`.
+Conséquence : ces coups restent signalés comme fautes, juste sans
+l'étiquette fine « Occasion manquée » (question posée à l'utilisateur après
+coup — réponse : pas la peine).
+
+### Le vrai défaut trouvé en cours de route : la navigation réanalysait tout
+
+Signalé par l'utilisateur après la première livraison : « quand je reviens
+en arrière il réanalyse les coups ». La classification calculait bien
+l'éval de CHAQUE position, mais dans une variable locale à
+`classifyMainLine()` — jetée à la fin. `review(toPly:)` appelait toujours
+`refreshAnalysis()`, une salve fraîche à chaque pas. Corrigé en promouvant
+ce cache en propriété d'instance (`evalCache`, clé = demi-coup), consultée
+en premier par la navigation (`showCurrentCachedEvalOrRefresh()`) — une
+position déjà classée s'affiche de façon SYNCHRONE, sans salve moteur.
+
+Un instantané RECHARGÉ DU DISQUE (relance de l'app) ne porte que le
+meilleur coup par position — `AnalysisEvalStore.PositionEval` ne persiste
+pas de score par rang. La barre d'éval reste instantanée dans ce cas ; les
+flèches se dégradent gracieusement à UNE seule (au lieu de deux), plutôt que
+de classer approximativement deux coups sans base de comparaison fiable.
+
+### Deux ajustements de confort demandés dans la foulée
+
+- L'écran ouvrait sur la FIN de la partie (choix du premier jet) ; demande
+  ensuite : ouvrir sur le DÉBUT, pour dérouler la partie du premier coup —
+  la classification tourne en fond, la position affichée initiale (le
+  début) est de toute façon déjà couverte quand la passe se termine.
+- Le ruban de coups ne suivait pas la navigation dans une longue partie —
+  `ScrollViewReader` + `scrollTo` sur le numéro de ligne, comme
+  ``AnalysisView``.
+- Budget de la passe Chess960 relevé de 30 % (multiplicateur local,
+  ``DevicePerformance/classificationNodeBudget`` du mode normal inchangé)
+  à la demande de l'utilisateur.
+
+### Vérifié
+
+744 tests unitaires verts — SUITE COMPLÈTE, sans échec (dont 9 tests
+Chess960AnalysisViewModelTests : couverture de toute la ligne roque compris,
+dame hors-jeu classée en faute, cache entre deux ouvertures, navigation sans
+réanalyse). Tests d'interface Chess960/Analyse verts.

@@ -477,6 +477,16 @@
         }
       }
     },
+    "%lld / %lld" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld / %2$lld"
+          }
+        }
+      }
+    },
     "%lld / %lld parties jouées" : {
       "localizations" : {
         "en" : {
@@ -1620,6 +1630,9 @@
           }
         }
       }
+    },
+    "Analyse — Chess960" : {
+
     },
     "Analyse : coup %lld/%lld" : {
       "localizations" : {
@@ -5331,6 +5344,9 @@
         }
       }
     },
+    "Début" : {
+
+    },
     "Débutant" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -6640,6 +6656,9 @@
           }
         }
       }
+    },
+    "Fin" : {
+
     },
     "Fin de la ligne connue" : {
       "extractionState" : "stale",

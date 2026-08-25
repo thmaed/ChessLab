@@ -31,6 +31,12 @@ enum AnalysisEvalStore {
     static let currentSchema = 1
     /// À INCRÉMENTER à chaque changement de moteur, de budget ou de seuils.
     static let engineProfile = "SF17.1/300k+3Mx2/2-5-10-20"
+    /// Profil de ``Chess960AnalysisViewModel`` : passe de base SEULE (pas
+    /// d'affinage ×10, pas de livre d'ouvertures) — un profil distinct pour
+    /// que le fichier reste auto-descriptif, même si la clé (qui inclut déjà
+    /// la FEN de départ) ne permettrait de toute façon aucune collision avec
+    /// une partie standard.
+    static let chess960Profile = "SF17.1-Chess960/300k×1"
     /// Nombre de parties conservées (LRU par date de modification).
     static let maxSnapshots = 300
 
@@ -95,20 +101,26 @@ enum AnalysisEvalStore {
             guard let move = game.moves[idx] else { break }
             lans.append(move.lan)
         }
+        return key(startFEN: start.fen, lans: lans)
+    }
+
+    /// Même clé, pour un appelant qui n'a pas de ``Game`` ChessKit — le
+    /// Chess960 rejoue sa ligne principale en UCI, pas via `MoveTree`.
+    static func key(startFEN: String, lans: [String]) -> String? {
         guard !lans.isEmpty else { return nil }
-        let material = start.fen + "|" + lans.joined(separator: " ")
+        let material = startFEN + "|" + lans.joined(separator: " ")
         let digest = SHA256.hash(data: Data(material.utf8))
         return digest.map { String(format: "%02x", $0) }.joined()
     }
 
     // MARK: Lecture / écriture
 
-    static func load(key: String) -> Snapshot? {
+    static func load(key: String, profile: String = engineProfile) -> Snapshot? {
         let url = fileURL(for: key)
         guard let data = try? Data(contentsOf: url),
               let snapshot = try? JSONDecoder().decode(Snapshot.self, from: data),
               snapshot.schema == currentSchema,
-              snapshot.profile == engineProfile
+              snapshot.profile == profile
         else { return nil }
         // LRU : consulter un instantané le rajeunit.
         try? FileManager.default.setAttributes([.modificationDate: Date()], ofItemAtPath: url.path)
