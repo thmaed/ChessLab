@@ -45,7 +45,7 @@ struct StolenMoveVariant: PlayableVariant {
         displayNameKey: "Coup Volé",
         shortNameKey: "Coup Volé",
         taglineKey: "Un jeton tous les 7 coups pour en jouer deux d'affilée",
-        rulesKey: "Les règles sont celles du jeu classique. En plus : tous les 7 coups joués (réglable), vous gagnez un jeton — un seul en stock, le perdre en en gagnant un nouveau sans l'avoir dépensé. En le dépensant (hors échec), vous jouez deux coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale.",
+        rulesKey: "Les règles sont celles du jeu classique. En plus : tous les 7 coups joués (réglable de 4 à 8), vous gagnez un jeton. Vous n'en gardez jamais plus d'UN : le nouveau efface l'ancien s'il n'a pas été dépensé, et impossible de le dépenser si vous êtes vous-même en échec. Le dépenser vous fait jouer DEUX coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale.",
         icon: "bolt.badge.clock.fill",
         tint: Theme.gold,
         startFEN: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"

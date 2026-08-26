@@ -70,11 +70,6 @@ struct VariantsHubView: View {
                         action: onOpenStolenMove
                     )
                 }
-
-                Text("Sans réseau de neurones dédié aux six premières : le moteur y joue avec son évaluation classique, un cran sous le mode normal. Coup Volé, lui, garde le moteur habituel — seul le déroulement du tour change.")
-                    .font(.caption)
-                    .foregroundStyle(Theme.textTertiary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(20)
         }

@@ -9288,18 +9288,18 @@
         }
       }
     },
-    "Les règles sont celles du jeu classique. En plus : tous les 7 coups joués (réglable), vous gagnez un jeton — un seul en stock, le perdre en en gagnant un nouveau sans l'avoir dépensé. En le dépensant (hors échec), vous jouez deux coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale." : {
+    "Les règles sont celles du jeu classique. En plus : tous les 7 coups joués (réglable de 4 à 8), vous gagnez un jeton. Vous n'en gardez jamais plus d'UN : le nouveau efface l'ancien s'il n'a pas été dépensé, et impossible de le dépenser si vous êtes vous-même en échec. Le dépenser vous fait jouer DEUX coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale." : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The rules are those of classical chess. In addition: every 7 moves played (adjustable), you earn a token — only one in stock, lost if a new one is earned before it's spent. Spending it (outside of check) lets you play two moves in a row — unless the first one checks your opponent, in which case the turn stops there. An en passant capture made possible by the opponent's last move stays valid even if your first move of the double turn comes in between."
+            "value" : "The rules are those of classical chess. In addition: every 7 moves played (adjustable from 4 to 8), you earn a token. You never hold more than ONE: a new one replaces the old if it wasn't spent, and it can't be spent while you're in check yourself. Spending it lets you play TWO moves in a row — unless the first one checks your opponent, in which case the turn stops there. An en passant capture made possible by the opponent's last move stays valid even if your first move of the double turn comes in between."
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Les règles sont celles du jeu classique. En plus : tous les 7 coups joués (réglable), vous gagnez un jeton — un seul en stock, le perdre en en gagnant un nouveau sans l'avoir dépensé. En le dépensant (hors échec), vous jouez deux coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale."
+            "value" : "Les règles sont celles du jeu classique. En plus : tous les 7 coups joués (réglable de 4 à 8), vous gagnez un jeton. Vous n'en gardez jamais plus d'UN : le nouveau efface l'ancien s'il n'a pas été dépensé, et impossible de le dépenser si vous êtes vous-même en échec. Le dépenser vous fait jouer DEUX coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale."
           }
         }
       }
@@ -14060,22 +14060,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sans limite de temps"
-          }
-        }
-      }
-    },
-    "Sans réseau de neurones dédié aux six premières : le moteur y joue avec son évaluation classique, un cran sous le mode normal. Coup Volé, lui, garde le moteur habituel — seul le déroulement du tour change." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No dedicated network for the first six: the engine plays with its classical evaluation there, a notch below normal mode. Stolen Move, though, keeps the usual engine — only the turn structure changes."
-          }
-        },
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sans réseau de neurones dédié aux six premières : le moteur y joue avec son évaluation classique, un cran sous le mode normal. Coup Volé, lui, garde le moteur habituel — seul le déroulement du tour change."
           }
         }
       }
