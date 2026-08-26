@@ -18,16 +18,27 @@ final class AppStoreScreenshotUITests: XCTestCase {
 
     @MainActor
     func testCaptureAppStoreScreenshotsFrench() throws {
-        try capture(appleLanguageCode: "fr", folder: "fr")
+        try captureOpenings(appleLanguageCode: "fr", folder: "fr")
+        try captureFinalesAndVariants(appleLanguageCode: "fr", folder: "fr")
+        try capturePlay(appleLanguageCode: "fr", folder: "fr")
     }
 
     @MainActor
     func testCaptureAppStoreScreenshotsEnglish() throws {
-        try capture(appleLanguageCode: "en", folder: "en")
+        try captureOpenings(appleLanguageCode: "en", folder: "en")
+        try captureFinalesAndVariants(appleLanguageCode: "en", folder: "en")
+        try capturePlay(appleLanguageCode: "en", folder: "en")
     }
 
+    /// Lance l'app avec les arguments de langue standard — chaque phase de
+    /// capture appelle ceci pour repartir d'un lancement FRAIS plutôt que de
+    /// chaîner toutes les captures sur UNE SEULE session d'app. Certains
+    /// simulateurs (constaté sur iPhone 14 Plus) laissent le retour arrière
+    /// se dégrader après une navigation profonde (lecteur d'Ouvertures) —
+    /// repartir de zéro entre chaque phase élimine tout état accumulé, au
+    /// prix d'un aller-retour d'accueil affiché deux fois de plus.
     @MainActor
-    private func capture(appleLanguageCode: String, folder: String) throws {
+    private func launchApp(appleLanguageCode: String) -> XCUIApplication {
         let fr = appleLanguageCode == "fr"
         let app = XCUIApplication()
         app.launchArguments += [
@@ -36,10 +47,19 @@ final class AppStoreScreenshotUITests: XCTestCase {
             "-AppleLocale", fr ? "fr_FR" : "en_US",
         ]
         app.launch()
-
-        // 01 — Accueil.
         XCTAssertTrue(app.staticTexts["ChessLab"].waitForExistence(timeout: 5))
         RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+        return app
+    }
+
+    // MARK: 01, 02 & 03 — Accueil, Ouvertures
+
+    @MainActor
+    private func captureOpenings(appleLanguageCode: String, folder: String) throws {
+        let fr = appleLanguageCode == "fr"
+        let app = launchApp(appleLanguageCode: appleLanguageCode)
+
+        // 01 — Accueil.
         save(app.screenshot(), folder: folder, name: "01-accueil")
 
         // 02 & 03 — Ouvertures : la liste, puis le lecteur avec ses flèches
@@ -89,16 +109,18 @@ final class AppStoreScreenshotUITests: XCTestCase {
                 save(app.screenshot(), folder: folder, name: "03-debug-not-hittable")
             }
         }
+    }
+
+    // MARK: 05 & 06 — Finales ; 07, 08 & 09 — Variantes
+
+    @MainActor
+    private func captureFinalesAndVariants(appleLanguageCode: String, folder: String) throws {
+        let fr = appleLanguageCode == "fr"
+        let app = launchApp(appleLanguageCode: appleLanguageCode)
 
         // 05 & 06 — Finales : la liste groupée par familles (l'argument n° 1
         // de la 1.5 : 77 cours prouvés), puis le lecteur sur la Lucena —
         // rangée 1 en bas, pied « vérifié par table de finales » visible.
-        var back = 0
-        while !app.buttons["mode_endgames"].exists && !app.staticTexts[fr ? "Finales" : "Endgames"].firstMatch.isHittable, back < 4 {
-            if app.navigationBars.buttons.firstMatch.exists { app.navigationBars.buttons.firstMatch.tap() }
-            RunLoop.current.run(until: Date().addingTimeInterval(0.4))
-            back += 1
-        }
         if tapLabeled(app, fr ? "Finales" : "Endgames", id: "mode_endgames") {
             RunLoop.current.run(until: Date().addingTimeInterval(0.6))
             save(app.screenshot(), folder: folder, name: "05-finales")
@@ -142,20 +164,91 @@ final class AppStoreScreenshotUITests: XCTestCase {
             }
         }
 
-        // Revenir à un état où le mode de jeu est accessible (accueil sur iPhone,
-        // barre latérale persistante sur iPad).
-        let playLabel = fr ? "Contre l'ordinateur" : "Against the computer"
-        func playHittable() -> Bool {
-            app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", playLabel)).firstMatch.isHittable
-        }
-        var hops = 0
-        while !playHittable(), hops < 5 {
-            if app.navigationBars.buttons.firstMatch.exists { app.navigationBars.buttons.firstMatch.tap() }
+        // 07, 08 & 09 — Variantes : le hub à tuiles, puis Roi de la colline en
+        // pleine partie (une variante Fairy-Stockfish, pas Chess960 — pas
+        // d'étape de réglage de position à négocier), puis la position de
+        // départ de Horde (asymétrique — 36 pions blancs, aucune autre pièce
+        // — déjà assez parlante sans jouer le moindre coup).
+        var backToVariants = 0
+        while !app.buttons["mode_variants"].exists && !app.staticTexts[fr ? "Variantes" : "Variants"].firstMatch.isHittable, backToVariants < 15 {
+            goBack(app)
             RunLoop.current.run(until: Date().addingTimeInterval(0.4))
-            hops += 1
+            backToVariants += 1
         }
+        if tapLabeled(app, fr ? "Variantes" : "Variants", id: "mode_variants") {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+            save(app.screenshot(), folder: folder, name: "07-variantes")
 
-        // 04 — Partie en cours.
+            let kingOfTheHill = app.buttons["variant_kingofthehill"]
+            if kingOfTheHill.waitForExistence(timeout: 6) {
+                kingOfTheHill.tap()
+                let start = app.buttons["fairyVariant_start"]
+                if start.waitForExistence(timeout: 6) {
+                    start.tap()
+                    if app.otherElements["square_e2"].waitForExistence(timeout: 10) {
+                        app.otherElements["square_e2"].tap()
+                        app.otherElements["square_e4"].tap()
+                        let moveMarker = app.otherElements["fairyVariant_moveCount"]
+                        let deadline = Date().addingTimeInterval(15)
+                        while Date() < deadline, moveMarker.value as? String != "2" {
+                            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+                        }
+                        RunLoop.current.run(until: Date().addingTimeInterval(1))
+                        save(app.screenshot(), folder: folder, name: "08-variante-partie")
+                    } else {
+                        save(app.screenshot(), folder: folder, name: "debug-08-no-board")
+                        XCTFail("plateau Roi de la colline jamais apparu : capture 08 impossible")
+                    }
+                } else {
+                    save(app.screenshot(), folder: folder, name: "debug-08-no-start")
+                    XCTFail("bouton Commencer jamais apparu (Roi de la colline) : capture 08 impossible")
+                }
+            } else {
+                save(app.screenshot(), folder: folder, name: "debug-07-no-king-of-hill-tile")
+                XCTFail("tuile Roi de la colline jamais apparue : capture 08 impossible")
+            }
+
+            // Retour au hub avant la seconde variante — deux niveaux à
+            // remonter (partie → réglages → hub), chacun via le bouton
+            // système de la barre de navigation.
+            var backToHub = 0
+            while !app.buttons["variant_horde"].waitForExistence(timeout: 1), backToHub < 15 {
+                goBack(app)
+                RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+                backToHub += 1
+            }
+            let horde = app.buttons["variant_horde"]
+            if horde.waitForExistence(timeout: 6) {
+                horde.tap()
+                let start = app.buttons["fairyVariant_start"]
+                if start.waitForExistence(timeout: 6) {
+                    start.tap()
+                    if app.otherElements["square_b5"].waitForExistence(timeout: 10) {
+                        RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+                        save(app.screenshot(), folder: folder, name: "09-variante-horde")
+                    } else {
+                        save(app.screenshot(), folder: folder, name: "debug-09-no-board")
+                        XCTFail("plateau Horde jamais apparu : capture 09 impossible")
+                    }
+                } else {
+                    save(app.screenshot(), folder: folder, name: "debug-09-no-start")
+                    XCTFail("bouton Commencer jamais apparu (Horde) : capture 09 impossible")
+                }
+            } else {
+                save(app.screenshot(), folder: folder, name: "debug-09-no-horde-tile")
+                XCTFail("tuile Horde jamais apparue : capture 09 impossible")
+            }
+        }
+    }
+
+    // MARK: 04 — Partie en cours (mode classique)
+
+    @MainActor
+    private func capturePlay(appleLanguageCode: String, folder: String) throws {
+        let fr = appleLanguageCode == "fr"
+        let app = launchApp(appleLanguageCode: appleLanguageCode)
+        let playLabel = fr ? "Contre l'ordinateur" : "Against the computer"
+
         if tapLabeled(app, playLabel) {
             if tapLabeled(app, fr ? "Commencer" : "Start") {
                 if app.otherElements["square_e2"].waitForExistence(timeout: 10) {
@@ -185,6 +278,26 @@ final class AppStoreScreenshotUITests: XCTestCase {
         let match = app.descendants(matching: .any).matching(NSPredicate(format: "label == %@", label)).firstMatch
         if match.waitForExistence(timeout: timeout) { match.tap(); return true }
         return false
+    }
+
+    /// Navigue « en arrière » — geste de bord sur iPhone plutôt que le
+    /// bouton système de la barre de navigation : sur certains simulateurs
+    /// (constaté sur iPhone 14 Plus, 1284×2778), ce bouton se fait parfois
+    /// calculer un point de frappe invalide (« {-1, -1} après défilement »)
+    /// et le tap n'a AUCUN effet, bloquant toute navigation retour pendant
+    /// des minutes sans jamais faire échouer le test (garde tolérante).
+    /// Le geste de bord ne dépend d'aucun calcul de cadre de bouton. Garde
+    /// le bouton système sur iPad, où la barre latérale rend le geste de
+    /// bord ambigu (peut révéler/masquer la barre au lieu de reculer) et où
+    /// ce défaut n'a jamais été observé.
+    private func goBack(_ app: XCUIApplication) {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            goBack(app)
+        } else {
+            let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.0, dy: 0.5))
+            let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5))
+            start.press(forDuration: 0.05, thenDragTo: end)
+        }
     }
 
     private func save(_ screenshot: XCUIScreenshot, folder: String, name: String) {

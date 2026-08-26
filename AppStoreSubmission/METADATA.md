@@ -6,7 +6,7 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 > **Convention d'édition** : dans les blocs à coller, JAMAIS de retour à la ligne à l'intérieur d'un paragraphe — App Store Connect rend chaque saut de ligne tel quel, une césure à 78 colonnes hacherait le texte sur la fiche. Une ligne par paragraphe ; les titres EN CAPITALES gardent leur propre ligne.
 
-> **Pour cette mise à jour**, trois champs demandent une action : **Nouveautés de cette version** (ci-dessous, obligatoire), le numéro de build (voir « Version et build » — `CURRENT_PROJECT_VERSION` vaut `8.1` dans le projet, à corriger avant de soumettre), et la **description**, qui gagne un bloc VARIANTES (Chess960 + trois variantes Fairy-Stockfish) et voit son compte de cours de finales passer de 77 à 78 (« Pions électriques »). Le **texte promotionnel** est mis à jour pour le même compte ; nom, sous-titre, mots-clés et catégories restent valables.
+> **Révisé le 26/08/2026** — le module Variantes, esquissé à 4 formes de jeu (Chess960 + 3) le 25/08, est allé jusqu'à 8 en une nuit : Roi de la colline, Trois échecs, Horde, Course des rois, Antéchecs, Atomique, et Coup Volé (variante maison). Tous les champs qui mentionnaient « 3 variantes » sont corrigés en conséquence. Trois champs demandent encore une action avant de soumettre : **Nouveautés de cette version** (ci-dessous, obligatoire), le numéro de build (voir « Version et build » — `CURRENT_PROJECT_VERSION` a dérivé à `8.2` tout seul au fil des builds locaux, à fixer délibérément juste avant d'archiver), et le **compte de cours de finales**, passé de 77 à 78 (« Pions électriques »).
 
 ---
 
@@ -14,44 +14,50 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> ⏳ **Pas encore soumise.** Ce texte couvre 1.5 → 1.6 (20 → 25/08/2026). Point de départ : 1.5.0 build 7, en ligne depuis le 20/08/2026.
+> ⏳ **Pas encore soumise.** Ce texte couvre 1.5 → 1.6 (20 → 26/08/2026). Point de départ : 1.5.0 build 7, en ligne depuis le 20/08/2026.
 
-### Français (1456 car. — limite 4 000)
+### Français
 
 ```
-NOUVEAU : LE MODULE VARIANTES
-Chess960 (les échecs Fischer Random) rejoint l'app : position de départ aléatoire, choisie par numéro (0-959), ou composée vous-même. Jouez contre l'ordinateur ou à deux, avec une analyse de fin de partie complète, comme en mode « Jouer ». Trois variantes de plus, présentées en tuiles : Roi de la colline, Trois échecs et Horde — chacune contre l'ordinateur avec indice, alerte gaffe et barre d'évaluation.
+NOUVEAU : LE MODULE VARIANTES S'ÉTOFFE — 8 FAÇONS DE JOUER
+Chess960 (les échecs Fischer Random) rejoint l'app : position de départ aléatoire, choisie par numéro (0-959), ou composée vous-même. Sept variantes s'y ajoutent, chacune contre l'ordinateur avec indice, alerte gaffe, barre d'évaluation (activée par défaut) et une analyse de fin de partie complète, comme en mode « Jouer » : Roi de la colline, Trois échecs, Horde, Course des rois, Antéchecs, Atomique, et Coup Volé — une variante maison où un jeton gagné tous les 7 coups permet d'en jouer deux d'affilée.
 
 OUVERTURES : UN NOUVEAU LECTEUR
-L'index devient un arbre des lignes : chaque coup n'apparaît qu'une fois. Sous un échiquier fixe : les coups joués par les maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish, et une barre d'évaluation — tout précalculé, jamais d'attente.
+L'index devient un arbre des lignes : chaque coup n'apparaît qu'une fois. Sous un échiquier fixe : les coups joués par les maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish, et une barre d'évaluation — tout précalculé, jamais d'attente. La recherche par nom, déjà proposée dans les Finales, s'applique désormais aussi aux Ouvertures.
 
-FINALES : 78 COURS, ET UNE RECHERCHE
-« Pions électriques » rejoint le catalogue. Une leçon corrigée (le pion passé éloigné), et un champ de recherche par nom, comme dans Ouvertures.
+FINALES : 78 COURS
+« Pions électriques » rejoint le catalogue. Une leçon corrigée (le pion passé éloigné), et une ligne qui s'arrêtait avant le mat promis.
+
+FIABILITÉ DU MOTEUR
+Plusieurs correctifs autour du démarrage et de l'arrêt du moteur d'échecs, en particulier lors des changements rapides d'écran — moins de risque de voir « moteur indisponible » s'afficher à tort.
 
 LES MODES SE PARLENT, AU MÊME ENDROIT PARTOUT
-« Changer de mode » — qui bascule vers le Laboratoire, l'ordinateur ou une partie à deux en emportant la position affichée — a désormais la même apparence sur les neuf écrans concernés, au lieu d'être caché dans un menu d'export.
+« Changer de mode » — qui bascule vers le Laboratoire, l'ordinateur ou une partie à deux en emportant la position affichée — a désormais la même apparence sur tous les écrans concernés, au lieu d'être caché dans un menu d'export.
 
 ET AUSSI
-Reprendre un coup consulté agit dès le premier appui, avec une annulation à disposition. Le thème du plateau ne se choisit plus que dans les Réglages. Le Laboratoire explique chaque statistique d'un tap. Et une installation neuve pèse 60 Mo au lieu de 175.
+Reprendre un coup consulté agit dès le premier appui, avec une annulation à disposition. Le thème du plateau ne se choisit plus que dans les Réglages. Le Laboratoire explique chaque statistique d'un tap, et son intervalle de confiance suit maintenant la correction statistique usuelle. Une installation neuve pèse 60 Mo au lieu de 175.
 ```
 
-### English (1343 char. — 4,000 limit)
+### English
 
 ```
-NEW: THE VARIANTS MODULE
-Chess960 (Fischer Random Chess) joins the app: a randomly drawn starting position, one chosen by number (0-959), or one you compose yourself. Play against the computer or two players, with a full post-game analysis, just like "Play" mode. Three more variants, in a tile-based hub: King of the Hill, Three-Check and Horde — each against the computer with hints, blunder alerts and an eval bar.
+NEW: THE VARIANTS MODULE GROWS TO 8 WAYS TO PLAY
+Chess960 (Fischer Random Chess) joins the app: a randomly drawn starting position, one chosen by number (0-959), or one you compose yourself. Seven more variants join it, each against the computer with hints, blunder alerts, an eval bar (now on by default) and a full post-game analysis just like "Play" mode: King of the Hill, Three-Check, Horde, Racing Kings, Antichess, Atomic, and Stolen Move — a house variant where a token earned every 7 moves lets you play two moves in a row.
 
 OPENINGS: A NEW READER
-The index becomes a tree of lines: every move appears only once. Under a fixed board: the moves masters actually played with their percentages, Stockfish's top three moves, and an eval bar — all precomputed, never a wait.
+The index becomes a tree of lines: every move appears only once. Under a fixed board: the moves masters actually played with their percentages, Stockfish's top three moves, and an eval bar — all precomputed, never a wait. Search by name, already available in Endgames, now works in Openings too.
 
-ENDGAMES: 78 COURSES, AND A SEARCH FIELD
-"Electric Pawns" joins the catalogue. A fixed lesson (the distant passed pawn), and a search-by-name field, just like Openings.
+ENDGAMES: 78 COURSES
+"Electric Pawns" joins the catalogue. A fixed lesson (the distant passed pawn), and a line that used to stop short of the mate it promised.
+
+ENGINE RELIABILITY
+Several fixes around starting and stopping the chess engine, especially when switching screens quickly — less chance of a spurious "engine unavailable" message.
 
 THE MODES TALK TO EACH OTHER, THE SAME WAY EVERYWHERE
-"Switch mode" — which jumps to the Laboratory, the computer or a two-player game while carrying the displayed position along — now looks the same across all nine relevant screens, instead of being buried in an export menu.
+"Switch mode" — which jumps to the Laboratory, the computer or a two-player game while carrying the displayed position along — now looks the same across every relevant screen, instead of being buried in an export menu.
 
 ALSO
-Resuming a reviewed move now acts on the first tap, with an undo available. The board theme is now chosen only in Settings. The Laboratory explains each statistic with a tap. And a fresh install now takes 60MB instead of 175.
+Resuming a reviewed move now acts on the first tap, with an undo available. The board theme is now chosen only in Settings. The Laboratory explains each statistic with a tap, and its confidence interval now follows the standard statistical correction. A fresh install now takes 60MB instead of 175.
 ```
 
 ---
@@ -75,7 +81,7 @@ stockfish,tactique,ouverture,puzzle,gambit,fen,pgn,elo,entrainement,scanner,anal
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
 ```
-Analysez vos parties, scannez un échiquier : 58 ouvertures, 78 finales prouvées, Chess960 et 3 variantes, 100 000+ puzzles — 100% local.
+Analysez vos parties, scannez un échiquier : 58 ouvertures, 78 finales prouvées, Chess960 et 7 variantes, 100 000+ puzzles — 100% local.
 ```
 
 **Description** (4000 car. max) :
@@ -98,7 +104,7 @@ LE COIN DES FINALES
 78 cours prouvés par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Neuf familles, de l'opposition aux études célèbres. Et l'entraînement libre : concluez la position contre la meilleure défense, tout coup qui préserve le verdict est accepté — pas seulement celui de la leçon.
 
 VARIANTES
-Chess960 (les échecs Fischer Random) : position de départ aléatoire, choisie par numéro, ou composée soi-même, avec la même analyse de fin de partie qu'en mode « Jouer ». Trois variantes de plus contre l'ordinateur : Roi de la colline, Trois échecs et Horde.
+Chess960 (les échecs Fischer Random) : position de départ aléatoire, choisie par numéro, ou composée soi-même, avec la même analyse de fin de partie qu'en mode « Jouer ». Sept variantes de plus contre l'ordinateur, chacune avec sa propre analyse : Roi de la colline, Trois échecs, Horde, Course des rois, Antéchecs, Atomique, et Coup Volé (un jeton gagné tous les 7 coups permet d'en jouer deux d'affilée).
 
 VOS PROPRES RÉPERTOIRES
 Importez vos ouvertures au format PGN, variantes comprises, et entraînez-les avec le même système. Partagez un répertoire par simple fichier — aucun compte, aucun serveur. Ce que vous avez déjà mémorisé sur une position vaut aussitôt dans le répertoire importé.
@@ -145,7 +151,7 @@ stockfish,tactics,openings,puzzle,gambit,fen,pgn,elo,training,scanner,analysis,o
 
 **Promotional text** (170 char. max):
 ```
-Analyze your games, scan a chessboard: 58 openings, 78 proven endgames, Chess960 and 3 variants, 100,000+ puzzles — fully offline, no ads.
+Analyze your games, scan a chessboard: 58 openings, 78 proven endgames, Chess960 and 7 variants, 100,000+ puzzles — fully offline, no ads.
 ```
 
 **Description** (4000 char. max):
@@ -168,7 +174,7 @@ THE ENDGAME CORNER
 78 courses proven by endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. Nine families, from the opposition to famous studies. And free training: finish the position against best defence, where any move that preserves the verdict is accepted — not just the lesson's move.
 
 VARIANTS
-Chess960 (Fischer Random Chess): a randomly drawn starting position, one chosen by number, or one you compose yourself, with a full post-game analysis just like "Play" mode. Three more variants against the computer: King of the Hill, Three-Check and Horde.
+Chess960 (Fischer Random Chess): a randomly drawn starting position, one chosen by number, or one you compose yourself, with a full post-game analysis just like "Play" mode. Seven more variants against the computer, each with its own analysis: King of the Hill, Three-Check, Horde, Racing Kings, Antichess, Atomic, and Stolen Move (a token earned every 7 moves lets you play two moves in a row).
 
 YOUR OWN REPERTOIRES
 Import your openings as PGN, variations included, and drill them with the same system. Share a repertoire as a single file — no account, no server. What you already know about a position counts right away in the imported repertoire.
@@ -228,9 +234,9 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**1.6.0, build à corriger avant soumission** — nouveautés détaillées dans `RELEASE_NOTES-1.6.0.md`, et le texte prêt à coller est la section « Nouveautés de cette version » en haut de ce fichier.
+**1.6.0, build à FIXER DÉLIBÉRÉMENT juste avant l'archive** — nouveautés détaillées dans `RELEASE_NOTES-1.6.0.md`, et le texte prêt à coller est la section « Nouveautés de cette version » en haut de ce fichier.
 
-Vérifié dans `ChessLab.xcodeproj/project.pbxproj` (25/08/2026) : la cible applicative (`com.chesslab.ChessLab`) porte `MARKETING_VERSION = 1.6` aux deux configurations, Debug et Release — correct. Mais `CURRENT_PROJECT_VERSION = 8.1` **aux deux configurations**, ce qui n'est probablement pas volontaire : le dernier build réellement soumis était le 7 (1.5.0). App Store Connect exige un entier (ou une liste d'entiers séparés par des points) strictement supérieur au dernier build soumis — `8` conviendrait, `8.1` est à vérifier avant de soumettre.
+Vérifié dans `ChessLab.xcodeproj/project.pbxproj` (26/08/2026) : la cible applicative (`com.chesslab.ChessLab`) porte `MARKETING_VERSION = 1.6` aux deux configurations, Debug et Release — correct. Mais `CURRENT_PROJECT_VERSION` **dérive tout seul** au fil des builds locaux (`8.1` le 25/08, `8.2` observé le 26/08, sans action délibérée) — le dernier build réellement soumis était le 7 (1.5.0). App Store Connect exige un entier (ou une liste d'entiers séparés par des points) strictement supérieur au dernier build soumis, donc n'importe laquelle de ces valeurs conviendrait numériquement (`8` > `7`), mais la dérive elle-même est le problème : ne PAS archiver avec la valeur trouvée « par hasard » au dernier build local — la fixer consciemment (`8` tout rond est le plus simple) au moment de l'archive, pas avant, sinon elle continuera de bouger.
 
 ⏳ **1.6.0 : pas encore soumise.** Succède au build 7 de la 1.5.0, en ligne depuis le 20/08/2026.
 
@@ -252,7 +258,7 @@ git push origin main
 Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) : soumettre sans pousser publierait un binaire dont les sources annoncées ne correspondent pas.
 
 ### Historique des versions
-- **1.6.0** — pas encore soumise : module Variantes (Chess960 complet + trois variantes Fairy-Stockfish), nouveau lecteur d'Ouvertures en arbre, Finales à 78 cours avec recherche, « Changer de mode » uniformisé sur neuf écrans, stockage allégé (175 → 60 Mo) (`RELEASE_NOTES-1.6.0.md` — couvre 1.5 → 1.6).
+- **1.6.0** — pas encore soumise : module Variantes porté à 8 façons de jouer (Chess960 complet, six variantes Fairy-Stockfish, et Coup Volé — variante maison sur Stockfish standard), analyse de fin de partie commune aux 7 non-Chess960, nouveau lecteur d'Ouvertures en arbre, Finales à 78 cours avec recherche, « Changer de mode » uniformisé, correctifs de fiabilité moteur, stockage allégé (175 → 60 Mo) (`RELEASE_NOTES-1.6.0.md` — couvre 1.5 → 1.6).
 - **1.5.0** — module Finales (77 cours prouvés par tablebase, 9 familles), entraînement libre arbitré au verdict, correctif majeur iOS 18, ~900 positions ajoutées aux ouvertures, verdicts d'analyse affinés, sélecteur « Changer de mode » avec reprise de position, Stockfish 17.1 (`RELEASE_NOTES-1.5.0.md` — couvre 1.2 → 1.5).
 - **1.4.0** — préparée, **jamais soumise** : répertoires d'ouvertures personnels (import PGN + partage par fichier), les 58 ouvertures relues au moteur, un seul essai par puzzle, lecteur d'ouvertures à plateau ancré (`RELEASE_NOTES-1.4.0.md`, conservé comme document historique). Son contenu est livré avec la 1.5.
 - **1.3.0** — préparée, **jamais soumise** : échiquier tolérant au doigt, score de précision recalibré, revue d'analyse fiabilisée, iPhone en portrait. Son contenu est livré avec la 1.4 ; aucune note de version distincte n'a été rédigée.
@@ -265,9 +271,9 @@ Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/0
 English, for the Apple reviewer. Frames the app's value proposition (six advanced modes, entirely free), then explains the camera permission, the network call, the licensing situation (GPLv3 engine, public source), and that no login/test account is needed.
 
 ```
-ChessLab's purpose is to offer an extensive set of advanced chess features — entirely free, with no paywall, no ads, and no in-app purchases. That is the app's core value: depth and quality normally found in paid or subscription chess apps, given away for free as a passion project. It bundles six modes:
+ChessLab's purpose is to offer an extensive set of advanced chess features — entirely free, with no paywall, no ads, and no in-app purchases. That is the app's core value: depth and quality normally found in paid or subscription chess apps, given away for free as a passion project. It bundles seven modes:
 
-1. Play vs the computer (powered by the embedded Stockfish engine) — adjustable strength (Elo ~900 to ~3190), clocks, hints, risky-move warnings, opening book. 2. Two Players — local pass-and-play on a single device. 3. Analyze — full game/position analysis with Stockfish: move-by-move classification, evaluation graph, best-move/threat arrows. 4. Openings — 58 hand-written, annotated openings; step through each one move by move, with variations and simplified spaced-repetition training. 5. Puzzles — over 100,000 tactics puzzles from the Lichess database, plus puzzles auto-generated from the user's own mistakes in Analyze. 6. Laboratory — engine-vs-engine testing to compare Stockfish configurations over a series of games.
+1. Play vs the computer (powered by the embedded Stockfish engine) — adjustable strength (Elo ~900 to ~3190), clocks, hints, risky-move warnings, opening book. 2. Two Players — local pass-and-play on a single device. 3. Analyze — full game/position analysis with Stockfish: move-by-move classification, evaluation graph, best-move/threat arrows. 4. Openings — 58 hand-written, annotated openings; step through each one move by move, with variations and simplified spaced-repetition training. 5. Puzzles — over 100,000 tactics puzzles from the Lichess database, plus puzzles auto-generated from the user's own mistakes in Analyze. 6. Laboratory — engine-vs-engine testing to compare Stockfish configurations over a series of games. 7. Variants — Chess960 plus seven more ways to play against the computer (King of the Hill, Three-Check, Horde, Racing Kings, Antichess, Atomic, and a house variant, Stolen Move), each with the same strength/clock settings and its own post-game analysis as the main Play mode.
 
 There is no account, no server, no login — nothing to set up before reviewing.
 
