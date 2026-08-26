@@ -43,6 +43,26 @@ struct LabStatsTests {
         #expect(elo < ci.high)
     }
 
+    @Test func confidenceIntervalNeverCollapsesToZeroWidthOnAUnanimousSample() {
+        // Deux nulles d'affilée : variance observée EXACTEMENT nulle sans le
+        // terme de continuité (Wilson) — l'intervalle ne doit jamais
+        // prétendre à une certitude parfaite après seulement 2 parties.
+        let stats = LabStats(results: [.draw, .draw], plyCounts: [40, 40])
+        let ci = try! #require(stats.elo95ConfidenceInterval)
+        #expect(ci.low < ci.high, "l'intervalle ne doit jamais s'effondrer à une largeur nulle")
+    }
+
+    @Test func confidenceIntervalNarrowsAsMoreUnanimousGamesAccumulate() {
+        // Le terme de continuité décroît avec n : plus de parties, même
+        // toutes identiques, doit resserrer l'intervalle — jamais l'élargir
+        // ni le laisser figé.
+        let few = LabStats(results: Array(repeating: .draw, count: 2), plyCounts: Array(repeating: 40, count: 2))
+        let many = LabStats(results: Array(repeating: .draw, count: 50), plyCounts: Array(repeating: 40, count: 50))
+        let ciFew = try! #require(few.elo95ConfidenceInterval)
+        let ciMany = try! #require(many.elo95ConfidenceInterval)
+        #expect((ciMany.high - ciMany.low) < (ciFew.high - ciFew.low))
+    }
+
     @Test func likelihoodOfSuperiorityAboveHalfWhenAWinsMore() {
         let stats = LabStats(results: [.winA, .winA, .winA, .winA, .winB, .draw], plyCounts: [40, 40, 40, 40, 40, 40])
         #expect(stats.likelihoodOfSuperiority > 0.5)

@@ -79,12 +79,28 @@ struct LabStats: Equatable {
     // MARK: Interne
 
     /// Erreur standard du score moyen (résultats codés 1 / ½ / 0).
+    ///
+    /// Deux correctifs du 26/08/2026, signalés par la revue du 25/08 et
+    /// appliqués sur demande explicite plutôt que silencieusement (changent
+    /// les chiffres affichés à l'utilisateur) :
+    /// - **Bessel** (`n - 1`, pas `n`) : ces `n` parties ESTIMENT une force
+    ///   inconnue, diviser par `n` sous-estime systématiquement
+    ///   l'incertitude — ~5 % trop étroit à `n` = 10, négligeable à 100.
+    /// - **Terme de continuité (Wilson)** : sans lui, un échantillon où
+    ///   TOUTES les parties jouées jusqu'ici partagent le même résultat (ex.
+    ///   deux nulles d'affilée) donne une variance observée EXACTEMENT
+    ///   nulle → un intervalle de largeur nulle, une fausse certitude à 95 %
+    ///   après une poignée de parties. `z²/(4n²)` est le terme que Wilson
+    ///   ajoute à cette même place pour qu'un petit échantillon ne prétende
+    ///   jamais à une certitude parfaite.
     private var scoreStandardError: Double? {
         guard games > 1 else { return nil }
+        let n = Double(games)
         let sumSquares = Double(winsA) * 1 + Double(draws) * 0.25 // + winsB * 0
         let mean = score
-        let variance = max(0, sumSquares / Double(games) - mean * mean)
-        return sqrt(variance / Double(games))
+        let sampleVariance = max(0, (sumSquares - n * mean * mean) / (n - 1))
+        let continuityTerm = (1.96 * 1.96) / (4 * n * n)
+        return sqrt(sampleVariance / n + continuityTerm)
     }
 
     private func clampScore(_ s: Double) -> Double {
