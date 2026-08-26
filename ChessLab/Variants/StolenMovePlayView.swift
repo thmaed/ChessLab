@@ -8,6 +8,7 @@ import SwiftUI
 struct StolenMovePlayView: View {
     @Bindable var viewModel: StolenMovePlayViewModel
     let onExit: () -> Void
+    var onAnalyze: (VariantAnalysisSeed) -> Void = { _ in }
 
     @State private var appSettings = AppSettings.shared
     @State private var showResignConfirmation = false
@@ -214,7 +215,21 @@ struct StolenMovePlayView: View {
                         .foregroundStyle(Theme.textPrimary)
                     Spacer(minLength: 0)
                 }
-                panelButton("Accueil", icon: "house.fill", filled: true) { onExit() }
+                HStack(spacing: 10) {
+                    panelButton("Accueil", icon: "house.fill") { onExit() }
+                    panelButton("Analyser", icon: "chart.xyaxis.line", filled: true) {
+                        let seed = VariantAnalysisSeed(
+                            variantID: variant.id, variantDisplayName: variant.displayName, startFEN: variant.startFEN,
+                            uciLog: viewModel.uciLog, sanLog: viewModel.sanLog, moveLog: viewModel.moveLog,
+                            fenLog: viewModel.fenLog, outcome: outcome
+                        )
+                        Task {
+                            // Voir ``StolenMovePlayViewModel/stopEngineBeforeAnalysis()``.
+                            await viewModel.stopEngineBeforeAnalysis()
+                            onAnalyze(seed)
+                        }
+                    }
+                }
             }
             .cardStyle()
             .overlay(Theme.cardShape.strokeBorder(Theme.strokeStrong, lineWidth: 1))

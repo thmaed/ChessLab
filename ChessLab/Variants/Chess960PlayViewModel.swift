@@ -115,6 +115,13 @@ final class Chess960PlayViewModel {
         Task { [engine] in await engine.stop() }
     }
 
+    /// Voir le commentaire jumeau sur
+    /// ``FairyVariantPlayViewModel/stopEngineBeforeAnalysis()``.
+    func stopEngineBeforeAnalysis() async {
+        engineQueue.cancel()
+        await engine.stop()
+    }
+
     // MARK: Affichage
 
     var displayedGame: Chess960Game { reviewGame ?? game }

@@ -114,6 +114,13 @@ final class EngineLegalityPlayViewModel {
         Task { [engine] in await engine.stop() }
     }
 
+    /// Voir le commentaire jumeau sur
+    /// ``FairyVariantPlayViewModel/stopEngineBeforeAnalysis()``.
+    func stopEngineBeforeAnalysis() async {
+        engineQueue.cancel()
+        await engine.stop()
+    }
+
     // MARK: Affichage
 
     var displayedBoard: Board { reviewBoard ?? board }

@@ -230,6 +230,20 @@ final class VariantAnalysisViewModel {
     private func showCurrentCachedEvalOrRefresh() {
         if let cached = evalCache[displayedPly] {
             showCachedEval(cached)
+        } else if displayedPly == totalPlies, let terminal = terminalRankedEval() {
+            // Même garde-fou que ``rankedEval(at:)`` (utilisé par la passe de
+            // classification) : la dernière position d'une partie Atomique
+            // terminée par explosion du roi n'a PLUS de roi d'un des deux
+            // camps. Sans ce court-circuit, naviguer jusqu'au tout dernier
+            // coup AVANT que la classification n'ait elle-même atteint cette
+            // position (fenêtre de course à l'ouverture de l'écran) envoyait
+            // cette position sans roi au moteur réel via `refreshAnalysis()`
+            // — Fairy-Stockfish n'est jamais censé recevoir une position
+            // qu'aucune partie normale ne lui aurait jamais demandé
+            // d'évaluer. Signalé par l'utilisateur : « plantée du moteur à
+            // la fin de l'atomique ».
+            evalCache[displayedPly] = terminal
+            showCachedEval(terminal)
         } else {
             refreshAnalysis()
         }

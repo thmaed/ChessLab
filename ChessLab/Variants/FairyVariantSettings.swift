@@ -9,7 +9,7 @@ struct FairyVariantSettings: Codable, Equatable, Hashable {
     var timeControlID: String = TimeControl.none.id
     var customMinutes: Int = 15
     var customIncrementSeconds: Int = 0
-    var showEvalBar: Bool = false
+    var showEvalBar: Bool = true
     var hintsEnabled: Bool = true
     var blunderAlertEnabled: Bool = true
     /// Coup Volé UNIQUEMENT (ignoré par les six autres variantes, qui

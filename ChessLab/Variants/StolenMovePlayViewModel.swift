@@ -134,6 +134,16 @@ final class StolenMovePlayViewModel {
         Task { [engine] in await engine.stop() }
     }
 
+    /// Voir le commentaire jumeau sur
+    /// ``FairyVariantPlayViewModel/stopEngineBeforeAnalysis()`` — s'applique
+    /// aussi ici bien que Coup Volé tourne sur Stockfish STANDARD, pas
+    /// Fairy-Stockfish : `std::cin`/`std::cout` sont partagés par LES DEUX
+    /// types de moteur, pas seulement entre deux instances du même.
+    func stopEngineBeforeAnalysis() async {
+        engineQueue.cancel()
+        await engine.stop()
+    }
+
     // MARK: Affichage
 
     var displayedBoard: Board { reviewBoard ?? board }

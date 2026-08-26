@@ -9,10 +9,16 @@ import Testing
 @MainActor
 struct StolenMovePlayViewModelTests {
 
-    private func game(color: PlayerColorChoice = .white, tokenInterval: Int = 7) -> StolenMovePlayViewModel {
+    private func game(color: PlayerColorChoice = .white, tokenInterval: Int = 7, showEvalBar: Bool = false) -> StolenMovePlayViewModel {
         var settings = FairyVariantSettings()
         settings.colorChoice = color.rawValue
         settings.stolenMoveTokenInterval = tokenInterval
+        // `false` par défaut ICI (pas le défaut de `FairyVariantSettings`,
+        // maintenant `true` en production) : les tests mécaniques n'ont pas
+        // besoin de la salve moteur qu'il déclenche à chaque tour utilisateur
+        // — même discipline que `FairyVariantPlayViewModelTests`/
+        // `EngineLegalityPlayViewModelTests`.
+        settings.showEvalBar = showEvalBar
         return StolenMovePlayViewModel(settings: settings)
     }
 

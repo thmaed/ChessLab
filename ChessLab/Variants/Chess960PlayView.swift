@@ -181,7 +181,12 @@ struct Chess960PlayView: View {
                 HStack(spacing: 10) {
                     panelButton("Accueil", icon: "house.fill") { onExit() }
                     panelButton("Analyser", icon: "chart.xyaxis.line", filled: true) {
-                        onAnalyze(viewModel.exportedPGN)
+                        let pgn = viewModel.exportedPGN
+                        Task {
+                            // Voir ``Chess960PlayViewModel/stopEngineBeforeAnalysis()``.
+                            await viewModel.stopEngineBeforeAnalysis()
+                            onAnalyze(pgn)
+                        }
                     }
                 }
             }

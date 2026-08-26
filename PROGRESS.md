@@ -9782,3 +9782,105 @@ export PGN avec l'annotation `[jeton]`, prise en passant qui survit au
 coup intercalé (via le vrai chemin d'interaction, pas un raccourci de
 test) — plus deux tests moteur réel : réponse après le premier coup, et
 l'ordinateur qui dépense tout seul son jeton pour enchaîner deux coups.
+
+## 26/08 — Trois signalements après coup, et un blocage de suite de tests
+
+Trois retours utilisateur juste après la livraison de Coup Volé/la revue :
+bouton Analyser absent en Coup Volé, plantée moteur en fin d'Atomique,
+moteur souvent indisponible après l'analyse d'une variante. Plus une
+demande produit (barre d'éval activée par défaut) et un blocage de suite de
+tests découvert en vérifiant tout ça.
+
+### Bouton Analyser absent en Coup Volé
+
+Oubli simple : le bouton avait été ajouté aux six autres variantes dans la
+tâche du module d'analyse, mais Coup Volé a été construit APRÈS, dans une
+tâche séparée — jamais rattrapé. Ajouté (`onAnalyze`, panneau de fin de
+partie, routage dans `HomeView`), même patron que les six autres.
+
+### Plantée moteur en fin d'Atomique — position sans roi envoyée au moteur réel
+
+La toute dernière position d'une partie Atomique terminée par explosion du
+roi n'a plus de roi d'un des deux camps. `VariantAnalysisViewModel` avait
+DÉJÀ ce garde-fou dans sa passe de classification (`rankedEval(at:)`
+court-circuite via `terminalRankedEval()` quand `ply == totalPlies`), mais
+PAS dans `showCurrentCachedEvalOrRefresh()` — le chemin emprunté par la
+navigation INTERACTIVE (`review(toPly:)`). Naviguer jusqu'à la dernière
+position AVANT que la classification (lancée en tâche de fond à
+l'ouverture de l'écran) ne l'ait elle-même atteinte envoyait donc cette
+position sans roi directement à Fairy-Stockfish via `refreshAnalysis()` —
+une requête qu'aucune partie normale ne lui aurait jamais faite. Corrigé en
+appliquant le MÊME court-circuit aux deux endroits. Reproduit et vérifié
+par un test dédié (`atomicTerminalPositionNeverQueriesTheLiveEngine`) qui
+navigue vers la position finale IMMÉDIATEMENT après construction du modèle
+— avant tout délai possible pour la classification — et vérifie que
+l'évaluation affichée est correcte SANS aucun appel moteur.
+
+### Moteur souvent indisponible après l'analyse d'une variante
+
+Cause structurelle, pas un hasard de timing : en tapant « Analyser »,
+l'écran de partie navigue immédiatement pendant que son propre moteur
+s'arrête en tâche de fond (`.onDisappear` ne peut pas `await`, l'arrêt y
+est toujours détaché) — au même instant, le nouvel écran d'Analyse démarre
+LE SIEN. Les deux moteurs se disputent alors `std::cin`/`std::cout`,
+globaux au process (même défaut que documenté sur `acquireEngineProcess()`
+plus haut, cette fois sur ce chemin de navigation précis). Corrigé en
+ajoutant `stopEngineBeforeAnalysis()` — attend RÉELLEMENT l'arrêt — appelé
+et attendu par le bouton Analyser AVANT de naviguer, dans les 3 variantes
+concernées ET Chess960, qui avait exactement le même défaut sur son propre
+bouton Analyser.
+
+### Barre d'évaluation activée par défaut dans les variantes
+
+Demande directe : `FairyVariantSettings.showEvalBar` passe de `false` à
+`true`. Le réglage reste par variante (`FairyVariantSettingsStore`) : une
+variante déjà configurée par l'utilisateur garde son choix, seul le point
+de départ pour une variante jamais réglée change.
+
+### LabStats : Bessel et un terme de continuité, sur demande
+
+Signalés par la revue du 25/08, corrigés seulement après confirmation
+explicite (ce n'est pas qu'un bug, c'est aussi un choix de rigueur
+statistique qui change les chiffres affichés) :
+- **Bessel** (`n - 1`, pas `n`) : ces `n` parties ESTIMENT une force
+  inconnue, diviser par `n` sous-estimait systématiquement l'incertitude.
+- **Terme de continuité (Wilson)**, `z²/(4n²)` ajouté au carré de l'erreur
+  standard : empêche l'intervalle de confiance de s'effondrer à une
+  largeur NULLE quand toutes les parties jouées jusqu'ici partagent le
+  même résultat (ex. deux nulles d'affilée donnaient auparavant un
+  intervalle exactement 0 ↔ 0 Elo — une fausse certitude à 95 % après deux
+  parties).
+
+### Le blocage : un défaut par défaut réveille un chemin resté silencieux
+
+En revérifiant tout ce qui précède, la suite complète (`xcodebuild test
+-only-testing:ChessLabTests`) est restée bloquée **8h45** (9 min de vrai
+travail CPU accumulé sur cette durée — un vrai blocage, pas une lenteur).
+Diagnostiqué en relançant SANS piper la sortie dans `tail` (qui bufferise
+tout jusqu'à la fin du process — inutile pour observer un blocage en
+direct) et en surveillant en direct via `Monitor` plutôt qu'en sondant à
+l'aveugle.
+
+Cause : `VariantAnalysisViewModelTests.fairySeed` construisait
+`FairyVariantPlayViewModel` avec un `FairyVariantSettings()` NU, sans
+préciser `showEvalBar` — les trois AUTRES générateurs de position de test
+du même genre (`FairyVariantPlayViewModelTests`, `EngineLegalityPlayViewModelTests`,
+et le `game(...)` de `StolenMovePlayViewModelTests`) avaient déjà ce
+paramètre explicite à `false`, celui-ci non. Tant que le défaut de
+production était `false`, l'oubli ne changeait rien. Une fois passé à
+`true`, chaque `forceMove` de cette fonction (utilisée par la majorité des
+tests du fichier) s'est mise à enfiler une salve d'évaluation sur un
+`EngineController` jamais démarré — un chemin protégé par `EngineWatchdog`
+(borné, pas de blocage infini À CET ENDROIT), mais qui, multiplié sur des
+dizaines d'appels dans un fichier à fort trafic, a suffi à gripper la
+sérialisation cross-suite (`EngineIntegrationGate`) au point de paraître
+bloqué indéfiniment. Corrigé (le quatrième générateur aligné sur les trois
+autres) ; suite complète revérifiée ENTIÈREMENT verte ensuite
+(805 tests/121 suites, 325 s — durée redevenue normale).
+
+**How to apply** : tout changement du défaut d'un type de réglages PARTAGÉ
+(`FairyVariantSettings`, `PlayGameSettings`...) doit être suivi d'un `grep`
+de TOUS les endroits qui construisent une instance NUE de ce type dans les
+tests — pas seulement ceux qui passent déjà par un générateur `game(...)`
+dédié. Voir la mémoire de session pour la stratégie de tests ciblés
+adoptée à la suite de cet épisode.

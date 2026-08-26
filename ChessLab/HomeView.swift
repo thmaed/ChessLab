@@ -663,6 +663,8 @@ struct HomeView: View {
                 case let .activeStolenMoveGame(settings):
                     StolenMoveActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
                         path = NavigationPath()
+                    } onAnalyze: { seed in
+                        path.append(Route.activeVariantAnalysis(seed))
                     }
 
                 case let .activeChess960Game(settings):
@@ -1514,13 +1516,14 @@ private struct StolenMoveActiveGameHost: View {
     let settings: FairyVariantSettings
     let sessionKey: String
     let onExit: () -> Void
+    var onAnalyze: (VariantAnalysisSeed) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: StolenMovePlayViewModel?
 
     var body: some View {
         Group {
             if let viewModel {
-                StolenMovePlayView(viewModel: viewModel, onExit: onExit)
+                StolenMovePlayView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze)
             } else {
                 Color.clear
             }

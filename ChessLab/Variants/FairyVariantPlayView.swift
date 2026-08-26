@@ -187,11 +187,20 @@ struct FairyVariantPlayView: View {
                 HStack(spacing: 10) {
                     panelButton("Accueil", icon: "house.fill") { onExit() }
                     panelButton("Analyser", icon: "chart.xyaxis.line", filled: true) {
-                        onAnalyze(VariantAnalysisSeed(
+                        let seed = VariantAnalysisSeed(
                             variantID: variant.id, variantDisplayName: variant.displayName, startFEN: variant.startFEN,
                             uciLog: viewModel.uciLog, sanLog: viewModel.sanLog, moveLog: viewModel.moveLog,
                             fenLog: viewModel.fenLog, outcome: outcome
-                        ))
+                        )
+                        Task {
+                            // Attend l'arrêt RÉEL du moteur avant de naviguer
+                            // — sans ça, le nouveau moteur de l'écran
+                            // d'analyse démarre en même temps que celui-ci
+                            // s'arrête, `.onDisappear` ne pouvant pas
+                            // `await`. Voir ``FairyVariantPlayViewModel/stopEngineBeforeAnalysis()``.
+                            await viewModel.stopEngineBeforeAnalysis()
+                            onAnalyze(seed)
+                        }
                     }
                 }
             }

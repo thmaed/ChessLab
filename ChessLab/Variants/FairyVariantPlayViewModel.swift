@@ -108,6 +108,21 @@ final class FairyVariantPlayViewModel {
         Task { [engine] in await engine.stop() }
     }
 
+    /// Comme ``handleViewDisappear()``, mais ATTEND que le moteur soit
+    /// réellement arrêté — nécessaire avant une navigation qui va elle-même
+    /// démarrer un AUTRE moteur (« Analyser ») : `.onDisappear` ne peut pas
+    /// `await`, donc son arrêt reste détaché ; livré sans garantie d'ordre
+    /// face au nouvel écran d'analyse qui démarre le SIEN au même instant.
+    /// Les deux se disputent alors `std::cin`/`std::cout`, globaux au
+    /// process — même défaut que documenté sur
+    /// ``EngineController/acquireEngineProcess(timeoutMs:)``, cette fois
+    /// signalé par l'utilisateur sur CE chemin précis : « moteur souvent
+    /// indisponible à la fin de l'analyse après une partie variantes ».
+    func stopEngineBeforeAnalysis() async {
+        engineQueue.cancel()
+        await engine.stop()
+    }
+
     // MARK: Affichage
 
     var displayedBoard: Board { reviewBoard ?? board }

@@ -169,11 +169,16 @@ struct EngineLegalityPlayView: View {
                 HStack(spacing: 10) {
                     panelButton("Accueil", icon: "house.fill") { onExit() }
                     panelButton("Analyser", icon: "chart.xyaxis.line", filled: true) {
-                        onAnalyze(VariantAnalysisSeed(
+                        let seed = VariantAnalysisSeed(
                             variantID: variant.id, variantDisplayName: variant.displayName, startFEN: variant.startFEN,
                             uciLog: viewModel.uciLog, sanLog: viewModel.sanLog, moveLog: viewModel.moveLog,
                             fenLog: viewModel.fenLog, outcome: outcome
-                        ))
+                        )
+                        Task {
+                            // Voir ``EngineLegalityPlayViewModel/stopEngineBeforeAnalysis()``.
+                            await viewModel.stopEngineBeforeAnalysis()
+                            onAnalyze(seed)
+                        }
                     }
                 }
             }

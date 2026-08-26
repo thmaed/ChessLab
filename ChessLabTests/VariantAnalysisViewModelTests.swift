@@ -14,7 +14,15 @@ struct VariantAnalysisViewModelTests {
     /// (lot A), donc aucun moteur n'est nécessaire pour CETTE construction,
     /// seulement pour l'analyse elle-même le cas échéant.
     private func fairySeed(_ variant: FairyVariant = .kingOfTheHill, moves: [String]) -> VariantAnalysisSeed {
-        let vm = FairyVariantPlayViewModel(variant: variant, settings: FairyVariantSettings())
+        var settings = FairyVariantSettings()
+        // `showEvalBar` est maintenant activé par défaut en production —
+        // sans ce `false` explicite, chaque `forceMove` ci-dessous
+        // enfilerait une salve moteur sur un `EngineController` jamais
+        // démarré, gaspillant jusqu'à ~8 s (le sursis d'``EngineWatchdog``)
+        // par coup utilisateur, dans une construction censée être PURE.
+        // Trouvé le 26/08/2026 après un blocage en suite complète.
+        settings.showEvalBar = false
+        let vm = FairyVariantPlayViewModel(variant: variant, settings: settings)
         for uci in moves { vm.forceMove(uci: uci) }
         return VariantAnalysisSeed(
             variantID: variant.id, variantDisplayName: variant.displayName, startFEN: variant.startFEN,
@@ -44,6 +52,61 @@ struct VariantAnalysisViewModelTests {
 
         let last = try? #require(vm.displayedLastMove)
         #expect(last?.start == Square("b8") && last?.end == Square("c6"))
+    }
+
+    /// Construit une graine sur une variante du lot B (Fairy-Stockfish
+    /// arbitre) — contrairement au lot A, même poser une position de test
+    /// est TOUJOURS un aller-retour moteur réel ; appeler SANS
+    /// ``EngineIntegrationGate`` planterait la suite.
+    private func engineLegalitySeed(_ variant: EngineLegalityVariant, moves: [String]) async throws -> VariantAnalysisSeed {
+        var settings = FairyVariantSettings()
+        // Pas besoin de la barre d'éval (maintenant activée par défaut en
+        // production) pour construire une graine de test — évite une salve
+        // moteur superflue à chaque coup forcé.
+        settings.showEvalBar = false
+        let vm = EngineLegalityPlayViewModel(variant: variant, settings: settings)
+        vm.start()
+        let deadline = Date().addingTimeInterval(600)
+        while Date() < deadline, !vm.isPositionReady, !vm.isEngineUnavailable {
+            try await Task.sleep(for: .milliseconds(200))
+        }
+        try #require(vm.isPositionReady, "la position initiale n'a jamais été prête")
+        for uci in moves { await vm.forceMove(uci: uci) }
+        return VariantAnalysisSeed(
+            variantID: variant.id, variantDisplayName: variant.displayName, startFEN: variant.startFEN,
+            uciLog: vm.uciLog, sanLog: vm.sanLog, moveLog: vm.moveLog, fenLog: vm.fenLog, outcome: vm.outcome
+        )
+    }
+
+    @Test("Atomique : la dernière position (roi explosé) ne redemande jamais le moteur, même avant la fin de la classification")
+    func atomicTerminalPositionNeverQueriesTheLiveEngine() async throws {
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            // 1.e4 e5 2.Nf3 Nc6 3.Bc4 Nf6 4.Ng5 d5 5.exd5 Nxd5 6.Nxf7 — Nxf7
+            // fait exploser tout le voisinage 3x3 de f7, y compris le roi
+            // noir en e8 : partie terminée, plus AUCUN roi noir sur l'échiquier.
+            let seed = try await engineLegalitySeed(.atomic, moves: [
+                "e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "g8f6",
+                "f3g5", "d7d5", "e4d5", "f6d5", "g5f7",
+            ])
+            #expect(seed.outcome == GameOutcome(winner: .white, reason: .atomicKingExploded))
+
+            let vm = VariantAnalysisViewModel(seed: seed)
+            // Navigue jusqu'à la toute dernière position IMMÉDIATEMENT après
+            // la construction — AVANT que la passe de classification lancée
+            // par `init` n'ait eu la moindre chance d'atteindre cette même
+            // position elle-même. Si `showCurrentCachedEvalOrRefresh()`
+            // n'avait pas le même garde-fou que `rankedEval(at:)`, ceci
+            // enverrait la position sans roi noir directement à Fairy-
+            // Stockfish via `refreshAnalysis()` — signalé par l'utilisateur
+            // comme une « plantée du moteur à la fin de l'atomique ».
+            vm.review(toPly: vm.totalPlies)
+
+            #expect(vm.displayedBoard.position.pieces.contains { $0.kind == .king && $0.color == .black } == false)
+            #expect(vm.currentEvalMate == nil, "un résultat certain se code en centipawns extrêmes, pas en mat")
+            #expect(vm.currentEvalCp == EngineScore.mateCentipawns, "l'éval doit refléter la victoire blanche connue, immédiatement")
+
+            vm.handleViewDisappear()
+        }
     }
 
     @Test("Roi de la colline : le coup final gagnant garde son FEN et son issue")
