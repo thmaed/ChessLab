@@ -13,6 +13,8 @@ enum MenuDestination: Hashable {
     case analysis
     case puzzles
     case openings
+    case endgames
+    case variants
     case laboratory
     case progression
     case settings
@@ -58,6 +60,15 @@ struct ChessLabCommands: Commands {
                 .keyboardShortcut("p", modifiers: [.command, .shift])
             Button("Ouvertures") { MenuCommands.shared.request(.openings) }
                 .keyboardShortcut("o", modifiers: [.command, .shift])
+            // Finales et Variantes manquaient : sur Mac, tout ce que la barre
+            // latérale propose doit s'atteindre depuis les menus.
+            Button("Finales") { MenuCommands.shared.request(.endgames) }
+                .keyboardShortcut("e", modifiers: [.command, .shift])
+            // Sans raccourci, délibérément : ⌘⇧V appartient à « Coller et
+            // adapter le style » dans le menu Édition que Catalyst fournit,
+            // et aucune autre lettre ne dit « Variantes ». L'entrée de menu
+            // suffit à la rendre atteignable au clavier.
+            Button("Variantes") { MenuCommands.shared.request(.variants) }
             Button("Laboratoire") { MenuCommands.shared.request(.laboratory) }
                 .keyboardShortcut("l", modifiers: [.command, .shift])
 
@@ -93,6 +104,18 @@ final class MacMenuDelegate: UIResponder, UIApplicationDelegate {
 
     static let minimumWindowSize = CGSize(width: 820, height: 680)
 
+    /// Taille d'ouverture. Sans elle, la fenêtre s'ouvrait à son PLANCHER
+    /// (820 × 680) : la taille la plus serrée que l'app accepte, celle où
+    /// « Réglages » et « Aide » passent sous le pli de la barre latérale.
+    /// Les HIG demandent l'inverse — une taille initiale qui met le contenu
+    /// en valeur. 1200 × 860 laisse respirer le plateau et la colonne de
+    /// droite, sans présumer d'un grand écran.
+    static let defaultWindowSize = CGSize(width: 1200, height: 860)
+
+    /// Posée une seule fois : ensuite la fenêtre appartient à l'utilisateur,
+    /// et macOS restaure lui-même sa taille d'une session à l'autre.
+    private var hasSizedInitialWindow = false
+
     /// Plancher de fenêtre. Posé à l'ACTIVATION de la scène et pas depuis une
     /// vue : au premier `onAppear` de la racine, la `UIWindowScene` n'est pas
     /// encore attachée et `sizeRestrictions` est ignoré — la fenêtre se
@@ -104,10 +127,11 @@ final class MacMenuDelegate: UIResponder, UIApplicationDelegate {
     ) -> Bool {
         NotificationCenter.default.addObserver(
             forName: UIScene.didActivateNotification, object: nil, queue: .main
-        ) { notification in
+        ) { [weak self] notification in
             guard let scene = notification.object as? UIWindowScene else { return }
             MainActor.assumeIsolated {
                 scene.sizeRestrictions?.minimumSize = Self.minimumWindowSize
+                self?.sizeInitialWindowIfNeeded(scene)
             }
             // Le système reconfigure la scène juste APRÈS son activation et
             // écrase ce qu'on vient de poser : on repasse une fois.
@@ -116,6 +140,28 @@ final class MacMenuDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         return true
+    }
+
+    /// Demande la taille d'ouverture au gestionnaire de fenêtres, une fois.
+    ///
+    /// `requestGeometryUpdate` est la voie Catalyst prévue pour ça : une
+    /// *demande*, que le système est libre d'ignorer (fenêtre déjà restaurée
+    /// par macOS, écran trop petit) — d'où l'absence de traitement d'erreur,
+    /// il n'y a rien à rattraper.
+    @MainActor
+    private func sizeInitialWindowIfNeeded(_ scene: UIWindowScene) {
+        guard !hasSizedInitialWindow else { return }
+        hasSizedInitialWindow = true
+        let current = scene.effectiveGeometry.systemFrame
+        // Une fenêtre déjà plus grande que le plancher a été restaurée par
+        // macOS : c'est le choix de l'utilisateur, on n'y touche pas.
+        guard current.width <= Self.minimumWindowSize.width,
+              current.height <= Self.minimumWindowSize.height else { return }
+        scene.requestGeometryUpdate(
+            UIWindowScene.GeometryPreferences.Mac(
+                systemFrame: CGRect(origin: current.origin, size: Self.defaultWindowSize)
+            )
+        )
     }
 
     override func buildMenu(with builder: UIMenuBuilder) {

@@ -118,9 +118,16 @@ struct OpeningReaderView: View {
         let side = size.width >= 1000
             ? min(size.height - 40, size.width * 0.52, 800)
             : min(size.height - 40, size.width * 0.48, 560)
-        return HStack(spacing: 0) {
+        // Les deux colonnes partent du HAUT. Le plateau était centré
+        // verticalement pendant que le panneau, lui, restait accroché en
+        // haut : dès que la fenêtre dépassait le plafond de taille du plateau
+        // (800 pt), un vide s'ouvrait au-dessus du plateau et un autre sous
+        // le panneau, et l'écran paraissait cassé alors que chaque colonne,
+        // isolément, était juste. Sans effet tant que le plateau remplit la
+        // hauteur, c'est-à-dire dans toutes les fenêtres jusqu'au plafond.
+        return HStack(alignment: .top, spacing: 0) {
             boardStack(side: side)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             VStack(spacing: 0) {
                 panel
                 controlBar

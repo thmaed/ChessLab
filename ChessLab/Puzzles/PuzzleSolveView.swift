@@ -80,7 +80,14 @@ struct PuzzleSolveView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .padding(.vertical, 6)
                 .padding(.leading, 6)
+                // Le plateau descendait jusqu'au dernier pixel de la fenêtre :
+                // aucune marge sous les lettres de colonnes, il touchait le
+                // bord. 16 pt lui rendent son assise.
+                .padding(.bottom, 16)
 
+            // Colonne élastique plutôt que figée à 360 pt : à cette largeur
+            // fixe elle affamait le plateau dans les fenêtres moyennes et
+            // restait à moitié vide dans les grandes.
             ScrollView {
                 VStack(spacing: 18) {
                     header
@@ -89,7 +96,7 @@ struct PuzzleSolveView: View {
                 .frame(maxWidth: .infinity)
                 .padding(24)
             }
-            .frame(width: 360)
+            .frame(minWidth: 300, maxWidth: 380)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

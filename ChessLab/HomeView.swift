@@ -155,6 +155,8 @@ struct HomeView: View {
         case .analysis: item = .analysis; route = .analysisEntry
         case .puzzles: item = .puzzles; route = .puzzleQueue
         case .openings: item = .openings; route = .openingList
+        case .endgames: item = .endgames; route = .endgameList
+        case .variants: item = .variants; route = .variantsHub
         case .laboratory: item = .laboratory; route = .labSetup(startFEN: nil)
         case .progression: item = .progression; route = .progression
         case .settings: item = .settings; route = .settings
