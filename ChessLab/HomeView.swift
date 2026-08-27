@@ -442,7 +442,7 @@ struct HomeView: View {
     private var iPadDashboard: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                homeHeader
+                homeHeader()
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 // La reprise vit désormais en HAUT de la barre latérale
@@ -929,17 +929,47 @@ struct HomeView: View {
     // MARK: Dispositions iPhone / iPad
 
     /// iPhone : tout défile dans une seule colonne (inchangé).
+    /// Espacements resserrés sur les petits iPhone.
+    ///
+    /// Sur un SE (375 × 667 pt), l'en-tête et ses marges mangeaient plus de la
+    /// moitié de la hauteur avant la première tuile : deux rangées et demie
+    /// visibles, Laboratoire et Variantes sous le pli. Les classes de taille
+    /// ne distinguent pas un SE d'un Pro Max — tous deux `regular` en hauteur,
+    /// `compact` en largeur — d'où cette mesure de la hauteur réelle.
+    ///
+    /// Le seuil de 700 pt attrape le SE (667) et l'iPhone 8, pas le 13 mini
+    /// (812) : au-delà, la respiration d'origine est conservée.
+    private static let shortPhoneHeight: CGFloat = 700
+
+    /// Hauteur du conteneur, MESURÉE plutôt que lue dans un `GeometryReader`
+    /// enveloppant.
+    ///
+    /// Envelopper la `ScrollView` dans un `GeometryReader` cassait
+    /// l'instanciation paresseuse de la grille : les tuiles sous le pli
+    /// n'entraient plus du tout dans l'arbre d'accessibilité, et
+    /// `FairyVariantUITests` ne trouvait plus `mode_variants` sur un SE.
+    /// `onGeometryChange` mesure sans rien changer à la hiérarchie de vues.
+    @State private var homeContainerHeight: CGFloat = 0
+
+    private var isShortPhone: Bool {
+        homeContainerHeight > 0 && homeContainerHeight < Self.shortPhoneHeight
+    }
+
     private var iPhoneHome: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
-                homeHeader
+            VStack(alignment: .leading, spacing: isShortPhone ? 16 : 22) {
+                homeHeader(compact: isShortPhone)
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 if let resumableGame { resumeBanner(resumableGame) }
                 modesSection(minTile: ModeGridMetrics.minTileIPhone)
                 if !recentGames.isEmpty { recentGamesSection }
             }
-            .padding(20)
+            .padding(.horizontal, 20)
+            .padding(.vertical, isShortPhone ? 14 : 20)
+        }
+        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+            homeContainerHeight = height
         }
     }
 
@@ -955,10 +985,10 @@ struct HomeView: View {
                 columns: [GridItem(.adaptive(minimum: minTile), spacing: ModeGridMetrics.spacing)],
                 spacing: ModeGridMetrics.spacing
             ) {
-                ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Force, cadence, aides", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
+                ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Force, cadence, aides", shortSubtitle: "Force et cadence", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
                     path.append(Route.newGame)
                 }
-                ModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", subtitle: "Sur le même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true) {
+                ModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", subtitle: "Sur le même appareil", shortSubtitle: "Même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true) {
                     path.append(Route.twoPlayerSetup)
                 }
                 ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", shortSubtitle: "Tactique et Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true) {
@@ -967,7 +997,7 @@ struct HomeView: View {
                 ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings") {
                     path.append(Route.openingList)
                 }
-                ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", shortSubtitle: "Techniques prouvées", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames") {
+                ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", shortSubtitle: "Fins gagnantes", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames") {
                     path.append(Route.endgameList)
                 }
                 ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", shortSubtitle: "PGN, FEN", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true) {
@@ -1112,8 +1142,11 @@ struct HomeView: View {
     /// - important: Le wordmark doit rester lisible par accessibilité comme
     ///   « ChessLab » : le test UI de fumée s'accroche à
     ///   `staticTexts["ChessLab"]` pour prouver que l'accueil est monté.
-    private var homeHeader: some View {
-        HStack(spacing: 14) {
+    /// `compact` : version resserrée pour les petits iPhone — icône et nom
+    /// plus sobres, pour rendre à la grille la hauteur que l'en-tête lui
+    /// prenait. Voir ``iPhoneHome``.
+    private func homeHeader(compact: Bool = false) -> some View {
+        HStack(spacing: compact ? 12 : 14) {
             // L'illustration porte DÉJÀ son cadre émeraude et son fond : elle
             // remplace donc la tuile entière (dégradé + liseré + glyphe de
             // cavalier), au lieu d'être posée dessus — deux cadres empilés se
@@ -1122,7 +1155,7 @@ struct HomeView: View {
             Image("AppLogo")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(width: 56, height: 56)
+                .frame(width: compact ? 46 : 56, height: compact ? 46 : 56)
                 .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -1139,15 +1172,17 @@ struct HomeView: View {
                     // sous-titre rattrapait le titre. Plafonné à 1,4× — un
                     // en-tête d'accueil doit rester un en-tête.
                     .scaledSystemFont(
-                        size: 32, relativeTo: .largeTitle,
+                        size: compact ? 27 : 32, relativeTo: .largeTitle,
                         weight: .bold, design: .rounded, maximumScale: 1.4
                     )
                     .kerning(0.2)
                     .accessibilityLabel(Text(verbatim: "ChessLab"))
 
-                Text("Jouez, analysez, progressez.")
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.textSecondary)
+                if !compact {
+                    Text("Jouez, analysez, progressez.")
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.textSecondary)
+                }
             }
             Spacer(minLength: 0)
         }

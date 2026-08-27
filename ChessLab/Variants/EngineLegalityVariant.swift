@@ -31,6 +31,9 @@ struct EngineLegalityVariant: Identifiable {
     private let displayNameKey: String
     private let shortNameKey: String
     private let taglineKey: String
+    /// Accroche raccourcie pour les tuiles des petits iPhone — voir
+    /// ``FairyVariant/shortTagline``.
+    private let shortTaglineKey: String
     private let rulesKey: String
     let icon: String
     let tint: Color
@@ -39,6 +42,7 @@ struct EngineLegalityVariant: Identifiable {
     var displayName: String { LocalizationController.string(displayNameKey) }
     var shortName: String { LocalizationController.string(shortNameKey) }
     var tagline: String { LocalizationController.string(taglineKey) }
+    var shortTagline: String { LocalizationController.string(shortTaglineKey) }
     var rules: String { LocalizationController.string(rulesKey) }
 
     static let racingKings = EngineLegalityVariant(
@@ -46,6 +50,7 @@ struct EngineLegalityVariant: Identifiable {
         displayNameKey: "Course des rois",
         shortNameKey: "Course rois",
         taglineKey: "Le premier roi en 8e rangée gagne",
+        shortTaglineKey: "Le roi en 8e",
         rulesKey: "Pas de pions, pas de roque. Aucun coup n'a le droit de mettre le roi adverse en échec — sauf s'il gagne la partie sur-le-champ. Le but : amener votre roi sur la 8e rangée avant l'adversaire. Si les Blancs y arrivent les premiers, les Noirs ont EXACTEMENT un coup pour égaliser en y arrivant aussi — sinon les Blancs ont gagné.",
         icon: "flag.checkered",
         tint: Theme.info,
@@ -57,6 +62,7 @@ struct EngineLegalityVariant: Identifiable {
         displayNameKey: "Atomique",
         shortNameKey: "Atomique",
         taglineKey: "Chaque capture fait exploser les cases voisines",
+        shortTaglineKey: "Prises explosives",
         rulesKey: "Toute capture fait exploser la case d'arrivée : la pièce qui capture ET la pièce capturée disparaissent, ainsi que toute pièce SAUF les pions sur les huit cases voisines. La partie se termine dès qu'un roi explose — un coup qui ferait exploser votre PROPRE roi est interdit. Deux rois peuvent se toucher sans risque : aucun ne peut capturer l'autre sans se détruire lui-même.",
         icon: "burst.fill",
         tint: Theme.danger,
@@ -68,6 +74,7 @@ struct EngineLegalityVariant: Identifiable {
         displayNameKey: "Antéchecs",
         shortNameKey: "Antéchecs",
         taglineKey: "Perdez toutes vos pièces — ou restez bloqué — pour gagner",
+        shortTaglineKey: "Perdre pour gagner",
         rulesKey: "Le but est INVERSÉ : vous gagnez en perdant toutes vos pièces, ou en étant dans l'incapacité de jouer un coup. Capturer est OBLIGATOIRE dès que c'est possible — s'il existe plusieurs captures, vous choisissez laquelle. Il n'y a ni échec ni mat : le roi se capture comme n'importe quelle pièce, et le roque n'existe pas.",
         icon: "arrow.triangle.swap",
         tint: Theme.rose,

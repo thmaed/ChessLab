@@ -113,7 +113,14 @@ struct NewGameSetupView: View {
                         Slider(value: $eloSlider, in: EngineStrength.playSliderRange, step: 50)
                             .tint(Theme.accent)
 
-                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                        // Grille ADAPTATIVE, et non deux colonnes figées : sur
+                        // un iPhone SE, deux colonnes ne laissaient que ~146 pt
+                        // par carte, où « Intermédiaire confirmé » se coupait
+                        // en plein mot (« Intermé-diaire co… »). Sous 172 pt
+                        // disponibles par colonne, la grille passe à une seule
+                        // colonne confortable ; les iPhone plus larges gardent
+                        // leurs deux colonnes.
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 172), spacing: 10)], spacing: 10) {
                             ForEach(Array(EnginePreset.all.enumerated()), id: \.element.id) { index, preset in
                                 EngineLevelCard(
                                     preset: preset,

@@ -23,6 +23,10 @@ struct FairyVariant: Identifiable {
     private let displayNameKey: String
     private let shortNameKey: String
     private let taglineKey: String
+    /// Accroche RACCOURCIE, pour les tuiles des petits iPhone : sur un
+    /// écran de 375 pt, la tuile n'offre qu'une ligne d'environ 17
+    /// caractères, et l'accroche complète s'y coupait en plein mot.
+    private let shortTaglineKey: String
     /// Explication complète, affichée à l'ouverture des réglages — pas
     /// seulement l'accroche courte des tuiles (``tagline``).
     private let rulesKey: String
@@ -34,6 +38,7 @@ struct FairyVariant: Identifiable {
     var displayName: String { LocalizationController.string(displayNameKey) }
     var shortName: String { LocalizationController.string(shortNameKey) }
     var tagline: String { LocalizationController.string(taglineKey) }
+    var shortTagline: String { LocalizationController.string(shortTaglineKey) }
     var rules: String { LocalizationController.string(rulesKey) }
 
     static let kingOfTheHill = FairyVariant(
@@ -41,6 +46,7 @@ struct FairyVariant: Identifiable {
         displayNameKey: "Roi de la colline",
         shortNameKey: "Roi colline",
         taglineKey: "Amenez votre roi au centre pour gagner",
+        shortTaglineKey: "Roi au centre",
         rulesKey: "Les règles sont celles du jeu classique. Vous gagnez aussi IMMÉDIATEMENT si votre roi atteint l'une des quatre cases centrales — d4, e4, d5 ou e5 — quel que soit l'état du reste de l'échiquier, y compris en plein milieu de partie.",
         icon: "mountain.2.fill",
         tint: Theme.gold,
@@ -52,6 +58,7 @@ struct FairyVariant: Identifiable {
         displayNameKey: "Trois échecs",
         shortNameKey: "3 échecs",
         taglineKey: "Trois échecs infligés valent la partie",
+        shortTaglineKey: "Échec trois fois",
         rulesKey: "Les règles sont celles du jeu classique, échec et mat compris. En plus, vous gagnez dès que vous avez mis le roi adverse en échec TROIS FOIS au cours de la partie — chaque échec compte, qu'il soit paré, capturé ou fui au coup suivant.",
         icon: "3.circle.fill",
         tint: Theme.danger,
@@ -63,6 +70,7 @@ struct FairyVariant: Identifiable {
         displayNameKey: "Horde",
         shortNameKey: "Horde",
         taglineKey: "36 pions contre une armée classique",
+        shortTaglineKey: "36 pions",
         rulesKey: "Position asymétrique : les Blancs commencent avec des pions occupant une grande partie de l'échiquier et AUCUNE autre pièce — pas même de roi. Les Noirs ont une armée classique complète, avec ses droits de roque. Les Blancs gagnent en mettant le roi noir échec et mat — un pion promu peut y contribuer. Les Noirs gagnent en capturant la toute dernière pièce blanche.",
         icon: "person.3.fill",
         tint: Theme.teal,
