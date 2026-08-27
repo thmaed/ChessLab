@@ -48,8 +48,7 @@ struct VariantsHubView: View {
                         ModeCard(
                             title: LocalizedStringKey(variant.displayName),
                             shortTitle: LocalizedStringKey(variant.shortName),
-                            subtitle: LocalizedStringKey(variant.tagline),
-                            shortSubtitle: LocalizedStringKey(variant.shortTagline),
+                            subtitle: LocalizedStringKey(variant.shortTagline),
                             systemImage: variant.icon,
                             tint: variant.tint,
                             isEnabled: true,
@@ -62,8 +61,7 @@ struct VariantsHubView: View {
                         ModeCard(
                             title: LocalizedStringKey(variant.displayName),
                             shortTitle: LocalizedStringKey(variant.shortName),
-                            subtitle: LocalizedStringKey(variant.tagline),
-                            shortSubtitle: LocalizedStringKey(variant.shortTagline),
+                            subtitle: LocalizedStringKey(variant.shortTagline),
                             systemImage: variant.icon,
                             tint: variant.tint,
                             isEnabled: true,
@@ -75,8 +73,7 @@ struct VariantsHubView: View {
                     ModeCard(
                         title: LocalizedStringKey(StolenMoveVariant.shared.displayName),
                         shortTitle: LocalizedStringKey(StolenMoveVariant.shared.shortName),
-                        subtitle: LocalizedStringKey(StolenMoveVariant.shared.tagline),
-                        shortSubtitle: LocalizedStringKey(StolenMoveVariant.shared.shortTagline),
+                        subtitle: LocalizedStringKey(StolenMoveVariant.shared.shortTagline),
                         systemImage: StolenMoveVariant.shared.icon,
                         tint: StolenMoveVariant.shared.tint,
                         isEnabled: true,
@@ -86,6 +83,12 @@ struct VariantsHubView: View {
                 }
             }
             .padding(20)
+            // Même mesure de lecture que l'Aide et les Réglages : sans elle,
+            // une fenêtre Mac large alignait les huit tuiles sur UNE rangée
+            // écrasée en haut de l'écran, le reste vide. Bornée, la grille se
+            // replie en un bloc de trois colonnes à taille confortable.
+            .frame(maxWidth: Theme.readableWidth, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
         .appBackground()
         .navigationTitle("Variantes d'échecs")

@@ -104,17 +104,27 @@ final class MacMenuDelegate: UIResponder, UIApplicationDelegate {
 
     static let minimumWindowSize = CGSize(width: 820, height: 680)
 
-    /// Taille d'ouverture. Sans elle, la fenêtre s'ouvrait à son PLANCHER
-    /// (820 × 680) : la taille la plus serrée que l'app accepte, celle où
-    /// « Réglages » et « Aide » passent sous le pli de la barre latérale.
-    /// Les HIG demandent l'inverse — une taille initiale qui met le contenu
-    /// en valeur. 1200 × 860 laisse respirer le plateau et la colonne de
-    /// droite, sans présumer d'un grand écran.
+    /// Taille d'ouverture, en points **Mac** — pas en points iOS comme
+    /// ``minimumWindowSize``.
+    ///
+    /// Les deux API ne parlent pas la même unité : `sizeRestrictions` se règle
+    /// dans les points de l'app (iOS), tandis que `requestGeometryUpdate` pose
+    /// un `systemFrame` dans ceux de la fenêtre (Mac). Les comparer serait
+    /// comparer des pouces à des centimètres — d'où l'absence de garde sur la
+    /// taille courante, remplacée par le drapeau persistant ci-dessous.
+    ///
+    /// Sans cette taille, la fenêtre s'ouvrait à son PLANCHER : la plus serrée
+    /// que l'app accepte, celle où « Réglages » et « Aide » passent sous le pli
+    /// de la barre latérale. Les HIG demandent l'inverse — une taille initiale
+    /// qui met le contenu en valeur. macOS ramène la fenêtre dans l'écran si
+    /// elle n'y tient pas.
     static let defaultWindowSize = CGSize(width: 1200, height: 860)
 
-    /// Posée une seule fois : ensuite la fenêtre appartient à l'utilisateur,
-    /// et macOS restaure lui-même sa taille d'une session à l'autre.
-    private var hasSizedInitialWindow = false
+    /// Posée au tout PREMIER lancement, et plus jamais : ensuite la fenêtre
+    /// appartient à l'utilisateur, et macOS restaure lui-même sa taille d'une
+    /// session à l'autre. Persistant, car une taille d'ouverture réimposée à
+    /// chaque démarrage écraserait ce choix.
+    private static let hasSizedInitialWindowKey = "MacMenuDelegate.hasSizedInitialWindow"
 
     /// Plancher de fenêtre. Posé à l'ACTIVATION de la scène et pas depuis une
     /// vue : au premier `onAppear` de la racine, la `UIWindowScene` n'est pas
@@ -150,16 +160,15 @@ final class MacMenuDelegate: UIResponder, UIApplicationDelegate {
     /// il n'y a rien à rattraper.
     @MainActor
     private func sizeInitialWindowIfNeeded(_ scene: UIWindowScene) {
-        guard !hasSizedInitialWindow else { return }
-        hasSizedInitialWindow = true
-        let current = scene.effectiveGeometry.systemFrame
-        // Une fenêtre déjà plus grande que le plancher a été restaurée par
-        // macOS : c'est le choix de l'utilisateur, on n'y touche pas.
-        guard current.width <= Self.minimumWindowSize.width,
-              current.height <= Self.minimumWindowSize.height else { return }
+        let defaults = UserDefaults.standard
+        guard !defaults.bool(forKey: Self.hasSizedInitialWindowKey) else { return }
+        defaults.set(true, forKey: Self.hasSizedInitialWindowKey)
         scene.requestGeometryUpdate(
             UIWindowScene.GeometryPreferences.Mac(
-                systemFrame: CGRect(origin: current.origin, size: Self.defaultWindowSize)
+                systemFrame: CGRect(
+                    origin: scene.effectiveGeometry.systemFrame.origin,
+                    size: Self.defaultWindowSize
+                )
             )
         )
     }
