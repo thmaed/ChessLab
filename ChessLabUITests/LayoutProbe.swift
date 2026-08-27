@@ -263,6 +263,52 @@ enum LayoutProbe {
         return found.sorted { $0.amount > $1.amount }
     }
 
+    // MARK: - Coupe verticale
+
+    /// De combien de points `element` sort de la fenêtre par le HAUT ou par le
+    /// BAS (0 s'il tient entièrement).
+    ///
+    /// Volontairement **ciblé**, là où ``horizontalOverflows(in:tolerance:ignoring:)``
+    /// balaie tout : verticalement, un balayage général crierait au loup sur
+    /// chaque `ScrollView`, où du contenu sous le pli est le fonctionnement
+    /// normal. Ici on nomme l'élément qu'on exige visible, et l'appelant
+    /// répond de ce choix — utile sur les écrans SANS défilement, où passer
+    /// sous le pli, c'est disparaître pour de bon.
+    @MainActor
+    static func verticalClip(
+        of element: XCUIElement, in app: XCUIApplication, tolerance: CGFloat = 0.5
+    ) -> CGFloat {
+        let window = app.frame
+        let frame = element.frame
+        guard frame.height > 0 else { return 0 }
+        let above = window.minY - frame.minY
+        let below = frame.maxY - window.maxY
+        let worst = max(above, below)
+        return worst > tolerance ? worst : 0
+    }
+
+    /// Échoue si l'élément est coupé par un bord horizontal de la fenêtre.
+    @MainActor
+    static func assertNoVerticalClipping(
+        of element: XCUIElement, named name: String, in app: XCUIApplication,
+        context: String, file: StaticString = #filePath, line: UInt = #line
+    ) {
+        guard element.exists else {
+            XCTFail("\(name) est absent — \(context)", file: file, line: line)
+            return
+        }
+        let clipped = verticalClip(of: element, in: app)
+        guard clipped > 0 else { return }
+        XCTFail(
+            String(
+                format: "%@ est coupé de %.1f pt par le bord de la fenêtre — %@ : y=[%.1f…%.1f] hors de [%.1f…%.1f]",
+                name, clipped, context,
+                element.frame.minY, element.frame.maxY, app.frame.minY, app.frame.maxY
+            ),
+            file: file, line: line
+        )
+    }
+
     /// Échoue le test en listant tout ce qui dépasse.
     @MainActor
     static func assertNoHorizontalOverflow(
