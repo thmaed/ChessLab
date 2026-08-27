@@ -48,6 +48,20 @@ enum Theme {
     static let cardShape = RoundedRectangle(cornerRadius: 18, style: .continuous)
     static let controlShape = RoundedRectangle(cornerRadius: 14, style: .continuous)
 
+    // MARK: Mesure de lecture
+
+    /// Largeur maximale d'une colonne de texte suivi (Aide, Réglages,
+    /// Progression, tableau de bord de l'accueil).
+    ///
+    /// Sans elle, une fenêtre Mac en plein écran étire les paragraphes sur
+    /// toute sa largeur — plus de 300 caractères par ligne sur un 27 pouces,
+    /// où l'œil perd la ligne suivante à chaque retour. 720 pt tient la
+    /// mesure autour de 70-90 caractères, la plage lisible que recommandent
+    /// les HIG. À utiliser en paire : `.frame(maxWidth: Theme.readableWidth)`
+    /// puis `.frame(maxWidth: .infinity, alignment: .center)` pour recentrer
+    /// la colonne dans la fenêtre.
+    static let readableWidth: CGFloat = 720
+
     // MARK: Dégradés
 
     /// Dégradé d'accent signature (émeraude → sarcelle), en diagonale.

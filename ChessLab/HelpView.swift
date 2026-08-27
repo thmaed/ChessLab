@@ -104,6 +104,8 @@ struct HelpView: View {
                 thanksCard
             }
             .padding(20)
+            .frame(maxWidth: Theme.readableWidth, alignment: .leading)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
         .appBackground()
         .navigationTitle("Aide")

@@ -11,6 +11,17 @@ struct VariantsHubView: View {
     let onOpenEngineLegalityVariant: (EngineLegalityVariant) -> Void
     let onOpenStolenMove: () -> Void
 
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+
+    /// En *regular*, ``ModeCard`` affiche les libellés longs : la grille a
+    /// besoin de colonnes plus larges qu'en compact, sinon les tuiles
+    /// tronquent leur texte (voir ``ModeGridMetrics/minTileRegular``).
+    private var minTile: CGFloat {
+        horizontalSizeClass == .regular
+            ? ModeGridMetrics.minTileRegular
+            : ModeGridMetrics.minTileIPhone
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
@@ -20,7 +31,7 @@ struct VariantsHubView: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: ModeGridMetrics.minTileIPhone), spacing: ModeGridMetrics.spacing)],
+                    columns: [GridItem(.adaptive(minimum: minTile), spacing: ModeGridMetrics.spacing)],
                     spacing: ModeGridMetrics.spacing
                 ) {
                     ModeCard(

@@ -252,6 +252,12 @@ struct PlayView: View {
 
             // Colonne droite : barre d'éval (sortie de la colonne plateau pour
             // lui rendre sa hauteur), actions, transport et liste des coups.
+            //
+            // Bornée en largeur : sans cap, une fenêtre Mac large éparpillait
+            // ses commandes d'un bord à l'autre — transport à gauche de la
+            // colonne, abandon collé au bord droit de l'écran, « Coups joués »
+            // flottant entre les deux. Le poste de jeu reste un bloc compact,
+            // quelle que soit la fenêtre.
             ScrollView {
                 VStack(spacing: 16) {
                     if viewModel.settings.showEvalBar {
@@ -267,6 +273,7 @@ struct PlayView: View {
                 .frame(maxWidth: .infinity)
                 .padding(20)
             }
+            .frame(maxWidth: 420)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }

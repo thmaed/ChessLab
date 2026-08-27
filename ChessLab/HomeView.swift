@@ -1837,6 +1837,18 @@ enum ModeGridMetrics {
     /// portrait depuis le Lot 2).
     static let minTileIPhone: CGFloat = 132
 
+    /// Largeur mini d'une tuile en classe *regular* (iPad, Mac).
+    ///
+    /// La grille de l'accueil est compacte-seulement, mais celle du hub des
+    /// variantes sert aussi en regular — et ``ModeCard`` y affiche les
+    /// libellés LONGS (`title`/`subtitle` au lieu de `shortTitle`/
+    /// `shortSubtitle`). Avec 132, une fenêtre Mac de 1000 pt ouvrait cinq
+    /// colonnes trop étroites pour ce texte : sept tuiles sur huit
+    /// tronquaient leur sous-titre, « Course des rois » jusqu'à son titre.
+    /// 178 laisse la place aux libellés longs sans jamais descendre sous
+    /// deux colonnes.
+    static let minTileRegular: CGFloat = 178
+
     /// Place utile pour les tuiles sur un écran de largeur `screen`.
     static func usableWidth(screen: CGFloat) -> CGFloat {
         screen - 2 * contentPadding
