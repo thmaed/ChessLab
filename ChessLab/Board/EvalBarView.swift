@@ -7,11 +7,14 @@ import SwiftUI
 struct EvalBarView: View {
     let evalCp: Int?
     let evalMate: Int?
-    /// Épaisseur de la barre. 20 pt par défaut — la valeur historique, celle
-    /// des modes Jouer et Analyser où la barre est un élément à part entière.
-    /// Le lecteur Labs la veut FINE (le prompt) : elle y accompagne
-    /// l'échiquier au lieu de lui disputer la place.
-    var height: CGFloat = 20
+    /// Épaisseur par défaut — la valeur historique, celle des modes Jouer et
+    /// Analyser où la barre est un élément à part entière. Exposée pour que
+    /// les écrans qui réservent sa place dans leur budget de hauteur (les
+    /// écrans de jeu des variantes) lisent la même valeur qu'elle.
+    static let defaultHeight: CGFloat = 20
+    /// Épaisseur de la barre. Le lecteur Labs la veut FINE (le prompt) : elle
+    /// y accompagne l'échiquier au lieu de lui disputer la place.
+    var height: CGFloat = EvalBarView.defaultHeight
     /// Score écrit DANS la barre. À masquer sous ~14 pt : le chiffre n'y tient
     /// plus, et l'écran hôte l'affiche alors à côté (voir ``OpeningReaderView``).
     var showsLabel: Bool = true

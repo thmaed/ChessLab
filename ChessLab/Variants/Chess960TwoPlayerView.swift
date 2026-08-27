@@ -14,7 +14,6 @@ struct Chess960TwoPlayerView: View {
     @State private var showResignConfirmation = false
     @State private var showDrawConfirmation = false
     @State private var copiedMessage: String?
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var topColor: Piece.Color { viewModel.orientation.opposite }
     private var bottomColor: Piece.Color { viewModel.orientation }
@@ -24,7 +23,7 @@ struct Chess960TwoPlayerView: View {
         GeometryReader { geo in
             VStack(spacing: 10) {
                 playerRow(for: topColor, atTop: true)
-                boardBlock(size: geo.size)
+                boardBlock
                 playerRow(for: bottomColor, atTop: false)
                 gameOverPanel
                 controlBar
@@ -32,6 +31,15 @@ struct Chess960TwoPlayerView: View {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
+            // Colonne bornée par la HAUTEUR de la fenêtre. Le plateau est
+            // carré, donc déjà borné par la hauteur : sans cette borne, les
+            // bandeaux joueurs, la barre de contrôle et la bande des coups
+            // s'étiraient seuls sur toute la largeur d'une fenêtre Mac large
+            // — le transport à un bout, l'abandon à l'autre, séparés par un
+            // mètre de vide. Ils restent maintenant à la largeur du plateau.
+            // Sans effet en portrait (hauteur > largeur) : ni l'iPhone ni
+            // l'iPad debout ne changent.
+            .frame(maxWidth: geo.size.height)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(moveCountMarker)
             .background(fenMarker)
@@ -87,28 +95,39 @@ struct Chess960TwoPlayerView: View {
 
     // MARK: Blocs
 
-    private func boardBlock(size: CGSize) -> some View {
-        let side = min(size.width - 24, size.height * (dynamicTypeSize.isAccessibilitySize ? 0.5 : 0.62))
-        return ChessBoardView(
-            board: viewModel.displayedBoard,
-            orientation: viewModel.orientation,
-            theme: appSettings.boardTheme,
-            selectedSquare: viewModel.selectedSquare,
-            legalTargetSquares: viewModel.legalTargetSquares,
-            lastMove: viewModel.displayedLastMove,
-            hintMoves: [],
-            interactionEnabled: viewModel.outcome == nil && !viewModel.isReviewing,
-            showCoordinates: true,
-            // Tous côté haut, aucune restriction — les DEUX camps sont
-            // « l'utilisateur », comme dans TwoPlayerGameView.
-            allPiecesRotated: isTabletopMode && !viewModel.isReviewing
-                && viewModel.displayedBoard.position.sideToMove == topColor,
-            draggableColor: nil,
-            onTapSquare: { viewModel.selectSquare($0) },
-            onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) }
-        )
-        .frame(width: side, height: side)
-        .frame(maxWidth: .infinity)
+    /// Le côté du plateau, c'est ce qui RESTE une fois les rangées fixes
+    /// posées — bandeaux joueurs, barre de contrôle, bande des coups, et le
+    /// panneau de fin de partie quand il apparaît. Ce lecteur de géométrie
+    /// mesure l'espace réellement laissé par la pile, au lieu de parier une
+    /// fraction de la fenêtre (`hauteur × 0,62`) : ce pari ignorait les
+    /// rangées et tronquait le plateau dès que la fenêtre devenait courte —
+    /// sur Mac, dès sa taille minimale. Il rend aussi les grandes tailles de
+    /// texte gratuites : les rangées grandissent, le plateau se réduit
+    /// d'autant, sans facteur dédié.
+    private var boardBlock: some View {
+        GeometryReader { slot in
+            let side = max(0, min(slot.size.width, slot.size.height))
+            ChessBoardView(
+                board: viewModel.displayedBoard,
+                orientation: viewModel.orientation,
+                theme: appSettings.boardTheme,
+                selectedSquare: viewModel.selectedSquare,
+                legalTargetSquares: viewModel.legalTargetSquares,
+                lastMove: viewModel.displayedLastMove,
+                hintMoves: [],
+                interactionEnabled: viewModel.outcome == nil && !viewModel.isReviewing,
+                showCoordinates: true,
+                // Tous côté haut, aucune restriction — les DEUX camps sont
+                // « l'utilisateur », comme dans TwoPlayerGameView.
+                allPiecesRotated: isTabletopMode && !viewModel.isReviewing
+                    && viewModel.displayedBoard.position.sideToMove == topColor,
+                draggableColor: nil,
+                onTapSquare: { viewModel.selectSquare($0) },
+                onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) }
+            )
+            .frame(width: side, height: side)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
     }
 
     private func playerRow(for color: Piece.Color, atTop: Bool) -> some View {
