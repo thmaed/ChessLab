@@ -41,7 +41,12 @@ struct OpeningImportSheet: View {
                 .padding(20)
             }
             .appBackground()
-            .navigationTitle("Ajouter un répertoire")
+            // Titre court : la barre porte déjà « Annuler » et « Importer », et
+            // sur un iPhone SE il ne restait que ~13 caractères entre les deux
+            // — « Ajouter un répertoire » s'y affichait « Ajouter un ré… ».
+            // L'action est portée par le bouton de confirmation, le titre n'a
+            // qu'à nommer l'objet.
+            .navigationTitle("Répertoire")
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(Theme.background, for: .navigationBar)
             .toolbarColorScheme(.dark, for: .navigationBar)

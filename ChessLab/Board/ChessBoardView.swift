@@ -172,7 +172,8 @@ struct ChessBoardView: View {
                     ArrowShape(
                         from: centerPoint(of: hint.from, squareSize: squareSize),
                         to: centerPoint(of: hint.to, squareSize: squareSize),
-                        widthScale: hint.widthScale
+                        widthScale: hint.widthScale,
+                        squareSize: squareSize
                     )
                     .fill(hint.color)
                     .shadow(color: hint.color.opacity(0.6), radius: hint.rank == 1 ? 4 : 0)
@@ -847,13 +848,27 @@ private struct ArrowShape: Shape {
     let from: CGPoint
     let to: CGPoint
     var widthScale: CGFloat = 1
+    /// Côté d'une case — l'unité à laquelle la flèche se mesure.
+    ///
+    /// Les proportions étaient auparavant en points ABSOLUS (20, 15, 9),
+    /// calibrées sur une case d'environ 50 pt : la flèche écrasait donc la
+    /// position sur un iPhone SE (case de 47 pt, plateau de 375) et
+    /// devenait un trait de crayon sur une fenêtre Mac en plein écran
+    /// (case de ~190 pt). Elle garde maintenant la même allure partout.
+    var squareSize: CGFloat = 50
+
+    /// Proportions d'origine, rapportées à la case de 50 pt sur laquelle
+    /// elles avaient été réglées : 20/50, 15/50 et 9/50.
+    private static let headLengthRatio: CGFloat = 0.40
+    private static let headWidthRatio: CGFloat = 0.30
+    private static let shaftWidthRatio: CGFloat = 0.18
 
     func path(in rect: CGRect) -> Path {
         var path = Path()
         let angle = atan2(to.y - from.y, to.x - from.x)
-        let headLength: CGFloat = 20 * widthScale
-        let headWidth: CGFloat = 15 * widthScale
-        let shaftWidth: CGFloat = 9 * widthScale
+        let headLength = Self.headLengthRatio * squareSize * widthScale
+        let headWidth = Self.headWidthRatio * squareSize * widthScale
+        let shaftWidth = Self.shaftWidthRatio * squareSize * widthScale
 
         let shaftEnd = CGPoint(
             x: to.x - cos(angle) * headLength,

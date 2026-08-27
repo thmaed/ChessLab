@@ -38,6 +38,39 @@ final class SmallPhoneTourUITests: XCTestCase {
         capture(app, entry: "Variantes", name: "07-variantes-hub")
         capture(app, entry: "Réglages", name: "08-reglages")
         capture(app, entry: "Aide", name: "09-aide")
+        capture(app, entry: "Analyser", name: "14-analyser")
+        capture(app, entry: "Laboratoire", name: "15-laboratoire")
+        capture(app, entry: "Progression", name: "16-progression")
+        capture(app, entry: "Deux joueurs", name: "17-deux-joueurs")
+
+        // Le lecteur d'ouvertures est l'écran le plus exposé sur 375 pt : il
+        // empile un échiquier, une barre d'éval et deux colonnes de listes.
+        if tapEntry(app, label: "Ouvertures") {
+            settle(1.2)
+            // Le premier cours VISIBLE, en écartant les `opening_*` qui ne
+            // sont pas des cours : `opening_add` (le « + » de la barre) — que
+            // la première version de cette tournée ouvrait par erreur — et
+            // `opening_openIndex`. Viser un cours nommé ne marche pas : la
+            // liste est paresseuse, et un cours situé plus bas n'existe pas
+            // encore dans l'arbre d'accessibilité.
+            let course = app.buttons.matching(
+                NSPredicate(
+                    format: "identifier BEGINSWITH 'opening_' AND identifier != 'opening_add' AND identifier != 'opening_openIndex'"
+                )
+            ).firstMatch
+            if course.waitForExistence(timeout: 8), course.isHittable {
+                course.tap()
+                settle(2.0)
+                save(app, "18-ouvertures-lecteur")
+                app.swipeUp()
+                settle(0.8)
+                save(app, "19-ouvertures-lecteur-defile")
+                goBack(app)
+                settle(0.8)
+            }
+            goBack(app)
+            settle(0.8)
+        }
 
         // Les réglages d'une variante : même écran partagé par les six
         // variantes Fairy-Stockfish, avec en plus le pavé de règles.

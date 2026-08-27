@@ -9,13 +9,15 @@ struct Chess960AnalysisView: View {
 
     @State private var appSettings = AppSettings.shared
     @State private var copiedMessage: String?
-    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     var body: some View {
         GeometryReader { geo in
             VStack(spacing: 10) {
                 boardBlock(size: geo.size)
                 navigationBar
+                    .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
+                        navigationBarHeight = height
+                    }
                 movesList
             }
             .padding(.horizontal, 12)
@@ -43,8 +45,32 @@ struct Chess960AnalysisView: View {
         }
     }
 
+    /// Hauteur réelle de la barre de navigation, qui grandit avec la taille
+    /// du texte. Mesurée plutôt que devinée — voir ``boardBlock(size:)``.
+    @State private var navigationBarHeight: CGFloat = 44
+
+    /// Ce qu'on laisse à la liste des coups quoi qu'il arrive. Elle défile,
+    /// mais poussée hors de l'écran elle ne défilerait plus : elle aurait
+    /// disparu.
+    private static let minimumMovesListHeight: CGFloat = 120
+
+    /// Le côté du plateau vient d'un budget de hauteur MESURÉ, et non d'une
+    /// fraction devinée de la fenêtre.
+    ///
+    /// C'était `hauteur × 0,56`, avec un `0,42` de rattrapage aux tailles
+    /// d'accessibilité — deux nombres qui ne disaient pas d'où ils venaient et
+    /// ne connaissaient ni la hauteur réelle de la barre de navigation, ni ce
+    /// qu'il fallait laisser à la liste des coups. On soustrait maintenant ce
+    /// qu'on doit à ces deux-là, et le facteur d'accessibilité devient inutile :
+    /// un texte plus grand fait une barre plus haute, donc un plateau plus
+    /// petit, tout seul. Même raisonnement que sur les écrans de JEU des
+    /// variantes, adapté au fait que la liste des coups, ici, est défilante.
     private func boardBlock(size: CGSize) -> some View {
-        let side = min(size.width - 24, size.height * (dynamicTypeSize.isAccessibilitySize ? 0.42 : 0.56))
+        let reserved = navigationBarHeight
+            + Self.minimumMovesListHeight
+            + EvalBarView.defaultHeight
+            + 28   // les deux espacements de la pile (10 + 10) + celui du bloc (8)
+        let side = max(0, min(size.width - 24, size.height - reserved))
         return VStack(spacing: 8) {
             EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
                 .frame(width: side)
