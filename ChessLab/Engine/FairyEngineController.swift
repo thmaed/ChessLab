@@ -1,4 +1,5 @@
 import CFairyStockfishKit
+import ChessKit
 // `EngineCommand`/`EngineResponse` sont définis dans `CStockfishKit`
 // (`UCIProtocol.swift`) — un parseur UCI pur, sans rien de spécifique à
 // Stockfish (vérifié : Fairy-Stockfish parle EXACTEMENT le même dialecte
@@ -123,6 +124,52 @@ actor FairyEngineController {
         let fen: String
         let inCheck: Bool
         let legalMoves: [String]
+        /// Pièces EN MAIN, par camp — la réserve du Crazyhouse, lue dans la
+        /// section entre crochets de la FEN. Vide pour toutes les autres
+        /// variantes, dont la FEN n'en comporte pas.
+        let pocket: [Piece.Color: [Piece.Kind: Int]]
+
+        init(
+            fen: String, inCheck: Bool, legalMoves: [String],
+            pocket: [Piece.Color: [Piece.Kind: Int]] = [:]
+        ) {
+            self.fen = fen
+            self.inCheck = inCheck
+            self.legalMoves = legalMoves
+            self.pocket = pocket
+        }
+    }
+
+    /// Lit la réserve d'une FEN Crazyhouse.
+    ///
+    /// Le moteur écrit les pièces en main entre crochets, juste après le
+    /// plateau : `rnb1kbnr/…/RNBQKBNR[Pp] w KQkq - 0 3` — majuscules pour les
+    /// Blancs, minuscules pour les Noirs, `[]` quand les deux mains sont
+    /// vides. ChessKit ignore cette section (vérifié : il lit le plateau
+    /// correctement et n'en dit rien), c'est donc à nous de la relever.
+    static func parsePocket(fromFEN fen: String) -> [Piece.Color: [Piece.Kind: Int]] {
+        guard let open = fen.firstIndex(of: "["), let close = fen.firstIndex(of: "]"),
+              open < close
+        else { return [:] }
+        var pocket: [Piece.Color: [Piece.Kind: Int]] = [:]
+        for character in fen[fen.index(after: open)..<close] {
+            let color: Piece.Color = character.isUppercase ? .white : .black
+            guard let kind = pieceKind(fromFENCharacter: character) else { continue }
+            pocket[color, default: [:]][kind, default: 0] += 1
+        }
+        return pocket
+    }
+
+    private static func pieceKind(fromFENCharacter character: Character) -> Piece.Kind? {
+        switch Character(character.lowercased()) {
+        case "p": .pawn
+        case "n": .knight
+        case "b": .bishop
+        case "r": .rook
+        case "q": .queen
+        case "k": .king
+        default: nil
+        }
     }
 
     /// Positionne l'engin sur `startFEN` + `uciLog`, puis interroge `d`
@@ -151,17 +198,35 @@ actor FairyEngineController {
         let legalMoves = perftLines.compactMap { line -> String? in
             guard let colonIndex = line.firstIndex(of: ":") else { return nil }
             let move = String(line[line.startIndex..<colonIndex])
-            // Une ligne de coup fait 4-5 caractères ("e2e4", "e7e8q") ; la
-            // ligne de résumé « Nodes searched: N » en a bien plus — sans
-            // cette borne haute, elle se glissait dans la liste comme un
-            // faux coup (trouvé en explorant Course des rois : un roi déjà
-            // arrivé donne ZÉRO coup réel, et "Nodes searched" restait seul).
-            guard (4...5).contains(move.count), move.first!.isLowercase, move.first!.isLetter
-            else { return nil }
-            return move
+            return isUCIMove(move) ? move : nil
         }
 
-        return PositionQuery(fen: fen, inCheck: inCheck, legalMoves: legalMoves)
+        return PositionQuery(
+            fen: fen, inCheck: inCheck, legalMoves: legalMoves,
+            pocket: Self.parsePocket(fromFEN: fen)
+        )
+    }
+
+    /// Une ligne de `go perft 1` porte-t-elle un coup, ou le résumé final ?
+    ///
+    /// Deux formes acceptées. Le coup ORDINAIRE, 4 ou 5 caractères tout en
+    /// minuscules (`e2e4`, `e7e8q`) — la borne haute écarte la ligne
+    /// « Nodes searched: N », qui se glissait sinon dans la liste comme un
+    /// faux coup (trouvé en explorant Course des rois : un roi déjà arrivé
+    /// donne ZÉRO coup réel, et ce résumé restait seul).
+    ///
+    /// Et la POSE du Crazyhouse, `P@e4` : une majuscule, une arobase, une
+    /// case. Elle était rejetée en silence par le seul test « première lettre
+    /// minuscule » — le moteur en émettait 33 dans la position sondée, aucune
+    /// n'arrivait jusqu'au view model, et rien ne le signalait.
+    private func isUCIMove(_ move: String) -> Bool {
+        let characters = Array(move)
+        if characters.count == 4, characters[1] == "@" {
+            return characters[0].isUppercase && characters[0].isLetter
+                && characters[2].isLowercase && characters[3].isNumber
+        }
+        guard (4...5).contains(characters.count) else { return false }
+        return characters[0].isLowercase && characters[0].isLetter
     }
 
     // MARK: Démarrage
