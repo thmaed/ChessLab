@@ -194,4 +194,49 @@ struct FairyVariantPlayViewModelTests {
             vm.handleViewDisappear()
         }
     }
+
+    /// Défaut signalé par l'utilisateur : « dans le mode Variantes je
+    /// rencontre régulièrement des messages où il est indiqué que le moteur
+    /// n'a pas pu être démarré, souvent après la fin de partie et l'analyse
+    /// ou si je reviens en arrière et recommence ».
+    ///
+    /// Le view model SURVIT à l'aller-retour (``SessionStore`` le conserve
+    /// exprès), donc son ``FairyEngineController`` aussi — et avec lui
+    /// l'instance ``FairyStockfishEngine`` dont `stop()` a définitivement clos
+    /// le flux de lignes. Au retour, le lecteur itérait un flux mort : aucun
+    /// `uciok` ne revenait, le démarrage expirait, et l'écran annonçait un
+    /// moteur en panne alors que le process, lui, tournait très bien.
+    @Test("Le moteur redémarre après un aller-retour sur l'écran")
+    func engineRestartsAfterLeavingAndComingBack() async throws {
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let vm = game(.kingOfTheHill, color: .black)
+            vm.start()
+
+            let firstDeadline = Date().addingTimeInterval(30)
+            while Date() < firstDeadline, vm.totalPlies < 1 {
+                try await Task.sleep(for: .milliseconds(200))
+            }
+            try #require(vm.totalPlies >= 1, "l'ordinateur n'a pas joué au PREMIER démarrage")
+            #expect(!vm.isEngineUnavailable)
+
+            // On quitte l'écran, puis on y revient : SwiftUI rappelle
+            // `start()` sur le MÊME view model.
+            vm.handleViewDisappear()
+            try await Task.sleep(for: .seconds(1))
+
+            vm.start()
+            let pliesBefore = vm.totalPlies
+            vm.attemptUserMove(from: Square("e7"), to: Square("e5"))
+            try #require(vm.totalPlies == pliesBefore + 1, "le coup utilisateur doit tenir")
+
+            let secondDeadline = Date().addingTimeInterval(30)
+            while Date() < secondDeadline, vm.totalPlies < pliesBefore + 2 {
+                try await Task.sleep(for: .milliseconds(200))
+            }
+            #expect(!vm.isEngineUnavailable, "le moteur est annoncé en panne APRÈS un aller-retour")
+            #expect(vm.totalPlies >= pliesBefore + 2, "l'ordinateur n'a pas rejoué après l'aller-retour")
+
+            vm.handleViewDisappear()
+        }
+    }
 }

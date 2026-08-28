@@ -173,6 +173,34 @@ actor FairyEngineController {
     func start(variant: String, coreCount: Int? = nil, multipv: Int = 1) async -> Bool {
         uciOk = false
         if !engine.isRunning {
+            // NOUVELLE instance, systématiquement — c'est le correctif du
+            // défaut « le moteur n'a pas pu être démarré », signalé après une
+            // fin de partie suivie de l'analyse, ou après un simple
+            // aller-retour sur l'écran.
+            //
+            // ``FairyStockfishEngine/stop()`` termine son `AsyncStream` de
+            // lignes, et un flux terminé l'est POUR TOUJOURS. Le view model,
+            // lui, survit à la navigation (``SessionStore`` le conserve
+            // exprès), donc son contrôleur et son instance de moteur aussi :
+            // au retour, ``startReader()`` itérait un flux mort, plus aucun
+            // `uciok` ne remontait, et le démarrage expirait au bout de cinq
+            // secondes. L'écran annonçait alors une panne moteur… alors que le
+            // process, lui, avait parfaitement démarré — et restait en vie,
+            // occupant `isProcessBusy` pour les écrans suivants.
+            //
+            // ``EngineController`` connaissait déjà ce piège et le contournait
+            // dans ``EngineController/restart(coreCount:multipv:setupCommands:)``
+            // (« Nouvelle instance : le flux de lignes précédent est clos »),
+            // mais ce contrôleur-ci, écrit à part, n'avait pas d'équivalent.
+            // C'est pourquoi le moteur standard ne montrait jamais le défaut.
+            //
+            // `stop()` d'abord : si l'instance sortante avait pris le process
+            // et l'a perdu autrement que par un arrêt propre (moteur mort de
+            // son côté), la lâcher sans plus rien laisserait `gRunning` à vrai
+            // côté C++, et le process resterait occupé pour tout le monde.
+            // Sur une instance jamais démarrée, c'est un no-op.
+            engine.stop()
+            engine = FairyStockfishEngine()
             guard await acquireEngineProcess() else {
                 didFailToStart = true
                 return false
