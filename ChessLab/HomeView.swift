@@ -455,6 +455,12 @@ struct HomeView: View {
             .frame(maxWidth: .infinity, alignment: .center)
         }
         .appBackground()
+        // Le damier fantôme ne vit QUE sur ce tableau de bord : c'est le seul
+        // écran dont le contenu, borné à 680 pt de large, laisse une grande
+        // surface nue sur un iPad ou une fenêtre Mac. Ailleurs — un écran de
+        // jeu, une liste — il n'y a pas de vide à meubler, et il ne serait
+        // que du bruit.
+        .background(BoardGhost())
         .scrollContentBackground(.hidden)
     }
 

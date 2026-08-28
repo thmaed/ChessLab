@@ -133,9 +133,97 @@ struct AppBackground: View {
                     colors: [Theme.info.opacity(0.07), .clear],
                     center: UnitPoint(x: 1.05, y: 1.02), startRadius: 4, endRadius: diagonal * 0.56
                 )
+                GrainOverlay()
             }
         }
         .ignoresSafeArea()
+    }
+}
+
+/// Voile de grain, à 3,5 % — presque invisible, et c'est le but.
+///
+/// Un grand dégradé sombre affiche des BANDES sur un écran large : les pas de
+/// quantification du noir deviennent visibles dès que le dégradé s'étale sur
+/// plus d'un millier de points, ce qu'une fenêtre Mac ou un iPad en paysage
+/// font sans effort. Un bruit très faible casse ces paliers — c'est le remède
+/// classique, et il ne coûte qu'une tuile de 128×128 générée une seule fois.
+///
+/// `.overlay` plutôt qu'une opacité simple : le grain module la luminosité
+/// existante au lieu de déposer un gris uniforme, donc il disparaît là où le
+/// fond est déjà clair (les halos) et travaille là où il est plat.
+private struct GrainOverlay: View {
+    /// Tuile générée UNE fois pour toute la vie de l'app.
+    private static let tile: Image = {
+        let side = 128
+        var pixels = [UInt8](repeating: 0, count: side * side * 4)
+        var generator = SystemRandomNumberGenerator()
+        for index in stride(from: 0, to: pixels.count, by: 4) {
+            let value = UInt8.random(in: 96...160, using: &generator)
+            pixels[index] = value
+            pixels[index + 1] = value
+            pixels[index + 2] = value
+            pixels[index + 3] = 255
+        }
+        let context = CGContext(
+            data: &pixels, width: side, height: side, bitsPerComponent: 8,
+            bytesPerRow: side * 4, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue
+        )
+        guard let cgImage = context?.makeImage() else { return Image(systemName: "circle") }
+        return Image(decorative: cgImage, scale: 1)
+    }()
+
+    var body: some View {
+        Self.tile
+            .resizable(resizingMode: .tile)
+            .blendMode(.overlay)
+            .opacity(0.035)
+            .allowsHitTesting(false)
+    }
+}
+
+/// Damier fantôme — la présence graphique discrète des grands écrans.
+///
+/// Même idiome que l'icône décorative de ``ModeCard``, qui déborde du coin de
+/// chaque tuile : un motif tiré du sujet, très pâle, coupé par le bord. Ici
+/// c'est le damier de l'icône de l'app, redessiné en VECTORIEL plutôt que
+/// repris en photo — l'icône est claire, contrastée et photoréaliste, trois
+/// défauts derrière une interface sombre et plate.
+///
+/// Réservé aux écrans qui ont du vide à meubler (le tableau de bord iPad et
+/// Mac) : sur un écran de jeu, déjà chargé, ce serait du bruit.
+struct BoardGhost: View {
+    /// Côté du damier, en fraction de la plus petite dimension offerte.
+    var scale: CGFloat = 1.15
+
+    var body: some View {
+        GeometryReader { geo in
+            let side = min(geo.size.width, geo.size.height) * scale
+            let square = side / 8
+
+            Canvas { context, _ in
+                for rank in 0..<8 {
+                    for file in 0..<8 where (rank + file).isMultiple(of: 2) {
+                        context.fill(
+                            Path(CGRect(
+                                x: CGFloat(file) * square, y: CGFloat(rank) * square,
+                                width: square, height: square
+                            )),
+                            with: .color(.white)
+                        )
+                    }
+                }
+            }
+            .frame(width: side, height: side)
+            .rotationEffect(.degrees(-14))
+            // Débordant du coin bas-droit : le motif est coupé par le bord,
+            // ce qui le lit comme une texture et non comme une image posée.
+            .offset(x: geo.size.width - side * 0.62, y: geo.size.height - side * 0.55)
+            .opacity(0.022)
+            .blur(radius: 0.5)
+        }
+        .allowsHitTesting(false)
+        .clipped()
     }
 }
 

@@ -1,13 +1,16 @@
 # Checklist de soumission App Store — ChessLab
 
-État au 21/07/2026, révisé le 19/08/2026 (passage à la 1.5.0 build 7), **re-révisé le 26/08/2026** pour la 1.6.0 : le module Variantes est passé de 4 à 8 façons de jouer en deux nuits (25 et 25→26/08), avec une revue complète du code de toute l'app et plusieurs correctifs de fiabilité moteur. Voir `RELEASE_NOTES-1.6.0.md` et `METADATA.md` (réécrits en conséquence le 26/08) pour le détail. Coché = fait par ce lot de préparation ou déjà en place. Non coché = reste une action utilisateur (compte, App Store Connect, ou décision qui n'appartient qu'à toi).
+État au 21/07/2026, révisé le 19/08/2026 (1.5.0 build 7), le 26/08/2026 (1.6.0), et **re-révisé le 28/08/2026 pour la 1.7.0**.
 
-## ⚠️ Pas encore prête à soumettre (mise à jour du 26/08/2026, soir)
+La **1.6 a été soumise le 28/08/2026**. La 1.7.0 qui se prépare est une version de finition : correctif d'un défaut moteur récurrent des Variantes, et une passe de mise en page sur les grandes fenêtres en classe *regular* (iPad plein écran, Split View, Stage Manager) et les petits iPhone. Voir `RELEASE_NOTES-1.7.0.md` et `METADATA.md` pour le détail.
 
-- [ ] **Captures d'écran FR manquantes** : seul l'anglais existe pour iPhone et iPad (`AppStoreSubmission/screenshots/<iphone-6.7|ipad-13>/en/`). Le test `testCaptureAppStoreScreenshotsFrench` existe et bénéficie désormais du même correctif de navigation que la version anglaise (voir ci-dessous), mais n'a pas encore été relancé sur aucun des deux idiomes.
-- [ ] **Numéro de build à fixer délibérément** — `CURRENT_PROJECT_VERSION` a dérivé de `8.1` à `8.2` tout seul au fil des builds locaux de ce soir, sans action volontaire. Ne pas archiver avec la valeur trouvée par hasard : la choisir consciemment juste avant `Product ▸ Archive` (voir « Version et build » dans `METADATA.md`).
+Coché = fait ou déjà en place. Non coché = reste une action utilisateur (compte, App Store Connect, ou décision qui n'appartient qu'à toi).
 
-Tout le reste (captures EN, les 4 vidéos) est fait et vérifié — voir « Fait dans ce lot » ci-dessous.
+## ⚠️ Avant de soumettre la 1.7
+
+- [ ] **Numéro de build à choisir délibérément** — il doit être strictement supérieur à celui effectivement soumis pour la 1.6, que ce dépôt ne connaît pas (il porte `8.4`, mais rien ne garantit que ce soit la valeur partie). Vérifier dans App Store Connect, puis le fixer juste avant `Product ▸ Archive`.
+- [ ] **Captures d'écran et vidéos à rafraîchir si besoin** — celles en place datent de la 1.6 et restent exactes sur le fond ; la 1.7 ne change aucun écran au point de les périmer, mais l'accueil iPad, le hub des Variantes et les écrans de variantes ont changé d'allure. À refaire si tu veux que la fiche colle au binaire. Les tests de capture sont prêts (`AppStoreScreenshotUITests`, `AppStoreVideoUITests`).
+- [ ] **Captures FR** — toujours absentes (anglais seulement). Décision prise de s'en passer.
 
 ## Fait dans ce lot
 
