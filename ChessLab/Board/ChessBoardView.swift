@@ -52,6 +52,14 @@ struct ChessBoardView: View {
     /// ailleurs : les flèches restent alors décoratives (pas de capture de tap,
     /// le plateau reste entièrement jouable au tap-tap).
     var onTapArrow: ((HintMove) -> Void)? = nil
+    /// Case occupée par le canard du Duck Chess — `nil` partout ailleurs.
+    ///
+    /// Dessiné ICI plutôt qu'en surcouche depuis l'écran de jeu : lui seul
+    /// connaît la taille d'une case et l'orientation du plateau, et le canard
+    /// doit suivre les deux. Il se pose AU-DESSUS des pièces, puisqu'il occupe
+    /// une case que rien d'autre ne peut occuper — jamais de superposition à
+    /// arbitrer.
+    var duckSquare: Square? = nil
 
     /// Un essai raté à signaler. Le `id` (nonce fourni par le VM) garantit
     /// que deux essais identiques (mêmes cases) redéclenchent l'animation.
@@ -137,6 +145,7 @@ struct ChessBoardView: View {
                 }
 
                 piecesLayer(squareSize: squareSize)
+                duckLayer(squareSize: squareSize)
                 // Au-DESSUS des pièces : sur une case occupée (capture), un
                 // marqueur placé dessous serait masqué par la pièce adverse.
                 dropTargetLayer(squareSize: squareSize)
@@ -753,6 +762,25 @@ struct ChessBoardView: View {
     // résolvait sur la case de bord la plus proche et pouvait jouer un coup
     // jamais visé. Son remplaçant, `BoardGeometry.geometricSquare(at:)`, rend
     // `nil` au-delà d'une marge de grâce d'une demi-case.
+
+    /// Le canard 🦆 du Duck Chess, posé sur sa case.
+    ///
+    /// Un emoji plutôt qu'un glyphe vectoriel : c'est LE signe distinctif de
+    /// la variante, il doit se reconnaître d'un coup d'œil, et aucun symbole
+    /// SF ne dit « canard ». Il ne tourne pas avec le plateau (contrairement
+    /// aux pièces en mode table) — un canard à l'envers ne veut rien dire.
+    @ViewBuilder
+    private func duckLayer(squareSize: CGFloat) -> some View {
+        if let duckSquare {
+            Text(verbatim: "🦆")
+                .font(.system(size: squareSize * 0.62))
+                .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
+                .frame(width: squareSize, height: squareSize)
+                .position(centerPoint(of: duckSquare, squareSize: squareSize))
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
+    }
 
     private func square(row: Int, col: Int) -> Square {
         geometry(squareSize: 1).square(row: row, col: col)
