@@ -160,6 +160,23 @@ actor FairyEngineController {
         return pocket
     }
 
+    /// Lettre FEN d'un type de pièce : « P », « N », « B », « R », « Q », « K ».
+    ///
+    /// À ne PAS confondre avec `Piece.Kind.rawValue`, qui est la lettre SAN —
+    /// celle du pion y est VIDE, puisqu'en notation algébrique un pion ne se
+    /// nomme pas. S'en servir pour bâtir une pose donnait le préfixe « @ » au
+    /// lieu de « P@ », et aucune case de pose n'était trouvée.
+    static func fenLetter(for kind: Piece.Kind) -> String {
+        switch kind {
+        case .pawn: "P"
+        case .knight: "N"
+        case .bishop: "B"
+        case .rook: "R"
+        case .queen: "Q"
+        case .king: "K"
+        }
+    }
+
     private static func pieceKind(fromFENCharacter character: Character) -> Piece.Kind? {
         switch Character(character.lowercased()) {
         case "p": .pawn

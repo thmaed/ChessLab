@@ -19,6 +19,14 @@ enum EngineLegalitySAN {
         uci: String, beforeFEN: String, legalMovesAtPosition: [String],
         isCheck: Bool, isMate: Bool
     ) -> String {
+        // Une POSE (Crazyhouse) s'écrit déjà en SAN : `P@e4` est la notation
+        // standard, il ne manque que le suffixe d'échec. Traitée en premier,
+        // car tout ce qui suit suppose une case de DÉPART, qu'une pose n'a pas.
+        if let atIndex = uci.firstIndex(of: "@") {
+            let kind = String(uci[uci.startIndex..<atIndex]).uppercased()
+            let square = String(uci[uci.index(after: atIndex)...])
+            return kind + "@" + square + suffix(isCheck: isCheck, isMate: isMate)
+        }
         guard let position = Position(fen: beforeFEN), uci.count >= 4 else { return uci }
         let from = Square(String(uci.prefix(2)))
         let to = Square(String(uci.dropFirst(2).prefix(2)))

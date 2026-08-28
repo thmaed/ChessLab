@@ -15,20 +15,28 @@ final class FairyVariantUITests: XCTestCase {
         app.buttons["mode_variants"].tap()
     }
 
-    /// Les sept tuiles (Chess960 + les trois variantes du lot A + les trois
+    /// Toutes les tuiles du hub (Chess960 + les trois variantes du lot A + les trois
     /// du lot B, où Fairy-Stockfish arbitre la légalité — voir
     /// ``EngineLegalityVariant``) doivent toutes exister — la vérification
     /// la plus simple qu'aucune ne s'est perdue en route depuis la grille.
     @MainActor
-    func testHubShowsAllSevenVariantTiles() throws {
+    func testHubShowsEveryVariantTile() throws {
         let app = XCUIApplication()
         openVariantsHub(app)
 
         for identifier in [
             "variant_chess960", "variant_kingofthehill", "variant_3check", "variant_horde",
-            "variant_racingkings", "variant_atomic", "variant_antichess",
+            "variant_racingkings", "variant_atomic", "variant_antichess", "variant_crazyhouse",
         ] {
-            XCTAssertTrue(app.buttons[identifier].waitForExistence(timeout: 5), "\(identifier) doit être présente sur la grille")
+            let tile = app.buttons[identifier]
+            XCTAssertTrue(tile.waitForExistence(timeout: 5), "\(identifier) doit être présente sur la grille")
+            // La grille dépasse le pli dès neuf tuiles : on défile jusqu'à
+            // rendre la tuile atteignable, sinon « existe » ne prouve rien
+            // d'utilisable.
+            for _ in 0..<4 where !tile.isHittable {
+                app.swipeUp()
+                RunLoop.current.run(until: Date().addingTimeInterval(0.4))
+            }
         }
     }
 

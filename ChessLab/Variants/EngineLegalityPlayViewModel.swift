@@ -59,6 +59,33 @@ final class EngineLegalityPlayViewModel {
     struct PendingPromotion: Equatable { let from: Square; let to: Square }
     private(set) var pendingPromotion: PendingPromotion?
 
+    // MARK: Réserve (Crazyhouse)
+
+    /// Pièces en main, par camp — vide pour les variantes sans réserve.
+    private(set) var pocket: [Piece.Color: [Piece.Kind: Int]] = [:]
+    /// Pièce de la réserve choisie pour être POSÉE, le cas échéant. Exclusive
+    /// de ``selectedSquare`` : on déplace une pièce OU on en pose une.
+    private(set) var selectedPocketKind: Piece.Kind?
+
+    /// La réserve du joueur, triée de la plus forte à la plus faible — ordre
+    /// stable, pour que les pièces ne sautent pas d'une case à l'autre quand
+    /// le compte change.
+    var userPocket: [(kind: Piece.Kind, count: Int)] {
+        pocketEntries(for: userColor)
+    }
+
+    var enginePocket: [(kind: Piece.Kind, count: Int)] {
+        pocketEntries(for: engineColor)
+    }
+
+    private func pocketEntries(for color: Piece.Color) -> [(kind: Piece.Kind, count: Int)] {
+        let order: [Piece.Kind] = [.queen, .rook, .bishop, .knight, .pawn]
+        return order.compactMap { kind in
+            guard let count = pocket[color]?[kind], count > 0 else { return nil }
+            return (kind, count)
+        }
+    }
+
     // MARK: Moteur
 
     private let engine = FairyEngineController()
@@ -149,6 +176,15 @@ final class EngineLegalityPlayViewModel {
 
     func selectSquare(_ square: Square) {
         guard canUserAct else { return }
+        // Une pièce de réserve est en main : le prochain tap POSE.
+        if selectedPocketKind != nil {
+            if legalTargetSquares.contains(square) {
+                attemptDrop(on: square)
+            } else {
+                clearSelection()
+            }
+            return
+        }
         if let selected = selectedSquare, legalTargetSquares.contains(square) {
             attemptUserMove(from: selected, to: square)
             return
@@ -172,6 +208,43 @@ final class EngineLegalityPlayViewModel {
             }
         selectedSquare = square
         legalTargetSquares = Array(Set(targets))
+    }
+
+    /// Choisit (ou déselectionne) une pièce de la réserve à poser.
+    ///
+    /// Les cases où la pose est légale viennent du MOTEUR, jamais d'un calcul
+    /// maison : elles sont déjà dans `legalMovesForCurrentPosition` sous la
+    /// forme `P@e4` — il suffit de les filtrer. C'est la même discipline que
+    /// pour les déplacements, et c'est elle qui donne gratuitement les règles
+    /// fines (un pion ne se pose ni en 1re ni en 8e rangée, une pose peut
+    /// parer un échec, etc.).
+    func selectPocketPiece(_ kind: Piece.Kind) {
+        guard canUserAct, (pocket[userColor]?[kind] ?? 0) > 0 else { return }
+        if selectedPocketKind == kind {
+            clearSelection()
+            return
+        }
+        selectedSquare = nil
+        selectedPocketKind = kind
+        let prefix = FairyEngineController.fenLetter(for: kind) + "@"
+        legalTargetSquares = Array(Set(
+            legalMovesForCurrentPosition
+                .filter { $0.hasPrefix(prefix) }
+                .compactMap { Square(String($0.dropFirst(2))) }
+        ))
+    }
+
+    /// Pose la pièce choisie sur `square`, si le moteur l'autorise.
+    func attemptDrop(on square: Square) {
+        guard canUserAct, let kind = selectedPocketKind else { return }
+        let uci = FairyEngineController.fenLetter(for: kind) + "@" + square.notation
+        guard legalMovesForCurrentPosition.contains(uci) else {
+            Haptics.illegal()
+            clearSelection()
+            return
+        }
+        clearSelection()
+        enqueueEngineWork { [weak self] in await self?.performMove(uci: uci) }
     }
 
     func attemptUserMove(from start: Square, to end: Square) {
@@ -206,6 +279,7 @@ final class EngineLegalityPlayViewModel {
 
     private func clearSelection() {
         selectedSquare = nil
+        selectedPocketKind = nil
         legalTargetSquares = []
     }
 
@@ -279,7 +353,11 @@ final class EngineLegalityPlayViewModel {
         uciLog = candidateLog
         sanLog.append(san)
         fenLog.append(query.fen)
-        if let beforePosition = Position(fen: beforeFEN) {
+        // Une POSE n'a pas de case de départ : rien à consigner dans
+        // `moveLog`, dont chaque entrée est un `Move` (pièce, départ,
+        // arrivée). L'analyse s'en accommode — elle lit `moveLog` pour juger
+        // les sacrifices, et une pièce posée n'en est pas un.
+        if !uci.contains("@"), let beforePosition = Position(fen: beforeFEN) {
             let from = Square(String(uci.prefix(2)))
             let to = Square(String(uci.dropFirst(2).prefix(2)))
             if let piece = beforePosition.piece(at: from) {
@@ -307,6 +385,7 @@ final class EngineLegalityPlayViewModel {
         currentFEN = query.fen
         board = Board(position: Position(fen: query.fen)!)
         legalMovesForCurrentPosition = query.legalMoves
+        pocket = query.pocket
         playSound(for: san)
         hintMoves = []
 

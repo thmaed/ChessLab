@@ -69,6 +69,25 @@ struct EngineLegalityVariant: Identifiable {
         startFEN: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     )
 
+    /// Crazyhouse — la seule variante du hub où l'on POSE des pièces.
+    ///
+    /// Fairy-Stockfish la joue nativement, avec un réseau NNUE dédié : le
+    /// moteur y est fort, contrairement aux variantes qu'il arbitre sans
+    /// réseau. Côté app, elle est la première à avoir une RÉSERVE — lue dans
+    /// la section entre crochets de la FEN, voir
+    /// ``FairyEngineController/parsePocket(fromFEN:)``.
+    static let crazyhouse = EngineLegalityVariant(
+        id: "crazyhouse",
+        displayNameKey: "Crazyhouse",
+        shortNameKey: "Crazyhouse",
+        taglineKey: "Les pièces capturées changent de camp et se reposent",
+        shortTaglineKey: "Les prises reviennent",
+        rulesKey: "Toute pièce que vous capturez change de camp et rejoint votre RÉSERVE. À votre tour, au lieu de déplacer une pièce, vous pouvez en poser une de votre réserve sur n'importe quelle case vide — y compris pour donner échec ou mat. Un pion ne peut se poser ni sur la 1re ni sur la 8e rangée. Un pion promu qui se fait capturer redevient un simple pion dans la réserve adverse. Pour tout le reste, les règles sont celles du jeu classique.",
+        icon: "tray.full.fill",
+        tint: Theme.accent,
+        startFEN: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    )
+
     static let antichess = EngineLegalityVariant(
         id: "antichess",
         displayNameKey: "Antéchecs",
@@ -81,7 +100,7 @@ struct EngineLegalityVariant: Identifiable {
         startFEN: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     )
 
-    static let all: [EngineLegalityVariant] = [.racingKings, .atomic, .antichess]
+    static let all: [EngineLegalityVariant] = [.racingKings, .atomic, .antichess, .crazyhouse]
 
     // MARK: Fin de partie
 
@@ -130,9 +149,15 @@ struct EngineLegalityVariant: Identifiable {
             // est inversé (perdre ses pièces, ou être immobilisé).
             return GameOutcome(winner: nextMover, reason: .antichessStuck)
 
-        case EngineLegalityVariant.atomic.id:
-            // Aucun roi n'a explosé (vérifié plus haut) mais plus de coup
-            // légal : mat ou pat au sens classique.
+        case EngineLegalityVariant.atomic.id, EngineLegalityVariant.crazyhouse.id:
+            // Atomique : aucun roi n'a explosé (vérifié plus haut) mais plus
+            // de coup légal. Crazyhouse : rien de spécial, le but reste le
+            // mat. Dans les deux cas, mat ou pat au sens classique.
+            //
+            // Attention pour Crazyhouse : « plus de coup légal » compte AUSSI
+            // les poses, que le moteur énumère — un camp qui tient une pièce
+            // en réserve n'est donc mat que si aucune pose ne pare l'échec,
+            // ce que Fairy-Stockfish sait, et nous pas.
             return inCheck
                 ? GameOutcome(winner: nextMover.opposite, reason: .checkmate)
                 : GameOutcome(winner: nil, reason: .draw(.stalemate))

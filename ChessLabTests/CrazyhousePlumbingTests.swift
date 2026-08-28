@@ -94,3 +94,78 @@ struct CrazyhousePlumbingTests {
         }
     }
 }
+
+/// Le cycle complet : capturer, tenir la pièce, la poser.
+@Suite(.serialized)
+@MainActor
+struct CrazyhouseGameTests {
+
+    private func game() -> EngineLegalityPlayViewModel {
+        var settings = FairyVariantSettings()
+        settings.colorChoice = PlayerColorChoice.white.rawValue
+        settings.showEvalBar = false
+        return EngineLegalityPlayViewModel(variant: .crazyhouse, settings: settings)
+    }
+
+    @Test("Une capture remplit la réserve, et la pièce se repose")
+    func captureFillsPocketAndPieceIsDropped() async throws {
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let vm = game()
+            vm.start()
+            try await Task.sleep(for: .seconds(1))
+            try #require(!vm.isEngineUnavailable, "le moteur doit démarrer")
+
+            // 1.e4 d5 2.exd5 : les Blancs capturent un pion.
+            for uci in ["e2e4", "d7d5", "e4d5"] {
+                await vm.forceMove(uci: uci)
+            }
+            #expect(vm.userPocket.contains { $0.kind == .pawn && $0.count == 1 },
+                    "le pion capturé doit être dans la réserve blanche")
+            #expect(vm.sanLog.last == "exd5")
+
+            // Les Noirs reprennent : chacun tient un pion.
+            await vm.forceMove(uci: "d8d5")
+            #expect(vm.enginePocket.contains { $0.kind == .pawn },
+                    "les Noirs tiennent le pion repris")
+
+            // Les Blancs posent leur pion. On choisit une case que le moteur
+            // autorise, plutôt que d'en présumer une.
+            vm.selectPocketPiece(.pawn)
+            #expect(vm.selectedPocketKind == .pawn)
+            let target = try #require(vm.legalTargetSquares.first, "aucune case de pose proposée")
+            let beforePlies = vm.totalPlies
+            await vm.forceMove(uci: "P@" + target.notation)
+
+            #expect(vm.totalPlies == beforePlies + 1, "la pose doit compter comme un coup")
+            #expect(vm.sanLog.last?.hasPrefix("P@") == true, "SAN de pose attendu, eu : \(vm.sanLog.last ?? "—")")
+            #expect(vm.userPocket.isEmpty, "la réserve blanche doit s'être vidée")
+            #expect(vm.displayedBoard.position.piece(at: target)?.kind == .pawn,
+                    "le pion posé doit être sur le plateau")
+
+            vm.handleViewDisappear()
+        }
+    }
+
+    @Test("Choisir une pièce en réserve ne propose que des cases légales")
+    func dropTargetsComeFromTheEngine() async throws {
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let vm = game()
+            vm.start()
+            try await Task.sleep(for: .seconds(1))
+            try #require(!vm.isEngineUnavailable)
+
+            for uci in ["e2e4", "d7d5", "e4d5", "d8d5"] { await vm.forceMove(uci: uci) }
+            vm.selectPocketPiece(.pawn)
+
+            #expect(!vm.legalTargetSquares.isEmpty, "des cases de pose doivent être proposées")
+            // Règle de Crazyhouse que nous n'écrivons NULLE PART : elle vient
+            // du moteur, et doit donc être vraie sans qu'on l'ait codée.
+            #expect(vm.legalTargetSquares.allSatisfy { $0.rank.value != 1 && $0.rank.value != 8 },
+                    "un pion ne se pose ni en 1re ni en 8e rangée")
+            #expect(vm.legalTargetSquares.allSatisfy { vm.displayedBoard.position.piece(at: $0) == nil },
+                    "une pose ne va que sur une case vide")
+
+            vm.handleViewDisappear()
+        }
+    }
+}

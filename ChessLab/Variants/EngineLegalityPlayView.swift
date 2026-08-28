@@ -29,7 +29,9 @@ struct EngineLegalityPlayView: View {
         GeometryReader { geo in
             VStack(spacing: 10) {
                 playerRow(for: viewModel.engineColor)
+                pocketStrip(for: viewModel.engineColor)
                 boardBlock
+                pocketStrip(for: viewModel.userColor)
                 playerRow(for: viewModel.userColor)
                 gameOverPanel
                 controlBar
@@ -142,6 +144,77 @@ struct EngineLegalityPlayView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
+    }
+
+    // MARK: Réserve (Crazyhouse)
+
+    /// Les pièces EN MAIN d'un camp, à poser sur le plateau.
+    ///
+    /// N'existe que pour Crazyhouse — ailleurs la réserve est toujours vide,
+    /// et la bande disparaît d'elle-même plutôt que de laisser une rangée
+    /// creuse. Celle du joueur est tactile : un appui choisit la pièce, les
+    /// cases où la poser s'allument sur le plateau, un second appui sur la
+    /// même pièce la repose.
+    @ViewBuilder
+    private func pocketStrip(for color: Piece.Color) -> some View {
+        let entries = color == viewModel.userColor ? viewModel.userPocket : viewModel.enginePocket
+        if !entries.isEmpty {
+            HStack(spacing: 6) {
+                ForEach(entries, id: \.kind) { entry in
+                    pocketButton(kind: entry.kind, count: entry.count, color: color)
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(Theme.surface.opacity(0.6), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+            // Marqueur en fond plutôt qu'un identifiant sur la pile : posé sur
+            // le `HStack`, il n'était pas remonté à l'accessibilité, et les
+            // tests ne trouvaient jamais la bande. Même patron que
+            // ``moveCountMarker``.
+            .background(
+                Color.clear
+                    .accessibilityIdentifier(color == viewModel.userColor ? "pocket_user" : "pocket_engine")
+            )
+        }
+    }
+
+    private func pocketButton(kind: Piece.Kind, count: Int, color: Piece.Color) -> some View {
+        let isMine = color == viewModel.userColor
+        let isSelected = isMine && viewModel.selectedPocketKind == kind
+        return Button {
+            viewModel.selectPocketPiece(kind)
+        } label: {
+            HStack(spacing: 2) {
+                PieceGlyphView(
+                    piece: Piece(kind, color: color, square: Square("a1")),
+                    outline: color == .black ? Theme.textSecondary.opacity(0.5) : nil
+                )
+                .frame(width: 26, height: 26)
+                if count > 1 {
+                    Text("\(count)")
+                        .font(.caption2.weight(.bold).monospacedDigit())
+                        .foregroundStyle(Theme.textSecondary)
+                }
+            }
+            .padding(.horizontal, 6)
+            .padding(.vertical, 3)
+            .background(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .fill(isSelected ? variant.tint.opacity(0.28) : Color.clear)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                    .strokeBorder(isSelected ? variant.tint : Color.clear, lineWidth: 1.5)
+            )
+        }
+        .buttonStyle(.plain)
+        // La réserve adverse est un RELEVÉ, pas une commande : on la montre
+        // pour que le joueur sache ce qui peut lui tomber dessus, mais elle
+        // ne se touche pas.
+        .disabled(!isMine)
+        .accessibilityIdentifier(isMine ? "pocket_\(FairyEngineController.fenLetter(for: kind))" : "")
+        .accessibilityLabel(Text("\(count) \(kind.rawValue.isEmpty ? "pion" : kind.rawValue) en réserve"))
     }
 
     private func playerRow(for color: Piece.Color) -> some View {
