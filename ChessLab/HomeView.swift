@@ -126,6 +126,11 @@ struct HomeView: View {
         /// variante ne correspond à son tour double).
         case stolenMoveSetup
         case activeStolenMoveGame(FairyVariantSettings)
+        /// Duck Chess — règle puis partie à deux. Pas de réglages : aucun
+        /// moteur ne joue cette variante (voir ``DuckChessRules``), donc ni
+        /// force, ni cadence, ni couleur à choisir.
+        case duckChessSetup
+        case activeDuckChessGame
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
@@ -621,6 +626,8 @@ struct HomeView: View {
                         path.append(Route.engineLegalitySetup(variant.id))
                     } onOpenStolenMove: {
                         path.append(Route.stolenMoveSetup)
+                    } onOpenDuckChess: {
+                        path.append(Route.duckChessSetup)
                     }
 
                 case .chess960Setup:
@@ -662,6 +669,16 @@ struct HomeView: View {
 
                 case let .activeVariantAnalysis(seed):
                     VariantAnalysisActiveGameHost(seed: seed, sessionKey: sessionKey(for: route))
+
+                case .duckChessSetup:
+                    DuckChessSetupView {
+                        path.append(Route.activeDuckChessGame)
+                    }
+
+                case .activeDuckChessGame:
+                    DuckChessPlayView {
+                        path = NavigationPath()
+                    }
 
                 case .stolenMoveSetup:
                     FairyVariantSetupView(variant: StolenMoveVariant.shared) { settings in

@@ -3306,6 +3306,22 @@
         }
       }
     },
+    "Canard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duck"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canard"
+          }
+        }
+      }
+    },
     "Canard Opening": {
       "extractionState": "stale",
       "localizations": {
@@ -3820,6 +3836,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Chaque position, disséquée"
+          }
+        }
+      }
+    },
+    "Chaque tour se joue en DEUX temps : vous déplacez une pièce, puis vous posez le canard sur une case vide de votre choix. Le canard n'appartient à personne et bloque totalement sa case — aucune pièce ne peut s'y poser ni la traverser, et il ne se capture pas. Il doit changer de case à chaque tour. Il n'y a NI ÉCHEC NI MAT : un roi a le droit de rester sous une attaque, et on gagne en le capturant. Faute de moteur capable d'arbitrer cette variante, elle se joue à deux sur le même appareil.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every turn has TWO steps: you move a piece, then you place the duck on any empty square you like. The duck belongs to nobody and blocks its square completely — no piece may land on it or move through it, and it cannot be captured. It must change square every turn. There is NO CHECK AND NO CHECKMATE: a king may stay under attack, and you win by capturing it. With no engine able to referee this variant, it is played by two people on the same device."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chaque tour se joue en DEUX temps : vous déplacez une pièce, puis vous posez le canard sur une case vide de votre choix. Le canard n'appartient à personne et bloque totalement sa case — aucune pièce ne peut s'y poser ni la traverser, et il ne se capture pas. Il doit changer de case à chaque tour. Il n'y a NI ÉCHEC NI MAT : un roi a le droit de rester sous une attaque, et on gagne en le capturant. Faute de moteur capable d'arbitrer cette variante, elle se joue à deux sur le même appareil."
           }
         }
       }
@@ -5406,6 +5438,22 @@
         }
       }
     },
+    "Duck Chess": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duck Chess"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Duck Chess"
+          }
+        }
+      }
+    },
     "Duras Gambit": {
       "extractionState": "stale",
       "localizations": {
@@ -5587,6 +5635,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dépenser le jeton sur le prochain coup"
+          }
+        }
+      }
+    },
+    "Déplacez une pièce": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move a piece"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déplacez une pièce"
           }
         }
       }
@@ -8873,6 +8937,22 @@
         }
       }
     },
+    "Le canard bloque": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The duck blocks"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le canard bloque"
+          }
+        }
+      }
+    },
     "Le coup était %@": {
       "extractionState": "stale",
       "localizations": {
@@ -11272,6 +11352,22 @@
         }
       }
     },
+    "Partie terminée": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game over"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie terminée"
+          }
+        }
+      }
+    },
     "Partie à deux joueurs": {
       "localizations": {
         "en": {
@@ -11878,6 +11974,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ouverture portugaise"
+          }
+        }
+      }
+    },
+    "Posez le canard sur une case vide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Place the duck on an empty square"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posez le canard sur une case vide"
           }
         }
       }
@@ -16425,6 +16537,22 @@
         }
       }
     },
+    "Un canard bloque une case après chaque coup": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A duck blocks a square after every move"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un canard bloque une case après chaque coup"
+          }
+        }
+      }
+    },
     "Un grand merci à Nils Gauthey pour tout le travail accompli sur ChessLab. Ses relectures, ses corrections et ses idées ont fait progresser l'app dans son ensemble, et tout particulièrement la qualité des ouvertures et des finales : les lignes que vous étudiez ici lui doivent beaucoup.": {
       "localizations": {
         "en": {
@@ -17403,6 +17531,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "accord mutuel"
+          }
+        }
+      }
+    },
+    "au trait": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "to move"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "au trait"
           }
         }
       }

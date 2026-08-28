@@ -10,6 +10,7 @@ struct VariantsHubView: View {
     let onOpenFairyVariant: (FairyVariant) -> Void
     let onOpenEngineLegalityVariant: (EngineLegalityVariant) -> Void
     let onOpenStolenMove: () -> Void
+    let onOpenDuckChess: () -> Void
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -79,6 +80,16 @@ struct VariantsHubView: View {
                         isEnabled: true,
                         accessibilityID: "variant_\(StolenMoveVariant.shared.id)",
                         action: onOpenStolenMove
+                    )
+                    ModeCard(
+                        title: LocalizedStringKey(DuckChessVariant.shared.displayName),
+                        shortTitle: LocalizedStringKey(DuckChessVariant.shared.shortName),
+                        subtitle: LocalizedStringKey(DuckChessVariant.shared.shortTagline),
+                        systemImage: DuckChessVariant.shared.icon,
+                        tint: DuckChessVariant.shared.tint,
+                        isEnabled: true,
+                        accessibilityID: "variant_\(DuckChessVariant.shared.id)",
+                        action: onOpenDuckChess
                     )
                 }
             }
