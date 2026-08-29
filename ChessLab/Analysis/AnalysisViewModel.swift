@@ -2180,16 +2180,10 @@ final class AnalysisViewModel {
 
     // MARK: Courbe d'évaluation
 
-    struct EvalCurvePoint: Identifiable {
-        let id: MoveTree.Index
-        let ply: Int
-        /// POV Blancs, bornée ±10 (mat = ±10).
-        let pawns: Double
-        /// Qualité du coup menant à ce point (nil tant que la classification
-        /// n'est pas passée) — la courbe en tire ses pastilles de moments
-        /// critiques.
-        var quality: MoveQuality?
-    }
+    /// Le type partagé par les quatre écrans d'analyse — voir
+    /// ``EvalCurvePoint``. Il vivait ici, en propre ; l'extraction du 29/08
+    /// l'a sorti pour que les variantes aient la même courbe.
+    typealias EvalCurvePoint = ChessLab.EvalCurvePoint<MoveTree.Index>
 
     /// Ply de la position affichée, pour situer le curseur sur la courbe.
     var currentPly: Int? {

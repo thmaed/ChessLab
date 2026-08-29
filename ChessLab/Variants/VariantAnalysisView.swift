@@ -19,6 +19,17 @@ struct VariantAnalysisView: View {
                     .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                         navigationBarHeight = height
                     }
+                // La courbe d'évaluation, comme en mode « Contre
+                // l'ordinateur » : elle dit d'un coup d'œil OÙ la partie a
+                // basculé, et un appui y saute directement.
+                if !viewModel.evalCurvePoints.isEmpty {
+                    EvalCurveView(
+                        points: viewModel.evalCurvePoints,
+                        currentPly: viewModel.displayedPly
+                    ) { ply in
+                        viewModel.review(toPly: ply)
+                    }
+                }
                 movesList
             }
             .padding(.horizontal, 12)
@@ -55,6 +66,12 @@ struct VariantAnalysisView: View {
     /// disparu.
     private static let minimumMovesListHeight: CGFloat = 120
 
+    /// Ce que la courbe d'évaluation prend à la hauteur — sa hauteur propre
+    /// plus l'espacement de la pile. Réservé, jamais deviné : sans cette
+    /// ligne, la courbe poussait la liste des coups hors de l'écran sur les
+    /// appareils courts.
+    private static let evalCurveHeight: CGFloat = 64 + 10
+
     /// Le côté du plateau vient d'un budget de hauteur MESURÉ, et non d'une
     /// fraction devinée de la fenêtre.
     ///
@@ -68,6 +85,7 @@ struct VariantAnalysisView: View {
     /// variantes, adapté au fait que la liste des coups, ici, est défilante.
     private func boardBlock(size: CGSize) -> some View {
         let reserved = navigationBarHeight
+            + Self.evalCurveHeight
             + Self.minimumMovesListHeight
             + EvalBarView.defaultHeight
             + 28   // les deux espacements de la pile (10 + 10) + celui du bloc (8)

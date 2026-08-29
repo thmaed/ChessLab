@@ -219,6 +219,20 @@ final class OpeningsModuleUITests: XCTestCase {
         if field.waitForExistence(timeout: 5) {
             field.tap()
             field.typeText("scandinav")
+            // RANGER LE CLAVIER, sans quoi rien de ce qu'on cherche n'est
+            // atteignable. Sur un iPhone SE en AX5, le clavier plus le texte
+            // géant ne laissent RIEN d'autre à l'écran : le résultat filtré
+            // existe, il est simplement dessous. Mesuré — l'échec ne
+            // rapportait que des touches de clavier (« shift », « emoji »,
+            // « dictation », « Search ») en guise de boutons visibles.
+            if app.keyboards.buttons["Search"].exists {
+                app.keyboards.buttons["Search"].tap()
+            } else if app.keyboards.buttons["Rechercher"].exists {
+                app.keyboards.buttons["Rechercher"].tap()
+            } else {
+                app.typeText("\n")
+            }
+            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
         } else {
             var scrolls = 0
             while !(entry.exists && entry.isHittable) && scrolls < 40 {

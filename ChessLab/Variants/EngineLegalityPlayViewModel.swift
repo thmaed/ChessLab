@@ -50,7 +50,38 @@ final class EngineLegalityPlayViewModel {
     private(set) var isPositionReady = false
 
     let clock: GameClock?
-    private let startFEN: String
+    /// La position de DÉPART de cette partie-ci.
+    ///
+    /// Pas forcément celle du modèle de variante : les Barricades aléatoires
+    /// tirent leurs deux premiers murs à la création (voir
+    /// ``EngineLegalityVariant/initialPositionFEN()``), si bien que chaque
+    /// partie commence ailleurs. C'est celle-là qu'il faut à l'export PGN et
+    /// à l'analyse de fin de partie, pas le modèle.
+    private(set) var startFEN: String
+
+    // MARK: Chaîne de positions
+    //
+    // Le moteur se replace d'ordinaire en rejouant `startFEN + uciLog` : la
+    // partie est entièrement décrite par ses coups. Les Barricades ALÉATOIRES
+    // brisent ce contrat — le tirage des murs n'est dans aucun coup, donc
+    // rejouer ne le reproduirait pas. Ces deux variables disent d'où repartir
+    // et ce qu'il reste à rejouer : sans réécriture elles valent exactement
+    // `startFEN` et `uciLog`, et rien ne change pour les cinq autres
+    // variantes.
+
+    private var chainFEN: String
+    private var chainMoves: [String] = []
+
+    /// Le mur qui ne bouge pas — Barricades aléatoires uniquement, `nil`
+    /// partout ailleurs. Tiré au sort à la création et gardé tel quel : la
+    /// FEN ne distingue pas un mur fixe d'un mur mobile.
+    private let fixedWall: Square?
+
+    /// Combien de fois retirer les murs au sort avant d'accepter une position
+    /// sans coup légal. Sans ce garde-fou, deux murs mal tombés pourraient
+    /// mater un camp que personne n'a attaqué ; avec lui, un VRAI mat finit
+    /// quand même par passer, tous les tirages y menant.
+    private static let wallRedrawAttempts = 5
 
     // MARK: Interaction
 
@@ -118,10 +149,16 @@ final class EngineLegalityPlayViewModel {
         let color = settings.resolvedColorChoice.resolved()
         userColor = color
         engineColor = color.opposite
-        startFEN = variant.startFEN
-        board = Board(position: Position(fen: variant.startFEN)!)
-        fenLog = [variant.startFEN]
-        currentFEN = variant.startFEN
+        // `initialPosition()` et non `startFEN` : les Barricades aléatoires
+        // posent ici leurs trois premiers murs et tirent celui qui ne bougera
+        // plus de la partie.
+        let opening = variant.initialPosition()
+        startFEN = opening.fen
+        fixedWall = opening.fixedWall
+        chainFEN = opening.fen
+        board = Board(position: Position(fen: VariantFEN.forChessKit(opening.fen))!)
+        fenLog = [opening.fen]
+        currentFEN = opening.fen
         clock = settings.timeControl.hasClock ? GameClock(control: settings.timeControl) : nil
 
         clock?.onFlagFall = { [weak self] color in
@@ -157,8 +194,7 @@ final class EngineLegalityPlayViewModel {
     /// ChessKit, d'où elles ont justement été retirées pour qu'il puisse le
     /// lire (voir ``BarricadesFEN``).
     var displayedBlockedSquares: [Square] {
-        guard variant.id == EngineLegalityVariant.barricades.id else { return [] }
-        return BarricadesFEN.wallSquares(in: displayedRawFEN)
+        BarricadesFEN.wallSquares(in: displayedRawFEN)
     }
 
     /// La FEN BRUTE de la position affichée, telle que le moteur l'écrit —
@@ -363,7 +399,7 @@ final class EngineLegalityPlayViewModel {
         // remettre en file ICI serait un AUTO-RÉFÉRENCEMENT qui bloque
         // indéfiniment (elle attendrait sa propre fin). La sérialisation se
         // fait UNE SEULE FOIS, au point d'entrée.
-        guard let query = await engine.queryPosition(startFEN: startFEN, uciLog: candidateLog) else {
+        guard var query = await engine.queryPosition(startFEN: chainFEN, uciLog: chainMoves + [uci]) else {
             return false
         }
 
@@ -376,7 +412,31 @@ final class EngineLegalityPlayViewModel {
         // la revue du 25/08/2026.
         clearResumeUndo()
 
-        let isMate = query.legalMoves.isEmpty && query.inCheck
+        // Les murs mobiles se redéploient ICI, entre le coup et tout ce qui
+        // en découle : c'est la position MURÉE qui décide de l'échec, du mat
+        // et des coups suivants. On retire au sort tant qu'un tirage laisse
+        // le camp au trait sans aucun coup — sinon deux murs mal tombés
+        // materaient quelqu'un que personne n'a attaqué.
+        if variant.rewritesPositionEachMove {
+            var attempts = 0
+            var rewritten = query
+            while attempts < Self.wallRedrawAttempts {
+                guard let fen = variant.rewrittenPosition(after: query.fen, fixedWall: fixedWall),
+                      let next = await engine.queryPosition(startFEN: fen, uciLog: [])
+                else { break }
+                rewritten = next
+                if !variant.removingWallCaptures(from: next.legalMoves, in: next.fen).isEmpty { break }
+                attempts += 1
+            }
+            query = rewritten
+            chainFEN = query.fen
+            chainMoves = []
+        } else {
+            chainMoves.append(uci)
+        }
+        let legalAfterMove = variant.removingWallCaptures(from: query.legalMoves, in: query.fen)
+
+        let isMate = legalAfterMove.isEmpty && query.inCheck
         let san = EngineLegalitySAN.build(
             uci: uci, beforeFEN: beforeFEN, legalMovesAtPosition: legalMovesForCurrentPosition,
             isCheck: query.inCheck, isMate: isMate
@@ -425,12 +485,15 @@ final class EngineLegalityPlayViewModel {
         }
         currentFEN = query.fen
         board = Board(position: Position(fen: VariantFEN.forChessKit(query.fen))!)
-        legalMovesForCurrentPosition = query.legalMoves
+        legalMovesForCurrentPosition = legalAfterMove
         pocket = query.pocket
         playSound(for: san)
         hintMoves = []
 
-        if let end = variant.outcome(afterFEN: query.fen, legalMovesForNextMover: query.legalMoves, inCheck: query.inCheck) {
+        if let end = variant.outcome(
+            afterFEN: query.fen, legalMovesForNextMover: legalAfterMove, inCheck: query.inCheck,
+            pocketIsEmpty: query.pocket.allSatisfy { $0.value.isEmpty }
+        ) {
             outcome = end
             clock?.pause()
             Haptics.gameEnded()
@@ -471,6 +534,32 @@ final class EngineLegalityPlayViewModel {
         Haptics.gameEnded()
     }
 
+    // MARK: Nulle proposée
+
+    /// Dernière évaluation du MOTEUR, de son point de vue (positif = il se
+    /// voit mieux). Relevée sur sa propre recherche, et non sur la barre
+    /// d'évaluation, que le joueur peut avoir éteinte.
+    private(set) var lastEngineEvalCp: Int?
+
+    /// Signalé brièvement quand l'ordinateur refuse la nulle (remis à zéro
+    /// par la vue après affichage).
+    var drawOfferDeclinedByEngine = false
+
+    /// L'utilisateur propose nulle. Même règle qu'en mode « Contre
+    /// l'ordinateur » : accepté si le moteur ne se voit pas mieux qu'une
+    /// quasi-égalité sur son dernier coup, refusé sinon — et refusé tant
+    /// qu'il n'a pas joué, faute d'avoir un avis.
+    func offerDrawToEngine() {
+        guard outcome == nil, !isEngineThinking else { return }
+        guard VariantDrawRules.engineAcceptsDraw(lastEngineEvalCp: lastEngineEvalCp) else {
+            drawOfferDeclinedByEngine = true
+            return
+        }
+        outcome = GameOutcome(winner: nil, reason: .drawByAgreement)
+        clock?.pause()
+        Haptics.gameEnded()
+    }
+
     // MARK: Position initiale
 
     private func initializePosition() async {
@@ -491,18 +580,30 @@ final class EngineLegalityPlayViewModel {
         // cette méthode sortait AVANT la remise à zéro. Le correctif du
         // moteur a rendu le défaut atteignable.
         let isResuming = !uciLog.isEmpty
-        guard let query = await engine.queryPosition(startFEN: startFEN, uciLog: uciLog) else {
+        // Un essai, puis un second avant de conclure à la panne : une
+        // interrogation sans réponse ne prouve pas que le moteur est mort,
+        // seulement qu'il n'a pas répondu à temps — et l'écran qui annonce
+        // « moteur indisponible » ne se reprend jamais tout seul.
+        var query = await engine.queryPosition(startFEN: chainFEN, uciLog: chainMoves)
+        if query == nil {
+            query = await engine.queryPosition(startFEN: chainFEN, uciLog: chainMoves)
+        }
+        guard let query else {
             isEngineUnavailable = true
             return
         }
         currentFEN = query.fen
         if !isResuming { fenLog = [query.fen] }
         board = Board(position: Position(fen: VariantFEN.forChessKit(query.fen))!)
-        legalMovesForCurrentPosition = query.legalMoves
+        let legal = variant.removingWallCaptures(from: query.legalMoves, in: query.fen)
+        legalMovesForCurrentPosition = legal
         pocket = query.pocket
         isPositionReady = true
 
-        if let end = variant.outcome(afterFEN: query.fen, legalMovesForNextMover: query.legalMoves, inCheck: query.inCheck) {
+        if let end = variant.outcome(
+            afterFEN: query.fen, legalMovesForNextMover: legal, inCheck: query.inCheck,
+            pocketIsEmpty: query.pocket.allSatisfy { $0.value.isEmpty }
+        ) {
             outcome = end
             return
         }
@@ -572,13 +673,18 @@ final class EngineLegalityPlayViewModel {
         await engine.send(.position(.fen(currentFEN)))
 
         let mover = engineColor
+        // Barricades ALÉATOIRES : le moteur croit les murs capturables (voir
+        // ``EngineLegalityVariant/removingWallCaptures(from:in:)``). Lui
+        // imposer la liste déjà filtrée l'empêche non seulement de jouer une
+        // prise de mur, mais aussi de bâtir un plan autour.
+        let searchmoves = variant.rewritesPositionEachMove ? legalMovesForCurrentPosition : nil
         let budgetMs: Int
         if let depth = settings.strength.maxDepth {
-            await engine.send(.go(depth: depth))
+            await engine.send(.go(depth: depth, searchmoves: searchmoves))
             budgetMs = 15_000
         } else {
             let movetime = computeMovetime(for: mover)
-            await engine.send(.go(movetime: movetime))
+            await engine.send(.go(movetime: movetime, searchmoves: searchmoves))
             budgetMs = movetime + EngineWatchdog.graceMs
         }
 
@@ -607,6 +713,7 @@ final class EngineLegalityPlayViewModel {
             return
         }
         if let cp = result.cp {
+            lastEngineEvalCp = cp
             setEval(cp: cp, mate: result.mate, moverIsWhite: mover == .white)
         }
         guard let lan = result.lan, lan != "(none)", outcome == nil, !isReviewing else {
@@ -902,6 +1009,10 @@ final class EngineLegalityPlayViewModel {
         fenLog = Array(fenLog.prefix(count + 1))
         moveLog = Array(moveLog.prefix(count))
         currentFEN = fenLog.last ?? startFEN
+        // La chaîne se recale sur la position RÉTABLIE : ses murs sont ceux
+        // du journal, et aucun coup ne reste à rejouer par-dessus.
+        chainFEN = currentFEN
+        chainMoves = variant.rewritesPositionEachMove ? [] : uciLog
         board = Board(position: Position(fen: VariantFEN.forChessKit(currentFEN))!)
         outcome = nil
         pendingBlunderWarning = nil
@@ -923,8 +1034,8 @@ final class EngineLegalityPlayViewModel {
     /// contenu d'avant : la bande montrait une pièce que le joueur n'avait
     /// plus, et la choisir n'allumait aucune case.
     private func refreshLegalMovesAndContinue() async {
-        guard let query = await engine.queryPosition(startFEN: startFEN, uciLog: uciLog) else { return }
-        legalMovesForCurrentPosition = query.legalMoves
+        guard let query = await engine.queryPosition(startFEN: chainFEN, uciLog: chainMoves) else { return }
+        legalMovesForCurrentPosition = variant.removingWallCaptures(from: query.legalMoves, in: query.fen)
         pocket = query.pocket
         isPositionReady = true
 

@@ -124,10 +124,65 @@ struct BarricadesTests {
         let variant = try #require(EngineLegalityVariant.all.first { $0.id == "barricades" })
         #expect(variant.startFEN == BarricadesConfiguration.startFEN)
         #expect(variant.customDefinitionPath != nil, "elle doit s'enseigner au moteur")
-        // Les autres, le moteur les connaît d'origine.
-        for other in EngineLegalityVariant.all where other.id != variant.id {
-            #expect(other.customDefinitionPath == nil, "\(other.id) n'a rien à enseigner")
+        // Les deux Barricades partagent le même fichier de définition ; toutes
+        // les autres, le moteur les connaît d'origine.
+        let taught: Set<String> = [
+            EngineLegalityVariant.barricades.id, EngineLegalityVariant.randomBarricades.id,
+        ]
+        for other in EngineLegalityVariant.all {
+            let path = other.customDefinitionPath
+            #expect(
+                (path != nil) == taught.contains(other.id),
+                "\(other.id) : définition \(path == nil ? "absente" : "présente") à tort"
+            )
         }
+    }
+
+    // MARK: Fin de partie
+
+    /// Le défaut signalé le 29/08 : un mat subi en Barricades ne terminait
+    /// pas la partie.
+    ///
+    /// La variante avait été ajoutée au catalogue sans toucher au `switch` de
+    /// ``EngineLegalityVariant/outcome(afterFEN:legalMovesForNextMover:inCheck:)``,
+    /// où seuls Atomique et Crazyhouse étaient nommés pour le mat classique —
+    /// tout le reste tombait sur `return nil`. Le mat se jouait donc à
+    /// l'écran sans que rien ne l'annonce. Le cas classique est désormais le
+    /// DÉFAUT, ce qui rend le même oubli impossible.
+    @Test("Plus aucun coup légal et le roi en échec : c'est mat")
+    func mateIsDetected() throws {
+        let mated = "rnb1kbnr/pppp1ppp/8/4W3/3W2pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 0 1"
+        let outcome = try #require(
+            EngineLegalityVariant.barricades.outcome(
+                afterFEN: mated, legalMovesForNextMover: [], inCheck: true
+            ),
+            "un mat en Barricades doit terminer la partie"
+        )
+        #expect(outcome.reason == .checkmate)
+        #expect(outcome.winner == .black, "c'est le camp au trait qui est maté")
+    }
+
+    @Test("Plus aucun coup légal sans échec : c'est pat")
+    func stalemateIsDetected() throws {
+        let outcome = try #require(
+            EngineLegalityVariant.barricades.outcome(
+                afterFEN: BarricadesConfiguration.startFEN, legalMovesForNextMover: [], inCheck: false
+            )
+        )
+        #expect(outcome.winner == nil)
+    }
+
+    /// Le filet posé sous l'oubli : TOUTE variante du catalogue doit conclure
+    /// quand il n'y a plus de coup et que le roi est en échec.
+    @Test("Aucune variante ne laisse un mat passer", arguments: EngineLegalityVariant.all.map(\.id))
+    func everyVariantEndsOnMate(id: String) throws {
+        let variant = try #require(EngineLegalityVariant.all.first { $0.id == id })
+        // Antéchecs mis à part : le but y est inversé, être bloqué fait GAGNER.
+        let outcome = variant.outcome(
+            afterFEN: "rnb1kbnr/pppp1ppp/8/8/6pq/5P2/PPPPP2P/RNBQKBNR w KQkq - 0 1",
+            legalMovesForNextMover: [], inCheck: true
+        )
+        #expect(outcome != nil, "\(id) ne conclut pas sur une position sans coup légal")
     }
 
     // MARK: Une vraie partie

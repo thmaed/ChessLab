@@ -13,8 +13,21 @@ protocol PlayableVariant {
     var rules: String { get }
     var icon: String { get }
     var tint: Color { get }
+    /// La variante se joue-t-elle aussi à DEUX sur le même appareil ?
+    ///
+    /// Faux par défaut, et ce n'est pas une limite technique : les autres
+    /// variantes du hub tirent leur intérêt du niveau de l'adversaire, alors
+    /// que le Duck Chess est un jeu de salon — poser le canard sous le nez de
+    /// l'autre fait la moitié du sel, et une machine ne rend pas ça.
+    var supportsTwoPlayers: Bool { get }
+}
+
+extension PlayableVariant {
+    var supportsTwoPlayers: Bool { false }
 }
 
 extension FairyVariant: PlayableVariant {}
 extension EngineLegalityVariant: PlayableVariant {}
-extension DuckChessVariant: PlayableVariant {}
+extension DuckChessVariant: PlayableVariant {
+    var supportsTwoPlayers: Bool { true }
+}

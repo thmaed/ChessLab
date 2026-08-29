@@ -15,6 +15,7 @@ struct DuckChessPlayView: View {
 
     @State private var appSettings = AppSettings.shared
     @State private var showResignConfirmation = false
+    @State private var showDrawConfirmation = false
     @State private var copiedMessage: String?
 
     private let variant = DuckChessVariant.shared
@@ -71,6 +72,27 @@ struct DuckChessPlayView: View {
                 Button("\(LocalizationController.string("Noirs"))", role: .destructive) {
                     viewModel.resign(.black)
                 }
+            }
+            Button("Annuler", role: .cancel) {}
+        }
+        .alert("Nulle refusée", isPresented: $viewModel.drawOfferDeclinedByEngine) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Le moteur préfère continuer la partie.")
+        }
+        .confirmationDialog(
+            viewModel.isVersusEngine
+                ? Text("Proposer nulle au moteur ?")
+                : Text("Les deux joueurs sont d'accord pour la nulle ?"),
+            isPresented: $showDrawConfirmation,
+            titleVisibility: .visible
+        ) {
+            if viewModel.isVersusEngine {
+                Button("Proposer nulle") { viewModel.offerDrawToEngine() }
+            } else {
+                // À deux sur le même appareil, personne n'a besoin d'être
+                // convaincu : la nulle est actée d'un tap.
+                Button("Confirmer la nulle") { viewModel.agreeToDraw() }
             }
             Button("Annuler", role: .cancel) {}
         }
@@ -297,7 +319,7 @@ struct DuckChessPlayView: View {
             onUndoResume: { viewModel.cancelResumeFromReview() },
             onToggleHint: { viewModel.toggleHint() },
             onShowMoveList: {},
-            onOfferDraw: {},
+            onOfferDraw: { showDrawConfirmation = true },
             onResign: { showResignConfirmation = true }
         )
     }

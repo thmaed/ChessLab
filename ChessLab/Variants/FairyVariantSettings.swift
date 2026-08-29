@@ -16,6 +16,9 @@ struct FairyVariantSettings: Codable, Equatable, Hashable {
     /// partagent ce même type de réglages) — nombre de coups entre deux
     /// jetons, voir ``StolenMoveVariant/tokenIntervalRange``.
     var stolenMoveTokenInterval: Int = StolenMoveVariant.defaultTokenInterval
+    /// Duck Chess UNIQUEMENT (voir ``PlayableVariant/supportsTwoPlayers``) —
+    /// partie à deux sur le même appareil, sans adversaire artificiel.
+    var twoPlayers: Bool = false
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -29,6 +32,7 @@ struct FairyVariantSettings: Codable, Equatable, Hashable {
         hintsEnabled = try container.decodeIfPresent(Bool.self, forKey: .hintsEnabled) ?? fallback.hintsEnabled
         blunderAlertEnabled = try container.decodeIfPresent(Bool.self, forKey: .blunderAlertEnabled) ?? fallback.blunderAlertEnabled
         stolenMoveTokenInterval = try container.decodeIfPresent(Int.self, forKey: .stolenMoveTokenInterval) ?? fallback.stolenMoveTokenInterval
+        twoPlayers = try container.decodeIfPresent(Bool.self, forKey: .twoPlayers) ?? fallback.twoPlayers
     }
 
     init() {}

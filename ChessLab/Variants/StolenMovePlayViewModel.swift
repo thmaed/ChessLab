@@ -413,6 +413,32 @@ final class StolenMovePlayViewModel {
         Haptics.gameEnded()
     }
 
+    // MARK: Nulle proposée
+
+    /// Dernière évaluation du MOTEUR, de son point de vue (positif = il se
+    /// voit mieux). Relevée sur sa propre recherche, et non sur la barre
+    /// d'évaluation, que le joueur peut avoir éteinte.
+    private(set) var lastEngineEvalCp: Int?
+
+    /// Signalé brièvement quand l'ordinateur refuse la nulle (remis à zéro
+    /// par la vue après affichage).
+    var drawOfferDeclinedByEngine = false
+
+    /// L'utilisateur propose nulle. Même règle qu'en mode « Contre
+    /// l'ordinateur » : accepté si le moteur ne se voit pas mieux qu'une
+    /// quasi-égalité sur son dernier coup, refusé sinon — et refusé tant
+    /// qu'il n'a pas joué, faute d'avoir un avis.
+    func offerDrawToEngine() {
+        guard outcome == nil, !isEngineThinking else { return }
+        guard VariantDrawRules.engineAcceptsDraw(lastEngineEvalCp: lastEngineEvalCp) else {
+            drawOfferDeclinedByEngine = true
+            return
+        }
+        outcome = GameOutcome(winner: nil, reason: .drawByAgreement)
+        clock?.pause()
+        Haptics.gameEnded()
+    }
+
     // MARK: Moteur
 
     private func enqueueEngineWork(_ work: @escaping () async -> Void) {
@@ -496,6 +522,7 @@ final class StolenMovePlayViewModel {
             return
         }
         if let cp = result.cp {
+            lastEngineEvalCp = cp
             setEval(cp: cp, mate: result.mate, moverIsWhite: mover == .white)
         }
         guard let lan = result.lan, lan != "(none)", outcome == nil, !isReviewing else {

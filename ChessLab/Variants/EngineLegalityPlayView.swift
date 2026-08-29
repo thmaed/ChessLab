@@ -14,6 +14,7 @@ struct EngineLegalityPlayView: View {
 
     @State private var appSettings = AppSettings.shared
     @State private var showResignConfirmation = false
+    @State private var showDrawConfirmation = false
     @State private var copiedMessage: String?
 
     private var variant: EngineLegalityVariant { viewModel.variant }
@@ -68,6 +69,19 @@ struct EngineLegalityPlayView: View {
             titleVisibility: .visible
         ) {
             Button("Abandonner", role: .destructive) { viewModel.userResigns() }
+            Button("Annuler", role: .cancel) {}
+        }
+        .alert("Nulle refusée", isPresented: $viewModel.drawOfferDeclinedByEngine) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Le moteur préfère continuer la partie.")
+        }
+        .confirmationDialog(
+            "Proposer nulle au moteur ?",
+            isPresented: $showDrawConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Proposer nulle") { viewModel.offerDrawToEngine() }
             Button("Annuler", role: .cancel) {}
         }
         .alert(
@@ -263,7 +277,10 @@ struct EngineLegalityPlayView: View {
                     panelButton("Accueil", icon: "house.fill") { onExit() }
                     panelButton("Analyser", icon: "chart.xyaxis.line", filled: true) {
                         let seed = VariantAnalysisSeed(
-                            variantID: variant.id, variantDisplayName: variant.displayName, startFEN: variant.startFEN,
+                            variantID: variant.id, variantDisplayName: variant.displayName,
+                            // La position de départ de CETTE partie : les
+                            // Barricades aléatoires n'ont pas celle du modèle.
+                            startFEN: viewModel.startFEN,
                             uciLog: viewModel.uciLog, sanLog: viewModel.sanLog, moveLog: viewModel.moveLog,
                             fenLog: viewModel.fenLog, outcome: outcome
                         )
@@ -322,7 +339,7 @@ struct EngineLegalityPlayView: View {
             onUndoResume: { viewModel.cancelResumeFromReview() },
             onToggleHint: { viewModel.toggleHint() },
             onShowMoveList: {},
-            onOfferDraw: {},
+            onOfferDraw: { showDrawConfirmation = true },
             onResign: { showResignConfirmation = true }
         )
     }

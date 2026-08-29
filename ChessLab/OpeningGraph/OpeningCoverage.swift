@@ -2,29 +2,15 @@ import Foundation
 
 /// Badge de niveau d'une ouverture — progression motivante : découverte →
 /// travaillée → solide. Purement dérivé de la couverture.
+/// Le calcul reste (il est dérivé, testé, et sert à savoir quoi travailler
+/// ensuite) ; ses libellés et ses icônes sont partis le 29/08 : aucun écran
+/// ne les affichait, et ils traînaient donc en français hors du catalogue de
+/// traduction. À réécrire — traduits — le jour où un écran les montrera.
 enum OpeningBadge: String, Hashable {
     case notStarted
     case discovery
     case worked
     case solid
-
-    var label: String {
-        switch self {
-        case .notStarted: "À découvrir"
-        case .discovery: "Découverte"
-        case .worked: "Travaillée"
-        case .solid: "Solide"
-        }
-    }
-
-    var systemImage: String {
-        switch self {
-        case .notStarted: "circle.dashed"
-        case .discovery: "sparkles"
-        case .worked: "book"
-        case .solid: "checkmark.seal.fill"
-        }
-    }
 }
 
 /// Couverture d'une ouverture : combien de ses positions entraînables ont été

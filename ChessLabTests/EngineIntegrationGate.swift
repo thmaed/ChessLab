@@ -1,6 +1,8 @@
 import CFairyStockfishKit
 import CStockfishKit
 import Foundation
+import Testing
+@testable import ChessLab
 
 /// Verrou global : UN SEUL test à la fois touche un moteur réel — Stockfish
 /// OU Fairy-Stockfish — quelle que soit la SUITE qui le contient.
@@ -78,25 +80,87 @@ final class EngineIntegrationGate {
     /// sous charge système lourde. Aligné sur
     /// ``EngineController/acquireEngineProcess(timeoutMs:)``, doublé au même
     /// moment pour la même raison.
-    private func waitForBothEnginesToGoIdle(timeoutMs: Int = 10000) async {
+    /// **Budget porté à 30 s, et l'expiration ne passe plus sous silence.**
+    ///
+    /// Le doublement du 25/08 avait déjà pour motif un abandon silencieux ;
+    /// il en restait un. Observé le 29/08 en suite complète : « Course des
+    /// rois » sortait sur `isEngineUnavailable` après 283 s, et
+    /// `CrazyhouseGameTests` jouait ses coups sur un moteur jamais démarré.
+    /// Dans les deux cas le verrou avait rendu la main pendant que le moteur
+    /// précédent achevait sa démolition — donc le test SUIVANT échouait pour
+    /// une faute qui n'était pas la sienne, et rien ne désignait la vraie.
+    ///
+    /// Rendre `false` plutôt que de continuer permet à ``withExclusiveAccess(_:)``
+    /// de le DIRE, sur le test qui n'a pas su se libérer.
+    @discardableResult
+    private func waitForBothEnginesToGoIdle(timeoutMs: Int = 30000) async -> Bool {
         let deadline = Date().addingTimeInterval(Double(timeoutMs) / 1000)
         while Date() < deadline,
               StockfishEngine.isProcessBusy || FairyStockfishEngine.isProcessBusy {
             try? await Task.sleep(nanoseconds: 20_000_000)
         }
+        return !(StockfishEngine.isProcessBusy || FairyStockfishEngine.isProcessBusy)
     }
 
-    func withExclusiveAccess<T>(_ body: () async throws -> T) async rethrows -> T {
+    /// Signale l'expiration là où elle se produit — pas trois tests plus loin.
+    private func reportIfStillBusy(_ freed: Bool, file: StaticString, line: UInt) {
+        guard !freed else { return }
+        Issue.record(
+            """
+            Le moteur n'était toujours pas libéré 30 s après ce test \
+            (Stockfish occupé : \(StockfishEngine.isProcessBusy), \
+            Fairy-Stockfish occupé : \(FairyStockfishEngine.isProcessBusy)). \
+            Le test SUIVANT va démarrer sur un process encore pris, et c'est \
+            LUI qui échouera. La faute est ici.
+            """,
+            sourceLocation: SourceLocation(fileID: "ChessLabTests/EngineIntegrationGate.swift",
+                                           filePath: String(describing: file),
+                                           line: Int(line), column: 1)
+        )
+    }
+
+    func withExclusiveAccess<T>(
+        file: StaticString = #file, line: UInt = #line, _ body: () async throws -> T
+    ) async rethrows -> T {
         await acquire()
         do {
             let value = try await body()
-            await waitForBothEnginesToGoIdle()
+            reportIfStillBusy(await waitForBothEnginesToGoIdle(), file: file, line: line)
             release()
             return value
         } catch {
-            await waitForBothEnginesToGoIdle()
+            reportIfStillBusy(await waitForBothEnginesToGoIdle(), file: file, line: line)
             release()
             throw error
         }
+    }
+
+    /// Attend qu'une partie arbitrée par le moteur soit RÉELLEMENT prête.
+    ///
+    /// `EngineLegalityPlayViewModel` ne peut pas jouer un coup avant que le
+    /// moteur n'ait rendu la position de départ : c'est lui l'arbitre de
+    /// légalité. Plusieurs suites se contentaient d'un `sleep` d'une seconde
+    /// suivi de `#require(!isEngineUnavailable)` — une attente qui suffit à
+    /// vide et jamais sous charge, et un contrôle qui ne dit rien puisque
+    /// `isEngineUnavailable` ne passe à vrai qu'en cas d'échec FRANC. Le
+    /// test partait alors sur un moteur pas encore démarré, et échouait sur
+    /// une réserve vide sans que rien n'explique pourquoi.
+    static func waitUntilReady(
+        _ viewModel: EngineLegalityPlayViewModel, timeout: TimeInterval = 600,
+        sourceLocation: SourceLocation = #_sourceLocation
+    ) async throws {
+        let deadline = Date().addingTimeInterval(timeout)
+        // Sortir dès `isEngineUnavailable` : un moteur qui a VRAIMENT
+        // abandonné ne deviendra jamais prêt, et attendre 600 s pour rien
+        // ne fait qu'allonger la suite.
+        while Date() < deadline, !viewModel.isPositionReady, !viewModel.isEngineUnavailable {
+            try await Task.sleep(for: .milliseconds(200))
+        }
+        let unavailable = viewModel.isEngineUnavailable
+        try #require(
+            viewModel.isPositionReady,
+            Comment(rawValue: "la position initiale n'a jamais été prête (moteur indisponible : \(unavailable))"),
+            sourceLocation: sourceLocation
+        )
     }
 }

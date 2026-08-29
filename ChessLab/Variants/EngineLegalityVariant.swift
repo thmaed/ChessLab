@@ -30,7 +30,6 @@ struct EngineLegalityVariant: Identifiable {
     /// propriété calculée traduit à CHAQUE lecture, jamais un résultat figé.
     private let displayNameKey: String
     private let shortNameKey: String
-    private let taglineKey: String
     /// Accroche raccourcie pour les tuiles des petits iPhone — voir
     /// ``FairyVariant/shortTagline``.
     private let shortTaglineKey: String
@@ -41,7 +40,6 @@ struct EngineLegalityVariant: Identifiable {
 
     var displayName: String { LocalizationController.string(displayNameKey) }
     var shortName: String { LocalizationController.string(shortNameKey) }
-    var tagline: String { LocalizationController.string(taglineKey) }
     var shortTagline: String { LocalizationController.string(shortTaglineKey) }
     var rules: String { LocalizationController.string(rulesKey) }
 
@@ -49,7 +47,6 @@ struct EngineLegalityVariant: Identifiable {
         id: "racingkings",
         displayNameKey: "Course des rois",
         shortNameKey: "Course rois",
-        taglineKey: "Le premier roi en 8e rangée gagne",
         shortTaglineKey: "Le roi en 8e",
         rulesKey: "Pas de pions, pas de roque. Aucun coup n'a le droit de mettre le roi adverse en échec — sauf s'il gagne la partie sur-le-champ. Le but : amener votre roi sur la 8e rangée avant l'adversaire. Si les Blancs y arrivent les premiers, les Noirs ont EXACTEMENT un coup pour égaliser en y arrivant aussi — sinon les Blancs ont gagné.",
         icon: "flag.checkered",
@@ -61,7 +58,6 @@ struct EngineLegalityVariant: Identifiable {
         id: "atomic",
         displayNameKey: "Atomique",
         shortNameKey: "Atomique",
-        taglineKey: "Chaque capture fait exploser les cases voisines",
         shortTaglineKey: "Prises explosives",
         rulesKey: "Toute capture fait exploser la case d'arrivée : la pièce qui capture ET la pièce capturée disparaissent, ainsi que toute pièce SAUF les pions sur les huit cases voisines. La partie se termine dès qu'un roi explose — un coup qui ferait exploser votre PROPRE roi est interdit. Deux rois peuvent se toucher sans risque : aucun ne peut capturer l'autre sans se détruire lui-même.",
         icon: "burst.fill",
@@ -80,7 +76,6 @@ struct EngineLegalityVariant: Identifiable {
         id: "crazyhouse",
         displayNameKey: "Crazyhouse",
         shortNameKey: "Crazyhouse",
-        taglineKey: "Les pièces capturées changent de camp et se reposent",
         shortTaglineKey: "Les prises reviennent",
         rulesKey: "Toute pièce que vous capturez change de camp et rejoint votre RÉSERVE. À votre tour, au lieu de déplacer une pièce, vous pouvez en poser une de votre réserve sur n'importe quelle case vide — y compris pour donner échec ou mat. Un pion ne peut se poser ni sur la 1re ni sur la 8e rangée. Un pion promu qui se fait capturer redevient un simple pion dans la réserve adverse. Pour tout le reste, les règles sont celles du jeu classique.",
         icon: "tray.full.fill",
@@ -92,7 +87,6 @@ struct EngineLegalityVariant: Identifiable {
         id: "antichess",
         displayNameKey: "Antéchecs",
         shortNameKey: "Antéchecs",
-        taglineKey: "Perdez toutes vos pièces — ou restez bloqué — pour gagner",
         shortTaglineKey: "Perdre pour gagner",
         rulesKey: "Le but est INVERSÉ : vous gagnez en perdant toutes vos pièces, ou en étant dans l'incapacité de jouer un coup. Capturer est OBLIGATOIRE dès que c'est possible — s'il existe plusieurs captures, vous choisissez laquelle. Il n'y a ni échec ni mat : le roi se capture comme n'importe quelle pièce, et le roque n'existe pas.",
         icon: "arrow.triangle.swap",
@@ -111,7 +105,6 @@ struct EngineLegalityVariant: Identifiable {
         id: BarricadesConfiguration.variantID,
         displayNameKey: "Barricades",
         shortNameKey: "Barricades",
-        taglineKey: "Deux cases murées dès le premier coup",
         shortTaglineKey: "Deux cases murées",
         rulesKey: "Les règles des échecs, à un détail près : les cases d4 et e5 sont MURÉES dès le départ. Aucune pièce ne peut s'y poser ni les traverser, et un mur ne se capture pas — il ne bougera jamais de la partie. Les tours, fous et dames butent donc dessus comme sur une pièce, tandis que les cavaliers leur sautent par-dessus sans pouvoir s'y arrêter. Tout le reste — échec, mat, pat, roque, prise en passant, promotion — est inchangé.",
         icon: "square.grid.3x3.fill",
@@ -119,7 +112,49 @@ struct EngineLegalityVariant: Identifiable {
         startFEN: BarricadesConfiguration.startFEN
     )
 
-    static let all: [EngineLegalityVariant] = [.racingKings, .atomic, .antichess, .crazyhouse, .barricades]
+    /// Barricades ALÉATOIRES — les mêmes murs, mais qui changent de case à
+    /// chaque demi-coup.
+    ///
+    /// Deux différences de fond avec sa sœur fixe, toutes deux dues au fait
+    /// que les murs bougent :
+    ///
+    /// - la position ne se REJOUE pas depuis le départ (le tirage des murs
+    ///   n'est pas dans les coups) : la vue-modèle enchaîne de position en
+    ///   position, voir ``rewritesPositionEachMove`` ;
+    /// - `mobilityRegion` étant figé par variante, il ne peut pas suivre des
+    ///   murs mobiles : les prises de mur sont retirées de la liste du moteur
+    ///   côté app, voir ``removingWallCaptures(from:in:)``.
+    static let randomBarricades = EngineLegalityVariant(
+        id: BarricadesConfiguration.randomVariantID,
+        displayNameKey: "Barricades aléatoires",
+        // Pas de dé ⚄ (U+2684) : SF Pro ne le porte pas, la tuile affichait un
+        // carré vide. Vérifié à l'écran.
+        shortNameKey: "Murs mobiles",
+        shortTaglineKey: "Ils bougent chaque coup",
+        rulesKey: "Les règles des échecs, avec deux murs qui ne tiennent pas en place : après CHAQUE coup, ils sautent sur deux cases vides tirées au hasard entre la 2e et la 7e rangée. Aucune pièce ne peut s'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n'est acquis, et calculer loin ne sert pas à grand-chose.",
+        icon: "die.face.4.fill",
+        tint: Theme.violet,
+        startFEN: BarricadesConfiguration.randomStartFEN
+    )
+
+    static let all: [EngineLegalityVariant] = [
+        .racingKings, .atomic, .antichess, .crazyhouse, .barricades, .randomBarricades,
+    ]
+
+    // MARK: Place dans le hub
+
+    /// Les variantes de cette famille montrées AVANT le Coup Volé et le Duck
+    /// Chess, dans l'ordre du hub.
+    static var hubOrdered: [EngineLegalityVariant] {
+        all.filter { variant in !hubTrailing.contains { $0.id == variant.id } }
+    }
+
+    /// Celles qui ferment la marche, après toutes les autres tuiles.
+    ///
+    /// ``all`` sert aux RECHERCHES par identifiant, et son ordre n'a donc
+    /// aucune raison de commander l'affichage : le hub mêle trois familles de
+    /// variantes, aucune liste seule ne peut dire où va une tuile.
+    static let hubTrailing: [EngineLegalityVariant] = [.barricades, .randomBarricades]
 
     // MARK: Définition à enseigner au moteur
 
@@ -130,8 +165,63 @@ struct EngineLegalityVariant: Identifiable {
     /// minuscule, et une version périmée serait un piège silencieux — le
     /// moteur chargerait d'anciennes règles sans que rien ne le dise.
     var customDefinitionPath: String? {
-        guard id == Self.barricades.id else { return nil }
+        guard id == Self.barricades.id || id == Self.randomBarricades.id else { return nil }
         return BarricadesConfiguration.writeConfigurationFile()
+    }
+
+    // MARK: Murs mobiles — propre aux Barricades aléatoires
+
+    /// La position se réécrit-elle après chaque demi-coup ?
+    ///
+    /// Vrai pour les Barricades aléatoires, et pour elles seules : le tirage
+    /// des murs ne figure dans aucun coup, donc rejouer `startFEN + coups` ne
+    /// le reproduirait pas. La vue-modèle enchaîne alors de position en
+    /// position au lieu de rejouer depuis le départ.
+    var rewritesPositionEachMove: Bool { id == Self.randomBarricades.id }
+
+    /// La position de DÉPART réelle d'une partie, et la case du mur FIXE.
+    ///
+    /// Les Barricades aléatoires posent ici leurs trois premiers murs et
+    /// tirent au sort celui qui ne bougera pas : le modèle de variante ne
+    /// peut porter ni l'un ni l'autre, ils changent à chaque partie. La case
+    /// du mur fixe ne se relit pas dans la FEN — rien n'y distingue un mur
+    /// d'un autre — c'est donc la vue-modèle qui la garde, le temps de la
+    /// partie.
+    func initialPosition() -> (fen: String, fixedWall: Square?) {
+        guard rewritesPositionEachMove else { return (startFEN, nil) }
+        var generator = SystemRandomNumberGenerator()
+        return BarricadesConfiguration.openingPosition(using: &generator)
+    }
+
+    /// La position après un demi-coup, murs mobiles redéployés — le mur fixe,
+    /// lui, n'est jamais retiré.
+    func rewrittenPosition(after fen: String, fixedWall: Square?) -> String? {
+        guard rewritesPositionEachMove else { return nil }
+        var generator = SystemRandomNumberGenerator()
+        return BarricadesConfiguration.relocatingWalls(in: fen, fixed: fixedWall, using: &generator)
+    }
+
+    /// Retire les coups qui PRENNENT un mur.
+    ///
+    /// Le moteur les propose : faute de `mobilityRegion` — impossible à
+    /// figer sur des murs mobiles — il voit deux pièces blanches immobiles et
+    /// sans valeur, donc capturables. Les retirer ici est une soustraction
+    /// d'une ligne sur une liste que le moteur a produite ; tout le reste de
+    /// la légalité (échec, clouage, roque, prise en passant) reste la sienne,
+    /// et reste juste : un mur EST une pièce sur son échiquier, donc il
+    /// bloque les lignes et les cavaliers lui sautent par-dessus.
+    ///
+    /// Si un camp n'avait plus QUE des prises de mur, il n'aurait réellement
+    /// aucun coup : rendre une liste vide est alors la bonne réponse, et la
+    /// partie se conclut sur un mat ou un pat comme il se doit.
+    func removingWallCaptures(from moves: [String], in fen: String) -> [String] {
+        guard rewritesPositionEachMove else { return moves }
+        let walls = Set(BarricadesFEN.wallSquares(in: fen).map(\.notation))
+        guard !walls.isEmpty else { return moves }
+        return moves.filter { move in
+            guard move.count >= 4 else { return true }
+            return !walls.contains(String(move.dropFirst(2).prefix(2)))
+        }
     }
 
     // MARK: Fin de partie
@@ -150,8 +240,15 @@ struct EngineLegalityVariant: Identifiable {
     ///   ligne `Checkers:` de `d`, non vide. Ignoré hors Atomique (les
     ///   deux autres variantes n'ont pas de notion d'échec qui bloque un
     ///   coup, seulement la légalité déjà filtrée en amont).
-    func outcome(afterFEN fen: String, legalMovesForNextMover: [String], inCheck: Bool) -> GameOutcome? {
-        guard let position = Position(fen: fen) else { return nil }
+    /// - parameter pocketIsEmpty: les deux réserves sont-elles vides ? Seul
+    ///   le Crazyhouse en a ; ailleurs, `true` par défaut.
+    func outcome(
+        afterFEN fen: String, legalMovesForNextMover: [String], inCheck: Bool,
+        pocketIsEmpty: Bool = true
+    ) -> GameOutcome? {
+        // FEN ÉPURÉE : la brute porte la réserve du Crazyhouse et les murs de
+        // Barricades, que ChessKit ne connaît pas (voir ``VariantFEN``).
+        guard let position = Position(fen: VariantFEN.forChessKit(fen)) else { return nil }
         let nextMover = position.sideToMove
         let kings = position.pieces.filter { $0.kind == .king }
 
@@ -164,6 +261,17 @@ struct EngineLegalityVariant: Identifiable {
             if !kings.contains(where: { $0.color == .black }) {
                 return GameOutcome(winner: .white, reason: .atomicKingExploded)
             }
+        }
+
+        // Plus personne ne peut mater : nulle, avant même de regarder s'il
+        // reste des coups. La règle ne vaut PAS pour toutes les variantes —
+        // voir ``VariantDrawRules/declaresInsufficientMaterial(variantID:)``,
+        // qui explique pourquoi l'Atomique, l'Antéchecs ou la Course des rois
+        // s'y refusent.
+        if VariantDrawRules.isInsufficientMaterial(
+            fen: fen, variantID: id, pocketIsEmpty: pocketIsEmpty
+        ) {
+            return GameOutcome(winner: nil, reason: .draw(.insufficientMaterial))
         }
 
         guard legalMovesForNextMover.isEmpty else { return nil }
@@ -181,21 +289,27 @@ struct EngineLegalityVariant: Identifiable {
             // est inversé (perdre ses pièces, ou être immobilisé).
             return GameOutcome(winner: nextMover, reason: .antichessStuck)
 
-        case EngineLegalityVariant.atomic.id, EngineLegalityVariant.crazyhouse.id:
-            // Atomique : aucun roi n'a explosé (vérifié plus haut) mais plus
-            // de coup légal. Crazyhouse : rien de spécial, le but reste le
-            // mat. Dans les deux cas, mat ou pat au sens classique.
+        default:
+            // MAT OU PAT AU SENS CLASSIQUE — et c'est volontairement le cas
+            // par DÉFAUT, non une liste d'identifiants.
             //
-            // Attention pour Crazyhouse : « plus de coup légal » compte AUSSI
-            // les poses, que le moteur énumère — un camp qui tient une pièce
-            // en réserve n'est donc mat que si aucune pose ne pare l'échec,
-            // ce que Fairy-Stockfish sait, et nous pas.
+            // Il l'était : `atomic` et `crazyhouse` y étaient nommés, et tout
+            // le reste tombait sur `return nil`. Barricades, ajouté sans
+            // toucher à ce `switch`, n'a donc jamais eu de fin de partie —
+            // un mat s'y jouait sans que rien ne l'annonce, signalé par
+            // l'utilisateur le 29/08. Renversé : une variante qui ne
+            // redéfinit PAS la fin de partie hérite maintenant de celle des
+            // échecs, et l'oubli devient impossible.
+            //
+            // Atomique : l'explosion d'un roi est traitée plus haut, avant
+            // même le test « plus de coup légal ». Crazyhouse : « plus de
+            // coup légal » compte AUSSI les poses, que le moteur énumère —
+            // un camp qui tient une pièce en réserve n'est donc mat que si
+            // aucune pose ne pare l'échec, ce que Fairy-Stockfish sait, et
+            // nous pas.
             return inCheck
                 ? GameOutcome(winner: nextMover.opposite, reason: .checkmate)
                 : GameOutcome(winner: nil, reason: .draw(.stalemate))
-
-        default:
-            return nil
         }
     }
 }

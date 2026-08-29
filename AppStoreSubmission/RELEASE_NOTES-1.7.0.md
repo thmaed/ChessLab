@@ -8,15 +8,29 @@ Notes DÉTAILLÉES pour le dépôt. Le texte à coller dans App Store Connect es
 
 ## Français
 
-**Trois variantes de plus : Crazyhouse, Duck Chess et Barricades**
+**Quatre variantes de plus : Crazyhouse, Duck Chess et les deux Barricades**
 
-Le hub passe à onze façons de jouer.
+Le hub passe à douze façons de jouer.
 
 **Crazyhouse** — toute pièce que vous capturez change de camp et rejoint votre réserve, d'où vous pouvez la reposer sur n'importe quelle case vide, y compris pour donner mat. Une bande sous chaque joueur montre les pièces en main : la vôtre se touche pour choisir, celle d'en face vous prévient de ce qui peut tomber. Un pion ne se pose ni sur la 1re ni sur la 8e rangée, et un pion promu capturé redevient un simple pion. Jouable contre l'ordinateur, à toutes les forces.
 
 **Duck Chess** — un canard 🦆 occupe une case et la bloque totalement : aucune pièce ne peut s'y poser ni la traverser, et il ne se capture pas. Chaque tour se joue en deux temps — vous déplacez une pièce, puis vous posez le canard où vous voulez, en changeant de case à chaque fois. Il n'y a ni échec ni mat : un roi a le droit de rester sous une attaque, et on gagne en le capturant. Jouable **contre l'ordinateur**, avec tout ce qu'offrent les autres variantes : choix de la couleur, force réglable, cadence, barre d'évaluation, indice, alerte gaffe, reprise d'un coup, et une analyse de fin de partie qui rejoue la partie canard compris. L'ordinateur pose son canard là où il gêne le plus — sur la case d'arrivée du coup qu'il vous prête, ou en travers de son chemin.
 
 **Barricades** — les règles des échecs, à un détail près : les cases d4 et e5 sont murées dès le départ. Aucune pièce ne peut s'y poser ni les traverser, et un mur ne se capture pas — il ne bougera pas de la partie. Tours, fous et dames butent donc dessus comme sur une pièce, tandis que les cavaliers leur sautent par-dessus sans pouvoir s'y arrêter. Tout le reste — échec, mat, pat, roque, prise en passant, promotion — est inchangé. Deux cases en moins au centre, et l'ouverture n'est déjà plus la même : d2-d4 n'existe pas.
+
+**Barricades aléatoires** — les mêmes murs, mais qui ne tiennent pas en place : après chaque coup ils sautent sur deux cases vides tirées au hasard entre la 2e et la 7e rangée. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus. Calculer loin n'y sert pas à grand-chose, et c'est tout l'intérêt.
+
+**Proposer nulle, partout**
+
+Le bouton « ½ » existait dans les écrans de variantes sans rien faire. Il fonctionne maintenant dans les douze modes, avec la même règle qu'en mode « Contre l'ordinateur » : l'ordinateur accepte s'il ne se voit pas mieux qu'une quasi-égalité sur son dernier coup, refuse sinon, et vous le dit. À deux sur le même appareil, la nulle est actée d'un tap.
+
+**Les nulles par manque de matériel sont déclarées**
+
+Roi et fou contre roi seul ne mène nulle part : la partie s'arrête sur une nulle au lieu de tourner à vide. La règle ne s'applique qu'aux variantes où l'on gagne EN MATANT — Barricades, Crazyhouse (réserves vides), Coup Volé, Chess960. Elle est volontairement écartée là où un fou seul gagne encore : l'Atomique fait exploser un roi sans le mater, le Duck Chess le capture, la Course des rois et le Roi de la colline se gagnent en arrivant quelque part, et Trois échecs en donnant trois échecs.
+
+**Une courbe d'évaluation dans toutes les analyses**
+
+L'analyse de fin de partie du mode « Contre l'ordinateur » montrait où la partie avait basculé ; celles des variantes, non. Elles l'ont maintenant toutes — Chess960, les huit variantes, Duck Chess : la courbe s'affiche au-dessus de la liste des coups, se remplit au fil du classement, épingle les moments critiques, et un appui saute au coup correspondant.
 
 **Le moteur des Variantes ne décroche plus**
 
@@ -64,15 +78,29 @@ Un grain très léger a été ajouté au fond : il supprime les bandes que les g
 
 ## English
 
-**Three more variants: Crazyhouse, Duck Chess and Barricades**
+**Four more variants: Crazyhouse, Duck Chess and both Barricades**
 
-The hub grows to eleven ways to play.
+The hub grows to twelve ways to play.
 
 **Crazyhouse** — every piece you capture switches sides and joins your reserve, from which you can drop it back onto any empty square, including to deliver mate. A strip under each player shows the pieces in hand: yours is tappable, your opponent's warns you what may land. A pawn cannot be dropped on the 1st or 8th rank, and a promoted pawn that is captured returns as a plain pawn. Playable against the computer, at every strength.
 
 **Duck Chess** — a duck 🦆 sits on a square and blocks it completely: no piece may land on it or move through it, and it cannot be captured. Every turn has two steps — you move a piece, then you place the duck wherever you like, on a different square each time. There is no check and no checkmate: a king may stay under attack, and you win by capturing it. Playable **against the computer**, with everything the other variants offer: colour choice, adjustable strength, time control, eval bar, hints, blunder alerts, takebacks, and a post-game analysis that replays the game with the duck in place. The computer drops its duck where it hurts most — on the arrival square of the move it expects from you, or across its path.
 
 **Barricades** — the rules of chess, with one twist: d4 and e5 are walled off from the start. No piece may land on them or move through them, and a wall cannot be captured — it will not move for the whole game. Rooks, bishops and queens therefore stop against a wall as they would against a piece, while knights leap over one without being able to stop on it. Everything else — check, checkmate, stalemate, castling, en passant, promotion — is unchanged. Two squares fewer in the centre, and the opening is already a different game: d2-d4 does not exist.
+
+**Shifting Barricades** — the same walls, except they will not stay put: after every move they jump to two empty squares drawn at random between the 2nd and 7th ranks. A bishop that held a diagonal loses it next move, a rook pins and then does not. Calculating far ahead is worth very little here, and that is rather the point.
+
+**Offering a draw, everywhere**
+
+The "½" button was present on the variant screens and did nothing. It now works in all twelve modes, with the same rule as "Play the computer": the computer accepts if it does not see itself better than near-equality on its last move, declines otherwise, and tells you so. With two players on one device, a draw is agreed with a single tap.
+
+**Draws by insufficient material are declared**
+
+King and bishop against a bare king leads nowhere: the game now ends in a draw instead of running on. The rule applies only to variants that are won BY CHECKMATE — Barricades, Crazyhouse (empty hands), Stolen Move, Chess960. It is deliberately left out where a lone bishop can still win: Atomic blows a king up without mating it, Duck Chess captures it, Racing Kings and King of the Hill are won by arriving somewhere, and Three-Check by giving three checks.
+
+**An evaluation curve in every analysis**
+
+The post-game analysis in "Play the computer" showed where a game turned; the variants' did not. They all have it now — Chess960, the eight variants, Duck Chess: the curve sits above the move list, fills in as the classification runs, pins the critical moments, and a tap jumps to the matching move.
 
 **The Variants engine no longer drops out**
 
@@ -144,10 +172,18 @@ A very light grain has been added to the background: it removes the banding that
 
 - **Barricades : une case-mur, sur un moteur qui n'en a pas.** Le Fairy-Stockfish vendorisé est la version 14 : son parseur de FEN n'a aucun cas pour `*`, `position.h` n'a aucune notion de case bloquée, et la liste des options de `parser.cpp` ne contient ni `wallingRule` ni équivalent. Le mur est donc FABRIQUÉ avec ce que ce build offre : le type de pièce `immobile` (notation Betza vide, donc aucun coup) posé sur d4 et e5 pour bloquer les lignes, `mobilityRegionBlack<Pièce>` pour interdire ces deux cases aux six types de pièces noires — les Blancs n'y peuvent rien poser non plus, ce sont leurs propres pièces — et `pieceValueMg`/`pieceValueEg` à zéro pour que les murs ne pèsent rien dans l'évaluation. Le blocage des glissantes ne vient PAS de `mobilityRegion`, qui n'est qu'un masque d'arrivée appliqué après le calcul des attaques (`position.h`, `board_bb(c, pt)`), mais de l'occupation : un mur est une pièce, donc il arrête une ligne, et un cavalier lui saute par-dessus. La définition est ENGENDRÉE par l'app (`BarricadesConfiguration`) à partir d'une seule ligne, `wallSquares`, puis chargée par l'option UCI `VariantPath` avant `UCI_Variant` — l'ordre inverse laisserait le moteur refuser un nom qu'il ne connaît pas encore, sans rien dire. `BarricadesEngineSpikeTests` valide chacun de ces points contre le moteur RÉEL, et a été écrite avant la moindre ligne d'interface.
 
+- **Le faux échec de la suite complète, enfin expliqué.** Un test de variante échouait au hasard en suite COMPLÈTE — jamais en isolation — sur « moteur indisponible », depuis des semaines. Ce n'était pas le moteur : `FairyEngineController.captureRawLines` abandonnait au bout de 4 s, et ces 4 s ne mesurent PAS le calcul du moteur (`d` et `go perft 1` répondent en millisecondes) mais le temps que ses lignes mettent à remonter, chemin qui passe par le MainActor. Sous la charge d'une suite complète, il le dépassait ; `queryPosition` rendait `nil`, et l'appelant en concluait à une panne. Budget porté à 15 s, un second essai avant de conclure, et `EngineIntegrationGate` ne relâche plus son verrou en silence quand les moteurs ne se libèrent pas — il le SIGNALE sur le test fautif, au lieu de laisser échouer le suivant. La suite complète passe désormais en entier (898 tests).
+
+- **Barricades aléatoires : trois murs, dont un fixe.** Le mur fixe est tiré à la création de la partie et gardé par la vue-modèle : rien dans la FEN ne distingue un mur fixe d'un mur mobile. Les deux autres se redéploient à chaque demi-coup.
+
+- **Barricades aléatoires : deux mécanismes que la variante fixe n'avait pas.** D'abord, la position ne se REJOUE plus depuis le départ : le tirage des murs ne figure dans aucun coup, donc `startFEN + uciLog` ne le reproduirait pas. `EngineLegalityPlayViewModel` enchaîne désormais de position en position (`chainFEN`/`chainMoves`) — sans réécriture, ces deux variables valent exactement `startFEN` et `uciLog`, si bien que les cinq autres variantes de la famille ne changent pas d'un iota. Ensuite, `mobilityRegion` est figé par variante et ne peut pas suivre des murs mobiles : les prises de mur sont retirées de la liste que le moteur produit, et cette même liste lui est réimposée en `searchmoves` pour qu'il n'échafaude pas de plan autour. Tout le reste de la légalité — échec, clouage, roque, prise en passant — reste la sienne, et reste juste : un mur EST une pièce sur son échiquier. Garde-fou : si un tirage laisse le camp au trait sans aucun coup, on retire les murs au sort jusqu'à cinq fois, pour que deux murs mal tombés ne matent pas quelqu'un que personne n'a attaqué — un VRAI mat, lui, résiste à tous les tirages.
+
+- **Le mat de Barricades qui ne se voyait pas.** Signalé par l'utilisateur : un mat subi ne terminait pas la partie. La variante avait été ajoutée au catalogue sans toucher au `switch` de fin de partie, où seuls Atomique et Crazyhouse étaient nommés pour le mat classique — tout le reste tombait sur `return nil`. Le cas classique est devenu le DÉFAUT et les fins de partie particulières sont les exceptions nommées : une variante ajoutée sans y penser hérite maintenant des règles des échecs au lieu de n'en avoir aucune. Un test paramétré vérifie que chaque variante du catalogue conclut sur une position sans coup légal.
+
 - **Ce que la sonde a démenti.** L'hypothèse de départ était que la lettre du mur corromprait la rangée côté ChessKit, comme le fait la réserve du Crazyhouse. Faux, et mesuré : ChessKit 0.17.0 avance d'une case sur un caractère inconnu au MILIEU d'une rangée, si bien que `3pW1n1` se relit correctement `3p2n1`. La corruption du Crazyhouse venait d'ailleurs — sa réserve arrive APRÈS la 8e colonne, `Square.File` plafonne, et les caractères en trop s'empilent sur h1. `BarricadesFEN` existe quand même, pour ne pas dépendre d'une tolérance que rien ne promet, et `VariantFEN` compose les deux nettoyages pour qu'aucun écran n'ait à savoir laquelle des deux variantes enrichit sa FEN. Au passage : l'écran d'ANALYSE, lui, ne filtrait rien — une partie de Crazyhouse s'y relisait donc avec sa dernière rangée abîmée depuis le début. Corrigé.
 
 - **Le piège de localisation, en détail.** `Text("…")` et les autres vues SwiftUI localisent un `LocalizedStringKey` ; elles ne localisent PAS un `String`. Un littéral français typé `String` échappe donc à la fois à la traduction ET à l'extraction automatique du catalogue : rien ne le signale, l'app démarre, l'écran s'affiche. Deux formes du défaut coexistaient. La première : un composant dont le paramètre était typé `String` (`EngineUnavailableBanner.message`, neuf appelants ; `TextImportSheet.title`/`placeholder`/`confirmLabel`) — corrigée en typant le paramètre `LocalizedStringKey`, ce qui met la contrainte dans le type. La seconde : un texte composé à l'exécution, qui doit passer par `LocalizationController.string(_:)` — corrigée site par site (validateur FEN, scanner, éditeur de position, alerte gaffe, import PGN/FEN, répertoire), avec les clés ajoutées à la main au catalogue, `string(_:)` n'étant pas extrait automatiquement. Deux contrôles nouveaux dans `LocalizedStringHygieneTests` : toute chaîne française livrée doit avoir sa version anglaise, et un échantillon par famille de textes composés à l'exécution doit être réellement traduit.
 
-- **À surveiller.** Le Duck Chess **à deux sur le même appareil** n'est plus atteignable depuis le hub : l'écran de réglages est désormais celui, commun, des autres variantes, qui ne propose pas ce choix. Le modèle et la vue le gèrent toujours (`DuckChessViewModel(versusEngine: false)`, seul montage sous lequel les tests peuvent jouer les deux camps) — à rebrancher si on le veut, par une option sur l'écran de réglages partagé. `OpeningBadge` (dans `OpeningCoverage.swift`) n'a plus aucun appelant : ses libellés restent donc hors catalogue, volontairement — à supprimer plutôt qu'à traduire. L'accroche longue des variantes (`tagline`) n'a plus aucun lecteur depuis que les tuiles utilisent la forme courte : à supprimer ou à réemployer. Et `OpeningsModuleUITests/testTheModuleSurvivesTheLargestTextSize` échoue sur iPhone SE — en AX5 la liste paresseuse n'instancie jamais `opening_scandinavian` ; défaut du test, vérifié préexistant par bissection, jamais lancé sur cet appareil auparavant.
+- **Ménage du 29/08.** Le Duck Chess **à deux sur le même appareil** est rebranché : l'écran de réglages partagé porte un interrupteur « Deux joueurs », affiché seulement pour les variantes qui le déclarent (`PlayableVariant.supportsTwoPlayers`), et qui masque alors les réglages sans objet — couleur, force, aides. Le bouton « ½ » ne s'affiche plus là où il ne faisait rien : `PlayControlBar.onOfferDraw` est devenu optionnel, `nil` le masque, et sept écrans le passent ainsi. `OpeningBadge` garde son calcul (dérivé, testé) mais perd ses libellés et ses icônes, qu'aucun écran n'affichait — c'est pourquoi ils traînaient en français hors du catalogue. L'accroche longue des variantes (`tagline`) n'a plus aucun lecteur depuis que les tuiles utilisent la forme courte : à supprimer ou à réemployer. Et `OpeningsModuleUITests/testTheModuleSurvivesTheLargestTextSize` passe désormais sur iPhone SE : le test ne rangeait pas le clavier après avoir tapé sa recherche, et en AX5 le clavier plus le texte géant ne laissent rien d'autre à l'écran — le résultat filtré était là, dessous. Diagnostiqué en faisant dire à l'échec quels boutons il voyait : quatre touches de clavier.
 
 - **Historique des fichiers de notes** — `RELEASE_NOTES-1.5.0.md` et `RELEASE_NOTES-1.6.0.md` ont été supprimés du dépôt une fois leurs versions soumises, comme l'avait été `RELEASE_NOTES-1.4.0.md` avant eux. L'historique résumé des versions vit dans `METADATA.md`, et le détail complet reste dans l'historique Git.

@@ -112,8 +112,7 @@ struct CrazyhouseGameTests {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
             let vm = game()
             vm.start()
-            try await Task.sleep(for: .seconds(1))
-            try #require(!vm.isEngineUnavailable, "le moteur doit démarrer")
+            try await EngineIntegrationGate.waitUntilReady(vm)
 
             // 1.e4 d5 2.exd5 : les Blancs capturent un pion.
             for uci in ["e2e4", "d7d5", "e4d5"] {
@@ -151,8 +150,7 @@ struct CrazyhouseGameTests {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
             let vm = game()
             vm.start()
-            try await Task.sleep(for: .seconds(1))
-            try #require(!vm.isEngineUnavailable)
+            try await EngineIntegrationGate.waitUntilReady(vm)
 
             for uci in ["e2e4", "d7d5", "e4d5", "d8d5"] { await vm.forceMove(uci: uci) }
             vm.selectPocketPiece(.pawn)

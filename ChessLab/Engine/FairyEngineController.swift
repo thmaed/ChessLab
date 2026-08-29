@@ -97,8 +97,18 @@ actor FairyEngineController {
     /// méthodes qui l'utilisent (``legalMoves(startFEN:uciLog:)``,
     /// ``positionAfter(startFEN:uciLog:)``) sont toujours attendues
     /// séquentiellement par leur appelant, comme le reste de cet acteur.
+    ///
+    /// **Budget porté de 4 s à 15 s le 29/08.** Ce n'est pas le temps de
+    /// CALCUL du moteur — `d` et `go perft 1` répondent en millisecondes —
+    /// mais le temps qu'il faut aux lignes pour remonter jusqu'ici, et ce
+    /// chemin passe par le MainActor. Sous la charge d'une suite complète,
+    /// 4 s ne suffisaient pas : `queryPosition` rendait `nil`, et l'appelant
+    /// en concluait à une panne moteur alors que le moteur allait très bien.
+    /// C'était l'échec récurrent de `CrazyhouseGameTests` en suite complète,
+    /// vert en isolation à chaque fois. Le budget ne coûte rien quand tout va
+    /// bien : la boucle sort dès que la réponse arrive.
     private func captureRawLines(
-        sending raw: String, until terminator: @escaping (String) -> Bool, timeoutMs: Int = 4000
+        sending raw: String, until terminator: @escaping (String) -> Bool, timeoutMs: Int = 15000
     ) async -> [String] {
         guard engine.isRunning else { return [] }
         rawLineBuffer = []

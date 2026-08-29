@@ -58,7 +58,7 @@ struct VariantsHubView: View {
                             onOpenFairyVariant(variant)
                         }
                     }
-                    ForEach(EngineLegalityVariant.all, id: \.id) { variant in
+                    ForEach(EngineLegalityVariant.hubOrdered, id: \.id) { variant in
                         ModeCard(
                             title: LocalizedStringKey(variant.displayName),
                             shortTitle: LocalizedStringKey(variant.shortName),
@@ -94,6 +94,21 @@ struct VariantsHubView: View {
                         accessibilityID: "variant_\(DuckChessVariant.shared.id)",
                         action: onOpenDuckChess
                     )
+                    // Barricades ferme la marche — voir
+                    // ``EngineLegalityVariant/hubTrailing``.
+                    ForEach(EngineLegalityVariant.hubTrailing, id: \.id) { variant in
+                        ModeCard(
+                            title: LocalizedStringKey(variant.displayName),
+                            shortTitle: LocalizedStringKey(variant.shortName),
+                            subtitle: LocalizedStringKey(variant.shortTagline),
+                            systemImage: variant.icon,
+                            tint: variant.tint,
+                            isEnabled: true,
+                            accessibilityID: "variant_\(variant.id)"
+                        ) {
+                            onOpenEngineLegalityVariant(variant)
+                        }
+                    }
                 }
             }
             .padding(20)

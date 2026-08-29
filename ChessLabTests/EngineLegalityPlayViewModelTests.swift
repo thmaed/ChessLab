@@ -32,19 +32,12 @@ struct EngineLegalityPlayViewModelTests {
     // la suite (60 s, puis 278 s, puis 406 s observés au fil des ajouts) —
     // même classe que `GameClockStartTests` (120 s → 300 s), pas une
     // régression réelle. 0 échec en isolation à chaque mesure (4/4 en ~4 s).
+    /// Déléguée à ``EngineIntegrationGate/waitUntilReady(_:timeout:sourceLocation:)``
+    /// depuis le 29/08 : les suites Crazyhouse avaient besoin de la même
+    /// attente, et deux copies d'un compte à rebours moteur sont deux façons
+    /// de diverger.
     private func waitReady(_ vm: EngineLegalityPlayViewModel, timeout: TimeInterval = 600) async throws {
-        let deadline = Date().addingTimeInterval(timeout)
-        // Sortir dès `isEngineUnavailable` : un moteur qui a VRAIMENT
-        // abandonné (budget de `acquireEngineProcess` épuisé) ne deviendra
-        // jamais prêt — poursuivre à interroger `isPositionReady` jusqu'à
-        // `deadline` gaspillait les 600 s en pure perte à chaque échec de ce
-        // genre (observé en suite complète le 25/08 : le vrai signalement
-        // « Course des rois... moteur indisponible » de l'utilisateur, voir
-        // ``EngineController/acquireEngineProcess(timeoutMs:)``).
-        while Date() < deadline, !vm.isPositionReady, !vm.isEngineUnavailable {
-            try await Task.sleep(for: .milliseconds(200))
-        }
-        try #require(vm.isPositionReady, "la position initiale n'a jamais été prête")
+        try await EngineIntegrationGate.waitUntilReady(vm, timeout: timeout)
     }
 
     @Test("Course des rois : position de départ, l'ordinateur répond après le premier coup")

@@ -12,6 +12,7 @@ struct FairyVariantPlayView: View {
 
     @State private var appSettings = AppSettings.shared
     @State private var showResignConfirmation = false
+    @State private var showDrawConfirmation = false
     @State private var copiedMessage: String?
 
     private var variant: FairyVariant { viewModel.variant }
@@ -64,6 +65,19 @@ struct FairyVariantPlayView: View {
             titleVisibility: .visible
         ) {
             Button("Abandonner", role: .destructive) { viewModel.userResigns() }
+            Button("Annuler", role: .cancel) {}
+        }
+        .alert("Nulle refusée", isPresented: $viewModel.drawOfferDeclinedByEngine) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text("Le moteur préfère continuer la partie.")
+        }
+        .confirmationDialog(
+            "Proposer nulle au moteur ?",
+            isPresented: $showDrawConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("Proposer nulle") { viewModel.offerDrawToEngine() }
             Button("Annuler", role: .cancel) {}
         }
         .alert(
@@ -271,7 +285,7 @@ struct FairyVariantPlayView: View {
             onUndoResume: { viewModel.cancelResumeFromReview() },
             onToggleHint: { viewModel.toggleHint() },
             onShowMoveList: {},
-            onOfferDraw: {},
+            onOfferDraw: { showDrawConfirmation = true },
             onResign: { showResignConfirmation = true }
         )
     }

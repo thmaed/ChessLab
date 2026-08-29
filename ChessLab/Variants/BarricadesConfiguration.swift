@@ -38,6 +38,16 @@ enum BarricadesConfiguration {
 
     static let variantID = "barricades"
 
+    /// La variante SŒUR, où les murs se déplacent à chaque demi-coup.
+    ///
+    /// Elle ne peut pas se protéger comme la fixe : `mobilityRegion` est une
+    /// propriété STATIQUE de la variante, elle ne suit pas des murs qui
+    /// bougent. Les murs y restent donc capturables aux yeux du moteur, et
+    /// c'est la vue-modèle qui retire ces coups de la liste — une soustraction
+    /// d'une ligne, pas une réimplémentation des échecs. Voir
+    /// ``EngineLegalityVariant/removingWallCaptures(from:in:)``.
+    static let randomVariantID = "randombarricades"
+
     /// Les cases murées. Le nom de la variante vient d'elles.
     static let wallSquares: [Square] = [Square("d4"), Square("e5")]
 
@@ -77,21 +87,138 @@ enum BarricadesConfiguration {
         return tokens.joined(separator: " ")
     }
 
-    /// Le fichier de définition, tel que `VariantPath` l'attend.
+    /// Position de départ de la variante ALÉATOIRE : les échecs ordinaires.
+    /// Ses deux murs sont posés au premier coup, au hasard — il n'y a donc
+    /// rien à écrire ici.
+    static let randomStartFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+    /// Rangées où un mur mobile a le droit de se poser. Ni la première ni la
+    /// dernière : un mur surgi sur la rangée de départ enfermerait une tour
+    /// dans son coin sans que personne y soit pour rien.
+    static let randomWallRanks = 2...7
+
+    /// Combien de murs se REDÉPLOIENT à chaque demi-coup.
+    static let movingWallCount = 2
+
+    /// Trois murs en tout : deux qui sautent d'une case à l'autre, un qui
+    /// reste. Le fixe donne un point d'appui — sans lui, rien du plateau ne
+    /// tient d'un coup au suivant et la partie n'a plus de forme du tout.
+
+    /// Le fichier de définition, tel que `VariantPath` l'attend — les DEUX
+    /// variantes dans un seul fichier, qu'un seul chargement suffit à
+    /// enseigner au moteur.
     static var configurationText: String {
-        let open = openSquaresBitboard
+        let wall = String(wallLetter).lowercased()
         var lines = [
             "# Barricades — engendré par BarricadesConfiguration, ne pas éditer à la main.",
             "[\(variantID):chess]",
-            "immobile = \(String(wallLetter).lowercased())",
+            "immobile = \(wall)",
             "startFen = \(startFEN)",
-            "pieceValueMg = \(String(wallLetter).lowercased()):0",
-            "pieceValueEg = \(String(wallLetter).lowercased()):0",
+            "pieceValueMg = \(wall):0",
+            "pieceValueEg = \(wall):0",
         ]
+        let open = openSquaresBitboard
         for piece in restrictedPieceNames {
             lines.append("mobilityRegionBlack\(piece) = \(open)")
         }
+        // La variante ALÉATOIRE n'a PAS de `mobilityRegion` : ses murs se
+        // déplacent, aucune région figée ne pourrait les suivre.
+        lines += [
+            "",
+            "[\(randomVariantID):chess]",
+            "immobile = \(wall)",
+            "startFen = \(randomStartFEN)",
+            "pieceValueMg = \(wall):0",
+            "pieceValueEg = \(wall):0",
+        ]
         return lines.joined(separator: "\n") + "\n"
+    }
+
+    // MARK: Murs mobiles
+
+    /// Repose les murs MOBILES au hasard sur des cases vides des rangées 2 à 7,
+    /// en laissant le mur FIXE où il est.
+    ///
+    /// - parameter fixed: le mur qui ne bouge pas de la partie. Il n'est pas
+    ///   retiré puis remis : il n'est jamais retiré. S'il se retrouve sous une
+    ///   pièce — impossible, aucune pièce ne peut s'y poser — il serait
+    ///   simplement ignoré.
+    ///
+    /// Rend `nil` si la position est illisible ou s'il n'y a pas assez de
+    /// cases libres : la partie continue alors avec les murs qu'elle avait,
+    /// plutôt que de s'arrêter sur un détail.
+    static func relocatingWalls(
+        in fen: String, fixed: Square? = nil, using generator: inout some RandomNumberGenerator
+    ) -> String? {
+        let cleared = BarricadesFEN.forChessKit(fen)
+        guard let position = Position(fen: cleared) else { return nil }
+        let occupied = Set(position.pieces.map(\.square))
+        let candidates = DuckChessRules.allSquares.filter { square in
+            randomWallRanks.contains(square.rank.value)
+                && !occupied.contains(square)
+                && square != fixed
+        }
+        guard candidates.count >= movingWallCount else { return nil }
+
+        var chosen: Set<Square> = fixed.map { [$0] } ?? []
+        while chosen.count < movingWallCount + (fixed == nil ? 0 : 1) {
+            guard let square = candidates.randomElement(using: &generator) else { return nil }
+            chosen.insert(square)
+        }
+        return inserting(walls: chosen, into: cleared)
+    }
+
+    /// Tire la case du mur FIXE d'une partie, et rend la position d'ouverture
+    /// complète — mur fixe compris, murs mobiles compris.
+    static func openingPosition(
+        using generator: inout some RandomNumberGenerator
+    ) -> (fen: String, fixedWall: Square?) {
+        guard let position = Position(fen: randomStartFEN) else { return (randomStartFEN, nil) }
+        let occupied = Set(position.pieces.map(\.square))
+        let candidates = DuckChessRules.allSquares.filter {
+            randomWallRanks.contains($0.rank.value) && !occupied.contains($0)
+        }
+        guard let fixed = candidates.randomElement(using: &generator),
+              let fen = relocatingWalls(in: randomStartFEN, fixed: fixed, using: &generator)
+        else { return (randomStartFEN, nil) }
+        return (fen, fixed)
+    }
+
+    /// Réécrit une FEN SANS mur en y plaçant ceux qu'on lui donne.
+    static func inserting(walls: Set<Square>, into fen: String) -> String? {
+        var fields = fen.split(separator: " ", omittingEmptySubsequences: false).map(String.init)
+        guard let placement = fields.first else { return nil }
+        let files = Array("abcdefgh")
+        var ranks: [String] = []
+        for (index, rankText) in placement.split(separator: "/", omittingEmptySubsequences: false).enumerated() {
+            let rank = 8 - index
+            var slots: [Character] = []
+            for character in rankText {
+                if let empty = character.wholeNumberValue, (1...8).contains(empty) {
+                    slots.append(contentsOf: Array(repeating: ".", count: empty))
+                } else {
+                    slots.append(character)
+                }
+            }
+            for (file, slot) in slots.enumerated() where slot == "." {
+                guard file < files.count, walls.contains(Square("\(files[file])\(rank)")) else { continue }
+                slots[file] = wallLetter
+            }
+            var line = ""
+            var empty = 0
+            for slot in slots {
+                if slot == "." {
+                    empty += 1
+                } else {
+                    if empty > 0 { line += "\(empty)"; empty = 0 }
+                    line.append(slot)
+                }
+            }
+            if empty > 0 { line += "\(empty)" }
+            ranks.append(line)
+        }
+        fields[0] = ranks.joined(separator: "/")
+        return fields.joined(separator: " ")
     }
 
     /// Écrit la définition sur le disque et rend son chemin.

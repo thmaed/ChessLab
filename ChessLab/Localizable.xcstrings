@@ -31,7 +31,22 @@
         }
       }
     },
-    "%@": {},
+    "%@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@"
+          }
+        }
+      }
+    },
     "%@ (%@)": {
       "localizations": {
         "en": {
@@ -1131,22 +1146,6 @@
         }
       }
     },
-    "36 pions contre une armée classique": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "36 pawns against a full army"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "36 pions contre une armée classique"
-          }
-        }
-      }
-    },
     "4": {
       "localizations": {
         "en": {
@@ -1415,6 +1414,22 @@
         }
       }
     },
+    "Adversaire": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opponent"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adversaire"
+          }
+        }
+      }
+    },
     "Aide": {
       "localizations": {
         "en": {
@@ -1638,22 +1653,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Attaque de l'Amazone"
-          }
-        }
-      }
-    },
-    "Amenez votre roi au centre pour gagner": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "March your king to the centre to win"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Amenez votre roi au centre pour gagner"
           }
         }
       }
@@ -2838,6 +2837,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Barricades"
+          }
+        }
+      }
+    },
+    "Barricades aléatoires": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shifting Barricades"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Barricades aléatoires"
           }
         }
       }
@@ -4038,6 +4053,22 @@
         }
       }
     },
+    "Chacun son tour sur le même écran, sans ordinateur.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taking turns on the same screen, with no computer."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chacun son tour sur le même écran, sans ordinateur."
+          }
+        }
+      }
+    },
     "Changer": {
       "localizations": {
         "en": {
@@ -4109,22 +4140,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Chapitre terminé !"
-          }
-        }
-      }
-    },
-    "Chaque capture fait exploser les cases voisines": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Every capture blows up the surrounding squares"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chaque capture fait exploser les cases voisines"
           }
         }
       }
@@ -5723,22 +5738,6 @@
         }
       }
     },
-    "Deux cases murées dès le premier coup": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Two squares walled off from the first move"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deux cases murées dès le premier coup"
-          }
-        }
-      }
-    },
     "Deux joueurs": {
       "localizations": {
         "en": {
@@ -5751,6 +5750,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deux joueurs"
+          }
+        }
+      }
+    },
+    "Deux joueurs sur cet appareil": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two players on this device"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deux joueurs sur cet appareil"
           }
         }
       }
@@ -7743,6 +7758,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Il manque un roi."
+          }
+        }
+      }
+    },
+    "Ils bougent chaque coup": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "They move every move"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ils bougent chaque coup"
           }
         }
       }
@@ -9805,22 +9836,6 @@
         }
       }
     },
-    "Le premier roi en 8e rangée gagne": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The first king on the 8th rank wins"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le premier roi en 8e rangée gagne"
-          }
-        }
-      }
-    },
     "Le presse-papiers ne contient pas d'image.": {
       "localizations": {
         "en": {
@@ -10056,22 +10071,6 @@
         }
       }
     },
-    "Les pièces capturées changent de camp et se reposent": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Captured pieces switch sides and come back"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Les pièces capturées changent de camp et se reposent"
-          }
-        }
-      }
-    },
     "Les pièces de la rangée de base sont mélangées — 960 départs possibles, zéro théorie à réciter, que de la compréhension. Aussi appelé « Fischer Random ».": {
       "extractionState": "stale",
       "localizations": {
@@ -10133,6 +10132,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Les puzzles tactiques proposés dans l'app sont issus de la base de données publique de Lichess."
+          }
+        }
+      }
+    },
+    "Les règles des échecs, avec deux murs qui ne tiennent pas en place : après CHAQUE coup, ils sautent sur deux cases vides tirées au hasard entre la 2e et la 7e rangée. Aucune pièce ne peut s'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n'est acquis, et calculer loin ne sert pas à grand-chose.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The rules of chess, with two walls that will not stay put: after EVERY move they jump to two empty squares drawn at random between the 2nd and 7th ranks. No piece may land on them or move through them, and they cannot be captured. A bishop that held a diagonal loses it next move, a rook pins and then does not: nothing is settled, and calculating far ahead is worth very little."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les règles des échecs, avec deux murs qui ne tiennent pas en place : après CHAQUE coup, ils sautent sur deux cases vides tirées au hasard entre la 2e et la 7e rangée. Aucune pièce ne peut s'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n'est acquis, et calculer loin ne sert pas à grand-chose."
           }
         }
       }
@@ -11084,6 +11099,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Moteurs"
+          }
+        }
+      }
+    },
+    "Murs mobiles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moving walls"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Murs mobiles"
           }
         }
       }
@@ -12153,22 +12184,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Pause"
-          }
-        }
-      }
-    },
-    "Perdez toutes vos pièces — ou restez bloqué — pour gagner": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Lose all your pieces — or get stuck — to win"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Perdez toutes vos pièces — ou restez bloqué — pour gagner"
           }
         }
       }
@@ -17237,22 +17252,6 @@
         }
       }
     },
-    "Trois échecs infligés valent la partie": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Deliver three checks to win the game"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Trois échecs infligés valent la partie"
-          }
-        }
-      }
-    },
     "Troitsky's Knight Errand (1906)": {
       "extractionState": "stale",
       "localizations": {
@@ -17386,22 +17385,6 @@
         }
       }
     },
-    "Un canard bloque une case après chaque coup": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A duck blocks a square after every move"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un canard bloque une case après chaque coup"
-          }
-        }
-      }
-    },
     "Un grand merci à Nils Gauthey pour tout le travail accompli sur ChessLab. Ses relectures, ses corrections et ses idées ont fait progresser l'app dans son ensemble, et tout particulièrement la qualité des ouvertures et des finales : les lignes que vous étudiez ici lui doivent beaucoup.": {
       "localizations": {
         "en": {
@@ -17430,22 +17413,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Un jeton tous les %lld coups"
-          }
-        }
-      }
-    },
-    "Un jeton tous les 7 coups pour en jouer deux d'affilée": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A token every 7 moves, to play two in a row"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un jeton tous les 7 coups pour en jouer deux d'affilée"
           }
         }
       }

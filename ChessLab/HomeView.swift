@@ -1632,7 +1632,7 @@ private struct DuckChessActiveGameHost: View {
         .onAppear {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
-                    DuckChessViewModel(settings: settings)
+                    DuckChessViewModel(settings: settings, versusEngine: !settings.twoPlayers)
                 }
             }
         }

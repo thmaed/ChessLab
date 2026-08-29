@@ -29,7 +29,6 @@ struct StolenMoveVariant: PlayableVariant {
     let id: String
     private let displayNameKey: String
     private let shortNameKey: String
-    private let taglineKey: String
     /// Accroche raccourcie pour les tuiles des petits iPhone — voir
     /// ``FairyVariant/shortTagline``.
     private let shortTaglineKey: String
@@ -40,7 +39,6 @@ struct StolenMoveVariant: PlayableVariant {
 
     var displayName: String { LocalizationController.string(displayNameKey) }
     var shortName: String { LocalizationController.string(shortNameKey) }
-    var tagline: String { LocalizationController.string(taglineKey) }
     var shortTagline: String { LocalizationController.string(shortTaglineKey) }
     var rules: String { LocalizationController.string(rulesKey) }
 
@@ -48,7 +46,6 @@ struct StolenMoveVariant: PlayableVariant {
         id: "stolenmove",
         displayNameKey: "Coup Volé",
         shortNameKey: "Coup Volé",
-        taglineKey: "Un jeton tous les 7 coups pour en jouer deux d'affilée",
         shortTaglineKey: "Un jeton, 2 coups",
         rulesKey: "Les règles sont celles du jeu classique. En plus : tous les 7 coups joués (réglable de 4 à 8), vous gagnez un jeton. Vous n'en gardez jamais plus d'UN : le nouveau efface l'ancien s'il n'a pas été dépensé, et impossible de le dépenser si vous êtes vous-même en échec. Le dépenser vous fait jouer DEUX coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale.",
         icon: "bolt.badge.clock.fill",

@@ -703,6 +703,63 @@ final class DuckChessViewModel {
 
     func userResigns() { resign(userColor) }
 
+    // MARK: Nulle proposée
+
+    /// Dernière évaluation du moteur, de SON point de vue.
+    ///
+    /// Le Duck Chess n'a pas de nulle « selon les règles » — on y gagne en
+    /// capturant le roi, il n'y a ni pat ni matériel insuffisant (un fou seul
+    /// prend un roi). La nulle par ACCORD, elle, garde tout son sens : deux
+    /// joueurs peuvent convenir d'en rester là.
+    private var lastEngineEvalCp: Int? {
+        guard let currentEvalCp, let engineColor else { return nil }
+        return engineColor == .white ? currentEvalCp : -currentEvalCp
+    }
+
+    var drawOfferDeclinedByEngine = false
+
+    /// L'avis du moteur ne traîne pas toujours à portée : `currentEvalCp` ne
+    /// se remplit que si le joueur a laissé la barre d'évaluation allumée. On
+    /// le lui DEMANDE alors, plutôt que de refuser la nulle pour une raison
+    /// qui n'a rien à voir avec la position.
+    func offerDrawToEngine() {
+        guard outcome == nil, isVersusEngine, !isEngineThinking, let engine else { return }
+        if let known = lastEngineEvalCp {
+            settleDrawOffer(engineEvalCp: known)
+            return
+        }
+        enqueueEngineWork { [weak self] in
+            guard let self, self.outcome == nil else { return }
+            let evaluated = await engine.evaluate(
+                position: self.position, duck: self.duckSquare,
+                enPassant: self.enPassant, movetimeMs: 400
+            )
+            let cp = evaluated.map { self.engineColor == .white ? $0.cpWhite : -$0.cpWhite }
+            self.settleDrawOffer(engineEvalCp: cp)
+        }
+    }
+
+    private func settleDrawOffer(engineEvalCp: Int?) {
+        guard outcome == nil else { return }
+        guard VariantDrawRules.engineAcceptsDraw(lastEngineEvalCp: engineEvalCp) else {
+            drawOfferDeclinedByEngine = true
+            return
+        }
+        outcome = GameOutcome(winner: nil, reason: .drawByAgreement)
+        clock?.pause()
+        hintMoves = []
+        Haptics.gameEnded()
+    }
+
+    /// À deux sur le même appareil, personne n'a besoin d'être convaincu.
+    func agreeToDraw() {
+        guard outcome == nil, !isVersusEngine else { return }
+        outcome = GameOutcome(winner: nil, reason: .drawByAgreement)
+        clock?.pause()
+        hintMoves = []
+        Haptics.gameEnded()
+    }
+
     // MARK: Export & analyse
 
     /// PGN annoté à la mode Duck Chess : `e4@f6` — le coup, puis la case du

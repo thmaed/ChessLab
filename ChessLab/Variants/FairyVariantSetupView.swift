@@ -20,8 +20,14 @@ struct FairyVariantSetupView: View {
     @State private var hintsEnabled: Bool
     @State private var blunderAlertEnabled: Bool
     @State private var stolenMoveTokenInterval: Int
+    @State private var twoPlayers: Bool
 
     private var isStolenMove: Bool { variant.id == StolenMoveVariant.shared.id }
+
+    /// Face à personne, il n'y a ni force à régler, ni couleur à choisir, ni
+    /// aide à demander : ces trois sections disparaissent au lieu de proposer
+    /// des réglages sans effet.
+    private var hidesEngineSettings: Bool { variant.supportsTwoPlayers && twoPlayers }
 
     init(variant: any PlayableVariant, onStart: @escaping (FairyVariantSettings) -> Void) {
         self.variant = variant
@@ -46,6 +52,7 @@ struct FairyVariantSetupView: View {
             max(saved.stolenMoveTokenInterval, StolenMoveVariant.tokenIntervalRange.lowerBound),
             StolenMoveVariant.tokenIntervalRange.upperBound
         ))
+        _twoPlayers = State(initialValue: variant.supportsTwoPlayers && saved.twoPlayers)
     }
 
     var body: some View {
@@ -53,6 +60,20 @@ struct FairyVariantSetupView: View {
             VStack(alignment: .leading, spacing: 22) {
                 ruleSummary
 
+                if variant.supportsTwoPlayers {
+                    SettingsSection(title: "Adversaire", systemImage: "person.2.fill", tint: variant.tint) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            ToggleRow(label: "Deux joueurs sur cet appareil", isOn: $twoPlayers)
+                            Text("Chacun son tour sur le même écran, sans ordinateur.")
+                                .font(.caption)
+                                .foregroundStyle(Theme.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                    .accessibilityIdentifier("fairyVariant_twoPlayers")
+                }
+
+                if !hidesEngineSettings {
                 SettingsSection(title: "Couleur", systemImage: "circle.lefthalf.filled", tint: variant.tint) {
                     FlowLayout(spacing: 8, lineSpacing: 8) {
                         ForEach(PlayerColorChoice.allCases) { choice in
@@ -87,20 +108,25 @@ struct FairyVariantSetupView: View {
                     }
                 }
 
+                }
+
                 cadenceSection
 
                 if isStolenMove {
                     stolenMoveSection
                 }
 
-                SettingsSection(title: "Aides", systemImage: "lifepreserver", tint: variant.tint) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar)
-                        ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled)
-                        ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled)
+                if !hidesEngineSettings {
+                    SettingsSection(title: "Aides", systemImage: "lifepreserver", tint: variant.tint) {
+                        VStack(alignment: .leading, spacing: 10) {
+                            ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar)
+                            ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled)
+                            ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled)
+                        }
                     }
                 }
             }
+            .animation(Theme.gentle, value: twoPlayers)
             .padding(20)
         }
         .appBackground()
@@ -223,6 +249,7 @@ struct FairyVariantSetupView: View {
         settings.hintsEnabled = hintsEnabled
         settings.blunderAlertEnabled = blunderAlertEnabled
         settings.stolenMoveTokenInterval = stolenMoveTokenInterval
+        settings.twoPlayers = variant.supportsTwoPlayers && twoPlayers
         FairyVariantSettingsStore.save(settings, for: variant.id)
         onStart(settings)
     }

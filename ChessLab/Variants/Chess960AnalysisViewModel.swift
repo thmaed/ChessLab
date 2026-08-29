@@ -554,6 +554,24 @@ final class Chess960AnalysisViewModel {
         return ranked
     }
 
+
+    // MARK: Courbe d'évaluation
+
+    /// Les points de la courbe, tels qu'``EvalCurveView`` les attend.
+    ///
+    /// Tirés du CACHE de classification : la courbe se dessine donc au fur et
+    /// à mesure que la passe avance, au lieu d'apparaître d'un coup à la fin.
+    /// Les positions non encore évaluées sont simplement absentes — une
+    /// courbe qui pousse vaut mieux qu'un rectangle vide.
+    var evalCurvePoints: [EvalCurvePoint<Int>] {
+        (0...max(0, totalPlies)).compactMap { ply in
+            guard let cached = evalCache[ply] else { return nil }
+            return EvalCurvePoint(
+                id: ply, ply: ply, centipawnsWhite: cached.cpWhite, quality: moveQuality[ply]
+            )
+        }
+    }
+
     // MARK: Export
 
     var exportedPGN: String {

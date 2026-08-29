@@ -47,8 +47,7 @@ struct CrazyhouseRegressionTests {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
             let vm = game()
             vm.start()
-            try await Task.sleep(for: .seconds(1))
-            try #require(!vm.isEngineUnavailable)
+            try await EngineIntegrationGate.waitUntilReady(vm)
 
             // 1.e4 d5 2.exd5 Dxd5 : chacun tient un pion.
             for uci in ["e2e4", "d7d5", "e4d5", "d8d5"] { await vm.forceMove(uci: uci) }
@@ -70,8 +69,7 @@ struct CrazyhouseRegressionTests {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
             let vm = game()
             vm.start()
-            try await Task.sleep(for: .seconds(1))
-            try #require(!vm.isEngineUnavailable)
+            try await EngineIntegrationGate.waitUntilReady(vm)
 
             for uci in ["e2e4", "d7d5", "e4d5", "d8d5"] { await vm.forceMove(uci: uci) }
             vm.selectPocketPiece(.pawn)
@@ -95,8 +93,7 @@ struct CrazyhouseRegressionTests {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
             let vm = game()
             vm.start()
-            try await Task.sleep(for: .seconds(1))
-            try #require(!vm.isEngineUnavailable)
+            try await EngineIntegrationGate.waitUntilReady(vm)
 
             for uci in ["e2e4", "d7d5", "e4d5", "d8d5"] { await vm.forceMove(uci: uci) }
             let pliesBefore = vm.totalPlies
@@ -129,8 +126,7 @@ struct CrazyhouseRegressionTests {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
             let vm = game()
             vm.start()
-            try await Task.sleep(for: .seconds(1))
-            try #require(!vm.isEngineUnavailable)
+            try await EngineIntegrationGate.waitUntilReady(vm)
 
             for uci in ["e2e4", "d7d5", "e4d5"] { await vm.forceMove(uci: uci) }
             #expect(!vm.userPocket.isEmpty, "après exd5, les Blancs tiennent un pion")

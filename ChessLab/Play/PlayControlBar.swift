@@ -52,7 +52,15 @@ struct PlayControlBar: View {
     let onUndoResume: () -> Void
     let onToggleHint: () -> Void
     let onShowMoveList: () -> Void
-    let onOfferDraw: () -> Void
+    /// `nil` masque le bouton « ½ ».
+    ///
+    /// Il ne se propose pas partout : contre l'ordinateur dans une variante,
+    /// personne n'est là pour négocier, et en Duck Chess la nulle n'existe
+    /// même pas — on gagne en capturant le roi. Ces écrans passaient jusqu'ici
+    /// une fermeture VIDE : le bouton s'affichait, on pouvait le presser, et
+    /// il ne se passait rien. Un bouton mort promet quelque chose que l'écran
+    /// ne tient pas ; mieux vaut ne pas le montrer.
+    let onOfferDraw: (() -> Void)?
     let onResign: () -> Void
 
     /// Côté d'un bouton rond. Le minimum des Human Interface Guidelines est
@@ -154,14 +162,16 @@ struct PlayControlBar: View {
                     action: onShowMoveList
                 )
             }
-            elasticGap
-            controlButton(
-                text: "½",
-                label: "Proposer nulle",
-                tint: Theme.info,
-                disabled: isFinished || isEngineThinking,
-                action: onOfferDraw
-            )
+            if let onOfferDraw {
+                elasticGap
+                controlButton(
+                    text: "½",
+                    label: "Proposer nulle",
+                    tint: Theme.info,
+                    disabled: isFinished || isEngineThinking,
+                    action: onOfferDraw
+                )
+            }
             elasticGap
             controlButton(
                 "flag.fill",
