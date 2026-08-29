@@ -277,6 +277,19 @@ final class EngineLegalityPlayViewModel {
 
     func cancelPromotion() { pendingPromotion = nil }
 
+    /// Type de pièce d'une POSE (`P@e4` → pion) — inverse de
+    /// ``FairyEngineController/fenLetter(for:)``.
+    private static func pocketKind(fromDrop uci: String) -> Piece.Kind? {
+        switch uci.first {
+        case "P": .pawn
+        case "N": .knight
+        case "B": .bishop
+        case "R": .rook
+        case "Q": .queen
+        default: nil
+        }
+    }
+
     private func clearSelection() {
         selectedSquare = nil
         selectedPocketKind = nil
@@ -353,11 +366,21 @@ final class EngineLegalityPlayViewModel {
         uciLog = candidateLog
         sanLog.append(san)
         fenLog.append(query.fen)
-        // Une POSE n'a pas de case de départ : rien à consigner dans
-        // `moveLog`, dont chaque entrée est un `Move` (pièce, départ,
-        // arrivée). L'analyse s'en accommode — elle lit `moveLog` pour juger
-        // les sacrifices, et une pièce posée n'en est pas un.
-        if !uci.contains("@"), let beforePosition = Position(fen: beforeFEN) {
+        // Une POSE n'a pas de case de départ. On lui consigne malgré tout une
+        // entrée, départ ET arrivée sur la case de pose : `moveLog` est
+        // indexé par PLY partout ailleurs (``displayedLastMove``,
+        // ``resumeFromReview()``, la troncature d'une reprise), et sauter une
+        // entrée décalait tout — le surlignage du dernier coup désignait le
+        // mauvais, et reprendre après deux poses plantait sur
+        // `moveLog.suffix(from:)`, l'indice dépassant le tableau.
+        if uci.contains("@"), let square = Square(String(uci.dropFirst(2))) as Square?,
+           let kind = Self.pocketKind(fromDrop: uci) {
+            moveLog.append(Move(
+                result: .move,
+                piece: Piece(kind, color: previousMover, square: square),
+                start: square, end: square
+            ))
+        } else if let beforePosition = Position(fen: CrazyhouseFEN.forChessKit(beforeFEN)) {
             let from = Square(String(uci.prefix(2)))
             let to = Square(String(uci.dropFirst(2).prefix(2)))
             if let piece = beforePosition.piece(at: from) {
@@ -383,7 +406,7 @@ final class EngineLegalityPlayViewModel {
             }
         }
         currentFEN = query.fen
-        board = Board(position: Position(fen: query.fen)!)
+        board = Board(position: Position(fen: CrazyhouseFEN.forChessKit(query.fen))!)
         legalMovesForCurrentPosition = query.legalMoves
         pocket = query.pocket
         playSound(for: san)
@@ -436,14 +459,29 @@ final class EngineLegalityPlayViewModel {
         // PAS de ``runOnEngineQueue`` ici : cette méthode tourne déjà À
         // L'INTÉRIEUR d'un travail mis en file par `start()` — s'auto-mettre
         // en file bloquerait indéfiniment (elle attendrait sa propre fin).
-        guard let query = await engine.queryPosition(startFEN: startFEN, uciLog: []) else {
+        // Position COURANTE, pas la position de départ. Le view model survit
+        // à la navigation (``SessionStore`` le conserve exprès), donc
+        // `start()` est rappelé à chaque retour sur une partie DÉJÀ jouée :
+        // réinterroger le départ y remettait le plateau à zéro tout en
+        // gardant les journaux de coups, désynchronisant les deux. La
+        // consultation plantait alors sur `fenLog[ply]`, et un moteur qui
+        // avait le trait rejouait depuis la position initiale au milieu de
+        // la partie.
+        //
+        // Latent jusqu'ici : avant que ``FairyEngineController/start(variant:coreCount:multipv:)``
+        // ne sache repartir d'une instance neuve, le redémarrage échouait et
+        // cette méthode sortait AVANT la remise à zéro. Le correctif du
+        // moteur a rendu le défaut atteignable.
+        let isResuming = !uciLog.isEmpty
+        guard let query = await engine.queryPosition(startFEN: startFEN, uciLog: uciLog) else {
             isEngineUnavailable = true
             return
         }
         currentFEN = query.fen
-        fenLog = [query.fen]
-        board = Board(position: Position(fen: query.fen)!)
+        if !isResuming { fenLog = [query.fen] }
+        board = Board(position: Position(fen: CrazyhouseFEN.forChessKit(query.fen))!)
         legalMovesForCurrentPosition = query.legalMoves
+        pocket = query.pocket
         isPositionReady = true
 
         if let end = variant.outcome(afterFEN: query.fen, legalMovesForNextMover: query.legalMoves, inCheck: query.inCheck) {
@@ -507,7 +545,11 @@ final class EngineLegalityPlayViewModel {
         defer { isEngineThinking = false }
 
         await engine.synchronize()
-        await engine.send(.position(.fen(board.position.fen)))
+        // FEN BRUTE, pas `board.position.fen` : celle de ChessKit a
+        // perdu la réserve (et, avant assainissement, corrompait la
+        // dernière rangée). Sans réserve, le moteur ne reposerait jamais
+        // ce qu'il a capturé.
+        await engine.send(.position(.fen(currentFEN)))
 
         let mover = engineColor
         let budgetMs: Int
@@ -742,7 +784,7 @@ final class EngineLegalityPlayViewModel {
             return
         }
         reviewPly = clamped
-        reviewBoard = Board(position: Position(fen: fenLog[clamped])!)
+        reviewBoard = Board(position: Position(fen: CrazyhouseFEN.forChessKit(fenLog[clamped]))!)
         clearSelection()
         refreshDisplayedEvalBar()
     }
@@ -810,7 +852,7 @@ final class EngineLegalityPlayViewModel {
         fenLog.append(contentsOf: undo.fen)
         moveLog.append(contentsOf: undo.moves)
         currentFEN = fenLog.last ?? currentFEN
-        board = Board(position: Position(fen: currentFEN)!)
+        board = Board(position: Position(fen: CrazyhouseFEN.forChessKit(currentFEN))!)
         outcome = nil
         clearSelection()
         isPositionReady = false
@@ -840,7 +882,7 @@ final class EngineLegalityPlayViewModel {
         fenLog = Array(fenLog.prefix(count + 1))
         moveLog = Array(moveLog.prefix(count))
         currentFEN = fenLog.last ?? startFEN
-        board = Board(position: Position(fen: currentFEN)!)
+        board = Board(position: Position(fen: CrazyhouseFEN.forChessKit(currentFEN))!)
         outcome = nil
         pendingBlunderWarning = nil
         clearSelection()
@@ -856,9 +898,14 @@ final class EngineLegalityPlayViewModel {
     /// ici : on revient toujours à une position déjà jouée, donc non
     /// terminale par construction. Enchaîne ensuite comme
     /// ``initializePosition()``/``performMove(uci:)``.
+    /// Rafraîchit ce qui dépend de la position après une troncature ou une
+    /// reprise — y compris la RÉSERVE, qu'un oubli laissait figée sur son
+    /// contenu d'avant : la bande montrait une pièce que le joueur n'avait
+    /// plus, et la choisir n'allumait aucune case.
     private func refreshLegalMovesAndContinue() async {
         guard let query = await engine.queryPosition(startFEN: startFEN, uciLog: uciLog) else { return }
         legalMovesForCurrentPosition = query.legalMoves
+        pocket = query.pocket
         isPositionReady = true
 
         if board.position.sideToMove == engineColor {

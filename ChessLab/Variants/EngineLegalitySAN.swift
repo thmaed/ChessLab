@@ -27,7 +27,11 @@ enum EngineLegalitySAN {
             let square = String(uci[uci.index(after: atIndex)...])
             return kind + "@" + square + suffix(isCheck: isCheck, isMate: isMate)
         }
-        guard let position = Position(fen: beforeFEN), uci.count >= 4 else { return uci }
+        // FEN assainie : celle du moteur porte la réserve du Crazyhouse et
+        // ses marques de promotion, que ChessKit lit de travers — voir
+        // ``CrazyhouseFEN``.
+        guard let position = Position(fen: CrazyhouseFEN.forChessKit(beforeFEN)), uci.count >= 4
+        else { return uci }
         let from = Square(String(uci.prefix(2)))
         let to = Square(String(uci.dropFirst(2).prefix(2)))
         guard let piece = position.piece(at: from) else { return uci }

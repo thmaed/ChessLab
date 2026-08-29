@@ -60,6 +60,13 @@ struct ChessBoardView: View {
     /// une case que rien d'autre ne peut occuper — jamais de superposition à
     /// arbitrer.
     var duckSquare: Square? = nil
+    /// Faut-il cercler de rouge un roi en échec. `false` en Duck Chess, où la
+    /// notion N'EXISTE PAS : l'anneau y venait de l'état que ChessKit calcule
+    /// tout seul, sans rien savoir du canard — il s'allumait donc sur un roi
+    /// que le canard protégeait, et sautait d'un roi à l'autre au sein d'un
+    /// même tour, le trait ne passant qu'à la pose. Contredire à l'écran la
+    /// règle qu'annonce la variante était le pire des deux maux.
+    var showsCheckIndicator: Bool = true
 
     /// Un essai raté à signaler. Le `id` (nonce fourni par le VM) garantit
     /// que deux essais identiques (mêmes cases) redéclenchent l'animation.
@@ -765,16 +772,16 @@ struct ChessBoardView: View {
 
     /// Le canard 🦆 du Duck Chess, posé sur sa case.
     ///
-    /// Un emoji plutôt qu'un glyphe vectoriel : c'est LE signe distinctif de
-    /// la variante, il doit se reconnaître d'un coup d'œil, et aucun symbole
-    /// SF ne dit « canard ». Il ne tourne pas avec le plateau (contrairement
-    /// aux pièces en mode table) — un canard à l'envers ne veut rien dire.
+    /// Un canard de bain VECTORIEL (``DuckGlyphView``), et non l'emoji 🦆 :
+    /// celui-ci est un colvert brun-vert, méconnaissable sur une case de
+    /// 47 pt et étranger au style plat de l'app. Il ne tourne pas avec le
+    /// plateau en mode table — un canard à l'envers ne veut rien dire.
     @ViewBuilder
     private func duckLayer(squareSize: CGFloat) -> some View {
         if let duckSquare {
-            Text(verbatim: "🦆")
-                .font(.system(size: squareSize * 0.62))
-                .shadow(color: .black.opacity(0.45), radius: 2, y: 1)
+            DuckGlyphView()
+                .frame(width: squareSize * 0.78, height: squareSize * 0.78)
+                .shadow(color: .black.opacity(0.4), radius: 2, y: 1)
                 .frame(width: squareSize, height: squareSize)
                 .position(centerPoint(of: duckSquare, squareSize: squareSize))
                 .allowsHitTesting(false)
@@ -820,6 +827,7 @@ struct ChessBoardView: View {
     }
 
     private var kingInCheckSquare: Square? {
+        guard showsCheckIndicator else { return nil }
         let checkedColor: Piece.Color?
         switch board.state {
         case let .check(color): checkedColor = color

@@ -2,11 +2,19 @@
 
 Notes DÉTAILLÉES pour le dépôt. Le texte à coller dans App Store Connect est la section « Nouveautés de cette version » de `METADATA.md` (limite 4 000 caractères).
 
-> ⏳ **PAS ENCORE SOUMISE.** Couvre ce qui a été livré depuis la 1.6, soumise le 28/08/2026. Une version de finition, sans nouveau module : un défaut moteur récurrent des Variantes, et une passe de mise en page menée écran par écran sur les deux extrêmes du parc — la très grande fenêtre et le très petit iPhone.
+> ⏳ **PAS ENCORE SOUMISE.** Couvre ce qui a été livré depuis la 1.6, soumise le 28/08/2026. Deux variantes de plus au hub — Crazyhouse et Duck Chess —, un défaut moteur récurrent des Variantes corrigé, et une passe de mise en page menée écran par écran sur les deux extrêmes du parc : la très grande fenêtre et le très petit iPhone.
 
 ---
 
 ## Français
+
+**Deux variantes de plus : Crazyhouse et Duck Chess**
+
+Le hub passe à dix façons de jouer.
+
+**Crazyhouse** — toute pièce que vous capturez change de camp et rejoint votre réserve, d'où vous pouvez la reposer sur n'importe quelle case vide, y compris pour donner mat. Une bande sous chaque joueur montre les pièces en main : la vôtre se touche pour choisir, celle d'en face vous prévient de ce qui peut tomber. Un pion ne se pose ni sur la 1re ni sur la 8e rangée, et un pion promu capturé redevient un simple pion. Jouable contre l'ordinateur, à toutes les forces.
+
+**Duck Chess** — un canard 🦆 occupe une case et la bloque totalement : aucune pièce ne peut s'y poser ni la traverser, et il ne se capture pas. Chaque tour se joue en deux temps — vous déplacez une pièce, puis vous posez le canard où vous voulez, en changeant de case à chaque fois. Il n'y a ni échec ni mat : un roi a le droit de rester sous une attaque, et on gagne en le capturant. Cette variante se joue **à deux sur le même appareil** : aucun moteur d'échecs existant ne sait l'arbitrer, ses règles sortant trop du jeu classique — et c'est de toute façon à deux qu'elle est la plus drôle, poser le canard sous le nez de l'autre faisant la moitié du sel.
 
 **Le moteur des Variantes ne décroche plus**
 
@@ -47,6 +55,14 @@ Un grain très léger a été ajouté au fond : il supprime les bandes que les g
 ---
 
 ## English
+
+**Two more variants: Crazyhouse and Duck Chess**
+
+The hub grows to ten ways to play.
+
+**Crazyhouse** — every piece you capture switches sides and joins your reserve, from which you can drop it back onto any empty square, including to deliver mate. A strip under each player shows the pieces in hand: yours is tappable, your opponent's warns you what may land. A pawn cannot be dropped on the 1st or 8th rank, and a promoted pawn that is captured returns as a plain pawn. Playable against the computer, at every strength.
+
+**Duck Chess** — a duck 🦆 sits on a square and blocks it completely: no piece may land on it or move through it, and it cannot be captured. Every turn has two steps — you move a piece, then you place the duck wherever you like, on a different square each time. There is no check and no checkmate: a king may stay under attack, and you win by capturing it. This variant is played **by two people on the same device**: no existing chess engine can referee it, its rules straying too far from classical chess — and it is the funnier for it, since dropping the duck under your opponent's nose is half the fun.
 
 **The Variants engine no longer drops out**
 
@@ -95,6 +111,10 @@ A very light grain has been added to the background: it removes the banding that
 - **Le défaut moteur, en détail.** `FairyStockfishEngine.stop()` termine son `AsyncStream` de lignes, et un `AsyncStream` terminé l'est définitivement. Le view model survit à la navigation (`SessionStore` le conserve exprès), donc son `FairyEngineController` et son instance de moteur aussi : au retour, `startReader()` itérait un flux mort, aucun `uciok` ne remontait, et le démarrage expirait sur `isEngineUnavailable` — alors que le process, lui, tournait et gardait `isProcessBusy`. `EngineController` documentait déjà ce piège dans `restart()` (« Nouvelle instance : le flux de lignes précédent est clos ») et `PlayViewModel` crée de toute façon un contrôleur neuf à chaque partie, d'où l'immunité du mode classique. Correctif dans `FairyEngineController.start()`. Le test `engineRestartsAfterLeavingAndComingBack` reproduit le scénario et échouait avant.
 
 - **Un détecteur de plus.** `LayoutProbe` ne savait mesurer que les débordements de LARGEUR — c'est pourquoi la troncature du plateau des variantes n'a été trouvée qu'à l'œil. Il mesure désormais aussi la coupe verticale, de façon ciblée (un balayage général crierait au loup sur chaque `ScrollView`). Les tests qui s'appuient dessus disent franchement ce qu'ils ne prouvent pas : ils n'ont pas été vus échouer sur le code fautif, aucune géométrie de simulateur ne reproduisant la fenêtre Mac de 820 × 680, et les trois tentatives sont consignées dans leur en-tête.
+
+- **Duck Chess, pourquoi en Swift.** C'est la seule variante du hub dont la légalité ne vient pas d'un moteur. Fairy-Stockfish l'ignore et n'a aucun mécanisme de case bloquée (`variants.ini` n'a pas de `wallingRule`) ; surtout, un coup y est DEUX actions, ce que le protocole UCI ne sait pas exprimer et dont le nombre de combinaisons (coups légaux × cases vides) rendrait la recherche absurde. Les coups légaux de ChessKit ne conviennent pas davantage, et pour une raison qui EST la variante : ils sont filtrés sur l'échec, notion absente ici. D'où `DuckChessRules`, avec son propre générateur, et `DuckChessFEN` qui compose le plateau résultant à la main — ChessKit refuserait d'appliquer ces coups. Le canard ne figure pas dans la FEN produite : il n'est pas une pièce, ce qui garde la FEN ordinaire et tout l'affichage réutilisable.
+
+- **Crazyhouse, à l'inverse**, n'a presque rien coûté côté règles : Fairy-Stockfish la joue nativement, donc les cases de pose légales sont filtrées parmi les coups qu'il énumère, jamais calculées ici. Deux trous de plomberie ont dû être bouchés, tous deux silencieux : le filtre de coups rejetait les poses (`P@e4`, majuscule en tête, là où il exigeait une minuscule), et rien ne lisait la réserve pourtant écrite dans la FEN.
 
 - **Outil de revue.** `SmallPhoneTourUITests` dépose les captures de quinze écrans dans `/tmp/cl-small-phone/` — un outil à lancer à la demande, pas un test de non-régression, comme les captures App Store.
 

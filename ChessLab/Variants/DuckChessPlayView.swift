@@ -89,7 +89,8 @@ struct DuckChessPlayView: View {
                 draggableColor: nil,
                 onTapSquare: { viewModel.selectSquare($0) },
                 onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) },
-                duckSquare: viewModel.duckSquare
+                duckSquare: viewModel.duckSquare,
+                showsCheckIndicator: false
             )
             .frame(width: side, height: side)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
