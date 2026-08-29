@@ -5,11 +5,16 @@ import SwiftUI
 /// Ouvertures…). Extraite d'`AnalysisEntryView` à sa deuxième
 /// utilisation.
 struct TextImportSheet<Accessory: View>: View {
-    let title: String
+    // `LocalizedStringKey` pour tout ce qui est ÉCRIT ICI une fois pour
+    // toutes : `Text`, `navigationTitle` et `Button` ne traduisent pas un
+    // `String`, et un littéral typé `String` n'est même pas vu par
+    // l'extraction du catalogue. `errorMessage` reste un `String` parce
+    // qu'il se compose à l'exécution — c'est à sa source de le traduire.
+    let title: LocalizedStringKey
     @Binding var text: String
     let errorMessage: String?
-    let placeholder: String
-    let confirmLabel: String
+    let placeholder: LocalizedStringKey
+    let confirmLabel: LocalizedStringKey
     let onConfirm: () -> Void
     /// Contenu OPTIONNEL glissé sous la zone de texte — une option propre à
     /// l'appelant (ajouter à la bibliothèque, choisir un camp…). Vide par
@@ -19,8 +24,9 @@ struct TextImportSheet<Accessory: View>: View {
     @Environment(\.dismiss) private var dismiss
 
     init(
-        title: String, text: Binding<String>, errorMessage: String?, placeholder: String,
-        confirmLabel: String = "Importer", onConfirm: @escaping () -> Void,
+        title: LocalizedStringKey, text: Binding<String>, errorMessage: String?,
+        placeholder: LocalizedStringKey,
+        confirmLabel: LocalizedStringKey = "Importer", onConfirm: @escaping () -> Void,
         @ViewBuilder accessory: () -> Accessory = { EmptyView() }
     ) {
         self.title = title

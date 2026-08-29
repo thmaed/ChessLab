@@ -291,13 +291,13 @@ struct LabSetupView: View {
             title: "Coller un PGN ou un FEN",
             text: $importText,
             errorMessage: importError,
-            placeholder: "1. e4 e5 2. Nf3 …   ou   rnbqkbnr/pppppppp/…",
+            placeholder: "1. e4 e5 2. Nf3 …\n\nou\n\nrnbqkbnr/pppppppp/…",
             confirmLabel: "Utiliser la position"
         ) {
             if applyResolved(importText) {
                 showTextImport = false
             } else {
-                importError = "Ni un FEN ni un PGN reconnaissable."
+                importError = LocalizationController.string("Ni un FEN ni un PGN reconnaissable.")
             }
         }
         .preferredColorScheme(.dark)
@@ -324,9 +324,16 @@ struct LabSetupView: View {
         fenText = resolved.fen
         fenError = false
         if resolved.fromPGN {
-            sourceNote = resolved.plies > 0
-                ? "Position après \(resolved.plies) demi-coup\(resolved.plies > 1 ? "s" : "") d'un PGN"
-                : "Position de départ d'un PGN"
+            // Deux clés distinctes plutôt qu'un « s » collé au chiffre : le
+            // pluriel ne se fabrique pas par concaténation dans une langue
+            // qu'on ne connaît pas encore.
+            sourceNote = if resolved.plies > 1 {
+                LocalizationController.string("Position après %lld demi-coups d'un PGN", resolved.plies)
+            } else if resolved.plies == 1 {
+                LocalizationController.string("Position après %lld demi-coup d'un PGN", resolved.plies)
+            } else {
+                LocalizationController.string("Position de départ d'un PGN")
+            }
         } else {
             sourceNote = nil
         }

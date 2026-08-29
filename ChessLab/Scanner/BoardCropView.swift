@@ -76,11 +76,11 @@ struct BoardCropView: View {
 
     private var hint: String {
         if !quad.isUsable {
-            return "Les coins se croisent : replacez-les dans l'ordre autour du plateau."
+            return LocalizationController.string("Les coins se croisent : replacez-les dans l'ordre autour du plateau.")
         }
         return wasDetectedAutomatically
-            ? "Plateau détecté. Ajustez les coins si besoin : les lignes de la grille doivent suivre les rangées du plateau."
-            : "Plateau non détecté automatiquement. Placez les quatre coins : les lignes de la grille doivent suivre les rangées du plateau."
+            ? LocalizationController.string("Plateau détecté. Ajustez les coins si besoin : les lignes de la grille doivent suivre les rangées du plateau.")
+            : LocalizationController.string("Plateau non détecté automatiquement. Placez les quatre coins : les lignes de la grille doivent suivre les rangées du plateau.")
     }
 
     private var outlineColor: Color {

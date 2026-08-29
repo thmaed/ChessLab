@@ -67,6 +67,50 @@ enum DuckChessRules {
         return captured.color
     }
 
+    /// La position est-elle légale **au sens des échecs ordinaires** ?
+    ///
+    /// Question posée du point de vue de Stockfish, qui sert de conseiller à
+    /// l'ordinateur (voir ``DuckChessEngine``) et ne connaît ni le canard ni
+    /// cette variante. Une position de Duck Chess est illégale pour lui dès
+    /// que le roi du camp qui vient de jouer reste attaqué — ce qui est ici
+    /// parfaitement normal, l'échec n'existant pas. Lui envoyer une telle
+    /// position, c'est lui demander d'évaluer un échiquier où le roi est
+    /// prenable : il répond n'importe quoi, quand il ne s'arrête pas.
+    ///
+    /// Le canard est délibérément IGNORÉ dans le calcul : il ne figure pas
+    /// dans la FEN transmise, donc il ne peut pas parer une attaque aux yeux
+    /// du moteur, même quand il la pare vraiment sur le plateau.
+    static func isStandardLegal(_ position: Position) -> Bool {
+        let kings = position.pieces.filter { $0.kind == .king }
+        guard kings.contains(where: { $0.color == .white }),
+              kings.contains(where: { $0.color == .black })
+        else { return false }
+        return !moves(in: position, duck: nil).contains { capturesKing($0, in: position) != nil }
+    }
+
+    /// Cases TRAVERSÉES entre deux cases alignées, bornes exclues — vide si
+    /// elles ne sont ni sur une ligne, ni sur une colonne, ni sur une
+    /// diagonale (un saut de cavalier ne traverse rien).
+    ///
+    /// Sert à poser le canard SUR le chemin d'un coup adverse plutôt que sur
+    /// sa seule case d'arrivée — voir ``DuckChessEngine/chooseDuckSquare(position:currentDuck:enPassant:)``.
+    static func pathBetween(from: Square, to: Square) -> [Square] {
+        let deltaFile = to.file.number - from.file.number
+        let deltaRank = to.rank.value - from.rank.value
+        guard deltaFile == 0 || deltaRank == 0 || abs(deltaFile) == abs(deltaRank) else { return [] }
+        let stepFile = deltaFile == 0 ? 0 : deltaFile / abs(deltaFile)
+        let stepRank = deltaRank == 0 ? 0 : deltaRank / abs(deltaRank)
+        var result: [Square] = []
+        var file = from.file.number + stepFile
+        var rank = from.rank.value + stepRank
+        while let square = square(file, rank), square != to {
+            result.append(square)
+            file += stepFile
+            rank += stepRank
+        }
+        return result
+    }
+
     // MARK: Génération par pièce
 
     private static func moves(

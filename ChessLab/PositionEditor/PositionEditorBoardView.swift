@@ -132,11 +132,16 @@ struct PositionEditorBoardView: View {
     /// Libellé explicite : sans lui, VoiceOver (et XCUITest) lirait la
     /// concaténation imprévisible des `Text` de coordonnées.
     private func accessibilityLabel(for sq: Square) -> String {
-        if let piece = pieces[sq] { return "\(sq.notation), \(PieceNaming.french(piece))" }
-        if let color = unknownPieces[sq] {
-            return "\(sq.notation), pièce \(color == .white ? "blanche" : "noire") à préciser"
+        if let piece = pieces[sq] {
+            return LocalizationController.string("%@, %@", sq.notation, PieceNaming.french(piece))
         }
-        return "\(sq.notation), case vide"
+        if let color = unknownPieces[sq] {
+            return LocalizationController.string(
+                "%@, pièce %@ à préciser", sq.notation,
+                LocalizationController.string(color == .white ? "blanche" : "noire")
+            )
+        }
+        return LocalizationController.string("%@, case vide", sq.notation)
     }
 
     private func square(row: Int, col: Int) -> Square {

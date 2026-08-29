@@ -4,13 +4,19 @@ import Testing
 
 /// Le tour en DEUX temps du Duck Chess : déplacer, puis poser le canard.
 /// C'est là que la variante se joue, et là que tout peut se désynchroniser.
+///
+/// Toutes les parties de cette suite sont montées `versusEngine: false` :
+/// c'est le seul montage où le test peut jouer LES DEUX camps. Face à
+/// l'ordinateur, la vue-modèle refuse (à raison) les gestes de l'utilisateur
+/// pendant le tour de la machine — voir ``DuckChessEngineTurnTests`` pour ce
+/// versant-là.
 @Suite
 @MainActor
 struct DuckChessViewModelTests {
 
     @Test("Un tour se déroule en deux temps, et le trait ne change qu'à la pose")
     func turnHasTwoPhases() {
-        let vm = DuckChessViewModel()
+        let vm = DuckChessViewModel(versusEngine: false)
         #expect(vm.phase == .movePiece)
         #expect(vm.sideToMove == .white)
 
@@ -28,7 +34,7 @@ struct DuckChessViewModelTests {
 
     @Test("Le canard doit changer de case à chaque tour")
     func duckMustMove() {
-        let vm = DuckChessViewModel()
+        let vm = DuckChessViewModel(versusEngine: false)
         vm.selectSquare(Square("e2")); vm.selectSquare(Square("e4"))
         vm.selectSquare(Square("e5"))
         #expect(vm.duckSquare == Square("e5"))
@@ -47,7 +53,7 @@ struct DuckChessViewModelTests {
 
     @Test("Le canard bloque réellement les coups proposés")
     func duckBlocksSelection() {
-        let vm = DuckChessViewModel()
+        let vm = DuckChessViewModel(versusEngine: false)
         vm.selectSquare(Square("e2")); vm.selectSquare(Square("e4"))
         vm.selectSquare(Square("d5"))   // canard en d5, tour aux Noirs
 
@@ -60,7 +66,7 @@ struct DuckChessViewModelTests {
 
     @Test("Capturer le roi termine la partie, sans pose de canard")
     func capturingTheKingEndsIt() {
-        let vm = DuckChessViewModel()
+        let vm = DuckChessViewModel(versusEngine: false)
         // On amène une position où les Blancs prennent le roi noir.
         // 1.e4 (canard a3) e5 (canard a4) 2.Dh5 (canard a5) Cf6?? (canard a6)
         // 3.Dxf7 n'est pas la prise du roi — on force plus simplement.
@@ -77,7 +83,7 @@ struct DuckChessViewModelTests {
 
     @Test("La capture du roi, sur une position construite, désigne le vainqueur")
     func kingCaptureDeclaresWinner() {
-        let vm = DuckChessViewModel()
+        let vm = DuckChessViewModel(versusEngine: false)
         // Mécanique pure : on interroge les règles sur une position où la
         // tour peut prendre le roi, puis on vérifie que le view model
         // conclurait pareil.
@@ -89,7 +95,7 @@ struct DuckChessViewModelTests {
 
     @Test("Le roque déplace aussi la tour")
     func castlingMovesTheRook() {
-        let vm = DuckChessViewModel()
+        let vm = DuckChessViewModel(versusEngine: false)
         // 1.Cf3 (canard h6) a6 (canard h3) 2.e3 (canard a3) b6 (canard a4)
         // 3.Fe2 (canard b3) c6 (canard b4) 4.O-O
         let script: [(String, String, String)] = [
@@ -111,7 +117,7 @@ struct DuckChessViewModelTests {
 
     @Test("La promotion propose un choix et le respecte")
     func promotionIsOffered() {
-        let vm = DuckChessViewModel()
+        let vm = DuckChessViewModel(versusEngine: false)
         // Position construite via une suite de coups serait longue : on
         // vérifie la mécanique d'offre sur la position de départ modifiée
         // par les règles elles-mêmes.

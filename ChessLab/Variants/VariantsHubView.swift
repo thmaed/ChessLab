@@ -86,6 +86,9 @@ struct VariantsHubView: View {
                         shortTitle: LocalizedStringKey(DuckChessVariant.shared.shortName),
                         subtitle: LocalizedStringKey(DuckChessVariant.shared.shortTagline),
                         systemImage: DuckChessVariant.shared.icon,
+                        // Un canard, pas un passereau : la tuile porte le
+                        // dessin qu'on retrouve ensuite sur le plateau.
+                        customGlyph: .duck,
                         tint: DuckChessVariant.shared.tint,
                         isEnabled: true,
                         accessibilityID: "variant_\(DuckChessVariant.shared.id)",

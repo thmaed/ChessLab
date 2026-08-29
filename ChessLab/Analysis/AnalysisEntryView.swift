@@ -258,7 +258,7 @@ struct AnalysisEntryView: View {
     private func validate(text: String) {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
-            importError = "Collez une partie (PGN) ou une position (FEN)."
+            importError = LocalizationController.string("Collez une partie (PGN) ou une position (FEN).")
             return
         }
         if FENValidator.errors(in: trimmed).isEmpty {
@@ -298,7 +298,7 @@ struct AnalysisEntryView: View {
         if looksLikeFEN(trimmed), let detail = FENValidator.errors(in: trimmed).first {
             importError = detail
         } else {
-            importError = "Ce texte n'a pu être lu ni comme une partie (PGN) ni comme une position (FEN)."
+            importError = LocalizationController.string("Ce texte n'a pu être lu ni comme une partie (PGN) ni comme une position (FEN).")
         }
     }
 
@@ -314,7 +314,7 @@ struct AnalysisEntryView: View {
         // L'échec était avalé en silence : l'écran ne bougeait pas et rien
         // n'expliquait pourquoi.
         if case let .failure(error) = result {
-            importError = "Import impossible : \(error.localizedDescription)"
+            importError = LocalizationController.string("Import impossible : %@", error.localizedDescription)
             return
         }
         guard case let .success(urls) = result, let url = urls.first else { return }

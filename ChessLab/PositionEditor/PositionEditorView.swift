@@ -237,9 +237,12 @@ struct PositionEditorView<Header: View>: View {
     private var toolHint: String {
         switch vm.selectedTool {
         case .eraser:
-            return "Tapez une pièce pour la retirer."
+            return LocalizationController.string("Tapez une pièce pour la retirer.")
         case let .piece(kind, color):
-            return "Tapez une case pour poser un \(PieceNaming.french(kind, color: color)) ; re-tapez-le pour l'effacer."
+            return LocalizationController.string(
+                "Tapez une case pour poser un %@ ; re-tapez-le pour l'effacer.",
+                PieceNaming.french(kind, color: color)
+            )
         }
     }
 

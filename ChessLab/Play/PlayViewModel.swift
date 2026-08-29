@@ -32,11 +32,13 @@ struct PendingBlunderWarning {
     var message: String {
         switch severity {
         case .missedMate:
-            "Ce coup laisse passer un mat forcé."
+            LocalizationController.string("Ce coup laisse passer un mat forcé.")
         case .allowsMate:
-            "Ce coup permet un mat forcé à l'adversaire."
+            LocalizationController.string("Ce coup permet un mat forcé à l'adversaire.")
         case let .centipawns(drop):
-            "Ce coup fait perdre environ \(min(drop, 1_000) / 100) pion(s) d'évaluation."
+            LocalizationController.string(
+                "Ce coup fait perdre environ %lld pion(s) d'évaluation.", min(drop, 1_000) / 100
+            )
         }
     }
 }

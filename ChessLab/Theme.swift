@@ -312,8 +312,28 @@ extension View {
 /// (``FilterChip``), étendu à toute l'app — plus vivant, et le contraste
 /// icône/fond est garanti sur toutes les teintes de section, y compris le
 /// jaune `warning` où une icône blanche serait illisible.
+/// Un dessin À NOUS, là où aucun symbole SF ne dit la chose.
+///
+/// Le Duck Chess est le seul cas à ce jour : `bird.fill` montre un passereau
+/// de profil, alors que la variante EST un canard de bain jaune — c'est son
+/// nom, c'est ce qu'on voit sur le plateau, et c'est ce qui la distingue des
+/// neuf autres tuiles du hub. Un `enum` plutôt qu'une vue quelconque : la
+/// liste des dessins maison reste courte et lisible d'un coup d'œil.
+enum ModeGlyph {
+    case duck
+
+    @ViewBuilder
+    func view(outlined: Bool) -> some View {
+        switch self {
+        case .duck: DuckGlyphView(outlined: outlined)
+        }
+    }
+}
+
 struct IconBadge: View {
     let systemImage: String
+    /// Quand il est là, il REMPLACE `systemImage`.
+    var customGlyph: ModeGlyph? = nil
     var tint: Color = Theme.accent
     var size: CGFloat = 48
     var isEnabled: Bool = true
@@ -338,9 +358,18 @@ struct IconBadge: View {
             } else {
                 shape.fill(Color.white.opacity(0.06))
             }
-            Image(systemName: systemImage)
-                .font(.system(size: size * 0.42, weight: .semibold))
-                .foregroundStyle(isEnabled ? Theme.background : Theme.textTertiary)
+            if let customGlyph {
+                // Le halo sombre du dessin le détache du dégradé de la
+                // pastille, qui est dans la teinte du mode — un canard jaune
+                // sur un fond ambre s'y fondrait sans lui.
+                customGlyph.view(outlined: true)
+                    .frame(width: size * 0.66, height: size * 0.66)
+                    .opacity(isEnabled ? 1 : 0.45)
+            } else {
+                Image(systemName: systemImage)
+                    .font(.system(size: size * 0.42, weight: .semibold))
+                    .foregroundStyle(isEnabled ? Theme.background : Theme.textTertiary)
+            }
         }
         .frame(width: size, height: size)
         .shadow(

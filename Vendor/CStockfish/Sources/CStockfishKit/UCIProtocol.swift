@@ -13,7 +13,13 @@ public enum EngineCommand: Equatable, Sendable {
     case setoption(id: String, value: String)
     case position(Position)
     // Ordre des labels aligné sur les appels de l'app : `.go(nodes:movetime:)`.
-    case go(depth: Int? = nil, nodes: Int? = nil, movetime: Int? = nil)
+    /// `searchmoves` restreint la recherche à une liste de coups.
+    ///
+    /// Indispensable au Duck Chess : le canard rend illégaux des coups que le
+    /// moteur croit jouables, et lui les imposer d'avance est le seul moyen
+    /// d'obtenir un adversaire qui respecte la variante sans rien connaître
+    /// d'elle. La clause vient EN DERNIER — voir la sérialisation.
+    case go(depth: Int? = nil, nodes: Int? = nil, movetime: Int? = nil, searchmoves: [String]? = nil)
 
     /// Argument de `position` (l'app ne se sert que du FEN, mais `startpos`
     /// reste utile et sans coût).
@@ -37,11 +43,20 @@ public enum EngineCommand: Equatable, Sendable {
             case let .fen(fen): return "position fen \(fen)"
             case .startpos: return "position startpos"
             }
-        case let .go(depth, nodes, movetime):
+        case let .go(depth, nodes, movetime, searchmoves):
             var parts = ["go"]
             if let depth { parts.append("depth \(depth)") }
             if let nodes { parts.append("nodes \(nodes)") }
             if let movetime { parts.append("movetime \(movetime)") }
+            // `searchmoves` EN DERNIER, et ce n'est pas cosmétique : le
+            // parseur de Stockfish avale tout ce qui suit ce mot-clé comme un
+            // coup de plus (`uci.cpp` : « Needs to be the last command on the
+            // line »). Placé en tête, il mangeait `movetime 400` — la
+            // recherche partait alors sans limite de temps, et seul le chien
+            // de garde de l'app l'arrêtait, deux secondes trop tard.
+            if let searchmoves, !searchmoves.isEmpty {
+                parts.append("searchmoves " + searchmoves.joined(separator: " "))
+            }
             return parts.joined(separator: " ")
         }
     }

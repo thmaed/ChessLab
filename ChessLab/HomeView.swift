@@ -126,11 +126,16 @@ struct HomeView: View {
         /// variante ne correspond à son tour double).
         case stolenMoveSetup
         case activeStolenMoveGame(FairyVariantSettings)
-        /// Duck Chess — règle puis partie à deux. Pas de réglages : aucun
-        /// moteur ne joue cette variante (voir ``DuckChessRules``), donc ni
-        /// force, ni cadence, ni couleur à choisir.
+        /// Duck Chess — réglages, partie, puis analyse. Aucun moteur ne sait
+        /// ARBITRER cette variante (voir ``DuckChessRules``), mais Stockfish
+        /// sait y jouer dès qu'on le borne aux coups que le canard autorise
+        /// (voir ``DuckChessEngine``) : elle a donc les mêmes réglages que
+        /// les autres — force, couleur, cadence, indice, alerte gaffe.
         case duckChessSetup
-        case activeDuckChessGame
+        case activeDuckChessGame(FairyVariantSettings)
+        /// Analyse de fin de partie Duck Chess — journaux de la partie SOURCE,
+        /// canard compris (voir ``DuckChessAnalysisSeed``).
+        case activeDuckChessAnalysis(DuckChessAnalysisSeed)
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
@@ -671,14 +676,21 @@ struct HomeView: View {
                     VariantAnalysisActiveGameHost(seed: seed, sessionKey: sessionKey(for: route))
 
                 case .duckChessSetup:
-                    DuckChessSetupView {
-                        path.append(Route.activeDuckChessGame)
+                    // L'écran de réglages COMMUN, comme les autres variantes :
+                    // couleur, force du moteur, cadence, indice, alerte gaffe.
+                    FairyVariantSetupView(variant: DuckChessVariant.shared) { settings in
+                        path.append(Route.activeDuckChessGame(settings))
                     }
 
-                case .activeDuckChessGame:
-                    DuckChessPlayView {
+                case let .activeDuckChessGame(settings):
+                    DuckChessActiveGameHost(settings: settings, sessionKey: sessionKey(for: route)) {
                         path = NavigationPath()
+                    } onAnalyze: { seed in
+                        path.append(Route.activeDuckChessAnalysis(seed))
                     }
+
+                case let .activeDuckChessAnalysis(seed):
+                    DuckChessAnalysisActiveGameHost(seed: seed, sessionKey: sessionKey(for: route))
 
                 case .stolenMoveSetup:
                     FairyVariantSetupView(variant: StolenMoveVariant.shared) { settings in
@@ -1598,6 +1610,59 @@ private struct StolenMoveActiveGameHost: View {
     }
 }
 
+/// Le Duck Chess passe par un hôte comme les autres variantes : sans lui, la
+/// vue-modèle vivait dans un `@State` de la vue, et revenir de l'analyse (ou
+/// de n'importe quel écran empilé) recommençait la partie à zéro.
+private struct DuckChessActiveGameHost: View {
+    let settings: FairyVariantSettings
+    let sessionKey: String
+    let onExit: () -> Void
+    var onAnalyze: (DuckChessAnalysisSeed) -> Void = { _ in }
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: DuckChessViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                DuckChessPlayView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    DuckChessViewModel(settings: settings)
+                }
+            }
+        }
+    }
+}
+
+private struct DuckChessAnalysisActiveGameHost: View {
+    let seed: DuckChessAnalysisSeed
+    let sessionKey: String
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: DuckChessAnalysisViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                DuckChessAnalysisView(viewModel: viewModel)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            if viewModel == nil {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    DuckChessAnalysisViewModel(seed: seed)
+                }
+            }
+        }
+    }
+}
+
 private struct VariantAnalysisActiveGameHost: View {
     let seed: VariantAnalysisSeed
     let sessionKey: String
@@ -1936,6 +2001,8 @@ struct ModeCard: View {
     /// suspension malgré `minimumScaleFactor`.
     var shortSubtitle: LocalizedStringKey?
     let systemImage: String
+    /// Dessin maison à la place du symbole SF — voir ``ModeGlyph``.
+    var customGlyph: ModeGlyph? = nil
     var tint: Color = Theme.accent
     let isEnabled: Bool
     var accessibilityID: String? = nil
@@ -1953,10 +2020,30 @@ struct ModeCard: View {
     private var displayedTitle: LocalizedStringKey { isRegular ? title : (shortTitle ?? title) }
     private var displayedSubtitle: LocalizedStringKey { isRegular ? (subtitle ?? "Bientôt") : (shortSubtitle ?? subtitle ?? "Bientôt") }
 
+    /// L'icône « fantôme » du fond : la même forme, en très pâle, débordant
+    /// dans le coin. Le dessin maison n'a pas de couleur unique — on n'en
+    /// garde donc que la SILHOUETTE, teintée comme le reste, en s'en servant
+    /// de masque.
+    @ViewBuilder
+    private var ghostIcon: some View {
+        if let customGlyph {
+            tint.opacity(isEnabled ? 0.10 : 0.04)
+                .frame(width: ghostIconSize, height: ghostIconSize)
+                .mask { customGlyph.view(outlined: false) }
+        } else {
+            Image(systemName: systemImage)
+                .font(.system(size: ghostIconSize, weight: .semibold))
+                .foregroundStyle(tint.opacity(isEnabled ? 0.08 : 0.03))
+        }
+    }
+
     var body: some View {
         Button(action: action) {
             VStack(alignment: .leading, spacing: 0) {
-                IconBadge(systemImage: systemImage, tint: tint, size: iconSize, isEnabled: isEnabled)
+                IconBadge(
+                    systemImage: systemImage, customGlyph: customGlyph,
+                    tint: tint, size: iconSize, isEnabled: isEnabled
+                )
 
                 Spacer(minLength: 16)
 
@@ -1985,9 +2072,7 @@ struct ModeCard: View {
                     // Grande icône décorative "fantôme" débordant dans le
                     // coin, dans la teinte du mode — donne un caractère
                     // illustré à chaque tuile sans image bitmap.
-                    Image(systemName: systemImage)
-                        .font(.system(size: ghostIconSize, weight: .semibold))
-                        .foregroundStyle(tint.opacity(isEnabled ? 0.08 : 0.03))
+                    ghostIcon
                         .offset(x: isRegular ? 56 : 46, y: isRegular ? 42 : 34)
                         // Purement décorative — et invisible au-delà de la
                         // carte, que `clipShape` écrête. L'accessibilité, elle,

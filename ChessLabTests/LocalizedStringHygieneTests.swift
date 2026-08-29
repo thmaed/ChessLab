@@ -13,16 +13,20 @@ import Testing
 @MainActor
 struct LocalizedStringHygieneTests {
 
-    /// Les chaînes françaises livrées, telles que le bundle les contient.
-    private static func shippedFrenchStrings() throws -> [String: String] {
+    /// Les chaînes livrées pour une langue, telles que le bundle les contient.
+    private static func shippedStrings(_ localization: String) throws -> [String: String] {
         let url = try #require(
             Bundle.main.url(forResource: "Localizable", withExtension: "strings",
-                            subdirectory: nil, localization: "fr"),
-            "les chaînes françaises compilées sont introuvables dans le bundle"
+                            subdirectory: nil, localization: localization),
+            "les chaînes « \(localization) » compilées sont introuvables dans le bundle"
         )
         let data = try Data(contentsOf: url)
         let plist = try PropertyListSerialization.propertyList(from: data, format: nil)
         return try #require(plist as? [String: String])
+    }
+
+    private static func shippedFrenchStrings() throws -> [String: String] {
+        try shippedStrings("fr")
     }
 
     /// Aucune chaîne ne doit contenir deux espaces d'affilée. Mesuré sur le
@@ -77,5 +81,59 @@ struct LocalizedStringHygieneTests {
             offenders.isEmpty,
             "espace avant saut de ligne dans : \(offenders.keys.sorted().prefix(3).joined(separator: " | "))"
         )
+    }
+
+    // MARK: L'anglais existe vraiment
+
+    /// Toute clé française livrée doit avoir sa contrepartie ANGLAISE.
+    ///
+    /// Une clé absente de la table anglaise ne casse rien de visible côté
+    /// développement : l'app démarre, l'écran s'affiche — en français, au
+    /// milieu d'une interface anglaise. C'est passé inaperçu longtemps, et
+    /// ce n'est visible que pour qui lance l'app en anglais.
+    @Test("Chaque chaîne française livrée a sa version anglaise")
+    func everyFrenchStringHasAnEnglishCounterpart() throws {
+        let fr = try Self.shippedFrenchStrings()
+        let en = try Self.shippedStrings("en")
+        try #require(fr.count > 900, "catalogue anormalement petit : \(fr.count)")
+
+        let missing = fr.keys.filter { en[$0] == nil }.sorted()
+        #expect(
+            missing.isEmpty,
+            "\(missing.count) chaîne(s) sans anglais, dont : \(missing.prefix(5).joined(separator: " | "))"
+        )
+    }
+
+    /// Les textes qui n'atteignent l'écran QUE par
+    /// ``LocalizationController/string(_:)``.
+    ///
+    /// Ceux-là ne sont pas extraits automatiquement dans le catalogue : rien,
+    /// à la compilation, ne signale une clé oubliée — `string(_:)` rend alors
+    /// la clé elle-même, c'est-à-dire du français, et l'app a l'air de
+    /// marcher. C'est exactement ce qui était arrivé aux messages du
+    /// validateur de FEN, du scanner, de l'éditeur de position, de l'alerte
+    /// gaffe et de l'import PGN/FEN : tous français en anglais.
+    ///
+    /// Un échantillon plutôt qu'une liste exhaustive — un par FAMILLE, pour
+    /// que la disparition d'une famille entière se voie.
+    @Test("Les textes composés à l'exécution sont bien traduits", arguments: [
+        "FEN mal formé : 6 champs attendus (position, trait, roques, en passant, demi-coups, coups).",
+        "Ce coup laisse passer un mat forcé.",
+        "Ce coup fait perdre environ %lld pion(s) d'évaluation.",
+        "Tapez une pièce pour la retirer.",
+        "%@, case vide",
+        "Cette image n'a pas pu être lue.",
+        "Les coins se croisent : replacez-les dans l'ordre autour du plateau.",
+        "Collez une partie (PGN) ou une position (FEN).",
+        "Ni un FEN ni un PGN reconnaissable.",
+        "Cette position n'est pas dans le répertoire.",
+        "Résultat inconnu",
+        "L'ordinateur n'a pas démarré : il ne jouera pas.",
+        "%lld %@ en réserve",
+    ])
+    func runtimeComposedStringsAreTranslated(key: String) throws {
+        let en = try Self.shippedStrings("en")
+        let translation = try #require(en[key], "clé absente du catalogue : elle sortira en français")
+        #expect(translation != key, "traduction anglaise identique au français")
     }
 }

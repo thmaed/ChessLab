@@ -126,7 +126,7 @@ struct EndgameFreeTrainView: View {
             finishedCard
         case .unavailable:
             EngineUnavailableBanner(
-                message: LocalizationController.string("L'arbitre et la défense reposent sur le moteur — relancez-le pour continuer."),
+                message: "L'arbitre et la défense reposent sur le moteur — relancez-le pour continuer.",
                 isRetrying: false,
                 onRetry: onRetryEngine
             )

@@ -316,8 +316,17 @@ actor EngineController {
     /// parsé et réveille la continuation au `bestmove`.
     private var moveReaderTask: Task<Void, Never>?
 
+    /// - parameter searchmoves: restreint la recherche à ces coups (UCI).
+    ///   Sert au Duck Chess, où le canard rend illégaux des coups que le
+    ///   moteur croit jouables — voir ``DuckChessEngine``. `nil` ailleurs.
+    /// - parameter nodes: budget en NŒUDS, combiné au temps (le premier
+    ///   atteint arrête la recherche). C'est ce que veut une passe de
+    ///   classification : un budget en nœuds rend le verdict comparable d'un
+    ///   appareil à l'autre, là où un budget en temps le fait dépendre de la
+    ///   machine — `movetimeMs` ne sert plus alors que de filet.
     func computeBestMove(
-        fen: String, setupCommands: [EngineCommand], movetimeMs: Int?, depth: Int?
+        fen: String, setupCommands: [EngineCommand], movetimeMs: Int?, depth: Int?,
+        searchmoves: [String]? = nil, nodes: Int? = nil
     ) async -> (lan: String, moverCp: Int?)? {
         guard engine.isRunning else { return nil }
         ensureMoveReader()
@@ -330,9 +339,9 @@ actor EngineController {
         }
         await send(.position(.fen(fen)))
         if let depth {
-            await send(.go(depth: depth))
+            await send(.go(depth: depth, searchmoves: searchmoves))
         } else {
-            await send(.go(movetime: movetimeMs ?? 100))
+            await send(.go(nodes: nodes, movetime: movetimeMs ?? 100, searchmoves: searchmoves))
         }
 
         let budgetMs = movetimeMs ?? (depth != nil ? 3000 : 200)

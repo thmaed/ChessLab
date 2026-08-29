@@ -10,7 +10,13 @@ import SwiftUI
 /// Vue partagée plutôt que deux copies : la première version était déjà
 /// dupliquée à l'identique dans les deux écrans, et seul le texte changeait.
 struct EngineUnavailableBanner: View {
-    let message: String
+    /// `LocalizedStringKey`, PAS `String` : `Text` ne traduit que le premier.
+    /// En `String`, les neuf appelants passaient une phrase française qui
+    /// restait telle quelle dans une app en anglais — et l'extraction
+    /// automatique du catalogue ne la voyait même pas, faute de littéral
+    /// typé. Le type porte donc la contrainte : impossible d'écrire ici un
+    /// message non traduisible sans que le compilateur le dise.
+    let message: LocalizedStringKey
     let isRetrying: Bool
     let onRetry: () -> Void
 

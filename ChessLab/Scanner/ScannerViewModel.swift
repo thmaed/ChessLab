@@ -90,7 +90,7 @@ final class ScannerViewModel {
         errorMessage = nil
 
         guard let prepared = Self.prepare(uiImage) else {
-            errorMessage = "Cette image n'a pas pu être lue."
+            errorMessage = LocalizationController.string("Cette image n'a pas pu être lue.")
             return
         }
 
@@ -148,7 +148,7 @@ final class ScannerViewModel {
 
     func loadFromDropped(data: Data) async {
         guard let uiImage = UIImage(data: data) else {
-            errorMessage = "Ce fichier n'est pas une image lisible."
+            errorMessage = LocalizationController.string("Ce fichier n'est pas une image lisible.")
             return
         }
         await load(uiImage)
@@ -176,7 +176,7 @@ final class ScannerViewModel {
         errorMessage = nil
 
         guard quad.isUsable else {
-            errorMessage = "Les coins se croisent : replacez-les dans l'ordre autour du plateau."
+            errorMessage = LocalizationController.string("Les coins se croisent : replacez-les dans l'ordre autour du plateau.")
             return
         }
 
@@ -184,7 +184,7 @@ final class ScannerViewModel {
         defer { isProcessing = false }
 
         guard let result = await runScan(image: image, quad: quad) else {
-            errorMessage = "Ce cadrage n'a pas pu être redressé — vérifiez que les quatre coins entourent bien le plateau."
+            errorMessage = LocalizationController.string("Ce cadrage n'a pas pu être redressé — vérifiez que les quatre coins entourent bien le plateau.")
             return
         }
         applyScan(result)

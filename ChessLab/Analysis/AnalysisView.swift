@@ -145,8 +145,8 @@ struct AnalysisView: View {
             let count = await viewModel.generatePuzzles(in: modelContext)
             isGeneratingPuzzles = false
             puzzleGenerationMessage = count > 0
-                ? "\(count) puzzle(s) créé(s) — retrouvez-les dans le mode Puzzles."
-                : "Aucune gaffe assez nette pour un puzzle sans ambiguïté dans cette partie."
+                ? LocalizationController.string("%lld puzzle(s) créé(s) — retrouvez-les dans le mode Puzzles.", count)
+                : LocalizationController.string("Aucune gaffe assez nette pour un puzzle sans ambiguïté dans cette partie.")
         }
     }
 

@@ -17,7 +17,7 @@ enum FENValidator {
         let fields = trimmed.split(separator: " ").map(String.init)
 
         guard fields.count == 6, let position = Position(fen: trimmed) else {
-            return ["FEN mal formé : 6 champs attendus (position, trait, roques, en passant, demi-coups, coups)."]
+            return [LocalizationController.string("FEN mal formé : 6 champs attendus (position, trait, roques, en passant, demi-coups, coups).")]
         }
 
         var errors: [String] = []
@@ -25,14 +25,14 @@ enum FENValidator {
         let whiteKings = position.pieces.filter { $0.kind == .king && $0.color == .white }.count
         let blackKings = position.pieces.filter { $0.kind == .king && $0.color == .black }.count
         if whiteKings != 1 || blackKings != 1 {
-            errors.append("Il faut exactement un roi blanc et un roi noir.")
+            errors.append(LocalizationController.string("Il faut exactement un roi blanc et un roi noir."))
         }
 
         let pawnOnEdgeRank = position.pieces.contains {
             $0.kind == .pawn && ($0.square.rank.value == 1 || $0.square.rank.value == 8)
         }
         if pawnOnEdgeRank {
-            errors.append("Un pion ne peut pas être sur la 1re ou la 8e rangée.")
+            errors.append(LocalizationController.string("Un pion ne peut pas être sur la 1re ou la 8e rangée."))
         }
 
         // Une position fraîchement chargée (aucun coup joué) ne peut avoir
@@ -42,7 +42,7 @@ enum FENValidator {
         if whiteKings == 1, blackKings == 1 {
             switch Board(position: position).state {
             case .check, .checkmate:
-                errors.append("Le camp qui n'a pas le trait ne peut pas être déjà en échec.")
+                errors.append(LocalizationController.string("Le camp qui n'a pas le trait ne peut pas être déjà en échec."))
             default:
                 break
             }
@@ -54,23 +54,23 @@ enum FENValidator {
             // interrogé sur une position terminée, répondait `bestmove (none)`
             // — écran de jeu figé.
             if !hasLegalMove(in: position) {
-                errors.append("Le camp au trait n'a aucun coup légal : la position est déjà terminée (mat ou pat).")
+                errors.append(LocalizationController.string("Le camp au trait n'a aucun coup légal : la position est déjà terminée (mat ou pat)."))
             }
         }
 
         let castling = fields[2]
         if castling != "-" {
             if castling.contains("K"), !hasRookAndKing(position, kingSquare: "e1", rookSquare: "h1", color: .white) {
-                errors.append("Droit de petit roque blanc incohérent avec la position du roi/de la tour.")
+                errors.append(LocalizationController.string("Droit de petit roque blanc incohérent avec la position du roi/de la tour."))
             }
             if castling.contains("Q"), !hasRookAndKing(position, kingSquare: "e1", rookSquare: "a1", color: .white) {
-                errors.append("Droit de grand roque blanc incohérent avec la position du roi/de la tour.")
+                errors.append(LocalizationController.string("Droit de grand roque blanc incohérent avec la position du roi/de la tour."))
             }
             if castling.contains("k"), !hasRookAndKing(position, kingSquare: "e8", rookSquare: "h8", color: .black) {
-                errors.append("Droit de petit roque noir incohérent avec la position du roi/de la tour.")
+                errors.append(LocalizationController.string("Droit de petit roque noir incohérent avec la position du roi/de la tour."))
             }
             if castling.contains("q"), !hasRookAndKing(position, kingSquare: "e8", rookSquare: "a8", color: .black) {
-                errors.append("Droit de grand roque noir incohérent avec la position du roi/de la tour.")
+                errors.append(LocalizationController.string("Droit de grand roque noir incohérent avec la position du roi/de la tour."))
             }
         }
 
@@ -90,13 +90,13 @@ enum FENValidator {
             default:
                 expectedPawnSquareNotation = ""
                 expectedColor = .white
-                errors.append("Case en passant invalide : doit être sur la 3e ou 6e rangée.")
+                errors.append(LocalizationController.string("Case en passant invalide : doit être sur la 3e ou 6e rangée."))
             }
 
             if !expectedPawnSquareNotation.isEmpty {
                 let piece = position.piece(at: Square(expectedPawnSquareNotation))
                 if piece?.kind != .pawn || piece?.color != expectedColor {
-                    errors.append("Case en passant incohérente : aucun pion capturable à cet endroit.")
+                    errors.append(LocalizationController.string("Case en passant incohérente : aucun pion capturable à cet endroit."))
                 }
             }
         }

@@ -17,3 +17,4 @@ protocol PlayableVariant {
 
 extension FairyVariant: PlayableVariant {}
 extension EngineLegalityVariant: PlayableVariant {}
+extension DuckChessVariant: PlayableVariant {}
