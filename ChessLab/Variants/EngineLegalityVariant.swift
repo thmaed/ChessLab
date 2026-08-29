@@ -100,7 +100,39 @@ struct EngineLegalityVariant: Identifiable {
         startFEN: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     )
 
-    static let all: [EngineLegalityVariant] = [.racingKings, .atomic, .antichess, .crazyhouse]
+    /// Barricades — les échecs ordinaires, avec deux cases MURÉES.
+    ///
+    /// La seule variante du hub que Fairy-Stockfish ne connaît pas d'origine :
+    /// elle lui est ENSEIGNÉE au démarrage, par un fichier de définition que
+    /// l'app engendre elle-même (voir ``BarricadesConfiguration``). Le moteur
+    /// reste l'arbitre — c'est bien lui qui refuse de poser une pièce sur un
+    /// mur ou de le traverser, rien n'en est réimplémenté ici.
+    static let barricades = EngineLegalityVariant(
+        id: BarricadesConfiguration.variantID,
+        displayNameKey: "Barricades",
+        shortNameKey: "Barricades",
+        taglineKey: "Deux cases murées dès le premier coup",
+        shortTaglineKey: "Deux cases murées",
+        rulesKey: "Les règles des échecs, à un détail près : les cases d4 et e5 sont MURÉES dès le départ. Aucune pièce ne peut s'y poser ni les traverser, et un mur ne se capture pas — il ne bougera jamais de la partie. Les tours, fous et dames butent donc dessus comme sur une pièce, tandis que les cavaliers leur sautent par-dessus sans pouvoir s'y arrêter. Tout le reste — échec, mat, pat, roque, prise en passant, promotion — est inchangé.",
+        icon: "square.grid.3x3.fill",
+        tint: Theme.warning,
+        startFEN: BarricadesConfiguration.startFEN
+    )
+
+    static let all: [EngineLegalityVariant] = [.racingKings, .atomic, .antichess, .crazyhouse, .barricades]
+
+    // MARK: Définition à enseigner au moteur
+
+    /// Chemin d'un fichier de définition à charger AVANT de choisir la
+    /// variante, ou `nil` quand le moteur la connaît déjà.
+    ///
+    /// Écrit à chaque appel plutôt que gardé : le fichier est engendré et
+    /// minuscule, et une version périmée serait un piège silencieux — le
+    /// moteur chargerait d'anciennes règles sans que rien ne le dise.
+    var customDefinitionPath: String? {
+        guard id == Self.barricades.id else { return nil }
+        return BarricadesConfiguration.writeConfigurationFile()
+    }
 
     // MARK: Fin de partie
 

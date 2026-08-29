@@ -87,7 +87,8 @@ struct VariantAnalysisView: View {
                 interactionEnabled: false,
                 showCoordinates: true,
                 onTapSquare: { _ in },
-                onDropPiece: { _, _ in }
+                onDropPiece: { _, _ in },
+                blockedSquares: viewModel.displayedBlockedSquares
             )
             .frame(width: side, height: side)
         }

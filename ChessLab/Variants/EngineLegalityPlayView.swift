@@ -138,7 +138,8 @@ struct EngineLegalityPlayView: View {
                     showCoordinates: true,
                     draggableColor: viewModel.userColor,
                     onTapSquare: { viewModel.selectSquare($0) },
-                    onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) }
+                    onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) },
+                    blockedSquares: viewModel.displayedBlockedSquares
                 )
                 .frame(width: side, height: side)
             }

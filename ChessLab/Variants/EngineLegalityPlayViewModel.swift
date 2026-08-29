@@ -151,6 +151,24 @@ final class EngineLegalityPlayViewModel {
     // MARK: Affichage
 
     var displayedBoard: Board { reviewBoard ?? board }
+
+    /// Les cases MURÉES de la position affichée — vides hors Barricades.
+    /// Lues dans la FEN du MOTEUR (celle qui les porte), pas dans le plateau
+    /// ChessKit, d'où elles ont justement été retirées pour qu'il puisse le
+    /// lire (voir ``BarricadesFEN``).
+    var displayedBlockedSquares: [Square] {
+        guard variant.id == EngineLegalityVariant.barricades.id else { return [] }
+        return BarricadesFEN.wallSquares(in: displayedRawFEN)
+    }
+
+    /// La FEN BRUTE de la position affichée, telle que le moteur l'écrit —
+    /// réserve et murs compris. ``displayedFEN`` en est la version épurée,
+    /// celle que ChessKit sait lire.
+    var displayedRawFEN: String {
+        guard let reviewPly, reviewPly < fenLog.count else { return currentFEN }
+        return fenLog[reviewPly]
+    }
+
     var totalPlies: Int { uciLog.count }
     var displayedPly: Int { reviewPly ?? uciLog.count }
     var isReviewing: Bool { reviewPly != nil }
@@ -380,7 +398,7 @@ final class EngineLegalityPlayViewModel {
                 piece: Piece(kind, color: previousMover, square: square),
                 start: square, end: square
             ))
-        } else if let beforePosition = Position(fen: CrazyhouseFEN.forChessKit(beforeFEN)) {
+        } else if let beforePosition = Position(fen: VariantFEN.forChessKit(beforeFEN)) {
             let from = Square(String(uci.prefix(2)))
             let to = Square(String(uci.dropFirst(2).prefix(2)))
             if let piece = beforePosition.piece(at: from) {
@@ -406,7 +424,7 @@ final class EngineLegalityPlayViewModel {
             }
         }
         currentFEN = query.fen
-        board = Board(position: Position(fen: CrazyhouseFEN.forChessKit(query.fen))!)
+        board = Board(position: Position(fen: VariantFEN.forChessKit(query.fen))!)
         legalMovesForCurrentPosition = query.legalMoves
         pocket = query.pocket
         playSound(for: san)
@@ -479,7 +497,7 @@ final class EngineLegalityPlayViewModel {
         }
         currentFEN = query.fen
         if !isResuming { fenLog = [query.fen] }
-        board = Board(position: Position(fen: CrazyhouseFEN.forChessKit(query.fen))!)
+        board = Board(position: Position(fen: VariantFEN.forChessKit(query.fen))!)
         legalMovesForCurrentPosition = query.legalMoves
         pocket = query.pocket
         isPositionReady = true
@@ -530,7 +548,9 @@ final class EngineLegalityPlayViewModel {
 
     private func setupEngine() async {
         guard outcome == nil else { return }
-        guard await engine.start(variant: variant.id) else {
+        // `customDefinitionPath` n'est renseigné que pour les variantes que le
+        // moteur ne connaît pas d'origine — Barricades aujourd'hui.
+        guard await engine.start(variant: variant.id, variantPath: variant.customDefinitionPath) else {
             isEngineUnavailable = true
             return
         }
@@ -784,7 +804,7 @@ final class EngineLegalityPlayViewModel {
             return
         }
         reviewPly = clamped
-        reviewBoard = Board(position: Position(fen: CrazyhouseFEN.forChessKit(fenLog[clamped]))!)
+        reviewBoard = Board(position: Position(fen: VariantFEN.forChessKit(fenLog[clamped]))!)
         clearSelection()
         refreshDisplayedEvalBar()
     }
@@ -852,7 +872,7 @@ final class EngineLegalityPlayViewModel {
         fenLog.append(contentsOf: undo.fen)
         moveLog.append(contentsOf: undo.moves)
         currentFEN = fenLog.last ?? currentFEN
-        board = Board(position: Position(fen: CrazyhouseFEN.forChessKit(currentFEN))!)
+        board = Board(position: Position(fen: VariantFEN.forChessKit(currentFEN))!)
         outcome = nil
         clearSelection()
         isPositionReady = false
@@ -882,7 +902,7 @@ final class EngineLegalityPlayViewModel {
         fenLog = Array(fenLog.prefix(count + 1))
         moveLog = Array(moveLog.prefix(count))
         currentFEN = fenLog.last ?? startFEN
-        board = Board(position: Position(fen: CrazyhouseFEN.forChessKit(currentFEN))!)
+        board = Board(position: Position(fen: VariantFEN.forChessKit(currentFEN))!)
         outcome = nil
         pendingBlunderWarning = nil
         clearSelection()

@@ -251,8 +251,19 @@ actor FairyEngineController {
     /// Démarre le moteur, règle `UCI_Variant`, et attend `uciok` — borné à
     /// ~`startTimeoutMs`. `variant` : nom UCI Fairy-Stockfish exact (voir
     /// ``FairyVariant/uciVariantName``, ex. « kingofthehill »).
+    ///
+    /// - parameter variantPath: chemin d'un fichier de définition de variantes
+    ///   à charger AVANT de choisir la variante. C'est la seule façon d'ajouter
+    ///   une variante que le moteur ne connaît pas d'origine (voir
+    ///   ``BarricadesVariant``) : l'option `VariantPath` relit le fichier et
+    ///   reconstruit la liste des variantes acceptées, donc elle doit
+    ///   impérativement précéder `UCI_Variant` — dans l'autre ordre, le moteur
+    ///   refuse un nom qu'il ne connaît pas encore et reste aux échecs
+    ///   ordinaires, sans rien dire.
     @discardableResult
-    func start(variant: String, coreCount: Int? = nil, multipv: Int = 1) async -> Bool {
+    func start(
+        variant: String, variantPath: String? = nil, coreCount: Int? = nil, multipv: Int = 1
+    ) async -> Bool {
         uciOk = false
         if !engine.isRunning {
             // NOUVELLE instance, systématiquement — c'est le correctif du
@@ -304,6 +315,9 @@ actor FairyEngineController {
         let threads = coreCount.map { max($0 - 1, 1) } ?? 1
         await sendRaw(.setoption(id: "Threads", value: "\(threads)"))
         await sendRaw(.setoption(id: "MultiPV", value: "\(multipv)"))
+        if let variantPath {
+            await sendRaw(.setoption(id: "VariantPath", value: variantPath))
+        }
         await sendRaw(.setoption(id: "UCI_Variant", value: variant))
         await sendRaw(.ucinewgame)
         didFailToStart = false

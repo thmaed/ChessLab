@@ -8,13 +8,15 @@ Notes DÉTAILLÉES pour le dépôt. Le texte à coller dans App Store Connect es
 
 ## Français
 
-**Deux variantes de plus : Crazyhouse et Duck Chess**
+**Trois variantes de plus : Crazyhouse, Duck Chess et Barricades**
 
-Le hub passe à dix façons de jouer.
+Le hub passe à onze façons de jouer.
 
 **Crazyhouse** — toute pièce que vous capturez change de camp et rejoint votre réserve, d'où vous pouvez la reposer sur n'importe quelle case vide, y compris pour donner mat. Une bande sous chaque joueur montre les pièces en main : la vôtre se touche pour choisir, celle d'en face vous prévient de ce qui peut tomber. Un pion ne se pose ni sur la 1re ni sur la 8e rangée, et un pion promu capturé redevient un simple pion. Jouable contre l'ordinateur, à toutes les forces.
 
 **Duck Chess** — un canard 🦆 occupe une case et la bloque totalement : aucune pièce ne peut s'y poser ni la traverser, et il ne se capture pas. Chaque tour se joue en deux temps — vous déplacez une pièce, puis vous posez le canard où vous voulez, en changeant de case à chaque fois. Il n'y a ni échec ni mat : un roi a le droit de rester sous une attaque, et on gagne en le capturant. Jouable **contre l'ordinateur**, avec tout ce qu'offrent les autres variantes : choix de la couleur, force réglable, cadence, barre d'évaluation, indice, alerte gaffe, reprise d'un coup, et une analyse de fin de partie qui rejoue la partie canard compris. L'ordinateur pose son canard là où il gêne le plus — sur la case d'arrivée du coup qu'il vous prête, ou en travers de son chemin.
+
+**Barricades** — les règles des échecs, à un détail près : les cases d4 et e5 sont murées dès le départ. Aucune pièce ne peut s'y poser ni les traverser, et un mur ne se capture pas — il ne bougera pas de la partie. Tours, fous et dames butent donc dessus comme sur une pièce, tandis que les cavaliers leur sautent par-dessus sans pouvoir s'y arrêter. Tout le reste — échec, mat, pat, roque, prise en passant, promotion — est inchangé. Deux cases en moins au centre, et l'ouverture n'est déjà plus la même : d2-d4 n'existe pas.
 
 **Le moteur des Variantes ne décroche plus**
 
@@ -62,13 +64,15 @@ Un grain très léger a été ajouté au fond : il supprime les bandes que les g
 
 ## English
 
-**Two more variants: Crazyhouse and Duck Chess**
+**Three more variants: Crazyhouse, Duck Chess and Barricades**
 
-The hub grows to ten ways to play.
+The hub grows to eleven ways to play.
 
 **Crazyhouse** — every piece you capture switches sides and joins your reserve, from which you can drop it back onto any empty square, including to deliver mate. A strip under each player shows the pieces in hand: yours is tappable, your opponent's warns you what may land. A pawn cannot be dropped on the 1st or 8th rank, and a promoted pawn that is captured returns as a plain pawn. Playable against the computer, at every strength.
 
 **Duck Chess** — a duck 🦆 sits on a square and blocks it completely: no piece may land on it or move through it, and it cannot be captured. Every turn has two steps — you move a piece, then you place the duck wherever you like, on a different square each time. There is no check and no checkmate: a king may stay under attack, and you win by capturing it. Playable **against the computer**, with everything the other variants offer: colour choice, adjustable strength, time control, eval bar, hints, blunder alerts, takebacks, and a post-game analysis that replays the game with the duck in place. The computer drops its duck where it hurts most — on the arrival square of the move it expects from you, or across its path.
+
+**Barricades** — the rules of chess, with one twist: d4 and e5 are walled off from the start. No piece may land on them or move through them, and a wall cannot be captured — it will not move for the whole game. Rooks, bishops and queens therefore stop against a wall as they would against a piece, while knights leap over one without being able to stop on it. Everything else — check, checkmate, stalemate, castling, en passant, promotion — is unchanged. Two squares fewer in the centre, and the opening is already a different game: d2-d4 does not exist.
 
 **The Variants engine no longer drops out**
 
@@ -137,6 +141,10 @@ A very light grain has been added to the background: it removes the banding that
 - **Crazyhouse, à l'inverse**, n'a presque rien coûté côté règles : Fairy-Stockfish la joue nativement, donc les cases de pose légales sont filtrées parmi les coups qu'il énumère, jamais calculées ici. Deux trous de plomberie ont dû être bouchés, tous deux silencieux : le filtre de coups rejetait les poses (`P@e4`, majuscule en tête, là où il exigeait une minuscule), et rien ne lisait la réserve pourtant écrite dans la FEN.
 
 - **Outil de revue.** `SmallPhoneTourUITests` dépose les captures de quinze écrans dans `/tmp/cl-small-phone/` — un outil à lancer à la demande, pas un test de non-régression, comme les captures App Store.
+
+- **Barricades : une case-mur, sur un moteur qui n'en a pas.** Le Fairy-Stockfish vendorisé est la version 14 : son parseur de FEN n'a aucun cas pour `*`, `position.h` n'a aucune notion de case bloquée, et la liste des options de `parser.cpp` ne contient ni `wallingRule` ni équivalent. Le mur est donc FABRIQUÉ avec ce que ce build offre : le type de pièce `immobile` (notation Betza vide, donc aucun coup) posé sur d4 et e5 pour bloquer les lignes, `mobilityRegionBlack<Pièce>` pour interdire ces deux cases aux six types de pièces noires — les Blancs n'y peuvent rien poser non plus, ce sont leurs propres pièces — et `pieceValueMg`/`pieceValueEg` à zéro pour que les murs ne pèsent rien dans l'évaluation. Le blocage des glissantes ne vient PAS de `mobilityRegion`, qui n'est qu'un masque d'arrivée appliqué après le calcul des attaques (`position.h`, `board_bb(c, pt)`), mais de l'occupation : un mur est une pièce, donc il arrête une ligne, et un cavalier lui saute par-dessus. La définition est ENGENDRÉE par l'app (`BarricadesConfiguration`) à partir d'une seule ligne, `wallSquares`, puis chargée par l'option UCI `VariantPath` avant `UCI_Variant` — l'ordre inverse laisserait le moteur refuser un nom qu'il ne connaît pas encore, sans rien dire. `BarricadesEngineSpikeTests` valide chacun de ces points contre le moteur RÉEL, et a été écrite avant la moindre ligne d'interface.
+
+- **Ce que la sonde a démenti.** L'hypothèse de départ était que la lettre du mur corromprait la rangée côté ChessKit, comme le fait la réserve du Crazyhouse. Faux, et mesuré : ChessKit 0.17.0 avance d'une case sur un caractère inconnu au MILIEU d'une rangée, si bien que `3pW1n1` se relit correctement `3p2n1`. La corruption du Crazyhouse venait d'ailleurs — sa réserve arrive APRÈS la 8e colonne, `Square.File` plafonne, et les caractères en trop s'empilent sur h1. `BarricadesFEN` existe quand même, pour ne pas dépendre d'une tolérance que rien ne promet, et `VariantFEN` compose les deux nettoyages pour qu'aucun écran n'ait à savoir laquelle des deux variantes enrichit sa FEN. Au passage : l'écran d'ANALYSE, lui, ne filtrait rien — une partie de Crazyhouse s'y relisait donc avec sa dernière rangée abîmée depuis le début. Corrigé.
 
 - **Le piège de localisation, en détail.** `Text("…")` et les autres vues SwiftUI localisent un `LocalizedStringKey` ; elles ne localisent PAS un `String`. Un littéral français typé `String` échappe donc à la fois à la traduction ET à l'extraction automatique du catalogue : rien ne le signale, l'app démarre, l'écran s'affiche. Deux formes du défaut coexistaient. La première : un composant dont le paramètre était typé `String` (`EngineUnavailableBanner.message`, neuf appelants ; `TextImportSheet.title`/`placeholder`/`confirmLabel`) — corrigée en typant le paramètre `LocalizedStringKey`, ce qui met la contrainte dans le type. La seconde : un texte composé à l'exécution, qui doit passer par `LocalizationController.string(_:)` — corrigée site par site (validateur FEN, scanner, éditeur de position, alerte gaffe, import PGN/FEN, répertoire), avec les clés ajoutées à la main au catalogue, `string(_:)` n'étant pas extrait automatiquement. Deux contrôles nouveaux dans `LocalizedStringHygieneTests` : toute chaîne française livrée doit avoir sa version anglaise, et un échantillon par famille de textes composés à l'exécution doit être réellement traduit.
 

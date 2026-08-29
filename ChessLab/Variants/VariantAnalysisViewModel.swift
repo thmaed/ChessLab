@@ -92,10 +92,19 @@ final class VariantAnalysisViewModel {
         )
     }
 
+    /// Définition à enseigner au moteur avant de choisir la variante —
+    /// `nil` pour celles qu'il connaît d'origine (voir
+    /// ``EngineLegalityVariant/customDefinitionPath``).
+    private var customDefinitionPath: String? {
+        EngineLegalityVariant.all.first { $0.id == variantID }?.customDefinitionPath
+    }
+
     func start() {
         enqueueEngineWork { [weak self] in
             guard let self else { return }
-            _ = await self.engine.start(variant: self.variantID)
+            _ = await self.engine.start(
+                variant: self.variantID, variantPath: self.customDefinitionPath
+            )
         }
         classifyMainLine()
     }
@@ -133,7 +142,25 @@ final class VariantAnalysisViewModel {
         }
     }
 
-    var displayedBoard: Board { Board(position: Position(fen: fenLog[displayedPly])!) }
+    /// Le plateau d'affichage — bâti sur la FEN ÉPURÉE.
+    ///
+    /// La FEN journalisée est celle du MOTEUR : elle porte la réserve du
+    /// Crazyhouse et les murs de Barricades, deux enrichissements que ChessKit
+    /// ne sait pas lire et qui corrompent silencieusement sa dernière rangée
+    /// (voir ``VariantFEN``). L'écran de partie passait déjà par ce filtre ;
+    /// celui-ci ne le faisait pas, et affichait donc une tour changée en pion
+    /// dès qu'une partie de Crazyhouse était analysée.
+    var displayedBoard: Board {
+        Board(position: Position(fen: VariantFEN.forChessKit(fenLog[displayedPly]))!)
+    }
+
+    /// Cases MURÉES de la position affichée — vides hors Barricades. Lues
+    /// dans la FEN BRUTE, seule à les porter.
+    var displayedBlockedSquares: [Square] {
+        guard variantID == EngineLegalityVariant.barricades.id else { return [] }
+        return BarricadesFEN.wallSquares(in: fenLog[displayedPly])
+    }
+
     var displayedFEN: String { fenLog[displayedPly] }
 
     var displayedLastMove: Move? {
@@ -330,7 +357,9 @@ final class VariantAnalysisViewModel {
                 let winPercentAfterMover = mover == .white ? after.winPercentWhite : 100 - after.winPercentWhite
 
                 let move = self.moveLog[i]
-                let boardAfterMove = Board(position: Position(fen: self.fenLog[ply])!)
+                guard let positionAfterMove = Position(fen: VariantFEN.forChessKit(self.fenLog[ply]))
+                else { break }
+                let boardAfterMove = Board(position: positionAfterMove)
                 let isSacrifice = MoveClassifier.involvesSacrifice(move: move, boardAfterMove: boardAfterMove)
                 let nextMove = (i + 1 < self.moveLog.count) ? self.moveLog[i + 1] : nil
                 let sacrificeRecaptured = MoveClassifier.isImmediatelyRecaptured(move, byNext: nextMove)

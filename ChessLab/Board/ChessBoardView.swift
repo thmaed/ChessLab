@@ -60,6 +60,10 @@ struct ChessBoardView: View {
     /// une case que rien d'autre ne peut occuper — jamais de superposition à
     /// arbitrer.
     var duckSquare: Square? = nil
+    /// Cases MURÉES — Barricades. Aucune pièce ne s'y pose ni ne les
+    /// traverse ; c'est le moteur qui l'impose, l'affichage ne fait que le
+    /// montrer (voir ``BarricadesConfiguration``).
+    var blockedSquares: [Square] = []
     /// Faut-il cercler de rouge un roi en échec. `false` en Duck Chess, où la
     /// notion N'EXISTE PAS : l'anneau y venait de l'état que ChessKit calcule
     /// tout seul, sans rien savoir du canard — il s'allumait donc sur un roi
@@ -152,6 +156,7 @@ struct ChessBoardView: View {
                 }
 
                 piecesLayer(squareSize: squareSize)
+                wallLayer(squareSize: squareSize)
                 duckLayer(squareSize: squareSize)
                 // Au-DESSUS des pièces : sur une case occupée (capture), un
                 // marqueur placé dessous serait masqué par la pièce adverse.
@@ -769,6 +774,19 @@ struct ChessBoardView: View {
     // résolvait sur la case de bord la plus proche et pouvait jouer un coup
     // jamais visé. Son remplaçant, `BoardGeometry.geometricSquare(at:)`, rend
     // `nil` au-delà d'une marge de grâce d'une demi-case.
+
+    /// Les cases MURÉES de Barricades, posées SOUS les pièces — aucune ne
+    /// peut s'y trouver, mais une flèche d'indice ou un marqueur de dernier
+    /// coup peut passer par-dessus, et doit rester lisible.
+    private func wallLayer(squareSize: CGFloat) -> some View {
+        ForEach(blockedSquares, id: \.self) { square in
+            WallGlyphView()
+                .frame(width: squareSize, height: squareSize)
+                .position(centerPoint(of: square, squareSize: squareSize))
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
+    }
 
     /// Le canard 🦆 du Duck Chess, posé sur sa case.
     ///

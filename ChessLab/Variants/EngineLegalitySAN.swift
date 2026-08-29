@@ -30,7 +30,7 @@ enum EngineLegalitySAN {
         // FEN assainie : celle du moteur porte la réserve du Crazyhouse et
         // ses marques de promotion, que ChessKit lit de travers — voir
         // ``CrazyhouseFEN``.
-        guard let position = Position(fen: CrazyhouseFEN.forChessKit(beforeFEN)), uci.count >= 4
+        guard let position = Position(fen: VariantFEN.forChessKit(beforeFEN)), uci.count >= 4
         else { return uci }
         let from = Square(String(uci.prefix(2)))
         let to = Square(String(uci.dropFirst(2).prefix(2)))

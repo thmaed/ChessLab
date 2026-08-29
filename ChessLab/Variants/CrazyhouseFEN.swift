@@ -47,3 +47,17 @@ enum CrazyhouseFEN {
         return result
     }
 }
+
+/// La FEN telle que ChessKit doit la recevoir, d'où qu'elle vienne.
+///
+/// Deux variantes enrichissent la FEN du moteur de caractères que ChessKit ne
+/// connaît pas — la réserve et les marques de promotion du Crazyhouse, la
+/// lettre du mur de Barricades — et les DEUX corrompent la dernière rangée de
+/// la même façon (voir ``CrazyhouseFEN``). Les écrans de variantes passent
+/// donc par ici plutôt que d'appeler l'un ou l'autre nettoyage et d'oublier le
+/// second le jour où une troisième variante arrivera.
+enum VariantFEN {
+    static func forChessKit(_ fen: String) -> String {
+        BarricadesFEN.forChessKit(CrazyhouseFEN.forChessKit(fen))
+    }
+}
