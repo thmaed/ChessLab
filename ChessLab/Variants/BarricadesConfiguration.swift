@@ -97,12 +97,14 @@ enum BarricadesConfiguration {
     /// dans son coin sans que personne y soit pour rien.
     static let randomWallRanks = 2...7
 
-    /// Combien de murs se REDÉPLOIENT à chaque demi-coup.
-    static let movingWallCount = 2
+    /// Trois murs en tout.
+    static let wallCount = 3
 
-    /// Trois murs en tout : deux qui sautent d'une case à l'autre, un qui
-    /// reste. Le fixe donne un point d'appui — sans lui, rien du plateau ne
-    /// tient d'un coup au suivant et la partie n'a plus de forme du tout.
+    /// Combien se REDÉPLOIENT à chaque demi-coup — deux sur les trois, tirés
+    /// au sort. Celui qui reste n'est pas le même d'un coup à l'autre : c'est
+    /// ce tirage-là, et non un mur figé pour la partie, qui fait la variante.
+    /// Un mur immobile donnerait un point d'appui permanent ; ici, le seul
+    /// point d'appui dure un coup, et on ne sait pas lequel ce sera.
 
     /// Le fichier de définition, tel que `VariantPath` l'attend — les DEUX
     /// variantes dans un seul fichier, qu'un seul chargement suffit à
@@ -136,52 +138,52 @@ enum BarricadesConfiguration {
 
     // MARK: Murs mobiles
 
-    /// Repose les murs MOBILES au hasard sur des cases vides des rangées 2 à 7,
-    /// en laissant le mur FIXE où il est.
+    /// Redéploie DEUX des trois murs, tirés au sort ; le troisième reste où
+    /// il est.
     ///
-    /// - parameter fixed: le mur qui ne bouge pas de la partie. Il n'est pas
-    ///   retiré puis remis : il n'est jamais retiré. S'il se retrouve sous une
-    ///   pièce — impossible, aucune pièce ne peut s'y poser — il serait
-    ///   simplement ignoré.
+    /// Celui qui reste change à chaque appel — c'est un tirage, pas un mur
+    /// désigné pour la partie. Les deux qui bougent vont sur des cases vides
+    /// des rangées 2 à 7, et jamais sur l'une des trois cases murées
+    /// d'avant : sans cette exclusion, un « mur qui bouge » pourrait retomber
+    /// sur sa propre case et ne pas bouger du tout.
+    ///
+    /// Quand la position n'a pas encore ses trois murs — au tout premier
+    /// appel — ils sont simplement tous posés.
     ///
     /// Rend `nil` si la position est illisible ou s'il n'y a pas assez de
     /// cases libres : la partie continue alors avec les murs qu'elle avait,
     /// plutôt que de s'arrêter sur un détail.
     static func relocatingWalls(
-        in fen: String, fixed: Square? = nil, using generator: inout some RandomNumberGenerator
+        in fen: String, using generator: inout some RandomNumberGenerator
     ) -> String? {
         let cleared = BarricadesFEN.forChessKit(fen)
         guard let position = Position(fen: cleared) else { return nil }
-        let occupied = Set(position.pieces.map(\.square))
-        let candidates = DuckChessRules.allSquares.filter { square in
-            randomWallRanks.contains(square.rank.value)
-                && !occupied.contains(square)
-                && square != fixed
-        }
-        guard candidates.count >= movingWallCount else { return nil }
+        let current = BarricadesFEN.wallSquares(in: fen)
 
-        var chosen: Set<Square> = fixed.map { [$0] } ?? []
-        while chosen.count < movingWallCount + (fixed == nil ? 0 : 1) {
+        // Le mur épargné ce coup-ci, s'il y en a trois à départager.
+        let staying: Set<Square> = current.count >= wallCount
+            ? Set([current.randomElement(using: &generator)].compactMap { $0 })
+            : []
+        let moving = wallCount - staying.count
+
+        let occupied = Set(position.pieces.map(\.square))
+        let forbidden = occupied.union(current)
+        let candidates = DuckChessRules.allSquares.filter {
+            randomWallRanks.contains($0.rank.value) && !forbidden.contains($0)
+        }
+        guard candidates.count >= moving else { return nil }
+
+        var chosen = staying
+        while chosen.count < wallCount {
             guard let square = candidates.randomElement(using: &generator) else { return nil }
             chosen.insert(square)
         }
         return inserting(walls: chosen, into: cleared)
     }
 
-    /// Tire la case du mur FIXE d'une partie, et rend la position d'ouverture
-    /// complète — mur fixe compris, murs mobiles compris.
-    static func openingPosition(
-        using generator: inout some RandomNumberGenerator
-    ) -> (fen: String, fixedWall: Square?) {
-        guard let position = Position(fen: randomStartFEN) else { return (randomStartFEN, nil) }
-        let occupied = Set(position.pieces.map(\.square))
-        let candidates = DuckChessRules.allSquares.filter {
-            randomWallRanks.contains($0.rank.value) && !occupied.contains($0)
-        }
-        guard let fixed = candidates.randomElement(using: &generator),
-              let fen = relocatingWalls(in: randomStartFEN, fixed: fixed, using: &generator)
-        else { return (randomStartFEN, nil) }
-        return (fen, fixed)
+    /// La position d'ouverture : les trois murs posés au hasard.
+    static func openingPosition(using generator: inout some RandomNumberGenerator) -> String {
+        relocatingWalls(in: randomStartFEN, using: &generator) ?? randomStartFEN
     }
 
     /// Réécrit une FEN SANS mur en y plaçant ceux qu'on lui donne.

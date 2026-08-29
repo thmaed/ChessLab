@@ -60,23 +60,35 @@ struct BarricadesEngineSpikeTests {
     }
 
     /// Démarre le moteur sur la variante et interroge UNE position.
-    private func query(fen: String, moves: [String] = []) async throws -> FairyEngineController.PositionQuery? {
+    ///
+    /// Un second essai à chaque étape, et un message qui DIT laquelle a
+    /// lâché : sous la charge d'une suite complète, un démarrage ou un
+    /// aller-retour de lignes peut manquer son budget sans que le moteur ait
+    /// le moindre problème (voir ``FairyEngineController/captureRawLines``).
+    /// Un `nil` anonyme laissait croire à un refus de la variante.
+    private func query(fen: String, moves: [String] = []) async throws -> FairyEngineController.PositionQuery {
         let path = try writeINI()
         defer { try? FileManager.default.removeItem(atPath: path) }
         let engine = FairyEngineController()
-        guard await engine.start(variant: "barricades", variantPath: path) else {
-            await engine.stop()
-            return nil
+        defer { Task { await engine.stop() } }
+
+        var started = await engine.start(variant: "barricades", variantPath: path)
+        if !started {
+            started = await engine.start(variant: "barricades", variantPath: path)
         }
-        let result = await engine.queryPosition(startFEN: fen, uciLog: moves)
-        await engine.stop()
-        return result
+        try #require(started, "le moteur n'a pas démarré sur la variante, même au second essai")
+
+        var result = await engine.queryPosition(startFEN: fen, uciLog: moves)
+        if result == nil {
+            result = await engine.queryPosition(startFEN: fen, uciLog: moves)
+        }
+        return try #require(result, "le moteur n'a pas rendu la position, même au second essai")
     }
 
     @Test("Le moteur accepte la variante et rend une position lisible")
     func engineLoadsTheVariant() async throws {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
-            let query = try #require(await self.query(fen: Self.startFEN), "le moteur n'a pas démarré")
+            let query = try await self.query(fen: Self.startFEN)
             // Les murs doivent être DANS la position rendue, sinon le moteur
             // a silencieusement ignoré le `W` et joue aux échecs ordinaires.
             #expect(query.fen.contains("W"), "les murs ont disparu de la position : \(query.fen)")
@@ -87,7 +99,7 @@ struct BarricadesEngineSpikeTests {
     @Test("Aucun coup de départ ne se pose sur un mur, et d2-d4 disparaît")
     func noOpeningMoveLandsOnAWall() async throws {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
-            let query = try #require(await self.query(fen: Self.startFEN))
+            let query = try await self.query(fen: Self.startFEN)
             let landings = Set(query.legalMoves.compactMap { $0.count >= 4 ? String($0.dropFirst(2).prefix(2)) : nil })
             #expect(!landings.contains("d4"), "d4 est un mur")
             #expect(!landings.contains("e5"), "e5 est un mur")
@@ -138,7 +150,7 @@ struct BarricadesEngineSpikeTests {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
             // Tour blanche en d1, colonne d vide jusqu'au mur de d4.
             let fen = "4k3/8/8/4W3/3W4/8/8/3RK3 w - - 0 1"
-            let query = try #require(await self.query(fen: fen))
+            let query = try await self.query(fen: fen)
             let dFile = query.legalMoves.filter { $0.hasPrefix("d1d") }.sorted()
             #expect(dFile == ["d1d2", "d1d3"], "la tour doit s'arrêter sous le mur : \(dFile)")
         }
@@ -151,7 +163,7 @@ struct BarricadesEngineSpikeTests {
             // mais b4/e7/a5… restent atteignables, et surtout le saut
             // c6→d4 est le seul refusé pour cause de mur, pas de blocage.
             let fen = "4k3/8/2n5/4W3/3W4/8/8/4K3 b - - 0 1"
-            let query = try #require(await self.query(fen: fen))
+            let query = try await self.query(fen: fen)
             let knight = query.legalMoves.filter { $0.hasPrefix("c6") }.sorted()
             #expect(!knight.contains("c6d4"), "d4 est un mur")
             #expect(!knight.contains("c6e5"), "e5 est un mur")
@@ -166,7 +178,7 @@ struct BarricadesEngineSpikeTests {
             // Tour noire en d8, colonne d vide : elle descend jusqu'à d5 et
             // s'arrête — d4 lui est refusé.
             let fen = "3rk3/8/8/4W3/3W4/8/8/4K3 b - - 0 1"
-            let query = try #require(await self.query(fen: fen))
+            let query = try await self.query(fen: fen)
             let dFile = query.legalMoves.filter { $0.hasPrefix("d8d") }.sorted()
             #expect(dFile == ["d8d5", "d8d6", "d8d7"], "la tour ne doit pas prendre le mur : \(dFile)")
         }
@@ -177,7 +189,7 @@ struct BarricadesEngineSpikeTests {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
             // Fou noir en g7 : g7-f6-e5 est barré par le mur de e5.
             let fen = "4k3/6b1/8/4W3/3W4/8/8/4K3 b - - 0 1"
-            let query = try #require(await self.query(fen: fen))
+            let query = try await self.query(fen: fen)
             let diagonal = query.legalMoves.filter { $0.hasPrefix("g7") }.sorted()
             #expect(diagonal.contains("g7f6"))
             #expect(!diagonal.contains("g7e5"), "e5 est un mur : \(diagonal)")

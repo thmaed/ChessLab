@@ -55,5 +55,15 @@ final class Chess960AnalysisUITests: XCTestCase {
         }
         XCTAssertGreaterThanOrEqual(Int(totalPlies.value as? String ?? "") ?? 0, 1,
                                      "la partie rejouée doit compter au moins le coup joué avant l'abandon")
+
+        // La courbe d'évaluation, partagée par les quatre écrans d'analyse
+        // depuis le 29/08 : on vérifie qu'elle est bien là, et on garde une
+        // capture pour l'œil.
+        XCTAssertTrue(app.otherElements["evalCurve"].waitForExistence(timeout: 15),
+                      "la courbe d'évaluation doit être affichée")
+        try? FileManager.default.createDirectory(atPath: "/tmp/cl-courbe", withIntermediateDirectories: true)
+        try? app.screenshot().pngRepresentation
+            .write(to: URL(fileURLWithPath: "/tmp/cl-courbe/chess960.png"))
+
     }
 }

@@ -238,7 +238,69 @@ final class AppStoreScreenshotUITests: XCTestCase {
                 save(app.screenshot(), folder: folder, name: "debug-09-no-horde-tile")
                 XCTFail("tuile Horde jamais apparue : capture 09 impossible")
             }
+
+            captureDuckChess(app, folder: folder)
         }
+    }
+
+    // MARK: 10 — Duck Chess, la variante la plus reconnaissable de la 1.7
+    //
+    // Dixième et DERNIÈRE capture : App Store Connect n'en accepte pas plus.
+    // Le canard jaune posé sur une case dit d'un coup d'œil ce qu'aucune
+    // ligne de description ne dira aussi vite — et il faut avoir joué un tour
+    // complet pour le voir, puisqu'il n'est pas là au départ.
+    @MainActor
+    private func captureDuckChess(_ app: XCUIApplication, folder: String) {
+        // Retour au hub, puis descente jusqu'à la tuile : avec douze
+        // variantes, le canard n'est plus dans le premier écran.
+        var backToHub = 0
+        while !app.buttons["variant_kingofthehill"].waitForExistence(timeout: 1), backToHub < 15 {
+            goBack(app)
+            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+            backToHub += 1
+        }
+        let duck = app.buttons["variant_duck"]
+        var scrolls = 0
+        while !(duck.exists && duck.isHittable), scrolls < 10 {
+            app.swipeUp(velocity: .slow)
+            RunLoop.current.run(until: Date().addingTimeInterval(0.45))
+            scrolls += 1
+        }
+        guard duck.exists, duck.isHittable else {
+            save(app.screenshot(), folder: folder, name: "debug-10-no-duck-tile")
+            XCTFail("tuile Duck Chess jamais atteinte : capture 10 impossible")
+            return
+        }
+        duck.tap()
+
+        let start = app.buttons["fairyVariant_start"]
+        guard start.waitForExistence(timeout: 6) else {
+            save(app.screenshot(), folder: folder, name: "debug-10-no-start")
+            XCTFail("bouton Commencer jamais apparu (Duck Chess) : capture 10 impossible")
+            return
+        }
+        start.tap()
+
+        guard app.otherElements["square_e2"].waitForExistence(timeout: 12) else {
+            save(app.screenshot(), folder: folder, name: "debug-10-no-board")
+            XCTFail("plateau Duck Chess jamais apparu : capture 10 impossible")
+            return
+        }
+        // Un tour COMPLET : le coup, puis la pose du canard — sans elle, il
+        // n'y a rien à montrer. On attend ensuite la réponse de l'ordinateur,
+        // qui pose le sien ailleurs.
+        app.otherElements["square_e2"].tap()
+        app.otherElements["square_e4"].tap()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.8))
+        app.otherElements["square_e5"].tap()
+
+        let moveMarker = app.otherElements["duck_moveCount"]
+        let deadline = Date().addingTimeInterval(30)
+        while Date() < deadline, Int(moveMarker.value as? String ?? "0") ?? 0 < 2 {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+        }
+        RunLoop.current.run(until: Date().addingTimeInterval(1))
+        save(app.screenshot(), folder: folder, name: "10-variante-canard")
     }
 
     // MARK: 04 — Partie en cours (mode classique)

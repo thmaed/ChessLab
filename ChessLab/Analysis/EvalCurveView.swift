@@ -49,6 +49,21 @@ struct EvalCurveView<ID: Hashable>: View {
     /// place aux coups tout en restant parfaitement lisible.
     var height: CGFloat = 64
 
+    /// L'échelle verticale S'ADAPTE à la partie, au lieu d'être figée à
+    /// ±10 pions.
+    ///
+    /// Figée, elle écrasait tout : une partie normale tient dans ±2, donc la
+    /// courbe occupait un dixième de la hauteur et ressemblait à un trait
+    /// plat — le décrochage qu'elle est censée montrer devenait invisible.
+    /// Elle reste SYMÉTRIQUE, pour que le milieu soit toujours l'égalité, et
+    /// bornée des deux côtés : un plancher à ±1,5 pion pour ne pas
+    /// transformer trois centipions d'écart en montagne russe, un plafond à
+    /// ±10 pour qu'un mat annoncé n'aplatisse pas le reste.
+    private var verticalBound: Double {
+        let peak = points.map { abs($0.pawns) }.max() ?? 0
+        return min(10, max(1.5, peak * 1.15))
+    }
+
     var body: some View {
         Chart {
             ForEach(points) { point in
@@ -96,7 +111,7 @@ struct EvalCurveView<ID: Hashable>: View {
                     .lineStyle(StrokeStyle(lineWidth: 1.5, dash: [3, 3]))
             }
         }
-        .chartYScale(domain: -10...10)
+        .chartYScale(domain: -verticalBound...verticalBound)
         .chartYAxis(.hidden)
         .chartXAxis(.hidden)
         .frame(height: height)

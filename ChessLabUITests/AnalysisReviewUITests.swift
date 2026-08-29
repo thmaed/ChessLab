@@ -62,6 +62,15 @@ final class AnalysisReviewUITests: XCTestCase {
             "après navigation, le coup affiché doit être catégorisé dans le bandeau coach"
         )
 
+// La courbe d'évaluation, partagée par les quatre écrans d'analyse
+        // depuis le 29/08 : on vérifie qu'elle est bien là, et on garde une
+        // capture pour l'œil.
+        XCTAssertTrue(app.otherElements["evalCurve"].waitForExistence(timeout: 15),
+                      "la courbe d'évaluation doit être affichée")
+        try? FileManager.default.createDirectory(atPath: "/tmp/cl-courbe", withIntermediateDirectories: true)
+        try? app.screenshot().pngRepresentation
+            .write(to: URL(fileURLWithPath: "/tmp/cl-courbe/jouer.png"))
+
         // Ouvrir le bilan depuis le menu d'options.
         app.buttons["Plus d'options"].tap()
         let summaryEntry = app.buttons["Bilan de la partie"]

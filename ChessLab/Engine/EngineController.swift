@@ -37,7 +37,16 @@ actor EngineController {
 
     private let startTimeoutMs: Int
 
-    init(startTimeoutMs: Int = 5000) {
+    /// **Porté de 5 s à 15 s le 29/08**, comme son jumeau
+    /// ``FairyEngineController``. Ce budget ne mesure pas le démarrage du
+    /// moteur — `uciok` arrive en millisecondes — mais le temps que sa
+    /// réponse met à remonter par le MainActor. Sous charge, 5 s ne
+    /// suffisaient pas, et l'écran annonçait « moteur indisponible » alors
+    /// que le moteur allait bien. Ce contrôleur-ci sert le mode Jouer, le
+    /// Laboratoire, le Duck Chess et le Coup Volé : le même symptôme y est
+    /// donc possible, sur un appareil lent ou déjà sollicité. Le cas normal
+    /// ne coûte rien de plus, la boucle sort dès `uciok`.
+    init(startTimeoutMs: Int = 15000) {
         self.startTimeoutMs = startTimeoutMs
         engine = StockfishEngine()
         var cont: AsyncStream<EngineResponse>.Continuation!
@@ -269,6 +278,17 @@ actor EngineController {
     /// reste des dizaines de ms ; ce budget ne coûte donc rien au cas normal,
     /// seulement au cas déjà dégradé — cohérent avec l'hypothèse (jamais
     /// confirmée autrement) derrière le signalement initial de l'utilisateur.
+    /// **Essayé à 30 s le 29/08, revenu à 8 s le jour même.** L'idée était la
+    /// même que pour les deux autres budgets de cette famille (`uciok` et le
+    /// retour des lignes brutes) : ils bornent des attentes qui dépendent de
+    /// l'ordonnanceur, pas du moteur. Mais celui-ci se comporte autrement —
+    /// il n'attend pas une RÉPONSE, il attend qu'une ressource se libère, et
+    /// une instance précédente qui s'arrête normalement la rend en quelques
+    /// dizaines de millisecondes. Mesuré : à 30 s, la suite complète est
+    /// passée de 6 minutes à plus de 39 sans jamais finir — trente tests
+    /// moteur sérialisés derrière un verrou, chacun capable d'attendre une
+    /// demi-minute, s'affament les uns les autres. Les deux autres budgets,
+    /// eux, ont bien réglé le défaut (898 tests verts).
     private func acquireEngineProcess(timeoutMs: Int = 8000) async -> Bool {
         var attemptsLeft = max(timeoutMs / 50, 1)
         while true {

@@ -23,7 +23,12 @@ struct DuckChessAnalysisView: View {
                     }
                 // La courbe d'évaluation, comme en mode « Contre
                 // l'ordinateur » : elle dit d'un coup d'œil OÙ la partie a
-                // basculé, et un appui y saute directement.
+                // basculé, et un appui y saute directement. Dans une carte,
+                // comme la liste des coups juste dessous — posée à nu sur le
+                // fond, elle avait l'air d'un reste de mise en page. Le
+                // rembourrage horizontal dégage aussi le repère de position
+                // quand on est au tout premier ou au tout dernier coup, sinon
+                // collé au bord et coupé en deux.
                 if !viewModel.evalCurvePoints.isEmpty {
                     EvalCurveView(
                         points: viewModel.evalCurvePoints,
@@ -31,6 +36,9 @@ struct DuckChessAnalysisView: View {
                     ) { ply in
                         viewModel.review(toPly: ply)
                     }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 movesList
             }
@@ -86,7 +94,7 @@ struct DuckChessAnalysisView: View {
     /// plus l'espacement de la pile. Réservé, jamais deviné : sans cette
     /// ligne, la courbe poussait la liste des coups hors de l'écran sur les
     /// appareils courts.
-    private static let evalCurveHeight: CGFloat = 64 + 10
+    private static let evalCurveHeight: CGFloat = 64 + 12 + 10
 
     private func boardBlock(size: CGSize) -> some View {
         let reserved = navigationBarHeight

@@ -131,7 +131,7 @@ struct EngineLegalityVariant: Identifiable {
         // carré vide. Vérifié à l'écran.
         shortNameKey: "Murs mobiles",
         shortTaglineKey: "Ils bougent chaque coup",
-        rulesKey: "Les règles des échecs, avec deux murs qui ne tiennent pas en place : après CHAQUE coup, ils sautent sur deux cases vides tirées au hasard entre la 2e et la 7e rangée. Aucune pièce ne peut s'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n'est acquis, et calculer loin ne sert pas à grand-chose.",
+        rulesKey: "Les règles des échecs, avec TROIS murs qui ne tiennent pas en place. Après chaque coup, deux d'entre eux — tirés au sort, jamais les mêmes — sautent sur des cases vides entre la 2e et la 7e rangée ; le troisième reste où il est. Aucune pièce ne peut s'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n'est acquis, et calculer loin ne sert pas à grand-chose.",
         icon: "die.face.4.fill",
         tint: Theme.violet,
         startFEN: BarricadesConfiguration.randomStartFEN
@@ -179,26 +179,24 @@ struct EngineLegalityVariant: Identifiable {
     /// position au lieu de rejouer depuis le départ.
     var rewritesPositionEachMove: Bool { id == Self.randomBarricades.id }
 
-    /// La position de DÉPART réelle d'une partie, et la case du mur FIXE.
+    /// La position de DÉPART réelle d'une partie.
     ///
-    /// Les Barricades aléatoires posent ici leurs trois premiers murs et
-    /// tirent au sort celui qui ne bougera pas : le modèle de variante ne
-    /// peut porter ni l'un ni l'autre, ils changent à chaque partie. La case
-    /// du mur fixe ne se relit pas dans la FEN — rien n'y distingue un mur
-    /// d'un autre — c'est donc la vue-modèle qui la garde, le temps de la
+    /// Les Barricades aléatoires y posent leurs trois premiers murs : le
+    /// modèle de variante ne peut pas les porter, ils changent à chaque
     /// partie.
-    func initialPosition() -> (fen: String, fixedWall: Square?) {
-        guard rewritesPositionEachMove else { return (startFEN, nil) }
+    func initialPosition() -> String {
+        guard rewritesPositionEachMove else { return startFEN }
         var generator = SystemRandomNumberGenerator()
         return BarricadesConfiguration.openingPosition(using: &generator)
     }
 
-    /// La position après un demi-coup, murs mobiles redéployés — le mur fixe,
-    /// lui, n'est jamais retiré.
-    func rewrittenPosition(after fen: String, fixedWall: Square?) -> String? {
+    /// La position après un demi-coup : deux des trois murs, tirés au sort,
+    /// ont changé de case. Le troisième reste — mais pas le même d'un coup à
+    /// l'autre, et rien à retenir d'un appel au suivant.
+    func rewrittenPosition(after fen: String) -> String? {
         guard rewritesPositionEachMove else { return nil }
         var generator = SystemRandomNumberGenerator()
-        return BarricadesConfiguration.relocatingWalls(in: fen, fixed: fixedWall, using: &generator)
+        return BarricadesConfiguration.relocatingWalls(in: fen, using: &generator)
     }
 
     /// Retire les coups qui PRENNENT un mur.

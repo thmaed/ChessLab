@@ -23,41 +23,42 @@ struct RandomBarricadesTests {
     func wallsLandOnEmptySquaresInTheMiddle() throws {
         var generator = SystemRandomNumberGenerator()
         for _ in 0..<50 {
-            let opening = BarricadesConfiguration.openingPosition(using: &generator)
-            let walls = BarricadesFEN.wallSquares(in: opening.fen)
-            #expect(walls.count == 3, "il en faut exactement trois : \(opening.fen)")
+            let fen = BarricadesConfiguration.openingPosition(using: &generator)
+            let walls = BarricadesFEN.wallSquares(in: fen)
+            #expect(walls.count == 3, "il en faut exactement trois : \(fen)")
             #expect(Set(walls).count == 3, "et sur trois cases DIFFÉRENTES")
             for wall in walls {
                 #expect((2...7).contains(wall.rank.value), "\(wall.notation) hors des rangées 2 à 7")
             }
-            let fixed = try #require(opening.fixedWall, "l'un des trois doit être le mur fixe")
-            #expect(walls.contains(fixed), "le mur fixe doit être posé, lui aussi")
             // Aucune pièce écrasée : le plateau garde ses 32 pièces.
-            let board = try #require(Position(fen: BarricadesFEN.forChessKit(opening.fen)))
-            #expect(board.pieces.count == 32, "un mur s'est posé sur une pièce : \(opening.fen)")
+            let board = try #require(Position(fen: BarricadesFEN.forChessKit(fen)))
+            #expect(board.pieces.count == 32, "un mur s'est posé sur une pièce : \(fen)")
         }
     }
 
-    /// Le cœur de la variante telle qu'elle a été demandée : trois murs, dont
-    /// UN qui ne bouge pas de la partie.
-    @Test("Le mur fixe reste, les deux autres sautent")
-    func theFixedWallNeverMoves() throws {
+    /// Le cœur de la variante : à CHAQUE coup, deux des trois murs bougent et
+    /// le troisième reste — mais ce n'est pas toujours le même qui reste.
+    @Test("Deux murs sur trois bougent, et celui qui reste change")
+    func twoOfThreeMoveAndTheStayerVaries() throws {
         var generator = SystemRandomNumberGenerator()
-        let opening = BarricadesConfiguration.openingPosition(using: &generator)
-        let fixed = try #require(opening.fixedWall)
-        var fen = opening.fen
-        var movingSeen: Set<Set<Square>> = []
+        var fen = BarricadesConfiguration.openingPosition(using: &generator)
+        var stayers: Set<Square> = []
 
-        for _ in 0..<25 {
-            fen = try #require(BarricadesConfiguration.relocatingWalls(
-                in: fen, fixed: fixed, using: &generator
-            ))
-            let walls = Set(BarricadesFEN.wallSquares(in: fen))
-            #expect(walls.count == 3, "ils s'accumulent ou s'évaporent : \(fen)")
-            #expect(walls.contains(fixed), "le mur fixe a bougé : \(fen)")
-            movingSeen.insert(walls.subtracting([fixed]))
+        for _ in 0..<40 {
+            let before = Set(BarricadesFEN.wallSquares(in: fen))
+            try #require(before.count == 3)
+            fen = try #require(BarricadesConfiguration.relocatingWalls(in: fen, using: &generator))
+            let after = Set(BarricadesFEN.wallSquares(in: fen))
+
+            #expect(after.count == 3, "ils s'accumulent ou s'évaporent : \(fen)")
+            let kept = before.intersection(after)
+            #expect(kept.count == 1, "il doit rester EXACTEMENT un mur en place : \(kept)")
+            #expect(after.subtracting(before).count == 2, "les deux autres doivent avoir changé de case")
+            stayers.formUnion(kept)
         }
-        #expect(movingSeen.count > 1, "les deux autres n'ont jamais bougé")
+        // Sur quarante coups, le mur épargné ne peut pas être toujours le
+        // même : ce serait un mur fixe, et ce n'est pas la règle.
+        #expect(stayers.count > 1, "c'est toujours le même mur qui reste — il est donc fixe")
     }
 
     @Test("Le tirage ne touche ni la première ni la dernière rangée")
@@ -67,9 +68,7 @@ struct RandomBarricadesTests {
         // pourrait déborder si la borne était mal posée.
         let sparse = "4k3/8/8/8/8/8/8/4K3 w - - 0 1"
         for _ in 0..<100 {
-            let fen = try #require(BarricadesConfiguration.relocatingWalls(
-                in: sparse, fixed: Square("d5"), using: &generator
-            ))
+            let fen = try #require(BarricadesConfiguration.relocatingWalls(in: sparse, using: &generator))
             for wall in BarricadesFEN.wallSquares(in: fen) {
                 #expect(wall.rank.value != 1 && wall.rank.value != 8, "\(wall.notation) sur une rangée de départ")
             }
@@ -79,7 +78,7 @@ struct RandomBarricadesTests {
     @Test("Chaque partie commence sur un tirage différent")
     func everyGameOpensDifferently() {
         let openings = Set(
-            (0..<30).map { _ in EngineLegalityVariant.randomBarricades.initialPosition().fen }
+            (0..<30).map { _ in EngineLegalityVariant.randomBarricades.initialPosition() }
         )
         #expect(openings.count > 1, "toutes les parties commencent au même endroit")
         for fen in openings {

@@ -39,7 +39,16 @@ actor FairyEngineController {
 
     private let startTimeoutMs: Int
 
-    init(startTimeoutMs: Int = 5000) {
+    /// **Porté de 5 s à 15 s le 29/08**, pour la même raison que
+    /// ``captureRawLines(sending:until:timeoutMs:)`` : ce budget ne mesure pas
+    /// le démarrage du moteur — `uciok` arrive en millisecondes — mais le
+    /// temps que sa réponse met à REMONTER par le MainActor. Sous charge, 5 s
+    /// ne suffisaient pas, `didFailToStart` passait à vrai, et l'écran
+    /// annonçait « moteur indisponible » alors que le moteur allait bien.
+    /// Observé en suite complète ; sur un appareil lent ou déjà sollicité, un
+    /// vrai joueur peut le voir aussi. Le cas normal ne coûte rien de plus :
+    /// la boucle sort dès `uciok`.
+    init(startTimeoutMs: Int = 15000) {
         self.startTimeoutMs = startTimeoutMs
         engine = FairyStockfishEngine()
         var cont: AsyncStream<EngineResponse>.Continuation!
@@ -385,6 +394,17 @@ actor FairyEngineController {
     /// suite de tests COMPLÈTE, un moteur précédent lent à libérer
     /// `isProcessBusy` sous charge système faisait échouer ce garde pour un
     /// simple ralentissement, pas un vrai blocage.
+    /// **Essayé à 30 s le 29/08, revenu à 8 s le jour même.** L'idée était la
+    /// même que pour les deux autres budgets de cette famille (`uciok` et le
+    /// retour des lignes brutes) : ils bornent des attentes qui dépendent de
+    /// l'ordonnanceur, pas du moteur. Mais celui-ci se comporte autrement —
+    /// il n'attend pas une RÉPONSE, il attend qu'une ressource se libère, et
+    /// une instance précédente qui s'arrête normalement la rend en quelques
+    /// dizaines de millisecondes. Mesuré : à 30 s, la suite complète est
+    /// passée de 6 minutes à plus de 39 sans jamais finir — trente tests
+    /// moteur sérialisés derrière un verrou, chacun capable d'attendre une
+    /// demi-minute, s'affament les uns les autres. Les deux autres budgets,
+    /// eux, ont bien réglé le défaut (898 tests verts).
     private func acquireEngineProcess(timeoutMs: Int = 8000) async -> Bool {
         var attemptsLeft = max(timeoutMs / 50, 1)
         while true {

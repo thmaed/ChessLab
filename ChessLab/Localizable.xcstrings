@@ -10136,18 +10136,18 @@
         }
       }
     },
-    "Les règles des échecs, avec deux murs qui ne tiennent pas en place : après CHAQUE coup, ils sautent sur deux cases vides tirées au hasard entre la 2e et la 7e rangée. Aucune pièce ne peut s'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n'est acquis, et calculer loin ne sert pas à grand-chose.": {
+    "Les règles des échecs, avec TROIS murs qui ne tiennent pas en place. Après chaque coup, deux d'entre eux — tirés au sort, jamais les mêmes — sautent sur des cases vides entre la 2e et la 7e rangée ; le troisième reste où il est. Aucune pièce ne peut s'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n'est acquis, et calculer loin ne sert pas à grand-chose.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "The rules of chess, with two walls that will not stay put: after EVERY move they jump to two empty squares drawn at random between the 2nd and 7th ranks. No piece may land on them or move through them, and they cannot be captured. A bishop that held a diagonal loses it next move, a rook pins and then does not: nothing is settled, and calculating far ahead is worth very little."
+            "value": "The rules of chess, with THREE walls that will not stay put. After every move two of them — drawn at random, never the same pair — jump to empty squares between the 2nd and 7th ranks; the third stays where it is. No piece may land on them or move through them, and they cannot be captured. A bishop that held a diagonal loses it next move, a rook pins and then does not: nothing is settled, and calculating far ahead is worth very little."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les règles des échecs, avec deux murs qui ne tiennent pas en place : après CHAQUE coup, ils sautent sur deux cases vides tirées au hasard entre la 2e et la 7e rangée. Aucune pièce ne peut s'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n'est acquis, et calculer loin ne sert pas à grand-chose."
+            "value": "Les règles des échecs, avec TROIS murs qui ne tiennent pas en place. Après chaque coup, deux d'entre eux — tirés au sort, jamais les mêmes — sautent sur des cases vides entre la 2e et la 7e rangée ; le troisième reste où il est. Aucune pièce ne peut s'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n'est acquis, et calculer loin ne sert pas à grand-chose."
           }
         }
       }

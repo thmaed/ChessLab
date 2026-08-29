@@ -72,10 +72,6 @@ final class EngineLegalityPlayViewModel {
     private var chainFEN: String
     private var chainMoves: [String] = []
 
-    /// Le mur qui ne bouge pas — Barricades aléatoires uniquement, `nil`
-    /// partout ailleurs. Tiré au sort à la création et gardé tel quel : la
-    /// FEN ne distingue pas un mur fixe d'un mur mobile.
-    private let fixedWall: Square?
 
     /// Combien de fois retirer les murs au sort avant d'accepter une position
     /// sans coup légal. Sans ce garde-fou, deux murs mal tombés pourraient
@@ -150,15 +146,13 @@ final class EngineLegalityPlayViewModel {
         userColor = color
         engineColor = color.opposite
         // `initialPosition()` et non `startFEN` : les Barricades aléatoires
-        // posent ici leurs trois premiers murs et tirent celui qui ne bougera
-        // plus de la partie.
+        // posent ici leurs trois premiers murs, au hasard de la partie.
         let opening = variant.initialPosition()
-        startFEN = opening.fen
-        fixedWall = opening.fixedWall
-        chainFEN = opening.fen
-        board = Board(position: Position(fen: VariantFEN.forChessKit(opening.fen))!)
-        fenLog = [opening.fen]
-        currentFEN = opening.fen
+        startFEN = opening
+        chainFEN = opening
+        board = Board(position: Position(fen: VariantFEN.forChessKit(opening))!)
+        fenLog = [opening]
+        currentFEN = opening
         clock = settings.timeControl.hasClock ? GameClock(control: settings.timeControl) : nil
 
         clock?.onFlagFall = { [weak self] color in
@@ -412,28 +406,22 @@ final class EngineLegalityPlayViewModel {
         // la revue du 25/08/2026.
         clearResumeUndo()
 
-        // Les murs mobiles se redéploient ICI, entre le coup et tout ce qui
-        // en découle : c'est la position MURÉE qui décide de l'échec, du mat
-        // et des coups suivants. On retire au sort tant qu'un tirage laisse
-        // le camp au trait sans aucun coup — sinon deux murs mal tombés
-        // materaient quelqu'un que personne n'a attaqué.
-        if variant.rewritesPositionEachMove {
-            var attempts = 0
-            var rewritten = query
-            while attempts < Self.wallRedrawAttempts {
-                guard let fen = variant.rewrittenPosition(after: query.fen, fixedWall: fixedWall),
-                      let next = await engine.queryPosition(startFEN: fen, uciLog: [])
-                else { break }
-                rewritten = next
-                if !variant.removingWallCaptures(from: next.legalMoves, in: next.fen).isEmpty { break }
-                attempts += 1
-            }
-            query = rewritten
-            chainFEN = query.fen
-            chainMoves = []
-        } else {
+        if !variant.rewritesPositionEachMove {
             chainMoves.append(uci)
         }
+        // La fin de partie se juge sur la position TELLE QUE LE COUP L'A
+        // LAISSÉE, murs compris, AVANT tout redéploiement.
+        //
+        // C'était l'inverse, et c'était faux : les murs se redéployaient
+        // d'abord, et le garde-fou « retirer au sort tant que le camp au
+        // trait n'a aucun coup » annulait alors les VRAIS mats — il suffisait
+        // qu'un mur retombe sur la ligne d'échec pour rouvrir la position, et
+        // la boucle s'arrêtait là, satisfaite. Un mat infligé disparaissait
+        // sous le tirage suivant. Signalé par l'utilisateur le 29/08.
+        //
+        // Dans le bon ordre, la question ne se pose plus : vous matez, la
+        // partie s'arrête, et ce que les murs auraient fait ensuite n'a aucun
+        // objet.
         let legalAfterMove = variant.removingWallCaptures(from: query.legalMoves, in: query.fen)
 
         let isMate = legalAfterMove.isEmpty && query.inCheck
@@ -498,6 +486,15 @@ final class EngineLegalityPlayViewModel {
             clock?.pause()
             Haptics.gameEnded()
             return true
+        }
+
+        // La partie continue : les murs mobiles sautent MAINTENANT, pour le
+        // tour suivant. On retire au sort tant qu'un tirage laisse le camp au
+        // trait sans aucun coup — ici c'est sans danger pour les vrais mats,
+        // ils ont déjà été conclus au-dessus ; il ne reste que le cas où deux
+        // murs mal tombés materaient quelqu'un que personne n'a attaqué.
+        if variant.rewritesPositionEachMove {
+            await redeployWalls(after: query)
         }
 
         clock?.startTurn(for: board.position.sideToMove, previousMover: previousMover)
@@ -1022,6 +1019,34 @@ final class EngineLegalityPlayViewModel {
         hintMoves = []
         isPositionReady = false
         enqueueEngineWork { [weak self] in await self?.refreshLegalMovesAndContinue() }
+    }
+
+    /// Redéploie les murs pour le tour suivant, et recale sur la position
+    /// obtenue tout ce que l'écran montre — plateau, journal, coups légaux.
+    ///
+    /// La ligne du journal écrite juste avant est RÉÉCRITE : c'est la
+    /// position murée de neuf que l'adversaire va voir, et c'est elle que la
+    /// relecture doit rejouer.
+    private func redeployWalls(after query: FairyEngineController.PositionQuery) async {
+        var settled = query
+        var attempts = 0
+        while attempts < Self.wallRedrawAttempts {
+            guard let fen = variant.rewrittenPosition(after: query.fen),
+                  let next = await engine.queryPosition(startFEN: fen, uciLog: [])
+            else { break }
+            settled = next
+            if !variant.removingWallCaptures(from: next.legalMoves, in: next.fen).isEmpty { break }
+            attempts += 1
+        }
+        chainFEN = settled.fen
+        chainMoves = []
+        currentFEN = settled.fen
+        if !fenLog.isEmpty { fenLog[fenLog.count - 1] = settled.fen }
+        board = Board(position: Position(fen: VariantFEN.forChessKit(settled.fen))!)
+        legalMovesForCurrentPosition = variant.removingWallCaptures(
+            from: settled.legalMoves, in: settled.fen
+        )
+        pocket = settled.pocket
     }
 
     /// Rafraîchit les coups légaux de la position COURANTE après une

@@ -268,6 +268,16 @@ struct BarricadesTests {
             }
             #expect(!analysis.moveQuality.isEmpty, "la ligne n'a reçu aucune pastille")
 
+            // La courbe se remplit depuis le cache de classification : elle
+            // doit porter des points, et aucun ne doit sortir des bornes —
+            // un mat à ±10 000 centipions aplatirait tout le reste.
+            let curve = analysis.evalCurvePoints
+            #expect(!curve.isEmpty, "la courbe d'évaluation est restée vide")
+            for point in curve {
+                #expect(point.pawns >= -10 && point.pawns <= 10, "point hors bornes : \(point.pawns)")
+                #expect(point.ply == point.id, "le saut au coup se fait par l'identifiant")
+            }
+
             analysis.review(toPly: 1)
             #expect(Set(analysis.displayedBlockedSquares) == [Square("d4"), Square("e5")])
             // Et le plateau d'affichage reste un plateau d'échecs ordinaire :
