@@ -18,6 +18,8 @@ final class AppStoreScreenshotUITests: XCTestCase {
 
     @MainActor
     func testCaptureAppStoreScreenshotsFrench() throws {
+        try CaptureToolGate.requireEnabled()
+
         try captureOpenings(appleLanguageCode: "fr", folder: "fr")
         try captureFinalesAndVariants(appleLanguageCode: "fr", folder: "fr")
         try capturePlay(appleLanguageCode: "fr", folder: "fr")
@@ -25,6 +27,8 @@ final class AppStoreScreenshotUITests: XCTestCase {
 
     @MainActor
     func testCaptureAppStoreScreenshotsEnglish() throws {
+        try CaptureToolGate.requireEnabled()
+
         try captureOpenings(appleLanguageCode: "en", folder: "en")
         try captureFinalesAndVariants(appleLanguageCode: "en", folder: "en")
         try capturePlay(appleLanguageCode: "en", folder: "en")

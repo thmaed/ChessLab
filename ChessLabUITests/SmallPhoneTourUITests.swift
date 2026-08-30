@@ -17,6 +17,8 @@ final class SmallPhoneTourUITests: XCTestCase {
 
     @MainActor
     func testCaptureSmallPhoneTour() throws {
+        try CaptureToolGate.requireEnabled()
+
         let app = XCUIApplication()
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()

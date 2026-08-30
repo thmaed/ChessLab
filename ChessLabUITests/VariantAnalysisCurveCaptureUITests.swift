@@ -10,6 +10,8 @@ final class VariantAnalysisCurveCaptureUITests: XCTestCase {
 
     @MainActor
     func testCaptureVariantAnalysisCurve() throws {
+        try CaptureToolGate.requireEnabled()
+
         let app = XCUIApplication()
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()

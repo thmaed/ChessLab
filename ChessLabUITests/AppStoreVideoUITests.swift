@@ -15,6 +15,8 @@ final class AppStoreVideoUITests: XCTestCase {
 
     @MainActor
     func testVideoClassicAndPuzzleEnglish() throws {
+        try CaptureToolGate.requireEnabled()
+
         let app = XCUIApplication()
         app.launchArguments += [
             "-resetPlaySettings",
@@ -62,6 +64,8 @@ final class AppStoreVideoUITests: XCTestCase {
 
     @MainActor
     func testVideoVariantsHordeAndChess960English() throws {
+        try CaptureToolGate.requireEnabled()
+
         let app = XCUIApplication()
         app.launchArguments += [
             "-resetPlaySettings",
