@@ -106,6 +106,10 @@ King and bishop against a bare king leads nowhere: the game now ends in a draw i
 
 The post-game analysis in "Play the computer" showed where a game turned; the variants' did not. They all have it now — Chess960, the eight variants, Duck Chess: the curve sits above the move list, fills in as the classification runs, pins the critical moments, and a tap jumps to the matching move.
 
+**"Engine unavailable" after returning from an analysis: the real ending**
+
+The remaining case of the banner: finish a variant game, analyse it, go back — and the engine declared itself unavailable. Two defects stacked. First a contradiction between guards: returning to a finished game, the screen refused to restart the engine yet queried it anyway. Then, deeper: the stream that carries the engine's replies died permanently on the first missed deadline — every screen then lived with silent evaluations and hints, with no message at all. Every read now gets its own stream, and the full scenario — mate, analysis, return, review with the eval bar — is replayed by tests.
+
 **The Variants engine no longer drops out**
 
 The message "the engine could not be started" kept coming back in Variants mode — typically after a game ended and its analysis was opened, or after going back to start again. It never happened in the regular "Play" mode.
