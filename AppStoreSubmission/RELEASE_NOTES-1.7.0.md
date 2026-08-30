@@ -32,6 +32,10 @@ Roi et fou contre roi seul ne mène nulle part : la partie s'arrête sur une nul
 
 L'analyse de fin de partie du mode « Contre l'ordinateur » montrait où la partie avait basculé ; celles des variantes, non. Elles l'ont maintenant toutes — Chess960, les huit variantes, Duck Chess : la courbe s'affiche au-dessus de la liste des coups, se remplit au fil du classement, épingle les moments critiques, et un appui saute au coup correspondant.
 
+**« Moteur indisponible » au retour d'une analyse : la vraie fin**
+
+Le cas restant du bandeau : finir une partie de variante, l'analyser, revenir en arrière — et le moteur se déclarait indisponible. Deux défauts superposés. D'abord une contradiction de gardes : au retour sur une partie finie, l'écran refusait de redémarrer le moteur tout en l'interrogeant quand même. Ensuite, plus profond : le flux par lequel remontent les réponses du moteur mourait définitivement au premier délai dépassé — chaque écran vivait ensuite avec des évaluations et des indices muets, sans le moindre message. Chaque lecture a désormais son propre flux, et le scénario complet — mat, analyse, retour, consultation avec barre d'évaluation — est rejoué par des tests.
+
 **Le moteur des Variantes ne décroche plus**
 
 Le message « le moteur n'a pas pu être démarré » revenait régulièrement dans le mode Variantes — typiquement après la fin d'une partie suivie de son analyse, ou après être revenu en arrière pour relancer. Il ne se produisait jamais dans le mode « Jouer » classique.
