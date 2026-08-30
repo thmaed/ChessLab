@@ -71,8 +71,31 @@ final class AppStoreScreenshotUITests: XCTestCase {
         if tapLabeled(app, fr ? "Ouvertures" : "Openings", id: "mode_openings") {
             RunLoop.current.run(until: Date().addingTimeInterval(0.6))
             save(app.screenshot(), folder: folder, name: "02-ouvertures")
-            // La List SwiftUI est paresseuse : on défile jusqu'à l'italienne.
+            // FILTRER plutôt que défiler, exactement comme la liste des
+            // finales juste en dessous.
+            //
+            // Le défilement échouait d'une façon particulièrement traîtresse :
+            // la rangée « Italian Game » devenait `isHittable` alors qu'elle
+            // était encore CACHÉE derrière le champ de recherche flottant du
+            // bas — le tap partait dans le champ, la navigation n'avait pas
+            // lieu, et la capture `03-index-lignes` manquait à l'appel sans
+            // que rien n'échoue. Constaté le 30/08 en régénérant les visuels.
+            // La recherche remonte la rangée en haut de liste, loin de tout
+            // ce qui la recouvre.
             let italian = app.buttons["opening_italian-game"]
+            let search = app.searchFields.firstMatch
+            if search.waitForExistence(timeout: 5) {
+                search.tap()
+                search.typeText("Italian")
+                // Ranger le clavier : il masque la liste filtrée, et sur les
+                // petits écrans il ne reste rien d'autre (même leçon que
+                // `OpeningsModuleUITests` en taille d'accessibilité).
+                for key in ["Search", "Rechercher", "search"] where app.keyboards.buttons[key].exists {
+                    app.keyboards.buttons[key].tap()
+                    break
+                }
+                RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+            }
             var scrolls = 0
             while !italian.isHittable, scrolls < 20 {
                 app.swipeUp(velocity: .slow)
@@ -356,9 +379,25 @@ final class AppStoreScreenshotUITests: XCTestCase {
     /// le bouton système sur iPad, où la barre latérale rend le geste de
     /// bord ambigu (peut révéler/masquer la barre au lieu de reculer) et où
     /// ce défaut n'a jamais été observé.
+    /// Revenir en arrière, selon l'ossature.
+    ///
+    /// La branche iPad s'appelait ELLE-MÊME, sans condition d'arrêt : une
+    /// récursion infinie qui faisait déborder la pile et emportait le harnais
+    /// de test (`EXC_BAD_ACCESS`, « Could not determine thread index for
+    /// stack guard region »). Elle n'avait manifestement jamais été exécutée
+    /// depuis son écriture — les captures iPad de la 1.6 datent d'avant, ou
+    /// se sont arrêtées sans qu'on regarde. Trouvé le 30/08 en régénérant les
+    /// visuels : huit fichiers sur onze, puis le runner par terre.
+    ///
+    /// Sur iPad, c'est le bouton de la barre de navigation qui ramène —
+    /// exactement comme dans ``SmallPhoneTourUITests``. Le geste de bord,
+    /// lui, reste réservé à l'iPhone : il y contourne un défaut de simulateur
+    /// où le point de frappe du bouton devenait invalide après un
+    /// défilement.
     private func goBack(_ app: XCUIApplication) {
         if UIDevice.current.userInterfaceIdiom == .pad {
-            goBack(app)
+            let back = app.navigationBars.buttons.element(boundBy: 0)
+            if back.exists, back.isHittable { back.tap() }
         } else {
             let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.0, dy: 0.5))
             let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5))

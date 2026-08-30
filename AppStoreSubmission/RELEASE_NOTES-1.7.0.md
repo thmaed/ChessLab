@@ -148,7 +148,21 @@ A very light grain has been added to the background: it removes the banding that
 
 ## Notes internes (ne pas coller dans App Store Connect)
 
-- **Version et build** — `MARKETING_VERSION` passe à `1.7.0`. Le numéro de build reste à fixer DÉLIBÉRÉMENT juste avant `Product ▸ Archive` : il doit être strictement supérieur à celui effectivement soumis pour la 1.6, que ce dépôt ne connaît pas (il porte `8.4`, mais rien ne garantit que ce soit la valeur partie). Vérifier dans App Store Connect avant d'archiver.
+- **Version et build — FIXÉS le 30/08.** `MARKETING_VERSION = 1.7.0`,
+  `CURRENT_PROJECT_VERSION = 10` aux deux configurations de la cible
+  applicative. Un ENTIER, délibérément : la valeur dérivait de décimale en
+  décimale (`8.1` → `8.2` → `8.4` → `9.0`) et repartait à chaque fois d'un
+  chiffre trouvé par hasard. `10` est strictement supérieur à tout ce que ce
+  dépôt a porté, donc à tout ce qui a pu être soumis pour la 1.6.
+
+  **La dérive vient de l'IDE, pas de la ligne de commande.** Vérifié le
+  30/08 : une dizaine de `xcodebuild build`/`test` d'affilée laissent la
+  valeur intacte ; le passage de `8.4` à `9.0`, lui, s'est glissé dans un
+  commit pendant que le projet était ouvert dans Xcode. À surveiller au
+  `git diff` avant chaque archive — c'est là qu'elle bouge.
+
+  Reste à confirmer dans App Store Connect que le dernier build de la 1.6
+  était bien inférieur à 10 (le dépôt ne le sait pas).
 
 - **Origine du lot : une revue Mac Catalyst.** L'essentiel de cette version vient d'une revue de l'app compilée pour Mac et pilotée en fenêtre réelle sur onze gabarits, du minimum autorisé au plein écran 27 pouces. Le Mac n'est PAS proposé sur la fiche App Store (décision inchangée, voir `CHECKLIST.md`) — mais la fenêtre Mac redimensionnable est le meilleur banc d'essai qui soit pour les mises en page en classe *regular*, celles-là mêmes que servent l'iPad plein écran, le Split View et le Stage Manager. Tout ce qui a été corrigé là bénéficie donc à l'iPad, qui est bien sur la fiche.
 

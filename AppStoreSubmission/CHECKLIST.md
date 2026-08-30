@@ -9,7 +9,8 @@ Coché = fait ou déjà en place. Non coché = reste une action utilisateur (com
 ## ⚠️ Avant de soumettre la 1.7
 
 - [ ] **Numéro de build à choisir délibérément** — il doit être strictement supérieur à celui effectivement soumis pour la 1.6, que ce dépôt ne connaît pas (il porte `8.4`, mais rien ne garantit que ce soit la valeur partie). Vérifier dans App Store Connect, puis le fixer juste avant `Product ▸ Archive`.
-- [ ] **Captures d'écran et vidéos à rafraîchir si besoin** — celles en place datent de la 1.6 et restent exactes sur le fond ; la 1.7 ne change aucun écran au point de les périmer, mais l'accueil iPad, le hub des Variantes et les écrans de variantes ont changé d'allure. À refaire si tu veux que la fiche colle au binaire. Les tests de capture sont prêts (`AppStoreScreenshotUITests`, `AppStoreVideoUITests`).
+- [x] **Captures d'écran refaites le 30/08** — onze par idiome (une de plus qu'en 1.6 : le Duck Chess, canard posé, qui est l'image la plus parlante de cette version), en anglais, sur iPhone 14 Plus (1284×2778) et iPad Pro 13" M5 (2064×2752). Tailles vérifiées une à une. Dans `screenshots/<iphone-6.7|ipad-13>/en/`. Deux défauts de l'outillage corrigés au passage : la rangée « Italian Game » devenait `isHittable` alors qu'elle était encore cachée derrière le champ de recherche flottant (le tap partait dans le champ, et la capture de l'index manquait sans que rien n'échoue — on filtre maintenant au lieu de défiler), et `goBack` s'appelait LUI-MÊME sur iPad, récursion infinie qui faisait déborder la pile et emportait le harnais de test.
+- [ ] **Vidéos à rafraîchir si besoin** — celles en place datent de la 1.6 et montrent Horde et Chess960, toujours exacts. Elles ne montrent aucune des quatre nouvelles variantes. `AppStoreVideoUITests` est prêt (poser le témoin `/tmp/cl-captures` pour le lancer).
 - [ ] **Captures FR** — toujours absentes (anglais seulement). Décision prise de s'en passer.
 
 ## Fait dans ce lot
