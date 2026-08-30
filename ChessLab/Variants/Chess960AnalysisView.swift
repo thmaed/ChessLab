@@ -37,6 +37,7 @@ struct Chess960AnalysisView: View {
                     .padding(.vertical, 6)
                     .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
+                accuracyCard
                 movesList
             }
             .padding(.horizontal, 12)
@@ -79,6 +80,9 @@ struct Chess960AnalysisView: View {
     /// appareils courts.
     private static let evalCurveHeight: CGFloat = 64 + 12 + 10
 
+    /// Ce que la carte de précision prend à la hauteur, espacement compris.
+    private static let accuracyCardHeight: CGFloat = 44 + 10
+
     /// Le côté du plateau vient d'un budget de hauteur MESURÉ, et non d'une
     /// fraction devinée de la fenêtre.
     ///
@@ -93,6 +97,7 @@ struct Chess960AnalysisView: View {
     private func boardBlock(size: CGSize) -> some View {
         let reserved = navigationBarHeight
             + Self.evalCurveHeight
+            + Self.accuracyCardHeight
             + Self.minimumMovesListHeight
             + EvalBarView.defaultHeight
             + 28   // les deux espacements de la pile (10 + 10) + celui du bloc (8)
@@ -261,6 +266,41 @@ struct Chess960AnalysisView: View {
         Color.clear
             .accessibilityIdentifier("chess960_analysis_totalPlies")
             .accessibilityValue("\(viewModel.totalPlies)")
+    }
+
+
+    /// Précision par joueur — le même bilan d'un coup d'œil qu'en mode
+    /// « Contre l'ordinateur ». Elle se complète au fil de la classification,
+    /// et n'apparaît donc qu'une fois le premier coup jugé.
+    @ViewBuilder
+    private var accuracyCard: some View {
+        if !viewModel.accuracyByColor.isEmpty {
+            HStack(spacing: 14) {
+                ForEach([Piece.Color.white, .black], id: \.self) { color in
+                    if let accuracy = viewModel.accuracyByColor[color] {
+                        HStack(spacing: 9) {
+                            Circle()
+                                .fill(color == .white ? Color.white : Color.black)
+                                .overlay(Circle().strokeBorder(Theme.strokeStrong, lineWidth: 1))
+                                .frame(width: 11, height: 11)
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text("\(Int(accuracy.rounded()))%")
+                                    .font(.subheadline.bold().monospacedDigit())
+                                    .foregroundStyle(Theme.textPrimary)
+                                Text("précision")
+                                    .font(.caption2)
+                                    .foregroundStyle(Theme.textSecondary)
+                            }
+                        }
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .accessibilityIdentifier("variantAnalysis_accuracy")
+        }
     }
 
     private var exportMenu: some View {

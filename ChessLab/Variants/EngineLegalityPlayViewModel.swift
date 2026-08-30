@@ -976,11 +976,40 @@ final class EngineLegalityPlayViewModel {
         fenLog.append(contentsOf: undo.fen)
         moveLog.append(contentsOf: undo.moves)
         currentFEN = fenLog.last ?? currentFEN
+        resyncEngineChain()
         board = Board(position: Position(fen: VariantFEN.forChessKit(currentFEN))!)
         outcome = nil
         clearSelection()
         isPositionReady = false
         enqueueEngineWork { [weak self] in await self?.refreshLegalMovesAndContinue() }
+    }
+
+    /// Recale la chaîne moteur sur les journaux, après une reprise, une
+    /// annulation de reprise ou une troncature.
+    ///
+    /// Deux formes, selon que la variante réécrit ou non sa position — et les
+    /// confondre est exactement ce qui faisait « rejouer plein de coups à
+    /// toute vitesse » après une reprise, signalé le 29/08 :
+    ///
+    /// - variante ORDINAIRE : on repart du DÉPART, et tous les coups restent
+    ///   à rejouer. C'est l'invariant que tient le reste de la classe
+    ///   (`chainFEN == startFEN`, `chainMoves == uciLog`).
+    /// - Barricades ALÉATOIRES : on repart de la position COURANTE, sans
+    ///   aucun coup à rejouer — le tirage des murs ne figure dans aucun coup,
+    ///   il n'y a donc rien à rejouer par-dessus.
+    ///
+    /// La troncature mélangeait les deux : la position courante ET tous les
+    /// coups qui y avaient mené. Le moteur se voyait demander de rejouer,
+    /// depuis une position qui les contenait déjà, les coups qui l'avaient
+    /// produite.
+    private func resyncEngineChain() {
+        if variant.rewritesPositionEachMove {
+            chainFEN = currentFEN
+            chainMoves = []
+        } else {
+            chainFEN = startFEN
+            chainMoves = uciLog
+        }
     }
 
     private func offerResumeUndo(_ undo: ResumeUndo) {
@@ -1006,10 +1035,7 @@ final class EngineLegalityPlayViewModel {
         fenLog = Array(fenLog.prefix(count + 1))
         moveLog = Array(moveLog.prefix(count))
         currentFEN = fenLog.last ?? startFEN
-        // La chaîne se recale sur la position RÉTABLIE : ses murs sont ceux
-        // du journal, et aucun coup ne reste à rejouer par-dessus.
-        chainFEN = currentFEN
-        chainMoves = variant.rewritesPositionEachMove ? [] : uciLog
+        resyncEngineChain()
         board = Board(position: Position(fen: VariantFEN.forChessKit(currentFEN))!)
         outcome = nil
         pendingBlunderWarning = nil

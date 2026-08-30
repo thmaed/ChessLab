@@ -555,6 +555,22 @@ final class Chess960AnalysisViewModel {
     }
 
 
+
+    /// Précision par joueur — même calcul qu'en mode « Contre l'ordinateur »
+    /// (voir ``VariantAccuracy``). Se complète au fil de la classification :
+    /// les demi-coups pas encore évalués sont simplement sautés.
+    var accuracyByColor: [Piece.Color: Double] {
+        VariantAccuracy.byColor(
+            plyCount: totalPlies,
+            winPercentWhite: { evalCache[$0]?.winPercentWhite },
+            // Pas de journal de FEN ici (cet écran REJOUE la partie plutôt
+            // que de la relire), mais pas besoin : au Chess960 les Blancs
+            // ouvrent toujours, et les camps alternent sans exception — ni
+            // pose, ni tour double, ni trait qui saute un temps.
+            moverAt: { $0.isMultiple(of: 2) ? .white : .black }
+        )
+    }
+
     // MARK: Courbe d'évaluation
 
     /// Les points de la courbe, tels qu'``EvalCurveView`` les attend.

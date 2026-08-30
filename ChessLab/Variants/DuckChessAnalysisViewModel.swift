@@ -310,6 +310,21 @@ final class DuckChessAnalysisViewModel {
     }
 
 
+
+    /// Précision par joueur — même calcul qu'en mode « Contre l'ordinateur »
+    /// (voir ``VariantAccuracy``). Se complète au fil de la classification :
+    /// les demi-coups pas encore évalués sont simplement sautés.
+    var accuracyByColor: [Piece.Color: Double] {
+        VariantAccuracy.byColor(
+            plyCount: totalPlies,
+            winPercentWhite: { evalCache[$0]?.winPercentWhite },
+            moverAt: { ply in
+                guard ply < fenLog.count else { return nil }
+                return Position(fen: VariantFEN.forChessKit(fenLog[ply]))?.sideToMove
+            }
+        )
+    }
+
     // MARK: Courbe d'évaluation
 
     /// Les points de la courbe, tels qu'``EvalCurveView`` les attend.
