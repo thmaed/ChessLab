@@ -32,8 +32,25 @@ actor FairyEngineController {
         return "fairystockfish"
     }
 
-    private let parsed: AsyncStream<EngineResponse>
-    private let parsedContinuation: AsyncStream<EngineResponse>.Continuation
+    /// Les abonnés du flux de réponses — un par LECTURE en cours.
+    ///
+    /// Il y avait ici UN AsyncStream unique, créé à l'init et partagé par
+    /// tous les consommateurs successifs. Or annuler la tâche qui itère un
+    /// AsyncStream TERMINE le stream — définitivement. C'est exactement ce
+    /// que fait ``EngineWatchdog`` à chaque échéance dépassée : le premier
+    /// timeout de la vie du contrôleur tuait donc le flux pour toujours, et
+    /// toutes les lectures suivantes (synchronize, éval, indices) se
+    /// terminaient à vide, sans erreur. Reproduit le 30/08 : partie finie,
+    /// « Analyser » interrompt une éval en vol (timeout → annulation), et au
+    /// retour le moteur — pourtant redémarré et VIVANT — semblait muet.
+    ///
+    /// Chaque accès à ``responseStream`` fabrique désormais SON stream,
+    /// alimenté par ``ingest(_:)`` tant qu'il vit ; une annulation ne tue que
+    /// lui. Corollaire assumé : un abonné ne reçoit QUE ce qui est émis
+    /// après son abonnement — fini le tampon commun où de vieux `readyok`/
+    /// `bestmove` attendaient de satisfaire le mauvais lecteur.
+    private var responseSubscribers: [UInt64: AsyncStream<EngineResponse>.Continuation] = [:]
+    private var nextResponseSubscriberID: UInt64 = 0
     private var readerTask: Task<Void, Never>?
     private var uciOk = false
 
@@ -51,20 +68,30 @@ actor FairyEngineController {
     init(startTimeoutMs: Int = 15000) {
         self.startTimeoutMs = startTimeoutMs
         engine = FairyStockfishEngine()
-        var cont: AsyncStream<EngineResponse>.Continuation!
-        parsed = AsyncStream(bufferingPolicy: .unbounded) { cont = $0 }
-        parsedContinuation = cont
         EngineInstanceCounter.shared.didCreate()
     }
 
     deinit {
         engine.stop()
         readerTask?.cancel()
+        for continuation in responseSubscribers.values { continuation.finish() }
         EngineInstanceCounter.shared.didRelease()
     }
 
     var responseStream: AsyncStream<EngineResponse> {
-        parsed
+        var continuation: AsyncStream<EngineResponse>.Continuation!
+        let stream = AsyncStream(bufferingPolicy: .unbounded) { continuation = $0 }
+        let id = nextResponseSubscriberID
+        nextResponseSubscriberID += 1
+        responseSubscribers[id] = continuation
+        continuation.onTermination = { [weak self] _ in
+            Task { await self?.dropResponseSubscriber(id) }
+        }
+        return stream
+    }
+
+    private func dropResponseSubscriber(_ id: UInt64) {
+        responseSubscribers[id] = nil
     }
 
     private(set) var didFailToStart = false
@@ -84,7 +111,7 @@ actor FairyEngineController {
     private func ingest(_ line: String) {
         if line == "uciok" { uciOk = true }
         if let response = EngineResponse(rawValue: line) {
-            parsedContinuation.yield(response)
+            for continuation in responseSubscribers.values { continuation.yield(response) }
         }
         if rawCapturing { rawLineBuffer.append(line) }
     }
@@ -371,9 +398,12 @@ actor FairyEngineController {
     @discardableResult
     func synchronize(timeoutMs: Int = 5000) async -> Bool {
         guard engine.isRunning else { return false }
+        // S'abonner AVANT d'envoyer : `readyok` revient en microsecondes, et
+        // un abonné ne reçoit que ce qui suit son abonnement.
+        let stream = responseStream
         await sendRaw(.isready)
         let outcome = await EngineWatchdog.run(deadlineMs: timeoutMs) {
-            for await response in self.responseStream {
+            for await response in stream {
                 if case .readyok = response { return true }
             }
             return false

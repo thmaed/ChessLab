@@ -901,12 +901,16 @@ final class AnalysisViewModel {
             let expectedIndex = self.currentIndex
 
             await engine.synchronize()
+            // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+            // son abonnement (voir ``EngineController/responseStream``) — lu
+            // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+            let responses = await engine.responseStream
             await engine.send(.setoption(id: "MultiPV", value: "1"))
             await engine.send(.position(.fen(threatFEN)))
             await engine.send(.go(movetime: 200))
 
             let outcome = await EngineWatchdog.run(deadlineMs: 200 + EngineWatchdog.graceMs) {
-                for await response in await engine.responseStream {
+                for await response in responses {
                     guard case let .bestmove(lan, _) = response else { continue }
                     guard !self.isTornDown, self.currentIndex == expectedIndex, lan.count >= 4 else { return }
                     self.threatMove = HintMove(
@@ -1164,6 +1168,9 @@ final class AnalysisViewModel {
                 // déjà comme terminaison), et la navigation relance une
                 // recherche neuve. `movetime` en filet de sécurité contre une
                 // position pathologique qui n'atteindrait jamais la profondeur.
+                // S'abonner AVANT le `go` : un abonné ne reçoit que ce qui
+                // suit son abonnement (voir ``EngineController/responseStream``).
+                let responses = await engine.responseStream
                 await engine.send(.go(
                     depth: ThermalMonitor.shared.liveDepth(preferred: AppSettings.liveAnalysisDepth),
                     movetime: 8000
@@ -1176,7 +1183,7 @@ final class AnalysisViewModel {
                 var lanByRank: [Int: String] = [:]
                 var scoreByRank: [Int: Double] = [:]
 
-                readLoop: for await response in await engine.responseStream {
+                readLoop: for await response in responses {
                     switch response {
                     case let .info(info):
                         // `isLiveAnalyzing` est un drapeau PARTAGÉ du view
@@ -1894,12 +1901,16 @@ final class AnalysisViewModel {
         // d'affilée : exactement ce qui fait chauffer l'appareil (Lot 2.C).
         let adjustedNodes = max(1, Int(Double(nodes) * ThermalMonitor.shared.nodeFactor))
         // Les deux limites ensemble : UCI s'arrête à la première atteinte.
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.go(nodes: adjustedNodes, movetime: capMs))
 
         let outcome = await EngineWatchdog.run(deadlineMs: capMs + EngineWatchdog.graceMs) {
             var result: [Int: (lan: String, pv: [String], cp: Int)] = [:]
             var stopSent = false
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard let rank = info.multipv, let pv = info.pv, let firstMove = pv.first else { break }

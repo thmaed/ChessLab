@@ -26,11 +26,20 @@ actor EngineController {
         return "stockfish"
     }
 
-    /// Flux des réponses UCI PARSÉES. Alimenté par un lecteur unique qui
-    /// consomme les lignes brutes du moteur ; les consommateurs de l'app
-    /// l'itèrent tour à tour (une seule recherche à la fois).
-    private let parsed: AsyncStream<EngineResponse>
-    private let parsedContinuation: AsyncStream<EngineResponse>.Continuation
+    /// Les abonnés du flux de réponses — un par LECTURE en cours.
+    ///
+    /// Même correctif que ``FairyEngineController`` (30/08, reproduit là-bas
+    /// puis appliqué ici par symétrie) : le flux unique partagé mourait POUR
+    /// TOUJOURS à la première annulation d'un consommateur — or
+    /// ``EngineWatchdog`` annule le perdant de chaque course. Un seul
+    /// timeout, et synchronize/éval/analyse se terminaient à vide, sans
+    /// erreur, pour le reste de la session du contrôleur. Chaque accès à
+    /// ``responseStream`` fabrique désormais SON stream ; une annulation ne
+    /// tue que lui, et un abonné ne reçoit que ce qui suit son abonnement —
+    /// fini le tampon commun où de vieux `bestmove` guettaient le mauvais
+    /// lecteur.
+    private var responseSubscribers: [UInt64: AsyncStream<EngineResponse>.Continuation] = [:]
+    private var nextResponseSubscriberID: UInt64 = 0
     private var readerTask: Task<Void, Never>?
     /// Passe à vrai à la réception de `uciok` — le moteur a fini son handshake.
     private var uciOk = false
@@ -49,13 +58,11 @@ actor EngineController {
     init(startTimeoutMs: Int = 15000) {
         self.startTimeoutMs = startTimeoutMs
         engine = StockfishEngine()
-        var cont: AsyncStream<EngineResponse>.Continuation!
-        parsed = AsyncStream(bufferingPolicy: .unbounded) { cont = $0 }
-        parsedContinuation = cont
         EngineInstanceCounter.shared.didCreate()
     }
 
     deinit {
+        for continuation in responseSubscribers.values { continuation.finish() }
         // Rendre le process, même si personne n'a appelé `stop()` (chemin
         // d'erreur, écran détruit brutalement). Sans ça : `cstockfish_stop()`
         // jamais appelé → le drapeau global reste vrai → tous les écrans
@@ -74,7 +81,19 @@ actor EngineController {
 
     /// Flux des réponses UCI parsées (info, bestmove, readyok).
     var responseStream: AsyncStream<EngineResponse> {
-        parsed
+        var continuation: AsyncStream<EngineResponse>.Continuation!
+        let stream = AsyncStream(bufferingPolicy: .unbounded) { continuation = $0 }
+        let id = nextResponseSubscriberID
+        nextResponseSubscriberID += 1
+        responseSubscribers[id] = continuation
+        continuation.onTermination = { [weak self] _ in
+            Task { await self?.dropResponseSubscriber(id) }
+        }
+        return stream
+    }
+
+    private func dropResponseSubscriber(_ id: UInt64) {
+        responseSubscribers[id] = nil
     }
 
     private(set) var didFailToStart = false
@@ -102,7 +121,7 @@ actor EngineController {
     private func ingest(_ line: String) {
         if line == "uciok" { uciOk = true }
         if let response = EngineResponse(rawValue: line) {
-            parsedContinuation.yield(response)
+            for continuation in responseSubscribers.values { continuation.yield(response) }
         }
     }
 
@@ -206,25 +225,17 @@ actor EngineController {
     @discardableResult
     func synchronize(timeoutMs: Int = 5000) async -> Bool {
         guard engine.isRunning else { return false }
-        // `responseStream` est un `AsyncStream` à **consommateur unique**.
-        // Deux tâches suspendues dans `next()` sur le même flux ne se « volent »
-        // pas des réponses comme le disaient les commentaires de l'app : la
-        // bibliothèque standard lève un `fatalError` (« attempt to await next()
-        // on more than one task »). C'est un crash immédiat, pas une
-        // dégradation.
-        //
-        // L'invariant reposait entièrement sur la discipline d'une file
-        // sérielle, plus quelques appels HORS file. On le rend au moins
-        // vérifiable : le lecteur permanent du Laboratoire est un consommateur
-        // à lui seul, donc `synchronize()` ne doit jamais être appelé pendant
-        // qu'il vit.
-        assert(
-            moveReaderTask == nil,
-            "synchronize() consomme responseStream alors que le lecteur de coups le consomme déjà : deux `next()` concurrents = fatalError du stdlib"
-        )
+        // Depuis le 30/08, chaque lecture a SON stream (voir
+        // ``responseSubscribers``) : deux consommateurs ne partagent plus un
+        // itérateur — l'ancien assert « pas pendant le lecteur de coups »
+        // n'a donc plus d'objet, et c'est un gain : synchronize devient légal
+        // à tout moment. S'abonner AVANT d'envoyer : `readyok` revient en
+        // microsecondes, et un abonné ne reçoit que ce qui suit son
+        // abonnement.
+        let stream = responseStream
         await sendRaw(.isready)
         let outcome = await EngineWatchdog.run(deadlineMs: timeoutMs) {
-            for await response in self.responseStream {
+            for await response in stream {
                 if case .readyok = response { return true }
             }
             return false

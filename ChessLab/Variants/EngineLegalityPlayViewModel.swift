@@ -176,7 +176,11 @@ final class EngineLegalityPlayViewModel {
     func start() {
         enqueueEngineWork { [weak self] in await self?.setupEngine() }
         enqueueEngineWork { [weak self] in await self?.initializePosition() }
-        clock?.startTurn(for: .white)
+        // La pendule ne repart QUE si la partie continue, et pour le camp
+        // RÉELLEMENT au trait : `.white` en dur remettait le temps des
+        // Blancs en décompte au retour sur une position où c'était aux
+        // Noirs — et faisait tourner une pendule sur une partie finie.
+        if outcome == nil { clock?.startTurn(for: board.position.sideToMove) }
     }
 
     func handleViewDisappear() {
@@ -589,6 +593,22 @@ final class EngineLegalityPlayViewModel {
         // ne sache repartir d'une instance neuve, le redémarrage échouait et
         // cette méthode sortait AVANT la remise à zéro. Le correctif du
         // moteur a rendu le défaut atteignable.
+        // Partie DÉJÀ finie : tout est dans les journaux, et le moteur n'a
+        // rien à dire de la position — l'interroger ici, tout juste redémarré
+        // ou pas encore, c'est ce qui fabriquait le bandeau du retour
+        // d'analyse (l'autre moitié du correctif du 30/08, voir
+        // ``setupEngine()``). On se contente de déclarer l'écran prêt et de
+        // relancer l'évaluation de la position AFFICHÉE, qui peut être un
+        // coup consulté.
+        if outcome != nil {
+            isPositionReady = true
+            if settings.showEvalBar {
+                let shown = displayedBoard.position
+                await refreshEvalBar(fen: shown.fen, mover: shown.sideToMove)
+            }
+            return
+        }
+
         let isResuming = !uciLog.isEmpty
         // Un essai, puis un second avant de conclure à la panne : une
         // interrogation sans réponse ne prouve pas que le moteur est mort,
@@ -658,13 +678,28 @@ final class EngineLegalityPlayViewModel {
     }
 
     private func setupEngine() async {
-        guard outcome == nil else { return }
+        // Démarré MÊME quand la partie est finie — c'était le cœur du
+        // « moteur indisponible » au retour de l'analyse, signalé le 30/08
+        // sur le Crazyhouse et REPRODUIT en test avant d'être corrigé
+        // (``FinishedGameReturnTests``). « Analyser » arrête ce moteur (un
+        // seul process à la fois) ; au retour, l'ancien garde
+        // `outcome == nil` sautait le redémarrage pendant
+        // qu'``initializePosition()`` interrogeait quand même le moteur —
+        // arrêté — et fabriquait le bandeau. Déterministe, pas une course.
+        // Une partie finie a d'ailleurs encore besoin de lui : consulter un
+        // coup rafraîchit la barre d'évaluation.
+        //
         // `customDefinitionPath` n'est renseigné que pour les variantes que le
-        // moteur ne connaît pas d'origine — Barricades aujourd'hui.
+        // moteur ne connaît pas d'origine — les deux Barricades aujourd'hui.
         guard await engine.start(variant: variant.id, variantPath: variant.customDefinitionPath) else {
             declareEngineUnavailable("démarrage refusé (acquisition du process, ou uciok jamais reçu)")
             return
         }
+        // Un démarrage qui aboutit EFFACE le bandeau d'un échec passé : il ne
+        // se reprenait jamais tout seul, alors que « Réessayer » ou un simple
+        // retour sur l'écran viennent de prouver que le moteur va bien.
+        isEngineUnavailable = false
+        engineUnavailableReason = nil
         for command in settings.strength.setupCommands {
             await engine.send(command)
         }
@@ -676,6 +711,10 @@ final class EngineLegalityPlayViewModel {
         defer { isEngineThinking = false }
 
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         // FEN BRUTE, pas `board.position.fen` : celle de ChessKit a
         // perdu la réserve (et, avant assainissement, corrompait la
         // dernière rangée). Sans réserve, le moteur ne reposerait jamais
@@ -702,7 +741,7 @@ final class EngineLegalityPlayViewModel {
             var bestLAN: String?
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     if (info.multipv ?? 1) == 1, let value = EngineScore.moverCentipawns(info) {
@@ -757,13 +796,17 @@ final class EngineLegalityPlayViewModel {
 
     private func refreshEvalBar(fen: String, mover: Piece.Color) async {
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: 220))
 
         let search = await EngineWatchdog.run(deadlineMs: 220 + EngineWatchdog.graceMs) { [engine] in
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard (info.multipv ?? 1) == 1 else { break }
@@ -829,6 +872,10 @@ final class EngineLegalityPlayViewModel {
 
         let fen = board.position.fen
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.setoption(id: "MultiPV", value: "3"))
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: Self.hintBudgetMs))
@@ -836,7 +883,7 @@ final class EngineLegalityPlayViewModel {
         let search = await EngineWatchdog.run(deadlineMs: Self.hintBudgetMs + EngineWatchdog.graceMs) { [engine] in
             var lanByRank: [Int: String] = [:]
             var scoreByRank: [Int: Double] = [:]
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     if let rank = info.multipv, let firstMove = info.pv?.first {
@@ -892,6 +939,10 @@ final class EngineLegalityPlayViewModel {
 
     private func quickScore(fen: String) async -> (cp: Int, mate: Int?)? {
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: 300))
 
@@ -899,7 +950,7 @@ final class EngineLegalityPlayViewModel {
             [engine] () -> (cp: Int, mate: Int?)? in
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard (info.multipv ?? 1) == 1 else { break }

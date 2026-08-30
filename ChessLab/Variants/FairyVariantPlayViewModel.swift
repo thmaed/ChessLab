@@ -91,7 +91,8 @@ final class FairyVariantPlayViewModel {
 
     func start() {
         enqueueEngineWork { [weak self] in await self?.setupEngine() }
-        clock?.startTurn(for: .white)
+        // Gardée et au camp RÉEL — voir ``EngineLegalityPlayViewModel/start()``.
+        if outcome == nil { clock?.startTurn(for: board.position.sideToMove) }
         if board.position.sideToMove == engineColor {
             enqueueEngineWork { [weak self] in await self?.requestEngineMove() }
         } else {
@@ -340,11 +341,17 @@ final class FairyVariantPlayViewModel {
     }
 
     private func setupEngine() async {
-        guard outcome == nil else { return }
+        // Plus de garde `outcome == nil` : même correctif que
+        // ``EngineLegalityPlayViewModel/setupEngine()`` (30/08). Ici le
+        // symptôme était plus discret — pas de bandeau, mais au retour d'une
+        // analyse sur partie finie le moteur restait arrêté, et consulter un
+        // coup ne rafraîchissait plus jamais la barre d'évaluation.
         guard await engine.start(variant: variant.id) else {
             isEngineUnavailable = true
             return
         }
+        // Un démarrage qui aboutit efface le bandeau d'un échec passé.
+        isEngineUnavailable = false
         for command in settings.strength.setupCommands {
             await engine.send(command)
         }
@@ -356,6 +363,10 @@ final class FairyVariantPlayViewModel {
         defer { isEngineThinking = false }
 
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(board.position.fen)))
 
         let mover = engineColor
@@ -373,7 +384,7 @@ final class FairyVariantPlayViewModel {
             var bestLAN: String?
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     if (info.multipv ?? 1) == 1, let value = EngineScore.moverCentipawns(info) {
@@ -433,13 +444,17 @@ final class FairyVariantPlayViewModel {
 
     private func refreshEvalBar(fen: String, mover: Piece.Color) async {
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: 220))
 
         let search = await EngineWatchdog.run(deadlineMs: 220 + EngineWatchdog.graceMs) { [engine] in
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard (info.multipv ?? 1) == 1 else { break }
@@ -508,6 +523,10 @@ final class FairyVariantPlayViewModel {
 
         let fen = board.position.fen
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.setoption(id: "MultiPV", value: "3"))
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: Self.hintBudgetMs))
@@ -515,7 +534,7 @@ final class FairyVariantPlayViewModel {
         let search = await EngineWatchdog.run(deadlineMs: Self.hintBudgetMs + EngineWatchdog.graceMs) { [engine] in
             var lanByRank: [Int: String] = [:]
             var scoreByRank: [Int: Double] = [:]
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     if let rank = info.multipv, let firstMove = info.pv?.first {
@@ -571,6 +590,10 @@ final class FairyVariantPlayViewModel {
 
     private func quickScore(fen: String) async -> (cp: Int, mate: Int?)? {
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: 300))
 
@@ -578,7 +601,7 @@ final class FairyVariantPlayViewModel {
             [engine] () -> (cp: Int, mate: Int?)? in
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard (info.multipv ?? 1) == 1 else { break }

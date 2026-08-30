@@ -701,6 +701,10 @@ final class PlayViewModel {
     /// dédié.
     private func quickScore(fen: String, engine: EngineController) async -> (cp: Int, mate: Int?)? {
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: 300))
 
@@ -708,7 +712,7 @@ final class PlayViewModel {
             () -> (cp: Int, mate: Int?)? in
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard (info.multipv ?? 1) == 1 else { break }
@@ -748,6 +752,10 @@ final class PlayViewModel {
         let mover = board.position.sideToMove
 
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: 300))
 
@@ -755,7 +763,7 @@ final class PlayViewModel {
             var cp: Int?
             var mate: Int?
 
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard (info.multipv ?? 1) == 1 else { break }
@@ -836,6 +844,9 @@ final class PlayViewModel {
                 // retourne alors à la convergence, ce qui libère la file — la
                 // prochaine opération n'a plus besoin de stopper un indice déjà
                 // terminé (`stopHintIfNeeded` gère une `hintTask` finie).
+                // S'abonner AVANT le `go` : un abonné ne reçoit que ce qui
+                // suit son abonnement (voir ``EngineController/responseStream``).
+                let responses = await engine.responseStream
                 await engine.send(.go(
                     depth: ThermalMonitor.shared.liveDepth(preferred: AppSettings.liveAnalysisDepth),
                     movetime: 8000
@@ -852,7 +863,7 @@ final class PlayViewModel {
                 var lanByRank: [Int: String] = [:]
                 var scoreByRank: [Int: Double] = [:]
 
-                for await response in await engine.responseStream {
+                for await response in responses {
                     switch response {
                     case let .info(info):
                         // L'arrêt (coup joué, indice re-basculé…) a pu être
@@ -1292,6 +1303,10 @@ final class PlayViewModel {
         engine: EngineController
     ) async -> EngineWatchdogOutcome<(lan: String?, cp: Int?, mate: Int?)> {
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(board.position.fen)))
 
         let budgetMs: Int
@@ -1309,7 +1324,7 @@ final class PlayViewModel {
             var finalScoreCp: Int?
             var finalScoreMate: Int?
 
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     if (info.multipv ?? 1) == 1, let value = EngineScore.moverCentipawns(info) {

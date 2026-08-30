@@ -203,6 +203,10 @@ final class VariantAnalysisViewModel {
             defer { self.isAnalyzing = false }
 
             await self.engine.synchronize()
+            // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+            // son abonnement (voir ``EngineController/responseStream``) — lu
+            // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+            let responses = await self.engine.responseStream
             await self.engine.send(.setoption(id: "MultiPV", value: "3"))
             await self.engine.send(.position(.fen(fen)))
             await self.engine.send(.go(movetime: Self.analysisBudgetMs))
@@ -212,7 +216,7 @@ final class VariantAnalysisViewModel {
                 var scoreByRank: [Int: Double] = [:]
                 var bestCp: Int?
                 var bestMate: Int?
-                for await response in await engine.responseStream {
+                for await response in responses {
                     switch response {
                     case let .info(info):
                         if (info.multipv ?? 1) == 1 {
@@ -440,6 +444,10 @@ final class VariantAnalysisViewModel {
             Double(DevicePerformance.classificationNodeBudget)
                 * Self.classificationNodeMultiplier * ThermalMonitor.shared.nodeFactor
         ))
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.go(nodes: nodes, movetime: DevicePerformance.classificationCapMs))
 
         let outcome = await EngineWatchdog.run(
@@ -448,7 +456,7 @@ final class VariantAnalysisViewModel {
             var lanByRank: [Int: String] = [:]
             var scoreByRank: [Int: Double] = [:]
             var mateByRank: [Int: Int] = [:]
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard let rank = info.multipv, let firstMove = info.pv?.first else { break }

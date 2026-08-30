@@ -98,7 +98,8 @@ final class Chess960PlayViewModel {
 
     func start() {
         enqueueEngineWork { [weak self] in await self?.setupEngine() }
-        clock?.startTurn(for: .white)
+        // Gardée et au camp RÉEL — voir ``EngineLegalityPlayViewModel/start()``.
+        if outcome == nil { clock?.startTurn(for: game.board.position.sideToMove) }
         if game.board.position.sideToMove == engineColor {
             enqueueEngineWork { [weak self] in await self?.requestEngineMove() }
         } else {
@@ -357,11 +358,17 @@ final class Chess960PlayViewModel {
     }
 
     private func setupEngine() async {
-        guard outcome == nil else { return }
+        // Plus de garde `outcome == nil` : même correctif que
+        // ``EngineLegalityPlayViewModel/setupEngine()`` (30/08). Ici le
+        // symptôme était plus discret — pas de bandeau, mais au retour d'une
+        // analyse sur partie finie le moteur restait arrêté, et consulter un
+        // coup ne rafraîchissait plus jamais la barre d'évaluation.
         guard await engine.start() else {
             isEngineUnavailable = true
             return
         }
+        // Un démarrage qui aboutit efface le bandeau d'un échec passé.
+        isEngineUnavailable = false
         // LE réglage qui fait la variante : sous `UCI_Chess960`, Stockfish lit
         // les droits Shredder et rend le roque en roi-prend-tour — le dialecte
         // exact de `Chess960Game.apply(uci:)`.
@@ -377,6 +384,10 @@ final class Chess960PlayViewModel {
         defer { isEngineThinking = false }
 
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(game.shredderFEN)))
 
         let mover = engineColor
@@ -394,7 +405,7 @@ final class Chess960PlayViewModel {
             var bestLAN: String?
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     if (info.multipv ?? 1) == 1, let value = EngineScore.moverCentipawns(info) {
@@ -472,13 +483,17 @@ final class Chess960PlayViewModel {
 
     private func refreshEvalBar(fen: String, mover: Piece.Color) async {
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: 220))
 
         let search = await EngineWatchdog.run(deadlineMs: 220 + EngineWatchdog.graceMs) { [engine] in
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard (info.multipv ?? 1) == 1 else { break }
@@ -568,6 +583,10 @@ final class Chess960PlayViewModel {
 
         let fen = game.shredderFEN
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.setoption(id: "MultiPV", value: "3"))
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: Self.hintBudgetMs))
@@ -575,7 +594,7 @@ final class Chess960PlayViewModel {
         let search = await EngineWatchdog.run(deadlineMs: Self.hintBudgetMs + EngineWatchdog.graceMs) { [engine] in
             var lanByRank: [Int: String] = [:]
             var scoreByRank: [Int: Double] = [:]
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     if let rank = info.multipv, let firstMove = info.pv?.first {
@@ -650,6 +669,10 @@ final class Chess960PlayViewModel {
     /// centipions ET mat en N éventuel, du point de vue du camp au trait.
     private func quickScore(fen: String) async -> (cp: Int, mate: Int?)? {
         await engine.synchronize()
+        // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
+        // son abonnement (voir ``EngineController/responseStream``) — lu
+        // APRÈS le `go`, un `bestmove` rapide se perdait sous charge.
+        let responses = await engine.responseStream
         await engine.send(.position(.fen(fen)))
         await engine.send(.go(movetime: 300))
 
@@ -657,7 +680,7 @@ final class Chess960PlayViewModel {
             [engine] () -> (cp: Int, mate: Int?)? in
             var cp: Int?
             var mate: Int?
-            for await response in await engine.responseStream {
+            for await response in responses {
                 switch response {
                 case let .info(info):
                     guard (info.multipv ?? 1) == 1 else { break }
