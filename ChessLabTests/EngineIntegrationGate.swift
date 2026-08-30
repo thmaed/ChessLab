@@ -156,10 +156,10 @@ final class EngineIntegrationGate {
         while Date() < deadline, !viewModel.isPositionReady, !viewModel.isEngineUnavailable {
             try await Task.sleep(for: .milliseconds(200))
         }
-        let unavailable = viewModel.isEngineUnavailable
+        let reason = viewModel.engineUnavailableReason ?? (viewModel.isEngineUnavailable ? "raison inconnue" : "délai dépassé sans échec déclaré")
         try #require(
             viewModel.isPositionReady,
-            Comment(rawValue: "la position initiale n'a jamais été prête (moteur indisponible : \(unavailable))"),
+            Comment(rawValue: "la position initiale n'a jamais été prête — \(reason)"),
             sourceLocation: sourceLocation
         )
     }

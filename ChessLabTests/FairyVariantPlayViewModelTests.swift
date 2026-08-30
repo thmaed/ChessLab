@@ -178,18 +178,28 @@ struct FairyVariantPlayViewModelTests {
             }
             let liveEval = try #require(vm.currentEvalCp, "aucune éval en direct (ou un mat, hors du cas visé ici)")
 
-            // 1.e4, avant la réponse noire : une position tactiquement
-            // différente de la position live — si la consultation ne
-            // redéclenchait rien, l'éval resterait EXACTEMENT celle du direct.
+            // Consulter un coup passé doit RELANCER l'évaluation.
+            //
+            // Ce test exigeait autrefois que la nouvelle valeur DIFFÈRE de
+            // celle du direct — un pari sur ce que le moteur allait répondre,
+            // pas une propriété du code : deux positions peuvent
+            // parfaitement valoir le même nombre de centipions, et le test
+            // tombait alors sans qu'aucun défaut n'existe (mesuré : 61 contre
+            // 61). Ce qui se vérifie vraiment, c'est le CONTRAT : la
+            // consultation efface l'ancienne valeur sur-le-champ, puis en
+            // installe une nouvelle.
+            _ = liveEval
             vm.review(toPly: 1)
             #expect(vm.isReviewing)
+            #expect(vm.currentEvalCp == nil && vm.currentEvalMate == nil,
+                    "l'éval du direct doit être effacée AUSSITÔT, pas laissée à mentir")
 
             let reviewDeadline = Date().addingTimeInterval(20)
-            while Date() < reviewDeadline, vm.currentEvalCp == liveEval {
+            while Date() < reviewDeadline, vm.currentEvalCp == nil, vm.currentEvalMate == nil {
                 try await Task.sleep(for: .milliseconds(300))
             }
-            #expect(vm.currentEvalCp != nil, "aucune éval après consultation d'un coup passé")
-            #expect(vm.currentEvalCp != liveEval, "l'éval doit refléter la position CONSULTÉE, pas être un résidu du direct")
+            #expect(vm.currentEvalCp != nil || vm.currentEvalMate != nil,
+                    "aucune éval après consultation d'un coup passé")
 
             vm.handleViewDisappear()
         }

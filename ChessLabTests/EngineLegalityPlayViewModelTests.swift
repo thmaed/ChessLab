@@ -134,15 +134,23 @@ struct EngineLegalityPlayViewModelTests {
             }
             let liveEval = try #require(vm.currentEvalCp, "aucune éval en direct")
 
+             // Voir ``FairyVariantPlayViewModelTests`` : ce test exigeait
+            // autrefois une valeur DIFFÉRENTE de celle du direct, ce qui est
+            // un pari sur la réponse du moteur et non une propriété du code —
+            // deux positions peuvent valoir le même nombre de centipions. On
+            // vérifie le CONTRAT : effacement immédiat, puis nouvelle valeur.
+            _ = liveEval
             vm.review(toPly: 1)
             #expect(vm.isReviewing)
+            #expect(vm.currentEvalCp == nil && vm.currentEvalMate == nil,
+                    "l'éval du direct doit être effacée AUSSITÔT, pas laissée à mentir")
 
             let reviewDeadline = Date().addingTimeInterval(20)
-            while Date() < reviewDeadline, vm.currentEvalCp == liveEval {
+            while Date() < reviewDeadline, vm.currentEvalCp == nil, vm.currentEvalMate == nil {
                 try await Task.sleep(for: .milliseconds(300))
             }
-            #expect(vm.currentEvalCp != nil, "aucune éval après consultation d'un coup passé")
-            #expect(vm.currentEvalCp != liveEval, "l'éval doit refléter la position CONSULTÉE, pas être un résidu du direct")
+            #expect(vm.currentEvalCp != nil || vm.currentEvalMate != nil,
+                    "aucune éval après consultation d'un coup passé")
 
             vm.handleViewDisappear()
         }

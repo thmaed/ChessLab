@@ -454,6 +454,16 @@ final class Chess960PlayViewModel {
     /// PARTICULIÈREMENT après la fin — c'est là qu'on revoit la partie.
     private func refreshDisplayedEvalBar() {
         guard settings.showEvalBar else { return }
+        // EFFACER D'ABORD, et de façon SYNCHRONE. Sans cela, la barre gardait
+        // la valeur de la position précédente pendant tout le temps du calcul
+        // — soit un cinquième de seconde à afficher une évaluation qui ne
+        // correspond pas à ce qu'on voit. Une barre neutre le temps du
+        // calcul dit « je ne sais pas encore », ce qui est vrai ; l'ancienne
+        // valeur dit quelque chose de faux. C'est aussi ce qui rend
+        // observable, donc testable, le fait que consulter un coup passé
+        // relance bien l'évaluation.
+        currentEvalCp = nil
+        currentEvalMate = nil
         enqueueEngineWork { [weak self] in
             guard let self else { return }
             await self.refreshEvalBar(fen: self.displayedGame.shredderFEN, mover: self.displayedGame.board.position.sideToMove)

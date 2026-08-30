@@ -151,7 +151,10 @@ actor EngineController {
                 return false
             }
             iterationsLeft -= 1
-            try? await Task.sleep(nanoseconds: 20_000_000)
+            // Voir ``FairyEngineController/captureRawLines(sending:until:timeoutMs:)`` :
+            // avec `try?`, une tâche annulée épuise ces tours en un clin
+            // d'œil et conclut à tort que le moteur n'a pas démarré.
+            do { try await Task.sleep(nanoseconds: 20_000_000) } catch { return false }
         }
 
         let threads = coreCount.map { max($0 - 1, 1) } ?? 1
@@ -299,7 +302,7 @@ actor EngineController {
             }
             guard attemptsLeft > 0 else { return false }
             attemptsLeft -= 1
-            try? await Task.sleep(nanoseconds: 50_000_000)
+            do { try await Task.sleep(nanoseconds: 50_000_000) } catch { return false }
         }
     }
 

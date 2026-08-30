@@ -119,6 +119,19 @@ final class EngineLegalityPlayViewModel {
     private var engineQueue: Task<Void, Never> = Task {}
     private(set) var isEngineThinking = false
     private(set) var isEngineUnavailable = false
+
+    /// POURQUOI le moteur s'est déclaré indisponible.
+    ///
+    /// Trois chemins y mènent, et rien ne les distinguait : le démarrage qui
+    /// échoue, la position qu'on n'obtient pas, la recherche qui n'aboutit
+    /// pas. Un échec de suite complète disait donc « indisponible » sans
+    /// jamais dire lequel — j'ai passé plusieurs tours à supposer le mauvais.
+    private(set) var engineUnavailableReason: String?
+
+    private func declareEngineUnavailable(_ reason: String) {
+        isEngineUnavailable = true
+        engineUnavailableReason = reason
+    }
     private(set) var currentEvalCp: Int?
     private(set) var currentEvalMate: Int?
 
@@ -393,7 +406,7 @@ final class EngineLegalityPlayViewModel {
         // remettre en file ICI serait un AUTO-RÉFÉRENCEMENT qui bloque
         // indéfiniment (elle attendrait sa propre fin). La sérialisation se
         // fait UNE SEULE FOIS, au point d'entrée.
-        guard var query = await engine.queryPosition(startFEN: chainFEN, uciLog: chainMoves + [uci]) else {
+        guard let query = await engine.queryPosition(startFEN: chainFEN, uciLog: chainMoves + [uci]) else {
             return false
         }
 
@@ -586,7 +599,7 @@ final class EngineLegalityPlayViewModel {
             query = await engine.queryPosition(startFEN: chainFEN, uciLog: chainMoves)
         }
         guard let query else {
-            isEngineUnavailable = true
+            declareEngineUnavailable("position jamais rendue (deux essais de queryPosition)")
             return
         }
         currentFEN = query.fen
@@ -649,7 +662,7 @@ final class EngineLegalityPlayViewModel {
         // `customDefinitionPath` n'est renseigné que pour les variantes que le
         // moteur ne connaît pas d'origine — Barricades aujourd'hui.
         guard await engine.start(variant: variant.id, variantPath: variant.customDefinitionPath) else {
-            isEngineUnavailable = true
+            declareEngineUnavailable("démarrage refusé (acquisition du process, ou uciok jamais reçu)")
             return
         }
         for command in settings.strength.setupCommands {
@@ -706,7 +719,7 @@ final class EngineLegalityPlayViewModel {
         }
 
         guard case let .finished(result) = search else {
-            isEngineUnavailable = true
+            declareEngineUnavailable("recherche sans réponse (chien de garde expiré)")
             return
         }
         if let cp = result.cp {
@@ -726,6 +739,16 @@ final class EngineLegalityPlayViewModel {
 
     private func refreshDisplayedEvalBar() {
         guard settings.showEvalBar else { return }
+        // EFFACER D'ABORD, et de façon SYNCHRONE. Sans cela, la barre gardait
+        // la valeur de la position précédente pendant tout le temps du calcul
+        // — soit un cinquième de seconde à afficher une évaluation qui ne
+        // correspond pas à ce qu'on voit. Une barre neutre le temps du
+        // calcul dit « je ne sais pas encore », ce qui est vrai ; l'ancienne
+        // valeur dit quelque chose de faux. C'est aussi ce qui rend
+        // observable, donc testable, le fait que consulter un coup passé
+        // relance bien l'évaluation.
+        currentEvalCp = nil
+        currentEvalMate = nil
         enqueueEngineWork { [weak self] in
             guard let self else { return }
             await self.refreshEvalBar(fen: self.displayedBoard.position.fen, mover: self.displayedBoard.position.sideToMove)

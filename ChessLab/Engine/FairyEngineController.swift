@@ -127,7 +127,13 @@ actor FairyEngineController {
         let deadline = Date().addingTimeInterval(Double(timeoutMs) / 1000)
         while Date() < deadline {
             if rawLineBuffer.contains(where: terminator) { break }
-            try? await Task.sleep(nanoseconds: 10_000_000)
+            // `do`/`catch` et NON `try?` : dans une tâche ANNULÉE,
+            // `Task.sleep` échoue immédiatement, et `try?` transformait alors
+            // cette attente en boucle à vide — quinze secondes de MainActor
+            // saturé, à empêcher précisément le lecteur de lignes de livrer
+            // ce qu'on attend. La boucle se sabotait elle-même, et le seul
+            // symptôme visible était « moteur indisponible ».
+            do { try await Task.sleep(nanoseconds: 10_000_000) } catch { break }
         }
         return rawLineBuffer
     }
@@ -328,7 +334,11 @@ actor FairyEngineController {
                 return false
             }
             iterationsLeft -= 1
-            try? await Task.sleep(nanoseconds: 20_000_000)
+            // Voir ``captureRawLines(sending:until:timeoutMs:)`` : avec
+            // `try?`, une tâche annulée épuisait ces 750 tours en un clin
+            // d'œil et rendait « le moteur n'a pas démarré » — alors qu'il
+            // n'avait simplement pas eu une milliseconde pour répondre.
+            do { try await Task.sleep(nanoseconds: 20_000_000) } catch { return false }
         }
 
         let threads = coreCount.map { max($0 - 1, 1) } ?? 1
@@ -415,7 +425,9 @@ actor FairyEngineController {
             }
             guard attemptsLeft > 0 else { return false }
             attemptsLeft -= 1
-            try? await Task.sleep(nanoseconds: 50_000_000)
+            // Même piège : annulée, cette boucle brûlait ses 160 tours sans
+            // jamais laisser l'instance précédente finir de se libérer.
+            do { try await Task.sleep(nanoseconds: 50_000_000) } catch { return false }
         }
     }
 }

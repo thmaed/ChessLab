@@ -78,15 +78,42 @@ public:
     }
 
 protected:
+    // `mutex_` : la ligne en cours est une `std::string` que DEUX threads
+    // pouvaient toucher en même temps.
+    //
+    // Les deux shims — celui-ci et celui de Fairy-Stockfish — détournent le
+    // MÊME `std::cout` global. Si les deux moteurs vivent un instant
+    // ensemble (arrêt de l'un qui traîne pendant le démarrage de l'autre),
+    // leurs deux threads finissent par écrire dans le même `OutputBuffer`, et
+    // `line_.push_back()` corrompt le tas. Constaté le 30/08 : abandon sur
+    // `POINTER_BEING_FREED_WAS_NOT_ALLOCATED`, pile
+    // `UCIEngine::loop → OutputBuffer::overflow → std::string::__grow_by`.
+    // Le process entier tombait, et les tests voisins ne voyaient qu'un
+    // moteur « indisponible ».
+    //
+    // Le verrou ne remplace pas la discipline côté app (un seul moteur à la
+    // fois) : il fait que son non-respect coûte une ligne mélangée, et non
+    // le process.
     int_type overflow(int_type ch) override {
         if (ch == traits_type::eof()) {
             return ch;
         }
         char c = traits_type::to_char_type(ch);
-        if (c == '\n') {
-            flushLine();
-        } else if (c != '\r') {
-            line_.push_back(c);
+        std::string finished;
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (c == '\n') {
+                finished.swap(line_);
+            } else if (c != '\r') {
+                line_.push_back(c);
+            } else {
+                return ch;
+            }
+        }
+        // Le callback est appelé HORS du verrou : il remonte en Swift, et le
+        // tenir pendant ce trajet inviterait l'interblocage.
+        if (c == '\n' && callback_) {
+            callback_(finished.c_str(), context_);
         }
         return ch;
     }
@@ -99,15 +126,9 @@ protected:
     }
 
 private:
-    void flushLine() {
-        if (callback_) {
-            callback_(line_.c_str(), context_);
-        }
-        line_.clear();
-    }
-
     cstockfish_output_callback callback_ = nullptr;
     void *context_ = nullptr;
+    std::mutex mutex_;
     std::string line_;
 };
 
@@ -173,15 +194,22 @@ void cstockfish_stop(void) {
     if (gEngineThread.joinable()) {
         gEngineThread.join();
     }
-    // Restaure les flux d'origine.
-    if (gOldCin) {
+    // Restaure les flux d'origine — mais SEULEMENT s'ils sont encore les
+    // nôtres.
+    //
+    // Sans cette vérification, un shim qui s'arrête réinstallait son
+    // « ancien » tampon par-dessus celui d'un moteur démarré entre-temps :
+    // la sortie du nouveau venu partait dans le vide, et il passait pour
+    // muet. Les deux shims se marchant sur le même `std::cout` global, c'est
+    // exactement le scénario que produit un arrêt qui traîne.
+    if (gOldCin && std::cin.rdbuf() == &gInput) {
         std::cin.rdbuf(gOldCin);
-        gOldCin = nullptr;
     }
-    if (gOldCout) {
+    gOldCin = nullptr;
+    if (gOldCout && std::cout.rdbuf() == &gOutput) {
         std::cout.rdbuf(gOldCout);
-        gOldCout = nullptr;
     }
+    gOldCout = nullptr;
     gRunning = false;
 }
 

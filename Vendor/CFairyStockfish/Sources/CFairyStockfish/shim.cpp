@@ -150,14 +150,18 @@ void cfairystockfish_stop(void) {
     if (gEngineThread.joinable()) {
         gEngineThread.join();
     }
-    if (gOldCin) {
+    // Voir ``CStockfish/shim.cpp`` : on ne restaure QUE si les flux sont
+    // encore les nôtres. Sinon un arrêt qui traîne réinstallait son ancien
+    // tampon par-dessus celui d'un moteur démarré entre-temps, qui passait
+    // alors pour muet.
+    if (gOldCin && std::cin.rdbuf() == &gInput) {
         std::cin.rdbuf(gOldCin);
-        gOldCin = nullptr;
     }
-    if (gOldCout) {
+    gOldCin = nullptr;
+    if (gOldCout && std::cout.rdbuf() == &gOutput) {
         std::cout.rdbuf(gOldCout);
-        gOldCout = nullptr;
     }
+    gOldCout = nullptr;
     gRunning = false;
 }
 
