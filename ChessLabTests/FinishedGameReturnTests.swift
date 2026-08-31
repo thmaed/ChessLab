@@ -37,10 +37,18 @@ struct FinishedGameReturnTests {
         vm.start()                                      // retour : `.onAppear`
     }
 
-    @Test("Crazyhouse fini + analyse + retour : pas de « moteur indisponible »")
-    func returningToAFinishedGameDoesNotDeclareTheEngineDead() async throws {
+    @Test(
+        "Partie finie + analyse + retour : pas de « moteur indisponible »",
+        arguments: [
+            EngineLegalityVariant.crazyhouse, .atomic, .racingKings,
+            .barricades, .randomBarricades,
+        ]
+    )
+    func returningToAFinishedGameDoesNotDeclareTheEngineDead(
+        variant: EngineLegalityVariant
+    ) async throws {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
-            let vm = self.game(.crazyhouse)
+            let vm = self.game(variant)
             vm.start()
             try await EngineIntegrationGate.waitUntilReady(vm)
             vm.userResigns()
@@ -99,6 +107,138 @@ struct FinishedGameReturnTests {
                     "le moteur doit être reparti pour évaluer le coup consulté")
 
             vm.handleViewDisappear()
+        }
+    }
+
+    /// Trois allers-retours d'affilée sur la MÊME partie : une fuite ou une
+    /// dégradation par cycle (flux, abonnés, process) se verrait ici, pas au
+    /// premier tour.
+    @Test("Trois cycles analyse → retour d'affilée tiennent")
+    func threeConsecutiveRoundTripsHold() async throws {
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let vm = self.game(.crazyhouse, showEvalBar: true)
+            vm.start()
+            try await EngineIntegrationGate.waitUntilReady(vm)
+            vm.attemptUserMove(from: Square("e2"), to: Square("e4"))
+            let replied = Date().addingTimeInterval(30)
+            while Date() < replied, vm.totalPlies < 2 {
+                try await Task.sleep(for: .milliseconds(200))
+            }
+            try #require(vm.totalPlies >= 2)
+            vm.userResigns()
+
+            for cycle in 1...3 {
+                try await self.analysisRoundTrip(vm)
+                try await Task.sleep(for: .seconds(2))
+                #expect(!vm.isEngineUnavailable,
+                        "cycle \(cycle) : \(vm.engineUnavailableReason ?? "indisponible")")
+
+                vm.review(toPly: 1)
+                let evalDeadline = Date().addingTimeInterval(20)
+                while Date() < evalDeadline, vm.currentEvalCp == nil, vm.currentEvalMate == nil {
+                    try await Task.sleep(for: .milliseconds(300))
+                }
+                #expect(vm.currentEvalCp != nil || vm.currentEvalMate != nil,
+                        "cycle \(cycle) : l'éval de consultation n'est pas revenue")
+                vm.reviewToLive()
+            }
+            vm.handleViewDisappear()
+        }
+    }
+
+    /// La même promesse pour l'AUTRE famille Fairy (lot A — ChessKit arbitre,
+    /// Fairy-Stockfish conseille) : son `setupEngine` avait la même garde.
+    @Test("Roi de la colline fini + analyse + retour : la consultation vit encore")
+    func fairyVariantSurvivesTheRoundTrip() async throws {
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            var settings = FairyVariantSettings()
+            settings.colorChoice = PlayerColorChoice.white.rawValue
+            settings.eloSliderValue = 1400
+            settings.showEvalBar = true
+            settings.hintsEnabled = false
+            settings.blunderAlertEnabled = false
+            let vm = FairyVariantPlayViewModel(variant: .kingOfTheHill, settings: settings)
+            vm.start()
+            try await Task.sleep(for: .seconds(1))
+
+            vm.attemptUserMove(from: Square("e2"), to: Square("e4"))
+            let replied = Date().addingTimeInterval(30)
+            while Date() < replied, vm.totalPlies < 2 {
+                try await Task.sleep(for: .milliseconds(200))
+            }
+            try #require(vm.totalPlies >= 2, "l'ordinateur n'a jamais répondu")
+            vm.userResigns()
+
+            await vm.stopEngineBeforeAnalysis()
+            vm.handleViewDisappear()
+            try await Task.sleep(for: .milliseconds(400))
+            vm.start()
+            try await Task.sleep(for: .seconds(2))
+            #expect(!vm.isEngineUnavailable, "bandeau au retour sur le lot A")
+
+            vm.review(toPly: 1)
+            let evalDeadline = Date().addingTimeInterval(20)
+            while Date() < evalDeadline, vm.currentEvalCp == nil, vm.currentEvalMate == nil {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            #expect(vm.currentEvalCp != nil || vm.currentEvalMate != nil,
+                    "l'éval de consultation doit revenir sur le lot A aussi")
+
+            vm.handleViewDisappear()
+        }
+    }
+
+    /// L'écran d'ANALYSE lui-même : le quitter puis y revenir. Son moteur est
+    /// arrêté au départ ; au retour, `start()` doit le relancer, garder les
+    /// pastilles déjà calculées, et redonner une évaluation.
+    @Test("Quitter puis rouvrir l'écran d'analyse : le moteur repart, les pastilles restent")
+    func reenteringTheAnalysisScreenWorks() async throws {
+        try await EngineIntegrationGate.shared.withExclusiveAccess {
+            let vm = self.game(.crazyhouse)
+            vm.start()
+            try await EngineIntegrationGate.waitUntilReady(vm)
+            vm.attemptUserMove(from: Square("e2"), to: Square("e4"))
+            let replied = Date().addingTimeInterval(30)
+            while Date() < replied, vm.totalPlies < 2 {
+                try await Task.sleep(for: .milliseconds(200))
+            }
+            try #require(vm.totalPlies >= 2)
+            vm.userResigns()
+            let seed = VariantAnalysisSeed(
+                variantID: EngineLegalityVariant.crazyhouse.id,
+                variantDisplayName: EngineLegalityVariant.crazyhouse.displayName,
+                startFEN: vm.startFEN,
+                uciLog: vm.uciLog, sanLog: vm.sanLog, moveLog: vm.moveLog,
+                fenLog: vm.fenLog, outcome: vm.outcome
+            )
+            await vm.stopEngineBeforeAnalysis()
+
+            let analysis = VariantAnalysisViewModel(seed: seed)
+            analysis.start()
+            let classified = Date().addingTimeInterval(60)
+            while Date() < classified, analysis.isClassifying || analysis.moveQuality.isEmpty {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            try #require(!analysis.moveQuality.isEmpty, "aucune pastille au premier passage")
+            let badges = analysis.moveQuality
+
+            // Quitter, revenir.
+            analysis.handleViewDisappear()
+            try await Task.sleep(for: .milliseconds(400))
+            analysis.start()
+            try await Task.sleep(for: .seconds(2))
+            #expect(!analysis.isEngineUnavailable, "le moteur d'analyse doit repartir")
+            #expect(analysis.moveQuality == badges, "les pastilles calculées doivent rester")
+
+            analysis.review(toPly: 1)
+            let evalDeadline = Date().addingTimeInterval(20)
+            while Date() < evalDeadline, analysis.currentEvalCp == nil, analysis.currentEvalMate == nil {
+                try await Task.sleep(for: .milliseconds(300))
+            }
+            #expect(analysis.currentEvalCp != nil || analysis.currentEvalMate != nil,
+                    "l'évaluation doit revenir au second passage")
+
+            analysis.handleViewDisappear()
         }
     }
 }

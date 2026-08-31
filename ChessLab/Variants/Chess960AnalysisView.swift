@@ -54,6 +54,15 @@ struct Chess960AnalysisView: View {
             ToolbarItem(placement: .navigationBarTrailing) { exportMenu }
         }
         .onAppear { viewModel.start() }
+        .overlay(alignment: .top) {
+            if viewModel.isEngineUnavailable {
+                EngineUnavailableBanner(
+                    message: "L'analyse n'a pas pu démarrer : le moteur est indisponible.",
+                    isRetrying: false,
+                    onRetry: {}
+                )
+            }
+        }
         .onDisappear { viewModel.handleViewDisappear() }
         .alert(
             "Copié",

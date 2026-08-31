@@ -35,6 +35,15 @@
 
 using namespace std;
 
+// ChessLab — l'entrée UCI vient du SHIM, jamais du `std::cin` global : les
+// deux moteurs vendorisés (Stockfish et Fairy-Stockfish) vivent dans le même
+// process et se partageraient ce flux unique. Détourner `cin.rdbuf` était la
+// première approche, et elle a produit trois défauts (corruption de sortie,
+// flux muet, GEL de l'arrêt — voir Vendor/CFairyStockfish/Sources/CFairyStockfish/shim.cpp) :
+// quand les moteurs se chevauchent, `getline` lit le tampon de L'AUTRE.
+// Un flux dédié par moteur supprime la classe entière de problèmes.
+extern std::istream* chesslab_fsf_stdin;
+
 namespace FairyEngine {
 
 extern vector<string> setup_bench(const Position&, istream&);
@@ -288,7 +297,7 @@ void UCI::loop(int argc, char* argv[]) {
   std::vector<Move> banmoves = {};
 
   do {
-      if (argc == 1 && !getline(cin, cmd)) // Block here waiting for input or EOF
+      if (argc == 1 && !getline(chesslab_fsf_stdin ? *chesslab_fsf_stdin : cin, cmd)) // Block here waiting for input or EOF
           cmd = "quit";
 
       istringstream is(cmd);

@@ -19,6 +19,8 @@
 #include "include/cstockfish.h"
 #include "stockfish/_main.h"
 
+#include <atomic>
+#include <chrono>
 #include <condition_variable>
 #include <deque>
 #include <mutex>
@@ -26,6 +28,12 @@
 #include <string>
 #include <thread>
 #include <iostream>
+
+/// L'entrée UCI DÉDIÉE de ce moteur — lue par son uci.cpp à la place du
+/// `std::cin` global (voir la déclaration `extern` là-bas). Posée une fois au
+/// premier démarrage et jamais remise à zéro : le tampon qu'elle enveloppe
+/// est global au shim et vit aussi longtemps que le process.
+std::istream* chesslab_sf_stdin = nullptr;
 
 namespace {
 
@@ -136,7 +144,14 @@ private:
 InputBuffer gInput;
 OutputBuffer gOutput;
 std::thread gEngineThread;
-std::streambuf *gOldCin = nullptr;
+// Générations du fil moteur — et non un simple booléen « fini », qui était
+// PARTAGÉ entre un fil détaché et son successeur : le zombie posait le
+// drapeau du neuf, le neuf passait pour mort (ou l'inverse), et l'arrêt
+// borné joignait le mauvais fil. Chaque fil reçoit SA génération à la
+// création et la pose en sortant ; `gThreadGeneration != gDoneGeneration`
+// dit précisément « le dernier fil lancé vit encore ».
+std::atomic<uint64_t> gThreadGeneration{0};
+std::atomic<uint64_t> gDoneGeneration{0};
 std::streambuf *gOldCout = nullptr;
 bool gRunning = false;
 std::mutex gLifecycleMutex;
@@ -149,6 +164,15 @@ int cstockfish_start(const char *binaryPath,
                      cstockfish_output_callback callback,
                      void *context) {
     std::lock_guard<std::mutex> lock(gLifecycleMutex);
+    if (gThreadGeneration.load() != gDoneGeneration.load()) {
+        // Le fil moteur PRÉCÉDENT, détaché par un arrêt borné, vit encore :
+        // démarrer une seconde boucle UCI du même moteur corromprait leurs
+        // états globaux partagés (Threads, options). On refuse — l'app
+        // affiche « moteur indisponible » avec « Réessayer », ce qui est
+        // exactement vrai, et la voie se libère dès que le fil sourd lit le
+        // « quit » resté dans sa file.
+        return -1;
+    }
     if (gRunning) {
         // Le process est DÉJÀ pris. On le dit à l'appelant au lieu de sortir
         // en silence : reconfigurer `gOutput` ici détournerait la sortie du
@@ -156,17 +180,20 @@ int cstockfish_start(const char *binaryPath,
         return -1;
     }
 
+    const uint64_t generation = gThreadGeneration.fetch_add(1) + 1;
     gOutput.configure(callback, context);
-    gOldCin = std::cin.rdbuf(&gInput);
+    static std::istream gEngineInput(&gInput);
+    chesslab_sf_stdin = &gEngineInput;
     gOldCout = std::cout.rdbuf(&gOutput);
 
     std::string path = binaryPath ? binaryPath : "stockfish";
-    gEngineThread = std::thread([path]() {
+    gEngineThread = std::thread([path, generation]() {
         // argv[0] : son dossier parent est fouillé par Stockfish pour les
         // réseaux NNUE (voir CommandLine::get_binary_directory).
         std::string arg0 = path;
         char *argv[] = {const_cast<char *>(arg0.c_str())};
         _main(1, argv);
+        gDoneGeneration.store(generation);
     });
     gRunning = true;
     return 0;
@@ -191,8 +218,33 @@ void cstockfish_stop(void) {
     // « quit » fait sortir la boucle UCI de Stockfish, donc le thread se
     // termine proprement.
     gInput.push("quit\n");
+    // Join BORNÉ, et ce n'est pas un luxe : `getline(std::cin, …)` lit le
+    // tampon COURANT de std::cin, que l'AUTRE shim peut avoir détourné si
+    // les deux moteurs se sont chevauchés un instant. Le « quit » poussé
+    // ci-dessus atterrit alors dans un tampon que le fil moteur ne lit pas :
+    // il attend sur la mauvaise variable de condition, et un join aveugle
+    // gelait le MainActor POUR TOUJOURS (constaté le 31/08 : une suite de
+    // tests pendue 5 h 40 dans `PlayViewModel.deinit → cstockfish_stop`,
+    // le fil moteur dans `InputBuffer::underflow`). Deux secondes suffisent
+    // à tout arrêt sain — au-delà, on DÉTACHE : le fil sourd garde son
+    // « quit » en file et sortira de lui-même si les tampons lui
+    // reviennent ; en attendant, `gEngineZombie` interdit de redémarrer ce
+    // shim par-dessus.
+    const uint64_t generation = gThreadGeneration.load();
+    bool finished = false;
+    for (int i = 0; i < 200; ++i) {
+        if (gDoneGeneration.load() >= generation) { finished = true; break; }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
     if (gEngineThread.joinable()) {
-        gEngineThread.join();
+        if (finished) {
+            gEngineThread.join();
+        } else {
+            // Fil sourd (voir le commentaire au-dessus) : détaché. L'écart
+            // `gThreadGeneration != gDoneGeneration` interdit tout
+            // redémarrage tant qu'il vit.
+            gEngineThread.detach();
+        }
     }
     // Restaure les flux d'origine — mais SEULEMENT s'ils sont encore les
     // nôtres.
@@ -202,10 +254,6 @@ void cstockfish_stop(void) {
     // la sortie du nouveau venu partait dans le vide, et il passait pour
     // muet. Les deux shims se marchant sur le même `std::cout` global, c'est
     // exactement le scénario que produit un arrêt qui traîne.
-    if (gOldCin && std::cin.rdbuf() == &gInput) {
-        std::cin.rdbuf(gOldCin);
-    }
-    gOldCin = nullptr;
     if (gOldCout && std::cout.rdbuf() == &gOutput) {
         std::cout.rdbuf(gOldCout);
     }

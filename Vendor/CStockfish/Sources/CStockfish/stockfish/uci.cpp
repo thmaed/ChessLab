@@ -39,6 +39,15 @@
 #include "types.h"
 #include "ucioption.h"
 
+// ChessLab — l'entrée UCI vient du SHIM, jamais du `std::cin` global : les
+// deux moteurs vendorisés (Stockfish et Fairy-Stockfish) vivent dans le même
+// process et se partageraient ce flux unique. Détourner `cin.rdbuf` était la
+// première approche, et elle a produit trois défauts (corruption de sortie,
+// flux muet, GEL de l'arrêt — voir Vendor/CStockfish/Sources/CStockfish/shim.cpp) :
+// quand les moteurs se chevauchent, `getline` lit le tampon de L'AUTRE.
+// Un flux dédié par moteur supprime la classe entière de problèmes.
+extern std::istream* chesslab_sf_stdin;
+
 namespace Stockfish {
 
 constexpr auto BenchmarkCommand = "speedtest";
@@ -94,7 +103,7 @@ void UCIEngine::loop() {
     do
     {
         if (cli.argc == 1
-            && !getline(std::cin, cmd))  // Wait for an input or an end-of-file (EOF) indication
+            && !getline(chesslab_sf_stdin ? *chesslab_sf_stdin : std::cin, cmd))  // Wait for an input or an end-of-file (EOF) indication
             cmd = "quit";
 
         std::istringstream is(cmd);

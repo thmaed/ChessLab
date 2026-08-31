@@ -43,6 +43,9 @@ final class Chess960AnalysisViewModel {
     private(set) var isAnalyzing = false
 
     private let engine = EngineController()
+    /// Voir ``VariantAnalysisViewModel/isEngineUnavailable`` — même trou,
+    /// même correctif du 31/08.
+    private(set) var isEngineUnavailable = false
     private var engineQueue: Task<Void, Never> = Task {}
     /// Jeton de fraîcheur : une analyse dont le jeton ne correspond plus à
     /// `analysisToken` au moment de conclure est jetée — même principe que
@@ -86,7 +89,11 @@ final class Chess960AnalysisViewModel {
     func start() {
         enqueueEngineWork { [weak self] in
             guard let self else { return }
-            guard await self.engine.start() else { return }
+            guard await self.engine.start() else {
+                self.isEngineUnavailable = true
+                return
+            }
+            self.isEngineUnavailable = false
             await self.engine.send(.setoption(id: "UCI_Chess960", value: "true"))
         }
         // Enfilée AVANT toute salve d'indices : la file est sérielle (FIFO),

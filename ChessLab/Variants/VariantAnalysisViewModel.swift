@@ -58,6 +58,12 @@ final class VariantAnalysisViewModel {
 
     private(set) var displayedPly: Int = 0
 
+    /// Le moteur d'analyse n'a pas démarré. Aligné sur
+    /// ``DuckChessAnalysisViewModel`` le 31/08 : cet écran IGNORAIT l'échec
+    /// (`_ = await engine.start(…)`) — classification silencieusement vide,
+    /// éval muette, et rien à l'écran pour le dire.
+    private(set) var isEngineUnavailable = false
+
     private(set) var currentEvalCp: Int?
     private(set) var currentEvalMate: Int?
     var hintMoves: [HintMove] = []
@@ -102,9 +108,16 @@ final class VariantAnalysisViewModel {
     func start() {
         enqueueEngineWork { [weak self] in
             guard let self else { return }
-            _ = await self.engine.start(
+            guard await self.engine.start(
                 variant: self.variantID, variantPath: self.customDefinitionPath
-            )
+            ) else {
+                self.isEngineUnavailable = true
+                return
+            }
+            // Un démarrage qui aboutit efface le bandeau d'un échec passé —
+            // l'écran survit à la navigation, et `start()` est rappelé à
+            // chaque retour.
+            self.isEngineUnavailable = false
         }
         classifyMainLine()
     }
