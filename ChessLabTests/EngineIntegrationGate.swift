@@ -147,6 +147,24 @@ final class EngineIntegrationGate {
         }
     }
 
+    /// Réessaie un démarrage moteur pendant huit secondes.
+    ///
+    /// Même SOUS le verrou, le premier essai peut échouer à tort : le moteur
+    /// du test précédent met parfois quelques instants à rendre le process
+    /// sous la charge d'une suite complète (constaté le 31/08 — vert en
+    /// isolation, rouge une fois sur trente en suite). La boucle sort au
+    /// premier succès ; huit secondes d'échecs, elles, sont un VRAI défaut.
+    static func patiently(
+        isolation: isolated (any Actor)? = #isolation, _ start: () async -> Bool
+    ) async -> Bool {
+        let deadline = Date().addingTimeInterval(8)
+        while true {
+            if await start() { return true }
+            guard Date() < deadline else { return false }
+            do { try await Task.sleep(for: .milliseconds(250)) } catch { return false }
+        }
+    }
+
     /// Attend qu'une partie arbitrée par le moteur soit RÉELLEMENT prête.
     ///
     /// `EngineLegalityPlayViewModel` ne peut pas jouer un coup avant que le

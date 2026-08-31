@@ -52,6 +52,8 @@ actor FairyEngineController {
     private var responseSubscribers: [UInt64: AsyncStream<EngineResponse>.Continuation] = [:]
     private var nextResponseSubscriberID: UInt64 = 0
     private var readerTask: Task<Void, Never>?
+    /// L'instance moteur que `readerTask` itère — voir ``startReader()``.
+    private var readerEngineID: ObjectIdentifier?
     private var uciOk = false
 
     private let startTimeoutMs: Int
@@ -99,7 +101,19 @@ actor FairyEngineController {
     // MARK: Lecteur unique
 
     private func startReader() {
+        // IDEMPOTENT quand le lecteur vivant lit déjà CETTE instance : le
+        // laisser en place. L'ancien réflexe — annuler puis relancer — tuait
+        // le flux : `lines` est UN AsyncStream stocké par instance, et
+        // annuler la tâche qui l'itère le TERMINE pour toujours ; le nouveau
+        // lecteur itérait alors un flux mort, plus aucune ligne ne remontait,
+        // et le redémarrage suivant expirait sur « uciok jamais reçu — moteur
+        // vivant » (trouvé le 31/08 par FairyEngineStressTests, tournée des
+        // variantes : le 2e start() sur moteur en marche, soit le chemin du
+        // RETOUR D'ÉCRAN avec view model gardé par SessionStore).
+        let current = ObjectIdentifier(engine)
+        if let readerTask, !readerTask.isCancelled, readerEngineID == current { return }
         readerTask?.cancel()
+        readerEngineID = current
         let stream = engine.lines
         readerTask = Task { [weak self] in
             for await line in stream {
