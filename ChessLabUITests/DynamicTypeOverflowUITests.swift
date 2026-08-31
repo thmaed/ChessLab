@@ -10,6 +10,7 @@ import XCTest
 ///
 /// Les tailles d'accessibilité se forcent au lancement, il n'existe pas d'API
 /// pour en changer en cours de route.
+@MainActor
 final class DynamicTypeOverflowUITests: XCTestCase {
 
     override func setUpWithError() throws {

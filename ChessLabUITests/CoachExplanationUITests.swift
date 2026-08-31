@@ -9,6 +9,7 @@ import XCTest
 /// et qu'elle n'a rien poussé dehors. Mesures faites sur les `frame`
 /// d'accessibilité, jamais sur des captures — en paysage le simulateur rend
 /// une image tournée dans un cadre resté portrait (piège documenté).
+@MainActor
 final class CoachExplanationUITests: XCTestCase {
 
     /// Mat du berger : la partie complète la plus courte qui contienne une

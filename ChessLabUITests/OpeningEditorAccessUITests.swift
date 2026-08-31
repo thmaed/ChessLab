@@ -5,6 +5,7 @@ import XCTest
 ///
 /// L'utilisateur ne trouvait pas l'éditeur. Ce test répond sur pièces plutôt
 /// que par une description du chemin.
+@MainActor
 final class OpeningEditorAccessUITests: XCTestCase {
 
     @MainActor

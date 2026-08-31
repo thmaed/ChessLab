@@ -6,6 +6,7 @@ import XCTest
 ///
 /// Ils s'appuient sur ``LayoutProbe`` : uniquement des `frame`
 /// d'accessibilité, jamais des captures d'écran.
+@MainActor
 final class LayoutOverflowUITests: XCTestCase {
 
     override func setUpWithError() throws {

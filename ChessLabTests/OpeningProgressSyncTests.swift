@@ -65,8 +65,8 @@ struct OpeningProgressSyncTests {
         insertLog(context, rating: .again, at: t1)
         insertLog(context, rating: .good, at: t2)
         // Les deux enregistrements dupliqués laissés par CloudKit (pas d'unicité).
-        insertProgress(context, reps: 2, lastReview: t2) // A
-        insertProgress(context, reps: 1, lastReview: t1) // B
+        _ = insertProgress(context, reps: 2, lastReview: t2) // A
+        _ = insertProgress(context, reps: 1, lastReview: t1) // B
         try context.save()
 
         OpeningProgressSync.reconcile(in: context)
@@ -96,7 +96,7 @@ struct OpeningProgressSyncTests {
         let context = try makeContext()
         insertLog(context, rating: .good, at: base)
         insertLog(context, rating: .good, at: base.addingTimeInterval(day))
-        insertProgress(context, reps: 1, lastReview: base) // volontairement en retard
+        _ = insertProgress(context, reps: 1, lastReview: base) // volontairement en retard
         try context.save()
 
         OpeningProgressSync.reconcile(in: context)

@@ -2,6 +2,7 @@ import XCTest
 
 /// Roi de la colline / Trois échecs / Horde (Fairy-Stockfish, lot A) — le
 /// hub affiche les trois tuiles, et une partie se lance et se joue.
+@MainActor
 final class FairyVariantUITests: XCTestCase {
 
     override func setUpWithError() throws {

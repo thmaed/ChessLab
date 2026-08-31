@@ -12,6 +12,7 @@ import XCTest
 ///
 /// Aucun test ne pouvait l'attraper : `tap()` de XCUITest est au pixel près.
 /// Il faut donc simuler le tremblement à la main.
+@MainActor
 final class TapToMoveUITests: XCTestCase {
 
     override func setUpWithError() throws {
@@ -84,6 +85,7 @@ final class TapToMoveUITests: XCTestCase {
 /// Invisible sur un déplacement vers une case VIDE, d'où le « des fois ».
 /// Invisible aussi en mode deux joueurs, où `draggableColor` est `nil` et où
 /// toutes les pièces sont donc déplaçables — le test doit passer par « Jouer ».
+@MainActor
 final class TapToCaptureUITests: XCTestCase {
 
     override func setUpWithError() throws {

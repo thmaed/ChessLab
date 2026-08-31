@@ -225,6 +225,11 @@ final class VariantAnalysisViewModel {
             await self.engine.send(.go(movetime: Self.analysisBudgetMs))
 
             let search = await EngineWatchdog.run(deadlineMs: Self.analysisBudgetMs + EngineWatchdog.graceMs) { [engine = self.engine] in
+                // Capture de MAINTIEN, pas une survivance : quand le garde-fou
+                // abandonne cette branche, elle survit au view model — seul `engine`
+                // garde alors l'acteur (et le flux qu'on lit) en vie jusqu'à la
+                // vraie fin de la lecture. L'usage EST la capture :
+                _ = engine
                 var lanByRank: [Int: String] = [:]
                 var scoreByRank: [Int: Double] = [:]
                 var bestCp: Int?
@@ -466,6 +471,7 @@ final class VariantAnalysisViewModel {
         let outcome = await EngineWatchdog.run(
             deadlineMs: DevicePerformance.classificationCapMs + EngineWatchdog.graceMs
         ) { [engine = self.engine] in
+            _ = engine  // capture de MAINTIEN — voir le premier garde-fou du fichier
             var lanByRank: [Int: String] = [:]
             var scoreByRank: [Int: Double] = [:]
             var mateByRank: [Int: Int] = [:]

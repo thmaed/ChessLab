@@ -11,6 +11,7 @@ import XCTest
 /// Plus / Pro Max passent en `horizontalSizeClass == .regular` en paysage »
 /// conditionne tout le diagnostic du Lot 1, elle ne peut pas rester une
 /// croyance.
+@MainActor
 final class LayoutTraitsUITests: XCTestCase {
 
     override func setUpWithError() throws {

@@ -1,5 +1,6 @@
 import XCTest
 
+@MainActor
 final class ChessLabUITests: XCTestCase {
 
     override func setUpWithError() throws {

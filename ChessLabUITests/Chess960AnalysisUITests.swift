@@ -6,6 +6,7 @@ import XCTest
 /// « Analyser » du bilan de fin de partie, arrivée sur l'écran d'analyse
 /// Chess960 avec la partie effectivement rejouée (au moins le coup joué
 /// avant l'abandon).
+@MainActor
 final class Chess960AnalysisUITests: XCTestCase {
 
     override func setUpWithError() throws {

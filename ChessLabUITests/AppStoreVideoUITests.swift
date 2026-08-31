@@ -8,6 +8,7 @@ import XCTest
 /// piloter l'app pendant que ça tourne. Pas un test de régression : lancé
 /// à la demande, jamais dans la suite verte habituelle. Même discipline de
 /// navigation tolérante/bornée que ``AppStoreScreenshotUITests``.
+@MainActor
 final class AppStoreVideoUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false

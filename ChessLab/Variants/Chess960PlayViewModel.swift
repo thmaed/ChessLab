@@ -402,6 +402,11 @@ final class Chess960PlayViewModel {
         }
 
         let search = await EngineWatchdog.run(deadlineMs: budgetMs) { [engine] in
+            // Capture de MAINTIEN, pas une survivance : quand le garde-fou
+            // abandonne cette branche, elle survit au view model — seul `engine`
+            // garde alors l'acteur (et le flux qu'on lit) en vie jusqu'à la
+            // vraie fin de la lecture. L'usage EST la capture :
+            _ = engine
             var bestLAN: String?
             var cp: Int?
             var mate: Int?
@@ -491,6 +496,7 @@ final class Chess960PlayViewModel {
         await engine.send(.go(movetime: 220))
 
         let search = await EngineWatchdog.run(deadlineMs: 220 + EngineWatchdog.graceMs) { [engine] in
+            _ = engine  // capture de MAINTIEN — voir le premier garde-fou du fichier
             var cp: Int?
             var mate: Int?
             for await response in responses {
@@ -592,6 +598,7 @@ final class Chess960PlayViewModel {
         await engine.send(.go(movetime: Self.hintBudgetMs))
 
         let search = await EngineWatchdog.run(deadlineMs: Self.hintBudgetMs + EngineWatchdog.graceMs) { [engine] in
+            _ = engine  // capture de MAINTIEN — voir le premier garde-fou du fichier
             var lanByRank: [Int: String] = [:]
             var scoreByRank: [Int: Double] = [:]
             for await response in responses {
@@ -678,6 +685,7 @@ final class Chess960PlayViewModel {
 
         let outcome = await EngineWatchdog.run(deadlineMs: 300 + EngineWatchdog.graceMs) {
             [engine] () -> (cp: Int, mate: Int?)? in
+            _ = engine  // capture de MAINTIEN — voir le premier garde-fou du fichier
             var cp: Int?
             var mate: Int?
             for await response in responses {

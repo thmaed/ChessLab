@@ -4,6 +4,7 @@ import XCTest
 /// sur plusieurs coups, l'abandonne, ouvre l'analyse et dépose une capture
 /// dans `/tmp/cl-courbe/`. Sert à juger la courbe d'évaluation avec de la
 /// matière — deux demi-coups ne disent rien de son allure.
+@MainActor
 final class VariantAnalysisCurveCaptureUITests: XCTestCase {
 
     override func setUpWithError() throws { continueAfterFailure = false }

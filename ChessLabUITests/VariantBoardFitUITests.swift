@@ -39,6 +39,7 @@ import XCTest
 /// précis. C'est déjà ce qui manquait : le défaut a été trouvé à l'œil, et
 /// aucun test ne l'aurait signalé, ``LayoutProbe`` ne sachant alors mesurer
 /// que les débordements de LARGEUR.
+@MainActor
 final class VariantBoardFitUITests: XCTestCase {
 
     override func setUpWithError() throws {
@@ -46,7 +47,12 @@ final class VariantBoardFitUITests: XCTestCase {
     }
 
     override func tearDown() {
-        XCUIDevice.shared.orientation = .portrait
+        // `tearDown()` reste non-isolé (signature héritée d'XCTestCase),
+        // mais XCTest l'exécute sur le fil principal : l'affirmation est
+        // sûre, et remettre l'orientation ne mérite pas une version async.
+        MainActor.assumeIsolated {
+            XCUIDevice.shared.orientation = .portrait
+        }
         super.tearDown()
     }
 

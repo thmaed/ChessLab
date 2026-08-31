@@ -11,6 +11,7 @@ import XCTest
 /// deux iPad Pro (relevé du 14/08, consigné en « question ouverte » dans
 /// `PROGRESS.md`), sans qu'on sache s'il s'agissait d'un vrai défaut ou d'un
 /// artefact de test.
+@MainActor
 final class PromotionUITests: XCTestCase {
 
     /// Pion blanc en a7, deux rois : la promotion est le seul coup intéressant,

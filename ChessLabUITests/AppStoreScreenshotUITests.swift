@@ -11,6 +11,7 @@ import XCTest
 /// idiome, la capture continue sans faire échouer le test.
 ///
 /// Écrit sur le disque hôte sous `/tmp/cl-appstore-screenshots/<idiom>/<langue>/`.
+@MainActor
 final class AppStoreScreenshotUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false

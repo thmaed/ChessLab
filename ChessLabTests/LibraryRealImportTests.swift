@@ -79,7 +79,7 @@ struct LibraryRealImportTests {
     /// contient précisément deux (Prangins, 15/11/2025).
     @Test func twoGamesSameDayAreNotConfused() throws {
         let context = try makeContext()
-        GameLibraryService.importPGNCollection(text: pgn, in: context)
+        _ = GameLibraryService.importPGNCollection(text: pgn, in: context)
         let stored = try context.fetch(FetchDescriptor<GameRecord>())
         let prangins = stored.filter { $0.whiteName?.contains("Gauthey") == true }
         #expect(prangins.count >= 3, "les parties de Gauthey avec les Blancs doivent toutes être là")
@@ -89,7 +89,7 @@ struct LibraryRealImportTests {
     /// comportement demandé, il doit valoir sur un fichier réel.
     @Test func reimportingTheSameFileAddsNothing() throws {
         let context = try makeContext()
-        GameLibraryService.importPGNCollection(text: pgn, in: context)
+        _ = GameLibraryService.importPGNCollection(text: pgn, in: context)
         let again = GameLibraryService.importPGNCollection(text: pgn, in: context)
 
         #expect(again.imported == 0)

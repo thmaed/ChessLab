@@ -16,6 +16,7 @@ import XCTest
 /// Le rythme est fait de pauses FIXES : une preview se REGARDE. La fenêtre
 /// 15-30 s exigée par Apple est découpée au post-traitement
 /// (`tools/appstore-preview/make_preview.swift`).
+@MainActor
 final class AppStorePreviewTourUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false

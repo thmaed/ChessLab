@@ -20,6 +20,7 @@ import XCTest
 ///
 /// `tap()` de XCUITest étant au pixel près, il faut simuler la dérive à la
 /// main — comme le fait déjà `TapToMoveUITests` pour la case de départ.
+@MainActor
 final class TapPrecisionUITests: XCTestCase {
 
     override func setUpWithError() throws {

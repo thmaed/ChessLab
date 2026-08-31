@@ -13,6 +13,7 @@ import XCTest
 ///
 /// Les mesures sont imprimées même quand le test passe — c'est la marge réelle
 /// qui documente, pas le verdict.
+@MainActor
 final class IPadSheetSizingUITests: XCTestCase {
 
     override func setUpWithError() throws {

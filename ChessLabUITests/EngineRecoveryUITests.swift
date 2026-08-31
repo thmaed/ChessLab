@@ -10,6 +10,7 @@ import XCTest
 /// `<n> = 1` fait échouer le PREMIER démarrage seulement : c'est ce qui rend
 /// la reprise observable — la bannière apparaît, « Réessayer » réussit, la
 /// partie repart. Un échec permanent n'aurait prouvé que l'affichage.
+@MainActor
 final class EngineRecoveryUITests: XCTestCase {
 
     override func setUpWithError() throws {

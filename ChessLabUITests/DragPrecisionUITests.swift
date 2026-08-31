@@ -10,6 +10,7 @@ import XCTest
 /// Tous les points de relâchement sont calculés à partir de la **taille de
 /// case mesurée** (`frame.height` d'une case), jamais en points en dur : le
 /// plateau n'a pas la même taille sur iPhone, iPad et Mac.
+@MainActor
 final class DragPrecisionUITests: XCTestCase {
 
     override func setUpWithError() throws {

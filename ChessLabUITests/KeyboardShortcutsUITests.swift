@@ -20,6 +20,7 @@ import XCTest
 /// Il assère maintenant le **comportement** plutôt que le chrome : après deux
 /// ←, le plateau doit être revenu à la position de départ. Une refonte
 /// d'habillage ne le cassera plus ; une flèche qui cesse de naviguer, si.
+@MainActor
 final class KeyboardShortcutsUITests: XCTestCase {
 
     override func setUpWithError() throws {

@@ -1,6 +1,7 @@
 import XCTest
 
 /// L'aide doit être atteignable depuis les Réglages, et décrire les modules.
+@MainActor
 final class HelpRouteUITests: XCTestCase {
 
     /// Depuis la 1.4, l'aide a aussi un bouton coloré sur l'accueil — c'est le

@@ -10,6 +10,7 @@ import XCTest
 ///
 /// Test déterministe : aucun moteur n'est sollicité avant la position finale,
 /// et la vérification porte sur le contenu du plateau, pas sur un coup joué.
+@MainActor
 final class ScannerFlowUITests: XCTestCase {
 
     override func setUpWithError() throws {

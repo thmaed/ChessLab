@@ -13,6 +13,7 @@ import XCTest
 /// Le test s'appuie sur les `frame` — jamais sur une capture d'écran : en
 /// paysage le simulateur rend l'app tournée à 90° dans un cadre resté
 /// portrait (piège documenté dans `PROGRESS.md`).
+@MainActor
 final class OrientationLockUITests: XCTestCase {
 
     override func setUpWithError() throws {

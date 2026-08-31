@@ -3,6 +3,7 @@ import XCTest
 /// Capture d'écrans du flux d'ouvertures EN ANGLAIS, pour vérifier la
 /// localisation (aucune chaîne française résiduelle) : liste, lecteur au
 /// départ, et fin de ligne (« End of the line »).
+@MainActor
 final class OpeningReaderScreenshotUITests: XCTestCase {
 
     func testOpeningReaderInEnglish() {

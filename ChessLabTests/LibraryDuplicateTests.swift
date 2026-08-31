@@ -115,7 +115,7 @@ struct LibraryDuplicateTests {
             let pgn = scholars
                 .replacingOccurrences(of: "Alice", with: names.0)
                 .replacingOccurrences(of: "Bob", with: names.1)
-            GameLibraryService.importPGNCollection(text: pgn, in: context)
+            _ = GameLibraryService.importPGNCollection(text: pgn, in: context)
         }
         var stored = try context.fetch(FetchDescriptor<GameRecord>())
         #expect(stored.count == 3)
@@ -133,7 +133,7 @@ struct LibraryDuplicateTests {
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let context = ModelContext(container)
-        GameLibraryService.importPGNCollection(text: scholars, in: context)
+        _ = GameLibraryService.importPGNCollection(text: scholars, in: context)
         #expect(GameLibraryService.delete([], in: context) == 0)
         #expect(try context.fetch(FetchDescriptor<GameRecord>()).count == 1)
     }
@@ -144,7 +144,7 @@ struct LibraryDuplicateTests {
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         let context = ModelContext(container)
-        GameLibraryService.importPGNCollection(text: scholars, in: context)
+        _ = GameLibraryService.importPGNCollection(text: scholars, in: context)
 
         let stored = try context.fetch(FetchDescriptor<GameRecord>())
         let record = try #require(stored.first)

@@ -13,6 +13,7 @@ import XCTest
 /// jouer disparaissait aussitôt sous une partie remise à zéro. Aucun test
 /// unitaire ne pouvait le voir : ils appellent le view model directement,
 /// en court-circuitant précisément le chemin où vivait le défaut.
+@MainActor
 final class Chess960SessionUITests: XCTestCase {
 
     override func setUpWithError() throws {

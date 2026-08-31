@@ -50,7 +50,7 @@ struct VariantAnalysisViewModelTests {
         vm.review(toPly: 4)
         #expect(vm.displayedFEN == seed.fenLog[4])
 
-        let last = try? #require(vm.displayedLastMove)
+        let last = vm.displayedLastMove
         #expect(last?.start == Square("b8") && last?.end == Square("c6"))
     }
 

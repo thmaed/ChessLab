@@ -4,6 +4,7 @@ import XCTest
 /// dérouler la meilleure ligne de Stockfish demi-coup par demi-coup, chaque
 /// position proposant le meilleur coup du camp au trait. On pilote le VRAI
 /// chemin de l'app et on lit le marqueur `analysisMoveCount`.
+@MainActor
 final class AnalysisStepThroughUITests: XCTestCase {
 
     override func setUpWithError() throws {

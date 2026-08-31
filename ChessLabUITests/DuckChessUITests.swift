@@ -3,6 +3,7 @@ import XCTest
 /// Duck Chess de bout en bout : la tuile, l'écran de réglages COMMUN aux
 /// variantes, un tour complet en deux temps (déplacer, puis poser le canard),
 /// et la réponse de l'ordinateur.
+@MainActor
 final class DuckChessUITests: XCTestCase {
 
     override func setUpWithError() throws { continueAfterFailure = false }

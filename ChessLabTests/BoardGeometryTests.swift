@@ -263,7 +263,7 @@ struct BoardGeometryTests {
     /// joueur d'en face : son « haut » est le bas de l'écran. Un décalage codé
     /// en dur vers le haut de l'écran lui collerait le fantôme sous la main,
     /// c'est-à-dire précisément le défaut que la levée corrige.
-    @Test func theDragGhostLiftsAwayFromTheHandOnBothSidesOfTheTable() {
+    @Test @MainActor func theDragGhostLiftsAwayFromTheHandOnBothSidesOfTheTable() {
         let upright = ChessBoardView.dragLiftOffset(squareSize: s, rotated: false)
         let rotated = ChessBoardView.dragLiftOffset(squareSize: s, rotated: true)
 

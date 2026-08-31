@@ -4,6 +4,7 @@ import XCTest
 /// affiché, et la feuille « Bilan de la partie » avec le décompte par
 /// joueur — vérifiés sur le parcours réel (partie jouée puis analysée),
 /// pas sur un écran vide.
+@MainActor
 final class AnalysisReviewUITests: XCTestCase {
 
     override func setUpWithError() throws {

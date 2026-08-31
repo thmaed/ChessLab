@@ -5,6 +5,7 @@ import XCTest
 /// L'état thermique est injecté par `-simulateThermalState` : faire chauffer
 /// un simulateur pour de vrai n'est pas une option, et sans injection ce
 /// bandeau ne serait jamais vu avant qu'un utilisateur ne le rencontre.
+@MainActor
 final class ThermalBadgeUITests: XCTestCase {
 
     /// Le bandeau est un élément d'accessibilité COMBINÉ : il apparaît donc

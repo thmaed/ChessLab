@@ -9,6 +9,7 @@ import XCTest
 /// pensée sur un grand iPhone devient vite chargée.
 ///
 /// Il vit à part des tests verts habituels, comme ``AppStoreScreenshotUITests``.
+@MainActor
 final class SmallPhoneTourUITests: XCTestCase {
 
     override func setUpWithError() throws {

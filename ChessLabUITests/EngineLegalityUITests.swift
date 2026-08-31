@@ -4,6 +4,7 @@ import XCTest
 /// — bout en bout : tuile → réglages → partie → un coup joué. Les tuiles
 /// elles-mêmes sont couvertes par ``FairyVariantUITests/
 /// testHubShowsAllSevenVariantTiles()``, qui liste les deux lots ensemble.
+@MainActor
 final class EngineLegalityUITests: XCTestCase {
 
     override func setUpWithError() throws {

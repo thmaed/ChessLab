@@ -8,6 +8,7 @@ import XCTest
 /// Motivation : le relevé du plateau sur iPad Pro 11" a échoué faute de
 /// trouver « Contre l'ordinateur » à l'écran. Plutôt que de contourner par
 /// une navigation plus futée, on mesure ce que voit l'utilisateur.
+@MainActor
 final class IPadEntryPointsUITests: XCTestCase {
 
     private static let modes = [

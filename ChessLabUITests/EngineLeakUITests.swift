@@ -10,6 +10,7 @@ import XCTest
 ///
 /// Le compteur est exposé par un marqueur invisible de l'accueil,
 /// « vivantes/créées » — voir `HomeView.engineInstanceMarker`.
+@MainActor
 final class EngineLeakUITests: XCTestCase {
 
     override func setUpWithError() throws {

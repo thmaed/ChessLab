@@ -6,6 +6,7 @@ import XCTest
 /// La preuve que le MOTEUR arbitre les murs vit dans les tests unitaires
 /// (`BarricadesEngineSpikeTests`, `BarricadesTests`). Ici on vérifie
 /// l'autre moitié : que le joueur les voit, et que la partie se lance.
+@MainActor
 final class BarricadesUITests: XCTestCase {
 
     override func setUpWithError() throws { continueAfterFailure = false }

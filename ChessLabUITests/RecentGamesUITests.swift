@@ -5,6 +5,7 @@ import XCTest
 /// Le parcours attendu par l'utilisateur : jouer une partie, la retrouver sur
 /// l'accueil, et ouvrir son analyse directement — sans passer par
 /// Analyser → Bibliothèque → partie.
+@MainActor
 final class RecentGamesUITests: XCTestCase {
 
     override func setUpWithError() throws {

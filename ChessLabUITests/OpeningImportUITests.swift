@@ -8,6 +8,7 @@ import XCTest
 /// ce qu'aucun d'eux ne voit : que la feuille est atteignable, que la liste se
 /// rafraîchit toute seule après l'import (le magasin est observé), et qu'un
 /// cours importé s'ouvre dans le MÊME lecteur que les cours livrés.
+@MainActor
 final class OpeningImportUITests: XCTestCase {
 
     /// Nom unique : le simulateur garde ses Documents entre deux exécutions.

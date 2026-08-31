@@ -14,6 +14,7 @@ import XCTest
 /// simulateurs iOS 26 ; l'appareil de l'utilisateur est en iOS 18 avec SA
 /// taille de texte. D'où ce test, qui vérifie la seule chose qui compte
 /// vraiment : `isHittable`.
+@MainActor
 final class BoardHitTestUITests: XCTestCase {
 
     override func setUpWithError() throws {

@@ -5,6 +5,7 @@ import XCTest
 /// rafraîchir la reprise. Sans ça, « Reprendre la partie en cours » gardait un
 /// instantané figé : elle rouvrait une partie périmée avec un mauvais nombre
 /// de coups, alors que l'autosave sur disque était pourtant à jour.
+@MainActor
 final class ResumeGameUITests: XCTestCase {
 
     override func setUpWithError() throws {

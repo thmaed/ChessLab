@@ -7,6 +7,7 @@ import XCTest
 /// prouvent le catalogue, celui-ci prouve qu'un doigt y ARRIVE — et que le
 /// lecteur, conçu pour des ouvertures, monte bien un plateau qui part d'une
 /// position arbitraire (quatre pièces, pas trente-deux).
+@MainActor
 final class EndgameModuleUITests: XCTestCase {
 
     override func setUpWithError() throws {

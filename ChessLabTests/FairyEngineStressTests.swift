@@ -28,8 +28,8 @@ struct FairyEngineStressTests {
     }
 
     @Test("La tournée des variantes : neuf redémarrages enchaînés, deux fois")
-    func rapidVariantSwitching() async throws {
-        try await EngineIntegrationGate.shared.withExclusiveAccess {
+    func rapidVariantSwitching() async {
+        await EngineIntegrationGate.shared.withExclusiveAccess {
             let controller = FairyEngineController()
             defer { Task { await controller.stop() } }
 
@@ -90,8 +90,8 @@ struct FairyEngineStressTests {
     }
 
     @Test("Le process passe d'un moteur à l'autre sans délai ni reste, six fois")
-    func rapidEngineHandoff() async throws {
-        try await EngineIntegrationGate.shared.withExclusiveAccess {
+    func rapidEngineHandoff() async {
+        await EngineIntegrationGate.shared.withExclusiveAccess {
             // Le contrat de l'app est UN moteur à la fois : chaque
             // `acquireEngineProcess` exige les DEUX types libres (les shims
             // partagent trop d'état pour cohabiter — constaté, pas supposé).

@@ -6,6 +6,7 @@ import XCTest
 /// Un échange préserve toujours le jeu de pièces ; seules deux règles du
 /// Chess960 peuvent encore se briser en cours de route (roi hors de
 /// l'intervalle des tours, fous de même couleur), d'où ces tests.
+@MainActor
 final class Chess960SetupUITests: XCTestCase {
 
     override func setUpWithError() throws {

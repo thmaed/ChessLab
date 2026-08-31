@@ -2,6 +2,7 @@ import XCTest
 
 /// Captures de revue pour Crazyhouse — outil, pas test de non-régression.
 /// Dépose dans `/tmp/cl-crazyhouse/`.
+@MainActor
 final class CrazyhouseTourUITests: XCTestCase {
 
     @MainActor

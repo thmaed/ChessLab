@@ -12,6 +12,7 @@ import XCTest
 /// La bascule est provoquée par le bouton `toggleSkeleton` (`-skeletonToggle`,
 /// Debug seulement) : les déclencheurs réels ne s'automatisent pas — voir
 /// ``SkeletonOverride`` pour la limite de ce procédé.
+@MainActor
 final class SkeletonSwitchUITests: XCTestCase {
 
     override func setUpWithError() throws {

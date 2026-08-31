@@ -7,6 +7,7 @@ import XCTest
 /// lancement (domaine `NSArgumentDomain` de `UserDefaults`), exactement comme
 /// `-settings.appLanguage` ailleurs dans cette suite. Le premier contrôle du
 /// test est donc aussi celui de l'interrupteur lui-même.
+@MainActor
 final class OpeningsModuleUITests: XCTestCase {
 
     private func launchWithLabs(contentSize: String? = nil) -> XCUIApplication {

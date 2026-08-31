@@ -99,7 +99,7 @@ struct ProgressionSummaryTests {
             engineGame(result: "0-1", userColor: .white, elo: 1500),   // amateur
         ]
         let summary = ProgressionSummary.compute(games: games, puzzles: [])
-        let amateur = try? #require(summary.engineByBand.first { $0.band == .amateur })
+        let amateur = summary.engineByBand.first { $0.band == .amateur }
         #expect(amateur?.wins == 1)
         #expect(amateur?.losses == 1)
         #expect(amateur?.games == 2)
@@ -125,7 +125,7 @@ struct ProgressionSummaryTests {
             puzzle(rating: 1500, successes: 2, failures: 2),   // intermédiaire
         ]
         let summary = ProgressionSummary.compute(games: [], puzzles: puzzles)
-        let beginner = try? #require(summary.puzzlesByTier.first { $0.tier == .beginner })
+        let beginner = summary.puzzlesByTier.first { $0.tier == .beginner }
         #expect(beginner?.attempts == 4)
         #expect(beginner?.successRate == 1.0)
     }
