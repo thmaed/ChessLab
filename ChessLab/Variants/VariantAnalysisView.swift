@@ -79,11 +79,6 @@ struct VariantAnalysisView: View {
     /// du texte. Mesurée plutôt que devinée — voir ``boardBlock(size:)``.
     @State private var navigationBarHeight: CGFloat = 44
 
-    /// Ce qu'on laisse à la liste des coups quoi qu'il arrive. Elle défile,
-    /// mais poussée hors de l'écran elle ne défilerait plus : elle aurait
-    /// disparu.
-    private static let minimumMovesListHeight: CGFloat = 120
-
     /// Ce que la courbe d'évaluation prend à la hauteur — sa hauteur propre
     /// plus l'espacement de la pile. Réservé, jamais deviné : sans cette
     /// ligne, la courbe poussait la liste des coups hors de l'écran sur les
@@ -108,7 +103,7 @@ struct VariantAnalysisView: View {
         let reserved = navigationBarHeight
             + Self.evalCurveHeight
             + Self.accuracyCardHeight
-            + Self.minimumMovesListHeight
+            + VariantMoveStripView.reservedHeight
             + EvalBarView.defaultHeight
             + 28   // les deux espacements de la pile (10 + 10) + celui du bloc (8)
         let side = max(0, min(size.width - 24, size.height - reserved))
@@ -183,81 +178,17 @@ struct VariantAnalysisView: View {
         .accessibilityLabel(label)
     }
 
-    private func rowNumber(forPly ply: Int) -> Int {
-        max(1, (ply + 1) / 2)
-    }
-
+    /// Les coups EN LIGNE — même bande à capsules que le mode Contre
+    /// l'ordinateur, chaque coup remarquable bordé de la couleur de sa
+    /// catégorie d'évaluation. Voir ``VariantMoveStripView``.
     private var movesList: some View {
-        ScrollViewReader { proxy in
-            ScrollView {
-                LazyVGrid(columns: [GridItem(.fixed(28)), GridItem(.flexible()), GridItem(.flexible())], spacing: 6) {
-                    ForEach(viewModel.numberedMoves, id: \.number) { entry in
-                        Text("\(entry.number).")
-                            .foregroundStyle(Theme.textSecondary)
-                        moveButton(entry.white, ply: entry.number * 2 - 1)
-                        if let black = entry.black {
-                            moveButton(black, ply: entry.number * 2)
-                        } else {
-                            Color.clear
-                        }
-                    }
-                }
-                .font(.subheadline.monospacedDigit())
-                .padding(10)
-            }
-            .onChange(of: viewModel.displayedPly) { _, newPly in
-                withAnimation(Theme.gentle) {
-                    proxy.scrollTo(rowNumber(forPly: newPly), anchor: .center)
-                }
-            }
-            .onAppear { proxy.scrollTo(rowNumber(forPly: viewModel.displayedPly), anchor: .center) }
-        }
-        .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    private func moveButton(_ san: String, ply: Int) -> some View {
-        let quality = viewModel.moveQuality[ply].flatMap { $0.showsInMoveList ? $0 : nil }
-        return Button {
+        VariantMoveStripView(
+            numberedMoves: viewModel.numberedMoves,
+            currentPly: viewModel.displayedPly,
+            quality: viewModel.moveQuality
+        ) { ply in
             viewModel.review(toPly: ply)
-        } label: {
-            HStack(spacing: 3) {
-                Text(san)
-                if let quality {
-                    qualityGlyph(quality)
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.vertical, 3)
-            .padding(.horizontal, 6)
-            .background(
-                viewModel.displayedPly == ply ? Theme.accent.opacity(0.22) : Color.clear,
-                in: RoundedRectangle(cornerRadius: 6, style: .continuous)
-            )
-            .foregroundStyle(Theme.textPrimary)
         }
-        .buttonStyle(.plain)
-    }
-
-    @ViewBuilder
-    private func qualityGlyph(_ quality: MoveQuality) -> some View {
-        // `.accessibilityLabel` explicite : sans lui, VoiceOver lit soit le
-        // texte brut du glyphe ("!!"), soit le nom du symbole SF ("star
-        // fill") — ni l'un ni l'autre ne dit « coup brillant »/« le
-        // meilleur ». Même patron que ``MoveQualityBadgeView`` (la pastille
-        // posée sur le plateau), qui l'a déjà.
-        Group {
-            switch quality.icon {
-            case let .text(text):
-                Text(text)
-                    .font(.caption2.weight(.heavy))
-                    .foregroundStyle(quality.tint)
-            case let .symbol(name):
-                Image(systemName: name)
-                    .font(.system(size: 9, weight: .bold))
-                    .foregroundStyle(quality.tint)
-            }
-        }
-        .accessibilityLabel(Text(quality.label))
     }
 
     private var totalPliesMarker: some View {
