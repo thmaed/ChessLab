@@ -447,8 +447,16 @@ struct HomeView: View {
     }
 
     /// Tableau de bord d'accueil (colonne de détail, aucune sélection) :
-    /// reprise, progression, parties récentes — borné en largeur pour rester
+    /// modes, progression, parties récentes — borné en largeur pour rester
     /// lisible sur un très grand écran.
+    ///
+    /// La grille des modes DOUBLE la barre latérale, et c'est voulu : sans
+    /// elle, une installation neuve (Mac surtout) montrait un logo et une
+    /// carte de progression vide flottant dans une fenêtre noire — la barre
+    /// latérale liste, elle n'accueille pas. Le patron est celui des apps
+    /// système (App Store, Musique) : barre latérale pour naviguer, panneau
+    /// pour lancer. Trois colonnes au plus dans les 680 pt (tuiles
+    /// ``ModeGridMetrics/minTileRegular``, libellés longs).
     private var iPadDashboard: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
@@ -457,6 +465,7 @@ struct HomeView: View {
                 if seedingState.isSeeding { seedingBanner }
                 // La reprise vit désormais en HAUT de la barre latérale
                 // (persistante) — voir `sidebar` — pour ne pas doublonner ici.
+                modesSection(minTile: ModeGridMetrics.minTileRegular, shortSubtitles: true)
                 homeProgressCard
                 if !recentGames.isEmpty { recentGamesSection }
             }
@@ -1013,35 +1022,35 @@ struct HomeView: View {
     /// `minTile` : largeur mini d'une tuile, qui décide du nombre de colonnes
     /// — voir ``ModeGridMetrics/minTileIPhone`` pour le choix de la valeur et
     /// ce qu'elle garantit sur un écran de 320 pt.
-    private func modesSection(minTile: CGFloat) -> some View {
+    private func modesSection(minTile: CGFloat, shortSubtitles: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Modes")
             LazyVGrid(
                 columns: [GridItem(.adaptive(minimum: minTile), spacing: ModeGridMetrics.spacing)],
                 spacing: ModeGridMetrics.spacing
             ) {
-                ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Force, cadence, aides", shortSubtitle: "Force et cadence", systemImage: "cpu", tint: Theme.accent, isEnabled: true) {
+                ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Force, cadence, aides", shortSubtitle: "Force et cadence", systemImage: "cpu", tint: Theme.accent, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.newGame)
                 }
-                ModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", subtitle: "Sur le même appareil", shortSubtitle: "Même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true) {
+                ModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", subtitle: "Sur le même appareil", shortSubtitle: "Même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.twoPlayerSetup)
                 }
-                ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", shortSubtitle: "Tactique et Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true) {
+                ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", shortSubtitle: "Tactique et Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.puzzleQueue)
                 }
-                ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings") {
+                ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings", prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.openingList)
                 }
-                ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", shortSubtitle: "Fins gagnantes", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames") {
+                ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", shortSubtitle: "Fins gagnantes", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames", prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.endgameList)
                 }
-                ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", shortSubtitle: "PGN, FEN", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true) {
+                ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", shortSubtitle: "PGN, FEN", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.analysisEntry)
                 }
-                ModeCard(title: "Laboratoire", subtitle: "L'ordinateur contre lui-même", shortSubtitle: "Face à lui-même", systemImage: "flask", tint: Theme.rose, isEnabled: true) {
+                ModeCard(title: "Laboratoire", subtitle: "L'ordinateur contre lui-même", shortSubtitle: "Face à lui-même", systemImage: "flask", tint: Theme.rose, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.labSetup(startFEN: nil))
                 }
-                ModeCard(title: "Variantes", subtitle: "Chess960 et autres façons de jouer", shortSubtitle: "Chess960 et plus", systemImage: "die.face.5.fill", tint: Theme.violet, isEnabled: true, accessibilityID: "mode_variants") {
+                ModeCard(title: "Variantes", subtitle: "Chess960 et autres façons de jouer", shortSubtitle: "Chess960 et plus", systemImage: "die.face.5.fill", tint: Theme.violet, isEnabled: true, accessibilityID: "mode_variants", prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.variantsHub)
                 }
             }
@@ -2006,6 +2015,12 @@ struct ModeCard: View {
     var tint: Color = Theme.accent
     let isEnabled: Bool
     var accessibilityID: String? = nil
+    /// Le tableau de bord iPad/Mac borne sa colonne à 680 pt : trois tuiles
+    /// y sont PLUS ÉTROITES que sur l'accueil iPhone à deux colonnes, et les
+    /// sous-titres longs de la classe régulière y finissaient en points de
+    /// suspension. Il demande donc les accroches courtes, sans toucher aux
+    /// titres — qui, eux, tiennent.
+    var prefersShortSubtitle = false
     let action: () -> Void
 
     /// Sur iPad (classe régulière), la tuile grandit avec la grille à 3
@@ -2018,7 +2033,11 @@ struct ModeCard: View {
     private var iconSize: CGFloat { isRegular ? 58 : 48 }
     private var ghostIconSize: CGFloat { isRegular ? 118 : 96 }
     private var displayedTitle: LocalizedStringKey { isRegular ? title : (shortTitle ?? title) }
-    private var displayedSubtitle: LocalizedStringKey { isRegular ? (subtitle ?? "Bientôt") : (shortSubtitle ?? subtitle ?? "Bientôt") }
+    private var displayedSubtitle: LocalizedStringKey {
+        isRegular && !prefersShortSubtitle
+            ? (subtitle ?? "Bientôt")
+            : (shortSubtitle ?? subtitle ?? "Bientôt")
+    }
 
     /// L'icône « fantôme » du fond : la même forme, en très pâle, débordant
     /// dans le coin. Le dessin maison n'a pas de couleur unique — on n'en
