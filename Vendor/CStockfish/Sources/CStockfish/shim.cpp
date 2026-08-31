@@ -35,7 +35,29 @@
 /// est global au shim et vit aussi longtemps que le process.
 std::istream* chesslab_sf_stdin = nullptr;
 
+#include <cstdio>
+#include <sys/time.h>
+
 namespace {
+
+/// Journal de bord du cycle de vie — l'arme du diagnostic « moteur ARRÊTÉ
+/// entre le démarrage et l'interrogation » (31/08, deux occurrences à la
+/// même signature). Toute transition start/stop/fil est horodatée dans
+/// /tmp/cl-shim.log : à la prochaine occurrence, la chronologie dira QUI a
+/// arrêté le moteur, et quand. Simulateur seulement (le sandbox iOS réel
+/// n'a pas /tmp hôte) ; coût négligeable, fichier ouvert/fermé par ligne.
+void shimTrace(const char *what, unsigned long long gen, unsigned long long done, int running) {
+    static std::mutex traceMutex;
+    std::lock_guard<std::mutex> guard(traceMutex);
+    if (FILE *f = fopen("/tmp/cl-shim.log", "a")) {
+        struct timeval tv;
+        gettimeofday(&tv, nullptr);
+        fprintf(f, "%ld.%03d %s %s gen=%llu done=%llu running=%d\n",
+                (long)tv.tv_sec, (int)(tv.tv_usec / 1000), "sf", what, gen, done, running);
+        fclose(f);
+    }
+}
+
 
 /// Flux d'ENTRÉE bloquant : sert à Stockfish les commandes ligne par ligne,
 /// en attendant qu'elles arrivent. Chaque commande poussée porte déjà son
@@ -164,23 +186,27 @@ int cstockfish_start(const char *binaryPath,
                      cstockfish_output_callback callback,
                      void *context) {
     std::lock_guard<std::mutex> lock(gLifecycleMutex);
+    if (gRunning) {
+        // Le process est DÉJÀ pris. On le dit à l'appelant au lieu de sortir
+        // en silence : reconfigurer `gOutput` ici détournerait la sortie du
+        // propriétaire actuel vers le nouveau venu, ce qui est pire.
+        shimTrace("start REFUS deja-pris", gThreadGeneration.load(), gDoneGeneration.load(), 1);
+        return -1;
+    }
     if (gThreadGeneration.load() != gDoneGeneration.load()) {
-        // Le fil moteur PRÉCÉDENT, détaché par un arrêt borné, vit encore :
+        // Personne ne se dit propriétaire (gRunning est faux), et pourtant le
+        // fil moteur PRÉCÉDENT, détaché par un arrêt borné, vit encore :
         // démarrer une seconde boucle UCI du même moteur corromprait leurs
         // états globaux partagés (Threads, options). On refuse — l'app
         // affiche « moteur indisponible » avec « Réessayer », ce qui est
         // exactement vrai, et la voie se libère dès que le fil sourd lit le
         // « quit » resté dans sa file.
-        return -1;
-    }
-    if (gRunning) {
-        // Le process est DÉJÀ pris. On le dit à l'appelant au lieu de sortir
-        // en silence : reconfigurer `gOutput` ici détournerait la sortie du
-        // propriétaire actuel vers le nouveau venu, ce qui est pire.
+        shimTrace("start REFUS zombie-detache", gThreadGeneration.load(), gDoneGeneration.load(), 0);
         return -1;
     }
 
     const uint64_t generation = gThreadGeneration.fetch_add(1) + 1;
+    shimTrace("start OK", generation, gDoneGeneration.load(), 1);
     gOutput.configure(callback, context);
     static std::istream gEngineInput(&gInput);
     chesslab_sf_stdin = &gEngineInput;
@@ -194,6 +220,7 @@ int cstockfish_start(const char *binaryPath,
         char *argv[] = {const_cast<char *>(arg0.c_str())};
         _main(1, argv);
         gDoneGeneration.store(generation);
+        shimTrace("fil SORTI", generation, generation, 0);
     });
     gRunning = true;
     return 0;
@@ -217,6 +244,7 @@ void cstockfish_stop(void) {
     }
     // « quit » fait sortir la boucle UCI de Stockfish, donc le thread se
     // termine proprement.
+    shimTrace("stop ENTREE", gThreadGeneration.load(), gDoneGeneration.load(), gRunning ? 1 : 0);
     gInput.push("quit\n");
     // Join BORNÉ, et ce n'est pas un luxe : `getline(std::cin, …)` lit le
     // tampon COURANT de std::cin, que l'AUTRE shim peut avoir détourné si
@@ -244,11 +272,13 @@ void cstockfish_stop(void) {
     if (gEngineThread.joinable()) {
         if (finished) {
             gEngineThread.join();
+            shimTrace("stop JOINT", generation, gDoneGeneration.load(), 0);
         } else {
             // Fil sourd (voir le commentaire au-dessus) : détaché. L'écart
             // `gThreadGeneration != gDoneGeneration` interdit tout
             // redémarrage tant qu'il vit.
             gEngineThread.detach();
+            shimTrace("stop DETACHE", generation, gDoneGeneration.load(), 0);
         }
     }
     // Restaure les flux d'origine — mais SEULEMENT s'ils sont encore les

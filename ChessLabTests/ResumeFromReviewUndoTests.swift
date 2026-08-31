@@ -136,7 +136,7 @@ struct ResumeFromReviewUndoTests {
             blackRemaining: nil,
             savedAt: Date(timeIntervalSince1970: 0)
         )
-        return try #require(PlayViewModel(resuming: autosave, modelContext: try Self.inMemoryContext()))
+        return try #require(PlayViewModel(resuming: autosave, modelContext: try Self.inMemoryContext(), startsEngine: false))
     }
 
     @Test("Jouer : la reprise agit sans confirmation et reste défaisable")

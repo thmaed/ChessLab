@@ -168,6 +168,18 @@ final class PlayViewModel {
     /// en cours, jamais pendant. Toute opération enfilée ensuite trouve
     /// `engine == nil` et devient un no-op — aucun besoin moteur ne
     /// subsiste une fois `outcome` posé.
+    /// Filet de sécurité : un view model libéré SANS être passé par la fin
+    /// de partie ni la sortie d'écran (abandon de navigation, test) ne doit
+    /// pas laisser Stockfish tourner — le process est UNIQUE, et un moteur
+    /// abandonné est resté pris ~280 s en suite de tests complète, affamant
+    /// tous les tests Fairy de la fenêtre (voir `startsEngine` à l'init).
+    /// `releaseEngine()` ayant déjà mis `engine` à nil dans les parcours
+    /// normaux, ce chemin n'y ajoute rien.
+    isolated deinit {
+        guard let engine else { return }
+        Task { await engine.stop() }
+    }
+
     private func releaseEngine() {
         guard let engine else { return }
         // `engine` mis à nil TOUT DE SUITE : aucune opération enfilée ensuite
@@ -186,7 +198,14 @@ final class PlayViewModel {
     // MARK: Initialisation
 
     /// Démarre une nouvelle partie avec les réglages fournis.
-    init(settings: PlayGameSettings, modelContext: ModelContext) {
+    ///
+    /// - parameter startsEngine: `false` réservé aux tests de logique pure
+    ///   (export PGN, mise en page, reprise) : construire ce view model
+    ///   démarre sinon le VRAI Stockfish — un processus unique pour toute la
+    ///   suite de tests, que personne n'arrête avant la libération de l'écran.
+    ///   Un moteur ainsi abandonné est resté pris ~280 s en suite complète et
+    ///   affamait les tests Fairy, qui exigent les DEUX moteurs libres.
+    init(settings: PlayGameSettings, modelContext: ModelContext, startsEngine: Bool = true) {
         self.settings = settings
         self.modelContext = modelContext
         let startPosition = settings.startingPosition
@@ -222,11 +241,15 @@ final class PlayViewModel {
         // maintenant là où il a du sens : l'intention explicite de démarrer
         // une nouvelle partie (voir ``HomeView/startNewGame(_:)``).
         wireClock()
-        enqueueEngineWork { await self.setupEngine() }
+        if startsEngine {
+            enqueueEngineWork { await self.setupEngine() }
+        }
     }
 
     /// Reprend une partie sauvegardée.
-    init?(resuming autosave: PlayGameAutosave, modelContext: ModelContext) {
+    ///
+    /// - parameter startsEngine: voir ``init(settings:modelContext:startsEngine:)``.
+    init?(resuming autosave: PlayGameAutosave, modelContext: ModelContext, startsEngine: Bool = true) {
         guard let resolvedColor = Piece.Color(rawValue: autosave.resolvedUserColorRaw) else {
             return nil
         }
@@ -271,9 +294,11 @@ final class PlayViewModel {
             clock?.startTurn(for: board.position.sideToMove)
         }
 
-        enqueueEngineWork { await self.setupEngine() }
-        if outcome == nil, board.position.sideToMove == engineColor {
-            enqueueEngineWork { await self.requestEngineMove() }
+        if startsEngine {
+            enqueueEngineWork { await self.setupEngine() }
+            if outcome == nil, board.position.sideToMove == engineColor {
+                enqueueEngineWork { await self.requestEngineMove() }
+            }
         }
     }
 

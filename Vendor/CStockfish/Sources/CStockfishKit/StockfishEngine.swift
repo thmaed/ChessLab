@@ -52,6 +52,23 @@ public final class StockfishEngine: @unchecked Sendable {
             }, context)
         }
         didStart = (code == 0)
+        #if DEBUG
+        // Journal de DIAGNOSTIC (compagnon Swift de /tmp/cl-shim.log, tenu
+        // par shim.cpp) : la pile de l'appelant de chaque démarrage réussi.
+        // C'est lui qui a nommé le « moteur fantôme de 280 s » du 31/08 — un
+        // PlayViewModel construit par une suite de tests logiques, dont
+        // l'init démarrait le vrai moteur. Quand un moteur semble tenu trop
+        // longtemps, la question n'est jamais « qui échoue ? » mais « qui l'a
+        // démarré ? » : ce fichier y répond sans instrumentation nouvelle.
+        if didStart, let f = FileHandle(forWritingAtPath: "/tmp/cl-shim-caller.log")
+            ?? (FileManager.default.createFile(atPath: "/tmp/cl-shim-caller.log", contents: nil)
+                ? FileHandle(forWritingAtPath: "/tmp/cl-shim-caller.log") : nil) {
+            f.seekToEndOfFile()
+            let stack = Thread.callStackSymbols.dropFirst(2).prefix(14).joined(separator: "\n")
+            f.write("==== sf start @\(Date().timeIntervalSince1970)\n\(stack)\n".data(using: .utf8)!)
+            f.closeFile()
+        }
+        #endif
         return didStart
     }
 

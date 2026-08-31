@@ -173,7 +173,7 @@ struct BugFixes1407Tests {
         var settings = PlayGameSettings.default
         settings.startFEN = "r1bqkbnr/pppp1Qpp/2n5/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4"
 
-        let viewModel = PlayViewModel(settings: settings, modelContext: try Self.inMemoryContext())
+        let viewModel = PlayViewModel(settings: settings, modelContext: try Self.inMemoryContext(), startsEngine: false)
 
         let outcome = try #require(viewModel.outcome)
         #expect(outcome.reason == .checkmate)

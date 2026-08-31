@@ -134,7 +134,7 @@ final class PlayControlBarLayoutTests: XCTestCase {
             for: GameRecord.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
-        let viewModel = PlayViewModel(settings: PlayGameSettings(), modelContext: ModelContext(container))
+        let viewModel = PlayViewModel(settings: PlayGameSettings(), modelContext: ModelContext(container), startsEngine: false)
         let screen = Self.zoomedWidth
         let host = UIHostingController(
             rootView: PlayView(viewModel: viewModel, onExit: {}, onAnalyze: { _ in })

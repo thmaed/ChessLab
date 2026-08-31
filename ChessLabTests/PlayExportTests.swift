@@ -19,7 +19,7 @@ struct PlayExportTests {
             for: GameRecord.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
-        return PlayViewModel(settings: PlayGameSettings(), modelContext: ModelContext(container))
+        return PlayViewModel(settings: PlayGameSettings(), modelContext: ModelContext(container), startsEngine: false)
     }
 
     @Test func fenOfTheStartingPositionIsStandard() throws {
