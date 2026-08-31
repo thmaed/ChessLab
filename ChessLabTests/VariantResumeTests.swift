@@ -39,6 +39,15 @@ struct VariantResumeTests {
                 try await Task.sleep(for: .milliseconds(200))
             }
         }
+        // Attendre la FIN du tour machine, pas seulement son coup : sous
+        // charge, `isEngineThinking` peut rester vrai un instant après le
+        // coup (redéploiement des murs, indices), et `canResumeFromReview`
+        // est alors LÉGITIMEMENT faux — le test se faisait échouer tout
+        // seul en consultant trop tôt (vu le 31/08 sur randombarricades).
+        let calm = Date().addingTimeInterval(10)
+        while Date() < calm, vm.isEngineThinking {
+            try await Task.sleep(for: .milliseconds(200))
+        }
         return vm
     }
 
