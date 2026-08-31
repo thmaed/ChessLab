@@ -619,7 +619,8 @@ final class EngineLegalityPlayViewModel {
             query = await engine.queryPosition(startFEN: chainFEN, uciLog: chainMoves)
         }
         guard let query else {
-            declareEngineUnavailable("position jamais rendue (deux essais de queryPosition)")
+            let detail = await engine.lastQueryDiagnostic ?? "aucun diagnostic"
+            declareEngineUnavailable("position jamais rendue (deux essais) — \(detail)")
             return
         }
         currentFEN = query.fen
@@ -692,7 +693,8 @@ final class EngineLegalityPlayViewModel {
         // `customDefinitionPath` n'est renseigné que pour les variantes que le
         // moteur ne connaît pas d'origine — les deux Barricades aujourd'hui.
         guard await engine.start(variant: variant.id, variantPath: variant.customDefinitionPath) else {
-            declareEngineUnavailable("démarrage refusé (acquisition du process, ou uciok jamais reçu)")
+            let detail = await engine.lastStartFailure ?? "phase inconnue"
+            declareEngineUnavailable("démarrage refusé — \(detail)")
             return
         }
         // Un démarrage qui aboutit EFFACE le bandeau d'un échec passé : il ne

@@ -127,6 +127,18 @@ actor FairyEngineController {
     private var rawCapturing = false
     private var rawLineBuffer: [String] = []
 
+    /// Ce que la DERNIÈRE interrogation de position a réellement vu — pour
+    /// que l'intermittent « position jamais rendue » (un test au hasard, en
+    /// suite complète uniquement, ~1 passe sur 3) se NOMME à sa prochaine
+    /// occurrence au lieu de rester une énigme : quelle commande est restée
+    /// muette, combien de lignes sont quand même arrivées, et si la tâche
+    /// d'attente avait été annulée sous elle.
+    private(set) var lastQueryDiagnostic: String?
+
+    /// Pourquoi le dernier `start(variant:)` a échoué — la phase précise :
+    /// l'acquisition du process, ou l'attente d'`uciok`.
+    private(set) var lastStartFailure: String?
+
     /// Envoie une commande UCI brute et récolte les lignes reçues jusqu'à ce
     /// qu'une corresponde à `terminator` (incluse), borné à `timeoutMs`.
     /// Un seul appelant à la fois — pas de garde de réentrance : les
@@ -258,12 +270,24 @@ actor FairyEngineController {
         engine.send(positionCmd)
 
         let dLines = await captureRawLines(sending: "d", until: { $0.hasPrefix("Checkers:") })
-        guard let fenLine = dLines.first(where: { $0.hasPrefix("Fen: ") }) else { return nil }
+        guard let fenLine = dLines.first(where: { $0.hasPrefix("Fen: ") }) else {
+            lastQueryDiagnostic = "`d` muet : \(dLines.count) ligne(s) reçue(s) sans « Fen: », "
+                + "moteur \(engine.isRunning ? "vivant" : "ARRÊTÉ"), "
+                + "tâche \(Task.isCancelled ? "ANNULÉE" : "vivante")"
+            return nil
+        }
         let fen = String(fenLine.dropFirst("Fen: ".count))
         let inCheck = dLines.first(where: { $0.hasPrefix("Checkers:") })
             .map { $0.trimmingCharacters(in: .whitespaces) != "Checkers:" } ?? false
 
         let perftLines = await captureRawLines(sending: "go perft 1", until: { $0.hasPrefix("Nodes searched") })
+        if !perftLines.contains(where: { $0.hasPrefix("Nodes searched") }) {
+            lastQueryDiagnostic = "`go perft 1` muet : \(perftLines.count) ligne(s) sans résumé, "
+                + "moteur \(engine.isRunning ? "vivant" : "ARRÊTÉ"), "
+                + "tâche \(Task.isCancelled ? "ANNULÉE" : "vivante")"
+        } else {
+            lastQueryDiagnostic = nil
+        }
         let legalMoves = perftLines.compactMap { line -> String? in
             guard let colonIndex = line.firstIndex(of: ":") else { return nil }
             let move = String(line[line.startIndex..<colonIndex])
@@ -348,6 +372,9 @@ actor FairyEngineController {
             engine = FairyStockfishEngine()
             guard await acquireEngineProcess() else {
                 didFailToStart = true
+                lastStartFailure = "acquisition du process refusée (8 s) — "
+                    + "Stockfish occupé : \(StockfishEngine.isProcessBusy), "
+                    + "Fairy occupé : \(FairyStockfishEngine.isProcessBusy)"
                 return false
             }
         }
@@ -358,6 +385,8 @@ actor FairyEngineController {
         while !uciOk {
             if iterationsLeft <= 0 {
                 didFailToStart = true
+                lastStartFailure = "uciok jamais reçu (\(startTimeoutMs) ms) — moteur "
+                    + (engine.isRunning ? "vivant" : "ARRÊTÉ")
                 return false
             }
             iterationsLeft -= 1
@@ -377,6 +406,7 @@ actor FairyEngineController {
         await sendRaw(.setoption(id: "UCI_Variant", value: variant))
         await sendRaw(.ucinewgame)
         didFailToStart = false
+        lastStartFailure = nil
         return true
     }
 
