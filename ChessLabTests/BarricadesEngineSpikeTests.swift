@@ -76,7 +76,11 @@ struct BarricadesEngineSpikeTests {
         if !started {
             started = await engine.start(variant: "barricades", variantPath: path)
         }
-        try #require(started, "le moteur n'a pas démarré sur la variante, même au second essai")
+        if !started {
+            let phase = await engine.lastStartFailure ?? "phase inconnue"
+            Issue.record("le moteur n'a pas démarré sur la variante, même au second essai — \(phase)")
+        }
+        try #require(started)
 
         var result = await engine.queryPosition(startFEN: fen, uciLog: moves)
         if result == nil {

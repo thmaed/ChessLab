@@ -188,7 +188,12 @@ void cfairystockfish_stop(void) {
     // shim par-dessus.
     const uint64_t generation = gThreadGeneration.load();
     bool finished = false;
-    for (int i = 0; i < 200; ++i) {
+    // 600 × 10 ms et non 200 : « deux secondes suffisent à tout arrêt
+    // sain » était vrai d'une machine au repos — sous la charge d'une suite
+    // complète (~900 tests), le fil moteur peut rester des secondes sans
+    // tranche CPU, quit déjà en file. Six secondes restent bornées pour
+    // l'utilisateur ; le détachement reste le filet, plus rarement tendu.
+    for (int i = 0; i < 600; ++i) {
         if (gDoneGeneration.load() >= generation) { finished = true; break; }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
@@ -211,6 +216,16 @@ void cfairystockfish_stop(void) {
     }
     gOldCout = nullptr;
     gRunning = false;
+}
+
+/// Le fil moteur précédent est-il ENTIÈREMENT résorbé ? `is_running` dit
+/// si un moteur détient le process ; ceci dit si un fil DÉTACHÉ par un arrêt
+/// borné traîne encore — auquel cas `start` refuse. Le verrou des tests
+/// vérifie LES DEUX : il ne voyait que le premier, et lâchait un test sur un
+/// shim encore indémarrable (« Expectation failed: standardStarted », suite
+/// complète du 31/08).
+int cfairystockfish_is_settled(void) {
+    return gThreadGeneration.load() == gDoneGeneration.load() ? 1 : 0;
 }
 
 int cfairystockfish_is_running(void) {

@@ -56,6 +56,11 @@ public final class FairyStockfishEngine: @unchecked Sendable {
         didStart && cfairystockfish_is_running() != 0
     }
 
+    /// Aucun fil moteur détaché ne traîne — le shim acceptera un `start`.
+    public static var isProcessSettled: Bool {
+        cfairystockfish_is_settled() != 0
+    }
+
     public static var isProcessBusy: Bool {
         cfairystockfish_is_running() != 0
     }

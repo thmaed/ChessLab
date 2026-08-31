@@ -94,12 +94,22 @@ final class EngineIntegrationGate {
     /// de le DIRE, sur le test qui n'a pas su se libérer.
     @discardableResult
     private func waitForBothEnginesToGoIdle(timeoutMs: Int = 30000) async -> Bool {
+        // « Libre » ne suffit pas : il faut aussi « RÉSORBÉ ». Un arrêt borné
+        // peut détacher un fil moteur affamé de CPU (suite complète) ; le
+        // process est alors libre (`isProcessBusy` faux) mais le shim REFUSE
+        // tout démarrage tant que le fil détaché n'a pas lu son « quit ».
+        // Le verrou ne testait que le premier, et lâchait le test suivant
+        // sur un shim indémarrable — « Expectation failed: standardStarted »
+        // du 31/08, toujours à ~280 s, toujours vert en isolation.
+        func settled() -> Bool {
+            !StockfishEngine.isProcessBusy && !FairyStockfishEngine.isProcessBusy
+                && StockfishEngine.isProcessSettled && FairyStockfishEngine.isProcessSettled
+        }
         let deadline = Date().addingTimeInterval(Double(timeoutMs) / 1000)
-        while Date() < deadline,
-              StockfishEngine.isProcessBusy || FairyStockfishEngine.isProcessBusy {
+        while Date() < deadline, !settled() {
             try? await Task.sleep(nanoseconds: 20_000_000)
         }
-        return !(StockfishEngine.isProcessBusy || FairyStockfishEngine.isProcessBusy)
+        return settled()
     }
 
     /// Signale l'expiration là où elle se produit — pas trois tests plus loin.
@@ -109,7 +119,9 @@ final class EngineIntegrationGate {
             """
             Le moteur n'était toujours pas libéré 30 s après ce test \
             (Stockfish occupé : \(StockfishEngine.isProcessBusy), \
-            Fairy-Stockfish occupé : \(FairyStockfishEngine.isProcessBusy)). \
+            résorbé : \(StockfishEngine.isProcessSettled) ; \
+            Fairy occupé : \(FairyStockfishEngine.isProcessBusy), \
+            résorbé : \(FairyStockfishEngine.isProcessSettled)). \
             Le test SUIVANT va démarrer sur un process encore pris, et c'est \
             LUI qui échouera. La faute est ici.
             """,

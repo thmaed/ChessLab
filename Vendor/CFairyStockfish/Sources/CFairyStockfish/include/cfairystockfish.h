@@ -38,6 +38,9 @@ void cfairystockfish_stop(void);
 /// Vrai (1) si le thread moteur est en cours d'exécution.
 int cfairystockfish_is_running(void);
 
+/// 1 si aucun fil moteur détaché ne traîne (voir shim.cpp).
+int cfairystockfish_is_settled(void);
+
 #ifdef __cplusplus
 }
 #endif

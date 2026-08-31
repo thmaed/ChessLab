@@ -83,6 +83,11 @@ public final class StockfishEngine: @unchecked Sendable {
 
     /// Vrai si un moteur — le nôtre ou celui d'une autre instance — occupe le
     /// process. Sert à savoir s'il faut attendre avant de démarrer.
+    /// Aucun fil moteur détaché ne traîne — le shim acceptera un `start`.
+    public static var isProcessSettled: Bool {
+        cstockfish_is_settled() != 0
+    }
+
     public static var isProcessBusy: Bool {
         cstockfish_is_running() != 0
     }
