@@ -184,7 +184,14 @@ struct LocalStoreMaintenanceTests {
         let directory = try makeDirectory()
         defer { try? FileManager.default.removeItem(at: directory) }
         let root = directory.appending(path: "StoreQuarantine")
-        let fresh = root.appending(path: "2026-08-22T10-00-00Z")
+        // Datée d'IL Y A UNE HEURE, au format de production — pas une date en
+        // dur : « 2026-08-22 » était récente à l'écriture du test et périmée
+        // quinze jours plus tard, rougissant la suite sans qu'aucun code
+        // n'ait changé (pourriture de date, constatée le 05/09/2026).
+        let stamp = ISO8601DateFormatter()
+            .string(from: Date().addingTimeInterval(-3600))
+            .replacingOccurrences(of: ":", with: "-")
+        let fresh = root.appending(path: stamp)
         try FileManager.default.createDirectory(at: fresh, withIntermediateDirectories: true)
 
         LocalStoreMaintenance.pruneQuarantines(in: directory)
