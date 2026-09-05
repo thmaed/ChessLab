@@ -1,6 +1,6 @@
 # Checklist de soumission App Store — ChessLab
 
-État au 21/07/2026, révisé le 19/08/2026 (1.5.0 build 7), le 26/08/2026 (1.6.0), et **re-révisé le 28/08/2026 pour la 1.7.0**.
+État au 21/07/2026, révisé le 19/08/2026 (1.5.0 build 7), le 26/08/2026 (1.6.0), le 28/08/2026 (1.7.0), et **re-révisé le 05/09/2026 pour la 1.7.1 (build 10.1)** — la 1.7.0 n'est jamais partie, la 1.7.1 l'absorbe (voir `RELEASE_NOTES-1.7.1.md`).
 
 La **1.6 a été soumise le 28/08/2026**. La 1.7.0 qui se prépare est une version de finition : correctif d'un défaut moteur récurrent des Variantes, et une passe de mise en page sur les grandes fenêtres en classe *regular* (iPad plein écran, Split View, Stage Manager) et les petits iPhone. Voir `RELEASE_NOTES-1.7.0.md` et `METADATA.md` pour le détail.
 
@@ -8,7 +8,7 @@ Coché = fait ou déjà en place. Non coché = reste une action utilisateur (com
 
 ## ⚠️ Avant de soumettre la 1.7
 
-- [ ] **Numéro de build à choisir délibérément** — il doit être strictement supérieur à celui effectivement soumis pour la 1.6, que ce dépôt ne connaît pas (il porte `8.4`, mais rien ne garantit que ce soit la valeur partie). Vérifier dans App Store Connect, puis le fixer juste avant `Product ▸ Archive`.
+- [x] **Numéro de build : `10.1`**, fixé délibérément et commité le 05/09/2026. Reste à VÉRIFIER dans App Store Connect que le build effectivement soumis pour la 1.6 est bien inférieur (le dépôt portait `8.4` à l'époque sans garantie que ce soit la valeur partie) — s'il était ≥ 10.1, monter à `11` juste avant `Product ▸ Archive`.
 - [x] **Captures d'écran refaites le 30/08** — onze par idiome (une de plus qu'en 1.6 : le Duck Chess, canard posé, qui est l'image la plus parlante de cette version), en anglais, sur iPhone 14 Plus (1284×2778) et iPad Pro 13" M5 (2064×2752). Tailles vérifiées une à une. Dans `screenshots/<iphone-6.7|ipad-13>/en/`. Deux défauts de l'outillage corrigés au passage : la rangée « Italian Game » devenait `isHittable` alors qu'elle était encore cachée derrière le champ de recherche flottant (le tap partait dans le champ, et la capture de l'index manquait sans que rien n'échoue — on filtre maintenant au lieu de défiler), et `goBack` s'appelait LUI-MÊME sur iPad, récursion infinie qui faisait déborder la pile et emportait le harnais de test.
 - [ ] **Vidéos à rafraîchir si besoin** — celles en place datent de la 1.6 et montrent Horde et Chess960, toujours exacts. Elles ne montrent aucune des quatre nouvelles variantes. `AppStoreVideoUITests` est prêt (poser le témoin `/tmp/cl-captures` pour le lancer).
 - [ ] **Captures FR** — toujours absentes (anglais seulement). Décision prise de s'en passer.
