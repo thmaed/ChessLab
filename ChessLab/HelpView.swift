@@ -96,6 +96,11 @@ struct HelpView: View {
                     .foregroundStyle(Theme.textSecondary)
                     .padding(.bottom, 2)
 
+                // EN TÊTE, pas au fond : celui qui ouvre l'Aide pour
+                // retrouver la visite ne doit pas la chercher sous douze
+                // modules.
+                discoveryReplayCard
+
                 ForEach(modules) { module in
                     moduleCard(module)
                 }
@@ -112,6 +117,37 @@ struct HelpView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+    }
+
+    /// Rejouer la visite guidée. La demande REMONTE par notification :
+    /// l'Aide est poussée dans la pile, et c'est l'accueil — plus haut —
+    /// qui possède la visite et videra la pile en la lançant.
+    private var discoveryReplayCard: some View {
+        Button {
+            NotificationCenter.default.post(name: .replayDiscoveryTour, object: nil)
+        } label: {
+            HStack(alignment: .top, spacing: 14) {
+                IconBadge(systemImage: "sparkles", tint: Theme.accent, size: 42)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Revoir la visite guidée")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Deux minutes pour resituer les commandes essentielles.")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+        .buttonStyle(.pressable)
+        .accessibilityIdentifier("replayDiscoveryTour")
     }
 
     private func moduleCard(_ module: Module) -> some View {

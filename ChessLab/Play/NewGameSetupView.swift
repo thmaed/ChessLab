@@ -81,6 +81,16 @@ struct NewGameSetupView: View {
     }
 
     var body: some View {
+        // Le lecteur ENGLOBE le ScrollView (un lecteur posé dedans ne
+        // trouverait aucun défilable « en lui » et ses scrollTo seraient
+        // muets) : chaque étape de la visite centre ainsi sa section.
+        ScrollViewReader { discoveryProxy in
+            scrollBody
+                .discoveryAutoScroll(using: discoveryProxy)
+        }
+    }
+
+    private var scrollBody: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 SettingsSection(title: "Couleur", systemImage: "circle.lefthalf.filled", tint: Theme.accent) {
@@ -101,7 +111,7 @@ struct NewGameSetupView: View {
                     }
                 }
 
-                SettingsSection(title: "Force du moteur", systemImage: "gauge.with.needle", tint: Theme.accent) {
+                SettingsSection(title: "Force du moteur", systemImage: "gauge.with.needle", tint: Theme.accent, discoverySpot: .strengthSlider) {
                     VStack(alignment: .leading, spacing: 16) {
                         HStack {
                             Text(EngineStrength(sliderValue: eloSlider).displayLabel)
@@ -245,7 +255,7 @@ struct NewGameSetupView: View {
                     }
                 }
 
-                SettingsSection(title: "Aides", systemImage: "lightbulb.fill", tint: Theme.accent) {
+                SettingsSection(title: "Aides", systemImage: "lightbulb.fill", tint: Theme.accent, discoverySpot: .aidToggles) {
                     VStack(spacing: 12) {
                         ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled)
                         ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled)
@@ -465,9 +475,17 @@ struct SettingsSection<Content: View>: View {
     let title: LocalizedStringKey
     var systemImage: String? = nil
     var tint: Color = Theme.accent
+    /// Cible éventuelle de la visite guidée — le trou couvre la section
+    /// ENTIÈRE (en-tête compris), pas un contrôle isolé dedans.
+    var discoverySpot: DiscoverySpot? = nil
     @ViewBuilder let content: Content
 
     var body: some View {
+        sectionBody
+            .discoveryAnchor(ifPresent: discoverySpot)
+    }
+
+    private var sectionBody: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
                 if let systemImage {

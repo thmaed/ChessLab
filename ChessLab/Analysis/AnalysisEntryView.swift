@@ -68,6 +68,7 @@ struct AnalysisEntryView: View {
                 ) {
                     onOpenLibrary()
                 }
+                .discoveryAnchor(.analysisLibrary)
                 if let lastGamePGN {
                     entryCard(
                         title: "Dernière partie", subtitle: "Reprendre l'analyse là où elle s'est arrêtée",

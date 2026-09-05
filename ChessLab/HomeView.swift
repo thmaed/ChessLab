@@ -16,6 +16,9 @@ struct HomeView: View {
     /// latérale + détail (``NavigationSplitView``) ; `.compact` (iPhone, iPad
     /// en multitâche étroit) → pile + grille de modes, inchangée.
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    /// La visite guidée en coach marks — possédée ICI parce que l'overlay
+    /// doit dessiner par-dessus les deux ossatures, barres comprises.
+    @State private var discoveryTour = DiscoveryTourController()
     /// Mode sélectionné dans la barre latérale (iPad/Mac). `nil` = tableau de
     /// bord d'accueil (reprise, progression, parties récentes).
     @State private var sidebarSelection: SidebarItem?
@@ -232,6 +235,51 @@ struct HomeView: View {
         // Injecté AUTOUR du `Group`, donc au-dessus de la branche : le coffre
         // appartient à `HomeView`, que la bascule d'ossature n'atteint pas.
         .environment(\.sessionStore, sessionStore)
+        .environment(\.discoveryTour, discoveryTour)
+        // L'overlay vit à la RACINE : monté sur le Group, il dessine
+        // par-dessus la barre latérale, la pile ET leurs barres — pas dans
+        // un écran, qui ne pourrait couvrir que lui-même. C'est AUSSI ici
+        // que se lisent les préférences d'ancrage : posées sur l'arbre qui
+        // les écrit, pas dans l'overlay (qui lirait un dictionnaire vide).
+        .overlayPreferenceValue(DiscoveryAnchorKey.self) { anchors in
+            // Ce reader N'IGNORE PAS la zone sûre : il mesure les insets
+            // réels et les passe à l'overlay, dont le propre reader plein
+            // écran les voit à zéro.
+            GeometryReader { safeGeo in
+                DiscoveryTourOverlay(
+                    tour: discoveryTour, anchors: anchors,
+                    safeInsets: safeGeo.safeAreaInsets
+                )
+            }
+        }
+        .onChange(of: discoveryTour.currentStepIndex) { _, _ in
+            applyDiscoveryDestination()
+        }
+        .onChange(of: discoveryTour.isActive) { _, active in
+            if active { applyDiscoveryDestination() }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .replayDiscoveryTour)) { _ in
+            discoveryTour.start()
+        }
+        .task {
+            // Une NOUVELLE installation montre la visite — l'empreinte est la
+            // date de création du conteneur Documents, pas un booléen
+            // UserDefaults (qui voyage dans les sauvegardes et arriverait
+            // déjà posé sur un appareil vierge). Jamais pendant le seeding,
+            // jamais par-dessus une reprise proposée.
+            #if DEBUG
+            // Crochet de vérification : `-discoveryStep N` saute à l'étape N
+            // sans attendre ni empreinte — captures d'écran et outillage.
+            if UserDefaults.standard.object(forKey: "discoveryStep") != nil {
+                discoveryTour.start(at: UserDefaults.standard.integer(forKey: "discoveryStep"))
+                return
+            }
+            #endif
+            try? await Task.sleep(for: .seconds(1))
+            guard DiscoveryTourMemory.shouldOffer, !seedingState.isSeeding,
+                  resumableGame == nil, !discoveryTour.isActive else { return }
+            discoveryTour.start()
+        }
         .onChange(of: menuCommands.requested) { _, destination in
             guard let destination else { return }
             menuCommands.requested = nil
@@ -275,6 +323,31 @@ struct HomeView: View {
                 sessionStore.clear()
                 refreshResumableGame()
                 loadProgressSummary()
+            }
+        }
+    }
+
+    /// La visite PILOTE la navigation : chaque étape déclare son écran, et la
+    /// bascule qui se joue sous les yeux EST l'explication. Ossature selon la
+    /// classe de taille — pile (route) ou colonnes (sélection latérale).
+    private func applyDiscoveryDestination() {
+        guard let step = discoveryTour.currentStep else { return }
+        let route: Route?
+        let item: SidebarItem?
+        switch step.destination {
+        case .home: route = nil; item = nil
+        case .newGame: route = .newGame; item = .vsEngine
+        case .analysisEntry: route = .analysisEntry; item = .analysis
+        case .openings: route = .openingList; item = .openings
+        }
+        withAnimation(.easeInOut(duration: 0.3)) {
+            if horizontalSizeClass == .regular {
+                sidebarSelection = item
+                path = NavigationPath()
+            } else {
+                var newPath = NavigationPath()
+                if let route { newPath.append(route) }
+                path = newPath
             }
         }
     }
@@ -378,9 +451,9 @@ struct HomeView: View {
                 }
             }
             Section("Modes") {
-                sidebarLabel(.vsEngine, "Contre l'ordinateur", "cpu", Theme.accent)
+                sidebarLabel(.vsEngine, "Contre l'ordinateur", "cpu", Theme.accent, discoverySpot: .playTile)
                 sidebarLabel(.twoPlayer, "Deux joueurs", "person.2.fill", Theme.info)
-                sidebarLabel(.puzzles, "Puzzles", "puzzlepiece.fill", Theme.violet)
+                sidebarLabel(.puzzles, "Puzzles", "puzzlepiece.fill", Theme.violet, discoverySpot: .puzzlesTile)
                 sidebarLabel(
                     .openings, "Ouvertures", "books.vertical.fill", Theme.warning,
                     accessibilityID: "sidebar_openings"
@@ -388,7 +461,7 @@ struct HomeView: View {
                 sidebarLabel(.endgames, "Finales", "crown.fill", Theme.gold)
                 sidebarLabel(.analysis, "Analyser", "chart.xyaxis.line", Theme.teal)
                 sidebarLabel(.laboratory, "Laboratoire", "flask", Theme.rose)
-                sidebarLabel(.variants, "Variantes", "die.face.5.fill", Theme.violet, accessibilityID: "sidebar_variants")
+                sidebarLabel(.variants, "Variantes", "die.face.5.fill", Theme.violet, accessibilityID: "sidebar_variants", discoverySpot: .variantsTile)
             }
             Section("Suivi") {
                 // Mêmes teintes qu'en barre d'outils iPhone : le même bouton
@@ -396,7 +469,7 @@ struct HomeView: View {
                 // verte ici et grise là, l'aide l'inverse.
                 sidebarLabel(.progression, "Progression", "chart.bar.xaxis", Theme.info)
                 sidebarLabel(.settings, "Réglages", "gearshape.fill", Theme.gold)
-                sidebarLabel(.help, "Aide", "questionmark.circle", Theme.accent)
+                sidebarLabel(.help, "Aide", "questionmark.circle", Theme.accent, discoverySpot: .helpButton)
             }
         }
         .scrollContentBackground(.hidden)
@@ -411,13 +484,14 @@ struct HomeView: View {
 
     private func sidebarLabel(
         _ item: SidebarItem, _ title: LocalizedStringKey, _ icon: String, _ tint: Color,
-        accessibilityID: String? = nil
+        accessibilityID: String? = nil, discoverySpot: DiscoverySpot? = nil
     ) -> some View {
         Label {
             Text(title)
         } icon: {
             Image(systemName: icon).foregroundStyle(tint)
         }
+        .discoveryAnchor(ifPresent: discoverySpot)
         .tag(item)
         // Identifiant facultatif : les tests d'interface iPad n'ont pas de
         // tuile à viser (la grille laisse place à la barre latérale) et un
@@ -458,6 +532,13 @@ struct HomeView: View {
     /// pour lancer. Trois colonnes au plus dans les 680 pt (tuiles
     /// ``ModeGridMetrics/minTileRegular``, libellés longs).
     private var iPadDashboard: some View {
+        ScrollViewReader { discoveryProxy in
+            iPadDashboardScroll
+                .discoveryAutoScroll(using: discoveryProxy)
+        }
+    }
+
+    private var iPadDashboardScroll: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
                 homeHeader()
@@ -1000,6 +1081,13 @@ struct HomeView: View {
     }
 
     private var iPhoneHome: some View {
+        ScrollViewReader { discoveryProxy in
+            iPhoneHomeScroll
+                .discoveryAutoScroll(using: discoveryProxy)
+        }
+    }
+
+    private var iPhoneHomeScroll: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: isShortPhone ? 16 : 22) {
                 homeHeader(compact: isShortPhone)
@@ -1032,12 +1120,14 @@ struct HomeView: View {
                 ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Force, cadence, aides", shortSubtitle: "Force et cadence", systemImage: "cpu", tint: Theme.accent, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.newGame)
                 }
+                .discoveryAnchor(.playTile, priority: 1)
                 ModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", subtitle: "Sur le même appareil", shortSubtitle: "Même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.twoPlayerSetup)
                 }
                 ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", shortSubtitle: "Tactique et Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.puzzleQueue)
                 }
+                .discoveryAnchor(.puzzlesTile, priority: 1)
                 ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings", prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.openingList)
                 }
@@ -1053,6 +1143,7 @@ struct HomeView: View {
                 ModeCard(title: "Variantes", subtitle: "Chess960 et autres façons de jouer", shortSubtitle: "Chess960 et plus", systemImage: "die.face.5.fill", tint: Theme.violet, isEnabled: true, accessibilityID: "mode_variants", prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.variantsHub)
                 }
+                .discoveryAnchor(.variantsTile, priority: 1)
             }
         }
     }
@@ -1289,6 +1380,7 @@ struct HomeView: View {
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(Theme.accent)
             }
+            .discoveryAnchor(.recentGames)
 
             VStack(spacing: 10) {
                 ForEach(recentGames) { game in
