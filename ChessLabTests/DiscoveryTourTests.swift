@@ -90,7 +90,10 @@ import Testing
     }
 }
 
-@Suite struct DiscoveryTourStepsTests {
+// `.serialized` : deux tests de cette suite touchent la MÊME clé
+// UserDefaults (l'empreinte « vue ») — en parallèle, le nettoyage de l'un
+// tombait entre le markSeen et le shouldOffer de l'autre.
+@Suite(.serialized) struct DiscoveryTourStepsTests {
 
     @Test("Les étapes forment trois sections ordonnées, ids croissants")
     @MainActor func stepsAreWellFormed() {

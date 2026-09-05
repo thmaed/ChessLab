@@ -186,11 +186,11 @@ final class DiscoveryTourController {
         // symboles et les VRAIS noms — en prose seule, le lecteur doit nous
         // croire sur parole ; dessinées, il les reconnaîtra en arrivant.
         let playControls: [DiscoveryChipItem] = [
-            .init(icon: .system("lightbulb.fill"), label: "Indice", tint: Theme.accent),
-            .init(icon: .system("circle.righthalf.filled"), label: "Proposer nulle", tint: Theme.info),
-            .init(icon: .system("list.bullet"), label: "Coups joués", tint: Theme.teal),
-            .init(icon: .system("chevron.left"), label: "Revenir + « Reprendre ici »", tint: Theme.violet),
-            .init(icon: .system("flag.fill"), label: "Abandonner", tint: Theme.warning),
+            .init(icon: .system("lightbulb.fill"), label: LocalizationController.string("Indice"), tint: Theme.accent),
+            .init(icon: .system("circle.righthalf.filled"), label: LocalizationController.string("Proposer nulle"), tint: Theme.info),
+            .init(icon: .system("list.bullet"), label: LocalizationController.string("Coups joués"), tint: Theme.teal),
+            .init(icon: .system("chevron.left"), label: LocalizationController.string("Revenir + « Reprendre ici »"), tint: Theme.violet),
+            .init(icon: .system("flag.fill"), label: LocalizationController.string("Abandonner"), tint: Theme.warning),
         ]
         var variantChips: [DiscoveryChipItem] = [
             .init(icon: .system("die.face.5.fill"), label: "Chess960", tint: Theme.violet),
@@ -210,9 +210,9 @@ final class DiscoveryTourController {
             tint: DuckChessVariant.shared.tint
         ))
         let trainingChips: [DiscoveryChipItem] = [
-            .init(icon: .system("puzzlepiece.fill"), label: "Puzzles", tint: Theme.violet),
-            .init(icon: .system("books.vertical.fill"), label: "Ouvertures", tint: Theme.warning),
-            .init(icon: .system("crown.fill"), label: "Finales", tint: Theme.gold),
+            .init(icon: .system("puzzlepiece.fill"), label: LocalizationController.string("Puzzles"), tint: Theme.violet),
+            .init(icon: .system("books.vertical.fill"), label: LocalizationController.string("Ouvertures"), tint: Theme.warning),
+            .init(icon: .system("crown.fill"), label: LocalizationController.string("Finales"), tint: Theme.gold),
         ]
 
         return [
@@ -579,12 +579,26 @@ private struct DiscoveryCardView: View {
         }
         .padding(16)
         .frame(maxWidth: 360)
-        .background(Theme.surface, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        // Fond ÉMERAUDE sombre, pas la surface des cartes de l'app : sur un
+        // écran fait des mêmes gris, la carte de visite se confondait avec
+        // le contenu qu'elle commente (retour d'usage sur appareil). La
+        // teinte et le liseré au dégradé d'accent la rattachent à l'anneau
+        // du trou : tout ce qui est vert-menthe EST la visite.
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(red: 0.098, green: 0.200, blue: 0.160),
+                    Color(red: 0.078, green: 0.125, blue: 0.115),
+                ],
+                startPoint: .top, endPoint: .bottom
+            ),
+            in: RoundedRectangle(cornerRadius: 18, style: .continuous)
+        )
         .overlay(
             RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .strokeBorder(Theme.strokeStrong, lineWidth: 1)
+                .strokeBorder(Theme.accentGradient, lineWidth: 1.5)
         )
-        .shadow(color: .black.opacity(0.5), radius: 24, y: 8)
+        .shadow(color: .black.opacity(0.55), radius: 24, y: 8)
     }
 
     private var textAndChips: some View {
@@ -663,7 +677,9 @@ struct DiscoveryTourOverlay: View {
 
         ZStack {
             DiscoveryScrimShape(hole: effectiveHole, cornerRadius: 14)
-                .fill(Color.black.opacity(0.62), style: FillStyle(eoFill: true))
+                // 0,68 : assez sombre pour que l'app recule nettement
+                // derrière la visite — à 0,62 elles se confondaient.
+                .fill(Color.black.opacity(0.68), style: FillStyle(eoFill: true))
                 .animation(.easeInOut(duration: 0.45), value: effectiveHole)
                 // Le voile ENTIER avance la visite : c'est l'affordance que
                 // les gens cherchent avant de trouver le bouton.

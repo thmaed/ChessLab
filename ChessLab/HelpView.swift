@@ -15,11 +15,18 @@ struct HelpView: View {
         let body: LocalizedStringKey
     }
 
+    /// La version affichée vient du BUNDLE : le titre des nouveautés
+    /// mentionnait « 1.6 » alors que l'app était en 1.7.1 — un numéro écrit
+    /// en dur périme à chaque livraison, celui-ci ne peut plus.
+    private static let appVersion = Bundle.main.object(
+        forInfoDictionaryKey: "CFBundleShortVersionString"
+    ) as? String ?? ""
+
     private let modules: [Module] = [
         .init(
             icon: "sparkles", tint: Theme.accent,
-            title: "Nouveautés de la version 1.6",
-            body: "• Nouveau : le module Variantes. Chess960 (position aléatoire, par numéro ou composée soi-même), et trois variantes de plus — Roi de la colline, Trois échecs, Horde — chacune contre l'ordinateur avec indice, alerte gaffe et barre d'évaluation.\n• Ouvertures repensées : un index en arbre où chaque variante se lit sans doublon, et un tap sur n'importe quel coup ouvre la position.\n• Sous le plateau : les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish, et une barre d'évaluation.\n• Les 58 cours d'ouvertures complétés par une seconde passe : les réponses noires qui manquaient sont là.\n• Finales : « Pions électriques » ajoutée — 78 cours — « pion passé éloigné » corrigé, et une recherche par nom comme dans Ouvertures.\n• « Reprendre ici » agit au premier toucher : plus de confirmation, une annulation prend la place du bouton pendant quelques secondes.\n• « Changer de mode » : le même bouton violet sur tous les écrans, au lieu d'être caché dans les menus d'export.\n• Le thème du plateau se choisit dans les Réglages, et s'applique partout.\n• Laboratoire : touchez une statistique (LOS, écart Elo…) pour savoir ce qu'elle mesure.\n• L'app occupe 60 Mo au lieu de 175."
+            title: "Nouveautés de la version \(Self.appVersion)",
+            body: "• Quatre variantes de plus — le hub passe à douze : Crazyhouse (les pièces capturées rejoignent votre réserve, reposez-les où vous voulez), Duck Chess (un canard bloque une case et se déplace à chaque tour), Barricades (d4 et e5 murées dès le départ) et Barricades aléatoires (les murs sautent de case à chaque coup).\n• Une visite guidée présente les commandes essentielles au premier lancement — et se rejoue depuis cette Aide.\n• Toutes les analyses de variantes montrent désormais la courbe d'évaluation, la précision par couleur et les coups EN LIGNE, chaque coup remarquable entouré de la couleur de sa catégorie.\n• « Proposer nulle » fonctionne dans les douze modes, avec la même règle que contre l'ordinateur.\n• Les nulles par manque de matériel sont déclarées là où l'on gagne en matant, au lieu de laisser la partie tourner à vide.\n• Sur iPad et Mac, l'accueil affiche la grille des modes.\n• Stabilité du moteur des variantes en profondeur : plus de « moteur indisponible » au retour d'un écran."
         ),
         .init(
             icon: "cpu", tint: Theme.accent,
@@ -34,7 +41,7 @@ struct HelpView: View {
         .init(
             icon: "die.face.5.fill", tint: Theme.violet,
             title: "Variantes",
-            body: "D'autres façons de jouer aux échecs, présentées en tuiles. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959), ou composée vous-même en échangeant les pièces de la première rangée — jeu contre l'ordinateur ou à deux, avec la même analyse de fin de partie qu'en mode « Jouer ». Six variantes de plus, contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs (le troisième échec délivré gagne), Horde (les Blancs n'ont que des pions), Course des rois (le premier roi en 8e rangée gagne, sans jamais mettre l'adversaire en échec), Atomique (chaque capture fait exploser les cases voisines) et Antéchecs (but inversé : perdez toutes vos pièces, ou restez bloqué, pour gagner). Indice, alerte gaffe et barre d'évaluation partout ; la force de l'ordinateur se règle comme ailleurs."
+            body: "D'autres façons de jouer aux échecs, présentées en tuiles — douze en tout. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959) ou composée vous-même — contre l'ordinateur ou à deux, avec analyse de fin de partie. Contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs, Horde (les Blancs n'ont que des pions), Course des rois, Atomique (chaque capture explose), Antéchecs (perdez tout pour gagner), Crazyhouse (les pièces capturées rejoignent votre réserve et se reposent sur l'échiquier), Coup Volé (jouez un coup avec une pièce adverse), Duck Chess (un canard bloque une case et bouge à chaque tour), Barricades (d4 et e5 murées) et Barricades aléatoires (les murs changent de case à chaque coup). Chaque tuile explique ses règles sur son écran de réglages ; indice, alerte gaffe, barre d'évaluation et analyse partout, force de l'ordinateur réglable comme ailleurs."
         ),
         .init(
             icon: "puzzlepiece.fill", tint: Theme.violet,

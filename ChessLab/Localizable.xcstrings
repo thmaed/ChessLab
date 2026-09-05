@@ -19849,6 +19849,336 @@
           }
         }
       }
+    },
+    "Tout part d'ici": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It all starts here"
+          }
+        }
+      }
+    },
+    "Réglez votre adversaire": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tune your opponent"
+          }
+        }
+      }
+    },
+    "Les aides se choisissent avant": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aids are chosen beforehand"
+          }
+        }
+      }
+    },
+    "Pendant la partie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "During the game"
+          }
+        }
+      }
+    },
+    "Chaque partie s'analyse": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every game can be analyzed"
+          }
+        }
+      }
+    },
+    "Le raccourci de l'accueil": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The home shortcut"
+          }
+        }
+      }
+    },
+    "Partez sans crainte": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave without worry"
+          }
+        }
+      }
+    },
+    "La recherche flotte": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search floats"
+          }
+        }
+      }
+    },
+    "Douze façons de jouer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twelve ways to play"
+          }
+        }
+      }
+    },
+    "Trois salles d'entraînement": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Three training rooms"
+          }
+        }
+      }
+    },
+    "Et pour y revenir": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "And to come back"
+          }
+        }
+      }
+    },
+    "Cette tuile lance une partie contre l'ordinateur. Les autres attendront la fin de la visite — deux minutes, promis.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This tile starts a game against the computer. The others can wait until the tour is over — two minutes, promise."
+          }
+        }
+      }
+    },
+    "De débutant à maître, au curseur ou par préréglages. Le piège du premier soir : jouer sa première partie à pleine force.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From beginner to master, with the slider or the presets. The first-night trap: playing your first game at full strength."
+          }
+        }
+      }
+    },
+    "Les flèches d'indice et la barre d'évaluation s'activent ici, avant la partie. On les découvre souvent trop tard.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hint arrows and the evaluation bar are enabled here, before the game. They are often discovered too late."
+          }
+        }
+      }
+    },
+    "La barre du bas de l'écran de jeu cache cinq gestes — les voici, pour les reconnaître :": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The bar at the bottom of the game screen holds five gestures — here they are, so you recognize them:"
+          }
+        }
+      }
+    },
+    "Courbe d'évaluation, précision, coups en capsules colorées — et la courbe comme les capsules se touchent pour naviguer dans la partie. La bibliothèque garde tout.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evaluation curve, accuracy, moves as colored capsules — and both the curve and the capsules can be tapped to navigate the game. The library keeps everything."
+          }
+        }
+      }
+    },
+    "Vos dernières parties vivent aussi ici : un tap ouvre directement leur analyse, sans passer par la bibliothèque.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your latest games also live here: one tap opens their analysis directly, without going through the library."
+          }
+        }
+      }
+    },
+    "La partie en cours se sauvegarde toute seule. À votre retour, « Reprendre la partie » vous attend en haut de l'accueil.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The game in progress saves itself. When you come back, “Resume game” awaits at the top of the home screen."
+          }
+        }
+      }
+    },
+    "Dans les Ouvertures, le champ de recherche flotte AU-DESSUS de l'arbre. Cherchez, puis fermez le clavier pour toucher les résultats en dessous.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Openings, the search field floats ABOVE the tree. Search, then dismiss the keyboard to tap the results below."
+          }
+        }
+      }
+    },
+    "Chaque variante explique ses règles sur son écran de réglages — inutile de les connaître d'avance :": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each variant explains its rules on its setup screen — no need to know them in advance:"
+          }
+        }
+      }
+    },
+    "La tactique, le répertoire, et les fins de partie prouvées :": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tactics, repertoire, and proven endgames:"
+          }
+        }
+      }
+    },
+    "Le « ? » en haut de l'accueil rassemble l'aide — et cette visite, à rejouer quand vous voulez.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The “?” at the top of the home screen gathers the help — and this tour, to replay whenever you like."
+          }
+        }
+      }
+    },
+    "Comprendre": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Understand"
+          }
+        }
+      }
+    },
+    "Explorer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore"
+          }
+        }
+      }
+    },
+    "Passer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
+    "Terminer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        }
+      }
+    },
+    "Étape précédente": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous step"
+          }
+        }
+      }
+    },
+    "Revenir + « Reprendre ici »": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go back + “Resume here”"
+          }
+        }
+      }
+    },
+    "Revoir la visite guidée": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replay the guided tour"
+          }
+        }
+      }
+    },
+    "Deux minutes pour resituer les commandes essentielles.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two minutes to get your bearings on the essential controls."
+          }
+        }
+      }
+    },
+    "Nouveautés de la version %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's new in version %@"
+          }
+        }
+      }
+    },
+    "• Quatre variantes de plus — le hub passe à douze : Crazyhouse (les pièces capturées rejoignent votre réserve, reposez-les où vous voulez), Duck Chess (un canard bloque une case et se déplace à chaque tour), Barricades (d4 et e5 murées dès le départ) et Barricades aléatoires (les murs sautent de case à chaque coup).\n• Une visite guidée présente les commandes essentielles au premier lancement — et se rejoue depuis cette Aide.\n• Toutes les analyses de variantes montrent désormais la courbe d'évaluation, la précision par couleur et les coups EN LIGNE, chaque coup remarquable entouré de la couleur de sa catégorie.\n• « Proposer nulle » fonctionne dans les douze modes, avec la même règle que contre l'ordinateur.\n• Les nulles par manque de matériel sont déclarées là où l'on gagne en matant, au lieu de laisser la partie tourner à vide.\n• Sur iPad et Mac, l'accueil affiche la grille des modes.\n• Stabilité du moteur des variantes en profondeur : plus de « moteur indisponible » au retour d'un écran.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Four more variants — the hub now offers twelve ways to play: Crazyhouse (captured pieces join your reserve; drop them wherever you like), Duck Chess (a duck blocks a square and moves every turn), Barricades (d4 and e5 walled from the start) and Random Barricades (the walls jump to new squares after every move).\n• A guided tour presents the essential controls on first launch — and can be replayed from this Help.\n• Every variant analysis now shows the evaluation curve, per-color accuracy and the moves INLINE, each notable move outlined with the color of its category.\n• “Offer draw” works in all twelve modes, with the same rule as against the computer.\n• Draws for insufficient material are declared wherever winning means checkmating, instead of letting the game run on empty.\n• On iPad and Mac, the home screen shows the mode grid.\n• Deep stability work on the variants engine: no more “engine unavailable” when returning to a screen."
+          }
+        }
+      }
+    },
+    "D'autres façons de jouer aux échecs, présentées en tuiles — douze en tout. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959) ou composée vous-même — contre l'ordinateur ou à deux, avec analyse de fin de partie. Contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs, Horde (les Blancs n'ont que des pions), Course des rois, Atomique (chaque capture explose), Antéchecs (perdez tout pour gagner), Crazyhouse (les pièces capturées rejoignent votre réserve et se reposent sur l'échiquier), Coup Volé (jouez un coup avec une pièce adverse), Duck Chess (un canard bloque une case et bouge à chaque tour), Barricades (d4 et e5 murées) et Barricades aléatoires (les murs changent de case à chaque coup). Chaque tuile explique ses règles sur son écran de réglages ; indice, alerte gaffe, barre d'évaluation et analyse partout, force de l'ordinateur réglable comme ailleurs.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other ways to play chess, presented as tiles — twelve in all. Chess960 (Fischer Random): starting position drawn at random, chosen by number (0-959) or composed yourself — against the computer or two-player, with end-of-game analysis. Against the computer: King of the Hill (first king to the center wins), Three-check, Horde (White has only pawns), Racing Kings, Atomic (every capture explodes), Antichess (lose everything to win), Crazyhouse (captured pieces join your reserve and can be dropped back on the board), Stolen Move (play one move with an opponent's piece), Duck Chess (a duck blocks a square and moves every turn), Barricades (d4 and e5 walled) and Random Barricades (the walls change squares after every move). Each tile explains its rules on its setup screen; hint, blunder alert, evaluation bar and analysis everywhere, computer strength adjustable as elsewhere."
+          }
+        }
+      }
     }
   },
   "version": "1.0"
