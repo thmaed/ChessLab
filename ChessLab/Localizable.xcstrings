@@ -9095,6 +9095,22 @@
         }
       }
     },
+    "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour. Ou choisissez un personnage : neuf adversaires joués par Maia-3, un réseau entraîné sur des millions de parties humaines, chacun avec son style, son répertoire et son tempérament, à un niveau réglable sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play a game against the Stockfish engine. Choose your colour, the opponent's strength (Elo), the time control, and the aids: hints (best-move arrows), a warning on risky moves and an evaluation bar. After the game, one button leads straight to analysis. During the game, “Switch mode” (top right) sends the displayed position to analysis, the Laboratory or a two-player game — your game is waiting when you come back. Or pick a character: nine opponents played by Maia-3, a network trained on millions of human games, each with their own style, repertoire and temperament, at an adjustable level on the human scale (close to Lichess, not comparable to Stockfish's Elo). Behind them Stockfish only steps in for short mates, endgames with few pieces and repetitions."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour. Ou choisissez un personnage : neuf adversaires joués par Maia-3, un réseau entraîné sur des millions de parties humaines, chacun avec son style, son répertoire et son tempérament, à un niveau réglable sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions."
+          }
+        }
+      }
+    },
     "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour. Ou choisissez un personnage : neuf adversaires joués par Maia-3, un réseau entraîné sur des millions de parties humaines, chacun avec son style, son répertoire et son tempérament, à un niveau réglable sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. « S'adapte à mes résultats » fait monter ou baisser le niveau du personnage de 25 après chaque partie ; « Sparring » le fait se relâcher ou se durcir en partie, dans une bande de ±150 — les deux sont affichés, jamais cachés.": {
       "localizations": {
         "en": {
@@ -21127,6 +21143,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "• Le module Finales : 77 cours prouvés par table de finales, en neuf familles — de l'opposition à la Lucena, des forteresses aux études célèbres (Lasker, Troitsky, Kubbel…).\n• Entraînement libre des finales : concluez la position contre la meilleure défense — tout coup qui préserve le verdict est accepté, ceux qui le lâchent sont repris.\n• Vos répertoires personnels : import PGN variantes comprises, partage par simple fichier, éditeur intégré.\n• Les 58 cours d'ouvertures complétés : près de 900 positions ajoutées (London, Philidor, Petroff…).\n• « Changer de mode » (en haut à droite) bascule vers le Laboratoire, l'ordinateur ou Deux joueurs en emportant la position affichée.\n• Verdicts d'analyse plus sûrs : les coups limites sont réexaminés avec dix fois plus d'effort avant d'être étiquetés.\n• Correctif majeur pour iOS 18 : l'échiquier ne répondait plus au doigt.\n• Progrès : le bilan contre l'ordinateur se filtre sur 7 ou 30 jours."
+          }
+        }
+      }
+    },
+    "• Neuf personnages à affronter, joués par Maia-3, un réseau entraîné sur des millions de parties humaines : Léa l'attaquante, Marc le mur, Théo le gambiteur, Nadia la technicienne, Sacha le piégeur, Inès la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif et Camille, l'étalon. Chacun a son style, son répertoire d'ouvertures, son caractère et son illustration ; leur niveau se règle sur l'échelle humaine (proche de Lichess) et se mémorise par personnage.\n• Stockfish reste l'analyste : indice, alerte gaffe, barre d'évaluation et analyse de partie inchangés. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée.\n• Progrès : votre bilan par personnage, avec le plus haut niveau battu.\n• Laboratoire : un camp peut être joué par Camille (Maia), pour mesurer un personnage contre Stockfish.\n• Variantes : au-delà de 2850, la force de Fairy-Stockfish n'est plus bridée au lieu de retomber en silence à 1350.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Nine characters to face, played by Maia-3, a network trained on millions of human games: Léa the attacker, Marc the wall, Théo the gambiteer, Nadia the technician, Sacha the trapper, Inès the counter-attacker, Yuri the materialist, Pablo the impulsive one and Camille, the reference. Each has a style, an opening repertoire, a temper and an illustration; their level is set on the human scale (close to Lichess) and remembered per character.\n• Stockfish remains the analyst: hints, blunder alert, evaluation bar and game analysis unchanged. Behind a character it only steps in for a short mate, an endgame with few pieces or a repetition in a won position.\n• Progress: your record against each character, with the highest level beaten.\n• Lab: one side can be played by Camille (Maia), to measure a character against Stockfish.\n• Variants: above 2850, Fairy-Stockfish's strength is no longer limited instead of silently dropping to 1350."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Neuf personnages à affronter, joués par Maia-3, un réseau entraîné sur des millions de parties humaines : Léa l'attaquante, Marc le mur, Théo le gambiteur, Nadia la technicienne, Sacha le piégeur, Inès la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif et Camille, l'étalon. Chacun a son style, son répertoire d'ouvertures, son caractère et son illustration ; leur niveau se règle sur l'échelle humaine (proche de Lichess) et se mémorise par personnage.\n• Stockfish reste l'analyste : indice, alerte gaffe, barre d'évaluation et analyse de partie inchangés. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée.\n• Progrès : votre bilan par personnage, avec le plus haut niveau battu.\n• Laboratoire : un camp peut être joué par Camille (Maia), pour mesurer un personnage contre Stockfish.\n• Variantes : au-delà de 2850, la force de Fairy-Stockfish n'est plus bridée au lieu de retomber en silence à 1350."
           }
         }
       }

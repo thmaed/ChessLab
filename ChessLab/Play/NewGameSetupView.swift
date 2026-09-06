@@ -19,8 +19,6 @@ struct NewGameSetupView: View {
     @State private var eloSlider: Double
     @State private var opponentMode: OpponentMode
     @State private var opponentProfileID: String
-    @State private var profileAdaptiveEnabled: Bool
-    @State private var sparringEnabled: Bool
     @State private var timeControl: TimeControl
     @State private var isCustomTimeControlSelected: Bool
     @State private var customMinutes: Int
@@ -70,11 +68,9 @@ struct NewGameSetupView: View {
         ))
         _opponentMode = State(initialValue: saved.opponentProfileID == nil ? .elo : .profile)
         _opponentProfileID = State(initialValue: saved.opponentProfileID ?? OpponentProfile.camille.id)
-        _profileAdaptiveEnabled = State(initialValue: saved.profileAdaptiveEnabled)
         if let profileID = saved.opponentProfileID, let profile = OpponentProfile.named(profileID) {
             _eloSlider = State(initialValue: profile.clampedLevel(saved.eloSliderValue))
         }
-        _sparringEnabled = State(initialValue: saved.sparringEnabled)
         _isCustomTimeControlSelected = State(initialValue: saved.timeControlID == "custom")
         _timeControl = State(initialValue: TimeControl.presets.first { $0.id == saved.timeControlID } ?? .none)
         _timeCategory = State(initialValue: saved.timeControlID == "custom"
@@ -146,11 +142,6 @@ struct NewGameSetupView: View {
                                 profile: OpponentProfile.named(opponentProfileID) ?? .camille,
                                 level: $eloSlider
                             )
-                            ToggleRow(label: "S'adapte à mes résultats", isOn: $profileAdaptiveEnabled)
-                            Text("Après chaque partie, le niveau de ce personnage monte de 25 si vous gagnez, baisse de 25 si vous perdez. Toujours affiché, jamais en cachette.")
-                                .font(.caption2)
-                                .foregroundStyle(Theme.textTertiary)
-                                .fixedSize(horizontal: false, vertical: true)
                         } else {
                             HStack {
                                 Text(EngineStrength(sliderValue: eloSlider).displayLabel)
@@ -305,13 +296,6 @@ struct NewGameSetupView: View {
                         ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled)
                         ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar)
                         ToggleRow(label: "L'ordinateur peut abandonner s'il est perdu", isOn: $engineResignationEnabled)
-                        if opponentMode == .profile {
-                            ToggleRow(label: "Sparring : le personnage reste à votre hauteur", isOn: $sparringEnabled)
-                            Text("En partie, il se relâche quand il vous domine et se durcit quand vous le dominez, dans une bande de ±150 autour du niveau choisi. Nommé et affiché, jamais en cachette.")
-                                .font(.caption2)
-                                .foregroundStyle(Theme.textTertiary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
                         Text(effectiveTimeControl.hasClock ? "Reprise de coup indisponible avec pendule." : "Parcourez la partie avec la barre sous le plateau ; sans pendule, « Reprendre ici » relance depuis le coup consulté.")
                             .font(.caption)
                             .foregroundStyle(Theme.textTertiary)
@@ -489,9 +473,7 @@ struct NewGameSetupView: View {
             bookEnabled: bookEnabled,
             bookWidth: bookWidth,
             engineResignationEnabled: engineResignationEnabled,
-            opponentProfileID: opponentMode == .profile ? opponentProfileID : nil,
-            profileAdaptiveEnabled: profileAdaptiveEnabled,
-            sparringEnabled: sparringEnabled
+            opponentProfileID: opponentMode == .profile ? opponentProfileID : nil
         )
         if opponentMode == .profile {
             OpponentLevelStore.save(level: eloSlider, for: opponentProfileID)

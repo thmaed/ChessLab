@@ -10066,3 +10066,17 @@ du vert générique. La fiche devient une vraie vignette : grande illustration,
 prénom et surnom colorés, deux ou trois étiquettes de style (« Gambits »,
 « Initiative », « Finales fragiles »), sa phrase, sur un fond dégradé de sa
 couleur. Vérifié en capture et par le test d'interface.
+
+## 06/09 — Le curseur borné à la plage du personnage ; l'adaptatif retiré
+
+Le curseur d'un personnage ne va plus que là où il est crédible (Pablo
+800-1400, Nadia 1400-2500…) ; le niveau mémorisé est ramené dans la plage à
+la sélection et à l'ouverture de l'écran.
+
+Sur demande, les trois mécanismes d'adaptation sont RETIRÉS : « S'adapte à
+mes résultats » (± 25 par partie), « Sparring » (consigne modulée en
+partie) et l'estimation Elo invisible du joueur donnée à Maia comme
+« adversaire ». Bascules, réglages, logique, textes d'Aide, notes App Store
+et tests supprimés ; les anciennes clés de réglage sont ignorées au
+décodage (testé). Maia reçoit de nouveau le niveau du personnage comme
+niveau de l'adversaire. Le niveau ne bouge que par le curseur.

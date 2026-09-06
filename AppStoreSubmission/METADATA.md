@@ -25,9 +25,6 @@ NEUF PERSONNAGES À AFFRONTER
 STOCKFISH ANALYSE, ET ASSURE
 Indice, alerte gaffe, barre d'évaluation et analyse restent ceux de Stockfish. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée — et l'écran de fin le dit.
 
-DEUX OPTIONS, JAMAIS EN CACHETTE
-« S'adapte à mes résultats » fait évoluer le niveau du personnage de 25 après chaque partie. « Sparring » le fait se relâcher ou se durcir en partie, dans une bande de ±150. Toutes deux affichées, désactivées par défaut.
-
 PROGRÈS ET LABORATOIRE
 Votre bilan par personnage, avec le plus haut niveau battu. Au Laboratoire, un camp peut être joué par Camille (Maia).
 
@@ -49,9 +46,6 @@ Next to Stockfish's Elo level, pick an opponent with a personality: Léa the att
 
 STOCKFISH ANALYZES, AND COVERS
 Hints, blunder alert, evaluation bar and analysis are still Stockfish's. Behind a character it only steps in for a short mate, an endgame with few pieces or a repetition in a won position — and the end-of-game screen says so.
-
-TWO OPTIONS, NEVER HIDDEN
-"Adapts to my results" moves the character's level by 25 after each game. "Sparring" makes them ease off or toughen up during the game, within a ±150 band. Both shown, both off by default.
 
 PROGRESS AND LAB
 Your record against each character, with the highest level beaten. In the Lab, one side can be played by Camille (Maia).
@@ -264,7 +258,7 @@ git push origin main
 Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) : soumettre sans pousser publierait un binaire dont les sources annoncées ne correspondent pas.
 
 ### Historique des versions
-- **1.8.0** — pas encore soumise : neuf personnages joués par Maia-3 (style, répertoire, tempérament, illustration, niveau mémorisé par personnage sur l'échelle humaine), filet Stockfish à quatre cas, options « S'adapte à mes résultats » et « Sparring », Progrès par personnage, camp Maia au Laboratoire, licence AGPLv3, borne Fairy-Stockfish à 2850 (`RELEASE_NOTES-1.8.0.md` — absorbe la 1.7.1).
+- **1.8.0** — pas encore soumise : neuf personnages joués par Maia-3 (style, répertoire, tempérament, illustration, niveau mémorisé par personnage sur l'échelle humaine), filet Stockfish à quatre cas, Progrès par personnage, camp Maia au Laboratoire, licence AGPLv3, borne Fairy-Stockfish à 2850 (`RELEASE_NOTES-1.8.0.md` — absorbe la 1.7.1).
 - **1.7.1** — jamais soumise, absorbée par la 1.8.0 : visite guidée bilingue (11 étapes, rejouable depuis l'Aide), coups en ligne colorés dans TOUTES les analyses de variantes, grille des modes sur l'accueil iPad/Mac, stabilité du moteur des variantes en profondeur (6 mécanismes corrigés, suite de torture), Aide remise à jour (version lue du bundle, module Variantes à douze tuiles), zéro warning de compilation (`RELEASE_NOTES-1.7.1.md` — couvre 1.6 → 1.7.1).
 - **1.7.0** — jamais soumise, absorbée par la 1.7.1 : quatre variantes de plus au hub, qui passe à douze — **Crazyhouse** (les prises changent de camp et se reposent), **Duck Chess** (un canard bloque une case, tour en deux temps), **Barricades** (d4 et e5 murées dès le départ) et **Barricades aléatoires** (deux murs qui changent de case à chaque coup), toutes contre l'ordinateur. Plus le correctif d'un défaut moteur récurrent des Variantes (« le moteur n'a pas pu être démarré » après une analyse ou un retour en arrière), et une passe de mise en page menée sur les deux extrêmes du parc — grandes fenêtres en classe *regular* (iPad plein écran, Split View, Stage Manager) et petits iPhone (`RELEASE_NOTES-1.7.0.md` — couvre 1.6 → 1.7).
 - **1.6.0** — soumise le 28/08/2026 : module Variantes porté à 8 façons de jouer (Chess960 complet, six variantes Fairy-Stockfish, et Coup Volé — variante maison sur Stockfish standard), analyse de fin de partie commune aux 7 non-Chess960, nouveau lecteur d'Ouvertures en arbre, Finales à 78 cours avec recherche, « Changer de mode » uniformisé, correctifs de fiabilité moteur, stockage allégé (175 → 60 Mo) (notes supprimées après soumission ; détail dans l'historique Git).

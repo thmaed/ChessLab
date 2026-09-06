@@ -35,12 +35,6 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
     /// Elo » classique, Stockfish bridé. Le niveau du personnage est
     /// `eloSliderValue`.
     var opponentProfileID: String?
-    /// « S'adapte à mes résultats » : le niveau mémorisé du personnage monte
-    /// ou descend d'un pas après chaque partie (voir ``AdaptiveLevel``).
-    var profileAdaptiveEnabled: Bool = false
-    /// Mode « Sparring » (voir ``Sparring``) : le personnage se relâche ou se
-    /// durcit en partie pour rester disputé. Désactivé par défaut.
-    var sparringEnabled: Bool = false
 
     /// Décodage TOLÉRANT aux champs absents.
     ///
@@ -69,8 +63,6 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         bookWidth = try container.decodeIfPresent(OpeningBookWidth.self, forKey: .bookWidth) ?? fallback.bookWidth
         engineResignationEnabled = try container.decodeIfPresent(Bool.self, forKey: .engineResignationEnabled) ?? fallback.engineResignationEnabled
         opponentProfileID = try container.decodeIfPresent(String.self, forKey: .opponentProfileID)
-        profileAdaptiveEnabled = try container.decodeIfPresent(Bool.self, forKey: .profileAdaptiveEnabled) ?? fallback.profileAdaptiveEnabled
-        sparringEnabled = try container.decodeIfPresent(Bool.self, forKey: .sparringEnabled) ?? fallback.sparringEnabled
     }
 
     /// Requis dès qu'un `init(from:)` explicite existe : il masque
@@ -89,9 +81,7 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         bookEnabled: Bool = true,
         bookWidth: OpeningBookWidth = .mainLinesOnly,
         engineResignationEnabled: Bool = true,
-        opponentProfileID: String? = nil,
-        profileAdaptiveEnabled: Bool = false,
-        sparringEnabled: Bool = false
+        opponentProfileID: String? = nil
     ) {
         self.colorChoice = colorChoice
         self.eloSliderValue = eloSliderValue
@@ -107,8 +97,6 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         self.bookWidth = bookWidth
         self.engineResignationEnabled = engineResignationEnabled
         self.opponentProfileID = opponentProfileID
-        self.profileAdaptiveEnabled = profileAdaptiveEnabled
-        self.sparringEnabled = sparringEnabled
     }
 
     var resolvedColorChoice: PlayerColorChoice {

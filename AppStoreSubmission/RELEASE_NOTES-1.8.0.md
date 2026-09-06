@@ -24,10 +24,6 @@ Le niveau d'un personnage se règle au curseur et se mémorise par personnage. I
 
 Indice, alerte en cas de coup risqué, barre d'évaluation et analyse de fin de partie : rien ne change, c'est toujours Stockfish. Pendant une partie contre un personnage, il n'intervient que dans quatre cas, tous écrits dans l'Aide : un mat en un ou deux disponible (dès le niveau 1 400), une finale à sept pièces ou moins (dès 1 600, Stockfish bridé au niveau du personnage), une répétition ou la règle des cinquante coups en position gagnée, et le modèle indisponible. L'écran de fin compte ces interventions.
 
-**Deux options, nommées et affichées**
-
-« S'adapte à mes résultats » fait monter le niveau du personnage de 25 après une victoire et descendre de 25 après une défaite, entre 800 et 2 500 ; la variation s'affiche en fin de partie. « Sparring » fait se relâcher le personnage quand il vous domine et se durcir quand vous le dominez, dans une bande de ±150 autour du niveau choisi. Les deux sont désactivées par défaut. Rien ne module un niveau en cachette.
-
 **Progrès, Laboratoire, Aide**
 
 L'écran Progrès affiche votre bilan par personnage, avec le plus haut niveau battu. Au Laboratoire, un camp peut être joué par Camille (Maia) pour mesurer un personnage contre Stockfish. L'Aide et la visite guidée présentent les personnages ; l'écran Licences mentionne Maia-3 (AGPLv3).
@@ -55,10 +51,6 @@ A character's level is set with the slider and remembered per character. It foll
 **Stockfish remains the analyst, and the safety net**
 
 Hints, risky-move warning, evaluation bar and post-game analysis: nothing changes, it is still Stockfish. During a game against a character it only steps in in four cases, all written in Help: a mate in one or two available (from level 1400), an endgame with seven pieces or fewer (from 1600, Stockfish limited to the character's level), a repetition or the fifty-move rule in a won position, and the model being unavailable. The end-of-game screen counts these interventions.
-
-**Two options, named and shown**
-
-"Adapts to my results" raises the character's level by 25 after a win and lowers it by 25 after a loss, between 800 and 2500; the change is shown at the end of the game. "Sparring" makes the character ease off when dominating you and toughen up when you dominate them, within a ±150 band around the chosen level. Both are off by default. Nothing adjusts a level in secret.
 
 **Progress, Lab, Help**
 

@@ -82,15 +82,6 @@ final class PlayViewModel {
     private(set) var isMaiaUnavailable = false
     /// Chaque intervention du filet Stockfish derrière Maia, dans l'ordre.
     private(set) var safetyNetInterventions: [SafetyNetReason] = []
-    /// Nouveau niveau mémorisé du personnage après la partie, quand
-    /// « S'adapte à mes résultats » est actif ; `nil` sinon.
-    private(set) var adaptedLevel: Double?
-    /// Décalage de consigne du mode Sparring (0 hors Sparring), borné par
-    /// ``Sparring/maxOffset``. Non persisté : une reprise repart de zéro.
-    private(set) var sparringOffset: Double = 0
-    /// Niveau estimé du joueur après la partie (mis à jour en fin de partie
-    /// contre un personnage).
-    private(set) var playerLevelAfterGame: Double?
 
     /// Vrai quand c'est Maia qui joue les coups de l'adversaire.
     var isMaiaOpponentActive: Bool { opponentProfile != nil && !isMaiaUnavailable }
@@ -108,12 +99,6 @@ final class PlayViewModel {
         guard let profile = opponentProfile else { return nil }
         let level = Int(settings.eloSliderValue.rounded())
         var line = LocalizationController.string("Contre %@, niveau %lld", "\(profile.firstName) « \(profile.displayNickname) »", level)
-        if let adaptedLevel, Int(adaptedLevel) != level {
-            line += " → \(Int(adaptedLevel))"
-        }
-        if settings.sparringEnabled {
-            line += " · " + LocalizationController.string("Sparring")
-        }
         let interventions = safetyNetInterventions.filter { $0 != .unavailable }.count
         if isMaiaUnavailable {
             line += " · " + LocalizationController.string("Maia indisponible, Stockfish a joué")
@@ -207,25 +192,7 @@ final class PlayViewModel {
             interruptHintAnalysisIfNeeded()
             releaseEngine()
             announceOutcome(outcome)
-            adaptLevelIfWanted(outcome)
         }
-    }
-
-    /// « S'adapte à mes résultats » : un pas par partie, mémorisé pour le
-    /// personnage, affiché sur l'écran de fin.
-    private func adaptLevelIfWanted(_ outcome: GameOutcome) {
-        guard let profile = opponentProfile else { return }
-        let result: ProgressionSummary.GameResult = outcome.winner == nil ? .draw
-            : (outcome.winner == userColor ? .win : .loss)
-        // Le niveau estimé du joueur suit chaque partie contre un personnage
-        // (une partie abandonnée sans coup ne dit rien : on l'ignore).
-        if !moveLog.isEmpty {
-            playerLevelAfterGame = PlayerLevel.record(result: result, against: settings.eloSliderValue, seed: settings.eloSliderValue)
-        }
-        guard settings.profileAdaptiveEnabled else { return }
-        let next = AdaptiveLevel.next(after: result, level: settings.eloSliderValue, within: profile.levelRange)
-        OpponentLevelStore.save(level: next, for: profile.id)
-        adaptedLevel = next
     }
 
     /// Annonce VoiceOver du RÉSULTAT (Lot 4.B). Les coups étaient annoncés,
@@ -1407,15 +1374,9 @@ final class PlayViewModel {
         var choice: MaiaOpponent.Choice?
         do {
             let mood = profile.mood(lastMoverCp: recentEngineEvalsCp.last)
-            if settings.sparringEnabled {
-                sparringOffset = Sparring.offset(after: recentEngineEvalsCp.last, current: sparringOffset)
-            }
             choice = try await maia.chooseMove(
                 history: recentPositions(), board: board,
-                selfElo: Double(level) + sparringOffset,
-                // Maia joue contre VOUS : votre niveau estimé, amorcé au
-                // niveau choisi.
-                oppoElo: PlayerLevel.current(seed: Double(level)),
+                selfElo: Double(level), oppoElo: Double(level),
                 temperature: mood.temperature, topP: profile.topP,
                 style: mood.style
             )
