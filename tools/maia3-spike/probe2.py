@@ -1,0 +1,5 @@
+exec(open("probe_maia3.py").read().split('probe("Cavalier')[0])
+probe("Mat du berger : Noirs au trait après 1.e4 e5 2.Fc4 Cc6 3.Dh5 — Cf6?? perd sur Dxf7#", "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3")
+probe("Fourchette en vue : Blancs, Cd5 attaque Dc7 et Fe7 (tactique simple)", "r1bqk2r/pp2bppp/2np1n2/4p3/4P3/1NN5/PPP1BPPP/R1BQK2R w KQkq - 0 9")
+probe("Attaque grecque (Fxh7+ gagne) : Blancs au trait", "r1bq1rk1/ppp1bppp/2n1p3/3pP3/3P4/2PB1N2/P1P2PPP/R1BQK2R w KQ - 0 9")
+probe("Finale de pions élémentaire : Blancs, Kd5! gagne (opposition), e5? nulle", "8/8/8/3k4/8/3K4/4P3/8 w - - 0 1", k=5)

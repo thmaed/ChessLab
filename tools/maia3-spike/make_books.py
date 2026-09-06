@@ -1,0 +1,198 @@
+"""Répertoires d'ouvertures des personnages → opponent_books.json (arbres SAN validés par python-chess)."""
+import json, chess
+LINES = {
+ "lea": [
+  ("e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 exd4 O-O", 5),
+  ("e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Qf3", 4),
+  ("e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 e5 Nb3 Be6 f3 Be7 Qd2 O-O g4", 4),
+  ("e4 c5 Nf3 Nc6 d4 cxd4 Nxd4 g6 Nc3 Bg7 Be3 Nf6 Bc4 O-O Bb3 d6 f3 Bd7 Qd2 Rc8 O-O-O", 3),
+  ("e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 h4", 3),
+  ("e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5 Bh7 Bd3 Bxd3 Qxd3", 2),
+  ("e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bb6 a4 a6 Nc3", 1),
+  ("e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 g6 Be3 Bg7 f3 O-O Qd2 Nc6 O-O-O d5 exd5 Nxd5 Nxc6 bxc6 Bd4", 3),
+  ("d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3 O-O Be2 e5 O-O Nc6 d5 Ne7 Ne1 Nd7 Nd3 f5 Bd2 Nf6 f3 f4 c5 g5", 3),
+  ("d4 d5 c4 Nc6 Nc3 dxc4 Nf3 Nf6 e4 Bg4 d5 Ne5", 1),
+  ("c4 e5 Nc3 Nf6 g3 d5 cxd5 Nxd5 Bg2 Nb6 Nf3 Nc6 O-O Be7 d3 O-O Be3 f5", 1),
+  ("Nf3 Nf6 g3 g6 Bg2 Bg7 O-O O-O d3 d5 Nbd2 c5 e4 Nc6", 1),
+ ],
+ "marc": [
+  ("d4 d5 Bf4 Nf6 e3 e6 Nd2 c5 c3 Nc6 Ngf3 Bd6 Bg3 O-O Bd3 b6 Ne5", 5),
+  ("d4 Nf6 Bf4 e6 e3 c5 c3 b6 Nd2 Bb7 Ngf3 Be7 h3 O-O Bd3", 4),
+  ("d4 d5 Bf4 c5 e3 Nc6 c3 Nf6 Nd2 Bf5 Qb3 Qd7 Ngf3 e6 Be2", 3),
+  ("d4 Nf6 Bf4 g6 e3 Bg7 h3 O-O Nf3 d6 Be2 Nbd7 O-O", 3),
+  ("d4 d5 Nf3 Nf6 e3 e6 Bd3 c5 c3 Nc6 Nbd2 Bd6 O-O O-O dxc5 Bxc5 e4", 3),
+  ("Nf3 d5 g3 Nf6 Bg2 c6 O-O Bg4 d3 Nbd7 Nbd2 e5 e4", 2),
+  ("e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 d6 c3 O-O h3 Na5 Bc2 c5 d4 Qc7", 2),
+  ("e4 c6 d4 d5 Nc3 dxe4 Nxe4 Bf5 Ng3 Bg6 h4 h6 Nf3 Nd7 h5 Bh7 Bd3 Bxd3 Qxd3 e6", 4),
+  ("e4 c6 d4 d5 e5 Bf5 Nf3 e6 Be2 c5 Be3 Qb6 Nc3 Nc6", 3),
+  ("e4 c6 d4 d5 exd5 cxd5 c4 Nf6 Nc3 e6 Nf3 Be7", 2),
+  ("e4 e6 d4 d5 Nc3 Nf6 Bg5 Be7 e5 Nfd7 Bxe7 Qxe7 f4 O-O Nf3 c5", 2),
+  ("d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5 e3 e6 Bxc4 Bb4 O-O O-O", 4),
+  ("d4 d5 c4 c6 Nc3 Nf6 e3 e6 Nf3 Nbd7 Bd3 dxc4 Bxc4 b5 Bd3 Bb7", 3),
+  ("d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 h6 Bh4 b6", 2),
+  ("c4 c6 e4 d5 exd5 cxd5 d4 Nf6 Nc3 Nc6 Bg5 e6", 2),
+  ("Nf3 d5 g3 c6 Bg2 Bg4 O-O Nd7 d3 Ngf6 Nbd2 e5", 2),
+ ],
+ "theo": [
+  ("e4 e5 f4 exf4 Nf3 g5 Bc4 g4 O-O gxf3 Qxf3", 5),
+  ("e4 e5 f4 exf4 Nf3 d6 d4 g5 h4 g4 Ng5", 3),
+  ("e4 e5 f4 exf4 Bc4 Qh4+ Kf1 b5 Bxb5 Nf6 Nf3 Qh6 d3", 2),
+  ("e4 e5 f4 d5 exd5 exf4 Nf3 Nf6 Bc4 Nxd5 O-O", 3),
+  ("e4 e5 f4 Bc5 Nf3 d6 c3 Nf6 fxe5 dxe5 Nxe5 Qe7 d4", 2),
+  ("e4 e5 f4 d6 Nf3 exf4 d4 g5 h4", 2),
+  ("e4 e5 d4 exd4 c3 dxc3 Bc4 cxb2 Bxb2 Nf6 Nc3 Bb4 Qc2", 3),
+  ("e4 e5 d4 exd4 c3 d5 exd5 Qxd5 cxd4 Nc6 Nf3 Bg4 Be2", 1),
+  ("e4 e5 d4 exd4 Qxd4 Nc6 Qe3 Nf6 Nc3 Bb4 Bd2 O-O O-O-O Re8 Qg3", 2),
+  ("e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 exd4 O-O Nge7 Ng5 d5 exd5 Nxd5 Nxf7", 3),
+  ("e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 d6 Bc4 e6 O-O Nf6 Qe2 Be7 Rd1 e5 Be3 O-O Rac1", 2),
+  ("d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 Nbd2 Bg4 h3 Bxf3 Nxf3 Bb4+ Bd2 Qe7", 4),
+  ("d4 d5 c4 e5 dxe5 d4 e3 Bb4+ Bd2 dxe3 Bxb4 exf2+ Ke2 fxg1=N+ Rxg1 Bg4+", 2),
+  ("d4 Nf6 c4 e5 dxe5 Ng4 Bf4 Nc6 Nf3 Bb4+ Nbd2 Qe7 e3 Ngxe5 Nxe5 Nxe5 Be2 O-O O-O", 4),
+  ("d4 Nf6 c4 e5 dxe5 Ne4 a3 b6 Nf3 Bb7 Qc2 d5", 1),
+  ("e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Nxf7 Bxf2+ Kxf2 Nxe4+ Kg1 Qh4 g3 Nxg3 hxg3 Qxg3+", 3),
+  ("e4 e5 Nf3 Nc6 Bb5 f5 Nc3 fxe4 Nxe4 d5 Nxe5 dxe4 Nxc6 Qg5", 2),
+  ("e4 e5 Nf3 d5 exd5 e4 Qe2 Nf6 d3 Qxd5", 2),
+  ("e4 e5 Nf3 f5 Nxe5 Qf6 d4 d6 Nc4 fxe4 Nc3 Qg6", 2),
+  ("e4 e5 Nf3 Nc6 d4 exd4 Bc4 Bc5 c3 Nf6 e5 d5 Bb5 Ne4", 1),
+  ("c4 e5 Nc3 f5 d4 e4", 1),
+  ("Nf3 e5 Nxe5 Nc6 Nxc6 dxc6 d3 Bc5 e3 Nf6", 1),
+ ],
+ "nadia": [
+  ("d4 d5 c4 e6 Nc3 Nf6 Bg5 Be7 e3 O-O Nf3 Nbd7 Rc1 c6 Bd3 dxc4 Bxc4 Nd5 Bxe7 Qxe7 O-O Nxc3 Rxc3", 4),
+  ("d4 d5 c4 e6 Nc3 Nf6 cxd5 exd5 Bg5 Be7 e3 c6 Bd3 Nbd7 Qc2 O-O Nf3 Re8 O-O Nf8", 3),
+  ("d4 d5 c4 e6 Nf3 Nf6 g3 Be7 Bg2 O-O O-O dxc4 Qc2 a6 Qxc4 b5 Qc2 Bb7 Bd2", 4),
+  ("d4 Nf6 c4 e6 Nf3 d5 g3 Bb4+ Bd2 Be7 Bg2 O-O O-O", 2),
+  ("d4 d5 c4 c6 Nf3 Nf6 Nc3 dxc4 a4 Bf5 e3 e6 Bxc4 Bb4 O-O O-O Qe2", 2),
+  ("e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Nf6 Nxc6 bxc6 e5 Qe7 Qe2 Nd5 c4 Ba6 b3 g6", 3),
+  ("e4 e5 Nf3 Nc6 d4 exd4 Nxd4 Bc5 Nxc6 Qf6 Qd2 dxc6 Nc3 Be6", 2),
+  ("e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 d4 Nd6 Bxc6 dxc6 dxe5 Nf5 Qxd8+ Kxd8 Nc3 Ke8 h3 h5", 3),
+  ("e4 e5 Nf3 Nf6 Nxe5 d6 Nf3 Nxe4 d4 d5 Bd3 Nc6 O-O Be7 c4 Nb4 Be2 O-O Nc3 Bf5", 4),
+  ("e4 e5 Nf3 Nf6 d4 Nxe4 Bd3 d5 Nxe5 Nd7 Nxd7 Bxd7 O-O Bd6 c4 c6", 2),
+  ("e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7 Re1 b5 Bb3 O-O", 1),
+  ("e4 c5 Nf3 e6 d4 cxd4 Nxd4 Nc6 Nc3 Qc7 Be3 a6 Be2 Nf6 O-O Bb4", 1),
+  ("d4 d5 c4 dxc4 e4 e5 Nf3 exd4 Bxc4 Nc6 O-O Be6 Bxe6 fxe6 Qb3 Qd7", 3),
+  ("d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5 O-O a6 Qe2 b5 Bb3 Bb7 Rd1 Nbd7", 3),
+  ("d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3+ Qxc3 b6 Bg5 Bb7 e3 d6", 2),
+  ("d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 h6 Bxf6 Bxf6 e3 O-O Rc1 c6", 2),
+  ("c4 e5 Nc3 Nf6 Nf3 Nc6 g3 d5 cxd5 Nxd5 Bg2 Nb6 O-O Be7 d3 O-O Be3 Be6", 2),
+  ("c4 Nf6 Nc3 e6 e4 d5 e5 d4 exf6 dxc3 bxc3 Qxf6", 1),
+  ("Nf3 d5 c4 e6 g3 Nf6 Bg2 Be7 O-O O-O d4 dxc4 Qc2 a6", 2),
+ ],
+ "sacha": [
+  ("e4 e5 Bc4 Nf6 d4 exd4 Nf3 Nxe4 Qxd4 Nf6 Bg5 Be7 Nc3 Nc6 Qh4 d5 O-O-O", 5),
+  ("e4 e5 Bc4 Nf6 d4 exd4 Nf3 Nc6 O-O Nxe4 Re1 d5 Bxd5 Qxd5 Nc3", 3),
+  ("e4 e5 Bc4 Nc6 Nf3 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3", 3),
+  ("e4 e5 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 exd4 Nf3", 2),
+  ("d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Qxf3 Qxd4 Be3 Qg4 Qf2", 3),
+  ("d4 d5 e4 dxe4 Nc3 Nf6 f3 exf3 Nxf3 g6 Bc4 Bg7 Ne5 O-O Bg5", 3),
+  ("d4 Nf6 Nc3 d5 Bg5 Nbd7 f3 c6 e4 dxe4 fxe4 e5", 1),
+  ("e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Nb4 a3", 3),
+  ("e4 e5 Nf3 Nc6 Nc3 Nf6 Bc4 Nxe4 Nxe4 d5 Bd3 dxe4 Bxe4", 1),
+  ("e4 d5 exd5 Qxd5 Nc3 Qa5 d4 Nf6 Nf3 Bg4 h3 Bh5 g4 Bg6 Ne5", 4),
+  ("e4 d5 exd5 Qxd5 Nc3 Qd6 d4 Nf6 Nf3 a6 g3 Bg4 Bg2 Nc6", 2),
+  ("e4 d5 exd5 Nf6 d4 Nxd5 c4 Nb6 Nf3 Bg4 Be2 e6 O-O Be7", 2),
+  ("e4 d5 exd5 Nf6 Bb5+ Bd7 Bc4 Bg4 f3 Bf5", 2),
+  ("e4 Nf6 e5 Nd5 d4 d6 c4 Nb6 f4 dxe5 fxe5 Nc6 Be3 Bf5 Nc3 e6 Nf3 Bg4", 3),
+  ("e4 Nf6 e5 Nd5 d4 d6 Nf3 Bg4 Be2 e6 O-O Be7 c4 Nb6 Nc3 O-O", 2),
+  ("e4 Nf6 Nc3 d5 e5 d4", 1),
+  ("d4 Nf6 c4 e5 dxe5 Ng4 Bf4 Nc6 Nf3 Bb4+ Nbd2 Qe7 a3 Ngxe5 Nxe5 Nxe5 e3 Bxd2+ Qxd2 d6", 3),
+  ("d4 d5 c4 e5 dxe5 d4 Nf3 Nc6 g3 Bg4 Bg2 Qd7 O-O O-O-O", 2),
+  ("d4 Nf6 Nf3 c5 d5 b5 c4 bxc4", 1),
+  ("c4 e5 Nc3 Nf6 Nf3 e4 Ng5 b5", 1),
+  ("Nf3 d5 c4 d4 b4 f6 e3 e5", 1),
+ ],
+ "ines": [
+  ("c4 e5 Nc3 Nf6 g3 d5 cxd5 Nxd5 Bg2 Nb6 Nf3 Nc6 O-O Be7 a3 O-O b4 Be6 d3 f6", 4),
+  ("c4 c5 Nf3 Nf6 g3 d5 cxd5 Nxd5 Bg2 Nc6 O-O e5 d3 Be7 Nbd2 O-O Nc4", 3),
+  ("c4 Nf6 Nc3 e6 e4 d5 e5 d4 exf6 dxc3 bxc3 Qxf6 d4 c5 Nf3 Nc6", 2),
+  ("c4 e6 Nc3 d5 d4 Nf6 Bg5 Be7 e3 O-O Nf3 h6 Bh4 b6 Rc1 Bb7", 2),
+  ("c4 g6 Nc3 Bg7 g3 e5 Bg2 d6 d3 Nc6 e4 f5", 1),
+  ("Nf3 d5 c4 e6 g3 Nf6 Bg2 Be7 O-O O-O b3 c5 Bb2 Nc6 e3 b6", 3),
+  ("Nf3 Nf6 c4 g6 g3 Bg7 Bg2 O-O O-O d6 d4 Nbd7 Nc3 e5", 3),
+  ("Nf3 d5 g3 c6 Bg2 Bf5 O-O e6 d3 h6 Nbd2 Nf6 b3 Be7", 2),
+  ("e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be3 e5 Nb3 Be6 f3 Be7 Qd2 O-O O-O-O Nbd7 g4 b5", 4),
+  ("e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2 e5 Nb3 Be7 O-O O-O Be3 Be6 f4 exf4 Bxf4 Nc6", 3),
+  ("e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Bg5 e6 f4 Be7 Qf3 Qc7 O-O-O Nbd7 g4 b5", 2),
+  ("e4 c5 Nc3 d6 g3 Nc6 Bg2 g6 d3 Bg7 f4 e5", 1),
+  ("e4 d6 d4 Nf6 Nc3 g6 Nf3 Bg7 Be2 O-O O-O c6 a4 Nbd7 h3 e5", 3),
+  ("e4 d6 d4 Nf6 Nc3 g6 f4 Bg7 Nf3 O-O Bd3 Nc6 e5 dxe5 fxe5 Nd5", 2),
+  ("d4 Nf6 c4 e6 Nc3 Bb4 e3 O-O Bd3 d5 Nf3 c5 O-O Nc6 a3 Bxc3 bxc3 dxc4 Bxc4 Qc7", 3),
+  ("d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O a3 Bxc3+ Qxc3 b6 Bg5 Bb7 e3 d6 Ne2 Nbd7", 2),
+  ("d4 Nf6 c4 e6 Nf3 b6 g3 Bb7 Bg2 Be7 O-O O-O Nc3 Ne4 Qc2 Nxc3 Qxc3 c5", 3),
+  ("d4 Nf6 c4 e6 Nf3 d5 Nc3 Be7 Bg5 O-O e3 h6 Bh4 b6 Be2 Bb7 Bxf6 Bxf6 cxd5 exd5", 1),
+  ("d4 Nf6 Nf3 e6 Bf4 c5 e3 Nc6 c3 d5 Nbd2 Bd6", 1),
+ ],
+ "yuri": [
+  ("d4 d5 c4 dxc4 e3 e6 Bxc4 c5 Nf3 a6 O-O Nf6 Qe2 b5 Bb3 Bb7 Rd1 Nbd7 Nc3 Qb8", 4),
+  ("d4 d5 c4 e6 Nc3 Nf6 cxd5 exd5 Bg5 Be7 e3 c6 Qc2 Nbd7 Bd3 O-O Nf3 Re8 O-O Nf8 h3", 4),
+  ("d4 d5 c4 c6 cxd5 cxd5 Bf4 Nc6 e3 Nf6 Nc3 a6 Bd3 Bg4 Nge2 e6 O-O Bd6", 3),
+  ("d4 Nf6 c4 e6 Nf3 d5 Nc3 dxc4 e4 Bb4 Bg5 c5 Bxc4 cxd4 Nxd4 Bxc3+ bxc3 Qa5 Bb5+", 2),
+  ("d4 Nf6 c4 g6 Nc3 d5 cxd5 Nxd5 e4 Nxc3 bxc3 Bg7 Nf3 c5 Rb1 O-O Be2 cxd4 cxd4 Qa5+ Bd2 Qxa2", 2),
+  ("e4 e5 Nf3 Nc6 Nc3 Nf6 Bb5 Bb4 O-O O-O d3 d6 Bg5 Bxc3 bxc3 Qe7 Re1 Nd8 d4 Ne6", 3),
+  ("e4 e5 Nf3 Nc6 Nc3 Nf6 d4 exd4 Nxd4 Bb4 Nxc6 bxc6 Bd3 d5 exd5 cxd5 O-O O-O Bg5 c6 Qf3", 3),
+  ("e4 e5 Nf3 Nc6 Nc3 Bc5 Nxe5 Nxe5 d4 Bd6 dxe5 Bxe5 Bd3", 1),
+  ("e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6 Be2 e5 Nb3 Be7 O-O O-O Be3 Be6 Qd2", 1),
+  ("d4 d5 c4 dxc4 e4 Nf6 e5 Nd5 Bxc4 Nb6 Bb3 Nc6 Ne2 Bf5 Nbc3 e6 O-O Be7", 3),
+  ("d4 d5 c4 dxc4 e3 e6 Bxc4 c5 Nf3 a6 O-O b5 Bd3 Bb7 a4 b4 Nbd2 Nf6", 3),
+  ("d4 d5 c4 dxc4 Nf3 Nf6 e3 e6 Bxc4 c5 O-O a6 dxc5 Qxd1 Rxd1 Bxc5 Nbd2 b5", 3),
+  ("d4 d5 c4 dxc4 Nc3 a6 e4 b5 a4 b4 Na2 e6 Bxc4 Nf6", 2),
+  ("e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 d6 Bc4 e6 O-O Nf6 Qe2 Be7 Rd1 e5 h3 O-O Be3 a6", 4),
+  ("e4 c5 d4 cxd4 c3 dxc3 Nxc3 Nc6 Nf3 d6 Bc4 a6 O-O Nf6 Qe2 Bg4 h3 Bxf3 Qxf3 e6", 2),
+  ("e4 e5 f4 exf4 Nf3 d6 d4 g5 h4 g4 Ng1 Bh6 Nc3 c6 Nge2 Qf6", 3),
+  ("e4 e5 f4 exf4 Bc4 Nf6 Nc3 c6 d4 d5 exd5 cxd5 Bb5+ Bd7 Bxd7+ Nbxd7", 2),
+  ("e4 e5 d4 exd4 c3 dxc3 Bc4 cxb2 Bxb2 d5 Bxd5 Nf6 Bxf7+ Kxf7 Qxd8 Bb4+ Qd2 Bxd2+ Nxd2 c5", 3),
+  ("e4 e5 d4 exd4 c3 dxc3 Nxc3 Nc6 Bc4 d6 Nf3 Be6 Bxe6 fxe6 Qb3 Qd7", 2),
+  ("e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Be7 d4 Na5 Bd3 d6 dxe5 dxe5 Qa4+ c6 Nxe5 Nf6", 3),
+  ("e4 e5 Nf3 Nc6 Bc4 Bc5 b4 Bxb4 c3 Ba5 d4 d6 Qb3 Qd7 dxe5 dxe5 O-O Bb6", 2),
+  ("e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Na5 Bb5+ c6 dxc6 bxc6 Be2 h6 Nf3 e4 Ne5 Qc7", 2),
+  ("e4 e5 Bc4 Nf6 d4 exd4 Nf3 Nxe4 Qxd4 Nf6 Bg5 Be7 Nc3 Nc6 Qh4 d5 O-O-O Be6", 1),
+  ("c4 e5 Nc3 Nf6 Nf3 Nc6 g3 d5 cxd5 Nxd5 Bg2 Nb6 O-O Be7 d3 O-O Be3 f5 Rc1", 1),
+  ("Nf3 d5 c4 dxc4 e3 Nf6 Bxc4 e6 O-O c5 d4 a6", 2),
+ ],
+ "pablo": [
+  ("e4 e5 Nf3 Nc6 Bc4 Bc5 c3 Nf6 d4 exd4 cxd4 Bb4+ Nc3 Nxe4 O-O Bxc3 d5 Bf6 Re1 Ne7 Rxe4 d6", 4),
+  ("e4 e5 Nf3 Nc6 Bc4 Nf6 d3 Bc5 O-O d6 c3 a6 Bb3 Ba7 Re1 O-O h3 h6 Nbd2", 3),
+  ("e4 e5 Nc3 Nf6 f4 d5 fxe5 Nxe4 Nf3 Be7 d4 O-O Bd3 f5 exf6 Bxf6 O-O", 3),
+  ("e4 e5 Nc3 Nc6 f4 exf4 Nf3 g5 h4 g4 Ng5 h6 Nxf7 Kxf7 d4 d5 Bxf4", 2),
+  ("e4 e5 Nc3 Nf6 Bc4 Nxe4 Qh5 Nd6 Bb3 Nc6 Nb5 g6 Qf3 f5 Qd5 Qe7 Nxc7+ Kd8 Nxa8 b6", 2),
+  ("e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 d5 exd5 Nxd5 Nxf7 Kxf7 Qf3+ Ke6 Nc3 Ncb4 a3 Nxc2+", 1),
+  ("e4 e5 Nf3 Nc6 Bc4 h6 d4 exd4 Nxd4 Nxd4 Qxd4 Qf6 Qxf6 Nxf6 Nc3", 1),
+  ("e4 c5 Nf3 Nc6 Bc4 e6 O-O Nf6 d3 d5 exd5 exd5 Bb3 Be7 Re1 O-O", 1),
+  ("e4 e5 Nf3 Nc6 Bc4 Bc5 O-O Nf6 d3 O-O Bg5 h6 Bh4 g5 Bg3 d6", 3),
+  ("e4 e5 Nc3 Nc6 Bc4 Bc5 Qg4 Qf6 Nd5 Qxf2+ Kd1 Kf8", 2),
+  ("e4 e5 Nf3 Nc6 Bb5 Nf6 O-O Nxe4 Re1 Nd6 Nxe5 Be7 Bf1 Nxe5 Rxe5 O-O d4 Bf6", 2),
+  ("e4 e5 Nf3 Nc6 Bc4 Nf6 Ng5 Bc5 Nxf7 Bxf2+ Kxf2 Nxe4+ Kg1 Qh4 g3 Nxg3 hxg3 Qxg3+ Kf1 Rf8", 2),
+  ("d4 d5 Nf3 Nf6 c4 c6 Nc3 Bf5 cxd5 cxd5 Qb3 Qb6 Nxd5 Qxb3 Nc7+ Kd8 axb3 Kxc7", 2),
+  ("d4 d5 c4 c5 cxd5 Qxd5 Nc3 Qxd4 Qxd4 cxd4 Nb5 Na6 Nxd4 e5", 1),
+  ("d4 Nf6 c4 e6 Nc3 Bb4 Qc2 O-O Bg5 h6 Bh4 c5 dxc5 Na6", 1),
+  ("d4 d5 Bf4 Nf6 e3 c5 c3 Nc6 Nd2 Qb6 Qb3 c4 Qxb6 axb6 Rb1 Bf5", 1),
+  ("c4 e5 Nc3 Nf6 g3 Bb4 Bg2 O-O Nf3 e4 Ng5 Bxc3 bxc3 Re8 f3 exf3 Nxf3 d5", 1),
+  ("Nf3 d5 g3 Nc6 Bg2 e5 d3 Nf6 O-O Be7 Nbd2 O-O e4 dxe4 dxe4 Bg4", 1),
+ ],
+}
+def build(lines):
+    roots = []
+    def insert(nodes, moves, weight):
+        if not moves: return
+        san = moves[0]
+        node = next((n for n in nodes if n["san"] == san), None)
+        if node is None:
+            node = {"san": san, "weight": 0, "children": []}; nodes.append(node)
+        node["weight"] += weight
+        insert(node["children"], moves[1:], weight)
+    for line, weight in lines:
+        board = chess.Board(); sans = line.split()
+        for san in sans:
+            board.push_san(san)   # lève si illégal
+        insert(roots, sans, weight)
+    def strip(nodes):
+        for n in nodes:
+            if not n["children"]: del n["children"]
+            else: strip(n["children"])
+    strip(roots)
+    return {"roots": roots}
+books = {pid: build(lines) for pid, lines in LINES.items()}
+out = "/Users/thierry/Developer/ChessLab/ChessLab/Resources/opponent_books.json"
+json.dump(books, open(out, "w"), ensure_ascii=False, separators=(",", ":"))
+def count(nodes): return sum(1 + count(n.get("children", [])) for n in nodes)
+print({pid: count(b["roots"]) for pid, b in books.items()}, "→", out)
