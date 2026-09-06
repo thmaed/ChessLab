@@ -67,9 +67,13 @@ struct NewGameSetupView: View {
             EngineStrength.playSliderRange.upperBound
         ))
         _opponentMode = State(initialValue: saved.opponentProfileID == nil ? .elo : .profile)
-        _opponentProfileID = State(initialValue: saved.opponentProfileID ?? OpponentProfile.maia.id)
-        if let profileID = saved.opponentProfileID, let profile = OpponentProfile.named(profileID) {
-            _eloSlider = State(initialValue: profile.clampedLevel(saved.eloSliderValue))
+        // Maia est TOUJOURS la sélection de départ en mode Personnage : on
+        // ouvre sur l'étalon, pas sur le dernier personnage affronté (le
+        // niveau, lui, reste mémorisé par personnage).
+        _opponentProfileID = State(initialValue: OpponentProfile.maia.id)
+        if saved.opponentProfileID != nil {
+            let maia = OpponentProfile.maia
+            _eloSlider = State(initialValue: maia.clampedLevel(OpponentLevelStore.level(for: maia.id) ?? saved.eloSliderValue))
         }
         _isCustomTimeControlSelected = State(initialValue: saved.timeControlID == "custom")
         _timeControl = State(initialValue: TimeControl.presets.first { $0.id == saved.timeControlID } ?? .none)
