@@ -164,10 +164,10 @@ struct OpponentLevelSlider: View {
     @Binding var level: Double
 
     private var tint: Color { OpponentTintResolver.color(profile.tint) }
-    private var range: ClosedRange<Double> { EngineStrength.playSliderRange }
+    private var range: ClosedRange<Double> { profile.levelRange }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Niveau")
                     .font(.subheadline.weight(.semibold))
@@ -178,27 +178,17 @@ struct OpponentLevelSlider: View {
                     .foregroundStyle(Theme.textPrimary)
                     .contentTransition(.numericText())
             }
+            // Le curseur ne va que là où le personnage est crédible : ses
+            // deux bornes sont celles de sa plage.
             Slider(value: $level, in: range, step: 50)
                 .tint(tint)
-            // La plage crédible du personnage, sous la piste : une bande
-            // de sa couleur entre ses deux bornes.
-            GeometryReader { geometry in
-                let width = geometry.size.width
-                let span = range.upperBound - range.lowerBound
-                let start = width * (Double(profile.recommendedLevels.lowerBound) - range.lowerBound) / span
-                let end = width * (Double(profile.recommendedLevels.upperBound) - range.lowerBound) / span
-                ZStack(alignment: .leading) {
-                    Capsule().fill(Theme.stroke).frame(height: 4)
-                    Capsule().fill(tint.opacity(0.8))
-                        .frame(width: max(0, end - start), height: 4)
-                        .offset(x: start)
-                }
+            HStack {
+                Text("\(profile.recommendedLevels.lowerBound)")
+                Spacer()
+                Text("\(profile.recommendedLevels.upperBound)")
             }
-            .frame(height: 4)
-            .padding(.horizontal, 2)
-            Text("Crédible de \(profile.recommendedLevels.lowerBound) à \(profile.recommendedLevels.upperBound)")
-                .font(.caption)
-                .foregroundStyle(tint)
+            .font(.caption.monospacedDigit())
+            .foregroundStyle(tint)
             Text("Échelle humaine (proche de Lichess), différente de l'Elo de Stockfish. Stockfish n'intervient que pour les mats courts, les finales à peu de pièces et les répétitions.")
                 .font(.caption2)
                 .foregroundStyle(Theme.textTertiary)

@@ -85,6 +85,18 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
 
     var displayNickname: String { LocalizationController.string(nickname) }
 
+    /// La plage du curseur pour ce personnage : sa plage crédible, et rien
+    /// d'autre — un Pablo à 2 400 n'est plus Pablo. L'adaptation entre
+    /// parties et la mémoire par personnage s'y bornent aussi.
+    var levelRange: ClosedRange<Double> {
+        Double(recommendedLevels.lowerBound)...Double(recommendedLevels.upperBound)
+    }
+
+    /// Ramène un niveau (mémorisé, venu d'une autre version…) dans la plage.
+    func clampedLevel(_ level: Double) -> Double {
+        min(levelRange.upperBound, max(levelRange.lowerBound, level))
+    }
+
     /// Niveau par défaut : le milieu de la plage conseillée, arrondi à 50.
     var defaultLevel: Double {
         let middle = Double(recommendedLevels.lowerBound + recommendedLevels.upperBound) / 2

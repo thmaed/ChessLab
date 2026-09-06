@@ -16,6 +16,15 @@ import Testing
         #expect(AdaptiveLevel.next(after: .win, level: 1490) == 1525, "arrondi au pas")
     }
 
+    @Test func theLevelStaysInsideTheCharactersRange() {
+        let pablo = OpponentProfile.pablo   // 800...1400
+        #expect(AdaptiveLevel.next(after: .win, level: 1400, within: pablo.levelRange) == 1400)
+        #expect(AdaptiveLevel.next(after: .loss, level: 800, within: pablo.levelRange) == 800)
+        #expect(pablo.clampedLevel(2000) == 1400)
+        #expect(pablo.clampedLevel(500) == 800)
+        #expect(pablo.clampedLevel(1000) == 1000)
+    }
+
     @Test func theSettingSurvivesDecodingWithoutTheKey() throws {
         let legacy = try #require("{\"opponentProfileID\": \"lea\"}".data(using: .utf8))
         let decoded = try JSONDecoder().decode(PlayGameSettings.self, from: legacy)

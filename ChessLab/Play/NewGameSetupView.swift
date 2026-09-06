@@ -71,6 +71,9 @@ struct NewGameSetupView: View {
         _opponentMode = State(initialValue: saved.opponentProfileID == nil ? .elo : .profile)
         _opponentProfileID = State(initialValue: saved.opponentProfileID ?? OpponentProfile.camille.id)
         _profileAdaptiveEnabled = State(initialValue: saved.profileAdaptiveEnabled)
+        if let profileID = saved.opponentProfileID, let profile = OpponentProfile.named(profileID) {
+            _eloSlider = State(initialValue: profile.clampedLevel(saved.eloSliderValue))
+        }
         _sparringEnabled = State(initialValue: saved.sparringEnabled)
         _isCustomTimeControlSelected = State(initialValue: saved.timeControlID == "custom")
         _timeControl = State(initialValue: TimeControl.presets.first { $0.id == saved.timeControlID } ?? .none)
@@ -130,16 +133,14 @@ struct NewGameSetupView: View {
                         }
                         .pickerStyle(.segmented)
                         .onChange(of: opponentMode) { _, mode in
-                            guard mode == .profile else { return }
-                            if let remembered = OpponentLevelStore.level(for: opponentProfileID) {
-                                eloSlider = remembered
-                            }
+                            guard mode == .profile, let profile = OpponentProfile.named(opponentProfileID) else { return }
+                            eloSlider = profile.clampedLevel(OpponentLevelStore.level(for: profile.id) ?? profile.defaultLevel)
                         }
 
                         if opponentMode == .profile {
                             OpponentGalleryView(selectedID: $opponentProfileID) { profile in
-                                // Chaque personnage garde SON niveau.
-                                eloSlider = OpponentLevelStore.level(for: profile.id) ?? profile.defaultLevel
+                                // Chaque personnage garde SON niveau, dans SA plage.
+                                eloSlider = profile.clampedLevel(OpponentLevelStore.level(for: profile.id) ?? profile.defaultLevel)
                             }
                             OpponentLevelSlider(
                                 profile: OpponentProfile.named(opponentProfileID) ?? .camille,

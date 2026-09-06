@@ -9,7 +9,7 @@ enum AdaptiveLevel {
     static let step: Double = 25
     static let range: ClosedRange<Double> = 800...2500
 
-    static func next(after result: ProgressionSummary.GameResult, level: Double) -> Double {
+    static func next(after result: ProgressionSummary.GameResult, level: Double, within range: ClosedRange<Double> = range) -> Double {
         let moved: Double = switch result {
         case .win: level + step
         case .loss: level - step

@@ -223,7 +223,7 @@ final class PlayViewModel {
             playerLevelAfterGame = PlayerLevel.record(result: result, against: settings.eloSliderValue, seed: settings.eloSliderValue)
         }
         guard settings.profileAdaptiveEnabled else { return }
-        let next = AdaptiveLevel.next(after: result, level: settings.eloSliderValue)
+        let next = AdaptiveLevel.next(after: result, level: settings.eloSliderValue, within: profile.levelRange)
         OpponentLevelStore.save(level: next, for: profile.id)
         adaptedLevel = next
     }
