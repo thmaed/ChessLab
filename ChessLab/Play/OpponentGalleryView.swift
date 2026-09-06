@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// La galerie des personnages : une grille de vignettes, puis la carte du
-/// personnage choisi (illustration, prénom et surnom, sa phrase, sa plage).
+/// La galerie des personnages : une grille de vignettes, puis la fiche du
+/// personnage choisi (grande illustration sur sa couleur, prénom et surnom,
+/// étiquettes de style, sa phrase).
 struct OpponentGalleryView: View {
     @Binding var selectedID: String
     var onSelect: (OpponentProfile) -> Void = { _ in }
@@ -10,52 +11,57 @@ struct OpponentGalleryView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 104), spacing: 10)], spacing: 10) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 10)], spacing: 10) {
                 ForEach(OpponentProfile.all) { profile in
                     OpponentTile(profile: profile, isSelected: profile.id == selectedID) {
                         guard profile.id != selectedID else { return }
-                        selectedID = profile.id
+                        withAnimation(Theme.snappySpring) { selectedID = profile.id }
                         onSelect(profile)
                     }
                 }
             }
             OpponentProfileCard(profile: selected)
+                .id(selected.id)
+                .transition(.opacity.combined(with: .scale(scale: 0.98)))
         }
     }
 }
 
-/// Une vignette de la galerie : illustration, prénom, surnom.
+/// Une vignette de la galerie : illustration, prénom, surnom. Sélectionnée,
+/// elle prend la couleur du personnage.
 struct OpponentTile: View {
     let profile: OpponentProfile
     let isSelected: Bool
     let action: () -> Void
 
+    private var tint: Color { OpponentTintResolver.color(profile.tint) }
+
     var body: some View {
         Button(action: action) {
             VStack(spacing: 6) {
-                OpponentAvatar(profile: profile, size: 56)
+                OpponentAvatar(profile: profile, size: 54, emphasized: isSelected)
                 Text(profile.firstName)
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(isSelected ? Theme.background : Theme.textPrimary)
+                    .foregroundStyle(Theme.textPrimary)
                     .lineLimit(1)
-                Text("« \(LocalizationController.string(profile.nickname)) »")
-                    .font(.caption2)
-                    .foregroundStyle(isSelected ? Theme.background.opacity(0.75) : Theme.textTertiary)
+                Text(LocalizationController.string(profile.nickname))
+                    .font(.caption2.weight(isSelected ? .semibold : .regular))
+                    .foregroundStyle(isSelected ? tint : Theme.textTertiary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
             }
             .padding(.vertical, 10)
-            .padding(.horizontal, 6)
+            .padding(.horizontal, 4)
             .frame(maxWidth: .infinity)
-            .background {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.accentGradient)
-                } else {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.surfaceElevated)
-                }
-            }
-            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(isSelected ? Color.clear : Theme.stroke, lineWidth: 1))
-            .glow(Theme.accent, radius: 8, isActive: isSelected)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(isSelected ? tint.opacity(0.18) : Theme.surfaceElevated)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(isSelected ? tint : Theme.stroke, lineWidth: isSelected ? 2 : 1)
+            )
+            .glow(tint, radius: 10, isActive: isSelected)
         }
         .buttonStyle(.pressable)
         .accessibilityLabel(Text("\(profile.firstName) « \(LocalizationController.string(profile.nickname)) »"))
@@ -68,15 +74,18 @@ struct OpponentTile: View {
 struct OpponentAvatar: View {
     let profile: OpponentProfile
     var size: CGFloat = 44
+    var emphasized: Bool = false
+
+    private var tint: Color { OpponentTintResolver.color(profile.tint) }
 
     var body: some View {
         Image(profile.avatar)
             .resizable()
             .scaledToFit()
             .frame(width: size, height: size)
-            .background(Circle().fill(OpponentTintResolver.color(profile.tint).opacity(0.18)))
+            .background(Circle().fill(tint.opacity(emphasized ? 0.32 : 0.18)))
             .clipShape(Circle())
-            .overlay(Circle().strokeBorder(OpponentTintResolver.color(profile.tint).opacity(0.6), lineWidth: 1.5))
+            .overlay(Circle().strokeBorder(tint.opacity(emphasized ? 1 : 0.6), lineWidth: emphasized ? 2 : 1.5))
             .accessibilityHidden(true)
     }
 }
@@ -96,47 +105,105 @@ enum OpponentTintResolver {
     }
 }
 
-/// La carte d'un personnage : illustration, prénom et surnom, sa phrase, sa
-/// plage conseillée, et ce que fait Stockfish derrière lui.
+/// La fiche d'un personnage : grande illustration sur un fond de sa couleur,
+/// prénom et surnom, étiquettes de style, sa phrase.
 struct OpponentProfileCard: View {
     let profile: OpponentProfile
 
+    private var tint: Color { OpponentTintResolver.color(profile.tint) }
+
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
-            OpponentAvatar(profile: profile, size: 64)
-            VStack(alignment: .leading, spacing: 5) {
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
+        HStack(alignment: .top, spacing: 14) {
+            OpponentAvatar(profile: profile, size: 84, emphasized: true)
+            VStack(alignment: .leading, spacing: 7) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(profile.firstName)
-                        .font(.headline)
+                        .font(.title3.weight(.bold))
                         .foregroundStyle(Theme.textPrimary)
                     Text("« \(LocalizationController.string(profile.nickname)) »")
-                        .font(.subheadline)
-                        .foregroundStyle(Theme.textSecondary)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(tint)
+                }
+                FlowLayout(spacing: 6, lineSpacing: 6) {
+                    ForEach(profile.tags, id: \.self) { tag in
+                        Text(LocalizedStringKey(tag))
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(tint)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 3)
+                            .background(Capsule().fill(tint.opacity(0.14)))
+                            .overlay(Capsule().strokeBorder(tint.opacity(0.35), lineWidth: 1))
+                    }
                 }
                 Text(LocalizedStringKey(profile.tagline))
                     .font(.footnote)
                     .foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
-                Text("Crédible de \(profile.recommendedLevels.lowerBound) à \(profile.recommendedLevels.upperBound).")
-                    .font(.caption)
-                    .foregroundStyle(Theme.textTertiary)
-                // Mesuré au Laboratoire (05/09/2026) : Stockfish bridé à
-                // « 1100 » écrase Maia consigne 2200. Les deux échelles ne
-                // sont pas comparables, et on le dit plutôt que de mentir.
-                Text("Le niveau suit l'échelle humaine de Maia (proche de Lichess), pas celle de Stockfish : un personnage à 1500 joue comme un joueur de 1500, ce qui est bien moins fort que Stockfish bridé à 1500.")
-                    .font(.caption2)
-                    .foregroundStyle(Theme.textTertiary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text("Joue avec Maia-3, un réseau entraîné sur des millions de parties humaines. Stockfish n'intervient que pour les mats courts, les finales à peu de pièces et les répétitions.")
-                    .font(.caption2)
-                    .foregroundStyle(Theme.textTertiary)
-                    .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(12)
-        .background(Theme.surfaceElevated, in: Theme.controlShape)
-        .overlay(Theme.controlShape.strokeBorder(Theme.stroke, lineWidth: 1))
+        .padding(14)
+        .background {
+            Theme.controlShape.fill(
+                LinearGradient(
+                    colors: [tint.opacity(0.22), Theme.surfaceElevated],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                )
+            )
+        }
+        .overlay(Theme.controlShape.strokeBorder(tint.opacity(0.35), lineWidth: 1))
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("opponentCard_\(profile.id)")
+    }
+}
+
+/// Le niveau d'un personnage : le chiffre, le curseur teinté à sa couleur,
+/// sa plage crédible marquée sous la piste, et une ligne pour dire de quelle
+/// échelle il s'agit.
+struct OpponentLevelSlider: View {
+    let profile: OpponentProfile
+    @Binding var level: Double
+
+    private var tint: Color { OpponentTintResolver.color(profile.tint) }
+    private var range: ClosedRange<Double> { EngineStrength.playSliderRange }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .firstTextBaseline) {
+                Text("Niveau")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.textSecondary)
+                Spacer()
+                Text("\(Int(level))")
+                    .font(.title2.weight(.bold).monospacedDigit())
+                    .foregroundStyle(Theme.textPrimary)
+                    .contentTransition(.numericText())
+            }
+            Slider(value: $level, in: range, step: 50)
+                .tint(tint)
+            // La plage crédible du personnage, sous la piste : une bande
+            // de sa couleur entre ses deux bornes.
+            GeometryReader { geometry in
+                let width = geometry.size.width
+                let span = range.upperBound - range.lowerBound
+                let start = width * (Double(profile.recommendedLevels.lowerBound) - range.lowerBound) / span
+                let end = width * (Double(profile.recommendedLevels.upperBound) - range.lowerBound) / span
+                ZStack(alignment: .leading) {
+                    Capsule().fill(Theme.stroke).frame(height: 4)
+                    Capsule().fill(tint.opacity(0.8))
+                        .frame(width: max(0, end - start), height: 4)
+                        .offset(x: start)
+                }
+            }
+            .frame(height: 4)
+            .padding(.horizontal, 2)
+            Text("Crédible de \(profile.recommendedLevels.lowerBound) à \(profile.recommendedLevels.upperBound)")
+                .font(.caption)
+                .foregroundStyle(tint)
+            Text("Échelle humaine (proche de Lichess), différente de l'Elo de Stockfish. Stockfish n'intervient que pour les mats courts, les finales à peu de pièces et les répétitions.")
+                .font(.caption2)
+                .foregroundStyle(Theme.textTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .accessibilityElement(children: .contain)
     }
 }

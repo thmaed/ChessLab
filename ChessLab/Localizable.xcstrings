@@ -2234,6 +2234,22 @@
         }
       }
     },
+    "Attaque": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attack"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attaque"
+          }
+        }
+      }
+    },
     "Attaque à la découverte": {
       "extractionState": "stale",
       "localizations": {
@@ -5127,6 +5143,22 @@
         }
       }
     },
+    "Contre-attaque": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Counter-attack"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contre-attaque"
+          }
+        }
+      }
+    },
     "Copier": {
       "localizations": {
         "en": {
@@ -5556,6 +5588,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Formation Creepy Crawly"
+          }
+        }
+      }
+    },
+    "Crédible de %lld à %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Credible from %lld to %lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crédible de %lld à %lld"
           }
         }
       }
@@ -6334,6 +6382,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Losses"
+          }
+        }
+      }
+    },
+    "Défense": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Defence"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Défense"
           }
         }
       }
@@ -7140,6 +7204,22 @@
         }
       }
     },
+    "Fermé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Closed"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermé"
+          }
+        }
+      }
+    },
     "Fichier .pgn": {
       "extractionState": "stale",
       "localizations": {
@@ -7389,6 +7469,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Finales de tours"
+          }
+        }
+      }
+    },
+    "Finales fragiles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shaky endgames"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finales fragiles"
           }
         }
       }
@@ -7666,6 +7762,22 @@
         }
       }
     },
+    "Gaffes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blunders"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gaffes"
+          }
+        }
+      }
+    },
     "Gagnées": {
       "localizations": {
         "en": {
@@ -7704,6 +7816,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gambit"
+          }
+        }
+      }
+    },
+    "Gambits": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gambits"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gambits"
           }
         }
       }
@@ -8327,6 +8455,38 @@
         }
       }
     },
+    "Imprévisible": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unpredictable"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imprévisible"
+          }
+        }
+      }
+    },
+    "Impulsif": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impulsive"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impulsif"
+          }
+        }
+      }
+    },
     "Incrément par coup (s)": {
       "localizations": {
         "en": {
@@ -8421,6 +8581,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Indice (flèches des meilleurs coups)"
+          }
+        }
+      }
+    },
+    "Initiative": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Initiative"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Initiative"
           }
         }
       }
@@ -11170,6 +11346,22 @@
         }
       }
     },
+    "Matériel": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Material"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Matériel"
+          }
+        }
+      }
+    },
     "Maître national": {
       "extractionState": "stale",
       "localizations": {
@@ -12810,6 +13002,22 @@
         }
       }
     },
+    "Patient": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Patient"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Patient"
+          }
+        }
+      }
+    },
     "Pause": {
       "localizations": {
         "en": {
@@ -13218,6 +13426,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Piège"
+          }
+        }
+      }
+    },
+    "Pièges": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traps"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pièges"
           }
         }
       }
@@ -13853,6 +14077,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Proposer nulle au moteur ?"
+          }
+        }
+      }
+    },
+    "Précise": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Precise"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Précise"
           }
         }
       }
@@ -15875,6 +16115,22 @@
         }
       }
     },
+    "Sacrifices": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sacrifices"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sacrifices"
+          }
+        }
+      }
+    },
     "Same-Coloured Bishops: Fortress": {
       "extractionState": "stale",
       "localizations": {
@@ -15888,6 +16144,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Fous de même couleur : la forteresse"
+          }
+        }
+      }
+    },
+    "Sang-froid": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cool head"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sang-froid"
           }
         }
       }
@@ -16367,6 +16639,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Attaque sodium"
+          }
+        }
+      }
+    },
+    "Solide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solid"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solide"
           }
         }
       }
@@ -17058,6 +17346,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Techniques prouvées"
+          }
+        }
+      }
+    },
+    "Tenace": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tenacious"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tenace"
           }
         }
       }
@@ -20477,6 +20781,22 @@
         }
       }
     },
+    "Échanges": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trades"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échanges"
+          }
+        }
+      }
+    },
     "Échec de l'enregistrement : %@": {
       "localizations": {
         "en": {
@@ -20505,6 +20825,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Échec trois fois"
+          }
+        }
+      }
+    },
+    "Échelle humaine (proche de Lichess), différente de l'Elo de Stockfish. Stockfish n'intervient que pour les mats courts, les finales à peu de pièces et les répétitions.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Human scale (close to Lichess), different from Stockfish's Elo. Stockfish only steps in for short mates, endgames with few pieces and repetitions."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échelle humaine (proche de Lichess), différente de l'Elo de Stockfish. Stockfish n'intervient que pour les mats courts, les finales à peu de pièces et les répétitions."
           }
         }
       }
@@ -20600,6 +20936,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Balance"
+          }
+        }
+      }
+    },
+    "Étalon": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reference"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Étalon"
           }
         }
       }

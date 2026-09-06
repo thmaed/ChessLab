@@ -141,46 +141,44 @@ struct NewGameSetupView: View {
                                 // Chaque personnage garde SON niveau.
                                 eloSlider = OpponentLevelStore.level(for: profile.id) ?? profile.defaultLevel
                             }
-                            Text("Niveau de référence")
-                                .font(.subheadline.weight(.semibold))
-                                .foregroundStyle(Theme.textSecondary)
-                        }
-
-                        HStack {
-                            Text(EngineStrength(sliderValue: eloSlider).displayLabel)
-                                .font(.title2.weight(.bold))
-                                .foregroundStyle(Theme.textPrimary)
-                            Spacer()
-                        }
-
-                        Slider(value: $eloSlider, in: EngineStrength.playSliderRange, step: 50)
-                            .tint(Theme.accent)
-
-                        // Grille ADAPTATIVE, et non deux colonnes figées : sur
-                        // un iPhone SE, deux colonnes ne laissaient que ~146 pt
-                        // par carte, où « Intermédiaire confirmé » se coupait
-                        // en plein mot (« Intermé-diaire co… »). Sous 172 pt
-                        // disponibles par colonne, la grille passe à une seule
-                        // colonne confortable ; les iPhone plus larges gardent
-                        // leurs deux colonnes.
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 172), spacing: 10)], spacing: 10) {
-                            ForEach(Array(EnginePreset.all.enumerated()), id: \.element.id) { index, preset in
-                                EngineLevelCard(
-                                    preset: preset,
-                                    tier: engineLevelTier(forIndex: index, total: EnginePreset.all.count),
-                                    isSelected: abs(preset.strength.sliderValue - eloSlider) < 1
-                                ) {
-                                    eloSlider = preset.strength.sliderValue
-                                }
-                            }
-                        }
-
-                        if opponentMode == .profile {
+                            OpponentLevelSlider(
+                                profile: OpponentProfile.named(opponentProfileID) ?? .camille,
+                                level: $eloSlider
+                            )
                             ToggleRow(label: "S'adapte à mes résultats", isOn: $profileAdaptiveEnabled)
                             Text("Après chaque partie, le niveau de ce personnage monte de 25 si vous gagnez, baisse de 25 si vous perdez. Toujours affiché, jamais en cachette.")
                                 .font(.caption2)
                                 .foregroundStyle(Theme.textTertiary)
                                 .fixedSize(horizontal: false, vertical: true)
+                        } else {
+                            HStack {
+                                Text(EngineStrength(sliderValue: eloSlider).displayLabel)
+                                    .font(.title2.weight(.bold))
+                                    .foregroundStyle(Theme.textPrimary)
+                                Spacer()
+                            }
+
+                            Slider(value: $eloSlider, in: EngineStrength.playSliderRange, step: 50)
+                                .tint(Theme.accent)
+
+                            // Grille ADAPTATIVE, et non deux colonnes figées : sur
+                            // un iPhone SE, deux colonnes ne laissaient que ~146 pt
+                            // par carte, où « Intermédiaire confirmé » se coupait
+                            // en plein mot (« Intermé-diaire co… »). Sous 172 pt
+                            // disponibles par colonne, la grille passe à une seule
+                            // colonne confortable ; les iPhone plus larges gardent
+                            // leurs deux colonnes.
+                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 172), spacing: 10)], spacing: 10) {
+                                ForEach(Array(EnginePreset.all.enumerated()), id: \.element.id) { index, preset in
+                                    EngineLevelCard(
+                                        preset: preset,
+                                        tier: engineLevelTier(forIndex: index, total: EnginePreset.all.count),
+                                        isSelected: abs(preset.strength.sliderValue - eloSlider) < 1
+                                    ) {
+                                        eloSlider = preset.strength.sliderValue
+                                    }
+                                }
+                            }
                         }
                     }
                 }

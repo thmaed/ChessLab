@@ -63,6 +63,8 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     let nickname: String
     /// Une phrase, clé de localisation.
     let tagline: String
+    /// Deux ou trois étiquettes de style, clés de localisation.
+    let tags: [String]
     /// Nom de l'illustration dans le catalogue d'images.
     let avatar: String
     let tint: OpponentTint
@@ -94,6 +96,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let lea = OpponentProfile(
         id: "lea", firstName: "Léa", nickname: "Tornade",
         tagline: "Roque du côté opposé et pions lancés : votre roi est une adresse de livraison. Simplifie mal, même avec deux pions d'avance.",
+        tags: ["Attaque", "Sacrifices", "Rapide"],
         avatar: "avatar_lea", tint: .danger,
         temperature: 1.0, topP: 1.0, recommendedLevels: 1000...2400,
         safetyNet: SafetyNetPolicy(),
@@ -109,6 +112,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let marc = OpponentProfile(
         id: "marc", firstName: "Marc", nickname: "Béton",
         tagline: "Système London, roque au coup 6, zéro faiblesse. Il n'a pas perdu depuis des mois. Il n'a pas gagné beaucoup non plus, mais il dort bien.",
+        tags: ["Solide", "Fermé", "Patient"],
         avatar: "avatar_marc", tint: .accent,
         temperature: 0.8, topP: 1.0, recommendedLevels: 1000...2500,
         safetyNet: SafetyNetPolicy(),
@@ -124,6 +128,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let theo = OpponentProfile(
         id: "theo", firstName: "Théo", nickname: "Gambit",
         tagline: "Offre un pion au deuxième coup, un deuxième au troisième, et cherche le mat avant d'avoir développé sa dame. Ses finales ressemblent à des accidents.",
+        tags: ["Gambits", "Initiative", "Finales fragiles"],
         avatar: "avatar_theo", tint: .gold,
         temperature: 1.1, topP: 1.0, recommendedLevels: 800...1800,
         safetyNet: SafetyNetPolicy(mateFromLevel: 1400, endgameFromLevel: nil),
@@ -139,6 +144,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let nadia = OpponentProfile(
         id: "nadia", firstName: "Nadia", nickname: "Finale",
         tagline: "Échange les dames au coup 12, propose nulle au coup 30 si c'est égal, et vous mate au coup 65 si ce ne l'est pas. Aucune fantaisie.",
+        tags: ["Échanges", "Finales", "Précise"],
         avatar: "avatar_nadia", tint: .teal,
         temperature: 0.8, topP: 1.0, recommendedLevels: 1400...2500,
         safetyNet: SafetyNetPolicy(mateFromLevel: 1400, endgameFromLevel: 1000, endgamePieceLimit: 9),
@@ -154,6 +160,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let sacha = OpponentProfile(
         id: "sacha", firstName: "Sacha", nickname: "Traquenard",
         tagline: "Ses coups ont l'air faux. La moitié le sont vraiment, l'autre moitié coûte une pièce à qui le croit. Tombe lui-même dans les pièges des autres, par principe.",
+        tags: ["Pièges", "Tactique", "Imprévisible"],
         avatar: "avatar_sacha", tint: .violet,
         temperature: 1.2, topP: 1.0, recommendedLevels: 800...1600,
         safetyNet: SafetyNetPolicy(mateFromLevel: 1200),
@@ -168,6 +175,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let ines = OpponentProfile(
         id: "ines", firstName: "Inès", nickname: "Ressort",
         tagline: "Laisse venir, encaisse, sourit. Plus vous attaquez, plus elle est dangereuse ; sa meilleure position est légèrement inférieure.",
+        tags: ["Défense", "Contre-attaque", "Sang-froid"],
         avatar: "avatar_ines", tint: .info,
         temperature: 0.9, topP: 1.0, recommendedLevels: 1200...2400,
         safetyNet: SafetyNetPolicy(),
@@ -184,6 +192,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let yuri = OpponentProfile(
         id: "yuri", firstName: "Yuri", nickname: "Grippe-sou",
         tagline: "Un pion offert est un pion pris. Il accepte tous les gambits, défend pendant quarante coups sans se plaindre, puis vous rappelle qu'il a un pion de plus.",
+        tags: ["Matériel", "Défense", "Tenace"],
         avatar: "avatar_yuri", tint: .neutral,
         temperature: 0.9, topP: 1.0, recommendedLevels: 1000...2200,
         safetyNet: SafetyNetPolicy(),
@@ -198,6 +207,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let pablo = OpponentProfile(
         id: "pablo", firstName: "Pablo", nickname: "Yolo",
         tagline: "Brillant au coup 15, en prise au coup 16. Joue vite, attaque tout, oublie son roi. Le débutant humain que Stockfish ne sait pas imiter.",
+        tags: ["Impulsif", "Attaque", "Gaffes"],
         avatar: "avatar_pablo", tint: .rose,
         temperature: 1.5, topP: 1.0, recommendedLevels: 800...1400,
         safetyNet: SafetyNetPolicy(mateFromLevel: 1400, endgameFromLevel: nil),
@@ -214,6 +224,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let camille = OpponentProfile(
         id: "camille", firstName: "Camille", nickname: "Neutre",
         tagline: "Maia-3 tel quel : joue comme un humain de ce niveau, sans style particulier.",
+        tags: ["Neutre", "Étalon"],
         avatar: "avatar_camille", tint: .accent,
         temperature: 1.0, topP: 1.0, recommendedLevels: 800...2500,
         safetyNet: SafetyNetPolicy(),

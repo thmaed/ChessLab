@@ -10054,3 +10054,15 @@ guidée et l'Aide ne mentionnent pas encore les personnages).
   « Réglez votre adversaire » parlent des personnages (FR et EN).
 - Suite complète unitaire : 968 tests / 152 suites verts avant ces quatre
   points ; suites ciblées et test d'interface verts après.
+
+## 06/09 — Galerie des personnages, plus jolie et sans les paliers Elo
+
+En mode Personnage, les cartes de préréglages Stockfish (« Grand débutant
+(800) »…) disparaissent : elles décrivaient l'échelle de Stockfish, pas celle
+du personnage. Reste le curseur, teinté à la couleur du personnage, avec sa
+plage crédible marquée sous la piste et le chiffre en grand. Les vignettes
+passent à trois colonnes ; la sélection prend la couleur du personnage au lieu
+du vert générique. La fiche devient une vraie vignette : grande illustration,
+prénom et surnom colorés, deux ou trois étiquettes de style (« Gambits »,
+« Initiative », « Finales fragiles »), sa phrase, sur un fond dégradé de sa
+couleur. Vérifié en capture et par le test d'interface.
