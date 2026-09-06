@@ -143,34 +143,34 @@ struct NewGameSetupView: View {
                                 level: $eloSlider
                             )
                         } else {
-                            HStack {
+                            // Le chiffre, le curseur, et juste dessous le nom
+                            // du palier où l'on est (« Débutant confirmé ») :
+                            // la grille des huit cartes disait la même chose
+                            // en huit fois plus de place.
+                            HStack(alignment: .firstTextBaseline) {
                                 Text(EngineStrength(sliderValue: eloSlider).displayLabel)
-                                    .font(.title2.weight(.bold))
+                                    .font(.title2.weight(.bold).monospacedDigit())
                                     .foregroundStyle(Theme.textPrimary)
+                                    .contentTransition(.numericText())
                                 Spacer()
+                                if let preset = EnginePreset.nearest(toSliderValue: eloSlider) {
+                                    Text(LocalizedStringKey(preset.label))
+                                        .font(.subheadline.weight(.semibold))
+                                        .foregroundStyle(Theme.accent)
+                                        .contentTransition(.opacity)
+                                }
                             }
+                            .animation(Theme.snappySpring, value: eloSlider)
 
                             Slider(value: $eloSlider, in: EngineStrength.playSliderRange, step: 50)
                                 .tint(Theme.accent)
-
-                            // Grille ADAPTATIVE, et non deux colonnes figées : sur
-                            // un iPhone SE, deux colonnes ne laissaient que ~146 pt
-                            // par carte, où « Intermédiaire confirmé » se coupait
-                            // en plein mot (« Intermé-diaire co… »). Sous 172 pt
-                            // disponibles par colonne, la grille passe à une seule
-                            // colonne confortable ; les iPhone plus larges gardent
-                            // leurs deux colonnes.
-                            LazyVGrid(columns: [GridItem(.adaptive(minimum: 172), spacing: 10)], spacing: 10) {
-                                ForEach(Array(EnginePreset.all.enumerated()), id: \.element.id) { index, preset in
-                                    EngineLevelCard(
-                                        preset: preset,
-                                        tier: engineLevelTier(forIndex: index, total: EnginePreset.all.count),
-                                        isSelected: abs(preset.strength.sliderValue - eloSlider) < 1
-                                    ) {
-                                        eloSlider = preset.strength.sliderValue
-                                    }
-                                }
+                            HStack {
+                                Text("\(Int(EngineStrength.playSliderRange.lowerBound))")
+                                Spacer()
+                                Text("Maximum")
                             }
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(Theme.textTertiary)
                         }
                     }
                 }
@@ -410,12 +410,6 @@ struct NewGameSetupView: View {
     /// Répartit `total` préréglages sur 5 paliers de jauge (1...5), en
     /// ordre croissant, pour donner un repère visuel rapide de la force
     /// relative sans avoir à mémoriser les valeurs Elo.
-    private func engineLevelTier(forIndex index: Int, total: Int) -> Int {
-        guard total > 1 else { return 1 }
-        let t = Double(index) / Double(total - 1)
-        return 1 + Int((t * 4).rounded())
-    }
-
     private var customTimeControlEditor: some View {
         VStack(spacing: 10) {
             Stepper(value: $customMinutes, in: 1...180) {
@@ -559,73 +553,6 @@ struct SettingsSection<Content: View>: View {
     }
 }
 
-private struct EngineLevelCard: View {
-    let preset: EnginePreset
-    let tier: Int
-    let isSelected: Bool
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 10) {
-                StrengthGauge(filledBars: tier, isSelected: isSelected)
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(LocalizedStringKey(preset.label))
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(isSelected ? Theme.background : Theme.textPrimary)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Text(caption)
-                        .font(.caption)
-                        .foregroundStyle(isSelected ? Theme.background.opacity(0.7) : Theme.textTertiary)
-                }
-
-                Spacer(minLength: 0)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background {
-                if isSelected {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.accentGradient)
-                } else {
-                    RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.surfaceElevated)
-                }
-            }
-            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(isSelected ? Color.clear : Theme.stroke, lineWidth: 1))
-            .glow(Theme.accent, radius: 8, isActive: isSelected)
-        }
-        .buttonStyle(.pressable)
-        .accessibilityAddTraits(isSelected ? [.isSelected] : [])
-    }
-
-    private var caption: String {
-        preset.strength == .maximum ? "Pleine puissance" : "Elo \(Int(preset.strength.sliderValue))"
-    }
-}
-
-/// Jauge à 5 barres façon "signal" indiquant la force relative d'un
-/// préréglage, pour repérer le niveau d'un coup d'œil sans lire l'Elo.
-private struct StrengthGauge: View {
-    let filledBars: Int
-    let isSelected: Bool
-
-    var body: some View {
-        HStack(alignment: .bottom, spacing: 2) {
-            ForEach(0..<5, id: \.self) { i in
-                RoundedRectangle(cornerRadius: 1.5)
-                    .fill(i < filledBars ? barColor : barColor.opacity(0.25))
-                    .frame(width: 3, height: 6 + CGFloat(i) * 4)
-            }
-        }
-        .frame(width: 26, height: 22, alignment: .bottom)
-    }
-
-    private var barColor: Color {
-        isSelected ? Theme.background : Theme.accent
-    }
-}
 
 struct ChipButton: View {
     let label: LocalizedStringKey

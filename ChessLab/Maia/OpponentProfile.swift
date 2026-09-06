@@ -43,12 +43,10 @@ struct Temperament: Hashable, Sendable {
     static let winningThresholdCp = 200
 }
 
-/// Couleur d'identité d'un personnage, résolue par la vue (`Theme`).
+/// Couleur d'identité d'un personnage : celle du disque de son
+/// illustration, résolue par la vue.
 enum OpponentTint: String, Hashable, Sendable {
-    case accent, teal, gold, violet, rose, info, danger, neutral
-    /// La couleur réservée à Maia elle-même, l'étalon : un menthe pâle,
-    /// distinct du vert des personnages.
-    case maia
+    case maiaBlue, red, deepBlue, green, purple, orange, cyan, slate, yellow
 }
 
 /// Un adversaire du mode Jouer : un caractère posé sur Maia-3.
@@ -112,7 +110,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         id: "lea", firstName: "Lena", nickname: "Tornade",
         tagline: "Roque du côté opposé et pions lancés : votre roi est une adresse de livraison. Simplifie mal, même avec deux pions d'avance.",
         tags: ["Attaque", "Sacrifices", "Rapide"],
-        avatar: "avatar_lea", tint: .danger,
+        avatar: "avatar_lea", tint: .red,
         temperature: 1.0, topP: 1.0, recommendedLevels: 1000...2400,
         safetyNet: SafetyNetPolicy(),
         style: StyleProfile(weights: [
@@ -128,7 +126,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         id: "marc", firstName: "Nils", nickname: "Béton",
         tagline: "Système London, roque au coup 6, zéro faiblesse. Il n'a pas perdu depuis des mois. Il n'a pas gagné beaucoup non plus, mais il dort bien.",
         tags: ["Solide", "Fermé", "Patient"],
-        avatar: "avatar_marc", tint: .accent,
+        avatar: "avatar_marc", tint: .deepBlue,
         temperature: 0.8, topP: 1.0, recommendedLevels: 1000...2500,
         safetyNet: SafetyNetPolicy(),
         style: StyleProfile(weights: [
@@ -144,7 +142,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         id: "theo", firstName: "Tom", nickname: "Gambit",
         tagline: "Offre un pion au deuxième coup, un deuxième au troisième, et cherche le mat avant d'avoir développé sa dame. Ses finales ressemblent à des accidents.",
         tags: ["Gambits", "Initiative", "Finales fragiles"],
-        avatar: "avatar_theo", tint: .gold,
+        avatar: "avatar_theo", tint: .green,
         temperature: 1.1, topP: 1.0, recommendedLevels: 800...1800,
         safetyNet: SafetyNetPolicy(mateFromLevel: 1400, endgameFromLevel: nil),
         style: StyleProfile(weights: [
@@ -160,7 +158,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         id: "nadia", firstName: "Nadia", nickname: "Finale",
         tagline: "Échange les dames au coup 12, propose nulle au coup 30 si c'est égal, et vous mate au coup 65 si ce ne l'est pas. Aucune fantaisie.",
         tags: ["Échanges", "Finales", "Précise"],
-        avatar: "avatar_nadia", tint: .teal,
+        avatar: "avatar_nadia", tint: .purple,
         temperature: 0.8, topP: 1.0, recommendedLevels: 1400...2500,
         safetyNet: SafetyNetPolicy(mateFromLevel: 1400, endgameFromLevel: 1000, endgamePieceLimit: 9),
         style: StyleProfile(weights: [
@@ -176,7 +174,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         id: "sacha", firstName: "Sacha", nickname: "Traquenard",
         tagline: "Ses coups ont l'air faux. La moitié le sont vraiment, l'autre moitié coûte une pièce à qui le croit. Tombe lui-même dans les pièges des autres, par principe.",
         tags: ["Pièges", "Tactique", "Imprévisible"],
-        avatar: "avatar_sacha", tint: .violet,
+        avatar: "avatar_sacha", tint: .orange,
         temperature: 1.2, topP: 1.0, recommendedLevels: 800...1600,
         safetyNet: SafetyNetPolicy(mateFromLevel: 1200),
         style: StyleProfile(weights: [
@@ -191,7 +189,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         id: "ines", firstName: "Ana", nickname: "Ressort",
         tagline: "Laisse venir, encaisse, sourit. Plus vous attaquez, plus elle est dangereuse ; sa meilleure position est légèrement inférieure.",
         tags: ["Défense", "Contre-attaque", "Sang-froid"],
-        avatar: "avatar_ines", tint: .info,
+        avatar: "avatar_ines", tint: .cyan,
         temperature: 0.9, topP: 1.0, recommendedLevels: 1200...2400,
         safetyNet: SafetyNetPolicy(),
         style: StyleProfile(weights: [
@@ -208,7 +206,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         id: "yuri", firstName: "Yuri", nickname: "Grippe-sou",
         tagline: "Un pion offert est un pion pris. Il accepte tous les gambits, défend pendant quarante coups sans se plaindre, puis vous rappelle qu'il a un pion de plus.",
         tags: ["Matériel", "Défense", "Tenace"],
-        avatar: "avatar_yuri", tint: .neutral,
+        avatar: "avatar_yuri", tint: .slate,
         temperature: 0.9, topP: 1.0, recommendedLevels: 1000...2200,
         safetyNet: SafetyNetPolicy(),
         style: StyleProfile(weights: [
@@ -223,7 +221,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         id: "pablo", firstName: "Pablo", nickname: "Yolo",
         tagline: "Brillant au coup 15, en prise au coup 16. Joue vite, attaque tout, oublie son roi. Le débutant humain que Stockfish ne sait pas imiter.",
         tags: ["Impulsif", "Attaque", "Gaffes"],
-        avatar: "avatar_pablo", tint: .rose,
+        avatar: "avatar_pablo", tint: .yellow,
         temperature: 1.5, topP: 1.0, recommendedLevels: 800...1400,
         safetyNet: SafetyNetPolicy(mateFromLevel: 1400, endgameFromLevel: nil),
         style: StyleProfile(weights: [
@@ -240,7 +238,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         id: "maia", firstName: "Maia", nickname: "Neutre",
         tagline: "Le réseau tel quel : joue comme un humain de ce niveau, sans style particulier.",
         tags: ["Neutre", "Étalon"],
-        avatar: "avatar_maia", tint: .maia,
+        avatar: "avatar_maia", tint: .maiaBlue,
         temperature: 1.0, topP: 1.0, recommendedLevels: 800...2500,
         safetyNet: SafetyNetPolicy(),
         style: .none,

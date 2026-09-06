@@ -5935,6 +5935,22 @@
         }
       }
     },
+    "De débutant à maître, au curseur, avec le nom du palier juste dessous — ou un personnage joué par Maia-3, avec son style et son caractère. Le piège du premier soir : jouer sa première partie à pleine force.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From beginner to master, by slider, with the name of the tier right below — or a character played by Maia-3, with a style and a temper of their own. The first-night trap: playing your first game at full strength."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De débutant à maître, au curseur, avec le nom du palier juste dessous — ou un personnage joué par Maia-3, avec son style et son caractère. Le piège du premier soir : jouer sa première partie à pleine force."
+          }
+        }
+      }
+    },
     "Depuis la 1.0, ChessLab a beaucoup évolué :\n\n• Ouvertures entièrement repensées : un lecteur guidé coup par coup, 58 ouvertures rédigées à la main et bilingues, des flèches colorées (coup recommandé, pièges, autres coups) et un entraînement en répétition espacée qui se règle tout seul.\n• iPad & Mac : interface à barre latérale, échiquier bord à bord, raccourcis clavier et survol au trackpad.\n• Synchronisation iCloud optionnelle : parties, puzzles et ouvertures suivent vos appareils, sans compte ni serveur tiers.\n• Analyse : suivez la meilleure ligne de Stockfish un demi-coup à la fois ; alerte « coup risqué » plus juste.\n• Progrès : un tableau de bord depuis l'accueil, avec un set de puzzles ciblé sur vos thèmes faibles.\n• Scanner plus fiable, moteur Stockfish recompilé (plus rapide et sans saccade), et nouveaux thèmes de plateau et de pièces.": {
       "extractionState": "stale",
       "localizations": {

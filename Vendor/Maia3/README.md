@@ -18,3 +18,9 @@ Citation :
 
 > Monroe, Eilender, Chalmers, Tang, Anderson. *Chessformer: A Unified
 > Architecture for Chess Modeling.* ICLR 2026. https://arxiv.org/abs/2605.19091
+
+## Illustrations des personnages
+
+`ChessLab/Assets.xcassets/Opponents/avatar_*.png` : neuf portraits fournis par
+l'auteur de l'app le 06/09/2026 (planche 3 × 3 générée, découpée en disques de 512 px, une image par
+personnage, couleur du disque reprise comme teinte du personnage). Propriété de l'auteur, distribués avec l'app sous sa licence.

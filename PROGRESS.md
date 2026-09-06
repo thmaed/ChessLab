@@ -10089,3 +10089,21 @@ au lieu du vert des personnages. Prénoms sans accent : Léa → Lena, Théo →
 Tom, Inès → Ana ; Marc → Nils, le testeur appliqué de l'app, dans le rôle du
 mur (solide, patient, aucune faiblesse). Identifiants et illustrations
 inchangés, Aide, notes et fiche App Store suivies.
+
+## 06/09 — Niveau Elo : le curseur et son palier, plus de grille
+
+En mode « Niveau Elo », la grille des huit cartes de préréglages disparaît.
+Reste le chiffre, le nom du palier juste à côté (`EnginePreset.nearest` : le
+préréglage le plus proche, l'égalité au plus bas — 900 est encore « Grand
+débutant », 950 « Débutant » ; 3190 = « Maximum », sans palier), le curseur
+et ses deux bornes. `EngineLevelCard` et `StrengthGauge` retirés. Testé
+(`EnginePresetBandTests`), visite guidée ajustée.
+
+## 06/09 — Les vrais portraits des personnages
+
+Neuf portraits fournis par l'auteur (planche 3 × 3), découpés en disques de
+512 px (`avatar_<id>.png`, un par personnage, en remplacement des SVG
+provisoires). La couleur du disque de chaque portrait, mesurée sur la
+planche, devient la teinte du personnage (`OpponentTint` : neuf cas
+nommés par couleur) ; l'app n'ajoute plus de fond derrière l'avatar, seulement
+un liseré, blanc quand le personnage est choisi.

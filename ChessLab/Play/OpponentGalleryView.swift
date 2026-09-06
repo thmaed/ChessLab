@@ -79,29 +79,32 @@ struct OpponentAvatar: View {
     private var tint: Color { OpponentTintResolver.color(profile.tint) }
 
     var body: some View {
+        // L'illustration porte déjà son disque de couleur : seul un liseré
+        // s'ajoute, plus marqué quand le personnage est choisi.
         Image(profile.avatar)
             .resizable()
             .scaledToFit()
             .frame(width: size, height: size)
-            .background(Circle().fill(tint.opacity(emphasized ? 0.32 : 0.18)))
             .clipShape(Circle())
-            .overlay(Circle().strokeBorder(tint.opacity(emphasized ? 1 : 0.6), lineWidth: emphasized ? 2 : 1.5))
+            .overlay(Circle().strokeBorder(emphasized ? Color.white.opacity(0.85) : tint.opacity(0.5), lineWidth: emphasized ? 2 : 1))
             .accessibilityHidden(true)
     }
 }
 
+/// Les couleurs des disques des illustrations, mesurées sur la planche
+/// (06/09/2026) : la teinte de chaque personnage EST celle de son avatar.
 enum OpponentTintResolver {
     static func color(_ tint: OpponentTint) -> Color {
         switch tint {
-        case .accent: Theme.accent
-        case .teal: Theme.teal
-        case .gold: Theme.gold
-        case .violet: Theme.violet
-        case .rose: Theme.rose
-        case .info: Theme.info
-        case .danger: Theme.danger
-        case .neutral: Theme.textSecondary
-        case .maia: Color(red: 0.64, green: 0.87, blue: 0.82)
+        case .maiaBlue: Color(red: 0.200, green: 0.435, blue: 0.675)
+        case .red: Color(red: 0.882, green: 0.141, blue: 0.125)
+        case .deepBlue: Color(red: 0.016, green: 0.373, blue: 0.718)
+        case .green: Color(red: 0.192, green: 0.518, blue: 0.247)
+        case .purple: Color(red: 0.412, green: 0.216, blue: 0.631)
+        case .orange: Color(red: 0.976, green: 0.604, blue: 0.086)
+        case .cyan: Color(red: 0.004, green: 0.667, blue: 0.753)
+        case .slate: Color(red: 0.263, green: 0.322, blue: 0.404)
+        case .yellow: Color(red: 0.996, green: 0.765, blue: 0.086)
         }
     }
 }

@@ -113,7 +113,9 @@ struct MaiaCalibrationHarness {
         // et reçoit la CONSIGNE m : c'est exactement ce que fera l'app.
         settings.sideAEloSlider = Double(tier)
         settings.sideAMaiaTargetElo = Double(consigne)
-        settings.sideBOpponentProfileID = nil
+        // MAIA_OPPONENT=<id> : le camp B est un autre personnage (Maia pour
+        // mesurer un STYLE contre l'étalon) au lieu de Stockfish bridé.
+        settings.sideBOpponentProfileID = ProcessInfo.processInfo.environment["MAIA_OPPONENT"].flatMap { OpponentProfile.named($0)?.id }
         settings.sideBEloSlider = Double(tier)
         settings.sideABookEnabled = false
         settings.sideBBookEnabled = false
@@ -122,7 +124,7 @@ struct MaiaCalibrationHarness {
         // 300 ms et non 150 : plus près du budget du mode Jouer (900 ms sans
         // pendule), à un coût de campagne encore tenable ; un moteur bridé
         // est de toute façon peu sensible au temps.
-        settings.movetimeMs = 300
+        settings.movetimeMs = Int(ProcessInfo.processInfo.environment["MAIA_MOVETIME"] ?? "") ?? 300
         settings.liveVisualization = false
         settings.keepAwakeSetting = false
 

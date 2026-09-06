@@ -120,6 +120,24 @@ struct EnginePreset: Identifiable, Equatable {
         strength == .maximum ? label : "\(label) (\(Int(strength.sliderValue)))"
     }
 
+    /// Le palier dont le nom décrit une valeur du curseur : le préréglage le
+    /// plus proche, l'égalité allant au plus bas (900 est encore « Grand
+    /// débutant », 950 déjà « Débutant »). Au maximum du curseur, aucun
+    /// palier : c'est « Maximum », et ``EngineStrength/displayLabel`` le dit.
+    static func nearest(toSliderValue value: Double) -> EnginePreset? {
+        guard value < EngineStrength.playSliderRange.upperBound else { return nil }
+        var best: EnginePreset?
+        var bestDistance = Double.infinity
+        for preset in all {
+            let distance = abs(preset.strength.sliderValue - value)
+            if distance < bestDistance {
+                best = preset
+                bestDistance = distance
+            }
+        }
+        return best
+    }
+
     /// Préréglages rapides du mode Jouer. S'arrêtent à « Grand Maître » (2500) :
     /// au-delà, le curseur libre monte jusqu'au maximum de Stockfish, mais sans
     /// bouton dédié — ces niveaux ne se jouent pas, ils se subissent. Les

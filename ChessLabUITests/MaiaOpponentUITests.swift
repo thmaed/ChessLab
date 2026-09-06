@@ -24,6 +24,12 @@ final class MaiaOpponentUITests: XCTestCase {
             RunLoop.current.run(until: Date().addingTimeInterval(0.6))
         }
 
+        // Capture du mode Niveau Elo (curseur + palier), pour relecture.
+        let eloShot = XCUIScreen.main.screenshot().pngRepresentation
+        let eloPath = NSTemporaryDirectory() + "elo-mode.png"
+        try? eloShot.write(to: URL(fileURLWithPath: eloPath))
+        print("UIDBG elo screenshot:", eloPath)
+
         // La bascule Niveau Elo / Personnage : un contrôle segmenté.
         let segment = app.segmentedControls.buttons["Personnage"].exists
             ? app.segmentedControls.buttons["Personnage"]
