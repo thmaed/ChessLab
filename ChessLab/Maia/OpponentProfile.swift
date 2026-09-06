@@ -124,8 +124,8 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
 
     static let marc = OpponentProfile(
         id: "marc", firstName: "Nils", nickname: "Béton",
-        tagline: "Système London, roque au coup 6, zéro faiblesse. Il n'a pas perdu depuis des mois. Il n'a pas gagné beaucoup non plus, mais il dort bien.",
-        tags: ["Solide", "Fermé", "Patient"],
+        tagline: "Système London, roque au coup 6, zéro faiblesse. Il maîtrise très bien la théorie et n'a pas perdu depuis des mois. Il dort bien.",
+        tags: ["Solide", "Théorie", "Patient"],
         avatar: "avatar_marc", tint: .deepBlue,
         temperature: 0.8, topP: 1.0, recommendedLevels: 1000...2500,
         safetyNet: SafetyNetPolicy(),
