@@ -250,9 +250,6 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     static let all: [OpponentProfile] = [.maia, .lea, .marc, .theo, .nadia, .sacha, .ines, .yuri, .pablo]
 
     static func named(_ id: String) -> OpponentProfile? {
-        // « camille » : l'ancien identifiant de l'étalon, encore possible
-        // dans un réglage ou une partie enregistrée.
-        if id == "camille" { return .maia }
-        return all.first { $0.id == id }
+        all.first { $0.id == id }
     }
 }

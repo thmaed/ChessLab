@@ -23,7 +23,7 @@ struct MaiaOpponentIntegrationTests {
     }
 
     @Test("Maia ouvre la partie et répond, sans que le filet se déclare indisponible")
-    func camillePlaysBothHerMoves() async throws {
+    func maiaPlaysBothHerMoves() async throws {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
             var settings = PlayGameSettings.default
             settings.colorChoice = PlayerColorChoice.black.rawValue

@@ -51,9 +51,9 @@ import Testing
 
     @Test func theOpponentProfileSurvivesARoundTripAndItsAbsence() throws {
         var settings = PlayGameSettings.default
-        settings.opponentProfileID = "camille"
+        settings.opponentProfileID = "nils"
         let data = try JSONEncoder().encode(settings)
-        #expect(try JSONDecoder().decode(PlayGameSettings.self, from: data).opponentProfileID == "camille")
+        #expect(try JSONDecoder().decode(PlayGameSettings.self, from: data).opponentProfileID == "nils")
         // Réglages d'une version antérieure : aucune clé → mode Elo.
         let legacy = try #require("{\"eloSliderValue\": 1400}".data(using: .utf8))
         let decoded = try JSONDecoder().decode(PlayGameSettings.self, from: legacy)
@@ -65,7 +65,7 @@ import Testing
     @Test func theGalleryResolvesItsProfiles() {
         #expect(OpponentProfile.named("maia") == .maia)
         #expect(OpponentProfile.named("inconnu") == nil)
-        #expect(PlayGameSettings(opponentProfileID: "camille").opponentProfile == .maia)
+        #expect(PlayGameSettings(opponentProfileID: "camille").opponentProfile == nil, "l'identifiant du spike n'est plus reconnu")
         #expect(PlayGameSettings().opponentProfile == .maia, "une installation neuve rencontre Maia")
         #expect(PlayGameSettings(opponentProfileID: nil).opponentProfile == nil)
     }
