@@ -2,7 +2,7 @@
 
 Notes DÉTAILLÉES pour le dépôt. Le texte à coller dans App Store Connect est la section « Nouveautés de cette version » de `METADATA.md` (limite 4 000 caractères).
 
-> ⏳ **PAS ENCORE SOUMISE.** Couvre la 1.7.1 (jamais partie : visite guidée, analyses de variantes, stabilité moteur) PLUS la 1.8.0 des 5-6/09/2026 : les personnages joués par Maia-3. Build : 13 (les builds 11 et 12 du matin, partis de Xcode, sont écartés). Si la 1.7.1 part avant, retirer d'ici ce qui lui appartient.
+> ✅ **SOUMISE le 06/09/2026, build 13**, par `tools/asc/release.sh` puis le clic de Thierry. Couvre la 1.7.1 (jamais partie : visite guidée, analyses de variantes, stabilité moteur) PLUS la 1.8.0 des 5-6/09/2026 : les personnages joués par Maia-3. Build : 13 (les builds 11 et 12 du matin, partis de Xcode, sont écartés). Si la 1.7.1 part avant, retirer d'ici ce qui lui appartient.
 
 ---
 

@@ -10186,3 +10186,7 @@ Thierry dans `~/.private_keys/` (hors dépôt, `.p8` ignorés par Git).
 - État à 17 h : textes des deux langues, 10 + 10 captures par langue, notes
   réviseurs en place ; build 13 téléversé (« Upload succeeded »), en
   traitement chez Apple ; aperçus vidéo en cours.
+- 17 h 30 : build 13 traité et rattaché, quatre aperçus par langue, les dix-huit
+  champs relus depuis App Store Connect identiques à `METADATA.md`. `main`
+  poussé (21 commits), puis Thierry a cliqué « Soumettre pour révision » :
+  **1.8.0 soumise le 06/09/2026.**

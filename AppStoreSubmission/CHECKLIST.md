@@ -9,7 +9,7 @@
 - [x] **Captures refaites le 06/09** là où l'app a changé, iPhone 6,7" et iPad 13", en anglais : `01-accueil` (sous-titre de la tuile), `04-partie` (contre Lena) et la NOUVELLE `04-adversaires` (la galerie, carte de Lena) — douze captures par idiome désormais. Les huit autres sont inchangées. **Vidéos** : les deux « partie classique + puzzle » réenregistrées (galerie, Lena choisie, deux coups, puzzle) — iPhone 28,0 s en 886×1920, iPad 29,5 s en 1200×1600 ; les deux Variantes inchangées. Les outils de capture passent `-discoveryTourSeen` pour que la visite guidée ne voile pas les écrans.
 - [ ] **Tester sur un appareil ancien** (iPhone 11 ou SE) que le premier coup d'un personnage ne traîne pas : le modèle Core ML se charge en tâche de fond à l'ouverture de la partie, l'inférence tourne sur CPU (mesurée 1,4 ms sur M2, attendue sous 10 ms sur A13).
 - [ ] **Vérifier l'app sur le téléphone** (installée le 06/09 sur l'iPhone 17 Pro en Debug) : galerie, une partie contre Milo, l'écran de fin, Progrès par personnage.
-- [ ] Pousser `main` avant d'archiver (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0). `tools/asc/release.sh` le vérifie et refuse de partir sinon.
+- [x] Pousser `main` avant d'archiver (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0). `tools/asc/release.sh` le vérifie et refuse de partir sinon. Poussé le 06/09/2026 avant la soumission.
 
 La **1.6 a été soumise le 28/08/2026**. La 1.7.0 qui se prépare est une version de finition : correctif d'un défaut moteur récurrent des Variantes, et une passe de mise en page sur les grandes fenêtres en classe *regular* (iPad plein écran, Split View, Stage Manager) et les petits iPhone. Voir `RELEASE_NOTES-1.7.0.md` et `METADATA.md` pour le détail.
 
