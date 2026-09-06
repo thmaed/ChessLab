@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Export d'une archive vers App Store Connect, téléversement direct
+	     par xcodebuild. Signature MANUELLE : le certificat « Apple
+	     Distribution » et le profil « ChessLab App Store 2026 » ont été créés
+	     par l'API (tools/asc/), parce que la clé d'API n'a pas accès aux
+	     certificats gérés dans le nuage par Xcode. -->
+	<key>method</key>
+	<string>app-store-connect</string>
+	<key>destination</key>
+	<string>upload</string>
+	<key>signingStyle</key>
+	<string>manual</string>
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.chesslab.ChessLab</key>
+		<string>ChessLab App Store 2026</string>
+	</dict>
+	<key>teamID</key>
+	<string>3N3BN259H6</string>
+	<key>uploadSymbols</key>
+	<true/>
+	<key>manageAppVersionAndBuildNumber</key>
+	<false/>
+</dict>
+</plist>

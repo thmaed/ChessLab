@@ -2,7 +2,7 @@
 
 Notes DÉTAILLÉES pour le dépôt. Le texte à coller dans App Store Connect est la section « Nouveautés de cette version » de `METADATA.md` (limite 4 000 caractères).
 
-> ⏳ **PAS ENCORE SOUMISE.** Couvre la 1.7.1 (jamais partie : visite guidée, analyses de variantes, stabilité moteur) PLUS la 1.8.0 des 5-6/09/2026 : les personnages joués par Maia-3. Build : 11. Si la 1.7.1 part avant, retirer d'ici ce qui lui appartient.
+> ⏳ **PAS ENCORE SOUMISE.** Couvre la 1.7.1 (jamais partie : visite guidée, analyses de variantes, stabilité moteur) PLUS la 1.8.0 des 5-6/09/2026 : les personnages joués par Maia-3. Build : 13 (les builds 11 et 12 du matin, partis de Xcode, sont écartés). Si la 1.7.1 part avant, retirer d'ici ce qui lui appartient.
 
 ---
 
@@ -64,7 +64,7 @@ Fairy-Stockfish only accepts an Elo between 500 and 2850; above that, the settin
 
 ## Notes internes (ne pas coller dans App Store Connect)
 
-- **Version et build — FIXÉS le 06/09.** `MARKETING_VERSION = 1.8.0`, `CURRENT_PROJECT_VERSION = 11` aux deux configurations de la cible applicative. Vérifier au `git diff` avant l'archive que l'IDE n'a pas fait dériver le build.
+- **Version et build — FIXÉS le 06/09.** `MARKETING_VERSION = 1.8.0`, `CURRENT_PROJECT_VERSION = 13` aux deux configurations de la cible applicative. Vérifier au `git diff` avant l'archive que l'IDE n'a pas fait dériver le build.
 
 - **Ce que Maia-3 est, sur pièces.** Transformeur encodeur à 64 jetons (une case chacun), entrée = 12 plans de pièces × 8 positions d'historique par case, plateau retourné quand les Noirs jouent, ni droits de roque ni en passant (inférés de l'historique) ; deux Elo continus (soi, adversaire) ; sortie = 4 352 logits + une tête W/D/L humaine. Modèle 23M (22,9 M de paramètres, 56,6 % de coups humains prédits) converti en Core ML fp16 : 43 Mo, dans `ChessLab/Maia3_23M.mlpackage` — le 5M (10 Mo, 55,4 %) a servi au spike et a été remplacé le 06/09. Calcul forcé sur CPU : le GPU du simulateur rend des logits de coups nuls en fp16 (mesuré, `MaiaModel.swift`). Encodeur, coups légaux et modèle prouvés sur 56 fixtures générées par l'implémentation de référence (`MaiaFixtureTests`).
 

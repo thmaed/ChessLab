@@ -1,15 +1,15 @@
 # Checklist de soumission App Store — ChessLab
 
-État au 21/07/2026, révisé le 19/08/2026 (1.5.0 build 7), le 26/08/2026 (1.6.0), le 28/08/2026 (1.7.0), le 05/09/2026 (1.7.1 build 10.1), et **re-révisé le 06/09/2026 pour la 1.8.0 (build 11)** — ni la 1.7.0 ni la 1.7.1 ne sont parties, la 1.8.0 les absorbe (voir `RELEASE_NOTES-1.8.0.md`).
+État au 21/07/2026, révisé le 19/08/2026 (1.5.0 build 7), le 26/08/2026 (1.6.0), le 28/08/2026 (1.7.0), le 05/09/2026 (1.7.1 build 10.1), et **re-révisé le 06/09/2026 pour la 1.8.0 (build 13)** — ni la 1.7.0 ni la 1.7.1 ne sont parties, la 1.8.0 les absorbe (voir `RELEASE_NOTES-1.8.0.md`).
 
 ## ⚠️ Avant de soumettre la 1.8
 
-- [x] **Version et build : `1.8.0` / `11`**, fixés et commités le 06/09/2026.
+- [x] **Version et build : `1.8.0` / `13`**, fixés le 06/09/2026 (les builds 11 et 12 partis de Xcode le matin même occupaient les numéros).
 - [x] **Licence Maia-3 (AGPLv3)** : texte intégral et provenance dans `Vendor/Maia3/`, entrée dans l'écran Licences, mention dans la description et les notes réviseurs de `METADATA.md`. Le code source poussé sur GitHub doit contenir `ChessLab/Maia3_23M.mlpackage` (43 Mo) et `tools/maia3-spike/` (le script de conversion) : c'est ce qui rend les poids convertis reproductibles, donc l'obligation AGPL tenue.
 - [x] **Captures refaites le 06/09** là où l'app a changé, iPhone 6,7" et iPad 13", en anglais : `01-accueil` (sous-titre de la tuile), `04-partie` (contre Lena) et la NOUVELLE `04-adversaires` (la galerie, carte de Lena) — douze captures par idiome désormais. Les huit autres sont inchangées. **Vidéos** : les deux « partie classique + puzzle » réenregistrées (galerie, Lena choisie, deux coups, puzzle) — iPhone 28,0 s en 886×1920, iPad 29,5 s en 1200×1600 ; les deux Variantes inchangées. Les outils de capture passent `-discoveryTourSeen` pour que la visite guidée ne voile pas les écrans.
 - [ ] **Tester sur un appareil ancien** (iPhone 11 ou SE) que le premier coup d'un personnage ne traîne pas : le modèle Core ML se charge en tâche de fond à l'ouverture de la partie, l'inférence tourne sur CPU (mesurée 1,4 ms sur M2, attendue sous 10 ms sur A13).
 - [ ] **Vérifier l'app sur le téléphone** (installée le 06/09 sur l'iPhone 17 Pro en Debug) : galerie, une partie contre Milo, l'écran de fin, Progrès par personnage.
-- [ ] Pousser `main` avant d'archiver (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0).
+- [ ] Pousser `main` avant d'archiver (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0). `tools/asc/release.sh` le vérifie et refuse de partir sinon.
 
 La **1.6 a été soumise le 28/08/2026**. La 1.7.0 qui se prépare est une version de finition : correctif d'un défaut moteur récurrent des Variantes, et une passe de mise en page sur les grandes fenêtres en classe *regular* (iPad plein écran, Split View, Stage Manager) et les petits iPhone. Voir `RELEASE_NOTES-1.7.0.md` et `METADATA.md` pour le détail.
 

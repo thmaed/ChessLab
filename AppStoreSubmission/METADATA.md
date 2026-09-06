@@ -102,7 +102,7 @@ LE COIN DES FINALES
 78 cours prouvés par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Neuf familles, de l'opposition aux études célèbres. Et l'entraînement libre : concluez la position contre la meilleure défense, tout coup qui préserve le verdict est accepté — pas seulement celui de la leçon.
 
 VARIANTES
-Chess960 (les échecs Fischer Random) : position de départ aléatoire, choisie par numéro, ou composée soi-même, avec la même analyse de fin de partie qu'en mode « Jouer ». Sept variantes de plus contre l'ordinateur, chacune avec sa propre analyse : Roi de la colline, Trois échecs, Horde, Course des rois, Antéchecs, Atomique, et Coup Volé (un jeton gagné tous les 7 coups permet d'en jouer deux d'affilée).
+Chess960 (les échecs Fischer Random) : position de départ aléatoire, choisie par numéro, ou composée soi-même, avec la même analyse de fin de partie qu'en mode « Jouer ». Sept variantes de plus contre l'ordinateur, chacune avec sa propre analyse : Roi de la colline, Trois échecs, Horde, Course des rois, Antéchecs, Atomique, et Coup Volé.
 
 VOS PROPRES RÉPERTOIRES
 Importez vos ouvertures au format PGN, variantes comprises, et entraînez-les avec le même système. Partagez un répertoire par simple fichier — aucun compte, aucun serveur. Ce que vous avez déjà mémorisé sur une position vaut aussitôt dans le répertoire importé.
@@ -120,17 +120,17 @@ CONÇU POUR IPAD
 Échiquier grand format et panneaux visibles simultanément (coups, courbe, MultiPV), clavier et trackpad pris en charge, portrait et paysage soignés.
 
 SYNCHRONISATION iCLOUD (optionnelle)
-Activez la synchronisation iCloud dans les Réglages pour que vos parties suivent tous vos appareils, via votre iCloud privé. Aucun compte à créer, aucun serveur ChessLab. Désactivée par défaut : l'app fonctionne entièrement hors ligne.
+Activez-la dans les Réglages pour que vos parties suivent tous vos appareils, via votre iCloud privé. Aucun compte, aucun serveur ChessLab. Désactivée par défaut.
 
 VIE PRIVÉE
-Hors ligne par défaut : aucun serveur ChessLab, aucune mesure d'audience, aucune publicité. Vos parties et réglages restent sur votre appareil. La synchronisation iCloud, si vous l'activez, utilise votre propre iCloud privé — vos données ne sont jamais partagées avec le développeur. Bilingue français/anglais.
+Hors ligne par défaut : aucun serveur ChessLab, aucune mesure d'audience, aucune publicité. Vos parties et réglages restent sur votre appareil, et ne sont jamais partagés avec le développeur. Bilingue français/anglais.
 
 ChessLab intègre le moteur Stockfish (licence GPLv3), le réseau Maia-3 de l'Université de Toronto (licence AGPLv3) et des jeux de pièces vectorielles libres — cburnett (GPLv2+/CC BY-SA), chessnut (Apache 2.0) et merida (GPLv2+). Code source complet et mentions de licence disponibles depuis l'app (Réglages → Licences).
 ```
 
 ---
 
-## English (secondary localization — App Store Connect: "English (U.S.)")
+## English (secondary localization — App Store Connect: "English (U.K.)", en-GB — la fiche a toujours été en anglais britannique ; un « English (U.S.) » neuf est refusé, le nom « ChessLab » y étant pris par une autre app)
 
 **Name** (30 char. max):
 ```
@@ -232,7 +232,7 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**1.8.0, build 11** — fixés délibérément et COMMITÉS le 06/09/2026 (`MARKETING_VERSION = 1.8.0`, `CURRENT_PROJECT_VERSION = 11`). Vérifier dans App Store Connect que le build réellement soumis pour la 1.6 est bien inférieur à 11 avant d'archiver. Nouveautés détaillées dans `RELEASE_NOTES-1.8.0.md`, texte prêt à coller ci-dessus.
+**1.8.0, build 13** — fixés le 06/09/2026 (`MARKETING_VERSION = 1.8.0`, `CURRENT_PROJECT_VERSION = 13`) : App Store Connect avait déjà reçu des builds 11 et 12 le matin même, depuis Xcode, et exige un numéro strictement supérieur. Le build 13 est celui téléversé par `tools/asc/release.sh`. Vérifier dans App Store Connect que le build réellement soumis pour la 1.6 est bien inférieur à 11 avant d'archiver. Nouveautés détaillées dans `RELEASE_NOTES-1.8.0.md`, texte prêt à coller ci-dessus.
 
 Historique : la 1.7.1 (build 10.1) avait été fixée le 05/09 et n'est jamais partie ; la 1.8.0 l'absorbe.
 

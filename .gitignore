@@ -53,3 +53,7 @@ tools/opening-generator/bin/
 *.p8
 .private_keys/
 AuthKey_*
+
+# Environnement Python de l'outil App Store Connect
+tools/asc/.venv/
+__pycache__/
