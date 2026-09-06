@@ -4,7 +4,7 @@ Tout ce qu'il faut pour soumettre ChessLab sur l'App Store, en dehors des étape
 
 - **`CHECKLIST.md`** — commence par là : ce qui est fait, ce qui reste.
 - **`METADATA.md`** — nom, sous-titre, mots-clés, description (FR + EN), catégories, réponses aux questionnaires App Privacy / âge / chiffrement, et une note aux reviewers Apple (caméra, réseau, licence GPLv3). À copier-coller dans App Store Connect.
-- **`screenshots/`** — captures d'écran réelles (pas des maquettes), prises sur simulateur, EN ANGLAIS uniquement (décision du 19/08 : un seul jeu de visuels pour la fiche) :
+- **`screenshots/`** — captures d'écran réelles (pas des maquettes), prises sur simulateur, EN ANGLAIS uniquement (décision du 19/08 : un seul jeu de visuels pour la fiche). Douze par idiome depuis le 06/09 (`04-adversaires` : la galerie des personnages) :
   - `iphone-6.7/en/` : 1284×2778 — capturées en 1320×2868 (iPhone 17 Pro Max) puis converties par étirement (écart de ratio 0,4 %, invisible), format « 6,7 pouces » accepté par App Store Connect ;
   - `ipad-13/en/` : 2064×2752 (iPad Pro 13" M5 / 12.9").
 

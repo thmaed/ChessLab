@@ -21,6 +21,7 @@ final class AppStoreVideoUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += [
             "-resetPlaySettings",
+            "-discoveryTourSeen",
             "-AppleLanguages", "(en)",
             "-AppleLocale", "en_US",
         ]
@@ -29,10 +30,17 @@ final class AppStoreVideoUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["ChessLab"].waitForExistence(timeout: 5))
         RunLoop.current.run(until: Date().addingTimeInterval(0.4))
 
-        // Contre l'ordinateur, réglages par défaut, deux coups joués.
+        // Contre l'ordinateur : la galerie s'ouvre, Lena est choisie, deux
+        // coups joués contre elle.
         guard tapLabeled(app, "Against the computer") else {
             XCTFail("tuile « Against the computer » introuvable")
             return
+        }
+        let lena = app.descendants(matching: .any).matching(identifier: "opponentTile_lea").firstMatch
+        if lena.waitForExistence(timeout: 5) {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+            lena.tap()
+            RunLoop.current.run(until: Date().addingTimeInterval(1.0))
         }
         guard tapLabeled(app, "Start") else {
             XCTFail("bouton « Start » introuvable (mode classique)")
@@ -70,6 +78,7 @@ final class AppStoreVideoUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += [
             "-resetPlaySettings",
+            "-discoveryTourSeen",
             "-AppleLanguages", "(en)",
             "-AppleLocale", "en_US",
         ]

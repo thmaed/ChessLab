@@ -10120,3 +10120,20 @@ les deux premières étapes parlent des personnages. Aide : la fiche « Contre
 l'ordinateur » commence par le choix de l'adversaire. Fiche App Store :
 sous-titre « Adversaires humains, analyse », texte promotionnel et
 description menés par les personnages, mot-clé « maia ». FR et EN.
+
+## 06/09 — Visuels App Store refaits là où l'app a changé, bouton Revanche retiré
+
+Captures (anglais, iPhone 6,7" et iPad 13") : seules les trois qui ont
+changé sont refaites — l'accueil (sous-titre de la tuile), la partie en cours
+(contre Lena, son prénom en haut du plateau) et une NOUVELLE capture,
+`04-adversaires`, la galerie des personnages avec la carte de Lena. Les huit
+autres (Ouvertures, Finales, Variantes) sont inchangées et gardées telles
+quelles. Les deux vidéos « partie classique + puzzle » sont réenregistrées
+(la galerie s'ouvre, Lena est choisie, deux coups, puis un puzzle) ; les deux
+vidéos Variantes ne bougent pas. Les outils de capture passent
+`-discoveryTourSeen` : la visite guidée, qui démarre une seconde après
+l'accueil sur une installation vierge, aurait voilé les écrans à capturer.
+
+Le bouton « Revanche » de l'écran de fin (mode Contre l'ordinateur) est
+retiré : signalé comme ne relançant pas la partie, et l'écran Nouvelle partie
+est à un tap. Celui du mode Deux joueurs reste.

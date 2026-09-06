@@ -36,6 +36,12 @@ struct ChessLabApp: App {
             // pas entre les runs) rendrait les libellés imprévisibles.
             UserDefaults.standard.removeObject(forKey: "settings.appLanguage")
         }
+        // Outils de capture (visuels et vidéos App Store) : la visite guidée
+        // démarre une seconde après l'accueil sur une installation vierge et
+        // son voile prendrait la place des écrans à capturer. Déclarée vue.
+        if CommandLine.arguments.contains("-discoveryTourSeen") {
+            DiscoveryTourMemory.markSeen()
+        }
 
         // Pré-chauffe le moteur audio (session + synthèse des buffers) et
         // les générateurs haptiques hors du premier coup : sans ça, jouer le

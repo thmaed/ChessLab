@@ -48,6 +48,10 @@ final class AppStoreScreenshotUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments += [
             "-resetPlaySettings",
+            // La visite guidée démarre une seconde après l'accueil sur une
+            // installation vierge et son voile prendrait la place des
+            // écrans à capturer : on la déclare déjà vue.
+            "-discoveryTourSeen",
             "-AppleLanguages", "(\(appleLanguageCode))",
             "-AppleLocale", fr ? "fr_FR" : "en_US",
         ]
@@ -340,6 +344,14 @@ final class AppStoreScreenshotUITests: XCTestCase {
         let playLabel = fr ? "Contre l'ordinateur" : "Against the computer"
 
         if tapLabeled(app, playLabel) {
+            // La galerie des personnages s'ouvre par défaut (Maia choisie) :
+            // Lena choisie pour la capture, sa carte rouge est plus parlante.
+            let lena = app.descendants(matching: .any).matching(identifier: "opponentTile_lea").firstMatch
+            if lena.waitForExistence(timeout: 5) {
+                lena.tap()
+                RunLoop.current.run(until: Date().addingTimeInterval(0.8))
+                save(app.screenshot(), folder: folder, name: "04-adversaires")
+            }
             if tapLabeled(app, fr ? "Commencer" : "Start") {
                 if app.otherElements["square_e2"].waitForExistence(timeout: 10) {
                     app.otherElements["square_e2"].tap()

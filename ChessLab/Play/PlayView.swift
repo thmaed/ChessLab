@@ -6,7 +6,6 @@ struct PlayView: View {
     @Bindable var viewModel: PlayViewModel
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
-    var onRematch: (PlayGameSettings) -> Void = { _ in }
     /// Ouvre l'analyse sur la position AFFICHÉE (FEN) — sans attendre la fin
     /// de partie, contrairement à `onAnalyze` qui porte le PGN complet.
     var onAnalyzePosition: (String) -> Void = { _ in }
@@ -483,7 +482,8 @@ struct PlayView: View {
 
     /// Bilan compact affiché sous le plateau en fin de partie : résultat +
     /// raison, sortie de répertoire éventuelle, et les actions (Accueil,
-    /// Analyser, Revanche).
+    /// Analyser). Le bouton « Revanche » a été retiré le 06/09/2026 : il ne
+    /// relançait pas la partie, et l'écran Nouvelle partie est à un tap.
     @ViewBuilder
     private var gameOverPanel: some View {
         if let outcome = viewModel.outcome {
@@ -518,7 +518,6 @@ struct PlayView: View {
                     // partie (tout le flux « Jouer à partir d'ici » était
                     // concerné).
                     panelButton("Analyser", icon: "chart.xyaxis.line") { onAnalyze(PGNExport.pgn(for: viewModel.game)) }
-                    panelButton("Revanche", icon: "arrow.triangle.2.circlepath", filled: true) { onRematch(rematchSettings()) }
                 }
             }
             .cardStyle()
@@ -547,14 +546,6 @@ struct PlayView: View {
             .glow(Theme.accent, radius: 8, isActive: filled)
         }
         .buttonStyle(.pressable)
-    }
-
-    /// Revanche : mêmes réglages, mais l'utilisateur joue l'autre camp que
-    /// celui qu'il vient de jouer.
-    private func rematchSettings() -> PlayGameSettings {
-        var settings = viewModel.settings
-        settings.colorChoice = (viewModel.userColor.opposite == .white ? PlayerColorChoice.white : .black).rawValue
-        return settings
     }
 
     /// Marqueur invisible exposant le nombre de coups joués pour les

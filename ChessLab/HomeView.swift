@@ -592,8 +592,6 @@ struct HomeView: View {
                         refreshResumableGame()
                     } onAnalyze: { pgn in
                         path.append(Route.activeAnalysis(.pgn(pgn)))
-                    } onRematch: { newSettings in
-                        rematch(with: newSettings)
                     } onAnalyzePosition: { fen in
                         // EMPILÉ au-dessus de la partie, qui reste vivante en
                         // dessous : le retour la retrouve telle quelle.
@@ -610,8 +608,6 @@ struct HomeView: View {
                         refreshResumableGame()
                     } onAnalyze: { pgn in
                         path.append(Route.activeAnalysis(.pgn(pgn)))
-                    } onRematch: { newSettings in
-                        rematch(with: newSettings)
                     } onAnalyzePosition: { fen in
                         path.append(Route.activeAnalysis(.fen(fen)))
                     } onOpenLab: { fen in
@@ -964,8 +960,6 @@ struct HomeView: View {
     /// FEN** (celui qu'on veut jouer). Corrige l'ancien comportement qui
     /// donnait toujours les Blancs, y compris pour un répertoire/une ligne
     /// des Noirs.
-    /// Revanche : remplace la partie courante en haut de la pile par une
-    /// nouvelle (nouvel hôte paresseux → nouveau `PlayViewModel`).
     /// Clé de session d'une route — voir ``SessionStore``.
     ///
     /// La route EST l'identité de l'écran : même route, même partie. Deux
@@ -1018,9 +1012,6 @@ struct HomeView: View {
         path.append(Route.activeTwoPlayerGame(settings))
     }
 
-    private func rematch(with settings: PlayGameSettings) {
-        startNewGame(settings, replacingCurrent: true)
-    }
 
     private func twoPlayerRematch(with settings: TwoPlayerGameSettings) {
         startNewTwoPlayerGame(settings, replacingCurrent: true)
@@ -1520,7 +1511,6 @@ private struct ActiveGameHost: View {
     let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
-    var onRematch: (PlayGameSettings) -> Void = { _ in }
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
@@ -1534,7 +1524,7 @@ private struct ActiveGameHost: View {
             if let viewModel {
                 PlayView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
+                    onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
                     onOpenTwoPlayer: onOpenTwoPlayer
                 )
             } else {
@@ -1559,7 +1549,6 @@ private struct ResumedGameHost: View {
     let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
-    var onRematch: (PlayGameSettings) -> Void = { _ in }
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
@@ -1573,7 +1562,7 @@ private struct ResumedGameHost: View {
             if let viewModel {
                 PlayView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
+                    onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
                     onOpenTwoPlayer: onOpenTwoPlayer
                 )
             } else {
@@ -1863,7 +1852,7 @@ private struct TwoPlayerActiveGameHost: View {
             if let viewModel {
                 TwoPlayerGameView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
+                    onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
                     onPlayVsEngine: onPlayVsEngine
                 )
             } else {
@@ -1901,7 +1890,7 @@ private struct TwoPlayerResumedGameHost: View {
             if let viewModel {
                 TwoPlayerGameView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onRematch: onRematch, onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
+                    onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
                     onPlayVsEngine: onPlayVsEngine
                 )
             } else {
