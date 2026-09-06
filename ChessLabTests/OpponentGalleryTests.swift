@@ -13,7 +13,7 @@ import UIKit
         #expect(OpponentProfile.all.count == 9)
         #expect(Set(OpponentProfile.all.map(\.id)).count == 9)
         #expect(Set(OpponentProfile.all.map(\.firstName)).count == 9)
-        #expect(OpponentProfile.all.last == .camille, "l'étalon ferme la galerie")
+        #expect(OpponentProfile.all.first == .maia, "l'étalon ouvre la galerie")
     }
 
     @Test func everyCharacterHasItsIllustration() {
@@ -36,7 +36,7 @@ import UIKit
             #expect(profile.style.strength >= 0 && profile.style.strength <= 1.5, "\(profile.id)")
             #expect(profile.temperament.pace > 0, "\(profile.id)")
         }
-        #expect(OpponentProfile.camille.style.isNeutral)
+        #expect(OpponentProfile.maia.style.isNeutral)
         #expect(!OpponentProfile.lea.style.isNeutral)
     }
 
@@ -64,7 +64,7 @@ import UIKit
             try walk(book.roots, board: Board(position: .standard), path: [])
             #expect(walked >= 100, "\(bookID) : \(walked) nœuds seulement")
         }
-        #expect(OpponentBooks.book(for: .camille) == nil, "Camille joue le livre général")
+        #expect(OpponentBooks.book(for: .maia) == nil, "Maia joue le livre général")
     }
 
     @Test func aRepertoireAnswersItsOwnFirstMoves() {

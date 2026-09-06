@@ -63,9 +63,9 @@ import Testing
     }
 
     @Test func theGalleryResolvesItsProfiles() {
-        #expect(OpponentProfile.named("camille") == .camille)
+        #expect(OpponentProfile.named("maia") == .maia)
         #expect(OpponentProfile.named("inconnu") == nil)
-        #expect(PlayGameSettings(opponentProfileID: "camille").opponentProfile == .camille)
+        #expect(PlayGameSettings(opponentProfileID: "camille").opponentProfile == .maia)
         #expect(PlayGameSettings().opponentProfile == nil)
     }
 }

@@ -12,7 +12,7 @@ import Testing
 /// TEST_RUNNER_MAIA_TIERS=1100,1500,2000 \
 /// TEST_RUNNER_MAIA_CONSIGNES=1100,1500,2000   # une liste par palier (« ; » entre paliers) ou une seule liste
 /// TEST_RUNNER_MAIA_GAMES=100 \
-/// TEST_RUNNER_MAIA_PROFILE=camille \
+/// TEST_RUNNER_MAIA_PROFILE=maia \
 /// TEST_RUNNER_MAIA_CSV=/chemin/maia-calibration.csv \
 /// xcodebuild test … -only-testing:ChessLabTests/MaiaCalibrationHarness
 /// ```
@@ -57,7 +57,7 @@ struct MaiaCalibrationHarness {
 
     @Test func measureProfileAgainstBridledStockfish() async throws {
         let env = ProcessInfo.processInfo.environment
-        let profileID = env["MAIA_PROFILE"] ?? OpponentProfile.camille.id
+        let profileID = env["MAIA_PROFILE"] ?? OpponentProfile.maia.id
         let profile = try #require(OpponentProfile.named(profileID), "personnage inconnu : \(profileID)")
         let tiers = (env["MAIA_TIERS"] ?? "1100,1500,2000").split(separator: ",").compactMap { Int($0.trimmingCharacters(in: .whitespaces)) }
         let games = Int(env["MAIA_GAMES"] ?? "") ?? 100

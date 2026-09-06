@@ -456,8 +456,8 @@ struct LabSetupView: View {
                 // Le camp joue Camille (Maia-3) avec son filet Stockfish, au
                 // lieu de Stockfish bridé : c'est ainsi qu'un personnage se
                 // mesure contre l'étalon.
-                ChipButton(label: "Camille (Maia)", systemImage: "person.crop.circle", isSelected: isMaia) {
-                    profileID.wrappedValue = isMaia ? nil : OpponentProfile.camille.id
+                ChipButton(label: "Maia (réseau)", systemImage: "person.crop.circle", isSelected: isMaia) {
+                    profileID.wrappedValue = isMaia ? nil : OpponentProfile.maia.id
                 }
             }
         }

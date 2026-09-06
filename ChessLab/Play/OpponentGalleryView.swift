@@ -7,7 +7,7 @@ struct OpponentGalleryView: View {
     @Binding var selectedID: String
     var onSelect: (OpponentProfile) -> Void = { _ in }
 
-    private var selected: OpponentProfile { OpponentProfile.named(selectedID) ?? .camille }
+    private var selected: OpponentProfile { OpponentProfile.named(selectedID) ?? .maia }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -101,6 +101,7 @@ enum OpponentTintResolver {
         case .info: Theme.info
         case .danger: Theme.danger
         case .neutral: Theme.textSecondary
+        case .maia: Color(red: 0.64, green: 0.87, blue: 0.82)
         }
     }
 }

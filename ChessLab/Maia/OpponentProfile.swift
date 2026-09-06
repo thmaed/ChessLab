@@ -46,6 +46,9 @@ struct Temperament: Hashable, Sendable {
 /// Couleur d'identité d'un personnage, résolue par la vue (`Theme`).
 enum OpponentTint: String, Hashable, Sendable {
     case accent, teal, gold, violet, rose, info, danger, neutral
+    /// La couleur réservée à Maia elle-même, l'étalon : un menthe pâle,
+    /// distinct du vert des personnages.
+    case maia
 }
 
 /// Un adversaire du mode Jouer : un caractère posé sur Maia-3.
@@ -106,7 +109,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     // MARK: Galerie
 
     static let lea = OpponentProfile(
-        id: "lea", firstName: "Léa", nickname: "Tornade",
+        id: "lea", firstName: "Lena", nickname: "Tornade",
         tagline: "Roque du côté opposé et pions lancés : votre roi est une adresse de livraison. Simplifie mal, même avec deux pions d'avance.",
         tags: ["Attaque", "Sacrifices", "Rapide"],
         avatar: "avatar_lea", tint: .danger,
@@ -122,7 +125,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     )
 
     static let marc = OpponentProfile(
-        id: "marc", firstName: "Marc", nickname: "Béton",
+        id: "marc", firstName: "Nils", nickname: "Béton",
         tagline: "Système London, roque au coup 6, zéro faiblesse. Il n'a pas perdu depuis des mois. Il n'a pas gagné beaucoup non plus, mais il dort bien.",
         tags: ["Solide", "Fermé", "Patient"],
         avatar: "avatar_marc", tint: .accent,
@@ -138,7 +141,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     )
 
     static let theo = OpponentProfile(
-        id: "theo", firstName: "Théo", nickname: "Gambit",
+        id: "theo", firstName: "Tom", nickname: "Gambit",
         tagline: "Offre un pion au deuxième coup, un deuxième au troisième, et cherche le mat avant d'avoir développé sa dame. Ses finales ressemblent à des accidents.",
         tags: ["Gambits", "Initiative", "Finales fragiles"],
         avatar: "avatar_theo", tint: .gold,
@@ -185,7 +188,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     )
 
     static let ines = OpponentProfile(
-        id: "ines", firstName: "Inès", nickname: "Ressort",
+        id: "ines", firstName: "Ana", nickname: "Ressort",
         tagline: "Laisse venir, encaisse, sourit. Plus vous attaquez, plus elle est dangereuse ; sa meilleure position est légèrement inférieure.",
         tags: ["Défense", "Contre-attaque", "Sang-froid"],
         avatar: "avatar_ines", tint: .info,
@@ -230,14 +233,14 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         bookID: "pablo"
     )
 
-    /// L'étalon : Maia tel quel, température 1, sans trait, sans surnom
-    /// mérité. Sert de référence au calibrage et de vitrine à l'humanité
-    /// brute du modèle.
-    static let camille = OpponentProfile(
-        id: "camille", firstName: "Camille", nickname: "Neutre",
-        tagline: "Maia-3 tel quel : joue comme un humain de ce niveau, sans style particulier.",
+    /// L'étalon : le réseau Maia-3 tel quel, température 1, sans trait.
+    /// Sert de référence au calibrage et de vitrine à l'humanité brute du
+    /// modèle. En tête de la galerie, sous son propre nom.
+    static let maia = OpponentProfile(
+        id: "maia", firstName: "Maia", nickname: "Neutre",
+        tagline: "Le réseau tel quel : joue comme un humain de ce niveau, sans style particulier.",
         tags: ["Neutre", "Étalon"],
-        avatar: "avatar_camille", tint: .accent,
+        avatar: "avatar_maia", tint: .maia,
         temperature: 1.0, topP: 1.0, recommendedLevels: 800...2500,
         safetyNet: SafetyNetPolicy(),
         style: .none,
@@ -245,10 +248,13 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         bookID: nil
     )
 
-    /// L'ordre de la galerie.
-    static let all: [OpponentProfile] = [.lea, .marc, .theo, .nadia, .sacha, .ines, .yuri, .pablo, .camille]
+    /// L'ordre de la galerie : Maia d'abord, puis les caractères.
+    static let all: [OpponentProfile] = [.maia, .lea, .marc, .theo, .nadia, .sacha, .ines, .yuri, .pablo]
 
     static func named(_ id: String) -> OpponentProfile? {
-        all.first { $0.id == id }
+        // « camille » : l'ancien identifiant de l'étalon, encore possible
+        // dans un réglage ou une partie enregistrée.
+        if id == "camille" { return .maia }
+        return all.first { $0.id == id }
     }
 }

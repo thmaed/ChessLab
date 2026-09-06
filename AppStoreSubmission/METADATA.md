@@ -20,13 +20,13 @@ C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur fin
 
 ```
 NEUF PERSONNAGES À AFFRONTER
-À côté du niveau Elo de Stockfish, choisissez un adversaire qui a un caractère : Léa l'attaquante, Marc le mur, Théo le gambiteur, Nadia la technicienne, Sacha le piégeur, Inès la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif, et Camille l'étalon. Ils sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait — gaffes comprises quand le niveau est bas. Chacun a son style, son répertoire d'ouvertures, son tempérament et son illustration ; le niveau se règle et se mémorise par personnage, sur l'échelle humaine (proche de Lichess). Tout tourne sur l'appareil, sans réseau.
+À côté du niveau Elo de Stockfish, choisissez un adversaire qui a un caractère : Lena l'attaquante, Nils le mur, Tom le gambiteur, Nadia la technicienne, Sacha le piégeur, Ana la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif, et Maia l'étalon. Ils sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait — gaffes comprises quand le niveau est bas. Chacun a son style, son répertoire d'ouvertures, son tempérament et son illustration ; le niveau se règle et se mémorise par personnage, sur l'échelle humaine (proche de Lichess). Tout tourne sur l'appareil, sans réseau.
 
 STOCKFISH ANALYSE, ET ASSURE
 Indice, alerte gaffe, barre d'évaluation et analyse restent ceux de Stockfish. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée — et l'écran de fin le dit.
 
 PROGRÈS ET LABORATOIRE
-Votre bilan par personnage, avec le plus haut niveau battu. Au Laboratoire, un camp peut être joué par Camille (Maia).
+Votre bilan par personnage, avec le plus haut niveau battu. Au Laboratoire, un camp peut être joué par Maia.
 
 QUATRE VARIANTES DE PLUS — LE HUB PASSE À 12
 Crazyhouse (les prises changent de camp et se reposent), Duck Chess (un canard bloque une case, tour en deux temps), Barricades (d4 et e5 murées) et Barricades aléatoires (les murs changent de case à chaque coup). Toutes contre l'ordinateur, analyse de fin de partie comprise.
@@ -42,13 +42,13 @@ Six mécanismes de panne du moteur corrigés en profondeur ; au-delà de 2850, l
 
 ```
 NINE CHARACTERS TO FACE
-Next to Stockfish's Elo level, pick an opponent with a personality: Léa the attacker, Marc the wall, Théo the gambiteer, Nadia the technician, Sacha the trapper, Inès the counter-attacker, Yuri the materialist, Pablo the impulsive one, and Camille the reference. They are played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play — blunders included when the level is low. Each has a style, an opening repertoire, a temperament and an illustration; the level is set and remembered per character, on the human scale (close to Lichess). Everything runs on the device, offline.
+Next to Stockfish's Elo level, pick an opponent with a personality: Lena the attacker, Nils the wall, Tom the gambiteer, Nadia the technician, Sacha the trapper, Ana the counter-attacker, Yuri the materialist, Pablo the impulsive one, and Maia the reference. They are played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play — blunders included when the level is low. Each has a style, an opening repertoire, a temperament and an illustration; the level is set and remembered per character, on the human scale (close to Lichess). Everything runs on the device, offline.
 
 STOCKFISH ANALYZES, AND COVERS
 Hints, blunder alert, evaluation bar and analysis are still Stockfish's. Behind a character it only steps in for a short mate, an endgame with few pieces or a repetition in a won position — and the end-of-game screen says so.
 
 PROGRESS AND LAB
-Your record against each character, with the highest level beaten. In the Lab, one side can be played by Camille (Maia).
+Your record against each character, with the highest level beaten. In the Lab, one side can be played by Maia.
 
 FOUR MORE VARIANTS — THE HUB GROWS TO 12
 Crazyhouse (captures switch sides and get dropped back), Duck Chess (a duck blocks a square, two-part turns), Barricades (d4 and e5 walled) and Random Barricades (the walls move after every move). All against the computer, post-game analysis included.

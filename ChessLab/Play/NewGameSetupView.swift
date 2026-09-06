@@ -67,7 +67,7 @@ struct NewGameSetupView: View {
             EngineStrength.playSliderRange.upperBound
         ))
         _opponentMode = State(initialValue: saved.opponentProfileID == nil ? .elo : .profile)
-        _opponentProfileID = State(initialValue: saved.opponentProfileID ?? OpponentProfile.camille.id)
+        _opponentProfileID = State(initialValue: saved.opponentProfileID ?? OpponentProfile.maia.id)
         if let profileID = saved.opponentProfileID, let profile = OpponentProfile.named(profileID) {
             _eloSlider = State(initialValue: profile.clampedLevel(saved.eloSliderValue))
         }
@@ -139,7 +139,7 @@ struct NewGameSetupView: View {
                                 eloSlider = profile.clampedLevel(OpponentLevelStore.level(for: profile.id) ?? profile.defaultLevel)
                             }
                             OpponentLevelSlider(
-                                profile: OpponentProfile.named(opponentProfileID) ?? .camille,
+                                profile: OpponentProfile.named(opponentProfileID) ?? .maia,
                                 level: $eloSlider
                             )
                         } else {

@@ -10080,3 +10080,12 @@ partie) et l'estimation Elo invisible du joueur donnée à Maia comme
 et tests supprimés ; les anciennes clés de réglage sont ignorées au
 décodage (testé). Maia reçoit de nouveau le niveau du personnage comme
 niveau de l'adversaire. Le niveau ne bouge que par le curseur.
+
+## 06/09 — Maia en tête, prénoms sans accent, Nils
+
+L'étalon s'appelle désormais Maia (identifiant `maia`, l'ancien `camille`
+reste accepté), ouvre la galerie, et porte sa propre couleur (menthe pâle)
+au lieu du vert des personnages. Prénoms sans accent : Léa → Lena, Théo →
+Tom, Inès → Ana ; Marc → Nils, le testeur appliqué de l'app, dans le rôle du
+mur (solide, patient, aucune faiblesse). Identifiants et illustrations
+inchangés, Aide, notes et fiche App Store suivies.
