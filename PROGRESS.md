@@ -10159,3 +10159,30 @@ comptés sur l'app et les tests). Retirés : `OpponentBooks.loadedIDs`,
 `PuzzleSessionDrawer.countDue`, `BoardScanReading.squaresNeedingKind` et
 `SquareOccupancy.needsKind`, `SettingsView.settingRow`. Le 5M ne subsiste
 nulle part (dépôt vérifié après commit).
+
+## 06/09 — App Store Connect sans les mains (`tools/asc/`)
+
+Objectif : tout remplir dans App Store Connect, ne laisser que le clic
+« Soumettre pour révision ». Clé d'API d'équipe (App Manager) déposée par
+Thierry dans `~/.private_keys/` (hors dépôt, `.p8` ignorés par Git).
+
+- `asc.py` (Python, PyJWT + requests, venv dans `tools/asc/.venv`) : version,
+  métadonnées FR et en-GB lues dans `METADATA.md`, captures, aperçus, build,
+  rattachement, notes réviseurs, état. `release.sh` enchaîne archive, export
+  avec téléversement direct par xcodebuild, puis la fiche ; refuse de partir
+  si `main` n'est pas poussé (GPLv3).
+- Découvertes en chemin, toutes documentées dans `tools/asc/README.md` :
+  la clé n'a pas accès aux certificats gérés dans le nuage par Xcode
+  (« Cloud signing permission error ») → certificat Apple Distribution et
+  profil « ChessLab App Store 2026 » créés PAR L'API, signature manuelle ;
+  App Store Connect avait déjà reçu des builds 11 et 12 le matin depuis
+  Xcode → build 13 ; la fiche est en français et en anglais du ROYAUME-UNI
+  (un en-US neuf est refusé, le nom « ChessLab » y étant pris) ; les captures
+  1284 × 2778 sont le format « 6,5 pouces » de l'API, le 6,7 les refuse ;
+  dix captures par format au plus (deux déplacées dans `hors-fiche/`) ;
+  description FR ramenée de 4 219 à 3 986 caractères ; le premier codesign
+  en arrière-plan a échoué (errSecInternalComponent) jusqu'à ce que Thierry
+  autorise codesign dans le trousseau (« Toujours autoriser »).
+- État à 17 h : textes des deux langues, 10 + 10 captures par langue, notes
+  réviseurs en place ; build 13 téléversé (« Upload succeeded »), en
+  traitement chez Apple ; aperçus vidéo en cours.
