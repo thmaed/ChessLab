@@ -66,12 +66,12 @@ Fairy-Stockfish only accepts an Elo between 500 and 2850; above that, the settin
 
 - **Version et build — FIXÉS le 06/09.** `MARKETING_VERSION = 1.8.0`, `CURRENT_PROJECT_VERSION = 11` aux deux configurations de la cible applicative. Vérifier au `git diff` avant l'archive que l'IDE n'a pas fait dériver le build.
 
-- **Ce que Maia-3 est, sur pièces.** Transformeur encodeur à 64 jetons (une case chacun), entrée = 12 plans de pièces × 8 positions d'historique par case, plateau retourné quand les Noirs jouent, ni droits de roque ni en passant (inférés de l'historique) ; deux Elo continus (soi, adversaire) ; sortie = 4 352 logits + une tête W/D/L humaine. Modèle 5M (5,23 M de paramètres) converti en Core ML fp16 : 10 Mo, dans `ChessLab/Maia3_5M.mlpackage`. Calcul forcé sur CPU : le GPU du simulateur rend des logits de coups nuls en fp16 (mesuré, `MaiaModel.swift`). Encodeur, coups légaux et modèle prouvés sur 56 fixtures générées par l'implémentation de référence (`MaiaFixtureTests`).
+- **Ce que Maia-3 est, sur pièces.** Transformeur encodeur à 64 jetons (une case chacun), entrée = 12 plans de pièces × 8 positions d'historique par case, plateau retourné quand les Noirs jouent, ni droits de roque ni en passant (inférés de l'historique) ; deux Elo continus (soi, adversaire) ; sortie = 4 352 logits + une tête W/D/L humaine. Modèle 23M (22,9 M de paramètres, 56,6 % de coups humains prédits) converti en Core ML fp16 : 43 Mo, dans `ChessLab/Maia3_23M.mlpackage` — le 5M (10 Mo, 55,4 %) a servi au spike et a été remplacé le 06/09. Calcul forcé sur CPU : le GPU du simulateur rend des logits de coups nuls en fp16 (mesuré, `MaiaModel.swift`). Encodeur, coups légaux et modèle prouvés sur 56 fixtures générées par l'implémentation de référence (`MaiaFixtureTests`).
 
 - **Licence.** Maia-3 est AGPLv3, code et poids. Compatible avec le binaire GPLv3 (GPLv3 §13), aucun service réseau. Texte intégral et provenance dans `Vendor/Maia3/`, entrée dans l'écran Licences, mention à ajouter aux notes réviseurs (faite dans `METADATA.md`).
 
 - **Pourquoi le niveau ne suit pas l'échelle Stockfish.** Mesuré au Laboratoire (`tools/maia3-spike/calibration/`) : Camille réglée sur 2 200 fait 18 % contre Stockfish bridé à « 1 100 » (Skill Level 3, profondeur 4). Aucune consigne ne rattrape les paliers bas. La courbe consigne → niveau prévue par l'étude est abandonnée ; le niveau affiché est celui de Maia, et la carte le dit.
 
-- **Taille du bundle.** +10 Mo (modèle) +74 Ko (répertoires) +neuf SVG. Ressources à ~110 Mo, sous le seuil cellulaire de 200 Mo.
+- **Taille du bundle.** +43 Mo (modèle 23M) +74 Ko (répertoires) +neuf portraits PNG. Ressources à ~145 Mo, sous le seuil cellulaire de 200 Mo.
 
 - **Captures et vidéos.** Aucune capture ne montre encore la galerie des personnages — c'est l'image la plus parlante de cette version, à ajouter (`AppStoreScreenshotUITests`, écran Nouvelle partie en mode Personnage).

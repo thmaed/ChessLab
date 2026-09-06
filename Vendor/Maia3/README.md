@@ -1,8 +1,9 @@
-# Maia-3 (poids 5M) — provenance et licence
+# Maia-3 (poids 23M) — provenance et licence
 
-`ChessLab/Maia3_5M.mlpackage` est la conversion Core ML (fp16, batch 1) du
-checkpoint `maia3-5m.pt` publié par le CSSLab de l'Université de Toronto :
-https://huggingface.co/UofTCSSLab/Maia3-5M — code d'inférence :
+`ChessLab/Maia3_23M.mlpackage` est la conversion Core ML (fp16, batch 1) du
+checkpoint `maia3-23m.pt` publié par le CSSLab de l'Université de Toronto :
+https://huggingface.co/UofTCSSLab/Maia3-23M (le 5M, utilisé pour le spike,
+a été remplacé le 06/09/2026) — code d'inférence :
 https://github.com/CSSLab/maia3
 
 Licence : **GNU Affero General Public License v3.0** (code et poids), texte

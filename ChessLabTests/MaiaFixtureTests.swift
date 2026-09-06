@@ -137,13 +137,14 @@ struct MaiaEncoderFixtureTests {
 struct MaiaModelFixtureTests {
 
     /// fp16 côté Core ML contre fp32 côté référence : les probabilités
-    /// s'écartent de quelques millièmes (0,0034 mesuré au spike), et deux
-    /// coups quasi ex æquo peuvent s'inverser.
-    private static let probabilityTolerance = 0.02
-    private static let tieTolerance = 0.03
+    /// s'écartent de quelques centièmes au plus (0,0034 mesuré sur le 5M,
+    /// 0,027 sur le 23M, dont les couches plus larges accumulent davantage
+    /// en fp16), et deux coups quasi ex æquo peuvent s'inverser.
+    private static let probabilityTolerance = 0.04
+    private static let tieTolerance = 0.05
 
     @Test func coreMLMatchesTheReferenceDistribution() async throws {
-        let model = try #require(MaiaModel(bundle: .main), "Maia3_5M absent du bundle de l'app")
+        let model = try #require(MaiaModel(bundle: .main), "\(MaiaModel.modelResourceName) absent du bundle de l'app")
         var swaps = 0
         for fixture in MaiaFixtures.cases {
             let replayed = try #require(MaiaFixtures.replay(fixture))

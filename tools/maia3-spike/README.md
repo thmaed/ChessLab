@@ -64,3 +64,14 @@ suit l'échelle humaine de Maia (proche de Lichess) et l'écran le dit ; le
 mode « Niveau Elo » garde l'échelle Stockfish. La courbe m(N) n'est donc
 pas appliquée. Le harnais reste pour mesurer les personnages entre eux
 (camp A = personnage, camp B = Camille) — le lot D.1.d de l'étude d'août.
+
+## Passage au 23M (06/09/2026)
+
+`convert_maia3.py 23m maia3-23m.pt Maia3_23M.mlpackage` (le wrapper gère le
+biais géométrique PAR CASE du 23M, `gab_per_square_dim = 32`) : 22,94 M de
+paramètres, wrapper identique à l'original à 2,9e-4, **43 Mo** en fp16,
+accord top-1 **36/36** avec torch en CPU seul, Δprob max 0,027 (contre
+0,0034 pour le 5M : les couches plus larges accumulent davantage en fp16 —
+tolérance des fixtures portée à 0,04), **3,2 ms** par coup sur CPU M2 (torch
+15,5 ms). Fixtures régénérées avec `make_fixtures.py 23m maia3-23m.pt`.
+Le 5M reste documenté ci-dessus comme spike ; il n'est plus embarqué.

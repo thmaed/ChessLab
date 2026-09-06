@@ -11,7 +11,7 @@ struct MaiaPrediction: Sendable {
     let loss: Double
 }
 
-/// Le réseau Maia-3 (5M) en Core ML : « quel coup jouerait un humain de tel
+/// Le réseau Maia-3 (23M) en Core ML : « quel coup jouerait un humain de tel
 /// niveau, contre un adversaire de tel niveau, dans cette position ? »
 ///
 /// Chargé par URL depuis le bundle, comme le modèle du scanner
@@ -24,7 +24,10 @@ struct MaiaPrediction: Sendable {
 /// contrat simple et le coût est nul — une inférence dure quelques
 /// millisecondes.
 actor MaiaModel {
-    static let modelResourceName = "Maia3_5M"
+    /// Maia3-23M depuis le 06/09/2026 (le 5M a servi au spike et aux
+    /// premières mesures) : 22,9 M de paramètres, 43 Mo en fp16, 56,6 % de
+    /// coups humains prédits contre 55,4 %, 3 ms par coup sur CPU M2.
+    static let modelResourceName = "Maia3_23M"
     /// Bornes du conditionnement : le modèle interpole linéairement entre un
     /// embedding « 0 » et un embedding « 5 000 ».
     static let eloRange: ClosedRange<Double> = 0...5000

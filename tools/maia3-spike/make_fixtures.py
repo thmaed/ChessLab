@@ -9,10 +9,12 @@ Sortie : ChessLabTests/Fixtures_maia3.json — pour chaque cas :
   - wdl : [win, draw, loss] du camp au trait
 
 Usage : mlenv/bin/python make_fixtures.py  (depuis tools/maia3-spike, avec
-maia3/ cloné et maia3-5m.pt à côté — voir README)
+maia3/ cloné et le checkpoint (maia3-23m.pt aujourd'hui, maia3-5m.pt pour le spike) à côté — voir README)
 """
 import json, random, sys, types
 sys.path.insert(0, "maia3")
+# make_fixtures.py [alias] [checkpoint] [sortie]  — défaut : 23m, maia3-23m.pt
+ALIAS, CKPT = (sys.argv[1:3] + ["23m", "maia3-23m.pt"])[:2] if len(sys.argv) > 2 else ("23m", "maia3-23m.pt")
 import torch, chess
 from collections import deque
 from maia3.models import MAIA3Model
@@ -21,10 +23,10 @@ from maia3.dataset import tokenize_board, get_legal_moves_mask, get_historical_t
 from maia3.utils import get_all_possible_moves, mirror_move
 
 random.seed(20260905)
-spec = resolve_model_spec("5m")
+spec = resolve_model_spec(ALIAS)
 cfg = types.SimpleNamespace(**spec.config, device="cpu")
 model = MAIA3Model(cfg)
-sd = torch.load("maia3-5m.pt", map_location="cpu", weights_only=True)
+sd = torch.load(CKPT, map_location="cpu", weights_only=True)
 model.load_state_dict({k.replace("smolgen", "gab"): v for k, v in sd.items()}, strict=False)
 model.eval()
 all_moves = get_all_possible_moves(); idx = {m: i for i, m in enumerate(all_moves)}
@@ -94,6 +96,6 @@ add("6k1/5ppp/8/8/8/8/5PPP/R5K1 w - - 0 1", [], ((800, 800), (2400, 2400)))
 add("8/8/4k3/8/8/4K3/4P3/8 w - - 0 1", [], ((1500, 1500),))
 add("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4", [], ((1500, 1500),))
 
-out = sys.argv[1] if len(sys.argv) > 1 else "../../ChessLabTests/Fixtures_maia3.json"
-json.dump({"model": "maia3-5m", "history": cfg.history, "cases": cases}, open(out, "w"))
+out = sys.argv[3] if len(sys.argv) > 3 else "../../ChessLabTests/Fixtures_maia3.json"
+json.dump({"model": spec.name, "history": cfg.history, "cases": cases}, open(out, "w"))
 print(len(cases), "cas écrits dans", out)

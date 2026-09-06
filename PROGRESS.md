@@ -10137,3 +10137,14 @@ l'accueil sur une installation vierge, aurait voilé les écrans à capturer.
 Le bouton « Revanche » de l'écran de fin (mode Contre l'ordinateur) est
 retiré : signalé comme ne relançant pas la partie, et l'écran Nouvelle partie
 est à un tap. Celui du mode Deux joueurs reste.
+
+## 06/09 — Maia-3 23M à la place du 5M
+
+Sur demande, le modèle embarqué passe au 23M (22,9 M de paramètres, 56,6 %
+de coups humains prédits contre 55,4 %) : `convert_maia3.py` (générique,
+gère le biais géométrique PAR CASE du 23M), wrapper identique à l'original
+à 2,9e-4, **43 Mo** en fp16 (contre 10), accord top-1 36/36 avec torch en
+CPU, Δprob max 0,027 (tolérance des fixtures portée à 0,04), 3,2 ms par coup
+sur CPU M2. Fixtures régénérées (56 cas). Le 5M est retiré du projet ; il
+reste documenté comme spike. Ressources de l'app ~145 Mo, sous le seuil
+cellulaire de 200 Mo.
