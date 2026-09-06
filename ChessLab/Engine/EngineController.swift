@@ -343,6 +343,7 @@ actor EngineController {
         resolve(with: nil)
         staleBestmovesToDiscard = 0
         latestMoverCp = nil
+        latestMoverMate = nil
 
         // Nouvelle instance : le flux de lignes précédent est clos.
         engine = StockfishEngine()
@@ -356,8 +357,12 @@ actor EngineController {
 
     // MARK: Recherche coup par coup (mode Laboratoire)
 
-    private var pendingContinuation: CheckedContinuation<(lan: String, moverCp: Int?)?, Never>?
+    private var pendingContinuation: CheckedContinuation<(lan: String, moverCp: Int?, moverMate: Int?)?, Never>?
     private var latestMoverCp: Int?
+    /// Mat en N annoncé par la dernière ligne `info` (négatif : le camp au
+    /// trait se fait mater), `nil` sinon. Sert au filet derrière Maia, qui
+    /// distingue un mat en deux d'une position simplement gagnée.
+    private var latestMoverMate: Int?
     private var requestID = 0
     private var staleBestmovesToDiscard = 0
     /// Lecteur de la recherche coup par coup (Laboratoire) : consomme le flux
@@ -375,10 +380,11 @@ actor EngineController {
     func computeBestMove(
         fen: String, setupCommands: [EngineCommand], movetimeMs: Int?, depth: Int?,
         searchmoves: [String]? = nil, nodes: Int? = nil
-    ) async -> (lan: String, moverCp: Int?)? {
+    ) async -> (lan: String, moverCp: Int?, moverMate: Int?)? {
         guard engine.isRunning else { return nil }
         ensureMoveReader()
         latestMoverCp = nil
+        latestMoverMate = nil
         requestID &+= 1
         let id = requestID
 
@@ -439,23 +445,26 @@ actor EngineController {
             if (info.multipv ?? 1) == 1 {
                 if let mate = info.score?.mate {
                     latestMoverCp = mate > 0 ? 10_000 : -10_000
+                    latestMoverMate = mate
                 } else if let cp = info.score?.cp {
                     latestMoverCp = Int(cp)
+                    latestMoverMate = nil
                 }
             }
         case let .bestmove(move, _):
             if staleBestmovesToDiscard > 0 {
                 staleBestmovesToDiscard -= 1
                 latestMoverCp = nil
+                latestMoverMate = nil
                 return
             }
-            resolve(with: (move, latestMoverCp))
+            resolve(with: (move, latestMoverCp, latestMoverMate))
         default:
             break
         }
     }
 
-    private func resolve(with value: (lan: String, moverCp: Int?)?) {
+    private func resolve(with value: (lan: String, moverCp: Int?, moverMate: Int?)?) {
         guard let continuation = pendingContinuation else { return }
         pendingContinuation = nil
         continuation.resume(returning: value)

@@ -9884,3 +9884,173 @@ de TOUS les endroits qui construisent une instance NUE de ce type dans les
 tests — pas seulement ceux qui passent déjà par un générateur `game(...)`
 dédié. Voir la mémoire de session pour la stratégie de tests ciblés
 adoptée à la suite de cet épisode.
+
+## 05/09 — Adversaires humanisés : étude, spike Maia-3, lots 1 et 2
+
+**La demande.** En mode Contre l'ordinateur, jouer soit contre un niveau Elo
+(l'existant), soit contre des personnages qui ont chacun un style, un niveau
+de référence réglable et une capacité d'adaptation. Étude complète publiée
+(artefact « Adversaires humanisés »), réécrite le soir même autour de la
+cible arbitrée par l'utilisateur : **Maia-3 joue, Stockfish analyse**.
+
+**Ce qui a été établi sur pièces (dépôt `CSSLab/maia3` cloné et lu).**
+Maia-3 est un transformeur encodeur à 64 jetons (une case chacun) ; entrée =
+12 plans de pièces × 8 positions d'historique par case, plateau retourné
+quand les Noirs jouent, **ni droits de roque ni en passant** ; deux Elo
+continus (soi, adversaire) par interpolation linéaire entre deux embeddings ;
+sortie = 4 352 logits (64 × 64 + 256 promotions) et une tête W/D/L « issue
+humaine ». Licence AGPL-3.0, code et poids (compatible GPLv3 §13, aucun
+service réseau). Les exécutables officiels jouent en argmax (température 0) ;
+la température 1 est le réglage fidèle aux humains.
+
+**Spike de conversion (scripts et mesures dans `tools/maia3-spike/`).**
+Maia3-5M (5,23 M de paramètres) converti en Core ML fp16 : 10 Mo, accord
+top-1 35/36 avec torch, 0,8 à 3,8 ms par coup sur M2. torch 2.14 échoue à la
+conversion (`aten::Int` sur une forme), 2.7.0 passe ; le forward est réécrit
+avec des formes littérales (batch 1) — équivalent à l'original à 1,7e-4.
+Sondes de comportement : pièce en prise reprise à 96 % dès 800 ; contre le
+mat du berger, `Cf6??` joué 20 % à 800 et 2 % à 2400 ; **l'attaque grecque
+gagnante n'est jamais trouvée, à aucun niveau** (Maia ne calcule pas) ;
+finales de pions sans différenciation par niveau. D'où le rôle de Stockfish.
+
+**Le piège trouvé au lot 1, mesuré et non supposé.** Sur le simulateur, le
+modèle fp16 rend des logits de coups TOUS NULS dès que le GPU participe
+(`.all`, `.cpuAndGPU`) — la tête valeur, elle, reste juste. En CPU seul, ou
+en fp32 quelle que soit l'unité, les sorties sont celles de la référence.
+`MaiaModel` force donc `.cpuOnly`, documenté dans le code ; une inférence
+CPU coûte ~1,4 ms sur M2.
+
+**Lot 1 — noyau (`ChessLab/Maia/`).** `MaiaMoveTable` (vocabulaire),
+`MaiaEncoder` (historique → 64 × 97), `MaiaLegalMoves` (coups légaux
+ChessKit → indices, promotions ×4), `MaiaModel` (acteur Core ML, chargé par
+URL avec repli), `MaiaPolicy` (masque, softmax, température, top-p).
+**Prouvé par fixtures** : `Fixtures_maia3.json` est généré par
+l'implémentation de référence (`make_fixtures.py`, 56 cas : Blancs et Noirs,
+historiques courts et longs, roques, prises en passant, promotions, finales)
+— l'encodeur Swift est identique bit à bit, les coups légaux et leurs
+indices sont ceux du masque de référence, la distribution Core ML colle à
+0,02 près (`MaiaFixtureTests`, 8 tests).
+
+**Lot 2 — la partie.** `PlayGameSettings.opponentProfileID` (décodage
+tolérant, testé) ; `OpponentProfile` avec un seul personnage pour l'instant,
+Camille « Neutre », l'étalon ; `MaiaOpponent` (acteur) ; `SafetyNet` : les
+QUATRE cas du filet, purs et testés — mat en un ou deux dès 1 400, finale à
+sept pièces ou moins dès 1 600 (Stockfish bridé au niveau du personnage puis
+retour à pleine puissance), répétition ou cinquante coups en position gagnée
+(≥ 200 cp), modèle indisponible (repli sur Stockfish bridé pour le reste de
+la partie). Dans `PlayViewModel` : `sessionStrength` (plein pot quand Maia
+joue, bridé sinon) réémis aux trois points de redémarrage ; `quickScore`
+généralisé en `quickSearch` (coup + score + mat) pour servir aussi le filet ;
+`requestMaiaMove` ; positions rejouées depuis `moveLog` à chaque coup.
+Écran Nouvelle partie : bascule « Niveau Elo / Personnage » dans la section
+Force du moteur, carte de Camille, libellé « Niveau de référence » ; le prénom
+remplace « Ordinateur » sur l'écran de jeu, dans l'annonce VoiceOver et dans
+la bibliothèque. Test de bout en bout au vrai modèle et au vrai Stockfish
+(`MaiaOpponentIntegrationTests`, 3,9 s) et test d'interface
+(`MaiaOpponentUITests`) — ce dernier a rappelé que la visite guidée démarre
+une seconde après l'accueil sur une installation vierge et que son voile
+avale les taps : le test la passe.
+
+**Bug trouvé en chemin, non corrigé :** les écrans de variantes envoient la
+plage 800-3190 à Fairy-Stockfish, dont `UCI_Elo` est borné 500-2850 ; hors
+bornes, la valeur est rejetée en silence et le bridage reste à 1350.
+
+**Reste des lots :** 3 (Laboratoire, camp « personnage Maia », courbe
+consigne → niveau), 4 (galerie de huit personnages avec illustrations
+dessinées, traits de style, répertoires, Progrès, licences), 5 (adaptation),
+6 (optionnel, sélecteur MultiPV au-dessus de 1 900).
+
+## 05/09 (nuit) — Adversaires humanisés, lots 3, 4 et 5
+
+**Lot 3 — Laboratoire et calibrage.** `LabGameSettings` accepte un
+personnage par camp (`sideAOpponentProfileID`, `sideBOpponentProfileID`) et
+une CONSIGNE Maia distincte du curseur (`sideAMaiaTargetElo`…) : le curseur
+reste le niveau (seuils du filet, bridage en finale), la consigne est ce que
+le calibrage fait varier. `LabViewModel.maiaTurn` joue le personnage avec le
+MÊME arbitre que le mode Jouer (`MaiaTurnResolver`, partagé — le personnage
+calibré est celui qui joue dans l'app). `EngineController.computeBestMove`
+rend aussi le mat en N. Chip « Camille (Maia) » par camp dans l'écran du
+Laboratoire. Harnais `MaiaCalibrationHarness` (éteint par défaut, variables
+d'environnement, CSV et PGN écrits après chaque série).
+
+**Mesuré, et ça change la décision.** Cinq points (30 parties, 300 ms/coup,
+détail dans `tools/maia3-spike/README.md` et `calibration/`) : Camille consigne
+2200 contre Stockfish bridé « 1100 » fait 18 % ; consigne 2000 contre « 1500 »
+fait 33 %. Stockfish bridé aux paliers bas (Skill Level 0-5, profondeur 1-6)
+ne laisse aucune pièce en prise et voit les tactiques à deux coups : il est
+BEAUCOUP plus fort qu'un humain du même chiffre, et aucune consigne Maia ne
+rattrape les paliers bas. La courbe consigne → niveau prévue par l'étude est
+donc abandonnée : **le niveau d'un personnage suit l'échelle humaine de
+Maia** (proche de Lichess, c'est ce sur quoi il est entraîné), l'écran le
+dit en toutes lettres, et le mode « Niveau Elo » garde l'échelle Stockfish.
+Le harnais reste l'instrument pour mesurer les personnages ENTRE EUX
+(camp A = personnage, camp B = Camille), ce qui était le lot D.1.d d'août.
+
+**Lot 4 — la galerie.** Neuf personnages dans `OpponentProfile` : Léa
+« Tornade », Marc « Béton », Théo « Gambit », Nadia « Finale », Sacha
+« Traquenard », Inès « Ressort », Yuri « Grippe-sou », Pablo « Yolo », et
+Camille « Neutre » l'étalon. Chacun = température, style, tempérament,
+filet, répertoire, illustration.
+- `OpponentStyle` : treize traits lus en rejouant le coup (échec, capture,
+  gain, sacrifice, vers le roi, assaut de pions, roque, développement, pions
+  faibles, échange égal, échange des dames, tension, mobilité) ; score borné
+  à ±force en nats, la probabilité Maia est multipliée par e^score puis
+  renormalisée — le style colore la distribution humaine sans jamais acheter
+  une gaffe improbable. Testé : reconnaissance ET non-reconnaissance sur
+  positions connues (mat du berger, don grec, roque, assaut g4-g5), borne.
+- `Temperament` : rythme, seuils d'abandon et de nulle, humeur selon le score
+  (température et poids ajoutés quand il mène ou perd : Marc se calme, Inès
+  s'anime, Théo s'emballe).
+- Répertoires : `opponent_books.json`, huit arbres (174 à 366 nœuds) générés
+  par `tools/maia3-spike/make_books.py` et VALIDÉS coup par coup par
+  python-chess, puis re-vérifiés légaux depuis la position de départ par
+  `OpponentGalleryTests`. Un personnage joue son répertoire, pas le livre
+  général ; hors répertoire, Maia connaît la suite.
+- Illustrations : neuf avatars SVG dessinés (`Assets.xcassets/Opponents/`),
+  vectoriels, testés présents.
+- Écran Nouvelle partie : galerie de vignettes + carte du personnage choisi,
+  niveau MÉMORISÉ PAR PERSONNAGE (`OpponentLevelStore`, clé synchronisée
+  iCloud), section Livre masquée en mode Personnage. Écran de fin : « Contre
+  Théo « Gambit », niveau 1300 · Stockfish est intervenu 2 fois ». Progrès :
+  bilan par personnage avec le plus haut niveau battu (`GameRecord.opponentProfileID`
+  additif). Licences : entrée Maia-3 (AGPLv3). Une trentaine de chaînes FR/EN.
+
+**Lot 5 — adaptation.** « S'adapte à mes résultats » : après chaque partie,
+le niveau mémorisé du personnage monte de 25 sur une victoire, baisse de 25
+sur une défaite, borné 800-2500, affiché sur l'écran de fin (« niveau 1500 →
+1525 »). Le mode « Sparring » (modulation en cours de partie) n'est PAS fait —
+décision d'août maintenue : rien ne module un niveau en cachette, et un mode
+nommé de plus attend d'être demandé.
+
+**Vérifié.** 65 tests des suites Maia/personnages verts, test de bout en bout
+au vrai modèle (Camille joue ses deux coups en 3,5 s), test d'interface
+(bascule, galerie, Théo choisi, prénom sur l'écran de jeu). Suite complète
+lancée en point de contrôle.
+
+**Non fait, à décider.** Commit (rien n'est commité — sept lots de fichiers
+dans l'arbre de travail) ; Sparring ; Elo de l'adversaire en entrée de Maia
+(aujourd'hui égal au niveau du personnage) ; Aide utilisateur (la visite
+guidée et l'Aide ne mentionnent pas encore les personnages).
+
+## 06/09 — Adversaires humanisés : ce qui restait, et les commits
+
+- **Fairy-Stockfish borné.** `EngineStrength.fairySetupCommands` : au-delà de
+  2850 (borne haute de `UCI_Elo` chez Fairy-Stockfish 14), plus de bridage du
+  tout au lieu d'un 1350 silencieux ; en dessous de 500, ramené à la borne.
+  Utilisé par `EngineLegalityPlayViewModel` et `FairyVariantPlayViewModel`
+  (les seuls écrans Fairy). Testé.
+- **Le niveau du joueur en entrée de Maia.** `PlayerLevel` : estimation Elo
+  classique (K = 32), amorcée au niveau choisi, mise à jour après chaque
+  partie contre un personnage, jamais affichée — c'est l'« Elo de
+  l'adversaire » que Maia reçoit pour jouer contre VOUS comme un humain joue
+  contre quelqu'un de votre force. Testé.
+- **Sparring.** Mode nommé, bascule dans Aides (mode Personnage seulement),
+  désactivé par défaut : la consigne Maia bouge de ±25 par coup du
+  personnage quand le score dépasse ±250 cp, bornée à ±150, revient
+  doucement vers zéro en partie disputée ; le filet et les seuils restent
+  ceux du niveau ; mention sur l'écran de fin. Non persisté à la reprise.
+  Testé.
+- **Aide et visite guidée** : la fiche « Contre l'ordinateur » et l'étape
+  « Réglez votre adversaire » parlent des personnages (FR et EN).
+- Suite complète unitaire : 968 tests / 152 suites verts avant ces quatre
+  points ; suites ciblées et test d'interface verts après.

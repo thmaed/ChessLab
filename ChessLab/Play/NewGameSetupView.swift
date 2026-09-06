@@ -17,6 +17,10 @@ struct NewGameSetupView: View {
 
     @State private var colorChoice: PlayerColorChoice
     @State private var eloSlider: Double
+    @State private var opponentMode: OpponentMode
+    @State private var opponentProfileID: String
+    @State private var profileAdaptiveEnabled: Bool
+    @State private var sparringEnabled: Bool
     @State private var timeControl: TimeControl
     @State private var isCustomTimeControlSelected: Bool
     @State private var customMinutes: Int
@@ -64,6 +68,10 @@ struct NewGameSetupView: View {
             max(saved.eloSliderValue, EngineStrength.playSliderRange.lowerBound),
             EngineStrength.playSliderRange.upperBound
         ))
+        _opponentMode = State(initialValue: saved.opponentProfileID == nil ? .elo : .profile)
+        _opponentProfileID = State(initialValue: saved.opponentProfileID ?? OpponentProfile.camille.id)
+        _profileAdaptiveEnabled = State(initialValue: saved.profileAdaptiveEnabled)
+        _sparringEnabled = State(initialValue: saved.sparringEnabled)
         _isCustomTimeControlSelected = State(initialValue: saved.timeControlID == "custom")
         _timeControl = State(initialValue: TimeControl.presets.first { $0.id == saved.timeControlID } ?? .none)
         _timeCategory = State(initialValue: saved.timeControlID == "custom"
@@ -113,6 +121,31 @@ struct NewGameSetupView: View {
 
                 SettingsSection(title: "Force du moteur", systemImage: "gauge.with.needle", tint: Theme.accent, discoverySpot: .strengthSlider) {
                     VStack(alignment: .leading, spacing: 16) {
+                        // Deux façons de régler l'adversaire : le niveau Elo
+                        // de Stockfish (l'historique, inchangé), ou un
+                        // personnage joué par Maia-3 au niveau du curseur.
+                        Picker("Adversaire", selection: $opponentMode.animation()) {
+                            Text("Niveau Elo").tag(OpponentMode.elo)
+                            Text("Personnage").tag(OpponentMode.profile)
+                        }
+                        .pickerStyle(.segmented)
+                        .onChange(of: opponentMode) { _, mode in
+                            guard mode == .profile else { return }
+                            if let remembered = OpponentLevelStore.level(for: opponentProfileID) {
+                                eloSlider = remembered
+                            }
+                        }
+
+                        if opponentMode == .profile {
+                            OpponentGalleryView(selectedID: $opponentProfileID) { profile in
+                                // Chaque personnage garde SON niveau.
+                                eloSlider = OpponentLevelStore.level(for: profile.id) ?? profile.defaultLevel
+                            }
+                            Text("Niveau de référence")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(Theme.textSecondary)
+                        }
+
                         HStack {
                             Text(EngineStrength(sliderValue: eloSlider).displayLabel)
                                 .font(.title2.weight(.bold))
@@ -141,9 +174,20 @@ struct NewGameSetupView: View {
                                 }
                             }
                         }
+
+                        if opponentMode == .profile {
+                            ToggleRow(label: "S'adapte à mes résultats", isOn: $profileAdaptiveEnabled)
+                            Text("Après chaque partie, le niveau de ce personnage monte de 25 si vous gagnez, baisse de 25 si vous perdez. Toujours affiché, jamais en cachette.")
+                                .font(.caption2)
+                                .foregroundStyle(Theme.textTertiary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
                 }
 
+                // Un personnage joue son propre répertoire : le livre général
+                // ne concerne que le mode Niveau Elo.
+                if opponentMode == .elo {
                 SettingsSection(title: "Livre d'ouvertures", systemImage: "book.closed.fill", tint: Theme.accent) {
                     VStack(alignment: .leading, spacing: 12) {
                         ToggleRow(label: "Le moteur pioche dans un livre d'ouvertures", isOn: $bookEnabled.animation())
@@ -167,6 +211,7 @@ struct NewGameSetupView: View {
                             }
                         }
                     }
+                }
                 }
 
                 SettingsSection(title: "Cadence", systemImage: "timer", tint: Theme.accent) {
@@ -261,6 +306,13 @@ struct NewGameSetupView: View {
                         ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled)
                         ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar)
                         ToggleRow(label: "L'ordinateur peut abandonner s'il est perdu", isOn: $engineResignationEnabled)
+                        if opponentMode == .profile {
+                            ToggleRow(label: "Sparring : le personnage reste à votre hauteur", isOn: $sparringEnabled)
+                            Text("En partie, il se relâche quand il vous domine et se durcit quand vous le dominez, dans une bande de ±150 autour du niveau choisi. Nommé et affiché, jamais en cachette.")
+                                .font(.caption2)
+                                .foregroundStyle(Theme.textTertiary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                         Text(effectiveTimeControl.hasClock ? "Reprise de coup indisponible avec pendule." : "Parcourez la partie avec la barre sous le plateau ; sans pendule, « Reprendre ici » relance depuis le coup consulté.")
                             .font(.caption)
                             .foregroundStyle(Theme.textTertiary)
@@ -437,8 +489,14 @@ struct NewGameSetupView: View {
             multiMoveTakebackEnabled: multiMoveTakebackEnabled,
             bookEnabled: bookEnabled,
             bookWidth: bookWidth,
-            engineResignationEnabled: engineResignationEnabled
+            engineResignationEnabled: engineResignationEnabled,
+            opponentProfileID: opponentMode == .profile ? opponentProfileID : nil,
+            profileAdaptiveEnabled: profileAdaptiveEnabled,
+            sparringEnabled: sparringEnabled
         )
+        if opponentMode == .profile {
+            OpponentLevelStore.save(level: eloSlider, for: opponentProfileID)
+        }
         PlaySettingsStore.save(settings)
         onStart(settings)
     }
@@ -692,4 +750,13 @@ struct OptionRow: View {
         .buttonStyle(.pressable)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
     }
+}
+
+// MARK: - Adversaire : niveau Elo ou personnage
+
+/// Contre qui l'on joue : Stockfish bridé à un Elo, ou un personnage joué
+/// par Maia-3 (voir ``OpponentProfile``).
+enum OpponentMode: Hashable {
+    case elo
+    case profile
 }

@@ -31,7 +31,7 @@ struct HelpView: View {
         .init(
             icon: "cpu", tint: Theme.accent,
             title: "Contre l'ordinateur",
-            body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
+            body: "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour. Ou choisissez un personnage : neuf adversaires joués par Maia-3, un réseau entraîné sur des millions de parties humaines, chacun avec son style, son répertoire et son tempérament, à un niveau réglable sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. « S'adapte à mes résultats » fait monter ou baisser le niveau du personnage de 25 après chaque partie ; « Sparring » le fait se relâcher ou se durcir en partie, dans une bande de ±150 — les deux sont affichés, jamais cachés."
         ),
         .init(
             icon: "person.2.fill", tint: Theme.info,

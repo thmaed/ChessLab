@@ -70,6 +70,65 @@ final class PlayViewModel {
     private var engine: EngineController?
     private(set) var isEngineThinking = false
     private var recentEngineEvalsCp: [Int] = []
+
+    // MARK: Adversaire Maia
+
+    /// Le personnage de la partie (mode « Personnage »), sinon `nil`.
+    var opponentProfile: OpponentProfile? { settings.opponentProfile }
+    private var maiaOpponent: MaiaOpponent?
+    /// Vrai quand le modèle n'a pas pu être chargé ou n'a pas répondu : le
+    /// personnage se replie sur Stockfish bridé à son niveau pour le reste
+    /// de la partie (quatrième cas du filet).
+    private(set) var isMaiaUnavailable = false
+    /// Chaque intervention du filet Stockfish derrière Maia, dans l'ordre.
+    private(set) var safetyNetInterventions: [SafetyNetReason] = []
+    /// Nouveau niveau mémorisé du personnage après la partie, quand
+    /// « S'adapte à mes résultats » est actif ; `nil` sinon.
+    private(set) var adaptedLevel: Double?
+    /// Décalage de consigne du mode Sparring (0 hors Sparring), borné par
+    /// ``Sparring/maxOffset``. Non persisté : une reprise repart de zéro.
+    private(set) var sparringOffset: Double = 0
+    /// Niveau estimé du joueur après la partie (mis à jour en fin de partie
+    /// contre un personnage).
+    private(set) var playerLevelAfterGame: Double?
+
+    /// Vrai quand c'est Maia qui joue les coups de l'adversaire.
+    var isMaiaOpponentActive: Bool { opponentProfile != nil && !isMaiaUnavailable }
+
+    /// Nom affiché de l'adversaire : le prénom du personnage, sinon
+    /// « Ordinateur » localisé.
+    var opponentDisplayName: String {
+        opponentProfile?.firstName ?? LocalizationController.string("Ordinateur")
+    }
+
+    /// Une ligne pour l'écran de fin : qui était l'adversaire, à quel niveau,
+    /// et combien de fois Stockfish est intervenu derrière lui. `nil` en mode
+    /// Niveau Elo.
+    var opponentSummaryLine: String? {
+        guard let profile = opponentProfile else { return nil }
+        let level = Int(settings.eloSliderValue.rounded())
+        var line = LocalizationController.string("Contre %@, niveau %lld", "\(profile.firstName) « \(profile.displayNickname) »", level)
+        if let adaptedLevel, Int(adaptedLevel) != level {
+            line += " → \(Int(adaptedLevel))"
+        }
+        if settings.sparringEnabled {
+            line += " · " + LocalizationController.string("Sparring")
+        }
+        let interventions = safetyNetInterventions.filter { $0 != .unavailable }.count
+        if isMaiaUnavailable {
+            line += " · " + LocalizationController.string("Maia indisponible, Stockfish a joué")
+        } else if interventions > 0 {
+            line += " · " + LocalizationController.string("Stockfish est intervenu %lld fois", interventions)
+        }
+        return line
+    }
+
+    /// Réglage de force envoyé à Stockfish pour la session : plein pot quand
+    /// Maia joue (Stockfish n'est alors que filet et analyste), bridé au
+    /// curseur sinon — y compris quand Maia s'est révélé indisponible.
+    private var sessionStrength: EngineStrength {
+        isMaiaOpponentActive ? .maximum : settings.strength
+    }
     /// Vrai si Stockfish n'a pas démarré (réseau NNUE absent, mémoire…).
     /// Sans cet état, l'échec était totalement silencieux : les commandes
     /// partaient dans le vide, aucun `bestmove` n'arrivait jamais et la
@@ -133,7 +192,10 @@ final class PlayViewModel {
             GameLibraryService.recordVsEngineGame(
                 game: game, outcome: outcome,
                 userColor: userColor, engineColor: engineColor,
-                strength: settings.strength, in: modelContext
+                strength: settings.strength,
+                engineName: opponentProfile?.firstName ?? "Ordinateur",
+                opponentProfileID: settings.opponentProfileID,
+                in: modelContext
             )
             // HORS file, et AVANT `releaseEngine()` : une analyse d'indice
             // tourne en `go infinite` et son maillon de file ne se termine
@@ -145,7 +207,25 @@ final class PlayViewModel {
             interruptHintAnalysisIfNeeded()
             releaseEngine()
             announceOutcome(outcome)
+            adaptLevelIfWanted(outcome)
         }
+    }
+
+    /// « S'adapte à mes résultats » : un pas par partie, mémorisé pour le
+    /// personnage, affiché sur l'écran de fin.
+    private func adaptLevelIfWanted(_ outcome: GameOutcome) {
+        guard let profile = opponentProfile else { return }
+        let result: ProgressionSummary.GameResult = outcome.winner == nil ? .draw
+            : (outcome.winner == userColor ? .win : .loss)
+        // Le niveau estimé du joueur suit chaque partie contre un personnage
+        // (une partie abandonnée sans coup ne dit rien : on l'ignore).
+        if !moveLog.isEmpty {
+            playerLevelAfterGame = PlayerLevel.record(result: result, against: settings.eloSliderValue, seed: settings.eloSliderValue)
+        }
+        guard settings.profileAdaptiveEnabled else { return }
+        let next = AdaptiveLevel.next(after: result, level: settings.eloSliderValue)
+        OpponentLevelStore.save(level: next, for: profile.id)
+        adaptedLevel = next
     }
 
     /// Annonce VoiceOver du RÉSULTAT (Lot 4.B). Les coups étaient annoncés,
@@ -242,6 +322,7 @@ final class PlayViewModel {
         // une nouvelle partie (voir ``HomeView/startNewGame(_:)``).
         wireClock()
         if startsEngine {
+            enqueueEngineWork { await self.loadMaiaIfNeeded() }
             enqueueEngineWork { await self.setupEngine() }
         }
     }
@@ -295,6 +376,7 @@ final class PlayViewModel {
         }
 
         if startsEngine {
+            enqueueEngineWork { await self.loadMaiaIfNeeded() }
             enqueueEngineWork { await self.setupEngine() }
             if outcome == nil, board.position.sideToMove == engineColor {
                 enqueueEngineWork { await self.requestEngineMove() }
@@ -363,7 +445,7 @@ final class PlayViewModel {
         engine = controller
         isEngineUnavailable = false
         await controller.send(.ucinewgame)
-        for command in settings.strength.setupCommands {
+        for command in sessionStrength.setupCommands {
             await controller.send(command)
         }
         return true
@@ -398,7 +480,7 @@ final class PlayViewModel {
                 ),
                 multipv: 1,
                 setupCommands: [.setoption(id: "Hash", value: "\(AppSettings.engineHashMB)")]
-                    + settings.strength.setupCommands
+                    + sessionStrength.setupCommands
             ) else {
                 self.engine = nil
                 isEngineUnavailable = true
@@ -437,7 +519,7 @@ final class PlayViewModel {
             ),
             multipv: 1,
             setupCommands: [.setoption(id: "Hash", value: "\(AppSettings.engineHashMB)")]
-                + settings.strength.setupCommands
+                + sessionStrength.setupCommands
         )
         isEngineUnavailable = !restarted
         return restarted
@@ -725,6 +807,14 @@ final class PlayViewModel {
     /// en ±10 000 cp pour rester comparable, mais `mate` permet un message
     /// dédié.
     private func quickScore(fen: String, engine: EngineController) async -> (cp: Int, mate: Int?)? {
+        guard let search = await quickSearch(fen: fen, engine: engine) else { return nil }
+        return (search.cp, search.mate)
+    }
+
+    /// Recherche COURTE (300 ms) : meilleur coup, score et mat éventuel du
+    /// point de vue du camp au trait. Sert l'alerte gaffe (score seul) et le
+    /// filet derrière Maia (coup ET score).
+    private func quickSearch(fen: String, engine: EngineController) async -> (lan: String?, cp: Int, mate: Int?)? {
         await engine.synchronize()
         // S'abonner AVANT d'envoyer : un abonné ne reçoit que ce qui suit
         // son abonnement (voir ``EngineController/responseStream``) — lu
@@ -734,7 +824,7 @@ final class PlayViewModel {
         await engine.send(.go(movetime: 300))
 
         let outcome = await EngineWatchdog.run(deadlineMs: 300 + EngineWatchdog.graceMs) {
-            () -> (cp: Int, mate: Int?)? in
+            () -> (lan: String?, cp: Int, mate: Int?)? in
             var cp: Int?
             var mate: Int?
             for await response in responses {
@@ -745,14 +835,14 @@ final class PlayViewModel {
                         cp = value
                         mate = EngineScore.mateInMoves(info)
                     }
-                case .bestmove:
-                    if let cp { return (cp, mate) }
+                case let .bestmove(move, _):
+                    if let cp { return (move, cp, mate) }
                     return nil
                 default:
                     break
                 }
             }
-            if let cp { return (cp, mate) }
+            if let cp { return (nil, cp, mate) }
             return nil
         }
 
@@ -1135,7 +1225,7 @@ final class PlayViewModel {
     private func announceMove(_ move: Move) {
         guard UIAccessibility.isVoiceOverRunning else { return }
         let who = move.piece.color == engineColor
-            ? LocalizationController.string("Ordinateur")
+            ? opponentDisplayName
             : LocalizationController.string("Vous")
         UIAccessibility.post(
             notification: .announcement,
@@ -1247,14 +1337,164 @@ final class PlayViewModel {
     /// le calcul normal (livre désactivé, position personnalisée, ou
     /// position sortie de l'arbre connu).
     private func bookMoveIfAvailable() -> String? {
-        guard settings.bookEnabled, settings.startFEN == nil else { return nil }
+        guard settings.startFEN == nil else { return nil }
+        // Un personnage joue SON répertoire (c'est son caractère, pas un
+        // réglage) ; sans répertoire propre, le livre général si l'utilisateur
+        // l'a laissé actif.
+        let book: OpeningBook
+        let width: OpeningBookWidth
+        if isMaiaOpponentActive, let profile = opponentProfile, let repertoire = OpponentBooks.book(for: profile) {
+            book = repertoire
+            width = .includeSidelines
+        } else {
+            guard settings.bookEnabled else { return nil }
+            book = OpeningBookLoader.standard
+            width = settings.bookWidth
+        }
         guard let san = OpeningBookEngine.pickNextMove(
-            book: OpeningBookLoader.standard,
+            book: book,
             sanPath: moveLog.map(\.san),
-            width: settings.bookWidth
+            width: width
         ) else { return nil }
         guard let move = Move(san: san, position: board.position) else { return nil }
         return move.lan
+    }
+
+    // MARK: Adversaire Maia
+
+    /// Charge le modèle Maia-3 si la partie se joue contre un personnage.
+    /// Hors du MainActor : le chargement Core ML prend quelques dizaines de
+    /// millisecondes, et l'écran vient d'apparaître.
+    private func loadMaiaIfNeeded() async {
+        guard opponentProfile != nil, maiaOpponent == nil, outcome == nil else { return }
+        let loaded = await Task.detached(priority: .userInitiated) { MaiaOpponent() }.value
+        maiaOpponent = loaded
+        if loaded == nil {
+            isMaiaUnavailable = true
+            safetyNetInterventions.append(.unavailable)
+        }
+    }
+
+    /// Les positions de la partie, de la position de départ à la courante —
+    /// l'historique dont Maia a besoin (voir ``MaiaEncoder``). Rejoué depuis
+    /// `moveLog` à chaque coup : quelques dizaines de microsecondes, et aucun
+    /// état de plus à tenir synchronisé.
+    private func recentPositions() -> [Position] {
+        var replay = Board(position: settings.startingPosition)
+        var positions = [replay.position]
+        for move in moveLog {
+            guard let made = replay.move(pieceAt: move.start, to: move.end) else { break }
+            if case .promotion = replay.state {
+                replay.completePromotion(of: made, to: move.promotedPiece?.kind ?? .queen)
+            }
+            positions.append(replay.position)
+        }
+        return positions
+    }
+
+    /// Un coup du personnage : Maia propose, le filet Stockfish dispose
+    /// (quatre cas, voir ``SafetyNet``), puis le coup est joué avec le rythme
+    /// habituel.
+    ///
+    /// - returns: `false` si Maia n'a pas répondu — l'appelant enchaîne alors
+    ///   sur le chemin classique, Stockfish ayant été bridé au niveau du
+    ///   personnage ici même.
+    private func requestMaiaMove(engine: EngineController, maia: MaiaOpponent) async -> Bool {
+        guard let profile = opponentProfile else { return false }
+        let level = Int(settings.eloSliderValue.rounded())
+        let mover = board.position.sideToMove
+
+        var choice: MaiaOpponent.Choice?
+        do {
+            let mood = profile.mood(lastMoverCp: recentEngineEvalsCp.last)
+            if settings.sparringEnabled {
+                sparringOffset = Sparring.offset(after: recentEngineEvalsCp.last, current: sparringOffset)
+            }
+            choice = try await maia.chooseMove(
+                history: recentPositions(), board: board,
+                selfElo: Double(level) + sparringOffset,
+                // Maia joue contre VOUS : votre niveau estimé, amorcé au
+                // niveau choisi.
+                oppoElo: PlayerLevel.current(seed: Double(level)),
+                temperature: mood.temperature, topP: profile.topP,
+                style: mood.style
+            )
+        } catch {
+            choice = nil
+        }
+        guard let choice else {
+            isMaiaUnavailable = true
+            safetyNetInterventions.append(.unavailable)
+            for command in settings.strength.setupCommands {
+                await engine.send(command)
+            }
+            return false
+        }
+
+        // Le filet : une recherche courte de Stockfish plein pot. Son score
+        // alimente aussi la barre d'éval et la logique d'abandon, comme le
+        // faisait la recherche du coup en mode classique.
+        var lan = choice.uci
+        var scoreCp: Int?
+        var scoreMate: Int?
+        let quick = await quickSearch(fen: board.position.fen, engine: engine)
+        scoreCp = quick?.cp
+        scoreMate = quick?.mate
+        let decision = MaiaTurnResolver.resolve(
+            maiaUCI: choice.uci,
+            quick: quick.map { MaiaTurnResolver.QuickSearch(lan: $0.lan, cp: $0.cp, mate: $0.mate) },
+            level: level, pieceCount: board.position.pieces.count,
+            policy: profile.safetyNet, board: board
+        )
+        switch decision {
+        case .play:
+            break
+        case let .override(best, reason):
+            lan = best
+            safetyNetInterventions.append(reason)
+        case .searchBridled:
+            if let bridled = await bridledSearch(engine: engine) {
+                lan = bridled.lan
+                scoreCp = bridled.cp ?? scoreCp
+                scoreMate = bridled.cp == nil ? scoreMate : bridled.mate
+                safetyNetInterventions.append(.endgame)
+            }
+        }
+
+        try? await Task.sleep(nanoseconds: naturalMoveDelayNanos())
+        guard outcome == nil, board.position.sideToMove == mover else { return true }
+
+        if let scoreCp {
+            recentEngineEvalsCp.append(scoreCp)
+            if recentEngineEvalsCp.count > 6 { recentEngineEvalsCp.removeFirst() }
+            let moverIsWhite = mover == .white
+            if let scoreMate {
+                currentEvalMate = moverIsWhite ? scoreMate : -scoreMate
+                currentEvalCp = nil
+            } else {
+                currentEvalCp = moverIsWhite ? scoreCp : -scoreCp
+                currentEvalMate = nil
+            }
+        }
+
+        applyEngineMove(lan: lan)
+        if outcome == nil { maybeEngineResignsOrOffersDraw() }
+        return true
+    }
+
+    /// Recherche de Stockfish BRIDÉ au niveau du personnage (cas « finale
+    /// technique » du filet), puis retour à pleine puissance pour le reste :
+    /// l'indice et l'alerte gaffe ne doivent pas hériter du bridage.
+    private func bridledSearch(engine: EngineController) async -> (lan: String, cp: Int?, mate: Int?)? {
+        for command in settings.strength.setupCommands {
+            await engine.send(command)
+        }
+        let search = await performMoveSearch(engine: engine)
+        for command in EngineStrength.maximum.setupCommands {
+            await engine.send(command)
+        }
+        guard case let .finished(result) = search, let lan = result.lan else { return nil }
+        return (lan, result.cp, result.mate)
     }
 
     // MARK: Coup moteur
@@ -1275,6 +1515,13 @@ final class PlayViewModel {
             guard outcome == nil else { return }
             applyEngineMove(lan: bookLAN)
             return
+        }
+
+        if isMaiaOpponentActive, let maia = maiaOpponent {
+            if await requestMaiaMove(engine: engine, maia: maia) { return }
+            // Maia n'a pas répondu : `isMaiaUnavailable` est posé, Stockfish
+            // vient d'être bridé au niveau du personnage, et la suite est le
+            // chemin classique — pour ce coup et tous les suivants.
         }
 
         let mover = board.position.sideToMove
@@ -1335,7 +1582,7 @@ final class PlayViewModel {
         await engine.send(.position(.fen(board.position.fen)))
 
         let budgetMs: Int
-        if let depth = settings.strength.maxDepth {
+        if let depth = sessionStrength.maxDepth {
             await engine.send(.go(depth: depth))
             budgetMs = 15_000
         } else {
@@ -1415,13 +1662,15 @@ final class PlayViewModel {
     /// grignotait le temps du moteur (à 1+0, ~la moitié). Supprimé sous
     /// 30 s restantes (zeitnot), sinon borné à ~2 % du temps restant.
     private func naturalMoveDelayNanos() -> UInt64 {
+        // Le rythme du personnage : Pablo joue vite, Nadia réfléchit.
+        let pace = opponentProfile?.temperament.pace ?? 1
         let maxSeconds: Double
         if let clock, clock.control.hasClock {
             let remaining = clock.remaining(for: engineColor)
             if remaining < 30 { return 0 }
-            maxSeconds = min(0.7, remaining * 0.02)
+            maxSeconds = min(0.7 * pace, remaining * 0.02)
         } else {
-            maxSeconds = 0.7
+            maxSeconds = 0.7 * pace
         }
         guard maxSeconds > 0.1 else { return 0 }
         let lower = min(0.25, maxSeconds)
@@ -1451,8 +1700,12 @@ final class PlayViewModel {
     /// perdant sur plusieurs coups d'affilée, ou propose nulle si l'éval
     /// reste proche de zéro en finale avec peu de matériel.
     private func maybeEngineResignsOrOffersDraw() {
-        let last3 = recentEngineEvalsCp.suffix(3)
-        if settings.engineResignationEnabled, last3.count == 3, last3.allSatisfy({ $0 < -800 }) {
+        // Seuils du personnage (Léa s'accroche, Nadia abandonne tôt), ou les
+        // seuils historiques en mode Niveau Elo.
+        let temperament = opponentProfile?.temperament ?? Temperament()
+        let recent = recentEngineEvalsCp.suffix(temperament.resignPatience)
+        if settings.engineResignationEnabled, recent.count == temperament.resignPatience,
+           recent.allSatisfy({ $0 < temperament.resignThresholdCp }) {
             outcome = GameOutcome(winner: userColor, reason: .resignation)
             clock?.pause()
             Haptics.gameEnded()
@@ -1461,7 +1714,8 @@ final class PlayViewModel {
         }
 
         let last6 = recentEngineEvalsCp.suffix(6)
-        if !engineHasOfferedDraw, last6.count == 6, last6.allSatisfy({ abs($0) < 30 }), board.position.pieces.count <= 12 {
+        if temperament.offersDraws, !engineHasOfferedDraw, last6.count == 6,
+           last6.allSatisfy({ abs($0) < temperament.drawOfferMaxCp }), board.position.pieces.count <= 12 {
             engineHasOfferedDraw = true
             pendingDrawOffer = true
         }

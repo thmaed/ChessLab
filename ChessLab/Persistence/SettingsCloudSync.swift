@@ -70,6 +70,8 @@ final class SettingsCloudSync {
         "lastPlayGameSettings",
         "labGameSettings.v1",
         "lastTwoPlayerGameSettings",
+        // Niveau mémorisé par personnage (mode Contre l'ordinateur).
+        "opponentLevels.v1",
     ]
 
     /// Exclusions explicitement DÉCIDÉES (par opposition à celles qui découlent

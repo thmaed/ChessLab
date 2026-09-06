@@ -35,6 +35,13 @@ struct LicensesView: View {
             url: URL(string: "https://fairy-stockfish.github.io")
         ),
         .init(
+            icon: "person.crop.circle.badge.checkmark", tint: Theme.teal,
+            name: "Maia-3 (Chessformer)",
+            license: "Licence AGPLv3",
+            body: "Réseau de neurones qui prédit le coup qu'un humain jouerait, entraîné par le CSSLab de l'Université de Toronto sur des millions de parties Lichess. C'est lui qui joue les personnages du mode Contre l'ordinateur ; ses poids (modèle 5M) sont convertis pour Core ML. Licence AGPLv3, compatible avec la GPLv3 de l'app, qui ne fournit aucun service réseau.",
+            url: URL(string: "https://github.com/CSSLab/maia3")
+        ),
+        .init(
             icon: "chevron.left.forwardslash.chevron.right", tint: Theme.info,
             name: "Code source de ChessLab",
             license: "GPLv3 (l'app entière)",

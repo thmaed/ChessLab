@@ -225,7 +225,7 @@ final class DiscoveryTourController {
             DiscoveryStep(
                 id: 1, section: "Jouer", spot: .strengthSlider, destination: .newGame,
                 title: "Réglez votre adversaire",
-                body: "De débutant à maître, au curseur ou par préréglages. Le piège du premier soir : jouer sa première partie à pleine force."
+                body: "De débutant à maître, au curseur ou par préréglages — ou un personnage joué par Maia-3, avec son style et son caractère. Le piège du premier soir : jouer sa première partie à pleine force."
             ),
             DiscoveryStep(
                 id: 2, section: "Jouer", spot: .aidToggles, destination: .newGame,

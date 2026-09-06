@@ -92,6 +92,9 @@ struct ProgressionSummary: Equatable {
     /// Le plus haut Elo battu — la statistique qui motive. `nil` si aucune
     /// victoire enregistrée.
     let bestWinElo: Int?
+    /// Résultats par personnage (parties jouées contre un
+    /// ``OpponentProfile``), dans l'ordre de la galerie.
+    let engineByOpponent: [OpponentRecord]
 
     var engineGames: Int { engineWins + engineDraws + engineLosses }
 
@@ -116,6 +119,17 @@ struct ProgressionSummary: Equatable {
         let draws: Int
         let losses: Int
         var id: String { band.rawValue }
+        var games: Int { wins + draws + losses }
+    }
+
+    struct OpponentRecord: Equatable, Identifiable {
+        let profileID: String
+        let wins: Int
+        let draws: Int
+        let losses: Int
+        /// Le plus haut niveau battu contre ce personnage.
+        let bestWinLevel: Int?
+        var id: String { profileID }
         var games: Int { wins + draws + losses }
     }
 
@@ -153,6 +167,7 @@ struct ProgressionSummary: Equatable {
         var losses = 0
         var bandAccumulator: [EloBand: (wins: Int, draws: Int, losses: Int)] = [:]
         var bestWinElo: Int?
+        var opponentAccumulator: [String: (wins: Int, draws: Int, losses: Int, best: Int?)] = [:]
 
         for game in games {
             guard let result = userResult(of: game) else { continue }
@@ -171,6 +186,24 @@ struct ProgressionSummary: Equatable {
             if result == .win {
                 bestWinElo = max(bestWinElo ?? 0, elo)
             }
+            if let profileID = game.opponentProfileID {
+                var entry = opponentAccumulator[profileID] ?? (0, 0, 0, nil)
+                switch result {
+                case .win:
+                    entry.wins += 1
+                    entry.best = max(entry.best ?? 0, elo)
+                case .draw: entry.draws += 1
+                case .loss: entry.losses += 1
+                }
+                opponentAccumulator[profileID] = entry
+            }
+        }
+        let opponentRecords: [OpponentRecord] = OpponentProfile.all.compactMap { profile in
+            guard let entry = opponentAccumulator[profile.id] else { return nil }
+            return OpponentRecord(
+                profileID: profile.id, wins: entry.wins, draws: entry.draws,
+                losses: entry.losses, bestWinLevel: entry.best
+            )
         }
         let bandRecords: [BandRecord] = EloBand.allCases.compactMap { band in
             guard let accumulated = bandAccumulator[band] else { return nil }
@@ -189,7 +222,8 @@ struct ProgressionSummary: Equatable {
             engineDraws: draws,
             engineLosses: losses,
             engineByBand: bandRecords,
-            bestWinElo: bestWinElo
+            bestWinElo: bestWinElo,
+            engineByOpponent: opponentRecords
         )
     }
 

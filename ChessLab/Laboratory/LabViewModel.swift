@@ -151,6 +151,17 @@ final class LabViewModel {
             hashMB: AppSettings.engineHashMB, multipv: 1
         )
 
+        // Le(s) camp(s) Maia : un seul modèle pour la série, chargé hors du
+        // MainActor. S'il manque, le camp joue Stockfish bridé à sa consigne
+        // (même repli que le mode Jouer) — et la série le dit.
+        var maia: MaiaOpponent?
+        if settings.usesMaia {
+            maia = await Task.detached(priority: .userInitiated) { MaiaOpponent() }.value
+            if maia == nil {
+                Self.watchdogLogger.warning("Modèle Maia-3 introuvable : le camp personnage joue Stockfish bridé")
+            }
+        }
+
         if started {
             // Budget d'essais : une partie interrompue par un raté moteur n'est
             // PAS enregistrée (sinon elle fausserait les stats en fausse nulle),
@@ -163,7 +174,7 @@ final class LabViewModel {
             var attempts = 0
             while completed.count < settings.gameCount, attempts < maxAttempts, !Task.isCancelled {
                 attempts += 1
-                let outcome = await playOneGame(engine: controller, gameIndex: completed.count)
+                let outcome = await playOneGame(engine: controller, maia: maia, gameIndex: completed.count)
                 if Task.isCancelled { break }
 
                 switch outcome {
@@ -212,6 +223,52 @@ final class LabViewModel {
         }
     }
 
+    /// Un coup de personnage au Laboratoire : Maia, puis le MÊME filet que le
+    /// mode Jouer (``MaiaTurnResolver``), avec les budgets de la série.
+    /// `nil` si Maia n'a pas répondu — l'appelant retombe sur Stockfish
+    /// bridé, comme le mode Jouer.
+    private func maiaTurn(
+        engine: EngineController, maia: MaiaOpponent, profile: OpponentProfile,
+        positions: [Position], level: Int, targetElo: Double?, opponentLevel: Int, strength: EngineStrength
+    ) async -> (lan: String, moverCp: Int?)? {
+        let choice: MaiaOpponent.Choice?
+        do {
+            choice = try await maia.chooseMove(
+                history: positions, board: board,
+                selfElo: targetElo ?? Double(level), oppoElo: Double(opponentLevel),
+                temperature: profile.temperature, topP: profile.topP
+            )
+        } catch {
+            choice = nil
+        }
+        guard let choice else { return nil }
+
+        let quickBudget = Int(Double(settings.movetimeMs) * ThermalMonitor.shared.movetimeFactor)
+        let quick = await engine.computeBestMove(
+            fen: board.position.fen, setupCommands: EngineStrength.maximum.setupCommands,
+            movetimeMs: quickBudget, depth: nil
+        )
+        let decision = MaiaTurnResolver.resolve(
+            maiaUCI: choice.uci,
+            quick: quick.map { MaiaTurnResolver.QuickSearch(lan: $0.lan, cp: $0.moverCp, mate: $0.moverMate) },
+            level: level, pieceCount: board.position.pieces.count,
+            policy: profile.safetyNet, board: board
+        )
+        switch decision {
+        case let .play(lan):
+            return (lan, quick?.moverCp)
+        case let .override(lan, _):
+            return (lan, quick?.moverCp)
+        case .searchBridled:
+            let bridled = await engine.computeBestMove(
+                fen: board.position.fen, setupCommands: strength.setupCommands,
+                movetimeMs: strength.maxDepth == nil ? quickBudget : nil, depth: strength.maxDepth
+            )
+            guard let bridled else { return (choice.uci, quick?.moverCp) }
+            return (bridled.lan, bridled.moverCp ?? quick?.moverCp)
+        }
+    }
+
     /// Issue d'une partie du Laboratoire.
     private enum GameLoopOutcome {
         /// Partie menée à une vraie fin (règles, adjudication, ou plafond de
@@ -222,13 +279,15 @@ final class LabViewModel {
         case interrupted
     }
 
-    private func playOneGame(engine: EngineController, gameIndex: Int) async -> GameLoopOutcome {
+    private func playOneGame(engine: EngineController, maia: MaiaOpponent?, gameIndex: Int) async -> GameLoopOutcome {
         let aWhite = !settings.alternateColors || gameIndex.isMultiple(of: 2)
 
         board = Board(position: settings.startingPosition)
         lastMove = nil
         currentPlyCount = 0
         currentEvalCp = nil
+        // L'historique dont Maia a besoin (voir ``MaiaEncoder``).
+        var positions: [Position] = [board.position]
 
         var game = Game(startingWith: settings.startingPosition)
         var gameIndexNode = game.startingIndex
@@ -248,6 +307,7 @@ final class LabViewModel {
             let moverIsA = (mover == .white) == aWhite
             let strength = moverIsA ? settings.sideAStrength : settings.sideBStrength
             let bookEnabled = moverIsA ? settings.sideABookEnabled : settings.sideBBookEnabled
+            let profile = moverIsA ? settings.sideAProfile : settings.sideBProfile
 
             var moveLAN: String?
             var whiteEval: Int?
@@ -256,6 +316,19 @@ final class LabViewModel {
                let san = OpeningBookEngine.pickNextMove(book: OpeningBookLoader.standard, sanPath: sanPath, width: settings.bookWidth),
                let bookMove = Move(san: san, position: board.position) {
                 moveLAN = bookMove.lan
+            } else if let profile, let maia,
+                      let turn = await maiaTurn(
+                          engine: engine, maia: maia, profile: profile, positions: positions,
+                          level: Int((moverIsA ? settings.sideAEloSlider : settings.sideBEloSlider).rounded()),
+                          targetElo: moverIsA ? settings.sideAMaiaTargetElo : settings.sideBMaiaTargetElo,
+                          opponentLevel: Int((moverIsA ? settings.sideBEloSlider : settings.sideAEloSlider).rounded()),
+                          strength: strength
+                      ) {
+                if Task.isCancelled { return .interrupted }
+                moveLAN = turn.lan
+                if let moverCp = turn.moverCp {
+                    whiteEval = mover == .white ? moverCp : -moverCp
+                }
             } else {
                 // Toute la recherche + consommation du flux se fait sur
                 // l'acteur moteur (hors MainActor) : un seul `await` ici, le
@@ -289,6 +362,7 @@ final class LabViewModel {
             gameIndexNode = game.make(move: applied, from: gameIndexNode)
             lastMove = applied
             sanPath.append(applied.san)
+            positions.append(board.position)
             currentPlyCount += 1
             if let whiteEval {
                 currentEvalCp = whiteEval

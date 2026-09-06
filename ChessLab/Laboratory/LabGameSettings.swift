@@ -11,6 +11,20 @@ import Foundation
 struct LabGameSettings: Codable, Hashable {
     var sideAEloSlider: Double = 2200
     var sideBEloSlider: Double = 2000
+    /// Personnage Maia pour le camp (voir ``OpponentProfile``) ; `nil` =
+    /// Stockfish bridé au curseur. Le curseur du camp vaut alors la
+    /// CONSIGNE Elo donnée à Maia — c'est ce que le calibrage fait varier.
+    /// Optionnels : une série sauvegardée par une version antérieure n'a pas
+    /// ces clés.
+    var sideAOpponentProfileID: String?
+    var sideBOpponentProfileID: String?
+    /// CONSIGNE Elo donnée à Maia pour ce camp, quand elle diffère du
+    /// curseur. Le curseur reste le NIVEAU du camp (seuils du filet, bridage
+    /// de Stockfish en finale) ; la consigne est ce que le calibrage fait
+    /// varier pour trouver celle qui tient ce niveau. `nil` = consigne =
+    /// curseur.
+    var sideAMaiaTargetElo: Double?
+    var sideBMaiaTargetElo: Double?
     /// Budget de réflexion par coup, en millisecondes (mode « rapide » =
     /// petite valeur). Ignoré pour un réglage très faible qui plafonne la
     /// profondeur (voir ``EngineStrength/maxDepth``).
@@ -58,6 +72,9 @@ struct LabGameSettings: Codable, Hashable {
 
     var sideAStrength: EngineStrength { EngineStrength(sliderValue: sideAEloSlider) }
     var sideBStrength: EngineStrength { EngineStrength(sliderValue: sideBEloSlider) }
+    var sideAProfile: OpponentProfile? { sideAOpponentProfileID.flatMap(OpponentProfile.named) }
+    var sideBProfile: OpponentProfile? { sideBOpponentProfileID.flatMap(OpponentProfile.named) }
+    var usesMaia: Bool { sideAProfile != nil || sideBProfile != nil }
 
     var startingPosition: Position {
         if let startFEN, let position = Position(fen: startFEN) {

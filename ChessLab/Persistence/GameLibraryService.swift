@@ -12,6 +12,8 @@ enum GameLibraryService {
         userColor: Piece.Color,
         engineColor: Piece.Color,
         strength: EngineStrength,
+        engineName: String = "Ordinateur",
+        opponentProfileID: String? = nil,
         in context: ModelContext
     ) {
         let record = GameRecord()
@@ -19,10 +21,11 @@ enum GameLibraryService {
         record.pgn = PGNExport.pgn(for: game)
         record.resultRaw = outcome.pgnResult
         record.outcomeReasonRaw = outcome.reason.storageLabel
-        record.whiteName = userColor == .white ? "Vous" : "Ordinateur"
-        record.blackName = userColor == .black ? "Vous" : "Ordinateur"
+        record.whiteName = userColor == .white ? "Vous" : engineName
+        record.blackName = userColor == .black ? "Vous" : engineName
         record.engineColorRaw = engineColor.rawValue
         record.engineEloApprox = Int(strength.sliderValue)
+        record.opponentProfileID = opponentProfileID
         record.moveCount = GameRecord.plyCount(of: game)
         // Empreinte canonique : c'est par elle que l'analyse retrouvera
         // cette partie pour y déposer son bilan chiffré.

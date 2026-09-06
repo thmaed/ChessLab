@@ -64,12 +64,12 @@ struct LabSetupView: View {
                     VStack(spacing: 14) {
                         strengthEditor(
                             name: "Moteur A", elo: $settings.sideAEloSlider,
-                            bookOn: $settings.sideABookEnabled, tint: Theme.accent
+                            bookOn: $settings.sideABookEnabled, profileID: $settings.sideAOpponentProfileID, tint: Theme.accent
                         )
                         Divider().overlay(Theme.stroke)
                         strengthEditor(
                             name: "Moteur B", elo: $settings.sideBEloSlider,
-                            bookOn: $settings.sideBBookEnabled, tint: Theme.info
+                            bookOn: $settings.sideBBookEnabled, profileID: $settings.sideBOpponentProfileID, tint: Theme.info
                         )
                     }
                 }
@@ -431,23 +431,34 @@ struct LabSetupView: View {
     /// curseur, puis le livre en chip plutôt qu'en interrupteur pleine
     /// largeur — c'est un réglage binaire secondaire, pas un titre.
     private func strengthEditor(
-        name: LocalizedStringKey, elo: Binding<Double>, bookOn: Binding<Bool>, tint: Color
+        name: LocalizedStringKey, elo: Binding<Double>, bookOn: Binding<Bool>,
+        profileID: Binding<String?>, tint: Color
     ) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        let isMaia = profileID.wrappedValue != nil
+        return VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 8) {
                 Circle().fill(tint).frame(width: 10, height: 10).glow(tint, radius: 5)
                 Text(name)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Theme.textSecondary)
                 Spacer()
-                Text(EngineStrength(sliderValue: elo.wrappedValue).displayLabel)
+                // Un camp Maia affiche sa CONSIGNE, pas un Elo Stockfish.
+                Text(isMaia ? "Consigne \(Int(elo.wrappedValue))" : EngineStrength(sliderValue: elo.wrappedValue).displayLabel)
                     .font(.headline.weight(.bold))
                     .foregroundStyle(Theme.textPrimary)
             }
             Slider(value: elo, in: EngineStrength.sliderRange, step: 10)
                 .tint(tint)
-            ChipButton(label: "Livre d'ouvertures", systemImage: "book.closed", isSelected: bookOn.wrappedValue) {
-                bookOn.wrappedValue.toggle()
+            FlowLayout(spacing: 8, lineSpacing: 8) {
+                ChipButton(label: "Livre d'ouvertures", systemImage: "book.closed", isSelected: bookOn.wrappedValue) {
+                    bookOn.wrappedValue.toggle()
+                }
+                // Le camp joue Camille (Maia-3) avec son filet Stockfish, au
+                // lieu de Stockfish bridé : c'est ainsi qu'un personnage se
+                // mesure contre l'étalon.
+                ChipButton(label: "Camille (Maia)", systemImage: "person.crop.circle", isSelected: isMaia) {
+                    profileID.wrappedValue = isMaia ? nil : OpponentProfile.camille.id
+                }
             }
         }
     }

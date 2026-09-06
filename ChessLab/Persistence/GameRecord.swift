@@ -34,6 +34,10 @@ final class GameRecord: Identifiable {
     /// `nil` pour une partie deux humains.
     var engineColorRaw: String?
     var engineEloApprox: Int?
+    /// Personnage affronté (voir ``OpponentProfile``) ; `nil` en mode Niveau
+    /// Elo et pour tout enregistrement antérieur. Optionnel, sans défaut :
+    /// CloudKit-compatible comme le reste.
+    var opponentProfileID: String?
     var playedAt: Date? = Date()
     /// Nombre de demi-coups de la ligne principale — même unité que le
     /// « coup(s) joué(s) » de la bannière de reprise.

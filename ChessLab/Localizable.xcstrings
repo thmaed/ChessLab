@@ -2127,6 +2127,22 @@
         }
       }
     },
+    "Après chaque partie, le niveau de ce personnage monte de 25 si vous gagnez, baisse de 25 si vous perdez. Toujours affiché, jamais en cachette.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After each game, this character's level goes up 25 if you win and down 25 if you lose. Always shown, never hidden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Après chaque partie, le niveau de ce personnage monte de 25 si vous gagnez, baisse de 25 si vous perdez. Toujours affiché, jamais en cachette."
+          }
+        }
+      }
+    },
     "Arbitrage…": {
       "localizations": {
         "en": {
@@ -2906,6 +2922,22 @@
         }
       }
     },
+    "Battu jusqu'à %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beaten up to %lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Battu jusqu'à %lld"
+          }
+        }
+      }
+    },
     "Benko Gambit": {
       "extractionState": "stale",
       "localizations": {
@@ -3390,6 +3422,22 @@
         }
       }
     },
+    "Brillant au coup 15, en prise au coup 16. Joue vite, attaque tout, oublie son roi. Le débutant humain que Stockfish ne sait pas imiter.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brilliant on move 15, hanging a piece on move 16. Plays fast, attacks everything, forgets his king. The human beginner Stockfish cannot imitate."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Brillant au coup 15, en prise au coup 16. Joue vite, attaque tout, oublie son roi. Le débutant humain que Stockfish ne sait pas imiter."
+          }
+        }
+      }
+    },
     "Budapest Gambit": {
       "extractionState": "stale",
       "localizations": {
@@ -3403,6 +3451,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gambit Budapest"
+          }
+        }
+      }
+    },
+    "Béton": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Concrete"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Béton"
           }
         }
       }
@@ -3429,6 +3493,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cadence"
+          }
+        }
+      }
+    },
+    "Camille (Maia)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camille (Maia)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Camille (Maia)"
           }
         }
       }
@@ -4053,6 +4133,16 @@
         }
       }
     },
+    "Cette tuile lance une partie contre l'ordinateur. Les autres attendront la fin de la visite — deux minutes, promis.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This tile starts a game against the computer. The others can wait until the tour is over — two minutes, promise."
+          }
+        }
+      }
+    },
     "Chacun son tour sur le même écran, sans ordinateur.": {
       "localizations": {
         "en": {
@@ -4176,6 +4266,16 @@
         }
       }
     },
+    "Chaque partie s'analyse": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every game can be analyzed"
+          }
+        }
+      }
+    },
     "Chaque position, disséquée": {
       "localizations": {
         "en": {
@@ -4204,6 +4304,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Chaque tour se joue en DEUX temps : vous déplacez une pièce, puis vous posez le canard sur une case vide de votre choix. Le canard n'appartient à personne et bloque totalement sa case — aucune pièce ne peut s'y poser ni la traverser, et il ne se capture pas. Il doit changer de case à chaque tour. Il n'y a NI ÉCHEC NI MAT : un roi a le droit de rester sous une attaque, et on gagne en le capturant. L'ordinateur joue cette variante avec Stockfish, restreint aux coups que le canard laisse passer : il joue bien, mais il ne voit pas le canard dans son évaluation."
+          }
+        }
+      }
+    },
+    "Chaque variante explique ses règles sur son écran de réglages — inutile de les connaître d'avance :": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Each variant explains its rules on its setup screen — no need to know them in advance:"
           }
         }
       }
@@ -4702,6 +4812,16 @@
         }
       }
     },
+    "Comprendre": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Understand"
+          }
+        }
+      }
+    },
     "Compte iCloud connecté": {
       "localizations": {
         "en": {
@@ -4792,6 +4912,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Deux pions liés contre tour"
+          }
+        }
+      }
+    },
+    "Consigne %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Target %lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consigne %lld"
           }
         }
       }
@@ -4955,6 +5091,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Contrasté"
+          }
+        }
+      }
+    },
+    "Contre %@, niveau %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Against %@, level %lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Contre %@, niveau %lld"
           }
         }
       }
@@ -5316,6 +5468,16 @@
         }
       }
     },
+    "Courbe d'évaluation, précision, coups en capsules colorées — et la courbe comme les capsules se touchent pour naviguer dans la partie. La bibliothèque garde tout.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Evaluation curve, accuracy, moves as colored capsules — and both the curve and the capsules can be tapped to navigate the game. The library keeps everything."
+          }
+        }
+      }
+    },
     "Cours indisponible": {
       "extractionState": "stale",
       "localizations": {
@@ -5394,6 +5556,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Formation Creepy Crawly"
+          }
+        }
+      }
+    },
+    "Crédible de %lld à %lld.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Credible from %lld to %lld."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Crédible de %lld à %lld."
           }
         }
       }
@@ -5563,7 +5741,18 @@
         }
       }
     },
+    "D'autres façons de jouer aux échecs, présentées en tuiles — douze en tout. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959) ou composée vous-même — contre l'ordinateur ou à deux, avec analyse de fin de partie. Contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs, Horde (les Blancs n'ont que des pions), Course des rois, Atomique (chaque capture explose), Antéchecs (perdez tout pour gagner), Crazyhouse (les pièces capturées rejoignent votre réserve et se reposent sur l'échiquier), Coup Volé (jouez un coup avec une pièce adverse), Duck Chess (un canard bloque une case et bouge à chaque tour), Barricades (d4 et e5 murées) et Barricades aléatoires (les murs changent de case à chaque coup). Chaque tuile explique ses règles sur son écran de réglages ; indice, alerte gaffe, barre d'évaluation et analyse partout, force de l'ordinateur réglable comme ailleurs.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other ways to play chess, presented as tiles — twelve in all. Chess960 (Fischer Random): starting position drawn at random, chosen by number (0-959) or composed yourself — against the computer or two-player, with end-of-game analysis. Against the computer: King of the Hill (first king to the center wins), Three-check, Horde (White has only pawns), Racing Kings, Atomic (every capture explodes), Antichess (lose everything to win), Crazyhouse (captured pieces join your reserve and can be dropped back on the board), Stolen Move (play one move with an opponent's piece), Duck Chess (a duck blocks a square and moves every turn), Barricades (d4 and e5 walled) and Random Barricades (the walls change squares after every move). Each tile explains its rules on its setup screen; hint, blunder alert, evaluation bar and analysis everywhere, computer strength adjustable as elsewhere."
+          }
+        }
+      }
+    },
     "D'autres façons de jouer aux échecs, présentées en tuiles. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959), ou composée vous-même en échangeant les pièces de la première rangée — jeu contre l'ordinateur ou à deux, avec la même analyse de fin de partie qu'en mode « Jouer ». Six variantes de plus, contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs (le troisième échec délivré gagne), Horde (les Blancs n'ont que des pions), Course des rois (le premier roi en 8e rangée gagne, sans jamais mettre l'adversaire en échec), Atomique (chaque capture fait exploser les cases voisines) et Antéchecs (but inversé : perdez toutes vos pièces, ou restez bloqué, pour gagner). Indice, alerte gaffe et barre d'évaluation partout ; la force de l'ordinateur se règle comme ailleurs.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -5658,6 +5847,42 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gambit danois refusé"
+          }
+        }
+      }
+    },
+    "Dans les Ouvertures, le champ de recherche flotte AU-DESSUS de l'arbre. Cherchez, puis fermez le clavier pour toucher les résultats en dessous.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Openings, the search field floats ABOVE the tree. Search, then dismiss the keyboard to tap the results below."
+          }
+        }
+      }
+    },
+    "De débutant à maître, au curseur ou par préréglages — ou un personnage joué par Maia-3, avec son style et son caractère. Le piège du premier soir : jouer sa première partie à pleine force.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From beginner to master, by slider or presets — or a character played by Maia-3, with a style and a temper of their own. The first-night trap: playing your first game at full strength."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De débutant à maître, au curseur ou par préréglages — ou un personnage joué par Maia-3, avec son style et son caractère. Le piège du premier soir : jouer sa première partie à pleine force."
+          }
+        }
+      }
+    },
+    "De débutant à maître, au curseur ou par préréglages. Le piège du premier soir : jouer sa première partie à pleine force.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "From beginner to master, with the slider or the presets. The first-night trap: playing your first game at full strength."
           }
         }
       }
@@ -5786,6 +6011,16 @@
         }
       }
     },
+    "Deux minutes pour resituer les commandes essentielles.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two minutes to get your bearings on the essential controls."
+          }
+        }
+      }
+    },
     "Deux personnes jouent sur le même appareil. Le mode « table » retourne les pièces pour rester lisible face à face. La partie terminée s'enregistre dans la bibliothèque.": {
       "localizations": {
         "en": {
@@ -5865,6 +6100,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Douze cours pour convertir vos finales : opposition, règle du carré, percée, Lucena, Philidor, tour contre pion, dame contre pion, mats élémentaires, étude de Réti. Chaque ligne est vérifiée par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Révision espacée et synchronisation iCloud, comme les ouvertures."
+          }
+        }
+      }
+    },
+    "Douze façons de jouer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Twelve ways to play"
           }
         }
       }
@@ -6293,6 +6538,22 @@
         }
       }
     },
+    "En partie, il se relâche quand il vous domine et se durcit quand vous le dominez, dans une bande de ±150 autour du niveau choisi. Nommé et affiché, jamais en cachette.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "During the game they ease off when dominating you and toughen up when you dominate them, within a ±150 band around the chosen level. Named and shown, never hidden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En partie, il se relâche quand il vous domine et se durcit quand vous le dominez, dans une bande de ±150 autour du niveau choisi. Nommé et affiché, jamais en cachette."
+          }
+        }
+      }
+    },
     "En pause": {
       "localizations": {
         "en": {
@@ -6584,6 +6845,16 @@
         }
       }
     },
+    "Et pour y revenir": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "And to come back"
+          }
+        }
+      }
+    },
     "Excellent": {
       "localizations": {
         "en": {
@@ -6650,6 +6921,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Explore, learn and train your openings from the Openings tab: step-by-step reader, active recall and spaced repetition. Content grows with updates."
+          }
+        }
+      }
+    },
+    "Explorer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explore"
           }
         }
       }
@@ -7411,6 +7692,22 @@
         }
       }
     },
+    "Gambit": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gambit"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gambit"
+          }
+        }
+      }
+    },
     "Global Opening": {
       "extractionState": "stale",
       "localizations": {
@@ -7575,6 +7872,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Étude de Grigoriev — le seul coup de roi"
+          }
+        }
+      }
+    },
+    "Grippe-sou": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Penny-pincher"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grippe-sou"
           }
         }
       }
@@ -8376,6 +8689,22 @@
         }
       }
     },
+    "Joue avec Maia-3, un réseau entraîné sur des millions de parties humaines. Stockfish n'intervient que pour les mats courts, les finales à peu de pièces et les répétitions.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plays with Maia-3, a network trained on millions of human games. Stockfish only steps in for short mates, endgames with few pieces, and repetitions."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Joue avec Maia-3, un réseau entraîné sur des millions de parties humaines. Stockfish n'intervient que pour les mats courts, les finales à peu de pièces et les répétitions."
+          }
+        }
+      }
+    },
     "Joue un autre coup sur l'échiquier pour ajouter une variante.": {
       "localizations": {
         "en": {
@@ -8586,6 +8915,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
+          }
+        }
+      }
+    },
+    "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour. Ou choisissez un personnage : neuf adversaires joués par Maia-3, un réseau entraîné sur des millions de parties humaines, chacun avec son style, son répertoire et son tempérament, à un niveau réglable sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. « S'adapte à mes résultats » fait monter ou baisser le niveau du personnage de 25 après chaque partie ; « Sparring » le fait se relâcher ou se durcir en partie, dans une bande de ±150 — les deux sont affichés, jamais cachés.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play a game against the Stockfish engine. Choose your colour, the opponent's strength (Elo), the time control, and the aids: hints (best-move arrows), a warning on risky moves and an evaluation bar. After the game, one button leads straight to analysis. During the game, “Switch mode” (top right) sends the displayed position to analysis, the Laboratory or a two-player game — your game is waiting when you come back. Or pick a character: nine opponents played by Maia-3, a network trained on millions of human games, each with their own style, repertoire and temperament, at an adjustable level on the human scale (close to Lichess, not comparable to Stockfish's Elo). Behind them Stockfish only steps in for short mates, endgames with few pieces and repetitions. \"Adapts to my results\" raises or lowers the character's level by 25 after each game; \"Sparring\" makes them ease off or toughen up during the game, within a ±150 band — both are shown, never hidden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour. Ou choisissez un personnage : neuf adversaires joués par Maia-3, un réseau entraîné sur des millions de parties humaines, chacun avec son style, son répertoire et son tempérament, à un niveau réglable sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. « S'adapte à mes résultats » fait monter ou baisser le niveau du personnage de 25 après chaque partie ; « Sparring » le fait se relâcher ou se durcir en partie, dans une bande de ±150 — les deux sont affichés, jamais cachés."
           }
         }
       }
@@ -9180,6 +9525,16 @@
         }
       }
     },
+    "La barre du bas de l'écran de jeu cache cinq gestes — les voici, pour les reconnaître :": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The bar at the bottom of the game screen holds five gestures — here they are, so you recognize them:"
+          }
+        }
+      }
+    },
     "La base n'a pas pu s'ouvrir — vos données existantes sont intactes. Redémarrez l'app pour réessayer.": {
       "localizations": {
         "en": {
@@ -9277,6 +9632,16 @@
         }
       }
     },
+    "La partie en cours se sauvegarde toute seule. À votre retour, « Reprendre la partie » vous attend en haut de l'accueil.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The game in progress saves itself. When you come back, “Resume game” awaits at the top of the home screen."
+          }
+        }
+      }
+    },
     "La partie sauvegardée n'a pas pu être restaurée.": {
       "localizations": {
         "en": {
@@ -9319,6 +9684,16 @@
         }
       }
     },
+    "La recherche flotte": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search floats"
+          }
+        }
+      }
+    },
     "La suite est dépliée ailleurs (transposition)": {
       "extractionState": "stale",
       "localizations": {
@@ -9332,6 +9707,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "La suite est dépliée ailleurs (transposition)"
+          }
+        }
+      }
+    },
+    "La tactique, le répertoire, et les fins de partie prouvées :": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tactics, repertoire, and proven endgames:"
           }
         }
       }
@@ -9365,6 +9750,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Labs"
+          }
+        }
+      }
+    },
+    "Laisse venir, encaisse, sourit. Plus vous attaquez, plus elle est dangereuse ; sa meilleure position est légèrement inférieure.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lets you come, absorbs, smiles. The harder you attack, the more dangerous she gets; her favourite position is slightly worse."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Laisse venir, encaisse, sourit. Plus vous attaquez, plus elle est dangereuse ; sa meilleure position est légèrement inférieure."
           }
         }
       }
@@ -9788,6 +10189,22 @@
         }
       }
     },
+    "Le niveau suit l'échelle humaine de Maia (proche de Lichess), pas celle de Stockfish : un personnage à 1500 joue comme un joueur de 1500, ce qui est bien moins fort que Stockfish bridé à 1500.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The level follows Maia's human scale (close to Lichess), not Stockfish's: a character at 1500 plays like a 1500 player, which is much weaker than Stockfish limited to 1500."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le niveau suit l'échelle humaine de Maia (proche de Lichess), pas celle de Stockfish : un personnage à 1500 joue comme un joueur de 1500, ce qui est bien moins fort que Stockfish bridé à 1500."
+          }
+        }
+      }
+    },
     "Le nombre de parties terminées, sur le total demandé au lancement de la série.\n\nLes statistiques ci-dessus se recalculent après chacune : elles sont volatiles au début et se stabilisent ensuite.": {
       "localizations": {
         "en": {
@@ -9868,6 +10285,16 @@
         }
       }
     },
+    "Le raccourci de l'accueil": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The home shortcut"
+          }
+        }
+      }
+    },
     "Le roi doit rester entre les deux tours.": {
       "localizations": {
         "en": {
@@ -9912,6 +10339,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Le score de A recalculé après chaque partie, et non partie par partie : la courbe part donc de très haut ou de très bas, puis se calme.\n\nLa zone claire autour d'elle est l'intervalle de confiance à 95 %. Tant qu'elle chevauche la ligne des 50 %, la série n'a pas tranché. C'est le rétrécissement de cette bande qui dit quand s'arrêter."
+          }
+        }
+      }
+    },
+    "Le « ? » en haut de l'accueil rassemble l'aide — et cette visite, à rejouer quand vous voulez.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The “?” at the top of the home screen gathers the help — and this tour, to replay whenever you like."
           }
         }
       }
@@ -9981,6 +10418,16 @@
         }
       }
     },
+    "Les aides se choisissent avant": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aids are chosen beforehand"
+          }
+        }
+      }
+    },
     "Les coins se croisent : replacez-les dans l'ordre autour du plateau.": {
       "localizations": {
         "en": {
@@ -10025,6 +10472,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Les deux joueurs sont d'accord pour la nulle ?"
+          }
+        }
+      }
+    },
+    "Les flèches d'indice et la barre d'évaluation s'activent ici, avant la partie. On les découvre souvent trop tard.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hint arrows and the evaluation bar are enabled here, before the game. They are often discovered too late."
           }
         }
       }
@@ -10212,6 +10669,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Les règles sont celles du jeu classique. Vous gagnez aussi IMMÉDIATEMENT si votre roi atteint l'une des quatre cases centrales — d4, e4, d5 ou e5 — quel que soit l'état du reste de l'échiquier, y compris en plein milieu de partie."
+          }
+        }
+      }
+    },
+    "Licence AGPLv3": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "AGPLv3 licence"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Licence AGPLv3"
           }
         }
       }
@@ -10562,6 +11035,54 @@
           "stringUnit": {
             "state": "translated",
             "value": "Légende"
+          }
+        }
+      }
+    },
+    "Maia indisponible, Stockfish a joué": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maia unavailable, Stockfish played"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maia indisponible, Stockfish a joué"
+          }
+        }
+      }
+    },
+    "Maia-3 (Chessformer)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maia-3 (Chessformer)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maia-3 (Chessformer)"
+          }
+        }
+      }
+    },
+    "Maia-3 tel quel : joue comme un humain de ce niveau, sans style particulier.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maia-3 as is: plays like a human of this level, with no particular style."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maia-3 tel quel : joue comme un humain de ce niveau, sans style particulier."
           }
         }
       }
@@ -11152,6 +11673,22 @@
         }
       }
     },
+    "Neutre": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neutral"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neutre"
+          }
+        }
+      }
+    },
     "Ni un FEN ni un PGN reconnaissable.": {
       "localizations": {
         "en": {
@@ -11235,12 +11772,44 @@
         }
       }
     },
+    "Niveau Elo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elo level"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niveau Elo"
+          }
+        }
+      }
+    },
     "Niveau atteint : ": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Level reached: "
+          }
+        }
+      }
+    },
+    "Niveau de référence": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reference level"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Niveau de référence"
           }
         }
       }
@@ -11378,6 +11947,16 @@
         }
       }
     },
+    "Nouveautés de la version %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's new in version %@"
+          }
+        }
+      }
+    },
     "Nouveautés de la version 1.4": {
       "extractionState": "stale",
       "localizations": {
@@ -11407,6 +11986,7 @@
       }
     },
     "Nouveautés de la version 1.6": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -11656,6 +12236,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Occasion manquée"
+          }
+        }
+      }
+    },
+    "Offre un pion au deuxième coup, un deuxième au troisième, et cherche le mat avant d'avoir développé sa dame. Ses finales ressemblent à des accidents.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offers a pawn on move two, another on move three, and hunts for mate before his queen is developed. His endgames look like accidents."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offre un pion au deuxième coup, un deuxième au troisième, et cherche le mat avant d'avoir développé sa dame. Ses finales ressemblent à des accidents."
           }
         }
       }
@@ -11960,6 +12556,22 @@
         }
       }
     },
+    "Par personnage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "By character"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Par personnage"
+          }
+        }
+      }
+    },
     "Parcourez la partie avec la barre sous le plateau ; sans pendule, « Reprendre ici » relance depuis le coup consulté.": {
       "localizations": {
         "en": {
@@ -12020,6 +12632,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Partager la position"
+          }
+        }
+      }
+    },
+    "Partez sans crainte": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Leave without worry"
           }
         }
       }
@@ -12178,12 +12800,32 @@
         }
       }
     },
+    "Passer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skip"
+          }
+        }
+      }
+    },
     "Pause": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
             "value": "Pause"
+          }
+        }
+      }
+    },
+    "Pendant la partie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "During the game"
           }
         }
       }
@@ -12243,6 +12885,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Perso"
+          }
+        }
+      }
+    },
+    "Personnage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Character"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personnage"
           }
         }
       }
@@ -14028,6 +14686,22 @@
         }
       }
     },
+    "Ressort": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Spring"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ressort"
+          }
+        }
+      }
+    },
     "Rester sur la principale": {
       "localizations": {
         "en": {
@@ -14142,6 +14816,16 @@
         }
       }
     },
+    "Revenir + « Reprendre ici »": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Go back + “Resume here”"
+          }
+        }
+      }
+    },
     "Revoir la ligne": {
       "extractionState": "stale",
       "localizations": {
@@ -14155,6 +14839,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Revoir la ligne"
+          }
+        }
+      }
+    },
+    "Revoir la visite guidée": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replay the guided tour"
           }
         }
       }
@@ -14471,6 +15165,22 @@
         }
       }
     },
+    "Roque du côté opposé et pions lancés : votre roi est une adresse de livraison. Simplifie mal, même avec deux pions d'avance.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Castles on the opposite wing and throws her pawns: your king is a delivery address. Simplifies badly, even two pawns up."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Roque du côté opposé et pions lancés : votre roi est une adresse de livraison. Simplifie mal, même avec deux pions d'avance."
+          }
+        }
+      }
+    },
     "Roques": {
       "localizations": {
         "en": {
@@ -14654,6 +15364,16 @@
         }
       }
     },
+    "Réglez votre adversaire": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tune your opponent"
+          }
+        }
+      }
+    },
     "Répartition": {
       "localizations": {
         "en": {
@@ -14830,6 +15550,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Répertoires PGN"
+          }
+        }
+      }
+    },
+    "Réseau de neurones qui prédit le coup qu'un humain jouerait, entraîné par le CSSLab de l'Université de Toronto sur des millions de parties Lichess. C'est lui qui joue les personnages du mode Contre l'ordinateur ; ses poids (modèle 5M) sont convertis pour Core ML. Licence AGPLv3, compatible avec la GPLv3 de l'app, qui ne fournit aucun service réseau.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neural network that predicts the move a human would play, trained by the CSSLab at the University of Toronto on millions of Lichess games. It plays the characters in the Against the computer mode; its weights (5M model) are converted for Core ML. AGPLv3 licence, compatible with the app's GPLv3; the app provides no network service."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réseau de neurones qui prédit le coup qu'un humain jouerait, entraîné par le CSSLab de l'Université de Toronto sur des millions de parties Lichess. C'est lui qui joue les personnages du mode Contre l'ordinateur ; ses poids (modèle 5M) sont convertis pour Core ML. Licence AGPLv3, compatible avec la GPLv3 de l'app, qui ne fournit aucun service réseau."
           }
         }
       }
@@ -15086,6 +15822,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Révision du jour"
+          }
+        }
+      }
+    },
+    "S'adapte à mes résultats": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Adapts to my results"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "S'adapte à mes résultats"
           }
         }
       }
@@ -15362,6 +16114,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sens de lecture"
+          }
+        }
+      }
+    },
+    "Ses coups ont l'air faux. La moitié le sont vraiment, l'autre moitié coûte une pièce à qui le croit. Tombe lui-même dans les pièges des autres, par principe.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "His moves look wrong. Half of them really are; the other half cost a piece to anyone who believes it. Falls into other people's traps too, on principle."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses coups ont l'air faux. La moitié le sont vraiment, l'autre moitié coûte une pièce à qui le croit. Tombe lui-même dans les pièges des autres, par principe."
           }
         }
       }
@@ -15683,6 +16451,38 @@
         }
       }
     },
+    "Sparring": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sparring"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sparring"
+          }
+        }
+      }
+    },
+    "Sparring : le personnage reste à votre hauteur": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sparring: the character stays at your level"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sparring : le personnage reste à votre hauteur"
+          }
+        }
+      }
+    },
     "St. George Defense": {
       "extractionState": "stale",
       "localizations": {
@@ -15795,6 +16595,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Stockfish"
+          }
+        }
+      }
+    },
+    "Stockfish est intervenu %lld fois": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockfish stepped in %lld times"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockfish est intervenu %lld fois"
           }
         }
       }
@@ -16040,6 +16856,22 @@
         }
       }
     },
+    "Système London, roque au coup 6, zéro faiblesse. Il n'a pas perdu depuis des mois. Il n'a pas gagné beaucoup non plus, mais il dort bien.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "London System, castles on move 6, zero weaknesses. He hasn't lost in months. He hasn't won much either, but he sleeps well."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Système London, roque au coup 6, zéro faiblesse. Il n'a pas perdu depuis des mois. Il n'a pas gagné beaucoup non plus, mais il dort bien."
+          }
+        }
+      }
+    },
     "Séance terminée !": {
       "localizations": {
         "en": {
@@ -16243,6 +17075,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tenez l'appareil à plat, à la verticale au-dessus du plateau, et cadrez les quatre coins. Une vue inclinée ne peut pas être lue."
+          }
+        }
+      }
+    },
+    "Terminer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
           }
         }
       }
@@ -16841,6 +17683,22 @@
         }
       }
     },
+    "Tornade": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tornado"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tornade"
+          }
+        }
+      }
+    },
     "Torre Attack": {
       "extractionState": "stale",
       "localizations": {
@@ -17024,6 +17882,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tout est à jour — belle régularité 👏"
+          }
+        }
+      }
+    },
+    "Tout part d'ici": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It all starts here"
           }
         }
       }
@@ -17219,6 +18087,22 @@
         }
       }
     },
+    "Traquenard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trap"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Traquenard"
+          }
+        }
+      }
+    },
     "Triangulation": {
       "extractionState": "stale",
       "localizations": {
@@ -17232,6 +18116,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Triangulation"
+          }
+        }
+      }
+    },
+    "Trois salles d'entraînement": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Three training rooms"
           }
         }
       }
@@ -17445,6 +18339,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Un pion ne peut pas être sur la 1re ou la 8e rangée."
+          }
+        }
+      }
+    },
+    "Un pion offert est un pion pris. Il accepte tous les gambits, défend pendant quarante coups sans se plaindre, puis vous rappelle qu'il a un pion de plus.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An offered pawn is a taken pawn. He accepts every gambit, defends for forty moves without complaint, then reminds you he is a pawn up."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un pion offert est un pion pris. Il accepte tous les gambits, défend pendant quarante coups sans se plaindre, puis vous rappelle qu'il a un pion de plus."
           }
         }
       }
@@ -17901,6 +18811,16 @@
         }
       }
     },
+    "Vos dernières parties vivent aussi ici : un tap ouvre directement leur analyse, sans passer par la bibliothèque.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your latest games also live here: one tap opens their analysis directly, without going through the library."
+          }
+        }
+      }
+    },
     "Vos données ne s'enregistrent plus": {
       "localizations": {
         "en": {
@@ -18247,6 +19167,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cavalier ou fou : lequel prendre ?"
+          }
+        }
+      }
+    },
+    "Yolo": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yolo"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yolo"
           }
         }
       }
@@ -19525,6 +20461,22 @@
         }
       }
     },
+    "Échange les dames au coup 12, propose nulle au coup 30 si c'est égal, et vous mate au coup 65 si ce ne l'est pas. Aucune fantaisie.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trades queens on move 12, offers a draw on move 30 if it's equal, and mates you on move 65 if it isn't. No frills."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échange les dames au coup 12, propose nulle au coup 30 si c'est égal, et vous mate au coup 65 si ce ne l'est pas. Aucune fantaisie."
+          }
+        }
+      }
+    },
     "Échec de l'enregistrement : %@": {
       "localizations": {
         "en": {
@@ -19648,6 +20600,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "Balance"
+          }
+        }
+      }
+    },
+    "Étape précédente": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous step"
           }
         }
       }
@@ -19818,6 +20780,7 @@
       }
     },
     "• Nouveau : le module Variantes. Chess960 (position aléatoire, par numéro ou composée soi-même), et trois variantes de plus — Roi de la colline, Trois échecs, Horde — chacune contre l'ordinateur avec indice, alerte gaffe et barre d'évaluation.\n• Ouvertures repensées : un index en arbre où chaque variante se lit sans doublon, et un tap sur n'importe quel coup ouvre la position.\n• Sous le plateau : les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish, et une barre d'évaluation.\n• Les 58 cours d'ouvertures complétés par une seconde passe : les réponses noires qui manquaient sont là.\n• Finales : « Pions électriques » ajoutée — 78 cours — « pion passé éloigné » corrigé, et une recherche par nom comme dans Ouvertures.\n• « Reprendre ici » agit au premier toucher : plus de confirmation, une annulation prend la place du bouton pendant quelques secondes.\n• « Changer de mode » : le même bouton violet sur tous les écrans, au lieu d'être caché dans les menus d'export.\n• Le thème du plateau se choisit dans les Réglages, et s'applique partout.\n• Laboratoire : touchez une statistique (LOS, écart Elo…) pour savoir ce qu'elle mesure.\n• L'app occupe 60 Mo au lieu de 175.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -19829,6 +20792,16 @@
           "stringUnit": {
             "state": "translated",
             "value": "• Nouveau : le module Variantes. Chess960 (position aléatoire, par numéro ou composée soi-même), et trois variantes de plus — Roi de la colline, Trois échecs, Horde — chacune contre l'ordinateur avec indice, alerte gaffe et barre d'évaluation.\n• Ouvertures repensées : un index en arbre où chaque variante se lit sans doublon, et un tap sur n'importe quel coup ouvre la position.\n• Sous le plateau : les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish, et une barre d'évaluation.\n• Les 58 cours d'ouvertures complétés par une seconde passe : les réponses noires qui manquaient sont là.\n• Finales : « Pions électriques » ajoutée — 78 cours — « pion passé éloigné » corrigé, et une recherche par nom comme dans Ouvertures.\n• « Reprendre ici » agit au premier toucher : plus de confirmation, une annulation prend la place du bouton pendant quelques secondes.\n• « Changer de mode » : le même bouton violet sur tous les écrans, au lieu d'être caché dans les menus d'export.\n• Le thème du plateau se choisit dans les Réglages, et s'applique partout.\n• Laboratoire : touchez une statistique (LOS, écart Elo…) pour savoir ce qu'elle mesure.\n• L'app occupe 60 Mo au lieu de 175."
+          }
+        }
+      }
+    },
+    "• Quatre variantes de plus — le hub passe à douze : Crazyhouse (les pièces capturées rejoignent votre réserve, reposez-les où vous voulez), Duck Chess (un canard bloque une case et se déplace à chaque tour), Barricades (d4 et e5 murées dès le départ) et Barricades aléatoires (les murs sautent de case à chaque coup).\n• Une visite guidée présente les commandes essentielles au premier lancement — et se rejoue depuis cette Aide.\n• Toutes les analyses de variantes montrent désormais la courbe d'évaluation, la précision par couleur et les coups EN LIGNE, chaque coup remarquable entouré de la couleur de sa catégorie.\n• « Proposer nulle » fonctionne dans les douze modes, avec la même règle que contre l'ordinateur.\n• Les nulles par manque de matériel sont déclarées là où l'on gagne en matant, au lieu de laisser la partie tourner à vide.\n• Sur iPad et Mac, l'accueil affiche la grille des modes.\n• Stabilité du moteur des variantes en profondeur : plus de « moteur indisponible » au retour d'un écran.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Four more variants — the hub now offers twelve ways to play: Crazyhouse (captured pieces join your reserve; drop them wherever you like), Duck Chess (a duck blocks a square and moves every turn), Barricades (d4 and e5 walled from the start) and Random Barricades (the walls jump to new squares after every move).\n• A guided tour presents the essential controls on first launch — and can be replayed from this Help.\n• Every variant analysis now shows the evaluation curve, per-color accuracy and the moves INLINE, each notable move outlined with the color of its category.\n• “Offer draw” works in all twelve modes, with the same rule as against the computer.\n• Draws for insufficient material are declared wherever winning means checkmating, instead of letting the game run on empty.\n• On iPad and Mac, the home screen shows the mode grid.\n• Deep stability work on the variants engine: no more “engine unavailable” when returning to a screen."
           }
         }
       }
@@ -19846,336 +20819,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "• Vos propres répertoires : importez vos ouvertures au format PGN, variantes comprises, entraînez-les comme les autres et partagez-les par simple fichier (voir la carte « Vos répertoires et le partage »).\n• Les 58 ouvertures livrées ont été relues au moteur : quinze coups fautifs corrigés, quatre défenses manquantes ajoutées. Chaque coup est désormais rejoué sous Stockfish avant d'être publié.\n• Puzzles : un seul essai par défaut, comme un vrai exercice de calcul. Les trois essais restent disponibles dans les Réglages.\n• Lecteur d'ouvertures : l'échiquier reste à l'écran pendant qu'on lit les coups. Sur iPad en paysage, plateau à gauche et explications à droite.\n• L'échiquier répond mieux au doigt : relâcher un peu à côté joue quand même le coup.\n• L'analyse explique POURQUOI un coup est une erreur, en nommant le motif tactique.\n• Score de précision recalibré, revue d'analyse qui reprend toute seule, pendule qui décompte dès le premier coup."
-          }
-        }
-      }
-    },
-    "Tout part d'ici": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It all starts here"
-          }
-        }
-      }
-    },
-    "Réglez votre adversaire": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tune your opponent"
-          }
-        }
-      }
-    },
-    "Les aides se choisissent avant": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aids are chosen beforehand"
-          }
-        }
-      }
-    },
-    "Pendant la partie": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "During the game"
-          }
-        }
-      }
-    },
-    "Chaque partie s'analyse": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Every game can be analyzed"
-          }
-        }
-      }
-    },
-    "Le raccourci de l'accueil": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The home shortcut"
-          }
-        }
-      }
-    },
-    "Partez sans crainte": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Leave without worry"
-          }
-        }
-      }
-    },
-    "La recherche flotte": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Search floats"
-          }
-        }
-      }
-    },
-    "Douze façons de jouer": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Twelve ways to play"
-          }
-        }
-      }
-    },
-    "Trois salles d'entraînement": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Three training rooms"
-          }
-        }
-      }
-    },
-    "Et pour y revenir": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "And to come back"
-          }
-        }
-      }
-    },
-    "Cette tuile lance une partie contre l'ordinateur. Les autres attendront la fin de la visite — deux minutes, promis.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This tile starts a game against the computer. The others can wait until the tour is over — two minutes, promise."
-          }
-        }
-      }
-    },
-    "De débutant à maître, au curseur ou par préréglages. Le piège du premier soir : jouer sa première partie à pleine force.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "From beginner to master, with the slider or the presets. The first-night trap: playing your first game at full strength."
-          }
-        }
-      }
-    },
-    "Les flèches d'indice et la barre d'évaluation s'activent ici, avant la partie. On les découvre souvent trop tard.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hint arrows and the evaluation bar are enabled here, before the game. They are often discovered too late."
-          }
-        }
-      }
-    },
-    "La barre du bas de l'écran de jeu cache cinq gestes — les voici, pour les reconnaître :": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The bar at the bottom of the game screen holds five gestures — here they are, so you recognize them:"
-          }
-        }
-      }
-    },
-    "Courbe d'évaluation, précision, coups en capsules colorées — et la courbe comme les capsules se touchent pour naviguer dans la partie. La bibliothèque garde tout.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Evaluation curve, accuracy, moves as colored capsules — and both the curve and the capsules can be tapped to navigate the game. The library keeps everything."
-          }
-        }
-      }
-    },
-    "Vos dernières parties vivent aussi ici : un tap ouvre directement leur analyse, sans passer par la bibliothèque.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your latest games also live here: one tap opens their analysis directly, without going through the library."
-          }
-        }
-      }
-    },
-    "La partie en cours se sauvegarde toute seule. À votre retour, « Reprendre la partie » vous attend en haut de l'accueil.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The game in progress saves itself. When you come back, “Resume game” awaits at the top of the home screen."
-          }
-        }
-      }
-    },
-    "Dans les Ouvertures, le champ de recherche flotte AU-DESSUS de l'arbre. Cherchez, puis fermez le clavier pour toucher les résultats en dessous.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "In Openings, the search field floats ABOVE the tree. Search, then dismiss the keyboard to tap the results below."
-          }
-        }
-      }
-    },
-    "Chaque variante explique ses règles sur son écran de réglages — inutile de les connaître d'avance :": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Each variant explains its rules on its setup screen — no need to know them in advance:"
-          }
-        }
-      }
-    },
-    "La tactique, le répertoire, et les fins de partie prouvées :": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tactics, repertoire, and proven endgames:"
-          }
-        }
-      }
-    },
-    "Le « ? » en haut de l'accueil rassemble l'aide — et cette visite, à rejouer quand vous voulez.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The “?” at the top of the home screen gathers the help — and this tour, to replay whenever you like."
-          }
-        }
-      }
-    },
-    "Comprendre": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Understand"
-          }
-        }
-      }
-    },
-    "Explorer": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Explore"
-          }
-        }
-      }
-    },
-    "Passer": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Skip"
-          }
-        }
-      }
-    },
-    "Terminer": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Done"
-          }
-        }
-      }
-    },
-    "Étape précédente": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Previous step"
-          }
-        }
-      }
-    },
-    "Revenir + « Reprendre ici »": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Go back + “Resume here”"
-          }
-        }
-      }
-    },
-    "Revoir la visite guidée": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Replay the guided tour"
-          }
-        }
-      }
-    },
-    "Deux minutes pour resituer les commandes essentielles.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Two minutes to get your bearings on the essential controls."
-          }
-        }
-      }
-    },
-    "Nouveautés de la version %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "What's new in version %@"
-          }
-        }
-      }
-    },
-    "• Quatre variantes de plus — le hub passe à douze : Crazyhouse (les pièces capturées rejoignent votre réserve, reposez-les où vous voulez), Duck Chess (un canard bloque une case et se déplace à chaque tour), Barricades (d4 et e5 murées dès le départ) et Barricades aléatoires (les murs sautent de case à chaque coup).\n• Une visite guidée présente les commandes essentielles au premier lancement — et se rejoue depuis cette Aide.\n• Toutes les analyses de variantes montrent désormais la courbe d'évaluation, la précision par couleur et les coups EN LIGNE, chaque coup remarquable entouré de la couleur de sa catégorie.\n• « Proposer nulle » fonctionne dans les douze modes, avec la même règle que contre l'ordinateur.\n• Les nulles par manque de matériel sont déclarées là où l'on gagne en matant, au lieu de laisser la partie tourner à vide.\n• Sur iPad et Mac, l'accueil affiche la grille des modes.\n• Stabilité du moteur des variantes en profondeur : plus de « moteur indisponible » au retour d'un écran.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "• Four more variants — the hub now offers twelve ways to play: Crazyhouse (captured pieces join your reserve; drop them wherever you like), Duck Chess (a duck blocks a square and moves every turn), Barricades (d4 and e5 walled from the start) and Random Barricades (the walls jump to new squares after every move).\n• A guided tour presents the essential controls on first launch — and can be replayed from this Help.\n• Every variant analysis now shows the evaluation curve, per-color accuracy and the moves INLINE, each notable move outlined with the color of its category.\n• “Offer draw” works in all twelve modes, with the same rule as against the computer.\n• Draws for insufficient material are declared wherever winning means checkmating, instead of letting the game run on empty.\n• On iPad and Mac, the home screen shows the mode grid.\n• Deep stability work on the variants engine: no more “engine unavailable” when returning to a screen."
-          }
-        }
-      }
-    },
-    "D'autres façons de jouer aux échecs, présentées en tuiles — douze en tout. Chess960 (Fischer Random) : position de départ tirée au hasard, choisie par numéro (0-959) ou composée vous-même — contre l'ordinateur ou à deux, avec analyse de fin de partie. Contre l'ordinateur : Roi de la colline (le premier roi au centre gagne), Trois échecs, Horde (les Blancs n'ont que des pions), Course des rois, Atomique (chaque capture explose), Antéchecs (perdez tout pour gagner), Crazyhouse (les pièces capturées rejoignent votre réserve et se reposent sur l'échiquier), Coup Volé (jouez un coup avec une pièce adverse), Duck Chess (un canard bloque une case et bouge à chaque tour), Barricades (d4 et e5 murées) et Barricades aléatoires (les murs changent de case à chaque coup). Chaque tuile explique ses règles sur son écran de réglages ; indice, alerte gaffe, barre d'évaluation et analyse partout, force de l'ordinateur réglable comme ailleurs.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Other ways to play chess, presented as tiles — twelve in all. Chess960 (Fischer Random): starting position drawn at random, chosen by number (0-959) or composed yourself — against the computer or two-player, with end-of-game analysis. Against the computer: King of the Hill (first king to the center wins), Three-check, Horde (White has only pawns), Racing Kings, Atomic (every capture explodes), Antichess (lose everything to win), Crazyhouse (captured pieces join your reserve and can be dropped back on the board), Stolen Move (play one move with an opponent's piece), Duck Chess (a duck blocks a square and moves every turn), Barricades (d4 and e5 walled) and Random Barricades (the walls change squares after every move). Each tile explains its rules on its setup screen; hint, blunder alert, evaluation bar and analysis everywhere, computer strength adjustable as elsewhere."
           }
         }
       }

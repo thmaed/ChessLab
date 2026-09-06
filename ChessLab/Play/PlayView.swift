@@ -379,7 +379,7 @@ struct PlayView: View {
             // existait au catalogue mais la plaque collait le littéral
             // français (même famille que Blancs/Noirs, revue du 19/08 —
             // repéré sur la première vidéo App Store anglaise).
-            name: LocalizationController.string("Ordinateur"),
+            name: viewModel.opponentDisplayName,
             color: opponent,
             isActive: viewModel.outcome == nil && viewModel.board.position.sideToMove == opponent,
             captured: captured.captures(by: opponent),
@@ -495,9 +495,17 @@ struct PlayView: View {
                         .font(.title2)
                         .foregroundStyle(didWin ? Theme.warning : Theme.textSecondary)
                         .glow(Theme.warning, radius: 8, isActive: didWin)
-                    Text(outcome.summary(userColor: viewModel.userColor))
-                        .font(.headline)
-                        .foregroundStyle(Theme.textPrimary)
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text(outcome.summary(userColor: viewModel.userColor))
+                            .font(.headline)
+                            .foregroundStyle(Theme.textPrimary)
+                        if let line = viewModel.opponentSummaryLine {
+                            Text(line)
+                                .font(.caption)
+                                .foregroundStyle(Theme.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
                     Spacer(minLength: 0)
                 }
 

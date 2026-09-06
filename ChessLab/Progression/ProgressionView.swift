@@ -134,10 +134,47 @@ struct ProgressionView: View {
                     bandRow(record)
                 }
             }
+
+            if !summary.engineByOpponent.isEmpty {
+                Divider().overlay(Theme.stroke)
+                Text("Par personnage")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.textSecondary)
+                ForEach(summary.engineByOpponent) { record in
+                    opponentRow(record)
+                }
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .cardStyle()
         .accessibilityIdentifier("progressionEngine")
+    }
+
+    @ViewBuilder
+    private func opponentRow(_ record: ProgressionSummary.OpponentRecord) -> some View {
+        if let profile = OpponentProfile.named(record.profileID) {
+            HStack(spacing: 10) {
+                OpponentAvatar(profile: profile, size: 28)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(profile.firstName)
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.textPrimary)
+                    if let best = record.bestWinLevel {
+                        Text("Battu jusqu'à \(best)")
+                            .font(.caption2)
+                            .foregroundStyle(Theme.textTertiary)
+                    }
+                }
+                Spacer()
+                HStack(spacing: 6) {
+                    pill("\(record.wins)", tint: Theme.accent)
+                    pill("\(record.draws)", tint: Theme.textSecondary)
+                    pill("\(record.losses)", tint: Theme.danger)
+                }
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(Text("\(profile.firstName) : \(record.wins) victoires, \(record.draws) nulles, \(record.losses) défaites"))
+        }
     }
 
     private func bandRow(_ record: ProgressionSummary.BandRecord) -> some View {
