@@ -236,8 +236,8 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     /// modèle. En tête de la galerie, sous son propre nom.
     static let maia = OpponentProfile(
         id: "maia", firstName: "Maia", nickname: "Neutre",
-        tagline: "Le réseau tel quel : joue comme un humain de ce niveau, sans style particulier.",
-        tags: ["Neutre", "Étalon"],
+        tagline: "Le modèle Maia-3 tel quel, sans aucune adaptation : joue comme un humain de ce niveau, sans style particulier.",
+        tags: ["Maia-3", "Sans adaptation", "Étalon"],
         avatar: "avatar_maia", tint: .maiaBlue,
         temperature: 1.0, topP: 1.0, recommendedLevels: 800...2500,
         safetyNet: SafetyNetPolicy(),

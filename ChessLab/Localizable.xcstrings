@@ -10349,6 +10349,22 @@
         }
       }
     },
+    "Le modèle Maia-3 tel quel, sans aucune adaptation : joue comme un humain de ce niveau, sans style particulier.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Maia-3 model as is, with no adaptation at all: plays like a human of this level, with no particular style."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le modèle Maia-3 tel quel, sans aucune adaptation : joue comme un humain de ce niveau, sans style particulier."
+          }
+        }
+      }
+    },
     "Le moteur pioche dans un livre d'ouvertures": {
       "localizations": {
         "en": {
@@ -10531,22 +10547,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Le roi en 8e"
-          }
-        }
-      }
-    },
-    "Le réseau tel quel : joue comme un humain de ce niveau, sans style particulier.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The network as is: plays like a human of this level, with no particular style."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le réseau tel quel : joue comme un humain de ce niveau, sans style particulier."
           }
         }
       }
@@ -11291,6 +11291,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Maia indisponible, Stockfish a joué"
+          }
+        }
+      }
+    },
+    "Maia-3": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maia-3"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Maia-3"
           }
         }
       }
@@ -16224,6 +16240,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sang-froid"
+          }
+        }
+      }
+    },
+    "Sans adaptation": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No adaptation"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sans adaptation"
           }
         }
       }
