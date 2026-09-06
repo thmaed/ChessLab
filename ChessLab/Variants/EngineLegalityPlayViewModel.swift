@@ -702,7 +702,7 @@ final class EngineLegalityPlayViewModel {
         // retour sur l'écran viennent de prouver que le moteur va bien.
         isEngineUnavailable = false
         engineUnavailableReason = nil
-        for command in settings.strength.setupCommands {
+        for command in settings.strength.fairySetupCommands {
             await engine.send(command)
         }
     }

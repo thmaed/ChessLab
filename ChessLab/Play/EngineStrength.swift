@@ -71,6 +71,24 @@ enum EngineStrength: Equatable {
         }
     }
 
+    /// Bornes de `UCI_Elo` chez Fairy-Stockfish 14 : 500…2850 (Stockfish :
+    /// 1320…3190). Une valeur hors bornes y est REJETÉE EN SILENCE par
+    /// `Option::operator=`, le bridage restant actif à l'Elo par défaut
+    /// (1350) : un curseur à 3000 donnait un adversaire à 1350 sans le
+    /// dire. Trouvé le 05/09/2026 pendant l'étude des adversaires humanisés.
+    static let fairyRatedRange: ClosedRange<Int> = 500...2850
+
+    /// Les mêmes commandes, pour Fairy-Stockfish : au-delà de sa borne
+    /// haute, plus de bridage du tout (comme `.maximum`), en dessous de sa
+    /// borne basse, ramené à la borne.
+    var fairySetupCommands: [EngineCommand] {
+        guard case let .limited(elo) = self else { return setupCommands }
+        if elo > Self.fairyRatedRange.upperBound {
+            return EngineStrength.maximum.setupCommands
+        }
+        return EngineStrength.limited(elo: max(elo, Self.fairyRatedRange.lowerBound)).setupCommands
+    }
+
     /// Profondeur de recherche maximale à utiliser pour `go depth`, si
     /// applicable (les niveaux sous 1320 plafonnent aussi la profondeur).
     var maxDepth: Int? {

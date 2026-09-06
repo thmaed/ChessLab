@@ -352,7 +352,7 @@ final class FairyVariantPlayViewModel {
         }
         // Un démarrage qui aboutit efface le bandeau d'un échec passé.
         isEngineUnavailable = false
-        for command in settings.strength.setupCommands {
+        for command in settings.strength.fairySetupCommands {
             await engine.send(command)
         }
     }
