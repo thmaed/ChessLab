@@ -13,11 +13,6 @@ import Foundation
 /// à moitié vide.
 @MainActor
 enum OpeningCatalogFeature {
-    /// Des cours d'ouverture sont-ils embarqués ?
-    static var hasCourses: Bool {
-        OpeningCourseLoader.catalog.contains { !$0.isEndgame }
-    }
-
     /// Les ouvertures présentées : les cours livrés et ceux qu'a importés
     /// l'utilisateur, les FINALES exclues.
     ///

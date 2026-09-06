@@ -77,19 +77,4 @@ enum MaiaEncoder {
         }
         return tensor
     }
-
-    /// Les 96 bits d'historique d'une case, en hexadécimal (24 caractères,
-    /// colonne 0 en poids fort) — le format des fixtures de référence.
-    static func hexRow(_ tensor: [Float], square: Int) -> String {
-        var hex = ""
-        let base = square * featuresPerSquare
-        for nibble in 0..<24 {
-            var value = 0
-            for bit in 0..<4 {
-                value = value << 1 | (tensor[base + nibble * 4 + bit] > 0.5 ? 1 : 0)
-            }
-            hex += String(value, radix: 16)
-        }
-        return hex
-    }
 }

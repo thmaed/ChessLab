@@ -76,11 +76,6 @@ struct BoardScanReading {
         Set(squares(rotation: rotation).filter { !$0.value.isConfident }.map(\.key))
     }
 
-    /// Cases occupées dont le TYPE reste à préciser (plateau réel, Lot 1.E).
-    func squaresNeedingKind(rotation: BoardReadingRotation) -> Set<Square> {
-        Set(squares(rotation: rotation).filter { $0.value.occupancy.needsKind }.map(\.key))
-    }
-
     /// Les mêmes, avec la couleur qu'on a su lire — de quoi les afficher et
     /// filtrer la palette de complétion à la bonne couleur.
     func unknownPieces(rotation: BoardReadingRotation) -> [Square: Piece.Color] {

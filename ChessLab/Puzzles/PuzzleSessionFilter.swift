@@ -25,13 +25,6 @@ struct PuzzleSessionFilter: Hashable {
 /// aucune classification de FEN au moment du filtrage.
 @MainActor
 enum PuzzleSessionDrawer {
-    /// Nombre de puzzles dus correspondant au filtre — requête de
-    /// comptage pure, aucun objet matérialisé.
-    static func countDue(matching filter: PuzzleSessionFilter, in context: ModelContext) -> Int {
-        let descriptor = FetchDescriptor<Puzzle>(predicate: predicate(matching: filter))
-        return (try? context.fetchCount(descriptor)) ?? 0
-    }
-
     /// Le prochain puzzle à présenter pour ce filtre — même priorité
     /// "jamais ouverts d'abord" que ``PuzzleSessionBuilder``, mais en
     /// deux tirages aléatoires par offset plutôt qu'en mélangeant une

@@ -10148,3 +10148,14 @@ CPU, Δprob max 0,027 (tolérance des fixtures portée à 0,04), 3,2 ms par coup
 sur CPU M2. Fixtures régénérées (56 cas). Le 5M est retiré du projet ; il
 reste documenté comme spike. Ressources de l'app ~145 Mo, sous le seuil
 cellulaire de 200 Mo.
+
+## 06/09 — Chasse au code mort
+
+Balayage des déclarations jamais référencées (script ponctuel, identifiants
+comptés sur l'app et les tests). Retirés : `OpponentBooks.loadedIDs`,
+`MaiaEncoder.hexRow` (déplacé dans `MaiaFixtureTests`, seul usager),
+`DuckChessSetupView` (écran remplacé par le hub, plus instancié nulle part),
+`OpeningExplorerViewModel.plyDepth`, `OpeningCatalogFeature.hasCourses`,
+`PuzzleSessionDrawer.countDue`, `BoardScanReading.squaresNeedingKind` et
+`SquareOccupancy.needsKind`, `SettingsView.settingRow`. Le 5M ne subsiste
+nulle part (dépôt vérifié après commit).

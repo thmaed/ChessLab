@@ -22,6 +22,4 @@ enum OpponentBooks {
         guard let id = profile.bookID else { return nil }
         return books[id]
     }
-
-    static var loadedIDs: [String] { Array(books.keys).sorted() }
 }

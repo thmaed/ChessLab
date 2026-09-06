@@ -347,21 +347,6 @@ struct SettingsView: View {
         }
     }
 
-    private func settingRow<Choices: View>(
-        label: String, help: String, @ViewBuilder choices: () -> Choices
-    ) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(label)
-                .font(.body.weight(.medium))
-                .foregroundStyle(Theme.textPrimary)
-            HStack(spacing: 8) { choices() }
-            Text(help)
-                .font(.caption)
-                .foregroundStyle(Theme.textTertiary)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-
     /// Aide : description succincte de chaque module.
     private var helpSection: some View {
         VStack(alignment: .leading, spacing: 12) {

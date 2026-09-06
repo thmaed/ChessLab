@@ -69,7 +69,6 @@ final class OpeningExplorerViewModel {
 
     var canGoBack: Bool { !history.isEmpty }
     var isLeaf: Bool { currentNode?.moves.isEmpty ?? true }
-    var plyDepth: Int { history.count }
 
     // MARK: Navigation
 

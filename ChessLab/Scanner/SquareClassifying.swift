@@ -23,12 +23,6 @@ enum SquareOccupancy: Equatable {
     }
 
     var isEmpty: Bool { self == .empty }
-
-    /// Vrai si la case est occupée par une pièce dont le type reste inconnu.
-    var needsKind: Bool {
-        if case let .piece(_, kind) = self { return kind == nil }
-        return false
-    }
 }
 
 /// Lecture d'une case, avec sa confiance.
