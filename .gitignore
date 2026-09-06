@@ -47,3 +47,9 @@ Vendor/CStockfish/Sources/CStockfish/stockfish/*.o
 Vendor/CStockfish/Sources/CStockfish/stockfish/.depend
 Vendor/CStockfish/Sources/CStockfish/stockfish/main.cpp
 tools/opening-generator/bin/
+
+# Clés App Store Connect : jamais dans le dépôt, même déposées par erreur
+# dans le projet. La clé vit dans ~/.private_keys/ (hors dépôt).
+*.p8
+.private_keys/
+AuthKey_*
