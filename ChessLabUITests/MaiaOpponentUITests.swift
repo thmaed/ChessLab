@@ -49,32 +49,32 @@ final class MaiaOpponentUITests: XCTestCase {
         let card = app.descendants(matching: .any).matching(identifier: "opponentCard_maia").firstMatch
         XCTAssertTrue(card.waitForExistence(timeout: 3), "la carte de Maia doit apparaître")
         XCTAssertTrue(card.label.contains("Maia"))
-        // La galerie : choisir Tom, la carte suit.
+        // La galerie : choisir Milo, la carte suit.
         let theo = app.descendants(matching: .any).matching(identifier: "opponentTile_theo").firstMatch
-        XCTAssertTrue(theo.waitForExistence(timeout: 3), "la vignette de Tom doit exister")
+        XCTAssertTrue(theo.waitForExistence(timeout: 3), "la vignette de Milo doit exister")
         var tries = 0
         while !theo.isHittable, tries < 4 { app.swipeUp(); RunLoop.current.run(until: Date().addingTimeInterval(0.3)); tries += 1 }
         theo.tap()
         RunLoop.current.run(until: Date().addingTimeInterval(0.6))
         let theoCard = app.descendants(matching: .any).matching(identifier: "opponentCard_theo").firstMatch
-        XCTAssertTrue(theoCard.waitForExistence(timeout: 3), "la carte de Tom doit apparaître")
+        XCTAssertTrue(theoCard.waitForExistence(timeout: 3), "la carte de Milo doit apparaître")
         let shot = XCUIScreen.main.screenshot().pngRepresentation
         let path = NSTemporaryDirectory() + "maia-gallery.png"
         try? shot.write(to: URL(fileURLWithPath: path))
         print("UIDBG gallery screenshot:", path)
-        // La suite du parcours se joue contre Tom : son prénom doit
+        // La suite du parcours se joue contre Milo : son prénom doit
         // remplacer « Ordinateur » sur l'écran de jeu.
 
         app.buttons["Commencer"].tap()
         XCTAssertTrue(app.otherElements["square_e2"].waitForExistence(timeout: 15))
-        XCTAssertTrue(app.staticTexts["Tom"].waitForExistence(timeout: 5), "le prénom remplace « Ordinateur »")
+        XCTAssertTrue(app.staticTexts["Milo"].waitForExistence(timeout: 5), "le prénom remplace « Ordinateur »")
         XCTAssertFalse(app.staticTexts["Ordinateur"].exists)
 
         // Un coup du joueur : l'écran reste vivant pendant que Camille répond.
         app.otherElements["square_e2"].tap()
         app.otherElements["square_e4"].tap()
         RunLoop.current.run(until: Date().addingTimeInterval(6))
-        XCTAssertTrue(app.staticTexts["Tom"].exists)
+        XCTAssertTrue(app.staticTexts["Milo"].exists)
         XCTAssertTrue(app.buttons["Abandonner"].exists)
     }
 }

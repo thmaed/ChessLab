@@ -20,7 +20,7 @@ C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur fin
 
 ```
 NEUF PERSONNAGES À AFFRONTER
-À côté du niveau Elo de Stockfish, choisissez un adversaire qui a un caractère : Lena l'attaquante, Nils le mur, Tom le gambiteur, Nadia la technicienne, Sacha le piégeur, Ana la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif, et Maia l'étalon. Ils sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait — gaffes comprises quand le niveau est bas. Chacun a son style, son répertoire d'ouvertures, son tempérament et son illustration ; le niveau se règle et se mémorise par personnage, sur l'échelle humaine (proche de Lichess). Tout tourne sur l'appareil, sans réseau.
+À côté du niveau Elo de Stockfish, choisissez un adversaire qui a un caractère : Lena l'attaquante, Nils le mur, Milo le gambiteur, Nadia la technicienne, Sacha le piégeur, Ana la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif, et Maia l'étalon. Ils sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait — gaffes comprises quand le niveau est bas. Chacun a son style, son répertoire d'ouvertures, son tempérament et son illustration ; le niveau se règle et se mémorise par personnage, sur l'échelle humaine (proche de Lichess). Tout tourne sur l'appareil, sans réseau.
 
 STOCKFISH ANALYSE, ET ASSURE
 Indice, alerte gaffe, barre d'évaluation et analyse restent ceux de Stockfish. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée — et l'écran de fin le dit.
@@ -42,7 +42,7 @@ Six mécanismes de panne du moteur corrigés en profondeur ; au-delà de 2850, l
 
 ```
 NINE CHARACTERS TO FACE
-Next to Stockfish's Elo level, pick an opponent with a personality: Lena the attacker, Nils the wall, Tom the gambiteer, Nadia the technician, Sacha the trapper, Ana the counter-attacker, Yuri the materialist, Pablo the impulsive one, and Maia the reference. They are played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play — blunders included when the level is low. Each has a style, an opening repertoire, a temperament and an illustration; the level is set and remembered per character, on the human scale (close to Lichess). Everything runs on the device, offline.
+Next to Stockfish's Elo level, pick an opponent with a personality: Lena the attacker, Nils the wall, Milo the gambiteer, Nadia the technician, Sacha the trapper, Ana the counter-attacker, Yuri the materialist, Pablo the impulsive one, and Maia the reference. They are played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play — blunders included when the level is low. Each has a style, an opening repertoire, a temperament and an illustration; the level is set and remembered per character, on the human scale (close to Lichess). Everything runs on the device, offline.
 
 STOCKFISH ANALYZES, AND COVERS
 Hints, blunder alert, evaluation bar and analysis are still Stockfish's. Behind a character it only steps in for a short mate, an endgame with few pieces or a repetition in a won position — and the end-of-game screen says so.

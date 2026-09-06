@@ -139,7 +139,7 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
     )
 
     static let theo = OpponentProfile(
-        id: "theo", firstName: "Tom", nickname: "Gambit",
+        id: "theo", firstName: "Milo", nickname: "Gambit",
         tagline: "Offre un pion au deuxième coup, un deuxième au troisième, et cherche le mat avant d'avoir développé sa dame. Ses finales ressemblent à des accidents.",
         tags: ["Gambits", "Initiative", "Finales fragiles"],
         avatar: "avatar_theo", tint: .green,
