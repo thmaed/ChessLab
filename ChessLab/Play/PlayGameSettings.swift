@@ -31,10 +31,15 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
     /// pour qui veut conclure lui-même : un débutant qui vient de gagner une
     /// dame apprend en donnant le mat, pas en voyant la partie s'arrêter.
     var engineResignationEnabled: Bool = true
-    /// Personnage choisi (voir ``OpponentProfile``) ; `nil` = mode « Niveau
-    /// Elo » classique, Stockfish bridé. Le niveau du personnage est
-    /// `eloSliderValue`.
-    var opponentProfileID: String?
+    /// Personnage choisi (voir ``OpponentProfile``) ; `nil` = mode Stockfish
+    /// bridé à un Elo. Le niveau du personnage est `eloSliderValue`.
+    ///
+    /// Par défaut MAIA : c'est l'adversaire le plus humain, donc celui qu'un
+    /// nouvel utilisateur doit rencontrer en premier. Un réglage enregistré
+    /// AVANT l'existence des personnages n'a pas cette clé et reste en mode
+    /// Stockfish (voir `init(from:)`) : on ne change pas l'adversaire de
+    /// quelqu'un dans son dos.
+    var opponentProfileID: String? = OpponentProfile.maia.id
 
     /// Décodage TOLÉRANT aux champs absents.
     ///
@@ -62,6 +67,8 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         bookEnabled = try container.decodeIfPresent(Bool.self, forKey: .bookEnabled) ?? fallback.bookEnabled
         bookWidth = try container.decodeIfPresent(OpeningBookWidth.self, forKey: .bookWidth) ?? fallback.bookWidth
         engineResignationEnabled = try container.decodeIfPresent(Bool.self, forKey: .engineResignationEnabled) ?? fallback.engineResignationEnabled
+        // Volontairement SANS repli sur le défaut : la clé absente veut dire
+        // « réglage d'avant les personnages », donc Stockfish.
         opponentProfileID = try container.decodeIfPresent(String.self, forKey: .opponentProfileID)
     }
 
@@ -81,7 +88,7 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         bookEnabled: Bool = true,
         bookWidth: OpeningBookWidth = .mainLinesOnly,
         engineResignationEnabled: Bool = true,
-        opponentProfileID: String? = nil
+        opponentProfileID: String? = OpponentProfile.maia.id
     ) {
         self.colorChoice = colorChoice
         self.eloSliderValue = eloSliderValue

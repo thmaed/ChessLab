@@ -220,12 +220,12 @@ final class DiscoveryTourController {
             DiscoveryStep(
                 id: 0, section: "Jouer", spot: .playTile, destination: .home,
                 title: "Tout part d'ici",
-                body: "Cette tuile lance une partie contre l'ordinateur. Les autres attendront la fin de la visite — deux minutes, promis."
+                body: "Cette tuile lance une partie contre neuf personnages joués par Maia-3, un réseau qui joue comme un humain — ou contre Stockfish. Les autres attendront la fin de la visite — deux minutes, promis."
             ),
             DiscoveryStep(
                 id: 1, section: "Jouer", spot: .strengthSlider, destination: .newGame,
-                title: "Réglez votre adversaire",
-                body: "De débutant à maître, au curseur, avec le nom du palier juste dessous — ou un personnage joué par Maia-3, avec son style et son caractère. Le piège du premier soir : jouer sa première partie à pleine force."
+                title: "Choisissez votre adversaire",
+                body: "Un personnage d'abord : chacun a son style, son répertoire et son caractère, et joue comme un vrai joueur de son niveau — gaffes comprises. Ou Stockfish, au curseur, avec le nom du palier à côté. Le piège du premier soir : jouer à pleine force."
             ),
             DiscoveryStep(
                 id: 2, section: "Jouer", spot: .aidToggles, destination: .newGame,

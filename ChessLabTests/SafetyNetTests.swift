@@ -66,6 +66,7 @@ import Testing
         #expect(OpponentProfile.named("maia") == .maia)
         #expect(OpponentProfile.named("inconnu") == nil)
         #expect(PlayGameSettings(opponentProfileID: "camille").opponentProfile == .maia)
-        #expect(PlayGameSettings().opponentProfile == nil)
+        #expect(PlayGameSettings().opponentProfile == .maia, "une installation neuve rencontre Maia")
+        #expect(PlayGameSettings(opponentProfileID: nil).opponentProfile == nil)
     }
 }

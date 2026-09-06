@@ -24,7 +24,13 @@ final class MaiaOpponentUITests: XCTestCase {
             RunLoop.current.run(until: Date().addingTimeInterval(0.6))
         }
 
-        // Capture du mode Niveau Elo (curseur + palier), pour relecture.
+        // Le mode Stockfish (à droite, plus le défaut) : capture pour relecture.
+        let stockfish = app.segmentedControls.buttons["Stockfish"].exists ? app.segmentedControls.buttons["Stockfish"] : app.buttons["Stockfish"]
+        XCTAssertTrue(stockfish.waitForExistence(timeout: 5), "la bascule « Stockfish » doit exister")
+        var stockfishScrolls = 0
+        while !stockfish.isHittable, stockfishScrolls < 6 { app.swipeDown(); RunLoop.current.run(until: Date().addingTimeInterval(0.3)); stockfishScrolls += 1 }
+        stockfish.tap()
+        RunLoop.current.run(until: Date().addingTimeInterval(0.5))
         let eloShot = XCUIScreen.main.screenshot().pngRepresentation
         let eloPath = NSTemporaryDirectory() + "elo-mode.png"
         try? eloShot.write(to: URL(fileURLWithPath: eloPath))

@@ -1117,7 +1117,7 @@ struct HomeView: View {
                 columns: [GridItem(.adaptive(minimum: minTile), spacing: ModeGridMetrics.spacing)],
                 spacing: ModeGridMetrics.spacing
             ) {
-                ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Force, cadence, aides", shortSubtitle: "Force et cadence", systemImage: "cpu", tint: Theme.accent, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
+                ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Neuf personnages, ou Stockfish", shortSubtitle: "Personnages", systemImage: "cpu", tint: Theme.accent, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.newGame)
                 }
                 .discoveryAnchor(.playTile, priority: 1)

@@ -49,7 +49,13 @@ struct PlaySettingsCompatibilityTests {
         let data = try #require("{}".data(using: .utf8))
         let settings = try JSONDecoder().decode(PlayGameSettings.self, from: data)
 
-        #expect(settings == PlayGameSettings.default)
+        // Tout revient au défaut, SAUF l'adversaire : un réglage sans la clé
+        // `opponentProfileID` date d'avant les personnages et reste en mode
+        // Stockfish, là où une installation neuve démarre avec Maia.
+        var expected = PlayGameSettings.default
+        expected.opponentProfileID = nil
+        #expect(settings == expected)
+        #expect(PlayGameSettings.default.opponentProfileID == OpponentProfile.maia.id)
     }
 
     @Test func theResignationFieldSurvivesARoundTrip() throws {

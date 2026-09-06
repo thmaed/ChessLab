@@ -69,25 +69,25 @@ ChessLab
 
 **Sous-titre** (30 car. max — 28 utilisés) :
 ```
-Jouez, analysez, progressez.
+Adversaires humains, analyse
 ```
 
 **Mots-clés** (100 car. max — 94 utilisés, séparés par des virgules, sans espace) :
 ```
-stockfish,tactique,ouverture,puzzle,gambit,fen,pgn,elo,entrainement,scanner,analyse,ia,plateau
+stockfish,maia,tactique,ouverture,puzzle,gambit,fen,pgn,elo,entrainement,scanner,analyse,ia,plateau
 ```
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
 ```
-Analysez vos parties, scannez un échiquier : 58 ouvertures, 78 finales prouvées, Chess960 et 7 variantes, 100 000+ puzzles — 100% local.
+Neuf adversaires qui jouent comme des humains (Maia-3), analyse Stockfish, 58 ouvertures, 78 finales prouvées, 100 000+ puzzles — 100 % local.
 ```
 
 **Description** (4000 car. max) :
 ```
 ChessLab est un compagnon d'échecs complet pour iPhone et iPad : jouer, analyser, s'entraîner et expérimenter, avec le moteur Stockfish intégré et sans jamais quitter l'application.
 
-CONTRE STOCKFISH
-Affrontez Stockfish à la force de votre choix, du débutant (~900 Elo) au niveau maximal (~3190 Elo), ou l'un des neuf personnages joués par Maia-3, un réseau entraîné sur des millions de parties humaines — chacun avec son style, son répertoire, son tempérament et son niveau réglable sur l'échelle humaine. Avec ou sans pendule. Indice, alerte avant un coup risqué et barre d'évaluation sont activables à tout moment.
+DES ADVERSAIRES HUMAINS
+Neuf personnages joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait, gaffes comprises. Chacun a son style, son répertoire, son tempérament, son portrait, et un niveau réglable sur l'échelle humaine. Ou affrontez Stockfish lui-même, du débutant (~900 Elo) au niveau maximal (~3190 Elo). Avec ou sans pendule. Indice, alerte avant un coup risqué et barre d'évaluation sont activables à tout moment.
 
 DEUX JOUEURS
 Jouez à deux sur le même appareil, avec un mode « table » qui retourne les pièces pour rester lisible face à face.
@@ -137,27 +137,27 @@ ChessLab intègre le moteur Stockfish (licence GPLv3), le réseau Maia-3 de l'Un
 ChessLab
 ```
 
-**Subtitle** (30 char. max — 23 used):
+**Subtitle** (30 char. max — 25 used):
 ```
-Play, analyze, improve.
+Human opponents, analysis
 ```
 
 **Keywords** (100 char. max — 92 used):
 ```
-stockfish,tactics,openings,puzzle,gambit,fen,pgn,elo,training,scanner,analysis,offline,board
+stockfish,maia,tactics,openings,puzzle,gambit,fen,pgn,elo,training,scanner,analysis,offline
 ```
 
 **Promotional text** (170 char. max):
 ```
-Analyze your games, scan a chessboard: 58 openings, 78 proven endgames, Chess960 and 7 variants, 100,000+ puzzles — fully offline, no ads.
+Nine opponents that play like humans (Maia-3), Stockfish analysis, 58 openings, 78 proven endgames, 100,000+ puzzles — fully offline, no ads.
 ```
 
 **Description** (4000 char. max):
 ```
 ChessLab is a complete chess companion for iPhone and iPad: play, analyze, train and experiment, with the Stockfish engine built in and without ever leaving the app.
 
-PLAY VS STOCKFISH
-Take on Stockfish at any strength you like, from beginner (~900 Elo) to maximum (~3190 Elo), or one of nine characters played by Maia-3, a network trained on millions of human games — each with a style, a repertoire, a temperament and an adjustable level on the human scale. With or without a clock. Hints, a warning before risky moves, and an evaluation bar can all be toggled on demand.
+HUMAN OPPONENTS
+Nine characters played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play, blunders included. Each has a style, a repertoire, a temperament, a portrait, and an adjustable level on the human scale. Or take on Stockfish itself, from beginner (~900 Elo) to maximum (~3190 Elo). With or without a clock. Hints, a warning before risky moves, and an evaluation bar can all be toggled on demand.
 
 TWO PLAYERS
 Play locally on the same device, with a "pass-and-play" mode that flips the pieces so both players read the board comfortably.

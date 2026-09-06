@@ -364,6 +364,16 @@
         }
       }
     },
+    "%@ « %@ »": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "new",
+            "value": "%1$@ « %2$@ »"
+          }
+        }
+      }
+    },
     "%@ · %@": {
       "extractionState": "stale",
       "localizations": {
@@ -2128,6 +2138,7 @@
       }
     },
     "Après chaque partie, le niveau de ce personnage monte de 25 si vous gagnez, baisse de 25 si vous perdez. Toujours affiché, jamais en cachette.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -3514,6 +3525,7 @@
       }
     },
     "Camille (Maia)": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -4159,6 +4171,22 @@
         }
       }
     },
+    "Cette tuile lance une partie contre neuf personnages joués par Maia-3, un réseau qui joue comme un humain — ou contre Stockfish. Les autres attendront la fin de la visite — deux minutes, promis.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This tile starts a game against nine characters played by Maia-3, a network that plays like a human — or against Stockfish. The others will wait until the tour is over — two minutes, promise."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette tuile lance une partie contre neuf personnages joués par Maia-3, un réseau qui joue comme un humain — ou contre Stockfish. Les autres attendront la fin de la visite — deux minutes, promis."
+          }
+        }
+      }
+    },
     "Chacun son tour sur le même écran, sans ordinateur.": {
       "localizations": {
         "en": {
@@ -4475,6 +4503,22 @@
         }
       }
     },
+    "Choisissez d'abord votre adversaire : un personnage, ou Stockfish. Neuf personnages sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines qui ne cherche pas le meilleur coup mais celui qu'un humain de ce niveau jouerait — gaffes comprises. Chacun a son style, son répertoire d'ouvertures et son tempérament, et son niveau se règle sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. Sinon, Stockfish lui-même, bridé au niveau de votre choix, du débutant au maximum. Réglez ensuite votre couleur, la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First choose your opponent: a character, or Stockfish. Nine characters are played by Maia-3, a network trained on millions of human games that does not look for the best move but for the one a human of that level would play — blunders included. Each has a style, an opening repertoire and a temperament, and their level is set on the human scale (close to Lichess, not comparable to Stockfish's Elo). Behind them Stockfish only steps in for short mates, endgames with few pieces and repetitions. Otherwise, Stockfish itself, limited to the level of your choice, from beginner to maximum. Then set your color, the time control, and the aids: hints (arrows for the best moves), a warning before risky moves and an evaluation bar. After the game, a button leads straight to the analysis. During a game, \"Switch mode\" (top right) sends the displayed position to analysis, the Lab or a two-player game — the game waits for you when you come back."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez d'abord votre adversaire : un personnage, ou Stockfish. Neuf personnages sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines qui ne cherche pas le meilleur coup mais celui qu'un humain de ce niveau jouerait — gaffes comprises. Chacun a son style, son répertoire d'ouvertures et son tempérament, et son niveau se règle sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. Sinon, Stockfish lui-même, bridé au niveau de votre choix, du débutant au maximum. Réglez ensuite votre couleur, la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
+          }
+        }
+      }
+    },
     "Choisissez une capture d'écran d'échiquier dans votre photothèque. Le plateau doit être entièrement visible.": {
       "extractionState": "stale",
       "localizations": {
@@ -4488,6 +4532,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Choisissez une capture d'écran d'échiquier dans votre photothèque. Le plateau doit être entièrement visible."
+          }
+        }
+      }
+    },
+    "Choisissez votre adversaire": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose your opponent"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez votre adversaire"
           }
         }
       }
@@ -5593,6 +5653,7 @@
       }
     },
     "Crédible de %lld à %lld": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -5609,6 +5670,7 @@
       }
     },
     "Crédible de %lld à %lld.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -5910,6 +5972,7 @@
       }
     },
     "De débutant à maître, au curseur ou par préréglages — ou un personnage joué par Maia-3, avec son style et son caractère. Le piège du premier soir : jouer sa première partie à pleine force.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -5926,6 +5989,7 @@
       }
     },
     "De débutant à maître, au curseur ou par préréglages. Le piège du premier soir : jouer sa première partie à pleine force.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -6619,6 +6683,7 @@
       }
     },
     "En partie, il se relâche quand il vous domine et se durcit quand vous le dominez, dans une bande de ±150 autour du niveau choisi. Nommé et affiché, jamais en cachette.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -7221,6 +7286,7 @@
       }
     },
     "Fermé": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -8882,6 +8948,7 @@
       }
     },
     "Joue avec Maia-3, un réseau entraîné sur des millions de parties humaines. Stockfish n'intervient que pour les mats courts, les finales à peu de pièces et les répétitions.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -9096,6 +9163,7 @@
       }
     },
     "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -9111,23 +9179,8 @@
         }
       }
     },
-    "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour. Ou choisissez un personnage : neuf adversaires joués par Maia-3, un réseau entraîné sur des millions de parties humaines, chacun avec son style, son répertoire et son tempérament, à un niveau réglable sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Play a game against the Stockfish engine. Choose your colour, the opponent's strength (Elo), the time control, and the aids: hints (best-move arrows), a warning on risky moves and an evaluation bar. After the game, one button leads straight to analysis. During the game, “Switch mode” (top right) sends the displayed position to analysis, the Laboratory or a two-player game — your game is waiting when you come back. Or pick a character: nine opponents played by Maia-3, a network trained on millions of human games, each with their own style, repertoire and temperament, at an adjustable level on the human scale (close to Lichess, not comparable to Stockfish's Elo). Behind them Stockfish only steps in for short mates, endgames with few pieces and repetitions."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour. Ou choisissez un personnage : neuf adversaires joués par Maia-3, un réseau entraîné sur des millions de parties humaines, chacun avec son style, son répertoire et son tempérament, à un niveau réglable sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions."
-          }
-        }
-      }
-    },
     "Jouez une partie contre le moteur Stockfish. Réglez votre couleur, la force de l'adversaire (Elo), la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour. Ou choisissez un personnage : neuf adversaires joués par Maia-3, un réseau entraîné sur des millions de parties humaines, chacun avec son style, son répertoire et son tempérament, à un niveau réglable sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. « S'adapte à mes résultats » fait monter ou baisser le niveau du personnage de 25 après chaque partie ; « Sparring » le fait se relâcher ou se durcir en partie, dans une bande de ±150 — les deux sont affichés, jamais cachés.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -10414,6 +10467,7 @@
       }
     },
     "Le niveau suit l'échelle humaine de Maia (proche de Lichess), pas celle de Stockfish : un personnage à 1500 joue comme un joueur de 1500, ce qui est bien moins fort que Stockfish bridé à 1500.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -11328,6 +11382,7 @@
       }
     },
     "Maia-3 tel quel : joue comme un humain de ce niveau, sans style particulier.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -11442,6 +11497,7 @@
         }
       }
     },
+    "Maximum": {},
     "Maître national": {
       "extractionState": "stale",
       "localizations": {
@@ -11945,6 +12001,22 @@
         }
       }
     },
+    "Neuf personnages, ou Stockfish": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nine characters, or Stockfish"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neuf personnages, ou Stockfish"
+          }
+        }
+      }
+    },
     "Neutre": {
       "localizations": {
         "en": {
@@ -12071,6 +12143,7 @@
       }
     },
     "Niveau de référence": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -13189,6 +13262,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Personnage"
+          }
+        }
+      }
+    },
+    "Personnages": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Characters"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personnages"
           }
         }
       }
@@ -16147,6 +16236,7 @@
       }
     },
     "S'adapte à mes résultats": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -16836,6 +16926,7 @@
       }
     },
     "Sparring": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -16852,6 +16943,7 @@
       }
     },
     "Sparring : le personnage reste à votre hauteur": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -18723,6 +18815,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Un jeton, 2 coups"
+          }
+        }
+      }
+    },
+    "Un personnage d'abord : chacun a son style, son répertoire et son caractère, et joue comme un vrai joueur de son niveau — gaffes comprises. Ou Stockfish, au curseur, avec le nom du palier à côté. Le piège du premier soir : jouer à pleine force.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A character first: each has a style, a repertoire and a temper, and plays like a real player of their level — blunders included. Or Stockfish, by slider, with the tier's name next to it. The first-night trap: playing at full strength."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un personnage d'abord : chacun a son style, son répertoire et son caractère, et joue comme un vrai joueur de son niveau — gaffes comprises. Ou Stockfish, au curseur, avec le nom du palier à côté. Le piège du premier soir : jouer à pleine force."
           }
         }
       }
@@ -20764,6 +20872,7 @@
         }
       }
     },
+    "« %@ »": {},
     "À mémoriser": {
       "localizations": {
         "en": {
@@ -21244,6 +21353,7 @@
       }
     },
     "• Neuf personnages à affronter, joués par Maia-3, un réseau entraîné sur des millions de parties humaines : Léa l'attaquante, Marc le mur, Théo le gambiteur, Nadia la technicienne, Sacha le piégeur, Inès la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif et Camille, l'étalon. Chacun a son style, son répertoire d'ouvertures, son caractère et son illustration ; leur niveau se règle sur l'échelle humaine (proche de Lichess) et se mémorise par personnage.\n• Stockfish reste l'analyste : indice, alerte gaffe, barre d'évaluation et analyse de partie inchangés. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée.\n• Progrès : votre bilan par personnage, avec le plus haut niveau battu.\n• Laboratoire : un camp peut être joué par Camille (Maia), pour mesurer un personnage contre Stockfish.\n• Variantes : au-delà de 2850, la force de Fairy-Stockfish n'est plus bridée au lieu de retomber en silence à 1350.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -21260,6 +21370,7 @@
       }
     },
     "• Neuf personnages à affronter, joués par Maia-3, un réseau entraîné sur des millions de parties humaines : Léa l'attaquante, Marc le mur, Théo le gambiteur, Nadia la technicienne, Sacha le piégeur, Inès la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif et Camille, l'étalon. Chacun a son style, son répertoire d'ouvertures, son caractère et son illustration ; leur niveau se règle sur l'échelle humaine (proche de Lichess) et se mémorise par personnage.\n• Stockfish reste l'analyste : indice, alerte gaffe, barre d'évaluation et analyse de partie inchangés. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée.\n• « S'adapte à mes résultats » fait évoluer le niveau du personnage de 25 après chaque partie ; « Sparring » le fait se relâcher ou se durcir en partie, dans une bande de ±150. Les deux sont affichés, jamais cachés.\n• Progrès : votre bilan par personnage, avec le plus haut niveau battu.\n• Laboratoire : un camp peut être joué par Camille (Maia), pour mesurer un personnage contre Stockfish.\n• Variantes : au-delà de 2850, la force de Fairy-Stockfish n'est plus bridée au lieu de retomber en silence à 1350.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -21276,6 +21387,7 @@
       }
     },
     "• Neuf personnages à affronter, joués par Maia-3, un réseau entraîné sur des millions de parties humaines : Léa l'attaquante, Marc le mur, Théo le gambiteur, Nadia la technicienne, Sacha le piégeur, Inès la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif — et Maia elle-même, l'étalon sans style. Chacun a son style, son répertoire d'ouvertures, son caractère et son illustration ; leur niveau se règle sur l'échelle humaine (proche de Lichess) et se mémorise par personnage.\n• Stockfish reste l'analyste : indice, alerte gaffe, barre d'évaluation et analyse de partie inchangés. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée.\n• Progrès : votre bilan par personnage, avec le plus haut niveau battu.\n• Laboratoire : un camp peut être joué par Maia, pour mesurer un personnage contre Stockfish.\n• Variantes : au-delà de 2850, la force de Fairy-Stockfish n'est plus bridée au lieu de retomber en silence à 1350.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {
@@ -21309,6 +21421,7 @@
       }
     },
     "• Quatre variantes de plus — le hub passe à douze : Crazyhouse (les pièces capturées rejoignent votre réserve, reposez-les où vous voulez), Duck Chess (un canard bloque une case et se déplace à chaque tour), Barricades (d4 et e5 murées dès le départ) et Barricades aléatoires (les murs sautent de case à chaque coup).\n• Une visite guidée présente les commandes essentielles au premier lancement — et se rejoue depuis cette Aide.\n• Toutes les analyses de variantes montrent désormais la courbe d'évaluation, la précision par couleur et les coups EN LIGNE, chaque coup remarquable entouré de la couleur de sa catégorie.\n• « Proposer nulle » fonctionne dans les douze modes, avec la même règle que contre l'ordinateur.\n• Les nulles par manque de matériel sont déclarées là où l'on gagne en matant, au lieu de laisser la partie tourner à vide.\n• Sur iPad et Mac, l'accueil affiche la grille des modes.\n• Stabilité du moteur des variantes en profondeur : plus de « moteur indisponible » au retour d'un écran.": {
+      "extractionState": "stale",
       "localizations": {
         "en": {
           "stringUnit": {

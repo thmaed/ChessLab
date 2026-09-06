@@ -118,14 +118,14 @@ struct NewGameSetupView: View {
                     }
                 }
 
-                SettingsSection(title: "Force du moteur", systemImage: "gauge.with.needle", tint: Theme.accent, discoverySpot: .strengthSlider) {
+                SettingsSection(title: "Adversaire", systemImage: "person.crop.circle", tint: Theme.accent, discoverySpot: .strengthSlider) {
                     VStack(alignment: .leading, spacing: 16) {
-                        // Deux façons de régler l'adversaire : le niveau Elo
-                        // de Stockfish (l'historique, inchangé), ou un
-                        // personnage joué par Maia-3 au niveau du curseur.
+                        // Deux façons de choisir l'adversaire : un personnage
+                        // joué par Maia-3 (le plus humain, en premier et par
+                        // défaut), ou Stockfish bridé à un Elo.
                         Picker("Adversaire", selection: $opponentMode.animation()) {
-                            Text("Niveau Elo").tag(OpponentMode.elo)
                             Text("Personnage").tag(OpponentMode.profile)
+                            Text("Stockfish").tag(OpponentMode.elo)
                         }
                         .pickerStyle(.segmented)
                         .onChange(of: opponentMode) { _, mode in

@@ -10107,3 +10107,16 @@ provisoires). La couleur du disque de chaque portrait, mesurée sur la
 planche, devient la teinte du personnage (`OpponentTint` : neuf cas
 nommés par couleur) ; l'app n'ajoute plus de fond derrière l'avatar, seulement
 un liseré, blanc quand le personnage est choisi.
+
+## 06/09 — Les personnages en avant
+
+Le mode humain devient le premier proposé : dans Nouvelle partie, la
+section « Force du moteur » devient « Adversaire », « Personnage » passe à
+gauche et par défaut (Maia pour une installation neuve — un réglage
+enregistré avant les personnages n'a pas la clé et reste en mode Stockfish,
+on ne change pas l'adversaire de quelqu'un dans son dos), « Stockfish » à
+droite. Tuile d'accueil « Neuf personnages, ou Stockfish ». Visite guidée :
+les deux premières étapes parlent des personnages. Aide : la fiche « Contre
+l'ordinateur » commence par le choix de l'adversaire. Fiche App Store :
+sous-titre « Adversaires humains, analyse », texte promotionnel et
+description menés par les personnages, mot-clé « maia ». FR et EN.
