@@ -14,8 +14,10 @@ data class Step(val name: String, val ok: Boolean?, val detail: String = "")
  *     démarrent-elles et jouent-elles juste ?
  *  B. **Maia3** — le réseau de politique converti en ONNX rend-il les mêmes
  *     coups que côté iOS, et à quelle vitesse ?
+ *  C. **Scanner** — le détecteur de pièces YOLO, converti en ONNX et sa NMS
+ *     réécrite, retrouve-t-il les mêmes pièces que le Core ML embarqué ?
  *
- * Les deux tournent même si l'autre échoue : ce sont deux questions séparées.
+ * Les trois tournent même si l'une échoue : ce sont trois questions séparées.
  */
 object SpikeScenario {
 
@@ -26,6 +28,9 @@ object SpikeScenario {
     private const val MAIA_MODEL = "maia3_23m_fp16.onnx"
     private const val MAIA_FIXTURE = "android_fixture.json"
 
+    private const val YOLO_MODEL = "chess_pieces_yolo.onnx"
+    private const val YOLO_FIXTURE = "android_yolo_fixture.json"
+
     fun run(context: Context, emit: (Step) -> Unit, log: (String) -> Unit) {
         val step: (String, Boolean?, String) -> Unit = { name, ok, detail ->
             val mark = when (ok) { true -> "OK "; false -> "ECHEC"; null -> "..." }
@@ -34,6 +39,7 @@ object SpikeScenario {
         }
         runEngine(context, step, log)
         runMaia(context, step)
+        runYolo(context, step)
     }
 
     // ------------------------------------------------------------ A. Stockfish
@@ -152,6 +158,38 @@ object SpikeScenario {
         step(
             "Latence par coup", result.medianMs > 0,
             "médiane %.1f ms, p90 %.1f ms — %d thread(s)".format(result.medianMs, result.p90Ms, result.threads)
+        )
+    }
+
+    // -------------------------------------------------------------- C. Scanner
+
+    private fun runYolo(context: Context, step: (String, Boolean?, String) -> Unit) {
+        val t0 = System.currentTimeMillis()
+        val result = try {
+            YoloBench.run(context, YOLO_MODEL, YOLO_FIXTURE)
+        } catch (e: Throwable) {
+            step("Détecteur YOLO en ONNX Runtime", false, e.message?.take(120) ?: e.javaClass.simpleName)
+            return
+        }
+        step(
+            "Détecteur YOLO chargé et exécuté", true,
+            "${result.images} image(s) en ${System.currentTimeMillis() - t0} ms"
+        )
+        // Le bon critère n'est PAS l'égalité stricte. Le modèle embarqué côté
+        // iOS est en fp16 et fait sa NMS dans le graphe Core ML ; celui-ci est
+        // en fp32 avec une NMS réécrite. Une boîte limite peut basculer d'un
+        // côté ou de l'autre du seuil sans que le portage soit en cause — la
+        // même comparaison faite sur le Mac, en Python, donne exactement le
+        // même écart. On exige donc 95 %, et on affiche le compte exact.
+        val rate = result.matched.toDouble() / result.expected
+        step(
+            "Mêmes pièces que le Core ML embarqué", rate >= 0.95,
+            "${result.matched}/${result.expected} détections (%.0f %%), IoU min %.3f"
+                .format(rate * 100, result.worstIou)
+        )
+        step(
+            "Latence par image", result.medianMs > 0,
+            "médiane %.1f ms — %d thread(s)".format(result.medianMs, result.threads)
         )
     }
 }

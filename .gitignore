@@ -68,3 +68,11 @@ tools/maia3-spike/maia3/
 tools/maia3-spike/*.pt
 tools/maia3-spike/*.onnx
 tools/maia3-spike/*.mlpackage/
+
+# Spike Scanner : le détecteur converti (10 Mo) et les images déjà mises au
+# format d'entrée sont reconstruits par tools/yolo-spike/convert_yolo_onnx.py
+# à partir des poids d'entraînement (runs/, déjà ignoré) et du modèle Core ML
+# embarqué. Seul android_yolo_fixture.json est versionné : il garde la trace
+# lisible des détections attendues.
+tools/yolo-spike/*.onnx
+tools/yolo-spike/*_640.png

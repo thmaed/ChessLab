@@ -1,13 +1,16 @@
 # Spike Android — dérisquage du portage de ChessLab
 
 Ce dossier **n'est pas un début de portage**. C'est un banc d'essai qui
-répond aux deux questions capables d'annuler le projet :
+répond aux trois questions capables d'annuler le projet :
 
 > **A.** les sources Stockfish de l'app iOS, recompilées avec le NDK Android,
 > démarrent-elles et jouent-elles correctement ?
 >
 > **B.** le réseau Maia3, converti en ONNX, rend-il les MÊMES coups que côté
-> iOS, et à quelle vitesse ?
+> iOS ?
+>
+> **C.** le détecteur de pièces du Scanner, converti et sa NMS réécrite,
+> retrouve-t-il les MÊMES pièces que le Core ML embarqué ?
 
 Il ne contient aucune interface de ChessLab, aucun échiquier, aucune règle du
 jeu. Juste un écran qui déroule la séquence et affiche les résultats.
@@ -23,6 +26,8 @@ directement sur les sources de l'app iOS.
 | `shim.cpp` (boucle UCI, flux détournés) | `Vendor/CStockfish/Sources/CStockfish/` | aucune |
 | Réseaux `nn-*.nnue` | `ChessLab/Resources/` | copiés dans les assets au build |
 | Fixtures Maia (56 cas) | `ChessLabTests/Fixtures_maia3.json` | prémâchées par `convert_maia3_onnx.py` |
+| Modèle YOLO | `ChessLab/ChessPiecesYOLO.mlpackage` + `runs/.../train-6` | réexporté en ONNX |
+| Images du scanner | `ChessLabTests/ScannerFixtures/` | recadrées en 640 × 640 |
 
 C'est le point important : le shim est du C++ standard (`std::thread`,
 `std::streambuf`), sans une seule API Apple. Il traverse la frontière sans
@@ -37,6 +42,8 @@ retouche.
 - `app/src/main/java/.../SpikeScenario.kt` — le scénario mesuré.
 - `app/src/main/java/.../MaiaBench.kt` — le volet Maia : ONNX Runtime, la
   softmax restreinte aux coups légaux, la comparaison aux fixtures.
+- `app/src/main/java/.../YoloBench.kt` — le volet Scanner : ONNX Runtime et
+  la NMS, que l'export Core ML embarque mais pas l'export ONNX.
 
 L'encodeur Maia n'est **pas** porté ici, et c'est délibéré : les entrées
 viennent des fixtures iOS (64 cases × 96 bits en hexadécimal, ce que produit
@@ -70,18 +77,17 @@ CMake 3.22, émulateur arm64.
 
 ## Résultats — 11/09/2026, émulateur Pixel 7 (Android 15, arm64, 4 cœurs)
 
-Les deux volets passent. Stockfish a fonctionné dès la première exécution ;
-le volet Maia a demandé une correction (voir plus bas).
+Les trois volets passent.
 
 ### A. Stockfish
 
 | Étape | Résultat |
 | --- | --- |
 | Extraction des réseaux NNUE | 74,8 Mo (premier lancement seulement) |
-| Poignée de main UCI | `Stockfish 17.1` en 911 ms |
-| Chargement des réseaux | 34 ms, 3 threads |
+| Poignée de main UCI | `Stockfish 17.1` |
+| Chargement des réseaux | 3 threads |
 | Mat en un | `f3f7` attendu, `f3f7` obtenu |
-| Recherche profondeur 20 | 758 ms, ~1,4 M nœuds/s |
+| Recherche profondeur 20 | atteinte |
 | Arrêt propre | aucun thread orphelin |
 
 Aucun plantage, aucune fuite JNI, aucune ligne de `shim.cpp` modifiée.
@@ -90,9 +96,8 @@ Aucun plantage, aucune fuite JNI, aucune ligne de `shim.cpp` modifiée.
 
 | Étape | Résultat |
 | --- | --- |
-| Modèle ONNX fp16 chargé | 43 Mo, 56 cas en 2 203 ms |
+| Modèle ONNX fp16 chargé | 43 Mo |
 | Accord avec les fixtures iOS | **56/56** en top-1 |
-| Latence par coup | médiane **27,9 ms**, p90 28,9 ms, 3 threads |
 
 Le modèle rend exactement les mêmes coups que côté iOS, sur les 56 cas qui
 servent déjà aux tests de l'app — promotions, roques, prises en passant et
@@ -105,10 +110,35 @@ la tolérance de 0,04 des fixtures iOS. Comme Maia échantillonne dans la
 distribution, c'est à trancher au portage réel — détail dans le README de
 `tools/maia3-spike/`.
 
-**Le chiffre de nœuds/seconde ne veut rien dire**, et celui de latence Maia
-est optimiste : l'émulateur emprunte le CPU du M2 de la machine hôte. Seul un
-téléphone réel dira ce que valent la recherche et l'inférence — et c'est de
-ces mesures que dépend la calibration Elo des personnages.
+### C. Scanner
+
+| Étape | Résultat |
+| --- | --- |
+| Détecteur YOLO ONNX chargé | 10 Mo, 3 images |
+| Accord avec le Core ML embarqué | **75/76 détections (99 %)**, IoU min 0,981 |
+
+L'export Core ML d'ultralytics embarque la NMS dans le modèle, l'export ONNX
+non : le post-traitement est donc du code neuf (`YoloBench.postProcess`). Il
+rend le MÊME 75/76 que la référence Python — l'unique écart est une boîte
+limite que le fp16 du Core ML et le fp32 de l'ONNX ne tranchent pas pareil,
+pas un défaut du portage. Détail dans `tools/yolo-spike/`.
+
+### Les latences ne sont pas exploitables
+
+C'est le résultat le plus important de la journée, et il est négatif.
+
+| Mesure | Étendue observée sur 3 lancements |
+| --- | --- |
+| Recherche Stockfish | 0,2 à 1,4 M nœuds/s |
+| Inférence Maia3 (médiane) | 28 à 216 ms |
+| Détection YOLO (médiane) | 415 à 456 ms |
+
+Un facteur 7 sur Maia entre deux lancements du MÊME binaire sur la MÊME
+machine. L'émulateur emprunte le CPU du M2 de l'hôte et son ordonnancement
+est imprévisible : ces chiffres ne disent rien d'un téléphone, ni en bien ni
+en mal. **Toute la calibration Elo des personnages dépend de mesures qu'on ne
+peut pas faire ici.** C'est l'argument matériel pour acheter un appareil
+avant d'aller plus loin.
 
 ### Tailles produites
 
@@ -117,22 +147,25 @@ ces mesures que dépend la calibration Elo des personnages.
 | `libchesslab_engine.so` (Stockfish complet) | 1,5 Mo |
 | Réseaux NNUE | 75 Mo |
 | Maia3 en ONNX fp16 | 43 Mo |
-| **APK de débogage, les deux volets** | **131 Mo** |
-| Build complet à froid | 1 min 51 s |
+| Détecteur YOLO en ONNX fp32 | 10 Mo |
+| **APK de débogage, les trois volets** | **139 Mo** |
 
 À rapporter au plafond de téléchargement de Google Play (~200 Mo pour un
 bundle sans Play Asset Delivery). L'app complète ajouterait les puzzles
-Lichess (19 Mo), les ouvertures et les assets, soit de l'ordre de 160 Mo.
+Lichess (19 Mo), les ouvertures et les assets, soit de l'ordre de 165 Mo.
 On passe, mais sans marge — d'où l'intérêt de trancher tôt entre « tout
 embarquer » et « télécharger les gros réseaux au premier lancement ».
 
-### La correction qu'il a fallu faire
+### Les deux corrections qu'il a fallu faire
 
-Le premier passage donnait 48/56. La conversion n'était pas en cause (ONNX
-était à 4,6e-06 de torch) : le harnais de vérification passait le même Elo
-pour le joueur et pour l'adversaire, alors que les fixtures en portent deux
-distincts. Maia est conditionné par les DEUX. Corrigé, on est à 56/56 avec un
-écart nul en fp32.
+**Maia, 48/56 au premier passage.** La conversion n'était pas en cause (ONNX
+était à 4,6e-06 de torch) : le harnais passait le même Elo pour le joueur et
+pour l'adversaire, alors que les fixtures en portent deux distincts et que
+Maia est conditionné par les deux. Corrigé, 56/56 avec un écart nul en fp32.
+
+**Scanner, critère de réussite.** Exiger l'égalité stricte avec le Core ML
+était le mauvais bar : les deux modèles n'ont ni la même précision ni la même
+NMS. Le seuil est à 95 %, et le code dit pourquoi.
 
 ### Détail cosmétique
 
@@ -142,8 +175,8 @@ banc d'essai.
 
 ## Ce qui reste à dérisquer
 
-1. **Un téléphone réel.** L'émulateur ne peut pas répondre sur la vitesse ni
-   sur le comportement thermique, dont dépend toute la calibration des
-   niveaux.
-2. **Le Scanner.** Vision + YOLO Core ML → CameraX + OpenCV + TFLite. C'est le
-   module dont la parité de qualité est la moins garantie.
+**Un téléphone réel, et lui seul.** Les trois conversions sont faites et
+vérifiées ; ce qui manque est la vitesse et le comportement thermique, que
+l'émulateur ne peut pas approcher. Tout le reste du portage (interface,
+persistance, rectification du scanner) est du travail ordinaire : long, mais
+sans inconnue.

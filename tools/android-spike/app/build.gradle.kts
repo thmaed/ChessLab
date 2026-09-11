@@ -9,12 +9,16 @@ plugins {
 // Les gros fichiers vivent déjà ailleurs dans le dépôt : on les recopie dans
 // les assets au moment du build plutôt que de les dupliquer dans Git.
 //   • réseaux NNUE  (75 Mo) ← ChessLab/Resources/
-//   • modèle Maia3  (46 Mo) ← tools/maia3-spike/ (produit par convert_maia3_onnx.py)
+//   • modèle Maia3  (43 Mo) ← tools/maia3-spike/ (produit par convert_maia3_onnx.py)
+//   • détecteur YOLO (10 Mo) ← tools/yolo-spike/ (produit par convert_yolo_onnx.py)
 val generatedAssets = layout.buildDirectory.dir("generatedAssets")
 val copyAssets by tasks.registering(Copy::class) {
     from(rootProject.file("../../ChessLab/Resources")) { include("nn-*.nnue") }
     from(rootProject.file("../maia3-spike")) {
         include("maia3_23m_fp16.onnx", "android_fixture.json")
+    }
+    from(rootProject.file("../yolo-spike")) {
+        include("chess_pieces_yolo.onnx", "android_yolo_fixture.json", "*_640.png")
     }
     into(generatedAssets)
 }
