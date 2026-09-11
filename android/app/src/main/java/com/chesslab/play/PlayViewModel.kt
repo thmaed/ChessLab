@@ -12,7 +12,9 @@ import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.engine.EngineService
+import com.chesslab.library.Autosave
 import com.chesslab.library.GameRecorder
+import com.chesslab.library.LibraryDatabase
 import com.chesslab.maia.MaiaOpponent
 import com.chesslab.maia.OpponentGallery
 import com.chesslab.maia.OpponentProfile
@@ -55,6 +57,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     /** La partie, pour la bibliothèque : le plateau ne connaît pas l'histoire. */
     private val recorder = GameRecorder()
+
+    /** Les coups en UCI : ce qu'il faut pour REJOUER la partie à la reprise. */
+    private val uciLog = mutableListOf<String>()
 
     private var maia: MaiaOpponent? = null
 
@@ -124,6 +129,8 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     private fun recordAndContinue(move: Move) {
         history += board.position.copy()
         recorder.record(move)
+        uciLog += move.lan
+        autosave()
         refresh(null, move)
         if (!ui.gameOver && board.position.sideToMove != humanColor) askOpponent()
     }
@@ -174,7 +181,63 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         }
         history += board.position.copy()
         recorder.record(move)
+        uciLog += move.lan
+        autosave()
         refresh(null, move)
+    }
+
+    /**
+     * Garde la partie en cours. Une seule par mode : reprendre, c'est
+     * reprendre LA partie interrompue, pas en choisir une dans une pile.
+     */
+    private fun autosave() = viewModelScope.launch(Dispatchers.IO) {
+        val dao = LibraryDatabase.get(getApplication()).autosaves()
+        if (ui.gameOver || uciLog.isEmpty()) { dao.clear(MODE); return@launch }
+        dao.put(
+            Autosave(
+                mode = MODE,
+                savedAt = System.currentTimeMillis(),
+                moves = uciLog.joinToString(" "),
+                opponentId = ui.opponent?.id,
+                level = ui.level,
+                label = "Contre ${ui.opponent?.firstName ?: "Stockfish"} · ${uciLog.size} demi-coups",
+            )
+        )
+    }
+
+    /** Reprend la partie interrompue, s'il y en a une. */
+    fun resumeSaved() = viewModelScope.launch {
+        val saved = withContext(Dispatchers.IO) {
+            LibraryDatabase.get(getApplication<Application>()).autosaves().byMode(MODE)
+        } ?: return@launch
+        resume(saved)
+    }
+
+    /** Rejoue une partie sauvegardée, coup par coup. */
+    fun resume(autosave: Autosave) {
+        val profile = autosave.opponentId?.let { OpponentGallery.byId(it) }
+        newGame()
+        ui = ui.copy(opponent = profile, level = autosave.level)
+        for (lan in autosave.moveList) {
+            var move = board.move(pieceAt = Square(lan.substring(0, 2)), to = Square(lan.substring(2, 4)))
+                ?: break
+            if (lan.length == 5) {
+                move = board.completePromotion(of = move, to = kindOf(lan[4]))
+            }
+            history += board.position.copy()
+            recorder.record(move)
+            uciLog += move.lan
+            ui = ui.copy(sanMoves = ui.sanMoves + move.san, lastMove = move.start to move.end)
+        }
+        refresh("Partie reprise")
+        if (!ui.gameOver && board.position.sideToMove != humanColor) askOpponent()
+    }
+
+    private fun kindOf(c: Char): Piece.Kind = when (c) {
+        'q' -> Piece.Kind.queen
+        'r' -> Piece.Kind.rook
+        'b' -> Piece.Kind.bishop
+        else -> Piece.Kind.knight
     }
 
     private fun thinkingLabel(profile: OpponentProfile?): String =
@@ -191,6 +254,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         }
         val over = state is Board.State.Checkmate || state is Board.State.Draw
         if (over && !ui.gameOver) {
+            viewModelScope.launch(Dispatchers.IO) {
+                LibraryDatabase.get(getApplication()).autosaves().clear(MODE)
+            }
             recorder.save(
                 getApplication(),
                 white = "Vous",
@@ -230,11 +296,14 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         Board.State.DrawReason.agreement -> "accord"
     }
 
+    companion object { private const val MODE = "engine" }
+
     fun newGame() {
         board = Board()
         history.clear()
         history += Position.standard
         recorder.reset()
+        uciLog.clear()
         ui = ui.copy(
             position = Position.standard,
             selected = null, legalTargets = emptySet(), lastMove = null, checkedKing = null,

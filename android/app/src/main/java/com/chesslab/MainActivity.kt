@@ -68,7 +68,7 @@ private fun App() {
         }
         when (current) {
             Route.Home -> HomeScreen { stack.add(it) }
-            Route.PlayVsEngine -> PlayScreen()
+            is Route.PlayVsEngine -> PlayScreen(resume = current.resume)
             Route.TwoPlayer -> TwoPlayerScreen()
             Route.Analysis -> AnalysisScreen()
             Route.Puzzles -> PuzzleScreen()

@@ -15,6 +15,11 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
+import com.chesslab.library.LibraryDatabase
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -43,7 +48,7 @@ data class Mode(
 )
 
 private val modes = listOf(
-    Mode(Route.PlayVsEngine, "Contre l'ordinateur", "Neuf personnages, ou Stockfish", "Personnages", Icons.Default.Memory, Palette.accent),
+    Mode(Route.PlayVsEngine(), "Contre l'ordinateur", "Neuf personnages, ou Stockfish", "Personnages", Icons.Default.Memory, Palette.accent),
     Mode(Route.TwoPlayer, "Deux joueurs", "Sur le même appareil", "Même appareil", Icons.Default.People, Palette.info),
     Mode(Route.Puzzles, "Puzzles", "Tactique et bibliothèque Lichess", "Tactique et Lichess", Icons.Default.Extension, Palette.violet),
     Mode(Route.Openings, "Ouvertures", "Apprends et révise tes ouvertures", "Apprends et révise", Icons.Default.MenuBook, Palette.warning),
@@ -55,6 +60,10 @@ private val modes = listOf(
 
 @Composable
 fun HomeScreen(onOpen: (Route) -> Unit) {
+    val context = LocalContext.current
+    val autosaves by remember { LibraryDatabase.get(context).autosaves().all() }
+        .collectAsState(initial = emptyList())
+
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -79,6 +88,28 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
             }
         }
         Spacer(Modifier.height(12.dp))
+
+        // La partie interrompue, s'il y en a une : elle passe AVANT les modes.
+        autosaves.firstOrNull()?.let { save ->
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .testTag("reprendre")
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Palette.accent.copy(alpha = 0.12f))
+                    .clickable { onOpen(Route.PlayVsEngine(resume = true)) }
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Default.PlayArrow, null, tint = Palette.accent, modifier = Modifier.size(22.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Reprendre", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent)
+                    Text(save.label, fontSize = 11.sp, color = Palette.textSecondary)
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+        }
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),

@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,7 +32,8 @@ import com.chesslab.ui.StatusRow
 import kotlin.math.roundToInt
 
 @Composable
-fun PlayScreen(model: PlayViewModel = viewModel()) {
+fun PlayScreen(resume: Boolean = false, model: PlayViewModel = viewModel()) {
+    LaunchedEffect(resume) { if (resume) model.resumeSaved() }
     val ui = model.ui
     val scroll = rememberScrollState()
 

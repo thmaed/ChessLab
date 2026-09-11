@@ -8,7 +8,8 @@ package com.chesslab.nav
  */
 sealed class Route(val title: String) {
     data object Home : Route("ChessLab")
-    data object PlayVsEngine : Route("Contre l'ordinateur")
+    /** [resume] : reprendre la partie interrompue plutôt que d'en commencer une. */
+    data class PlayVsEngine(val resume: Boolean = false) : Route("Contre l'ordinateur")
     data object TwoPlayer : Route("Deux joueurs")
     data object Analysis : Route("Analyser")
     data object Puzzles : Route("Puzzles")

@@ -210,6 +210,25 @@ class AppTest {
         awaitText("Blancs — Noirs", 10_000)
     }
 
+    @Test fun anInterruptedGameCanBeResumed() {
+        open("Contre l'ordinateur")
+        awaitText("À vous de jouer", 120_000)
+        compose.onNodeWithTag("adversaire-stockfish").performClick()
+
+        compose.onNodeWithTag("case-d2").performClick()
+        compose.onNodeWithTag("case-d4").performClick()
+        awaitTag("coup-1", 60_000)          // le moteur a répondu
+
+        // on quitte en pleine partie : l'accueil doit proposer de reprendre
+        compose.onNodeWithTag("retour").performClick()
+        awaitTag("reprendre", 15_000)
+        compose.onNodeWithTag("reprendre").performClick()
+
+        // les deux demi-coups sont rejoués
+        awaitTag("coup-1", 60_000)
+        awaitText("Partie reprise", 30_000)
+    }
+
     @Test fun backReturnsHome() {
         open("Analyser")
         compose.onNodeWithTag("retour").performClick()

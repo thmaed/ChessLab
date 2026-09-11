@@ -53,9 +53,47 @@ interface GameDao {
     suspend fun count(): Int
 }
 
-@Database(entities = [GameRecord::class], version = 1, exportSchema = false)
+/**
+ * Une partie EN COURS, pour la reprendre.
+ *
+ * Une seule par mode : reprendre, c'est reprendre LA partie interrompue, pas
+ * en choisir une dans une pile. Les coups sont gardés en UCI — le format que
+ * le plateau rejoue sans ambiguïté.
+ */
+@Entity(tableName = "autosaves")
+data class Autosave(
+    /** Le mode : « engine », « twoPlayer »… Clé primaire : une par mode. */
+    @PrimaryKey val mode: String,
+    @ColumnInfo(name = "saved_at") val savedAt: Long,
+    /** Les coups joués, en UCI, séparés par des espaces. */
+    val moves: String,
+    /** L'adversaire, pour le rétablir tel quel. */
+    @ColumnInfo(name = "opponent_id") val opponentId: String? = null,
+    val level: Double = 1500.0,
+    val label: String,
+) {
+    val moveList: List<String> get() = moves.split(" ").filter { it.isNotEmpty() }
+}
+
+@Dao
+interface AutosaveDao {
+    @Query("SELECT * FROM autosaves ORDER BY saved_at DESC")
+    fun all(): Flow<List<Autosave>>
+
+    @Query("SELECT * FROM autosaves WHERE mode = :mode")
+    suspend fun byMode(mode: String): Autosave?
+
+    @Insert(onConflict = androidx.room.OnConflictStrategy.REPLACE)
+    suspend fun put(autosave: Autosave)
+
+    @Query("DELETE FROM autosaves WHERE mode = :mode")
+    suspend fun clear(mode: String)
+}
+
+@Database(entities = [GameRecord::class, Autosave::class], version = 2, exportSchema = false)
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
+    abstract fun autosaves(): AutosaveDao
 
     companion object {
         @Volatile private var instance: LibraryDatabase? = null
@@ -63,7 +101,12 @@ abstract class LibraryDatabase : RoomDatabase() {
         fun get(context: Context): LibraryDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(
                 context.applicationContext, LibraryDatabase::class.java, "chesslab.db",
-            ).build().also { instance = it }
+            )
+                // Une base de PARTIES : rien d'irremplaçable, tout est
+                // reconstructible ou déjà joué. Une migration ratée ne doit pas
+                // empêcher l'app de démarrer.
+                .fallbackToDestructiveMigration()
+                .build().also { instance = it }
         }
     }
 }
