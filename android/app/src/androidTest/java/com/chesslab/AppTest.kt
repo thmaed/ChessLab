@@ -152,6 +152,17 @@ class AppTest {
         awaitText("À vous de jouer", 30_000)
     }
 
+    @Test fun theLaboratoryPlaysByItself() {
+        open("Laboratoire")
+        // deux Stockfish : pas d'attente de chargement du réseau
+        compose.onNodeWithTag("camp-a-stockfish").performClick()
+        compose.onNodeWithTag("camp-b-stockfish").performClick()
+        compose.onNodeWithTag("lancer").performClick()
+
+        awaitTag("coup-3", 120_000)      // quatre demi-coups joués tout seuls
+        compose.onNodeWithTag("lancer").performClick()   // pause
+    }
+
     @Test fun backReturnsHome() {
         open("Analyser")
         compose.onNodeWithTag("retour").performClick()

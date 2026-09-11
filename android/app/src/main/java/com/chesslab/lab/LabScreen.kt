@@ -1,0 +1,118 @@
+package com.chesslab.lab
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.chesslab.maia.OpponentGallery
+import com.chesslab.maia.OpponentProfile
+import com.chesslab.ui.BoardView
+import com.chesslab.ui.MoveStrip
+import com.chesslab.ui.Palette
+import com.chesslab.ui.StatusRow
+
+@Composable
+fun LabScreen(model: LabViewModel = viewModel()) {
+    val ui = model.ui
+
+    Column(
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
+    ) {
+        Scoreboard(ui)
+        Spacer(Modifier.height(8.dp))
+        SidePicker("Camp A", ui.sideA.profile, "a", model::setSideA)
+        Spacer(Modifier.height(6.dp))
+        SidePicker("Camp B", ui.sideB.profile, "b", model::setSideB)
+
+        Spacer(Modifier.height(8.dp))
+        StatusRow(ui.status, busy = ui.running)
+        Spacer(Modifier.height(8.dp))
+
+        BoardView(position = ui.position, lastMove = ui.lastMove, enabled = false)
+
+        Spacer(Modifier.height(10.dp))
+        MoveStrip(ui.sanMoves)
+
+        Spacer(Modifier.height(8.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Button(onClick = model::toggle, modifier = Modifier.testTag("lancer")) {
+                Text(if (ui.running) "Pause" else "Lancer")
+            }
+            Spacer(Modifier.width(8.dp))
+            TextButton(onClick = model::reset, modifier = Modifier.testTag("remise")) {
+                Text("Remettre à zéro", color = Palette.textSecondary)
+            }
+        }
+        Spacer(Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun Scoreboard(ui: LabUiState) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(Palette.surface)
+            .padding(horizontal = 12.dp, vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(Modifier.weight(1f)) {
+            Text(
+                "${ui.winsA} — ${ui.draws} — ${ui.winsB}",
+                fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                modifier = Modifier.testTag("bilan"),
+            )
+            Text(
+                "partie ${ui.gameNumber + 1} · " +
+                    (if (ui.aPlaysWhite) "A a les blancs" else "A a les noirs"),
+                fontSize = 11.sp, color = Palette.textTertiary,
+            )
+        }
+        Text("A / nulles / B", fontSize = 11.sp, color = Palette.textSecondary)
+    }
+}
+
+@Composable
+private fun SidePicker(label: String, selected: OpponentProfile?, tag: String, onPick: (OpponentProfile?) -> Unit) {
+    Column {
+        Text(label, fontSize = 11.sp, color = Palette.textTertiary)
+        Row(
+            Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Chip("Stockfish", selected == null, "camp-$tag-stockfish") { onPick(null) }
+            OpponentGallery.all.forEach { profile ->
+                Chip(profile.firstName, profile.id == selected?.id, "camp-$tag-${profile.id}") { onPick(profile) }
+            }
+        }
+    }
+}
+
+@Composable
+private fun Chip(label: String, active: Boolean, tag: String, onClick: () -> Unit) {
+    Text(
+        label,
+        fontSize = 11.sp,
+        color = if (active) Palette.background else Palette.textSecondary,
+        modifier = Modifier
+            .testTag(tag)
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (active) Palette.accent else Palette.surface)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 5.dp),
+    )
+}

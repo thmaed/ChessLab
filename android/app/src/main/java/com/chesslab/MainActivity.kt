@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.chesslab.analysis.AnalysisScreen
+import com.chesslab.lab.LabScreen
 import com.chesslab.nav.Route
 import com.chesslab.play.PlayScreen
 import com.chesslab.courses.CourseListScreen
@@ -71,6 +72,7 @@ private fun App() {
             Route.Endgames -> CourseListScreen(endgames = true) { stack.add(reader(it)) }
             is Route.CourseReader -> CourseScreen(current.id)
             Route.Settings -> SettingsScreen()
+            Route.Laboratory -> LabScreen()
             else -> Placeholder(current.title)
         }
     }
