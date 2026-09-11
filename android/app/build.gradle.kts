@@ -14,7 +14,10 @@ val copyAssets by tasks.registering(Copy::class) {
         include("nn-*.nnue")
         include("lichess_puzzles.json")
         include("openings/**")          // cours d'ouvertures ET de finales
+        include("opponent_books.json")  // les répertoires des personnages
     }
+    // le modèle vit dans tools/, avec le script qui le produit
+    from(rootProject.file("../tools/maia3-spike")) { include("maia3_23m_fp16.onnx") }
     into(generatedAssets)
 }
 
@@ -51,6 +54,7 @@ tasks.named("preBuild") { dependsOn(copyAssets) }
 dependencies {
     implementation(project(":chesskit"))
     implementation(project(":engine"))
+    implementation(project(":maia"))
 
     implementation(platform("androidx.compose:compose-bom:2024.10.01"))
     implementation("androidx.compose.ui:ui")

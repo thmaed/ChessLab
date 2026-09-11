@@ -44,7 +44,8 @@ class AppTest {
 
     @Test fun playingAMoveMakesTheEngineReply() {
         open("Contre l'ordinateur")
-        awaitText("À vous de jouer")
+        awaitText("À vous de jouer", 120_000)
+        compose.onNodeWithTag("adversaire-stockfish").performClick()
 
         compose.onNodeWithTag("case-e2").performClick()
         compose.onNodeWithTag("case-e4").performClick()
@@ -133,6 +134,22 @@ class AppTest {
         compose.onNodeWithTag("theme-classic").performClick()
         compose.onNodeWithTag("piece-classic").performClick()
         compose.onNodeWithTag("temps-400").performClick()
+    }
+
+    @Test fun aCharacterPlaysWithMaia() {
+        open("Contre l'ordinateur")
+        // le réseau fait 43 Mo : son chargement prend du temps sur émulateur
+        awaitText("À vous de jouer", 120_000)
+
+        compose.onNodeWithTag("adversaire-nadia").performClick()
+        awaitText("À vous de jouer", 30_000)
+
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+
+        awaitTag("coup-0", 10_000)
+        awaitTag("coup-1", 120_000)      // Nadia répond
+        awaitText("À vous de jouer", 30_000)
     }
 
     @Test fun backReturnsHome() {

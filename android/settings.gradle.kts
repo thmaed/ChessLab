@@ -12,4 +12,5 @@ rootProject.name = "chesslab-android"
 // c'est la boucle de travail principale du portage.
 include(":chesskit")
 include(":engine")
+include(":maia")
 include(":app")

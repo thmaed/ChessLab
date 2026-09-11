@@ -12,6 +12,9 @@ import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.engine.EngineService
+import com.chesslab.maia.MaiaOpponent
+import com.chesslab.maia.OpponentGallery
+import com.chesslab.maia.OpponentProfile
 import com.chesslab.settings.SettingsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,33 +26,61 @@ data class PlayUiState(
     val legalTargets: Set<Square> = emptySet(),
     val lastMove: Pair<Square, Square>? = null,
     val checkedKing: Square? = null,
-    val status: String = "Démarrage du moteur…",
+    val status: String = "Démarrage…",
     val sanMoves: List<String> = emptyList(),
     val thinking: Boolean = false,
     val pendingPromotion: Move? = null,
     val gameOver: Boolean = false,
+    /** `null` = Stockfish brut. */
+    val opponent: OpponentProfile? = OpponentGallery.all.first(),
+    val level: Double = OpponentGallery.all.first().defaultLevel,
+    val maiaAvailable: Boolean = true,
 )
 
 /**
- * Une partie contre le moteur. Pendant réduit de `PlayViewModel.swift`.
+ * Une partie contre l'ordinateur : un des neuf personnages, ou Stockfish.
  *
- * Le joueur a les blancs ; le moteur répond dès que le trait change.
+ * Pendant réduit de `PlayViewModel.swift`. Les personnages sont Maia-3 — un
+ * réseau entraîné sur des parties HUMAINES — recoloré par un style borné ;
+ * Stockfish reste disponible pour qui veut un mur.
  */
 class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     private var board = Board()
     private val humanColor = Piece.Color.white
 
+    /** L'historique des positions : Maia lit les huit dernières. */
+    private val history = mutableListOf(Position.standard)
+
+    private var maia: MaiaOpponent? = null
+
     var ui by mutableStateOf(PlayUiState())
         private set
 
-    init { startEngine() }
+    init { prepare() }
 
-    private fun startEngine() = viewModelScope.launch {
-        val identity = withContext(Dispatchers.IO) {
-            EngineService.use(getApplication()) { EngineService.identity }
+    private fun prepare() = viewModelScope.launch {
+        val loaded = withContext(Dispatchers.IO) {
+            MaiaOpponent.shared(getApplication(), EngineService.threads)
         }
-        refresh(if (identity == null) "Moteur indisponible" else "À vous de jouer")
+        maia = loaded
+        // Stockfish sert au filet et au mode « moteur » : on le démarre aussi
+        withContext(Dispatchers.IO) { EngineService.use(getApplication()) { EngineService.identity } }
+        ui = ui.copy(maiaAvailable = loaded != null)
+        refresh(if (loaded == null) "Modèle indisponible — Stockfish prend le relais" else "À vous de jouer")
+    }
+
+    fun chooseOpponent(profile: OpponentProfile?) {
+        ui = ui.copy(
+            opponent = profile,
+            level = profile?.defaultLevel ?: 1500.0,
+        )
+        newGame()
+    }
+
+    fun setLevel(value: Double) {
+        val clamped = ui.opponent?.clampedLevel(value) ?: value.coerceIn(800.0, 3000.0)
+        ui = ui.copy(level = clamped)
     }
 
     fun onSquareTap(square: Square) {
@@ -63,17 +94,16 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         val piece = board.position.piece(square)
-        if (piece != null && piece.color == humanColor) {
-            ui = ui.copy(selected = square, legalTargets = board.legalMoves(square).toSet())
+        ui = if (piece != null && piece.color == humanColor) {
+            ui.copy(selected = square, legalTargets = board.legalMoves(square).toSet())
         } else {
-            ui = ui.copy(selected = null, legalTargets = emptySet())
+            ui.copy(selected = null, legalTargets = emptySet())
         }
     }
 
     private fun play(from: Square, to: Square) {
         val move = board.move(pieceAt = from, to = to) ?: return
-        val state = board.state
-        if (state is Board.State.Promotion) {
+        if (board.state is Board.State.Promotion) {
             ui = ui.copy(selected = null, legalTargets = emptySet(), pendingPromotion = move)
             return
         }
@@ -88,27 +118,45 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun recordAndContinue(move: Move) {
+        history += board.position.copy()
         refresh(null, move)
-        if (!ui.gameOver && board.position.sideToMove != humanColor) askEngine()
+        if (!ui.gameOver && board.position.sideToMove != humanColor) askOpponent()
     }
 
-    private fun askEngine() = viewModelScope.launch {
-        ui = ui.copy(thinking = true, status = "Le moteur réfléchit…")
-        val best = withContext(Dispatchers.IO) {
-            EngineService.use(getApplication()) { e ->
-                e.send("position fen ${board.position.fen}")
-                e.search("go movetime ${SettingsStore.state.value.engineMoveTimeMs}", timeoutMs = 60_000)
+    private fun askOpponent() = viewModelScope.launch {
+        val profile = ui.opponent
+        ui = ui.copy(thinking = true, status = thinkingLabel(profile))
+
+        val lan = withContext(Dispatchers.IO) {
+            val engine = maia
+            if (profile != null && engine != null) {
+                // le personnage tel qu'il joue MAINTENANT : sans évaluation
+                // continue, on s'en tient à son humeur de repos
+                val mood = profile.mood(lastMoverCp = null)
+                engine.chooseMove(
+                    history = history.toList(),
+                    board = Board(board.position.copy()),
+                    selfElo = ui.level,
+                    oppoElo = ui.level,
+                    temperature = mood.temperature,
+                    topP = profile.topP,
+                    style = mood.style,
+                )?.uci
+            } else {
+                EngineService.use(getApplication()) { e ->
+                    e.send("position fen ${board.position.fen}")
+                    e.search("go movetime ${SettingsStore.state.value.engineMoveTimeMs}", timeoutMs = 60_000)
+                }?.split(" ")?.getOrNull(1)
             }
         }
         ui = ui.copy(thinking = false)
 
-        val lan = best?.split(" ")?.getOrNull(1)
-        if (lan == null || lan == "(none)") { refresh("Le moteur n'a pas répondu"); return@launch }
+        if (lan == null || lan == "(none)") { refresh("L'adversaire n'a pas répondu"); return@launch }
 
         val from = Square(lan.substring(0, 2))
         val to = Square(lan.substring(2, 4))
         var move = board.move(pieceAt = from, to = to)
-        if (move == null) { refresh("Coup du moteur refusé : $lan"); return@launch }
+        if (move == null) { refresh("Coup refusé : $lan"); return@launch }
 
         if (lan.length == 5) {
             val kind = when (lan[4]) {
@@ -119,8 +167,12 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             }
             move = board.completePromotion(of = move, to = kind)
         }
+        history += board.position.copy()
         refresh(null, move)
     }
+
+    private fun thinkingLabel(profile: OpponentProfile?): String =
+        if (profile != null) "${profile.firstName} réfléchit…" else "Le moteur réfléchit…"
 
     private fun refresh(status: String?, move: Move? = null) {
         val position = board.position
@@ -131,14 +183,13 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             is Board.State.Checkmate -> kingSquare(state.color)
             else -> null
         }
-
         val over = state is Board.State.Checkmate || state is Board.State.Draw
         val text = status ?: when (state) {
             is Board.State.Checkmate ->
                 if (state.color == humanColor) "Échec et mat — vous perdez" else "Échec et mat — vous gagnez"
             is Board.State.Draw -> "Nulle — " + drawLabel(state.reason)
             is Board.State.Check -> "Échec"
-            else -> if (position.sideToMove == humanColor) "À vous de jouer" else "Le moteur réfléchit…"
+            else -> if (position.sideToMove == humanColor) "À vous de jouer" else thinkingLabel(ui.opponent)
         }
 
         ui = ui.copy(
@@ -166,7 +217,13 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     fun newGame() {
         board = Board()
-        ui = PlayUiState(status = "À vous de jouer")
+        history.clear()
+        history += Position.standard
+        ui = ui.copy(
+            position = Position.standard,
+            selected = null, legalTargets = emptySet(), lastMove = null, checkedKing = null,
+            sanMoves = emptyList(), gameOver = false, pendingPromotion = null,
+            status = "À vous de jouer",
+        )
     }
-
 }
