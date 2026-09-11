@@ -70,10 +70,44 @@ appareil.
 scripts de conversion et ignorés par Git. Sans eux, l'app se construit quand
 même : les personnages laissent la place à Stockfish et le scanner le dit.
 
-## Taille
+## Taille et publication
 
-APK de débogage : ~170 Mo — réseaux NNUE 75, Maia 43, puzzles 19, ONNX Runtime
-17, cours 4, YOLO 10. Sous le plafond de Google Play (~200 Mo sans Play Asset
-Delivery), mais SANS MARGE : c'est la première décision d'architecture à
-trancher avant une publication — tout embarquer, ou télécharger les gros
-réseaux au premier lancement.
+| | compressé | brut |
+| --- | --- | --- |
+| Réseau NNUE principal | 61,7 Mo | 74,9 Mo |
+| Maia-3 (ONNX fp16) | 41,8 Mo | 45,5 Mo |
+| Détecteur YOLO | 9,2 Mo | 10,6 Mo |
+| ONNX Runtime | 6,3 Mo | 17,6 Mo |
+| Puzzles Lichess | 4,7 Mo | 18,8 Mo |
+| Moteurs (Stockfish, Fairy) | 6,2 Mo | 24,3 Mo |
+| **Bundle complet** | **145,6 Mo** | 243,7 Mo |
+
+C'est la taille COMPRESSÉE qui compte pour Google Play, dont le plafond est
+d'environ 200 Mo sans Play Asset Delivery : on passe, sans marge confortable.
+Sur l'appareil, compter en plus les 78 Mo de réseaux NNUE extraits — Stockfish
+veut de vrais fichiers, et les assets Android n'en sont pas.
+
+### Signer
+
+Le trousseau ne vit PAS dans le dépôt. Le build cherche un
+`keystore.properties` dans `~/.chesslab-android/`, puis dans
+`android/keystore.properties` (ignoré par Git) :
+
+```properties
+storeFile=/chemin/vers/chesslab-release.jks
+storePassword=…
+keyAlias=chesslab
+keyPassword=…
+```
+
+Sans lui, `assembleRelease` sort un APK NON SIGNÉ : bon pour un essai local,
+refusé par Google Play.
+
+```bash
+./gradlew :app:bundleRelease   # l'AAB à téléverser
+./gradlew :app:assembleRelease # l'APK, pour installer à la main
+```
+
+R8 reste désactivé : les ponts JNI et les modèles se chargent par nom, et un
+obfuscateur mal réglé les casse en silence — un plantage qui n'apparaîtrait
+qu'en production.

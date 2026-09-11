@@ -76,3 +76,8 @@ tools/maia3-spike/*.mlpackage/
 # lisible des détections attendues.
 tools/yolo-spike/*.onnx
 tools/yolo-spike/*_640.png
+
+# Trousseau de signature Android : jamais dans le dépôt.
+android/keystore.properties
+*.jks
+*.keystore

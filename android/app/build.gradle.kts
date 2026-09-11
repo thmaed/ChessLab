@@ -1,3 +1,4 @@
+import java.util.Properties
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -23,6 +24,18 @@ val copyAssets by tasks.registering(Copy::class) {
     into(generatedAssets)
 }
 
+// La signature de publication. Le trousseau ne vit PAS dans le dépôt : le
+// fichier de propriétés est cherché dans ~/.chesslab-android/, puis dans
+// android/keystore.properties (lui aussi ignoré par Git). Sans lui, le build
+// release marche quand même — il sort simplement non signé, bon pour un essai
+// local mais pas pour Google Play.
+val keystoreProps = Properties().apply {
+    listOf(
+        File(System.getProperty("user.home"), ".chesslab-android/keystore.properties"),
+        rootProject.file("keystore.properties"),
+    ).firstOrNull { it.exists() }?.inputStream()?.use { load(it) }
+}
+
 android {
     namespace = "com.chesslab"
     compileSdk = 35
@@ -39,7 +52,28 @@ android {
 
     sourceSets["main"].assets.srcDir(generatedAssets)
 
-    buildTypes { release { isMinifyEnabled = false } }
+    signingConfigs {
+        if (keystoreProps.getProperty("storeFile") != null) {
+            create("release") {
+                storeFile = file(keystoreProps.getProperty("storeFile"))
+                storePassword = keystoreProps.getProperty("storePassword")
+                keyAlias = keystoreProps.getProperty("keyAlias")
+                keyPassword = keystoreProps.getProperty("keyPassword")
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // R8 reste DÉSACTIVÉ : les ponts JNI et les modèles ONNX se
+            // chargent par réflexion et par nom, et un obfuscateur mal réglé
+            // les casse en silence — un plantage qui n'apparaîtrait qu'en
+            // production. À rallumer un jour, avec des règles écrites et une
+            // suite de tests passée sur le build release.
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.findByName("release")
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
