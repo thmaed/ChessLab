@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.MoveStrip
 import com.chesslab.ui.Palette
@@ -35,58 +36,56 @@ fun AnalysisScreen(initialFen: String? = null, model: AnalysisViewModel = viewMo
     }
     val ui = model.ui
 
-    Column(
-        Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
-    ) {
-        StatusRow(ui.status, busy = ui.thinking)
-        Spacer(Modifier.height(8.dp))
+    BoardScaffold(
+        header = {
+            StatusRow(ui.status, busy = ui.thinking)
+            Spacer(Modifier.height(8.dp))
 
-        EvaluationBar(ui)
-        Spacer(Modifier.height(10.dp))
-
-        BoardView(
-            position = ui.position,
-            lastMove = ui.lastMove,
-            checkedKing = ui.checkedKing,
-            enabled = false,
-        )
-
-        Spacer(Modifier.height(10.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = model::previous, modifier = Modifier.testTag("precedent")) {
-                Icon(Icons.Default.ChevronLeft, "Coup précédent", tint = Palette.textPrimary)
+            EvaluationBar(ui)
+            Spacer(Modifier.height(10.dp))
+        },
+        board = {
+            BoardView(
+                position = ui.position,
+                lastMove = ui.lastMove,
+                checkedKing = ui.checkedKing,
+                enabled = false,
+            )
+        },
+        panel = {
+            Spacer(Modifier.height(10.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = model::previous, modifier = Modifier.testTag("precedent")) {
+                    Icon(Icons.Default.ChevronLeft, "Coup précédent", tint = Palette.textPrimary)
+                }
+                IconButton(onClick = model::next, modifier = Modifier.testTag("suivant")) {
+                    Icon(Icons.Default.ChevronRight, "Coup suivant", tint = Palette.textPrimary)
+                }
+                Spacer(Modifier.width(8.dp))
+                Box(Modifier.weight(1f)) {
+                    MoveStrip(ui.sanMoves, selected = ui.cursor.takeIf { it >= 0 }, onSelect = model::goTo)
+                }
             }
-            IconButton(onClick = model::next, modifier = Modifier.testTag("suivant")) {
-                Icon(Icons.Default.ChevronRight, "Coup suivant", tint = Palette.textPrimary)
-            }
-            Spacer(Modifier.width(8.dp))
-            Box(Modifier.weight(1f)) {
-                MoveStrip(ui.sanMoves, selected = ui.cursor.takeIf { it >= 0 }, onSelect = model::goTo)
-            }
-        }
 
-        Spacer(Modifier.height(12.dp))
-        SavedGames(model)
+            Spacer(Modifier.height(12.dp))
+            SavedGames(model)
 
-        Spacer(Modifier.height(12.dp))
-        OutlinedTextField(
-            value = ui.input,
-            onValueChange = model::onInputChange,
-            label = { Text("PGN ou FEN") },
-            modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp).testTag("saisie"),
-            textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, fontFamily = FontFamily.Monospace),
-        )
-        if (ui.error != null) {
-            Text(ui.error!!, color = Palette.danger, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
-        }
-        TextButton(onClick = model::load, modifier = Modifier.testTag("charger")) {
-            Text("Charger", color = Palette.accent)
-        }
-        Spacer(Modifier.height(24.dp))
-    }
+            Spacer(Modifier.height(12.dp))
+            OutlinedTextField(
+                value = ui.input,
+                onValueChange = model::onInputChange,
+                label = { Text("PGN ou FEN") },
+                modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp).testTag("saisie"),
+                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, fontFamily = FontFamily.Monospace),
+            )
+            if (ui.error != null) {
+                Text(ui.error!!, color = Palette.danger, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
+            }
+            TextButton(onClick = model::load, modifier = Modifier.testTag("charger")) {
+                Text("Charger", color = Palette.accent)
+            }
+        },
+    )
 }
 
 /** La bibliothèque : les parties déjà jouées, rechargeables d'un tap. */

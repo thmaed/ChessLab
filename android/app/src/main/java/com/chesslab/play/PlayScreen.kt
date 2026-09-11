@@ -27,6 +27,7 @@ import com.chesslab.maia.OpponentProfile
 import com.chesslab.maia.OpponentTint
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.MoveStrip
+import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
 import kotlin.math.roundToInt
@@ -35,37 +36,39 @@ import kotlin.math.roundToInt
 fun PlayScreen(resume: Boolean = false, model: PlayViewModel = viewModel()) {
     LaunchedEffect(resume) { if (resume) model.resumeSaved() }
     val ui = model.ui
-    val scroll = rememberScrollState()
 
-    Column(Modifier.fillMaxSize().verticalScroll(scroll).padding(horizontal = 16.dp)) {
-        OpponentPicker(ui.opponent, ui.maiaAvailable, model::chooseOpponent)
-        Spacer(Modifier.height(8.dp))
-
-        ui.opponent?.let { profile ->
-            OpponentCard(profile, ui.level, model::setLevel)
+    BoardScaffold(
+        header = {
+            OpponentPicker(ui.opponent, ui.maiaAvailable, model::chooseOpponent)
             Spacer(Modifier.height(8.dp))
-        }
 
-        StatusRow(ui.status, busy = ui.thinking)
-        Spacer(Modifier.height(8.dp))
+            ui.opponent?.let { profile ->
+                OpponentCard(profile, ui.level, model::setLevel)
+                Spacer(Modifier.height(8.dp))
+            }
 
-        BoardView(
-            position = ui.position,
-            selected = ui.selected,
-            legalTargets = ui.legalTargets,
-            lastMove = ui.lastMove,
-            checkedKing = ui.checkedKing,
-            enabled = !ui.thinking && !ui.gameOver,
-            onSquareTap = model::onSquareTap,
-        )
-
-        Spacer(Modifier.height(10.dp))
-        MoveStrip(ui.sanMoves)
-        TextButton(onClick = model::newGame, modifier = Modifier.testTag("nouvelle")) {
-            Text("Nouvelle partie", color = Palette.accent)
-        }
-        Spacer(Modifier.height(24.dp))
-    }
+            StatusRow(ui.status, busy = ui.thinking)
+            Spacer(Modifier.height(8.dp))
+        },
+        board = {
+            BoardView(
+                position = ui.position,
+                selected = ui.selected,
+                legalTargets = ui.legalTargets,
+                lastMove = ui.lastMove,
+                checkedKing = ui.checkedKing,
+                enabled = !ui.thinking && !ui.gameOver,
+                onSquareTap = model::onSquareTap,
+            )
+        },
+        panel = {
+            Spacer(Modifier.height(10.dp))
+            MoveStrip(ui.sanMoves)
+            TextButton(onClick = model::newGame, modifier = Modifier.testTag("nouvelle")) {
+                Text("Nouvelle partie", color = Palette.accent)
+            }
+        },
+    )
 
     if (ui.pendingPromotion != null) PromotionDialog(model::completePromotion)
 }

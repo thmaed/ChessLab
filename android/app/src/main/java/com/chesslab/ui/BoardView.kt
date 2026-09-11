@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chesskit.Piece
@@ -61,11 +62,20 @@ fun BoardView(
     val ranks = if (orientation == Piece.Color.white) (8 downTo 1) else (1..8)
     val files = if (orientation == Piece.Color.white) (1..8) else (8 downTo 1)
 
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .aspectRatio(1f)
-    ) {
+    // Le plateau prend le CARRÉ le plus grand qui tienne à la fois dans la
+    // largeur offerte ET dans la hauteur de l'écran.
+    //
+    // `fillMaxWidth().aspectRatio(1f)` ne regardait que la largeur : en
+    // paysage, le plateau faisait plus du double de la hauteur de l'écran et
+    // on n'en voyait qu'une rangée. La contrainte de hauteur ne peut pas
+    // venir du parent — tous ces écrans défilent, donc leur hauteur est
+    // infinie — elle vient donc de l'écran lui-même, dont on garde un cinquième
+    // pour l'entête et le panneau. Quand le parent BORNE bien la hauteur (le
+    // côte-à-côte de [BoardScaffold] en paysage), c'est sa borne qui prime.
+    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
+    BoxWithConstraints(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+        val side = minOf(maxWidth, maxHeight, screenHeight * 0.80f)
+        Column(Modifier.size(side)) {
         for (rank in ranks) {
             Row(Modifier.fillMaxWidth().weight(1f)) {
                 for (file in files) {
@@ -87,6 +97,7 @@ fun BoardView(
                     )
                 }
             }
+        }
         }
     }
 }

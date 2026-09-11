@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.chesslab.maia.OpponentGallery
 import com.chesslab.maia.OpponentProfile
+import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.MoveStrip
 import com.chesslab.ui.Palette
@@ -28,36 +29,37 @@ import com.chesslab.ui.StatusRow
 fun LabScreen(model: LabViewModel = viewModel()) {
     val ui = model.ui
 
-    Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
-    ) {
-        Scoreboard(ui)
-        Spacer(Modifier.height(8.dp))
-        SidePicker("Camp A", ui.sideA.profile, "a", model::setSideA)
-        Spacer(Modifier.height(6.dp))
-        SidePicker("Camp B", ui.sideB.profile, "b", model::setSideB)
+    BoardScaffold(
+        header = {
+            Scoreboard(ui)
+            Spacer(Modifier.height(8.dp))
+            SidePicker("Camp A", ui.sideA.profile, "a", model::setSideA)
+            Spacer(Modifier.height(6.dp))
+            SidePicker("Camp B", ui.sideB.profile, "b", model::setSideB)
 
-        Spacer(Modifier.height(8.dp))
-        StatusRow(ui.status, busy = ui.running)
-        Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(8.dp))
+            StatusRow(ui.status, busy = ui.running)
+            Spacer(Modifier.height(8.dp))
+        },
+        board = {
+            BoardView(position = ui.position, lastMove = ui.lastMove, enabled = false)
+        },
+        panel = {
+            Spacer(Modifier.height(10.dp))
+            MoveStrip(ui.sanMoves)
 
-        BoardView(position = ui.position, lastMove = ui.lastMove, enabled = false)
-
-        Spacer(Modifier.height(10.dp))
-        MoveStrip(ui.sanMoves)
-
-        Spacer(Modifier.height(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Button(onClick = model::toggle, modifier = Modifier.testTag("lancer")) {
-                Text(if (ui.running) "Pause" else "Lancer")
+            Spacer(Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = model::toggle, modifier = Modifier.testTag("lancer")) {
+                    Text(if (ui.running) "Pause" else "Lancer")
+                }
+                Spacer(Modifier.width(8.dp))
+                TextButton(onClick = model::reset, modifier = Modifier.testTag("remise")) {
+                    Text("Remettre à zéro", color = Palette.textSecondary)
+                }
             }
-            Spacer(Modifier.width(8.dp))
-            TextButton(onClick = model::reset, modifier = Modifier.testTag("remise")) {
-                Text("Remettre à zéro", color = Palette.textSecondary)
-            }
-        }
-        Spacer(Modifier.height(24.dp))
-    }
+        },
+    )
 }
 
 @Composable

@@ -185,8 +185,12 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
             Spacer(Modifier.height(12.dp))
         }
 
+        // Le nombre de colonnes suit la largeur : deux sur un téléphone droit,
+        // quatre couché ou sur tablette. Deux tuiles de 132 dp sur 900 dp de
+        // large, c'est une tuile à moitié vide et un accueil qui défile pour
+        // rien.
         LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Adaptive(minSize = 170.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(bottom = 24.dp),

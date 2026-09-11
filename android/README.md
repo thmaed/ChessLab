@@ -34,6 +34,7 @@ recopiés depuis `ChessLab/Resources/` au moment du build.
 | Variantes | Chess960, Roi de la colline, Trois échecs, Horde, Course des rois, Atomique, Antichecs |
 | Scanner | lire une position sur une photo (cadrage manuel) |
 | Réglages | quatre thèmes, trois jeux de pièces, force du moteur |
+| Paysage | plateau et panneau côte à côte, sur téléphone comme sur tablette |
 | Bibliothèque | les parties terminées, enregistrées et rejouables |
 | Entraîner | répétition espacée FSRS-5 : séance du jour, positions à consolider, une ligne |
 
@@ -43,7 +44,6 @@ recopiés depuis `ChessLab/Resources/` au moment du build.
   du thermique — et c'est de là que dépend la calibration des niveaux.
 - La détection automatique du plateau dans le scanner (le cadrage est manuel).
 - L'anglais : l'interface est en français seulement.
-- Les mises en page tablette et paysage.
 - La synchronisation entre appareils (iOS passe par CloudKit ; côté Android le
   journal de révisions est déjà écrit pour fusionner, mais rien ne le transporte).
 
@@ -55,7 +55,7 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@21
 ./gradlew :app:testDebugUnitTest          # FSRS et les files de révision, sans émulateur
 ./gradlew :maia:testDebugUnitTest         # l'encodeur, prouvé au bit près
 ./gradlew :vision:testDebugUnitTest       # homographie et lecture de grille
-./gradlew :app:connectedDebugAndroidTest  # 31 cas de bout en bout, sur appareil
+./gradlew :app:connectedDebugAndroidTest  # 33 cas de bout en bout, sur appareil
 ./gradlew :app:assembleDebug
 ```
 

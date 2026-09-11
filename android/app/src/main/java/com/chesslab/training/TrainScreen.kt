@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.chesslab.play.PromotionDialog
+import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
 
@@ -64,107 +65,110 @@ fun TrainScreen(mode: TrainMode, model: TrainViewModel = viewModel()) {
         return
     }
 
-    Column(Modifier.fillMaxSize().padding(horizontal = 16.dp).verticalScroll(rememberScrollState())) {
-        Header(ui)
-        Spacer(Modifier.height(10.dp))
-
-        BoardView(
-            position = ui.position,
-            orientation = ui.orientation,
-            selected = ui.selected,
-            legalTargets = ui.legalTargets,
-            lastMove = ui.lastMove,
-            checkedKing = ui.checkedKing,
-            hint = ui.hint,
-            enabled = ui.phase == TrainPhase.awaiting,
-            onSquareTap = model::tap,
-        )
-
-        Spacer(Modifier.height(12.dp))
-        when (ui.phase) {
-            TrainPhase.wrong -> Panel(Palette.danger) {
-                Text("Ce n'était pas le coup du répertoire.", color = Palette.textPrimary, fontSize = 13.sp)
-                Text(
-                    "La suite est ${ui.wrongCorrect ?: "—"}.",
-                    color = Palette.danger, fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.testTag("bon-coup"),
-                )
-                ui.comment?.let { Spacer(Modifier.height(4.dp)); Comment(it) }
-                Spacer(Modifier.height(8.dp))
-                Button(onClick = model::continueAfterWrong, modifier = Modifier.testTag("continuer")) {
-                    Text("Jouer ${ui.wrongCorrect ?: ""} et continuer")
-                }
-            }
-
-            TrainPhase.variation -> Panel(Palette.info) {
-                Text(
-                    "${ui.variationPlayed} est au répertoire, mais la ligne principale est ${ui.variationMain}.",
-                    color = Palette.textPrimary, fontSize = 13.sp,
-                    modifier = Modifier.testTag("variante"),
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Button(onClick = model::playVariation, modifier = Modifier.testTag("jouer-variante")) {
-                        Text("Jouer ${ui.variationPlayed}")
-                    }
-                    OutlinedButton(onClick = model::keepMainLine, modifier = Modifier.testTag("rester-principale")) {
-                        Text("Rester sur ${ui.variationMain}")
-                    }
-                }
-            }
-
-            TrainPhase.complete -> Panel(Palette.accent) {
-                Text("Séance terminée", color = Palette.accent, fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier.testTag("seance-terminee"))
-                Text(
-                    "${ui.correct} coup${if (ui.correct > 1) "s" else ""} juste${if (ui.correct > 1) "s" else ""} " +
-                        "sur ${ui.reviewed} révisé${if (ui.reviewed > 1) "s" else ""}.",
-                    fontSize = 13.sp, color = Palette.textSecondary,
-                )
-                Spacer(Modifier.height(8.dp))
-                Button(onClick = model::restart, modifier = Modifier.testTag("recommencer")) { Text("Recommencer") }
-            }
-
-            else -> {
-                ui.note?.let {
-                    Text(
-                        it, fontSize = 13.sp, color = Palette.info,
-                        modifier = Modifier.testTag("note"),
-                    )
-                    Spacer(Modifier.height(6.dp))
-                }
-                ui.comment?.let { Comment(it); Spacer(Modifier.height(8.dp)) }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        if (ui.phase == TrainPhase.awaiting) "À vous de jouer" else "Le partenaire réfléchit…",
-                        fontSize = 13.sp, color = Palette.textSecondary,
-                        modifier = Modifier.testTag("consigne"),
-                    )
-                    Spacer(Modifier.weight(1f))
-                    TextButton(
-                        onClick = model::showHint,
-                        enabled = ui.phase == TrainPhase.awaiting,
-                        modifier = Modifier.testTag("indice"),
-                    ) {
-                        Icon(Icons.Default.Lightbulb, null, Modifier.size(16.dp), tint = Palette.textSecondary)
-                        Spacer(Modifier.width(4.dp))
-                        Text("Indice", color = Palette.textSecondary)
-                    }
-                }
-            }
-        }
-
-        if (ui.playedSans.isNotEmpty()) {
+    BoardScaffold(
+        header = {
+            Header(ui)
             Spacer(Modifier.height(10.dp))
-            Text(
-                ui.playedSans.chunked(2).mapIndexed { i, pair -> "${i + 1}. ${pair.joinToString(" ")}" }
-                    .joinToString("  "),
-                fontSize = 12.sp, color = Palette.textSecondary,
-                modifier = Modifier.testTag("coups-joues"),
+        },
+        board = {
+            BoardView(
+                position = ui.position,
+                orientation = ui.orientation,
+                selected = ui.selected,
+                legalTargets = ui.legalTargets,
+                lastMove = ui.lastMove,
+                checkedKing = ui.checkedKing,
+                hint = ui.hint,
+                enabled = ui.phase == TrainPhase.awaiting,
+                onSquareTap = model::tap,
             )
-        }
-        Spacer(Modifier.height(24.dp))
-    }
+        },
+        panel = {
+            Spacer(Modifier.height(12.dp))
+            when (ui.phase) {
+                TrainPhase.wrong -> Panel(Palette.danger) {
+                    Text("Ce n'était pas le coup du répertoire.", color = Palette.textPrimary, fontSize = 13.sp)
+                    Text(
+                        "La suite est ${ui.wrongCorrect ?: "—"}.",
+                        color = Palette.danger, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.testTag("bon-coup"),
+                    )
+                    ui.comment?.let { Spacer(Modifier.height(4.dp)); Comment(it) }
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = model::continueAfterWrong, modifier = Modifier.testTag("continuer")) {
+                        Text("Jouer ${ui.wrongCorrect ?: ""} et continuer")
+                    }
+                }
+
+                TrainPhase.variation -> Panel(Palette.info) {
+                    Text(
+                        "${ui.variationPlayed} est au répertoire, mais la ligne principale est ${ui.variationMain}.",
+                        color = Palette.textPrimary, fontSize = 13.sp,
+                        modifier = Modifier.testTag("variante"),
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Button(onClick = model::playVariation, modifier = Modifier.testTag("jouer-variante")) {
+                            Text("Jouer ${ui.variationPlayed}")
+                        }
+                        OutlinedButton(onClick = model::keepMainLine, modifier = Modifier.testTag("rester-principale")) {
+                            Text("Rester sur ${ui.variationMain}")
+                        }
+                    }
+                }
+
+                TrainPhase.complete -> Panel(Palette.accent) {
+                    Text("Séance terminée", color = Palette.accent, fontWeight = FontWeight.SemiBold,
+                        modifier = Modifier.testTag("seance-terminee"))
+                    Text(
+                        "${ui.correct} coup${if (ui.correct > 1) "s" else ""} juste${if (ui.correct > 1) "s" else ""} " +
+                            "sur ${ui.reviewed} révisé${if (ui.reviewed > 1) "s" else ""}.",
+                        fontSize = 13.sp, color = Palette.textSecondary,
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Button(onClick = model::restart, modifier = Modifier.testTag("recommencer")) { Text("Recommencer") }
+                }
+
+                else -> {
+                    ui.note?.let {
+                        Text(
+                            it, fontSize = 13.sp, color = Palette.info,
+                            modifier = Modifier.testTag("note"),
+                        )
+                        Spacer(Modifier.height(6.dp))
+                    }
+                    ui.comment?.let { Comment(it); Spacer(Modifier.height(8.dp)) }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            if (ui.phase == TrainPhase.awaiting) "À vous de jouer" else "Le partenaire réfléchit…",
+                            fontSize = 13.sp, color = Palette.textSecondary,
+                            modifier = Modifier.testTag("consigne"),
+                        )
+                        Spacer(Modifier.weight(1f))
+                        TextButton(
+                            onClick = model::showHint,
+                            enabled = ui.phase == TrainPhase.awaiting,
+                            modifier = Modifier.testTag("indice"),
+                        ) {
+                            Icon(Icons.Default.Lightbulb, null, Modifier.size(16.dp), tint = Palette.textSecondary)
+                            Spacer(Modifier.width(4.dp))
+                            Text("Indice", color = Palette.textSecondary)
+                        }
+                    }
+                }
+            }
+
+            if (ui.playedSans.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    ui.playedSans.chunked(2).mapIndexed { i, pair -> "${i + 1}. ${pair.joinToString(" ")}" }
+                        .joinToString("  "),
+                    fontSize = 12.sp, color = Palette.textSecondary,
+                    modifier = Modifier.testTag("coups-joues"),
+                )
+            }
+        },
+    )
 
     if (ui.pendingPromotion != null) PromotionDialog(model::completePromotion)
 }

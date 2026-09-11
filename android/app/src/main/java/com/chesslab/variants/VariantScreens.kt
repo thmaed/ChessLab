@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
@@ -52,35 +53,36 @@ fun VariantPlayScreen(variantId: String, model: VariantPlayViewModel = viewModel
     LaunchedEffect(variantId) { model.load(variantId) }
     val ui = model.ui
 
-    Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
-    ) {
-        ui.variant?.let {
-            Text(it.blurb, fontSize = 11.sp, color = Palette.textTertiary)
-            Spacer(Modifier.height(6.dp))
-        }
-        StatusRow(ui.status, busy = ui.thinking)
-        Spacer(Modifier.height(8.dp))
-
-        BoardView(
-            position = ui.position,
-            selected = ui.selected,
-            legalTargets = ui.legalTargets,
-            lastMove = ui.lastMove,
-            checkedKing = ui.checkedKing,
-            enabled = ui.ready && !ui.thinking && !ui.gameOver,
-            onSquareTap = model::onSquareTap,
-        )
-
-        Spacer(Modifier.height(10.dp))
-        Text(
-            "${ui.uciLog.size} demi-coup" + (if (ui.uciLog.size > 1) "s" else ""),
-            fontSize = 11.sp, color = Palette.textTertiary,
-            modifier = Modifier.testTag("compteur"),
-        )
-        TextButton(onClick = model::newGame, modifier = Modifier.testTag("nouvelle")) {
-            Text("Nouvelle partie", color = Palette.accent)
-        }
-        Spacer(Modifier.height(24.dp))
-    }
+    BoardScaffold(
+        header = {
+            ui.variant?.let {
+                Text(it.blurb, fontSize = 11.sp, color = Palette.textTertiary)
+                Spacer(Modifier.height(6.dp))
+            }
+            StatusRow(ui.status, busy = ui.thinking)
+            Spacer(Modifier.height(8.dp))
+        },
+        board = {
+            BoardView(
+                position = ui.position,
+                selected = ui.selected,
+                legalTargets = ui.legalTargets,
+                lastMove = ui.lastMove,
+                checkedKing = ui.checkedKing,
+                enabled = ui.ready && !ui.thinking && !ui.gameOver,
+                onSquareTap = model::onSquareTap,
+            )
+        },
+        panel = {
+            Spacer(Modifier.height(10.dp))
+            Text(
+                "${ui.uciLog.size} demi-coup" + (if (ui.uciLog.size > 1) "s" else ""),
+                fontSize = 11.sp, color = Palette.textTertiary,
+                modifier = Modifier.testTag("compteur"),
+            )
+            TextButton(onClick = model::newGame, modifier = Modifier.testTag("nouvelle")) {
+                Text("Nouvelle partie", color = Palette.accent)
+            }
+        },
+    )
 }

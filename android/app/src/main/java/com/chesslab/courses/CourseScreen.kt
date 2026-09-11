@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import chesskit.FenParser
 import chesskit.Position
+import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
 import kotlinx.coroutines.Dispatchers
@@ -74,81 +75,80 @@ fun CourseScreen(courseId: String, onTrain: (id: String, name: String) -> Unit =
     }
     val options = loaded.positions[CourseRepository.fenKey(fen)].orEmpty()
 
-    Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text(loaded.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
-                if (loaded.summary.isNotEmpty() && index == 0) {
-                    Spacer(Modifier.height(4.dp))
-                    Text(loaded.summary, fontSize = 12.sp, color = Palette.textSecondary)
+    BoardScaffold(
+        header = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text(loaded.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+                    if (loaded.summary.isNotEmpty() && index == 0) {
+                        Spacer(Modifier.height(4.dp))
+                        Text(loaded.summary, fontSize = 12.sp, color = Palette.textSecondary)
+                    }
+                }
+                Spacer(Modifier.width(8.dp))
+                // LIRE puis ENTRAÎNER : le bouton est là où la lecture se termine,
+                // pas caché dans un menu.
+                FilledTonalButton(
+                    onClick = { onTrain(loaded.id, loaded.name) },
+                    modifier = Modifier.testTag("entrainer"),
+                ) { Text("Entraîner", fontSize = 13.sp) }
+            }
+
+            Spacer(Modifier.height(10.dp))
+            ChapterChips(loaded.chapters, chapter) { chapter = it; step = 0 }
+            Spacer(Modifier.height(10.dp))
+        },
+        board = { BoardView(position = position, enabled = false) },
+        panel = {
+            Spacer(Modifier.height(8.dp))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(onClick = { step = (index - 1).coerceAtLeast(0) }, modifier = Modifier.testTag("precedent")) {
+                    Icon(Icons.Default.ChevronLeft, "Position précédente", tint = Palette.textPrimary)
+                }
+                Text(
+                    "${index + 1} / ${fens.size}",
+                    fontSize = 12.sp, color = Palette.textTertiary,
+                    modifier = Modifier.testTag("progression"),
+                )
+                IconButton(onClick = { step = (index + 1).coerceAtMost(fens.lastIndex) }, modifier = Modifier.testTag("suivant")) {
+                    Icon(Icons.Default.ChevronRight, "Position suivante", tint = Palette.textPrimary)
+                }
+                Spacer(Modifier.weight(1f))
+                incoming?.let {
+                    Text(it.san, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent)
                 }
             }
-            Spacer(Modifier.width(8.dp))
-            // LIRE puis ENTRAÎNER : le bouton est là où la lecture se termine,
-            // pas caché dans un menu.
-            FilledTonalButton(
-                onClick = { onTrain(loaded.id, loaded.name) },
-                modifier = Modifier.testTag("entrainer"),
-            ) { Text("Entraîner", fontSize = 13.sp) }
-        }
 
-        Spacer(Modifier.height(10.dp))
-        ChapterChips(loaded.chapters, chapter) { chapter = it; step = 0 }
-
-        Spacer(Modifier.height(10.dp))
-        BoardView(position = position, enabled = false)
-
-        Spacer(Modifier.height(8.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            IconButton(onClick = { step = (index - 1).coerceAtLeast(0) }, modifier = Modifier.testTag("precedent")) {
-                Icon(Icons.Default.ChevronLeft, "Position précédente", tint = Palette.textPrimary)
+            incoming?.comment?.let { comment ->
+                Spacer(Modifier.height(6.dp))
+                Text(
+                    comment,
+                    fontSize = 13.sp, color = Palette.textPrimary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Palette.surface)
+                        .padding(12.dp)
+                        .testTag("commentaire"),
+                )
             }
-            Text(
-                "${index + 1} / ${fens.size}",
-                fontSize = 12.sp, color = Palette.textTertiary,
-                modifier = Modifier.testTag("progression"),
-            )
-            IconButton(onClick = { step = (index + 1).coerceAtMost(fens.lastIndex) }, modifier = Modifier.testTag("suivant")) {
-                Icon(Icons.Default.ChevronRight, "Position suivante", tint = Palette.textPrimary)
-            }
-            Spacer(Modifier.weight(1f))
-            incoming?.let {
-                Text(it.san, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent)
-            }
-        }
 
-        incoming?.comment?.let { comment ->
-            Spacer(Modifier.height(6.dp))
-            Text(
-                comment,
-                fontSize = 13.sp, color = Palette.textPrimary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Palette.surface)
-                    .padding(12.dp)
-                    .testTag("commentaire"),
-            )
-        }
-
-        if (options.isNotEmpty()) {
-            Spacer(Modifier.height(10.dp))
-            Text("Suites possibles", fontSize = 12.sp, color = Palette.textTertiary)
-            Spacer(Modifier.height(4.dp))
-            options.sortedByDescending { it.popularity ?: 0.0 }.take(6).forEach { move ->
-                MoveRow(move) {
-                    // suivre une suite revient à avancer si elle est sur la ligne
-                    val next = fens.getOrNull(index + 1)
-                    if (next != null && CourseRepository.fenKey(next) == CourseRepository.fenKey(move.toFEN)) {
-                        step = index + 1
+            if (options.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                Text("Suites possibles", fontSize = 12.sp, color = Palette.textTertiary)
+                Spacer(Modifier.height(4.dp))
+                options.sortedByDescending { it.popularity ?: 0.0 }.take(6).forEach { move ->
+                    MoveRow(move) {
+                        // suivre une suite revient à avancer si elle est sur la ligne
+                        val next = fens.getOrNull(index + 1)
+                        if (next != null && CourseRepository.fenKey(next) == CourseRepository.fenKey(move.toFEN)) {
+                            step = index + 1
+                        }
                     }
                 }
             }
-        }
-        Spacer(Modifier.height(24.dp))
-    }
+        },
+    )
 }
 
 @Composable

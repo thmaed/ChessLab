@@ -274,4 +274,31 @@ class AppTest {
         compose.onNodeWithTag("retour").performClick()
         compose.onNodeWithTag("mode-Analyser").assertIsDisplayed()
     }
+
+    @Test fun leJeuResteJouableEnPaysage() {
+        open("Deux joueurs")
+        awaitText("Aux blancs de jouer")
+
+        compose.activityRule.scenario.onActivity {
+            it.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        }
+        compose.waitForIdle()
+
+        // Couché, le plateau doit rester ENTIER et cliquable : c'était le
+        // défaut — le panneau mangeait la hauteur et seule la 8e rangée
+        // restait visible.
+        compose.onNodeWithTag("case-a1").assertIsDisplayed()
+        compose.onNodeWithTag("case-h8").assertIsDisplayed()
+        compose.onNodeWithTag("case-d2").performClick()
+        compose.onNodeWithTag("case-d4").performClick()
+        awaitText("Aux noirs de jouer")
+
+        compose.activityRule.scenario.onActivity {
+            it.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+        }
+        compose.waitForIdle()
+        // Le coup survit à la rotation : l'activité ne se recrée pas.
+        awaitText("Aux noirs de jouer")
+        compose.onNodeWithTag("case-a1").assertIsDisplayed()
+    }
 }
