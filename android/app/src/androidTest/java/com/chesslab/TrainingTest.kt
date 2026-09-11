@@ -194,6 +194,26 @@ class TrainingTest {
         awaitText("À vous de jouer")
     }
 
+    @Test fun laProgressionRendCompteDeLaMemorisation() {
+        openDailyOnItalian()
+        play("a2", "a3"); awaitTag("bon-coup")
+        compose.onNodeWithTag("continuer").performClick()
+        awaitText("1. e4 e5")
+        play("g1", "f3"); awaitText("2. Nf3 Nc6")
+        compose.waitUntil(20_000) { runBlocking { dao.studiedCount() == 2 } }
+
+        compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        awaitTag("progression")
+        compose.onNodeWithTag("progression").performClick()
+
+        awaitText("Mémorisation")
+        // Deux positions vues, une ratée : c'est ce que l'écran doit dire, et
+        // aucune n'est encore due, donc il annonce la prochaine échéance.
+        awaitText("à consolider")
+        compose.onNodeWithTag("prochaine-revision").assertIsDisplayed()
+    }
+
     private companion object {
         const val FsrsAgain = 1
         const val FsrsGood = 3

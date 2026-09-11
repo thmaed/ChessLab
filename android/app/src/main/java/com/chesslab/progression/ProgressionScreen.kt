@@ -6,10 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +32,11 @@ fun ProgressionScreen() {
     val context = LocalContext.current
     val games by remember { LibraryDatabase.get(context).games().all() }.collectAsState(initial = emptyList())
     val puzzles by remember { StatsStore.puzzles(context) }.collectAsState(initial = null)
+
+    // La mémorisation. Relue à l'ouverture de l'écran : ces chiffres ne
+    // bougent qu'à la fin d'une séance, pas en continu.
+    var training by remember { mutableStateOf<TrainingStats?>(null) }
+    LaunchedEffect(Unit) { training = TrainingStats.read(context) }
 
     val wins = games.count { (it.result == "1-0" && it.white == "Vous") || (it.result == "0-1" && it.black == "Vous") }
     val losses = games.count { (it.result == "0-1" && it.white == "Vous") || (it.result == "1-0" && it.black == "Vous") }
@@ -73,6 +75,29 @@ fun ProgressionScreen() {
                 Stat("${stats.attempted}", "tentés", Palette.textPrimary, Modifier.weight(1f))
                 Stat("${stats.solved}", "résolus", Palette.accent, Modifier.weight(1f))
                 Stat("${stats.rate} %", "de réussite", Palette.violet, Modifier.weight(1f))
+            }
+        }
+
+        Spacer(Modifier.height(20.dp))
+        Section("Mémorisation")
+        val memo = training
+        if (memo == null || memo.studied == 0) {
+            Empty("Aucune position travaillée pour l'instant.")
+        } else {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Stat("${memo.studied}", "positions", Palette.textPrimary, Modifier.weight(1f))
+                Stat("${memo.solid}", "acquises", Palette.accent, Modifier.weight(1f))
+                Stat("${memo.hard}", "à consolider", Palette.danger, Modifier.weight(1f))
+            }
+            Spacer(Modifier.height(8.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Stat("${memo.due}", "à revoir", Palette.warning, Modifier.weight(1f))
+                Stat("${memo.reviewsThisWeek}", "révisions (7 j)", Palette.info, Modifier.weight(1f))
+                Stat(memo.retentionLabel, "de réussite", Palette.violet, Modifier.weight(1f))
+            }
+            memo.nextDueLabel?.let {
+                Spacer(Modifier.height(8.dp))
+                Text(it, fontSize = 11.sp, color = Palette.textTertiary, modifier = Modifier.testTag("prochaine-revision"))
             }
         }
 
