@@ -23,6 +23,9 @@ object Palette {
     val rose = Color(0.96f, 0.46f, 0.62f)
     val gold = Color(0.91f, 0.62f, 0.34f)
 
+    /** `Theme.teal` côté iOS est un alias d'`accentSecondary`. */
+    val teal = accentSecondary
+
     val textPrimary = Color.White.copy(alpha = 0.95f)
     val textSecondary = Color.White.copy(alpha = 0.58f)
     val textTertiary = Color.White.copy(alpha = 0.38f)

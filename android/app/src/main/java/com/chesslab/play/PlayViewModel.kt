@@ -11,7 +11,7 @@ import chesskit.Move
 import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
-import com.chesslab.engine.StockfishEngine
+import com.chesslab.engine.EngineService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -37,7 +37,6 @@ data class PlayUiState(
 class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     private var board = Board()
-    private var engine: StockfishEngine? = null
     private val humanColor = Piece.Color.white
 
     var ui by mutableStateOf(PlayUiState())
@@ -46,20 +45,10 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     init { startEngine() }
 
     private fun startEngine() = viewModelScope.launch {
-        val ok = withContext(Dispatchers.IO) {
-            val assets = getApplication<Application>().assets
-            val nets = assets.list("")!!.filter { it.endsWith(".nnue") }
-            val path = StockfishEngine.prepare(
-                nets, getApplication<Application>().filesDir,
-            ) { assets.open(it) }
-            val e = StockfishEngine(path)
-            if (!e.start()) return@withContext null
-            val threads = (Runtime.getRuntime().availableProcessors() - 1).coerceIn(1, 4)
-            if (e.handshake(threads, hashMb = 64) == null) return@withContext null
-            e
+        val identity = withContext(Dispatchers.IO) {
+            EngineService.use(getApplication()) { EngineService.identity }
         }
-        engine = ok
-        refresh(if (ok == null) "Moteur indisponible" else "À vous de jouer")
+        refresh(if (identity == null) "Moteur indisponible" else "À vous de jouer")
     }
 
     fun onSquareTap(square: Square) {
@@ -103,12 +92,12 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun askEngine() = viewModelScope.launch {
-        val e = engine ?: return@launch
         ui = ui.copy(thinking = true, status = "Le moteur réfléchit…")
         val best = withContext(Dispatchers.IO) {
-            e.send("position fen ${board.position.fen}")
-            e.send("go movetime 400")
-            e.awaitLine(20_000) { it.startsWith("bestmove") }
+            EngineService.use(getApplication()) { e ->
+                e.send("position fen ${board.position.fen}")
+                e.search("go movetime 400", timeoutMs = 20_000)
+            }
         }
         ui = ui.copy(thinking = false)
 
@@ -179,8 +168,4 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         ui = PlayUiState(status = "À vous de jouer")
     }
 
-    override fun onCleared() {
-        engine?.stop()
-        super.onCleared()
-    }
 }

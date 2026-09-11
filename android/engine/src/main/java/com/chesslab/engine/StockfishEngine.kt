@@ -2,7 +2,9 @@ package com.chesslab.engine
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -47,6 +49,48 @@ class StockfishEngine(private val binaryPath: String) {
     }
 
     fun send(command: String) = Stockfish.nativeSend(command)
+
+    /**
+     * Jette les lignes en attente.
+     *
+     * Indispensable avant toute nouvelle question : une recherche abandonnée
+     * laisse derrière elle ses `info` et son `bestmove`, et la question
+     * suivante récupérerait la réponse de la PRÉCÉDENTE — un coup calculé pour
+     * une autre position, donc refusé par le plateau.
+     */
+    fun drain() {
+        while (incoming.tryReceive().isSuccess) Unit
+    }
+
+    /**
+     * Une recherche complète, qui laisse TOUJOURS le moteur au repos.
+     *
+     * Si l'appelant est annulé en cours de route (l'utilisateur change
+     * d'écran), le moteur continuerait de chercher et polluerait la question
+     * suivante. On lui envoie donc `stop` et on attend son `bestmove` avant de
+     * rendre la main — c'est ce qui rend le moteur réutilisable sans surprise.
+     */
+    suspend fun search(
+        go: String,
+        timeoutMs: Long,
+        onInfo: (String) -> Unit = {},
+    ): String? {
+        drain()
+        send(go)
+        var settled = false
+        try {
+            val best = awaitLine(timeoutMs, onLine = onInfo) { it.startsWith("bestmove") }
+            settled = best != null
+            return best
+        } finally {
+            if (!settled) {
+                withContext(NonCancellable) {
+                    send("stop")
+                    awaitLine(3_000) { it.startsWith("bestmove") }
+                }
+            }
+        }
+    }
 
     /**
      * Consomme les lignes jusqu'à ce que [predicate] accepte, ou jusqu'au
