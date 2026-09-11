@@ -22,4 +22,7 @@ sealed class Route(val title: String) {
 
     /** Un cours ouvert : ouverture ou finale, même écran. */
     data class CourseReader(val id: String, val name: String) : Route(name)
+
+    /** Une variante en cours de partie. */
+    data class VariantGame(val id: String, val name: String) : Route(name)
 }

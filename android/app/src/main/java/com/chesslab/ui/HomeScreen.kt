@@ -50,7 +50,7 @@ private val modes = listOf(
     Mode(Route.Endgames, "Finales", "Lucena, Philidor, opposition — prouvées", "Fins gagnantes", Icons.Default.EmojiEvents, Palette.gold),
     Mode(Route.Analysis, "Analyser", "PGN, FEN, bibliothèque", "PGN, FEN", Icons.Default.ShowChart, Palette.teal),
     Mode(Route.Laboratory, "Laboratoire", "L'ordinateur contre lui-même", "Face à lui-même", Icons.Default.Science, Palette.rose),
-    Mode(Route.Variants, "Variantes", "Chess960 et autres façons de jouer", "Chess960 et plus", Icons.Default.Casino, Palette.violet, enabled = false),
+    Mode(Route.Variants, "Variantes", "Chess960 et autres façons de jouer", "Chess960 et plus", Icons.Default.Casino, Palette.violet),
 )
 
 @Composable

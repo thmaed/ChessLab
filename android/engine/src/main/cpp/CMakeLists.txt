@@ -77,3 +77,48 @@ target_compile_options(chesslab_engine PRIVATE -O3)
 
 find_library(log-lib log)
 target_link_libraries(chesslab_engine ${log-lib})
+
+# ---------------------------------------------------------------------------
+# Fairy-Stockfish : les variantes (Chess960, Duck, Coup Volé…)
+#
+# Les deux moteurs tiennent dans la MÊME bibliothèque parce qu'ils ne partagent
+# aucun symbole : Stockfish vit dans `namespace Stockfish`, Fairy dans
+# `namespace FairyEngine`, et leurs points d'entrée sont renommés (`_main` et
+# `_fairy_main`). Ils partagent en revanche le `std::cout` du process, que les
+# deux shims détournent — d'où la discipline « un seul moteur à la fois »,
+# tenue côté Kotlin par EngineService.
+
+set(FS_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../Vendor/CFairyStockfish/Sources/CFairyStockfish)
+
+if(EXISTS ${FS_ROOT}/shim.cpp)
+    file(GLOB_RECURSE FS_SOURCES
+        ${FS_ROOT}/fairystockfish/*.cpp
+        ${FS_ROOT}/fairystockfish/nnue/*.cpp
+        ${FS_ROOT}/fairystockfish/nnue/features/*.cpp
+        ${FS_ROOT}/fairystockfish/syzygy/*.cpp
+    )
+
+    add_library(chesslab_fairy SHARED
+        ${FS_SOURCES}
+        ${FS_ROOT}/shim.cpp
+        jni_fairy.cpp
+    )
+
+    target_include_directories(chesslab_fairy PRIVATE
+        ${FS_ROOT}
+        ${FS_ROOT}/include
+        ${FS_ROOT}/fairystockfish
+    )
+
+    target_compile_definitions(chesslab_fairy PRIVATE
+        NNUE_EMBEDDING_OFF
+        NO_PEXT
+        USE_POPCNT
+        USE_NEON=8
+        USE_PTHREADS      # mêmes piles de 8 Mo que Stockfish — voir l'entête
+        NDEBUG
+    )
+
+    target_compile_options(chesslab_fairy PRIVATE -O3)
+    target_link_libraries(chesslab_fairy ${log-lib})
+endif()

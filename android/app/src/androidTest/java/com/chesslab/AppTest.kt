@@ -163,6 +163,29 @@ class AppTest {
         compose.onNodeWithTag("lancer").performClick()   // pause
     }
 
+    @Test fun aVariantIsRefereedByTheEngine() {
+        open("Variantes")
+        compose.onNodeWithTag("variante-kingofthehill").performClick()
+
+        // le moteur doit répondre à `d` et `go perft 1` avant qu'on puisse jouer
+        awaitText("À vous de jouer", 60_000)
+
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+
+        // notre coup, puis celui du moteur : deux demi-coups au compteur
+        compose.waitUntil(90_000) {
+            compose.onAllNodesWithText("2 demi-coups").fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    @Test fun chess960ShufflesTheBackRank() {
+        open("Variantes")
+        compose.onNodeWithTag("variante-chess960").performClick()
+        awaitText("À vous de jouer", 60_000)
+        compose.onNodeWithTag("case-a1").assertIsDisplayed()
+    }
+
     @Test fun backReturnsHome() {
         open("Analyser")
         compose.onNodeWithTag("retour").performClick()

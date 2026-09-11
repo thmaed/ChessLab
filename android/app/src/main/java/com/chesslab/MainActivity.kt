@@ -26,6 +26,9 @@ import com.chesslab.puzzles.PuzzleScreen
 import com.chesslab.settings.SettingsScreen
 import com.chesslab.twoplayer.TwoPlayerScreen
 import com.chesslab.ui.HomeScreen
+import com.chesslab.variants.VariantCatalog
+import com.chesslab.variants.VariantListScreen
+import com.chesslab.variants.VariantPlayScreen
 import com.chesslab.ui.Palette
 
 class MainActivity : ComponentActivity() {
@@ -73,6 +76,10 @@ private fun App() {
             is Route.CourseReader -> CourseScreen(current.id)
             Route.Settings -> SettingsScreen()
             Route.Laboratory -> LabScreen()
+            Route.Variants -> VariantListScreen { id ->
+                stack.add(Route.VariantGame(id, VariantCatalog.byId(id)?.title ?: id))
+            }
+            is Route.VariantGame -> VariantPlayScreen(current.id)
             else -> Placeholder(current.title)
         }
     }
