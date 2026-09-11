@@ -17,6 +17,12 @@ data class Move(
     var assessment: Assessment = Assessment.null_,
     var comment: String = "",
 ) {
+    /** La notation abrégée, celle qui s'affiche. */
+    val san: String get() = SanParser.convert(this)
+
+    /** La notation longue des moteurs UCI. */
+    val lan: String get() = EngineLanParser.convert(this)
+
     sealed class Result {
         data object Move : Result()
         data class Capture(val piece: Piece) : Result()

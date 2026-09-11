@@ -21,6 +21,9 @@ class PuzzleCorpusTest {
     /** Le corpus entier : il passe en quelques secondes, autant tout prendre. */
     private val stride = 1
 
+    /** Un puzzle sur dix pour l'aller-retour SAN, qui coûte une analyse de plus. */
+    private val sanStride = 10
+
     @Test fun everyPuzzleSolutionIsPlayable() {
         assertTrue(corpus.exists(), "corpus introuvable : ${corpus.absolutePath}")
 
@@ -32,6 +35,8 @@ class PuzzleCorpusTest {
         var played = 0
         var promotions = 0
         var examined = 0
+        var lanChecked = 0
+        var sanChecked = 0
 
         for ((index, match) in puzzles.withIndex()) {
             if (index % stride != 0) continue
@@ -49,12 +54,15 @@ class PuzzleCorpusTest {
                 continue
             }
 
+            val checkSan = index % sanStride == 0
             val board = Board(position)
+
             for (lan in lans) {
                 val start = Square(lan.substring(0, 2))
                 val end = Square(lan.substring(2, 4))
-                val move = board.move(pieceAt = start, to = end)
+                val before = if (checkSan) board.position.copy() else null
 
+                var move = board.move(pieceAt = start, to = end)
                 if (move == null) {
                     if (failures.size < 10) failures += "coup refusé $lan dans $fen"
                     break
@@ -68,14 +76,41 @@ class PuzzleCorpusTest {
                         'b' -> Piece.Kind.bishop
                         else -> Piece.Kind.knight
                     }
-                    board.completePromotion(of = move, to = kind)
+                    move = board.completePromotion(of = move, to = kind)
                     promotions++
+                }
+
+                // Vérité terrain : le LAN rendu doit être CELUI de Lichess.
+                lanChecked++
+                if (move.lan != lan && failures.size < 10) {
+                    failures += "LAN rendu ${move.lan} au lieu de $lan dans $fen"
+                }
+
+                // Aller-retour SAN : ce qu'on écrit doit se relire, et rendre
+                // le même coup dans la même position.
+                if (before != null) {
+                    sanChecked++
+                    val san = move.san
+                    val reparsed = SanParser.parse(san, before)
+                    if (reparsed == null) {
+                        if (failures.size < 10) failures += "SAN illisible « $san » ($lan dans ${before.fen})"
+                    } else if (reparsed.start != move.start || reparsed.end != move.end ||
+                        reparsed.promotedPiece?.kind != move.promotedPiece?.kind
+                    ) {
+                        if (failures.size < 10) {
+                            failures += "SAN « $san » relu en ${reparsed.start.notation}${reparsed.end.notation}" +
+                                " au lieu de $lan (dans ${before.fen})"
+                        }
+                    }
                 }
             }
         }
 
-        println("puzzles : $examined examinés sur ${puzzles.size}, $played coups joués " +
-            "(dont $promotions promotions), ${failures.size} refus")
+        println(
+            "puzzles : $examined examinés, $played coups joués (dont $promotions promotions), " +
+                "$lanChecked LAN comparés à Lichess, $sanChecked aller-retours SAN, " +
+                "${failures.size} écart(s)"
+        )
 
         if (failures.isNotEmpty()) {
             fail("${failures.size} refus :\n" + failures.joinToString("\n"))

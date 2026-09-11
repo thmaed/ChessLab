@@ -4,9 +4,12 @@ Volet D du dérisquage du portage Android (voir `tools/android-spike/`).
 Il ne porte pas sur une conversion de modèle mais sur la **dépendance la plus
 transversale de l'app** : `ChessKit`, importé par 126 des 443 fichiers Swift.
 
-**État : les règles du jeu sont portées et prouvées.** Perft exact sur cinq
-positions de référence, et 416 520 coups de vraies parties rejoués sans un
-seul refus.
+**État : les règles du jeu ET la notation sont portées et prouvées.** Perft
+exact sur cinq positions de référence, 416 520 coups de vraies parties rejoués
+sans un refus, et autant de notations moteur comparées à celles de Lichess.
+
+Au passage, le corpus a révélé **trois bugs dans ChessKit lui-même**, dont un
+qui affecte l'app iOS aujourd'hui — voir « Trois bugs d'amont » plus bas.
 
 ## Le constat qui change la stratégie
 
@@ -42,11 +45,13 @@ devient la recette du port.
 | `FenParser.kt` | 95 | lecture et écriture du FEN |
 | `Square.kt` | 88 | case, colonne, rangée |
 | `Bitboard.kt` | 52 | translations sur la grille 8×8 |
-| `Piece.kt` / `Move.kt` | 88 | pièce, coup, annotations |
-| **total** | **1 203** | |
+| `SanParser.kt` | 160 | notation abrégée, celle qui s'affiche |
+| `EngineLanParser.kt` | 60 | notation longue des moteurs UCI |
+| `Piece.kt` / `Move.kt` | 94 | pièce, coup, annotations |
+| **total** | **1 423** | |
 
-Reste de ChessKit : `SANParser`, `EngineLANParser`, `MoveTree`, `Game` et
-`PGNParser` — la notation et l'arbre de variantes, pas les règles.
+Reste de ChessKit : `MoveTree`, `Game` et `PGNParser` — l'arbre de variantes
+et le format de partie, ni les règles ni la notation.
 
 ## Ce que ça prouve
 
@@ -77,11 +82,42 @@ d'un échec ou de prise en passant.
 
 > corpus : 106094 positions, 106094 lues, 0 écart(s) relevé(s)
 >
-> puzzles : 106094 examinés, **416520 coups joués** (dont 3054 promotions), **0 refus**
+> puzzles : 106094 examinés, **416520 coups joués** (dont 3054 promotions),
+> **416520 LAN comparés à Lichess**, 41616 aller-retours SAN, **0 écart**
 
-Aller-retour FEN exact sur les 106 094 positions embarquées par l'app, puis
-toutes les solutions de tous les puzzles rejouées sur le plateau porté. Aucune
-de ces positions n'a été choisie pour arranger le portage.
+Trois épreuves sur les mêmes données, dont une à **vérité terrain** :
+
+1. aller-retour FEN sur les 106 094 positions embarquées par l'app ;
+2. toutes les solutions de tous les puzzles rejouées sur le plateau porté ;
+3. la notation moteur de chaque coup comparée à celle écrite par Lichess —
+   ce n'est plus de la cohérence interne, c'est un arbitre extérieur ;
+4. et un puzzle sur dix en aller-retour SAN : ce qu'on écrit doit se relire et
+   rendre le même coup.
+
+Aucune de ces positions n'a été choisie pour arranger le portage.
+
+## Trois bugs d'amont
+
+Le corpus n'a trouvé **aucune erreur de traduction**. Il a trouvé trois bugs
+dans ChessKit, fidèlement reproduits par le port, puis corrigés :
+
+1. **`O-O+` était rejeté.** Le motif de validation oublie `[+#]?` sur la
+   branche du roque, alors que le motif du roque l'accepte. Un roque donnant
+   échec était donc illisible.
+2. **La désambiguïsation était perdue sur les prises.** Le motif n'autorise
+   pas le `x` entre l'indication et la case d'arrivée : « R4xf3 » perdait son
+   « 4 » et se relisait sur la mauvaise tour.
+3. **Un SAN ambigu pouvait être écrit.** `disambiguate` interroge les pièces
+   concurrentes sur la position d'AVANT le coup, mais leur validation se fait
+   contre la position COURANTE — déjà modifiée. La case libérée ouvre une
+   ligne, la pièce concurrente passe pour clouée, et le coup sort sans
+   indication. Sur `4r1k1/p4p1p/2p2p2/1pb2B2/3RP3/4R3/PP4PP/6K1 w`, les deux
+   tours peuvent aller en d3 et ChessKit écrit « Rd3 ».
+
+**Le troisième touche l'app iOS aujourd'hui** : `PGNExport` délègue à
+`Game`, dont la sérialisation écrit `move.san` (`PGNParser.swift:132`). Un PGN
+exporté depuis ChessLab peut donc contenir un coup que personne ne saura
+relire — y compris ChessLab. À traiter côté Swift, indépendamment d'Android.
 
 ## Les écarts assumés
 
@@ -109,15 +145,14 @@ Quatre, tous documentés dans le code :
 
 | Fichier ChessKit | lignes Swift |
 | --- | --- |
-| `Parsers/PGNParser/` (4 fichiers) | 922 |
+| `Parsers/PGNParser/` (4 fichiers, dont 270 dépréciées) | 922 |
 | `MoveTree/MoveTree.swift` (arbre de variantes) | 430 |
 | `Game.swift` | 407 |
-| `Parsers/SANParser.swift` | 265 |
-| `Parsers/EngineLANParser.swift` | 123 |
-| **total** | **2 147** |
+| **total** | **1 759** |
 
-Il ne reste que la notation et l'arbre de parties — **les règles du jeu sont
-faites et prouvées**. À vue de nez, 1 500 à 2 000 lignes de Kotlin de plus.
+Les règles ET la notation sont faites. Il ne reste que l'arbre de variantes et
+le format de partie — de la structure de données et de l'analyse lexicale, sans
+règle du jeu. À vue de nez, 800 à 1 200 lignes de Kotlin.
 
 ## Rejouer
 

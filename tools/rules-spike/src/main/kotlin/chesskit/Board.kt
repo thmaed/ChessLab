@@ -223,11 +223,21 @@ class Board(position: Position = Position.standard) {
         }
 
         val pseudoLegal = attacks and set.get(piece.color).inv()
-        return pseudoLegal.squares.filter { validate(piece, it) }.bb
+        return pseudoLegal.squares.filter { validate(piece, it, set) }.bb
     }
 
-    /** Le coup laisse-t-il son propre roi hors d'échec ? */
-    private fun validate(piece: Piece, to: Square): Boolean {
+    /**
+     * Le coup laisse-t-il son propre roi hors d'échec ?
+     *
+     * CORRIGÉ : l'original valide toujours contre la position COURANTE, même
+     * quand `disambiguate` l'interroge sur la position d'AVANT le coup. La
+     * case libérée par le coup ouvrait alors une ligne, la pièce concurrente
+     * passait pour clouée, et le SAN sortait sans indication — donc ambigu.
+     * Constaté sur `4r1k1/p4p1p/2p2p2/1pb2B2/3RP3/4R3/PP4PP/6K1 w`, où les
+     * deux tours peuvent aller en d3 et où l'original écrit « Rd3 ».
+     * Le jeu de pièces est désormais passé explicitement.
+     */
+    private fun validate(piece: Piece, to: Square, set: PieceSet = this.set): Boolean {
         val testSet = set.copy()
         testSet.remove(piece)
         testSet.add(piece.copy(square = to))
