@@ -24,6 +24,12 @@ sealed class Route(val title: String) {
     data object Scanner : Route("Scanner un échiquier")
     data object PositionEditor : Route("Éditeur de position")
 
+    /**
+     * Une séance d'entraînement. [courseId] n'est rempli que pour « une
+     * ligne » ; sinon la séance est quotidienne ou ciblée sur les difficiles.
+     */
+    data class Train(val kind: String, val courseId: String? = null, val label: String = "Entraînement") : Route(label)
+
     /** Un cours ouvert : ouverture ou finale, même écran. */
     data class CourseReader(val id: String, val name: String) : Route(name)
 

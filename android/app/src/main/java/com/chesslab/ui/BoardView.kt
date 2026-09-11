@@ -44,6 +44,8 @@ fun BoardView(
     legalTargets: Set<Square> = emptySet(),
     lastMove: Pair<Square, Square>? = null,
     checkedKing: Square? = null,
+    /** Les deux cases d'un coup soufflé : l'entraînement allume la réponse. */
+    hint: Pair<Square, Square>? = null,
     enabled: Boolean = true,
     onSquareTap: (Square) -> Unit = {},
 ) {
@@ -77,6 +79,7 @@ fun BoardView(
                         isLegalTarget = square in legalTargets,
                         isLastMove = lastMove?.let { square == it.first || square == it.second } == true,
                         isChecked = square == checkedKing,
+                        isHint = hint?.let { square == it.first || square == it.second } == true,
                         showFile = rank == ranks.last,
                         showRank = file == files.first,
                         modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -98,6 +101,7 @@ private fun SquareCell(
     isLegalTarget: Boolean,
     isLastMove: Boolean,
     isChecked: Boolean,
+    isHint: Boolean,
     showFile: Boolean,
     showRank: Boolean,
     modifier: Modifier,
@@ -107,6 +111,11 @@ private fun SquareCell(
     val base = if (isLight) theme.lightSquare else theme.darkSquare
     val background = when {
         isChecked -> theme.checkColor
+        // L'indice passe AVANT la sélection : il répond à une question posée,
+        // la sélection n'est qu'un état de la main. Violet plutôt que vert :
+        // sur un damier vert, le vert de l'accent se fondait dans les cases
+        // sombres, et l'ambre est déjà pris par le dernier coup.
+        isHint -> Palette.violet.copy(alpha = 0.60f).compositeOver(base)
         isSelected -> theme.selectedColor.compositeOver(base)
         isLastMove -> (if (isLight) theme.lastMoveLight else theme.lastMoveDark).compositeOver(base)
         else -> base

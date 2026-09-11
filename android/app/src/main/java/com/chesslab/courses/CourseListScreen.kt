@@ -28,12 +28,24 @@ import kotlinx.coroutines.withContext
  * le même format de cours, donc le même écran.
  */
 @Composable
-fun CourseListScreen(endgames: Boolean, onOpen: (String) -> Unit) {
+fun CourseListScreen(
+    endgames: Boolean,
+    onTrain: (kind: String) -> Unit = {},
+    onOpen: (String) -> Unit,
+) {
     val context = LocalContext.current
     var entries by remember { mutableStateOf<List<CatalogEntry>?>(null) }
     var query by remember { mutableStateOf("") }
 
+    var due by remember { mutableStateOf(0) }
+    var hard by remember { mutableStateOf(0) }
+
     LaunchedEffect(endgames) {
+        val dao = com.chesslab.library.LibraryDatabase.get(context).training()
+        val all = withContext(Dispatchers.IO) { dao.allProgress() }
+        val now = System.currentTimeMillis()
+        due = all.count { it.dueAt != null && it.dueAt <= now }
+        hard = all.count { com.chesslab.training.TrainingQueue.isHard(it.snapshot) }
         entries = withContext(Dispatchers.IO) {
             runCatching { CourseRepository.catalog(context.assets) }
                 .getOrDefault(emptyList())
@@ -53,6 +65,22 @@ fun CourseListScreen(endgames: Boolean, onOpen: (String) -> Unit) {
         )
         Spacer(Modifier.height(8.dp))
 
+        // Les deux séances, au-dessus de la liste : réviser précède choisir.
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            SessionChip(
+                // « rien pour l'instant » mentait : sans échéance en retard, la
+                // séance sert quand même des positions NEUVES. C'est ce qu'elle
+                // fera qu'il faut annoncer, pas l'état de la base.
+                "Révisions du jour", if (due > 0) "$due à revoir" else "de nouvelles positions",
+                Palette.warning, "seance-quotidienne", Modifier.weight(1f),
+            ) { onTrain("daily") }
+            SessionChip(
+                "Positions difficiles", if (hard > 0) "$hard à consolider" else "aucune",
+                Palette.danger, "seance-difficiles", Modifier.weight(1f),
+            ) { onTrain("hardest") }
+        }
+        Spacer(Modifier.height(10.dp))
+
         if (list == null) {
             Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator(color = Palette.accent) }
             return@Column
@@ -70,6 +98,24 @@ fun CourseListScreen(endgames: Boolean, onOpen: (String) -> Unit) {
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(filtered) { entry -> CourseRow(entry, onOpen) }
         }
+    }
+}
+
+@Composable
+private fun SessionChip(
+    title: String, subtitle: String, tint: androidx.compose.ui.graphics.Color,
+    tag: String, modifier: Modifier, onClick: () -> Unit,
+) {
+    Column(
+        modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(tint.copy(alpha = 0.12f))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 12.dp, vertical = 10.dp)
+            .testTag(tag),
+    ) {
+        Text(title, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = tint)
+        Text(subtitle, fontSize = 11.sp, color = Palette.textSecondary)
     }
 }
 

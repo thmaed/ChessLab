@@ -34,7 +34,7 @@ import kotlinx.coroutines.withContext
  * Pendant réduit d'`OpeningReaderView` / `EndgameReaderView`.
  */
 @Composable
-fun CourseScreen(courseId: String) {
+fun CourseScreen(courseId: String, onTrain: (id: String, name: String) -> Unit = { _, _ -> }) {
     val context = LocalContext.current
     var course by remember(courseId) { mutableStateOf<Course?>(null) }
     var chapter by remember(courseId) { mutableStateOf(0) }
@@ -77,10 +77,21 @@ fun CourseScreen(courseId: String) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
     ) {
-        Text(loaded.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
-        if (loaded.summary.isNotEmpty() && index == 0) {
-            Spacer(Modifier.height(4.dp))
-            Text(loaded.summary, fontSize = 12.sp, color = Palette.textSecondary)
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text(loaded.name, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+                if (loaded.summary.isNotEmpty() && index == 0) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(loaded.summary, fontSize = 12.sp, color = Palette.textSecondary)
+                }
+            }
+            Spacer(Modifier.width(8.dp))
+            // LIRE puis ENTRAÎNER : le bouton est là où la lecture se termine,
+            // pas caché dans un menu.
+            FilledTonalButton(
+                onClick = { onTrain(loaded.id, loaded.name) },
+                modifier = Modifier.testTag("entrainer"),
+            ) { Text("Entraîner", fontSize = 13.sp) }
         }
 
         Spacer(Modifier.height(10.dp))

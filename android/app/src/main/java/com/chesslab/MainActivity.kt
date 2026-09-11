@@ -22,6 +22,8 @@ import com.chesslab.play.PlayScreen
 import com.chesslab.courses.CourseListScreen
 import com.chesslab.courses.CourseRepository
 import com.chesslab.courses.CourseScreen
+import com.chesslab.training.TrainMode
+import com.chesslab.training.TrainScreen
 import com.chesslab.editor.PositionEditorScreen
 import com.chesslab.help.HelpScreen
 import com.chesslab.progression.ProgressionScreen
@@ -75,9 +77,24 @@ private fun App() {
             Route.TwoPlayer -> TwoPlayerScreen()
             is Route.Analysis -> AnalysisScreen(initialFen = current.fen)
             Route.Puzzles -> PuzzleScreen()
-            Route.Openings -> CourseListScreen(endgames = false) { stack.add(reader(it)) }
-            Route.Endgames -> CourseListScreen(endgames = true) { stack.add(reader(it)) }
-            is Route.CourseReader -> CourseScreen(current.id)
+            Route.Openings -> CourseListScreen(
+                endgames = false,
+                onTrain = { kind -> stack.add(trainRoute(kind)) },
+            ) { stack.add(reader(it)) }
+            Route.Endgames -> CourseListScreen(
+                endgames = true,
+                onTrain = { kind -> stack.add(trainRoute(kind)) },
+            ) { stack.add(reader(it)) }
+            is Route.CourseReader -> CourseScreen(current.id) { id, name ->
+                stack.add(Route.Train("line", id, "Entraîner : $name"))
+            }
+            is Route.Train -> TrainScreen(
+                when (current.kind) {
+                    "line" -> TrainMode.FullLine(current.courseId ?: "")
+                    "hardest" -> TrainMode.Hardest
+                    else -> TrainMode.Daily
+                }
+            )
             Route.Settings -> SettingsScreen()
             Route.Scanner -> ScannerScreen { fen -> stack.add(Route.Analysis(fen)) }
             Route.Progression -> ProgressionScreen()
@@ -94,6 +111,11 @@ private fun App() {
 }
 
 /** Le titre d'un cours vient du catalogue : la liste l'a déjà en mémoire. */
+private fun trainRoute(kind: String): Route.Train = Route.Train(
+    kind,
+    label = if (kind == "hardest") "Positions difficiles" else "Révisions du jour",
+)
+
 private fun reader(id: String): Route.CourseReader =
     Route.CourseReader(id, CourseRepository.cachedName(id) ?: id)
 

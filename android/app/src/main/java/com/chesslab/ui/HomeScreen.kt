@@ -17,12 +17,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.chesslab.library.LibraryDatabase
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,6 +63,16 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
     val context = LocalContext.current
     val autosaves by remember { LibraryDatabase.get(context).autosaves().all() }
         .collectAsState(initial = emptyList())
+
+    // Combien de positions réclament une révision aujourd'hui. Relu à chaque
+    // retour sur l'accueil : une séance vient d'en replanifier.
+    var due by remember { mutableStateOf(0) }
+    var studied by remember { mutableStateOf(0) }
+    LaunchedEffect(Unit) {
+        val dao = LibraryDatabase.get(context).training()
+        due = dao.dueCount(System.currentTimeMillis())
+        studied = dao.studiedCount()
+    }
 
     Column(Modifier.fillMaxSize().padding(horizontal = 16.dp)) {
         Spacer(Modifier.height(8.dp))
@@ -127,6 +134,34 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
         }
 
         Spacer(Modifier.height(12.dp))
+
+        // Les révisions du jour. La bande n'apparaît QUE s'il y a quelque
+        // chose à réviser : proposer « 0 position » chaque matin apprend à
+        // l'ignorer, et c'est la bande qu'on veut lire quand elle s'allume.
+        if (due > 0) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .testTag("reviser")
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(Palette.warning.copy(alpha = 0.12f))
+                    .clickable { onOpen(Route.Train("daily", label = "Révisions du jour")) }
+                    .padding(14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Default.Schedule, null, tint = Palette.warning, modifier = Modifier.size(22.dp))
+                Spacer(Modifier.width(10.dp))
+                Column(Modifier.weight(1f)) {
+                    Text("Réviser", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.warning)
+                    Text(
+                        "$due position${if (due > 1) "s" else ""} à revoir" +
+                            if (studied > 0) " · $studied apprise${if (studied > 1) "s" else ""}" else "",
+                        fontSize = 11.sp, color = Palette.textSecondary,
+                    )
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+        }
 
         // La partie interrompue, s'il y en a une : elle passe AVANT les modes.
         autosaves.firstOrNull()?.let { save ->

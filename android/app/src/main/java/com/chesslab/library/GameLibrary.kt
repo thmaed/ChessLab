@@ -90,10 +90,17 @@ interface AutosaveDao {
     suspend fun clear(mode: String)
 }
 
-@Database(entities = [GameRecord::class, Autosave::class], version = 2, exportSchema = false)
+@Database(
+    entities = [
+        GameRecord::class, Autosave::class,
+        com.chesslab.training.OpeningProgress::class, com.chesslab.training.OpeningReviewLog::class,
+    ],
+    version = 3, exportSchema = false,
+)
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
     abstract fun autosaves(): AutosaveDao
+    abstract fun training(): com.chesslab.training.TrainingDao
 
     companion object {
         @Volatile private var instance: LibraryDatabase? = null
@@ -102,9 +109,11 @@ abstract class LibraryDatabase : RoomDatabase() {
             instance ?: Room.databaseBuilder(
                 context.applicationContext, LibraryDatabase::class.java, "chesslab.db",
             )
-                // Une base de PARTIES : rien d'irremplaçable, tout est
-                // reconstructible ou déjà joué. Une migration ratée ne doit pas
-                // empêcher l'app de démarrer.
+                // Une migration ratée ne doit pas empêcher l'app de démarrer.
+                // Les parties sont rejouables et les autosaves éphémères ; la
+                // PROGRESSION, elle, ne l'est pas — c'est pourquoi tout schéma
+                // futur devra fournir une vraie migration plutôt que s'en
+                // remettre à ce filet, qui reste le dernier recours.
                 .fallbackToDestructiveMigration()
                 .build().also { instance = it }
         }
