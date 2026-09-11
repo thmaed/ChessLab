@@ -71,6 +71,9 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     color = Palette.textSecondary,
                 )
             }
+            IconButton(onClick = { onOpen(Route.Scanner) }, modifier = Modifier.testTag("scanner")) {
+                Icon(Icons.Default.PhotoCamera, "Scanner un échiquier", tint = Palette.textSecondary)
+            }
             IconButton(onClick = { onOpen(Route.Settings) }, modifier = Modifier.testTag("reglages")) {
                 Icon(Icons.Default.Settings, "Réglages", tint = Palette.textSecondary)
             }

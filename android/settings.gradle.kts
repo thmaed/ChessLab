@@ -13,4 +13,5 @@ rootProject.name = "chesslab-android"
 include(":chesskit")
 include(":engine")
 include(":maia")
+include(":vision")
 include(":app")

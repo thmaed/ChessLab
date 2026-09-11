@@ -19,6 +19,7 @@ val copyAssets by tasks.registering(Copy::class) {
     }
     // le modèle vit dans tools/, avec le script qui le produit
     from(rootProject.file("../tools/maia3-spike")) { include("maia3_23m_fp16.onnx") }
+    from(rootProject.file("../tools/yolo-spike")) { include("chess_pieces_yolo.onnx") }
     into(generatedAssets)
 }
 
@@ -50,12 +51,22 @@ android {
 
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
 
-tasks.named("preBuild") { dependsOn(copyAssets) }
+// Les images de fixtures du scanner, déjà mises au format d'entrée par
+// tools/yolo-spike, servent au test de bout en bout du scanner.
+val testAssets = layout.buildDirectory.dir("testAssets")
+val copyTestAssets by tasks.registering(Copy::class) {
+    from(rootProject.file("../ChessLabTests/ScannerFixtures")) { include("*.png") }
+    into(testAssets)
+}
+android.sourceSets["androidTest"].assets.srcDir(testAssets)
+
+tasks.named("preBuild") { dependsOn(copyAssets, copyTestAssets) }
 
 dependencies {
     implementation(project(":chesskit"))
     implementation(project(":engine"))
     implementation(project(":maia"))
+    implementation(project(":vision"))
 
     implementation(platform("androidx.compose:compose-bom:2024.10.01"))
     implementation("androidx.compose.ui:ui")

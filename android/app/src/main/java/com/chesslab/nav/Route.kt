@@ -19,6 +19,7 @@ sealed class Route(val title: String) {
     data object Progression : Route("Progression")
     data object Settings : Route("Réglages")
     data object Help : Route("Aide")
+    data object Scanner : Route("Scanner un échiquier")
 
     /** Un cours ouvert : ouverture ou finale, même écran. */
     data class CourseReader(val id: String, val name: String) : Route(name)
