@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
 import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -28,7 +29,10 @@ import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
 
 @Composable
-fun AnalysisScreen(model: AnalysisViewModel = viewModel()) {
+fun AnalysisScreen(initialFen: String? = null, model: AnalysisViewModel = viewModel()) {
+    LaunchedEffect(initialFen) {
+        if (!initialFen.isNullOrBlank()) { model.onInputChange(initialFen); model.load() }
+    }
     val ui = model.ui
 
     Column(

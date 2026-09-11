@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -53,7 +54,7 @@ private val modes = listOf(
     Mode(Route.Puzzles, "Puzzles", "Tactique et bibliothèque Lichess", "Tactique et Lichess", Icons.Default.Extension, Palette.violet),
     Mode(Route.Openings, "Ouvertures", "Apprends et révise tes ouvertures", "Apprends et révise", Icons.Default.MenuBook, Palette.warning),
     Mode(Route.Endgames, "Finales", "Lucena, Philidor, opposition — prouvées", "Fins gagnantes", Icons.Default.EmojiEvents, Palette.gold),
-    Mode(Route.Analysis, "Analyser", "PGN, FEN, bibliothèque", "PGN, FEN", Icons.Default.ShowChart, Palette.teal),
+    Mode(Route.Analysis(), "Analyser", "PGN, FEN, bibliothèque", "PGN, FEN", Icons.Default.ShowChart, Palette.teal),
     Mode(Route.Laboratory, "Laboratoire", "L'ordinateur contre lui-même", "Face à lui-même", Icons.Default.Science, Palette.rose),
     Mode(Route.Variants, "Variantes", "Chess960 et autres façons de jouer", "Chess960 et plus", Icons.Default.Casino, Palette.violet),
 )
@@ -80,11 +81,17 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     color = Palette.textSecondary,
                 )
             }
+            IconButton(onClick = { onOpen(Route.PositionEditor) }, modifier = Modifier.testTag("editeur")) {
+                Icon(Icons.Default.Edit, "Éditeur de position", tint = Palette.textSecondary)
+            }
             IconButton(onClick = { onOpen(Route.Progression) }, modifier = Modifier.testTag("progression")) {
                 Icon(Icons.Default.TrendingUp, "Progression", tint = Palette.textSecondary)
             }
             IconButton(onClick = { onOpen(Route.Scanner) }, modifier = Modifier.testTag("scanner")) {
                 Icon(Icons.Default.PhotoCamera, "Scanner un échiquier", tint = Palette.textSecondary)
+            }
+            IconButton(onClick = { onOpen(Route.Help) }, modifier = Modifier.testTag("aide")) {
+                Icon(Icons.AutoMirrored.Filled.HelpOutline, "Aide", tint = Palette.textSecondary)
             }
             IconButton(onClick = { onOpen(Route.Settings) }, modifier = Modifier.testTag("reglages")) {
                 Icon(Icons.Default.Settings, "Réglages", tint = Palette.textSecondary)

@@ -242,6 +242,33 @@ class AppTest {
         compose.onNodeWithTag("sons").performClick()   // et remis, pour ne rien laisser derrière
     }
 
+    @Test fun thePositionEditorBuildsAFen() {
+        compose.onNodeWithTag("editeur").performClick()
+        awaitTag("fen", 10_000)
+
+        // la position de départ, puis l'analyse
+        compose.onNodeWithTag("depart").performClick()
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithText(
+                "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1",
+            ).fetchSemanticsNodes().isNotEmpty()
+        }
+
+        // une pièce posée à la main change la FEN
+        compose.onNodeWithTag("vider").performClick()
+        compose.onNodeWithTag("palette-R").performClick()
+        compose.onNodeWithTag("case-e1").performClick()
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithText("8/8/8/8/8/8/8/4K3 w - - 0 1").fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    @Test fun helpExplainsWhatTheAppActuallyDoes() {
+        compose.onNodeWithTag("aide").performClick()
+        awaitText("Les neuf personnages", 10_000)
+        awaitText("Le filet de sécurité", 10_000)
+    }
+
     @Test fun backReturnsHome() {
         open("Analyser")
         compose.onNodeWithTag("retour").performClick()

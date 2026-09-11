@@ -22,6 +22,8 @@ import com.chesslab.play.PlayScreen
 import com.chesslab.courses.CourseListScreen
 import com.chesslab.courses.CourseRepository
 import com.chesslab.courses.CourseScreen
+import com.chesslab.editor.PositionEditorScreen
+import com.chesslab.help.HelpScreen
 import com.chesslab.progression.ProgressionScreen
 import com.chesslab.puzzles.PuzzleScreen
 import com.chesslab.scanner.ScannerScreen
@@ -71,14 +73,16 @@ private fun App() {
             Route.Home -> HomeScreen { stack.add(it) }
             is Route.PlayVsEngine -> PlayScreen(resume = current.resume)
             Route.TwoPlayer -> TwoPlayerScreen()
-            Route.Analysis -> AnalysisScreen()
+            is Route.Analysis -> AnalysisScreen(initialFen = current.fen)
             Route.Puzzles -> PuzzleScreen()
             Route.Openings -> CourseListScreen(endgames = false) { stack.add(reader(it)) }
             Route.Endgames -> CourseListScreen(endgames = true) { stack.add(reader(it)) }
             is Route.CourseReader -> CourseScreen(current.id)
             Route.Settings -> SettingsScreen()
-            Route.Scanner -> ScannerScreen()
+            Route.Scanner -> ScannerScreen { fen -> stack.add(Route.Analysis(fen)) }
             Route.Progression -> ProgressionScreen()
+            Route.Help -> HelpScreen()
+            Route.PositionEditor -> PositionEditorScreen { fen -> stack.add(Route.Analysis(fen)) }
             Route.Laboratory -> LabScreen()
             Route.Variants -> VariantListScreen { id ->
                 stack.add(Route.VariantGame(id, VariantCatalog.byId(id)?.title ?: id))

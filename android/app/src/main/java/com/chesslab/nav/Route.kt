@@ -11,7 +11,8 @@ sealed class Route(val title: String) {
     /** [resume] : reprendre la partie interrompue plutôt que d'en commencer une. */
     data class PlayVsEngine(val resume: Boolean = false) : Route("Contre l'ordinateur")
     data object TwoPlayer : Route("Deux joueurs")
-    data object Analysis : Route("Analyser")
+    /** [fen] : une position à charger d'emblée (venue du scanner ou de l'éditeur). */
+    data class Analysis(val fen: String? = null) : Route("Analyser")
     data object Puzzles : Route("Puzzles")
     data object Openings : Route("Ouvertures")
     data object Endgames : Route("Finales")
@@ -21,6 +22,7 @@ sealed class Route(val title: String) {
     data object Settings : Route("Réglages")
     data object Help : Route("Aide")
     data object Scanner : Route("Scanner un échiquier")
+    data object PositionEditor : Route("Éditeur de position")
 
     /** Un cours ouvert : ouverture ou finale, même écran. */
     data class CourseReader(val id: String, val name: String) : Route(name)
