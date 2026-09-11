@@ -22,6 +22,7 @@ import com.chesslab.courses.CourseListScreen
 import com.chesslab.courses.CourseRepository
 import com.chesslab.courses.CourseScreen
 import com.chesslab.puzzles.PuzzleScreen
+import com.chesslab.settings.SettingsScreen
 import com.chesslab.twoplayer.TwoPlayerScreen
 import com.chesslab.ui.HomeScreen
 import com.chesslab.ui.Palette
@@ -69,6 +70,7 @@ private fun App() {
             Route.Openings -> CourseListScreen(endgames = false) { stack.add(reader(it)) }
             Route.Endgames -> CourseListScreen(endgames = true) { stack.add(reader(it)) }
             is Route.CourseReader -> CourseScreen(current.id)
+            Route.Settings -> SettingsScreen()
             else -> Placeholder(current.title)
         }
     }

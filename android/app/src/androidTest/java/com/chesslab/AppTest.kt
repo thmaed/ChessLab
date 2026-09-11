@@ -120,6 +120,21 @@ class AppTest {
         awaitTag("progression")
     }
 
+    @Test fun settingsChangeTheBoardTheme() {
+        compose.onNodeWithTag("reglages").performClick()
+        compose.onNodeWithTag("theme-blue").performClick()
+        compose.onNodeWithTag("piece-merida").performClick()
+        compose.onNodeWithTag("temps-1000").performClick()
+        // le plateau d'aperçu suit le réglage
+        compose.onNodeWithTag("case-e2").assertIsDisplayed()
+
+        // on repose les valeurs par défaut : un test ne doit pas déteindre
+        // sur les suivants, et les réglages sont PERSISTÉS
+        compose.onNodeWithTag("theme-classic").performClick()
+        compose.onNodeWithTag("piece-classic").performClick()
+        compose.onNodeWithTag("temps-400").performClick()
+    }
+
     @Test fun backReturnsHome() {
         open("Analyser")
         compose.onNodeWithTag("retour").performClick()

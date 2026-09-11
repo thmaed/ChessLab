@@ -12,6 +12,7 @@ import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.engine.EngineService
+import com.chesslab.settings.SettingsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -96,7 +97,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         val best = withContext(Dispatchers.IO) {
             EngineService.use(getApplication()) { e ->
                 e.send("position fen ${board.position.fen}")
-                e.search("go movetime 400", timeoutMs = 20_000)
+                e.search("go movetime ${SettingsStore.state.value.engineMoveTimeMs}", timeoutMs = 60_000)
             }
         }
         ui = ui.copy(thinking = false)

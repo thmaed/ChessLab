@@ -11,6 +11,7 @@ import chesskit.Move
 import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
+import com.chesslab.settings.SettingsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -33,6 +34,8 @@ data class PuzzleUiState(
     val pendingPromotion: Move? = null,
     val loading: Boolean = true,
     val busy: Boolean = false,
+    /** Essais restants sur le puzzle courant (réglage : un ou trois). */
+    val attemptsLeft: Int = 1,
 )
 
 /**
@@ -84,6 +87,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             lastMove = null,
             checkedKing = null,
             outcome = PuzzleOutcome.solving,
+            attemptsLeft = SettingsStore.state.value.puzzleAttempts,
             status = "${puzzle.themeLabel} · ${puzzle.rating} — trouvez le meilleur coup",
         )
     }
@@ -117,12 +121,21 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
 
         // On compare AVANT de jouer : un coup faux ne doit pas salir le plateau.
         if (!expected.startsWith(played)) {
-            ui = ui.copy(
-                selected = null, legalTargets = emptySet(),
-                outcome = PuzzleOutcome.failed,
-                attemptedCount = ui.attemptedCount + 1,
-                status = "Ce n'est pas le coup — la solution commençait par ${expected}",
-            )
+            val left = ui.attemptsLeft - 1
+            ui = if (left > 0) {
+                ui.copy(
+                    selected = null, legalTargets = emptySet(),
+                    attemptsLeft = left,
+                    status = "Ce n'est pas le coup — il vous reste $left essai" + (if (left > 1) "s" else ""),
+                )
+            } else {
+                ui.copy(
+                    selected = null, legalTargets = emptySet(),
+                    outcome = PuzzleOutcome.failed,
+                    attemptedCount = ui.attemptedCount + 1,
+                    status = "Ce n'est pas le coup — la solution commençait par $expected",
+                )
+            }
             return
         }
 

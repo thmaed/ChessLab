@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.chesslab.settings.SettingsStore
 import chesskit.Board
 import chesskit.Move
 import chesskit.Piece
@@ -35,7 +36,7 @@ class TwoPlayerViewModel : ViewModel() {
 
     private var board = Board()
 
-    var ui by mutableStateOf(TwoPlayerUiState())
+    var ui by mutableStateOf(TwoPlayerUiState(autoFlip = SettingsStore.state.value.autoFlipTwoPlayer))
         private set
 
     fun onSquareTap(square: Square) {

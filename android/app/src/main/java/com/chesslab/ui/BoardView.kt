@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,6 +23,7 @@ import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.R
+import com.chesslab.settings.SettingsStore
 
 /**
  * L'échiquier. Pendant de `BoardView.swift`.
@@ -32,7 +35,10 @@ import com.chesslab.R
 @Composable
 fun BoardView(
     position: Position,
-    theme: BoardTheme = BoardTheme.classic,
+    /** `null` = celui des réglages. */
+    theme: BoardTheme? = null,
+    /** `null` = celui des réglages. */
+    pieceSet: String? = null,
     orientation: Piece.Color = Piece.Color.white,
     selected: Square? = null,
     legalTargets: Set<Square> = emptySet(),
@@ -41,6 +47,14 @@ fun BoardView(
     enabled: Boolean = true,
     onSquareTap: (Square) -> Unit = {},
 ) {
+    // Le thème et le jeu de pièces viennent des réglages : aucun écran n'a à
+    // les transmettre, et changer de thème se voit partout d'un coup.
+    val settings by SettingsStore.state.collectAsState()
+    val boardTheme = theme
+        ?: BoardTheme.all.firstOrNull { it.id == settings.boardThemeId }
+        ?: BoardTheme.classic
+    val pieces = pieceSet ?: settings.pieceSetId
+
     // rangée 8 en haut quand on joue les blancs, 1 en haut sinon
     val ranks = if (orientation == Piece.Color.white) (8 downTo 1) else (1..8)
     val files = if (orientation == Piece.Color.white) (1..8) else (8 downTo 1)
@@ -57,7 +71,8 @@ fun BoardView(
                     SquareCell(
                         square = square,
                         piece = position.piece(square),
-                        theme = theme,
+                        theme = boardTheme,
+                        pieceSet = pieces,
                         isSelected = square == selected,
                         isLegalTarget = square in legalTargets,
                         isLastMove = lastMove?.let { square == it.first || square == it.second } == true,
@@ -78,6 +93,7 @@ private fun SquareCell(
     square: Square,
     piece: Piece?,
     theme: BoardTheme,
+    pieceSet: String,
     isSelected: Boolean,
     isLegalTarget: Boolean,
     isLastMove: Boolean,
@@ -107,7 +123,7 @@ private fun SquareCell(
     ) {
         if (piece != null) {
             Image(
-                painter = painterResource(drawableFor(piece)),
+                painter = painterResource(drawableFor(piece, pieceSet)),
                 contentDescription = describe(piece),
                 modifier = Modifier.fillMaxSize(0.92f),
             )
@@ -151,25 +167,57 @@ private fun SquareCell(
 }
 
 /**
- * Le jeu cburnett, celui de l'app iOS — mêmes SVG, convertis en
- * `VectorDrawable` par `tools/svg-to-vector/convert_pieces.py`.
+ * Les trois jeux de l'app iOS — mêmes SVG, convertis en `VectorDrawable` par
+ * `tools/svg-to-vector/convert_pieces.py`.
  */
-private fun drawableFor(piece: Piece): Int = when (piece.color) {
-    Piece.Color.white -> when (piece.kind) {
-        Piece.Kind.king -> R.drawable.piece_wk
-        Piece.Kind.queen -> R.drawable.piece_wq
-        Piece.Kind.rook -> R.drawable.piece_wr
-        Piece.Kind.bishop -> R.drawable.piece_wb
-        Piece.Kind.knight -> R.drawable.piece_wn
-        Piece.Kind.pawn -> R.drawable.piece_wp
-    }
-    Piece.Color.black -> when (piece.kind) {
-        Piece.Kind.king -> R.drawable.piece_bk
-        Piece.Kind.queen -> R.drawable.piece_bq
-        Piece.Kind.rook -> R.drawable.piece_br
-        Piece.Kind.bishop -> R.drawable.piece_bb
-        Piece.Kind.knight -> R.drawable.piece_bn
-        Piece.Kind.pawn -> R.drawable.piece_bp
+private fun drawableFor(piece: Piece, set: String): Int {
+    val white = piece.color == Piece.Color.white
+    return when (set) {
+        "chessnut" -> if (white) when (piece.kind) {
+            Piece.Kind.king -> R.drawable.chessnut_wk
+            Piece.Kind.queen -> R.drawable.chessnut_wq
+            Piece.Kind.rook -> R.drawable.chessnut_wr
+            Piece.Kind.bishop -> R.drawable.chessnut_wb
+            Piece.Kind.knight -> R.drawable.chessnut_wn
+            Piece.Kind.pawn -> R.drawable.chessnut_wp
+        } else when (piece.kind) {
+            Piece.Kind.king -> R.drawable.chessnut_bk
+            Piece.Kind.queen -> R.drawable.chessnut_bq
+            Piece.Kind.rook -> R.drawable.chessnut_br
+            Piece.Kind.bishop -> R.drawable.chessnut_bb
+            Piece.Kind.knight -> R.drawable.chessnut_bn
+            Piece.Kind.pawn -> R.drawable.chessnut_bp
+        }
+        "merida" -> if (white) when (piece.kind) {
+            Piece.Kind.king -> R.drawable.merida_wk
+            Piece.Kind.queen -> R.drawable.merida_wq
+            Piece.Kind.rook -> R.drawable.merida_wr
+            Piece.Kind.bishop -> R.drawable.merida_wb
+            Piece.Kind.knight -> R.drawable.merida_wn
+            Piece.Kind.pawn -> R.drawable.merida_wp
+        } else when (piece.kind) {
+            Piece.Kind.king -> R.drawable.merida_bk
+            Piece.Kind.queen -> R.drawable.merida_bq
+            Piece.Kind.rook -> R.drawable.merida_br
+            Piece.Kind.bishop -> R.drawable.merida_bb
+            Piece.Kind.knight -> R.drawable.merida_bn
+            Piece.Kind.pawn -> R.drawable.merida_bp
+        }
+        else -> if (white) when (piece.kind) {
+            Piece.Kind.king -> R.drawable.piece_wk
+            Piece.Kind.queen -> R.drawable.piece_wq
+            Piece.Kind.rook -> R.drawable.piece_wr
+            Piece.Kind.bishop -> R.drawable.piece_wb
+            Piece.Kind.knight -> R.drawable.piece_wn
+            Piece.Kind.pawn -> R.drawable.piece_wp
+        } else when (piece.kind) {
+            Piece.Kind.king -> R.drawable.piece_bk
+            Piece.Kind.queen -> R.drawable.piece_bq
+            Piece.Kind.rook -> R.drawable.piece_br
+            Piece.Kind.bishop -> R.drawable.piece_bb
+            Piece.Kind.knight -> R.drawable.piece_bn
+            Piece.Kind.pawn -> R.drawable.piece_bp
+        }
     }
 }
 
