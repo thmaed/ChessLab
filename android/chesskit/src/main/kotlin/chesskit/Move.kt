@@ -42,8 +42,8 @@ data class Move(
 
     /** La valeur brute est ce qui s'écrit dans un PGN. */
     enum class Assessment(val raw: String, val notation: String) {
-        null_("$0", ""), good("$1", "!"), mistake("$2", "?"), brilliant("$3", "!!"),
-        blunder("$4", "??"), interesting("$5", "!?"), dubious("$6", "?!"),
-        forced("$7", "□"), singular("$8", ""), worst("$9", "")
+        null_("\$0", ""), good("\$1", "!"), mistake("\$2", "?"), brilliant("\$3", "!!"),
+        blunder("\$4", "??"), interesting("\$5", "!?"), dubious("\$6", "?!"),
+        forced("\$7", "□"), singular("\$8", ""), worst("\$9", "")
     }
 }

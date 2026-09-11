@@ -1,8 +1,4 @@
-plugins {
-    kotlin("jvm") version "2.0.21"
-}
-
-repositories { mavenCentral() }
+plugins { kotlin("jvm") }
 
 dependencies { testImplementation(kotlin("test")) }
 
