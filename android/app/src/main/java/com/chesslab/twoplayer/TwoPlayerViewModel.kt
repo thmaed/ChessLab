@@ -4,6 +4,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
+import android.app.Application
+import com.chesslab.library.GameRecorder
 import com.chesslab.settings.SettingsStore
 import chesskit.Board
 import chesskit.Move
@@ -32,9 +35,10 @@ data class TwoPlayerUiState(
  * Le plateau se retourne à chaque coup quand [TwoPlayerUiState.autoFlip] est
  * actif : c'est ce qui rend le mode jouable à deux autour d'un téléphone.
  */
-class TwoPlayerViewModel : ViewModel() {
+class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
 
     private var board = Board()
+    private val recorder = GameRecorder()
 
     var ui by mutableStateOf(TwoPlayerUiState(autoFlip = SettingsStore.state.value.autoFlipTwoPlayer))
         private set
@@ -79,13 +83,18 @@ class TwoPlayerViewModel : ViewModel() {
 
     fun newGame() {
         board = Board()
+        recorder.reset()
         ui = TwoPlayerUiState(autoFlip = ui.autoFlip)
     }
 
     private fun refresh(move: Move) {
+        recorder.record(move)
         val position = board.position
         val state = board.state
         val over = state is Board.State.Checkmate || state is Board.State.Draw
+        if (over && !ui.gameOver) {
+            recorder.save(getApplication(), white = "Blancs", black = "Noirs", source = "twoPlayer", state = state)
+        }
 
         val status = when (state) {
             is Board.State.Checkmate ->

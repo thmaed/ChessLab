@@ -12,6 +12,7 @@ import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.engine.EngineService
+import com.chesslab.library.GameRecorder
 import com.chesslab.maia.MaiaOpponent
 import com.chesslab.maia.OpponentGallery
 import com.chesslab.maia.OpponentProfile
@@ -51,6 +52,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     /** L'historique des positions : Maia lit les huit dernières. */
     private val history = mutableListOf(Position.standard)
+
+    /** La partie, pour la bibliothèque : le plateau ne connaît pas l'histoire. */
+    private val recorder = GameRecorder()
 
     private var maia: MaiaOpponent? = null
 
@@ -119,6 +123,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun recordAndContinue(move: Move) {
         history += board.position.copy()
+        recorder.record(move)
         refresh(null, move)
         if (!ui.gameOver && board.position.sideToMove != humanColor) askOpponent()
     }
@@ -168,6 +173,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             move = board.completePromotion(of = move, to = kind)
         }
         history += board.position.copy()
+        recorder.record(move)
         refresh(null, move)
     }
 
@@ -184,6 +190,15 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             else -> null
         }
         val over = state is Board.State.Checkmate || state is Board.State.Draw
+        if (over && !ui.gameOver) {
+            recorder.save(
+                getApplication(),
+                white = "Vous",
+                black = ui.opponent?.displayName ?: "Stockfish",
+                source = "engine",
+                state = state,
+            )
+        }
         val text = status ?: when (state) {
             is Board.State.Checkmate ->
                 if (state.color == humanColor) "Échec et mat — vous perdez" else "Échec et mat — vous gagnez"
@@ -219,6 +234,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         board = Board()
         history.clear()
         history += Position.standard
+        recorder.reset()
         ui = ui.copy(
             position = Position.standard,
             selected = null, legalTargets = emptySet(), lastMove = null, checkedKing = null,

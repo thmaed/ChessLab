@@ -15,6 +15,9 @@ import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.engine.EngineService
+import com.chesslab.library.GameRecord
+import com.chesslab.library.LibraryDatabase
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -52,6 +55,16 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
 
     var ui by mutableStateOf(AnalysisUiState())
         private set
+
+    /** Les parties enregistrées, les plus récentes d'abord. */
+    val savedGames: Flow<List<GameRecord>> =
+        LibraryDatabase.get(app).games().all()
+
+    /** Charge une partie de la bibliothèque comme si on collait son PGN. */
+    fun open(record: GameRecord) {
+        ui = ui.copy(input = record.pgn)
+        load()
+    }
 
     fun onInputChange(text: String) { ui = ui.copy(input = text, error = null) }
 

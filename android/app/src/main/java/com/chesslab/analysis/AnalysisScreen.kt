@@ -9,7 +9,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.*
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -62,6 +65,9 @@ fun AnalysisScreen(model: AnalysisViewModel = viewModel()) {
         }
 
         Spacer(Modifier.height(12.dp))
+        SavedGames(model)
+
+        Spacer(Modifier.height(12.dp))
         OutlinedTextField(
             value = ui.input,
             onValueChange = model::onInputChange,
@@ -76,6 +82,38 @@ fun AnalysisScreen(model: AnalysisViewModel = viewModel()) {
             Text("Charger", color = Palette.accent)
         }
         Spacer(Modifier.height(24.dp))
+    }
+}
+
+/** La bibliothèque : les parties déjà jouées, rechargeables d'un tap. */
+@Composable
+private fun SavedGames(model: AnalysisViewModel) {
+    val games by model.savedGames.collectAsState(initial = emptyList())
+    if (games.isEmpty()) return
+
+    Text("Bibliothèque", fontSize = 12.sp, color = Palette.textTertiary)
+    Spacer(Modifier.height(4.dp))
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        games.take(8).forEach { record ->
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .testTag("partie-${record.id}")
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Palette.surface)
+                    .clickable { model.open(record) }
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    "${record.white} — ${record.black}",
+                    fontSize = 12.sp, color = Palette.textPrimary, modifier = Modifier.weight(1f),
+                )
+                Text(record.result, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = Palette.accent)
+                Spacer(Modifier.width(8.dp))
+                Text("${record.moveCount} coups", fontSize = 10.sp, color = Palette.textTertiary)
+            }
+        }
     }
 }
 

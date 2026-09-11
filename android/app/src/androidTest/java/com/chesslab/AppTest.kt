@@ -186,6 +186,30 @@ class AppTest {
         compose.onNodeWithTag("case-a1").assertIsDisplayed()
     }
 
+    @Test fun aFinishedGameLandsInTheLibrary() {
+        open("Deux joueurs")
+        awaitText("Aux blancs de jouer")
+
+        // le mat du berger, en sept demi-coups
+        val moves = listOf(
+            "e2" to "e4", "e7" to "e5",
+            "f1" to "c4", "b8" to "c6",
+            "d1" to "h5", "g8" to "f6",
+            "h5" to "f7",
+        )
+        for ((from, to) in moves) {
+            compose.onNodeWithTag("case-$from").performClick()
+            compose.onNodeWithTag("case-$to").performClick()
+        }
+        awaitText("Échec et mat — les blancs gagnent", 10_000)
+
+        // la partie doit se retrouver dans la bibliothèque de l'écran Analyser
+        compose.onNodeWithTag("retour").performClick()
+        open("Analyser")
+        awaitText("Bibliothèque", 15_000)
+        awaitText("Blancs — Noirs", 10_000)
+    }
+
     @Test fun backReturnsHome() {
         open("Analyser")
         compose.onNodeWithTag("retour").performClick()
