@@ -4,7 +4,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,8 +59,14 @@ fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> 
                 onMove = model::moveCorner,
             )
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { model.scan() }, enabled = !ui.busy, modifier = Modifier.testTag("scanner")) {
-                Text("Lire le plateau")
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Button(onClick = { model.scan() }, enabled = !ui.busy, modifier = Modifier.testTag("scanner")) {
+                    Text("Lire le plateau")
+                }
+                Spacer(Modifier.width(8.dp))
+                TextButton(onClick = { model.autoFrame() }, modifier = Modifier.testTag("recadrer")) {
+                    Text("Retrouver le plateau", color = Palette.textSecondary)
+                }
             }
         }
 
@@ -113,29 +121,36 @@ private fun CornerPicker(
             .fillMaxWidth()
             .aspectRatio(bitmap.width.toFloat() / bitmap.height)
             .onSizeChanged { size = it }
-            .pointerInput(Unit) {
-                detectDragGestures(
-                    onDragStart = { start ->
-                        // on saisit la poignée la plus proche
-                        dragging = corners.indices.minByOrNull { index ->
-                            val (fx, fy) = corners[index]
-                            val dx = fx * size.width - start.x
-                            val dy = fy * size.height - start.y
-                            dx * dx + dy * dy
-                        } ?: -1
-                    },
-                    onDragEnd = { dragging = -1 },
-                    onDrag = { change, _ ->
-                        if (dragging >= 0 && size.width > 0) {
-                            onMove(
-                                dragging,
-                                change.position.x / size.width,
-                                change.position.y / size.height,
-                            )
-                        }
+            // Le geste est géré à la main plutôt qu'avec `detectDragGestures` :
+            // celui-ci consomme le slop AVANT qu'on puisse décider, si bien que
+            // la photo avalait aussi le défilement vertical de l'écran — le
+            // bouton « Lire le plateau » devenait inatteignable sans déplacer
+            // un coin au passage. Ici, si le doigt ne part pas d'une poignée,
+            // on ne consomme rien et le geste redescend au défilement.
+            .pointerInput(corners, size) {
+                val grab = 48.dp.toPx()
+                awaitEachGesture {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    if (size.width <= 0) return@awaitEachGesture
+                    val index = corners.indices.minByOrNull { i ->
+                        val (fx, fy) = corners[i]
+                        val dx = fx * size.width - down.position.x
+                        val dy = fy * size.height - down.position.y
+                        dx * dx + dy * dy
+                    }?.takeIf { i ->
+                        val (fx, fy) = corners[i]
+                        val dx = fx * size.width - down.position.x
+                        val dy = fy * size.height - down.position.y
+                        dx * dx + dy * dy <= grab * grab
+                    } ?: return@awaitEachGesture
+
+                    dragging = index
+                    drag(down.id) { change ->
+                        onMove(index, change.position.x / size.width, change.position.y / size.height)
                         change.consume()
-                    },
-                )
+                    }
+                    dragging = -1
+                }
             }
     ) {
         Image(bitmap, contentDescription = "Photo à cadrer", Modifier.fillMaxSize(), contentScale = ContentScale.Fit)

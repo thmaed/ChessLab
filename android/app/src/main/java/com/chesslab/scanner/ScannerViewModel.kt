@@ -11,6 +11,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import chesskit.FenParser
 import chesskit.Position
+import com.chesslab.vision.BoardAutoFrame
 import com.chesslab.vision.BoardReader
 import com.chesslab.vision.Homography
 import com.chesslab.vision.PieceDetector
@@ -63,16 +64,30 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
                 }
             }.getOrNull()
         }
-        ui = if (bitmap == null) {
-            ui.copy(status = "Image illisible")
-        } else {
-            ui.copy(
-                image = bitmap,
-                corners = ScannerUiState.defaultCorners,
-                position = null, placement = "", uncertain = 0,
-                status = "Placez les quatre coins sur le plateau",
-            )
+        if (bitmap == null) {
+            ui = ui.copy(status = "Image illisible")
+            return@launch
         }
+
+        // On CHERCHE le plateau avant de demander quoi que ce soit. Ce n'est
+        // jamais une vérité : cela pose les quatre poignées à peu près au bon
+        // endroit, et l'utilisateur garde la main.
+        val found = withContext(Dispatchers.IO) { runCatching { BoardAutoFrame.corners(bitmap) }.getOrNull() }
+        ui = ui.copy(
+            image = bitmap,
+            corners = found ?: ScannerUiState.defaultCorners,
+            position = null, placement = "", uncertain = 0,
+            status = if (found != null) "Plateau trouvé — ajustez si besoin"
+            else "Placez les quatre coins sur le plateau",
+        )
+    }
+
+    /** Refaire la détection à la demande, après un cadrage manuel raté. */
+    fun autoFrame() = viewModelScope.launch {
+        val bitmap = ui.image ?: return@launch
+        val found = withContext(Dispatchers.IO) { runCatching { BoardAutoFrame.corners(bitmap) }.getOrNull() }
+        ui = if (found == null) ui.copy(status = "Plateau introuvable — placez les coins à la main")
+        else ui.copy(corners = found, status = "Plateau trouvé — ajustez si besoin")
     }
 
     fun moveCorner(index: Int, x: Float, y: Float) {
