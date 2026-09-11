@@ -75,3 +75,39 @@ accord top-1 **36/36** avec torch en CPU seul, Δprob max 0,027 (contre
 tolérance des fixtures portée à 0,04), **3,2 ms** par coup sur CPU M2 (torch
 15,5 ms). Fixtures régénérées avec `make_fixtures.py 23m maia3-23m.pt`.
 Le 5M reste documenté ci-dessus comme spike ; il n'est plus embarqué.
+
+## Portage Android — ONNX Runtime (11/09/2026)
+
+`convert_maia3_onnx.py 23m maia3-23m.pt maia3_23m.onnx` reprend le MÊME
+wrapper `ExportMaia` (copie conforme ; `convert_maia3.py` reste figé comme
+trace de la conversion iOS livrée) et exporte en ONNX opset 17 au lieu de
+Core ML. Il vérifie dans la foulée contre `ChessLabTests/Fixtures_maia3.json`,
+c'est-à-dire contre la référence qui sert déjà aux tests iOS : les deux
+plateformes sont donc comparées au même étalon, pas l'une à l'autre.
+
+| Mesure | fp32 | fp16 |
+|---|---|---|
+| Taille | 87 Mo | **43 Mo** (Core ML iOS : 43 Mo) |
+| Accord top-1 avec les fixtures iOS | 56/56 | 56/56 |
+| Écart max de probabilité (top-5) | 0,0000 | 0,0759 |
+| Latence ONNX Runtime CPU sur M2 | 13,4 ms | 15,7 ms |
+
+Wrapper vs original : 2,93e-04, identique à la conversion Core ML. ONNX fp32
+vs torch : 4,59e-06 sur 18 positions × Elo — la conversion ONNX est
+numériquement exacte, tout l'écart restant vient de la quantification fp16.
+
+**Point à surveiller.** Le fp16 dérive de 0,076 sur les probabilités du top-5,
+alors que le Core ML fp16 tenait 0,027 et que les fixtures iOS tolèrent 0,04.
+Le coup le plus probable ne change jamais (56/56), mais Maia ÉCHANTILLONNE
+dans la distribution : une dérive sur les coups secondaires déplace un peu
+les fréquences de jeu. À trancher au moment du portage réel — garder le fp32
+(87 Mo), passer en précision mixte, ou mesurer l'effet sur des parties.
+
+**Piège rencontré.** onnx 1.22 écrit une IR version 11 que les runtimes
+mobiles publiés refusent encore. Le script la ramène à 10 ; le graphe reste
+en opset 17.
+
+Ni le checkpoint, ni l'environnement Python, ni les `.onnx` n'entrent dans le
+dépôt (voir `.gitignore`). Le seul fichier versionné est
+`android_fixture.json` (145 Ko) : les mêmes 56 cas, prémâchés pour que l'app
+Android puisse comparer sans porter l'encodeur.

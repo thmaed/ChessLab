@@ -57,3 +57,14 @@ AuthKey_*
 # Environnement Python de l'outil App Store Connect
 tools/asc/.venv/
 __pycache__/
+
+# Spike Maia-3 : outillage local, entièrement reconstructible depuis le README
+# du dossier. Rien de tout cela n'entre dans le dépôt — le checkpoint amont
+# pèse 88 Mo, l'ONNX fp32 87 Mo et le fp16 43 Mo, et l'environnement Python
+# embarque PyTorch. Le fichier VERSIONNÉ, lui, est android_fixture.json
+# (145 Ko) : il permet de rejouer la comparaison sans refaire la conversion.
+tools/maia3-spike/mlenv/
+tools/maia3-spike/maia3/
+tools/maia3-spike/*.pt
+tools/maia3-spike/*.onnx
+tools/maia3-spike/*.mlpackage/
