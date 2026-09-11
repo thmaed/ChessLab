@@ -86,6 +86,16 @@ class AppTest {
         compose.onNodeWithTag("precedent").performClick()
     }
 
+    @Test fun puzzlesLoadFromTheLibrary() {
+        open("Puzzles")
+        // la bibliothèque fait 19 Mo : on laisse le temps de la parcourir
+        awaitTag("score", 60_000)
+        compose.onNodeWithTag("case-e4").assertIsDisplayed()
+
+        compose.onNodeWithTag("passer").performClick()
+        awaitTag("score", 10_000)
+    }
+
     @Test fun backReturnsHome() {
         open("Analyser")
         compose.onNodeWithTag("retour").performClick()

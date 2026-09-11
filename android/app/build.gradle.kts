@@ -10,7 +10,10 @@ plugins {
 // assets au build plutôt que dupliqués dans Git (75 Mo).
 val generatedAssets = layout.buildDirectory.dir("generatedAssets")
 val copyAssets by tasks.registering(Copy::class) {
-    from(rootProject.file("../ChessLab/Resources")) { include("nn-*.nnue") }
+    from(rootProject.file("../ChessLab/Resources")) {
+        include("nn-*.nnue")
+        include("lichess_puzzles.json")
+    }
     into(generatedAssets)
 }
 
