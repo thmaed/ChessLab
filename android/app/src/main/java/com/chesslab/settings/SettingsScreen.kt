@@ -72,6 +72,32 @@ fun SettingsScreen() {
         }
 
         Spacer(Modifier.height(16.dp))
+        Section("Sons")
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .testTag("sons")
+                .clip(RoundedCornerShape(8.dp))
+                .background(Palette.surface)
+                .clickable { SettingsStore.setSounds(context, !settings.soundsEnabled) }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Switch(
+                checked = settings.soundsEnabled,
+                onCheckedChange = { SettingsStore.setSounds(context, it) },
+            )
+            Spacer(Modifier.width(10.dp))
+            Column {
+                Text("Sons du plateau", fontSize = 13.sp, color = Palette.textPrimary)
+                Text(
+                    "Synthétisés, aucun fichier audio embarqué.",
+                    fontSize = 10.sp, color = Palette.textTertiary,
+                )
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
         Section("Puzzles")
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf(1 to "Un essai", 3 to "Trois essais").forEach { (n, label) ->

@@ -229,6 +229,19 @@ class AppTest {
         awaitText("Partie reprise", 30_000)
     }
 
+    @Test fun progressionShowsWhatTheAppHasSeen() {
+        compose.onNodeWithTag("progression").performClick()
+        awaitText("Parties", 10_000)
+        awaitText("Puzzles", 10_000)
+    }
+
+    @Test fun soundsCanBeTurnedOff() {
+        compose.onNodeWithTag("reglages").performClick()
+        awaitText("Sons du plateau", 10_000)
+        compose.onNodeWithTag("sons").performClick()
+        compose.onNodeWithTag("sons").performClick()   // et remis, pour ne rien laisser derrière
+    }
+
     @Test fun backReturnsHome() {
         open("Analyser")
         compose.onNodeWithTag("retour").performClick()

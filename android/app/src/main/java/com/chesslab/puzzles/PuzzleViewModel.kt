@@ -12,6 +12,7 @@ import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.settings.SettingsStore
+import com.chesslab.settings.StatsStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -129,6 +130,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
                     status = "Ce n'est pas le coup — il vous reste $left essai" + (if (left > 1) "s" else ""),
                 )
             } else {
+                StatsStore.recordPuzzle(getApplication(), solvedIt = false)
                 ui.copy(
                     selected = null, legalTargets = emptySet(),
                     outcome = PuzzleOutcome.failed,
@@ -164,6 +166,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         show(move, "Bien joué — continuez")
 
         if (step >= puzzle.solution.size) {
+            StatsStore.recordPuzzle(getApplication(), solvedIt = true)
             ui = ui.copy(
                 outcome = PuzzleOutcome.solved,
                 solvedCount = ui.solvedCount + 1,

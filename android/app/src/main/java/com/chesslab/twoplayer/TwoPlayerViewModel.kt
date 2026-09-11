@@ -8,6 +8,7 @@ import androidx.lifecycle.AndroidViewModel
 import android.app.Application
 import com.chesslab.library.GameRecorder
 import com.chesslab.settings.SettingsStore
+import com.chesslab.sound.SoundPlayer
 import chesskit.Board
 import chesskit.Move
 import chesskit.Piece
@@ -91,6 +92,18 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
         recorder.record(move)
         val position = board.position
         val state = board.state
+
+        // le son suit le COUP, pas l'état : une prise reste une prise même
+        // quand elle donne échec — c'est l'échec qui l'emporte
+        SoundPlayer.enabled = SettingsStore.state.value.soundsEnabled
+        move.let {
+            SoundPlayer.forMove(
+                isCapture = it.result is Move.Result.Capture,
+                isCastle = it.result is Move.Result.Castle,
+                isCheck = state is Board.State.Check || state is Board.State.Checkmate,
+            )
+        }
+
         val over = state is Board.State.Checkmate || state is Board.State.Draw
         if (over && !ui.gameOver) {
             recorder.save(getApplication(), white = "Blancs", black = "Noirs", source = "twoPlayer", state = state)

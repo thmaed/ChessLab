@@ -27,6 +27,7 @@ data class AppSettings(
      * entraîne.
      */
     val puzzleAttempts: Int = 1,
+    val soundsEnabled: Boolean = true,
 )
 
 private val Context.dataStore by preferencesDataStore("settings")
@@ -44,6 +45,7 @@ object SettingsStore {
     private val keyMoveTime = intPreferencesKey("engineMoveTimeMs")
     private val keyAutoFlip = booleanPreferencesKey("autoFlipTwoPlayer")
     private val keyAttempts = intPreferencesKey("puzzleAttempts")
+    private val keySounds = booleanPreferencesKey("soundsEnabled")
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val _state = MutableStateFlow(AppSettings())
@@ -59,6 +61,7 @@ object SettingsStore {
                     engineMoveTimeMs = prefs[keyMoveTime] ?: 400,
                     autoFlipTwoPlayer = prefs[keyAutoFlip] ?: true,
                     puzzleAttempts = prefs[keyAttempts] ?: 1,
+                    soundsEnabled = prefs[keySounds] ?: true,
                 )
             }.collect { _state.value = it }
         }
@@ -74,4 +77,5 @@ object SettingsStore {
     fun setMoveTime(context: Context, ms: Int) = update(context) { it[keyMoveTime] = ms }
     fun setAutoFlip(context: Context, on: Boolean) = update(context) { it[keyAutoFlip] = on }
     fun setPuzzleAttempts(context: Context, n: Int) = update(context) { it[keyAttempts] = n }
+    fun setSounds(context: Context, on: Boolean) = update(context) { it[keySounds] = on }
 }

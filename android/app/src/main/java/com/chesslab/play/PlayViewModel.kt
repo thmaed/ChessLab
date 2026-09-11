@@ -19,6 +19,7 @@ import com.chesslab.maia.MaiaOpponent
 import com.chesslab.maia.OpponentGallery
 import com.chesslab.maia.OpponentProfile
 import com.chesslab.settings.SettingsStore
+import com.chesslab.sound.SoundPlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -252,6 +253,18 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             is Board.State.Checkmate -> kingSquare(state.color)
             else -> null
         }
+
+        // le son suit le COUP, pas l'état : une prise reste une prise même
+        // quand elle donne échec — c'est l'échec qui l'emporte
+        SoundPlayer.enabled = SettingsStore.state.value.soundsEnabled
+        move?.let {
+            SoundPlayer.forMove(
+                isCapture = it.result is Move.Result.Capture,
+                isCastle = it.result is Move.Result.Castle,
+                isCheck = state is Board.State.Check || state is Board.State.Checkmate,
+            )
+        }
+
         val over = state is Board.State.Checkmate || state is Board.State.Draw
         if (over && !ui.gameOver) {
             viewModelScope.launch(Dispatchers.IO) {
