@@ -27,6 +27,9 @@ class Position(
     var enPassantIsPossible: Boolean = enPassant != null
     var clock: Clock = clock
 
+    /** L'annotation de la position, écrite dans le PGN. */
+    var assessment: PositionAssessment = PositionAssessment.null_
+
     val pieces: List<Piece> get() = pieceSet.pieces
 
     fun piece(at: Square): Piece? = pieceSet.get(at)
