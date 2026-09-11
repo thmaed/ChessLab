@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,7 +59,12 @@ private fun PlayScreen(model: PlayViewModel = viewModel()) {
                 CircularProgressIndicator(Modifier.size(12.dp), strokeWidth = 2.dp, color = Palette.accent)
                 Spacer(Modifier.width(8.dp))
             }
-            Text(ui.status, style = MaterialTheme.typography.bodySmall, color = Palette.textSecondary)
+            Text(
+                ui.status,
+                style = MaterialTheme.typography.bodySmall,
+                color = Palette.textSecondary,
+                modifier = Modifier.testTag("statut"),
+            )
         }
 
         Spacer(Modifier.height(12.dp))
@@ -114,10 +120,10 @@ private fun MoveStrip(moves: List<String>) {
             }
             Text(
                 san,
+                modifier = Modifier.testTag("coup-$index").padding(end = 4.dp),
                 fontSize = 12.sp,
                 fontFamily = FontFamily.Monospace,
                 color = Palette.textPrimary,
-                modifier = Modifier.padding(end = 4.dp),
             )
         }
     }

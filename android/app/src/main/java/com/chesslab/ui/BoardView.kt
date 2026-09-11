@@ -1,5 +1,6 @@
 package com.chesslab.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -17,6 +20,7 @@ import androidx.compose.ui.unit.sp
 import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
+import com.chesslab.R
 
 /**
  * L'échiquier. Pendant de `BoardView.swift`.
@@ -92,14 +96,20 @@ private fun SquareCell(
         else -> base
     }
 
-    Box(modifier.background(background).clickable(onClick = onTap), Alignment.Center) {
+    // La case porte son nom : les tests d'interface cliquent « case-e2 »
+    // plutôt que des pixels, et restent valides quand la mise en page bouge.
+    Box(
+        modifier
+            .testTag("case-${square.notation}")
+            .background(background)
+            .clickable(onClick = onTap),
+        Alignment.Center,
+    ) {
         if (piece != null) {
-            Text(
-                text = glyph(piece),
-                style = TextStyle(
-                    fontSize = 34.sp,
-                    color = if (piece.color == Piece.Color.white) Color.White else Color(0xFF16181C),
-                ),
+            Image(
+                painter = painterResource(drawableFor(piece)),
+                contentDescription = describe(piece),
+                modifier = Modifier.fillMaxSize(0.92f),
             )
         }
 
@@ -141,17 +151,40 @@ private fun SquareCell(
 }
 
 /**
- * Les glyphes Unicode. Le jeu vectoriel cburnett de l'app iOS n'est pas encore
- * porté (12 SVG à convertir en `VectorDrawable`) ; en attendant, les glyphes
- * pleins d'Unicode rendent correctement sur case claire comme sur case sombre.
+ * Le jeu cburnett, celui de l'app iOS — mêmes SVG, convertis en
+ * `VectorDrawable` par `tools/svg-to-vector/convert_pieces.py`.
  */
-private fun glyph(piece: Piece): String = when (piece.kind) {
-    Piece.Kind.king -> "♚"
-    Piece.Kind.queen -> "♛"
-    Piece.Kind.rook -> "♜"
-    Piece.Kind.bishop -> "♝"
-    Piece.Kind.knight -> "♞"
-    Piece.Kind.pawn -> "♟"
+private fun drawableFor(piece: Piece): Int = when (piece.color) {
+    Piece.Color.white -> when (piece.kind) {
+        Piece.Kind.king -> R.drawable.piece_wk
+        Piece.Kind.queen -> R.drawable.piece_wq
+        Piece.Kind.rook -> R.drawable.piece_wr
+        Piece.Kind.bishop -> R.drawable.piece_wb
+        Piece.Kind.knight -> R.drawable.piece_wn
+        Piece.Kind.pawn -> R.drawable.piece_wp
+    }
+    Piece.Color.black -> when (piece.kind) {
+        Piece.Kind.king -> R.drawable.piece_bk
+        Piece.Kind.queen -> R.drawable.piece_bq
+        Piece.Kind.rook -> R.drawable.piece_br
+        Piece.Kind.bishop -> R.drawable.piece_bb
+        Piece.Kind.knight -> R.drawable.piece_bn
+        Piece.Kind.pawn -> R.drawable.piece_bp
+    }
+}
+
+/** Lu par les lecteurs d'écran, comme le `accessibilityLabel` iOS. */
+private fun describe(piece: Piece): String {
+    val kind = when (piece.kind) {
+        Piece.Kind.king -> "Roi"
+        Piece.Kind.queen -> "Dame"
+        Piece.Kind.rook -> "Tour"
+        Piece.Kind.bishop -> "Fou"
+        Piece.Kind.knight -> "Cavalier"
+        Piece.Kind.pawn -> "Pion"
+    }
+    val color = if (piece.color == Piece.Color.white) "blanc" else "noir"
+    return "$kind $color en ${piece.square.notation}"
 }
 
 private fun Color.compositeOver(background: Color): Color {
