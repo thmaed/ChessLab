@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Le fond du calque adaptatif. L'illustration déborde du masque, si bien
+         que cette couleur ne se voit jamais ; elle reprend le blanc cassé du
+         liseré de l'icône pour que rien ne jure si un lanceur exotique
+         montrait malgré tout un coin. -->
+    <color name="ic_launcher_background">#FCFBFB</color>
+</resources>

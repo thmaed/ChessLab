@@ -2,6 +2,8 @@ package com.chesslab.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -79,24 +81,51 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     "Jouer · Analyser · S'entraîner · Expérimenter",
                     style = MaterialTheme.typography.bodySmall,
                     color = Palette.textSecondary,
+                    maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
-            }
-            IconButton(onClick = { onOpen(Route.PositionEditor) }, modifier = Modifier.testTag("editeur")) {
-                Icon(Icons.Default.Edit, "Éditeur de position", tint = Palette.textSecondary)
-            }
-            IconButton(onClick = { onOpen(Route.Progression) }, modifier = Modifier.testTag("progression")) {
-                Icon(Icons.Default.TrendingUp, "Progression", tint = Palette.textSecondary)
-            }
-            IconButton(onClick = { onOpen(Route.Scanner) }, modifier = Modifier.testTag("scanner")) {
-                Icon(Icons.Default.PhotoCamera, "Scanner un échiquier", tint = Palette.textSecondary)
-            }
-            IconButton(onClick = { onOpen(Route.Help) }, modifier = Modifier.testTag("aide")) {
-                Icon(Icons.AutoMirrored.Filled.HelpOutline, "Aide", tint = Palette.textSecondary)
             }
             IconButton(onClick = { onOpen(Route.Settings) }, modifier = Modifier.testTag("reglages")) {
                 Icon(Icons.Default.Settings, "Réglages", tint = Palette.textSecondary)
             }
         }
+
+        // Les actions secondaires : des pastilles NOMMÉES plutôt que des
+        // icônes nues. Cinq pictogrammes côte à côte se devinent mal, et ils
+        // poussaient l'accroche sur trois lignes.
+        Spacer(Modifier.height(6.dp))
+        Row(
+            Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            listOf(
+                Triple(Route.Scanner, "Scanner", Icons.Default.PhotoCamera),
+                Triple(Route.PositionEditor, "Éditeur", Icons.Default.Edit),
+                Triple(Route.Progression, "Progression", Icons.Default.TrendingUp),
+                Triple(Route.Help, "Aide", Icons.AutoMirrored.Filled.HelpOutline),
+            ).forEach { (route, label, icon) ->
+                Row(
+                    Modifier
+                        .testTag(
+                            when (route) {
+                                Route.Scanner -> "scanner"
+                                Route.PositionEditor -> "editeur"
+                                Route.Progression -> "progression"
+                                else -> "aide"
+                            }
+                        )
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(Palette.surface)
+                        .clickable { onOpen(route) }
+                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(icon, null, tint = Palette.textSecondary, modifier = Modifier.size(15.dp))
+                    Spacer(Modifier.width(5.dp))
+                    Text(label, fontSize = 11.sp, color = Palette.textSecondary)
+                }
+            }
+        }
+
         Spacer(Modifier.height(12.dp))
 
         // La partie interrompue, s'il y en a une : elle passe AVANT les modes.
