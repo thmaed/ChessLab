@@ -13,6 +13,7 @@ val copyAssets by tasks.registering(Copy::class) {
     from(rootProject.file("../ChessLab/Resources")) {
         include("nn-*.nnue")
         include("lichess_puzzles.json")
+        include("openings/**")          // cours d'ouvertures ET de finales
     }
     into(generatedAssets)
 }

@@ -96,6 +96,30 @@ class AppTest {
         awaitTag("score", 10_000)
     }
 
+    @Test fun openingCoursesCanBeRead() {
+        open("Ouvertures")
+        awaitTag("compte")
+        // la liste est paresseuse : on filtre pour amener la ligne à l'écran
+        compose.onNodeWithTag("recherche").performTextInput("Italian")
+        awaitTag("cours-italian-game", 10_000)
+        compose.onNodeWithTag("cours-italian-game").performClick()
+
+        awaitTag("progression")
+        compose.onNodeWithTag("case-e4").assertIsDisplayed()
+        // le premier coup commenté de la Partie italienne est Bc4, au 5e demi-coup
+        repeat(5) { compose.onNodeWithTag("suivant").performClick() }
+        awaitTag("commentaire", 10_000)
+    }
+
+    @Test fun endgameCoursesAreListedApart() {
+        open("Finales")
+        awaitTag("compte")
+        compose.onNodeWithTag("recherche").performTextInput("Opposition")
+        awaitTag("cours-eg-opposition", 10_000)
+        compose.onNodeWithTag("cours-eg-opposition").performClick()
+        awaitTag("progression")
+    }
+
     @Test fun backReturnsHome() {
         open("Analyser")
         compose.onNodeWithTag("retour").performClick()

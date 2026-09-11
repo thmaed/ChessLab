@@ -18,6 +18,9 @@ import androidx.compose.ui.unit.dp
 import com.chesslab.analysis.AnalysisScreen
 import com.chesslab.nav.Route
 import com.chesslab.play.PlayScreen
+import com.chesslab.courses.CourseListScreen
+import com.chesslab.courses.CourseRepository
+import com.chesslab.courses.CourseScreen
 import com.chesslab.puzzles.PuzzleScreen
 import com.chesslab.twoplayer.TwoPlayerScreen
 import com.chesslab.ui.HomeScreen
@@ -63,10 +66,17 @@ private fun App() {
             Route.TwoPlayer -> TwoPlayerScreen()
             Route.Analysis -> AnalysisScreen()
             Route.Puzzles -> PuzzleScreen()
+            Route.Openings -> CourseListScreen(endgames = false) { stack.add(reader(it)) }
+            Route.Endgames -> CourseListScreen(endgames = true) { stack.add(reader(it)) }
+            is Route.CourseReader -> CourseScreen(current.id)
             else -> Placeholder(current.title)
         }
     }
 }
+
+/** Le titre d'un cours vient du catalogue : la liste l'a déjà en mémoire. */
+private fun reader(id: String): Route.CourseReader =
+    Route.CourseReader(id, CourseRepository.cachedName(id) ?: id)
 
 @Composable
 private fun TopBar(title: String, onBack: () -> Unit) {
