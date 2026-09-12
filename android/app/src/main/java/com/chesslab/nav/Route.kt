@@ -17,6 +17,13 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
 
     fun title(context: Context): String = dynamicTitle ?: context.getString(titleRes)
 
+    /**
+     * Vrai quand l'écran porte DÉJÀ son grand titre : la barre n'en montre
+     * alors qu'une flèche de retour. Deux fois le même mot, l'un sous
+     * l'autre, ne dit rien de plus.
+     */
+    open val hasOwnTitle: Boolean get() = false
+
     data object Home : Route(R.string.route_home)
     /**
      * La CONFIGURATION d'une partie, comme sur iOS : on choisit couleur,
@@ -43,8 +50,12 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data class AnalysisBoard(val fen: String? = null, val pgn: String? = null) :
         Route(R.string.route_analysis)
     data object Puzzles : Route(R.string.route_puzzles)
-    data object Openings : Route(R.string.route_openings)
-    data object Endgames : Route(R.string.route_endgames)
+    data object Openings : Route(R.string.route_openings) {
+        override val hasOwnTitle get() = true
+    }
+    data object Endgames : Route(R.string.route_endgames) {
+        override val hasOwnTitle get() = true
+    }
     data object Laboratory : Route(R.string.route_lab)
     data object Variants : Route(R.string.route_variants)
     data object Progression : Route(R.string.route_progress)

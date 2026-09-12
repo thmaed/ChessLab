@@ -107,8 +107,8 @@ class TrainingTest {
     @Test fun uneVarianteDuRepertoireLaisseChoisir() {
         openDailyOnItalian()
         play("e2", "e4"); awaitText("1. e4 e5")
-        play("g1", "f3"); awaitText("2. Nf3 Nc6")
-        play("f1", "c4"); awaitText("3. Bc4 Bc5")
+        play("g1", "f3"); awaitText("2. \u265ef3 \u265ec6")
+        play("f1", "c4"); awaitText("3. \u265dc4 \u265dc5")
         play("b2", "b4")                       // le gambit Evans : au répertoire, pas principal
 
         awaitTag("variante")
@@ -120,8 +120,8 @@ class TrainingTest {
     @Test fun laVarianteSeJoueSiOnLaChoisit() {
         openDailyOnItalian()
         play("e2", "e4"); awaitText("1. e4 e5")
-        play("g1", "f3"); awaitText("2. Nf3 Nc6")
-        play("f1", "c4"); awaitText("3. Bc4 Bc5")
+        play("g1", "f3"); awaitText("2. \u265ef3 \u265ec6")
+        play("f1", "c4"); awaitText("3. \u265dc4 \u265dc5")
         play("b2", "b4")
         awaitTag("variante")
         compose.onNodeWithTag("jouer-variante").performClick()
@@ -209,7 +209,7 @@ class TrainingTest {
         play("a2", "a3"); awaitTag("bon-coup")
         compose.onNodeWithTag("continuer").performClick()
         awaitText("1. e4 e5")
-        play("g1", "f3"); awaitText("2. Nf3 Nc6")
+        play("g1", "f3"); awaitText("2. \u265ef3 \u265ec6")
         compose.waitUntil(20_000) { runBlocking { dao.studiedCount() == 2 } }
 
         compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }

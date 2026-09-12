@@ -298,3 +298,37 @@ fun EntryCard(
         }
     }
 }
+
+/**
+ * Un champ de saisie nu, avec sa consigne quand il est vide.
+ *
+ * `OutlinedTextField` de Material apporte son propre cadre, son étiquette
+ * flottante et ses couleurs : dans une barre de recherche déjà dessinée, tout
+ * cela se contrarie. Ici, le texte et rien d'autre.
+ */
+@Composable
+fun BasicTextFieldWithPlaceholder(
+    value: String,
+    placeholder: String,
+    modifier: Modifier = Modifier,
+    /** Le repère va sur le CHAMP, pas sur la boîte : un test qui vise la boîte
+     *  ne trouve pas de quoi prendre le focus. */
+    tag: String = "",
+    onChange: (String) -> Unit,
+) {
+    Box(modifier, contentAlignment = Alignment.CenterStart) {
+        if (value.isEmpty()) {
+            Text(placeholder, fontSize = 14.sp, color = Palette.textTertiary, maxLines = 1)
+        }
+        androidx.compose.foundation.text.BasicTextField(
+            value = value,
+            onValueChange = onChange,
+            singleLine = true,
+            textStyle = androidx.compose.ui.text.TextStyle(
+                color = Palette.textPrimary, fontSize = 14.sp,
+            ),
+            cursorBrush = androidx.compose.ui.graphics.SolidColor(Palette.accent),
+            modifier = Modifier.fillMaxWidth().padding(vertical = 14.dp).testTag(tag),
+        )
+    }
+}

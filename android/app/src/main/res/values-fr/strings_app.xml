@@ -385,4 +385,35 @@
     <string name="entry_paste">Analyser PGN / FEN</string>
     <string name="entry_paste_sub">Collez une partie ou une position — le format est reconnu tout seul</string>
     <string name="entry_editor_sub">Composer une position sur le plateau</string>
+    <string name="courses_intro_openings_title">Chaque position, disséquée</string>
+    <string name="courses_intro_openings_body">L\'index de toutes les lignes, les coups des maîtres avec leurs pourcentages, et les trois meilleurs coups de Stockfish — calculés d\'avance.</string>
+    <string name="courses_intro_endgames_title">Des fins que l\'on prouve</string>
+    <string name="courses_intro_endgames_body">Lucena, Philidor, opposition : des positions à comprendre, pas à retenir — chacune avec le coup qui gagne, et pourquoi.</string>
+    <string name="courses_white_repertoire">Répertoire blanc</string>
+    <string name="courses_black_repertoire">Répertoire noir</string>
+    <string name="courses_none">Rien ne correspond à cette recherche.</string>
+    <string name="filter_all">Tous</string>
+    <plurals name="course_moves">
+        <item quantity="one">%1$d coup</item>
+        <item quantity="other">%1$d coups</item>
+    </plurals>
+    <string name="course_repertoire">Répertoire</string>
+    <string name="course_previous">Précédent</string>
+    <string name="course_next">Suivant</string>
+    <string name="role_trap">Piège</string>
+    <string name="role_inaccuracy">Imprécision</string>
+    <string name="role_refutation">Réfutation</string>
+    <string name="role_main_line">Ligne principale</string>
+    <string name="variant_chess960_short">Zéro théorie</string>
+    <string name="variant_koth_short">Le roi au centre</string>
+    <string name="variant_3check_short">Échec trois fois gagne</string>
+    <string name="variant_horde_short">36 pions</string>
+    <string name="variant_racing_short">Le roi en 8e</string>
+    <string name="variant_atomic_short">Prises explosives</string>
+    <string name="variant_antichess_short">Perdre pour gagner</string>
+    <string name="variant_crazyhouse">Crazyhouse</string>
+    <string name="variant_crazyhouse_short">Les prises reviennent</string>
+    <string name="variant_crazyhouse_blurb">Une pièce prise change de camp et peut être PARACHUTÉE sur n\'importe quelle case vide. Le plateau ne se vide jamais, et rien n\'est jamais tout à fait gagné.</string>
+    <string name="variants_intro">D\'autres façons de jouer aux échecs, contre l\'ordinateur — mêmes réglages de force et de cadence que le mode classique.</string>
+    <string name="route_variants_title">Variantes d\'échecs</string>
 </resources>

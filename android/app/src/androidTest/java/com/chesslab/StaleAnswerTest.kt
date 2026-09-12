@@ -44,16 +44,18 @@ class StaleAnswerTest {
     @Test fun uneNouvellePartieEnPleineReflexionNeJoueRienToutSeul() {
         openMode("play")
         awaitTag("commencer")
-        compose.onNodeWithTag("segment-1").performClick()   // Stockfish : la réponse est la plus lente
+        // Un personnage plutôt que Stockfish : son inférence prend plus de
+        // temps sur l'émulateur, donc la fenêtre « pendant qu'il calcule » est
+        // assez large pour être visée sans course.
+        compose.onNodeWithTag("adversaire-lea").performClick()
         compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer")
 
         compose.onNodeWithTag("case-e2").performClick()
         compose.onNodeWithTag("case-e4").performClick()
-        awaitText("réfléchit", 30_000)
 
-        // On abandonne pendant qu'il calcule, puis on relance : sa réponse
-        // d'avant ne doit pas atterrir sur le plateau neuf.
+        // On abandonne SANS attendre sa réponse, puis on relance : elle ne
+        // doit pas atterrir sur le plateau neuf.
         compose.onNodeWithTag("abandonner").performClick()
         compose.onNodeWithTag("abandonner-oui").performClick()
         awaitTag("nouvelle")

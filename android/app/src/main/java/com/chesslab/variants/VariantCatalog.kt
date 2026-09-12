@@ -16,6 +16,8 @@ data class Variant(
     /** Le nom et la description sont des ressources : elles se traduisent. */
     @StringRes val titleRes: Int,
     @StringRes val blurbRes: Int,
+    /** L'accroche COURTE de la tuile : trois mots, pas un paragraphe. */
+    @StringRes val shortRes: Int,
     val chess960: Boolean = false,
 )
 
@@ -24,25 +26,37 @@ object VariantCatalog {
     val all = listOf(
         Variant(
             "chess960", "chess", R.string.variant_chess960, R.string.variant_chess960_blurb,
+            R.string.variant_chess960_short,
             chess960 = true,
         ),
         Variant(
             "kingofthehill", "kingofthehill", R.string.variant_koth, R.string.variant_koth_blurb,
+            R.string.variant_koth_short,
         ),
         Variant(
             "3check", "3check", R.string.variant_3check, R.string.variant_3check_blurb,
+            R.string.variant_3check_short,
         ),
         Variant(
             "horde", "horde", R.string.variant_horde, R.string.variant_horde_blurb,
+            R.string.variant_horde_short,
         ),
         Variant(
             "racingkings", "racingkings", R.string.variant_racing, R.string.variant_racing_blurb,
+            R.string.variant_racing_short,
         ),
         Variant(
             "atomic", "atomic", R.string.variant_atomic, R.string.variant_atomic_blurb,
+            R.string.variant_atomic_short,
         ),
+        // Crazyhouse attend : le moteur la connaît, mais elle demande de
+        // PARACHUTER les pièces prises, donc une réserve et un geste de pose.
+        // Sans eux, le moteur jouerait des parachutages que l'utilisateur ne
+        // pourrait pas rendre — une variante à moitié jouable est pire que
+        // pas de variante.
         Variant(
             "antichess", "antichess", R.string.variant_antichess, R.string.variant_antichess_blurb,
+            R.string.variant_antichess_short,
         ),
     )
 

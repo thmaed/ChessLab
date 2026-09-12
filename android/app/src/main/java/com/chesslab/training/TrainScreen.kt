@@ -21,6 +21,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.chesslab.play.PromotionDialog
 import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
+import com.chesslab.ui.FigurineSan
 import com.chesslab.ui.Palette
 import androidx.compose.ui.res.stringResource
 import com.chesslab.R
@@ -167,7 +168,8 @@ fun TrainScreen(mode: TrainMode, model: TrainViewModel = viewModel()) {
             if (ui.playedSans.isNotEmpty()) {
                 Spacer(Modifier.height(10.dp))
                 Text(
-                    ui.playedSans.chunked(2).mapIndexed { i, pair -> "${i + 1}. ${pair.joinToString(" ")}" }
+                    ui.playedSans.map(FigurineSan::format).chunked(2)
+                    .mapIndexed { i, pair -> "${i + 1}. ${pair.joinToString(" ")}" }
                         .joinToString("  "),
                     fontSize = 12.sp, color = Palette.textSecondary,
                     modifier = Modifier.testTag("coups-joues"),

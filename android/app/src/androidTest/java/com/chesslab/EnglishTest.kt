@@ -62,12 +62,13 @@ class EnglishTest {
         openMode("openings")
         awaitText("Today's review")
         compose.onNodeWithText("Hard positions").assertIsDisplayed()
-        // Le décompte n'arrive qu'une fois le catalogue lu.
-        awaitText("openings")
+        // La carte d'introduction de la liste, en anglais.
+        awaitText("Every position, dissected")
         // Et le CONTENU des cours suit la langue, pas seulement le décor :
         // les fichiers portent les deux, et n'en lire qu'un serait pire que
-        // de ne rien traduire.
-        awaitText("A pesky countergambit")
+        // de ne rien traduire. Une ouverture BLANCHE : la liste groupe par
+        // camp, et le groupe noir est sous la ligne de flottaison.
+        awaitText("a Dutch with White")
     }
 
     @Test fun theHelpSpeaksEnglish() {

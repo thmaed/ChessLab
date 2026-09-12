@@ -79,7 +79,7 @@ fun MoveStrip(
             }
             val isSelected = index == selected
             Text(
-                san,
+                FigurineSan.format(san),
                 modifier = Modifier
                     .testTag("coup-$index")
                     .then(if (onSelect != null) Modifier.clickableNoRipple { onSelect(index) } else Modifier)

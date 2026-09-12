@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -48,6 +49,13 @@ fun BoardView(
     checkedKing: Square? = null,
     /** Les deux cases d'un coup soufflé : l'entraînement allume la réponse. */
     hint: Pair<Square, Square>? = null,
+    /**
+     * Les flèches posées sur le plateau : un coup candidat chacune, teintée
+     * comme sa pastille dans la liste. C'est ce qui rend un lecteur
+     * d'ouvertures lisible d'un coup d'œil — on VOIT les suites au lieu de les
+     * lire.
+     */
+    arrows: List<BoardArrow> = emptyList(),
     enabled: Boolean = true,
     onSquareTap: (Square) -> Unit = {},
 ) {
@@ -76,29 +84,91 @@ fun BoardView(
     val screenHeight = LocalConfiguration.current.screenHeightDp.dp
     BoxWithConstraints(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         val side = minOf(maxWidth, maxHeight, screenHeight * 0.80f)
-        Column(Modifier.size(side)) {
-        for (rank in ranks) {
-            Row(Modifier.fillMaxWidth().weight(1f)) {
-                for (file in files) {
-                    val square = Square(Square.File(file), Square.Rank(rank))
-                    SquareCell(
-                        square = square,
-                        piece = position.piece(square),
-                        theme = boardTheme,
-                        pieceSet = pieces,
-                        isSelected = square == selected,
-                        isLegalTarget = square in legalTargets,
-                        isLastMove = lastMove?.let { square == it.first || square == it.second } == true,
-                        isChecked = square == checkedKing,
-                        isHint = hint?.let { square == it.first || square == it.second } == true,
-                        showFile = rank == ranks.last,
-                        showRank = file == files.first,
-                        modifier = Modifier.weight(1f).fillMaxHeight(),
-                        onTap = { if (enabled) onSquareTap(square) },
-                    )
+        // Les cases, puis les flèches PAR-DESSUS. L'overlay doit être un frère
+        // de la colonne, pas son enfant : posé dedans, il devenait une rangée
+        // de plus et écrasait les huit autres, dont la hauteur est pondérée.
+        Box(Modifier.size(side)) {
+            Column(Modifier.fillMaxSize()) {
+                for (rank in ranks) {
+                    Row(Modifier.fillMaxWidth().weight(1f)) {
+                        for (file in files) {
+                            val square = Square(Square.File(file), Square.Rank(rank))
+                            SquareCell(
+                                square = square,
+                                piece = position.piece(square),
+                                theme = boardTheme,
+                                pieceSet = pieces,
+                                isSelected = square == selected,
+                                isLegalTarget = square in legalTargets,
+                                isLastMove = lastMove?.let { square == it.first || square == it.second } == true,
+                                isChecked = square == checkedKing,
+                                isHint = hint?.let { square == it.first || square == it.second } == true,
+                                showFile = rank == ranks.last,
+                                showRank = file == files.first,
+                                modifier = Modifier.weight(1f).fillMaxHeight(),
+                                onTap = { if (enabled) onSquareTap(square) },
+                            )
+                        }
+                    }
                 }
             }
+            if (arrows.isNotEmpty()) ArrowOverlay(arrows, orientation, Modifier.fillMaxSize())
         }
+    }
+}
+
+/** Une flèche : d'où, vers où, de quelle couleur, et à quel point marquée. */
+data class BoardArrow(
+    val from: Square,
+    val to: Square,
+    val tint: Color,
+    /** 1 = le coup recommandé, plus épais ; en dessous, les variantes. */
+    val strength: Float = 1f,
+)
+
+/**
+ * Les flèches, dessinées PAR-DESSUS les cases.
+ *
+ * Elles partent du bord de la case de départ et non de son centre : une
+ * flèche qui sort de sous la pièce la cache, et c'est la pièce qu'on regarde.
+ */
+@Composable
+private fun ArrowOverlay(arrows: List<BoardArrow>, orientation: Piece.Color, modifier: Modifier) {
+    androidx.compose.foundation.Canvas(modifier) {
+        val cell = size.width / 8f
+        fun center(square: Square): Offset {
+            val file = square.file.number - 1
+            val rank = square.rank.value - 1
+            val x = if (orientation == Piece.Color.white) file else 7 - file
+            val y = if (orientation == Piece.Color.white) 7 - rank else rank
+            return Offset((x + 0.5f) * cell, (y + 0.5f) * cell)
+        }
+        // Les moins marquées d'abord : la recommandée se pose au-dessus.
+        arrows.sortedBy { it.strength }.forEach { arrow ->
+            val a = center(arrow.from)
+            val b = center(arrow.to)
+            val dx = b.x - a.x
+            val dy = b.y - a.y
+            val length = kotlin.math.hypot(dx, dy)
+            if (length < 1f) return@forEach
+            val ux = dx / length
+            val uy = dy / length
+            val width = cell * (0.16f + 0.10f * arrow.strength)
+            val head = cell * 0.42f
+            // On démarre au bord de la case de départ, on s'arrête au bord de
+            // la pointe : la flèche relie deux cases sans les masquer.
+            val start = Offset(a.x + ux * cell * 0.34f, a.y + uy * cell * 0.34f)
+            val tip = Offset(b.x - ux * cell * 0.10f, b.y - uy * cell * 0.10f)
+            val neck = Offset(tip.x - ux * head, tip.y - uy * head)
+            val colour = arrow.tint.copy(alpha = 0.55f + 0.35f * arrow.strength)
+            drawLine(colour, start, neck, strokeWidth = width, cap = androidx.compose.ui.graphics.StrokeCap.Round)
+            val path = androidx.compose.ui.graphics.Path().apply {
+                moveTo(tip.x, tip.y)
+                lineTo(neck.x - uy * head * 0.52f, neck.y + ux * head * 0.52f)
+                lineTo(neck.x + uy * head * 0.52f, neck.y - ux * head * 0.52f)
+                close()
+            }
+            drawPath(path, colour)
         }
     }
 }

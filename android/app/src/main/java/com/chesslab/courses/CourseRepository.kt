@@ -17,6 +17,8 @@ data class CatalogEntry(
     val positionCount: Int,
     val isEndgame: Boolean,
     val family: String?,
+    /** Profondeur maximale de l'arbre, en demi-coups. */
+    val maxDepth: Int?,
 ) {
     @get:StringRes
     val sideLabel: Int get() = if (side == "white") R.string.color_white else R.string.color_black
@@ -105,6 +107,7 @@ object CourseRepository {
                 summary = localized(o.optJSONObject("summary")) ?: "",
                 positionCount = o.optInt("positionCount", 0),
                 isEndgame = o.optString("kind") == "endgame",
+                maxDepth = if (o.has("maxDepth")) o.getInt("maxDepth") else null,
                 family = o.optString("family").ifEmpty { null },
             )
         }

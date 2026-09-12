@@ -148,10 +148,16 @@ class AppTest {
         awaitTag("cours-italian-game", 10_000)
         compose.onNodeWithTag("cours-italian-game").performClick()
 
-        awaitTag("progression")
+        // Le lecteur DESCEND l'arbre : la racine, puis les suites.
+        awaitTag("racine")
         compose.onNodeWithTag("case-e4").assertIsDisplayed()
-        // le premier coup commenté de la Partie italienne est Bc4, au 5e demi-coup
-        repeat(5) { compose.onNodeWithTag("suivant").performClick() }
+        // le premier coup commenté de la Partie italienne est Fc4, au 5e demi-coup
+        // Un clic, puis on laisse l'écran se reposer : enchaîner cinq clics
+        // sans respirer détache le nœud sous la main de Compose.
+        repeat(5) {
+            compose.onNodeWithTag("suivant").performClick()
+            compose.waitForIdle()
+        }
         awaitTag("commentaire", 10_000)
     }
 
@@ -161,7 +167,7 @@ class AppTest {
         compose.onNodeWithTag("recherche").performTextInput("Opposition")
         awaitTag("cours-eg-opposition", 10_000)
         compose.onNodeWithTag("cours-eg-opposition").performClick()
-        awaitTag("progression")
+        awaitTag("racine")
     }
 
     @Test fun settingsChangeTheBoardTheme() {

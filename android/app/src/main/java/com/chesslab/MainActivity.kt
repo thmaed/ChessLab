@@ -83,7 +83,7 @@ private fun App() {
 
     Column(Modifier.fillMaxSize().safeDrawingPadding()) {
         if (current != Route.Home) {
-            TopBar(current.title(context)) { stack.removeAt(stack.lastIndex) }
+            TopBar(if (current.hasOwnTitle) "" else current.title(context)) { stack.removeAt(stack.lastIndex) }
         }
         when (current) {
             Route.Home -> HomeScreen { stack.add(it) }

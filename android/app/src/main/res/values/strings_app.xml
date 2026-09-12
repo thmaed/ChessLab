@@ -388,4 +388,35 @@
     <string name="entry_paste">Analyse PGN / FEN</string>
     <string name="entry_paste_sub">Paste a game or a position — the format is recognised on its own</string>
     <string name="entry_editor_sub">Compose a position on the board</string>
+    <string name="courses_intro_openings_title">Every position, dissected</string>
+    <string name="courses_intro_openings_body">The index of every line, the masters\' moves with their percentages, and Stockfish\'s three best moves — all computed in advance.</string>
+    <string name="courses_intro_endgames_title">Endings you can prove</string>
+    <string name="courses_intro_endgames_body">Lucena, Philidor, opposition: positions to understand, not to memorise — each one with the move that wins and why.</string>
+    <string name="courses_white_repertoire">White repertoire</string>
+    <string name="courses_black_repertoire">Black repertoire</string>
+    <string name="courses_none">Nothing matches this search.</string>
+    <string name="filter_all">All</string>
+    <plurals name="course_moves">
+        <item quantity="one">%1$d move</item>
+        <item quantity="other">%1$d moves</item>
+    </plurals>
+    <string name="course_repertoire">Repertoire</string>
+    <string name="course_previous">Previous</string>
+    <string name="course_next">Next</string>
+    <string name="role_trap">Trap</string>
+    <string name="role_inaccuracy">Inaccuracy</string>
+    <string name="role_refutation">Refutation</string>
+    <string name="role_main_line">Main line</string>
+    <string name="variant_chess960_short">Zero theory</string>
+    <string name="variant_koth_short">King to the centre</string>
+    <string name="variant_3check_short">Check three times</string>
+    <string name="variant_horde_short">36 pawns</string>
+    <string name="variant_racing_short">King to rank 8</string>
+    <string name="variant_atomic_short">Explosive captures</string>
+    <string name="variant_antichess_short">Lose to win</string>
+    <string name="variant_crazyhouse">Crazyhouse</string>
+    <string name="variant_crazyhouse_short">Captures come back</string>
+    <string name="variant_crazyhouse_blurb">A captured piece changes sides and can be DROPPED back on any empty square. The board never empties, and nothing is ever quite won.</string>
+    <string name="variants_intro">Other ways to play chess, against the computer — same strength and time-control settings as the classical mode.</string>
+    <string name="route_variants_title">Chess variants</string>
 </resources>
