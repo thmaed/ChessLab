@@ -506,4 +506,11 @@
     <string name="settings_notation">Move notation</string>
     <string name="settings_notation_french">French</string>
     <string name="settings_notation_english">English</string>
+    <string name="play_takeback">Take back</string>
+    <string name="blunder_title">Risky move</string>
+    <string name="blunder_missed_mate">That move lets a forced mate slip away.</string>
+    <string name="blunder_allows_mate">That move gives your opponent a forced mate.</string>
+    <string name="blunder_centipawns">That move costs about %1$d pawn(s) of evaluation.</string>
+    <string name="blunder_keep">Keep it</string>
+    <string name="setup_blunder_alert">Warn me about risky moves</string>
 </resources>

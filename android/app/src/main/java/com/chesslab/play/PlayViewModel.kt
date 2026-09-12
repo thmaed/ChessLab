@@ -39,6 +39,8 @@ data class PlayUiState(
      * est fort. Vide quand l'indice n'est pas demandé.
      */
     val hints: List<com.chesslab.ui.BoardArrow> = emptyList(),
+    /** L'alerte à montrer quand le coup qu'on vient de jouer coûte cher. */
+    val blunderWarning: BlunderSeverity? = null,
     val status: String = "",
     val sanMoves: List<String> = emptyList(),
     val thinking: Boolean = false,
@@ -66,6 +68,17 @@ data class PlayUiState(
     val started: Boolean = false,
 ) {
     val isReviewing: Boolean get() = displayedPly < sanMoves.size
+
+    /**
+     * Peut-on reprendre un coup ?
+     *
+     * **Pas avec une pendule** : on ne reprend pas du temps déjà écoulé, et
+     * iOS a tranché pareil. Ni pendant que le moteur réfléchit — la partie
+     * qu'il calcule ne serait plus celle qu'on lui a donnée.
+     */
+    val canTakeback: Boolean
+        get() = !settings.timeControl.hasClock && sanMoves.isNotEmpty() &&
+            !gameOver && !thinking
     val totalPlies: Int get() = sanMoves.size
 }
 
@@ -205,6 +218,8 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         // La recherche d'indice porte sur la position d'AVANT : la laisser
         // finir, c'est faire attendre l'adversaire pour des flèches périmées.
         stopHint()
+        val before = history.last().copy()
+        val wasHuman = move.piece.color == humanColor
         history += board.position.copy()
         moveLog += move
         recorder.record(move)
@@ -214,7 +229,79 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         refresh(null, move)
         if (ui.gameOver) { ticker?.cancel(); return }
         startClockForSideToMove()
-        if (board.position.sideToMove != humanColor) askOpponent()
+
+        // La vérification passe AVANT la réponse du moteur, et c'est la seule
+        // façon qu'elle marche : elle ne s'affiche que si reprendre est encore
+        // possible, or « le moteur réfléchit » interdit de reprendre. Lancées
+        // en parallèle, la réponse gagnait la course et l'alerte ne sortait
+        // jamais. iOS les met dans la même file, pour la même raison ; le
+        // joueur attend donc 300 ms de plus, une fois par coup.
+        val mustReply = board.position.sideToMove != humanColor
+        if (wasHuman && ui.settings.blunderAlertEnabled && !ui.settings.timeControl.hasClock) {
+            val after = board.position.copy()
+            val at = moveLog.size
+            viewModelScope.launch {
+                checkForBlunder(before, after, at)
+                if (mustReply && !ui.gameOver) askOpponent()
+            }
+        } else if (mustReply) {
+            askOpponent()
+        }
+    }
+
+    /**
+     * Le coup qu'on vient de jouer coûtait-il cher ?
+     *
+     * Deux recherches COURTES — 300 ms chacune, comme iOS : l'alerte doit
+     * arriver pendant qu'on regarde encore le coup, pas trois secondes plus
+     * tard. Elle ne s'affiche que si rien n'a bougé depuis, et que reprendre
+     * est encore possible : proposer une reprise impossible serait pire que se
+     * taire.
+     */
+    private suspend fun checkForBlunder(before: Position, after: Position, atMoveCount: Int) {
+        val verdict = withContext(Dispatchers.IO) {
+            EngineService.use(getApplication()) { e ->
+                val b = quickScore(e, before) ?: return@use null
+                val a = quickScore(e, after) ?: return@use null
+                BlunderAlert.severity(b.first, b.second, a.first, a.second)
+            }
+        } ?: return
+        // Un autre coup a pu être joué entre-temps — l'alerte porterait alors
+        // sur une position qui n'est plus à l'écran.
+        if (atMoveCount != moveLog.size || ui.gameOver || !ui.canTakeback) return
+        ui = ui.copy(blunderWarning = verdict)
+    }
+
+    /** Score et mat éventuel d'une position, du point de vue du camp au trait. */
+    private suspend fun quickScore(
+        engine: com.chesslab.engine.StockfishEngine,
+        position: Position,
+    ): Pair<Int, Int?>? {
+        engine.send("position fen ${position.fen}")
+        var cp: Int? = null
+        var mate: Int? = null
+        engine.search("go movetime 300", timeoutMs = 5_000) { line ->
+            if (!line.startsWith("info ") || !line.contains(" score ")) return@search
+            if ((line.substringAfter(" multipv ", "1").substringBefore(" ").toIntOrNull() ?: 1) != 1) return@search
+            val m = line.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
+            val c = line.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
+            if (m != null) { mate = m; cp = if (m > 0) 10_000 else -10_000 }
+            else if (c != null) { cp = c; mate = null }
+        }
+        return cp?.let { it to mate }
+    }
+
+    fun dismissBlunderWarning() { ui = ui.copy(blunderWarning = null) }
+
+    /**
+     * Reprendre après l'alerte. La riposte du moteur est très probablement
+     * déjà en train de se calculer : on l'annule d'abord, sinon la reprise
+     * échouerait en silence sur le garde « le moteur réfléchit ».
+     */
+    fun takebackAfterWarning() {
+        ui = ui.copy(blunderWarning = null, thinking = false)
+        thinkingJob?.cancel()
+        takeback()
     }
 
     private fun askOpponent() {
@@ -306,7 +393,34 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         val profile = autosave.opponentId?.let { OpponentGallery.byId(it) }
         newGame()
         ui = ui.copy(opponent = profile, level = autosave.level)
-        for (lan in autosave.moveList) {
+        rebuild(autosave.moveList, s(R.string.game_resumed))
+    }
+
+    /**
+     * Repose la partie sur exactement ces coups, puis remet en marche ce qui
+     * dépend de la position. Sert à REPRENDRE une partie sauvegardée comme à
+     * ANNULER un coup — deux gestes, une seule mécanique.
+     *
+     * La recherche en cours est annulée D'ABORD, et c'est indispensable :
+     * `newGame()` fait jouer le moteur quand l'utilisateur a les Noirs, et
+     * cette réponse-là porte sur la position de départ. Sans cette annulation,
+     * elle s'appliquait sur la partie fraîchement rejouée — un coup surgi de
+     * nulle part au milieu d'une reprise.
+     */
+    private fun rebuild(lans: List<String>, status: String?) {
+        thinkingJob?.cancel()
+        stopHint()
+
+        board = Board(startPosition)
+        history.clear()
+        history += startPosition
+        val custom = startPosition.fen.takeIf { it != Position.standard.fen }
+        recorder.reset(startPosition, custom)
+        moveLog.clear()
+        uciLog.clear()
+        ui = ui.copy(sanMoves = emptyList(), lastMove = null, thinking = false)
+
+        for (lan in lans) {
             var move = board.move(pieceAt = Square(lan.substring(0, 2)), to = Square(lan.substring(2, 4)))
                 ?: break
             if (lan.length == 5) {
@@ -318,8 +432,22 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             uciLog += move.lan
             ui = ui.copy(sanMoves = ui.sanMoves + move.san, lastMove = move.start to move.end)
         }
-        refresh(s(R.string.game_resumed))
+        ui = ui.copy(captured = CapturedMaterial.from(moveLog, board))
+        refresh(status)
+        autosave()
         if (!ui.gameOver && board.position.sideToMove != humanColor) askOpponent()
+    }
+
+    /**
+     * Annule son dernier coup — et la riposte du moteur avec, s'il a répondu.
+     * Reprendre un seul demi-coup rendrait la main à l'adversaire, ce qui
+     * n'est pas ce qu'on demande en disant « annuler ».
+     */
+    fun takeback() {
+        if (!ui.canTakeback) return
+        val last = moveLog.last()
+        val count = if (last.piece.color != humanColor && moveLog.size >= 2) 2 else 1
+        rebuild(uciLog.dropLast(count), s(R.string.your_turn))
     }
 
     private fun kindOf(c: Char): Piece.Kind = when (c) {
@@ -429,7 +557,8 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(
             position = startPosition,
             selected = null, legalTargets = emptySet(), lastMove = null, checkedKing = null,
-            hints = emptyList(), sanMoves = emptyList(), gameOver = false, outcome = null,
+            hints = emptyList(), blunderWarning = null,
+            sanMoves = emptyList(), gameOver = false, outcome = null,
             pendingPromotion = null, thinking = false, displayedPly = 0,
             captured = CapturedMaterial(),
             whiteClockMs = clock?.remaining(Piece.Color.white),

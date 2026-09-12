@@ -42,11 +42,23 @@ vérification sur appareil, pas après compilation.
       retraduirait les tours fraîchement écrites ; six tests le verrouillent.
 - [x] **Mode de flèches mémorisé.**
 
-### 2. Jouer
-- [ ] **Alerte avant un coup risqué** (`blunderAlertEnabled`) : iOS prévient
-      avant de valider un coup qui perd gros.
-- [ ] **Annuler un coup** (`multiMoveTakebackEnabled`) : Android sait REVOIR un
-      coup passé, pas le reprendre.
+### 2. Jouer — en partie, le 12/09
+- [x] **Annuler un coup.** Le dernier coup ET la riposte du moteur, car
+      reprendre un seul demi-coup rendrait la main à l'adversaire — ce n'est
+      pas ce qu'on demande en disant « annuler ». Pas avec une pendule : on ne
+      reprend pas du temps déjà écoulé, et iOS a tranché pareil. Le bouton
+      disparaît alors au lieu de rester grisé sans qu'on sache pourquoi.
+- [x] **Alerte après un coup risqué.** Rétroactive, comme iOS : prévenir AVANT
+      obligerait à faire attendre à chaque coup. Le barème est le même, en deux
+      couches — ce que le coup coûte en PROBABILITÉ DE GAIN (et non en
+      centipions bruts : perdre deux pions à +8 ne change rien), et si la
+      partie se joue encore (ni déjà perdue, ni encore gagnée). Trois messages
+      distincts : mat concédé, mat laissé filer, perte en pions.
+
+      **Le piège, trouvé sur l'appareil** : la vérification doit passer AVANT
+      la réponse du moteur. Lancées en parallèle, la réponse gagnait la course,
+      « le moteur réfléchit » interdisait de reprendre, et l'alerte ne sortait
+      jamais. iOS les met dans la même file pour cette raison-là.
 - [ ] **Répertoire d'ouvertures des personnages** : `opponent_books.json` est
       déjà copié dans les assets Android — et personne ne le lit. Les
       personnages jouent donc leurs ouvertures au réseau seul, sans le

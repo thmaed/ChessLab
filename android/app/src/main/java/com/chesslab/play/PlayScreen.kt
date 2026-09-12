@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -155,6 +156,7 @@ fun PlayScreen(
             onNext = model::reviewNext,
             onResumeHere = model::reviewLive,
             onHint = { model.toggleHint() },
+            onTakeback = { model.takeback() },
             onMoves = { showMoves = true },
             onDraw = { model.offerDraw() },
             onResign = { confirmResign = true },
@@ -168,6 +170,31 @@ fun PlayScreen(
     }
 
     if (ui.pendingPromotion != null) PromotionDialog(model::completePromotion)
+
+    ui.blunderWarning?.let { severity ->
+        val message = when (severity) {
+            is BlunderSeverity.MissedMate -> stringResource(R.string.blunder_missed_mate)
+            is BlunderSeverity.AllowsMate -> stringResource(R.string.blunder_allows_mate)
+            is BlunderSeverity.Centipawns ->
+                stringResource(R.string.blunder_centipawns, minOf(severity.drop, 1_000) / 100)
+        }
+        AlertDialog(
+            onDismissRequest = model::dismissBlunderWarning,
+            title = { Text(stringResource(R.string.blunder_title), color = Palette.textPrimary) },
+            text = { Text(message, color = Palette.textSecondary, modifier = Modifier.testTag("alerte-gaffe")) },
+            confirmButton = {
+                TextButton(onClick = model::takebackAfterWarning, modifier = Modifier.testTag("reprendre-le-coup")) {
+                    Text(stringResource(R.string.play_takeback), color = Palette.accent)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = model::dismissBlunderWarning) {
+                    Text(stringResource(R.string.blunder_keep), color = Palette.textSecondary)
+                }
+            },
+            containerColor = Palette.surfaceElevated,
+        )
+    }
 
     if (showMoves) {
         MoveListSheet(ui.sanMoves, ui.displayedPly) { showMoves = false }
@@ -292,6 +319,7 @@ private fun ControlBar(
     onNext: () -> Unit,
     onResumeHere: () -> Unit,
     onHint: () -> Unit,
+    onTakeback: () -> Unit,
     onMoves: () -> Unit,
     onDraw: () -> Unit,
     onResign: () -> Unit,
@@ -318,6 +346,14 @@ private fun ControlBar(
         }
 
         Spacer(Modifier.weight(1f))
+        // Annuler n'a de sens que sans pendule : on ne reprend pas du temps
+        // déjà écoulé. Le bouton disparaît alors plutôt que de rester grisé
+        // sans qu'on sache pourquoi.
+        if (!ui.settings.timeControl.hasClock && !ui.isReviewing) {
+            ControlButton(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.play_takeback),
+                enabled = ui.canTakeback, tag = "annuler", onClick = onTakeback)
+            Spacer(Modifier.width(10.dp))
+        }
         ControlButton(Icons.Default.Lightbulb, stringResource(R.string.train_hint),
             enabled = ui.settings.hintsEnabled && !ui.gameOver,
             tint = if (ui.hints.isNotEmpty()) Palette.accent else Palette.textPrimary,

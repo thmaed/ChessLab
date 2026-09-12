@@ -48,6 +48,11 @@ data class PlayGameSettings(
     val hintsEnabled: Boolean = true,
     val showEvalBar: Boolean = false,
     val engineResigns: Boolean = true,
+    /**
+     * Prévenir quand le coup qu'on vient de jouer coûte cher, et proposer de
+     * le reprendre. Sans effet avec une pendule : on ne reprend pas du temps.
+     */
+    val blunderAlertEnabled: Boolean = true,
     /** Position de départ imposée, ou `null` pour la position initiale. */
     val startFen: String? = null,
 ) {

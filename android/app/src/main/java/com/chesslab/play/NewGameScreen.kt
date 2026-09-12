@@ -53,6 +53,7 @@ fun NewGameScreen(
     var timeId by remember { mutableStateOf(initial.timeControlId) }
     var category by remember { mutableStateOf(TimeControl.byId(initial.timeControlId).category) }
     var hints by remember { mutableStateOf(initial.hintsEnabled) }
+    var blunderAlert by remember { mutableStateOf(initial.blunderAlertEnabled) }
     var evalBar by remember { mutableStateOf(initial.showEvalBar) }
     var engineResigns by remember { mutableStateOf(initial.engineResigns) }
 
@@ -134,6 +135,9 @@ fun NewGameScreen(
 
             SettingsSection(stringResource(R.string.setup_aids), Icons.Default.Lightbulb) {
                 ToggleRow(stringResource(R.string.setup_hints), hints, "aide-indice") { hints = it }
+                ToggleRow(stringResource(R.string.setup_blunder_alert), blunderAlert, "aide-alerte") {
+                    blunderAlert = it
+                }
                 ToggleRow(stringResource(R.string.setup_eval_bar), evalBar, "aide-eval") { evalBar = it }
                 ToggleRow(stringResource(R.string.setup_engine_resigns), engineResigns, "aide-abandon") { engineResigns = it }
             }
@@ -162,6 +166,7 @@ fun NewGameScreen(
                                 level = level,
                                 timeControlId = timeId,
                                 hintsEnabled = hints,
+                                blunderAlertEnabled = blunderAlert,
                                 showEvalBar = evalBar,
                                 engineResigns = engineResigns,
                             )
