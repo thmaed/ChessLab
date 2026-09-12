@@ -161,7 +161,13 @@ def main():
 
     en = english()
     body = "\n".join(convert(name, block, en) for name, block in found)
-    names = ", ".join(name for name, _ in found)
+    # L'ORDRE de la galerie est celui du tableau `all` de la source Swift —
+    # Maia d'abord, l'étalon — et non celui des déclarations, qui suit
+    # l'historique des ajouts.
+    declared = re.search(r"static let all: \[OpponentProfile\] = \[([^\]]*)\]", text)
+    order = re.findall(r"\.(\w+)", declared.group(1)) if declared else [n for n, _ in found]
+    known = {n for n, _ in found}
+    names = ", ".join(n for n in order if n in known)
 
     DST.write_text(f'''package com.chesslab.maia
 

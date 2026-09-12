@@ -45,6 +45,11 @@ class TrainingTest {
         dao.clearLogs()
     }
 
+    /** L'accueil défile : on fait venir la tuile avant de la toucher. */
+    private fun openMode(tag: String) {
+        compose.onNodeWithTag("mode-$tag").performScrollTo().performClick()
+    }
+
     private fun awaitText(text: String, timeoutMs: Long = 60_000) =
         compose.waitUntil(timeoutMs) {
             compose.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty()
@@ -57,7 +62,7 @@ class TrainingTest {
 
     /** Ouvre la séance quotidienne sur le cours italien, via les ouvertures. */
     private fun openDailyOnItalian() {
-        compose.onNodeWithTag("mode-openings").performClick()
+        openMode("openings")
         awaitTag("seance-quotidienne")
         compose.onNodeWithTag("seance-quotidienne").performClick()
         awaitTag("consigne")
@@ -165,7 +170,7 @@ class TrainingTest {
     }
 
     @Test fun lesPositionsDifficilesSontVidesAuDepart() {
-        compose.onNodeWithTag("mode-openings").performClick()
+        openMode("openings")
         awaitTag("seance-difficiles")
         compose.onNodeWithTag("seance-difficiles").performClick()
         awaitTag("rien-a-reviser")
@@ -188,7 +193,7 @@ class TrainingTest {
     }
 
     @Test fun entrainerUneLigneDepuisLeCours() {
-        compose.onNodeWithTag("mode-openings").performClick()
+        openMode("openings")
         awaitTag("recherche")
         compose.onNodeWithTag("recherche").performTextInput("Italian")
         awaitText("Italian Game")

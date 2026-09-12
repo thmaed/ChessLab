@@ -28,30 +28,38 @@ class EnglishTest {
 
     @get:Rule val rules: RuleChain = RuleChain.outerRule(LanguageRule("en")).around(compose)
 
+    /** L'accueil défile : on fait venir la tuile avant de la toucher. */
+    private fun openMode(tag: String) {
+        compose.onNodeWithTag("mode-$tag").performScrollTo().performClick()
+    }
+
     private fun awaitText(text: String, timeoutMs: Long = 60_000) =
         compose.waitUntil(timeoutMs) {
             compose.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty()
         }
 
     @Test fun theHomeSpeaksEnglish() {
-        compose.onNodeWithText("Play · Analyse · Train · Experiment").assertIsDisplayed()
-        compose.onNodeWithText("Against the computer").assertIsDisplayed()
-        compose.onNodeWithText("Two players").assertIsDisplayed()
-        compose.onNodeWithText("Winning endings").assertIsDisplayed()
+        compose.onNodeWithText("Play, analyze, improve.").assertIsDisplayed()
+        compose.onNodeWithText("Computer").assertIsDisplayed()
+        compose.onNodeWithText("2 players").assertIsDisplayed()
+        // La grille est paresseuse : les tuiles du bas se font venir.
+        compose.onNodeWithText("Winning endings").performScrollTo().assertIsDisplayed()
     }
 
     @Test fun theCharactersSpeakEnglish() {
-        compose.onNodeWithTag("mode-play").performClick()
-        awaitText("Your turn", 120_000)
-        // Le surnom, l'accroche et les étiquettes viennent tous du module maia :
-        // s'ils sont en français ici, c'est que ses ressources manquent.
+        openMode("play")
+        awaitText("Start", 120_000)
+        // Le surnom, l'accroche et les étiquettes viennent tous du module
+        // maia : s'ils sont en français ici, c'est que ses ressources manquent.
         compose.onNodeWithText("Tornado", substring = true).assertIsDisplayed()
-        compose.onNodeWithText("Attack", substring = true).assertIsDisplayed()
-        compose.onNodeWithText("Level on Maia's human scale", substring = true).assertIsDisplayed()
+        compose.onNodeWithTag("adversaire-lea").performClick()
+        awaitText("Attack")
+        awaitText("Castles on the opposite wing")
+        awaitText("Human scale")
     }
 
     @Test fun theCoursesSpeakEnglish() {
-        compose.onNodeWithTag("mode-openings").performClick()
+        openMode("openings")
         awaitText("Today's review")
         compose.onNodeWithText("Hard positions").assertIsDisplayed()
         // Le décompte n'arrive qu'une fois le catalogue lu.
@@ -71,7 +79,7 @@ class EnglishTest {
     }
 
     @Test fun theVariantsSpeakEnglish() {
-        compose.onNodeWithTag("mode-variants").performClick()
+        openMode("variants")
         awaitText("King of the Hill")
         compose.onNodeWithText("Racing Kings").assertIsDisplayed()
         compose.onNodeWithText("Antichess").assertIsDisplayed()

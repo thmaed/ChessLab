@@ -15,9 +15,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
+import com.chesslab.analysis.AnalysisEntryScreen
 import com.chesslab.analysis.AnalysisScreen
 import com.chesslab.lab.LabScreen
 import com.chesslab.nav.Route
+import com.chesslab.play.NewGameSetupRoute
 import com.chesslab.play.PlayScreen
 import com.chesslab.courses.CourseListScreen
 import com.chesslab.courses.CourseRepository
@@ -35,6 +37,7 @@ import com.chesslab.ui.HomeScreen
 import com.chesslab.variants.VariantCatalog
 import com.chesslab.variants.VariantListScreen
 import com.chesslab.variants.VariantPlayScreen
+import com.chesslab.ui.AppBackground
 import com.chesslab.ui.Palette
 import androidx.compose.ui.platform.LocalContext
 import com.chesslab.R
@@ -57,7 +60,9 @@ class MainActivity : ComponentActivity() {
                     primary = Palette.accent,
                 )
             ) {
-                Surface(Modifier.fillMaxSize(), color = Palette.background) { App() }
+                // Le fond signature remplace la surface unie : c'est lui qui
+                // donne à l'app son atmosphère, sur Android comme sur iOS.
+                AppBackground { App() }
             }
         }
     }
@@ -82,9 +87,26 @@ private fun App() {
         }
         when (current) {
             Route.Home -> HomeScreen { stack.add(it) }
-            is Route.PlayVsEngine -> PlayScreen(resume = current.resume)
+            Route.NewGame -> NewGameSetupRoute { settings ->
+                // On REMPLACE la configuration dans la pile : revenir depuis
+                // la partie doit ramener à l'accueil, pas à l'écran qu'on
+                // vient de valider.
+                stack[stack.lastIndex] = Route.PlayVsEngine(settings)
+            }
+            is Route.PlayVsEngine -> PlayScreen(
+                settings = current.settings, resume = current.resume,
+            )
             Route.TwoPlayer -> TwoPlayerScreen()
-            is Route.Analysis -> AnalysisScreen(initialFen = current.fen)
+            Route.Analysis -> AnalysisEntryScreen(
+                onScan = { stack.add(Route.Scanner) },
+                onLibrary = { stack.add(Route.AnalysisBoard()) },
+                onLastGame = { pgn -> stack.add(Route.AnalysisBoard(pgn = pgn)) },
+                onPaste = { stack.add(Route.AnalysisBoard()) },
+                onEditor = { stack.add(Route.PositionEditor) },
+            )
+            is Route.AnalysisBoard -> AnalysisScreen(
+                initialFen = current.fen, initialPgn = current.pgn,
+            )
             Route.Puzzles -> PuzzleScreen()
             Route.Openings -> CourseListScreen(
                 endgames = false,
@@ -105,10 +127,10 @@ private fun App() {
                 }
             )
             Route.Settings -> SettingsScreen()
-            Route.Scanner -> ScannerScreen { fen -> stack.add(Route.Analysis(fen)) }
+            Route.Scanner -> ScannerScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
             Route.Progression -> ProgressionScreen()
             Route.Help -> HelpScreen()
-            Route.PositionEditor -> PositionEditorScreen { fen -> stack.add(Route.Analysis(fen)) }
+            Route.PositionEditor -> PositionEditorScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
             Route.Laboratory -> LabScreen()
             Route.Variants -> VariantListScreen { id ->
                 stack.add(Route.VariantGame(id, VariantCatalog.byId(id)?.let { context.getString(it.titleRes) } ?: id))

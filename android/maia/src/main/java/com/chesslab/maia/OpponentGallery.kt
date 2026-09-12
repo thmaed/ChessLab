@@ -155,7 +155,7 @@ object OpponentGallery {
     )
 
     /** Dans l'ordre de la galerie iOS. */
-    val all = listOf(lea, marc, theo, nadia, sacha, ines, yuri, pablo, maia)
+    val all = listOf(maia, lea, marc, theo, nadia, sacha, ines, yuri, pablo)
 
     fun byId(id: String): OpponentProfile? = all.firstOrNull { it.id == id }
 }

@@ -33,9 +33,14 @@ import com.chesslab.R
 import androidx.compose.ui.res.pluralStringResource
 
 @Composable
-fun AnalysisScreen(initialFen: String? = null, model: AnalysisViewModel = viewModel()) {
-    LaunchedEffect(initialFen) {
-        if (!initialFen.isNullOrBlank()) { model.onInputChange(initialFen); model.load() }
+fun AnalysisScreen(
+    initialFen: String? = null,
+    initialPgn: String? = null,
+    model: AnalysisViewModel = viewModel(),
+) {
+    LaunchedEffect(initialFen, initialPgn) {
+        val incoming = initialFen?.takeIf { it.isNotBlank() } ?: initialPgn?.takeIf { it.isNotBlank() }
+        if (incoming != null) { model.onInputChange(incoming); model.load() }
     }
     val ui = model.ui
 

@@ -6,6 +6,7 @@ import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
@@ -39,7 +40,38 @@ class AppTest {
             compose.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
         }
 
-    private fun open(mode: String) = compose.onNodeWithTag("mode-$mode").performClick()
+    /**
+     * Ouvre un mode depuis l'accueil.
+     *
+     * L'accueil défile : une tuile sous la ligne de flottaison existe mais
+     * n'est pas à l'écran. On la fait venir avant de la toucher.
+     */
+    private fun open(mode: String) {
+        compose.onNodeWithTag("mode-$mode").performScrollTo().performClick()
+    }
+
+    /**
+     * Lance une partie depuis l'accueil, en passant par la configuration —
+     * c'est le chemin de l'utilisateur depuis que l'écran « Nouvelle partie »
+     * existe, comme sur iOS.
+     *
+     * [opponent] : le repère d'une vignette de personnage, ou `null` pour
+     * Stockfish (qui vit derrière le contrôle segmenté).
+     */
+    private fun startGame(opponent: String? = null) {
+        open("play")
+        awaitTag("commencer", 120_000)
+        if (opponent == null) compose.onNodeWithTag("segment-1").performClick()
+        else compose.onNodeWithTag(opponent).performClick()
+        compose.onNodeWithTag("commencer").performClick()
+        awaitText("À vous de jouer", 120_000)
+    }
+
+    /** Ouvre la feuille des coups joués et rend la main quand elle est là. */
+    private fun openMoveList() {
+        compose.onNodeWithTag("coups-joues").performClick()
+        awaitTag("coup-0", 10_000)
+    }
 
     @Test fun theHomeOffersTheModes() {
         compose.onNodeWithTag("mode-play").assertIsDisplayed()
@@ -48,16 +80,20 @@ class AppTest {
     }
 
     @Test fun playingAMoveMakesTheEngineReply() {
-        open("play")
-        awaitText("À vous de jouer", 120_000)
-        compose.onNodeWithTag("adversaire-stockfish").performClick()
+        startGame()
 
         compose.onNodeWithTag("case-e2").performClick()
         compose.onNodeWithTag("case-e4").performClick()
-
-        awaitTag("coup-0", 10_000)     // notre coup est écrit
-        awaitTag("coup-1", 60_000)     // le moteur a répondu
-        awaitText("À vous de jouer")   // la main revient
+        // Le moteur répond, la main revient, et les DEUX demi-coups sont là.
+        compose.waitUntil(90_000) {
+            compose.onAllNodesWithTag("coups-joues").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.waitUntil(90_000) {
+            compose.onNodeWithTag("coups-joues").performClick()
+            val found = compose.onAllNodesWithTag("coup-1").fetchSemanticsNodes().isNotEmpty()
+            if (!found) compose.onNodeWithTag("case-e4").performClick()   // referme la feuille
+            found
+        }
     }
 
     @Test fun twoPlayersAlternate() {
@@ -77,6 +113,8 @@ class AppTest {
 
     @Test fun analysingAPgnShowsAnEvaluation() {
         open("analysis")
+        // Analyser ouvre d'abord le CHOIX de la source, comme sur iOS.
+        compose.onNodeWithTag("entree-coller").performClick()
         compose.onNodeWithTag("saisie").performTextInput("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6")
         compose.onNodeWithTag("charger").performClick()
 
@@ -142,19 +180,15 @@ class AppTest {
     }
 
     @Test fun aCharacterPlaysWithMaia() {
-        open("play")
         // le réseau fait 43 Mo : son chargement prend du temps sur émulateur
-        awaitText("À vous de jouer", 120_000)
-
-        compose.onNodeWithTag("adversaire-nadia").performClick()
-        awaitText("À vous de jouer", 30_000)
+        startGame("adversaire-nadia")
 
         compose.onNodeWithTag("case-e2").performClick()
         compose.onNodeWithTag("case-e4").performClick()
+        awaitText("À vous de jouer", 120_000)   // Nadia a répondu
 
-        awaitTag("coup-0", 10_000)
-        awaitTag("coup-1", 120_000)      // Nadia répond
-        awaitText("À vous de jouer", 30_000)
+        openMoveList()
+        compose.onNodeWithTag("coup-1").assertIsDisplayed()
     }
 
     @Test fun theLaboratoryPlaysByItself() {
@@ -211,27 +245,25 @@ class AppTest {
         // la partie doit se retrouver dans la bibliothèque de l'écran Analyser
         compose.onNodeWithTag("retour").performClick()
         open("analysis")
-        awaitText("Bibliothèque", 15_000)
-        awaitText("Blancs — Noirs", 10_000)
+        awaitTag("entree-bibliotheque", 15_000)
+        compose.onNodeWithTag("entree-bibliotheque").performClick()
+        awaitText("Blancs — Noirs", 15_000)
     }
 
     @Test fun anInterruptedGameCanBeResumed() {
-        open("play")
-        awaitText("À vous de jouer", 120_000)
-        compose.onNodeWithTag("adversaire-stockfish").performClick()
-
+        startGame()
         compose.onNodeWithTag("case-d2").performClick()
         compose.onNodeWithTag("case-d4").performClick()
-        awaitTag("coup-1", 60_000)          // le moteur a répondu
+        awaitText("À vous de jouer", 90_000)   // le moteur a répondu
 
         // on quitte en pleine partie : l'accueil doit proposer de reprendre
         compose.onNodeWithTag("retour").performClick()
         awaitTag("reprendre", 15_000)
         compose.onNodeWithTag("reprendre").performClick()
 
-        // les deux demi-coups sont rejoués
-        awaitTag("coup-1", 60_000)
-        awaitText("Partie reprise", 30_000)
+        awaitText("Partie reprise", 60_000)
+        openMoveList()
+        compose.onNodeWithTag("coup-1").assertIsDisplayed()
     }
 
     @Test fun progressionShowsWhatTheAppHasSeen() {
@@ -248,7 +280,9 @@ class AppTest {
     }
 
     @Test fun thePositionEditorBuildsAFen() {
-        compose.onNodeWithTag("editeur").performClick()
+        // L'éditeur vit sous Analyser, comme sur iOS.
+        open("analysis")
+        compose.onNodeWithTag("entree-editeur").performClick()
         awaitTag("fen", 10_000)
 
         // la position de départ, puis l'analyse

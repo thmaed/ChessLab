@@ -18,11 +18,30 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     fun title(context: Context): String = dynamicTitle ?: context.getString(titleRes)
 
     data object Home : Route(R.string.route_home)
-    /** [resume] : reprendre la partie interrompue plutôt que d'en commencer une. */
-    data class PlayVsEngine(val resume: Boolean = false) : Route(R.string.route_play)
+    /**
+     * La CONFIGURATION d'une partie, comme sur iOS : on choisit couleur,
+     * adversaire, niveau et cadence AVANT de voir un plateau.
+     */
+    data object NewGame : Route(R.string.route_new_game)
+
+    /**
+     * La partie elle-même. [settings] vient de l'écran de configuration ;
+     * [resume] reprend celle qui a été interrompue.
+     */
+    data class PlayVsEngine(
+        val settings: com.chesslab.play.PlayGameSettings? = null,
+        val resume: Boolean = false,
+    ) : Route(R.string.route_play)
     data object TwoPlayer : Route(R.string.route_two_players)
-    /** [fen] : une position à charger d'emblée (venue du scanner ou de l'éditeur). */
-    data class Analysis(val fen: String? = null) : Route(R.string.route_analysis)
+    /** Le CHOIX de la source : scanner, bibliothèque, dernière partie, coller. */
+    data object Analysis : Route(R.string.route_analysis)
+
+    /**
+     * L'analyse elle-même. [fen] vient du scanner ou de l'éditeur, [pgn]
+     * d'une partie rangée ; les deux nuls ouvrent sur le champ de saisie.
+     */
+    data class AnalysisBoard(val fen: String? = null, val pgn: String? = null) :
+        Route(R.string.route_analysis)
     data object Puzzles : Route(R.string.route_puzzles)
     data object Openings : Route(R.string.route_openings)
     data object Endgames : Route(R.string.route_endgames)

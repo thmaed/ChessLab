@@ -53,12 +53,17 @@ class GameRecorder(startingPosition: Position = Position.standard) {
         black: String,
         source: String,
         state: Board.State,
+        /**
+         * Le score, quand il ne se lit pas sur le plateau : un abandon, une
+         * nulle acceptée, un drapeau tombé. `null` = on le déduit de l'état.
+         */
+        forcedResult: String? = null,
         variant: String? = null,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     ) {
         if (moveCount == 0) return
 
-        val result = when (state) {
+        val result = forcedResult ?: when (state) {
             is Board.State.Checkmate -> if (state.color == Piece.Color.white) "0-1" else "1-0"
             is Board.State.Draw -> "1/2-1/2"
             else -> "*"
@@ -66,7 +71,9 @@ class GameRecorder(startingPosition: Position = Position.standard) {
         game.tags.white = white
         game.tags.black = black
         game.tags.result = result
-        game.tags.date = SimpleDateFormat("yyyy.MM.dd", Locale.FRANCE).format(Date())
+        game.tags.date = // Locale.ROOT : la date d'un PGN est une donnée, pas un texte
+        // affiché — elle ne doit pas suivre la langue de l'appareil.
+        SimpleDateFormat("yyyy.MM.dd", Locale.ROOT).format(Date())
         game.tags.event = "ChessLab"
 
         val record = GameRecord(

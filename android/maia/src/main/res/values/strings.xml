@@ -3,6 +3,7 @@
      OpponentGallery.kt par tools/maia-profiles/generate_profiles.py —
      ne pas éditer à la main. -->
 <resources>
+    <string name="opponent_display_name">%1$s “%2$s”</string>
     <string name="opponent_ines_nickname">Spring</string>
     <string name="opponent_ines_tag1">Defence</string>
     <string name="opponent_ines_tag2">Counter-attack</string>
@@ -48,5 +49,4 @@
     <string name="opponent_yuri_tag2">Defence</string>
     <string name="opponent_yuri_tag3">Tenacious</string>
     <string name="opponent_yuri_tagline">An offered pawn is a taken pawn. He accepts every gambit, defends for forty moves without complaint, then reminds you he is a pawn up.</string>
-    <string name="opponent_display_name">%1$s \u201c%2$s\u201d</string>
 </resources>

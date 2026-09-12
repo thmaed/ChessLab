@@ -3,6 +3,7 @@
      OpponentGallery.kt par tools/maia-profiles/generate_profiles.py —
      ne pas éditer à la main. -->
 <resources>
+    <string name="opponent_display_name">%1$s « %2$s »</string>
     <string name="opponent_ines_nickname">Ressort</string>
     <string name="opponent_ines_tag1">Défense</string>
     <string name="opponent_ines_tag2">Contre-attaque</string>
@@ -48,5 +49,4 @@
     <string name="opponent_yuri_tag2">Défense</string>
     <string name="opponent_yuri_tag3">Tenace</string>
     <string name="opponent_yuri_tagline">Un pion offert est un pion pris. Il accepte tous les gambits, défend pendant quarante coups sans se plaindre, puis vous rappelle qu\'il a un pion de plus.</string>
-    <string name="opponent_display_name">%1$s « %2$s »</string>
 </resources>
