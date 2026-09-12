@@ -513,4 +513,15 @@
     <string name="blunder_centipawns">That move costs about %1$d pawn(s) of evaluation.</string>
     <string name="blunder_keep">Keep it</string>
     <string name="setup_blunder_alert">Warn me about risky moves</string>
+    <string name="two_setup_players">Players</string>
+    <string name="two_setup_rotation">Board layout</string>
+    <string name="two_rotation_face">Face to face</string>
+    <string name="two_rotation_face_note">The board turns after each move.</string>
+    <string name="two_rotation_fixed">Fixed</string>
+    <string name="two_rotation_fixed_note">Same orientation throughout — side by side.</string>
+    <string name="two_rotation_table">Table</string>
+    <string name="two_rotation_table_note">Fixed board, but the top player\'s row reads the right way up from their side.</string>
+    <string name="two_resume">Resume the game</string>
+    <string name="two_flag_fell">%1$s ran out of time.</string>
+    <string name="autosave_two_label">%1$s vs %2$s · %3$d plies</string>
 </resources>

@@ -510,4 +510,15 @@
     <string name="blunder_centipawns">Ce coup fait perdre environ %1$d pion(s) d\'évaluation.</string>
     <string name="blunder_keep">Le garder</string>
     <string name="setup_blunder_alert">Me prévenir des coups risqués</string>
+    <string name="two_setup_players">Joueurs</string>
+    <string name="two_setup_rotation">Présentation du plateau</string>
+    <string name="two_rotation_face">Face à face</string>
+    <string name="two_rotation_face_note">Le plateau se retourne à chaque coup.</string>
+    <string name="two_rotation_fixed">Fixe</string>
+    <string name="two_rotation_fixed_note">Même orientation du début à la fin — côte à côte.</string>
+    <string name="two_rotation_table">Table</string>
+    <string name="two_rotation_table_note">Plateau fixe, mais la ligne du joueur d\'en face se lit à l\'endroit depuis son côté.</string>
+    <string name="two_resume">Reprendre la partie</string>
+    <string name="two_flag_fell">Le drapeau de %1$s est tombé.</string>
+    <string name="autosave_two_label">%1$s contre %2$s · %3$d demi-coups</string>
 </resources>

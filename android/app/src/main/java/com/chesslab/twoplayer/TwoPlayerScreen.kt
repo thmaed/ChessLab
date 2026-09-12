@@ -22,6 +22,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -36,6 +37,8 @@ import com.chesslab.ui.TopBarActions
 
 @Composable
 fun TwoPlayerScreen(
+    settings: TwoPlayerSettings? = null,
+    resume: Boolean = false,
     /** La position envoyée par un autre mode. */
     startFen: String? = null,
     onPlayVsEngine: (String) -> Unit = {},
@@ -45,7 +48,13 @@ fun TwoPlayerScreen(
 ) {
     val ui = model.ui
 
-    LaunchedEffect(startFen) { if (startFen != null) model.startFrom(startFen) }
+    LaunchedEffect(settings, resume, startFen) {
+        when {
+            resume -> model.resumeSaved()
+            settings != null -> model.start(settings)
+            startFen != null -> model.startFrom(startFen)
+        }
+    }
 
     TopBarActions {
         QuickSwitchMenu(
@@ -60,7 +69,10 @@ fun TwoPlayerScreen(
     val top = if (ui.orientation == Piece.Color.white) Piece.Color.black else Piece.Color.white
     BoardScaffold(
         header = {
-            SidePlayerRow(top, ui, "joueur-haut")
+            SidePlayerRow(
+                top, ui, "joueur-haut",
+                upsideDown = ui.settings.rotation == TwoPlayerSettings.RotationMode.tabletop,
+            )
             Spacer(Modifier.height(6.dp))
         },
         board = {
@@ -86,7 +98,10 @@ fun TwoPlayerScreen(
 
             Spacer(Modifier.height(4.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(checked = ui.autoFlip, onCheckedChange = { model.toggleAutoFlip() })
+                Switch(
+                    checked = ui.settings.rotation == TwoPlayerSettings.RotationMode.faceToFace,
+                    onCheckedChange = { model.toggleAutoFlip() },
+                )
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.flip_each_move), fontSize = 13.sp, color = Palette.textSecondary)
                 Spacer(Modifier.weight(1f))
@@ -103,11 +118,22 @@ fun TwoPlayerScreen(
 
 /** Une ligne joueur : la pastille du camp, son nom, ses prises. */
 @Composable
-private fun SidePlayerRow(color: Piece.Color, ui: TwoPlayerUiState, tag: String) {
+private fun SidePlayerRow(
+    color: Piece.Color,
+    ui: TwoPlayerUiState,
+    tag: String,
+    /**
+     * En mode « table », la ligne du joueur d'EN FACE est retournée à 180° :
+     * il lit son nom et sa pendule à l'endroit depuis son côté, et personne
+     * n'a besoin de faire tourner l'appareil.
+     */
+    upsideDown: Boolean = false,
+) {
     val active = !ui.gameOver && ui.position.sideToMove == color
     Row(
         Modifier
             .fillMaxWidth()
+            .then(if (upsideDown) Modifier.rotate(180f) else Modifier)
             .clip(RoundedCornerShape(10.dp))
             .background(if (active) Palette.surfaceElevated else Color.Transparent)
             .border(
@@ -127,8 +153,11 @@ private fun SidePlayerRow(color: Piece.Color, ui: TwoPlayerUiState, tag: String)
                 .border(1.dp, Palette.stroke, CircleShape)
         )
         Spacer(Modifier.width(7.dp))
+        val nom = if (color == Piece.Color.white) ui.settings.whiteName else ui.settings.blackName
         Text(
-            stringResource(if (color == Piece.Color.white) R.string.color_white else R.string.color_black),
+            nom.ifBlank {
+                stringResource(if (color == Piece.Color.white) R.string.color_white else R.string.color_black)
+            },
             fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
             color = if (active) Palette.textPrimary else Palette.textSecondary,
         )
@@ -138,6 +167,22 @@ private fun SidePlayerRow(color: Piece.Color, ui: TwoPlayerUiState, tag: String)
             Text(
                 kinds.joinToString("") { glyph(it) },
                 fontSize = 13.sp, color = Palette.textSecondary,
+            )
+        }
+        // La pendule à droite, quand il y en a une.
+        val millis = if (color == Piece.Color.white) ui.whiteClockMs else ui.blackClockMs
+        if (millis != null) {
+            Spacer(Modifier.weight(1f))
+            Text(
+                com.chesslab.play.GameClock.format(millis, java.util.Locale.getDefault()),
+                fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                color = when {
+                    millis < 10_000 -> Palette.danger
+                    active -> Palette.textPrimary
+                    else -> Palette.textSecondary
+                },
+                modifier = Modifier.testTag("pendule-${color.name}"),
             )
         }
         val advantage = ui.captured.advantage(color)

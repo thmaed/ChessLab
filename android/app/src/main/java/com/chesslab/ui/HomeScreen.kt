@@ -71,7 +71,7 @@ data class Mode(
 private val modes = listOf(
     Mode(Route.NewGame, "play", R.string.route_play, R.string.home_play_short,
         R.string.home_play_long, R.string.home_play_sub, Icons.Default.Memory, Palette.accent),
-    Mode(Route.TwoPlayer(), "two", R.string.route_two_players, R.string.home_two_short,
+    Mode(Route.TwoPlayerSetup, "two", R.string.route_two_players, R.string.home_two_short,
         R.string.home_two_long, R.string.home_two_sub, Icons.Default.People, Palette.info),
     Mode(Route.Puzzles, "puzzles", R.string.route_puzzles, R.string.route_puzzles,
         R.string.home_puzzles_long, R.string.home_puzzles_sub, Icons.Default.Extension, Palette.violet),
@@ -115,11 +115,20 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
         ) {
             Header(onOpen)
 
-            autosaves.firstOrNull()?.let { save ->
+            // La plus RÉCENTE des parties interrompues, quel que soit son
+            // mode : celle qu'on a quittée en dernier est celle qu'on veut
+            // reprendre. Les proposer toutes ferait deux bandes concurrentes
+            // pour un seul geste.
+            autosaves.maxByOrNull { it.savedAt }?.let { save ->
                 Banner(
                     Icons.Default.PlayArrow, stringResource(R.string.home_resume),
                     save.label, Palette.accent, "reprendre",
-                ) { onOpen(Route.PlayVsEngine(resume = true)) }
+                ) {
+                    onOpen(
+                        if (save.mode == "twoPlayer") Route.TwoPlayer(resume = true)
+                        else Route.PlayVsEngine(resume = true)
+                    )
+                }
             }
             if (due > 0) {
                 Banner(

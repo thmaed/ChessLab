@@ -66,10 +66,18 @@ vérification sur appareil, pas après compilation.
       c4, Cf3) mais leurs poids. Le livre général est branché aussi, avec son
       réglage.
 
-### 3. Deux joueurs
-- [ ] **Écran de réglages** avant la partie (pendule, retournement).
-- [ ] **Reprise d'une partie interrompue** : seul le mode « contre
-      l'ordinateur » est sauvegardé.
+### 3. Deux joueurs — FAIT le 12/09
+- [x] **Écran de réglages** : les NOMS des deux joueurs, la présentation du
+      plateau (face à face, fixe, table) et la cadence. Les noms ne sont pas
+      un ornement : une partie rangée sous « Blancs — Noirs » se confond avec
+      toutes les autres, sous « Thierry — Camille » on la retrouve.
+- [x] **Mode table** : plateau fixe, mais la ligne du joueur d'en face
+      retournée à 180°, pour qu'il lise son nom et sa pendule à l'endroit
+      depuis son côté.
+- [x] **Pendule** : le mode n'en avait aucune. Elle part avec la partie, comme
+      une vraie qu'on enclenche en s'asseyant.
+- [x] **Reprise d'une partie interrompue**, et l'accueil propose la plus
+      RÉCENTE des deux modes plutôt que toujours celle contre l'ordinateur.
 
 ### 4. Puzzles
 - [ ] **Filtres** : thème, difficulté, phase de partie. Android tire 40 puzzles

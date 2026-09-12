@@ -7,6 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.AndroidViewModel
 import android.app.Application
 import com.chesslab.library.GameRecorder
+import com.chesslab.library.LibraryDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import androidx.lifecycle.viewModelScope
 import com.chesslab.settings.SettingsStore
 import com.chesslab.sound.SoundPlayer
 import chesskit.Board
@@ -28,7 +33,10 @@ data class TwoPlayerUiState(
     val pendingPromotion: Move? = null,
     val gameOver: Boolean = false,
     val orientation: Piece.Color = Piece.Color.white,
-    val autoFlip: Boolean = true,
+    val settings: TwoPlayerSettings = TwoPlayerSettings(),
+    val whiteClockMs: Long? = null,
+    val blackClockMs: Long? = null,
+    val started: Boolean = false,
     /** Les prises de chaque camp, pour les lignes joueurs. */
     val captured: com.chesslab.play.CapturedMaterial = com.chesslab.play.CapturedMaterial(),
 )
@@ -37,8 +45,9 @@ data class TwoPlayerUiState(
  * Deux joueurs sur le même appareil. Pendant réduit de
  * `TwoPlayerViewModel.swift`.
  *
- * Le plateau se retourne à chaque coup quand [TwoPlayerUiState.autoFlip] est
- * actif : c'est ce qui rend le mode jouable à deux autour d'un téléphone.
+ * Le plateau se retourne à chaque coup en mode « face à face » : c'est ce qui
+ * rend le mode jouable à deux autour d'un téléphone. Trois présentations, comme
+ * iOS — voir [TwoPlayerSettings.RotationMode].
  */
 class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -51,12 +60,28 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
      */
     private var startPosition: Position = Position.standard
 
+    private companion object {
+        /** La clé d'autosauvegarde du mode, distincte de celle de « Jouer ». */
+        const val MODE = "twoPlayer"
+    }
+
+    /** La pendule, quand la cadence en demande une. */
+    private var clock: com.chesslab.play.GameClock? = null
+    private var ticker: kotlinx.coroutines.Job? = null
+
+    /** Les coups en UCI : ce qu'il faut pour REJOUER la partie à la reprise. */
+    private val uciLog = mutableListOf<String>()
+
     /** Les coups joués : ce qu'il faut pour compter les prises. */
     private val moveLog = mutableListOf<Move>()
 
     var ui by mutableStateOf(
         TwoPlayerUiState(
-            autoFlip = SettingsStore.state.value.autoFlipTwoPlayer,
+            settings = TwoPlayerSettings(
+                rotation = if (SettingsStore.state.value.autoFlipTwoPlayer)
+                    TwoPlayerSettings.RotationMode.faceToFace
+                else TwoPlayerSettings.RotationMode.fixed,
+            ),
             status = s(R.string.white_to_move),
         )
     )
@@ -68,6 +93,91 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
      * recomposé souvent, et repartir de zéro à chaque fois effacerait les
      * coups qu'on vient de jouer.
      */
+    /** Démarre une partie avec les réglages de l'écran de configuration. */
+    fun start(settings: TwoPlayerSettings) {
+        ui = ui.copy(settings = settings, started = true)
+        startPosition = settings.startFen?.let { Position.fromFen(it) } ?: Position.standard
+        newGame()
+    }
+
+    /** Reprend la partie interrompue. */
+    fun resumeSaved() = viewModelScope.launch {
+        val saved = withContext(Dispatchers.IO) {
+            LibraryDatabase.get(getApplication<Application>()).autosaves().byMode(MODE)
+        } ?: return@launch
+        ui = ui.copy(started = true)
+        startPosition = Position.standard
+        newGame()
+        for (lan in saved.moveList) {
+            var move = board.move(Square(lan.substring(0, 2)), Square(lan.substring(2, 4))) ?: break
+            if (lan.length == 5) move = board.completePromotion(move, kindOf(lan[4]))
+            refresh(move)
+        }
+    }
+
+    /**
+     * La pendule du camp au trait. Elle s'arrête d'elle-même quand le drapeau
+     * tombe, et la partie s'arrête avec.
+     */
+    private fun startClockForSideToMove() {
+        val c = clock ?: return
+        if (ui.gameOver) return
+        c.start(board.position.sideToMove, System.currentTimeMillis())
+        ticker?.cancel()
+        ticker = viewModelScope.launch {
+            while (true) {
+                kotlinx.coroutines.delay(100)
+                val now = System.currentTimeMillis()
+                c.tick(now)
+                ui = ui.copy(
+                    whiteClockMs = c.remaining(Piece.Color.white),
+                    blackClockMs = c.remaining(Piece.Color.black),
+                )
+                val flagged = Piece.Color.entries.firstOrNull { c.flagged(it) }
+                if (flagged != null) {
+                    ticker?.cancel()
+                    val nom = if (flagged == Piece.Color.white) whiteName() else blackName()
+                    ui = ui.copy(
+                        gameOver = true,
+                        status = s(R.string.two_flag_fell, nom),
+                    )
+                    return@launch
+                }
+            }
+        }
+    }
+
+    /** Le nom d'un camp, ou sa couleur si personne ne s'est nommé. */
+    private fun whiteName(): String = ui.settings.whiteName.ifBlank { s(R.string.color_white) }
+    private fun blackName(): String = ui.settings.blackName.ifBlank { s(R.string.color_black) }
+
+    /**
+     * La partie en cours est gardée pour être REPRISE. Une partie à deux
+     * s'interrompt comme une autre — on pose le téléphone — et rien ne la
+     * rattrapait jusqu'ici.
+     */
+    private fun autosave() = viewModelScope.launch(Dispatchers.IO) {
+        val dao = LibraryDatabase.get(getApplication()).autosaves()
+        if (ui.gameOver || uciLog.isEmpty()) { dao.clear(MODE); return@launch }
+        dao.put(
+            com.chesslab.library.Autosave(
+                mode = MODE,
+                moves = uciLog.joinToString(" "),
+                opponentId = null,
+                level = 0.0,
+                label = s(R.string.autosave_two_label, whiteName(), blackName(), uciLog.size),
+                savedAt = System.currentTimeMillis(),
+            )
+        )
+    }
+
+    private fun kindOf(c: Char): Piece.Kind = when (c) {
+        'q' -> Piece.Kind.queen
+        'r' -> Piece.Kind.rook
+        'b' -> Piece.Kind.bishop
+        else -> Piece.Kind.knight
+    }
+
     fun startFrom(fen: String) {
         val position = Position.fromFen(fen) ?: return
         if (position.fen == startPosition.fen && ui.sanMoves.isEmpty()) return
@@ -106,7 +216,9 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun toggleAutoFlip() {
-        ui = ui.copy(autoFlip = !ui.autoFlip)
+        val next = if (ui.settings.rotation == TwoPlayerSettings.RotationMode.faceToFace)
+            TwoPlayerSettings.RotationMode.fixed else TwoPlayerSettings.RotationMode.faceToFace
+        ui = ui.copy(settings = ui.settings.copy(rotation = next))
     }
 
     fun flip() {
@@ -114,21 +226,33 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun newGame() {
+        ticker?.cancel()
+        clock = ui.settings.timeControl.takeIf { it.hasClock }
+            ?.let { com.chesslab.play.GameClock(it) }
+        uciLog.clear()
         board = Board(startPosition)
         val custom = startPosition.fen.takeIf { it != Position.standard.fen }
         recorder.reset(startPosition, custom)
         moveLog.clear()
         ui = TwoPlayerUiState(
-            autoFlip = ui.autoFlip,
+            settings = ui.settings,
+            started = true,
+            whiteClockMs = clock?.remaining(Piece.Color.white),
+            blackClockMs = clock?.remaining(Piece.Color.black),
             position = startPosition,
             status = s(
                 if (startPosition.sideToMove == Piece.Color.white) R.string.white_to_move
                 else R.string.black_to_move
             ),
         )
+        // La pendule part avec la partie, comme une vraie : on l'a enclenchée
+        // en s'asseyant, pas au premier coup.
+        startClockForSideToMove()
     }
 
     private fun refresh(move: Move) {
+        uciLog += move.lan
+        clock?.stopAndIncrement(System.currentTimeMillis())
         moveLog += move
         recorder.record(move)
         val position = board.position
@@ -167,8 +291,12 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
             else -> null
         }
 
+        startClockForSideToMove()
+        autosave()
         ui = ui.copy(
             position = position,
+            whiteClockMs = clock?.remaining(Piece.Color.white),
+            blackClockMs = clock?.remaining(Piece.Color.black),
             selected = null,
             legalTargets = emptySet(),
             lastMove = move.start to move.end,
@@ -177,7 +305,8 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
             captured = com.chesslab.play.CapturedMaterial.from(moveLog, board),
             sanMoves = ui.sanMoves + move.san,
             gameOver = over,
-            orientation = if (ui.autoFlip && !over) position.sideToMove else ui.orientation,
+            orientation = if (ui.settings.rotation == TwoPlayerSettings.RotationMode.faceToFace && !over)
+                position.sideToMove else ui.orientation,
         )
     }
 

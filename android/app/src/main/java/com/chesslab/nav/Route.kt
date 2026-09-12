@@ -43,10 +43,21 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     ) : Route(R.string.route_play)
 
     /**
-     * Une partie à deux sur le même appareil. [startFen] la fait commencer à
-     * la position qu'un autre mode vient d'envoyer.
+     * La CONFIGURATION d'une partie à deux : noms, présentation du plateau,
+     * cadence. Comme pour le mode « contre l'ordinateur », on décide avant de
+     * voir un plateau.
      */
-    data class TwoPlayer(val startFen: String? = null) : Route(R.string.route_two_players)
+    data object TwoPlayerSetup : Route(R.string.route_two_players)
+
+    /**
+     * La partie à deux elle-même. [startFen] la fait commencer à la position
+     * qu'un autre mode vient d'envoyer ; [resume] reprend l'interrompue.
+     */
+    data class TwoPlayer(
+        val settings: com.chesslab.twoplayer.TwoPlayerSettings? = null,
+        val startFen: String? = null,
+        val resume: Boolean = false,
+    ) : Route(R.string.route_two_players)
     /** Le CHOIX de la source : scanner, bibliothèque, dernière partie, coller. */
     data object Analysis : Route(R.string.route_analysis)
 
