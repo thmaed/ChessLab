@@ -154,10 +154,83 @@ Asset Delivery** : les réseaux NNUE (62 Mo compressés) et le modèle Maia
 
 ---
 
+## 3bis. Publier sans les mains (déjà en place)
+
+Le greffon **Gradle Play Publisher** est monté dans le projet. Il fait pour
+Google ce que `tools/asc` fait pour Apple : téléverser le binaire et remplir la
+fiche, depuis des fichiers VERSIONNÉS dans le dépôt.
+
+```bash
+export JAVA_HOME=/opt/homebrew/opt/openjdk@21
+cd android
+./gradlew publishBundle                        # l'AAB, sur la piste interne
+./gradlew publishListing                       # textes, captures, visuels
+./gradlew publishBundle --track internal       # ou une autre piste
+./gradlew promoteArtifact --from-track internal --promote-track production
+./gradlew bootstrapListing                     # l'INVERSE : récupérer ce que Google a
+```
+
+### La clé, hors dépôt
+
+Pas de fichier `.p8` comme chez Apple : un **compte de service** Google Cloud.
+
+1. Console Google Cloud → créer un compte de service, télécharger sa clé JSON.
+2. Play Console → **Utilisateurs et autorisations** → inviter l'adresse du
+   compte de service, avec le droit de publier.
+3. Poser la clé en `~/.private_keys/play-service-account.json` — là où vit déjà
+   la clé App Store Connect. Elle est ignorée par Git où qu'elle soit.
+
+Sans cette clé, le greffon se tait : `./gradlew build` marche pour qui n'a pas à
+publier. Avec elle, tout s'enchaîne.
+
+### Les sources de vérité
+
+Tout est dans `android/app/src/main/play/` :
+
+```
+default-language.txt          fr-FR
+contact-email.txt             À REMPLIR — adresse publique exigée par Google
+contact-website.txt
+listings/<langue>/title.txt              (30 car.)
+listings/<langue>/short-description.txt  (80 car.)
+listings/<langue>/full-description.txt   (4000 car.)
+listings/<langue>/graphics/icon/                 512 × 512
+listings/<langue>/graphics/feature-graphic/     1024 × 500
+listings/<langue>/graphics/phone-screenshots/   six captures, 1080 × 2340
+release-notes/<langue>/<piste>.txt       (500 car.)
+```
+
+Les deux langues (`fr-FR`, `en-US`) sont remplies, textes ET captures. Les
+captures viennent d'un vrai téléphone, et la description n'annonce que ce que
+l'app Android fait — ni l'import de répertoire PGN, ni l'alerte gaffe, ni la
+synchro iCloud, qui sont des fonctions iOS.
+
+**Une seule chose à remplir avant de publier** : `contact-email.txt`. Google
+exige une adresse de contact PUBLIQUE sur la fiche ; je n'en ai pas choisi une
+à votre place.
+
+### Refaire les captures
+
+Elles ont été prises à l'`adb` sur un Galaxy A16, l'app dans la langue voulue :
+
+```bash
+adb shell cmd locale set-app-locales com.chesslab --locales fr-FR
+adb shell am force-stop com.chesslab && adb shell am start -n com.chesslab/.MainActivity
+adb exec-out screencap -p > 1-accueil.png
+```
+
+Sur l'ÉMULATEUR, le clavier flottant de Gboard s'incruste dans l'image dès
+qu'un champ de saisie a eu le focus, et ni `ESC` ni la désactivation de l'IME
+ne l'enlèvent proprement. D'où les captures prises sur un vrai téléphone.
+
 ## 4. Créer la fiche
 
-Play Console → **Créer une application**. Puis, dans « Développer la présence
-sur le Play Store » :
+**La fiche est déjà rédigée et versionnée** (voir §3bis) : cette section décrit
+ce que l'API ne sait PAS faire et qu'il faut donc saisir à la main, plus les
+formats, pour qui voudrait refaire les visuels.
+
+Play Console → **Créer une application** — cette étape-là n'a pas d'API. Puis,
+dans « Développer la présence sur le Play Store » :
 
 ### 4.1 Les visuels
 
@@ -178,18 +251,14 @@ $SDK/platform-tools/adb exec-out screencap -p > capture.png
 
 ### 4.2 Les textes
 
-- **Titre** : 30 caractères max.
-- **Description courte** : 80 caractères max — c'est elle qu'on lit dans les
-  résultats de recherche.
-- **Description complète** : 4000 caractères max.
+Écrits et versionnés dans `app/src/main/play/listings/` — `./gradlew
+publishListing` les envoie. Limites respectées : titre 30, description courte
+80, description complète 4000.
 
-`AppStoreSubmission/METADATA.md` contient la description iOS française et
-anglaise déjà rédigée : la base est bonne, il faut la retailler (Apple donne
-4000 caractères aussi, mais le sous-titre de 30 et les mots-clés n'ont pas
-d'équivalent Play — les mots-clés Play se placent *dans* la description).
-
-Déclarez les **deux langues** (fr-FR et en-US) : l'app est bilingue, la fiche
-doit l'être.
+Ils dérivent de `AppStoreSubmission/METADATA.md` mais **ne le recopient pas** :
+l'app Android n'a ni import de répertoire PGN, ni alerte gaffe, ni synchro
+iCloud, et la fiche ne les annonce donc pas. Elle annonce en revanche ce
+qu'iOS n'a pas encore : les puzzles tirés de vos propres fautes.
 
 ### 4.3 Les déclarations obligatoires
 
@@ -213,6 +282,10 @@ Toutes se remplissent dans « Contenu de l'application ». Pour ChessLab :
 ---
 
 ## 5. Téléverser et publier
+
+Une fois la fiche créée dans la console et la clé du compte de service posée,
+tout passe par Gradle (§3bis) — sauf les déclarations de §4.3, qui restent à la
+main une fois pour toutes.
 
 1. **Test interne** (`Tests > Test interne`) — jusqu'à 100 testeurs, pas de
    délai d'examen, disponible en quelques minutes. C'est là qu'on envoie le
@@ -238,3 +311,7 @@ plus rapides.
 - [ ] **La mise à disposition des sources** (GPLv3, §0) et l'écran de licences.
 - [ ] **`versionName`** passé à `1.0`, `versionCode` délibéré.
 - [ ] Une passe sur un écran étroit et en paysage sur l'appareil réel.
+- [ ] **`contact-email.txt`** — l'adresse publique de contact, la seule pièce
+      de la fiche que je n'ai pas remplie à votre place.
+- [ ] Les déclarations de §4.3 dans la console (classification, sécurité des
+      données, public cible) : aucune API ne les couvre.

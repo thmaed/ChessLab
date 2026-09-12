@@ -81,3 +81,8 @@ tools/yolo-spike/*_640.png
 android/keystore.properties
 *.jks
 *.keystore
+
+# Clé du compte de service Google Play : elle vaut le droit de publier sous
+# votre nom. Elle vit dans ~/.private_keys/, comme la clé App Store Connect.
+play-service-account.json
+android/play-service-account.json

@@ -1,0 +1,41 @@
+ChessLab est un compagnon d'échecs complet : jouer, analyser, s'entraîner et expérimenter, avec le moteur Stockfish embarqué et sans jamais quitter l'application. Rien ne part sur un serveur.
+
+DES ADVERSAIRES QUI JOUENT COMME DES HUMAINS
+Neuf personnages joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait — gaffes comprises quand le niveau est bas. Chacun a son style, son répertoire d'ouvertures, son tempérament et son portrait, et son niveau se règle sur l'échelle humaine. Ou affrontez Stockfish lui-même, du débutant au niveau maximal. Avec ou sans pendule : bullet, blitz, rapide, classique, avec incrément.
+
+ANALYSER VRAIMENT SES PARTIES
+Chaque coup est noté — excellent, bon, imprécision, erreur, gaffe, occasion manquée — et chaque joueur reçoit sa précision sur cent. La courbe de la partie montre d'un coup d'œil où elle a basculé.
+
+Surtout, l'app dit POURQUOI un coup était mauvais, en une phrase : « mat du couloir », « fourchette sur votre tour et votre cavalier », « votre fou était en prise ». Ce n'est pas une explication inventée : la punition du moteur est rejouée sur l'échiquier, et seul ce qui s'y voit est nommé.
+
+Et ce que vous avez raté devient un exercice : les positions où vous vous êtes trompé se rangent à côté des puzzles, pour les retravailler.
+
+Entrée par PGN, par FEN, par l'éditeur de position, ou en photographiant un échiquier.
+
+OUVERTURES
+58 ouvertures rédigées à la main, en français et en anglais, toutes relues au moteur. Avancez coup par coup : chaque coup est expliqué, les variantes sont proposées, et des flèches colorées relient le plateau à la liste. Un entraînement par répétition espacée les ancre pour de bon.
+
+LE COIN DES FINALES
+78 cours prouvés par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. De l'opposition aux études célèbres.
+
+PUZZLES
+Plus de 100 000 problèmes tactiques de la base Lichess, filtrables par niveau et par thème — plus les vôtres, tirés de vos propres erreurs.
+
+VARIANTES
+Chess960 (échecs Fischer Random), Roi de la colline, Trois échecs, Horde, Course des rois, Atomique et Antiéchecs, contre l'ordinateur, chacune avec son analyse de fin de partie.
+
+DEUX JOUEURS
+À deux sur le même appareil, le plateau se retournant à chaque coup pour rester lisible face à face.
+
+LABORATOIRE
+Faites s'affronter deux réglages sur une série de parties pour comparer leur force.
+
+CHANGER DE MODE SANS PERDRE LE FIL
+La position que vous regardez s'emporte d'un bouton vers un autre mode : un coup vous intrigue pendant une analyse, essayez-le contre l'ordinateur, puis revenez.
+
+VIE PRIVÉE
+Aucun compte, aucun serveur, aucune publicité, aucune mesure d'audience. L'application n'a même pas la permission d'accéder à Internet : vos parties et vos réglages restent sur votre téléphone. Pour changer d'appareil, un simple fichier que vous écrivez et rouvrez où vous voulez.
+
+Français et anglais, décor et contenu des cours compris. Portrait et paysage.
+
+ChessLab intègre le moteur Stockfish (GPLv3), le réseau Maia-3 de l'Université de Toronto (AGPLv3) et le jeu de pièces cburnett (CC BY-SA 3.0). Les puzzles viennent de la base Lichess (CC0).

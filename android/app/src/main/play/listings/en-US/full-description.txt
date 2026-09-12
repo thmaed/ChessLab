@@ -1,0 +1,41 @@
+ChessLab is a complete chess companion: play, analyse, train and experiment, with the Stockfish engine built in and without ever leaving the app. Nothing is sent to a server.
+
+OPPONENTS THAT PLAY LIKE PEOPLE
+Nine characters played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play — blunders included at the lower levels. Each has a style, an opening repertoire, a temperament and a portrait, and a level set on the human scale. Or face Stockfish itself, from beginner to full strength. With or without a clock: bullet, blitz, rapid, classical, with increment.
+
+REALLY ANALYSE YOUR GAMES
+Every move is graded — excellent, good, inaccuracy, mistake, blunder, missed chance — and each player gets an accuracy out of a hundred. The evaluation curve shows at a glance where the game turned.
+
+Above all, the app tells you WHY a move was bad, in one sentence: "back-rank mate", "fork on your rook and your knight", "your bishop was hanging". This is not an invented explanation: the engine's refutation is replayed on a board, and only what can be seen there is named.
+
+And what you missed becomes an exercise: the positions where you went wrong are filed next to the puzzles, to work on again.
+
+Load a game by PGN, by FEN, from the position editor, or by photographing a board.
+
+OPENINGS
+58 openings written by hand, in English and French, all checked against the engine. Walk through them move by move: each move is explained, the alternatives are offered, and coloured arrows tie the board to the move list. Spaced repetition makes them stick.
+
+THE ENDGAME CORNER
+78 courses proved by tablebase — the exact mathematical verdict: no move taught throws away a win, no defence offered loses a draw. From the opposition to the famous studies.
+
+PUZZLES
+Over 100,000 tactical problems from the Lichess database, filtered by level and by theme — plus your own, drawn from your own mistakes.
+
+VARIANTS
+Chess960 (Fischer Random), King of the Hill, Three-Check, Horde, Racing Kings, Atomic and Antichess, against the computer, each with its own end-of-game analysis.
+
+TWO PLAYERS
+Two people on one device, the board flipping each move so it reads right from both sides.
+
+LABORATORY
+Set two configurations against each other over a series of games to compare their strength.
+
+SWITCH MODE WITHOUT LOSING YOUR PLACE
+The position you are looking at travels to another mode at the touch of a button: a move intrigues you during an analysis, try it against the computer, then come back.
+
+PRIVACY
+No account, no server, no advertising, no analytics. The app does not even hold permission to reach the internet: your games and settings stay on your phone. To move to another device, a single file you write and reopen wherever you like.
+
+English and French, interface and course content alike. Portrait and landscape.
+
+ChessLab embeds the Stockfish engine (GPLv3), the Maia-3 network from the University of Toronto (AGPLv3) and the cburnett piece set (CC BY-SA 3.0). Puzzles come from the Lichess database (CC0).

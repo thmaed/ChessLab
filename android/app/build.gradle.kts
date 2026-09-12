@@ -6,6 +6,7 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
+    id("com.github.triplet.play")
 }
 
 // Les réseaux NNUE vivent déjà dans ChessLab/Resources/ : recopiés dans les
@@ -35,6 +36,32 @@ val keystoreProps = Properties().apply {
         File(System.getProperty("user.home"), ".chesslab-android/keystore.properties"),
         rootProject.file("keystore.properties"),
     ).firstOrNull { it.exists() }?.inputStream()?.use { load(it) }
+}
+
+// La clé du compte de service Google Play. Comme le trousseau de signature,
+// elle ne vit PAS dans le dépôt : on la cherche dans ~/.private_keys/ — là où
+// vit déjà la clé App Store Connect — puis dans android/, lui aussi ignoré.
+val playCredentials = listOf(
+    File(System.getProperty("user.home"), ".private_keys/play-service-account.json"),
+    rootProject.file("play-service-account.json"),
+).firstOrNull { it.exists() }
+
+play {
+    // Sans clé, le greffon se tait : `./gradlew build` marche pour qui n'a pas
+    // à publier, et les tâches de publication disent pourquoi elles ne font
+    // rien plutôt que d'échouer en énumérant des chemins.
+    enabled.set(playCredentials != null)
+    playCredentials?.let { serviceAccountCredentials.set(it) }
+
+    // Un AAB, jamais un APK : Google Play n'accepte plus d'APK pour une app neuve.
+    defaultToAppBundles.set(true)
+
+    // On ne vise JAMAIS la production par défaut. Publier se demande
+    // explicitement (`--track production`), et l'accès à la production
+    // n'est de toute façon accordé qu'après le test fermé de 14 jours.
+    track.set("internal")
+    releaseStatus.set(com.github.triplet.gradle.androidpublisher.ReleaseStatus.COMPLETED)
+
 }
 
 android {

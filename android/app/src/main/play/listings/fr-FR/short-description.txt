@@ -1,0 +1,1 @@
+Jouer, analyser, progresser. Stockfish et Maia embarqués, sans réseau.
