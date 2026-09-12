@@ -20,6 +20,9 @@ import androidx.compose.ui.unit.sp
 import com.chesslab.ui.Palette
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
+import androidx.compose.ui.res.pluralStringResource
 
 /**
  * La liste des cours — ouvertures ou finales selon [endgames].
@@ -59,7 +62,7 @@ fun CourseListScreen(
         OutlinedTextField(
             value = query,
             onValueChange = { query = it },
-            label = { Text(if (endgames) "Chercher une finale" else "Chercher une ouverture") },
+            label = { Text(stringResource(if (endgames) R.string.course_search_endgame else R.string.course_search_opening)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth().testTag("recherche"),
         )
@@ -71,11 +74,13 @@ fun CourseListScreen(
                 // « rien pour l'instant » mentait : sans échéance en retard, la
                 // séance sert quand même des positions NEUVES. C'est ce qu'elle
                 // fera qu'il faut annoncer, pas l'état de la base.
-                "Révisions du jour", if (due > 0) "$due à revoir" else "de nouvelles positions",
+                stringResource(R.string.train_daily),
+                if (due > 0) stringResource(R.string.train_daily_due, due) else stringResource(R.string.train_daily_new),
                 Palette.warning, "seance-quotidienne", Modifier.weight(1f),
             ) { onTrain("daily") }
             SessionChip(
-                "Positions difficiles", if (hard > 0) "$hard à consolider" else "aucune",
+                stringResource(R.string.train_hardest),
+                if (hard > 0) stringResource(R.string.train_hard_count, hard) else stringResource(R.string.train_hard_none),
                 Palette.danger, "seance-difficiles", Modifier.weight(1f),
             ) { onTrain("hardest") }
         }
@@ -90,7 +95,10 @@ fun CourseListScreen(
             query.isBlank() || it.name.contains(query, true) || it.summary.contains(query, true)
         }
         Text(
-            "${filtered.size} ${if (endgames) "finales" else "ouvertures"}",
+            pluralStringResource(
+                if (endgames) R.plurals.course_count_endgames else R.plurals.course_count_openings,
+                filtered.size, filtered.size,
+            ),
             fontSize = 12.sp, color = Palette.textTertiary,
             modifier = Modifier.padding(bottom = 6.dp).testTag("compte"),
         )
@@ -136,9 +144,9 @@ private fun CourseRow(entry: CatalogEntry, onOpen: (String) -> Unit) {
                 color = Palette.textPrimary, modifier = Modifier.weight(1f),
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
-            Tag(entry.sideLabel, if (entry.side == "white") Palette.textSecondary else Palette.info)
+            Tag(stringResource(entry.sideLabel), if (entry.side == "white") Palette.textSecondary else Palette.info)
             Spacer(Modifier.width(5.dp))
-            Tag(entry.levelLabel, if (entry.level == "advanced") Palette.warning else Palette.accent)
+            Tag(stringResource(entry.levelLabel), if (entry.level == "advanced") Palette.warning else Palette.accent)
         }
         if (entry.summary.isNotEmpty()) {
             Spacer(Modifier.height(4.dp))
@@ -152,7 +160,7 @@ private fun CourseRow(entry: CatalogEntry, onOpen: (String) -> Unit) {
             Text(
                 listOfNotNull(
                     entry.eco.joinToString("–").ifEmpty { null },
-                    "${entry.positionCount} positions".takeIf { entry.positionCount > 0 },
+                    pluralStringResource(R.plurals.course_positions, entry.positionCount, entry.positionCount).takeIf { entry.positionCount > 0 },
                 ).joinToString(" · "),
                 fontSize = 11.sp, color = Palette.textTertiary,
             )

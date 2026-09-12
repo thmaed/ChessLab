@@ -1,5 +1,7 @@
 package com.chesslab.maia
 
+import android.content.Context
+import androidx.annotation.StringRes
 import kotlin.math.roundToInt
 
 /**
@@ -54,10 +56,16 @@ enum class OpponentTint { maiaBlue, red, deepBlue, green, purple, orange, cyan, 
  */
 data class OpponentProfile(
     val id: String,
+    /** Le prénom ne se traduit pas : Lena reste Lena. */
     val firstName: String,
-    val nickname: String,
-    val tagline: String,
-    val tags: List<String>,
+    /**
+     * Le surnom, l'accroche et les étiquettes sont des RESSOURCES, pas des
+     * chaînes : ce sont les seuls textes du modèle que l'utilisateur lit, et
+     * ils existent dans les deux langues.
+     */
+    @StringRes val nicknameRes: Int,
+    @StringRes val taglineRes: Int,
+    val tagRes: List<Int>,
     val tint: OpponentTint,
     /** 0 = le coup le plus probable, 1 = fidèle aux humains, au-delà = erratique. */
     val temperature: Double,
@@ -68,7 +76,13 @@ data class OpponentProfile(
     val temperament: Temperament,
     val bookId: String?,
 ) {
-    val displayName: String get() = "$firstName « $nickname »"
+    fun nickname(context: Context): String = context.getString(nicknameRes)
+    fun tagline(context: Context): String = context.getString(taglineRes)
+    fun tags(context: Context): List<String> = tagRes.map(context::getString)
+
+    /** « Lena « Tornade » » — le prénom, puis le surnom traduit. */
+    fun displayName(context: Context): String =
+        context.getString(R.string.opponent_display_name, firstName, nickname(context))
 
     /**
      * La plage du curseur : sa plage crédible, et rien d'autre — un Pablo à

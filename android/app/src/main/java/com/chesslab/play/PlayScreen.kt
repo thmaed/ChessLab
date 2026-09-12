@@ -31,6 +31,9 @@ import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
 import kotlin.math.roundToInt
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
 
 @Composable
 fun PlayScreen(resume: Boolean = false, model: PlayViewModel = viewModel()) {
@@ -65,7 +68,7 @@ fun PlayScreen(resume: Boolean = false, model: PlayViewModel = viewModel()) {
             Spacer(Modifier.height(10.dp))
             MoveStrip(ui.sanMoves)
             TextButton(onClick = model::newGame, modifier = Modifier.testTag("nouvelle")) {
-                Text("Nouvelle partie", color = Palette.accent)
+                Text(stringResource(R.string.new_game), color = Palette.accent)
             }
         },
     )
@@ -113,7 +116,7 @@ private fun OpponentCard(profile: OpponentProfile, level: Double, onLevel: (Doub
             )
             Spacer(Modifier.width(8.dp))
             Text(
-                profile.displayName,
+                profile.displayName(LocalContext.current),
                 fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
             )
             Spacer(Modifier.weight(1f))
@@ -125,13 +128,13 @@ private fun OpponentCard(profile: OpponentProfile, level: Double, onLevel: (Doub
         }
         Spacer(Modifier.height(4.dp))
         Text(
-            profile.tagline,
+            profile.tagline(LocalContext.current),
             fontSize = 11.sp, color = Palette.textSecondary,
             maxLines = 3, overflow = TextOverflow.Ellipsis,
         )
         Spacer(Modifier.height(2.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            profile.tags.forEach { tag ->
+            profile.tags(LocalContext.current).forEach { tag ->
                 Text(
                     tag, fontSize = 10.sp, color = tintColor(profile.tint),
                     modifier = Modifier
@@ -149,7 +152,7 @@ private fun OpponentCard(profile: OpponentProfile, level: Double, onLevel: (Doub
             modifier = Modifier.testTag("curseur-niveau"),
         )
         Text(
-            "Niveau sur l'échelle humaine de Maia, proche de celle de Lichess.",
+            stringResource(R.string.maia_scale_note),
             fontSize = 10.sp, color = Palette.textTertiary,
         )
     }
@@ -188,17 +191,17 @@ private fun tintColor(tint: OpponentTint): Color = when (tint) {
 fun PromotionDialog(onPick: (Piece.Kind) -> Unit) {
     AlertDialog(
         onDismissRequest = { onPick(Piece.Kind.queen) },
-        title = { Text("Promotion") },
-        text = { Text("En quelle pièce promouvoir le pion ?") },
+        title = { Text(stringResource(R.string.theme_promotion)) },
+        text = { Text(stringResource(R.string.promote_to)) },
         confirmButton = {
             Row {
                 listOf(
-                    Piece.Kind.queen to "Dame",
-                    Piece.Kind.rook to "Tour",
-                    Piece.Kind.bishop to "Fou",
-                    Piece.Kind.knight to "Cavalier",
+                    Piece.Kind.queen to R.string.piece_queen,
+                    Piece.Kind.rook to R.string.piece_rook,
+                    Piece.Kind.bishop to R.string.piece_bishop,
+                    Piece.Kind.knight to R.string.piece_knight,
                 ).forEach { (kind, label) ->
-                    TextButton(onClick = { onPick(kind) }) { Text(label) }
+                    TextButton(onClick = { onPick(kind) }) { Text(stringResource(label)) }
                 }
             }
         },

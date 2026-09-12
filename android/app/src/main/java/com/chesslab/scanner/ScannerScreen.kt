@@ -33,6 +33,8 @@ import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
 import androidx.compose.foundation.Canvas
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
 
 @Composable
 fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> Unit = {}) {
@@ -48,7 +50,7 @@ fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> 
         Spacer(Modifier.height(8.dp))
 
         Button(onClick = { pick.launch("image/*") }, modifier = Modifier.testTag("choisir")) {
-            Text("Choisir une photo")
+            Text(stringResource(R.string.scan_choose))
         }
 
         ui.image?.let { bitmap ->
@@ -61,18 +63,18 @@ fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> 
             Spacer(Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = { model.scan() }, enabled = !ui.busy, modifier = Modifier.testTag("scanner")) {
-                    Text("Lire le plateau")
+                    Text(stringResource(R.string.scan_read))
                 }
                 Spacer(Modifier.width(8.dp))
                 TextButton(onClick = { model.autoFrame() }, modifier = Modifier.testTag("recadrer")) {
-                    Text("Retrouver le plateau", color = Palette.textSecondary)
+                    Text(stringResource(R.string.scan_reframe), color = Palette.textSecondary)
                 }
             }
         }
 
         ui.position?.let { position ->
             Spacer(Modifier.height(12.dp))
-            Text("Position lue", fontSize = 12.sp, color = Palette.textTertiary)
+            Text(stringResource(R.string.scan_result), fontSize = 12.sp, color = Palette.textTertiary)
             Spacer(Modifier.height(4.dp))
             BoardView(position = position, enabled = false)
 
@@ -88,12 +90,11 @@ fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> 
                     .testTag("fen"),
             )
             Text(
-                "Le trait, les roques et la prise en passant ne se lisent pas sur une "
-                    + "photo : à vous de les corriger.",
+                stringResource(R.string.scan_fen_note),
                 fontSize = 10.sp, color = Palette.textTertiary,
             )
             TextButton(onClick = { onAnalyse(model.fen) }, modifier = Modifier.testTag("analyser")) {
-                Text("Analyser cette position", color = Palette.accent)
+                Text(stringResource(R.string.scan_analyse), color = Palette.accent)
             }
         }
         Spacer(Modifier.height(24.dp))
@@ -153,7 +154,7 @@ private fun CornerPicker(
                 }
             }
     ) {
-        Image(bitmap, contentDescription = "Photo à cadrer", Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
+        Image(bitmap, contentDescription = stringResource(R.string.scan_photo_to_frame), Modifier.fillMaxSize(), contentScale = ContentScale.Fit)
 
         Canvas(Modifier.fillMaxSize()) {
             val points = corners.map { (fx, fy) -> Offset(fx * this.size.width, fy * this.size.height) }

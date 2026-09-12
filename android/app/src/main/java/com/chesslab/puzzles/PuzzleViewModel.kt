@@ -17,6 +17,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.chesslab.R
+import com.chesslab.ui.q
+import com.chesslab.ui.s
 
 enum class PuzzleOutcome { solving, solved, failed }
 
@@ -28,7 +31,7 @@ data class PuzzleUiState(
     val legalTargets: Set<Square> = emptySet(),
     val lastMove: Pair<Square, Square>? = null,
     val checkedKing: Square? = null,
-    val status: String = "Chargement de la bibliothèque…",
+    val status: String = "",
     val outcome: PuzzleOutcome = PuzzleOutcome.solving,
     val solvedCount: Int = 0,
     val attemptedCount: Int = 0,
@@ -53,7 +56,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     private var board = Board()
     private var step = 0
 
-    var ui by mutableStateOf(PuzzleUiState())
+    var ui by mutableStateOf(PuzzleUiState(status = s(R.string.puzzle_loading)))
         private set
 
     init {
@@ -64,7 +67,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             }
             queue = sampled
             if (queue.isEmpty()) {
-                ui = ui.copy(loading = false, status = "Bibliothèque indisponible")
+                ui = ui.copy(loading = false, status = s(R.string.puzzle_library_unavailable))
             } else {
                 ui = ui.copy(loading = false)
                 present(0)
@@ -89,7 +92,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             checkedKing = null,
             outcome = PuzzleOutcome.solving,
             attemptsLeft = SettingsStore.state.value.puzzleAttempts,
-            status = "${puzzle.themeLabel} · ${puzzle.rating} — trouvez le meilleur coup",
+            status = s(R.string.puzzle_prompt, s(puzzle.themeLabel), puzzle.rating),
         )
     }
 
@@ -127,7 +130,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
                 ui.copy(
                     selected = null, legalTargets = emptySet(),
                     attemptsLeft = left,
-                    status = "Ce n'est pas le coup — il vous reste $left essai" + (if (left > 1) "s" else ""),
+                    status = q(R.plurals.puzzle_wrong_tries, left, left),
                 )
             } else {
                 StatsStore.recordPuzzle(getApplication(), solvedIt = false)
@@ -135,7 +138,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
                     selected = null, legalTargets = emptySet(),
                     outcome = PuzzleOutcome.failed,
                     attemptedCount = ui.attemptedCount + 1,
-                    status = "Ce n'est pas le coup — la solution commençait par $expected",
+                    status = s(R.string.puzzle_wrong_solution, expected),
                 )
             }
             return
@@ -163,7 +166,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Le coup du résolveur est joué : on enchaîne la riposte, ou on conclut. */
     private fun advance(move: Move, puzzle: Puzzle) {
-        show(move, "Bien joué — continuez")
+        show(move, s(R.string.puzzle_good))
 
         if (step >= puzzle.solution.size) {
             StatsStore.recordPuzzle(getApplication(), solvedIt = true)
@@ -171,7 +174,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
                 outcome = PuzzleOutcome.solved,
                 solvedCount = ui.solvedCount + 1,
                 attemptedCount = ui.attemptedCount + 1,
-                status = "Résolu",
+                status = s(R.string.puzzle_solved),
             )
             return
         }
@@ -186,7 +189,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             }
             step++
             ui = ui.copy(busy = false)
-            if (reply != null) show(reply, "À vous")
+            if (reply != null) show(reply, s(R.string.your_turn))
         }
     }
 

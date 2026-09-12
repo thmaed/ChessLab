@@ -31,6 +31,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chesslab.nav.Route
+import androidx.annotation.StringRes
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.pluralStringResource
+import com.chesslab.R
 
 /**
  * Une tuile de l'accueil. Titres, accroches et teintes repris de
@@ -39,23 +43,28 @@ import com.chesslab.nav.Route
  */
 data class Mode(
     val route: Route,
-    val title: String,
-    val subtitle: String,
-    val shortSubtitle: String,
+    /**
+     * Le repère des tests. Stable et indépendant de la langue : un repère tiré
+     * du titre affiché aurait changé de nom en passant à l'anglais.
+     */
+    val tag: String,
+    @StringRes val title: Int,
+    @StringRes val subtitle: Int,
+    @StringRes val shortSubtitle: Int,
     val icon: ImageVector,
     val tint: Color,
     val enabled: Boolean = true,
 )
 
 private val modes = listOf(
-    Mode(Route.PlayVsEngine(), "Contre l'ordinateur", "Neuf personnages, ou Stockfish", "Personnages", Icons.Default.Memory, Palette.accent),
-    Mode(Route.TwoPlayer, "Deux joueurs", "Sur le même appareil", "Même appareil", Icons.Default.People, Palette.info),
-    Mode(Route.Puzzles, "Puzzles", "Tactique et bibliothèque Lichess", "Tactique et Lichess", Icons.Default.Extension, Palette.violet),
-    Mode(Route.Openings, "Ouvertures", "Apprends et révise tes ouvertures", "Apprends et révise", Icons.Default.MenuBook, Palette.warning),
-    Mode(Route.Endgames, "Finales", "Lucena, Philidor, opposition — prouvées", "Fins gagnantes", Icons.Default.EmojiEvents, Palette.gold),
-    Mode(Route.Analysis(), "Analyser", "PGN, FEN, bibliothèque", "PGN, FEN", Icons.Default.ShowChart, Palette.teal),
-    Mode(Route.Laboratory, "Laboratoire", "L'ordinateur contre lui-même", "Face à lui-même", Icons.Default.Science, Palette.rose),
-    Mode(Route.Variants, "Variantes", "Chess960 et autres façons de jouer", "Chess960 et plus", Icons.Default.Casino, Palette.violet),
+    Mode(Route.PlayVsEngine(), "play", R.string.route_play, R.string.home_play_long, R.string.home_play_sub, Icons.Default.Memory, Palette.accent),
+    Mode(Route.TwoPlayer, "two", R.string.route_two_players, R.string.home_two_long, R.string.home_two_sub, Icons.Default.People, Palette.info),
+    Mode(Route.Puzzles, "puzzles", R.string.route_puzzles, R.string.home_puzzles_long, R.string.home_puzzles_sub, Icons.Default.Extension, Palette.violet),
+    Mode(Route.Openings, "openings", R.string.route_openings, R.string.home_openings_long, R.string.home_openings_sub, Icons.Default.MenuBook, Palette.warning),
+    Mode(Route.Endgames, "endgames", R.string.route_endgames, R.string.home_endgames_long, R.string.home_endgames_sub, Icons.Default.EmojiEvents, Palette.gold),
+    Mode(Route.Analysis(), "analysis", R.string.route_analysis, R.string.home_analysis_long, R.string.home_analysis_sub, Icons.Default.ShowChart, Palette.teal),
+    Mode(Route.Laboratory, "lab", R.string.route_lab, R.string.home_lab_long, R.string.home_lab_sub, Icons.Default.Science, Palette.rose),
+    Mode(Route.Variants, "variants", R.string.route_variants, R.string.home_variants_long, R.string.home_variants_sub, Icons.Default.Casino, Palette.violet),
 )
 
 @Composable
@@ -66,6 +75,7 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
 
     // Combien de positions réclament une révision aujourd'hui. Relu à chaque
     // retour sur l'accueil : une séance vient d'en replanifier.
+    val reviewLabel = stringResource(R.string.train_daily)
     var due by remember { mutableStateOf(0) }
     var studied by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) {
@@ -85,14 +95,14 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     color = Palette.textPrimary,
                 )
                 Text(
-                    "Jouer · Analyser · S'entraîner · Expérimenter",
+                    stringResource(R.string.home_tagline),
                     style = MaterialTheme.typography.bodySmall,
                     color = Palette.textSecondary,
                     maxLines = 1, overflow = TextOverflow.Ellipsis,
                 )
             }
             IconButton(onClick = { onOpen(Route.Settings) }, modifier = Modifier.testTag("reglages")) {
-                Icon(Icons.Default.Settings, "Réglages", tint = Palette.textSecondary)
+                Icon(Icons.Default.Settings, stringResource(R.string.route_settings), tint = Palette.textSecondary)
             }
         }
 
@@ -105,10 +115,10 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             listOf(
-                Triple(Route.Scanner, "Scanner", Icons.Default.PhotoCamera),
-                Triple(Route.PositionEditor, "Éditeur", Icons.Default.Edit),
-                Triple(Route.Progression, "Progression", Icons.Default.TrendingUp),
-                Triple(Route.Help, "Aide", Icons.AutoMirrored.Filled.HelpOutline),
+                Triple(Route.Scanner, R.string.chip_scanner, Icons.Default.PhotoCamera),
+                Triple(Route.PositionEditor, R.string.chip_editor, Icons.Default.Edit),
+                Triple(Route.Progression, R.string.chip_progress, Icons.Default.TrendingUp),
+                Triple(Route.Help, R.string.chip_help, Icons.AutoMirrored.Filled.HelpOutline),
             ).forEach { (route, label, icon) ->
                 Row(
                     Modifier
@@ -128,7 +138,7 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                 ) {
                     Icon(icon, null, tint = Palette.textSecondary, modifier = Modifier.size(15.dp))
                     Spacer(Modifier.width(5.dp))
-                    Text(label, fontSize = 11.sp, color = Palette.textSecondary)
+                    Text(stringResource(label), fontSize = 11.sp, color = Palette.textSecondary)
                 }
             }
         }
@@ -145,17 +155,20 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     .testTag("reviser")
                     .clip(RoundedCornerShape(14.dp))
                     .background(Palette.warning.copy(alpha = 0.12f))
-                    .clickable { onOpen(Route.Train("daily", label = "Révisions du jour")) }
+                    .clickable { onOpen(Route.Train("daily", label = reviewLabel)) }
                     .padding(14.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(Icons.Default.Schedule, null, tint = Palette.warning, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Réviser", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.warning)
                     Text(
-                        "$due position${if (due > 1) "s" else ""} à revoir" +
-                            if (studied > 0) " · $studied apprise${if (studied > 1) "s" else ""}" else "",
+                        stringResource(R.string.home_review),
+                        fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.warning,
+                    )
+                    Text(
+                        pluralStringResource(R.plurals.home_review_due, due, due) +
+                            if (studied > 0) " · " + pluralStringResource(R.plurals.home_review_learned, studied, studied) else "",
                         fontSize = 11.sp, color = Palette.textSecondary,
                     )
                 }
@@ -178,7 +191,7 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                 Icon(Icons.Default.PlayArrow, null, tint = Palette.accent, modifier = Modifier.size(22.dp))
                 Spacer(Modifier.width(10.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Reprendre", fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent)
+                    Text(stringResource(R.string.home_resume), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent)
                     Text(save.label, fontSize = 11.sp, color = Palette.textSecondary)
                 }
             }
@@ -205,7 +218,7 @@ private fun ModeCard(mode: Mode, onOpen: (Route) -> Unit) {
     val alpha = if (mode.enabled) 1f else 0.4f
     Box(
         Modifier
-            .testTag("mode-${mode.route.title}")
+            .testTag("mode-${mode.tag}")
             .height(132.dp)
             .clip(RoundedCornerShape(18.dp))
             .background(Palette.surface)
@@ -227,12 +240,12 @@ private fun ModeCard(mode: Mode, onOpen: (Route) -> Unit) {
             )
             Spacer(Modifier.weight(1f))
             Text(
-                mode.title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
+                stringResource(mode.title), fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
                 color = Palette.textPrimary.copy(alpha = alpha),
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
             Text(
-                if (mode.enabled) mode.shortSubtitle else "Bientôt",
+                stringResource(if (mode.enabled) mode.shortSubtitle else R.string.soon_label),
                 fontSize = 11.sp, color = Palette.textSecondary.copy(alpha = alpha),
                 maxLines = 2, overflow = TextOverflow.Ellipsis,
             )

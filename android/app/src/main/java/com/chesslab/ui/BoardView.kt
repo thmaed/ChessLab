@@ -25,6 +25,7 @@ import chesskit.Position
 import chesskit.Square
 import com.chesslab.R
 import com.chesslab.settings.SettingsStore
+import androidx.compose.ui.res.stringResource
 
 /**
  * L'échiquier. Pendant de `BoardView.swift`.
@@ -242,18 +243,22 @@ private fun drawableFor(piece: Piece, set: String): Int {
 }
 
 /** Lu par les lecteurs d'écran, comme le `accessibilityLabel` iOS. */
-private fun describe(piece: Piece): String {
-    val kind = when (piece.kind) {
-        Piece.Kind.king -> "Roi"
-        Piece.Kind.queen -> "Dame"
-        Piece.Kind.rook -> "Tour"
-        Piece.Kind.bishop -> "Fou"
-        Piece.Kind.knight -> "Cavalier"
-        Piece.Kind.pawn -> "Pion"
-    }
-    val color = if (piece.color == Piece.Color.white) "blanc" else "noir"
-    return "$kind $color en ${piece.square.notation}"
-}
+@Composable
+private fun describe(piece: Piece): String = stringResource(
+    R.string.square_piece,
+    stringResource(
+        when (piece.kind) {
+            Piece.Kind.king -> R.string.piece_king
+            Piece.Kind.queen -> R.string.piece_queen
+            Piece.Kind.rook -> R.string.piece_rook
+            Piece.Kind.bishop -> R.string.piece_bishop
+            Piece.Kind.knight -> R.string.piece_knight
+            Piece.Kind.pawn -> R.string.piece_pawn
+        }
+    ),
+    stringResource(if (piece.color == Piece.Color.white) R.string.colour_white_adj else R.string.colour_black_adj),
+    piece.square.notation,
+)
 
 private fun Color.compositeOver(background: Color): Color {
     val a = alpha

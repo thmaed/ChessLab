@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Les textes des neuf personnages, en anglais. GÉNÉRÉ avec
+     OpponentGallery.kt par tools/maia-profiles/generate_profiles.py —
+     ne pas éditer à la main. -->
+<resources>
+    <string name="opponent_ines_nickname">Spring</string>
+    <string name="opponent_ines_tag1">Defence</string>
+    <string name="opponent_ines_tag2">Counter-attack</string>
+    <string name="opponent_ines_tag3">Cool head</string>
+    <string name="opponent_ines_tagline">Lets you come, absorbs, smiles. The harder you attack, the more dangerous she gets; her favourite position is slightly worse.</string>
+    <string name="opponent_lea_nickname">Tornado</string>
+    <string name="opponent_lea_tag1">Attack</string>
+    <string name="opponent_lea_tag2">Sacrifices</string>
+    <string name="opponent_lea_tag3">Rapid</string>
+    <string name="opponent_lea_tagline">Castles on the opposite wing and throws her pawns: your king is a delivery address. Simplifies badly, even two pawns up.</string>
+    <string name="opponent_maia_nickname">Neutral</string>
+    <string name="opponent_maia_tag1">Maia-3</string>
+    <string name="opponent_maia_tag2">No adaptation</string>
+    <string name="opponent_maia_tag3">Reference</string>
+    <string name="opponent_maia_tagline">The Maia-3 model as is, with no adaptation at all: plays like a human of this level, with no particular style.</string>
+    <string name="opponent_marc_nickname">Concrete</string>
+    <string name="opponent_marc_tag1">Solid</string>
+    <string name="opponent_marc_tag2">Book</string>
+    <string name="opponent_marc_tag3">Patient</string>
+    <string name="opponent_marc_tagline">London System, castles on move 6, zero weaknesses. He knows his theory inside out and hasn\'t lost in months. He sleeps well.</string>
+    <string name="opponent_nadia_nickname">Endgame</string>
+    <string name="opponent_nadia_tag1">Trades</string>
+    <string name="opponent_nadia_tag2">Endgames</string>
+    <string name="opponent_nadia_tag3">Precise</string>
+    <string name="opponent_nadia_tagline">Trades queens on move 12, offers a draw on move 30 if it\'s equal, and mates you on move 65 if it isn\'t. No frills.</string>
+    <string name="opponent_pablo_nickname">Yolo</string>
+    <string name="opponent_pablo_tag1">Impulsive</string>
+    <string name="opponent_pablo_tag2">Attack</string>
+    <string name="opponent_pablo_tag3">Blunders</string>
+    <string name="opponent_pablo_tagline">Brilliant on move 15, hanging a piece on move 16. Plays fast, attacks everything, forgets his king. The human beginner Stockfish cannot imitate.</string>
+    <string name="opponent_sacha_nickname">Trap</string>
+    <string name="opponent_sacha_tag1">Traps</string>
+    <string name="opponent_sacha_tag2">Tactic</string>
+    <string name="opponent_sacha_tag3">Unpredictable</string>
+    <string name="opponent_sacha_tagline">His moves look wrong. Half of them really are; the other half cost a piece to anyone who believes it. Falls into other people\'s traps too, on principle.</string>
+    <string name="opponent_theo_nickname">Gambit</string>
+    <string name="opponent_theo_tag1">Gambits</string>
+    <string name="opponent_theo_tag2">Initiative</string>
+    <string name="opponent_theo_tag3">Shaky endgames</string>
+    <string name="opponent_theo_tagline">Offers a pawn on move two, another on move three, and hunts for mate before his queen is developed. His endgames look like accidents.</string>
+    <string name="opponent_yuri_nickname">Penny-pincher</string>
+    <string name="opponent_yuri_tag1">Material</string>
+    <string name="opponent_yuri_tag2">Defence</string>
+    <string name="opponent_yuri_tag3">Tenacious</string>
+    <string name="opponent_yuri_tagline">An offered pawn is a taken pawn. He accepts every gambit, defends for forty moves without complaint, then reminds you he is a pawn up.</string>
+    <string name="opponent_display_name">%1$s \u201c%2$s\u201d</string>
+</resources>

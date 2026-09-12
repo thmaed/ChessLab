@@ -35,6 +35,7 @@ recopiés depuis `ChessLab/Resources/` au moment du build.
 | Scanner | lire une position sur une photo, plateau détecté tout seul |
 | Réglages | quatre thèmes, trois jeux de pièces, force du moteur |
 | Paysage | plateau et panneau côte à côte, sur téléphone comme sur tablette |
+| Deux langues | français et anglais, décor ET contenu des cours ; réglage dans l'app |
 | Bibliothèque | les parties terminées, enregistrées et rejouables |
 | Entraîner | répétition espacée FSRS-5 : séance du jour, positions à consolider, une ligne |
 
@@ -42,7 +43,6 @@ recopiés depuis `ChessLab/Resources/` au moment du build.
 
 - **La mesure sur un vrai téléphone.** L'émulateur ne dit rien de la vitesse ni
   du thermique — et c'est de là que dépend la calibration des niveaux.
-- L'anglais : l'interface est en français seulement.
 - La synchronisation entre appareils (iOS passe par CloudKit ; côté Android le
   journal de révisions est déjà écrit pour fusionner, mais rien ne le transporte).
 
@@ -54,13 +54,38 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@21
 ./gradlew :app:testDebugUnitTest          # FSRS et les files de révision, sans émulateur
 ./gradlew :maia:testDebugUnitTest         # l'encodeur, prouvé au bit près
 ./gradlew :vision:testDebugUnitTest       # homographie et lecture de grille
-./gradlew :app:connectedDebugAndroidTest  # 35 cas de bout en bout, sur appareil
+./gradlew :app:connectedDebugAndroidTest  # 40 cas de bout en bout, sur appareil
 ./gradlew :app:assembleDebug
 ```
 
 **La boucle de travail est la JVM.** Les règles, l'encodeur Maia et la vision
 se testent sur la machine en quelques secondes ; seule l'interface demande un
 appareil.
+
+## Les deux langues
+
+L'anglais est la langue PAR DÉFAUT (`res/values/`), le français vit dans
+`res/values-fr/` — un téléphone réglé sur une langue qu'on ne traduit pas
+retombe ainsi sur l'anglais plutôt que sur du français incompris. Le français
+reste la langue D'ÉCRITURE : traduire, c'est partir de lui.
+
+- `app/src/main/res/values{,-fr}/strings_app.xml` — le décor, 295 clés.
+- `maia/src/main/res/values{,-fr}/strings.xml` — les neuf personnages,
+  **générés** avec `OpponentGallery.kt` par
+  `tools/maia-profiles/generate_profiles.py`, qui va chercher l'anglais dans
+  `ChessLab/Localizable.xcstrings` : l'app iOS l'avait déjà traduit.
+- Le CONTENU des cours (noms, résumés, commentaires) porte ses deux langues
+  dans ses propres fichiers JSON ; `CourseRepository` lit celle du moment.
+
+Le choix se fait dans les Réglages (Système / Français / English). Sur Android
+13 et au-delà il passe par le réglage système « langue de l'application », ce
+qui fait aussi apparaître ChessLab dans la liste des Réglages ; en dessous,
+l'activité enveloppe son contexte elle-même.
+
+Les tests d'interface tournent en FRANÇAIS, langue fixée par `LanguageRule`
+avant que l'activité démarre : sans elle, les mêmes assertions passeraient sur
+une machine et échoueraient sur une autre. `EnglishTest` couvre l'anglais,
+personnages et contenu des cours compris.
 
 ## Deux artefacts non versionnés
 

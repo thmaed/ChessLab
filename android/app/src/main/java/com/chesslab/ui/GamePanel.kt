@@ -21,7 +21,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import chesskit.Piece
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
 
 /** La ligne d'état sous le titre : ce que l'app a à dire, et si elle réfléchit. */
 @Composable
@@ -65,7 +66,7 @@ fun MoveStrip(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         if (moves.isEmpty()) {
-            Text("Aucun coup joué", fontSize = 12.sp, color = Palette.textTertiary)
+            Text(stringResource(R.string.no_moves_played), fontSize = 12.sp, color = Palette.textTertiary)
         }
         moves.forEachIndexed { index, san ->
             if (index % 2 == 0) {
@@ -97,10 +98,6 @@ fun MoveStrip(
         }
     }
 }
-
-/** Le camp au trait, en toutes lettres. */
-fun sideLabel(color: Piece.Color): String =
-    if (color == Piece.Color.white) "les blancs" else "les noirs"
 
 /** Un clic sans l'ondulation : dans une bande de coups, elle fait du bruit. */
 private fun Modifier.clickableNoRipple(onClick: () -> Unit): Modifier = composed {

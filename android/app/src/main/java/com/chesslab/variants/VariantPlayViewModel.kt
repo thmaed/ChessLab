@@ -15,6 +15,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.chesslab.R
+import com.chesslab.ui.s
 
 data class VariantUiState(
     val position: Position = Position.standard,
@@ -23,7 +25,7 @@ data class VariantUiState(
     val legalTargets: Set<Square> = emptySet(),
     val lastMove: Pair<Square, Square>? = null,
     val checkedKing: Square? = null,
-    val status: String = "Démarrage du moteur…",
+    val status: String = "",
     val uciLog: List<String> = emptyList(),
     val thinking: Boolean = false,
     val gameOver: Boolean = false,
@@ -44,14 +46,14 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
     private var legal: List<String> = emptyList()
     private val humanColor = Piece.Color.white
 
-    var ui by mutableStateOf(VariantUiState())
+    var ui by mutableStateOf(VariantUiState(status = s(R.string.engine_starting)))
         private set
 
     fun load(variantId: String) {
         val variant = VariantCatalog.byId(variantId) ?: return
         startFen = if (variant.chess960) VariantCatalog.randomChess960Fen() else null
         ui = ui.copy(variant = variant, uciLog = emptyList(), gameOver = false, ready = false,
-            status = "Démarrage du moteur…", lastMove = null)
+            status = s(R.string.engine_starting), lastMove = null)
         refresh()
     }
 
@@ -77,7 +79,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(thinking = false)
 
         if (query == null) {
-            ui = ui.copy(status = "Moteur de variantes indisponible", ready = false)
+            ui = ui.copy(status = s(R.string.variant_engine_unavailable), ready = false)
             return@launch
         }
 
@@ -94,9 +96,9 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
             gameOver = over,
             ready = true,
             status = when {
-                over -> "Partie terminée"
-                position.sideToMove == humanColor -> "À vous de jouer"
-                else -> "Le moteur réfléchit…"
+                over -> s(R.string.game_over)
+                position.sideToMove == humanColor -> s(R.string.your_turn)
+                else -> s(R.string.engine_thinking)
             },
         )
 
@@ -105,14 +107,14 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun askEngine(): Job = viewModelScope.launch {
         val variant = ui.variant ?: return@launch
-        ui = ui.copy(thinking = true, status = "Le moteur réfléchit…")
+        ui = ui.copy(thinking = true, status = s(R.string.engine_thinking))
         val best = withContext(Dispatchers.IO) {
             FairyEngine.use(getApplication()) { engine ->
                 engine.bestMove(variant.uci, startFen, ui.uciLog, movetimeMs = 400)
             }
         }
         ui = ui.copy(thinking = false)
-        if (best == null || best == "(none)") { ui = ui.copy(status = "Le moteur n'a pas répondu"); return@launch }
+        if (best == null || best == "(none)") { ui = ui.copy(status = s(R.string.engine_silent)); return@launch }
         ui = ui.copy(uciLog = ui.uciLog + best)
         refresh(Square(best.substring(0, 2)) to Square(best.substring(2, 4)))
     }

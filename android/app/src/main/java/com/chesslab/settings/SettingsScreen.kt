@@ -23,6 +23,9 @@ import chesskit.Position
 import com.chesslab.ui.BoardTheme
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
+import androidx.compose.runtime.*
 
 @Composable
 fun SettingsScreen() {
@@ -32,12 +35,12 @@ fun SettingsScreen() {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
     ) {
-        Section("Aperçu")
+        Section(stringResource(R.string.settings_preview))
         // un aperçu vaut mieux qu'une vignette : c'est le vrai plateau
         BoardView(position = remembered, enabled = false)
 
         Spacer(Modifier.height(16.dp))
-        Section("Thème du plateau")
+        Section(stringResource(R.string.settings_board_theme))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             BoardTheme.all.forEach { theme ->
                 ThemeSwatch(theme, theme.id == settings.boardThemeId) {
@@ -47,32 +50,32 @@ fun SettingsScreen() {
         }
 
         Spacer(Modifier.height(16.dp))
-        Section("Jeu de pièces")
+        Section(stringResource(R.string.settings_piece_set))
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf(
-                "classic" to "Classique",
-                "chessnut" to "Moderne",
-                "merida" to "Contrasté",
+                "classic" to R.string.pieces_classic,
+                "chessnut" to R.string.pieces_modern,
+                "merida" to R.string.pieces_bold,
             ).forEach { (id, label) ->
-                Choice(label, id == settings.pieceSetId, "piece-$id") {
+                Choice(stringResource(label), id == settings.pieceSetId, "piece-$id") {
                     SettingsStore.setPieceSet(context, id)
                 }
             }
         }
 
         Spacer(Modifier.height(16.dp))
-        Section("Temps de réflexion du moteur")
+        Section(stringResource(R.string.settings_engine_time))
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf(200 to "Rapide (0,2 s)", 400 to "Normal (0,4 s)", 1000 to "Réfléchi (1 s)", 3000 to "Long (3 s)")
+            listOf(200 to R.string.speed_fast, 400 to R.string.speed_normal, 1000 to R.string.speed_thoughtful, 3000 to R.string.speed_long)
                 .forEach { (ms, label) ->
-                    Choice(label, ms == settings.engineMoveTimeMs, "temps-$ms") {
+                    Choice(stringResource(label), ms == settings.engineMoveTimeMs, "temps-$ms") {
                         SettingsStore.setMoveTime(context, ms)
                     }
                 }
         }
 
         Spacer(Modifier.height(16.dp))
-        Section("Sons")
+        Section(stringResource(R.string.settings_sounds))
         Row(
             Modifier
                 .fillMaxWidth()
@@ -89,26 +92,42 @@ fun SettingsScreen() {
             )
             Spacer(Modifier.width(10.dp))
             Column {
-                Text("Sons du plateau", fontSize = 13.sp, color = Palette.textPrimary)
+                Text(stringResource(R.string.settings_board_sounds), fontSize = 13.sp, color = Palette.textPrimary)
                 Text(
-                    "Synthétisés, aucun fichier audio embarqué.",
+                    stringResource(R.string.settings_sounds_note),
                     fontSize = 10.sp, color = Palette.textTertiary,
                 )
             }
         }
 
         Spacer(Modifier.height(16.dp))
-        Section("Puzzles")
+        Section(stringResource(R.string.settings_language))
+        val activity = LocalContext.current as? android.app.Activity
+        var language by remember { mutableStateOf(AppLanguage.current(context)) }
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf(1 to "Un essai", 3 to "Trois essais").forEach { (n, label) ->
-                Choice(label, n == settings.puzzleAttempts, "essais-$n") {
+            listOf(
+                AppLanguage.system to R.string.settings_language_system,
+                AppLanguage.french to R.string.settings_language_fr,
+                AppLanguage.english to R.string.settings_language_en,
+            ).forEach { (value, label) ->
+                Choice(stringResource(label), value == language, "langue-${value.name}") {
+                    language = value
+                    AppLanguage.apply(context, value) { activity?.recreate() }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(16.dp))
+        Section(stringResource(R.string.progress_puzzles))
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf(1 to R.string.settings_one_try, 3 to R.string.settings_three_tries).forEach { (n, label) ->
+                Choice(stringResource(label), n == settings.puzzleAttempts, "essais-$n") {
                     SettingsStore.setPuzzleAttempts(context, n)
                 }
             }
         }
         Text(
-            "Un seul essai par défaut : trois invitent à tenter un coup « pour voir », "
-                + "l'inverse de ce qu'un puzzle entraîne.",
+            stringResource(R.string.settings_tries_note),
             fontSize = 11.sp, color = Palette.textTertiary,
             modifier = Modifier.padding(top = 6.dp),
         )

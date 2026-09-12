@@ -20,10 +20,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.chesslab.R
+import com.chesslab.ui.s
 
 /** Un camp du laboratoire : un personnage, ou Stockfish à un temps donné. */
 data class LabSide(val profile: OpponentProfile?, val level: Double) {
-    val label: String get() = profile?.displayName ?: "Stockfish"
+    /** Le nom affiché demande un contexte : le surnom est une ressource. */
+    fun label(context: android.content.Context): String =
+        profile?.displayName(context) ?: context.getString(R.string.stockfish)
 }
 
 data class LabUiState(
@@ -34,7 +38,7 @@ data class LabUiState(
     val sideB: LabSide = LabSide(null, 1500.0),
     val movetimeMs: Int = 200,
     val running: Boolean = false,
-    val status: String = "Prêt",
+    val status: String = "",
     /** Bilan de la série, du point de vue du camp A. */
     val winsA: Int = 0,
     val draws: Int = 0,
@@ -57,7 +61,7 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     private var maia: MaiaOpponent? = null
     private var loop: Job? = null
 
-    var ui by mutableStateOf(LabUiState())
+    var ui by mutableStateOf(LabUiState(status = s(R.string.lab_ready)))
         private set
 
     init {
@@ -74,20 +78,20 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
 
     fun toggle() {
         if (ui.running) { stop(); return }
-        ui = ui.copy(running = true, status = "En cours…")
+        ui = ui.copy(running = true, status = s(R.string.lab_running))
         loop = viewModelScope.launch { runSeries() }
     }
 
     fun stop() {
         loop?.cancel()
         loop = null
-        ui = ui.copy(running = false, status = "En pause")
+        ui = ui.copy(running = false, status = s(R.string.lab_paused))
     }
 
     fun reset() {
         stop()
         newGame()
-        ui = ui.copy(winsA = 0, draws = 0, winsB = 0, gameNumber = 0, aPlaysWhite = true, status = "Prêt")
+        ui = ui.copy(winsA = 0, draws = 0, winsB = 0, gameNumber = 0, aPlaysWhite = true, status = s(R.string.lab_ready))
     }
 
     private fun newGame() {
@@ -154,7 +158,7 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
             position = board.position,
             lastMove = move.start to move.end,
             sanMoves = ui.sanMoves + move.san,
-            status = "${side.label} a joué ${move.san}",
+            status = s(R.string.lab_played, side.label(getApplication()), move.san),
         )
         return true
     }

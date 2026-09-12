@@ -1,5 +1,7 @@
 package com.chesslab.variants
 
+import androidx.annotation.StringRes
+import com.chesslab.R
 import kotlin.random.Random
 
 /**
@@ -11,8 +13,9 @@ import kotlin.random.Random
 data class Variant(
     val id: String,
     val uci: String,
-    val title: String,
-    val blurb: String,
+    /** Le nom et la description sont des ressources : elles se traduisent. */
+    @StringRes val titleRes: Int,
+    @StringRes val blurbRes: Int,
     val chess960: Boolean = false,
 )
 
@@ -20,39 +23,26 @@ object VariantCatalog {
 
     val all = listOf(
         Variant(
-            "chess960", "chess", "Chess960",
-            "Les pièces du fond sont mélangées, identiquement des deux côtés. " +
-                "La théorie d'ouverture ne sert plus à rien : il faut jouer.",
+            "chess960", "chess", R.string.variant_chess960, R.string.variant_chess960_blurb,
             chess960 = true,
         ),
         Variant(
-            "kingofthehill", "kingofthehill", "Roi de la colline",
-            "Amener son roi sur l'une des quatre cases centrales gagne la partie, " +
-                "immédiatement. Le mat reste possible.",
+            "kingofthehill", "kingofthehill", R.string.variant_koth, R.string.variant_koth_blurb,
         ),
         Variant(
-            "3check", "3check", "Trois échecs",
-            "Donner échec trois fois gagne la partie. Le mat compte toujours.",
+            "3check", "3check", R.string.variant_3check, R.string.variant_3check_blurb,
         ),
         Variant(
-            "horde", "horde", "Horde",
-            "Les Blancs n'ont que des pions — trente-six — et doivent mater. " +
-                "Les Noirs gagnent en les capturant tous.",
+            "horde", "horde", R.string.variant_horde, R.string.variant_horde_blurb,
         ),
         Variant(
-            "racingkings", "racingkings", "Course des rois",
-            "Le premier roi arrivé sur la huitième rangée gagne. " +
-                "Aucun échec n'est autorisé, dans aucun sens.",
+            "racingkings", "racingkings", R.string.variant_racing, R.string.variant_racing_blurb,
         ),
         Variant(
-            "atomic", "atomic", "Atomique",
-            "Toute capture fait exploser la case d'arrivée et ses voisines, " +
-                "pions exceptés. La partie s'arrête dès qu'un roi explose.",
+            "atomic", "atomic", R.string.variant_atomic, R.string.variant_atomic_blurb,
         ),
         Variant(
-            "antichess", "antichess", "Antichecs",
-            "La capture est OBLIGATOIRE quand elle est possible, et le but est " +
-                "de perdre toutes ses pièces. Le roi n'est plus sacré.",
+            "antichess", "antichess", R.string.variant_antichess, R.string.variant_antichess_blurb,
         ),
     )
 

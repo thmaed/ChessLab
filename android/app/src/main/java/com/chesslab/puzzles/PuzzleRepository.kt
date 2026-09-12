@@ -3,6 +3,8 @@ package com.chesslab.puzzles
 import android.content.res.AssetManager
 import android.util.JsonReader
 import kotlin.random.Random
+import androidx.annotation.StringRes
+import com.chesslab.R
 
 /** Un puzzle de la bibliothèque Lichess embarquée. */
 data class Puzzle(
@@ -14,16 +16,17 @@ data class Puzzle(
     val phase: String?,
 ) {
     /** Le thème en toutes lettres. Repris de `PuzzleTheme.label`. */
-    val themeLabel: String
+    @get:StringRes
+    val themeLabel: Int
         get() = when (theme) {
-            "checkmate" -> "Mat"
-            "hangingPiece" -> "Pièce en prise"
-            "fork" -> "Fourchette"
-            "pin" -> "Clouage"
-            "skewer" -> "Enfilade"
-            "discoveredAttack" -> "Attaque à la découverte"
-            "sacrifice" -> "Sacrifice"
-            else -> "Tactique"
+            "checkmate" -> R.string.theme_mate
+            "hangingPiece" -> R.string.theme_hanging
+            "fork" -> R.string.theme_fork
+            "pin" -> R.string.theme_pin
+            "skewer" -> R.string.theme_skewer
+            "discoveredAttack" -> R.string.theme_discovered
+            "sacrifice" -> R.string.theme_sacrifice
+            else -> R.string.theme_tactic
         }
 }
 

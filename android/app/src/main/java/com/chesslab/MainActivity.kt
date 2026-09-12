@@ -36,8 +36,16 @@ import com.chesslab.variants.VariantCatalog
 import com.chesslab.variants.VariantListScreen
 import com.chesslab.variants.VariantPlayScreen
 import com.chesslab.ui.Palette
+import androidx.compose.ui.platform.LocalContext
+import com.chesslab.R
+import androidx.compose.ui.res.stringResource
 
 class MainActivity : ComponentActivity() {
+    /** Le choix de langue s'applique avant toute résolution de ressource. */
+    override fun attachBaseContext(newBase: android.content.Context) {
+        super.attachBaseContext(com.chesslab.settings.AppLanguage.wrap(newBase))
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -64,12 +72,13 @@ class MainActivity : ComponentActivity() {
 private fun App() {
     val stack = remember { mutableStateListOf<Route>(Route.Home) }
     val current = stack.last()
+    val context = LocalContext.current
 
     BackHandler(enabled = stack.size > 1) { stack.removeAt(stack.lastIndex) }
 
     Column(Modifier.fillMaxSize().safeDrawingPadding()) {
         if (current != Route.Home) {
-            TopBar(current.title) { stack.removeAt(stack.lastIndex) }
+            TopBar(current.title(context)) { stack.removeAt(stack.lastIndex) }
         }
         when (current) {
             Route.Home -> HomeScreen { stack.add(it) }
@@ -79,14 +88,14 @@ private fun App() {
             Route.Puzzles -> PuzzleScreen()
             Route.Openings -> CourseListScreen(
                 endgames = false,
-                onTrain = { kind -> stack.add(trainRoute(kind)) },
+                onTrain = { kind -> stack.add(trainRoute(context, kind)) },
             ) { stack.add(reader(it)) }
             Route.Endgames -> CourseListScreen(
                 endgames = true,
-                onTrain = { kind -> stack.add(trainRoute(kind)) },
+                onTrain = { kind -> stack.add(trainRoute(context, kind)) },
             ) { stack.add(reader(it)) }
             is Route.CourseReader -> CourseScreen(current.id) { id, name ->
-                stack.add(Route.Train("line", id, "Entraîner : $name"))
+                stack.add(Route.Train("line", id, context.getString(R.string.route_train_named, name)))
             }
             is Route.Train -> TrainScreen(
                 when (current.kind) {
@@ -102,18 +111,18 @@ private fun App() {
             Route.PositionEditor -> PositionEditorScreen { fen -> stack.add(Route.Analysis(fen)) }
             Route.Laboratory -> LabScreen()
             Route.Variants -> VariantListScreen { id ->
-                stack.add(Route.VariantGame(id, VariantCatalog.byId(id)?.title ?: id))
+                stack.add(Route.VariantGame(id, VariantCatalog.byId(id)?.let { context.getString(it.titleRes) } ?: id))
             }
             is Route.VariantGame -> VariantPlayScreen(current.id)
-            else -> Placeholder(current.title)
+            else -> Placeholder(current.title(context))
         }
     }
 }
 
 /** Le titre d'un cours vient du catalogue : la liste l'a déjà en mémoire. */
-private fun trainRoute(kind: String): Route.Train = Route.Train(
+private fun trainRoute(context: android.content.Context, kind: String): Route.Train = Route.Train(
     kind,
-    label = if (kind == "hardest") "Positions difficiles" else "Révisions du jour",
+    label = context.getString(if (kind == "hardest") R.string.train_hardest else R.string.train_daily),
 )
 
 private fun reader(id: String): Route.CourseReader =
@@ -135,6 +144,6 @@ private fun TopBar(title: String, onBack: () -> Unit) {
 @Composable
 private fun Placeholder(title: String) {
     Box(Modifier.fillMaxSize(), androidx.compose.ui.Alignment.Center) {
-        Text("$title — bientôt", color = Palette.textSecondary)
+        Text(stringResource(R.string.soon, title), color = Palette.textSecondary)
     }
 }

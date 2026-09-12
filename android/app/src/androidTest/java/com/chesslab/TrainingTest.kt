@@ -15,6 +15,7 @@ import com.chesslab.library.LibraryDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
+import org.junit.rules.RuleChain
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -29,7 +30,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class TrainingTest {
 
-    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    // La langue passe AVANT l'activité : les assertions sont en français,
+    // et l'émulateur, lui, peut être réglé sur n'importe quoi.
+    private val compose = createAndroidComposeRule<MainActivity>()
+
+    @get:Rule val rules: RuleChain = RuleChain.outerRule(LanguageRule()).around(compose)
 
     private val dao by lazy {
         LibraryDatabase.get(InstrumentationRegistry.getInstrumentation().targetContext).training()
@@ -52,7 +57,7 @@ class TrainingTest {
 
     /** Ouvre la séance quotidienne sur le cours italien, via les ouvertures. */
     private fun openDailyOnItalian() {
-        compose.onNodeWithTag("mode-Ouvertures").performClick()
+        compose.onNodeWithTag("mode-openings").performClick()
         awaitTag("seance-quotidienne")
         compose.onNodeWithTag("seance-quotidienne").performClick()
         awaitTag("consigne")
@@ -160,7 +165,7 @@ class TrainingTest {
     }
 
     @Test fun lesPositionsDifficilesSontVidesAuDepart() {
-        compose.onNodeWithTag("mode-Ouvertures").performClick()
+        compose.onNodeWithTag("mode-openings").performClick()
         awaitTag("seance-difficiles")
         compose.onNodeWithTag("seance-difficiles").performClick()
         awaitTag("rien-a-reviser")
@@ -183,7 +188,7 @@ class TrainingTest {
     }
 
     @Test fun entrainerUneLigneDepuisLeCours() {
-        compose.onNodeWithTag("mode-Ouvertures").performClick()
+        compose.onNodeWithTag("mode-openings").performClick()
         awaitTag("recherche")
         compose.onNodeWithTag("recherche").performTextInput("Italian")
         awaitText("Italian Game")

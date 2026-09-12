@@ -3,6 +3,8 @@ package com.chesslab.courses
 import android.content.res.AssetManager
 import org.json.JSONArray
 import org.json.JSONObject
+import androidx.annotation.StringRes
+import com.chesslab.R
 
 /** Une entrée du catalogue : de quoi dresser la liste sans ouvrir les cours. */
 data class CatalogEntry(
@@ -16,8 +18,11 @@ data class CatalogEntry(
     val isEndgame: Boolean,
     val family: String?,
 ) {
-    val sideLabel: String get() = if (side == "white") "Blancs" else "Noirs"
-    val levelLabel: String get() = if (level == "advanced") "Avancé" else "Club"
+    @get:StringRes
+    val sideLabel: Int get() = if (side == "white") R.string.color_white else R.string.color_black
+
+    @get:StringRes
+    val levelLabel: Int get() = if (level == "advanced") R.string.level_advanced else R.string.level_club
 }
 
 /** Un coup possible depuis une position du cours. */
@@ -59,13 +64,33 @@ object CourseRepository {
 
     private const val DIR = "openings"
     private var catalog: List<CatalogEntry>? = null
+    private var catalogLanguage: String? = null
     private val cache = LinkedHashMap<String, Course>()
+
+    /**
+     * La langue dans laquelle lire les cours.
+     *
+     * Les fichiers portent `{"fr": …, "en": …}` pour chaque texte. Tant qu'on
+     * ne lisait que `fr`, une app en anglais montrait des commentaires en
+     * français : le décor traduit et le contenu non, ce qui est pire que rien.
+     */
+    private fun language(): String =
+        if (java.util.Locale.getDefault().language == "fr") "fr" else "en"
+
+    /** Le texte dans la langue courante, avec repli sur le français. */
+    private fun localized(o: JSONObject?): String? {
+        if (o == null) return null
+        val value = o.optString(language()).ifEmpty { o.optString("fr") }
+        return value.ifEmpty { null }
+    }
 
     /** La clé d'indexation : les quatre premiers champs d'une FEN. */
     fun fenKey(fen: String): String = fen.trim().split(" ").take(4).joinToString(" ")
 
     fun catalog(assets: AssetManager): List<CatalogEntry> {
-        catalog?.let { return it }
+        // Le catalogue est mémorisé, mais la langue peut avoir changé entre
+        // deux ouvertures de l'app : on le relit alors.
+        if (catalogLanguage == language()) catalog?.let { return it }
         val text = assets.open("$DIR/opening_catalog.json").bufferedReader().use { it.readText() }
         val array = JSONArray(text)
         val out = ArrayList<CatalogEntry>(array.length())
@@ -77,13 +102,15 @@ object CourseRepository {
                 eco = o.optJSONArray("eco")?.let { e -> (0 until e.length()).map { e.getString(it) } } ?: emptyList(),
                 side = o.optString("side", "white"),
                 level = o.optString("level", "club"),
-                summary = o.optJSONObject("summary")?.optString("fr") ?: "",
+                summary = localized(o.optJSONObject("summary")) ?: "",
                 positionCount = o.optInt("positionCount", 0),
                 isEndgame = o.optString("kind") == "endgame",
                 family = o.optString("family").ifEmpty { null },
             )
         }
         catalog = out
+        catalogLanguage = language()
+        cache.clear()
         return out
     }
 
@@ -104,7 +131,7 @@ object CourseRepository {
                 val fens = c.getJSONArray("positionFENs")
                 Chapter(
                     id = c.optString("id", "ch$i"),
-                    title = c.optJSONObject("title")?.optString("fr") ?: c.optString("id", "Chapitre ${i + 1}"),
+                    title = localized(c.optJSONObject("title")) ?: c.optString("id", ""),
                     positionFENs = (0 until fens.length()).map { fens.getString(it) },
                 )
             }
@@ -121,7 +148,7 @@ object CourseRepository {
                         uci = m.optString("uci"),
                         toFEN = m.optString("toFEN"),
                         role = m.optString("role", "sideline"),
-                        comment = m.optJSONObject("comment")?.optString("fr")?.ifEmpty { null },
+                        comment = localized(m.optJSONObject("comment")),
                         eval = if (m.has("eval")) m.getDouble("eval") else null,
                         popularity = if (m.has("popularityClub")) m.getDouble("popularityClub") else null,
                     )
@@ -132,7 +159,7 @@ object CourseRepository {
         val course = Course(
             id = o.getString("id"),
             name = o.getString("name"),
-            summary = o.optJSONObject("summary")?.optString("fr") ?: "",
+            summary = localized(o.optJSONObject("summary")) ?: "",
             rootFEN = o.optString("rootFEN"),
             chapters = chapters,
             positions = positions,

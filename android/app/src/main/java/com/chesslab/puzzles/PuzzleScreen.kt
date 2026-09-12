@@ -18,6 +18,8 @@ import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
 
 @Composable
 fun PuzzleScreen(model: PuzzleViewModel = viewModel()) {
@@ -37,12 +39,12 @@ fun PuzzleScreen(model: PuzzleViewModel = viewModel()) {
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Badge(puzzle.themeLabel, Palette.violet)
+                    Badge(stringResource(puzzle.themeLabel), Palette.violet)
                     Spacer(Modifier.width(8.dp))
                     Badge("${puzzle.rating}", Palette.info)
                     Spacer(Modifier.weight(1f))
                     Text(
-                        "${ui.solvedCount}/${ui.attemptedCount} résolus",
+                        stringResource(R.string.puzzle_score, ui.solvedCount, ui.attemptedCount),
                         fontSize = 12.sp, color = Palette.textSecondary,
                         modifier = Modifier.testTag("score"),
                     )
@@ -65,10 +67,10 @@ fun PuzzleScreen(model: PuzzleViewModel = viewModel()) {
         panel = {
             Spacer(Modifier.height(12.dp))
             when (ui.outcome) {
-                PuzzleOutcome.solved -> Verdict("Résolu", Palette.accent, model::next)
-                PuzzleOutcome.failed -> Verdict("Raté", Palette.danger, model::next)
+                PuzzleOutcome.solved -> Verdict(stringResource(R.string.puzzle_solved), Palette.accent, model::next)
+                PuzzleOutcome.failed -> Verdict(stringResource(R.string.puzzle_failed), Palette.danger, model::next)
                 PuzzleOutcome.solving -> TextButton(onClick = model::next, modifier = Modifier.testTag("passer")) {
-                    Text("Passer", color = Palette.textSecondary)
+                    Text(stringResource(R.string.puzzle_skip), color = Palette.textSecondary)
                 }
             }
         },
@@ -82,7 +84,7 @@ private fun Verdict(text: String, tint: androidx.compose.ui.graphics.Color, onNe
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(text, color = tint, fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("verdict"))
         Spacer(Modifier.weight(1f))
-        Button(onClick = onNext, modifier = Modifier.testTag("suivant")) { Text("Puzzle suivant") }
+        Button(onClick = onNext, modifier = Modifier.testTag("suivant")) { Text(stringResource(R.string.puzzle_next)) }
     }
 }
 

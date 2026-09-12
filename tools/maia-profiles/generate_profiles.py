@@ -3,7 +3,13 @@
     python3 tools/maia-profiles/generate_profiles.py
 
 Lit `ChessLab/Maia/OpponentProfile.swift` et écrit
-`android/maia/src/main/java/com/chesslab/maia/OpponentGallery.kt`.
+`android/maia/src/main/java/com/chesslab/maia/OpponentGallery.kt` ainsi que les
+deux catalogues de textes `maia/src/main/res/values{,-fr}/strings.xml`.
+
+Les textes du personnage — surnom, accroche, étiquettes — ne sont PAS écrits
+dans le Kotlin : le profil porte des identifiants de ressources, et l'anglais
+vient de `ChessLab/Localizable.xcstrings`, le catalogue déjà traduit d'iOS.
+Une accroche recopiée à la main serait une traduction à refaire.
 
 Pourquoi générer plutôt que recopier : ce sont des DONNÉES — neuf profils,
 chacun avec une dizaine de poids de style et un tempérament. Les recopier à la
@@ -12,9 +18,28 @@ Ici, une commande suffit.
 """
 import pathlib, re
 
+import json
+
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 SRC = ROOT / "ChessLab/Maia/OpponentProfile.swift"
 DST = ROOT / "android/maia/src/main/java/com/chesslab/maia/OpponentGallery.kt"
+RES = ROOT / "android/maia/src/main/res"
+CATALOG = ROOT / "ChessLab/Localizable.xcstrings"
+
+
+def english():
+    """Le français vers l'anglais, tel que le catalogue iOS le connaît déjà."""
+    strings = json.loads(CATALOG.read_text())["strings"]
+    return {
+        key: value["localizations"]["en"]["stringUnit"]["value"]
+        for key, value in strings.items()
+        if "en" in value.get("localizations", {})
+    }
+
+
+def xml_escape(text):
+    text = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+    return text.replace("'", "\\'").replace('"', '\\"')
 
 
 def blocks(text):
@@ -84,22 +109,38 @@ def dbl(value):
     return v if ("." in v or v == "null") else v + ".0"
 
 
-def convert(name, body):
+TEXTS = {}   # clé de ressource -> (anglais, français)
+
+
+def text_res(oid, suffix, french, en):
+    """Enregistre un texte et rend la référence de ressource Kotlin."""
+    key = f"opponent_{oid}_{suffix}"
+    TEXTS[key] = (en.get(french, french), french)
+    return f"R.string.{key}"
+
+
+def convert(name, body, en):
     style = field(body, "style") or "StyleProfile(weights: [:], strength: 0)"
     style_weights = weights(style[style.index("["):style.rindex("]") + 1]) if "[" in style else ""
     strength = re.search(r"strength:\s*(-?[\d.]+)", style)
     temperament = field(body, "temperament") or "Temperament()"
     safety = field(body, "safetyNet") or "SafetyNetPolicy()"
     levels = field(body, "recommendedLevels").replace("...", "..")
-    tags = field(body, "tags").replace("[", "listOf(").replace("]", ")")
     book = field(body, "bookID")
+    oid = field(body, "id").strip('"')
+    nickname = text_res(oid, "nickname", field(body, "nickname").strip('"'), en)
+    tagline = text_res(oid, "tagline", field(body, "tagline").strip('"'), en)
+    tag_values = re.findall(r'"([^"]*)"', field(body, "tags"))
+    tags = "listOf(" + ", ".join(
+        text_res(oid, f"tag{i + 1}", t, en) for i, t in enumerate(tag_values)
+    ) + ")"
 
     return f'''    val {name} = OpponentProfile(
         id = {field(body, "id")},
         firstName = {field(body, "firstName")},
-        nickname = {field(body, "nickname")},
-        tagline = {field(body, "tagline")},
-        tags = {tags},
+        nicknameRes = {nickname},
+        taglineRes = {tagline},
+        tagRes = {tags},
         tint = OpponentTint.{field(body, "tint").lstrip(".")},
         temperature = {dbl(field(body, "temperature"))},
         topP = {dbl(field(body, "topP"))},
@@ -118,7 +159,8 @@ def main():
     if len(found) != 9:
         raise SystemExit(f"9 personnages attendus, {len(found)} trouvés")
 
-    body = "\n".join(convert(name, block) for name, block in found)
+    en = english()
+    body = "\n".join(convert(name, block, en) for name, block in found)
     names = ", ".join(name for name, _ in found)
 
     DST.write_text(f'''package com.chesslab.maia
@@ -140,7 +182,27 @@ object OpponentGallery {{
     fun byId(id: String): OpponentProfile? = all.firstOrNull {{ it.id == id }}
 }}
 ''')
-    print(f"{len(found)} personnages écrits dans {DST.relative_to(ROOT)}")
+    for folder, index, note in (
+        ("values", 0, "en anglais"),
+        ("values-fr", 1, "en français"),
+    ):
+        lines = [
+            '<?xml version="1.0" encoding="utf-8"?>',
+            f"<!-- Les textes des neuf personnages, {note}. GÉNÉRÉ avec",
+            "     OpponentGallery.kt par tools/maia-profiles/generate_profiles.py —",
+            "     ne pas éditer à la main. -->",
+            "<resources>",
+        ]
+        # Le nom affiché : guillemets français en français, anglais en anglais.
+        TEXTS["opponent_display_name"] = ("%1$s \u201c%2$s\u201d", "%1$s « %2$s »")
+        for key in sorted(TEXTS):
+            lines.append(f'    <string name="{key}">{xml_escape(TEXTS[key][index])}</string>')
+        lines.append("</resources>")
+        folder_path = RES / folder
+        folder_path.mkdir(parents=True, exist_ok=True)
+        (folder_path / "strings.xml").write_text("\n".join(lines) + "\n")
+
+    print(f"{len(found)} personnages et {len(TEXTS)} textes écrits")
 
 
 main()

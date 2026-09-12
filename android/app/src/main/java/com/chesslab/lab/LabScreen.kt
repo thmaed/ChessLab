@@ -24,6 +24,8 @@ import com.chesslab.ui.BoardView
 import com.chesslab.ui.MoveStrip
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
 
 @Composable
 fun LabScreen(model: LabViewModel = viewModel()) {
@@ -51,11 +53,11 @@ fun LabScreen(model: LabViewModel = viewModel()) {
             Spacer(Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Button(onClick = model::toggle, modifier = Modifier.testTag("lancer")) {
-                    Text(if (ui.running) "Pause" else "Lancer")
+                    Text(stringResource(if (ui.running) R.string.lab_pause else R.string.lab_start))
                 }
                 Spacer(Modifier.width(8.dp))
                 TextButton(onClick = model::reset, modifier = Modifier.testTag("remise")) {
-                    Text("Remettre à zéro", color = Palette.textSecondary)
+                    Text(stringResource(R.string.lab_reset), color = Palette.textSecondary)
                 }
             }
         },

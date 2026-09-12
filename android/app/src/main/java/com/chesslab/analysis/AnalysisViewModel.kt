@@ -22,6 +22,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.chesslab.R
+import com.chesslab.ui.s
 
 data class AnalysisUiState(
     val position: Position = Position.standard,
@@ -30,7 +32,7 @@ data class AnalysisUiState(
     val cursor: Int = -1,
     val lastMove: Pair<Square, Square>? = null,
     val checkedKing: Square? = null,
-    val status: String = "Colle un PGN ou une FEN",
+    val status: String = "",
     val evaluation: String = "",
     val depth: Int = 0,
     val bestLine: String = "",
@@ -53,7 +55,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     private var moves: List<Move> = emptyList()
     private var evalJob: Job? = null
 
-    var ui by mutableStateOf(AnalysisUiState())
+    var ui by mutableStateOf(AnalysisUiState(status = s(R.string.analysis_paste)))
         private set
 
     /** Les parties enregistrées, les plus récentes d'abord. */
@@ -78,7 +80,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             moves = emptyList()
             ui = ui.copy(
                 position = position, sanMoves = emptyList(), cursor = -1,
-                lastMove = null, status = "Position chargée", error = null,
+                lastMove = null, status = s(R.string.analysis_position_loaded), error = null,
             )
             evaluate()
             return
@@ -96,7 +98,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             .sorted()
 
         if (mainline.isEmpty()) {
-            ui = ui.copy(error = "Aucun coup trouvé dans ce PGN")
+            ui = ui.copy(error = s(R.string.analysis_no_moves))
             return
         }
 
@@ -107,7 +109,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         val label = listOfNotNull(
             game.tags.white.ifEmpty { null },
             game.tags.black.ifEmpty { null },
-        ).joinToString(" — ").ifEmpty { "Partie chargée" }
+        ).joinToString(" — ").ifEmpty { s(R.string.analysis_game_loaded) }
 
         ui = ui.copy(
             sanMoves = moves.map { it.san },

@@ -28,6 +28,9 @@ import com.chesslab.ui.BoardView
 import com.chesslab.ui.MoveStrip
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
+import androidx.compose.ui.res.pluralStringResource
 
 @Composable
 fun AnalysisScreen(initialFen: String? = null, model: AnalysisViewModel = viewModel()) {
@@ -56,10 +59,10 @@ fun AnalysisScreen(initialFen: String? = null, model: AnalysisViewModel = viewMo
             Spacer(Modifier.height(10.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = model::previous, modifier = Modifier.testTag("precedent")) {
-                    Icon(Icons.Default.ChevronLeft, "Coup précédent", tint = Palette.textPrimary)
+                    Icon(Icons.Default.ChevronLeft, stringResource(R.string.previous_move), tint = Palette.textPrimary)
                 }
                 IconButton(onClick = model::next, modifier = Modifier.testTag("suivant")) {
-                    Icon(Icons.Default.ChevronRight, "Coup suivant", tint = Palette.textPrimary)
+                    Icon(Icons.Default.ChevronRight, stringResource(R.string.next_move), tint = Palette.textPrimary)
                 }
                 Spacer(Modifier.width(8.dp))
                 Box(Modifier.weight(1f)) {
@@ -74,7 +77,7 @@ fun AnalysisScreen(initialFen: String? = null, model: AnalysisViewModel = viewMo
             OutlinedTextField(
                 value = ui.input,
                 onValueChange = model::onInputChange,
-                label = { Text("PGN ou FEN") },
+                label = { Text(stringResource(R.string.analysis_input_label)) },
                 modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp).testTag("saisie"),
                 textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, fontFamily = FontFamily.Monospace),
             )
@@ -82,7 +85,7 @@ fun AnalysisScreen(initialFen: String? = null, model: AnalysisViewModel = viewMo
                 Text(ui.error!!, color = Palette.danger, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
             }
             TextButton(onClick = model::load, modifier = Modifier.testTag("charger")) {
-                Text("Charger", color = Palette.accent)
+                Text(stringResource(R.string.analysis_load), color = Palette.accent)
             }
         },
     )
@@ -94,7 +97,7 @@ private fun SavedGames(model: AnalysisViewModel) {
     val games by model.savedGames.collectAsState(initial = emptyList())
     if (games.isEmpty()) return
 
-    Text("Bibliothèque", fontSize = 12.sp, color = Palette.textTertiary)
+    Text(stringResource(R.string.analysis_library), fontSize = 12.sp, color = Palette.textTertiary)
     Spacer(Modifier.height(4.dp))
     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
         games.take(8).forEach { record ->
@@ -114,7 +117,7 @@ private fun SavedGames(model: AnalysisViewModel) {
                 )
                 Text(record.result, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = Palette.accent)
                 Spacer(Modifier.width(8.dp))
-                Text("${record.moveCount} coups", fontSize = 10.sp, color = Palette.textTertiary)
+                Text(pluralStringResource(R.plurals.analysis_move_count, record.moveCount, record.moveCount), fontSize = 10.sp, color = Palette.textTertiary)
             }
         }
     }

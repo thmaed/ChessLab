@@ -25,6 +25,8 @@ android {
 kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) } }
 
 dependencies {
+    // @StringRes : les personnages portent des ressources, pas des chaînes.
+    implementation("androidx.annotation:annotation:1.9.1")
     api(project(":chesskit"))
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.20.0")
     testImplementation(kotlin("test"))

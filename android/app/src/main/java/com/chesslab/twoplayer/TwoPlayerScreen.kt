@@ -19,6 +19,8 @@ import com.chesslab.ui.BoardView
 import com.chesslab.ui.MoveStrip
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
 
 @Composable
 fun TwoPlayerScreen(model: TwoPlayerViewModel = viewModel()) {
@@ -49,13 +51,13 @@ fun TwoPlayerScreen(model: TwoPlayerViewModel = viewModel()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Switch(checked = ui.autoFlip, onCheckedChange = { model.toggleAutoFlip() })
                 Spacer(Modifier.width(8.dp))
-                Text("Retourner à chaque coup", fontSize = 13.sp, color = Palette.textSecondary)
+                Text(stringResource(R.string.flip_each_move), fontSize = 13.sp, color = Palette.textSecondary)
                 Spacer(Modifier.weight(1f))
                 TextButton(onClick = model::flip) {
-                    Icon(Icons.Default.SwapVert, "Retourner le plateau", tint = Palette.accent)
+                    Icon(Icons.Default.SwapVert, stringResource(R.string.flip_board), tint = Palette.accent)
                 }
             }
-            TextButton(onClick = model::newGame) { Text("Nouvelle partie", color = Palette.accent) }
+            TextButton(onClick = model::newGame) { Text(stringResource(R.string.new_game), color = Palette.accent) }
         },
     )
 

@@ -24,6 +24,8 @@ import chesskit.Square
 import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
 
 /**
  * L'éditeur de position : poser les pièces à la main.
@@ -50,8 +52,7 @@ fun PositionEditorScreen(onAnalyse: (String) -> Unit = {}) {
     BoardScaffold(
         header = {
             Text(
-                if (brush == null) "Gomme : tapez une case pour la vider"
-                else "Posez des pièces en tapant les cases",
+                stringResource(if (brush == null) R.string.editor_eraser_hint else R.string.editor_place_hint),
                 fontSize = 12.sp, color = Palette.textSecondary,
             )
             Spacer(Modifier.height(8.dp))
@@ -76,21 +77,21 @@ fun PositionEditorScreen(onAnalyse: (String) -> Unit = {}) {
                 Switch(checked = whiteToMove, onCheckedChange = { whiteToMove = it })
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    if (whiteToMove) "Aux blancs de jouer" else "Aux noirs de jouer",
+                    stringResource(if (whiteToMove) R.string.white_to_move else R.string.black_to_move),
                     fontSize = 13.sp, color = Palette.textPrimary,
                     modifier = Modifier.testTag("trait"),
                 )
             }
 
-            Text("Roques encore possibles", fontSize = 11.sp, color = Palette.textTertiary)
+            Text(stringResource(R.string.editor_castling), fontSize = 11.sp, color = Palette.textTertiary)
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 listOf(
-                    Castling.wK to "Blancs ⌐", Castling.wQ to "Blancs ⌐⌐",
-                    Castling.bK to "Noirs ⌐", Castling.bQ to "Noirs ⌐⌐",
+                    Castling.wK to R.string.editor_white_short, Castling.wQ to R.string.editor_white_long,
+                    Castling.bK to R.string.editor_black_short, Castling.bQ to R.string.editor_black_long,
                 ).forEach { (c, label) ->
                     val on = castling[c] == true
                     Text(
-                        label, fontSize = 11.sp,
+                        stringResource(label), fontSize = 11.sp,
                         color = if (on) Palette.background else Palette.textSecondary,
                         modifier = Modifier
                             .clip(RoundedCornerShape(10.dp))
@@ -115,14 +116,14 @@ fun PositionEditorScreen(onAnalyse: (String) -> Unit = {}) {
 
             Row {
                 TextButton(onClick = { pieces.clear() }, modifier = Modifier.testTag("vider")) {
-                    Text("Vider", color = Palette.textSecondary)
+                    Text(stringResource(R.string.editor_clear), color = Palette.textSecondary)
                 }
                 TextButton(
                     onClick = { Position.standard.pieces.forEach { pieces[it.square] = it } },
                     modifier = Modifier.testTag("depart"),
-                ) { Text("Position de départ", color = Palette.textSecondary) }
+                ) { Text(stringResource(R.string.editor_start_position), color = Palette.textSecondary) }
                 TextButton(onClick = { onAnalyse(position.fen) }, modifier = Modifier.testTag("analyser")) {
-                    Text("Analyser", color = Palette.accent)
+                    Text(stringResource(R.string.route_analysis), color = Palette.accent)
                 }
             }
         },
@@ -137,19 +138,20 @@ private fun Palette(
     onColor: (Piece.Color) -> Unit,
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-        listOf(Piece.Color.white to "Blanc", Piece.Color.black to "Noir").forEach { (c, label) ->
-            Chip(label, c == color) { onColor(c) }
+        listOf(Piece.Color.white to R.string.color_white_one, Piece.Color.black to R.string.color_black_one).forEach { (c, label) ->
+            Chip(stringResource(label), c == color) { onColor(c) }
         }
     }
     Spacer(Modifier.height(6.dp))
     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
         listOf(
-            Piece.Kind.pawn to "Pion", Piece.Kind.knight to "C", Piece.Kind.bishop to "F",
-            Piece.Kind.rook to "T", Piece.Kind.queen to "D", Piece.Kind.king to "R",
+            Piece.Kind.pawn to R.string.piece_pawn, Piece.Kind.knight to R.string.piece_initial_knight,
+            Piece.Kind.bishop to R.string.piece_initial_bishop, Piece.Kind.rook to R.string.piece_initial_rook,
+            Piece.Kind.queen to R.string.piece_initial_queen, Piece.Kind.king to R.string.piece_initial_king,
         ).forEach { (kind, label) ->
-            Chip(label, kind == brush) { onKind(kind) }
+            Chip(stringResource(label), kind == brush) { onKind(kind) }
         }
-        Chip("Gomme", brush == null) { onKind(null) }
+        Chip(stringResource(R.string.editor_eraser), brush == null) { onKind(null) }
     }
 }
 

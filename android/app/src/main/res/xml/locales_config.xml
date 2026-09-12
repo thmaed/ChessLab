@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Les langues que l'app parle. Android 13 et au-delà s'en sert pour lister
+     ChessLab dans « Langues de l'application » des réglages système. -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="fr" />
+</locale-config>

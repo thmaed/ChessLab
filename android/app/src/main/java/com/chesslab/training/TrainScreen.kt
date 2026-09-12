@@ -22,6 +22,9 @@ import com.chesslab.play.PromotionDialog
 import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
+import androidx.compose.ui.res.pluralStringResource
 
 /**
  * L'entraînement : un échiquier continu, l'utilisateur joue SON camp, le
@@ -46,8 +49,8 @@ fun TrainScreen(mode: TrainMode, model: TrainViewModel = viewModel()) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     when (mode) {
-                        TrainMode.Hardest -> "Aucune position ratée"
-                        else -> "Rien à réviser aujourd'hui"
+                        TrainMode.Hardest -> stringResource(R.string.train_no_hard)
+                        else -> stringResource(R.string.train_nothing_today)
                     },
                     color = Palette.textPrimary, fontWeight = FontWeight.SemiBold,
                     modifier = Modifier.testTag("rien-a-reviser"),
@@ -55,8 +58,8 @@ fun TrainScreen(mode: TrainMode, model: TrainViewModel = viewModel()) {
                 Spacer(Modifier.height(6.dp))
                 Text(
                     when (mode) {
-                        TrainMode.Hardest -> "Les positions difficiles apparaissent ici dès qu'un coup est manqué."
-                        else -> "Revenez demain, ou ouvrez un cours pour travailler une ligne."
+                        TrainMode.Hardest -> stringResource(R.string.train_no_hard_body)
+                        else -> stringResource(R.string.train_nothing_today_body)
                     },
                     fontSize = 13.sp, color = Palette.textSecondary,
                 )
@@ -87,46 +90,49 @@ fun TrainScreen(mode: TrainMode, model: TrainViewModel = viewModel()) {
             Spacer(Modifier.height(12.dp))
             when (ui.phase) {
                 TrainPhase.wrong -> Panel(Palette.danger) {
-                    Text("Ce n'était pas le coup du répertoire.", color = Palette.textPrimary, fontSize = 13.sp)
+                    Text(stringResource(R.string.train_not_repertoire), color = Palette.textPrimary, fontSize = 13.sp)
                     Text(
-                        "La suite est ${ui.wrongCorrect ?: "—"}.",
+                        stringResource(R.string.train_continuation_is, ui.wrongCorrect ?: "—"),
                         color = Palette.danger, fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.testTag("bon-coup"),
                     )
                     ui.comment?.let { Spacer(Modifier.height(4.dp)); Comment(it) }
                     Spacer(Modifier.height(8.dp))
                     Button(onClick = model::continueAfterWrong, modifier = Modifier.testTag("continuer")) {
-                        Text("Jouer ${ui.wrongCorrect ?: ""} et continuer")
+                        Text(stringResource(R.string.train_play_and_continue, ui.wrongCorrect ?: ""))
                     }
                 }
 
                 TrainPhase.variation -> Panel(Palette.info) {
                     Text(
-                        "${ui.variationPlayed} est au répertoire, mais la ligne principale est ${ui.variationMain}.",
+                        stringResource(R.string.train_variation, ui.variationPlayed ?: "", ui.variationMain ?: ""),
                         color = Palette.textPrimary, fontSize = 13.sp,
                         modifier = Modifier.testTag("variante"),
                     )
                     Spacer(Modifier.height(8.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Button(onClick = model::playVariation, modifier = Modifier.testTag("jouer-variante")) {
-                            Text("Jouer ${ui.variationPlayed}")
+                            Text(stringResource(R.string.train_play_variation, ui.variationPlayed ?: ""))
                         }
                         OutlinedButton(onClick = model::keepMainLine, modifier = Modifier.testTag("rester-principale")) {
-                            Text("Rester sur ${ui.variationMain}")
+                            Text(stringResource(R.string.train_keep_main, ui.variationMain ?: ""))
                         }
                     }
                 }
 
                 TrainPhase.complete -> Panel(Palette.accent) {
-                    Text("Séance terminée", color = Palette.accent, fontWeight = FontWeight.SemiBold,
+                    Text(stringResource(R.string.train_session_done), color = Palette.accent, fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.testTag("seance-terminee"))
                     Text(
-                        "${ui.correct} coup${if (ui.correct > 1) "s" else ""} juste${if (ui.correct > 1) "s" else ""} " +
-                            "sur ${ui.reviewed} révisé${if (ui.reviewed > 1) "s" else ""}.",
+                        stringResource(
+                            R.string.train_session_score,
+                            pluralStringResource(R.plurals.train_correct, ui.correct, ui.correct),
+                            pluralStringResource(R.plurals.train_reviewed, ui.reviewed, ui.reviewed),
+                        ),
                         fontSize = 13.sp, color = Palette.textSecondary,
                     )
                     Spacer(Modifier.height(8.dp))
-                    Button(onClick = model::restart, modifier = Modifier.testTag("recommencer")) { Text("Recommencer") }
+                    Button(onClick = model::restart, modifier = Modifier.testTag("recommencer")) { Text(stringResource(R.string.train_restart)) }
                 }
 
                 else -> {
@@ -140,7 +146,7 @@ fun TrainScreen(mode: TrainMode, model: TrainViewModel = viewModel()) {
                     ui.comment?.let { Comment(it); Spacer(Modifier.height(8.dp)) }
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            if (ui.phase == TrainPhase.awaiting) "À vous de jouer" else "Le partenaire réfléchit…",
+                            stringResource(if (ui.phase == TrainPhase.awaiting) R.string.your_turn else R.string.partner_thinking),
                             fontSize = 13.sp, color = Palette.textSecondary,
                             modifier = Modifier.testTag("consigne"),
                         )
@@ -152,7 +158,7 @@ fun TrainScreen(mode: TrainMode, model: TrainViewModel = viewModel()) {
                         ) {
                             Icon(Icons.Default.Lightbulb, null, Modifier.size(16.dp), tint = Palette.textSecondary)
                             Spacer(Modifier.width(4.dp))
-                            Text("Indice", color = Palette.textSecondary)
+                            Text(stringResource(R.string.train_hint), color = Palette.textSecondary)
                         }
                     }
                 }
@@ -185,7 +191,8 @@ private fun Header(ui: TrainUiState) {
             fontWeight = FontWeight.Medium, modifier = Modifier.weight(1f).testTag("cours-en-cours"),
         )
         Text(
-            if (ui.remaining > 0) "${ui.remaining} à revoir" else "${ui.reviewed} révisé${if (ui.reviewed > 1) "s" else ""}",
+            if (ui.remaining > 0) stringResource(R.string.train_remaining, ui.remaining)
+            else pluralStringResource(R.plurals.train_reviewed, ui.reviewed, ui.reviewed),
             fontSize = 12.sp, color = Palette.textSecondary, modifier = Modifier.testTag("restant"),
         )
     }

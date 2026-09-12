@@ -27,6 +27,8 @@ import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
 
 /**
  * La lecture d'un cours : un chapitre, une position à la fois, avec le
@@ -55,7 +57,7 @@ fun CourseScreen(courseId: String, onTrain: (id: String, name: String) -> Unit =
         return
     }
     if (loaded.chapters.isEmpty()) {
-        Box(Modifier.fillMaxSize(), Alignment.Center) { Text("Ce cours n'a pas de chapitre", color = Palette.textSecondary) }
+        Box(Modifier.fillMaxSize(), Alignment.Center) { Text(stringResource(R.string.course_no_chapter), color = Palette.textSecondary) }
         return
     }
 
@@ -91,7 +93,7 @@ fun CourseScreen(courseId: String, onTrain: (id: String, name: String) -> Unit =
                 FilledTonalButton(
                     onClick = { onTrain(loaded.id, loaded.name) },
                     modifier = Modifier.testTag("entrainer"),
-                ) { Text("Entraîner", fontSize = 13.sp) }
+                ) { Text(stringResource(R.string.course_train), fontSize = 13.sp) }
             }
 
             Spacer(Modifier.height(10.dp))
@@ -103,7 +105,7 @@ fun CourseScreen(courseId: String, onTrain: (id: String, name: String) -> Unit =
             Spacer(Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(onClick = { step = (index - 1).coerceAtLeast(0) }, modifier = Modifier.testTag("precedent")) {
-                    Icon(Icons.Default.ChevronLeft, "Position précédente", tint = Palette.textPrimary)
+                    Icon(Icons.Default.ChevronLeft, stringResource(R.string.course_previous_position), tint = Palette.textPrimary)
                 }
                 Text(
                     "${index + 1} / ${fens.size}",
@@ -111,7 +113,7 @@ fun CourseScreen(courseId: String, onTrain: (id: String, name: String) -> Unit =
                     modifier = Modifier.testTag("progression"),
                 )
                 IconButton(onClick = { step = (index + 1).coerceAtMost(fens.lastIndex) }, modifier = Modifier.testTag("suivant")) {
-                    Icon(Icons.Default.ChevronRight, "Position suivante", tint = Palette.textPrimary)
+                    Icon(Icons.Default.ChevronRight, stringResource(R.string.course_next_position), tint = Palette.textPrimary)
                 }
                 Spacer(Modifier.weight(1f))
                 incoming?.let {
@@ -135,7 +137,7 @@ fun CourseScreen(courseId: String, onTrain: (id: String, name: String) -> Unit =
 
             if (options.isNotEmpty()) {
                 Spacer(Modifier.height(10.dp))
-                Text("Suites possibles", fontSize = 12.sp, color = Palette.textTertiary)
+                Text(stringResource(R.string.course_next_moves), fontSize = 12.sp, color = Palette.textTertiary)
                 Spacer(Modifier.height(4.dp))
                 options.sortedByDescending { it.popularity ?: 0.0 }.take(6).forEach { move ->
                     MoveRow(move) {
@@ -201,7 +203,7 @@ private fun MoveRow(move: CourseMove, onFollow: () -> Unit) {
         }
         Spacer(Modifier.weight(1f))
         if (move.comment != null) {
-            Text("commenté", fontSize = 10.sp, color = Palette.violet)
+            Text(stringResource(R.string.course_commented), fontSize = 10.sp, color = Palette.violet)
         }
     }
 }

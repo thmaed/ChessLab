@@ -14,6 +14,8 @@ import chesskit.Move
 import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
+import com.chesslab.R
+import com.chesslab.ui.s
 
 data class TwoPlayerUiState(
     val position: Position = Position.standard,
@@ -21,7 +23,7 @@ data class TwoPlayerUiState(
     val legalTargets: Set<Square> = emptySet(),
     val lastMove: Pair<Square, Square>? = null,
     val checkedKing: Square? = null,
-    val status: String = "Aux blancs de jouer",
+    val status: String = "",
     val sanMoves: List<String> = emptyList(),
     val pendingPromotion: Move? = null,
     val gameOver: Boolean = false,
@@ -41,7 +43,12 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
     private var board = Board()
     private val recorder = GameRecorder()
 
-    var ui by mutableStateOf(TwoPlayerUiState(autoFlip = SettingsStore.state.value.autoFlipTwoPlayer))
+    var ui by mutableStateOf(
+        TwoPlayerUiState(
+            autoFlip = SettingsStore.state.value.autoFlipTwoPlayer,
+            status = s(R.string.white_to_move),
+        )
+    )
         private set
 
     fun onSquareTap(square: Square) {
@@ -106,17 +113,20 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
 
         val over = state is Board.State.Checkmate || state is Board.State.Draw
         if (over && !ui.gameOver) {
-            recorder.save(getApplication(), white = "Blancs", black = "Noirs", source = "twoPlayer", state = state)
+            recorder.save(
+                getApplication(), white = s(R.string.color_white), black = s(R.string.color_black),
+                source = "twoPlayer", state = state,
+            )
         }
 
         val status = when (state) {
             is Board.State.Checkmate ->
-                "Échec et mat — " + (if (state.color == Piece.Color.white) "les noirs gagnent" else "les blancs gagnent")
-            is Board.State.Draw -> "Nulle — " + drawLabel(state.reason)
+                s(R.string.checkmate_side, s(if (state.color == Piece.Color.white) R.string.mate_black_wins else R.string.mate_white_wins))
+            is Board.State.Draw -> s(R.string.draw_reason, drawLabel(state.reason))
             is Board.State.Check ->
-                "Échec — " + (if (position.sideToMove == Piece.Color.white) "aux blancs" else "aux noirs")
+                s(R.string.check_side, s(if (position.sideToMove == Piece.Color.white) R.string.check_white else R.string.check_black))
             else ->
-                if (position.sideToMove == Piece.Color.white) "Aux blancs de jouer" else "Aux noirs de jouer"
+                s(if (position.sideToMove == Piece.Color.white) R.string.white_to_move else R.string.black_to_move)
         }
 
         val checkedKing = when (state) {
@@ -142,10 +152,10 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
         board.position.pieces.firstOrNull { it.kind == Piece.Kind.king && it.color == color }?.square
 
     private fun drawLabel(reason: Board.State.DrawReason): String = when (reason) {
-        Board.State.DrawReason.stalemate -> "pat"
-        Board.State.DrawReason.fiftyMoves -> "règle des cinquante coups"
-        Board.State.DrawReason.insufficientMaterial -> "matériel insuffisant"
-        Board.State.DrawReason.repetition -> "triple répétition"
-        Board.State.DrawReason.agreement -> "accord"
+        Board.State.DrawReason.stalemate -> s(R.string.draw_stalemate)
+        Board.State.DrawReason.fiftyMoves -> s(R.string.draw_fifty)
+        Board.State.DrawReason.insufficientMaterial -> s(R.string.draw_material)
+        Board.State.DrawReason.repetition -> s(R.string.draw_repetition)
+        Board.State.DrawReason.agreement -> s(R.string.draw_agreement)
     }
 }

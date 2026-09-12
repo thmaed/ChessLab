@@ -23,6 +23,9 @@ import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
+import androidx.compose.ui.res.pluralStringResource
 
 @Composable
 fun VariantListScreen(onOpen: (String) -> Unit) {
@@ -40,9 +43,9 @@ fun VariantListScreen(onOpen: (String) -> Unit) {
                     .clickable { onOpen(variant.id) }
                     .padding(12.dp)
             ) {
-                Text(variant.title, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+                Text(stringResource(variant.titleRes), fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
                 Spacer(Modifier.height(4.dp))
-                Text(variant.blurb, fontSize = 12.sp, color = Palette.textSecondary)
+                Text(stringResource(variant.blurbRes), fontSize = 12.sp, color = Palette.textSecondary)
             }
         }
     }
@@ -56,7 +59,7 @@ fun VariantPlayScreen(variantId: String, model: VariantPlayViewModel = viewModel
     BoardScaffold(
         header = {
             ui.variant?.let {
-                Text(it.blurb, fontSize = 11.sp, color = Palette.textTertiary)
+                Text(stringResource(it.blurbRes), fontSize = 11.sp, color = Palette.textTertiary)
                 Spacer(Modifier.height(6.dp))
             }
             StatusRow(ui.status, busy = ui.thinking)
@@ -76,12 +79,12 @@ fun VariantPlayScreen(variantId: String, model: VariantPlayViewModel = viewModel
         panel = {
             Spacer(Modifier.height(10.dp))
             Text(
-                "${ui.uciLog.size} demi-coup" + (if (ui.uciLog.size > 1) "s" else ""),
+                pluralStringResource(R.plurals.variant_halfmoves, ui.uciLog.size, ui.uciLog.size),
                 fontSize = 11.sp, color = Palette.textTertiary,
                 modifier = Modifier.testTag("compteur"),
             )
             TextButton(onClick = model::newGame, modifier = Modifier.testTag("nouvelle")) {
-                Text("Nouvelle partie", color = Palette.accent)
+                Text(stringResource(R.string.new_game), color = Palette.accent)
             }
         },
     )

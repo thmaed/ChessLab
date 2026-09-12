@@ -18,6 +18,9 @@ import com.chesslab.vision.PieceDetector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.chesslab.R
+import com.chesslab.ui.q
+import com.chesslab.ui.s
 
 data class ScannerUiState(
     val image: Bitmap? = null,
@@ -27,7 +30,7 @@ data class ScannerUiState(
     val placement: String = "",
     val uncertain: Int = 0,
     val busy: Boolean = false,
-    val status: String = "Choisissez une photo d'échiquier",
+    val status: String = "",
 ) {
     companion object {
         /** Un cadre confortable au départ : l'utilisateur l'ajuste. */
@@ -50,7 +53,7 @@ data class ScannerUiState(
  */
 class ScannerViewModel(app: Application) : AndroidViewModel(app) {
 
-    var ui by mutableStateOf(ScannerUiState())
+    var ui by mutableStateOf(ScannerUiState(status = s(R.string.scan_pick_photo)))
         private set
 
     fun load(uri: Uri) = viewModelScope.launch {
@@ -65,7 +68,7 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
             }.getOrNull()
         }
         if (bitmap == null) {
-            ui = ui.copy(status = "Image illisible")
+            ui = ui.copy(status = s(R.string.scan_unreadable))
             return@launch
         }
 
@@ -77,8 +80,7 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
             image = bitmap,
             corners = found ?: ScannerUiState.defaultCorners,
             position = null, placement = "", uncertain = 0,
-            status = if (found != null) "Plateau trouvé — ajustez si besoin"
-            else "Placez les quatre coins sur le plateau",
+            status = s(if (found != null) R.string.scan_found else R.string.scan_place_corners),
         )
     }
 
@@ -86,8 +88,8 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
     fun autoFrame() = viewModelScope.launch {
         val bitmap = ui.image ?: return@launch
         val found = withContext(Dispatchers.IO) { runCatching { BoardAutoFrame.corners(bitmap) }.getOrNull() }
-        ui = if (found == null) ui.copy(status = "Plateau introuvable — placez les coins à la main")
-        else ui.copy(corners = found, status = "Plateau trouvé — ajustez si besoin")
+        ui = if (found == null) ui.copy(status = s(R.string.scan_not_found))
+        else ui.copy(corners = found, status = s(R.string.scan_found))
     }
 
     fun moveCorner(index: Int, x: Float, y: Float) {
@@ -98,7 +100,7 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
 
     fun scan() = viewModelScope.launch {
         val bitmap = ui.image ?: return@launch
-        ui = ui.copy(busy = true, status = "Lecture du plateau…")
+        ui = ui.copy(busy = true, status = s(R.string.scan_reading))
 
         val result = withContext(Dispatchers.IO) {
             val detector = PieceDetector.shared(getApplication()) ?: return@withContext null
@@ -112,7 +114,7 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(busy = false)
 
         if (result == null) {
-            ui = ui.copy(status = "Modèle de reconnaissance indisponible")
+            ui = ui.copy(status = s(R.string.scan_model_unavailable))
             return@launch
         }
         val (placement, uncertain, count) = result
@@ -124,9 +126,8 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
             position = position,
             placement = placement,
             uncertain = uncertain,
-            status = "$count pièce" + (if (count > 1) "s" else "") + " reconnue" +
-                (if (count > 1) "s" else "") +
-                (if (uncertain > 0) " · $uncertain douteuse" + (if (uncertain > 1) "s" else "") else ""),
+            status = q(R.plurals.scan_pieces, count, count) +
+                (if (uncertain > 0) " · " + q(R.plurals.scan_uncertain, uncertain, uncertain) else ""),
         )
     }
 

@@ -23,6 +23,8 @@ import com.chesslab.sound.SoundPlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.chesslab.R
+import com.chesslab.ui.s
 
 data class PlayUiState(
     val position: Position = Position.standard,
@@ -30,7 +32,7 @@ data class PlayUiState(
     val legalTargets: Set<Square> = emptySet(),
     val lastMove: Pair<Square, Square>? = null,
     val checkedKing: Square? = null,
-    val status: String = "Démarrage…",
+    val status: String = "",
     val sanMoves: List<String> = emptyList(),
     val thinking: Boolean = false,
     val pendingPromotion: Move? = null,
@@ -64,7 +66,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     private var maia: MaiaOpponent? = null
 
-    var ui by mutableStateOf(PlayUiState())
+    var ui by mutableStateOf(PlayUiState(status = s(R.string.starting)))
         private set
 
     init { prepare() }
@@ -77,7 +79,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         // Stockfish sert au filet et au mode « moteur » : on le démarre aussi
         withContext(Dispatchers.IO) { EngineService.use(getApplication()) { EngineService.identity } }
         ui = ui.copy(maiaAvailable = loaded != null)
-        refresh(if (loaded == null) "Modèle indisponible — Stockfish prend le relais" else "À vous de jouer")
+        refresh(s(if (loaded == null) R.string.model_unavailable_stockfish else R.string.your_turn))
     }
 
     fun chooseOpponent(profile: OpponentProfile?) {
@@ -164,12 +166,12 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         }
         ui = ui.copy(thinking = false)
 
-        if (lan == null || lan == "(none)") { refresh("L'adversaire n'a pas répondu"); return@launch }
+        if (lan == null || lan == "(none)") { refresh(s(R.string.rival_silent)); return@launch }
 
         val from = Square(lan.substring(0, 2))
         val to = Square(lan.substring(2, 4))
         var move = board.move(pieceAt = from, to = to)
-        if (move == null) { refresh("Coup refusé : $lan"); return@launch }
+        if (move == null) { refresh(s(R.string.move_refused, lan)); return@launch }
 
         if (lan.length == 5) {
             val kind = when (lan[4]) {
@@ -201,7 +203,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
                 moves = uciLog.joinToString(" "),
                 opponentId = ui.opponent?.id,
                 level = ui.level,
-                label = "Contre ${ui.opponent?.firstName ?: "Stockfish"} · ${uciLog.size} demi-coups",
+                label = s(R.string.autosave_label, ui.opponent?.firstName ?: s(R.string.stockfish), uciLog.size),
             )
         )
     }
@@ -230,7 +232,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             uciLog += move.lan
             ui = ui.copy(sanMoves = ui.sanMoves + move.san, lastMove = move.start to move.end)
         }
-        refresh("Partie reprise")
+        refresh(s(R.string.game_resumed))
         if (!ui.gameOver && board.position.sideToMove != humanColor) askOpponent()
     }
 
@@ -242,7 +244,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun thinkingLabel(profile: OpponentProfile?): String =
-        if (profile != null) "${profile.firstName} réfléchit…" else "Le moteur réfléchit…"
+        if (profile != null) s(R.string.someone_thinking, profile.firstName) else s(R.string.engine_thinking)
 
     private fun refresh(status: String?, move: Move? = null) {
         val position = board.position
@@ -272,18 +274,18 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             }
             recorder.save(
                 getApplication(),
-                white = "Vous",
-                black = ui.opponent?.displayName ?: "Stockfish",
+                white = s(R.string.you),
+                black = ui.opponent?.displayName(getApplication()) ?: s(R.string.stockfish),
                 source = "engine",
                 state = state,
             )
         }
         val text = status ?: when (state) {
             is Board.State.Checkmate ->
-                if (state.color == humanColor) "Échec et mat — vous perdez" else "Échec et mat — vous gagnez"
-            is Board.State.Draw -> "Nulle — " + drawLabel(state.reason)
-            is Board.State.Check -> "Échec"
-            else -> if (position.sideToMove == humanColor) "À vous de jouer" else thinkingLabel(ui.opponent)
+                s(if (state.color == humanColor) R.string.checkmate_you_lose else R.string.checkmate_you_win)
+            is Board.State.Draw -> s(R.string.draw_reason, drawLabel(state.reason))
+            is Board.State.Check -> s(R.string.check)
+            else -> if (position.sideToMove == humanColor) s(R.string.your_turn) else thinkingLabel(ui.opponent)
         }
 
         ui = ui.copy(
@@ -302,11 +304,11 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         board.position.pieces.firstOrNull { it.kind == Piece.Kind.king && it.color == color }?.square
 
     private fun drawLabel(reason: Board.State.DrawReason): String = when (reason) {
-        Board.State.DrawReason.stalemate -> "pat"
-        Board.State.DrawReason.fiftyMoves -> "règle des cinquante coups"
-        Board.State.DrawReason.insufficientMaterial -> "matériel insuffisant"
-        Board.State.DrawReason.repetition -> "triple répétition"
-        Board.State.DrawReason.agreement -> "accord"
+        Board.State.DrawReason.stalemate -> s(R.string.draw_stalemate)
+        Board.State.DrawReason.fiftyMoves -> s(R.string.draw_fifty)
+        Board.State.DrawReason.insufficientMaterial -> s(R.string.draw_material)
+        Board.State.DrawReason.repetition -> s(R.string.draw_repetition)
+        Board.State.DrawReason.agreement -> s(R.string.draw_agreement)
     }
 
     companion object { private const val MODE = "engine" }
@@ -321,7 +323,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             position = Position.standard,
             selected = null, legalTargets = emptySet(), lastMove = null, checkedKing = null,
             sanMoves = emptyList(), gameOver = false, pendingPromotion = null,
-            status = "À vous de jouer",
+            status = s(R.string.your_turn),
         )
     }
 }

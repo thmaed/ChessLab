@@ -19,6 +19,9 @@ import androidx.compose.ui.unit.sp
 import com.chesslab.library.LibraryDatabase
 import com.chesslab.settings.StatsStore
 import com.chesslab.ui.Palette
+import androidx.compose.ui.res.stringResource
+import com.chesslab.R
+import androidx.compose.ui.res.pluralStringResource
 
 /**
  * La progression : ce que l'app a vu de vous.
@@ -45,57 +48,60 @@ fun ProgressionScreen() {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
     ) {
-        Section("Parties")
+        Section(stringResource(R.string.progress_games))
         if (games.isEmpty()) {
-            Empty("Aucune partie enregistrée pour l'instant.")
+            Empty(stringResource(R.string.progress_no_games))
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Stat("${games.size}", "jouées", Palette.textPrimary, Modifier.weight(1f))
-                Stat("$wins", "gagnées", Palette.accent, Modifier.weight(1f))
-                Stat("$draws", "nulles", Palette.textSecondary, Modifier.weight(1f))
-                Stat("$losses", "perdues", Palette.danger, Modifier.weight(1f))
+                Stat("${games.size}", stringResource(R.string.progress_played), Palette.textPrimary, Modifier.weight(1f))
+                Stat("$wins", stringResource(R.string.progress_won), Palette.accent, Modifier.weight(1f))
+                Stat("$draws", stringResource(R.string.progress_drawn), Palette.textSecondary, Modifier.weight(1f))
+                Stat("$losses", stringResource(R.string.progress_lost), Palette.danger, Modifier.weight(1f))
             }
             Spacer(Modifier.height(8.dp))
             val favourite = games.groupingBy { it.black }.eachCount().maxByOrNull { it.value }
             if (favourite != null) {
                 Text(
-                    "Adversaire le plus affronté : ${favourite.key} (${favourite.value} parties)",
+                    stringResource(
+                        R.string.progress_favourite, favourite.key,
+                        pluralStringResource(R.plurals.progress_games_count, favourite.value, favourite.value),
+                    ),
                     fontSize = 11.sp, color = Palette.textTertiary,
                 )
             }
         }
 
         Spacer(Modifier.height(20.dp))
-        Section("Puzzles")
+        Section(stringResource(R.string.progress_puzzles))
         val stats = puzzles
         if (stats == null || stats.attempted == 0) {
-            Empty("Aucun puzzle tenté pour l'instant.")
+            Empty(stringResource(R.string.progress_no_puzzles))
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Stat("${stats.attempted}", "tentés", Palette.textPrimary, Modifier.weight(1f))
-                Stat("${stats.solved}", "résolus", Palette.accent, Modifier.weight(1f))
-                Stat("${stats.rate} %", "de réussite", Palette.violet, Modifier.weight(1f))
+                Stat("${stats.attempted}", stringResource(R.string.progress_attempted), Palette.textPrimary, Modifier.weight(1f))
+                Stat("${stats.solved}", stringResource(R.string.progress_solved), Palette.accent, Modifier.weight(1f))
+                Stat("${stats.rate} %", stringResource(R.string.progress_success_rate), Palette.violet, Modifier.weight(1f))
             }
         }
 
         Spacer(Modifier.height(20.dp))
-        Section("Mémorisation")
+        Section(stringResource(R.string.progress_memory))
         val memo = training
         if (memo == null || memo.studied == 0) {
-            Empty("Aucune position travaillée pour l'instant.")
+            Empty(stringResource(R.string.progress_no_memory))
         } else {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Stat("${memo.studied}", "positions", Palette.textPrimary, Modifier.weight(1f))
-                Stat("${memo.solid}", "acquises", Palette.accent, Modifier.weight(1f))
-                Stat("${memo.hard}", "à consolider", Palette.danger, Modifier.weight(1f))
+                Stat("${memo.studied}", stringResource(R.string.progress_positions), Palette.textPrimary, Modifier.weight(1f))
+                Stat("${memo.solid}", stringResource(R.string.progress_solid), Palette.accent, Modifier.weight(1f))
+                Stat("${memo.hard}", stringResource(R.string.progress_to_firm), Palette.danger, Modifier.weight(1f))
             }
             Spacer(Modifier.height(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Stat("${memo.due}", "à revoir", Palette.warning, Modifier.weight(1f))
-                Stat("${memo.reviewsThisWeek}", "révisions (7 j)", Palette.info, Modifier.weight(1f))
-                Stat(memo.retentionLabel, "de réussite", Palette.violet, Modifier.weight(1f))
+                Stat("${memo.due}", stringResource(R.string.progress_due), Palette.warning, Modifier.weight(1f))
+                Stat("${memo.reviewsThisWeek}", stringResource(R.string.progress_reviews_week), Palette.info, Modifier.weight(1f))
+                Stat(memo.retentionLabel, stringResource(R.string.progress_success_rate), Palette.violet, Modifier.weight(1f))
             }
-            memo.nextDueLabel?.let {
+            memo.nextDueLabel(LocalContext.current)?.let {
                 Spacer(Modifier.height(8.dp))
                 Text(it, fontSize = 11.sp, color = Palette.textTertiary, modifier = Modifier.testTag("prochaine-revision"))
             }

@@ -9,6 +9,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
+import org.junit.rules.RuleChain
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -22,7 +23,11 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class AppTest {
 
-    @get:Rule val compose = createAndroidComposeRule<MainActivity>()
+    // La langue passe AVANT l'activité : les assertions sont en français,
+    // et l'émulateur, lui, peut être réglé sur n'importe quoi.
+    private val compose = createAndroidComposeRule<MainActivity>()
+
+    @get:Rule val rules: RuleChain = RuleChain.outerRule(LanguageRule()).around(compose)
 
     private fun awaitText(text: String, timeoutMs: Long = 60_000) =
         compose.waitUntil(timeoutMs) {
@@ -37,13 +42,13 @@ class AppTest {
     private fun open(mode: String) = compose.onNodeWithTag("mode-$mode").performClick()
 
     @Test fun theHomeOffersTheModes() {
-        compose.onNodeWithTag("mode-Contre l'ordinateur").assertIsDisplayed()
-        compose.onNodeWithTag("mode-Deux joueurs").assertIsDisplayed()
-        compose.onNodeWithTag("mode-Analyser").assertIsDisplayed()
+        compose.onNodeWithTag("mode-play").assertIsDisplayed()
+        compose.onNodeWithTag("mode-two").assertIsDisplayed()
+        compose.onNodeWithTag("mode-analysis").assertIsDisplayed()
     }
 
     @Test fun playingAMoveMakesTheEngineReply() {
-        open("Contre l'ordinateur")
+        open("play")
         awaitText("À vous de jouer", 120_000)
         compose.onNodeWithTag("adversaire-stockfish").performClick()
 
@@ -56,7 +61,7 @@ class AppTest {
     }
 
     @Test fun twoPlayersAlternate() {
-        open("Deux joueurs")
+        open("two")
         awaitText("Aux blancs de jouer")
 
         compose.onNodeWithTag("case-d2").performClick()
@@ -71,7 +76,7 @@ class AppTest {
     }
 
     @Test fun analysingAPgnShowsAnEvaluation() {
-        open("Analyser")
+        open("analysis")
         compose.onNodeWithTag("saisie").performTextInput("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6")
         compose.onNodeWithTag("charger").performClick()
 
@@ -88,7 +93,7 @@ class AppTest {
     }
 
     @Test fun puzzlesLoadFromTheLibrary() {
-        open("Puzzles")
+        open("puzzles")
         // la bibliothèque fait 19 Mo : on laisse le temps de la parcourir
         awaitTag("score", 60_000)
         compose.onNodeWithTag("case-e4").assertIsDisplayed()
@@ -98,7 +103,7 @@ class AppTest {
     }
 
     @Test fun openingCoursesCanBeRead() {
-        open("Ouvertures")
+        open("openings")
         awaitTag("compte")
         // la liste est paresseuse : on filtre pour amener la ligne à l'écran
         compose.onNodeWithTag("recherche").performTextInput("Italian")
@@ -113,7 +118,7 @@ class AppTest {
     }
 
     @Test fun endgameCoursesAreListedApart() {
-        open("Finales")
+        open("endgames")
         awaitTag("compte")
         compose.onNodeWithTag("recherche").performTextInput("Opposition")
         awaitTag("cours-eg-opposition", 10_000)
@@ -137,7 +142,7 @@ class AppTest {
     }
 
     @Test fun aCharacterPlaysWithMaia() {
-        open("Contre l'ordinateur")
+        open("play")
         // le réseau fait 43 Mo : son chargement prend du temps sur émulateur
         awaitText("À vous de jouer", 120_000)
 
@@ -153,7 +158,7 @@ class AppTest {
     }
 
     @Test fun theLaboratoryPlaysByItself() {
-        open("Laboratoire")
+        open("lab")
         // deux Stockfish : pas d'attente de chargement du réseau
         compose.onNodeWithTag("camp-a-stockfish").performClick()
         compose.onNodeWithTag("camp-b-stockfish").performClick()
@@ -164,7 +169,7 @@ class AppTest {
     }
 
     @Test fun aVariantIsRefereedByTheEngine() {
-        open("Variantes")
+        open("variants")
         compose.onNodeWithTag("variante-kingofthehill").performClick()
 
         // le moteur doit répondre à `d` et `go perft 1` avant qu'on puisse jouer
@@ -180,14 +185,14 @@ class AppTest {
     }
 
     @Test fun chess960ShufflesTheBackRank() {
-        open("Variantes")
+        open("variants")
         compose.onNodeWithTag("variante-chess960").performClick()
         awaitText("À vous de jouer", 60_000)
         compose.onNodeWithTag("case-a1").assertIsDisplayed()
     }
 
     @Test fun aFinishedGameLandsInTheLibrary() {
-        open("Deux joueurs")
+        open("two")
         awaitText("Aux blancs de jouer")
 
         // le mat du berger, en sept demi-coups
@@ -205,13 +210,13 @@ class AppTest {
 
         // la partie doit se retrouver dans la bibliothèque de l'écran Analyser
         compose.onNodeWithTag("retour").performClick()
-        open("Analyser")
+        open("analysis")
         awaitText("Bibliothèque", 15_000)
         awaitText("Blancs — Noirs", 10_000)
     }
 
     @Test fun anInterruptedGameCanBeResumed() {
-        open("Contre l'ordinateur")
+        open("play")
         awaitText("À vous de jouer", 120_000)
         compose.onNodeWithTag("adversaire-stockfish").performClick()
 
@@ -270,13 +275,13 @@ class AppTest {
     }
 
     @Test fun backReturnsHome() {
-        open("Analyser")
+        open("analysis")
         compose.onNodeWithTag("retour").performClick()
-        compose.onNodeWithTag("mode-Analyser").assertIsDisplayed()
+        compose.onNodeWithTag("mode-analysis").assertIsDisplayed()
     }
 
     @Test fun leJeuResteJouableEnPaysage() {
-        open("Deux joueurs")
+        open("two")
         awaitText("Aux blancs de jouer")
 
         compose.activityRule.scenario.onActivity {
