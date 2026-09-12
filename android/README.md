@@ -60,6 +60,8 @@ Deux conséquences à connaître avant de toucher au code :
 
 ## Ce qui reste
 
+- **La moitié iOS du transfert** : le format est spécifié, il reste à l'écrire
+  en Swift.
 - **Crazyhouse.** Fairy-Stockfish la connaît, mais elle demande de parachuter
   les pièces prises : il y faut une réserve et un geste de pose. Sans eux, le
   moteur jouerait des coups que l'utilisateur ne pourrait pas rendre.
@@ -83,6 +85,32 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@21
 **La boucle de travail est la JVM.** Les règles, l'encodeur Maia et la vision
 se testent sur la machine en quelques secondes ; seule l'interface demande un
 appareil.
+
+## Le transfert entre appareils
+
+Pas de compte, pas de serveur : un fichier `.clab` que l'utilisateur écrit où
+il veut (Réglages › Transfert entre appareils) et rouvre où il veut. C'est la
+seule forme de synchronisation compatible avec ce que l'aide promet — rien ne
+part sans qu'on l'ait demandé.
+
+**L'import FUSIONNE, il ne remplace jamais.** Le fichier ne porte pas l'état
+FSRS : il porte le JOURNAL des révisions, et l'état se recalcule en le
+rejouant. C'est la stratégie d'`OpeningProgressSync.swift` côté iOS, dont
+iCloud n'était qu'un tuyau. Il en découle trois propriétés, prouvées par
+`TransferMergeTest` :
+
+- **déterministe** — le résultat ne dépend que de la chronologie réelle ;
+- **idempotent** — réimporter le même fichier ne change rien ;
+- **commutatif** — A puis B donne le même état que B puis A.
+
+Le format est le CONTRAT entre les plateformes ; il est spécifié dans le
+commentaire de `TransferFile.kt`, avec un exemple complet. Pour qu'iOS et
+Android s'échangent leurs progressions, il reste à écrire la moitié Swift :
+lire et écrire ce même JSON. Aujourd'hui, Android ↔ Android fonctionne.
+
+Ce qui ne voyage PAS, et c'est voulu : la bibliothèque de puzzles et les cours,
+embarqués et identiques partout. iOS l'a appris à ses dépens — dans un store
+commun, la synchro poussait les cent mille puzzles vers iCloud.
 
 ## Les deux langues
 

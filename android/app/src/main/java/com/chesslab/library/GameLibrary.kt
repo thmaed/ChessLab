@@ -10,6 +10,8 @@ import androidx.room.PrimaryKey
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -22,6 +24,11 @@ import kotlinx.coroutines.flow.Flow
 @Entity(tableName = "games")
 data class GameRecord(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    /**
+     * L'identité de la partie entre appareils. Le `id` auto-incrémenté est
+     * local : deux téléphones donneraient le même à deux parties différentes.
+     */
+    val uid: String = java.util.UUID.randomUUID().toString(),
     @ColumnInfo(name = "played_at") val playedAt: Long,
     val white: String,
     val black: String,
@@ -43,8 +50,14 @@ interface GameDao {
     @Query("SELECT * FROM games WHERE id = :id")
     suspend fun byId(id: Long): GameRecord?
 
-    @Insert
+    @Insert(onConflict = androidx.room.OnConflictStrategy.IGNORE)
     suspend fun insert(record: GameRecord): Long
+
+    @Query("SELECT * FROM games ORDER BY played_at")
+    suspend fun allOnce(): List<GameRecord>
+
+    @Insert(onConflict = androidx.room.OnConflictStrategy.IGNORE)
+    suspend fun insertAll(records: List<GameRecord>)
 
     @Query("DELETE FROM games WHERE id = :id")
     suspend fun delete(id: Long)
@@ -95,7 +108,7 @@ interface AutosaveDao {
         GameRecord::class, Autosave::class,
         com.chesslab.training.OpeningProgress::class, com.chesslab.training.OpeningReviewLog::class,
     ],
-    version = 3, exportSchema = false,
+    version = 4, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
@@ -105,15 +118,62 @@ abstract class LibraryDatabase : RoomDatabase() {
     companion object {
         @Volatile private var instance: LibraryDatabase? = null
 
+        /**
+         * v3 → v4 : des identifiants STABLES pour le journal et les parties.
+         *
+         * C'est la migration qui rend le transfert entre appareils possible :
+         * un compteur auto-incrémenté est local, un UUID ne l'est pas. Les
+         * lignes existantes reçoivent le leur ici — sans quoi le premier
+         * export d'une base déjà remplie sortirait des entrées sans identité,
+         * que l'autre appareil ne saurait pas dédoublonner.
+         *
+         * Écrite À LA MAIN plutôt que laissée au filet destructeur : une
+         * progression FSRS ne se reconstruit pas.
+         */
+        val MIGRATION_3_4 = object : Migration(3, 4) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE games ADD COLUMN uid TEXT NOT NULL DEFAULT ''")
+                db.execSQL("UPDATE games SET uid = lower(hex(randomblob(16))) WHERE uid = ''")
+
+                // Le journal change de CLÉ PRIMAIRE : SQLite ne sait pas le
+                // faire en place, on recrée la table et on recopie.
+                db.execSQL(
+                    """
+                    CREATE TABLE opening_review_log_new (
+                        uid TEXT NOT NULL PRIMARY KEY,
+                        fen_key TEXT NOT NULL,
+                        rating_raw INTEGER NOT NULL,
+                        reviewed_at INTEGER NOT NULL,
+                        elapsed_days REAL NOT NULL,
+                        scheduled_days REAL NOT NULL,
+                        stability_after REAL NOT NULL
+                    )
+                    """.trimIndent()
+                )
+                db.execSQL(
+                    """
+                    INSERT INTO opening_review_log_new
+                        (uid, fen_key, rating_raw, reviewed_at, elapsed_days, scheduled_days, stability_after)
+                    SELECT lower(hex(randomblob(16))), fen_key, rating_raw, reviewed_at,
+                           elapsed_days, scheduled_days, stability_after
+                    FROM opening_review_log
+                    """.trimIndent()
+                )
+                db.execSQL("DROP TABLE opening_review_log")
+                db.execSQL("ALTER TABLE opening_review_log_new RENAME TO opening_review_log")
+            }
+        }
+
         fun get(context: Context): LibraryDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(
                 context.applicationContext, LibraryDatabase::class.java, "chesslab.db",
             )
-                // Une migration ratée ne doit pas empêcher l'app de démarrer.
-                // Les parties sont rejouables et les autosaves éphémères ; la
-                // PROGRESSION, elle, ne l'est pas — c'est pourquoi tout schéma
-                // futur devra fournir une vraie migration plutôt que s'en
-                // remettre à ce filet, qui reste le dernier recours.
+                .addMigrations(MIGRATION_3_4)
+                // Le filet, et RIEN DE PLUS : chaque changement de schéma doit
+                // fournir sa migration, comme ci-dessus. Il reste là pour
+                // qu'une base corrompue n'empêche pas l'app de démarrer, jamais
+                // pour éviter d'écrire une migration — une progression FSRS ne
+                // se reconstruit pas.
                 .fallbackToDestructiveMigration()
                 .build().also { instance = it }
         }

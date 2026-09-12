@@ -118,6 +118,11 @@ dependencies {
     // Les tests JVM : FSRS et les files de révision sont du calcul pur, ils
     // n'ont rien à faire dans un émulateur.
     testImplementation("junit:junit:4.13.2")
+    // `org.json` n'est qu'un TALON dans les tests JVM : chaque appel lève
+    // « not mocked ». La vraie implémentation, elle, se comporte comme celle
+    // d'Android — c'est ce qui permet de tester le format de transfert sans
+    // émulateur.
+    testImplementation("org.json:json:20240303")
 
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.10.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")

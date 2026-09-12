@@ -60,7 +60,16 @@ data class OpeningProgress(
  */
 @Entity(tableName = "opening_review_log")
 data class OpeningReviewLog(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    /**
+     * L'identifiant de l'ÉVÉNEMENT, tiré au sort à l'écriture.
+     *
+     * Ce n'est pas un détail : c'est lui qui rend la fusion possible. Un
+     * compteur auto-incrémenté est LOCAL — deux appareils écriraient chacun
+     * 1, 2, 3… et l'union perdrait la moitié des révisions. Un UUID n'entre
+     * jamais en collision, donc réunir deux journaux se réduit à supprimer
+     * les doublons.
+     */
+    @PrimaryKey val uid: String = java.util.UUID.randomUUID().toString(),
     @ColumnInfo(name = "fen_key") val fenKey: String,
     /** [FsrsRating] : 1 = encore … 4 = facile. */
     @ColumnInfo(name = "rating_raw") val ratingRaw: Int,
@@ -81,8 +90,18 @@ interface TrainingDao {
     @Upsert
     suspend fun put(progress: OpeningProgress)
 
-    @Insert
+    /** `IGNORE` : réimporter un journal déjà connu ne doit rien casser. */
+    @Insert(onConflict = androidx.room.OnConflictStrategy.IGNORE)
     suspend fun log(entry: OpeningReviewLog)
+
+    @Insert(onConflict = androidx.room.OnConflictStrategy.IGNORE)
+    suspend fun logAll(entries: List<OpeningReviewLog>)
+
+    @Query("SELECT * FROM opening_review_log ORDER BY reviewed_at")
+    suspend fun allLogs(): List<OpeningReviewLog>
+
+    @Upsert
+    suspend fun putAll(rows: List<OpeningProgress>)
 
     @Query("SELECT COUNT(*) FROM opening_progress WHERE due_at IS NOT NULL AND due_at <= :now")
     suspend fun dueCount(now: Long): Int

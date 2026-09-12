@@ -149,6 +149,8 @@ fun SettingsScreen() {
         )
         }
 
+        com.chesslab.transfer.TransferSection()
+
         // Ce que l'app doit à d'autres : Stockfish est sous GPLv3, et cela
         // s'affiche, ce n'est pas une note de bas de page.
         SettingsSection(stringResource(R.string.settings_about), Icons.Default.Info) {

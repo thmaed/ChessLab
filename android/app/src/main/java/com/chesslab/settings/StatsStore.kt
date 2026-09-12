@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -34,6 +35,24 @@ object StatsStore {
         context.applicationContext.statsStore.data.map {
             PuzzleStats(it[attempted] ?: 0, it[solved] ?: 0)
         }
+
+    /** Une lecture unique, pour l'export : le flux ne convient pas ici. */
+    suspend fun snapshot(context: Context): PuzzleStats =
+        context.applicationContext.statsStore.data.first().let {
+            PuzzleStats(it[attempted] ?: 0, it[solved] ?: 0)
+        }
+
+    /**
+     * Relève les compteurs après un import. Le MAXIMUM et non la somme : ils
+     * ne descendent jamais, donc le plus grand est le mieux informé, et
+     * additionner compterait deux fois ce qui précède l'échange.
+     */
+    suspend fun raiseTo(context: Context, attemptedValue: Int, solvedValue: Int) {
+        context.applicationContext.statsStore.edit {
+            it[attempted] = maxOf(it[attempted] ?: 0, attemptedValue)
+            it[solved] = maxOf(it[solved] ?: 0, solvedValue)
+        }
+    }
 
     fun recordPuzzle(context: Context, solvedIt: Boolean) {
         val store = context.applicationContext.statsStore

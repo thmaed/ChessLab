@@ -426,4 +426,22 @@
     <string name="phase_endgame">Finale</string>
     <string name="settings_about">À propos</string>
     <string name="settings_licences">Stockfish et Fairy-Stockfish sont sous GPLv3, ChessKit sous MIT, les pièces cburnett sous CC BY-SA 3.0, les puzzles viennent de la base Lichess (CC0). Distribuer cette app engage ces obligations.</string>
+    <string name="transfer_title">Transfert entre appareils</string>
+    <string name="transfer_explanation">Aucun compte, aucun serveur : un fichier que vous enregistrez où vous voulez et rouvrez où vous voulez. L\'import FUSIONNE — il ne remplace jamais — si bien qu\'importer deux fois le même fichier ne change rien.</string>
+    <string name="transfer_export">Exporter</string>
+    <string name="transfer_import">Importer</string>
+    <string name="transfer_exported_one">Exporté.</string>
+    <string name="transfer_exported_many">Exporté : %%d révisions.</string>
+    <string name="transfer_nothing_new">Rien de nouveau dans ce fichier.</string>
+    <string name="transfer_failed">Le fichier n\'a pas pu être lu.</string>
+    <string name="transfer_not_ours">Ce n\'est pas un fichier de transfert ChessLab.</string>
+    <string name="transfer_too_new">Ce fichier vient d\'une version plus récente de l\'app.</string>
+    <plurals name="transfer_imported">
+        <item quantity="one">%1$d révision ajoutée</item>
+        <item quantity="other">%1$d révisions ajoutées</item>
+    </plurals>
+    <plurals name="transfer_imported_games">
+        <item quantity="one">%1$d partie</item>
+        <item quantity="other">%1$d parties</item>
+    </plurals>
 </resources>
