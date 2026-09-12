@@ -24,6 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.chesslab.R
+import com.chesslab.ui.HintArrowBuilder
 import com.chesslab.ui.s
 
 data class PlayUiState(
@@ -33,7 +34,11 @@ data class PlayUiState(
     val lastMove: Pair<Square, Square>? = null,
     val checkedKing: Square? = null,
     /** Les deux cases d'un coup soufflé par l'indice. */
-    val hint: Pair<Square, Square>? = null,
+    /**
+     * Les flèches d'indice : UNE À TROIS, d'autant plus marquées que le coup
+     * est fort. Vide quand l'indice n'est pas demandé.
+     */
+    val hints: List<com.chesslab.ui.BoardArrow> = emptyList(),
     val status: String = "",
     val sanMoves: List<String> = emptyList(),
     val thinking: Boolean = false,
@@ -100,6 +105,13 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     private var ticker: kotlinx.coroutines.Job? = null
     /** La recherche en cours : une nouvelle partie doit pouvoir l'annuler. */
     private var thinkingJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * La recherche d'indice. Elle dure jusqu'à huit secondes et tient le
+     * moteur : jouer un coup doit l'interrompre, sinon l'adversaire attendrait
+     * la fin d'une réponse qu'on ne regarde déjà plus.
+     */
+    private var hintJob: kotlinx.coroutines.Job? = null
 
     var ui by mutableStateOf(PlayUiState(status = s(R.string.starting)))
         private set
@@ -190,6 +202,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun recordAndContinue(move: Move) {
+        // La recherche d'indice porte sur la position d'AVANT : la laisser
+        // finir, c'est faire attendre l'adversaire pour des flèches périmées.
+        stopHint()
         history += board.position.copy()
         moveLog += move
         recorder.record(move)
@@ -365,7 +380,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             position = position,
             selected = null,
             legalTargets = emptySet(),
-            hint = null,
+            hints = emptyList(),
             lastMove = move?.let { it.start to it.end } ?: ui.lastMove,
             checkedKing = checkedKing,
             status = text,
@@ -396,6 +411,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         // La recherche en cours vaut pour la position d'AVANT : la laisser
         // vivre, c'est risquer de la voir jouer sur le plateau neuf.
         thinkingJob?.cancel()
+        stopHint()
         ticker?.cancel()
         board = Board(startPosition)
         history.clear()
@@ -410,7 +426,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(
             position = startPosition,
             selected = null, legalTargets = emptySet(), lastMove = null, checkedKing = null,
-            hint = null, sanMoves = emptyList(), gameOver = false, outcome = null,
+            hints = emptyList(), sanMoves = emptyList(), gameOver = false, outcome = null,
             pendingPromotion = null, thinking = false, displayedPly = 0,
             captured = CapturedMaterial(),
             whiteClockMs = clock?.remaining(Piece.Color.white),
@@ -502,17 +518,69 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     // MARK: Indice et consultation
 
     /** Montre — ou cache — le meilleur coup, si les aides sont permises. */
-    fun toggleHint() = viewModelScope.launch {
-        if (!ui.settings.hintsEnabled || ui.gameOver) return@launch
-        if (ui.hint != null) { ui = ui.copy(hint = null); return@launch }
-        val best = withContext(Dispatchers.IO) {
-            EngineService.use(getApplication()) { e ->
-                e.send("position fen ${board.position.fen}")
-                e.search("go movetime 600", timeoutMs = 10_000)
+    /**
+     * Montre — ou cache — les flèches d'indice.
+     *
+     * Le moteur est interrogé en MultiPV 3, et les flèches se posent AU FIL DE
+     * L'EAU : la première apparaît en une fraction de seconde et se précise
+     * ensuite, plutôt que de faire attendre huit secondes un résultat complet.
+     * C'est ce que fait iOS, et c'est ce qui rend l'indice utilisable.
+     */
+    fun toggleHint() {
+        if (!ui.settings.hintsEnabled || ui.gameOver) return
+        if (ui.hints.isNotEmpty() || hintJob?.isActive == true) { stopHint(); return }
+
+        val fen = board.position.fen
+        hintJob = viewModelScope.launch {
+            val lanByRank = HashMap<Int, String>()
+            val scoreByRank = HashMap<Int, Double>()
+            withContext(Dispatchers.IO) {
+                EngineService.use(getApplication()) { e ->
+                    e.send("setoption name MultiPV value 3")
+                    e.send("position fen $fen")
+                    try {
+                        // Bornée en PROFONDEUR plutôt qu'infinie : au-delà, les
+                        // flèches ne bougent plus à l'œil, et le moteur repasse
+                        // au repos au lieu de chauffer tant que l'indice reste
+                        // affiché. Le plafond en millisecondes est le filet.
+                        e.search("go depth 18 movetime 8000", timeoutMs = 20_000) { line ->
+                            readHintInfo(line, lanByRank, scoreByRank)
+                        }
+                    } finally {
+                        // Le moteur sert aussi à faire jouer l'adversaire : le
+                        // laisser en MultiPV 3 lui ferait calculer trois lignes
+                        // pour un coup dont on n'en veut qu'une.
+                        e.send("setoption name MultiPV value 1")
+                    }
+                }
             }
-        }?.split(" ")?.getOrNull(1) ?: return@launch
-        if (best.length < 4) return@launch
-        ui = ui.copy(hint = Square(best.substring(0, 2)) to Square(best.substring(2, 4)))
+        }
+    }
+
+    /** Efface les flèches et rend le moteur. */
+    private fun stopHint() {
+        hintJob?.cancel()
+        hintJob = null
+        ui = ui.copy(hints = emptyList())
+    }
+
+    /** Une ligne `info` du moteur → une flèche de plus, ou une flèche affinée. */
+    private fun readHintInfo(
+        line: String,
+        lanByRank: MutableMap<Int, String>,
+        scoreByRank: MutableMap<Int, Double>,
+    ) {
+        if (!line.startsWith("info ") || !line.contains(" score ")) return
+        val rank = line.substringAfter(" multipv ", "").substringBefore(" ").toIntOrNull() ?: 1
+        val lan = line.substringAfter(" pv ", "").trim().substringBefore(" ")
+        if (lan.length < 4) return
+        val mate = line.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
+        val cp = line.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
+        val score = HintArrowBuilder.score(cp, mate) ?: return
+
+        lanByRank[rank] = lan
+        scoreByRank[rank] = score
+        ui = ui.copy(hints = HintArrowBuilder.build(lanByRank, scoreByRank))
     }
 
     /** Remonte d'un demi-coup dans la partie jouée. */
@@ -538,7 +606,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(
             displayedPly = target,
             position = position,
-            selected = null, legalTargets = emptySet(), hint = null,
+            selected = null, legalTargets = emptySet(), hints = emptyList(),
             lastMove = move?.let { it.start to it.end },
         )
     }

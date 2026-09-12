@@ -122,7 +122,9 @@ fun PlayScreen(
                 legalTargets = ui.legalTargets,
                 lastMove = ui.lastMove,
                 checkedKing = ui.checkedKing,
-                hint = ui.hint,
+                // Pas de flèches en CONSULTATION d'un coup passé : elles
+                // porteraient sur une position qu'on ne joue pas. Comme iOS.
+                arrows = if (ui.isReviewing) emptyList() else ui.hints,
                 enabled = !ui.thinking && !ui.gameOver,
                 onSquareTap = model::onSquareTap,
             )
@@ -318,7 +320,7 @@ private fun ControlBar(
         Spacer(Modifier.weight(1f))
         ControlButton(Icons.Default.Lightbulb, stringResource(R.string.train_hint),
             enabled = ui.settings.hintsEnabled && !ui.gameOver,
-            tint = if (ui.hint != null) Palette.accent else Palette.textPrimary,
+            tint = if (ui.hints.isNotEmpty()) Palette.accent else Palette.textPrimary,
             tag = "indice", onClick = onHint)
         if (!ui.isReviewing) {
             Spacer(Modifier.width(10.dp))

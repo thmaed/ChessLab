@@ -169,7 +169,11 @@ private fun ArrowOverlay(arrows: List<BoardArrow>, orientation: Piece.Color, mod
             if (length < 1f) return@forEach
             val ux = dx / length
             val uy = dy / length
-            val width = cell * (0.16f + 0.10f * arrow.strength)
+            // Proportions d'iOS : `shaftWidthRatio` 0,18 de case, multiplié
+            // par un facteur de 0,7 à 1,35 selon la force — soit 0,126 à 0,243
+            // de case. Une flèche faible se voit sans peser autant qu'une
+            // forte, et les deux apps dessinent la même chose.
+            val width = cell * (0.126f + 0.117f * arrow.strength)
             val head = cell * 0.42f
             // On démarre au bord de la case de départ, on s'arrête au bord de
             // la pointe : la flèche relie deux cases sans les masquer.
