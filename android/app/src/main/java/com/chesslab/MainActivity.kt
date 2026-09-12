@@ -168,9 +168,16 @@ private fun App() {
                 onPlayVsEngine = { stack.add(Route.PlayVsEngine(startFen = it)) },
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayer(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
+                onFreeTrain = { id, name -> stack.add(Route.EndgameFree(id, name)) },
             ) { id, name ->
                 stack.add(Route.Train("line", id, context.getString(R.string.route_train_named, name)))
             }
+            is Route.EndgameFree -> com.chesslab.training.EndgameFreeScreen(
+                courseId = current.courseId,
+                onPlayVsEngine = { stack.add(Route.PlayVsEngine(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(startFen = it)) },
+                onOpenLab = { stack.add(Route.Laboratory(it)) },
+            )
             is Route.Train -> TrainScreen(
                 mode = when (current.kind) {
                     "line" -> TrainMode.FullLine(current.courseId ?: "")

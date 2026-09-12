@@ -36,6 +36,8 @@ import com.chesslab.ui.CardShape
 import com.chesslab.ui.ControlShape
 import com.chesslab.ui.sanText
 import com.chesslab.ui.MoveStrip
+import kotlin.math.max
+import com.chesslab.ui.HintArrowBuilder
 import com.chesslab.ui.Palette
 import com.chesslab.ui.QuickSwitchMenu
 import com.chesslab.ui.StatusRow
@@ -211,36 +213,80 @@ fun AnalysisScreen(
  * partie sans être soufflé ; « Trois » à comparer des candidats. Le défaut ne
  * montre que le meilleur coup — trois flèches en permanence, c'est la solution
  * affichée en continu, et plus rien n'invite à chercher.
+ *
+ * **Deux régimes, et c'est la couleur qui les distingue.** En REVUE d'une
+ * partie, les flèches sont VERTES et lues dans la classification déjà faite :
+ * rien n'est recalculé en naviguant, et après une faute la rétrospective prime
+ * — c'est le point d'apprentissage. En analyse d'une POSITION, elles sont
+ * GRISES et viennent du moteur en continu. Une flèche verte dit « ce que le
+ * camp au trait peut jouer ici », une rouge « ce que l'adversaire menace ».
  */
 private fun arrowsFor(ui: AnalysisUiState): List<BoardArrow> {
     // « Aucune » coupe TOUT, menace comprise : c'est le réglage de celui qui
     // revoit sa partie sans vouloir être soufflé.
-    val kept = when (ui.arrowMode) {
-        ArrowMode.none -> return emptyList()
+    if (ui.arrowMode == ArrowMode.none) return emptyList()
+
+    val threat = ui.threat?.let {
+        BoardArrow(it.first, it.second, HintArrowBuilder.threatTint, 1f)
+    }
+    // « Il fallait jouer ça » : la seule flèche qui porte sur la position
+    // PRÉCÉDENTE. Vive et pleinement opaque.
+    val better = ui.betterMove?.let {
+        BoardArrow(it.first, it.second, HintArrowBuilder.betterTint, 1f)
+    }
+
+    ui.reviewEval?.let { cached ->
+        // Après une faute, la rétrospective prime et reste SEULE : la flèche
+        // verte porterait sur le coup de l'adversaire, ce qui se lit de
+        // travers juste après s'être trompé.
+        val green = if (better != null) listOf(better) else reviewArrows(cached, ui.arrowMode)
+        return green + listOfNotNull(threat)
+    }
+
+    val live = when (ui.arrowMode) {
+        ArrowMode.none -> emptyList()
         ArrowMode.best -> ui.candidates.take(1)
         ArrowMode.three -> ui.candidates
-    }
-    val arrows = kept.mapNotNull { candidate ->
+    }.mapNotNull { candidate ->
         if (candidate.lan.length < 4) return@mapNotNull null
+        // Pas de force : le coup est trop loin du meilleur pour être suggéré.
+        // Une position sans vraie alternative n'affiche donc qu'une ou deux
+        // flèches, même en mode « Trois ».
+        val strength = candidate.strength ?: return@mapNotNull null
         BoardArrow(
             from = Square(candidate.lan.substring(0, 2)),
             to = Square(candidate.lan.substring(2, 4)),
-            tint = Palette.accent,
-            // Le rang fait l'épaisseur : le coup recommandé est le plus marqué.
-            strength = when (candidate.rank) { 1 -> 1f; 2 -> 0.6f; else -> 0.35f },
+            tint = HintArrowBuilder.tint(strength),
+            strength = strength.toFloat(),
         )
-    }.toMutableList()
+    }
+    return live + listOfNotNull(threat, better)
+}
 
-    // Ce que l'ADVERSAIRE ferait si on lui laissait la main : en rouge, la
-    // couleur de ce qui menace.
-    ui.threat?.let { arrows += BoardArrow(it.first, it.second, Palette.danger, 0.7f) }
-
-    // « Il fallait jouer ça » : la seule flèche qui porte sur la position
-    // PRÉCÉDENTE. Pleinement marquée — c'est l'information la plus utile de
-    // l'écran quand elle apparaît.
-    ui.betterMove?.let { arrows += BoardArrow(it.first, it.second, Palette.violet, 1f) }
+/**
+ * Les flèches VERTES d'une revue : le meilleur coup de la position affichée,
+ * plus un second de taille voisine quand un autre coup est presque aussi bon
+ * — « deux coups qui se valent ». Tout est lu dans l'évaluation en cache.
+ */
+private fun reviewArrows(cached: PositionEval, mode: ArrowMode): List<BoardArrow> {
+    val best = cached.bestLan?.takeIf { it.length >= 4 } ?: return emptyList()
+    val arrows = mutableListOf(reviewArrow(best, 1.0))
+    val second = cached.secondBestLan?.takeIf { it.length >= 4 }
+    val gap = cached.gapToSecondBest
+    // En mode « Trois », dès qu'un 2e coup existe ; en mode « Meilleur »,
+    // seulement s'il est PROCHE (≤ 4 points de %).
+    if (second != null && gap != null && (mode == ArrowMode.three || gap <= 4.0)) {
+        arrows += reviewArrow(second, max(0.6, 1 - gap / 12))
+    }
     return arrows
 }
+
+private fun reviewArrow(lan: String, strength: Double) = BoardArrow(
+    from = Square(lan.substring(0, 2)),
+    to = Square(lan.substring(2, 4)),
+    tint = HintArrowBuilder.reviewBestTint(strength),
+    strength = strength.toFloat(),
+)
 
 @Composable
 private fun OverflowMenu(

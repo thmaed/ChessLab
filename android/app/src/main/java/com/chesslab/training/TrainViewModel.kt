@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import chesskit.Board
-import chesskit.FenParser
 import chesskit.Move
 import chesskit.Piece
 import chesskit.Position
@@ -187,7 +186,7 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
     private fun startCourse() {
         val c = course ?: return
         val root = CourseRepository.fenKey(c.rootFEN)
-        val position = FenParser.parse(c.rootFEN) ?: Position.standard
+        val position = CourseRepository.position(c.rootFEN) ?: Position.standard
         board = Board(position)
         currentKey = root
         pendingVariation = null

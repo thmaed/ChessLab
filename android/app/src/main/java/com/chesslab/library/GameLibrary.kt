@@ -218,11 +218,22 @@ abstract class LibraryDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * TOUTES les migrations, en un seul endroit.
+         *
+         * Le test de migration s'en sert aussi : une liste recopiée à la main
+         * dans le test finit par prendre du retard sur la base, et un schéma
+         * neuf passe alors par le filet DESTRUCTEUR sans que rien ne l'annonce
+         * — c'est arrivé au passage en v6. Ici, oublier une migration fait
+         * échouer le test.
+         */
+        val ALL_MIGRATIONS get() = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+
         fun get(context: Context): LibraryDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(
                 context.applicationContext, LibraryDatabase::class.java, "chesslab.db",
             )
-                .addMigrations(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+                .addMigrations(*ALL_MIGRATIONS)
                 // Le filet, et RIEN DE PLUS : chaque changement de schéma doit
                 // fournir sa migration, comme ci-dessus. Il reste là pour
                 // qu'une base corrompue n'empêche pas l'app de démarrer, jamais

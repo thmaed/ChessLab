@@ -14,7 +14,7 @@ class TrainingQueueTest {
 
     /** 1.e4 e5 2.Cf3 — un cours minuscule, des Blancs. */
     private val tiny = Course(
-        id = "tiny", name = "Petit cours", summary = "", 
+        id = "tiny", name = "Petit cours", summary = "", side = "white",
         rootFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -",
         chapters = emptyList(),
         positions = mapOf(

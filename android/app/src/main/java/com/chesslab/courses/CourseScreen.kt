@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.SportsMartialArts
 import androidx.compose.material.icons.automirrored.filled.Subject
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -29,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import chesskit.FenParser
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.R
@@ -53,6 +53,11 @@ fun CourseScreen(
     onPlayVsEngine: (String) -> Unit = {},
     onOpenTwoPlayer: (String) -> Unit = {},
     onOpenLab: (String) -> Unit = {},
+    /**
+     * L'entraînement LIBRE, proposé pour les seules FINALES : une ouverture
+     * n'a pas de verdict théorique à préserver, la question n'a pas de sens.
+     */
+    onFreeTrain: (id: String, name: String) -> Unit = { _, _ -> },
     onTrain: (id: String, name: String) -> Unit = { _, _ -> },
 ) {
     val context = LocalContext.current
@@ -75,7 +80,7 @@ fun CourseScreen(
 
     val rootKey = CourseRepository.fenKey(loaded.rootFEN)
     val currentKey = path.lastOrNull()?.second?.let { CourseRepository.fenKey(it.toFEN) } ?: rootKey
-    val position = remember(currentKey) { FenParser.parse("$currentKey 0 1") ?: Position.standard }
+    val position = remember(currentKey) { CourseRepository.position(currentKey) ?: Position.standard }
 
     TopBarActions {
         QuickSwitchMenu(
@@ -99,6 +104,15 @@ fun CourseScreen(
                 color = Palette.textPrimary, modifier = Modifier.weight(1f),
                 maxLines = 1, overflow = TextOverflow.Ellipsis,
             )
+            // L'entraînement LIBRE n'a de sens que pour une finale : une
+            // ouverture n'a pas de verdict théorique à préserver.
+            val estFinale = CourseRepository.catalog(context.assets)
+                .firstOrNull { it.id == loaded.id }?.isEndgame == true
+            if (estFinale) {
+                CircleIconButton(Icons.Default.SportsMartialArts, stringResource(R.string.endgame_free),
+                    Palette.warning, "entrainer-libre") { onFreeTrain(loaded.id, loaded.name) }
+                Spacer(Modifier.width(8.dp))
+            }
             CircleIconButton(Icons.Default.School, stringResource(R.string.course_train),
                 Palette.accent, "entrainer") { onTrain(loaded.id, loaded.name) }
         }

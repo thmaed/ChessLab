@@ -1,6 +1,9 @@
 package com.chesslab.courses
 
 import android.content.res.AssetManager
+import chesskit.FenParser
+import chesskit.Piece
+import chesskit.Position
 import org.json.JSONArray
 import org.json.JSONObject
 import androidx.annotation.StringRes
@@ -46,6 +49,8 @@ data class Course(
     val id: String,
     val name: String,
     val summary: String,
+    /** Le camp que l'on joue : « white » ou « black ». */
+    val side: String,
     val rootFEN: String,
     val chapters: List<Chapter>,
     val positions: Map<String, List<CourseMove>>,
@@ -88,6 +93,34 @@ object CourseRepository {
 
     /** La clé d'indexation : les quatre premiers champs d'une FEN. */
     fun fenKey(fen: String): String = fen.trim().split(" ").take(4).joinToString(" ")
+
+    /**
+     * La position décrite par une FEN de cours — de QUATRE à six champs.
+     *
+     * Les fichiers de cours portent des FEN à quatre champs : c'est la clé du
+     * graphe (voir [fenKey]), les pendules n'y ont pas leur place. `FenParser`,
+     * lui, en exige six. Sans ce complément, toute finale s'ouvrait sur la
+     * POSITION DE DÉPART — et comme les 59 ouvertures commencent justement au
+     * début, le repli habituel `?: Position.standard` donnait par accident la
+     * bonne réponse et masquait le défaut sur les 78 finales.
+     *
+     * Rend `null` sur une FEN qui ne décrit pas une vraie position : le parseur
+     * est très permissif (six jetons quelconques lui font un échiquier vide),
+     * on exige donc la présence des DEUX rois. Pendant d'`OpeningFENKey.position(from:)`.
+     */
+    fun position(fen: String): Position? {
+        val trimmed = fen.trim()
+        val padded = when (trimmed.split(" ").filter { it.isNotEmpty() }.size) {
+            4 -> "$trimmed 0 1"
+            5 -> "$trimmed 1"
+            else -> trimmed
+        }
+        val position = FenParser.parse(padded) ?: return null
+        val kings = position.pieces.filter { it.kind == Piece.Kind.king }
+        val bothKings = kings.any { it.color == Piece.Color.white } &&
+            kings.any { it.color == Piece.Color.black }
+        return position.takeIf { bothKings }
+    }
 
     fun catalog(assets: AssetManager): List<CatalogEntry> {
         // Le catalogue est mémorisé, mais la langue peut avoir changé entre
@@ -163,6 +196,7 @@ object CourseRepository {
             id = o.getString("id"),
             name = o.getString("name"),
             summary = localized(o.optJSONObject("summary")) ?: "",
+            side = o.optString("side", "white"),
             rootFEN = o.optString("rootFEN"),
             chapters = chapters,
             positions = positions,

@@ -92,11 +92,49 @@ object HintArrowBuilder {
      *
      * Le gris n'est pas un défaut de coloriste : les couleurs de sens sont
      * déjà prises — ambre pour le dernier coup, rouge pour l'échec et la
-     * menace, vert pour l'accent, violet pour la rétrospective. Un indice
-     * neutre ne se confond avec aucune d'elles, sur aucun thème de plateau.
+     * menace, vert pour l'accent et pour la rétrospective. Un indice neutre
+     * ne se confond avec aucune d'elles, sur aucun thème de plateau.
      */
     fun tint(strength: Double): Color {
         val shade = (0.12 + (1 - strength) * 0.5).toFloat()
         return Color(shade, shade, shade)
     }
+
+    /**
+     * La force d'une flèche de rang [rank], compte tenu de l'écart au meilleur
+     * coup — ou `null` quand l'écart la disqualifie.
+     *
+     * Sortie du corps de [build] pour que l'analyse s'en serve sans passer par
+     * les flèches : elle publie ses candidats avec leur force, et l'écran ne
+     * dessine que ceux qui en ont une. C'est ainsi qu'iOS tient la promesse
+     * « une position sans vraie alternative n'affiche qu'une ou deux flèches ».
+     */
+    fun strength(rank: Int, score: Double, bestScore: Double): Double? {
+        val gap = bestScore - score
+        if (gap > MAX_GAP_CP) return null
+        val gapFactor = min(1.0, max(0.0, gap / MAX_GAP_CP))
+        return max(0.12, 1 - RANK_STRENGTH_STEP * (rank - 1) - GAP_STRENGTH_RANGE * gapFactor)
+    }
+
+    /**
+     * « Il fallait jouer ça » : la seule flèche qui porte sur la position
+     * PRÉCÉDENTE. Vive et pleinement opaque — c'est l'information la plus
+     * utile de l'écran quand elle apparaît.
+     */
+    val betterTint: Color get() = Palette.accent.copy(alpha = 0.9f)
+
+    /**
+     * Ce que l'ADVERSAIRE ferait si on lui laissait la main. Rouge TRANSLUCIDE :
+     * elle ne se confond pas avec les flèches de coups à jouer, et ne prétend
+     * pas non plus être une suggestion.
+     */
+    val threatTint: Color get() = Palette.danger.copy(alpha = 0.55f)
+
+    /**
+     * Le meilleur coup en REVUE d'une partie terminée : vert — et non le gris
+     * de l'analyse en direct d'une position — gradué par la force, de sorte
+     * que deux coups qui se valent donnent deux verts voisins.
+     */
+    fun reviewBestTint(strength: Double): Color =
+        Palette.accent.copy(alpha = (0.5 + strength * 0.45).toFloat())
 }

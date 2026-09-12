@@ -535,4 +535,22 @@
         <item quantity="one">%1$d to review</item>
         <item quantity="other">%1$d to review</item>
     </plurals>
+    <string name="verdict_win">winning</string>
+    <string name="verdict_draw">drawn</string>
+    <string name="verdict_loss">losing</string>
+    <string name="endgame_free">Free training</string>
+    <string name="endgame_free_note">Any move that preserves the verdict is accepted — engine-checked.</string>
+    <string name="endgame_slip">%1$s → %2$s</string>
+    <string name="endgame_slip_title">That move gives the verdict away</string>
+    <string name="endgame_retry">Try again</string>
+    <string name="endgame_free_drawn">Drawn.</string>
+    <string name="endgame_arbitrating">Checking…</string>
+    <string name="endgame_unavailable">The engine could not judge this position.</string>
+    <string name="endgame_slips">%1$d slips</string>
+    <string name="endgame_clean">No move taken back — clean conversion.</string>
+    <string name="endgame_slips_final">Moves taken back along the way: %1$d</string>
+    <string name="endgame_replay">Play again</string>
+    <string name="endgame_play_best">Play the best move</string>
+    <string name="endgame_defence_thinking">The defence is thinking…</string>
+    <string name="endgame_free_goal">Verdict to hold:</string>
 </resources>

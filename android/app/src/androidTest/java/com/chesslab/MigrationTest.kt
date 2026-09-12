@@ -95,7 +95,9 @@ class MigrationTest {
         seedVersion3()
 
         val db = Room.databaseBuilder(context, LibraryDatabase::class.java, name)
-            .addMigrations(LibraryDatabase.MIGRATION_3_4, LibraryDatabase.MIGRATION_4_5)
+            // La liste de l'APP, et pas une copie : une copie prend du retard,
+            // et le schéma neuf passe alors par le filet destructeur en silence.
+            .addMigrations(*LibraryDatabase.ALL_MIGRATIONS)
             .build()
         try {
             // Rien n'a disparu.

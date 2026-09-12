@@ -52,6 +52,17 @@ class AppTest {
     }
 
     /**
+     * Deux joueurs passe d'abord par l'écran de RÉGLAGES — noms, présentation
+     * du plateau, cadence — depuis le 12/09. On le traverse avec les valeurs
+     * par défaut : c'est bien la partie qu'on vient tester.
+     */
+    private fun openTwoPlayers() {
+        open("two")
+        awaitTag("commencer")
+        compose.onNodeWithTag("commencer").performClick()
+    }
+
+    /**
      * Lance une partie depuis l'accueil, en passant par la configuration —
      * c'est le chemin de l'utilisateur depuis que l'écran « Nouvelle partie »
      * existe, comme sur iOS.
@@ -98,7 +109,7 @@ class AppTest {
     }
 
     @Test fun twoPlayersAlternate() {
-        open("two")
+        openTwoPlayers()
         awaitText("Aux blancs de jouer")
 
         compose.onNodeWithTag("case-d2").performClick()
@@ -115,9 +126,14 @@ class AppTest {
     @Test fun analysingAPgnShowsAnEvaluation() {
         open("analysis")
         // Analyser ouvre d'abord le CHOIX de la source, comme sur iOS.
-        compose.onNodeWithTag("entree-coller").performClick()
-        compose.onNodeWithTag("saisie").performTextInput("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6")
-        compose.onNodeWithTag("charger").performClick()
+        compose.onNodeWithTag("entree-coller").performScrollTo().performClick()
+        // Le champ et le bouton vivent SOUS la liste des parties enregistrées :
+        // dès qu'une partie y est rangée, ils passent sous le pli et le tap
+        // part dans le vide. Le défaut ne se voyait qu'en suite complète, où
+        // une partie terminée a justement été rangée juste avant.
+        compose.onNodeWithTag("saisie").performScrollTo()
+            .performTextInput("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6")
+        compose.onNodeWithTag("charger").performScrollTo().performClick()
 
         awaitTag("coup-5", 10_000)     // les six demi-coups sont là
 
@@ -233,7 +249,7 @@ class AppTest {
     }
 
     @Test fun aFinishedGameLandsInTheLibrary() {
-        open("two")
+        openTwoPlayers()
         awaitText("Aux blancs de jouer")
 
         // le mat du berger, en sept demi-coups
@@ -253,7 +269,7 @@ class AppTest {
         compose.onNodeWithTag("retour").performClick()
         open("analysis")
         awaitTag("entree-bibliotheque", 15_000)
-        compose.onNodeWithTag("entree-bibliotheque").performClick()
+        compose.onNodeWithTag("entree-bibliotheque").performScrollTo().performClick()
         awaitText("Blancs — Noirs", 15_000)
     }
 
@@ -289,7 +305,7 @@ class AppTest {
     @Test fun thePositionEditorBuildsAFen() {
         // L'éditeur vit sous Analyser, comme sur iOS.
         open("analysis")
-        compose.onNodeWithTag("entree-editeur").performClick()
+        compose.onNodeWithTag("entree-editeur").performScrollTo().performClick()
         awaitTag("fen", 10_000)
 
         // la position de départ, puis l'analyse
@@ -322,7 +338,7 @@ class AppTest {
     }
 
     @Test fun leJeuResteJouableEnPaysage() {
-        open("two")
+        openTwoPlayers()
         awaitText("Aux blancs de jouer")
 
         compose.activityRule.scenario.onActivity {

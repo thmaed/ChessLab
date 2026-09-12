@@ -12,7 +12,7 @@ vérification sur appareil, pas après compilation.
 | | |
 | --- | --- |
 | Jouer contre l'ordinateur | 9 personnages Maia + Stockfish, niveau, couleur, pendule, indice, barre d'éval, abandon du moteur |
-| Analyse des parties | classification, précision, coach, courbe, candidats, menace, rétrospective, bilan, export PGN, puzzles depuis les erreurs |
+| Analyse des parties | classification, précision, coach, courbe, candidats, menace, rétrospective, bilan, export PGN, puzzles depuis les erreurs ; flèches alignées le 12/09 — VERTES et lues dans le cache en revue, GRISES depuis le moteur en analyse d'une position, rouge translucide pour la menace, et la rétrospective reste SEULE quand elle sort |
 | Ouvertures | 58 cours, lecteur qui descend l'arbre, flèches colorées, commentaires, statistiques des maîtres, éval |
 | Finales | 78 cours, même lecteur |
 | Entraînement | FSRS-5, séance du jour, positions difficiles, une ligne |
@@ -91,9 +91,32 @@ vérification sur appareil, pas après compilation.
 - [ ] **Statistiques** par thème et par niveau — les données sont désormais
       enregistrées, l'écran reste à faire.
 
-### 5. Finales
-- [ ] **Entraînement libre** : conclure la position contre la meilleure défense,
-      tout coup qui préserve le verdict étant accepté.
+### 5. Finales — FAIT le 12/09
+- [x] **Entraînement libre** : conclure la position contre la meilleure défense,
+      tout coup qui préserve le verdict étant accepté. Le seuil est celui de
+      l'audit iOS (250 centipions), et un verdict qui S'AMÉLIORE passe sans
+      commentaire — sous jeu optimal c'est impossible, donc c'est l'arbitre qui
+      se corrige, et on n'accuse pas l'utilisateur d'un artefact.
+
+      **Trois pièges, tous trouvés sur l'appareil.**
+
+      1. Les 78 cours de finales s'ouvraient sur la POSITION DE DÉPART. Les
+         fichiers portent des FEN à quatre champs — c'est la clé du graphe —
+         et `FenParser` en exige six ; le repli `?: Position.standard` rendait
+         donc un échiquier complet. Comme les 59 ouvertures partent justement
+         du début, le défaut était invisible depuis toujours, et il touchait
+         AUSSI l'entraînement guidé. `CourseRepository.position()` complète les
+         compteurs, comme `OpeningFENKey.position(from:)` chez iOS.
+      2. Le coup était joué sur le VRAI plateau avant d'être arbitré : un coup
+         repris laissait quand même la pièce sur sa nouvelle case, et la flèche
+         de correction montrait le meilleur coup de l'ADVERSAIRE. iOS arbitre
+         sur une copie — `Board` y est une `struct`, ici c'est une classe, et
+         l'affectation ne copie rien.
+      3. Le verdict à tenir était figé sur la position de départ. iOS le
+         RECALCULE après chaque riposte : sans quoi une nulle améliorée en gain
+         pouvait ensuite être regâchée sans que rien ne le dise.
+
+      Cinq cas instrumentés verrouillent le tout, avec un arbitre postiche.
 
 ### 6. Laboratoire
 - [ ] **Estimation Elo** de l'écart entre les deux camps, avec intervalle de
@@ -133,3 +156,10 @@ Android : les sept premières.
       GPLv3 demande davantage — voir `PUBLIER.md` §0.
 - [ ] **Cache des évaluations d'analyse** : iOS garde sur disque ce que le
       moteur a déjà calculé ; Android recalcule à chaque ouverture.
+- [ ] **Revue automatique à l'ouverture d'un PGN.** iOS distingue à la source
+      la REVUE d'une partie (un PGN qui a des coups) de l'analyse d'une
+      POSITION : en revue il classe tout de suite, puis laisse le moteur au
+      REPOS et navigue dans le cache. Android demande un appui sur « Revue » et
+      garde une analyse en continu à chaque déplacement du curseur — donc le
+      moteur tourne tout du long. C'est le même chantier que le cache disque
+      ci-dessus, et il pèse sur la batterie autant que sur la parité.

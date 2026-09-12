@@ -22,6 +22,7 @@ import com.chesslab.library.LibraryDatabase
 import com.chesslab.settings.SettingsStore
 import com.chesslab.puzzles.OwnPuzzle
 import com.chesslab.puzzles.PuzzleSolutionTrimmer
+import com.chesslab.ui.HintArrowBuilder
 import com.chesslab.ui.s
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -43,7 +44,18 @@ enum class ArrowMode(val labelRes: Int) {
 }
 
 /** Un coup candidat du moteur à la position affichée. */
-data class Candidate(val rank: Int, val san: String, val lan: String, val eval: String)
+data class Candidate(
+    val rank: Int,
+    val san: String,
+    val lan: String,
+    val eval: String,
+    /**
+     * La force de la flèche — `null` quand le coup est trop loin du meilleur
+     * pour mériter d'être montré. Le candidat reste dans la LISTE (on veut
+     * pouvoir lire pourquoi il est moins bon), il n'a simplement pas de flèche.
+     */
+    val strength: Double? = null,
+)
 
 /**
  * L'évaluation d'UNE position, telle que le moteur la rend.
@@ -58,6 +70,8 @@ data class PositionEval(
     val bestLan: String?,
     /** Écart (points de %) entre le 1er et le 2e choix, POV du camp au trait. */
     val gapToSecondBest: Double?,
+    /** Le 2e choix lui-même : la flèche de comparaison, en revue. */
+    val secondBestLan: String? = null,
     /** La variante principale, en LAN : c'est elle qui sert de réfutation. */
     val pv: List<String>,
     /**
@@ -176,6 +190,13 @@ data class AnalysisUiState(
     val reviewTotal: Int = 0,
     /** Le meilleur coup de la position précédente, en LAN, après une faute. */
     val betterLan: String? = null,
+    /**
+     * L'évaluation MISE EN CACHE de la position affichée, quand la revue est
+     * passée par là. Sa présence fait basculer les flèches du gris de
+     * l'analyse en direct au vert de la revue — ce sont deux régimes
+     * différents, et iOS les distingue.
+     */
+    val reviewEval: PositionEval? = null,
     /** Le nombre de puzzles que la dernière génération a créés, à annoncer. */
     val puzzlesCreated: Int? = null,
 ) {
@@ -348,6 +369,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             // du coup affiché — c'est là que vivait le coup qu'il fallait jouer.
             betterLan = if (ui.qualities[clamped]?.isFault == true)
                 reviewEvals[clamped]?.bestLan else null,
+            reviewEval = reviewEvals[clamped + 1],
         )
         evaluate()
     }
@@ -473,11 +495,19 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Les candidats, dans l'ordre du moteur, avec leur SAN et leur éval. */
     private fun publishCandidates(position: Position, lines: Map<Int, RankedLine>) {
+        // Les forces se mesurent AU TRAIT, point de vue commun à toutes les
+        // lignes de la même position — les convertir au point de vue des
+        // Blancs d'abord inverserait l'ordre une fois sur deux.
+        val bestScore = lines[1]?.let { HintArrowBuilder.score(it.cp, it.mate) }
         val candidates = (1..3).mapNotNull { rank ->
             val line = lines[rank] ?: return@mapNotNull null
             val san = sanFor(position, line.lan) ?: return@mapNotNull null
             val white = toWhitePov(line, position.sideToMove)
-            Candidate(rank, san, line.lan, scoreText(white.cp, white.mate))
+            val score = HintArrowBuilder.score(line.cp, line.mate)
+            val strength = if (bestScore != null && score != null) {
+                HintArrowBuilder.strength(rank, score, bestScore)
+            } else null
+            Candidate(rank, san, line.lan, scoreText(white.cp, white.mate), strength)
         }
         ui = ui.copy(candidates = candidates)
     }
@@ -537,7 +567,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     /** Une recherche sur une position, en MultiPV 2. */
     private suspend fun rankedEval(engine: com.chesslab.engine.StockfishEngine, position: Position): PositionEval {
         terminalWinWhite(position)?.let {
-            return PositionEval(null, null, null, null, emptyList(), terminalWinWhite = it)
+            return PositionEval(null, null, null, null, pv = emptyList(), terminalWinWhite = it)
         }
         engine.send("position fen ${position.fen}")
         val lines = HashMap<Int, RankedLine>()
@@ -554,7 +584,8 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         } else null
         return PositionEval(
             cp = white?.cp, mate = white?.mate,
-            bestLan = best?.lan, gapToSecondBest = gap, pv = best?.pv ?: emptyList(),
+            bestLan = best?.lan, gapToSecondBest = gap, secondBestLan = second?.lan,
+            pv = best?.pv ?: emptyList(),
         )
     }
 

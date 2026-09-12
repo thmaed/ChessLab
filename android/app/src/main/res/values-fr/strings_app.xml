@@ -532,4 +532,22 @@
         <item quantity="one">%1$d à revoir</item>
         <item quantity="other">%1$d à revoir</item>
     </plurals>
+    <string name="verdict_win">gagnant</string>
+    <string name="verdict_draw">nulle</string>
+    <string name="verdict_loss">perdant</string>
+    <string name="endgame_free">Entraînement libre</string>
+    <string name="endgame_free_note">Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur.</string>
+    <string name="endgame_slip">%1$s → %2$s</string>
+    <string name="endgame_slip_title">Ce coup lâche le verdict</string>
+    <string name="endgame_retry">Réessayer</string>
+    <string name="endgame_free_drawn">Nulle.</string>
+    <string name="endgame_arbitrating">Vérification…</string>
+    <string name="endgame_unavailable">Le moteur n\'a pas pu juger cette position.</string>
+    <string name="endgame_slips">%1$d faux pas</string>
+    <string name="endgame_clean">Aucun coup repris — conversion propre.</string>
+    <string name="endgame_slips_final">Coups repris en route : %1$d</string>
+    <string name="endgame_replay">Rejouer</string>
+    <string name="endgame_play_best">Jouer le meilleur coup</string>
+    <string name="endgame_defence_thinking">La défense réfléchit…</string>
+    <string name="endgame_free_goal">Verdict à tenir :</string>
 </resources>

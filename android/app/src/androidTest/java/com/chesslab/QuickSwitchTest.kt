@@ -44,6 +44,17 @@ class QuickSwitchTest {
         compose.onNodeWithTag("mode-$mode").performScrollTo().performClick()
     }
 
+    /**
+     * Deux joueurs passe d'abord par l'écran de RÉGLAGES — noms, présentation
+     * du plateau, cadence — depuis le 12/09. On le traverse avec les valeurs
+     * par défaut : c'est bien la partie qu'on vient tester.
+     */
+    private fun openTwoPlayers() {
+        open("two")
+        awaitTag("commencer")
+        compose.onNodeWithTag("commencer").performClick()
+    }
+
     /** Ouvre le menu et choisit une destination par son libellé. */
     private fun switchTo(label: String) {
         compose.onNodeWithTag("changer-de-mode").performClick()
@@ -53,13 +64,13 @@ class QuickSwitchTest {
     }
 
     @Test fun leMenuEstSurLesDeuxJoueurs() {
-        open("two")
+        openTwoPlayers()
         awaitTag("changer-de-mode")
         compose.onNodeWithTag("changer-de-mode").assertIsDisplayed()
     }
 
     @Test fun deuxJoueursEnvoieLaPositionVersLAnalyse() {
-        open("two")
+        openTwoPlayers()
         awaitTag("case-e2")
         // Un coup, pour que la position ne soit plus la position initiale :
         // c'est LUI qu'on doit retrouver de l'autre côté.
@@ -85,13 +96,15 @@ class QuickSwitchTest {
         open("openings")
         awaitTag("changer-de-mode", 60_000)
         // Depuis une liste, la bascule ouvre simplement le mode : il n'y a pas
-        // de position affichée à emporter.
+        // de position affichée à emporter, donc on arrive sur les RÉGLAGES.
         switchTo("Deux joueurs")
+        awaitTag("commencer", 30_000)
+        compose.onNodeWithTag("commencer").performClick()
         awaitTag("case-e2", 30_000)
     }
 
     @Test fun lAnalyseRenvoieVersUnePartieContreLOrdinateur() {
-        open("two")
+        openTwoPlayers()
         awaitTag("case-e2")
         compose.onNodeWithTag("case-d2").performClick()
         compose.onNodeWithTag("case-d4").performClick()

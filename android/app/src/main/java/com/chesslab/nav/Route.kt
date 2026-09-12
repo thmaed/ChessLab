@@ -90,6 +90,13 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data class Train(val kind: String, val courseId: String? = null, val label: String? = null) :
         Route(R.string.route_training, label)
 
+    /**
+     * L'entraînement LIBRE d'une finale : conclure la position contre la
+     * meilleure défense, tout coup qui préserve le verdict étant accepté.
+     */
+    data class EndgameFree(val courseId: String, val name: String) :
+        Route(R.string.endgame_free, name)
+
     /** Un cours ouvert : ouverture ou finale, même écran. */
     data class CourseReader(val id: String, val name: String) : Route(R.string.route_openings, name)
 
