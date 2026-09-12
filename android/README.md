@@ -60,8 +60,6 @@ Deux conséquences à connaître avant de toucher au code :
 
 ## Ce qui reste
 
-- **La moitié iOS du transfert** : le format est spécifié, il reste à l'écrire
-  en Swift.
 - **Crazyhouse.** Fairy-Stockfish la connaît, mais elle demande de parachuter
   les pièces prises : il y faut une réserve et un geste de pose. Sans eux, le
   moteur jouerait des coups que l'utilisateur ne pourrait pas rendre.
@@ -103,10 +101,12 @@ iCloud n'était qu'un tuyau. Il en découle trois propriétés, prouvées par
 - **idempotent** — réimporter le même fichier ne change rien ;
 - **commutatif** — A puis B donne le même état que B puis A.
 
-Le format est le CONTRAT entre les plateformes ; il est spécifié dans le
-commentaire de `TransferFile.kt`, avec un exemple complet. Pour qu'iOS et
-Android s'échangent leurs progressions, il reste à écrire la moitié Swift :
-lire et écrire ce même JSON. Aujourd'hui, Android ↔ Android fonctionne.
+Le transfert est **entre appareils Android** : changer de téléphone, ou en
+tenir deux. L'échange avec iOS a été écarté (décision du 12/09/2026) : les
+deux apps gardent chacune sa progression. Le format reste néanmoins spécifié
+dans le commentaire de `TransferFile.kt`, avec un exemple complet — si l'envie
+revenait, la moitié Swift serait mécanique, la stratégie de fusion existant
+déjà des deux côtés.
 
 Ce qui ne voyage PAS, et c'est voulu : la bibliothèque de puzzles et les cours,
 embarqués et identiques partout. iOS l'a appris à ses dépens — dans un store
