@@ -191,7 +191,6 @@ data class AnalysisUiState(
     }
     val displayedExplanation: MoveExplanation? get() = explanations[cursor]
     val displayedWinDelta: Double? get() = winDeltas[cursor]
-    val canReview: Boolean get() = sanMoves.isNotEmpty() && !reviewing
 }
 
 /**

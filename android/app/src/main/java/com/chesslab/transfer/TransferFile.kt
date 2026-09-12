@@ -36,8 +36,14 @@ import org.json.JSONObject
  *   "puzzles": { "attempted": 12, "solved": 9 } }
  * ```
  *
- * Le format est le CONTRAT entre les plateformes : l'app iOS doit écrire et
- * lire exactement celui-ci pour que les deux se parlent.
+ * Le transfert reste ENTRE APPAREILS ANDROID (décision du 12/09/2026) :
+ * changer de téléphone, ou en tenir deux. Rien n'est prévu pour iOS, et la
+ * version du format n'a donc qu'un seul écrivain à satisfaire.
+ *
+ * Les PUZZLES MAISON — ceux que l'analyse tire de vos fautes — n'y sont pas
+ * non plus, et c'est délibéré : ils se déduisent entièrement des parties, qui
+ * voyagent. Les emporter serait transporter deux fois la même information, et
+ * il faudrait alors arbitrer les doublons.
  */
 data class TransferFile(
     val exportedAt: Long,

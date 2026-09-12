@@ -133,7 +133,12 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             attemptsLeft = SettingsStore.state.value.puzzleAttempts,
             allowedAttempts = SettingsStore.state.value.puzzleAttempts,
             hint = null,
-            status = s(R.string.puzzle_prompt, s(puzzle.themeLabel), puzzle.rating),
+            // Cote 0 = SANS cote : c'est le cas des puzzles maison, dont la
+            // difficulté n'a jamais été mesurée. Afficher « · 0 » donnerait un
+            // chiffre pour une chose qu'on ne sait pas.
+            status = if (puzzle.rating > 0)
+                s(R.string.puzzle_prompt, s(puzzle.themeLabel), puzzle.rating)
+            else s(R.string.puzzle_prompt_unrated, s(puzzle.themeLabel)),
         )
     }
 

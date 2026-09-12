@@ -229,7 +229,7 @@ même : les personnages laissent la place à Stockfish et le scanner le dit.
 | ONNX Runtime | 6,3 Mo | 17,6 Mo |
 | Puzzles Lichess | 4,7 Mo | 18,8 Mo |
 | Moteurs (Stockfish, Fairy) | 6,2 Mo | 24,3 Mo |
-| **Bundle complet** | **145,6 Mo** | 243,7 Mo |
+| **Bundle complet** | **148 Mo** | 243,7 Mo |
 
 C'est la taille COMPRESSÉE qui compte pour Google Play, dont le plafond est
 d'environ 200 Mo sans Play Asset Delivery : on passe, sans marge confortable.

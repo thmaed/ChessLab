@@ -112,7 +112,7 @@ des pistes différentes**. Pour une première publication : `versionCode = 1`,
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21
 cd android
 ./gradlew :app:bundleRelease
-# → app/build/outputs/bundle/release/app-release.aab   (~146 Mo)
+# → app/build/outputs/bundle/release/app-release.aab   (148 Mo, mesuré)
 ```
 
 **C'est un AAB qu'on téléverse**, pas un APK : Google Play n'accepte plus d'APK
@@ -123,14 +123,19 @@ Vérifiez que le bundle est bien **signé** (sans `keystore.properties`, la tâc
 sort un binaire non signé que Play refusera) :
 
 ```bash
-jarsigner -verify -verbose app/build/outputs/bundle/release/app-release.aab | tail -3
+jarsigner -verify app/build/outputs/bundle/release/app-release.aab
+# attendu : « jar verified. »
 ```
+
+L'avertissement `PKIX path building failed` qui suit est **normal** : la clé de
+téléversement est auto-signée, aucune autorité ne la garantit — c'est le
+principe. Seule la ligne « jar verified. » compte.
 
 ### 3.4 La taille
 
 | | compressé |
 | --- | --- |
-| Bundle complet | **~146 Mo** |
+| Bundle complet | **148 Mo** (mesuré le 12/09/2026) |
 | Plafond Google Play sans Play Asset Delivery | ~200 Mo |
 
 On passe, sans marge confortable. Si un jour ça déborde, la sortie est **Play
