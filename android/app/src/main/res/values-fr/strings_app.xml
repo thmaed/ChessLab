@@ -496,4 +496,5 @@
     <string name="puzzle_source_own">Mes parties</string>
     <string name="puzzle_no_own">Aucun puzzle tiré de vos parties — analysez-en une et utilisez « Créer des puzzles depuis les erreurs ».</string>
     <string name="puzzle_prompt_unrated">%1$s — trouvez le meilleur coup</string>
+    <string name="analysis_pgn_unreadable">Ce PGN n\'a pas pu être lu.</string>
 </resources>

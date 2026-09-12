@@ -88,6 +88,14 @@ portent sont PURES, donc vérifiées sur la JVM sans émulateur
   sur un plateau : mat du couloir, fourchette, clouage, pièce en prise. Aucun
   modèle de langage n'entre là — dans une app d'apprentissage, une explication
   inventée s'apprend aussi bien qu'une vraie.
+- **Un PGN collé est NETTOYÉ avant d'être lu.** Un copier-coller depuis
+  Lichess ou chess.com apporte un BOM, des fins de ligne Windows ou un
+  commentaire de présentation : valide à l'œil, refusé par le lecteur.
+  `PgnSanitizer` le répare, comme `PGNSanitizer.swift` — et va plus loin, parce
+  que dans un champ « coller » on colle souvent les COUPS SEULS, sans en-tête,
+  cas qu'iOS ne traite pas. Ce qui passait déjà (pendules `[%clk …]`, NAG,
+  variantes, lignes vides en trop) n'est pas touché : `PgnRealWorldTest` dit
+  lequel est lequel.
 - **Le budget de recherche est en NŒUDS** (300 000 par position, 900 000 pour
   une solution de puzzle) et non en temps : un budget en temps rendrait le
   verdict dépendant de la charge de l'appareil, et la même partie analysée deux
@@ -138,8 +146,14 @@ Kotlin : à signaler, avec les trois autres déjà relevés.
   moteur jouerait des coups que l'utilisateur ne pourrait pas rendre.
 - **La mesure sur un vrai téléphone.** L'émulateur ne dit rien de la vitesse ni
   du thermique — et c'est de là que dépend la calibration des niveaux.
-- **Les écrans d'analyse annexes d'iOS** : l'éditeur de tags PGN et la
-  bibliothèque de parties détaillée. L'analyse elle-même est à parité.
+- **L'AFFINAGE des verdicts limites.** iOS approfondit la recherche quand la
+  perte d'un coup tombe près d'un seuil (`RefinementStopRule`), pour ne jamais
+  afficher une étiquette qu'il retirerait ensuite. Android classe au budget
+  fixe : un coup pile à la frontière peut donc être jugé « imprécision » là où
+  iOS dirait « bon coup ». Les deux sont défendables ; ce n'est pas la même
+  chose.
+- **Les écrans d'analyse annexes d'iOS** : l'éditeur de tags PGN, la
+  bibliothèque de parties détaillée, la pastille de résultat.
 
 ## Construire et tester
 

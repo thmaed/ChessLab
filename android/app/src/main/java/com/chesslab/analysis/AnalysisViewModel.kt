@@ -263,10 +263,17 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             return
         }
 
+        // Un PGN collé depuis un site web arrive avec un BOM, des fins de
+        // ligne Windows ou un commentaire de présentation : valide à l'œil,
+        // refusé par le lecteur. On le nettoie AVANT de le lui donner. Et un
+        // fichier de base contient souvent plusieurs parties : on prend la
+        // première, la seule que cet écran puisse montrer.
+        val cleaned = PgnSanitizer.splitIntoGames(PgnSanitizer.sanitize(text))
+            .firstOrNull() ?: text
         val parsed = try {
-            PgnParser.parse(text)
+            PgnParser.parse(cleaned)
         } catch (e: Exception) {
-            ui = ui.copy(error = "PGN illisible : ${e.message}")
+            ui = ui.copy(error = s(R.string.analysis_pgn_unreadable))
             return
         }
 

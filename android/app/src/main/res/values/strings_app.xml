@@ -499,4 +499,5 @@
     <string name="puzzle_source_own">My games</string>
     <string name="puzzle_no_own">No puzzle from your games yet — analyse one and use “Make puzzles from the mistakes”.</string>
     <string name="puzzle_prompt_unrated">%1$s — find the best move</string>
+    <string name="analysis_pgn_unreadable">This PGN could not be read.</string>
 </resources>
