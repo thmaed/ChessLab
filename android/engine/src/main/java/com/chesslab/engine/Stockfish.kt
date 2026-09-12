@@ -14,4 +14,7 @@ internal object Stockfish {
     external fun nativeReadLine(): String?
     external fun nativeStop()
     external fun nativeIsRunning(): Boolean
+
+    /** Rend au système les pages que l'allocateur natif garde en réserve. */
+    external fun nativePurge()
 }

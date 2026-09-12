@@ -43,7 +43,14 @@ class MaiaOpponent private constructor(private val model: MaiaModel) {
         val legal = MaiaLegalMoves.moves(board)
         if (legal.isEmpty()) return null
 
-        val prediction = model.predict(MaiaEncoder.tokens(history), selfElo, oppoElo)
+        // Le réseau peut refuser : sa session est rendue au système quand
+        // l'app passe en arrière-plan (voir [MaiaModel.release]), et rien ne
+        // garantit qu'elle rouvre — mémoire encore trop juste, fichier illisible.
+        // Dans ce cas on rend `null` et l'appelant retombe sur Stockfish, ce
+        // qu'il sait déjà faire ; une exception, elle, emporterait la partie.
+        val prediction = runCatching {
+            model.predict(MaiaEncoder.tokens(history), selfElo, oppoElo)
+        }.getOrNull() ?: return null
 
         // Le style repondère la distribution HUMAINE de Maia — borné, donc il
         // la colore sans la remplacer — puis le tirage se fait dans le résultat.

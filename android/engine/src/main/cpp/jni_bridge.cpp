@@ -17,6 +17,7 @@
 //
 
 #include <jni.h>
+#include <malloc.h>
 
 #include <condition_variable>
 #include <deque>
@@ -56,6 +57,24 @@ Java_com_chesslab_engine_Stockfish_nativeStart(JNIEnv *env, jobject, jstring pat
     const int result = cstockfish_start(nativePath, onEngineLine, nullptr);
     env->ReleaseStringUTFChars(path, nativePath);
     return result;
+}
+
+/// Rend au SYSTÈME les pages que l'allocateur garde en réserve.
+///
+/// Libérer de la mémoire native (fermer la session ONNX de Maia, rétrécir la
+/// table de transposition) ne la rend pas au noyau : l'allocateur la conserve
+/// pour la prochaine demande. Mesuré sur un Galaxy A16 — 147 Mo « libres »
+/// dans le tas et pourtant toujours comptés dans le RSS de l'app, donc
+/// toujours vus par le tueur de processus, qui est précisément ce qu'on
+/// cherchait à éviter.
+///
+/// `M_PURGE` est l'ordre de bionic pour ça. Il coûte quelques millisecondes et
+/// n'est appelé qu'en passant en arrière-plan.
+JNIEXPORT void JNICALL
+Java_com_chesslab_engine_Stockfish_nativePurge(JNIEnv *, jobject) {
+#if defined(M_PURGE)
+    mallopt(M_PURGE, 0);
+#endif
 }
 
 JNIEXPORT void JNICALL

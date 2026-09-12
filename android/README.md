@@ -169,15 +169,61 @@ ce qui rend la mesure utile : ce qui passe là passe partout.
 Méthode : Laboratoire, Maia contre Maia, cadence comptée À L'INTÉRIEUR d'une
 partie (134 demi-coups sur 16,1 s) pour ne pas mesurer un bord tronqué.
 
+## La mémoire, et pourquoi Android tuait l'app
+
+Mesuré sur le Galaxy A16 (4 Go) : **ChessLab montait à 582 Mo en pleine
+partie** — et Android l'évinçait dès qu'on passait à une autre app.
+
+```
+lmkd: Reclaim 'com.chesslab', oom_score_adj 900, to free 243628kB rss
+ActivityManager: Process com.chesslab has died: cch CAC
+```
+
+`oom_score_adj 900` et `cch` : l'app était en ARRIÈRE-PLAN. Ce n'était pas un
+plantage — aucune exception, aucun tombstone — mais le résultat pour
+l'utilisateur est le même : on revient, la partie a disparu.
+
+| | avant | après |
+| --- | --- | --- |
+| En jeu contre un personnage | 582 Mo | **477 Mo** |
+| Passé en arrière-plan | 582 Mo | **328 Mo** |
+
+Trois corrections, chacune nécessaire :
+
+1. **La table de transposition faisait 64 Mo.** Un chiffre de bureau : une
+   recherche de 300 000 nœuds ne visite pas de quoi en remplir le quart. Elle
+   se dimensionne désormais sur ce que l'appareil concède
+   (`ActivityManager.memoryClass`), soit 8 à 32 Mo.
+2. **Rien n'était jamais rendu.** `onTrimMemory` relâche la table et la session
+   ONNX de Maia quand plus personne ne regarde l'app. Ni l'une ni l'autre ne
+   porte d'état de partie : la table se reprend au prochain appel du moteur, la
+   session se rouvre au prochain coup.
+3. **Libérer ne suffisait pas.** Mesuré : 147 Mo « libres » dans le tas natif et
+   toujours comptés dans le RSS — l'allocateur garde les pages. Il faut les lui
+   faire rendre, d'où `mallopt(M_PURGE)` par un appel JNI d'une ligne. Sans
+   cette troisième étape, les deux premières ne gagnaient que 42 Mo.
+
+**Le prix, mesuré** : le premier coup après un retour d'arrière-plan coûte
+**3,1 s** au lieu de 120 ms, le temps de rouvrir la session. Les suivants
+reviennent à 120 ms. C'est un échange qu'on fait volontiers contre une partie
+perdue.
+
+**Ce qui n'est PAS fait** : le moteur n'est pas arrêté, seulement dégonflé. Les
+réseaux NNUE (78 Mo) restent chargés. Les arrêter demanderait de redémarrer
+Stockfish, et le shim n'en accepte qu'un par process — un arrêt borné peut
+laisser un fil détaché qui refuse le suivant. Le gain ne vaut pas ce risque-là.
+
 ## Ce qui reste
 
 - **Crazyhouse.** Fairy-Stockfish la connaît, mais elle demande de parachuter
   les pièces prises : il y faut une réserve et un geste de pose. Sans eux, le
   moteur jouerait des coups que l'utilisateur ne pourrait pas rendre.
-- **Le thermique.** La vitesse est mesurée (voir plus haut) ; ce qui ne l'est
-  pas encore, c'est ce que devient cette cadence après vingt minutes de jeu,
-  téléphone chaud. iOS a un `ThermalMonitor` qui réduit le budget en
-  surchauffe ; Android n'en a pas.
+- **Rien sur le thermique** — et c'est une bonne nouvelle : vingt minutes de
+  Laboratoire en continu sur le Galaxy A16 n'ont fait passer la batterie que de
+  31,0 à 31,6 °C, les huit cœurs sont restés à pleine fréquence (2000-2200 MHz)
+  et la cadence n'a pas bougé (≈ 10 s par partie du début à la fin). iOS a un
+  `ThermalMonitor` qui réduit le budget en surchauffe ; sur ce téléphone-ci,
+  rien ne l'aurait déclenché. À revérifier sur un appareil plus contraint.
 - **L'AFFINAGE des verdicts limites.** iOS approfondit la recherche quand la
   perte d'un coup tombe près d'un seuil (`RefinementStopRule`), pour ne jamais
   afficher une étiquette qu'il retirerait ensuite. Android classe au budget
