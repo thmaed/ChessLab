@@ -18,6 +18,7 @@ val copyAssets by tasks.registering(Copy::class) {
         include("lichess_puzzles.json")
         include("openings/**")          // cours d'ouvertures ET de finales
         include("opponent_books.json")  // les répertoires des personnages
+        include("opening_book.json")    // le livre d'ouvertures général
         include("opening_library.json") // les lignes qui étendent la théorie de l'analyse
     }
     // le modèle vit dans tools/, avec le script qui le produit

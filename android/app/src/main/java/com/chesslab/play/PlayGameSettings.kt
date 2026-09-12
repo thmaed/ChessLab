@@ -53,6 +53,13 @@ data class PlayGameSettings(
      * le reprendre. Sans effet avec une pendule : on ne reprend pas du temps.
      */
     val blunderAlertEnabled: Boolean = true,
+    /**
+     * Le livre d'ouvertures GÉNÉRAL, pour Stockfish et les personnages sans
+     * répertoire propre. Le répertoire d'un personnage, lui, ne se coupe pas :
+     * c'est son caractère.
+     */
+    val bookEnabled: Boolean = true,
+    val bookWidth: BookWidth = BookWidth.includeSidelines,
     /** Position de départ imposée, ou `null` pour la position initiale. */
     val startFen: String? = null,
 ) {

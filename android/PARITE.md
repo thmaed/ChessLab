@@ -59,10 +59,12 @@ vérification sur appareil, pas après compilation.
       la réponse du moteur. Lancées en parallèle, la réponse gagnait la course,
       « le moteur réfléchit » interdisait de reprendre, et l'alerte ne sortait
       jamais. iOS les met dans la même file pour cette raison-là.
-- [ ] **Répertoire d'ouvertures des personnages** : `opponent_books.json` est
-      déjà copié dans les assets Android — et personne ne le lit. Les
-      personnages jouent donc leurs ouvertures au réseau seul, sans le
-      répertoire qui fait leur caractère.
+- [x] **Répertoire d'ouvertures des personnages.** Le fichier était embarqué
+      depuis septembre et personne ne le lisait. Les huit répertoires sont
+      maintenant consultés, avec tirage PONDÉRÉ — ce qui distingue les
+      personnages n'est pas la liste des premiers coups (tous proposent e4, d4,
+      c4, Cf3) mais leurs poids. Le livre général est branché aussi, avec son
+      réglage.
 
 ### 3. Deux joueurs
 - [ ] **Écran de réglages** avant la partie (pendule, retournement).

@@ -272,6 +272,35 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(blunderWarning = verdict)
     }
 
+    /**
+     * Le coup de livre pour la position courante, en LAN, ou `null` s'il faut
+     * calculer : livre coupé, position de départ personnalisée (le livre part
+     * de la position initiale et n'aurait aucun sens ailleurs), ou position
+     * sortie de l'arbre connu.
+     */
+    private fun bookMove(): String? {
+        if (ui.settings.startFen != null) return null
+        val assets = getApplication<Application>().assets
+        val profile = ui.opponent
+        val roots: List<BookNode>
+        val width: BookWidth
+        val own = profile?.id?.let { OpeningBookStore.forOpponent(assets, it) }
+        if (profile != null && maia != null && own != null) {
+            roots = own
+            width = BookWidth.includeSidelines
+        } else {
+            if (!ui.settings.bookEnabled) return null
+            roots = OpeningBookStore.general(assets)
+            width = ui.settings.bookWidth
+        }
+        val san = OpeningBookPicker.pick(roots, moveLog.map { it.san }, width) ?: return null
+        // Le SAN vient d'un fichier : il peut ne pas être jouable ici (livre
+        // mal aligné, position atteinte par une autre voie). On le vérifie sur
+        // le plateau plutôt que de faire confiance au fichier.
+        val move = chesskit.SanParser.parse(san, board.position) ?: return null
+        return move.lan
+    }
+
     /** Score et mat éventuel d'une position, du point de vue du camp au trait. */
     private suspend fun quickScore(
         engine: com.chesslab.engine.StockfishEngine,
@@ -310,7 +339,13 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             val profile = ui.opponent
             ui = ui.copy(thinking = true, status = thinkingLabel(profile))
 
-            val lan = withContext(Dispatchers.IO) {
+            // LE LIVRE D'ABORD. Un personnage joue SON répertoire — c'est son
+            // caractère, pas un réglage —, sinon le livre général si
+            // l'utilisateur l'a laissé actif. Sans livre, un réseau entraîné
+            // sur des parties humaines rejoue les mêmes ouvertures, et le
+            // style qu'on prête au personnage ne se voit nulle part.
+            val fromBook = bookMove()
+            val lan = fromBook ?: withContext(Dispatchers.IO) {
                 val engine = maia
                 if (profile != null && engine != null) {
                     // le personnage tel qu'il joue MAINTENANT : sans évaluation
