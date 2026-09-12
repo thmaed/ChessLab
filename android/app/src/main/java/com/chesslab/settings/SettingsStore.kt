@@ -28,7 +28,22 @@ data class AppSettings(
      */
     val puzzleAttempts: Int = 1,
     val soundsEnabled: Boolean = true,
+    /** Le plateau vibre-t-il ? Coup, prise, échec, fin, coup refusé. */
+    val hapticsEnabled: Boolean = true,
+    /**
+     * La langue de la NOTATION des coups : « Cf3 » ou « Nf3 ».
+     *
+     * Française par défaut, comme iOS. Elle ne touche JAMAIS le PGN stocké ou
+     * exporté — le standard est en lettres anglaises, et un PGN français ne
+     * serait lu par personne.
+     */
+    val pieceNotation: PieceNotation = PieceNotation.french,
+    /** Les flèches du moteur en analyse — le réglage SURVIT à la fermeture. */
+    val analysisArrowMode: String = "best",
 )
+
+/** La langue dans laquelle un coup s'écrit. Pendant de `PieceNotation`. */
+enum class PieceNotation { french, english }
 
 private val Context.dataStore by preferencesDataStore("settings")
 
@@ -46,6 +61,9 @@ object SettingsStore {
     private val keyAutoFlip = booleanPreferencesKey("autoFlipTwoPlayer")
     private val keyAttempts = intPreferencesKey("puzzleAttempts")
     private val keySounds = booleanPreferencesKey("soundsEnabled")
+    private val keyHaptics = booleanPreferencesKey("hapticsEnabled")
+    private val keyNotation = stringPreferencesKey("pieceNotation")
+    private val keyArrowMode = stringPreferencesKey("analysisArrowMode")
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val _state = MutableStateFlow(AppSettings())
@@ -62,6 +80,10 @@ object SettingsStore {
                     autoFlipTwoPlayer = prefs[keyAutoFlip] ?: true,
                     puzzleAttempts = prefs[keyAttempts] ?: 1,
                     soundsEnabled = prefs[keySounds] ?: true,
+                    hapticsEnabled = prefs[keyHaptics] ?: true,
+                    pieceNotation = if (prefs[keyNotation] == "english") PieceNotation.english
+                    else PieceNotation.french,
+                    analysisArrowMode = prefs[keyArrowMode] ?: "best",
                 )
             }.collect { _state.value = it }
         }
@@ -78,4 +100,8 @@ object SettingsStore {
     fun setAutoFlip(context: Context, on: Boolean) = update(context) { it[keyAutoFlip] = on }
     fun setPuzzleAttempts(context: Context, n: Int) = update(context) { it[keyAttempts] = n }
     fun setSounds(context: Context, on: Boolean) = update(context) { it[keySounds] = on }
+    fun setHaptics(context: Context, on: Boolean) = update(context) { it[keyHaptics] = on }
+    fun setPieceNotation(context: Context, notation: PieceNotation) =
+        update(context) { it[keyNotation] = notation.name }
+    fun setArrowMode(context: Context, mode: String) = update(context) { it[keyArrowMode] = mode }
 }

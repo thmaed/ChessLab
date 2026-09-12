@@ -137,13 +137,11 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
         // le son suit le COUP, pas l'état : une prise reste une prise même
         // quand elle donne échec — c'est l'échec qui l'emporte
         SoundPlayer.enabled = SettingsStore.state.value.soundsEnabled
-        move.let {
-            SoundPlayer.forMove(
-                isCapture = it.result is Move.Result.Capture,
-                isCastle = it.result is Move.Result.Castle,
-                isCheck = state is Board.State.Check || state is Board.State.Checkmate,
-            )
-        }
+        val isCapture = move.result is Move.Result.Capture
+        val isCastle = move.result is Move.Result.Castle
+        val isCheck = state is Board.State.Check || state is Board.State.Checkmate
+        SoundPlayer.forMove(isCapture, isCastle, isCheck)
+        com.chesslab.sound.Haptics.forMove(isCapture, isCastle, isCheck)
 
         val over = state is Board.State.Checkmate || state is Board.State.Draw
         if (over && !ui.gameOver) {

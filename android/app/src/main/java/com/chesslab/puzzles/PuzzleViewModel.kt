@@ -179,6 +179,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
                     status = q(R.plurals.puzzle_wrong_tries, left, left),
                 )
             } else {
+                com.chesslab.sound.Haptics.illegal()
                 StatsStore.recordPuzzle(getApplication(), solvedIt = false)
                 ui.copy(
                     selected = null, legalTargets = emptySet(),
@@ -215,6 +216,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         show(move, s(R.string.puzzle_good))
 
         if (step >= puzzle.solution.size) {
+            com.chesslab.sound.Haptics.gameEnded()
             StatsStore.recordPuzzle(getApplication(), solvedIt = true)
             ui = ui.copy(
                 outcome = PuzzleOutcome.solved,

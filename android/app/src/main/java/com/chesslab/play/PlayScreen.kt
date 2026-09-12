@@ -429,7 +429,7 @@ private fun MoveListSheet(moves: List<String>, currentPly: Int, onClose: () -> U
                             pair.forEachIndexed { half, san ->
                                 val ply = index * 2 + half + 1
                                 Text(
-                                    FigurineSan.format(san), fontSize = 14.sp,
+                                    sanText(san), fontSize = 14.sp,
                                     fontWeight = if (ply == currentPly) FontWeight.Bold else FontWeight.Normal,
                                     color = if (ply == currentPly) Palette.accent else Palette.textPrimary,
                                     modifier = Modifier.weight(1f).testTag("coup-${ply - 1}"),

@@ -29,13 +29,18 @@ vérification sur appareil, pas après compilation.
 
 ## Ce qui manque — par ordre de traitement
 
-### 1. Réglages
-- [ ] **Retour haptique** (`hapticsEnabled`) : iOS vibre au coup, à la prise, à
-      l'échec. Android ne vibre jamais, et le réglage n'existe pas.
-- [ ] **Notation des pièces** (`pieceNotation`) : lettres ou figurines. Android
-      impose les figurines.
-- [ ] **Mode de flèches mémorisé** : Android le remet à « meilleur coup » à
-      chaque ouverture de l'analyse.
+### 1. Réglages — FAIT le 12/09
+- [x] **Retour haptique.** Le vocabulaire d'iOS — coup, prise, échec, fin de
+      partie, coup refusé — porté aux effets prédéfinis d'Android, qui sont
+      calibrés par le constructeur. Vérifié sur le Galaxy A16 :
+      `com.chesslab … played: Prebaked=TICK(MEDIUM)`, 39 ms, sur le coup joué.
+- [x] **Notation des coups.** Le réglage n'est PAS « figurines ou lettres »
+      comme je l'avais d'abord noté, mais **française ou anglaise** (Cf3 contre
+      Nf3) : iOS garde les figurines pour le seul lecteur d'ouvertures, et
+      applique la langue partout ailleurs. Android fait maintenant pareil.
+      Le piège est la conversion en UNE passe — « R → T » puis « K → R »
+      retraduirait les tours fraîchement écrites ; six tests le verrouillent.
+- [x] **Mode de flèches mémorisé.**
 
 ### 2. Jouer
 - [ ] **Alerte avant un coup risqué** (`blunderAlertEnabled`) : iOS prévient

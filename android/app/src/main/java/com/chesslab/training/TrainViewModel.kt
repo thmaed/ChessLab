@@ -258,6 +258,11 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
             isCastle = played.result is Move.Result.Castle,
             isCheck = checked != null,
         )
+        com.chesslab.sound.Haptics.forMove(
+            isCapture = played.result is Move.Result.Capture,
+            isCastle = played.result is Move.Result.Castle,
+            isCheck = checked != null,
+        )
         ui = ui.copy(
             position = board.position,
             lastMove = played.start to played.end,
@@ -328,6 +333,8 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
         val edge = cands.firstOrNull { it.uci == uci }
         when {
             edge == null -> {
+                // Le coup est refusé : le doigt le sent avant que l'œil ne lise.
+                com.chesslab.sound.Haptics.illegal()
                 record(FsrsRating.again)
                 wrongMain = main
                 ui = ui.copy(

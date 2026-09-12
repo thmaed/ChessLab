@@ -10,6 +10,9 @@ class ChessLabApp : Application() {
     override fun onCreate() {
         super.onCreate()
         SettingsStore.start(this)
+        // Trouver le vibreur coûte un peu : on le fait une fois, ici, pour que
+        // le premier coup ne soit pas plus lent que les suivants.
+        com.chesslab.sound.Haptics.prepare(this)
     }
 
     /**

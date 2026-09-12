@@ -346,15 +346,18 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         // quand elle donne échec — c'est l'échec qui l'emporte
         SoundPlayer.enabled = SettingsStore.state.value.soundsEnabled
         move?.let {
-            SoundPlayer.forMove(
-                isCapture = it.result is Move.Result.Capture,
-                isCastle = it.result is Move.Result.Castle,
-                isCheck = state is Board.State.Check || state is Board.State.Checkmate,
-            )
+            val isCapture = it.result is Move.Result.Capture
+            val isCastle = it.result is Move.Result.Castle
+            val isCheck = state is Board.State.Check || state is Board.State.Checkmate
+            SoundPlayer.forMove(isCapture, isCastle, isCheck)
+            // Le doigt sent ce que l'oreille entend, et l'un marche quand
+            // l'autre est coupé — en silence, ou dans un train.
+            com.chesslab.sound.Haptics.forMove(isCapture, isCastle, isCheck)
         }
 
         val over = state is Board.State.Checkmate || state is Board.State.Draw
         if (over && !ui.gameOver) {
+            com.chesslab.sound.Haptics.gameEnded()
             ticker?.cancel()
             viewModelScope.launch(Dispatchers.IO) {
                 LibraryDatabase.get(getApplication()).autosaves().clear(MODE)

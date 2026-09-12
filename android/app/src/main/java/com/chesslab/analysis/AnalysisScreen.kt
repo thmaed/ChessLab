@@ -34,7 +34,7 @@ import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.CardShape
 import com.chesslab.ui.ControlShape
-import com.chesslab.ui.FigurineSan
+import com.chesslab.ui.sanText
 import com.chesslab.ui.MoveStrip
 import com.chesslab.ui.Palette
 import com.chesslab.ui.QuickSwitchMenu
@@ -358,7 +358,7 @@ private fun CandidatesBar(ui: AnalysisUiState, onPlay: (Candidate) -> Unit) {
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Text(
-                    FigurineSan.format(candidate.san),
+                    sanText(candidate.san),
                     fontSize = 14.sp,
                     fontWeight = if (candidate.rank == 1) FontWeight.Bold else FontWeight.Medium,
                     color = Palette.textPrimary,
@@ -397,7 +397,7 @@ private fun CoachBar(ui: AnalysisUiState) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             QualityBadge(quality)
             Text(
-                FigurineSan.format(san),
+                sanText(san),
                 fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary,
             )
             Text(

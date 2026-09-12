@@ -26,7 +26,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Visibility
@@ -111,6 +113,66 @@ fun SettingsScreen() {
                     stringResource(R.string.settings_sounds_note),
                     fontSize = 10.sp, color = Palette.textTertiary,
                 )
+            }
+        }
+
+        }
+
+        SettingsSection(stringResource(R.string.settings_haptics), Icons.Default.Vibration) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .testTag("haptique")
+                .clip(RoundedCornerShape(8.dp))
+                .background(Palette.surface)
+                .clickable { SettingsStore.setHaptics(context, !settings.hapticsEnabled) }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Switch(
+                checked = settings.hapticsEnabled,
+                onCheckedChange = { SettingsStore.setHaptics(context, it) },
+            )
+            Spacer(Modifier.width(10.dp))
+            Column {
+                Text(stringResource(R.string.settings_board_haptics), fontSize = 13.sp, color = Palette.textPrimary)
+                Text(
+                    stringResource(R.string.settings_haptics_note),
+                    fontSize = 10.sp, color = Palette.textTertiary,
+                )
+            }
+        }
+
+        }
+
+        SettingsSection(stringResource(R.string.settings_notation), Icons.Default.Abc) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            // Le libellé porte son propre EXEMPLE : « Cf3 » explique mieux que
+            // n'importe quelle phrase ce que le réglage change.
+            listOf(
+                com.chesslab.settings.PieceNotation.french to "Cf3, Dxd5, O-O",
+                com.chesslab.settings.PieceNotation.english to "Nf3, Qxd5, O-O",
+            ).forEach { (notation, exemple) ->
+                val active = settings.pieceNotation == notation
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (active) Palette.accent.copy(alpha = 0.18f) else Palette.surface)
+                        .clickable { SettingsStore.setPieceNotation(context, notation) }
+                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                        .testTag("notation-${notation.name}"),
+                ) {
+                    Text(
+                        stringResource(
+                            if (notation == com.chesslab.settings.PieceNotation.french)
+                                R.string.settings_notation_french else R.string.settings_notation_english
+                        ),
+                        fontSize = 13.sp,
+                        color = if (active) Palette.accent else Palette.textPrimary,
+                    )
+                    Text(exemple, fontSize = 11.sp, color = Palette.textTertiary)
+                }
             }
         }
 

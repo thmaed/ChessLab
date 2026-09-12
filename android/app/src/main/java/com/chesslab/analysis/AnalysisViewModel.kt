@@ -19,6 +19,7 @@ import com.chesslab.R
 import com.chesslab.engine.EngineService
 import com.chesslab.library.GameRecord
 import com.chesslab.library.LibraryDatabase
+import com.chesslab.settings.SettingsStore
 import com.chesslab.puzzles.OwnPuzzle
 import com.chesslab.puzzles.PuzzleSolutionTrimmer
 import com.chesslab.ui.s
@@ -213,7 +214,14 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     /** Les évaluations de la revue, une par POSITION (il y en a une de plus que de coups). */
     private var reviewEvals: MutableMap<Int, PositionEval> = HashMap()
 
-    var ui by mutableStateOf(AnalysisUiState(status = s(R.string.analysis_paste)))
+    var ui by mutableStateOf(
+        AnalysisUiState(
+            status = s(R.string.analysis_paste),
+            arrowMode = ArrowMode.entries
+                .firstOrNull { it.name == SettingsStore.state.value.analysisArrowMode }
+                ?: ArrowMode.best,
+        )
+    )
         private set
 
     /** Les parties enregistrées, les plus récentes d'abord. */
@@ -231,8 +239,14 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(orientation = ui.orientation.opposite)
     }
 
+    /**
+     * Le choix de flèches SURVIT à la fermeture de l'écran : quelqu'un qui
+     * revoit ses parties sans vouloir être soufflé a coupé les flèches une
+     * fois, pas à chaque ouverture.
+     */
     fun setArrowMode(mode: ArrowMode) {
         ui = ui.copy(arrowMode = mode)
+        SettingsStore.setArrowMode(getApplication(), mode.name)
     }
 
     /** Le PGN de la partie chargée, pour l'export. Vide si rien n'est chargé. */
