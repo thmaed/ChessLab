@@ -11,6 +11,7 @@ import chesskit.Move
 import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
+import com.chesslab.library.LibraryDatabase
 import com.chesslab.settings.SettingsStore
 import com.chesslab.settings.StatsStore
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,17 @@ import com.chesslab.ui.q
 import com.chesslab.ui.s
 
 enum class PuzzleOutcome { solving, solved, failed }
+
+/**
+ * D'où viennent les puzzles proposés. Pendant de `PuzzleSource` sur iOS.
+ *
+ * « Mes parties » regroupe ceux que l'analyse a tirés de vos propres fautes :
+ * la position est déjà arrivée sur votre échiquier, et l'erreur est la vôtre.
+ */
+enum class PuzzleSource(val labelRes: Int) {
+    lichess(R.string.puzzle_source_lichess),
+    ownGames(R.string.puzzle_source_own),
+}
 
 data class PuzzleUiState(
     val position: Position = Position.standard,
@@ -44,6 +56,9 @@ data class PuzzleUiState(
     val allowedAttempts: Int = 1,
     /** Les deux cases du coup soufflé, quand l'utilisateur l'a demandé. */
     val hint: Pair<Square, Square>? = null,
+    val source: PuzzleSource = PuzzleSource.lichess,
+    /** Combien de puzzles maison existent — le sélecteur s'efface sans eux. */
+    val ownCount: Int = 0,
 )
 
 /**
@@ -63,19 +78,39 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     var ui by mutableStateOf(PuzzleUiState(status = s(R.string.puzzle_loading)))
         private set
 
-    init {
-        viewModelScope.launch {
-            val sampled = withContext(Dispatchers.IO) {
+    init { load(PuzzleSource.lichess) }
+
+    /**
+     * Change de source. L'écran repart à zéro : mélanger deux files ferait un
+     * compteur de score qui ne veut plus rien dire.
+     */
+    fun setSource(source: PuzzleSource) {
+        if (source == ui.source && !ui.loading) return
+        load(source)
+    }
+
+    private fun load(source: PuzzleSource) = viewModelScope.launch {
+        ui = ui.copy(loading = true, source = source, hint = null)
+        val dao = LibraryDatabase.get(getApplication()).ownPuzzles()
+        val own = withContext(Dispatchers.IO) { runCatching { dao.all() }.getOrDefault(emptyList()) }
+        queue = when (source) {
+            PuzzleSource.ownGames -> own.map { it.toPuzzle() }
+            PuzzleSource.lichess -> withContext(Dispatchers.IO) {
                 runCatching { PuzzleRepository.sample(getApplication<Application>().assets, count = 40) }
                     .getOrDefault(emptyList())
             }
-            queue = sampled
-            if (queue.isEmpty()) {
-                ui = ui.copy(loading = false, status = s(R.string.puzzle_library_unavailable))
-            } else {
-                ui = ui.copy(loading = false)
-                present(0)
-            }
+        }
+        ui = ui.copy(loading = false, ownCount = own.size)
+        if (queue.isEmpty()) {
+            ui = ui.copy(
+                puzzle = null,
+                status = s(
+                    if (source == PuzzleSource.ownGames) R.string.puzzle_no_own
+                    else R.string.puzzle_library_unavailable
+                ),
+            )
+        } else {
+            present(0)
         }
     }
 

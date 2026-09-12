@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.chesslab.R
+import androidx.compose.ui.text.font.FontWeight
 
 /** La ligne d'état sous le titre : ce que l'app a à dire, et si elle réfléchit. */
 @Composable
@@ -51,6 +52,14 @@ fun StatusRow(status: String, busy: Boolean = false) {
 fun MoveStrip(
     moves: List<String>,
     selected: Int? = null,
+    /**
+     * La catégorie de chaque coup, par index — le ruban n'en montre que les
+     * REMARQUABLES (voir `MoveQuality.showsInMoveList`). Un symbole sur chaque
+     * coup, alors que la moitié sont « meilleur » ou « bon », noierait
+     * précisément ce qu'on cherche en balayant la partie : les moments où elle
+     * a basculé.
+     */
+    qualities: Map<Int, com.chesslab.analysis.MoveQuality> = emptyMap(),
     onSelect: ((Int) -> Unit)? = null,
 ) {
     val scroll = rememberScrollState()
@@ -95,6 +104,15 @@ fun MoveStrip(
                 fontFamily = FontFamily.Monospace,
                 color = if (isSelected) Palette.accent else Palette.textPrimary,
             )
+            qualities[index]?.takeIf { it.showsInMoveList }?.let { quality ->
+                Text(
+                    quality.symbol ?: "",
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = quality.tint,
+                    modifier = Modifier.padding(end = 5.dp).testTag("qualite-$index"),
+                )
+            }
         }
     }
 }

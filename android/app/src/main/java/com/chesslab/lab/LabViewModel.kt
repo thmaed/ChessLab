@@ -58,6 +58,9 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
 
     private var board = Board()
     private val history = mutableListOf(Position.standard)
+
+    /** La position de départ de CHAQUE partie de la série. */
+    private var startPosition: Position = Position.standard
     private var maia: MaiaOpponent? = null
     private var loop: Job? = null
 
@@ -70,6 +73,17 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
                 MaiaOpponent.shared(getApplication(), EngineService.threads)
             }
         }
+    }
+
+    /**
+     * Impose la position de départ de la série. Sans effet en cours de
+     * série : changer le point de départ au milieu d'un bilan le fausserait.
+     */
+    fun startFrom(fen: String) {
+        val position = Position.fromFen(fen) ?: return
+        if (ui.running || position.fen == startPosition.fen) return
+        startPosition = position
+        reset()
     }
 
     fun setSideA(profile: OpponentProfile?) { ui = ui.copy(sideA = LabSide(profile, profile?.defaultLevel ?: 1500.0)) }
@@ -95,10 +109,10 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun newGame() {
-        board = Board()
+        board = Board(startPosition)
         history.clear()
-        history += Position.standard
-        ui = ui.copy(position = Position.standard, lastMove = null, sanMoves = emptyList())
+        history += startPosition
+        ui = ui.copy(position = startPosition, lastMove = null, sanMoves = emptyList())
     }
 
     private suspend fun runSeries() {

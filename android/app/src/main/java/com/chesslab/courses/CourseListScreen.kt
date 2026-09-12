@@ -39,6 +39,8 @@ import com.chesslab.R
 import com.chesslab.ui.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.chesslab.ui.QuickSwitchMenu
+import com.chesslab.ui.TopBarActions
 
 /**
  * La liste des cours — ouvertures ou finales selon [endgames].
@@ -51,9 +53,25 @@ import kotlinx.coroutines.withContext
 fun CourseListScreen(
     endgames: Boolean,
     onTrain: (kind: String) -> Unit = {},
+    /**
+     * Les bascules de la liste ne portent AUCUNE position : il n'y en a pas
+     * d'affichée. Elles ouvrent simplement le mode, comme les tuiles de
+     * l'accueil — c'est ce que fait iOS sur ses deux écrans de liste.
+     */
+    onPlayVsEngine: () -> Unit = {},
+    onOpenTwoPlayer: () -> Unit = {},
+    onOpenLab: () -> Unit = {},
     onOpen: (String) -> Unit,
 ) {
     val context = LocalContext.current
+
+    TopBarActions {
+        QuickSwitchMenu(
+            onPlayVsEngine = onPlayVsEngine,
+            onOpenTwoPlayer = onOpenTwoPlayer,
+            onOpenLab = onOpenLab,
+        )
+    }
     var entries by remember { mutableStateOf<List<CatalogEntry>?>(null) }
     var query by remember { mutableStateOf("") }
     var sideFilter by remember { mutableStateOf<String?>(null) }

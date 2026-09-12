@@ -1,0 +1,904 @@
+[
+ {
+  "eco": "A04",
+  "name": "Ouverture Réti",
+  "name_en": "Réti Opening",
+  "moves": [
+   "Nf3"
+  ]
+ },
+ {
+  "eco": "A05",
+  "name": "Ouverture Réti",
+  "name_en": "Réti Opening",
+  "moves": [
+   "Nf3",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "A07",
+  "name": "Attaque indienne du roi",
+  "name_en": "King's Indian Attack",
+  "moves": [
+   "Nf3",
+   "d5",
+   "g3"
+  ]
+ },
+ {
+  "eco": "A10",
+  "name": "Partie anglaise",
+  "name_en": "English Opening",
+  "moves": [
+   "c4"
+  ]
+ },
+ {
+  "eco": "A15",
+  "name": "Anglaise, anglo-indienne",
+  "name_en": "English, Anglo-Indian",
+  "moves": [
+   "c4",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "A20",
+  "name": "Anglaise, système symétrique",
+  "name_en": "English, Symmetrical",
+  "moves": [
+   "c4",
+   "e5"
+  ]
+ },
+ {
+  "eco": "A40",
+  "name": "Partie de pion dame",
+  "name_en": "Queen's Pawn Game",
+  "moves": [
+   "d4"
+  ]
+ },
+ {
+  "eco": "A45",
+  "name": "Attaque Trompowsky",
+  "name_en": "Trompowsky Attack",
+  "moves": [
+   "d4",
+   "Nf6",
+   "Bg5"
+  ]
+ },
+ {
+  "eco": "A56",
+  "name": "Défense Benoni",
+  "name_en": "Benoni Defence",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "c5"
+  ]
+ },
+ {
+  "eco": "A57",
+  "name": "Gambit Benko",
+  "name_en": "Benko Gambit",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "c5",
+   "d5",
+   "b5"
+  ]
+ },
+ {
+  "eco": "A80",
+  "name": "Défense hollandaise",
+  "name_en": "Dutch Defence",
+  "moves": [
+   "d4",
+   "f5"
+  ]
+ },
+ {
+  "eco": "B00",
+  "name": "Partie de pion roi",
+  "name_en": "King's Pawn Game",
+  "moves": [
+   "e4"
+  ]
+ },
+ {
+  "eco": "B01",
+  "name": "Défense scandinave",
+  "name_en": "Scandinavian Defence",
+  "moves": [
+   "e4",
+   "d5"
+  ]
+ },
+ {
+  "eco": "B02",
+  "name": "Défense Alekhine",
+  "name_en": "Alekhine Defence",
+  "moves": [
+   "e4",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "B06",
+  "name": "Défense moderne",
+  "name_en": "Modern Defence",
+  "moves": [
+   "e4",
+   "g6"
+  ]
+ },
+ {
+  "eco": "B07",
+  "name": "Défense Pirc",
+  "name_en": "Pirc Defence",
+  "moves": [
+   "e4",
+   "d6",
+   "d4",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "B10",
+  "name": "Défense Caro-Kann",
+  "name_en": "Caro-Kann Defence",
+  "moves": [
+   "e4",
+   "c6"
+  ]
+ },
+ {
+  "eco": "B12",
+  "name": "Caro-Kann, variante d'avance",
+  "name_en": "Caro-Kann, Advance",
+  "moves": [
+   "e4",
+   "c6",
+   "d4",
+   "d5",
+   "e5"
+  ]
+ },
+ {
+  "eco": "B13",
+  "name": "Caro-Kann, variante d'échange",
+  "name_en": "Caro-Kann, Exchange",
+  "moves": [
+   "e4",
+   "c6",
+   "d4",
+   "d5",
+   "exd5",
+   "cxd5"
+  ]
+ },
+ {
+  "eco": "B20",
+  "name": "Défense sicilienne",
+  "name_en": "Sicilian Defence",
+  "moves": [
+   "e4",
+   "c5"
+  ]
+ },
+ {
+  "eco": "B21",
+  "name": "Sicilienne, gambit Smith-Morra",
+  "name_en": "Sicilian, Smith-Morra Gambit",
+  "moves": [
+   "e4",
+   "c5",
+   "d4"
+  ]
+ },
+ {
+  "eco": "B22",
+  "name": "Sicilienne, variante Alapine",
+  "name_en": "Sicilian, Alapin",
+  "moves": [
+   "e4",
+   "c5",
+   "c3"
+  ]
+ },
+ {
+  "eco": "B23",
+  "name": "Sicilienne fermée",
+  "name_en": "Sicilian, Closed",
+  "moves": [
+   "e4",
+   "c5",
+   "Nc3"
+  ]
+ },
+ {
+  "eco": "B27",
+  "name": "Défense sicilienne",
+  "name_en": "Sicilian Defence",
+  "moves": [
+   "e4",
+   "c5",
+   "Nf3"
+  ]
+ },
+ {
+  "eco": "B30",
+  "name": "Sicilienne, vieille sicilienne",
+  "name_en": "Sicilian, Old Sicilian",
+  "moves": [
+   "e4",
+   "c5",
+   "Nf3",
+   "Nc6"
+  ]
+ },
+ {
+  "eco": "B32",
+  "name": "Sicilienne, Lasker-Pelikan",
+  "name_en": "Sicilian, Lasker-Pelikan",
+  "moves": [
+   "e4",
+   "c5",
+   "Nf3",
+   "Nc6",
+   "d4",
+   "cxd4",
+   "Nxd4",
+   "Nf6",
+   "Nc3",
+   "e5"
+  ]
+ },
+ {
+  "eco": "B33",
+  "name": "Sicilienne, variante Sveshnikov",
+  "name_en": "Sicilian, Sveshnikov",
+  "moves": [
+   "e4",
+   "c5",
+   "Nf3",
+   "Nc6",
+   "d4",
+   "cxd4",
+   "Nxd4",
+   "Nf6",
+   "Nc3",
+   "e5",
+   "Ndb5",
+   "d6"
+  ]
+ },
+ {
+  "eco": "B40",
+  "name": "Défense sicilienne",
+  "name_en": "Sicilian Defence",
+  "moves": [
+   "e4",
+   "c5",
+   "Nf3",
+   "e6"
+  ]
+ },
+ {
+  "eco": "B50",
+  "name": "Défense sicilienne",
+  "name_en": "Sicilian Defence",
+  "moves": [
+   "e4",
+   "c5",
+   "Nf3",
+   "d6"
+  ]
+ },
+ {
+  "eco": "B70",
+  "name": "Sicilienne, variante Dragon",
+  "name_en": "Sicilian, Dragon",
+  "moves": [
+   "e4",
+   "c5",
+   "Nf3",
+   "d6",
+   "d4",
+   "cxd4",
+   "Nxd4",
+   "Nf6",
+   "Nc3",
+   "g6"
+  ]
+ },
+ {
+  "eco": "B90",
+  "name": "Sicilienne, variante Najdorf",
+  "name_en": "Sicilian, Najdorf",
+  "moves": [
+   "e4",
+   "c5",
+   "Nf3",
+   "d6",
+   "d4",
+   "cxd4",
+   "Nxd4",
+   "Nf6",
+   "Nc3",
+   "a6"
+  ]
+ },
+ {
+  "eco": "C00",
+  "name": "Défense française",
+  "name_en": "French Defence",
+  "moves": [
+   "e4",
+   "e6"
+  ]
+ },
+ {
+  "eco": "C01",
+  "name": "Française, variante d'échange",
+  "name_en": "French, Exchange",
+  "moves": [
+   "e4",
+   "e6",
+   "d4",
+   "d5",
+   "exd5"
+  ]
+ },
+ {
+  "eco": "C02",
+  "name": "Française, variante d'avance",
+  "name_en": "French, Advance",
+  "moves": [
+   "e4",
+   "e6",
+   "d4",
+   "d5",
+   "e5"
+  ]
+ },
+ {
+  "eco": "C10",
+  "name": "Française, variante Rubinstein",
+  "name_en": "French, Rubinstein",
+  "moves": [
+   "e4",
+   "e6",
+   "d4",
+   "d5",
+   "Nc3",
+   "dxe4"
+  ]
+ },
+ {
+  "eco": "C11",
+  "name": "Française, variante classique",
+  "name_en": "French, Classical",
+  "moves": [
+   "e4",
+   "e6",
+   "d4",
+   "d5",
+   "Nc3",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "C15",
+  "name": "Française, variante Winawer",
+  "name_en": "French, Winawer",
+  "moves": [
+   "e4",
+   "e6",
+   "d4",
+   "d5",
+   "Nc3",
+   "Bb4"
+  ]
+ },
+ {
+  "eco": "C20",
+  "name": "Partie de pion roi",
+  "name_en": "King's Pawn Game",
+  "moves": [
+   "e4",
+   "e5"
+  ]
+ },
+ {
+  "eco": "C23",
+  "name": "Ouverture du fou",
+  "name_en": "Bishop's Opening",
+  "moves": [
+   "e4",
+   "e5",
+   "Bc4"
+  ]
+ },
+ {
+  "eco": "C25",
+  "name": "Partie viennoise",
+  "name_en": "Vienna Game",
+  "moves": [
+   "e4",
+   "e5",
+   "Nc3"
+  ]
+ },
+ {
+  "eco": "C30",
+  "name": "Gambit du roi",
+  "name_en": "King's Gambit",
+  "moves": [
+   "e4",
+   "e5",
+   "f4"
+  ]
+ },
+ {
+  "eco": "C41",
+  "name": "Défense Philidor",
+  "name_en": "Philidor Defence",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "d6"
+  ]
+ },
+ {
+  "eco": "C42",
+  "name": "Défense Petrov",
+  "name_en": "Petrov Defence",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "C44",
+  "name": "Partie écossaise",
+  "name_en": "Scotch Game",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "d4"
+  ]
+ },
+ {
+  "eco": "C45",
+  "name": "Écossaise, variante principale",
+  "name_en": "Scotch, Main Line",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "d4",
+   "exd4",
+   "Nxd4"
+  ]
+ },
+ {
+  "eco": "C46",
+  "name": "Partie des trois cavaliers",
+  "name_en": "Three Knights Game",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Nc3"
+  ]
+ },
+ {
+  "eco": "C47",
+  "name": "Partie des quatre cavaliers",
+  "name_en": "Four Knights Game",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Nc3",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "C50",
+  "name": "Partie italienne",
+  "name_en": "Italian Game",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bc4"
+  ]
+ },
+ {
+  "eco": "C53",
+  "name": "Italienne, Giuoco Piano",
+  "name_en": "Italian, Giuoco Piano",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bc4",
+   "Bc5"
+  ]
+ },
+ {
+  "eco": "C57",
+  "name": "Italienne, défense des deux cavaliers",
+  "name_en": "Italian, Two Knights Defence",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bc4",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "C60",
+  "name": "Partie espagnole (Ruy Lopez)",
+  "name_en": "Ruy Lopez",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bb5"
+  ]
+ },
+ {
+  "eco": "C65",
+  "name": "Espagnole, défense berlinoise",
+  "name_en": "Ruy Lopez, Berlin Defence",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bb5",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "C68",
+  "name": "Espagnole, variante d'échange",
+  "name_en": "Ruy Lopez, Exchange",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bb5",
+   "a6",
+   "Bxc6"
+  ]
+ },
+ {
+  "eco": "C70",
+  "name": "Partie espagnole",
+  "name_en": "Ruy Lopez",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bb5",
+   "a6"
+  ]
+ },
+ {
+  "eco": "C77",
+  "name": "Espagnole, défense Morphy",
+  "name_en": "Ruy Lopez, Morphy Defence",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bb5",
+   "a6",
+   "Ba4",
+   "Nf6"
+  ]
+ },
+ {
+  "eco": "C84",
+  "name": "Espagnole, variante fermée",
+  "name_en": "Ruy Lopez, Closed",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bb5",
+   "a6",
+   "Ba4",
+   "Nf6",
+   "O-O",
+   "Be7"
+  ]
+ },
+ {
+  "eco": "C88",
+  "name": "Espagnole, variante fermée",
+  "name_en": "Ruy Lopez, Closed",
+  "moves": [
+   "e4",
+   "e5",
+   "Nf3",
+   "Nc6",
+   "Bb5",
+   "a6",
+   "Ba4",
+   "Nf6",
+   "O-O",
+   "Be7",
+   "Re1",
+   "b5"
+  ]
+ },
+ {
+  "eco": "D00",
+  "name": "Partie de pion dame",
+  "name_en": "Queen's Pawn Game",
+  "moves": [
+   "d4",
+   "d5"
+  ]
+ },
+ {
+  "eco": "D02",
+  "name": "Système Londres",
+  "name_en": "London System",
+  "moves": [
+   "d4",
+   "d5",
+   "Nf3"
+  ]
+ },
+ {
+  "eco": "D06",
+  "name": "Gambit dame",
+  "name_en": "Queen's Gambit",
+  "moves": [
+   "d4",
+   "d5",
+   "c4"
+  ]
+ },
+ {
+  "eco": "D07",
+  "name": "Gambit dame refusé, défense Chigorine",
+  "name_en": "Queen's Gambit Declined, Chigorin Defence",
+  "moves": [
+   "d4",
+   "d5",
+   "c4",
+   "Nc6"
+  ]
+ },
+ {
+  "eco": "D10",
+  "name": "Défense slave",
+  "name_en": "Slav Defence",
+  "moves": [
+   "d4",
+   "d5",
+   "c4",
+   "c6"
+  ]
+ },
+ {
+  "eco": "D20",
+  "name": "Gambit dame accepté",
+  "name_en": "Queen's Gambit Accepted",
+  "moves": [
+   "d4",
+   "d5",
+   "c4",
+   "dxc4"
+  ]
+ },
+ {
+  "eco": "D30",
+  "name": "Gambit dame refusé",
+  "name_en": "Queen's Gambit Declined",
+  "moves": [
+   "d4",
+   "d5",
+   "c4",
+   "e6"
+  ]
+ },
+ {
+  "eco": "D35",
+  "name": "Gambit dame refusé, variante d'échange",
+  "name_en": "Queen's Gambit Declined, Exchange",
+  "moves": [
+   "d4",
+   "d5",
+   "c4",
+   "e6",
+   "Nc3",
+   "Nf6",
+   "cxd5",
+   "exd5"
+  ]
+ },
+ {
+  "eco": "D37",
+  "name": "Gambit dame refusé",
+  "name_en": "Queen's Gambit Declined",
+  "moves": [
+   "d4",
+   "d5",
+   "c4",
+   "e6",
+   "Nc3",
+   "Nf6",
+   "Nf3",
+   "Be7"
+  ]
+ },
+ {
+  "eco": "D43",
+  "name": "Semi-slave",
+  "name_en": "Semi-Slav",
+  "moves": [
+   "d4",
+   "d5",
+   "c4",
+   "c6",
+   "Nc3",
+   "Nf6",
+   "Nf3",
+   "e6"
+  ]
+ },
+ {
+  "eco": "D80",
+  "name": "Défense Grünfeld",
+  "name_en": "Grünfeld Defence",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "g6",
+   "Nc3",
+   "d5"
+  ]
+ },
+ {
+  "eco": "D85",
+  "name": "Grünfeld, variante d'échange",
+  "name_en": "Grünfeld, Exchange",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "g6",
+   "Nc3",
+   "d5",
+   "cxd5",
+   "Nxd5",
+   "e4",
+   "Nxc3",
+   "bxc3"
+  ]
+ },
+ {
+  "eco": "E00",
+  "name": "Néo-indienne",
+  "name_en": "Neo-Indian",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "e6"
+  ]
+ },
+ {
+  "eco": "E01",
+  "name": "Ouverture catalane",
+  "name_en": "Catalan Opening",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "e6",
+   "g3"
+  ]
+ },
+ {
+  "eco": "E12",
+  "name": "Défense indienne de la dame",
+  "name_en": "Queen's Indian Defence",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "e6",
+   "Nf3",
+   "b6"
+  ]
+ },
+ {
+  "eco": "E20",
+  "name": "Défense Nimzo-indienne",
+  "name_en": "Nimzo-Indian Defence",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "e6",
+   "Nc3",
+   "Bb4"
+  ]
+ },
+ {
+  "eco": "E60",
+  "name": "Défense est-indienne",
+  "name_en": "King's Indian Defence",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "g6"
+  ]
+ },
+ {
+  "eco": "E70",
+  "name": "Est-indienne",
+  "name_en": "King's Indian",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "g6",
+   "Nc3",
+   "Bg7",
+   "e4",
+   "d6"
+  ]
+ },
+ {
+  "eco": "E90",
+  "name": "Est-indienne, variante classique",
+  "name_en": "King's Indian, Classical",
+  "moves": [
+   "d4",
+   "Nf6",
+   "c4",
+   "g6",
+   "Nc3",
+   "Bg7",
+   "e4",
+   "d6",
+   "Nf3",
+   "O-O"
+  ]
+ }
+]

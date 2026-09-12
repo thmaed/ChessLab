@@ -36,6 +36,8 @@ import com.chesslab.R
 import com.chesslab.ui.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import com.chesslab.ui.QuickSwitchMenu
+import com.chesslab.ui.TopBarActions
 
 /**
  * La lecture d'un cours. Pendant d'`OpeningReaderView`.
@@ -46,7 +48,13 @@ import kotlinx.coroutines.withContext
  * mènent.
  */
 @Composable
-fun CourseScreen(courseId: String, onTrain: (id: String, name: String) -> Unit = { _, _ -> }) {
+fun CourseScreen(
+    courseId: String,
+    onPlayVsEngine: (String) -> Unit = {},
+    onOpenTwoPlayer: (String) -> Unit = {},
+    onOpenLab: (String) -> Unit = {},
+    onTrain: (id: String, name: String) -> Unit = { _, _ -> },
+) {
     val context = LocalContext.current
     var course by remember(courseId) { mutableStateOf<Course?>(null) }
     /** Le chemin parcouru : une clé FEN et le coup qui y a mené. */
@@ -68,6 +76,14 @@ fun CourseScreen(courseId: String, onTrain: (id: String, name: String) -> Unit =
     val rootKey = CourseRepository.fenKey(loaded.rootFEN)
     val currentKey = path.lastOrNull()?.second?.let { CourseRepository.fenKey(it.toFEN) } ?: rootKey
     val position = remember(currentKey) { FenParser.parse("$currentKey 0 1") ?: Position.standard }
+
+    TopBarActions {
+        QuickSwitchMenu(
+            onPlayVsEngine = { onPlayVsEngine(position.fen) },
+            onOpenTwoPlayer = { onOpenTwoPlayer(position.fen) },
+            onOpenLab = { onOpenLab(position.fen) },
+        )
+    }
     val incoming = path.lastOrNull()?.second
     val options = loaded.positions[currentKey].orEmpty()
         .sortedWith(compareByDescending<CourseMove> { it.isMainLine }.thenByDescending { it.popularity ?: 0.0 })

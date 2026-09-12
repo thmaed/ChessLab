@@ -13,7 +13,9 @@ import org.junit.runner.RunWith
 import java.io.File
 
 /**
- * La migration v3 → v4 : celle qui donne au journal des identifiants stables.
+ * Les migrations : v3 → v4 (identifiants stables du journal) et v4 → v5 (les
+ * puzzles tirés de vos propres parties). Une base déjà remplie doit traverser
+ * les deux sans rien perdre — une progression FSRS ne se reconstruit pas.
  *
  * Ce test existe pour une raison précise. La base garde un filet destructeur
  * pour qu'une base corrompue n'empêche pas l'app de démarrer — mais ce filet
@@ -93,7 +95,7 @@ class MigrationTest {
         seedVersion3()
 
         val db = Room.databaseBuilder(context, LibraryDatabase::class.java, name)
-            .addMigrations(LibraryDatabase.MIGRATION_3_4)
+            .addMigrations(LibraryDatabase.MIGRATION_3_4, LibraryDatabase.MIGRATION_4_5)
             .build()
         try {
             // Rien n'a disparu.
@@ -112,6 +114,19 @@ class MigrationTest {
             assertTrue("les identifiants doivent être remplis", logs.all { it.uid.isNotBlank() })
             assertEquals("et distincts", 2, logs.map { it.uid }.toSet().size)
             assertTrue("les parties aussi", db.games().allOnce().all { it.uid.isNotBlank() })
+
+            // La table v5 existe et s'écrit : sans elle, « créer des puzzles
+            // depuis les erreurs » planterait sur une base migrée depuis v3.
+            assertEquals(0, db.ownPuzzles().count())
+            db.ownPuzzles().insert(
+                com.chesslab.puzzles.OwnPuzzle(
+                    uid = "p1", fen = "6k1/8/8/3R4/8/4n3/6PP/6K1 b - - 0 1",
+                    playedSan = "Rd5", solution = "e3d5", theme = "hangingPiece",
+                    rating = 0, createdAt = 1_700_000_000_000L, sourcePgn = "1. e4 e5",
+                )
+            )
+            assertEquals(1, db.ownPuzzles().count())
+            assertEquals(1, db.ownPuzzles().countFor("6k1/8/8/3R4/8/4n3/6PP/6K1 b - - 0 1"))
         } finally {
             db.close()
             context.deleteDatabase(name)

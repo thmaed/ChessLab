@@ -77,6 +77,12 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     /** Le camp de l'utilisateur : il change d'une partie à l'autre. */
     private var humanColor = Piece.Color.white
 
+    /**
+     * La position d'où la partie part. Standard, sauf quand « Changer de
+     * mode » a envoyé ici la position d'un autre écran.
+     */
+    private var startPosition: Position = Position.standard
+
     /** L'historique des positions : Maia lit les huit dernières. */
     private val history = mutableListOf(Position.standard)
 
@@ -119,6 +125,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      * ne changent plus en cours de route.
      */
     fun start(settings: PlayGameSettings) {
+        startPosition = settings.startFen?.let { Position.fromFen(it) } ?: Position.standard
         val color = when (settings.colorChoice) {
             PlayerColorChoice.white -> Piece.Color.white
             PlayerColorChoice.black -> Piece.Color.black
@@ -390,22 +397,25 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         // vivre, c'est risquer de la voir jouer sur le plateau neuf.
         thinkingJob?.cancel()
         ticker?.cancel()
-        board = Board()
+        board = Board(startPosition)
         history.clear()
-        history += Position.standard
-        recorder.reset()
+        history += startPosition
+        // La FEN n'est transmise que si elle n'est PAS la position standard :
+        // un PGN ordinaire ne porte pas de tag `SetUp`.
+        val custom = startPosition.fen.takeIf { it != Position.standard.fen }
+        recorder.reset(startPosition, custom)
         uciLog.clear()
         moveLog.clear()
         clock = ui.settings.timeControl.takeIf { it.hasClock }?.let { GameClock(it) }
         ui = ui.copy(
-            position = Position.standard,
+            position = startPosition,
             selected = null, legalTargets = emptySet(), lastMove = null, checkedKing = null,
             hint = null, sanMoves = emptyList(), gameOver = false, outcome = null,
             pendingPromotion = null, thinking = false, displayedPly = 0,
             captured = CapturedMaterial(),
             whiteClockMs = clock?.remaining(Piece.Color.white),
             blackClockMs = clock?.remaining(Piece.Color.black),
-            status = if (humanColor == Piece.Color.white) s(R.string.your_turn) else thinkingLabel(ui.opponent),
+            status = if (board.position.sideToMove == humanColor) s(R.string.your_turn) else thinkingLabel(ui.opponent),
         )
         startClockForSideToMove()
         // L'utilisateur peut avoir les Noirs : c'est alors au moteur d'ouvrir.
@@ -506,6 +516,12 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Remonte d'un demi-coup dans la partie jouée. */
+    /**
+     * Le PGN de la partie en cours, pour « Analyser » : la bibliothèque ne
+     * l'a pas encore quand la partie vient tout juste de se terminer.
+     */
+    fun currentPgn(): String = recorder.pgn
+
     fun reviewPrevious() = review(ui.displayedPly - 1)
 
     fun reviewNext() = review(ui.displayedPly + 1)

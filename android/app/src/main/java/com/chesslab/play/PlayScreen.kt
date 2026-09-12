@@ -31,6 +31,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import chesskit.Piece
 import com.chesslab.R
 import com.chesslab.ui.*
+import com.chesslab.ui.QuickSwitchMenu
+import com.chesslab.ui.TopBarActions
 
 /**
  * L'écran de jeu. Pendant de `PlayView` (disposition iPhone).
@@ -46,19 +48,48 @@ import com.chesslab.ui.*
 fun PlayScreen(
     settings: PlayGameSettings? = null,
     resume: Boolean = false,
+    /** La position envoyée par un autre mode : on joue À PARTIR D'ICI. */
+    startFen: String? = null,
+    onOpenTwoPlayer: (String) -> Unit = {},
+    onAnalyze: (String) -> Unit = {},
+    onAnalyzeGame: (String) -> Unit = {},
+    onOpenLab: (String) -> Unit = {},
     model: PlayViewModel = viewModel(),
 ) {
     val ui = model.ui
     var showMoves by remember { mutableStateOf(false) }
     var confirmResign by remember { mutableStateOf(false) }
 
-    LaunchedEffect(settings, resume) {
-        if (resume) model.resumeSaved() else if (settings != null) model.start(settings)
+    LaunchedEffect(settings, resume, startFen) {
+        when {
+            resume -> model.resumeSaved()
+            settings != null -> model.start(settings)
+            // « Jouer à partir d'ici » : on reprend les DERNIERS réglages —
+            // adversaire, niveau, cadence — et on n'impose que la position et
+            // la couleur, celle du camp au trait. C'est ce que fait iOS.
+            startFen != null -> model.start(
+                model.ui.settings.copy(
+                    startFen = startFen,
+                    colorChoice = if (chesskit.Position.fromFen(startFen)?.sideToMove == Piece.Color.black)
+                        PlayerColorChoice.black else PlayerColorChoice.white,
+                )
+            )
+        }
+    }
+
+    // La position AFFICHÉE, et non celle du plateau : en consultation d'un
+    // coup passé, c'est celle-là qu'on emporte ailleurs.
+    TopBarActions {
+        QuickSwitchMenu(
+            onOpenTwoPlayer = { onOpenTwoPlayer(model.ui.position.fen) },
+            onAnalyze = { onAnalyze(model.ui.position.fen) },
+            onOpenLab = { onOpenLab(model.ui.position.fen) },
+        )
     }
 
     // Le temps que le moteur se prépare, l'écran attend plutôt que de montrer
     // un plateau sur lequel on ne peut rien faire.
-    if (!ui.started && !resume) {
+    if (!ui.started && !resume && startFen == null) {
         Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator(color = Palette.accent) }
         return
     }
@@ -110,7 +141,11 @@ fun PlayScreen(
         )
 
         Spacer(Modifier.height(8.dp))
-        if (ui.gameOver) GameOverPanel(gutter, ui.outcome ?: ui.status) { model.newGame() }
+        if (ui.gameOver) GameOverPanel(
+            gutter, ui.outcome ?: ui.status,
+            onAnalyze = { onAnalyzeGame(model.currentPgn()) },
+            onNewGame = { model.newGame() },
+        )
         else ControlBar(
             modifier = gutter,
             ui = ui,
@@ -327,7 +362,12 @@ private fun ControlButton(
 
 /** Le panneau de fin : le mot de la fin, et de quoi recommencer. */
 @Composable
-private fun GameOverPanel(modifier: Modifier, message: String, onNewGame: () -> Unit) {
+private fun GameOverPanel(
+    modifier: Modifier,
+    message: String,
+    onAnalyze: () -> Unit,
+    onNewGame: () -> Unit,
+) {
     Row(
         modifier
             .fillMaxWidth()
@@ -341,6 +381,19 @@ private fun GameOverPanel(modifier: Modifier, message: String, onNewGame: () -> 
         Text(message, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
             color = Palette.textPrimary, modifier = Modifier.weight(1f))
         Spacer(Modifier.width(12.dp))
+        // « Analyser » mène la partie qu'on vient de jouer vers son bilan :
+        // c'est le moment où on veut savoir ce qui s'est passé.
+        Text(
+            stringResource(R.string.route_analysis),
+            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.teal,
+            modifier = Modifier
+                .clip(CircleShape)
+                .border(1.dp, Palette.teal.copy(alpha = 0.5f), CircleShape)
+                .clickable(onClick = onAnalyze)
+                .padding(horizontal = 14.dp, vertical = 8.dp)
+                .testTag("analyser-la-partie"),
+        )
+        Spacer(Modifier.width(8.dp))
         Text(
             stringResource(R.string.new_game),
             fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.background,

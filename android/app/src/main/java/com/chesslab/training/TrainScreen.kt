@@ -26,6 +26,8 @@ import com.chesslab.ui.Palette
 import androidx.compose.ui.res.stringResource
 import com.chesslab.R
 import androidx.compose.ui.res.pluralStringResource
+import com.chesslab.ui.QuickSwitchMenu
+import com.chesslab.ui.TopBarActions
 
 /**
  * L'entraînement : un échiquier continu, l'utilisateur joue SON camp, le
@@ -36,9 +38,23 @@ import androidx.compose.ui.res.pluralStringResource
  * réviser et si le coup était juste — le reste est de la plomberie.
  */
 @Composable
-fun TrainScreen(mode: TrainMode, model: TrainViewModel = viewModel()) {
+fun TrainScreen(
+    mode: TrainMode,
+    onPlayVsEngine: (String) -> Unit = {},
+    onOpenTwoPlayer: (String) -> Unit = {},
+    onOpenLab: (String) -> Unit = {},
+    model: TrainViewModel = viewModel(),
+) {
     val ui = model.ui
     LaunchedEffect(mode) { model.start(mode) }
+
+    TopBarActions {
+        QuickSwitchMenu(
+            onPlayVsEngine = { onPlayVsEngine(model.ui.position.fen) },
+            onOpenTwoPlayer = { onOpenTwoPlayer(model.ui.position.fen) },
+            onOpenLab = { onOpenLab(model.ui.position.fen) },
+        )
+    }
 
     if (ui.loading) {
         Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator(color = Palette.accent) }

@@ -71,7 +71,7 @@ data class Mode(
 private val modes = listOf(
     Mode(Route.NewGame, "play", R.string.route_play, R.string.home_play_short,
         R.string.home_play_long, R.string.home_play_sub, Icons.Default.Memory, Palette.accent),
-    Mode(Route.TwoPlayer, "two", R.string.route_two_players, R.string.home_two_short,
+    Mode(Route.TwoPlayer(), "two", R.string.route_two_players, R.string.home_two_short,
         R.string.home_two_long, R.string.home_two_sub, Icons.Default.People, Palette.info),
     Mode(Route.Puzzles, "puzzles", R.string.route_puzzles, R.string.route_puzzles,
         R.string.home_puzzles_long, R.string.home_puzzles_sub, Icons.Default.Extension, Palette.violet),
@@ -81,7 +81,7 @@ private val modes = listOf(
         R.string.home_endgames_long, R.string.home_endgames_sub, Icons.Default.EmojiEvents, Palette.gold),
     Mode(Route.Analysis, "analysis", R.string.route_analysis, R.string.route_analysis,
         R.string.home_analysis_long, R.string.home_analysis_sub, Icons.Default.ShowChart, Palette.teal),
-    Mode(Route.Laboratory, "lab", R.string.route_lab, R.string.route_lab,
+    Mode(Route.Laboratory(), "lab", R.string.route_lab, R.string.route_lab,
         R.string.home_lab_long, R.string.home_lab_sub, Icons.Default.Science, Palette.rose),
     Mode(Route.Variants, "variants", R.string.route_variants, R.string.route_variants,
         R.string.home_variants_long, R.string.home_variants_sub, Icons.Default.Casino, Palette.violet),

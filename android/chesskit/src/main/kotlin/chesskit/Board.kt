@@ -13,7 +13,21 @@ package chesskit
  */
 class Board(position: Position = Position.standard) {
 
-    var position: Position = position
+    /**
+     * La position COPIÉE, jamais celle de l'appelant.
+     *
+     * L'original Swift est une `struct` : `Board(position:)` en reçoit
+     * gratuitement une copie, et jouer sur le plateau ne touche pas la position
+     * de celui qui l'a passée. En Kotlin, [Position] est une classe : sans
+     * cette copie, `Board(p).move(...)` RÉÉCRIT `p` chez l'appelant.
+     *
+     * Ce n'est pas une précaution abstraite. L'analyse en a été victime : le
+     * détecteur de motifs rejoue la réfutation du moteur sur la position d'après
+     * un coup fautif, et écrasait au passage la liste des positions de la
+     * partie. Des coups suivants étaient alors classés sur des positions qui
+     * n'étaient pas les leurs — un mat noté « excellent ».
+     */
+    var position: Position = position.copy()
         private set
 
     var state: State = State.Active
@@ -32,7 +46,8 @@ class Board(position: Position = Position.standard) {
 
     fun update(position: Position, resetPositionCounts: Boolean = false) {
         if (resetPositionCounts) positionCounts.clear()
-        this.position = position
+        // Copie, pour la même raison que dans le constructeur.
+        this.position = position.copy()
         updateState()
     }
 
@@ -119,7 +134,18 @@ class Board(position: Position = Position.standard) {
     }
 
     private fun updateState(move: Move? = null) {
-        val moveColor = move?.piece?.color ?: position.sideToMove
+        // Le camp qui VIENT DE JOUER : c'est de son point de vue que [checkState]
+        // regarde, puisqu'un échec frappe toujours l'adversaire du dernier coup.
+        //
+        // Sans coup — plateau construit depuis une position, ou `update()` —
+        // c'est donc l'OPPOSÉ du camp au trait. ChessKit (Swift comme ici, le
+        // port est fidèle) prenait le camp au trait lui-même : un plateau
+        // construit sur une position de mat se déclarait « active », et pouvait
+        // même annoncer un échec sur le camp qui venait de mater. Visible dans
+        // l'analyse : le roi maté n'était pas surligné, et le coup de mat était
+        // classé sur une évaluation absente. Corrigé dans le port, à signaler en
+        // amont.
+        val moveColor = move?.piece?.color ?: position.sideToMove.opposite
 
         if (move != null) {
             if (move.piece.kind == Piece.Kind.pawn) {

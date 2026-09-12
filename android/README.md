@@ -36,6 +36,14 @@ Deux conséquences à connaître avant de toucher au code :
 - **Les neuf personnages ont des illustrations**, recopiées des assets iOS par
   `tools/android-assets/copy_images.py`. Leur teinte est celle de l'avatar, pas
   une couleur de la palette.
+- **« Changer de mode » est le lien transversal de l'app**, comme
+  `QuickSwitchMenu.swift` : un bouton dans la barre du haut, qui emporte la
+  POSITION AFFICHÉE vers un autre grand mode. Il est sur Jouer, Deux joueurs,
+  Analyser, Puzzles, Entraîner, les lecteurs de cours, les listes d'ouvertures
+  et de finales, et les variantes (analyse seule — les autres modes jouent aux
+  règles orthodoxes). Les écrans ne peuvent pas écrire dans la barre du haut,
+  qui est composée au-dessus d'eux : ils s'y inscrivent par `TopBarActions` et
+  s'en retirent en partant.
 
 ## Ce qui marche
 
@@ -46,7 +54,11 @@ Deux conséquences à connaître avant de toucher au code :
 | Puzzles | les 106 094 puzzles Lichess, lus en flux |
 | Ouvertures | 58 cours, chapitres, commentaires, statistiques |
 | Finales | 78 cours, même lecteur |
-| Analyser | PGN et FEN, navigation, évaluation du moteur, bibliothèque |
+| Analyser | PGN et FEN, ouverture nommée (ECO), flèches du moteur, coups candidats |
+| Revue de partie | chaque coup classé, précision par joueur, courbe d'évaluation |
+| Bandeau coach | « e5 — Erreur, −12 % », et CE QUI punit le coup, en une phrase |
+| Puzzles maison | tirés de vos propres fautes, à côté des puzzles Lichess |
+| Changer de mode | la position affichée s'emporte vers un autre mode, depuis huit écrans |
 | Laboratoire | l'ordinateur contre lui-même, en série |
 | Variantes | Chess960, Roi de la colline, Trois échecs, Horde, Course des rois, Atomique, Antichecs |
 | Pendule | bullet, blitz, rapide, classique, avec incrément |
@@ -58,6 +70,67 @@ Deux conséquences à connaître avant de toucher au code :
 | Bibliothèque | les parties terminées, enregistrées et rejouables |
 | Entraîner | répétition espacée FSRS-5 : séance du jour, positions à consolider, une ligne |
 
+## L'analyse d'une partie
+
+Tout le barème vient d'iOS, à la constante près — et les fonctions qui le
+portent sont PURES, donc vérifiées sur la JVM sans émulateur
+(`ClassificationTest`, `TrimmerTest`, `ThreatTest`).
+
+- **Classer un coup** se fait sur la PROBABILITÉ DE GAIN et non sur les
+  centipions : à +8, lâcher 300 cp ne change rien ; à 0.00, c'est décisif. Le
+  barème est celui d'iOS — Excellent sous 2 %, Bon coup 2-5 %, Imprécision
+  5-10 %, Erreur 10-20 %, Gaffe au-delà.
+- **La précision** est la courbe de Lichess appliquée à une moyenne PONDÉRÉE
+  par la volatilité de la position. Sans cette pondération, vingt coups de
+  finition dans une partie déjà gagnée gonflent le score de plusieurs points
+  sans que rien n'ait été mieux joué.
+- **L'explication d'une faute** est lue sur la RÉFUTATION du moteur, rejouée
+  sur un plateau : mat du couloir, fourchette, clouage, pièce en prise. Aucun
+  modèle de langage n'entre là — dans une app d'apprentissage, une explication
+  inventée s'apprend aussi bien qu'une vraie.
+- **Le budget de recherche est en NŒUDS** (300 000 par position, 900 000 pour
+  une solution de puzzle) et non en temps : un budget en temps rendrait le
+  verdict dépendant de la charge de l'appareil, et la même partie analysée deux
+  fois donnerait deux réponses.
+
+## Le moteur ne se laisse plus abandonner à mi-démarrage
+
+`EngineService.start()` tourne désormais sous `NonCancellable`. Sans ça,
+quitter un écran PENDANT le démarrage annulait la tâche entre `e.start()` —
+qui a déjà lancé le moteur natif — et l'affectation d'`engine`. Le moteur
+restait vivant sans propriétaire ; or Stockfish n'en accepte qu'UN par
+process, si bien que toute demande suivante se voyait refuser, `failed`
+passait à vrai, et l'app annonçait « moteur indisponible » **pour le reste de
+la session**.
+
+Trouvé en analysant une partie juste après l'avoir chargée : la revue rendait
+zéro évaluation, et le bilan s'affichait vide au lieu de dire qu'il avait
+échoué. C'est le pendant Android des six mécanismes de panne moteur corrigés
+côté iOS fin août.
+
+## Deux bugs de ChessKit corrigés dans le port
+
+**1. Un plateau construit sur une position finie se croyait actif.**
+`Board(position)`, sans qu'aucun coup n'y ait été joué, se déclarait actif sur
+une position de MAT, et pouvait annoncer un échec sur le camp qui venait de
+mater : `updateState()` prenait le camp AU TRAIT là où il faut celui qui vient
+de jouer. Visible dans l'analyse — le roi maté n'était pas surligné, et le coup
+de mat était classé sur une évaluation absente, donc noté « occasion manquée ».
+
+**2. `Board` écrivait dans la position de l'appelant.** Le constructeur gardait
+la position PAR RÉFÉRENCE, et jouer dessus la modifiait chez celui qui l'avait
+passée. L'original Swift est une `struct` — la copie y est gratuite, le port
+l'a perdue en route. Conséquence mesurée : le détecteur de motifs rejoue la
+réfutation du moteur sur la position d'après un coup fautif, et écrasait au
+passage la liste des positions de la partie. Les coups suivants étaient alors
+classés sur des positions qui n'étaient pas les leurs — un mat noté
+« excellent », et des précisions fausses sans que rien ne le signale.
+
+Les deux sont corrigés dans `chesskit/Board.kt` et prouvés par
+`BoardStateTest` / `BoardIsolationTest` (les tests échouent si on retire le
+correctif — vérifié). **Les deux sont dans ChessKit en amont**, Swift comme
+Kotlin : à signaler, avec les trois autres déjà relevés.
+
 ## Ce qui reste
 
 - **Crazyhouse.** Fairy-Stockfish la connaît, mais elle demande de parachuter
@@ -65,10 +138,12 @@ Deux conséquences à connaître avant de toucher au code :
   moteur jouerait des coups que l'utilisateur ne pourrait pas rendre.
 - **La mesure sur un vrai téléphone.** L'émulateur ne dit rien de la vitesse ni
   du thermique — et c'est de là que dépend la calibration des niveaux.
-- La synchronisation entre appareils (iOS passe par CloudKit ; côté Android le
-  journal de révisions est déjà écrit pour fusionner, mais rien ne le transporte).
+- **Les écrans d'analyse annexes d'iOS** : l'éditeur de tags PGN et la
+  bibliothèque de parties détaillée. L'analyse elle-même est à parité.
 
 ## Construire et tester
+
+Pour publier, voir `PUBLIER.md` — le chemin complet jusqu'au Play Store.
 
 ```bash
 export JAVA_HOME=/opt/homebrew/opt/openjdk@21
@@ -76,7 +151,7 @@ export JAVA_HOME=/opt/homebrew/opt/openjdk@21
 ./gradlew :app:testDebugUnitTest          # FSRS et les files de révision, sans émulateur
 ./gradlew :maia:testDebugUnitTest         # l'encodeur, prouvé au bit près
 ./gradlew :vision:testDebugUnitTest       # homographie et lecture de grille
-./gradlew :app:connectedDebugAndroidTest  # 40 cas de bout en bout, sur appareil
+./gradlew :app:connectedDebugAndroidTest  # 59 cas de bout en bout, sur appareil
 ./gradlew :app:assembleDebug
 ```
 

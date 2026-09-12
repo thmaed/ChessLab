@@ -44,6 +44,14 @@ class GameRecorder(startingPosition: Position = Position.standard) {
     val moveCount: Int get() = game.moves.indices.size
 
     /**
+     * Le PGN de la partie TELLE QU'ELLE EST, pour l'envoyer à l'analyse sans
+     * attendre qu'elle soit rangée dans la bibliothèque. Les tags `SetUp` et
+     * `FEN` posés par [reset] en font partie : sans eux, l'analyse rejouerait
+     * les coups depuis la position standard et n'afficherait rien.
+     */
+    val pgn: String get() = game.pgn
+
+    /**
      * Écrit la partie. `null` si elle est vide — une partie sans coup n'a rien
      * à faire dans la bibliothèque.
      */

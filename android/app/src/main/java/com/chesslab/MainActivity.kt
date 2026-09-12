@@ -38,7 +38,10 @@ import com.chesslab.variants.VariantCatalog
 import com.chesslab.variants.VariantListScreen
 import com.chesslab.variants.VariantPlayScreen
 import com.chesslab.ui.AppBackground
+import com.chesslab.ui.LocalTopBarSlot
 import com.chesslab.ui.Palette
+import com.chesslab.ui.TopBarSlot
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import com.chesslab.R
 import androidx.compose.ui.res.stringResource
@@ -78,6 +81,9 @@ private fun App() {
     val stack = remember { mutableStateListOf<Route>(Route.Home) }
     val current = stack.last()
     val context = LocalContext.current
+    // Les écrans sont composés SOUS la barre : ils y déposent leurs boutons
+    // par ce relais plutôt que de la reconstruire chacun pour soi.
+    val topBar = remember { TopBarSlot() }
 
     BackHandler(enabled = stack.size > 1) { stack.removeAt(stack.lastIndex) }
 
@@ -88,8 +94,13 @@ private fun App() {
     // du texte gèrent l'encart du clavier eux-mêmes.
     Column(Modifier.fillMaxSize().systemBarsPadding()) {
         if (current != Route.Home) {
-            TopBar(if (current.hasOwnTitle) "" else current.title(context)) { stack.removeAt(stack.lastIndex) }
+            TopBar(
+                title = if (current.hasOwnTitle) "" else current.title(context),
+                actions = topBar.content,
+                onBack = { stack.removeAt(stack.lastIndex) },
+            )
         }
+        CompositionLocalProvider(LocalTopBarSlot provides topBar) {
         when (current) {
             Route.Home -> HomeScreen { stack.add(it) }
             Route.NewGame -> NewGameSetupRoute { settings ->
@@ -100,8 +111,18 @@ private fun App() {
             }
             is Route.PlayVsEngine -> PlayScreen(
                 settings = current.settings, resume = current.resume,
+                startFen = current.startFen,
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(it)) },
+                onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
+                onAnalyzeGame = { stack.add(Route.AnalysisBoard(pgn = it)) },
+                onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
-            Route.TwoPlayer -> TwoPlayerScreen()
+            is Route.TwoPlayer -> TwoPlayerScreen(
+                startFen = current.startFen,
+                onPlayVsEngine = { stack.add(Route.PlayVsEngine(startFen = it)) },
+                onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
+                onOpenLab = { stack.add(Route.Laboratory(it)) },
+            )
             Route.Analysis -> AnalysisEntryScreen(
                 onScan = { stack.add(Route.Scanner) },
                 onLibrary = { stack.add(Route.AnalysisBoard()) },
@@ -111,37 +132,61 @@ private fun App() {
             )
             is Route.AnalysisBoard -> AnalysisScreen(
                 initialFen = current.fen, initialPgn = current.pgn,
+                onPlayVsEngine = { stack.add(Route.PlayVsEngine(startFen = it)) },
+                onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
-            Route.Puzzles -> PuzzleScreen()
+            Route.Puzzles -> PuzzleScreen(
+                onPlayVsEngine = { stack.add(Route.PlayVsEngine(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(it)) },
+                onOpenLab = { stack.add(Route.Laboratory(it)) },
+            )
             Route.Openings -> CourseListScreen(
                 endgames = false,
                 onTrain = { kind -> stack.add(trainRoute(context, kind)) },
+                onPlayVsEngine = { stack.add(Route.NewGame) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayer()) },
+                onOpenLab = { stack.add(Route.Laboratory()) },
             ) { stack.add(reader(it)) }
             Route.Endgames -> CourseListScreen(
                 endgames = true,
                 onTrain = { kind -> stack.add(trainRoute(context, kind)) },
+                onPlayVsEngine = { stack.add(Route.NewGame) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayer()) },
+                onOpenLab = { stack.add(Route.Laboratory()) },
             ) { stack.add(reader(it)) }
-            is Route.CourseReader -> CourseScreen(current.id) { id, name ->
+            is Route.CourseReader -> CourseScreen(
+                courseId = current.id,
+                onPlayVsEngine = { stack.add(Route.PlayVsEngine(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(it)) },
+                onOpenLab = { stack.add(Route.Laboratory(it)) },
+            ) { id, name ->
                 stack.add(Route.Train("line", id, context.getString(R.string.route_train_named, name)))
             }
             is Route.Train -> TrainScreen(
-                when (current.kind) {
+                mode = when (current.kind) {
                     "line" -> TrainMode.FullLine(current.courseId ?: "")
                     "hardest" -> TrainMode.Hardest
                     else -> TrainMode.Daily
-                }
+                },
+                onPlayVsEngine = { stack.add(Route.PlayVsEngine(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(it)) },
+                onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
             Route.Settings -> SettingsScreen()
             Route.Scanner -> ScannerScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
             Route.Progression -> ProgressionScreen()
             Route.Help -> HelpScreen()
             Route.PositionEditor -> PositionEditorScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
-            Route.Laboratory -> LabScreen()
+            is Route.Laboratory -> LabScreen(startFen = current.startFen)
             Route.Variants -> VariantListScreen { id ->
                 stack.add(Route.VariantGame(id, VariantCatalog.byId(id)?.let { context.getString(it.titleRes) } ?: id))
             }
-            is Route.VariantGame -> VariantPlayScreen(current.id)
+            is Route.VariantGame -> VariantPlayScreen(
+                variantId = current.id,
+                onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
+            )
             else -> Placeholder(current.title(context))
+        }
         }
     }
 }
@@ -156,7 +201,11 @@ private fun reader(id: String): Route.CourseReader =
     Route.CourseReader(id, CourseRepository.cachedName(id) ?: id)
 
 @Composable
-private fun TopBar(title: String, onBack: () -> Unit) {
+private fun TopBar(
+    title: String,
+    actions: (@Composable RowScope.() -> Unit)?,
+    onBack: () -> Unit,
+) {
     Row(
         Modifier.fillMaxWidth().padding(horizontal = 4.dp, vertical = 2.dp),
         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically,
@@ -165,6 +214,8 @@ private fun TopBar(title: String, onBack: () -> Unit) {
             Icon(Icons.AutoMirrored.Filled.ArrowBack, "Retour", tint = Palette.textPrimary)
         }
         Text(title, style = MaterialTheme.typography.titleMedium, color = Palette.textPrimary)
+        Spacer(Modifier.weight(1f))
+        actions?.invoke(this)
     }
 }
 

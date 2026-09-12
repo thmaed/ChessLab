@@ -51,6 +51,8 @@ import com.chesslab.ui.StatusRow
 import androidx.compose.ui.res.stringResource
 import com.chesslab.R
 import androidx.compose.ui.res.pluralStringResource
+import com.chesslab.ui.QuickSwitchMenu
+import com.chesslab.ui.TopBarActions
 
 @Composable
 fun VariantListScreen(onOpen: (String) -> Unit) {
@@ -141,9 +143,23 @@ private fun variantIcon(id: String): ImageVector = when (id) {
 }
 
 @Composable
-fun VariantPlayScreen(variantId: String, model: VariantPlayViewModel = viewModel()) {
+fun VariantPlayScreen(
+    variantId: String,
+    /**
+     * Seule l'analyse est proposée : les autres modes jouent aux règles
+     * ORTHODOXES, et y envoyer une position de Horde ou de Roi de la colline
+     * donnerait une partie qui n'a plus rien à voir. iOS fait le même
+     * choix sur son écran Chess960.
+     */
+    onAnalyze: (String) -> Unit = {},
+    model: VariantPlayViewModel = viewModel(),
+) {
     LaunchedEffect(variantId) { model.load(variantId) }
     val ui = model.ui
+
+    TopBarActions {
+        QuickSwitchMenu(onAnalyze = { onAnalyze(model.ui.position.fen) })
+    }
 
     BoardScaffold(
         header = {

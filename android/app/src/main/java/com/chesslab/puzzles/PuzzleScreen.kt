@@ -25,6 +25,8 @@ import chesskit.Piece
 import com.chesslab.R
 import com.chesslab.play.PromotionDialog
 import com.chesslab.ui.*
+import com.chesslab.ui.QuickSwitchMenu
+import com.chesslab.ui.TopBarActions
 
 /**
  * Résoudre un puzzle. Pendant de `PuzzleSolveView`.
@@ -35,10 +37,24 @@ import com.chesslab.ui.*
  * trouver celle qui dit quoi faire.
  */
 @Composable
-fun PuzzleScreen(model: PuzzleViewModel = viewModel()) {
+fun PuzzleScreen(
+    onPlayVsEngine: (String) -> Unit = {},
+    onOpenTwoPlayer: (String) -> Unit = {},
+    onOpenLab: (String) -> Unit = {},
+    model: PuzzleViewModel = viewModel(),
+) {
     val ui = model.ui
 
+    TopBarActions {
+        QuickSwitchMenu(
+            onPlayVsEngine = { onPlayVsEngine(model.ui.position.fen) },
+            onOpenTwoPlayer = { onOpenTwoPlayer(model.ui.position.fen) },
+            onOpenLab = { onOpenLab(model.ui.position.fen) },
+        )
+    }
+
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        SourcePicker(ui, model::setSource)
         Header(ui)
         Spacer(Modifier.height(12.dp))
 
@@ -77,6 +93,35 @@ fun PuzzleScreen(model: PuzzleViewModel = viewModel()) {
     if (ui.pendingPromotion != null) PromotionDialog(model::completePromotion)
 }
 
+/**
+ * Lichess ou vos propres parties. Le sélecteur ne s'affiche QUE si des puzzles
+ * maison existent : sans eux, un onglet vide n'annoncerait qu'une déception.
+ */
+@Composable
+private fun SourcePicker(ui: PuzzleUiState, onPick: (PuzzleSource) -> Unit) {
+    if (ui.ownCount == 0 && ui.source == PuzzleSource.lichess) return
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        PuzzleSource.entries.forEach { source ->
+            val active = source == ui.source
+            Text(
+                stringResource(source.labelRes),
+                fontSize = 12.sp,
+                fontWeight = if (active) FontWeight.Bold else FontWeight.Normal,
+                color = if (active) Palette.background else Palette.textSecondary,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(if (active) Palette.accent else Palette.surface)
+                    .clickable { onPick(source) }
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .testTag("source-${source.name}"),
+            )
+        }
+    }
+}
+
 @Composable
 private fun Header(ui: PuzzleUiState) {
     Column(
@@ -108,7 +153,9 @@ private fun Header(ui: PuzzleUiState) {
                 stringResource(puzzle.themeLabel).uppercase(),
                 fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Palette.accent,
             )
-            ContextPill("${puzzle.rating}", difficultyTint(puzzle.rating))
+            // Cote 0 : un puzzle maison n'en a pas, et en inventer une serait
+            // pire que de n'en montrer aucune.
+            if (puzzle.rating > 0) ContextPill("${puzzle.rating}", difficultyTint(puzzle.rating))
             puzzle.phase?.let { ContextPill(stringResource(phaseLabel(it)), Palette.info) }
             Text(
                 stringResource(R.string.puzzle_score, ui.solvedCount, ui.attemptedCount),

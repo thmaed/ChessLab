@@ -30,10 +30,30 @@ import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
 import androidx.compose.ui.res.stringResource
 import com.chesslab.R
+import androidx.compose.runtime.LaunchedEffect
+import com.chesslab.ui.QuickSwitchMenu
+import com.chesslab.ui.TopBarActions
 
 @Composable
-fun TwoPlayerScreen(model: TwoPlayerViewModel = viewModel()) {
+fun TwoPlayerScreen(
+    /** La position envoyée par un autre mode. */
+    startFen: String? = null,
+    onPlayVsEngine: (String) -> Unit = {},
+    onAnalyze: (String) -> Unit = {},
+    onOpenLab: (String) -> Unit = {},
+    model: TwoPlayerViewModel = viewModel(),
+) {
     val ui = model.ui
+
+    LaunchedEffect(startFen) { if (startFen != null) model.startFrom(startFen) }
+
+    TopBarActions {
+        QuickSwitchMenu(
+            onPlayVsEngine = { onPlayVsEngine(model.ui.position.fen) },
+            onAnalyze = { onAnalyze(model.ui.position.fen) },
+            onOpenLab = { onOpenLab(model.ui.position.fen) },
+        )
+    }
 
     // Les deux camps encadrent le plateau, comme en mode Jouer : celui qui a
     // le trait s'allume, et chacun montre ce qu'il a pris.

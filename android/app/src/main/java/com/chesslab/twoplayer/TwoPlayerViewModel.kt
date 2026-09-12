@@ -45,6 +45,12 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
     private var board = Board()
     private val recorder = GameRecorder()
 
+    /**
+     * La position d'où la partie part : standard, sauf quand « Changer de
+     * mode » a envoyé ici la position d'un autre écran.
+     */
+    private var startPosition: Position = Position.standard
+
     /** Les coups joués : ce qu'il faut pour compter les prises. */
     private val moveLog = mutableListOf<Move>()
 
@@ -55,6 +61,19 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
         )
     )
         private set
+
+    /**
+     * Reprend la partie à la position qu'un autre mode vient d'envoyer.
+     * Sans effet si c'est déjà celle qui est sur le plateau : l'écran est
+     * recomposé souvent, et repartir de zéro à chaque fois effacerait les
+     * coups qu'on vient de jouer.
+     */
+    fun startFrom(fen: String) {
+        val position = Position.fromFen(fen) ?: return
+        if (position.fen == startPosition.fen && ui.sanMoves.isEmpty()) return
+        startPosition = position
+        newGame()
+    }
 
     fun onSquareTap(square: Square) {
         if (ui.gameOver || ui.pendingPromotion != null) return
@@ -95,10 +114,18 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun newGame() {
-        board = Board()
-        recorder.reset()
+        board = Board(startPosition)
+        val custom = startPosition.fen.takeIf { it != Position.standard.fen }
+        recorder.reset(startPosition, custom)
         moveLog.clear()
-        ui = TwoPlayerUiState(autoFlip = ui.autoFlip, status = s(R.string.white_to_move))
+        ui = TwoPlayerUiState(
+            autoFlip = ui.autoFlip,
+            position = startPosition,
+            status = s(
+                if (startPosition.sideToMove == Piece.Color.white) R.string.white_to_move
+                else R.string.black_to_move
+            ),
+        )
     }
 
     private fun refresh(move: Move) {

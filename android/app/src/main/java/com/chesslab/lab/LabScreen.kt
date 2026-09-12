@@ -30,10 +30,17 @@ import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
 import androidx.compose.ui.res.stringResource
 import com.chesslab.R
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
-fun LabScreen(model: LabViewModel = viewModel()) {
+fun LabScreen(
+    /** La position envoyée par un autre mode : la série part de là. */
+    startFen: String? = null,
+    model: LabViewModel = viewModel(),
+) {
     val ui = model.ui
+
+    LaunchedEffect(startFen) { if (startFen != null) model.startFrom(startFen) }
 
     BoardScaffold(
         header = {

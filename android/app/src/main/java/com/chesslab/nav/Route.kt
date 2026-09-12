@@ -38,8 +38,15 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data class PlayVsEngine(
         val settings: com.chesslab.play.PlayGameSettings? = null,
         val resume: Boolean = false,
+        /** La position d'où partir, quand on arrive par « Changer de mode ». */
+        val startFen: String? = null,
     ) : Route(R.string.route_play)
-    data object TwoPlayer : Route(R.string.route_two_players)
+
+    /**
+     * Une partie à deux sur le même appareil. [startFen] la fait commencer à
+     * la position qu'un autre mode vient d'envoyer.
+     */
+    data class TwoPlayer(val startFen: String? = null) : Route(R.string.route_two_players)
     /** Le CHOIX de la source : scanner, bibliothèque, dernière partie, coller. */
     data object Analysis : Route(R.string.route_analysis)
 
@@ -56,7 +63,8 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data object Endgames : Route(R.string.route_endgames) {
         override val hasOwnTitle get() = true
     }
-    data object Laboratory : Route(R.string.route_lab)
+    /** Le Laboratoire. [startFen] impose la position de départ de la série. */
+    data class Laboratory(val startFen: String? = null) : Route(R.string.route_lab)
     data object Variants : Route(R.string.route_variants)
     data object Progression : Route(R.string.route_progress)
     data object Settings : Route(R.string.route_settings)

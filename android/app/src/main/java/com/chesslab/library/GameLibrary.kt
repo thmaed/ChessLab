@@ -107,13 +107,15 @@ interface AutosaveDao {
     entities = [
         GameRecord::class, Autosave::class,
         com.chesslab.training.OpeningProgress::class, com.chesslab.training.OpeningReviewLog::class,
+        com.chesslab.puzzles.OwnPuzzle::class,
     ],
-    version = 4, exportSchema = false,
+    version = 5, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
     abstract fun autosaves(): AutosaveDao
     abstract fun training(): com.chesslab.training.TrainingDao
+    abstract fun ownPuzzles(): com.chesslab.puzzles.OwnPuzzleDao
 
     companion object {
         @Volatile private var instance: LibraryDatabase? = null
@@ -164,11 +166,37 @@ abstract class LibraryDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * v4 → v5 : les puzzles tirés de vos propres parties.
+         *
+         * Table NEUVE, donc rien à convertir — mais elle est écrite à la main
+         * comme les autres : le filet destructeur effacerait la progression
+         * FSRS pour un simple ajout de table.
+         */
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS own_puzzles (
+                        uid TEXT NOT NULL PRIMARY KEY,
+                        fen TEXT NOT NULL,
+                        playedSan TEXT NOT NULL,
+                        solution TEXT NOT NULL,
+                        theme TEXT NOT NULL,
+                        rating INTEGER NOT NULL,
+                        createdAt INTEGER NOT NULL,
+                        sourcePgn TEXT NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
         fun get(context: Context): LibraryDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(
                 context.applicationContext, LibraryDatabase::class.java, "chesslab.db",
             )
-                .addMigrations(MIGRATION_3_4)
+                .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
                 // Le filet, et RIEN DE PLUS : chaque changement de schéma doit
                 // fournir sa migration, comme ci-dessus. Il reste là pour
                 // qu'une base corrompue n'empêche pas l'app de démarrer, jamais

@@ -47,7 +47,13 @@ fun BoardView(
     legalTargets: Set<Square> = emptySet(),
     lastMove: Pair<Square, Square>? = null,
     checkedKing: Square? = null,
-    /** Les deux cases d'un coup soufflé : l'entraînement allume la réponse. */
+    /**
+     * Le coup soufflé, montré comme une FLÈCHE et non comme deux cases
+     * teintées. Teinter les cases disait « regarde ici » deux fois sans jamais
+     * dire dans quel sens — on ne savait pas laquelle était le départ. C'est
+     * aussi ce que fait iOS depuis toujours (`HintMove` de nature `.best`),
+     * et les deux apps montrent désormais la même chose.
+     */
     hint: Pair<Square, Square>? = null,
     /**
      * Les flèches posées sur le plateau : un coup candidat chacune, teintée
@@ -102,7 +108,6 @@ fun BoardView(
                                 isLegalTarget = square in legalTargets,
                                 isLastMove = lastMove?.let { square == it.first || square == it.second } == true,
                                 isChecked = square == checkedKing,
-                                isHint = hint?.let { square == it.first || square == it.second } == true,
                                 showFile = rank == ranks.last,
                                 showRank = file == files.first,
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -112,10 +117,21 @@ fun BoardView(
                     }
                 }
             }
-            if (arrows.isNotEmpty()) ArrowOverlay(arrows, orientation, Modifier.fillMaxSize())
+            val drawn = if (hint == null) arrows
+                else arrows + BoardArrow(hint.first, hint.second, HINT_TINT)
+            if (drawn.isNotEmpty()) ArrowOverlay(drawn, orientation, Modifier.fillMaxSize())
         }
     }
 }
+
+/**
+ * La teinte de la flèche d'indice : le gris très sombre d'iOS
+ * (`Color(white: 0.12)`), lisible sur les cases claires comme sur les sombres
+ * de tous les thèmes, et qui ne se confond avec aucune des couleurs de sens
+ * déjà prises — l'ambre du dernier coup, le rouge de l'échec, le vert de
+ * l'accent.
+ */
+private val HINT_TINT = Color(0xFF1F1F1F)
 
 /** Une flèche : d'où, vers où, de quelle couleur, et à quel point marquée. */
 data class BoardArrow(
@@ -183,7 +199,6 @@ private fun SquareCell(
     isLegalTarget: Boolean,
     isLastMove: Boolean,
     isChecked: Boolean,
-    isHint: Boolean,
     showFile: Boolean,
     showRank: Boolean,
     modifier: Modifier,
@@ -193,11 +208,6 @@ private fun SquareCell(
     val base = if (isLight) theme.lightSquare else theme.darkSquare
     val background = when {
         isChecked -> theme.checkColor
-        // L'indice passe AVANT la sélection : il répond à une question posée,
-        // la sélection n'est qu'un état de la main. Violet plutôt que vert :
-        // sur un damier vert, le vert de l'accent se fondait dans les cases
-        // sombres, et l'ambre est déjà pris par le dernier coup.
-        isHint -> Palette.violet.copy(alpha = 0.60f).compositeOver(base)
         isSelected -> theme.selectedColor.compositeOver(base)
         isLastMove -> (if (isLight) theme.lastMoveLight else theme.lastMoveDark).compositeOver(base)
         else -> base
