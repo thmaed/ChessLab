@@ -10,7 +10,14 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.*
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +62,7 @@ fun PuzzleScreen(
 
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         SourcePicker(ui, model::setSource)
+        FilterBar(ui, model::setFilter)
         Header(ui)
         Spacer(Modifier.height(12.dp))
 
@@ -91,6 +99,123 @@ fun PuzzleScreen(
     }
 
     if (ui.pendingPromotion != null) PromotionDialog(model::completePromotion)
+}
+
+/**
+ * Les filtres : difficulté, phase, thème. Sans eux, on tire dans 106 094
+ * positions au hasard ; avec, on travaille une faiblesse précise — les
+ * fourchettes, les finales — et c'est tout l'intérêt d'une base de cette
+ * taille.
+ *
+ * Une seule ligne qui défile, pas trois : trois rangées de puces mangeraient
+ * le plateau, et c'est le plateau qu'on vient voir.
+ */
+@Composable
+private fun FilterBar(ui: PuzzleUiState, onFilter: (PuzzleFilter) -> Unit) {
+    var open by remember { mutableStateOf(false) }
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 2.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            stringResource(R.string.puzzle_filters) +
+                if (ui.filter.isEmpty) "" else " ·",
+            fontSize = 12.sp,
+            color = if (ui.filter.isEmpty) Palette.textTertiary else Palette.accent,
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable { open = !open }
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .testTag("filtres"),
+        )
+        // Ce qui est actif se lit sans ouvrir le tiroir.
+        listOfNotNull(
+            ui.filter.difficulty?.labelRes,
+            ui.filter.phase?.labelRes,
+            ui.filter.theme?.labelRes,
+        ).forEach {
+            Text(
+                stringResource(it), fontSize = 11.sp, color = Palette.accent,
+                modifier = Modifier.padding(start = 6.dp),
+            )
+        }
+        Spacer(Modifier.weight(1f))
+        if (ui.dueCount > 0) {
+            Text(
+                pluralStringResource(R.plurals.puzzle_due, ui.dueCount, ui.dueCount),
+                fontSize = 11.sp, color = Palette.warning,
+                modifier = Modifier.testTag("a-revoir"),
+            )
+        }
+    }
+    if (!open) return
+
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        ChipRow(
+            actif = ui.filter.difficulty?.labelRes,
+            libelles = DifficultyTier.entries.map { it.labelRes },
+            tag = "niveau",
+        ) { index ->
+            onFilter(ui.filter.copy(difficulty = index?.let { DifficultyTier.entries[it] }))
+        }
+        ChipRow(
+            actif = ui.filter.phase?.labelRes,
+            libelles = GamePhase.entries.map { it.labelRes },
+            tag = "phase",
+        ) { index ->
+            onFilter(ui.filter.copy(phase = index?.let { GamePhase.entries[it] }))
+        }
+        ChipRow(
+            actif = ui.filter.theme?.labelRes,
+            libelles = PuzzleThemeKind.entries.map { it.labelRes },
+            tag = "theme",
+        ) { index ->
+            onFilter(ui.filter.copy(theme = index?.let { PuzzleThemeKind.entries[it] }))
+        }
+    }
+}
+
+/**
+ * Une ligne de puces avec « Tous » en tête. Toucher la puce ACTIVE la
+ * désactive : c'est le geste qu'on cherche quand on veut revenir à tout, et il
+ * évite d'aller chercher « Tous » à l'autre bout de la ligne.
+ */
+@Composable
+private fun ChipRow(
+    actif: Int?,
+    libelles: List<Int>,
+    tag: String,
+    onPick: (Int?) -> Unit,
+) {
+    Row(
+        Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Puce(stringResource(R.string.puzzle_filter_all), actif == null, "$tag-tous") { onPick(null) }
+        libelles.forEachIndexed { index, res ->
+            val selected = actif == res
+            Puce(stringResource(res), selected, "$tag-$index") { onPick(if (selected) null else index) }
+        }
+    }
+}
+
+@Composable
+private fun Puce(label: String, selected: Boolean, tag: String, onClick: () -> Unit) {
+    Text(
+        label,
+        fontSize = 11.sp,
+        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+        color = if (selected) Palette.background else Palette.textSecondary,
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(if (selected) Palette.accent else Palette.surface)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 5.dp)
+            .testTag(tag),
+    )
 }
 
 /**

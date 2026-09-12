@@ -107,15 +107,16 @@ interface AutosaveDao {
     entities = [
         GameRecord::class, Autosave::class,
         com.chesslab.training.OpeningProgress::class, com.chesslab.training.OpeningReviewLog::class,
-        com.chesslab.puzzles.OwnPuzzle::class,
+        com.chesslab.puzzles.OwnPuzzle::class, com.chesslab.puzzles.PuzzleProgress::class,
     ],
-    version = 5, exportSchema = false,
+    version = 6, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
     abstract fun autosaves(): AutosaveDao
     abstract fun training(): com.chesslab.training.TrainingDao
     abstract fun ownPuzzles(): com.chesslab.puzzles.OwnPuzzleDao
+    abstract fun puzzleProgress(): com.chesslab.puzzles.PuzzleProgressDao
 
     companion object {
         @Volatile private var instance: LibraryDatabase? = null
@@ -192,11 +193,36 @@ abstract class LibraryDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * v5 → v6 : la progression par puzzle. Table neuve, écrite à la main
+         * comme les autres — le filet destructeur effacerait la progression
+         * FSRS pour un simple ajout de table.
+         */
+        val MIGRATION_5_6 = object : Migration(5, 6) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS puzzle_progress (
+                        externalId TEXT NOT NULL PRIMARY KEY,
+                        successCount INTEGER NOT NULL,
+                        failureCount INTEGER NOT NULL,
+                        easinessFactor REAL NOT NULL,
+                        intervalDays INTEGER NOT NULL,
+                        repetitions INTEGER NOT NULL,
+                        dueAt INTEGER,
+                        updatedAt INTEGER NOT NULL,
+                        theme TEXT NOT NULL
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
         fun get(context: Context): LibraryDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(
                 context.applicationContext, LibraryDatabase::class.java, "chesslab.db",
             )
-                .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
+                .addMigrations(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                 // Le filet, et RIEN DE PLUS : chaque changement de schéma doit
                 // fournir sa migration, comme ci-dessus. Il reste là pour
                 // qu'une base corrompue n'empêche pas l'app de démarrer, jamais

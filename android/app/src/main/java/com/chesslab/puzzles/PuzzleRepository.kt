@@ -48,6 +48,10 @@ object PuzzleRepository {
         assets: AssetManager,
         count: Int,
         ratings: IntRange = 0..4000,
+        /** `null` = tous les thèmes. */
+        theme: String? = null,
+        /** `null` = toutes les phases. */
+        phase: String? = null,
         random: Random = Random.Default,
     ): List<Puzzle> {
         val kept = ArrayList<Puzzle>(count)
@@ -59,6 +63,8 @@ object PuzzleRepository {
                 while (json.hasNext()) {
                     val puzzle = readPuzzle(json) ?: continue
                     if (puzzle.rating !in ratings) continue
+                    if (theme != null && puzzle.theme != theme) continue
+                    if (phase != null && puzzle.phase != phase) continue
 
                     seen++
                     if (kept.size < count) {

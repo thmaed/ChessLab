@@ -79,11 +79,17 @@ vérification sur appareil, pas après compilation.
 - [x] **Reprise d'une partie interrompue**, et l'accueil propose la plus
       RÉCENTE des deux modes plutôt que toujours celle contre l'ordinateur.
 
-### 4. Puzzles
-- [ ] **Filtres** : thème, difficulté, phase de partie. Android tire 40 puzzles
-      au hasard dans toute la base.
-- [ ] **Progression et répétition espacée** : iOS revoit les puzzles ratés.
-- [ ] **Statistiques** par thème et par niveau.
+### 4. Puzzles — FAIT le 12/09
+- [x] **Filtres** : difficulté (quatre paliers de cote), phase de partie,
+      thème (huit). Sans eux on tirait au hasard dans 106 094 positions ; avec,
+      on travaille une faiblesse précise, et c'est tout l'intérêt d'une base de
+      cette taille. Une seule ligne repliable, pas trois rangées permanentes —
+      c'est le plateau qu'on vient voir.
+- [x] **Progression et répétition espacée** (SM-2, comme iOS — et non FSRS, qui
+      sert aux ouvertures : une position d'ouverture se révise des dizaines de
+      fois, un puzzle se résout une fois). Ce qu'on rate revient demain.
+- [ ] **Statistiques** par thème et par niveau — les données sont désormais
+      enregistrées, l'écran reste à faire.
 
 ### 5. Finales
 - [ ] **Entraînement libre** : conclure la position contre la meilleure défense,

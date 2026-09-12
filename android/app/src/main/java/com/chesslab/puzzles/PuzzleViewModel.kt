@@ -57,6 +57,9 @@ data class PuzzleUiState(
     /** Les deux cases du coup soufflé, quand l'utilisateur l'a demandé. */
     val hint: Pair<Square, Square>? = null,
     val source: PuzzleSource = PuzzleSource.lichess,
+    val filter: PuzzleFilter = PuzzleFilter(),
+    /** Combien de puzzles attendent d'être revus. */
+    val dueCount: Int = 0,
     /** Combien de puzzles maison existent — le sélecteur s'efface sans eux. */
     val ownCount: Int = 0,
 )
@@ -78,7 +81,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     var ui by mutableStateOf(PuzzleUiState(status = s(R.string.puzzle_loading)))
         private set
 
-    init { load(PuzzleSource.lichess) }
+    init { load(PuzzleSource.lichess, PuzzleFilter()) }
 
     /**
      * Change de source. L'écran repart à zéro : mélanger deux files ferait un
@@ -86,32 +89,68 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun setSource(source: PuzzleSource) {
         if (source == ui.source && !ui.loading) return
-        load(source)
+        load(source, ui.filter)
     }
 
-    private fun load(source: PuzzleSource) = viewModelScope.launch {
-        ui = ui.copy(loading = true, source = source, hint = null)
-        val dao = LibraryDatabase.get(getApplication()).ownPuzzles()
-        val own = withContext(Dispatchers.IO) { runCatching { dao.all() }.getOrDefault(emptyList()) }
+    /** Change de filtre : la file se reconstitue autour de ce qu'on demande. */
+    fun setFilter(filter: PuzzleFilter) {
+        if (filter == ui.filter) return
+        load(ui.source, filter)
+    }
+
+    private fun load(source: PuzzleSource, filter: PuzzleFilter) = viewModelScope.launch {
+        ui = ui.copy(loading = true, source = source, filter = filter, hint = null)
+        val db = LibraryDatabase.get(getApplication())
+        val own = withContext(Dispatchers.IO) { runCatching { db.ownPuzzles().all() }.getOrDefault(emptyList()) }
+        val due = withContext(Dispatchers.IO) {
+            runCatching { db.puzzleProgress().dueCount(System.currentTimeMillis()) }.getOrDefault(0)
+        }
         queue = when (source) {
-            PuzzleSource.ownGames -> own.map { it.toPuzzle() }
+            PuzzleSource.ownGames -> own.map { it.toPuzzle() }.filter { matches(it, filter) }
             PuzzleSource.lichess -> withContext(Dispatchers.IO) {
-                runCatching { PuzzleRepository.sample(getApplication<Application>().assets, count = 40) }
-                    .getOrDefault(emptyList())
+                runCatching {
+                    PuzzleRepository.sample(
+                        getApplication<Application>().assets,
+                        count = 40,
+                        ratings = filter.ratings,
+                        theme = filter.theme?.raw,
+                        phase = filter.phase?.raw,
+                    )
+                }.getOrDefault(emptyList())
             }
         }
-        ui = ui.copy(loading = false, ownCount = own.size)
+        ui = ui.copy(loading = false, ownCount = own.size, dueCount = due)
         if (queue.isEmpty()) {
             ui = ui.copy(
                 puzzle = null,
                 status = s(
-                    if (source == PuzzleSource.ownGames) R.string.puzzle_no_own
-                    else R.string.puzzle_library_unavailable
+                    when {
+                        source == PuzzleSource.ownGames -> R.string.puzzle_no_own
+                        !filter.isEmpty -> R.string.puzzle_none_match
+                        else -> R.string.puzzle_library_unavailable
+                    }
                 ),
             )
         } else {
             present(0)
         }
+    }
+
+    /** Un puzzle maison n'a pas de cote : seul le thème le filtre. */
+    private fun matches(puzzle: Puzzle, filter: PuzzleFilter): Boolean =
+        (filter.theme == null || puzzle.theme == filter.theme.raw) &&
+            (filter.phase == null || puzzle.phase == filter.phase.raw)
+
+    /**
+     * Range le résultat, et programme la prochaine rencontre. Ce qu'on vient
+     * de rater revient demain ; ce qu'on a résolu s'éloigne.
+     */
+    private fun recordProgress(puzzle: Puzzle, success: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        val dao = LibraryDatabase.get(getApplication()).puzzleProgress()
+        val now = System.currentTimeMillis()
+        val current = dao.byId(puzzle.id) ?: PuzzleProgress(externalId = puzzle.id, theme = puzzle.theme)
+        val next = PuzzleSchedule.next(current, success)
+        dao.put(next.copy(dueAt = PuzzleSchedule.dueAt(next, now), updatedAt = now, theme = puzzle.theme))
     }
 
     private fun present(index: Int) {
@@ -181,6 +220,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             } else {
                 com.chesslab.sound.Haptics.illegal()
                 StatsStore.recordPuzzle(getApplication(), solvedIt = false)
+                ui.puzzle?.let { recordProgress(it, success = false) }
                 ui.copy(
                     selected = null, legalTargets = emptySet(),
                     outcome = PuzzleOutcome.failed,
@@ -218,6 +258,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         if (step >= puzzle.solution.size) {
             com.chesslab.sound.Haptics.gameEnded()
             StatsStore.recordPuzzle(getApplication(), solvedIt = true)
+            recordProgress(puzzle, success = true)
             ui = ui.copy(
                 outcome = PuzzleOutcome.solved,
                 solvedCount = ui.solvedCount + 1,
