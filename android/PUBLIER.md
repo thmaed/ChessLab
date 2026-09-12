@@ -127,6 +127,16 @@ jarsigner -verify app/build/outputs/bundle/release/app-release.aab
 # attendu : « jar verified. »
 ```
 
+Pour un **APK** (`assembleRelease`), `jarsigner` répond « no manifest » : il
+n'est pas le bon outil, la signature y est en v2/v3. C'est `apksigner` qu'il
+faut :
+
+```bash
+$SDK/build-tools/35.0.0/apksigner verify --print-certs \
+  app/build/outputs/apk/release/app-release.apk
+# attendu : « Signer #1 certificate DN: CN=ChessLab, … »
+```
+
 L'avertissement `PKIX path building failed` qui suit est **normal** : la clé de
 téléversement est auto-signée, aucune autorité ne la garantit — c'est le
 principe. Seule la ligne « jar verified. » compte.
@@ -221,9 +231,9 @@ plus rapides.
 
 ## 6. Ce qu'il reste à faire côté app avant de publier
 
-- [ ] **La mesure sur un vrai téléphone.** L'émulateur ne dit rien de la
-      vitesse ni du thermique, et c'est de là que dépend la calibration des
-      niveaux (voir `README.md`, « Ce qui reste »).
+- [x] ~~La mesure sur un vrai téléphone~~ — faite le 12/09/2026 sur un Galaxy
+      A16 (voir `README.md`). Reste le comportement THERMIQUE après une longue
+      session.
 - [ ] **La page de politique de confidentialité**, en ligne, avec son URL.
 - [ ] **La mise à disposition des sources** (GPLv3, §0) et l'écran de licences.
 - [ ] **`versionName`** passé à `1.0`, `versionCode` délibéré.

@@ -139,13 +139,45 @@ Les deux sont corrigés dans `chesskit/Board.kt` et prouvés par
 correctif — vérifié). **Les deux sont dans ChessKit en amont**, Swift comme
 Kotlin : à signaler, avec les trois autres déjà relevés.
 
+## Mesuré sur un vrai téléphone (12/09/2026)
+
+**Samsung Galaxy A16 5G** (SM-A165F, MediaTek Helio G99, 8 cœurs à 2,0 GHz,
+3,7 Go, Android 16) — un appareil d'ENTRÉE DE GAMME, choisi de fait, et c'est
+ce qui rend la mesure utile : ce qui passe là passe partout.
+
+| | |
+| --- | --- |
+| Démarrage à froid | **466 ms** (282 ms à chaud) |
+| Maia — un coup | **120 ms**, stable (121 et 119 ms sur deux parties) |
+| Stockfish — une position de revue | **≈ 780 ms** à 300 000 nœuds |
+| Analyse en continu | **profondeur 18** |
+| APK installé | 170 Mo, plus 78 Mo de réseaux extraits |
+
+**Ce que la mesure tranche.**
+
+- **Le budget en NŒUDS tient sa promesse.** iOS annonce 600-750 ms par position
+  sur un iPhone 17 Pro ; ce téléphone-ci fait 780 ms. L'écart est dérisoire
+  parce que le budget ne mesure pas du temps mais du TRAVAIL : l'analyse rend
+  le même verdict partout, elle prend seulement le temps qu'il lui faut. Ce
+  n'était jusqu'ici qu'une intention documentée.
+- **Maia n'a pas besoin d'être bridée.** L'émulateur donnait 28 à 216 ms selon
+  le lancement — un facteur 7 qui interdisait toute calibration (voir
+  l'étude). Sur l'appareil, la cadence est stable à 120 ms : un adversaire
+  répond dans le temps d'un battement de cils, et la calibration des niveaux
+  peut se faire sur l'échelle Maia sans compensation de lenteur.
+
+Méthode : Laboratoire, Maia contre Maia, cadence comptée À L'INTÉRIEUR d'une
+partie (134 demi-coups sur 16,1 s) pour ne pas mesurer un bord tronqué.
+
 ## Ce qui reste
 
 - **Crazyhouse.** Fairy-Stockfish la connaît, mais elle demande de parachuter
   les pièces prises : il y faut une réserve et un geste de pose. Sans eux, le
   moteur jouerait des coups que l'utilisateur ne pourrait pas rendre.
-- **La mesure sur un vrai téléphone.** L'émulateur ne dit rien de la vitesse ni
-  du thermique — et c'est de là que dépend la calibration des niveaux.
+- **Le thermique.** La vitesse est mesurée (voir plus haut) ; ce qui ne l'est
+  pas encore, c'est ce que devient cette cadence après vingt minutes de jeu,
+  téléphone chaud. iOS a un `ThermalMonitor` qui réduit le budget en
+  surchauffe ; Android n'en a pas.
 - **L'AFFINAGE des verdicts limites.** iOS approfondit la recherche quand la
   perte d'un coup tombe près d'un seuil (`RefinementStopRule`), pour ne jamais
   afficher une étiquette qu'il retirerait ensuite. Android classe au budget
