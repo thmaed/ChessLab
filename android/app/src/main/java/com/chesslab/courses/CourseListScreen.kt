@@ -154,7 +154,8 @@ fun CourseListScreen(
         // dans une liste de 136 entrées.
         SearchField(
             query, endgames, filtered.size,
-            Modifier.align(Alignment.BottomCenter).padding(horizontal = 20.dp, vertical = 14.dp),
+            Modifier.align(Alignment.BottomCenter).imePadding()
+                .padding(horizontal = 20.dp, vertical = 14.dp),
         ) { query = it }
     }
 }

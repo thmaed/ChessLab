@@ -22,6 +22,10 @@ import com.chesslab.maia.OpponentProfile
 import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.MoveStrip
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.ui.text.style.TextAlign
+import com.chesslab.ui.accentGradient
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
 import androidx.compose.ui.res.stringResource
@@ -35,9 +39,9 @@ fun LabScreen(model: LabViewModel = viewModel()) {
         header = {
             Scoreboard(ui)
             Spacer(Modifier.height(8.dp))
-            SidePicker("Camp A", ui.sideA.profile, "a", model::setSideA)
+            SidePicker(stringResource(R.string.lab_side_a), ui.sideA.profile, "a", model::setSideA)
             Spacer(Modifier.height(6.dp))
-            SidePicker("Camp B", ui.sideB.profile, "b", model::setSideB)
+            SidePicker(stringResource(R.string.lab_side_b), ui.sideB.profile, "b", model::setSideB)
 
             Spacer(Modifier.height(8.dp))
             StatusRow(ui.status, busy = ui.running)
@@ -51,14 +55,32 @@ fun LabScreen(model: LabViewModel = viewModel()) {
             MoveStrip(ui.sanMoves)
 
             Spacer(Modifier.height(8.dp))
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Button(onClick = model::toggle, modifier = Modifier.testTag("lancer")) {
-                    Text(stringResource(if (ui.running) R.string.lab_pause else R.string.lab_start))
-                }
-                Spacer(Modifier.width(8.dp))
-                TextButton(onClick = model::reset, modifier = Modifier.testTag("remise")) {
-                    Text(stringResource(R.string.lab_reset), color = Palette.textSecondary)
-                }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(
+                    stringResource(if (ui.running) R.string.lab_pause else R.string.lab_start),
+                    fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.background,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(CircleShape)
+                        .background(accentGradient)
+                        .clickable { model.toggle() }
+                        .padding(vertical = 13.dp)
+                        .testTag("lancer"),
+                )
+                Text(
+                    stringResource(R.string.lab_reset),
+                    fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(CircleShape)
+                        .background(Palette.surfaceElevated)
+                        .border(1.dp, Palette.stroke, CircleShape)
+                        .clickable { model.reset() }
+                        .padding(vertical = 13.dp)
+                        .testTag("remise"),
+                )
             }
         },
     )

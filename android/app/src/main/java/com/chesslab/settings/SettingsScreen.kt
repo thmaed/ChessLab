@@ -22,6 +22,16 @@ import androidx.compose.ui.unit.sp
 import chesskit.Position
 import com.chesslab.ui.BoardTheme
 import com.chesslab.ui.BoardView
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VolumeUp
+import com.chesslab.ui.SettingsSection
 import com.chesslab.ui.Palette
 import androidx.compose.ui.res.stringResource
 import com.chesslab.R
@@ -33,24 +43,26 @@ fun SettingsScreen() {
     val settings by SettingsStore.state.collectAsState()
 
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        Section(stringResource(R.string.settings_preview))
-        // un aperçu vaut mieux qu'une vignette : c'est le vrai plateau
-        BoardView(position = remembered, enabled = false)
+        // Un aperçu vaut mieux qu'une vignette : c'est le vrai plateau, avec
+        // le thème et les pièces choisis juste en dessous.
+        SettingsSection(stringResource(R.string.settings_preview), Icons.Default.Visibility) {
+            BoardView(position = remembered, enabled = false)
+        }
 
-        Spacer(Modifier.height(16.dp))
-        Section(stringResource(R.string.settings_board_theme))
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            BoardTheme.all.forEach { theme ->
-                ThemeSwatch(theme, theme.id == settings.boardThemeId) {
-                    SettingsStore.setBoardTheme(context, theme.id)
+        SettingsSection(stringResource(R.string.settings_board_theme), Icons.Default.Palette) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                BoardTheme.all.forEach { theme ->
+                    ThemeSwatch(theme, theme.id == settings.boardThemeId) {
+                        SettingsStore.setBoardTheme(context, theme.id)
+                    }
                 }
             }
         }
 
-        Spacer(Modifier.height(16.dp))
-        Section(stringResource(R.string.settings_piece_set))
+        SettingsSection(stringResource(R.string.settings_piece_set), Icons.Default.Category) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf(
                 "classic" to R.string.pieces_classic,
@@ -63,8 +75,9 @@ fun SettingsScreen() {
             }
         }
 
-        Spacer(Modifier.height(16.dp))
-        Section(stringResource(R.string.settings_engine_time))
+        }
+
+        SettingsSection(stringResource(R.string.settings_engine_time), Icons.Default.Speed) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf(200 to R.string.speed_fast, 400 to R.string.speed_normal, 1000 to R.string.speed_thoughtful, 3000 to R.string.speed_long)
                 .forEach { (ms, label) ->
@@ -74,8 +87,9 @@ fun SettingsScreen() {
                 }
         }
 
-        Spacer(Modifier.height(16.dp))
-        Section(stringResource(R.string.settings_sounds))
+        }
+
+        SettingsSection(stringResource(R.string.settings_sounds), Icons.Default.VolumeUp) {
         Row(
             Modifier
                 .fillMaxWidth()
@@ -100,8 +114,9 @@ fun SettingsScreen() {
             }
         }
 
-        Spacer(Modifier.height(16.dp))
-        Section(stringResource(R.string.settings_language))
+        }
+
+        SettingsSection(stringResource(R.string.settings_language), Icons.Default.Language) {
         val activity = LocalContext.current as? android.app.Activity
         var language by remember { mutableStateOf(AppLanguage.current(context)) }
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -117,8 +132,9 @@ fun SettingsScreen() {
             }
         }
 
-        Spacer(Modifier.height(16.dp))
-        Section(stringResource(R.string.progress_puzzles))
+        }
+
+        SettingsSection(stringResource(R.string.progress_puzzles), Icons.Default.Extension) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf(1 to R.string.settings_one_try, 3 to R.string.settings_three_tries).forEach { (n, label) ->
                 Choice(stringResource(label), n == settings.puzzleAttempts, "essais-$n") {
@@ -131,8 +147,18 @@ fun SettingsScreen() {
             fontSize = 11.sp, color = Palette.textTertiary,
             modifier = Modifier.padding(top = 6.dp),
         )
+        }
 
-        Spacer(Modifier.height(32.dp))
+        // Ce que l'app doit à d'autres : Stockfish est sous GPLv3, et cela
+        // s'affiche, ce n'est pas une note de bas de page.
+        SettingsSection(stringResource(R.string.settings_about), Icons.Default.Info) {
+            Text(
+                stringResource(R.string.settings_licences),
+                fontSize = 13.sp, color = Palette.textSecondary,
+            )
+        }
+
+        Spacer(Modifier.height(12.dp))
     }
 }
 

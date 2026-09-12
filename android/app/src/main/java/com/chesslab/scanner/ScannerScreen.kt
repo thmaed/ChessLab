@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.chesslab.ui.BoardView
+import androidx.compose.foundation.clickable
 import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
 import androidx.compose.foundation.Canvas
@@ -49,9 +50,19 @@ fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> 
         StatusRow(ui.status, busy = ui.busy)
         Spacer(Modifier.height(8.dp))
 
-        Button(onClick = { pick.launch("image/*") }, modifier = Modifier.testTag("choisir")) {
-            Text(stringResource(R.string.scan_choose))
-        }
+        Text(
+            stringResource(R.string.scan_choose),
+            fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+            color = Palette.background,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(androidx.compose.foundation.shape.CircleShape)
+                .background(com.chesslab.ui.accentGradient)
+                .clickable { pick.launch("image/*") }
+                .padding(vertical = 13.dp)
+                .testTag("choisir"),
+        )
 
         ui.image?.let { bitmap ->
             Spacer(Modifier.height(10.dp))

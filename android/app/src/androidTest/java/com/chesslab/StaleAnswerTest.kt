@@ -33,7 +33,8 @@ class StaleAnswerTest {
 
     private fun awaitText(text: String, timeoutMs: Long = 120_000) =
         compose.waitUntil(timeoutMs) {
-            compose.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText(text, substring = true, ignoreCase = true)
+                .fetchSemanticsNodes().isNotEmpty()
         }
 
     private fun awaitTag(tag: String, timeoutMs: Long = 120_000) =
@@ -73,13 +74,13 @@ class StaleAnswerTest {
 
     @Test fun passerUnPuzzlePendantLaRiposteNeLaJouePasSurLeSuivant() {
         openMode("puzzles")
-        awaitText("trouvez le meilleur coup")
+        awaitText("Trouvez le meilleur coup")
 
         // On passe plusieurs fois de suite, plus vite que la riposte de 450 ms.
         repeat(6) { compose.onNodeWithTag("passer").performClick() }
         compose.waitForIdle()
         Thread.sleep(2_000)
         compose.waitForIdle()
-        awaitText("trouvez le meilleur coup", 20_000)
+        awaitText("Trouvez le meilleur coup", 20_000)
     }
 }

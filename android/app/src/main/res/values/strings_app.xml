@@ -419,4 +419,14 @@
     <string name="variant_crazyhouse_blurb">A captured piece changes sides and can be DROPPED back on any empty square. The board never empties, and nothing is ever quite won.</string>
     <string name="variants_intro">Other ways to play chess, against the computer — same strength and time-control settings as the classical mode.</string>
     <string name="route_variants_title">Chess variants</string>
+    <string name="puzzle_instruction">Find the best move</string>
+    <string name="puzzle_one_try">One try only</string>
+    <string name="puzzle_tries">Tries</string>
+    <string name="puzzle_solved_bang">Solved!</string>
+    <string name="puzzle_revealed">Solution revealed</string>
+    <string name="phase_opening">Opening</string>
+    <string name="phase_middlegame">Middlegame</string>
+    <string name="phase_endgame">Endgame</string>
+    <string name="settings_about">About</string>
+    <string name="settings_licences">Stockfish and Fairy-Stockfish are under GPLv3, ChessKit under MIT, the cburnett pieces under CC BY-SA 3.0, the puzzles come from the Lichess database (CC0). Distributing this app carries those obligations.</string>
 </resources>

@@ -40,6 +40,10 @@ data class PuzzleUiState(
     val busy: Boolean = false,
     /** Essais restants sur le puzzle courant (réglage : un ou trois). */
     val attemptsLeft: Int = 1,
+    /** Essais permis : ce que le réglage accorde, pour dessiner les pastilles. */
+    val allowedAttempts: Int = 1,
+    /** Les deux cases du coup soufflé, quand l'utilisateur l'a demandé. */
+    val hint: Pair<Square, Square>? = null,
 )
 
 /**
@@ -92,6 +96,8 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             checkedKing = null,
             outcome = PuzzleOutcome.solving,
             attemptsLeft = SettingsStore.state.value.puzzleAttempts,
+            allowedAttempts = SettingsStore.state.value.puzzleAttempts,
+            hint = null,
             status = s(R.string.puzzle_prompt, s(puzzle.themeLabel), puzzle.rating),
         )
     }
@@ -188,9 +194,21 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
                 reply = board.completePromotion(of = reply, to = kindOf(lan[4]))
             }
             step++
-            ui = ui.copy(busy = false)
+            ui = ui.copy(busy = false, hint = null)
             if (reply != null) show(reply, s(R.string.your_turn))
         }
+    }
+
+    /**
+     * Montre le coup à jouer, sans le jouer : l'utilisateur garde la main, et
+     * son essai reste entier. C'est un coup de pouce, pas une reddition.
+     */
+    fun showHint() {
+        if (ui.outcome != PuzzleOutcome.solving) return
+        val puzzle = ui.puzzle ?: return
+        val lan = puzzle.solution.getOrNull(step) ?: return
+        if (lan.length < 4) return
+        ui = ui.copy(hint = Square(lan.substring(0, 2)) to Square(lan.substring(2, 4)))
     }
 
     private fun show(move: Move, status: String) {

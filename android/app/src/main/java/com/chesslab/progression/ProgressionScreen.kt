@@ -18,6 +18,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chesslab.library.LibraryDatabase
 import com.chesslab.settings.StatsStore
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.SportsEsports
+import com.chesslab.ui.SettingsSection
 import com.chesslab.ui.Palette
 import androidx.compose.ui.res.stringResource
 import com.chesslab.R
@@ -46,9 +51,10 @@ fun ProgressionScreen() {
     val draws = games.count { it.result == "1/2-1/2" }
 
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
+        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        Section(stringResource(R.string.progress_games))
+        SettingsSection(stringResource(R.string.progress_games), Icons.Default.SportsEsports, Palette.info) {
         if (games.isEmpty()) {
             Empty(stringResource(R.string.progress_no_games))
         } else {
@@ -71,8 +77,9 @@ fun ProgressionScreen() {
             }
         }
 
-        Spacer(Modifier.height(20.dp))
-        Section(stringResource(R.string.progress_puzzles))
+        }
+
+        SettingsSection(stringResource(R.string.progress_puzzles), Icons.Default.Extension, Palette.violet) {
         val stats = puzzles
         if (stats == null || stats.attempted == 0) {
             Empty(stringResource(R.string.progress_no_puzzles))
@@ -84,8 +91,9 @@ fun ProgressionScreen() {
             }
         }
 
-        Spacer(Modifier.height(20.dp))
-        Section(stringResource(R.string.progress_memory))
+        }
+
+        SettingsSection(stringResource(R.string.progress_memory), Icons.Default.Psychology, Palette.accent) {
         val memo = training
         if (memo == null || memo.studied == 0) {
             Empty(stringResource(R.string.progress_no_memory))
@@ -107,7 +115,9 @@ fun ProgressionScreen() {
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        }
+
+        Spacer(Modifier.height(12.dp))
     }
 }
 

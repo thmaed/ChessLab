@@ -1,102 +1,232 @@
 package com.chesslab.puzzles
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.chesslab.play.PromotionDialog
-import com.chesslab.ui.BoardScaffold
-import com.chesslab.ui.BoardView
-import com.chesslab.ui.Palette
-import com.chesslab.ui.StatusRow
-import androidx.compose.ui.res.stringResource
+import chesskit.Piece
 import com.chesslab.R
+import com.chesslab.play.PromotionDialog
+import com.chesslab.ui.*
 
+/**
+ * Résoudre un puzzle. Pendant de `PuzzleSolveView`.
+ *
+ * Deux lignes d'en-tête, et pas quatre : la CONSIGNE seule en gros, puis tout
+ * le contexte — thème, difficulté, phase, avancement — sur une ligne discrète.
+ * Empilées, aucune ne ressortait et le regard devait toutes les lire pour
+ * trouver celle qui dit quoi faire.
+ */
 @Composable
 fun PuzzleScreen(model: PuzzleViewModel = viewModel()) {
     val ui = model.ui
 
-    BoardScaffold(
-        header = {
-            StatusRow(ui.status, busy = ui.loading || ui.busy)
-            Spacer(Modifier.height(8.dp))
+    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Header(ui)
+        Spacer(Modifier.height(12.dp))
 
-            ui.puzzle?.let { puzzle ->
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Palette.surface)
-                        .padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Badge(stringResource(puzzle.themeLabel), Palette.violet)
-                    Spacer(Modifier.width(8.dp))
-                    Badge("${puzzle.rating}", Palette.info)
-                    Spacer(Modifier.weight(1f))
-                    Text(
-                        stringResource(R.string.puzzle_score, ui.solvedCount, ui.attemptedCount),
-                        fontSize = 12.sp, color = Palette.textSecondary,
-                        modifier = Modifier.testTag("score"),
-                    )
-                }
+        BoardView(
+            position = ui.position,
+            orientation = ui.orientation,
+            selected = ui.selected,
+            legalTargets = ui.legalTargets,
+            lastMove = ui.lastMove,
+            checkedKing = ui.checkedKing,
+            hint = ui.hint,
+            enabled = ui.outcome == PuzzleOutcome.solving && !ui.busy,
+            onSquareTap = model::onSquareTap,
+        )
+
+        Spacer(Modifier.height(14.dp))
+        if (ui.outcome == PuzzleOutcome.solving) {
+            AttemptsIndicator(ui.attemptsLeft, ui.allowedAttempts)
+            if (ui.hint == null) {
+                Spacer(Modifier.height(12.dp))
+                HintButton { model.showHint() }
             }
-            Spacer(Modifier.height(10.dp))
-        },
-        board = {
-            BoardView(
-                position = ui.position,
-                orientation = ui.orientation,
-                selected = ui.selected,
-                legalTargets = ui.legalTargets,
-                lastMove = ui.lastMove,
-                checkedKing = ui.checkedKing,
-                enabled = ui.outcome == PuzzleOutcome.solving && !ui.busy,
-                onSquareTap = model::onSquareTap,
-            )
-        },
-        panel = {
             Spacer(Modifier.height(12.dp))
-            when (ui.outcome) {
-                PuzzleOutcome.solved -> Verdict(stringResource(R.string.puzzle_solved), Palette.accent, model::next)
-                PuzzleOutcome.failed -> Verdict(stringResource(R.string.puzzle_failed), Palette.danger, model::next)
-                PuzzleOutcome.solving -> TextButton(onClick = model::next, modifier = Modifier.testTag("passer")) {
-                    Text(stringResource(R.string.puzzle_skip), color = Palette.textSecondary)
-                }
+            TextButton(onClick = model::next, modifier = Modifier.testTag("passer")) {
+                Text(stringResource(R.string.puzzle_skip), color = Palette.textSecondary)
             }
-        },
-    )
+        } else {
+            ResultCard(
+                solved = ui.outcome == PuzzleOutcome.solved,
+                modifier = Modifier.padding(horizontal = 20.dp),
+                onNext = model::next,
+            )
+        }
+    }
 
     if (ui.pendingPromotion != null) PromotionDialog(model::completePromotion)
 }
 
 @Composable
-private fun Verdict(text: String, tint: androidx.compose.ui.graphics.Color, onNext: () -> Unit) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(text, color = tint, fontWeight = FontWeight.SemiBold, modifier = Modifier.testTag("verdict"))
-        Spacer(Modifier.weight(1f))
-        Button(onClick = onNext, modifier = Modifier.testTag("suivant")) { Text(stringResource(R.string.puzzle_next)) }
+private fun Header(ui: PuzzleUiState) {
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier
+                    .size(13.dp)
+                    .clip(CircleShape)
+                    .background(if (ui.orientation == Piece.Color.white) Color.White else Color.Black)
+                    .border(1.dp, Palette.stroke, CircleShape)
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                stringResource(R.string.puzzle_instruction),
+                fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                modifier = Modifier.testTag("statut"),
+            )
+        }
+        val puzzle = ui.puzzle ?: return@Column
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(7.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                stringResource(puzzle.themeLabel).uppercase(),
+                fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Palette.accent,
+            )
+            ContextPill("${puzzle.rating}", difficultyTint(puzzle.rating))
+            puzzle.phase?.let { ContextPill(stringResource(phaseLabel(it)), Palette.info) }
+            Text(
+                stringResource(R.string.puzzle_score, ui.solvedCount, ui.attemptedCount),
+                fontSize = 12.sp, color = Palette.textSecondary,
+                modifier = Modifier.testTag("score"),
+            )
+        }
     }
 }
 
 @Composable
-private fun Badge(text: String, tint: androidx.compose.ui.graphics.Color) {
+private fun ContextPill(label: String, tint: Color) {
     Text(
-        text,
-        fontSize = 11.sp,
-        color = tint,
+        label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = tint,
         modifier = Modifier
-            .clip(RoundedCornerShape(6.dp))
-            .background(tint.copy(alpha = 0.14f))
-            .padding(horizontal = 7.dp, vertical = 3.dp),
+            .clip(CircleShape)
+            .background(tint.copy(alpha = 0.16f))
+            .padding(horizontal = 8.dp, vertical = 3.dp),
     )
+}
+
+/** La difficulté se lit à sa couleur, du vert au rouge. */
+private fun difficultyTint(rating: Int): Color = when {
+    rating < 1200 -> Palette.accent
+    rating < 1600 -> Palette.teal
+    rating < 2000 -> Palette.warning
+    else -> Palette.danger
+}
+
+private fun phaseLabel(phase: String): Int = when (phase) {
+    "opening" -> R.string.phase_opening
+    "middlegame" -> R.string.phase_middlegame
+    else -> R.string.phase_endgame
+}
+
+/** Les essais restants, en pastilles : on voit ce qu'il reste sans compter. */
+@Composable
+private fun AttemptsIndicator(left: Int, allowed: Int) {
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text(
+            stringResource(if (allowed == 1) R.string.puzzle_one_try else R.string.puzzle_tries).uppercase(),
+            fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.4.sp, color = Palette.textTertiary,
+        )
+        repeat(allowed) { index ->
+            Box(
+                Modifier
+                    .size(9.dp)
+                    .clip(CircleShape)
+                    .background(if (index < left) Palette.accent else Color.White.copy(alpha = 0.12f))
+            )
+        }
+    }
+}
+
+@Composable
+private fun HintButton(onClick: () -> Unit) {
+    Row(
+        Modifier
+            .clip(CircleShape)
+            .background(Palette.surfaceElevated)
+            .border(1.dp, Palette.stroke, CircleShape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 14.dp, vertical = 7.dp)
+            .testTag("indice"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Default.Lightbulb, null, tint = Palette.textSecondary, modifier = Modifier.size(15.dp))
+        Spacer(Modifier.width(6.dp))
+        Text(stringResource(R.string.train_hint), fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold, color = Palette.textSecondary)
+    }
+}
+
+/**
+ * Le verdict, SOUS le plateau et jamais par-dessus : la position reste
+ * visible, y compris la flèche de la solution.
+ */
+@Composable
+private fun ResultCard(solved: Boolean, modifier: Modifier, onNext: () -> Unit) {
+    val tint = if (solved) Palette.accent else Palette.textSecondary
+    Column(
+        modifier
+            .fillMaxWidth()
+            .clip(CardShape)
+            .background(cardGradient)
+            .subtleBorder()
+            .padding(16.dp)
+            .testTag("verdict"),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Box(
+                Modifier.size(46.dp).clip(CircleShape).background(tint.copy(alpha = 0.16f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    if (solved) Icons.Default.CheckCircle else Icons.Default.Flag, null,
+                    tint = tint, modifier = Modifier.size(24.dp),
+                )
+            }
+            Spacer(Modifier.width(12.dp))
+            Text(
+                stringResource(if (solved) R.string.puzzle_solved_bang else R.string.puzzle_revealed),
+                fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary,
+            )
+        }
+        Text(
+            stringResource(R.string.puzzle_next),
+            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.background,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(CircleShape)
+                .background(accentGradient)
+                .clickable(onClick = onNext)
+                .padding(vertical = 12.dp)
+                .testTag("suivant"),
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+        )
+    }
 }

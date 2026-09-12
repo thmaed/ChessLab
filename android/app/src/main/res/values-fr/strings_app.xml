@@ -416,4 +416,14 @@
     <string name="variant_crazyhouse_blurb">Une pièce prise change de camp et peut être PARACHUTÉE sur n\'importe quelle case vide. Le plateau ne se vide jamais, et rien n\'est jamais tout à fait gagné.</string>
     <string name="variants_intro">D\'autres façons de jouer aux échecs, contre l\'ordinateur — mêmes réglages de force et de cadence que le mode classique.</string>
     <string name="route_variants_title">Variantes d\'échecs</string>
+    <string name="puzzle_instruction">Trouvez le meilleur coup</string>
+    <string name="puzzle_one_try">Un seul essai</string>
+    <string name="puzzle_tries">Essais</string>
+    <string name="puzzle_solved_bang">Résolu !</string>
+    <string name="puzzle_revealed">Solution révélée</string>
+    <string name="phase_opening">Ouverture</string>
+    <string name="phase_middlegame">Milieu de partie</string>
+    <string name="phase_endgame">Finale</string>
+    <string name="settings_about">À propos</string>
+    <string name="settings_licences">Stockfish et Fairy-Stockfish sont sous GPLv3, ChessKit sous MIT, les pièces cburnett sous CC BY-SA 3.0, les puzzles viennent de la base Lichess (CC0). Distribuer cette app engage ces obligations.</string>
 </resources>

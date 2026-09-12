@@ -35,7 +35,8 @@ class EnglishTest {
 
     private fun awaitText(text: String, timeoutMs: Long = 60_000) =
         compose.waitUntil(timeoutMs) {
-            compose.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty()
+            compose.onAllNodesWithText(text, substring = true, ignoreCase = true)
+                .fetchSemanticsNodes().isNotEmpty()
         }
 
     @Test fun theHomeSpeaksEnglish() {

@@ -81,7 +81,12 @@ private fun App() {
 
     BackHandler(enabled = stack.size > 1) { stack.removeAt(stack.lastIndex) }
 
-    Column(Modifier.fillMaxSize().safeDrawingPadding()) {
+    // `systemBarsPadding` et non `safeDrawingPadding` : ce dernier inclut le
+    // CLAVIER, si bien que son ouverture redimensionnait tout l'arbre de
+    // l'écran. Combiné à un changement d'écran dans la même image, Compose
+    // remesurait un nœud déjà détaché et plantait. Les écrans qui saisissent
+    // du texte gèrent l'encart du clavier eux-mêmes.
+    Column(Modifier.fillMaxSize().systemBarsPadding()) {
         if (current != Route.Home) {
             TopBar(if (current.hasOwnTitle) "" else current.title(context)) { stack.removeAt(stack.lastIndex) }
         }

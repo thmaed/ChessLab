@@ -20,6 +20,23 @@ Rien n'est dupliqué. Le `CMakeLists` pointe sur `Vendor/CStockfish` et
 les cours d'ouvertures et de finales et les répertoires des personnages sont
 recopiés depuis `ChessLab/Resources/` au moment du build.
 
+## La ressemblance avec iOS
+
+Le portage ne reprend pas seulement les fonctions : il reprend la FORME, écran
+par écran, depuis les sources SwiftUI et les captures de la soumission App
+Store. Le fond signature (`AppBackground`), les pastilles d'icône, les cartes
+à bordure teintée, les en-têtes de section, les puces, les lignes joueurs, les
+tuiles de mode — tout vient de `ChessLab/Theme.swift` et de ses vues, avec les
+mêmes valeurs.
+
+Deux conséquences à connaître avant de toucher au code :
+
+- **Une partie se prépare.** Accueil → Nouvelle partie (couleur, adversaire,
+  niveau, cadence, aides) → Jouer. Il n'y a pas de raccourci vers le plateau.
+- **Les neuf personnages ont des illustrations**, recopiées des assets iOS par
+  `tools/android-assets/copy_images.py`. Leur teinte est celle de l'avatar, pas
+  une couleur de la palette.
+
 ## Ce qui marche
 
 | | |
@@ -32,6 +49,8 @@ recopiés depuis `ChessLab/Resources/` au moment du build.
 | Analyser | PGN et FEN, navigation, évaluation du moteur, bibliothèque |
 | Laboratoire | l'ordinateur contre lui-même, en série |
 | Variantes | Chess960, Roi de la colline, Trois échecs, Horde, Course des rois, Atomique, Antichecs |
+| Pendule | bullet, blitz, rapide, classique, avec incrément |
+| Abandon, nulle, indice | et la consultation d'un coup passé |
 | Scanner | lire une position sur une photo, plateau détecté tout seul |
 | Réglages | quatre thèmes, trois jeux de pièces, force du moteur |
 | Paysage | plateau et panneau côte à côte, sur téléphone comme sur tablette |
@@ -41,6 +60,9 @@ recopiés depuis `ChessLab/Resources/` au moment du build.
 
 ## Ce qui reste
 
+- **Crazyhouse.** Fairy-Stockfish la connaît, mais elle demande de parachuter
+  les pièces prises : il y faut une réserve et un geste de pose. Sans eux, le
+  moteur jouerait des coups que l'utilisateur ne pourrait pas rendre.
 - **La mesure sur un vrai téléphone.** L'émulateur ne dit rien de la vitesse ni
   du thermique — et c'est de là que dépend la calibration des niveaux.
 - La synchronisation entre appareils (iOS passe par CloudKit ; côté Android le

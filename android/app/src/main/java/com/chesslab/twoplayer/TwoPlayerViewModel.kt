@@ -29,6 +29,8 @@ data class TwoPlayerUiState(
     val gameOver: Boolean = false,
     val orientation: Piece.Color = Piece.Color.white,
     val autoFlip: Boolean = true,
+    /** Les prises de chaque camp, pour les lignes joueurs. */
+    val captured: com.chesslab.play.CapturedMaterial = com.chesslab.play.CapturedMaterial(),
 )
 
 /**
@@ -42,6 +44,9 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
 
     private var board = Board()
     private val recorder = GameRecorder()
+
+    /** Les coups joués : ce qu'il faut pour compter les prises. */
+    private val moveLog = mutableListOf<Move>()
 
     var ui by mutableStateOf(
         TwoPlayerUiState(
@@ -92,10 +97,12 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
     fun newGame() {
         board = Board()
         recorder.reset()
-        ui = TwoPlayerUiState(autoFlip = ui.autoFlip)
+        moveLog.clear()
+        ui = TwoPlayerUiState(autoFlip = ui.autoFlip, status = s(R.string.white_to_move))
     }
 
     private fun refresh(move: Move) {
+        moveLog += move
         recorder.record(move)
         val position = board.position
         val state = board.state
@@ -142,6 +149,7 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
             lastMove = move.start to move.end,
             checkedKing = checkedKing,
             status = status,
+            captured = com.chesslab.play.CapturedMaterial.from(moveLog, board),
             sanMoves = ui.sanMoves + move.san,
             gameOver = over,
             orientation = if (ui.autoFlip && !over) position.sideToMove else ui.orientation,
