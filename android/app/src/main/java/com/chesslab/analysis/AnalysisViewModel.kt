@@ -26,6 +26,7 @@ import com.chesslab.ui.HintArrowBuilder
 import com.chesslab.ui.s
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
@@ -231,9 +232,24 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     private var game: Game? = null
     private var evalJob: Job? = null
     private var reviewJob: Job? = null
+    private var lazyJob: Job? = null
 
     /** Les évaluations de la revue, une par POSITION (il y en a une de plus que de coups). */
     private var reviewEvals: MutableMap<Int, PositionEval> = HashMap()
+
+    /**
+     * REVUE d'une partie (un PGN qui a des coups) ou ANALYSE d'une position
+     * (FEN, scan, éditeur) ? iOS distingue les deux à la source, et tout en
+     * dépend : en revue, la classification part TOUTE SEULE au chargement,
+     * puis le moteur se tait — naviguer lit le cache, rien n'est recalculé.
+     * Sur une position, l'analyse en continu est la seule source d'évaluation.
+     */
+    private var isGameReview = false
+
+    /** La clé du cache disque pour la partie chargée ; `null` pour une ligne explorée à la main. */
+    private var persistenceKey: String? = null
+    private val store = AnalysisEvalStore(java.io.File(app.filesDir, "analysis-cache"))
+    private val book by lazy { EcoOpeningLoader.bookLines(getApplication<Application>().assets) }
 
     var ui by mutableStateOf(
         AnalysisUiState(
@@ -285,6 +301,8 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             positions = listOf(position)
             moves = emptyList()
             game = null
+            isGameReview = false
+            persistenceKey = null
             ui = ui.copy(
                 position = position, sanMoves = emptyList(), cursor = -1,
                 lastMove = null, status = s(R.string.analysis_position_loaded), error = null,
@@ -340,8 +358,27 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             curve = emptyList(), summary = null,
             reviewing = false, reviewDone = 0, reviewTotal = 0,
         )
+        isGameReview = true
+        // Analyse DÉJÀ FAITE ? Le cache disque la restitue entière — évals,
+        // verdicts, courbe, précision — avant même que le moteur démarre : la
+        // partie s'ouvre classifiée, et la revue ne repart que pour ce qui
+        // manque (écran quitté en cours de route).
+        persistenceKey = AnalysisEvalStore.key(start.fen, moves.map { it.lan })
+        persistenceKey?.let { key -> store.load(key) }?.let { restored ->
+            reviewEvals = restored.toMutableMap()
+            classify(positions, moves, reviewEvals, book)
+        }
         goTo(moves.size - 1)
+        if (!isMainLineFullyEvaluated()) review()
     }
+
+    /**
+     * Vrai quand chaque position de la ligne principale porte son évaluation.
+     * Fondé sur les DONNÉES, pas sur un drapeau : un drapeau ment dès que la
+     * revue s'interrompt sans le remettre à zéro.
+     */
+    private fun isMainLineFullyEvaluated(): Boolean =
+        positions.indices.all { reviewEvals.containsKey(it) }
 
     fun goTo(index: Int) {
         val clamped = index.coerceIn(-1, moves.size - 1)
@@ -371,7 +408,80 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                 reviewEvals[clamped]?.bestLan else null,
             reviewEval = reviewEvals[clamped + 1],
         )
-        evaluate()
+        // REVUE : l'analyse a DÉJÀ été calculée. Naviguer ne relance RIEN —
+        // l'évaluation et les flèches sont lues dans le cache, le moteur reste
+        // au repos. Une position pas encore évaluée (variante explorée, revue
+        // interrompue) est classée UNE fois, sans rallumer l'analyse en
+        // continu. EXPLORATION d'une position : l'analyse en continu est la
+        // seule source, elle recalcule à chaque coup — c'est voulu.
+        if (isGameReview) showCachedEval(clamped) else evaluate()
+    }
+
+    /**
+     * Affiche l'évaluation MISE EN CACHE de la position affichée,
+     * instantanément et sans toucher au moteur ; en demande une seule si elle
+     * manque. Les candidats viennent du même cache : le meilleur coup avec
+     * son éval, le 2e choix quand il est proche — ce que les chips savent
+     * jouer pour explorer.
+     */
+    private fun showCachedEval(cursor: Int) {
+        val index = cursor + 1
+        val position = positions.getOrNull(index) ?: return
+        val cached = reviewEvals[index]
+        if (cached == null) {
+            ensureEvaluatedLazily(index)
+            return
+        }
+        val candidates = ArrayList<Candidate>()
+        cached.bestLan?.let { lan ->
+            sanFor(position, lan)?.let { san ->
+                candidates += Candidate(1, san, lan, scoreText(cached.cp, cached.mate), strength = 1.0)
+            }
+        }
+        val gap = cached.gapToSecondBest
+        cached.secondBestLan?.let { lan ->
+            sanFor(position, lan)?.let { san ->
+                candidates += Candidate(2, san, lan, "", strength = gap?.let { max(0.6, 1 - it / 12) })
+            }
+        }
+        ui = ui.copy(
+            thinking = false, depth = 0,
+            evaluation = cached.terminalWinWhite?.let { terminalText(it) } ?: scoreText(cached.cp, cached.mate),
+            evalCp = cached.cp, evalMate = cached.mate,
+            bestLine = cached.pv.joinToString(" "),
+            candidates = candidates,
+        )
+    }
+
+    /**
+     * Classe un nœud isolé dès qu'on y navigue pour la première fois — une
+     * variante explorée depuis un candidat, ou un coup que la revue n'a pas
+     * encore atteint. Une seule recherche, puis le cache reprend la main.
+     */
+    private fun ensureEvaluatedLazily(index: Int) {
+        if (ui.reviewing || reviewEvals.containsKey(index)) return
+        val position = positions.getOrNull(index)?.copy() ?: return
+        val fen = position.fen
+        lazyJob?.cancel()
+        lazyJob = viewModelScope.launch {
+            ui = ui.copy(thinking = true)
+            val eval = try {
+                withContext(Dispatchers.IO) {
+                    EngineService.use(getApplication()) { e ->
+                        e.send("setoption name MultiPV value 2")
+                        rankedEval(e, position)
+                    }
+                }
+            } finally {
+                ui = ui.copy(thinking = false)
+            } ?: return@launch
+            // La ligne a pu changer pendant la recherche : une éval rangée
+            // sous le mauvais index serait pire que pas d'éval du tout.
+            if (positions.getOrNull(index)?.fen != fen) return@launch
+            reviewEvals[index] = eval
+            classify(positions, moves, reviewEvals, book)
+            if (ui.cursor + 1 == index) showCachedEval(ui.cursor)
+        }
     }
 
     fun previous() = goTo(ui.cursor - 1)
@@ -393,12 +503,17 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         // fidèle à ce que fait iOS quand on suit une variante depuis le bout.
         positions = positions.take(at + 2) + board.position.copy()
         moves = moves.take(at + 1) + done
-        reviewEvals.clear()
+        // Les évaluations du tronc commun restent vraies ; celles de la suite
+        // coupée ne le sont plus. Et une ligne explorée à la main n'entre pas
+        // dans le cache disque : il ne garde que la partie telle que jouée.
+        reviewEvals = reviewEvals.filterKeys { it <= at + 1 }.toMutableMap()
+        persistenceKey = null
         ui = ui.copy(
             sanMoves = moves.map { it.san },
             qualities = emptyMap(), explanations = emptyMap(), winDeltas = emptyMap(),
             curve = emptyList(), summary = null,
         )
+        if (isGameReview && reviewEvals.isNotEmpty()) classify(positions, moves, reviewEvals, book)
         goTo(moves.size - 1)
     }
 
@@ -418,7 +533,10 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
      */
     private fun evaluate() {
         evalJob?.cancel()
-        if (ui.reviewing) return
+        // GARANTIE : en REVUE d'une partie, on ne lance JAMAIS l'analyse en
+        // continu. La revue se contente du cache ; le moteur reste au repos
+        // une fois la passe finie — quelle que soit la voie d'appel.
+        if (ui.reviewing || isGameReview) return
         val position = ui.position.copy()
         val fen = position.fen
 
@@ -528,38 +646,53 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
      * régime dégradé, où l'on préfère perdre la reproductibilité plutôt que
      * laisser l'analyse s'éterniser.
      */
+    /**
+     * La revue : chaque position de la ligne principale évaluée dans l'ORDRE,
+     * la passe avance visiblement coup par coup, puis s'arrête — et le moteur
+     * se tait. Part toute seule au chargement d'une partie ; ne refait pas
+     * ce que le cache sait déjà (revue interrompue, partie déjà vue).
+     */
     fun review() {
         if (moves.isEmpty() || ui.reviewing) return
         evalJob?.cancel()
+        lazyJob?.cancel()
         reviewJob?.cancel()
 
         val snapshotPositions = positions.map { it.copy() }
         val snapshotMoves = moves.toList()
-        val assets = getApplication<Application>().assets
-        val book = EcoOpeningLoader.bookLines(assets)
+        val key = persistenceKey
+        val book = book
 
         reviewJob = viewModelScope.launch {
-            ui = ui.copy(reviewing = true, reviewDone = 0, reviewTotal = snapshotPositions.size)
-            val evals = HashMap<Int, PositionEval>()
+            val evals = reviewEvals
+            val missing = snapshotPositions.indices.filter { it !in evals }
+            ui = ui.copy(reviewing = true, reviewDone = snapshotPositions.size - missing.size, reviewTotal = snapshotPositions.size)
             try {
                 withContext(Dispatchers.IO) {
                     EngineService.use(getApplication()) { e ->
                         e.send("setoption name MultiPV value 2")
-                        for ((i, position) in snapshotPositions.withIndex()) {
+                        for (i in missing) {
                             ensureActive()
-                            evals[i] = rankedEval(e, position)
+                            evals[i] = rankedEval(e, snapshotPositions[i])
                             withContext(Dispatchers.Main) {
-                                ui = ui.copy(reviewDone = i + 1)
+                                ui = ui.copy(reviewDone = ui.reviewDone + 1)
                             }
                         }
                     }
                 }
-                reviewEvals = evals
                 classify(snapshotPositions, snapshotMoves, evals, book)
             } finally {
+                // Une classification interrompue n'est pas perdue : ce qui est
+                // déjà classé part sur le disque, la revue reprendra là au
+                // prochain chargement. `NonCancellable` : on est peut-être ici
+                // parce qu'on a été annulé.
+                if (key != null && evals.isNotEmpty()) {
+                    withContext(NonCancellable + Dispatchers.IO) { store.save(key, evals.toMap()) }
+                }
                 ui = ui.copy(reviewing = false)
-                // La position affichée retrouve son analyse en continu.
-                evaluate()
+                // Revue TERMINÉE : le moteur s'arrête ici. La navigation lira
+                // le cache, plus de recalcul à chaque coup.
+                if (isGameReview) showCachedEval(ui.cursor) else evaluate()
             }
         }
     }
@@ -923,7 +1056,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     private fun kingSquare(position: Position, color: Piece.Color): Square? =
         position.pieces.firstOrNull { it.kind == Piece.Kind.king && it.color == color }?.square
 
-    private companion object {
+    companion object {
         /**
          * 300 000 nœuds, comme iOS : ~600-750 ms en milieu de partie sur un
          * téléphone récent, et la profondeur atteinte s'adapte toute seule — le

@@ -278,12 +278,21 @@ Android : les sept premières.
       scanner (YOLO11, AGPLv3). Ce détecteur manquait AUSSI côté iOS ; il y a
       été ajouté dans le même commit (`LicensesView.swift`). Trois tests JVM
       sur la liste, un instrumenté sur l'écran.
-- [ ] **Cache des évaluations d'analyse** : iOS garde sur disque ce que le
-      moteur a déjà calculé ; Android recalcule à chaque ouverture.
-- [ ] **Revue automatique à l'ouverture d'un PGN.** iOS distingue à la source
-      la REVUE d'une partie (un PGN qui a des coups) de l'analyse d'une
-      POSITION : en revue il classe tout de suite, puis laisse le moteur au
-      REPOS et navigue dans le cache. Android demande un appui sur « Revue » et
-      garde une analyse en continu à chaque déplacement du curseur — donc le
-      moteur tourne tout du long. C'est le même chantier que le cache disque
-      ci-dessus, et il pèse sur la batterie autant que sur la parité.
+- [x] **Cache des évaluations d'analyse** — fait le 13/09. `AnalysisEvalStore`
+      comme sur iOS : un fichier JSON par partie, clé SHA-256 de la position
+      de départ et de la ligne principale en LAN (deux PGN cosmétiquement
+      différents de la même partie partagent leur analyse), profil moteur +
+      budget qui invalide tout s'il change, 300 parties gardées (LRU).
+      Seules les évaluations sont rangées : verdicts, courbe et précision se
+      recalculent par la fonction pure. Une revue interrompue est persistée
+      telle quelle et reprend où elle en était. Quatre tests JVM, un
+      instrumenté qui rouvre la partie et trouve le bilan en moins de 3 s.
+- [x] **Revue automatique à l'ouverture d'un PGN** — fait le 13/09. Le modèle
+      distingue désormais à la source la REVUE d'une partie de l'analyse
+      d'une POSITION : en revue, la classification part toute seule au
+      chargement (progression visible), puis le moteur se TAIT — naviguer lit
+      le cache (éval, flèches vertes, candidats), rien n'est recalculé ; une
+      position pas encore évaluée (variante explorée depuis un candidat) est
+      classée une seule fois. Sur une position (FEN, scan, éditeur),
+      l'analyse en continu reste la seule source. Le bouton « Revue » ne
+      subsiste qu'en repli, quand une revue n'a pas abouti.

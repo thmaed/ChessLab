@@ -91,9 +91,8 @@ class AnalysisReviewTest {
     @Test fun laRevueClasseLesCoupsEtDonneUnePrecision() {
         loadGame()
 
-        compose.onNodeWithTag("analyser-partie").performScrollTo().performClick()
-        // La revue affiche sa progression, puis les deux précisions remplacent
-        // la phrase d'invite.
+        // La revue part TOUTE SEULE au chargement : sa progression s'affiche,
+        // puis les deux précisions remplacent la phrase d'invite.
         awaitTag("precision", 300_000)
 
         // Le bandeau ne suffit pas : il s'affiche aussi avec un bilan VIDE.
@@ -111,10 +110,25 @@ class AnalysisReviewTest {
         compose.onNodeWithTag("feuille-bilan").assertIsDisplayed()
     }
 
+    /**
+     * Le cache disque : la même partie rouverte s'affiche classifiée SANS
+     * repasser par le moteur — la précision est là avant qu'une revue ait eu
+     * le temps d'évaluer une seule position.
+     */
+    @Test fun laRevueEstEnCacheEntreDeuxOuvertures() {
+        loadGame()
+        awaitTag("precision", 300_000)
+        val premiere = textOf("precision")
+
+        compose.onNodeWithTag("retour").performClick()
+        compose.onNodeWithTag("retour").performClick()
+        loadGame()
+        awaitTag("precision", 3_000)
+        require(textOf("precision") == premiere) { "le cache devrait rendre le même bilan : « ${textOf("precision")} » vs « $premiere »" }
+    }
+
     @Test fun lesFautesDeviennentDesPuzzles() {
         loadGame()
-
-        compose.onNodeWithTag("analyser-partie").performScrollTo().performClick()
         awaitTag("precision", 300_000)
 
         compose.onNodeWithTag("menu-analyse").performClick()
