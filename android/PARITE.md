@@ -7,6 +7,27 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+## ✅ La passe est TERMINÉE — 13/09/2026
+
+Les onze sections sont faites : plus une seule case à cocher. Les deux apps
+offrent les mêmes fonctions, les mêmes écrans, les mêmes barèmes et les mêmes
+libellés dans les deux langues, aux écarts ASSUMÉS près — iCloud hors
+périmètre, aucun échange iOS ↔ Android, et les deux points signalés en
+commentaire à l'endroit exact du code (l'entraînement, et le commentaire
+unique par arête de répertoire côté Android).
+
+Vingt-six écarts relevés le 12/09, tous refermés. En chemin, la passe a
+trouvé une dizaine de DÉFAUTS que personne n'avait vus — les 78 finales
+ouvertes sur la position de départ, une réponse du moteur atterrissant sur
+une partie relancée, la progression qui comptait les victoires par le nom
+« Vous » et rendait donc zéro en anglais, la clé FEN non canonique, le
+détecteur du scanner absent des licences DES DEUX CÔTÉS. Ils sont corrigés,
+chacun avec son test.
+
+À partir d'ici, la règle de `CLAUDE.md` prend le relais : toute évolution
+demandée sur l'app iPhone se porte sur Android dans le même chantier. Ce
+document redevient ce qu'il doit être — la liste des écarts, vide.
+
 ## Ce qui est déjà à parité
 
 | | |
