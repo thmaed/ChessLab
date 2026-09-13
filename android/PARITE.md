@@ -255,8 +255,14 @@ Android : les sept premières.
 ### 11. Le reste
 - [ ] **Visite guidée** au premier lancement (onze étapes, rejouables depuis
       l'aide).
-- [ ] **Écran Licences** : Android n'a qu'une phrase dans les réglages. La
-      GPLv3 demande davantage — voir `PUBLIER.md` §0.
+- [x] **Écran Licences** — fait le 13/09. Réglages → À propos → « Licences »
+      ouvre le même écran qu'iOS : une carte par composant, nom, licence,
+      texte, lien (confié au navigateur d'un tap — l'app ne déclare toujours
+      pas la permission réseau). Les dix entrées d'iOS, plus deux que seul le
+      binaire Android embarque : ONNX Runtime (MIT) et le détecteur du
+      scanner (YOLO11, AGPLv3). Ce détecteur manquait AUSSI côté iOS ; il y a
+      été ajouté dans le même commit (`LicensesView.swift`). Trois tests JVM
+      sur la liste, un instrumenté sur l'écran.
 - [ ] **Cache des évaluations d'analyse** : iOS garde sur disque ce que le
       moteur a déjà calculé ; Android recalcule à chaque ouverture.
 - [ ] **Revue automatique à l'ouverture d'un PGN.** iOS distingue à la source

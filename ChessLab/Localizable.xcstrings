@@ -6600,6 +6600,22 @@
         }
       }
     },
+    "Détecteur de pièces du scanner (YOLO11)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scanner piece detector (YOLO11)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Détecteur de pièces du scanner (YOLO11)"
+          }
+        }
+      }
+    },
     "Döry Defense": {
       "extractionState": "stale",
       "localizations": {
@@ -15981,6 +15997,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Réseau de neurones qui prédit le coup qu'un humain jouerait, entraîné par le CSSLab de l'Université de Toronto sur des millions de parties Lichess. C'est lui qui joue les personnages du mode Contre l'ordinateur ; ses poids (modèle 23M) sont convertis pour Core ML. Licence AGPLv3, compatible avec la GPLv3 de l'app, qui ne fournit aucun service réseau."
+          }
+        }
+      }
+    },
+    "Réseau de neurones qui repère les pièces sur la photo d'un plateau : architecture YOLO11 d'Ultralytics, entraîné pour ChessLab sur des photos de vrais jeux, converti pour Core ML. Licence AGPLv3, compatible avec la GPLv3 de l'app.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neural network that spots the pieces on a photo of a board: Ultralytics YOLO11 architecture, trained for ChessLab on photos of real sets, converted for Core ML. AGPLv3 licence, compatible with the app's GPLv3."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réseau de neurones qui repère les pièces sur la photo d'un plateau : architecture YOLO11 d'Ultralytics, entraîné pour ChessLab sur des photos de vrais jeux, converti pour Core ML. Licence AGPLv3, compatible avec la GPLv3 de l'app."
           }
         }
       }

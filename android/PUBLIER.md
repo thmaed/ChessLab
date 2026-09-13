@@ -22,9 +22,11 @@ distribution impose donc :
 - n'ajouter aucune restriction d'usage supplémentaire.
 
 En pratique : un dépôt public (ou une archive téléchargeable) dont l'URL
-figure dans la fiche Play, et un écran « Licences » dans l'app. C'est la même
-contrainte que côté iOS — voir le `README.md` à la racine du dépôt. **À régler
-avant de soumettre, pas après.**
+figure dans la fiche Play, et un écran « Licences » dans l'app — il existe
+depuis le 13/09/2026 (Réglages → À propos → Licences, `LicencesScreen.kt`),
+avec le lien vers le dépôt des sources. C'est la même contrainte que côté
+iOS — voir le `README.md` à la racine du dépôt. **Le dépôt public reste à
+ouvrir avant de soumettre, pas après.**
 
 ---
 

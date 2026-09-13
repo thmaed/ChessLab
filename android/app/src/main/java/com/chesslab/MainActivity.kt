@@ -193,7 +193,8 @@ private fun App() {
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayer(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
-            Route.Settings -> SettingsScreen()
+            Route.Settings -> SettingsScreen(onOpenLicences = { stack.add(Route.Licences) })
+            Route.Licences -> com.chesslab.settings.LicencesScreen()
             Route.Scanner -> ScannerScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
             Route.Progression -> ProgressionScreen(onTrainTheme = { stack.add(Route.Puzzles(theme = it)) })
             Route.Help -> HelpScreen()

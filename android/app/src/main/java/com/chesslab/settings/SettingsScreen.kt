@@ -25,6 +25,8 @@ import com.chesslab.ui.BoardView
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material.icons.filled.Language
@@ -33,6 +35,7 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VolumeUp
+import com.chesslab.ui.IconBadge
 import com.chesslab.ui.SettingsSection
 import com.chesslab.ui.Palette
 import androidx.compose.ui.res.stringResource
@@ -40,7 +43,7 @@ import com.chesslab.R
 import androidx.compose.runtime.*
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(onOpenLicences: () -> Unit = {}) {
     val context = LocalContext.current
     val settings by SettingsStore.state.collectAsState()
 
@@ -214,12 +217,32 @@ fun SettingsScreen() {
         com.chesslab.transfer.TransferSection()
 
         // Ce que l'app doit à d'autres : Stockfish est sous GPLv3, et cela
-        // s'affiche, ce n'est pas une note de bas de page.
+        // s'affiche sur un écran à part, comme sur iOS — pas en note de bas
+        // de page.
         SettingsSection(stringResource(R.string.settings_about), Icons.Default.Info) {
-            Text(
-                stringResource(R.string.settings_licences),
-                fontSize = 13.sp, color = Palette.textSecondary,
-            )
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onOpenLicences)
+                    .padding(vertical = 4.dp)
+                    .testTag("licences"),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                IconBadge(Icons.Default.Description, Palette.textSecondary, 34.dp)
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.licences_title),
+                        fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Palette.textPrimary,
+                    )
+                    Text(
+                        stringResource(R.string.settings_licences_subtitle),
+                        fontSize = 11.sp, color = Palette.textTertiary,
+                    )
+                }
+                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Palette.textTertiary)
+            }
         }
 
         Spacer(Modifier.height(12.dp))

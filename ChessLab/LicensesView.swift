@@ -8,6 +8,11 @@ import SwiftUI
 /// Stockfish ET de Fairy-Stockfish (voir le README, section licence, pour
 /// le détail des obligations). Écran volontairement séparé de ``HelpView`` : l'un
 /// explique l'app, l'autre ce qu'elle embarque.
+///
+/// Le détecteur du scanner (YOLO11, AGPLv3 comme Maia-3) y figure depuis le
+/// 13/09/2026 : la passe de parité Android l'avait trouvé absent des deux
+/// côtés. Pendant Android : `LicencesScreen.kt`, qui ajoute ONNX Runtime,
+/// que seul le binaire Android embarque.
 struct LicensesView: View {
     private struct Entry: Identifiable {
         let id = UUID()
@@ -40,6 +45,13 @@ struct LicensesView: View {
             license: "Licence AGPLv3",
             body: "Réseau de neurones qui prédit le coup qu'un humain jouerait, entraîné par le CSSLab de l'Université de Toronto sur des millions de parties Lichess. C'est lui qui joue les personnages du mode Contre l'ordinateur ; ses poids (modèle 23M) sont convertis pour Core ML. Licence AGPLv3, compatible avec la GPLv3 de l'app, qui ne fournit aucun service réseau.",
             url: URL(string: "https://github.com/CSSLab/maia3")
+        ),
+        .init(
+            icon: "camera.viewfinder", tint: Theme.teal,
+            name: "Détecteur de pièces du scanner (YOLO11)",
+            license: "Licence AGPLv3",
+            body: "Réseau de neurones qui repère les pièces sur la photo d'un plateau : architecture YOLO11 d'Ultralytics, entraîné pour ChessLab sur des photos de vrais jeux, converti pour Core ML. Licence AGPLv3, compatible avec la GPLv3 de l'app.",
+            url: URL(string: "https://github.com/ultralytics/ultralytics")
         ),
         .init(
             icon: "chevron.left.forwardslash.chevron.right", tint: Theme.info,

@@ -81,6 +81,8 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data object Progression : Route(R.string.route_progress)
     data object Settings : Route(R.string.route_settings)
     data object Help : Route(R.string.route_help)
+    /** Les licences des composants embarqués, depuis les réglages. */
+    data object Licences : Route(R.string.licences_title)
     data object Scanner : Route(R.string.route_scanner)
     data object PositionEditor : Route(R.string.route_editor)
 
