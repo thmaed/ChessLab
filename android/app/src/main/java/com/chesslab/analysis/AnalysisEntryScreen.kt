@@ -1,5 +1,8 @@
 package com.chesslab.analysis
 
+import com.chesslab.discovery.DiscoverySpot
+import com.chesslab.discovery.discoveryAnchor
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -53,7 +56,8 @@ fun AnalysisEntryScreen(
             stringResource(R.string.analysis_library),
             pluralStringResource(R.plurals.progress_games_count, games.size, games.size),
             Icons.Default.MenuBook, Palette.warning, "entree-bibliotheque",
-            enabled = games.isNotEmpty(), onClick = onLibrary,
+            enabled = games.isNotEmpty(),
+            modifier = Modifier.discoveryAnchor(DiscoverySpot.analysisLibrary), onClick = onLibrary,
         )
         if (lastPgn != null && lastPgn.isNotEmpty()) {
             EntryCard(

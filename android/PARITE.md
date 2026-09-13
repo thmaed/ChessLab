@@ -253,8 +253,23 @@ Android : les sept premières.
       joueurs ; Android tire au hasard et ne joue que contre l'ordinateur.
 
 ### 11. Le reste
-- [ ] **Visite guidée** au premier lancement (onze étapes, rejouables depuis
-      l'aide).
+- [x] **Visite guidée** — faite le 13/09. Les onze étapes d'iOS, en trois
+      sections (Jouer, Comprendre, Explorer) : voile percé d'un trou qui
+      GLISSE d'un contrôle au suivant, anneau qui respire, flèche courbe à
+      tête calculée, carte émeraude avec barre de progression, chips des
+      gestes de partie / des variantes (lues dans le catalogue, et le titre
+      les COMPTE plutôt que d'écrire « Douze » tant qu'Android n'en a pas
+      douze) / des salles d'entraînement. La visite PILOTE la navigation
+      (accueil, réglages de partie, entrée d'Analyser, Ouvertures). Se
+      propose une seconde après l'accueil d'une NOUVELLE installation
+      (empreinte `firstInstallTime`, pas un booléen — même raison qu'iOS),
+      jamais par-dessus une reprise ; « Passer » compte comme vue ; se
+      rejoue depuis l'Aide (carte en tête). Géométrie portée avec ses
+      chiffres et ses six tests ; un instrumenté traverse quatre étapes.
+      Trouvé en chemin : l'accueil Android n'avait pas la section « Parties
+      récentes » qu'une étape désigne — ajoutée (quatre parties, pastille de
+      résultat ivoire/ardoise d'iOS, un tap ouvre l'analyse, « Voir tout »
+      vers la bibliothèque).
 - [x] **Écran Licences** — fait le 13/09. Réglages → À propos → « Licences »
       ouvre le même écran qu'iOS : une carte par composant, nom, licence,
       texte, lien (confié au navigateur d'un tap — l'app ne déclare toujours

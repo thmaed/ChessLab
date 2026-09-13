@@ -45,6 +45,16 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import com.chesslab.R
 import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.LaunchedEffect
+import com.chesslab.discovery.DiscoveryAnchors
+import com.chesslab.discovery.DiscoveryDestination
+import com.chesslab.discovery.DiscoveryTourController
+import com.chesslab.discovery.DiscoveryTourMemory
+import com.chesslab.discovery.DiscoveryTourOverlay
+import com.chesslab.discovery.LocalDiscoveryAnchors
+import com.chesslab.discovery.LocalDiscoveryTour
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 
 class MainActivity : ComponentActivity() {
     /** Le choix de langue s'applique avant toute résolution de ressource. */
@@ -87,11 +97,47 @@ private fun App() {
 
     BackHandler(enabled = stack.size > 1) { stack.removeAt(stack.lastIndex) }
 
+    // La visite guidée. Une NOUVELLE installation la montre, une seconde
+    // après l'accueil — jamais par-dessus une reprise proposée. L'empreinte
+    // est `firstInstallTime`, pas un booléen : voir `DiscoveryTourMemory`.
+    // Le crochet `discoveryStep` (extra d'intent, builds débogables
+    // seulement) saute à une étape sans attendre : captures et outillage.
+    val tour = remember { DiscoveryTourController(onSeen = { DiscoveryTourMemory.markSeen(context) }) }
+    val anchors = remember { DiscoveryAnchors() }
+    LaunchedEffect(Unit) {
+        val debuggable = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
+        val requested = (context as? android.app.Activity)?.intent?.getIntExtra("discoveryStep", -1) ?: -1
+        if (debuggable && requested >= 0) {
+            tour.start(requested)
+            return@LaunchedEffect
+        }
+        delay(1000)
+        val resumable = com.chesslab.library.LibraryDatabase.get(context).autosaves().all().first()
+        if (DiscoveryTourMemory.shouldOffer(context) && resumable.isEmpty() && !tour.isActive) tour.start()
+    }
+    // La visite PILOTE la navigation : chaque étape déclare son écran, et la
+    // bascule qui se joue sous les yeux EST l'explication.
+    LaunchedEffect(tour.isActive, tour.currentStepIndex) {
+        val step = tour.currentStep ?: return@LaunchedEffect
+        val wanted: List<Route> = when (step.destination) {
+            DiscoveryDestination.home -> listOf(Route.Home)
+            DiscoveryDestination.newGame -> listOf(Route.Home, Route.NewGame)
+            DiscoveryDestination.analysisEntry -> listOf(Route.Home, Route.Analysis)
+            DiscoveryDestination.openings -> listOf(Route.Home, Route.Openings)
+        }
+        if (stack.toList() != wanted) {
+            stack.clear()
+            stack.addAll(wanted)
+        }
+    }
+
     // `systemBarsPadding` et non `safeDrawingPadding` : ce dernier inclut le
     // CLAVIER, si bien que son ouverture redimensionnait tout l'arbre de
     // l'écran. Combiné à un changement d'écran dans la même image, Compose
     // remesurait un nœud déjà détaché et plantait. Les écrans qui saisissent
     // du texte gèrent l'encart du clavier eux-mêmes.
+    Box(Modifier.fillMaxSize()) {
+    CompositionLocalProvider(LocalDiscoveryAnchors provides anchors, LocalDiscoveryTour provides tour) {
     Column(Modifier.fillMaxSize().systemBarsPadding()) {
         if (current != Route.Home) {
             TopBar(
@@ -197,7 +243,7 @@ private fun App() {
             Route.Licences -> com.chesslab.settings.LicencesScreen()
             Route.Scanner -> ScannerScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
             Route.Progression -> ProgressionScreen(onTrainTheme = { stack.add(Route.Puzzles(theme = it)) })
-            Route.Help -> HelpScreen()
+            Route.Help -> HelpScreen(onReplayTour = { tour.start() })
             Route.PositionEditor -> PositionEditorScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
             is Route.Laboratory -> LabScreen(startFen = current.startFen)
             Route.Variants -> VariantListScreen { id ->
@@ -210,6 +256,10 @@ private fun App() {
             else -> Placeholder(current.title(context))
         }
         }
+    }
+    }
+    // Par-dessus les écrans ET leurs barres : à la racine, pas dans un écran.
+    DiscoveryTourOverlay(tour, anchors)
     }
 }
 

@@ -124,10 +124,11 @@ fun CircleIconButton(
     label: String,
     tint: Color,
     tag: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     Box(
-        Modifier
+        modifier
             .size(34.dp)
             .clip(CircleShape)
             .background(tint.copy(alpha = 0.16f))
@@ -274,10 +275,11 @@ fun EntryCard(
     tint: Color,
     tag: String,
     enabled: Boolean = true,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
     Row(
-        Modifier
+        modifier
             .fillMaxWidth()
             .clip(CardShape)
             .background(cardGradient)

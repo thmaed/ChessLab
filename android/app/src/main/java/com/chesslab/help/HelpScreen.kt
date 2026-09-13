@@ -13,7 +13,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material3.Icon
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.testTag
 import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Groups
@@ -38,11 +44,34 @@ import com.chesslab.R
  * signifient. Une aide qui ne dit que le bon côté ne sert à personne.
  */
 @Composable
-fun HelpScreen() {
+fun HelpScreen(onReplayTour: () -> Unit = {}) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
+        // EN TÊTE, pas au fond : celui qui ouvre l'Aide pour retrouver la
+        // visite ne doit pas la chercher sous neuf modules.
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(Palette.surface)
+                .clickable(onClick = onReplayTour)
+                .padding(14.dp)
+                .testTag("revoir-visite"),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconBadge(Icons.Default.AutoAwesome, Palette.accent, 42.dp)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    stringResource(R.string.discovery_replay_title), fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                )
+                Text(stringResource(R.string.discovery_replay_sub), fontSize = 12.sp, color = Palette.textSecondary)
+            }
+            Icon(Icons.Default.ChevronRight, null, tint = Palette.textTertiary, modifier = Modifier.size(16.dp))
+        }
         sections.forEach { (title, body, look) ->
             Row(
                 Modifier

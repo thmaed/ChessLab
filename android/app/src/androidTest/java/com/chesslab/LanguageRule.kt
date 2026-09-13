@@ -25,6 +25,13 @@ class LanguageRule(private val tag: String = "fr") : TestRule {
     override fun apply(base: Statement, description: Description): Statement =
         object : Statement() {
             override fun evaluate() {
+                // La visite guidée se proposerait à CHAQUE installation de
+                // test et recouvrirait l'écran d'un voile qui avale les
+                // taps : on la marque vue avant que l'activité démarre. Le
+                // test qui la vérifie la rejoue depuis l'Aide.
+                com.chesslab.discovery.DiscoveryTourMemory.markSeen(
+                    InstrumentationRegistry.getInstrumentation().targetContext
+                )
                 val before = set(tag)
                 try {
                     base.evaluate()

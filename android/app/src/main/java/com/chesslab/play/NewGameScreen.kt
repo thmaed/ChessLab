@@ -1,5 +1,8 @@
 package com.chesslab.play
 
+import com.chesslab.discovery.DiscoverySpot
+import com.chesslab.discovery.discoveryAnchor
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -76,7 +79,10 @@ fun NewGameScreen(
                 }
             }
 
-            SettingsSection(stringResource(R.string.setup_opponent), Icons.Default.Person) {
+            SettingsSection(
+                stringResource(R.string.setup_opponent), Icons.Default.Person,
+                modifier = Modifier.discoveryAnchor(DiscoverySpot.strengthSlider),
+            ) {
                 if (maiaAvailable) {
                     Segmented(
                         listOf(stringResource(R.string.setup_character), stringResource(R.string.stockfish)),
@@ -133,7 +139,10 @@ fun NewGameScreen(
                 }
             }
 
-            SettingsSection(stringResource(R.string.setup_aids), Icons.Default.Lightbulb) {
+            SettingsSection(
+                stringResource(R.string.setup_aids), Icons.Default.Lightbulb,
+                modifier = Modifier.discoveryAnchor(DiscoverySpot.aidToggles),
+            ) {
                 ToggleRow(stringResource(R.string.setup_hints), hints, "aide-indice") { hints = it }
                 ToggleRow(stringResource(R.string.setup_blunder_alert), blunderAlert, "aide-alerte") {
                     blunderAlert = it

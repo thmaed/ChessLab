@@ -45,8 +45,14 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chesslab.R
+import com.chesslab.discovery.DiscoverySpot
+import com.chesslab.discovery.discoveryAnchor
+import com.chesslab.library.GameRecord
 import com.chesslab.library.LibraryDatabase
 import com.chesslab.nav.Route
+import androidx.compose.material.icons.filled.ChevronRight
+import java.text.DateFormat
+import java.util.Date
 
 /**
  * Une tuile de mode. Pendant de `ModeCard` (`HomeView.swift`).
@@ -66,15 +72,19 @@ data class Mode(
     val icon: ImageVector,
     val tint: Color,
     val enabled: Boolean = true,
+    /** La cible de la visite guidée que porte cette tuile, s'il y en a une. */
+    val spot: DiscoverySpot? = null,
 )
 
 private val modes = listOf(
     Mode(Route.NewGame, "play", R.string.route_play, R.string.home_play_short,
-        R.string.home_play_long, R.string.home_play_sub, Icons.Default.Memory, Palette.accent),
+        R.string.home_play_long, R.string.home_play_sub, Icons.Default.Memory, Palette.accent,
+        spot = DiscoverySpot.playTile),
     Mode(Route.TwoPlayerSetup, "two", R.string.route_two_players, R.string.home_two_short,
         R.string.home_two_long, R.string.home_two_sub, Icons.Default.People, Palette.info),
     Mode(Route.Puzzles(), "puzzles", R.string.route_puzzles, R.string.route_puzzles,
-        R.string.home_puzzles_long, R.string.home_puzzles_sub, Icons.Default.Extension, Palette.violet),
+        R.string.home_puzzles_long, R.string.home_puzzles_sub, Icons.Default.Extension, Palette.violet,
+        spot = DiscoverySpot.puzzlesTile),
     Mode(Route.Openings, "openings", R.string.route_openings, R.string.route_openings,
         R.string.home_openings_long, R.string.home_openings_sub, Icons.Default.MenuBook, Palette.warning),
     Mode(Route.Endgames, "endgames", R.string.route_endgames, R.string.route_endgames,
@@ -84,7 +94,8 @@ private val modes = listOf(
     Mode(Route.Laboratory(), "lab", R.string.route_lab, R.string.route_lab,
         R.string.home_lab_long, R.string.home_lab_sub, Icons.Default.Science, Palette.rose),
     Mode(Route.Variants, "variants", R.string.route_variants, R.string.route_variants,
-        R.string.home_variants_long, R.string.home_variants_sub, Icons.Default.Casino, Palette.violet),
+        R.string.home_variants_long, R.string.home_variants_sub, Icons.Default.Casino, Palette.violet,
+        spot = DiscoverySpot.variantsTile),
 )
 
 @Composable
@@ -101,6 +112,11 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
         studied = dao.studiedCount()
     }
     val reviewLabel = stringResource(R.string.train_daily)
+    // Les quatre dernières parties, comme sur iOS : un tap ouvre leur
+    // analyse sans passer par la bibliothèque.
+    val games by remember { LibraryDatabase.get(context).games().all() }
+        .collectAsState(initial = emptyList())
+    val recent = games.take(4)
 
     // Une grille SIMPLE, pas paresseuse. Huit tuiles ne valent pas la peine
     // d'être recyclées, et la version paresseuse plantait
@@ -146,6 +162,7 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
                 }
             }
+            if (recent.isNotEmpty()) RecentGames(recent, onOpen)
             Spacer(Modifier.height(8.dp))
         }
     }
@@ -162,7 +179,8 @@ private fun Header(onOpen: (Route) -> Unit) {
             horizontalArrangement = Arrangement.End,
         ) {
             CircleIconButton(Icons.AutoMirrored.Filled.HelpOutline,
-                stringResource(R.string.route_help), Palette.accent, "aide") { onOpen(Route.Help) }
+                stringResource(R.string.route_help), Palette.accent, "aide",
+                modifier = Modifier.discoveryAnchor(DiscoverySpot.helpButton)) { onOpen(Route.Help) }
             Spacer(Modifier.width(8.dp))
             CircleIconButton(Icons.Default.TrendingUp,
                 stringResource(R.string.route_progress), Palette.info, "progression") { onOpen(Route.Progression) }
@@ -227,11 +245,100 @@ private fun Banner(
     }
 }
 
+/**
+ * Les parties récentes : l'en-tête, « Voir tout » vers la bibliothèque, puis
+ * une ligne par partie qui ouvre directement son analyse. Pendant de
+ * `recentGamesSection` (`HomeView.swift`).
+ */
+@Composable
+private fun RecentGames(games: List<GameRecord>, onOpen: (Route) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            Modifier.fillMaxWidth().padding(top = 8.dp).discoveryAnchor(DiscoverySpot.recentGames),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            SectionHeader(stringResource(R.string.home_recent_games))
+            Spacer(Modifier.weight(1f))
+            Text(
+                stringResource(R.string.home_see_all), fontSize = 13.sp, fontWeight = FontWeight.Medium,
+                color = Palette.accent,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable { onOpen(Route.AnalysisBoard()) }
+                    .padding(4.dp)
+                    .testTag("voir-tout"),
+            )
+        }
+        games.forEach { game ->
+            RecentGameRow(game) { onOpen(Route.AnalysisBoard(pgn = game.pgn)) }
+        }
+    }
+}
+
+@Composable
+private fun RecentGameRow(game: GameRecord, onOpen: () -> Unit) {
+    val playable = game.pgn.isNotEmpty()
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .testTag("recente-${game.id}")
+            .clip(CardShape)
+            .background(cardGradient)
+            .subtleBorder()
+            .clickable(enabled = playable, onClick = onOpen)
+            .padding(14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        IconBadge(Icons.Default.ShowChart, Palette.teal, 40.dp)
+        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(3.dp)) {
+            Text(
+                recentGameTitle(game), fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+                color = Palette.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // La MÊME pastille que la bibliothèque : un seul langage pour
+                // la même information.
+                GameResultPill(game.result)
+                Text(
+                    DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(game.playedAt)),
+                    fontSize = 11.sp, color = Palette.textSecondary,
+                )
+            }
+        }
+        Text(
+            stringResource(R.string.route_analysis), fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+            color = if (playable) Palette.accent else Palette.textTertiary,
+        )
+        Icon(Icons.Default.ChevronRight, null, tint = Palette.textTertiary, modifier = Modifier.size(16.dp))
+    }
+}
+
+/**
+ * Intitulé lisible : « Contre l'ordinateur » pour une partie moteur, sinon
+ * les deux noms. Les noms « Vous »/« Blancs »/« Noirs » sont rangés dans la
+ * langue du moment ; on les relit dans celle d'aujourd'hui.
+ */
+@Composable
+private fun recentGameTitle(game: GameRecord): String {
+    if (game.source == "engine") return stringResource(R.string.route_play)
+    return "${playerName(game.white)} – ${playerName(game.black)}"
+}
+
+@Composable
+private fun playerName(stored: String): String = when (stored) {
+    "Vous", "You" -> stringResource(R.string.you)
+    "Blancs", "White" -> stringResource(R.string.color_white_side)
+    "Noirs", "Black" -> stringResource(R.string.color_black_side)
+    else -> stored
+}
+
 @Composable
 private fun ModeCard(mode: Mode, onOpen: (Route) -> Unit) {
     Box(
         Modifier
             .testTag("mode-${mode.tag}")
+            .then(if (mode.spot != null) Modifier.discoveryAnchor(mode.spot) else Modifier)
             .height(132.dp)
             .clip(CardShape)
             .background(cardGradient)

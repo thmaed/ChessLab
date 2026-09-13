@@ -72,7 +72,7 @@ fun CourseListScreen(
 
     TopBarActions {
         if (!endgames) {
-            CircleIconButton(Icons.Default.Add, stringResource(R.string.import_add), Palette.accent, "ajouter-repertoire", onImport)
+            CircleIconButton(Icons.Default.Add, stringResource(R.string.import_add), Palette.accent, "ajouter-repertoire", onClick = onImport)
             Spacer(Modifier.width(8.dp))
         }
         QuickSwitchMenu(
