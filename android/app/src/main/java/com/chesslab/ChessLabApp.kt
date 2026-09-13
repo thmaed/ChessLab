@@ -13,6 +13,8 @@ class ChessLabApp : Application() {
         // Trouver le vibreur coûte un peu : on le fait une fois, ici, pour que
         // le premier coup ne soit pas plus lent que les suivants.
         com.chesslab.sound.Haptics.prepare(this)
+        // Les répertoires personnels : leur dossier, relu une fois.
+        com.chesslab.courses.UserOpeningStore.attach(this)
     }
 
     /**

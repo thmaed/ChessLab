@@ -155,7 +155,11 @@ private fun App() {
                 onPlayVsEngine = { stack.add(Route.NewGame) },
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup) },
                 onOpenLab = { stack.add(Route.Laboratory()) },
+                onImport = { stack.add(Route.OpeningImport) },
             ) { stack.add(reader(it)) }
+            Route.OpeningImport -> com.chesslab.courses.OpeningImportScreen(
+                onImported = { stack.removeAt(stack.lastIndex) },
+            )
             Route.Endgames -> CourseListScreen(
                 endgames = true,
                 onTrain = { kind -> stack.add(trainRoute(context, kind)) },

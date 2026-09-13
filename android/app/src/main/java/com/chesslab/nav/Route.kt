@@ -97,6 +97,9 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data class EndgameFree(val courseId: String, val name: String) :
         Route(R.string.endgame_free, name)
 
+    /** L'ajout d'un répertoire personnel : PGN collé ou fichier. */
+    data object OpeningImport : Route(R.string.import_title)
+
     /** Un cours ouvert : ouverture ou finale, même écran. */
     data class CourseReader(val id: String, val name: String) : Route(R.string.route_openings, name)
 

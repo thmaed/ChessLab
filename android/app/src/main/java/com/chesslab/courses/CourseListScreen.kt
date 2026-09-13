@@ -13,7 +13,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.MenuBook
@@ -61,11 +64,17 @@ fun CourseListScreen(
     onPlayVsEngine: () -> Unit = {},
     onOpenTwoPlayer: () -> Unit = {},
     onOpenLab: () -> Unit = {},
+    /** L'ajout d'un répertoire personnel — pour les ouvertures seulement. */
+    onImport: () -> Unit = {},
     onOpen: (String) -> Unit,
 ) {
     val context = LocalContext.current
 
     TopBarActions {
+        if (!endgames) {
+            CircleIconButton(Icons.Default.Add, stringResource(R.string.import_add), Palette.accent, "ajouter-repertoire", onImport)
+            Spacer(Modifier.width(8.dp))
+        }
         QuickSwitchMenu(
             onPlayVsEngine = onPlayVsEngine,
             onOpenTwoPlayer = onOpenTwoPlayer,
@@ -73,13 +82,17 @@ fun CourseListScreen(
         )
     }
     var entries by remember { mutableStateOf<List<CatalogEntry>?>(null) }
+    // Le magasin des répertoires change à chaque import ou suppression : la
+    // liste se relit alors d'elle-même.
+    val storeVersion by UserOpeningStore.version.collectAsState()
+    var pendingDeletion by remember { mutableStateOf<CatalogEntry?>(null) }
     var query by remember { mutableStateOf("") }
     var sideFilter by remember { mutableStateOf<String?>(null) }
     var levelFilter by remember { mutableStateOf<String?>(null) }
     var due by remember { mutableStateOf(0) }
     var hard by remember { mutableStateOf(0) }
 
-    LaunchedEffect(endgames) {
+    LaunchedEffect(endgames, storeVersion) {
         val dao = com.chesslab.library.LibraryDatabase.get(context).training()
         val all = withContext(Dispatchers.IO) { dao.allProgress() }
         val now = System.currentTimeMillis()
@@ -104,7 +117,10 @@ fun CourseListScreen(
         (query.isBlank() || entry.name.contains(query, true) || entry.summary.contains(query, true) ||
             entry.eco.any { it.contains(query, true) }) &&
             (sideFilter == null || entry.side == sideFilter) &&
-            (levelFilter == null || entry.level == levelFilter)
+            // Les répertoires IMPORTÉS échappent au filtre de niveau : ils n'en
+            // portent pas de significatif, et ce que l'utilisateur a apporté
+            // ne doit pas disparaître derrière un filtre qu'il n'a pas renseigné.
+            (levelFilter == null || entry.level == levelFilter || UserOpeningStore.isUserCourse(entry.id))
     }
 
     Box(Modifier.fillMaxSize()) {
@@ -149,10 +165,31 @@ fun CourseListScreen(
                 )
             }
 
+            // Les répertoires PERSONNELS ont leur section, en tête : rangés
+            // alphabétiquement au milieu de cinquante-huit ouvertures, ils
+            // étaient introuvables, et rien ne disait qu'un import avait marché.
+            val mine = filtered.filter { UserOpeningStore.isUserCourse(it.id) }
+            if (mine.isNotEmpty()) {
+                item(key = "entete-miens") { GroupHeader(stringResource(R.string.courses_my_repertoires)) }
+                items(mine, key = { it.id }) { entry ->
+                    CourseRow(entry, onOpen, onDelete = { pendingDeletion = entry }, onShare = {
+                        // Le presse-papiers EN PLUS du partage, comme partout :
+                        // la feuille dépend des apps installées, pas lui.
+                        UserOpeningStore.exportJson(entry.id)?.let { json ->
+                            val send = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                type = "application/json"
+                                putExtra(android.content.Intent.EXTRA_TEXT, json)
+                                putExtra(android.content.Intent.EXTRA_SUBJECT, "${entry.name}.json")
+                            }
+                            runCatching { context.startActivity(android.content.Intent.createChooser(send, entry.name)) }
+                        }
+                    })
+                }
+            }
             // Regroupé par CAMP, comme sur iOS : un répertoire blanc et un
             // répertoire noir ne se mélangent pas dans la tête.
-            val white = filtered.filter { it.side == "white" }
-            val black = filtered.filter { it.side != "white" }
+            val white = filtered.filter { it.side == "white" && !UserOpeningStore.isUserCourse(it.id) }
+            val black = filtered.filter { it.side != "white" && !UserOpeningStore.isUserCourse(it.id) }
             if (white.isNotEmpty()) {
                 item(key = "entete-blancs") { GroupHeader(stringResource(R.string.courses_white_repertoire)) }
                 items(white, key = { it.id }) { CourseRow(it, onOpen) }
@@ -166,6 +203,26 @@ fun CourseListScreen(
                     Text(stringResource(R.string.courses_none), fontSize = 13.sp, color = Palette.textSecondary)
                 }
             }
+        }
+
+        pendingDeletion?.let { entry ->
+            AlertDialog(
+                onDismissRequest = { pendingDeletion = null },
+                title = { Text(stringResource(R.string.import_delete_title), color = Palette.textPrimary) },
+                text = { Text(stringResource(R.string.import_delete_body), color = Palette.textSecondary) },
+                confirmButton = {
+                    TextButton(onClick = { UserOpeningStore.delete(entry.id); pendingDeletion = null },
+                        modifier = Modifier.testTag("supprimer-confirmer")) {
+                        Text(stringResource(R.string.import_delete), color = Palette.danger)
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { pendingDeletion = null }) {
+                        Text(stringResource(R.string.cancel), color = Palette.textSecondary)
+                    }
+                },
+                containerColor = Palette.surfaceElevated,
+            )
         }
 
         // La recherche EN BAS, à portée de pouce : c'est le geste qu'on répète
@@ -280,7 +337,14 @@ private fun SessionChip(
 /** Une entrée : nom, code ECO, résumé, puis les trois pastilles de mesure. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun CourseRow(entry: CatalogEntry, onOpen: (String) -> Unit) {
+private fun CourseRow(
+    entry: CatalogEntry,
+    onOpen: (String) -> Unit,
+    /** Les actions d'un répertoire PERSONNEL, toujours visibles : une fonction qu'il faut deviner n'existe pas vraiment. */
+    onDelete: (() -> Unit)? = null,
+    onShare: (() -> Unit)? = null,
+) {
+    var menu by remember { mutableStateOf(false) }
     Column(
         Modifier
             .fillMaxWidth()
@@ -298,6 +362,26 @@ private fun CourseRow(entry: CatalogEntry, onOpen: (String) -> Unit) {
                 color = Palette.textPrimary, modifier = Modifier.weight(1f),
                 maxLines = 2, overflow = TextOverflow.Ellipsis,
             )
+            if (onDelete != null) {
+                Box {
+                    Icon(
+                        Icons.Default.MoreHoriz, stringResource(R.string.import_actions), tint = Palette.textSecondary,
+                        modifier = Modifier.size(22.dp).clickable { menu = true }.testTag("actions-${entry.id}"),
+                    )
+                    DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.import_share)) },
+                            onClick = { menu = false; onShare?.invoke() },
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.import_delete), color = Palette.danger) },
+                            onClick = { menu = false; onDelete() },
+                            modifier = Modifier.testTag("supprimer-${entry.id}"),
+                        )
+                    }
+                }
+                Spacer(Modifier.width(4.dp))
+            }
             ecoLabel(entry)?.let { eco ->
                 Text(
                     eco, fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
@@ -318,6 +402,7 @@ private fun CourseRow(entry: CatalogEntry, onOpen: (String) -> Unit) {
             )
         }
         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (UserOpeningStore.isUserCourse(entry.id)) Stat(stringResource(R.string.import_mine), null, Icons.Default.Person)
             Stat(stringResource(entry.sideLabel), if (entry.side == "white") "○" else "●")
             if (entry.positionCount > 0) {
                 Stat(pluralStringResource(R.plurals.course_positions, entry.positionCount, entry.positionCount), null,

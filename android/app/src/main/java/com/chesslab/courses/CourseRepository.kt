@@ -201,7 +201,15 @@ object CourseRepository {
         return position.takeIf { bothKings }
     }
 
-    fun catalog(assets: AssetManager): List<CatalogEntry> {
+    /**
+     * Le catalogue : les répertoires PERSONNELS d'abord, puis les cours
+     * embarqués — c'est l'ordre d'iOS, et c'est ce qui fait qu'un import se
+     * voit sans chercher. Tout ce qui consulte le catalogue (liste,
+     * entraînement, lecteur) sert donc les deux sans le savoir.
+     */
+    fun catalog(assets: AssetManager): List<CatalogEntry> = UserOpeningStore.catalog() + embeddedCatalog(assets)
+
+    private fun embeddedCatalog(assets: AssetManager): List<CatalogEntry> {
         // Le catalogue est mémorisé, mais la langue peut avoir changé entre
         // deux ouvertures de l'app : on le relit alors.
         if (catalogLanguage == language()) catalog?.let { return it }
@@ -230,9 +238,11 @@ object CourseRepository {
     }
 
     /** Le nom d'un cours si le catalogue est déjà lu — pour titrer l'écran. */
-    fun cachedName(id: String): String? = catalog?.firstOrNull { it.id == id }?.name
+    fun cachedName(id: String): String? =
+        UserOpeningStore.catalog().firstOrNull { it.id == id }?.name ?: catalog?.firstOrNull { it.id == id }?.name
 
     fun course(assets: AssetManager, id: String): Course? {
+        if (UserOpeningStore.isUserCourse(id)) return UserOpeningStore.course(id)
         cache[id]?.let { return it }
         val text = runCatching {
             assets.open("$DIR/$id.json").bufferedReader().use { it.readText() }

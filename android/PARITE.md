@@ -13,7 +13,7 @@ vérification sur appareil, pas après compilation.
 | --- | --- |
 | Jouer contre l'ordinateur | 9 personnages Maia + Stockfish, niveau, couleur, pendule, indice, barre d'éval, abandon du moteur |
 | Analyse des parties | classification, précision, coach, courbe, candidats, menace, rétrospective, bilan, export PGN, puzzles depuis les erreurs ; flèches alignées le 12/09 — VERTES et lues dans le cache en revue, GRISES depuis le moteur en analyse d'une position, rouge translucide pour la menace, et la rétrospective reste SEULE quand elle sort |
-| Ouvertures | 58 cours, lecteur qui descend l'arbre, flèches colorées, commentaires, index des lignes, coups des maîtres et lignes de Stockfish pré-calculées (sidecar Labs, 13/09) |
+| Ouvertures | 58 cours, lecteur qui descend l'arbre, flèches colorées, commentaires, index des lignes, coups des maîtres et lignes de Stockfish pré-calculées (sidecar Labs, 13/09), répertoires personnels importés d'un PGN (13/09) |
 | Finales | 78 cours, même lecteur |
 | Entraînement | FSRS-5, séance du jour, positions difficiles, une ligne |
 | Puzzles | 106 094 puzzles Lichess, essais réglables, indice |
@@ -187,9 +187,40 @@ vérification sur appareil, pas après compilation.
       cases douteuses, orientation devinée) ; sur l'appareil, la capture de
       référence traverse tout l'écran jusqu'à l'analyse.
 
-### 9. Répertoires personnels
-- [ ] **Import PGN** de ses propres ouvertures, variantes comprises, et
-      entraînement dessus avec le même FSRS.
+### 9. Répertoires personnels — FAIT le 13/09
+- [x] **Import PGN** : les variantes entre parenthèses deviennent des
+      branches, les transpositions fusionnent en un seul nœud (deux ordres de
+      coups, une position, une seule progression), les annotations de
+      l'auteur (`?`, `?!`) deviennent des rôles, les commentaires suivent, et
+      chaque partie d'une étude devient un chapitre. Le nom se devine dans le
+      PGN (`[Opening]`, puis `[Event]` tronqué avant le « : » d'une étude
+      Lichess). Douze cas repris d'`OpeningPGNImporterTests`.
+- [x] **Le magasin** : des fichiers JSON au format EXACT des cours embarqués,
+      relus par le même décodeur — ce qui rend le partage gratuit (un fichier
+      exporté par Android est un cours pour iOS, et réciproquement) — et
+      validés à l'entrée par le validateur d'intégrité porté (`rootMissing`,
+      arêtes orphelines, coups illégaux, cibles fausses, clés non canoniques,
+      chapitres orphelins). Les 137 cours livrés le passent sans remarque.
+- [x] **L'écran** : « + » sur la liste des ouvertures, PGN collé ou fichier
+      (un `.json` reçu d'un ami entre tel quel, ré-identifié), nom deviné,
+      camp étudié ; section « Mes répertoires » en tête de liste, hors filtre
+      de niveau ; partage et suppression (la progression reste — elle est
+      indexée par position). Un test instrumenté fait le tour complet.
+- [x] **L'entraînement** en hérite sans une ligne : le catalogue sert les
+      répertoires personnels en premier, et FSRS est indexé par FEN.
+
+      Trouvé en chemin : le nettoyage d'un PGN multi-parties se faisait AVANT
+      le découpage, et ne gardait qu'une ligne vide — la seconde partie perdait
+      la sienne et devenait illisible. iOS découpe d'abord. L'analyse ne l'a
+      jamais vu : elle ne lit que la première partie.
+
+      Restent, hors de ce lot :
+- [ ] **L'éditeur de répertoire** d'iOS (`OpeningEditorView`, 628 lignes) :
+      renommer, ajouter des coups en jouant sur le plateau, commenter ou
+      supprimer une arête. L'import couvre l'usage principal ; l'édition sur
+      place vient après les gros blocs.
+- [ ] **Le transfert `.clab`** n'emporte pas encore les répertoires
+      personnels — iOS les fait suivre par iCloud, Android n'a que le fichier.
 
 ### 10. Variantes — cinq manquantes sur douze
 iOS : Chess960, Roi de la colline, Trois échecs, Horde, Course des rois,
