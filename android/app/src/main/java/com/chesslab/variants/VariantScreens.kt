@@ -24,6 +24,7 @@ import com.chesslab.ui.BoardView
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Fence
+import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Groups
@@ -182,6 +183,7 @@ private fun Reserve(ui: VariantUiState, color: Piece.Color, model: VariantPlayVi
 private fun variantTint(id: String): Color = when (id) {
     "barricades" -> Palette.textSecondary
     "duck" -> Palette.gold
+    "stolenmove" -> Palette.warning
     "randombarricades" -> Palette.violet
     "chess960" -> Palette.violet
     "kingofthehill" -> Palette.gold
@@ -196,6 +198,7 @@ private fun variantTint(id: String): Color = when (id) {
 private fun variantIcon(id: String): ImageVector = when (id) {
     "barricades" -> Icons.Default.Fence
     "duck" -> Icons.Default.Pets
+    "stolenmove" -> Icons.Default.Bolt
     "randombarricades" -> Icons.Default.Shuffle
     "chess960" -> Icons.Default.Casino
     "kingofthehill" -> Icons.Default.Terrain

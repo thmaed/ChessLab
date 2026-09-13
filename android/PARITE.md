@@ -260,11 +260,10 @@ vérification sur appareil, pas après compilation.
       le reste de l'import. Trois tests JVM, un instrumenté qui fait l'aller-
       retour complet.
 
-### 10. Variantes — cinq manquantes sur douze
-iOS : Chess960, Roi de la colline, Trois échecs, Horde, Course des rois,
-Atomique, Antiéchecs, **Crazyhouse**, **Barricades**, **Barricades
-aléatoires**, **Coup Volé**, **Duck Chess**.
-Android : les sept premières.
+### 10. Variantes — les DOUZE, des deux côtés (13/09)
+iOS comme Android : Chess960, Roi de la colline, Trois échecs, Horde, Course
+des rois, Atomique, Antiéchecs, Crazyhouse, Barricades, Barricades
+aléatoires, Coup Volé, Duck Chess.
 - [x] **Crazyhouse** — fait le 13/09. La seule variante du hub où l'on POSE
       des pièces. La réserve se lit entre crochets dans la FEN du moteur
       (`CrazyhouseFen`), s'affiche au-dessus du plateau pour l'adversaire et
@@ -301,7 +300,20 @@ Android : les sept premières.
       moteur (il apprend la variante ; un mur fixe ne se prend pas ; un mur
       mobile se prendrait sans le filtre de l'app ; un mur arrête une tour) et
       deux d'écran.
-- [ ] **Coup Volé** — variante maison.
+- [x] **Coup Volé** — fait le 13/09. Variante MAISON : le tour double
+      n'existe dans aucun moteur et aucune option UCI ne saurait le décrire.
+      `chesskit` reste l'unique arbitre de chaque coup, Stockfish n'est que
+      l'adversaire, et le TOUR est tenu par l'app. Les cinq règles y sont :
+      un jeton tous les N coups joués par un camp (réglable de 4 à 8), un
+      seul en stock — un nouveau efface l'ancien —, pas de dépense en échec,
+      deux coups d'affilée sauf si le premier donne échec, et la prise en
+      passant ouverte par le dernier coup adverse qui SURVIT au coup
+      intercalé (le trait et la case en passant sont rendus au second coup :
+      sans cela `chesskit` ferait jouer l'adversaire et effacerait une prise
+      pourtant légale). L'ordinateur dépense toujours un jeton disponible —
+      non dépensé, il serait perdu au suivant. Sept tests JVM sur les règles,
+      un instrumenté qui gagne un jeton en quatre coups, le dépense, et joue
+      bien deux coups sans que l'adversaire s'intercale.
 - [x] **Duck Chess** — fait le 13/09. La seule variante dont les règles sont
       calculées DANS L'APP : aucun moteur ne la connaît, et un coup y est DEUX
       actions — déplacer une pièce, puis poser le canard —, ce que le

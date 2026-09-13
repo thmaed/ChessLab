@@ -257,12 +257,16 @@ private fun App() {
                 when (id) {
                     "chess960" -> stack.add(Route.Chess960Setup)
                     "duck" -> stack.add(Route.DuckGame)
+                    "stolenmove" -> stack.add(Route.StolenMoveGame)
                     else -> stack.add(
                         Route.VariantGame(id, VariantCatalog.byId(id)?.let { context.getString(it.titleRes) } ?: id)
                     )
                 }
             }
             Route.DuckGame -> com.chesslab.variants.DuckChessScreen(
+                onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
+            )
+            Route.StolenMoveGame -> com.chesslab.variants.StolenMoveScreen(
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
             )
             Route.Chess960Setup -> com.chesslab.variants.Chess960SetupScreen { number, twoPlayer ->

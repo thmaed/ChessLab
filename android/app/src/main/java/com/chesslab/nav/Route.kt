@@ -116,6 +116,9 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     /** Le Duck Chess : ses règles vivent dans l'app, pas dans le moteur. */
     data object DuckGame : Route(R.string.variant_duck)
 
+    /** Le Coup Volé : le tour double est tenu par l'app. */
+    data object StolenMoveGame : Route(R.string.variant_stolen)
+
     /** Une variante en cours de partie. */
     data class VariantGame(
         val id: String,

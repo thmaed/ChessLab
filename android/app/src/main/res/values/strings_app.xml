@@ -811,4 +811,12 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="duck_place">Place the duck on an empty square</string>
     <string name="duck_engine_places">The duck is landing…</string>
     <string name="duck_king_taken">King captured — %1$s</string>
+    <string name="variant_stolen">Stolen Move</string>
+    <string name="variant_stolen_short">One token, 2 moves</string>
+    <string name="variant_stolen_blurb">The rules are those of classical chess. In addition: every %1$d moves played, you earn a token. You never hold more than ONE, and you cannot spend it while in check. Spending it lets you play TWO moves in a row — unless the first one checks your opponent, in which case the turn stops there.</string>
+    <string name="stolen_token">Token available</string>
+    <string name="stolen_spend">Spend the token</string>
+    <string name="stolen_spending">Token spent: play your first move</string>
+    <string name="stolen_second_move">Your turn, second move</string>
+    <string name="stolen_interval">One token every %1$d moves</string>
 </resources>

@@ -93,6 +93,12 @@ object VariantCatalog {
             "duck", "chess", R.string.variant_duck, R.string.variant_duck_blurb,
             R.string.variant_duck_short, appRuled = true,
         ),
+        // Le Coup Volé non plus : le tour double n'existe dans aucun moteur.
+        // `chesskit` arbitre chaque coup, l'app tient le tour.
+        Variant(
+            "stolenmove", "chess", R.string.variant_stolen, R.string.variant_stolen_blurb,
+            R.string.variant_stolen_short, appRuled = true,
+        ),
     )
 
     fun byId(id: String): Variant? = all.firstOrNull { it.id == id }

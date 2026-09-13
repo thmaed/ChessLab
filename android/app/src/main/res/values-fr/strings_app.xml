@@ -808,4 +808,12 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="duck_place">Posez le canard sur une case vide</string>
     <string name="duck_engine_places">Le canard se pose…</string>
     <string name="duck_king_taken">Roi capturé — %1$s</string>
+    <string name="variant_stolen">Coup Volé</string>
+    <string name="variant_stolen_short">Un jeton, 2 coups</string>
+    <string name="variant_stolen_blurb">Les règles sont celles du jeu classique. En plus : tous les %1$d coups joués, vous gagnez un jeton. Vous n\'en gardez jamais plus d\'UN, et vous ne pouvez pas le dépenser en échec. Le dépenser vous fait jouer DEUX coups d\'affilée — sauf si le premier met l\'adversaire en échec, auquel cas le tour s\'arrête là.</string>
+    <string name="stolen_token">Jeton disponible</string>
+    <string name="stolen_spend">Dépenser le jeton</string>
+    <string name="stolen_spending">Jeton dépensé : jouez votre premier coup</string>
+    <string name="stolen_second_move">À vous, second coup</string>
+    <string name="stolen_interval">Un jeton tous les %1$d coups</string>
 </resources>
