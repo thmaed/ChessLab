@@ -15,6 +15,10 @@ class ChessLabApp : Application() {
         com.chesslab.sound.Haptics.prepare(this)
         // Les répertoires personnels : leur dossier, relu une fois.
         com.chesslab.courses.UserOpeningStore.attach(this)
+        // Les Barricades ne sont pas des variantes du moteur : c'est cette
+        // définition qui les lui enseigne, au premier démarrage de Fairy.
+        com.chesslab.engine.FairyEngine.variantDefinition =
+            com.chesslab.variants.BarricadesConfiguration.configurationText
     }
 
     /**

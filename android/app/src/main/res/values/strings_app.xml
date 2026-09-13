@@ -791,4 +791,24 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d repertoire</item>
         <item quantity="other">%1$d repertoires</item>
     </plurals>
+    <string name="chess960_setup">Starting position</string>
+    <string name="chess960_number">Position number</string>
+    <string name="chess960_number_hint">0 to 959 — the numbering used by Lichess and engines.</string>
+    <string name="chess960_random">Random</string>
+    <string name="chess960_classic">Classical (518)</string>
+    <string name="chess960_two_players">Two players on this device</string>
+    <string name="chess960_two_players_hint">Nobody plays the engine: it only referees.</string>
+    <string name="chess960_invalid">There are only 960 positions, numbered 0 to 959.</string>
+    <string name="variant_barricades">Barricades</string>
+    <string name="variant_barricades_short">Two walled squares</string>
+    <string name="variant_barricades_blurb">Two squares are WALLED: d4 and e5. Nothing lands there, nothing is captured there, and sliding pieces stop at them — only knights jump over. In every other respect, the rules of classical chess.</string>
+    <string name="variant_random_barricades">Random barricades</string>
+    <string name="variant_random_barricades_short">The walls move</string>
+    <string name="variant_random_barricades_blurb">Three walls, two of which change square on EVERY half-move — and never the same one stays. No foothold lasts longer than a move, and you never know which one will hold.</string>
+    <string name="variant_duck">Duck Chess</string>
+    <string name="variant_duck_short">A duck blocks</string>
+    <string name="variant_duck_blurb">After EVERY move, you place the duck on an empty square: it blocks it for everyone, cannot be captured, and must move each turn. No check, no checkmate, no stalemate — you win by CAPTURING the king.</string>
+    <string name="duck_place">Place the duck on an empty square</string>
+    <string name="duck_engine_places">The duck is landing…</string>
+    <string name="duck_king_taken">King captured — %1$s</string>
 </resources>

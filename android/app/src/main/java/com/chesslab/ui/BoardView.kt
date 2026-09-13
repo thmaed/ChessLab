@@ -68,6 +68,18 @@ fun BoardView(
      * continuer — jamais une correction silencieuse.
      */
     marked: Set<Square> = emptySet(),
+    /**
+     * Les cases MURÉES des Barricades. Elles ne portent pas de pièce aux yeux
+     * de `chesskit` — le mur en est une pour le moteur seul —, donc elles se
+     * dessinent ici, à part, comme un bloc plein qu'aucune pièce ne traverse.
+     */
+    walls: Set<Square> = emptySet(),
+    /**
+     * La case du CANARD (Duck Chess). Il n'est pas une pièce — il n'appartient
+     * à personne et ne se capture pas —, donc il ne figure ni dans la position
+     * ni dans la FEN : il se dessine ici, et vit dans le modèle.
+     */
+    duck: Square? = null,
     enabled: Boolean = true,
     onSquareTap: (Square) -> Unit = {},
 ) {
@@ -115,6 +127,8 @@ fun BoardView(
                                 isLastMove = lastMove?.let { square == it.first || square == it.second } == true,
                                 isChecked = square == checkedKing,
                                 isMarked = square in marked,
+                                isWall = square in walls,
+                                isDuck = square == duck,
                                 showFile = rank == ranks.last,
                                 showRank = file == files.first,
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -211,6 +225,8 @@ private fun SquareCell(
     isLastMove: Boolean,
     isChecked: Boolean,
     isMarked: Boolean = false,
+    isWall: Boolean = false,
+    isDuck: Boolean = false,
     showFile: Boolean,
     showRank: Boolean,
     modifier: Modifier,
@@ -219,6 +235,10 @@ private fun SquareCell(
     val isLight = square.color == Square.Color.light
     val base = if (isLight) theme.lightSquare else theme.darkSquare
     val background = when {
+        // Le mur passe AVANT tout le reste : une case murée n'est ni en échec,
+        // ni sélectionnée, ni le dernier coup — elle est hors du jeu.
+        isWall -> wallColour
+        isDuck -> Palette.gold.copy(alpha = 0.45f).compositeOver(base)
         isChecked -> theme.checkColor
         isSelected -> theme.selectedColor.compositeOver(base)
         isMarked -> Palette.warning.copy(alpha = 0.45f).compositeOver(base)
@@ -240,6 +260,16 @@ private fun SquareCell(
                 painter = painterResource(drawableFor(piece, pieceSet)),
                 contentDescription = describe(piece),
                 modifier = Modifier.fillMaxSize(0.92f),
+            )
+        }
+
+        // Le canard, en toutes lettres : aucun jeu de pièces n'en a, et
+        // l'emoji dit la chose mieux qu'un symbole emprunté à autre chose.
+        if (isDuck) {
+            androidx.compose.material3.Text(
+                "\uD83E\uDD86",
+                fontSize = 22.sp,
+                modifier = Modifier.testTag("canard"),
             )
         }
 
@@ -278,6 +308,27 @@ private fun SquareCell(
             )
         }
     }
+}
+
+/**
+ * L'ardoise d'un mur : plus sombre que n'importe quelle case, pour qu'on voie
+ * d'un coup d'œil que le plateau a un trou plutôt qu'une case foncée.
+ */
+private val wallColour = Color(0.13f, 0.14f, 0.17f)
+
+/**
+ * Une pièce dessinée HORS du plateau : la réserve du Crazyhouse. Le jeu de
+ * pièces est celui des réglages, comme sur l'échiquier — deux pièces
+ * différentes pour la même chose se verraient tout de suite.
+ */
+@Composable
+fun PieceIcon(piece: Piece, modifier: Modifier = Modifier) {
+    val settings by com.chesslab.settings.SettingsStore.state.collectAsState()
+    Image(
+        painter = painterResource(drawableFor(piece, settings.pieceSetId)),
+        contentDescription = describe(piece),
+        modifier = modifier,
+    )
 }
 
 /**

@@ -19,6 +19,22 @@ data class Variant(
     /** L'accroche COURTE de la tuile : trois mots, pas un paragraphe. */
     @StringRes val shortRes: Int,
     val chess960: Boolean = false,
+    /**
+     * La variante porte des MURS : des cases hors du jeu, que le moteur
+     * connaît comme des pièces et que `chesskit` ne doit jamais voir.
+     */
+    val hasWalls: Boolean = false,
+    /**
+     * Les murs se déplacent à chaque demi-coup. La position se RÉÉCRIT alors
+     * entre les coups : le tirage ne figure dans aucun coup, donc rejouer
+     * « position de départ + coups » ne le reproduirait pas.
+     */
+    val wallsMove: Boolean = false,
+    /**
+     * Les règles sont calculées DANS L'APP : aucun moteur ne connaît la
+     * variante, et rien dans Fairy-Stockfish ne permet de la décrire.
+     */
+    val appRuled: Boolean = false,
 )
 
 object VariantCatalog {
@@ -49,14 +65,33 @@ object VariantCatalog {
             "atomic", "atomic", R.string.variant_atomic, R.string.variant_atomic_blurb,
             R.string.variant_atomic_short,
         ),
-        // Crazyhouse attend : le moteur la connaît, mais elle demande de
-        // PARACHUTER les pièces prises, donc une réserve et un geste de pose.
-        // Sans eux, le moteur jouerait des parachutages que l'utilisateur ne
-        // pourrait pas rendre — une variante à moitié jouable est pire que
-        // pas de variante.
+        // La seule variante du hub où l'on POSE des pièces : elle a sa
+        // réserve, lue dans la FEN, et son geste de pose.
+        Variant(
+            "crazyhouse", "crazyhouse", R.string.variant_crazyhouse,
+            R.string.variant_crazyhouse_blurb, R.string.variant_crazyhouse_short,
+        ),
         Variant(
             "antichess", "antichess", R.string.variant_antichess, R.string.variant_antichess_blurb,
             R.string.variant_antichess_short,
+        ),
+        // Les deux Barricades ne sont pas des variantes du moteur : c'est
+        // `BarricadesConfiguration` qui les lui enseigne au démarrage.
+        Variant(
+            BarricadesConfiguration.variantId, BarricadesConfiguration.variantId,
+            R.string.variant_barricades, R.string.variant_barricades_blurb,
+            R.string.variant_barricades_short, hasWalls = true,
+        ),
+        Variant(
+            BarricadesConfiguration.randomVariantId, BarricadesConfiguration.randomVariantId,
+            R.string.variant_random_barricades, R.string.variant_random_barricades_blurb,
+            R.string.variant_random_barricades_short, hasWalls = true, wallsMove = true,
+        ),
+        // Le Duck Chess n'est pas arbitré par le moteur : un coup y est DEUX
+        // actions, ce que le protocole UCI ne sait pas exprimer.
+        Variant(
+            "duck", "chess", R.string.variant_duck, R.string.variant_duck_blurb,
+            R.string.variant_duck_short, appRuled = true,
         ),
     )
 

@@ -265,13 +265,73 @@ iOS : Chess960, Roi de la colline, Trois échecs, Horde, Course des rois,
 Atomique, Antiéchecs, **Crazyhouse**, **Barricades**, **Barricades
 aléatoires**, **Coup Volé**, **Duck Chess**.
 Android : les sept premières.
-- [ ] **Crazyhouse** — demande une réserve de pièces et un geste de parachutage.
-- [ ] **Barricades** et **Barricades aléatoires** — murs sur le plateau, et qui
-      se déplacent à chaque coup pour la seconde.
+- [x] **Crazyhouse** — fait le 13/09. La seule variante du hub où l'on POSE
+      des pièces. La réserve se lit entre crochets dans la FEN du moteur
+      (`CrazyhouseFen`), s'affiche au-dessus du plateau pour l'adversaire et
+      en dessous pour soi, et ne s'affiche PAS quand elle est vide — une bande
+      vide vole de la place à l'échiquier sans rien dire. On touche une pièce
+      de sa main, les cases de pose s'allument, on la pose ; la réserve d'en
+      face est un relevé, elle ne se touche pas. Le `~` des pièces promues est
+      retiré avant de rendre la position à `chesskit`, qui refuserait tout le
+      reste à cause de lui. La lettre d'une pose est la lettre FEN, pas la
+      lettre SAN — vide pour le pion, elle donnait « @e4 » côté iOS et aucune
+      case trouvée. Cinq tests JVM, un test de plomberie qui interroge le VRAI
+      moteur (la FEN porte la réserve, les poses sont listées « P@xx » et
+      visent des cases vides) et un test d'écran.
+- [x] **Barricades** et **Barricades aléatoires** — faites le 13/09. Le moteur
+      n'a AUCUNE notion de case-mur : la définition écrite par l'app la lui
+      fabrique, avec le type `immobile` (notation Betza vide : aucun coup
+      possible), `mobilityRegion` pour que les Noirs ne puissent pas s'y
+      poser, et une valeur nulle pour qu'un mur ne pèse rien. Elle est
+      enseignée par `VariantPath`, AVANT tout `UCI_Variant` — dans l'autre
+      ordre le moteur refuse un nom qu'il ne connaît pas encore et reste aux
+      échecs ordinaires sans rien dire. Le blocage des lignes ne vient pas de
+      la région de mobilité mais de l'OCCUPATION : un mur est une pièce, donc
+      il arrête une tour et un cavalier lui saute par-dessus.
+      La variante aléatoire ne peut pas se protéger ainsi — une région figée
+      ne suit pas des murs qui bougent —, donc le moteur y propose de prendre
+      les murs et c'est l'app qui retire ces coups-là, rien d'autre. Sa
+      position se RÉÉCRIT entre les demi-coups (deux murs sur trois changent
+      de case, jamais le même épargné), ce qu'aucun journal de coups ne
+      saurait reproduire : le modèle rebase la position et compte les
+      demi-coups à part.
+      Le « W » du mur ne parvient jamais à `chesskit`, qui refuserait toute la
+      position à cause de lui ; le plateau le dessine comme une ardoise, plus
+      sombre que n'importe quelle case. Neuf tests JVM, quatre sur le VRAI
+      moteur (il apprend la variante ; un mur fixe ne se prend pas ; un mur
+      mobile se prendrait sans le filtre de l'app ; un mur arrête une tour) et
+      deux d'écran.
 - [ ] **Coup Volé** — variante maison.
-- [ ] **Duck Chess** — un canard bloque une case, tour en deux temps.
-- [ ] **Chess960** : iOS a le choix par NUMÉRO de position et un mode deux
-      joueurs ; Android tire au hasard et ne joue que contre l'ordinateur.
+- [x] **Duck Chess** — fait le 13/09. La seule variante dont les règles sont
+      calculées DANS L'APP : aucun moteur ne la connaît, et un coup y est DEUX
+      actions — déplacer une pièce, puis poser le canard —, ce que le
+      protocole UCI ne sait pas exprimer. `DuckChessRules` engendre donc les
+      coups lui-même (pseudo-légaux au sens classique : ni échec, ni mat, ni
+      pat — on gagne en CAPTURANT le roi), `DuckChessFen` les applique en
+      écrivant le plateau résultant, et Stockfish n'est qu'un CONSEILLER,
+      borné par `searchmoves` aux coups que le canard autorise. Trois cas le
+      mettraient en défaut, tous traités avant lui : un roi prenable (position
+      illégale à ses yeux, et pourtant le coup gagnant), une position illégale
+      qui ne l'est pas ici, et une liste vide.
+      Le canard bloque totalement une case — rien ne s'y pose, rien ne la
+      traverse, il ne se capture pas — et il DOIT changer de case à chaque
+      tour. L'ordinateur le pose là où il gêne : sur la case d'arrivée du
+      meilleur coup adverse, sinon sur son trajet. Il ne figure ni dans la
+      position ni dans la FEN, ce qui permet de rendre celle-ci à `chesskit`
+      et de réutiliser tout l'affichage ; il se dessine à part. Vingt-quatre
+      tests JVM (quinze portés un à un de la suite iOS) et un d'écran.
+- [x] **Chess960 par numéro, et à deux** — fait le 13/09. La tuile ouvre un
+      écran de réglage : la position se choisit par son NUMÉRO de Scharnagl,
+      celui de Lichess et des moteurs — champ de saisie pour viser, curseur
+      pour explorer, « Au hasard » et « Classique (518) » —, et le plateau la
+      MONTRE avant qu'on commence, parce qu'un numéro seul ne dit rien. La
+      numérotation est portée de python-chess comme sur iOS, et le test JVM
+      compare les 960 FEN au MÊME fichier de référence que la suite iOS : si
+      la 518 n'était pas la partie classique, tout le reste serait faux sans
+      que rien ne le dise. Un interrupteur « à deux sur cet appareil » : le
+      moteur ne joue plus, il arbitre seulement, le statut nomme la couleur au
+      trait, et le plateau se retourne si le réglage du mode Deux joueurs le
+      demande. Cinq tests JVM, trois instrumentés.
 
 ### 11. Le reste
 - [x] **Visite guidée** — faite le 13/09. Les onze étapes d'iOS, en trois

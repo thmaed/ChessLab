@@ -788,4 +788,24 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%1$d répertoire</item>
         <item quantity="other">%1$d répertoires</item>
     </plurals>
+    <string name="chess960_setup">Position de départ</string>
+    <string name="chess960_number">Numéro de position</string>
+    <string name="chess960_number_hint">0 à 959 — la numérotation de Lichess et des moteurs.</string>
+    <string name="chess960_random">Au hasard</string>
+    <string name="chess960_classic">Classique (518)</string>
+    <string name="chess960_two_players">À deux sur cet appareil</string>
+    <string name="chess960_two_players_hint">Personne ne joue contre le moteur : il ne fait qu\'arbitrer.</string>
+    <string name="chess960_invalid">Il n\'y a que 960 positions, numérotées de 0 à 959.</string>
+    <string name="variant_barricades">Barricades</string>
+    <string name="variant_barricades_short">Deux cases murées</string>
+    <string name="variant_barricades_blurb">Deux cases sont MURÉES : d4 et e5. Rien ne s\'y pose, rien ne s\'y prend, et les pièces qui glissent s\'y arrêtent — seuls les cavaliers sautent par-dessus. Pour tout le reste, les règles du jeu classique.</string>
+    <string name="variant_random_barricades">Barricades aléatoires</string>
+    <string name="variant_random_barricades_short">Les murs se déplacent</string>
+    <string name="variant_random_barricades_blurb">Trois murs, et deux d\'entre eux changent de case à CHAQUE demi-coup — celui qui reste n\'est jamais le même. Aucun point d\'appui ne dure plus d\'un coup, et l\'on ne sait pas lequel tiendra.</string>
+    <string name="variant_duck">Duck Chess</string>
+    <string name="variant_duck_short">Un canard bloque</string>
+    <string name="variant_duck_blurb">Après CHAQUE coup, on pose le canard sur une case vide : il la bloque pour tout le monde, ne se capture pas, et doit changer de place à chaque tour. Ni échec, ni mat, ni pat — on gagne en CAPTURANT le roi.</string>
+    <string name="duck_place">Posez le canard sur une case vide</string>
+    <string name="duck_engine_places">Le canard se pose…</string>
+    <string name="duck_king_taken">Roi capturé — %1$s</string>
 </resources>

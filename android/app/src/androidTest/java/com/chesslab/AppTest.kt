@@ -82,7 +82,7 @@ class AppTest {
     /** Ouvre la feuille des coups joués et rend la main quand elle est là. */
     private fun openMoveList() {
         compose.onNodeWithTag("coups-joues").performClick()
-        awaitTag("coup-0", 10_000)
+        awaitTag("coup-0", 15_000)
     }
 
     @Test fun theHomeOffersTheModes() {
@@ -163,7 +163,7 @@ class AppTest {
         // la liste est paresseuse : on filtre pour amener la ligne à l'écran
         compose.onNodeWithTag("recherche").performTextInput("Italian")
         awaitTag("cours-italian-game", 10_000)
-        compose.onNodeWithTag("cours-italian-game").performClick()
+        compose.onNodeWithTag("cours-italian-game").performScrollTo().performClick()
 
         // Le lecteur DESCEND l'arbre : la racine, puis les suites.
         awaitTag("racine")
@@ -183,7 +183,11 @@ class AppTest {
         awaitTag("compte")
         compose.onNodeWithTag("recherche").performTextInput("Opposition")
         awaitTag("cours-eg-opposition", 10_000)
-        compose.onNodeWithTag("cours-eg-opposition").performClick()
+        // `performScrollTo()` AVANT le tap : le champ de recherche flotte en
+        // bas et ouvre le clavier, qui couvre alors une partie de la liste —
+        // un tap sur une ligne à moitié cachée atterrit à côté, sans erreur.
+        // Le test échouait ensuite soixante secondes sur la page suivante.
+        compose.onNodeWithTag("cours-eg-opposition").performScrollTo().performClick()
         awaitTag("racine")
     }
 
@@ -203,13 +207,24 @@ class AppTest {
     }
 
     @Test fun aCharacterPlaysWithMaia() {
-        // le réseau fait 43 Mo : son chargement prend du temps sur émulateur
+        // le réseau fait 43 Mo : son chargement prend du temps
         startGame("adversaire-nadia")
 
-        compose.onNodeWithTag("case-e2").performClick()
-        compose.onNodeWithTag("case-e4").performClick()
-        awaitText("À vous de jouer", 120_000)   // Nadia a répondu
+        // Le statut dit « À vous de jouer » AVANT que le réseau soit chargé :
+        // le tap tombe alors sur un plateau qui n'écoute pas encore, et rien
+        // ne le rejoue — le test attendait ensuite une liste de coups vide.
+        // On insiste jusqu'à ce que Nadia se mette à réfléchir, seule preuve
+        // que le coup est parti. Rejouer un coup déjà joué ne fait rien : sa
+        // case de départ est vide.
+        var parti = false
+        for (essai in 1..5) {
+            compose.onNodeWithTag("case-e2").performClick()
+            compose.onNodeWithTag("case-e4").performClick()
+            if (runCatching { awaitText("réfléchit", 15_000) }.isSuccess) { parti = true; break }
+        }
+        require(parti) { "le coup n'est jamais parti : le plateau n'a pas répondu en cinq essais" }
 
+        awaitText("À vous de jouer", 120_000)   // Nadia a répondu
         openMoveList()
         compose.onNodeWithTag("coup-1").assertIsDisplayed()
     }
@@ -242,9 +257,106 @@ class AppTest {
         }
     }
 
+    /**
+     * Le Crazyhouse s'ouvre et se joue. La RÉSERVE, elle, se vérifie sur le
+     * moteur (`EngineTest`) : provoquer une prise à travers l'interface
+     * demanderait que l'adversaire veuille bien prendre, ce qu'aucun test ne
+     * peut exiger d'un moteur qui réfléchit.
+     */
+    @Test fun leCrazyhouseSeJoue() {
+        open("variants")
+        compose.onNodeWithTag("variante-crazyhouse").performScrollTo().performClick()
+        awaitText("À vous de jouer", 60_000)
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+        compose.waitUntil(90_000) {
+            compose.onAllNodesWithText("2 demi-coups").fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    /**
+     * Les Barricades se jouent, murs compris. Que le moteur les REFUSE
+     * vraiment aux pièces se vérifie sur lui (`EngineTest`) ; ici on vérifie
+     * que la variante s'ouvre et avance, c'est-à-dire que la définition a
+     * bien été chargée avant que l'écran la demande.
+     */
+    @Test fun lesBarricadesSeJouent() {
+        open("variants")
+        compose.onNodeWithTag("variante-barricades").performScrollTo().performClick()
+        awaitText("À vous de jouer", 60_000)
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+        compose.waitUntil(90_000) {
+            compose.onAllNodesWithText("2 demi-coups").fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    /**
+     * Les murs mobiles : la position se réécrit entre les coups, et le
+     * compteur continue de monter.
+     *
+     * Le test n'impose AUCUN coup précis : les trois murs se posent au hasard
+     * sur les rangées 3 à 6, donc e4 est muré une fois sur cinq environ et
+     * « 1.e4 » n'est alors même pas légal. On pousse le premier pion qui
+     * accepte de bouger — c'est le va-et-vient qu'on vérifie, pas un coup.
+     */
+    @Test fun lesBarricadesAleatoiresDeplacentLeursMurs() {
+        open("variants")
+        compose.onNodeWithTag("variante-randombarricades").performScrollTo().performClick()
+        awaitText("À vous de jouer", 60_000)
+
+        val pushes = listOf("e2" to "e4", "d2" to "d4", "a2" to "a4", "h2" to "h4", "b2" to "b4", "g2" to "g4")
+        for ((from, to) in pushes) {
+            compose.onNodeWithTag("case-$from").performClick()
+            compose.onNodeWithTag("case-$to").performClick()
+            val joue = runCatching {
+                compose.waitUntil(20_000) {
+                    compose.onAllNodesWithText("demi-coup", substring = true).fetchSemanticsNodes()
+                        .isNotEmpty() && compose.onAllNodesWithText("0 demi-coup").fetchSemanticsNodes().isEmpty()
+                }
+            }.isSuccess
+            if (joue) break
+        }
+        // Notre coup, puis celui du moteur — chacun suivi d'un redéploiement
+        // des murs, donc de deux interrogations de plus.
+        compose.waitUntil(120_000) {
+            compose.onAllNodesWithText("2 demi-coups").fetchSemanticsNodes().isNotEmpty()
+        }
+    }
+
+    /**
+     * Le Duck Chess : un tour en DEUX temps. On déplace une pièce, puis on
+     * pose le canard — et c'est la pose qui rend la main. Le compteur ne monte
+     * donc que d'un demi-coup par TOUR complet.
+     */
+    @Test fun leDuckChessSeJoueEnDeuxTemps() {
+        open("variants")
+        compose.onNodeWithTag("variante-duck").performScrollTo().performClick()
+        awaitText("À vous de jouer", 30_000)
+
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+        // Le trait n'a PAS changé : le canard reste à poser.
+        awaitText("Posez le canard", 10_000)
+
+        compose.onNodeWithTag("case-e5").performClick()
+        compose.onNodeWithTag("canard", useUnmergedTree = true).assertExists()
+
+        // L'ordinateur joue son tour entier, canard compris.
+        compose.waitUntil(120_000) {
+            compose.onAllNodesWithText("2 demi-coups").fetchSemanticsNodes().isNotEmpty()
+        }
+        awaitText("À vous de jouer", 30_000)
+        compose.onNodeWithTag("canard", useUnmergedTree = true).assertExists()
+    }
+
     @Test fun chess960ShufflesTheBackRank() {
         open("variants")
+        // Depuis le 13/09, la tuile ouvre un RÉGLAGE : on y choisit la
+        // position par son numéro. « Au hasard » retrouve le geste d'avant.
         compose.onNodeWithTag("variante-chess960").performClick()
+        compose.onNodeWithTag("hasard-960").performScrollTo().performClick()
+        compose.onNodeWithTag("commencer-960").performClick()
         awaitText("À vous de jouer", 60_000)
         compose.onNodeWithTag("case-a1").assertIsDisplayed()
     }

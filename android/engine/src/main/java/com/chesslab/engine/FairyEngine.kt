@@ -118,6 +118,15 @@ class FairyEngine private constructor(private val binaryPath: String) {
         private var failed = false
 
         /**
+         * La définition des variantes MAISON, en syntaxe `variants.ini`.
+         *
+         * Posée par l'app au démarrage : le module `engine` ne connaît aucune
+         * variante, et c'est très bien — il ne sait qu'enseigner celles qu'on
+         * lui donne. `null` : le moteur s'en tient à celles qu'il embarque.
+         */
+        var variantDefinition: String? = null
+
+        /**
          * Donne le moteur de variantes à [block], seul.
          *
          * Même discipline que pour Stockfish, et pour une raison de plus : les
@@ -136,6 +145,22 @@ class FairyEngine private constructor(private val binaryPath: String) {
             val engine = FairyEngine(File(dir, "fairy").absolutePath)
             if (!engine.start()) { failed = true; return null }
             engine.send("uci")
+            // AVANT tout `UCI_Variant` : `VariantPath` relit le fichier et
+            // reconstruit la liste des variantes acceptées. Dans l'autre ordre,
+            // le moteur refuse un nom qu'il ne connaît pas encore et reste aux
+            // échecs ordinaires, SANS RIEN DIRE.
+            //
+            // Le fichier est réécrit à chaque démarrage plutôt que conservé :
+            // il est engendré et minuscule, et une version périmée laissée là
+            // par une mise à jour serait un piège silencieux — le moteur
+            // chargerait d'anciennes règles sans que rien ne le signale.
+            variantDefinition?.let { definition ->
+                runCatching {
+                    val file = File(dir, "variants.ini")
+                    file.writeText(definition)
+                    engine.send("setoption name VariantPath value ${file.absolutePath}")
+                }
+            }
             instance = engine
             return engine
         }

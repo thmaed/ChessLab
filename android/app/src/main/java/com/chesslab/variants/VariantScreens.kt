@@ -23,6 +23,9 @@ import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.BoardView
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Fence
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Inventory2
 import androidx.compose.material.icons.filled.Looks3
@@ -53,6 +56,14 @@ import com.chesslab.R
 import androidx.compose.ui.res.pluralStringResource
 import com.chesslab.ui.QuickSwitchMenu
 import com.chesslab.ui.TopBarActions
+import androidx.compose.foundation.border
+import chesskit.Piece
+import chesskit.Square
+import com.chesslab.ui.PieceIcon
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.text.font.FontFamily
 
 @Composable
 fun VariantListScreen(onOpen: (String) -> Unit) {
@@ -119,8 +130,59 @@ private fun VariantCard(variant: Variant, onOpen: (String) -> Unit) {
     }
 }
 
+/**
+ * La réserve d'un camp : les pièces prises qui attendent d'être posées.
+ *
+ * Rien du tout quand elle est vide — une bande vide sous un plateau ne dit
+ * rien et vole de la place à l'échiquier, qui en manque toujours. La sienne se
+ * touche pour choisir la pièce à poser ; celle d'en face ne se touche pas.
+ */
+@Composable
+private fun Reserve(ui: VariantUiState, color: Piece.Color, model: VariantPlayViewModel) {
+    val hand = ui.pocket[color].orEmpty()
+    if (hand.isEmpty()) return
+    val mine = color == Piece.Color.white
+    Row(
+        Modifier.fillMaxWidth().padding(vertical = 2.dp).testTag("reserve-${if (mine) "blancs" else "noirs"}"),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        CrazyhouseFen.order.forEach { kind ->
+            val count = hand[kind] ?: 0
+            if (count == 0) return@forEach
+            val selected = mine && ui.selectedDrop == kind
+            Row(
+                Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(if (selected) Palette.accent.copy(alpha = 0.28f) else Color.Transparent)
+                    .border(
+                        1.5.dp,
+                        if (selected) Palette.accent else Color.Transparent,
+                        RoundedCornerShape(8.dp),
+                    )
+                    .clickable(enabled = mine) { model.selectPocketPiece(kind) }
+                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                    .testTag("reserve-${CrazyhouseFen.letter(kind)}-${if (mine) "moi" else "lui"}"),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                PieceIcon(Piece(kind, color, Square("a1")), Modifier.size(26.dp))
+                if (count > 1) {
+                    Text(
+                        "$count", fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                        color = Palette.textSecondary,
+                    )
+                }
+            }
+        }
+    }
+}
+
 /** Une couleur par variante, reprise de l'écran iOS. */
 private fun variantTint(id: String): Color = when (id) {
+    "barricades" -> Palette.textSecondary
+    "duck" -> Palette.gold
+    "randombarricades" -> Palette.violet
     "chess960" -> Palette.violet
     "kingofthehill" -> Palette.gold
     "3check" -> Palette.danger
@@ -132,6 +194,9 @@ private fun variantTint(id: String): Color = when (id) {
 }
 
 private fun variantIcon(id: String): ImageVector = when (id) {
+    "barricades" -> Icons.Default.Fence
+    "duck" -> Icons.Default.Pets
+    "randombarricades" -> Icons.Default.Shuffle
     "chess960" -> Icons.Default.Casino
     "kingofthehill" -> Icons.Default.Terrain
     "3check" -> Icons.Default.Looks3
@@ -145,6 +210,9 @@ private fun variantIcon(id: String): ImageVector = when (id) {
 @Composable
 fun VariantPlayScreen(
     variantId: String,
+    /** La position Chess960 choisie au réglage ; `null` = tirage au sort. */
+    chess960Number: Int? = null,
+    twoPlayer: Boolean = false,
     /**
      * Seule l'analyse est proposée : les autres modes jouent aux règles
      * ORTHODOXES, et y envoyer une position de Horde ou de Roi de la colline
@@ -154,12 +222,17 @@ fun VariantPlayScreen(
     onAnalyze: (String) -> Unit = {},
     model: VariantPlayViewModel = viewModel(),
 ) {
-    LaunchedEffect(variantId) { model.load(variantId) }
+    LaunchedEffect(variantId, chess960Number, twoPlayer) {
+        model.load(variantId, chess960Number, twoPlayer)
+    }
     val ui = model.ui
 
     TopBarActions {
         QuickSwitchMenu(onAnalyze = { onAnalyze(model.ui.position.fen) })
     }
+
+    val settings by com.chesslab.settings.SettingsStore.state.collectAsState()
+    val autoFlip = settings.autoFlipTwoPlayer
 
     BoardScaffold(
         header = {
@@ -169,22 +242,41 @@ fun VariantPlayScreen(
             }
             StatusRow(ui.status, busy = ui.thinking)
             Spacer(Modifier.height(8.dp))
+            // La réserve ADVERSE, au-dessus du plateau comme le camp qu'elle
+            // sert : un relevé de ce qui peut nous tomber dessus.
+            Reserve(ui, Piece.Color.black, model)
+            ui.chess960Number?.let {
+                Text(
+                    stringResource(R.string.chess960_number) + " $it",
+                    fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = Palette.textTertiary,
+                    modifier = Modifier.testTag("numero-position"),
+                )
+            }
         },
         board = {
             BoardView(
                 position = ui.position,
+                // À deux sur un seul appareil, le plateau se retourne pour
+                // celui qui doit jouer — le même réglage que le mode Deux
+                // joueurs ordinaire le commande.
+                orientation = if (ui.twoPlayer && autoFlip) ui.position.sideToMove
+                else Piece.Color.white,
                 selected = ui.selected,
                 legalTargets = ui.legalTargets,
                 lastMove = ui.lastMove,
                 checkedKing = ui.checkedKing,
+                walls = ui.walls,
                 enabled = ui.ready && !ui.thinking && !ui.gameOver,
                 onSquareTap = model::onSquareTap,
             )
         },
         panel = {
-            Spacer(Modifier.height(10.dp))
+            Spacer(Modifier.height(6.dp))
+            // La NÔTRE, sous le plateau, du côté où l'on joue.
+            Reserve(ui, Piece.Color.white, model)
+            Spacer(Modifier.height(4.dp))
             Text(
-                pluralStringResource(R.plurals.variant_halfmoves, ui.uciLog.size, ui.uciLog.size),
+                pluralStringResource(R.plurals.variant_halfmoves, ui.plies, ui.plies),
                 fontSize = 11.sp, color = Palette.textTertiary,
                 modifier = Modifier.testTag("compteur"),
             )

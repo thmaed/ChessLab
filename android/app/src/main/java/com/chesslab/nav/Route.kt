@@ -110,6 +110,18 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     /** Un cours ouvert : ouverture ou finale, même écran. */
     data class CourseReader(val id: String, val name: String) : Route(R.string.route_openings, name)
 
+    /** Le réglage d'une partie de Chess960 : le NUMÉRO de position, et à deux ou non. */
+    data object Chess960Setup : Route(R.string.variant_chess960)
+
+    /** Le Duck Chess : ses règles vivent dans l'app, pas dans le moteur. */
+    data object DuckGame : Route(R.string.variant_duck)
+
     /** Une variante en cours de partie. */
-    data class VariantGame(val id: String, val name: String) : Route(R.string.route_variants, name)
+    data class VariantGame(
+        val id: String,
+        val name: String,
+        /** La position Chess960 choisie ; `null` = tirage au sort. */
+        val chess960Number: Int? = null,
+        val twoPlayer: Boolean = false,
+    ) : Route(R.string.route_variants, name)
 }

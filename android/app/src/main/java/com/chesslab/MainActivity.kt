@@ -252,10 +252,29 @@ private fun App() {
             Route.PositionEditor -> PositionEditorScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
             is Route.Laboratory -> LabScreen(startFen = current.startFen)
             Route.Variants -> VariantListScreen { id ->
-                stack.add(Route.VariantGame(id, VariantCatalog.byId(id)?.let { context.getString(it.titleRes) } ?: id))
+                // Le Chess960 passe par un réglage : on y choisit la position
+                // par son NUMÉRO, et l'on peut jouer à deux.
+                when (id) {
+                    "chess960" -> stack.add(Route.Chess960Setup)
+                    "duck" -> stack.add(Route.DuckGame)
+                    else -> stack.add(
+                        Route.VariantGame(id, VariantCatalog.byId(id)?.let { context.getString(it.titleRes) } ?: id)
+                    )
+                }
+            }
+            Route.DuckGame -> com.chesslab.variants.DuckChessScreen(
+                onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
+            )
+            Route.Chess960Setup -> com.chesslab.variants.Chess960SetupScreen { number, twoPlayer ->
+                stack[stack.lastIndex] = Route.VariantGame(
+                    "chess960", context.getString(R.string.variant_chess960),
+                    chess960Number = number, twoPlayer = twoPlayer,
+                )
             }
             is Route.VariantGame -> VariantPlayScreen(
                 variantId = current.id,
+                chess960Number = current.chess960Number,
+                twoPlayer = current.twoPlayer,
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
             )
             else -> Placeholder(current.title(context))
