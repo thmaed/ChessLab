@@ -62,6 +62,12 @@ fun BoardView(
      * lire.
      */
     arrows: List<BoardArrow> = emptyList(),
+    /**
+     * Les cases à MARQUER : celles dont la lecture du scanner est douteuse.
+     * Un surlignage d'avertissement, pour qu'on les regarde avant de
+     * continuer — jamais une correction silencieuse.
+     */
+    marked: Set<Square> = emptySet(),
     enabled: Boolean = true,
     onSquareTap: (Square) -> Unit = {},
 ) {
@@ -108,6 +114,7 @@ fun BoardView(
                                 isLegalTarget = square in legalTargets,
                                 isLastMove = lastMove?.let { square == it.first || square == it.second } == true,
                                 isChecked = square == checkedKing,
+                                isMarked = square in marked,
                                 showFile = rank == ranks.last,
                                 showRank = file == files.first,
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -203,6 +210,7 @@ private fun SquareCell(
     isLegalTarget: Boolean,
     isLastMove: Boolean,
     isChecked: Boolean,
+    isMarked: Boolean = false,
     showFile: Boolean,
     showRank: Boolean,
     modifier: Modifier,
@@ -213,6 +221,7 @@ private fun SquareCell(
     val background = when {
         isChecked -> theme.checkColor
         isSelected -> theme.selectedColor.compositeOver(base)
+        isMarked -> Palette.warning.copy(alpha = 0.45f).compositeOver(base)
         isLastMove -> (if (isLight) theme.lastMoveLight else theme.lastMoveDark).compositeOver(base)
         else -> base
     }

@@ -47,7 +47,19 @@ class ScannerPipelineTest {
         )
 
         val detections = detector!!.detect(bitmap!!, corners)
-        val placement = BoardReader.placement(BoardReader.grid(detections))
+        val grid = BoardReader.grid(detections)
+        val placement = BoardReader.placement(grid)
+
+        // L'orientation devinée ne promet qu'une chose : une position LÉGALE.
+        // Sur cette finale, les deux sens le sont, et le départage par les
+        // pions retient l'envers (un pion blanc en h2 y pèse plus qu'un pion
+        // blanc en a7) — iOS devine pareil, et l'utilisateur inverse d'un tap.
+        val reading = com.chesslab.scanner.ScanReading(grid)
+        org.junit.Assert.assertTrue(
+            com.chesslab.editor.FenValidator.isLegal(
+                reading.fen(reading.suggestedRotation(), chesskit.Piece.Color.white)
+            )
+        )
 
         // du manifeste de l'app iOS
         val expected = "5rk1/P7/2R5/5P1p/8/4b3/6K1/8"

@@ -19,7 +19,7 @@ vérification sur appareil, pas après compilation.
 | Puzzles | 106 094 puzzles Lichess, essais réglables, indice |
 | Deux joueurs | plateau qui se retourne |
 | Laboratoire | série de parties, Maia ou Stockfish de chaque côté |
-| Scanner | détection du plateau, coins ajustables, recadrage |
+| Scanner | détection du plateau, coins ajustables, recadrage, confirmation dans l'éditeur avec cases douteuses et sens de lecture (13/09) |
 | Éditeur de position | composer une position |
 | Progression | statistiques d'entraînement |
 | Changer de mode | sur huit écrans |
@@ -168,9 +168,24 @@ vérification sur appareil, pas après compilation.
       s'affiche. Les 1 834 du catalogue le sont tous — le verrou est pour
       demain.
 
-### 8. Scanner
-- [ ] **Écran de confirmation** : corriger les pièces mal lues AVANT d'utiliser
-      la position. Android donne la FEN et la propose telle quelle.
+### 8. Scanner — FAIT le 13/09
+- [x] **Écran de confirmation**, OBLIGATOIRE : rien de ce qui sort du scanner
+      ne part vers le moteur sans passer sous les yeux de l'utilisateur. Comme
+      iOS, c'est l'éditeur de position pré-rempli avec la lecture : les cases
+      douteuses (confiance < 0,55) sont surlignées, une bannière en donne le
+      compte, le sens de lecture s'inverse d'un tap (deux orientations
+      plausibles pour un diagramme, l'orientation proposée étant celle qui
+      donne une position légale — ou, à égalité, la mieux placée pour ses
+      pions), les roques sont DÉDUITS de la position et jamais inventés, et
+      « Recadrer » ramène aux coins. Avant : la FEN lue partait telle quelle,
+      avec « KQkq » inventé.
+- [x] **Le validateur de FEN** d'iOS, porté avec ses sept règles (deux rois,
+      pas de pion sur les rangées extrêmes, camp sans le trait pas en échec,
+      camp au trait avec un coup légal, roques et case « en passant »
+      cohérents) : l'éditeur les met en mots et refuse d'analyser une
+      position injouable. Huit cas JVM ; sept pour la lecture (rotation, FEN,
+      cases douteuses, orientation devinée) ; sur l'appareil, la capture de
+      référence traverse tout l'écran jusqu'à l'analyse.
 
 ### 9. Répertoires personnels
 - [ ] **Import PGN** de ses propres ouvertures, variantes comprises, et

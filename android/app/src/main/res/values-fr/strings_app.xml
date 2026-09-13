@@ -229,6 +229,27 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="route_training">Entraînement</string>
     <string name="route_two_players">Deux joueurs</string>
     <string name="route_variants">Variantes</string>
+    <string name="scan_confirm_title">Vérifier la position</string>
+    <string name="scan_confident_banner">Toutes les cases ont été lues avec certitude — vérifiez tout de même.</string>
+    <string name="scan_reading_orientation">Sens de lecture</string>
+    <string name="scan_flip">Inverser la lecture</string>
+    <string name="scan_rotation_hint">Lecture pivotée de %1$d°. Si le plateau apparaît à l\'envers, inversez la lecture.</string>
+    <string name="scan_recrop">Recadrer</string>
+    <string name="fen_error_fields">FEN mal formé : 6 champs attendus (position, trait, roques, en passant, demi-coups, coups).</string>
+    <string name="fen_error_kings">Il faut exactement un roi blanc et un roi noir.</string>
+    <string name="fen_error_pawn_rank">Un pion ne peut pas être sur la 1re ou la 8e rangée.</string>
+    <string name="fen_error_opponent_in_check">Le camp qui n\'a pas le trait est déjà en échec.</string>
+    <string name="fen_error_no_legal_move">Le camp au trait n\'a aucun coup légal : la position est déjà terminée (mat ou pat).</string>
+    <string name="fen_error_castling_wk">Droit de petit roque blanc incohérent avec la position du roi/de la tour.</string>
+    <string name="fen_error_castling_wq">Droit de grand roque blanc incohérent avec la position du roi/de la tour.</string>
+    <string name="fen_error_castling_bk">Droit de petit roque noir incohérent avec la position du roi/de la tour.</string>
+    <string name="fen_error_castling_bq">Droit de grand roque noir incohérent avec la position du roi/de la tour.</string>
+    <string name="fen_error_ep_rank">Case en passant invalide : doit être sur la 3e ou 6e rangée.</string>
+    <string name="fen_error_ep_pawn">Case en passant incohérente : aucun pion capturable à cet endroit.</string>
+    <plurals name="scan_uncertain_banner">
+        <item quantity="one">%1$d case incertaine, surlignée sur le plateau : vérifiez-la avant de continuer.</item>
+        <item quantity="other">%1$d cases incertaines, surlignées sur le plateau : vérifiez-les avant de continuer.</item>
+    </plurals>
     <string name="scan_analyse">Analyser cette position</string>
     <string name="scan_choose">Choisir une photo</string>
     <string name="scan_fen_note">Le trait, les roques et la prise en passant ne se lisent pas sur une photo : à vous de les corriger.</string>

@@ -232,6 +232,27 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="route_training">Training</string>
     <string name="route_two_players">Two players</string>
     <string name="route_variants">Variants</string>
+    <string name="scan_confirm_title">Check the position</string>
+    <string name="scan_confident_banner">Every square was read with confidence — check anyway.</string>
+    <string name="scan_reading_orientation">Reading orientation</string>
+    <string name="scan_flip">Flip the reading</string>
+    <string name="scan_rotation_hint">Reading rotated by %1$d°. If the board looks upside down, flip the reading.</string>
+    <string name="scan_recrop">Recrop</string>
+    <string name="fen_error_fields">Malformed FEN: 6 fields expected (position, side to move, castling, en passant, half-moves, moves).</string>
+    <string name="fen_error_kings">There must be exactly one white king and one black king.</string>
+    <string name="fen_error_pawn_rank">A pawn cannot stand on the 1st or the 8th rank.</string>
+    <string name="fen_error_opponent_in_check">The side not to move is already in check.</string>
+    <string name="fen_error_no_legal_move">The side to move has no legal move: the position is already over (mate or stalemate).</string>
+    <string name="fen_error_castling_wk">White kingside castling right inconsistent with the king\'s/rook\'s position.</string>
+    <string name="fen_error_castling_wq">White queenside castling right inconsistent with the king\'s/rook\'s position.</string>
+    <string name="fen_error_castling_bk">Black kingside castling right inconsistent with the king\'s/rook\'s position.</string>
+    <string name="fen_error_castling_bq">Black queenside castling right inconsistent with the king\'s/rook\'s position.</string>
+    <string name="fen_error_ep_rank">Invalid en passant square: it must be on the 3rd or 6th rank.</string>
+    <string name="fen_error_ep_pawn">Inconsistent en passant square: no pawn can be captured there.</string>
+    <plurals name="scan_uncertain_banner">
+        <item quantity="one">%1$d uncertain square, highlighted on the board: check it before continuing.</item>
+        <item quantity="other">%1$d uncertain squares, highlighted on the board: check them before continuing.</item>
+    </plurals>
     <string name="scan_analyse">Analyze this position</string>
     <string name="scan_choose">Choose a photo</string>
     <string name="scan_fen_note">Side to move, castling rights and en passant cannot be read from a photo: correct them yourself.</string>

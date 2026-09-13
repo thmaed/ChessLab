@@ -44,6 +44,13 @@ fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> 
         uri?.let(model::load)
     }
 
+    // Étape 3 — la confirmation, OBLIGATOIRE : rien de ce qui sort du scanner
+    // n'a échappé au regard de l'utilisateur. C'est l'éditeur, pré-rempli.
+    if (ui.stage == ScanStage.confirm && ui.fen != null) {
+        ScanConfirmation(ui, model, onAnalyse)
+        return
+    }
+
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp)
     ) {
@@ -83,31 +90,6 @@ fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> 
             }
         }
 
-        ui.position?.let { position ->
-            Spacer(Modifier.height(12.dp))
-            Text(stringResource(R.string.scan_result), fontSize = 12.sp, color = Palette.textTertiary)
-            Spacer(Modifier.height(4.dp))
-            BoardView(position = position, enabled = false)
-
-            Spacer(Modifier.height(8.dp))
-            Text(
-                model.fen,
-                fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = Palette.textSecondary,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Palette.surface)
-                    .padding(10.dp)
-                    .testTag("fen"),
-            )
-            Text(
-                stringResource(R.string.scan_fen_note),
-                fontSize = 10.sp, color = Palette.textTertiary,
-            )
-            TextButton(onClick = { onAnalyse(model.fen) }, modifier = Modifier.testTag("analyser")) {
-                Text(stringResource(R.string.scan_analyse), color = Palette.accent)
-            }
-        }
         Spacer(Modifier.height(24.dp))
     }
 }
@@ -178,4 +160,63 @@ private fun CornerPicker(
             }
         }
     }
+}
+
+
+/**
+ * L'écran de confirmation du scanner : l'éditeur pré-rempli avec la lecture,
+ * augmenté des deux choses qu'une image ne peut pas donner — l'orientation de
+ * lecture et le trait. Les cases douteuses sont surlignées ; toute correction
+ * se fait à la palette, comme dans l'éditeur. Pendant de `ScanConfirmationView`.
+ */
+@Composable
+private fun ScanConfirmation(ui: ScannerUiState, model: ScannerViewModel, onAnalyse: (String) -> Unit) {
+    val uncertain = ui.lowConfidence.size
+    com.chesslab.editor.PositionEditorScreen(
+        initialFen = ui.fen,
+        marked = ui.lowConfidence,
+        onBack = model::backToCrop,
+        backLabel = "‹ " + stringResource(R.string.scan_recrop),
+        onAnalyse = onAnalyse,
+        extra = {
+            Text(
+                stringResource(R.string.scan_confirm_title),
+                fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                color = Palette.textPrimary,
+            )
+            Spacer(Modifier.height(8.dp))
+            // La bannière de confiance : combien de cases méritent un regard.
+            Text(
+                if (uncertain > 0) androidx.compose.ui.res.pluralStringResource(R.plurals.scan_uncertain_banner, uncertain, uncertain)
+                else stringResource(R.string.scan_confident_banner),
+                fontSize = 12.sp,
+                color = if (uncertain > 0) Palette.warning else Palette.accent,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Palette.surface)
+                    .padding(12.dp)
+                    .testTag(if (uncertain > 0) "banniere-incertaine" else "banniere-sure"),
+            )
+            Spacer(Modifier.height(10.dp))
+            // Le sens de lecture : deux orientations plausibles, un bouton.
+            Text(stringResource(R.string.scan_reading_orientation), fontSize = 11.sp, color = Palette.textTertiary)
+            Spacer(Modifier.height(4.dp))
+            Text(
+                stringResource(R.string.scan_flip), fontSize = 12.sp, color = Palette.textPrimary,
+                modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(Palette.surface)
+                    .clickable(onClick = model::flipReading)
+                    .padding(horizontal = 10.dp, vertical = 6.dp)
+                    .testTag("inverser-lecture"),
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                stringResource(R.string.scan_rotation_hint, ui.rotation.degrees),
+                fontSize = 10.sp, color = Palette.textTertiary,
+            )
+            Spacer(Modifier.height(10.dp))
+        },
+    )
 }

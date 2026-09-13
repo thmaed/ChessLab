@@ -35,12 +35,39 @@ import com.chesslab.R
  * interrupteurs, parce qu'ils ne se déduisent pas d'un plateau.
  */
 @Composable
-fun PositionEditorScreen(onAnalyse: (String) -> Unit = {}) {
-    val pieces = remember { mutableStateMapOf<Square, Piece>() }
+fun PositionEditorScreen(
+    /**
+     * La position de départ. Absente : un plateau vide. C'est ce qui fait de
+     * l'éditeur l'écran de confirmation du scanner — pré-rempli avec la
+     * lecture, et rebâti quand elle change (l'orientation qu'on inverse).
+     */
+    initialFen: String? = null,
+    /** Les cases à surligner : les lectures douteuses du scanner. */
+    marked: Set<Square> = emptySet(),
+    /** Ce que l'appelant veut ajouter au panneau : bannière de confiance, sens de lecture. */
+    extra: @Composable ColumnScope.() -> Unit = {},
+    /** Un retour vers l'écran d'avant (« Recadrer »), quand il y en a un. */
+    onBack: (() -> Unit)? = null,
+    backLabel: String? = null,
+    onAnalyse: (String) -> Unit = {},
+) {
+    // La position initiale est SEMÉE à la composition, pas versée par un effet
+    // différé : un effet arrive une frame plus tard, et l'écran se montrait
+    // d'abord vide — assez longtemps pour qu'une capture le surprenne. Elle
+    // se ressème à chaque changement : inverser la lecture du scanner
+    // remplace tout le plateau.
+    val initial = remember(initialFen) { initialFen?.let { chesskit.FenParser.parse(it) } }
+    val pieces = remember(initialFen) {
+        mutableStateMapOf<Square, Piece>().apply { initial?.pieces?.forEach { put(it.square, it) } }
+    }
     var brush by remember { mutableStateOf<Piece.Kind?>(Piece.Kind.pawn) }
     var brushColor by remember { mutableStateOf(Piece.Color.white) }
-    var whiteToMove by remember { mutableStateOf(true) }
-    val castling = remember { mutableStateMapOf<Castling, Boolean>() }
+    var whiteToMove by remember(initialFen) { mutableStateOf(initial?.sideToMove != Piece.Color.black) }
+    val castling = remember(initialFen) {
+        mutableStateMapOf<Castling, Boolean>().apply {
+            initial?.let { p -> Castling.all.forEach { put(it, it in p.legalCastlings) } }
+        }
+    }
 
     val position = Position(
         pieces = pieces.values.toList(),
@@ -51,6 +78,13 @@ fun PositionEditorScreen(onAnalyse: (String) -> Unit = {}) {
 
     BoardScaffold(
         header = {
+            if (onBack != null && backLabel != null) {
+                Text(
+                    backLabel, fontSize = 13.sp, color = Palette.accent,
+                    modifier = Modifier.clickable(onClick = onBack).padding(vertical = 4.dp).testTag("recadrer"),
+                )
+                Spacer(Modifier.height(4.dp))
+            }
             Text(
                 stringResource(if (brush == null) R.string.editor_eraser_hint else R.string.editor_place_hint),
                 fontSize = 12.sp, color = Palette.textSecondary,
@@ -60,6 +94,7 @@ fun PositionEditorScreen(onAnalyse: (String) -> Unit = {}) {
         board = {
             BoardView(
                 position = position,
+                marked = marked,
                 enabled = true,
                 onSquareTap = { square ->
                     val kind = brush
@@ -70,6 +105,7 @@ fun PositionEditorScreen(onAnalyse: (String) -> Unit = {}) {
         },
         panel = {
             Spacer(Modifier.height(10.dp))
+            extra()
             Palette(brush, brushColor, onKind = { brush = it }, onColor = { brushColor = it })
 
             Spacer(Modifier.height(10.dp))
@@ -114,6 +150,16 @@ fun PositionEditorScreen(onAnalyse: (String) -> Unit = {}) {
                     .testTag("fen"),
             )
 
+            // Ce qui empêche la position d'être jouable, dit avant qu'on
+            // l'envoie au moteur — même règle qu'iOS.
+            val faults = remember(position.fen) { FenValidator.errors(position.fen) }
+            faults.forEach { fault ->
+                Text(
+                    stringResource(fault), fontSize = 11.sp, color = Palette.warning,
+                    modifier = Modifier.padding(top = 4.dp).testTag("defaut-fen"),
+                )
+            }
+
             Row {
                 TextButton(onClick = { pieces.clear() }, modifier = Modifier.testTag("vider")) {
                     Text(stringResource(R.string.editor_clear), color = Palette.textSecondary)
@@ -122,8 +168,14 @@ fun PositionEditorScreen(onAnalyse: (String) -> Unit = {}) {
                     onClick = { Position.standard.pieces.forEach { pieces[it.square] = it } },
                     modifier = Modifier.testTag("depart"),
                 ) { Text(stringResource(R.string.editor_start_position), color = Palette.textSecondary) }
-                TextButton(onClick = { onAnalyse(position.fen) }, modifier = Modifier.testTag("analyser")) {
-                    Text(stringResource(R.string.route_analysis), color = Palette.accent)
+                TextButton(
+                    onClick = { onAnalyse(position.fen) }, enabled = faults.isEmpty(),
+                    modifier = Modifier.testTag("analyser"),
+                ) {
+                    Text(
+                        stringResource(R.string.route_analysis),
+                        color = if (faults.isEmpty()) Palette.accent else Palette.textTertiary,
+                    )
                 }
             }
         },
