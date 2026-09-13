@@ -73,7 +73,7 @@ private val modes = listOf(
         R.string.home_play_long, R.string.home_play_sub, Icons.Default.Memory, Palette.accent),
     Mode(Route.TwoPlayerSetup, "two", R.string.route_two_players, R.string.home_two_short,
         R.string.home_two_long, R.string.home_two_sub, Icons.Default.People, Palette.info),
-    Mode(Route.Puzzles, "puzzles", R.string.route_puzzles, R.string.route_puzzles,
+    Mode(Route.Puzzles(), "puzzles", R.string.route_puzzles, R.string.route_puzzles,
         R.string.home_puzzles_long, R.string.home_puzzles_sub, Icons.Default.Extension, Palette.violet),
     Mode(Route.Openings, "openings", R.string.route_openings, R.string.route_openings,
         R.string.home_openings_long, R.string.home_openings_sub, Icons.Default.MenuBook, Palette.warning),

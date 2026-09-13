@@ -144,7 +144,8 @@ private fun App() {
                 onPlayVsEngine = { stack.add(Route.PlayVsEngine(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
-            Route.Puzzles -> PuzzleScreen(
+            is Route.Puzzles -> PuzzleScreen(
+                initialTheme = current.theme,
                 onPlayVsEngine = { stack.add(Route.PlayVsEngine(startFen = it)) },
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayer(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
@@ -194,7 +195,7 @@ private fun App() {
             )
             Route.Settings -> SettingsScreen()
             Route.Scanner -> ScannerScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
-            Route.Progression -> ProgressionScreen()
+            Route.Progression -> ProgressionScreen(onTrainTheme = { stack.add(Route.Puzzles(theme = it)) })
             Route.Help -> HelpScreen()
             Route.PositionEditor -> PositionEditorScreen { fen -> stack.add(Route.AnalysisBoard(fen = fen)) }
             is Route.Laboratory -> LabScreen(startFen = current.startFen)

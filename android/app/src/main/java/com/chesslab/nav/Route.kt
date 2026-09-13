@@ -67,7 +67,8 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
      */
     data class AnalysisBoard(val fen: String? = null, val pgn: String? = null) :
         Route(R.string.route_analysis)
-    data object Puzzles : Route(R.string.route_puzzles)
+    /** [theme] : une série ciblée sur un thème — l'entrée depuis la progression. */
+    data class Puzzles(val theme: String? = null) : Route(R.string.route_puzzles)
     data object Openings : Route(R.string.route_openings) {
         override val hasOwnTitle get() = true
     }

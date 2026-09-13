@@ -40,6 +40,16 @@ data class GameRecord(
     val variant: String? = null,
     @ColumnInfo(name = "move_count") val moveCount: Int,
     val pgn: String,
+    /** Le personnage affronté, ou `null` pour Stockfish et pour toute partie antérieure. */
+    @ColumnInfo(name = "opponent_id") val opponentId: String? = null,
+    /** Le niveau approximatif de l'adversaire, en Elo — ce qui fait la progression « par niveau ». */
+    @ColumnInfo(name = "engine_elo") val engineElo: Int? = null,
+    /**
+     * La couleur du moteur, « white » ou « black » ; `null` pour deux humains.
+     * Champ SÉMANTIQUE : la couleur du joueur s'en déduit, là où le nom
+     * « Vous » est traduit et ne peut plus servir de repère.
+     */
+    @ColumnInfo(name = "engine_color") val engineColor: String? = null,
 )
 
 @Dao
@@ -109,7 +119,7 @@ interface AutosaveDao {
         com.chesslab.training.OpeningProgress::class, com.chesslab.training.OpeningReviewLog::class,
         com.chesslab.puzzles.OwnPuzzle::class, com.chesslab.puzzles.PuzzleProgress::class,
     ],
-    version = 6, exportSchema = false,
+    version = 7, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
@@ -227,7 +237,25 @@ abstract class LibraryDatabase : RoomDatabase() {
          * — c'est arrivé au passage en v6. Ici, oublier une migration fait
          * échouer le test.
          */
-        val ALL_MIGRATIONS get() = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+        val ALL_MIGRATIONS get() = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+
+        /**
+         * v6 → v7 : la progression VENTILÉE. La note du puzzle sur sa
+         * progression (réussite par palier), et sur une partie le personnage,
+         * son niveau et la couleur du moteur (bilan par niveau d'adversaire,
+         * par personnage, meilleure victoire). Trois colonnes ajoutées, rien à
+         * convertir : les anciennes lignes gardent leurs `NULL` et comptent
+         * dans les totaux sans entrer dans les ventilations — comme iOS pour
+         * ses enregistrements antérieurs.
+         */
+        val MIGRATION_6_7 = object : Migration(6, 7) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE puzzle_progress ADD COLUMN rating INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE games ADD COLUMN opponent_id TEXT")
+                db.execSQL("ALTER TABLE games ADD COLUMN engine_elo INTEGER")
+                db.execSQL("ALTER TABLE games ADD COLUMN engine_color TEXT")
+            }
+        }
 
         fun get(context: Context): LibraryDatabase = instance ?: synchronized(this) {
             instance ?: Room.databaseBuilder(

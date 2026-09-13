@@ -58,6 +58,8 @@ data class PuzzleUiState(
     val hint: Pair<Square, Square>? = null,
     val source: PuzzleSource = PuzzleSource.lichess,
     val filter: PuzzleFilter = PuzzleFilter(),
+    /** Le bilan : réussite et thèmes à travailler. `null` tant que rien n'est tenté. */
+    val stats: com.chesslab.progression.PuzzleStats? = null,
     /** Combien de puzzles attendent d'être revus. */
     val dueCount: Int = 0,
     /** Combien de puzzles maison existent — le sélecteur s'efface sans eux. */
@@ -92,6 +94,13 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         load(source, ui.filter)
     }
 
+    /** Une série sur UN thème — l'entrée depuis la progression (« à travailler »). */
+    fun trainTheme(raw: String) {
+        val kind = PuzzleThemeKind.entries.firstOrNull { it.raw == raw } ?: return
+        if (ui.filter.theme == kind && ui.source == PuzzleSource.lichess) return
+        load(PuzzleSource.lichess, ui.filter.copy(theme = kind))
+    }
+
     /** Change de filtre : la file se reconstitue autour de ce qu'on demande. */
     fun setFilter(filter: PuzzleFilter) {
         if (filter == ui.filter) return
@@ -104,6 +113,11 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val own = withContext(Dispatchers.IO) { runCatching { db.ownPuzzles().all() }.getOrDefault(emptyList()) }
         val due = withContext(Dispatchers.IO) {
             runCatching { db.puzzleProgress().dueCount(System.currentTimeMillis()) }.getOrDefault(0)
+        }
+        // Le bilan, recalculé depuis la progression — jamais un compteur qui
+        // dérive de ce qu'il compte.
+        val stats = withContext(Dispatchers.IO) {
+            runCatching { com.chesslab.progression.PuzzleStats.compute(db.puzzleProgress().all()) }.getOrNull()
         }
         queue = when (source) {
             PuzzleSource.ownGames -> own.map { it.toPuzzle() }.filter { matches(it, filter) }
@@ -119,7 +133,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
                 }.getOrDefault(emptyList())
             }
         }
-        ui = ui.copy(loading = false, ownCount = own.size, dueCount = due)
+        ui = ui.copy(loading = false, ownCount = own.size, dueCount = due, stats = stats)
         if (queue.isEmpty()) {
             ui = ui.copy(
                 puzzle = null,
@@ -150,7 +164,8 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val now = System.currentTimeMillis()
         val current = dao.byId(puzzle.id) ?: PuzzleProgress(externalId = puzzle.id, theme = puzzle.theme)
         val next = PuzzleSchedule.next(current, success)
-        dao.put(next.copy(dueAt = PuzzleSchedule.dueAt(next, now), updatedAt = now, theme = puzzle.theme))
+        dao.put(next.copy(dueAt = PuzzleSchedule.dueAt(next, now), updatedAt = now, theme = puzzle.theme, rating = puzzle.rating))
+        ui = ui.copy(stats = com.chesslab.progression.PuzzleStats.compute(dao.all()))
     }
 
     private fun present(index: Int) {

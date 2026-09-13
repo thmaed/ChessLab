@@ -46,6 +46,7 @@ object TransferService {
                 TransferFile.GameEntry(
                     it.uid, it.playedAt, it.white, it.black, it.result,
                     it.source, it.variant, it.moveCount, it.pgn,
+                    opponentId = it.opponentId, engineElo = it.engineElo, engineColor = it.engineColor,
                 )
             },
             puzzlesAttempted = stats.attempted,
@@ -111,6 +112,7 @@ object TransferService {
                                 playedAt = it.playedAt, uid = it.uid, white = it.white,
                                 black = it.black, result = it.result, source = it.source,
                                 variant = it.variant, moveCount = it.moveCount, pgn = it.pgn,
+                                opponentId = it.opponentId, engineElo = it.engineElo, engineColor = it.engineColor,
                             )
                         }
                     )

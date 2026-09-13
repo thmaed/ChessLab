@@ -292,8 +292,14 @@ class AppTest {
 
     @Test fun progressionShowsWhatTheAppHasSeen() {
         compose.onNodeWithTag("progression").performClick()
-        awaitText("Parties", 10_000)
-        awaitText("Puzzles", 10_000)
+        // Selon ce que la suite a déjà laissé dans la bibliothèque, l'écran
+        // montre le bilan contre l'ordinateur, les puzzles — ou dit
+        // honnêtement qu'il n'a rien à montrer. Jamais des zéros.
+        compose.waitUntil(10_000) {
+            listOf("Contre l'ordinateur", "Puzzles", "Rien à afficher").any { text ->
+                compose.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty()
+            }
+        }
     }
 
     @Test fun soundsCanBeTurnedOff() {

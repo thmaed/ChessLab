@@ -22,6 +22,7 @@ import com.chesslab.settings.SettingsStore
 import com.chesslab.sound.SoundPlayer
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlinx.coroutines.withContext
 import com.chesslab.R
 import com.chesslab.ui.HintArrowBuilder
@@ -558,6 +559,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
                 black = if (humanColor == Piece.Color.white) opponentName() else s(R.string.you),
                 source = "engine",
                 state = state,
+                opponentId = ui.opponent?.id,
+                engineElo = ui.level.roundToInt(),
+                engineColor = humanColor.opposite,
             )
         }
         val text = status ?: when (state) {
@@ -682,6 +686,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             source = "engine",
             state = board.state,
             forcedResult = result,
+            opponentId = ui.opponent?.id,
+            engineElo = ui.level.roundToInt(),
+            engineColor = humanColor.opposite,
         )
         ui = ui.copy(gameOver = true, thinking = false, outcome = message, status = message)
     }

@@ -30,6 +30,12 @@ data class PuzzleProgress(
     val updatedAt: Long = 0,
     /** Le thème, gardé ici pour les statistiques sans relire la base. */
     val theme: String = "tactic",
+    /**
+     * La note Lichess du puzzle, pour ventiler la réussite par palier. 0 pour
+     * un puzzle tiré de vos parties, qui n'en a pas — comme iOS, il compte
+     * dans le total mais dans aucun palier.
+     */
+    val rating: Int = 0,
 )
 
 @Dao

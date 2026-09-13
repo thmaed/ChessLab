@@ -21,7 +21,7 @@ vérification sur appareil, pas après compilation.
 | Laboratoire | série de parties, Maia ou Stockfish de chaque côté |
 | Scanner | détection du plateau, coins ajustables, recadrage, confirmation dans l'éditeur avec cases douteuses et sens de lecture (13/09) |
 | Éditeur de position | composer une position |
-| Progression | statistiques d'entraînement |
+| Progression | statistiques d'entraînement ; bilan complet le 13/09 — par niveau d'adversaire, par personnage, meilleure victoire, réussite des puzzles par palier, niveau atteint, thèmes à travailler |
 | Changer de mode | sur huit écrans |
 | Thèmes, jeux de pièces, sons | mêmes valeurs qu'iOS |
 | Deux langues | décor ET contenu des cours |
@@ -88,8 +88,25 @@ vérification sur appareil, pas après compilation.
 - [x] **Progression et répétition espacée** (SM-2, comme iOS — et non FSRS, qui
       sert aux ouvertures : une position d'ouverture se révise des dizaines de
       fois, un puzzle se résout une fois). Ce qu'on rate revient demain.
-- [ ] **Statistiques** par thème et par niveau — les données sont désormais
-      enregistrées, l'écran reste à faire.
+- [x] **Statistiques** par thème et par niveau — FAIT le 13/09. Sur l'écran
+      des puzzles, la carte « Réussite » d'iOS : taux, « N réussis sur M
+      tentatives », et les thèmes À TRAVAILLER (au moins quatre essais et plus
+      d'un tiers d'échecs, sinon on désignerait comme faiblesse un thème
+      réussi à 90 %). Sur l'écran Progression, tout ce qu'iOS y met et
+      qu'Android n'avait pas : la réussite par palier de difficulté en barres,
+      le « niveau atteint » (le palier le plus dur tenu à 60 % sur cinq essais
+      au moins), les thèmes faibles qui LANCENT une série ciblée d'un tap,
+      et côté parties : fenêtre 7 jours / 30 jours / tout, victoires-nulles-
+      défaites, MEILLEURE VICTOIRE en Elo, bilan par niveau d'adversaire et
+      par personnage avec « battu jusqu'à ». Il fallait pour cela que les
+      parties portent l'adversaire, son niveau et la couleur du moteur, et
+      les puzzles leur note : schéma v7, trois colonnes, rien à convertir.
+      Le transfert `.clab` les emporte. Neuf cas JVM.
+
+      Trouvé en chemin : la progression comptait les victoires en cherchant
+      le nom « Vous » — traduit « You » en anglais, donc zéro victoire dans
+      cette langue. Le bilan lit désormais la couleur du moteur, champ
+      sémantique, le nom ne servant que de repli pour les parties anciennes.
 
 ### 5. Finales — FAIT le 12/09
 - [x] **Entraînement libre** : conclure la position contre la meilleure défense,

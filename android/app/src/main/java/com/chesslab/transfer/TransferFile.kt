@@ -73,6 +73,10 @@ data class TransferFile(
         val variant: String?,
         val moveCount: Int,
         val pgn: String,
+        /** Depuis le schéma v7 : ce que la progression ventile. Absents d'un fichier plus ancien. */
+        val opponentId: String? = null,
+        val engineElo: Int? = null,
+        val engineColor: String? = null,
     )
 
     companion object {
@@ -113,6 +117,9 @@ data class TransferFile(
                         .put("white", g.white).put("black", g.black).put("result", g.result)
                         .put("source", g.source).put("variant", g.variant ?: JSONObject.NULL)
                         .put("moveCount", g.moveCount).put("pgn", g.pgn)
+                        .put("opponentId", g.opponentId ?: JSONObject.NULL)
+                        .put("engineElo", g.engineElo ?: JSONObject.NULL)
+                        .put("engineColor", g.engineColor ?: JSONObject.NULL)
                 )
             }
             root.put("games", games)
@@ -161,6 +168,9 @@ data class TransferFile(
                         o.optString("result", "*"), o.optString("source", "engine"),
                         o.optString("variant").ifEmpty { null }.takeIf { !o.isNull("variant") },
                         o.optInt("moveCount"), o.optString("pgn"),
+                        opponentId = o.optString("opponentId").ifEmpty { null }.takeIf { !o.isNull("opponentId") },
+                        engineElo = if (o.isNull("engineElo")) null else o.optInt("engineElo"),
+                        engineColor = o.optString("engineColor").ifEmpty { null }.takeIf { !o.isNull("engineColor") },
                     )
                 }
             }

@@ -18,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,12 +46,15 @@ import com.chesslab.ui.TopBarActions
  */
 @Composable
 fun PuzzleScreen(
+    /** Un thème imposé à l'ouverture — depuis « à travailler » de la progression. */
+    initialTheme: String? = null,
     onPlayVsEngine: (String) -> Unit = {},
     onOpenTwoPlayer: (String) -> Unit = {},
     onOpenLab: (String) -> Unit = {},
     model: PuzzleViewModel = viewModel(),
 ) {
     val ui = model.ui
+    LaunchedEffect(initialTheme) { initialTheme?.let(model::trainTheme) }
 
     TopBarActions {
         QuickSwitchMenu(
@@ -63,6 +67,7 @@ fun PuzzleScreen(
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         SourcePicker(ui, model::setSource)
         FilterBar(ui, model::setFilter)
+        ui.stats?.takeIf { it.attempts > 0 }?.let { PuzzleStatsCard(it) }
         Header(ui)
         Spacer(Modifier.height(12.dp))
 
@@ -400,5 +405,54 @@ private fun ResultCard(solved: Boolean, modifier: Modifier, onNext: () -> Unit) 
                 .testTag("suivant"),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
+    }
+}
+
+
+/**
+ * Le bilan de vos puzzles : taux de réussite et thèmes d'erreurs récurrents —
+ * « vous ratez souvent des fourchettes ». Pendant de `statsCard` dans
+ * `PuzzleQueueView`. Ne s'affiche qu'une fois quelques puzzles tentés : ni
+ * « 0 % » ni thème désigné sur trois essais.
+ */
+@Composable
+private fun PuzzleStatsCard(stats: com.chesslab.progression.PuzzleStats) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp, vertical = 6.dp)
+            .clip(com.chesslab.ui.CardShape)
+            .background(Palette.surface)
+            .padding(12.dp)
+            .testTag("bilan-puzzles"),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(stringResource(R.string.puzzle_stats_title), fontSize = 13.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, color = Palette.textPrimary,
+                modifier = Modifier.weight(1f))
+            Text(
+                stats.successRate?.let { "${kotlin.math.round(it * 100).toInt()}" + stringResource(R.string.percent_suffix) } ?: "—",
+                fontSize = 18.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = Palette.accent,
+            )
+        }
+        Text(
+            stringResource(R.string.puzzle_stats_solved_of, stats.successes, stats.attempts),
+            fontSize = 11.sp, color = Palette.textTertiary,
+        )
+        if (stats.weakestThemes.isNotEmpty()) {
+            Text(stringResource(R.string.progress_to_work_on), fontSize = 11.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, color = Palette.textSecondary,
+                modifier = Modifier.padding(top = 4.dp))
+            stats.weakestThemes.take(3).forEach { record ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(record.labelRes), fontSize = 11.sp, color = Palette.textPrimary, modifier = Modifier.weight(1f))
+                    Text(
+                        stringResource(R.string.progress_failed_of, kotlin.math.round(record.failureRate * 100).toInt(), record.attempts),
+                        fontSize = 11.sp, color = Palette.textTertiary,
+                    )
+                }
+            }
+        }
     }
 }

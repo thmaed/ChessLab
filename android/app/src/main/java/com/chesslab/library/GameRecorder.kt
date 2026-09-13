@@ -67,6 +67,10 @@ class GameRecorder(startingPosition: Position = Position.standard) {
          */
         forcedResult: String? = null,
         variant: String? = null,
+        /** Le personnage affronté, son niveau et sa couleur — ce que la progression ventile. */
+        opponentId: String? = null,
+        engineElo: Int? = null,
+        engineColor: Piece.Color? = null,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     ) {
         if (moveCount == 0) return
@@ -90,6 +94,9 @@ class GameRecorder(startingPosition: Position = Position.standard) {
             source = source, variant = variant,
             moveCount = moveCount,
             pgn = game.pgn,
+            opponentId = opponentId,
+            engineElo = engineElo,
+            engineColor = engineColor?.let { if (it == Piece.Color.white) "white" else "black" },
         )
         scope.launch { LibraryDatabase.get(context).games().insert(record) }
     }
