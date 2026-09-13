@@ -102,6 +102,18 @@ android {
             isMinifyEnabled = false
             signingConfig = signingConfigs.findByName("release")
         }
+        debug {
+            // Un identifiant DISTINCT, pour que le build de test et le build
+            // signé cohabitent sur le même téléphone.
+            //
+            // Sans lui, installer l'un chasse l'autre — les signatures
+            // diffèrent, Android refuse la mise à jour — et la seule issue est
+            // de DÉSINSTALLER, ce qui emporte la bibliothèque de parties et
+            // toute la progression. Vérifier une capture sur le build signé
+            // puis relancer la suite instrumentée devenait un choix entre les
+            // deux. Chacun a désormais son bac à sable.
+            applicationIdSuffix = ".debug"
+        }
     }
 
     compileOptions {

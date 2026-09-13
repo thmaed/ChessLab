@@ -219,10 +219,11 @@ class AppTest {
         // deux Stockfish : pas d'attente de chargement du réseau
         compose.onNodeWithTag("camp-a-stockfish").performClick()
         compose.onNodeWithTag("camp-b-stockfish").performClick()
-        compose.onNodeWithTag("lancer").performClick()
+        // Le bouton vit sous le bilan détaillé, donc bien sous le pli.
+        compose.onNodeWithTag("lancer").performScrollTo().performClick()
 
         awaitTag("coup-3", 120_000)      // quatre demi-coups joués tout seuls
-        compose.onNodeWithTag("lancer").performClick()   // pause
+        compose.onNodeWithTag("lancer").performScrollTo().performClick()   // pause
     }
 
     @Test fun aVariantIsRefereedByTheEngine() {

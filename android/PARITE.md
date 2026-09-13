@@ -118,11 +118,25 @@ vérification sur appareil, pas après compilation.
 
       Cinq cas instrumentés verrouillent le tout, avec un arbitre postiche.
 
-### 6. Laboratoire
-- [ ] **Estimation Elo** de l'écart entre les deux camps, avec intervalle de
-      confiance.
-- [ ] **Position de départ** imposée à la série.
-- [ ] **Export** du bilan.
+### 6. Laboratoire — FAIT le 12/09
+- [x] **Estimation Elo** avec intervalle de confiance à 95 %, LOS, score,
+      V·N·D, longueur moyenne, répartition et courbe de progression — chaque
+      tuile s'ouvrant sur son explication, comme iOS. Les formules sont portées
+      à l'identique, y compris les deux correctifs qui changent les chiffres :
+      **Bessel** (`n − 1`) et le **terme de continuité de Wilson**, sans lequel
+      deux nulles d'affilée donnent une variance nulle — donc une fausse
+      certitude à 95 % après deux parties. `erf` n'existe pas en Kotlin : c'est
+      l'approximation d'Abramowitz & Stegun, vérifiée à 1,5·10⁻⁷.
+      Quatorze cas repris un à un de `LabStatsTests.swift`.
+- [x] **Position de départ** imposée : un FEN **ou un PGN**, dont on prend la
+      position finale — pour lancer une série depuis la fin d'une ouverture
+      qu'on vient de coller.
+- [x] **Export** : PGN de toutes les parties (en-têtes synthétiques, résultat
+      en clôture, tags `SetUp`/`FEN` conservés) et CSV des résultats.
+      Presse-papiers EN PLUS du partage, comme l'analyse.
+- [x] Trois libellés du bandeau étaient écrits EN DUR, donc en français au
+      milieu d'un écran anglais — les ressources existaient déjà. Un test JVM
+      compare désormais les deux catalogues clé par clé, argument par argument.
 
 ### 7. Ouvertures
 - [ ] **Index des lignes** : la table de toutes les variantes d'un cours, pour

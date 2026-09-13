@@ -102,6 +102,49 @@
     <string name="lab_a_white">A a les blancs</string>
     <string name="lab_game_n">partie %1$d · %2$s</string>
     <string name="lab_legend">A / nulles / B</string>
+    <string name="lab_end_checkmate">Échec et mat</string>
+    <string name="lab_stat_score">Score de A</string>
+    <string name="lab_stat_wdl">Victoires · Nulles · Défaites</string>
+    <string name="lab_stat_elo">Écart Elo</string>
+    <string name="lab_stat_los">LOS</string>
+    <string name="lab_stat_moves">Coups par partie</string>
+    <string name="lab_stat_games">Parties jouées</string>
+    <string name="lab_progression">Progression de A</string>
+    <string name="lab_distribution">Répartition</string>
+    <string name="lab_export">Exporter la série</string>
+    <string name="lab_export_pgn">PGN de toutes les parties</string>
+    <string name="lab_export_csv">CSV des résultats</string>
+    <string name="lab_copied">Copié</string>
+    <string name="lab_start_position">Imposer la position de départ</string>
+    <string name="lab_start_position_sub">Collez un FEN ou un PGN — un PGN fait partir la série de sa position finale.</string>
+    <string name="lab_start_standard">Position standard</string>
+    <string name="lab_start_unreadable">Ni un FEN légal, ni un PGN lisible.</string>
+    <string name="lab_start_from_pgn">Position de départ tirée d\'un PGN (%1$d demi-coups).</string>
+    <string name="lab_game_number">partie %1$d</string>
+    <string name="lab_explain_score">Les points marqués par le camp A, en pourcentage du maximum possible : un gain vaut 1 point, une nulle ½, une défaite 0.
+
+50 %% veut dire que les deux réglages font jeu égal. C\'est la mesure d\'où tout le reste est déduit, écart Elo compris.</string>
+    <string name="lab_explain_wdl">Le détail des résultats, toujours du point de vue de A.
+
+Les nulles comptent pour une demi-victoire dans le score, mais elles sont ignorées par le LOS : elles ne disent rien sur qui est le plus fort.</string>
+    <string name="lab_explain_elo">La différence de force entre A et B, convertie du score en points Elo. Positive si A est devant.
+
+Le « ± » est la marge de l\'intervalle de confiance à 95 %% : la vraie valeur a 19 chances sur 20 de s\'y trouver. Cette marge se resserre à mesure que les parties s\'accumulent — c\'est elle, et non l\'écart lui-même, qui dit si la série a assez tourné.</string>
+    <string name="lab_explain_los">La probabilité que A soit RÉELLEMENT plus fort que B, et non que l\'écart observé vienne du hasard.
+
+Elle ne se calcule que sur les parties décisives : les nulles n\'y entrent pas. En dessous de 95 %%, la série n\'a pas encore tranché, même si l\'écart Elo paraît net. À 50 %%, les deux camps sont indiscernables.</string>
+    <string name="lab_explain_moves">La longueur moyenne des parties terminées, en coups complets (un coup = un demi-coup blanc plus un demi-coup noir).
+
+Des parties courtes vont souvent avec des gains nets ; des parties longues, avec des positions équilibrées ou des finales disputées.</string>
+    <string name="lab_explain_distribution">La même chose que « V · N · D », vue comme une barre : la part verte est ce que A a gagné, la grise les nulles, la rouge ce que B a gagné.
+
+Une bande grise très large signale des réglages trop proches pour se départager — ou un temps de réflexion trop court pour que la différence s\'exprime.</string>
+    <string name="lab_explain_progression">Le score de A recalculé après chaque partie, et non partie par partie : la courbe part donc de très haut ou de très bas, puis se calme.
+
+La zone claire autour d\'elle est l\'intervalle de confiance à 95 %%. Tant qu\'elle chevauche la ligne des 50 %%, la série n\'a pas tranché. C\'est le rétrécissement de cette bande qui dit quand s\'arrêter.</string>
+    <string name="lab_explain_games">Le nombre de parties terminées.
+
+Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles au début et se stabilisent ensuite.</string>
     <string name="lab_pause">Pause</string>
     <string name="lab_paused">En pause</string>
     <string name="lab_played">%1$s a joué %2$s</string>

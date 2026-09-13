@@ -120,6 +120,21 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     private var thinkingJob: kotlinx.coroutines.Job? = null
 
     /**
+     * L'ÉPOQUE de la partie : incrémentée dès que le plateau change de vie —
+     * partie neuve, fin de partie, coup repris, partie rejouée.
+     *
+     * L'annulation du travail en cours ne suffit pas. Le coup de l'adversaire
+     * traverse plusieurs attentes (le livre, l'inférence, la recherche), et
+     * entre deux d'entre elles la partie peut avoir été abandonnée puis
+     * relancée : la réponse revient alors sur un plateau qui n'est plus le
+     * sien. iOS se garde à chaque reprise (« le trait peut avoir changé entre
+     * la mise en file et l'exécution … sans ce garde-fou, le moteur jouerait
+     * un coup pour le camp de l'utilisateur ») ; ici l'époque dit la même
+     * chose en un seul test.
+     */
+    private var gameEpoch = 0
+
+    /**
      * La recherche d'indice. Elle dure jusqu'à huit secondes et tient le
      * moteur : jouer un coup doit l'interrompre, sinon l'adversaire attendrait
      * la fin d'une réponse qu'on ne regarde déjà plus.
@@ -335,6 +350,13 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     private fun askOpponent() {
         thinkingJob?.cancel()
+        // Ce qui vaut à l'instant du lancement. Tout ce qui suit une attente
+        // se vérifie contre ça avant d'écrire quoi que ce soit.
+        val epoch = gameEpoch
+        // Le trait peut avoir changé entre la demande et l'exécution — une
+        // gaffe reprise, par exemple. Sans ce contrôle, l'adversaire jouerait
+        // un coup pour le camp de l'utilisateur.
+        if (ui.gameOver || board.position.sideToMove == humanColor) return
         thinkingJob = viewModelScope.launch {
             val profile = ui.opponent
             ui = ui.copy(thinking = true, status = thinkingLabel(profile))
@@ -367,6 +389,10 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
                     }?.split(" ")?.getOrNull(1)
                 }
             }
+            // La partie a pu changer de vie pendant la recherche : abandonnée
+            // et relancée, reprise d'un coup, rejouée. La réponse ne vaut
+            // alors plus rien, et l'appliquer écraserait le plateau neuf.
+            if (epoch != gameEpoch) return@launch
             ui = ui.copy(thinking = false)
 
             if (lan == null || lan == "(none)") { refresh(s(R.string.rival_silent)); return@launch }
@@ -443,6 +469,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      * nulle part au milieu d'une reprise.
      */
     private fun rebuild(lans: List<String>, status: String?) {
+        gameEpoch++
         thinkingJob?.cancel()
         stopHint()
 
@@ -576,6 +603,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     fun newGame() {
         // La recherche en cours vaut pour la position d'AVANT : la laisser
         // vivre, c'est risquer de la voir jouer sur le plateau neuf.
+        gameEpoch++
         thinkingJob?.cancel()
         stopHint()
         ticker?.cancel()
@@ -641,6 +669,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     /** Termine la partie, l'enregistre, et arrête tout ce qui tourne. */
     private fun finish(message: String, result: String) {
         if (ui.gameOver) return
+        gameEpoch++
         ticker?.cancel()
         thinkingJob?.cancel()
         viewModelScope.launch(Dispatchers.IO) {

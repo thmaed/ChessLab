@@ -12,6 +12,7 @@ import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.engine.EngineService
+import com.chesslab.library.GameRecorder
 import com.chesslab.maia.MaiaOpponent
 import com.chesslab.maia.OpponentGallery
 import com.chesslab.maia.OpponentProfile
@@ -39,14 +40,27 @@ data class LabUiState(
     val movetimeMs: Int = 200,
     val running: Boolean = false,
     val status: String = "",
-    /** Bilan de la série, du point de vue du camp A. */
-    val winsA: Int = 0,
-    val draws: Int = 0,
-    val winsB: Int = 0,
+    /** Les parties TERMINÉES de la série : c'est d'elles que tout se déduit. */
+    val completed: List<LabCompletedGame> = emptyList(),
     val gameNumber: Int = 0,
     /** Les couleurs alternent d'une partie à l'autre, comme sur iOS. */
     val aPlaysWhite: Boolean = true,
-)
+    /** La position imposée à la série, quand elle n'est pas la position standard. */
+    val startFen: String? = null,
+) {
+    /**
+     * Le bilan, RECALCULÉ à partir des parties plutôt que compté au fil de
+     * l'eau : un compteur et une liste finissent par diverger, et c'est le
+     * genre de divergence qu'on ne voit pas — les chiffres restent
+     * plausibles.
+     */
+    val stats: LabStats
+        get() = LabStats.of(completed.map { it.labResult }, completed.map { it.plyCount })
+
+    val winsA: Int get() = stats.winsA
+    val draws: Int get() = stats.draws
+    val winsB: Int get() = stats.winsB
+}
 
 /**
  * Le laboratoire : l'ordinateur contre lui-même, en série.
@@ -61,6 +75,13 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
 
     /** La position de départ de CHAQUE partie de la série. */
     private var startPosition: Position = Position.standard
+
+    /**
+     * L'HISTOIRE de la partie en cours, et pas seulement sa position : c'est
+     * elle qui rend un PGN, donc l'export. Le plateau, lui, ne sait rien du
+     * chemin parcouru.
+     */
+    private var recorder = GameRecorder()
     private var maia: MaiaOpponent? = null
     private var loop: Job? = null
 
@@ -83,6 +104,15 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
         val position = Position.fromFen(fen) ?: return
         if (ui.running || position.fen == startPosition.fen) return
         startPosition = position
+        ui = ui.copy(startFen = position.fen.takeIf { it != Position.standard.fen })
+        reset()
+    }
+
+    /** Revenir à la position standard : la série repart de zéro. */
+    fun clearStartPosition() {
+        if (ui.running || ui.startFen == null) return
+        startPosition = Position.standard
+        ui = ui.copy(startFen = null)
         reset()
     }
 
@@ -104,14 +134,15 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
 
     fun reset() {
         stop()
+        ui = ui.copy(completed = emptyList(), gameNumber = 0, aPlaysWhite = true, status = s(R.string.lab_ready))
         newGame()
-        ui = ui.copy(winsA = 0, draws = 0, winsB = 0, gameNumber = 0, aPlaysWhite = true, status = s(R.string.lab_ready))
     }
 
     private fun newGame() {
         board = Board(startPosition)
         history.clear()
         history += startPosition
+        recorder.reset(startPosition, startFen = ui.startFen)
         ui = ui.copy(position = startPosition, lastMove = null, sanMoves = emptyList())
     }
 
@@ -167,6 +198,7 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
         history += board.position.copy()
+        recorder.record(move)
 
         ui = ui.copy(
             position = board.position,
@@ -177,17 +209,54 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
         return true
     }
 
+    /**
+     * La partie qui vient de finir entre au bilan, avec son PGN.
+     *
+     * Le résultat est rangé côté ÉCHIQUIER (« 1-0 ») et non côté A : c'est ce
+     * qu'attend un PGN, et `LabCompletedGame` sait retrouver le point de vue
+     * de A à partir de la couleur qu'il avait dans cette partie-là. Compter
+     * directement pour A, comme on le faisait, rendait l'export impossible.
+     */
     private fun tally() {
-        when (val state = board.state) {
-            is Board.State.Checkmate -> {
-                // `state.color` est le camp MATÉ
-                val loserIsA = (state.color == Piece.Color.white) == ui.aPlaysWhite
-                ui = if (loserIsA) ui.copy(winsB = ui.winsB + 1) else ui.copy(winsA = ui.winsA + 1)
-            }
-            is Board.State.Draw -> ui = ui.copy(draws = ui.draws + 1)
-            else -> Unit
+        val state = board.state
+        val result = when (state) {
+            is Board.State.Checkmate -> if (state.color == Piece.Color.white) "0-1" else "1-0"
+            is Board.State.Draw -> "1/2-1/2"
+            else -> return
         }
+        ui = ui.copy(
+            completed = ui.completed + LabCompletedGame(
+                index = ui.completed.size,
+                aWasWhite = ui.aPlaysWhite,
+                pgnResult = result,
+                reasonLabel = reasonLabel(state),
+                plyCount = ui.sanMoves.size,
+                pgn = recorder.pgn,
+            )
+        )
     }
+
+    private fun reasonLabel(state: Board.State): String = when (state) {
+        is Board.State.Checkmate -> s(R.string.lab_end_checkmate)
+        is Board.State.Draw -> when (state.reason) {
+            Board.State.DrawReason.stalemate -> s(R.string.draw_stalemate)
+            Board.State.DrawReason.fiftyMoves -> s(R.string.draw_fifty)
+            Board.State.DrawReason.insufficientMaterial -> s(R.string.draw_material)
+            Board.State.DrawReason.repetition -> s(R.string.draw_repetition)
+            Board.State.DrawReason.agreement -> s(R.string.draw_agreement)
+        }
+        else -> ""
+    }
+
+    /** Le PGN de toute la série, pour l'export. */
+    fun exportPgn(): String = LabExport.pgn(
+        ui.completed,
+        nameA = ui.sideA.label(getApplication()),
+        nameB = ui.sideB.label(getApplication()),
+    )
+
+    /** Le CSV de toute la série : une ligne par partie. */
+    fun exportCsv(): String = LabExport.csv(ui.completed)
 
     override fun onCleared() {
         loop?.cancel()

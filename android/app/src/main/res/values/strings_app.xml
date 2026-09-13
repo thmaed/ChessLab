@@ -105,6 +105,49 @@
     <string name="lab_a_white">A has White</string>
     <string name="lab_game_n">game %1$d · %2$s</string>
     <string name="lab_legend">A / draws / B</string>
+    <string name="lab_end_checkmate">Checkmate</string>
+    <string name="lab_stat_score">A’s score</string>
+    <string name="lab_stat_wdl">Wins · Draws · Losses</string>
+    <string name="lab_stat_elo">Elo difference</string>
+    <string name="lab_stat_los">LOS</string>
+    <string name="lab_stat_moves">Moves per game</string>
+    <string name="lab_stat_games">Games played</string>
+    <string name="lab_progression">A’s progress</string>
+    <string name="lab_distribution">Breakdown</string>
+    <string name="lab_export">Export the series</string>
+    <string name="lab_export_pgn">PGN of every game</string>
+    <string name="lab_export_csv">CSV of the results</string>
+    <string name="lab_copied">Copied</string>
+    <string name="lab_start_position">Set start position</string>
+    <string name="lab_start_position_sub">Paste a FEN or a PGN — a PGN starts the series from its final position.</string>
+    <string name="lab_start_standard">Standard position</string>
+    <string name="lab_start_unreadable">Neither a legal FEN nor a readable PGN.</string>
+    <string name="lab_start_from_pgn">Start position taken from a PGN (%1$d plies).</string>
+    <string name="lab_game_number">game %1$d</string>
+    <string name="lab_explain_score">The points A has scored, as a percentage of the maximum: a win is worth 1 point, a draw ½, a loss 0.
+
+50%% means the two settings are level. Everything else, the Elo difference included, is derived from it.</string>
+    <string name="lab_explain_wdl">The results in detail, always from A’s point of view.
+
+Draws count as half a win in the score, but the LOS ignores them: they say nothing about who is stronger.</string>
+    <string name="lab_explain_elo">The difference in strength between A and B, converted from the score into Elo points. Positive when A is ahead.
+
+The “±” is the 95%% confidence margin: the true value has 19 chances in 20 of lying inside it. That margin narrows as games accumulate — and it, not the Elo figure itself, is what tells you whether the series has run long enough.</string>
+    <string name="lab_explain_los">The probability that A really is stronger than B, rather than the observed gap being chance.
+
+It is computed on decisive games only: draws do not enter. Below 95%% the series has not settled anything, however clear the Elo difference looks. At 50%% the two sides are indistinguishable.</string>
+    <string name="lab_explain_moves">The average length of the finished games, in full moves (one move = one White ply plus one Black ply).
+
+Short games often go with clear wins; long ones with balanced positions or hard-fought endgames.</string>
+    <string name="lab_explain_distribution">The same thing as “W · D · L”, seen as a bar: the green part is what A won, the grey the draws, the red what B won.
+
+A very wide grey band means the two settings are too close to be told apart — or that the thinking time is too short for the difference to show.</string>
+    <string name="lab_explain_progression">A’s score recalculated after every game, not game by game: the curve therefore starts very high or very low, then settles.
+
+The pale band around it is the 95%% confidence interval. As long as it straddles the 50%% line, the series has settled nothing. It is the narrowing of that band that tells you when to stop.</string>
+    <string name="lab_explain_games">The number of games finished.
+
+The statistics above are recomputed after each one: they are volatile at first and steady later.</string>
     <string name="lab_pause">Pause</string>
     <string name="lab_paused">Paused</string>
     <string name="lab_played">%1$s played %2$s</string>
