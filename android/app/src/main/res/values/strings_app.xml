@@ -765,4 +765,30 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="home_analyse_game">Analyse the game</string>
     <string name="color_white_side">White</string>
     <string name="color_black_side">Black</string>
+    <string name="repedit_rename">Rename</string>
+    <string name="repedit_rename_title">Rename repertoire</string>
+    <string name="repedit_save">Save</string>
+    <string name="repedit_error_title">Cannot edit</string>
+    <string name="repedit_hint_first">Play a move on the board to add it to your repertoire.</string>
+    <string name="repedit_hint_more">Play another move on the board to add a variation.</string>
+    <string name="repedit_moves_here">Moves from this position</string>
+    <string name="repedit_legend_comment">comment</string>
+    <string name="repedit_legend_delete">delete the variation</string>
+    <string name="repedit_comment_title">Comment on %1$s</string>
+    <string name="repedit_comment_help">This text will appear under the move %1$s during review.</string>
+    <string name="repedit_delete_move">Delete %1$s</string>
+    <string name="repedit_not_found">This repertoire cannot be found.</string>
+    <string name="repedit_err_unknown_position">This position is not in the repertoire.</string>
+    <string name="repedit_err_illegal">Illegal move in this position: %1$s</string>
+    <string name="repedit_err_duplicate">This move is already in the repertoire: %1$s</string>
+    <string name="repedit_err_save">Save refused: %1$s</string>
+    <string name="repedit_open">Edit</string>
+    <plurals name="repedit_positions">
+        <item quantity="one">%1$d position</item>
+        <item quantity="other">%1$d positions</item>
+    </plurals>
+    <plurals name="transfer_imported_repertoires">
+        <item quantity="one">%1$d repertoire</item>
+        <item quantity="other">%1$d repertoires</item>
+    </plurals>
 </resources>

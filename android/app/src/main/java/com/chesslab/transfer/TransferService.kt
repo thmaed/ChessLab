@@ -51,6 +51,11 @@ object TransferService {
             },
             puzzlesAttempted = stats.attempted,
             puzzlesSolved = stats.solved,
+            repertoires = com.chesslab.courses.UserOpeningStore.catalog().mapNotNull { entry ->
+                com.chesslab.courses.UserOpeningStore.exportJson(entry.id)?.let {
+                    TransferFile.RepertoireEntry(entry.id, entry.name, it)
+                }
+            },
         )
     }
 
@@ -120,10 +125,26 @@ object TransferService {
 
                 StatsStore.raiseTo(context, incoming.puzzlesAttempted, incoming.puzzlesSolved)
 
+                // Les répertoires personnels. Un fichier illisible ou refusé
+                // par le validateur est IGNORÉ, jamais fatal : le reste de
+                // l'import a déjà été appliqué, et un répertoire abîmé ne doit
+                // pas emporter les parties et les révisions avec lui.
+                val store = com.chesslab.courses.UserOpeningStore
+                val known = store.catalog().mapTo(HashSet()) { it.id }
+                var repertoires = 0
+                for (entry in TransferMerge.mergeRepertoires(known, incoming.repertoires)) {
+                    if (!com.chesslab.courses.UserOpeningStore.isUserCourse(entry.id)) continue
+                    val course = runCatching { com.chesslab.courses.CourseRepository.parse(entry.json) }
+                        .getOrNull() ?: continue
+                    if (course.id != entry.id) continue
+                    if (runCatching { store.save(course) }.isSuccess) repertoires++
+                }
+
                 TransferMerge.Summary(
                     newReviews = added,
                     newGames = fresh.size,
                     positionsAffected = incoming.reviewLog.mapTo(HashSet()) { it.fenKey }.size,
+                    newRepertoires = repertoires,
                 )
             }
         }

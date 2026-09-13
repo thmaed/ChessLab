@@ -81,14 +81,29 @@ fun TransferSection() {
             busy = false
             message = result.fold(
                 onSuccess = { summary ->
-                    if (summary.isEmpty) nothingNew
-                    else context.resources.getQuantityString(
-                        R.plurals.transfer_imported, summary.newReviews, summary.newReviews,
-                    ) + if (summary.newGames > 0) {
-                        " · " + context.resources.getQuantityString(
-                            R.plurals.transfer_imported_games, summary.newGames, summary.newGames,
+                    if (summary.isEmpty) {
+                        nothingNew
+                    } else {
+                        // Une seule phrase, en morceaux séparés par « · » :
+                        // ce qui vaut zéro ne s'écrit pas.
+                        val parts = mutableListOf(
+                            context.resources.getQuantityString(
+                                R.plurals.transfer_imported, summary.newReviews, summary.newReviews,
+                            )
                         )
-                    } else ""
+                        if (summary.newGames > 0) {
+                            parts += context.resources.getQuantityString(
+                                R.plurals.transfer_imported_games, summary.newGames, summary.newGames,
+                            )
+                        }
+                        if (summary.newRepertoires > 0) {
+                            parts += context.resources.getQuantityString(
+                                R.plurals.transfer_imported_repertoires,
+                                summary.newRepertoires, summary.newRepertoires,
+                            )
+                        }
+                        parts.joinToString(" · ")
+                    }
                 },
                 onFailure = { error ->
                     when ((error as? TransferFile.DecodeError)?.failure) {

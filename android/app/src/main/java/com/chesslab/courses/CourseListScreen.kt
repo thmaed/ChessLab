@@ -66,6 +66,8 @@ fun CourseListScreen(
     onOpenLab: () -> Unit = {},
     /** L'ajout d'un répertoire personnel — pour les ouvertures seulement. */
     onImport: () -> Unit = {},
+    /** Ouvrir l'éditeur d'arbre d'un répertoire personnel. */
+    onEdit: (id: String, name: String) -> Unit = { _, _ -> },
     onOpen: (String) -> Unit,
 ) {
     val context = LocalContext.current
@@ -172,7 +174,7 @@ fun CourseListScreen(
             if (mine.isNotEmpty()) {
                 item(key = "entete-miens") { GroupHeader(stringResource(R.string.courses_my_repertoires)) }
                 items(mine, key = { it.id }) { entry ->
-                    CourseRow(entry, onOpen, onDelete = { pendingDeletion = entry }, onShare = {
+                    CourseRow(entry, onOpen, onEdit = { onEdit(entry.id, entry.name) }, onDelete = { pendingDeletion = entry }, onShare = {
                         // Le presse-papiers EN PLUS du partage, comme partout :
                         // la feuille dépend des apps installées, pas lui.
                         UserOpeningStore.exportJson(entry.id)?.let { json ->
@@ -341,6 +343,7 @@ private fun CourseRow(
     entry: CatalogEntry,
     onOpen: (String) -> Unit,
     /** Les actions d'un répertoire PERSONNEL, toujours visibles : une fonction qu'il faut deviner n'existe pas vraiment. */
+    onEdit: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
     onShare: (() -> Unit)? = null,
 ) {
@@ -369,6 +372,11 @@ private fun CourseRow(
                         modifier = Modifier.size(22.dp).clickable { menu = true }.testTag("actions-${entry.id}"),
                     )
                     DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.repedit_open)) },
+                            onClick = { menu = false; onEdit?.invoke() },
+                            modifier = Modifier.testTag("modifier-${entry.id}"),
+                        )
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.import_share)) },
                             onClick = { menu = false; onShare?.invoke() },

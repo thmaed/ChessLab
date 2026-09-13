@@ -203,7 +203,12 @@ private fun App() {
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup) },
                 onOpenLab = { stack.add(Route.Laboratory()) },
                 onImport = { stack.add(Route.OpeningImport) },
+                onEdit = { id, name -> stack.add(Route.OpeningEditor(id, name)) },
             ) { stack.add(reader(it)) }
+            is Route.OpeningEditor -> com.chesslab.courses.OpeningEditorScreen(
+                courseId = current.id,
+                onBack = { stack.removeAt(stack.lastIndex) },
+            )
             Route.OpeningImport -> com.chesslab.courses.OpeningImportScreen(
                 onImported = { stack.removeAt(stack.lastIndex) },
             )

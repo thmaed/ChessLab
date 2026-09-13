@@ -156,9 +156,35 @@ class TransferMergeTest {
             reviewLog = listOf(TransferFile.LogEntry("a", e4, 3, t0, 0.5, 1.0, 3.17)),
             games = listOf(TransferFile.GameEntry("g", t0, "Vous", "Lena", "1-0", "engine", null, 40, "1. e4 e5")),
             puzzlesAttempted = 12, puzzlesSolved = 9,
+            repertoires = listOf(
+                TransferFile.RepertoireEntry("user-1", "Ma Scandinave", "{\"id\":\"user-1\"}")
+            ),
         )
         val back = TransferFile.decode(TransferFile.encode(file)).getOrThrow()
         assertEquals(file, back)
+    }
+
+    /**
+     * Les répertoires personnels voyagent, et l'identité vient du fichier de
+     * cours lui-même : un répertoire déjà là n'est JAMAIS écrasé — il a pu
+     * être modifié depuis l'export, et l'import fusionne, il ne remplace pas.
+     */
+    @Test fun `seuls les repertoires inconnus sont retenus`() {
+        val incoming = listOf(
+            TransferFile.RepertoireEntry("user-2", "Zoukertort", "{}"),
+            TransferFile.RepertoireEntry("user-1", "Ma Scandinave", "{}"),
+            TransferFile.RepertoireEntry("user-1", "Doublon", "{}"),
+        )
+        val kept = TransferMerge.mergeRepertoires(setOf("user-2"), incoming)
+        assertEquals(listOf("user-1"), kept.map { it.id })
+        // Rien de neuf : la fusion est idempotente.
+        assertEquals(emptyList<String>(), TransferMerge.mergeRepertoires(setOf("user-1", "user-2"), incoming).map { it.id })
+    }
+
+    /** Un fichier d'une version antérieure n'a pas de répertoires — et c'est bien. */
+    @Test fun `un fichier sans repertoires se lit sans en inventer`() {
+        val old = TransferFile(exportedAt = t0, device = "x", reviewLog = emptyList(), games = emptyList(), puzzlesAttempted = 0, puzzlesSolved = 0)
+        assertEquals(emptyList<TransferFile.RepertoireEntry>(), TransferFile.decode(TransferFile.encode(old)).getOrThrow().repertoires)
     }
 
     @Test fun `un fichier étranger est refusé sans lever`() {

@@ -35,8 +35,9 @@ object TransferMerge {
         val newReviews: Int,
         val newGames: Int,
         val positionsAffected: Int,
+        val newRepertoires: Int = 0,
     ) {
-        val isEmpty: Boolean get() = newReviews == 0 && newGames == 0
+        val isEmpty: Boolean get() = newReviews == 0 && newGames == 0 && newRepertoires == 0
     }
 
     /**
@@ -92,6 +93,23 @@ object TransferMerge {
         incoming.filter { it.uid !in localUids }
             .distinctBy { it.uid }
             .sortedBy { it.playedAt }
+
+    /**
+     * Les répertoires à écrire : ceux dont l'identité MANQUE ici.
+     *
+     * Un répertoire qui existe déjà des deux côtés n'est jamais écrasé — il a
+     * pu être modifié ici depuis l'export, et l'import FUSIONNE, il ne
+     * remplace pas. L'identité vient du fichier lui-même (`user-<uuid>`,
+     * posée à la création), donc elle traverse les appareils : réimporter deux
+     * fois le même fichier ne crée pas de doublon.
+     */
+    fun mergeRepertoires(
+        localIds: Set<String>,
+        incoming: List<TransferFile.RepertoireEntry>,
+    ): List<TransferFile.RepertoireEntry> =
+        incoming.filter { it.id !in localIds }
+            .distinctBy { it.id }
+            .sortedBy { it.name.lowercase() }
 
     /**
      * Les compteurs de puzzles : le MAXIMUM des deux.

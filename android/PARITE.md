@@ -232,12 +232,33 @@ vérification sur appareil, pas après compilation.
       jamais vu : elle ne lit que la première partie.
 
       Restent, hors de ce lot :
-- [ ] **L'éditeur de répertoire** d'iOS (`OpeningEditorView`, 628 lignes) :
-      renommer, ajouter des coups en jouant sur le plateau, commenter ou
-      supprimer une arête. L'import couvre l'usage principal ; l'édition sur
-      place vient après les gros blocs.
-- [ ] **Le transfert `.clab`** n'emporte pas encore les répertoires
-      personnels — iOS les fait suivre par iCloud, Android n'a que le fichier.
+- [x] **L'éditeur de répertoire** — fait le 13/09. Le geste central est
+      l'ajout, et il n'a PAS de bouton : on joue le coup sur l'échiquier, il
+      entre dans le répertoire et l'éditeur y entre avec nous. La consigne
+      reste affichée en permanence (côté iOS, elle disparaissait dès qu'un
+      coup existait, et l'écran passait pour une liste en lecture seule).
+      Renommer, commenter une arête, supprimer une variante ; le fil des coups
+      ramène à n'importe quel demi-coup ; « Suivant » nomme le coup à venir.
+      Enregistrement IMMÉDIAT, et le résultat n'est gardé que si le fichier a
+      bien été écrit. La couche de graphe est pure et porte les deux
+      invariants d'iOS : aucune arête que le validateur rejetterait (le coup
+      est rejoué, TRAIT compris — `canMove` ne le consulte pas), et aucun nœud
+      inatteignable (purge par accessibilité depuis la racine, jamais en
+      descendant le sous-arbre : une transposition maintient une position
+      jointe). Seize tests JVM, quatre instrumentés.
+      Écart ASSUMÉ : le modèle Android ne garde qu'un commentaire par arête,
+      donc le réenregistrement l'écrit dans les deux langues au lieu de
+      préserver la traduction de l'autre. Rien n'est perdu, mais une version
+      anglaise distincte ne survivrait pas à une modification française.
+- [x] **Le transfert `.clab` emporte les répertoires personnels** — fait le
+      13/09. Le fichier de cours voyage tel quel : c'est LUI le répertoire, et
+      il se relit par l'analyseur de l'import. L'identité vient du fichier
+      (`user-<uuid>`, posée à la création), donc elle traverse les appareils —
+      réimporter ne duplique pas, et un répertoire déjà présent n'est JAMAIS
+      écrasé : il a pu être modifié ici depuis l'export, et l'import fusionne.
+      Un cours illisible ou refusé par le validateur est ignoré sans emporter
+      le reste de l'import. Trois tests JVM, un instrumenté qui fait l'aller-
+      retour complet.
 
 ### 10. Variantes — cinq manquantes sur douze
 iOS : Chess960, Roi de la colline, Trois échecs, Horde, Course des rois,

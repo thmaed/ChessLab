@@ -762,4 +762,30 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="home_analyse_game">Analyser la partie</string>
     <string name="color_white_side">Blancs</string>
     <string name="color_black_side">Noirs</string>
+    <string name="repedit_rename">Renommer</string>
+    <string name="repedit_rename_title">Renommer le répertoire</string>
+    <string name="repedit_save">Enregistrer</string>
+    <string name="repedit_error_title">Modification impossible</string>
+    <string name="repedit_hint_first">Joue un coup sur l\'échiquier pour l\'ajouter à ton répertoire.</string>
+    <string name="repedit_hint_more">Joue un autre coup sur l\'échiquier pour ajouter une variante.</string>
+    <string name="repedit_moves_here">Coups depuis cette position</string>
+    <string name="repedit_legend_comment">commenter</string>
+    <string name="repedit_legend_delete">supprimer la variante</string>
+    <string name="repedit_comment_title">Commenter %1$s</string>
+    <string name="repedit_comment_help">Ce texte s\'affichera sous le coup %1$s pendant la révision.</string>
+    <string name="repedit_delete_move">Supprimer %1$s</string>
+    <string name="repedit_not_found">Ce répertoire est introuvable.</string>
+    <string name="repedit_err_unknown_position">Cette position n\'est pas dans le répertoire.</string>
+    <string name="repedit_err_illegal">Coup impossible dans cette position : %1$s</string>
+    <string name="repedit_err_duplicate">Ce coup est déjà dans le répertoire : %1$s</string>
+    <string name="repedit_err_save">Enregistrement refusé : %1$s</string>
+    <string name="repedit_open">Modifier</string>
+    <plurals name="repedit_positions">
+        <item quantity="one">%1$d position</item>
+        <item quantity="other">%1$d positions</item>
+    </plurals>
+    <plurals name="transfer_imported_repertoires">
+        <item quantity="one">%1$d répertoire</item>
+        <item quantity="other">%1$d répertoires</item>
+    </plurals>
 </resources>

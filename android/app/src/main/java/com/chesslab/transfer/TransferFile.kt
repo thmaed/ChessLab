@@ -52,6 +52,12 @@ data class TransferFile(
     val games: List<GameEntry>,
     val puzzlesAttempted: Int,
     val puzzlesSolved: Int,
+    /**
+     * Les répertoires PERSONNELS, tels qu'ils sont sur le disque. Le fichier
+     * de cours EST le répertoire : on l'emporte tel quel plutôt que d'inventer
+     * un second format, et il se relit par le même analyseur que l'import.
+     */
+    val repertoires: List<RepertoireEntry> = emptyList(),
 ) {
     data class LogEntry(
         val uid: String,
@@ -61,6 +67,13 @@ data class TransferFile(
         val elapsedDays: Double,
         val scheduledDays: Double,
         val stabilityAfter: Double,
+    )
+
+    /** Un répertoire personnel : son identité, son nom, et son fichier. */
+    data class RepertoireEntry(
+        val id: String,
+        val name: String,
+        val json: String,
     )
 
     data class GameEntry(
@@ -123,6 +136,13 @@ data class TransferFile(
                 )
             }
             root.put("games", games)
+
+            val repertoires = JSONArray()
+            for (r in file.repertoires) {
+                repertoires.put(JSONObject().put("id", r.id).put("name", r.name).put("course", r.json))
+            }
+            root.put("repertoires", repertoires)
+
             root.put("puzzles", JSONObject()
                 .put("attempted", file.puzzlesAttempted).put("solved", file.puzzlesSolved))
             return root.toString()
@@ -175,6 +195,17 @@ data class TransferFile(
                 }
             }
 
+            val repertoires = ArrayList<RepertoireEntry>()
+            root.optJSONArray("repertoires")?.let { array ->
+                for (i in 0 until array.length()) {
+                    val o = array.getJSONObject(i)
+                    val id = o.optString("id")
+                    val json = o.optString("course")
+                    if (id.isEmpty() || json.isEmpty()) continue
+                    repertoires += RepertoireEntry(id, o.optString("name"), json)
+                }
+            }
+
             val puzzles = root.optJSONObject("puzzles")
             return Result.success(
                 TransferFile(
@@ -184,6 +215,7 @@ data class TransferFile(
                     games = games,
                     puzzlesAttempted = puzzles?.optInt("attempted") ?: 0,
                     puzzlesSolved = puzzles?.optInt("solved") ?: 0,
+                    repertoires = repertoires,
                 )
             )
         }
