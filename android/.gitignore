@@ -3,3 +3,5 @@ build/
 .cxx/
 local.properties
 .idea/
+# Le démon du compilateur Kotlin y laisse un fichier de session vide.
+.kotlin/
