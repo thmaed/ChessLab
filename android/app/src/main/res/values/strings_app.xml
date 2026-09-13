@@ -445,6 +445,28 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="other">%1$d moves</item>
     </plurals>
     <string name="course_repertoire">Repertoire</string>
+    <string name="percent_suffix">%</string>
+    <string name="index_open">Line index</string>
+    <string name="index_title">Line index</string>
+    <string name="index_close">Close</string>
+    <string name="index_side_white">White side</string>
+    <string name="index_side_black">Black side</string>
+    <string name="index_transposition">transposition</string>
+    <string name="index_transposition_hint">Go to the line that continues this position</string>
+    <string name="index_legend">Legend</string>
+    <string name="index_legend_variant">Variation: it starts again from the move shown</string>
+    <string name="index_legend_transposition">Transposition: tap to see what follows</string>
+    <string name="labs_masters">Masters</string>
+    <string name="labs_masters_none">No master game is known for this position.</string>
+    <string name="labs_engine">Stockfish</string>
+    <string name="labs_engine_none">Analysis unavailable for this position.</string>
+    <string name="labs_depth">d%1$d</string>
+    <string name="labs_in_repertoire">in the repertoire</string>
+    <string name="labs_off_repertoire">outside the repertoire</string>
+    <plurals name="index_variants">
+        <item quantity="one">%1$d variation</item>
+        <item quantity="other">%1$d variations</item>
+    </plurals>
     <string name="course_previous">Previous</string>
     <string name="course_next">Next</string>
     <string name="role_trap">Trap</string>

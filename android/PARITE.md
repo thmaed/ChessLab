@@ -13,7 +13,7 @@ vérification sur appareil, pas après compilation.
 | --- | --- |
 | Jouer contre l'ordinateur | 9 personnages Maia + Stockfish, niveau, couleur, pendule, indice, barre d'éval, abandon du moteur |
 | Analyse des parties | classification, précision, coach, courbe, candidats, menace, rétrospective, bilan, export PGN, puzzles depuis les erreurs ; flèches alignées le 12/09 — VERTES et lues dans le cache en revue, GRISES depuis le moteur en analyse d'une position, rouge translucide pour la menace, et la rétrospective reste SEULE quand elle sort |
-| Ouvertures | 58 cours, lecteur qui descend l'arbre, flèches colorées, commentaires, statistiques des maîtres, éval |
+| Ouvertures | 58 cours, lecteur qui descend l'arbre, flèches colorées, commentaires, index des lignes, coups des maîtres et lignes de Stockfish pré-calculées (sidecar Labs, 13/09) |
 | Finales | 78 cours, même lecteur |
 | Entraînement | FSRS-5, séance du jour, positions difficiles, une ligne |
 | Puzzles | 106 094 puzzles Lichess, essais réglables, indice |
@@ -138,9 +138,35 @@ vérification sur appareil, pas après compilation.
       milieu d'un écran anglais — les ressources existaient déjà. Un test JVM
       compare désormais les deux catalogues clé par clé, argument par argument.
 
-### 7. Ouvertures
-- [ ] **Index des lignes** : la table de toutes les variantes d'un cours, pour
-      sauter directement à l'une d'elles.
+### 7. Ouvertures — FAIT le 13/09
+- [x] **Index des lignes** : l'arbre de toutes les variantes, chaque coup écrit
+      UNE fois, les débranchements imbriqués avec leurs rails, et chaque coup
+      est un bouton — taper le 7ᵉ coup du Fried Liver amène directement à
+      cette position, fil des coups rempli. Titres de chapitre posés au point
+      de divergence, repères « transposition » qui renvoient à la rangée qui
+      déplie vraiment la position, verdicts du moteur (`??`, `?!`, `!!`…) sur
+      les coups qui le méritent. Quinze cas repris d'`OpeningLineTreeTests`,
+      bornes mesurées sur les 58 ouvertures comprises (≤ 200 rangées, profondeur
+      3 à 12) ; les titres de l'Italienne tombent au bon endroit (Evans → 4.b4,
+      Fried Liver → 6.Cxd5, Traxler → 4…Fc5).
+- [x] **Le sidecar Labs**, qu'Android n'embarquait pas : pour chaque position,
+      les coups des MAÎTRES avec leur part et leur bilan, et les trois lignes
+      de STOCKFISH calculées d'avance, avec la profondeur. Le lecteur les montre
+      en deux colonnes sous le répertoire, comme iOS, et l'évaluation de la
+      position vient désormais du moteur pré-calculé (« +0,25 p20 »), le coup
+      du cours ne servant que de repli. 2,6 Mo d'assets en plus.
+- [x] Nom de la variante atteinte sous le plateau, et sur chaque suite du
+      répertoire le nom de la ligne qu'elle ouvre.
+- [x] **La clé canonique** (`OpeningFENKey.key(for:)`) : Android n'avait que la
+      troncature à quatre champs. Suffisant pour une FEN venue d'un fichier,
+      faux pour une position qu'on vient de JOUER — ChessKit garde une case
+      « en passant » sans preneur et un droit de roque dont la tour est prise ;
+      deux chemins vers la même position donnaient deux clés. Sans effet sur
+      le lecteur (ses clés viennent du fichier), indispensable à l'import de
+      répertoires (§9). Six cas repris d'`OpeningFENKeyTests`.
+- [x] Le statut des commentaires est honoré : seul un commentaire `validated`
+      s'affiche. Les 1 834 du catalogue le sont tous — le verrou est pour
+      demain.
 
 ### 8. Scanner
 - [ ] **Écran de confirmation** : corriger les pièces mal lues AVANT d'utiliser

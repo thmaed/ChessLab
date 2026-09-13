@@ -1,9 +1,11 @@
 package com.chesslab.courses
 
 import android.content.res.AssetManager
+import chesskit.Board
 import chesskit.FenParser
 import chesskit.Piece
 import chesskit.Position
+import chesskit.Square
 import org.json.JSONArray
 import org.json.JSONObject
 import androidx.annotation.StringRes
@@ -36,9 +38,17 @@ data class CourseMove(
     val uci: String,
     val toFEN: String,
     val role: String,
+    /**
+     * Le commentaire, seulement s'il est VALIDÉ. Un brouillon (`draft`) reste
+     * dans le fichier sans jamais s'afficher — c'est la règle d'iOS
+     * (`MoveEdge.displayableComment`), et elle protège l'utilisateur d'un
+     * texte que personne n'a relu.
+     */
     val comment: String?,
     val eval: Double?,
     val popularity: Double?,
+    /** Le coup critique de sa position, aux yeux de l'auteur. */
+    val isCritical: Boolean = false,
 ) {
     val isMainLine: Boolean get() = role == "mainLine"
 }
@@ -54,7 +64,16 @@ data class Course(
     val rootFEN: String,
     val chapters: List<Chapter>,
     val positions: Map<String, List<CourseMove>>,
-)
+    /**
+     * Le nom de variante d'une position (« Italian Game: Giuoco Piano »),
+     * indexé par clé FEN — 113 positions en portent un sur le catalogue. C'est
+     * le sous-titre du lecteur, et le nom que l'index donne à une branche.
+     */
+    val ecoNames: Map<String, String> = emptyMap(),
+) {
+    /** Les coups jouables depuis une clé FEN, ou rien. */
+    fun moves(key: String): List<CourseMove> = positions[key].orEmpty()
+}
 
 /**
  * Les cours d'ouvertures et de finales, lus depuis les assets.
@@ -93,6 +112,66 @@ object CourseRepository {
 
     /** La clé d'indexation : les quatre premiers champs d'une FEN. */
     fun fenKey(fen: String): String = fen.trim().split(" ").take(4).joinToString(" ")
+
+    /**
+     * La clé CANONIQUE d'une position vivante. Pendant d'`OpeningFENKey.key(for:)`.
+     *
+     * [fenKey] suffit pour une FEN qui vient d'un FICHIER : le générateur
+     * l'a déjà canonisée. Une position qu'on vient de JOUER, non — ChessKit
+     * émet la case « en passant » après tout double pas, qu'un preneur existe
+     * ou non, et garde un droit de roque quand la tour concernée est capturée
+     * sur sa case. Deux chemins vers la même position donneraient alors deux
+     * clés, et la transposition ne fusionnerait pas. Sémantique alignée sur
+     * `python-chess`, côté générateur, pour que les clés coïncident.
+     */
+    fun key(position: Position): String {
+        val fields = position.fen.split(" ")
+        if (fields.size < 4) return position.fen
+        return "${fields[0]} ${fields[1]} ${canonicalCastling(fields[2], position)} ${canonicalEnPassant(fields[3], position)}"
+    }
+
+    /**
+     * On ne garde un droit de roque que si le roi ET la tour concernés sont
+     * TOUJOURS sur leur case d'origine. On ne fait que RETIRER un droit
+     * fantôme, jamais en accorder un : le filtre est borné par le champ de
+     * ChessKit, qui retire bien les droits quand roi ou tour se déplacent.
+     */
+    private fun canonicalCastling(field: String, position: Position): String {
+        if (field == "-") return "-"
+        fun present(kind: Piece.Kind, color: Piece.Color, at: String): Boolean {
+            val piece = position.piece(Square(at)) ?: return false
+            return piece.kind == kind && piece.color == color
+        }
+        val whiteKingHome = present(Piece.Kind.king, Piece.Color.white, "e1")
+        val blackKingHome = present(Piece.Kind.king, Piece.Color.black, "e8")
+        val out = StringBuilder()
+        if ('K' in field && whiteKingHome && present(Piece.Kind.rook, Piece.Color.white, "h1")) out.append('K')
+        if ('Q' in field && whiteKingHome && present(Piece.Kind.rook, Piece.Color.white, "a1")) out.append('Q')
+        if ('k' in field && blackKingHome && present(Piece.Kind.rook, Piece.Color.black, "h8")) out.append('k')
+        if ('q' in field && blackKingHome && present(Piece.Kind.rook, Piece.Color.black, "a8")) out.append('q')
+        return out.toString().ifEmpty { "-" }
+    }
+
+    /**
+     * La case « en passant » n'est gardée que si une prise y est réellement
+     * légale : case VIDE (le pion preneur s'y déplace) et un pion du camp au
+     * trait sur une AUTRE colonne qui peut l'atteindre — un pion n'y arrive
+     * que par une prise diagonale. Sans ces gardes, une case périmée pointant
+     * sur une case occupée (juste après une prise e.p.) ferait passer une
+     * prise normale pour une prise en passant.
+     */
+    private fun canonicalEnPassant(field: String, position: Position): String {
+        if (field == "-" || field.length != 2) return "-"
+        val target = Square(field)
+        if (position.piece(target) != null) return "-"
+        val board = Board(position)
+        val mover = position.sideToMove
+        val legal = position.pieces.any { piece ->
+            piece.color == mover && piece.kind == Piece.Kind.pawn && piece.square.file != target.file &&
+                target in board.legalMoves(piece.square)
+        }
+        return if (legal) field else "-"
+    }
 
     /**
      * La position décrite par une FEN de cours — de QUATRE à six champs.
@@ -158,7 +237,14 @@ object CourseRepository {
         val text = runCatching {
             assets.open("$DIR/$id.json").bufferedReader().use { it.readText() }
         }.getOrNull() ?: return null
+        val course = parse(text)
+        if (cache.size > 3) cache.remove(cache.keys.first())   // quelques cours suffisent en mémoire
+        cache[id] = course
+        return course
+    }
 
+    /** Lit un cours depuis son texte JSON — l'entrée des tests, qui n'ont pas d'assets. */
+    fun parse(text: String): Course {
         val o = JSONObject(text)
 
         val chapters = o.optJSONArray("chapters")?.let { array ->
@@ -174,9 +260,12 @@ object CourseRepository {
         } ?: emptyList()
 
         val positions = HashMap<String, List<CourseMove>>()
+        val ecoNames = HashMap<String, String>()
         o.optJSONObject("positions")?.let { all ->
             for (key in all.keys()) {
-                val moves = all.getJSONObject(key).optJSONArray("moves") ?: continue
+                val node = all.getJSONObject(key)
+                node.optString("ecoName").ifEmpty { null }?.let { ecoNames[fenKey(key)] = it }
+                val moves = node.optJSONArray("moves") ?: continue
                 positions[fenKey(key)] = (0 until moves.length()).map { i ->
                     val m = moves.getJSONObject(i)
                     CourseMove(
@@ -184,9 +273,13 @@ object CourseRepository {
                         uci = m.optString("uci"),
                         toFEN = m.optString("toFEN"),
                         role = m.optString("role", "sideline"),
-                        comment = localized(m.optJSONObject("comment")),
+                        // Un commentaire sans statut « validated » n'existe
+                        // pas pour l'écran : même règle qu'iOS.
+                        comment = if (m.optString("commentStatus") == "validated")
+                            localized(m.optJSONObject("comment")) else null,
                         eval = if (m.has("eval")) m.getDouble("eval") else null,
                         popularity = if (m.has("popularityClub")) m.getDouble("popularityClub") else null,
+                        isCritical = m.optBoolean("isCritical", false),
                     )
                 }
             }
@@ -200,9 +293,8 @@ object CourseRepository {
             rootFEN = o.optString("rootFEN"),
             chapters = chapters,
             positions = positions,
+            ecoNames = ecoNames,
         )
-        if (cache.size > 3) cache.remove(cache.keys.first())   // quelques cours suffisent en mémoire
-        cache[id] = course
         return course
     }
 }

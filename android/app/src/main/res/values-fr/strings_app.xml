@@ -442,6 +442,28 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="other">%1$d coups</item>
     </plurals>
     <string name="course_repertoire">Répertoire</string>
+    <string name="percent_suffix">" %"</string>
+    <string name="index_open">Index des lignes</string>
+    <string name="index_title">Index des lignes</string>
+    <string name="index_close">Fermer</string>
+    <string name="index_side_white">Côté blanc</string>
+    <string name="index_side_black">Côté noir</string>
+    <string name="index_transposition">transposition</string>
+    <string name="index_transposition_hint">Aller à la ligne qui poursuit cette position</string>
+    <string name="index_legend">Légende</string>
+    <string name="index_legend_variant">Variante : elle repart du coup indiqué</string>
+    <string name="index_legend_transposition">Transposition : taper pour voir la suite</string>
+    <string name="labs_masters">Maîtres</string>
+    <string name="labs_masters_none">Aucune partie de maître connue pour cette position.</string>
+    <string name="labs_engine">Stockfish</string>
+    <string name="labs_engine_none">Analyse indisponible pour cette position.</string>
+    <string name="labs_depth">p%1$d</string>
+    <string name="labs_in_repertoire">dans le répertoire</string>
+    <string name="labs_off_repertoire">hors répertoire</string>
+    <plurals name="index_variants">
+        <item quantity="one">%1$d variante</item>
+        <item quantity="other">%1$d variantes</item>
+    </plurals>
     <string name="course_previous">Précédent</string>
     <string name="course_next">Suivant</string>
     <string name="role_trap">Piège</string>

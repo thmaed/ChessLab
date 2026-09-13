@@ -17,6 +17,7 @@ val copyAssets by tasks.registering(Copy::class) {
         include("nn-*.nnue")
         include("lichess_puzzles.json")
         include("openings/**")          // cours d'ouvertures ET de finales
+        include("openings_stats/**")    // le sidecar Labs : maîtres et moteur par position
         include("opponent_books.json")  // les répertoires des personnages
         include("opening_book.json")    // le livre d'ouvertures général
         include("opening_library.json") // les lignes qui étendent la théorie de l'analyse

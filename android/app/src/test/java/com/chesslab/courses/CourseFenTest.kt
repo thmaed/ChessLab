@@ -94,4 +94,48 @@ class CourseFenTest {
         assertNull(CourseRepository.position("4k3/8/8/8/8/8/8/8 w - -"))   // roi blanc absent
         assertNotNull(CourseRepository.position("4k3/8/8/8/8/8/8/4K3 w - -"))
     }
+
+    // MARK: La clé canonique
+
+    private fun play(vararg moves: Pair<String, String>): chesskit.Board {
+        val board = chesskit.Board(chesskit.Position.standard)
+        for ((from, to) in moves) requireNotNull(board.move(chesskit.Square(from), chesskit.Square(to))) { "$from$to illégal" }
+        return board
+    }
+
+    @Test fun `la position de depart a la cle attendue`() {
+        assertEquals("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq -", CourseRepository.key(chesskit.Position.standard))
+    }
+
+    @Test fun `deux ordres de coups vers la meme position donnent la meme cle`() {
+        // 1.Cf3 d5 2.d4 et 1.d4 d5 2.Cf3 : mêmes pièces, compteurs différents
+        // — et une case e.p. « d3 » d'un côté seulement. Les FEN diffèrent, les
+        // clés doivent coïncider : c'est ce qui fait fusionner les transpositions.
+        val a = play("g1" to "f3", "d7" to "d5", "d2" to "d4")
+        val b = play("d2" to "d4", "d7" to "d5", "g1" to "f3")
+        assertTrue(a.position.fen != b.position.fen)
+        assertEquals(CourseRepository.key(a.position), CourseRepository.key(b.position))
+    }
+
+    @Test fun `la case en passant est gardee quand la prise est legale`() {
+        // 1.e4 c5 2.e5 d5 : le pion e5 peut prendre exd6 e.p.
+        val board = play("e2" to "e4", "c7" to "c5", "e4" to "e5", "d7" to "d5")
+        assertTrue(CourseRepository.key(board.position).endsWith(" d6"))
+    }
+
+    @Test fun `la case en passant est retiree sans preneur`() {
+        // Après 1.e4, ChessKit émet « e3 » — aucun pion noir ne peut y prendre.
+        val key = CourseRepository.key(play("e2" to "e4").position)
+        assertTrue(!key.contains("e3"))
+        assertTrue(key.endsWith(" -"))
+    }
+
+    @Test fun `un droit de roque tombe avec la tour capturee sur sa case`() {
+        // Gambit dame accepté, juste avant Txa8 : les Blancs perdent « Q »
+        // (leur tour a1 est partie) et les Noirs « q » (la tour a8 est prise).
+        val position = CourseRepository.position("rn1qkbnr/1bp1pppp/8/1p6/2pP4/4PN2/1P3PPP/RNBQKB1R w KQkq -")!!
+        val board = chesskit.Board(position)
+        requireNotNull(board.move(chesskit.Square("a1"), chesskit.Square("a8")))
+        assertEquals("Rn1qkbnr/1bp1pppp/8/1p6/2pP4/4PN2/1P3PPP/1NBQKB1R b Kk -", CourseRepository.key(board.position))
+    }
 }
