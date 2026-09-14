@@ -49,6 +49,8 @@ fun PositionEditorScreen(
     /** Un retour vers l'écran d'avant (« Recadrer »), quand il y en a un. */
     onBack: (() -> Unit)? = null,
     backLabel: String? = null,
+    /** Le libellé du bouton de sortie : « Analyser », ou « Utiliser cette position ». */
+    @androidx.annotation.StringRes confirmLabel: Int = R.string.route_analysis,
     onAnalyse: (String) -> Unit = {},
 ) {
     // La position initiale est SEMÉE à la composition, pas versée par un effet
@@ -173,7 +175,7 @@ fun PositionEditorScreen(
                     modifier = Modifier.testTag("analyser"),
                 ) {
                     Text(
-                        stringResource(R.string.route_analysis),
+                        stringResource(confirmLabel),
                         color = if (faults.isEmpty()) Palette.accent else Palette.textTertiary,
                     )
                 }

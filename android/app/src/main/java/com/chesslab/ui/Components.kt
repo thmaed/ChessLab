@@ -245,7 +245,15 @@ fun ChipButton(
 @Composable
 fun ToggleRow(label: String, checked: Boolean, tag: String = "", onChange: (Boolean) -> Unit) {
     Row(
-        Modifier.fillMaxWidth().padding(vertical = 2.dp).testTag(tag),
+        Modifier
+            .fillMaxWidth()
+            // TOUTE la ligne bascule, pas seulement le petit interrupteur :
+            // viser un rectangle de 50 dp sur 30 quand la phrase juste à côté
+            // ne répond pas est une gêne inutile, et iOS coche la ligne
+            // entière.
+            .clickable { onChange(!checked) }
+            .padding(vertical = 2.dp)
+            .testTag(tag),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(label, fontSize = 14.sp, color = Palette.textPrimary, modifier = Modifier.weight(1f))

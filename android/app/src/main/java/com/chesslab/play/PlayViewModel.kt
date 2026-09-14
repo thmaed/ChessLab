@@ -26,6 +26,7 @@ import kotlin.math.roundToInt
 import kotlinx.coroutines.withContext
 import com.chesslab.R
 import com.chesslab.ui.HintArrowBuilder
+import com.chesslab.ui.q
 import com.chesslab.ui.s
 
 data class PlayUiState(
@@ -67,6 +68,24 @@ data class PlayUiState(
     val settings: PlayGameSettings = PlayGameSettings(),
     /** Faux tant que l'écran de configuration n'a pas rendu la main. */
     val started: Boolean = false,
+    /** L'évaluation de la position affichée, POV Blancs — la barre s'en sert. */
+    val evalCp: Int? = null,
+    val evalMate: Int? = null,
+    /** Maia a lâché en cours de partie : Stockfish bridé prend le relais. */
+    val maiaUnavailable: Boolean = false,
+    /** Combien de fois le filet a corrigé le coup du personnage. */
+    val safetyNetInterventions: Int = 0,
+    /** Le moteur propose nulle : à l'utilisateur de répondre. */
+    val pendingDrawOffer: Boolean = false,
+    /** Le moteur vient de refuser la nulle — à dire une fois, puis à oublier. */
+    val drawDeclined: Boolean = false,
+    /** L'indice est DEMANDÉ : il se relance après chaque coup, comme sur iOS. */
+    val hintsWanted: Boolean = false,
+    /** Stockfish n'a pas démarré : la bannière le dit, et propose de réessayer. */
+    val engineUnavailable: Boolean = false,
+    val retryingEngine: Boolean = false,
+    /** Les coups écartés par « Reprendre ici », le temps de pouvoir les rendre. */
+    val resumeUndo: ResumeUndo? = null,
 ) {
     val isReviewing: Boolean get() = displayedPly < sanMoves.size
 
@@ -81,7 +100,18 @@ data class PlayUiState(
         get() = !settings.timeControl.hasClock && sanMoves.isNotEmpty() &&
             !gameOver && !thinking
     val totalPlies: Int get() = sanMoves.size
+
+    /**
+     * Peut-on repartir du coup consulté ? Jamais avec une pendule — on ne
+     * rend pas du temps écoulé — ni pendant que le moteur calcule la suite
+     * qu'on s'apprête à jeter.
+     */
+    val canResumeFromReview: Boolean
+        get() = isReviewing && !settings.timeControl.hasClock && !gameOver && !thinking
 }
+
+/** Ce que « Reprendre ici » a écarté, et d'où : de quoi le rendre. */
+data class ResumeUndo(val discarded: List<String>, val atPly: Int)
 
 /**
  * Une partie contre l'ordinateur : un des neuf personnages, ou Stockfish.
@@ -142,6 +172,23 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      */
     private var hintJob: kotlinx.coroutines.Job? = null
 
+    /** Le compte à rebours des huit secondes d'annulation de « Reprendre ici ». */
+    private var undoJob: kotlinx.coroutines.Job? = null
+
+    /**
+     * Les dernières évaluations vues par l'ADVERSAIRE, en centipions de son
+     * point de vue. C'est d'elles que tout dépend : son humeur, son abandon,
+     * sa proposition de nulle. Sans évaluation continue, un personnage n'a
+     * pas de caractère et le moteur ne renonce jamais.
+     */
+    private val recentEngineEvals = mutableListOf<Int>()
+
+    /** Le moteur ne propose nulle qu'UNE fois par partie. */
+    private var engineHasOfferedDraw = false
+
+    /** `ucinewgame` reste à envoyer : le moteur est partagé par toute l'app. */
+    private var needsUciNewGame = true
+
     var ui by mutableStateOf(PlayUiState(status = s(R.string.starting)))
         private set
 
@@ -189,15 +236,62 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun setLevel(value: Double) {
-        val clamped = ui.opponent?.clampedLevel(value) ?: value.coerceIn(800.0, 3000.0)
+        val clamped = ui.opponent?.clampedLevel(value)
+            ?: value.coerceIn(EngineStrength.playSliderRange)
         ui = ui.copy(level = clamped)
+    }
+
+    /**
+     * La force à laquelle le moteur doit jouer CE coup.
+     *
+     * Le curseur ne servait à rien : quel que soit le niveau choisi, Stockfish
+     * jouait à pleine puissance. Il est bridé par `UCI_Elo` entre 1320 et
+     * 3190, et sous 1320 par un `Skill Level` bas ET une profondeur plafonnée
+     * — sans quoi un « grand débutant » à qui l'on donne quatre dixièmes de
+     * seconde reste un joueur redoutable.
+     */
+    private fun strength(): EngineStrength = EngineStrength.of(ui.level)
+
+    /**
+     * Le budget de réflexion. Sans pendule, 900 ms. Avec, une fraction du
+     * temps restant plus une part de l'incrément, bornée pour ne JAMAIS
+     * tomber au drapeau sur un seul coup.
+     */
+    private fun movetimeMs(): Int {
+        val c = clock ?: return 900
+        if (!c.control.hasClock) return 900
+        val remaining = c.remaining(board.position.sideToMove) / 1000.0
+        val increment = c.control.incrementSeconds.toDouble()
+        val base = remaining / 30 + increment * 0.8
+        val maximum = minOf(30.0, remaining * 0.25)
+        return (base.coerceIn(0.15, maxOf(0.15, maximum)) * 1000).toInt()
+    }
+
+    /**
+     * Le rythme HUMAIN : un adversaire qui répond dans la même milliseconde
+     * n'en est pas un. Pablo joue vite, Nadia réfléchit. Supprimé sous
+     * 30 secondes — en zeitnot, le temps est trop précieux pour du décor — et
+     * plafonné à 2 % du temps restant.
+     */
+    private fun naturalDelayMs(): Long {
+        val pace = ui.opponent?.temperament?.pace ?: 1.0
+        val maxSeconds = clock?.takeIf { it.control.hasClock }?.let { c ->
+            val remaining = c.remaining(board.position.sideToMove) / 1000.0
+            if (remaining < 30) return 0
+            minOf(0.7 * pace, remaining * 0.02)
+        } ?: (0.7 * pace)
+        if (maxSeconds <= 0.1) return 0
+        val lower = minOf(0.25, maxSeconds)
+        return (kotlin.random.Random.nextDouble(lower, maxSeconds) * 1000).toLong()
     }
 
     fun onSquareTap(square: Square) {
         if (ui.thinking || ui.gameOver || ui.pendingPromotion != null) return
         // En consultation d'un coup passé, le plateau est une PHOTO : y jouer
         // écrirait un coup dans une position qui n'est plus celle de la partie.
-        if (ui.isReviewing) { reviewLive(); return }
+        // On n'en sort pas par un tap, mais par les chevrons ou « Reprendre
+        // ici » — sortir du passé par inadvertance surprenait.
+        if (ui.isReviewing) return
         if (board.position.sideToMove != humanColor) return
 
         val selected = ui.selected
@@ -215,12 +309,30 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun play(from: Square, to: Square) {
-        val move = board.move(pieceAt = from, to = to) ?: return
+        val move = board.move(pieceAt = from, to = to) ?: run {
+            // Un geste refusé doit se SENTIR : sans retour, on croit que
+            // l'écran n'a pas vu le doigt.
+            com.chesslab.sound.Haptics.illegal()
+            ui = ui.copy(selected = null, legalTargets = emptySet())
+            return
+        }
         if (board.state is Board.State.Promotion) {
             ui = ui.copy(selected = null, legalTargets = emptySet(), pendingPromotion = move)
             return
         }
         recordAndContinue(move)
+    }
+
+    /**
+     * Annule la promotion — donc le coup : le pion retourne d'où il vient.
+     * Promouvoir en dame parce qu'on a touché à côté, c'est jouer à la place
+     * de quelqu'un qui n'a pas encore choisi.
+     */
+    fun cancelPromotion() {
+        if (ui.pendingPromotion == null) return
+        ui = ui.copy(pendingPromotion = null, selected = null, legalTargets = emptySet())
+        // Le plateau a DÉJÀ bougé : on le repose sur les coups joués.
+        rebuild(uciLog.toList(), null)
     }
 
     fun completePromotion(kind: Piece.Kind) {
@@ -234,6 +346,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         // La recherche d'indice porte sur la position d'AVANT : la laisser
         // finir, c'est faire attendre l'adversaire pour des flèches périmées.
         stopHint()
+        // N'IMPORTE QUEL coup périme l'offre d'annulation : la rendre après
+        // coup réinjecterait une suite qui ne colle plus à la partie.
+        clearResumeUndo()
         val before = history.last().copy()
         val wasHuman = move.piece.color == humanColor
         history += board.position.copy()
@@ -263,6 +378,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         } else if (mustReply) {
             askOpponent()
         }
+        if (!mustReply && !ui.gameOver && ui.hintsWanted) startHint()
     }
 
     /**
@@ -349,6 +465,53 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         takeback()
     }
 
+    /** Ce qu'une recherche COURTE à pleine puissance a vu de la position. */
+    private data class QuickSearch(val lan: String?, val cp: Int?, val mate: Int?)
+
+    /**
+     * Une recherche de 300 ms à PLEINE puissance, du point de vue du camp au
+     * trait. Elle sert quatre fois : la barre d'évaluation, l'humeur du
+     * personnage, le filet derrière Maia, et la décision d'abandonner ou de
+     * proposer nulle. Une seule recherche les nourrit toutes.
+     */
+    private suspend fun quickSearch(): QuickSearch? = withContext(Dispatchers.IO) {
+        val fen = board.position.fen
+        EngineService.use(getApplication()) { e ->
+            e.send("position fen $fen")
+            var cp: Int? = null
+            var mate: Int? = null
+            val best = e.search("go movetime 300", timeoutMs = 5_000) { line ->
+                if (!line.startsWith("info ") || !line.contains(" score ")) return@search
+                if ((line.substringAfter(" multipv ", "1").substringBefore(" ").toIntOrNull() ?: 1) != 1) return@search
+                val m = line.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
+                val c = line.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
+                if (m != null) { mate = m; cp = if (m > 0) 10_000 else -10_000 }
+                else if (c != null) { cp = c; mate = null }
+            }?.split(" ")?.getOrNull(1)
+            QuickSearch(best?.takeIf { it.length >= 4 }, cp, mate)
+        }
+    }
+
+    /** Une recherche de Stockfish BRIDÉ au niveau choisi. */
+    private suspend fun bridledSearch(): String? = withContext(Dispatchers.IO) {
+        val strength = strength()
+        val fen = board.position.fen
+        val budget = movetimeMs()
+        val newGame = needsUciNewGame
+        EngineService.use(getApplication()) { e ->
+            // Le moteur est PARTAGÉ par toute l'app : le bridage se pose avant
+            // chaque recherche, et `EngineService` le relève pour les autres.
+            if (newGame) e.send("ucinewgame")
+            strength.setupCommands.forEach { e.send(it) }
+            EngineService.markBridled()
+            e.send("position fen $fen")
+            // Sous 1320, la force se simule en plafonnant la PROFONDEUR :
+            // un budget en millisecondes ne suffit pas à affaiblir un moteur.
+            val go = strength.maxDepth?.let { "go depth $it" } ?: "go movetime $budget"
+            e.search(go, timeoutMs = 60_000)
+        }?.split(" ")?.getOrNull(1)
+    }.also { needsUciNewGame = false }
+
     private fun askOpponent() {
         thinkingJob?.cancel()
         // Ce qui vaut à l'instant du lancement. Tout ce qui suit une attente
@@ -364,53 +527,45 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
             // LE LIVRE D'ABORD. Un personnage joue SON répertoire — c'est son
             // caractère, pas un réglage —, sinon le livre général si
-            // l'utilisateur l'a laissé actif. Sans livre, un réseau entraîné
-            // sur des parties humaines rejoue les mêmes ouvertures, et le
-            // style qu'on prête au personnage ne se voit nulle part.
+            // l'utilisateur l'a laissé actif.
             val fromBook = bookMove()
-            val lan = fromBook ?: withContext(Dispatchers.IO) {
-                val engine = maia
-                if (profile != null && engine != null) {
-                    // le personnage tel qu'il joue MAINTENANT : sans évaluation
-                    // continue, on s'en tient à son humeur de repos
-                    val mood = profile.mood(lastMoverCp = null)
-                    engine.chooseMove(
-                        history = history.toList(),
-                        board = Board(board.position.copy()),
-                        selfElo = ui.level,
-                        oppoElo = ui.level,
-                        temperature = mood.temperature,
-                        topP = profile.topP,
-                        style = mood.style,
-                    )?.uci
-                } else {
-                    EngineService.use(getApplication()) { e ->
-                        e.send("position fen ${board.position.fen}")
-                        e.search("go movetime ${SettingsStore.state.value.engineMoveTimeMs}", timeoutMs = 60_000)
-                    }?.split(" ")?.getOrNull(1)
-                }
-            }
-            // La partie a pu changer de vie pendant la recherche : abandonnée
-            // et relancée, reprise d'un coup, rejouée. La réponse ne vaut
-            // alors plus rien, et l'appliquer écraserait le plateau neuf.
+
+            // La position vue à pleine puissance : elle nourrit l'évaluation,
+            // l'humeur, le filet et la décision d'abandonner.
+            val quick = if (fromBook == null || needsEval()) quickSearch() else null
+            if (epoch != gameEpoch) return@launch
+            quick?.cp?.let { noteEngineEval(it) }
+
+            val lan = fromBook ?: chooseMove(profile, quick)
             if (epoch != gameEpoch) return@launch
             ui = ui.copy(thinking = false)
 
-            if (lan == null || lan == "(none)") { refresh(s(R.string.rival_silent)); return@launch }
+            if (lan == null || lan == "(none)") {
+                // Le moteur n'a rien à jouer : c'est que la partie est finie.
+                // La laisser ouverte et muette était le défaut qu'iOS a corrigé.
+                refresh(null)
+                if (!ui.gameOver) finish(s(R.string.rival_silent), "*")
+                return@launch
+            }
+
+            // Le rythme humain, avant de poser le coup.
+            val delay = naturalDelayMs()
+            if (delay > 0) kotlinx.coroutines.delay(delay)
+            if (epoch != gameEpoch) return@launch
 
             val from = Square(lan.substring(0, 2))
             val to = Square(lan.substring(2, 4))
             var move = board.move(pieceAt = from, to = to)
-            if (move == null) { refresh(s(R.string.move_refused, lan)); return@launch }
+            if (move == null) {
+                // Un coup injouable ne doit pas laisser l'écran figé : on
+                // conclut sur l'état RÉEL du plateau.
+                refresh(null)
+                if (!ui.gameOver) finish(s(R.string.move_refused, lan), "*")
+                return@launch
+            }
 
             if (lan.length == 5) {
-                val kind = when (lan[4]) {
-                    'q' -> Piece.Kind.queen
-                    'r' -> Piece.Kind.rook
-                    'b' -> Piece.Kind.bishop
-                    else -> Piece.Kind.knight
-                }
-                move = board.completePromotion(of = move, to = kind)
+                move = board.completePromotion(of = move, to = kindOf(lan[4]))
             }
             history += board.position.copy()
             moveLog += move
@@ -419,9 +574,123 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             clock?.stopAndIncrement(System.currentTimeMillis())
             autosave()
             refresh(null, move)
-            if (!ui.gameOver) startClockForSideToMove() else ticker?.cancel()
+            if (!ui.gameOver) {
+                startClockForSideToMove()
+                maybeResignOrOfferDraw()
+                // L'indice DEMANDÉ se relance de lui-même : sur iOS il suit la
+                // partie, il ne se redemande pas à chaque coup.
+                if (ui.hintsWanted && !ui.gameOver) startHint()
+            } else {
+                ticker?.cancel()
             }
         }
+    }
+
+    /** A-t-on besoin d'une évaluation, même quand le livre fournit le coup ? */
+    private fun needsEval(): Boolean =
+        ui.settings.showEvalBar || ui.settings.engineResigns || ui.opponent != null
+
+    /**
+     * Le coup de l'adversaire : Maia arbitrée par le filet, ou Stockfish
+     * bridé. Si Maia ne répond pas, Stockfish prend le relais POUR TOUTE LA
+     * SUITE — une partie figée sur « l'adversaire n'a pas répondu » n'est pas
+     * une partie.
+     */
+    private suspend fun chooseMove(profile: OpponentProfile?, quick: QuickSearch?): String? {
+        val engine = maia
+        if (profile == null || engine == null || ui.maiaUnavailable) return bridledSearch()
+
+        val mood = profile.mood(lastMoverCp = quick?.cp)
+        val proposed = withContext(Dispatchers.IO) {
+            engine.chooseMove(
+                history = history.toList(),
+                board = Board(board.position.copy()),
+                selfElo = ui.level,
+                oppoElo = ui.level,
+                temperature = mood.temperature,
+                topP = profile.topP,
+                style = mood.style,
+            )?.uci
+        }
+        if (proposed == null) {
+            // Le réseau a lâché : on le dit, et Stockfish bridé au niveau du
+            // personnage joue à sa place — ce que `MaiaOpponent` documente
+            // depuis toujours sans que personne ne l'ait branché.
+            ui = ui.copy(maiaUnavailable = true)
+            return bridledSearch()
+        }
+
+        // LE FILET. Quatre cas bornés, et rien d'autre : un mat en un ou deux
+        // que le personnage est censé voir, une finale technique, une
+        // répétition en position gagnée. Ailleurs, Maia joue ce qu'elle veut —
+        // y compris se tromper, ce qui est tout l'intérêt.
+        return when (val decision = MaiaTurnResolver.resolve(
+            maiaUci = proposed, quick = quick?.let { MaiaTurnResolver.Quick(it.lan, it.cp, it.mate) },
+            level = ui.level.roundToInt(), pieceCount = board.position.pieces.size,
+            policy = profile.safetyNet, board = Board(board.position.copy()),
+        )) {
+            is MaiaTurnResolver.Decision.Play -> proposed
+            is MaiaTurnResolver.Decision.Override -> {
+                ui = ui.copy(safetyNetInterventions = ui.safetyNetInterventions + 1)
+                decision.lan
+            }
+            MaiaTurnResolver.Decision.SearchBridled -> {
+                ui = ui.copy(safetyNetInterventions = ui.safetyNetInterventions + 1)
+                bridledSearch() ?: proposed
+            }
+        }
+    }
+
+    /** Range une évaluation vue par l'adversaire, et met la barre à jour. */
+    private fun noteEngineEval(cp: Int) {
+        recentEngineEvals += cp
+        if (recentEngineEvals.size > 12) recentEngineEvals.removeAt(0)
+        // La barre se lit du point de vue des BLANCS : l'évaluation, elle,
+        // vient du camp au trait.
+        val whitePov = if (board.position.sideToMove == Piece.Color.white) cp else -cp
+        ui = ui.copy(
+            evalCp = whitePov.coerceIn(-10_000, 10_000),
+            evalMate = null,
+        )
+    }
+
+    /**
+     * L'adversaire abandonne-t-il, ou propose-t-il nulle ?
+     *
+     * Les seuils sont ceux du PERSONNAGE — Léa s'accroche, Nadia renonce tôt —
+     * et le réglage de l'utilisateur peut couper l'abandon : un débutant qui
+     * vient de gagner une dame apprend en donnant le mat, pas en voyant la
+     * partie s'arrêter.
+     */
+    private fun maybeResignOrOfferDraw() {
+        val temperament = ui.opponent?.temperament ?: com.chesslab.maia.Temperament()
+        val patience = temperament.resignPatience
+        val recent = recentEngineEvals.takeLast(patience)
+        if (ui.settings.engineResigns && recent.size == patience &&
+            recent.all { it < temperament.resignThresholdCp }
+        ) {
+            finish(s(R.string.outcome_opponent_resigned), if (humanColor == Piece.Color.white) "1-0" else "0-1")
+            return
+        }
+        val last6 = recentEngineEvals.takeLast(6)
+        if (temperament.offersDraws && !engineHasOfferedDraw && last6.size == 6 &&
+            last6.all { kotlin.math.abs(it) < temperament.drawOfferMaxCp } &&
+            board.position.pieces.size <= 12
+        ) {
+            engineHasOfferedDraw = true
+            ui = ui.copy(pendingDrawOffer = true)
+        }
+    }
+
+    /** L'utilisateur répond à la nulle proposée par l'adversaire. */
+    fun acceptDrawOffer() {
+        ui = ui.copy(pendingDrawOffer = false)
+        finish(s(R.string.outcome_draw_agreed), "1/2-1/2")
+    }
+
+    fun declineDrawOffer() { ui = ui.copy(pendingDrawOffer = false) }
+
+    fun dismissDrawDeclined() { ui = ui.copy(drawDeclined = false) }
 
     /**
      * Garde la partie en cours. Une seule par mode : reprendre, c'est
@@ -469,8 +738,12 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      * elle s'appliquait sur la partie fraîchement rejouée — un coup surgi de
      * nulle part au milieu d'une reprise.
      */
+    /** Vrai quand le dernier rejeu a buté sur un coup injouable. */
+    private var failedResume = false
+
     private fun rebuild(lans: List<String>, status: String?) {
         gameEpoch++
+        failedResume = false
         thinkingJob?.cancel()
         stopHint()
 
@@ -485,7 +758,14 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
         for (lan in lans) {
             var move = board.move(pieceAt = Square(lan.substring(0, 2)), to = Square(lan.substring(2, 4)))
-                ?: break
+                ?: run {
+                    // Sauter le coup fautif appliquerait tous les suivants à
+                    // une position devenue fausse, et l'on re-sauvegarderait
+                    // par-dessus : la fin de la partie serait perdue sans que
+                    // personne le sache. On s'arrête et on le dit.
+                    failedResume = true
+                    null
+                } ?: break
             if (lan.length == 5) {
                 move = board.completePromotion(of = move, to = kindOf(lan[4]))
             }
@@ -496,7 +776,15 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             ui = ui.copy(sanMoves = ui.sanMoves + move.san, lastMove = move.start to move.end)
         }
         ui = ui.copy(captured = CapturedMaterial.from(moveLog, board))
-        refresh(status)
+        refresh(if (failedResume) s(R.string.play_resume_failed) else status)
+        if (failedResume) {
+            // La sauvegarde est inutilisable : on l'efface plutôt que de la
+            // réécrire tronquée.
+            viewModelScope.launch(Dispatchers.IO) {
+                LibraryDatabase.get(getApplication()).autosaves().clear(MODE)
+            }
+            return
+        }
         autosave()
         if (!ui.gameOver && board.position.sideToMove != humanColor) askOpponent()
     }
@@ -547,9 +835,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         val over = state is Board.State.Checkmate || state is Board.State.Draw
-        if (over && !ui.gameOver) {
-            com.chesslab.sound.Haptics.gameEnded()
-            ticker?.cancel()
+        // Une position de départ déjà finie n'est pas une partie : rien à
+        // ranger en bibliothèque.
+        if (over && !ui.gameOver && moveLog.isNotEmpty()) {
             viewModelScope.launch(Dispatchers.IO) {
                 LibraryDatabase.get(getApplication()).autosaves().clear(MODE)
             }
@@ -564,6 +852,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
                 engineColor = humanColor.opposite,
             )
         }
+        if (over && !ui.gameOver) { com.chesslab.sound.Haptics.gameEnded(); ticker?.cancel() }
         val text = status ?: when (state) {
             is Board.State.Checkmate ->
                 s(if (state.color == humanColor) R.string.checkmate_you_lose else R.string.checkmate_you_win)
@@ -621,7 +910,13 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         uciLog.clear()
         moveLog.clear()
         clock = ui.settings.timeControl.takeIf { it.hasClock }?.let { GameClock(it) }
+        recentEngineEvals.clear()
+        engineHasOfferedDraw = false
+        needsUciNewGame = true
         ui = ui.copy(
+            maiaUnavailable = false, safetyNetInterventions = 0,
+            pendingDrawOffer = false, drawDeclined = false,
+            evalCp = null, evalMate = null,
             position = startPosition,
             selected = null, legalTargets = emptySet(), lastMove = null, checkedKing = null,
             hints = emptyList(), blunderWarning = null,
@@ -632,6 +927,14 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             blackClockMs = clock?.remaining(Piece.Color.black),
             status = if (board.position.sideToMove == humanColor) s(R.string.your_turn) else thinkingLabel(ui.opponent),
         )
+        // La position de départ peut être DÉJÀ finie — « Jouer à partir d'ici »
+        // depuis la position finale d'une partie. L'annoncer vaut mieux que
+        // d'afficher « à vous de jouer » indéfiniment.
+        val state = board.state
+        if (state is Board.State.Checkmate || state is Board.State.Draw) {
+            refresh(null)
+            return
+        }
         startClockForSideToMove()
         // L'utilisateur peut avoir les Noirs : c'est alors au moteur d'ouvrir.
         if (board.position.sideToMove != humanColor) askOpponent()
@@ -643,18 +946,20 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         val c = clock ?: return
         c.start(board.position.sideToMove, System.currentTimeMillis())
         ticker?.cancel()
-        ticker = viewModelScope.launch {
-            while (true) {
-                kotlinx.coroutines.delay(100)
-                val now = System.currentTimeMillis()
-                c.tick(now)
-                ui = ui.copy(
-                    whiteClockMs = c.remaining(Piece.Color.white),
-                    blackClockMs = c.remaining(Piece.Color.black),
-                )
-                val flagged = Piece.Color.entries.firstOrNull { c.flagged(it) }
-                if (flagged != null) { flag(flagged); return@launch }
-            }
+        ticker = viewModelScope.launch { tickLoop(c) }
+    }
+
+    private suspend fun tickLoop(c: GameClock) {
+        while (true) {
+            kotlinx.coroutines.delay(100)
+            val now = System.currentTimeMillis()
+            c.tick(now)
+            ui = ui.copy(
+                whiteClockMs = c.remaining(Piece.Color.white),
+                blackClockMs = c.remaining(Piece.Color.black),
+            )
+            val flagged = Piece.Color.entries.firstOrNull { c.flagged(it) }
+            if (flagged != null) { flag(flagged); return }
         }
     }
 
@@ -668,6 +973,31 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         )
     }
 
+    /**
+     * L'écran disparaît, ou l'app passe en arrière-plan : la pendule
+     * s'arrête, et l'indice avec. Sans cela le drapeau tombait derrière un
+     * autre écran, sans que personne le voie.
+     */
+    fun pauseForBackground() {
+        if (ui.gameOver) return
+        clock?.pause(System.currentTimeMillis())
+        ticker?.cancel()
+        stopHint()
+        ui = ui.copy(
+            whiteClockMs = clock?.remaining(Piece.Color.white),
+            blackClockMs = clock?.remaining(Piece.Color.black),
+        )
+    }
+
+    /** Le retour sur l'écran : la pendule repart où elle en était. */
+    fun resumeFromBackground() {
+        if (ui.gameOver || !ui.started) return
+        val c = clock ?: return
+        c.resume(System.currentTimeMillis())
+        ticker?.cancel()
+        ticker = viewModelScope.launch { tickLoop(c) }
+    }
+
     // MARK: Fin de partie
 
     /** Termine la partie, l'enregistre, et arrête tout ce qui tourne. */
@@ -676,6 +1006,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         gameEpoch++
         ticker?.cancel()
         thinkingJob?.cancel()
+        // Une recherche d'indice dure jusqu'à huit secondes : la laisser
+        // survivre à la partie tiendrait le moteur de toute l'app pour rien.
+        stopHint()
         viewModelScope.launch(Dispatchers.IO) {
             LibraryDatabase.get(getApplication()).autosaves().clear(MODE)
         }
@@ -709,12 +1042,16 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      * il n'a pas d'amour-propre, mais il ne concède pas une partie gagnée.
      */
     fun offerDraw() = viewModelScope.launch {
-        if (ui.gameOver) return@launch
-        val advantage = ui.captured.advantage(humanColor.opposite)
-        if (advantage >= 2) {
-            ui = ui.copy(status = s(R.string.outcome_draw_refused))
-        } else {
+        if (ui.gameOver || ui.thinking) return@launch
+        // Le critère est l'ÉVALUATION, pas le matériel capturé : une position
+        // matériellement égale peut être stratégiquement perdue, et une
+        // position gagnée avec un pion de moins reste gagnée. Sans évaluation
+        // — le moteur n'a pas encore joué — on ne concède rien.
+        val last = recentEngineEvals.lastOrNull()
+        if (last != null && kotlin.math.abs(last) <= 50) {
             finish(s(R.string.outcome_draw_agreed), "1/2-1/2")
+        } else {
+            ui = ui.copy(drawDeclined = true)
         }
     }
 
@@ -731,8 +1068,19 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      */
     fun toggleHint() {
         if (!ui.settings.hintsEnabled || ui.gameOver) return
-        if (ui.hints.isNotEmpty() || hintJob?.isActive == true) { stopHint(); return }
+        if (ui.hintsWanted) { ui = ui.copy(hintsWanted = false); stopHint(); return }
+        ui = ui.copy(hintsWanted = true)
+        startHint()
+    }
 
+    /**
+     * Lance l'analyse d'indice pour la position courante — si c'est bien à
+     * l'utilisateur de jouer et que le moteur n'est pas déjà pris.
+     */
+    private fun startHint() {
+        if (!ui.hintsWanted || ui.gameOver || ui.thinking) return
+        if (board.position.sideToMove != humanColor) return
+        hintJob?.cancel()
         val fen = board.position.fen
         hintJob = viewModelScope.launch {
             val lanByRank = HashMap<Int, String>()
@@ -760,7 +1108,10 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Efface les flèches et rend le moteur. */
+    /**
+     * Efface les flèches et rend le moteur — sans renoncer à l'indice : c'est
+     * `hintsWanted` qui dit si l'utilisateur en veut, et il survit aux coups.
+     */
     private fun stopHint() {
         hintJob?.cancel()
         hintJob = null
@@ -816,4 +1167,60 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Revient à la position vive. */
     fun reviewLive() = review(ui.sanMoves.size)
+
+    /** Va au demi-coup demandé — la liste des coups s'en sert. */
+    fun reviewTo(ply: Int) = review(ply)
+
+    /**
+     * Repart du coup CONSULTÉ : la suite est écartée, et la partie continue
+     * d'ici. Sans confirmation — mais avec huit secondes pour se raviser, ce
+     * qui vaut mieux qu'une boîte de dialogue devant chaque geste.
+     */
+    fun resumeFromReview() {
+        if (!ui.canResumeFromReview) return
+        val ply = ui.displayedPly
+        val discarded = uciLog.drop(ply)
+        if (discarded.isEmpty()) return
+        rebuild(uciLog.take(ply), s(R.string.your_turn))
+        ui = ui.copy(resumeUndo = ResumeUndo(discarded, ply))
+        undoJob?.cancel()
+        undoJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(8_000)
+            ui = ui.copy(resumeUndo = null)
+        }
+    }
+
+    /** Rend les coups que « Reprendre ici » venait d'écarter. */
+    fun cancelResumeFromReview() {
+        val undo = ui.resumeUndo ?: return
+        undoJob?.cancel()
+        ui = ui.copy(resumeUndo = null)
+        rebuild(uciLog.take(undo.atPly) + undo.discarded, null)
+    }
+
+    private fun clearResumeUndo() {
+        undoJob?.cancel()
+        if (ui.resumeUndo != null) ui = ui.copy(resumeUndo = null)
+    }
+
+    /**
+     * La ligne qui résume l'adversaire en fin de partie : contre qui, à quel
+     * niveau, et combien de fois le filet est intervenu.
+     */
+    fun opponentSummaryLine(): String {
+        val profile = ui.opponent
+        val level = ui.level.roundToInt()
+        val base = if (profile != null) {
+            s(R.string.play_summary_character, profile.displayName(getApplication()), level)
+        } else {
+            s(R.string.play_summary_engine, level)
+        }
+        val extra = when {
+            ui.maiaUnavailable -> s(R.string.play_summary_maia_down)
+            ui.safetyNetInterventions > 0 ->
+                q(R.plurals.play_summary_safety_net, ui.safetyNetInterventions, ui.safetyNetInterventions)
+            else -> null
+        }
+        return if (extra != null) "$base · $extra" else base
+    }
 }

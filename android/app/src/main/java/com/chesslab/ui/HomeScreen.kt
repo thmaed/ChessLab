@@ -77,7 +77,7 @@ data class Mode(
 )
 
 private val modes = listOf(
-    Mode(Route.NewGame, "play", R.string.route_play, R.string.home_play_short,
+    Mode(Route.NewGame(), "play", R.string.route_play, R.string.home_play_short,
         R.string.home_play_long, R.string.home_play_sub, Icons.Default.Memory, Palette.accent,
         spot = DiscoverySpot.playTile),
     Mode(Route.TwoPlayerSetup, "two", R.string.route_two_players, R.string.home_two_short,

@@ -46,9 +46,11 @@ class StaleAnswerTest {
         openMode("play")
         awaitTag("commencer")
         // Un personnage plutôt que Stockfish : son inférence prend plus de
-        // temps sur l'émulateur, donc la fenêtre « pendant qu'il calcule » est
-        // assez large pour être visée sans course.
-        compose.onNodeWithTag("adversaire-lea").performClick()
+        // temps, donc la fenêtre « pendant qu'il calcule » est assez large
+        // pour être visée sans course. Les réglages étant mémorisés, l'écran
+        // peut s'ouvrir sur Stockfish : on redemande les personnages.
+        compose.onNodeWithTag("segment-0").performScrollTo().performClick()
+        compose.onNodeWithTag("adversaire-lea").performScrollTo().performClick()
         compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer")
 

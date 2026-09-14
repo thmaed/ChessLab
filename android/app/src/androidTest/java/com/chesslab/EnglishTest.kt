@@ -7,6 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Rule
 import org.junit.rules.RuleChain
@@ -50,6 +51,9 @@ class EnglishTest {
     @Test fun theCharactersSpeakEnglish() {
         openMode("play")
         awaitText("Start", 120_000)
+        // Les réglages sont mémorisés : l'écran peut s'ouvrir sur Stockfish,
+        // et la galerie n'est alors pas là. On demande les personnages.
+        compose.onNodeWithTag("segment-0").performScrollTo().performClick()
         // Le surnom, l'accroche et les étiquettes viennent tous du module
         // maia : s'ils sont en français ici, c'est que ses ressources manquent.
         compose.onNodeWithText("Tornado", substring = true).assertIsDisplayed()

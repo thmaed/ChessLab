@@ -72,6 +72,16 @@ object EngineService {
      * démarrer — l'appelant doit alors le dire à l'utilisateur plutôt que
      * d'attendre.
      */
+    /**
+     * Vrai quand la dernière prise a laissé le moteur bridé : la prise
+     * suivante le relève. Posé par le mode Jouer via [markBridled].
+     */
+    @Volatile
+    private var bridled = false
+
+    /** Le mode Jouer prévient qu'il vient de brider le moteur. */
+    fun markBridled() { bridled = true }
+
     suspend fun <T> use(context: Context, block: suspend (StockfishEngine) -> T): T? =
         mutex.withLock {
             val e = start(context) ?: return@withLock null
@@ -80,6 +90,19 @@ object EngineService {
             if (currentHashMb != fullHashMb) {
                 e.send("setoption name Hash value $fullHashMb")
                 currentHashMb = fullHashMb
+            }
+            // PLEINE PUISSANCE par défaut, à chaque prise du moteur.
+            //
+            // Le mode Jouer le BRIDE (`UCI_Elo`, `Skill Level`) pour tenir le
+            // niveau choisi. Comme un seul Stockfish sert toute l'app, ce
+            // bridage survivrait à la partie : l'analyse, les puzzles et le
+            // laboratoire se retrouveraient à évaluer avec un moteur affaibli,
+            // sans que rien ne le dise. On le relève donc ici, et c'est au
+            // mode Jouer de le reposer avant CHACUNE de ses recherches.
+            if (bridled) {
+                e.send("setoption name UCI_LimitStrength value false")
+                e.send("setoption name Skill Level value 20")
+                bridled = false
             }
             block(e)
         }

@@ -20,6 +20,18 @@ data class TimeControl(
     val hasClock: Boolean get() = initialSeconds > 0
 
     companion object {
+        /**
+         * Une cadence choisie à la main : minutes par joueur et incrément.
+         * Elle ne figure pas dans [presets] — elle se fabrique à la demande.
+         */
+        fun custom(minutes: Int, incrementSeconds: Int) = TimeControl(
+            id = "custom",
+            category = "custom",
+            label = "$minutes+$incrementSeconds",
+            initialSeconds = minutes * 60,
+            incrementSeconds = incrementSeconds,
+        )
+
         val none = TimeControl("none", "none", "—", 0, 0)
         val presets = listOf(
             none,
@@ -34,7 +46,7 @@ data class TimeControl(
             TimeControl("classical_30_30", "classical", "30+30", 1800, 30),
             TimeControl("classical_90_30", "classical", "90+30", 5400, 30),
         )
-        val categories = listOf("none", "bullet", "blitz", "rapid", "classical")
+        val categories = listOf("none", "bullet", "blitz", "rapid", "classical", "custom")
         fun byId(id: String): TimeControl = presets.firstOrNull { it.id == id } ?: none
     }
 }
@@ -43,8 +55,16 @@ data class PlayGameSettings(
     val colorChoice: PlayerColorChoice = PlayerColorChoice.white,
     /** `null` = Stockfish bridé à [level] ; sinon le personnage joué par Maia. */
     val opponentId: String? = "maia",
-    val level: Double = 1500.0,
+    /**
+     * Défaut ACCUEILLANT — « Débutant confirmé », ~1200 — plutôt que la pleine
+     * puissance : un débutant qui démarre sans rien régler ne doit pas
+     * affronter Stockfish à fond.
+     */
+    val level: Double = 1200.0,
     val timeControlId: String = "none",
+    /** Utilisés seulement quand [timeControlId] vaut « custom ». */
+    val customMinutes: Int = 15,
+    val customIncrementSeconds: Int = 0,
     val hintsEnabled: Boolean = true,
     val showEvalBar: Boolean = false,
     val engineResigns: Boolean = true,
@@ -59,9 +79,14 @@ data class PlayGameSettings(
      * c'est son caractère.
      */
     val bookEnabled: Boolean = true,
-    val bookWidth: BookWidth = BookWidth.includeSidelines,
+    val bookWidth: BookWidth = BookWidth.mainLinesOnly,
     /** Position de départ imposée, ou `null` pour la position initiale. */
     val startFen: String? = null,
 ) {
-    val timeControl: TimeControl get() = TimeControl.byId(timeControlId)
+    val timeControl: TimeControl
+        get() = if (timeControlId == "custom") TimeControl.custom(customMinutes, customIncrementSeconds)
+        else TimeControl.byId(timeControlId)
+
+    /** La force du moteur qui correspond au curseur — en mode Stockfish. */
+    val strength: EngineStrength get() = EngineStrength.of(level)
 }

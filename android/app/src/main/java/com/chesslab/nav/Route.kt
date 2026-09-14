@@ -29,7 +29,10 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
      * La CONFIGURATION d'une partie, comme sur iOS : on choisit couleur,
      * adversaire, niveau et cadence AVANT de voir un plateau.
      */
-    data object NewGame : Route(R.string.route_new_game)
+    data class NewGame(
+        /** La position venue d'un autre écran, ou rapportée par l'éditeur. */
+        val startFen: String? = null,
+    ) : Route(if (startFen == null) R.string.route_new_game else R.string.route_continue_game)
 
     /**
      * La partie elle-même. [settings] vient de l'écran de configuration ;
@@ -83,8 +86,9 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data object Help : Route(R.string.route_help)
     /** Les licences des composants embarqués, depuis les réglages. */
     data object Licences : Route(R.string.licences_title)
-    data object Scanner : Route(R.string.route_scanner)
-    data object PositionEditor : Route(R.string.route_editor)
+    /** [forSetup] : la position lue repart vers l'écran de réglage d'une partie. */
+    data class Scanner(val forSetup: Boolean = false) : Route(R.string.route_scanner)
+    data class PositionEditor(val forSetup: Boolean = false) : Route(R.string.route_editor)
 
     /**
      * Une séance d'entraînement. [courseId] n'est rempli que pour « une

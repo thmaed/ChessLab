@@ -55,13 +55,18 @@ fun PlayScreen(
     onAnalyze: (String) -> Unit = {},
     onAnalyzeGame: (String) -> Unit = {},
     onOpenLab: (String) -> Unit = {},
+    /** Revenir à l'accueil depuis le panneau de fin de partie. */
+    onHome: () -> Unit = {},
     model: PlayViewModel = viewModel(),
 ) {
     val ui = model.ui
     var showMoves by remember { mutableStateOf(false) }
     var confirmResign by remember { mutableStateOf(false) }
 
+    // La partie ne se relance PAS en revenant sur l'écran : aller voir
+    // l'analyse et revenir détruisait la partie en cours.
     LaunchedEffect(settings, resume, startFen) {
+        if (ui.started && settings == null && !resume && startFen == null) return@LaunchedEffect
         when {
             resume -> model.resumeSaved()
             settings != null -> model.start(settings)
@@ -75,6 +80,24 @@ fun PlayScreen(
                         PlayerColorChoice.black else PlayerColorChoice.white,
                 )
             )
+        }
+    }
+
+    // La pendule s'arrête quand l'écran s'en va ou que l'app passe derrière.
+    // Sans cela, le drapeau tombait pendant qu'on regardait l'analyse.
+    val owner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(owner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> model.pauseForBackground()
+                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> model.resumeFromBackground()
+                else -> Unit
+            }
+        }
+        owner.lifecycle.addObserver(observer)
+        onDispose {
+            owner.lifecycle.removeObserver(observer)
+            model.pauseForBackground()
         }
     }
 
@@ -104,7 +127,7 @@ fun PlayScreen(
     Column(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
         PlayerRow(
             modifier = gutter,
-            name = ui.opponent?.displayName(LocalContext.current) ?: stringResource(R.string.stockfish),
+            name = ui.opponent?.firstName ?: stringResource(R.string.play_computer),
             color = opponentColor,
             active = !ui.gameOver && ui.position.sideToMove == opponentColor,
             captured = ui.captured.captures(opponentColor),
@@ -126,9 +149,16 @@ fun PlayScreen(
                 // Pas de flèches en CONSULTATION d'un coup passé : elles
                 // porteraient sur une position qu'on ne joue pas. Comme iOS.
                 arrows = if (ui.isReviewing) emptyList() else ui.hints,
-                enabled = !ui.thinking && !ui.gameOver,
+                // En consultation, le plateau est une PHOTO : on n'y joue pas,
+                // et le toucher ne ramène pas au direct par surprise.
+                enabled = !ui.thinking && !ui.gameOver && !ui.isReviewing,
                 onSquareTap = model::onSquareTap,
             )
+        }
+
+        if (ui.settings.showEvalBar) {
+            Spacer(Modifier.height(6.dp))
+            EvalBar(gutter, ui.evalCp, ui.evalMate)
         }
 
         Spacer(Modifier.height(6.dp))
@@ -146,15 +176,18 @@ fun PlayScreen(
         Spacer(Modifier.height(8.dp))
         if (ui.gameOver) GameOverPanel(
             gutter, ui.outcome ?: ui.status,
+            summary = model.opponentSummaryLine(),
             onAnalyze = { onAnalyzeGame(model.currentPgn()) },
             onNewGame = { model.newGame() },
+            onHome = onHome,
         )
         else ControlBar(
             modifier = gutter,
             ui = ui,
             onPrevious = model::reviewPrevious,
             onNext = model::reviewNext,
-            onResumeHere = model::reviewLive,
+            onResumeHere = model::resumeFromReview,
+            onCancelResume = model::cancelResumeFromReview,
             onHint = { model.toggleHint() },
             onTakeback = { model.takeback() },
             onMoves = { showMoves = true },
@@ -169,7 +202,44 @@ fun PlayScreen(
         )
     }
 
-    if (ui.pendingPromotion != null) PromotionDialog(model::completePromotion)
+    if (ui.pendingPromotion != null) {
+        PromotionDialog(onPick = model::completePromotion, onCancel = model::cancelPromotion)
+    }
+
+    // Le moteur propose nulle : on répond, et l'offre disparaît.
+    if (ui.pendingDrawOffer) {
+        AlertDialog(
+            onDismissRequest = model::declineDrawOffer,
+            title = { Text(stringResource(R.string.play_draw_offered), color = Palette.textPrimary) },
+            text = { Text(stringResource(R.string.play_draw_offered_body), color = Palette.textSecondary) },
+            confirmButton = {
+                TextButton(onClick = model::acceptDrawOffer, modifier = Modifier.testTag("nulle-accepter")) {
+                    Text(stringResource(R.string.play_accept), color = Palette.accent)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = model::declineDrawOffer) {
+                    Text(stringResource(R.string.play_decline), color = Palette.textSecondary)
+                }
+            },
+            containerColor = Palette.surfaceElevated,
+        )
+    }
+
+    // Le refus, dit une fois : sans cela il se perdait dans la ligne d'état.
+    if (ui.drawDeclined) {
+        AlertDialog(
+            onDismissRequest = model::dismissDrawDeclined,
+            title = { Text(stringResource(R.string.play_draw_declined), color = Palette.textPrimary) },
+            text = { Text(stringResource(R.string.play_draw_declined_body), color = Palette.textSecondary) },
+            confirmButton = {
+                TextButton(onClick = model::dismissDrawDeclined) {
+                    Text(stringResource(android.R.string.ok), color = Palette.accent)
+                }
+            },
+            containerColor = Palette.surfaceElevated,
+        )
+    }
 
     ui.blunderWarning?.let { severity ->
         val message = when (severity) {
@@ -197,7 +267,11 @@ fun PlayScreen(
     }
 
     if (showMoves) {
-        MoveListSheet(ui.sanMoves, ui.displayedPly) { showMoves = false }
+        MoveListSheet(
+            moves = ui.sanMoves, currentPly = ui.displayedPly,
+            onPick = { ply -> model.reviewTo(ply); showMoves = false },
+            onClose = { showMoves = false },
+        )
     }
 
     if (confirmResign) {
@@ -318,6 +392,7 @@ private fun ControlBar(
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     onResumeHere: () -> Unit,
+    onCancelResume: () -> Unit,
     onHint: () -> Unit,
     onTakeback: () -> Unit,
     onMoves: () -> Unit,
@@ -331,7 +406,9 @@ private fun ControlBar(
         ControlButton(Icons.Default.ChevronRight, stringResource(R.string.next_move),
             enabled = ui.displayedPly < ui.totalPlies, tag = "suivant", onClick = onNext)
 
-        if (ui.isReviewing) {
+        // « Reprendre ici » ne s'offre que si la reprise est POSSIBLE : avec
+        // une pendule, on ne rend pas du temps écoulé.
+        if (ui.canResumeFromReview) {
             Spacer(Modifier.width(10.dp))
             Text(
                 stringResource(R.string.play_resume_here),
@@ -344,6 +421,21 @@ private fun ControlBar(
                     .testTag("reprendre-ici"),
             )
         }
+        // Huit secondes pour se raviser : la reprise écarte des coups sans
+        // rien demander, mais elle ne les jette pas tout de suite.
+        ui.resumeUndo?.let { undo ->
+            Spacer(Modifier.width(10.dp))
+            Text(
+                stringResource(R.string.play_resume_undo),
+                fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.warning,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .border(1.dp, Palette.warning.copy(alpha = 0.6f), CircleShape)
+                    .clickable(onClick = onCancelResume)
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .testTag("annuler-reprise"),
+            )
+        }
 
         Spacer(Modifier.weight(1f))
         // Annuler n'a de sens que sans pendule : on ne reprend pas du temps
@@ -354,9 +446,12 @@ private fun ControlBar(
                 enabled = ui.canTakeback, tag = "annuler", onClick = onTakeback)
             Spacer(Modifier.width(10.dp))
         }
+        // L'indice est un ÉTAT : allumé, il suit la partie et se repose après
+        // chaque coup. Le bouton le dit par son fond, pas seulement sa teinte.
         ControlButton(Icons.Default.Lightbulb, stringResource(R.string.train_hint),
             enabled = ui.settings.hintsEnabled && !ui.gameOver,
-            tint = if (ui.hints.isNotEmpty()) Palette.accent else Palette.textPrimary,
+            tint = if (ui.hintsWanted) Palette.background else Palette.textPrimary,
+            background = if (ui.hintsWanted) Palette.accent else Palette.surfaceElevated,
             tag = "indice", onClick = onHint)
         if (!ui.isReviewing) {
             Spacer(Modifier.width(10.dp))
@@ -378,6 +473,8 @@ private fun ControlButton(
     label: String,
     text: String? = null,
     tint: Color = Palette.textPrimary,
+    /** Le fond : c'est lui qui dit qu'un bouton à BASCULE est allumé. */
+    background: Color = Palette.surfaceElevated,
     enabled: Boolean = true,
     tag: String,
     onClick: () -> Unit,
@@ -386,7 +483,7 @@ private fun ControlButton(
         Modifier
             .size(46.dp)
             .clip(CircleShape)
-            .background(Palette.surfaceElevated)
+            .background(background)
             .border(1.dp, Palette.stroke, CircleShape)
             .clickable(enabled = enabled, onClick = onClick)
             .testTag(tag),
@@ -403,10 +500,12 @@ private fun ControlButton(
 private fun GameOverPanel(
     modifier: Modifier,
     message: String,
+    summary: String,
     onAnalyze: () -> Unit,
     onNewGame: () -> Unit,
+    onHome: () -> Unit,
 ) {
-    Row(
+    Column(
         modifier
             .fillMaxWidth()
             .clip(ControlShape)
@@ -414,11 +513,27 @@ private fun GameOverPanel(
             .subtleBorder(ControlShape)
             .padding(14.dp)
             .testTag("fin-de-partie"),
-        verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(message, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
-            color = Palette.textPrimary, modifier = Modifier.weight(1f))
-        Spacer(Modifier.width(12.dp))
+        Text(message, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+        // Contre qui, à quel niveau, et ce que le filet a corrigé : la partie
+        // ne se juge pas sans savoir qui la jouait en face.
+        Text(
+            summary, fontSize = 11.sp, color = Palette.textTertiary,
+            modifier = Modifier.padding(top = 2.dp).testTag("resume-adversaire"),
+        )
+        Spacer(Modifier.height(10.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            stringResource(R.string.play_home),
+            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textSecondary,
+            modifier = Modifier
+                .clip(CircleShape)
+                .border(1.dp, Palette.stroke, CircleShape)
+                .clickable(onClick = onHome)
+                .padding(horizontal = 14.dp, vertical = 8.dp)
+                .testTag("accueil"),
+        )
+        Spacer(Modifier.weight(1f))
         // « Analyser » mène la partie qu'on vient de jouer vers son bilan :
         // c'est le moment où on veut savoir ce qui s'est passé.
         Text(
@@ -442,13 +557,42 @@ private fun GameOverPanel(
                 .padding(horizontal = 14.dp, vertical = 8.dp)
                 .testTag("nouvelle"),
         )
+        }
+    }
+}
+
+/**
+ * La barre d'évaluation : qui mène, et de combien. Le réglage existait sans
+ * que rien ne la dessine — un interrupteur sans effet.
+ */
+@Composable
+private fun EvalBar(modifier: Modifier, cp: Int?, mate: Int?) {
+    val share = when {
+        mate != null -> if (mate > 0) 1f else 0f
+        cp != null -> (com.chesslab.analysis.EvalConversion.fromCentipawns(cp) / 100).toFloat()
+        else -> 0.5f
+    }.coerceIn(0.03f, 0.97f)
+    Box(
+        modifier
+            .fillMaxWidth()
+            .height(8.dp)
+            .clip(CircleShape)
+            .background(Palette.surfaceElevated)
+            .testTag("barre-eval")
+    ) {
+        Box(Modifier.fillMaxWidth(share).fillMaxHeight().background(Color.White.copy(alpha = 0.92f)))
     }
 }
 
 /** La liste des coups, en feuille : deux colonnes par numéro. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MoveListSheet(moves: List<String>, currentPly: Int, onClose: () -> Unit) {
+private fun MoveListSheet(
+    moves: List<String>,
+    currentPly: Int,
+    onPick: (Int) -> Unit,
+    onClose: () -> Unit,
+) {
     ModalBottomSheet(onDismissRequest = onClose, containerColor = Palette.surface) {
         Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 28.dp)) {
             Text(stringResource(R.string.play_moves), fontSize = 16.sp,
@@ -468,7 +612,10 @@ private fun MoveListSheet(moves: List<String>, currentPly: Int, onClose: () -> U
                                     sanText(san), fontSize = 14.sp,
                                     fontWeight = if (ply == currentPly) FontWeight.Bold else FontWeight.Normal,
                                     color = if (ply == currentPly) Palette.accent else Palette.textPrimary,
-                                    modifier = Modifier.weight(1f).testTag("coup-${ply - 1}"),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .clickable { onPick(ply) }
+                                        .testTag("coup-${ply - 1}"),
                                 )
                             }
                             if (pair.size == 1) Spacer(Modifier.weight(1f))
@@ -481,9 +628,11 @@ private fun MoveListSheet(moves: List<String>, currentPly: Int, onClose: () -> U
 }
 
 @Composable
-fun PromotionDialog(onPick: (Piece.Kind) -> Unit) {
+fun PromotionDialog(onPick: (Piece.Kind) -> Unit, onCancel: () -> Unit = {}) {
     AlertDialog(
-        onDismissRequest = { onPick(Piece.Kind.queen) },
+        // Toucher à côté ANNULE le coup. Promouvoir en dame par défaut, c'est
+        // jouer à la place de quelqu'un qui n'a pas encore choisi.
+        onDismissRequest = onCancel,
         title = { Text(stringResource(R.string.theme_promotion)) },
         text = { Text(stringResource(R.string.promote_to)) },
         confirmButton = {

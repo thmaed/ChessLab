@@ -70,11 +70,19 @@ class AppTest {
      * [opponent] : le repère d'une vignette de personnage, ou `null` pour
      * Stockfish (qui vit derrière le contrôle segmenté).
      */
+    /**
+     * Ouvre l'écran de réglage et lance une partie.
+     *
+     * Les réglages sont MÉMORISÉS d'une partie à l'autre depuis le 14/09 :
+     * l'écran peut donc s'ouvrir sur Stockfish, et la galerie des personnages
+     * n'est alors pas affichée. On choisit donc explicitement le camp avant
+     * de désigner un adversaire — ce que fait aussi l'utilisateur.
+     */
     private fun startGame(opponent: String? = null) {
         open("play")
         awaitTag("commencer", 120_000)
-        if (opponent == null) compose.onNodeWithTag("segment-1").performClick()
-        else compose.onNodeWithTag(opponent).performClick()
+        compose.onNodeWithTag(if (opponent == null) "segment-1" else "segment-0").performScrollTo().performClick()
+        if (opponent != null) compose.onNodeWithTag(opponent).performScrollTo().performClick()
         compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer", 120_000)
     }

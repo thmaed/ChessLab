@@ -114,9 +114,14 @@ class QuickSwitchTest {
         awaitTag("case-d4", 30_000)
 
         // Et de l'analyse, on repart jouer CETTE position contre l'ordinateur.
+        // Depuis le 14/09 on passe par l'écran de RÉGLAGE, comme sur iOS :
+        // on choisit son adversaire avant de jouer la position, au lieu de
+        // repartir en silence aux derniers réglages.
         switchTo("Contre l'ordinateur")
+        awaitTag("commencer", 60_000)
+        compose.onNodeWithTag("commencer").performClick()
         awaitTag("case-d4", 120_000)
-        // Le pion est bien en d4 : la partie n'a pas recommencé de zéro.
+        // Le pion est bien en d4 : la position a suivi.
         compose.onNodeWithTag("case-d4").assertIsDisplayed()
     }
 }

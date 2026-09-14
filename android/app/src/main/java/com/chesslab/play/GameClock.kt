@@ -9,7 +9,7 @@ import chesskit.Piece
  * intervalle régulier. C'est ce qui la rend testable — une pendule qui
  * s'appuie sur un minuteur interne ne se vérifie qu'en attendant.
  */
-class GameClock(private val control: TimeControl) {
+class GameClock(val control: TimeControl) {
 
     private var whiteMs = control.initialSeconds * 1000L
     private var blackMs = control.initialSeconds * 1000L
@@ -45,6 +45,30 @@ class GameClock(private val control: TimeControl) {
         if (remaining(color) > 0) add(color, control.incrementSeconds * 1000L)
         running = null
     }
+
+    /**
+     * Suspend le décompte SANS rendre la main : le camp qui jouait reste le
+     * même, on ne compte simplement plus. Sert quand l'écran disparaît ou que
+     * l'app passe en arrière-plan — contre un moteur local, perdre au temps
+     * parce qu'on a répondu à un message serait absurde.
+     */
+    fun pause(now: Long) {
+        if (!hasClock) return
+        tick(now)
+        paused = running
+        running = null
+    }
+
+    /** Reprend le décompte du camp suspendu, s'il y en avait un. */
+    fun resume(now: Long) {
+        if (!hasClock) return
+        val color = paused ?: return
+        paused = null
+        running = color
+        lastTick = now
+    }
+
+    private var paused: Piece.Color? = null
 
     /** Reporte le temps écoulé depuis le dernier appel sur le camp qui joue. */
     fun tick(now: Long) {
