@@ -82,16 +82,12 @@ fun TwoPlayerSetupScreen(
       ) {
         SettingsSection(stringResource(R.string.two_setup_players), Icons.Default.People) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                BasicTextFieldWithPlaceholder(
-                    value = white,
-                    placeholder = stringResource(R.string.color_white),
-                    tag = "nom-blancs",
-                ) { white = it }
-                BasicTextFieldWithPlaceholder(
-                    value = black,
-                    placeholder = stringResource(R.string.color_black),
-                    tag = "nom-noirs",
-                ) { black = it }
+                // Le champ porte son étiquette AU-DESSUS et non seulement en
+                // filigrane : dès qu'un nom est tapé, le filigrane disparaît
+                // et plus rien ne dit lequel des deux champs est celui des
+                // Blancs.
+                NameField(stringResource(R.string.color_white), white, "nom-blancs") { white = it }
+                NameField(stringResource(R.string.color_black), black, "nom-noirs") { black = it }
                 // Retaper deux noms pour les échanger est la friction typique
                 // d'une revanche décidée sur place.
                 Row(
@@ -261,6 +257,18 @@ private fun timeCategoryIcon(category: String) = when (category) {
     "classical" -> Icons.Default.FlagCircle
     "custom" -> Icons.Default.Tune
     else -> Icons.Default.AllInclusive
+}
+
+/** Un nom de joueur, son étiquette au-dessus. */
+@Composable
+private fun NameField(label: String, value: String, tag: String, onChange: (String) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(
+            label.uppercase(),
+            fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Palette.textTertiary,
+        )
+        BasicTextFieldWithPlaceholder(value = value, placeholder = label, tag = tag, onChange = onChange)
+    }
 }
 
 /** Un nombre qu'on règle à la main, entre deux bornes. */

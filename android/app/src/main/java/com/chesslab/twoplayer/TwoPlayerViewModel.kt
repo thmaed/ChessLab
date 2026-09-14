@@ -208,14 +208,12 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * La revanche : les mêmes réglages, les deux joueurs échangent les
-     * couleurs — et on repart de la position STANDARD, pas de celle qu'un
-     * autre mode avait imposée à la partie précédente.
+     * La revanche : les mêmes réglages — position de départ comprise —, les
+     * deux joueurs échangent les couleurs.
      */
     fun rematchSettings(): TwoPlayerSettings = ui.settings.copy(
         whiteName = ui.settings.blackName,
         blackName = ui.settings.whiteName,
-        startFen = null,
     )
 
     // MARK: Pendule
