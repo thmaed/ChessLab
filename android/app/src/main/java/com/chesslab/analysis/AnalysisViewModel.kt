@@ -559,7 +559,12 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                         e.send("setoption name MultiPV value 3")
                         e.send("position fen $fen")
                         val lines = HashMap<Int, RankedLine>()
-                        e.search("go depth 18", timeoutMs = 30_000) { line ->
+                        // La profondeur de l'analyse EN CONTINU : rabotée
+                        // quand l'appareil chauffe (voir `ThermalMonitor`),
+                        // car cette position est réévaluée à chaque
+                        // navigation.
+                        val depth = com.chesslab.engine.ThermalMonitor.liveDepth(18)
+                        e.search("go depth $depth", timeoutMs = 30_000) { line ->
                             parseInfo(line)?.let { info ->
                                 lines[info.rank] = info.line
                                 if (info.rank == 1) publishLive(position, info, lines)
@@ -704,7 +709,11 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         }
         engine.send("position fen ${position.fen}")
         val lines = HashMap<Int, RankedLine>()
-        engine.search("go nodes $REVIEW_NODES movetime $REVIEW_CAP_MS", timeoutMs = 20_000) { line ->
+        // La surchauffe rabote le TRAVAIL demandé — les nœuds — et non le
+        // temps accordé : le verdict reste comparable d'une exécution à
+        // l'autre, seulement rendu sur une recherche moins profonde.
+        val reviewNodes = com.chesslab.engine.ThermalMonitor.nodes(REVIEW_NODES.toLong())
+        engine.search("go nodes $reviewNodes movetime $REVIEW_CAP_MS", timeoutMs = 20_000) { line ->
             parseInfo(line)?.let { lines[it.rank] = it.line }
         }
         val best = lines[1]
@@ -928,7 +937,8 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     ): Map<Int, RankedLine> {
         engine.send("position fen ${position.fen}")
         val lines = HashMap<Int, RankedLine>()
-        engine.search("go nodes $PUZZLE_NODES movetime $PUZZLE_CAP_MS", timeoutMs = 30_000) { line ->
+        val puzzleNodes = com.chesslab.engine.ThermalMonitor.nodes(PUZZLE_NODES.toLong())
+        engine.search("go nodes $puzzleNodes movetime $PUZZLE_CAP_MS", timeoutMs = 30_000) { line ->
             parseInfo(line)?.let { lines[it.rank] = it.line }
         }
         return lines

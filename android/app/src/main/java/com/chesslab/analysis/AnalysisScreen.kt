@@ -110,6 +110,7 @@ fun AnalysisScreen(
 
     BoardScaffold(
         header = {
+            com.chesslab.ui.ThermalBadge()
             OpeningHeader(ui)
             StatusRow(ui.status, busy = ui.thinking)
             Spacer(Modifier.height(8.dp))

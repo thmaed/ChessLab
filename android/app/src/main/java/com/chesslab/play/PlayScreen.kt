@@ -139,6 +139,9 @@ fun PlayScreen(
     // paysage poussait les lignes joueurs, les commandes et l'état hors de
     // l'écran — on voyait un plateau et rien d'autre.
     val banner: @Composable () -> Unit = {
+        // Le bandeau thermique n'occupe aucune place tant que l'appareil est
+        // froid ; quand il chauffe, il dit POURQUOI le moteur joue moins bien.
+        ThermalBadge(gutter)
         if (ui.engineUnavailable) {
             EngineBanner(gutter, ui.retryingEngine, onRetry = { model.retryEngine() })
             Spacer(Modifier.height(6.dp))

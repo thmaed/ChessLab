@@ -30,8 +30,16 @@ object EngineService {
     var identity: String? = null
         private set
 
+    /**
+     * Les fils du moteur : tous les cœurs sauf un, plafonné à quatre — et UN
+     * SEUL quand l'appareil chauffe (voir [ThermalMonitor]). C'est lu au
+     * DÉMARRAGE du moteur : changer `Threads` en pleine recherche n'a pas de
+     * comportement défini côté UCI.
+     */
     val threads: Int
-        get() = (Runtime.getRuntime().availableProcessors() - 1).coerceIn(1, 4)
+        get() = ThermalMonitor.threads(
+            (Runtime.getRuntime().availableProcessors() - 1).coerceIn(1, 4)
+        )
 
     /**
      * La taille de la table de transposition, en mégaoctets.
@@ -168,6 +176,9 @@ object EngineService {
         if (failed) return@withContext null
 
         val app = context.applicationContext
+        // L'écoute thermique se branche avec le moteur : c'est lui qu'elle
+        // sert à brider, et il n'y a rien à surveiller tant qu'il dort.
+        ThermalMonitor.start(app)
         val assets = app.assets
         val nets = assets.list("")!!.filter { it.endsWith(".nnue") }
         val path = StockfishEngine.prepare(nets, app.filesDir) { assets.open(it) }

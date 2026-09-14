@@ -178,7 +178,12 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
             } else {
                 EngineService.use(getApplication()) { e ->
                     e.send("position fen ${board.position.fen}")
-                    e.search("go movetime ${ui.movetimeMs}", timeoutMs = 60_000)
+                    // Une série fait tourner le moteur des minutes durant :
+                    // c'est l'usage qui fait le plus chauffer l'appareil, et
+                    // celui où lever le pied soi-même vaut mieux que se
+                    // faire brider par le système.
+                    val budget = com.chesslab.engine.ThermalMonitor.movetimeMs(ui.movetimeMs)
+                    e.search("go movetime $budget", timeoutMs = 60_000)
                 }?.split(" ")?.getOrNull(1)
             }
         } ?: return false

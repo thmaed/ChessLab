@@ -51,6 +51,7 @@ fun LabScreen(
 
     BoardScaffold(
         header = {
+            com.chesslab.ui.ThermalBadge()
             Scoreboard(ui)
             Spacer(Modifier.height(8.dp))
             SidePicker(stringResource(R.string.lab_side_a), ui.sideA.profile, "a", model::setSideA)

@@ -262,6 +262,13 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      * tomber au drapeau sur un seul coup.
      */
     private fun movetimeMs(): Int {
+        val budget = baseMovetimeMs()
+        // Quand l'appareil chauffe, on rend la moitié du temps plutôt que de
+        // laisser le système brider le processeur à notre place.
+        return com.chesslab.engine.ThermalMonitor.movetimeMs(budget)
+    }
+
+    private fun baseMovetimeMs(): Int {
         val c = clock ?: return 900
         if (!c.control.hasClock) return 900
         val remaining = c.remaining(board.position.sideToMove) / 1000.0
