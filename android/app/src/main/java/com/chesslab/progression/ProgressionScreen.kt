@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronRight
@@ -66,7 +67,15 @@ fun ProgressionScreen(onTrainTheme: (String) -> Unit = {}) {
         }
     }
 
-    val rows = puzzleRows ?: return
+    // Le temps que la base réponde, l'écran DIT qu'il travaille. Il rendait
+    // une page blanche : impossible de distinguer « rien à montrer » de
+    // « pas encore lu », et c'est la première impression de l'écran.
+    val rows = puzzleRows ?: run {
+        Box(Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+            androidx.compose.material3.CircularProgressIndicator(color = Palette.accent)
+        }
+        return
+    }
     val now = System.currentTimeMillis()
     val cutoff = range.cutoff(now)
     val inRange = if (cutoff == null) games else games.filter { it.playedAt >= cutoff }

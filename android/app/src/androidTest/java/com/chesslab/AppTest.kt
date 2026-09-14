@@ -1,6 +1,8 @@
 package com.chesslab
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -39,6 +41,22 @@ class AppTest {
     private fun awaitTag(tag: String, timeoutMs: Long = 60_000) =
         compose.waitUntil(timeoutMs) {
             compose.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty()
+        }
+
+    /**
+     * Attend que ce soit au camp [name] de jouer, dans une partie à deux.
+     *
+     * Le mode ne porte plus de ligne d'état depuis l'alignement sur iOS : le
+     * trait se lit sur la ligne du joueur DU BAS, qui est justement celle du
+     * camp au trait (le plateau pivote vers lui). C'est ce que voit un
+     * humain, donc c'est ce que vérifie le test.
+     */
+    private fun awaitTurn(name: String, timeoutMs: Long = 20_000) =
+        compose.waitUntil(timeoutMs) {
+            compose.onAllNodes(
+                hasTestTag("joueur-bas") and hasText(name, substring = true, ignoreCase = true),
+                useUnmergedTree = false,
+            ).fetchSemanticsNodes().isNotEmpty()
         }
 
     /**
@@ -118,17 +136,82 @@ class AppTest {
 
     @Test fun twoPlayersAlternate() {
         openTwoPlayers()
-        awaitText("Aux blancs de jouer")
+        awaitTurn("Blancs")
 
         compose.onNodeWithTag("case-d2").performClick()
         compose.onNodeWithTag("case-d4").performClick()
-        awaitText("Aux noirs de jouer")
+        awaitTurn("Noirs")
 
         // le plateau s'est retourné : d7 reste cliquable par son nom
         compose.onNodeWithTag("case-d7").performClick()
         compose.onNodeWithTag("case-d5").performClick()
-        awaitText("Aux blancs de jouer")
-        awaitTag("coup-1")
+        awaitTurn("Blancs")
+        // La notation reste MASQUÉE pendant la partie (parti pris d'iOS) ;
+        // ce qui prouve que les coups ont été joués, c'est la barre de
+        // consultation, qui n'apparaît qu'à partir du premier.
+        awaitTag("transport")
+    }
+
+    /**
+     * Le mode Deux joueurs sait finir une partie autrement que par le mat :
+     * l'un des deux abandonne, et c'est SON nom qui décide du résultat.
+     */
+    @Test fun twoPlayersCanResign() {
+        openTwoPlayers()
+        awaitTurn("Blancs")
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+        awaitTurn("Noirs")
+
+        compose.onNodeWithTag("abandonner-bas").performClick()
+        awaitTag("abandon-black")
+        compose.onNodeWithTag("abandon-black").performClick()
+
+        awaitTag("fin-de-partie")
+        awaitText("Blancs a gagné")
+        // La notation se révèle enfin, sur l'écran de résultat.
+        compose.onNodeWithTag("notation-finale").assertIsDisplayed()
+    }
+
+    /** La nulle par accord : deux joueurs d'accord, et rien d'autre à décider. */
+    @Test fun twoPlayersCanAgreeToADraw() {
+        openTwoPlayers()
+        awaitTurn("Blancs")
+        compose.onNodeWithTag("case-d2").performClick()
+        compose.onNodeWithTag("case-d4").performClick()
+        awaitTurn("Noirs")
+
+        compose.onNodeWithTag("nulle-bas").performClick()
+        awaitTag("nulle-confirmer")
+        compose.onNodeWithTag("nulle-confirmer").performClick()
+
+        awaitTag("fin-de-partie")
+        awaitText("Partie nulle")
+    }
+
+    /**
+     * On remonte la partie avec la barre de consultation, puis on la RELANCE
+     * depuis le coup consulté : les coups suivants sont écartés, et le pion
+     * qu'on venait de jouer n'est plus là.
+     */
+    @Test fun twoPlayersCanResumeFromAPastMove() {
+        openTwoPlayers()
+        awaitTurn("Blancs")
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+        awaitTurn("Noirs")
+        compose.onNodeWithTag("case-e7").performClick()
+        compose.onNodeWithTag("case-e5").performClick()
+        awaitTurn("Blancs")
+
+        compose.onNodeWithTag("precedent").performClick()
+        awaitTag("reprendre-ici")
+        compose.onNodeWithTag("reprendre-ici").performClick()
+
+        // La partie est repartie après 1. e4 : c'est de nouveau aux Noirs,
+        // et l'annulation est offerte pendant quelques secondes.
+        awaitTurn("Noirs")
+        awaitTag("annuler-reprise")
     }
 
     @Test fun analysingAPgnShowsAnEvaluation() {
@@ -371,7 +454,7 @@ class AppTest {
 
     @Test fun aFinishedGameLandsInTheLibrary() {
         openTwoPlayers()
-        awaitText("Aux blancs de jouer")
+        awaitTurn("Blancs")
 
         // le mat du berger, en sept demi-coups
         val moves = listOf(
@@ -384,7 +467,8 @@ class AppTest {
             compose.onNodeWithTag("case-$from").performClick()
             compose.onNodeWithTag("case-$to").performClick()
         }
-        awaitText("Échec et mat — les blancs gagnent", 10_000)
+        // Le résultat porte les NOMS des joueurs, comme sur iOS.
+        awaitText("Blancs a gagné", 10_000)
 
         // la partie doit se retrouver dans la bibliothèque de l'écran Analyser
         compose.onNodeWithTag("retour").performClick()
@@ -412,12 +496,19 @@ class AppTest {
 
     @Test fun progressionShowsWhatTheAppHasSeen() {
         compose.onNodeWithTag("progression").performClick()
-        // Selon ce que la suite a déjà laissé dans la bibliothèque, l'écran
-        // montre le bilan contre l'ordinateur, les puzzles — ou dit
-        // honnêtement qu'il n'a rien à montrer. Jamais des zéros.
-        compose.waitUntil(10_000) {
-            listOf("Contre l'ordinateur", "Puzzles", "Rien à afficher").any { text ->
-                compose.onAllNodesWithText(text, substring = true).fetchSemanticsNodes().isNotEmpty()
+        // Selon ce que la suite a déjà laissé derrière elle, l'écran montre le
+        // bilan contre l'ordinateur, les puzzles, la mémorisation — ou dit
+        // honnêtement qu'il n'a rien à montrer. Jamais des zéros, et jamais
+        // rien du tout : la carte « Mémorisation » manquait à cette liste, et
+        // le test tombait dès qu'une séance d'ouvertures précédait la première
+        // partie enregistrée.
+        // `ignoreCase` n'est pas un détail : les titres de section sont écrits
+        // EN CAPITALES, et la comparaison sensible à la casse ne trouvait
+        // « Contre l'ordinateur » que lorsqu'une autre carte le sauvait.
+        compose.waitUntil(30_000) {
+            listOf("Contre l'ordinateur", "Puzzles", "Mémorisation", "Rien à afficher").any { text ->
+                compose.onAllNodesWithText(text, substring = true, ignoreCase = true)
+                    .fetchSemanticsNodes().isNotEmpty()
             }
         }
     }
@@ -476,7 +567,7 @@ class AppTest {
 
     @Test fun leJeuResteJouableEnPaysage() {
         openTwoPlayers()
-        awaitText("Aux blancs de jouer")
+        awaitTurn("Blancs")
 
         compose.activityRule.scenario.onActivity {
             it.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -490,14 +581,14 @@ class AppTest {
         compose.onNodeWithTag("case-h8").assertIsDisplayed()
         compose.onNodeWithTag("case-d2").performClick()
         compose.onNodeWithTag("case-d4").performClick()
-        awaitText("Aux noirs de jouer")
+        awaitTurn("Noirs")
 
         compose.activityRule.scenario.onActivity {
             it.requestedOrientation = android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         }
         compose.waitForIdle()
         // Le coup survit à la rotation : l'activité ne se recrée pas.
-        awaitText("Aux noirs de jouer")
+        awaitTurn("Noirs")
         compose.onNodeWithTag("case-a1").assertIsDisplayed()
     }
 }

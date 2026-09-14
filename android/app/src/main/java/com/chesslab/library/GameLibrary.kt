@@ -94,6 +94,20 @@ data class Autosave(
     @ColumnInfo(name = "opponent_id") val opponentId: String? = null,
     val level: Double = 1500.0,
     val label: String,
+    /**
+     * La position de DÉPART de la partie. Sans elle, une partie commencée sur
+     * une position venue d'un autre mode était irrécupérable : on la rejouait
+     * depuis l'échiquier initial, et les coups ne collaient plus.
+     */
+    @ColumnInfo(name = "start_fen") val startFen: String? = null,
+    /** Le camp de l'utilisateur, pour le rétablir tel quel (mode Jouer). */
+    @ColumnInfo(name = "user_color") val userColor: String? = null,
+    /** La cadence, et les deux temps RESTANTS : reprendre à temps plein serait un cadeau. */
+    @ColumnInfo(name = "time_control_id") val timeControlId: String? = null,
+    @ColumnInfo(name = "white_ms") val whiteMs: Long? = null,
+    @ColumnInfo(name = "black_ms") val blackMs: Long? = null,
+    /** Les réglages du mode Deux joueurs — les noms, surtout — en JSON. */
+    @ColumnInfo(name = "settings_json") val settingsJson: String? = null,
 ) {
     val moveList: List<String> get() = moves.split(" ").filter { it.isNotEmpty() }
 }
@@ -119,7 +133,7 @@ interface AutosaveDao {
         com.chesslab.training.OpeningProgress::class, com.chesslab.training.OpeningReviewLog::class,
         com.chesslab.puzzles.OwnPuzzle::class, com.chesslab.puzzles.PuzzleProgress::class,
     ],
-    version = 7, exportSchema = false,
+    version = 8, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
@@ -237,7 +251,27 @@ abstract class LibraryDatabase : RoomDatabase() {
          * — c'est arrivé au passage en v6. Ici, oublier une migration fait
          * échouer le test.
          */
-        val ALL_MIGRATIONS get() = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
+        val ALL_MIGRATIONS get() = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+
+        /**
+         * Une partie interrompue se reprend TELLE QUELLE : sa position de
+         * départ, le camp de l'utilisateur, la cadence et les deux temps
+         * restants. Jusqu'ici on reprenait une partie jouée avec les Noirs à
+         * trente secondes… avec les Blancs et le temps plein.
+         *
+         * Sept colonnes optionnelles : les sauvegardes existantes restent
+         * lisibles, et repartent simplement sans pendule.
+         */
+        val MIGRATION_7_8 = object : Migration(7, 8) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE autosaves ADD COLUMN start_fen TEXT")
+                db.execSQL("ALTER TABLE autosaves ADD COLUMN user_color TEXT")
+                db.execSQL("ALTER TABLE autosaves ADD COLUMN time_control_id TEXT")
+                db.execSQL("ALTER TABLE autosaves ADD COLUMN white_ms INTEGER")
+                db.execSQL("ALTER TABLE autosaves ADD COLUMN black_ms INTEGER")
+                db.execSQL("ALTER TABLE autosaves ADD COLUMN settings_json TEXT")
+            }
+        }
 
         /**
          * v6 → v7 : la progression VENTILÉE. La note du puzzle sur sa

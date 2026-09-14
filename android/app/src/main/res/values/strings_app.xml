@@ -41,7 +41,7 @@
     <string name="course_search_endgame">Search an endgame</string>
     <string name="course_search_opening">Search an opening</string>
     <string name="course_train">Train</string>
-    <string name="draw_agreement">agreement</string>
+    <string name="draw_agreement">mutual agreement</string>
     <string name="draw_fifty">fifty-move rule</string>
     <string name="draw_material">insufficient material</string>
     <string name="draw_reason">Draw — %1$s</string>
@@ -687,11 +687,11 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="two_setup_players">Players</string>
     <string name="two_setup_rotation">Board layout</string>
     <string name="two_rotation_face">Face to face</string>
-    <string name="two_rotation_face_note">The board turns after each move.</string>
-    <string name="two_rotation_fixed">Fixed</string>
-    <string name="two_rotation_fixed_note">Same orientation throughout — side by side.</string>
-    <string name="two_rotation_table">Table</string>
-    <string name="two_rotation_table_note">Fixed board, but the top player\'s row reads the right way up from their side.</string>
+    <string name="two_rotation_face_note">The board rotates towards the player to move — pass the device around.</string>
+    <string name="two_rotation_fixed">Side by side</string>
+    <string name="two_rotation_fixed_note">The board stays put — you both look from the same side.</string>
+    <string name="two_rotation_table">Across a table</string>
+    <string name="two_rotation_table_note">Device laid flat: the far player\'s name, clock and buttons are flipped.</string>
     <string name="two_resume">Resume the game</string>
     <string name="two_flag_fell">%1$s ran out of time.</string>
     <string name="autosave_two_label">%1$s vs %2$s · %3$d plies</string>
@@ -868,4 +868,45 @@ The statistics above are recomputed after each one: they are volatile at first a
     </plurals>
     <string name="play_computer">Computer</string>
     <string name="play_resume_failed">Cannot resume: the saved game cannot be replayed.</string>
+
+    <!-- Deux joueurs : abandon, nulle, revanche, consultation, export -->
+    <string name="two_who_resigns">Who resigns?</string>
+    <string name="two_draw_agree">Do both players agree to a draw?</string>
+    <string name="two_draw_confirm">Confirm draw</string>
+    <string name="two_draw_button">Draw</string>
+    <string name="two_rematch">Rematch</string>
+    <string name="two_setup_swap">Swap colours</string>
+    <string name="two_outcome_won">%1$s won (%2$s)</string>
+    <string name="two_outcome_draw">Draw (%1$s)</string>
+    <string name="reason_checkmate">checkmate</string>
+    <string name="reason_resignation">resignation</string>
+    <string name="reason_timeout">time out</string>
+    <string name="two_review_state">Reviewing — move %1$d/%2$d</string>
+    <string name="two_resume_undo_label">Resumed at move %1$d — %2$d moves discarded</string>
+    <string name="two_resume_announce">Game resumed, %1$d moves discarded. You can undo.</string>
+    <string name="two_first_move">First move</string>
+    <string name="two_last_move">Back to live</string>
+    <string name="export_title">Export</string>
+    <string name="export_copy_fen">Copy position (FEN)</string>
+    <string name="export_copy_pgn">Copy game (PGN)</string>
+    <string name="export_share_fen">Share position</string>
+    <string name="export_share_pgn">Share game</string>
+    <string name="export_copied_fen">Position (FEN) copied to the clipboard.</string>
+    <string name="export_copied_pgn">Game (PGN) copied to the clipboard.</string>
+
+    <!-- Verbalisation d'un coup pour les lecteurs d'écran -->
+    <string name="narration_king">king</string>
+    <string name="narration_queen">queen</string>
+    <string name="narration_rook">rook</string>
+    <string name="narration_bishop">bishop</string>
+    <string name="narration_knight">knight</string>
+    <string name="narration_pawn">pawn</string>
+    <string name="narration_castle_short">kingside castle</string>
+    <string name="narration_castle_long">queenside castle</string>
+    <string name="narration_to">%1$s to %2$s</string>
+    <string name="narration_takes">%1$s takes on %2$s</string>
+    <string name="narration_promotion">%1$s, promoted to %2$s</string>
+    <string name="narration_check">%1$s, check</string>
+    <string name="narration_mate">%1$s, checkmate</string>
+    <string name="narration_move_by">%1$s: %2$s</string>
 </resources>

@@ -9,8 +9,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.geometry.Offset
@@ -80,6 +88,19 @@ fun BoardView(
      * ni dans la FEN : il se dessine ici, et vit dans le modèle.
      */
     duck: Square? = null,
+    /**
+     * Toutes les pièces retournées à 180°. Sert au mode « autour d'une
+     * table » des parties à deux : l'appareil est posé à plat entre les
+     * joueurs, et les pièces se lisent à l'endroit pour celui qui a le trait,
+     * quel que soit son côté de la table.
+     */
+    piecesRotated: Boolean = false,
+    /**
+     * Le camp qu'on peut SAISIR à la souris ou au doigt. `null` = les deux,
+     * ce qui convient à l'éditeur et à l'analyse ; les modes de jeu passent
+     * le camp au trait, sans quoi on traînerait une pièce adverse.
+     */
+    draggableColor: Piece.Color? = null,
     enabled: Boolean = true,
     onSquareTap: (Square) -> Unit = {},
 ) {
@@ -111,7 +132,56 @@ fun BoardView(
         // Les cases, puis les flèches PAR-DESSUS. L'overlay doit être un frère
         // de la colonne, pas son enfant : posé dedans, il devenait une rangée
         // de plus et écrasait les huit autres, dont la hauteur est pondérée.
-        Box(Modifier.size(side)) {
+        // Le glisser-déposer. Il se branche sur le PLATEAU et non sur chaque
+        // case : un geste part d'une case et finit sur une autre, et seul le
+        // plateau connaît les deux dans le même repère.
+        //
+        // Il réutilise `onSquareTap` — poser le doigt sélectionne, le lever
+        // joue — plutôt qu'un second chemin parallèle : toutes les règles
+        // particulières (le canard, le coup volé, la promotion) restent ainsi
+        // au même endroit, et un mode qui les respecte au toucher les respecte
+        // au glissé.
+        var drag by remember { mutableStateOf<DragState?>(null) }
+        val cellPx = with(LocalDensity.current) { side.toPx() } / 8f
+        fun squareAt(offset: Offset): Square? {
+            val column = (offset.x / cellPx).toInt()
+            val row = (offset.y / cellPx).toInt()
+            if (column !in 0..7 || row !in 0..7) return null
+            val file = if (orientation == Piece.Color.white) column + 1 else 8 - column
+            val rank = if (orientation == Piece.Color.white) 8 - row else row + 1
+            return Square(Square.File(file), Square.Rank(rank))
+        }
+
+        Box(
+            Modifier
+                .size(side)
+                .pointerInput(orientation, enabled, draggableColor, position) {
+                    detectDragGestures(
+                        onDragStart = { offset ->
+                            if (!enabled) return@detectDragGestures
+                            val square = squareAt(offset) ?: return@detectDragGestures
+                            val piece = position.piece(square) ?: return@detectDragGestures
+                            if (draggableColor != null && piece.color != draggableColor) return@detectDragGestures
+                            drag = DragState(square, piece, offset)
+                            onSquareTap(square)
+                        },
+                        onDrag = { change, amount ->
+                            change.consume()
+                            drag = drag?.let { it.copy(current = it.current + amount) }
+                        },
+                        onDragEnd = {
+                            val current = drag ?: return@detectDragGestures
+                            drag = null
+                            val target = squareAt(current.current)
+                            // Lâcher hors du plateau, ou sur sa case de
+                            // départ, ANNULE : la pièce reste sélectionnée,
+                            // rien n'est joué.
+                            if (target != null && target != current.from) onSquareTap(target)
+                        },
+                        onDragCancel = { drag = null },
+                    )
+                }
+        ) {
             Column(Modifier.fillMaxSize()) {
                 for (rank in ranks) {
                     Row(Modifier.fillMaxWidth().weight(1f)) {
@@ -129,6 +199,10 @@ fun BoardView(
                                 isMarked = square in marked,
                                 isWall = square in walls,
                                 isDuck = square == duck,
+                                // La pièce qu'on traîne quitte sa case : la
+                                // laisser dessinée dessous en montrerait deux.
+                                hidePiece = drag?.from == square,
+                                piecesRotated = piecesRotated,
                                 showFile = rank == ranks.last,
                                 showRank = file == files.first,
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
@@ -141,6 +215,23 @@ fun BoardView(
             val drawn = if (hint == null) arrows
                 else arrows + BoardArrow(hint.first, hint.second, HINT_TINT)
             if (drawn.isNotEmpty()) ArrowOverlay(drawn, orientation, Modifier.fillMaxSize())
+
+            // La pièce saisie, sous le doigt et un peu plus grande : c'est
+            // elle qu'on déplace, elle doit passer par-dessus tout le reste.
+            drag?.let { held ->
+                val cellDp = side / 8
+                Image(
+                    painter = painterResource(drawableFor(held.piece, pieces)),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .offset(
+                            x = with(LocalDensity.current) { held.current.x.toDp() } - cellDp * 0.6f,
+                            y = with(LocalDensity.current) { held.current.y.toDp() } - cellDp * 0.6f,
+                        )
+                        .size(cellDp * 1.2f)
+                        .then(if (piecesRotated) Modifier.rotate(180f) else Modifier),
+                )
+            }
         }
     }
 }
@@ -153,6 +244,9 @@ fun BoardView(
  * l'accent.
  */
 private val HINT_TINT = Color(0xFF1F1F1F)
+
+/** La pièce qu'on traîne : d'où elle vient, laquelle, et où est le doigt. */
+private data class DragState(val from: Square, val piece: Piece, val current: Offset)
 
 /** Une flèche : d'où, vers où, de quelle couleur, et à quel point marquée. */
 data class BoardArrow(
@@ -227,6 +321,8 @@ private fun SquareCell(
     isMarked: Boolean = false,
     isWall: Boolean = false,
     isDuck: Boolean = false,
+    hidePiece: Boolean = false,
+    piecesRotated: Boolean = false,
     showFile: Boolean,
     showRank: Boolean,
     modifier: Modifier,
@@ -255,11 +351,13 @@ private fun SquareCell(
             .clickable(onClick = onTap),
         Alignment.Center,
     ) {
-        if (piece != null) {
+        if (piece != null && !hidePiece) {
             Image(
                 painter = painterResource(drawableFor(piece, pieceSet)),
                 contentDescription = describe(piece),
-                modifier = Modifier.fillMaxSize(0.92f),
+                modifier = Modifier
+                    .fillMaxSize(0.92f)
+                    .then(if (piecesRotated) Modifier.rotate(180f) else Modifier),
             )
         }
 

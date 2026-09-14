@@ -50,7 +50,14 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
      * cadence. Comme pour le mode « contre l'ordinateur », on décide avant de
      * voir un plateau.
      */
-    data object TwoPlayerSetup : Route(R.string.route_two_players)
+    data class TwoPlayerSetup(
+        /**
+         * La position venue d'un autre écran. Arriver avec une position ne
+         * saute plus les réglages : on passe par le même écran, dont le titre
+         * dit alors qu'on CONTINUE une partie — comme sur iOS.
+         */
+        val startFen: String? = null,
+    ) : Route(if (startFen == null) R.string.route_two_players else R.string.route_continue_game)
 
     /**
      * La partie à deux elle-même. [startFen] la fait commencer à la position

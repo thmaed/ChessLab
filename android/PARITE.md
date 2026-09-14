@@ -7,9 +7,63 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
-## ✅ La passe est TERMINÉE — 13/09/2026
+## 🔁 Nouvelle passe — 14/09/2026, écran par écran sur appareil
 
-Les onze sections sont faites : plus une seule case à cocher. Les deux apps
+La passe de septembre déclarait la parité atteinte. En testant l'app sur le
+Galaxy, elle ne l'était pas : ce qui avait été VÉRIFIÉ, c'était la présence
+des écrans, pas leur comportement. Quatre agents relisant les deux codes
+côte à côte ont relevé une centaine d'écarts, dont plusieurs muets — le
+curseur de force ne bridait pas le moteur, trois interrupteurs de réglage
+n'avaient aucun effet, le filet de sécurité était porté mais jamais appelé.
+
+Cette passe reprend module par module. Un module n'est refermé qu'après
+vérification SUR APPAREIL, suite instrumentée passée.
+
+### Module « Jouer contre l'ordinateur » — FAIT le 14/09
+Voir le commit « Jouer : le curseur bride enfin le moteur, et le filet se
+referme ».
+
+### Module « Deux joueurs » — FAIT le 14/09
+- [x] **Les noms des joueurs étaient perdus.** La bibliothèque rangeait
+      toutes les parties à deux sous « Blancs — Noirs » : l'écran de réglages
+      demandait deux noms et personne ne les lisait. Ils sont désormais
+      enregistrés, mémorisés d'une partie sur l'autre (`TwoPlayerSettingsStore`,
+      comme `PlaySettingsStore`), et portés par le résultat lui-même
+      (« Camille a gagné (échec et mat) », formulation d'iOS).
+- [x] **Abandon et nulle par accord.** Ils n'existaient pas. « Qui
+      abandonne ? » nomme les deux joueurs, comme iOS ; la nulle demande
+      confirmation. La chute de drapeau, elle, n'enregistrait RIEN.
+- [x] **Panneau de fin** : résultat, notation enfin révélée, Accueil /
+      Analyser / Revanche (couleurs échangées, position standard). Confettis
+      sur une victoire — `CelebrationOverlay`, mêmes bornes qu'iOS, et rien
+      du tout quand « réduire les animations » est actif.
+- [x] **Barre de consultation** : début / précédent / curseur / suivant /
+      direct, « Reprendre ici » hors pendule, et huit secondes pour annuler.
+- [x] **Reprise fidèle** : l'autosauvegarde porte les réglages, la position
+      de départ, la cadence et les DEUX temps restants (base v8).
+- [x] **Pendule** : suspendue quand l'écran s'en va ou que l'app passe
+      derrière — le drapeau tombait derrière l'analyse.
+- [x] **Cadences** : les six familles et la cadence personnalisée, comme
+      « Nouvelle partie ». Le bouton « Commencer » passe dans une barre fixe.
+- [x] **Mode « autour d'une table »** : ligne du haut ET commandes retournées
+      à 180°, pièces retournées quand c'est au joueur d'en face, sélecteur de
+      promotion retourné avec lui.
+- [x] **Notation MASQUÉE pendant la partie**, révélée sur l'écran de
+      résultat : parti pris d'iOS, deux joueurs n'arbitrent pas leur partie.
+- [x] **Menu d'export** (FEN, PGN, partage) — il manquait aussi au mode Jouer.
+- [x] **Glisser-déposer** sur le plateau, pour TOUS les modes : on ne traîne
+      que les pièces du camp au trait.
+- [x] **Annonces pour lecteur d'écran** : le coup joué (« Blancs : cavalier
+      en f 3, échec »), le résultat, et la troncature d'une reprise.
+      `MoveNarration` est LOCALISÉ des deux côtés — il était en français dur
+      sur iOS.
+- [x] **Arriver avec une position** passe par l'écran de réglages, titré
+      « Continuer la partie », au lieu de sauter directement au plateau.
+
+## ✅ La passe de septembre — 13/09/2026
+
+(Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :
+plus une seule case à cocher. Les deux apps
 offrent les mêmes fonctions, les mêmes écrans, les mêmes barèmes et les mêmes
 libellés dans les deux langues, aux écarts ASSUMÉS près — iCloud hors
 périmètre, aucun échange iOS ↔ Android, et les deux points signalés en
@@ -38,7 +92,7 @@ document redevient ce qu'il doit être — la liste des écarts, vide.
 | Finales | 78 cours, même lecteur |
 | Entraînement | FSRS-5, séance du jour, positions difficiles, une ligne |
 | Puzzles | 106 094 puzzles Lichess, essais réglables, indice |
-| Deux joueurs | plateau qui se retourne |
+| Deux joueurs | noms des joueurs, trois présentations, cadences, abandon, nulle, consultation, revanche, export (14/09) |
 | Laboratoire | série de parties, Maia ou Stockfish de chaque côté |
 | Scanner | détection du plateau, coins ajustables, recadrage, confirmation dans l'éditeur avec cases douteuses et sens de lecture (13/09) |
 | Éditeur de position | composer une position |

@@ -80,7 +80,7 @@ private val modes = listOf(
     Mode(Route.NewGame(), "play", R.string.route_play, R.string.home_play_short,
         R.string.home_play_long, R.string.home_play_sub, Icons.Default.Memory, Palette.accent,
         spot = DiscoverySpot.playTile),
-    Mode(Route.TwoPlayerSetup, "two", R.string.route_two_players, R.string.home_two_short,
+    Mode(Route.TwoPlayerSetup(), "two", R.string.route_two_players, R.string.home_two_short,
         R.string.home_two_long, R.string.home_two_sub, Icons.Default.People, Palette.info),
     Mode(Route.Puzzles(), "puzzles", R.string.route_puzzles, R.string.route_puzzles,
         R.string.home_puzzles_long, R.string.home_puzzles_sub, Icons.Default.Extension, Palette.violet,

@@ -331,6 +331,17 @@
         }
       }
     },
+    "%@ en %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ to %@"
+          }
+        }
+      }
+    },
     "%@ parties": {
       "extractionState": "stale",
       "localizations": {
@@ -360,6 +371,17 @@
           "stringUnit": {
             "state": "new",
             "value": "%1$@ pour %2$@"
+          }
+        }
+      }
+    },
+    "%@ prend en %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ takes on %@"
           }
         }
       }
@@ -483,6 +505,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "%@, pièce %@ à préciser"
+          }
+        }
+      }
+    },
+    "%@, promotion en %@": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, promoted to %@"
+          }
+        }
+      }
+    },
+    "%@, échec": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, check"
+          }
+        }
+      }
+    },
+    "%@, échec et mat": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@, checkmate"
           }
         }
       }
@@ -20153,6 +20208,17 @@
         }
       }
     },
+    "grand roque": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "queenside castle"
+          }
+        }
+      }
+    },
     "hors répertoire": {
       "localizations": {
         "en": {
@@ -20469,6 +20535,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "perdant"
+          }
+        }
+      }
+    },
+    "petit roque": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "kingside castle"
           }
         }
       }

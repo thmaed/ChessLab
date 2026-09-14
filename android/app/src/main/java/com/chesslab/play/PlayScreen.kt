@@ -20,6 +20,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -151,6 +152,9 @@ fun PlayScreen(
                 arrows = if (ui.isReviewing) emptyList() else ui.hints,
                 // En consultation, le plateau est une PHOTO : on n'y joue pas,
                 // et le toucher ne ramène pas au direct par surprise.
+                // On ne traîne que SES pièces : un glissé sur une pièce
+                // adverse jouerait deux coups de la même couleur d'affilée.
+                draggableColor = ui.userColor,
                 enabled = !ui.thinking && !ui.gameOver && !ui.isReviewing,
                 onSquareTap = model::onSquareTap,
             )
@@ -628,11 +632,22 @@ private fun MoveListSheet(
 }
 
 @Composable
-fun PromotionDialog(onPick: (Piece.Kind) -> Unit, onCancel: () -> Unit = {}) {
+fun PromotionDialog(
+    onPick: (Piece.Kind) -> Unit,
+    onCancel: () -> Unit = {},
+    /**
+     * Retourné à 180°. Sert au mode « autour d'une table » : si c'est le
+     * joueur d'en face qui promeut, le sélecteur doit se lire depuis SON
+     * côté.
+     */
+    rotated: Boolean = false,
+) {
+    val turn = if (rotated) Modifier.rotate(180f) else Modifier
     AlertDialog(
         // Toucher à côté ANNULE le coup. Promouvoir en dame par défaut, c'est
         // jouer à la place de quelqu'un qui n'a pas encore choisi.
         onDismissRequest = onCancel,
+        modifier = turn,
         title = { Text(stringResource(R.string.theme_promotion)) },
         text = { Text(stringResource(R.string.promote_to)) },
         confirmButton = {

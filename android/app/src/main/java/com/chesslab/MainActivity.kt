@@ -162,14 +162,14 @@ private fun App() {
             is Route.PlayVsEngine -> PlayScreen(
                 settings = current.settings, resume = current.resume,
                 startFen = current.startFen,
-                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
                 onAnalyzeGame = { stack.add(Route.AnalysisBoard(pgn = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
                 onHome = { stack.removeRange(1, stack.size) },
             )
-            Route.TwoPlayerSetup -> com.chesslab.twoplayer.TwoPlayerSetupScreen(
-                initial = com.chesslab.twoplayer.TwoPlayerSettings(),
+            is Route.TwoPlayerSetup -> com.chesslab.twoplayer.TwoPlayerSetupScreen(
+                startFen = current.startFen,
             ) { settings ->
                 // On REMPLACE la configuration dans la pile : revenir depuis la
                 // partie doit ramener à l'accueil, pas à l'écran qu'on valide.
@@ -181,7 +181,12 @@ private fun App() {
                 startFen = current.startFen,
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
+                onAnalyzeGame = { stack.add(Route.AnalysisBoard(pgn = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
+                onHome = { stack.removeRange(1, stack.size) },
+                // La revanche REMPLACE la partie finie dans la pile : revenir
+                // en arrière ne doit pas rouvrir celle qu'on vient de finir.
+                onRematch = { stack[stack.lastIndex] = Route.TwoPlayer(settings = it) },
             )
             Route.Analysis -> AnalysisEntryScreen(
                 onScan = { stack.add(Route.Scanner()) },
@@ -198,14 +203,14 @@ private fun App() {
             is Route.Puzzles -> PuzzleScreen(
                 initialTheme = current.theme,
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
-                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
             Route.Openings -> CourseListScreen(
                 endgames = false,
                 onTrain = { kind -> stack.add(trainRoute(context, kind)) },
                 onPlayVsEngine = { stack.add(Route.NewGame()) },
-                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup()) },
                 onOpenLab = { stack.add(Route.Laboratory()) },
                 onImport = { stack.add(Route.OpeningImport) },
                 onEdit = { id, name -> stack.add(Route.OpeningEditor(id, name)) },
@@ -221,13 +226,13 @@ private fun App() {
                 endgames = true,
                 onTrain = { kind -> stack.add(trainRoute(context, kind)) },
                 onPlayVsEngine = { stack.add(Route.NewGame()) },
-                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup()) },
                 onOpenLab = { stack.add(Route.Laboratory()) },
             ) { stack.add(reader(it)) }
             is Route.CourseReader -> CourseScreen(
                 courseId = current.id,
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
-                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
                 onFreeTrain = { id, name -> stack.add(Route.EndgameFree(id, name)) },
             ) { id, name ->
@@ -236,7 +241,7 @@ private fun App() {
             is Route.EndgameFree -> com.chesslab.training.EndgameFreeScreen(
                 courseId = current.courseId,
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
-                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
             is Route.Train -> TrainScreen(
@@ -246,7 +251,7 @@ private fun App() {
                     else -> TrainMode.Daily
                 },
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
-                onOpenTwoPlayer = { stack.add(Route.TwoPlayer(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
             Route.Settings -> SettingsScreen(onOpenLicences = { stack.add(Route.Licences) })

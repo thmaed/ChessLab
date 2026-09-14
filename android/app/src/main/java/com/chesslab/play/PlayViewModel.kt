@@ -707,6 +707,14 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
                 opponentId = ui.opponent?.id,
                 level = ui.level,
                 label = s(R.string.autosave_label, ui.opponent?.firstName ?: s(R.string.stockfish), uciLog.size),
+                // Tout ce qu'il faut pour reprendre la partie TELLE QUELLE :
+                // sa position de départ, le camp joué, la cadence, et les deux
+                // temps restants — pris au plus PRÉCIS, pas à l'affichage.
+                startFen = ui.settings.startFen,
+                userColor = humanColor.name,
+                timeControlId = ui.settings.timeControlId,
+                whiteMs = clock?.remaining(Piece.Color.white),
+                blackMs = clock?.remaining(Piece.Color.black),
             )
         )
     }
@@ -719,11 +727,29 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         resume(saved)
     }
 
-    /** Rejoue une partie sauvegardée, coup par coup. */
+    /**
+     * Rejoue une partie sauvegardée — avec sa couleur, sa position de départ,
+     * sa cadence et ses deux pendules. Reprendre une partie jouée avec les
+     * Noirs à trente secondes… avec les Blancs et le temps plein n'était pas
+     * une reprise.
+     */
     fun resume(autosave: Autosave) {
         val profile = autosave.opponentId?.let { OpponentGallery.byId(it) }
+        autosave.userColor?.let { name ->
+            runCatching { Piece.Color.valueOf(name) }.getOrNull()?.let { humanColor = it }
+        }
+        startPosition = autosave.startFen?.let { Position.fromFen(it) } ?: Position.standard
+        val settings = ui.settings.copy(
+            startFen = autosave.startFen,
+            timeControlId = autosave.timeControlId ?: ui.settings.timeControlId,
+            opponentId = autosave.opponentId,
+        )
+        ui = ui.copy(
+            settings = settings, opponent = profile, level = autosave.level,
+            userColor = humanColor, started = true,
+        )
         newGame()
-        ui = ui.copy(opponent = profile, level = autosave.level)
+        clock?.restore(autosave.whiteMs, autosave.blackMs)
         rebuild(autosave.moveList, s(R.string.game_resumed))
     }
 

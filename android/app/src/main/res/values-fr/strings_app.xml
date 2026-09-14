@@ -38,7 +38,7 @@
     <string name="course_search_endgame">Chercher une finale</string>
     <string name="course_search_opening">Chercher une ouverture</string>
     <string name="course_train">Entraîner</string>
-    <string name="draw_agreement">accord</string>
+    <string name="draw_agreement">accord mutuel</string>
     <string name="draw_fifty">règle des cinquante coups</string>
     <string name="draw_material">matériel insuffisant</string>
     <string name="draw_reason">Nulle — %1$s</string>
@@ -684,11 +684,11 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="two_setup_players">Joueurs</string>
     <string name="two_setup_rotation">Présentation du plateau</string>
     <string name="two_rotation_face">Face à face</string>
-    <string name="two_rotation_face_note">Le plateau se retourne à chaque coup.</string>
-    <string name="two_rotation_fixed">Fixe</string>
-    <string name="two_rotation_fixed_note">Même orientation du début à la fin — côte à côte.</string>
-    <string name="two_rotation_table">Table</string>
-    <string name="two_rotation_table_note">Plateau fixe, mais la ligne du joueur d\'en face se lit à l\'endroit depuis son côté.</string>
+    <string name="two_rotation_face_note">Le plateau pivote vers le joueur au trait — on se passe l\'appareil.</string>
+    <string name="two_rotation_fixed">Côte à côte</string>
+    <string name="two_rotation_fixed_note">Le plateau ne bouge pas — vous regardez du même côté.</string>
+    <string name="two_rotation_table">Autour d\'une table</string>
+    <string name="two_rotation_table_note">Appareil posé à plat : nom, pendule et boutons d\'en face sont retournés.</string>
     <string name="two_resume">Reprendre la partie</string>
     <string name="two_flag_fell">Le drapeau de %1$s est tombé.</string>
     <string name="autosave_two_label">%1$s contre %2$s · %3$d demi-coups</string>
@@ -865,4 +865,45 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     </plurals>
     <string name="play_computer">Ordinateur</string>
     <string name="play_resume_failed">Reprise impossible : la partie enregistrée ne se rejoue pas.</string>
+
+    <!-- Deux joueurs : abandon, nulle, revanche, consultation, export -->
+    <string name="two_who_resigns">Qui abandonne ?</string>
+    <string name="two_draw_agree">Les deux joueurs sont d\'accord pour la nulle ?</string>
+    <string name="two_draw_confirm">Confirmer la nulle</string>
+    <string name="two_draw_button">Nulle</string>
+    <string name="two_rematch">Revanche</string>
+    <string name="two_setup_swap">Inverser les couleurs</string>
+    <string name="two_outcome_won">%1$s a gagné (%2$s)</string>
+    <string name="two_outcome_draw">Partie nulle (%1$s)</string>
+    <string name="reason_checkmate">échec et mat</string>
+    <string name="reason_resignation">abandon</string>
+    <string name="reason_timeout">temps écoulé</string>
+    <string name="two_review_state">Consultation — coup %1$d/%2$d</string>
+    <string name="two_resume_undo_label">Reprise au coup %1$d — %2$d coups écartés</string>
+    <string name="two_resume_announce">Partie reprise, %1$d coups écartés. Annulation possible.</string>
+    <string name="two_first_move">Premier coup</string>
+    <string name="two_last_move">Revenir au direct</string>
+    <string name="export_title">Exporter</string>
+    <string name="export_copy_fen">Copier la position (FEN)</string>
+    <string name="export_copy_pgn">Copier la partie (PGN)</string>
+    <string name="export_share_fen">Partager la position</string>
+    <string name="export_share_pgn">Partager la partie</string>
+    <string name="export_copied_fen">Position (FEN) copiée dans le presse-papiers.</string>
+    <string name="export_copied_pgn">Partie (PGN) copiée dans le presse-papiers.</string>
+
+    <!-- Verbalisation d'un coup pour les lecteurs d'écran -->
+    <string name="narration_king">roi</string>
+    <string name="narration_queen">dame</string>
+    <string name="narration_rook">tour</string>
+    <string name="narration_bishop">fou</string>
+    <string name="narration_knight">cavalier</string>
+    <string name="narration_pawn">pion</string>
+    <string name="narration_castle_short">petit roque</string>
+    <string name="narration_castle_long">grand roque</string>
+    <string name="narration_to">%1$s en %2$s</string>
+    <string name="narration_takes">%1$s prend en %2$s</string>
+    <string name="narration_promotion">%1$s, promotion en %2$s</string>
+    <string name="narration_check">%1$s, échec</string>
+    <string name="narration_mate">%1$s, échec et mat</string>
+    <string name="narration_move_by">%1$s : %2$s</string>
 </resources>

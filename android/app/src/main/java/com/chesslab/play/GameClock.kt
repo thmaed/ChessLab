@@ -18,6 +18,16 @@ class GameClock(val control: TimeControl) {
 
     val hasClock: Boolean get() = control.hasClock
 
+    /**
+     * Repose les deux pendules là où elles étaient — à la reprise d'une partie
+     * interrompue. Sans cela on reprenait à temps PLEIN, ce qui est un cadeau
+     * que personne n'a demandé.
+     */
+    fun restore(whiteMs: Long?, blackMs: Long?) {
+        if (whiteMs != null) this.whiteMs = whiteMs
+        if (blackMs != null) this.blackMs = blackMs
+    }
+
     /** Le temps restant, en millisecondes, jamais négatif. */
     fun remaining(color: Piece.Color): Long =
         (if (color == Piece.Color.white) whiteMs else blackMs).coerceAtLeast(0)
