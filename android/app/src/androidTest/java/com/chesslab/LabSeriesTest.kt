@@ -68,7 +68,12 @@ class LabSeriesTest {
 
         // Le plateau montre la finale, et le retour à la position standard est
         // offert — donc la série a bien changé de point de départ.
-        compose.onNodeWithTag("case-a4").assertIsDisplayed()
+        //
+        // `performScrollTo` avant l'assertion : le clavier virtuel reste
+        // ouvert après la saisie et pousse le plateau hors de l'écran, si
+        // bien que « la case existe » et « la case se voit » divergeaient —
+        // le test tombait une fois sur trois, en suite complète seulement.
+        compose.onNodeWithTag("case-a4").performScrollTo().assertIsDisplayed()
         awaitTag("position-standard", 10_000)
     }
 

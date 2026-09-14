@@ -16,6 +16,10 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.foundation.layout.offset
+import androidx.compose.animation.core.Animatable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.unit.IntOffset
+import kotlin.math.roundToInt
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -141,8 +145,55 @@ fun BoardView(
         // particulières (le canard, le coup volé, la promotion) restent ainsi
         // au même endroit, et un mode qui les respecte au toucher les respecte
         // au glissé.
+        // La pièce SAISIE — d'où elle vient et laquelle — change une fois par
+        // geste ; sa POSITION, elle, change à chaque doigt qui bouge. Les
+        // deux sont séparées à dessein : la position n'est lue que dans la
+        // phase de disposition (`offset { … }`), jamais pendant la
+        // composition. Lue en composition, elle recomposait les 64 cases à
+        // chaque image — et tout ce qui tournait en même temps (le moteur,
+        // une suite de tests) s'en ressentait.
         var drag by remember { mutableStateOf<DragState?>(null) }
+        val dragOffset = remember { mutableStateOf(Offset.Zero) }
         val cellPx = with(LocalDensity.current) { side.toPx() } / 8f
+        val cellDp = side / 8
+
+        // Le GLISSEMENT du dernier coup. Une pièce qui se téléporte d'une
+        // case à l'autre se suit mal : on ne voit pas d'où elle vient, et
+        // c'est justement ce qu'on cherche quand l'adversaire joue.
+        //
+        // « Réduire les animations » du système la supprime : la pièce est
+        // alors POSÉE sur sa case d'arrivée, sans glisser.
+        val reduceMotion = rememberReduceMotion()
+        var slide by remember { mutableStateOf<Pair<Square, Square>?>(null) }
+        val slideProgress = remember { Animatable(0f) }
+        // Vrai juste après un glisser-déposer : la pièce a DÉJÀ suivi le
+        // doigt jusqu'à sa case, la rejouer depuis le départ la ferait
+        // revenir en arrière.
+        var suppressSlide by remember { mutableStateOf(false) }
+        LaunchedEffect(lastMove) {
+            val move = lastMove
+            if (move == null || reduceMotion || suppressSlide) {
+                suppressSlide = false
+                slide = null
+                return@LaunchedEffect
+            }
+            slide = move
+            slideProgress.snapTo(0f)
+            slideProgress.animateTo(
+                1f,
+                androidx.compose.animation.core.spring(dampingRatio = 0.78f, stiffness = 500f),
+            )
+            slide = null
+        }
+
+        /** Le centre d'une case, en pixels, dans le repère du plateau. */
+        fun centerOf(square: Square): Offset {
+            val file = square.file.number - 1
+            val rank = square.rank.value - 1
+            val column = if (orientation == Piece.Color.white) file else 7 - file
+            val row = if (orientation == Piece.Color.white) 7 - rank else rank
+            return Offset((column + 0.5f) * cellPx, (row + 0.5f) * cellPx)
+        }
         fun squareAt(offset: Offset): Square? {
             val column = (offset.x / cellPx).toInt()
             val row = (offset.y / cellPx).toInt()
@@ -162,21 +213,25 @@ fun BoardView(
                             val square = squareAt(offset) ?: return@detectDragGestures
                             val piece = position.piece(square) ?: return@detectDragGestures
                             if (draggableColor != null && piece.color != draggableColor) return@detectDragGestures
-                            drag = DragState(square, piece, offset)
+                            drag = DragState(square, piece)
+                            dragOffset.value = offset
                             onSquareTap(square)
                         },
                         onDrag = { change, amount ->
                             change.consume()
-                            drag = drag?.let { it.copy(current = it.current + amount) }
+                            if (drag != null) dragOffset.value += amount
                         },
                         onDragEnd = {
                             val current = drag ?: return@detectDragGestures
                             drag = null
-                            val target = squareAt(current.current)
+                            val target = squareAt(dragOffset.value)
                             // Lâcher hors du plateau, ou sur sa case de
                             // départ, ANNULE : la pièce reste sélectionnée,
                             // rien n'est joué.
-                            if (target != null && target != current.from) onSquareTap(target)
+                            if (target != null && target != current.from) {
+                                suppressSlide = true
+                                onSquareTap(target)
+                            }
                         },
                         onDragCancel = { drag = null },
                     )
@@ -199,9 +254,10 @@ fun BoardView(
                                 isMarked = square in marked,
                                 isWall = square in walls,
                                 isDuck = square == duck,
-                                // La pièce qu'on traîne quitte sa case : la
-                                // laisser dessinée dessous en montrerait deux.
-                                hidePiece = drag?.from == square,
+                                // La pièce qu'on traîne — ou qui glisse —
+                                // quitte sa case : la laisser dessinée
+                                // dessous en montrerait deux.
+                                hidePiece = drag?.from == square || slide?.second == square,
                                 piecesRotated = piecesRotated,
                                 showFile = rank == ranks.last,
                                 showRank = file == files.first,
@@ -216,18 +272,44 @@ fun BoardView(
                 else arrows + BoardArrow(hint.first, hint.second, HINT_TINT)
             if (drawn.isNotEmpty()) ArrowOverlay(drawn, orientation, Modifier.fillMaxSize())
 
+            // La pièce qui GLISSE, entre sa case de départ et son arrivée.
+            slide?.let { (from, to) ->
+                position.piece(to)?.let { piece ->
+                    val start = centerOf(from)
+                    val end = centerOf(to)
+                    val half = cellPx * 0.46f
+                    Image(
+                        painter = painterResource(drawableFor(piece, pieces)),
+                        contentDescription = null,
+                        modifier = Modifier
+                            // `offset { … }` et non `offset(x =, y =)` : la
+                            // lambda est évaluée à la DISPOSITION, donc la
+                            // progression de l'animation ne recompose rien.
+                            .offset {
+                                val t = slideProgress.value
+                                IntOffset(
+                                    (start.x + (end.x - start.x) * t - half).roundToInt(),
+                                    (start.y + (end.y - start.y) * t - half).roundToInt(),
+                                )
+                            }
+                            .size(cellDp * 0.92f)
+                            .then(if (piecesRotated) Modifier.rotate(180f) else Modifier),
+                    )
+                }
+            }
+
             // La pièce saisie, sous le doigt et un peu plus grande : c'est
             // elle qu'on déplace, elle doit passer par-dessus tout le reste.
             drag?.let { held ->
-                val cellDp = side / 8
+                val half = cellPx * 0.6f
                 Image(
                     painter = painterResource(drawableFor(held.piece, pieces)),
                     contentDescription = null,
                     modifier = Modifier
-                        .offset(
-                            x = with(LocalDensity.current) { held.current.x.toDp() } - cellDp * 0.6f,
-                            y = with(LocalDensity.current) { held.current.y.toDp() } - cellDp * 0.6f,
-                        )
+                        .offset {
+                            val at = dragOffset.value
+                            IntOffset((at.x - half).roundToInt(), (at.y - half).roundToInt())
+                        }
                         .size(cellDp * 1.2f)
                         .then(if (piecesRotated) Modifier.rotate(180f) else Modifier),
                 )
@@ -245,8 +327,25 @@ fun BoardView(
  */
 private val HINT_TINT = Color(0xFF1F1F1F)
 
-/** La pièce qu'on traîne : d'où elle vient, laquelle, et où est le doigt. */
-private data class DragState(val from: Square, val piece: Piece, val current: Offset)
+/**
+ * Vrai quand le système demande de RÉDUIRE les animations (échelle de durée
+ * à zéro dans les options pour développeurs, ou dans l'accessibilité selon
+ * les surcouches). Les animations décoratives s'effacent alors.
+ */
+@Composable
+fun rememberReduceMotion(): Boolean {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    return remember {
+        android.provider.Settings.Global.getFloat(
+            context.contentResolver,
+            android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
+            1f,
+        ) == 0f
+    }
+}
+
+/** La pièce qu'on traîne : d'où elle vient, et laquelle. */
+private data class DragState(val from: Square, val piece: Piece)
 
 /** Une flèche : d'où, vers où, de quelle couleur, et à quel point marquée. */
 data class BoardArrow(
@@ -375,19 +474,27 @@ private fun SquareCell(
         // une pièce à prendre — la convention de l'app iOS
         if (isLegalTarget) {
             if (piece == null) {
+                // Une case vide : une PASTILLE pleine, petite.
                 Box(
                     Modifier
-                        .fillMaxSize(0.30f)
+                        .fillMaxSize(0.32f)
                         .clip(CircleShape)
                         .background(theme.legalDotColor)
                 )
             } else {
-                Box(
-                    Modifier
-                        .fillMaxSize(0.94f)
-                        .clip(CircleShape)
-                        .background(theme.legalDotColor.copy(alpha = 0.28f))
-                )
+                // Une prise : un ANNEAU autour de la pièce, qui reste
+                // visible. Un disque translucide par-dessus la ternissait,
+                // et ne disait plus « ici, tu prends ». Dessiné au Canvas et
+                // non avec une sous-composition : il y en aurait une par
+                // case atteignable, à chaque sélection.
+                androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+                    val ring = size.minDimension * 0.86f
+                    drawCircle(
+                        color = theme.legalDotColor,
+                        radius = (ring - size.minDimension * 0.08f) / 2f,
+                        style = androidx.compose.ui.graphics.drawscope.Stroke(size.minDimension * 0.08f),
+                    )
+                }
             }
         }
 

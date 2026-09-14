@@ -13,7 +13,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
@@ -33,16 +32,7 @@ import kotlin.random.Random
  */
 @Composable
 fun CelebrationOverlay(modifier: Modifier = Modifier, pieceCount: Int = 36) {
-    val context = LocalContext.current
-    val reduceMotion = remember {
-        val scale = android.provider.Settings.Global.getFloat(
-            context.contentResolver,
-            android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
-            1f,
-        )
-        scale == 0f
-    }
-    if (reduceMotion) return
+    if (rememberReduceMotion()) return
 
     val palette = listOf(Palette.accent, Palette.info, Palette.warning, Palette.violet, Palette.rose)
     val confetti = remember {
