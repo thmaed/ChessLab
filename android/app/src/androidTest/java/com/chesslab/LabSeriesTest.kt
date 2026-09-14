@@ -1,6 +1,7 @@
 package com.chesslab
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -69,11 +70,15 @@ class LabSeriesTest {
         // Le plateau montre la finale, et le retour à la position standard est
         // offert — donc la série a bien changé de point de départ.
         //
-        // `performScrollTo` avant l'assertion : le clavier virtuel reste
-        // ouvert après la saisie et pousse le plateau hors de l'écran, si
-        // bien que « la case existe » et « la case se voit » divergeaient —
-        // le test tombait une fois sur trois, en suite complète seulement.
-        compose.onNodeWithTag("case-a4").performScrollTo().assertIsDisplayed()
+        // On vérifie que le FOU est en a4, et non que la case a4 « se voit » :
+        // le clavier virtuel reste ouvert après la saisie et pousse le
+        // plateau hors de l'écran, si bien que la visibilité dépendait du
+        // moment — le test tombait une fois sur trois, en suite complète
+        // seulement. La présence de la pièce, elle, ne dépend de rien.
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithContentDescription("Fou blanc en a4")
+                .fetchSemanticsNodes().isNotEmpty()
+        }
         awaitTag("position-standard", 10_000)
     }
 

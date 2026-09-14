@@ -14,6 +14,9 @@ import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.LastPage
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import com.chesslab.ui.isLandscape
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -121,72 +124,96 @@ fun TwoPlayerScreen(
     val top = ui.orientation.opposite
     val gutter = Modifier.padding(horizontal = 12.dp)
 
-    Box(Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
-            // En mode « autour d'une table », la zone du haut porte AUSSI les
-            // commandes, le tout retourné à 180° : le joueur d'en face lit son
-            // nom, sa pendule et ses boutons à l'endroit, sans jamais avoir à
-            // faire tourner l'appareil.
-            if (tabletop) {
-                Column(Modifier.rotate(180f)) {
-                    PlayerRow(gutter, top, ui, model, "joueur-haut")
-                    Spacer(Modifier.height(8.dp))
-                    if (!ui.gameOver) {
-                        ControlsBar(gutter, "haut", onResign = { confirmResign = true }) {
-                            confirmDraw = true
-                        }
+    // Le contenu ne s'écrit QU'UNE FOIS : seule la disposition change entre le
+    // portrait (tout empilé) et le paysage (plateau à gauche, le reste à
+    // droite). Empilé en paysage, tout ce qui suit le plateau passait sous la
+    // ligne de flottaison — on ne pouvait plus ni abandonner ni consulter.
+    val topZone: @Composable () -> Unit = {
+        // En mode « autour d'une table », la zone du haut porte AUSSI les
+        // commandes, le tout retourné à 180° : le joueur d'en face lit son
+        // nom, sa pendule et ses boutons à l'endroit, sans jamais avoir à
+        // faire tourner l'appareil.
+        if (tabletop) {
+            Column(Modifier.rotate(180f)) {
+                PlayerRow(gutter, top, ui, model, "joueur-haut")
+                Spacer(Modifier.height(8.dp))
+                if (!ui.gameOver) {
+                    ControlsBar(gutter, "haut", onResign = { confirmResign = true }) {
+                        confirmDraw = true
                     }
                 }
-            } else {
-                PlayerRow(gutter, top, ui, model, "joueur-haut")
             }
-            Spacer(Modifier.height(6.dp))
+        } else {
+            PlayerRow(gutter, top, ui, model, "joueur-haut")
+        }
+    }
+    val board: @Composable () -> Unit = {
+        BoardView(
+            position = ui.position,
+            orientation = ui.orientation,
+            selected = ui.selected,
+            legalTargets = ui.legalTargets,
+            lastMove = ui.lastMove,
+            checkedKing = ui.checkedKing,
+            // Les pièces se retournent quand c'est au joueur d'EN FACE de
+            // jouer : c'est lui qui regarde le plateau à ce moment-là.
+            piecesRotated = tabletop && !ui.isReviewing && ui.position.sideToMove == top,
+            draggableColor = ui.position.sideToMove,
+            enabled = !ui.gameOver && !ui.isReviewing,
+            onSquareTap = model::onSquareTap,
+        )
+    }
+    val below: @Composable () -> Unit = {
+        PlayerRow(gutter, ui.orientation, ui, model, "joueur-bas")
 
-            BoardView(
-                position = ui.position,
-                orientation = ui.orientation,
-                selected = ui.selected,
-                legalTargets = ui.legalTargets,
-                lastMove = ui.lastMove,
-                checkedKing = ui.checkedKing,
-                // Les pièces se retournent quand c'est au joueur d'EN FACE de
-                // jouer : c'est lui qui regarde le plateau à ce moment-là.
-                piecesRotated = tabletop && !ui.isReviewing && ui.position.sideToMove == top,
-                draggableColor = ui.position.sideToMove,
-                enabled = !ui.gameOver && !ui.isReviewing,
-                onSquareTap = model::onSquareTap,
+        if (ui.totalPlies > 0) {
+            Spacer(Modifier.height(8.dp))
+            TransportBar(
+                gutter, ui,
+                onStart = model::reviewToStart,
+                onPrevious = model::reviewPrevious,
+                onPick = model::reviewTo,
+                onNext = model::reviewNext,
+                onLive = model::reviewToLive,
+                onResumeHere = model::resumeFromReview,
+                onCancelResume = model::cancelResumeFromReview,
             )
+        }
 
+        Spacer(Modifier.height(10.dp))
+        if (ui.gameOver) {
+            GameOverPanel(
+                gutter,
+                message = ui.outcome.orEmpty(),
+                moves = ui.sanMoves,
+                onHome = onHome,
+                onAnalyze = { onAnalyzeGame(model.currentPgn()) },
+                onRematch = { onRematch(model.rematchSettings()) },
+            )
+        } else {
+            ControlsBar(gutter, "bas", onResign = { confirmResign = true }) { confirmDraw = true }
+        }
+    }
+
+    Box(Modifier.fillMaxSize()) {
+        if (isLandscape()) {
+            Row(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
+                Box(Modifier.weight(1f).fillMaxHeight(), Alignment.Center) { board() }
+                Column(
+                    Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()),
+                ) {
+                    topZone()
+                    Spacer(Modifier.height(6.dp))
+                    below()
+                    Spacer(Modifier.height(20.dp))
+                }
+            }
+        } else Column(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
+            topZone()
             Spacer(Modifier.height(6.dp))
-            PlayerRow(gutter, ui.orientation, ui, model, "joueur-bas")
-
-            if (ui.totalPlies > 0) {
-                Spacer(Modifier.height(8.dp))
-                TransportBar(
-                    gutter, ui,
-                    onStart = model::reviewToStart,
-                    onPrevious = model::reviewPrevious,
-                    onPick = model::reviewTo,
-                    onNext = model::reviewNext,
-                    onLive = model::reviewToLive,
-                    onResumeHere = model::resumeFromReview,
-                    onCancelResume = model::cancelResumeFromReview,
-                )
-            }
-
-            Spacer(Modifier.height(10.dp))
-            if (ui.gameOver) {
-                GameOverPanel(
-                    gutter,
-                    message = ui.outcome.orEmpty(),
-                    moves = ui.sanMoves,
-                    onHome = onHome,
-                    onAnalyze = { onAnalyzeGame(model.currentPgn()) },
-                    onRematch = { onRematch(model.rematchSettings()) },
-                )
-            } else {
-                ControlsBar(gutter, "bas", onResign = { confirmResign = true }) { confirmDraw = true }
-            }
+            board()
+            Spacer(Modifier.height(6.dp))
+            below()
         }
 
         // Seuls les confettis passent PAR-DESSUS : le bilan s'affiche sous le

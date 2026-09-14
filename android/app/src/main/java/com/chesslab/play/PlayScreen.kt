@@ -132,14 +132,19 @@ fun PlayScreen(
     // point de largeur gagné est un point sur les 64 cases. (Compose refuse
     // une marge négative, là où SwiftUI l'accepte.)
     val gutter = Modifier.padding(horizontal = 12.dp)
-    Box(Modifier.fillMaxSize()) {
-    Column(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
-        // Le moteur n'a pas démarré : on le DIT, avec de quoi réessayer. Sans
-        // cette bannière la partie restait figée sans le moindre message.
+
+    // Le contenu ne s'écrit QU'UNE FOIS : la disposition seule change entre
+    // le portrait (tout empilé, plateau de bord à bord) et le paysage
+    // (plateau à gauche, borné par la hauteur, le reste à droite). Empiler en
+    // paysage poussait les lignes joueurs, les commandes et l'état hors de
+    // l'écran — on voyait un plateau et rien d'autre.
+    val banner: @Composable () -> Unit = {
         if (ui.engineUnavailable) {
             EngineBanner(gutter, ui.retryingEngine, onRetry = { model.retryEngine() })
             Spacer(Modifier.height(6.dp))
         }
+    }
+    val opponentRow: @Composable () -> Unit = {
         PlayerRow(
             modifier = gutter,
             name = ui.opponent?.firstName ?: stringResource(R.string.play_computer),
@@ -151,8 +156,46 @@ fun PlayScreen(
             thinking = ui.thinking,
             tag = "joueur-adverse",
         )
+    }
+    val userRow: @Composable () -> Unit = {
+        PlayerRow(
+            modifier = gutter,
+            name = stringResource(R.string.you),
+            color = ui.userColor,
+            active = !ui.gameOver && ui.position.sideToMove == ui.userColor,
+            captured = ui.captured.captures(ui.userColor),
+            advantage = ui.captured.advantage(ui.userColor),
+            clockMs = if (ui.userColor == Piece.Color.white) ui.whiteClockMs else ui.blackClockMs,
+            tag = "joueur-vous",
+        )
+    }
+    val actions: @Composable () -> Unit = {
+        if (ui.gameOver) GameOverPanel(
+            gutter, ui.outcome ?: ui.status,
+            summary = model.opponentSummaryLine(),
+            onAnalyze = { onAnalyzeGame(model.currentPgn()) },
+            onHome = onHome,
+        )
+        else ControlBar(
+            modifier = gutter,
+            ui = ui,
+            onPrevious = model::reviewPrevious,
+            onNext = model::reviewNext,
+            onResumeHere = model::resumeFromReview,
+            onCancelResume = model::cancelResumeFromReview,
+            onHint = { model.toggleHint() },
+            onTakeback = { model.takeback() },
+            onMoves = { showMoves = true },
+            onDraw = { model.offerDraw() },
+            onResign = { confirmResign = true },
+        )
         Spacer(Modifier.height(6.dp))
-
+        Text(
+            ui.status, fontSize = 13.sp, color = Palette.textSecondary,
+            modifier = gutter.testTag("statut"),
+        )
+    }
+    val board: @Composable () -> Unit = {
         Box(Modifier.fillMaxWidth()) {
             BoardView(
                 position = ui.position,
@@ -173,50 +216,41 @@ fun PlayScreen(
                 onSquareTap = model::onSquareTap,
             )
         }
-
+    }
+    val evalBar: @Composable () -> Unit = {
         if (ui.settings.showEvalBar) {
             Spacer(Modifier.height(6.dp))
             EvalBar(gutter, ui.evalCp, ui.evalMate)
         }
+    }
 
+    Box(Modifier.fillMaxSize()) {
+    if (isLandscape()) {
+        Row(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
+            Box(Modifier.weight(1f).fillMaxHeight(), Alignment.Center) { board() }
+            Column(
+                Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()),
+            ) {
+                banner()
+                opponentRow()
+                evalBar()
+                Spacer(Modifier.height(6.dp))
+                userRow()
+                Spacer(Modifier.height(8.dp))
+                actions()
+                Spacer(Modifier.height(20.dp))
+            }
+        }
+    } else Column(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
+        banner()
+        opponentRow()
         Spacer(Modifier.height(6.dp))
-        PlayerRow(
-            modifier = gutter,
-            name = stringResource(R.string.you),
-            color = ui.userColor,
-            active = !ui.gameOver && ui.position.sideToMove == ui.userColor,
-            captured = ui.captured.captures(ui.userColor),
-            advantage = ui.captured.advantage(ui.userColor),
-            clockMs = if (ui.userColor == Piece.Color.white) ui.whiteClockMs else ui.blackClockMs,
-            tag = "joueur-vous",
-        )
-
+        board()
+        evalBar()
+        Spacer(Modifier.height(6.dp))
+        userRow()
         Spacer(Modifier.height(8.dp))
-        if (ui.gameOver) GameOverPanel(
-            gutter, ui.outcome ?: ui.status,
-            summary = model.opponentSummaryLine(),
-            onAnalyze = { onAnalyzeGame(model.currentPgn()) },
-            onHome = onHome,
-        )
-        else ControlBar(
-            modifier = gutter,
-            ui = ui,
-            onPrevious = model::reviewPrevious,
-            onNext = model::reviewNext,
-            onResumeHere = model::resumeFromReview,
-            onCancelResume = model::cancelResumeFromReview,
-            onHint = { model.toggleHint() },
-            onTakeback = { model.takeback() },
-            onMoves = { showMoves = true },
-            onDraw = { model.offerDraw() },
-            onResign = { confirmResign = true },
-        )
-
-        Spacer(Modifier.height(6.dp))
-        Text(
-            ui.status, fontSize = 13.sp, color = Palette.textSecondary,
-            modifier = gutter.testTag("statut"),
-        )
+        actions()
     }
 
     // Seuls les confettis passent PAR-DESSUS, et seulement pour une victoire :
