@@ -909,4 +909,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="narration_check">%1$s, check</string>
     <string name="narration_mate">%1$s, checkmate</string>
     <string name="narration_move_by">%1$s: %2$s</string>
+
+    <string name="play_engine_down">The computer did not start: it will not play.</string>
+    <string name="play_engine_retry">Retry</string>
 </resources>

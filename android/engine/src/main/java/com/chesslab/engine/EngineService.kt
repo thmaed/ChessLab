@@ -82,6 +82,19 @@ object EngineService {
     /** Le mode Jouer prévient qu'il vient de brider le moteur. */
     fun markBridled() { bridled = true }
 
+    /**
+     * Vrai quand le démarrage a ÉCHOUÉ et qu'on ne réessaiera pas tout seul.
+     * L'écran de jeu s'en sert pour le dire plutôt que de rester figé.
+     */
+    val isUnavailable: Boolean get() = failed && engine == null
+
+    /**
+     * Efface l'échec pour qu'un prochain `use` retente le démarrage. Sert au
+     * bouton « Réessayer » de la bannière : un échec de lancement est parfois
+     * passager — mémoire tendue, process tué par le système.
+     */
+    fun retry() { failed = false }
+
     suspend fun <T> use(context: Context, block: suspend (StockfishEngine) -> T): T? =
         mutex.withLock {
             val e = start(context) ?: return@withLock null

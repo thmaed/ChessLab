@@ -433,7 +433,7 @@ fun PieceIcon(piece: Piece, modifier: Modifier = Modifier) {
  * Les trois jeux de l'app iOS — mêmes SVG, convertis en `VectorDrawable` par
  * `tools/svg-to-vector/convert_pieces.py`.
  */
-private fun drawableFor(piece: Piece, set: String): Int {
+internal fun drawableFor(piece: Piece, set: String): Int {
     val white = piece.color == Piece.Color.white
     return when (set) {
         "chessnut" -> if (white) when (piece.kind) {

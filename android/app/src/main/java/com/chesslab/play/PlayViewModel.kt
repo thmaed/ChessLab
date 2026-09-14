@@ -86,6 +86,10 @@ data class PlayUiState(
     val retryingEngine: Boolean = false,
     /** Les coups écartés par « Reprendre ici », le temps de pouvoir les rendre. */
     val resumeUndo: ResumeUndo? = null,
+    /** Ce que le lecteur d'écran doit dire : le coup joué, puis le résultat. */
+    val announcement: com.chesslab.ui.Announcement? = null,
+    /** La partie est GAGNÉE — ce qui décide des confettis, et d'eux seuls. */
+    val userWon: Boolean = false,
 ) {
     val isReviewing: Boolean get() = displayedPly < sanMoves.size
 
@@ -201,7 +205,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         maia = loaded
         // Stockfish sert au filet et au mode « moteur » : on le démarre aussi
         withContext(Dispatchers.IO) { EngineService.use(getApplication()) { EngineService.identity } }
-        ui = ui.copy(maiaAvailable = loaded != null)
+        ui = ui.copy(maiaAvailable = loaded != null, engineUnavailable = EngineService.isUnavailable)
         refresh(s(if (loaded == null) R.string.model_unavailable_stockfish else R.string.your_turn))
     }
 
@@ -767,6 +771,14 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     /** Vrai quand le dernier rejeu a buté sur un coup injouable. */
     private var failedResume = false
 
+    /** Le numéro de la prochaine annonce — voir [com.chesslab.ui.Announcement]. */
+    private var announcementId = 0
+
+    private fun announce(text: String) {
+        announcementId += 1
+        ui = ui.copy(announcement = com.chesslab.ui.Announcement(announcementId, text))
+    }
+
     private fun rebuild(lans: List<String>, status: String?) {
         gameEpoch++
         failedResume = false
@@ -858,6 +870,15 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             // Le doigt sent ce que l'oreille entend, et l'un marche quand
             // l'autre est coupé — en silence, ou dans un train.
             com.chesslab.sound.Haptics.forMove(isCapture, isCastle, isCheck)
+            // Et le lecteur d'écran l'entend : sans annonce, on ne sait pas
+            // ce que l'adversaire vient de jouer.
+            announce(
+                com.chesslab.ui.MoveNarration.announcement(
+                    getApplication(),
+                    if (it.piece.color == humanColor) s(R.string.you) else opponentName(),
+                    it.san,
+                )
+            )
         }
 
         val over = state is Board.State.Checkmate || state is Board.State.Draw
@@ -903,6 +924,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             blackClockMs = clock?.remaining(Piece.Color.black),
             gameOver = over,
             outcome = if (over) text else ui.outcome,
+            userWon = if (over) state is Board.State.Checkmate && state.color != humanColor else ui.userWon,
         )
     }
 
@@ -946,7 +968,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             position = startPosition,
             selected = null, legalTargets = emptySet(), lastMove = null, checkedKing = null,
             hints = emptyList(), blunderWarning = null,
-            sanMoves = emptyList(), gameOver = false, outcome = null,
+            sanMoves = emptyList(), gameOver = false, outcome = null, userWon = false,
             pendingPromotion = null, thinking = false, displayedPly = 0,
             captured = CapturedMaterial(),
             whiteClockMs = clock?.remaining(Piece.Color.white),
@@ -1028,6 +1050,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Termine la partie, l'enregistre, et arrête tout ce qui tourne. */
     private fun finish(message: String, result: String) {
+        val won = result == (if (humanColor == Piece.Color.white) "1-0" else "0-1")
         if (ui.gameOver) return
         gameEpoch++
         ticker?.cancel()
@@ -1049,11 +1072,36 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             engineElo = ui.level.roundToInt(),
             engineColor = humanColor.opposite,
         )
-        ui = ui.copy(gameOver = true, thinking = false, outcome = message, status = message)
+        ui = ui.copy(
+            gameOver = true, thinking = false, outcome = message, status = message,
+            userWon = won,
+        )
+        // Les coups étaient annoncés, la fin de partie non : on voyait le
+        // moteur cesser de répondre sans savoir qu'on venait de gagner.
+        announce(message)
     }
 
     private fun opponentName(): String =
         ui.opponent?.displayName(getApplication()) ?: s(R.string.stockfish)
+
+    /**
+     * Le moteur n'a pas démarré : on retente. Un échec de lancement est
+     * parfois passager, et rester devant une bannière sans recours n'aide
+     * personne.
+     */
+    fun retryEngine() = viewModelScope.launch {
+        if (ui.retryingEngine) return@launch
+        ui = ui.copy(retryingEngine = true)
+        EngineService.retry()
+        withContext(Dispatchers.IO) { EngineService.use(getApplication()) { EngineService.identity } }
+        ui = ui.copy(retryingEngine = false, engineUnavailable = EngineService.isUnavailable)
+        // Le moteur est revenu et c'était à lui de jouer : il reprend la main.
+        if (!ui.engineUnavailable && !ui.gameOver && ui.started &&
+            board.position.sideToMove != humanColor && !ui.thinking
+        ) {
+            askOpponent()
+        }
+    }
 
     /** L'utilisateur abandonne. */
     fun resign() {
@@ -1209,6 +1257,9 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         if (discarded.isEmpty()) return
         rebuild(uciLog.take(ply), s(R.string.your_turn))
         ui = ui.copy(resumeUndo = ResumeUndo(discarded, ply))
+        // Sans feuille de confirmation, rien n'annonce la troncature à qui ne
+        // voit pas la liste raccourcir.
+        announce(s(R.string.two_resume_announce, discarded.size))
         undoJob?.cancel()
         undoJob = viewModelScope.launch {
             kotlinx.coroutines.delay(8_000)

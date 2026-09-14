@@ -61,8 +61,13 @@ class StaleAnswerTest {
         // doit pas atterrir sur le plateau neuf.
         compose.onNodeWithTag("abandonner").performClick()
         compose.onNodeWithTag("abandonner-oui").performClick()
-        awaitTag("nouvelle")
-        compose.onNodeWithTag("nouvelle").performClick()
+        // Le panneau de fin n'offre que l'accueil et l'analyse, comme iOS :
+        // on repasse donc par l'écran de réglages, qui est à un tap.
+        awaitTag("accueil")
+        compose.onNodeWithTag("accueil").performClick()
+        openMode("play")
+        awaitTag("commencer")
+        compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer", 60_000)
 
         Thread.sleep(6_000)

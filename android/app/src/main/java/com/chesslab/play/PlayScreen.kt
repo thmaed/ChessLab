@@ -105,12 +105,19 @@ fun PlayScreen(
     // La position AFFICHÉE, et non celle du plateau : en consultation d'un
     // coup passé, c'est celle-là qu'on emporte ailleurs.
     TopBarActions {
+        ExportMenu(
+            fen = { model.ui.position.fen },
+            pgn = { model.currentPgn() },
+            hasGame = model.ui.sanMoves.isNotEmpty(),
+        )
         QuickSwitchMenu(
             onOpenTwoPlayer = { onOpenTwoPlayer(model.ui.position.fen) },
             onAnalyze = { onAnalyze(model.ui.position.fen) },
             onOpenLab = { onOpenLab(model.ui.position.fen) },
         )
     }
+
+    Announce(ui.announcement)
 
     // Le temps que le moteur se prépare, l'écran attend plutôt que de montrer
     // un plateau sur lequel on ne peut rien faire.
@@ -125,7 +132,14 @@ fun PlayScreen(
     // point de largeur gagné est un point sur les 64 cases. (Compose refuse
     // une marge négative, là où SwiftUI l'accepte.)
     val gutter = Modifier.padding(horizontal = 12.dp)
+    Box(Modifier.fillMaxSize()) {
     Column(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
+        // Le moteur n'a pas démarré : on le DIT, avec de quoi réessayer. Sans
+        // cette bannière la partie restait figée sans le moindre message.
+        if (ui.engineUnavailable) {
+            EngineBanner(gutter, ui.retryingEngine, onRetry = { model.retryEngine() })
+            Spacer(Modifier.height(6.dp))
+        }
         PlayerRow(
             modifier = gutter,
             name = ui.opponent?.firstName ?: stringResource(R.string.play_computer),
@@ -182,7 +196,6 @@ fun PlayScreen(
             gutter, ui.outcome ?: ui.status,
             summary = model.opponentSummaryLine(),
             onAnalyze = { onAnalyzeGame(model.currentPgn()) },
-            onNewGame = { model.newGame() },
             onHome = onHome,
         )
         else ControlBar(
@@ -204,6 +217,11 @@ fun PlayScreen(
             ui.status, fontSize = 13.sp, color = Palette.textSecondary,
             modifier = gutter.testTag("statut"),
         )
+    }
+
+    // Seuls les confettis passent PAR-DESSUS, et seulement pour une victoire :
+    // le bilan s'affiche sous le plateau, qui reste visible et consultable.
+    if (ui.gameOver && ui.userWon) CelebrationOverlay(Modifier.fillMaxSize())
     }
 
     if (ui.pendingPromotion != null) {
@@ -345,6 +363,7 @@ private fun PlayerRow(
         Spacer(Modifier.width(8.dp))
         CapturedTray(captured, color.opposite, advantage)
         Spacer(Modifier.weight(1f))
+
         if (clockMs != null) {
             Text(
                 GameClock.format(clockMs), fontSize = 19.sp, fontWeight = FontWeight.SemiBold,
@@ -353,35 +372,6 @@ private fun PlayerRow(
             )
         }
     }
-}
-
-/** Les pièces prises, en petit, puis l'avantage de matériel s'il y en a. */
-@Composable
-private fun CapturedTray(kinds: List<Piece.Kind>, glyphColor: Piece.Color, advantage: Int) {
-    if (kinds.isEmpty() && advantage <= 0) return
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        kinds.forEach { kind ->
-            Text(
-                pieceGlyph(kind),
-                fontSize = 13.sp,
-                color = if (glyphColor == Piece.Color.white) Palette.textPrimary else Palette.textSecondary,
-            )
-        }
-        if (advantage > 0) {
-            Spacer(Modifier.width(4.dp))
-            Text("+$advantage", fontSize = 12.sp, color = Palette.textSecondary)
-        }
-    }
-}
-
-/** Les figurines Unicode : elles disent la pièce sans charger une image. */
-private fun pieceGlyph(kind: Piece.Kind): String = when (kind) {
-    Piece.Kind.king -> "♚"
-    Piece.Kind.queen -> "♛"
-    Piece.Kind.rook -> "♜"
-    Piece.Kind.bishop -> "♝"
-    Piece.Kind.knight -> "♞"
-    Piece.Kind.pawn -> "♟"
 }
 
 /**
@@ -506,7 +496,6 @@ private fun GameOverPanel(
     message: String,
     summary: String,
     onAnalyze: () -> Unit,
-    onNewGame: () -> Unit,
     onHome: () -> Unit,
 ) {
     Column(
@@ -550,17 +539,43 @@ private fun GameOverPanel(
                 .padding(horizontal = 14.dp, vertical = 8.dp)
                 .testTag("analyser-la-partie"),
         )
-        Spacer(Modifier.width(8.dp))
+        }
+    }
+}
+
+/**
+ * « L'ordinateur n'a pas démarré : il ne jouera pas. » — et un bouton pour
+ * retenter. Dans le FLUX et non en superposition : posée par-dessus, elle
+ * recouvrait la 8e rangée.
+ */
+@Composable
+private fun EngineBanner(modifier: Modifier, retrying: Boolean, onRetry: () -> Unit) {
+    Row(
+        modifier
+            .fillMaxWidth()
+            .clip(ControlShape)
+            .background(Palette.danger.copy(alpha = 0.14f))
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .testTag("moteur-absent"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Text(
-            stringResource(R.string.new_game),
-            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.background,
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(accentGradient)
-                .clickable(onClick = onNewGame)
-                .padding(horizontal = 14.dp, vertical = 8.dp)
-                .testTag("nouvelle"),
+            stringResource(R.string.play_engine_down),
+            fontSize = 12.sp, color = Palette.danger, modifier = Modifier.weight(1f),
         )
+        if (retrying) {
+            CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Palette.danger)
+        } else {
+            Text(
+                stringResource(R.string.play_engine_retry),
+                fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.danger,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .border(1.dp, Palette.danger.copy(alpha = 0.6f), CircleShape)
+                    .clickable(onClick = onRetry)
+                    .padding(horizontal = 12.dp, vertical = 5.dp)
+                    .testTag("moteur-reessayer"),
+            )
         }
     }
 }
