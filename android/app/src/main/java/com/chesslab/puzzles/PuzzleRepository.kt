@@ -14,6 +14,12 @@ data class Puzzle(
     val theme: String,
     val rating: Int,
     val phase: String?,
+    /**
+     * Le PGN de la partie D'OÙ vient le puzzle, pour les puzzles maison :
+     * revoir la faute dans son contexte vaut mieux que la revoir seule.
+     * `null` pour les 106 094 puzzles de Lichess, qui n'ont pas de partie.
+     */
+    val sourcePgn: String? = null,
 ) {
     /** Le thème en toutes lettres. Repris de `PuzzleTheme.label`. */
     @get:StringRes

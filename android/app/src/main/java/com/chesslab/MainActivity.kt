@@ -212,8 +212,16 @@ private fun App() {
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
+            Route.PuzzleQueue -> com.chesslab.puzzles.PuzzleQueueScreen(
+                onStart = { filter -> stack.add(Route.Puzzles(filter = filter)) },
+                onPlayVsEngine = { stack.add(Route.NewGame()) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup()) },
+                onOpenLab = { stack.add(Route.Laboratory()) },
+            )
             is Route.Puzzles -> PuzzleScreen(
                 initialTheme = current.theme,
+                filter = current.filter,
+                onViewSourceGame = { stack.add(Route.AnalysisBoard(pgn = it)) },
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },

@@ -48,13 +48,20 @@ import com.chesslab.ui.TopBarActions
 fun PuzzleScreen(
     /** Un thème imposé à l'ouverture — depuis « à travailler » de la progression. */
     initialTheme: String? = null,
+    /** La séance choisie sur l'écran précédent. */
+    filter: PuzzleFilter? = null,
     onPlayVsEngine: (String) -> Unit = {},
     onOpenTwoPlayer: (String) -> Unit = {},
     onOpenLab: (String) -> Unit = {},
+    /** Revoir la faute DANS sa partie : le PGN d'origine part vers l'analyse. */
+    onViewSourceGame: (String) -> Unit = {},
     model: PuzzleViewModel = viewModel(),
 ) {
     val ui = model.ui
-    LaunchedEffect(initialTheme) { initialTheme?.let(model::trainTheme) }
+    LaunchedEffect(initialTheme, filter) {
+        initialTheme?.let(model::trainTheme)
+        if (initialTheme == null && filter != null) model.setFilter(filter)
+    }
 
     TopBarActions {
         QuickSwitchMenu(
@@ -65,9 +72,12 @@ fun PuzzleScreen(
     }
 
     Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        // Les filtres et le bilan ont quitté cet écran pour celui du CHOIX de
+        // la séance : on décide ce qu'on travaille avant de résoudre, et le
+        // puzzle courant ne change plus sous les doigts. Ne restent ici que
+        // la source (Lichess ou maison) et le compte des révisions.
         SourcePicker(ui, model::setSource)
-        FilterBar(ui, model::setFilter)
-        ui.stats?.takeIf { it.attempts > 0 }?.let { PuzzleStatsCard(it) }
+        DueBadge(ui)
         Header(ui)
         Spacer(Modifier.height(12.dp))
 
@@ -79,6 +89,9 @@ fun PuzzleScreen(
             lastMove = ui.lastMove,
             checkedKing = ui.checkedKing,
             hint = ui.hint,
+            // On ne traîne que les pièces du camp à qui l'on demande de
+            // trouver : glisser une pièce adverse n'est pas une réponse.
+            draggableColor = ui.position.sideToMove,
             enabled = ui.outcome == PuzzleOutcome.solving && !ui.busy,
             onSquareTap = model::onSquareTap,
         )
@@ -99,11 +112,15 @@ fun PuzzleScreen(
                 solved = ui.outcome == PuzzleOutcome.solved,
                 modifier = Modifier.padding(horizontal = 20.dp),
                 onNext = model::next,
+                sourcePgn = ui.puzzle?.sourcePgn,
+                onViewSourceGame = onViewSourceGame,
             )
         }
     }
 
-    if (ui.pendingPromotion != null) PromotionDialog(model::completePromotion)
+    if (ui.pendingPromotion != null) {
+        PromotionDialog(onPick = model::completePromotion, onCancel = model::cancelPromotion)
+    }
 }
 
 /**
@@ -115,6 +132,18 @@ fun PuzzleScreen(
  * Une seule ligne qui défile, pas trois : trois rangées de puces mangeraient
  * le plateau, et c'est le plateau qu'on vient voir.
  */
+@Composable
+private fun DueBadge(ui: PuzzleUiState) {
+    if (ui.dueCount <= 0) return
+    Row(Modifier.fillMaxWidth().padding(horizontal = 20.dp), horizontalArrangement = Arrangement.End) {
+        Text(
+            pluralStringResource(R.plurals.puzzle_due, ui.dueCount, ui.dueCount),
+            fontSize = 11.sp, color = Palette.warning,
+            modifier = Modifier.testTag("a-revoir"),
+        )
+    }
+}
+
 @Composable
 private fun FilterBar(ui: PuzzleUiState, onFilter: (PuzzleFilter) -> Unit) {
     var open by remember { mutableStateOf(false) }
@@ -365,7 +394,13 @@ private fun HintButton(onClick: () -> Unit) {
  * visible, y compris la flèche de la solution.
  */
 @Composable
-private fun ResultCard(solved: Boolean, modifier: Modifier, onNext: () -> Unit) {
+private fun ResultCard(
+    solved: Boolean,
+    modifier: Modifier,
+    onNext: () -> Unit,
+    sourcePgn: String? = null,
+    onViewSourceGame: (String) -> Unit = {},
+) {
     val tint = if (solved) Palette.accent else Palette.textSecondary
     Column(
         modifier
@@ -405,6 +440,21 @@ private fun ResultCard(solved: Boolean, modifier: Modifier, onNext: () -> Unit) 
                 .testTag("suivant"),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
         )
+        // Un puzzle MAISON vient d'une partie qu'on a jouée : la revoir dans
+        // son contexte vaut mieux que la revoir seule, et c'est là que le
+        // « pourquoi » se trouve.
+        if (sourcePgn != null) {
+            Text(
+                stringResource(R.string.puzzle_view_source),
+                fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Palette.textSecondary,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onViewSourceGame(sourcePgn) }
+                    .padding(vertical = 4.dp)
+                    .testTag("voir-la-partie"),
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            )
+        }
     }
 }
 
@@ -416,7 +466,7 @@ private fun ResultCard(solved: Boolean, modifier: Modifier, onNext: () -> Unit) 
  * « 0 % » ni thème désigné sur trois essais.
  */
 @Composable
-private fun PuzzleStatsCard(stats: com.chesslab.progression.PuzzleStats) {
+internal fun PuzzleStatsCard(stats: com.chesslab.progression.PuzzleStats) {
     Column(
         Modifier
             .fillMaxWidth()

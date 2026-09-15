@@ -85,7 +85,17 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data class AnalysisBoard(val fen: String? = null, val pgn: String? = null) :
         Route(R.string.route_analysis)
     /** [theme] : une série ciblée sur un thème — l'entrée depuis la progression. */
-    data class Puzzles(val theme: String? = null) : Route(R.string.route_puzzles)
+    /**
+     * Le CHOIX de la séance : niveau, phase, type. Comme sur iOS, on décide ce
+     * qu'on travaille avant de résoudre — sans quoi le puzzle courant change
+     * sous les doigts à chaque réglage.
+     */
+    data object PuzzleQueue : Route(R.string.route_puzzles)
+
+    data class Puzzles(
+        val theme: String? = null,
+        val filter: com.chesslab.puzzles.PuzzleFilter? = null,
+    ) : Route(R.string.route_puzzles)
     data object Openings : Route(R.string.route_openings) {
         override val hasOwnTitle get() = true
     }

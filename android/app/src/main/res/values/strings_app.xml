@@ -963,4 +963,12 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="entry_also_library">Also add to the library</string>
     <string name="entry_also_library_note">No effect on a FEN position — the library keeps games.</string>
     <string name="analysis_summary_partial">Analysis in progress — the summary fills in as moves are classified.</string>
+    <string name="puzzle_view_source">See it in the original game</string>
+
+    <string name="puzzle_level">Level</string>
+    <string name="puzzle_phase">Phase</string>
+    <string name="puzzle_type">Puzzle type</string>
+    <string name="puzzle_start_session">Start the session</string>
+    <string name="puzzle_all_puzzles">All puzzles</string>
+    <string name="filter_all_f">All</string>
 </resources>

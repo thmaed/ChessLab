@@ -241,6 +241,10 @@ class AppTest {
 
     @Test fun puzzlesLoadFromTheLibrary() {
         open("puzzles")
+        // Les puzzles passent d'abord par le CHOIX de la séance, comme sur
+        // iOS : on décide ce qu'on travaille avant de résoudre.
+        awaitTag("commencer-puzzles", 15_000)
+        compose.onNodeWithTag("commencer-puzzles").performClick()
         // la bibliothèque fait 19 Mo : on laisse le temps de la parcourir
         awaitTag("score", 60_000)
         compose.onNodeWithTag("case-e4").assertIsDisplayed()

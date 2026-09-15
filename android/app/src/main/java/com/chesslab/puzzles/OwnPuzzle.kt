@@ -36,6 +36,7 @@ data class OwnPuzzle(
         theme = theme,
         rating = rating,
         phase = null,
+        sourcePgn = sourcePgn.ifBlank { null },
     )
 }
 

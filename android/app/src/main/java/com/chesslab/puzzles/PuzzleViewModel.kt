@@ -257,6 +257,17 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         advance(move, puzzle)
     }
 
+    /**
+     * Toucher à côté ANNULE : le coup n'est pas joué, et il ne compte pas
+     * comme un essai. Promouvoir en dame à la place de quelqu'un qui n'a pas
+     * encore choisi serait lui faire rater le puzzle.
+     */
+    fun cancelPromotion() {
+        if (ui.pendingPromotion == null) return
+        board = Board(ui.position.copy())
+        ui = ui.copy(pendingPromotion = null, selected = null, legalTargets = emptySet())
+    }
+
     fun completePromotion(kind: Piece.Kind) {
         val pending = ui.pendingPromotion ?: return
         val puzzle = ui.puzzle ?: return
