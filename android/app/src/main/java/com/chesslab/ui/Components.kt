@@ -248,6 +248,51 @@ fun ChipButton(
     }
 }
 
+/**
+ * Les couleurs d'un interrupteur, à la palette de l'app.
+ *
+ * Material 3 peint un `Switch` sans couleurs explicites en VIOLET — sa teinte
+ * primaire par défaut, qui n'est celle d'aucun autre élément de l'app. Trois
+ * écrans (Réglages, Laboratoire, éditeur de position) avaient donc des
+ * interrupteurs violets à côté de ceux, verts, des écrans de partie.
+ */
+@Composable
+fun chessLabSwitchColors(): androidx.compose.material3.SwitchColors =
+    androidx.compose.material3.SwitchDefaults.colors(
+        checkedTrackColor = Palette.accent,
+        checkedThumbColor = Palette.background,
+        checkedBorderColor = Color.Transparent,
+        uncheckedTrackColor = Palette.surfaceElevated,
+        uncheckedThumbColor = Palette.textTertiary,
+        uncheckedBorderColor = Palette.stroke,
+        disabledCheckedTrackColor = Palette.accent.copy(alpha = 0.35f),
+        disabledCheckedThumbColor = Palette.background.copy(alpha = 0.6f),
+        disabledUncheckedTrackColor = Palette.surface,
+        disabledUncheckedThumbColor = Palette.textTertiary.copy(alpha = 0.5f),
+    )
+
+/**
+ * Les couleurs d'un curseur, à la palette — et SANS graduations.
+ *
+ * Material 3 dessine un point par pas dès qu'on lui donne `steps` : sur un
+ * curseur de 50 ms à 5 s par pas de 50, cela fait quatre-vingt-dix-huit points
+ * qui transforment la piste en pointillé illisible. Le pas reste utile pour la
+ * valeur, jamais pour le décor — il se fait donc dans `onValueChange`, et les
+ * graduations sont rendues transparentes ici.
+ */
+@Composable
+fun chessLabSliderColors(tint: Color = Palette.accent): androidx.compose.material3.SliderColors =
+    androidx.compose.material3.SliderDefaults.colors(
+        thumbColor = tint,
+        activeTrackColor = tint,
+        inactiveTrackColor = Palette.surfaceElevated,
+        activeTickColor = Color.Transparent,
+        inactiveTickColor = Color.Transparent,
+        disabledThumbColor = Palette.textTertiary,
+        disabledActiveTrackColor = Palette.textTertiary.copy(alpha = 0.4f),
+        disabledInactiveTrackColor = Palette.surface,
+    )
+
 /** Une rangée à bascule : le libellé, puis l'interrupteur. */
 @Composable
 fun ToggleRow(label: String, checked: Boolean, tag: String = "", onChange: (Boolean) -> Unit) {
@@ -267,10 +312,7 @@ fun ToggleRow(label: String, checked: Boolean, tag: String = "", onChange: (Bool
         Spacer(Modifier.width(12.dp))
         androidx.compose.material3.Switch(
             checked = checked, onCheckedChange = onChange,
-            colors = androidx.compose.material3.SwitchDefaults.colors(
-                checkedTrackColor = Palette.accent,
-                checkedThumbColor = Palette.background,
-            ),
+            colors = chessLabSwitchColors(),
         )
     }
 }

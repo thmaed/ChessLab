@@ -990,7 +990,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="lab_keep_awake">Garder l\'écran allumé</string>
     <string name="lab_level_a">Niveau du camp A</string>
     <string name="lab_level_b">Niveau du camp B</string>
-    <string name="lab_movetime">Temps de réflexion par coup (ms)</string>
+    <string name="lab_movetime">Réflexion par coup</string>
     <string name="lab_series_section">Série</string>
 
     <!-- Sources des données d\'ouvertures -->

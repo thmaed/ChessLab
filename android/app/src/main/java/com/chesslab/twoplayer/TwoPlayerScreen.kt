@@ -385,9 +385,8 @@ private fun TransportBar(
                 onValueChange = { onPick(it.toInt()) },
                 valueRange = 0f..ui.totalPlies.toFloat(),
                 steps = (ui.totalPlies - 1).coerceAtLeast(0),
-                colors = SliderDefaults.colors(
-                    thumbColor = if (ui.isReviewing) Palette.warning else Palette.accent,
-                    activeTrackColor = if (ui.isReviewing) Palette.warning else Palette.accent,
+                colors = com.chesslab.ui.chessLabSliderColors(
+                    if (ui.isReviewing) Palette.warning else Palette.accent
                 ),
                 modifier = Modifier.weight(1f).padding(horizontal = 6.dp).testTag("transport"),
             )

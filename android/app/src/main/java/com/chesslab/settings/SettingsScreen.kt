@@ -116,6 +116,7 @@ fun SettingsScreen(
             Switch(
                 checked = settings.soundsEnabled,
                 onCheckedChange = { SettingsStore.setSounds(context, it) },
+                colors = com.chesslab.ui.chessLabSwitchColors(),
             )
             Spacer(Modifier.width(10.dp))
             Column {
@@ -143,6 +144,7 @@ fun SettingsScreen(
             Switch(
                 checked = settings.hapticsEnabled,
                 onCheckedChange = { SettingsStore.setHaptics(context, it) },
+                colors = com.chesslab.ui.chessLabSwitchColors(),
             )
             Spacer(Modifier.width(10.dp))
             Column {

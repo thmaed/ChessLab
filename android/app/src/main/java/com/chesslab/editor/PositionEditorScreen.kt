@@ -112,7 +112,10 @@ fun PositionEditorScreen(
 
             Spacer(Modifier.height(10.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Switch(checked = whiteToMove, onCheckedChange = { whiteToMove = it })
+                Switch(
+                    checked = whiteToMove, onCheckedChange = { whiteToMove = it },
+                    colors = com.chesslab.ui.chessLabSwitchColors(),
+                )
                 Spacer(Modifier.width(8.dp))
                 Text(
                     stringResource(if (whiteToMove) R.string.white_to_move else R.string.black_to_move),

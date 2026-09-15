@@ -235,6 +235,7 @@ fun VariantSetupScreen(
                             typedNumber = number.toString()
                         },
                         valueRange = 0f..959f,
+                        colors = com.chesslab.ui.chessLabSliderColors(),
                         modifier = Modifier.testTag("curseur-960"),
                     )
                     Text(

@@ -31,6 +31,7 @@ import com.chesslab.ui.Palette
 import com.chesslab.ui.StatusRow
 import androidx.compose.ui.res.stringResource
 import com.chesslab.R
+import kotlin.math.roundToInt
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -244,10 +245,13 @@ private fun AdvancedSettings(ui: LabUiState, model: LabViewModel, enabled: Boole
         }
         androidx.compose.material3.Slider(
             value = ui.movetimeMs.toFloat(),
-            onValueChange = { model.setMovetime((it / 50).toInt() * 50) },
+            // Le pas de 50 ms se fait ICI et non par `steps` : Material
+            // dessinerait alors quatre-vingt-dix-huit graduations, et la piste
+            // deviendrait un pointillé.
+            onValueChange = { model.setMovetime((it / 50).roundToInt() * 50) },
             valueRange = 50f..5_000f,
-            steps = 98,
             enabled = enabled,
+            colors = com.chesslab.ui.chessLabSliderColors(),
             modifier = Modifier.testTag("curseur-temps"),
         )
         Text(
@@ -352,6 +356,7 @@ private fun Toggle(
     ) {
         androidx.compose.material3.Switch(
             checked = checked, onCheckedChange = { onChange(it) }, enabled = enabled,
+            colors = com.chesslab.ui.chessLabSwitchColors(),
         )
         Spacer(Modifier.width(10.dp))
         Text(

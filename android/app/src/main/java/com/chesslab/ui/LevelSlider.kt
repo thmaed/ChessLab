@@ -54,7 +54,7 @@ fun LevelSlider(
             value = value.toFloat().coerceIn(range.start, range.endInclusive),
             onValueChange = { onChange(((it / 10).roundToInt() * 10).toDouble().coerceIn(range.start.toDouble(), range.endInclusive.toDouble())) },
             valueRange = range,
-            colors = SliderDefaults.colors(thumbColor = tint, activeTrackColor = tint),
+            colors = chessLabSliderColors(tint),
             modifier = Modifier.testTag("curseur-niveau"),
         )
         Row {

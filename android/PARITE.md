@@ -222,6 +222,17 @@ trois choses manquaient vraiment.
       ressemblaient trop pour qu'on retrouve la sienne d'un coup d'œil.
       `ChipButton` accepte désormais une teinte, comme le `FilterChip` d'iOS.
 
+### Interrupteurs et curseurs — FAIT le 15/09 (vu sur appareil)
+- [x] **Plus d'interrupteurs VIOLETS.** Material 3 peint un `Switch` sans
+      couleurs explicites avec sa teinte primaire par défaut, qui n'est celle
+      d'aucun élément de l'app : les Réglages, le Laboratoire et l'éditeur de
+      position avaient donc des interrupteurs violets à côté des verts.
+      `chessLabSwitchColors()` les tient tous.
+- [x] **Plus de piste violette ni de graduations** sur les curseurs :
+      `chessLabSliderColors()`. Le curseur de réflexion du Laboratoire
+      affichait quatre-vingt-dix-huit points — un pointillé illisible — parce
+      que le pas était donné à Material au lieu d'être appliqué à la valeur.
+
 ## ✅ La passe de septembre — 13/09/2026
 
 (Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :

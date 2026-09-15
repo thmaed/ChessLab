@@ -993,7 +993,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="lab_keep_awake">Keep the screen awake</string>
     <string name="lab_level_a">Side A level</string>
     <string name="lab_level_b">Side B level</string>
-    <string name="lab_movetime">Thinking time per move (ms)</string>
+    <string name="lab_movetime">Thinking time per move</string>
     <string name="lab_series_section">Series</string>
 
     <!-- Sources des données d'ouvertures -->
