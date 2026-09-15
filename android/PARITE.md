@@ -168,6 +168,27 @@ tout régler depuis toujours.
       modèle de vue survit à la navigation, et aller voir l'analyse faisait
       tomber le drapeau sans que personne n'ait joué.
 
+### Module « Laboratoire » — les réglages AVANCÉS — FAIT le 15/09
+iOS règle une série sur un écran dédié (`LabSetupView`) en quatre sections ;
+Android les tient sous le plateau, ce qui reste un écart de FORME assumé — mais
+trois choses manquaient vraiment.
+- [x] **Livre d'ouvertures**, camp par camp, plus son ampleur (lignes
+      principales / avec variantes). Sans lui, deux Stockfish rejouaient
+      indéfiniment la même ouverture : la série mesurait une position, pas une
+      force. Un personnage garde TOUJOURS son propre répertoire — c'est son
+      caractère, pas un réglage.
+- [x] **Réflexion par coup en CURSEUR**, 50 ms à 5 s (c'était un incrémenteur
+      plafonné à 3 s : on ne parcourt pas cette plage en tapant cinquante fois
+      sur « + »), avec la note de calibration — les Elo de Stockfish sont calés
+      sur 2-3 s par coup — et l'avertissement quand un camp proche du maximum
+      tourne à moins d'une demi-seconde.
+- [x] **Reprendre une série interrompue** : la série s'écrit sur le disque
+      après CHAQUE partie, et une bannière la propose à l'ouverture. Un quart
+      d'heure de calcul se perdait sans que rien ne le dise.
+- [x] **La veille se DÉDUIT de la longueur** tant qu'on n'y a pas touché
+      (au-delà de vingt parties), et un choix explicite tient ensuite — le
+      réglage était écrasé à chaque changement de longueur.
+
 ## ✅ La passe de septembre — 13/09/2026
 
 (Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :

@@ -64,12 +64,22 @@ data class LabUiState(
      */
     val liveVisualization: Boolean = true,
     /**
-     * Empêcher la mise en veille pendant la série. Une longue série tourne
-     * plusieurs minutes sans qu'on touche l'écran ; en deçà d'une vingtaine
-     * de parties on ne prend pas la main sur un réglage système que personne
-     * n'a demandé.
+     * Le livre d'ouvertures, camp par camp. Sans lui, deux moteurs rejouent
+     * indéfiniment la même ouverture et la série mesure une seule position
+     * plutôt qu'une force.
      */
-    val keepAwake: Boolean = false,
+    val bookA: Boolean = true,
+    val bookB: Boolean = true,
+    /** L'ampleur du livre : lignes principales, ou variantes comprises. */
+    val bookWidth: com.chesslab.play.BookWidth = com.chesslab.play.BookWidth.includeSidelines,
+    /**
+     * Empêcher la mise en veille pendant la série. `null` = le défaut suit la
+     * LONGUEUR : au-delà d'une vingtaine de parties l'appareil s'endormirait à
+     * coup sûr avant la fin ; en deçà, on ne prend pas la main sur un réglage
+     * système que personne n'a demandé. Renseigné dès que l'utilisateur y
+     * touche — et son choix tient alors, même s'il change la longueur.
+     */
+    val keepAwakeSetting: Boolean? = null,
     val running: Boolean = false,
     val status: String = "",
     /** Les parties TERMINÉES de la série : c'est d'elles que tout se déduit. */
@@ -79,6 +89,11 @@ data class LabUiState(
     val aPlaysWhite: Boolean = true,
     /** La position imposée à la série, quand elle n'est pas la position standard. */
     val startFen: String? = null,
+    /**
+     * Une série INTERROMPUE retrouvée sur le disque : une bannière propose de
+     * la reprendre. `null` dès qu'on a tranché — repris ou écarté.
+     */
+    val resumable: LabAutosave.Snapshot? = null,
 ) {
     /**
      * Le bilan, RECALCULÉ à partir des parties plutôt que compté au fil de
@@ -86,6 +101,29 @@ data class LabUiState(
      * genre de divergence qu'on ne voit pas — les chiffres restent
      * plausibles.
      */
+    val keepAwake: Boolean get() = keepAwakeSetting ?: (gameCount > 20)
+
+    /** Les réglages seuls, tels qu'ils s'écrivent sur le disque. */
+    val seriesSettings: LabSeriesSettings
+        get() = LabSeriesSettings(
+            sideAProfileId = sideA.profile?.id, sideBProfileId = sideB.profile?.id,
+            sideALevel = sideA.level, sideBLevel = sideB.level,
+            movetimeMs = movetimeMs, gameCount = gameCount,
+            alternateColors = alternateColors, resignationEnabled = resignationEnabled,
+            drawAgreementEnabled = drawAgreementEnabled, liveVisualization = liveVisualization,
+            bookA = bookA, bookB = bookB, bookWidth = bookWidth,
+            keepAwakeSetting = keepAwakeSetting, startFen = startFen,
+        )
+
+    /**
+     * Un camp proche du maximum ET moins d'une demi-seconde par coup : le
+     * temps court bride surtout le camp fort, et l'écart réel sera plus petit
+     * que l'écart affiché. L'écran le dit plutôt que de laisser conclure.
+     */
+    val shortTimeWarning: Boolean
+        get() = movetimeMs < 500 &&
+            (sideA.profile == null && sideA.level >= 2800 || sideB.profile == null && sideB.level >= 2800)
+
     val stats: LabStats
         get() = LabStats.of(completed.map { it.labResult }, completed.map { it.plyCount })
 
@@ -152,13 +190,16 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     fun setSideB(profile: OpponentProfile?) { ui = ui.copy(sideB = LabSide(profile, profile?.defaultLevel ?: 1500.0)) }
     fun setLevelA(level: Double) { ui = ui.copy(sideA = ui.sideA.copy(level = level)) }
     fun setLevelB(level: Double) { ui = ui.copy(sideB = ui.sideB.copy(level = level)) }
-    fun setMovetime(ms: Int) { ui = ui.copy(movetimeMs = ms) }
-    fun setGameCount(count: Int) { ui = ui.copy(gameCount = count.coerceIn(1, 500), keepAwake = count > 20) }
+    fun setMovetime(ms: Int) { ui = ui.copy(movetimeMs = ms.coerceIn(50, 5_000)) }
+    fun setGameCount(count: Int) { ui = ui.copy(gameCount = count.coerceIn(1, 500)) }
+    fun setBookA(on: Boolean) { ui = ui.copy(bookA = on) }
+    fun setBookB(on: Boolean) { ui = ui.copy(bookB = on) }
+    fun setBookWidth(width: com.chesslab.play.BookWidth) { ui = ui.copy(bookWidth = width) }
     fun setAlternateColors(on: Boolean) { ui = ui.copy(alternateColors = on) }
     fun setResignation(on: Boolean) { ui = ui.copy(resignationEnabled = on) }
     fun setDrawAgreement(on: Boolean) { ui = ui.copy(drawAgreementEnabled = on) }
     fun setLiveVisualization(on: Boolean) { ui = ui.copy(liveVisualization = on) }
-    fun setKeepAwake(on: Boolean) { ui = ui.copy(keepAwake = on) }
+    fun setKeepAwake(on: Boolean) { ui = ui.copy(keepAwakeSetting = on) }
 
     fun toggle() {
         if (ui.running) { stop(); return }
@@ -174,7 +215,11 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
 
     fun reset() {
         stop()
-        ui = ui.copy(completed = emptyList(), gameNumber = 0, aPlaysWhite = true, status = s(R.string.lab_ready))
+        LabAutosave.clear(getApplication())
+        ui = ui.copy(
+            completed = emptyList(), gameNumber = 0, aPlaysWhite = true,
+            resumable = null, status = s(R.string.lab_ready),
+        )
         newGame()
     }
 
@@ -243,7 +288,16 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     private suspend fun step(): Boolean {
         val whiteIsA = ui.aPlaysWhite
         val toMove = board.position.sideToMove
-        val side = if ((toMove == Piece.Color.white) == whiteIsA) ui.sideA else ui.sideB
+        val isA = (toMove == Piece.Color.white) == whiteIsA
+        val side = if (isA) ui.sideA else ui.sideB
+
+        // Le LIVRE d'abord : tant qu'on est dans l'arbre connu, le coup vient
+        // de là et le moteur ne cherche pas. C'est ce qui VARIE les ouvertures
+        // d'une partie à l'autre — sans lui, deux Stockfish rejouent la même
+        // et la série mesure une position, pas une force.
+        bookMove(side, isA)?.let { bookLan ->
+            if (applyMove(bookLan, side)) return true
+        }
 
         val lan = withContext(Dispatchers.IO) {
             val profile = side.profile
@@ -269,6 +323,40 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
             }
         } ?: return false
 
+        return applyMove(lan, side)
+    }
+
+    /**
+     * Le coup du livre pour ce camp, ou `null` — livre coupé, position de
+     * départ personnalisée (le livre part de la position initiale et n'aurait
+     * aucun sens ailleurs), ou position sortie de l'arbre connu.
+     *
+     * Un personnage a SON répertoire : c'est son caractère, pas un réglage, et
+     * il ne se coupe donc pas — même règle qu'en mode « Contre l'ordinateur ».
+     */
+    private fun bookMove(side: LabSide, isA: Boolean): String? {
+        if (ui.startFen != null) return null
+        val assets = getApplication<Application>().assets
+        val own = side.profile?.id?.let { com.chesslab.play.OpeningBookStore.forOpponent(assets, it) }
+        val roots: List<com.chesslab.play.BookNode>
+        val width: com.chesslab.play.BookWidth
+        if (own != null && maia != null) {
+            roots = own
+            width = com.chesslab.play.BookWidth.includeSidelines
+        } else {
+            val enabled = if (isA) ui.bookA else ui.bookB
+            if (!enabled) return null
+            roots = com.chesslab.play.OpeningBookStore.general(assets)
+            width = ui.bookWidth
+        }
+        val san = com.chesslab.play.OpeningBookPicker.pick(roots, ui.sanMoves, width) ?: return null
+        // Le SAN vient d'un fichier : il peut ne pas être jouable ici. On le
+        // vérifie sur le plateau plutôt que de faire confiance au fichier.
+        return chesskit.SanParser.parse(san, board.position)?.lan
+    }
+
+    /** Pose un coup en LAN sur le plateau et publie l'état. `false` s'il est refusé. */
+    private suspend fun applyMove(lan: String, side: LabSide): Boolean {
         if (lan == "(none)" || lan.length < 4) return false
         var move: Move = board.move(pieceAt = Square(lan.substring(0, 2)), to = Square(lan.substring(2, 4)))
             ?: return false
@@ -349,6 +437,55 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
                 pgn = recorder.pgn,
             )
         )
+        // Sur le disque APRÈS CHAQUE PARTIE : une série de cent parties tourne
+        // un quart d'heure, et l'app évincée par le système jetait jusqu'ici
+        // tout le travail sans même le dire.
+        LabAutosave.save(getApplication(), ui.seriesSettings, ui.completed)
+    }
+
+    // MARK: Reprise
+
+    /**
+     * Une série interrompue attend-elle sur le disque ? Appelé à l'ouverture
+     * de l'écran. Une série TERMINÉE n'est pas proposée : elle n'a plus rien à
+     * reprendre, et son fichier ne sert qu'à ne pas la reproposer.
+     */
+    fun lookForInterruptedSeries() {
+        if (ui.running || ui.completed.isNotEmpty()) return
+        val snapshot = LabAutosave.load(getApplication()) ?: return
+        if (snapshot.isComplete || snapshot.completed.isEmpty()) return
+        ui = ui.copy(resumable = snapshot)
+    }
+
+    /** Reprendre : les réglages ET les parties déjà jouées reviennent. */
+    fun resumeInterruptedSeries() {
+        val snapshot = ui.resumable ?: return
+        val settings = snapshot.settings
+        startPosition = settings.startFen?.let { Position.fromFen(it) } ?: Position.standard
+        ui = ui.copy(
+            sideA = settings.sideA, sideB = settings.sideB,
+            movetimeMs = settings.movetimeMs, gameCount = settings.gameCount,
+            alternateColors = settings.alternateColors,
+            resignationEnabled = settings.resignationEnabled,
+            drawAgreementEnabled = settings.drawAgreementEnabled,
+            liveVisualization = settings.liveVisualization,
+            bookA = settings.bookA, bookB = settings.bookB, bookWidth = settings.bookWidth,
+            keepAwakeSetting = settings.keepAwakeSetting, startFen = settings.startFen,
+            completed = snapshot.completed,
+            gameNumber = snapshot.completed.size,
+            // La couleur de A suit l'alternance : la reprendre au hasard
+            // biaiserait le reste de la série.
+            aPlaysWhite = !settings.alternateColors || snapshot.completed.size % 2 == 0,
+            resumable = null,
+            status = s(R.string.lab_resumed, snapshot.completed.size),
+        )
+        newGame()
+    }
+
+    /** Écarter : on repart de zéro, et le fichier s'en va avec. */
+    fun discardInterruptedSeries() {
+        LabAutosave.clear(getApplication())
+        ui = ui.copy(resumable = null)
     }
 
     private fun reasonLabel(state: Board.State): String = when (state) {

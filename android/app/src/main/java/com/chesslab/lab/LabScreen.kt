@@ -50,6 +50,10 @@ fun LabScreen(
 
     LaunchedEffect(startFen) { if (startFen != null) model.startFrom(startFen) }
 
+    // Une série interrompue attend peut-être sur le disque : on le demande à
+    // l'ouverture, une fois.
+    LaunchedEffect(Unit) { model.lookForInterruptedSeries() }
+
     // Une longue série tourne plusieurs minutes sans qu'on touche l'écran :
     // sans ce verrou, l'appareil s'endort et la série s'arrête avec lui. On
     // ne le prend QUE pendant la série, et on le rend en partant.
@@ -78,6 +82,16 @@ fun LabScreen(
         panel = {
             Spacer(Modifier.height(10.dp))
             MoveStrip(ui.sanMoves)
+
+            ui.resumable?.let { snapshot ->
+                Spacer(Modifier.height(12.dp))
+                ResumeBanner(
+                    played = snapshot.completed.size,
+                    total = snapshot.settings.gameCount,
+                    onResume = model::resumeInterruptedSeries,
+                    onDiscard = model::discardInterruptedSeries,
+                )
+            }
 
             Spacer(Modifier.height(12.dp))
             LabStatsPanel(ui)
@@ -126,6 +140,41 @@ fun LabScreen(
 }
 
 /**
+ * La bannière de reprise. Pendant de `resumeBanner` (`LabSetupView`).
+ *
+ * Elle ne reprend RIEN toute seule : une série qu'on retrouve peut aussi être
+ * une série qu'on avait abandonnée exprès, et la relancer d'office ferait
+ * repartir le moteur pour un quart d'heure sans qu'on l'ait demandé.
+ */
+@Composable
+private fun ResumeBanner(played: Int, total: Int, onResume: () -> Unit, onDiscard: () -> Unit) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(com.chesslab.ui.ControlShape)
+            .background(Palette.surfaceElevated)
+            .border(1.dp, Palette.accent.copy(alpha = 0.45f), com.chesslab.ui.ControlShape)
+            .padding(14.dp)
+            .testTag("reprendre-serie"),
+    ) {
+        Text(
+            stringResource(R.string.lab_resume_title), fontSize = 14.sp,
+            fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+        )
+        Spacer(Modifier.height(2.dp))
+        Text(
+            stringResource(R.string.lab_resume_body, played, total),
+            fontSize = 12.sp, color = Palette.textSecondary,
+        )
+        Spacer(Modifier.height(10.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            SmallPill(stringResource(R.string.lab_resume), "reprendre", onResume)
+            SmallPill(stringResource(R.string.lab_resume_discard), "recommencer", onDiscard)
+        }
+    }
+}
+
+/**
  * Les réglages de la SÉRIE : sa longueur, l'alternance des couleurs, ce qu'on
  * autorise pour l'abréger, le rythme d'affichage.
  *
@@ -141,9 +190,6 @@ private fun SeriesSettings(ui: LabUiState, model: LabViewModel) {
         Stepper(stringResource(R.string.lab_games), ui.gameCount, 1..500, 5, "nombre-parties", enabled) {
             model.setGameCount(it)
         }
-        Stepper(stringResource(R.string.lab_movetime), ui.movetimeMs, 50..3_000, 50, "temps-coup", enabled) {
-            model.setMovetime(it)
-        }
         Stepper(stringResource(R.string.lab_level_a), ui.sideA.level.toInt(), 800..3190, 100, "niveau-a", enabled) {
             model.setLevelA(it.toDouble())
         }
@@ -153,8 +199,98 @@ private fun SeriesSettings(ui: LabUiState, model: LabViewModel) {
         Toggle(stringResource(R.string.lab_alternate), ui.alternateColors, "alterner", enabled, model::setAlternateColors)
         Toggle(stringResource(R.string.lab_resign_allowed), ui.resignationEnabled, "abandon", enabled, model::setResignation)
         Toggle(stringResource(R.string.lab_draw_allowed), ui.drawAgreementEnabled, "nulle", enabled, model::setDrawAgreement)
+        // Les nulles selon les RÈGLES restent déclarées quoi qu'on coche : le
+        // réglage ne porte que sur la nulle par accord.
+        Text(
+            stringResource(R.string.lab_draw_rules_note),
+            fontSize = 11.sp, color = Palette.textTertiary,
+        )
         Toggle(stringResource(R.string.lab_animate), ui.liveVisualization, "animer", enabled, model::setLiveVisualization)
+
+        Spacer(Modifier.height(10.dp))
+        AdvancedSettings(ui, model, enabled)
+    }
+}
+
+/**
+ * Les réglages AVANCÉS : le temps de réflexion, le livre d'ouvertures, la mise
+ * en veille. Pendant de la section du même nom de `LabSetupView`.
+ *
+ * Le temps est un curseur et non un incrémenteur : de 50 ms à 5 s, on ne
+ * parcourt pas cette plage en tapant cinquante fois sur « + ». Et il porte sa
+ * NOTE : les Elo de Stockfish sont calibrés à deux ou trois secondes par coup,
+ * un chiffre qu'on ne devine pas et qui rend les étiquettes honnêtes.
+ */
+@Composable
+private fun AdvancedSettings(ui: LabUiState, model: LabViewModel, enabled: Boolean) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        com.chesslab.ui.SectionHeader(stringResource(R.string.lab_advanced_section))
+        Spacer(Modifier.height(4.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                stringResource(R.string.lab_movetime), fontSize = 13.sp,
+                color = if (enabled) Palette.textPrimary else Palette.textTertiary,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                if (ui.movetimeMs >= 1_000) "%.1f s".format(ui.movetimeMs / 1000.0)
+                else "${ui.movetimeMs} ms",
+                fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                color = Palette.textSecondary,
+                modifier = Modifier.testTag("temps-coup"),
+            )
+        }
+        androidx.compose.material3.Slider(
+            value = ui.movetimeMs.toFloat(),
+            onValueChange = { model.setMovetime((it / 50).toInt() * 50) },
+            valueRange = 50f..5_000f,
+            steps = 98,
+            enabled = enabled,
+            modifier = Modifier.testTag("curseur-temps"),
+        )
+        Text(
+            stringResource(R.string.lab_movetime_note),
+            fontSize = 11.sp, color = Palette.textTertiary,
+        )
+        if (ui.shortTimeWarning) {
+            Text(
+                stringResource(R.string.lab_short_time_warning),
+                fontSize = 11.sp, color = Palette.warning,
+                modifier = Modifier.testTag("avertissement-temps"),
+            )
+        }
+
+        Spacer(Modifier.height(6.dp))
+        Text(
+            stringResource(R.string.lab_book_section), fontSize = 12.sp,
+            fontWeight = FontWeight.SemiBold, color = Palette.textSecondary,
+        )
+        Toggle(stringResource(R.string.lab_book_a), ui.bookA, "livre-a", enabled, model::setBookA)
+        Toggle(stringResource(R.string.lab_book_b), ui.bookB, "livre-b", enabled, model::setBookB)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            listOf(
+                com.chesslab.play.BookWidth.mainLinesOnly to R.string.setup_book_main,
+                com.chesslab.play.BookWidth.includeSidelines to R.string.setup_book_sidelines,
+            ).forEach { (width, label) ->
+                com.chesslab.ui.ChipButton(
+                    stringResource(label), ui.bookWidth == width,
+                    Modifier.testTag("livre-${width.name}"),
+                ) { if (enabled) model.setBookWidth(width) }
+            }
+        }
+        Text(
+            stringResource(R.string.lab_book_note),
+            fontSize = 11.sp, color = Palette.textTertiary,
+        )
+
+        Spacer(Modifier.height(6.dp))
         Toggle(stringResource(R.string.lab_keep_awake), ui.keepAwake, "eveil", enabled, model::setKeepAwake)
+        Text(
+            stringResource(R.string.lab_keep_awake_note),
+            fontSize = 11.sp, color = Palette.textTertiary,
+        )
     }
 }
 
