@@ -544,6 +544,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="role_trap">Trap</string>
     <string name="role_inaccuracy">Inaccuracy</string>
     <string name="role_refutation">Refutation</string>
+    <string name="role_memorise">Memorise</string>
     <string name="role_main_line">Main line</string>
     <string name="variant_chess960_short">Zero theory</string>
     <string name="variant_koth_short">King to the centre</string>

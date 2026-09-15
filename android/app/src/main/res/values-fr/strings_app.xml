@@ -541,6 +541,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="role_trap">Piège</string>
     <string name="role_inaccuracy">Imprécision</string>
     <string name="role_refutation">Réfutation</string>
+    <string name="role_memorise">À mémoriser</string>
     <string name="role_main_line">Ligne principale</string>
     <string name="variant_chess960_short">Zéro théorie</string>
     <string name="variant_koth_short">Le roi au centre</string>

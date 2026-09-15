@@ -229,10 +229,10 @@ fun CourseScreen(
 
             if (coloured.isNotEmpty()) {
                 Spacer(Modifier.height(16.dp))
-                SectionHeader(stringResource(R.string.course_repertoire), Modifier.padding(horizontal = 20.dp))
+                SectionHeader(stringResource(R.string.course_repertoire), Modifier.padding(horizontal = 16.dp))
                 Spacer(Modifier.height(8.dp))
                 Column(
-                    Modifier.padding(horizontal = 20.dp),
+                    Modifier.padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     coloured.forEach { (move, tint, _) ->
@@ -414,38 +414,65 @@ private fun MoveRow(move: CourseMove, tint: Color, branchName: String? = null, o
             .background(tint.copy(alpha = 0.10f))
             .border(1.dp, tint.copy(alpha = 0.45f), ControlShape)
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 11.dp)
+            .padding(horizontal = 12.dp, vertical = 10.dp)
             .testTag("coup-${move.uci}"),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalAlignment = Alignment.Top,
     ) {
-        Box(Modifier.size(10.dp).clip(CircleShape).background(tint))
-        Spacer(Modifier.width(10.dp))
-        Column {
-            Text(FigurineSan.format(move.san), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
-            branchName?.let {
-                Text(it, fontSize = 10.sp, color = Palette.textTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis)
-            }
-        }
+        Box(Modifier.padding(top = 4.dp).size(10.dp).clip(CircleShape).background(tint))
+        Spacer(Modifier.width(8.dp))
+        Text(
+            FigurineSan.format(move.san), fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
+            color = Palette.textPrimary, maxLines = 1,
+        )
         roleLabel(move.role)?.let { label ->
+            Spacer(Modifier.width(6.dp))
+            Tag(stringResource(label), roleTint(move.role) ?: tint)
+        }
+        // NOMMÉ, pas symbolisé : un marqueur qu'il faut aller chercher ailleurs
+        // n'informe personne. Même libellé qu'iOS.
+        if (move.isCritical) {
+            Spacer(Modifier.width(6.dp))
+            Tag(stringResource(R.string.role_memorise), Palette.warning)
+        }
+        // Le nom de la variante passe à DROITE plutôt que sous le coup : sur
+        // une liste de huit branches, une deuxième ligne par coup faisait
+        // descendre le répertoire hors de l'écran. C'est la mise en page d'iOS.
+        if (branchName != null) {
             Spacer(Modifier.width(8.dp))
             Text(
-                stringResource(label), fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
-                color = roleTint(move.role) ?: tint,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background((roleTint(move.role) ?: tint).copy(alpha = 0.16f))
-                    .padding(horizontal = 7.dp, vertical = 2.dp),
+                branchName, fontSize = 10.sp, fontWeight = FontWeight.Medium, color = tint,
+                textAlign = androidx.compose.ui.text.style.TextAlign.End,
+                maxLines = 2, overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
             )
+        } else {
+            Spacer(Modifier.weight(1f))
         }
-        Spacer(Modifier.weight(1f))
         // La part, avec le séparateur de la langue : « 62 % » en français,
         // « 62% » en anglais — c'était écrit en dur à la française.
         move.popularity?.let {
-            Text(percent(it), fontSize = 12.sp, color = Palette.textSecondary)
+            Spacer(Modifier.width(6.dp))
+            Text(percent(it), fontSize = 11.sp, color = Palette.textSecondary, maxLines = 1)
         }
         Spacer(Modifier.width(6.dp))
-        Icon(Icons.Default.ChevronRight, null, tint = Palette.textTertiary, modifier = Modifier.size(16.dp))
+        Icon(
+            Icons.Default.ChevronRight, null, tint = Palette.textTertiary,
+            modifier = Modifier.padding(top = 2.dp).size(15.dp),
+        )
     }
+}
+
+/** Une étiquette de rôle : courte, teintée, et jamais plus grosse que le coup. */
+@Composable
+private fun Tag(label: String, tint: Color) {
+    Text(
+        label, fontSize = 10.sp, fontWeight = FontWeight.Bold, color = tint,
+        maxLines = 1,
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(tint.copy(alpha = 0.16f))
+            .padding(horizontal = 6.dp, vertical = 2.dp),
+    )
 }
 
 @Composable

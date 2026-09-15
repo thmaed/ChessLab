@@ -24,6 +24,12 @@ data class CatalogEntry(
     val family: String?,
     /** Profondeur maximale de l'arbre, en demi-coups. */
     val maxDepth: Int?,
+    /**
+     * Le nom d'ORIGINE, en anglais — celui du fichier. Il ne s'affiche jamais,
+     * il se CHERCHE : quelqu'un qui tape « Sicilian » dans une app en français
+     * doit trouver la Sicilienne, et c'est ce que fait iOS.
+     */
+    val originalName: String = name,
 ) {
     @get:StringRes
     val sideLabel: Int get() = if (side == "white") R.string.color_white else R.string.color_black
@@ -102,6 +108,33 @@ object CourseRepository {
      */
     private fun language(): String =
         if (java.util.Locale.getDefault().language == "fr") "fr" else "en"
+
+    /**
+     * Le NOM d'un cours, traduit.
+     *
+     * Le nom est une chaîne unique dans `opening_catalog.json` (« Italian
+     * Game », « The Opposition ») : iOS s'en sert comme CLÉ de traduction et
+     * affiche « Partie italienne » en français. Android lisait le nom brut, et
+     * montrait cent trente-six titres en anglais dans une app en français.
+     *
+     * La table est GÉNÉRÉE au build depuis le catalogue de localisation iOS
+     * (`generateCourseNames`) : une traduction changée d'un côté n'a pas à
+     * être reportée de l'autre. Un nom absent — un répertoire personnel, par
+     * exemple — se rend tel quel : il n'y a rien à traduire.
+     */
+    private var names: Map<String, JSONObject>? = null
+    private var namesLanguage: String? = null
+
+    @Synchronized
+    private fun translated(assets: AssetManager, name: String): String {
+        if (namesLanguage != language()) { names = null; namesLanguage = language() }
+        val table = names ?: runCatching {
+            val text = assets.open("$DIR/course_names.json").bufferedReader().use { it.readText() }
+            val o = JSONObject(text)
+            o.keys().asSequence().associateWith { o.getJSONObject(it) }
+        }.getOrDefault(emptyMap()).also { names = it }
+        return localized(table[name]) ?: name
+    }
 
     /** Le texte dans la langue courante, avec repli sur le français. */
     private fun localized(o: JSONObject?): String? {
@@ -220,7 +253,8 @@ object CourseRepository {
             val o = array.getJSONObject(i)
             out += CatalogEntry(
                 id = o.getString("id"),
-                name = o.getString("name"),
+                name = translated(assets, o.getString("name")),
+                originalName = o.getString("name"),
                 eco = o.optJSONArray("eco")?.let { e -> (0 until e.length()).map { e.getString(it) } } ?: emptyList(),
                 side = o.optString("side", "white"),
                 level = o.optString("level", "club"),
@@ -247,7 +281,10 @@ object CourseRepository {
         val text = runCatching {
             assets.open("$DIR/$id.json").bufferedReader().use { it.readText() }
         }.getOrNull() ?: return null
-        val course = parse(text)
+        // Le nom se traduit ICI et non dans [parse] : celui-ci sert aussi aux
+        // tests et aux répertoires personnels, qui n'ont pas d'assets — et un
+        // nom choisi par l'utilisateur n'a rien à traduire.
+        val course = parse(text).let { it.copy(name = translated(assets, it.name)) }
         if (cache.size > 3) cache.remove(cache.keys.first())   // quelques cours suffisent en mémoire
         cache[id] = course
         return course

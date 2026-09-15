@@ -116,7 +116,10 @@ fun CourseListScreen(
 
     val tint = if (endgames) Palette.gold else Palette.warning
     val filtered = list.filter { entry ->
-        (query.isBlank() || entry.name.contains(query, true) || entry.summary.contains(query, true) ||
+        // Le nom d'ORIGINE compte aussi : dans une app en français, taper
+        // « Sicilian » doit trouver la Sicilienne. Même règle qu'iOS.
+        (query.isBlank() || entry.name.contains(query, true) ||
+            entry.originalName.contains(query, true) || entry.summary.contains(query, true) ||
             entry.eco.any { it.contains(query, true) }) &&
             (sideFilter == null || entry.side == sideFilter) &&
             // Les répertoires IMPORTÉS échappent au filtre de niveau : ils n'en

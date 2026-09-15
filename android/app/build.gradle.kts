@@ -28,6 +28,52 @@ val copyAssets by tasks.registering(Copy::class) {
     into(generatedAssets)
 }
 
+/**
+ * Les NOMS des cours, traduits — extraits du catalogue de localisation iOS.
+ *
+ * Le nom d'un cours (« Italian Game », « The Opposition ») est une chaîne
+ * UNIQUE dans `opening_catalog.json` : côté iOS il sert de CLÉ de traduction
+ * (`Bundle.main.localizedString(forKey: entry.name…)`), et l'app en français
+ * affiche donc « Partie italienne ». Android lisait le nom brut, et montrait
+ * cent trente-six titres en anglais dans une app en français.
+ *
+ * Le fichier est GÉNÉRÉ au build depuis `Localizable.xcstrings` plutôt que
+ * recopié dans Git : une traduction changée côté iOS ne doit pas avoir à être
+ * reportée à la main, sous peine de divergence silencieuse.
+ */
+val generateCourseNames by tasks.registering {
+    val catalog = rootProject.file("../ChessLab/Resources/openings/opening_catalog.json")
+    val strings = rootProject.file("../ChessLab/Localizable.xcstrings")
+    val output = generatedAssets.map { it.file("openings/course_names.json") }
+    inputs.file(catalog)
+    inputs.file(strings)
+    outputs.file(output)
+    doLast {
+        @Suppress("UNCHECKED_CAST")
+        fun parse(text: String): Any? = groovy.json.JsonSlurper().parseText(text)
+        val names = (parse(catalog.readText()) as List<Map<String, Any?>>)
+            .mapNotNull { it["name"] as? String }
+            .toSortedSet()
+        val table = (parse(strings.readText()) as Map<String, Any?>)["strings"] as Map<String, Any?>
+        val out = LinkedHashMap<String, Map<String, String>>()
+        for (name in names) {
+            val entry = table[name] as? Map<String, Any?> ?: continue
+            val localizations = entry["localizations"] as? Map<String, Any?> ?: continue
+            val byLanguage = LinkedHashMap<String, String>()
+            for (language in listOf("fr", "en")) {
+                val unit = (localizations[language] as? Map<String, Any?>)
+                    ?.get("stringUnit") as? Map<String, Any?> ?: continue
+                (unit["value"] as? String)?.let { byLanguage[language] = it }
+            }
+            if (byLanguage.isNotEmpty()) out[name] = byLanguage
+        }
+        val file = output.get().asFile
+        file.parentFile.mkdirs()
+        file.writeText(groovy.json.JsonOutput.toJson(out))
+        logger.lifecycle("course_names.json : " + out.size + " noms traduits sur " + names.size)
+    }
+}
+
 // La signature de publication. Le trousseau ne vit PAS dans le dépôt : le
 // fichier de propriétés est cherché dans ~/.chesslab-android/, puis dans
 // android/keystore.properties (lui aussi ignoré par Git). Sans lui, le build
@@ -136,7 +182,7 @@ val copyTestAssets by tasks.registering(Copy::class) {
 }
 android.sourceSets["androidTest"].assets.srcDir(testAssets)
 
-tasks.named("preBuild") { dependsOn(copyAssets, copyTestAssets) }
+tasks.named("preBuild") { dependsOn(copyAssets, copyTestAssets, generateCourseNames) }
 
 dependencies {
     implementation(project(":chesskit"))

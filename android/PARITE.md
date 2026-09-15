@@ -189,6 +189,23 @@ trois choses manquaient vraiment.
       (au-delà de vingt parties), et un choix explicite tient ensuite — le
       réglage était écrasé à chaque changement de longueur.
 
+### Modules « Ouvertures » et « Finales » — FAIT le 15/09
+- [x] **Les noms de cours sont TRADUITS**. Le nom (« Italian Game », « The
+      Opposition ») est une chaîne unique dans `opening_catalog.json` ; iOS
+      s'en sert comme clé de traduction et affiche « Partie italienne ».
+      Android lisait le nom brut : cent trente-six titres anglais dans une app
+      en français, dont les 78 finales. La table est GÉNÉRÉE au build depuis
+      `Localizable.xcstrings` (`generateCourseNames`) — pas recopiée dans Git,
+      pour qu'une traduction changée d'un côté n'ait pas à être reportée de
+      l'autre. Un test refuse tout cours dont le nom n'a pas de français.
+- [x] **La recherche garde le nom d'ORIGINE** : taper « Sicilian » dans une app
+      en français trouve la Sicilienne, comme sur iOS.
+- [x] **Les lignes du répertoire tiennent sur UNE ligne** : le nom de la
+      variante passe à droite au lieu de s'empiler sous le coup, comme sur
+      iOS — huit branches faisaient sinon descendre le répertoire hors de
+      l'écran. Marges alignées (16 dp) et étiquettes rendues à leur taille.
+- [x] **« À mémoriser »**, l'étiquette du coup critique, manquait à Android.
+
 ## ✅ La passe de septembre — 13/09/2026
 
 (Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :
