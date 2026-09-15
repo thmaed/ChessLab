@@ -218,11 +218,31 @@ Pas de fichier `.p8` comme chez Apple : un **compte de service** Google Cloud,
 c'est-à-dire un « utilisateur » qui n'est pas une personne, invité dans la Play
 Console comme on inviterait un collègue.
 
-Le tout se fait DEPUIS la Play Console, qui ouvre la console Cloud au bon
-endroit — y aller directement fait perdre le lien entre les deux.
+Deux chemins y mènent. Le premier est guidé et fait le liage tout seul ; le
+second marche aussi bien, mais il faut penser à activer l'API soi-même.
 
-> Il faut être **propriétaire** du compte développeur : un utilisateur invité,
-> même administrateur, ne voit pas « Accès à l'API ».
+> **« Accès à l'API » est une page du COMPTE, pas d'une application.** Depuis
+> l'intérieur d'une app, le menu de gauche montre les réglages de l'app et la
+> page n'y figure pas : il faut remonter à « Toutes les applications ». Direct :
+> `https://play.google.com/console/api-access`.
+>
+> Il faut être **propriétaire** du compte développeur — un utilisateur invité,
+> même administrateur, ne la voit pas — et la vérification d'identité doit être
+> terminée, sans quoi le menu reste réduit.
+
+#### Chemin de secours : tout depuis Google Cloud
+
+Si la page reste introuvable, rien n'est perdu :
+
+1. <https://console.cloud.google.com> → créer un projet ;
+2. **API et services** → **Bibliothèque** → « Google Play Android Developer
+   API » → **Activer**. C'est l'étape que la page « Accès à l'API » faisait
+   pour vous ; sautée, tout le reste rend `403` ;
+3. **IAM et administration** → **Comptes de service** → créer (aucun rôle),
+   puis la clé JSON comme à l'étape 3 ci-dessous ;
+4. Play Console → **Utilisateurs et autorisations** → **Inviter un
+   utilisateur** → coller l'adresse du compte de service, mêmes droits qu'au
+   tableau de l'étape 4.
 
 **1. Lier un projet Cloud.** Play Console → **Paramètres** → **Accès à l'API**.
 Au premier passage, Google propose de créer un projet Google Cloud ou d'en lier
