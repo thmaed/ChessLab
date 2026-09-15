@@ -968,4 +968,16 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_start_session">Commencer la séance</string>
     <string name="puzzle_all_puzzles">Tous les puzzles</string>
     <string name="filter_all_f">Toutes</string>
+
+    <string name="lab_series_done">Série terminée — %1$d parties.</string>
+    <string name="lab_games">Parties dans la série</string>
+    <string name="lab_alternate">Alterner les couleurs à chaque partie</string>
+    <string name="lab_resign_allowed">Abandon autorisé (camp perdant)</string>
+    <string name="lab_draw_allowed">Nul par accord autorisé</string>
+    <string name="lab_animate">Animer le plateau (sinon mode rapide)</string>
+    <string name="lab_keep_awake">Garder l\'écran allumé</string>
+    <string name="lab_level_a">Niveau du camp A</string>
+    <string name="lab_level_b">Niveau du camp B</string>
+    <string name="lab_movetime">Temps de réflexion par coup (ms)</string>
+    <string name="lab_series_section">Série</string>
 </resources>

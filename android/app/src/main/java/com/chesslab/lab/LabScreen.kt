@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +50,15 @@ fun LabScreen(
 
     LaunchedEffect(startFen) { if (startFen != null) model.startFrom(startFen) }
 
+    // Une longue série tourne plusieurs minutes sans qu'on touche l'écran :
+    // sans ce verrou, l'appareil s'endort et la série s'arrête avec lui. On
+    // ne le prend QUE pendant la série, et on le rend en partant.
+    val view = androidx.compose.ui.platform.LocalView.current
+    DisposableEffect(ui.keepAwake && ui.running) {
+        view.keepScreenOn = ui.keepAwake && ui.running
+        onDispose { view.keepScreenOn = false }
+    }
+
     BoardScaffold(
         header = {
             com.chesslab.ui.ThermalBadge()
@@ -71,6 +81,9 @@ fun LabScreen(
 
             Spacer(Modifier.height(12.dp))
             LabStatsPanel(ui)
+
+            Spacer(Modifier.height(12.dp))
+            SeriesSettings(ui, model)
 
             Spacer(Modifier.height(12.dp))
             StartPositionField(ui, model::startFrom, model::clearStartPosition)
@@ -110,6 +123,106 @@ fun LabScreen(
             }
         },
     )
+}
+
+/**
+ * Les réglages de la SÉRIE : sa longueur, l'alternance des couleurs, ce qu'on
+ * autorise pour l'abréger, le rythme d'affichage.
+ *
+ * Ils sont grisés pendant qu'elle tourne : changer la longueur ou le niveau au
+ * milieu d'un bilan le fausserait, et un bilan faux ne se voit pas.
+ */
+@Composable
+private fun SeriesSettings(ui: LabUiState, model: LabViewModel) {
+    val enabled = !ui.running
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        com.chesslab.ui.SectionHeader(stringResource(R.string.lab_series_section))
+        Spacer(Modifier.height(4.dp))
+        Stepper(stringResource(R.string.lab_games), ui.gameCount, 1..500, 5, "nombre-parties", enabled) {
+            model.setGameCount(it)
+        }
+        Stepper(stringResource(R.string.lab_movetime), ui.movetimeMs, 50..3_000, 50, "temps-coup", enabled) {
+            model.setMovetime(it)
+        }
+        Stepper(stringResource(R.string.lab_level_a), ui.sideA.level.toInt(), 800..3190, 100, "niveau-a", enabled) {
+            model.setLevelA(it.toDouble())
+        }
+        Stepper(stringResource(R.string.lab_level_b), ui.sideB.level.toInt(), 800..3190, 100, "niveau-b", enabled) {
+            model.setLevelB(it.toDouble())
+        }
+        Toggle(stringResource(R.string.lab_alternate), ui.alternateColors, "alterner", enabled, model::setAlternateColors)
+        Toggle(stringResource(R.string.lab_resign_allowed), ui.resignationEnabled, "abandon", enabled, model::setResignation)
+        Toggle(stringResource(R.string.lab_draw_allowed), ui.drawAgreementEnabled, "nulle", enabled, model::setDrawAgreement)
+        Toggle(stringResource(R.string.lab_animate), ui.liveVisualization, "animer", enabled, model::setLiveVisualization)
+        Toggle(stringResource(R.string.lab_keep_awake), ui.keepAwake, "eveil", enabled, model::setKeepAwake)
+    }
+}
+
+/** Un nombre qu'on règle à la main, entre deux bornes. */
+@Composable
+private fun Stepper(
+    title: String,
+    value: Int,
+    range: IntRange,
+    step: Int,
+    tag: String,
+    enabled: Boolean,
+    onChange: (Int) -> Unit,
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            title, fontSize = 13.sp,
+            color = if (enabled) Palette.textPrimary else Palette.textTertiary,
+            modifier = Modifier.weight(1f),
+        )
+        listOf("−" to -step, "+" to step).forEach { (glyph, delta) ->
+            Text(
+                glyph, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                color = if (enabled) Palette.accent else Palette.textTertiary,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(Palette.surfaceElevated)
+                    .clickable(enabled = enabled) { onChange((value + delta).coerceIn(range)) }
+                    .padding(horizontal = 14.dp, vertical = 4.dp)
+                    .testTag("$tag-${if (delta < 0) "moins" else "plus"}"),
+            )
+            if (delta < 0) {
+                Text(
+                    "$value", fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+                    color = if (enabled) Palette.textPrimary else Palette.textTertiary,
+                    modifier = Modifier.padding(horizontal = 10.dp).testTag(tag),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun Toggle(
+    label: String,
+    checked: Boolean,
+    tag: String,
+    enabled: Boolean,
+    onChange: (Boolean) -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(CircleShape)
+            .clickable(enabled = enabled) { onChange(!checked) }
+            .padding(vertical = 2.dp)
+            .testTag(tag),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        androidx.compose.material3.Switch(
+            checked = checked, onCheckedChange = { onChange(it) }, enabled = enabled,
+        )
+        Spacer(Modifier.width(10.dp))
+        Text(
+            label, fontSize = 13.sp,
+            color = if (enabled) Palette.textPrimary else Palette.textTertiary,
+        )
+    }
 }
 
 /**

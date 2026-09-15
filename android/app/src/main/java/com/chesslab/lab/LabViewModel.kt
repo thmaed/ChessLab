@@ -38,6 +38,38 @@ data class LabUiState(
     val sideA: LabSide = LabSide(OpponentGallery.all.first(), 1800.0),
     val sideB: LabSide = LabSide(null, 1500.0),
     val movetimeMs: Int = 200,
+    /**
+     * Le nombre de parties de la série. La série S'ARRÊTE quand il est
+     * atteint : sans borne, on lançait un laboratoire qui tournait jusqu'à ce
+     * qu'on y repense, et le bilan ne voulait plus rien dire — deux séries ne
+     * se comparaient pas.
+     */
+    val gameCount: Int = 20,
+    /**
+     * Alterner la couleur de A d'une partie à l'autre. Recommandé : sans
+     * cela, l'avantage du trait se glisse entier dans l'écart mesuré.
+     */
+    val alternateColors: Boolean = true,
+    /**
+     * L'abandon d'un camp nettement perdant, plutôt que de jouer jusqu'au
+     * mat. Sur une série de cent parties, les finales jouées jusqu'au bout
+     * coûtent plus de temps que tout le reste.
+     */
+    val resignationEnabled: Boolean = true,
+    /** La nulle par accord sur une position durablement nulle. */
+    val drawAgreementEnabled: Boolean = true,
+    /**
+     * Animer le plateau coup par coup. Décoché, la série défile au plus vite —
+     * c'est le mode « je veux le chiffre, pas le spectacle ».
+     */
+    val liveVisualization: Boolean = true,
+    /**
+     * Empêcher la mise en veille pendant la série. Une longue série tourne
+     * plusieurs minutes sans qu'on touche l'écran ; en deçà d'une vingtaine
+     * de parties on ne prend pas la main sur un réglage système que personne
+     * n'a demandé.
+     */
+    val keepAwake: Boolean = false,
     val running: Boolean = false,
     val status: String = "",
     /** Les parties TERMINÉES de la série : c'est d'elles que tout se déduit. */
@@ -118,7 +150,15 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
 
     fun setSideA(profile: OpponentProfile?) { ui = ui.copy(sideA = LabSide(profile, profile?.defaultLevel ?: 1500.0)) }
     fun setSideB(profile: OpponentProfile?) { ui = ui.copy(sideB = LabSide(profile, profile?.defaultLevel ?: 1500.0)) }
+    fun setLevelA(level: Double) { ui = ui.copy(sideA = ui.sideA.copy(level = level)) }
+    fun setLevelB(level: Double) { ui = ui.copy(sideB = ui.sideB.copy(level = level)) }
     fun setMovetime(ms: Int) { ui = ui.copy(movetimeMs = ms) }
+    fun setGameCount(count: Int) { ui = ui.copy(gameCount = count.coerceIn(1, 500), keepAwake = count > 20) }
+    fun setAlternateColors(on: Boolean) { ui = ui.copy(alternateColors = on) }
+    fun setResignation(on: Boolean) { ui = ui.copy(resignationEnabled = on) }
+    fun setDrawAgreement(on: Boolean) { ui = ui.copy(drawAgreementEnabled = on) }
+    fun setLiveVisualization(on: Boolean) { ui = ui.copy(liveVisualization = on) }
+    fun setKeepAwake(on: Boolean) { ui = ui.copy(keepAwake = on) }
 
     fun toggle() {
         if (ui.running) { stop(); return }
@@ -139,6 +179,7 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun newGame() {
+        recentEvals.clear()
         board = Board(startPosition)
         history.clear()
         history += startPosition
@@ -148,15 +189,55 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
 
     private suspend fun runSeries() {
         while (viewModelScope.isActive && ui.running) {
-            if (board.state is Board.State.Checkmate || board.state is Board.State.Draw) {
-                tally()
+            // La série s'arrête d'elle-même : c'est ce qui rend deux bilans
+            // comparables.
+            if (ui.completed.size >= ui.gameCount) {
+                ui = ui.copy(running = false, status = s(R.string.lab_series_done, ui.completed.size))
+                return
+            }
+            val forced = forcedOutcome()
+            if (forced != null || board.state is Board.State.Checkmate || board.state is Board.State.Draw) {
+                tally(forced)
                 newGame()
-                ui = ui.copy(gameNumber = ui.gameNumber + 1, aPlaysWhite = !ui.aPlaysWhite)
+                ui = ui.copy(
+                    gameNumber = ui.gameNumber + 1,
+                    aPlaysWhite = if (ui.alternateColors) !ui.aPlaysWhite else ui.aPlaysWhite,
+                )
                 continue
             }
             if (!step()) { stop(); return }
+            // Mode rapide : sans animation, la série défile au plus vite. Avec,
+            // on laisse le temps de VOIR le coup.
+            if (ui.liveVisualization) kotlinx.coroutines.delay(120)
         }
     }
+
+    /**
+     * L'abandon et la nulle par accord — ce qu'un moteur ne déclare pas tout
+     * seul. Le critère est l'évaluation SOUTENUE : un camp à moins de huit
+     * pions pendant plusieurs coups abandonne, deux camps à zéro pendant
+     * plusieurs coups conviennent d'une nulle. Sans cela, une série de cent
+     * parties passe l'essentiel de son temps sur des finales déjà jouées.
+     */
+    private fun forcedOutcome(): String? {
+        if (recentEvals.size < RESIGN_PLIES) return null
+        val last = recentEvals.takeLast(RESIGN_PLIES)
+        if (ui.resignationEnabled && last.all { it <= -RESIGN_CP }) {
+            return if (board.position.sideToMove == Piece.Color.white) "0-1" else "1-0"
+        }
+        if (ui.resignationEnabled && last.all { it >= RESIGN_CP }) {
+            return if (board.position.sideToMove == Piece.Color.white) "1-0" else "0-1"
+        }
+        if (ui.drawAgreementEnabled && ui.sanMoves.size >= DRAW_MIN_PLIES &&
+            last.all { kotlin.math.abs(it) <= DRAW_CP }
+        ) {
+            return "1/2-1/2"
+        }
+        return null
+    }
+
+    /** Les dernières évaluations, DU POINT DE VUE du camp au trait. */
+    private val recentEvals = ArrayDeque<Int>()
 
     /** Un demi-coup. `false` si personne n'a su répondre. */
     private suspend fun step(): Boolean {
@@ -211,7 +292,35 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
             sanMoves = ui.sanMoves + move.san,
             status = s(R.string.lab_played, side.label(getApplication()), move.san),
         )
+        if (ui.resignationEnabled || ui.drawAgreementEnabled) noteEval()
         return true
+    }
+
+    /**
+     * Une sonde COURTE après chaque coup, quand l'abandon ou la nulle sont
+     * permis : c'est elle qui dit si la partie est jouée. Soixante
+     * millisecondes — au regard des deux cents du coup lui-même, et de
+     * l'inférence de Maia, c'est peu payé pour ne pas dérouler quarante
+     * coups d'une finale décidée.
+     */
+    private suspend fun noteEval() {
+        val cp = withContext(Dispatchers.IO) {
+            EngineService.use(getApplication()) { e ->
+                e.send("position fen ${board.position.fen}")
+                var score: Int? = null
+                e.search("go movetime 60", timeoutMs = 5_000) { line ->
+                    if (line.contains(" score cp ")) {
+                        score = line.substringAfter(" score cp ").substringBefore(" ").toIntOrNull()
+                    } else if (line.contains(" score mate ")) {
+                        val mate = line.substringAfter(" score mate ").substringBefore(" ").toIntOrNull()
+                        if (mate != null) score = if (mate > 0) 10_000 else -10_000
+                    }
+                }
+                score
+            }
+        } ?: return
+        recentEvals.addLast(cp)
+        while (recentEvals.size > RESIGN_PLIES) recentEvals.removeFirst()
     }
 
     /**
@@ -222,9 +331,9 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
      * de A à partir de la couleur qu'il avait dans cette partie-là. Compter
      * directement pour A, comme on le faisait, rendait l'export impossible.
      */
-    private fun tally() {
+    private fun tally(forced: String? = null) {
         val state = board.state
-        val result = when (state) {
+        val result = forced ?: when (state) {
             is Board.State.Checkmate -> if (state.color == Piece.Color.white) "0-1" else "1-0"
             is Board.State.Draw -> "1/2-1/2"
             else -> return
@@ -234,7 +343,8 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
                 index = ui.completed.size,
                 aWasWhite = ui.aPlaysWhite,
                 pgnResult = result,
-                reasonLabel = reasonLabel(state),
+                reasonLabel = if (forced == null) reasonLabel(state)
+                else if (forced == "1/2-1/2") s(R.string.draw_agreement) else s(R.string.reason_resignation),
                 plyCount = ui.sanMoves.size,
                 pgn = recorder.pgn,
             )
@@ -266,5 +376,15 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     override fun onCleared() {
         loop?.cancel()
         super.onCleared()
+    }
+
+    private companion object {
+        /** Huit pions d'écart, tenus sur autant de demi-coups : c'est perdu. */
+        const val RESIGN_CP = 800
+        const val RESIGN_PLIES = 8
+
+        /** Zéro tenu sur huit demi-coups, après vingt : c'est nul. */
+        const val DRAW_CP = 15
+        const val DRAW_MIN_PLIES = 40
     }
 }
