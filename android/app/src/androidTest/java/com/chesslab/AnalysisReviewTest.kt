@@ -2,6 +2,7 @@ package com.chesslab
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
@@ -86,6 +87,49 @@ class AnalysisReviewTest {
         compose.onNodeWithTag("saisie").performScrollTo().performTextInput(missedMate)
         compose.onNodeWithTag("charger").performScrollTo().performClick()
         awaitTag("coup-0")
+    }
+
+    /**
+     * Le plateau d'analyse SE JOUE : on y pose un coup pour voir ce qu'il
+     * donne, et la ligne affichée s'allonge. Il était inerte — la seule façon
+     * d'explorer était de toucher une pastille de candidat, donc on ne pouvait
+     * essayer que ce que le moteur proposait déjà.
+     */
+    @Test fun lePlateauDAnalyseSeJoue() {
+        loadGame()
+        // La partie fait huit demi-coups : on se place au dernier, où c'est
+        // aux Blancs, et on joue un coup À LA MAIN.
+        awaitTag("coup-7", 60_000)
+        compose.onNodeWithTag("coup-7").performClick()
+        compose.waitForIdle()
+
+        compose.onNodeWithTag("case-d2").performClick()
+        compose.onNodeWithTag("case-d4").performClick()
+        // Le coup s'ajoute à la ligne : un neuvième demi-coup apparaît.
+        awaitTag("coup-8", 30_000)
+    }
+
+    /** La lecture automatique déroule la partie sans qu'on touche à rien. */
+    @Test fun laLectureAutomatiqueDerouleLaPartie() {
+        loadGame()
+        compose.onNodeWithTag("debut").performClick()
+        compose.waitForIdle()
+        compose.onNodeWithTag("lecture").performClick()
+
+        // Le bouton devient « pause » : la lecture est partie.
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithContentDescription("Mettre en pause")
+                .fetchSemanticsNodes().isNotEmpty()
+        }
+        // Et elle avance : un coup par seconde, donc le premier est passé.
+        compose.waitUntil(20_000) {
+            compose.onAllNodesWithTag("coup-0").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithTag("lecture").performClick()
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithContentDescription("Lire la partie")
+                .fetchSemanticsNodes().isNotEmpty()
+        }
     }
 
     @Test fun laRevueClasseLesCoupsEtDonneUnePrecision() {

@@ -910,4 +910,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="play_engine_down">L\'ordinateur n\'a pas démarré : il ne jouera pas.</string>
     <string name="play_engine_retry">Réessayer</string>
     <string name="thermal_throttled">Appareil chaud — moteur bridé</string>
+    <string name="analysis_play">Lire la partie</string>
+    <string name="analysis_pause">Mettre en pause</string>
+    <string name="analysis_play_best">Jouer le meilleur coup</string>
 </resources>

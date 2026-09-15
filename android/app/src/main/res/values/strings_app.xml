@@ -913,4 +913,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="play_engine_down">The computer did not start: it will not play.</string>
     <string name="play_engine_retry">Retry</string>
     <string name="thermal_throttled">Device is hot — engine eased off</string>
+    <string name="analysis_play">Play the game</string>
+    <string name="analysis_pause">Pause</string>
+    <string name="analysis_play_best">Play the best move</string>
 </resources>

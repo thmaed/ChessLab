@@ -31,6 +31,10 @@ import chesskit.Square
 import com.chesslab.R
 import com.chesslab.ui.BoardArrow
 import com.chesslab.ui.BoardScaffold
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.FirstPage
+import androidx.compose.material.icons.filled.Pause
+import androidx.compose.material.icons.filled.PlayArrow
 import com.chesslab.ui.BoardView
 import com.chesslab.ui.CardShape
 import com.chesslab.ui.ControlShape
@@ -111,6 +115,10 @@ fun AnalysisScreen(
     BoardScaffold(
         header = {
             com.chesslab.ui.ThermalBadge()
+            if (ui.engineUnavailable) {
+                EngineBanner(ui.retryingEngine, onRetry = { model.retryEngine() })
+                Spacer(Modifier.height(6.dp))
+            }
             OpeningHeader(ui)
             StatusRow(ui.status, busy = ui.thinking)
             Spacer(Modifier.height(8.dp))
@@ -119,10 +127,18 @@ fun AnalysisScreen(
             BoardView(
                 position = ui.position,
                 orientation = ui.orientation,
+                selected = ui.selected,
+                legalTargets = ui.legalTargets,
                 lastMove = ui.lastMove,
                 checkedKing = ui.checkedKing,
                 arrows = arrowsFor(ui),
-                enabled = false,
+                // Le plateau d'analyse SE JOUE : on y pose un coup pour voir
+                // ce qu'il donne. Il était inerte, et la seule façon
+                // d'explorer était de toucher une pastille de candidat — on
+                // ne pouvait donc essayer que ce que le moteur proposait.
+                draggableColor = ui.position.sideToMove,
+                enabled = true,
+                onSquareTap = model::selectSquare,
             )
         },
         panel = {
@@ -131,11 +147,44 @@ fun AnalysisScreen(
 
             Spacer(Modifier.height(10.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = model::goToStart, enabled = ui.canGoPrevious,
+                    modifier = Modifier.testTag("debut"),
+                ) {
+                    Icon(Icons.Default.FirstPage, stringResource(R.string.two_first_move), tint = Palette.textPrimary)
+                }
                 IconButton(onClick = model::previous, modifier = Modifier.testTag("precedent")) {
                     Icon(Icons.Default.ChevronLeft, stringResource(R.string.previous_move), tint = Palette.textPrimary)
                 }
                 IconButton(onClick = model::next, modifier = Modifier.testTag("suivant")) {
                     Icon(Icons.Default.ChevronRight, stringResource(R.string.next_move), tint = Palette.textPrimary)
+                }
+                // Lire la partie toute seule, un coup par seconde : c'est la
+                // façon la plus simple de la REVOIR — on regarde le plateau,
+                // pas les boutons.
+                IconButton(
+                    onClick = model::toggleAutoplay,
+                    enabled = ui.canGoNext || ui.autoplaying,
+                    modifier = Modifier.testTag("lecture"),
+                ) {
+                    Icon(
+                        if (ui.autoplaying) Icons.Default.Pause else Icons.Default.PlayArrow,
+                        stringResource(if (ui.autoplaying) R.string.analysis_pause else R.string.analysis_play),
+                        tint = if (ui.autoplaying) Palette.accent else Palette.textPrimary,
+                    )
+                }
+                // Dérouler la meilleure ligne coup par coup depuis une
+                // position (scan, FEN, éditeur) : l'action « intelligente »
+                // de l'écran, donc teintée accent.
+                IconButton(
+                    onClick = model::playBestMove, enabled = ui.canPlayBestMove,
+                    modifier = Modifier.testTag("meilleur-coup"),
+                ) {
+                    Icon(
+                        Icons.Default.AutoAwesome,
+                        stringResource(R.string.analysis_play_best),
+                        tint = if (ui.canPlayBestMove) Palette.accent else Palette.textTertiary,
+                    )
                 }
                 Spacer(Modifier.width(8.dp))
                 Box(Modifier.weight(1f)) {
@@ -182,6 +231,15 @@ fun AnalysisScreen(
     )
 
     if (showSummary) GameSummarySheet(ui) { showSummary = false }
+
+    // Le plateau se joue : une poussée de pion en 8e demande donc en quoi
+    // promouvoir, ici comme ailleurs.
+    if (ui.pendingPromotion != null) {
+        com.chesslab.play.PromotionDialog(
+            onPick = model::completePromotion,
+            onCancel = model::cancelPromotion,
+        )
+    }
     ui.puzzlesCreated?.let { count ->
         AlertDialog(
             onDismissRequest = model::clearPuzzleNotice,
@@ -288,6 +346,35 @@ private fun reviewArrow(lan: String, strength: Double) = BoardArrow(
     tint = HintArrowBuilder.reviewBestTint(strength),
     strength = strength.toFloat(),
 )
+
+/**
+ * « L'ordinateur n'a pas démarré » — et de quoi retenter. Dans le flux : posée
+ * par-dessus, elle recouvrirait la 8e rangée.
+ */
+@Composable
+private fun EngineBanner(retrying: Boolean, onRetry: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(com.chesslab.ui.ControlShape)
+            .background(Palette.danger.copy(alpha = 0.14f))
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .testTag("moteur-absent"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            stringResource(R.string.play_engine_down),
+            fontSize = 12.sp, color = Palette.danger, modifier = Modifier.weight(1f),
+        )
+        if (retrying) {
+            CircularProgressIndicator(Modifier.size(16.dp), strokeWidth = 2.dp, color = Palette.danger)
+        } else {
+            TextButton(onClick = onRetry, modifier = Modifier.testTag("moteur-reessayer")) {
+                Text(stringResource(R.string.play_engine_retry), fontSize = 12.sp, color = Palette.danger)
+            }
+        }
+    }
+}
 
 @Composable
 private fun OverflowMenu(

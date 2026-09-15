@@ -200,7 +200,28 @@ data class AnalysisUiState(
     val reviewEval: PositionEval? = null,
     /** Le nombre de puzzles que la dernière génération a créés, à annoncer. */
     val puzzlesCreated: Int? = null,
+    /** La case choisie, et les cases où elle peut aller : le plateau se JOUE. */
+    val selected: Square? = null,
+    val legalTargets: Set<Square> = emptySet(),
+    /** Le coup en attente du choix de la pièce de promotion. */
+    val pendingPromotion: Move? = null,
+    /** La lecture automatique déroule la partie, un coup par seconde. */
+    val autoplaying: Boolean = false,
+    /** Stockfish n'a pas démarré : la bannière le dit, et propose de réessayer. */
+    val engineUnavailable: Boolean = false,
+    val retryingEngine: Boolean = false,
 ) {
+    val canGoNext: Boolean get() = cursor < sanMoves.size - 1
+    val canGoPrevious: Boolean get() = cursor >= 0
+
+    /**
+     * Peut-on dérouler le meilleur coup ? Seulement quand il y en a un, et
+     * qu'on est au BOUT de la ligne : au milieu d'une partie, « jouer le
+     * meilleur coup » couperait la suite sans prévenir.
+     */
+    val canPlayBestMove: Boolean
+        get() = !canGoNext && candidates.isNotEmpty() && pendingPromotion == null
+
     /** La qualité du coup qui mène à la position affichée. */
     val displayedQuality: MoveQuality? get() = qualities[cursor]
 
@@ -395,6 +416,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(
             position = position,
             cursor = clamped,
+            selected = null, legalTargets = emptySet(),
             lastMove = move?.let { it.start to it.end },
             checkedKing = checked,
             evaluation = "", depth = 0, bestLine = "",
@@ -486,6 +508,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
 
     fun previous() = goTo(ui.cursor - 1)
     fun next() = goTo(ui.cursor + 1)
+    fun goToStart() = goTo(-1)
 
     /** Jouer un coup candidat, c'est aller le voir : il devient le coup courant. */
     fun playCandidate(candidate: Candidate) {
@@ -496,13 +519,101 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         val to = Square(candidate.lan.substring(2, 4))
         val move = board.move(from, to) ?: return
         val done = if (board.state is Board.State.Promotion)
-            board.completePromotion(move, Piece.Kind.queen) else move
+            board.completePromotion(move, kindOf(candidate.lan.getOrNull(4))) else move
+        append(board, done)
+    }
 
-        // On COUPE la suite : explorer un candidat crée une nouvelle ligne.
-        // Rejouer la partie d'origine demande de la recharger, ce qui est
-        // fidèle à ce que fait iOS quand on suit une variante depuis le bout.
+    // MARK: Jouer sur le plateau — l'exploration d'une variante
+
+    /**
+     * Le plateau d'analyse SE JOUE : on pose un coup dessus pour voir ce qu'il
+     * donne, comme sur iOS. Il était inerte — la seule façon d'explorer était
+     * de toucher une pastille de candidat, donc on ne pouvait essayer que ce
+     * que le moteur proposait déjà.
+     */
+    fun selectSquare(square: Square) {
+        if (ui.pendingPromotion != null) return
+        stopAutoplay()
+        val position = positions.getOrNull(ui.cursor + 1) ?: return
+        val board = Board(position.copy())
+        val mover = position.sideToMove
+
+        val selected = ui.selected
+        if (selected != null && square in ui.legalTargets) {
+            attemptMove(selected, square)
+            return
+        }
+
+        // Toucher la case d'ARRIVÉE d'une flèche, sans rien avoir sélectionné,
+        // joue ce candidat : c'est ce que fait iOS quand on tape la flèche
+        // elle-même, et c'est le geste qu'on essaie spontanément.
+        if (selected == null) {
+            ui.candidates.firstOrNull { it.lan.length >= 4 && Square(it.lan.substring(2, 4)) == square }
+                ?.let { candidate ->
+                    val from = Square(candidate.lan.substring(0, 2))
+                    if (position.piece(from)?.color == mover && position.piece(square)?.color != mover) {
+                        playCandidate(candidate)
+                        return
+                    }
+                }
+        }
+
+        val piece = position.piece(square)
+        ui = if (piece != null && piece.color == mover) {
+            ui.copy(selected = square, legalTargets = board.legalMoves(square).toSet())
+        } else {
+            ui.copy(selected = null, legalTargets = emptySet())
+        }
+    }
+
+    /** Le glisser-déposer : d'une case à l'autre, sans passer par la sélection. */
+    fun attemptMove(from: Square, to: Square) {
+        if (ui.pendingPromotion != null) return
+        val position = positions.getOrNull(ui.cursor + 1) ?: return
+        if (position.piece(from)?.color != position.sideToMove) return
+        val board = Board(position.copy())
+        val move = board.move(pieceAt = from, to = to) ?: run {
+            ui = ui.copy(selected = null, legalTargets = emptySet())
+            return
+        }
+        if (board.state is Board.State.Promotion) {
+            ui = ui.copy(selected = null, legalTargets = emptySet(), pendingPromotion = move)
+            return
+        }
+        append(board, move)
+    }
+
+    fun completePromotion(kind: Piece.Kind) {
+        val pending = ui.pendingPromotion ?: return
+        val position = positions.getOrNull(ui.cursor + 1) ?: return
+        val board = Board(position.copy())
+        val move = board.move(pieceAt = pending.start, to = pending.end) ?: return
+        ui = ui.copy(pendingPromotion = null)
+        append(board, board.completePromotion(of = move, to = kind))
+    }
+
+    /** Toucher à côté ANNULE : le coup n'est pas joué, la pièce reste où elle est. */
+    fun cancelPromotion() {
+        if (ui.pendingPromotion == null) return
+        ui = ui.copy(pendingPromotion = null, selected = null, legalTargets = emptySet())
+    }
+
+    /** Déroule le meilleur coup du moteur, un coup à la fois. */
+    fun playBestMove() {
+        if (!ui.canPlayBestMove) return
+        ui.candidates.firstOrNull { it.rank == 1 }?.let { playCandidate(it) }
+    }
+
+    /**
+     * Ajoute [move] à la ligne affichée, en COUPANT la suite : explorer, c'est
+     * créer une nouvelle ligne. Rejouer la partie d'origine demande de la
+     * recharger, ce qui est fidèle à ce que fait iOS quand on suit une
+     * variante depuis le bout.
+     */
+    private fun append(board: Board, move: Move) {
+        val at = ui.cursor
         positions = positions.take(at + 2) + board.position.copy()
-        moves = moves.take(at + 1) + done
+        moves = moves.take(at + 1) + move
         // Les évaluations du tronc commun restent vraies ; celles de la suite
         // coupée ne le sont plus. Et une ligne explorée à la main n'entre pas
         // dans le cache disque : il ne garde que la partie telle que jouée.
@@ -512,9 +623,60 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             sanMoves = moves.map { it.san },
             qualities = emptyMap(), explanations = emptyMap(), winDeltas = emptyMap(),
             curve = emptyList(), summary = null,
+            selected = null, legalTargets = emptySet(),
         )
         if (isGameReview && reviewEvals.isNotEmpty()) classify(positions, moves, reviewEvals, book)
         goTo(moves.size - 1)
+    }
+
+    private fun kindOf(c: Char?): Piece.Kind = when (c) {
+        'r' -> Piece.Kind.rook
+        'b' -> Piece.Kind.bishop
+        'n' -> Piece.Kind.knight
+        else -> Piece.Kind.queen
+    }
+
+    // MARK: Lecture automatique
+
+    private var autoplayJob: Job? = null
+
+    /**
+     * Déroule la partie toute seule, un coup par seconde. C'est la façon la
+     * plus simple de REVOIR une partie : on regarde le plateau, pas les
+     * boutons.
+     */
+    fun toggleAutoplay() {
+        if (ui.autoplaying) { stopAutoplay(); return }
+        if (!ui.canGoNext) return
+        ui = ui.copy(autoplaying = true)
+        autoplayJob = viewModelScope.launch {
+            while (ui.canGoNext) {
+                kotlinx.coroutines.delay(1_000)
+                if (!ui.autoplaying) return@launch
+                next()
+            }
+            ui = ui.copy(autoplaying = false)
+        }
+    }
+
+    fun stopAutoplay() {
+        autoplayJob?.cancel()
+        autoplayJob = null
+        if (ui.autoplaying) ui = ui.copy(autoplaying = false)
+    }
+
+    /**
+     * Le moteur n'a pas démarré : on retente. Un échec de lancement est
+     * parfois passager, et rester devant une bannière sans recours n'aide
+     * personne.
+     */
+    fun retryEngine() = viewModelScope.launch {
+        if (ui.retryingEngine) return@launch
+        ui = ui.copy(retryingEngine = true)
+        EngineService.retry()
+        withContext(Dispatchers.IO) { EngineService.use(getApplication()) { EngineService.identity } }
+        ui = ui.copy(retryingEngine = false, engineUnavailable = EngineService.isUnavailable)
+        if (!ui.engineUnavailable) evaluate()
     }
 
     /** L'ouverture reconnue à hauteur du coup [cursor]. */
@@ -579,7 +741,9 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                     }
                 }
             } finally {
-                ui = ui.copy(thinking = false)
+                // Le moteur n'a pas démarré : l'écran le DIT plutôt que de
+                // rester sur un tiret, avec de quoi réessayer.
+                ui = ui.copy(thinking = false, engineUnavailable = EngineService.isUnavailable)
             }
         }
     }
