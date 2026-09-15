@@ -188,6 +188,11 @@ private fun App() {
                 // en arrière ne doit pas rouvrir celle qu'on vient de finir.
                 onRematch = { stack[stack.lastIndex] = Route.TwoPlayer(settings = it) },
             )
+            is Route.VariantAnalysis -> com.chesslab.variants.VariantAnalysisScreen(
+                variantId = current.variantId,
+                startFen = current.startFen,
+                uciLog = current.uciLog,
+            )
             Route.Analysis -> AnalysisEntryScreen(
                 onScan = { stack.add(Route.Scanner()) },
                 onLibrary = { stack.add(Route.AnalysisLibrary) },
@@ -332,6 +337,9 @@ private fun App() {
                 variantId = current.id,
                 chess960Number = current.chess960Number,
                 twoPlayer = current.twoPlayer,
+                onReviewGame = { id, fen, log ->
+                    stack.add(Route.VariantAnalysis(id, fen, log))
+                },
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
             )
             else -> Placeholder(current.title(context))

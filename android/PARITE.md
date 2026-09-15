@@ -116,6 +116,21 @@ referme ».
       pièces d'un coup.
 - [x] **Glissement du dernier coup** et **anneau de prise**.
 
+### Modules « Réglages », « Scanner », « Variantes » — FAIT le 15/09
+- [x] **Sources des données** (à quoi les ouvertures doivent leurs chiffres) et
+      **Aide** dans les réglages : iOS les offre aux deux endroits.
+- [x] **Photographier un vrai plateau** : le scanner n'ouvrait que la galerie,
+      alors que la carte d'entrée promet « photo ou plateau réel ». Aucune
+      permission demandée — on passe par l'app photo du système.
+- [x] **Revoir une partie de VARIANTE aux règles de la variante**
+      (`VariantAnalysisViewModel` + son écran) : l'analyse ordinaire jugeait
+      une Horde ou un Roi de la colline aux règles orthodoxes, et son chiffre
+      était donc faux. Panneau de fin de partie avec « Analyser », comme sur
+      iOS.
+- [x] **La promotion s'annule** dans les deux écrans d'entraînement.
+- [x] **Mémorisation** : la carte manquait à iOS, pas à Android — c'est iOS
+      qui a été relevé (`TrainingStats.swift`, neuf tests).
+
 ## ✅ La passe de septembre — 13/09/2026
 
 (Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :

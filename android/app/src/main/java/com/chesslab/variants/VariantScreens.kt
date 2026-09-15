@@ -223,6 +223,8 @@ fun VariantPlayScreen(
      * choix sur son écran Chess960.
      */
     onAnalyze: (String) -> Unit = {},
+    /** Revoir la partie AUX RÈGLES DE LA VARIANTE : l'analyse ordinaire ment ici. */
+    onReviewGame: (String, String?, List<String>) -> Unit = { _, _, _ -> },
     model: VariantPlayViewModel = viewModel(),
 ) {
     LaunchedEffect(variantId, chess960Number, twoPlayer) {
@@ -284,8 +286,32 @@ fun VariantPlayScreen(
                 fontSize = 11.sp, color = Palette.textTertiary,
                 modifier = Modifier.testTag("compteur"),
             )
-            TextButton(onClick = model::newGame, modifier = Modifier.testTag("nouvelle")) {
-                Text(stringResource(R.string.new_game), color = Palette.accent)
+            if (ui.gameOver) {
+                // Le panneau de fin, comme dans les autres modes : le mot de
+                // la fin, et de quoi continuer. « Analyser » passe par
+                // l'analyse DE LA VARIANTE — l'orthodoxe jugerait une position
+                // de Horde à des règles qui n'y sont pas.
+                Spacer(Modifier.height(10.dp))
+                Row(
+                    Modifier.fillMaxWidth().testTag("fin-de-partie"),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    TextButton(onClick = model::newGame, modifier = Modifier.testTag("nouvelle")) {
+                        Text(stringResource(R.string.new_game), color = Palette.accent)
+                    }
+                    Spacer(Modifier.weight(1f))
+                    TextButton(
+                        onClick = { onReviewGame(ui.variant?.id ?: "", model.startFen(), ui.uciLog) },
+                        enabled = ui.uciLog.isNotEmpty(),
+                        modifier = Modifier.testTag("analyser-la-partie"),
+                    ) {
+                        Text(stringResource(R.string.route_analysis), color = Palette.teal)
+                    }
+                }
+            } else {
+                TextButton(onClick = model::newGame, modifier = Modifier.testTag("nouvelle")) {
+                    Text(stringResource(R.string.new_game), color = Palette.accent)
+                }
             }
         },
     )

@@ -27,6 +27,9 @@ data class PositionQuery(
  * chaque ligne porte un coup. C'est la méthode de l'app iOS, pour la même
  * raison : réimplémenter huit jeux de règles serait long et faux.
  */
+/** Ce qu'une recherche de variante rend : le score POV Blancs, et le coup. */
+data class VariantEval(val cp: Int?, val mate: Int?, val bestLan: String?)
+
 class FairyEngine private constructor(private val binaryPath: String) {
 
     private val incoming = Channel<String>(Channel.UNLIMITED)
@@ -95,6 +98,40 @@ class FairyEngine private constructor(private val binaryPath: String) {
     private fun isUciMove(text: String): Boolean {
         if (text.length in 4..5 && text.all { it.isLowerCase() || it.isDigit() }) return true
         return text.length == 4 && text[1] == '@'
+    }
+
+    /**
+     * L'ÉVALUATION d'une position de variante, et le meilleur coup avec.
+     *
+     * `bestMove` jette le score : il suffit pour jouer, pas pour analyser. Une
+     * analyse de variante qui passerait par le moteur ORTHODOXE rendrait des
+     * chiffres faux — une position de Horde ou de Roi de la colline n'y veut
+     * plus rien dire.
+     *
+     * Le score est ramené au point de vue des BLANCS, comme partout ailleurs
+     * dans l'app : celui du moteur suit le camp au trait et changerait de
+     * signe à chaque coup.
+     */
+    suspend fun evaluate(
+        variant: String,
+        startFen: String?,
+        uciLog: List<String>,
+        movetimeMs: Int,
+        whiteToMove: Boolean,
+    ): VariantEval? {
+        send("setoption name UCI_Variant value $variant")
+        val base = if (startFen != null) "position fen $startFen" else "position startpos"
+        send(if (uciLog.isEmpty()) base else "$base moves ${uciLog.joinToString(" ")}")
+        val lines = capture("go movetime $movetimeMs", 60_000) { it.startsWith("bestmove") }
+
+        val best = lines.lastOrNull { it.startsWith("bestmove") }
+            ?.split(" ")?.getOrNull(1)?.takeIf { it != "(none)" }
+        val info = lines.lastOrNull { it.startsWith("info ") && it.contains(" score ") } ?: return null
+        val sign = if (whiteToMove) 1 else -1
+        val mate = info.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
+        val cp = info.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
+        if (mate == null && cp == null) return null
+        return VariantEval(cp = cp?.let { it * sign }, mate = mate?.let { it * sign }, bestLan = best)
     }
 
     /** Le meilleur coup du moteur pour la variante. */

@@ -55,6 +55,16 @@ data class VariantUiState(
 class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
 
     private var startFen: String? = null
+
+    /**
+     * La position d'où repart la ligne courante, pour la revoir.
+     *
+     * Aux Barricades ALÉATOIRES, les murs bougent et la base est rebasée en
+     * cours de partie : la revue porte alors sur le segment depuis le dernier
+     * déplacement de murs, pas sur la partie entière. C'est ce que le moteur
+     * sait reproduire — un journal de coups ne contient pas un tirage.
+     */
+    fun startFen(): String? = startFen
     private var legal: List<String> = emptyList()
 
     /**

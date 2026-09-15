@@ -68,6 +68,17 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
         val startFen: String? = null,
         val resume: Boolean = false,
     ) : Route(R.string.route_two_players)
+    /**
+     * Revoir une partie de VARIANTE, aux règles de la variante. L'analyse
+     * ordinaire juge aux règles orthodoxes : sur une Horde ou un Roi de la
+     * colline, son chiffre serait faux, ce qui est pire que pas de chiffre.
+     */
+    data class VariantAnalysis(
+        val variantId: String,
+        val startFen: String?,
+        val uciLog: List<String>,
+    ) : Route(R.string.route_analysis)
+
     /** Le CHOIX de la source : scanner, bibliothèque, dernière partie, coller. */
     data object Analysis : Route(R.string.route_analysis)
 
