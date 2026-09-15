@@ -388,6 +388,7 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
                 EngineService.use(getApplication()) { engine ->
                     engine.send("setoption name MultiPV value 3")
                     engine.send("position fen $fen")
+                    try {
                     engine.search("go movetime 1500", timeoutMs = 30_000) { line ->
                         if (!line.startsWith("info ") || !line.contains(" multipv ")) return@search
                         val rank = line.substringAfter(" multipv ", "").substringBefore(" ").toIntOrNull()
@@ -402,7 +403,13 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
                             cp != null -> scoreByRank[rank] = cp.toDouble()
                         }
                     }
-                    engine.send("setoption name MultiPV value 1")
+                    } finally {
+                        // Un indice ANNULÉ laissait `MultiPV` à 3 pour le reste
+                        // de la partie : trois fois le travail à chaque coup.
+                        kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
+                            engine.send("setoption name MultiPV value 1")
+                        }
+                    }
                 }
             }
             if (interactionBoard().position.fen != fen || !ui.hintWanted) return@launch

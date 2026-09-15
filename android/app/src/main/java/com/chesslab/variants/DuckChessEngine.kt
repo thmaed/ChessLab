@@ -136,6 +136,7 @@ object DuckChessEngine {
         EngineService.use(context) { engine ->
             engine.send("setoption name MultiPV value 3")
             engine.send("position fen ${position.fen}")
+            try {
             engine.search(
                 "go movetime $movetimeMs searchmoves ${legal.joinToString(" ") { it.uci }}",
                 timeoutMs = 30_000,
@@ -153,7 +154,13 @@ object DuckChessEngine {
                     cp != null -> scoreByRank[rank] = cp.toDouble()
                 }
             }
-            engine.send("setoption name MultiPV value 1")
+            } finally {
+                // Un indice ANNULÉ laissait `MultiPV` à 3 pour le reste de la
+                // partie : trois fois le travail à chaque coup, en silence.
+                kotlinx.coroutines.withContext(kotlinx.coroutines.NonCancellable) {
+                    engine.send("setoption name MultiPV value 1")
+                }
+            }
         }
         return lanByRank to scoreByRank
     }

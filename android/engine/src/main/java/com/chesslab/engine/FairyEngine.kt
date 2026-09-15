@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import kotlin.concurrent.thread
@@ -52,18 +54,45 @@ class FairyEngine private constructor(private val binaryPath: String) {
 
     fun drain() { while (incoming.tryReceive().isSuccess) Unit }
 
+    /**
+     * Envoie [command] et lit jusqu'à ce que [until] accepte une ligne.
+     *
+     * **Le moteur doit être ARRÊTÉ quand on rend la main**, sans quoi il
+     * continue de chercher pendant que l'appelant suivant lui réécrit sa
+     * position — et une `Position` réécrite sous un thread de recherche mène
+     * droit au plantage natif. Deux façons de sortir d'ici sans que le moteur
+     * ait fini : le délai, et l'ANNULATION de la coroutine (la barre
+     * d'évaluation et les flèches d'indice s'annulent à chaque coup). Dans les
+     * deux cas on lui envoie `stop` et on attend son `bestmove`, hors
+     * annulation — c'est la discipline que [StockfishEngine.search] tient
+     * déjà, et qui manquait ici.
+     */
     private suspend fun capture(command: String, timeoutMs: Long, until: (String) -> Boolean): List<String> {
         drain()
         send(command)
         val out = mutableListOf<String>()
-        withTimeoutOrNull(timeoutMs) {
-            while (true) {
-                val line = incoming.receive()
-                out += line
-                if (until(line)) break
+        var settled = false
+        try {
+            withTimeoutOrNull(timeoutMs) {
+                while (true) {
+                    val line = incoming.receive()
+                    out += line
+                    if (until(line)) { settled = true; break }
+                }
+            }
+            return out
+        } finally {
+            // `go perft` ne s'interrompt pas et ne rend pas de `bestmove` : il
+            // est instantané, il n'y a rien à arrêter. Une VRAIE recherche, si.
+            if (!settled && command.startsWith("go") && !command.startsWith("go perft")) {
+                withContext(NonCancellable) {
+                    send("stop")
+                    withTimeoutOrNull(3_000) {
+                        while (true) if (incoming.receive().startsWith("bestmove")) break
+                    }
+                }
             }
         }
-        return out
     }
 
     /**
@@ -190,8 +219,14 @@ class FairyEngine private constructor(private val binaryPath: String) {
         send("setoption name MultiPV value 3")
         val base = if (startFen != null) "position fen $startFen" else "position startpos"
         send(if (uciLog.isEmpty()) base else "$base moves ${uciLog.joinToString(" ")}")
-        val lines = capture("go movetime $movetimeMs", 60_000) { it.startsWith("bestmove") }
-        send("setoption name MultiPV value 1")
+        // `finally` : un indice ANNULÉ en cours de route laissait sinon
+        // `MultiPV` à 3 pour toute la suite de la partie — trois fois le
+        // travail à chaque coup, sans que rien ne le dise.
+        val lines = try {
+            capture("go movetime $movetimeMs", 60_000) { it.startsWith("bestmove") }
+        } finally {
+            withContext(NonCancellable) { send("setoption name MultiPV value 1") }
+        }
 
         val lanByRank = mutableMapOf<Int, String>()
         val scoreByRank = mutableMapOf<Int, Double>()

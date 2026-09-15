@@ -236,6 +236,19 @@ trois choses manquaient vraiment.
       variante : saisir un numéro Chess960 ouvrait le clavier PAR-DESSUS le
       bouton, et il fallait deviner qu'il fallait d'abord le refermer.
 
+### Moteur de variantes : une recherche annulée s'ARRÊTE — FAIT le 15/09
+Signalé à l'essai : l'app s'arrête net « vers la fin » d'une partie de Horde.
+- [x] `FairyEngine.capture` n'arrêtait pas le moteur quand elle sortait sans
+      avoir vu `bestmove` — au délai, et surtout à l'ANNULATION. Le verrou
+      était rendu pendant que la recherche tournait encore, et l'appelant
+      suivant réécrivait la position sous le thread de recherche :
+      `SIGSEGV` à l'adresse `0x1470`. `StockfishEngine.search` tenait cette
+      discipline depuis toujours ; Fairy ne l'avait jamais eue, et personne ne
+      l'annulait avant que la barre d'évaluation et les indices n'arrivent.
+- [x] **`MultiPV` revient à 1** même si l'indice est annulé — des trois côtés
+      (Fairy, Duck Chess, Coup Volé). Sinon le moteur cherchait trois lignes à
+      chaque coup pour le reste de la partie, en silence.
+
 ## ✅ La passe de septembre — 13/09/2026
 
 (Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :
