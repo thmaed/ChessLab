@@ -291,10 +291,14 @@ fun VariantSetupScreen(
         }
 
         // Le bouton reste EN BAS et toujours visible : c'est la seule action
-        // de l'écran, et elle ne doit pas se mériter en défilant.
+        // de l'écran, et elle ne doit pas se mériter en défilant. `imePadding`
+        // le fait MONTER avec le clavier : sans lui, saisir un numéro Chess960
+        // ouvrait le clavier par-dessus le bouton, et il fallait deviner qu'il
+        // fallait d'abord refermer le clavier pour commencer la partie.
         Box(
             Modifier
                 .fillMaxWidth()
+                .imePadding()
                 .background(Palette.background.copy(alpha = 0.94f))
                 .padding(horizontal = 20.dp, vertical = 14.dp)
         ) {

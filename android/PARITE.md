@@ -232,6 +232,9 @@ trois choses manquaient vraiment.
       `chessLabSliderColors()`. Le curseur de réflexion du Laboratoire
       affichait quatre-vingt-dix-huit points — un pointillé illisible — parce
       que le pas était donné à Material au lieu d'être appliqué à la valeur.
+- [x] **« Commencer » monte avec le clavier** sur l'écran de réglage d'une
+      variante : saisir un numéro Chess960 ouvrait le clavier PAR-DESSUS le
+      bouton, et il fallait deviner qu'il fallait d'abord le refermer.
 
 ## ✅ La passe de septembre — 13/09/2026
 

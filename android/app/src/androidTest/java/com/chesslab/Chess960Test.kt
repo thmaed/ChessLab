@@ -7,6 +7,8 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.test.platform.app.InstrumentationRegistry
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -29,6 +31,19 @@ class Chess960Test {
             compose.onAllNodesWithText(text, substring = true, ignoreCase = true)
                 .fetchSemanticsNodes().isNotEmpty()
         }
+
+    /**
+     * Les réglages d'une variante se RETIENNENT d'une partie à l'autre —
+     * c'est voulu, et c'est ce qui rend ces tests dépendants les uns des
+     * autres : celui qui coche « à deux » le laissait coché pour le suivant,
+     * qui attendait alors « à vous de jouer » et recevait « aux blancs de
+     * jouer ». On repart donc des valeurs d'usine à chaque test.
+     */
+    @Before fun oublieLesReglagesPrecedents() {
+        InstrumentationRegistry.getInstrumentation().targetContext
+            .getSharedPreferences("play", android.content.Context.MODE_PRIVATE)
+            .edit().clear().commit()
+    }
 
     private fun openSetup() {
         compose.onNodeWithTag("mode-variants").performScrollTo().performClick()

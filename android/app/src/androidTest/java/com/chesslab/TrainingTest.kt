@@ -193,12 +193,20 @@ class TrainingTest {
         compose.onNodeWithTag("cours-en-cours").assertIsDisplayed()
     }
 
+    /**
+     * Le nom d'un cours s'AFFICHE en français et se CHERCHE en anglais.
+     *
+     * « Italian Game » est la clé du catalogue ; l'app en français montre
+     * « Partie italienne ». Taper le nom d'origine doit quand même trouver le
+     * cours — quelqu'un qui a lu le nom anglais quelque part ne doit pas
+     * rester bredouille. C'est la règle d'iOS, qui cherche dans les deux.
+     */
     @Test fun entrainerUneLigneDepuisLeCours() {
         openMode("openings")
         awaitTag("recherche")
         compose.onNodeWithTag("recherche").performTextInput("Italian")
-        awaitText("Italian Game")
-        compose.onNodeWithText("Italian Game", substring = true).performClick()
+        awaitText("Partie italienne")
+        compose.onNodeWithText("Partie italienne", substring = true).performClick()
         awaitTag("entrainer")
         compose.onNodeWithTag("entrainer").performClick()
         awaitTag("consigne")
