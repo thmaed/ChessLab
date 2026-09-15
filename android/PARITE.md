@@ -92,6 +92,30 @@ referme ».
 - [x] **La barre du haut était FIGÉE** (défaut trouvé ici, valable pour TOUS
       les écrans) : ses actions gardaient l'état de l'ouverture de l'écran.
 
+### Module « Puzzles » — FAIT le 15/09
+- [x] **On choisit sa séance AVANT de résoudre** : niveau, phase, type, le
+      bilan de ce qu'on rate d'habitude, puis « Commencer ». Les filtres
+      vivaient dans un tiroir au-dessus du plateau, et le puzzle courant
+      changeait sous les doigts.
+- [x] **« Voir dans la partie d'origine »** pour un puzzle maison.
+- [x] **Toucher à côté annule la promotion** — elle promouvait en dame sans
+      rien demander, ce qui pouvait faire rater le puzzle.
+
+### Module « Laboratoire » — FAIT le 15/09
+- [x] **Une série a une LONGUEUR** (1 à 500) et s'arrête d'elle-même. Sans
+      borne, deux bilans ne se comparaient pas.
+- [x] Le **niveau de chaque camp** (on ne pouvait choisir que le personnage),
+      le temps par coup, l'alternance des couleurs, le mode rapide.
+- [x] **Abandon et nulle par accord** sur évaluation soutenue : sur cent
+      parties, les finales jouées jusqu'au mat coûtent plus que tout le reste.
+- [x] **Écran gardé allumé** pendant une longue série.
+
+### Le plateau, pour TOUS les modes — 15/09
+- [x] **Glisser-déposer**, explicitement déclaré écran par écran : sur un
+      plateau qui COMPOSE (éditeur de position), un glissé aurait posé deux
+      pièces d'un coup.
+- [x] **Glissement du dernier coup** et **anneau de prise**.
+
 ## ✅ La passe de septembre — 13/09/2026
 
 (Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :
@@ -123,9 +147,9 @@ document redevient ce qu'il doit être — la liste des écarts, vide.
 | Ouvertures | 58 cours, lecteur qui descend l'arbre, flèches colorées, commentaires, index des lignes, coups des maîtres et lignes de Stockfish pré-calculées (sidecar Labs, 13/09), répertoires personnels importés d'un PGN (13/09) |
 | Finales | 78 cours, même lecteur |
 | Entraînement | FSRS-5, séance du jour, positions difficiles, une ligne |
-| Puzzles | 106 094 puzzles Lichess, essais réglables, indice |
+| Puzzles | 106 094 puzzles Lichess, choix de la séance, essais réglables, indice, retour à la partie d'origine (15/09) |
 | Deux joueurs | noms des joueurs, trois présentations, cadences, abandon, nulle, consultation, revanche, export (14/09) |
-| Laboratoire | série de parties, Maia ou Stockfish de chaque côté |
+| Laboratoire | série BORNÉE, niveau par camp, abandon et nulle, mode rapide, écran gardé allumé (15/09) |
 | Scanner | détection du plateau, coins ajustables, recadrage, confirmation dans l'éditeur avec cases douteuses et sens de lecture (13/09) |
 | Éditeur de position | composer une position |
 | Progression | statistiques d'entraînement ; bilan complet le 13/09 — par niveau d'adversaire, par personnage, meilleure victoire, réussite des puzzles par palier, niveau atteint, thèmes à travailler |

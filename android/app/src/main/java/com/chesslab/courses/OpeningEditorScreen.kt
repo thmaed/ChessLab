@@ -79,6 +79,9 @@ fun OpeningEditorScreen(courseId: String, onBack: () -> Unit) {
                 selected = state.selected,
                 legalTargets = state.legalTargets,
                 lastMove = state.lastMove,
+                // L'éditeur de répertoire JOUE des coups : on y traîne le
+                // camp au trait, comme sur un plateau de partie.
+                draggableColor = state.position.sideToMove,
                 enabled = true,
                 onSquareTap = state::tap,
             )

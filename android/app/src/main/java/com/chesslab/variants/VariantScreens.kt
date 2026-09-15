@@ -269,6 +269,7 @@ fun VariantPlayScreen(
                 lastMove = ui.lastMove,
                 checkedKing = ui.checkedKing,
                 walls = ui.walls,
+                draggableColor = ui.position.sideToMove,
                 enabled = ui.ready && !ui.thinking && !ui.gameOver,
                 onSquareTap = model::onSquareTap,
             )

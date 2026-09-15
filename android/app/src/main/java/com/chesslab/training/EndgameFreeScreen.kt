@@ -111,6 +111,7 @@ fun EndgameFreeScreen(
                 lastMove = ui.lastMove,
                 checkedKing = ui.checkedKing,
                 arrows = ui.hints,
+                draggableColor = ui.position.sideToMove,
                 enabled = ui.phase == FreePhase.awaiting,
                 onSquareTap = model::onSquareTap,
             )

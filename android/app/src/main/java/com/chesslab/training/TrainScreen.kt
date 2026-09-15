@@ -99,6 +99,7 @@ fun TrainScreen(
                 lastMove = ui.lastMove,
                 checkedKing = ui.checkedKing,
                 hint = ui.hint,
+                draggableColor = ui.position.sideToMove,
                 enabled = ui.phase == TrainPhase.awaiting,
                 onSquareTap = model::tap,
             )

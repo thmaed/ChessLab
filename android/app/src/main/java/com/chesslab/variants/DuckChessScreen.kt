@@ -59,6 +59,7 @@ fun DuckChessScreen(
                 legalTargets = if (ui.phase == DuckPhase.placeDuck) ui.duckTargets else ui.legalTargets,
                 lastMove = ui.lastMove,
                 duck = ui.duck,
+                draggableColor = ui.position.sideToMove,
                 enabled = !ui.thinking && ui.winner == null,
                 onSquareTap = model::onSquareTap,
             )

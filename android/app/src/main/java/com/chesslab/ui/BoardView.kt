@@ -100,9 +100,14 @@ fun BoardView(
      */
     piecesRotated: Boolean = false,
     /**
-     * Le camp qu'on peut SAISIR à la souris ou au doigt. `null` = les deux,
-     * ce qui convient à l'éditeur et à l'analyse ; les modes de jeu passent
-     * le camp au trait, sans quoi on traînerait une pièce adverse.
+     * Le camp qu'on peut SAISIR au doigt. `null` = **aucun glisser-déposer** :
+     * c'est le défaut, et il est délibéré.
+     *
+     * Sur un plateau qui JOUE, un glissé est un coup. Sur un plateau qui
+     * COMPOSE — l'éditeur de position, l'éditeur de répertoire —, toucher une
+     * case y pose ou y efface une pièce : un glissé y ferait deux gestes
+     * d'un coup, au départ ET à l'arrivée. Chaque écran doit donc dire
+     * explicitement quel camp se traîne.
      */
     draggableColor: Piece.Color? = null,
     enabled: Boolean = true,
@@ -209,10 +214,10 @@ fun BoardView(
                 .pointerInput(orientation, enabled, draggableColor, position) {
                     detectDragGestures(
                         onDragStart = { offset ->
-                            if (!enabled) return@detectDragGestures
+                            if (!enabled || draggableColor == null) return@detectDragGestures
                             val square = squareAt(offset) ?: return@detectDragGestures
                             val piece = position.piece(square) ?: return@detectDragGestures
-                            if (draggableColor != null && piece.color != draggableColor) return@detectDragGestures
+                            if (piece.color != draggableColor) return@detectDragGestures
                             drag = DragState(square, piece)
                             dragOffset.value = offset
                             onSquareTap(square)

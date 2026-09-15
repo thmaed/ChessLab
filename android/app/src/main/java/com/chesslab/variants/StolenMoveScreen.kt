@@ -66,6 +66,7 @@ fun StolenMoveScreen(
                 legalTargets = ui.legalTargets,
                 lastMove = ui.lastMove,
                 checkedKing = ui.checkedKing,
+                draggableColor = Piece.Color.white,
                 enabled = ui.outcome == null && !ui.thinking && ui.mover == Piece.Color.white,
                 onSquareTap = model::onSquareTap,
             )
