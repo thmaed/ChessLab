@@ -959,4 +959,5 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="entry_open_file_sub">Fichier .pgn ou .fen</string>
     <string name="entry_also_library">Ajouter aussi à la bibliothèque</string>
     <string name="entry_also_library_note">Sans effet sur une position FEN — la bibliothèque range des parties.</string>
+    <string name="analysis_summary_partial">Analyse en cours — le bilan se complète au fil des coups classés.</string>
 </resources>

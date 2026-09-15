@@ -76,6 +76,25 @@ fun AnalysisScreen(
     var showSummary by remember { mutableStateOf(false) }
     var toast by remember { mutableStateOf<String?>(null) }
 
+    // L'écran qui s'en va arrête ce qui tourne pour lui : la lecture
+    // automatique et l'analyse en continu. Sans cela le moteur restait à
+    // plein régime derrière un autre écran.
+    val owner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(owner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> model.handleViewDisappear()
+                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> model.handleViewAppear()
+                else -> Unit
+            }
+        }
+        owner.lifecycle.addObserver(observer)
+        onDispose {
+            owner.lifecycle.removeObserver(observer)
+            model.handleViewDisappear()
+        }
+    }
+
     TopBarActions {
         QuickSwitchMenu(
             onPlayVsEngine = { onPlayVsEngine(model.ui.position.fen) },
@@ -672,6 +691,31 @@ private fun GameSummarySheet(ui: AnalysisUiState, onDismiss: () -> Unit) {
                 Text(stringResource(R.string.analysis_no_review), color = Palette.textSecondary)
             } else {
                 Column(Modifier.testTag("feuille-bilan")) {
+                    // L'ouverture jouée, en tête : c'est le premier repère
+                    // qu'on cherche en rouvrant le bilan d'une partie.
+                    ui.opening?.let { opening ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            if (opening.eco.isNotEmpty()) {
+                                Text(
+                                    opening.eco,
+                                    fontSize = 10.sp, fontWeight = FontWeight.Bold,
+                                    fontFamily = FontFamily.Monospace, color = Palette.background,
+                                    modifier = Modifier
+                                        .clip(CircleShape)
+                                        .background(Palette.warning)
+                                        .padding(horizontal = 6.dp, vertical = 2.dp),
+                                )
+                                Spacer(Modifier.width(6.dp))
+                            }
+                            Text(
+                                opening.displayName(
+                                    java.util.Locale.getDefault().language == "fr"
+                                ),
+                                fontSize = 12.sp, color = Palette.textSecondary,
+                            )
+                        }
+                        Spacer(Modifier.height(10.dp))
+                    }
                     AccuracyPair(summary)
                     Spacer(Modifier.height(12.dp))
                     // Les catégories dans l'ordre de l'échelle, du meilleur au
@@ -708,13 +752,22 @@ private fun GameSummarySheet(ui: AnalysisUiState, onDismiss: () -> Unit) {
                             fontSize = 11.sp, color = Palette.textTertiary,
                         )
                     }
+                    // Un bilan PARTIEL le dit : sans cette ligne, un décompte
+                    // en cours passe pour un décompte définitif.
+                    if (!summary.isComplete) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            stringResource(R.string.analysis_summary_partial),
+                            fontSize = 11.sp, color = Palette.warning,
+                            modifier = Modifier.testTag("bilan-partiel"),
+                        )
+                    }
                 }
             }
         },
     )
 }
 
-/** La bibliothèque : les parties déjà jouées, rechargeables d'un tap. */
 /**
  * La barre d'évaluation : le verdict chiffré, et la part du plateau que chaque
  * camp occupe. Le remplissage dit d'un coup d'œil qui mène, sans lire le

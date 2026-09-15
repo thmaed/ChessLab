@@ -662,6 +662,27 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * L'écran s'en va : on arrête TOUT ce qui tourne pour lui.
+     *
+     * Sans cela, la lecture automatique continuait de dérouler la partie
+     * derrière l'écran disparu — en relançant une analyse à chaque coup — et
+     * l'analyse en continu gardait le moteur à plein régime pendant qu'on
+     * regardait autre chose. La REVUE, elle, poursuit : elle sauvegarde ce
+     * qu'elle classe, et la reprendre coûterait plus cher que la finir.
+     */
+    fun handleViewDisappear() {
+        stopAutoplay()
+        evalJob?.cancel()
+        lazyJob?.cancel()
+        ui = ui.copy(thinking = false)
+    }
+
+    /** Le retour sur l'écran : l'analyse en continu reprend là où elle était. */
+    fun handleViewAppear() {
+        if (!isGameReview && ui.sanMoves.isNotEmpty() || positions.size > 1) evaluate()
+    }
+
     fun stopAutoplay() {
         autoplayJob?.cancel()
         autoplayJob = null

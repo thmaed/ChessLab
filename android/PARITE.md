@@ -60,6 +60,38 @@ referme ».
 - [x] **Arriver avec une position** passe par l'écran de réglages, titré
       « Continuer la partie », au lieu de sauter directement au plateau.
 
+### Module « Analyse » — FAIT le 15/09
+- [x] **Le plateau était INERTE.** `enabled = false` : la seule façon
+      d'explorer une idée était de toucher une pastille de candidat, donc on
+      ne pouvait essayer que ce que le moteur proposait déjà. Il se joue
+      maintenant au doigt comme au glissé, toucher la case d'arrivée d'une
+      flèche joue ce candidat, et la promotion demande en quoi promouvoir.
+- [x] **Retour au début, lecture automatique** (un coup par seconde) et
+      **« jouer le meilleur coup »** : trois commandes d'iOS qui manquaient.
+- [x] **Bannière « l'ordinateur n'a pas démarré »** + Réessayer.
+- [x] **Affinage des verdicts limites** — le plus important : un coup sur 22
+      recevait une étiquette FAUSSE. Bande de ±2 points autour des trois
+      frontières, 3 M nœuds, arrêt anticipé (`RefinementStopRule`), re-test
+      entre les deux affinages, jamais sur la théorie ni en surchauffe.
+- [x] **Budgets moteur par PALIER d'appareil** (`DevicePerformance`), comme
+      iOS : 180 000 à 300 000 nœuds, plafonds et profondeur assortis.
+- [x] **Une vraie BIBLIOTHÈQUE** : recherche, filtres (mode, résultat,
+      étiquette), étiquettes libres, suppression unitaire et en lot, import
+      d'un fichier PGN, précision par partie. C'était huit lignes sous
+      l'écran d'analyse.
+- [x] **Le bilan chiffré rejoint la partie enregistrée** (base v9) : clé
+      d'empreinte, version du barème, précision, perte moyenne, coups classés
+      et coups de théorie par camp.
+- [x] **Écran d'entrée** : « Autres sources » replié, feuille de saisie avec
+      « Ajouter aussi à la bibliothèque », ouverture d'un fichier .pgn/.fen.
+- [x] **L'écran qui s'en va arrête ce qui tourne pour lui** : la lecture
+      automatique déroulait la partie derrière l'écran disparu, et l'analyse
+      en continu gardait le moteur à plein régime.
+- [x] **Bilan** : l'ouverture en tête, et la mention « analyse en cours »
+      quand le décompte est partiel.
+- [x] **La barre du haut était FIGÉE** (défaut trouvé ici, valable pour TOUS
+      les écrans) : ses actions gardaient l'état de l'ouverture de l'écran.
+
 ## ✅ La passe de septembre — 13/09/2026
 
 (Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :
@@ -87,7 +119,7 @@ document redevient ce qu'il doit être — la liste des écarts, vide.
 | | |
 | --- | --- |
 | Jouer contre l'ordinateur | 9 personnages Maia + Stockfish, niveau, couleur, pendule, indice, barre d'éval, abandon du moteur |
-| Analyse des parties | classification, précision, coach, courbe, candidats, menace, rétrospective, bilan, export PGN, puzzles depuis les erreurs ; flèches alignées le 12/09 — VERTES et lues dans le cache en revue, GRISES depuis le moteur en analyse d'une position, rouge translucide pour la menace, et la rétrospective reste SEULE quand elle sort |
+| Analyse des parties | plateau JOUABLE, lecture automatique, meilleur coup, affinage des verdicts limites, classification, précision, coach, courbe, candidats, menace, rétrospective, bilan, export PGN, puzzles depuis les erreurs (15/09) ; flèches alignées le 12/09 — VERTES et lues dans le cache en revue, GRISES depuis le moteur en analyse d'une position, rouge translucide pour la menace, et la rétrospective reste SEULE quand elle sort |
 | Ouvertures | 58 cours, lecteur qui descend l'arbre, flèches colorées, commentaires, index des lignes, coups des maîtres et lignes de Stockfish pré-calculées (sidecar Labs, 13/09), répertoires personnels importés d'un PGN (13/09) |
 | Finales | 78 cours, même lecteur |
 | Entraînement | FSRS-5, séance du jour, positions difficiles, une ligne |

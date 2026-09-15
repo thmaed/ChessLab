@@ -962,4 +962,5 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="entry_open_file_sub">A .pgn or .fen file</string>
     <string name="entry_also_library">Also add to the library</string>
     <string name="entry_also_library_note">No effect on a FEN position — the library keeps games.</string>
+    <string name="analysis_summary_partial">Analysis in progress — the summary fills in as moves are classified.</string>
 </resources>
