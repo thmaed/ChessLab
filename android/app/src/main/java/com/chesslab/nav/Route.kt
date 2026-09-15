@@ -109,6 +109,9 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data object Settings : Route(R.string.route_settings)
     data object Help : Route(R.string.route_help)
     /** Les licences des composants embarqués, depuis les réglages. */
+    /** Les sources des données d'ouvertures — réglages › Ouvertures. */
+    data object Sources : Route(R.string.sources_title)
+
     data object Licences : Route(R.string.licences_title)
     /** [forSetup] : la position lue repart vers l'écran de réglage d'une partie. */
     data class Scanner(val forSetup: Boolean = false) : Route(R.string.route_scanner)

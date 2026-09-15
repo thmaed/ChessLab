@@ -983,4 +983,19 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="lab_level_b">Side B level</string>
     <string name="lab_movetime">Thinking time per move (ms)</string>
     <string name="lab_series_section">Series</string>
+
+    <!-- Sources des données d'ouvertures -->
+    <string name="sources_title">Sources</string>
+    <string name="sources_intro">Openings are pre-generated from open sources, then embedded. The moves and statistics are facts; the explanations, where they exist, are written by hand.</string>
+    <string name="sources_eco_title">Names and ECO codes</string>
+    <string name="sources_eco_body">The public lichess-org/chess-openings dataset (public domain). Used to name every position reached.</string>
+    <string name="sources_moves_title">Moves and statistics</string>
+    <string name="sources_moves_body">Lichess Opening Explorer API: master games and online games filtered by level (~1400-2000). Popularity and scores of each move.</string>
+    <string name="sources_eval_title">Evaluations</string>
+    <string name="sources_eval_body">The Stockfish engine, ahead of time, to annotate critical moves and spot traps.</string>
+    <string name="sources_offline">No opening data is downloaded in use: everything works offline.</string>
+    <string name="settings_openings">Openings</string>
+    <string name="settings_sources">Data sources</string>
+    <string name="settings_help">Help</string>
+    <string name="settings_help_sub">What each mode does.</string>
 </resources>

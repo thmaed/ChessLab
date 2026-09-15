@@ -274,7 +274,12 @@ private fun App() {
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
-            Route.Settings -> SettingsScreen(onOpenLicences = { stack.add(Route.Licences) })
+            Route.Settings -> SettingsScreen(
+                onOpenLicences = { stack.add(Route.Licences) },
+                onOpenSources = { stack.add(Route.Sources) },
+                onOpenHelp = { stack.add(Route.Help) },
+            )
+            Route.Sources -> com.chesslab.settings.SourcesScreen()
             Route.Licences -> com.chesslab.settings.LicencesScreen()
             is Route.Scanner -> ScannerScreen { fen ->
                 // Le scanner appelé DEPUIS le réglage d'une partie y rapporte

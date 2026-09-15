@@ -980,4 +980,19 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="lab_level_b">Niveau du camp B</string>
     <string name="lab_movetime">Temps de réflexion par coup (ms)</string>
     <string name="lab_series_section">Série</string>
+
+    <!-- Sources des données d\'ouvertures -->
+    <string name="sources_title">Sources</string>
+    <string name="sources_intro">Les ouvertures sont pré-générées à partir de sources ouvertes, puis embarquées. Les coups et statistiques sont des faits ; les explications, quand elles existent, sont rédigées à la main.</string>
+    <string name="sources_eco_title">Noms et codes ECO</string>
+    <string name="sources_eco_body">Jeu de données public lichess-org/chess-openings (domaine public). Sert à nommer chaque position atteinte.</string>
+    <string name="sources_moves_title">Coups et statistiques</string>
+    <string name="sources_moves_body">API Lichess Opening Explorer : parties de maîtres et parties en ligne filtrées par niveau (≈1400-2000). Popularité et scores des coups.</string>
+    <string name="sources_eval_title">Évaluations</string>
+    <string name="sources_eval_body">Moteur Stockfish, en amont, pour annoter les coups critiques et repérer les pièges.</string>
+    <string name="sources_offline">Aucune donnée d\'ouverture n\'est téléchargée à l\'usage : tout fonctionne hors ligne.</string>
+    <string name="settings_openings">Ouvertures</string>
+    <string name="settings_sources">Sources des données</string>
+    <string name="settings_help">Aide</string>
+    <string name="settings_help_sub">Ce que fait chaque mode.</string>
 </resources>

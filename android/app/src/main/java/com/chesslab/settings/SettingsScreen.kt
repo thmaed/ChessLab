@@ -23,7 +23,9 @@ import chesskit.Position
 import com.chesslab.ui.BoardTheme
 import com.chesslab.ui.BoardView
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Description
@@ -43,7 +45,13 @@ import com.chesslab.R
 import androidx.compose.runtime.*
 
 @Composable
-fun SettingsScreen(onOpenLicences: () -> Unit = {}) {
+fun SettingsScreen(
+    onOpenLicences: () -> Unit = {},
+    /** « Sources des données » : à quoi les ouvertures doivent leurs chiffres. */
+    onOpenSources: () -> Unit = {},
+    /** « Comment ça marche » : le même écran que le « ? » de l'accueil. */
+    onOpenHelp: () -> Unit = {},
+) {
     val context = LocalContext.current
     val settings by SettingsStore.state.collectAsState()
 
@@ -214,38 +222,67 @@ fun SettingsScreen(onOpenLicences: () -> Unit = {}) {
         )
         }
 
+        // Les ouvertures sont pré-générées à partir de sources ouvertes : le
+        // dire n'est pas qu'une politesse, c'est aussi ce qui explique
+        // pourquoi tout marche en avion.
+        SettingsSection(stringResource(R.string.settings_openings), Icons.Default.MenuBook) {
+            LinkRow(
+                Icons.Default.Description, stringResource(R.string.settings_sources),
+                stringResource(R.string.sources_intro).take(60) + "…", "sources", onOpenSources,
+            )
+        }
+
         com.chesslab.transfer.TransferSection()
+
+        // L'aide est aussi ICI, et pas seulement derrière le « ? » de
+        // l'accueil : c'est dans les réglages qu'on la cherche quand on ne
+        // l'a pas trouvée du premier coup.
+        SettingsSection(stringResource(R.string.settings_help), Icons.AutoMirrored.Filled.HelpOutline) {
+            LinkRow(
+                Icons.AutoMirrored.Filled.HelpOutline, stringResource(R.string.route_help),
+                stringResource(R.string.settings_help_sub), "aide", onOpenHelp,
+            )
+        }
 
         // Ce que l'app doit à d'autres : Stockfish est sous GPLv3, et cela
         // s'affiche sur un écran à part, comme sur iOS — pas en note de bas
         // de page.
         SettingsSection(stringResource(R.string.settings_about), Icons.Default.Info) {
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable(onClick = onOpenLicences)
-                    .padding(vertical = 4.dp)
-                    .testTag("licences"),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                IconBadge(Icons.Default.Description, Palette.textSecondary, 34.dp)
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        stringResource(R.string.licences_title),
-                        fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Palette.textPrimary,
-                    )
-                    Text(
-                        stringResource(R.string.settings_licences_subtitle),
-                        fontSize = 11.sp, color = Palette.textTertiary,
-                    )
-                }
-                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Palette.textTertiary)
-            }
+            LinkRow(
+                Icons.Default.Description, stringResource(R.string.licences_title),
+                stringResource(R.string.settings_licences_subtitle), "licences", onOpenLicences,
+            )
         }
 
         Spacer(Modifier.height(12.dp))
+    }
+}
+
+/** Une ligne qui MÈNE ailleurs : une icône, un titre, une explication, un chevron. */
+@Composable
+private fun LinkRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    subtitle: String,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp)
+            .testTag(tag),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        IconBadge(icon, Palette.textSecondary, 34.dp)
+        Column(Modifier.weight(1f)) {
+            Text(title, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = Palette.textPrimary)
+            Text(subtitle, fontSize = 11.sp, color = Palette.textTertiary)
+        }
+        Icon(Icons.Default.ChevronRight, contentDescription = null, tint = Palette.textTertiary)
     }
 }
 

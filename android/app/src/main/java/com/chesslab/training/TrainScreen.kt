@@ -195,7 +195,9 @@ fun TrainScreen(
         },
     )
 
-    if (ui.pendingPromotion != null) PromotionDialog(model::completePromotion)
+    if (ui.pendingPromotion != null) {
+        PromotionDialog(onPick = model::completePromotion, onCancel = model::cancelPromotion)
+    }
 }
 
 @Composable
