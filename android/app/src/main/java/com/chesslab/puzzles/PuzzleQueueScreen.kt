@@ -77,33 +77,39 @@ fun PuzzleQueueScreen(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
+            // Chaque groupe a SA couleur — le niveau en vert, la phase en
+            // bleu, le thème en ambre — et chaque puce son icône. Trois rangées
+            // de puces toutes vertes se ressemblent trop pour qu'on retrouve la
+            // sienne d'un coup d'œil ; c'est le parti pris d'iOS.
             Group(stringResource(R.string.puzzle_level)) {
                 ChipButton(stringResource(R.string.filter_all), difficulty == null,
-                    Modifier.testTag("niveau-tous")) { difficulty = null }
+                    Modifier.testTag("niveau-tous"), tint = Palette.accent) { difficulty = null }
                 DifficultyTier.entries.forEach { tier ->
                     ChipButton(
                         stringResource(tier.labelRes), difficulty == tier,
-                        Modifier.testTag("niveau-${tier.name}"),
+                        Modifier.testTag("niveau-${tier.name}"), tint = tier.tint,
                     ) { difficulty = if (difficulty == tier) null else tier }
                 }
             }
             Group(stringResource(R.string.puzzle_phase)) {
                 ChipButton(stringResource(R.string.filter_all_f), phase == null,
-                    Modifier.testTag("phase-toutes")) { phase = null }
+                    Modifier.testTag("phase-toutes"), tint = Palette.info) { phase = null }
                 GamePhase.entries.forEach { value ->
                     ChipButton(
                         stringResource(value.labelRes), phase == value,
                         Modifier.testTag("phase-${value.name}"),
+                        icon = value.icon, tint = Palette.info,
                     ) { phase = if (phase == value) null else value }
                 }
             }
             Group(stringResource(R.string.puzzle_type)) {
                 ChipButton(stringResource(R.string.filter_all), theme == null,
-                    Modifier.testTag("theme-tous")) { theme = null }
+                    Modifier.testTag("theme-tous"), tint = Palette.warning) { theme = null }
                 PuzzleThemeKind.entries.forEach { value ->
                     ChipButton(
                         stringResource(value.labelRes), theme == value,
                         Modifier.testTag("theme-${value.name}"),
+                        icon = value.icon, tint = Palette.warning,
                     ) { theme = if (theme == value) null else value }
                 }
             }

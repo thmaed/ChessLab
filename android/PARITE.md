@@ -206,6 +206,22 @@ trois choses manquaient vraiment.
       l'écran. Marges alignées (16 dp) et étiquettes rendues à leur taille.
 - [x] **« À mémoriser »**, l'étiquette du coup critique, manquait à Android.
 
+### Module « Puzzles » — les COULEURS — FAIT le 15/09
+- [x] **Le palier, pas la cote brute** : l'en-tête affichait « 1 742 » là où iOS
+      dit « Confirmé ». Quatre paliers lisibles, c'est le choix explicite de
+      `DifficultyTier`, et la cote nue le défaisait.
+- [x] **Les teintes des paliers** étaient différentes des deux côtés
+      (vert-bleu-jaune-rouge contre vert-bleu-ambre-rose) : celles d'iOS font foi.
+- [x] **La phase a sa couleur et son icône** — ouverture en turquoise,
+      milieu en violet, finale en ambre. Android la peignait toujours en bleu,
+      sans icône.
+- [x] **Les pastilles sont CERCLÉES** : sur fond sombre, un aplat à 15 % se
+      confond avec la surface et la pastille redevient du texte gris.
+- [x] **Chaque groupe de filtres a sa couleur** (niveau vert, phase bleue,
+      thème ambre) et chaque puce son icône : trois rangées toutes vertes se
+      ressemblaient trop pour qu'on retrouve la sienne d'un coup d'œil.
+      `ChipButton` accepte désormais une teinte, comme le `FilterChip` d'iOS.
+
 ## ✅ La passe de septembre — 13/09/2026
 
 (Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :

@@ -214,13 +214,20 @@ fun ChipButton(
     selected: Boolean,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
+    /**
+     * La couleur du groupe. Elle remplit la puce quand elle est choisie et
+     * teinte son icône sinon — c'est ce qui distingue trois rangées de filtres
+     * empilées (niveau, phase, thème) sans avoir à lire leurs en-têtes. Même
+     * paramètre que le `FilterChip` d'iOS ; Android les peignait toutes en vert.
+     */
+    tint: Color = Palette.accent,
     onClick: () -> Unit,
 ) {
     Row(
         modifier
             .clip(CircleShape)
             .then(
-                if (selected) Modifier.background(accentGradient)
+                if (selected) Modifier.background(tintGradient(tint))
                 else Modifier.background(Palette.surfaceElevated).border(1.dp, Palette.stroke, CircleShape)
             )
             .clickable(onClick = onClick)
@@ -230,12 +237,12 @@ fun ChipButton(
         if (icon != null) {
             Icon(
                 icon, null, modifier = Modifier.size(15.dp),
-                tint = if (selected) Palette.background else Palette.textPrimary,
+                tint = if (selected) Palette.background else tint,
             )
             Spacer(Modifier.width(6.dp))
         }
         Text(
-            label, fontSize = 14.sp, fontWeight = FontWeight.Medium,
+            label, fontSize = 14.sp, fontWeight = FontWeight.Medium, maxLines = 1,
             color = if (selected) Palette.background else Palette.textPrimary,
         )
     }

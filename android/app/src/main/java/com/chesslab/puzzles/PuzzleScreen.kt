@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -312,10 +313,18 @@ private fun Header(ui: PuzzleUiState) {
                 stringResource(puzzle.themeLabel).uppercase(),
                 fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Palette.accent,
             )
+            // Le PALIER, pas la cote brute : « Confirmé » se lit, « 1 742 » se
+            // décode. Quatre paliers, quatre couleurs, du vert au rose — c'est
+            // le choix d'iOS, et Android montrait encore le nombre.
             // Cote 0 : un puzzle maison n'en a pas, et en inventer une serait
             // pire que de n'en montrer aucune.
-            if (puzzle.rating > 0) ContextPill("${puzzle.rating}", difficultyTint(puzzle.rating))
-            puzzle.phase?.let { ContextPill(stringResource(phaseLabel(it)), Palette.info) }
+            if (puzzle.rating > 0) {
+                val tier = DifficultyTier.forRating(puzzle.rating)
+                ContextPill(stringResource(tier.labelRes), tier.tint)
+            }
+            GamePhase.of(puzzle.phase)?.let { phase ->
+                ContextPill(stringResource(phase.labelRes), phase.tint, phase.icon)
+            }
             Text(
                 stringResource(R.string.puzzle_score, ui.solvedCount, ui.attemptedCount),
                 fontSize = 12.sp, color = Palette.textSecondary,
@@ -325,29 +334,27 @@ private fun Header(ui: PuzzleUiState) {
     }
 }
 
+/**
+ * Une pastille de contexte : teintée, cerclée, et lisible d'un coup d'œil.
+ *
+ * Le CERCLE compte : sur un fond sombre, un aplat à 15 % d'une couleur claire
+ * se confond avec la surface, et la pastille redevient du texte gris. C'est
+ * pour cela qu'iOS en pose un.
+ */
 @Composable
-private fun ContextPill(label: String, tint: Color) {
-    Text(
-        label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = tint,
-        modifier = Modifier
+private fun ContextPill(label: String, tint: Color, icon: ImageVector? = null) {
+    Row(
+        Modifier
             .clip(CircleShape)
-            .background(tint.copy(alpha = 0.16f))
+            .background(tint.copy(alpha = 0.15f))
+            .border(1.dp, tint.copy(alpha = 0.30f), CircleShape)
             .padding(horizontal = 8.dp, vertical = 3.dp),
-    )
-}
-
-/** La difficulté se lit à sa couleur, du vert au rouge. */
-private fun difficultyTint(rating: Int): Color = when {
-    rating < 1200 -> Palette.accent
-    rating < 1600 -> Palette.teal
-    rating < 2000 -> Palette.warning
-    else -> Palette.danger
-}
-
-private fun phaseLabel(phase: String): Int = when (phase) {
-    "opening" -> R.string.phase_opening
-    "middlegame" -> R.string.phase_middlegame
-    else -> R.string.phase_endgame
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        icon?.let { Icon(it, null, tint = tint, modifier = Modifier.size(11.dp)) }
+        Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = tint, maxLines = 1)
+    }
 }
 
 /** Les essais restants, en pastilles : on voit ce qu'il reste sans compter. */
