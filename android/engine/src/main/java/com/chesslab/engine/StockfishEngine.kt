@@ -73,13 +73,31 @@ class StockfishEngine(private val binaryPath: String) {
     suspend fun search(
         go: String,
         timeoutMs: Long,
+        /**
+         * L'ARRÊT ANTICIPÉ : appelé sur chaque ligne lue, il demande au moteur
+         * de s'arrêter dès qu'il a tranché, SANS quitter la recherche. C'est
+         * ce qui permet d'obtenir « trois niveaux » dans un seul arbre —
+         * relancer une recherche plus profonde repaie l'arbre entier (mesuré
+         * ×13, pas ×10), alors qu'un `stop` ne coûte rien.
+         *
+         * Déclaré AVANT [onInfo] pour que la lambda finale des appelants
+         * reste, comme avant, celle qui lit les lignes.
+         */
+        stopWhen: ((String) -> Boolean)? = null,
         onInfo: (String) -> Unit = {},
     ): String? {
         drain()
         send(go)
         var settled = false
+        var asked = false
         try {
-            val best = awaitLine(timeoutMs, onLine = onInfo) { it.startsWith("bestmove") }
+            val best = awaitLine(timeoutMs, onLine = { line ->
+                onInfo(line)
+                if (!asked && stopWhen?.invoke(line) == true) {
+                    asked = true
+                    send("stop")
+                }
+            }) { it.startsWith("bestmove") }
             settled = best != null
             return best
         } finally {

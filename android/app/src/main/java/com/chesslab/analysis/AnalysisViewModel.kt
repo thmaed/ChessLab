@@ -847,6 +847,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                                 ui = ui.copy(reviewDone = ui.reviewDone + 1)
                             }
                         }
+                        refineBorderlineVerdicts(e, snapshotPositions, snapshotMoves, evals, book)
                     }
                 }
                 classify(snapshotPositions, snapshotMoves, evals, book)
@@ -865,6 +866,142 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
     }
+
+    // MARK: Affinage des verdicts limites
+
+    /**
+     * Recalcule PLUS PROFONDÉMENT les positions dont le verdict hésite.
+     *
+     * Mesuré côté iOS sur neuf parties de tournoi (887 coups, quatre budgets,
+     * ~25 milliards de nœuds) : au budget de base, **4,62 %** des coups
+     * reçoivent un verdict qu'un budget 33 fois supérieur contredirait — un
+     * coup sur 22 passe à tort de « signalé » à « non signalé », ou l'inverse.
+     *
+     * Augmenter le budget PARTOUT serait un mauvais calcul : dix fois plus
+     * d'effort ne ramène ce chiffre qu'à 1,69 %. Les erreurs ne sont pas
+     * réparties au hasard, elles se concentrent autour des SEUILS — dépenser
+     * du calcul sur un coup qui perd 40 points ne sert à rien, c'est une faute
+     * à n'importe quelle profondeur. On ne recalcule donc que la bande
+     * d'hésitation : ±2 points autour des trois frontières de signalement,
+     * soit ~15 % des coups, pour 85 % des erreurs corrigées.
+     *
+     * Un coup de THÉORIE ou un coup FORCÉ n'est jamais affiné : leur étiquette
+     * ne dépend pas de l'évaluation, ce serait payer jusqu'à 2 × 3 M nœuds
+     * pour rien. Et en SURCHAUFFE on renonce à l'affinage plutôt qu'à la passe
+     * de base : mieux vaut tous les coups classés normalement que la moitié
+     * classés finement.
+     */
+    private suspend fun refineBorderlineVerdicts(
+        engine: com.chesslab.engine.StockfishEngine,
+        positions: List<Position>,
+        moves: List<Move>,
+        evals: MutableMap<Int, PositionEval>,
+        book: List<EcoOpening>,
+    ) {
+        if (com.chesslab.engine.ThermalMonitor.isThrottling) return
+        val refined = HashSet<Int>()
+
+        for (index in moves.indices) {
+            kotlinx.coroutines.currentCoroutineContext().ensureActive()
+            val before = evals[index] ?: continue
+            val after = evals[index + 1] ?: continue
+            val mover = positions[index].sideToMove
+
+            // Un coup de théorie ou un coup forcé porte son étiquette quoi
+            // qu'en dise le moteur : affiner serait payer pour rien.
+            val path = moves.take(index + 1).map { it.san }
+            if (EcoOpeningLookup.isInBook(path, book)) continue
+            if (legalMoveCount(positions[index]) == 1) continue
+
+            fun lossNow(): Double {
+                val b = moverWin(evals[index] ?: before, mover)
+                val a = moverWin(evals[index + 1] ?: after, mover)
+                return maxOf(0.0, b - a)
+            }
+            if (!isBorderline(lossNow())) continue
+
+            // Le PARENT d'abord. La distance donnée à la règle d'arrêt se
+            // mesure contre l'éval déjà connue de l'enfant, et réciproquement.
+            if (index !in refined) {
+                val fixedAfter = moverWin(evals[index + 1] ?: after, mover)
+                refineOne(engine, positions[index], mover) { whiteWin ->
+                    val beforeMover = if (mover == Piece.Color.white) whiteWin else 100 - whiteWin
+                    distanceToNearestThreshold(maxOf(0.0, beforeMover - fixedAfter))
+                }?.let { evals[index] = it; refined += index }
+            }
+
+            // RE-TEST entre les deux affinages : si celui du parent a déjà
+            // sorti la perte de la bande d'hésitation, l'enfant n'a plus rien
+            // à trancher — on s'épargne au moins son plancher d'un million de
+            // nœuds.
+            if (!isBorderline(lossNow())) continue
+            if (index + 1 in refined) continue
+            val fixedBefore = moverWin(evals[index] ?: before, mover)
+            refineOne(engine, positions[index + 1], mover) { whiteWin ->
+                val afterMover = if (mover == Piece.Color.white) whiteWin else 100 - whiteWin
+                distanceToNearestThreshold(maxOf(0.0, fixedBefore - afterMover))
+            }?.let { evals[index + 1] = it; refined += index + 1 }
+        }
+    }
+
+    /** La probabilité de gain d'une position, DU POINT DE VUE de [mover]. */
+    private fun moverWin(eval: PositionEval, mover: Piece.Color): Double {
+        val white = eval.winPercentWhite
+        return if (mover == Piece.Color.white) white else 100 - white
+    }
+
+    /**
+     * Une recherche d'affinage sur UNE position, arrêtée dès qu'elle a
+     * tranché — voir [RefinementStopRule]. La recherche n'est jamais quittée
+     * puis relancée : relancer repaie l'arbre entier (mesuré ×13, pas ×10).
+     */
+    private suspend fun refineOne(
+        engine: com.chesslab.engine.StockfishEngine,
+        position: Position,
+        mover: Piece.Color,
+        lossDistance: (Double) -> Double,
+    ): PositionEval? {
+        if (terminalWinWhite(position) != null) return null
+        val rule = RefinementStopRule()
+        engine.send("position fen ${position.fen}")
+        val lines = HashMap<Int, RankedLine>()
+        engine.search(
+            "go nodes $REFINEMENT_NODES movetime $REFINEMENT_CAP_MS",
+            timeoutMs = 60_000,
+            stopWhen = { raw ->
+                val info = parseInfo(raw)
+                if (info == null || info.rank != 1) false
+                else {
+                    val white = toWhitePov(info.line, position.sideToMove)
+                    val winWhite = white.mate?.let { EvalConversion.fromMate(it) }
+                        ?: EvalConversion.fromCentipawns(white.cp ?: 0)
+                    rule.shouldStop(info.depth, info.nodes, winWhite, lossDistance(winWhite))
+                }
+            },
+        ) { line -> parseInfo(line)?.let { lines[it.rank] = it.line } }
+
+        val best = lines[1] ?: return null
+        val second = lines[2]
+        val white = toWhitePov(best, position.sideToMove)
+        val gap = if (second != null) winPercentMover(best) - winPercentMover(second) else null
+        return PositionEval(
+            cp = white.cp, mate = white.mate,
+            bestLan = best.lan, gapToSecondBest = gap, secondBestLan = second?.lan,
+            pv = best.pv,
+        )
+    }
+
+    /**
+     * Ce verdict est-il trop proche d'une frontière pour être tranché au
+     * budget de base ? Seules comptent les frontières qui DÉCLENCHENT un
+     * signalement : franchir Excellent/Bon ne change rien pour le lecteur,
+     * les deux sont bons.
+     */
+    private fun isBorderline(loss: Double): Boolean =
+        REFINEMENT_THRESHOLDS.any { kotlin.math.abs(loss - it) <= REFINEMENT_BAND }
+
+    private fun distanceToNearestThreshold(loss: Double): Double =
+        REFINEMENT_THRESHOLDS.minOf { kotlin.math.abs(loss - it) }
 
     /** Une recherche sur une position, en MultiPV 2. */
     private suspend fun rankedEval(engine: com.chesslab.engine.StockfishEngine, position: Position): PositionEval {
@@ -1160,7 +1297,13 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     /** Une ligne de classement du moteur. */
     private data class RankedLine(val lan: String, val pv: List<String>, val cp: Int?, val mate: Int?)
 
-    private data class ParsedInfo(val rank: Int, val depth: Int, val line: RankedLine)
+    private data class ParsedInfo(
+        val rank: Int,
+        val depth: Int,
+        val line: RankedLine,
+        /** Les nœuds cherchés — le plancher de l'arrêt anticipé s'y mesure. */
+        val nodes: Long? = null,
+    )
 
     private data class WhitePov(val cp: Int?, val mate: Int?)
 
@@ -1190,7 +1333,8 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         val mate = line.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
         val cp = line.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
         if (mate == null && cp == null) return null
-        return ParsedInfo(rank, depth, RankedLine(pv.first(), pv, cp, mate))
+        val nodes = line.substringAfter(" nodes ", "").substringBefore(" ").toLongOrNull()
+        return ParsedInfo(rank, depth, RankedLine(pv.first(), pv, cp, mate), nodes)
     }
 
     /** Ce qu'affiche une position finie : le signe, pas un chiffre. */
@@ -1243,6 +1387,47 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
          * un appareil lent. UCI s'arrête à la première limite atteinte.
          */
         const val REVIEW_CAP_MS = 1_500
+
+        /**
+         * La demi-largeur de la bande d'hésitation, en points de probabilité
+         * de gain, autour des seuils qui déclenchent un signalement. Choisie
+         * chronomètre en main sur la courbe mesurée côté iOS :
+         *
+         *     ±1,0 → ×1,96   59 % des erreurs corrigées   il reste 1,92 %
+         *     ±1,5 → ×2,42   73 %                         il reste 1,24 %
+         *     ±2,0 → ×2,95   85 %                         il reste 0,68 %   ← ici
+         *     ±3,0 → ×3,81   93 %                         il reste 0,34 %
+         *
+         * Au-delà de ±2 on paie surtout des recalculs qui CONFIRMENT le
+         * verdict.
+         */
+        const val REFINEMENT_BAND = 2.0
+
+        /**
+         * Le budget de la seconde recherche.
+         *
+         * ⚠️ Hypothèse réfutée par la mesure : la seconde recherche, lancée
+         * sur la MÊME position sans réinitialiser le moteur, n'hérite d'aucune
+         * remise de la table de transposition — un coup affiné coûte ×13,1 un
+         * coup de base. Le bilan reste bon (≈ ×2,2 au total avec l'arrêt
+         * anticipé, contre ×11,4 pour tout approfondir), mais il vaut par le
+         * CIBLAGE, pas par une remise qui n'existe pas.
+         */
+        const val REFINEMENT_NODES = 3_000_000
+
+        /**
+         * Un plafond PROPRE : celui de la passe de base tronquerait la
+         * recherche approfondie au point de la rendre inutile — on aurait payé
+         * l'attente sans gagner la précision.
+         */
+        const val REFINEMENT_CAP_MS = 12_000
+
+        /** Les trois frontières qui déclenchent un signalement. */
+        val REFINEMENT_THRESHOLDS = listOf(
+            MoveClassifier.INACCURACY_THRESHOLD,
+            MoveClassifier.MISTAKE_THRESHOLD,
+            MoveClassifier.BLUNDER_THRESHOLD,
+        )
 
         /** Le triple du budget de classification : une solution de puzzle doit tenir. */
         const val PUZZLE_NODES = 900_000
