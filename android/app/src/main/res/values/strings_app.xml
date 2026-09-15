@@ -916,4 +916,43 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="analysis_play">Play the game</string>
     <string name="analysis_pause">Pause</string>
     <string name="analysis_play_best">Play the best move</string>
+
+    <!-- Bibliothèque des parties -->
+    <string name="library_search">Search a player or a tag</string>
+    <string name="library_all_modes">All modes</string>
+    <string name="library_all_results">All results</string>
+    <string name="library_wins">Won</string>
+    <string name="library_draws">Drawn</string>
+    <string name="library_losses">Lost</string>
+    <string name="library_all_tags">All tags</string>
+    <string name="library_imported_filter">Imported</string>
+    <string name="library_no_match">No game matches the search or the filters.</string>
+    <string name="library_empty_title">No game saved yet</string>
+    <string name="library_empty_body">Games you finish — against the computer or two players — show up here.</string>
+    <string name="library_import">Import a PGN file</string>
+    <string name="library_imported_none">Nothing to import: no readable game in that file.</string>
+    <string name="library_import_failed">That file could not be read.</string>
+    <string name="library_edit_tags">Edit tags</string>
+    <string name="library_tags_hint">Separate tags with commas.</string>
+    <string name="library_tags_placeholder">opening, to review</string>
+    <string name="library_select">Select</string>
+    <string name="library_select_all">Select all</string>
+    <string name="library_select_none">Deselect all</string>
+    <string name="library_delete">Delete</string>
+    <string name="library_delete_title">Delete this game?</string>
+    <string name="library_delete_selected">Delete (%1$d)</string>
+    <string name="library_accuracy">Accuracy %1$d%% / %2$d%%</string>
+    <string name="save">Save</string>
+    <plurals name="library_imported">
+        <item quantity="one">%d game imported.</item>
+        <item quantity="other">%d games imported.</item>
+    </plurals>
+    <plurals name="library_delete_many">
+        <item quantity="one">Delete %d game?</item>
+        <item quantity="other">Delete %d games?</item>
+    </plurals>
+    <plurals name="library_games">
+        <item quantity="one">%d game</item>
+        <item quantity="other">%d games</item>
+    </plurals>
 </resources>

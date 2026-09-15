@@ -913,4 +913,43 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="analysis_play">Lire la partie</string>
     <string name="analysis_pause">Mettre en pause</string>
     <string name="analysis_play_best">Jouer le meilleur coup</string>
+
+    <!-- Bibliothèque des parties -->
+    <string name="library_search">Rechercher un joueur ou une étiquette</string>
+    <string name="library_all_modes">Tous les modes</string>
+    <string name="library_all_results">Tous résultats</string>
+    <string name="library_wins">Gagnées</string>
+    <string name="library_draws">Nulles</string>
+    <string name="library_losses">Perdues</string>
+    <string name="library_all_tags">Toutes étiquettes</string>
+    <string name="library_imported_filter">Importées</string>
+    <string name="library_no_match">Aucune partie ne correspond à la recherche ou aux filtres.</string>
+    <string name="library_empty_title">Aucune partie enregistrée</string>
+    <string name="library_empty_body">Les parties terminées — contre l\'ordinateur ou à deux — apparaîtront ici.</string>
+    <string name="library_import">Importer un fichier PGN</string>
+    <string name="library_imported_none">Rien à importer : aucune partie lisible dans ce fichier.</string>
+    <string name="library_import_failed">Ce fichier n\'a pas pu être lu.</string>
+    <string name="library_edit_tags">Modifier les étiquettes</string>
+    <string name="library_tags_hint">Séparez les étiquettes par des virgules.</string>
+    <string name="library_tags_placeholder">ouverture, à revoir</string>
+    <string name="library_select">Sélectionner</string>
+    <string name="library_select_all">Tout sélectionner</string>
+    <string name="library_select_none">Tout décocher</string>
+    <string name="library_delete">Supprimer</string>
+    <string name="library_delete_title">Supprimer cette partie ?</string>
+    <string name="library_delete_selected">Supprimer (%1$d)</string>
+    <string name="library_accuracy">Précision %1$d %% / %2$d %%</string>
+    <string name="save">Enregistrer</string>
+    <plurals name="library_imported">
+        <item quantity="one">%d partie importée.</item>
+        <item quantity="other">%d parties importées.</item>
+    </plurals>
+    <plurals name="library_delete_many">
+        <item quantity="one">Supprimer %d partie ?</item>
+        <item quantity="other">Supprimer %d parties ?</item>
+    </plurals>
+    <plurals name="library_games">
+        <item quantity="one">%d partie</item>
+        <item quantity="other">%d parties</item>
+    </plurals>
 </resources>

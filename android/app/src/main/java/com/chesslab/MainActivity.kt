@@ -190,11 +190,14 @@ private fun App() {
             )
             Route.Analysis -> AnalysisEntryScreen(
                 onScan = { stack.add(Route.Scanner()) },
-                onLibrary = { stack.add(Route.AnalysisBoard()) },
+                onLibrary = { stack.add(Route.AnalysisLibrary) },
                 onLastGame = { pgn -> stack.add(Route.AnalysisBoard(pgn = pgn)) },
                 onPaste = { stack.add(Route.AnalysisBoard()) },
                 onEditor = { stack.add(Route.PositionEditor()) },
             )
+            Route.AnalysisLibrary -> com.chesslab.analysis.AnalysisLibraryScreen { pgn ->
+                stack.add(Route.AnalysisBoard(pgn = pgn))
+            }
             is Route.AnalysisBoard -> AnalysisScreen(
                 initialFen = current.fen, initialPgn = current.pgn,
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },

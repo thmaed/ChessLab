@@ -50,7 +50,45 @@ data class GameRecord(
      * « Vous » est traduit et ne peut plus servir de repère.
      */
     @ColumnInfo(name = "engine_color") val engineColor: String? = null,
-)
+    /**
+     * Les étiquettes libres posées par l'utilisateur, en une seule chaîne
+     * séparée par des virgules (« ouverture,à revoir »). Une chaîne plutôt
+     * qu'une table : on ne cherche jamais « toutes les parties d'une
+     * étiquette » ailleurs que dans cette liste, et une table de jointure
+     * coûterait une migration pour rien.
+     */
+    val tags: String? = null,
+    /**
+     * L'empreinte canonique de la partie — position de départ et suite des
+     * coups. C'est le SEUL lien entre une session d'analyse et la partie
+     * enregistrée : l'écran d'analyse ne reçoit qu'un texte PGN, jamais une
+     * identité. La clé porte la partie JOUÉE et non sa mise en forme, si bien
+     * que deux PGN aux en-têtes différents se retrouvent.
+     */
+    @ColumnInfo(name = "analysis_key") val analysisKey: String? = null,
+    /**
+     * La version du BARÈME ayant produit les chiffres ci-dessous. Ne JAMAIS
+     * moyenner des parties de versions différentes : sans ce numéro, une
+     * moyenne mélangerait des mesures faites à des aunes différentes, et
+     * personne ne le verrait.
+     */
+    @ColumnInfo(name = "analysis_version") val analysisVersion: Int? = null,
+    @ColumnInfo(name = "white_accuracy") val whiteAccuracy: Double? = null,
+    @ColumnInfo(name = "black_accuracy") val blackAccuracy: Double? = null,
+    /** Perte moyenne de probabilité de gain, hors théorie, non pondérée. */
+    @ColumnInfo(name = "white_average_loss") val whiteAverageLoss: Double? = null,
+    @ColumnInfo(name = "black_average_loss") val blackAverageLoss: Double? = null,
+    /** Coups pris en compte, hors théorie. */
+    @ColumnInfo(name = "white_classified") val whiteClassified: Int? = null,
+    @ColumnInfo(name = "black_classified") val blackClassified: Int? = null,
+    /** Coups de théorie reconnus, par camp. */
+    @ColumnInfo(name = "white_book") val whiteBook: Int? = null,
+    @ColumnInfo(name = "black_book") val blackBook: Int? = null,
+) {
+    /** Les étiquettes, découpées et nettoyées. */
+    val tagList: List<String>
+        get() = tags?.split(",")?.map { it.trim() }?.filter { it.isNotEmpty() }.orEmpty()
+}
 
 @Dao
 interface GameDao {
@@ -71,6 +109,29 @@ interface GameDao {
 
     @Query("DELETE FROM games WHERE id = :id")
     suspend fun delete(id: Long)
+
+    @Query("DELETE FROM games WHERE id IN (:ids)")
+    suspend fun deleteAll(ids: List<Long>)
+
+    @Query("UPDATE games SET tags = :tags WHERE id = :id")
+    suspend fun setTags(id: Long, tags: String?)
+
+    /** Le bilan chiffré d'une partie analysée, rangé pour être relu tel quel. */
+    @Query(
+        """UPDATE games SET analysis_key = :key, analysis_version = :version,
+           white_accuracy = :whiteAccuracy, black_accuracy = :blackAccuracy,
+           white_average_loss = :whiteLoss, black_average_loss = :blackLoss,
+           white_classified = :whiteClassified, black_classified = :blackClassified,
+           white_book = :whiteBook, black_book = :blackBook
+           WHERE id = :id"""
+    )
+    suspend fun setMetrics(
+        id: Long, key: String, version: Int,
+        whiteAccuracy: Double?, blackAccuracy: Double?,
+        whiteLoss: Double?, blackLoss: Double?,
+        whiteClassified: Int?, blackClassified: Int?,
+        whiteBook: Int?, blackBook: Int?,
+    )
 
     @Query("SELECT COUNT(*) FROM games")
     suspend fun count(): Int
@@ -133,7 +194,7 @@ interface AutosaveDao {
         com.chesslab.training.OpeningProgress::class, com.chesslab.training.OpeningReviewLog::class,
         com.chesslab.puzzles.OwnPuzzle::class, com.chesslab.puzzles.PuzzleProgress::class,
     ],
-    version = 8, exportSchema = false,
+    version = 9, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
@@ -251,7 +312,35 @@ abstract class LibraryDatabase : RoomDatabase() {
          * — c'est arrivé au passage en v6. Ici, oublier une migration fait
          * échouer le test.
          */
-        val ALL_MIGRATIONS get() = arrayOf(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+        val ALL_MIGRATIONS get() = arrayOf(
+            MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
+        )
+
+        /**
+         * v8 → v9 : la bibliothèque devient un vrai classeur. Les ÉTIQUETTES
+         * posées à la main, et le BILAN CHIFFRÉ d'une partie analysée — écrit
+         * une fois la ligne principale entièrement classée, pour que le bilan
+         * se rouvre sans tout recalculer et que la mesure du niveau ait une
+         * matière.
+         *
+         * Onze colonnes optionnelles : `NULL` veut dire « pas encore
+         * analysée », ce qui est l'état de la plupart des parties.
+         */
+        val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE games ADD COLUMN tags TEXT")
+                db.execSQL("ALTER TABLE games ADD COLUMN analysis_key TEXT")
+                db.execSQL("ALTER TABLE games ADD COLUMN analysis_version INTEGER")
+                db.execSQL("ALTER TABLE games ADD COLUMN white_accuracy REAL")
+                db.execSQL("ALTER TABLE games ADD COLUMN black_accuracy REAL")
+                db.execSQL("ALTER TABLE games ADD COLUMN white_average_loss REAL")
+                db.execSQL("ALTER TABLE games ADD COLUMN black_average_loss REAL")
+                db.execSQL("ALTER TABLE games ADD COLUMN white_classified INTEGER")
+                db.execSQL("ALTER TABLE games ADD COLUMN black_classified INTEGER")
+                db.execSQL("ALTER TABLE games ADD COLUMN white_book INTEGER")
+                db.execSQL("ALTER TABLE games ADD COLUMN black_book INTEGER")
+            }
+        }
 
         /**
          * Une partie interrompue se reprend TELLE QUELLE : sa position de

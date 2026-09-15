@@ -72,6 +72,13 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data object Analysis : Route(R.string.route_analysis)
 
     /**
+     * La BIBLIOTHÈQUE des parties : rechercher, filtrer, étiqueter, supprimer,
+     * importer. Un écran à part, et non une liste coincée sous l'analyse :
+     * c'est un classeur, pas un raccourci vers la dernière partie.
+     */
+    data object AnalysisLibrary : Route(R.string.analysis_library)
+
+    /**
      * L'analyse elle-même. [fen] vient du scanner ou de l'éditeur, [pgn]
      * d'une partie rangée ; les deux nuls ouvrent sur le champ de saisie.
      */

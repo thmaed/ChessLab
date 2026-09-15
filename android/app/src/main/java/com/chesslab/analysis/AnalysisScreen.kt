@@ -210,9 +210,10 @@ fun AnalysisScreen(
                 EvalCurve(ui.curve, currentPly = ui.cursor + 1, onSelect = model::goTo)
             }
 
-            Spacer(Modifier.height(12.dp))
-            SavedGames(model)
-
+            // La liste des parties enregistrées a quitté cet écran pour la
+            // BIBLIOTHÈQUE, qui sait chercher, filtrer, étiqueter et
+            // supprimer. Huit lignes coincées sous l'analyse ne servaient
+            // qu'à retrouver la dernière partie, ce que l'accueil fait déjà.
             Spacer(Modifier.height(12.dp))
             OutlinedTextField(
                 value = ui.input,
@@ -713,40 +714,6 @@ private fun GameSummarySheet(ui: AnalysisUiState, onDismiss: () -> Unit) {
 }
 
 /** La bibliothèque : les parties déjà jouées, rechargeables d'un tap. */
-@Composable
-private fun SavedGames(model: AnalysisViewModel) {
-    val games by model.savedGames.collectAsState(initial = emptyList())
-    if (games.isEmpty()) return
-
-    Text(stringResource(R.string.analysis_library), fontSize = 12.sp, color = Palette.textTertiary)
-    Spacer(Modifier.height(4.dp))
-    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        games.take(8).forEach { record ->
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .testTag("partie-${record.id}")
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Palette.surface)
-                    .clickable { model.open(record) }
-                    .padding(horizontal = 10.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    "${record.white} — ${record.black}",
-                    fontSize = 12.sp, color = Palette.textPrimary, modifier = Modifier.weight(1f),
-                )
-                Text(record.result, fontSize = 12.sp, fontFamily = FontFamily.Monospace, color = Palette.accent)
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    pluralStringResource(R.plurals.analysis_move_count, record.moveCount, record.moveCount),
-                    fontSize = 10.sp, color = Palette.textTertiary,
-                )
-            }
-        }
-    }
-}
-
 /**
  * La barre d'évaluation : le verdict chiffré, et la part du plateau que chaque
  * camp occupe. Le remplissage dit d'un coup d'œil qui mène, sans lire le

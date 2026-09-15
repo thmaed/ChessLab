@@ -56,7 +56,10 @@ fun AnalysisEntryScreen(
             stringResource(R.string.analysis_library),
             pluralStringResource(R.plurals.progress_games_count, games.size, games.size),
             Icons.Default.MenuBook, Palette.warning, "entree-bibliotheque",
-            enabled = games.isNotEmpty(),
+            // Toujours ouverte, même vide : c'est de là qu'on IMPORTE un
+            // fichier PGN, et une bibliothèque vide est justement le moment
+            // où l'on veut le faire.
+            enabled = true,
             modifier = Modifier.discoveryAnchor(DiscoverySpot.analysisLibrary), onClick = onLibrary,
         )
         if (lastPgn != null && lastPgn.isNotEmpty()) {

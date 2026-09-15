@@ -1120,15 +1120,69 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
 
+        val summary = GameSummary.compute(entries, moves.size, accuracy)
         ui = ui.copy(
             qualities = qualities,
             explanations = explanations,
             winDeltas = deltas,
             curve = curve,
-            summary = GameSummary.compute(entries, moves.size, accuracy),
+            summary = summary,
             betterLan = if (qualities[ui.cursor]?.isFault == true)
                 evals[ui.cursor]?.bestLan else null,
         )
+        if (summary.isComplete) persistMetrics(summary)
+    }
+
+    /**
+     * Range le bilan chiffré AVEC la partie enregistrée, quand la ligne
+     * principale est entièrement classée.
+     *
+     * La bibliothèque montre alors la précision sans rien recalculer, et la
+     * mesure du niveau a une matière. Le lien passe par l'EMPREINTE de la
+     * partie et non par son identité : l'écran d'analyse ne reçoit qu'un texte
+     * PGN, jamais un numéro de ligne — et deux PGN aux en-têtes différents mais
+     * aux mêmes coups se retrouvent.
+     */
+    private fun persistMetrics(summary: GameSummary) {
+        val key = persistenceKey ?: return
+        viewModelScope.launch(Dispatchers.IO) {
+            val dao = LibraryDatabase.get(getApplication()).games()
+            val start = positions.firstOrNull()?.fen ?: return@launch
+            val lans = moves.map { it.lan }
+            val record = dao.allOnce().firstOrNull { candidate ->
+                candidate.analysisKey == key || matchesKey(candidate, key, start, lans)
+            } ?: return@launch
+            dao.setMetrics(
+                id = record.id, key = key, version = ANALYSIS_VERSION,
+                whiteAccuracy = summary.white.accuracy, blackAccuracy = summary.black.accuracy,
+                whiteLoss = summary.white.averageLoss, blackLoss = summary.black.averageLoss,
+                whiteClassified = summary.white.classifiedCount,
+                blackClassified = summary.black.classifiedCount,
+                whiteBook = summary.white.bookCount, blackBook = summary.black.bookCount,
+            )
+        }
+    }
+
+    /**
+     * Une partie enregistrée porte-t-elle la ligne qu'on vient d'analyser ?
+     * On recalcule son empreinte depuis son PGN — c'est le seul moyen, la
+     * partie n'ayant pas encore de clé la première fois.
+     */
+    private fun matchesKey(record: GameRecord, key: String, start: String, lans: List<String>): Boolean {
+        if (record.moveCount != lans.size) return false
+        val cleaned = PgnSanitizer.splitIntoGames(PgnSanitizer.sanitize(record.pgn)).firstOrNull()
+            ?: record.pgn
+        val parsed = runCatching { PgnParser.parse(cleaned) }.getOrNull() ?: return false
+        val theirStart = parsed.startingPosition ?: Position.standard
+        if (theirStart.fen != start) return false
+        val mainline = parsed.moves.indices
+            .filter { it.variation == MoveTree.Index.MAIN_VARIATION }
+            .sorted()
+        val theirs = AnalysisEvalStore.key(
+            theirStart.fen,
+            mainline.mapNotNull { parsed.moves[it]?.lan },
+        )
+        return theirs == key
     }
 
     /**
@@ -1421,6 +1475,17 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
          * l'attente sans gagner la précision.
          */
         const val REFINEMENT_CAP_MS = 12_000
+
+        /**
+         * La version du BARÈME rangée avec chaque bilan. À incrémenter dès que
+         * change quoi que ce soit qui déplace les valeurs : seuils de
+         * classification, budget de recherche, formule de précision,
+         * traitement de la théorie. Sans elle, une moyenne glissante
+         * mélangerait des parties mesurées à des aunes différentes — et
+         * personne ne le verrait. Elle va de pair avec le profil moteur du
+         * cache disque : les deux se changent ensemble.
+         */
+        const val ANALYSIS_VERSION = 1
 
         /** Les trois frontières qui déclenchent un signalement. */
         val REFINEMENT_THRESHOLDS = listOf(
