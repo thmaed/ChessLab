@@ -2,6 +2,8 @@ package com.chesslab
 
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -82,10 +84,16 @@ class AnalysisReviewTest {
 
     private fun loadGame() {
         compose.onNodeWithTag("mode-analysis").performScrollTo().performClick()
+        // « Coller » vit désormais sous « Autres sources », et ouvre une
+        // FEUILLE : on colle avant d'analyser, et l'écran d'analyse ne porte
+        // plus de formulaire.
+        awaitTag("entree-autres")
+        compose.onNodeWithTag("entree-autres").performScrollTo().performClick()
+        awaitTag("entree-coller")
         compose.onNodeWithTag("entree-coller").performScrollTo().performClick()
         awaitTag("saisie")
-        compose.onNodeWithTag("saisie").performScrollTo().performTextInput(missedMate)
-        compose.onNodeWithTag("charger").performScrollTo().performClick()
+        compose.onNodeWithTag("saisie").performTextInput(missedMate)
+        compose.onNodeWithTag("charger").performClick()
         awaitTag("coup-0")
     }
 
@@ -174,10 +182,27 @@ class AnalysisReviewTest {
     @Test fun lesFautesDeviennentDesPuzzles() {
         loadGame()
         awaitTag("precision", 300_000)
+        // La précision peut s'afficher AVANT la fin de la revue : la première
+        // position évaluée suffit à en calculer une, et la revue repart
+        // ensuite pour les autres. Or « Créer des puzzles » est désactivé
+        // pendant une revue — le tap partait alors dans le vide, et le test
+        // attendait une boîte que personne n'allait ouvrir.
+        awaitNoTag("revue-en-cours", 300_000)
 
-        compose.onNodeWithTag("menu-analyse").performClick()
-        compose.waitForIdle()
-        compose.onNodeWithTag("creer-puzzles").performClick()
+        // « Créer des puzzles » est DÉSACTIVÉ tant que l'app travaille — une
+        // revue peut repartir pour une position manquante juste après que la
+        // précision s'est affichée. On rouvre donc le menu jusqu'à ce que
+        // l'entrée réponde, comme le ferait quelqu'un devant l'écran.
+        compose.waitUntil(300_000) {
+            compose.onNodeWithTag("menu-analyse").performClick()
+            compose.waitForIdle()
+            val ready = compose.onAllNodes(
+                hasTestTag("creer-puzzles") and isEnabled()
+            ).fetchSemanticsNodes().isNotEmpty()
+            if (ready) compose.onNodeWithTag("creer-puzzles").performClick()
+            else compose.onNodeWithTag("retourner").performClick()   // referme le menu
+            ready
+        }
         awaitTag("puzzles-crees", 300_000)
         // Le mat manqué donne son puzzle : la boîte annonce un nombre, pas un
         // « aucune position ».

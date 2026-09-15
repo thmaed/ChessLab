@@ -210,23 +210,13 @@ fun AnalysisScreen(
                 EvalCurve(ui.curve, currentPly = ui.cursor + 1, onSelect = model::goTo)
             }
 
-            // La liste des parties enregistrées a quitté cet écran pour la
-            // BIBLIOTHÈQUE, qui sait chercher, filtrer, étiqueter et
-            // supprimer. Huit lignes coincées sous l'analyse ne servaient
-            // qu'à retrouver la dernière partie, ce que l'accueil fait déjà.
-            Spacer(Modifier.height(12.dp))
-            OutlinedTextField(
-                value = ui.input,
-                onValueChange = model::onInputChange,
-                label = { Text(stringResource(R.string.analysis_input_label)) },
-                modifier = Modifier.fillMaxWidth().heightIn(min = 96.dp).testTag("saisie"),
-                textStyle = androidx.compose.ui.text.TextStyle(fontSize = 12.sp, fontFamily = FontFamily.Monospace),
-            )
+            // Ni liste de parties ni formulaire sur cet écran : la
+            // BIBLIOTHÈQUE sait chercher, filtrer, étiqueter et supprimer, et
+            // l'on COLLE avant d'analyser, pas après. Ne reste ici que
+            // l'erreur, quand le texte reçu s'avère illisible.
             if (ui.error != null) {
-                Text(ui.error!!, color = Palette.danger, fontSize = 12.sp, modifier = Modifier.padding(top = 4.dp))
-            }
-            TextButton(onClick = model::load, modifier = Modifier.testTag("charger")) {
-                Text(stringResource(R.string.analysis_load), color = Palette.accent)
+                Spacer(Modifier.height(12.dp))
+                Text(ui.error!!, color = Palette.danger, fontSize = 12.sp)
             }
         },
     )
@@ -637,10 +627,21 @@ private fun ReviewBar(ui: AnalysisUiState, onReview: () -> Unit, onSummary: () -
     }
 }
 
-/** Les deux précisions côte à côte : c'est le chiffre qu'on cherche d'abord. */
+/**
+ * Les deux précisions côte à côte : c'est le chiffre qu'on cherche d'abord.
+ *
+ * Une précision calculée sur une PARTIE de la partie — revue interrompue,
+ * reprise en cours — se dit telle quelle : chiffre en gris, suivi de « … ».
+ * Affichée comme une précision définitive, elle mentait : une seule position
+ * évaluée suffit à en produire une, et elle vaut alors 100 %.
+ */
 @Composable
 private fun AccuracyPair(summary: GameSummary, modifier: Modifier = Modifier) {
-    Row(modifier.testTag("precision"), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+    val tint = if (summary.isComplete) Palette.accent else Palette.textTertiary
+    Row(
+        modifier.testTag(if (summary.isComplete) "precision" else "precision-partielle"),
+        horizontalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
         listOf(
             R.string.analysis_white to summary.white,
             R.string.analysis_black to summary.black,
@@ -648,9 +649,9 @@ private fun AccuracyPair(summary: GameSummary, modifier: Modifier = Modifier) {
             Column {
                 Text(stringResource(label), fontSize = 10.sp, color = Palette.textTertiary)
                 Text(
-                    side.accuracy?.let { "%.1f %%".format(it) } ?: "—",
+                    side.accuracy?.let { "%.1f %%".format(it) + if (summary.isComplete) "" else " …" } ?: "—",
                     fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
-                    fontFamily = FontFamily.Monospace, color = Palette.accent,
+                    fontFamily = FontFamily.Monospace, color = tint,
                 )
             }
         }

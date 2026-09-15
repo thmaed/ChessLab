@@ -57,7 +57,7 @@ class AnalysisEvalStoreTest {
         store.save(key, mapOf(0 to PositionEval(0, null, "e2e4", null, pv = emptyList())))
         assertNull(store.load(key, profile = "SF16/autre"))
         assertNull(store.load("cle-inexistante"))
-        store.file(key).writeText("{\"schema\": 99, \"profile\": \"${AnalysisEvalStore.engineProfile}\", \"evals\": {}}")
+        store.file(key).writeText("{\"schema\": 99, \"profile\": \"${AnalysisEvalStore.DEFAULT_PROFILE}\", \"evals\": {}}")
         assertNull(store.load(key))
         store.file(key).writeText("pas du json")
         assertNull(store.load(key))

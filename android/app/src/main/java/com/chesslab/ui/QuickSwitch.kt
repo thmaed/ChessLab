@@ -16,6 +16,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -94,17 +97,49 @@ private fun Destination(
  */
 class TopBarSlot {
     var content by mutableStateOf<(@Composable RowScope.() -> Unit)?>(null)
+
+    /**
+     * Le numéro de version, incrémenté à CHAQUE composition de l'écran qui
+     * pose ses actions.
+     *
+     * Sans lui, la barre du haut restait figée sur son premier rendu :
+     * Compose mémorise la lambda passée à [TopBarActions], si bien que son
+     * identité ne change jamais et que rien n'invalidait la barre. Les
+     * actions gardaient donc l'état de l'écran AU MOMENT DE SON OUVERTURE —
+     * « Créer des puzzles » restait désactivé toute la session, et « Copier
+     * la partie (PGN) » n'apparaissait jamais, puisqu'à l'ouverture il n'y a
+     * pas encore de partie.
+     */
+    var version by mutableIntStateOf(0)
 }
 
 val LocalTopBarSlot = staticCompositionLocalOf { TopBarSlot() }
 
 /** L'écran pose ses actions dans la barre du haut ; elles partent avec lui. */
+/**
+ * `@NonRestartableComposable` n'est pas une optimisation : c'est la CONDITION
+ * pour que la barre suive l'écran.
+ *
+ * En composable ordinaire, Compose considérait la lambda reçue comme stable —
+ * elle est mémorisée, son identité ne change jamais — et sautait donc la
+ * recomposition de cette fonction. Ses effets ne rejouaient pas, et la barre
+ * gardait les actions telles qu'elles étaient à l'OUVERTURE de l'écran.
+ * Mesuré : quatorze recompositions de l'écran d'analyse, une seule mise à
+ * jour de la barre.
+ */
+@NonRestartableComposable
 @Composable
 fun TopBarActions(content: @Composable RowScope.() -> Unit) {
     val slot = LocalTopBarSlot.current
     val latest by rememberUpdatedState(content)
+    // L'écran vient de se recomposer : la barre doit suivre. Voir
+    // [TopBarSlot.version] pour ce que coûtait son absence.
+    SideEffect { slot.version++ }
     DisposableEffect(slot) {
-        val mine: @Composable RowScope.() -> Unit = { latest() }
+        val mine: @Composable RowScope.() -> Unit = {
+            @Suppress("UNUSED_EXPRESSION") slot.version
+            latest()
+        }
         slot.content = mine
         // On ne vide que SI c'est bien le nôtre : quand un écran en remplace
         // un autre, le nouveau s'inscrit avant que l'ancien ne se retire.

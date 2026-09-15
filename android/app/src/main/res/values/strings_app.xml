@@ -955,4 +955,11 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%d game</item>
         <item quantity="other">%d games</item>
     </plurals>
+
+    <string name="entry_other_sources">Other sources</string>
+    <string name="entry_other_sources_sub">Paste, open a file, compose a position</string>
+    <string name="entry_open_file">Open a file</string>
+    <string name="entry_open_file_sub">A .pgn or .fen file</string>
+    <string name="entry_also_library">Also add to the library</string>
+    <string name="entry_also_library_note">No effect on a FEN position — the library keeps games.</string>
 </resources>

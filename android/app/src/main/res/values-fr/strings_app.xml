@@ -952,4 +952,11 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%d partie</item>
         <item quantity="other">%d parties</item>
     </plurals>
+
+    <string name="entry_other_sources">Autres sources</string>
+    <string name="entry_other_sources_sub">Coller, ouvrir un fichier, composer une position</string>
+    <string name="entry_open_file">Importer un fichier</string>
+    <string name="entry_open_file_sub">Fichier .pgn ou .fen</string>
+    <string name="entry_also_library">Ajouter aussi à la bibliothèque</string>
+    <string name="entry_also_library_note">Sans effet sur une position FEN — la bibliothèque range des parties.</string>
 </resources>

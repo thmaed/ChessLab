@@ -216,15 +216,16 @@ class AppTest {
 
     @Test fun analysingAPgnShowsAnEvaluation() {
         open("analysis")
-        // Analyser ouvre d'abord le CHOIX de la source, comme sur iOS.
+        // Analyser ouvre d'abord le CHOIX de la source, comme sur iOS, et
+        // « Coller » vit sous « Autres sources » — les chemins qui demandent
+        // un travail sont repliés.
+        awaitTag("entree-autres", 15_000)
+        compose.onNodeWithTag("entree-autres").performScrollTo().performClick()
+        awaitTag("entree-coller", 10_000)
         compose.onNodeWithTag("entree-coller").performScrollTo().performClick()
-        // Le champ et le bouton vivent SOUS la liste des parties enregistrées :
-        // dès qu'une partie y est rangée, ils passent sous le pli et le tap
-        // part dans le vide. Le défaut ne se voyait qu'en suite complète, où
-        // une partie terminée a justement été rangée juste avant.
-        compose.onNodeWithTag("saisie").performScrollTo()
-            .performTextInput("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6")
-        compose.onNodeWithTag("charger").performScrollTo().performClick()
+        awaitTag("saisie", 10_000)
+        compose.onNodeWithTag("saisie").performTextInput("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6")
+        compose.onNodeWithTag("charger").performClick()
 
         awaitTag("coup-5", 10_000)     // les six demi-coups sont là
 
@@ -521,8 +522,12 @@ class AppTest {
     }
 
     @Test fun thePositionEditorBuildsAFen() {
-        // L'éditeur vit sous Analyser, comme sur iOS.
+        // L'éditeur vit sous Analyser, comme sur iOS, dans « Autres
+        // sources » : composer une position est un travail, pas un raccourci.
         open("analysis")
+        awaitTag("entree-autres", 15_000)
+        compose.onNodeWithTag("entree-autres").performScrollTo().performClick()
+        awaitTag("entree-editeur", 10_000)
         compose.onNodeWithTag("entree-editeur").performScrollTo().performClick()
         awaitTag("fen", 10_000)
 

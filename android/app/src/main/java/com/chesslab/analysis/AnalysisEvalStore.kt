@@ -29,14 +29,39 @@ import java.security.MessageDigest
  * Le fichier embarque un profil (moteur + budget). Changer de Stockfish ou de
  * budget invalide TOUT — mieux vaut réanalyser que mélanger deux vérités.
  */
-class AnalysisEvalStore(private val directory: File) {
+class AnalysisEvalStore(
+    private val directory: File,
+    /**
+     * Le profil écrit dans chaque instantané et exigé à la relecture. Donné à
+     * la construction plutôt que lu d'un `Context` : le magasin n'a alors
+     * besoin de rien d'Android, et se vérifie sur la JVM.
+     */
+    private val profile: String = DEFAULT_PROFILE,
+) {
 
     companion object {
         const val currentSchema = 1
 
-        /** À CHANGER à chaque changement de moteur ou de budget de revue. */
-        val engineProfile =
-            "SF17.1/${AnalysisViewModel.REVIEW_NODES}n+${AnalysisViewModel.REVIEW_CAP_MS}ms/MPV2"
+        /**
+         * À CHANGER à chaque changement de moteur ou de budget de revue —
+         * l'affinage des verdicts limites en fait partie. Le PALIER de
+         * l'appareil y entre aussi : le budget d'une position en dépend, et
+         * un cache écrit à 180 000 nœuds ne vaut pas un cache écrit à 300 000.
+         *
+         * Par défaut, le palier haut : c'est l'ancienne valeur, et un cache
+         * écrit avant ce changement porte donc un profil différent — il est
+         * ignoré, ce qui est exactement ce qu'on veut, puisqu'il ne connaît
+         * pas l'affinage.
+         */
+        /** Le profil d'un appareil de palier haut — le repli, et celui des tests. */
+        const val DEFAULT_PROFILE = "SF17.1/high/300000n+1600ms/MPV2+refine"
+
+        fun engineProfile(context: android.content.Context): String {
+            val tier = com.chesslab.engine.DevicePerformance.tier(context)
+            val nodes = com.chesslab.engine.DevicePerformance.classificationNodes(context)
+            val cap = com.chesslab.engine.DevicePerformance.classificationCapMs(context)
+            return "SF17.1/$tier/${nodes}n+${cap}ms/MPV2+refine"
+        }
 
         /** Nombre de parties conservées (LRU par date de modification). Un cache n'est pas une base. */
         const val maxSnapshots = 300
@@ -60,7 +85,7 @@ class AnalysisEvalStore(private val directory: File) {
     fun file(key: String): File = File(directory, "$key.json")
 
     /** Les évaluations par demi-coup (0 = position de départ), ou `null` si rien d'utilisable. */
-    fun load(key: String, profile: String = engineProfile): Map<Int, PositionEval>? {
+    fun load(key: String, profile: String = this.profile): Map<Int, PositionEval>? {
         val file = file(key)
         val text = runCatching { file.readText() }.getOrNull() ?: return null
         val root = runCatching { JSONObject(text) }.getOrNull() ?: return null
@@ -92,7 +117,7 @@ class AnalysisEvalStore(private val directory: File) {
         directory.mkdirs()
         val root = JSONObject()
         root.put("schema", currentSchema)
-        root.put("profile", engineProfile)
+        root.put("profile", profile)
         val node = JSONObject()
         for ((ply, eval) in evals) {
             node.put(ply.toString(), JSONObject().apply {

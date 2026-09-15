@@ -269,7 +269,10 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
 
     /** La clé du cache disque pour la partie chargée ; `null` pour une ligne explorée à la main. */
     private var persistenceKey: String? = null
-    private val store = AnalysisEvalStore(java.io.File(app.filesDir, "analysis-cache"))
+    private val store = AnalysisEvalStore(
+        java.io.File(app.filesDir, "analysis-cache"),
+        AnalysisEvalStore.engineProfile(app),
+    )
     private val book by lazy { EcoOpeningLoader.bookLines(getApplication<Application>().assets) }
 
     var ui by mutableStateOf(
@@ -725,7 +728,8 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                         // quand l'appareil chauffe (voir `ThermalMonitor`),
                         // car cette position est réévaluée à chaque
                         // navigation.
-                        val depth = com.chesslab.engine.ThermalMonitor.liveDepth(18)
+                        val preferred = com.chesslab.engine.DevicePerformance.liveDepth(getApplication())
+                        val depth = com.chesslab.engine.ThermalMonitor.liveDepth(preferred)
                         e.search("go depth $depth", timeoutMs = 30_000) { line ->
                             parseInfo(line)?.let { info ->
                                 lines[info.rank] = info.line
@@ -965,8 +969,9 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         val rule = RefinementStopRule()
         engine.send("position fen ${position.fen}")
         val lines = HashMap<Int, RankedLine>()
+        val cap = com.chesslab.engine.DevicePerformance.refinementCapMs(getApplication())
         engine.search(
-            "go nodes $REFINEMENT_NODES movetime $REFINEMENT_CAP_MS",
+            "go nodes $REFINEMENT_NODES movetime $cap",
             timeoutMs = 60_000,
             stopWhen = { raw ->
                 val info = parseInfo(raw)
@@ -1013,8 +1018,10 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         // La surchauffe rabote le TRAVAIL demandé — les nœuds — et non le
         // temps accordé : le verdict reste comparable d'une exécution à
         // l'autre, seulement rendu sur une recherche moins profonde.
-        val reviewNodes = com.chesslab.engine.ThermalMonitor.nodes(REVIEW_NODES.toLong())
-        engine.search("go nodes $reviewNodes movetime $REVIEW_CAP_MS", timeoutMs = 20_000) { line ->
+        val budget = com.chesslab.engine.DevicePerformance.classificationNodes(getApplication())
+        val reviewNodes = com.chesslab.engine.ThermalMonitor.nodes(budget)
+        val cap = com.chesslab.engine.DevicePerformance.classificationCapMs(getApplication())
+        engine.search("go nodes $reviewNodes movetime $cap", timeoutMs = 20_000) { line ->
             parseInfo(line)?.let { lines[it.rank] = it.line }
         }
         val best = lines[1]
@@ -1429,18 +1436,10 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         position.pieces.firstOrNull { it.kind == Piece.Kind.king && it.color == color }?.square
 
     companion object {
-        /**
-         * 300 000 nœuds, comme iOS : ~600-750 ms en milieu de partie sur un
-         * téléphone récent, et la profondeur atteinte s'adapte toute seule — le
-         * débit en nœuds/seconde baisse quand la position se complique.
-         */
-        const val REVIEW_NODES = 300_000
-
-        /**
-         * Le plafond qui empêche une revue de quarante coups de s'éterniser sur
-         * un appareil lent. UCI s'arrête à la première limite atteinte.
-         */
-        const val REVIEW_CAP_MS = 1_500
+        // Le budget d'une position de revue et son plafond de temps vivent
+        // désormais dans `DevicePerformance` : ils dépendent de l'appareil,
+        // comme sur iOS. Un budget unique servait mal les deux bouts — trop
+        // lourd sur un téléphone d'entrée de gamme, trop timide sur un récent.
 
         /**
          * La demi-largeur de la bande d'hésitation, en points de probabilité
@@ -1468,13 +1467,6 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
          * CIBLAGE, pas par une remise qui n'existe pas.
          */
         const val REFINEMENT_NODES = 3_000_000
-
-        /**
-         * Un plafond PROPRE : celui de la passe de base tronquerait la
-         * recherche approfondie au point de la rendre inutile — on aurait payé
-         * l'attente sans gagner la précision.
-         */
-        const val REFINEMENT_CAP_MS = 12_000
 
         /**
          * La version du BARÈME rangée avec chaque bilan. À incrémenter dès que

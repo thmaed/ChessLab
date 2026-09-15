@@ -192,7 +192,16 @@ private fun App() {
                 onScan = { stack.add(Route.Scanner()) },
                 onLibrary = { stack.add(Route.AnalysisLibrary) },
                 onLastGame = { pgn -> stack.add(Route.AnalysisBoard(pgn = pgn)) },
-                onPaste = { stack.add(Route.AnalysisBoard()) },
+                // Le texte collé (ou lu dans un fichier) part avec la route :
+                // l'écran d'analyse n'a plus de formulaire, il reçoit une
+                // partie ou une position toute faite.
+                onPaste = { text ->
+                    if (chesskit.FenParser.parse(text.trim()) != null) {
+                        stack.add(Route.AnalysisBoard(fen = text.trim()))
+                    } else {
+                        stack.add(Route.AnalysisBoard(pgn = text))
+                    }
+                },
                 onEditor = { stack.add(Route.PositionEditor()) },
             )
             Route.AnalysisLibrary -> com.chesslab.analysis.AnalysisLibraryScreen { pgn ->
