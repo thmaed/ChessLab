@@ -212,18 +212,88 @@ cd android
 ./gradlew bootstrapListing                     # l'INVERSE : récupérer ce que Google a
 ```
 
-### La clé, hors dépôt
+### La clé, hors dépôt — le compte de service, pas à pas
 
-Pas de fichier `.p8` comme chez Apple : un **compte de service** Google Cloud.
+Pas de fichier `.p8` comme chez Apple : un **compte de service** Google Cloud,
+c'est-à-dire un « utilisateur » qui n'est pas une personne, invité dans la Play
+Console comme on inviterait un collègue.
 
-1. Console Google Cloud → créer un compte de service, télécharger sa clé JSON.
-2. Play Console → **Utilisateurs et autorisations** → inviter l'adresse du
-   compte de service, avec le droit de publier.
-3. Poser la clé en `~/.private_keys/play-service-account.json` — là où vit déjà
-   la clé App Store Connect. Elle est ignorée par Git où qu'elle soit.
+Le tout se fait DEPUIS la Play Console, qui ouvre la console Cloud au bon
+endroit — y aller directement fait perdre le lien entre les deux.
+
+> Il faut être **propriétaire** du compte développeur : un utilisateur invité,
+> même administrateur, ne voit pas « Accès à l'API ».
+
+**1. Lier un projet Cloud.** Play Console → **Paramètres** → **Accès à l'API**.
+Au premier passage, Google propose de créer un projet Google Cloud ou d'en lier
+un existant. Un projet neuf, dédié à l'app, est plus simple à révoquer ensuite.
+Cette étape ACTIVE au passage l'API « Google Play Android Developer » ; sans
+elle, tout le reste rend `403`.
+
+**2. Créer le compte de service.** Sur la même page, section **Comptes de
+service** → « Créer un compte de service ». Le lien ouvre la console Cloud, sur
+le bon projet :
+
+- *Nom* : `chesslab-publisher` (l'adresse s'en déduit) ;
+- *Rôle* : **aucun**. Les droits qui comptent ne sont pas ceux de Cloud mais
+  ceux de la Play Console, accordés à l'étape 4. En donner ici ne sert à rien
+  et élargit la surface ;
+- terminer la création.
+
+L'adresse obtenue ressemble à
+`chesslab-publisher@<projet>.iam.gserviceaccount.com`.
+
+**3. Sa clé.** Toujours dans la console Cloud, ouvrir le compte de service →
+onglet **Clés** → « Ajouter une clé » → « Créer une clé » → **JSON**. Le
+fichier se télécharge une seule fois et ne se retélécharge JAMAIS : perdu, il
+faut en créer un autre et révoquer le précédent.
+
+```bash
+mkdir -p ~/.private_keys
+mv ~/Downloads/<projet>-<hash>.json ~/.private_keys/play-service-account.json
+chmod 600 ~/.private_keys/play-service-account.json
+```
+
+C'est là que vit déjà la clé App Store Connect. **Elle ne doit jamais entrer
+dans le dépôt** — le `.gitignore` la couvre où qu'elle soit, mais c'est une
+ceinture, pas une excuse.
+
+**4. Lui donner les droits.** Retour dans la Play Console → **Accès à l'API** →
+« Actualiser les comptes de service » : le nouveau apparaît. « Accorder l'accès »,
+puis cocher, pour CETTE application :
+
+| Droit | Pourquoi |
+| --- | --- |
+| Afficher les informations sur l'application | socle : sans lui, rien ne se lit |
+| Gérer la présence sur le Store | `publishListing` — textes, captures, visuels |
+| Gérer les versions de test | `publishBundle` sur les pistes interne/fermée |
+| Gérer les versions de production | seulement le jour où l'on promeut |
+
+Inviter. La propagation est en général immédiate ; comptez tout de même
+quelques minutes avant de vous étonner d'un `401`.
+
+**5. Vérifier.** L'application doit déjà exister dans la console — l'API sait
+envoyer des binaires, pas créer une fiche.
+
+```bash
+cd android && ./gradlew :app:publishBundle --dry-run
+# « SKIPPED » = clé absente ou illisible
+# la tâche listée = le greffon a la clé
+```
 
 Sans cette clé, le greffon se tait : `./gradlew build` marche pour qui n'a pas à
 publier. Avec elle, tout s'enchaîne.
+
+### Ce que l'API ne fera jamais
+
+Deux étapes n'existent pas dans l'API, et resteront web :
+
+- **créer l'application** (nom, langue par défaut, gratuite ou payante) ;
+- **les déclarations** : questionnaire de contenu, public cible, sécurité des
+  données, politique de confidentialité, présence de publicité.
+
+Il faut les avoir faites une fois, à la main, avant que la moindre commande
+serve à quelque chose.
 
 ### Les sources de vérité
 
