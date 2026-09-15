@@ -19,6 +19,12 @@ n'avaient aucun effet, le filet de sécurité était porté mais jamais appelé.
 Cette passe reprend module par module. Un module n'est refermé qu'après
 vérification SUR APPAREIL, suite instrumentée passée.
 
+**Les dix modules sont passés** (15/09, 09 h → 14 h). Vingt-trois lots. Ce
+qu'elle a trouvé de plus coûteux n'était visible d'aucune capture d'écran :
+les noms des joueurs jetés à l'enregistrement, un coup sur 22 mal étiqueté
+faute d'affinage, la barre du haut figée sur l'état d'ouverture de l'écran,
+et un plateau d'analyse qu'on ne pouvait pas jouer.
+
 ### Module « Jouer contre l'ordinateur » — FAIT le 14/09
 Voir le commit « Jouer : le curseur bride enfin le moteur, et le filet se
 referme ».
