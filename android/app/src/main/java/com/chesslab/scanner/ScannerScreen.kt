@@ -4,6 +4,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.drag
@@ -40,8 +41,25 @@ import com.chesslab.R
 @Composable
 fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> Unit = {}) {
     val ui = model.ui
+    val context = androidx.compose.ui.platform.LocalContext.current
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let(model::load)
+    }
+
+    // L'APPAREIL PHOTO, pour lire un vrai plateau posé sur une table — ce que
+    // la carte d'entrée promet depuis toujours (« photo ou plateau réel ») et
+    // que seule la galerie permettait.
+    //
+    // On passe par l'app photo du système : elle rend une image et garde la
+    // caméra pour elle, si bien que l'app ne demande AUCUNE permission. La
+    // photo est écrite en pleine résolution dans notre cache — une vignette
+    // ne se lit pas, à soixante-quatre cases.
+    var captureUri by remember { mutableStateOf<android.net.Uri?>(null) }
+    val capture = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
+        if (taken) captureUri?.let(model::load)
+    }
+    val hasCamera = remember {
+        context.packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_CAMERA_ANY)
     }
 
     // Étape 3 — la confirmation, OBLIGATOIRE : rien de ce qui sort du scanner
@@ -57,19 +75,44 @@ fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> 
         StatusRow(ui.status, busy = ui.busy)
         Spacer(Modifier.height(8.dp))
 
-        Text(
-            stringResource(R.string.scan_choose),
-            fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
-            color = Palette.background,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(androidx.compose.foundation.shape.CircleShape)
-                .background(com.chesslab.ui.accentGradient)
-                .clickable { pick.launch("image/*") }
-                .padding(vertical = 13.dp)
-                .testTag("choisir"),
-        )
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            if (hasCamera) {
+                Text(
+                    stringResource(R.string.scan_photo),
+                    fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                    color = Palette.background,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .background(com.chesslab.ui.accentGradient)
+                        .clickable {
+                            captureUri = newCaptureUri(context)
+                            captureUri?.let { capture.launch(it) }
+                        }
+                        .padding(vertical = 13.dp)
+                        .testTag("photographier"),
+                )
+            }
+            Text(
+                stringResource(R.string.scan_choose),
+                fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                color = if (hasCamera) Palette.textPrimary else Palette.background,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier
+                    .weight(1f)
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .then(
+                        if (hasCamera) Modifier
+                            .background(Palette.surfaceElevated)
+                            .border(1.dp, Palette.stroke, androidx.compose.foundation.shape.CircleShape)
+                        else Modifier.background(com.chesslab.ui.accentGradient)
+                    )
+                    .clickable { pick.launch("image/*") }
+                    .padding(vertical = 13.dp)
+                    .testTag("choisir"),
+            )
+        }
 
         ui.image?.let { bitmap ->
             Spacer(Modifier.height(10.dp))
@@ -220,3 +263,16 @@ private fun ScanConfirmation(ui: ScannerUiState, model: ScannerViewModel, onAnal
         },
     )
 }
+
+/**
+ * Un fichier neuf dans le cache, et le droit d'y écrire pour l'app photo.
+ * `null` si le cache est indisponible — on n'en fait alors pas une erreur :
+ * le choix d'une image reste là.
+ */
+private fun newCaptureUri(context: android.content.Context): android.net.Uri? = runCatching {
+    val dir = java.io.File(context.cacheDir, "captures").apply { mkdirs() }
+    val file = java.io.File(dir, "plateau-${System.currentTimeMillis()}.jpg")
+    androidx.core.content.FileProvider.getUriForFile(
+        context, "${context.packageName}.captures", file,
+    )
+}.getOrNull()

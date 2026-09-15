@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Le seul dossier partagé : le cache où l'app photo dépose la prise de vue du
+  scanner. Rien d'autre n'est exposé — ni la bibliothèque de parties, ni la
+  progression.
+-->
+<paths>
+    <cache-path name="captures" path="captures/" />
+</paths>

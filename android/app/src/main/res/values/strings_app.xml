@@ -998,4 +998,5 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="settings_sources">Data sources</string>
     <string name="settings_help">Help</string>
     <string name="settings_help_sub">What each mode does.</string>
+    <string name="scan_photo">Take a photo</string>
 </resources>

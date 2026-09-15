@@ -4,6 +4,13 @@
          à l'installation, sans rien demander à l'utilisateur. -->
     <uses-permission android:name="android.permission.VIBRATE" />
 
+    <!-- L'appareil photo du scanner. AUCUNE permission `CAMERA` n'est
+         demandée : on passe par l'app photo du système, qui rend une image et
+         garde la caméra pour elle. Déclarer la permission la rendrait au
+         contraire OBLIGATOIRE. Et la caméra n'est pas REQUISE : un téléphone
+         sans appareil photo garde le scanner, avec le choix d'une image. -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+
     <application
         android:name=".ChessLabApp"
         android:label="@string/app_name"
@@ -12,6 +19,19 @@
         android:theme="@style/Theme.ChessLab"
         android:allowBackup="false"
         android:localeConfig="@xml/locales_config">
+        <!-- Le fichier où l'app photo écrit la prise de vue. Il vit dans le
+             cache de l'app et ne sort pas de l'appareil : le fournisseur ne
+             fait qu'ouvrir un droit d'écriture, le temps d'une photo. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.captures"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
