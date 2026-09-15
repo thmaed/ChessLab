@@ -49,9 +49,11 @@ fun VariantAnalysisScreen(
     variantId: String,
     startFen: String?,
     uciLog: List<String>,
+    /** Les positions, quand les coups ne les reproduisent pas (canard, tour double). */
+    fenLog: List<String> = emptyList(),
     model: VariantAnalysisViewModel = viewModel(),
 ) {
-    LaunchedEffect(variantId, startFen, uciLog) { model.load(variantId, startFen, uciLog) }
+    LaunchedEffect(variantId, startFen, uciLog, fenLog) { model.load(variantId, startFen, uciLog, fenLog) }
     val ui = model.ui
 
     BoardScaffold(

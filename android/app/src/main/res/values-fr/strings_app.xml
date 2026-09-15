@@ -788,13 +788,10 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%1$d répertoire</item>
         <item quantity="other">%1$d répertoires</item>
     </plurals>
-    <string name="chess960_setup">Position de départ</string>
     <string name="chess960_number">Numéro de position</string>
     <string name="chess960_number_hint">0 à 959 — la numérotation de Lichess et des moteurs.</string>
     <string name="chess960_random">Au hasard</string>
     <string name="chess960_classic">Classique (518)</string>
-    <string name="chess960_two_players">À deux sur cet appareil</string>
-    <string name="chess960_two_players_hint">Personne ne joue contre le moteur : il ne fait qu\'arbitrer.</string>
     <string name="chess960_invalid">Il n\'y a que 960 positions, numérotées de 0 à 959.</string>
     <string name="variant_barricades">Barricades</string>
     <string name="variant_barricades_short">Deux cases murées</string>
@@ -996,4 +993,16 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="settings_help">Aide</string>
     <string name="settings_help_sub">Ce que fait chaque mode.</string>
     <string name="scan_photo">Prendre une photo</string>
+
+    <!-- Réglages d\'une partie de variante -->
+    <string name="setup_level_low">Débutant</string>
+    <string name="setup_level_high">Maximum</string>
+    <string name="variant_elo_note">Les Elo sont calibrés pour la partie classique : sans réseau de neurones dédié à cette variante, le niveau réel peut différer.</string>
+    <string name="variant_two_players">Deux joueurs sur cet appareil</string>
+    <string name="variant_two_players_note">Chacun son tour sur le même écran, sans ordinateur.</string>
+    <string name="chess960_position">Position de départ</string>
+    <string name="chess960_choose">Choisir un numéro</string>
+    <string name="stolen_tokens">Jetons</string>
+    <string name="stolen_interval_label">Coups entre deux jetons</string>
+    <string name="stolen_interval_note">Plus l\'intervalle est court, plus les tours doubles reviennent souvent.</string>
 </resources>

@@ -791,13 +791,10 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d repertoire</item>
         <item quantity="other">%1$d repertoires</item>
     </plurals>
-    <string name="chess960_setup">Starting position</string>
     <string name="chess960_number">Position number</string>
     <string name="chess960_number_hint">0 to 959 — the numbering used by Lichess and engines.</string>
     <string name="chess960_random">Random</string>
     <string name="chess960_classic">Classical (518)</string>
-    <string name="chess960_two_players">Two players on this device</string>
-    <string name="chess960_two_players_hint">Nobody plays the engine: it only referees.</string>
     <string name="chess960_invalid">There are only 960 positions, numbered 0 to 959.</string>
     <string name="variant_barricades">Barricades</string>
     <string name="variant_barricades_short">Two walled squares</string>
@@ -999,4 +996,16 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="settings_help">Help</string>
     <string name="settings_help_sub">What each mode does.</string>
     <string name="scan_photo">Take a photo</string>
+
+    <!-- Réglages d'une partie de variante -->
+    <string name="setup_level_low">Beginner</string>
+    <string name="setup_level_high">Maximum</string>
+    <string name="variant_elo_note">Elo ratings are calibrated for classical chess: without a neural network trained on this variant, the real level may differ.</string>
+    <string name="variant_two_players">Two players on this device</string>
+    <string name="variant_two_players_note">Taking turns on the same screen, no computer.</string>
+    <string name="chess960_position">Starting position</string>
+    <string name="chess960_choose">Choose a number</string>
+    <string name="stolen_tokens">Tokens</string>
+    <string name="stolen_interval_label">Moves between tokens</string>
+    <string name="stolen_interval_note">The shorter the interval, the more often double turns come round.</string>
 </resources>

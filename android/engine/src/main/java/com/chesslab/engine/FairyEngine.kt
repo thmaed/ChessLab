@@ -135,12 +135,79 @@ class FairyEngine private constructor(private val binaryPath: String) {
     }
 
     /** Le meilleur coup du moteur pour la variante. */
-    suspend fun bestMove(variant: String, startFen: String?, uciLog: List<String>, movetimeMs: Int): String? {
+    suspend fun bestMove(variant: String, startFen: String?, uciLog: List<String>, movetimeMs: Int): String? =
+        search(variant, startFen, uciLog, movetimeMs).bestLan
+
+    /**
+     * Le coup du moteur, AVEC son score et sous les contraintes de force.
+     *
+     * [setup] porte les `setoption` de bridage — ils doivent partir avant le
+     * `go`, et après le choix de la variante : Fairy-Stockfish réapplique ses
+     * bornes d'Elo par variante. [depth] remplace le temps quand le niveau
+     * demandé est sous la borne d'`UCI_Elo` et se règle en profondeur.
+     *
+     * Le score rendu est celui du CAMP AU TRAIT, contrairement à [evaluate] :
+     * l'appelant sait qui joue, et c'est ce point de vue qu'attendent l'alerte
+     * de gaffe et la règle de nulle.
+     */
+    suspend fun search(
+        variant: String,
+        startFen: String?,
+        uciLog: List<String>,
+        movetimeMs: Int,
+        depth: Int? = null,
+        setup: List<String> = emptyList(),
+    ): VariantEval {
         send("setoption name UCI_Variant value $variant")
+        for (command in setup) send(command)
+        val base = if (startFen != null) "position fen $startFen" else "position startpos"
+        send(if (uciLog.isEmpty()) base else "$base moves ${uciLog.joinToString(" ")}")
+        val go = if (depth != null) "go depth $depth" else "go movetime $movetimeMs"
+        val lines = capture(go, 60_000) { it.startsWith("bestmove") }
+        val best = lines.lastOrNull { it.startsWith("bestmove") }?.split(" ")?.getOrNull(1)
+        val info = lines.lastOrNull { it.startsWith("info ") && it.contains(" score ") }
+        return VariantEval(
+            cp = info?.substringAfter(" score cp ", "")?.substringBefore(" ")?.toIntOrNull(),
+            mate = info?.substringAfter(" score mate ", "")?.substringBefore(" ")?.toIntOrNull(),
+            bestLan = best,
+        )
+    }
+
+    /**
+     * Les trois meilleures lignes, pour les flèches d'indice.
+     *
+     * `MultiPV` est remis à 1 en sortant : le laisser à 3 ferait chercher le
+     * moteur trois fois plus longtemps pour tous les coups suivants, indice ou
+     * pas.
+     */
+    suspend fun hintLines(
+        variant: String,
+        startFen: String?,
+        uciLog: List<String>,
+        movetimeMs: Int,
+    ): Pair<Map<Int, String>, Map<Int, Double>> {
+        send("setoption name UCI_Variant value $variant")
+        send("setoption name MultiPV value 3")
         val base = if (startFen != null) "position fen $startFen" else "position startpos"
         send(if (uciLog.isEmpty()) base else "$base moves ${uciLog.joinToString(" ")}")
         val lines = capture("go movetime $movetimeMs", 60_000) { it.startsWith("bestmove") }
-        return lines.lastOrNull { it.startsWith("bestmove") }?.split(" ")?.getOrNull(1)
+        send("setoption name MultiPV value 1")
+
+        val lanByRank = mutableMapOf<Int, String>()
+        val scoreByRank = mutableMapOf<Int, Double>()
+        for (line in lines) {
+            if (!line.startsWith("info ") || !line.contains(" multipv ")) continue
+            val rank = line.substringAfter(" multipv ", "").substringBefore(" ").toIntOrNull() ?: continue
+            val first = line.substringAfter(" pv ", "").substringBefore(" ").takeIf { it.isNotBlank() } ?: continue
+            lanByRank[rank] = first
+            val mate = line.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
+            val cp = line.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
+            when {
+                mate != null -> scoreByRank[rank] = if (mate > 0) 10_000.0 - mate else -10_000.0 - mate
+                cp != null -> scoreByRank[rank] = cp.toDouble()
+            }
+        }
+        return lanByRank to scoreByRank
     }
 
     fun stop() {

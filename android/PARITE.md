@@ -137,6 +137,37 @@ referme ».
 - [x] **Mémorisation** : la carte manquait à iOS, pas à Android — c'est iOS
       qui a été relevé (`TrainingStats.swift`, neuf tests).
 
+### Module « Variantes » — les RÉGLAGES d'une partie — FAIT le 15/09
+Signalé à l'essai : « dans toutes les variantes je ne peux pas choisir le
+niveau ELO, le camp, la cadence et les aides ». C'était exact, et pour les
+HUIT : on tombait sur un adversaire à pleine puissance, avec les Blancs, sans
+pendule et sans aucune aide, alors que le mode « Contre l'ordinateur » laisse
+tout régler depuis toujours.
+- [x] **Un écran de réglage pour les huit** (`VariantSetupScreen`, pendant de
+      `FairyVariantSetupView` + `Chess960SetupView` réunis) : camp, force du
+      moteur, cadence, aides — plus ce qui n'appartient qu'à un jeu (le numéro
+      de Scharnagl du Chess960, l'intervalle des jetons du Coup Volé, le mode à
+      deux du Duck Chess). Les réglages se retiennent PAR VARIANTE : le Roi de
+      la colline et la Horde n'ont aucune raison de partager une cadence.
+- [x] **Le bridage arrive VRAIMENT au moteur** : `fairySetupCommands` avant le
+      `go`, et `go depth` sous la borne d'`UCI_Elo`. Sans cela le curseur ne
+      changeait rien du tout — Fairy-Stockfish rejette une valeur hors bornes
+      en silence.
+- [x] **Pendule** des deux côtés du plateau, incrément Fischer, drapeau, et le
+      budget de réflexion du moteur calculé sur le temps qui reste
+      (`VariantClock`, partagée par les trois écrans de jeu).
+- [x] **Aides** : barre d'évaluation, flèches d'indice (MultiPV 3), alerte de
+      coup risqué au même barème qu'en mode ordinaire.
+- [x] **Abandon et nulle proposée**, à la même règle d'acceptation (±50 cp sur
+      le dernier avis du moteur).
+- [x] **Analyse d'après-partie pour les HUIT** : le Duck Chess et le Coup Volé
+      n'en avaient aucune. Leur partie ne se rejoue pas à partir de ses coups —
+      le canard n'est dans aucun coup, et un tour double ferait jouer deux fois
+      le même camp — donc l'analyse accepte désormais un JOURNAL DE POSITIONS.
+- [x] **La pendule s'arrête en quittant l'écran et repart au retour** : le
+      modèle de vue survit à la navigation, et aller voir l'analyse faisait
+      tomber le drapeau sans que personne n'ait joué.
+
 ## ✅ La passe de septembre — 13/09/2026
 
 (Relevé de l'époque, conservé tel quel.) Les onze sections sont faites :

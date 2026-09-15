@@ -41,7 +41,7 @@ class Chess960Test {
         // 518 : la position classique. Elle se reconnaît d'un coup d'œil, ce
         // qu'aucune des 959 autres ne permet.
         compose.onNodeWithTag("classique-960").performScrollTo().performClick()
-        compose.onNodeWithTag("commencer-960").performClick()
+        compose.onNodeWithTag("commencer").performClick()
 
         awaitText("À vous de jouer")
         compose.onNodeWithTag("numero-position").assertExists()
@@ -58,7 +58,7 @@ class Chess960Test {
         openSetup()
         compose.onNodeWithTag("numero-960").performTextClearance()
         compose.onNodeWithTag("numero-960").performTextInput("0")
-        compose.onNodeWithTag("commencer-960").performClick()
+        compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer")
         awaitText("0")
     }
@@ -71,8 +71,8 @@ class Chess960Test {
     @Test fun aDeuxLeMoteurNeJoueRien() {
         openSetup()
         compose.onNodeWithTag("classique-960").performScrollTo().performClick()
-        compose.onNodeWithTag("a-deux-960").performScrollTo().performClick()
-        compose.onNodeWithTag("commencer-960").performClick()
+        compose.onNodeWithTag("deux-joueurs").performScrollTo().performClick()
+        compose.onNodeWithTag("commencer").performClick()
 
         awaitText("Aux blancs de jouer")
         compose.onNodeWithTag("case-e2").performClick()

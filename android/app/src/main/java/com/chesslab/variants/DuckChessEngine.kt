@@ -5,6 +5,7 @@ import chesskit.Piece
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.engine.EngineService
+import com.chesslab.play.EngineStrength
 import kotlin.math.abs
 
 /**
@@ -34,12 +35,24 @@ import kotlin.math.abs
  */
 object DuckChessEngine {
 
-    /** Le budget de réflexion : la variante se joue à un rythme de salon. */
+    /** Le budget de réflexion par défaut : la variante se joue à un rythme de salon. */
     const val movetimeMs = 400
 
-    /** Choisit un coup pour le camp au trait. */
+    /**
+     * Choisit un coup pour le camp au trait.
+     *
+     * [strength] BRIDE le moteur : sans elle, choisir « 1200 Elo » sur l'écran
+     * de réglage ne changeait rien et l'on affrontait un Stockfish entier. Les
+     * deux replis — la prise du roi, puis l'heuristique — restent à pleine
+     * force : ils ne cherchent pas, ils constatent.
+     */
     suspend fun chooseMove(
-        context: Context, position: Position, duck: Square?, enPassant: Square?,
+        context: Context,
+        position: Position,
+        duck: Square?,
+        enPassant: Square?,
+        strength: EngineStrength = EngineStrength.Maximum,
+        movetimeMs: Int = DuckChessEngine.movetimeMs,
     ): DuckChessRules.Move? {
         val legal = DuckChessRules.moves(position, duck, enPassant)
         if (legal.isEmpty()) return null
@@ -49,18 +62,100 @@ object DuckChessEngine {
 
         // 2. Stockfish, borné aux coups que le canard autorise.
         if (DuckChessRules.isStandardLegal(position)) {
+            val searchmoves = "searchmoves ${legal.joinToString(" ") { it.uci }}"
+            val go = strength.maxDepth?.let { "go depth $it $searchmoves" }
+                ?: "go movetime $movetimeMs $searchmoves"
             val best = EngineService.use(context) { engine ->
+                for (command in strength.setupCommands) engine.send(command)
                 engine.send("position fen ${position.fen}")
-                engine.search(
-                    "go movetime $movetimeMs searchmoves ${legal.joinToString(" ") { it.uci }}",
-                    timeoutMs = 30_000,
-                )
+                engine.search(go, timeoutMs = 30_000)
             }?.split(" ")?.getOrNull(1)
             legal.firstOrNull { it.uci == best }?.let { return it }
         }
 
         // 3. Repli : la meilleure prise, sinon un coup au hasard.
         return heuristicMove(legal, position)
+    }
+
+    /** Ce que le moteur pense d'une position, POV du camp au trait. */
+    data class Eval(val cp: Int?, val mate: Int?, val bestLan: String?)
+
+    /**
+     * L'évaluation d'une position de Duck Chess — pour la barre, l'alerte de
+     * gaffe et la revue d'après-partie.
+     *
+     * Elle vaut ce que vaut un moteur qui ne VOIT PAS le canard : très fiable
+     * sur le matériel et les grosses fautes, discutable sur le positionnel
+     * fin. Et `null` sur une position que les échecs ordinaires tiendraient
+     * pour illégale — mieux vaut pas de chiffre qu'un chiffre faux.
+     */
+    suspend fun evaluate(
+        context: Context,
+        position: Position,
+        duck: Square?,
+        enPassant: Square?,
+        movetimeMs: Int = 300,
+    ): Eval? {
+        if (!DuckChessRules.isStandardLegal(position)) return null
+        val legal = DuckChessRules.moves(position, duck, enPassant)
+        if (legal.isEmpty()) return null
+        var cp: Int? = null
+        var mate: Int? = null
+        val best = EngineService.use(context) { engine ->
+            for (command in EngineStrength.Maximum.setupCommands) engine.send(command)
+            engine.send("position fen ${position.fen}")
+            engine.search(
+                "go movetime $movetimeMs searchmoves ${legal.joinToString(" ") { it.uci }}",
+                timeoutMs = 30_000,
+            ) { line ->
+                if (!line.startsWith("info ") || !line.contains(" score ")) return@search
+                line.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
+                    ?.let { cp = it; mate = null }
+                line.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
+                    ?.let { mate = it }
+            }
+        }?.split(" ")?.getOrNull(1)
+        if (cp == null && mate == null) return null
+        return Eval(cp, mate, best?.takeIf { it != "(none)" })
+    }
+
+    /** Les trois meilleures lignes, pour les flèches d'indice. */
+    suspend fun hintLines(
+        context: Context,
+        position: Position,
+        duck: Square?,
+        enPassant: Square?,
+        movetimeMs: Int = 1_500,
+    ): Pair<Map<Int, String>, Map<Int, Double>> {
+        val empty = emptyMap<Int, String>() to emptyMap<Int, Double>()
+        if (!DuckChessRules.isStandardLegal(position)) return empty
+        val legal = DuckChessRules.moves(position, duck, enPassant)
+        if (legal.isEmpty()) return empty
+        val lanByRank = HashMap<Int, String>()
+        val scoreByRank = HashMap<Int, Double>()
+        EngineService.use(context) { engine ->
+            engine.send("setoption name MultiPV value 3")
+            engine.send("position fen ${position.fen}")
+            engine.search(
+                "go movetime $movetimeMs searchmoves ${legal.joinToString(" ") { it.uci }}",
+                timeoutMs = 30_000,
+            ) { line ->
+                if (!line.startsWith("info ") || !line.contains(" multipv ")) return@search
+                val rank = line.substringAfter(" multipv ", "").substringBefore(" ").toIntOrNull()
+                    ?: return@search
+                val first = line.substringAfter(" pv ", "").substringBefore(" ")
+                if (first.isBlank()) return@search
+                lanByRank[rank] = first
+                val mate = line.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
+                val cp = line.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
+                when {
+                    mate != null -> scoreByRank[rank] = if (mate > 0) 10_000.0 - mate else -10_000.0 - mate
+                    cp != null -> scoreByRank[rank] = cp.toDouble()
+                }
+            }
+            engine.send("setoption name MultiPV value 1")
+        }
+        return lanByRank to scoreByRank
     }
 
     /** À défaut du moteur : prendre ce qui vaut le plus, sinon avancer. */

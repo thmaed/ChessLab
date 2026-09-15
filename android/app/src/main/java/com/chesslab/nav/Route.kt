@@ -77,6 +77,12 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
         val variantId: String,
         val startFen: String?,
         val uciLog: List<String>,
+        /**
+         * Les POSITIONS, quand les coups ne suffisent pas à les reproduire :
+         * le canard du Duck Chess et le tour double du Coup Volé ne figurent
+         * dans aucun coup. Vide : la partie se rejoue au moteur.
+         */
+        val fenLog: List<String> = emptyList(),
     ) : Route(R.string.route_analysis)
 
     /** Le CHOIX de la source : scanner, bibliothèque, dernière partie, coller. */
@@ -152,14 +158,21 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     /** Un cours ouvert : ouverture ou finale, même écran. */
     data class CourseReader(val id: String, val name: String) : Route(R.string.route_openings, name)
 
-    /** Le réglage d'une partie de Chess960 : le NUMÉRO de position, et à deux ou non. */
-    data object Chess960Setup : Route(R.string.variant_chess960)
+    /**
+     * Le réglage d'une partie de variante : force, camp, cadence, aides — et
+     * ce qui n'appartient qu'à un jeu (numéro Chess960, jetons du Coup Volé).
+     */
+    data class VariantSetup(val id: String, val name: String) : Route(R.string.route_variants, name)
 
     /** Le Duck Chess : ses règles vivent dans l'app, pas dans le moteur. */
-    data object DuckGame : Route(R.string.variant_duck)
+    data class DuckGame(
+        val settings: com.chesslab.variants.VariantSettings = com.chesslab.variants.VariantSettings(),
+    ) : Route(R.string.variant_duck)
 
     /** Le Coup Volé : le tour double est tenu par l'app. */
-    data object StolenMoveGame : Route(R.string.variant_stolen)
+    data class StolenMoveGame(
+        val settings: com.chesslab.variants.VariantSettings = com.chesslab.variants.VariantSettings(),
+    ) : Route(R.string.variant_stolen)
 
     /** Une variante en cours de partie. */
     data class VariantGame(
@@ -168,5 +181,7 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
         /** La position Chess960 choisie ; `null` = tirage au sort. */
         val chess960Number: Int? = null,
         val twoPlayer: Boolean = false,
+        /** Ce que l'écran de réglage a retenu. */
+        val settings: com.chesslab.variants.VariantSettings = com.chesslab.variants.VariantSettings(),
     ) : Route(R.string.route_variants, name)
 }

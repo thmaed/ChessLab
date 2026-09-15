@@ -8,10 +8,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
@@ -20,9 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.chesslab.ui.BoardScaffold
+import com.chesslab.ui.ControlButton
+import com.chesslab.ui.EvalBar
 import com.chesslab.ui.BoardView
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Fence
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Pets
@@ -216,6 +224,8 @@ fun VariantPlayScreen(
     /** La position Chess960 choisie au réglage ; `null` = tirage au sort. */
     chess960Number: Int? = null,
     twoPlayer: Boolean = false,
+    /** Ce qui a été réglé avant de commencer : force, camp, cadence, aides. */
+    settings: VariantSettings = VariantSettings(),
     /**
      * Seule l'analyse est proposée : les autres modes jouent aux règles
      * ORTHODOXES, et y envoyer une position de Horde ou de Roi de la colline
@@ -227,10 +237,20 @@ fun VariantPlayScreen(
     onReviewGame: (String, String?, List<String>) -> Unit = { _, _, _ -> },
     model: VariantPlayViewModel = viewModel(),
 ) {
-    LaunchedEffect(variantId, chess960Number, twoPlayer) {
-        model.load(variantId, chess960Number, twoPlayer)
+    LaunchedEffect(variantId, chess960Number, twoPlayer, settings) {
+        model.load(variantId, chess960Number, twoPlayer, settings)
     }
     val ui = model.ui
+    var confirmResign by remember { mutableStateOf(false) }
+
+    // L'écran s'en va : la pendule s'arrête, et repart au retour. Le modèle de
+    // vue survit à la navigation — sans ces deux gestes, aller voir l'analyse
+    // faisait tomber le drapeau sans que personne n'ait joué, et la pendule ne
+    // repartait jamais.
+    DisposableEffect(Unit) {
+        model.resumeFromBackground()
+        onDispose { model.pauseForBackground() }
+    }
 
     TopBarActions {
         QuickSwitchMenu(onAnalyze = { onAnalyze(model.ui.position.fen) })
@@ -247,6 +267,7 @@ fun VariantPlayScreen(
             }
             StatusRow(ui.status, busy = ui.thinking)
             Spacer(Modifier.height(8.dp))
+            VariantClockRow(ui, top = true)
             // La réserve ADVERSE, au-dessus du plateau comme le camp qu'elle
             // sert : un relevé de ce qui peut nous tomber dessus.
             Reserve(ui, Piece.Color.black, model)
@@ -265,22 +286,37 @@ fun VariantPlayScreen(
                 // celui qui doit jouer — le même réglage que le mode Deux
                 // joueurs ordinaire le commande.
                 orientation = if (ui.twoPlayer && autoFlip) ui.position.sideToMove
-                else Piece.Color.white,
+                else ui.userColor,
                 selected = ui.selected,
                 legalTargets = ui.legalTargets,
                 lastMove = ui.lastMove,
                 checkedKing = ui.checkedKing,
                 walls = ui.walls,
+                arrows = ui.hints,
                 draggableColor = ui.position.sideToMove,
                 enabled = ui.ready && !ui.thinking && !ui.gameOver,
                 onSquareTap = model::onSquareTap,
             )
         },
         panel = {
+            if (ui.settings.showEvalBar) {
+                Spacer(Modifier.height(6.dp))
+                EvalBar(cp = ui.evalCp, mate = ui.evalMate)
+            }
             Spacer(Modifier.height(6.dp))
+            VariantClockRow(ui, top = false)
             // La NÔTRE, sous le plateau, du côté où l'on joue.
             Reserve(ui, Piece.Color.white, model)
             Spacer(Modifier.height(4.dp))
+            if (!ui.twoPlayer) {
+                VariantControlBar(
+                    ui = ui,
+                    onHint = model::toggleHint,
+                    onDraw = model::offerDraw,
+                    onResign = { confirmResign = true },
+                )
+                Spacer(Modifier.height(8.dp))
+            }
             Text(
                 pluralStringResource(R.plurals.variant_halfmoves, ui.plies, ui.plies),
                 fontSize = 11.sp, color = Palette.textTertiary,
@@ -315,4 +351,134 @@ fun VariantPlayScreen(
             }
         },
     )
+
+    if (confirmResign) {
+        AlertDialog(
+            onDismissRequest = { confirmResign = false },
+            title = { Text(stringResource(R.string.play_resign)) },
+            text = { Text(stringResource(R.string.play_resign_confirm)) },
+            confirmButton = {
+                TextButton(
+                    onClick = { confirmResign = false; model.resign() },
+                    modifier = Modifier.testTag("abandonner-oui"),
+                ) { Text(stringResource(R.string.play_resign), color = Palette.danger) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmResign = false }) { Text(stringResource(R.string.cancel)) }
+            },
+            containerColor = Palette.surface,
+        )
+    }
+
+    // Le refus, dit une fois : sans cela il se perdrait dans la ligne d'état.
+    if (ui.drawDeclined) {
+        AlertDialog(
+            onDismissRequest = model::dismissDrawDeclined,
+            title = { Text(stringResource(R.string.play_draw_declined), color = Palette.textPrimary) },
+            text = { Text(stringResource(R.string.play_draw_declined_body), color = Palette.textSecondary) },
+            confirmButton = {
+                TextButton(onClick = model::dismissDrawDeclined) {
+                    Text(stringResource(android.R.string.ok), color = Palette.accent)
+                }
+            },
+            containerColor = Palette.surfaceElevated,
+        )
+    }
+
+    ui.blunderWarning?.let { severity ->
+        val message = when (severity) {
+            is com.chesslab.play.BlunderSeverity.MissedMate -> stringResource(R.string.blunder_missed_mate)
+            is com.chesslab.play.BlunderSeverity.AllowsMate -> stringResource(R.string.blunder_allows_mate)
+            is com.chesslab.play.BlunderSeverity.Centipawns ->
+                stringResource(R.string.blunder_centipawns, minOf(severity.drop, 1_000) / 100)
+        }
+        AlertDialog(
+            onDismissRequest = model::dismissBlunderWarning,
+            title = { Text(stringResource(R.string.blunder_title), color = Palette.textPrimary) },
+            text = { Text(message, color = Palette.textSecondary, modifier = Modifier.testTag("alerte-gaffe")) },
+            confirmButton = {
+                TextButton(
+                    onClick = model::takebackAfterBlunderWarning,
+                    modifier = Modifier.testTag("reprendre-le-coup"),
+                ) { Text(stringResource(R.string.play_takeback), color = Palette.accent) }
+            },
+            dismissButton = {
+                TextButton(onClick = model::dismissBlunderWarning) {
+                    Text(stringResource(R.string.blunder_keep), color = Palette.textSecondary)
+                }
+            },
+            containerColor = Palette.surfaceElevated,
+        )
+    }
+}
+
+/**
+ * Les deux pendules, quand la cadence en demande. Celle d'en face au-dessus du
+ * plateau, la nôtre en dessous : la même géographie que le mode « Contre
+ * l'ordinateur », pour qu'on n'ait pas à chercher.
+ */
+@Composable
+private fun VariantClockRow(ui: VariantUiState, top: Boolean) {
+    val white = ui.whiteClockMs ?: return
+    val black = ui.blackClockMs ?: return
+    val color = if (top) ui.userColor.opposite else ui.userColor
+    val ms = if (color == Piece.Color.white) white else black
+    val active = ui.position.sideToMove == color && !ui.gameOver
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp))
+            .background(if (active) Palette.surfaceElevated else Color.Transparent)
+            .padding(horizontal = 12.dp, vertical = 5.dp)
+            .testTag(if (top) "pendule-adversaire" else "pendule-moi"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(
+            Modifier
+                .size(9.dp)
+                .clip(androidx.compose.foundation.shape.CircleShape)
+                .background(if (color == Piece.Color.white) Color.White else Color.Black)
+                .border(1.dp, Palette.stroke, androidx.compose.foundation.shape.CircleShape)
+        )
+        Spacer(Modifier.weight(1f))
+        Text(
+            com.chesslab.play.GameClock.format(ms),
+            fontSize = 19.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace,
+            color = when {
+                ms < 30_000 -> Palette.danger
+                active -> Palette.textPrimary
+                else -> Palette.textTertiary
+            },
+        )
+    }
+}
+
+/** Indice, nulle, abandon — les trois actions que toute partie doit offrir. */
+@Composable
+private fun VariantControlBar(
+    ui: VariantUiState,
+    onHint: () -> Unit,
+    onDraw: () -> Unit,
+    onResign: () -> Unit,
+) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        ControlButton(
+            Icons.Default.Lightbulb, stringResource(R.string.train_hint),
+            enabled = ui.settings.hintsEnabled && !ui.gameOver,
+            tint = if (ui.hintWanted) Palette.background else Palette.textPrimary,
+            background = if (ui.hintWanted) Palette.accent else Palette.surfaceElevated,
+            tag = "indice", onClick = onHint,
+        )
+        Spacer(Modifier.weight(1f))
+        ControlButton(
+            text = "½", label = stringResource(R.string.play_offer_draw),
+            tint = Palette.info, enabled = !ui.gameOver && !ui.thinking,
+            tag = "nulle", onClick = onDraw,
+        )
+        Spacer(Modifier.width(10.dp))
+        ControlButton(
+            Icons.Default.Flag, stringResource(R.string.play_resign),
+            tint = Palette.danger, enabled = !ui.gameOver, tag = "abandonner", onClick = onResign,
+        )
+    }
 }

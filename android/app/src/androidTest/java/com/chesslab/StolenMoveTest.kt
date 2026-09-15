@@ -4,6 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import org.junit.Rule
@@ -41,11 +42,12 @@ class StolenMoveTest {
     @Test fun leJetonDonneDeuxCoupsDAffilee() {
         compose.onNodeWithTag("mode-variants").performScrollTo().performClick()
         compose.onNodeWithTag("variante-stolenmove").performScrollTo().performClick()
-        awaitText("À vous de jouer", 30_000)
 
-        // Un jeton tous les QUATRE coups : le régler recommence la partie,
-        // et abrège d'autant ce test.
-        compose.onNodeWithTag("intervalle-4").performScrollTo().performClick()
+        // Un jeton tous les QUATRE coups : réglé AVANT de commencer, comme
+        // tout le reste depuis le 15/09 — et cela abrège d'autant ce test.
+        repeat(2) { compose.onNodeWithTag("intervalle-moins").performScrollTo().performClick() }
+        compose.onNodeWithTag("intervalle").assertTextEquals("4")
+        compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer", 30_000)
 
         // Quatre coups de part et d'autre — des poussées de flanc, qui

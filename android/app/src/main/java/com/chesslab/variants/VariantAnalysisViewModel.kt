@@ -65,6 +65,27 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
     private var startFen: String? = null
     private var uciLog: List<String> = emptyList()
 
+    /**
+     * Les positions fournies TELLES QUELLES par la partie, au lieu d'être
+     * rejouées au moteur.
+     *
+     * Deux variantes du hub en ont besoin, et pour la même raison : leur
+     * partie ne se reconstruit pas à partir de ses coups. Le canard du Duck
+     * Chess ne figure dans aucun coup, et le tour double du Coup Volé ferait
+     * jouer deux fois le même camp — un moteur refuserait la seconde. Leur
+     * journal de positions est donc la seule source exacte.
+     */
+    private var givenFens: List<String> = emptyList()
+
+    /**
+     * L'identifiant à donner au MOTEUR. Le Duck Chess et le Coup Volé se
+     * jugent aux règles ORDINAIRES — le premier faute de moteur qui connaisse
+     * le canard, le second parce qu'il EST le jeu ordinaire entre deux tours
+     * doubles. Le reste garde son propre jeu de règles.
+     */
+    private val engineVariant: String
+        get() = if (variantId == "duck" || variantId == "stolenmove") "chess" else variantId
+
     /** Une position et ses murs par demi-coup — le moteur les rend avec la FEN. */
     private var fens: List<String> = emptyList()
     private var evalJob: Job? = null
@@ -80,11 +101,18 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
      * Charge la partie. [uciLog] vient du mode de jeu : c'est la seule chose
      * qu'il sait dire de sûr — les règles vivent dans le moteur, pas ici.
      */
-    fun load(variantId: String, startFen: String?, uciLog: List<String>) {
+    fun load(
+        variantId: String,
+        startFen: String?,
+        uciLog: List<String>,
+        /** Les positions déjà connues, quand les coups ne les reproduisent pas. */
+        fenLog: List<String> = emptyList(),
+    ) {
         if (this.variantId == variantId && this.uciLog == uciLog && fens.isNotEmpty()) return
         this.variantId = variantId
         this.startFen = startFen
         this.uciLog = uciLog
+        this.givenFens = fenLog
         ui = ui.copy(
             variantName = VariantCatalog.byId(variantId)?.let { s(it.titleRes) } ?: variantId,
             sanMoves = emptyList(), qualities = emptyMap(), displayedPly = 0,
@@ -98,13 +126,23 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
      * un plateau faux dès la première prise atomique ou le premier mur.
      */
     private suspend fun rebuild() {
+        // La partie a donné ses positions : rien à rejouer, et surtout rien à
+        // redemander au moteur, qui refuserait la moitié d'entre elles.
+        if (givenFens.isNotEmpty()) {
+            fens = givenFens
+            ui = ui.copy(sanMoves = uciLog, engineUnavailable = false)
+            goTo(uciLog.size)
+            classify()
+            return
+        }
+
         val positions = ArrayList<String>()
         val sans = ArrayList<String>()
         val ok = withContext(Dispatchers.IO) {
             FairyEngine.use(getApplication()) { engine ->
                 for (ply in 0..uciLog.size) {
                     currentCoroutineContext().ensureActive()
-                    val query = engine.queryPosition(variantId, startFen, uciLog.take(ply))
+                    val query = engine.queryPosition(engineVariant, startFen, uciLog.take(ply))
                         ?: return@use false
                     positions += query.fen
                     // La notation d'une variante n'est pas celle de `chesskit` :
@@ -152,12 +190,7 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
             ui = ui.copy(thinking = true)
             val eval = try {
                 withContext(Dispatchers.IO) {
-                    FairyEngine.use(getApplication()) { engine ->
-                        engine.evaluate(
-                            variantId, startFen, uciLog.take(ply), LIVE_MS,
-                            whiteToMove = fens.getOrNull(ply)?.contains(" w ") == true,
-                        )
-                    }
+                    FairyEngine.use(getApplication()) { engine -> evalAt(engine, ply, LIVE_MS) }
                 }
             } finally {
                 ui = ui.copy(thinking = false)
@@ -186,10 +219,7 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
                     FairyEngine.use(getApplication()) { engine ->
                         for (ply in fens.indices) {
                             currentCoroutineContext().ensureActive()
-                            val eval = engine.evaluate(
-                                variantId, startFen, uciLog.take(ply), PASS_MS,
-                                whiteToMove = fens[ply].contains(" w "),
-                            )
+                            val eval = evalAt(engine, ply, PASS_MS)
                             if (eval != null) winPercents[ply] = winPercent(eval.cp, eval.mate)
                             withContext(Dispatchers.Main) { ui = ui.copy(done = ply + 1) }
                         }
@@ -202,6 +232,25 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
     }
+
+    /**
+     * L'évaluation d'un demi-coup donné.
+     *
+     * Deux chemins, un seul endroit : la partie rejouée s'interroge par
+     * « départ + coups », celle qui a donné ses positions par la POSITION
+     * elle-même — c'est la seule façon d'évaluer un tour double ou une
+     * position à canard, qu'aucune suite de coups ne reconstitue.
+     */
+    private suspend fun evalAt(engine: FairyEngine, ply: Int, movetimeMs: Int) =
+        if (givenFens.isNotEmpty()) {
+            val fen = fens.getOrNull(ply) ?: return@evalAt null
+            engine.evaluate(engineVariant, fen, emptyList(), movetimeMs, whiteToMove = fen.contains(" w "))
+        } else {
+            engine.evaluate(
+                engineVariant, startFen, uciLog.take(ply), movetimeMs,
+                whiteToMove = fens.getOrNull(ply)?.contains(" w ") == true,
+            )
+        }
 
     private fun publishQualities() {
         val qualities = HashMap<Int, MoveQuality>()

@@ -340,6 +340,8 @@ class AppTest {
     @Test fun aVariantIsRefereedByTheEngine() {
         open("variants")
         compose.onNodeWithTag("variante-kingofthehill").performClick()
+        // Depuis le 15/09, la tuile ouvre un RÉGLAGE : on le valide tel quel.
+        compose.onNodeWithTag("commencer").performClick()
 
         // le moteur doit répondre à `d` et `go perft 1` avant qu'on puisse jouer
         awaitText("À vous de jouer", 60_000)
@@ -362,6 +364,8 @@ class AppTest {
     @Test fun leCrazyhouseSeJoue() {
         open("variants")
         compose.onNodeWithTag("variante-crazyhouse").performScrollTo().performClick()
+        // Depuis le 15/09, la tuile ouvre un RÉGLAGE : on le valide tel quel.
+        compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer", 60_000)
         compose.onNodeWithTag("case-e2").performClick()
         compose.onNodeWithTag("case-e4").performClick()
@@ -379,6 +383,8 @@ class AppTest {
     @Test fun lesBarricadesSeJouent() {
         open("variants")
         compose.onNodeWithTag("variante-barricades").performScrollTo().performClick()
+        // Depuis le 15/09, la tuile ouvre un RÉGLAGE : on le valide tel quel.
+        compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer", 60_000)
         compose.onNodeWithTag("case-e2").performClick()
         compose.onNodeWithTag("case-e4").performClick()
@@ -399,6 +405,8 @@ class AppTest {
     @Test fun lesBarricadesAleatoiresDeplacentLeursMurs() {
         open("variants")
         compose.onNodeWithTag("variante-randombarricades").performScrollTo().performClick()
+        // Depuis le 15/09, la tuile ouvre un RÉGLAGE : on le valide tel quel.
+        compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer", 60_000)
 
         val pushes = listOf("e2" to "e4", "d2" to "d4", "a2" to "a4", "h2" to "h4", "b2" to "b4", "g2" to "g4")
@@ -428,6 +436,8 @@ class AppTest {
     @Test fun leDuckChessSeJoueEnDeuxTemps() {
         open("variants")
         compose.onNodeWithTag("variante-duck").performScrollTo().performClick()
+        // Depuis le 15/09, la tuile ouvre un RÉGLAGE : on le valide tel quel.
+        compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer", 30_000)
 
         compose.onNodeWithTag("case-e2").performClick()
@@ -452,7 +462,7 @@ class AppTest {
         // position par son numéro. « Au hasard » retrouve le geste d'avant.
         compose.onNodeWithTag("variante-chess960").performClick()
         compose.onNodeWithTag("hasard-960").performScrollTo().performClick()
-        compose.onNodeWithTag("commencer-960").performClick()
+        compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer", 60_000)
         compose.onNodeWithTag("case-a1").assertIsDisplayed()
     }

@@ -192,6 +192,7 @@ private fun App() {
                 variantId = current.variantId,
                 startFen = current.startFen,
                 uciLog = current.uciLog,
+                fenLog = current.fenLog,
             )
             Route.Analysis -> AnalysisEntryScreen(
                 onScan = { stack.add(Route.Scanner()) },
@@ -309,34 +310,50 @@ private fun App() {
                 }
             }
             is Route.Laboratory -> LabScreen(startFen = current.startFen)
+            // TOUTES les variantes passent par un réglage : on y choisit son
+            // camp, la force du moteur, la cadence et les aides — exactement
+            // comme en « Contre l'ordinateur ». Sans lui, on tombait sur un
+            // adversaire à pleine puissance, avec les Blancs et sans pendule.
             Route.Variants -> VariantListScreen { id ->
-                // Le Chess960 passe par un réglage : on y choisit la position
-                // par son NUMÉRO, et l'on peut jouer à deux.
-                when (id) {
-                    "chess960" -> stack.add(Route.Chess960Setup)
-                    "duck" -> stack.add(Route.DuckGame)
-                    "stolenmove" -> stack.add(Route.StolenMoveGame)
-                    else -> stack.add(
-                        Route.VariantGame(id, VariantCatalog.byId(id)?.let { context.getString(it.titleRes) } ?: id)
+                stack.add(
+                    Route.VariantSetup(
+                        id,
+                        VariantCatalog.byId(id)?.let { context.getString(it.titleRes) } ?: id,
+                    )
+                )
+            }
+            is Route.VariantSetup -> com.chesslab.variants.VariantSetupScreen(current.id) { settings ->
+                val name = VariantCatalog.byId(current.id)?.let { context.getString(it.titleRes) } ?: current.id
+                stack[stack.lastIndex] = when (current.id) {
+                    "duck" -> Route.DuckGame(settings)
+                    "stolenmove" -> Route.StolenMoveGame(settings)
+                    else -> Route.VariantGame(
+                        current.id, name,
+                        chess960Number = settings.chess960Number,
+                        twoPlayer = settings.twoPlayers,
+                        settings = settings,
                     )
                 }
             }
-            Route.DuckGame -> com.chesslab.variants.DuckChessScreen(
+            is Route.DuckGame -> com.chesslab.variants.DuckChessScreen(
+                settings = current.settings,
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
+                onReviewGame = { fens, moves ->
+                    stack.add(Route.VariantAnalysis("duck", fens.firstOrNull(), moves, fenLog = fens))
+                },
             )
-            Route.StolenMoveGame -> com.chesslab.variants.StolenMoveScreen(
+            is Route.StolenMoveGame -> com.chesslab.variants.StolenMoveScreen(
+                settings = current.settings,
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
+                onReviewGame = { fens, moves ->
+                    stack.add(Route.VariantAnalysis("stolenmove", fens.firstOrNull(), moves, fenLog = fens))
+                },
             )
-            Route.Chess960Setup -> com.chesslab.variants.Chess960SetupScreen { number, twoPlayer ->
-                stack[stack.lastIndex] = Route.VariantGame(
-                    "chess960", context.getString(R.string.variant_chess960),
-                    chess960Number = number, twoPlayer = twoPlayer,
-                )
-            }
             is Route.VariantGame -> VariantPlayScreen(
                 variantId = current.id,
                 chess960Number = current.chess960Number,
                 twoPlayer = current.twoPlayer,
+                settings = current.settings,
                 onReviewGame = { id, fen, log ->
                     stack.add(Route.VariantAnalysis(id, fen, log))
                 },

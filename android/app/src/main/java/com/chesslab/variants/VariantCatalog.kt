@@ -35,6 +35,13 @@ data class Variant(
      * variante, et rien dans Fairy-Stockfish ne permet de la décrire.
      */
     val appRuled: Boolean = false,
+    /**
+     * Deux humains peuvent y jouer sur le même appareil. Le Duck Chess s'y
+     * prête — il n'y a pas d'information cachée —, les variantes arbitrées
+     * par le moteur aussi ; le Coup Volé non : son jeton se dépense en
+     * secret.
+     */
+    val supportsTwoPlayers: Boolean = true,
 )
 
 object VariantCatalog {
@@ -97,7 +104,9 @@ object VariantCatalog {
         // `chesskit` arbitre chaque coup, l'app tient le tour.
         Variant(
             "stolenmove", "chess", R.string.variant_stolen, R.string.variant_stolen_blurb,
-            R.string.variant_stolen_short, appRuled = true,
+            // Le jeton se dépense en SECRET : à deux sur le même écran, il n'y
+            // aurait plus de surprise, et c'est toute la variante.
+            R.string.variant_stolen_short, appRuled = true, supportsTwoPlayers = false,
         ),
     )
 
