@@ -3,6 +3,8 @@ package com.chesslab.progression
 import android.content.Context
 import com.chesslab.library.LibraryDatabase
 import com.chesslab.training.Fsrs
+import com.chesslab.training.OpeningProgress
+import com.chesslab.training.OpeningReviewLog
 import com.chesslab.training.FsrsRating
 import com.chesslab.training.TrainingQueue
 import kotlinx.coroutines.Dispatchers
@@ -45,32 +47,50 @@ data class TrainingStats(
         }
     }
 
+    val isEmpty: Boolean get() = studied == 0
+
     companion object {
-        /** Au-delà d'une semaine de stabilité, la position tient : on la dit acquise. */
-        private const val SOLID_DAYS = 7.0
+        /**
+         * Au-delà d'une semaine de stabilité, la position tient : on la dit
+         * acquise. Solide sans être définitif — c'est le seuil qu'utilise
+         * aussi la file d'entraînement pour ne plus la proposer en priorité.
+         */
+        const val SOLID_DAYS = 7.0
+
+        /**
+         * Le calcul, SÉPARÉ de la lecture en base — c'est ce qui le rend
+         * vérifiable sur des valeurs écrites à la main, et c'est la forme
+         * qu'a aussi `TrainingStats.swift`.
+         *
+         * [logs] ne sert qu'à la RÉTENTION : le journal porte la vérité des
+         * notes, là où la table n'a que l'état courant.
+         */
+        fun compute(
+            progress: List<OpeningProgress>,
+            logs: List<OpeningReviewLog>,
+            now: Long = System.currentTimeMillis(),
+        ): TrainingStats {
+            val week = now - 7 * Fsrs.DAY_MS
+            val month = now - 30 * Fsrs.DAY_MS
+            val recent = logs.filter { it.reviewedAt >= month }
+            val retention = if (recent.isEmpty()) null
+            else recent.count { it.ratingRaw != FsrsRating.again.raw }.toDouble() / recent.size
+
+            return TrainingStats(
+                studied = progress.count { it.reps > 0 },
+                solid = progress.count { it.reps > 0 && it.stability >= SOLID_DAYS },
+                hard = progress.count { TrainingQueue.isHard(it.snapshot) },
+                due = progress.count { it.dueAt != null && it.dueAt <= now },
+                reviewsThisWeek = logs.count { it.reviewedAt >= week },
+                retention = retention,
+                nextDueAt = progress.mapNotNull { it.dueAt }.filter { it > now }.minOrNull(),
+            )
+        }
 
         suspend fun read(context: Context): TrainingStats = withContext(Dispatchers.IO) {
             val dao = LibraryDatabase.get(context).training()
-            val all = dao.allProgress()
-            val now = System.currentTimeMillis()
-            val week = now - 7 * Fsrs.DAY_MS
-            val month = now - 30 * Fsrs.DAY_MS
-
-            // Le journal porte la vérité des notes : la table, elle, n'a que
-            // l'état courant. Mille entrées suffisent à une moyenne honnête.
-            val logs = dao.recentLogs(1000).filter { it.reviewedAt >= month }
-            val retention = if (logs.isEmpty()) null
-            else logs.count { it.ratingRaw != FsrsRating.again.raw }.toDouble() / logs.size
-
-            TrainingStats(
-                studied = all.count { it.reps > 0 },
-                solid = all.count { it.reps > 0 && it.stability >= SOLID_DAYS },
-                hard = all.count { TrainingQueue.isHard(it.snapshot) },
-                due = all.count { it.dueAt != null && it.dueAt <= now },
-                reviewsThisWeek = dao.reviewsSince(week),
-                retention = retention,
-                nextDueAt = all.mapNotNull { it.dueAt }.filter { it > now }.minOrNull(),
-            )
+            // Mille entrées de journal suffisent à une moyenne honnête.
+            compute(dao.allProgress(), dao.recentLogs(1000))
         }
     }
 }

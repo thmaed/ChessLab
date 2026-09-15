@@ -12043,6 +12043,17 @@
         }
       }
     },
+    "Mémorisation": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Memorisation"
+          }
+        }
+      }
+    },
     "Même appareil": {
       "localizations": {
         "en": {
@@ -14165,6 +14176,39 @@
           "stringUnit": {
             "state": "translated",
             "value": "Prises explosives"
+          }
+        }
+      }
+    },
+    "Prochaine révision aujourd'hui": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next review today"
+          }
+        }
+      }
+    },
+    "Prochaine révision dans %lld jours": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next review in %lld days"
+          }
+        }
+      }
+    },
+    "Prochaine révision demain": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next review tomorrow"
           }
         }
       }
@@ -19920,6 +19964,17 @@
         }
       }
     },
+    "acquises": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "solid"
+          }
+        }
+      }
+    },
     "au trait": {
       "localizations": {
         "en": {
@@ -20017,6 +20072,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "cavalier noir"
+          }
+        }
+      }
+    },
+    "cette semaine": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "this week"
           }
         }
       }
@@ -20649,6 +20715,17 @@
         }
       }
     },
+    "positions": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "positions"
+          }
+        }
+      }
+    },
     "profondeur %lld": {
       "extractionState": "stale",
       "localizations": {
@@ -20842,6 +20919,17 @@
           "stringUnit": {
             "state": "translated",
             "value": "répétition de position"
+          }
+        }
+      }
+    },
+    "réussite": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "success"
           }
         }
       }
@@ -21366,6 +21454,28 @@
           "stringUnit": {
             "state": "translated",
             "value": "Evaluations"
+          }
+        }
+      }
+    },
+    "à raffermir": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "to firm up"
+          }
+        }
+      }
+    },
+    "à réviser": {
+      "extractionState": "manual",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "due"
           }
         }
       }

@@ -44,6 +44,7 @@ struct ProgressionView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var allGames: [GameRecord] = []
     @State private var puzzles: [Puzzle] = []
+    @State private var memory: TrainingStats?
     @State private var timeRange: ProgressionTimeRange = .allTime
 
     /// Passe une session de puzzles filtrée sur le thème le plus faible —
@@ -59,12 +60,16 @@ struct ProgressionView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                if summary.hasAnyData || !allGames.isEmpty {
+                let hasMemory = !(memory?.isEmpty ?? true)
+                if summary.hasAnyData || !allGames.isEmpty || hasMemory {
                     if !allGames.isEmpty {
                         engineCard(summary)
                     }
                     if summary.puzzleAttempts > 0 {
                         puzzleCard(summary)
+                    }
+                    if let memory, !memory.isEmpty {
+                        memoryCard(memory)
                     }
                 } else {
                     emptyState
@@ -375,6 +380,37 @@ struct ProgressionView: View {
 
     // MARK: Chargement
 
+    // MARK: Mémorisation
+
+    /// Ce que la répétition espacée a produit. Une mémorisation sans bilan
+    /// demande de la confiance sans jamais rien montrer en retour — et c'est
+    /// justement ce dont on a besoin pour s'y tenir. (Écran porté depuis
+    /// Android, où il existait d'abord.)
+    @ViewBuilder
+    private func memoryCard(_ memory: TrainingStats) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            cardHeader("Mémorisation", systemImage: "brain.head.profile", tint: Theme.accent)
+
+            HStack(spacing: 10) {
+                statTile("\(memory.studied)", "positions", tint: Theme.textPrimary)
+                statTile("\(memory.solid)", "acquises", tint: Theme.accent)
+                statTile("\(memory.hard)", "à raffermir", tint: Theme.danger)
+            }
+            HStack(spacing: 10) {
+                statTile("\(memory.due)", "à réviser", tint: Theme.warning)
+                statTile("\(memory.reviewsThisWeek)", "cette semaine", tint: Theme.info)
+                statTile(memory.retentionLabel, "réussite", tint: Theme.violet)
+            }
+            if let next = memory.nextDueLabel() {
+                Text(next)
+                    .font(.caption)
+                    .foregroundStyle(Theme.textTertiary)
+                    .accessibilityIdentifier("nextReview")
+            }
+        }
+        .cardStyle()
+    }
+
     private func load() {
         // Fusionne d'abord la progression puzzles synchronisée (autres
         // appareils) dans les Puzzle locaux, pour que le bilan la reflète.
@@ -391,5 +427,11 @@ struct ProgressionView: View {
         })
         attempted.propertiesToFetch = [\.successCount, \.failureCount, \.themeRaw, \.rating]
         puzzles = (try? modelContext.fetch(attempted)) ?? []
+
+        // La mémorisation : l'état courant des positions, et le JOURNAL pour
+        // la rétention — la table ne porte que l'état, le journal les notes.
+        let progress = (try? modelContext.fetch(FetchDescriptor<OpeningPositionProgress>())) ?? []
+        let logs = (try? modelContext.fetch(FetchDescriptor<OpeningReviewLog>())) ?? []
+        memory = TrainingStats.compute(progress: progress, logs: logs)
     }
 }
