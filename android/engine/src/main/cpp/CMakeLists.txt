@@ -16,6 +16,17 @@
 cmake_minimum_required(VERSION 3.22.1)
 project(chesslab_engine CXX)
 
+# PAGES DE 16 Ko — obligatoire pour publier une app qui vise Android 15+.
+#
+# Les appareils récents passent à des pages mémoire de 16 Ko ; une
+# bibliothèque dont les segments sont alignés sur 4 Ko n'y démarre pas, et le
+# Play Store refuse l'envoi. Le NDK r27 sait le faire mais ne le fait pas par
+# défaut : il faut le lui demander, une fois par bibliothèque.
+#
+# Vérification, après compilation :
+#   llvm-readelf -l libchesslab_engine.so | grep LOAD   →  0x4000, pas 0x1000
+set(PAGE_16K "-Wl,-z,max-page-size=16384,-z,common-page-size=16384")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)   # gnu++17, comme cxxLanguageStandard côté SPM
@@ -77,6 +88,7 @@ target_compile_options(chesslab_engine PRIVATE -O3)
 
 find_library(log-lib log)
 target_link_libraries(chesslab_engine ${log-lib})
+target_link_options(chesslab_engine PRIVATE ${PAGE_16K})
 
 # ---------------------------------------------------------------------------
 # Fairy-Stockfish : les variantes (Chess960, Duck, Coup Volé…)
@@ -121,4 +133,5 @@ if(EXISTS ${FS_ROOT}/shim.cpp)
 
     target_compile_options(chesslab_fairy PRIVATE -O3)
     target_link_libraries(chesslab_fairy ${log-lib})
+    target_link_options(chesslab_fairy PRIVATE ${PAGE_16K})
 endif()

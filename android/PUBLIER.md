@@ -70,6 +70,46 @@ apparaît ; la demande est examinée à la main.
 
 ## 3. Préparer le binaire
 
+### 3.0 Les pages de 16 Ko — réglé le 15/09/2026
+
+Google exige, pour toute app qui vise Android 15 (SDK 35) ou plus, que les
+bibliothèques natives soient alignées sur des pages de **16 Ko**. Les
+appareils récents passent à ce format ; une bibliothèque alignée sur 4 Ko n'y
+démarre pas, et le Play Store refuse l'envoi.
+
+Le Galaxy A16 le signalait à chaque installation par une boîte système :
+« Cette appli n'est pas compatible avec les pages de 16 ko ». Trois des six
+bibliothèques étaient en cause.
+
+Ce qui l'a réglé :
+
+- nos deux moteurs (`libchesslab_engine.so`, `libchesslab_fairy.so`) :
+  `target_link_options(… -Wl,-z,max-page-size=16384)` dans le `CMakeLists.txt`
+  du module `engine`. Le NDK r27 sait le faire, mais **ne le fait pas** par
+  défaut ;
+- `libonnxruntime4j_jni.so` : ONNX Runtime **1.20.0 → 1.22.0**.
+
+Les trois autres (`libonnxruntime.so`, `libdatastore_shared_counter.so`,
+`libandroidx.graphics.path.so`) l'étaient déjà.
+
+**Vérifier après chaque changement de dépendance native** — c'est une
+régression qui ne se voit pas autrement :
+
+```bash
+NDK=$ANDROID_HOME/ndk/27.2.12479018
+READELF=$NDK/toolchains/llvm/prebuilt/darwin-x86_64/bin/llvm-readelf
+unzip -o -q app/build/outputs/apk/release/app-release.apk 'lib/*' -d /tmp/chk
+for so in /tmp/chk/lib/arm64-v8a/*.so; do
+  echo "$($READELF -l "$so" | grep -m1 LOAD | awk '{print $NF}')  $(basename $so)"
+done | sort          # toutes les lignes doivent dire 0x4000
+```
+
+Et l'alignement des entrées du ZIP, que l'AGP fait déjà :
+
+```bash
+$ANDROID_HOME/build-tools/35.0.0/zipalign -c -P 16 -v 4 app-release.apk | tail -1
+```
+
 ### 3.1 Le trousseau de signature
 
 Il ne vit **pas** dans le dépôt (`*.jks` et `keystore.properties` sont
