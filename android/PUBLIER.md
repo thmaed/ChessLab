@@ -218,8 +218,23 @@ Pas de fichier `.p8` comme chez Apple : un **compte de service** Google Cloud,
 c'est-à-dire un « utilisateur » qui n'est pas une personne, invité dans la Play
 Console comme on inviterait un collègue.
 
-Deux chemins y mènent. Le premier est guidé et fait le liage tout seul ; le
-second marche aussi bien, mais il faut penser à activer l'API soi-même.
+> **Un vérificateur existe.** Plutôt que de relire ce qui suit en se demandant
+> laquelle des six étapes a raté, lancez :
+>
+> ```bash
+> cd android && ./tools/verifier-cle-play.sh
+> ```
+>
+> Il dit précisément ce qui manque — fichier au mauvais endroit, clé invalide,
+> API non activée, compte non invité, droits insuffisants, application
+> inexistante — et comment le réparer. `--installer` pose au passage la clé
+> depuis `~/Downloads`.
+
+**1. Lier un projet Cloud.** Play Console → **Paramètres** → **Accès à l'API**.
+Au premier passage, Google propose de créer un projet Google Cloud ou d'en lier
+un existant. Un projet neuf, dédié à l'app, est plus simple à révoquer ensuite.
+Cette étape ACTIVE au passage l'API « Google Play Android Developer » ; sans
+elle, tout le reste rend `403`.
 
 > **« Accès à l'API » est une page du COMPTE, pas d'une application.** Depuis
 > l'intérieur d'une app, le menu de gauche montre les réglages de l'app et la
@@ -227,28 +242,12 @@ second marche aussi bien, mais il faut penser à activer l'API soi-même.
 > `https://play.google.com/console/api-access`.
 >
 > Il faut être **propriétaire** du compte développeur — un utilisateur invité,
-> même administrateur, ne la voit pas — et la vérification d'identité doit être
-> terminée, sans quoi le menu reste réduit.
-
-#### Chemin de secours : tout depuis Google Cloud
-
-Si la page reste introuvable, rien n'est perdu :
-
-1. <https://console.cloud.google.com> → créer un projet ;
-2. **API et services** → **Bibliothèque** → « Google Play Android Developer
-   API » → **Activer**. C'est l'étape que la page « Accès à l'API » faisait
-   pour vous ; sautée, tout le reste rend `403` ;
-3. **IAM et administration** → **Comptes de service** → créer (aucun rôle),
-   puis la clé JSON comme à l'étape 3 ci-dessous ;
-4. Play Console → **Utilisateurs et autorisations** → **Inviter un
-   utilisateur** → coller l'adresse du compte de service, mêmes droits qu'au
-   tableau de l'étape 4.
-
-**1. Lier un projet Cloud.** Play Console → **Paramètres** → **Accès à l'API**.
-Au premier passage, Google propose de créer un projet Google Cloud ou d'en lier
-un existant. Un projet neuf, dédié à l'app, est plus simple à révoquer ensuite.
-Cette étape ACTIVE au passage l'API « Google Play Android Developer » ; sans
-elle, tout le reste rend `403`.
+> même administrateur, ne la voit pas, sans message ni case grisée : elle est
+> simplement absente — et la vérification d'identité doit être terminée, sans
+> quoi le menu reste amputé. Pour trancher : **Utilisateurs et autorisations**,
+> cherchez votre adresse, regardez la colonne du rôle.
+>
+> Introuvable malgré tout ? Voir le chemin de secours en fin de section.
 
 **2. Créer le compte de service.** Sur la même page, section **Comptes de
 service** → « Créer un compte de service ». Le lien ouvre la console Cloud, sur
@@ -267,6 +266,18 @@ L'adresse obtenue ressemble à
 onglet **Clés** → « Ajouter une clé » → « Créer une clé » → **JSON**. Le
 fichier se télécharge une seule fois et ne se retélécharge JAMAIS : perdu, il
 faut en créer un autre et révoquer le précédent.
+
+**Le renommage n'est pas facultatif.** Google donne au fichier un nom à lui
+(`chesslab-472210-a1b2c3d4e5f6.json`) ; le greffon ne lit QUE le chemin
+ci-dessous, exactement. Une clé parfaitement valide laissée dans
+`~/Downloads` ne sert à rien, et le greffon se contente alors de dire
+`SKIPPED` — c'est l'erreur la plus fréquente.
+
+```bash
+cd android && ./tools/verifier-cle-play.sh --installer   # le fait pour vous
+```
+
+ou à la main :
 
 ```bash
 mkdir -p ~/.private_keys
@@ -296,13 +307,33 @@ quelques minutes avant de vous étonner d'un `401`.
 envoyer des binaires, pas créer une fiche.
 
 ```bash
-cd android && ./gradlew :app:publishBundle --dry-run
-# « SKIPPED » = clé absente ou illisible
-# la tâche listée = le greffon a la clé
+cd android && ./tools/verifier-cle-play.sh
 ```
 
 Sans cette clé, le greffon se tait : `./gradlew build` marche pour qui n'a pas à
 publier. Avec elle, tout s'enchaîne.
+
+#### Chemin de secours : tout depuis Google Cloud
+
+Quand « Accès à l'API » reste introuvable — compte dont on n'est pas
+propriétaire, vérification d'identité en cours —, la même chose se monte à la
+main. Une seule étape s'ajoute : activer l'API soi-même, ce que la page guidée
+faisait au passage.
+
+1. <https://console.cloud.google.com> → créer un projet ;
+2. **API et services** → **Bibliothèque** → « Google Play Android Developer
+   API » → **Activer**. Sautée, cette étape fait rendre `403` à tout le
+   reste — et le vérificateur le dit en toutes lettres ;
+3. **IAM et administration** → **Comptes de service** → créer (aucun rôle),
+   puis la clé JSON comme à l'étape 3 ;
+4. Play Console → **Utilisateurs et autorisations** → **Inviter un
+   utilisateur** → coller l'adresse du compte de service, mêmes droits qu'au
+   tableau de l'étape 4.
+
+Cette dernière étape demande tout de même le droit de gérer les utilisateurs.
+Sans lui, il n'y a pas de contournement : **seul le propriétaire du compte peut
+ouvrir l'API**. Le téléversement par le web, lui, ne demande que le droit de
+gérer les versions — c'est la sortie quand on n'est qu'invité.
 
 ### Ce que l'API ne fera jamais
 
