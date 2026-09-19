@@ -4,11 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ChessLab — Jouer, analyser, progresser</title>
-<meta name="description" content="Une app d'échecs qui tourne entièrement sur le téléphone : aucun compte, aucun réseau, aucune donnée qui sort de l'appareil.">
+<meta name="description" content="Une app d'échecs qui tourne entièrement sur votre appareil : aucun compte, aucun réseau, aucune donnée qui sort. iPhone, iPad et Android.">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main class="page">
+<main class="page" id="top">
+
+<p class="langues"><strong>Français</strong> &nbsp;&middot;&nbsp; <a href="#english">English</a></p>
 
 <h1>Chess<span class="lab">Lab</span></h1>
 <p class="accroche">Jouer, analyser, progresser — sur votre appareil, et nulle part ailleurs.<br>
@@ -16,10 +18,10 @@
 
 <div class="promesse">
 <p><strong>Aucun compte. Aucun réseau. Aucune donnée qui sort de l'appareil.</strong></p>
-<p>Ce n'est pas une intention, c'est vérifiable : l'application ne demande pas
-la permission <code>INTERNET</code> d'Android, sans laquelle aucun programme ne
-peut ouvrir la moindre connexion. Mettez-la en mode avion — tout fonctionne,
-y compris l'analyse et les adversaires, qui calculent sur le téléphone.</p>
+<p>Ce n'est pas une intention, c'est vérifiable : l'application Android ne
+demande pas la permission <code>INTERNET</code>, sans laquelle aucun programme
+ne peut ouvrir la moindre connexion. Mettez-la en mode avion — tout fonctionne,
+y compris l'analyse et les adversaires, qui calculent sur l'appareil.</p>
 </div>
 
 <h2>Ce qu'elle fait</h2>
@@ -31,8 +33,9 @@ appareil aussi. Douze variantes : Chess960, Roi de la colline, Horde, Atomique,
 Crazyhouse, Duck Chess…</p>
 
 <h3>Analyser</h3>
-<p>Chaque coup classé, chaque faute expliquée — pas seulement signalée. Vos
-erreurs deviennent des puzzles.</p>
+<p>Chaque coup classé, chaque faute expliquée — pas seulement signalée. L'app
+dit <em>pourquoi</em> un coup était mauvais, en une phrase, et ne nomme que ce
+qui se voit sur l'échiquier. Vos erreurs deviennent des exercices.</p>
 
 <h3>Apprendre</h3>
 <p>58 ouvertures et 78 finales, en cours jouables plutôt qu'en listes à retenir.
@@ -45,16 +48,69 @@ sur le plateau. La reconnaissance se fait sur l'appareil.</p>
 
 <h2>Liens</h2>
 <ul class="liens">
-<li><a href="privacy-policy.html">Politique de confidentialité</a> — <span lang="en">Privacy&nbsp;Policy</span></li>
-<li><a href="support.html">Aide</a> — <span lang="en">Support</span></li>
+<li><a href="privacy-policy.html">Politique de confidentialité</a></li>
+<li><a href="support.html">Aide</a></li>
 <li><a href="https://github.com/thmaed/ChessLab">Code source</a> — GPLv3</li>
 <li><a href="mailto:thmaed@icloud.com">thmaed@icloud.com</a></li>
 </ul>
 
+<hr style="border:0;border-top:1px solid var(--trait);margin:4rem 0 0">
+
+<div id="english" lang="en">
+
+<p class="langues"><a href="#top">Français</a> &nbsp;&middot;&nbsp; <strong>English</strong></p>
+
+<h1>Chess<span class="lab">Lab</span></h1>
+<p class="accroche">Play, analyse, improve — on your device, and nowhere else.<br>
+<span style="color:var(--texte-tenu)">iPhone, iPad and Android.</span></p>
+
+<div class="promesse">
+<p><strong>No account. No network. No data leaving the device.</strong></p>
+<p>This is not a promise, it is verifiable: the Android app does not request the
+<code>INTERNET</code> permission, without which no program can open a connection
+at all. Put it in airplane mode — everything works, including analysis and the
+computer opponents, which compute on the device.</p>
+</div>
+
+<h2>What it does</h2>
+
+<h3>Play</h3>
+<p>Against nine characters who play like real players of their level, blunders
+included, or against Stockfish throttled by a slider. Two players on one device
+too. Twelve variants: Chess960, King of the Hill, Horde, Atomic, Crazyhouse,
+Duck Chess…</p>
+
+<h3>Analyse</h3>
+<p>Every move graded, every mistake explained — not merely flagged. The app says
+<em>why</em> a move was bad, in one sentence, and names only what can be seen on
+the board. Your mistakes become exercises.</p>
+
+<h3>Learn</h3>
+<p>58 openings and 78 endgames, as courses you play rather than lists you
+memorise. Over 100,000 puzzles. Spaced repetition decides what you review, and
+when.</p>
+
+<h3>Scan</h3>
+<p>Photograph a real chessboard or read a screenshot: the position lands on the
+board. Recognition runs on the device.</p>
+
+<h2>Links</h2>
+<ul class="liens">
+<li><a href="privacy-policy.html#english">Privacy Policy</a></li>
+<li><a href="support.html">Support</a></li>
+<li><a href="https://github.com/thmaed/ChessLab">Source code</a> — GPLv3</li>
+<li><a href="mailto:thmaed@icloud.com">thmaed@icloud.com</a></li>
+</ul>
+
+</div>
+
 <div class="pied">
-<p>ChessLab embarque <a href="https://stockfishchess.org">Stockfish</a>,
-publié sous licence GPLv3. Le code source de l'application est disponible, comme
+<p>ChessLab embarque <a href="https://stockfishchess.org">Stockfish</a>, publié
+sous licence GPLv3 — le code source de l'application est donc disponible, comme
 cette licence l'exige.</p>
+<p lang="en">ChessLab embeds <a href="https://stockfishchess.org">Stockfish</a>,
+released under the GPLv3 licence — the app's source code is therefore available,
+as that licence requires.</p>
 </div>
 
 </main>
