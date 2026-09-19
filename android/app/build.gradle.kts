@@ -113,11 +113,20 @@ play {
 }
 
 android {
+    // Le `namespace` est le paquet KOTLIN — celui des fichiers source et de la
+    // classe `R`. Il n'a pas à ressembler à l'identifiant du Play Store, et le
+    // renommer ferait bouger des milliers de lignes pour rien.
     namespace = "com.chesslab"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.chesslab"
+        // L'identifiant sous lequel Google Play connaît l'app, et sous lequel
+        // Android la distingue de toute autre. Il est DÉFINITIF une fois la
+        // première version envoyée : ni Google ni Android ne savent renommer
+        // une app installée. C'est aussi celui qui était déjà enregistré dans
+        // la console, et le bon des deux — `com.chesslab` laisserait entendre
+        // qu'on possède le domaine chesslab.com.
+        applicationId = "com.maeder.chesslab"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

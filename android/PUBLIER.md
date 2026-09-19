@@ -377,8 +377,8 @@ exige une adresse de contact PUBLIQUE sur la fiche ; je n'en ai pas choisi une
 Elles ont été prises à l'`adb` sur un Galaxy A16, l'app dans la langue voulue :
 
 ```bash
-adb shell cmd locale set-app-locales com.chesslab --locales fr-FR
-adb shell am force-stop com.chesslab && adb shell am start -n com.chesslab/.MainActivity
+adb shell cmd locale set-app-locales com.maeder.chesslab --locales fr-FR
+adb shell am force-stop com.maeder.chesslab && adb shell am start -n com.maeder.chesslab/com.chesslab.MainActivity
 adb exec-out screencap -p > 1-accueil.png
 ```
 

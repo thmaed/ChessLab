@@ -18,7 +18,7 @@ set -uo pipefail
 
 # Surchargeable pour pouvoir ÉPROUVER le vérificateur lui-même.
 CLE="${CLE_PLAY:-${HOME}/.private_keys/play-service-account.json}"
-PAQUET="com.chesslab"
+PAQUET="com.maeder.chesslab"
 PORTEE="https://www.googleapis.com/auth/androidpublisher"
 
 rouge() { printf '\033[31m✗\033[0m %s\n' "$1"; }
