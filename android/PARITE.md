@@ -7,6 +7,46 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+## ⬜ Écart OUVERT — les tablettes, 19/09/2026
+
+**iOS s'adapte à l'iPad, Android ne s'adapte pas aux tablettes.** Dix fichiers
+Swift lisent `horizontalSizeClass` pour remettre en page sur grand écran ;
+Android n'a aucun équivalent, et la découverte s'est faite en prenant les
+captures d'écran de tablette pour la fiche Play.
+
+Mesuré sur un émulateur 2560 × 1600 :
+
+- **l'accueil** étale ses huit tuiles sur une rangée de sept plus une
+  orpheline, et laisse les deux tiers inférieurs vides ;
+- **l'entrée de l'analyse** montre trois lignes puis 70 % de noir ;
+- **une partie** place bien le plateau à gauche — la mise en page paysage
+  fonctionne — mais la colonne de droite est vide aux trois quarts et le
+  plateau colle au bord ;
+- seul **l'écran de nouvelle partie** tient : sa grille de personnages remplit
+  la largeur.
+
+L'app MARCHE, elle n'est pas mise en page. Rien n'est cassé, rien n'est
+inaccessible.
+
+**Décision du 19/09 : on publie sans captures de tablette.** Google affichera
+« conçue pour les téléphones », ce qui est exact. Publier les captures telles
+quelles aurait desservi la fiche — une app aux deux tiers vide se referme.
+
+Ce qui reste à faire, le jour où on s'y met :
+
+- [ ] **Accueil** : plafonner la largeur des tuiles et centrer la grille.
+- [ ] **Entrée de l'analyse** : centrer et borner.
+- [ ] **Partie** : donner à la colonne de droite ce qu'elle a déjà sur
+      téléphone — liste des coups, pièces prises — plutôt que du vide.
+- [ ] **Listes d'ouvertures et de finales** : deux colonnes au lieu d'une
+      très large.
+- [ ] Puis les douze captures : `tools/captures-tablette.sh` les prend en deux
+      commandes, il est écrit et éprouvé.
+
+Ce chantier a gagné en importance le 19/09 : viser le SDK 36 fait qu'Android 16
+IGNORE les restrictions de redimensionnement sur grand écran. L'app y sera
+redimensionnable qu'on le veuille ou non.
+
 ## 🔁 Nouvelle passe — 14/09/2026, écran par écran sur appareil
 
 La passe de septembre déclarait la parité atteinte. En testant l'app sur le

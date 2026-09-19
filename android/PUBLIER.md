@@ -211,6 +211,31 @@ Le chantier tient donc en deux temps : dépouiller au moment de l'empaquetage,
 puis joindre les symboles au bundle. **Pas la veille d'une publication** : cela
 change le binaire livré, et il faudrait repasser la suite instrumentée dessus.
 
+### 3.3ter Les captures de TABLETTE — sciemment absentes
+
+Google réserve deux emplacements aux tablettes, 7 et 10 pouces, et signale
+« conçue pour les téléphones » quand ils restent vides. Ils le restent, et
+c'est un choix : l'app fonctionne sur tablette mais n'y est pas mise en page
+(voir l'écart ouvert en tête de `PARITE.md`). Des captures d'écran aux deux
+tiers vides desservent une fiche plus que leur absence.
+
+Le jour où les mises en page seront faites, elles se prennent en deux
+commandes — il n'y a pas de tablette Android à la maison, donc émulateur :
+
+```bash
+./tools/captures-tablette.sh chesslab-tab10 fr-FR large-tablet-screenshots
+./tools/captures-tablette.sh chesslab-tab7  fr-FR tablet-screenshots
+```
+
+Les AVD se créent avec `avdmanager create avd -d "pixel_tablet"` et
+`-d "Nexus 7"` ; **relever la définition de la 7 pouces** dans son
+`config.ini` (1200 × 1920 plutôt que 800 × 1280), sans quoi le petit côté
+tombe sous les 1080 px que Google demande.
+
+Le script évite tout champ de saisie : sur émulateur, le clavier de Gboard
+s'incruste dans l'image dès qu'un champ a eu le focus, et rien ne l'enlève
+proprement.
+
 ### 3.4 La taille
 
 | | compressé |
