@@ -169,9 +169,9 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
             position = position,
             walls = BarricadesFen.wallSquares(fen).toSet(),
             displayedPly = target,
-            lastMove = move?.takeIf { it.length >= 4 }?.let {
-                Square(it.substring(0, 2)) to Square(it.substring(2, 4))
-            },
+            // Même raison qu'à l'écran de jeu : un parachutage du Crazyhouse
+            // (`P@e4`) n'a pas de case de départ.
+            lastMove = move?.let { VariantMoveMarks.of(it) },
             evalCp = null, evalMate = null, evaluation = "",
         )
         evaluate(target)

@@ -35,12 +35,15 @@ class VariantClockTest {
     }
 
     /**
-     * 900 ms sans pendule : assez pour un coup sensé, assez peu pour ne pas
-     * faire attendre. C'est le chiffre d'iOS, et il ne doit pas dépendre d'un
-     * temps restant qui n'existe pas.
+     * Sans pendule, le moteur prend le temps CHOISI dans les réglages.
+     *
+     * C'était 900 ms en dur, et le réglage « Temps de réflexion du moteur » ne
+     * servait à rien — ses quatre choix ne changeaient rien. Le chiffre ne doit
+     * en tout cas pas dépendre d'un temps restant qui n'existe pas.
      */
-    @Test fun `sans pendule le moteur prend un temps fixe`() {
-        assertEquals(900, clock(TimeControl.byId("none")).movetimeFor(Piece.Color.white))
+    @Test fun `sans pendule le moteur prend le temps réglé`() {
+        val attendu = com.chesslab.settings.AppSettings().engineMoveTimeMs
+        assertEquals(attendu, clock(TimeControl.byId("none")).movetimeFor(Piece.Color.white))
     }
 
     /**

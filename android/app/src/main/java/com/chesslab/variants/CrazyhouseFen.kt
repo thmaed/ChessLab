@@ -1,6 +1,7 @@
 package com.chesslab.variants
 
 import chesskit.Piece
+import chesskit.Square
 
 /**
  * La RÉSERVE du Crazyhouse, lue dans la FEN du moteur.
@@ -71,5 +72,30 @@ object CrazyhouseFen {
         'q' -> Piece.Kind.queen
         'k' -> Piece.Kind.king
         else -> null
+    }
+}
+
+/**
+ * Les deux cases à SURLIGNER pour un coup rendu par le moteur.
+ *
+ * Un coup de variante n'est pas toujours « départ + arrivée » : au Crazyhouse,
+ * le moteur répond `P@e4` pour poser une pièce de sa réserve. Découpé comme un
+ * coup ordinaire, cela donne `P@` et `e4` — et `Square("P@")` ne proteste pas,
+ * il retombe silencieusement sur `a1`. L'app surlignait donc `a1` → `e4` à
+ * chaque parachutage de l'adversaire, alors que le parachutage de l'utilisateur,
+ * lui, était marqué correctement.
+ *
+ * Une pose n'a pas d'origine : ses deux cases sont la même.
+ */
+object VariantMoveMarks {
+
+    fun of(lan: String): Pair<Square, Square>? {
+        if (lan.length < 4) return null
+        // `P@e4` : la lettre de la pièce, puis l'arobase, puis la case.
+        if (lan[1] == '@') {
+            val cible = Square(lan.substring(2, 4))
+            return cible to cible
+        }
+        return Square(lan.substring(0, 2)) to Square(lan.substring(2, 4))
     }
 }

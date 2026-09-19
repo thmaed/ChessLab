@@ -440,7 +440,10 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         if (best == null || best == "(none)") { ui = ui.copy(status = s(R.string.engine_silent)); return@launch }
         clock.stopAndIncrement()
         ui = ui.copy(uciLog = ui.uciLog + best)
-        refresh(Square(best.substring(0, 2)) to Square(best.substring(2, 4)))
+        // `VariantMoveMarks` et non un découpage à la main : au Crazyhouse le
+        // moteur répond `P@e4`, dont les deux premiers caractères ne sont pas
+        // une case.
+        refresh(VariantMoveMarks.of(best))
     }
 
 

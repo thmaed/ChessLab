@@ -130,6 +130,13 @@ android {
     // classe `R`. Il n'a pas à ressembler à l'identifiant du Play Store, et le
     // renommer ferait bouger des milliers de lignes pour rien.
     namespace = "com.chesslab"
+    // Le NDK est déclaré ICI aussi, et pas seulement dans `engine` qui compile
+    // les moteurs : sans lui, AGP ne trouve pas `llvm-strip` au moment
+    // d'empaqueter et renonce en une ligne noyée dans le journal — « Unable to
+    // strip the following libraries, packaging them as they are ». Les
+    // bibliothèques partaient donc chez les utilisateurs avec leurs
+    // informations de débogage : 20 Mo pour rien.
+    ndkVersion = "27.2.12479018"
     // 36 = Android 16. Google exige que toute NOUVELLE app vise au moins ce
     // niveau ; la console refuse le fichier sinon, et c'est une erreur, pas un
     // avertissement.
@@ -179,23 +186,20 @@ android {
             isMinifyEnabled = false
             signingConfig = signingConfigs.findByName("release")
 
-            // La console Play réclame un fichier de symboles natifs. Il n'y en
-            // a pas, et `ndk { debugSymbolLevel = … }` n'y change rien ici :
-            // ce réglage ne porte que sur les bibliothèques que le module
-            // COMPILE lui-même, or les nôtres viennent du module `engine`.
+            // Les SYMBOLES des bibliothèques natives, joints au bundle plutôt
+            // que livrés DANS l'app.
             //
-            // Sans conséquence pour l'instant, parce que les `.so` livrés ne
-            // sont PAS dépouillés : ils gardent `.symtab` et `.debug_info`
-            // (13 371 symboles pour Fairy-Stockfish). C'est pour cela que la
-            // trace du plantage du 15/09 portait des noms de fonctions — et
-            // c'est aussi pour cela qu'elle en portait de FAUX, le symbole
-            // exporté le plus proche n'étant pas toujours le bon.
+            // Sans eux, un plantage natif remonte en adresses nues, et l'outil
+            // rattache chacune au symbole exporté le plus proche — ce qui
+            // désigne régulièrement la mauvaise fonction. C'est exactement ce
+            // qui est arrivé au plantage du 15/09 : la trace accusait
+            // l'évaluation NNUE, la faute était ailleurs, et il a fallu la
+            // décoder à la main.
             //
-            // À faire un jour, et pas la veille d'une publication : dépouiller
-            // les bibliothèques (l'app rétrécirait de plusieurs dizaines de
-            // mégaoctets — les utilisateurs téléchargent aujourd'hui nos
-            // informations de débogage) et envoyer les symboles à part. Voir
-            // PUBLIER.md.
+            // `SYMBOL_TABLE` et non `FULL` : les noms de fonctions suffisent à
+            // lire une pile, tandis que les informations de débogage complètes
+            // pèsent des dizaines de mégaoctets pour deux moteurs d'échecs.
+            ndk { debugSymbolLevel = "SYMBOL_TABLE" }
         }
         debug {
             // Un identifiant DISTINCT, pour que le build de test et le build
@@ -209,6 +213,24 @@ android {
             // deux. Chacun a désormais son bac à sable.
             applicationIdSuffix = ".debug"
         }
+    }
+
+    /**
+     * Le bundle ne se découpe PAS par langue.
+     *
+     * Par défaut, Google Play ne livre à chaque appareil que les ressources de
+     * SA langue. Or l'app propose de changer de langue dans ses réglages : sur
+     * un téléphone anglais, basculer en français ne trouvait rien à afficher et
+     * ne faisait donc rien — un réglage qui semble marcher et n'agit pas. Rien
+     * de tout cela ne se voit en installant un APK à la main, qui contient tout.
+     *
+     * Le remède habituel — télécharger la langue manquante avec Play Core —
+     * nous est INTERDIT : l'app n'a pas la permission INTERNET, et c'est toute
+     * sa promesse. Il ne reste que celui-ci, et il ne coûte rien : deux langues
+     * de chaînes pour tout le monde, quelques dizaines de kilo-octets sur 139 Mo.
+     */
+    bundle {
+        language { enableSplit = false }
     }
 
     compileOptions {

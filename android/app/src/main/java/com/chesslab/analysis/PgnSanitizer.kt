@@ -29,7 +29,7 @@ object PgnSanitizer {
      * lecture : BOM de tête, `\r\n` / `\r`, espaces insécables.
      */
     fun normalizeWhitespace(pgn: String): String =
-        pgn.removePrefix("﻿")
+        pgn.removePrefix("\uFEFF")
             .replace("\r\n", "\n")
             .replace('\r', '\n')
             .replace(' ', ' ')   // insécable

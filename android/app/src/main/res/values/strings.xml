@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">ChessLab</string>
+    <!-- Un NOM, pas une phrase : il ne se traduit pas, et le dire évite
+         que l'analyse statique réclame une traduction française à chaque
+         passage. -->
+    <string name="app_name" translatable="false">ChessLab</string>
 </resources>

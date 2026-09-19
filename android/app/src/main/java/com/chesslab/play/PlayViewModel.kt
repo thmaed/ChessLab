@@ -257,9 +257,15 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     private fun strength(): EngineStrength = EngineStrength.of(ui.level)
 
     /**
-     * Le budget de réflexion. Sans pendule, 900 ms. Avec, une fraction du
-     * temps restant plus une part de l'incrément, bornée pour ne JAMAIS
-     * tomber au drapeau sur un seul coup.
+     * Le budget de réflexion. Sans pendule, celui que l'utilisateur a choisi
+     * dans les réglages ; avec, une fraction du temps restant plus une part de
+     * l'incrément, bornée pour ne JAMAIS tomber au drapeau sur un seul coup.
+     *
+     * Le réglage « Temps de réflexion du moteur » était enregistré et JAMAIS
+     * relu : ses quatre choix — rapide, normal, posé, long — ne changeaient
+     * rien, et le moteur prenait 900 ms quoi qu'on choisisse. Il ne vaut que
+     * sans pendule : avec une pendule, c'est elle qui commande, sans quoi
+     * « long » ferait tomber au drapeau en blitz.
      */
     private fun movetimeMs(): Int {
         val budget = baseMovetimeMs()
@@ -269,7 +275,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun baseMovetimeMs(): Int {
-        val c = clock ?: return 900
+        val c = clock ?: return com.chesslab.settings.SettingsStore.state.value.engineMoveTimeMs
         if (!c.control.hasClock) return 900
         val remaining = c.remaining(board.position.sideToMove) / 1000.0
         val increment = c.control.incrementSeconds.toDouble()

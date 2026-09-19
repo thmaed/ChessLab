@@ -91,14 +91,15 @@ class VariantClock(private val scope: CoroutineScope) {
     }
 
     /**
-     * Le temps que s'accorde le moteur. Sans pendule, 900 ms — assez pour un
-     * coup sensé, assez peu pour ne pas faire attendre. Avec une pendule, il se
-     * rationne comme un joueur : un trentième de ce qui reste, plus le gros de
-     * l'incrément, borné par le quart de ce qui reste.
+     * Le temps que s'accorde le moteur. Sans pendule, celui que l'utilisateur a
+     * choisi dans les réglages — le même que le mode « Contre l'ordinateur »,
+     * puisque c'est le même bouton. Avec une pendule, il se rationne comme un
+     * joueur : un trentième de ce qui reste, plus le gros de l'incrément, borné
+     * par le quart de ce qui reste.
      */
     fun movetimeFor(mover: Piece.Color): Int {
-        val c = clock ?: return DEFAULT_MOVETIME_MS
-        if (!c.hasClock) return DEFAULT_MOVETIME_MS
+        val c = clock ?: return reglage()
+        if (!c.hasClock) return reglage()
         val remaining = c.remaining(mover) / 1000.0
         val increment = c.control.incrementSeconds.toDouble()
         val base = remaining / 30 + increment * 0.8
@@ -110,7 +111,7 @@ class VariantClock(private val scope: CoroutineScope) {
         onTick(remaining(Piece.Color.white), remaining(Piece.Color.black))
     }
 
-    private companion object {
-        const val DEFAULT_MOVETIME_MS = 900
-    }
+    /** Le temps choisi dans les réglages, et 900 ms si rien n'a été choisi. */
+    private fun reglage(): Int =
+        com.chesslab.settings.SettingsStore.state.value.engineMoveTimeMs
 }
