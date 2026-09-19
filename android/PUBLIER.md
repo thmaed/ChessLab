@@ -183,6 +183,34 @@ L'avertissement `PKIX path building failed` qui suit est **normal** : la clé de
 téléversement est auto-signée, aucune autorité ne la garantit — c'est le
 principe. Seule la ligne « jar verified. » compte.
 
+### 3.3bis Ce que la console REPROCHE, et qui ne bloque pas
+
+Au premier envoi, trois avertissements accompagnent le fichier. Aucun
+n'empêche de publier ; deux méritent tout de même une réponse.
+
+**« Aucun testeur désigné »** — normal tant que la liste de testeurs n'est pas
+faite. Piste de test → onglet Testeurs.
+
+**« Aucun fichier de désobscurcissement »** — R8 est volontairement éteint
+(voir le commentaire dans `app/build.gradle.kts`). Sans code obscurci, il n'y a
+rien à désobscurcir : l'avertissement est sans objet. Le gain de taille serait
+d'ailleurs mince — l'essentiel du poids est en ASSETS (réseaux NNUE, modèle
+Maia), que R8 ne touche pas.
+
+**« Aucun symbole de débogage natif »** — celui-là cache une vraie économie.
+Les `.so` livrés ne sont PAS dépouillés : mesuré le 19/09/2026, chacun de nos
+deux moteurs garde `.symtab` et `.debug_info`, soit 13 371 symboles pour
+Fairy-Stockfish seul. Autrement dit, **les utilisateurs téléchargent nos
+informations de débogage**. Les dépouiller ferait maigrir l'app de plusieurs
+dizaines de mégaoctets.
+
+Attention au faux remède : `ndk { debugSymbolLevel = "SYMBOL_TABLE" }` dans le
+module `app` ne produit rien ici, parce que le réglage ne porte que sur les
+bibliothèques que le module COMPILE lui-même — les nôtres viennent d'`engine`.
+Le chantier tient donc en deux temps : dépouiller au moment de l'empaquetage,
+puis joindre les symboles au bundle. **Pas la veille d'une publication** : cela
+change le binaire livré, et il faudrait repasser la suite instrumentée dessus.
+
 ### 3.4 La taille
 
 | | compressé |

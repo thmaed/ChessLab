@@ -117,7 +117,10 @@ android {
     // classe `R`. Il n'a pas à ressembler à l'identifiant du Play Store, et le
     // renommer ferait bouger des milliers de lignes pour rien.
     namespace = "com.chesslab"
-    compileSdk = 35
+    // 36 = Android 16. Google exige que toute NOUVELLE app vise au moins ce
+    // niveau ; la console refuse le fichier sinon, et c'est une erreur, pas un
+    // avertissement.
+    compileSdk = 36
 
     defaultConfig {
         // L'identifiant sous lequel Google Play connaît l'app, et sous lequel
@@ -128,7 +131,7 @@ android {
         // qu'on possède le domaine chesslab.com.
         applicationId = "com.maeder.chesslab"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "0.1"
         ndk { abiFilters += listOf("arm64-v8a") }
@@ -157,6 +160,24 @@ android {
             // suite de tests passée sur le build release.
             isMinifyEnabled = false
             signingConfig = signingConfigs.findByName("release")
+
+            // La console Play réclame un fichier de symboles natifs. Il n'y en
+            // a pas, et `ndk { debugSymbolLevel = … }` n'y change rien ici :
+            // ce réglage ne porte que sur les bibliothèques que le module
+            // COMPILE lui-même, or les nôtres viennent du module `engine`.
+            //
+            // Sans conséquence pour l'instant, parce que les `.so` livrés ne
+            // sont PAS dépouillés : ils gardent `.symtab` et `.debug_info`
+            // (13 371 symboles pour Fairy-Stockfish). C'est pour cela que la
+            // trace du plantage du 15/09 portait des noms de fonctions — et
+            // c'est aussi pour cela qu'elle en portait de FAUX, le symbole
+            // exporté le plus proche n'étant pas toujours le bon.
+            //
+            // À faire un jour, et pas la veille d'une publication : dépouiller
+            // les bibliothèques (l'app rétrécirait de plusieurs dizaines de
+            // mégaoctets — les utilisateurs téléchargent aujourd'hui nos
+            // informations de débogage) et envoyer les symboles à part. Voir
+            // PUBLIER.md.
         }
         debug {
             // Un identifiant DISTINCT, pour que le build de test et le build
