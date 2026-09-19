@@ -112,6 +112,19 @@ play {
 
 }
 
+/**
+ * Le numéro de version de la PROCHAINE release, tenu dans `version.properties`.
+ *
+ * Il ne se saisit plus à la main : la tâche `bumpVersionCode` l'incrémente
+ * après chaque `assembleRelease` / `bundleRelease`. Une construction produit
+ * donc toujours un numéro que Google n'a jamais vu, et l'erreur « Le code de
+ * version N a déjà été utilisé » ne peut plus se produire.
+ */
+val fichierVersion = file("../version.properties")
+val prochainVersionCode: Int = Properties().apply {
+    fichierVersion.inputStream().use { load(it) }
+}.getProperty("versionCode").trim().toInt()
+
 android {
     // Le `namespace` est le paquet KOTLIN — celui des fichiers source et de la
     // classe `R`. Il n'a pas à ressembler à l'identifiant du Play Store, et le
@@ -132,12 +145,12 @@ android {
         applicationId = "com.maeder.chesslab"
         minSdk = 26
         targetSdk = 36
-        // ENTIER, jamais réutilisé : Google refuse un envoi qui reprend un
-        // code déjà vu, même sur une autre piste, et même quand l'envoi
-        // précédent a été REFUSÉ. Le 1 est parti avec le premier essai, celui
-        // que la console a rejeté parce qu'il visait encore le SDK 35.
-        // À incrémenter à chaque téléversement, sans exception.
-        versionCode = 3
+        // Lu dans `version.properties`, et incrémenté TOUT SEUL après chaque
+        // construction de release. Google consomme un versionCode dès qu'un
+        // fichier est déposé — même refusé —, et le numéro 1 puis le 2 sont
+        // partis ainsi, chacun coûtant un aller-retour.
+        versionCode = prochainVersionCode
+        // Celui-ci reste à la main : c'est ce que les gens LISENT.
         versionName = "1.0"
         ndk { abiFilters += listOf("arm64-v8a") }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -252,3 +265,31 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 }
+
+/**
+ * Incrémente le numéro de version après une construction de release.
+ *
+ * Écrit à la main plutôt que par `Properties.store` : celui-ci insère un
+ * horodatage en commentaire, et le fichier changerait à chaque écriture même
+ * sans que le numéro bouge — des diffs pour rien dans l'historique.
+ *
+ * Sauter un numéro ne coûte rien (Google en accepte jusqu'à 2 100 000 000) ;
+ * en réutiliser un coûte un aller-retour. La tâche penche donc du bon côté :
+ * deux constructions d'affilée consomment deux numéros, et c'est très bien.
+ */
+val bumpVersionCode by tasks.registering {
+    val fichier = fichierVersion
+    val utilise = prochainVersionCode
+    doLast {
+        fichier.writeText(
+            fichier.readText().replace(
+                Regex("^versionCode=.*$", RegexOption.MULTILINE),
+                "versionCode=${utilise + 1}",
+            )
+        )
+        logger.lifecycle("versionCode $utilise construit — le prochain sera ${utilise + 1}")
+    }
+}
+
+tasks.matching { it.name == "assembleRelease" || it.name == "bundleRelease" }
+    .configureEach { finalizedBy(bumpVersionCode) }
