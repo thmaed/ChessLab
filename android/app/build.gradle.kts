@@ -137,7 +137,7 @@ android {
         // précédent a été REFUSÉ. Le 1 est parti avec le premier essai, celui
         // que la console a rejeté parce qu'il visait encore le SDK 35.
         // À incrémenter à chaque téléversement, sans exception.
-        versionCode = 2
+        versionCode = 3
         versionName = "1.0"
         ndk { abiFilters += listOf("arm64-v8a") }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
