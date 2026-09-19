@@ -1,0 +1,55 @@
+/* Les couleurs de l'app, pour que le site et l'écran se ressemblent. */
+:root {
+  --fond: #0d1512;
+  --surface: #17211d;
+  --trait: #2a3733;
+  --texte: #eef4f1;
+  --texte-doux: #a8b8b2;
+  --texte-tenu: #74857f;
+  --accent: #5ccc8f;
+  --accent2: #3db8b8;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --fond: #f7faf8; --surface: #ffffff; --trait: #dde6e2;
+    --texte: #11201a; --texte-doux: #46574f; --texte-tenu: #6d7d76;
+    --accent: #1e8b56; --accent2: #17807f;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 0 20px;
+  background: var(--fond); color: var(--texte);
+  font: 16px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-text-size-adjust: 100%;
+}
+.page { max-width: 46rem; margin: 0 auto; padding-block: 3.5rem 5rem; }
+h1 { font-size: 2.1rem; line-height: 1.2; margin: 0 0 .4rem; letter-spacing: -.02em; }
+h1 .lab { color: var(--accent2); }
+h2 {
+  font-size: 1.25rem; margin: 2.6rem 0 .8rem; letter-spacing: -.01em;
+  padding-top: 1.6rem; border-top: 1px solid var(--trait);
+}
+h3 { font-size: 1rem; margin: 1.8rem 0 .5rem; color: var(--texte-doux); }
+p, li { color: var(--texte-doux); }
+strong { color: var(--texte); font-weight: 600; }
+a { color: var(--accent); }
+a:hover { color: var(--accent2); }
+.accroche { font-size: 1.15rem; color: var(--texte-doux); margin: 0 0 2rem; }
+.promesse {
+  background: var(--surface); border: 1px solid var(--trait);
+  border-radius: 14px; padding: 1.25rem 1.4rem; margin: 2rem 0;
+}
+.promesse p:first-child { margin-top: 0; }
+.promesse p:last-child { margin-bottom: 0; }
+table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: .95rem; }
+th, td { text-align: left; padding: .55rem .7rem; border-bottom: 1px solid var(--trait); }
+th { color: var(--texte-tenu); font-weight: 600; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; }
+td { color: var(--texte-doux); }
+.date { color: var(--texte-tenu); font-size: .9rem; }
+.pied { margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--trait); font-size: .9rem; color: var(--texte-tenu); }
+.pied a { color: var(--texte-doux); }
+.langues { margin: 0 0 2.5rem; font-size: .9rem; }
+.liens { list-style: none; padding: 0; margin: 2rem 0; }
+.liens li { padding: .35rem 0; }
+code { background: var(--surface); border: 1px solid var(--trait); border-radius: 5px; padding: .1em .4em; font-size: .88em; }
