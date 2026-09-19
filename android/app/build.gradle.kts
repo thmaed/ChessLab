@@ -132,8 +132,13 @@ android {
         applicationId = "com.maeder.chesslab"
         minSdk = 26
         targetSdk = 36
-        versionCode = 1
-        versionName = "0.1"
+        // ENTIER, jamais réutilisé : Google refuse un envoi qui reprend un
+        // code déjà vu, même sur une autre piste, et même quand l'envoi
+        // précédent a été REFUSÉ. Le 1 est parti avec le premier essai, celui
+        // que la console a rejeté parce qu'il visait encore le SDK 35.
+        // À incrémenter à chaque téléversement, sans exception.
+        versionCode = 2
+        versionName = "1.0"
         ndk { abiFilters += listOf("arm64-v8a") }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
