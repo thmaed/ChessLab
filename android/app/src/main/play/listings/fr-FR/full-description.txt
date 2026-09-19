@@ -22,7 +22,7 @@ PUZZLES
 Plus de 100 000 problèmes tactiques de la base Lichess, filtrables par niveau et par thème — plus les vôtres, tirés de vos propres erreurs.
 
 VARIANTES
-Chess960 (échecs Fischer Random), Roi de la colline, Trois échecs, Horde, Course des rois, Atomique et Antiéchecs, contre l'ordinateur, chacune avec son analyse de fin de partie.
+Douze : Chess960 (échecs Fischer Random), Roi de la colline, Trois échecs, Horde, Course des rois, Atomique, Crazyhouse, Antiéchecs, les Barricades et leur version aléatoire, le Duck Chess et le Coup Volé. Chacune se règle comme une vraie partie — camp, force du moteur, cadence, aides — et se revoit ensuite aux règles de la variante, pas à celles des échecs ordinaires.
 
 DEUX JOUEURS
 À deux sur le même appareil, le plateau se retournant à chaque coup pour rester lisible face à face.

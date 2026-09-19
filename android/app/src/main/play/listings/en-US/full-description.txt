@@ -22,7 +22,7 @@ PUZZLES
 Over 100,000 tactical problems from the Lichess database, filtered by level and by theme — plus your own, drawn from your own mistakes.
 
 VARIANTS
-Chess960 (Fischer Random), King of the Hill, Three-Check, Horde, Racing Kings, Atomic and Antichess, against the computer, each with its own end-of-game analysis.
+Twelve: Chess960 (Fischer Random), King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Crazyhouse, Antichess, Barricades and its random version, Duck Chess and Stolen Move. Each is set up like a real game — side, engine strength, clock, assistance — and reviewed afterwards by the variant's own rules, not by ordinary chess ones.
 
 TWO PLAYERS
 Two people on one device, the board flipping each move so it reads right from both sides.
