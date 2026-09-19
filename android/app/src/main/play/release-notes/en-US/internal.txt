@@ -1,3 +1,3 @@
 First Android release of ChessLab.
 
-Play nine characters or Stockfish, analyse your games move by move with the reason behind each mistake, 58 openings, 78 endgames, over 100,000 puzzles, seven variants. Everything runs on the phone, with no account and no network.
+Play nine characters or Stockfish, analyse your games move by move with the reason behind each mistake, 58 openings, 78 endgames, over 100,000 puzzles, twelve variants. Everything runs on the phone, with no account and no network.

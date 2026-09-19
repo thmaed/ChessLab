@@ -1,0 +1,5 @@
+Première version Android de ChessLab, à éprouver.
+
+Jouer contre neuf personnages ou contre Stockfish, analyser ses parties coup par coup avec la raison de chaque faute, 58 ouvertures, 78 finales, plus de 100 000 puzzles, douze variantes.
+
+Tout tourne sur le téléphone : aucun compte, aucun réseau, aucune donnée qui sort de l'appareil. L'app fonctionne en mode avion, c'est le meilleur moyen de s'en assurer.
