@@ -50,7 +50,7 @@ introduit un texte faux.
 
 ### Module « Variantes » — la REVUE de partie et la place des règles — 20/09
 
-- [ ] **L'analyse d'une partie de variante n'avait pas de COURBE
+- [x] **L'analyse d'une partie de variante n'avait pas de COURBE
       d'évaluation.** iOS en pose une sous la barre de navigation, dans les
       trois écrans de revue de variante (`VariantAnalysisView`,
       `Chess960AnalysisView`, `DuckChessAnalysisView`) ; Android n'en avait que
@@ -58,7 +58,7 @@ introduit un texte faux.
       et un appui y saute. Le composant existait déjà (`EvalCurve.kt`) : il ne
       manquait que les points, et donc le cache des évaluations en pions que la
       passe de classification ne gardait pas.
-- [ ] **Ni carte de PRÉCISION.** Elle vient juste dessous sur iOS, dans les
+- [x] **Ni carte de PRÉCISION.** Elle vient juste dessous sur iOS, dans les
       mêmes trois écrans. Le calcul est celui du mode « Contre l'ordinateur »,
       et vit désormais dans `VariantAccuracy.kt` — pendant exact de
       `VariantAccuracy.swift`, huit tests JVM à l'appui.
@@ -66,7 +66,7 @@ introduit un texte faux.
       coup à la fin, comme sur iOS où ce sont des propriétés calculées lues au
       cache. La courbe s'allonge, les pastilles se posent, le pourcentage
       s'affine.
-- [ ] **L'écran de JEU affichait les règles de la variante** au-dessus du
+- [x] **L'écran de JEU affichait les règles de la variante** au-dessus du
       plateau, sur deux à quatre lignes prises au plateau. Aucun écran de jeu
       iOS ne le fait : les règles se lisent sur l'écran de réglages, avant de
       lancer la partie. Elles y sont désormais dans une section « Règle », avec
@@ -106,8 +106,24 @@ repris un par un sur le Galaxy A16.
       main : ils vérifient le raisonnement, pas le CONTRAT avec le moteur. Or
       c'est là qu'on s'était déjà trompé — le septième champ des Trois Échecs
       ne se voyait dans aucun journal.
-- [ ] La douzième, le **Duck Chess**, est arbitrée dans l'app sans moteur :
+- [x] La douzième, le **Duck Chess**, est arbitrée dans l'app sans moteur :
       elle se vérifie autrement, et ne l'est pas encore.
+
+### La phrase de victoire, et un écart ASSUMÉ au Duck Chess — 20/09
+
+- [x] **La phrase de fin s'affiche vraiment** (`VariantVictoryTest`) : une
+      partie de Roi de la colline jouée coup par coup PAR OÙ LES DOIGTS
+      PASSENT, sur l'appareil, avec le vrai moteur pour arbitre, jusqu'à
+      « Blancs a gagné (roi au centre) ». `VariantEndingsTest` prouvait le
+      verdict ; celui-ci prouve qu'il arrive jusqu'aux yeux.
+
+**Un écart ASSUMÉ, et c'est iOS qui est en tort** : au Duck Chess, iOS annonce
+la fin comme un « échec et mat » (`GameOutcome(reason: .checkmate)`), alors que
+son propre générateur de notation écrit, commentaire à l'appui, qu'il n'y a « ni
+échec ni mat » dans cette variante — on y gagne en CAPTURANT le roi. Android dit
+« Roi capturé — Blancs », ce qui est juste. Aligner Android sur iOS lui ferait
+dire une chose que le code d'iOS lui-même déclare fausse : à trancher, dans
+l'autre sens de préférence.
 
 ### La barre d'évaluation, activée PAR DÉFAUT — 20/09
 
@@ -186,7 +202,7 @@ Deux joueurs, la bibliothèque de parties.
       « Analyser la dernière partie » sous les statistiques ; côté Android il
       fallait exporter le PGN de TOUTE la série et le recoller dans l'analyse
       pour en regarder une seule.
-- [ ] **Le lecteur de cours ne disait rien au bout d'une ligne.** « Suivant »
+- [x] **Le lecteur de cours ne disait rien au bout d'une ligne.** « Suivant »
       devenait gris, et c'était tout. iOS écrit « Fin de la ligne. Reviens en
       arrière pour explorer une variante » — le mot manquait, et avec lui
       l'invitation à aller voir les variantes.
@@ -206,20 +222,20 @@ refaire en deux écrans est un chantier à part, à décider.
 
 ### Modules « Analyser » et « Accueil » — 20/09
 
-- [ ] **La ligne d'état du moteur disait « profondeur 18 ».** iOS a renoncé à
+- [x] **La ligne d'état du moteur disait « profondeur 18 ».** iOS a renoncé à
       ce mot, commentaire à l'appui : il ne dit rien à qui ne connaît pas les
       moteurs. Devient « L'ordinateur calcule — 18 coups d'avance », dans une
       capsule au-dessus du plateau, avec le point qui s'allume.
-- [ ] **L'écran avait SA barre d'évaluation** : un ruban vert et bleu de 8 dp,
+- [x] **L'écran avait SA barre d'évaluation** : un ruban vert et bleu de 8 dp,
       doublé d'une carte répétant le chiffre, la profondeur et le début de la
       variante. iOS n'a ni la carte ni la variante — le score est DANS la barre,
       et les coups du moteur sont dans la barre des candidats juste dessous.
       Remplacée par la barre partagée.
-- [ ] **La bande des coups était coincée dans la rangée de navigation**, à
+- [x] **La bande des coups était coincée dans la rangée de navigation**, à
       côté de cinq boutons : deux capsules y tenaient. Elle passe en pleine
       largeur, en fin de panneau, sous un titre « Coups joués » — la place
       qu'elle a sur iOS.
-- [ ] **Trois formats de nombres divergeaient.** L'éval d'un candidat
+- [x] **Trois formats de nombres divergeaient.** L'éval d'un candidat
       s'écrivait « +0,44 » (deux décimales, virgule de la locale) contre
       « +0.4 » sur iOS, et « +M5 » là où iOS écrit « M5 ». La précision
       s'écrivait « 97,1 % » contre « 97% ». L'écart de gain affichait « −0 % »
@@ -254,30 +270,30 @@ côtés. Ce qui suit a été trouvé, et corrigé.
       rend une position plausible. Un cavalier capturé apparaissait en h1.
       Toutes les lectures passent désormais par `VariantFen.forChessKit`,
       pendant de `VariantFEN.swift`, et cinq tests le verrouillent.
-- [ ] **La FEN des Trois Échecs était ILLISIBLE.** Fairy-Stockfish y glisse un
+- [x] **La FEN des Trois Échecs était ILLISIBLE.** Fairy-Stockfish y glisse un
       septième champ (« 3+3 », les échecs restants) ; `chesskit` en attend six
       exactement et rendait `null`. Tout ce qui en dépendait retombait
       silencieusement sur rien. Le champ est retiré au même endroit.
 
 **Ce qu'Android ne disait pas :**
 
-- [ ] **Aucune partie de variante ne disait QUI avait gagné.** Le moteur
+- [x] **Aucune partie de variante ne disait QUI avait gagné.** Le moteur
       annonçait « plus aucun coup légal » et l'écran affichait « Partie
       terminée ». iOS dit « Vous avez gagné (roi au centre) ». Porté :
       `VariantOutcome.kt` (pendant d'`EngineLegalityVariant.outcome` et de
       `FairyVariant.specialOutcome`) et `VariantDrawRules.kt` — dont la règle
       du matériel insuffisant, qui ne vaut QUE dans les variantes où l'on
       gagne par mat. Douze tests JVM.
-- [ ] **Le compteur des Trois Échecs n'existait pas.** C'est la ressource qui
+- [x] **Le compteur des Trois Échecs n'existait pas.** C'est la ressource qui
       décide la partie ; iOS l'affiche en permanence sur chaque bandeau
       joueur. Lu dans la FEN du moteur (`ThreeCheckFen`).
-- [ ] **Les coups s'affichaient en UCI** — « b5b6 a7b6 » — là où iOS écrit
+- [x] **Les coups s'affichaient en UCI** — « b5b6 a7b6 » — là où iOS écrit
       « b6 axb6 ». Portés : `VariantSan.kt` (d'`EngineLegalitySAN.swift`) et
       `DuckChessSan.kt` (de `DuckChessSAN.swift`, avec son « ++ » et sans
       échec ni mat). Le Coup Volé fournissait déjà sa notation. Douze tests.
-- [ ] **L'écran de jeu n'avait pas de BANDE DES COUPS** : un « 12 demi-coups »
+- [x] **L'écran de jeu n'avait pas de BANDE DES COUPS** : un « 12 demi-coups »
       disait seulement qu'il s'était passé quelque chose.
-- [ ] **Les bandeaux joueurs n'existaient pas.** Une ligne de pendule nue, et
+- [x] **Les bandeaux joueurs n'existaient pas.** Une ligne de pendule nue, et
       seulement s'il y avait une cadence : sans horloge, rien ne disait qui
       jouait quoi. iOS montre « Ordinateur » / « Vous », l'icône, le témoin de
       réflexion, le compteur d'échecs et la pendule.
@@ -286,20 +302,20 @@ côtés. Ce qui suit a été trouvé, et corrigé.
 
 **Ce qui était là mais pas pareil :**
 
-- [ ] **La barre d'évaluation** : 8 dp sans rien écrit, contre 20 pt avec le
+- [x] **La barre d'évaluation** : 8 dp sans rien écrit, contre 20 pt avec le
       score DEDANS, un repère d'égalité au milieu, dégradés et liseré côté
       iOS. Refaite à l'identique, et elle sert une dizaine d'écrans. Son score
       s'écrit « +1.5 », avec un point, dans les deux langues — comme iOS, dont
       le `String(format:)` travaille en locale POSIX.
-- [ ] **Le ruban de coups** était du texte posé sur le fond ; iOS en fait des
+- [x] **Le ruban de coups** était du texte posé sur le fond ; iOS en fait des
       CAPSULES bordées de la couleur de la catégorie, le coup courant en
       dégradé d'accent. Refait, et partagé par les deux écrans d'analyse comme
       chez iOS. Il se CENTRE maintenant sur le coup affiché au lieu de rester
       collé à la fin.
-- [ ] **La pastille de qualité** (« !! », « ?? ») se pose désormais SUR la case
+- [x] **La pastille de qualité** (« !! », « ?? ») se pose désormais SUR la case
       d'arrivée, dans les deux écrans d'analyse, au lieu d'une ligne de texte
       à côté du plateau.
-- [ ] **La barre de navigation de la revue** est une carte portant le compteur
+- [x] **La barre de navigation de la revue** est une carte portant le compteur
       « 4 / 10 » au milieu, la progression de la passe à côté — la forme
       d'iOS —, au lieu de quatre flèches alignées à gauche et d'une barre de
       progression sur sa propre ligne.
