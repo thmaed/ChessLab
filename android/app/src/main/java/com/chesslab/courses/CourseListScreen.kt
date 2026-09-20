@@ -129,9 +129,14 @@ fun CourseListScreen(
             (levelFilter == null || entry.level == levelFilter || UserOpeningStore.isUserCourse(entry.id))
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         LazyColumn(
-            Modifier.fillMaxSize(),
+            // BORNÉE à la mesure de lecture : une liste de 136 entrées étirée
+            // sur toute la largeur d'une tablette met le titre à un bout et le
+            // compte de positions à l'autre, avec un mètre de vide entre. iOS
+            // borne ainsi tous ses écrans qui se LISENT (`Theme.readableWidth`) ;
+            // il ne met pas ces listes en deux colonnes, et nous non plus.
+            Modifier.widthIn(max = com.chesslab.ui.Metrics.readableWidth).fillMaxSize(),
             contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 4.dp, bottom = 90.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
@@ -257,7 +262,11 @@ fun CourseListScreen(
         // dans une liste de 136 entrées.
         SearchField(
             query, endgames, filtered.size,
+            // Bornée comme la liste qu'elle filtre : un champ de recherche
+            // étiré sur toute la largeur d'une tablette, sous une liste
+            // bornée, se lit comme un élément d'un autre écran.
             Modifier.align(Alignment.BottomCenter).imePadding()
+                .widthIn(max = com.chesslab.ui.Metrics.readableWidth)
                 .padding(horizontal = 20.dp, vertical = 14.dp),
         ) { query = it }
     }

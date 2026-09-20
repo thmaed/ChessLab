@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.rememberScrollState
@@ -116,9 +117,21 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
     // mesurait : le nombre d'éléments changeait sous ses pieds. Ici tout est
     // composé, donc rien ne change de nombre.
     BoxWithConstraints(Modifier.fillMaxSize()) {
-        val columns = ((maxWidth - 40.dp) / 174.dp).toInt().coerceAtLeast(2)
+        // BORNÉE À LA MESURE DE LECTURE, et centrée. Sans cette borne, une
+        // tablette étalait les huit tuiles sur une rangée de sept plus une
+        // orpheline, et laissait les deux tiers du bas vides. iOS borne de la
+        // même façon (`Theme.readableWidth`).
+        val largeur = minOf(maxWidth, Metrics.readableWidth)
+        val columns = tileColumns(largeur, padding = 20.dp, spacing = 14.dp)
         Column(
-            Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp).testTag("accueil"),
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .testTag("accueil"),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+        Column(
+            Modifier.widthIn(max = Metrics.readableWidth).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Header(onOpen)
@@ -155,6 +168,7 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
             }
             if (recent.isNotEmpty()) RecentGames(recent, onOpen)
             Spacer(Modifier.height(8.dp))
+        }
         }
     }
 }

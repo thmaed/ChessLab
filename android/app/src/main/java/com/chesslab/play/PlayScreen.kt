@@ -27,6 +27,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -227,12 +228,32 @@ fun PlayScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
+    // Sur un grand écran, la liste des coups n'a plus à se cacher derrière un
+    // bouton : il y a la place de la montrer en continu, et c'est ce que fait
+    // l'iPad. Sur téléphone elle reste dans sa feuille — la place y manque.
+    val grandEcran = maxWidth >= com.chesslab.ui.Metrics.regularBreakpoint
     if (isLandscape()) {
         Row(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
-            Box(Modifier.weight(1f).fillMaxHeight(), Alignment.Center) { board() }
+            // Le plateau est CARRÉ : borné à la hauteur, il ne déborde pas, et
+            // toute la largeur restante va au panneau. Sans cette borne il
+            // collait au bord sur une tablette.
+            Box(
+                Modifier.weight(1f).fillMaxHeight().padding(horizontal = 4.dp),
+                Alignment.Center,
+            ) { board() }
+            // Bornée : sans cap, un écran large éparpille les commandes d'un
+            // bord à l'autre — transport à gauche, abandon collé à droite. Le
+            // poste de jeu reste un bloc compact, comme iOS. La borne est posée
+            // sur la colonne INTÉRIEURE : `weight` fixe déjà la largeur de la
+            // sienne, et un `widthIn` posé après elle serait sans effet.
+            Box(Modifier.weight(1f).fillMaxHeight(), Alignment.TopCenter) {
             Column(
-                Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()),
+                Modifier
+                    .widthIn(max = 420.dp)
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .verticalScroll(rememberScrollState()),
             ) {
                 banner()
                 opponentRow()
@@ -241,7 +262,14 @@ fun PlayScreen(
                 userRow()
                 Spacer(Modifier.height(8.dp))
                 actions()
+                if (grandEcran) {
+                    Spacer(Modifier.height(16.dp))
+                    Column(gutter) {
+                        MovesSection(ui.sanMoves, ui.displayedPly, model::reviewTo)
+                    }
+                }
                 Spacer(Modifier.height(20.dp))
+            }
             }
         }
     } else Column(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
@@ -254,6 +282,14 @@ fun PlayScreen(
         userRow()
         Spacer(Modifier.height(8.dp))
         actions()
+        // Tablette en PORTRAIT : le plateau prend la largeur, et il reste de
+        // quoi dérouler les coups en dessous — sans feuille, comme iPad.
+        if (grandEcran) {
+            Spacer(Modifier.height(16.dp))
+            Column(gutter.verticalScroll(rememberScrollState())) {
+                MovesSection(ui.sanMoves, ui.displayedPly, model::reviewTo)
+            }
+        }
     }
 
     // Seuls les confettis passent PAR-DESSUS, et seulement pour une victoire :
@@ -602,33 +638,53 @@ private fun MoveListSheet(
 ) {
     ModalBottomSheet(onDismissRequest = onClose, containerColor = Palette.surface) {
         Column(Modifier.padding(horizontal = 20.dp).padding(bottom = 28.dp)) {
-            Text(stringResource(R.string.play_moves), fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
-            Spacer(Modifier.height(12.dp))
-            if (moves.isEmpty()) {
-                Text(stringResource(R.string.no_moves_played), fontSize = 13.sp, color = Palette.textSecondary)
-            } else {
-                Column(Modifier.heightIn(max = 420.dp).verticalScroll(rememberScrollState())) {
-                    moves.chunked(2).forEachIndexed { index, pair ->
-                        Row(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
-                            Text("${index + 1}.", fontSize = 13.sp, color = Palette.textTertiary,
-                                modifier = Modifier.width(34.dp))
-                            pair.forEachIndexed { half, san ->
-                                val ply = index * 2 + half + 1
-                                Text(
-                                    sanText(san), fontSize = 14.sp,
-                                    fontWeight = if (ply == currentPly) FontWeight.Bold else FontWeight.Normal,
-                                    color = if (ply == currentPly) Palette.accent else Palette.textPrimary,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .clickable { onPick(ply) }
-                                        .testTag("coup-${ply - 1}"),
-                                )
-                            }
-                            if (pair.size == 1) Spacer(Modifier.weight(1f))
-                        }
-                    }
+            MovesSection(moves, currentPly, onPick, maxHeight = 420.dp)
+        }
+    }
+}
+
+/**
+ * Les coups joués, en deux colonnes. Pendant de `movesSection` (`PlayView`).
+ *
+ * Elle vivait DANS la feuille modale, et n'existait donc que sur téléphone,
+ * derrière un bouton. Sur une tablette il y a la place de la montrer en
+ * continu — c'est ce que fait iPad — et la colonne de droite, qui était vide
+ * aux trois quarts, a enfin quelque chose à dire.
+ */
+@Composable
+fun MovesSection(
+    moves: List<String>,
+    currentPly: Int,
+    onPick: (Int) -> Unit,
+    maxHeight: Dp = Dp.Unspecified,
+) {
+    Text(stringResource(R.string.play_moves), fontSize = 16.sp,
+        fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+    Spacer(Modifier.height(12.dp))
+    if (moves.isEmpty()) {
+        Text(stringResource(R.string.no_moves_played), fontSize = 13.sp, color = Palette.textSecondary)
+        return
+    }
+    val defilement = if (maxHeight == Dp.Unspecified) Modifier
+    else Modifier.heightIn(max = maxHeight).verticalScroll(rememberScrollState())
+    Column(defilement) {
+        moves.chunked(2).forEachIndexed { index, pair ->
+            Row(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+                Text("${index + 1}.", fontSize = 13.sp, color = Palette.textTertiary,
+                    modifier = Modifier.width(34.dp))
+                pair.forEachIndexed { half, san ->
+                    val ply = index * 2 + half + 1
+                    Text(
+                        sanText(san), fontSize = 14.sp,
+                        fontWeight = if (ply == currentPly) FontWeight.Bold else FontWeight.Normal,
+                        color = if (ply == currentPly) Palette.accent else Palette.textPrimary,
+                        modifier = Modifier
+                            .weight(1f)
+                            .clickable { onPick(ply) }
+                            .testTag("coup-${ply - 1}"),
+                    )
                 }
+                if (pair.size == 1) Spacer(Modifier.weight(1f))
             }
         }
     }

@@ -80,7 +80,9 @@ fun AnalysisEntryScreen(
         }
     }
 
-    Column(
+    // BORNÉE et centrée : trois cartes étirées sur une tablette laissaient
+    // 70 % de noir sous elles. iOS borne pareil (`Theme.readableWidth`).
+    com.chesslab.ui.ReadableColumn(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {

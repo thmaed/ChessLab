@@ -293,20 +293,22 @@ class AppTest {
 
     @Test fun settingsChangeTheBoardTheme() {
         compose.onNodeWithTag("reglages").performClick()
-        // Les sections suivent l'ordre d'iOS depuis le 20/09 : le temps de
-        // réflexion est passé sous les sons, donc hors de l'écran. Un clic sur
-        // un nœud non affiché échoue — on fait défiler jusqu'à lui.
+        // Les sections suivent l'ordre d'iOS depuis le 20/09, et une section
+        // peut donc être hors de l'écran : un clic sur un nœud non affiché
+        // échoue, d'où le défilement.
+        //
+        // Ni « temps-1000 » ni le plateau d'aperçu ne sont attendus : le
+        // réglage du temps de réflexion et le grand aperçu ont été RETIRÉS le
+        // 20/09 — iOS n'a ni l'un ni l'autre, et chaque ligne de thème porte
+        // désormais ses propres pièces.
         compose.onNodeWithTag("theme-blue").performScrollTo().performClick()
         compose.onNodeWithTag("piece-merida").performScrollTo().performClick()
-        compose.onNodeWithTag("temps-1000").performScrollTo().performClick()
-        // le plateau d'aperçu suit le réglage
-        compose.onNodeWithTag("case-e2").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("theme-blue").performScrollTo().assertIsDisplayed()
 
         // on repose les valeurs par défaut : un test ne doit pas déteindre
         // sur les suivants, et les réglages sont PERSISTÉS
         compose.onNodeWithTag("theme-classic").performScrollTo().performClick()
         compose.onNodeWithTag("piece-classic").performScrollTo().performClick()
-        compose.onNodeWithTag("temps-400").performScrollTo().performClick()
     }
 
     @Test fun aCharacterPlaysWithMaia() {

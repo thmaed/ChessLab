@@ -380,16 +380,33 @@ inaccessible.
 « conçue pour les téléphones », ce qui est exact. Publier les captures telles
 quelles aurait desservi la fiche — une app aux deux tiers vide se referme.
 
-Ce qui reste à faire, le jour où on s'y met :
+**FAIT le 20/09**, mesuré sur l'émulateur 2560 × 1600 (1280 × 800 dp) :
 
-- [ ] **Accueil** : plafonner la largeur des tuiles et centrer la grille.
-- [ ] **Entrée de l'analyse** : centrer et borner.
-- [ ] **Partie** : donner à la colonne de droite ce qu'elle a déjà sur
-      téléphone — liste des coups, pièces prises — plutôt que du vide.
-- [ ] **Listes d'ouvertures et de finales** : deux colonnes au lieu d'une
-      très large.
-- [ ] Puis les douze captures : `tools/captures-tablette.sh` les prend en deux
+- [x] **Accueil** : la grille est bornée à la mesure de lecture et centrée —
+      trois colonnes de trois, au lieu de sept plus une orpheline.
+- [x] **Entrée de l'analyse** : bornée et centrée.
+- [x] **Partie** : le plateau prend la hauteur à gauche, la colonne de droite
+      est plafonnée à 420 dp — sans cap, les commandes s'éparpillaient d'un
+      bord à l'autre — et elle porte maintenant la LISTE DES COUPS, qui se
+      cachait derrière un bouton. C'est ce que fait l'iPad : il y a la place,
+      la feuille modale n'a plus lieu d'être.
+- [x] **Listes d'ouvertures et de finales** : bornées à la mesure de lecture,
+      champ de recherche compris. **PAS en deux colonnes** : c'était le plan du
+      19/09, mais iOS ne le fait pas — il n'a ni grille ni deux colonnes sur
+      ces écrans, et le suivre aurait fabriqué une divergence au lieu d'en
+      corriger une.
+- [ ] Les douze captures : `tools/captures-tablette.sh` les prend en deux
       commandes, il est écrit et éprouvé.
+
+Le gabarit vit dans `ui/Layout.kt` : `Metrics.readableWidth` (720 dp, la valeur
+d'iOS), les deux largeurs minimales de tuile, et le seuil de 600 dp au-delà
+duquel on n'est plus sur un téléphone.
+
+**Un piège Compose, documenté dans le code** : `fillMaxWidth()` AVANT
+`widthIn()` perd la borne, sans erreur ni avertissement — le premier fixe la
+largeur au maximum du parent, le second ne peut plus la réduire. L'ordre
+correct est `widthIn` d'abord. La première tentative n'avait aucun effet
+visible, et c'est une capture d'écran qui l'a dit.
 
 Ce chantier a gagné en importance le 19/09 : viser le SDK 36 fait qu'Android 16
 IGNORE les restrictions de redimensionnement sur grand écran. L'app y sera
