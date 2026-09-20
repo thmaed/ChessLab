@@ -18,6 +18,13 @@ data class Variant(
     @StringRes val blurbRes: Int,
     /** L'accroche COURTE de la tuile : trois mots, pas un paragraphe. */
     @StringRes val shortRes: Int,
+    /**
+     * Le nom COURT, pour une tuile trop étroite pour le nom entier — « Roi
+     * colline » plutôt que « Roi de la colline ». C'est celui qu'iOS affiche
+     * sur iPhone ; les variantes dont le nom tient déjà n'en ont pas, et
+     * gardent le leur.
+     */
+    @StringRes val shortTitleRes: Int = titleRes,
     val chess960: Boolean = false,
     /**
      * La variante porte des MURS : des cases hors du jeu, que le moteur
@@ -46,6 +53,22 @@ data class Variant(
 
 object VariantCatalog {
 
+    /**
+     * Les douze variantes, DANS L'ORDRE DU HUB iOS.
+     *
+     * Cet ordre n'est pas alphabétique et ne suit aucune famille technique :
+     * il va du plus familier au plus dépaysant. Chess960 d'abord, parce qu'on
+     * y joue aux échecs ordinaires depuis une autre position ; puis celles qui
+     * ajoutent une condition de victoire ; puis celles qui changent les règles
+     * du mouvement ; et les Barricades ferment la marche, parce qu'elles
+     * modifient l'échiquier lui-même.
+     *
+     * Côté iOS il se lit dans `VariantsHubView`, qui enchaîne quatre listes —
+     * Chess960, `FairyVariant.all`, `EngineLegalityVariant.hubOrdered`, le
+     * Coup Volé, le Duck Chess, puis `hubTrailing`. Ici tout tient en une
+     * seule liste : le classement iOS vient de sa manière d'arbitrer, pas
+     * d'une intention de présentation, et rien n'oblige à la reproduire.
+     */
     val all = listOf(
         Variant(
             "chess960", "chess", R.string.variant_chess960, R.string.variant_chess960_blurb,
@@ -55,10 +78,12 @@ object VariantCatalog {
         Variant(
             "kingofthehill", "kingofthehill", R.string.variant_koth, R.string.variant_koth_blurb,
             R.string.variant_koth_short,
+            shortTitleRes = R.string.variant_koth_name,
         ),
         Variant(
             "3check", "3check", R.string.variant_3check, R.string.variant_3check_blurb,
             R.string.variant_3check_short,
+            shortTitleRes = R.string.variant_3check_name,
         ),
         Variant(
             "horde", "horde", R.string.variant_horde, R.string.variant_horde_blurb,
@@ -67,10 +92,15 @@ object VariantCatalog {
         Variant(
             "racingkings", "racingkings", R.string.variant_racing, R.string.variant_racing_blurb,
             R.string.variant_racing_short,
+            shortTitleRes = R.string.variant_racing_name,
         ),
         Variant(
             "atomic", "atomic", R.string.variant_atomic, R.string.variant_atomic_blurb,
             R.string.variant_atomic_short,
+        ),
+        Variant(
+            "antichess", "antichess", R.string.variant_antichess, R.string.variant_antichess_blurb,
+            R.string.variant_antichess_short,
         ),
         // La seule variante du hub où l'on POSE des pièces : elle a sa
         // réserve, lue dans la FEN, et son geste de pose.
@@ -78,12 +108,24 @@ object VariantCatalog {
             "crazyhouse", "crazyhouse", R.string.variant_crazyhouse,
             R.string.variant_crazyhouse_blurb, R.string.variant_crazyhouse_short,
         ),
+        // Le Coup Volé n'est arbitré par aucun moteur : le tour double n'existe
+        // dans aucun. `chesskit` arbitre chaque coup, l'app tient le tour.
         Variant(
-            "antichess", "antichess", R.string.variant_antichess, R.string.variant_antichess_blurb,
-            R.string.variant_antichess_short,
+            "stolenmove", "chess", R.string.variant_stolen, R.string.variant_stolen_blurb,
+            // Le jeton se dépense en SECRET : à deux sur le même écran, il n'y
+            // aurait plus de surprise, et c'est toute la variante.
+            R.string.variant_stolen_short, appRuled = true, supportsTwoPlayers = false,
+        ),
+        // Le Duck Chess non plus : un coup y est DEUX actions, ce que le
+        // protocole UCI ne sait pas exprimer.
+        Variant(
+            "duck", "chess", R.string.variant_duck, R.string.variant_duck_blurb,
+            R.string.variant_duck_short, appRuled = true,
+            shortTitleRes = R.string.variant_duck_name,
         ),
         // Les deux Barricades ne sont pas des variantes du moteur : c'est
-        // `BarricadesConfiguration` qui les lui enseigne au démarrage.
+        // `BarricadesConfiguration` qui les lui enseigne au démarrage. Elles
+        // ferment la marche, comme sur iOS.
         Variant(
             BarricadesConfiguration.variantId, BarricadesConfiguration.variantId,
             R.string.variant_barricades, R.string.variant_barricades_blurb,
@@ -93,20 +135,7 @@ object VariantCatalog {
             BarricadesConfiguration.randomVariantId, BarricadesConfiguration.randomVariantId,
             R.string.variant_random_barricades, R.string.variant_random_barricades_blurb,
             R.string.variant_random_barricades_short, hasWalls = true, wallsMove = true,
-        ),
-        // Le Duck Chess n'est pas arbitré par le moteur : un coup y est DEUX
-        // actions, ce que le protocole UCI ne sait pas exprimer.
-        Variant(
-            "duck", "chess", R.string.variant_duck, R.string.variant_duck_blurb,
-            R.string.variant_duck_short, appRuled = true,
-        ),
-        // Le Coup Volé non plus : le tour double n'existe dans aucun moteur.
-        // `chesskit` arbitre chaque coup, l'app tient le tour.
-        Variant(
-            "stolenmove", "chess", R.string.variant_stolen, R.string.variant_stolen_blurb,
-            // Le jeton se dépense en SECRET : à deux sur le même écran, il n'y
-            // aurait plus de surprise, et c'est toute la variante.
-            R.string.variant_stolen_short, appRuled = true, supportsTwoPlayers = false,
+            shortTitleRes = R.string.variant_random_barricades_name,
         ),
     )
 

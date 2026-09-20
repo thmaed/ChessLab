@@ -7,6 +7,47 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Module « Variantes » — l'INTERFACE alignée sur iOS — FAIT le 20/09
+Relevé en comparant les deux catalogues ligne à ligne. Rien ne fonctionnait
+mal : les douze variantes se jouaient. C'est le VOCABULAIRE et la PRÉSENTATION
+qui divergeaient, et cela ne se voit qu'en posant les deux téléphones côte à
+côte.
+
+- [x] **Les descriptions des règles étaient des textes DIFFÉRENTS.** Android
+      avait des résumés de deux lignes écrits pour lui ; iOS des explications
+      complètes. Exemple : Android disait « Toute capture fait exploser la case
+      d'arrivée et ses voisines, pions exceptés » quand iOS précise lesquelles,
+      et ce qu'il advient du roi. Les douze textes viennent désormais d'iOS,
+      dans les deux langues.
+- [x] **Antichecs → Antéchecs.** Une faute d'orthographe dans le nom d'une
+      variante, présente depuis l'origine.
+- [x] **Quatre sous-titres** reformulés : « Le roi au centre » → « Roi au
+      centre », « Échec trois fois gagne » → « Échec trois fois », « Un canard
+      bloque » → « Le canard bloque », « Les murs se déplacent » → « Ils bougent
+      chaque coup ».
+- [x] **Six tuiles sur douze étaient à la mauvaise place.** L'ordre du hub va
+      du plus familier au plus dépaysant — il n'est ni alphabétique ni
+      technique. Le Crazyhouse passait avant les Antéchecs, le Duck Chess avant
+      le Coup Volé, et les Barricades siégeaient au milieu alors qu'elles
+      ferment la marche. Un test JVM le verrouille désormais.
+- [x] **Trois teintes divergeaient** : les Barricades étaient grises au lieu
+      d'ambrées, et le Duck Chess et le Coup Volé avaient leurs couleurs
+      ÉCHANGÉES. C'est à la couleur qu'on reconnaît une tuile d'un coup d'œil.
+- [x] **Le Duck Chess portait une PATTE** en guise d'icône. La variante doit
+      son nom à un canard, qu'on voit ensuite sur le plateau.
+- [x] **Les noms COURTS** — « Roi colline », « 3 échecs », « Course rois »,
+      « Canard », « Murs mobiles » — n'existaient pas. iOS les affiche sur
+      iPhone ; Android laissait le nom long passer à la ligne. La tuile choisit
+      maintenant selon la place, comme iOS selon sa classe de taille.
+- [x] **Le titre de l'écran** disait « Variantes », comme la tuile d'accueil.
+      iOS distingue les deux : la tuile dit « Variantes », l'écran « Variantes
+      d'échecs ».
+
+**Un écart ASSUMÉ**, et il est volontaire : le texte du Coup Volé garde son
+paramètre. iOS écrit « tous les 7 coups (réglable de 4 à 8) » en dur ; Android
+affiche l'intervalle RÉEL, et sa plage va de 2 à 12. Recopier iOS aurait
+introduit un texte faux.
+
 ## ⬜ Écart OUVERT — les tablettes, 19/09/2026
 
 **iOS s'adapte à l'iPad, Android ne s'adapte pas aux tablettes.** Dix fichiers

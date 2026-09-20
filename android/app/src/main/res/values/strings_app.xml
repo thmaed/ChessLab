@@ -258,6 +258,9 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="route_train_named">Train: %1$s</string>
     <string name="route_training">Training</string>
     <string name="route_two_players">Two players</string>
+    <!-- Le titre de l'ÉCRAN, plus explicite que celui de la tuile
+         d'accueil — même distinction que sur iOS. -->
+    <string name="variants_hub_title">Chess variants</string>
     <string name="route_variants">Variants</string>
     <string name="scan_confirm_title">Check the position</string>
     <string name="scan_confident_banner">Every square was read with confidence — check anyway.</string>
@@ -355,20 +358,29 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="train_session_score">%1$s out of %2$s.</string>
     <string name="train_variation">%1$s is in the repertoire, but the main line is %2$s.</string>
     <string name="variant_3check">Three-Check</string>
-    <string name="variant_3check_blurb">Giving check three times wins the game. Mate still counts.</string>
+    <string name="variant_3check_blurb">The rules are those of classical chess, checkmate included. In addition, you win as soon as you have checked the opponent\'s king THREE TIMES during the game — every check counts, whether it\'s blocked, captured, or escaped on the next move.</string>
     <string name="variant_antichess">Antichess</string>
-    <string name="variant_antichess_blurb">Capturing is COMPULSORY whenever it is possible, and the goal is to lose all your pieces. The king is no longer sacred.</string>
+    <string name="variant_antichess_blurb">The goal is REVERSED: you win by losing all your pieces, or by being unable to make a move. Capturing is MANDATORY whenever possible — if several captures are available, you choose which. There is no check or checkmate: the king is captured like any other piece, and castling doesn\'t exist.</string>
     <string name="variant_atomic">Atomic</string>
-    <string name="variant_atomic_blurb">Every capture blows up the destination square and its neighbours, pawns excepted. The game stops the moment a king explodes.</string>
+    <string name="variant_atomic_blurb">Any capture blows up the destination square: the capturing piece AND the captured piece both disappear, along with every piece EXCEPT pawns on the eight surrounding squares. The game ends the moment a king explodes — a move that would blow up your OWN king is illegal. Two kings can safely touch: neither can capture the other without destroying itself.</string>
+    <!-- Les noms COURTS des variantes, pour les tuiles étroites. Ce sont
+         ceux qu'iOS affiche sur iPhone : « Roi colline » plutôt que
+         « Roi de la colline ». Les variantes dont le nom tient déjà
+         n'en ont pas. -->
+    <string name="variant_koth_name">King Hill</string>
+    <string name="variant_3check_name">3-Check</string>
+    <string name="variant_racing_name">Racing Kings</string>
+    <string name="variant_random_barricades_name">Moving walls</string>
+    <string name="variant_duck_name">Duck</string>
     <string name="variant_chess960">Chess960</string>
     <string name="variant_chess960_blurb">The back-rank pieces are shuffled, identically on both sides. Opening theory is worth nothing here: you have to play.</string>
     <string name="variant_engine_unavailable">Variant engine unavailable</string>
     <string name="variant_horde">Horde</string>
-    <string name="variant_horde_blurb">White has nothing but pawns — thirty-six of them — and must mate. Black wins by capturing them all.</string>
+    <string name="variant_horde_blurb">Asymmetric position: White starts with pawns covering a large part of the board and NO other piece — not even a king. Black has a full classical army, castling rights included. White wins by checkmating the black king — a promoted pawn can contribute to that. Black wins by capturing White\'s very last piece.</string>
     <string name="variant_koth">King of the Hill</string>
-    <string name="variant_koth_blurb">Walking your king to one of the four central squares wins the game, immediately. Mate still counts.</string>
+    <string name="variant_koth_blurb">The rules are those of classical chess. You also win IMMEDIATELY if your king reaches one of the four central squares — d4, e4, d5 or e5 — regardless of the rest of the board, even in the middle of the game.</string>
     <string name="variant_racing">Racing Kings</string>
-    <string name="variant_racing_blurb">The first king to reach the eighth rank wins. No check is allowed, in either direction.</string>
+    <string name="variant_racing_blurb">No pawns, no castling. No move is allowed to check the opponent\'s king — unless it wins the game outright. The goal: bring your king to the 8th rank before your opponent. If White gets there first, Black has EXACTLY one move to also reach it and draw — otherwise White has won.</string>
     <string name="white_to_move">White to move</string>
     <string name="you">You</string>
     <string name="your_turn">Your turn</string>
@@ -555,7 +567,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="variant_antichess_short">Lose to win</string>
     <string name="variant_crazyhouse">Crazyhouse</string>
     <string name="variant_crazyhouse_short">Captures come back</string>
-    <string name="variant_crazyhouse_blurb">A captured piece changes sides and can be DROPPED back on any empty square. The board never empties, and nothing is ever quite won.</string>
+    <string name="variant_crazyhouse_blurb">Every piece you capture switches sides and joins your RESERVE. On your turn, instead of moving a piece, you may drop one from your reserve onto any empty square — including to give check or checkmate. A pawn cannot be dropped on the 1st or 8th rank. A promoted pawn that gets captured returns to the opponent\'s reserve as a plain pawn. In every other respect, the rules are those of classical chess.</string>
     <string name="variants_intro">Other ways to play chess, against the computer — same strength and time-control settings as the classical mode.</string>
     <string name="route_variants_title">Chess variants</string>
     <string name="puzzle_instruction">Find the best move</string>
@@ -799,19 +811,19 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="chess960_invalid">There are only 960 positions, numbered 0 to 959.</string>
     <string name="variant_barricades">Barricades</string>
     <string name="variant_barricades_short">Two walled squares</string>
-    <string name="variant_barricades_blurb">Two squares are WALLED: d4 and e5. Nothing lands there, nothing is captured there, and sliding pieces stop at them — only knights jump over. In every other respect, the rules of classical chess.</string>
-    <string name="variant_random_barricades">Random barricades</string>
-    <string name="variant_random_barricades_short">The walls move</string>
-    <string name="variant_random_barricades_blurb">Three walls, two of which change square on EVERY half-move — and never the same one stays. No foothold lasts longer than a move, and you never know which one will hold.</string>
+    <string name="variant_barricades_blurb">The rules of chess, with one twist: d4 and e5 are WALLED OFF from the start. No piece may land on them or move through them, and a wall cannot be captured — it will never move for the whole game. Rooks, bishops and queens therefore stop against a wall as they would against a piece, while knights leap over one without being able to stop on it. Everything else — check, checkmate, stalemate, castling, en passant, promotion — is unchanged.</string>
+    <string name="variant_random_barricades">Shifting Barricades</string>
+    <string name="variant_random_barricades_short">They move every move</string>
+    <string name="variant_random_barricades_blurb">The rules of chess, with THREE walls that will not stay put. After every move two of them — drawn at random, never the same pair — jump to empty squares between the 2nd and 7th ranks; the third stays where it is. No piece may land on them or move through them, and they cannot be captured. A bishop that held a diagonal loses it next move, a rook pins and then does not: nothing is settled, and calculating far ahead is worth very little.</string>
     <string name="variant_duck">Duck Chess</string>
-    <string name="variant_duck_short">A duck blocks</string>
-    <string name="variant_duck_blurb">After EVERY move, you place the duck on an empty square: it blocks it for everyone, cannot be captured, and must move each turn. No check, no checkmate, no stalemate — you win by CAPTURING the king.</string>
+    <string name="variant_duck_short">The duck blocks</string>
+    <string name="variant_duck_blurb">Every turn has TWO steps: you move a piece, then you place the duck on any empty square you like. The duck belongs to nobody and blocks its square completely — no piece may land on it or move through it, and it cannot be captured. It must change square every turn. There is NO CHECK AND NO CHECKMATE: a king may stay under attack, and you win by capturing it. The computer plays this variant with Stockfish, restricted to the moves the duck allows: it plays well, but it does not see the duck in its evaluation.</string>
     <string name="duck_place">Place the duck on an empty square</string>
     <string name="duck_engine_places">The duck is landing…</string>
     <string name="duck_king_taken">King captured — %1$s</string>
     <string name="variant_stolen">Stolen Move</string>
     <string name="variant_stolen_short">One token, 2 moves</string>
-    <string name="variant_stolen_blurb">The rules are those of classical chess. In addition: every %1$d moves played, you earn a token. You never hold more than ONE, and you cannot spend it while in check. Spending it lets you play TWO moves in a row — unless the first one checks your opponent, in which case the turn stops there.</string>
+    <string name="variant_stolen_blurb">The rules are those of classical chess. In addition: every %1$d moves played, you earn a token. You never hold more than ONE: a new one replaces the old if it wasn\'t spent, and it can\'t be spent while you\'re in check yourself. Spending it lets you play TWO moves in a row — unless the first one checks your opponent, in which case the turn stops there. An en passant capture made possible by the opponent\'s last move stays valid even if your first move of the double turn comes in between.</string>
     <string name="stolen_token">Token available</string>
     <string name="stolen_spend">Spend the token</string>
     <string name="stolen_spending">Token spent: play your first move</string>

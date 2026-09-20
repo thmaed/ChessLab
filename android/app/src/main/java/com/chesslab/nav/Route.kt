@@ -121,7 +121,8 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     }
     /** Le Laboratoire. [startFen] impose la position de départ de la série. */
     data class Laboratory(val startFen: String? = null) : Route(R.string.route_lab)
-    data object Variants : Route(R.string.route_variants)
+    /** Le hub porte « Variantes d'échecs » ; la tuile d'accueil, « Variantes ». */
+    data object Variants : Route(R.string.variants_hub_title)
     data object Progression : Route(R.string.route_progress)
     data object Settings : Route(R.string.route_settings)
     data object Help : Route(R.string.route_help)

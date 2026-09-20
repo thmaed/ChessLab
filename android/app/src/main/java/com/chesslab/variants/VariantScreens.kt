@@ -31,9 +31,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material.icons.filled.Fence
 import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.FlutterDash
+import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Inventory2
@@ -78,6 +78,11 @@ import androidx.compose.ui.text.font.FontFamily
 fun VariantListScreen(onOpen: (String) -> Unit) {
     BoxWithConstraints(Modifier.fillMaxSize()) {
         val columns = ((maxWidth - 40.dp) / 174.dp).toInt().coerceAtLeast(2)
+        // Le nom COURT quand la tuile est étroite — « Roi colline » plutôt que
+        // « Roi de la colline ». iOS fait le même choix, sur sa classe de taille
+        // compacte : c'est la place disponible qui décide, pas la variante.
+        val largeurTuile = (maxWidth - 40.dp - 14.dp * (columns - 1)) / columns.toFloat()
+        val etroit = largeurTuile < 200.dp
         Column(
             Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -89,7 +94,7 @@ fun VariantListScreen(onOpen: (String) -> Unit) {
             VariantCatalog.all.chunked(columns).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     row.forEach { variant ->
-                        Box(Modifier.weight(1f)) { VariantCard(variant, onOpen) }
+                        Box(Modifier.weight(1f)) { VariantCard(variant, etroit, onOpen) }
                     }
                     repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
                 }
@@ -104,7 +109,7 @@ fun VariantListScreen(onOpen: (String) -> Unit) {
  * pastille d'icône, flèche de lancement, icône fantôme, bordure teintée.
  */
 @Composable
-private fun VariantCard(variant: Variant, onOpen: (String) -> Unit) {
+private fun VariantCard(variant: Variant, etroit: Boolean, onOpen: (String) -> Unit) {
     val tint = variantTint(variant.id)
     val icon = variantIcon(variant.id)
     Box(
@@ -128,7 +133,8 @@ private fun VariantCard(variant: Variant, onOpen: (String) -> Unit) {
             IconBadge(icon, tint)
             Spacer(Modifier.weight(1f))
             Text(
-                stringResource(variant.titleRes), fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
+                stringResource(if (etroit) variant.shortTitleRes else variant.titleRes),
+                fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                 color = Palette.textPrimary, maxLines = 2, overflow = TextOverflow.Ellipsis,
             )
             Text(
@@ -187,34 +193,52 @@ private fun Reserve(ui: VariantUiState, color: Piece.Color, model: VariantPlayVi
     }
 }
 
-/** Une couleur par variante, reprise de l'écran iOS. */
+/**
+ * Une couleur par variante, RELEVÉE sur l'écran iOS.
+ *
+ * Trois divergeaient : les Barricades étaient grises au lieu d'ambrées, et le
+ * Duck Chess et le Coup Volé avaient leurs teintes ÉCHANGÉES. Une couleur de
+ * tuile n'est pas un détail : c'est ce à quoi on reconnaît une variante d'un
+ * coup d'œil, et deux apps qui ne s'accordent pas là-dessus désorientent celui
+ * qui passe de l'une à l'autre.
+ */
 private fun variantTint(id: String): Color = when (id) {
-    "barricades" -> Palette.textSecondary
-    "duck" -> Palette.gold
-    "stolenmove" -> Palette.warning
-    "randombarricades" -> Palette.violet
     "chess960" -> Palette.violet
     "kingofthehill" -> Palette.gold
     "3check" -> Palette.danger
     "horde" -> Palette.teal
     "racingkings" -> Palette.info
     "atomic" -> Palette.danger
+    "antichess" -> Palette.rose
     "crazyhouse" -> Palette.accent
+    "stolenmove" -> Palette.gold
+    "duck" -> Palette.warning
+    "barricades" -> Palette.warning
+    "randombarricades" -> Palette.violet
     else -> Palette.rose
 }
 
+/**
+ * L'icône d'une variante, au plus près de celle d'iOS.
+ *
+ * Material ne porte pas les mêmes symboles que SF Symbols : là où iOS met une
+ * montagne, un dé ou une grille, on prend l'équivalent le plus proche. Une
+ * seule était franchement fausse — le Duck Chess portait une PATTE, alors que
+ * la variante doit son nom à un canard qu'on voit ensuite sur le plateau.
+ */
 private fun variantIcon(id: String): ImageVector = when (id) {
-    "barricades" -> Icons.Default.Fence
-    "duck" -> Icons.Default.Pets
-    "stolenmove" -> Icons.Default.Bolt
-    "randombarricades" -> Icons.Default.Shuffle
-    "chess960" -> Icons.Default.Casino
-    "kingofthehill" -> Icons.Default.Terrain
-    "3check" -> Icons.Default.Looks3
-    "horde" -> Icons.Default.Groups
-    "racingkings" -> Icons.Default.SportsScore
-    "atomic" -> Icons.Default.Whatshot
-    "crazyhouse" -> Icons.Default.Inventory2
+    "chess960" -> Icons.Default.Casino               // dé
+    "kingofthehill" -> Icons.Default.Terrain         // montagne
+    "3check" -> Icons.Default.Looks3                 // le chiffre trois
+    "horde" -> Icons.Default.Groups                  // la foule
+    "racingkings" -> Icons.Default.SportsScore       // drapeau à damier
+    "atomic" -> Icons.Default.Whatshot               // l'explosion
+    "antichess" -> Icons.Default.SwapVert            // l'inversion
+    "crazyhouse" -> Icons.Default.Inventory2         // la réserve
+    "stolenmove" -> Icons.Default.Bolt               // l'éclair du jeton
+    "duck" -> Icons.Default.FlutterDash              // un canard, enfin
+    "barricades" -> Icons.Default.GridOn             // la grille murée
+    "randombarricades" -> Icons.Default.Shuffle      // le tirage
     else -> Icons.Default.SwapVert
 }
 

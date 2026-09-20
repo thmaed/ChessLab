@@ -255,6 +255,9 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="route_train_named">Entraîner : %1$s</string>
     <string name="route_training">Entraînement</string>
     <string name="route_two_players">Deux joueurs</string>
+    <!-- Le titre de l'ÉCRAN, plus explicite que celui de la tuile
+         d'accueil — même distinction que sur iOS. -->
+    <string name="variants_hub_title">Variantes d\'échecs</string>
     <string name="route_variants">Variantes</string>
     <string name="scan_confirm_title">Vérifier la position</string>
     <string name="scan_confident_banner">Toutes les cases ont été lues avec certitude — vérifiez tout de même.</string>
@@ -352,20 +355,29 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="train_session_score">%1$s sur %2$s.</string>
     <string name="train_variation">%1$s est au répertoire, mais la ligne principale est %2$s.</string>
     <string name="variant_3check">Trois échecs</string>
-    <string name="variant_3check_blurb">Donner échec trois fois gagne la partie. Le mat compte toujours.</string>
-    <string name="variant_antichess">Antichecs</string>
-    <string name="variant_antichess_blurb">La capture est OBLIGATOIRE quand elle est possible, et le but est de perdre toutes ses pièces. Le roi n\'est plus sacré.</string>
+    <string name="variant_3check_blurb">Les règles sont celles du jeu classique, échec et mat compris. En plus, vous gagnez dès que vous avez mis le roi adverse en échec TROIS FOIS au cours de la partie — chaque échec compte, qu\'il soit paré, capturé ou fui au coup suivant.</string>
+    <string name="variant_antichess">Antéchecs</string>
+    <string name="variant_antichess_blurb">Le but est INVERSÉ : vous gagnez en perdant toutes vos pièces, ou en étant dans l\'incapacité de jouer un coup. Capturer est OBLIGATOIRE dès que c\'est possible — s\'il existe plusieurs captures, vous choisissez laquelle. Il n\'y a ni échec ni mat : le roi se capture comme n\'importe quelle pièce, et le roque n\'existe pas.</string>
     <string name="variant_atomic">Atomique</string>
-    <string name="variant_atomic_blurb">Toute capture fait exploser la case d\'arrivée et ses voisines, pions exceptés. La partie s\'arrête dès qu\'un roi explose.</string>
+    <string name="variant_atomic_blurb">Toute capture fait exploser la case d\'arrivée : la pièce qui capture ET la pièce capturée disparaissent, ainsi que toute pièce SAUF les pions sur les huit cases voisines. La partie se termine dès qu\'un roi explose — un coup qui ferait exploser votre PROPRE roi est interdit. Deux rois peuvent se toucher sans risque : aucun ne peut capturer l\'autre sans se détruire lui-même.</string>
+    <!-- Les noms COURTS des variantes, pour les tuiles étroites. Ce sont
+         ceux qu'iOS affiche sur iPhone : « Roi colline » plutôt que
+         « Roi de la colline ». Les variantes dont le nom tient déjà
+         n'en ont pas. -->
+    <string name="variant_koth_name">Roi colline</string>
+    <string name="variant_3check_name">3 échecs</string>
+    <string name="variant_racing_name">Course rois</string>
+    <string name="variant_random_barricades_name">Murs mobiles</string>
+    <string name="variant_duck_name">Canard</string>
     <string name="variant_chess960">Chess960</string>
     <string name="variant_chess960_blurb">Les pièces du fond sont mélangées, identiquement des deux côtés. La théorie d\'ouverture ne sert plus à rien : il faut jouer.</string>
     <string name="variant_engine_unavailable">Moteur de variantes indisponible</string>
     <string name="variant_horde">Horde</string>
-    <string name="variant_horde_blurb">Les Blancs n\'ont que des pions — trente-six — et doivent mater. Les Noirs gagnent en les capturant tous.</string>
+    <string name="variant_horde_blurb">Position asymétrique : les Blancs commencent avec des pions occupant une grande partie de l\'échiquier et AUCUNE autre pièce — pas même de roi. Les Noirs ont une armée classique complète, avec ses droits de roque. Les Blancs gagnent en mettant le roi noir échec et mat — un pion promu peut y contribuer. Les Noirs gagnent en capturant la toute dernière pièce blanche.</string>
     <string name="variant_koth">Roi de la colline</string>
-    <string name="variant_koth_blurb">Amener son roi sur l\'une des quatre cases centrales gagne la partie, immédiatement. Le mat reste possible.</string>
+    <string name="variant_koth_blurb">Les règles sont celles du jeu classique. Vous gagnez aussi IMMÉDIATEMENT si votre roi atteint l\'une des quatre cases centrales — d4, e4, d5 ou e5 — quel que soit l\'état du reste de l\'échiquier, y compris en plein milieu de partie.</string>
     <string name="variant_racing">Course des rois</string>
-    <string name="variant_racing_blurb">Le premier roi arrivé sur la huitième rangée gagne. Aucun échec n\'est autorisé, dans aucun sens.</string>
+    <string name="variant_racing_blurb">Pas de pions, pas de roque. Aucun coup n\'a le droit de mettre le roi adverse en échec — sauf s\'il gagne la partie sur-le-champ. Le but : amener votre roi sur la 8e rangée avant l\'adversaire. Si les Blancs y arrivent les premiers, les Noirs ont EXACTEMENT un coup pour égaliser en y arrivant aussi — sinon les Blancs ont gagné.</string>
     <string name="white_to_move">Aux blancs de jouer</string>
     <string name="you">Vous</string>
     <string name="your_turn">À vous de jouer</string>
@@ -544,15 +556,15 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="role_memorise">À mémoriser</string>
     <string name="role_main_line">Ligne principale</string>
     <string name="variant_chess960_short">Zéro théorie</string>
-    <string name="variant_koth_short">Le roi au centre</string>
-    <string name="variant_3check_short">Échec trois fois gagne</string>
+    <string name="variant_koth_short">Roi au centre</string>
+    <string name="variant_3check_short">Échec trois fois</string>
     <string name="variant_horde_short">36 pions</string>
     <string name="variant_racing_short">Le roi en 8e</string>
     <string name="variant_atomic_short">Prises explosives</string>
     <string name="variant_antichess_short">Perdre pour gagner</string>
     <string name="variant_crazyhouse">Crazyhouse</string>
     <string name="variant_crazyhouse_short">Les prises reviennent</string>
-    <string name="variant_crazyhouse_blurb">Une pièce prise change de camp et peut être PARACHUTÉE sur n\'importe quelle case vide. Le plateau ne se vide jamais, et rien n\'est jamais tout à fait gagné.</string>
+    <string name="variant_crazyhouse_blurb">Toute pièce que vous capturez change de camp et rejoint votre RÉSERVE. À votre tour, au lieu de déplacer une pièce, vous pouvez en poser une de votre réserve sur n\'importe quelle case vide — y compris pour donner échec ou mat. Un pion ne peut se poser ni sur la 1re ni sur la 8e rangée. Un pion promu qui se fait capturer redevient un simple pion dans la réserve adverse. Pour tout le reste, les règles sont celles du jeu classique.</string>
     <string name="variants_intro">D\'autres façons de jouer aux échecs, contre l\'ordinateur — mêmes réglages de force et de cadence que le mode classique.</string>
     <string name="route_variants_title">Variantes d\'échecs</string>
     <string name="puzzle_instruction">Trouvez le meilleur coup</string>
@@ -796,19 +808,19 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="chess960_invalid">Il n\'y a que 960 positions, numérotées de 0 à 959.</string>
     <string name="variant_barricades">Barricades</string>
     <string name="variant_barricades_short">Deux cases murées</string>
-    <string name="variant_barricades_blurb">Deux cases sont MURÉES : d4 et e5. Rien ne s\'y pose, rien ne s\'y prend, et les pièces qui glissent s\'y arrêtent — seuls les cavaliers sautent par-dessus. Pour tout le reste, les règles du jeu classique.</string>
+    <string name="variant_barricades_blurb">Les règles des échecs, à un détail près : les cases d4 et e5 sont MURÉES dès le départ. Aucune pièce ne peut s\'y poser ni les traverser, et un mur ne se capture pas — il ne bougera jamais de la partie. Les tours, fous et dames butent donc dessus comme sur une pièce, tandis que les cavaliers leur sautent par-dessus sans pouvoir s\'y arrêter. Tout le reste — échec, mat, pat, roque, prise en passant, promotion — est inchangé.</string>
     <string name="variant_random_barricades">Barricades aléatoires</string>
-    <string name="variant_random_barricades_short">Les murs se déplacent</string>
-    <string name="variant_random_barricades_blurb">Trois murs, et deux d\'entre eux changent de case à CHAQUE demi-coup — celui qui reste n\'est jamais le même. Aucun point d\'appui ne dure plus d\'un coup, et l\'on ne sait pas lequel tiendra.</string>
+    <string name="variant_random_barricades_short">Ils bougent chaque coup</string>
+    <string name="variant_random_barricades_blurb">Les règles des échecs, avec TROIS murs qui ne tiennent pas en place. Après chaque coup, deux d\'entre eux — tirés au sort, jamais les mêmes — sautent sur des cases vides entre la 2e et la 7e rangée ; le troisième reste où il est. Aucune pièce ne peut s\'y poser ni les traverser, et ils ne se capturent pas. Un fou qui tenait une diagonale la perd au coup suivant, une tour cloue puis ne cloue plus : rien n\'est acquis, et calculer loin ne sert pas à grand-chose.</string>
     <string name="variant_duck">Duck Chess</string>
-    <string name="variant_duck_short">Un canard bloque</string>
-    <string name="variant_duck_blurb">Après CHAQUE coup, on pose le canard sur une case vide : il la bloque pour tout le monde, ne se capture pas, et doit changer de place à chaque tour. Ni échec, ni mat, ni pat — on gagne en CAPTURANT le roi.</string>
+    <string name="variant_duck_short">Le canard bloque</string>
+    <string name="variant_duck_blurb">Chaque tour se joue en DEUX temps : vous déplacez une pièce, puis vous posez le canard sur une case vide de votre choix. Le canard n\'appartient à personne et bloque totalement sa case — aucune pièce ne peut s\'y poser ni la traverser, et il ne se capture pas. Il doit changer de case à chaque tour. Il n\'y a NI ÉCHEC NI MAT : un roi a le droit de rester sous une attaque, et on gagne en le capturant. L\'ordinateur joue cette variante avec Stockfish, restreint aux coups que le canard laisse passer : il joue bien, mais il ne voit pas le canard dans son évaluation.</string>
     <string name="duck_place">Posez le canard sur une case vide</string>
     <string name="duck_engine_places">Le canard se pose…</string>
     <string name="duck_king_taken">Roi capturé — %1$s</string>
     <string name="variant_stolen">Coup Volé</string>
     <string name="variant_stolen_short">Un jeton, 2 coups</string>
-    <string name="variant_stolen_blurb">Les règles sont celles du jeu classique. En plus : tous les %1$d coups joués, vous gagnez un jeton. Vous n\'en gardez jamais plus d\'UN, et vous ne pouvez pas le dépenser en échec. Le dépenser vous fait jouer DEUX coups d\'affilée — sauf si le premier met l\'adversaire en échec, auquel cas le tour s\'arrête là.</string>
+    <string name="variant_stolen_blurb">Les règles sont celles du jeu classique. En plus : tous les %1$d coups joués, vous gagnez un jeton. Vous n\'en gardez jamais plus d\'UN : le nouveau efface l\'ancien s\'il n\'a pas été dépensé, et impossible de le dépenser si vous êtes vous-même en échec. Le dépenser vous fait jouer DEUX coups d\'affilée — sauf si le premier met l\'adversaire en échec, auquel cas le tour s\'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s\'intercale.</string>
     <string name="stolen_token">Jeton disponible</string>
     <string name="stolen_spend">Dépenser le jeton</string>
     <string name="stolen_spending">Jeton dépensé : jouez votre premier coup</string>
