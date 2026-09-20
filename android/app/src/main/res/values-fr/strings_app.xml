@@ -316,6 +316,15 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
          finales — c'est lui qui dit ce que ces cours valent. -->
     <string name="course_line_end">Fin de la ligne. Reviens en arrière pour explorer une variante.</string>
     <string name="endgame_proven_footer">Chaque ligne de ces cours est vérifiée par table de finales (Syzygy) : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle.</string>
+    <!-- « Attaque à la découverte » déborde à côté des autres puces :
+         raccourci ICI SEULEMENT, comme iOS. Le libellé complet reste sur
+         l'écran de résolution, où il a la place. -->
+    <string name="theme_discovered_short">Découverte</string>
+    <!-- Deux notes d'iOS qui manquaient, et le titre de la section qui
+         réunit sons et vibrations — iOS n'en fait qu'une. -->
+    <string name="settings_notation_note">Le PGN exporté reste en notation anglaise — c\'est le standard, lisible par tous les autres logiciels.</string>
+    <string name="settings_puzzle_attempts_note">Avec un seul essai, on calcule la variante jusqu\'au bout avant de jouer — c\'est tout l\'intérêt de l\'exercice. Trois essais laissent chercher en tâtonnant.</string>
+    <string name="settings_feedback">Sons et vibrations</string>
     <string name="variant_accuracy_caption">précision</string>
     <string name="variants_hub_title">Variantes d\'échecs</string>
     <string name="route_variants">Variantes</string>
@@ -1040,7 +1049,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_phase">Phase</string>
     <string name="puzzle_type">Type de puzzle</string>
     <string name="puzzle_start_session">Commencer la séance</string>
-    <string name="puzzle_all_puzzles">Tous les puzzles</string>
+    <string name="puzzle_all_puzzles">Tous les puzzles, mélangés</string>
     <string name="filter_all_f">Toutes</string>
 
     <string name="lab_series_done">Série terminée — %1$d parties.</string>

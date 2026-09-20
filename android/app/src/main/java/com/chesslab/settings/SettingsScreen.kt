@@ -59,10 +59,26 @@ fun SettingsScreen(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
-        // Un aperçu vaut mieux qu'une vignette : c'est le vrai plateau, avec
-        // le thème et les pièces choisis juste en dessous.
-        SettingsSection(stringResource(R.string.settings_preview), Icons.Default.Visibility) {
-            BoardView(position = remembered, enabled = false)
+        // L'ORDRE d'iOS (`SettingsView`) : la langue d'abord — c'est le
+        // réglage qu'on vient changer —, puis ce qui se voit sur le
+        // plateau, puis ce qui change la façon de travailler, et enfin
+        // l'aide et les licences. L'aperçu suit le thème qu'il montre.
+        SettingsSection(stringResource(R.string.settings_language), Icons.Default.Language) {
+        val activity = LocalContext.current as? android.app.Activity
+        var language by remember { mutableStateOf(AppLanguage.current(context)) }
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf(
+                AppLanguage.system to R.string.settings_language_system,
+                AppLanguage.french to R.string.settings_language_fr,
+                AppLanguage.english to R.string.settings_language_en,
+            ).forEach { (value, label) ->
+                Choice(stringResource(label), value == language, "langue-${value.name}") {
+                    language = value
+                    AppLanguage.apply(context, value) { activity?.recreate() }
+                }
+            }
+        }
+
         }
 
         SettingsSection(stringResource(R.string.settings_board_theme), Icons.Default.Palette) {
@@ -75,6 +91,10 @@ fun SettingsScreen(
             }
         }
 
+        SettingsSection(stringResource(R.string.settings_preview), Icons.Default.Visibility) {
+            BoardView(position = remembered, enabled = false)
+        }
+
         SettingsSection(stringResource(R.string.settings_piece_set), Icons.Default.Category) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf(
@@ -85,74 +105,6 @@ fun SettingsScreen(
                 Choice(stringResource(label), id == settings.pieceSetId, "piece-$id") {
                     SettingsStore.setPieceSet(context, id)
                 }
-            }
-        }
-
-        }
-
-        SettingsSection(stringResource(R.string.settings_engine_time), Icons.Default.Speed) {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf(200 to R.string.speed_fast, 400 to R.string.speed_normal, 1000 to R.string.speed_thoughtful, 3000 to R.string.speed_long)
-                .forEach { (ms, label) ->
-                    Choice(stringResource(label), ms == settings.engineMoveTimeMs, "temps-$ms") {
-                        SettingsStore.setMoveTime(context, ms)
-                    }
-                }
-        }
-
-        }
-
-        SettingsSection(stringResource(R.string.settings_sounds), Icons.Default.VolumeUp) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .testTag("sons")
-                .clip(RoundedCornerShape(8.dp))
-                .background(Palette.surface)
-                .clickable { SettingsStore.setSounds(context, !settings.soundsEnabled) }
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Switch(
-                checked = settings.soundsEnabled,
-                onCheckedChange = { SettingsStore.setSounds(context, it) },
-                colors = com.chesslab.ui.chessLabSwitchColors(),
-            )
-            Spacer(Modifier.width(10.dp))
-            Column {
-                Text(stringResource(R.string.settings_board_sounds), fontSize = 13.sp, color = Palette.textPrimary)
-                Text(
-                    stringResource(R.string.settings_sounds_note),
-                    fontSize = 10.sp, color = Palette.textTertiary,
-                )
-            }
-        }
-
-        }
-
-        SettingsSection(stringResource(R.string.settings_haptics), Icons.Default.Vibration) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .testTag("haptique")
-                .clip(RoundedCornerShape(8.dp))
-                .background(Palette.surface)
-                .clickable { SettingsStore.setHaptics(context, !settings.hapticsEnabled) }
-                .padding(horizontal = 12.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Switch(
-                checked = settings.hapticsEnabled,
-                onCheckedChange = { SettingsStore.setHaptics(context, it) },
-                colors = com.chesslab.ui.chessLabSwitchColors(),
-            )
-            Spacer(Modifier.width(10.dp))
-            Column {
-                Text(stringResource(R.string.settings_board_haptics), fontSize = 13.sp, color = Palette.textPrimary)
-                Text(
-                    stringResource(R.string.settings_haptics_note),
-                    fontSize = 10.sp, color = Palette.textTertiary,
-                )
             }
         }
 
@@ -189,24 +141,11 @@ fun SettingsScreen(
             }
         }
 
-        }
-
-        SettingsSection(stringResource(R.string.settings_language), Icons.Default.Language) {
-        val activity = LocalContext.current as? android.app.Activity
-        var language by remember { mutableStateOf(AppLanguage.current(context)) }
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf(
-                AppLanguage.system to R.string.settings_language_system,
-                AppLanguage.french to R.string.settings_language_fr,
-                AppLanguage.english to R.string.settings_language_en,
-            ).forEach { (value, label) ->
-                Choice(stringResource(label), value == language, "langue-${value.name}") {
-                    language = value
-                    AppLanguage.apply(context, value) { activity?.recreate() }
-                }
-            }
-        }
-
+            Spacer(Modifier.height(6.dp))
+            Text(
+                stringResource(R.string.settings_notation_note),
+                fontSize = 11.sp, color = Palette.textTertiary,
+            )
         }
 
         SettingsSection(stringResource(R.string.progress_puzzles), Icons.Default.Extension) {
@@ -217,16 +156,89 @@ fun SettingsScreen(
                 }
             }
         }
-        Text(
-            stringResource(R.string.settings_tries_note),
-            fontSize = 11.sp, color = Palette.textTertiary,
-            modifier = Modifier.padding(top = 6.dp),
-        )
+            // La note d'iOS, et elle SEULE : Android en avait écrit une
+            // seconde qui disait la même chose autrement, et deux phrases
+            // jumelles l'une sous l'autre se lisent moins bien qu'une.
+            Spacer(Modifier.height(6.dp))
+            Text(
+                stringResource(R.string.settings_puzzle_attempts_note),
+                fontSize = 11.sp, color = Palette.textTertiary,
+            )
         }
 
-        // Les ouvertures sont pré-générées à partir de sources ouvertes : le
-        // dire n'est pas qu'une politesse, c'est aussi ce qui explique
-        // pourquoi tout marche en avion.
+        // Sons et vibrations dans la MÊME section, comme iOS : ce sont les
+        // deux façons dont l'app répond au doigt, et les séparer en faisait
+        // deux réglages sans rapport.
+        SettingsSection(stringResource(R.string.settings_feedback), Icons.Default.VolumeUp) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .testTag("sons")
+                .clip(RoundedCornerShape(8.dp))
+                .background(Palette.surface)
+                .clickable { SettingsStore.setSounds(context, !settings.soundsEnabled) }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Switch(
+                checked = settings.soundsEnabled,
+                onCheckedChange = { SettingsStore.setSounds(context, it) },
+                colors = com.chesslab.ui.chessLabSwitchColors(),
+            )
+            Spacer(Modifier.width(10.dp))
+            Column {
+                Text(stringResource(R.string.settings_board_sounds), fontSize = 13.sp, color = Palette.textPrimary)
+                Text(
+                    stringResource(R.string.settings_sounds_note),
+                    fontSize = 10.sp, color = Palette.textTertiary,
+                )
+            }
+        }
+
+        
+
+            Spacer(Modifier.height(6.dp))
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .testTag("haptique")
+                .clip(RoundedCornerShape(8.dp))
+                .background(Palette.surface)
+                .clickable { SettingsStore.setHaptics(context, !settings.hapticsEnabled) }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Switch(
+                checked = settings.hapticsEnabled,
+                onCheckedChange = { SettingsStore.setHaptics(context, it) },
+                colors = com.chesslab.ui.chessLabSwitchColors(),
+            )
+            Spacer(Modifier.width(10.dp))
+            Column {
+                Text(stringResource(R.string.settings_board_haptics), fontSize = 13.sp, color = Palette.textPrimary)
+                Text(
+                    stringResource(R.string.settings_haptics_note),
+                    fontSize = 10.sp, color = Palette.textTertiary,
+                )
+            }
+        }
+
+        
+        }
+
+        SettingsSection(stringResource(R.string.settings_engine_time), Icons.Default.Speed) {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            listOf(200 to R.string.speed_fast, 400 to R.string.speed_normal, 1000 to R.string.speed_thoughtful, 3000 to R.string.speed_long)
+                .forEach { (ms, label) ->
+                    Choice(stringResource(label), ms == settings.engineMoveTimeMs, "temps-$ms") {
+                        SettingsStore.setMoveTime(context, ms)
+                    }
+                }
+        }
+
+        }
+
         SettingsSection(stringResource(R.string.settings_openings), Icons.Default.MenuBook) {
             LinkRow(
                 Icons.Default.Description, stringResource(R.string.settings_sources),
@@ -234,11 +246,6 @@ fun SettingsScreen(
             )
         }
 
-        com.chesslab.transfer.TransferSection()
-
-        // L'aide est aussi ICI, et pas seulement derrière le « ? » de
-        // l'accueil : c'est dans les réglages qu'on la cherche quand on ne
-        // l'a pas trouvée du premier coup.
         SettingsSection(stringResource(R.string.settings_help), Icons.AutoMirrored.Filled.HelpOutline) {
             LinkRow(
                 Icons.AutoMirrored.Filled.HelpOutline, stringResource(R.string.route_help),
@@ -246,9 +253,6 @@ fun SettingsScreen(
             )
         }
 
-        // Ce que l'app doit à d'autres : Stockfish est sous GPLv3, et cela
-        // s'affiche sur un écran à part, comme sur iOS — pas en note de bas
-        // de page.
         SettingsSection(stringResource(R.string.settings_about), Icons.Default.Info) {
             LinkRow(
                 Icons.Default.Description, stringResource(R.string.licences_title),

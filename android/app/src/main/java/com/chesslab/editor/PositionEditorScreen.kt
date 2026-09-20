@@ -9,6 +9,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
@@ -144,16 +151,40 @@ fun PositionEditorScreen(
             }
 
             Spacer(Modifier.height(10.dp))
-            Text(
-                position.fen,
-                fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = Palette.textSecondary,
-                modifier = Modifier
+            Row(
+                Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(8.dp))
                     .background(Palette.surface)
-                    .padding(10.dp)
-                    .testTag("fen"),
-            )
+                    .padding(10.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    position.fen,
+                    fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = Palette.textSecondary,
+                    modifier = Modifier.weight(1f).testTag("fen"),
+                )
+                // La COPIER, comme iOS : une position composée à la main finit
+                // souvent ailleurs — un site d'analyse, un message. Sans ce
+                // bouton, il fallait la recopier au clavier.
+                val presse = LocalClipboardManager.current
+                val copié = stringResource(R.string.export_copied_fen)
+                val contexte = LocalContext.current
+                IconButton(
+                    onClick = {
+                        presse.setText(AnnotatedString(position.fen))
+                        android.widget.Toast.makeText(contexte, copié, android.widget.Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.testTag("copier-fen"),
+                ) {
+                    Icon(
+                        Icons.Default.ContentCopy,
+                        stringResource(R.string.export_copy_fen),
+                        tint = Palette.textSecondary,
+                        modifier = Modifier.size(18.dp),
+                    )
+                }
+            }
 
             // Ce qui empêche la position d'être jouable, dit avant qu'on
             // l'envoie au moteur — même règle qu'iOS.

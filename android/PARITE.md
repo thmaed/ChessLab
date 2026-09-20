@@ -73,6 +73,36 @@ introduit un texte faux.
       l'icône et la teinte de la variante — la présentation d'iOS
       (`FairyVariantSetupView.ruleSummary`).
 
+### Modules « Réglages », « Puzzles », « Éditeur » — 20/09
+
+- [x] **Les Réglages n'étaient pas dans l'ordre d'iOS** (vérifié à l'écran) :
+      la langue vient d'abord — c'est le réglage qu'on vient changer —, puis ce
+      qui se voit sur le plateau, puis ce qui change la façon de travailler, et
+      enfin l'aide et les licences.
+- [x] **Sons et vibrations faisaient DEUX sections** ; iOS n'en fait qu'une,
+      « Sons et vibrations ». Ce sont les deux façons dont l'app répond au
+      doigt.
+- [x] **Deux notes d'iOS manquaient** : « Le PGN exporté reste en notation
+      anglaise — c'est le standard… » et « Avec un seul essai, on calcule la
+      variante jusqu'au bout avant de jouer… ». Android en avait écrit une
+      troisième, jumelle de la seconde : retirée, deux phrases qui disent la
+      même chose l'une sous l'autre se lisent moins bien qu'une.
+- [x] **L'éditeur de position ne savait pas COPIER la FEN** (vérifié à
+      l'écran). iOS a le bouton depuis toujours ; ici il fallait la recopier au
+      clavier.
+- [ ] **Deux libellés de puzzles** : « Tous les puzzles » → « Tous les puzzles,
+      mélangés », et la puce « Attaque à la découverte » raccourcie en
+      « Découverte » — sur cet écran seulement, comme iOS, le libellé entier
+      restant à la résolution.
+
+**Deux AJOUTS d'Android, laissés en place** : la section « Temps de réflexion
+du moteur » des réglages, et l'aperçu du plateau. iOS n'a ni l'un ni l'autre.
+
+**Conformes, vérifiés en lisant les deux codes** : la Progression (bilan,
+par niveau, par personnage, par difficulté, à travailler, mémorisation), le
+Scanner (photo, galerie, recadrage, confirmation, témoin d'activité), le mode
+Deux joueurs, la bibliothèque de parties.
+
 ### Modules « Laboratoire », « Ouvertures » et « Finales » — 20/09
 
 - [ ] **On ne pouvait pas revoir la dernière partie d'une série.** iOS propose

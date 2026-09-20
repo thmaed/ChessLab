@@ -107,7 +107,14 @@ fun PuzzleQueueScreen(
                     Modifier.testTag("theme-tous"), tint = Palette.warning) { theme = null }
                 PuzzleThemeKind.entries.forEach { value ->
                     ChipButton(
-                        stringResource(value.labelRes), theme == value,
+                        // « Attaque à la découverte » déborde à côté des
+                        // autres puces : raccourci ICI SEULEMENT, comme iOS.
+                        // Le libellé entier reste sur l'écran de résolution.
+                        stringResource(
+                            if (value.labelRes == R.string.theme_discovered) R.string.theme_discovered_short
+                            else value.labelRes
+                        ),
+                        theme == value,
                         Modifier.testTag("theme-${value.name}"),
                         icon = value.icon, tint = Palette.warning,
                     ) { theme = if (theme == value) null else value }

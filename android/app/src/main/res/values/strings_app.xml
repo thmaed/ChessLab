@@ -319,6 +319,15 @@ The statistics above are recomputed after each one: they are volatile at first a
          finales — c'est lui qui dit ce que ces cours valent. -->
     <string name="course_line_end">End of the line. Go back to explore a variation.</string>
     <string name="endgame_proven_footer">Every line in these courses is checked against an endgame tablebase (Syzygy): no move taught gives up the win, no defence offered loses the draw.</string>
+    <!-- « Attaque à la découverte » déborde à côté des autres puces :
+         raccourci ICI SEULEMENT, comme iOS. Le libellé complet reste sur
+         l'écran de résolution, où il a la place. -->
+    <string name="theme_discovered_short">Discovery</string>
+    <!-- Deux notes d'iOS qui manquaient, et le titre de la section qui
+         réunit sons et vibrations — iOS n'en fait qu'une. -->
+    <string name="settings_notation_note">The exported PGN stays in English notation — that is the standard, readable by every other program.</string>
+    <string name="settings_puzzle_attempts_note">With a single try, you work the line out to the end before playing — that is the whole point of the exercise. Three tries let you grope your way there.</string>
+    <string name="settings_feedback">Sounds and vibration</string>
     <string name="variant_accuracy_caption">accuracy</string>
     <string name="variants_hub_title">Chess variants</string>
     <string name="route_variants">Variants</string>
@@ -1043,7 +1052,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="puzzle_phase">Phase</string>
     <string name="puzzle_type">Puzzle type</string>
     <string name="puzzle_start_session">Start the session</string>
-    <string name="puzzle_all_puzzles">All puzzles</string>
+    <string name="puzzle_all_puzzles">All puzzles, shuffled</string>
     <string name="filter_all_f">All</string>
 
     <string name="lab_series_done">Series finished — %1$d games.</string>
