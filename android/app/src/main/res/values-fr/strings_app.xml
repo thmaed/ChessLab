@@ -292,6 +292,21 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="variant_three_checks_a11y">%1$d échecs sur 3</string>
     <string name="variant_player_you">Vous</string>
     <string name="variant_player_engine">Ordinateur</string>
+    <!-- La ligne d'état du moteur, au-dessus du plateau d'analyse. iOS a
+         renoncé au mot « profondeur » : il ne dit rien à qui ne connaît
+         pas les moteurs, alors qu'un nombre de coups d'avance se comprend. -->
+    <string name="analysis_engine_idle">Moteur en attente</string>
+    <string name="analysis_engine_off">Moteur indisponible</string>
+    <string name="analysis_engine_working">L\'ordinateur calcule — %1$d coups d\'avance</string>
+    <string name="analysis_moves_played">Coups joués</string>
+    <!-- La bande de reprise de l'accueil, aux mots d'iOS : elle disait
+         « Reprendre » puis le nom de l'adversaire, quand iOS annonce ce
+         qu'on reprend et où en est la partie. -->
+    <string name="home_resume_title">Reprendre la partie en cours</string>
+    <plurals name="home_resume_moves">
+        <item quantity="one">%1$d coup joué</item>
+        <item quantity="other">%1$d coups joués</item>
+    </plurals>
     <string name="variant_accuracy_caption">précision</string>
     <string name="variants_hub_title">Variantes d\'échecs</string>
     <string name="route_variants">Variantes</string>
@@ -707,10 +722,10 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="analysis_depth">profondeur %1$d</string>
     <string name="analysis_review_hint">Classer chaque coup et noter les deux joueurs.</string>
     <string name="analysis_make_puzzles">Créer des puzzles depuis les erreurs</string>
-    <string name="analysis_no_puzzles">Aucune position de cette partie ne fait un puzzle net.</string>
+    <string name="analysis_no_puzzles">Aucune gaffe assez nette pour un puzzle sans ambiguïté dans cette partie.</string>
     <plurals name="analysis_puzzles_created">
-        <item quantity="one">%1$d puzzle ajouté à vos puzzles maison.</item>
-        <item quantity="other">%1$d puzzles ajoutés à vos puzzles maison.</item>
+        <item quantity="one">%1$d puzzle créé — retrouvez-le dans le mode Puzzles.</item>
+        <item quantity="other">%1$d puzzles créés — retrouvez-les dans le mode Puzzles.</item>
     </plurals>
     <string name="puzzle_source_lichess">Lichess</string>
     <string name="puzzle_source_own">Mes parties</string>

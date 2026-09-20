@@ -137,8 +137,16 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
             // pour un seul geste.
             autosaves.maxByOrNull { it.savedAt }?.let { save ->
                 Banner(
-                    Icons.Default.PlayArrow, stringResource(R.string.home_resume),
-                    save.label, Palette.accent, "reprendre",
+                    Icons.Default.PlayArrow,
+                    stringResource(R.string.home_resume_title),
+                    // Où en est la partie, comme iOS — pas le nom de
+                    // l'adversaire, qu'on retrouve en l'ouvrant.
+                    pluralStringResource(
+                        R.plurals.home_resume_moves,
+                        save.moveList.size,
+                        save.moveList.size,
+                    ),
+                    Palette.accent, "reprendre",
                 ) {
                     onOpen(
                         if (save.mode == "twoPlayer") Route.TwoPlayer(resume = true)

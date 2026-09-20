@@ -73,6 +73,42 @@ introduit un texte faux.
       l'icône et la teinte de la variante — la présentation d'iOS
       (`FairyVariantSetupView.ruleSummary`).
 
+### Modules « Analyser » et « Accueil » — 20/09
+
+- [ ] **La ligne d'état du moteur disait « profondeur 18 ».** iOS a renoncé à
+      ce mot, commentaire à l'appui : il ne dit rien à qui ne connaît pas les
+      moteurs. Devient « L'ordinateur calcule — 18 coups d'avance », dans une
+      capsule au-dessus du plateau, avec le point qui s'allume.
+- [ ] **L'écran avait SA barre d'évaluation** : un ruban vert et bleu de 8 dp,
+      doublé d'une carte répétant le chiffre, la profondeur et le début de la
+      variante. iOS n'a ni la carte ni la variante — le score est DANS la barre,
+      et les coups du moteur sont dans la barre des candidats juste dessous.
+      Remplacée par la barre partagée.
+- [ ] **La bande des coups était coincée dans la rangée de navigation**, à
+      côté de cinq boutons : deux capsules y tenaient. Elle passe en pleine
+      largeur, en fin de panneau, sous un titre « Coups joués » — la place
+      qu'elle a sur iOS.
+- [ ] **Trois formats de nombres divergeaient.** L'éval d'un candidat
+      s'écrivait « +0,44 » (deux décimales, virgule de la locale) contre
+      « +0.4 » sur iOS, et « +M5 » là où iOS écrit « M5 ». La précision
+      s'écrivait « 97,1 % » contre « 97% ». L'écart de gain affichait « −0 % »
+      quand le coup n'avait rien coûté ; iOS écrit « ≈ 0 % », en gris.
+- [ ] **Les puzzles créés depuis les gaffes** se disaient « ajoutés à vos
+      puzzles maison » ; iOS renvoie vers le mode Puzzles, et nomme la raison
+      quand il n'y en a aucun.
+- [ ] **La bande de reprise de l'accueil** disait « Reprendre » puis le nom de
+      l'adversaire. iOS annonce ce qu'on reprend et où en est la partie :
+      « Reprendre la partie en cours », « 14 coups joués ».
+
+**Une AJOUT d'Android, laissé en place** : la bande « Réviser » de l'accueil,
+qui mène à la séance du jour. iOS n'a rien de tel sur son accueil. Retirer une
+fonction utile est une décision produit, pas une correction de parité — à
+trancher.
+
+**Les tuiles de l'accueil sont conformes** : les huit titres, sous-titres longs
+et courts sont ceux d'iOS, et le choix long/court suit la largeur comme sa
+classe de taille.
+
 ### Module « Variantes » — la REVUE DE FOND du 20/09
 
 Revue demandée : « Android doit être identique à iOS ». Faite en lisant les

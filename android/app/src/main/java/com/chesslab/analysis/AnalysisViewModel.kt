@@ -1438,11 +1438,21 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** L'évaluation en clair, POV Blancs. */
+    /**
+     * L'évaluation COMPACTE, au format d'iOS (`evalLabel`) : un chiffre après
+     * la virgule, un point décimal, et « M5 » sans signe pour un mat blanc.
+     *
+     * Elle en portait deux (« +0,44 »), avec la virgule de la locale et un
+     * « +M5 » qu'iOS n'écrit pas. Le point n'est pas un oubli : `String(format:)`
+     * travaille en locale POSIX côté iOS, et le même score doit s'écrire
+     * pareil sur les deux téléphones.
+     */
     private fun scoreText(cp: Int?, mate: Int?): String = when {
-        mate != null -> if (mate > 0) "+M$mate" else "−M${-mate}"
+        mate != null -> if (mate > 0) "M$mate" else "−M${-mate}"
         cp != null -> {
             val pawns = cp / 100.0
-            (if (pawns >= 0) "+%.2f" else "−%.2f").format(abs(pawns))
+            val signe = if (pawns > 0) "+" else if (pawns < 0) "−" else ""
+            signe + "%.1f".format(java.util.Locale.ROOT, abs(pawns))
         }
         else -> ""
     }

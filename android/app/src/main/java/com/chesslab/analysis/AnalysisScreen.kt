@@ -140,6 +140,8 @@ fun AnalysisScreen(
             }
             OpeningHeader(ui)
             StatusRow(ui.status, busy = ui.thinking)
+            Spacer(Modifier.height(6.dp))
+            EngineStatusBadge(ui)
             Spacer(Modifier.height(8.dp))
         },
         board = {
@@ -163,7 +165,12 @@ fun AnalysisScreen(
         },
         panel = {
             Spacer(Modifier.height(10.dp))
-            EvaluationBar(ui)
+            // La barre PARTAGÉE, celle d'iOS : le score s'écrit dedans. Cet
+            // écran avait la sienne — un ruban vert et bleu de 8 dp, doublé
+            // d'une carte qui répétait le chiffre, la profondeur et le début
+            // de la variante. iOS n'a ni la carte ni la variante : les coups
+            // du moteur sont dans la barre des candidats, juste dessous.
+            com.chesslab.ui.EvalBar(cp = ui.evalCp, mate = ui.evalMate)
 
             Spacer(Modifier.height(10.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -206,13 +213,15 @@ fun AnalysisScreen(
                         tint = if (ui.canPlayBestMove) Palette.accent else Palette.textTertiary,
                     )
                 }
-                Spacer(Modifier.width(8.dp))
-                Box(Modifier.weight(1f)) {
-                    MoveStrip(
-                        ui.sanMoves,
-                        selected = ui.cursor.takeIf { it >= 0 },
-                        qualities = ui.qualities,
-                        onSelect = model::goTo,
+                Spacer(Modifier.weight(1f))
+                if (ui.reviewing) {
+                    CircularProgressIndicator(
+                        Modifier.size(12.dp), strokeWidth = 2.dp, color = Palette.textTertiary,
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        "${ui.reviewDone}/${ui.reviewTotal}",
+                        fontSize = 11.sp, color = Palette.textTertiary,
                     )
                 }
             }
@@ -231,6 +240,24 @@ fun AnalysisScreen(
                 // où −1 est la position de départ.
                 EvalCurve(ui.curve, currentPly = ui.cursor + 1) { model.goTo(it - 1) }
             }
+
+            if (ui.sanMoves.isNotEmpty()) {
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    stringResource(R.string.analysis_moves_played),
+                    fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                )
+                Spacer(Modifier.height(8.dp))
+            }
+            // La bande PLEINE LARGEUR, en fin de panneau comme iOS. Elle était
+            // coincée dans la rangée de navigation, à côté de cinq boutons :
+            // deux capsules y tenaient.
+            MoveStrip(
+                ui.sanMoves,
+                selected = ui.cursor.takeIf { it >= 0 },
+                qualities = ui.qualities,
+                onSelect = model::goTo,
+            )
 
             // Ni liste de parties ni formulaire sur cet écran : la
             // BIBLIOTHÈQUE sait chercher, filtrer, étiqueter et supprimer, et
@@ -555,10 +582,19 @@ private fun CoachBar(ui: AnalysisUiState) {
             // Le meilleur coup n'est pas rappelé en toutes lettres : la flèche
             // sur le plateau le montre déjà. À la place, ce que le coup a coûté.
             ui.displayedWinDelta?.let { delta ->
+                // Sous un demi-point, le coup n'a RIEN coûté : « ≈ 0 % » le
+                // dit, là où « −0 % » laissait croire à une perte. Mêmes
+                // seuils et mêmes couleurs qu'iOS (`winDeltaLabel`).
+                val négligeable = kotlin.math.abs(delta) < 0.5
                 Text(
-                    (if (delta >= 0) "+%.0f %%" else "−%.0f %%").format(kotlin.math.abs(delta)),
+                    if (négligeable) "≈ 0 %"
+                    else (if (delta > 0) "+" else "−") + "${kotlin.math.round(kotlin.math.abs(delta)).toInt()} %",
                     fontSize = 12.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace,
-                    color = if (delta >= -1) Palette.accent else quality.tint,
+                    color = when {
+                        négligeable -> Palette.textSecondary
+                        delta > 0 -> Palette.accent
+                        else -> quality.tint
+                    },
                     modifier = Modifier.testTag("ecart"),
                 )
             }
@@ -671,7 +707,11 @@ private fun AccuracyPair(summary: GameSummary, modifier: Modifier = Modifier) {
             Column {
                 Text(stringResource(label), fontSize = 10.sp, color = Palette.textTertiary)
                 Text(
-                    side.accuracy?.let { "%.1f %%".format(it) + if (summary.isComplete) "" else " …" } ?: "—",
+                    // ENTIÈRE et collée au signe, comme iOS : « 97% ». La
+                    // décimale donnait une précision que le calcul n'a pas.
+                    side.accuracy?.let {
+                        "${kotlin.math.round(it).toInt()}%" + if (summary.isComplete) "" else " …"
+                    } ?: "—",
                     fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
                     fontFamily = FontFamily.Monospace, color = tint,
                 )
@@ -777,64 +817,36 @@ private fun GameSummarySheet(ui: AnalysisUiState, onDismiss: () -> Unit) {
  * chiffre — c'est ce que fait `EvalBarView` sur iOS.
  */
 @Composable
-private fun EvaluationBar(ui: AnalysisUiState) {
-    // Probabilité de gain des Blancs, bornée pour rester lisible aux extrêmes.
-    val share = when {
-        ui.evalMate != null -> if (ui.evalMate > 0) 1f else 0f
-        ui.evalCp != null -> (EvalConversion.fromCentipawns(ui.evalCp) / 100).toFloat()
-        else -> 0.5f
-    }.coerceIn(0.03f, 0.97f)
-
-    Column(Modifier.fillMaxWidth()) {
+private fun EngineStatusBadge(ui: AnalysisUiState) {
+    // Une ligne d'état NEUTRE, qui nomme ce qui travaille et jusqu'où il a
+    // calculé. Elle disait « profondeur 18 » : le mot ne veut rien dire pour
+    // qui ne connaît pas les moteurs, alors qu'un nombre de coups d'avance se
+    // comprend. iOS l'a changé pour cette raison, commentaire à l'appui.
+    val texte = when {
+        ui.engineUnavailable -> stringResource(R.string.analysis_engine_off)
+        ui.depth > 0 -> stringResource(R.string.analysis_engine_working, ui.depth)
+        else -> stringResource(R.string.analysis_engine_idle)
+    }
+    val vivant = !ui.engineUnavailable && ui.depth > 0
+    Row(
+        Modifier
+            .clip(CircleShape)
+            .background(Palette.surface)
+            .subtleBorder(CircleShape)
+            .padding(horizontal = 10.dp, vertical = 4.dp)
+            .testTag("moteur-etat"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
         Box(
             Modifier
-                .fillMaxWidth()
-                .height(8.dp)
+                .size(6.dp)
                 .clip(CircleShape)
-                .background(Palette.info.copy(alpha = 0.55f))
-                .testTag("barre-eval")
-        ) {
-            Box(Modifier.fillMaxWidth(share).fillMaxHeight().background(Palette.accent))
-        }
-        Spacer(Modifier.height(8.dp))
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(10.dp))
-                .background(Palette.surface)
-                .padding(horizontal = 12.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                ui.evaluation.ifEmpty { "—" },
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                fontFamily = FontFamily.Monospace,
-                color = when {
-                    ui.evaluation.startsWith("+") -> Palette.accent
-                    ui.evaluation.startsWith("−") -> Palette.danger
-                    else -> Palette.textTertiary
-                },
-                modifier = Modifier.testTag("evaluation"),
-            )
-            Spacer(Modifier.width(12.dp))
-            Column {
-                if (ui.depth > 0) {
-                    Text(
-                        stringResource(R.string.analysis_depth, ui.depth),
-                        fontSize = 11.sp, color = Palette.textTertiary,
-                    )
-                }
-                if (ui.bestLine.isNotEmpty()) {
-                    Text(
-                        ui.bestLine.split(" ").take(6).joinToString(" "),
-                        fontSize = 11.sp,
-                        fontFamily = FontFamily.Monospace,
-                        color = Palette.textSecondary,
-                        maxLines = 1,
-                    )
-                }
-            }
-        }
+                .background(
+                    (if (vivant) Palette.accent else Palette.textTertiary)
+                        .copy(alpha = if (vivant) 1f else 0.5f)
+                )
+        )
+        Spacer(Modifier.width(7.dp))
+        Text(texte, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Palette.textSecondary, maxLines = 1)
     }
 }

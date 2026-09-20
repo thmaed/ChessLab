@@ -295,6 +295,21 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="variant_three_checks_a11y">%1$d checks out of 3</string>
     <string name="variant_player_you">You</string>
     <string name="variant_player_engine">Computer</string>
+    <!-- La ligne d'état du moteur, au-dessus du plateau d'analyse. iOS a
+         renoncé au mot « profondeur » : il ne dit rien à qui ne connaît
+         pas les moteurs, alors qu'un nombre de coups d'avance se comprend. -->
+    <string name="analysis_engine_idle">Engine idle</string>
+    <string name="analysis_engine_off">Engine unavailable</string>
+    <string name="analysis_engine_working">The computer is calculating — %1$d moves ahead</string>
+    <string name="analysis_moves_played">Moves played</string>
+    <!-- La bande de reprise de l'accueil, aux mots d'iOS : elle disait
+         « Reprendre » puis le nom de l'adversaire, quand iOS annonce ce
+         qu'on reprend et où en est la partie. -->
+    <string name="home_resume_title">Resume the current game</string>
+    <plurals name="home_resume_moves">
+        <item quantity="one">%1$d move played</item>
+        <item quantity="other">%1$d moves played</item>
+    </plurals>
     <string name="variant_accuracy_caption">accuracy</string>
     <string name="variants_hub_title">Chess variants</string>
     <string name="route_variants">Variants</string>
@@ -710,10 +725,10 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="analysis_depth">depth %1$d</string>
     <string name="analysis_review_hint">Classify every move and score each player.</string>
     <string name="analysis_make_puzzles">Make puzzles from the mistakes</string>
-    <string name="analysis_no_puzzles">No position in this game makes a clear puzzle.</string>
+    <string name="analysis_no_puzzles">No blunder clear-cut enough for an unambiguous puzzle in this game.</string>
     <plurals name="analysis_puzzles_created">
-        <item quantity="one">%1$d puzzle added to your own puzzles.</item>
-        <item quantity="other">%1$d puzzles added to your own puzzles.</item>
+        <item quantity="one">%1$d puzzle created — find it in Puzzles.</item>
+        <item quantity="other">%1$d puzzles created — find them in Puzzles.</item>
     </plurals>
     <string name="puzzle_source_lichess">Lichess</string>
     <string name="puzzle_source_own">My games</string>

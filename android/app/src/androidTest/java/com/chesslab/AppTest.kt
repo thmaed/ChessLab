@@ -229,10 +229,16 @@ class AppTest {
 
         awaitTag("coup-5", 10_000)     // les six demi-coups sont là
 
-        // le moteur évalue la position courante
+        // le moteur évalue la position courante — lu sur sa LIGNE D'ÉTAT, qui
+        // annonce le nombre de coups d'avance dès qu'il a calculé. Le chiffre
+        // d'évaluation, lui, s'écrit maintenant DANS la barre, comme sur iOS,
+        // et s'efface quand la position est égale : l'attendre reviendrait à
+        // attendre que la partie penche.
         compose.waitUntil(60_000) {
-            val nodes = compose.onAllNodesWithTag("evaluation").fetchSemanticsNodes()
-            nodes.isNotEmpty() && nodes.first().config.toString().let { !it.contains("—") }
+            val nodes = compose.onAllNodesWithTag("moteur-etat").fetchSemanticsNodes()
+            nodes.isNotEmpty() && nodes.first().config.toString().let {
+                it.contains("coups d'avance") || it.contains("moves ahead")
+            }
         }
 
         // et on peut remonter dans la partie

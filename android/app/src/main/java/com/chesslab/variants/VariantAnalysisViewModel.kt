@@ -421,11 +421,13 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
         return lines.joinToString("\n") + "\n\n" + moves.toString().trim() + "\n"
     }
 
+    /** Le MÊME format que l'analyse orthodoxe, et que celui d'iOS. */
     private fun scoreText(cp: Int?, mate: Int?): String = when {
-        mate != null -> if (mate > 0) "+M$mate" else "−M${-mate}"
+        mate != null -> if (mate > 0) "M$mate" else "−M${-mate}"
         cp != null -> {
             val pawns = cp / 100.0
-            if (pawns >= 0) "+%.2f".format(pawns) else "−%.2f".format(-pawns)
+            val signe = if (pawns > 0) "+" else if (pawns < 0) "−" else ""
+            signe + "%.1f".format(java.util.Locale.ROOT, kotlin.math.abs(pawns))
         }
         else -> "—"
     }
