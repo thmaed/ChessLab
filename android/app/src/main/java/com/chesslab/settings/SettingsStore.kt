@@ -19,7 +19,6 @@ data class AppSettings(
     val boardThemeId: String = "classic",
     val pieceSetId: String = "classic",
     /** Temps de réflexion du moteur, en millisecondes, pour une partie. */
-    val engineMoveTimeMs: Int = 400,
     val autoFlipTwoPlayer: Boolean = true,
     /**
      * Essais accordés par puzzle. UN SEUL par défaut, comme sur iOS : trois
@@ -57,7 +56,6 @@ object SettingsStore {
 
     private val keyBoardTheme = stringPreferencesKey("boardThemeId")
     private val keyPieceSet = stringPreferencesKey("pieceSetId")
-    private val keyMoveTime = intPreferencesKey("engineMoveTimeMs")
     private val keyAutoFlip = booleanPreferencesKey("autoFlipTwoPlayer")
     private val keyAttempts = intPreferencesKey("puzzleAttempts")
     private val keySounds = booleanPreferencesKey("soundsEnabled")
@@ -76,7 +74,6 @@ object SettingsStore {
                 AppSettings(
                     boardThemeId = prefs[keyBoardTheme] ?: "classic",
                     pieceSetId = prefs[keyPieceSet] ?: "classic",
-                    engineMoveTimeMs = prefs[keyMoveTime] ?: 400,
                     autoFlipTwoPlayer = prefs[keyAutoFlip] ?: true,
                     puzzleAttempts = prefs[keyAttempts] ?: 1,
                     soundsEnabled = prefs[keySounds] ?: true,
@@ -96,7 +93,6 @@ object SettingsStore {
 
     fun setBoardTheme(context: Context, id: String) = update(context) { it[keyBoardTheme] = id }
     fun setPieceSet(context: Context, id: String) = update(context) { it[keyPieceSet] = id }
-    fun setMoveTime(context: Context, ms: Int) = update(context) { it[keyMoveTime] = ms }
     fun setAutoFlip(context: Context, on: Boolean) = update(context) { it[keyAutoFlip] = on }
     fun setPuzzleAttempts(context: Context, n: Int) = update(context) { it[keyAttempts] = n }
     fun setSounds(context: Context, on: Boolean) = update(context) { it[keySounds] = on }

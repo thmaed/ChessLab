@@ -94,8 +94,6 @@
     <string name="home_play_sub">Characters</string>
     <string name="home_puzzles_long">Tactics and Lichess library</string>
     <string name="home_puzzles_sub">Tactics and Lichess</string>
-    <string name="home_resume">Resume</string>
-    <string name="home_review">Review</string>
     <string name="home_tagline">Play, analyze, improve.</string>
     <string name="home_two_long">On the same device</string>
     <string name="home_two_sub">Same device</string>
@@ -368,14 +366,12 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="scan_unreadable">Unreadable image</string>
     <string name="settings_board_sounds">Board sounds</string>
     <string name="settings_board_theme">Board theme</string>
-    <string name="settings_engine_time">Engine thinking time</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_en">English</string>
     <string name="settings_language_fr">Français</string>
     <string name="settings_language_system">System</string>
     <string name="settings_one_try">One try</string>
     <string name="settings_piece_set">Piece set</string>
-    <string name="settings_preview">Preview</string>
     <string name="settings_puzzle_tries">Puzzle attempts</string>
     <string name="settings_sounds">Sounds</string>
     <string name="settings_sounds_note">Synthesised, no audio file embedded.</string>
@@ -383,10 +379,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="someone_thinking">%1$s is thinking…</string>
     <string name="soon">%1$s — soon</string>
     <string name="soon_label">Soon</string>
-    <string name="speed_fast">Fast (0.2 s)</string>
-    <string name="speed_long">Long (3 s)</string>
-    <string name="speed_normal">Normal (0.4 s)</string>
-    <string name="speed_thoughtful">Thoughtful (1 s)</string>
     <string name="square_piece">%1$s %2$s on %3$s</string>
     <string name="starting">Starting…</string>
     <string name="stockfish">Stockfish</string>
@@ -472,14 +464,6 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d position</item>
         <item quantity="other">%1$d positions</item>
     </plurals>
-    <plurals name="home_review_due">
-        <item quantity="one">%1$d position to revisit</item>
-        <item quantity="other">%1$d positions to revisit</item>
-    </plurals>
-    <plurals name="home_review_learned">
-        <item quantity="one">%1$d learned</item>
-        <item quantity="other">%1$d learned</item>
-    </plurals>
     <plurals name="progress_games_count">
         <item quantity="one">%1$d game</item>
         <item quantity="other">%1$d games</item>
@@ -508,7 +492,6 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d half-move</item>
         <item quantity="other">%1$d half-moves</item>
     </plurals>
-    <string name="settings_tries_note">One try by default: three invite you to try a move « just to see », the opposite of what a puzzle trains.</string>
     <string name="piece_initial_knight">N</string>
     <string name="piece_initial_bishop">B</string>
     <string name="piece_initial_rook">R</string>

@@ -91,8 +91,6 @@
     <string name="home_play_sub">Personnages</string>
     <string name="home_puzzles_long">Tactique et bibliothèque Lichess</string>
     <string name="home_puzzles_sub">Tactique et Lichess</string>
-    <string name="home_resume">Reprendre</string>
-    <string name="home_review">Réviser</string>
     <string name="home_tagline">Jouez, analysez, progressez.</string>
     <string name="home_two_long">Sur le même appareil</string>
     <string name="home_two_sub">Même appareil</string>
@@ -365,14 +363,12 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="scan_unreadable">Image illisible</string>
     <string name="settings_board_sounds">Sons du plateau</string>
     <string name="settings_board_theme">Thème du plateau</string>
-    <string name="settings_engine_time">Temps de réflexion du moteur</string>
     <string name="settings_language">Langue</string>
     <string name="settings_language_en">English</string>
     <string name="settings_language_fr">Français</string>
     <string name="settings_language_system">Système</string>
     <string name="settings_one_try">Un essai</string>
     <string name="settings_piece_set">Jeu de pièces</string>
-    <string name="settings_preview">Aperçu</string>
     <string name="settings_puzzle_tries">Essais par puzzle</string>
     <string name="settings_sounds">Sons</string>
     <string name="settings_sounds_note">Synthétisés, aucun fichier audio embarqué.</string>
@@ -380,10 +376,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="someone_thinking">%1$s réfléchit…</string>
     <string name="soon">%1$s — bientôt</string>
     <string name="soon_label">Bientôt</string>
-    <string name="speed_fast">Rapide (0,2 s)</string>
-    <string name="speed_long">Long (3 s)</string>
-    <string name="speed_normal">Normal (0,4 s)</string>
-    <string name="speed_thoughtful">Réfléchi (1 s)</string>
     <string name="square_piece">%1$s %2$s en %3$s</string>
     <string name="starting">Démarrage…</string>
     <string name="stockfish">Stockfish</string>
@@ -469,14 +461,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%1$d position</item>
         <item quantity="other">%1$d positions</item>
     </plurals>
-    <plurals name="home_review_due">
-        <item quantity="one">%1$d position à revoir</item>
-        <item quantity="other">%1$d positions à revoir</item>
-    </plurals>
-    <plurals name="home_review_learned">
-        <item quantity="one">%1$d apprise</item>
-        <item quantity="other">%1$d apprises</item>
-    </plurals>
     <plurals name="progress_games_count">
         <item quantity="one">%1$d partie</item>
         <item quantity="other">%1$d parties</item>
@@ -505,7 +489,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%1$d demi-coup</item>
         <item quantity="other">%1$d demi-coups</item>
     </plurals>
-    <string name="settings_tries_note">Un seul essai par défaut : trois invitent à tenter un coup « pour voir », l\'inverse de ce qu\'un puzzle entraîne.</string>
     <string name="piece_initial_knight">C</string>
     <string name="piece_initial_bishop">F</string>
     <string name="piece_initial_rook">T</string>

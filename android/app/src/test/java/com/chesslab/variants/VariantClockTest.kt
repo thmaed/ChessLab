@@ -35,15 +35,17 @@ class VariantClockTest {
     }
 
     /**
-     * Sans pendule, le moteur prend le temps CHOISI dans les réglages.
+     * Sans pendule, le moteur prend un temps FIXE — le même que sur iPhone.
      *
-     * C'était 900 ms en dur, et le réglage « Temps de réflexion du moteur » ne
-     * servait à rien — ses quatre choix ne changeaient rien. Le chiffre ne doit
-     * en tout cas pas dépendre d'un temps restant qui n'existe pas.
+     * Android en avait fait un réglage à quatre vitesses ; iOS n'en offre
+     * aucun (`PlayViewModel.baseMovetime`, 900 ms), et deux apps qui ne
+     * réfléchissent pas aussi longtemps ne jouent pas au même niveau. Le
+     * chiffre ne doit en tout cas pas dépendre d'un temps restant qui
+     * n'existe pas.
      */
-    @Test fun `sans pendule le moteur prend le temps réglé`() {
-        val attendu = com.chesslab.settings.AppSettings().engineMoveTimeMs
-        assertEquals(attendu, clock(TimeControl.byId("none")).movetimeFor(Piece.Color.white))
+    @Test fun `sans pendule le moteur prend le temps d'iOS`() {
+        assertEquals(900, com.chesslab.play.ENGINE_MOVETIME_MS)
+        assertEquals(900, clock(TimeControl.byId("none")).movetimeFor(Piece.Color.white))
     }
 
     /**

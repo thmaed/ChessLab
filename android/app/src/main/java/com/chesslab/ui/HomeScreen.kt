@@ -104,14 +104,6 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
     val autosaves by remember { LibraryDatabase.get(context).autosaves().all() }
         .collectAsState(initial = emptyList())
 
-    var due by remember { mutableStateOf(0) }
-    var studied by remember { mutableStateOf(0) }
-    LaunchedEffect(Unit) {
-        val dao = LibraryDatabase.get(context).training()
-        due = dao.dueCount(System.currentTimeMillis())
-        studied = dao.studiedCount()
-    }
-    val reviewLabel = stringResource(R.string.train_daily)
     // Les quatre dernières parties, comme sur iOS : un tap ouvre leur
     // analyse sans passer par la bibliothèque.
     val games by remember { LibraryDatabase.get(context).games().all() }
@@ -154,15 +146,6 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     )
                 }
             }
-            if (due > 0) {
-                Banner(
-                    Icons.Default.Schedule, stringResource(R.string.home_review),
-                    pluralStringResource(R.plurals.home_review_due, due, due) +
-                        if (studied > 0) " · " + pluralStringResource(R.plurals.home_review_learned, studied, studied) else "",
-                    Palette.warning, "reviser",
-                ) { onOpen(Route.Train("daily", label = reviewLabel)) }
-            }
-
             SectionHeader(stringResource(R.string.home_modes), Modifier.padding(top = 8.dp))
             modes.chunked(columns).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {

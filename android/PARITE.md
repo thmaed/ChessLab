@@ -188,8 +188,10 @@ PROPOSE un coup, seul signal franc depuis que le chiffre vit dans la barre.
       « Découverte » — sur cet écran seulement, comme iOS, le libellé entier
       restant à la résolution.
 
-**Deux AJOUTS d'Android, laissés en place** : la section « Temps de réflexion
-du moteur » des réglages, et l'aperçu du plateau. iOS n'a ni l'un ni l'autre.
+**RETIRÉS le 20/09, sur décision** : la section « Temps de réflexion du
+moteur » — le temps est figé à 900 ms, la valeur d'iOS — et le grand aperçu du
+plateau, remplacé par une vignette dans CHAQUE ligne de thème, avec ses vraies
+pièces, comme iOS.
 
 **Conformes, vérifiés en lisant les deux codes** : la Progression (bilan,
 par niveau, par personnage, par difficulté, à travailler, mémorisation), le
@@ -247,10 +249,9 @@ refaire en deux écrans est un chantier à part, à décider.
       l'adversaire. iOS annonce ce qu'on reprend et où en est la partie :
       « Reprendre la partie en cours », « 14 coups joués ».
 
-**Une AJOUT d'Android, laissé en place** : la bande « Réviser » de l'accueil,
-qui mène à la séance du jour. iOS n'a rien de tel sur son accueil. Retirer une
-fonction utile est une décision produit, pas une correction de parité — à
-trancher.
+**RETIRÉE le 20/09, sur décision** : la bande « Réviser » de l'accueil, qu'iOS
+n'a pas. On révise désormais en passant par la tuile Ouvertures, comme sur
+iPhone.
 
 **Les tuiles de l'accueil sont conformes** : les huit titres, sous-titres longs
 et courts sont ceux d'iOS, et le choix long/court suit la largeur comme sa
@@ -334,6 +335,25 @@ Au passage, `EvalCurve` rend maintenant le DEMI-COUP touché, comme
 traduit dans sa propre numérotation. L'analyse orthodoxe compte les coups
 (−1 = départ), les variantes comptent les demi-coups ; le composant partagé
 n'avait pas à connaître l'une des deux.
+
+### Les décisions prises le 20/09
+
+Quatre points laissés au choix, tranchés :
+
+- [x] **La bande « Réviser » de l'accueil** : RETIRÉE. iOS ne l'a pas.
+- [x] **Le réglage « Temps de réflexion du moteur »** : RETIRÉ. Le temps sans
+      pendule est figé à 900 ms — la valeur d'iOS (`PlayViewModel.baseMovetime`).
+      Deux apps qui ne réfléchissent pas aussi longtemps ne jouent pas au même
+      niveau.
+- [x] **Le grand aperçu du plateau** des réglages : RETIRÉ, remplacé par une
+      vignette dans chaque ligne de thème — six cases, six vraies pièces, comme
+      `piecePreview` d'iOS. Android montrait des pastilles de deux couleurs
+      PUIS un grand échiquier à part : deux endroits pour une seule question,
+      et aucun ne disait à quoi ressemble une pièce sur ce thème.
+- [x] **Le Laboratoire reste à UN écran.** iOS en a deux (réglages, puis
+      série). Écart de forme assumé, décidé le 20/09 après l'avoir rouvert.
+- [x] **Le Duck Chess garde « Roi capturé »**, contre l'« échec et mat » d'iOS
+      — voir plus haut : c'est iOS qui se contredit.
 
 ## ⬜ Écart OUVERT — les tablettes, 19/09/2026
 

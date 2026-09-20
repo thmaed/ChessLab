@@ -1,5 +1,10 @@
 package com.chesslab.settings
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.ui.res.painterResource
+import chesskit.Piece
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -81,21 +86,21 @@ fun SettingsScreen(
 
         }
 
+        // Une LIGNE par thème, avec ses VRAIES pièces posées dessus — comme
+        // iOS. Android montrait des pastilles de deux couleurs, puis un grand
+        // échiquier d'aperçu à part : deux endroits pour une seule question,
+        // et aucun des deux ne disait à quoi ressemble une pièce sur ce thème.
         SettingsSection(stringResource(R.string.settings_board_theme), Icons.Default.Palette) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 BoardTheme.all.forEach { theme ->
-                    ThemeSwatch(theme, theme.id == settings.boardThemeId) {
+                    ThemeRow(theme, settings.pieceSetId, theme.id == settings.boardThemeId) {
                         SettingsStore.setBoardTheme(context, theme.id)
                     }
                 }
             }
         }
 
-        SettingsSection(stringResource(R.string.settings_preview), Icons.Default.Visibility) {
-            BoardView(position = remembered, enabled = false)
-        }
-
-        SettingsSection(stringResource(R.string.settings_piece_set), Icons.Default.Category) {
+                SettingsSection(stringResource(R.string.settings_piece_set), Icons.Default.Category) {
         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
             listOf(
                 "classic" to R.string.pieces_classic,
@@ -227,19 +232,7 @@ fun SettingsScreen(
         
         }
 
-        SettingsSection(stringResource(R.string.settings_engine_time), Icons.Default.Speed) {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-            listOf(200 to R.string.speed_fast, 400 to R.string.speed_normal, 1000 to R.string.speed_thoughtful, 3000 to R.string.speed_long)
-                .forEach { (ms, label) ->
-                    Choice(stringResource(label), ms == settings.engineMoveTimeMs, "temps-$ms") {
-                        SettingsStore.setMoveTime(context, ms)
-                    }
-                }
-        }
-
-        }
-
-        SettingsSection(stringResource(R.string.settings_openings), Icons.Default.MenuBook) {
+                SettingsSection(stringResource(R.string.settings_openings), Icons.Default.MenuBook) {
             LinkRow(
                 Icons.Default.Description, stringResource(R.string.settings_sources),
                 stringResource(R.string.sources_intro).take(60) + "…", "sources", onOpenSources,
@@ -304,25 +297,69 @@ private fun Section(title: String) {
 }
 
 @Composable
-private fun ThemeSwatch(theme: BoardTheme, selected: Boolean, onPick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.testTag("theme-${theme.id}").clickable(onClick = onPick),
+private fun ThemeRow(
+    theme: BoardTheme,
+    pieceSetId: String,
+    selected: Boolean,
+    onPick: () -> Unit,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .testTag("theme-${theme.id}")
+            .clip(RoundedCornerShape(8.dp))
+            .background(if (selected) Palette.accent.copy(alpha = 0.12f) else Palette.surface)
+            .clickable(onClick = onPick)
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
+        // Six cases, six pièces : un roi, une dame et un cavalier de chaque
+        // camp. C'est l'échantillon d'iOS, et il suffit à juger un thème.
         Row(
             Modifier
-                .size(56.dp, 36.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(7.dp))
+                .border(1.dp, Palette.stroke, RoundedCornerShape(7.dp))
         ) {
-            Box(Modifier.weight(1f).fillMaxHeight().background(theme.lightSquare))
-            Box(Modifier.weight(1f).fillMaxHeight().background(theme.darkSquare))
+            val exemples = listOf(
+                Piece.Color.white to Piece.Kind.king,
+                Piece.Color.white to Piece.Kind.queen,
+                Piece.Color.white to Piece.Kind.knight,
+                Piece.Color.black to Piece.Kind.king,
+                Piece.Color.black to Piece.Kind.queen,
+                Piece.Color.black to Piece.Kind.knight,
+            )
+            exemples.forEachIndexed { index, (couleur, genre) ->
+                Box(
+                    Modifier
+                        .size(30.dp)
+                        .background(if (index % 2 == 0) theme.lightSquare else theme.darkSquare),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        painterResource(
+                            com.chesslab.ui.drawableFor(
+                                Piece(genre, couleur, chesskit.Square.e1), pieceSetId,
+                            )
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize().padding(3.dp),
+                    )
+                }
+            }
         }
-        Spacer(Modifier.height(3.dp))
+        Spacer(Modifier.width(12.dp))
         Text(
-            theme.label, fontSize = 10.sp,
-            color = if (selected) Palette.accent else Palette.textSecondary,
+            theme.label, fontSize = 13.sp,
+            color = if (selected) Palette.accent else Palette.textPrimary,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            modifier = Modifier.weight(1f),
         )
+        if (selected) {
+            Icon(
+                Icons.Default.CheckCircle, null,
+                tint = Palette.accent, modifier = Modifier.size(18.dp),
+            )
+        }
     }
 }
 

@@ -29,6 +29,15 @@ import com.chesslab.ui.HintArrowBuilder
 import com.chesslab.ui.q
 import com.chesslab.ui.s
 
+/**
+ * Le temps que le moteur prend par coup QUAND IL N'Y A PAS DE PENDULE.
+ *
+ * Figé, comme sur iOS (`PlayViewModel.baseMovetime`, 900 ms). Android en
+ * faisait un réglage à quatre vitesses ; iOS n'en offre aucun, et deux apps
+ * qui ne réfléchissent pas aussi longtemps ne jouent pas au même niveau.
+ */
+const val ENGINE_MOVETIME_MS = 900
+
 data class PlayUiState(
     val position: Position = Position.standard,
     val selected: Square? = null,
@@ -275,7 +284,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun baseMovetimeMs(): Int {
-        val c = clock ?: return com.chesslab.settings.SettingsStore.state.value.engineMoveTimeMs
+        val c = clock ?: return ENGINE_MOVETIME_MS
         if (!c.control.hasClock) return 900
         val remaining = c.remaining(board.position.sideToMove) / 1000.0
         val increment = c.control.incrementSeconds.toDouble()

@@ -113,5 +113,5 @@ class VariantClock(private val scope: CoroutineScope) {
 
     /** Le temps choisi dans les réglages, et 900 ms si rien n'a été choisi. */
     private fun reglage(): Int =
-        com.chesslab.settings.SettingsStore.state.value.engineMoveTimeMs
+        com.chesslab.play.ENGINE_MOVETIME_MS
 }
