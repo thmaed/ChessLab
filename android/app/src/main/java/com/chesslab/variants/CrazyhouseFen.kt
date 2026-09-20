@@ -87,6 +87,69 @@ object CrazyhouseFen {
  *
  * Une pose n'a pas d'origine : ses deux cases sont la même.
  */
+/**
+ * La FEN d'une variante, rendue lisible par `chesskit`. Pendant de
+ * `VariantFEN.swift`.
+ *
+ * Le moteur écrit des choses que `chesskit` ne connaît pas : la RÉSERVE du
+ * Crazyhouse entre crochets, la marque `~` d'un pion promu, et le `W` d'un mur
+ * des Barricades. `chesskit` ne lève jamais d'exception — il retombe sur une
+ * position PLAUSIBLE —, si bien qu'une FEN mal assainie ne se voit pas dans un
+ * journal : elle se voit sur l'échiquier, plusieurs coups plus tard, sous la
+ * forme d'une pièce qui n'a rien à y faire.
+ *
+ * Tout ce qui donne une FEN du moteur à `chesskit` passe donc par ici.
+ */
+/**
+ * Le compteur des Trois Échecs, lu dans la FEN du moteur.
+ *
+ * Fairy-Stockfish écrit les échecs qu'il RESTE à donner (« 3+3 » au départ,
+ * « 1+3 » quand les Blancs en ont donné deux). L'écran, lui, montre ceux qui
+ * ont été DONNÉS, comme iOS : c'est ce qu'on compte quand on joue.
+ */
+object ThreeCheckFen {
+
+    private const val TOTAL = 3
+
+    /** Vide si la FEN ne porte pas de compteur — c'est-à-dire partout ailleurs. */
+    fun given(fen: String): Map<Piece.Color, Int> {
+        val fields = fen.trim().split(" ").filter { it.isNotEmpty() }
+        if (fields.size != 7) return emptyMap()
+        val parts = fields[4].split("+")
+        if (parts.size != 2) return emptyMap()
+        val white = parts[0].toIntOrNull() ?: return emptyMap()
+        val black = parts[1].toIntOrNull() ?: return emptyMap()
+        return mapOf(
+            Piece.Color.white to (TOTAL - white).coerceIn(0, TOTAL),
+            Piece.Color.black to (TOTAL - black).coerceIn(0, TOTAL),
+        )
+    }
+}
+
+object VariantFen {
+    fun forChessKit(fen: String): String =
+        withoutCheckCounter(BarricadesFen.forChessKit(CrazyhouseFen.boardFen(fen)))
+
+    /**
+     * Le compteur des Trois Échecs, retiré.
+     *
+     * Fairy-Stockfish glisse un SEPTIÈME champ dans la FEN de cette variante —
+     * « 3+3 », les échecs qu'il reste à donner à chaque camp. `chesskit` en
+     * attend six exactement et rend `null` au septième : la position entière
+     * devenait illisible, et tout ce qui en dépendait retombait
+     * silencieusement sur rien.
+     */
+    private fun withoutCheckCounter(fen: String): String {
+        val fields = fen.split(" ").filter { it.isNotEmpty() }
+        if (fields.size != 7) return fen
+        // Le champ surnuméraire est le cinquième, et il est reconnaissable :
+        // deux nombres séparés d'un « + ». On ne retire que celui-là, jamais
+        // « un champ de trop » au hasard.
+        if (!Regex("""^\d+\+\d+$""").matches(fields[4])) return fen
+        return (fields.take(4) + fields.drop(5)).joinToString(" ")
+    }
+}
+
 object VariantMoveMarks {
 
     fun of(lan: String): Pair<Square, Square>? {

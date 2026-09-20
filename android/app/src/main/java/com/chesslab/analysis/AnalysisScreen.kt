@@ -151,6 +151,7 @@ fun AnalysisScreen(
                 lastMove = ui.lastMove,
                 checkedKing = ui.checkedKing,
                 arrows = arrowsFor(ui),
+                qualityBadge = ui.qualityBadge,
                 // Le plateau d'analyse SE JOUE : on y pose un coup pour voir
                 // ce qu'il donne. Il était inerte, et la seule façon
                 // d'explorer était de toucher une pastille de candidat — on
@@ -226,7 +227,9 @@ fun AnalysisScreen(
 
             if (ui.curve.size > 1) {
                 Spacer(Modifier.height(10.dp))
-                EvalCurve(ui.curve, currentPly = ui.cursor + 1, onSelect = model::goTo)
+                // La courbe rend un DEMI-COUP ; cet écran-ci compte les COUPS,
+                // où −1 est la position de départ.
+                EvalCurve(ui.curve, currentPly = ui.cursor + 1) { model.goTo(it - 1) }
             }
 
             // Ni liste de parties ni formulaire sur cet écran : la

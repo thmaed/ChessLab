@@ -48,6 +48,110 @@ paramètre. iOS écrit « tous les 7 coups (réglable de 4 à 8) » en dur ; And
 affiche l'intervalle RÉEL, et sa plage va de 2 à 12. Recopier iOS aurait
 introduit un texte faux.
 
+### Module « Variantes » — la REVUE de partie et la place des règles — 20/09
+
+- [ ] **L'analyse d'une partie de variante n'avait pas de COURBE
+      d'évaluation.** iOS en pose une sous la barre de navigation, dans les
+      trois écrans de revue de variante (`VariantAnalysisView`,
+      `Chess960AnalysisView`, `DuckChessAnalysisView`) ; Android n'en avait que
+      dans l'analyse orthodoxe. Elle dit d'un coup d'œil OÙ la partie a basculé,
+      et un appui y saute. Le composant existait déjà (`EvalCurve.kt`) : il ne
+      manquait que les points, et donc le cache des évaluations en pions que la
+      passe de classification ne gardait pas.
+- [ ] **Ni carte de PRÉCISION.** Elle vient juste dessous sur iOS, dans les
+      mêmes trois écrans. Le calcul est celui du mode « Contre l'ordinateur »,
+      et vit désormais dans `VariantAccuracy.kt` — pendant exact de
+      `VariantAccuracy.swift`, huit tests JVM à l'appui.
+- [ ] **Les deux se COMPLÈTENT au fil de la passe** au lieu d'apparaître d'un
+      coup à la fin, comme sur iOS où ce sont des propriétés calculées lues au
+      cache. La courbe s'allonge, les pastilles se posent, le pourcentage
+      s'affine.
+- [ ] **L'écran de JEU affichait les règles de la variante** au-dessus du
+      plateau, sur deux à quatre lignes prises au plateau. Aucun écran de jeu
+      iOS ne le fait : les règles se lisent sur l'écran de réglages, avant de
+      lancer la partie. Elles y sont désormais dans une section « Règle », avec
+      l'icône et la teinte de la variante — la présentation d'iOS
+      (`FairyVariantSetupView.ruleSummary`).
+
+### Module « Variantes » — la REVUE DE FOND du 20/09
+
+Revue demandée : « Android doit être identique à iOS ». Faite en lisant les
+deux codes écran par écran, puis en comparant les textes affichés des deux
+côtés. Ce qui suit a été trouvé, et corrigé.
+
+**Deux DÉFAUTS, pas des écarts d'apparence :**
+
+- [ ] **La revue d'une partie de Crazyhouse posait la RÉSERVE sur
+      l'échiquier.** L'écran de jeu assainissait la FEN du moteur, l'écran de
+      revue la donnait brute à `chesskit` — qui ne lève jamais d'exception et
+      rend une position plausible. Un cavalier capturé apparaissait en h1.
+      Toutes les lectures passent désormais par `VariantFen.forChessKit`,
+      pendant de `VariantFEN.swift`, et cinq tests le verrouillent.
+- [ ] **La FEN des Trois Échecs était ILLISIBLE.** Fairy-Stockfish y glisse un
+      septième champ (« 3+3 », les échecs restants) ; `chesskit` en attend six
+      exactement et rendait `null`. Tout ce qui en dépendait retombait
+      silencieusement sur rien. Le champ est retiré au même endroit.
+
+**Ce qu'Android ne disait pas :**
+
+- [ ] **Aucune partie de variante ne disait QUI avait gagné.** Le moteur
+      annonçait « plus aucun coup légal » et l'écran affichait « Partie
+      terminée ». iOS dit « Vous avez gagné (roi au centre) ». Porté :
+      `VariantOutcome.kt` (pendant d'`EngineLegalityVariant.outcome` et de
+      `FairyVariant.specialOutcome`) et `VariantDrawRules.kt` — dont la règle
+      du matériel insuffisant, qui ne vaut QUE dans les variantes où l'on
+      gagne par mat. Douze tests JVM.
+- [ ] **Le compteur des Trois Échecs n'existait pas.** C'est la ressource qui
+      décide la partie ; iOS l'affiche en permanence sur chaque bandeau
+      joueur. Lu dans la FEN du moteur (`ThreeCheckFen`).
+- [ ] **Les coups s'affichaient en UCI** — « b5b6 a7b6 » — là où iOS écrit
+      « b6 axb6 ». Portés : `VariantSan.kt` (d'`EngineLegalitySAN.swift`) et
+      `DuckChessSan.kt` (de `DuckChessSAN.swift`, avec son « ++ » et sans
+      échec ni mat). Le Coup Volé fournissait déjà sa notation. Douze tests.
+- [ ] **L'écran de jeu n'avait pas de BANDE DES COUPS** : un « 12 demi-coups »
+      disait seulement qu'il s'était passé quelque chose.
+- [ ] **Les bandeaux joueurs n'existaient pas.** Une ligne de pendule nue, et
+      seulement s'il y avait une cadence : sans horloge, rien ne disait qui
+      jouait quoi. iOS montre « Ordinateur » / « Vous », l'icône, le témoin de
+      réflexion, le compteur d'échecs et la pendule.
+- [ ] **La revue n'avait ni titre propre, ni menu d'export.** « Analyse —
+      Horde » désormais, et copier/partager la FEN et le PGN comme iOS.
+
+**Ce qui était là mais pas pareil :**
+
+- [ ] **La barre d'évaluation** : 8 dp sans rien écrit, contre 20 pt avec le
+      score DEDANS, un repère d'égalité au milieu, dégradés et liseré côté
+      iOS. Refaite à l'identique, et elle sert une dizaine d'écrans. Son score
+      s'écrit « +1.5 », avec un point, dans les deux langues — comme iOS, dont
+      le `String(format:)` travaille en locale POSIX.
+- [ ] **Le ruban de coups** était du texte posé sur le fond ; iOS en fait des
+      CAPSULES bordées de la couleur de la catégorie, le coup courant en
+      dégradé d'accent. Refait, et partagé par les deux écrans d'analyse comme
+      chez iOS. Il se CENTRE maintenant sur le coup affiché au lieu de rester
+      collé à la fin.
+- [ ] **La pastille de qualité** (« !! », « ?? ») se pose désormais SUR la case
+      d'arrivée, dans les deux écrans d'analyse, au lieu d'une ligne de texte
+      à côté du plateau.
+- [ ] **La barre de navigation de la revue** est une carte portant le compteur
+      « 4 / 10 » au milieu, la progression de la passe à côté — la forme
+      d'iOS —, au lieu de quatre flèches alignées à gauche et d'une barre de
+      progression sur sa propre ligne.
+- [ ] **L'alerte de coup risqué** répondait « Le garder » / « Annuler » ;
+      iOS répond « Ignorer » / « Reprendre le coup ». « Annuler » disait à la
+      fois « annuler le coup » et « annuler la boîte ».
+
+**Vérifié sur appareil** (Galaxy A16, 20/09) : le hub, la section « Règle », la
+revue d'une partie de Horde (titre, barre, pastille, courbe, précision,
+capsules en notation), une partie de Trois Échecs (bandeaux, compteur, bande
+des coups). **Pas encore vérifié sur appareil** : les fins de partie des douze
+variantes, une par une.
+
+Au passage, `EvalCurve` rend maintenant le DEMI-COUP touché, comme
+`EvalCurveView.swift`, au lieu de l'index du coup : c'est l'appelant qui
+traduit dans sa propre numérotation. L'analyse orthodoxe compte les coups
+(−1 = départ), les variantes comptent les demi-coups ; le composant partagé
+n'avait pas à connaître l'une des deux.
+
 ## ⬜ Écart OUVERT — les tablettes, 19/09/2026
 
 **iOS s'adapte à l'iPad, Android ne s'adapte pas aux tablettes.** Dix fichiers

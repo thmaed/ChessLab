@@ -55,7 +55,7 @@ fun StolenMoveScreen(
     settings: VariantSettings = VariantSettings(),
     onAnalyze: (String) -> Unit = {},
     /** Revoir la partie : les POSITIONS, pas les coups — un tour double n'est pas rejouable. */
-    onReviewGame: (List<String>, List<String>) -> Unit = { _, _ -> },
+    onReviewGame: (List<String>, List<String>, List<String>) -> Unit = { _, _, _ -> },
     model: StolenMoveViewModel = viewModel(),
 ) {
     LaunchedEffect(settings) { model.apply(settings) }
@@ -185,7 +185,7 @@ fun StolenMoveScreen(
                     }
                     Spacer(Modifier.weight(1f))
                     TextButton(
-                        onClick = { onReviewGame(model.analysisFens(), model.analysisMoves()) },
+                        onClick = { onReviewGame(model.analysisFens(), model.analysisMoves(), model.analysisSans()) },
                         enabled = model.analysisMoves().isNotEmpty(),
                         modifier = Modifier.testTag("analyser-la-partie"),
                     ) {

@@ -27,6 +27,13 @@ data class VariantUiState(
     val checkedKing: Square? = null,
     val status: String = "",
     val uciLog: List<String> = emptyList(),
+    /**
+     * Les mêmes coups EN NOTATION, pour la bande sous le plateau. Écrits
+     * au fil de la partie : il faut la position d'avant et les coups
+     * qu'elle permettait, et ni l'une ni les autres ne se retrouvent après
+     * coup. Voir [VariantSan].
+     */
+    val sanMoves: List<String> = emptyList(),
     /** Les pièces en main, par camp — vide partout sauf au Crazyhouse. */
     val pocket: Map<Piece.Color, Map<Piece.Kind, Int>> = emptyMap(),
     /** La pièce de la réserve qu'on s'apprête à poser. */
@@ -61,6 +68,12 @@ data class VariantUiState(
     val drawDeclined: Boolean = false,
     /** Le mot de la fin : « Échec et mat — vous gagnez », « Abandon »… */
     val outcome: String? = null,
+    /**
+     * Les échecs DONNÉS par chaque camp, au Trois Échecs — la ressource qui
+     * décide la partie, comme le temps sur une pendule. Lus dans la FEN du
+     * moteur, qui tient le décompte ; vides ailleurs.
+     */
+    val checksGiven: Map<Piece.Color, Int> = emptyMap(),
 )
 
 /**
@@ -140,7 +153,8 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         val number = chess960Number ?: settings.chess960Number
         clock.reset(settings.timeControl)
         ui = ui.copy(
-            variant = variant, uciLog = emptyList(), gameOver = false, ready = false,
+            variant = variant, uciLog = emptyList(), sanMoves = emptyList(),
+            gameOver = false, ready = false,
             status = s(R.string.engine_starting), lastMove = null,
             twoPlayer = twoPlayer || settings.twoPlayers, chess960Number = number,
             settings = settings, userColor = humanColor,
@@ -173,7 +187,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         startFen = startingFen(variant, ui.chess960Number)
         clock.reset(ui.settings.timeControl)
         ui = ui.copy(
-            uciLog = emptyList(), gameOver = false, lastMove = null, plies = 0,
+            uciLog = emptyList(), sanMoves = emptyList(), gameOver = false, lastMove = null, plies = 0,
             whiteClockMs = clock.remaining(Piece.Color.white),
             blackClockMs = clock.remaining(Piece.Color.black),
             evalCp = null, evalMate = null, hints = emptyList(), blunderWarning = null,
@@ -190,6 +204,14 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         number != null -> Chess960Position.startingFen(number) ?: VariantCatalog.randomChess960Fen()
         else -> VariantCatalog.randomChess960Fen()
     }
+
+    /**
+     * La position telle que le moteur l'a rendue au coup PRÉCÉDENT. Elle
+     * sert à écrire la notation du coup qu'on vient de jouer : sans les
+     * coups légaux d'avant, « Nbd2 » s'écrirait « Nd2 » et désignerait
+     * deux cavaliers à la fois.
+     */
+    private var previousQuery: com.chesslab.engine.PositionQuery? = null
 
     /** Interroge le moteur et remet à jour le plateau. */
     private fun refresh(afterMove: Pair<Square, Square>? = null): Job = viewModelScope.launch {
@@ -237,8 +259,39 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         else answer.legalMoves
         val position = parse(answer.fen) ?: Position.standard
         val pocket = CrazyhouseFen.pocket(answer.fen)
+
+        // La notation du coup qu'on vient de jouer. On ne l'ajoute qu'une fois
+        // — la bande doit avoir autant de capsules que le journal a de coups —,
+        // et jamais quand les murs mobiles ont rebasé la partie.
+        val sans = if (afterMove != null && previousQuery != null &&
+            ui.sanMoves.size < rebased + ui.uciLog.size
+        ) {
+            ui.sanMoves + VariantSan.build(
+                uci = ui.uciLog.lastOrNull() ?: "",
+                beforeFen = previousQuery!!.fen,
+                legalMovesBefore = previousQuery!!.legalMoves,
+                isCheck = answer.inCheck,
+                isMate = answer.inCheck && answer.legalMoves.isEmpty(),
+            )
+        } else {
+            ui.sanMoves
+        }
+        previousQuery = answer
         val walls = if (variant.hasWalls) BarricadesFen.wallSquares(answer.fen).toSet() else emptySet()
-        val over = legal.isEmpty()
+
+        // POURQUOI la partie s'arrête, et qui gagne. Le moteur reste l'arbitre
+        // de la légalité ; on ne fait que LIRE la position qu'il rend pour la
+        // nommer. Sans cela l'écran disait « Partie terminée » et rien d'autre
+        // — on ne savait même pas si l'on avait gagné.
+        val verdict = VariantOutcome.detect(
+            variantId = variant.id,
+            fen = answer.fen,
+            legalMoves = legal,
+            inCheck = answer.inCheck,
+            pocketIsEmpty = pocket.values.all { it.values.all { n -> n == 0 } },
+        )
+        val over = legal.isEmpty() || verdict != null
+        val verdictText = verdict?.let { phrase(it) }
 
         ui = ui.copy(
             position = position,
@@ -250,10 +303,12 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
             checkedKing = if (answer.inCheck) kingSquare(position, position.sideToMove) else null,
             walls = walls,
             plies = rebased + ui.uciLog.size,
+            sanMoves = sans,
+            checksGiven = ThreeCheckFen.given(answer.fen),
             gameOver = over,
             ready = true,
             status = when {
-                over -> s(R.string.game_over)
+                over -> verdictText ?: s(R.string.game_over)
                 // À deux, dire « à vous » ne dit rien : c'est la COULEUR au
                 // trait qui désigne celui dont c'est le tour.
                 ui.twoPlayer -> s(
@@ -267,7 +322,10 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
 
         if (over) {
             clock.stop()
-            ui = ui.copy(outcome = ui.outcome ?: s(R.string.game_over), hints = emptyList())
+            ui = ui.copy(
+                outcome = ui.outcome ?: verdictText ?: s(R.string.game_over),
+                hints = emptyList(),
+            )
             return@launch
         }
 
@@ -529,7 +587,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
     private fun parse(fen: String): Position? {
         // Les murs disparaissent AVANT `chesskit` : le « W » n'est une pièce
         // que pour le moteur, et la lettre ferait refuser toute la position.
-        val fields = BarricadesFen.forChessKit(CrazyhouseFen.boardFen(fen)).split(" ").filter { it.isNotEmpty() }
+        val fields = VariantFen.forChessKit(fen).split(" ").filter { it.isNotEmpty() }
         if (fields.size < 4) return null
         val six = fields.take(4) + listOf(fields.getOrNull(4) ?: "0", fields.getOrNull(5) ?: "1")
         return FenParser.parse(six.joinToString(" "))
@@ -538,6 +596,24 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
     private companion object {
         /** Écart d'évaluation en deçà duquel l'ordinateur accepte une nulle. */
         const val DRAW_ACCEPTANCE_CP = 50
+    }
+
+    /**
+     * Le verdict mis en phrase, comme iOS : « Vous avez gagné (roi au
+     * centre) », « Partie nulle (pat) ». À deux sur le même appareil il n'y a
+     * pas de « vous » : c'est la COULEUR qui gagne.
+     */
+    private fun phrase(verdict: VariantOutcome.Result): String {
+        val raison = s(verdict.reasonRes)
+        val winner = verdict.winner ?: return s(R.string.variant_draw, raison)
+        if (ui.twoPlayer) {
+            val camp = s(
+                if (winner == Piece.Color.white) R.string.color_white else R.string.color_black
+            )
+            return s(R.string.variant_side_won, camp, raison)
+        }
+        return if (winner == humanColor) s(R.string.variant_you_won, raison)
+        else s(R.string.variant_you_lost, raison)
     }
 
     private fun kingSquare(position: Position, color: Piece.Color): Square? =

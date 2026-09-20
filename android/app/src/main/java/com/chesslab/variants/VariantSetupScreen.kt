@@ -95,11 +95,22 @@ fun VariantSetupScreen(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(22.dp),
         ) {
-            Text(
-                stringResource(variant.blurbRes),
-                fontSize = 12.sp, color = Palette.textSecondary,
-                modifier = Modifier.testTag("regle"),
-            )
+            // La RÈGLE du jeu, en tête et dans une section comme les autres —
+            // c'est le seul endroit où elle est lue, et c'est ici qu'il faut
+            // la lire : avant de choisir sa force et sa cadence, pas une fois
+            // le plateau devant soi. Même présentation qu'iOS, icône et teinte
+            // de la variante comprises.
+            SettingsSection(
+                stringResource(R.string.variant_rule),
+                variantIcon(variant.id),
+                variantTint(variant.id),
+            ) {
+                Text(
+                    stringResource(variant.blurbRes),
+                    fontSize = 12.sp, color = Palette.textSecondary,
+                    modifier = Modifier.testTag("regle"),
+                )
+            }
 
             if (variant.supportsTwoPlayers) {
                 SettingsSection(stringResource(R.string.setup_opponent), Icons.Default.People) {

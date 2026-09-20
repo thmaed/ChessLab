@@ -313,7 +313,7 @@ fun PlayScreen(
             text = { Text(message, color = Palette.textSecondary, modifier = Modifier.testTag("alerte-gaffe")) },
             confirmButton = {
                 TextButton(onClick = model::takebackAfterWarning, modifier = Modifier.testTag("reprendre-le-coup")) {
-                    Text(stringResource(R.string.play_takeback), color = Palette.accent)
+                    Text(stringResource(R.string.blunder_takeback), color = Palette.accent)
                 }
             },
             dismissButton = {

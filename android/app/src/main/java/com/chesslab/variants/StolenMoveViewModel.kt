@@ -127,6 +127,8 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
     /** Ce que la revue d'après-partie reçoit : les positions, dans l'ordre. */
     fun analysisFens(): List<String> = fenLog.toList()
     fun analysisMoves(): List<String> = lanLog.toList()
+    /** `chesskit` joue chaque coup ici : il en donne la notation. */
+    fun analysisSans(): List<String> = ui.sanMoves.toList()
 
     fun newGame() {
         turn?.cancel()

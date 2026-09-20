@@ -15,7 +15,7 @@ import com.chesslab.R
  */
 sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = null) {
 
-    fun title(context: Context): String = dynamicTitle ?: context.getString(titleRes)
+    open fun title(context: Context): String = dynamicTitle ?: context.getString(titleRes)
 
     /**
      * Vrai quand l'écran porte DÉJÀ son grand titre : la barre n'en montre
@@ -83,7 +83,20 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
          * dans aucun coup. Vide : la partie se rejoue au moteur.
          */
         val fenLog: List<String> = emptyList(),
-    ) : Route(R.string.route_analysis)
+        /**
+         * Les coups EN NOTATION, quand la partie les a écrits en la jouant :
+         * le Duck Chess et le Coup Volé ne se rejouent pas au moteur, et leur
+         * notation ne peut donc pas se reconstruire après coup. Vide : la
+         * revue l'écrit elle-même, demi-coup par demi-coup.
+         */
+        val sanLog: List<String> = emptyList(),
+        /** Le nom de la variante, pour le titre « Analyse — Horde ». */
+        val variantName: String = "",
+    ) : Route(R.string.route_analysis) {
+        override fun title(context: Context): String =
+            if (variantName.isEmpty()) context.getString(titleRes)
+            else context.getString(R.string.route_variant_analysis, variantName)
+    }
 
     /** Le CHOIX de la source : scanner, bibliothèque, dernière partie, coller. */
     data object Analysis : Route(R.string.route_analysis)

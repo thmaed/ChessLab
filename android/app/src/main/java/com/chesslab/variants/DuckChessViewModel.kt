@@ -86,6 +86,14 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
     private val duckLog = ArrayList<Square?>()
     private val lanLog = ArrayList<String>()
 
+    /**
+     * Les mêmes coups EN NOTATION, pour la revue. Écrite au moment où le
+     * coup se joue, et pas après : il faut la position d'avant et les coups
+     * qu'elle permettait, et ni l'une ni les autres ne se retrouvent depuis
+     * un journal de positions. Voir [DuckChessSan].
+     */
+    private val sanLog = ArrayList<String>()
+
     private val clock = VariantClock(viewModelScope).apply {
         onTick = { white, black -> ui = ui.copy(whiteClockMs = white, blackClockMs = black) }
         onFlag = { flagged ->
@@ -102,6 +110,7 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
     /** Ce que la revue d'après-partie reçoit : les positions, dans l'ordre. */
     fun analysisFens(): List<String> = fenLog.toList()
     fun analysisMoves(): List<String> = lanLog.toList()
+    fun analysisSans(): List<String> = sanLog.toList()
 
     init { newGame() }
 
@@ -197,6 +206,7 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         lanLog += move.uci
+        sanLog += DuckChessSan.build(move, position, legal, capturesKing = victim != null)
 
         if (victim != null) {
             // Le roi est tombé : la partie s'arrête AVANT même la pose du

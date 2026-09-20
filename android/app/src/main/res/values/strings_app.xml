@@ -260,6 +260,42 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="route_two_players">Two players</string>
     <!-- Le titre de l'ÉCRAN, plus explicite que celui de la tuile
          d'accueil — même distinction que sur iOS. -->
+    <!-- Sous le pourcentage, dans la carte de précision de l'analyse
+         des variantes : minuscule, comme sur iOS. -->
+    <!-- En-tête de la section qui porte les règles de la variante, sur
+         l'écran de réglages. Le seul endroit où elles sont écrites. -->
+    <string name="variant_rule">Rule</string>
+    <!-- Le titre de la revue d'une partie de variante : « Analyse — Horde ».
+         iOS compose le même (`VariantAnalysisView`). -->
+    <string name="route_variant_analysis">Analysis — %1$s</string>
+    <!-- Ce que le lecteur d'écran annonce pour la barre d'évaluation. -->
+    <string name="eval_a11y_title">Evaluation</string>
+    <string name="eval_a11y_white">White</string>
+    <string name="eval_a11y_black">Black</string>
+    <!-- « mat en 3 pour les noirs ». -->
+    <string name="eval_a11y_mate">mate in %1$d for %2$s</string>
+    <string name="eval_a11y_equal">level position</string>
+    <!-- « +0,8 pour les blancs » — le nombre est formaté à part. -->
+    <string name="eval_a11y_score">%1$s for %2$s</string>
+    <!-- Pourquoi une partie de variante s'est arrêtée. Les mêmes mots
+         qu'iOS (`GameOutcome.reasonText`), au mot près. -->
+    <string name="reason_stalemate">stalemate</string>
+    <string name="reason_king_of_the_hill">king in the centre</string>
+    <string name="reason_three_checks">three checks delivered</string>
+    <string name="reason_horde_extinct">no pieces left</string>
+    <string name="reason_racing_goal">king reached the 8th rank</string>
+    <string name="reason_racing_draw">both kings arrive together</string>
+    <string name="reason_antichess_stuck">no move possible</string>
+    <string name="reason_atomic_king">king exploded</string>
+    <string name="variant_you_won">You won (%1$s)</string>
+    <string name="variant_you_lost">You lost (%1$s)</string>
+    <string name="variant_draw">Draw (%1$s)</string>
+    <string name="variant_side_won">%1$s won (%2$s)</string>
+    <string name="variant_three_checks_badge">%1$d/3</string>
+    <string name="variant_three_checks_a11y">%1$d checks out of 3</string>
+    <string name="variant_player_you">You</string>
+    <string name="variant_player_engine">Computer</string>
+    <string name="variant_accuracy_caption">accuracy</string>
     <string name="variants_hub_title">Chess variants</string>
     <string name="route_variants">Variants</string>
     <string name="scan_confirm_title">Check the position</string>
@@ -695,7 +731,11 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="blunder_missed_mate">That move lets a forced mate slip away.</string>
     <string name="blunder_allows_mate">That move gives your opponent a forced mate.</string>
     <string name="blunder_centipawns">That move costs about %1$d pawn(s) of evaluation.</string>
-    <string name="blunder_keep">Keep it</string>
+    <!-- Les deux réponses à l'alerte de gaffe, mot pour mot celles
+         d'iOS : « Annuler » disait à la fois « annuler le coup » et
+         « annuler la boîte ». -->
+    <string name="blunder_takeback">Take back the move</string>
+    <string name="blunder_keep">Ignore</string>
     <string name="setup_blunder_alert">Warn me about risky moves</string>
     <string name="two_setup_players">Players</string>
     <string name="two_setup_rotation">Board layout</string>

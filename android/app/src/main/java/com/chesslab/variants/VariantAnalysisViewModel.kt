@@ -9,10 +9,12 @@ import androidx.lifecycle.viewModelScope
 import chesskit.Position
 import chesskit.Square
 import com.chesslab.R
+import com.chesslab.analysis.CurvePoint
 import com.chesslab.analysis.EvalConversion
 import com.chesslab.analysis.MoveClassifier
 import com.chesslab.analysis.MoveQuality
 import com.chesslab.engine.FairyEngine
+import com.chesslab.engine.PositionQuery
 import com.chesslab.ui.s
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -37,6 +39,15 @@ data class VariantAnalysisUiState(
     val classifying: Boolean = false,
     val done: Int = 0,
     val total: Int = 0,
+    /**
+     * La courbe d'évaluation — un point par demi-coup ÉVALUÉ. Elle POUSSE au
+     * fil de la passe au lieu d'apparaître d'un coup à la fin : une courbe qui
+     * s'allonge vaut mieux qu'un rectangle vide.
+     */
+    val curve: List<CurvePoint> = emptyList(),
+    /** La précision de chaque camp, en pourcent — nulle tant qu'aucun coup n'est jugé. */
+    val accuracyWhite: Double? = null,
+    val accuracyBlack: Double? = null,
     val variantName: String = "",
     val engineUnavailable: Boolean = false,
 ) {
@@ -44,6 +55,18 @@ data class VariantAnalysisUiState(
     val canGoPrevious: Boolean get() = displayedPly > 0
     val canGoNext: Boolean get() = displayedPly < totalPlies
     val displayedQuality: MoveQuality? get() = qualities[displayedPly - 1]
+
+    /**
+     * La pastille à poser SUR l'échiquier : le verdict du dernier coup, sur sa
+     * case d'arrivée. Le verdict là où il s'est joué vaut mieux qu'une ligne
+     * de texte à côté — on regarde la case, on lit le jugement.
+     */
+    val qualityBadge: Pair<Square, MoveQuality>?
+        get() {
+            val quality = displayedQuality ?: return null
+            val end = lastMove?.second ?: return null
+            return end to quality
+        }
 }
 
 /**
@@ -77,6 +100,9 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
      */
     private var givenFens: List<String> = emptyList()
 
+    /** La notation fournie par la partie, quand elle en a une. */
+    private var givenSans: List<String> = emptyList()
+
     /**
      * L'identifiant à donner au MOTEUR. Le Duck Chess et le Coup Volé se
      * jugent aux règles ORDINAIRES — le premier faute de moteur qui connaisse
@@ -94,6 +120,14 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
     /** L'évaluation de chaque position, POV Blancs, en probabilité de gain. */
     private val winPercents = HashMap<Int, Double>()
 
+    /**
+     * La même évaluation en PIONS, POV Blancs, bornée ±10 — ce que la courbe
+     * dessine. Bornée parce qu'un mat annoncé vaut « gagné », pas « +327 » :
+     * sans borne, un seul mat écraserait toute la partie sur la ligne
+     * d'équilibre. Même règle que `pawnsWhite` de l'analyse orthodoxe.
+     */
+    private val pawnsWhite = HashMap<Int, Double>()
+
     var ui by mutableStateOf(VariantAnalysisUiState())
         private set
 
@@ -107,15 +141,25 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
         uciLog: List<String>,
         /** Les positions déjà connues, quand les coups ne les reproduisent pas. */
         fenLog: List<String> = emptyList(),
+        /**
+         * La notation déjà écrite par la partie. Le Duck Chess et le Coup Volé
+         * la fournissent — leurs règles vivent dans l'app, et le moteur ne
+         * saurait ni rejouer leur partie ni la noter. Vide : on l'écrit ici.
+         */
+        sanLog: List<String> = emptyList(),
     ) {
         if (this.variantId == variantId && this.uciLog == uciLog && fens.isNotEmpty()) return
         this.variantId = variantId
         this.startFen = startFen
         this.uciLog = uciLog
         this.givenFens = fenLog
+        this.givenSans = sanLog
+        winPercents.clear()
+        pawnsWhite.clear()
         ui = ui.copy(
             variantName = VariantCatalog.byId(variantId)?.let { s(it.titleRes) } ?: variantId,
             sanMoves = emptyList(), qualities = emptyMap(), displayedPly = 0,
+            curve = emptyList(), accuracyWhite = null, accuracyBlack = null,
         )
         viewModelScope.launch { rebuild() }
     }
@@ -130,7 +174,12 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
         // redemander au moteur, qui refuserait la moitié d'entre elles.
         if (givenFens.isNotEmpty()) {
             fens = givenFens
-            ui = ui.copy(sanMoves = uciLog, engineUnavailable = false)
+            // La notation de la partie si elle l'a écrite ; à défaut le coup
+            // brut, qui ne ment jamais même s'il ne se lit pas.
+            ui = ui.copy(
+                sanMoves = if (givenSans.size == uciLog.size) givenSans else uciLog,
+                engineUnavailable = false,
+            )
             goTo(uciLog.size)
             classify()
             return
@@ -140,14 +189,30 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
         val sans = ArrayList<String>()
         val ok = withContext(Dispatchers.IO) {
             FairyEngine.use(getApplication()) { engine ->
+                // Ce que la position PRÉCÉDENTE permettait : il faut ses coups
+                // légaux pour désambiguïser (« Nbd2 » plutôt que « Nd2 »), et
+                // l'échec ne se connaît qu'une fois le coup joué.
+                var previous: PositionQuery? = null
                 for (ply in 0..uciLog.size) {
                     currentCoroutineContext().ensureActive()
                     val query = engine.queryPosition(engineVariant, startFen, uciLog.take(ply))
                         ?: return@use false
                     positions += query.fen
-                    // La notation d'une variante n'est pas celle de `chesskit` :
-                    // on garde le coup en LAN, qui ne ment jamais.
-                    if (ply > 0) sans += uciLog[ply - 1]
+                    val before = previous
+                    if (ply > 0 && before != null) {
+                        sans += VariantSan.build(
+                            uci = uciLog[ply - 1],
+                            beforeFen = before.fen,
+                            legalMovesBefore = before.legalMoves,
+                            isCheck = query.inCheck,
+                            // Échec et AUCUN coup : c'est mat. Dans plusieurs
+                            // de ces jeux la partie s'arrête autrement — roi au
+                            // centre, trois échecs —, et le moteur le dit en
+                            // n'offrant plus rien.
+                            isMate = query.inCheck && query.legalMoves.isEmpty(),
+                        )
+                    }
+                    previous = query
                 }
                 true
             }
@@ -163,7 +228,11 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
     fun goTo(ply: Int) {
         val target = ply.coerceIn(0, uciLog.size)
         val fen = fens.getOrNull(target) ?: return
-        val position = Position.fromFen(fen) ?: return
+        // ASSAINIE, jamais brute : la FEN du moteur porte la réserve du
+        // Crazyhouse et les murs des Barricades. Sans ce passage, la réserve
+        // se posait SUR le plateau — un cavalier capturé apparaissait en h1,
+        // et `chesskit`, qui ne lève jamais d'exception, n'en disait rien.
+        val position = Position.fromFen(VariantFen.forChessKit(fen)) ?: return
         val move = uciLog.getOrNull(target - 1)
         ui = ui.copy(
             position = position,
@@ -220,12 +289,22 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
                         for (ply in fens.indices) {
                             currentCoroutineContext().ensureActive()
                             val eval = evalAt(engine, ply, PASS_MS)
-                            if (eval != null) winPercents[ply] = winPercent(eval.cp, eval.mate)
-                            withContext(Dispatchers.Main) { ui = ui.copy(done = ply + 1) }
+                            if (eval != null) {
+                                winPercents[ply] = winPercent(eval.cp, eval.mate)
+                                pawnsWhite[ply] = pawns(eval.cp, eval.mate)
+                            }
+                            // Publié à CHAQUE demi-coup, pas à la fin : la
+                            // courbe s'allonge et les pastilles se posent sous
+                            // les yeux, comme sur iOS, où ces trois-là sont des
+                            // propriétés calculées lues au cache.
+                            withContext(Dispatchers.Main) {
+                                ui = ui.copy(done = ply + 1)
+                                publish()
+                            }
                         }
                     }
                 }
-                publishQualities()
+                publish()
             } finally {
                 ui = ui.copy(classifying = false)
                 evaluate(ui.displayedPly)
@@ -252,7 +331,15 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
 
-    private fun publishQualities() {
+    /**
+     * Ce que la passe a appris, porté à l'écran : les pastilles de qualité, la
+     * courbe et la précision de chaque camp.
+     *
+     * Les trois sortent du MÊME cache et se recalculent ensemble — elles
+     * disent la même chose avec la même confiance, et l'une qui avancerait
+     * sans les autres ferait douter des deux.
+     */
+    private fun publish() {
         val qualities = HashMap<Int, MoveQuality>()
         for (index in uciLog.indices) {
             val before = winPercents[index] ?: continue
@@ -274,11 +361,65 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
                 )
             )
         }
-        ui = ui.copy(qualities = qualities)
+
+        // Le point d'index i est ATTEINT par le coup i−1 : c'est la qualité de
+        // ce coup-là qui marque le décrochage. Les positions pas encore
+        // évaluées sont simplement absentes.
+        val curve = fens.indices.mapNotNull { ply ->
+            val value = pawnsWhite[ply] ?: return@mapNotNull null
+            CurvePoint(ply = ply, pawns = value, quality = if (ply == 0) null else qualities[ply - 1])
+        }
+
+        val accuracy = VariantAccuracy.byColor(
+            plyCount = uciLog.size,
+            winPercentWhite = { winPercents[it] },
+            whiteMovesAt = { fens.getOrNull(it)?.contains(" w ") },
+        )
+        ui = ui.copy(
+            qualities = qualities,
+            curve = curve,
+            accuracyWhite = accuracy.white,
+            accuracyBlack = accuracy.black,
+        )
     }
 
     private fun winPercent(cp: Int?, mate: Int?): Double =
         mate?.let { EvalConversion.fromMate(it) } ?: EvalConversion.fromCentipawns(cp ?: 0)
+
+    /**
+     * L'évaluation en pions, POV Blancs, bornée ±10 : un mat annoncé vaut
+     * « gagné », pas un nombre de pions. Même règle que `pawnsWhite` de
+     * l'analyse orthodoxe.
+     */
+    private fun pawns(cp: Int?, mate: Int?): Double =
+        mate?.let { if (it > 0) 10.0 else -10.0 }
+            ?: kotlin.math.min(10.0, kotlin.math.max(-10.0, (cp ?: 0) / 100.0))
+
+    /** La FEN de la position AFFICHÉE — celle qu'on copie ou qu'on partage. */
+    fun displayedFen(): String = fens.getOrNull(ui.displayedPly) ?: startFen ?: ""
+
+    /**
+     * La partie en PGN. Pendant d'`exportedPGN` : mêmes en-têtes, dans le
+     * même ordre.
+     *
+     * L'en-tête `Variant` n'est pas décoratif — sans lui, un autre logiciel
+     * relirait une partie de Horde aux règles ordinaires et la déclarerait
+     * illégale au premier coup.
+     */
+    fun exportedPgn(): String {
+        val lines = mutableListOf(
+            """[Event "ChessLab ${ui.variantName}"]""",
+            """[Variant "$variantId"]""",
+            """[SetUp "1"]""",
+            """[FEN "${startFen ?: fens.firstOrNull() ?: ""}"]""",
+        )
+        val moves = StringBuilder()
+        ui.sanMoves.forEachIndexed { index, san ->
+            if (index % 2 == 0) moves.append("${index / 2 + 1}. ")
+            moves.append(san).append(" ")
+        }
+        return lines.joinToString("\n") + "\n\n" + moves.toString().trim() + "\n"
+    }
 
     private fun scoreText(cp: Int?, mate: Int?): String = when {
         mate != null -> if (mate > 0) "+M$mate" else "−M${-mate}"

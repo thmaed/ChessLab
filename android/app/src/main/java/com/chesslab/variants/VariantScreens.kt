@@ -27,7 +27,13 @@ import com.chesslab.ui.BoardScaffold
 import com.chesslab.ui.ControlButton
 import com.chesslab.ui.EvalBar
 import com.chesslab.ui.BoardView
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
@@ -202,7 +208,7 @@ private fun Reserve(ui: VariantUiState, color: Piece.Color, model: VariantPlayVi
  * coup d'œil, et deux apps qui ne s'accordent pas là-dessus désorientent celui
  * qui passe de l'une à l'autre.
  */
-private fun variantTint(id: String): Color = when (id) {
+internal fun variantTint(id: String): Color = when (id) {
     "chess960" -> Palette.violet
     "kingofthehill" -> Palette.gold
     "3check" -> Palette.danger
@@ -226,7 +232,7 @@ private fun variantTint(id: String): Color = when (id) {
  * seule était franchement fausse — le Duck Chess portait une PATTE, alors que
  * la variante doit son nom à un canard qu'on voit ensuite sur le plateau.
  */
-private fun variantIcon(id: String): ImageVector = when (id) {
+internal fun variantIcon(id: String): ImageVector = when (id) {
     "chess960" -> Icons.Default.Casino               // dé
     "kingofthehill" -> Icons.Default.Terrain         // montagne
     "3check" -> Icons.Default.Looks3                 // le chiffre trois
@@ -285,13 +291,14 @@ fun VariantPlayScreen(
 
     BoardScaffold(
         header = {
-            ui.variant?.let {
-                Text(stringResource(it.blurbRes), fontSize = 11.sp, color = Palette.textTertiary)
-                Spacer(Modifier.height(6.dp))
-            }
+            // Pas de rappel des RÈGLES ici : on les a lues sur l'écran de
+            // réglages, juste avant de lancer la partie, et une fois le
+            // plateau posé elles ne font plus que voler de la hauteur au
+            // plateau — sur les appareils courts, deux à quatre lignes. iOS
+            // n'en affiche aucune sur ses écrans de jeu.
             StatusRow(ui.status, busy = ui.thinking)
             Spacer(Modifier.height(8.dp))
-            VariantClockRow(ui, top = true)
+            VariantPlayerRow(ui, top = true)
             // La réserve ADVERSE, au-dessus du plateau comme le camp qu'elle
             // sert : un relevé de ce qui peut nous tomber dessus.
             Reserve(ui, Piece.Color.black, model)
@@ -328,7 +335,7 @@ fun VariantPlayScreen(
                 EvalBar(cp = ui.evalCp, mate = ui.evalMate)
             }
             Spacer(Modifier.height(6.dp))
-            VariantClockRow(ui, top = false)
+            VariantPlayerRow(ui, top = false)
             // La NÔTRE, sous le plateau, du côté où l'on joue.
             Reserve(ui, Piece.Color.white, model)
             Spacer(Modifier.height(4.dp))
@@ -341,6 +348,14 @@ fun VariantPlayScreen(
                 )
                 Spacer(Modifier.height(8.dp))
             }
+            // La bande des coups, comme iOS : on voit la partie qu'on joue.
+            // Elle n'y était pas — seul un « 12 demi-coups » disait qu'il
+            // s'était passé quelque chose.
+            com.chesslab.ui.MoveStrip(
+                moves = ui.sanMoves,
+                selected = ui.sanMoves.lastIndex.takeIf { it >= 0 },
+            )
+            Spacer(Modifier.height(6.dp))
             Text(
                 pluralStringResource(R.plurals.variant_halfmoves, ui.plies, ui.plies),
                 fontSize = 11.sp, color = Palette.textTertiary,
@@ -424,7 +439,7 @@ fun VariantPlayScreen(
                 TextButton(
                     onClick = model::takebackAfterBlunderWarning,
                     modifier = Modifier.testTag("reprendre-le-coup"),
-                ) { Text(stringResource(R.string.play_takeback), color = Palette.accent) }
+                ) { Text(stringResource(R.string.blunder_takeback), color = Palette.accent) }
             },
             dismissButton = {
                 TextButton(onClick = model::dismissBlunderWarning) {
@@ -437,42 +452,95 @@ fun VariantPlayScreen(
 }
 
 /**
- * Les deux pendules, quand la cadence en demande. Celle d'en face au-dessus du
- * plateau, la nôtre en dessous : la même géographie que le mode « Contre
- * l'ordinateur », pour qu'on n'ait pas à chercher.
+ * Le bandeau d'un joueur : qui c'est, s'il réfléchit, ses échecs, sa pendule.
+ * Pendant du `playerRow` de `FairyVariantPlayView`.
+ *
+ * Il ne portait qu'une pendule — et seulement quand il y en avait une : sans
+ * cadence, l'écran ne disait nulle part qui jouait quoi. Il dit maintenant
+ * « Ordinateur » ou « Vous », comme iOS, et le compteur des Trois Échecs y
+ * tient sa place : c'est la ressource qui décide cette partie-là, autant que
+ * le temps restant.
  */
 @Composable
-private fun VariantClockRow(ui: VariantUiState, top: Boolean) {
-    val white = ui.whiteClockMs ?: return
-    val black = ui.blackClockMs ?: return
+private fun VariantPlayerRow(ui: VariantUiState, top: Boolean) {
     val color = if (top) ui.userColor.opposite else ui.userColor
-    val ms = if (color == Piece.Color.white) white else black
+    val isEngine = !ui.twoPlayer && color != ui.userColor
+    val ms = if (color == Piece.Color.white) ui.whiteClockMs else ui.blackClockMs
     val active = ui.position.sideToMove == color && !ui.gameOver
+    val variantTint = ui.variant?.let { variantTint(it.id) } ?: Palette.accent
+
     Row(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (active) Palette.surfaceElevated else Color.Transparent)
-            .padding(horizontal = 12.dp, vertical = 5.dp)
-            .testTag(if (top) "pendule-adversaire" else "pendule-moi"),
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (active) Palette.surfaceElevated else Palette.surface)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .testTag(if (top) "joueur-adversaire" else "joueur-moi"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            Modifier
-                .size(9.dp)
-                .clip(androidx.compose.foundation.shape.CircleShape)
-                .background(if (color == Piece.Color.white) Color.White else Color.Black)
-                .border(1.dp, Palette.stroke, androidx.compose.foundation.shape.CircleShape)
+        Icon(
+            if (isEngine) Icons.Default.Memory else Icons.Default.Person,
+            // Décoratif : le texte juste après porte déjà l'information.
+            contentDescription = null,
+            tint = if (isEngine) variantTint else Palette.info,
+            modifier = Modifier.size(16.dp),
         )
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.width(8.dp))
         Text(
-            com.chesslab.play.GameClock.format(ms),
-            fontSize = 19.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace,
-            color = when {
-                ms < 30_000 -> Palette.danger
-                active -> Palette.textPrimary
-                else -> Palette.textTertiary
-            },
+            // À deux sur le même appareil, personne n'est « l'ordinateur » ni
+            // « vous » : c'est la couleur qui désigne le joueur.
+            if (ui.twoPlayer) stringResource(
+                if (color == Piece.Color.white) R.string.color_white else R.string.color_black
+            ) else stringResource(
+                if (isEngine) R.string.variant_player_engine else R.string.variant_player_you
+            ),
+            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+        )
+        if (isEngine && ui.thinking) {
+            Spacer(Modifier.width(8.dp))
+            CircularProgressIndicator(
+                Modifier.size(12.dp), strokeWidth = 2.dp, color = Palette.textSecondary,
+            )
+        }
+        ui.checksGiven[color]?.let { given ->
+            Spacer(Modifier.width(8.dp))
+            ThreeCheckBadge(given, variantTint)
+        }
+        Spacer(Modifier.weight(1f))
+        if (ms != null) {
+            Text(
+                com.chesslab.play.GameClock.format(ms),
+                fontSize = 19.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace,
+                color = when {
+                    ms < 30_000 -> Palette.danger
+                    active -> Palette.textPrimary
+                    else -> Palette.textTertiary
+                },
+                modifier = Modifier.testTag(if (top) "pendule-adversaire" else "pendule-moi"),
+            )
+        }
+    }
+}
+
+/** « 2/3 » : les échecs déjà donnés, visibles en permanence. */
+@Composable
+private fun ThreeCheckBadge(given: Int, tint: Color) {
+    val description = stringResource(R.string.variant_three_checks_a11y, given)
+    Row(
+        Modifier
+            .clip(CircleShape)
+            .background(tint.copy(alpha = 0.16f))
+            .padding(horizontal = 8.dp, vertical = 3.dp)
+            .semantics { contentDescription = description }
+            .testTag("compteur-echecs"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Default.Bolt, null, tint = tint, modifier = Modifier.size(12.dp))
+        Spacer(Modifier.width(3.dp))
+        Text(
+            stringResource(R.string.variant_three_checks_badge, given),
+            fontSize = 12.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
+            color = tint,
         )
     }
 }

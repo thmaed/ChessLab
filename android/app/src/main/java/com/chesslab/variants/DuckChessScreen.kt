@@ -64,7 +64,7 @@ fun DuckChessScreen(
     settings: VariantSettings = VariantSettings(),
     onAnalyze: (String) -> Unit = {},
     /** Revoir la partie : les POSITIONS, pas les coups — le canard n'est dans aucun coup. */
-    onReviewGame: (List<String>, List<String>) -> Unit = { _, _ -> },
+    onReviewGame: (List<String>, List<String>, List<String>) -> Unit = { _, _, _ -> },
     model: DuckChessViewModel = viewModel(),
 ) {
     LaunchedEffect(settings) { model.apply(settings) }
@@ -147,7 +147,7 @@ fun DuckChessScreen(
                     }
                     Spacer(Modifier.weight(1f))
                     TextButton(
-                        onClick = { onReviewGame(model.analysisFens(), model.analysisMoves()) },
+                        onClick = { onReviewGame(model.analysisFens(), model.analysisMoves(), model.analysisSans()) },
                         enabled = model.analysisMoves().isNotEmpty(),
                         modifier = Modifier.testTag("analyser-la-partie"),
                     ) {

@@ -257,6 +257,42 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="route_two_players">Deux joueurs</string>
     <!-- Le titre de l'ÉCRAN, plus explicite que celui de la tuile
          d'accueil — même distinction que sur iOS. -->
+    <!-- Sous le pourcentage, dans la carte de précision de l'analyse
+         des variantes : minuscule, comme sur iOS. -->
+    <!-- En-tête de la section qui porte les règles de la variante, sur
+         l'écran de réglages. Le seul endroit où elles sont écrites. -->
+    <string name="variant_rule">Règle</string>
+    <!-- Le titre de la revue d'une partie de variante : « Analyse — Horde ».
+         iOS compose le même (`VariantAnalysisView`). -->
+    <string name="route_variant_analysis">Analyse — %1$s</string>
+    <!-- Ce que le lecteur d'écran annonce pour la barre d'évaluation. -->
+    <string name="eval_a11y_title">Évaluation</string>
+    <string name="eval_a11y_white">les blancs</string>
+    <string name="eval_a11y_black">les noirs</string>
+    <!-- « mat en 3 pour les noirs ». -->
+    <string name="eval_a11y_mate">mat en %1$d pour %2$s</string>
+    <string name="eval_a11y_equal">position égale</string>
+    <!-- « +0,8 pour les blancs » — le nombre est formaté à part. -->
+    <string name="eval_a11y_score">%1$s pour %2$s</string>
+    <!-- Pourquoi une partie de variante s'est arrêtée. Les mêmes mots
+         qu'iOS (`GameOutcome.reasonText`), au mot près. -->
+    <string name="reason_stalemate">pat</string>
+    <string name="reason_king_of_the_hill">roi au centre</string>
+    <string name="reason_three_checks">trois échecs infligés</string>
+    <string name="reason_horde_extinct">plus aucune pièce</string>
+    <string name="reason_racing_goal">roi arrivé en 8e rangée</string>
+    <string name="reason_racing_draw">les deux rois arrivent ensemble</string>
+    <string name="reason_antichess_stuck">plus aucun coup possible</string>
+    <string name="reason_atomic_king">roi explosé</string>
+    <string name="variant_you_won">Vous avez gagné (%1$s)</string>
+    <string name="variant_you_lost">Vous avez perdu (%1$s)</string>
+    <string name="variant_draw">Partie nulle (%1$s)</string>
+    <string name="variant_side_won">%1$s a gagné (%2$s)</string>
+    <string name="variant_three_checks_badge">%1$d/3</string>
+    <string name="variant_three_checks_a11y">%1$d échecs sur 3</string>
+    <string name="variant_player_you">Vous</string>
+    <string name="variant_player_engine">Ordinateur</string>
+    <string name="variant_accuracy_caption">précision</string>
     <string name="variants_hub_title">Variantes d\'échecs</string>
     <string name="route_variants">Variantes</string>
     <string name="scan_confirm_title">Vérifier la position</string>
@@ -692,7 +728,11 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="blunder_missed_mate">Ce coup laisse passer un mat forcé.</string>
     <string name="blunder_allows_mate">Ce coup permet un mat forcé à l\'adversaire.</string>
     <string name="blunder_centipawns">Ce coup fait perdre environ %1$d pion(s) d\'évaluation.</string>
-    <string name="blunder_keep">Le garder</string>
+    <!-- Les deux réponses à l'alerte de gaffe, mot pour mot celles
+         d'iOS : « Annuler » disait à la fois « annuler le coup » et
+         « annuler la boîte ». -->
+    <string name="blunder_takeback">Reprendre le coup</string>
+    <string name="blunder_keep">Ignorer</string>
     <string name="setup_blunder_alert">Me prévenir des coups risqués</string>
     <string name="two_setup_players">Joueurs</string>
     <string name="two_setup_rotation">Présentation du plateau</string>

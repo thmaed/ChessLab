@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -92,6 +93,13 @@ fun BoardView(
      * ni dans la FEN : il se dessine ici, et vit dans le modèle.
      */
     duck: Square? = null,
+    /**
+     * La PASTILLE de qualité posée sur la case d'arrivée du dernier coup :
+     * « !! », « ?? », « ✕ »… C'est le verdict là où il s'est joué, plutôt
+     * qu'une ligne de texte à côté du plateau — on regarde la case, on lit le
+     * jugement. Pendant du `qualityBadge` de `ChessBoardView.swift`.
+     */
+    qualityBadge: Pair<Square, com.chesslab.analysis.MoveQuality>? = null,
     /**
      * Toutes les pièces retournées à 180°. Sert au mode « autour d'une
      * table » des parties à deux : l'appareil est posé à plat entre les
@@ -276,6 +284,36 @@ fun BoardView(
             val drawn = if (hint == null) arrows
                 else arrows + BoardArrow(hint.first, hint.second, HINT_TINT)
             if (drawn.isNotEmpty()) ArrowOverlay(drawn, orientation, Modifier.fillMaxSize())
+
+            // La pastille de qualité, en haut à droite de la case d'arrivée —
+            // décalée de 0,30 case comme sur iOS, pour qu'elle mord sur le
+            // coin sans cacher la pièce.
+            qualityBadge?.let { (square, quality) ->
+                val at = centerOf(square)
+                val half = cellPx * 0.21f
+                Box(
+                    Modifier
+                        .offset {
+                            IntOffset(
+                                (at.x + cellPx * 0.30f - half).roundToInt(),
+                                (at.y - cellPx * 0.30f - half).roundToInt(),
+                            )
+                        }
+                        .size(cellDp * 0.42f)
+                        .clip(CircleShape)
+                        .background(quality.tint)
+                        .border(cellDp * 0.02f, Color.White.copy(alpha = 0.9f), CircleShape),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        quality.symbol ?: "",
+                        fontSize = (cellDp * 0.30f).value.sp,
+                        fontWeight = FontWeight.Black,
+                        color = Color.White,
+                        maxLines = 1,
+                    )
+                }
+            }
 
             // La pièce qui GLISSE, entre sa case de départ et son arrivée.
             slide?.let { (from, to) ->

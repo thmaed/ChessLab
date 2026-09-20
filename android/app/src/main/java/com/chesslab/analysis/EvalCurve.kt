@@ -29,6 +29,11 @@ import kotlin.math.roundToInt
  *
  * 64 dp et non 100 : la courbe sert à REPÉRER les décrochages et à y sauter,
  * pas à lire une valeur.
+ *
+ * [onSelect] rend le DEMI-COUP touché — l'index du point, 0 pour la position
+ * de départ —, comme `EvalCurveView.swift`. À l'appelant de le traduire dans
+ * sa propre numérotation s'il en tient une autre : l'analyse orthodoxe compte
+ * les COUPS (−1 = départ), les variantes comptent les demi-coups.
  */
 @Composable
 fun EvalCurve(
@@ -46,22 +51,31 @@ fun EvalCurve(
      * soit toujours l'égalité, et bornée des deux côtés.
      */
     val bound = min(10.0, max(1.5, (points.maxOfOrNull { abs(it.pawns) } ?: 0.0) * 1.15))
-    val last = points.size - 1
+
+    // L'abscisse est le DEMI-COUP, pas le rang du point dans la liste. Les deux
+    // coïncident tant que la partie est évaluée d'un bout à l'autre ; ils
+    // divergent dès qu'une position manque, et alors un point placé à son rang
+    // se retrouve décalé, l'appui tombe sur le coup d'à côté et le repère de
+    // position ment. iOS trace sur cet axe-là (`EvalCurveView.swift`).
+    val firstPly = points.first().ply
+    val lastPly = points.last().ply
+    val span = max(1, lastPly - firstPly)
 
     Canvas(
         Modifier
             .fillMaxWidth()
             .height(64.dp)
             .testTag("courbe")
-            .pointerInput(points.size) {
+            .pointerInput(points) {
                 detectTapGestures { offset ->
-                    val ply = (offset.x / size.width * last).roundToInt().coerceIn(0, last)
-                    // Le point d'index i est atteint par le coup i-1.
-                    onSelect(ply - 1)
+                    val tapped = firstPly + (offset.x / size.width * span).roundToInt()
+                    // Le point le PLUS PROCHE, et non le demi-coup touché : si
+                    // celui-là n'a pas été évalué, il n'y a rien à montrer.
+                    points.minByOrNull { abs(it.ply - tapped) }?.let { onSelect(it.ply) }
                 }
             }
     ) {
-        fun x(ply: Int) = ply.toFloat() / last * size.width
+        fun x(ply: Int) = (ply - firstPly).toFloat() / span * size.width
         fun y(pawns: Double) = (0.5 - pawns / (2 * bound)).toFloat() * size.height
 
         val zero = y(0.0)
@@ -70,19 +84,21 @@ fun EvalCurve(
         // chacune se coupe à la ligne médiane, donc une seule couleur par côté.
         for (above in listOf(true, false)) {
             val path = Path().apply {
-                moveTo(0f, zero)
-                points.forEachIndexed { i, p ->
+                moveTo(x(firstPly), zero)
+                points.forEach { p ->
                     val value = if (above) max(0.0, p.pawns) else min(0.0, p.pawns)
-                    lineTo(x(i), y(value))
+                    lineTo(x(p.ply), y(value))
                 }
-                lineTo(x(last), zero)
+                lineTo(x(lastPly), zero)
                 close()
             }
             drawPath(path, (if (above) Palette.accent else Palette.info).copy(alpha = 0.28f))
         }
 
         val line = Path().apply {
-            points.forEachIndexed { i, p -> if (i == 0) moveTo(x(i), y(p.pawns)) else lineTo(x(i), y(p.pawns)) }
+            points.forEachIndexed { i, p ->
+                if (i == 0) moveTo(x(p.ply), y(p.pawns)) else lineTo(x(p.ply), y(p.pawns))
+            }
         }
         drawPath(line, Palette.textPrimary.copy(alpha = 0.75f), style = Stroke(width = 1.6.dp.toPx()))
 
@@ -91,16 +107,16 @@ fun EvalCurve(
         drawLine(Palette.stroke, Offset(0f, zero), Offset(size.width, zero), strokeWidth = 1.dp.toPx())
 
         // Les MOMENTS CRITIQUES, épinglés. Le halo sombre les détache de l'aire.
-        points.forEachIndexed { i, p ->
-            val quality = p.quality ?: return@forEachIndexed
-            if (!quality.marksCriticalPhase) return@forEachIndexed
-            val center = Offset(x(i), y(p.pawns))
+        points.forEach { p ->
+            val quality = p.quality ?: return@forEach
+            if (!quality.marksCriticalPhase) return@forEach
+            val center = Offset(x(p.ply), y(p.pawns))
             drawCircle(Palette.background, radius = 5.dp.toPx(), center = center)
             drawCircle(quality.tint, radius = 3.5.dp.toPx(), center = center)
         }
 
         // Où l'on se trouve dans la partie.
-        if (currentPly != null && currentPly in 0..last) {
+        if (currentPly != null && currentPly in firstPly..lastPly) {
             drawLine(
                 Palette.accent.copy(alpha = 0.9f),
                 Offset(x(currentPly), 0f), Offset(x(currentPly), size.height),

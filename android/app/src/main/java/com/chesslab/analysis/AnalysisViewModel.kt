@@ -211,6 +211,17 @@ data class AnalysisUiState(
     val engineUnavailable: Boolean = false,
     val retryingEngine: Boolean = false,
 ) {
+    /**
+     * La PASTILLE de qualité du dernier coup, à poser sur sa case d'arrivée.
+     * Pendant du `qualityBadge` d'iOS : le verdict là où il s'est joué.
+     */
+    val qualityBadge: Pair<chesskit.Square, MoveQuality>?
+        get() {
+            val quality = qualities[cursor] ?: return null
+            val end = lastMove?.second ?: return null
+            return end to quality
+        }
+
     val canGoNext: Boolean get() = cursor < sanMoves.size - 1
     val canGoPrevious: Boolean get() = cursor >= 0
 
