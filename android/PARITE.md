@@ -73,6 +73,39 @@ introduit un texte faux.
       l'icône et la teinte de la variante — la présentation d'iOS
       (`FairyVariantSetupView.ruleSummary`).
 
+### Les DOUZE fins de partie, jugées sur le vrai moteur — 20/09
+
+- [x] **Onze variantes sur douze vérifiées SUR APPAREIL** contre les FEN que
+      Fairy-Stockfish rend vraiment (`VariantEndingsTest`) : chaque variante
+      reçoit une position à un coup de la fin, le coup est joué PAR LE MOTEUR,
+      et c'est sa réponse qui est jugée. Les onze verdicts sont exacts —
+      vainqueur et raison.
+
+      Les tests JVM de `VariantOutcome` travaillent sur des FEN écrites à la
+      main : ils vérifient le raisonnement, pas le CONTRAT avec le moteur. Or
+      c'est là qu'on s'était déjà trompé — le septième champ des Trois Échecs
+      ne se voyait dans aucun journal.
+- [ ] La douzième, le **Duck Chess**, est arbitrée dans l'app sans moteur :
+      elle se vérifie autrement, et ne l'est pas encore.
+
+### La barre d'évaluation, activée PAR DÉFAUT — 20/09
+
+Demandé le 20/09 : « par défaut je veux que la barre d'évaluation soit activée
+dans les paramètres, dans tous les modes ».
+
+En le faisant, on a trouvé qu'**iOS n'était pas cohérent avec lui-même** : les
+variantes Fairy l'avaient à `true`, Chess960 et le mode « Contre l'ordinateur »
+à `false`. Android l'avait à `false` partout. Les deux apps la mettent
+maintenant à `true` dans les quatre endroits — c'est la seule fois de la revue
+où iOS a été touché, et c'est une décision produit, pas une correction de
+parité.
+
+- [x] Vérifié à l'écran sur une variante JAMAIS ouverte (Atomique) : les trois
+      aides sont actives d'emblée.
+- [ ] Les réglages DÉJÀ enregistrés gardent leur valeur — c'est le
+      comportement voulu d'un changement de défaut, mais il faudra basculer
+      l'interrupteur une fois dans les modes déjà configurés.
+
 ### Ce que la suite sur appareil a rattrapé — 20/09
 
 Les 118 tests instrumentés ont tourné sur le Galaxy A16 après la revue : trois

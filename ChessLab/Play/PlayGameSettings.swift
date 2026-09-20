@@ -15,7 +15,11 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
     var startFEN: String?
     var hintsEnabled: Bool = true
     var blunderAlertEnabled: Bool = true
-    var showEvalBar: Bool = false
+    /// Activée PAR DÉFAUT, dans tous les modes qui l'offrent (décision du
+    /// 20/09/2026). Elle était à `false` ici et à `true` pour les variantes
+    /// Fairy : le même réglage n'avait pas la même valeur d'un jeu à l'autre,
+    /// et personne ne l'aurait deviné.
+    var showEvalBar: Bool = true
     /// Autorise, en tapant un coup antérieur dans la liste, de reprendre
     /// plusieurs coups d'un coup plutôt qu'un seul à la fois (bouton
     /// "Reprendre" habituel). Désactivé par défaut : c'est une aide plus
@@ -83,7 +87,7 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         startFEN: String? = nil,
         hintsEnabled: Bool = true,
         blunderAlertEnabled: Bool = true,
-        showEvalBar: Bool = false,
+        showEvalBar: Bool = true,
         multiMoveTakebackEnabled: Bool = false,
         bookEnabled: Bool = true,
         bookWidth: OpeningBookWidth = .mainLinesOnly,

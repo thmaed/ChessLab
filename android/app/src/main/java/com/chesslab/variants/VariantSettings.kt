@@ -31,7 +31,13 @@ data class VariantSettings(
     val timeControlId: String = "none",
     val customMinutes: Int = 15,
     val customIncrementSeconds: Int = 0,
-    val showEvalBar: Boolean = false,
+    /**
+     * Activée PAR DÉFAUT, dans tous les modes qui l'offrent (décision du
+     * 20/09/2026). iOS l'avait à `false` ici et à `true` pour les variantes
+     * Fairy : le même réglage n'avait pas la même valeur d'un jeu à l'autre.
+     * Les deux apps la mettent maintenant à `true` partout.
+     */
+    val showEvalBar: Boolean = true,
     val hintsEnabled: Boolean = true,
     val blunderAlertEnabled: Boolean = true,
     /** Coup Volé SEULEMENT : le nombre de coups entre deux jetons. */

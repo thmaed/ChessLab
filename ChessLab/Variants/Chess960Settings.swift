@@ -11,7 +11,11 @@ struct Chess960Settings: Codable, Equatable, Hashable {
     var timeControlID: String = TimeControl.none.id
     var customMinutes: Int = 15
     var customIncrementSeconds: Int = 0
-    var showEvalBar: Bool = false
+    /// Activée PAR DÉFAUT, dans tous les modes qui l'offrent (décision du
+    /// 20/09/2026). Elle était à `false` ici et à `true` pour les variantes
+    /// Fairy : le même réglage n'avait pas la même valeur d'un jeu à l'autre,
+    /// et personne ne l'aurait deviné.
+    var showEvalBar: Bool = true
     var hintsEnabled: Bool = true
     var blunderAlertEnabled: Bool = true
     /// Dernier numéro de Scharnagl joué — c'est lui que « Rejouer la même »
