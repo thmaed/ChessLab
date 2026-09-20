@@ -395,8 +395,23 @@ quelles aurait desservi la fiche — une app aux deux tiers vide se referme.
       19/09, mais iOS ne le fait pas — il n'a ni grille ni deux colonnes sur
       ces écrans, et le suivre aurait fabriqué une divergence au lieu d'en
       corriger une.
-- [ ] Les douze captures : `tools/captures-tablette.sh` les prend en deux
-      commandes, il est écrit et éprouvé.
+- [x] **Les captures, prises le 20/09** — quatre jeux de six : 10 pouces
+      (2560 × 1600) et 7 pouces (1200 × 1920), en français et en anglais.
+
+      Deux pièges rencontrés. Le premier : les images 10 pouces étaient parties
+      dans le créneau `tablet-screenshots`, réservé au 7 pouces — le script
+      prend le dossier en argument, et rien ne vérifie que la taille
+      correspond. Le second : enchaîner les passes dans une même boucle échoue
+      en silence, l'émulateur de la précédente n'étant pas encore libéré. Une
+      par une, elles passent.
+
+**Ce que les captures montrent, et la décision qui reste** : le 7 pouces en
+PORTRAIT est le plus flatteur — deux colonnes qui remplissent l'écran. Le
+10 pouces en paysage garde environ un cinquième de vide sous la grille de
+l'accueil ; les autres écrans (nouvelle partie, ouvertures, analyse) tiennent
+la largeur. Le motif du 19/09 — « une app aux deux tiers vide se referme » —
+ne tient plus, mais l'accueil en paysage n'est pas éclatant pour autant.
+Publier ou non ces captures reste une décision produit.
 
 Le gabarit vit dans `ui/Layout.kt` : `Metrics.readableWidth` (720 dp, la valeur
 d'iOS), les deux largeurs minimales de tuile, et le seuil de 600 dp au-delà
