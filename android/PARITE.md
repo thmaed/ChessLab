@@ -73,6 +73,27 @@ introduit un texte faux.
       l'icône et la teinte de la variante — la présentation d'iOS
       (`FairyVariantSetupView.ruleSummary`).
 
+### La passe de vérification SUR APPAREIL — 20/09
+
+Tout ce que la revue avait produit et que personne n'avait encore vu à l'écran,
+repris un par un sur le Galaxy A16.
+
+- [x] **La revue d'une partie de Crazyhouse** : 1.e4 Cf6 2.d4 Cxe4, abandon,
+      revue. Trente et une pièces sur l'échiquier, la réserve n'y est pas — le
+      cavalier fantôme a disparu. Avec, au passage, le titre « Analyse —
+      Crazyhouse », la barre d'évaluation, la pastille de qualité sur e4, le
+      compteur « 4 / 4 », la courbe, les précisions et les capsules « 1. e4 ·
+      Cf6 ?! · 2. d4 ?? · Cxe4 ».
+- [x] **Le menu d'export** de la revue : copier la position, copier la partie,
+      partager l'une ou l'autre — les quatre entrées d'iOS.
+- [x] **L'alerte de coup risqué** répond « Ignorer » / « Reprendre le coup ».
+- [x] **« Analyser la dernière partie »** du Laboratoire ouvre bien la dernière
+      partie de la série (Défense Nimzo-indienne, 37 demi-coups, `Dh2#`).
+- [x] **La bande de reprise** : « Reprendre la partie en cours », « 2 coups
+      joués ».
+- [x] **Les libellés de puzzles** : la puce « Découverte », et « Tous les
+      puzzles, mélangés ».
+
 ### Les DOUZE fins de partie, jugées sur le vrai moteur — 20/09
 
 - [x] **Onze variantes sur douze vérifiées SUR APPAREIL** contre les FEN que
@@ -146,7 +167,7 @@ PROPOSE un coup, seul signal franc depuis que le chiffre vit dans la barre.
 - [x] **L'éditeur de position ne savait pas COPIER la FEN** (vérifié à
       l'écran). iOS a le bouton depuis toujours ; ici il fallait la recopier au
       clavier.
-- [ ] **Deux libellés de puzzles** : « Tous les puzzles » → « Tous les puzzles,
+- [x] **Deux libellés de puzzles** : « Tous les puzzles » → « Tous les puzzles,
       mélangés », et la puce « Attaque à la découverte » raccourcie en
       « Découverte » — sur cet écran seulement, comme iOS, le libellé entier
       restant à la résolution.
@@ -161,7 +182,7 @@ Deux joueurs, la bibliothèque de parties.
 
 ### Modules « Laboratoire », « Ouvertures » et « Finales » — 20/09
 
-- [ ] **On ne pouvait pas revoir la dernière partie d'une série.** iOS propose
+- [x] **On ne pouvait pas revoir la dernière partie d'une série.** iOS propose
       « Analyser la dernière partie » sous les statistiques ; côté Android il
       fallait exporter le PGN de TOUTE la série et le recoller dans l'analyse
       pour en regarder une seule.
@@ -173,7 +194,7 @@ Deux joueurs, la bibliothèque de parties.
       (vérifié à l'écran le 20/09) : « Chaque ligne de ces cours est vérifiée
       par table de finales (Syzygy)… ». C'est lui qui dit ce que ces cours
       valent.
-- [ ] Deux libellés recalés : « Parties dans la série » → « Nombre de
+- [x] Deux libellés recalés : « Parties dans la série » → « Nombre de
       parties », et « Ni un FEN légal, ni un PGN lisible. » → « Ni un FEN ni un
       PGN reconnaissable. »
 
@@ -206,7 +227,7 @@ refaire en deux écrans est un chantier à part, à décider.
 - [ ] **Les puzzles créés depuis les gaffes** se disaient « ajoutés à vos
       puzzles maison » ; iOS renvoie vers le mode Puzzles, et nomme la raison
       quand il n'y en a aucun.
-- [ ] **La bande de reprise de l'accueil** disait « Reprendre » puis le nom de
+- [x] **La bande de reprise de l'accueil** disait « Reprendre » puis le nom de
       l'adversaire. iOS annonce ce qu'on reprend et où en est la partie :
       « Reprendre la partie en cours », « 14 coups joués ».
 
@@ -227,7 +248,7 @@ côtés. Ce qui suit a été trouvé, et corrigé.
 
 **Deux DÉFAUTS, pas des écarts d'apparence :**
 
-- [ ] **La revue d'une partie de Crazyhouse posait la RÉSERVE sur
+- [x] **La revue d'une partie de Crazyhouse posait la RÉSERVE sur
       l'échiquier.** L'écran de jeu assainissait la FEN du moteur, l'écran de
       revue la donnait brute à `chesskit` — qui ne lève jamais d'exception et
       rend une position plausible. Un cavalier capturé apparaissait en h1.
@@ -260,7 +281,7 @@ côtés. Ce qui suit a été trouvé, et corrigé.
       seulement s'il y avait une cadence : sans horloge, rien ne disait qui
       jouait quoi. iOS montre « Ordinateur » / « Vous », l'icône, le témoin de
       réflexion, le compteur d'échecs et la pendule.
-- [ ] **La revue n'avait ni titre propre, ni menu d'export.** « Analyse —
+- [x] **La revue n'avait ni titre propre, ni menu d'export.** « Analyse —
       Horde » désormais, et copier/partager la FEN et le PGN comme iOS.
 
 **Ce qui était là mais pas pareil :**
@@ -282,7 +303,7 @@ côtés. Ce qui suit a été trouvé, et corrigé.
       « 4 / 10 » au milieu, la progression de la passe à côté — la forme
       d'iOS —, au lieu de quatre flèches alignées à gauche et d'une barre de
       progression sur sa propre ligne.
-- [ ] **L'alerte de coup risqué** répondait « Le garder » / « Annuler » ;
+- [x] **L'alerte de coup risqué** répondait « Le garder » / « Annuler » ;
       iOS répond « Ignorer » / « Reprendre le coup ». « Annuler » disait à la
       fois « annuler le coup » et « annuler la boîte ».
 
