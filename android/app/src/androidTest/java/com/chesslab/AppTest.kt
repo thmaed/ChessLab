@@ -229,16 +229,14 @@ class AppTest {
 
         awaitTag("coup-5", 10_000)     // les six demi-coups sont là
 
-        // le moteur évalue la position courante — lu sur sa LIGNE D'ÉTAT, qui
-        // annonce le nombre de coups d'avance dès qu'il a calculé. Le chiffre
-        // d'évaluation, lui, s'écrit maintenant DANS la barre, comme sur iOS,
-        // et s'efface quand la position est égale : l'attendre reviendrait à
-        // attendre que la partie penche.
+        // Le moteur a analysé la position : il PROPOSE un coup. C'est le seul
+        // signal franc qui reste depuis que le chiffre d'évaluation s'écrit
+        // dans la barre — il s'y efface quand la position est égale, et la
+        // ligne d'état retombe sur « Moteur en attente » dès que l'évaluation
+        // affichée sort du cache de la revue plutôt que de l'analyse en
+        // direct. iOS se comporte pareil.
         compose.waitUntil(60_000) {
-            val nodes = compose.onAllNodesWithTag("moteur-etat").fetchSemanticsNodes()
-            nodes.isNotEmpty() && nodes.first().config.toString().let {
-                it.contains("coups d'avance") || it.contains("moves ahead")
-            }
+            compose.onAllNodesWithTag("candidat-1").fetchSemanticsNodes().isNotEmpty()
         }
 
         // et on peut remonter dans la partie
@@ -295,17 +293,20 @@ class AppTest {
 
     @Test fun settingsChangeTheBoardTheme() {
         compose.onNodeWithTag("reglages").performClick()
-        compose.onNodeWithTag("theme-blue").performClick()
-        compose.onNodeWithTag("piece-merida").performClick()
-        compose.onNodeWithTag("temps-1000").performClick()
+        // Les sections suivent l'ordre d'iOS depuis le 20/09 : le temps de
+        // réflexion est passé sous les sons, donc hors de l'écran. Un clic sur
+        // un nœud non affiché échoue — on fait défiler jusqu'à lui.
+        compose.onNodeWithTag("theme-blue").performScrollTo().performClick()
+        compose.onNodeWithTag("piece-merida").performScrollTo().performClick()
+        compose.onNodeWithTag("temps-1000").performScrollTo().performClick()
         // le plateau d'aperçu suit le réglage
-        compose.onNodeWithTag("case-e2").assertIsDisplayed()
+        compose.onNodeWithTag("case-e2").performScrollTo().assertIsDisplayed()
 
         // on repose les valeurs par défaut : un test ne doit pas déteindre
         // sur les suivants, et les réglages sont PERSISTÉS
-        compose.onNodeWithTag("theme-classic").performClick()
-        compose.onNodeWithTag("piece-classic").performClick()
-        compose.onNodeWithTag("temps-400").performClick()
+        compose.onNodeWithTag("theme-classic").performScrollTo().performClick()
+        compose.onNodeWithTag("piece-classic").performScrollTo().performClick()
+        compose.onNodeWithTag("temps-400").performScrollTo().performClick()
     }
 
     @Test fun aCharacterPlaysWithMaia() {

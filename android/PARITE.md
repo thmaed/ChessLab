@@ -73,6 +73,29 @@ introduit un texte faux.
       l'icône et la teinte de la variante — la présentation d'iOS
       (`FairyVariantSetupView.ruleSummary`).
 
+### Ce que la suite sur appareil a rattrapé — 20/09
+
+Les 118 tests instrumentés ont tourné sur le Galaxy A16 après la revue : trois
+échecs, tous dus à la revue elle-même, et l'un d'eux n'était pas qu'un test.
+
+- [x] **La capsule d'état du moteur était MUETTE.** Son étiquette était posée
+      sur la rangée et non sur le texte, et Compose ne fusionne pas les
+      descendants d'une `Row` ordinaire : ni le lecteur d'écran ni les tests
+      n'y lisaient rien. `semantics(mergeDescendants = true)`.
+- [x] Deux tests attendaient l'ancienne mise en page : les réglages réordonnés
+      mettent le temps de réflexion hors de l'écran (un clic sur un nœud non
+      affiché échoue), et le hub affiche « King Hill » et non « King of the
+      Hill » sur une tuile étroite — ce qui EST le comportement d'iOS.
+
+**Ce que le troisième a appris** : la capsule retombe sur « Moteur en attente »
+dès que l'évaluation affichée sort du CACHE de la revue plutôt que de l'analyse
+en direct — `depth` y est remis à zéro. iOS fait exactement pareil
+(`isLiveAnalyzing` faux → « Moteur en attente »), donc le portage est fidèle ;
+c'est le test qui présumait le contraire. Il attend désormais que le moteur
+PROPOSE un coup, seul signal franc depuis que le chiffre vit dans la barre.
+
+**118 tests sur 118 verts** après correction.
+
 ### Modules « Réglages », « Puzzles », « Éditeur » — 20/09
 
 - [x] **Les Réglages n'étaient pas dans l'ordre d'iOS** (vérifié à l'écran) :

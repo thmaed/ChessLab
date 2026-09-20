@@ -86,8 +86,13 @@ class EnglishTest {
 
     @Test fun theVariantsSpeakEnglish() {
         openMode("variants")
-        awaitText("King of the Hill")
+        // Les noms COURTS, comme iOS sur un iPhone : une tuile étroite affiche
+        // « King Hill » et non « King of the Hill ». Celles dont le nom tient
+        // déjà gardent le leur.
+        awaitText("King Hill")
         compose.onNodeWithText("Racing Kings").assertIsDisplayed()
         compose.onNodeWithText("Antichess").assertIsDisplayed()
+        // Et le titre de l'écran, qui n'est pas celui de la tuile d'accueil.
+        compose.onNodeWithText("Chess variants").assertIsDisplayed()
     }
 }

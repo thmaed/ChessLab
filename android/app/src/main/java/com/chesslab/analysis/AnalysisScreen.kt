@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
@@ -834,6 +835,10 @@ private fun EngineStatusBadge(ui: AnalysisUiState) {
             .background(Palette.surface)
             .subtleBorder(CircleShape)
             .padding(horizontal = 10.dp, vertical = 4.dp)
+            // FUSIONNÉE : sans cela, la rangée ne porte que son étiquette et
+            // le texte reste dans l'enfant — invisible au lecteur d'écran
+            // comme aux tests d'interface, qui lisaient une capsule vide.
+            .semantics(mergeDescendants = true) {}
             .testTag("moteur-etat"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
