@@ -73,6 +73,30 @@ introduit un texte faux.
       l'icône et la teinte de la variante — la présentation d'iOS
       (`FairyVariantSetupView.ruleSummary`).
 
+### Modules « Laboratoire », « Ouvertures » et « Finales » — 20/09
+
+- [ ] **On ne pouvait pas revoir la dernière partie d'une série.** iOS propose
+      « Analyser la dernière partie » sous les statistiques ; côté Android il
+      fallait exporter le PGN de TOUTE la série et le recoller dans l'analyse
+      pour en regarder une seule.
+- [ ] **Le lecteur de cours ne disait rien au bout d'une ligne.** « Suivant »
+      devenait gris, et c'était tout. iOS écrit « Fin de la ligne. Reviens en
+      arrière pour explorer une variante » — le mot manquait, et avec lui
+      l'invitation à aller voir les variantes.
+- [x] **L'engagement de la maison manquait au pied de la liste des finales**
+      (vérifié à l'écran le 20/09) : « Chaque ligne de ces cours est vérifiée
+      par table de finales (Syzygy)… ». C'est lui qui dit ce que ces cours
+      valent.
+- [ ] Deux libellés recalés : « Parties dans la série » → « Nombre de
+      parties », et « Ni un FEN légal, ni un PGN lisible. » → « Ni un FEN ni un
+      PGN reconnaissable. »
+
+**Un écart de FORME toujours ouvert** : iOS règle une série sur un écran dédié
+(`LabSetupView`) puis la fait tourner sur un autre (`LabRunView`) ; Android
+tient les réglages sous le plateau, sur un seul écran. C'était noté « assumé »
+le 15/09 ; la demande du 20/09 (« identique à iOS ») le remet en question. Le
+refaire en deux écrans est un chantier à part, à décider.
+
 ### Modules « Analyser » et « Accueil » — 20/09
 
 - [ ] **La ligne d'état du moteur disait « profondeur 18 ».** iOS a renoncé à

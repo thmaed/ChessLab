@@ -310,7 +310,10 @@ private fun App() {
                     stack.add(Route.AnalysisBoard(fen = fen))
                 }
             }
-            is Route.Laboratory -> LabScreen(startFen = current.startFen)
+            is Route.Laboratory -> LabScreen(
+                startFen = current.startFen,
+                onAnalyze = { stack.add(Route.AnalysisBoard(pgn = it)) },
+            )
             // TOUTES les variantes passent par un réglage : on y choisit son
             // camp, la force du moteur, la cadence et les aides — exactement
             // comme en « Contre l'ordinateur ». Sans lui, on tombait sur un

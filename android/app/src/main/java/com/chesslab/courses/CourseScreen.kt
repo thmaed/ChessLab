@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.AccountTree
@@ -225,6 +226,28 @@ fun CourseScreen(
             incoming?.comment?.let { comment ->
                 Spacer(Modifier.height(12.dp))
                 CommentCard(comment, Modifier.padding(horizontal = 20.dp))
+            }
+
+            // La ligne s'arrête ici : le dire, plutôt que de laisser un écran
+            // où plus rien ne répond. C'est aussi une invitation à revenir en
+            // arrière, là où les variantes se trouvent.
+            if (coloured.isEmpty()) {
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        Icons.Default.Flag, null,
+                        tint = Palette.textTertiary, modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Text(
+                        stringResource(R.string.course_line_end),
+                        fontSize = 13.sp, color = Palette.textTertiary,
+                        modifier = Modifier.testTag("fin-de-ligne"),
+                    )
+                }
             }
 
             if (coloured.isNotEmpty()) {

@@ -121,7 +121,7 @@
     <string name="lab_start_position">Set start position</string>
     <string name="lab_start_position_sub">Paste a FEN or a PGN — a PGN starts the series from its final position.</string>
     <string name="lab_start_standard">Standard position</string>
-    <string name="lab_start_unreadable">Neither a legal FEN nor a readable PGN.</string>
+    <string name="lab_start_unreadable">Neither a recognisable FEN nor PGN.</string>
     <string name="lab_start_from_pgn">Start position taken from a PGN (%1$d plies).</string>
     <string name="lab_game_number">game %1$d</string>
     <string name="lab_explain_score">The points A has scored, as a percentage of the maximum: a win is worth 1 point, a draw ½, a loss 0.
@@ -310,6 +310,15 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d move played</item>
         <item quantity="other">%1$d moves played</item>
     </plurals>
+    <!-- Ouvrir la DERNIÈRE partie de la série dans l'analyse. iOS le
+         propose sous les statistiques ; sans lui il fallait exporter tout
+         le PGN de la série et le recoller ailleurs. -->
+    <string name="lab_analyse_last">Analyse the last game</string>
+    <!-- Deux textes d'iOS qui manquaient : le mot de fin d'une ligne de
+         cours, et l'engagement de la maison en pied de la liste des
+         finales — c'est lui qui dit ce que ces cours valent. -->
+    <string name="course_line_end">End of the line. Go back to explore a variation.</string>
+    <string name="endgame_proven_footer">Every line in these courses is checked against an endgame tablebase (Syzygy): no move taught gives up the win, no defence offered loses the draw.</string>
     <string name="variant_accuracy_caption">accuracy</string>
     <string name="variants_hub_title">Chess variants</string>
     <string name="route_variants">Variants</string>
@@ -1038,7 +1047,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="filter_all_f">All</string>
 
     <string name="lab_series_done">Series finished — %1$d games.</string>
-    <string name="lab_games">Games in the series</string>
+    <string name="lab_games">Number of games</string>
     <string name="lab_alternate">Alternate colours each game</string>
     <string name="lab_resign_allowed">Resignation allowed (losing side)</string>
     <string name="lab_draw_allowed">Draw by agreement allowed</string>

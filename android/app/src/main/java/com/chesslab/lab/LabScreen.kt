@@ -45,6 +45,8 @@ import androidx.compose.ui.text.AnnotatedString
 fun LabScreen(
     /** La position envoyée par un autre mode : la série part de là. */
     startFen: String? = null,
+    /** Revoir une partie de la série dans l'écran d'analyse. */
+    onAnalyze: (String) -> Unit = {},
     model: LabViewModel = viewModel(),
 ) {
     val ui = model.ui
@@ -105,7 +107,7 @@ fun LabScreen(
 
             if (ui.completed.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
-                ExportRow(model)
+                ExportRow(model, onAnalyze)
             }
 
             Spacer(Modifier.height(12.dp))
@@ -430,7 +432,7 @@ private fun StartPositionField(
 
 /** Exporter la série : le PGN de toutes les parties, ou le CSV des résultats. */
 @Composable
-private fun ExportRow(model: LabViewModel) {
+private fun ExportRow(model: LabViewModel, onAnalyze: (String) -> Unit) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val chooserTitle = stringResource(R.string.lab_export)
@@ -456,6 +458,15 @@ private fun ExportRow(model: LabViewModel) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SmallPill(stringResource(R.string.lab_export_pgn), "export-pgn") { send(model.exportPgn()) }
             SmallPill(stringResource(R.string.lab_export_csv), "export-csv") { send(model.exportCsv()) }
+        }
+        // Revoir la DERNIÈRE partie, comme iOS le propose. Sans elle, il
+        // fallait exporter la série entière et recoller le tout dans
+        // l'analyse pour regarder une seule partie.
+        if (model.ui.completed.isNotEmpty()) {
+            Spacer(Modifier.height(8.dp))
+            SmallPill(stringResource(R.string.lab_analyse_last), "analyser-derniere") {
+                model.lastGamePgn().takeIf { it.isNotEmpty() }?.let(onAnalyze)
+            }
         }
     }
 }

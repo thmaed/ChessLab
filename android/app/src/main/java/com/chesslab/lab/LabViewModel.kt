@@ -510,6 +510,20 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     /** Le CSV de toute la série : une ligne par partie. */
     fun exportCsv(): String = LabExport.csv(ui.completed)
 
+    /**
+     * Le PGN de la DERNIÈRE partie, pour aller la revoir. Vide tant qu'aucune
+     * n'est finie. Sans ce chemin, il fallait exporter la série entière et
+     * recoller le tout dans l'analyse pour regarder une seule partie.
+     */
+    fun lastGamePgn(): String {
+        val last = ui.completed.lastOrNull() ?: return ""
+        return LabExport.pgn(
+            listOf(last),
+            nameA = ui.sideA.label(getApplication()),
+            nameB = ui.sideB.label(getApplication()),
+        )
+    }
+
     override fun onCleared() {
         loop?.cancel()
         super.onCleared()

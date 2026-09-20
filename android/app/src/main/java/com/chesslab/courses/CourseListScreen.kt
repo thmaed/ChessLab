@@ -13,6 +13,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.MoreHoriz
@@ -206,6 +207,28 @@ fun CourseListScreen(
             if (filtered.isEmpty()) {
                 item(key = "vide") {
                     Text(stringResource(R.string.courses_none), fontSize = 13.sp, color = Palette.textSecondary)
+                }
+            }
+            // L'ENGAGEMENT de la maison, en pied de liste : c'est lui qui dit
+            // ce que ces cours valent, et pourquoi on peut les suivre les yeux
+            // fermés. iOS le porte au même endroit.
+            if (endgames && filtered.isNotEmpty()) {
+                item(key = "engagement") {
+                    Row(
+                        Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 4.dp),
+                        verticalAlignment = Alignment.Top,
+                    ) {
+                        Icon(
+                            Icons.Default.VerifiedUser, null,
+                            tint = Palette.textTertiary, modifier = Modifier.size(14.dp),
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            stringResource(R.string.endgame_proven_footer),
+                            fontSize = 11.sp, color = Palette.textTertiary,
+                            modifier = Modifier.testTag("engagement-syzygy"),
+                        )
+                    }
                 }
             }
         }

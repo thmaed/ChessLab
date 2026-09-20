@@ -118,7 +118,7 @@
     <string name="lab_start_position">Imposer la position de départ</string>
     <string name="lab_start_position_sub">Collez un FEN ou un PGN — un PGN fait partir la série de sa position finale.</string>
     <string name="lab_start_standard">Position standard</string>
-    <string name="lab_start_unreadable">Ni un FEN légal, ni un PGN lisible.</string>
+    <string name="lab_start_unreadable">Ni un FEN ni un PGN reconnaissable.</string>
     <string name="lab_start_from_pgn">Position de départ tirée d\'un PGN (%1$d demi-coups).</string>
     <string name="lab_game_number">partie %1$d</string>
     <string name="lab_explain_score">Les points marqués par le camp A, en pourcentage du maximum possible : un gain vaut 1 point, une nulle ½, une défaite 0.
@@ -307,6 +307,15 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%1$d coup joué</item>
         <item quantity="other">%1$d coups joués</item>
     </plurals>
+    <!-- Ouvrir la DERNIÈRE partie de la série dans l'analyse. iOS le
+         propose sous les statistiques ; sans lui il fallait exporter tout
+         le PGN de la série et le recoller ailleurs. -->
+    <string name="lab_analyse_last">Analyser la dernière partie</string>
+    <!-- Deux textes d'iOS qui manquaient : le mot de fin d'une ligne de
+         cours, et l'engagement de la maison en pied de la liste des
+         finales — c'est lui qui dit ce que ces cours valent. -->
+    <string name="course_line_end">Fin de la ligne. Reviens en arrière pour explorer une variante.</string>
+    <string name="endgame_proven_footer">Chaque ligne de ces cours est vérifiée par table de finales (Syzygy) : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle.</string>
     <string name="variant_accuracy_caption">précision</string>
     <string name="variants_hub_title">Variantes d\'échecs</string>
     <string name="route_variants">Variantes</string>
@@ -1035,7 +1044,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="filter_all_f">Toutes</string>
 
     <string name="lab_series_done">Série terminée — %1$d parties.</string>
-    <string name="lab_games">Parties dans la série</string>
+    <string name="lab_games">Nombre de parties</string>
     <string name="lab_alternate">Alterner les couleurs à chaque partie</string>
     <string name="lab_resign_allowed">Abandon autorisé (camp perdant)</string>
     <string name="lab_draw_allowed">Nul par accord autorisé</string>
