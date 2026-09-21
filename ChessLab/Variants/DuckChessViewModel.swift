@@ -520,7 +520,7 @@ final class DuckChessViewModel {
         if let victim {
             // Le roi est tombé : la partie s'arrête AVANT même la pose du
             // canard, qui n'aurait plus d'objet.
-            outcome = GameOutcome(winner: victim.opposite, reason: .checkmate)
+            outcome = GameOutcome(winner: victim.opposite, reason: .kingCaptured)
             phase = .movePiece
             clock?.pause()
             hintMoves = []

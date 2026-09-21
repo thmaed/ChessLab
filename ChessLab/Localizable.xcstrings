@@ -20858,6 +20858,22 @@
         }
       }
     },
+    "roi capturé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "king captured"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "roi capturé"
+          }
+        }
+      }
+    },
     "roi explosé": {
       "localizations": {
         "en": {

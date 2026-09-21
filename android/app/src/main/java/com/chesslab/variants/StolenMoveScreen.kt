@@ -73,11 +73,10 @@ fun StolenMoveScreen(
 
     BoardScaffold(
         header = {
-            Text(
-                stringResource(R.string.variant_stolen_blurb, ui.tokenInterval),
-                fontSize = 11.sp, color = Palette.textTertiary,
-            )
-            Spacer(Modifier.height(6.dp))
+            // Comme au Duck Chess : les règles se lisent sur l'écran de
+            // réglages. Le chantier du 20/09 les avait retirées de l'écran
+            // partagé des variantes et oublié les deux variantes ARBITRÉES
+            // PAR L'APP, qui ont chacune le leur.
             StatusRow(ui.status, busy = ui.thinking)
             Spacer(Modifier.height(8.dp))
             StolenClockRow(ui, top = true)

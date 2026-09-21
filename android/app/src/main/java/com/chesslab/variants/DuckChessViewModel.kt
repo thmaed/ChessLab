@@ -41,6 +41,14 @@ data class DuckUiState(
     val settings: VariantSettings = VariantSettings(),
     /** Le camp de l'utilisateur : le plateau se retourne avec lui. */
     val userColor: Piece.Color = Piece.Color.white,
+    /**
+     * Faux quand les deux camps sont humains. Le réglage « Deux joueurs »
+     * était PROPOSÉ par l'écran d'avant et n'arrivait pas jusqu'ici : la
+     * machine jouait quand même, et le second joueur regardait.
+     */
+    val versusEngine: Boolean = true,
+    /** Le moteur a refusé la nulle — l'écran le dit, puis oublie. */
+    val drawDeclined: Boolean = false,
     val whiteClockMs: Long? = null,
     val blackClockMs: Long? = null,
     /** L'évaluation POV Blancs, pour la barre. */
@@ -70,7 +78,20 @@ data class DuckUiState(
  */
 class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
 
-    private var humanColor = Piece.Color.white
+    /**
+     * Le camp de la MACHINE — `null` quand on joue à deux sur l'appareil.
+     * C'est la forme d'iOS (`DuckChessViewModel.engineColor`), et elle dit
+     * d'elle-même laquelle des deux parties on joue.
+     */
+    private var engineColor: Piece.Color? = Piece.Color.black
+    private val versusEngine: Boolean get() = engineColor != null
+
+    /**
+     * Le camp de l'utilisateur. À deux, il n'y en a pas : le plateau reste
+     * côté blancs et ne se retourne PAS — iOS non plus (`orientation:
+     * viewModel.userColor`, blanc quand `engineColor` est nul).
+     */
+    private val humanColor: Piece.Color get() = engineColor?.opposite ?: Piece.Color.white
     private var enPassant: Square? = null
     private var legal: List<DuckChessRules.Move> = emptyList()
     private var turn: Job? = null
@@ -97,9 +118,11 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
     private val clock = VariantClock(viewModelScope).apply {
         onTick = { white, black -> ui = ui.copy(whiteClockMs = white, blackClockMs = black) }
         onFlag = { flagged ->
-            val word = s(
-                if (flagged == humanColor) R.string.outcome_flag_you else R.string.outcome_flag_opponent
-            )
+            val word = if (!versusEngine) {
+                s(R.string.variant_side_won, s(colorName(flagged.opposite)), s(R.string.reason_timeout))
+            } else {
+                s(if (flagged == humanColor) R.string.outcome_flag_you else R.string.outcome_flag_opponent)
+            }
             ui = ui.copy(outcome = word, status = word, phase = DuckPhase.over, hints = emptyList())
         }
     }
@@ -117,13 +140,18 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
     /** Les réglages arrivent de l'écran d'avant ; les rejouer relancerait la partie. */
     fun apply(settings: VariantSettings) {
         if (ui.settings == settings && fenLog.size > 1) return
-        humanColor = when (settings.colorChoice) {
-            PlayerColorChoice.white -> Piece.Color.white
-            PlayerColorChoice.black -> Piece.Color.black
-            PlayerColorChoice.random ->
-                if (kotlin.random.Random.nextBoolean()) Piece.Color.white else Piece.Color.black
+        engineColor = if (settings.twoPlayers) {
+            null
+        } else {
+            val user = when (settings.colorChoice) {
+                PlayerColorChoice.white -> Piece.Color.white
+                PlayerColorChoice.black -> Piece.Color.black
+                PlayerColorChoice.random ->
+                    if (kotlin.random.Random.nextBoolean()) Piece.Color.white else Piece.Color.black
+            }
+            user.opposite
         }
-        ui = ui.copy(settings = settings, userColor = humanColor)
+        ui = ui.copy(settings = settings, userColor = humanColor, versusEngine = versusEngine)
         newGame()
     }
 
@@ -138,10 +166,10 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
         val settings = ui.settings
         clock.reset(settings.timeControl)
         ui = DuckUiState(
-            status = if (humanColor == Piece.Color.white) s(R.string.your_turn)
-            else s(R.string.engine_thinking),
+            status = startStatus(),
             settings = settings,
             userColor = humanColor,
+            versusEngine = versusEngine,
             whiteClockMs = clock.remaining(Piece.Color.white),
             blackClockMs = clock.remaining(Piece.Color.black),
         )
@@ -149,8 +177,19 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
         duckLog += null
         refreshLegal()
         clock.startTurn(ui.position.sideToMove)
-        if (humanColor != Piece.Color.white) engineTurn() else afterHumanTurnStarts()
+        if (engineColor == Piece.Color.white) engineTurn() else afterHumanTurnStarts()
     }
+
+    /**
+     * Ce que l'écran dit de faire au premier coup. À deux, personne n'attend
+     * la machine : c'est « à vous » des deux côtés, comme le « Déplacez une
+     * pièce » d'iOS (`DuckChessViewModel.instruction`).
+     */
+    private fun startStatus(): String =
+        if (engineColor == Piece.Color.white) s(R.string.engine_thinking) else s(R.string.your_turn)
+
+    private fun colorName(color: Piece.Color) =
+        if (color == Piece.Color.white) R.string.color_white else R.string.color_black
 
     private fun refreshLegal() {
         legal = DuckChessRules.moves(ui.position, ui.duck, enPassant)
@@ -158,7 +197,9 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
 
     fun onSquareTap(square: Square) {
         if (ui.thinking || ui.gameOver) return
-        if (ui.position.sideToMove != humanColor) return
+        // À deux, les deux camps passent par les mêmes doigts : le seul
+        // interdit est de jouer à la place de la machine.
+        if (versusEngine && ui.position.sideToMove != humanColor) return
 
         if (ui.phase == DuckPhase.placeDuck) {
             if (square in ui.duckTargets) placeDuck(square)
@@ -180,7 +221,7 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         val piece = ui.position.piece(square)
-        ui = if (piece != null && piece.color == humanColor) {
+        ui = if (piece != null && piece.color == ui.position.sideToMove) {
             ui.copy(
                 selected = square,
                 legalTargets = legal.filter { it.from == square }.mapTo(HashSet()) { it.to },
@@ -212,7 +253,7 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
             // Le roi est tombé : la partie s'arrête AVANT même la pose du
             // canard, qui n'aurait plus d'objet.
             clock.stop()
-            val word = s(R.string.duck_king_taken, s(winnerLabel(victim.opposite)))
+            val word = phrase(victim.opposite, R.string.reason_king_captured)
             fenLog += next.fen
             duckLog += ui.duck
             ui = ui.copy(
@@ -228,9 +269,10 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
             position = next, lastMove = move.from to move.to, selected = null,
             legalTargets = emptySet(), phase = DuckPhase.placeDuck,
             duckTargets = DuckChessRules.duckTargets(next, ui.duck).toSet(),
-            status = if (next.sideToMove == humanColor) s(R.string.duck_place) else s(R.string.duck_engine_places),
+            status = if (next.sideToMove == engineColor) s(R.string.duck_engine_places)
+            else s(R.string.duck_place),
         )
-        if (mover == humanColor) checkBlunder(position, next)
+        if (versusEngine && mover == humanColor) checkBlunder(position, next)
     }
 
     /** La pose du canard : c'est ELLE qui rend la main à l'autre camp. */
@@ -243,12 +285,13 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(
             duck = square, position = flipped, duckTargets = emptySet(),
             phase = DuckPhase.movePiece, plies = ui.plies + 1,
-            status = if (flipped.sideToMove == humanColor) s(R.string.your_turn) else s(R.string.engine_thinking),
+            status = if (flipped.sideToMove == engineColor) s(R.string.engine_thinking)
+            else s(R.string.your_turn),
         )
         refreshLegal()
         if (ui.gameOver) return
         clock.startTurn(flipped.sideToMove)
-        if (flipped.sideToMove != humanColor) engineTurn() else afterHumanTurnStarts()
+        if (flipped.sideToMove == engineColor) engineTurn() else afterHumanTurnStarts()
     }
 
     /** Le trait revient : la barre se remet à jour, et l'indice avec si on l'a demandé. */
@@ -288,7 +331,10 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
      * positionnel fin. C'est la même réserve qu'iOS pose sur sa propre analyse.
      */
     private fun refreshEvalBar() {
-        if (!ui.settings.showEvalBar) return
+        // Sans adversaire artificiel, pas de barre : c'est la règle d'iOS
+        // (`DuckChessPlayView.showsEvalBar`), et à deux elle soufflerait la
+        // position à celui qui n'a pas le trait.
+        if (!ui.settings.showEvalBar || !versusEngine) return
         val position = ui.position
         val duck = ui.duck
         val ep = enPassant
@@ -302,7 +348,7 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun toggleHint() {
-        if (!ui.settings.hintsEnabled || ui.gameOver) return
+        if (!ui.settings.hintsEnabled || !versusEngine || ui.gameOver) return
         if (ui.hintWanted) {
             hintJob?.cancel()
             ui = ui.copy(hintWanted = false, hints = emptyList())
@@ -328,7 +374,7 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
 
     /** L'alerte de gaffe, rétroactive : prévenir avant ferait attendre à chaque coup. */
     private fun checkBlunder(before: Position, after: Position) {
-        if (!ui.settings.blunderAlertEnabled) return
+        if (!ui.settings.blunderAlertEnabled || !versusEngine) return
         val duck = ui.duck
         val ep = enPassant
         viewModelScope.launch {
@@ -347,13 +393,79 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
 
     // MARK: Fin de partie
 
-    fun resign() {
+    /**
+     * La mise en MOTS d'une fin, dans la forme d'iOS (`GameOutcome.summary`) :
+     * « Vous avez gagné (roi capturé) » face à la machine, « Blancs a gagné
+     * (roi capturé) » à deux. Le Duck Chess disait « Roi capturé — les blancs
+     * gagnent », une tournure à lui seul.
+     */
+    private fun phrase(winner: Piece.Color?, @androidx.annotation.StringRes reasonRes: Int): String {
+        val raison = s(reasonRes)
+        if (winner == null) return s(R.string.variant_draw, raison)
+        if (!versusEngine) return s(R.string.variant_side_won, s(colorName(winner)), raison)
+        return if (winner == humanColor) s(R.string.variant_you_won, raison)
+        else s(R.string.variant_you_lost, raison)
+    }
+
+    /** À deux, [color] dit QUI abandonne ; face au moteur, c'est l'utilisateur. */
+    fun resign(color: Piece.Color = humanColor) {
         if (ui.gameOver) return
         turn?.cancel()
         clock.stop()
-        val word = s(R.string.outcome_resigned)
+        val word = phrase(color.opposite, R.string.reason_resignation)
         ui = ui.copy(outcome = word, status = word, phase = DuckPhase.over, hints = emptyList())
     }
+
+    /**
+     * La nulle par ACCORD. Le Duck Chess n'a pas de nulle « selon les règles »
+     * — pas de pat, pas de matériel insuffisant, un fou seul prend un roi —
+     * mais deux joueurs peuvent convenir d'en rester là, et le moteur juge
+     * comme ailleurs : il accepte s'il ne se voit pas mieux qu'à égalité.
+     *
+     * Son avis ne traîne pas toujours à portée : la barre d'évaluation peut
+     * être éteinte. On le lui DEMANDE alors, plutôt que de refuser la nulle
+     * pour une raison qui n'a rien à voir avec la position — c'est ce que fait
+     * `DuckChessViewModel.offerDrawToEngine()`.
+     */
+    fun offerDraw() {
+        if (ui.gameOver || ui.thinking) return
+        if (!versusEngine) { settleDraw(); return }
+        val known = lastEngineEvalCp()
+        if (known != null) { settleDrawOffer(known); return }
+        val position = ui.position
+        val duck = ui.duck
+        val ep = enPassant
+        viewModelScope.launch {
+            val eval = DuckChessEngine.evaluate(getApplication(), position, duck, ep, movetimeMs = 400)
+            if (ui.gameOver) return@launch
+            val sign = if (position.sideToMove == engineColor) 1 else -1
+            settleDrawOffer(eval?.cp?.let { it * sign })
+        }
+    }
+
+    /** L'évaluation connue, du point de vue de la MACHINE. */
+    private fun lastEngineEvalCp(): Int? {
+        val white = ui.evalCp ?: return null
+        return if (engineColor == Piece.Color.white) white else -white
+    }
+
+    private fun settleDrawOffer(engineEvalCp: Int?) {
+        if (ui.gameOver) return
+        if (!VariantDrawRules.engineAcceptsDraw(engineEvalCp)) {
+            ui = ui.copy(drawDeclined = true)
+            return
+        }
+        settleDraw()
+    }
+
+    private fun settleDraw() {
+        turn?.cancel()
+        clock.stop()
+        val word = phrase(null, R.string.draw_agreement)
+        ui = ui.copy(outcome = word, status = word, phase = DuckPhase.over, hints = emptyList())
+    }
+
+    fun dismissDrawDeclined() { ui = ui.copy(drawDeclined = false) }
 
     /** L'écran s'en va : la pendule s'arrête, sinon le drapeau tombe derrière. */
     fun pauseForBackground() {
@@ -366,9 +478,6 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
         if (ui.gameOver) return
         clock.startTurn(ui.position.sideToMove)
     }
-
-    private fun winnerLabel(color: Piece.Color) =
-        if (color == Piece.Color.white) R.string.mate_white_wins else R.string.mate_black_wins
 
     override fun onCleared() {
         turn?.cancel()

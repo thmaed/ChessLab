@@ -250,9 +250,17 @@ struct DuckChessPlayView: View {
                         .font(.title2)
                         .foregroundStyle(Theme.textSecondary)
                         .accessibilityHidden(true)
-                    Text(outcome.summary(
-                        whiteName: playerName(for: .white), blackName: playerName(for: .black)
-                    ))
+                    // Face au moteur, la phrase se dit à la DEUXIÈME personne,
+                    // comme dans les trois autres écrans de variante : composer
+                    // « X a gagné » avec X = « Vous » donnait « Vous a gagné ».
+                    // La forme nom-verbe ne vaut que pour le jeu à deux, où les
+                    // camps ont des noms (« Blancs a gagné »).
+                    Text(viewModel.isVersusEngine
+                        ? outcome.summary(userColor: viewModel.userColor)
+                        : outcome.summary(
+                            whiteName: playerName(for: .white),
+                            blackName: playerName(for: .black)
+                        ))
                     .font(.headline)
                     .foregroundStyle(Theme.textPrimary)
                     Spacer(minLength: 0)

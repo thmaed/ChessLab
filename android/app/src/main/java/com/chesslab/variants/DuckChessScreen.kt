@@ -1,9 +1,7 @@
 package com.chesslab.variants
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,12 +9,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -82,14 +83,12 @@ fun DuckChessScreen(
 
     BoardScaffold(
         header = {
-            Text(
-                stringResource(R.string.variant_duck_blurb),
-                fontSize = 11.sp, color = Palette.textTertiary,
-            )
-            Spacer(Modifier.height(6.dp))
+            // Les règles se lisent sur l'écran de RÉGLAGES, avant de lancer la
+            // partie — aucun écran de jeu iOS ne les répète. Elles prenaient
+            // ici trois lignes au plateau, à chaque coup, pour rien.
             StatusRow(ui.status, busy = ui.thinking)
             Spacer(Modifier.height(8.dp))
-            DuckClockRow(ui, top = true)
+            DuckPlayerRow(ui, top = true)
         },
         board = {
             BoardView(
@@ -108,12 +107,12 @@ fun DuckChessScreen(
             )
         },
         panel = {
-            if (ui.settings.showEvalBar) {
+            if (ui.settings.showEvalBar && ui.versusEngine) {
                 Spacer(Modifier.height(6.dp))
                 EvalBar(cp = ui.evalCp, mate = ui.evalMate)
             }
             Spacer(Modifier.height(6.dp))
-            DuckClockRow(ui, top = false)
+            DuckPlayerRow(ui, top = false)
             Spacer(Modifier.height(4.dp))
             Text(
                 pluralStringResource(R.plurals.variant_halfmoves, ui.plies, ui.plies),
@@ -124,12 +123,20 @@ fun DuckChessScreen(
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 ControlButton(
                     Icons.Default.Lightbulb, stringResource(R.string.train_hint),
-                    enabled = ui.settings.hintsEnabled && !ui.gameOver,
+                    // L'indice vient du moteur : à deux, il n'y en a pas — et
+                    // il soufflerait le coup à celui qui n'a pas le trait.
+                    enabled = ui.settings.hintsEnabled && ui.versusEngine && !ui.gameOver,
                     tint = if (ui.hintWanted) Palette.background else Palette.textPrimary,
                     background = if (ui.hintWanted) Palette.accent else Palette.surfaceElevated,
                     tag = "indice", onClick = model::toggleHint,
                 )
                 Spacer(Modifier.weight(1f))
+                ControlButton(
+                    text = "½", label = stringResource(R.string.play_offer_draw),
+                    tint = Palette.info, enabled = !ui.gameOver && !ui.thinking,
+                    tag = "nulle", onClick = model::offerDraw,
+                )
+                Spacer(Modifier.width(10.dp))
                 ControlButton(
                     Icons.Default.Flag, stringResource(R.string.play_resign),
                     tint = Palette.danger, enabled = !ui.gameOver,
@@ -168,15 +175,45 @@ fun DuckChessScreen(
             title = { Text(stringResource(R.string.play_resign)) },
             text = { Text(stringResource(R.string.play_resign_confirm)) },
             confirmButton = {
-                TextButton(
-                    onClick = { confirmResign = false; model.resign() },
-                    modifier = Modifier.testTag("abandonner-oui"),
-                ) { Text(stringResource(R.string.play_resign), color = Palette.danger) }
+                // À deux sur le même appareil, « abandonner » ne dit pas de
+                // quel côté : on nomme les deux camps, comme iOS.
+                if (ui.versusEngine) {
+                    TextButton(
+                        onClick = { confirmResign = false; model.resign() },
+                        modifier = Modifier.testTag("abandonner-oui"),
+                    ) { Text(stringResource(R.string.play_resign), color = Palette.danger) }
+                } else {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        TextButton(
+                            onClick = { confirmResign = false; model.resign(Piece.Color.white) },
+                            modifier = Modifier.testTag("abandonner-blancs"),
+                        ) { Text(stringResource(R.string.color_white), color = Palette.danger) }
+                        TextButton(
+                            onClick = { confirmResign = false; model.resign(Piece.Color.black) },
+                            modifier = Modifier.testTag("abandonner-noirs"),
+                        ) { Text(stringResource(R.string.color_black), color = Palette.danger) }
+                    }
+                }
             },
             dismissButton = {
                 TextButton(onClick = { confirmResign = false }) { Text(stringResource(R.string.cancel)) }
             },
             containerColor = Palette.surface,
+        )
+    }
+
+    // Le refus, dit une fois : sans cela il se perdrait dans la ligne d'état.
+    if (ui.drawDeclined) {
+        AlertDialog(
+            onDismissRequest = model::dismissDrawDeclined,
+            title = { Text(stringResource(R.string.play_draw_declined), color = Palette.textPrimary) },
+            text = { Text(stringResource(R.string.play_draw_declined_body), color = Palette.textSecondary) },
+            confirmButton = {
+                TextButton(onClick = model::dismissDrawDeclined) {
+                    Text(stringResource(android.R.string.ok), color = Palette.accent)
+                }
+            },
+            containerColor = Palette.surfaceElevated,
         )
     }
 
@@ -205,38 +242,65 @@ fun DuckChessScreen(
 }
 
 /** La pendule d'un camp — celle d'en face au-dessus, la nôtre en dessous. */
+/**
+ * Le bandeau d'un joueur : qui c'est, s'il réfléchit, sa pendule.
+ *
+ * Il ne portait qu'une pendule — et disparaissait tout entier SANS cadence :
+ * l'écran ne disait alors nulle part qui jouait quoi. C'est le défaut déjà
+ * corrigé le 20/09 sur l'écran partagé des variantes, que le Duck Chess avait
+ * gardé faute d'y passer.
+ */
 @Composable
-private fun DuckClockRow(ui: DuckUiState, top: Boolean) {
-    val white = ui.whiteClockMs ?: return
-    val black = ui.blackClockMs ?: return
+private fun DuckPlayerRow(ui: DuckUiState, top: Boolean) {
     val color = if (top) ui.userColor.opposite else ui.userColor
-    val ms = if (color == Piece.Color.white) white else black
+    val isEngine = ui.versusEngine && color != ui.userColor
+    val ms = if (color == Piece.Color.white) ui.whiteClockMs else ui.blackClockMs
     val active = ui.position.sideToMove == color && !ui.gameOver
     Row(
         Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp))
-            .background(if (active) Palette.surfaceElevated else Color.Transparent)
-            .padding(horizontal = 12.dp, vertical = 5.dp)
-            .testTag(if (top) "pendule-adversaire" else "pendule-moi"),
+            .clip(RoundedCornerShape(12.dp))
+            .background(if (active) Palette.surfaceElevated else Palette.surface)
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .testTag(if (top) "joueur-adversaire" else "joueur-moi"),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            Modifier
-                .size(9.dp)
-                .clip(CircleShape)
-                .background(if (color == Piece.Color.white) Color.White else Color.Black)
-                .border(1.dp, Palette.stroke, CircleShape)
+        Icon(
+            if (isEngine) Icons.Default.Memory else Icons.Default.Person,
+            // Décoratif : le texte juste après porte déjà l'information.
+            contentDescription = null,
+            tint = if (isEngine) variantTint("duck") else Palette.info,
+            modifier = Modifier.size(16.dp),
         )
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.width(8.dp))
         Text(
-            GameClock.format(ms),
-            fontSize = 19.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace,
-            color = when {
-                ms < 30_000 -> Palette.danger
-                active -> Palette.textPrimary
-                else -> Palette.textTertiary
-            },
+            // À deux sur le même appareil, personne n'est « l'ordinateur » ni
+            // « vous » : c'est la couleur qui désigne le joueur.
+            if (!ui.versusEngine) stringResource(
+                if (color == Piece.Color.white) R.string.color_white else R.string.color_black
+            ) else stringResource(
+                if (isEngine) R.string.variant_player_engine else R.string.variant_player_you
+            ),
+            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
         )
+        if (isEngine && ui.thinking) {
+            Spacer(Modifier.width(8.dp))
+            CircularProgressIndicator(
+                Modifier.size(12.dp), strokeWidth = 2.dp, color = Palette.textSecondary,
+            )
+        }
+        Spacer(Modifier.weight(1f))
+        if (ms != null) {
+            Text(
+                GameClock.format(ms),
+                fontSize = 19.sp, fontWeight = FontWeight.SemiBold, fontFamily = FontFamily.Monospace,
+                color = when {
+                    ms < 30_000 -> Palette.danger
+                    active -> Palette.textPrimary
+                    else -> Palette.textTertiary
+                },
+                modifier = Modifier.testTag(if (top) "pendule-adversaire" else "pendule-moi"),
+            )
+        }
     }
 }

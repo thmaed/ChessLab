@@ -876,7 +876,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="variant_duck_blurb">Every turn has TWO steps: you move a piece, then you place the duck on any empty square you like. The duck belongs to nobody and blocks its square completely — no piece may land on it or move through it, and it cannot be captured. It must change square every turn. There is NO CHECK AND NO CHECKMATE: a king may stay under attack, and you win by capturing it. The computer plays this variant with Stockfish, restricted to the moves the duck allows: it plays well, but it does not see the duck in its evaluation.</string>
     <string name="duck_place">Place the duck on an empty square</string>
     <string name="duck_engine_places">The duck is landing…</string>
-    <string name="duck_king_taken">King captured — %1$s</string>
     <string name="variant_stolen">Stolen Move</string>
     <string name="variant_stolen_short">One token, 2 moves</string>
     <string name="variant_stolen_blurb">The rules are those of classical chess. In addition: every %1$d moves played, you earn a token. You never hold more than ONE: a new one replaces the old if it wasn\'t spent, and it can\'t be spent while you\'re in check yourself. Spending it lets you play TWO moves in a row — unless the first one checks your opponent, in which case the turn stops there. An en passant capture made possible by the opponent\'s last move stays valid even if your first move of the double turn comes in between.</string>
@@ -947,6 +946,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="reason_checkmate">checkmate</string>
     <string name="reason_resignation">resignation</string>
     <string name="reason_timeout">time out</string>
+    <string name="reason_king_captured">king captured</string>
     <string name="two_review_state">Reviewing — move %1$d/%2$d</string>
     <string name="two_resume_undo_label">Resumed at move %1$d — %2$d moves discarded</string>
     <string name="two_resume_announce">Game resumed, %1$d moves discarded. You can undo.</string>

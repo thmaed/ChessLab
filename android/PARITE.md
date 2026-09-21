@@ -117,13 +117,13 @@ repris un par un sur le Galaxy A16.
       « Blancs a gagné (roi au centre) ». `VariantEndingsTest` prouvait le
       verdict ; celui-ci prouve qu'il arrive jusqu'aux yeux.
 
-**Un écart ASSUMÉ, et c'est iOS qui est en tort** : au Duck Chess, iOS annonce
-la fin comme un « échec et mat » (`GameOutcome(reason: .checkmate)`), alors que
-son propre générateur de notation écrit, commentaire à l'appui, qu'il n'y a « ni
-échec ni mat » dans cette variante — on y gagne en CAPTURANT le roi. Android dit
-« Roi capturé — Blancs », ce qui est juste. Aligner Android sur iOS lui ferait
-dire une chose que le code d'iOS lui-même déclare fausse : à trancher, dans
-l'autre sens de préférence.
+**~~Un écart ASSUMÉ~~ — TRANCHÉ le 21/09, et c'était bien iOS qui était en
+tort** : au Duck Chess, iOS annonçait la fin comme un « échec et mat »
+(`GameOutcome(reason: .checkmate)`), alors que son propre générateur de
+notation écrit, commentaire à l'appui, qu'il n'y a « ni échec ni mat » dans
+cette variante — on y gagne en CAPTURANT le roi. iOS a reçu la raison qui
+manquait (`.kingCaptured`, « roi capturé ») ; les deux apps disent maintenant
+la même chose. Voir la section du 21/09 en fin de document.
 
 ### La barre d'évaluation, activée PAR DÉFAUT — 20/09
 
@@ -353,7 +353,8 @@ Quatre points laissés au choix, tranchés :
 - [x] **Le Laboratoire reste à UN écran.** iOS en a deux (réglages, puis
       série). Écart de forme assumé, décidé le 20/09 après l'avoir rouvert.
 - [x] **Le Duck Chess garde « Roi capturé »**, contre l'« échec et mat » d'iOS
-      — voir plus haut : c'est iOS qui se contredit.
+      — voir plus haut : c'est iOS qui se contredit. **Repris le 21/09** :
+      plutôt que de garder deux phrases, c'est iOS qui a été corrigé.
 
 ## ⬜ Écart OUVERT — les tablettes, 19/09/2026
 
@@ -1073,3 +1074,70 @@ aléatoires, Coup Volé, Duck Chess.
       classée une seule fois. Sur une position (FEN, scan, éditeur),
       l'analyse en continu reste la seule source. Le bouton « Revue » ne
       subsiste qu'en repli, quand une revue n'a pas abouti.
+
+## Le Duck Chess, repris des deux côtés — 21/09/2026
+
+Demandé après la revue : « y a-t-il des choses à corriger sur iOS ? ». Il y en
+avait une, et la chercher en a montré quatre autres — toutes dans la même
+variante, et aucune visible autrement qu'en la jouant.
+
+**Les deux corrections d'iOS** — les seules de la revue, avec la barre
+d'évaluation :
+
+- [x] **« Échec et mat » au Duck Chess.** La variante n'a ni échec ni mat : le
+      canard masque le coup qui vient, donc on ne peut pas exiger d'un joueur
+      qu'il voie la menace, et la partie se gagne en PRENANT le roi. L'app
+      écrivait `Dxe8++` sur la bande des coups, puis « échec et mat » dans le
+      panneau juste dessous. `GameOutcome.Reason` reçoit `.kingCaptured`
+      (« roi capturé » / « king captured »), sa neuvième raison de variante.
+- [x] **« Vous a gagné ».** L'écran composait la phrase à la façon du jeu à
+      deux — « X a gagné » — avec X valant « Vous ». Les trois autres écrans
+      de variante disent « Vous avez gagné (…) » ; le Duck Chess était seul de
+      son espèce. La forme nom-verbe ne sert plus qu'à deux, où les camps ont
+      des noms.
+
+**Et quatre défauts côté Android**, trouvés en portant la première :
+
+- [x] **La phrase de fin avait sa tournure à elle** — « Roi capturé — les
+      blancs gagnent » — quand toutes les autres variantes disent « Vous avez
+      gagné (…) » / « Blancs a gagné (…) ». Même forme partout désormais.
+- [x] **Le réglage « Deux joueurs » ne servait à rien.** L'écran d'avant le
+      proposait, `DuckChessViewModel` ne le lisait pas : la machine jouait
+      quand même, et le second joueur regardait. Le modèle connaît maintenant
+      un `engineColor` nul, comme iOS ; avec lui partent la barre
+      d'évaluation, l'indice et l'alerte de gaffe — trois aides qui demandent
+      un adversaire artificiel — et l'abandon demande QUI abandonne.
+- [x] **Pas de proposition de NULLE**, qu'iOS offre. Le Duck Chess n'a pas de
+      nulle « selon les règles » (ni pat, ni matériel insuffisant : un fou
+      seul prend un roi), mais deux joueurs peuvent convenir d'en rester là,
+      et le moteur juge comme ailleurs. S'il n'a pas d'avis sous la main —
+      barre d'évaluation éteinte — on le lui DEMANDE, au lieu de refuser pour
+      une raison étrangère à la position.
+- [x] **Les règles s'affichaient encore au-dessus du plateau**, au Duck Chess
+      et au Coup Volé. Le chantier du 20/09 les avait retirées de l'écran
+      partagé des variantes et oublié les deux variantes ARBITRÉES PAR L'APP,
+      qui ont chacune le leur.
+- [x] **La règle du Coup Volé montrait son `%1$d`** sur l'écran de réglages :
+      c'est la seule dont le texte porte un chiffre, et la section « Règle »
+      du 20/09 ne le lui passait pas.
+- [x] **Aucun bandeau joueur**, et la ligne de pendule DISPARAISSAIT sans
+      cadence : l'écran ne disait alors nulle part qui jouait quoi. Même
+      défaut que celui corrigé le 20/09 sur l'écran partagé des variantes, que
+      le Duck Chess avait gardé faute d'y passer. Il porte maintenant l'icône,
+      « Ordinateur » / « Vous » — ou la couleur, à deux —, le témoin de
+      réflexion et la pendule s'il y en a une.
+
+**Prouvé par des parties jouées**, pas par des positions montées :
+`DuckChessViewModelTests.kingCaptureIsNotCheckmate` côté iOS et
+`DuckChessOutcomeTest` sur l'appareil — 1.e4 f6 2.Dh5 a6 3.Dxe8++ des deux
+côtés, plus un test qui attend deux secondes pour prouver qu'à deux la machine
+ne joue pas.
+
+**Un écart de FORME laissé ouvert, sur l'écran PARTAGÉ des autres variantes** :
+à deux, le Duck Chess nomme désormais les camps comme iOS — « Blancs a gagné
+(abandon) », « Noirs a gagné (temps écoulé) » — et demande QUI abandonne. Les
+autres variantes disent encore « Vous avez abandonné » et « Temps écoulé —
+vous perdez » à deux joueurs, où il n'y a pas de « vous ». À reprendre d'un
+seul mouvement pour les onze. Le Coup Volé, lui, annonce le mat par « les
+blancs gagnent » (`StolenMoveViewModel`) là où iOS écrit « Vous avez perdu
+(échec et mat) » : même famille de défaut, même correctif.

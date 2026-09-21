@@ -106,7 +106,12 @@ fun VariantSetupScreen(
                 variantTint(variant.id),
             ) {
                 Text(
-                    stringResource(variant.blurbRes),
+                    // Le Coup Volé est le seul dont la règle porte un CHIFFRE
+                    // — l'intervalle entre deux jetons, réglable juste en
+                    // dessous. Sans le lui passer, le texte affichait son
+                    // « %1$d » tel quel.
+                    if (variant.id == "stolenmove") stringResource(variant.blurbRes, tokenInterval)
+                    else stringResource(variant.blurbRes),
                     fontSize = 12.sp, color = Palette.textSecondary,
                     modifier = Modifier.testTag("regle"),
                 )

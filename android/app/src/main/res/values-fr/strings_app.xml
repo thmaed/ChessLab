@@ -873,7 +873,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="variant_duck_blurb">Chaque tour se joue en DEUX temps : vous déplacez une pièce, puis vous posez le canard sur une case vide de votre choix. Le canard n\'appartient à personne et bloque totalement sa case — aucune pièce ne peut s\'y poser ni la traverser, et il ne se capture pas. Il doit changer de case à chaque tour. Il n\'y a NI ÉCHEC NI MAT : un roi a le droit de rester sous une attaque, et on gagne en le capturant. L\'ordinateur joue cette variante avec Stockfish, restreint aux coups que le canard laisse passer : il joue bien, mais il ne voit pas le canard dans son évaluation.</string>
     <string name="duck_place">Posez le canard sur une case vide</string>
     <string name="duck_engine_places">Le canard se pose…</string>
-    <string name="duck_king_taken">Roi capturé — %1$s</string>
     <string name="variant_stolen">Coup Volé</string>
     <string name="variant_stolen_short">Un jeton, 2 coups</string>
     <string name="variant_stolen_blurb">Les règles sont celles du jeu classique. En plus : tous les %1$d coups joués, vous gagnez un jeton. Vous n\'en gardez jamais plus d\'UN : le nouveau efface l\'ancien s\'il n\'a pas été dépensé, et impossible de le dépenser si vous êtes vous-même en échec. Le dépenser vous fait jouer DEUX coups d\'affilée — sauf si le premier met l\'adversaire en échec, auquel cas le tour s\'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s\'intercale.</string>
@@ -944,6 +943,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="reason_checkmate">échec et mat</string>
     <string name="reason_resignation">abandon</string>
     <string name="reason_timeout">temps écoulé</string>
+    <string name="reason_king_captured">roi capturé</string>
     <string name="two_review_state">Consultation — coup %1$d/%2$d</string>
     <string name="two_resume_undo_label">Reprise au coup %1$d — %2$d coups écartés</string>
     <string name="two_resume_announce">Partie reprise, %1$d coups écartés. Annulation possible.</string>

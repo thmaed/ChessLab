@@ -27,6 +27,12 @@ struct GameOutcome: Equatable, Hashable {
         case antichessStuck
         /// Un roi a explosé au contact d'une capture — Atomique.
         case atomicKingExploded
+        /// Roi PRIS — Duck Chess. La variante n'a ni échec ni mat : le canard
+        /// masque le coup qui vient, donc on ne peut pas exiger qu'un joueur
+        /// voie la menace, et la partie se gagne en CAPTURANT le roi. C'est ce
+        /// qu'écrit déjà la notation de la variante (``DuckChessSAN``, qui
+        /// marque « ++ » et jamais « # ») ; l'issue disait « échec et mat ».
+        case kingCaptured
     }
 
     /// `nil` si la partie est nulle.
@@ -61,6 +67,7 @@ struct GameOutcome: Equatable, Hashable {
         case .racingKingsDraw: LocalizationController.string("les deux rois arrivent ensemble")
         case .antichessStuck: LocalizationController.string("plus aucun coup possible")
         case .atomicKingExploded: LocalizationController.string("roi explosé")
+        case .kingCaptured: LocalizationController.string("roi capturé")
         }
     }
 
@@ -164,6 +171,7 @@ extension GameOutcome.Reason {
         case .racingKingsDraw: "racingKingsDraw"
         case .antichessStuck: "antichessStuck"
         case .atomicKingExploded: "atomicKingExploded"
+        case .kingCaptured: "kingCaptured"
         }
     }
 }

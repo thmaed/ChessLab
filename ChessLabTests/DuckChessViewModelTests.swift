@@ -93,6 +93,34 @@ struct DuckChessViewModelTests {
         #expect(vm.outcome == nil)
     }
 
+    @Test("Une partie gagnée par capture du roi ne dit PAS « échec et mat »")
+    func kingCaptureIsNotCheckmate() {
+        // Le Duck Chess n'a ni échec ni mat — sa propre notation l'écrit, en
+        // marquant « ++ » et jamais « # ». L'issue, elle, annonçait
+        // `.checkmate` : le panneau de fin contredisait la bande des coups
+        // juste au-dessus. Joué ici pour de vrai, du départ à la capture.
+        let vm = DuckChessViewModel(versusEngine: false)
+        func turn(_ from: String, _ to: String, duck: String) {
+            vm.selectSquare(Square(from))
+            vm.selectSquare(Square(to))
+            vm.selectSquare(Square(duck))
+        }
+        turn("e2", "e4", duck: "h3")
+        turn("f7", "f6", duck: "h6")   // f7 libérée : la diagonale h5-e8 s'ouvre
+        turn("d1", "h5", duck: "a3")
+        turn("a7", "a6", duck: "a4")   // les Noirs ne voient pas venir la dame
+
+        vm.selectSquare(Square("h5"))
+        vm.selectSquare(Square("e8"))
+
+        #expect(vm.outcome?.winner == .white)
+        #expect(vm.outcome?.reason == .kingCaptured)
+        #expect(vm.outcome?.reason.storageLabel == "kingCaptured")
+        #expect(vm.sanLog.last == "Qxe8++", "la notation marque la prise du roi")
+        // La partie s'arrête AVANT la pose du canard : il n'aurait plus d'objet.
+        #expect(vm.phase == .movePiece)
+    }
+
     @Test("Le roque déplace aussi la tour")
     func castlingMovesTheRook() {
         let vm = DuckChessViewModel(versusEngine: false)
