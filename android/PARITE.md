@@ -1186,9 +1186,12 @@ il faut un vrai mat pour en voir un.
       faisait — la raison d'être du correctif est écrite, pas déduite.
 - [ ] **Pas encore vérifié sur appareil** : le téléphone n'était pas branché.
 
-**Une question de FOND, laissée ouverte** : le barème est calibré sur les
-échecs classiques. Mesuré au moteur, l'écart entre le meilleur et le pire coup
-d'une position vaut **46 à 56 points** de probabilité de gain aux échecs, et
-seulement **17 à 22** à la Horde. Le seuil de 15 points y est donc bien plus
-sévère proportionnellement : seul un coup proche du pire déclenche l'alerte.
-Faut-il un seuil par variante ? C'est une décision produit, pas un défaut.
+**Une question de FOND — TRANCHÉE le 26/09 : on garde un seuil UNIQUE.** Le
+barème est calibré sur les échecs classiques. Mesuré au moteur, l'écart entre
+le meilleur et le pire coup d'une position vaut **46 à 56 points** de
+probabilité de gain aux échecs, et seulement **17 à 22** à la Horde : le seuil
+de 15 points y est donc proportionnellement bien plus sévère, et seul un coup
+proche du pire déclenche l'alerte. Un seuil par variante a été envisagé puis
+écarté — douze barèmes à calibrer et à tenir, pour une alerte qui se contente
+d'être plus discrète là où les positions bougent moins. Ce n'était pas un
+défaut, et ce n'en devient pas un.
