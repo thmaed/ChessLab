@@ -413,8 +413,14 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
                 }
             } ?: return@launch
             val (before, after) = pair
-            val beforeCp = before.cp ?: (if (before.mate != null) 0 else return@launch)
-            val afterCp = after.cp ?: (if (after.mate != null) 0 else return@launch)
+            // Un mat vaut ±10 000 centipions, JAMAIS zéro : voir
+            // `BlunderAlert.centipawns`. C'est le défaut qui faisait prévenir
+            // « coup risqué » sur le coup qui force le mat — très visible à la
+            // Horde, où l'extinction de la horde EST un mat pour le moteur.
+            val beforeCp = com.chesslab.play.BlunderAlert.centipawns(before.cp, before.mate)
+                ?: return@launch
+            val afterCp = com.chesslab.play.BlunderAlert.centipawns(after.cp, after.mate)
+                ?: return@launch
             val severity = com.chesslab.play.BlunderAlert.severity(
                 beforeCp = beforeCp, beforeMate = before.mate,
                 afterCp = afterCp, afterMate = after.mate,

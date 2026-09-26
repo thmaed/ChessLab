@@ -1141,3 +1141,54 @@ vous perdez » à deux joueurs, où il n'y a pas de « vous ». À reprendre d'u
 seul mouvement pour les onze. Le Coup Volé, lui, annonce le mat par « les
 blancs gagnent » (`StolenMoveViewModel`) là où iOS écrit « Vous avez perdu
 (échec et mat) » : même famille de défaut, même correctif.
+
+## L'alerte de coup risqué, faussée dans les variantes — 26/09/2026
+
+Signalé depuis la Horde : « l'alerte ne me semble pas tout à fait juste ».
+Elle ne l'était pas, et pas seulement à la Horde — les trois modes de variante
+étaient touchés. **iOS a toujours eu raison ; c'est Android qui se contredisait
+lui-même**, son mode « Contre l'ordinateur » faisant déjà la chose correcte.
+
+**Le défaut** : le moteur annonce `score mate N` **ou** `score cp N`, jamais
+les deux — sur un mat, le champ `cp` est simplement ABSENT. Les trois modes de
+variante le ramenaient alors à **zéro**, c'est-à-dire à 50 % de probabilité de
+gain, l'égalité parfaite, pour une position gagnée ou perdue.
+
+Conséquence, mesurée sur le vrai moteur compilé pour le bureau :
+
+| situation | iOS | Android (avant) |
+| --- | --- | --- |
+| on gagne (+400), le coup FORCE le mat | rien | « coup risqué, 4 pions perdus » |
+| on était maté en 4, le coup en SORT | rien | « coup risqué, 3 pions perdus » |
+
+Dans les deux cas l'app prévenait sur le **meilleur coup de la position**.
+
+**Pourquoi la Horde le montre** : le moteur y rend l'extinction de la horde
+comme un **mat** (mesuré : deux pions restants → `mate 5`, un seul → `mate 3`).
+Les scores de mat y sont donc bien plus fréquents qu'aux échecs classiques, où
+il faut un vrai mat pour en voir un.
+
+- [x] `BlunderAlert.MATE_CENTIPAWNS` et `BlunderAlert.centipawns()` — la
+      convention ±10 000 (celle d'`EngineScore.mateCentipawns` sur iOS) n'est
+      plus écrite qu'à UN endroit, pour qu'un quatrième mode ne la recopie pas
+      de travers.
+- [x] Les trois appels corrigés : `VariantPlayViewModel` (les neuf variantes
+      arbitrées par le moteur, dont la Horde), `DuckChessViewModel`,
+      `StolenMoveViewModel`. Le mode principal, qui avait déjà raison, cite
+      désormais la constante au lieu d'un littéral.
+- [x] **Duck Chess, seconde divergence au même endroit** : iOS écarte
+      VOLONTAIREMENT le mat dans cette variante — le canard peut barrer la
+      ligne au coup suivant, donc un mat annoncé n'en est pas un, et la barre
+      d'évaluation n'y affiche jamais « M3 ». Android le prenait au sérieux et
+      pouvait annoncer « vous concédez un mat » pour une fin que rien ne
+      garantit. Aligné.
+- [x] Trois tests JVM, dont deux qui affirment AUSSI ce que l'ancien code
+      faisait — la raison d'être du correctif est écrite, pas déduite.
+- [ ] **Pas encore vérifié sur appareil** : le téléphone n'était pas branché.
+
+**Une question de FOND, laissée ouverte** : le barème est calibré sur les
+échecs classiques. Mesuré au moteur, l'écart entre le meilleur et le pire coup
+d'une position vaut **46 à 56 points** de probabilité de gain aux échecs, et
+seulement **17 à 22** à la Horde. Le seuil de 15 points y est donc bien plus
+sévère proportionnellement : seul un coup proche du pire déclenche l'alerte.
+Faut-il un seuil par variante ? C'est une décision produit, pas un défaut.

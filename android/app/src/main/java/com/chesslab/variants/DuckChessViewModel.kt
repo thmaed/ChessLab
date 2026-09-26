@@ -380,9 +380,19 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             val beforeEval = DuckChessEngine.evaluate(getApplication(), before, duck, null) ?: return@launch
             val afterEval = DuckChessEngine.evaluate(getApplication(), after, duck, ep) ?: return@launch
+            // Un « mat » annoncé par le moteur n'en est pas un ICI : le canard
+            // peut barrer la ligne au coup suivant. On le ramène à un très gros
+            // avantage — ±10 000 via `BlunderAlert.centipawns` — et on ne passe
+            // AUCUN mat au barème, sans quoi l'alerte annoncerait « vous
+            // concédez un mat » pour une fin que rien ne garantit. C'est le
+            // raisonnement d'iOS (`DuckChessEngine.evaluate`, qui écrête et ne
+            // rend jamais de mat), et la raison pour laquelle le Duck Chess
+            // n'affiche jamais « M3 » sur sa barre d'évaluation.
             val severity = BlunderAlert.severity(
-                beforeCp = beforeEval.cp ?: 0, beforeMate = beforeEval.mate,
-                afterCp = afterEval.cp ?: 0, afterMate = afterEval.mate,
+                beforeCp = BlunderAlert.centipawns(beforeEval.cp, beforeEval.mate) ?: return@launch,
+                beforeMate = null,
+                afterCp = BlunderAlert.centipawns(afterEval.cp, afterEval.mate) ?: return@launch,
+                afterMate = null,
             ) ?: return@launch
             if (ui.gameOver) return@launch
             ui = ui.copy(blunderWarning = severity)

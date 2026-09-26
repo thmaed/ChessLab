@@ -426,8 +426,14 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
             val before = scoreOf(beforeFen) ?: return@launch
             val after = scoreOf(afterFen) ?: return@launch
             val severity = com.chesslab.play.BlunderAlert.severity(
-                beforeCp = before.first ?: 0, beforeMate = before.second,
-                afterCp = after.first ?: 0, afterMate = after.second,
+                // Un mat vaut ±10 000 centipions, jamais zéro : voir
+                // `BlunderAlert.centipawns`.
+                beforeCp = com.chesslab.play.BlunderAlert.centipawns(before.first, before.second)
+                    ?: return@launch,
+                beforeMate = before.second,
+                afterCp = com.chesslab.play.BlunderAlert.centipawns(after.first, after.second)
+                    ?: return@launch,
+                afterMate = after.second,
             ) ?: return@launch
             if (ui.gameOver || interactionBoard().position.fen != afterFen) return@launch
             ui = ui.copy(blunderWarning = severity)

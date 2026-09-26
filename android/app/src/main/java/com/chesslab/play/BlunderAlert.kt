@@ -40,6 +40,29 @@ sealed class BlunderSeverity {
  */
 object BlunderAlert {
 
+    /**
+     * Ce que vaut un MAT en centipions. Pendant d'`EngineScore.mateCentipawns`
+     * (iOS), et même valeur.
+     *
+     * Le moteur annonce « score mate N » OU « score cp N », jamais les deux :
+     * sur un mat, le champ `cp` est simplement ABSENT. Le ramener à zéro — ce
+     * que faisaient les trois modes de variante — place la position à 50 % de
+     * probabilité de gain, c'est-à-dire à l'égalité, alors qu'elle est gagnée
+     * ou perdue. L'alerte prévenait alors sur le MEILLEUR coup de la position :
+     * celui qui force le mat, et celui qui sort d'un mat subi.
+     */
+    const val MATE_CENTIPAWNS = 10_000
+
+    /**
+     * L'éval d'une sonde ramenée en centipions, mat compris.
+     *
+     * À employer par tout appelant de [severity] : c'est le seul endroit où la
+     * convention est écrite, et la seule façon de ne pas la retrouver recopiée
+     * de travers dans un quatrième mode.
+     */
+    fun centipawns(cp: Int?, mate: Int?): Int? =
+        cp ?: mate?.let { if (it > 0) MATE_CENTIPAWNS else -MATE_CENTIPAWNS }
+
     /** Seuil de perte de probabilité de gain, en points de pourcentage. */
     const val RISKY_MOVE_WIN_LOSS_THRESHOLD = 15.0
 

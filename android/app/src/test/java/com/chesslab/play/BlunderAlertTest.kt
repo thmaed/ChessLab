@@ -44,6 +44,54 @@ class BlunderAlertTest {
         )
     }
 
+    // Les deux régressions du 26/09 : un MAT n'est pas une position à
+    // l'équilibre. Le moteur annonce « score mate N » OU « score cp N », jamais
+    // les deux ; ramener le `cp` absent à zéro plaçait la position à 50 % et
+    // faisait prévenir sur le MEILLEUR coup. Trouvé à la Horde, où le moteur
+    // rend l'extinction de la horde comme un mat, donc bien plus souvent.
+
+    @Test fun `un mat vaut dix mille centipions, pas zéro`() {
+        assertEquals(10_000, BlunderAlert.centipawns(cp = null, mate = 3))
+        assertEquals(-10_000, BlunderAlert.centipawns(cp = null, mate = -3))
+        assertEquals("le cp prime quand il existe", 42, BlunderAlert.centipawns(cp = 42, mate = null))
+        assertNull("sans score, rien à convertir", BlunderAlert.centipawns(cp = null, mate = null))
+    }
+
+    @Test fun `le coup qui FORCE le mat n'est pas un coup risqué`() {
+        // On gagne nettement (+400), notre coup mate en 3 : l'adversaire au
+        // trait voit « mate -3 ». C'est le meilleur coup possible.
+        val cp = BlunderAlert.centipawns(cp = null, mate = -3)!!
+        assertNull(
+            "avec un cp ramené à zéro, l'app annonçait « -31 points, 4 pions perdus »",
+            BlunderAlert.severity(beforeCp = 400, beforeMate = null, afterCp = cp, afterMate = -3),
+        )
+        // Et voici ce que faisait l'ancien code, pour que la raison d'être de
+        // `centipawns` soit écrite noir sur blanc plutôt que déduite.
+        assertTrue(
+            "le zéro d'autrefois produisait bien une fausse alerte",
+            BlunderAlert.severity(
+                beforeCp = 400, beforeMate = null, afterCp = 0, afterMate = -3,
+            ) is BlunderSeverity.Centipawns,
+        )
+    }
+
+    @Test fun `sortir d'un mat subi n'est pas un coup risqué`() {
+        // On était maté en 4 ; le coup l'évite, au prix d'une position encore
+        // inférieure (+400 pour l'adversaire). La partie était perdue : le
+        // plancher des 25 % doit faire taire l'alerte.
+        val cp = BlunderAlert.centipawns(cp = null, mate = -4)!!
+        assertNull(
+            "avec un cp ramené à zéro, on partait de 50 % au lieu de 0 %",
+            BlunderAlert.severity(beforeCp = cp, beforeMate = -4, afterCp = 400, afterMate = null),
+        )
+        assertTrue(
+            "le zéro d'autrefois produisait bien une fausse alerte",
+            BlunderAlert.severity(
+                beforeCp = 0, beforeMate = -4, afterCp = 400, afterMate = null,
+            ) is BlunderSeverity.Centipawns,
+        )
+    }
+
     @Test fun `une perte franche dans une position vive alerte`() {
         // +0,30 pour nous, puis +3,00 pour l'adversaire : on a lâché une pièce.
         val verdict = BlunderAlert.severity(beforeCp = 30, beforeMate = null, afterCp = 300, afterMate = null)

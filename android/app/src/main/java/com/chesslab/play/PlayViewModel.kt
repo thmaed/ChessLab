@@ -472,7 +472,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             if ((line.substringAfter(" multipv ", "1").substringBefore(" ").toIntOrNull() ?: 1) != 1) return@search
             val m = line.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
             val c = line.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
-            if (m != null) { mate = m; cp = if (m > 0) 10_000 else -10_000 }
+            if (m != null) { mate = m; cp = BlunderAlert.centipawns(null, m) }
             else if (c != null) { cp = c; mate = null }
         }
         return cp?.let { it to mate }
@@ -511,7 +511,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
                 if ((line.substringAfter(" multipv ", "1").substringBefore(" ").toIntOrNull() ?: 1) != 1) return@search
                 val m = line.substringAfter(" score mate ", "").substringBefore(" ").toIntOrNull()
                 val c = line.substringAfter(" score cp ", "").substringBefore(" ").toIntOrNull()
-                if (m != null) { mate = m; cp = if (m > 0) 10_000 else -10_000 }
+                if (m != null) { mate = m; cp = BlunderAlert.centipawns(null, m) }
                 else if (c != null) { cp = c; mate = null }
             }?.split(" ")?.getOrNull(1)
             QuickSearch(best?.takeIf { it.length >= 4 }, cp, mate)
