@@ -392,7 +392,7 @@ struct PlayView: View {
         let me = viewModel.userColor
         let captured = viewModel.capturedMaterial
         return PlayerRowView(
-            name: LocalizationController.string("Vous"),
+            name: PlayerName.you,
             color: me,
             isActive: viewModel.outcome == nil && viewModel.board.position.sideToMove == me,
             captured: captured.captures(by: me),
@@ -511,13 +511,14 @@ struct PlayView: View {
 
                 HStack(spacing: 10) {
                     panelButton("Accueil", icon: "house.fill") { onExit() }
-                    // `PGNExport` et non `game.pgn` brut : ChessKit n'émet pas
-                    // les tags [SetUp]/[FEN] pour une position de départ
+                    // Le PGN D'EXPORT et non `game.pgn` brut : ChessKit n'émet
+                    // pas les tags [SetUp]/[FEN] pour une position de départ
                     // personnalisée, et l'analyse rechargerait alors les coups
                     // DEPUIS la position standard — analyse vide au lieu de la
                     // partie (tout le flux « Jouer à partir d'ici » était
-                    // concerné).
-                    panelButton("Analyser", icon: "chart.xyaxis.line") { onAnalyze(PGNExport.pgn(for: viewModel.game)) }
+                    // concerné). Il porte aussi les joueurs et le résultat, que
+                    // l'en-tête d'analyse affiche.
+                    panelButton("Analyser", icon: "chart.xyaxis.line") { onAnalyze(viewModel.exportedPGN) }
                 }
             }
             .cardStyle()

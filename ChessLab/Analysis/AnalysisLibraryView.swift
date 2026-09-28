@@ -67,7 +67,13 @@ struct AnalysisLibraryView: View {
                 return false
             }
             if query.isEmpty { return true }
-            let haystack = ([record.whiteName, record.blackName, record.resultRaw].compactMap { $0 }
+            // Les noms AFFICHÉS entrent aussi dans la botte de foin : on
+            // cherche ce qu'on lit à l'écran (« You », ou le nom qu'on s'est
+            // donné), pas la sentinelle française stockée en base.
+            let haystack = ([
+                record.whiteName, record.blackName, record.resultRaw,
+                PlayerName.display(record.whiteName), PlayerName.display(record.blackName),
+            ].compactMap { $0 }
                 + record.tags)
                 .map { $0.lowercased() }
                 .joined(separator: " ")
@@ -107,7 +113,11 @@ struct AnalysisLibraryView: View {
                                     if isSelecting {
                                         toggle(record)
                                     } else {
-                                        guard let pgn = record.pgn, !pgn.isEmpty else { return }
+                                        // Les parties d'avant le 28/09 n'ont
+                                        // pas de balises : on les complète
+                                        // avec ce que l'enregistrement sait.
+                                        guard let pgn = GameLibraryService.analysablePGN(of: record)
+                                        else { return }
                                         onSelect(.pgn(pgn))
                                     }
                                 } label: {
@@ -467,7 +477,10 @@ struct AnalysisLibraryView: View {
             IconBadge(systemImage: "flag.checkered", tint: Theme.teal, size: 42)
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("\(record.whiteName ?? "Blancs") – \(record.blackName ?? "Noirs")")
+                // Traduits à l'AFFICHAGE : la base stocke « Vous » en clair
+                // (c'est aussi la sentinelle qui dit de quel côté on jouait),
+                // et cette ligne l'affichait tel quel en anglais.
+                Text(verbatim: "\(PlayerName.display(record.whiteName, fallback: PlayerName.white)) – \(PlayerName.display(record.blackName, fallback: PlayerName.black))")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Theme.textPrimary)
                 HStack(spacing: 8) {

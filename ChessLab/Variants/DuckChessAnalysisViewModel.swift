@@ -345,13 +345,11 @@ final class DuckChessAnalysisViewModel {
     // MARK: Export
 
     var exportedPGN: String {
-        var lines = [
-            "[Event \"ChessLab \(variantDisplayName)\"]",
-            "[Variant \"\(DuckChessVariant.shared.id)\"]",
-        ]
-        if let outcome {
-            lines.append("[Result \"\(outcome.pgnResult)\"]")
-        }
+        let lines = PGNExport.tagLines(
+            event: "ChessLab \(variantDisplayName)",
+            white: "?", black: "?", result: outcome?.pgnResult,
+            variant: DuckChessVariant.shared.id
+        )
         var moves = ""
         for (index, san) in sanLog.enumerated() {
             if index % 2 == 0 { moves += "\(index / 2 + 1). " }

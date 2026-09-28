@@ -66,6 +66,7 @@ final class SettingsCloudSync {
         "settings.pieceSetID",
         "settings.hapticsEnabled",
         "settings.pieceNotation",
+        "settings.playerName",
         // Réglages de mode, sérialisés en un bloc JSON chacun.
         "lastPlayGameSettings",
         "labGameSettings.v1",

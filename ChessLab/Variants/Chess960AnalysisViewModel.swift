@@ -612,15 +612,13 @@ final class Chess960AnalysisViewModel {
     // MARK: Export
 
     var exportedPGN: String {
-        var lines = [
-            "[Event \"ChessLab Chess960\"]",
-            "[Variant \"Chess960\"]",
-            "[SetUp \"1\"]",
-            "[FEN \"\(startFEN)\"]",
-        ]
-        if !tags.white.isEmpty { lines.append("[White \"\(tags.white)\"]") }
-        if !tags.black.isEmpty { lines.append("[Black \"\(tags.black)\"]") }
-        if !tags.result.isEmpty { lines.append("[Result \"\(tags.result)\"]") }
+        let lines = PGNExport.tagLines(
+            event: "ChessLab Chess960",
+            white: tags.white.isEmpty ? "?" : tags.white,
+            black: tags.black.isEmpty ? "?" : tags.black,
+            result: tags.result.isEmpty ? nil : tags.result,
+            variant: "Chess960", startFEN: startFEN
+        )
         var moves = ""
         for (index, san) in sanLog.enumerated() {
             if index % 2 == 0 { moves += "\(index / 2 + 1). " }

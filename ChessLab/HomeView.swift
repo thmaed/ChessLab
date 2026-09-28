@@ -1376,7 +1376,7 @@ struct HomeView: View {
             VStack(spacing: 10) {
                 ForEach(recentGames) { game in
                     Button {
-                        guard let pgn = game.pgn, !pgn.isEmpty else { return }
+                        guard let pgn = GameLibraryService.analysablePGN(of: game) else { return }
                         path.append(Route.activeAnalysis(.pgn(pgn)))
                     } label: {
                         recentGameRow(game)
@@ -1422,31 +1422,16 @@ struct HomeView: View {
         .accessibilityLabel(Text("Analyser la partie"))
     }
 
-    /// Intitulé lisible : « Contre Stockfish » pour une partie moteur, sinon
-    /// les deux noms. Les noms « Vous »/« Stockfish » sont stockés en français
-    /// dans le modèle ; on les localise à l'affichage.
+    /// Intitulé lisible : « Contre l'ordinateur » pour une partie moteur,
+    /// sinon les deux noms — traduits à l'affichage par ``PlayerName``, qui
+    /// sait aussi rendre à l'utilisateur le nom qu'il s'est choisi.
     private func recentGameTitle(_ game: GameRecord) -> String {
         if game.mode == .vsEngine {
             return LocalizationController.string("Contre l'ordinateur")
         }
-        let white = localizedPlayerName(game.whiteName) ?? LocalizationController.string("Blancs")
-        let black = localizedPlayerName(game.blackName) ?? LocalizationController.string("Noirs")
+        let white = PlayerName.display(game.whiteName, fallback: PlayerName.white)
+        let black = PlayerName.display(game.blackName, fallback: PlayerName.black)
         return "\(white) – \(black)"
-    }
-
-    /// Traduit les noms « spéciaux » stockés en français ; laisse tel quel un
-    /// vrai prénom saisi par l'utilisateur.
-    private func localizedPlayerName(_ stored: String?) -> String? {
-        guard let stored else { return nil }
-        switch stored {
-        case "Vous": return LocalizationController.string("Vous")
-        case "Blancs": return LocalizationController.string("Blancs")
-        case "Noirs": return LocalizationController.string("Noirs")
-        // « Stockfish » : nom stocké par les parties antérieures au renommage —
-        // affiché « Ordinateur » comme les nouvelles, pour l'uniformité.
-        case "Ordinateur", "Stockfish": return LocalizationController.string("Ordinateur")
-        default: return stored
-        }
     }
 
     private func resumeBanner(_ resumable: ResumableGame) -> some View {

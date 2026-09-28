@@ -1195,3 +1195,48 @@ proche du pire déclenche l'alerte. Un seuil par variante a été envisagé puis
 écarté — douze barèmes à calibrer et à tenir, pour une alerte qui se contente
 d'être plus discrète là où les positions bougent moins. Ce n'était pas un
 défaut, et ce n'en devient pas un.
+
+## Retour d'un testeur anglophone — CORRIGÉ SUR iOS, À PORTER — 28/09/2026
+
+Trois défauts signalés le 27/09 par un testeur sur iPad Pro 13" et iPhone 16,
+interface en anglais. Les correctifs sont faits **côté iOS seulement** — la
+demande portait explicitement sur l'iPhone et l'iPad. Ce qui suit est donc
+l'écart créé ce jour-là, à refermer.
+
+- [ ] **Le nom du joueur s'affichait « Vous » dans une interface anglaise.**
+      La bibliothèque stocke le mot français EN CLAIR (c'est aussi la
+      sentinelle qui dit de quel côté on jouait) et l'affichait tel quel.
+      iOS a désormais un point de résolution unique, `PlayerName`
+      (`ChessLab/Localization/PlayerName.swift`) : il traduit les noms
+      « spéciaux » — « Vous »/« You », « Blancs »/« White »,
+      « Noirs »/« Black », « Ordinateur »/« Computer »/« Stockfish » — dans la
+      langue DU JOUR, et laisse intact un vrai nom. Le stockage, lui, ne
+      change pas : le sentinelle reste le mot français. Vérifier côté Android
+      la ligne de bibliothèque, l'accueil, l'en-tête d'analyse et la plaque de
+      joueur.
+- [ ] **Aucun réglage pour se renommer.** iOS ajoute `AppSettings.playerName`
+      (clé `settings.playerName`, synchronisée iCloud, nettoyée des
+      guillemets/crochets/sauts de ligne et bornée à 40 caractères) et un
+      champ « Votre nom » dans Réglages, juste sous la langue. Vide = « Vous ».
+      Le nom choisi remplace la sentinelle PARTOUT où elle s'affiche, y compris
+      dans les parties déjà enregistrées, et part dans les balises PGN.
+- [ ] **Le PGN exporté n'avait AUCUNE balise ni résultat.** C'était exact :
+      `ChessKit.Game.pgn` ne sérialise que les balises renseignées, et l'app
+      n'en renseignait aucune. `PGNExport` porte désormais un `Metadata` et
+      émet les sept balises obligatoires — Event (le mode, dans la langue de
+      l'app), Site « ChessLab », Date « AAAA.MM.JJ », Round « - », White,
+      Black, Result (« * » si la partie n'est pas finie) — plus `SetUp`/`FEN`
+      pour une position de départ personnalisée. Le résultat clôt aussi le
+      movetext. Les neuf exports de VARIANTES, qui assemblaient leurs balises
+      à la main, passent par le même constructeur
+      (`PGNExport.tagLines(event:white:black:result:variant:startFEN:)`) et
+      gagnent au passage les joueurs, le site et la date.
+      Côté Android, l'équivalent est `AnalysisViewModel.pgn()` et les exports
+      de variantes : même manque à vérifier.
+
+**Un quatrième point reste OUVERT des deux côtés** : le testeur rapporte que
+« parfois, pas toujours », en paysage et barre latérale ouverte, le reste de
+l'écran part hors cadre à droite. Non reproduit sur iPad Pro 13" (iPadOS 26.5,
+simulateur) : neuf écrans de détail, deux rotations, trois bascules de barre
+latérale et la bibliothèque, tous mesurés dans le cadre
+(`ChessLabUITests/SidebarLandscapeLayoutUITests`). En attente d'une capture.

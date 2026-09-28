@@ -448,9 +448,8 @@ struct TwoPlayerGameView: View {
 
                 HStack(spacing: 10) {
                     panelButton("Accueil", icon: "house.fill") { onExit() }
-                    // Toujours une position standard ici, mais on passe par
-                    // `PGNExport` comme partout ailleurs — voir ``PlayView``.
-                    panelButton("Analyser", icon: "chart.xyaxis.line") { onAnalyze(PGNExport.pgn(for: viewModel.game)) }
+                    // Le PGN d'export, en-têtes comprises — voir ``PlayView``.
+                    panelButton("Analyser", icon: "chart.xyaxis.line") { onAnalyze(viewModel.exportedPGN) }
                     panelButton("Revanche", icon: "arrow.triangle.2.circlepath", filled: true) { onRematch(rematchSettings()) }
                 }
             }

@@ -766,19 +766,20 @@ final class DuckChessViewModel {
     /// canard. Aucun lecteur externe ne connaît cette variante ; l'export sert
     /// à relire et à partager une partie, pas à la rejouer ailleurs.
     var exportedPGN: String {
-        var tags = [
-            "[Event \"ChessLab \(variant.displayName)\"]",
-            "[Variant \"\(variant.id)\"]",
-        ]
-        if isVersusEngine, let engineColor {
-            let user = LocalizationController.string("Vous")
-            let machine = LocalizationController.string("Ordinateur")
-            tags.append("[White \"\(engineColor == .white ? machine : user)\"]")
-            tags.append("[Black \"\(engineColor == .black ? machine : user)\"]")
-        }
-        if let outcome {
-            tags.append("[Result \"\(outcome.pgnResult)\"]")
-        }
+        // Sans moteur, la partie se joue à deux sur le même appareil : ce
+        // sont les Blancs et les Noirs, faute de noms saisis.
+        let white = isVersusEngine
+            ? (engineColor == .white ? PlayerName.computer : PlayerName.you)
+            : PlayerName.white
+        let black = isVersusEngine
+            ? (engineColor == .black ? PlayerName.computer : PlayerName.you)
+            : PlayerName.black
+        let tags = PGNExport.tagLines(
+            event: "ChessLab \(variant.displayName)",
+            white: white, black: black,
+            result: outcome?.pgnResult,
+            variant: variant.id
+        )
         var moves = ""
         for (index, san) in sanLog.enumerated() {
             if index % 2 == 0 { moves += "\(index / 2 + 1). " }

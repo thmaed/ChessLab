@@ -867,15 +867,13 @@ final class Chess960PlayViewModel {
     /// PGN de la variante : tags `Variant`/`SetUp`/`FEN`, roque en O-O — le
     /// format que Lichess et les autres logiciels 960 relisent.
     var exportedPGN: String {
-        var tags = [
-            "[Event \"ChessLab Chess960\"]",
-            "[Variant \"Chess960\"]",
-            "[SetUp \"1\"]",
-            "[FEN \"\(startFEN)\"]",
-        ]
-        if let outcome {
-            tags.append("[Result \"\(outcome.pgnResult)\"]")
-        }
+        let tags = PGNExport.tagLines(
+            event: "ChessLab Chess960",
+            white: userColor == .white ? PlayerName.you : PlayerName.computer,
+            black: userColor == .black ? PlayerName.you : PlayerName.computer,
+            result: outcome?.pgnResult,
+            variant: "Chess960", startFEN: startFEN
+        )
         var moves = ""
         for (index, san) in sanLog.enumerated() {
             if index % 2 == 0 { moves += "\(index / 2 + 1). " }

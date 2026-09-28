@@ -778,20 +778,17 @@ final class FairyVariantPlayViewModel {
     /// PGN — tag `Variant` propre à Fairy-Stockfish (lu par Lichess et les
     /// autres logiciels compatibles).
     var exportedPGN: String {
-        var tags = [
-            "[Event \"ChessLab \(variant.displayName)\"]",
-            "[Variant \"\(variant.id)\"]",
-        ]
         // Horde n'a pas la position de départ classique : le dire au format
         // PGN standard (comme Chess960) pour qu'un lecteur externe la
         // retrouve, plutôt que de supposer la position initiale usuelle.
-        if variant.id == FairyVariant.horde.id {
-            tags.append("[SetUp \"1\"]")
-            tags.append("[FEN \"\(startFEN)\"]")
-        }
-        if let outcome {
-            tags.append("[Result \"\(outcome.pgnResult)\"]")
-        }
+        let tags = PGNExport.tagLines(
+            event: "ChessLab \(variant.displayName)",
+            white: userColor == .white ? PlayerName.you : PlayerName.computer,
+            black: userColor == .black ? PlayerName.you : PlayerName.computer,
+            result: outcome?.pgnResult,
+            variant: variant.id,
+            startFEN: variant.id == FairyVariant.horde.id ? startFEN : nil
+        )
         var moves = ""
         for (index, san) in sanLog.enumerated() {
             if index % 2 == 0 { moves += "\(index / 2 + 1). " }

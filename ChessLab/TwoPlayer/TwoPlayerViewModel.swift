@@ -247,8 +247,19 @@ final class TwoPlayerViewModel {
     /// FEN de la position AFFICHÉE : en consultation, celle sous les yeux.
     var displayedFEN: String { displayedBoard.position.fen }
 
-    /// PGN rechargeable de la partie en cours, en-têtes comprises.
-    var exportedPGN: String { PGNExport.pgn(for: game) }
+    /// PGN rechargeable de la partie en cours, en-têtes comprises — mêmes
+    /// sept balises que ``PlayViewModel/exportedPGN``, avec les noms saisis à
+    /// l'écran de réglages.
+    var exportedPGN: String {
+        PGNExport.pgn(
+            for: game,
+            metadata: .twoPlayer(
+                whiteName: settings.whiteName,
+                blackName: settings.blackName,
+                result: outcome?.pgnResult
+            )
+        )
+    }
 
     /// Avant le premier coup il n'y a pas de partie à exporter — la
     /// POSITION, elle, s'exporte toujours.

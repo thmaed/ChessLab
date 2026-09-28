@@ -107,6 +107,12 @@ struct AnalysisEntryView: View {
             .animation(Theme.gentle, value: showOtherSources)
         }
         .appBackground()
+        // L'échantillon de bibliothèque se sème ICI aussi (`-seedLibrarySample`,
+        // Debug seulement) : posé uniquement dans la bibliothèque, il ne
+        // servait à rien — la carte qui y mène est DÉSACTIVÉE tant qu'aucune
+        // partie n'est rangée, donc on ne pouvait pas atteindre l'écran qui
+        // sème. Idempotent, donc sans effet au second passage.
+        .onAppear { LibrarySampleSeeder.seedIfRequested(in: modelContext) }
         .navigationTitle("Analyser")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)

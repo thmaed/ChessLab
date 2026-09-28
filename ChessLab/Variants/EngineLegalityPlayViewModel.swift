@@ -1192,17 +1192,14 @@ final class EngineLegalityPlayViewModel {
     /// la position de départ classique : le dire au format PGN standard
     /// (comme Horde/Chess960) pour qu'un lecteur externe la retrouve.
     var exportedPGN: String {
-        var tags = [
-            "[Event \"ChessLab \(variant.displayName)\"]",
-            "[Variant \"\(variant.id)\"]",
-        ]
-        if variant.id == EngineLegalityVariant.racingKings.id {
-            tags.append("[SetUp \"1\"]")
-            tags.append("[FEN \"\(startFEN)\"]")
-        }
-        if let outcome {
-            tags.append("[Result \"\(outcome.pgnResult)\"]")
-        }
+        let tags = PGNExport.tagLines(
+            event: "ChessLab \(variant.displayName)",
+            white: userColor == .white ? PlayerName.you : PlayerName.computer,
+            black: userColor == .black ? PlayerName.you : PlayerName.computer,
+            result: outcome?.pgnResult,
+            variant: variant.id,
+            startFEN: variant.id == EngineLegalityVariant.racingKings.id ? startFEN : nil
+        )
         var moves = ""
         for (index, san) in sanLog.enumerated() {
             if index % 2 == 0 { moves += "\(index / 2 + 1). " }

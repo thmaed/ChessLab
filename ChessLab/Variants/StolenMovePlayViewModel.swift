@@ -965,13 +965,13 @@ final class StolenMovePlayViewModel {
     var displayedFEN: String { displayedBoard.position.fen }
 
     var exportedPGN: String {
-        var tags = [
-            "[Event \"ChessLab \(variant.displayName)\"]",
-            "[Variant \"\(variant.id)\"]",
-        ]
-        if let outcome {
-            tags.append("[Result \"\(outcome.pgnResult)\"]")
-        }
+        let tags = PGNExport.tagLines(
+            event: "ChessLab \(variant.displayName)",
+            white: userColor == .white ? PlayerName.you : PlayerName.computer,
+            black: userColor == .black ? PlayerName.you : PlayerName.computer,
+            result: outcome?.pgnResult,
+            variant: variant.id
+        )
         // Deux coups d'affilée pour le MÊME camp cassent la numérotation
         // standard « blanc puis noir » — annotés `[jeton]` plutôt que
         // silencieusement mal numérotés : ce PGN ne prétend de toute façon

@@ -178,7 +178,7 @@ struct Chess960PlayView: View {
                 .foregroundStyle(color == viewModel.engineColor ? Theme.accent : Theme.info)
             Text(color == viewModel.engineColor
                  ? LocalizationController.string("Ordinateur")
-                 : LocalizationController.string("Vous"))
+                 : PlayerName.you)
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Theme.textPrimary)
             if color == viewModel.engineColor, viewModel.isEngineThinking {

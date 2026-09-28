@@ -22,6 +22,7 @@ final class AppSettings {
         static let pieceNotation = "settings.pieceNotation"
         static let appLanguage = "settings.appLanguage"
         static let puzzleAttempts = "settings.puzzleAttempts"
+        static let playerName = "settings.playerName"
     }
 
     /// Essais accordés par puzzle, avant que la solution ne soit fléchée.
@@ -124,6 +125,56 @@ final class AppSettings {
     /// des nombres et des dates).
     var locale: Locale { Locale(identifier: appLanguage.resolvedCode) }
 
+    /// Le nom sous lequel l'utilisateur joue : plaque de joueur, bibliothèque,
+    /// balises `[White]`/`[Black]` des PGN exportés.
+    ///
+    /// Vide = « Vous » dans la langue active (voir ``PlayerName``). C'est le
+    /// défaut, et il convient à la plupart : personne n'a besoin de se nommer
+    /// pour jouer seul contre l'ordinateur. Mais un testeur a cherché — en
+    /// vain — comment signer ses parties (27/09/2026), et un PGN partagé au
+    /// club sans nom de joueur ne vaut pas grand-chose.
+    ///
+    /// Borné à ``playerNameMaxLength`` : ce nom part dans des balises PGN, et
+    /// une chaîne de mille caractères y produirait un fichier que les autres
+    /// logiciels refusent.
+    ///
+    /// Propriété CALCULÉE au-dessus d'un stockage privé, et non un `didSet`
+    /// qui se réécrirait : sous `@Observable`, une propriété stockée devient
+    /// un couple accesseur/observateur, et se réassigner depuis son propre
+    /// `didSet` y récurse — la pile déborde, l'app meurt (mesuré le
+    /// 28/09/2026, `EXC_BAD_ACCESS` sur le garde de pile). Ailleurs dans ce
+    /// fichier, les `didSet` ne font qu'écrire dans `UserDefaults` : ils sont
+    /// sans danger.
+    var playerName: String {
+        get { storedPlayerName }
+        set {
+            let cleaned = Self.sanitizedPlayerName(newValue)
+            guard cleaned != storedPlayerName else { return }
+            storedPlayerName = cleaned
+            UserDefaults.standard.set(cleaned, forKey: Keys.playerName)
+        }
+    }
+
+    /// Le stockage réel — c'est LUI que l'observation suit.
+    private var storedPlayerName: String
+
+    /// Longueur maximale retenue pour ``playerName``.
+    nonisolated static let playerNameMaxLength = 40
+
+    /// Rend un nom utilisable TEL QUEL dans une balise PGN : sans guillemet
+    /// (qui fermerait la balise), sans crochet, sans saut de ligne, borné.
+    ///
+    /// On nettoie à l'ENTRÉE plutôt qu'à l'export : un seul point de passage,
+    /// et le joueur voit tout de suite ce qui sera écrit. Les espaces, eux,
+    /// ne se coupent qu'à la LECTURE (``PlayerName/you``) : les rogner ici
+    /// empêcherait de taper l'espace d'un prénom composé, avalé à la frappe.
+    nonisolated static func sanitizedPlayerName(_ raw: String) -> String {
+        let flattened = raw
+            .replacingOccurrences(of: "[\\r\\n\\t]", with: " ", options: .regularExpression)
+            .replacingOccurrences(of: "[\"\\[\\]]", with: "", options: .regularExpression)
+        return String(flattened.prefix(playerNameMaxLength))
+    }
+
     private init() {
         let defaults = UserDefaults.standard
         boardThemeID = defaults.string(forKey: Keys.boardThemeID) ?? BoardTheme.classic.id
@@ -144,6 +195,8 @@ final class AppSettings {
 
         pieceNotation = defaults.string(forKey: Keys.pieceNotation)
             .flatMap(PieceNotation.init(rawValue:)) ?? .french
+
+        storedPlayerName = Self.sanitizedPlayerName(defaults.string(forKey: Keys.playerName) ?? "")
 
         appLanguage = defaults.string(forKey: Keys.appLanguage)
             .flatMap(AppLanguage.init(rawValue:)) ?? .system
@@ -182,6 +235,10 @@ final class AppSettings {
         let notation = defaults.string(forKey: Keys.pieceNotation)
             .flatMap(PieceNotation.init(rawValue:)) ?? .french
         if notation != pieceNotation { pieceNotation = notation }
+
+        // Le nom voyage, lui : c'est la même personne sur les deux appareils.
+        let name = Self.sanitizedPlayerName(defaults.string(forKey: Keys.playerName) ?? "")
+        if name != playerName { playerName = name }
     }
 
     /// Thème de plateau résolu (retombe sur classique si l'id stocké est

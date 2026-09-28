@@ -71,6 +71,25 @@ struct LibraryDuplicateTests {
         #expect(a != b)
     }
 
+    /// « ? » vaut ABSENT. Une partie rangée avant que l'app n'émette ses
+    /// balises (donc sans joueurs), exportée puis réimportée depuis un outil
+    /// qui note l'inconnu « ? », est la MÊME partie — sinon elle revient en
+    /// double.
+    @Test func anUnknownPlayerIsTheSameAsNoPlayerAtAll() throws {
+        let bare = "1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0"
+        let questionMarks = """
+        [Event "?"]
+        [White "?"]
+        [Black "?"]
+        [Result "1-0"]
+
+        1. e4 e5 2. Bc4 Nc6 3. Qh5 Nf6 4. Qxf7# 1-0
+        """
+        let a = try #require(GameLibraryService.signature(ofPGN: bare))
+        let b = try #require(GameLibraryService.signature(ofPGN: questionMarks))
+        #expect(a == b)
+    }
+
     @Test func unreadablePGNHasNoSignature() {
         #expect(GameLibraryService.signature(ofPGN: "ceci n'est pas un PGN") == nil)
         #expect(GameLibraryService.signature(ofPGN: "") == nil)

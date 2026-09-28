@@ -18,7 +18,20 @@ enum GameLibraryService {
     ) {
         let record = GameRecord()
         record.modeRaw = GameRecordMode.vsEngine.rawValue
-        record.pgn = PGNExport.pgn(for: game)
+        // Le PGN rangé porte les mêmes en-têtes que celui qu'on partage :
+        // c'est lui que rouvre l'analyse, et c'est lui qu'on réexporte depuis
+        // la bibliothèque.
+        record.pgn = PGNExport.pgn(
+            for: game,
+            metadata: .vsEngine(
+                userColor: userColor,
+                // Le nom AFFICHÉ dans les balises — « Ordinateur » est une
+                // sentinelle française, qu'on ne sert pas telle quelle à un
+                // lecteur anglophone.
+                engineName: PlayerName.display(engineName, fallback: PlayerName.computer),
+                result: outcome.pgnResult
+            )
+        )
         record.resultRaw = outcome.pgnResult
         record.outcomeReasonRaw = outcome.reason.storageLabel
         record.whiteName = userColor == .white ? "Vous" : engineName
@@ -32,6 +45,37 @@ enum GameLibraryService {
         record.analysisKey = AnalysisEvalStore.key(for: game)
         context.insert(record)
         PersistenceLog.save(context)
+    }
+
+    /// Le PGN d'une partie rangée, COMPLÉTÉ par ce que l'enregistrement sait.
+    ///
+    /// Les parties jouées avant le 28/09/2026 ont été rangées sans aucune
+    /// balise : leurs joueurs, leur date et leur résultat ne vivaient que dans
+    /// les colonnes du modèle. Rouvertes puis repartagées, elles ressortaient
+    /// donc nues — le défaut que le testeur signalait, pour tout ce qu'il
+    /// avait déjà joué.
+    ///
+    /// Prudence volontaire : on ne recompose que les PGN SANS section de
+    /// balises, et jamais une partie importée. Repasser un PGN externe par le
+    /// lecteur puis le resérialiser lui coûterait ses commentaires et ses
+    /// variantes — on lui préfère son texte d'origine, intact.
+    static func analysablePGN(of record: GameRecord) -> String? {
+        guard let pgn = record.pgn, !pgn.isEmpty else { return nil }
+        guard record.mode != .imported, !pgn.contains("[") else { return pgn }
+        guard let game = PGNLoader.game(from: pgn) else { return pgn }
+        let event = record.mode == .vsEngine
+            ? LocalizationController.string("Contre l'ordinateur")
+            : LocalizationController.string("Deux joueurs")
+        return PGNExport.pgn(
+            for: game,
+            metadata: PGNExport.Metadata(
+                event: event,
+                date: record.playedAt,
+                white: PlayerName.display(record.whiteName, fallback: PlayerName.white),
+                black: PlayerName.display(record.blackName, fallback: PlayerName.black),
+                result: record.resultRaw
+            )
+        )
     }
 
     /// Résultat d'un import PGN multi-parties.
@@ -59,9 +103,19 @@ enum GameLibraryService {
         guard let game = PGNLoader.game(from: pgn) else { return nil }
         let moves = movetext(of: pgn)
         guard !moves.isEmpty else { return nil }
-        let white = game.tags.white.trimmingCharacters(in: .whitespaces).lowercased()
-        let black = game.tags.black.trimmingCharacters(in: .whitespaces).lowercased()
-        return "\(white)|\(black)|\(moves)"
+        return "\(normalizedName(game.tags.white))|\(normalizedName(game.tags.black))|\(moves)"
+    }
+
+    /// Nom de joueur réduit à ce qui compte pour reconnaître une partie.
+    ///
+    /// « ? » vaut ABSENT : c'est ce que le standard écrit pour un joueur
+    /// inconnu, et c'est ce que notre propre export pose depuis qu'il émet les
+    /// sept balises (27/09/2026). Sans cette équivalence, une partie rangée
+    /// avant ce changement — donc sans balises — puis réimportée après aurait
+    /// deux signatures différentes, et reviendrait en double.
+    private nonisolated static func normalizedName(_ raw: String) -> String {
+        let trimmed = raw.trimmingCharacters(in: .whitespaces).lowercased()
+        return trimmed == "?" ? "" : trimmed
     }
 
     /// Suite de coups NORMALISÉE : balises, commentaires, variantes, numéros
@@ -205,7 +259,12 @@ enum GameLibraryService {
     ) {
         let record = GameRecord()
         record.modeRaw = GameRecordMode.twoHuman.rawValue
-        record.pgn = PGNExport.pgn(for: game)
+        record.pgn = PGNExport.pgn(
+            for: game,
+            metadata: .twoPlayer(
+                whiteName: whiteName, blackName: blackName, result: outcome.pgnResult
+            )
+        )
         record.resultRaw = outcome.pgnResult
         record.outcomeReasonRaw = outcome.reason.storageLabel
         record.whiteName = whiteName

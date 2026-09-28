@@ -29,12 +29,15 @@ struct PlayExportTests {
         ))
     }
 
-    /// Avant le premier coup il n'y a PAS de partie : `PGNExport` rend une
-    /// chaîne vide, et l'app doit le savoir plutôt que de copier du vide.
+    /// Avant le premier coup il n'y a PAS de partie : l'app doit le savoir
+    /// plutôt que de proposer de copier des en-têtes sans coups.
+    ///
+    /// Le PGN n'est plus VIDE depuis qu'il porte ses sept balises (27/09/2026) :
+    /// c'est `hasGameToExport` qui tient la garde, et le movetext qui est vide.
     @Test func thereIsNoGameToExportBeforeTheFirstMove() throws {
         let viewModel = try makeViewModel()
         #expect(viewModel.hasGameToExport == false)
-        #expect(viewModel.exportedPGN.isEmpty)
+        #expect(!viewModel.exportedPGN.contains("1."))
         // La POSITION, elle, existe toujours.
         #expect(!viewModel.displayedFEN.isEmpty)
     }

@@ -2287,14 +2287,16 @@ final class AnalysisViewModel {
     /// Noms des joueurs depuis les en-têtes PGN quand la partie en a
     /// (partie jouée contre Stockfish, PGN importé) — « Blancs »/« Noirs »
     /// sinon.
+    /// Les noms de l'en-tête d'analyse. Un PGN produit par l'app porte
+    /// désormais ses balises `[White]`/`[Black]` : elles peuvent contenir la
+    /// sentinelle « Vous » (ou « You », selon la langue du jour de la partie),
+    /// que ``PlayerName`` retourne dans la langue d'aujourd'hui.
     var whitePlayerName: String {
-        let name = game.tags.white.trimmingCharacters(in: .whitespaces)
-        return name.isEmpty || name == "?" ? LocalizationController.string("Blancs") : name
+        PlayerName.display(game.tags.white, fallback: PlayerName.white)
     }
 
     var blackPlayerName: String {
-        let name = game.tags.black.trimmingCharacters(in: .whitespaces)
-        return name.isEmpty || name == "?" ? LocalizationController.string("Noirs") : name
+        PlayerName.display(game.tags.black, fallback: PlayerName.black)
     }
 
     // MARK: Export / "Jouer à partir d'ici"
@@ -2308,6 +2310,21 @@ final class AnalysisViewModel {
     /// donc ses coups depuis la position standard une fois rechargé — et cette
     /// valeur alimente à la fois le partage et le `sourceGamePGN` des puzzles
     /// générés, qui héritaient du même défaut.
-    var exportedPGN: String { PGNExport.pgn(for: game) }
+    ///
+    /// Les en-têtes déjà portées par la partie (celles d'une partie jouée dans
+    /// l'app, ou d'un PGN importé) sont GARDÉES telles quelles ; on ne comble
+    /// que les manques, pour qu'une position ouverte à la FEN sorte malgré
+    /// tout un PGN conforme — sept balises, résultat compris.
+    var exportedPGN: String {
+        PGNExport.pgn(
+            for: game,
+            metadata: PGNExport.Metadata(
+                event: LocalizationController.string("Analyser"),
+                // Ni date ni joueurs à inventer : « ? » et « ????.??.?? » sont
+                // ce que le standard prévoit pour l'inconnu.
+                date: nil, white: "?", black: "?", result: nil
+            )
+        )
+    }
     var currentFEN: String { board.position.fen }
 }

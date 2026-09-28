@@ -8360,6 +8360,22 @@
         }
       }
     },
+    "Il s'affiche sur votre plaque de joueur, dans la bibliothèque et dans les balises PGN des parties exportées. Laissez vide pour « Vous ».": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It shows on your player plate, in the library and in the PGN tags of the games you export. Leave it empty for “You”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il s'affiche sur votre plaque de joueur, dans la bibliothèque et dans les balises PGN des parties exportées. Laissez vide pour « Vous »."
+          }
+        }
+      }
+    },
     "Ils bougent chaque coup": {
       "localizations": {
         "en": {
@@ -19526,6 +19542,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Vos répertoires et le partage"
+          }
+        }
+      }
+    },
+    "Votre nom": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your name"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre nom"
           }
         }
       }

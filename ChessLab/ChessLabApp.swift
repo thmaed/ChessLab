@@ -20,13 +20,15 @@ struct ChessLabApp: App {
         // sans coût et protège tout futur code faisant de l'I/O sur pipe.
         signal(SIGPIPE, SIG_IGN)
 
-        // Toucher le singleton AVANT tout rendu : son init applique la langue
-        // choisie (``LocalizationController``), pour que le tout premier écran
-        // s'affiche déjà dans la bonne langue.
-        _ = AppSettings.shared
-
         // Utilisé par les tests UI pour repartir de réglages vierges,
         // indépendamment des parties précédentes sur le simulateur.
+        //
+        // AVANT de toucher `AppSettings.shared` : son `init` lit ces clés une
+        // fois pour toutes et les garde en mémoire. Effacées après, elles
+        // restaient vivantes pour toute la session — le réglage était bien
+        // remis à zéro sur le disque, et l'app continuait d'afficher l'ancien
+        // (constaté le 28/09/2026 sur le nom du joueur ; la langue avait le
+        // même défaut, en silence).
         if CommandLine.arguments.contains("-resetPlaySettings") {
             PlaySettingsStore.clear()
             AutosaveStore.clearPlay()
@@ -35,7 +37,14 @@ struct ChessLabApp: App {
             // laissé par un test précédent (le simulateur ne se réinitialise
             // pas entre les runs) rendrait les libellés imprévisibles.
             UserDefaults.standard.removeObject(forKey: "settings.appLanguage")
+            // Même raison pour le nom du joueur.
+            UserDefaults.standard.removeObject(forKey: "settings.playerName")
         }
+
+        // Toucher le singleton AVANT tout rendu : son init applique la langue
+        // choisie (``LocalizationController``), pour que le tout premier écran
+        // s'affiche déjà dans la bonne langue.
+        _ = AppSettings.shared
         // Outils de capture (visuels et vidéos App Store) : la visite guidée
         // démarre une seconde après l'accueil sur une installation vierge et
         // son voile prendrait la place des écrans à capturer. Déclarée vue.

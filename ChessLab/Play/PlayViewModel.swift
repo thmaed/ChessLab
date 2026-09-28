@@ -1193,7 +1193,7 @@ final class PlayViewModel {
         guard UIAccessibility.isVoiceOverRunning else { return }
         let who = move.piece.color == engineColor
             ? opponentDisplayName
-            : LocalizationController.string("Vous")
+            : PlayerName.you
         UIAccessibility.post(
             notification: .announcement,
             argument: "\(who) : \(MoveNarration.describe(san: move.san))"
@@ -1765,8 +1765,20 @@ final class PlayViewModel {
     /// position courante alors qu'il en regarde une autre serait un piège.
     var displayedFEN: String { displayedBoard.position.fen }
 
-    /// PGN rechargeable de la partie en cours, en-têtes comprises.
-    var exportedPGN: String { PGNExport.pgn(for: game) }
+    /// PGN rechargeable de la partie en cours, en-têtes comprises : les sept
+    /// balises du standard, donc les joueurs, la date et le résultat — un
+    /// export qui n'en portait aucune n'était qu'une suite de coups, et
+    /// plusieurs logiciels la refusent (retour d'un testeur, 27/09/2026).
+    var exportedPGN: String {
+        PGNExport.pgn(
+            for: game,
+            metadata: .vsEngine(
+                userColor: userColor,
+                engineName: opponentDisplayName,
+                result: outcome?.pgnResult
+            )
+        )
+    }
 
     /// Y a-t-il une PARTIE à exporter ? Avant le premier coup il n'y en a pas,
     /// et `PGNExport` rend une chaîne vide : proposer « copier la partie »

@@ -10190,3 +10190,80 @@ Thierry dans `~/.private_keys/` (hors dépôt, `.p8` ignorés par Git).
   champs relus depuis App Store Connect identiques à `METADATA.md`. `main`
   poussé (21 commits), puis Thierry a cliqué « Soumettre pour révision » :
   **1.8.0 soumise le 06/09/2026.**
+
+## 28/09 — Retour d'un testeur anglophone : le nom, le PGN, et une question ouverte
+
+Trois points remontés le 27/09 par un testeur (iPad Pro 13" M5 et iPhone 16,
+iPadOS/iOS 26.6.2, interface en anglais).
+
+**« My name Vous […] even though the system is in English ».** C'était exact,
+et à deux endroits. La bibliothèque STOCKE « Vous » en clair — ce mot est
+aussi la sentinelle qui dit de quel côté jouait l'utilisateur pour les
+enregistrements d'avant `engineColorRaw` — et la ligne de bibliothèque
+l'affichait tel quel. L'accueil, lui, le traduisait déjà, avec sa propre
+fonction privée. Il y a maintenant UN point de résolution, `PlayerName`, qui
+traduit les noms spéciaux dans les DEUX sens (« Vous »/« You »,
+« Blancs »/« White », « Noirs »/« Black »,
+« Ordinateur »/« Computer »/« Stockfish ») et laisse intact un vrai nom : une
+partie enregistrée en anglais puis relue en français se retourne elle aussi,
+c'est la langue du jour qui décide. Le stockage ne bouge pas.
+
+**« tried to change it to Me, but cannot find how ».** Il n'y avait pas de
+réglage. `AppSettings.playerName` (synchronisé iCloud, nettoyé des guillemets
+et crochets qui casseraient une balise PGN, borné à 40 caractères) et un champ
+« Votre nom » dans Réglages, sous la langue. Vide = « Vous ». Le nom choisi
+remplace la sentinelle partout, y compris dans les parties déjà rangées.
+
+*Piège rencontré en chemin, à ne pas refaire :* la première version nettoyait
+le nom dans un `didSet` qui se réassignait. Sous `@Observable`, une propriété
+stockée devient un couple accesseur/observateur et se réassigner depuis son
+propre `didSet` RÉCURSE — la pile déborde et l'app meurt (`EXC_BAD_ACCESS`
+sur le garde de pile, pile de crash sans ambiguïté). C'est une propriété
+calculée au-dessus d'un stockage privé. Les autres `didSet` du fichier ne
+font qu'écrire dans `UserDefaults` : eux ne risquent rien.
+
+**« it just records the moves, no pgn tags, no result ».** Exact aussi :
+`ChessKit.Game.pgn` ne sérialise que les balises renseignées, et l'app n'en
+renseignait aucune — `game.tags` n'était jamais touché. `PGNExport` prend
+désormais un `Metadata` et pose les sept balises obligatoires (Event = le
+mode dans la langue de l'app, Site « ChessLab », Date « AAAA.MM.JJ »,
+Round « - », White, Black, Result — « * » pour une partie inachevée), sans
+jamais écraser celles d'un PGN importé, et le résultat clôt aussi le
+movetext. Les balises se posent sur une COPIE du `Game` et c'est `PGNParser`
+qui sérialise : plus d'insertion de texte à la main dans un PGN (c'était
+l'origine d'un défaut de juillet). Les neuf exports de variantes, qui
+assemblaient leurs lignes eux-mêmes, passent par le même constructeur
+`PGNExport.tagLines(…)` et gagnent au passage joueurs, site et date.
+
+**Le quatrième point reste ouvert.** « Sometimes, not all the time », en
+paysage, barre latérale ouverte, le reste de l'écran partirait hors cadre à
+droite. Non reproduit : `SidebarLandscapeLayoutUITests` mesure les neuf écrans
+de détail, deux allers-retours de rotation, trois bascules de barre latérale
+et la bibliothèque — tout tient dans la fenêtre sur iPad Pro 13" (iPadOS 26.5,
+simulateur ; le testeur est en 26.6.2). Le relevé est imprimé même quand le
+test passe : barre latérale [10…330], contenu du détail [364…1012] barre
+masquée et [529…1177] barre ouverte, fenêtre 1376. Il manque une capture de
+l'état fautif pour aller plus loin.
+
+**Les parties DÉJÀ jouées en profitent.** Celles d'avant ce jour ont été
+rangées sans balises : joueurs, date et résultat ne vivaient que dans les
+colonnes du modèle. Rouvertes depuis la bibliothèque ou l'accueil, elles
+passent par `GameLibraryService.analysablePGN(of:)`, qui les complète avec ce
+que l'enregistrement sait. Prudence volontaire : seulement les PGN SANS
+section de balises, et jamais une partie importée — repasser un PGN externe
+par le lecteur puis le resérialiser lui coûterait ses commentaires et ses
+variantes. La signature de dédoublonnage traite par ailleurs « ? » comme un
+nom absent, sinon une vieille partie exportée puis réimportée serait revenue
+en double.
+
+*Deux défauts d'outillage trouvés en chemin.* `-seedLibrarySample` ne semait
+que depuis la bibliothèque, écran inatteignable tant qu'aucune partie n'est
+rangée — la carte qui y mène est désactivée ; l'échantillon se sème aussi
+depuis l'écran d'entrée Analyser. Et `-resetPlaySettings` effaçait ses clés
+APRÈS que `AppSettings.shared` les ait lues : le disque était bien remis à
+zéro, la session continuait sur les anciennes valeurs. La langue avait ce
+défaut depuis toujours, en silence.
+
+Vérifié : 998 tests unitaires au vert, et deux tests d'interface qui lancent
+l'app en anglais (`-AppleLanguages (en)`) pour lire la plaque du joueur —
+« You » par défaut, le nom choisi sinon — sur iPad Pro 13" ET iPhone 16 Pro.

@@ -365,17 +365,12 @@ final class Chess960TwoPlayerViewModel {
     var displayedFEN: String { displayedGame.shredderFEN }
 
     var exportedPGN: String {
-        var tags = [
-            "[Event \"ChessLab Chess960\"]",
-            "[White \"\(settings.whiteName)\"]",
-            "[Black \"\(settings.blackName)\"]",
-            "[Variant \"Chess960\"]",
-            "[SetUp \"1\"]",
-            "[FEN \"\(startFEN)\"]",
-        ]
-        if let outcome {
-            tags.append("[Result \"\(outcome.pgnResult)\"]")
-        }
+        let tags = PGNExport.tagLines(
+            event: "ChessLab Chess960",
+            white: settings.whiteName, black: settings.blackName,
+            result: outcome?.pgnResult,
+            variant: "Chess960", startFEN: startFEN
+        )
         var moves = ""
         for (index, san) in sanLog.enumerated() {
             if index % 2 == 0 { moves += "\(index / 2 + 1). " }

@@ -27,6 +27,7 @@ struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 languageSection
+                playerNameSection
                 boardThemeSection
                 pieceSetSection
                 notationSection
@@ -79,6 +80,37 @@ struct SettingsView: View {
                     }
                 }
             }
+            .cardStyle()
+        }
+    }
+
+    /// Le nom sous lequel on joue. Vide = « Vous », le défaut.
+    ///
+    /// Un testeur anglophone a cherché en vain comment s'y substituer un nom
+    /// (27/09/2026) : on ne joue pas contre son ordinateur sous son état civil,
+    /// mais un PGN partagé au club signé « You » ne vaut pas grand-chose.
+    private var playerNameSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Votre nom")
+            VStack(alignment: .leading, spacing: 8) {
+                TextField(
+                    "Vous", text: $settings.playerName,
+                    prompt: Text("Vous").foregroundStyle(Theme.textTertiary)
+                )
+                .textInputAutocapitalization(.words)
+                .autocorrectionDisabled()
+                .submitLabel(.done)
+                .foregroundStyle(Theme.textPrimary)
+                .padding(10)
+                .background(Theme.surfaceElevated, in: Theme.controlShape)
+                .overlay(Theme.controlShape.strokeBorder(Theme.stroke, lineWidth: 1))
+                .accessibilityIdentifier("playerNameField")
+                Text("Il s'affiche sur votre plaque de joueur, dans la bibliothèque et dans les balises PGN des parties exportées. Laissez vide pour « Vous ».")
+                    .font(.caption)
+                    .foregroundStyle(Theme.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle()
         }
     }

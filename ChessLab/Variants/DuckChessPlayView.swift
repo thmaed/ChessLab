@@ -344,7 +344,7 @@ struct DuckChessPlayView: View {
         }
         return color == viewModel.engineColor
             ? LocalizationController.string("Ordinateur")
-            : LocalizationController.string("Vous")
+            : PlayerName.you
     }
 
     private var movesStrip: some View {

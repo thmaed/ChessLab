@@ -552,15 +552,13 @@ final class VariantAnalysisViewModel {
     // MARK: Export
 
     var exportedPGN: String {
-        var lines = [
-            "[Event \"ChessLab \(variantDisplayName)\"]",
-            "[Variant \"\(variantID)\"]",
-            "[SetUp \"1\"]",
-            "[FEN \"\(startFEN)\"]",
-        ]
-        if let outcome {
-            lines.append("[Result \"\(outcome.pgnResult)\"]")
-        }
+        // Une partie relue : ses joueurs ne sont pas connus ici, et « ? » est
+        // ce que le standard réserve à l'inconnu.
+        let lines = PGNExport.tagLines(
+            event: "ChessLab \(variantDisplayName)",
+            white: "?", black: "?", result: outcome?.pgnResult,
+            variant: variantID, startFEN: startFEN
+        )
         var moves = ""
         for (index, san) in sanLog.enumerated() {
             if index % 2 == 0 { moves += "\(index / 2 + 1). " }
