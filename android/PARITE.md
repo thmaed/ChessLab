@@ -1234,9 +1234,33 @@ l'écart créé ce jour-là, à refermer.
       Côté Android, l'équivalent est `AnalysisViewModel.pgn()` et les exports
       de variantes : même manque à vérifier.
 
-**Un quatrième point reste OUVERT des deux côtés** : le testeur rapporte que
-« parfois, pas toujours », en paysage et barre latérale ouverte, le reste de
-l'écran part hors cadre à droite. Non reproduit sur iPad Pro 13" (iPadOS 26.5,
-simulateur) : neuf écrans de détail, deux rotations, trois bascules de barre
-latérale et la bibliothèque, tous mesurés dans le cadre
-(`ChessLabUITests/SidebarLandscapeLayoutUITests`). En attente d'une capture.
+- [ ] **Une fenêtre étroite prend la disposition téléphone (29/09).** Le
+      quatrième point du testeur, élucidé : ce n'était ni la barre latérale ni
+      le paysage, mais la fenêtre RÉDUITE pour partager l'écran. Le rognage
+      visible sur ses captures est un artefact de redimensionnement d'iPadOS,
+      pas un défaut de l'app (mesuré : à 744 pt rien ne déborde). En revanche
+      iPadOS garde la classe `regular` bien en dessous de la largeur d'un
+      écran d'iPad, et l'app y montrait encore deux colonnes — barre latérale
+      de 290 pt, plateau à 454 pt sur 744. iOS pose désormais une classe de
+      taille CORRIGÉE au plus haut de l'arbre (`ChessLab/NarrowWindowLayout.swift`,
+      seuil 744 pt = largeur en portrait de l'iPad mini) : sous ce seuil, tous
+      les écrans prennent la disposition téléphone, plateau pleine largeur.
+      **Côté Android, il n'y a rien d'équivalent à porter tel quel** :
+      l'app n'a pas d'ossature à deux colonnes, et ses écrans de jeu ne
+      décident que de l'ORIENTATION (`isLandscape()` dans `ui/BoardScaffold.kt`,
+      qui lit `LocalConfiguration` — donc la fenêtre, et non l'écran, en
+      multi-fenêtre). Ce qui reste à vérifier sur une grande tablette en écran
+      partagé : une fenêtre plus large que haute mais ÉTROITE y prend la
+      disposition côte à côte, où le plateau est borné par la hauteur — c'est
+      exactement le cas qui a mal tourné côté iOS.
+- [ ] **Le partage plateau / panneau, revu le 29/09.** Deux règles côté iOS
+      (`PlayView`), toutes deux nées d'un essai sur appareil : en paysage, le
+      plateau prend son carré et le panneau prend CE QUI RESTE, borné entre
+      340 et 420 pt — ils se disputaient la largeur à parts égales et le
+      panneau en emportait 43 % dans une fenêtre réduite ; en colonne unique,
+      la liste des coups passe dans la feuille dès que `hauteur − largeur`
+      tombe sous 330 pt, au lieu de rogner l'échiquier. Gains mesurés : 626 →
+      706 pt en paysage sur 13", 401 → 463 sur mini, 916 → 1032 en portrait
+      barre repliée. Côté Android, `BoardScaffold` partage lui aussi le
+      paysage entre plateau et panneau : vérifier dans quelle proportion, et
+      ce que devient la liste des coups quand la fenêtre est basse.

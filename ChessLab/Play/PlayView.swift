@@ -38,7 +38,7 @@ struct PlayView: View {
                     if geo.size.width > geo.size.height {
                         iPadWideLayout(size: geo.size)
                     } else {
-                        iPadTallLayout
+                        iPadTallLayout(size: geo.size)
                     }
                 }
             } else {
@@ -46,6 +46,37 @@ struct PlayView: View {
             }
         }
         .appBackground()
+        // La feuille des coups sert aux DEUX dispositions : l'iPhone y range
+        // toujours la liste, et l'iPad y renvoie quand la colonne est trop
+        // courte pour la porter — voir ``movesListFitsBelowBoard(in:)``.
+        // Posée ici, et non dans la seule disposition iPhone, sinon le bouton
+        // « Coups joués » de l'iPad n'ouvrait rien.
+        .sheet(isPresented: $showPanelSheet) {
+            NavigationStack {
+                ScrollView {
+                    MoveListView(
+                        moves: viewModel.sanMoveList,
+                        currentPly: viewModel.displayedPly,
+                        onSelectMove: {
+                            viewModel.review(toPly: $0 + 1)
+                            showPanelSheet = false
+                        }
+                    )
+                }
+                .background(Theme.background)
+                .navigationTitle("Coups")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbarBackground(Theme.background, for: .navigationBar)
+                .toolbarColorScheme(.dark, for: .navigationBar)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Fermer") { showPanelSheet = false }
+                    }
+                }
+            }
+            .presentationDetents([.medium, .large])
+            .preferredColorScheme(.dark)
+        }
         .navigationTitle("Jouer")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
@@ -141,32 +172,6 @@ struct PlayView: View {
         .padding(.top, 4)
         .padding(.bottom, 10)
         .animation(Theme.spring, value: viewModel.outcome != nil)
-        .sheet(isPresented: $showPanelSheet) {
-            NavigationStack {
-                ScrollView {
-                    MoveListView(
-                        moves: viewModel.sanMoveList,
-                        currentPly: viewModel.displayedPly,
-                        onSelectMove: {
-                            viewModel.review(toPly: $0 + 1)
-                            showPanelSheet = false
-                        }
-                    )
-                }
-                .background(Theme.background)
-                .navigationTitle("Coups")
-                .navigationBarTitleDisplayMode(.inline)
-                .toolbarBackground(Theme.background, for: .navigationBar)
-                .toolbarColorScheme(.dark, for: .navigationBar)
-                .toolbar {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Fermer") { showPanelSheet = false }
-                    }
-                }
-            }
-            .presentationDetents([.medium, .large])
-            .preferredColorScheme(.dark)
-        }
     }
 
     /// iPad en hauteur (portrait) : **colonne unique, plateau pleine
@@ -177,7 +182,16 @@ struct PlayView: View {
     /// hauteur fixe. Sur un iPad en portrait, cette place, c'est toute la
     /// largeur — et il reste de quoi dérouler la liste des coups en dessous,
     /// sans feuille ni panneau.
-    private var iPadTallLayout: some View {
+    ///
+    /// **Sauf quand la colonne est courte.** Une fenêtre redimensionnée
+    /// (partage d'écran, fenêtrage d'iPadOS 26) donne une colonne presque
+    /// carrée : le plateau y prend la largeur, et il ne reste plus assez de
+    /// hauteur pour les pendules, les commandes ET la liste des coups. La
+    /// liste gagnait alors sa place contre l'échiquier — mesuré sur iPad
+    /// Pro 11" en fenêtre partagée (29/09/2026) : plateau de 358 pt dans une
+    /// colonne de 544. Sous le seuil, la liste passe dans la feuille, comme
+    /// sur iPhone, et le plateau reprend la largeur.
+    private func iPadTallLayout(size: CGSize) -> some View {
         VStack(spacing: 10) {
             ThermalBadge()
             topClock
@@ -199,26 +213,50 @@ struct PlayView: View {
                 EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
             }
             if viewModel.outcome == nil {
-                controlBar(showMoveList: false)
+                controlBar(showMoveList: !Self.movesListFitsBelowBoard(in: size))
             } else {
                 gameOverPanel
             }
 
-            // La liste prend ce qui reste, mais jamais moins que de quoi lire
-            // quelques coups : un plateau VRAIMENT pleine largeur ne laissait
-            // qu'un filet de 60 pt, où l'on ne voyait que le titre. Ce
-            // minimum est ce qui rend le plateau « quasi » pleine largeur
-            // (~84 %) plutôt que strictement pleine largeur — et c'est le bon
-            // compromis : l'échiquier reste énorme, la liste reste lisible.
-            ScrollView {
-                movesSection
+            if Self.movesListFitsBelowBoard(in: size) {
+                // La liste prend ce qui reste, mais jamais moins que de quoi
+                // lire quelques coups : un plateau VRAIMENT pleine largeur ne
+                // laissait qu'un filet de 60 pt, où l'on ne voyait que le
+                // titre. Ce minimum est ce qui rend le plateau « quasi »
+                // pleine largeur (~84 %) plutôt que strictement pleine
+                // largeur — et c'est le bon compromis : l'échiquier reste
+                // énorme, la liste reste lisible.
+                ScrollView {
+                    movesSection
+                }
+                .frame(minHeight: 150, maxHeight: .infinity)
+            } else {
+                // Rien ne doit étirer la colonne à la place de la liste : le
+                // plateau est CARRÉ et ne peut pas absorber la hauteur qu'elle
+                // laisse.
+                Spacer(minLength: 0)
             }
-            .frame(minHeight: 150, maxHeight: .infinity)
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
         .padding(.bottom, 16)
         .animation(Theme.spring, value: viewModel.outcome != nil)
+    }
+
+    /// Reste-t-il, sous un plateau pleine largeur, de quoi loger la liste des
+    /// coups en plus des pendules, de la barre d'évaluation et des commandes ?
+    ///
+    /// Le plateau est carré : posé sur toute la largeur, il en consomme autant
+    /// en hauteur. Ce qui reste — `hauteur − largeur` — doit suffire au reste.
+    /// Il en faut environ 250 pt pour les pendules et les commandes, et autant
+    /// pour que la liste mérite sa place. En dessous de ces 330 pt, elle ne se
+    /// paierait qu'en cases d'échiquier.
+    ///
+    /// Le seuil laisse INCHANGÉ tout iPad en plein écran : la colonne y est
+    /// bien plus haute que large (540 pt de marge sur un 13 pouces en
+    /// portrait, 576 sur un mini). Il ne mord que sur les fenêtres réduites.
+    static func movesListFitsBelowBoard(in size: CGSize) -> Bool {
+        size.height - size.width >= 330
     }
 
     /// iPad en largeur (paysage) : deux colonnes. Un plateau pleine largeur
@@ -245,8 +283,14 @@ struct PlayView: View {
                 bottomClock
             }
             // Carré, donc borné à la hauteur : au-delà il déborderait
-            // verticalement. Toute la largeur restante va au panneau de droite.
-            .frame(maxWidth: size.height, maxHeight: .infinity)
+            // verticalement. Et borné par ce que le panneau lui laisse, pour
+            // que les deux ne se disputent pas la largeur à parts égales —
+            // c'est ce partage qui rabotait l'échiquier dans une fenêtre
+            // réduite.
+            .frame(
+                maxWidth: max(0, min(size.height, size.width - Self.panelWidth(in: size))),
+                maxHeight: .infinity
+            )
             .padding(.vertical, 6)
 
             // Colonne droite : barre d'éval (sortie de la colonne plateau pour
@@ -272,9 +316,30 @@ struct PlayView: View {
                 .frame(maxWidth: .infinity)
                 .padding(20)
             }
-            .frame(maxWidth: 420)
+            .frame(width: Self.panelWidth(in: size))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    /// Largeur de la colonne de droite, en paysage.
+    ///
+    /// Le principe : **le plateau prend son carré, le panneau prend ce qui
+    /// reste.** L'ancienne écriture laissait les deux colonnes se disputer la
+    /// largeur à parts égales (plateau « jusqu'à la hauteur », panneau
+    /// « jusqu'à 420 »), et dans une fenêtre réduite le panneau en emportait
+    /// 43 % — mesuré sur iPad Pro 11" le 29/09/2026 : plateau 454 pt, panneau
+    /// 376, pour une fenêtre de 866.
+    ///
+    /// Deux bornes, et chacune a sa raison :
+    /// - **340 pt au moins**, soit la largeur utile de la barre de commandes
+    ///   sur un iPhone : en dessous, transport, indice, nulle et abandon ne
+    ///   tiennent plus sur leur ligne ;
+    /// - **420 pt au plus** : sans plafond, une grande fenêtre Mac éparpillait
+    ///   les commandes d'un bord à l'autre de la colonne.
+    static func panelWidth(in size: CGSize) -> CGFloat {
+        // Jamais plus large que la fenêtre elle-même : une largeur négative
+        // pour la colonne plateau ferait râler la mise en page.
+        min(size.width, min(420, max(340, size.width - size.height)))
     }
 
     /// Liste des coups affichée en continu : l'iPad a la place, la feuille de

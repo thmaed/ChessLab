@@ -96,6 +96,11 @@ struct ChessLabApp: App {
                 // Bascule d'ossature à la demande (`-skeletonToggle`), pour
                 // tester la survie de la partie — voir ``SkeletonOverride``.
                 .skeletonOverride()
+                // Une fenêtre plus étroite que le plus étroit des iPad prend
+                // la disposition iPhone — voir ``NarrowWindowLayout``. Posée
+                // AU-DESSUS de la bascule de test, qui reste maîtresse quand
+                // elle force une classe.
+                .narrowWindowSizeClass()
                 .preferredColorScheme(.dark)
                 // `Text` dépend de la locale de l'environnement : la changer
                 // force SwiftUI à re-rendre chaque `Text`, qui re-résout alors

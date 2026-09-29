@@ -10267,3 +10267,101 @@ défaut depuis toujours, en silence.
 Vérifié : 998 tests unitaires au vert, et deux tests d'interface qui lancent
 l'app en anglais (`-AppleLanguages (en)`) pour lire la plaque du joueur —
 « You » par défaut, le nom choisi sinon — sur iPad Pro 13" ET iPhone 16 Pro.
+
+## 29/09 — Une fenêtre plus étroite qu'un iPad n'est plus un iPad
+
+Le testeur a fini par isoler ce qu'il voyait, et ce n'était ni la barre
+latérale ni le paysage : c'était la fenêtre **réduite pour partager l'écran**
+avec une autre app. Ses captures montrent le contenu rogné par la droite.
+
+Deux choses s'y mêlaient, et il faut les séparer.
+
+**Ce qu'on voit sur les captures ne vient pas de nous.** Pendant qu'on fait
+glisser le bord d'une fenêtre, iPadOS montre l'ancienne mise en page rognée
+par la nouvelle largeur, le temps de quelques images. Le testeur le dit
+lui-même : « many apps have this problem ». Mesuré : à 744 pt — la fenêtre
+`regular` la plus étroite qu'on puisse obtenir en plein écran, l'iPad mini en
+portrait — **rien ne déborde**, la disposition est élastique
+(`NarrowWindowLayoutUITests`).
+
+**Mais il y avait bien un défaut dessous.** iPadOS garde la classe `regular`
+très en dessous de la largeur d'un écran d'iPad. Dans une fenêtre de 700 pt,
+ChessLab montrait encore barre latérale + détail : la barre prenait 290 pt, et
+il restait au plateau moins de place que sur un iPhone. Désormais, sous
+**744 pt** — la largeur en portrait de l'iPad le plus étroit jamais vendu —
+l'app prend la disposition iPhone. Le seuil n'est pas un réglage de goût :
+au-dessus, c'est la disposition dessinée et vérifiée sur appareil ; en
+dessous, aucun écran d'iPad n'a jamais été aussi étroit.
+
+La correction tient en une valeur d'environnement posée au plus haut de
+l'arbre (``NarrowWindowLayout``) : les sept écrans qui demandent « suis-je en
+régulier ? » obtiennent la bonne réponse sans qu'aucun ne change. C'est le
+mécanisme que ``SkeletonOverrideHost`` emploie déjà pour les tests, et la
+bascule de test reste maîtresse (elle est posée plus bas).
+
+Mesures, sur iPad mini en portrait (744 pt), seuil monté à 800 le temps de
+l'expérience puis rendu à 744 :
+
+| | plateau | part de la fenêtre |
+| --- | --- | --- |
+| Deux colonnes (avant) | 454 pt | 61 % |
+| Disposition iPhone | 744 pt | 100 % |
+
+Rien ne change sur un iPad en plein écran : 13" portrait (1032 pt) et paysage,
+11" portrait (834 pt), mini portrait (744 pt) gardent leurs deux colonnes,
+vérifié après coup. **Le seuil est une constante nommée** : le porter à 800
+donnerait aussi le plein écran au mini en portrait, à 900 au 11 pouces — c'est
+une décision produit, pas une contrainte technique.
+
+*Au passage :* `LabRunView.boardBlockWidth` imposait un plancher de 380 pt
+sans regarder la place disponible — dans une fenêtre plus étroite que ça, le
+bloc plateau débordait par la droite. Il est maintenant borné par les deux
+bouts.
+
+## 29/09 — L'échiquier reprend la place que le panneau lui prenait
+
+Suite du point précédent, sur appareil cette fois (iPad Pro 11", iPadOS 26.7,
+fenêtre redimensionnée) : « l'échiquier ne prend pas de place, et la zone avec
+l'évaluation, les boutons et les coups joués est trop proéminente ». Deux
+causes distinctes, une par disposition.
+
+**En deux colonnes, les deux se disputaient la largeur à parts égales.** Le
+plateau demandait « jusqu'à la hauteur », le panneau « jusqu'à 420 » ; quand la
+somme dépassait la fenêtre, SwiftUI coupait la poire en deux et le panneau
+emportait jusqu'à 43 % de la largeur. Le partage est maintenant explicite et
+dit dans le bon ordre : **le plateau prend son carré, le panneau prend ce qui
+reste**, borné entre 340 pt (la largeur utile de la barre de commandes — en
+dessous, transport, indice, nulle et abandon ne tiennent plus sur leur ligne)
+et 420 pt (sans plafond, une grande fenêtre éparpillait les commandes d'un bord
+à l'autre).
+
+**En colonne unique, la liste des coups gagnait sa place contre l'échiquier.**
+Le plateau est carré : posé sur toute la largeur, il en consomme autant en
+hauteur, et ce qui reste — `hauteur − largeur` — doit loger pendules, barre
+d'évaluation, commandes ET liste. En dessous de 330 pt, la liste ne se payait
+qu'en cases d'échiquier. Elle passe désormais dans la feuille, comme sur
+iPhone, avec le bouton « Coups joués » qui prend le relais (vérifié : le bouton
+apparaît et la feuille s'ouvre). Le seuil laisse inchangée toute colonne de
+pleine hauteur — 540 pt de marge sur un 13 pouces en portrait, 576 sur un mini.
+
+Mesures avant/après, au même endroit, par les `frame` d'accessibilité
+(`NarrowWindowLayoutUITests`) :
+
+| | avant | après |
+| --- | --- | --- |
+| 13" paysage, plateau | 626 pt (45 % de la fenêtre) | **706 pt (51 %)** |
+| mini paysage, plateau | 401 pt (35 %) | **463 pt (41 %)** |
+| 13" portrait, barre repliée | 916 pt | **1032 pt (toute la fenêtre)** |
+| mini portrait, barre repliée | — | **744 pt (toute la fenêtre)** |
+
+Portrait barre latérale OUVERTE : inchangé (702 pt sur 13", 454 sur mini).
+
+Les deux règles sont des fonctions pures (`PlayView.panelWidth(in:)` et
+`PlayView.movesListFitsBelowBoard(in:)`), verrouillées par des tests qui citent
+les tailles réelles des appareils : c'est ce qui garantit qu'un futur
+ajustement ne déplacera pas un iPad en plein écran sans le vouloir.
+
+*Note de suite complète :* un test d'intégration moteur différent a lâché à
+chacun des deux passages (Maia, puis Coup Volé), et chacun passe seul en 4 et
+7 secondes. C'est la contention déjà connue sous charge, sans rapport avec la
+mise en page.

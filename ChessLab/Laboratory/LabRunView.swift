@@ -60,8 +60,13 @@ struct LabRunView: View {
     /// cartes de statistiques et des contrôles (~540 pt) — au-delà, la page
     /// défile et l'essentiel resterait hors écran.
     private func boardBlockWidth(in size: CGSize) -> CGFloat {
-        guard horizontalSizeClass == .regular else { return 380 }
-        return max(380, min(size.width - 40, size.height - 540, 780))
+        // Jamais plus large que la place offerte : 380 pt remplissent un
+        // iPhone, mais une FENÊTRE peut être plus étroite qu'un écran
+        // (partage d'écran, fenêtrage iPadOS 26) et le bloc débordait alors
+        // par la droite. Le plancher ne vaut que tant qu'il tient.
+        let available = max(0, size.width - 40)
+        guard horizontalSizeClass == .regular else { return min(380, available) }
+        return min(max(380, min(available, size.height - 540, 780)), available)
     }
 
     // MARK: Progression
