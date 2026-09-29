@@ -1,63 +1,57 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 1.7.0** (build à fixer — voir « Version et build » plus bas). Voir `RELEASE_NOTES-1.7.0.md` pour le détail complet des changements depuis la 1.6.
+**Version courante : 1.8.1, build 14** (fixés dans `project.pbxproj` le 29/09/2026). Voir `RELEASE_NOTES-1.8.1.md` pour le détail des changements depuis la 1.8.
 
 Tout ce qui suit est à copier-coller directement dans les champs correspondants d'App Store Connect. Les limites de caractères d'Apple sont respectées (vérifiées).
 
 > **Convention d'édition** : dans les blocs à coller, JAMAIS de retour à la ligne à l'intérieur d'un paragraphe — App Store Connect rend chaque saut de ligne tel quel, une césure à 78 colonnes hacherait le texte sur la fiche. Une ligne par paragraphe ; les titres EN CAPITALES gardent leur propre ligne.
 
-> **Révisé le 26/08/2026** — le module Variantes, esquissé à 4 formes de jeu (Chess960 + 3) le 25/08, est allé jusqu'à 8 en une nuit : Roi de la colline, Trois échecs, Horde, Course des rois, Antéchecs, Atomique, et Coup Volé (variante maison). Tous les champs qui mentionnaient « 3 variantes » sont corrigés en conséquence. Trois champs demandent encore une action avant de soumettre : **Nouveautés de cette version** (ci-dessous, obligatoire), le numéro de build (voir « Version et build » — `CURRENT_PROJECT_VERSION` a dérivé à `8.2` tout seul au fil des builds locaux, à fixer délibérément juste avant d'archiver), et le **compte de cours de finales**, passé de 77 à 78 (« Pions électriques »).
+> **Révisé le 29/09/2026** — la description annonçait « sept variantes de plus » dans les deux langues, alors que le hub en compte douze depuis la 1.8 : Crazyhouse, Duck Chess, Barricades et Barricades aléatoires y sont entrées sans que la description permanente suive (la fiche Google Play, elle, avait été corrigée le 19/09). Corrigé ici, les deux descriptions vérifiées sous la limite. Captures et aperçus vidéo de la 1.8 conservés — rien du contenu n'a changé.
 
 ---
 
-## Nouveautés de cette version — 1.8.0 (4000 car. max)
+## Nouveautés de cette version — 1.8.1 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> ✅ **Soumise le 06/09/2026 (build 13).** Ce texte couvre 1.6 → 1.8.0 (28/08 → 06/09/2026) — la 1.7.0 et la 1.7.1 ne sont jamais parties, tout est regroupé ici. Point de départ : la 1.6, soumise le 28/08/2026. Détail dans `RELEASE_NOTES-1.8.0.md` (et `RELEASE_NOTES-1.7.1.md` pour la part 1.7).
+> ⏳ **Prête, pas soumise.** Version 1.8.1, build 14. Couvre le 13/09 → 29/09/2026, depuis la 1.8 (build 13, READY_FOR_SALE depuis sa révision). Détail dans `RELEASE_NOTES-1.8.1.md`.
 
 ### Français
 
 ```
-NEUF PERSONNAGES À AFFRONTER
-À côté du niveau Elo de Stockfish, choisissez un adversaire qui a un caractère : Lena l'attaquante, Nils le mur, Milo le gambiteur, Nadia la technicienne, Sacha le piégeur, Ana la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif, et Maia l'étalon. Ils sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait — gaffes comprises quand le niveau est bas. Chacun a son style, son répertoire d'ouvertures, son tempérament et son illustration ; le niveau se règle et se mémorise par personnage, sur l'échelle humaine (proche de Lichess). Tout tourne sur l'appareil, sans réseau.
+VOTRE NOM, ENFIN
+Réglages → Votre nom : le nom sous lequel vous jouez s'affiche sur votre plaque, dans la bibliothèque et dans les parties que vous exportez. Laissez le champ vide et il vaut « Vous ». Au passage, ce nom suit désormais la langue de l'interface — en anglais il dit « You », y compris dans les parties déjà enregistrées, alors qu'il restait français.
 
-STOCKFISH ANALYSE, ET ASSURE
-Indice, alerte gaffe, barre d'évaluation et analyse restent ceux de Stockfish. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée — et l'écran de fin le dit.
+LE PGN EXPORTÉ EST UN VRAI PGN
+Une partie partagée ou copiée ne portait que la suite des coups : ni en-têtes, ni résultat. Elle porte maintenant les sept balises du standard — événement, site, date, ronde, Blancs, Noirs, résultat — et le résultat clôt aussi les coups. Les en-têtes d'un PGN importé ne sont jamais écrasées : on ne comble que les manques. Les douze variantes en profitent, et vos parties déjà rangées sont complétées quand vous les rouvrez.
 
-PROGRÈS ET LABORATOIRE
-Votre bilan par personnage, avec le plus haut niveau battu. Au Laboratoire, un camp peut être joué par Maia.
+IPAD : LES FENÊTRES PARTAGÉES, ET LA PLACE DE L'ÉCHIQUIER
+Dans une fenêtre réduite pour partager l'écran avec une autre app, ChessLab gardait ses deux colonnes : la barre latérale prenait sa place entière, et il restait à l'échiquier moins de largeur que sur un iPhone. Sous la largeur du plus étroit des iPad, l'app prend désormais la disposition iPhone — une colonne, échiquier pleine largeur. Là où les deux colonnes restent, l'échiquier se sert le premier : il gagne jusqu'à 15 % en paysage, et toute la largeur en portrait quand la barre latérale est repliée.
 
-QUATRE VARIANTES DE PLUS — LE HUB PASSE À 12
-Crazyhouse (les prises changent de camp et se reposent), Duck Chess (un canard bloque une case, tour en deux temps), Barricades (d4 et e5 murées) et Barricades aléatoires (les murs changent de case à chaque coup). Toutes contre l'ordinateur, analyse de fin de partie comprise.
+MÉMORISATION
+Une carte de plus dans Progrès : positions vues, acquises, à raffermir, dues aujourd'hui, révisions de la semaine et taux de réussite. La répétition espacée montre enfin ce qu'elle fait de vos révisions.
 
-UNE VISITE GUIDÉE, ET LES ANALYSES DE VARIANTES AU COMPLET
-Onze étapes courtes au premier lancement, rejouables depuis l'Aide. Les douze variantes ont la même analyse que le mode classique : courbe, précision par couleur, coups en ligne colorés. « Proposer nulle » fonctionne partout.
-
-FIABILITÉ ET MISE EN PAGE
-Six mécanismes de panne du moteur corrigés en profondeur ; au-delà de 2850, la force des variantes n'est plus bridée au lieu de retomber en silence à 1350 ; grille des modes sur l'accueil iPad et Mac ; mise en page revue sur les grandes fenêtres et les petits iPhone.
+DÉTAILS
+Barre d'évaluation activée par défaut dans tous les modes qui l'offrent. Au Duck Chess, prendre le roi n'est plus annoncé « échec et mat » mais « roi capturé » — le canard masque le coup qui vient, et la partie se gagne en prenant le roi. Annonces VoiceOver des coups revues. Le détecteur du scanner est déclaré dans l'écran Licences.
 ```
 
 ### English
 
 ```
-NINE CHARACTERS TO FACE
-Next to Stockfish's Elo level, pick an opponent with a personality: Lena the attacker, Nils the wall, Milo the gambiteer, Nadia the technician, Sacha the trapper, Ana the counter-attacker, Yuri the materialist, Pablo the impulsive one, and Maia the reference. They are played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play — blunders included when the level is low. Each has a style, an opening repertoire, a temperament and an illustration; the level is set and remembered per character, on the human scale (close to Lichess). Everything runs on the device, offline.
+YOUR NAME, AT LAST
+Settings → Your name: the name you play under shows on your plate, in the library and in the games you export. Leave the field empty and it reads "You". Along the way, that name now follows the interface language — in English it says "You", including in games already recorded, where it used to stay French.
 
-STOCKFISH ANALYZES, AND COVERS
-Hints, blunder alert, evaluation bar and analysis are still Stockfish's. Behind a character it only steps in for a short mate, an endgame with few pieces or a repetition in a won position — and the end-of-game screen says so.
+AN EXPORTED PGN IS A REAL PGN
+A game shared or copied carried only the moves: no headers, no result. It now carries the seven tags of the standard — event, site, date, round, White, Black, result — and the result closes the moves too. The headers of an imported PGN are never overwritten: only the gaps are filled. The twelve variants benefit as well, and games already stored are completed when you reopen them.
 
-PROGRESS AND LAB
-Your record against each character, with the highest level beaten. In the Lab, one side can be played by Maia.
+IPAD: SHARED WINDOWS, AND ROOM FOR THE BOARD
+In a window shrunk to share the screen with another app, ChessLab kept its two columns: the sidebar took its full place, and the board was left with less width than on an iPhone. Below the width of the narrowest iPad, the app now takes the iPhone layout — one column, board at full width. Where the two columns remain, the board serves itself first: it gains up to 15 % in landscape, and the whole width in portrait when the sidebar is folded.
 
-FOUR MORE VARIANTS — THE HUB GROWS TO 12
-Crazyhouse (captures switch sides and get dropped back), Duck Chess (a duck blocks a square, two-part turns), Barricades (d4 and e5 walled) and Random Barricades (the walls move after every move). All against the computer, post-game analysis included.
+MEMORISATION
+One more card in Progress: positions seen, acquired, to firm up, due today, reviews this week and success rate. Spaced repetition finally shows what it does with your reviews.
 
-A GUIDED TOUR, AND VARIANT ANALYSIS COMPLETE
-Eleven short steps on first launch, replayable from Help. All twelve variants get the same analysis as the classic mode: curve, per-color accuracy, colored inline moves. "Offer a draw" works everywhere.
-
-RELIABILITY AND LAYOUT
-Six engine failure mechanisms fixed in depth; above 2850, variant strength is no longer limited instead of silently dropping to 1350; mode grid on the iPad and Mac home; layout revisited on large windows and small iPhones.
+DETAILS
+Evaluation bar on by default in every mode that offers it. In Duck Chess, taking the king is no longer announced as "checkmate" but as "king captured" — the duck hides the move to come, and the game is won by taking the king. VoiceOver move announcements revised. The scanner's detector is declared on the Licences screen.
 ```
 
 ## Français (langue principale)
@@ -84,7 +78,7 @@ Neuf adversaires qui jouent comme des humains (Maia-3), analyse Stockfish, 58 ou
 
 **Description** (4000 car. max) :
 ```
-ChessLab est un compagnon d'échecs complet pour iPhone et iPad : jouer, analyser, s'entraîner et expérimenter, avec le moteur Stockfish intégré et sans jamais quitter l'application.
+ChessLab est un compagnon d'échecs complet pour iPhone et iPad : jouer, analyser, s'entraîner et expérimenter, avec le moteur Stockfish intégré, sans jamais quitter l'app.
 
 DES ADVERSAIRES HUMAINS
 Neuf personnages joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait, gaffes comprises. Chacun a son style, son répertoire, son tempérament, son portrait, et un niveau réglable sur l'échelle humaine. Ou affrontez Stockfish lui-même, du débutant (~900 Elo) au niveau maximal (~3190 Elo). Avec ou sans pendule. Indice, alerte avant un coup risqué et barre d'évaluation sont activables à tout moment.
@@ -102,13 +96,13 @@ LE COIN DES FINALES
 78 cours prouvés par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Neuf familles, de l'opposition aux études célèbres. Et l'entraînement libre : concluez la position contre la meilleure défense, tout coup qui préserve le verdict est accepté — pas seulement celui de la leçon.
 
 VARIANTES
-Chess960 (les échecs Fischer Random) : position de départ aléatoire, choisie par numéro, ou composée soi-même, avec la même analyse de fin de partie qu'en mode « Jouer ». Sept variantes de plus contre l'ordinateur, chacune avec sa propre analyse : Roi de la colline, Trois échecs, Horde, Course des rois, Antéchecs, Atomique, et Coup Volé.
+Chess960 (les échecs Fischer Random) : position de départ aléatoire, choisie par numéro, ou composée soi-même, avec la même analyse de fin de partie qu'en mode « Jouer ». Onze variantes de plus contre l'ordinateur, chacune avec sa propre analyse : Roi de la colline, Trois échecs, Horde, Course des rois, Atomique, Antéchecs, Crazyhouse, Coup Volé, Duck Chess, Barricades et Barricades aléatoires.
 
 VOS PROPRES RÉPERTOIRES
 Importez vos ouvertures au format PGN, variantes comprises, et entraînez-les avec le même système. Partagez un répertoire par simple fichier — aucun compte, aucun serveur. Ce que vous avez déjà mémorisé sur une position vaut aussitôt dans le répertoire importé.
 
 PUZZLES
-Plus de 100 000 problèmes tactiques issus de la base Lichess, filtrables par niveau et par thème, plus des puzzles générés automatiquement depuis vos propres erreurs en analyse. Répétition espacée et suivi de vos points forts.
+Plus de 100 000 problèmes tactiques issus de la base Lichess, filtrables par niveau et par thème, plus des puzzles générés depuis vos propres erreurs en analyse. Répétition espacée et suivi de vos points forts.
 
 LABORATOIRE
 Faites s'affronter deux réglages de Stockfish sur une série de parties pour comparer leur force, avec estimation de l'écart Elo et intervalle de confiance.
@@ -117,10 +111,10 @@ Faites s'affronter deux réglages de Stockfish sur une série de parties pour co
 Composez une position à la main, ou scannez-la depuis une capture d'écran ou une photo d'écran — la reconnaissance se corrige avant de jouer ou d'analyser.
 
 CONÇU POUR IPAD
-Échiquier grand format et panneaux visibles simultanément (coups, courbe, MultiPV), clavier et trackpad pris en charge, portrait et paysage soignés.
+Échiquier grand format et panneaux côte à côte (coups, courbe, MultiPV), clavier et trackpad, portrait, paysage et fenêtre partagée.
 
 SYNCHRONISATION iCLOUD (optionnelle)
-Activez-la dans les Réglages pour que vos parties suivent tous vos appareils, via votre iCloud privé. Aucun compte, aucun serveur ChessLab. Désactivée par défaut.
+Activez-la dans les Réglages pour que vos parties suivent vos appareils, via votre iCloud privé. Aucun compte, aucun serveur. Désactivée par défaut.
 
 VIE PRIVÉE
 Hors ligne par défaut : aucun serveur ChessLab, aucune mesure d'audience, aucune publicité. Vos parties et réglages restent sur votre appareil, et ne sont jamais partagés avec le développeur. Bilingue français/anglais.
@@ -172,7 +166,7 @@ THE ENDGAME CORNER
 78 courses proven by endgame tablebases — the exact mathematical verdict: no taught move gives up a win, no recommended defence loses a draw. Nine families, from the opposition to famous studies. And free training: finish the position against best defence, where any move that preserves the verdict is accepted — not just the lesson's move.
 
 VARIANTS
-Chess960 (Fischer Random Chess): a randomly drawn starting position, one chosen by number, or one you compose yourself, with a full post-game analysis just like "Play" mode. Seven more variants against the computer, each with its own analysis: King of the Hill, Three-Check, Horde, Racing Kings, Antichess, Atomic, and Stolen Move (a token earned every 7 moves lets you play two moves in a row).
+Chess960 (Fischer Random Chess): a randomly drawn starting position, one chosen by number, or one you compose yourself, with a full post-game analysis just like "Play" mode. Eleven more variants against the computer, each with its own analysis: King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Stolen Move (a token every 7 moves lets you play twice in a row), Duck Chess, Barricades and Random Barricades.
 
 YOUR OWN REPERTOIRES
 Import your openings as PGN, variations included, and drill them with the same system. Share a repertoire as a single file — no account, no server. What you already know about a position counts right away in the imported repertoire.
@@ -232,7 +226,11 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**1.8.0, build 13** — fixés le 06/09/2026 (`MARKETING_VERSION = 1.8.0`, `CURRENT_PROJECT_VERSION = 13`) : App Store Connect avait déjà reçu des builds 11 et 12 le matin même, depuis Xcode, et exige un numéro strictement supérieur. Le build 13 est celui téléversé par `tools/asc/release.sh`. Vérifier dans App Store Connect que le build réellement soumis pour la 1.6 est bien inférieur à 11 avant d'archiver. Nouveautés détaillées dans `RELEASE_NOTES-1.8.0.md`, texte prêt à coller ci-dessus.
+**1.8.1, build 14** — fixés le 29/09/2026 (`MARKETING_VERSION = 1.8.1`, `CURRENT_PROJECT_VERSION = 14`), aux deux configurations de la cible applicative. La 1.8 (build 13) est **READY_FOR_SALE** : le 14 est le premier numéro libre. Nouveautés détaillées dans `RELEASE_NOTES-1.8.1.md`, texte prêt à coller ci-dessus.
+
+Pourquoi 1.8.1 et non 1.9.0 : la version est faite de corrections — le nom du joueur, les balises PGN, la mise en page en fenêtre partagée — avec deux ajouts modestes (le réglage « Votre nom », la carte Mémorisation). Aucun mode ni module nouveau. Si le choix doit changer, c'est une constante dans `project.pbxproj` et un titre ici.
+
+**Historique du 06/09/2026** — 1.8.0, build 13 : App Store Connect avait déjà reçu des builds 11 et 12 le matin même, depuis Xcode, et exige un numéro strictement supérieur. Le build 13 est celui téléversé par `tools/asc/release.sh`.
 
 Historique : la 1.7.1 (build 10.1) avait été fixée le 05/09 et n'est jamais partie ; la 1.8.0 l'absorbe.
 
@@ -271,20 +269,16 @@ Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/0
 
 ## App Review Notes (paste into App Store Connect → App Review Information → Notes)
 
-English, for the Apple reviewer. Frames the app's value proposition (six advanced modes, entirely free), then explains the camera permission, the network call, the licensing situation (GPLv3 engine, public source), and that no login/test account is needed.
+English, for the Apple reviewer. Opens with the nature of the update (1.8.1 : correction de défauts), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
 
 ```
-ChessLab's purpose is to offer an extensive set of advanced chess features — entirely free, with no paywall, no ads, and no in-app purchases. That is the app's core value: depth and quality normally found in paid or subscription chess apps, given away for free as a passion project. It bundles seven modes:
+WHAT'S IN THIS UPDATE (1.8.1): a bug-fix release. No new mode, no change to permissions, privacy or licensing. It fixes three defects reported by a tester on 27 September 2026: the player's name stayed in French ("Vous") in an otherwise fully English interface; an exported PGN carried only the moves, with no tag pairs and no result, which some chess programs reject; and on iPad, a window narrowed to share the screen kept the two-column layout, leaving the board less room than on an iPhone. Two small additions: an optional "Your name" setting, and a memorisation card in the Progress screen.
 
-1. Play vs the computer (powered by the embedded Stockfish engine) — adjustable strength (Elo ~900 to ~3190), clocks, hints, risky-move warnings, opening book; or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs fully on-device via Core ML — Stockfish only steps in for short mates, small endgames and repetitions. 2. Two Players — local pass-and-play on a single device. 3. Analyze — full game/position analysis with Stockfish: move-by-move classification, evaluation graph, best-move/threat arrows. 4. Openings — 58 hand-written, annotated openings; step through each one move by move, with variations and simplified spaced-repetition training. 5. Puzzles — over 100,000 tactics puzzles from the Lichess database, plus puzzles auto-generated from the user's own mistakes in Analyze. 6. Laboratory — engine-vs-engine testing to compare Stockfish configurations over a series of games. 7. Variants — Chess960 plus seven more ways to play against the computer (King of the Hill, Three-Check, Horde, Racing Kings, Antichess, Atomic, and a house variant, Stolen Move), each with the same strength/clock settings and its own post-game analysis as the main Play mode.
+ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 100,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
 
-There is no account, no server, no login — nothing to set up before reviewing.
+CAMERA: the Scanner uses the camera only to photograph a chess diagram — a screenshot or a physical board seen from above — and reconstruct the position with on-device recognition. Photos never leave the device. On Simulator (no camera), use the "Paste" entry in the Scanner screen with any chess diagram in the clipboard: it skips the camera and exercises the same recognition.
 
-CAMERA: the Scanner feature uses the camera only to photograph a chess diagram (a screenshot or a physical board from above) and reconstruct the position with on-device image recognition. Photos are processed entirely on-device and are never uploaded anywhere. If testing on Simulator (no camera), use the "Paste" entry in the Scanner screen with any chess diagram image copied to the clipboard, or the "Import a file" entry (visible on Mac Catalyst) — both skip the camera and exercise the same recognition pipeline.
+NETWORK: there is no ChessLab server, no API, no analytics, no ads. The only network activity is an optional iCloud sync, OFF by default. Turned on (Settings → Sync), CloudKit syncs the user's own saved games and progress through their OWN private iCloud database; the bundled puzzles and courses stay local. No data reaches the developer, hence "Data Not Collected". With sync off — the default — the app makes no network call at all.
 
-NETWORK: ChessLab has no first-party or third-party backend — no ChessLab server, no API, no analytics, no ads. The ONLY network activity is an optional iCloud sync, which is OFF by default. When a user turns it on (Settings → Sync), SwiftData/CloudKit syncs their own data — saved games, puzzle progress, and opening-training progress — through the user's OWN private iCloud database (CloudKit private database). The bundled content (the 100,000+ puzzle library and the 58 opening courses) stays local and is never synced. No data is shared with the developer, so the App Privacy answer remains "Data Not Collected". With sync disabled — the default — the app makes no network calls at all.
-
-ENGINE LICENSE (GPLv3): ChessLab embeds the Stockfish chess engine, compiled from its own sources and bundled directly into the app (with ARM NEON optimizations). Because Stockfish is GPLv3, the ChessLab binary as a whole is a GPLv3 derivative work. To comply, the complete source code of the app — matching this submitted build — is published publicly at https://github.com/thmaed/ChessLab. Copyright and license notices for all third-party components (Stockfish/GPLv3, Maia-3/AGPLv3 — compatible with GPLv3 per its section 13, the app provides no network service, ChessKit/MIT, the chess piece sets cburnett/GPLv2+ & CC BY-SA 3.0, chessnut/Apache 2.0 and merida/GPLv2+, the Lichess puzzle database/CC0) are also shown in-app under Settings → Licenses. All embedded piece sets are free/open-source and license-compatible with the app's GPLv3.
-
-No in-app purchases, no ads, no user-generated content shared publicly, no multiplayer/online play.
+ENGINE LICENSE (GPLv3): ChessLab embeds the Stockfish engine, compiled from its own sources, so the binary as a whole is a GPLv3 derivative work. The complete source code matching this build is published at https://github.com/thmaed/ChessLab. Notices for every third-party component (Stockfish/GPLv3, Maia-3/AGPLv3 — compatible per its section 13, the app provides no network service —, ChessKit/MIT, the piece sets cburnett/GPLv2+ & CC BY-SA 3.0, chessnut/Apache 2.0, merida/GPLv2+, the Lichess puzzles/CC0) are shown in-app under Settings → Licences.
 ```

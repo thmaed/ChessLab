@@ -10365,3 +10365,37 @@ ajustement ne déplacera pas un iPad en plein écran sans le vouloir.
 chacun des deux passages (Maia, puis Coup Volé), et chacun passe seul en 4 et
 7 secondes. C'est la contention déjà connue sous charge, sans rapport avec la
 mise en page.
+
+## 29/09 — La 1.8.1 est prête à partir
+
+La 1.8 est **READY_FOR_SALE** depuis sa révision (`asc.py status`). La suivante
+est donc une version neuve : `MARKETING_VERSION = 1.8.1`,
+`CURRENT_PROJECT_VERSION = 14`, fixés aux deux configurations de la cible
+applicative.
+
+**1.8.1 plutôt que 1.9.0** : la version est faite de corrections — le nom du
+joueur, les balises PGN, la mise en page en fenêtre partagée — avec deux ajouts
+modestes (le réglage « Votre nom », la carte Mémorisation, qui existait côté
+Android). Aucun mode ni module nouveau.
+
+Les nouveautés sont écrites dans les deux langues (`METADATA.md`, 1 950 et
+1 752 caractères sur 4 000) et détaillées dans `RELEASE_NOTES-1.8.1.md`. Les
+captures et les aperçus vidéo de la 1.8 sont conservés : rien du contenu n'a
+changé, et c'est la décision de Thierry.
+
+**Une erreur trouvée en passant, dans la fiche elle-même.** La description
+annonçait « sept variantes de plus » DANS LES DEUX LANGUES, alors que le hub en
+compte douze depuis la 1.8 : Crazyhouse, Duck Chess, Barricades et Barricades
+aléatoires y sont entrées sans que la description permanente suive. Le champ
+« Nouveautés » de la 1.8 les annonçait bien, mais lui n'est lu qu'une fois ; la
+description, elle, est ce que voit un visiteur six mois plus tard. La fiche
+Google Play avait été corrigée le 19/09, pas celle de l'App Store. Corrigé, et
+la description française — qui était à 3 987 caractères sur 4 000 — a été
+resserrée de cinq tournures pour loger les quatre noms manquants (3 989).
+
+Le compte des variantes est désormais vérifiable dans le code plutôt que de
+mémoire : Chess960 + `FairyVariant.all` (3) + `EngineLegalityVariant.all` (6) +
+Coup Volé + Duck Chess = 12.
+
+Relu par le lecteur de `tools/asc/asc.py` lui-même, qui contrôle les limites
+d'Apple champ par champ : les douze champs des deux langues passent.
