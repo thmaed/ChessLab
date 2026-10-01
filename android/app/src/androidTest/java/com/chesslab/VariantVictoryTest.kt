@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 
 /**
@@ -28,6 +29,14 @@ import org.junit.Test
  * qu'on puisse forcer, et personne n'y joue contre nous.
  */
 class VariantVictoryTest {
+
+    /**
+     * La phrase attendue est FRANÇAISE : sans cette règle, le test ne passait
+     * que sur un appareil réglé en français (le Galaxy), et échouait sur un
+     * émulateur anglais avec « White won (king in the centre) ». Constaté le
+     * 01/10/2026.
+     */
+    @get:Rule val language = LanguageRule()
 
     private val app = InstrumentationRegistry.getInstrumentation()
         .targetContext.applicationContext as Application

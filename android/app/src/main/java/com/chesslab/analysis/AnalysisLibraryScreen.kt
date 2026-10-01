@@ -1,5 +1,7 @@
 package com.chesslab.analysis
 
+import com.chesslab.library.PlayerName
+
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -82,11 +84,18 @@ fun AnalysisLibraryScreen(onOpen: (String) -> Unit) {
     val importer = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch {
-            val count = withContext(Dispatchers.IO) { importPgn(context, uri, dao) }
+            val outcome = withContext(Dispatchers.IO) { importPgn(context, uri, dao) }
+            val res = context.resources
             message = when {
-                count == null -> importFailed
-                count == 0 -> importedOne
-                else -> context.resources.getQuantityString(R.plurals.library_imported, count, count)
+                outcome == null -> importFailed
+                outcome.added == 0 && outcome.duplicates == 0 -> importedOne
+                else -> listOfNotNull(
+                    outcome.added.takeIf { it > 0 }
+                        ?.let { res.getQuantityString(R.plurals.library_imported, it, it) },
+                    // Comme iOS : ce qui était déjà là est DIT, pas tu.
+                    outcome.duplicates.takeIf { it > 0 }
+                        ?.let { res.getQuantityString(R.plurals.library_duplicates, it, it) },
+                ).joinToString(" ")
             }
         }
     }
@@ -95,7 +104,7 @@ fun AnalysisLibraryScreen(onOpen: (String) -> Unit) {
         records.flatMap { it.tagList }.distinctBy { it.lowercase() }.sortedBy { it.lowercase() }
     }
     val filtered = remember(records, query, mode, result, tag) {
-        filter(records, query, mode, result, tag)
+        filter(records, query, mode, result, tag) { PlayerName.display(context, it) }
     }
 
     Column(Modifier.fillMaxSize()) {
@@ -272,7 +281,7 @@ fun AnalysisLibraryScreen(onOpen: (String) -> Unit) {
             title = { Text(stringResource(R.string.library_delete_title), color = Palette.textPrimary) },
             text = {
                 Text(
-                    "${record.white} — ${record.black}",
+                    recordTitle(record),
                     color = Palette.textSecondary,
                 )
             },
@@ -359,6 +368,13 @@ fun filter(
     mode: String?,
     result: ResultFilter,
     tag: String?,
+    /**
+     * Le nom tel qu'il s'AFFICHE, pour que la recherche trouve ce qu'on lit
+     * à l'écran (« You », ou le nom qu'on s'est donné) et pas seulement la
+     * sentinelle rangée en base. Par défaut rien : la fonction reste pure et
+     * se teste sans contexte Android.
+     */
+    displayName: (String) -> String? = { null },
 ): List<GameRecord> {
     val needle = query.trim().lowercase()
     return records.filter { record ->
@@ -366,7 +382,10 @@ fun filter(
         if (result != ResultFilter.all && userResult(record) != result) return@filter false
         if (tag != null && record.tagList.none { it.equals(tag, ignoreCase = true) }) return@filter false
         if (needle.isEmpty()) return@filter true
-        val haystack = (listOf(record.white, record.black, record.result) + record.tagList)
+        val haystack = (listOfNotNull(
+            record.white, record.black, record.result,
+            displayName(record.white), displayName(record.black),
+        ) + record.tagList)
             .joinToString(" ") { it.lowercase() }
         haystack.contains(needle)
     }
@@ -423,7 +442,7 @@ private fun RecordRow(
         }
         Column(Modifier.weight(1f)) {
             Text(
-                "${record.white} — ${record.black}",
+                recordTitle(record),
                 fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
             )
             Spacer(Modifier.height(4.dp))
@@ -560,24 +579,39 @@ private fun EmptyLibrary(onImport: () -> Unit) {
     }
 }
 
+/** Ce qu'un import a fait : ajouté, et écarté parce que déjà présent. */
+private data class ImportOutcome(val added: Int, val duplicates: Int)
+
 /**
- * Importe un fichier PGN — une partie, ou cent. Rend le nombre de parties
- * ajoutées, ou `null` si le fichier est illisible.
+ * Importe un fichier PGN — une partie, ou cent. `null` si le fichier est
+ * illisible.
+ *
+ * Les parties DÉJÀ rangées sont écartées, reconnues par leurs joueurs et leurs
+ * coups ([com.chesslab.library.GameSignature]) — et le même ensemble reçoit
+ * celles du lot en cours : un fichier qui contient deux fois la même partie
+ * n'en range qu'une. Pendant d'`importPGNCollection` côté iOS.
  */
 private suspend fun importPgn(
     context: android.content.Context,
     uri: Uri,
     dao: com.chesslab.library.GameDao,
-): Int? = runCatching {
+): ImportOutcome? = runCatching {
     val text = context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
         ?: return null
     val games = PgnSanitizer.splitIntoGames(PgnSanitizer.sanitize(text))
+    val seen = dao.allOnce().mapNotNull { com.chesslab.library.GameSignature.of(it.pgn) }.toMutableSet()
     var added = 0
+    var duplicates = 0
     for (pgn in games) {
         val parsed = runCatching { chesskit.PgnParser.parse(pgn) }.getOrNull() ?: continue
         val plies = parsed.moves.indices
             .count { it.variation == chesskit.MoveTree.Index.MAIN_VARIATION }
         if (plies == 0) continue
+        val signature = com.chesslab.library.GameSignature.of(pgn)
+        if (signature != null && !seen.add(signature)) {
+            duplicates++
+            continue
+        }
         val inserted = dao.insert(
             GameRecord(
                 playedAt = System.currentTimeMillis(),
@@ -591,5 +625,18 @@ private suspend fun importPgn(
         )
         if (inserted > 0) added++
     }
-    added
+    ImportOutcome(added, duplicates)
 }.getOrNull()
+
+/**
+ * « Blancs — Noirs », traduits À L'AFFICHAGE par [PlayerName] : la base range
+ * le nom du joueur dans la langue du jour de la partie, et cette ligne le
+ * montrait tel quel — « Vous » dans une interface passée en anglais.
+ */
+@Composable
+private fun recordTitle(record: GameRecord): String {
+    val context = LocalContext.current
+    val white = PlayerName.display(context, record.white, PlayerName.white(context))
+    val black = PlayerName.display(context, record.black, PlayerName.black(context))
+    return "$white — $black"
+}

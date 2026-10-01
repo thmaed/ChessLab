@@ -363,6 +363,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="scan_unreadable">Image illisible</string>
     <string name="settings_board_sounds">Sons du plateau</string>
     <string name="settings_board_theme">Thème du plateau</string>
+    <string name="settings_player_name">Votre nom</string>
+    <string name="settings_player_name_hint">Il s\'affiche sur votre plaque de joueur, dans la bibliothèque et dans les balises PGN des parties exportées. Laissez vide pour « Vous ».</string>
     <string name="settings_language">Langue</string>
     <string name="settings_language_en">English</string>
     <string name="settings_language_fr">Français</string>
@@ -381,7 +383,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="stockfish">Stockfish</string>
     <string name="theme_blue">Bleu</string>
     <string name="theme_classic">Classique</string>
-    <string name="theme_contrast">Contraste</string>
+    <string name="theme_contrast">Contraste élevé</string>
     <string name="theme_discovered">Attaque à la découverte</string>
     <string name="theme_endgame">Finale</string>
     <string name="theme_fork">Fourchette</string>
@@ -1006,6 +1008,10 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="library_delete_selected">Supprimer (%1$d)</string>
     <string name="library_accuracy">Précision %1$d %% / %2$d %%</string>
     <string name="save">Enregistrer</string>
+    <plurals name="library_duplicates">
+        <item quantity="one">%d déjà présente, non réimportée.</item>
+        <item quantity="other">%d déjà présentes, non réimportées.</item>
+    </plurals>
     <plurals name="library_imported">
         <item quantity="one">%d partie importée.</item>
         <item quantity="other">%d parties importées.</item>

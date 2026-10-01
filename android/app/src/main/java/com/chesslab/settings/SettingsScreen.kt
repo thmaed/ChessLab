@@ -39,6 +39,7 @@ import androidx.compose.material.icons.filled.Abc
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VolumeUp
@@ -84,6 +85,38 @@ fun SettingsScreen(
             }
         }
 
+        }
+
+        // Le nom sous lequel on joue — juste sous la langue, comme sur iOS.
+        // L'état du champ est LOCAL : lié directement au magasin, il se
+        // ferait réécrire par les relectures en différé et perdrait des
+        // frappes. On écrit à chaque changement, on ne relit jamais.
+        SettingsSection(stringResource(R.string.settings_player_name), Icons.Default.Person) {
+            var name by remember { mutableStateOf(settings.playerName) }
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Palette.surfaceElevated)
+                        .border(1.dp, Palette.stroke, RoundedCornerShape(10.dp))
+                        .padding(horizontal = 12.dp),
+                ) {
+                    com.chesslab.ui.BasicTextFieldWithPlaceholder(
+                        value = name,
+                        placeholder = stringResource(R.string.you),
+                        tag = "player-name",
+                    ) {
+                        val cleaned = SettingsStore.sanitizedPlayerName(it)
+                        name = cleaned
+                        SettingsStore.setPlayerName(context, cleaned)
+                    }
+                }
+                Text(
+                    stringResource(R.string.settings_player_name_hint),
+                    fontSize = 12.sp, color = Palette.textTertiary,
+                )
+            }
         }
 
         // Une LIGNE par thème, avec ses VRAIES pièces posées dessus — comme
@@ -349,7 +382,7 @@ private fun ThemeRow(
         }
         Spacer(Modifier.width(12.dp))
         Text(
-            theme.label, fontSize = 13.sp,
+            stringResource(theme.labelRes), fontSize = 13.sp,
             color = if (selected) Palette.accent else Palette.textPrimary,
             fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
             modifier = Modifier.weight(1f),

@@ -62,10 +62,13 @@ introduit un texte faux.
       mêmes trois écrans. Le calcul est celui du mode « Contre l'ordinateur »,
       et vit désormais dans `VariantAccuracy.kt` — pendant exact de
       `VariantAccuracy.swift`, huit tests JVM à l'appui.
-- [ ] **Les deux se COMPLÈTENT au fil de la passe** au lieu d'apparaître d'un
+- [x] **Les deux se COMPLÈTENT au fil de la passe** au lieu d'apparaître d'un
       coup à la fin, comme sur iOS où ce sont des propriétés calculées lues au
       cache. La courbe s'allonge, les pastilles se posent, le pourcentage
       s'affine.
+      *Prouvé le 01/10 sur l'émulateur téléphone : `VariantAnalysisTest.
+      laRevueSeCompleteAuFilDeLaPasse` relève la courbe PENDANT la passe et
+      exige de l'y voir partielle avant qu'elle soit entière.*
 - [x] **L'écran de JEU affichait les règles de la variante** au-dessus du
       plateau, sur deux à quatre lignes prises au plateau. Aucun écran de jeu
       iOS ne le fait : les règles se lisent sur l'écran de réglages, avant de
@@ -139,9 +142,10 @@ parité.
 
 - [x] Vérifié à l'écran sur une variante JAMAIS ouverte (Atomique) : les trois
       aides sont actives d'emblée.
-- [ ] Les réglages DÉJÀ enregistrés gardent leur valeur — c'est le
+- [x] Les réglages DÉJÀ enregistrés gardent leur valeur — c'est le
       comportement voulu d'un changement de défaut, mais il faudra basculer
       l'interrupteur une fois dans les modes déjà configurés.
+      **Clos le 01/10 : ce n'est pas un écart.** iOS se comporte de même — un défaut qui change ne réécrit pas un choix déjà fait.
 
 ### Ce que la suite sur appareil a rattrapé — 20/09
 
@@ -242,9 +246,10 @@ refaire en deux écrans est un chantier à part, à décider.
       « +0.4 » sur iOS, et « +M5 » là où iOS écrit « M5 ». La précision
       s'écrivait « 97,1 % » contre « 97% ». L'écart de gain affichait « −0 % »
       quand le coup n'avait rien coûté ; iOS écrit « ≈ 0 % », en gris.
-- [ ] **Les puzzles créés depuis les gaffes** se disaient « ajoutés à vos
+- [x] **Les puzzles créés depuis les gaffes** se disaient « ajoutés à vos
       puzzles maison » ; iOS renvoie vers le mode Puzzles, et nomme la raison
       quand il n'y en a aucun.
+      **Fait (constaté le 01/10)** : `analysis_puzzles_created` et `analysis_no_puzzles` reprennent mot pour mot les deux phrases d'iOS, et `AnalysisScreen` les emploie.
 - [x] **La bande de reprise de l'accueil** disait « Reprendre » puis le nom de
       l'adversaire. iOS annonce ce qu'on reprend et où en est la partie :
       « Reprendre la partie en cours », « 14 coups joués ».
@@ -1185,6 +1190,7 @@ il faut un vrai mat pour en voir un.
 - [x] Trois tests JVM, dont deux qui affirment AUSSI ce que l'ancien code
       faisait — la raison d'être du correctif est écrite, pas déduite.
 - [ ] **Pas encore vérifié sur appareil** : le téléphone n'était pas branché.
+      *Toujours vrai le 01/10 : le Galaxy n'était pas branché pour la passe.*
 
 **Une question de FOND — TRANCHÉE le 26/09 : on garde un seuil UNIQUE.** Le
 barème est calibré sur les échecs classiques. Mesuré au moteur, l'écart entre
@@ -1203,7 +1209,7 @@ interface en anglais. Les correctifs sont faits **côté iOS seulement** — la
 demande portait explicitement sur l'iPhone et l'iPad. Ce qui suit est donc
 l'écart créé ce jour-là, à refermer.
 
-- [ ] **Le nom du joueur s'affichait « Vous » dans une interface anglaise.**
+- [x] **Le nom du joueur s'affichait « Vous » dans une interface anglaise.**
       La bibliothèque stocke le mot français EN CLAIR (c'est aussi la
       sentinelle qui dit de quel côté on jouait) et l'affichait tel quel.
       iOS a désormais un point de résolution unique, `PlayerName`
@@ -1214,13 +1220,15 @@ l'écart créé ce jour-là, à refermer.
       change pas : le sentinelle reste le mot français. Vérifier côté Android
       la ligne de bibliothèque, l'accueil, l'en-tête d'analyse et la plaque de
       joueur.
-- [ ] **Aucun réglage pour se renommer.** iOS ajoute `AppSettings.playerName`
+      **Porté le 01/10** : `library/PlayerName.kt`, pendant exact de `PlayerName.swift` — accueil, bibliothèque (ligne, recherche, suppression), en-tête d'analyse, plaque du joueur, annonce TalkBack, plaques des variantes. Android avait le même défaut dans la bibliothèque.
+- [x] **Aucun réglage pour se renommer.** iOS ajoute `AppSettings.playerName`
       (clé `settings.playerName`, synchronisée iCloud, nettoyée des
       guillemets/crochets/sauts de ligne et bornée à 40 caractères) et un
       champ « Votre nom » dans Réglages, juste sous la langue. Vide = « Vous ».
       Le nom choisi remplace la sentinelle PARTOUT où elle s'affiche, y compris
       dans les parties déjà enregistrées, et part dans les balises PGN.
-- [ ] **Le PGN exporté n'avait AUCUNE balise ni résultat.** C'était exact :
+      **Porté le 01/10** : `SettingsStore.playerName` (même nettoyage, même borne de 40) et un champ « Votre nom » sous la langue. Vérifié sur tablette (`ParityPassTest`) : le champ écrit le réglage, et le nom arrive sur la plaque pendant la partie.
+- [x] **Le PGN exporté n'avait AUCUNE balise ni résultat.** C'était exact :
       `ChessKit.Game.pgn` ne sérialise que les balises renseignées, et l'app
       n'en renseignait aucune. `PGNExport` porte désormais un `Metadata` et
       émet les sept balises obligatoires — Event (le mode, dans la langue de
@@ -1233,8 +1241,9 @@ l'écart créé ce jour-là, à refermer.
       gagnent au passage les joueurs, le site et la date.
       Côté Android, l'équivalent est `AnalysisViewModel.pgn()` et les exports
       de variantes : même manque à vérifier.
+      **Porté le 01/10** : `library/PgnExport.kt`. Android posait déjà joueurs, résultat et date à la FIN de la partie, mais un export PENDANT la partie n'en portait aucune, et Site/Round manquaient toujours. Les sept balises sortent désormais de Jouer, Deux joueurs, l'analyse et des quatre exports de variantes ; le résultat clôt les coups. Douze tests JVM (`PgnExportTest`). L'enrichissement des vieilles parties à la réouverture n'est PAS porté, et n'a pas à l'être : l'enregistreur Android posait déjà leurs balises.
 
-- [ ] **Une fenêtre étroite prend la disposition téléphone (29/09).** Le
+- [x] **Une fenêtre étroite prend la disposition téléphone (29/09).** Le
       quatrième point du testeur, élucidé : ce n'était ni la barre latérale ni
       le paysage, mais la fenêtre RÉDUITE pour partager l'écran. Le rognage
       visible sur ses captures est un artefact de redimensionnement d'iPadOS,
@@ -1253,7 +1262,8 @@ l'écart créé ce jour-là, à refermer.
       partagé : une fenêtre plus large que haute mais ÉTROITE y prend la
       disposition côte à côte, où le plateau est borné par la hauteur — c'est
       exactement le cas qui a mal tourné côté iOS.
-- [ ] **Le partage plateau / panneau, revu le 29/09.** Deux règles côté iOS
+      **Clos le 01/10.** Sans ossature à deux colonnes, Android ne peut pas avoir le défaut d'iOS. Son équivalent — le côte à côte dans une petite fenêtre en largeur — est couvert par le garde-fou de `BoardLayout` : le panneau n'y prend jamais plus de la moitié, l'échiquier n'est jamais plus petit qu'avant (`BoardLayoutTest`).
+- [x] **Le partage plateau / panneau, revu le 29/09.** Deux règles côté iOS
       (`PlayView`), toutes deux nées d'un essai sur appareil : en paysage, le
       plateau prend son carré et le panneau prend CE QUI RESTE, borné entre
       340 et 420 pt — ils se disputaient la largeur à parts égales et le
@@ -1264,3 +1274,56 @@ l'écart créé ce jour-là, à refermer.
       barre repliée. Côté Android, `BoardScaffold` partage lui aussi le
       paysage entre plateau et panneau : vérifier dans quelle proportion, et
       ce que devient la liste des coups quand la fenêtre est basse.
+      **Porté le 01/10** : `ui/BoardLayout.kt` dans `BoardScaffold`, `PlayScreen` et `TwoPlayerScreen` — trois écrans qui partageaient À PARTS ÉGALES. Le plancher de 340 ne dépasse jamais la moitié de la largeur : Android, contrairement à iOS, met plateau et panneau côte à côte sur un téléphone en paysage. En portrait sur grand écran, la liste des coups passe dans sa feuille quand `hauteur − largeur < 330`, et le bouton « Coups » n'apparaît que lorsqu'elle n'est pas affichée (comme sur iOS). Vu sur la tablette 10" : l'échiquier prend toute la hauteur.
+
+## La passe de réalignement du 01/10/2026
+
+Demandée explicitement : « que l'app Android soit au même niveau » qu'iOS, sans
+toucher à iOS. Les cinq écarts nés côté iOS les 28-29/09 sont refermés plus haut.
+La passe en a trouvé d'autres, qu'aucune liste ne portait.
+
+- [x] **Les écrans de JEU des variantes n'avaient pas de menu d'export.** iOS en
+      a un sur chacun (copier la position, copier ou partager la partie) ;
+      Android ne l'avait que sur la REVUE. On ne pouvait pas envoyer une partie
+      en cours. Ajouté aux trois écrans (générique, Duck Chess, Coup Volé), avec
+      un score PGN (`pgnResult`) posé à chaque fin de partie — mat, verdict de
+      la variante, abandon, nulle, drapeau — et transmis à la revue, dont
+      l'export le porte désormais. Le Coup Volé annote `[jeton]` comme iOS.
+      Vérifié sur tablette (`ParityPassTest`).
+- [x] **L'import n'écartait AUCUN doublon.** Réimporter le même fichier doublait
+      la bibliothèque, et analyser cinq fois une partie collée la rangeait cinq
+      fois. iOS reconnaît une partie par ses joueurs et ses coups :
+      `library/GameSignature.kt` en est le pendant (« ? » vaut absent), et le
+      message dit combien étaient déjà là. Sept tests JVM.
+- [x] **Les noms des thèmes de plateau étaient écrits en dur en français** :
+      « Classique, Bleu, Noyer » au milieu d'un écran anglais, là où iOS dit
+      « Classic, Blue, Walnut ». Les traductions existaient, inutilisées. Le
+      quatrième s'appelle comme sur iOS : « Contraste élevé » / « High
+      contrast ». Un balayage du code ne trouve plus d'autre texte affiché qui
+      échappe aux ressources.
+- [x] **La visite guidée du premier lancement, vérifiée de bout en bout**, à la
+      demande : installation VIERGE sur l'émulateur téléphone (Pixel 7) puis
+      tablette (10"), les onze étapes parcourues, chaque projecteur sur sa
+      cible, « Done » ramène à l'accueil, et elle ne revient pas au lancement
+      suivant. Elle n'est posée « vue » qu'à la fin ou à l'abandon — une
+      recréation d'activité en cours de route ne la perd donc pas.
+- [x] **Le README annonçait quatre manques qui n'existaient plus** (Crazyhouse,
+      surchauffe, affinage, écrans annexes) : réécrit.
+
+**La suite instrumentée complète**, sur l'émulateur tablette (le Galaxy n'était
+pas branché) : 119 réussis, 6 échecs, tous expliqués.
+
+- [x] **Quatre venaient de la passe**, et c'est le comportement voulu : sur grand
+      écran, la liste des coups est affichée et le bouton « Coups » n'existe
+      plus — or `AppTest` (×3) et `StaleAnswerTest` le touchaient, écrits pour
+      le Galaxy où il reste. Ils ouvrent désormais la feuille SI le bouton est
+      là, et lisent la liste directement sinon. Repassés : 30/30 sur tablette,
+      33/33 sur téléphone.
+- [x] **`VariantVictoryTest` n'avait pas de règle de langue** : il ne passait
+      que sur un appareil réglé en français. Échouait à l'identique sur le code
+      d'AVANT la passe. `LanguageRule` ajoutée, il passe sur l'émulateur anglais.
+- [ ] **`OpeningIndexTest.taperUnCoupDeLIndexAmeneASaPosition` échoue sur la
+      tablette en paysage**, à l'identique sur le code d'avant la passe : la
+      puce `fil-4` du fil d'Ariane existe mais sort de sa rangée défilante.
+      Probablement le test qui ne la fait pas venir, pas l'écran qui casse —
+      à trancher en le regardant.

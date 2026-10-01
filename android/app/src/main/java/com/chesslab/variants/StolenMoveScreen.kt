@@ -40,6 +40,7 @@ import com.chesslab.ui.Palette
 import com.chesslab.ui.QuickSwitchMenu
 import com.chesslab.ui.StatusRow
 import com.chesslab.ui.TopBarActions
+import com.chesslab.ui.ExportMenu
 import com.chesslab.ui.accentGradient
 
 /**
@@ -55,7 +56,7 @@ fun StolenMoveScreen(
     settings: VariantSettings = VariantSettings(),
     onAnalyze: (String) -> Unit = {},
     /** Revoir la partie : les POSITIONS, pas les coups — un tour double n'est pas rejouable. */
-    onReviewGame: (List<String>, List<String>, List<String>) -> Unit = { _, _, _ -> },
+    onReviewGame: (List<String>, List<String>, List<String>, String?) -> Unit = { _, _, _, _ -> },
     model: StolenMoveViewModel = viewModel(),
 ) {
     LaunchedEffect(settings) { model.apply(settings) }
@@ -67,7 +68,13 @@ fun StolenMoveScreen(
         onDispose { model.pauseForBackground() }
     }
 
+    // Le menu d'export d'iOS, absent jusqu'ici de l'écran de jeu.
     TopBarActions {
+        ExportMenu(
+            fen = { ui.position.fen },
+            pgn = { model.exportedPgn() },
+            hasGame = ui.sanMoves.isNotEmpty(),
+        )
         QuickSwitchMenu(onAnalyze = { onAnalyze(ui.position.fen) })
     }
 
@@ -184,7 +191,7 @@ fun StolenMoveScreen(
                     }
                     Spacer(Modifier.weight(1f))
                     TextButton(
-                        onClick = { onReviewGame(model.analysisFens(), model.analysisMoves(), model.analysisSans()) },
+                        onClick = { onReviewGame(model.analysisFens(), model.analysisMoves(), model.analysisSans(), ui.pgnResult) },
                         enabled = model.analysisMoves().isNotEmpty(),
                         modifier = Modifier.testTag("analyser-la-partie"),
                     ) {

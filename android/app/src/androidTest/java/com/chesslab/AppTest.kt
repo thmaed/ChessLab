@@ -105,11 +105,20 @@ class AppTest {
         awaitText("À vous de jouer", 120_000)
     }
 
-    /** Ouvre la feuille des coups joués et rend la main quand elle est là. */
+    /**
+     * Ouvre la feuille des coups joués et rend la main quand elle est là.
+     *
+     * Sur un GRAND écran, la liste est déjà affichée à côté ou sous le plateau
+     * et le bouton n'existe pas — comme sur iPad (01/10/2026). Il n'y a alors
+     * rien à ouvrir : on attend simplement le premier coup.
+     */
     private fun openMoveList() {
-        compose.onNodeWithTag("coups-joues").performClick()
+        if (movesButtonShown()) compose.onNodeWithTag("coups-joues").performClick()
         awaitTag("coup-0", 15_000)
     }
+
+    private fun movesButtonShown() =
+        compose.onAllNodesWithTag("coups-joues").fetchSemanticsNodes().isNotEmpty()
 
     @Test fun theHomeOffersTheModes() {
         compose.onNodeWithTag("mode-play").assertIsDisplayed()
@@ -123,14 +132,17 @@ class AppTest {
         compose.onNodeWithTag("case-e2").performClick()
         compose.onNodeWithTag("case-e4").performClick()
         // Le moteur répond, la main revient, et les DEUX demi-coups sont là.
+        // Sur grand écran la liste est affichée en continu : on la lit
+        // directement. Sur téléphone elle vit dans sa feuille, qu'on ouvre.
         compose.waitUntil(90_000) {
-            compose.onAllNodesWithTag("coups-joues").fetchSemanticsNodes().isNotEmpty()
-        }
-        compose.waitUntil(90_000) {
-            compose.onNodeWithTag("coups-joues").performClick()
-            val found = compose.onAllNodesWithTag("coup-1").fetchSemanticsNodes().isNotEmpty()
-            if (!found) compose.onNodeWithTag("case-e4").performClick()   // referme la feuille
-            found
+            if (!movesButtonShown()) {
+                compose.onAllNodesWithTag("coup-1").fetchSemanticsNodes().isNotEmpty()
+            } else {
+                compose.onNodeWithTag("coups-joues").performClick()
+                val found = compose.onAllNodesWithTag("coup-1").fetchSemanticsNodes().isNotEmpty()
+                if (!found) compose.onNodeWithTag("case-e4").performClick()   // referme la feuille
+                found
+            }
         }
     }
 

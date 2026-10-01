@@ -1,5 +1,7 @@
 package com.chesslab.play
 
+import com.chesslab.library.PlayerName
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -164,7 +166,8 @@ fun PlayScreen(
     val userRow: @Composable () -> Unit = {
         PlayerRow(
             modifier = gutter,
-            name = stringResource(R.string.you),
+            // Le nom choisi dans les Réglages, sinon « Vous » — voir PlayerName.
+            name = PlayerName.you(LocalContext.current),
             color = ui.userColor,
             active = !ui.gameOver && ui.position.sideToMove == ui.userColor,
             captured = ui.captured.captures(ui.userColor),
@@ -173,7 +176,9 @@ fun PlayScreen(
             tag = "joueur-vous",
         )
     }
-    val actions: @Composable () -> Unit = {
+    // `movesInline` : la liste des coups est-elle déjà à l'écran ? Le bouton
+    // « Coups » ne sert alors à rien, et iOS ne le montre pas.
+    val actions: @Composable (movesInline: Boolean) -> Unit = { movesInline ->
         if (ui.gameOver) GameOverPanel(
             gutter, ui.outcome ?: ui.status,
             summary = model.opponentSummaryLine(),
@@ -190,6 +195,7 @@ fun PlayScreen(
             onHint = { model.toggleHint() },
             onTakeback = { model.takeback() },
             onMoves = { showMoves = true },
+            showMovesButton = !movesInline,
             onDraw = { model.offerDraw() },
             onResign = { confirmResign = true },
         )
@@ -233,24 +239,27 @@ fun PlayScreen(
     // bouton : il y a la place de la montrer en continu, et c'est ce que fait
     // l'iPad. Sur téléphone elle reste dans sa feuille — la place y manque.
     val grandEcran = maxWidth >= com.chesslab.ui.Metrics.regularBreakpoint
+    // Lus ICI, dans la portée de `BoxWithConstraints` : plus bas, une
+    // `Column` les masque derrière son propre récepteur.
+    val boxWidth = maxWidth.value
+    val boxHeight = maxHeight.value
+    val movesFit = movesListFitsBelowBoard(boxWidth, boxHeight)
     if (isLandscape()) {
+        // L'échiquier prend son CARRÉ, le panneau prend ce qui reste, borné
+        // entre 340 et 420 dp — le partage d'iOS (`PlayView.panelWidth`). Les
+        // deux colonnes se partageaient la largeur à parts égales, et la
+        // borne de 420 posée DANS la moitié droite y laissait un vide pendant
+        // que l'échiquier restait à l'étroit dans la gauche. Voir [BoardLayout].
+        val panelWidth = com.chesslab.ui.BoardLayout
+            .panelWidth(boxWidth, boxHeight, gap = 8f).dp
         Row(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
-            // Le plateau est CARRÉ : borné à la hauteur, il ne déborde pas, et
-            // toute la largeur restante va au panneau. Sans cette borne il
-            // collait au bord sur une tablette.
             Box(
                 Modifier.weight(1f).fillMaxHeight().padding(horizontal = 4.dp),
                 Alignment.Center,
             ) { board() }
-            // Bornée : sans cap, un écran large éparpille les commandes d'un
-            // bord à l'autre — transport à gauche, abandon collé à droite. Le
-            // poste de jeu reste un bloc compact, comme iOS. La borne est posée
-            // sur la colonne INTÉRIEURE : `weight` fixe déjà la largeur de la
-            // sienne, et un `widthIn` posé après elle serait sans effet.
-            Box(Modifier.weight(1f).fillMaxHeight(), Alignment.TopCenter) {
+            Box(Modifier.width(panelWidth).fillMaxHeight(), Alignment.TopCenter) {
             Column(
                 Modifier
-                    .widthIn(max = 420.dp)
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .verticalScroll(rememberScrollState()),
@@ -261,7 +270,7 @@ fun PlayScreen(
                 Spacer(Modifier.height(6.dp))
                 userRow()
                 Spacer(Modifier.height(8.dp))
-                actions()
+                actions(grandEcran)
                 if (grandEcran) {
                     Spacer(Modifier.height(16.dp))
                     Column(gutter) {
@@ -281,10 +290,15 @@ fun PlayScreen(
         Spacer(Modifier.height(6.dp))
         userRow()
         Spacer(Modifier.height(8.dp))
-        actions()
+        actions(grandEcran && movesFit)
         // Tablette en PORTRAIT : le plateau prend la largeur, et il reste de
         // quoi dérouler les coups en dessous — sans feuille, comme iPad.
-        if (grandEcran) {
+        // SAUF quand la colonne est courte (fenêtre partagée) : sous le
+        // plateau pleine largeur, il ne resterait plus de quoi loger
+        // pendules, commandes ET liste. Elle passe alors dans sa feuille, que
+        // le bouton « Coups » de la barre ouvre — la règle d'iOS
+        // (`PlayView.movesListFitsBelowBoard`).
+        if (grandEcran && movesFit) {
             Spacer(Modifier.height(16.dp))
             Column(gutter.verticalScroll(rememberScrollState())) {
                 MovesSection(ui.sanMoves, ui.displayedPly, model::reviewTo)
@@ -463,6 +477,8 @@ private fun ControlBar(
     onHint: () -> Unit,
     onTakeback: () -> Unit,
     onMoves: () -> Unit,
+    /** Faux quand la liste des coups est déjà affichée à côté ou dessous. */
+    showMovesButton: Boolean = true,
     onDraw: () -> Unit,
     onResign: () -> Unit,
 ) {
@@ -520,7 +536,7 @@ private fun ControlBar(
             tint = if (ui.hintsWanted) Palette.background else Palette.textPrimary,
             background = if (ui.hintsWanted) Palette.accent else Palette.surfaceElevated,
             tag = "indice", onClick = onHint)
-        if (!ui.isReviewing) {
+        if (!ui.isReviewing && showMovesButton) {
             Spacer(Modifier.width(10.dp))
             ControlButton(Icons.AutoMirrored.Filled.List, stringResource(R.string.play_moves),
                 tag = "coups-joues", onClick = onMoves)
@@ -724,3 +740,11 @@ fun PromotionDialog(
         containerColor = Palette.surface,
     )
 }
+
+/**
+ * Reste-t-il, sous un plateau pleine largeur, de quoi loger la liste des
+ * coups en plus des pendules, de l'évaluation et des commandes ? Le plateau
+ * est carré : posé sur la largeur, il en consomme autant en hauteur. Ce qui
+ * reste doit valoir au moins 330 dp. Pendant de `PlayView.movesListFitsBelowBoard`.
+ */
+internal fun movesListFitsBelowBoard(width: Float, height: Float): Boolean = height - width >= 330f

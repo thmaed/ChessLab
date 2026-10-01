@@ -1,5 +1,8 @@
 package com.chesslab.analysis
 
+import com.chesslab.library.PlayerName
+import com.chesslab.library.PgnExport
+
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -322,7 +325,24 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** Le PGN de la partie chargée, pour l'export. Vide si rien n'est chargé. */
-    fun pgn(): String = game?.pgn ?: ""
+    /**
+     * Le PGN à partager depuis l'analyse. Les en-têtes déjà portées par la
+     * partie (une partie jouée dans l'app, un PGN importé) sont GARDÉES ; on
+     * ne comble que les manques, pour qu'une position ouverte à la FEN sorte
+     * malgré tout un PGN conforme — sept balises, résultat compris. Ni date
+     * ni joueurs à inventer : « ? » et « ????.??.?? » sont ce que le standard
+     * prévoit pour l'inconnu.
+     */
+    fun pgn(): String {
+        val current = game ?: return ""
+        return PgnExport.pgn(
+            current,
+            PgnExport.Metadata(
+                event = s(R.string.route_analysis),
+                date = null, white = "?", black = "?", result = null,
+            ),
+        )
+    }
 
     fun load() {
         val text = ui.input.trim()
@@ -379,9 +399,15 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         moves = mainline.mapNotNull { parsed.moves[it] }
         game = parsed
 
+        // Les noms de l'en-tête passent par PlayerName : un PGN rangé par
+        // l'app porte la sentinelle « Vous »/« You » de la langue du jour de
+        // la partie, qu'on relit dans celle d'aujourd'hui (et qu'on remplace
+        // par le nom choisi, s'il y en a un). « ? », le joueur inconnu du
+        // standard, ne s'affiche pas.
+        val app = getApplication<Application>()
         val label = listOfNotNull(
-            parsed.tags.white.ifEmpty { null },
-            parsed.tags.black.ifEmpty { null },
+            PlayerName.display(app, parsed.tags.white),
+            PlayerName.display(app, parsed.tags.black),
         ).joinToString(" — ").ifEmpty { s(R.string.analysis_game_loaded) }
 
         ui = ui.copy(

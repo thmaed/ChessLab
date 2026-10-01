@@ -1,5 +1,7 @@
 package com.chesslab.ui
 
+import com.chesslab.library.PlayerName
+
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -321,21 +323,16 @@ private fun RecentGameRow(game: GameRecord, onOpen: () -> Unit) {
 
 /**
  * Intitulé lisible : « Contre l'ordinateur » pour une partie moteur, sinon
- * les deux noms. Les noms « Vous »/« Blancs »/« Noirs » sont rangés dans la
- * langue du moment ; on les relit dans celle d'aujourd'hui.
+ * les deux noms — traduits par [PlayerName], qui sait aussi rendre à
+ * l'utilisateur le nom qu'il s'est choisi.
  */
 @Composable
 private fun recentGameTitle(game: GameRecord): String {
     if (game.source == "engine") return stringResource(R.string.route_play)
-    return "${playerName(game.white)} – ${playerName(game.black)}"
-}
-
-@Composable
-private fun playerName(stored: String): String = when (stored) {
-    "Vous", "You" -> stringResource(R.string.you)
-    "Blancs", "White" -> stringResource(R.string.color_white_side)
-    "Noirs", "Black" -> stringResource(R.string.color_black_side)
-    else -> stored
+    val context = LocalContext.current
+    val white = PlayerName.display(context, game.white, PlayerName.white(context))
+    val black = PlayerName.display(context, game.black, PlayerName.black(context))
+    return "$white – $black"
 }
 
 @Composable

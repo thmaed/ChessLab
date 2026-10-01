@@ -1,5 +1,8 @@
 package com.chesslab.variants
 
+import com.chesslab.library.PlayerName
+import androidx.compose.ui.platform.LocalContext
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -51,6 +54,7 @@ import com.chesslab.ui.Palette
 import com.chesslab.ui.QuickSwitchMenu
 import com.chesslab.ui.StatusRow
 import com.chesslab.ui.TopBarActions
+import com.chesslab.ui.ExportMenu
 
 /**
  * Le Duck Chess : un tour en DEUX temps, et un canard qui bloque une case.
@@ -65,7 +69,7 @@ fun DuckChessScreen(
     settings: VariantSettings = VariantSettings(),
     onAnalyze: (String) -> Unit = {},
     /** Revoir la partie : les POSITIONS, pas les coups — le canard n'est dans aucun coup. */
-    onReviewGame: (List<String>, List<String>, List<String>) -> Unit = { _, _, _ -> },
+    onReviewGame: (List<String>, List<String>, List<String>, String?) -> Unit = { _, _, _, _ -> },
     model: DuckChessViewModel = viewModel(),
 ) {
     LaunchedEffect(settings) { model.apply(settings) }
@@ -77,7 +81,13 @@ fun DuckChessScreen(
         onDispose { model.pauseForBackground() }
     }
 
+    // Le menu d'export d'iOS, absent jusqu'ici de l'écran de jeu.
     TopBarActions {
+        ExportMenu(
+            fen = { ui.position.fen },
+            pgn = { model.exportedPgn() },
+            hasGame = ui.plies > 0,
+        )
         QuickSwitchMenu(onAnalyze = { onAnalyze(ui.position.fen) })
     }
 
@@ -154,7 +164,7 @@ fun DuckChessScreen(
                     }
                     Spacer(Modifier.weight(1f))
                     TextButton(
-                        onClick = { onReviewGame(model.analysisFens(), model.analysisMoves(), model.analysisSans()) },
+                        onClick = { onReviewGame(model.analysisFens(), model.analysisMoves(), model.analysisSans(), ui.pgnResult) },
                         enabled = model.analysisMoves().isNotEmpty(),
                         modifier = Modifier.testTag("analyser-la-partie"),
                     ) {
@@ -278,9 +288,7 @@ private fun DuckPlayerRow(ui: DuckUiState, top: Boolean) {
             // « vous » : c'est la couleur qui désigne le joueur.
             if (!ui.versusEngine) stringResource(
                 if (color == Piece.Color.white) R.string.color_white else R.string.color_black
-            ) else stringResource(
-                if (isEngine) R.string.variant_player_engine else R.string.variant_player_you
-            ),
+            ) else if (isEngine) stringResource(R.string.variant_player_engine) else PlayerName.you(LocalContext.current),
             fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
         )
         if (isEngine && ui.thinking) {

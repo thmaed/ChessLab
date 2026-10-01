@@ -92,6 +92,11 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
         val sanLog: List<String> = emptyList(),
         /** Le nom de la variante, pour le titre « Analyse — Horde ». */
         val variantName: String = "",
+        /**
+         * Le score au format PGN (« 1-0 »…), pour que l'export de la revue le
+         * porte comme celui d'iOS ; `null` si la partie n'est pas finie.
+         */
+        val result: String? = null,
     ) : Route(R.string.route_analysis) {
         override fun title(context: Context): String =
             if (variantName.isEmpty()) context.getString(titleRes)

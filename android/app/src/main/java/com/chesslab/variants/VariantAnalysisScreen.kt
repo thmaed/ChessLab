@@ -54,10 +54,12 @@ fun VariantAnalysisScreen(
     fenLog: List<String> = emptyList(),
     /** La notation, quand la partie l'a écrite en la jouant. */
     sanLog: List<String> = emptyList(),
+    /** Le score au format PGN, que l'export de la revue porte. */
+    result: String? = null,
     model: VariantAnalysisViewModel = viewModel(),
 ) {
     LaunchedEffect(variantId, startFen, uciLog, fenLog) {
-        model.load(variantId, startFen, uciLog, fenLog, sanLog)
+        model.load(variantId, startFen, uciLog, fenLog, sanLog, result)
     }
     val ui = model.ui
 

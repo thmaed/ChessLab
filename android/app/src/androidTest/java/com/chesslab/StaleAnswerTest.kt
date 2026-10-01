@@ -72,7 +72,11 @@ class StaleAnswerTest {
 
         Thread.sleep(6_000)
         compose.waitForIdle()
-        compose.onNodeWithTag("coups-joues").performClick()
+        // Sur grand écran la liste est déjà affichée et le bouton n'existe
+        // pas (comme sur iPad) : rien à ouvrir, on lit directement.
+        if (compose.onAllNodesWithTag("coups-joues").fetchSemanticsNodes().isNotEmpty()) {
+            compose.onNodeWithTag("coups-joues").performClick()
+        }
         compose.waitForIdle()
         assert(compose.onAllNodesWithTag("coup-0").fetchSemanticsNodes().isEmpty()) {
             "un coup est apparu tout seul dans la partie neuve"

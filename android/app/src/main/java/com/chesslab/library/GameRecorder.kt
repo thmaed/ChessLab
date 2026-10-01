@@ -1,6 +1,7 @@
 package com.chesslab.library
 
 import android.content.Context
+import com.chesslab.R
 import chesskit.Board
 import chesskit.Game
 import chesskit.Move
@@ -11,9 +12,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 /**
  * Tient la partie en cours sous forme de `Game`, et l'enregistre quand elle
@@ -32,9 +30,18 @@ class GameRecorder(startingPosition: Position = Position.standard) {
         cursor = game.make(move, from = cursor)
     }
 
+    /**
+     * Le résultat posé par [save] ; `null` tant que la partie n'est pas
+     * rangée. Les exports le lisent ici : une partie finie se partage avec son
+     * score, une partie en cours avec « * ».
+     */
+    var finalResult: String? = null
+        private set
+
     fun reset(startingPosition: Position = Position.standard, startFen: String? = null) {
         game = Game(startingPosition)
         cursor = game.startingIndex
+        finalResult = null
         if (startFen != null) {
             game.tags.setUp = "1"
             game.tags.fen = startFen
@@ -50,6 +57,13 @@ class GameRecorder(startingPosition: Position = Position.standard) {
      * les coups depuis la position standard et n'afficherait rien.
      */
     val pgn: String get() = game.pgn
+
+    /**
+     * Le PGN À PARTAGER pendant la partie : les sept balises du standard en
+     * plus — joueurs, date, et « * » tant que rien n'est joué jusqu'au bout.
+     * Voir [PgnExport].
+     */
+    fun pgn(metadata: PgnExport.Metadata): String = PgnExport.pgn(game, metadata)
 
     /**
      * Écrit la partie. `null` si elle est vide — une partie sans coup n'a rien
@@ -80,20 +94,28 @@ class GameRecorder(startingPosition: Position = Position.standard) {
             is Board.State.Draw -> "1/2-1/2"
             else -> "*"
         }
-        game.tags.white = white
-        game.tags.black = black
-        game.tags.result = result
-        game.tags.date = // Locale.ROOT : la date d'un PGN est une donnée, pas un texte
-        // affiché — elle ne doit pas suivre la langue de l'appareil.
-        SimpleDateFormat("yyyy.MM.dd", Locale.ROOT).format(Date())
-        game.tags.event = "ChessLab"
+        // Les balises portent les noms AFFICHÉS (le nom choisi, ou « Vous »
+        // dans la langue du jour) ; les colonnes de l'enregistrement, elles,
+        // gardent la sentinelle — c'est par elle que la progression sait de
+        // quel côté on jouait. Événement = le MODE, comme côté iOS.
+        val event = context.getString(
+            if (source == "twoPlayer") R.string.route_two_players else R.string.route_play
+        )
+        val metadata = PgnExport.Metadata(
+            event = event,
+            white = PlayerName.display(context, white, PlayerName.white(context)),
+            black = PlayerName.display(context, black, PlayerName.black(context)),
+            result = result,
+        )
+        val exported = PgnExport.pgn(game, metadata)
+        finalResult = result
 
         val record = GameRecord(
             playedAt = System.currentTimeMillis(),
             white = white, black = black, result = result,
             source = source, variant = variant,
             moveCount = moveCount,
-            pgn = game.pgn,
+            pgn = exported,
             opponentId = opponentId,
             engineElo = engineElo,
             engineColor = engineColor?.let { if (it == Piece.Color.white) "white" else "black" },

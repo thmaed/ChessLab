@@ -1,5 +1,8 @@
 package com.chesslab.variants
 
+import com.chesslab.library.PlayerName
+import androidx.compose.ui.platform.LocalContext
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -71,6 +74,7 @@ import com.chesslab.R
 import androidx.compose.ui.res.pluralStringResource
 import com.chesslab.ui.QuickSwitchMenu
 import com.chesslab.ui.TopBarActions
+import com.chesslab.ui.ExportMenu
 import androidx.compose.foundation.border
 import chesskit.Piece
 import chesskit.Square
@@ -264,7 +268,7 @@ fun VariantPlayScreen(
      */
     onAnalyze: (String) -> Unit = {},
     /** Revoir la partie AUX RÈGLES DE LA VARIANTE : l'analyse ordinaire ment ici. */
-    onReviewGame: (String, String?, List<String>) -> Unit = { _, _, _ -> },
+    onReviewGame: (String, String?, List<String>, String?) -> Unit = { _, _, _, _ -> },
     model: VariantPlayViewModel = viewModel(),
 ) {
     LaunchedEffect(variantId, chess960Number, twoPlayer, settings) {
@@ -282,7 +286,15 @@ fun VariantPlayScreen(
         onDispose { model.pauseForBackground() }
     }
 
+    // Le menu d'export d'iOS (copier la position, copier ou partager la
+    // partie) : il n'existait ici que sur la REVUE d'une variante, pas sur
+    // l'écran de jeu — on ne pouvait pas envoyer une partie en cours.
     TopBarActions {
+        ExportMenu(
+            fen = { model.ui.position.fen },
+            pgn = { model.exportedPgn() },
+            hasGame = model.ui.sanMoves.isNotEmpty(),
+        )
         QuickSwitchMenu(onAnalyze = { onAnalyze(model.ui.position.fen) })
     }
 
@@ -376,7 +388,7 @@ fun VariantPlayScreen(
                     }
                     Spacer(Modifier.weight(1f))
                     TextButton(
-                        onClick = { onReviewGame(ui.variant?.id ?: "", model.startFen(), ui.uciLog) },
+                        onClick = { onReviewGame(ui.variant?.id ?: "", model.startFen(), ui.uciLog, ui.pgnResult) },
                         enabled = ui.uciLog.isNotEmpty(),
                         modifier = Modifier.testTag("analyser-la-partie"),
                     ) {
@@ -491,9 +503,7 @@ private fun VariantPlayerRow(ui: VariantUiState, top: Boolean) {
             // « vous » : c'est la couleur qui désigne le joueur.
             if (ui.twoPlayer) stringResource(
                 if (color == Piece.Color.white) R.string.color_white else R.string.color_black
-            ) else stringResource(
-                if (isEngine) R.string.variant_player_engine else R.string.variant_player_you
-            ),
+            ) else if (isEngine) stringResource(R.string.variant_player_engine) else PlayerName.you(LocalContext.current),
             fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
         )
         if (isEngine && ui.thinking) {

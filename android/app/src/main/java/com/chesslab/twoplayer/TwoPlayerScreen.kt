@@ -195,12 +195,17 @@ fun TwoPlayerScreen(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
         if (isLandscape()) {
+            // L'échiquier prend son carré, le panneau ce qui reste — la règle
+            // du mode Jouer et d'iOS, plus le partage à parts égales. Voir
+            // [com.chesslab.ui.BoardLayout].
+            val panelWidth = com.chesslab.ui.BoardLayout
+                .panelWidth(maxWidth.value, maxHeight.value, gap = 0f).dp
             Row(Modifier.fillMaxSize().padding(vertical = 4.dp)) {
                 Box(Modifier.weight(1f).fillMaxHeight(), Alignment.Center) { board() }
                 Column(
-                    Modifier.weight(1f).fillMaxHeight().verticalScroll(rememberScrollState()),
+                    Modifier.width(panelWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
                 ) {
                     topZone()
                     Spacer(Modifier.height(6.dp))

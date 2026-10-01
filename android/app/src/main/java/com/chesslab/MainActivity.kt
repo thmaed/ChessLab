@@ -194,6 +194,7 @@ private fun App() {
                 uciLog = current.uciLog,
                 fenLog = current.fenLog,
                 sanLog = current.sanLog,
+                result = current.result,
             )
             Route.Analysis -> AnalysisEntryScreen(
                 onScan = { stack.add(Route.Scanner()) },
@@ -342,11 +343,12 @@ private fun App() {
             is Route.DuckGame -> com.chesslab.variants.DuckChessScreen(
                 settings = current.settings,
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
-                onReviewGame = { fens, moves, sans ->
+                onReviewGame = { fens, moves, sans, result ->
                     stack.add(
                         Route.VariantAnalysis(
                             "duck", fens.firstOrNull(), moves, fenLog = fens, sanLog = sans,
                             variantName = context.getString(R.string.variant_duck),
+                            result = result,
                         )
                     )
                 },
@@ -354,11 +356,12 @@ private fun App() {
             is Route.StolenMoveGame -> com.chesslab.variants.StolenMoveScreen(
                 settings = current.settings,
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
-                onReviewGame = { fens, moves, sans ->
+                onReviewGame = { fens, moves, sans, result ->
                     stack.add(
                         Route.VariantAnalysis(
                             "stolenmove", fens.firstOrNull(), moves, fenLog = fens, sanLog = sans,
                             variantName = context.getString(R.string.variant_stolen),
+                            result = result,
                         )
                     )
                 },
@@ -368,8 +371,8 @@ private fun App() {
                 chess960Number = current.chess960Number,
                 twoPlayer = current.twoPlayer,
                 settings = current.settings,
-                onReviewGame = { id, fen, log ->
-                    stack.add(Route.VariantAnalysis(id, fen, log, variantName = current.name))
+                onReviewGame = { id, fen, log, result ->
+                    stack.add(Route.VariantAnalysis(id, fen, log, variantName = current.name, result = result))
                 },
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
             )

@@ -59,6 +59,8 @@ data class DuckUiState(
     val blunderWarning: BlunderSeverity? = null,
     /** Le mot de la fin, quel qu'en soit le motif. */
     val outcome: String? = null,
+    /** Le score au format PGN une fois la partie finie — voir [DuckChessViewModel.exportedPgn]. */
+    val pgnResult: String? = null,
 ) {
     /** La partie est finie : roi pris, abandon, ou drapeau tombé. */
     val gameOver: Boolean get() = winner != null || outcome != null
@@ -123,7 +125,10 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
             } else {
                 s(if (flagged == humanColor) R.string.outcome_flag_you else R.string.outcome_flag_opponent)
             }
-            ui = ui.copy(outcome = word, status = word, phase = DuckPhase.over, hints = emptyList())
+            ui = ui.copy(
+                outcome = word, status = word, phase = DuckPhase.over, hints = emptyList(),
+                pgnResult = scoreFor(flagged.opposite),
+            )
         }
     }
 
@@ -134,6 +139,40 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
     fun analysisFens(): List<String> = fenLog.toList()
     fun analysisMoves(): List<String> = lanLog.toList()
     fun analysisSans(): List<String> = sanLog.toList()
+
+    private fun scoreFor(winner: Piece.Color?): String = when (winner) {
+        Piece.Color.white -> "1-0"
+        Piece.Color.black -> "0-1"
+        null -> "1/2-1/2"
+    }
+
+    /**
+     * La partie en PGN, notation du canard comprise (`e4@f6`). Pendant
+     * d'`exportedPGN` de `DuckChessViewModel.swift` : aucun lecteur externe ne
+     * connaît la variante, l'export sert à relire et à partager une partie, pas
+     * à la rejouer ailleurs. Sans moteur, ce sont les Blancs et les Noirs.
+     */
+    fun exportedPgn(): String {
+        val app = getApplication<Application>()
+        val you = com.chesslab.library.PlayerName.you(app)
+        val computer = com.chesslab.library.PlayerName.computer(app)
+        val (white, black) = when {
+            !versusEngine -> com.chesslab.library.PlayerName.white(app) to com.chesslab.library.PlayerName.black(app)
+            humanColor == Piece.Color.white -> you to computer
+            else -> computer to you
+        }
+        val tags = com.chesslab.library.PgnExport.tagLines(
+            event = "ChessLab ${s(R.string.variant_duck)}",
+            white = white, black = black, result = ui.pgnResult, variant = "duck",
+        )
+        val moves = StringBuilder()
+        sanLog.forEachIndexed { index, san ->
+            if (index % 2 == 0) moves.append("${index / 2 + 1}. ")
+            moves.append(san).append(' ')
+        }
+        ui.pgnResult?.let { moves.append(it) }
+        return tags.joinToString("\n") + "\n\n" + moves.toString().trim() + "\n"
+    }
 
     init { newGame() }
 
@@ -261,6 +300,7 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
                 legalTargets = emptySet(), duckTargets = emptySet(),
                 phase = DuckPhase.over, winner = victim.opposite, plies = ui.plies + 1,
                 status = word, outcome = word, hints = emptyList(),
+                pgnResult = scoreFor(victim.opposite),
             )
             return
         }
@@ -423,7 +463,10 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
         turn?.cancel()
         clock.stop()
         val word = phrase(color.opposite, R.string.reason_resignation)
-        ui = ui.copy(outcome = word, status = word, phase = DuckPhase.over, hints = emptyList())
+        ui = ui.copy(
+            outcome = word, status = word, phase = DuckPhase.over, hints = emptyList(),
+            pgnResult = scoreFor(color.opposite),
+        )
     }
 
     /**
@@ -472,7 +515,10 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
         turn?.cancel()
         clock.stop()
         val word = phrase(null, R.string.draw_agreement)
-        ui = ui.copy(outcome = word, status = word, phase = DuckPhase.over, hints = emptyList())
+        ui = ui.copy(
+            outcome = word, status = word, phase = DuckPhase.over, hints = emptyList(),
+            pgnResult = "1/2-1/2",
+        )
     }
 
     fun dismissDrawDeclined() { ui = ui.copy(drawDeclined = false) }

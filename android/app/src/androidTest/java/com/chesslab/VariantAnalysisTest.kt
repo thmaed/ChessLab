@@ -48,6 +48,38 @@ class VariantAnalysisTest {
         await { model.ui.evalCp != null || model.ui.evalMate != null }
     }
 
+    /**
+     * La courbe et la précision se COMPLÈTENT au fil de la passe, comme sur
+     * iOS où ce sont des propriétés calculées lues au cache — au lieu
+     * d'apparaître d'un coup à la fin. On guette un instant où la passe
+     * tourne et où la courbe est déjà là, mais pas encore entière.
+     */
+    @Test fun laRevueSeCompleteAuFilDeLaPasse() {
+        val model = VariantAnalysisViewModel(app)
+        val moves = listOf("e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "g8f6", "d2d3", "f8c5")
+        model.load("kingofthehill", null, moves)
+        await { model.ui.sanMoves.size == moves.size }
+        require(!model.ui.engineUnavailable) { "le moteur de variante n'a pas répondu" }
+
+        // La passe démarre d'elle-même au chargement ; on attend qu'elle tourne,
+        // puis on relève la taille de la courbe tant qu'elle tourne.
+        await { model.ui.classifying }
+        val seenWhileRunning = mutableSetOf<Int>()
+        await(240_000) {
+            val ui = model.ui
+            if (ui.classifying) seenWhileRunning += ui.curve.size
+            !ui.classifying
+        }
+        val final = model.ui.curve.size
+        require(final > 1) { "la passe n'a laissé aucune courbe" }
+        require(seenWhileRunning.any { it in 1 until final }) {
+            "la courbe n'est apparue qu'à la fin de la passe, d'un seul coup (vu : $seenWhileRunning, fin : $final)"
+        }
+        require(model.ui.accuracyWhite != null && model.ui.accuracyBlack != null) {
+            "la précision de chaque camp doit être là à la fin"
+        }
+    }
+
     /** Naviguer dans la partie change la position ET son évaluation. */
     @Test fun laNavigationRejoueChaquePosition() {
         val model = VariantAnalysisViewModel(app)

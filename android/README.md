@@ -215,23 +215,22 @@ laisser un fil détaché qui refuse le suivant. Le gain ne vaut pas ce risque-l�
 
 ## Ce qui reste
 
-- **Crazyhouse.** Fairy-Stockfish la connaît, mais elle demande de parachuter
-  les pièces prises : il y faut une réserve et un geste de pose. Sans eux, le
-  moteur jouerait des coups que l'utilisateur ne pourrait pas rendre.
-- **Rien sur le thermique** — et c'est une bonne nouvelle : vingt minutes de
-  Laboratoire en continu sur le Galaxy A16 n'ont fait passer la batterie que de
-  31,0 à 31,6 °C, les huit cœurs sont restés à pleine fréquence (2000-2200 MHz)
-  et la cadence n'a pas bougé (≈ 10 s par partie du début à la fin). iOS a un
-  `ThermalMonitor` qui réduit le budget en surchauffe ; sur ce téléphone-ci,
-  rien ne l'aurait déclenché. À revérifier sur un appareil plus contraint.
-- **L'AFFINAGE des verdicts limites.** iOS approfondit la recherche quand la
-  perte d'un coup tombe près d'un seuil (`RefinementStopRule`), pour ne jamais
-  afficher une étiquette qu'il retirerait ensuite. Android classe au budget
-  fixe : un coup pile à la frontière peut donc être jugé « imprécision » là où
-  iOS dirait « bon coup ». Les deux sont défendables ; ce n'est pas la même
-  chose.
-- **Les écrans d'analyse annexes d'iOS** : l'éditeur de tags PGN, la
-  bibliothèque de parties détaillée, la pastille de résultat.
+Relu contre le code le 01/10/2026. Les quatre manques que cette section listait
+sont tous comblés depuis — elle annonçait des écarts qui n'existaient plus :
+
+- **le Crazyhouse** se joue avec sa réserve et son geste de pose
+  (`CrazyhouseFen.kt`, la réserve dans `VariantPlayViewModel`) ;
+- **la surchauffe** est surveillée et l'app lève le pied d'elle-même
+  (`ThermalBadge.kt`, commit du 14/09) ;
+- **l'affinage des verdicts limites** est porté (`RefinementStopRule.kt`) :
+  un coup pile à une frontière ne reçoit plus une étiquette qu'iOS lui
+  retirerait ;
+- **les écrans d'analyse annexes** existent : bibliothèque filtrable avec ses
+  étiquettes, et pastille de résultat (`GameResultPill.kt`).
+
+Restent les écarts DÉCIDÉS, et eux seuls (voir `CLAUDE.md`) : pas d'iCloud —
+le transfert passe par un fichier `.clab` —, et pas d'échange de ce fichier
+avec iOS. La liste vivante des écarts à refermer est `PARITE.md`.
 
 ## Construire et tester
 

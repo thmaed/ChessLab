@@ -39,6 +39,15 @@ data class AppSettings(
     val pieceNotation: PieceNotation = PieceNotation.french,
     /** Les flèches du moteur en analyse — le réglage SURVIT à la fermeture. */
     val analysisArrowMode: String = "best",
+    /**
+     * Le nom sous lequel l'utilisateur joue : plaque de joueur, bibliothèque,
+     * balises `[White]`/`[Black]` des PGN exportés. Vide = « Vous » dans la
+     * langue active — voir [com.chesslab.library.PlayerName].
+     *
+     * Ajouté côté iOS le 28/09/2026 sur le retour d'un testeur qui cherchait
+     * comment signer ses parties ; porté ici par la règle des deux apps.
+     */
+    val playerName: String = "",
 )
 
 /** La langue dans laquelle un coup s'écrit. Pendant de `PieceNotation`. */
@@ -62,6 +71,23 @@ object SettingsStore {
     private val keyHaptics = booleanPreferencesKey("hapticsEnabled")
     private val keyNotation = stringPreferencesKey("pieceNotation")
     private val keyArrowMode = stringPreferencesKey("analysisArrowMode")
+    private val keyPlayerName = stringPreferencesKey("playerName")
+
+    /** Longueur maximale retenue pour le nom du joueur, comme sur iOS. */
+    const val PLAYER_NAME_MAX_LENGTH = 40
+
+    /**
+     * Rend un nom utilisable TEL QUEL dans une balise PGN : sans guillemet (qui
+     * fermerait la balise), sans crochet, sans saut de ligne, borné.
+     *
+     * Les espaces, eux, ne se coupent qu'à la LECTURE ([com.chesslab.library.PlayerName.you]) :
+     * les rogner ici avalerait l'espace d'un prénom composé pendant la frappe.
+     * Même règle que `AppSettings.sanitizedPlayerName` côté iOS.
+     */
+    fun sanitizedPlayerName(raw: String): String =
+        raw.replace(Regex("[\\r\\n\\t]"), " ")
+            .replace(Regex("[\"\\[\\]]"), "")
+            .take(PLAYER_NAME_MAX_LENGTH)
 
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val _state = MutableStateFlow(AppSettings())
@@ -81,6 +107,7 @@ object SettingsStore {
                     pieceNotation = if (prefs[keyNotation] == "english") PieceNotation.english
                     else PieceNotation.french,
                     analysisArrowMode = prefs[keyArrowMode] ?: "best",
+                    playerName = sanitizedPlayerName(prefs[keyPlayerName] ?: ""),
                 )
             }.collect { _state.value = it }
         }
@@ -100,4 +127,15 @@ object SettingsStore {
     fun setPieceNotation(context: Context, notation: PieceNotation) =
         update(context) { it[keyNotation] = notation.name }
     fun setArrowMode(context: Context, mode: String) = update(context) { it[keyArrowMode] = mode }
+
+    /**
+     * Pose le nom, nettoyé. L'état en mémoire suit TOUT DE SUITE, sans
+     * attendre le tour du magasin : un champ de saisie lié à un état qui
+     * revient en différé perdrait des frappes.
+     */
+    fun setPlayerName(context: Context, name: String) {
+        val cleaned = sanitizedPlayerName(name)
+        _state.value = _state.value.copy(playerName = cleaned)
+        update(context) { it[keyPlayerName] = cleaned }
+    }
 }

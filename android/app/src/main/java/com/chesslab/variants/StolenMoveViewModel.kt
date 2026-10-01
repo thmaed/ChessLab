@@ -37,6 +37,8 @@ data class StolenMoveUiState(
     val tokenInterval: Int = StolenMoveRules.defaultTokenInterval,
     val thinking: Boolean = false,
     val outcome: String? = null,
+    /** Le score au format PGN une fois la partie finie — voir [StolenMoveViewModel.exportedPgn]. */
+    val pgnResult: String? = null,
     /** Ce qui a été réglé avant de commencer. */
     val settings: VariantSettings = VariantSettings(),
     /** Le camp de l'utilisateur : le plateau se retourne avec lui. */
@@ -80,6 +82,9 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
     private val fenLog = ArrayList<String>()
     private val lanLog = ArrayList<String>()
 
+    /** Pour chaque coup joué : a-t-il ouvert un tour double ? L'export l'annote `[jeton]`. */
+    private val tokenSpendLog = ArrayList<Boolean>()
+
     private var evalJob: Job? = null
     private var hintJob: Job? = null
 
@@ -92,7 +97,10 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
             val word = s(
                 if (flagged == humanColor) R.string.outcome_flag_you else R.string.outcome_flag_opponent
             )
-            ui = ui.copy(outcome = word, status = word, hints = emptyList())
+            ui = ui.copy(
+                outcome = word, status = word, hints = emptyList(),
+                pgnResult = scoreFor(flagged.opposite),
+            )
         }
     }
     /**
@@ -139,6 +147,7 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
         enPassantAtTurnStart = null
         fenLog.clear()
         lanLog.clear()
+        tokenSpendLog.clear()
         fenLog += board.position.fen
         lastEngineEvalCp = null
         val settings = ui.settings
@@ -249,6 +258,7 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
 
         board = working
         lanLog += from.notation + to.notation
+        tokenSpendLog += spends
         publish(
             tokens = tokens, awaiting = awaiting, lastMove = from to to,
             san = ui.sanMoves + move.san,
@@ -289,6 +299,12 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
             awaitingSecondMoveBy = awaiting, wantsToSpend = false,
             checkedKing = (state as? Board.State.Check)?.let { kingSquare(position, it.color) },
             outcome = outcome,
+            pgnResult = when (state) {
+                // `state.color` est le camp MATÉ : c'est l'autre qui gagne.
+                is Board.State.Checkmate -> scoreFor(state.color.opposite)
+                is Board.State.Draw -> "1/2-1/2"
+                else -> null
+            },
             status = when {
                 outcome != null -> outcome
                 awaiting != null -> s(R.string.stolen_second_move)
@@ -462,6 +478,38 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
         return cp to mate
     }
 
+    private fun scoreFor(winner: Piece.Color?): String = when (winner) {
+        Piece.Color.white -> "1-0"
+        Piece.Color.black -> "0-1"
+        null -> "1/2-1/2"
+    }
+
+    /**
+     * La partie en PGN. Pendant d'`exportedPGN` de `StolenMovePlayViewModel.swift` :
+     * deux coups d'affilée pour le MÊME camp cassent la numérotation « blanc
+     * puis noir », et sont annotés `[jeton]` plutôt que silencieusement mal
+     * numérotés. Ce PGN ne prétend pas être rejouable ailleurs.
+     */
+    fun exportedPgn(): String {
+        val app = getApplication<Application>()
+        val you = com.chesslab.library.PlayerName.you(app)
+        val computer = com.chesslab.library.PlayerName.computer(app)
+        val (white, black) = if (humanColor == Piece.Color.white) you to computer else computer to you
+        val tags = com.chesslab.library.PgnExport.tagLines(
+            event = "ChessLab ${s(R.string.variant_stolen)}",
+            white = white, black = black, result = ui.pgnResult, variant = "stolenmove",
+        )
+        val moves = StringBuilder()
+        ui.sanMoves.forEachIndexed { index, san ->
+            if (index % 2 == 0) moves.append("${index / 2 + 1}. ")
+            moves.append(san)
+            if (tokenSpendLog.getOrNull(index) == true) moves.append(" [jeton]")
+            moves.append(' ')
+        }
+        ui.pgnResult?.let { moves.append(it) }
+        return tags.joinToString("\n") + "\n\n" + moves.toString().trim() + "\n"
+    }
+
     // MARK: Abandon et nulle
 
     fun resign() {
@@ -469,7 +517,10 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
         turn?.cancel()
         clock.stop()
         val word = s(R.string.outcome_resigned)
-        ui = ui.copy(outcome = word, status = word, hints = emptyList())
+        ui = ui.copy(
+            outcome = word, status = word, hints = emptyList(),
+            pgnResult = scoreFor(humanColor.opposite),
+        )
     }
 
     /**
@@ -487,7 +538,7 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
         turn?.cancel()
         clock.stop()
         val word = s(R.string.outcome_draw_agreed)
-        ui = ui.copy(outcome = word, status = word, hints = emptyList())
+        ui = ui.copy(outcome = word, status = word, hints = emptyList(), pgnResult = "1/2-1/2")
     }
 
     fun dismissDrawDeclined() { ui = ui.copy(drawDeclined = false) }

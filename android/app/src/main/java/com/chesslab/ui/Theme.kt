@@ -39,7 +39,13 @@ object Palette {
  */
 data class BoardTheme(
     val id: String,
-    val label: String,
+    /**
+     * Le nom, en RESSOURCE : il était écrit en dur en français, si bien que
+     * l'écran des réglages disait « Classique, Bleu, Noyer » au milieu d'une
+     * interface anglaise — là où iOS dit « Classic, Blue, Walnut ». Les
+     * traductions existaient déjà dans `strings_app.xml`, inutilisées.
+     */
+    @androidx.annotation.StringRes val labelRes: Int,
     val lightSquare: Color,
     val darkSquare: Color,
     val lastMoveLight: Color,
@@ -51,7 +57,7 @@ data class BoardTheme(
 ) {
     companion object {
         val classic = BoardTheme(
-            id = "classic", label = "Classique",
+            id = "classic", labelRes = com.chesslab.R.string.theme_classic,
             lightSquare = Color(0.93f, 0.90f, 0.82f),
             darkSquare = Color(0.46f, 0.59f, 0.34f),
             lastMoveLight = Color(0.98f, 0.90f, 0.45f, 0.85f),
@@ -63,7 +69,7 @@ data class BoardTheme(
         )
 
         val walnut = classic.copy(
-            id = "walnut", label = "Noyer",
+            id = "walnut", labelRes = com.chesslab.R.string.theme_walnut,
             lightSquare = Color(0.87f, 0.72f, 0.53f),
             darkSquare = Color(0.55f, 0.36f, 0.20f),
             lastMoveLight = Color(0.96f, 0.80f, 0.35f, 0.85f),
@@ -71,7 +77,7 @@ data class BoardTheme(
         )
 
         val blue = classic.copy(
-            id = "blue", label = "Bleu",
+            id = "blue", labelRes = com.chesslab.R.string.theme_blue,
             lightSquare = Color(0.86f, 0.89f, 0.92f),
             darkSquare = Color(0.42f, 0.55f, 0.69f),
             lastMoveLight = Color(0.62f, 0.82f, 0.96f, 0.85f),
@@ -79,7 +85,7 @@ data class BoardTheme(
         )
 
         val contrast = BoardTheme(
-            id = "contrast", label = "Contraste",
+            id = "contrast", labelRes = com.chesslab.R.string.theme_contrast,
             lightSquare = Color(0.96f, 0.96f, 0.93f),
             darkSquare = Color(0.20f, 0.24f, 0.31f),
             lastMoveLight = Color(0.99f, 0.85f, 0.32f, 0.90f),

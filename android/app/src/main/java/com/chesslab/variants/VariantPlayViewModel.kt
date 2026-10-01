@@ -69,6 +69,12 @@ data class VariantUiState(
     /** Le mot de la fin : « Échec et mat — vous gagnez », « Abandon »… */
     val outcome: String? = null,
     /**
+     * Le score au format PGN (« 1-0 », « 0-1 », « 1/2-1/2 ») une fois la
+     * partie finie ; `null` tant qu'elle court. [outcome] est une PHRASE, et
+     * l'export a besoin du chiffre.
+     */
+    val pgnResult: String? = null,
+    /**
      * Les échecs DONNÉS par chaque camp, au Trois Échecs — la ressource qui
      * décide la partie, comme le temps sur une pendule. Lus dans la FEN du
      * moteur, qui tient le décompte ; vides ailleurs.
@@ -87,6 +93,9 @@ data class VariantUiState(
 class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
 
     private var startFen: String? = null
+
+    /** La position de départ telle que le moteur l'a rendue — voir [exportedPgn]. */
+    private var firstFen: String? = null
 
     /**
      * La position d'où repart la ligne courante, pour la revoir.
@@ -121,7 +130,10 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
                 if (flagged == humanColor || ui.twoPlayer) R.string.outcome_flag_you
                 else R.string.outcome_flag_opponent
             )
-            ui = ui.copy(gameOver = true, status = word, outcome = word, hints = emptyList())
+            ui = ui.copy(
+                gameOver = true, status = word, outcome = word, hints = emptyList(),
+                pgnResult = scoreFor(winner = flagged.opposite),
+            )
         }
     }
 
@@ -154,7 +166,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         clock.reset(settings.timeControl)
         ui = ui.copy(
             variant = variant, uciLog = emptyList(), sanMoves = emptyList(),
-            gameOver = false, ready = false,
+            gameOver = false, ready = false, pgnResult = null,
             status = s(R.string.engine_starting), lastMove = null,
             twoPlayer = twoPlayer || settings.twoPlayers, chess960Number = number,
             settings = settings, userColor = humanColor,
@@ -187,7 +199,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         startFen = startingFen(variant, ui.chess960Number)
         clock.reset(ui.settings.timeControl)
         ui = ui.copy(
-            uciLog = emptyList(), sanMoves = emptyList(), gameOver = false, lastMove = null, plies = 0,
+            uciLog = emptyList(), sanMoves = emptyList(), gameOver = false, lastMove = null, plies = 0, pgnResult = null,
             whiteClockMs = clock.remaining(Piece.Color.white),
             blackClockMs = clock.remaining(Piece.Color.black),
             evalCp = null, evalMate = null, hints = emptyList(), blunderWarning = null,
@@ -258,6 +270,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         legal = if (variant.wallsMove) BarricadesConfiguration.removingWallCaptures(answer.legalMoves, answer.fen)
         else answer.legalMoves
         val position = parse(answer.fen) ?: Position.standard
+        if (ui.uciLog.isEmpty()) firstFen = answer.fen
         val pocket = CrazyhouseFen.pocket(answer.fen)
 
         // La notation du coup qu'on vient de jouer. On ne l'ajoute qu'une fois
@@ -306,6 +319,9 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
             sanMoves = sans,
             checksGiven = ThreeCheckFen.given(answer.fen),
             gameOver = over,
+            // Plus de coup légal sans verdict de la variante : c'est le pat
+            // ordinaire, donc nulle.
+            pgnResult = if (over) scoreFor(verdict?.winner) else null,
             ready = true,
             status = when {
                 over -> verdictText ?: s(R.string.game_over)
@@ -452,7 +468,11 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         if (ui.gameOver) return
         clock.stop()
         val word = s(R.string.outcome_resigned)
-        ui = ui.copy(gameOver = true, status = word, outcome = word, hints = emptyList())
+        val loser = if (ui.twoPlayer) ui.position.sideToMove else humanColor
+        ui = ui.copy(
+            gameOver = true, status = word, outcome = word, hints = emptyList(),
+            pgnResult = scoreFor(winner = loser.opposite),
+        )
     }
 
     /**
@@ -469,7 +489,10 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         }
         clock.stop()
         val word = s(R.string.outcome_draw_agreed)
-        ui = ui.copy(gameOver = true, status = word, outcome = word, hints = emptyList())
+        ui = ui.copy(
+            gameOver = true, status = word, outcome = word, hints = emptyList(),
+            pgnResult = "1/2-1/2",
+        )
     }
 
     fun dismissDrawDeclined() { ui = ui.copy(drawDeclined = false) }
@@ -597,6 +620,48 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         if (fields.size < 4) return null
         val six = fields.take(4) + listOf(fields.getOrNull(4) ?: "0", fields.getOrNull(5) ?: "1")
         return FenParser.parse(six.joinToString(" "))
+    }
+
+    private fun scoreFor(winner: Piece.Color?): String = when (winner) {
+        Piece.Color.white -> "1-0"
+        Piece.Color.black -> "0-1"
+        null -> "1/2-1/2"
+    }
+
+    /**
+     * La partie en PGN, pour le menu d'export de l'écran de jeu. Pendant
+     * d'`exportedPGN` des écrans de variante iOS : les sept balises du
+     * standard (voir [com.chesslab.library.PgnExport.tagLines]), puis
+     * `Variant`, et la position de départ quand elle n'est pas l'ordinaire —
+     * Chess960, Horde, Course des rois, Barricades.
+     */
+    fun exportedPgn(): String {
+        val app = getApplication<Application>()
+        val variant = ui.variant ?: return ""
+        val you = com.chesslab.library.PlayerName.you(app)
+        val computer = com.chesslab.library.PlayerName.computer(app)
+        val (white, black) = when {
+            ui.twoPlayer -> com.chesslab.library.PlayerName.white(app) to com.chesslab.library.PlayerName.black(app)
+            humanColor == Piece.Color.white -> you to computer
+            else -> computer to you
+        }
+        val tags = com.chesslab.library.PgnExport.tagLines(
+            event = "ChessLab ${app.getString(variant.titleRes)}",
+            white = white, black = black,
+            result = ui.pgnResult,
+            variant = variant.id,
+            // Comme iOS : Chess960, Horde et Course des rois déclarent leur
+            // position de départ, qu'un autre logiciel ne devinerait pas.
+            startFen = if (variant.chess960 || variant.id == "horde" || variant.id == "racingkings")
+                startFen ?: firstFen else null,
+        )
+        val moves = StringBuilder()
+        ui.sanMoves.forEachIndexed { index, san ->
+            if (index % 2 == 0) moves.append("${index / 2 + 1}. ")
+            moves.append(san).append(' ')
+        }
+        ui.pgnResult?.let { moves.append(it) }
+        return tags.joinToString("\n") + "\n\n" + moves.toString().trim() + "\n"
     }
 
     private companion object {

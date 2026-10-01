@@ -1,5 +1,8 @@
 package com.chesslab.play
 
+import com.chesslab.library.PlayerName
+import com.chesslab.library.PgnExport
+
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -897,7 +900,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             announce(
                 com.chesslab.ui.MoveNarration.announcement(
                     getApplication(),
-                    if (it.piece.color == humanColor) s(R.string.you) else opponentName(),
+                    if (it.piece.color == humanColor) PlayerName.you(getApplication()) else opponentName(),
                     it.san,
                 )
             )
@@ -1238,7 +1241,14 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      * Le PGN de la partie en cours, pour « Analyser » : la bibliothèque ne
      * l'a pas encore quand la partie vient tout juste de se terminer.
      */
-    fun currentPgn(): String = recorder.pgn
+    /**
+     * Le PGN à partager ou à analyser, EN-TÊTES COMPRISES : les sept balises
+     * du standard, donc les joueurs, la date et le résultat (« * » tant que la
+     * partie court). Le PGN nu de `recorder.pgn` ne portait que les coups.
+     */
+    fun currentPgn(): String = recorder.pgn(
+        PgnExport.Metadata.vsEngine(getApplication(), humanColor, opponentName(), recorder.finalResult)
+    )
 
     fun reviewPrevious() = review(ui.displayedPly - 1)
 

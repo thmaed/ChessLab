@@ -147,7 +147,10 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
          * saurait ni rejouer leur partie ni la noter. Vide : on l'écrit ici.
          */
         sanLog: List<String> = emptyList(),
+        /** Le score au format PGN, pour l'export ; `null` si la partie n'est pas finie. */
+        result: String? = null,
     ) {
+        this.result = result
         if (this.variantId == variantId && this.uciLog == uciLog && fens.isNotEmpty()) return
         this.variantId = variantId
         this.startFen = startFen
@@ -407,19 +410,26 @@ class VariantAnalysisViewModel(app: Application) : AndroidViewModel(app) {
      * illégale au premier coup.
      */
     fun exportedPgn(): String {
-        val lines = mutableListOf(
-            """[Event "ChessLab ${ui.variantName}"]""",
-            """[Variant "$variantId"]""",
-            """[SetUp "1"]""",
-            """[FEN "${startFen ?: fens.firstOrNull() ?: ""}"]""",
+        // Les sept balises du standard d'abord, comme partout (voir
+        // PgnExport.tagLines). Une partie relue : ses joueurs ne sont pas
+        // connus ici, et « ? » est ce que le standard réserve à l'inconnu.
+        val lines = com.chesslab.library.PgnExport.tagLines(
+            event = "ChessLab ${ui.variantName}",
+            white = "?", black = "?", result = result,
+            variant = variantId,
+            startFen = (startFen ?: fens.firstOrNull())?.takeIf { it.isNotBlank() },
         )
         val moves = StringBuilder()
         ui.sanMoves.forEachIndexed { index, san ->
             if (index % 2 == 0) moves.append("${index / 2 + 1}. ")
             moves.append(san).append(" ")
         }
+        result?.let { moves.append(it) }
         return lines.joinToString("\n") + "\n\n" + moves.toString().trim() + "\n"
     }
+
+    /** Le score de la partie revue, quand l'écran de jeu l'a transmis. */
+    private var result: String? = null
 
     /** Le MÊME format que l'analyse orthodoxe, et que celui d'iOS. */
     private fun scoreText(cp: Int?, mate: Int?): String = when {

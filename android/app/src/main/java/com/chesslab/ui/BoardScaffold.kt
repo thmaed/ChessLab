@@ -2,6 +2,8 @@ package com.chesslab.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -50,16 +52,21 @@ fun BoardScaffold(
     panel: @Composable ColumnScope.() -> Unit,
 ) {
     if (isLandscape()) {
-        Row(modifier.fillMaxSize().padding(horizontal = 16.dp)) {
-            Box(Modifier.weight(1f).fillMaxSize(), Alignment.Center) { board() }
-            Spacer(Modifier.width(12.dp))
-            Column(
-                Modifier.weight(1f).fillMaxSize().verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.Top,
-            ) {
-                header()
-                panel()
-                Spacer(Modifier.height(24.dp))
+        // Le partage n'est plus à parts égales : l'échiquier prend son carré,
+        // le panneau prend ce qui reste — voir [BoardLayout].
+        BoxWithConstraints(modifier.fillMaxSize().padding(horizontal = 16.dp)) {
+            val panelWidth = BoardLayout.panelWidth(maxWidth.value, maxHeight.value, gap = 12f).dp
+            Row(Modifier.fillMaxSize()) {
+                Box(Modifier.weight(1f).fillMaxHeight(), Alignment.Center) { board() }
+                Spacer(Modifier.width(12.dp))
+                Column(
+                    Modifier.width(panelWidth).fillMaxHeight().verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.Top,
+                ) {
+                    header()
+                    panel()
+                    Spacer(Modifier.height(24.dp))
+                }
             }
         }
     } else {

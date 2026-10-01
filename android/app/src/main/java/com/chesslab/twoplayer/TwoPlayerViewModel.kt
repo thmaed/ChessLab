@@ -1,5 +1,7 @@
 package com.chesslab.twoplayer
 
+import com.chesslab.library.PgnExport
+
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -506,7 +508,12 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
     // MARK: Consultation
 
     /** Le PGN de la partie en cours, pour « Analyser » et pour l'export. */
-    fun currentPgn(): String = recorder.pgn
+    /** Le PGN à partager ou à analyser, en-têtes comprises — voir `PlayViewModel.currentPgn`. */
+    fun currentPgn(): String = recorder.pgn(
+        PgnExport.Metadata.twoPlayer(
+            getApplication(), ui.settings.whiteName, ui.settings.blackName, recorder.finalResult,
+        )
+    )
 
     /** La FEN de la position AFFICHÉE : en consultation, celle sous les yeux. */
     fun displayedFen(): String = ui.position.fen

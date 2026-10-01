@@ -366,6 +366,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="scan_unreadable">Unreadable image</string>
     <string name="settings_board_sounds">Board sounds</string>
     <string name="settings_board_theme">Board theme</string>
+    <string name="settings_player_name">Your name</string>
+    <string name="settings_player_name_hint">It shows on your player plate, in the library and in the PGN tags of the games you export. Leave it empty for “You”.</string>
     <string name="settings_language">Language</string>
     <string name="settings_language_en">English</string>
     <string name="settings_language_fr">Français</string>
@@ -384,7 +386,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="stockfish">Stockfish</string>
     <string name="theme_blue">Blue</string>
     <string name="theme_classic">Classic</string>
-    <string name="theme_contrast">Contrast</string>
+    <string name="theme_contrast">High contrast</string>
     <string name="theme_discovered">Discovered attack</string>
     <string name="theme_endgame">Endgame</string>
     <string name="theme_fork">Fork</string>
@@ -1009,6 +1011,10 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="library_delete_selected">Delete (%1$d)</string>
     <string name="library_accuracy">Accuracy %1$d%% / %2$d%%</string>
     <string name="save">Save</string>
+    <plurals name="library_duplicates">
+        <item quantity="one">%d already there, not imported again.</item>
+        <item quantity="other">%d already there, not imported again.</item>
+    </plurals>
     <plurals name="library_imported">
         <item quantity="one">%d game imported.</item>
         <item quantity="other">%d games imported.</item>

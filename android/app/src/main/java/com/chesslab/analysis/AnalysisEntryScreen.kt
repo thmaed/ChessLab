@@ -222,6 +222,12 @@ private suspend fun addToLibrary(dao: com.chesslab.library.GameDao, text: String
         val plies = parsed.moves.indices
             .count { it.variation == chesskit.MoveTree.Index.MAIN_VARIATION }
         if (plies == 0) return
+        // Analyser cinq fois la même partie collée ne doit pas la ranger cinq
+        // fois : iOS passe ici par le même dédoublonnage que l'import.
+        val signature = com.chesslab.library.GameSignature.of(pgn)
+        if (signature != null &&
+            dao.allOnce().any { com.chesslab.library.GameSignature.of(it.pgn) == signature }
+        ) return
         dao.insert(
             com.chesslab.library.GameRecord(
                 playedAt = System.currentTimeMillis(),
