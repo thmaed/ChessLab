@@ -267,7 +267,8 @@ struct PlayView: View {
     /// autrement il dépasse l'écran et pousse pendules et contrôles sous le
     /// pli (finding #6, déjà corrigé une fois).
     private func iPadWideLayout(size: CGSize) -> some View {
-        HStack(alignment: .center, spacing: 0) {
+        let clocksBeside = Self.clocksBesideBoard(in: size)
+        return HStack(alignment: .center, spacing: 0) {
             // Colonne plateau, BORD À BORD : elle touche les bords haut, bas et
             // gauche de l'écran ; seules les fines lignes joueurs le bordent.
             // C'est le seul élément dont chaque point de taille compte (64
@@ -275,12 +276,12 @@ struct PlayView: View {
             // la colonne de droite qui reste un panneau confortablement margé.
             VStack(spacing: 6) {
                 ThermalBadge()
-                topClock
+                if !clocksBeside { topClock }
                 board
                     // Le plateau se sert en premier et prend toute la hauteur
                     // laissée par les pendules.
                     .layoutPriority(1)
-                bottomClock
+                if !clocksBeside { bottomClock }
             }
             // Carré, donc borné à la hauteur : au-delà il déborderait
             // verticalement. Et borné par ce que le panneau lui laisse, pour
@@ -301,24 +302,47 @@ struct PlayView: View {
             // colonne, abandon collé au bord droit de l'écran, « Coups joués »
             // flottant entre les deux. Le poste de jeu reste un bloc compact,
             // quelle que soit la fenêtre.
-            ScrollView {
-                VStack(spacing: 16) {
-                    if viewModel.settings.showEvalBar {
-                        EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
+            VStack(spacing: 12) {
+                // Plaques à côté du plateau (voir ``clocksBesideBoard(in:)``) :
+                // l'adversaire en haut, soi en bas, comme sur l'échiquier.
+                if clocksBeside { topClock }
+                ScrollView {
+                    VStack(spacing: 16) {
+                        if viewModel.settings.showEvalBar {
+                            EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
+                        }
+                        if viewModel.outcome == nil {
+                            controlBar(showMoveList: false)
+                        } else {
+                            gameOverPanel
+                        }
+                        movesSection
                     }
-                    if viewModel.outcome == nil {
-                        controlBar(showMoveList: false)
-                    } else {
-                        gameOverPanel
-                    }
-                    movesSection
+                    .frame(maxWidth: .infinity)
+                    .padding(clocksBeside ? .horizontal : .all, 20)
                 }
-                .frame(maxWidth: .infinity)
-                .padding(20)
+                if clocksBeside { bottomClock }
             }
+            .padding(.vertical, clocksBeside ? 12 : 0)
+            .padding(.horizontal, clocksBeside ? 12 : 0)
             .frame(width: Self.panelWidth(in: size))
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
+    /// Ce que les deux plaques joueurs (et leurs espacements) prennent à la
+    /// hauteur de la colonne plateau.
+    static let clocksHeight: CGFloat = 88
+
+    /// Les plaques joueurs passent dans la colonne de droite quand c'est la
+    /// HAUTEUR qui borne le plateau : elles lui prenaient ~88 pt pour rien,
+    /// alors que la colonne avait de la largeur à revendre. Sur l'iPhone Duo
+    /// ouvert, barre latérale repliée (13/10/2026) : plateau de ~463 pt avec
+    /// les plaques dessus/dessous, ~527 pt avec les plaques à côté. Quand
+    /// c'est la largeur qui borne — l'iPad en paysage, barre latérale ouverte
+    /// —, rien ne change : déplacer les plaques n'y gagnerait rien.
+    static func clocksBesideBoard(in size: CGSize) -> Bool {
+        size.height - clocksHeight < size.width - panelWidth(in: size)
     }
 
     /// Largeur de la colonne de droite, en paysage.

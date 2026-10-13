@@ -15,15 +15,41 @@ struct EndgameFreeTrainView: View {
     private var boardTheme: BoardTheme { appSettings.boardTheme }
 
     var body: some View {
-        VStack(spacing: 14) {
-            header
-            boardSquare
-                .padding(.horizontal, 16)
-            statusPanel
-            Spacer(minLength: 0)
+        GeometryReader { geo in
+            if BoardPanelLayout.usesSidePanel(in: geo.size) {
+                // Place nettement plus large que haute (l'iPhone Duo ouvert,
+                // une fenêtre Mac) : plateau à gauche sur toute la hauteur,
+                // objectif et état à droite. Même seuil que ``BoardWithPanel``.
+                HStack(alignment: .top, spacing: BoardPanelLayout.gap) {
+                    boardSquare
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    VStack(spacing: 14) {
+                        header
+                        statusPanel
+                        Spacer(minLength: 0)
+                    }
+                    .frame(width: BoardPanelLayout.panelWidth(in: geo.size))
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 12)
+            } else {
+                VStack(spacing: 14) {
+                    header
+                    boardSquare
+                        .padding(.horizontal, 16)
+                    statusPanel
+                    Spacer(minLength: 0)
+                }
+                .padding(.top, 12)
+                .padding(.bottom, 12)
+                // Toute la largeur : la pile n'est pas plus large que son
+                // plateau quand c'est la hauteur qui le borne, et le fond posé
+                // dessous laissait alors deux bandes noires de part et d'autre
+                // (vu sur le Duo ouvert, le 13/10/2026 ; vrai aussi sur iPad
+                // en paysage).
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            }
         }
-        .padding(.top, 12)
-        .padding(.bottom, 12)
         .appBackground()
         .navigationTitle(LocalizedStringKey(viewModel.course.name))
         .navigationBarTitleDisplayMode(.inline)

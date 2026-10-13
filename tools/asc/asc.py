@@ -10,6 +10,7 @@ Commandes :
                  URLs, en FR et EN — lus dans AppStoreSubmission/METADATA.md
     screenshots  remplace les captures des deux formats (iPhone 6,7", iPad 13")
     previews     remplace les aperçus vidéo des deux formats
+    duo          captures et aperçus iPhone Duo (API « asset library »)
     build        attend que le build soit traité par Apple, l'affiche
     attach       rattache le build à la version
     review       notes pour la révision (et « pas de compte de démonstration »)
@@ -45,6 +46,16 @@ PREVIEW_SETS = {
     "IPHONE_65": ["iphone-classic-puzzle.mov", "iphone-variants.mov"],
     "IPAD_PRO_3GEN_129": ["ipad-classic-puzzle.mov", "ipad-variants.mov"],
 }
+# iPhone Duo (13/10/2026) : ce format n'existe PAS dans l'ancienne API des
+# jeux de captures (`screenshotDisplayType` n'a aucune valeur Duo). Il passe
+# par l'« asset library » de l'app : chaque fichier y est déposé une fois,
+# puis « placé » sur la localisation de la version. Le groupe de placement
+# (IPHONE_DUO_PROFILE) découle des dimensions du fichier : 2853 × 2007 /
+# 2007 × 2853 pour l'écran intérieur, 2034 × 1398 / 1398 × 2034 pour
+# l'extérieur ; aperçus en 1920 × 886 / 886 × 1920, 15 à 30 s.
+DUO_SCREENSHOTS = SUBMISSION / "screenshots" / "iphone-duo" / "en"
+DUO_PREVIEWS = ["duo-inner-tour.mov", "duo-outer-tour.mov"]
+
 # Les langues de la fiche : le français, et l'anglais du ROYAUME-UNI — c'est
 # celui que la fiche a depuis l'origine ; un « en-US » neuf est refusé parce
 # que le nom « ChessLab » y est déjà pris par une autre app.
@@ -393,6 +404,92 @@ def cmd_previews(c, args):
             print(f"  {locale} {preview_type}: {len(files)} aperçu(s)")
 
 
+def library_upload(c, kind, library_id, path, reference):
+    """Dépose un fichier dans l'asset library : réservation, téléversement
+    par morceaux, confirmation."""
+    data = path.read_bytes()
+    reservation = c.post(f"/{kind}", {
+        "type": kind,
+        "attributes": {"category": "APP_SCREENSHOTS_AND_PREVIEWS", "fileName": path.name,
+                       "fileSize": len(data), "referenceName": reference},
+        "relationships": {"assetLibrary": rel("appAssetLibraries", library_id)},
+    })["data"]
+    for op in reservation["attributes"].get("uploadOperations") or []:
+        headers = {h["name"]: h["value"] for h in op.get("requestHeaders", [])}
+        chunk = data[op["offset"]: op["offset"] + op["length"]]
+        r = requests.request(op["method"], op["url"], headers=headers, data=chunk, timeout=600)
+        if r.status_code >= 400:
+            sys.exit(f"téléversement de {path.name} : {r.status_code} {r.text[:200]}")
+    c.patch(f"/{kind}/{reservation['id']}", {
+        "type": kind, "id": reservation["id"], "attributes": {"uploaded": True},
+    })
+    return reservation["id"]
+
+
+def wait_library(c, kind, ids, label):
+    """Attend la fin du traitement d'Apple ; s'arrête net sur FAILED."""
+    pending = set(ids)
+    deadline = time.time() + 900
+    while pending and time.time() < deadline:
+        for id_ in list(pending):
+            a = c.get(f"/{kind}/{id_}")["data"]["attributes"]
+            if a["state"] == "FAILED":
+                sys.exit(f"{label} {id_} refusé par Apple : {a.get('stateDetails')}")
+            if a["state"] not in ("AWAITING_UPLOAD", "UPLOAD_COMPLETE"):
+                pending.discard(id_)
+        if pending:
+            time.sleep(5)
+    if pending:
+        sys.exit(f"{label} : {len(pending)} fichier(s) toujours en traitement après 15 min")
+
+
+def cmd_duo(c, args):
+    app = find_app(c)
+    v = find_version(c, app["id"], args.version)
+    locs = version_localizations(c, v["id"])
+    if not locs:
+        sys.exit("aucune localisation sur la version : lancer `metadata` d'abord")
+    library_id = c.get(f"/apps/{app['id']}/assetLibrary")["data"]["id"]
+    prefix = f"duo-{args.version}-"
+    # Relancer remplace : les fichiers de CETTE version déposés auparavant
+    # sont retirés de la bibliothèque, et leurs placements avec eux.
+    for kind in ("appAssetLibraryImages", "appAssetLibraryVideos"):
+        for item in c.get_all(f"/appAssetLibraries/{library_id}/{kind.replace('appAssetLibrary', '').lower()}"):
+            if (item["attributes"].get("referenceName") or "").startswith(prefix):
+                c.delete(f"/{kind}/{item['id']}")
+    shots = sorted(DUO_SCREENSHOTS.glob("*.png"))[:10]
+    videos = [SUBMISSION / "videos" / n for n in DUO_PREVIEWS if (SUBMISSION / "videos" / n).exists()][:3]
+    image_ids = [library_upload(c, "appAssetLibraryImages", library_id, f, prefix + f.stem) for f in shots]
+    video_ids = [library_upload(c, "appAssetLibraryVideos", library_id, f, prefix + f.stem) for f in videos]
+    wait_library(c, "appAssetLibraryImages", image_ids, "capture Duo")
+    wait_library(c, "appAssetLibraryVideos", video_ids, "aperçu Duo")
+    for locale, loc in locs.items():
+        for placement_type, rel_name, kind, ids in (
+            ("APP_SCREENSHOT", "image", "appAssetLibraryImages", image_ids),
+            ("APP_PREVIEW", "video", "appAssetLibraryVideos", video_ids),
+        ):
+            placed = []
+            for id_ in ids:
+                placed.append(c.post("/appAssetLibraryPlacements", {
+                    "type": "appAssetLibraryPlacements",
+                    "attributes": {"placementType": placement_type},
+                    "relationships": {rel_name: rel(kind, id_),
+                                      "appStoreVersionLocalization": rel("appStoreVersionLocalizations", loc["id"])},
+                })["data"])
+            if len(placed) > 1:
+                # L'ordre des fichiers du dépôt est celui de la fiche.
+                c.post("/appAssetLibraryPlacementOrderingRequests", {
+                    "type": "appAssetLibraryPlacementOrderingRequests",
+                    "attributes": {"placementGroup": placed[0]["attributes"].get("placementGroup")},
+                    "relationships": {
+                        "orderedPlacements": {"data": [{"type": "appAssetLibraryPlacements", "id": p["id"]} for p in placed]},
+                        "appStoreVersionLocalization": rel("appStoreVersionLocalizations", loc["id"]),
+                    },
+                })
+            group = placed[0]["attributes"].get("placementGroup") if placed else "—"
+            print(f"  {locale} {placement_type}: {len(placed)} placé(s), groupe {group}")
+
+
 def find_build(c, app_id, version, build):
     builds = c.get_all("/builds", **{
         "filter[app]": app_id, "filter[version]": build,
@@ -475,6 +572,7 @@ def cmd_all(c, args):
     print("métadonnées"); cmd_metadata(c, args)
     print("captures"); cmd_screenshots(c, args)
     print("aperçus"); cmd_previews(c, args)
+    print("iPhone Duo"); cmd_duo(c, args)
     print("build"); cmd_attach(c, args)
     print("révision"); cmd_review(c, args)
     print("\nTout est en place. Il reste à ouvrir App Store Connect, relire, et cliquer « Soumettre pour révision ».")
@@ -483,7 +581,7 @@ def cmd_all(c, args):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("command", choices=["apps", "version", "metadata", "screenshots", "previews", "build", "attach", "review", "status", "all"])
+    p.add_argument("command", choices=["apps", "version", "metadata", "screenshots", "previews", "duo", "build", "attach", "review", "status", "all"])
     p.add_argument("--version", default=None, help="version marketing (défaut : MARKETING_VERSION du projet)")
     p.add_argument("--build", default=None, help="numéro de build (défaut : CURRENT_PROJECT_VERSION du projet)")
     p.add_argument("--wait", action="store_true", help="build : attendre le traitement par Apple (1 h max)")

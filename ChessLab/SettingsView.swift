@@ -1,4 +1,5 @@
 import CloudKit
+import SwiftData
 import SwiftUI
 
 /// Écran de réglages transversaux : thème de plateau **global et

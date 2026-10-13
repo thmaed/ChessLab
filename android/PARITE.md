@@ -7,6 +7,16 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### iPhone Duo (iOS, 13/10/2026) — rien à porter
+
+Le chantier iPhone Duo d'iOS (voir `PROGRESS.md`, 13/10) donne aux écrans
+d'échiquier un panneau à DROITE dès que la place est nettement plus large que
+haute, replie la barre latérale sur un échiquier trop serré, et laisse tourner
+l'app sur un écran assez grand. Android faisait déjà l'équivalent : rotation
+libre, et `BoardScaffold` met plateau et panneau côte à côte dès que la
+fenêtre est plus large que haute, sur TOUS les écrans d'échiquier. Pas de barre
+latérale côté Android, donc pas de repli. Aucun écart créé.
+
 ### Module « Variantes » — l'INTERFACE alignée sur iOS — FAIT le 20/09
 Relevé en comparant les deux catalogues ligne à ligne. Rien ne fonctionnait
 mal : les douze variantes se jouaient. C'est le VOCABULAIRE et la PRÉSENTATION

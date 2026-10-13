@@ -1,5 +1,6 @@
 import ChessKit
 import Charts
+import SwiftData
 import SwiftUI
 
 /// Écran principal du mode Analyser : plateau + analyse en continu,
@@ -189,10 +190,53 @@ struct AnalysisView: View {
         GeometryReader { geo in
             if geo.size.height > geo.size.width {
                 iPadPortraitBody(geo)
+            } else if BoardPanelLayout.usesSidePanel(in: geo.size) {
+                wideBody(geo)
             } else {
                 iPadLandscapeBody(geo)
             }
         }
+    }
+
+    /// Place nettement plus large que haute — l'iPhone Duo ouvert, une
+    /// fenêtre Mac, un iPad dont on a replié la barre latérale. Le paysage
+    /// ordinaire empile sous le plateau la barre d'éval, la navigation, les
+    /// candidats et la barre coach (~200 pt) : dans une fenêtre COURTE, le
+    /// plateau n'avait plus que 383 pt sur le Duo ouvert (13/10/2026), avec
+    /// un panneau de droite à moitié vide. Ici ces barres passent en tête du
+    /// panneau, et le plateau prend toute la hauteur. Même seuil que
+    /// ``BoardWithPanel``.
+    private func wideBody(_ geo: GeometryProxy) -> some View {
+        let padding: CGFloat = 16
+        let panelWidth = BoardPanelLayout.panelWidth(in: geo.size)
+        // Au-dessus du plateau, `board` porte la ligne d'état du moteur (et le
+        // badge thermique quand il paraît) : on la laisse passer.
+        let statusLine: CGFloat = 34
+        let side = max(0, min(
+            geo.size.height - 2 * padding - statusLine,
+            geo.size.width - 2 * padding - BoardPanelLayout.gap - panelWidth
+        ))
+        return HStack(alignment: .top, spacing: BoardPanelLayout.gap) {
+            board
+                .frame(width: side)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            VStack(spacing: 12) {
+                EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
+                navigationBar
+                candidatesBar
+                coachBar
+                ScrollView {
+                    VStack(spacing: 16) {
+                        openingHeader
+                        analysisPanel
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+            .frame(width: panelWidth)
+        }
+        .padding(padding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     /// Paysage : plateau borné + éval/navigation à gauche, panneau d'analyse

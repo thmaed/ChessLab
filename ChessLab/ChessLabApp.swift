@@ -8,6 +8,9 @@ struct ChessLabApp: App {
     #if targetEnvironment(macCatalyst)
     /// Uniquement pour élaguer la barre de menus — voir ``MacMenuDelegate``.
     @UIApplicationDelegateAdaptor(MacMenuDelegate.self) private var menuDelegate
+    #else
+    /// Les orientations selon la taille de l'écran — voir ``OrientationPolicy``.
+    @UIApplicationDelegateAdaptor(OrientationDelegate.self) private var orientationDelegate
     #endif
 
     init() {
@@ -101,6 +104,7 @@ struct ChessLabApp: App {
                 // AU-DESSUS de la bascule de test, qui reste maîtresse quand
                 // elle force une classe.
                 .narrowWindowSizeClass()
+                .refreshesSupportedOrientations()
                 .preferredColorScheme(.dark)
                 // `Text` dépend de la locale de l'environnement : la changer
                 // force SwiftUI à re-rendre chaque `Text`, qui re-résout alors

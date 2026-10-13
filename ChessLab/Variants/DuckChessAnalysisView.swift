@@ -15,8 +15,9 @@ struct DuckChessAnalysisView: View {
 
     var body: some View {
         GeometryReader { geo in
-            VStack(spacing: 10) {
+            BoardWithPanel {
                 boardBlock(size: geo.size)
+            } panel: {
                 navigationBar
                     .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                         navigationBarHeight = height
@@ -43,14 +44,6 @@ struct DuckChessAnalysisView: View {
                 accuracyCard
                 movesList
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            // Colonne bornée par la HAUTEUR : sans elle, une fenêtre Mac
-            // large étirerait la barre de navigation et la liste des coups
-            // sur toute sa largeur, loin du plateau. Même mesure que les
-            // écrans de partie.
-            .frame(maxWidth: geo.size.height)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .background(totalPliesMarker)
         }
         .appBackground()
@@ -102,7 +95,14 @@ struct DuckChessAnalysisView: View {
             + VariantMoveStripView.reservedHeight
             + EvalBarView.defaultHeight
             + 28   // les deux espacements de la pile (10 + 10) + celui du bloc (8)
-        let side = max(0, min(size.width - 24, size.height - reserved))
+        // Panneau à droite (voir ``BoardWithPanel``) : rien à réserver
+        // dessous, le plateau n'a que sa barre d'évaluation au-dessus.
+        let side = BoardPanelLayout.usesSidePanel(in: size)
+            ? max(0, min(
+                BoardPanelLayout.boardColumnWidth(in: size),
+                size.height - BoardPanelLayout.verticalPadding - EvalBarView.defaultHeight - 8
+            ))
+            : max(0, min(size.width - 24, size.height - reserved))
         return VStack(spacing: 8) {
             EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: nil)
                 .frame(width: side)

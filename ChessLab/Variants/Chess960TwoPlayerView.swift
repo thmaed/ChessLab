@@ -20,30 +20,17 @@ struct Chess960TwoPlayerView: View {
     private var isTabletopMode: Bool { viewModel.settings.rotationMode == .tabletop }
 
     var body: some View {
-        GeometryReader { geo in
-            VStack(spacing: 10) {
-                playerRow(for: topColor, atTop: true)
-                boardBlock
-                playerRow(for: bottomColor, atTop: false)
-                gameOverPanel
-                controlBar
-                movesStrip
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            // Colonne bornée par la HAUTEUR de la fenêtre. Le plateau est
-            // carré, donc déjà borné par la hauteur : sans cette borne, les
-            // bandeaux joueurs, la barre de contrôle et la bande des coups
-            // s'étiraient seuls sur toute la largeur d'une fenêtre Mac large
-            // — le transport à un bout, l'abandon à l'autre, séparés par un
-            // mètre de vide. Ils restent maintenant à la largeur du plateau.
-            // Sans effet en portrait (hauteur > largeur) : ni l'iPhone ni
-            // l'iPad debout ne changent.
-            .frame(maxWidth: geo.size.height)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background(moveCountMarker)
-            .background(fenMarker)
+        BoardWithPanel {
+            playerRow(for: topColor, atTop: true)
+            boardBlock
+            playerRow(for: bottomColor, atTop: false)
+        } panel: {
+            gameOverPanel
+            controlBar
+            movesStrip
         }
+        .background(moveCountMarker)
+        .background(fenMarker)
         .appBackground()
         .navigationTitle("Deux joueurs — Chess960")
         .navigationBarTitleDisplayMode(.inline)

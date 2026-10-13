@@ -10399,3 +10399,128 @@ Coup Volé + Duck Chess = 12.
 
 Relu par le lecteur de `tools/asc/asc.py` lui-même, qui contrôle les limites
 d'Apple champ par champ : les douze champs des deux langues passent.
+
+## 13/10 — L'iPhone Duo, ouvert et fermé (Xcode 27.1 RC)
+
+Revue de l'app entière sur le simulateur de l'iPhone Duo (iOS 27.1), dans ses
+deux postures, contre la page d'Apple « Prepare your app for iPhone Duo ».
+Écran extérieur (fermé) : 466 × 678 pt, classe compacte, disposition iPhone.
+Écran intérieur (ouvert) : 951 × 669 pt, classe régulière dans les deux sens,
+disposition iPad. Barre d'état sur le bord DROIT, barres d'outils VERTICALES
+dessous (SDK 27.1).
+
+**Les règles d'Apple, vérifiées dans le code.** Aucun `UIScreen.main`, aucune
+lecture de `UIDevice.orientation` / `interfaceOrientation` /
+`statusBarOrientation`, aucun choix de disposition par idiome : les écrans
+décident déjà par la place offerte (`GeometryReader`, `onGeometryChange`). Le
+SDK 27.1 a seulement demandé deux `import SwiftData` explicites
+(`AnalysisView`, `SettingsView`).
+
+**Fermé** : douze écrans relus, rien ne déborde des 382 pt utiles. Une seule
+exception, corrigée : la barre d'outils de l'accueil était UN élément
+contenant un `HStack` de trois boutons — restée horizontale en haut, seule de
+toute l'app à ne pas passer à la verticale. Devenue un `ToolbarItemGroup`.
+
+**Ouvert : les plateaux étaient trop petits**, et ce fut l'essentiel du
+travail. La barre latérale (~320 pt) et la barre d'état (84 pt) laissaient une
+colonne de détail presque carrée ; les écrans en colonne y empilaient tout
+sous le plateau. Mesuré avant / après :
+
+| écran | avant | après |
+| --- | --- | --- |
+| partie contre l'ordinateur | 349 pt | ~460 pt |
+| analyse | 184 pt | ~487 pt |
+| Chess960, Horde, Crazyhouse, Coup volé | ~330 pt | ~420 pt |
+| Duck Chess | ~280 pt | ~375 pt |
+| analyse Chess960 (et des variantes, du Duck Chess) | ~290 pt | ~510 pt |
+| entraînement d'ouverture | 320 pt | ~513 pt |
+| entraînement libre de finale | ~465 pt, fond tronqué | ~513 pt |
+| laboratoire | 330 pt | ~430 pt |
+
+Trois mécanismes, tous fondés sur la place et non sur l'appareil :
+
+1. **`BoardSidebarPolicy`** : sur un écran d'échiquier, dans une fenêtre plus
+   large que haute et plus étroite que 1 024 pt, la barre latérale se replie
+   (`.detailOnly`) ; elle revient en quittant l'échiquier, et un choix de
+   l'utilisateur est respecté. Les écrans signalent leur présence par
+   `reportsBoardScreen` (`Route.showsBoard`, exhaustif). Aucun iPad en plein
+   écran n'est touché (le plus étroit en paysage fait 1 133 pt, les portraits
+   sont exclus par la forme). Piège : une fois la visibilité LIÉE, le système
+   résout `.automatic` en `.detailOnly` sur le Duo — la barre disparaissait de
+   l'accueil ; la valeur par défaut est donc `.all`, ce que montrait
+   l'ossature auparavant.
+2. **`BoardWithPanel`** (`BoardPanelLayout`) : au-delà d'un rapport
+   largeur/hauteur de 1,3, les commandes passent dans un panneau à droite
+   (300 à 380 pt) et le plateau garde la hauteur. Adopté par les six écrans
+   de partie des variantes et les trois analyses de variantes ; même seuil
+   repris par l'analyse standard, l'entraînement d'ouverture, l'entraînement
+   libre de finale et le laboratoire. L'iPad en paysage barre ouverte (1,15)
+   reste en colonne, inchangé.
+3. **Le fond de l'entraînement de finale** ne couvrait que la pile, plus
+   étroite que l'écran dès que la hauteur borne le plateau : deux bandes
+   noires sur le Duo, et sur l'iPad en paysage. Corrigé.
+
+**Les orientations.** L'iPhone était verrouillé en portrait par l'Info.plist,
+Duo compris. La règle dépend désormais de la taille de l'écran
+(`OrientationPolicy`, délégué d'app iOS) : rotation libre quand le petit côté
+de l'écran atteint 600 pt (écran intérieur du Duo, iPad), portrait ailleurs
+(tous les iPhone, écran extérieur du Duo). L'Info.plist de l'iPhone déclare
+donc les quatre orientations, le délégué tranche. `OrientationLockUITests`
+garde le contrat sur iPhone (vert sur iPhone 17 Pro), et l'iPad tourne
+toujours (vert sur iPad Pro 11").
+
+Sur le simulateur, `XCUIDevice.orientation` ne fait PAS tourner l'écran
+intérieur du Duo — Safari pas davantage : l'interface y reste « paysage
+gauche », barre d'état à droite. La rotation se teste par les commandes
+*Rotate Left / Right* de Device Hub.
+
+**Outillage.** XCUITest est aveugle sur le Duo ouvert (cadre d'app rapporté à
+669 pt au lieu de 951, captures noires). D'où un crochet DEBUG
+`-openRoute <écran>` dans `HomeView` (une trentaine d'écrans, empilés une
+seconde après le lancement) et des captures par
+`xcrun simctl io <id> screenshot`.
+
+**Android** : rien à porter. L'app Android tourne librement et ses écrans
+d'échiquier (`BoardScaffold`) passent côte à côte dès que la fenêtre est plus
+large que haute ; elle n'a pas de barre latérale. Noté dans `PARITE.md`.
+
+**Un échec qui n'est pas de ce chantier.** Sur iPad Pro 11" (M5, runtime
+27.1), `SidebarLandscapeLayoutUITests.testNoDetailScreenOverflowsWithTheSidebarInLandscape`
+signale la puce « Thèmes » des Finales coupée de 14,5 pt au bord droit. Le même
+test échoue à l'identique sur le commit précédent (vérifié dans un worktree) :
+c'est la rangée de puces à défilement horizontal, que la nouvelle largeur
+(1 210 pt) coupe au milieu d'une puce. Laissé en l'état, à trancher à part.
+
+**Vérifié sur le simulateur, posture par posture (13/10, avec Thierry aux
+commandes de Device Hub).** Le journal du système montre deux modes : écran
+ouvert `alwaysAll` (le système fait tourner l'app quoi qu'elle déclare), écran
+fermé `dynamic` (l'app décide). Ouvert et tenu en hauteur (669 × 951), ChessLab
+prend la disposition iPhone, plateau pleine largeur ; fermé et tourné un tour
+complet, il reste en portrait (masque d'orientation 2 lu par le délégué, écran
+466 × 678). Deux défauts trouvés ainsi, corrigés :
+
+- **la barre revenait en rouvrant l'appareil sur une partie** : la même course
+  qu'au lancement — le système réécrit la visibilité des colonnes juste après
+  notre repli. Une réécriture dans la seconde qui suit une transition
+  (apparition, nouvelle taille) est annulée, une fois ; le délai que portait
+  le crochet `-openRoute` est retiré, le repli tient sans lui ;
+- **fermé et tourné, l'app passait en paysage** : le système gardait la
+  réponse donnée sur l'écran intérieur. `refreshesSupportedOrientations()`
+  lui fait reposer la question à chaque changement de taille de fenêtre.
+
+**Plateau contre l'ordinateur, écran ouvert : 463 → 527 pt** (demande de
+Thierry). Quand c'est la hauteur qui borne le plateau, les plaques des joueurs
+passent dans la colonne de droite, adversaire en haut et soi en bas
+(`PlayView.clocksBesideBoard(in:)`, testé). L'iPad barre ouverte, borné par la
+largeur, ne change pas.
+
+**Captures sur l'écran extérieur** : `xcrun simctl io <id> screenshot
+--display=1` (l'intérieur est `--display=3`, celui par défaut). La prise vidéo
+de l'écran intérieur est un panneau portrait dont la rotation est notée dans
+les métadonnées : `tools/appstore-preview/make_preview.swift` applique
+désormais `preferredTransform`, et `PREVIEW_FIT=1` loge l'image entière dans
+le format demandé, sur le fond de l'app.
+
+Tests : 1 025 tests unitaires verts (iPhone 17 Pro) ; sur iPad Pro 11",
+rotation, fenêtres étroites et barre latérale verts, sauf l'échec préexistant
+des puces des Finales noté plus haut.

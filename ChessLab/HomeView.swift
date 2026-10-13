@@ -26,6 +26,23 @@ struct HomeView: View {
     /// Bilan de progression compact du panneau iPad — recalculé à l'apparition.
     @State private var progressSummary: ProgressionSummary?
     @State private var path = NavigationPath()
+    /// Colonnes visibles de l'ossature iPad/Mac — pilotée par
+    /// ``BoardSidebarPolicy`` sur les écrans d'échiquier d'une fenêtre étroite.
+    ///
+    /// `.all` et non `.automatic` : une fois la visibilité LIÉE, le système
+    /// résout `.automatic` en `.detailOnly` sur l'iPhone Duo ouvert, et la
+    /// barre disparaissait aussi de l'accueil et des listes (constaté le
+    /// 13/10/2026). `.all` est ce que montrait l'ossature avant la liaison.
+    @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    /// Vrai quand c'est NOUS qui avons replié la barre : on ne la rouvre en
+    /// quittant l'échiquier que dans ce cas, jamais contre un choix de
+    /// l'utilisateur.
+    @State private var sidebarAutoCollapsed = false
+    @State private var splitSize: CGSize?
+    /// Dernier changement d'ossature (apparition, nouvelle taille) — voir
+    /// ``splitBody`` : le système y réécrit la visibilité des colonnes.
+    @State private var splitTransitionAt = Date.distantPast
+    @State private var boardScreens = BoardScreenPresence()
     /// View models des écrans de session, détenus ICI — donc au-dessus du
     /// `if/else` d'ossature, qui détruirait sinon tout le sous-arbre et la
     /// partie en cours avec lui. Voir ``SessionStore``.
@@ -146,6 +163,29 @@ struct HomeView: View {
         case help
         case licenses
         case openingsSources
+
+        /// L'écran montre-t-il un échiquier ? Décide du repli de la barre
+        /// latérale dans une fenêtre étroite (voir ``BoardSidebarPolicy``).
+        /// Sans `default` : une route ajoutée devra se prononcer.
+        var showsBoard: Bool {
+            switch self {
+            case .activeGame, .resumedGame, .activeTwoPlayerGame, .resumedTwoPlayerGame,
+                 .activeAnalysis, .positionEditor, .activePuzzleSession,
+                 .endgameFreeTrain, .endgameReader, .openingEditor, .openingLabsReader,
+                 .openingTrainDaily, .openingTrainLine,
+                 .activeChess960Game, .activeChess960TwoPlayerGame, .activeChess960Analysis,
+                 .activeFairyVariantGame, .activeEngineLegalityGame, .activeVariantAnalysis,
+                 .activeStolenMoveGame, .activeDuckChessGame, .activeDuckChessAnalysis,
+                 .activeLab, .resumedLab:
+                return true
+            case .newGame, .continueVsStockfish, .twoPlayerSetup, .continueTwoPlayer,
+                 .analysisEntry, .analysisLibrary, .scanner, .puzzleQueue,
+                 .openingList, .endgameList, .labSetup, .variantsHub, .chess960Setup,
+                 .fairyVariantSetup, .engineLegalitySetup, .stolenMoveSetup, .duckChessSetup,
+                 .progression, .settings, .help, .licenses, .openingsSources:
+                return false
+            }
+        }
     }
 
     /// Entrées de la barre latérale iPad/Mac. Chacune enracine la colonne de
@@ -224,6 +264,64 @@ struct HomeView: View {
         }
     }
 
+    #if DEBUG
+    /// Ouvre un écran DÈS le lancement : `-openRoute <nom>`. Outil de capture,
+    /// sur le modèle de `-skeletonToggle` et `-seedLibrarySample` — compilé en
+    /// Debug seulement.
+    ///
+    /// Né le 13/10/2026 pour l'iPhone Duo : déplié, XCUITest y voit une fenêtre
+    /// portrait de 669 pt alors qu'elle en fait 951 en largeur. Ses taps
+    /// tombent à côté et ses captures sortent NOIRES. On ouvre donc l'écran
+    /// par l'app elle-même, et on le photographie avec `simctl io screenshot`,
+    /// qui voit juste.
+    private static var debugLaunchRoute: Route? {
+        let args = CommandLine.arguments
+        guard let index = args.firstIndex(of: "-openRoute"), index + 1 < args.count else { return nil }
+        switch args[index + 1] {
+        case "newGame": return .newGame
+        case "game": return .activeGame(PlayGameSettings())
+        // Une partie ENTAMÉE (Italienne, 14 demi-coups, aux Blancs de jouer) :
+        // les captures App Store veulent une liste de coups et une évaluation.
+        case "gameInProgress":
+            return .resumedGame(PlayGameAutosave(
+                settings: PlayGameSettings(), resolvedUserColorRaw: "w",
+                moveLANs: ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5", "c2c3", "g8f6",
+                           "d2d3", "d7d6", "e1g1", "e8g8", "b1d2", "a7a6"],
+                whiteRemaining: nil, blackRemaining: nil, savedAt: .now
+            ))
+        case "twoPlayerSetup": return .twoPlayerSetup
+        case "twoPlayerGame": return .activeTwoPlayerGame(TwoPlayerGameSettings())
+        case "analysisEntry": return .analysisEntry
+        case "analysis":
+            return .activeAnalysis(.pgn("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O"))
+        case "library": return .analysisLibrary
+        case "puzzles": return .puzzleQueue
+        case "puzzleSession": return .activePuzzleSession(PuzzleSessionFilter())
+        case "openings": return .openingList
+        case "openingReader": return .openingLabsReader("italian-game")
+        case "endgames": return .endgameList
+        case "lab": return .labSetup(startFEN: nil)
+        case "labRun": return .activeLab(LabGameSettings())
+        case "variants": return .variantsHub
+        case "chess960": return .activeChess960Game(Chess960Settings())
+        case "horde": return .activeFairyVariantGame(variantID: FairyVariant.horde.id, settings: FairyVariantSettings())
+        case "duck": return .activeDuckChessGame(FairyVariantSettings())
+        case "stolen": return .activeStolenMoveGame(FairyVariantSettings())
+        case "chess960Analysis":
+            return .activeChess960Analysis("[Variant \"Chess960\"]\n[SetUp \"1\"]\n[FEN \"bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w KQkq - 0 1\"]\n\n1. e4 e5 2. Nc3 Nc6 3. Nf3 Nf6 *")
+        case "endgameReader": return .endgameReader("eg-bahr-rule-flaw")
+        case "endgameTrain": return .endgameFreeTrain("eg-bahr-rule-flaw")
+        case "openingTrain": return .openingTrainLine("italian-game")
+        case "crazyhouse": return .activeEngineLegalityGame(variantID: EngineLegalityVariant.crazyhouse.id, settings: FairyVariantSettings())
+        case "chess960TwoPlayer": return .activeChess960TwoPlayerGame(Chess960TwoPlayerSettings(startFEN: "bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w KQkq - 0 1"))
+        case "progression": return .progression
+        case "settings": return .settings
+        case "help": return .help
+        default: return nil
+        }
+    }
+    #endif
+
     var body: some View {
         Group {
             if horizontalSizeClass == .regular {
@@ -252,6 +350,11 @@ struct HomeView: View {
                 )
             }
         }
+        #if DEBUG
+        .task {
+            if let route = Self.debugLaunchRoute, path.isEmpty { path.append(route) }
+        }
+        #endif
         .onChange(of: discoveryTour.currentStepIndex) { _, _ in
             applyDiscoveryDestination()
         }
@@ -366,8 +469,14 @@ struct HomeView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .toolbarBackground(.hidden, for: .navigationBar)
                 .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        HStack(spacing: 10) {
+                    // Un GROUPE de trois éléments, et non un élément unique
+                    // contenant un `HStack` : sur l'écran extérieur de
+                    // l'iPhone Duo (SDK 27.1), les barres deviennent
+                    // VERTICALES sous la barre d'état, à droite. Le système
+                    // empile les éléments d'un groupe ; un `HStack` restait
+                    // une barre horizontale posée en haut, seule de toute
+                    // l'app à ne pas suivre (constaté le 13/10/2026).
+                    ToolbarItemGroup(placement: .navigationBarTrailing) {
                             // Coloré, à côté de Progression : l'aide explique
                             // des choses qu'on ne devine pas (import et partage
                             // de répertoires, portée de la synchro iCloud) et
@@ -389,7 +498,6 @@ struct HomeView: View {
                                 "gearshape.fill", label: "Réglages",
                                 identifier: "openSettings", tint: Theme.gold
                             ) { path.append(Route.settings) }
-                        }
                     }
                 }
                 .navigationDestination(for: Route.self) { destination(for: $0) }
@@ -403,17 +511,62 @@ struct HomeView: View {
     /// grille de tuiles laisse place à une navigation persistante, mieux
     /// adaptée au grand écran (Axe A de la roadmap v2).
     private var splitBody: some View {
-        NavigationSplitView {
+        NavigationSplitView(columnVisibility: $columnVisibility) {
             sidebar
         } detail: {
             NavigationStack(path: $path) {
                 detailRoot
                     .appBackground()
                     .scrollContentBackground(.hidden)
-                    .navigationDestination(for: Route.self) { destination(for: $0) }
+                    .navigationDestination(for: Route.self) { route in
+                        destination(for: route)
+                            .reportsBoardScreen(route.showsBoard, to: boardScreens)
+                    }
             }
         }
         .navigationSplitViewStyle(.balanced)
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newSize in
+            splitSize = newSize
+            splitTransitionAt = .now
+        }
+        .onAppear { splitTransitionAt = .now }
+        .onChange(of: sidebarShouldCollapse, initial: true) { _, collapse in
+            applySidebarPolicy(collapse: collapse)
+        }
+        // Pendant une transition d'ossature — lancement, iPhone Duo qu'on
+        // ouvre (la pile compacte cède la place à la barre latérale), fenêtre
+        // redimensionnée —, le système RÉÉCRIT la visibilité des colonnes
+        // juste après notre repli, et la barre revenait sur un échiquier
+        // serré : plateau retombé à ~350 pt en rouvrant le Duo sur une partie
+        // (13/10/2026). Une réécriture dans la seconde qui suit une
+        // transition est donc annulée, une fois. Un appui de l'utilisateur
+        // sur le bouton de la barre arrive bien après, et reste respecté.
+        .onChange(of: columnVisibility) { _, newValue in
+            guard newValue != .detailOnly, sidebarShouldCollapse,
+                  Date.now.timeIntervalSince(splitTransitionAt) < 1 else { return }
+            splitTransitionAt = .distantPast
+            columnVisibility = .detailOnly
+            sidebarAutoCollapsed = true
+        }
+    }
+
+    private var sidebarShouldCollapse: Bool {
+        BoardSidebarPolicy.collapsesSidebar(showsBoard: boardScreens.showsBoard, size: splitSize)
+    }
+
+    /// Replie la barre en arrivant sur un échiquier trop serré, la rend en
+    /// repartant — seulement si c'est nous qui l'avions repliée.
+    private func applySidebarPolicy(collapse: Bool) {
+        if collapse {
+            guard columnVisibility != .detailOnly else { return }
+            columnVisibility = .detailOnly
+            sidebarAutoCollapsed = true
+        } else if sidebarAutoCollapsed {
+            sidebarAutoCollapsed = false
+            columnVisibility = .all
+        }
     }
 
     private var sidebar: some View {

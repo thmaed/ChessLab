@@ -56,7 +56,17 @@ final class OpeningReaderViewModel {
 
     /// L'index est-il ouvert ? Il l'est À L'ARRIVÉE (le prompt : « au moment du
     /// choix du type d'ouverture ») puis se rappelle par l'icône de la barre.
-    var isIndexPresented = true
+    var isIndexPresented = !OpeningReaderViewModel.debugIndexClosed
+
+    /// `-readerIndexClosed` (DEBUG) : arriver sur le PLATEAU, sans l'index par
+    /// dessus — pour les captures App Store.
+    private static var debugIndexClosed: Bool {
+        #if DEBUG
+        CommandLine.arguments.contains("-readerIndexClosed")
+        #else
+        false
+        #endif
+    }
 
     private let rootBoard: Board
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }

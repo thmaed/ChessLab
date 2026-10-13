@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 1.8.1, build 14** (fixés dans `project.pbxproj` le 29/09/2026). Voir `RELEASE_NOTES-1.8.1.md` pour le détail des changements depuis la 1.8.
+**Version courante : 1.9.0, build 15** (fixés dans `project.pbxproj` le 13/10/2026). Voir `RELEASE_NOTES-1.9.0.md` pour le détail des changements depuis la 1.8.1.
 
 Tout ce qui suit est à copier-coller directement dans les champs correspondants d'App Store Connect. Les limites de caractères d'Apple sont respectées (vérifiées).
 
@@ -10,48 +10,42 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 ---
 
-## Nouveautés de cette version — 1.8.1 (4000 car. max)
+## Nouveautés de cette version — 1.9.0 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> ⏳ **Prête, pas soumise.** Version 1.8.1, build 14. Couvre le 13/09 → 29/09/2026, depuis la 1.8 (build 13, READY_FOR_SALE depuis sa révision). Détail dans `RELEASE_NOTES-1.8.1.md`.
+> ⏳ **Prête, pas soumise.** Version 1.9.0, build 15. Couvre le 30/09 → 13/10/2026, depuis la 1.8.1 (build 14, READY_FOR_SALE). Détail dans `RELEASE_NOTES-1.9.0.md`.
 
 ### Français
 
 ```
-VOTRE NOM, ENFIN
-Réglages → Votre nom : le nom sous lequel vous jouez s'affiche sur votre plaque, dans la bibliothèque et dans les parties que vous exportez. Laissez le champ vide et il vaut « Vous ». Au passage, ce nom suit désormais la langue de l'interface — en anglais il dit « You », y compris dans les parties déjà enregistrées, alors qu'il restait français.
+CHESSLAB S'OUVRE AVEC L'IPHONE DUO
+Fermé, l'écran extérieur montre ChessLab tel que vous le connaissez sur iPhone, barres d'outils à la verticale sous la barre d'état. Ouvert, le grand écran prend la disposition iPad — barre latérale des modes et colonne de détail — et l'échiquier y prend toute sa place.
 
-LE PGN EXPORTÉ EST UN VRAI PGN
-Une partie partagée ou copiée ne portait que la suite des coups : ni en-têtes, ni résultat. Elle porte maintenant les sept balises du standard — événement, site, date, ronde, Blancs, Noirs, résultat — et le résultat clôt aussi les coups. Les en-têtes d'un PGN importé ne sont jamais écrasées : on ne comble que les manques. Les douze variantes en profitent, et vos parties déjà rangées sont complétées quand vous les rouvrez.
+UN ÉCHIQUIER À LA TAILLE DE L'ÉCRAN OUVERT
+Sur une partie, une analyse ou un entraînement, la barre latérale s'efface d'elle-même quand elle prendrait la place du plateau, et revient dès que vous retournez aux listes ; un appui sur son bouton la rappelle à tout moment. Les commandes passent à droite de l'échiquier dès que l'écran est plus large que haut, et le plateau prend toute la hauteur : contre l'ordinateur, en analyse, dans les douze variantes, les entraînements et le Laboratoire.
 
-IPAD : LES FENÊTRES PARTAGÉES, ET LA PLACE DE L'ÉCHIQUIER
-Dans une fenêtre réduite pour partager l'écran avec une autre app, ChessLab gardait ses deux colonnes : la barre latérale prenait sa place entière, et il restait à l'échiquier moins de largeur que sur un iPhone. Sous la largeur du plus étroit des iPad, l'app prend désormais la disposition iPhone — une colonne, échiquier pleine largeur. Là où les deux colonnes restent, l'échiquier se sert le premier : il gagne jusqu'à 15 % en paysage, et toute la largeur en portrait quand la barre latérale est repliée.
+TOUTES LES POSITIONS DE L'APPAREIL
+Ouvert, ChessLab suit l'appareil quand vous le tournez, et choisit sa disposition d'après la place réelle de l'écran. Fermé, il reste en portrait, comme sur tout iPhone.
 
-MÉMORISATION
-Une carte de plus dans Progrès : positions vues, acquises, à raffermir, dues aujourd'hui, révisions de la semaine et taux de réussite. La répétition espacée montre enfin ce qu'elle fait de vos révisions.
-
-DÉTAILS
-Barre d'évaluation activée par défaut dans tous les modes qui l'offrent. Au Duck Chess, prendre le roi n'est plus annoncé « échec et mat » mais « roi capturé » — le canard masque le coup qui vient, et la partie se gagne en prenant le roi. Annonces VoiceOver des coups revues. Le détecteur du scanner est déclaré dans l'écran Licences.
+ET AUSSI
+L'entraînement libre des finales couvre désormais tout l'écran sur iPad en paysage, sans bandes noires sur les côtés.
 ```
 
 ### English
 
 ```
-YOUR NAME, AT LAST
-Settings → Your name: the name you play under shows on your plate, in the library and in the games you export. Leave the field empty and it reads "You". Along the way, that name now follows the interface language — in English it says "You", including in games already recorded, where it used to stay French.
+CHESSLAB UNFOLDS WITH IPHONE DUO
+Closed, the outer display shows ChessLab as you know it on iPhone, with toolbars standing vertically below the status bar. Open, the large display takes the iPad layout — sidebar of modes and detail column — and the board gets all the room it deserves.
 
-AN EXPORTED PGN IS A REAL PGN
-A game shared or copied carried only the moves: no headers, no result. It now carries the seven tags of the standard — event, site, date, round, White, Black, result — and the result closes the moves too. The headers of an imported PGN are never overwritten: only the gaps are filled. The twelve variants benefit as well, and games already stored are completed when you reopen them.
+A BOARD SIZED FOR THE OPEN DISPLAY
+In a game, an analysis or a training session, the sidebar steps aside on its own whenever it would take the board's room, and comes back as soon as you return to the lists; its button brings it back at any time. Controls move to the right of the board whenever the display is wider than tall, and the board takes the full height: against the computer, in analysis, in the twelve variants, in training and in the Laboratory.
 
-IPAD: SHARED WINDOWS, AND ROOM FOR THE BOARD
-In a window shrunk to share the screen with another app, ChessLab kept its two columns: the sidebar took its full place, and the board was left with less width than on an iPhone. Below the width of the narrowest iPad, the app now takes the iPhone layout — one column, board at full width. Where the two columns remain, the board serves itself first: it gains up to 15 % in landscape, and the whole width in portrait when the sidebar is folded.
+EVERY POSE OF THE DEVICE
+Open, ChessLab follows the device when you turn it, and picks its layout from the actual room on screen. Closed, it stays in portrait, like on any iPhone.
 
-MEMORISATION
-One more card in Progress: positions seen, acquired, to firm up, due today, reviews this week and success rate. Spaced repetition finally shows what it does with your reviews.
-
-DETAILS
-Evaluation bar on by default in every mode that offers it. In Duck Chess, taking the king is no longer announced as "checkmate" but as "king captured" — the duck hides the move to come, and the game is won by taking the king. VoiceOver move announcements revised. The scanner's detector is declared on the Licences screen.
+ALSO
+Endgame free training now fills the whole screen on iPad in landscape, with no black bands on the sides.
 ```
 
 ## Français (langue principale)
@@ -73,7 +67,7 @@ stockfish,maia,tactique,ouverture,puzzle,gambit,fen,pgn,elo,entrainement,scanner
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
 ```
-Neuf adversaires qui jouent comme des humains (Maia-3), analyse Stockfish, 58 ouvertures, 78 finales prouvées, 100 000+ puzzles — 100 % local.
+Prêt pour l'iPhone Duo, ouvert comme fermé. Neuf adversaires qui jouent comme des humains (Maia-3), analyse Stockfish, 58 ouvertures, 100 000+ puzzles — 100 % local.
 ```
 
 **Description** (4000 car. max) :
@@ -143,7 +137,7 @@ stockfish,maia,tactics,openings,puzzle,gambit,fen,pgn,elo,training,scanner,analy
 
 **Promotional text** (170 char. max):
 ```
-Nine opponents that play like humans (Maia-3), Stockfish analysis, 58 openings, 78 proven endgames, 100,000+ puzzles — fully offline, no ads.
+Ready for iPhone Duo, open or closed. Nine opponents that play like humans (Maia-3), Stockfish analysis, 58 openings, 100,000+ puzzles — fully offline, no ads.
 ```
 
 **Description** (4000 char. max):
@@ -226,9 +220,11 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**1.8.1, build 14** — fixés le 29/09/2026 (`MARKETING_VERSION = 1.8.1`, `CURRENT_PROJECT_VERSION = 14`), aux deux configurations de la cible applicative. La 1.8 (build 13) est **READY_FOR_SALE** : le 14 est le premier numéro libre. Nouveautés détaillées dans `RELEASE_NOTES-1.8.1.md`, texte prêt à coller ci-dessus.
+**1.9.0, build 15** — fixés le 13/10/2026 (`MARKETING_VERSION = 1.9.0`, `CURRENT_PROJECT_VERSION = 15`), aux deux configurations de la cible applicative. La 1.8.1 (build 14) est **READY_FOR_SALE** : le 15 est le premier numéro libre (vérifié par l'API le 13/10). Nouveautés détaillées dans `RELEASE_NOTES-1.9.0.md`, texte prêt à coller ci-dessus.
 
-Pourquoi 1.8.1 et non 1.9.0 : la version est faite de corrections — le nom du joueur, les balises PGN, la mise en page en fenêtre partagée — avec deux ajouts modestes (le réglage « Votre nom », la carte Mémorisation). Aucun mode ni module nouveau. Si le choix doit changer, c'est une constante dans `project.pbxproj` et un titre ici.
+Pourquoi 1.9.0 : un appareil nouveau pris en charge de bout en bout (iPhone Duo, SDK iOS 27.1), avec des dispositions nouvelles pour les écrans plus larges que hauts et une politique d'orientation qui change. Plus qu'une correction.
+
+**1.8.1, build 14** — 29/09/2026, version de corrections (nom du joueur, balises PGN, fenêtres partagées sur iPad).
 
 **Historique du 06/09/2026** — 1.8.0, build 13 : App Store Connect avait déjà reçu des builds 11 et 12 le matin même, depuis Xcode, et exige un numéro strictement supérieur. Le build 13 est celui téléversé par `tools/asc/release.sh`.
 
@@ -256,6 +252,7 @@ git push origin main
 Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) : soumettre sans pousser publierait un binaire dont les sources annoncées ne correspondent pas.
 
 ### Historique des versions
+- **1.8.1** — build 14, en ligne : nom du joueur traduit et réglable, PGN exporté avec ses sept balises, disposition iPhone dans une fenêtre d'iPad plus étroite que 744 pt, échiquier servi en premier (`RELEASE_NOTES-1.8.1.md`).
 - **1.8.0** — soumise le 06/09/2026, build 13, fiche remplie par `tools/asc/` : neuf personnages joués par Maia-3 (style, répertoire, tempérament, illustration, niveau mémorisé par personnage sur l'échelle humaine), filet Stockfish à quatre cas, Progrès par personnage, camp Maia au Laboratoire, licence AGPLv3, borne Fairy-Stockfish à 2850 (`RELEASE_NOTES-1.8.0.md` — absorbe la 1.7.1).
 - **1.7.1** — jamais soumise, absorbée par la 1.8.0 : visite guidée bilingue (11 étapes, rejouable depuis l'Aide), coups en ligne colorés dans TOUTES les analyses de variantes, grille des modes sur l'accueil iPad/Mac, stabilité du moteur des variantes en profondeur (6 mécanismes corrigés, suite de torture), Aide remise à jour (version lue du bundle, module Variantes à douze tuiles), zéro warning de compilation (`RELEASE_NOTES-1.7.1.md` — couvre 1.6 → 1.7.1).
 - **1.7.0** — jamais soumise, absorbée par la 1.7.1 : quatre variantes de plus au hub, qui passe à douze — **Crazyhouse** (les prises changent de camp et se reposent), **Duck Chess** (un canard bloque une case, tour en deux temps), **Barricades** (d4 et e5 murées dès le départ) et **Barricades aléatoires** (deux murs qui changent de case à chaque coup), toutes contre l'ordinateur. Plus le correctif d'un défaut moteur récurrent des Variantes (« le moteur n'a pas pu être démarré » après une analyse ou un retour en arrière), et une passe de mise en page menée sur les deux extrêmes du parc — grandes fenêtres en classe *regular* (iPad plein écran, Split View, Stage Manager) et petits iPhone (`RELEASE_NOTES-1.7.0.md` — couvre 1.6 → 1.7).
@@ -269,10 +266,10 @@ Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/0
 
 ## App Review Notes (paste into App Store Connect → App Review Information → Notes)
 
-English, for the Apple reviewer. Opens with the nature of the update (1.8.1 : correction de défauts), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
+English, for the Apple reviewer. Opens with the nature of the update (1.9.0 : prise en charge de l'iPhone Duo), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
 
 ```
-WHAT'S IN THIS UPDATE (1.8.1): a bug-fix release. No new mode, no change to permissions, privacy or licensing. It fixes three defects reported by a tester on 27 September 2026: the player's name stayed in French ("Vous") in an otherwise fully English interface; an exported PGN carried only the moves, with no tag pairs and no result, which some chess programs reject; and on iPad, a window narrowed to share the screen kept the two-column layout, leaving the board less room than on an iPhone. Two small additions: an optional "Your name" setting, and a memorisation card in the Progress screen.
+WHAT'S IN THIS UPDATE (1.9.0): iPhone Duo support, built with the iOS 27.1 SDK. No new mode; no change to permissions, privacy or licensing. Closed: iPhone layout, vertical toolbars. Open: iPad layout, the sidebar folds on board screens and controls sit beside the board. The app rotates on the inner display and iPad, and stays portrait on iPhones and the outer display. Layouts follow the available size, never idiom or orientation.
 
 ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 100,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
 

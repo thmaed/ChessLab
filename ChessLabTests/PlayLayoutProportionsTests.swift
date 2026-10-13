@@ -77,4 +77,29 @@ struct PlayLayoutProportionsTests {
         #expect(withoutList == 480)
         #expect(!PlayView.movesListFitsBelowBoard(in: column))
     }
+
+    // MARK: Plaques joueurs à côté du plateau (13/10/2026)
+
+    /// L'iPhone Duo ouvert, barre latérale repliée : la hauteur borne le
+    /// plateau, les plaques passent à côté — et le plateau y gagne.
+    @Test func theOpenDuoPutsThePlayerPlatesBesideTheBoard() {
+        let detail = CGSize(width: 867, height: 575)
+        #expect(PlayView.clocksBesideBoard(in: detail))
+        let column = detail.width - PlayView.panelWidth(in: detail)
+        let before = min(column, detail.height - PlayView.clocksHeight)
+        let after = min(column, detail.height - 12)
+        #expect(after - before >= 40)
+    }
+
+    /// Là où c'est la LARGEUR qui borne le plateau — l'iPad en paysage, barre
+    /// latérale ouverte —, les plaques restent dessus et dessous.
+    @Test(arguments: [
+        CGSize(width: 874, height: 760),   // 11" paysage, barre ouverte
+        CGSize(width: 813, height: 690),   // mini paysage, barre ouverte
+        CGSize(width: 1056, height: 960),  // 13" paysage, barre ouverte
+    ])
+    func aWidthBoundBoardKeepsItsPlates(size: CGSize) {
+        #expect(!PlayView.clocksBesideBoard(in: size))
+    }
 }
+

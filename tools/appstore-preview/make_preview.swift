@@ -106,18 +106,43 @@ Task {
     // Mise à l'échelle vers la résolution CIBLE exacte : échelle sur la
     // largeur, rognage vertical symétrique du dépassement (les rapports
     // simulateur/preview diffèrent de quelques pixels au plus).
+    //
+    // `PREVIEW_FIT=1` dans l'environnement : l'image ENTIÈRE tient dans la
+    // cible, centrée, sur le fond de l'app — pour une source dont le rapport
+    // n'a rien à voir avec celui demandé (écran intérieur de l'iPhone Duo,
+    // 1,42, dans un aperçu 1920×886 à 2,17), où le rognage couperait le plateau.
+    //
+    // L'orientation de la prise (`preferredTransform`) est appliquée d'abord :
+    // l'écran intérieur de l'iPhone Duo est un panneau natif PORTRAIT dont
+    // l'interface est couchée, et `simctl recordVideo` note la rotation dans
+    // les métadonnées au lieu de tourner les images. Identité partout ailleurs.
     let target = CGSize(width: CGFloat(width), height: CGFloat(height))
-    let scale = target.width / naturalSize.width
-    let scaledHeight = naturalSize.height * scale
+    let preferred = try await videoTrack.load(.preferredTransform)
+    let orientedRect = CGRect(origin: .zero, size: naturalSize).applying(preferred)
+    let orientation = preferred.concatenating(
+        CGAffineTransform(translationX: -orientedRect.minX, y: -orientedRect.minY))
+    let sourceSize = orientedRect.size
+    let fit = ProcessInfo.processInfo.environment["PREVIEW_FIT"] == "1"
+    let scale = fit
+        ? min(target.width / sourceSize.width, target.height / sourceSize.height)
+        : target.width / sourceSize.width
+    let xOffset = fit ? (target.width - sourceSize.width * scale) / 2 : 0
+    let scaledHeight = sourceSize.height * scale
     let yOffset = (target.height - scaledHeight) / 2  // négatif = rognage haut/bas
 
     let layerInstruction = AVMutableVideoCompositionLayerInstruction(assetTrack: compositionVideo)
     layerInstruction.setTransform(
-        CGAffineTransform(scaleX: scale, y: scale).concatenating(
-            CGAffineTransform(translationX: 0, y: yOffset)),
+        orientation
+            .concatenating(CGAffineTransform(scaleX: scale, y: scale))
+            .concatenating(CGAffineTransform(translationX: xOffset, y: yOffset)),
         at: .zero
     )
     let instruction = AVMutableVideoCompositionInstruction()
+    if fit {
+        // Le fond de l'app (`Theme.background`), pour que les bandes se
+        // fondent dans l'écran au lieu de l'encadrer de noir.
+        instruction.backgroundColor = CGColor(srgbRed: 0.043, green: 0.055, blue: 0.075, alpha: 1)
+    }
     instruction.timeRange = CMTimeRange(start: .zero, duration: finalDuration)
     instruction.layerInstructions = [layerInstruction]
 

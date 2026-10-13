@@ -14,6 +14,26 @@ struct OpeningTrainView: View {
     private var boardTheme: BoardTheme { appSettings.boardTheme }
 
     var body: some View {
+        GeometryReader { geo in
+            if showsBoard, BoardPanelLayout.usesSidePanel(in: geo.size) {
+                wideLayout(size: geo.size)
+            } else {
+                columnLayout
+            }
+        }
+        .appBackground()
+        .navigationTitle("Entraîner")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbarBackground(Theme.background, for: .navigationBar)
+        .toolbarColorScheme(.dark, for: .navigationBar)
+        .overlay { promotionOverlay }
+    }
+
+    private var showsBoard: Bool {
+        viewModel.phase != .empty && viewModel.phase != .complete
+    }
+
+    private var columnLayout: some View {
         VStack(spacing: 12) {
             header
             switch viewModel.phase {
@@ -31,12 +51,28 @@ struct OpeningTrainView: View {
             Spacer(minLength: 0)
         }
         .padding(.vertical, 12)
-        .appBackground()
-        .navigationTitle("Entraîner")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbarBackground(Theme.background, for: .navigationBar)
-        .toolbarColorScheme(.dark, for: .navigationBar)
-        .overlay { promotionOverlay }
+    }
+
+    /// Place nettement plus large que haute (l'iPhone Duo ouvert, une fenêtre
+    /// Mac) : le plateau prend toute la hauteur à gauche, le reste passe à
+    /// droite. En colonne, il n'avait plus que ce que laissaient l'en-tête, le
+    /// fil des coups et le commentaire — 320 pt sur le Duo ouvert, mesuré le
+    /// 13/10/2026. Même seuil que ``BoardWithPanel``.
+    private func wideLayout(size: CGSize) -> some View {
+        HStack(alignment: .top, spacing: BoardPanelLayout.gap) {
+            board
+                .aspectRatio(1, contentMode: .fit)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            VStack(spacing: 12) {
+                header
+                if !viewModel.playedSANs.isEmpty { moveTrail }
+                bottomArea
+                Spacer(minLength: 0)
+            }
+            .frame(width: BoardPanelLayout.panelWidth(in: size))
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 12)
     }
 
     // MARK: En-tête

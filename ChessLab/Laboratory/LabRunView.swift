@@ -21,24 +21,10 @@ struct LabRunView: View {
 
     var body: some View {
         GeometryReader { geo in
-            ScrollView {
-                VStack(spacing: 18) {
-                    // Le scénario qui chauffe le plus : des centaines de
-                    // recherches d'affilée (Lot 2.C).
-                    ThermalBadge()
-                    progressCard
-                    HStack(alignment: .center, spacing: 10) {
-                        LabVerticalEvalBar(evalCp: viewModel.currentEvalCp)
-                        board
-                    }
-                    .frame(maxWidth: boardBlockWidth(in: geo.size))
-                    .frame(maxWidth: .infinity)
-                    statsGrid
-                    progressChart
-                    resultDistribution
-                    controls
-                }
-                .padding(20)
+            if BoardPanelLayout.usesSidePanel(in: geo.size) {
+                wideBody(geo.size)
+            } else {
+                columnBody(geo.size)
             }
         }
         .appBackground()
@@ -50,6 +36,64 @@ struct LabRunView: View {
         .onDisappear { viewModel.handleViewDisappear() }
         .sheet(item: $shareItem) { item in
             ShareSheet(items: [item.url])
+        }
+    }
+
+    /// Place nettement plus large que haute — l'iPhone Duo ouvert, une
+    /// fenêtre Mac. La colonne y gardait sous le plateau la hauteur des
+    /// cartes de statistiques : plancher de 380 pt, soit 330 pt de plateau
+    /// sur le Duo ouvert (13/10/2026), dans une page qui défilait quand même.
+    /// Ici le plateau prend la hauteur à gauche, et le tableau de bord défile
+    /// seul à droite. Même seuil que ``BoardWithPanel``.
+    private func wideBody(_ size: CGSize) -> some View {
+        let padding: CGFloat = 20
+        let blockWidth = max(0, min(size.height - 2 * padding, size.width * 0.55))
+        return HStack(alignment: .top, spacing: 20) {
+            VStack(spacing: 12) {
+                ThermalBadge()
+                HStack(alignment: .center, spacing: 10) {
+                    LabVerticalEvalBar(evalCp: viewModel.currentEvalCp)
+                    board
+                }
+                // La hauteur du plateau (le bloc moins la barre de 36 pt et son
+                // espacement) : sans elle, la barre d'éval prenait toute la
+                // hauteur offerte et dépassait le plateau en haut et en bas.
+                .frame(height: max(0, blockWidth - 46))
+            }
+            .frame(width: blockWidth)
+            ScrollView {
+                VStack(spacing: 18) {
+                    progressCard
+                    statsGrid
+                    progressChart
+                    resultDistribution
+                    controls
+                }
+            }
+        }
+        .padding(.horizontal, padding)
+        .padding(.top, padding)
+    }
+
+    private func columnBody(_ size: CGSize) -> some View {
+        ScrollView {
+            VStack(spacing: 18) {
+                // Le scénario qui chauffe le plus : des centaines de
+                // recherches d'affilée (Lot 2.C).
+                ThermalBadge()
+                progressCard
+                HStack(alignment: .center, spacing: 10) {
+                    LabVerticalEvalBar(evalCp: viewModel.currentEvalCp)
+                    board
+                }
+                .frame(maxWidth: boardBlockWidth(in: size))
+                .frame(maxWidth: .infinity)
+                statsGrid
+                progressChart
+                resultDistribution
+                controls
+            }
+            .padding(20)
         }
     }
 

@@ -10,6 +10,12 @@ import XCTest
 /// verrou fait disparaître la classe de bugs en attendant un vrai layout
 /// paysage.
 ///
+/// Depuis le 13/10/2026, le verrou ne dépend plus de la famille d'appareil
+/// mais de la taille de l'écran (``OrientationPolicy``) : l'Info.plist de
+/// l'iPhone déclare les quatre orientations, et le délégué d'app ne laisse
+/// tourner que les écrans assez grands — l'écran intérieur de l'iPhone Duo.
+/// Ce test garde le contrat sur tous les autres iPhone.
+///
 /// Le test s'appuie sur les `frame` — jamais sur une capture d'écran : en
 /// paysage le simulateur rend l'app tournée à 90° dans un cadre resté
 /// portrait (piège documenté dans `PROGRESS.md`).
@@ -35,6 +41,11 @@ final class OrientationLockUITests: XCTestCase {
         try XCTSkipUnless(
             UIDevice.current.userInterfaceIdiom == .phone,
             "Verrou spécifique à l'iPhone — l'iPad garde ses quatre orientations"
+        )
+        let screen = UIScreen.main.bounds.size
+        try XCTSkipIf(
+            min(screen.width, screen.height) >= 600,
+            "Écran assez grand pour tourner (iPhone Duo ouvert) — voir OrientationPolicy"
         )
 
         XCUIDevice.shared.orientation = .portrait

@@ -28,26 +28,17 @@ struct DuckChessPlayView: View {
     }
 
     var body: some View {
-        GeometryReader { geo in
-            VStack(spacing: 10) {
-                playerRow(for: viewModel.userColor.opposite)
-                phaseBanner
-                boardBlock
-                playerRow(for: viewModel.userColor)
-                gameOverPanel
-                controlBar
-                movesStrip
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 8)
-            // Colonne bornée par la HAUTEUR de la fenêtre : le plateau est
-            // carré, donc déjà borné par elle. Sans cette borne, les bandeaux
-            // et la barre de contrôle s'étireraient seuls sur toute la largeur
-            // d'une fenêtre Mac. Même mesure que les autres variantes.
-            .frame(maxWidth: geo.size.height)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-            .background(moveCountMarker)
+        BoardWithPanel {
+            playerRow(for: viewModel.userColor.opposite)
+            phaseBanner
+            boardBlock
+            playerRow(for: viewModel.userColor)
+        } panel: {
+            gameOverPanel
+            controlBar
+            movesStrip
         }
+        .background(moveCountMarker)
         .appBackground()
         .navigationTitle(Text(variant.displayName))
         .navigationBarTitleDisplayMode(.inline)
