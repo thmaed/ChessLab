@@ -53,6 +53,7 @@ PREVIEW_SETS = {
 # (IPHONE_DUO_PROFILE) découle des dimensions du fichier : 2853 × 2007 /
 # 2007 × 2853 pour l'écran intérieur, 2034 × 1398 / 1398 × 2034 pour
 # l'extérieur ; aperçus en 1920 × 886 / 886 × 1920, 15 à 30 s.
+DUO_GROUP = "IPHONE_DUO_PROFILE"
 DUO_SCREENSHOTS = SUBMISSION / "screenshots" / "iphone-duo" / "en"
 DUO_PREVIEWS = ["duo-inner-tour.mov", "duo-outer-tour.mov"]
 
@@ -456,6 +457,8 @@ def cmd_duo(c, args):
     for kind in ("appAssetLibraryImages", "appAssetLibraryVideos"):
         for item in c.get_all(f"/appAssetLibraries/{library_id}/{kind.replace('appAssetLibrary', '').lower()}"):
             if (item["attributes"].get("referenceName") or "").startswith(prefix):
+                for placement in c.get_all(f"/{kind}/{item['id']}/placements"):
+                    c.delete(f"/appAssetLibraryPlacements/{placement['id']}")
                 c.delete(f"/{kind}/{item['id']}")
     shots = sorted(DUO_SCREENSHOTS.glob("*.png"))[:10]
     videos = [SUBMISSION / "videos" / n for n in DUO_PREVIEWS if (SUBMISSION / "videos" / n).exists()][:3]
@@ -472,7 +475,10 @@ def cmd_duo(c, args):
             for id_ in ids:
                 placed.append(c.post("/appAssetLibraryPlacements", {
                     "type": "appAssetLibraryPlacements",
-                    "attributes": {"placementType": placement_type},
+                    # Le groupe se NOMME : sans lui, Apple répond 409 (« combinaison
+                    # placementType / placementGroup non prise en charge »), il ne
+                    # le déduit pas des dimensions du fichier (constaté le 13/10).
+                    "attributes": {"placementType": placement_type, "placementGroup": DUO_GROUP},
                     "relationships": {rel_name: rel(kind, id_),
                                       "appStoreVersionLocalization": rel("appStoreVersionLocalizations", loc["id"])},
                 })["data"])
@@ -480,7 +486,7 @@ def cmd_duo(c, args):
                 # L'ordre des fichiers du dépôt est celui de la fiche.
                 c.post("/appAssetLibraryPlacementOrderingRequests", {
                     "type": "appAssetLibraryPlacementOrderingRequests",
-                    "attributes": {"placementGroup": placed[0]["attributes"].get("placementGroup")},
+                    "attributes": {"placementGroup": DUO_GROUP},
                     "relationships": {
                         "orderedPlacements": {"data": [{"type": "appAssetLibraryPlacements", "id": p["id"]} for p in placed]},
                         "appStoreVersionLocalization": rel("appStoreVersionLocalizations", loc["id"]),
