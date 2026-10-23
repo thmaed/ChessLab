@@ -13,18 +13,18 @@ Deuxième suggestion du testeur, faite des deux côtés. Vérifié par tests (iO
 `MissedMateDetectorTests`, `MissedMateScanIntegrationTests` avec le vrai
 moteur ; Android : `MissedMateDetectorTest` en JVM,
 `AnalysisReviewTest.lesMatsManquesSontProposesPuisAjoutes` et
-`PlaySetupTest.laFinDePartieProposeLesMatsManques` sur émulateur) — **reste à
-cocher sur appareil**.
+`PlaySetupTest.laFinDePartieProposeLesMatsManques` sur émulateur). **Galaxy
+A16, 23/10** : ces trois tests, et toute la classe `AnalysisReviewTest`, verts.
 
-- [ ] **Bouton « Mats manqués »** en fin de partie contre l'ordinateur, à côté
+- [x] **Bouton « Mats manqués »** en fin de partie contre l'ordinateur, à côté
       d'« Analyser » : ouvre l'analyse, qui cherche d'elle-même après la revue.
-- [ ] **« Chercher les mats manqués »** dans le menu de l'analyse, pour toute
+- [x] **« Chercher les mats manqués »** dans le menu de l'analyse, pour toute
       partie.
-- [ ] **Mêmes règles des deux côtés** (`MissedMateDetector`) : les deux camps,
+- [x] **Mêmes règles des deux côtés** (`MissedMateDetector`) : les deux camps,
       mat en 5 au plus, présélection à 97 % de gain, recherche dédiée au budget
       des puzzles, autre chemin vers le mat non compté, ligne COMPLÈTE jusqu'au
       mat (pas de `PuzzleSolutionTrimmer`), position déjà présente sautée.
-- [ ] **Proposition avant enregistrement** : « Coup 23, Blancs : mat en 2 —
+- [x] **Proposition avant enregistrement** : « Coup 23, Blancs : mat en 2 —
       L'ajouter à vos puzzles ? », mêmes phrases FR/EN. Puzzles thème « Mat »,
       provenance « Mes parties ».
 - [x] **Corrigé au passage (Android seul)** : une partie abandonnée dans les
@@ -37,9 +37,12 @@ cocher sur appareil**.
 Suggestions d'un testeur, faites des deux côtés dans le même chantier.
 Vérifié par tests (iOS : `PuzzleSessionDrawerTests` ; Android :
 `PuzzleAnswerTest` en JVM, `AppTest.ownGamesHideTheLevelFilter` sur
-émulateur) — **reste à cocher sur appareil**.
+émulateur). **Galaxy A16, 23/10** : `AppTest.ownGamesHideTheLevelFilter` et
+`puzzlesLoadFromTheLibrary` verts — la provenance est cochée. « Ratés » et le
+mat alternatif ne sont vérifiés qu'en JVM : leurs cases attendent un essai à
+la main sur l'appareil.
 
-- [ ] **Groupe « Provenance »** (Toutes · Mes parties · Bibliothèque) sur
+- [x] **Groupe « Provenance »** (Toutes · Mes parties · Bibliothèque) sur
       l'écran de choix. C'est iOS qui rattrapait Android ici : Android avait
       un sélecteur Lichess / Mes parties AU-DESSUS DU PLATEAU, iOS rien — ses
       puzzles maison se noyaient dans les ~100 000 de la bibliothèque. Le
