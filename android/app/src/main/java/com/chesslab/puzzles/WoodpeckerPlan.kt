@@ -17,7 +17,8 @@ import kotlin.random.Random
  * Pendant de `WoodpeckerPlan.swift`, mêmes décisions (23/10/2026) :
  *
  * - le programme ne touche PAS la répétition espacée des puzzles ;
- * - lots de 25, 50 ou 100 puzzles, 50 par défaut ;
+ * - lots de 10, 25 ou 50 puzzles, 25 par défaut (ramenés de 25/50/100 le
+ *   23/10/2026, à la demande de l'utilisateur) ;
  * - l'ordre est MÉLANGÉ à chaque cycle ;
  * - le nombre d'essais suit le réglage habituel ;
  * - réussi avec l'indice = réussi.
@@ -122,8 +123,8 @@ data class WoodpeckerPlan(
     }.toString()
 
     companion object {
-        val SIZES = listOf(25, 50, 100)
-        const val DEFAULT_SIZE = 50
+        val SIZES = listOf(10, 25, 50)
+        const val DEFAULT_SIZE = 25
 
         /** Premier cycle d'un nouveau programme. `null` sans aucun puzzle. */
         fun start(items: List<Item>, now: Long = System.currentTimeMillis(), random: Random = Random.Default): WoodpeckerPlan? {

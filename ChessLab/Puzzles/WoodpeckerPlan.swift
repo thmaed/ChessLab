@@ -10,7 +10,8 @@ import SwiftData
 /// en test. Décisions du 23/10/2026 :
 /// - le programme ne touche PAS la répétition espacée (SM-2) des puzzles :
 ///   deux méthodes, deux comptes séparés ;
-/// - lots de 25, 50 ou 100 puzzles, 50 par défaut ;
+/// - lots de 10, 25 ou 50 puzzles, 25 par défaut (ramenés de 25/50/100 le
+///   23/10/2026, à la demande de l'utilisateur) ;
 /// - l'ordre est MÉLANGÉ à chaque cycle : reconnaître le motif, pas la place
 ///   du puzzle dans la série ;
 /// - le nombre d'essais suit le réglage habituel (``AppSettings/puzzleAttempts``) ;
@@ -21,8 +22,8 @@ import SwiftData
 /// installation, et un programme synchronisé pourrait sinon désigner des
 /// puzzles absents de l'autre appareil. Vos puzzles maison y entrent aussi.
 struct WoodpeckerPlan: Codable, Equatable {
-    static let sizes = [25, 50, 100]
-    static let defaultSize = 50
+    static let sizes = [10, 25, 50]
+    static let defaultSize = 25
 
     struct Item: Codable, Equatable {
         var fen: String

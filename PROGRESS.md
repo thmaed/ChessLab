@@ -10657,3 +10657,7 @@ ici » soit toujours sur une position du joueur.
 - Raccourcis clavier ←/→ : même règle (ils appellent les mêmes fonctions).
 - Tests : `ReviewStepperTests` (4) ; `KeyboardShortcutsUITests` vert.
 
+Ajustement du même jour : les lots Woodpecker passent à **10, 25 ou 50
+puzzles, 25 par défaut** (demande de l'utilisateur ; ils étaient de 25, 50 ou
+100, 50 par défaut). Des deux côtés, aide comprise.
+

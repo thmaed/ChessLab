@@ -24,11 +24,11 @@ demi-coup choisi. Les variantes ne sont pas concernées.
 
 Troisième suggestion du testeur, faite des deux côtés. Décisions de
 l'utilisateur : le programme ne touche PAS la répétition espacée ; lots de 25,
-50 ou 100 (50 par défaut) ; ordre MÉLANGÉ à chaque cycle ; nombre d'essais du
+50 ou 100 (50 par défaut) — ramenés à 10, 25 ou 50 (25 par défaut) le même jour ; ordre MÉLANGÉ à chaque cycle ; nombre d'essais du
 réglage habituel ; réussi avec l'indice = réussi.
 
 - [x] **Carte « Méthode Woodpecker »** sur l'écran de choix : créer un programme
-      avec les critères choisis (taille 25/50/100), ou reprendre / arrêter celui
+      avec les critères choisis (taille 10/25/50), ou reprendre / arrêter celui
       en cours. Vérifié sur Galaxy A16
       (`AppTest.aWoodpeckerProgrammeCanBeCreatedResumedAndStopped`).
 - [x] **Écran de résolution en mode programme** : « Cycle n · k/N » et le chrono
