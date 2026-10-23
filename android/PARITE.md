@@ -34,10 +34,12 @@ réglage habituel ; réussi avec l'indice = réussi.
 - [x] **Écran de résolution en mode programme** : « Cycle n · k/N » et le chrono
       du cycle (temps ACTIF, en pause hors du premier plan) sur leur propre
       ligne, pas de « Passer », pas de score de séance. Vu sur Galaxy A16.
-- [ ] **Bilan de fin de cycle** (score et temps, cycle précédent, objectif =
+- [x] **Bilan de fin de cycle** (score et temps, cycle précédent, objectif =
       moitié du temps) et « Commencer le cycle n+1 » : vérifié en JVM
-      (`WoodpeckerPlanTest`) et dans le code, pas encore joué jusqu'au bout sur
-      l'appareil.
+      (`WoodpeckerPlanTest`), puis joué jusqu'au bout sur le Galaxy le 23/10 au
+      soir : `PuzzleDeviceFlowTest` résout dix VRAIS puzzles de la
+      bibliothèque coup par coup (ripostes comprises), voit le bilan, lance le
+      cycle 2, et vérifie que la répétition espacée n'a rien reçu.
 - [x] **Même plan des deux côtés** (`WoodpeckerPlan`), copie des puzzles dans le
       plan, plan stocké en un bloc JSON ; Room v10 (`woodpecker_programs`),
       migration vérifiée sur appareil (`MigrationTest`).
@@ -81,8 +83,11 @@ Vérifié par tests (iOS : `PuzzleSessionDrawerTests` ; Android :
 `PuzzleAnswerTest` en JVM, `AppTest.ownGamesHideTheLevelFilter` sur
 émulateur). **Galaxy A16, 23/10** : `AppTest.ownGamesHideTheLevelFilter` et
 `puzzlesLoadFromTheLibrary` verts — la provenance est cochée. « Ratés » et le
-mat alternatif ne sont vérifiés qu'en JVM : leurs cases attendent un essai à
-la main sur l'appareil.
+mat alternatif : cochés le 23/10 au soir — `PuzzleDeviceFlowTest` les joue
+À TRAVERS L'ÉCRAN sur le Galaxy (puzzle raté → revient dans « Ratés » →
+réussi par l'autre mat → quitte la série). Ce test a révélé que l'écran de
+résolution n'affichait JAMAIS son message d'état : une série vide montrait
+l'ancien plateau sous « Trouvez le meilleur coup ». Corrigé (`EmptySeries`).
 
 - [x] **Groupe « Provenance »** (Toutes · Mes parties · Bibliothèque) sur
       l'écran de choix. C'est iOS qui rattrapait Android ici : Android avait
@@ -91,11 +96,11 @@ la main sur l'appareil.
       sélecteur Android a rejoint l'écran de choix, comme les autres critères ;
       « Lichess » s'appelle désormais « Bibliothèque », comme sur iOS.
       « Mes parties » masque le groupe « Niveau » (aucune cote).
-- [ ] **Groupe « Historique » : Tous · Ratés.** Ratés = dernière tentative
+- [x] **Groupe « Historique » : Tous · Ratés.** Ratés = dernière tentative
       échouée (`failureCount > 0 && repetitions == 0`), échéance IGNORÉE.
       Réussi avec l'indice = réussi (décision du 23/10). Android retire de la
       file un puzzle réussi en série « Ratés ».
-- [ ] **Un coup qui mate est toujours juste**, même hors solution enregistrée,
+- [x] **Un coup qui mate est toujours juste**, même hors solution enregistrée,
       et clôt le puzzle. Android juge une promotion hors solution une fois la
       pièce choisie.
 - [x] **Doublons** : iOS ne recrée plus un puzzle maison pour une position

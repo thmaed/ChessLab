@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Extension
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.*
 import androidx.compose.foundation.horizontalScroll
@@ -101,6 +102,14 @@ fun PuzzleScreen(
         // résoudre, et le puzzle courant ne change plus sous les doigts. Ne
         // reste ici que le compte des révisions.
         DueBadge(ui)
+        // Série VIDE (aucun raté, aucun puzzle maison, rien pour ces critères) :
+        // on le DIT, comme l'écran vide d'iOS. Le plateau de l'ancien puzzle
+        // restait affiché sous « Trouvez le meilleur coup », et le message
+        // d'état — préparé par le view model — n'était montré nulle part.
+        if (!ui.loading && ui.puzzle == null) {
+            EmptySeries(ui.status)
+            return@Column
+        }
         Header(ui)
         ui.woodpeckerPlan?.let { WoodpeckerLine(it, ui.outcome == PuzzleOutcome.solving, model) }
         Spacer(Modifier.height(12.dp))
@@ -593,5 +602,23 @@ private fun WoodpeckerCycleSummary(plan: WoodpeckerPlan) {
                 fontSize = 12.sp, color = Palette.textTertiary,
             )
         }
+    }
+}
+
+/** Plus rien à résoudre : la raison, en clair — pendant du `ContentUnavailableView` d'iOS. */
+@Composable
+private fun EmptySeries(message: String) {
+    Column(
+        Modifier.fillMaxWidth().padding(horizontal = 32.dp, vertical = 48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Icon(Icons.Default.Extension, null, tint = Palette.textTertiary, modifier = Modifier.size(44.dp))
+        Text(
+            message,
+            fontSize = 15.sp, color = Palette.textSecondary,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.testTag("serie-vide"),
+        )
     }
 }
