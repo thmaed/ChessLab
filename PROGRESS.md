@@ -10603,3 +10603,7 @@ Lot B des suggestions du testeur. Porté sur Android dans le même chantier.
 - Tests : `MissedMateDetectorTests` (8), `MissedMateScanIntegrationTests`
   (opt-in `ENGINE_INTEGRATION=1`, 1,6 s sur simulateur).
 
+
+Vérifié sur **iPhone XS Max, iOS 18.7.9** (23/10) : `PuzzleFiltersUITests` (2),
+`PuzzleSessionDrawerTests`, `MissedMateDetectorTests` et
+`MissedMateScanIntegrationTests` avec le vrai moteur — 20 tests, tous verts.
