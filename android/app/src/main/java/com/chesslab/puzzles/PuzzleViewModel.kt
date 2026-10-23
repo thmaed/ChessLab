@@ -74,7 +74,51 @@ data class PuzzleUiState(
     val stats: com.chesslab.progression.PuzzleStats? = null,
     /** Combien de puzzles attendent d'être revus. */
     val dueCount: Int = 0,
+    /** Le plan du programme Woodpecker joué, `null` pour une série ordinaire. */
+    val woodpeckerPlan: WoodpeckerPlan? = null,
 )
+
+/**
+ * Compose une file de puzzles pour un filtre — la série ordinaire, ou le lot
+ * d'un programme Woodpecker ([count]). Pendant de `PuzzleSessionDrawer` (iOS).
+ */
+object PuzzleDraw {
+    suspend fun draw(
+        app: Application,
+        filter: PuzzleFilter,
+        own: List<OwnPuzzle>,
+        /** `null` : la série ordinaire (40 de la bibliothèque, tous les vôtres). */
+        count: Int? = null,
+    ): List<Puzzle> = withContext(Dispatchers.IO) {
+        val db = LibraryDatabase.get(app)
+        val mine = if (filter.source == PuzzleSource.lichess) emptyList()
+            else own.map { it.toPuzzle() }.filter { PuzzleAnswer.accepts(it, filter, isOwn = true) }
+        runCatching {
+            when {
+                // Les ratés, dus ou non : la progression dit lesquels, la
+                // bibliothèque et vos puzzles maison disent ce qu'ils sont.
+                filter.missedOnly -> {
+                    val missed = db.puzzleProgress().missedIds().toSet()
+                    val library = if (filter.source == PuzzleSource.ownGames) emptyList()
+                        else PuzzleRepository.byIds(app.assets, missed)
+                            .filter { PuzzleAnswer.accepts(it, filter, isOwn = false) }
+                    val all = (mine.filter { it.id in missed } + library).shuffled()
+                    if (count != null) all.take(count) else all
+                }
+                filter.source == PuzzleSource.ownGames ->
+                    if (count != null) mine.shuffled().take(count) else mine
+                else -> PuzzleRepository.sample(
+                    app.assets,
+                    count = count ?: 40,
+                    ratings = filter.ratings,
+                    theme = filter.theme?.raw,
+                    phase = filter.phase?.raw,
+                    extra = mine,
+                )
+            }
+        }.getOrDefault(emptyList())
+    }
+}
 
 /**
  * Résoudre des puzzles. Pendant réduit de `PuzzleSolveViewModel.swift`.
@@ -106,8 +150,103 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Change de filtre : la file se reconstitue autour de ce qu'on demande. */
     fun setFilter(filter: PuzzleFilter) {
-        if (filter == ui.filter) return
+        // Ce view model vit autant que l'activité : sortir d'un programme
+        // Woodpecker pour une série ordinaire doit recharger, même à filtre égal.
+        if (filter == ui.filter && program == null) return
         load(filter)
+    }
+
+    // MARK: Woodpecker
+
+    /** Le programme joué, `null` pour une série ordinaire. Pendant du mode programme d'iOS. */
+    private var program: WoodpeckerProgram? = null
+    /** Chrono du puzzle courant : temps ACTIF, en pause hors du premier plan. */
+    private var clockStartedAt: Long? = null
+    private var clockAccumulatedMs = 0L
+
+    /**
+     * Ouvre un programme sur son puzzle courant. Un cycle bouclé et laissé là
+     * repart sur le suivant : revenir au programme, c'est vouloir continuer.
+     */
+    fun openWoodpecker(id: String) {
+        if (program?.id == id && ui.woodpeckerPlan != null) return
+        loading?.cancel()
+        loading = viewModelScope.launch {
+            val dao = LibraryDatabase.get(getApplication()).woodpecker()
+            val stored = withContext(Dispatchers.IO) { dao.byId(id) }
+            var plan = stored?.plan
+            if (stored == null || plan == null) {
+                ui = ui.copy(loading = false, puzzle = null, woodpeckerPlan = null, status = s(R.string.woodpecker_missing))
+                return@launch
+            }
+            program = stored
+            if (plan.currentCycle.isComplete) {
+                plan = plan.startNextCycle()
+                persist(plan)
+            }
+            ui = ui.copy(loading = false, woodpeckerPlan = plan, hint = null)
+            presentWoodpecker()
+        }
+    }
+
+    private fun presentWoodpecker() {
+        val plan = ui.woodpeckerPlan ?: return
+        val index = plan.currentItemIndex ?: return
+        queue = listOf(plan.items[index].toPuzzle(index))
+        present(0)
+        clockAccumulatedMs = 0
+        clockStartedAt = System.currentTimeMillis()
+    }
+
+    /** La réponse va au PROGRAMME — jamais à la répétition espacée, ni aux stats. */
+    private fun recordWoodpecker(solved: Boolean) {
+        val plan = ui.woodpeckerPlan ?: return
+        val seconds = elapsedOnPuzzleMs() / 1000.0
+        clockStartedAt = null
+        clockAccumulatedMs = 0
+        val next = plan.record(solved, seconds)
+        ui = ui.copy(woodpeckerPlan = next)
+        persist(next)
+    }
+
+    private fun persist(plan: WoodpeckerPlan) {
+        val current = program ?: return
+        val updated = current.copy(planJson = plan.toJson(), updatedAt = System.currentTimeMillis())
+        program = updated
+        viewModelScope.launch(Dispatchers.IO) {
+            LibraryDatabase.get(getApplication()).woodpecker().put(updated)
+        }
+    }
+
+    /** Lance le cycle suivant sur le même lot, dans un nouvel ordre. */
+    fun startNextCycle() {
+        val plan = ui.woodpeckerPlan ?: return
+        if (!plan.currentCycle.isComplete) return
+        val next = plan.startNextCycle()
+        ui = ui.copy(woodpeckerPlan = next)
+        persist(next)
+        presentWoodpecker()
+    }
+
+    fun pauseClock() {
+        val started = clockStartedAt ?: return
+        clockAccumulatedMs += System.currentTimeMillis() - started
+        clockStartedAt = null
+    }
+
+    fun resumeClock() {
+        if (ui.woodpeckerPlan == null || ui.outcome != PuzzleOutcome.solving || clockStartedAt != null) return
+        clockStartedAt = System.currentTimeMillis()
+    }
+
+    private fun elapsedOnPuzzleMs(now: Long = System.currentTimeMillis()): Long =
+        clockAccumulatedMs + (clockStartedAt?.let { now - it } ?: 0L)
+
+    /** Temps actif du cycle, puzzle en cours compris — le chrono affiché. */
+    fun cycleElapsedSeconds(now: Long = System.currentTimeMillis()): Double {
+        val plan = ui.woodpeckerPlan ?: return 0.0
+        val running = if (ui.outcome == PuzzleOutcome.solving) elapsedOnPuzzleMs(now) / 1000.0 else 0.0
+        return plan.currentCycle.activeSeconds + running
     }
 
     /**
@@ -118,6 +257,9 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     private var loading: Job? = null
 
     private fun load(filter: PuzzleFilter) {
+        program = null
+        clockStartedAt = null
+        ui = ui.copy(woodpeckerPlan = null)
         loading?.cancel()
         loading = viewModelScope.launch { fill(filter) }
     }
@@ -135,32 +277,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val stats = withContext(Dispatchers.IO) {
             runCatching { com.chesslab.progression.PuzzleStats.compute(db.puzzleProgress().all()) }.getOrNull()
         }
-        val mine = if (filter.source == PuzzleSource.lichess) emptyList()
-            else own.map { it.toPuzzle() }.filter { PuzzleAnswer.accepts(it, filter, isOwn = true) }
-        queue = withContext(Dispatchers.IO) {
-            runCatching {
-                when {
-                    // Les ratés, dus ou non : la progression dit lesquels, la
-                    // bibliothèque et vos puzzles maison disent ce qu'ils sont.
-                    filter.missedOnly -> {
-                        val missed = db.puzzleProgress().missedIds().toSet()
-                        val library = if (filter.source == PuzzleSource.ownGames) emptyList()
-                            else PuzzleRepository.byIds(app.assets, missed)
-                                .filter { PuzzleAnswer.accepts(it, filter, isOwn = false) }
-                        (mine.filter { it.id in missed } + library).shuffled()
-                    }
-                    filter.source == PuzzleSource.ownGames -> mine
-                    else -> PuzzleRepository.sample(
-                        app.assets,
-                        count = 40,
-                        ratings = filter.ratings,
-                        theme = filter.theme?.raw,
-                        phase = filter.phase?.raw,
-                        extra = mine,
-                    )
-                }
-            }.getOrDefault(emptyList())
-        }
+        queue = PuzzleDraw.draw(app, filter, own)
         ui = ui.copy(loading = false, dueCount = due, stats = stats)
         if (queue.isEmpty()) {
             ui = ui.copy(
@@ -222,6 +339,12 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
 
     fun next() {
         if (queue.isEmpty()) return
+        // Programme : le puzzle suivant DU CYCLE ; en fin de cycle, l'écran
+        // montre le bilan et c'est `startNextCycle` qui repart.
+        ui.woodpeckerPlan?.let { plan ->
+            if (plan.currentItemIndex != null && ui.outcome != PuzzleOutcome.solving) presentWoodpecker()
+            return
+        }
         // Série « Ratés » : un puzzle réussi n'est plus raté, il quitte la
         // file — iOS ne le retirerait plus de la base.
         if (ui.filter.missedOnly && ui.outcome == PuzzleOutcome.solved) {
@@ -320,8 +443,11 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             )
         } else {
             com.chesslab.sound.Haptics.illegal()
-            StatsStore.recordPuzzle(getApplication(), solvedIt = false)
-            ui.puzzle?.let { recordProgress(it, success = false) }
+            if (ui.woodpeckerPlan != null) recordWoodpecker(solved = false)
+            else {
+                StatsStore.recordPuzzle(getApplication(), solvedIt = false)
+                ui.puzzle?.let { recordProgress(it, success = false) }
+            }
             ui.copy(
                 selected = null, legalTargets = emptySet(),
                 outcome = PuzzleOutcome.failed,
@@ -338,8 +464,11 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         // Un mat clôt le puzzle même s'il restait des coups à la séquence.
         if (step >= puzzle.solution.size || board.state is Board.State.Checkmate) {
             com.chesslab.sound.Haptics.gameEnded()
-            StatsStore.recordPuzzle(getApplication(), solvedIt = true)
-            recordProgress(puzzle, success = true)
+            if (ui.woodpeckerPlan != null) recordWoodpecker(solved = true)
+            else {
+                StatsStore.recordPuzzle(getApplication(), solvedIt = true)
+                recordProgress(puzzle, success = true)
+            }
             ui = ui.copy(
                 outcome = PuzzleOutcome.solved,
                 solvedCount = ui.solvedCount + 1,

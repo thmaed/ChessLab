@@ -72,7 +72,7 @@
     <string name="help_level_title">The level shown</string>
     <string name="help_offline_body">Everything. No account, no network, no data leaving the device. The engine, the puzzles, the courses and the opponents are all embedded.</string>
     <string name="help_offline_title">What stays offline</string>
-    <string name="help_puzzles_body">One try by default. Three invite you to try a move « just to see », exactly the opposite of what a puzzle trains: you calculate the line to the end BEFORE you touch the piece. The three-try net is still in the settings. “Missed” replays only what you got wrong on your last attempt, and a checkmating move is always accepted, even when it is not the stored solution. At the end of a game, “Missed mates” looks for the forced mates either side let slip and offers to make puzzles of them.</string>
+    <string name="help_puzzles_body">One try by default. Three invite you to try a move « just to see », exactly the opposite of what a puzzle trains: you calculate the line to the end BEFORE you touch the piece. The three-try net is still in the settings. “Missed” replays only what you got wrong on your last attempt, and a checkmating move is always accepted, even when it is not the stored solution. At the end of a game, “Missed mates” looks for the forced mates either side let slip and offers to make puzzles of them. The Woodpecker method replays a fixed set of 25, 50 or 100 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone.</string>
     <string name="help_puzzles_title">The puzzles</string>
     <string name="help_safety_body">Maia does not calculate: it can miss a mate in two or spoil an elementary endgame. Above a certain level, Stockfish takes over in FOUR cases only — a mate in one or two, an endgame with few pieces, a repetition in a winning position, and the case where the model does not answer. Below that level, missing a mate is PART of the character.</string>
     <string name="help_safety_title">The safety net</string>
@@ -1050,6 +1050,24 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="analysis_summary_partial">Analysis in progress — the summary fills in as moves are classified.</string>
     <string name="puzzle_view_source">See it in the original game</string>
 
+    <string name="woodpecker_title">Woodpecker method</string>
+    <string name="woodpecker_intro">A fixed set of puzzles, solved in full then replayed in a new order, cycle after cycle, to find more of them, faster. It uses the criteria chosen above.</string>
+    <string name="woodpecker_create">Create the programme</string>
+    <string name="woodpecker_resume">Resume</string>
+    <string name="woodpecker_stop">Stop</string>
+    <string name="woodpecker_stop_title">Stop this programme?</string>
+    <string name="woodpecker_stop_body">Its cycles stay recorded, but it will no longer be offered.</string>
+    <string name="woodpecker_stop_confirm">Stop the programme</string>
+    <string name="woodpecker_none_match">No puzzle matches these criteria.</string>
+    <string name="woodpecker_criteria">%1$d puzzles</string>
+    <string name="woodpecker_missing">This Woodpecker programme no longer exists on this device.</string>
+    <string name="woodpecker_start_cycle">Start cycle %1$d</string>
+    <string name="woodpecker_next_puzzle">Next puzzle</string>
+    <string name="woodpecker_progress">Cycle %1$d · %2$d/%3$d</string>
+    <string name="woodpecker_cycle_done">Cycle %1$d complete</string>
+    <string name="woodpecker_cycle_line">%1$d solved out of %2$d in %3$s</string>
+    <string name="woodpecker_previous_line">Cycle %1$d: %2$d solved out of %3$d in %4$s</string>
+    <string name="woodpecker_target">Next cycle target: under %1$s</string>
     <string name="puzzle_provenance">Source</string>
     <string name="puzzle_history">History</string>
     <string name="puzzle_missed">Missed</string>

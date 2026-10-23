@@ -20,6 +20,8 @@ struct PuzzleQueueView: View {
     var onOpenLab: () -> Void = {}
     var onPlayVsEngine: () -> Void = {}
     var onOpenTwoPlayer: () -> Void = {}
+    /// Ouvre un programme Woodpecker (créé ici, ou repris).
+    var onOpenWoodpecker: (UUID) -> Void = { _ in }
 
     @Environment(\.modelContext) private var modelContext
 
@@ -32,6 +34,11 @@ struct PuzzleQueueView: View {
     @State private var hasAnyPuzzle = true
     /// Bilan (Lot 5.B), recalculé à l'apparition — voir ``refresh()``.
     @State private var stats: PuzzleStats?
+    /// Le programme Woodpecker en cours (le plus récent non abandonné).
+    @State private var woodpecker: WoodpeckerProgram?
+    @State private var woodpeckerSize = WoodpeckerPlan.defaultSize
+    @State private var confirmsWoodpeckerArchive = false
+    @State private var woodpeckerMessage: String?
 
     private var currentFilter: PuzzleSessionFilter {
         PuzzleSessionFilter(
@@ -128,6 +135,8 @@ struct PuzzleQueueView: View {
                                 }
                             }
 
+                            woodpeckerCard
+
                             if let stats, stats.successRate != nil {
                                 statsCard(stats)
                             }
@@ -170,6 +179,129 @@ struct PuzzleQueueView: View {
             }
         }
         .onAppear { refresh() }
+        .confirmationDialog(
+            "Arrêter ce programme ?",
+            isPresented: $confirmsWoodpeckerArchive,
+            titleVisibility: .visible
+        ) {
+            Button("Arrêter le programme", role: .destructive) { archiveWoodpecker() }
+        } message: {
+            Text("Ses cycles restent enregistrés, mais il ne sera plus proposé.")
+        }
+        .alert(
+            "Woodpecker",
+            isPresented: Binding(get: { woodpeckerMessage != nil }, set: { if !$0 { woodpeckerMessage = nil } })
+        ) {
+            Button("OK") {}
+        } message: {
+            Text(woodpeckerMessage ?? "")
+        }
+    }
+
+    // MARK: Woodpecker
+
+    /// La méthode Woodpecker : un lot FIXE, repris en cycles de plus en plus
+    /// rapides (voir ``WoodpeckerPlan``). Un seul programme en cours à la
+    /// fois — la carte propose de le reprendre, sinon d'en créer un avec les
+    /// critères choisis au-dessus.
+    @ViewBuilder
+    private var woodpeckerCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Label("Méthode Woodpecker", systemImage: "arrow.triangle.2.circlepath")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Theme.textPrimary)
+
+            if let program = woodpecker, let plan = program.plan {
+                let cycle = plan.currentCycle
+                Text(program.criteria)
+                    .font(.caption)
+                    .foregroundStyle(Theme.textSecondary)
+                Text(cycle.isComplete
+                     ? LocalizationController.string("Cycle %lld terminé", cycle.number)
+                     : LocalizationController.string("Cycle %lld · %lld/%lld", cycle.number, cycle.attempts.count, cycle.order.count))
+                    .font(.caption.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(Theme.accent)
+                if let finished = plan.cycles.last(where: \.isComplete) {
+                    Text(LocalizationController.string(
+                        "Cycle %lld : %lld trouvés sur %lld en %@",
+                        finished.number, finished.solvedCount, finished.order.count,
+                        WoodpeckerPlan.formatDuration(finished.activeSeconds)
+                    ))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(Theme.textTertiary)
+                }
+                HStack(spacing: 10) {
+                    Button { onOpenWoodpecker(program.id) } label: {
+                        Text(cycle.isComplete
+                             ? LocalizationController.string("Commencer le cycle %lld", cycle.number + 1)
+                             : LocalizationController.string("Reprendre"))
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.background)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 10)
+                            .background(Theme.accentGradient, in: Capsule())
+                    }
+                    .buttonStyle(.pressable)
+                    .accessibilityIdentifier("woodpeckerResume")
+                    // « Arrêter » et non « Abandonner », qui se traduit
+                    // « Resign » : abandonner une PARTIE, pas un programme.
+                    Button("Arrêter", role: .destructive) { confirmsWoodpeckerArchive = true }
+                        .font(.subheadline)
+                        .accessibilityIdentifier("woodpeckerArchive")
+                }
+            } else {
+                Text("Un lot fixe de puzzles, résolu en entier puis repris dans un nouvel ordre, cycle après cycle, pour en trouver plus et plus vite. Il reprend les critères choisis au-dessus.")
+                    .font(.caption)
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Picker("Taille du lot", selection: $woodpeckerSize) {
+                    ForEach(WoodpeckerPlan.sizes, id: \.self) { size in
+                        Text("\(size)").tag(size)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityIdentifier("woodpeckerSize")
+                Button { createWoodpecker() } label: {
+                    Text("Créer le programme")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(Theme.surface, in: Capsule())
+                        .overlay(Capsule().strokeBorder(Theme.strokeStrong, lineWidth: 1))
+                }
+                .buttonStyle(.pressable)
+                .accessibilityIdentifier("woodpeckerCreate")
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
+        // `.contain` : sans lui, l'identifiant de la carte ÉCRASE ceux de ses
+        // boutons, que les tests ne retrouvent plus.
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("woodpeckerCard")
+    }
+
+    /// Compose le lot avec les critères de l'écran, puis l'ouvre aussitôt.
+    private func createWoodpecker() {
+        let puzzles = PuzzleSessionDrawer.sample(matching: currentFilter, count: woodpeckerSize, in: modelContext)
+        guard let plan = WoodpeckerPlan.start(items: puzzles.map(WoodpeckerPlan.Item.init)) else {
+            woodpeckerMessage = LocalizationController.string("Aucun puzzle ne correspond à ces critères.")
+            return
+        }
+        let program = WoodpeckerProgram()
+        program.criteria = LocalizationController.string("%lld puzzles", plan.items.count) + " · " + selectionSummary
+        program.plan = plan
+        modelContext.insert(program)
+        PersistenceLog.save(modelContext)
+        woodpecker = program
+        onOpenWoodpecker(program.id)
+    }
+
+    private func archiveWoodpecker() {
+        woodpecker?.isArchived = true
+        PersistenceLog.save(modelContext)
+        woodpecker = nil
     }
 
     /// "Attaque à la découverte" déborderait à côté des autres chips —
@@ -280,6 +412,13 @@ struct PuzzleQueueView: View {
         })
         attempted.propertiesToFetch = [\.successCount, \.failureCount, \.themeRaw]
         stats = (try? modelContext.fetch(attempted)).map { PuzzleStats.compute(from: $0) }
+
+        var programs = FetchDescriptor<WoodpeckerProgram>(
+            predicate: #Predicate { !$0.isArchived },
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        programs.fetchLimit = 1
+        woodpecker = (try? modelContext.fetch(programs))?.first
     }
 }
 

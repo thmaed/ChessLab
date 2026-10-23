@@ -132,6 +132,8 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
         val theme: String? = null,
         val filter: com.chesslab.puzzles.PuzzleFilter? = null,
     ) : Route(R.string.route_puzzles)
+    /** Un programme Woodpecker, repris là où il en est. */
+    data class Woodpecker(val id: String) : Route(R.string.route_puzzles)
     data object Openings : Route(R.string.route_openings) {
         override val hasOwnTitle get() = true
     }

@@ -193,8 +193,9 @@ interface AutosaveDao {
         GameRecord::class, Autosave::class,
         com.chesslab.training.OpeningProgress::class, com.chesslab.training.OpeningReviewLog::class,
         com.chesslab.puzzles.OwnPuzzle::class, com.chesslab.puzzles.PuzzleProgress::class,
+        com.chesslab.puzzles.WoodpeckerProgram::class,
     ],
-    version = 9, exportSchema = false,
+    version = 10, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
@@ -202,6 +203,7 @@ abstract class LibraryDatabase : RoomDatabase() {
     abstract fun training(): com.chesslab.training.TrainingDao
     abstract fun ownPuzzles(): com.chesslab.puzzles.OwnPuzzleDao
     abstract fun puzzleProgress(): com.chesslab.puzzles.PuzzleProgressDao
+    abstract fun woodpecker(): com.chesslab.puzzles.WoodpeckerDao
 
     companion object {
         @Volatile private var instance: LibraryDatabase? = null
@@ -314,7 +316,27 @@ abstract class LibraryDatabase : RoomDatabase() {
          */
         val ALL_MIGRATIONS get() = arrayOf(
             MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
+            MIGRATION_9_10,
         )
+
+        /**
+         * v9 → v10 : les programmes Woodpecker (23/10/2026). Une table neuve,
+         * rien à convertir : le plan voyage en un bloc JSON, comme sur iOS.
+         */
+        val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS woodpecker_programs (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        createdAt INTEGER NOT NULL,
+                        updatedAt INTEGER NOT NULL,
+                        criteria TEXT NOT NULL,
+                        planJson TEXT NOT NULL,
+                        archived INTEGER NOT NULL
+                    )"""
+                )
+            }
+        }
 
         /**
          * v8 → v9 : la bibliothèque devient un vrai classeur. Les ÉTIQUETTES

@@ -68,6 +68,30 @@ enum PuzzleSessionDrawer {
         return randomPick(matching: filter, neverOpenedOnly: false, excluding: excludedID, in: context)
     }
 
+    /// Le lot d'un programme Woodpecker : jusqu'à `count` puzzles DISTINCTS
+    /// correspondant au filtre, tirés au hasard, dus ou non — un programme ne
+    /// suit pas la répétition espacée. Moins que demandé si le filtre n'en
+    /// offre pas assez.
+    static func sample(matching filter: PuzzleSessionFilter, count: Int, in context: ModelContext) -> [Puzzle] {
+        var descriptor = FetchDescriptor<Puzzle>(predicate: predicate(matching: filter, ignoresSchedule: true))
+        let total = (try? context.fetchCount(descriptor)) ?? 0
+        guard total > 0, count > 0 else { return [] }
+        // Des offsets distincts, puis un puzzle par offset : même raison que
+        // ``randomPick`` — ne jamais matérialiser des dizaines de milliers
+        // d'objets pour en garder cinquante.
+        let offsets = Array(0..<total).shuffled().prefix(count)
+        descriptor.fetchLimit = 1
+        var seen = Set<UUID>()
+        return offsets.compactMap { offset in
+            descriptor.fetchOffset = offset
+            // Sans tri, rien ne GARANTIT que deux requêtes rangent les lignes
+            // dans le même ordre : un doublon reste possible, on l'écarte.
+            guard let puzzle = ((try? context.fetch(descriptor)) ?? []).first,
+                  seen.insert(puzzle.id).inserted else { return nil }
+            return puzzle
+        }
+    }
+
     /// Existe-t-il au moins un puzzle de cette provenance, dû ou non ?
     static func hasAnyPuzzle(from source: PuzzleSource, in context: ModelContext) -> Bool {
         let sourceRaw = source.rawValue
@@ -124,7 +148,8 @@ enum PuzzleSessionDrawer {
     /// c'est exactement le bug qui rendait les filtres de difficulté
     /// vides. Uniquement du `??` et des comparaisons simples.
     private static func predicate(
-        matching filter: PuzzleSessionFilter, neverOpenedOnly: Bool = false, excluding excludedID: UUID? = nil
+        matching filter: PuzzleSessionFilter, neverOpenedOnly: Bool = false, excluding excludedID: UUID? = nil,
+        ignoresSchedule: Bool = false
     ) -> Predicate<Puzzle> {
         let now = Date()
         let distantPast = Date.distantPast
@@ -150,9 +175,14 @@ enum PuzzleSessionDrawer {
         }
         // Trois prédicats composés plutôt qu'un seul : d'un bloc, le
         // compilateur renonçait à typer l'expression.
-        let schedule: Predicate<Puzzle> = filter.missedOnly
-            ? #Predicate { ($0.failureCount ?? 0) > 0 && ($0.repetitions ?? 0) == 0 }
-            : #Predicate { ($0.dueDate ?? distantPast) <= now }
+        let schedule: Predicate<Puzzle>
+        if filter.missedOnly {
+            schedule = #Predicate { ($0.failureCount ?? 0) > 0 && ($0.repetitions ?? 0) == 0 }
+        } else if ignoresSchedule {
+            schedule = #Predicate { _ in true }
+        } else {
+            schedule = #Predicate { ($0.dueDate ?? distantPast) <= now }
+        }
         // Un puzzle sans `sourceRaw` date d'avant ce champ : il venait
         // forcément de vos parties (voir ``Puzzle/source``).
         let legacySourceRaw = PuzzleSource.ownGames.rawValue

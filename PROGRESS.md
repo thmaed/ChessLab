@@ -10607,3 +10607,36 @@ Lot B des suggestions du testeur. Porté sur Android dans le même chantier.
 Vérifié sur **iPhone XS Max, iOS 18.7.9** (23/10) : `PuzzleFiltersUITests` (2),
 `PuzzleSessionDrawerTests`, `MissedMateDetectorTests` et
 `MissedMateScanIntegrationTests` avec le vrai moteur — 20 tests, tous verts.
+
+## 23/10 — Méthode Woodpecker ✅
+
+Lot C des suggestions du testeur. Porté sur Android dans le même chantier.
+
+**Décisions de l'utilisateur** : le programme ne touche PAS la répétition
+espacée (SM-2) ; lots de 25, 50 ou 100 puzzles, 50 par défaut ; ordre MÉLANGÉ à
+chaque cycle ; nombre d'essais du réglage habituel ; réussi avec l'indice =
+réussi.
+
+- **`WoodpeckerPlan`** (valeur pure, testée) : le lot COPIÉ (position, solution,
+  thème, phase, cote — la bibliothèque est échantillonnée différemment selon
+  l'installation, une référence pourrait manquer ailleurs), les cycles et leurs
+  réponses (trouvé, secondes). Temps du cycle = temps ACTIF, somme des réponses.
+  Objectif affiché : la moitié du dernier cycle fini.
+- **`WoodpeckerProgram`** (`@Model`) dans le store « Games » SYNCHRONISÉ, ajout
+  additif comme `UserOpeningRecord` ; le plan en un bloc JSON.
+  ⚠️ **Avant une version publiée avec la synchro iCloud active : déployer le
+  schéma CloudKit en production** (nouveau type d'enregistrement), sinon les
+  programmes ne voyageront pas.
+- **Écran de choix** : carte « Méthode Woodpecker » — créer avec les critères de
+  l'écran (`PuzzleSessionDrawer.sample` : tirage distinct, échéances ignorées),
+  ou reprendre / arrêter le programme en cours (un seul à la fois).
+- **Écran de résolution réutilisé** : `PuzzleSolveViewModel(woodpecker:)` joue
+  des `Puzzle` TRANSITOIRES (jamais insérés) ; les réponses vont au programme,
+  rien à la bibliothèque. Ligne « Cycle n · k/N » + chrono, en pause hors du
+  premier plan. Fin de cycle : bilan comparé et « Commencer le cycle n+1 ».
+  Rouvrir un programme au cycle bouclé démarre le suivant.
+- Piège : `.accessibilityIdentifier` sur la carte entière écrasait ceux de ses
+  boutons — `.accessibilityElement(children: .contain)` avant.
+- Tests : `WoodpeckerPlanTests` (8), trois tests dans `PuzzleSessionDrawerTests`,
+  `WoodpeckerUITests`.
+

@@ -19,6 +19,17 @@ final class PuzzleSolveViewModel {
     /// puzzle dû correspondant, la série est ouverte (voir
     /// ``PuzzleSessionFilter``).
     private let filter: PuzzleSessionFilter
+    /// Programme Woodpecker joué par cet écran, `nil` pour une série
+    /// ordinaire. Ses puzzles viennent du lot figé du programme, dans l'ordre
+    /// du cycle ; ses réponses vont au PROGRAMME, jamais à la répétition
+    /// espacée de la bibliothèque (décision du 23/10/2026).
+    private let program: WoodpeckerProgram?
+    /// Copie de travail du plan du programme, réécrite à chaque réponse.
+    private(set) var plan: WoodpeckerPlan?
+    /// Chrono du puzzle courant (programme seulement) : temps ACTIF, mis en
+    /// pause quand l'écran quitte le premier plan.
+    private var clockStartedAt: Date?
+    private var clockAccumulated: TimeInterval = 0
     /// Prétiré à la fin du puzzle courant (voir `finish`) : détermine si
     /// "Nouveau puzzle" est proposé, sans requête dans `body`.
     private var nextPuzzle: Puzzle?
@@ -75,16 +86,84 @@ final class PuzzleSolveViewModel {
         self.puzzle = first
         self.filter = filter
         self.modelContext = modelContext
+        self.program = nil
         let position = Position(fen: first.fen ?? "") ?? .standard
         board = Board(position: position)
         orientation = position.sideToMove
         markFirstOpenIfNeeded(first)
     }
 
+    /// Ouvre un programme Woodpecker sur son puzzle courant. Un cycle
+    /// terminé et laissé là repart sur le suivant : revenir au programme,
+    /// c'est vouloir continuer. `nil` si le plan est illisible.
+    init?(woodpecker program: WoodpeckerProgram, modelContext: ModelContext) {
+        guard var plan = program.plan else { return nil }
+        if plan.currentCycle.isComplete {
+            plan.startNextCycle()
+            program.plan = plan
+            PersistenceLog.save(modelContext)
+        }
+        guard let index = plan.currentItemIndex else { return nil }
+        let first = plan.items[index].makePuzzle()
+        self.puzzle = first
+        self.filter = PuzzleSessionFilter()
+        self.modelContext = modelContext
+        self.program = program
+        self.plan = plan
+        let position = Position(fen: first.fen ?? "") ?? .standard
+        board = Board(position: position)
+        orientation = position.sideToMove
+        clockStartedAt = Date()
+    }
+
+    var isWoodpecker: Bool { program != nil }
+
+    /// Le cycle courant est bouclé : l'écran montre son bilan.
+    var isCycleComplete: Bool { isFinished && plan?.currentCycle.isComplete == true }
+
     /// Série ouverte : pas de total connu à l'avance, seulement le rang
-    /// du puzzle courant.
+    /// du puzzle courant. Programme : le cycle et la place dans le lot.
     var sessionProgressText: String? {
-        "Puzzle n°\(sessionIndex)"
+        if let plan {
+            let cycle = plan.currentCycle
+            let rank = min(cycle.order.count, cycle.attempts.count + (isFinished ? 0 : 1))
+            return LocalizationController.string("Cycle %lld · %lld/%lld", cycle.number, rank, cycle.order.count)
+        }
+        return "Puzzle n°\(sessionIndex)"
+    }
+
+    // MARK: Chrono (programme Woodpecker)
+
+    func pauseClock() {
+        guard let started = clockStartedAt else { return }
+        clockAccumulated += Date().timeIntervalSince(started)
+        clockStartedAt = nil
+    }
+
+    func resumeClock() {
+        guard isWoodpecker, !isFinished, clockStartedAt == nil else { return }
+        clockStartedAt = Date()
+    }
+
+    private func elapsedOnPuzzle(at now: Date = Date()) -> TimeInterval {
+        clockAccumulated + (clockStartedAt.map { now.timeIntervalSince($0) } ?? 0)
+    }
+
+    /// Temps actif du cycle courant, puzzle en cours compris — l'affichage
+    /// en direct du chrono.
+    func cycleElapsed(at now: Date) -> TimeInterval {
+        (plan?.currentCycle.activeSeconds ?? 0) + (isFinished ? 0 : elapsedOnPuzzle(at: now))
+    }
+
+    /// Lance le cycle suivant sur le même lot, dans un nouvel ordre.
+    func startNextCycle() {
+        guard var plan, plan.currentCycle.isComplete else { return }
+        plan.startNextCycle()
+        self.plan = plan
+        program?.plan = plan
+        PersistenceLog.save(modelContext)
+        nextPuzzle = plan.currentItemIndex.map { plan.items[$0].makePuzzle() }
+        loadNextPuzzle()
     }
 
     var hasNextPuzzle: Bool { nextPuzzle != nil }
@@ -131,7 +210,12 @@ final class PuzzleSolveViewModel {
         hintMoves = []
         rejectedMove = nil
 
-        markFirstOpenIfNeeded(next)
+        if isWoodpecker {
+            clockAccumulated = 0
+            clockStartedAt = Date()
+        } else {
+            markFirstOpenIfNeeded(next)
+        }
     }
 
     // MARK: Interaction utilisateur
@@ -369,12 +453,31 @@ final class PuzzleSolveViewModel {
             isFailed = true
         }
         Haptics.gameEnded()
+        if isWoodpecker {
+            recordWoodpeckerAnswer(success: success)
+            return
+        }
         updateSchedule(success: success)
         // Prétire le puzzle suivant APRÈS la mise à jour SM-2 : le puzzle
         // courant n'est alors plus dû (son `dueDate` vient d'avancer) et
         // ne peut pas être retiré ; l'exclusion explicite reste par
         // sécurité.
         nextPuzzle = PuzzleSessionDrawer.drawNext(matching: filter, excluding: puzzle.id, in: modelContext)
+    }
+
+    /// La réponse va au programme (temps actif compris), puis le puzzle
+    /// suivant du cycle est prétiré — `nil` en fin de cycle, ce qui fait
+    /// apparaître le bilan.
+    private func recordWoodpeckerAnswer(success: Bool) {
+        let seconds = elapsedOnPuzzle()
+        clockStartedAt = nil
+        clockAccumulated = 0
+        guard var plan else { return }
+        plan.record(solved: success, seconds: seconds)
+        self.plan = plan
+        program?.plan = plan
+        PersistenceLog.save(modelContext)
+        nextPuzzle = plan.currentItemIndex.map { plan.items[$0].makePuzzle() }
     }
 
     private func updateSchedule(success: Bool) {

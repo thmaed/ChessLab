@@ -75,7 +75,7 @@ fun AnalysisScreen(
     LaunchedEffect(initialFen, initialPgn) {
         val incoming = initialFen?.takeIf { it.isNotBlank() } ?: initialPgn?.takeIf { it.isNotBlank() }
         if (incoming != null) { model.onInputChange(incoming); model.load() }
-        if (findMissedMates) model.requestMissedMatesOnce()
+        if (findMissedMates && incoming != null) model.requestMissedMatesOnce(incoming)
     }
     val ui = model.ui
     val context = LocalContext.current
@@ -99,6 +99,9 @@ fun AnalysisScreen(
         onDispose {
             owner.lifecycle.removeObserver(observer)
             model.handleViewDisappear()
+            // Revenir plus tard sur « Mats manqués » pour la même partie doit
+            // relancer la recherche, comme une nouvelle ouverture d'écran iOS.
+            model.forgetMissedMatesRequest()
         }
     }
 

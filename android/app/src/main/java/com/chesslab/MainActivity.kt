@@ -227,6 +227,13 @@ private fun App() {
                 onPlayVsEngine = { stack.add(Route.NewGame()) },
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup()) },
                 onOpenLab = { stack.add(Route.Laboratory()) },
+                onOpenWoodpecker = { stack.add(Route.Woodpecker(it)) },
+            )
+            is Route.Woodpecker -> PuzzleScreen(
+                woodpeckerId = current.id,
+                onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
+                onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
+                onOpenLab = { stack.add(Route.Laboratory(it)) },
             )
             is Route.Puzzles -> PuzzleScreen(
                 initialTheme = current.theme,

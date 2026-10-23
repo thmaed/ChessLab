@@ -132,7 +132,8 @@ struct ChessLabApp: App {
     private static func makeModelContainer() -> ModelContainer {
         let schema = Schema([
             GameRecord.self, Puzzle.self, PuzzleProgress.self,
-            OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self, UserOpeningRecord.self,])
+            OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self, UserOpeningRecord.self,
+            WoodpeckerProgram.self,])
 
         // Deux stores SÉPARÉS, et non un seul :
         // - « Games » (parties de l'utilisateur + PROGRESSION puzzles) :
@@ -162,6 +163,9 @@ struct ChessLabApp: App {
                 // Ils vivaient en fichiers locaux et ne suivaient donc aucun
                 // appareil — ce que l'aide devait avouer à l'utilisateur.
                 UserOpeningRecord.self,
+                // Programmes Woodpecker (23/10/2026) : progression
+                // personnelle, ajout ADDITIF comme les répertoires.
+                WoodpeckerProgram.self,
             ]),
             isStoredInMemoryOnly: false,
             cloudKitDatabase: CloudSyncSettingsStore.isEnabled ? .automatic : .none

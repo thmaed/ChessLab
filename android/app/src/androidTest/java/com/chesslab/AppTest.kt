@@ -283,6 +283,32 @@ class AppTest {
         compose.onNodeWithTag("historique-rates").performScrollTo().assertIsDisplayed()
     }
 
+    /**
+     * La méthode Woodpecker de bout en bout : créer un programme de 25 avec
+     * les critères de l'écran, le jouer (chrono, rang dans le lot), le
+     * retrouver au retour, l'arrêter. Pendant de `WoodpeckerUITests` (iOS).
+     */
+    @Test fun aWoodpeckerProgrammeCanBeCreatedResumedAndStopped() {
+        open("puzzles")
+        awaitTag("commencer-puzzles", 15_000)
+        compose.onNodeWithTag("woodpecker-taille-25").performScrollTo().performClick()
+        compose.onNodeWithTag("woodpecker-creer").performScrollTo().performClick()
+
+        // La bibliothèque fait 19 Mo : composer le lot la parcourt une fois.
+        awaitTag("woodpecker-chrono", 90_000)
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithText("1/25", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        assert(compose.onAllNodesWithTag("passer").fetchSemanticsNodes().isEmpty()) { "pas de « Passer » dans un programme" }
+
+        compose.onNodeWithTag("retour").performClick()
+        awaitTag("woodpecker-reprendre", 15_000)
+        compose.onNodeWithTag("woodpecker-arreter").performScrollTo().performClick()
+        awaitTag("woodpecker-arreter-oui")
+        compose.onNodeWithTag("woodpecker-arreter-oui").performClick()
+        awaitTag("woodpecker-creer", 10_000)
+    }
+
     @Test fun openingCoursesCanBeRead() {
         open("openings")
         awaitTag("compte")

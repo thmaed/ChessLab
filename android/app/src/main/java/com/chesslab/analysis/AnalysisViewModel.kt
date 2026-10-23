@@ -1356,13 +1356,20 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Demandée pendant la revue : la recherche part dès que la revue finit. */
     private var missedMatesPending = false
-    /** La demande venue de la fin de partie ne vaut qu'une fois par écran. */
-    private var missedMatesRequested = false
+    /**
+     * La partie pour laquelle « Mats manqués » a déjà été demandé. Une CLÉ et
+     * non un drapeau : ce view model vit autant que l'activité et sert toutes
+     * les analyses — un drapeau posé à la première partie aurait fait ignorer
+     * la demande de toutes les suivantes.
+     */
+    private var missedMatesRequestedFor: String? = null
 
-    /** « Mats manqués » en fin de partie : une seule fois, même si l'écran se recompose. */
-    fun requestMissedMatesOnce() {
-        if (missedMatesRequested) return
-        missedMatesRequested = true
+    fun forgetMissedMatesRequest() { missedMatesRequestedFor = null }
+
+    /** « Mats manqués » en fin de partie : une fois par partie, même si l'écran se recompose. */
+    fun requestMissedMatesOnce(gameKey: String) {
+        if (missedMatesRequestedFor == gameKey) return
+        missedMatesRequestedFor = gameKey
         findMissedMates()
     }
 

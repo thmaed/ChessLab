@@ -16,7 +16,7 @@ struct PuzzleSessionDrawerTests {
 
     private static let container: ModelContainer = {
         try! ModelContainer(
-            for: Puzzle.self, PuzzleProgress.self,
+            for: Puzzle.self, PuzzleProgress.self, WoodpeckerProgram.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         )
     }()
@@ -25,6 +25,7 @@ struct PuzzleSessionDrawerTests {
         let context = ModelContext(Self.container)
         try context.delete(model: Puzzle.self)
         try context.delete(model: PuzzleProgress.self)
+        try context.delete(model: WoodpeckerProgram.self)
         try context.save()
         return context
     }
@@ -168,4 +169,77 @@ struct PuzzleSessionDrawerTests {
         #expect(!viewModel.isSolved)
         #expect(viewModel.rejectedMove != nil)
     }
+
+    // MARK: Woodpecker
+
+    @Test func aWoodpeckerSampleIsDistinctAndIgnoresTheDueDate() throws {
+        let context = try makeContext()
+        for _ in 0..<5 { insertPuzzle(in: context, dueInDays: 6) }
+        insertPuzzle(in: context, source: .ownGames)
+        try context.save()
+
+        let sample = PuzzleSessionDrawer.sample(matching: PuzzleSessionFilter(source: .lichess), count: 4, in: context)
+        #expect(sample.count == 4)
+        #expect(Set(sample.map(\.id)).count == 4)
+        #expect(sample.allSatisfy { $0.source == .lichess })
+        // Plus demandé que disponible : tout ce qui correspond, pas plus.
+        #expect(PuzzleSessionDrawer.sample(matching: PuzzleSessionFilter(), count: 50, in: context).count == 6)
+    }
+
+    /// Un cycle complet joué à l'écran : les réponses vont au PROGRAMME, la
+    /// bibliothèque n'est pas touchée (aucune échéance, aucun compteur), puis
+    /// le cycle suivant repart sur le même lot.
+    @Test func aWoodpeckerCycleIsRecordedInTheProgramOnly() throws {
+        let context = try makeContext()
+        let library = insertPuzzle(in: context)
+        try context.save()
+
+        let item = WoodpeckerPlan.Item(library)
+        let plan = try #require(WoodpeckerPlan.start(items: [item, item]))
+        let program = WoodpeckerProgram()
+        program.plan = plan
+        context.insert(program)
+        try context.save()
+
+        let viewModel = try #require(PuzzleSolveViewModel(woodpecker: program, modelContext: context))
+        #expect(viewModel.isWoodpecker)
+        #expect(viewModel.sessionProgressText?.contains("1/2") == true)
+
+        viewModel.attemptMove(from: Square("a1"), to: Square("a8"))
+        #expect(viewModel.isSolved)
+        #expect(!viewModel.isCycleComplete)
+        viewModel.loadNextPuzzle()
+        viewModel.attemptMove(from: Square("b1"), to: Square("b8"))   // l'autre mat : juste aussi
+
+        #expect(viewModel.isCycleComplete)
+        let saved = try #require(program.plan)
+        #expect(saved.currentCycle.isComplete)
+        #expect(saved.currentCycle.solvedCount == 2)
+        // La bibliothèque n'a rien vu passer.
+        #expect(library.successCount == 0)
+        #expect(library.repetitions == 0)
+        #expect(library.firstOpenedAt == nil)
+        #expect(try context.fetchCount(FetchDescriptor<Puzzle>()) == 1, "aucun puzzle transitoire inséré")
+
+        viewModel.startNextCycle()
+        #expect(program.plan?.currentCycle.number == 2)
+        #expect(!viewModel.isFinished)
+        #expect(viewModel.sessionProgressText?.contains("Cycle 2") == true)
+    }
+
+    /// Un cycle bouclé puis laissé là : rouvrir le programme, c'est vouloir
+    /// continuer — le cycle suivant démarre.
+    @Test func reopeningAFinishedCycleStartsTheNextOne() throws {
+        let context = try makeContext()
+        var plan = try #require(WoodpeckerPlan.start(items: [WoodpeckerPlan.Item(fen: "7k/6pp/8/8/8/8/8/RR4K1 w - - 0 1", solutionLANs: ["a1a8"])]))
+        plan.record(solved: false, seconds: 3)
+        let program = WoodpeckerProgram()
+        program.plan = plan
+        context.insert(program)
+
+        let viewModel = try #require(PuzzleSolveViewModel(woodpecker: program, modelContext: context))
+        #expect(program.plan?.currentCycle.number == 2)
+        #expect(!viewModel.isFinished)
+    }
 }
+

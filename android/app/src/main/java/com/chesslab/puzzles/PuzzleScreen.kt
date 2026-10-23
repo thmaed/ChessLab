@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.*
 import androidx.compose.foundation.horizontalScroll
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,12 +58,33 @@ fun PuzzleScreen(
     onOpenLab: (String) -> Unit = {},
     /** Revoir la faute DANS sa partie : le PGN d'origine part vers l'analyse. */
     onViewSourceGame: (String) -> Unit = {},
+    /** Un programme Woodpecker à jouer, à la place d'une série. */
+    woodpeckerId: String? = null,
     model: PuzzleViewModel = viewModel(),
 ) {
     val ui = model.ui
-    LaunchedEffect(initialTheme, filter) {
-        initialTheme?.let(model::trainTheme)
-        if (initialTheme == null && filter != null) model.setFilter(filter)
+    LaunchedEffect(initialTheme, filter, woodpeckerId) {
+        when {
+            woodpeckerId != null -> model.openWoodpecker(woodpeckerId)
+            initialTheme != null -> model.trainTheme(initialTheme)
+            filter != null -> model.setFilter(filter)
+        }
+    }
+    // Le chrono d'un programme ne compte que le temps ACTIF.
+    val owner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+    DisposableEffect(owner) {
+        val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+            when (event) {
+                androidx.lifecycle.Lifecycle.Event.ON_PAUSE -> model.pauseClock()
+                androidx.lifecycle.Lifecycle.Event.ON_RESUME -> model.resumeClock()
+                else -> Unit
+            }
+        }
+        owner.lifecycle.addObserver(observer)
+        onDispose {
+            owner.lifecycle.removeObserver(observer)
+            model.pauseClock()
+        }
     }
 
     TopBarActions {
@@ -79,6 +102,7 @@ fun PuzzleScreen(
         // reste ici que le compte des révisions.
         DueBadge(ui)
         Header(ui)
+        ui.woodpeckerPlan?.let { WoodpeckerLine(it, ui.outcome == PuzzleOutcome.solving, model) }
         Spacer(Modifier.height(12.dp))
 
         BoardView(
@@ -103,17 +127,29 @@ fun PuzzleScreen(
                 Spacer(Modifier.height(12.dp))
                 HintButton { model.showHint() }
             }
-            Spacer(Modifier.height(12.dp))
-            TextButton(onClick = model::next, modifier = Modifier.testTag("passer")) {
-                Text(stringResource(R.string.puzzle_skip), color = Palette.textSecondary)
+            // Pas de « Passer » dans un programme : chaque puzzle du lot
+            // reçoit une réponse, comme sur iOS.
+            if (ui.woodpeckerPlan == null) {
+                Spacer(Modifier.height(12.dp))
+                TextButton(onClick = model::next, modifier = Modifier.testTag("passer")) {
+                    Text(stringResource(R.string.puzzle_skip), color = Palette.textSecondary)
+                }
             }
         } else {
+            val plan = ui.woodpeckerPlan
             ResultCard(
                 solved = ui.outcome == PuzzleOutcome.solved,
                 modifier = Modifier.padding(horizontal = 20.dp),
-                onNext = model::next,
+                onNext = if (plan?.currentCycle?.isComplete == true) model::startNextCycle else model::next,
                 sourcePgn = ui.puzzle?.sourcePgn,
                 onViewSourceGame = onViewSourceGame,
+                nextLabel = when {
+                    plan == null -> stringResource(R.string.puzzle_next)
+                    plan.currentCycle.isComplete ->
+                        stringResource(R.string.woodpecker_start_cycle, plan.currentCycle.number + 1)
+                    else -> stringResource(R.string.woodpecker_next_puzzle)
+                },
+                cycleSummary = plan?.takeIf { it.currentCycle.isComplete },
             )
         }
     }
@@ -295,11 +331,15 @@ private fun Header(ui: PuzzleUiState) {
             GamePhase.of(puzzle.phase)?.let { phase ->
                 ContextPill(stringResource(phase.labelRes), phase.tint, phase.icon)
             }
-            Text(
-                stringResource(R.string.puzzle_score, ui.solvedCount, ui.attemptedCount),
-                fontSize = 12.sp, color = Palette.textSecondary,
-                modifier = Modifier.testTag("score"),
-            )
+            // Programme : le rang dans le lot le remplace, sur la ligne d'en
+            // dessous (iOS n'affiche pas de score de séance dans ce mode).
+            if (ui.woodpeckerPlan == null) {
+                Text(
+                    stringResource(R.string.puzzle_score, ui.solvedCount, ui.attemptedCount),
+                    fontSize = 12.sp, color = Palette.textSecondary,
+                    modifier = Modifier.testTag("score"),
+                )
+            }
         }
     }
 }
@@ -377,6 +417,9 @@ private fun ResultCard(
     onNext: () -> Unit,
     sourcePgn: String? = null,
     onViewSourceGame: (String) -> Unit = {},
+    nextLabel: String = stringResource(R.string.puzzle_next),
+    /** Programme Woodpecker au cycle bouclé : son bilan, au-dessus du bouton. */
+    cycleSummary: WoodpeckerPlan? = null,
 ) {
     val tint = if (solved) Palette.accent else Palette.textSecondary
     Column(
@@ -405,8 +448,9 @@ private fun ResultCard(
                 fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary,
             )
         }
+        cycleSummary?.let { WoodpeckerCycleSummary(it) }
         Text(
-            stringResource(R.string.puzzle_next),
+            nextLabel,
             fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.background,
             modifier = Modifier
                 .fillMaxWidth()
@@ -480,6 +524,74 @@ internal fun PuzzleStatsCard(stats: com.chesslab.progression.PuzzleStats) {
                     )
                 }
             }
+        }
+    }
+}
+
+/**
+ * Programme Woodpecker : le rang dans le lot et le chrono du CYCLE, sur leur
+ * propre ligne — pendant de la seconde ligne d'en-tête d'iOS.
+ */
+@Composable
+private fun WoodpeckerLine(plan: WoodpeckerPlan, solving: Boolean, model: PuzzleViewModel) {
+    var now by remember { mutableStateOf(System.currentTimeMillis()) }
+    LaunchedEffect(Unit) {
+        while (true) {
+            now = System.currentTimeMillis()
+            kotlinx.coroutines.delay(1000)
+        }
+    }
+    val cycle = plan.currentCycle
+    val rank = minOf(cycle.order.size, cycle.attempts.size + if (solving) 1 else 0)
+    Row(
+        Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            stringResource(R.string.woodpecker_progress, cycle.number, rank, cycle.order.size),
+            fontSize = 12.sp, color = Palette.textSecondary,
+            modifier = Modifier.testTag("woodpecker-rang"),
+        )
+        Icon(Icons.Default.Timer, null, tint = Palette.warning, modifier = Modifier.size(14.dp))
+        Text(
+            WoodpeckerPlan.formatDuration(model.cycleElapsedSeconds(now)),
+            fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.warning,
+            modifier = Modifier.testTag("woodpecker-chrono"),
+        )
+    }
+}
+
+/** Le bilan d'un cycle bouclé, comparé au précédent, et l'objectif du suivant. */
+@Composable
+private fun WoodpeckerCycleSummary(plan: WoodpeckerPlan) {
+    val cycle = plan.currentCycle
+    Column(Modifier.testTag("woodpecker-bilan"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            stringResource(R.string.woodpecker_cycle_done, cycle.number),
+            fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+        )
+        Text(
+            stringResource(
+                R.string.woodpecker_cycle_line, cycle.solvedCount, cycle.order.size,
+                WoodpeckerPlan.formatDuration(cycle.activeSeconds),
+            ),
+            fontSize = 14.sp, color = Palette.accent,
+        )
+        plan.previousCycle?.let { previous ->
+            Text(
+                stringResource(
+                    R.string.woodpecker_previous_line, previous.number, previous.solvedCount,
+                    previous.order.size, WoodpeckerPlan.formatDuration(previous.activeSeconds),
+                ),
+                fontSize = 12.sp, color = Palette.textSecondary,
+            )
+        }
+        plan.nextCycleTargetSeconds?.let { target ->
+            Text(
+                stringResource(R.string.woodpecker_target, WoodpeckerPlan.formatDuration(target)),
+                fontSize = 12.sp, color = Palette.textTertiary,
+            )
         }
     }
 }

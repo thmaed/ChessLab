@@ -14,6 +14,8 @@ struct PuzzleSolveView: View {
 
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
+    /// Le chrono d'un programme Woodpecker ne compte que le temps ACTIF.
+    @Environment(\.scenePhase) private var scenePhase
     /// iPad plein écran & Mac en paysage : deux colonnes (plateau | infos).
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -46,6 +48,11 @@ struct PuzzleSolveView: View {
             }
         }
         .overlay { promotionOverlay }
+        .onAppear { viewModel.resumeClock() }
+        .onDisappear { viewModel.pauseClock() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { viewModel.resumeClock() } else { viewModel.pauseClock() }
+        }
         .overlay {
             // Confettis par-dessus tout l'écran à la résolution (une seule
             // fois par puzzle : l'overlay disparaît puis réapparaît au
@@ -171,7 +178,7 @@ struct PuzzleSolveView: View {
                     icon: viewModel.puzzle.phase.icon,
                     tint: tint(for: viewModel.puzzle.phase)
                 )
-                if let progress = viewModel.sessionProgressText {
+                if !viewModel.isWoodpecker, let progress = viewModel.sessionProgressText {
                     Text(progress)
                         .font(.caption.weight(.medium))
                         .foregroundStyle(Theme.textSecondary)
@@ -180,6 +187,31 @@ struct PuzzleSolveView: View {
             }
             .lineLimit(1)
             .minimumScaleFactor(0.8)
+
+            // Programme : le rang dans le lot et le chrono sur leur PROPRE
+            // ligne — ajoutés à la précédente, ils tronquaient les pastilles.
+            if viewModel.isWoodpecker {
+                HStack(spacing: 10) {
+                    if let progress = viewModel.sessionProgressText {
+                        Text(progress)
+                            .font(.caption.weight(.medium).monospacedDigit())
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                    // Le temps du CYCLE, en direct : c'est lui que la méthode
+                    // demande de faire baisser d'un passage à l'autre.
+                    TimelineView(.periodic(from: .now, by: 1)) { context in
+                        Label(
+                            WoodpeckerPlan.formatDuration(viewModel.cycleElapsed(at: context.date)),
+                            systemImage: "stopwatch"
+                        )
+                        .font(.caption.weight(.semibold).monospacedDigit())
+                        .foregroundStyle(Theme.warning)
+                    }
+                    .accessibilityIdentifier("woodpeckerClock")
+                    Spacer(minLength: 0)
+                }
+                .lineLimit(1)
+            }
         }
         .padding(.horizontal, 20)
     }
@@ -317,6 +349,9 @@ struct PuzzleSolveView: View {
     @ViewBuilder
     private var resultCard: some View {
         VStack(spacing: 14) {
+            if viewModel.isCycleComplete, let plan = viewModel.plan {
+                WoodpeckerCycleSummary(plan: plan)
+            }
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
@@ -345,9 +380,21 @@ struct PuzzleSolveView: View {
                 }
                 .buttonStyle(.pressable)
 
-                if viewModel.hasNextPuzzle {
+                if viewModel.isCycleComplete, let plan = viewModel.plan {
+                    Button { viewModel.startNextCycle() } label: {
+                        Text("Commencer le cycle \(plan.currentCycle.number + 1)")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.background)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Theme.accentGradient, in: Capsule())
+                            .glow(Theme.accent, radius: 9)
+                    }
+                    .buttonStyle(.pressable)
+                    .accessibilityIdentifier("woodpeckerNextCycle")
+                } else if viewModel.hasNextPuzzle {
                     Button { viewModel.loadNextPuzzle() } label: {
-                        Text("Nouveau puzzle")
+                        Text(viewModel.isWoodpecker ? "Puzzle suivant" : "Nouveau puzzle")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(Theme.background)
                             .frame(maxWidth: .infinity)
@@ -374,5 +421,44 @@ struct PuzzleSolveView: View {
         .shadow(color: .black.opacity(0.35), radius: 16, y: 6)
         .padding(.horizontal, 16)
         .transition(.move(edge: .bottom).combined(with: .opacity))
+    }
+}
+
+/// Le bilan d'un cycle Woodpecker bouclé : le score et le temps, comparés au
+/// cycle d'avant, et l'objectif du suivant — moitié moins de temps, la cible
+/// classique de la méthode.
+private struct WoodpeckerCycleSummary: View {
+    let plan: WoodpeckerPlan
+
+    var body: some View {
+        let cycle = plan.currentCycle
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Cycle \(cycle.number) terminé")
+                .font(.headline)
+                .foregroundStyle(Theme.textPrimary)
+            Text(line(for: cycle))
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(Theme.accent)
+            if let previous = plan.previousCycle {
+                Text(LocalizationController.string("Cycle %lld : ", previous.number) + line(for: previous))
+                    .font(.caption.monospacedDigit())
+                    .foregroundStyle(Theme.textSecondary)
+            }
+            if let target = plan.nextCycleTargetSeconds {
+                Text(LocalizationController.string("Objectif du cycle suivant : moins de %@", WoodpeckerPlan.formatDuration(target)))
+                    .font(.caption)
+                    .foregroundStyle(Theme.textTertiary)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("woodpeckerCycleSummary")
+    }
+
+    private func line(for cycle: WoodpeckerPlan.Cycle) -> String {
+        LocalizationController.string(
+            "%lld trouvés sur %lld en %@",
+            cycle.solvedCount, cycle.order.count, WoodpeckerPlan.formatDuration(cycle.activeSeconds)
+        )
     }
 }

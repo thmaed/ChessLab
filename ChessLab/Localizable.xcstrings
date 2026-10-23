@@ -896,6 +896,22 @@
         }
       }
     },
+    "%lld puzzles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld puzzles"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld puzzles"
+          }
+        }
+      }
+    },
     "%lld réussis sur %lld tentatives": {
       "localizations": {
         "en": {
@@ -924,6 +940,22 @@
           "stringUnit": {
             "state": "new",
             "value": "%1$lld sur %2$lld tentatives"
+          }
+        }
+      }
+    },
+    "%lld trouvés sur %lld en %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld solved out of %lld in %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld trouvés sur %lld en %@"
           }
         }
       }
@@ -2290,6 +2322,22 @@
         }
       }
     },
+    "Arrêter ce programme ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop this programme?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrêter ce programme ?"
+          }
+        }
+      }
+    },
     "Arrêter l'indice": {
       "localizations": {
         "en": {
@@ -2312,6 +2360,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Arrêter la lecture"
+          }
+        }
+      }
+    },
+    "Arrêter le programme": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stop the programme"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrêter le programme"
           }
         }
       }
@@ -2489,6 +2553,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Aucun puzzle dû"
+          }
+        }
+      }
+    },
+    "Aucun puzzle ne correspond à ces critères.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No puzzle matches these criteria."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun puzzle ne correspond à ces critères."
           }
         }
       }
@@ -4134,6 +4214,22 @@
         }
       }
     },
+    "Ce programme Woodpecker n'existe plus sur cet appareil.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Woodpecker programme no longer exists on this device."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce programme Woodpecker n'existe plus sur cet appareil."
+          }
+        }
+      }
+    },
     "Ce que fait chaque mode.": {
       "localizations": {
         "en": {
@@ -4994,6 +5090,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Commencer"
+          }
+        }
+      }
+    },
+    "Commencer le cycle %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start cycle %lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commencer le cycle %lld"
           }
         }
       }
@@ -5919,6 +6031,22 @@
         }
       }
     },
+    "Créer le programme": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Create the programme"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Créer le programme"
+          }
+        }
+      }
+    },
     "Créez un répertoire, puis importez un PGN annoté ou construisez-le coup par coup.": {
       "extractionState": "stale",
       "localizations": {
@@ -5949,6 +6077,70 @@
           "stringUnit": {
             "state": "translated",
             "value": "Couper avant de pousser"
+          }
+        }
+      }
+    },
+    "Cycle %lld : ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld: "
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld : "
+          }
+        }
+      }
+    },
+    "Cycle %lld : %lld trouvés sur %lld en %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld: %lld solved out of %lld in %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld : %lld trouvés sur %lld en %@"
+          }
+        }
+      }
+    },
+    "Cycle %lld terminé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld complete"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld terminé"
+          }
+        }
+      }
+    },
+    "Cycle %lld · %lld/%lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld · %lld/%lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld · %lld/%lld"
           }
         }
       }
@@ -12310,6 +12502,22 @@
         }
       }
     },
+    "Méthode Woodpecker": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woodpecker method"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Méthode Woodpecker"
+          }
+        }
+      }
+    },
     "Même appareil": {
       "localizations": {
         "en": {
@@ -12924,6 +13132,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "OK"
+          }
+        }
+      }
+    },
+    "Objectif du cycle suivant : moins de %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next cycle target: under %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Objectif du cycle suivant : moins de %@"
           }
         }
       }
@@ -14485,6 +14709,22 @@
         }
       }
     },
+    "Programme introuvable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programme not found"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programme introuvable"
+          }
+        }
+      }
+    },
     "Progressez sur 58 ouvertures rédigées à la main et bilingues, aux grandes lignes vérifiées. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud.": {
       "extractionState": "stale",
       "localizations": {
@@ -14752,6 +14992,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Puzzle"
+          }
+        }
+      }
+    },
+    "Puzzle suivant": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next puzzle"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puzzle suivant"
           }
         }
       }
@@ -16502,12 +16758,12 @@
         }
       }
     },
-    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs.": {
+    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. La méthode Woodpecker reprend un lot fixe de 25, 50 ou 100 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by source (your games or the library), level, game phase and theme, or replay only the puzzles you missed on your last attempt. A checkmating move is always accepted, even if it differs from the solution. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
+            "value": "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by source (your games or the library), level, game phase and theme, or replay only the puzzles you missed on your last attempt. A checkmating move is always accepted, even if it differs from the solution. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. The Woodpecker method replays a fixed set of 25, 50 or 100 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
           }
         },
         "fr": {
@@ -17029,6 +17285,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ses coups ont l'air faux. La moitié le sont vraiment, l'autre moitié coûte une pièce à qui le croit. Tombe lui-même dans les pièges des autres, par principe."
+          }
+        }
+      }
+    },
+    "Ses cycles restent enregistrés, mais il ne sera plus proposé.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Its cycles stay recorded, but it will no longer be offered."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses cycles restent enregistrés, mais il ne sera plus proposé."
           }
         }
       }
@@ -17909,6 +18181,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Tactique et bibliothèque Lichess"
+          }
+        }
+      }
+    },
+    "Taille du lot": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set size"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Taille du lot"
           }
         }
       }
@@ -19260,6 +19548,22 @@
         }
       }
     },
+    "Un lot fixe de puzzles, résolu en entier puis repris dans un nouvel ordre, cycle après cycle, pour en trouver plus et plus vite. Il reprend les critères choisis au-dessus.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fixed set of puzzles, solved in full then replayed in a new order, cycle after cycle, to find more of them, faster. It uses the criteria chosen above."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un lot fixe de puzzles, résolu en entier puis repris dans un nouvel ordre, cycle après cycle, pour en trouver plus et plus vite. Il reprend les critères choisis au-dessus."
+          }
+        }
+      }
+    },
     "Un mat manqué": {
       "localizations": {
         "en": {
@@ -20164,6 +20468,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cavalier ou fou : lequel prendre ?"
+          }
+        }
+      }
+    },
+    "Woodpecker": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woodpecker"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woodpecker"
           }
         }
       }

@@ -7,6 +7,35 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Méthode Woodpecker — 23/10/2026
+
+Troisième suggestion du testeur, faite des deux côtés. Décisions de
+l'utilisateur : le programme ne touche PAS la répétition espacée ; lots de 25,
+50 ou 100 (50 par défaut) ; ordre MÉLANGÉ à chaque cycle ; nombre d'essais du
+réglage habituel ; réussi avec l'indice = réussi.
+
+- [x] **Carte « Méthode Woodpecker »** sur l'écran de choix : créer un programme
+      avec les critères choisis (taille 25/50/100), ou reprendre / arrêter celui
+      en cours. Vérifié sur Galaxy A16
+      (`AppTest.aWoodpeckerProgrammeCanBeCreatedResumedAndStopped`).
+- [x] **Écran de résolution en mode programme** : « Cycle n · k/N » et le chrono
+      du cycle (temps ACTIF, en pause hors du premier plan) sur leur propre
+      ligne, pas de « Passer », pas de score de séance. Vu sur Galaxy A16.
+- [ ] **Bilan de fin de cycle** (score et temps, cycle précédent, objectif =
+      moitié du temps) et « Commencer le cycle n+1 » : vérifié en JVM
+      (`WoodpeckerPlanTest`) et dans le code, pas encore joué jusqu'au bout sur
+      l'appareil.
+- [x] **Même plan des deux côtés** (`WoodpeckerPlan`), copie des puzzles dans le
+      plan, plan stocké en un bloc JSON ; Room v10 (`woodpecker_programs`),
+      migration vérifiée sur appareil (`MigrationTest`).
+- [ ] **Écart restant — le `.clab` ne transporte pas les programmes Woodpecker**,
+      pas plus que la progression puzzle par puzzle (voir plus bas) ; iOS les
+      fait voyager par iCloud. À traiter avec elle.
+- [x] **Corrigé au passage (Android, lot B)** : la demande « Mats manqués »
+      tenait dans un drapeau du view model, qui vit autant que l'activité — une
+      deuxième partie terminée n'aurait plus déclenché la recherche. Clé par
+      partie, oubliée à la sortie de l'écran.
+
 ### Mats manqués en fin de partie — 23/10/2026
 
 Deuxième suggestion du testeur, faite des deux côtés. Vérifié par tests (iOS :

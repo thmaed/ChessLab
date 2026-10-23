@@ -96,6 +96,8 @@ struct HomeView: View {
         case scanner
         case puzzleQueue
         case activePuzzleSession(PuzzleSessionFilter)
+        /// Un programme Woodpecker, repris là où il en est.
+        case woodpecker(UUID)
         /// Liste des ouvertures — l'écran d'entrée du module.
         case openingList
         /// Module Finales : mêmes routes lecteur/entraîneur que les
@@ -174,7 +176,7 @@ struct HomeView: View {
         var showsBoard: Bool {
             switch self {
             case .activeGame, .resumedGame, .activeTwoPlayerGame, .resumedTwoPlayerGame,
-                 .activeAnalysis, .missedMates, .positionEditor, .activePuzzleSession,
+                 .activeAnalysis, .missedMates, .positionEditor, .activePuzzleSession, .woodpecker,
                  .endgameFreeTrain, .endgameReader, .openingEditor, .openingLabsReader,
                  .openingTrainDaily, .openingTrainLine,
                  .activeChess960Game, .activeChess960TwoPlayerGame, .activeChess960Analysis,
@@ -1001,6 +1003,19 @@ struct HomeView: View {
                         path.append(Route.newGame)
                     } onOpenTwoPlayer: {
                         path.append(Route.twoPlayerSetup)
+                    } onOpenWoodpecker: { id in
+                        path.append(Route.woodpecker(id))
+                    }
+
+                case let .woodpecker(id):
+                    WoodpeckerHost(programID: id, sessionKey: sessionKey(for: route)) {
+                        path.removeLast()
+                    } onOpenLab: { fen in
+                        path.append(Route.labSetup(startFEN: fen))
+                    } onPlayVsEngine: { fen in
+                        path.append(Route.continueVsStockfish(fen))
+                    } onOpenTwoPlayer: { fen in
+                        path.append(Route.continueTwoPlayer(fen))
                     }
 
                 case let .activePuzzleSession(filter):
@@ -2112,6 +2127,53 @@ private struct AnalysisHost: View {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) { AnalysisViewModel(source: source) }
             }
+        }
+    }
+}
+
+/// Héberge un programme Woodpecker : le même écran de résolution que les
+/// séries, nourri par le lot figé du programme.
+private struct WoodpeckerHost: View {
+    let programID: UUID
+    /// Identité de session — voir ``SessionStore``.
+    let sessionKey: String
+    let onExit: () -> Void
+    var onOpenLab: (String) -> Void = { _ in }
+    var onPlayVsEngine: (String) -> Void = { _ in }
+    var onOpenTwoPlayer: (String) -> Void = { _ in }
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: PuzzleSolveViewModel?
+    @State private var hasAttemptedLoad = false
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                PuzzleSolveView(
+                    viewModel: viewModel, onExit: onExit, onViewSourceGame: { _ in },
+                    onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
+                )
+            } else if hasAttemptedLoad {
+                ContentUnavailableView(
+                    "Programme introuvable",
+                    systemImage: "arrow.triangle.2.circlepath",
+                    description: Text("Ce programme Woodpecker n'existe plus sur cet appareil.")
+                )
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            guard viewModel == nil, !hasAttemptedLoad else { return }
+            let id = programID
+            var descriptor = FetchDescriptor<WoodpeckerProgram>(predicate: #Predicate { $0.id == id })
+            descriptor.fetchLimit = 1
+            if let program = ((try? modelContext.fetch(descriptor)) ?? []).first {
+                viewModel = sessionStore.value(for: sessionKey) {
+                    PuzzleSolveViewModel(woodpecker: program, modelContext: modelContext)
+                }
+            }
+            hasAttemptedLoad = true
         }
     }
 }

@@ -8,7 +8,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Autorenew
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.foundation.border
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +57,8 @@ fun PuzzleQueueScreen(
     onPlayVsEngine: () -> Unit = {},
     onOpenTwoPlayer: () -> Unit = {},
     onOpenLab: () -> Unit = {},
+    /** Ouvre un programme Woodpecker (créé ici, ou repris). */
+    onOpenWoodpecker: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
     var difficulty by remember { mutableStateOf<DifficultyTier?>(null) }
@@ -152,6 +160,11 @@ fun PuzzleQueueScreen(
                     ) { theme = if (theme == value) null else value }
                 }
             }
+            WoodpeckerCard(
+                filter = PuzzleFilter(difficulty, phase, theme, source, missedOnly),
+                criteria = summary(source, missedOnly, difficulty, phase, theme),
+                onOpen = onOpenWoodpecker,
+            )
             stats?.takeIf { it.attempts > 0 }?.let { PuzzleStatsCard(it) }
         }
 
@@ -218,4 +231,174 @@ private fun summary(
     )
     return if (parts.isEmpty()) stringResource(R.string.puzzle_all_puzzles)
     else parts.joinToString(" · ")
+}
+
+/**
+ * La méthode Woodpecker : un lot FIXE, repris en cycles de plus en plus
+ * rapides (voir [WoodpeckerPlan]). Un seul programme en cours à la fois — la
+ * carte propose de le reprendre, sinon d'en créer un avec les critères choisis
+ * au-dessus. Pendant de `woodpeckerCard` dans `PuzzleQueueView`.
+ */
+@Composable
+private fun WoodpeckerCard(filter: PuzzleFilter, criteria: String, onOpen: (String) -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var active by remember { mutableStateOf<WoodpeckerProgram?>(null) }
+    var size by remember { mutableStateOf(WoodpeckerPlan.DEFAULT_SIZE) }
+    var confirmStop by remember { mutableStateOf(false) }
+    var creating by remember { mutableStateOf(false) }
+    var message by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(Unit) {
+        active = withContext(Dispatchers.IO) {
+            runCatching { LibraryDatabase.get(context).woodpecker().active() }.getOrNull()
+        }
+    }
+
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(18.dp))
+            .background(Palette.surface)
+            .padding(16.dp)
+            .testTag("woodpecker-carte"),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            // Le symbole de cycle d'iOS (`arrow.triangle.2.circlepath`).
+            androidx.compose.material3.Icon(
+                Icons.Default.Autorenew, null, tint = Palette.textPrimary, modifier = Modifier.size(18.dp),
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                stringResource(R.string.woodpecker_title),
+                fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+            )
+        }
+        val program = active
+        val plan = program?.plan
+        if (program != null && plan != null) {
+            val cycle = plan.currentCycle
+            Text(program.criteria, fontSize = 12.sp, color = Palette.textSecondary)
+            Text(
+                if (cycle.isComplete) stringResource(R.string.woodpecker_cycle_done, cycle.number)
+                else stringResource(R.string.woodpecker_progress, cycle.number, cycle.attempts.size, cycle.order.size),
+                fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent,
+            )
+            plan.cycles.lastOrNull { it.isComplete }?.let { finished ->
+                Text(
+                    stringResource(
+                        R.string.woodpecker_previous_line, finished.number, finished.solvedCount,
+                        finished.order.size, WoodpeckerPlan.formatDuration(finished.activeSeconds),
+                    ),
+                    fontSize = 12.sp, color = Palette.textTertiary,
+                )
+            }
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    if (cycle.isComplete) stringResource(R.string.woodpecker_start_cycle, cycle.number + 1)
+                    else stringResource(R.string.woodpecker_resume),
+                    fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.background,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(CircleShape)
+                        .background(accentGradient)
+                        .clickable { onOpen(program.id) }
+                        .padding(vertical = 10.dp)
+                        .testTag("woodpecker-reprendre"),
+                )
+                Spacer(Modifier.width(12.dp))
+                Text(
+                    stringResource(R.string.woodpecker_stop),
+                    fontSize = 14.sp, color = Palette.danger,
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable { confirmStop = true }
+                        .padding(horizontal = 10.dp, vertical = 8.dp)
+                        .testTag("woodpecker-arreter"),
+                )
+            }
+        } else {
+            Text(stringResource(R.string.woodpecker_intro), fontSize = 12.sp, color = Palette.textSecondary)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                WoodpeckerPlan.SIZES.forEach { value ->
+                    ChipButton(
+                        "$value", size == value,
+                        Modifier.testTag("woodpecker-taille-$value"), tint = Palette.accent,
+                    ) { size = value }
+                }
+            }
+            Text(
+                stringResource(R.string.woodpecker_create),
+                fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(CircleShape)
+                    .border(1.dp, Palette.stroke, CircleShape)
+                    .clickable(enabled = !creating) {
+                        creating = true
+                        scope.launch {
+                            val app = context.applicationContext as android.app.Application
+                            val own = withContext(Dispatchers.IO) {
+                                runCatching { LibraryDatabase.get(app).ownPuzzles().all() }.getOrDefault(emptyList())
+                            }
+                            val puzzles = PuzzleDraw.draw(app, filter, own, count = size)
+                            val plan = WoodpeckerPlan.start(puzzles.map { WoodpeckerPlan.Item.of(it) })
+                            if (plan == null) {
+                                message = context.getString(R.string.woodpecker_none_match)
+                            } else {
+                                val now = System.currentTimeMillis()
+                                val created = WoodpeckerProgram(
+                                    id = java.util.UUID.randomUUID().toString(),
+                                    createdAt = now, updatedAt = now,
+                                    criteria = context.getString(R.string.woodpecker_criteria, plan.items.size) + " · " + criteria,
+                                    planJson = plan.toJson(),
+                                )
+                                withContext(Dispatchers.IO) { LibraryDatabase.get(app).woodpecker().put(created) }
+                                active = created
+                                onOpen(created.id)
+                            }
+                            creating = false
+                        }
+                    }
+                    .padding(vertical = 10.dp)
+                    .testTag("woodpecker-creer"),
+            )
+        }
+    }
+
+    if (confirmStop) {
+        AlertDialog(
+            onDismissRequest = { confirmStop = false },
+            title = { Text(stringResource(R.string.woodpecker_stop_title)) },
+            text = { Text(stringResource(R.string.woodpecker_stop_body)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmStop = false
+                        val program = active ?: return@TextButton
+                        active = null
+                        scope.launch(Dispatchers.IO) {
+                            LibraryDatabase.get(context).woodpecker()
+                                .put(program.copy(archived = true, updatedAt = System.currentTimeMillis()))
+                        }
+                    },
+                    modifier = Modifier.testTag("woodpecker-arreter-oui"),
+                ) { Text(stringResource(R.string.woodpecker_stop_confirm), color = Palette.danger) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmStop = false }) { Text(stringResource(R.string.cancel)) }
+            },
+            containerColor = Palette.surfaceElevated,
+        )
+    }
+    message?.let {
+        AlertDialog(
+            onDismissRequest = { message = null },
+            confirmButton = { TextButton(onClick = { message = null }) { Text("OK", color = Palette.accent) } },
+            text = { Text(it) },
+            containerColor = Palette.surfaceElevated,
+        )
+    }
 }
