@@ -51,7 +51,8 @@ final class KeyboardShortcutsUITests: XCTestCase {
             "le pion doit d'abord être en e4 (lu : \(e4.label))"
         )
 
-        // ← recule d'un demi-coup. Deux pressions suffisent à revenir au
+        // ← recule d'un COUP COMPLET, jusqu'à la position précédente où c'est
+        // au joueur de jouer (``ReviewStepper``). Deux pressions ramènent au
         // départ, que le moteur ait déjà répondu ou non — reculer au-delà du
         // coup 0 est sans effet.
         app.typeKey(.leftArrow, modifierFlags: [])

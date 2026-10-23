@@ -1812,8 +1812,28 @@ final class PlayViewModel {
         hintMoves = []
     }
 
-    func reviewPrevious() { review(toPly: displayedPly - 1) }
-    func reviewNext() { review(toPly: displayedPly + 1) }
+    /// Par coup COMPLET, vers les positions où c'est au joueur de jouer :
+    /// « Reprendre ici » y reprend SA partie (demande du 23/10/2026). La liste
+    /// des coups, elle, mène toujours au demi-coup choisi.
+    private var reviewStepper: ReviewStepper {
+        ReviewStepper(
+            totalPlies: moveLog.count,
+            userMovesOnEvenPlies: settings.startingPosition.sideToMove == userColor
+        )
+    }
+
+    var canReviewPrevious: Bool { reviewStepper.previous(from: displayedPly) != nil }
+    var canReviewNext: Bool { reviewStepper.next(from: displayedPly) != nil }
+
+    func reviewPrevious() {
+        guard let ply = reviewStepper.previous(from: displayedPly) else { return }
+        review(toPly: ply)
+    }
+
+    func reviewNext() {
+        guard let ply = reviewStepper.next(from: displayedPly) else { return }
+        review(toPly: ply)
+    }
     func reviewToStart() { review(toPly: 0) }
 
     func reviewToLive() {

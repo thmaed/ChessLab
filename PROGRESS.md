@@ -10640,3 +10640,20 @@ réussi.
 - Tests : `WoodpeckerPlanTests` (8), trois tests dans `PuzzleSessionDrawerTests`,
   `WoodpeckerUITests`.
 
+## 23/10 — Consultation contre l'ordinateur : par coup complet ✅
+
+Demande de l'utilisateur : en consultation d'une partie contre l'ordinateur,
+« coup précédent / suivant » bougent d'un COUP COMPLET, pour que « Reprendre
+ici » soit toujours sur une position du joueur.
+
+- `ReviewStepper` (pur) : la position du joueur juste avant / juste après. Les
+  positions du joueur sont les demi-coups pairs quand il a le trait au départ,
+  les impairs sinon (joueur aux Noirs, ou position de départ inversée). Pas
+  de position du joueur plus loin : retour au direct. Moteur en réflexion : le
+  premier recul n'est que d'un demi-coup (la position vive est la sienne).
+- `PlayControlBar` accepte des bornes `canGoBack` / `canGoForward` ; seul le
+  mode « Contre l'ordinateur » les fournit — les variantes gardent le
+  demi-coup. La liste des coups mène toujours au demi-coup choisi.
+- Raccourcis clavier ←/→ : même règle (ils appellent les mêmes fonctions).
+- Tests : `ReviewStepperTests` (4) ; `KeyboardShortcutsUITests` vert.
+

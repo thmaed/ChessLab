@@ -7,6 +7,19 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Consultation contre l'ordinateur : par coup complet — 23/10/2026
+
+Demande de l'utilisateur, faite des deux côtés : les flèches « coup
+précédent / suivant » avancent et reculent d'un COUP COMPLET, vers les
+positions où c'est au joueur de jouer — « Reprendre ici » y reprend donc
+toujours SA partie. Même règle pure (`ReviewStepper`), parité inversée pour une
+partie commencée avec les Noirs au trait. La liste des coups mène toujours au
+demi-coup choisi. Les variantes ne sont pas concernées.
+
+- [x] Android : `ReviewStepperTest` (JVM) ;
+      `PlaySetupTest.reprendreIciTronqueLaPartieEtSAnnule` réécrit — UN recul,
+      puis « Reprendre ici » rend la main au joueur — vert sur Galaxy A16.
+
 ### Méthode Woodpecker — 23/10/2026
 
 Troisième suggestion du testeur, faite des deux côtés. Décisions de

@@ -487,10 +487,10 @@ private fun ControlBar(
 ) {
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         ControlButton(Icons.Default.ChevronLeft, stringResource(R.string.previous_move),
-            enabled = ui.displayedPly > 0, tag = "precedent", onClick = onPrevious)
+            enabled = ui.canReviewPrevious, tag = "precedent", onClick = onPrevious)
         Spacer(Modifier.width(10.dp))
         ControlButton(Icons.Default.ChevronRight, stringResource(R.string.next_move),
-            enabled = ui.displayedPly < ui.totalPlies, tag = "suivant", onClick = onNext)
+            enabled = ui.canReviewNext, tag = "suivant", onClick = onNext)
 
         // « Reprendre ici » ne s'offre que si la reprise est POSSIBLE : avec
         // une pendule, on ne rend pas du temps écoulé.

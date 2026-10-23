@@ -31,6 +31,10 @@ struct PlayControlBar: View {
     let hasMoves: Bool
     let displayedPly: Int
     let totalPlies: Int
+    /// Bornes de navigation imposées par l'écran — contre l'ordinateur, par
+    /// coup complet (``ReviewStepper``). `nil` : demi-coup par demi-coup.
+    var canGoBack: Bool? = nil
+    var canGoForward: Bool? = nil
     let isReviewing: Bool
     let canResumeFromReview: Bool
     /// Nombre de coups écartés par la reprise qu'on peut encore annuler,
@@ -75,7 +79,7 @@ struct PlayControlBar: View {
             controlButton(
                 "chevron.left",
                 label: "Coup précédent",
-                disabled: !hasMoves || displayedPly == 0,
+                disabled: !hasMoves || !(canGoBack ?? (displayedPly > 0)),
                 action: onPrevious
             )
             // Raccourcis clavier iPad : ←/→ parcourent la partie, comme avant.
@@ -84,7 +88,7 @@ struct PlayControlBar: View {
             controlButton(
                 "chevron.right",
                 label: "Coup suivant",
-                disabled: !hasMoves || displayedPly >= totalPlies,
+                disabled: !hasMoves || !(canGoForward ?? (displayedPly < totalPlies)),
                 action: onNext
             )
             .keyboardShortcut(.rightArrow, modifiers: [])

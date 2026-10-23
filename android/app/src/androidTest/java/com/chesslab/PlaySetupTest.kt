@@ -128,11 +128,15 @@ class PlaySetupTest {
             compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isNotEmpty()
         }
 
-        // On remonte de deux demi-coups, puis on repart d'ici.
-        compose.onNodeWithTag("precedent").performClick()
+        // Un seul « précédent » recule d'un COUP COMPLET (23/10/2026) : on
+        // tombe sur la position d'avant 2. d4, où c'est à nous de jouer — et
+        // la reprise nous rend donc la main, pas au moteur.
         compose.onNodeWithTag("precedent").performClick()
         compose.onNodeWithTag("reprendre-ici").performClick()
         compose.waitForIdle()
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
 
         // La suite est écartée — et récupérable le temps qu'on s'en avise.
         compose.onNodeWithTag("annuler-reprise").assertIsDisplayed()

@@ -68,6 +68,8 @@ data class PlayUiState(
     val maiaAvailable: Boolean = true,
     /** Le camp de l'utilisateur : le plateau se retourne avec lui. */
     val userColor: Piece.Color = Piece.Color.white,
+    /** Vrai si c'est au joueur de jouer après un nombre PAIR de demi-coups. */
+    val userMovesOnEvenPlies: Boolean = true,
     val captured: CapturedMaterial = CapturedMaterial(),
     /** Millisecondes restantes, ou `null` sans pendule. */
     val whiteClockMs: Long? = null,
@@ -104,6 +106,11 @@ data class PlayUiState(
     val userWon: Boolean = false,
 ) {
     val isReviewing: Boolean get() = displayedPly < sanMoves.size
+
+    /** Les flèches vont par coup COMPLET, vers les positions du joueur. */
+    val reviewStepper: ReviewStepper get() = ReviewStepper(sanMoves.size, userMovesOnEvenPlies)
+    val canReviewPrevious: Boolean get() = reviewStepper.previous(displayedPly) != null
+    val canReviewNext: Boolean get() = reviewStepper.next(displayedPly) != null
 
     /**
      * Peut-on reprendre un coup ?
@@ -242,6 +249,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(
             settings = settings, opponent = profile, level = settings.level,
             userColor = color, started = true, outcome = null,
+            userMovesOnEvenPlies = startPosition.sideToMove == color,
         )
         newGame()
     }
@@ -776,6 +784,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(
             settings = settings, opponent = profile, level = autosave.level,
             userColor = humanColor, started = true,
+            userMovesOnEvenPlies = startPosition.sideToMove == humanColor,
         )
         newGame()
         clock?.restore(autosave.whiteMs, autosave.blackMs)
@@ -1259,9 +1268,18 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         PgnExport.Metadata.vsEngine(getApplication(), humanColor, opponentName(), recorder.finalResult)
     )
 
-    fun reviewPrevious() = review(ui.displayedPly - 1)
+    /**
+     * Par coup COMPLET, vers les positions où c'est au joueur de jouer :
+     * « Reprendre ici » y reprend SA partie. La liste des coups, elle, mène
+     * toujours au demi-coup choisi (`reviewTo`).
+     */
+    fun reviewPrevious() {
+        ui.reviewStepper.previous(ui.displayedPly)?.let(::review)
+    }
 
-    fun reviewNext() = review(ui.displayedPly + 1)
+    fun reviewNext() {
+        ui.reviewStepper.next(ui.displayedPly)?.let(::review)
+    }
 
     /**
      * Affiche la position après [ply] demi-coups, SANS toucher à la partie :
