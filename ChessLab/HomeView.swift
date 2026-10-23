@@ -289,6 +289,14 @@ struct HomeView: View {
                            "d2d3", "d7d6", "e1g1", "e8g8", "b1d2", "a7a6"],
                 whiteRemaining: nil, blackRemaining: nil, savedAt: .now
             ))
+        // La partie signalée le 22/10/2026 : aux Noirs, plateau retourné, la
+        // dame en h1 — la case d'ORIGINE du plateau — ne se sélectionnait plus.
+        case "blackQueenOnOrigin":
+            return .resumedGame(PlayGameAutosave(
+                settings: PlayGameSettings(), resolvedUserColorRaw: "b",
+                moveLANs: ["e2e4", "g8f6", "f1c4", "f6e4", "g1f3", "d7d5", "c4b3", "c8g4", "h2h3", "g4h5", "e1g1", "e4g5", "f1e1", "g5f3", "g2f3", "e7e6", "d2d3", "d8f6", "b1d2", "f6g5", "g1f1", "f8c5", "c2c4", "e8g8", "c4d5", "e6d5", "b3c2", "g5h4", "d3d4", "c5d4", "e1e2", "h4h3", "f1e1", "h3h1", "d2f1", "b8c6", "c2a4", "h5f3", "a4c6", "f3e2", "d1e2", "b7c6", "c1e3", "f8e8", "e2d3", "d4e3", "f2e3", "a8d8", "e1d2", "d5d4", "d2c2", "d4e3", "d3e2"],
+                whiteRemaining: nil, blackRemaining: nil, savedAt: .now
+            ))
         case "twoPlayerSetup": return .twoPlayerSetup
         case "twoPlayerGame": return .activeTwoPlayerGame(TwoPlayerGameSettings())
         case "analysisEntry": return .analysisEntry

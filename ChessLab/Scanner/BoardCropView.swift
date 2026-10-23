@@ -51,6 +51,10 @@ struct BoardCropView: View {
                     quadOutline(transform: transform)
                     handles(transform: transform)
                 }
+                // UN geste pour toute l'image, qui saisit le coin le plus
+                // proche du doigt — voir ``cornerDragGesture(transform:)``.
+                .contentShape(Rectangle())
+                .gesture(cornerDragGesture(transform: transform))
             }
             .frame(maxWidth: .infinity)
             .layoutPriority(1)
@@ -127,6 +131,19 @@ struct BoardCropView: View {
         .allowsHitTesting(false)
     }
 
+    /// Les poignées ne font que SE MONTRER : aucune ne porte de geste.
+    ///
+    /// 🐛 Même défaut que les pièces de ``ChessBoardView`` (signalé le
+    /// 22/10/2026, reproduit sur iPhone XS en iOS 18.7.9) : placées par
+    /// `.offset`, les quatre poignées étaient dessinées sur leur coin mais
+    /// MISES EN PAGE à l'origine du `ZStack`, où leurs cadres s'empilaient ;
+    /// en iOS 18, un toucher dans ce coin de l'image était avalé. Avant cela,
+    /// placées par `.position`, la dernière de `Corner.allCases` répondait sur
+    /// toute l'image.
+    ///
+    /// Le toucher est donc reçu par l'image entière et attribué au coin le
+    /// plus proche — exactement comme le recadrage Android
+    /// (`ScannerScreen.kt`), qui n'a jamais eu ce défaut.
     private func handles(transform: ImageDisplayTransform) -> some View {
         ForEach(Corner.allCases, id: \.self) { corner in
             let position = transform.toView(point(for: corner))
@@ -136,32 +153,42 @@ struct BoardCropView: View {
                 .fill(outlineColor.opacity(0.28))
                 .overlay(Circle().strokeBorder(outlineColor, lineWidth: 2))
                 .frame(width: diameter)
-                // Cible tactile confortable, indépendante du disque affiché.
-                .contentShape(Circle().inset(by: -12))
-                .gesture(dragGesture(for: corner, transform: transform))
                 .accessibilityIdentifier("cropHandle_\(identifier(for: corner))")
                 .accessibilityLabel(label(for: corner))
-                // ⚠️ `.offset` et NON `.position` — même piège que
-                // ``ChessBoardView/piecesLayer(squareSize:)``, où il rendait le
-                // plateau injouable en iOS 18. `.position` fabrique un
-                // conteneur de la taille de TOUTE l'image ; les quatre poignées
-                // s'empilaient, et la dernière de `Corner.allCases`
-                // interceptait partout. `.offset` laisse la vue à sa taille de
-                // poignée. Le `ZStack` parent est aligné `.topLeading`, d'où le
-                // demi-diamètre retranché pour retomber sur le centre voulu.
-                //
-                // Non signalé jusqu'ici faute d'avoir scanné un plateau depuis
-                // un iOS 18.
                 .offset(x: position.x - diameter / 2, y: position.y - diameter / 2)
+                .allowsHitTesting(false)
         }
     }
 
-    private func dragGesture(for corner: Corner, transform: ImageDisplayTransform) -> some Gesture {
+    /// Rayon de saisie autour d'un coin, en points : celui d'Android (48 dp).
+    /// Plus large que le disque affiché, pour une cible confortable au doigt.
+    static let grabRadius: CGFloat = 48
+
+    /// Le coin dont le centre est le plus proche de `location`, s'il est dans
+    /// le rayon de saisie. Extrait pour être testable.
+    static func nearestCorner(
+        to location: CGPoint, among corners: [(Corner, CGPoint)]
+    ) -> Corner? {
+        corners
+            .map { corner, center in (corner, hypot(center.x - location.x, center.y - location.y)) }
+            .filter { $0.1 <= grabRadius }
+            .min { $0.1 < $1.1 }?
+            .0
+    }
+
+    private func cornerDragGesture(transform: ImageDisplayTransform) -> some Gesture {
         DragGesture()
             .onChanged { value in
+                // Le coin se choisit au DÉPART du geste, une fois pour toutes :
+                // une poignée qu'on traîne près d'une autre ne doit pas la
+                // lâcher pour sa voisine.
+                let corner = draggedCorner ?? Self.nearestCorner(
+                    to: value.startLocation,
+                    among: Corner.allCases.map { ($0, transform.toView(point(for: $0))) }
+                )
+                guard let corner else { return }
                 draggedCorner = corner
-                let imagePoint = transform.toImage(value.location)
-                setPoint(clamped(imagePoint), for: corner)
+                setPoint(clamped(transform.toImage(value.location)), for: corner)
             }
             .onEnded { _ in draggedCorner = nil }
     }

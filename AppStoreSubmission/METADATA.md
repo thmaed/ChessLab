@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 1.9.0, build 15** (fixés dans `project.pbxproj` le 13/10/2026). Voir `RELEASE_NOTES-1.9.0.md` pour le détail des changements depuis la 1.8.1.
+**Version courante : 1.9.1, build 16** (fixés dans `project.pbxproj` le 23/10/2026). Voir `RELEASE_NOTES-1.9.1.md` pour le détail des changements depuis la 1.9.0.
 
 Tout ce qui suit est à copier-coller directement dans les champs correspondants d'App Store Connect. Les limites de caractères d'Apple sont respectées (vérifiées).
 
@@ -10,43 +10,33 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 ---
 
-## Nouveautés de cette version — 1.9.0 (4000 car. max)
+## Nouveautés de cette version — 1.9.1 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> ⏳ **Prête, pas soumise.** Version 1.9.0, build 15. Couvre le 30/09 → 13/10/2026, depuis la 1.8.1 (build 14, READY_FOR_SALE). Détail dans `RELEASE_NOTES-1.9.0.md`.
+> Version 1.9.1, build 16. Version de correction, née d'un signalement de joueur le 22/10/2026. Depuis la 1.9.0 (build 15, READY_FOR_SALE). Détail dans `RELEASE_NOTES-1.9.1.md`. Captures et aperçus de la 1.9.0 conservés : rien du contenu n'a changé.
 
 ### Français
 
 ```
-CHESSLAB S'OUVRE AVEC L'IPHONE DUO
-Fermé, l'écran extérieur montre ChessLab tel que vous le connaissez sur iPhone, barres d'outils à la verticale sous la barre d'état. Ouvert, le grand écran prend la disposition iPad — barre latérale des modes et colonne de détail — et l'échiquier y prend toute sa place.
+UNE CASE QUI NE RÉPONDAIT PLUS
+Sur iOS 18, la pièce posée dans le coin haut gauche de l'échiquier ne se laissait plus toucher : h1 quand on joue les Noirs, a8 quand on joue les Blancs. Le défaut a été signalé au moment de jouer une dame depuis h1, partie en cours contre Maia. C'est corrigé, partout où l'échiquier se joue, et vérifié sur un iPhone sous iOS 18. Merci pour ce signalement si précis.
 
-UN ÉCHIQUIER À LA TAILLE DE L'ÉCRAN OUVERT
-Sur une partie, une analyse ou un entraînement, la barre latérale s'efface d'elle-même quand elle prendrait la place du plateau, et revient dès que vous retournez aux listes ; un appui sur son bouton la rappelle à tout moment. Les commandes passent à droite de l'échiquier dès que l'écran est plus large que haut, et le plateau prend toute la hauteur : contre l'ordinateur, en analyse, dans les douze variantes, les entraînements et le Laboratoire.
-
-TOUTES LES POSITIONS DE L'APPAREIL
-Ouvert, ChessLab suit l'appareil quand vous le tournez, et choisit sa disposition d'après la place réelle de l'écran. Fermé, il reste en portrait, comme sur tout iPhone.
-
-ET AUSSI
-L'entraînement libre des finales couvre désormais tout l'écran sur iPad en paysage, sans bandes noires sur les côtés.
+LE SCANNER AUSSI
+Le recadrage manuel avait le même défaut sur iOS 18 : un coin posé tout en haut à gauche de l'image pouvait ne plus répondre. Les quatre coins se saisissent désormais au plus proche du doigt.
 ```
 
 ### English
 
 ```
-CHESSLAB UNFOLDS WITH IPHONE DUO
-Closed, the outer display shows ChessLab as you know it on iPhone, with toolbars standing vertically below the status bar. Open, the large display takes the iPad layout — sidebar of modes and detail column — and the board gets all the room it deserves.
+A SQUARE THAT STOPPED RESPONDING
+On iOS 18, the piece standing in the top-left corner of the board could no longer be touched: h1 when playing Black, a8 when playing White. It was reported while trying to move a queen from h1, mid-game against Maia. It is fixed, wherever the board is played, and checked on an iPhone running iOS 18. Many thanks for such a precise report.
 
-A BOARD SIZED FOR THE OPEN DISPLAY
-In a game, an analysis or a training session, the sidebar steps aside on its own whenever it would take the board's room, and comes back as soon as you return to the lists; its button brings it back at any time. Controls move to the right of the board whenever the display is wider than tall, and the board takes the full height: against the computer, in analysis, in the twelve variants, in training and in the Laboratory.
-
-EVERY POSE OF THE DEVICE
-Open, ChessLab follows the device when you turn it, and picks its layout from the actual room on screen. Closed, it stays in portrait, like on any iPhone.
-
-ALSO
-Endgame free training now fills the whole screen on iPad in landscape, with no black bands on the sides.
+THE SCANNER TOO
+Manual cropping had the same flaw on iOS 18: a corner placed at the very top left of the image could stop responding. The four corners are now picked up by whichever is closest to your finger.
 ```
+
+---
 
 ## Français (langue principale)
 
@@ -220,6 +210,8 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
+**1.9.1, build 16** — fixés le 23/10/2026, aux deux configurations de la cible applicative. La 1.9.0 (build 15) est **READY_FOR_SALE** : le 16 est le premier numéro libre (vérifié par l'API le 23/10). Version de correction : la case d'origine de l'échiquier et un coin du recadrage ne répondaient plus en iOS 18.
+
 **1.9.0, build 15** — fixés le 13/10/2026 (`MARKETING_VERSION = 1.9.0`, `CURRENT_PROJECT_VERSION = 15`), aux deux configurations de la cible applicative. La 1.8.1 (build 14) est **READY_FOR_SALE** : le 15 est le premier numéro libre (vérifié par l'API le 13/10). Nouveautés détaillées dans `RELEASE_NOTES-1.9.0.md`, texte prêt à coller ci-dessus.
 
 Pourquoi 1.9.0 : un appareil nouveau pris en charge de bout en bout (iPhone Duo, SDK iOS 27.1), avec des dispositions nouvelles pour les écrans plus larges que hauts et une politique d'orientation qui change. Plus qu'une correction.
@@ -252,6 +244,8 @@ git push origin main
 Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) : soumettre sans pousser publierait un binaire dont les sources annoncées ne correspondent pas.
 
 ### Historique des versions
+- **1.9.1** — build 16 : la pièce du coin haut gauche de l'échiquier (h1 aux Noirs, a8 aux Blancs) et un coin du recadrage du scanner ne répondaient plus au toucher en iOS 18 (`RELEASE_NOTES-1.9.1.md`).
+- **1.9.0** — build 15, en ligne : iPhone Duo, dispositions pour écrans plus larges que hauts (`RELEASE_NOTES-1.9.0.md`).
 - **1.8.1** — build 14, en ligne : nom du joueur traduit et réglable, PGN exporté avec ses sept balises, disposition iPhone dans une fenêtre d'iPad plus étroite que 744 pt, échiquier servi en premier (`RELEASE_NOTES-1.8.1.md`).
 - **1.8.0** — soumise le 06/09/2026, build 13, fiche remplie par `tools/asc/` : neuf personnages joués par Maia-3 (style, répertoire, tempérament, illustration, niveau mémorisé par personnage sur l'échelle humaine), filet Stockfish à quatre cas, Progrès par personnage, camp Maia au Laboratoire, licence AGPLv3, borne Fairy-Stockfish à 2850 (`RELEASE_NOTES-1.8.0.md` — absorbe la 1.7.1).
 - **1.7.1** — jamais soumise, absorbée par la 1.8.0 : visite guidée bilingue (11 étapes, rejouable depuis l'Aide), coups en ligne colorés dans TOUTES les analyses de variantes, grille des modes sur l'accueil iPad/Mac, stabilité du moteur des variantes en profondeur (6 mécanismes corrigés, suite de torture), Aide remise à jour (version lue du bundle, module Variantes à douze tuiles), zéro warning de compilation (`RELEASE_NOTES-1.7.1.md` — couvre 1.6 → 1.7.1).
@@ -266,10 +260,10 @@ Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/0
 
 ## App Review Notes (paste into App Store Connect → App Review Information → Notes)
 
-English, for the Apple reviewer. Opens with the nature of the update (1.9.0 : prise en charge de l'iPhone Duo), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
+English, for the Apple reviewer. Opens with the nature of the update (1.9.1 : correctif tactile iOS 18), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
 
 ```
-WHAT'S IN THIS UPDATE (1.9.0): iPhone Duo support, built with the iOS 27.1 SDK. No new mode; no change to permissions, privacy or licensing. Closed: iPhone layout, vertical toolbars. Open: iPad layout, the sidebar folds on board screens and controls sit beside the board. The app rotates on the inner display and iPad, and stays portrait on iPhones and the outer display. Layouts follow the available size, never idiom or orientation.
+WHAT'S IN THIS UPDATE (1.9.1): a bug-fix release. On iOS 18 only, the piece standing on the board's top-left square (h1 when playing Black, a8 when playing White) did not respond to touch, and neither did a crop handle placed at the top-left of the image in the Scanner. Both are fixed. No new feature; no change to permissions, privacy or licensing.
 
 ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 100,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
 

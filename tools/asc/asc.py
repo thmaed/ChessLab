@@ -16,6 +16,8 @@ Commandes :
     review       notes pour la révision (et « pas de compte de démonstration »)
     status       ce qu'App Store Connect a pour cette version
     all          tout ce qui précède, dans l'ordre, puis s'arrête AVANT la soumission
+    submit       SOUMET la version pour révision — à ne lancer que sur demande
+                 explicite, après relecture de `status`
 
 Authentification : clé d'API d'équipe (rôle App Manager) dans ~/.private_keys/
 AuthKey_<KEY_ID>.p8, avec ASC_ISSUER_ID dans l'environnement (et ASC_KEY_ID
@@ -572,6 +574,38 @@ def cmd_status(c, args):
           "· contact", detail["attributes"].get("contactEmail") if detail else "absent")
 
 
+def cmd_submit(c, args):
+    """Soumission pour révision, par l'API des « review submissions » : une
+    soumission ouverte (ou créée) pour l'app, la version comme élément, puis
+    `submitted`. Refuse si la version n'a pas de build rattaché."""
+    app = find_app(c)
+    v = find_version(c, app["id"], args.version)
+    state = v["attributes"]["appStoreState"]
+    if state not in ("PREPARE_FOR_SUBMISSION", "DEVELOPER_REJECTED", "REJECTED", "METADATA_REJECTED"):
+        sys.exit(f"version {args.version} en état {state} : rien à soumettre")
+    if not c.get(f"/appStoreVersions/{v['id']}/build").get("data"):
+        sys.exit(f"version {args.version} sans build rattaché (commande `attach`)")
+    open_subs = c.get_all("/reviewSubmissions", **{
+        "filter[app]": app["id"], "filter[platform]": "IOS", "filter[state]": "READY_FOR_REVIEW",
+    })
+    sub = open_subs[0] if open_subs else c.post("/reviewSubmissions", {
+        "type": "reviewSubmissions", "attributes": {"platform": "IOS"},
+        "relationships": {"app": rel("apps", app["id"])},
+    })["data"]
+    items = c.get_all(f"/reviewSubmissions/{sub['id']}/items")
+    if not items:
+        c.post("/reviewSubmissionItems", {
+            "type": "reviewSubmissionItems",
+            "relationships": {"reviewSubmission": rel("reviewSubmissions", sub["id"]),
+                              "appStoreVersion": rel("appStoreVersions", v["id"])},
+        })
+    c.patch(f"/reviewSubmissions/{sub['id']}", {
+        "type": "reviewSubmissions", "id": sub["id"], "attributes": {"submitted": True},
+    })
+    print(f"version {args.version} soumise pour révision (soumission {sub['id']})")
+    cmd_status(c, args)
+
+
 def cmd_all(c, args):
     args.wait = True
     print("version"); cmd_version(c, args)
@@ -587,7 +621,7 @@ def cmd_all(c, args):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("command", choices=["apps", "version", "metadata", "screenshots", "previews", "duo", "build", "attach", "review", "status", "all"])
+    p.add_argument("command", choices=["apps", "version", "metadata", "screenshots", "previews", "duo", "build", "attach", "review", "status", "all", "submit"])
     p.add_argument("--version", default=None, help="version marketing (défaut : MARKETING_VERSION du projet)")
     p.add_argument("--build", default=None, help="numéro de build (défaut : CURRENT_PROJECT_VERSION du projet)")
     p.add_argument("--wait", action="store_true", help="build : attendre le traitement par Apple (1 h max)")

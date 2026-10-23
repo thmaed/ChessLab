@@ -77,7 +77,14 @@ struct PositionedGestureOrderTests {
     ///
     /// Déplacer simplement le geste avant `.position` ne corrige rien — essayé
     /// sur l'appareil, sans effet : le conteneur pleine surface existe toujours
-    /// et c'est lui qui intercepte. `.offset` est la forme correcte.
+    /// et c'est lui qui intercepte.
+    ///
+    /// `.offset` ne vaut guère mieux quand plusieurs vues interactives
+    /// partagent un `ZStack` aligné `.topLeading` : dessinées à leur place,
+    /// elles restent MISES EN PAGE à l'origine, où leurs cadres s'empilent — la
+    /// dame noire en h1, plateau retourné, ne répondait plus (22/10/2026). La
+    /// forme sûre est de mettre chaque vue en page dans sa propre case, comme
+    /// ``ChessBoardView`` le fait désormais avec une grille.
     @Test func noInteractiveViewIsPlacedWithPosition() throws {
         let files = Self.swiftFiles()
         #expect(!files.isEmpty, "les sources doivent être trouvables depuis #filePath")
@@ -100,7 +107,8 @@ struct PositionedGestureOrderTests {
             """
             Vue interactive placée avec `.position(…)` : le conteneur qu'il \
             fabrique occupe toute la surface et intercepte le toucher en \
-            iOS 18. Utiliser `.offset(…)`, qui laisse la vue à sa taille.
+            iOS 18. Mettre la vue en page à sa place (une grille, comme les \
+            pièces de ChessBoardView) plutôt que de la déplacer.
             \(offenders.joined(separator: "\n"))
             """
         )

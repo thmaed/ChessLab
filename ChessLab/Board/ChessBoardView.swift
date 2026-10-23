@@ -573,61 +573,81 @@ struct ChessBoardView: View {
         .allowsHitTesting(false)
     }
 
+    /// Les pièces, rangées dans une GRILLE 8×8 calquée sur ``squaresGrid`` :
+    /// chaque glyphe est mis en page DANS sa propre case, sans `.position` ni
+    /// `.offset`.
+    ///
+    /// 🐛 Bug corrigé (iPhone XS Max / iOS 18, 16/08/2026) : le plateau était
+    /// injouable, seule la colonne H répondait — en réalité une seule pièce,
+    /// h2, la dernière de `position.pieces`. `.position()` est un modificateur
+    /// de MISE EN PAGE : chaque pièce fabriquait un conteneur de la taille du
+    /// plateau entier, ces conteneurs s'empilaient, et en iOS 18 celui du
+    /// dessus interceptait le toucher partout.
+    ///
+    /// 🐛 Bug corrigé ensuite (signalé le 22/10/2026) : « ma dame en h1 est
+    /// soudainement impossible à sélectionner », partie aux Noirs, plateau
+    /// retourné. Le premier correctif plaçait les pièces par `.offset`, un
+    /// modificateur de RENDU : la vue était dessinée sur sa case, mais MISE EN
+    /// PAGE à l'origine du `ZStack` — le coin haut-gauche, c'est-à-dire a8, ou
+    /// h1 plateau retourné. Les cadres de toutes les pièces s'y empilaient,
+    /// et en iOS 18 le tap sur cette case était AVALÉ — rien ne se
+    /// sélectionnait, ni tap-tap ni glisser (reproduit sur iPhone XS en
+    /// 18.7.9 ; le joueur, en 18.7.10, l'a aussi vu avec une tour en h1).
+    /// Partout ailleurs le plateau répondait, d'où un défaut qui n'apparaît
+    /// que le jour où l'on veut jouer DEPUIS ce coin.
+    ///
+    /// Dans une grille, le cadre de mise en page de chaque glyphe EST sa case :
+    /// plus rien ne s'empile nulle part, quelle que soit la version d'iOS.
+    /// Invisible en iOS 26, donc sur nos simulateurs : seul un appareil iOS 18
+    /// le montre (`OriginSquareSelectionUITests`, lancé sur l'iPhone XS).
     @ViewBuilder
     private func piecesLayer(squareSize: CGFloat) -> some View {
-        ForEach(board.position.pieces, id: \.square) { piece in
-            PieceGlyphView(piece: piece)
-                .frame(width: squareSize, height: squareSize)
-                .rotationEffect(pieceRotation)
-                .opacity((dragState?.square == piece.square || slidingMove?.end == piece.square || rejectAnim?.from == piece.square) ? 0 : 1)
-                // ⚠️ `.offset` et NON `.position` — la distinction porte tout
-                // le comportement tactile de cette couche.
-                //
-                // 🐛 Bug corrigé (iPhone XS Max / iOS 18) : le plateau était
-                // injouable, seule la colonne H répondait — en réalité une
-                // seule pièce, h2, la dernière de `position.pieces`, puis h4
-                // une fois le pion avancé.
-                //
-                // `.position()` est un modificateur de MISE EN PAGE : il rend
-                // une vue qui occupe tout l'espace offert et y place l'enfant.
-                // Chaque pièce fabriquait donc un conteneur de la taille du
-                // plateau entier, et ces 32 conteneurs s'empilaient. Déplacer
-                // simplement le geste avant `.position` ne suffit pas — essayé,
-                // sans effet : le conteneur reste, et c'est LUI qui intercepte
-                // en iOS 18.
-                //
-                // `.offset` est un modificateur de RENDU : la vue garde sa
-                // taille d'une case, et le hit-testing suit le décalage. Plus
-                // aucun conteneur pleine surface, donc plus rien à intercepter.
-                //
-                // Invisible en iOS 26, qui ne laisse plus la zone vide d'une
-                // vue positionnée capter le toucher — et invisible en test, nos
-                // simulateurs n'ayant que ce runtime.
-                .contentShape(Rectangle())
-                .gesture(isDraggable(piece) ? dragGesture(for: piece.square, squareSize: squareSize) : nil)
-                // Une pièce SANS geste doit être transparente au toucher.
-                // Sinon son glyphe, dessiné au-dessus de la grille, avale le
-                // tap : la grille est un FRÈRE dans le ZStack, pas un ancêtre,
-                // donc le tap n'est pas transmis, il est perdu.
-                //
-                // 🐛 Bug corrigé : taper une pièce ADVERSE ne faisait rien.
-                // Sélectionner sa pièce marchait (elle, a un geste), mais la
-                // seconde frappe sur la case à CAPTURER était avalée. La
-                // sélection restait affichée, plus aucun tap ne répondait, et
-                // seul le glisser fonctionnait — il part d'une pièce à soi.
-                // Invisible sur un déplacement vers une case vide.
-                .allowsHitTesting(isDraggable(piece))
-                .offset(originOffset(of: piece.square, squareSize: squareSize))
-                .animation(.easeInOut(duration: 0.35), value: allPiecesRotated)
-                // Une pièce glissable est au-dessus de sa case et capterait le
-                // survol : on relaie le hover depuis le glyphe pour que
-                // l'anneau apparaisse aussi sous ses propres pièces.
-                .onHover { hovering in
-                    guard interactionEnabled, isDraggable(piece) else { return }
-                    if hovering { hoveredSquare = piece.square }
-                    else if hoveredSquare == piece.square { hoveredSquare = nil }
+        VStack(spacing: 0) {
+            ForEach(0..<8, id: \.self) { row in
+                HStack(spacing: 0) {
+                    ForEach(0..<8, id: \.self) { col in
+                        let sq = square(row: row, col: col)
+                        if let piece = board.position.piece(at: sq) {
+                            pieceView(piece, squareSize: squareSize)
+                        } else {
+                            Color.clear
+                                .frame(width: squareSize, height: squareSize)
+                                .allowsHitTesting(false)
+                        }
+                    }
                 }
+            }
         }
+    }
+
+    private func pieceView(_ piece: Piece, squareSize: CGFloat) -> some View {
+        PieceGlyphView(piece: piece)
+            .frame(width: squareSize, height: squareSize)
+            .rotationEffect(pieceRotation)
+            .opacity((dragState?.square == piece.square || slidingMove?.end == piece.square || rejectAnim?.from == piece.square) ? 0 : 1)
+            .contentShape(Rectangle())
+            .gesture(isDraggable(piece) ? dragGesture(for: piece.square, squareSize: squareSize) : nil)
+            // Une pièce SANS geste doit être transparente au toucher.
+            // Sinon son glyphe, dessiné au-dessus de la grille, avale le
+            // tap : la grille est un FRÈRE dans le ZStack, pas un ancêtre,
+            // donc le tap n'est pas transmis, il est perdu.
+            //
+            // 🐛 Bug corrigé : taper une pièce ADVERSE ne faisait rien.
+            // Sélectionner sa pièce marchait (elle, a un geste), mais la
+            // seconde frappe sur la case à CAPTURER était avalée. La
+            // sélection restait affichée, plus aucun tap ne répondait, et
+            // seul le glisser fonctionnait — il part d'une pièce à soi.
+            // Invisible sur un déplacement vers une case vide.
+            .allowsHitTesting(isDraggable(piece))
+            .animation(.easeInOut(duration: 0.35), value: allPiecesRotated)
+            // Une pièce glissable est au-dessus de sa case et capterait le
+            // survol : on relaie le hover depuis le glyphe pour que
+            // l'anneau apparaisse aussi sous ses propres pièces.
+            .onHover { hovering in
+                guard interactionEnabled, isDraggable(piece) else { return }
+                if hovering { hoveredSquare = piece.square }
+                else if hoveredSquare == piece.square { hoveredSquare = nil }
+            }
     }
 
     /// Au-dessus des pièces (une pastille sous un glyphe ne se verrait pas)
@@ -813,18 +833,6 @@ struct ChessBoardView: View {
 
     private func centerPoint(of sq: Square, squareSize: CGFloat) -> CGPoint {
         geometry(squareSize: squareSize).centerPoint(of: sq)
-    }
-
-    /// Décalage du coin HAUT-GAUCHE d'une case depuis l'origine du plateau.
-    ///
-    /// Permet de placer une vue déjà dimensionnée à la case avec `.offset`
-    /// plutôt qu'avec `.position` : le `ZStack` étant aligné `.topLeading`, une
-    /// vue non décalée se trouve déjà sur a8 (ou h1 si le plateau est
-    /// retourné). Voir le commentaire de ``piecesLayer(squareSize:)`` pour ce
-    /// que cette différence change au toucher.
-    private func originOffset(of sq: Square, squareSize: CGFloat) -> CGSize {
-        let center = centerPoint(of: sq, squareSize: squareSize)
-        return CGSize(width: center.x - squareSize / 2, height: center.y - squareSize / 2)
     }
 
     private func accessibilityLabel(for sq: Square) -> String {

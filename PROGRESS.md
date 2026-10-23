@@ -10524,3 +10524,32 @@ le format demandé, sur le fond de l'app.
 Tests : 1 025 tests unitaires verts (iPhone 17 Pro) ; sur iPad Pro 11",
 rotation, fenêtres étroites et barre latérale verts, sauf l'échec préexistant
 des puces des Finales noté plus haut.
+
+## 1.9.1 — la case d'origine de l'échiquier ne répondait plus en iOS 18 ✅ (2026-10-23)
+
+Signalé le 22/10 par un joueur en iOS 18.7.10 : « ma dame en h1 est
+soudainement impossible à sélectionner », partie aux Noirs contre Maia.
+
+**Cause.** Le correctif d'août (`.position` → `.offset`, voir « Le plateau
+injouable en iOS 18 ») laissait chaque pièce MISE EN PAGE à l'origine du
+plateau — le coin haut gauche, h1 plateau retourné — et seulement DESSINÉE sur
+sa case. Les cadres s'y empilaient ; en iOS 18, un toucher sur cette case était
+avalé (rien ne se sélectionne, ni tap ni glisser). Le journal d'août disait
+déjà : « un appareil iOS 18 doit rester dans la boucle ». Il y est désormais :
+iPhone XS en 18.7.9.
+
+**Correction.** Pièces rangées dans une grille 8×8, chacune mise en page dans
+sa case (`ChessBoardView.piecesLayer`). Le recadrage du scanner, même
+construction, reçoit le toucher par l'image entière et saisit le coin le plus
+proche (principe du recadrage Android, rayon 48 pt).
+
+**Vérifié.** Sur l'iPhone XS : `OriginSquareSelectionUITests` (partie exacte du
+joueur, route DEBUG `blackQueenOnOrigin`) rouge avec l'ancien code, vert après ;
+`CropHandleDragUITests`, `TapToMoveUITests`, `DragPrecisionUITests` verts. Sur
+simulateur iOS 26.5 : les suites d'interaction du plateau et du scanner.
+Android : `OriginSquareTapTest` vert sur le Galaxy A16 — le plateau Compose
+reçoit tout par un seul `pointerInput`, rien à porter.
+
+**Piège rencontré.** Une série de tests UI a échoué en bloc (« le plateau doit
+s'afficher ») : la visite de découverte s'était relancée après une
+réinstallation. Les nouveaux tests passent `-discoveryTourSeen`.
