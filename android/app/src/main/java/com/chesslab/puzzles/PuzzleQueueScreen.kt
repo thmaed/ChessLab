@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -54,6 +56,8 @@ fun PuzzleQueueScreen(
     var difficulty by remember { mutableStateOf<DifficultyTier?>(null) }
     var phase by remember { mutableStateOf<GamePhase?>(null) }
     var theme by remember { mutableStateOf<PuzzleThemeKind?>(null) }
+    var source by remember { mutableStateOf<PuzzleSource?>(null) }
+    var missedOnly by remember { mutableStateOf(false) }
     var stats by remember { mutableStateOf<PuzzleStats?>(null) }
 
     LaunchedEffect(Unit) {
@@ -77,11 +81,39 @@ fun PuzzleQueueScreen(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
-            // Chaque groupe a SA couleur — le niveau en vert, la phase en
-            // bleu, le thème en ambre — et chaque puce son icône. Trois rangées
-            // de puces toutes vertes se ressemblent trop pour qu'on retrouve la
-            // sienne d'un coup d'œil ; c'est le parti pris d'iOS.
-            Group(stringResource(R.string.puzzle_level)) {
+            // Chaque groupe a SA couleur — la provenance en violet, l'historique
+            // en rose, le niveau en vert, la phase en bleu, le thème en ambre —
+            // et chaque puce son icône. Des rangées de puces toutes vertes se
+            // ressemblent trop pour qu'on retrouve la sienne d'un coup d'œil ;
+            // c'est le parti pris d'iOS.
+            Group(stringResource(R.string.puzzle_provenance)) {
+                ChipButton(stringResource(R.string.filter_all_f), source == null,
+                    Modifier.testTag("provenance-toutes"), tint = Palette.violet) { source = null }
+                PuzzleSource.entries.forEach { value ->
+                    ChipButton(
+                        stringResource(value.labelRes), source == value,
+                        Modifier.testTag("provenance-${value.name}"),
+                        icon = value.icon, tint = Palette.violet,
+                    ) {
+                        source = if (source == value) null else value
+                        // Vos puzzles n'ont pas de cote : un niveau choisi
+                        // les exclurait TOUS.
+                        if (source == PuzzleSource.ownGames) difficulty = null
+                    }
+                }
+            }
+            Group(stringResource(R.string.puzzle_history)) {
+                ChipButton(stringResource(R.string.filter_all), !missedOnly,
+                    Modifier.testTag("historique-tous"), tint = Palette.rose) { missedOnly = false }
+                ChipButton(
+                    stringResource(R.string.puzzle_missed), missedOnly,
+                    Modifier.testTag("historique-rates"),
+                    icon = Icons.Default.Cancel, tint = Palette.rose,
+                ) { missedOnly = !missedOnly }
+            }
+            // Masqué pour « Mes parties » : sans cote, aucun niveau ne
+            // retiendrait un seul puzzle.
+            if (source != PuzzleSource.ownGames) Group(stringResource(R.string.puzzle_level)) {
                 ChipButton(stringResource(R.string.filter_all), difficulty == null,
                     Modifier.testTag("niveau-tous"), tint = Palette.accent) { difficulty = null }
                 DifficultyTier.entries.forEach { tier ->
@@ -134,7 +166,7 @@ fun PuzzleQueueScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                summary(difficulty, phase, theme),
+                summary(source, missedOnly, difficulty, phase, theme),
                 fontSize = 11.sp, color = Palette.textTertiary,
                 modifier = Modifier.testTag("resume-selection"),
             )
@@ -146,7 +178,7 @@ fun PuzzleQueueScreen(
                     .fillMaxWidth()
                     .clip(CircleShape)
                     .background(accentGradient)
-                    .clickable { onStart(PuzzleFilter(difficulty, phase, theme)) }
+                    .clickable { onStart(PuzzleFilter(difficulty, phase, theme, source, missedOnly)) }
                     .padding(vertical = 14.dp)
                     .testTag("commencer-puzzles"),
                 textAlign = TextAlign.Center,
@@ -171,11 +203,15 @@ private fun Group(title: String, content: @Composable FlowRowScope.() -> Unit) {
 /** « Tous les puzzles », ou ce qu'on a choisi, en une ligne. */
 @Composable
 private fun summary(
+    source: PuzzleSource?,
+    missedOnly: Boolean,
     difficulty: DifficultyTier?,
     phase: GamePhase?,
     theme: PuzzleThemeKind?,
 ): String {
     val parts = listOfNotNull(
+        source?.let { stringResource(it.labelRes) },
+        if (missedOnly) stringResource(R.string.puzzle_missed) else null,
         difficulty?.let { stringResource(it.labelRes) },
         phase?.let { stringResource(it.labelRes) },
         theme?.let { stringResource(it.labelRes) },

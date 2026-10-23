@@ -110,7 +110,21 @@ data class PuzzleFilter(
     val difficulty: DifficultyTier? = null,
     val phase: GamePhase? = null,
     val theme: PuzzleThemeKind? = null,
+    /**
+     * `null` = les deux. Le choix vivait sur l'écran de résolution, au-dessus
+     * du plateau ; iOS le pose ici, avec les autres critères de la séance.
+     */
+    val source: PuzzleSource? = null,
+    /**
+     * Seulement les puzzles ratés à la DERNIÈRE tentative : un échec remet
+     * `repetitions` à zéro, un succès l'incrémente — `failureCount > 0 &&
+     * repetitions == 0` le dit sans champ nouveau. L'échéance est ignorée :
+     * ce qu'on vient de rater ne serait dû que demain. Réussi avec l'indice =
+     * réussi. Pendant de `PuzzleSessionFilter.missedOnly`.
+     */
+    val missedOnly: Boolean = false,
 ) {
     val ratings: IntRange get() = difficulty?.range ?: 0..4000
-    val isEmpty: Boolean get() = difficulty == null && phase == null && theme == null
+    val isEmpty: Boolean
+        get() = difficulty == null && phase == null && theme == null && source == null && !missedOnly
 }

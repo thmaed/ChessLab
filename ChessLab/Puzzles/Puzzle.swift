@@ -49,9 +49,24 @@ enum PuzzleTheme: String, Codable, CaseIterable {
 /// Provenance d'un puzzle : détecté dans une de vos parties analysées,
 /// ou issu de la bibliothèque Lichess embarquée (voir
 /// ``LichessPuzzleLoader``).
-enum PuzzleSource: String, Codable {
+enum PuzzleSource: String, Codable, CaseIterable {
     case ownGames
     case lichess
+
+    /// Clé française, localisée par l'appelant (comme ``PuzzleTheme/label``).
+    var label: String {
+        switch self {
+        case .ownGames: "Mes parties"
+        case .lichess: "Bibliothèque"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .ownGames: "person.fill"
+        case .lichess: "books.vertical.fill"
+        }
+    }
 }
 
 /// Un puzzle généré depuis une gaffe/erreur détectée en mode Analyser.

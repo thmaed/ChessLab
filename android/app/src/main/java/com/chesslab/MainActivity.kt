@@ -165,6 +165,7 @@ private fun App() {
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
                 onAnalyzeGame = { stack.add(Route.AnalysisBoard(pgn = it)) },
+                onFindMissedMates = { stack.add(Route.AnalysisBoard(pgn = it, findMissedMates = true)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
                 onHome = { stack.removeRange(1, stack.size) },
             )
@@ -217,6 +218,7 @@ private fun App() {
             }
             is Route.AnalysisBoard -> AnalysisScreen(
                 initialFen = current.fen, initialPgn = current.pgn,
+                findMissedMates = current.findMissedMates,
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
             )

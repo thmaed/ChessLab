@@ -288,6 +288,7 @@ struct PuzzleSolveView: View {
             .background(Theme.surfaceElevated, in: Capsule())
             .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
         }
+        .accessibilityIdentifier("puzzleHint")
         .buttonStyle(.pressable)
     }
 

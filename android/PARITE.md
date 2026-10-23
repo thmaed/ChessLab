@@ -7,6 +7,63 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Mats manqués en fin de partie — 23/10/2026
+
+Deuxième suggestion du testeur, faite des deux côtés. Vérifié par tests (iOS :
+`MissedMateDetectorTests`, `MissedMateScanIntegrationTests` avec le vrai
+moteur ; Android : `MissedMateDetectorTest` en JVM,
+`AnalysisReviewTest.lesMatsManquesSontProposesPuisAjoutes` et
+`PlaySetupTest.laFinDePartieProposeLesMatsManques` sur émulateur) — **reste à
+cocher sur appareil**.
+
+- [ ] **Bouton « Mats manqués »** en fin de partie contre l'ordinateur, à côté
+      d'« Analyser » : ouvre l'analyse, qui cherche d'elle-même après la revue.
+- [ ] **« Chercher les mats manqués »** dans le menu de l'analyse, pour toute
+      partie.
+- [ ] **Mêmes règles des deux côtés** (`MissedMateDetector`) : les deux camps,
+      mat en 5 au plus, présélection à 97 % de gain, recherche dédiée au budget
+      des puzzles, autre chemin vers le mat non compté, ligne COMPLÈTE jusqu'au
+      mat (pas de `PuzzleSolutionTrimmer`), position déjà présente sautée.
+- [ ] **Proposition avant enregistrement** : « Coup 23, Blancs : mat en 2 —
+      L'ajouter à vos puzzles ? », mêmes phrases FR/EN. Puzzles thème « Mat »,
+      provenance « Mes parties ».
+- [x] **Corrigé au passage (Android seul)** : une partie abandonnée dans les
+      premières secondes se ROUVRAIT quand le modèle Maia finissait de charger
+      (`refresh` relisait « partie finie » sur l'échiquier seul). iOS n'a pas ce
+      défaut.
+
+### Puzzles : provenance, « Ratés », mats alternatifs — 23/10/2026
+
+Suggestions d'un testeur, faites des deux côtés dans le même chantier.
+Vérifié par tests (iOS : `PuzzleSessionDrawerTests` ; Android :
+`PuzzleAnswerTest` en JVM, `AppTest.ownGamesHideTheLevelFilter` sur
+émulateur) — **reste à cocher sur appareil**.
+
+- [ ] **Groupe « Provenance »** (Toutes · Mes parties · Bibliothèque) sur
+      l'écran de choix. C'est iOS qui rattrapait Android ici : Android avait
+      un sélecteur Lichess / Mes parties AU-DESSUS DU PLATEAU, iOS rien — ses
+      puzzles maison se noyaient dans les ~100 000 de la bibliothèque. Le
+      sélecteur Android a rejoint l'écran de choix, comme les autres critères ;
+      « Lichess » s'appelle désormais « Bibliothèque », comme sur iOS.
+      « Mes parties » masque le groupe « Niveau » (aucune cote).
+- [ ] **Groupe « Historique » : Tous · Ratés.** Ratés = dernière tentative
+      échouée (`failureCount > 0 && repetitions == 0`), échéance IGNORÉE.
+      Réussi avec l'indice = réussi (décision du 23/10). Android retire de la
+      file un puzzle réussi en série « Ratés ».
+- [ ] **Un coup qui mate est toujours juste**, même hors solution enregistrée,
+      et clôt le puzzle. Android juge une promotion hors solution une fois la
+      pièce choisie.
+- [x] **Doublons** : iOS ne recrée plus un puzzle maison pour une position
+      déjà présente (Android le faisait déjà, `OwnPuzzleDao.countFor`).
+- [ ] **Écart restant — le `.clab` ne transporte pas la progression puzzle
+      par puzzle**, seulement deux compteurs. Après un transfert, la série
+      « Ratés » est vide sur le nouvel appareil, et la répétition espacée
+      repart de zéro. iOS fait voyager cette progression par iCloud
+      (`PuzzleProgress`). À ajouter au `TransferFile` (table `puzzle_progress`).
+- [ ] **Écart restant — un puzzle maison Android n'a pas de PHASE**
+      (`OwnPuzzle.toPuzzle()` la met à `null`) : un filtre de phase l'exclut,
+      alors qu'iOS la calcule à la création (`GamePhaseClassifier`).
+
 ### iPhone Duo (iOS, 13/10/2026) — rien à porter
 
 Le chantier iPhone Duo d'iOS (voir `PROGRESS.md`, 13/10) donne aux écrans

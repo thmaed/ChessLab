@@ -1637,7 +1637,7 @@ final class AnalysisViewModel {
     /// 2e choix. Pur, partagé pool ↔ interactif (voir ``terminalCachedEval``).
     /// `nil` si le rang 1 manque (moteur muet).
     private func makeCachedEval(
-        rankedDict: [Int: (lan: String, pv: [String], cp: Int)], sideToMove: Piece.Color
+        rankedDict: [Int: (lan: String, pv: [String], cp: Int, mate: Int?)], sideToMove: Piece.Color
     ) -> CachedEval? {
         guard let best = rankedDict[1] else { return nil }
         let cp = best.cp
@@ -1888,7 +1888,7 @@ final class AnalysisViewModel {
         /// envoie `stop` — la recherche rend alors son `bestmove` avec l'éval
         /// courante. Sert UNIQUEMENT à l'affinage (arrêt anticipé).
         onDepth: ((_ depth: Int, _ nodes: Int?, _ cp: Int) -> Bool)? = nil
-    ) async -> [Int: (lan: String, pv: [String], cp: Int)] {
+    ) async -> [Int: (lan: String, pv: [String], cp: Int, mate: Int?)] {
         // Barrière AVANT la recherche : jette les `info` en retard de la
         // recherche précédente, qui fausseraient ce classement — voir
         // ``EngineController/synchronize()``.
@@ -1908,7 +1908,7 @@ final class AnalysisViewModel {
         await engine.send(.go(nodes: adjustedNodes, movetime: capMs))
 
         let outcome = await EngineWatchdog.run(deadlineMs: capMs + EngineWatchdog.graceMs) {
-            var result: [Int: (lan: String, pv: [String], cp: Int)] = [:]
+            var result: [Int: (lan: String, pv: [String], cp: Int, mate: Int?)] = [:]
             var stopSent = false
             for await response in responses {
                 switch response {
@@ -1922,7 +1922,7 @@ final class AnalysisViewModel {
                     } else {
                         break
                     }
-                    result[rank] = (lan: firstMove, pv: pv, cp: cp)
+                    result[rank] = (lan: firstMove, pv: pv, cp: cp, mate: info.score?.mate.map { Int($0) })
                     // Arrêt anticipé : un seul `stop`, puis on laisse le
                     // `bestmove` clore la boucle normalement.
                     if !stopSent, rank == 1, let onDepth, let depth = info.depth,
@@ -2004,6 +2004,10 @@ final class AnalysisViewModel {
             guard game.moves.hasIndex(before: index), let move = game.moves[index] else { continue }
             let parentIndex = game.moves.index(before: index)
             guard let parentPosition = game.positions[parentIndex] else { continue }
+            // Déjà dans vos puzzles (la même partie analysée deux fois) : on
+            // ne le double pas, et on s'épargne la recherche. Même règle
+            // qu'Android (`OwnPuzzleDao.countFor`).
+            guard !PuzzleSessionDrawer.hasOwnPuzzle(fen: parentPosition.fen, in: context) else { continue }
 
             // Budget TRIPLE de celui de la classification (900 000 nœuds
             // contre 300 000), dans le même rapport que l'ancien 1 200 ms
@@ -2047,6 +2051,140 @@ final class AnalysisViewModel {
         }
         if !isEngineUnavailable {
             startLiveAnalysis()
+        }
+        return created
+    }
+
+    // MARK: Mats manqués
+
+    /// Avancement de la recherche des mats manqués (`nil` hors recherche) —
+    /// même rôle que ``classificationProgress`` : quelques secondes à une
+    /// demi-minute de moteur, l'écran doit montrer que ça avance.
+    private(set) var missedMateScanProgress: (done: Int, total: Int)?
+
+    /// Cherche, dans la ligne principale, les positions où le camp au trait
+    /// tenait un mat forcé en ``MissedMateDetector/maxMateMoves`` coups au
+    /// plus, et où le coup joué l'a laissé filer — des deux côtés de
+    /// l'échiquier. Ne crée RIEN : l'appelant propose, l'utilisateur décide
+    /// (voir ``saveMissedMates(_:in:)``).
+    ///
+    /// Passe par la file moteur : lancée pendant la classification, elle
+    /// attend sa fin — et profite alors de son cache (présélection gratuite).
+    /// Même arrêt de l'analyse en continu HORS file que
+    /// ``generatePuzzles(in:)``, pour la même raison (interblocage).
+    func findMissedMates(in context: ModelContext) async -> [MissedMate] {
+        await stopLiveAnalysisIfNeeded()
+        return await withCheckedContinuation { continuation in
+            enqueueEngineWork { [weak self] in
+                let found = await self?.performMissedMateScan(in: context) ?? []
+                continuation.resume(returning: found)
+            }
+        }
+    }
+
+    /// Deux étages, pour ne payer la recherche chère que là où elle sert :
+    ///
+    /// 1. **Présélection** par l'éval de la classification (en cache, ou
+    ///    calculée au besoin) : le camp au trait doit y être à
+    ///    ``MissedMateDetector/candidateWinPercent`` ou plus. Le cache réduit
+    ///    un mat à « ±10 » : il ne dit ni la distance du mat, ni sa ligne.
+    /// 2. **Recherche dédiée** (budget des puzzles, 900 000 nœuds) : la
+    ///    distance du mat et la ligne complète. Puis, si le coup joué n'est
+    ///    pas celui du moteur, la position d'APRÈS : si l'adversaire y est
+    ///    toujours maté, le joueur a pris un autre chemin vers le mat — rien
+    ///    de manqué.
+    private func performMissedMateScan(in context: ModelContext) async -> [MissedMate] {
+        guard let engine, !isTornDown else { return [] }
+        await stopLiveAnalysisIfNeeded()
+
+        let indices = mainLineIndices
+        let total = indices.count - 1
+        guard total > 0 else { return [] }
+        missedMateScanProgress = (done: 0, total: total)
+        defer { missedMateScanProgress = nil }
+
+        var found: [MissedMate] = []
+        // Un moteur muet est redémarré une fois par position ; s'il ne
+        // repart pas, on rend ce qu'on a trouvé jusque-là.
+        func recovered() async -> Bool {
+            guard engineWentSilent else { return true }
+            return await restartSilentEngine(engine)
+        }
+
+        scan: for offset in 1...total {
+            defer { missedMateScanProgress = (done: offset, total: total) }
+            if isTornDown { break }
+            let parentIndex = indices[offset - 1]
+            let index = indices[offset]
+            guard let move = game.moves[index],
+                  let parent = game.positions[parentIndex],
+                  let child = game.positions[index] else { continue }
+            // Le coup joué mate lui-même : rien de manqué.
+            if case .checkmate = Board(position: child).state { continue }
+            // Déjà dans vos puzzles : ne pas le proposer une seconde fois.
+            if PuzzleSessionDrawer.hasOwnPuzzle(fen: parent.fen, in: context) { continue }
+
+            let before = await evaluatePosition(at: parentIndex, engine: engine)
+            guard await recovered() else { break scan }
+            guard let before else { continue }
+            let winForMover = parent.sideToMove == .white ? before.winPercent : 100 - before.winPercent
+            guard MissedMateDetector.mightHoldMate(winPercentForMover: winForMover) else { continue }
+
+            let ranked = await rankedEval(fen: parent.fen, engine: engine, nodes: 900_000, capMs: 4_500, multipv: 1)
+            guard await recovered() else { break scan }
+            guard let best = ranked[1], let mateIn = best.mate,
+                  mateIn > 0, mateIn <= MissedMateDetector.maxMateMoves,
+                  let solution = MissedMateDetector.solution(pv: best.pv, startFEN: parent.fen) else { continue }
+            // Le coup du moteur lui-même : le mat a été trouvé.
+            if move.lan == best.lan { continue }
+
+            let after = await rankedEval(
+                fen: child.fen, engine: engine,
+                nodes: 300_000, capMs: DevicePerformance.classificationCapMs, multipv: 1
+            )
+            guard await recovered() else { break scan }
+            // Score POV du trait APRÈS le coup : négatif = l'adversaire du
+            // joueur est toujours maté.
+            if let stillMated = after[1]?.mate, stillMated < 0 { continue }
+
+            found.append(MissedMate(
+                fen: parent.fen,
+                playedMoveSAN: move.san,
+                solutionLANs: solution,
+                mateIn: mateIn,
+                mover: parent.sideToMove,
+                moveNumber: MissedMateDetector.moveNumber(fen: parent.fen)
+            ))
+        }
+
+        // Comme à la fin de la classification : en revue, le moteur se repose
+        // et l'écran montre l'éval en cache.
+        if !isTornDown, !isEngineUnavailable {
+            showCachedEval(at: currentIndex)
+        }
+        return found
+    }
+
+    /// Enregistre les mats retenus comme puzzles « Mat » de vos parties.
+    /// Retourne le nombre créé — une position déjà présente est sautée.
+    @discardableResult
+    func saveMissedMates(_ mates: [MissedMate], in context: ModelContext) -> Int {
+        let sourcePGN = exportedPGN
+        var created = 0
+        for mate in mates where !PuzzleSessionDrawer.hasOwnPuzzle(fen: mate.fen, in: context) {
+            let puzzle = Puzzle()
+            puzzle.fen = mate.fen
+            puzzle.playedMoveSAN = mate.playedMoveSAN
+            puzzle.solutionLANs = mate.solutionLANs
+            puzzle.themeRaw = PuzzleTheme.checkmate.rawValue
+            puzzle.phaseRaw = GamePhaseClassifier.classify(fen: mate.fen).rawValue
+            puzzle.sourceGamePGN = sourcePGN
+            puzzle.sourceRaw = PuzzleSource.ownGames.rawValue
+            context.insert(puzzle)
+            created += 1
+        }
+        if created > 0 {
+            PersistenceLog.save(context)
         }
         return created
     }

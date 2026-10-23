@@ -58,6 +58,8 @@ object PuzzleRepository {
         theme: String? = null,
         /** `null` = toutes les phases. */
         phase: String? = null,
+        /** Des puzzles déjà filtrés à verser au même tirage (vos puzzles maison). */
+        extra: List<Puzzle> = emptyList(),
         random: Random = Random.Default,
     ): List<Puzzle> {
         val kept = ArrayList<Puzzle>(count)
@@ -83,7 +85,36 @@ object PuzzleRepository {
                 json.endArray()
             }
         }
+        // Les puzzles maison entrent au MÊME tirage que la bibliothèque, et
+        // non en tête : « Toutes » tire uniformément dans l'ensemble, comme
+        // iOS — un choix explicite « Mes parties » existe pour les retrouver.
+        for (puzzle in extra) {
+            seen++
+            if (kept.size < count) {
+                kept += puzzle
+            } else {
+                val slot = random.nextInt(seen)
+                if (slot < count) kept[slot] = puzzle
+            }
+        }
         return kept.sortedBy { it.rating }
+    }
+
+    /** Les puzzles de la bibliothèque dont l'identifiant est demandé, en une passe. */
+    fun byIds(assets: AssetManager, ids: Set<String>): List<Puzzle> {
+        if (ids.isEmpty()) return emptyList()
+        val found = ArrayList<Puzzle>(ids.size)
+        assets.open(ASSET).reader().use { stream ->
+            JsonReader(stream).use { json ->
+                json.beginArray()
+                while (json.hasNext()) {
+                    val puzzle = readPuzzle(json) ?: continue
+                    if (puzzle.id in ids) found += puzzle
+                }
+                json.endArray()
+            }
+        }
+        return found
     }
 
     private fun readPuzzle(json: JsonReader): Puzzle? {

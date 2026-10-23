@@ -69,7 +69,7 @@
     <string name="help_level_title">Le niveau affiché</string>
     <string name="help_offline_body">Tout. Aucun compte, aucun réseau, aucune donnée qui sort de l\'appareil. Le moteur, les puzzles, les cours et les adversaires sont embarqués.</string>
     <string name="help_offline_title">Ce qui reste hors ligne</string>
-    <string name="help_puzzles_body">Un seul essai par défaut. Trois invitent à tenter un coup « pour voir », exactement l\'inverse de ce qu\'un puzzle entraîne : on calcule la variante jusqu\'au bout AVANT de poser la pièce. Le filet à trois essais reste dans les réglages.</string>
+    <string name="help_puzzles_body">Un seul essai par défaut. Trois invitent à tenter un coup « pour voir », exactement l\'inverse de ce qu\'un puzzle entraîne : on calcule la variante jusqu\'au bout AVANT de poser la pièce. Le filet à trois essais reste dans les réglages. « Ratés » ne rejoue que ce que vous avez manqué à la dernière tentative, et un coup qui mate est toujours accepté, même s\'il n\'est pas la solution enregistrée. En fin de partie, « Mats manqués » cherche les mats forcés que l\'un ou l\'autre camp a laissé filer, et propose d\'en faire des puzzles.</string>
     <string name="help_puzzles_title">Les puzzles</string>
     <string name="help_safety_body">Maia ne calcule pas : il peut rater un mat en deux ou gâcher une finale élémentaire. À partir d\'un certain niveau, Stockfish reprend la main dans QUATRE cas seulement — un mat en un ou deux, une finale à peu de pièces, une répétition en position gagnée, et le cas où le modèle ne répond pas. En dessous de ce niveau, rater un mat fait partie du personnage.</string>
     <string name="help_safety_title">Le filet de sécurité</string>
@@ -713,6 +713,19 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="arrows_three">Trois</string>
     <string name="analysis_accuracy">Précision</string>
     <string name="analysis_review">Analyser la partie</string>
+    <string name="analysis_find_missed_mates">Chercher les mats manqués</string>
+    <string name="analysis_scanning_mates">Mats manqués : coup %1$d/%2$d</string>
+    <string name="missed_mates_none_title">Aucun mat manqué</string>
+    <string name="missed_mates_one_title">Un mat manqué</string>
+    <string name="missed_mates_many_title">%1$d mats manqués</string>
+    <string name="missed_mate_line_white">Coup %1$d, Blancs : mat en %2$d</string>
+    <string name="missed_mate_line_black">Coup %1$d, Noirs : mat en %2$d</string>
+    <string name="missed_mates_none_body">Aucun des deux camps n\'a laissé filer de mat forcé en 5 coups ou moins dans cette partie.</string>
+    <string name="missed_mates_add_one">L\'ajouter à vos puzzles ? Vous le retrouverez dans Puzzles, « Mes parties ».</string>
+    <string name="missed_mates_add_many">Les ajouter à vos puzzles ? Vous les retrouverez dans Puzzles, « Mes parties ».</string>
+    <string name="missed_mates_add">Ajouter à mes puzzles</string>
+    <string name="missed_mates_decline">Non merci</string>
+    <string name="play_missed_mates">Mats manqués</string>
     <string name="analysis_reviewing">Analyse… %1$d/%2$d</string>
     <string name="analysis_no_review">Chargez une partie pour voir son bilan.</string>
     <string name="analysis_moves_counted">%1$d coups classés</string>
@@ -730,7 +743,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%1$d puzzle créé — retrouvez-le dans le mode Puzzles.</item>
         <item quantity="other">%1$d puzzles créés — retrouvez-les dans le mode Puzzles.</item>
     </plurals>
-    <string name="puzzle_source_lichess">Lichess</string>
+    <string name="puzzle_source_lichess">Bibliothèque</string>
     <string name="puzzle_source_own">Mes parties</string>
     <string name="puzzle_no_own">Aucun puzzle tiré de vos parties — analysez-en une et utilisez « Créer des puzzles depuis les erreurs ».</string>
     <string name="puzzle_prompt_unrated">%1$s — trouvez le meilleur coup</string>
@@ -1034,6 +1047,10 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="analysis_summary_partial">Analyse en cours — le bilan se complète au fil des coups classés.</string>
     <string name="puzzle_view_source">Voir dans la partie d\'origine</string>
 
+    <string name="puzzle_provenance">Provenance</string>
+    <string name="puzzle_history">Historique</string>
+    <string name="puzzle_missed">Ratés</string>
+    <string name="puzzle_no_missed">Aucun puzzle raté — vous avez réussi chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.</string>
     <string name="puzzle_level">Niveau</string>
     <string name="puzzle_phase">Phase</string>
     <string name="puzzle_type">Type de puzzle</string>

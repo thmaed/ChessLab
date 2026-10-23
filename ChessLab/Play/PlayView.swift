@@ -6,6 +6,9 @@ struct PlayView: View {
     @Bindable var viewModel: PlayViewModel
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
+    /// Ouvre l'analyse de la partie, qui cherche aussitôt les mats manqués
+    /// et propose d'en faire des puzzles.
+    var onFindMissedMates: (String) -> Void = { _ in }
     /// Ouvre l'analyse sur la position AFFICHÉE (FEN) — sans attendre la fin
     /// de partie, contrairement à `onAnalyze` qui porte le PGN complet.
     var onAnalyzePosition: (String) -> Void = { _ in }
@@ -608,6 +611,9 @@ struct PlayView: View {
                     // concerné). Il porte aussi les joueurs et le résultat, que
                     // l'en-tête d'analyse affiche.
                     panelButton("Analyser", icon: "chart.xyaxis.line") { onAnalyze(viewModel.exportedPGN) }
+                    // Les positions où l'un des camps tenait un mat forcé et
+                    // l'a laissé filer, proposées comme puzzles « Mat ».
+                    panelButton("Mats manqués", icon: "scope") { onFindMissedMates(viewModel.exportedPGN) }
                 }
             }
             .cardStyle()

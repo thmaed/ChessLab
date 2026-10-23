@@ -65,11 +65,17 @@ fun AnalysisScreen(
     initialPgn: String? = null,
     onPlayVsEngine: (String) -> Unit = {},
     onOpenLab: (String) -> Unit = {},
+    /**
+     * Ouverte depuis « Mats manqués » en fin de partie : la recherche part
+     * d'elle-même, après la revue que le chargement vient de lancer.
+     */
+    findMissedMates: Boolean = false,
     model: AnalysisViewModel = viewModel(),
 ) {
     LaunchedEffect(initialFen, initialPgn) {
         val incoming = initialFen?.takeIf { it.isNotBlank() } ?: initialPgn?.takeIf { it.isNotBlank() }
         if (incoming != null) { model.onInputChange(incoming); model.load() }
+        if (findMissedMates) model.requestMissedMatesOnce()
     }
     val ui = model.ui
     val context = LocalContext.current
@@ -126,7 +132,9 @@ fun AnalysisScreen(
             },
             onFlip = model::flip,
             onPuzzles = model::generatePuzzles,
-            canMakePuzzles = ui.summary != null && !ui.reviewing,
+            canMakePuzzles = ui.summary != null && !ui.reviewing && !ui.scanningMates,
+            onMissedMates = model::findMissedMates,
+            canFindMissedMates = ui.sanMoves.isNotEmpty() && !ui.reviewing && !ui.scanningMates,
             arrowMode = ui.arrowMode,
             onArrowMode = model::setArrowMode,
         )
@@ -215,7 +223,7 @@ fun AnalysisScreen(
                     )
                 }
                 Spacer(Modifier.weight(1f))
-                if (ui.reviewing) {
+                if (ui.reviewing || ui.scanningMates) {
                     CircularProgressIndicator(
                         Modifier.size(12.dp), strokeWidth = 2.dp, color = Palette.textTertiary,
                     )
@@ -281,6 +289,7 @@ fun AnalysisScreen(
             onCancel = model::cancelPromotion,
         )
     }
+    ui.missedMates?.let { mates -> MissedMatesDialog(mates, model::saveMissedMates, model::dismissMissedMates) }
     ui.puzzlesCreated?.let { count ->
         AlertDialog(
             onDismissRequest = model::clearPuzzleNotice,
@@ -425,6 +434,8 @@ private fun OverflowMenu(
     onPuzzles: () -> Unit,
     /** Il n'y a de puzzles à tirer qu'une fois les fautes connues. */
     canMakePuzzles: Boolean,
+    onMissedMates: () -> Unit,
+    canFindMissedMates: Boolean,
     arrowMode: ArrowMode,
     onArrowMode: (ArrowMode) -> Unit,
 ) {
@@ -453,6 +464,17 @@ private fun OverflowMenu(
             enabled = canMakePuzzles,
             onClick = { open = false; onPuzzles() },
             modifier = Modifier.testTag("creer-puzzles"),
+        )
+        DropdownMenuItem(
+            text = {
+                Text(
+                    stringResource(R.string.analysis_find_missed_mates),
+                    color = if (canFindMissedMates) Palette.textPrimary else Palette.textTertiary,
+                )
+            },
+            enabled = canFindMissedMates,
+            onClick = { open = false; onMissedMates() },
+            modifier = Modifier.testTag("mats-manques"),
         )
         DropdownMenuItem(
             text = { Text(stringResource(R.string.analysis_flip), color = Palette.textPrimary) },
@@ -639,16 +661,19 @@ private fun ReviewBar(ui: AnalysisUiState, onReview: () -> Unit, onSummary: () -
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (ui.reviewing) {
+        if (ui.reviewing || ui.scanningMates) {
             // Une jauge DÉTERMINÉE et non un compteur qui tourne : on sait
             // exactement où en est la revue, et le dire vaut mieux que de faire
             // patienter. (Un indicateur indéterminé anime sans fin, ce qui
             // empêche aussi les tests d'interface de se déclarer au repos.)
             Column(Modifier.weight(1f)) {
                 Text(
-                    stringResource(R.string.analysis_reviewing, ui.reviewDone, ui.reviewTotal),
+                    stringResource(
+                        if (ui.scanningMates) R.string.analysis_scanning_mates else R.string.analysis_reviewing,
+                        ui.reviewDone, ui.reviewTotal,
+                    ),
                     fontSize = 13.sp, color = Palette.textSecondary,
-                    modifier = Modifier.testTag("revue-en-cours"),
+                    modifier = Modifier.testTag(if (ui.scanningMates) "mats-en-cours" else "revue-en-cours"),
                 )
                 Spacer(Modifier.height(6.dp))
                 LinearProgressIndicator(
@@ -854,4 +879,60 @@ private fun EngineStatusBadge(ui: AnalysisUiState) {
         Spacer(Modifier.width(7.dp))
         Text(texte, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Palette.textSecondary, maxLines = 1)
     }
+}
+
+/**
+ * La proposition qui suit la recherche des mats manqués : rien n'est
+ * enregistré sans accord. Pendant de l'alerte de `AnalysisView` côté iOS, mêmes
+ * phrases.
+ */
+@Composable
+private fun MissedMatesDialog(
+    mates: List<com.chesslab.puzzles.MissedMate>,
+    onSave: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                when (mates.size) {
+                    0 -> stringResource(R.string.missed_mates_none_title)
+                    1 -> stringResource(R.string.missed_mates_one_title)
+                    else -> stringResource(R.string.missed_mates_many_title, mates.size)
+                },
+                color = Palette.textPrimary,
+            )
+        },
+        text = {
+            val lines = mates.map {
+                stringResource(
+                    if (it.mover == Piece.Color.white) R.string.missed_mate_line_white else R.string.missed_mate_line_black,
+                    it.moveNumber, it.mateIn,
+                )
+            }
+            val body = if (mates.isEmpty()) stringResource(R.string.missed_mates_none_body)
+            else lines.joinToString("\n") + "\n\n" + stringResource(
+                if (mates.size == 1) R.string.missed_mates_add_one else R.string.missed_mates_add_many
+            )
+            Text(body, color = Palette.textPrimary, modifier = Modifier.testTag("mats-manques-resultat"))
+        },
+        confirmButton = {
+            if (mates.isEmpty()) {
+                TextButton(onClick = onDismiss) { Text("OK", color = Palette.accent) }
+            } else {
+                TextButton(onClick = onSave, modifier = Modifier.testTag("ajouter-mats")) {
+                    Text(stringResource(R.string.missed_mates_add), color = Palette.accent)
+                }
+            }
+        },
+        dismissButton = {
+            if (mates.isNotEmpty()) {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.missed_mates_decline), color = Palette.textSecondary)
+                }
+            }
+        },
+        containerColor = Palette.surfaceElevated,
+    )
 }

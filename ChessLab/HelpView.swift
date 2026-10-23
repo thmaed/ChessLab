@@ -46,7 +46,7 @@ struct HelpView: View {
         .init(
             icon: "puzzlepiece.fill", tint: Theme.violet,
             title: "Puzzles",
-            body: "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par niveau, phase de partie et thème. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs."
+            body: "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs."
         ),
         .init(
             icon: "chart.bar.fill", tint: Theme.rose,
@@ -71,7 +71,7 @@ struct HelpView: View {
         .init(
             icon: "chart.xyaxis.line", tint: Theme.teal,
             title: "Analyser",
-            body: "Analysez une partie ou une position avec Stockfish : classification des coups (imprécision, erreur, gaffe), courbe d'évaluation, flèches des meilleurs coups et flèche rouge de la menace adverse, lecture automatique, et création de puzzles depuis les erreurs. Export PGN rechargeable. Entrée par PGN, FEN, éditeur ou scanner."
+            body: "Analysez une partie ou une position avec Stockfish : classification des coups (imprécision, erreur, gaffe), courbe d'évaluation, flèches des meilleurs coups et flèche rouge de la menace adverse, lecture automatique, création de puzzles depuis les erreurs, et recherche des mats manqués par l'un ou l'autre camp. Export PGN rechargeable. Entrée par PGN, FEN, éditeur ou scanner."
         ),
         .init(
             icon: "flask", tint: Theme.rose,

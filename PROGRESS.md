@@ -10553,3 +10553,53 @@ reçoit tout par un seul `pointerInput`, rien à porter.
 **Piège rencontré.** Une série de tests UI a échoué en bloc (« le plateau doit
 s'afficher ») : la visite de découverte s'était relancée après une
 réinstallation. Les nouveaux tests passent `-discoveryTourSeen`.
+
+## 23/10 — Puzzles : provenance, « Ratés », mats alternatifs ✅
+
+Lot A des suggestions du testeur de la 1.9.1 (les lots B « mats manqués en
+fin de partie » et C « Woodpecker » restent à faire). Porté sur Android dans
+le même chantier (voir `android/PARITE.md`, 23/10).
+
+- **Groupe « Provenance »** (Toutes · Mes parties · Bibliothèque). Sans lui,
+  les puzzles maison étaient tirés au hasard parmi ~100 000 et ne sortaient
+  pour ainsi dire jamais ; avec un niveau choisi, ils disparaissaient (pas de
+  cote). « Mes parties » masque désormais le groupe « Niveau ».
+- **Groupe « Historique » : Tous · Ratés.** « Raté » = dernière tentative
+  échouée, lu sans nouveau champ : `failureCount > 0 && repetitions == 0`.
+  L'échéance est ignorée en mode « Ratés » (un échec fixe la révision au
+  lendemain : le filtre aurait été vide juste après la séance). SM-2 n'est
+  pas faussé : après l'échec comme après le succès qui suit, la révision
+  tombe le lendemain. Réussi avec l'indice = réussi (décision du 23/10).
+- **Le prédicat de tirage est composé de trois `Predicate`** (`evaluate`) :
+  d'un bloc, le compilateur renonçait à typer l'expression.
+- **Un coup qui mate est toujours juste**, même hors solution enregistrée, et
+  clôt le puzzle (Lichess accepte n'importe quel mat ; la solution d'un puzzle
+  maison n'est qu'une variante du moteur).
+- **Plus de doublons** : la création depuis l'analyse saute une position déjà
+  présente dans vos puzzles, avant même la recherche moteur.
+- Tests : `PuzzleSessionDrawerTests` (9). Aide mise à jour (FR/EN).
+
+## 23/10 — Mats manqués en fin de partie ✅
+
+Lot B des suggestions du testeur. Porté sur Android dans le même chantier.
+
+- **Bouton « Mats manqués »** sur le panneau de fin de partie (contre
+  l'ordinateur) : route `missedMates(pgn)`, l'analyse de la partie qui lance
+  la recherche à l'apparition. La recherche passe par la file moteur : lancée
+  pendant la classification, elle attend sa fin et en réutilise le cache.
+- **Aussi dans le menu « … » de l'analyse** (« Chercher les mats manqués »).
+- **Deux étages** : présélection par l'éval de la classification (camp au
+  trait ≥ 97 % de gain), puis recherche dédiée à 900 000 nœuds qui lit la
+  DISTANCE du mat (`rankedEval` rend désormais `mate`). Si le coup joué n'est
+  pas celui du moteur, la position d'après est cherchée aussi : l'adversaire
+  toujours maté = un autre chemin vers le mat, rien de manqué. Les deux camps.
+- **Ligne complète jusqu'au mat** (`MissedMateDetector.solution`), pas
+  `PuzzleSolutionTrimmer` qui coupe à six demi-coups ou au premier gain
+  matériel. Mat en 5 au plus. Une variante jouée par le mauvais camp est
+  refusée (ChessKit ne consulte pas le trait).
+- **Rien n'est créé sans accord** : alerte « Un mat manqué — Coup 23, Blancs :
+  mat en 2. L'ajouter à vos puzzles ? ». Puzzles thème Mat, « Mes parties ».
+- Route de capture Debug `-openRoute missedMates`.
+- Tests : `MissedMateDetectorTests` (8), `MissedMateScanIntegrationTests`
+  (opt-in `ENGINE_INTEGRATION=1`, 1,6 s sur simulateur).
+

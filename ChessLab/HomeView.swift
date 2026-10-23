@@ -88,6 +88,10 @@ struct HomeView: View {
         case analysisEntry
         case analysisLibrary
         case activeAnalysis(AnalysisSource)
+        /// La même analyse, qui cherche d'elle-même les mats manqués dès
+        /// qu'elle a fini de classer les coups — bouton « Mats manqués » de la
+        /// fin de partie (voir ``PlayView``).
+        case missedMates(String)
         case positionEditor(String?)
         case scanner
         case puzzleQueue
@@ -170,7 +174,7 @@ struct HomeView: View {
         var showsBoard: Bool {
             switch self {
             case .activeGame, .resumedGame, .activeTwoPlayerGame, .resumedTwoPlayerGame,
-                 .activeAnalysis, .positionEditor, .activePuzzleSession,
+                 .activeAnalysis, .missedMates, .positionEditor, .activePuzzleSession,
                  .endgameFreeTrain, .endgameReader, .openingEditor, .openingLabsReader,
                  .openingTrainDaily, .openingTrainLine,
                  .activeChess960Game, .activeChess960TwoPlayerGame, .activeChess960Analysis,
@@ -303,6 +307,13 @@ struct HomeView: View {
         case "analysis":
             return .activeAnalysis(.pgn("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O"))
         case "library": return .analysisLibrary
+        // Les Blancs tenaient 1.Te8+ Txe8 2.Txe8# et ont joué 1.Ta3.
+        case "missedMates":
+            guard let start = Position(fen: "r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 23") else { return nil }
+            var game = Game(startingWith: start)
+            var index = game.startingIndex
+            for san in ["Ra3", "Rxa3"] { index = game.make(move: san, from: index) }
+            return .missedMates(PGNExport.pgn(for: game))
         case "puzzles": return .puzzleQueue
         case "puzzleSession": return .activePuzzleSession(PuzzleSessionFilter())
         case "openings": return .openingList
@@ -753,6 +764,8 @@ struct HomeView: View {
                         refreshResumableGame()
                     } onAnalyze: { pgn in
                         path.append(Route.activeAnalysis(.pgn(pgn)))
+                    } onFindMissedMates: { pgn in
+                        path.append(Route.missedMates(pgn))
                     } onAnalyzePosition: { fen in
                         // EMPILÉ au-dessus de la partie, qui reste vivante en
                         // dessous : le retour la retrouve telle quelle.
@@ -769,6 +782,8 @@ struct HomeView: View {
                         refreshResumableGame()
                     } onAnalyze: { pgn in
                         path.append(Route.activeAnalysis(.pgn(pgn)))
+                    } onFindMissedMates: { pgn in
+                        path.append(Route.missedMates(pgn))
                     } onAnalyzePosition: { fen in
                         path.append(Route.activeAnalysis(.fen(fen)))
                     } onOpenLab: { fen in
@@ -839,6 +854,13 @@ struct HomeView: View {
 
                 case let .activeAnalysis(source):
                     AnalysisHost(source: source, sessionKey: sessionKey(for: route)) { fen in
+                        startNewGame(playFromPosition(fen))
+                    } onOpenLab: { fen in
+                        path.append(Route.labSetup(startFEN: fen))
+                    }
+
+                case let .missedMates(pgn):
+                    AnalysisHost(source: .pgn(pgn), sessionKey: sessionKey(for: route), findsMissedMates: true) { fen in
                         startNewGame(playFromPosition(fen))
                     } onOpenLab: { fen in
                         path.append(Route.labSetup(startFEN: fen))
@@ -1657,6 +1679,7 @@ private struct ActiveGameHost: View {
     let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
+    let onFindMissedMates: (String) -> Void
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
@@ -1670,6 +1693,7 @@ private struct ActiveGameHost: View {
             if let viewModel {
                 PlayView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
+                    onFindMissedMates: onFindMissedMates,
                     onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
                     onOpenTwoPlayer: onOpenTwoPlayer
                 )
@@ -1695,6 +1719,7 @@ private struct ResumedGameHost: View {
     let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
+    let onFindMissedMates: (String) -> Void
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
@@ -1708,6 +1733,7 @@ private struct ResumedGameHost: View {
             if let viewModel {
                 PlayView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
+                    onFindMissedMates: onFindMissedMates,
                     onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
                     onOpenTwoPlayer: onOpenTwoPlayer
                 )
@@ -2065,6 +2091,7 @@ private struct AnalysisHost: View {
     let source: AnalysisSource
     /// Identité de session — voir ``SessionStore``.
     let sessionKey: String
+    var findsMissedMates = false
     let onPlayFromHere: (String) -> Void
     var onOpenLab: (String) -> Void = { _ in }
     @Environment(\.sessionStore) private var sessionStore
@@ -2073,7 +2100,10 @@ private struct AnalysisHost: View {
     var body: some View {
         Group {
             if let viewModel {
-                AnalysisView(viewModel: viewModel, onPlayFromHere: onPlayFromHere, onOpenLab: onOpenLab)
+                AnalysisView(
+                    viewModel: viewModel, onPlayFromHere: onPlayFromHere, onOpenLab: onOpenLab,
+                    findsMissedMatesOnAppear: findsMissedMates
+                )
             } else {
                 Color.clear
             }
@@ -2103,6 +2133,9 @@ private struct PuzzleSessionHost: View {
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: PuzzleSolveViewModel?
     @State private var hasAttemptedLoad = false
+    /// Distingue « vous n'en avez aucun » de « aucun n'est dû » quand la
+    /// série « Mes parties » ne trouve rien — lu seulement dans ce cas.
+    @State private var hasOwnPuzzles = false
 
     var body: some View {
         Group {
@@ -2112,14 +2145,31 @@ private struct PuzzleSessionHost: View {
                     onOpenLab: onOpenLab, onPlayVsEngine: onPlayVsEngine, onOpenTwoPlayer: onOpenTwoPlayer
                 )
             } else if hasAttemptedLoad {
-                // Défensif : le bouton de lancement n'apparaît que si le
-                // compte filtré est non nul, mais l'état a pu changer
-                // entre les deux (dernier puzzle résolu ailleurs).
-                ContentUnavailableView(
-                    "Aucun puzzle dû",
-                    systemImage: "puzzlepiece",
-                    description: Text("Plus aucun puzzle dû ne correspond à ces filtres.")
-                )
+                // L'écran de choix n'affiche aucun compte (voir
+                // ``PuzzleQueueView``) : une combinaison vide arrive ICI, et
+                // le message dit laquelle des raisons s'applique.
+                Group {
+                    if filter.missedOnly {
+                        ContentUnavailableView(
+                            "Aucun puzzle raté",
+                            systemImage: "checkmark.seal",
+                            description: Text("Vous avez réussi chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.")
+                        )
+                    } else if filter.source == .ownGames, !hasOwnPuzzles {
+                        ContentUnavailableView(
+                            "Aucun puzzle de vos parties",
+                            systemImage: "person.crop.circle.badge.questionmark",
+                            description: Text("Analysez une partie avec des erreurs pour créer des puzzles (menu \"...\" du mode Analyser).")
+                        )
+                    } else {
+                        ContentUnavailableView(
+                            "Aucun puzzle dû",
+                            systemImage: "puzzlepiece",
+                            description: Text("Plus aucun puzzle dû ne correspond à ces filtres.")
+                        )
+                    }
+                }
+                .accessibilityIdentifier("puzzleSessionEmpty")
             } else {
                 Color.clear
             }
@@ -2128,6 +2178,9 @@ private struct PuzzleSessionHost: View {
             if viewModel == nil, !hasAttemptedLoad {
                 viewModel = sessionStore.value(for: sessionKey) {
                     PuzzleSolveViewModel(filter: filter, modelContext: modelContext)
+                }
+                if viewModel == nil, filter.source == .ownGames {
+                    hasOwnPuzzles = PuzzleSessionDrawer.hasAnyPuzzle(from: .ownGames, in: modelContext)
                 }
                 hasAttemptedLoad = true
             }

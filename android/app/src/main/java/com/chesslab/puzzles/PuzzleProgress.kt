@@ -50,6 +50,10 @@ interface PuzzleProgressDao {
     @Query("SELECT * FROM puzzle_progress")
     suspend fun all(): List<PuzzleProgress>
 
+    /** Ratés à la dernière tentative, dus ou non — voir `PuzzleFilter.missedOnly`. */
+    @Query("SELECT externalId FROM puzzle_progress WHERE failureCount > 0 AND repetitions = 0")
+    suspend fun missedIds(): List<String>
+
     @Query("SELECT COUNT(*) FROM puzzle_progress WHERE dueAt IS NOT NULL AND dueAt <= :now")
     suspend fun dueCount(now: Long): Int
 

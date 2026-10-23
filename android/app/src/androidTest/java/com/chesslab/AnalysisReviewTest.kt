@@ -209,4 +209,34 @@ class AnalysisReviewTest {
         val message = textOf("puzzles-crees")
         require(message.contains("1 puzzle")) { "la boîte annonce : « $message »" }
     }
+
+    /**
+     * « Chercher les mats manqués » : 4.Cf3 laissait filer Dxf7#. La recherche
+     * le trouve, le PROPOSE — rien n'est créé avant l'accord —, puis l'ajoute
+     * aux puzzles. Pendant de `MissedMateScanIntegrationTests` côté iOS.
+     */
+    @Test fun lesMatsManquesSontProposesPuisAjoutes() {
+        loadGame()
+        compose.waitUntil(300_000) {
+            compose.onNodeWithTag("menu-analyse").performClick()
+            compose.waitForIdle()
+            val ready = compose.onAllNodes(
+                hasTestTag("mats-manques") and isEnabled()
+            ).fetchSemanticsNodes().isNotEmpty()
+            if (ready) compose.onNodeWithTag("mats-manques").performClick()
+            else compose.onNodeWithTag("retourner").performClick()   // referme le menu
+            ready
+        }
+        awaitTag("mats-manques-resultat", 300_000)
+        val message = textOf("mats-manques-resultat")
+        require(message.contains("Coup 4, Blancs : mat en 1")) { "la proposition dit : « $message »" }
+        // Proposé, pas encore créé.
+        require(runBlocking {
+            LibraryDatabase.get(ApplicationProvider.getApplicationContext()).ownPuzzles().count()
+        } == 0) { "un puzzle a été créé avant l'accord" }
+
+        compose.onNodeWithTag("ajouter-mats").performClick()
+        awaitTag("puzzles-crees", 30_000)
+        require(textOf("puzzles-crees").contains("1 puzzle")) { "la boîte annonce : « ${textOf("puzzles-crees")} »" }
+    }
 }

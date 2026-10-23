@@ -906,7 +906,16 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
 
-        val over = state is Board.State.Checkmate || state is Board.State.Draw
+        val boardOver = state is Board.State.Checkmate || state is Board.State.Draw
+        // Une partie finie HORS de l'échiquier — abandon, nulle acceptée,
+        // chute au temps — ne se lit pas sur la position. Sans ce garde, le
+        // `refresh` de fin de `prepare()` (le modèle Maia met quelques secondes
+        // à charger) ROUVRAIT une partie abandonnée juste après son début :
+        // « À vous de jouer » à la place de « Vous avez abandonné », et le
+        // panneau de fin de partie disparaissait (vu le 23/10/2026 en testant
+        // « Mats manqués »). Seul `newGame()` rouvre une partie.
+        val finishedOffBoard = ui.gameOver && !boardOver
+        val over = boardOver || finishedOffBoard
         // Une position de départ déjà finie n'est pas une partie : rien à
         // ranger en bibliothèque.
         if (over && !ui.gameOver && moveLog.isNotEmpty()) {
@@ -925,7 +934,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
         if (over && !ui.gameOver) { com.chesslab.sound.Haptics.gameEnded(); ticker?.cancel() }
-        val text = status ?: when (state) {
+        val text = if (finishedOffBoard) ui.outcome ?: ui.status else status ?: when (state) {
             is Board.State.Checkmate ->
                 s(if (state.color == humanColor) R.string.checkmate_you_lose else R.string.checkmate_you_win)
             is Board.State.Draw -> s(R.string.draw_reason, drawLabel(state.reason))
@@ -949,7 +958,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             blackClockMs = clock?.remaining(Piece.Color.black),
             gameOver = over,
             outcome = if (over) text else ui.outcome,
-            userWon = if (over) state is Board.State.Checkmate && state.color != humanColor else ui.userWon,
+            userWon = if (boardOver) state is Board.State.Checkmate && state.color != humanColor else ui.userWon,
         )
     }
 

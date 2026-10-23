@@ -1,6 +1,8 @@
 package com.chesslab
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
@@ -137,4 +139,38 @@ class PlaySetupTest {
         compose.onNodeWithTag("annuler-reprise").performClick()
         compose.waitForIdle()
     }
+
+    /**
+     * Fin de partie : « Mats manqués » rejoint « Accueil » et « Analyser », et
+     * mène à l'analyse qui cherche d'elle-même. Abandon au premier coup : aucun
+     * coup joué, donc rien à trouver — la proposition le dit.
+     */
+    @Test fun laFinDePartieProposeLesMatsManques() {
+        openSetup()
+        // « Commencer » est épinglé hors du défilement.
+        compose.onNodeWithTag("commencer").performClick()
+        awaitTag("abandonner", 60_000)
+        compose.waitUntil(60_000) {
+            compose.onAllNodes(hasTestTag("abandonner") and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithTag("abandonner").performClick()
+        awaitTag("abandonner-oui")
+        compose.onNodeWithTag("abandonner-oui").performClick()
+
+        awaitTag("fin-de-partie")
+        // Abandon AVANT que le modèle Maia ait fini de charger : la fin de ce
+        // chargement rouvrait la partie (« À vous de jouer », panneau de fin
+        // disparu). On laisse passer ce chargement, et la partie doit rester
+        // abandonnée.
+        Thread.sleep(6_000)
+        compose.waitForIdle()
+        compose.onNodeWithTag("fin-de-partie").assertIsDisplayed()
+        compose.onNodeWithTag("accueil").assertIsDisplayed()
+        compose.onNodeWithTag("analyser-la-partie").assertIsDisplayed()
+        compose.onNodeWithTag("mats-manques-partie").assertIsDisplayed()
+        compose.onNodeWithTag("mats-manques-partie").performClick()
+
+        awaitTag("mats-manques-resultat", 120_000)
+    }
 }
+

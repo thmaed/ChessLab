@@ -1,6 +1,10 @@
 package com.chesslab.puzzles
 
 import android.app.Application
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -15,6 +19,7 @@ import com.chesslab.library.LibraryDatabase
 import com.chesslab.settings.SettingsStore
 import com.chesslab.settings.StatsStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -25,14 +30,22 @@ import com.chesslab.ui.s
 enum class PuzzleOutcome { solving, solved, failed }
 
 /**
- * D'où viennent les puzzles proposés. Pendant de `PuzzleSource` sur iOS.
+ * D'où viennent les puzzles proposés. Pendant de `PuzzleSource` sur iOS, dans
+ * le même ordre que ses puces.
  *
  * « Mes parties » regroupe ceux que l'analyse a tirés de vos propres fautes :
  * la position est déjà arrivée sur votre échiquier, et l'erreur est la vôtre.
  */
 enum class PuzzleSource(val labelRes: Int) {
-    lichess(R.string.puzzle_source_lichess),
     ownGames(R.string.puzzle_source_own),
+    lichess(R.string.puzzle_source_lichess);
+
+    /** Les mêmes symboles qu'iOS (`person.fill`, `books.vertical.fill`). */
+    val icon: ImageVector
+        get() = when (this) {
+            ownGames -> Icons.Default.Person
+            lichess -> Icons.Default.LibraryBooks
+        }
 }
 
 data class PuzzleUiState(
@@ -56,14 +69,11 @@ data class PuzzleUiState(
     val allowedAttempts: Int = 1,
     /** Les deux cases du coup soufflé, quand l'utilisateur l'a demandé. */
     val hint: Pair<Square, Square>? = null,
-    val source: PuzzleSource = PuzzleSource.lichess,
     val filter: PuzzleFilter = PuzzleFilter(),
     /** Le bilan : réussite et thèmes à travailler. `null` tant que rien n'est tenté. */
     val stats: com.chesslab.progression.PuzzleStats? = null,
     /** Combien de puzzles attendent d'être revus. */
     val dueCount: Int = 0,
-    /** Combien de puzzles maison existent — le sélecteur s'efface sans eux. */
-    val ownCount: Int = 0,
 )
 
 /**
@@ -83,33 +93,39 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     var ui by mutableStateOf(PuzzleUiState(status = s(R.string.puzzle_loading)))
         private set
 
-    init { load(PuzzleSource.lichess, PuzzleFilter()) }
+    init { load(PuzzleFilter()) }
 
     /**
-     * Change de source. L'écran repart à zéro : mélanger deux files ferait un
-     * compteur de score qui ne veut plus rien dire.
+     * Une série sur UN thème — l'entrée depuis la progression (« à travailler »).
+     * Toutes provenances, comme iOS (`PuzzleSessionFilter(theme:)`).
      */
-    fun setSource(source: PuzzleSource) {
-        if (source == ui.source && !ui.loading) return
-        load(source, ui.filter)
-    }
-
-    /** Une série sur UN thème — l'entrée depuis la progression (« à travailler »). */
     fun trainTheme(raw: String) {
         val kind = PuzzleThemeKind.entries.firstOrNull { it.raw == raw } ?: return
-        if (ui.filter.theme == kind && ui.source == PuzzleSource.lichess) return
-        load(PuzzleSource.lichess, ui.filter.copy(theme = kind))
+        setFilter(PuzzleFilter(theme = kind))
     }
 
     /** Change de filtre : la file se reconstitue autour de ce qu'on demande. */
     fun setFilter(filter: PuzzleFilter) {
         if (filter == ui.filter) return
-        load(ui.source, filter)
+        load(filter)
     }
 
-    private fun load(source: PuzzleSource, filter: PuzzleFilter) = viewModelScope.launch {
-        ui = ui.copy(loading = true, source = source, filter = filter, hint = null)
-        val db = LibraryDatabase.get(getApplication())
+    /**
+     * Le chargement en cours. Un nouveau filtre ANNULE le précédent : `init`
+     * charge sans filtre et l'écran pose le sien aussitôt — deux passes sur la
+     * bibliothèque, et la plus lente des deux écrasait la file de l'autre.
+     */
+    private var loading: Job? = null
+
+    private fun load(filter: PuzzleFilter) {
+        loading?.cancel()
+        loading = viewModelScope.launch { fill(filter) }
+    }
+
+    private suspend fun fill(filter: PuzzleFilter) {
+        ui = ui.copy(loading = true, filter = filter, hint = null)
+        val app = getApplication<Application>()
+        val db = LibraryDatabase.get(app)
         val own = withContext(Dispatchers.IO) { runCatching { db.ownPuzzles().all() }.getOrDefault(emptyList()) }
         val due = withContext(Dispatchers.IO) {
             runCatching { db.puzzleProgress().dueCount(System.currentTimeMillis()) }.getOrDefault(0)
@@ -119,27 +135,40 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val stats = withContext(Dispatchers.IO) {
             runCatching { com.chesslab.progression.PuzzleStats.compute(db.puzzleProgress().all()) }.getOrNull()
         }
-        queue = when (source) {
-            PuzzleSource.ownGames -> own.map { it.toPuzzle() }.filter { matches(it, filter) }
-            PuzzleSource.lichess -> withContext(Dispatchers.IO) {
-                runCatching {
-                    PuzzleRepository.sample(
-                        getApplication<Application>().assets,
+        val mine = if (filter.source == PuzzleSource.lichess) emptyList()
+            else own.map { it.toPuzzle() }.filter { PuzzleAnswer.accepts(it, filter, isOwn = true) }
+        queue = withContext(Dispatchers.IO) {
+            runCatching {
+                when {
+                    // Les ratés, dus ou non : la progression dit lesquels, la
+                    // bibliothèque et vos puzzles maison disent ce qu'ils sont.
+                    filter.missedOnly -> {
+                        val missed = db.puzzleProgress().missedIds().toSet()
+                        val library = if (filter.source == PuzzleSource.ownGames) emptyList()
+                            else PuzzleRepository.byIds(app.assets, missed)
+                                .filter { PuzzleAnswer.accepts(it, filter, isOwn = false) }
+                        (mine.filter { it.id in missed } + library).shuffled()
+                    }
+                    filter.source == PuzzleSource.ownGames -> mine
+                    else -> PuzzleRepository.sample(
+                        app.assets,
                         count = 40,
                         ratings = filter.ratings,
                         theme = filter.theme?.raw,
                         phase = filter.phase?.raw,
+                        extra = mine,
                     )
-                }.getOrDefault(emptyList())
-            }
+                }
+            }.getOrDefault(emptyList())
         }
-        ui = ui.copy(loading = false, ownCount = own.size, dueCount = due, stats = stats)
+        ui = ui.copy(loading = false, dueCount = due, stats = stats)
         if (queue.isEmpty()) {
             ui = ui.copy(
                 puzzle = null,
                 status = s(
                     when {
-                        source == PuzzleSource.ownGames -> R.string.puzzle_no_own
+                        filter.missedOnly -> R.string.puzzle_no_missed
+                        filter.source == PuzzleSource.ownGames && own.isEmpty() -> R.string.puzzle_no_own
                         !filter.isEmpty -> R.string.puzzle_none_match
                         else -> R.string.puzzle_library_unavailable
                     }
@@ -149,11 +178,6 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             present(0)
         }
     }
-
-    /** Un puzzle maison n'a pas de cote : seul le thème le filtre. */
-    private fun matches(puzzle: Puzzle, filter: PuzzleFilter): Boolean =
-        (filter.theme == null || puzzle.theme == filter.theme.raw) &&
-            (filter.phase == null || puzzle.phase == filter.phase.raw)
 
     /**
      * Range le résultat, et programme la prochaine rencontre. Ce qu'on vient
@@ -198,6 +222,17 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
 
     fun next() {
         if (queue.isEmpty()) return
+        // Série « Ratés » : un puzzle réussi n'est plus raté, il quitte la
+        // file — iOS ne le retirerait plus de la base.
+        if (ui.filter.missedOnly && ui.outcome == PuzzleOutcome.solved) {
+            queue = queue.filterIndexed { index, _ -> index != cursor }
+            if (queue.isEmpty()) {
+                ui = ui.copy(puzzle = null, status = s(R.string.puzzle_no_missed))
+                return
+            }
+            present(cursor % queue.size)
+            return
+        }
         present((cursor + 1) % queue.size)
     }
 
@@ -224,30 +259,19 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val played = from.notation + to.notation
 
         // On compare AVANT de jouer : un coup faux ne doit pas salir le plateau.
-        if (!expected.startsWith(played)) {
-            val left = ui.attemptsLeft - 1
-            ui = if (left > 0) {
-                ui.copy(
-                    selected = null, legalTargets = emptySet(),
-                    attemptsLeft = left,
-                    status = q(R.plurals.puzzle_wrong_tries, left, left),
-                )
-            } else {
-                com.chesslab.sound.Haptics.illegal()
-                StatsStore.recordPuzzle(getApplication(), solvedIt = false)
-                ui.puzzle?.let { recordProgress(it, success = false) }
-                ui.copy(
-                    selected = null, legalTargets = emptySet(),
-                    outcome = PuzzleOutcome.failed,
-                    attemptedCount = ui.attemptedCount + 1,
-                    status = s(R.string.puzzle_wrong_solution, expected),
-                )
+        // Un autre coup qui mate reste juste (voir `PuzzleAnswer.deliversMate`) ;
+        // une promotion hors solution attend le choix de la pièce pour être jugée.
+        val isExpected = expected.startsWith(played)
+        if (!isExpected) {
+            val promotes = board.position.piece(from)?.kind == Piece.Kind.pawn && to.rank.value in setOf(1, 8)
+            if (!promotes && !PuzzleAnswer.deliversMate(board.position, from, to)) {
+                registerWrongAttempt(expected)
+                return
             }
-            return
         }
 
         var move = board.move(pieceAt = from, to = to) ?: return
-        if (expected.length == 5) {
+        if (isExpected && expected.length == 5) {
             move = board.completePromotion(of = move, to = kindOf(expected[4]))
         } else if (board.state is Board.State.Promotion) {
             ui = ui.copy(selected = null, legalTargets = emptySet(), pendingPromotion = move)
@@ -273,15 +297,46 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val puzzle = ui.puzzle ?: return
         val move = board.completePromotion(of = pending, to = kind)
         ui = ui.copy(pendingPromotion = null)
+        val expected = puzzle.solution.getOrNull(step) ?: return
+        val played = pending.start.notation + pending.end.notation
+        // Promotion hors solution : juste seulement si elle mate. Sinon le
+        // plateau revient à la position d'avant, comme pour un coup faux.
+        if (!expected.startsWith(played) && board.state !is Board.State.Checkmate) {
+            board = Board(ui.position.copy())
+            registerWrongAttempt(expected)
+            return
+        }
         step++
         advance(move, puzzle)
+    }
+
+    private fun registerWrongAttempt(expected: String) {
+        val left = ui.attemptsLeft - 1
+        ui = if (left > 0) {
+            ui.copy(
+                selected = null, legalTargets = emptySet(),
+                attemptsLeft = left,
+                status = q(R.plurals.puzzle_wrong_tries, left, left),
+            )
+        } else {
+            com.chesslab.sound.Haptics.illegal()
+            StatsStore.recordPuzzle(getApplication(), solvedIt = false)
+            ui.puzzle?.let { recordProgress(it, success = false) }
+            ui.copy(
+                selected = null, legalTargets = emptySet(),
+                outcome = PuzzleOutcome.failed,
+                attemptedCount = ui.attemptedCount + 1,
+                status = s(R.string.puzzle_wrong_solution, expected),
+            )
+        }
     }
 
     /** Le coup du résolveur est joué : on enchaîne la riposte, ou on conclut. */
     private fun advance(move: Move, puzzle: Puzzle) {
         show(move, s(R.string.puzzle_good))
 
-        if (step >= puzzle.solution.size) {
+        // Un mat clôt le puzzle même s'il restait des coups à la séquence.
+        if (step >= puzzle.solution.size || board.state is Board.State.Checkmate) {
             com.chesslab.sound.Haptics.gameEnded()
             StatsStore.recordPuzzle(getApplication(), solvedIt = true)
             recordProgress(puzzle, success = true)

@@ -72,7 +72,7 @@
     <string name="help_level_title">The level shown</string>
     <string name="help_offline_body">Everything. No account, no network, no data leaving the device. The engine, the puzzles, the courses and the opponents are all embedded.</string>
     <string name="help_offline_title">What stays offline</string>
-    <string name="help_puzzles_body">One try by default. Three invite you to try a move « just to see », exactly the opposite of what a puzzle trains: you calculate the line to the end BEFORE you touch the piece. The three-try net is still in the settings.</string>
+    <string name="help_puzzles_body">One try by default. Three invite you to try a move « just to see », exactly the opposite of what a puzzle trains: you calculate the line to the end BEFORE you touch the piece. The three-try net is still in the settings. “Missed” replays only what you got wrong on your last attempt, and a checkmating move is always accepted, even when it is not the stored solution. At the end of a game, “Missed mates” looks for the forced mates either side let slip and offers to make puzzles of them.</string>
     <string name="help_puzzles_title">The puzzles</string>
     <string name="help_safety_body">Maia does not calculate: it can miss a mate in two or spoil an elementary endgame. Above a certain level, Stockfish takes over in FOUR cases only — a mate in one or two, an endgame with few pieces, a repetition in a winning position, and the case where the model does not answer. Below that level, missing a mate is PART of the character.</string>
     <string name="help_safety_title">The safety net</string>
@@ -716,6 +716,19 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="arrows_three">Three</string>
     <string name="analysis_accuracy">Accuracy</string>
     <string name="analysis_review">Analyse the game</string>
+    <string name="analysis_find_missed_mates">Find missed mates</string>
+    <string name="analysis_scanning_mates">Missed mates: move %1$d/%2$d</string>
+    <string name="missed_mates_none_title">No missed mates</string>
+    <string name="missed_mates_one_title">One missed mate</string>
+    <string name="missed_mates_many_title">%1$d missed mates</string>
+    <string name="missed_mate_line_white">Move %1$d, White: mate in %2$d</string>
+    <string name="missed_mate_line_black">Move %1$d, Black: mate in %2$d</string>
+    <string name="missed_mates_none_body">Neither side let a forced mate in 5 or fewer slip in this game.</string>
+    <string name="missed_mates_add_one">Add it to your puzzles? You will find it under Puzzles, “My games”.</string>
+    <string name="missed_mates_add_many">Add them to your puzzles? You will find them under Puzzles, “My games”.</string>
+    <string name="missed_mates_add">Add to my puzzles</string>
+    <string name="missed_mates_decline">No thanks</string>
+    <string name="play_missed_mates">Missed mates</string>
     <string name="analysis_reviewing">Analysing… %1$d/%2$d</string>
     <string name="analysis_no_review">Load a game to see its report.</string>
     <string name="analysis_moves_counted">%1$d moves classified</string>
@@ -733,7 +746,7 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d puzzle created — find it in Puzzles.</item>
         <item quantity="other">%1$d puzzles created — find them in Puzzles.</item>
     </plurals>
-    <string name="puzzle_source_lichess">Lichess</string>
+    <string name="puzzle_source_lichess">Library</string>
     <string name="puzzle_source_own">My games</string>
     <string name="puzzle_no_own">No puzzle from your games yet — analyse one and use “Make puzzles from the mistakes”.</string>
     <string name="puzzle_prompt_unrated">%1$s — find the best move</string>
@@ -1037,6 +1050,10 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="analysis_summary_partial">Analysis in progress — the summary fills in as moves are classified.</string>
     <string name="puzzle_view_source">See it in the original game</string>
 
+    <string name="puzzle_provenance">Source</string>
+    <string name="puzzle_history">History</string>
+    <string name="puzzle_missed">Missed</string>
+    <string name="puzzle_no_missed">No missed puzzles — you solved every puzzle matching these filters on your last attempt.</string>
     <string name="puzzle_level">Level</string>
     <string name="puzzle_phase">Phase</string>
     <string name="puzzle_type">Puzzle type</string>

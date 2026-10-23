@@ -269,6 +269,20 @@ class AppTest {
         awaitTag("score", 10_000)
     }
 
+    @Test fun ownGamesHideTheLevelFilter() {
+        open("puzzles")
+        awaitTag("commencer-puzzles", 15_000)
+        // Vos puzzles n'ont pas de cote : choisir « Mes parties » retire le
+        // niveau, le désélectionner le rend — comme sur iOS.
+        compose.onNodeWithTag("niveau-tous").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("provenance-ownGames").performScrollTo().performClick()
+        compose.waitForIdle()
+        assert(compose.onAllNodesWithTag("niveau-tous").fetchSemanticsNodes().isEmpty())
+        compose.onNodeWithTag("provenance-ownGames").performScrollTo().performClick()
+        compose.onNodeWithTag("niveau-tous").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("historique-rates").performScrollTo().assertIsDisplayed()
+    }
+
     @Test fun openingCoursesCanBeRead() {
         open("openings")
         awaitTag("compte")

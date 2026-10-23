@@ -203,6 +203,13 @@ data class AnalysisUiState(
     val reviewEval: PositionEval? = null,
     /** Le nombre de puzzles que la dernière génération a créés, à annoncer. */
     val puzzlesCreated: Int? = null,
+    /** La recherche des mats manqués tourne (sa progression : `reviewDone`/`reviewTotal`). */
+    val scanningMates: Boolean = false,
+    /**
+     * Le résultat de la recherche, en attente de la décision de l'utilisateur :
+     * rien n'est enregistré sans son accord. Vide = aucun mat manqué.
+     */
+    val missedMates: List<com.chesslab.puzzles.MissedMate>? = null,
     /** La case choisie, et les cases où elle peut aller : le plateau se JOUE. */
     val selected: Square? = null,
     val legalTargets: Set<Square> = emptySet(),
@@ -896,6 +903,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
 
         reviewJob = viewModelScope.launch {
             val evals = reviewEvals
+            var reviewCompleted = false
             val missing = snapshotPositions.indices.filter { it !in evals }
             ui = ui.copy(reviewing = true, reviewDone = snapshotPositions.size - missing.size, reviewTotal = snapshotPositions.size)
             try {
@@ -913,6 +921,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                     }
                 }
                 classify(snapshotPositions, snapshotMoves, evals, book)
+                reviewCompleted = true
             } finally {
                 // Une classification interrompue n'est pas perdue : ce qui est
                 // déjà classé part sur le disque, la revue reprendra là au
@@ -925,6 +934,12 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                 // Revue TERMINÉE : le moteur s'arrête ici. La navigation lira
                 // le cache, plus de recalcul à chaque coup.
                 if (isGameReview) showCachedEval(ui.cursor) else evaluate()
+                // « Mats manqués » demandé pendant la revue : c'est son tour,
+                // et il profite du cache qu'elle vient de remplir.
+                if (reviewCompleted && missedMatesPending) {
+                    missedMatesPending = false
+                    findMissedMates()
+                }
             }
         }
     }
@@ -1337,6 +1352,140 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
 
     fun clearPuzzleNotice() { ui = ui.copy(puzzlesCreated = null) }
 
+    // MARK: Mats manqués
+
+    /** Demandée pendant la revue : la recherche part dès que la revue finit. */
+    private var missedMatesPending = false
+    /** La demande venue de la fin de partie ne vaut qu'une fois par écran. */
+    private var missedMatesRequested = false
+
+    /** « Mats manqués » en fin de partie : une seule fois, même si l'écran se recompose. */
+    fun requestMissedMatesOnce() {
+        if (missedMatesRequested) return
+        missedMatesRequested = true
+        findMissedMates()
+    }
+
+    /**
+     * Cherche les positions où le camp au trait tenait un mat forcé en
+     * [com.chesslab.puzzles.MissedMateDetector.MAX_MATE_MOVES] coups au plus,
+     * et où le coup joué l'a laissé filer — des deux côtés. Ne crée RIEN :
+     * l'écran propose, l'utilisateur décide. Pendant de
+     * `AnalysisViewModel.findMissedMates` côté iOS, mêmes étages :
+     *
+     * 1. **Présélection** par l'éval de la revue : le camp au trait doit y être
+     *    à 97 % ou plus (une position pas encore évaluée passe directement à
+     *    l'étage suivant).
+     * 2. **Recherche dédiée** (budget des puzzles) : la distance du mat et sa
+     *    ligne complète. Puis, si le coup joué n'est pas celui du moteur, la
+     *    position d'APRÈS : si l'adversaire y est toujours maté, le joueur a
+     *    pris un autre chemin vers le mat — rien de manqué.
+     */
+    fun findMissedMates() {
+        if (ui.scanningMates) return
+        if (ui.reviewing) { missedMatesPending = true; return }
+        if (moves.isEmpty()) { ui = ui.copy(missedMates = emptyList()); return }
+
+        evalJob?.cancel()
+        val snapshotPositions = positions.map { it.copy() }
+        val snapshotMoves = moves.toList()
+        val evals = reviewEvals.toMap()
+
+        reviewJob = viewModelScope.launch {
+            ui = ui.copy(scanningMates = true, reviewDone = 0, reviewTotal = snapshotMoves.size)
+            val found = ArrayList<com.chesslab.puzzles.MissedMate>()
+            var completed = false
+            try {
+                val dao = LibraryDatabase.get(getApplication()).ownPuzzles()
+                val childNodes = com.chesslab.engine.DevicePerformance.classificationNodes(getApplication())
+                val childCap = com.chesslab.engine.DevicePerformance.classificationCapMs(getApplication())
+                withContext(Dispatchers.IO) {
+                    EngineService.use(getApplication()) { e ->
+                        e.send("setoption name MultiPV value 1")
+                        for (i in snapshotMoves.indices) {
+                            ensureActive()
+                            withContext(Dispatchers.Main) { ui = ui.copy(reviewDone = i + 1) }
+                            val parent = snapshotPositions[i]
+                            val child = snapshotPositions.getOrNull(i + 1) ?: continue
+                            // Le coup joué mate lui-même : rien de manqué.
+                            if (Board(child).state is Board.State.Checkmate) continue
+                            // Déjà dans vos puzzles : ne pas le reproposer.
+                            if (dao.countFor(parent.fen) > 0) continue
+
+                            val before = evals[i]
+                            val winForMover = before?.let {
+                                if (parent.sideToMove == Piece.Color.white) it.winPercentWhite else 100 - it.winPercentWhite
+                            }
+                            if (winForMover != null &&
+                                !com.chesslab.puzzles.MissedMateDetector.mightHoldMate(winForMover)
+                            ) continue
+
+                            val best = deepEval(e, parent)[1] ?: continue
+                            val mateIn = best.mate ?: continue
+                            if (mateIn <= 0 || mateIn > com.chesslab.puzzles.MissedMateDetector.MAX_MATE_MOVES) continue
+                            val solution = com.chesslab.puzzles.MissedMateDetector.solution(best.pv, parent.fen)
+                                ?: continue
+                            // Le coup du moteur lui-même : le mat a été trouvé.
+                            if (snapshotMoves[i].lan == best.lan) continue
+
+                            // Score POV du trait APRÈS le coup : négatif = l'adversaire
+                            // du joueur est toujours maté.
+                            val after = deepEval(e, child, childNodes, childCap)[1]
+                            if ((after?.mate ?: 0) < 0) continue
+
+                            found += com.chesslab.puzzles.MissedMate(
+                                fen = parent.fen,
+                                playedSan = snapshotMoves[i].san,
+                                solution = solution,
+                                mateIn = mateIn,
+                                mover = parent.sideToMove,
+                                moveNumber = com.chesslab.puzzles.MissedMateDetector.moveNumber(parent.fen),
+                            )
+                        }
+                    }
+                }
+                completed = true
+            } finally {
+                // Écran quitté en route : pas de proposition à moitié faite.
+                ui = ui.copy(scanningMates = false, missedMates = if (completed) found.toList() else null)
+                if (isGameReview) showCachedEval(ui.cursor) else evaluate()
+            }
+        }
+    }
+
+    /** Enregistre les mats proposés comme puzzles « Mat » de vos parties. */
+    fun saveMissedMates() {
+        val mates = ui.missedMates ?: return
+        ui = ui.copy(missedMates = null)
+        val sourcePgn = pgn()
+        viewModelScope.launch {
+            val created = withContext(Dispatchers.IO) {
+                val dao = LibraryDatabase.get(getApplication()).ownPuzzles()
+                var count = 0
+                for (mate in mates) {
+                    if (dao.countFor(mate.fen) > 0) continue
+                    dao.insert(
+                        OwnPuzzle(
+                            uid = java.util.UUID.randomUUID().toString(),
+                            fen = mate.fen,
+                            playedSan = mate.playedSan,
+                            solution = mate.solution.joinToString(" "),
+                            theme = "checkmate",
+                            rating = 0,
+                            createdAt = System.currentTimeMillis(),
+                            sourcePgn = sourcePgn,
+                        )
+                    )
+                    count++
+                }
+                count
+            }
+            ui = ui.copy(puzzlesCreated = created)
+        }
+    }
+
+    fun dismissMissedMates() { ui = ui.copy(missedMates = null) }
+
     /**
      * Un score comparable, mat compris : un mat en 1 doit battre un mat en 3.
      *
@@ -1354,11 +1503,13 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     private suspend fun deepEval(
         engine: com.chesslab.engine.StockfishEngine,
         position: Position,
+        nodes: Long = PUZZLE_NODES.toLong(),
+        capMs: Int = PUZZLE_CAP_MS,
     ): Map<Int, RankedLine> {
         engine.send("position fen ${position.fen}")
         val lines = HashMap<Int, RankedLine>()
-        val puzzleNodes = com.chesslab.engine.ThermalMonitor.nodes(PUZZLE_NODES.toLong())
-        engine.search("go nodes $puzzleNodes movetime $PUZZLE_CAP_MS", timeoutMs = 30_000) { line ->
+        val puzzleNodes = com.chesslab.engine.ThermalMonitor.nodes(nodes)
+        engine.search("go nodes $puzzleNodes movetime $capMs", timeoutMs = 30_000) { line ->
             parseInfo(line)?.let { lines[it.rank] = it.line }
         }
         return lines

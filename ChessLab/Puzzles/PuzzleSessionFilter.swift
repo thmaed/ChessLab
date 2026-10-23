@@ -2,15 +2,22 @@ import Foundation
 import SwiftData
 
 /// Critères d'une série de puzzles : ce que l'utilisateur a sélectionné
-/// dans ``PuzzleQueueView`` (niveau, phase, éventuellement un thème via
-/// les groupes de la liste). La série est OUVERTE : plutôt qu'une liste
-/// figée de N puzzles choisie à l'avance, chaque "Nouveau puzzle" retire
-/// le prochain puzzle dû correspondant à ces critères — l'utilisateur
-/// enchaîne tant qu'il veut et s'arrête quand il veut.
+/// dans ``PuzzleQueueView`` (provenance, ratés, niveau, phase, thème). La
+/// série est OUVERTE : plutôt qu'une liste figée de N puzzles choisie à
+/// l'avance, chaque "Nouveau puzzle" retire le prochain puzzle dû
+/// correspondant à ces critères — l'utilisateur enchaîne tant qu'il veut et
+/// s'arrête quand il veut.
 struct PuzzleSessionFilter: Hashable {
     var difficulty: DifficultyTier?
     var phase: GamePhase?
     var theme: PuzzleTheme?
+    /// `nil` = les deux. Sans ce critère, vos puzzles maison (quelques
+    /// dizaines) se noyaient dans les ~100 000 de la bibliothèque : tirés
+    /// au hasard parmi eux, ils ne sortaient pour ainsi dire jamais.
+    var source: PuzzleSource?
+    /// Seulement les puzzles RATÉS À LA DERNIÈRE TENTATIVE — voir
+    /// ``PuzzleSessionDrawer/predicate(matching:neverOpenedOnly:excluding:)``.
+    var missedOnly = false
 }
 
 /// Compte et tire les puzzles dus correspondant à un
@@ -61,6 +68,28 @@ enum PuzzleSessionDrawer {
         return randomPick(matching: filter, neverOpenedOnly: false, excluding: excludedID, in: context)
     }
 
+    /// Existe-t-il au moins un puzzle de cette provenance, dû ou non ?
+    static func hasAnyPuzzle(from source: PuzzleSource, in context: ModelContext) -> Bool {
+        let sourceRaw = source.rawValue
+        let legacySourceRaw = PuzzleSource.ownGames.rawValue
+        var descriptor = FetchDescriptor<Puzzle>(predicate: #Predicate { ($0.sourceRaw ?? legacySourceRaw) == sourceRaw })
+        descriptor.fetchLimit = 1
+        return ((try? context.fetchCount(descriptor)) ?? 0) > 0
+    }
+
+    /// Un puzzle de vos parties existe-t-il déjà pour cette position ? Les
+    /// insertions pas encore sauvegardées comptent (`includePendingChanges`
+    /// par défaut) — utile pendant une génération en cours.
+    static func hasOwnPuzzle(fen: String, in context: ModelContext) -> Bool {
+        let legacySourceRaw = PuzzleSource.ownGames.rawValue
+        let target: String? = fen
+        var descriptor = FetchDescriptor<Puzzle>(predicate: #Predicate {
+            $0.fen == target && ($0.sourceRaw ?? legacySourceRaw) == legacySourceRaw
+        })
+        descriptor.fetchLimit = 1
+        return ((try? context.fetchCount(descriptor)) ?? 0) > 0
+    }
+
     private static func randomPick(
         matching filter: PuzzleSessionFilter, neverOpenedOnly: Bool, excluding excludedID: UUID?, in context: ModelContext
     ) -> Puzzle? {
@@ -76,6 +105,18 @@ enum PuzzleSessionDrawer {
 
     /// Prédicat unique couvrant toutes les combinaisons de filtres, via
     /// des bornes/valeurs neutres pour les critères absents.
+    ///
+    /// « Raté » se lit sans nouveau champ : un échec remet `repetitions` à
+    /// zéro (``SpacedRepetition``), un succès l'incrémente. `failureCount > 0
+    /// && repetitions == 0` dit donc exactement « la dernière tentative a
+    /// échoué » — et le puzzle quitte la liste dès qu'on le réussit. Un puzzle
+    /// réussi avec l'indice compte comme réussi (décision du 23/10/2026).
+    ///
+    /// En mode « ratés », l'échéance est IGNORÉE : un échec fixe la révision
+    /// au lendemain, le filtre serait donc vide juste après la séance — au
+    /// moment précis où l'on veut rejouer ce qu'on vient de manquer. Rejouer
+    /// en avance ne fausse pas SM-2 : après un échec comme après le succès
+    /// qui suit, la révision tombe le lendemain.
     ///
     /// - important: PAS de déballage forcé (`$0.rating!`) dans un
     /// `#Predicate` : SwiftData ne sait pas le traduire, la requête
@@ -99,14 +140,31 @@ enum PuzzleSessionDrawer {
         let excluded = excludedID ?? UUID()
         let requireNeverOpened = neverOpenedOnly
 
-        return #Predicate<Puzzle> {
-            ($0.dueDate ?? distantPast) <= now
-                && ($0.rating ?? -1) >= lowerRating
+        let criteria = #Predicate<Puzzle> {
+            ($0.rating ?? -1) >= lowerRating
                 && ($0.rating ?? -1) <= upperRating
                 && (phaseRaw == nil || $0.phaseRaw == phaseRaw)
                 && (themeRaw == nil || $0.themeRaw == themeRaw)
                 && (!requireNeverOpened || $0.firstOpenedAt == nil)
                 && $0.id != excluded
+        }
+        // Trois prédicats composés plutôt qu'un seul : d'un bloc, le
+        // compilateur renonçait à typer l'expression.
+        let schedule: Predicate<Puzzle> = filter.missedOnly
+            ? #Predicate { ($0.failureCount ?? 0) > 0 && ($0.repetitions ?? 0) == 0 }
+            : #Predicate { ($0.dueDate ?? distantPast) <= now }
+        // Un puzzle sans `sourceRaw` date d'avant ce champ : il venait
+        // forcément de vos parties (voir ``Puzzle/source``).
+        let legacySourceRaw = PuzzleSource.ownGames.rawValue
+        let provenance: Predicate<Puzzle>
+        if let sourceRaw = filter.source?.rawValue {
+            provenance = #Predicate { ($0.sourceRaw ?? legacySourceRaw) == sourceRaw }
+        } else {
+            provenance = #Predicate { _ in true }
+        }
+
+        return #Predicate<Puzzle> {
+            criteria.evaluate($0) && schedule.evaluate($0) && provenance.evaluate($0)
         }
     }
 }

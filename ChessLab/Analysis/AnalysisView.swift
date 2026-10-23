@@ -14,6 +14,10 @@ struct AnalysisView: View {
     /// pendant de « Jouer à partir d'ici », pour regarder deux moteurs
     /// trancher la position au lieu de la jouer soi-même.
     var onOpenLab: (String) -> Void = { _ in }
+    /// Ouverte depuis « Mats manqués » en fin de partie : la recherche part
+    /// d'elle-même (elle attend la fin de la classification dans la file
+    /// moteur, puis en réutilise le cache).
+    var findsMissedMatesOnAppear = false
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.modelContext) private var modelContext
@@ -24,6 +28,11 @@ struct AnalysisView: View {
     @State private var showSummarySheet = false
     @State private var isGeneratingPuzzles = false
     @State private var puzzleGenerationMessage: String?
+    @State private var isFindingMissedMates = false
+    /// Résultat d'une recherche, en attente de la décision de l'utilisateur :
+    /// rien n'est enregistré sans son accord.
+    @State private var missedMatesFound: [MissedMate]?
+    @State private var didStartMissedMateSearch = false
 
     var body: some View {
         Group {
@@ -61,6 +70,10 @@ struct AnalysisView: View {
                         generatePuzzles()
                     }
                     .disabled(viewModel.isClassifying || isGeneratingPuzzles)
+                    Button("Chercher les mats manqués", systemImage: "scope") {
+                        findMissedMates()
+                    }
+                    .disabled(viewModel.isClassifying || isFindingMissedMates)
                     // `Picker` et non des `Button` : le réglage COURANT porte
                     // sa coche — avant, ces deux sous-menus ne disaient pas
                     // lequel était actif.
@@ -97,7 +110,15 @@ struct AnalysisView: View {
                 .accessibilityIdentifier("analysisMoveCount")
                 .accessibilityValue("\(viewModel.moveListRows.count)")
         )
-        .onAppear { viewModel.handleViewAppear() }
+        .onAppear {
+            viewModel.handleViewAppear()
+            // Une seule fois par écran : un retour depuis un autre écran ne
+            // relance pas la recherche.
+            if findsMissedMatesOnAppear, !didStartMissedMateSearch {
+                didStartMissedMateSearch = true
+                findMissedMates()
+            }
+        }
         .onDisappear {
             viewModel.handleViewDisappear()
             // Le bilan chiffré rejoint la partie enregistrée quand il est
@@ -135,6 +156,66 @@ struct AnalysisView: View {
         } message: {
             Text(puzzleGenerationMessage ?? "")
         }
+        .alert(
+            missedMatesTitle,
+            isPresented: Binding(
+                get: { missedMatesFound != nil },
+                set: { if !$0 { missedMatesFound = nil } }
+            ),
+            presenting: missedMatesFound
+        ) { mates in
+            if mates.isEmpty {
+                Button("OK") {}
+            } else {
+                Button("Ajouter à mes puzzles") {
+                    let count = viewModel.saveMissedMates(mates, in: modelContext)
+                    puzzleGenerationMessage = LocalizationController.string(
+                        "%lld puzzle(s) créé(s) — retrouvez-les dans le mode Puzzles.", count
+                    )
+                }
+                Button("Non merci", role: .cancel) {}
+            }
+        } message: { mates in
+            Text(missedMatesMessage(mates))
+        }
+    }
+
+    /// Lance la recherche et présente son résultat. Ne crée rien : la
+    /// proposition attend la réponse de l'utilisateur.
+    private func findMissedMates() {
+        guard !isFindingMissedMates else { return }
+        isFindingMissedMates = true
+        Task {
+            let mates = await viewModel.findMissedMates(in: modelContext)
+            isFindingMissedMates = false
+            missedMatesFound = mates
+        }
+    }
+
+    private var missedMatesTitle: String {
+        let count = missedMatesFound?.count ?? 0
+        switch count {
+        case 0: return LocalizationController.string("Aucun mat manqué")
+        case 1: return LocalizationController.string("Un mat manqué")
+        default: return LocalizationController.string("%lld mats manqués", count)
+        }
+    }
+
+    /// Une ligne par mat : coup, camp, distance du mat.
+    private func missedMatesMessage(_ mates: [MissedMate]) -> String {
+        guard !mates.isEmpty else {
+            return LocalizationController.string("Aucun des deux camps n'a laissé filer de mat forcé en 5 coups ou moins dans cette partie.")
+        }
+        let lines = mates.map { mate in
+            LocalizationController.string(
+                mate.mover == .white ? "Coup %lld, Blancs : mat en %lld" : "Coup %lld, Noirs : mat en %lld",
+                mate.moveNumber, mate.mateIn
+            )
+        }
+        let question = mates.count == 1
+            ? LocalizationController.string("L'ajouter à vos puzzles ? Vous le retrouverez dans Puzzles, « Mes parties ».")
+            : LocalizationController.string("Les ajouter à vos puzzles ? Vous les retrouverez dans Puzzles, « Mes parties ».")
+        return lines.joined(separator: "\n") + "\n\n" + question
     }
 
     /// Cherche, parmi les coups déjà classés imprécision/erreur/gaffe,
@@ -448,6 +529,8 @@ struct AnalysisView: View {
             Spacer()
             if viewModel.isClassifying, let progress = viewModel.classificationProgress {
                 classificationIndicator(progress)
+            } else if let progress = viewModel.missedMateScanProgress {
+                missedMateScanIndicator(progress)
             }
         }
     }
@@ -656,6 +739,29 @@ struct AnalysisView: View {
             }
             classificationSpinner
         }
+    }
+
+    private func missedMateScanIndicator(_ progress: (done: Int, total: Int)) -> some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 6) {
+                classificationSpinner
+                Text("Mats manqués : coup \(progress.done)/\(progress.total)")
+                    .font(.caption2)
+                    .foregroundStyle(Theme.textTertiary)
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+            HStack(spacing: 6) {
+                classificationSpinner
+                Text("\(progress.done)/\(progress.total)")
+                    .font(.caption2.monospacedDigit())
+                    .foregroundStyle(Theme.textTertiary)
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+            classificationSpinner
+        }
+        .accessibilityIdentifier("missedMateScanProgress")
     }
 
     private var classificationSpinner: some View {

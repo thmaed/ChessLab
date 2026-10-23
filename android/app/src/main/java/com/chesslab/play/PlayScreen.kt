@@ -58,6 +58,8 @@ fun PlayScreen(
     onOpenTwoPlayer: (String) -> Unit = {},
     onAnalyze: (String) -> Unit = {},
     onAnalyzeGame: (String) -> Unit = {},
+    /** L'analyse de la partie, qui cherche aussitôt les mats manqués. */
+    onFindMissedMates: (String) -> Unit = {},
     onOpenLab: (String) -> Unit = {},
     /** Revenir à l'accueil depuis le panneau de fin de partie. */
     onHome: () -> Unit = {},
@@ -183,6 +185,7 @@ fun PlayScreen(
             gutter, ui.outcome ?: ui.status,
             summary = model.opponentSummaryLine(),
             onAnalyze = { onAnalyzeGame(model.currentPgn()) },
+            onMissedMates = { onFindMissedMates(model.currentPgn()) },
             onHome = onHome,
         )
         else ControlBar(
@@ -558,6 +561,7 @@ private fun GameOverPanel(
     message: String,
     summary: String,
     onAnalyze: () -> Unit,
+    onMissedMates: () -> Unit,
     onHome: () -> Unit,
 ) {
     Column(
@@ -600,6 +604,19 @@ private fun GameOverPanel(
                 .clickable(onClick = onAnalyze)
                 .padding(horizontal = 14.dp, vertical = 8.dp)
                 .testTag("analyser-la-partie"),
+        )
+        Spacer(Modifier.width(8.dp))
+        // Les positions où l'un des camps tenait un mat forcé et l'a laissé
+        // filer, proposées comme puzzles « Mat ». Pendant du bouton d'iOS.
+        Text(
+            stringResource(R.string.play_missed_mates),
+            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.teal,
+            modifier = Modifier
+                .clip(CircleShape)
+                .border(1.dp, Palette.teal.copy(alpha = 0.5f), CircleShape)
+                .clickable(onClick = onMissedMates)
+                .padding(horizontal = 14.dp, vertical = 8.dp)
+                .testTag("mats-manques-partie"),
         )
         }
     }

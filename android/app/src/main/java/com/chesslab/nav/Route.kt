@@ -117,7 +117,8 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
      * L'analyse elle-même. [fen] vient du scanner ou de l'éditeur, [pgn]
      * d'une partie rangée ; les deux nuls ouvrent sur le champ de saisie.
      */
-    data class AnalysisBoard(val fen: String? = null, val pgn: String? = null) :
+    /** [findMissedMates] : ouverte depuis « Mats manqués » en fin de partie. */
+    data class AnalysisBoard(val fen: String? = null, val pgn: String? = null, val findMissedMates: Boolean = false) :
         Route(R.string.route_analysis)
     /** [theme] : une série ciblée sur un thème — l'entrée depuis la progression. */
     /**

@@ -1,11 +1,11 @@
 import SwiftData
 import SwiftUI
 
-/// Écran de sélection avant une série de puzzles : trois groupes de
-/// chips capsules (niveau, phase, type de puzzle) et un bouton
-/// "Commencer" épinglé en bas — le tout tient sur UN SEUL écran, sans
-/// défilement. Chaque groupe porte sa propre teinte (vert/bleu/ambre,
-/// reprises de ``Theme``) pour se repérer d'un coup d'œil ; la ligne de
+/// Écran de sélection avant une série de puzzles : cinq groupes de chips
+/// capsules (provenance, historique, niveau, phase, type de puzzle) qui
+/// défilent, et un bouton "Commencer" épinglé en bas. Chaque groupe porte
+/// sa propre teinte (violet/rose/vert/bleu/ambre, reprises de ``Theme``)
+/// pour se repérer d'un coup d'œil ; la ligne de
 /// résumé au-dessus du bouton reformule la sélection courante. Aucune
 /// mention de quantité nulle part (ni total, ni "dus") — l'utilisateur
 /// choisit ses critères sans être influencé par combien de puzzles s'y
@@ -26,13 +26,18 @@ struct PuzzleQueueView: View {
     @State private var selectedDifficulty: DifficultyTier?
     @State private var selectedPhase: GamePhase?
     @State private var selectedTheme: PuzzleTheme?
+    @State private var selectedSource: PuzzleSource?
+    @State private var missedOnly = false
 
     @State private var hasAnyPuzzle = true
     /// Bilan (Lot 5.B), recalculé à l'apparition — voir ``refresh()``.
     @State private var stats: PuzzleStats?
 
     private var currentFilter: PuzzleSessionFilter {
-        PuzzleSessionFilter(difficulty: selectedDifficulty, phase: selectedPhase, theme: selectedTheme)
+        PuzzleSessionFilter(
+            difficulty: selectedDifficulty, phase: selectedPhase, theme: selectedTheme,
+            source: selectedSource, missedOnly: missedOnly
+        )
     }
 
     var body: some View {
@@ -51,19 +56,52 @@ struct PuzzleQueueView: View {
                 VStack(spacing: 0) {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
-                            filterGroup(title: "Niveau") {
-                                FilterChip(label: "Tous", tint: Theme.accent, isSelected: selectedDifficulty == nil) {
-                                    selectedDifficulty = nil
+                            filterGroup(title: "Provenance") {
+                                FilterChip(label: "Toutes", tint: Theme.violet, isSelected: selectedSource == nil) {
+                                    selectedSource = nil
                                 }
-                                ForEach(DifficultyTier.allCases, id: \.self) { tier in
-                                    FilterChip(
-                                        label: LocalizedStringKey(tier.label),
-                                        icon: "cellularbars",
-                                        iconVariableValue: tier.gaugeValue,
-                                        tint: Theme.accent,
-                                        isSelected: selectedDifficulty == tier
-                                    ) {
-                                        selectedDifficulty = (selectedDifficulty == tier) ? nil : tier
+                                .accessibilityIdentifier("provenance-toutes")
+                                ForEach(PuzzleSource.allCases, id: \.self) { source in
+                                    FilterChip(label: LocalizedStringKey(source.label), icon: source.icon, tint: Theme.violet, isSelected: selectedSource == source) {
+                                        selectedSource = (selectedSource == source) ? nil : source
+                                        // Vos puzzles n'ont pas de cote : un niveau
+                                        // choisi les exclurait TOUS (voir le
+                                        // prédicat du tirage).
+                                        if selectedSource == .ownGames { selectedDifficulty = nil }
+                                    }
+                                    .accessibilityIdentifier("provenance-\(source.rawValue)")
+                                }
+                            }
+
+                            filterGroup(title: "Historique") {
+                                FilterChip(label: "Tous", tint: Theme.rose, isSelected: !missedOnly) {
+                                    missedOnly = false
+                                }
+                                .accessibilityIdentifier("historique-tous")
+                                FilterChip(label: "Ratés", icon: "xmark.circle.fill", tint: Theme.rose, isSelected: missedOnly) {
+                                    missedOnly.toggle()
+                                }
+                                .accessibilityIdentifier("historique-rates")
+                            }
+
+                            // Masqué pour « Mes parties » : sans cote, aucun
+                            // niveau ne retiendrait un seul puzzle.
+                            if selectedSource != .ownGames {
+                                filterGroup(title: "Niveau") {
+                                    FilterChip(label: "Tous", tint: Theme.accent, isSelected: selectedDifficulty == nil) {
+                                        selectedDifficulty = nil
+                                    }
+                                    .accessibilityIdentifier("niveau-tous")
+                                    ForEach(DifficultyTier.allCases, id: \.self) { tier in
+                                        FilterChip(
+                                            label: LocalizedStringKey(tier.label),
+                                            icon: "cellularbars",
+                                            iconVariableValue: tier.gaugeValue,
+                                            tint: Theme.accent,
+                                            isSelected: selectedDifficulty == tier
+                                        ) {
+                                            selectedDifficulty = (selectedDifficulty == tier) ? nil : tier
+                                        }
                                     }
                                 }
                             }
@@ -144,7 +182,10 @@ struct PuzzleQueueView: View {
     private var selectionSummary: String {
         // Chaque `.label` est une clé française : on la localise via le bundle
         // détourné (comme partout hors `Text`).
-        let parts = [selectedDifficulty?.label, selectedPhase?.label, selectedTheme?.label]
+        let parts = [
+            selectedSource?.label, missedOnly ? "Ratés" : nil,
+            selectedDifficulty?.label, selectedPhase?.label, selectedTheme?.label,
+        ]
             .compactMap { $0 }
             .map { LocalizationController.string($0) }
         return parts.isEmpty
@@ -168,6 +209,7 @@ struct PuzzleQueueView: View {
             .glow(Theme.accent, radius: 12)
         }
         .buttonStyle(.pressable)
+        .accessibilityIdentifier("startPuzzleSession")
     }
 
     /// Bilan : réussite globale et thèmes à travailler (Lot 5.B, exigé par le

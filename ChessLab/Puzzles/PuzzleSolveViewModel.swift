@@ -216,10 +216,19 @@ final class PuzzleSolveViewModel {
 
     // MARK: Validation / progression
 
+    /// Un coup qui MATE est toujours juste, même s'il n'est pas celui de la
+    /// solution enregistrée : beaucoup de positions offrent deux mats au
+    /// dernier coup (Lichess accepte d'ailleurs n'importe lequel), et la
+    /// solution d'un puzzle maison n'est qu'UNE variante du moteur. Le
+    /// compter faux punissait une bonne réponse. Un mat clôt le puzzle même
+    /// s'il restait des coups à la séquence — la partie est finie.
     private func validate(scratch: Board, move: Move) {
         guard currentStep < solutionMoves.count else { return }
 
-        guard move.lan == solutionMoves[currentStep] else {
+        let deliversMate: Bool
+        if case .checkmate = scratch.state { deliversMate = true } else { deliversMate = false }
+
+        guard move.lan == solutionMoves[currentStep] || deliversMate else {
             rejectWrongMove(move)
             return
         }
@@ -230,7 +239,7 @@ final class PuzzleSolveViewModel {
         Haptics.move()
         currentStep += 1
 
-        if currentStep >= solutionMoves.count {
+        if currentStep >= solutionMoves.count || deliversMate {
             finish(success: true)
         } else {
             playForcedReply()
