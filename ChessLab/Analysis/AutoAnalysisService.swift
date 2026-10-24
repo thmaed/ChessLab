@@ -1,4 +1,5 @@
 import ChessKit
+import CStockfishKit
 import Foundation
 import Observation
 import SwiftData
@@ -53,6 +54,37 @@ final class AutoAnalysisService {
 
     private var context: ModelContext?
     private var runner: Task<Void, Never>?
+    /// Écrans qui tiennent le moteur (partie, analyse, laboratoire…). Le process
+    /// moteur est UNIQUE : tant qu'il y en a un, l'analyse automatique attend.
+    private var userLeases = 0
+    private var resumeTask: Task<Void, Never>?
+    /// Échecs par partie : au troisième, on y renonce.
+    private var failures: [String: Int] = [:]
+
+    /// Un écran réserve le moteur : l'analyse automatique s'arrête ET le libère
+    /// avant que l'appelant ne démarre le sien. C'est ce qui évite le conflit
+    /// de la fin de partie, quand l'utilisateur ouvre l'analyse pendant que
+    /// l'arrière-plan travaille encore.
+    func acquireUserEngine() async {
+        userLeases += 1
+        resumeTask?.cancel()
+        guard let running = runner else { return }
+        running.cancel()
+        await running.value
+    }
+
+    /// Le moteur est rendu. La reprise attend un peu : passer d'un écran à
+    /// l'autre (jeu → analyse) rend et reprend le moteur à quelques instants.
+    func releaseUserEngine() {
+        userLeases = max(0, userLeases - 1)
+        guard userLeases == 0 else { return }
+        resumeTask?.cancel()
+        resumeTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(3))
+            guard !Task.isCancelled else { return }
+            self?.startIfPossible()
+        }
+    }
 
     var isRunning: Bool { runner != nil }
 
@@ -85,6 +117,7 @@ final class AutoAnalysisService {
     private var mayRun: Bool {
         AppSettings.shared.autoAnalysisChoice == .on
             && isActive
+            && userLeases == 0
             && !ProcessInfo.processInfo.isLowPowerModeEnabled
             && !ThermalMonitor.shared.isThrottling
     }
@@ -125,31 +158,57 @@ final class AutoAnalysisService {
 
     /// Vrai si la partie est terminée (ou irrécupérable) — faux si interrompue.
     private func analyze(_ job: Job, context: ModelContext) async -> Bool {
-        let viewModel = AnalysisViewModel(source: .pgn(job.pgn))
+        let viewModel = AnalysisViewModel(source: .pgn(job.pgn), isBackground: true)
         let total = max(1, viewModel.moveListRows.count)
         progress = (0, total)
-        // Au plus 10 minutes : une partie de 130 demi-coups en prend 4 sur le
-        // plus lent des téléphones mesurés.
+        // Au plus 10 minutes en tout, et 2 minutes sans le moindre progrès : au
+        // delà, la partie est tenue pour bloquée (moteur muet, par exemple).
         let deadline = Date().addingTimeInterval(600)
+        var lastDone = -1
+        var lastChange = Date()
         var finished = false
-        while Date() < deadline {
-            if Task.isCancelled || !mayRun { break }
-            if viewModel.isEngineUnavailable { finished = true; break }
-            progress = (min(total, viewModel.moveEvaluations.count), total)
-            if viewModel.analysisMetrics != nil {
-                _ = viewModel.persistMetrics(in: context)
-                if let color = job.userColor {
-                    await createPuzzles(from: viewModel, color: color, context: context)
+        var failed = false
+
+        // Annulée (un écran réclame le moteur) : on arrête le view model TOUT DE
+        // SUITE, y compris au milieu des puzzles — sinon il continuerait de
+        // chercher plusieurs secondes derrière le nouvel arrivant.
+        await withTaskCancellationHandler {
+            while Date() < deadline {
+                if Task.isCancelled || !mayRun { break }
+                let done = viewModel.moveEvaluations.count
+                progress = (min(total, done), total)
+                if done != lastDone { lastDone = done; lastChange = Date() }
+                if viewModel.isEngineUnavailable || Date().timeIntervalSince(lastChange) > 120 {
+                    failed = true
+                    break
                 }
-                finished = true
-                break
+                if viewModel.analysisMetrics != nil {
+                    _ = viewModel.persistMetrics(in: context)
+                    if let color = job.userColor {
+                        await createPuzzles(from: viewModel, color: color, context: context)
+                    }
+                    finished = !Task.isCancelled
+                    break
+                }
+                try? await Task.sleep(for: .milliseconds(500))
             }
-            try? await Task.sleep(for: .milliseconds(500))
+        } onCancel: {
+            Task { @MainActor in viewModel.handleViewDisappear() }
         }
-        if !finished, Date() >= deadline { finished = true }   // trop longue : on renonce
+        if Date() >= deadline { failed = true }
         viewModel.handleViewDisappear()
-        // Laisse la file du moteur l'arrêter avant d'en lancer un autre.
-        try? await Task.sleep(for: .milliseconds(800))
+        // Rend le process moteur AVANT de rendre la main : le suivant (un écran
+        // de l'utilisateur, ou la partie suivante) l'attend.
+        for _ in 0..<120 {
+            if !StockfishEngine.isProcessBusy { break }
+            try? await Task.sleep(for: .milliseconds(50))
+        }
+        if failed {
+            let count = (failures[job.id] ?? 0) + 1
+            failures[job.id] = count
+            // Trois échecs : on y renonce, au lieu de réessayer sans fin.
+            return count >= 3
+        }
         return finished
     }
 }

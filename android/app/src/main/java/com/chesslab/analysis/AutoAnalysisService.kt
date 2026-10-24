@@ -14,6 +14,9 @@ import com.chesslab.settings.SettingsStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -34,7 +37,29 @@ import kotlinx.coroutines.launch
  * l'app quitte l'avant-plan (reprise au retour) ; arrêtable à tout moment — ce
  * qui est déjà classé reste sur le disque.
  */
-object AutoAnalysisService {
+object AutoAnalysisService : com.chesslab.engine.EngineService.UserEngineListener {
+
+    init { com.chesslab.engine.EngineService.userListener = this }
+
+    private var resumeJob: Job? = null
+    private val failures = HashMap<String, Int>()
+
+    /** Un écran prend le moteur : on s'arrête et on le rend AVANT qu'il ne démarre le sien. */
+    override suspend fun userWillUse() {
+        resumeJob?.cancel()
+        val running = runner ?: return
+        running.cancelAndJoin()
+    }
+
+    /** Le moteur est rendu ; la reprise attend un peu (on passe d'un écran à l'autre). */
+    override fun userDidFinish() {
+        resumeJob?.cancel()
+        resumeJob = scope.launch {
+            delay(3000)
+            startIfPossible()
+        }
+    }
+
 
     /** Parties en attente (le PGN fait foi d'identité), la première étant en cours. */
     var queue by mutableStateOf<List<AnalysisJob>>(emptyList())
@@ -100,7 +125,8 @@ object AutoAnalysisService {
     private fun mayRun(context: Context): Boolean {
         val power = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         return SettingsStore.state.value.autoAnalysis == "on" &&
-            foreground && !power.isPowerSaveMode && !ThermalMonitor.isThrottling
+            foreground && !power.isPowerSaveMode && !ThermalMonitor.isThrottling &&
+            !com.chesslab.engine.EngineService.isUserActive
     }
 
     private fun startIfPossible() {
@@ -131,18 +157,25 @@ object AutoAnalysisService {
     private suspend fun analyze(application: Application, job: AnalysisJob): Boolean {
         val store = ViewModelStore()
         val viewModel = ViewModelProvider(store, ViewModelProvider.AndroidViewModelFactory(application))[AnalysisViewModel::class.java]
+        // AVANT `load()`, qui lance la revue : son moteur cède le pas à tout écran.
+        viewModel.isBackground = true
         var finished = false
+        var failed = false
         try {
             viewModel.onInputChange(job.pgn)
             viewModel.load()
-            // Au plus 10 minutes : une partie de 130 demi-coups en prend 4 sur
-            // le plus lent des téléphones mesurés.
+            // Au plus 10 minutes en tout, et 2 minutes sans le moindre progrès :
+            // au-delà, la partie est tenue pour bloquée.
             val deadline = System.currentTimeMillis() + 600_000
+            var lastDone = -1
+            var lastChange = System.currentTimeMillis()
             while (System.currentTimeMillis() < deadline) {
                 if (!currentCoroutineContext().isActive || !mayRun(application)) break
                 val ui = viewModel.ui
                 if (ui.error != null) { finished = true; break }
                 progress = ui.reviewDone to maxOf(1, ui.reviewTotal)
+                if (ui.reviewDone != lastDone) { lastDone = ui.reviewDone; lastChange = System.currentTimeMillis() }
+                if (System.currentTimeMillis() - lastChange > 120_000) { failed = true; break }
                 if (ui.summary?.isComplete == true && !ui.reviewing) {
                     // A2 : ses erreurs et ses mats manqués deviennent des puzzles.
                     job.userColor?.let { color ->
@@ -158,13 +191,21 @@ object AutoAnalysisService {
                 }
                 delay(500)
             }
-            if (!finished && System.currentTimeMillis() >= deadline) finished = true   // trop longue : on renonce
+            if (!finished && !failed && System.currentTimeMillis() >= deadline) failed = true
         } finally {
-            // La revue ne s'arrête pas d'elle-même : vider le magasin annule
-            // `viewModelScope`, et la revue sauvegarde ce qu'elle a classé.
-            // Laisser le temps à la sauvegarde du bilan (écrite en E/S).
-            delay(300)
-            store.clear()
+            // Même annulée : vider le magasin annule `viewModelScope`, et la
+            // revue sauvegarde ce qu'elle a classé. Le temps laissé à la
+            // sauvegarde du bilan (écrite en E/S) ne doit pas être coupé.
+            withContext(NonCancellable) {
+                delay(300)
+                store.clear()
+            }
+        }
+        if (failed) {
+            val count = (failures[job.pgn] ?: 0) + 1
+            failures[job.pgn] = count
+            // Trois échecs : on y renonce, au lieu de réessayer sans fin.
+            return count >= 3
         }
         return finished
     }

@@ -73,8 +73,27 @@ actor FairyEngineController {
         EngineInstanceCounter.shared.didCreate()
     }
 
+    /// Réserve le moteur auprès de l'analyse automatique (A1), comme
+    /// ``EngineController`` : un seul process moteur à la fois.
+    private var holdsUserLease = false
+
+    private func takeUserLease() async {
+        guard !holdsUserLease else { return }
+        holdsUserLease = true
+        await AutoAnalysisService.shared.acquireUserEngine()
+    }
+
+    private func giveUserLease() async {
+        guard holdsUserLease else { return }
+        holdsUserLease = false
+        await AutoAnalysisService.shared.releaseUserEngine()
+    }
+
     deinit {
         engine.stop()
+        if holdsUserLease {
+            Task { @MainActor in AutoAnalysisService.shared.releaseUserEngine() }
+        }
         readerTask?.cancel()
         for continuation in responseSubscribers.values { continuation.finish() }
         EngineInstanceCounter.shared.didRelease()
@@ -354,6 +373,7 @@ actor FairyEngineController {
     func start(
         variant: String, variantPath: String? = nil, coreCount: Int? = nil, multipv: Int = 1
     ) async -> Bool {
+        await takeUserLease()
         uciOk = false
         if !engine.isRunning {
             // NOUVELLE instance, systématiquement — c'est le correctif du
@@ -460,6 +480,7 @@ actor FairyEngineController {
         engine.stop()
         readerTask?.cancel()
         readerTask = nil
+        await giveUserLease()
     }
 
     /// Vérifie ``StockfishEngine/isProcessBusy`` (l'AUTRE type de moteur) ET

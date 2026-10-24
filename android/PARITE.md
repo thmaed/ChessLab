@@ -81,6 +81,27 @@ vérification sur appareil, pas après compilation.
       `autoAnalysisPrompt` en build débogable ; iOS : réinitialiser le choix)
       et le bandeau pendant une vraie partie.
 
+### A1 — correctif du conflit avec l'analyse de l'utilisateur — 24/10/2026
+
+Retour de l'iPhone 17 Pro : l'analyse de fond « se bloque à l'avant-dernier coup »
+et gêne l'analyse que l'utilisateur ouvre en fin de partie. Cause : le process
+moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
+(Android) — deux analyses ne peuvent pas coexister.
+- [x] **L'écran de l'utilisateur passe toujours avant.** iOS : tout
+      `EngineController` / `FairyEngineController` « réserve » le moteur à son
+      démarrage (`acquireUserEngine`) ; le service s'arrête, rend le moteur,
+      puis l'écran démarre. Android : `EngineService.use` prévient le service
+      (`userWillUse`) avant de prendre le verrou ; le travail de fond passe
+      `background = true`. Reprise 3 s après la libération du moteur.
+- [x] **Le travail déjà fait n'est pas perdu** (cache disque par coup) : l'écran
+      de l'utilisateur le relit, le service reprend ensuite sur le cache.
+- [x] **Garde-fou contre le blocage** : 2 minutes sans progrès = échec ; moteur
+      indisponible = échec ; trois échecs d'une partie = on y renonce.
+- [x] Tests : `yieldsEngineToUserAnalysisThenResumes` (iOS),
+      `yieldsEngineToUserThenResumes` (Android, Galaxy A16).
+- [ ] À revérifier sur appareil en conditions réelles (fin de partie, tap sur
+      « Analyser » pendant que le fond travaille).
+
 ### A2 de la 2.0 — puzzles automatiques depuis les parties analysées — 24/10/2026
 
 - [x] Quand une partie est analysée, **ses** erreurs (jamais celles de

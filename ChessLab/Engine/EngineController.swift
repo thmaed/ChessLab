@@ -16,6 +16,24 @@ actor EngineController {
 
     private var engine: StockfishEngine
 
+    /// Le contrôleur du service d'analyse AUTOMATIQUE (A1) : il cède le pas à
+    /// tout autre. Le process moteur est unique ; les autres écrans, eux, le
+    /// RÉSERVENT à leur démarrage (voir ``AutoAnalysisService/acquireUserEngine()``).
+    private let isBackground: Bool
+    private var holdsUserLease = false
+
+    private func takeUserLease() async {
+        guard !isBackground, !holdsUserLease else { return }
+        holdsUserLease = true
+        await AutoAnalysisService.shared.acquireUserEngine()
+    }
+
+    private func giveUserLease() async {
+        guard holdsUserLease else { return }
+        holdsUserLease = false
+        await AutoAnalysisService.shared.releaseUserEngine()
+    }
+
     /// Chemin FICTIF dont le DOSSIER (les ressources du bundle) contient les
     /// réseaux `nn-*.nnue` : Stockfish y cherche son réseau, comme un binaire
     /// classique cherche le sien à côté de lui.
@@ -57,8 +75,9 @@ actor EngineController {
     /// Laboratoire, le Duck Chess et le Coup Volé : le même symptôme y est
     /// donc possible, sur un appareil lent ou déjà sollicité. Le cas normal
     /// ne coûte rien de plus, la boucle sort dès `uciok`.
-    init(startTimeoutMs: Int = 15000) {
+    init(startTimeoutMs: Int = 15000, isBackground: Bool = false) {
         self.startTimeoutMs = startTimeoutMs
+        self.isBackground = isBackground
         engine = StockfishEngine()
         EngineInstanceCounter.shared.didCreate()
     }
@@ -76,6 +95,9 @@ actor EngineController {
         // `stop()` de ``StockfishEngine`` est idempotent et ne coupe le process
         // que si CETTE instance le possède.
         engine.stop()
+        if holdsUserLease {
+            Task { @MainActor in AutoAnalysisService.shared.releaseUserEngine() }
+        }
         readerTask?.cancel()
         moveReaderTask?.cancel()
         EngineInstanceCounter.shared.didRelease()
@@ -147,6 +169,7 @@ actor EngineController {
     /// consommateurs et leurs tests restent valides.
     @discardableResult
     func start(coreCount: Int? = nil, multipv: Int = 1) async -> Bool {
+        await takeUserLease()
         if await EngineStartFailureSimulator.shared.consumeFailure() {
             didFailToStart = true
             return false
@@ -262,6 +285,7 @@ actor EngineController {
         engine.stop()
         readerTask?.cancel()
         readerTask = nil
+        await giveUserLease()
         // Le lecteur du Laboratoire aussi : c'est LUI qui faisait fuiter le
         // contrôleur. `ensureMoveReader` crée une tâche qui itère le flux parsé
         // sans fin ; tant qu'elle vit, elle retient l'instance, donc `deinit`

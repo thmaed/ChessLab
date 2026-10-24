@@ -269,6 +269,9 @@ data class AnalysisUiState(
  */
 class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
 
+    /** Vrai pour l'analyse automatique (A1) : son moteur cède le pas à tout écran. */
+    var isBackground = false
+
     private var positions: List<Position> = listOf(Position.standard)
     private var moves: List<Move> = emptyList()
     private var game: Game? = null
@@ -536,7 +539,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             ui = ui.copy(thinking = true)
             val eval = try {
                 withContext(Dispatchers.IO) {
-                    EngineService.use(getApplication()) { e ->
+                    EngineService.use(getApplication(), background = isBackground) { e ->
                         e.send("setoption name MultiPV value 2")
                         rankedEval(e, position)
                     }
@@ -742,7 +745,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         if (ui.retryingEngine) return@launch
         ui = ui.copy(retryingEngine = true)
         EngineService.retry()
-        withContext(Dispatchers.IO) { EngineService.use(getApplication()) { EngineService.identity } }
+        withContext(Dispatchers.IO) { EngineService.use(getApplication(), background = isBackground) { EngineService.identity } }
         ui = ui.copy(retryingEngine = false, engineUnavailable = EngineService.isUnavailable)
         if (!ui.engineUnavailable) evaluate()
     }
@@ -785,7 +788,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             ui = ui.copy(thinking = true)
             try {
                 withContext(Dispatchers.IO) {
-                    EngineService.use(getApplication()) { e ->
+                    EngineService.use(getApplication(), background = isBackground) { e ->
                         e.send("setoption name MultiPV value 3")
                         e.send("position fen $fen")
                         val lines = HashMap<Int, RankedLine>()
@@ -908,7 +911,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             ui = ui.copy(reviewing = true, reviewDone = snapshotPositions.size - missing.size, reviewTotal = snapshotPositions.size)
             try {
                 withContext(Dispatchers.IO) {
-                    EngineService.use(getApplication()) { e ->
+                    EngineService.use(getApplication(), background = isBackground) { e ->
                         e.send("setoption name MultiPV value 2")
                         for (i in missing) {
                             ensureActive()
@@ -1303,7 +1306,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                 val dao = LibraryDatabase.get(getApplication()).ownPuzzles()
 
                 withContext(Dispatchers.IO) {
-                    EngineService.use(getApplication()) { e ->
+                    EngineService.use(getApplication(), background = isBackground) { e ->
                         e.send("setoption name MultiPV value 2")
                         for ((done, i) in candidates.withIndex()) {
                             ensureActive()
@@ -1388,7 +1391,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         }
 
         withContext(Dispatchers.IO) {
-            EngineService.use(getApplication()) { e ->
+            EngineService.use(getApplication(), background = isBackground) { e ->
                 // 1. Les mats manqués.
                 e.send("setoption name MultiPV value 1")
                 val childNodes = com.chesslab.engine.DevicePerformance.classificationNodes(getApplication())
@@ -1501,7 +1504,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                 val childNodes = com.chesslab.engine.DevicePerformance.classificationNodes(getApplication())
                 val childCap = com.chesslab.engine.DevicePerformance.classificationCapMs(getApplication())
                 withContext(Dispatchers.IO) {
-                    EngineService.use(getApplication()) { e ->
+                    EngineService.use(getApplication(), background = isBackground) { e ->
                         e.send("setoption name MultiPV value 1")
                         for (i in snapshotMoves.indices) {
                             ensureActive()

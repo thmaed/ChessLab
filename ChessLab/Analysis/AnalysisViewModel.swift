@@ -322,7 +322,11 @@ final class AnalysisViewModel {
 
     // MARK: Initialisation
 
-    init(source: AnalysisSource) {
+    /// Vrai pour l'analyse automatique (A1) : son moteur cède le pas à tout autre écran.
+    private let isBackground: Bool
+
+    init(source: AnalysisSource, isBackground: Bool = false) {
+        self.isBackground = isBackground
         let newGame: Game
         switch source {
         case let .pgn(pgn):
@@ -387,7 +391,7 @@ final class AnalysisViewModel {
     /// l'écran restait muet — ni éval, ni flèches, ni classification, sans la
     /// moindre explication (voir ``PlayViewModel/startEngine()``).
     private func startEngine() async -> Bool {
-        let controller = EngineController()
+        let controller = EngineController(isBackground: isBackground)
 
         guard await controller.start(
             threads: ThermalMonitor.shared.threads(preferred: AppSettings.recommendedEngineThreads),

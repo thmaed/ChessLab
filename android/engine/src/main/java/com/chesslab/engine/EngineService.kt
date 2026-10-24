@@ -103,7 +103,40 @@ object EngineService {
      */
     fun retry() { failed = false }
 
-    suspend fun <T> use(context: Context, block: suspend (StockfishEngine) -> T): T? =
+    /**
+     * L'analyse automatique (A1) se tient à l'écart de tout écran de l'utilisateur :
+     * un seul moteur, et ce qu'on a sous les yeux passe avant ce qui travaille
+     * en fond. Pendant de `AutoAnalysisService.acquireUserEngine` côté iOS.
+     */
+    interface UserEngineListener {
+        /** Un écran va prendre le moteur : le travail de fond doit s'arrêter et le rendre. */
+        suspend fun userWillUse()
+        /** Plus aucun écran n'utilise le moteur. */
+        fun userDidFinish()
+    }
+
+    @Volatile var userListener: UserEngineListener? = null
+    private val activeUsers = java.util.concurrent.atomic.AtomicInteger(0)
+
+    /** Vrai tant qu'un écran de l'utilisateur tient (ou attend) le moteur. */
+    val isUserActive: Boolean get() = activeUsers.get() > 0
+
+    /**
+     * [background] : le travail de fond (analyse automatique) ; il cède le pas
+     * à tout autre appelant.
+     */
+    suspend fun <T> use(context: Context, background: Boolean = false, block: suspend (StockfishEngine) -> T): T? {
+        if (background) return useLocked(context, block)
+        activeUsers.incrementAndGet()
+        try {
+            userListener?.userWillUse()
+            return useLocked(context, block)
+        } finally {
+            if (activeUsers.decrementAndGet() == 0) userListener?.userDidFinish()
+        }
+    }
+
+    private suspend fun <T> useLocked(context: Context, block: suspend (StockfishEngine) -> T): T? =
         mutex.withLock {
             val e = start(context) ?: return@withLock null
             // La table a pu être rendue au système pendant qu'on était en
