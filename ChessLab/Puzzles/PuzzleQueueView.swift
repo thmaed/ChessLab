@@ -284,8 +284,21 @@ struct PuzzleQueueView: View {
 
     /// Compose le lot avec les critères de l'écran, puis l'ouvre aussitôt.
     private func createWoodpecker() {
-        let puzzles = PuzzleSessionDrawer.sample(matching: currentFilter, count: woodpeckerSize, in: modelContext)
-        guard let plan = WoodpeckerPlan.start(items: puzzles.map(WoodpeckerPlan.Item.init)) else {
+        var items = PuzzleSessionDrawer.sample(matching: currentFilter, count: woodpeckerSize, in: modelContext)
+            .map(WoodpeckerPlan.Item.init)
+        #if DEBUG
+        // Outil de test : un lot CONNU — le mat en deux du couloir, riposte
+        // comprise (Te8+ Txe8 Txe8#) —, pour qu'un test d'interface joue un
+        // cycle entier sans lire l'échiquier. Debug seulement.
+        if CommandLine.arguments.contains("-uiTestWoodpeckerDemo") {
+            items = Array(repeating: WoodpeckerPlan.Item(
+                fen: "r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 23",
+                solutionLANs: ["e3e8", "a8e8", "e1e8"], themeRaw: PuzzleTheme.checkmate.rawValue,
+                phaseRaw: GamePhase.endgame.rawValue
+            ), count: woodpeckerSize)
+        }
+        #endif
+        guard let plan = WoodpeckerPlan.start(items: items) else {
             woodpeckerMessage = LocalizationController.string("Aucun puzzle ne correspond à ces critères.")
             return
         }

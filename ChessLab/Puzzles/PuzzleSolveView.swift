@@ -349,9 +349,6 @@ struct PuzzleSolveView: View {
     @ViewBuilder
     private var resultCard: some View {
         VStack(spacing: 14) {
-            if viewModel.isCycleComplete, let plan = viewModel.plan {
-                WoodpeckerCycleSummary(plan: plan)
-            }
             HStack(spacing: 12) {
                 ZStack {
                     Circle()
@@ -366,6 +363,12 @@ struct PuzzleSolveView: View {
                     .font(.title3.bold())
                     .foregroundStyle(Theme.textPrimary)
                 Spacer()
+            }
+
+            // Le bilan du cycle APRÈS le verdict du dernier puzzle, juste
+            // au-dessus de « Commencer le cycle n+1 » — même ordre qu'Android.
+            if viewModel.isCycleComplete, let plan = viewModel.plan {
+                WoodpeckerCycleSummary(plan: plan)
             }
 
             HStack(spacing: 10) {
@@ -385,6 +388,11 @@ struct PuzzleSolveView: View {
                         Text("Commencer le cycle \(plan.currentCycle.number + 1)")
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(Theme.background)
+                            // Le plus long libellé de la rangée : il touchait
+                            // les bords de sa capsule.
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
+                            .padding(.horizontal, 10)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
                             .background(Theme.accentGradient, in: Capsule())
@@ -403,6 +411,7 @@ struct PuzzleSolveView: View {
                             .glow(Theme.accent, radius: 9)
                     }
                     .buttonStyle(.pressable)
+                    .accessibilityIdentifier("puzzleNext")
                 }
             }
 
