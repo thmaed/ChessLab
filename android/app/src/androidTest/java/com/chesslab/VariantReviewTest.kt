@@ -128,5 +128,75 @@ class VariantReviewTest {
         compose.waitUntil(30_000) { model.ui.plies == 4 && !model.ui.thinking }
         assertEquals(4, model.ui.sanMoves.size)
     }
+
+    /** Duck Chess : un tour = un coup ET la pose du canard. */
+    @Test fun leDuckChessSeConsulteEtSeReprend() {
+        lateinit var model: com.chesslab.variants.DuckChessViewModel
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { model = com.chesslab.variants.DuckChessViewModel(app) }
+        val settings = VariantSettings(blunderAlertEnabled = false, showEvalBar = false)
+        compose.setContent { com.chesslab.variants.DuckChessScreen(settings = settings, model = model) }
+
+        // Le canard bloque des cases au hasard des poses : on joue le premier
+        // coup légal trouvé plutôt qu'un coup fixé d'avance.
+        fun turn(pliesAfterReply: Int) {
+            compose.waitUntil(60_000) { !model.ui.thinking && model.ui.phase == com.chesslab.variants.DuckPhase.movePiece }
+            val mine = model.ui.position.pieces.filter { it.color == model.ui.userColor }.map { it.square }
+            for (from in mine) {
+                InstrumentationRegistry.getInstrumentation().runOnMainSync { model.onSquareTap(from) }
+                val target = model.ui.legalTargets.firstOrNull()
+                if (target != null) {
+                    InstrumentationRegistry.getInstrumentation().runOnMainSync { model.onSquareTap(target) }
+                    break
+                }
+            }
+            compose.waitUntil(10_000) { model.ui.phase == com.chesslab.variants.DuckPhase.placeDuck }
+            val duck = model.ui.duckTargets.first()
+            InstrumentationRegistry.getInstrumentation().runOnMainSync { model.onSquareTap(duck) }
+            compose.waitUntil(90_000) { model.ui.plies == pliesAfterReply && !model.ui.thinking }
+        }
+        turn(2)
+        turn(4)
+
+        compose.onNodeWithTag("precedent").performClick()
+        compose.waitUntil(5_000) { model.ui.review?.ply == 2 }
+        val duckThen = model.ui.review!!.duck
+        compose.onNodeWithTag("reprendre-ici").performClick()
+        compose.waitUntil(30_000) { model.ui.plies == 2 && model.ui.review == null && !model.ui.thinking }
+        assertEquals(duckThen, model.ui.duck)
+        assertEquals(model.ui.userColor, model.ui.position.sideToMove)
+
+        compose.onNodeWithTag("annuler-reprise").performClick()
+        compose.waitUntil(30_000) { model.ui.plies == 4 && !model.ui.thinking }
+    }
+
+    /** Coup Volé : la reprise rejoue la partie jusque-là, jetons compris. */
+    @Test fun leCoupVoleSeConsulteEtSeReprend() {
+        lateinit var model: com.chesslab.variants.StolenMoveViewModel
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { model = com.chesslab.variants.StolenMoveViewModel(app) }
+        val settings = VariantSettings(blunderAlertEnabled = false, showEvalBar = false)
+        compose.setContent { com.chesslab.variants.StolenMoveScreen(settings = settings, model = model) }
+
+        fun move(from: String, to: String, pliesAfterReply: Int) {
+            compose.waitUntil(60_000) { !model.ui.thinking && model.ui.mover == model.ui.userColor }
+            InstrumentationRegistry.getInstrumentation().runOnMainSync {
+                model.onSquareTap(Square(from))
+                model.onSquareTap(Square(to))
+            }
+            compose.waitUntil(90_000) { model.ui.sanMoves.size == pliesAfterReply && !model.ui.thinking }
+        }
+        move("e2", "e4", 2)
+        move("d2", "d4", 4)
+
+        compose.onNodeWithTag("precedent").performClick()
+        compose.waitUntil(5_000) { model.ui.review?.ply == 2 }
+        val positionThen = model.ui.review!!.position.fen
+        compose.onNodeWithTag("reprendre-ici").performClick()
+        compose.waitUntil(30_000) { model.ui.sanMoves.size == 2 && model.ui.review == null && !model.ui.thinking }
+        assertEquals(positionThen, model.ui.position.fen)
+        assertEquals(model.ui.userColor, model.ui.mover)
+
+        compose.onNodeWithTag("annuler-reprise").performClick()
+        compose.waitUntil(30_000) { model.ui.sanMoves.size == 4 && !model.ui.thinking }
+    }
 }
 

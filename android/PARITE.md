@@ -21,7 +21,7 @@ vérification sur appareil, pas après compilation.
 
 ### Variantes contre l'ordinateur : PAS DE CONSULTATION sur Android — relevé le 24/10/2026
 
-- [ ] **Écart (préexistant, jamais inscrit)** : sur iOS, les cinq écrans de
+- [x] **Écart (préexistant, jamais inscrit)** : sur iOS, les cinq écrans de
       variantes contre l'ordinateur (Chess960, variantes Fairy, Barricades &
       co., Coup Volé, Duck Chess) ont la barre de consultation — précédent /
       suivant, « Reprendre ici » hors pendule, annulation huit secondes. Sur
@@ -31,6 +31,15 @@ vérification sur appareil, pas après compilation.
       par coup complet (iOS, 24/10 — `ReviewStepper`, par la FEN, ou par la
       couleur de qui joue pour le tour double du Coup Volé). À porter EN BLOC :
       la barre, puis la même règle de pas.
+      **Porté le 24/10/2026, en bloc** : les trois ViewModels de variantes
+      (`VariantPlayViewModel` — Chess960 et les neuf variantes du moteur —,
+      `DuckChessViewModel`, `StolenMoveViewModel`) ont la consultation, la
+      reprise hors pendule et ses huit secondes d'annulation, et le pas d'un
+      coup complet contre l'ordinateur (demi-coup à deux). Reprises fidèles à
+      iOS : départ + coups gardés pour une variante ordinaire, position
+      consultée pour les Barricades aléatoires, rejeu des coups (jetons
+      compris) pour le Coup Volé, journaux tronqués pour le Duck Chess.
+      `VariantReviewTest` (cinq cas) vert sur Galaxy A16.
 
 ### Consultation contre l'ordinateur : par coup complet — 23/10/2026
 

@@ -60,7 +60,13 @@ fun StolenMoveScreen(
     model: StolenMoveViewModel = viewModel(),
 ) {
     LaunchedEffect(settings) { model.apply(settings) }
-    val ui = model.ui
+    val live = model.ui
+    // En consultation, le plateau montre le coup consulté ; la partie vive
+    // continue dessous.
+    val ui = live.review?.let { r ->
+        live.copy(position = r.position, lastMove = r.lastMove, checkedKing = null,
+            selected = null, legalTargets = emptySet(), hints = emptyList())
+    } ?: live
     var confirmResign by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
@@ -98,7 +104,7 @@ fun StolenMoveScreen(
                 checkedKing = ui.checkedKing,
                 arrows = ui.hints,
                 draggableColor = ui.userColor,
-                enabled = !ui.gameOver && !ui.thinking && ui.mover == ui.userColor,
+                enabled = !ui.gameOver && !ui.thinking && ui.mover == ui.userColor && live.review == null,
                 onSquareTap = model::onSquareTap,
             )
         },
@@ -158,6 +164,18 @@ fun StolenMoveScreen(
             )
 
             Spacer(Modifier.height(8.dp))
+            // La consultation, comme iOS : remonter la partie, et en repartir.
+            VariantReviewBar(
+                undoCount = live.resumeUndoCount,
+                canPrevious = model.canReviewPrevious,
+                canNext = model.canReviewNext,
+                canResume = model.canResumeFromReview,
+                onPrevious = model::reviewPrevious,
+                onNext = model::reviewNext,
+                onResume = model::resumeFromReview,
+                onCancelResume = model::cancelResumeFromReview,
+            )
+            Spacer(Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 ControlButton(
                     Icons.Default.Lightbulb, stringResource(R.string.train_hint),

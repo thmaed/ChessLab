@@ -61,10 +61,22 @@ data class DuckUiState(
     val outcome: String? = null,
     /** Le score au format PGN une fois la partie finie — voir [DuckChessViewModel.exportedPgn]. */
     val pgnResult: String? = null,
+    /** La position CONSULTÉE, `null` sur la position vive — voir [DuckReview]. */
+    val review: DuckReview? = null,
+    /** Coups écartés par « Reprendre ici », qu'on peut encore rendre (8 s). */
+    val resumeUndoCount: Int? = null,
 ) {
     /** La partie est finie : roi pris, abandon, ou drapeau tombé. */
     val gameOver: Boolean get() = winner != null || outcome != null
 }
+
+/** Ce qu'affiche le plateau quand on consulte un tour passé — canard compris. */
+data class DuckReview(
+    val ply: Int,
+    val position: Position,
+    val duck: Square?,
+    val lastMove: Pair<Square, Square>?,
+)
 
 /**
  * Le Duck Chess. Pendant réduit de `DuckChessViewModel.swift`.
@@ -195,6 +207,7 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun newGame() {
+        clearResumeUndo()
         turn?.cancel()
         evalJob?.cancel()
         hintJob?.cancel()
@@ -235,7 +248,7 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun onSquareTap(square: Square) {
-        if (ui.thinking || ui.gameOver) return
+        if (ui.thinking || ui.gameOver || ui.review != null) return
         // À deux, les deux camps passent par les mêmes doigts : le seul
         // interdit est de jouer à la place de la machine.
         if (versusEngine && ui.position.sideToMove != humanColor) return
@@ -272,6 +285,9 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Le déplacement d'une pièce — la moitié d'un tour. */
     private fun play(move: DuckChessRules.Move) {
+        // N'IMPORTE QUEL coup — le moteur compris — invalide l'offre
+        // d'annulation d'une reprise.
+        clearResumeUndo()
         val position = ui.position
         val victim = DuckChessRules.capturesKing(move, position)
         val next = DuckChessFen.applied(move, position)
@@ -361,6 +377,133 @@ class DuckChessViewModel(app: Application) : AndroidViewModel(app) {
             ui = ui.copy(thinking = false)
             if (square != null) placeDuck(square) else ui = ui.copy(status = s(R.string.game_over))
         }
+    }
+
+    // MARK: Consultation (pendant de la barre de consultation d'iOS)
+
+    /** Le tour affiché : celui qu'on consulte, ou la position vive. */
+    val displayedPly: Int get() = ui.review?.ply ?: ui.plies
+
+    /**
+     * Contre l'ordinateur, par coup COMPLET vers les positions du joueur — la
+     * FEN de chaque position dit qui a le trait ; à deux, chaque tour.
+     */
+    private val stepper: com.chesslab.play.ReviewStepper
+        get() = if (versusEngine) com.chesslab.play.ReviewStepper.fromFens(ui.plies, fenLog, humanColor)
+        else com.chesslab.play.ReviewStepper.everyPly(ui.plies)
+
+    val canReviewPrevious: Boolean get() = stepper.previous(displayedPly) != null
+    val canReviewNext: Boolean get() = stepper.next(displayedPly) != null
+
+    fun reviewPrevious() { stepper.previous(displayedPly)?.let(::reviewTo) }
+    fun reviewNext() { stepper.next(displayedPly)?.let(::reviewTo) }
+
+    fun reviewTo(ply: Int) {
+        if (ply < 0 || ply >= ui.plies || ply >= fenLog.size) {
+            ui = ui.copy(review = null)
+            return
+        }
+        val position = Position.fromFen(fenLog[ply]) ?: return
+        ui = ui.copy(
+            selected = null, legalTargets = emptySet(),
+            review = DuckReview(ply, position, duckLog.getOrNull(ply), marksOf(ply)),
+        )
+    }
+
+    /** Le coup qui a mené au tour `ply` : ses deux cases. */
+    private fun marksOf(ply: Int): Pair<Square, Square>? =
+        lanLog.getOrNull(ply - 1)?.takeIf { it.length >= 4 }
+            ?.let { Square(it.substring(0, 2)) to Square(it.substring(2, 4)) }
+
+    /**
+     * La prise en passant ouverte au tour `ply` : seule une poussée double du
+     * coup d'avant en ouvre une. Le journal ne la porte pas — elle s'en déduit.
+     */
+    private fun enPassantAt(ply: Int): Square? {
+        val lan = lanLog.getOrNull(ply - 1) ?: return null
+        val before = fenLog.getOrNull(ply - 1)?.let { Position.fromFen(it) } ?: return null
+        if (lan.length < 4) return null
+        val from = Square(lan.substring(0, 2))
+        val to = Square(lan.substring(2, 4))
+        if (before.piece(from)?.kind != Piece.Kind.pawn || abs(to.rank.value - from.rank.value) != 2) return null
+        return Square("${from.file.letter}${(to.rank.value + from.rank.value) / 2}")
+    }
+
+    /**
+     * Peut-on repartir du tour consulté ? Mêmes garde-fous qu'iOS : pas de
+     * pendule, partie en cours, moteur au repos — et un tour ENTIER (pas
+     * entre le coup et la pose du canard).
+     */
+    val canResumeFromReview: Boolean
+        get() {
+            val review = ui.review ?: return false
+            return !ui.settings.timeControl.hasClock && !ui.gameOver && !ui.thinking &&
+                ui.phase == DuckPhase.movePiece && review.ply < ui.plies
+        }
+
+    private data class Snapshot(
+        val fens: List<String>, val ducks: List<Square?>, val lans: List<String>, val sans: List<String>,
+    )
+
+    private var snapshot: Snapshot? = null
+    private var undoJob: Job? = null
+
+    /** Repart du tour CONSULTÉ : la suite est écartée, huit secondes pour se raviser. */
+    fun resumeFromReview() {
+        if (!canResumeFromReview) return
+        val ply = ui.review?.ply ?: return
+        snapshot = Snapshot(fenLog.toList(), duckLog.toList(), lanLog.toList(), sanLog.toList())
+        val discarded = ui.plies - ply
+        truncateTo(ply)
+        ui = ui.copy(resumeUndoCount = discarded)
+        undoJob?.cancel()
+        undoJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(8_000)
+            clearResumeUndo()
+        }
+    }
+
+    /** Rend les tours que « Reprendre ici » venait d'écarter. */
+    fun cancelResumeFromReview() {
+        val saved = snapshot ?: return
+        if (ui.gameOver || ui.thinking) return
+        clearResumeUndo()
+        fenLog.clear(); fenLog.addAll(saved.fens)
+        duckLog.clear(); duckLog.addAll(saved.ducks)
+        lanLog.clear(); lanLog.addAll(saved.lans)
+        sanLog.clear(); sanLog.addAll(saved.sans)
+        restoreLive(saved.fens.size - 1)
+    }
+
+    private fun truncateTo(ply: Int) {
+        turn?.cancel()
+        hintJob?.cancel()
+        fenLog.subList(ply + 1, fenLog.size).clear()
+        duckLog.subList(ply + 1, duckLog.size).clear()
+        lanLog.subList(ply, lanLog.size).clear()
+        sanLog.subList(minOf(ply, sanLog.size), sanLog.size).clear()
+        restoreLive(ply)
+    }
+
+    /** Recale la position vive sur la DERNIÈRE ligne des journaux. Pendant de `restoreLiveState`. */
+    private fun restoreLive(ply: Int) {
+        val position = Position.fromFen(fenLog[ply]) ?: return
+        enPassant = enPassantAt(ply)
+        ui = ui.copy(
+            position = position, duck = duckLog[ply], plies = ply, phase = DuckPhase.movePiece,
+            winner = null, outcome = null, pgnResult = null, review = null, thinking = false,
+            selected = null, legalTargets = emptySet(), duckTargets = emptySet(),
+            lastMove = marksOf(ply), hints = emptyList(), blunderWarning = null,
+            status = if (position.sideToMove == engineColor) s(R.string.engine_thinking) else s(R.string.your_turn),
+        )
+        refreshLegal()
+        if (versusEngine && position.sideToMove == engineColor) engineTurn() else afterHumanTurnStarts()
+    }
+
+    private fun clearResumeUndo() {
+        undoJob?.cancel()
+        snapshot = null
+        if (ui.resumeUndoCount != null) ui = ui.copy(resumeUndoCount = null)
     }
 
     // MARK: Aides

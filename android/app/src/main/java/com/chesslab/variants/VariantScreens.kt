@@ -365,7 +365,7 @@ fun VariantPlayScreen(
             Spacer(Modifier.height(4.dp))
             // La consultation, comme iOS : remonter la partie, et en repartir.
             VariantReviewBar(
-                ui = live,
+                undoCount = live.resumeUndoCount,
                 canPrevious = model.canReviewPrevious,
                 canNext = model.canReviewNext,
                 canResume = model.canResumeFromReview,
@@ -614,12 +614,14 @@ private fun VariantControlBar(
 /**
  * Précédent / suivant, et « Reprendre ici » en consultation — pendant de la
  * barre de consultation d'iOS (`PlayControlBar`) sur ses écrans de variantes.
+ * Commune aux trois écrans : variantes du moteur, Duck Chess, Coup Volé.
  * Contre l'ordinateur, les flèches vont par coup complet, vers les positions
  * du joueur.
  */
 @Composable
-private fun VariantReviewBar(
-    ui: VariantUiState,
+internal fun VariantReviewBar(
+    /** Coups écartés qu'on peut encore rendre, `null` sans offre d'annulation. */
+    undoCount: Int?,
     canPrevious: Boolean,
     canNext: Boolean,
     canResume: Boolean,
@@ -653,7 +655,7 @@ private fun VariantReviewBar(
         }
         // Huit secondes pour se raviser : la reprise écarte des coups sans
         // rien demander, mais elle ne les jette pas tout de suite.
-        if (ui.resumeUndoCount != null) {
+        if (undoCount != null) {
             Spacer(Modifier.width(10.dp))
             Text(
                 stringResource(R.string.play_resume_undo),

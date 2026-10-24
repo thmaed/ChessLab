@@ -53,12 +53,23 @@ data class StolenMoveUiState(
     val blunderWarning: com.chesslab.play.BlunderSeverity? = null,
     /** Le moteur vient de refuser la nulle — l'écran le dit, puis l'efface. */
     val drawDeclined: Boolean = false,
+    /** La position CONSULTÉE, `null` sur la position vive. */
+    val review: StolenReview? = null,
+    /** Coups écartés par « Reprendre ici », qu'on peut encore rendre (8 s). */
+    val resumeUndoCount: Int? = null,
 ) {
     /** Celui à qui appartient VRAIMENT le trait : le tour double le garde. */
     val mover: Piece.Color get() = awaitingSecondMoveBy ?: position.sideToMove
 
     val gameOver: Boolean get() = outcome != null
 }
+
+/** Ce qu'affiche le plateau quand on consulte un coup passé. */
+data class StolenReview(
+    val ply: Int,
+    val position: Position,
+    val lastMove: Pair<Square, Square>?,
+)
 
 /**
  * Le Coup Volé. Pendant réduit de `StolenMovePlayViewModel.swift`.
@@ -139,6 +150,7 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
     fun analysisSans(): List<String> = ui.sanMoves.toList()
 
     fun newGame() {
+        clearResumeUndo()
         turn?.cancel()
         evalJob?.cancel()
         hintJob?.cancel()
@@ -201,7 +213,7 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
     val canSpendNow: Boolean get() = canSpend()
 
     fun onSquareTap(square: Square) {
-        if (ui.outcome != null || ui.thinking || ui.mover != humanColor) return
+        if (ui.outcome != null || ui.thinking || ui.mover != humanColor || ui.review != null) return
         val playable = interactionBoard()
 
         val selected = ui.selected
@@ -224,6 +236,8 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Joue un coup et fait avancer le tour. Rend `false` si le coup est refusé. */
     private fun commit(from: Square, to: Square): Boolean {
+        // N'IMPORTE QUEL coup invalide l'offre d'annulation d'une reprise.
+        clearResumeUndo()
         val mover = ui.mover
         val second = ui.awaitingSecondMoveBy != null
         val working = if (second) interactionBoard() else board
@@ -362,6 +376,112 @@ class StolenMoveViewModel(app: Application) : AndroidViewModel(app) {
             return false
         }
         return commit(Square(best.substring(0, 2)), Square(best.substring(2, 4)))
+    }
+
+    // MARK: Consultation (pendant de la barre de consultation d'iOS)
+
+    /** Le demi-coup affiché : celui qu'on consulte, ou la position vive. */
+    val displayedPly: Int get() = ui.review?.ply ?: lanLog.size
+
+    /**
+     * Par coup COMPLET vers les positions du joueur. Le journal enregistre la
+     * position d'où part le coup SUIVANT, trait rendu à qui doit rejouer
+     * pendant un tour double : sa FEN dit donc exactement qui joue — la parité,
+     * elle, se tromperait au milieu d'un tour double.
+     */
+    private val stepper: com.chesslab.play.ReviewStepper
+        get() = com.chesslab.play.ReviewStepper.fromFens(lanLog.size, fenLog, humanColor)
+
+    val canReviewPrevious: Boolean get() = stepper.previous(displayedPly) != null
+    val canReviewNext: Boolean get() = stepper.next(displayedPly) != null
+
+    fun reviewPrevious() { stepper.previous(displayedPly)?.let(::reviewTo) }
+    fun reviewNext() { stepper.next(displayedPly)?.let(::reviewTo) }
+
+    fun reviewTo(ply: Int) {
+        if (ply < 0 || ply >= lanLog.size || ply >= fenLog.size) {
+            ui = ui.copy(review = null)
+            return
+        }
+        val position = FenParser.parse(fenLog[ply]) ?: return
+        val marks = lanLog.getOrNull(ply - 1)?.let { Square(it.substring(0, 2)) to Square(it.substring(2, 4)) }
+        ui = ui.copy(selected = null, legalTargets = emptySet(), review = StolenReview(ply, position, marks))
+    }
+
+    /** Mêmes garde-fous qu'iOS : pas de pendule, partie en cours, moteur au repos. */
+    val canResumeFromReview: Boolean
+        get() {
+            val review = ui.review ?: return false
+            return !ui.settings.timeControl.hasClock && ui.outcome == null && !ui.thinking && review.ply < lanLog.size
+        }
+
+    private var undoLans: List<String>? = null
+    private var undoSpends: List<Boolean>? = null
+    private var undoJob: Job? = null
+
+    /**
+     * Repart du coup CONSULTÉ. L'état d'un tour double — jetons, camp qui doit
+     * rejouer, prise en passant gardée — ne se lit sur aucune FEN : on REJOUE
+     * donc la partie jusque-là, dépenses de jeton comprises. C'est le même
+     * chemin que les coups joués, donc le même état, sans rien à recalculer.
+     */
+    fun resumeFromReview() {
+        if (!canResumeFromReview) return
+        val ply = ui.review?.ply ?: return
+        val lans = lanLog.toList()
+        val spends = tokenSpendLog.toList()
+        replay(lans.take(ply), spends.take(ply))
+        undoLans = lans
+        undoSpends = spends
+        ui = ui.copy(resumeUndoCount = lans.size - ply)
+        undoJob?.cancel()
+        undoJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(8_000)
+            clearResumeUndo()
+        }
+    }
+
+    /** Rend les coups que « Reprendre ici » venait d'écarter. */
+    fun cancelResumeFromReview() {
+        val lans = undoLans ?: return
+        val spends = undoSpends ?: return
+        if (ui.outcome != null || ui.thinking) return
+        clearResumeUndo()
+        replay(lans, spends)
+    }
+
+    /** Repart du départ et rejoue [lans] — chaque coup avec sa dépense de jeton. */
+    private fun replay(lans: List<String>, spends: List<Boolean>) {
+        turn?.cancel()
+        evalJob?.cancel()
+        hintJob?.cancel()
+        board = Board()
+        movesPlayed = HashMap()
+        enPassantAtTurnStart = null
+        fenLog.clear()
+        lanLog.clear()
+        tokenSpendLog.clear()
+        fenLog += board.position.fen
+        ui = ui.copy(
+            position = board.position, sanMoves = emptyList(),
+            tokens = mapOf(Piece.Color.white to 0, Piece.Color.black to 0),
+            awaitingSecondMoveBy = null, wantsToSpend = false, outcome = null, pgnResult = null,
+            review = null, thinking = false, hints = emptyList(), blunderWarning = null,
+            lastMove = null, checkedKing = null, selected = null, legalTargets = emptySet(),
+        )
+        for ((i, lan) in lans.withIndex()) {
+            if (lan.length < 4) break
+            ui = ui.copy(wantsToSpend = spends.getOrElse(i) { false })
+            if (!commit(Square(lan.substring(0, 2)), Square(lan.substring(2, 4)))) break
+        }
+        if (ui.outcome == null && ui.mover == engineColor) engineTurn() else afterHumanTurnStarts()
+    }
+
+    private fun clearResumeUndo() {
+        undoJob?.cancel()
+        undoLans = null
+        undoSpends = null
+        if (ui.resumeUndoCount != null) ui = ui.copy(resumeUndoCount = null)
     }
 
     // MARK: Aides

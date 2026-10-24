@@ -73,7 +73,13 @@ fun DuckChessScreen(
     model: DuckChessViewModel = viewModel(),
 ) {
     LaunchedEffect(settings) { model.apply(settings) }
-    val ui = model.ui
+    val live = model.ui
+    // En consultation, le plateau — canard compris — montre le tour consulté ;
+    // la partie vive continue dessous.
+    val ui = live.review?.let { r ->
+        live.copy(position = r.position, duck = r.duck, lastMove = r.lastMove, selected = null,
+            legalTargets = emptySet(), duckTargets = emptySet(), hints = emptyList())
+    } ?: live
     var confirmResign by remember { mutableStateOf(false) }
 
     DisposableEffect(Unit) {
@@ -112,7 +118,7 @@ fun DuckChessScreen(
                 duck = ui.duck,
                 arrows = ui.hints,
                 draggableColor = ui.position.sideToMove,
-                enabled = !ui.thinking && !ui.gameOver,
+                enabled = !ui.thinking && !ui.gameOver && live.review == null,
                 onSquareTap = model::onSquareTap,
             )
         },
@@ -128,6 +134,18 @@ fun DuckChessScreen(
                 pluralStringResource(R.plurals.variant_halfmoves, ui.plies, ui.plies),
                 fontSize = 11.sp, color = Palette.textTertiary,
                 modifier = Modifier.testTag("compteur"),
+            )
+            Spacer(Modifier.height(6.dp))
+            // La consultation, comme iOS : remonter la partie, et en repartir.
+            VariantReviewBar(
+                undoCount = live.resumeUndoCount,
+                canPrevious = model.canReviewPrevious,
+                canNext = model.canReviewNext,
+                canResume = model.canResumeFromReview,
+                onPrevious = model::reviewPrevious,
+                onNext = model::reviewNext,
+                onResume = model::resumeFromReview,
+                onCancelResume = model::cancelResumeFromReview,
             )
             Spacer(Modifier.height(6.dp))
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
