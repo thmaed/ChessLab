@@ -58,6 +58,29 @@ vérification sur appareil, pas après compilation.
       unique, déjà cohérente d'un écran à l'autre : le grand titre y demande une
       `LargeTopAppBar` qui se réduit au défilement, à décider avec C4.
 
+### A1 de la 2.0 — analyse automatique des parties — 24/10/2026
+
+- [x] **Service sans écran** (`AutoAnalysisService` des deux côtés) : file de
+      parties, UNE à la fois, par le même `AnalysisViewModel` que l'écran
+      d'analyse (mêmes verdicts) ; le bilan est recopié dans la partie
+      enregistrée. Déclenché à la fin d'une partie contre l'ordinateur
+      (standard seulement) si l'utilisateur l'a accepté.
+- [x] **Garde-fous identiques** : rien sans accord ; rien en économie d'énergie
+      ni appareil bridé ; interrompu en arrière-plan, repris au retour ;
+      arrêtable (bandeau « Analyse de votre partie en cours », « Arrêter »).
+- [x] **Proposition à l'accueil**, une fois, après la visite guidée (« Activer »
+      / « Plus tard » / « Non merci ») ; réglage « Analyser mes parties
+      automatiquement » dans Réglages. Local à l'appareil, hors iCloud.
+- [x] Tests : `AutoAnalysisServiceTests` (iOS, moteur réel) et
+      `AutoAnalysisServiceTest` (Android, Galaxy A16), verts.
+- [ ] **Écart assumé pour l'instant** : ni `BGProcessingTask` (iOS) ni service
+      de premier plan (Android) — l'analyse s'arrête quand l'app quitte
+      l'avant-plan, des DEUX côtés (donc pas de divergence). À décider après
+      mesure de batterie réelle (S1 : non mesurée, USB).
+- [ ] **À vérifier sur appareil** : la proposition (Android : extra d'intent
+      `autoAnalysisPrompt` en build débogable ; iOS : réinitialiser le choix)
+      et le bandeau pendant une vraie partie.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

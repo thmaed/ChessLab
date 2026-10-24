@@ -40,6 +40,7 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VolumeUp
@@ -202,6 +203,32 @@ fun SettingsScreen(
                 stringResource(R.string.settings_puzzle_attempts_note),
                 fontSize = 11.sp, color = Palette.textTertiary,
             )
+        }
+
+        SettingsSection(stringResource(R.string.settings_analysis), Icons.Default.ShowChart) {
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .testTag("auto_analysis_toggle")
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Palette.surface)
+                    .clickable {
+                        SettingsStore.setAutoAnalysis(context, if (settings.autoAnalysis == "on") "off" else "on")
+                    }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Switch(
+                    checked = settings.autoAnalysis == "on",
+                    onCheckedChange = { SettingsStore.setAutoAnalysis(context, if (it) "on" else "off") },
+                    colors = com.chesslab.ui.chessLabSwitchColors(),
+                )
+                Spacer(Modifier.width(10.dp))
+                Column {
+                    Text(stringResource(R.string.auto_analysis_setting), fontSize = 13.sp, color = Palette.textPrimary)
+                    Text(stringResource(R.string.auto_analysis_setting_note), fontSize = 10.sp, color = Palette.textTertiary)
+                }
+            }
         }
 
         // Sons et vibrations dans la MÊME section, comme iOS : ce sont les

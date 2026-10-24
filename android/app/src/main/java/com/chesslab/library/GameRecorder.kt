@@ -121,5 +121,9 @@ class GameRecorder(startingPosition: Position = Position.standard) {
             engineColor = engineColor?.let { if (it == Piece.Color.white) "white" else "black" },
         )
         scope.launch { LibraryDatabase.get(context).games().insert(record) }
+        // A1 : la partie contre l'ordinateur rejoint la file d'analyse (si l'utilisateur l'a voulu).
+        if (source == "engine" && variant == null) {
+            kotlinx.coroutines.MainScope().launch { com.chesslab.analysis.AutoAnalysisService.enqueue(context, exported) }
+        }
     }
 }

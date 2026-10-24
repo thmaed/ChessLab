@@ -47,6 +47,7 @@ import com.chesslab.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.LaunchedEffect
 import com.chesslab.discovery.DiscoveryAnchors
+import com.chesslab.ui.AutoAnalysisHost
 import com.chesslab.discovery.DiscoveryDestination
 import com.chesslab.discovery.DiscoveryTourController
 import com.chesslab.discovery.DiscoveryTourMemory
@@ -392,6 +393,7 @@ private fun App() {
     }
     // Par-dessus les écrans ET leurs barres : à la racine, pas dans un écran.
     DiscoveryTourOverlay(tour, anchors)
+    AutoAnalysisHost(tour)
     }
 }
 

@@ -22392,6 +22392,86 @@
           }
         }
       }
+    },
+    "Analyser vos parties automatiquement ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyze your games automatically?"
+          }
+        }
+      }
+    },
+    "Activer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on"
+          }
+        }
+      }
+    },
+    "Plus tard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Later"
+          }
+        }
+      }
+    },
+    "Après chaque partie contre l'ordinateur, ChessLab peut l'analyser en tâche de fond, sur l'appareil : environ 1 à 3 minutes par partie, avec un peu de batterie. Interrompu en économie d'énergie ou si l'appareil chauffe. Modifiable dans les Réglages.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After each game against the computer, ChessLab can analyze it in the background, on your device: about 1 to 3 minutes per game, using some battery. Paused in Low Power Mode or when the device gets hot. You can change this in Settings."
+          }
+        }
+      }
+    },
+    "Analyse de votre partie en cours": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyzing your game"
+          }
+        }
+      }
+    },
+    "%lld / %lld coups": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld / %lld moves"
+          }
+        }
+      }
+    },
+    "Analyser mes parties automatiquement": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyze my games automatically"
+          }
+        }
+      }
+    },
+    "Après chaque partie contre l'ordinateur, sur l'appareil, en tâche de fond : environ 1 à 3 minutes et un peu de batterie. Interrompu en économie d'énergie ou si l'appareil chauffe.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After each game against the computer, on your device, in the background: about 1 to 3 minutes and some battery. Paused in Low Power Mode or when the device gets hot."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

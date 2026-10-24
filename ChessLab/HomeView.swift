@@ -354,6 +354,7 @@ struct HomeView: View {
         // Injecté AUTOUR du `Group`, donc au-dessus de la branche : le coffre
         // appartient à `HomeView`, que la bascule d'ossature n'atteint pas.
         .environment(\.sessionStore, sessionStore)
+        .autoAnalysisHost()
         .environment(\.discoveryTour, discoveryTour)
         // L'overlay vit à la RACINE : monté sur le Group, il dessine
         // par-dessus la barre latérale, la pile ET leurs barres — pas dans

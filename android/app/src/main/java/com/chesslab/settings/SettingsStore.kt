@@ -48,6 +48,11 @@ data class AppSettings(
      * comment signer ses parties ; porté ici par la règle des deux apps.
      */
     val playerName: String = "",
+    /**
+     * Analyse automatique des parties (A1, 2.0) : "undecided" (l'accueil la
+     * propose), "on" ou "off". Reste local à l'appareil : un coût de batterie.
+     */
+    val autoAnalysis: String = "undecided",
 )
 
 /** La langue dans laquelle un coup s'écrit. Pendant de `PieceNotation`. */
@@ -72,6 +77,7 @@ object SettingsStore {
     private val keyNotation = stringPreferencesKey("pieceNotation")
     private val keyArrowMode = stringPreferencesKey("analysisArrowMode")
     private val keyPlayerName = stringPreferencesKey("playerName")
+    private val keyAutoAnalysis = stringPreferencesKey("autoAnalysis")
 
     /** Longueur maximale retenue pour le nom du joueur, comme sur iOS. */
     const val PLAYER_NAME_MAX_LENGTH = 40
@@ -108,6 +114,7 @@ object SettingsStore {
                     else PieceNotation.french,
                     analysisArrowMode = prefs[keyArrowMode] ?: "best",
                     playerName = sanitizedPlayerName(prefs[keyPlayerName] ?: ""),
+                    autoAnalysis = prefs[keyAutoAnalysis] ?: "undecided",
                 )
             }.collect { _state.value = it }
         }
@@ -126,6 +133,12 @@ object SettingsStore {
     fun setHaptics(context: Context, on: Boolean) = update(context) { it[keyHaptics] = on }
     fun setPieceNotation(context: Context, notation: PieceNotation) =
         update(context) { it[keyNotation] = notation.name }
+    /** Pose le choix ("on" / "off"), en mémoire TOUT DE SUITE : le service le relit aussitôt. */
+    fun setAutoAnalysis(context: Context, choice: String) {
+        _state.value = _state.value.copy(autoAnalysis = choice)
+        update(context) { it[keyAutoAnalysis] = choice }
+        com.chesslab.analysis.AutoAnalysisService.settingChanged()
+    }
     fun setArrowMode(context: Context, mode: String) = update(context) { it[keyArrowMode] = mode }
 
     /**
