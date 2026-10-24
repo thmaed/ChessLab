@@ -177,7 +177,20 @@ Progression, B3 dans le choix de séance des puzzles (un chip « À mon niveau �
 
 ---
 
-## 5. Décisions à prendre (avant tout code)
+## 5. Décisions
+
+**Tranchées le 24/10/2026** (« tout OK pour ta proposition ») :
+1. Analyse automatique **proposée au premier lancement de la 2.0**, avec une
+   phrase claire sur la batterie — pas de défaut silencieux.
+2. B1 utilise le niveau saisi à la création d'une partie (`PlayerLevel`) tant
+   que le niveau estimé n'existe pas.
+3. **B2 ne sort que si l'essai S2 le valide.**
+4. Pas de notification de rappel.
+5. Noms : « Coach » (B1) et « Séance du jour » (A5).
+6. Démarrage immédiat de **S1, S2 et B3**.
+7. **Ajout du volet C** (revue de l'interface) — voir §8.
+
+Les points d'origine, pour mémoire :
 
 1. **Analyse automatique : activée par défaut, ou à activer ?** Je recommande
    *à activer au premier lancement de la 2.0*, avec une phrase claire sur la
@@ -212,6 +225,8 @@ Essais techniques d'abord, parce qu'ils peuvent changer le périmètre :
 | **A5** | Séance du jour + série | A2, A3 | iOS, Android |
 | **V** | Aide, nouveautés, captures, schéma CloudKit, soumissions | tout | iOS, Android |
 
+| **C** | Revue de l'interface : menus modernisés, plus colorés et attractifs | audit, puis lots | iOS, Android |
+
 **Chemin critique** : S1 → A1 → (A2 ‖ B1 ‖ A3 ‖ A4) → A5 → V. B3 peut avancer
 dès maintenant, indépendamment, et c'est le meilleur premier lot : il est
 **petit, sans risque, et déjà utile à la 1.10**.
@@ -237,3 +252,26 @@ mes dernières parties »), et le plan tient encore, en moins automatique. Si S2
 > révisions, et ChessLab vous dit où vous perdez des points — et si c'est une
 > erreur que votre niveau fait souvent. Séance du jour en un bouton. Toujours
 > sans compte, sans réseau, sans pub.
+
+---
+
+## 8. Volet C — Revue de l'interface
+
+**Demande (24/10)** : voir s'il est possible de **moderniser les menus et les
+rendre plus attractifs et colorés**.
+
+Méthode, en trois temps, pour ne rien redessiner à l'aveugle :
+1. **Audit** : une capture de chaque écran principal, sur iPhone et Android,
+   puis un relevé de ce qui est déjà cohérent (le thème sombre, les teintes par
+   mode, les pastilles colorées des puzzles) et de ce qui est terne ou daté.
+   Livrable : un document d'audit illustré, avec des propositions classées par
+   effet / coût.
+2. **Maquettes** des deux ou trois changements les plus rentables, à valider
+   avant de les coder.
+3. **Réalisation** par lots, iOS d'abord, Android dans le même chantier.
+
+Garde-fous : conserver le sens des couleurs (vert de la revue, gris de
+l'analyse en direct, rouge translucide de la menace) ; respecter les Human
+Interface Guidelines (contrastes, Dynamic Type, cibles de 44 pt) ; ne rien
+casser pour les 21 tests d'interface qui dépendent des identifiants
+d'accessibilité.
