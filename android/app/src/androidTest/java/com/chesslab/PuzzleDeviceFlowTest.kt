@@ -3,7 +3,9 @@ package com.chesslab
 import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
@@ -170,4 +172,32 @@ class PuzzleDeviceFlowTest {
 
     private fun mutableFilter(initial: PuzzleFilter) =
         androidx.compose.runtime.mutableStateOf(initial)
+
+    /**
+     * Un thème LONG avec ses deux pastilles : « ATTAQUE À LA DÉCOUVERTE »,
+     * « Débutant », « Milieu de partie ». La ligne débordait, le score s'y
+     * écrivait une lettre par ligne et l'en-tête prenait la moitié de l'écran :
+     * plateau en bas, essais et indice hors champ (Galaxy A16, 24/10/2026).
+     */
+    @Test fun unThemeLongNeRepoussePasLePlateau() {
+        val model = makeModel()
+        val filter = PuzzleFilter(
+            difficulty = com.chesslab.puzzles.DifficultyTier.beginner,
+            phase = com.chesslab.puzzles.GamePhase.middlegame,
+            theme = com.chesslab.puzzles.PuzzleThemeKind.discoveredAttack,
+        )
+        compose.setContent { PuzzleScreen(filter = filter, model = model) }
+        compose.waitUntil(90_000) { model.ui.puzzle?.theme == "discoveredAttack" && !model.ui.loading }
+        compose.waitForIdle()
+
+        val screenHeight = compose.onRoot().fetchSemanticsNode().boundsInRoot.height
+        // Le HAUT du plateau : a8 aux Blancs, h1 aux Noirs (plateau retourné).
+        val boardTop = minOf(
+            compose.onNodeWithTag("case-a8").fetchSemanticsNode().boundsInRoot.top,
+            compose.onNodeWithTag("case-h1").fetchSemanticsNode().boundsInRoot.top,
+        )
+        assertTrue("le plateau commence trop bas : $boardTop sur $screenHeight", boardTop < screenHeight * 0.3f)
+        compose.onNodeWithTag("indice").assertIsDisplayed()
+    }
 }
+

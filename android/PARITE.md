@@ -7,6 +7,18 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Puzzles Android : l'en-tête qui repoussait le plateau — 24/10/2026
+
+- [x] **Signalé par l'utilisateur sur le Galaxy** : un puzzle « Attaque à la
+      découverte · Débutant · Milieu de partie » s'affichait avec l'en-tête sur
+      la moitié de l'écran, le plateau en bas, essais et indice hors champ. La
+      ligne de contexte (une `Row`) débordait. Elle passe désormais à la ligne
+      (`FlowRow`). `PuzzleDeviceFlowTest.unThemeLongNeRepoussePasLePlateau`,
+      vert sur Galaxy A16. iOS n'a pas ce défaut (une ligne, texte réductible).
+- [x] **La version de test s'appelle « ChessLab test »** sur l'appareil : sous
+      le même nom que celle du Play Store, deux icônes identiques — on
+      vérifiait les nouveautés dans la mauvaise.
+
 ### Variantes contre l'ordinateur : PAS DE CONSULTATION sur Android — relevé le 24/10/2026
 
 - [ ] **Écart (préexistant, jamais inscrit)** : sur iOS, les cinq écrans de

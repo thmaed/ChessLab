@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      La version de DÉBOGAGE (com.maeder.chesslab.debug) s'installe à côté de
+      celle du Play Store : sous le même nom, deux icônes « ChessLab »
+      identiques — et l'on vérifiait les nouveautés dans la mauvaise
+      (24/10/2026). Ce nom ne vaut que pour le débogage.
+    -->
+    <string name="app_name" translatable="false">ChessLab test</string>
+</resources>

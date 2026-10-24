@@ -297,6 +297,7 @@ private fun Puce(label: String, selected: Boolean, tag: String, onClick: () -> U
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Header(ui: PuzzleUiState) {
     Column(
@@ -320,13 +321,19 @@ private fun Header(ui: PuzzleUiState) {
             )
         }
         val puzzle = ui.puzzle ?: return@Column
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(7.dp),
-            verticalAlignment = Alignment.CenterVertically,
+        // Une ligne qui PASSE À LA LIGNE, pas une `Row` : avec un thème long
+        // (« ATTAQUE À LA DÉCOUVERTE ») et deux pastilles, la `Row` débordait,
+        // écrasait le score à quelques pixels — il s'écrivait alors une lettre
+        // par ligne et l'en-tête prenait la moitié de l'écran, poussant le
+        // plateau en bas et les essais hors champ (Galaxy A16, 24/10/2026).
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterHorizontally),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             Text(
                 stringResource(puzzle.themeLabel).uppercase(),
                 fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Palette.accent,
+                maxLines = 1,
             )
             // Le PALIER, pas la cote brute : « Confirmé » se lit, « 1 742 » se
             // décode. Quatre paliers, quatre couleurs, du vert au rose — c'est
@@ -345,7 +352,7 @@ private fun Header(ui: PuzzleUiState) {
             if (ui.woodpeckerPlan == null) {
                 Text(
                     stringResource(R.string.puzzle_score, ui.solvedCount, ui.attemptedCount),
-                    fontSize = 12.sp, color = Palette.textSecondary,
+                    fontSize = 12.sp, color = Palette.textSecondary, maxLines = 1,
                     modifier = Modifier.testTag("score"),
                 )
             }
