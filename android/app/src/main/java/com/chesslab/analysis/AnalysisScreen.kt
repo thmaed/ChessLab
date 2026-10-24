@@ -632,6 +632,25 @@ private fun CoachBar(ui: AnalysisUiState) {
                 modifier = Modifier.testTag("explication"),
             )
         }
+        // B1 — le Coach : ce que jouent les humains de votre niveau.
+        ui.displayedInsight?.let { insight ->
+            val line = HumanMoveCoach.sentence(
+                context, insight, quality.isFault, sanText(insight.topMoveSan),
+            )
+            if (line != null) {
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        line,
+                        fontSize = 12.sp, color = Palette.textPrimary, maxLines = 3,
+                        modifier = Modifier.testTag("coachHumain"),
+                    )
+                    Text(
+                        stringResource(R.string.coach_caveat),
+                        fontSize = 10.sp, color = Palette.textSecondary, maxLines = 1,
+                    )
+                }
+            }
+        }
     }
 }
 

@@ -1154,4 +1154,11 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%1$d nouveau puzzle de votre dernière partie</item>
         <item quantity="other">%1$d nouveaux puzzles de votre dernière partie</item>
     </plurals>
+    <string name="coach_less_than_one">moins de 1 %</string>
+    <string name="coach_most_common">Le plus courant : %1$s (%2$s).</string>
+    <string name="coach_typical">Coach · %1$s des joueurs de niveau %2$d jouent ce coup : erreur typique.</string>
+    <string name="coach_accident">Coach · %1$s des joueurs de niveau %2$d jouent ce coup : un accident, pas une habitude.</string>
+    <string name="coach_rare">Coach · coup rare : %1$s des joueurs de niveau %2$d le trouvent.</string>
+    <string name="coach_plain">Coach · %1$s des joueurs de niveau %2$d jouent ce coup.</string>
+    <string name="coach_caveat">D\'après Maia : ce que jouent les humains, pas ce qui est bon.</string>
 </resources>

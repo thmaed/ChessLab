@@ -52,4 +52,19 @@ actor MaiaOpponent {
             win: prediction.win, draw: prediction.draw, loss: prediction.loss
         )
     }
+
+    /// La distribution humaine sur les coups légaux, SANS tirage — pour le
+    /// Coach de l'analyse (``HumanMoveCoach``) : « que jouent les joueurs de ce
+    /// niveau ici ? ». Triée par probabilité décroissante ; vide si aucun coup
+    /// n'est légal.
+    func distribution(
+        history: [Position], board: Board, selfElo: Double, oppoElo: Double
+    ) async throws -> [MaiaCandidate] {
+        let legal = MaiaLegalMoves.moves(in: board)
+        guard !legal.isEmpty else { return [] }
+        let prediction = try await model.predict(
+            tokens: MaiaEncoder.tokens(history: history), selfElo: selfElo, oppoElo: oppoElo
+        )
+        return MaiaPolicy.candidates(logits: prediction.moveLogits, legal: legal)
+    }
 }

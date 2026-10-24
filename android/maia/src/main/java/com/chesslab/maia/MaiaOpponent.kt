@@ -63,6 +63,25 @@ class MaiaOpponent private constructor(private val model: MaiaModel) {
         return Choice(pick.move.uci, candidates, prediction.win, prediction.draw, prediction.loss)
     }
 
+    /**
+     * La distribution humaine sur les coups légaux, SANS tirage — pour le
+     * Coach de l'analyse (`HumanMoveCoach`). Triée par probabilité décroissante ;
+     * vide si aucun coup n'est légal, `null` si le réseau refuse.
+     */
+    fun distribution(
+        history: List<Position>,
+        board: Board,
+        selfElo: Double,
+        oppoElo: Double,
+    ): List<MaiaCandidate>? {
+        val legal = MaiaLegalMoves.moves(board)
+        if (legal.isEmpty()) return emptyList()
+        val prediction = runCatching {
+            model.predict(MaiaEncoder.tokens(history), selfElo, oppoElo)
+        }.getOrNull() ?: return null
+        return MaiaPolicy.candidates(prediction.moveLogits, legal)
+    }
+
     companion object {
         /** `null` si le modèle est absent — l'app retombe alors sur Stockfish. */
         fun shared(context: Context, threads: Int): MaiaOpponent? =

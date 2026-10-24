@@ -39,6 +39,25 @@ final class CoachExplanationUITests: XCTestCase {
         assertCoachBarFitsOnScreen(in: app, context: "portrait")
     }
 
+    /// B1 : sous « pourquoi », la ligne du Coach dit ce que jouent les humains
+    /// de votre niveau — avec la mise en garde, et sans pousser le bandeau
+    /// hors de l'écran.
+    @MainActor
+    func testTheHumanCoachLineAppearsAndStaysOnScreen() throws {
+        let app = launchOnTheBlunder()
+
+        let line = app.descendants(matching: .any)
+            .matching(identifier: "humanCoachLine").firstMatch
+        XCTAssertTrue(
+            line.waitForExistence(timeout: 90),
+            "une faute doit porter la ligne du Coach (ce que jouent les humains)"
+        )
+        XCTAssertTrue(line.label.hasPrefix("Coach"), "la ligne commence par « Coach » : \(line.label)")
+        print("COACH-HUMAIN|\(line.label)")
+
+        assertCoachBarFitsOnScreen(in: app, context: "portrait avec le Coach")
+    }
+
     /// Le cas qui a déjà cassé : colonne gauche de l'iPad en paysage, sans
     /// défilement possible. `ViewThatFits` doit y retomber sur la barre d'une
     /// ligne plutôt que déborder — le test n'exige donc PAS la phrase ici,
@@ -108,7 +127,7 @@ final class CoachExplanationUITests: XCTestCase {
     @MainActor
     private func launchOnTheBlunder() -> XCUIApplication {
         let app = XCUIApplication()
-        app.launchArguments += ["-resetPlaySettings"]
+        app.launchArguments += ["-resetPlaySettings", "-discoveryTourSeen"]
         app.launch()
 
         // Bouton sur iPhone, ligne de barre latérale sur iPad.

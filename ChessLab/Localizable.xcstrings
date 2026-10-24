@@ -2017,12 +2017,12 @@
         }
       }
     },
-    "Analysez une partie ou une position avec Stockfish : classification des coups (imprécision, erreur, gaffe), courbe d'évaluation, flèches des meilleurs coups et flèche rouge de la menace adverse, lecture automatique, création de puzzles depuis les erreurs, et recherche des mats manqués par l'un ou l'autre camp. Export PGN rechargeable. Entrée par PGN, FEN, éditeur ou scanner.": {
+    "Analysez une partie ou une position avec Stockfish : classification des coups (imprécision, erreur, gaffe), courbe d'évaluation, flèches des meilleurs coups et flèche rouge de la menace adverse, lecture automatique, création de puzzles depuis les erreurs, et recherche des mats manqués par l'un ou l'autre camp. Export PGN rechargeable. Entrée par PGN, FEN, éditeur ou scanner. Le Coach ajoute, sous l'explication d'une faute, la part des joueurs de votre niveau qui jouent ce coup (d'après Maia : ce que jouent les humains, pas ce qui est bon).": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Analyse a game or position with Stockfish: move classification (inaccuracy, mistake, blunder), evaluation graph, best-move arrows and a red arrow for the opponent's threat, auto-play, puzzle creation from mistakes, and a search for mates either side let slip. Reloadable PGN export. Enter via PGN, FEN, editor or scanner."
+            "value": "Analyse a game or position with Stockfish: move classification (inaccuracy, mistake, blunder), evaluation graph, best-move arrows and a red arrow for the opponent's threat, auto-play, puzzle creation from mistakes, and a search for mates either side let slip. Reloadable PGN export. Enter via PGN, FEN, editor or scanner. The Coach adds, under a mistake's explanation, the share of players at your level who play that move (according to Maia: what humans play, not what is good)."
           }
         },
         "fr": {
@@ -22489,6 +22489,76 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld new puzzles from your last game"
+          }
+        }
+      }
+    },
+    "moins de 1 %": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "less than 1%"
+          }
+        }
+      }
+    },
+    "Le plus courant : %@ (%@).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Most common: %1$@ (%2$@)."
+          }
+        }
+      }
+    },
+    "Coach · %@ des joueurs de niveau %lld jouent ce coup : erreur typique.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach · %1$@ of players rated %2$lld play this move: a typical mistake."
+          }
+        }
+      }
+    },
+    "Coach · %@ des joueurs de niveau %lld jouent ce coup : un accident, pas une habitude.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach · %1$@ of players rated %2$lld play this move: an accident, not a habit."
+          }
+        }
+      }
+    },
+    "Coach · coup rare : %@ des joueurs de niveau %lld le trouvent.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach · rare move: %1$@ of players rated %2$lld find it."
+          }
+        }
+      }
+    },
+    "Coach · %@ des joueurs de niveau %lld jouent ce coup.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coach · %1$@ of players rated %2$lld play this move."
+          }
+        }
+      }
+    },
+    "D'après Maia : ce que jouent les humains, pas ce qui est bon.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "According to Maia: what humans play, not what is good."
           }
         }
       }

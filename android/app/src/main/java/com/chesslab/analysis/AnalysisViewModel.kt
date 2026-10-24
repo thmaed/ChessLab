@@ -185,6 +185,8 @@ data class AnalysisUiState(
     /** La classification, par index de coup — vide tant que la revue n'a pas tourné. */
     val qualities: Map<Int, MoveQuality> = emptyMap(),
     val explanations: Map<Int, MoveExplanation> = emptyMap(),
+    /** Le Coach (B1), par index de coup — rempli à la demande, au fil de la navigation. */
+    val humanInsights: Map<Int, HumanMoveInsight> = emptyMap(),
     /** La perte de probabilité de gain de chaque coup, POV du joueur. */
     val winDeltas: Map<Int, Double> = emptyMap(),
     val curve: List<CurvePoint> = emptyList(),
@@ -255,6 +257,8 @@ data class AnalysisUiState(
         Square(it.substring(0, 2)) to Square(it.substring(2, 4))
     }
     val displayedExplanation: MoveExplanation? get() = explanations[cursor]
+    /** B1 : ce que Maia dit du coup affiché ; absent tant qu'elle n'a pas répondu. */
+    val displayedInsight: HumanMoveInsight? get() = humanInsights[cursor]
     val displayedWinDelta: Double? get() = winDeltas[cursor]
 }
 
@@ -371,7 +375,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             ui = ui.copy(
                 position = position, sanMoves = emptyList(), cursor = -1,
                 lastMove = null, status = s(R.string.analysis_position_loaded), error = null,
-                qualities = emptyMap(), explanations = emptyMap(), winDeltas = emptyMap(),
+                qualities = emptyMap(), explanations = emptyMap(), humanInsights = emptyMap(), winDeltas = emptyMap(),
                 curve = emptyList(), summary = null, opening = null,
                 reviewing = false, reviewDone = 0, reviewTotal = 0,
                 // Les Noirs au trait : on regarde la position de leur côté.
@@ -425,7 +429,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             cursor = moves.size - 1,
             status = label,
             error = null,
-            qualities = emptyMap(), explanations = emptyMap(), winDeltas = emptyMap(),
+            qualities = emptyMap(), explanations = emptyMap(), humanInsights = emptyMap(), winDeltas = emptyMap(),
             curve = emptyList(), summary = null,
             reviewing = false, reviewDone = 0, reviewTotal = 0,
         )
@@ -487,6 +491,38 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         // continu. EXPLORATION d'une position : l'analyse en continu est la
         // seule source, elle recalcule à chaque coup — c'est voulu.
         if (isGameReview) showCachedEval(clamped) else evaluate()
+        requestHumanInsight(clamped)
+    }
+
+    private var insightJob: Job? = null
+    private val coachLevel by lazy { HumanMoveCoach.defaultLevel(getApplication()) }
+
+    /**
+     * B1 — interroge Maia au niveau du joueur sur la position PARENT du coup
+     * affiché. À la demande et en cache : ~3 ms sur Mac, quelques dizaines de
+     * ms sur téléphone, donc rien à précalculer. Jamais pour l'analyse de fond
+     * (A1), jamais hors revue d'une partie. Mêmes règles qu'iOS
+     * (`AnalysisViewModel.refreshHumanInsight`).
+     */
+    private fun requestHumanInsight(cursor: Int) {
+        insightJob?.cancel()
+        if (isBackground || !isGameReview || cursor < 0) return
+        if (ui.humanInsights.containsKey(cursor)) return
+        val move = moves.getOrNull(cursor) ?: return
+        val parent = positions.getOrNull(cursor) ?: return
+        val history = positions.subList(maxOf(0, cursor - 7), cursor + 1).toList()
+        val level = coachLevel
+        insightJob = viewModelScope.launch {
+            val insight = withContext(Dispatchers.Default) {
+                val maia = com.chesslab.maia.MaiaOpponent.shared(getApplication(), EngineService.threads)
+                    ?: return@withContext null
+                val board = Board(parent.copy())
+                val distribution = maia.distribution(history, board, level.toDouble(), level.toDouble())
+                    ?: return@withContext null
+                HumanMoveCoach.insight(distribution, move.lan, board, level)
+            } ?: return@launch
+            ui = ui.copy(humanInsights = ui.humanInsights + (cursor to insight))
+        }
     }
 
     /**
@@ -671,7 +707,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         persistenceKey = null
         ui = ui.copy(
             sanMoves = moves.map { it.san },
-            qualities = emptyMap(), explanations = emptyMap(), winDeltas = emptyMap(),
+            qualities = emptyMap(), explanations = emptyMap(), humanInsights = emptyMap(), winDeltas = emptyMap(),
             curve = emptyList(), summary = null,
             selected = null, legalTargets = emptySet(),
         )

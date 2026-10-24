@@ -537,6 +537,8 @@ final class AnalysisViewModel {
     ///    file tourne jusqu'au bout même sans plus personne pour la retenir.
     func handleViewDisappear() {
         isTornDown = true
+        // Le modèle Maia (43 Mo) ne survit pas à l'écran.
+        maiaLoad = nil
         // Sans ça, la lecture continuerait de dérouler la partie derrière
         // l'écran disparu, en relançant une analyse à chaque coup.
         stopAutoplay()
@@ -935,12 +937,70 @@ final class AnalysisViewModel {
         }
     }
 
+    // MARK: Coach (B1) — ce que jouent les humains de votre niveau
+
+    /// Ce que Maia dit du coup AFFICHÉ, `nil` tant qu'elle n'a pas répondu (ou
+    /// quand il n'y a rien à dire : revue de fond, position isolée, modèle
+    /// absent).
+    private(set) var humanInsight: HumanMoveInsight?
+    /// Niveau auquel Maia est interrogée — voir ``HumanMoveCoach/defaultLevel()``.
+    private let coachLevel = HumanMoveCoach.defaultLevel()
+    private var maiaLoad: Task<MaiaOpponent?, Never>?
+    private var insightGeneration = 0
+
+    /// La phrase du Coach pour le coup affiché, ou `nil`.
+    var coachLine: String? {
+        guard let insight = humanInsight, let quality = lastMoveQuality else { return nil }
+        return HumanMoveCoach.sentence(for: insight, isFault: quality.isFault)
+    }
+
+    private func refreshHumanInsight() {
+        insightGeneration += 1
+        humanInsight = nil
+        guard !isBackground, isGameReview, !isTornDown,
+              currentIndex != game.startingIndex, let played = game.moves[currentIndex],
+              game.moves.hasIndex(before: currentIndex)
+        else { return }
+        let parentIndex = game.moves.index(before: currentIndex)
+        guard let parentPosition = game.positions[parentIndex] else { return }
+
+        // Les huit dernières positions jusqu'au parent : tout ce que lit Maia.
+        var history: [Position] = []
+        var cursor = parentIndex
+        while history.count < MaiaEncoder.historyLength {
+            if let position = game.positions[cursor] { history.append(position) }
+            guard cursor != game.startingIndex, game.moves.hasIndex(before: cursor) else { break }
+            cursor = game.moves.index(before: cursor)
+        }
+        history.reverse()
+
+        let generation = insightGeneration
+        let level = coachLevel
+        let parent = Board(position: parentPosition)
+        let playedLAN = played.lan
+        if maiaLoad == nil {
+            maiaLoad = Task.detached(priority: .userInitiated) { MaiaOpponent() }
+        }
+        guard let load = maiaLoad else { return }
+        Task { [weak self] in
+            guard let maia = await load.value else { return }
+            let distribution = try? await maia.distribution(
+                history: history, board: parent, selfElo: Double(level), oppoElo: Double(level))
+            guard let self, generation == self.insightGeneration, !self.isTornDown,
+                  let distribution
+            else { return }
+            self.humanInsight = HumanMoveCoach.insight(
+                distribution: distribution, playedLAN: playedLAN, parent: parent, level: level)
+        }
+    }
+
     private func syncBoard() {
         guard let position = game.positions[currentIndex] else { return }
         board = Board(position: position)
         selectedSquare = nil
         legalTargetSquares = []
         lastMove = currentIndex == game.startingIndex ? nil : game.moves[currentIndex]
+        refreshHumanInsight()
         openingName = EcoOpeningLookup.openingName(for: sanPath(to: currentIndex), in: EcoOpeningLoader.standard)
         refreshDerivedData()
     }

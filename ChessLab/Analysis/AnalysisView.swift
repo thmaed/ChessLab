@@ -596,8 +596,8 @@ struct AnalysisView: View {
             // ne peut pas repousser le plateau : elle prend la place restante
             // ou elle s'efface.
             ViewThatFits(in: .vertical) {
-                coachCard(quality: quality, move: move, explanation: viewModel.lastMoveExplanation)
-                coachCard(quality: quality, move: move, explanation: nil)
+                coachCard(quality: quality, move: move, explanation: viewModel.lastMoveExplanation, withCoach: true)
+                coachCard(quality: quality, move: move, explanation: nil, withCoach: false)
             }
             .transition(.opacity)
             .animation(Theme.gentle, value: quality)
@@ -610,7 +610,7 @@ struct AnalysisView: View {
     /// barre d'une ligne d'avant ce chantier — c'est ce qui en fait un repli
     /// sûr pour ``ViewThatFits``.
     private func coachCard(
-        quality: MoveQuality, move: Move, explanation: MoveExplanation?
+        quality: MoveQuality, move: Move, explanation: MoveExplanation?, withCoach: Bool
     ) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack(spacing: 10) {
@@ -654,6 +654,25 @@ struct AnalysisView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .accessibilityIdentifier("coachExplanation")
+            }
+
+            // B1 — le Coach : ce que jouent les humains de votre niveau. Dans
+            // la version riche seulement : le repli d'une ligne reste intact.
+            if withCoach, let line = viewModel.coachLine {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(line)
+                        .font(.footnote)
+                        .foregroundStyle(Theme.textPrimary)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("humanCoachLine")
+                    Text(HumanMoveCoach.caveat)
+                        .font(.caption2)
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
         }
         .padding(.horizontal, 12)

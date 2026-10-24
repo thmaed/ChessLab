@@ -114,6 +114,26 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [x] Tests : `createsOwnPuzzlesFromUserMistakes` (iOS), `createsOwnPuzzleFromMissedMate`
       (Android, Galaxy A16), verts.
 
+### B1 de la 2.0 — le Coach : ce que jouent les humains de votre niveau — 24/10/2026
+
+- [x] Sous l'explication d'un coup, une ligne « Coach · 13 % des joueurs de
+      niveau 1200 jouent ce coup : erreur typique. Le plus courant : g6
+      (55 %). » et, en dessous, la mise en garde « D'après Maia : ce que jouent
+      les humains, pas ce qui est bon ». Pour une faute : *erreur typique*
+      (≥ 8 % des joueurs), *accident* (< 3 %), ou le chiffre seul entre les
+      deux ; pour un bon coup : seulement s'il est *rare* (< 4 %). Seuils
+      identiques des deux côtés (`HumanMoveCoach`).
+- [x] Niveau interrogé = celui choisi à la création de la dernière partie
+      (1200 par défaut), borné à 600–2600. `PlayerLevel` n'existe plus (retiré
+      avec l'adaptatif le 06/09) : le niveau estimé (B2) le remplacera s'il
+      est validé.
+- [x] Calculé à la demande, mis en cache, jamais pour l'analyse de fond.
+- [x] Tests : `HumanMoveCoachTests` + `CoachExplanationUITests` (iOS),
+      `HumanMoveCoachTest` + `AnalysisReviewTest.leCoachDitCeQueJouentLesHumains`
+      (Android, Galaxy A16).
+- [ ] Écart : le texte d'aide « Analyser » mentionne le Coach côté iOS ; Android
+      n'a pas d'écran d'aide équivalent (écart antérieur, voir plus haut).
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

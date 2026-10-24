@@ -71,7 +71,7 @@ struct HelpView: View {
         .init(
             icon: "chart.xyaxis.line", tint: Theme.teal,
             title: "Analyser",
-            body: "Analysez une partie ou une position avec Stockfish : classification des coups (imprécision, erreur, gaffe), courbe d'évaluation, flèches des meilleurs coups et flèche rouge de la menace adverse, lecture automatique, création de puzzles depuis les erreurs, et recherche des mats manqués par l'un ou l'autre camp. Export PGN rechargeable. Entrée par PGN, FEN, éditeur ou scanner."
+            body: "Analysez une partie ou une position avec Stockfish : classification des coups (imprécision, erreur, gaffe), courbe d'évaluation, flèches des meilleurs coups et flèche rouge de la menace adverse, lecture automatique, création de puzzles depuis les erreurs, et recherche des mats manqués par l'un ou l'autre camp. Export PGN rechargeable. Entrée par PGN, FEN, éditeur ou scanner. Le Coach ajoute, sous l'explication d'une faute, la part des joueurs de votre niveau qui jouent ce coup (d'après Maia : ce que jouent les humains, pas ce qui est bon)."
         ),
         .init(
             icon: "flask", tint: Theme.rose,

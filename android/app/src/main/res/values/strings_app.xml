@@ -1157,4 +1157,11 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d new puzzle from your last game</item>
         <item quantity="other">%1$d new puzzles from your last game</item>
     </plurals>
+    <string name="coach_less_than_one">less than 1%</string>
+    <string name="coach_most_common">Most common: %1$s (%2$s).</string>
+    <string name="coach_typical">Coach · %1$s of players rated %2$d play this move: a typical mistake.</string>
+    <string name="coach_accident">Coach · %1$s of players rated %2$d play this move: an accident, not a habit.</string>
+    <string name="coach_rare">Coach · rare move: %1$s of players rated %2$d find it.</string>
+    <string name="coach_plain">Coach · %1$s of players rated %2$d play this move.</string>
+    <string name="coach_caveat">According to Maia: what humans play, not what is good.</string>
 </resources>

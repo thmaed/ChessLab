@@ -163,6 +163,21 @@ class AnalysisReviewTest {
     }
 
     /**
+     * B1 — le Coach. Sur la gaffe (4.Cf3 au lieu de Dxf7#), une fois la revue
+     * passée, la ligne « ce que jouent les humains de votre niveau » apparaît
+     * sous le bandeau, avec sa mise en garde.
+     */
+    @Test fun leCoachDitCeQueJouentLesHumains() {
+        loadGame()
+        awaitTag("precision", 300_000)
+        // La partie s'ouvre sur son dernier coup : un pas en arrière, et c'est la gaffe.
+        compose.onNodeWithTag("precedent").performClick()
+        awaitTag("coachHumain", 60_000)
+        val ligne = textOf("coachHumain")
+        require(ligne.startsWith("Coach") && ligne.contains("%")) { "ligne du Coach attendue, obtenu « $ligne »" }
+    }
+
+    /**
      * Le cache disque : la même partie rouverte s'affiche classifiée SANS
      * repasser par le moteur — la précision est là avant qu'une revue ait eu
      * le temps d'évaluer une seule position.
