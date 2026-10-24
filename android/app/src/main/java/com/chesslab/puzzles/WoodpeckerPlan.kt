@@ -205,6 +205,9 @@ interface WoodpeckerDao {
     @Query("SELECT * FROM woodpecker_programs WHERE archived = 0 ORDER BY updatedAt DESC LIMIT 1")
     suspend fun active(): WoodpeckerProgram?
 
+    @Query("SELECT * FROM woodpecker_programs")
+    suspend fun all(): List<WoodpeckerProgram>
+
     @Upsert
     suspend fun put(program: WoodpeckerProgram)
 

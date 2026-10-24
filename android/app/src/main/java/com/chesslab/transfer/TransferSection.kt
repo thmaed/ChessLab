@@ -102,6 +102,18 @@ fun TransferSection() {
                                 summary.newRepertoires, summary.newRepertoires,
                             )
                         }
+                        if (summary.puzzlesUpdated > 0) {
+                            parts += context.resources.getQuantityString(
+                                R.plurals.transfer_imported_puzzles,
+                                summary.puzzlesUpdated, summary.puzzlesUpdated,
+                            )
+                        }
+                        if (summary.woodpeckerUpdated > 0) {
+                            parts += context.resources.getQuantityString(
+                                R.plurals.transfer_imported_woodpecker,
+                                summary.woodpeckerUpdated, summary.woodpeckerUpdated,
+                            )
+                        }
                         parts.joinToString(" · ")
                     }
                 },

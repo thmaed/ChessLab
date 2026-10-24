@@ -35,7 +35,9 @@ data class OwnPuzzle(
         solution = solution.split(" ").filter { it.isNotEmpty() },
         theme = theme,
         rating = rating,
-        phase = null,
+        // Calculée sur la FEN, comme iOS le fait à la création : sans phase,
+        // un filtre de phase excluait TOUS les puzzles maison.
+        phase = GamePhase.classify(fen).raw,
         sourcePgn = sourcePgn.ifBlank { null },
     )
 }

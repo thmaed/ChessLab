@@ -36,8 +36,13 @@ object TransferMerge {
         val newGames: Int,
         val positionsAffected: Int,
         val newRepertoires: Int = 0,
+        /** Puzzles dont la progression a été reprise de l'autre appareil. */
+        val puzzlesUpdated: Int = 0,
+        val woodpeckerUpdated: Int = 0,
     ) {
-        val isEmpty: Boolean get() = newReviews == 0 && newGames == 0 && newRepertoires == 0
+        val isEmpty: Boolean
+            get() = newReviews == 0 && newGames == 0 && newRepertoires == 0 &&
+                puzzlesUpdated == 0 && woodpeckerUpdated == 0
     }
 
     /**
@@ -119,4 +124,26 @@ object TransferMerge {
      * échange.
      */
     fun mergeCounters(local: Int, incoming: Int): Int = maxOf(local, incoming)
+
+    /**
+     * La progression d'un puzzle : la plus RÉCENTE l'emporte (`updatedAt`),
+     * comme dans la synchro iCloud d'iOS (`PuzzleProgressSync`). Rend celles
+     * à écrire ici ; une égalité garde la locale — réimporter ne change rien.
+     */
+    fun mergePuzzleProgress(
+        local: Map<String, Long>,
+        incoming: List<TransferFile.PuzzleProgressEntry>,
+    ): List<TransferFile.PuzzleProgressEntry> =
+        incoming.groupBy { it.externalId }
+            .map { (_, entries) -> entries.maxBy { it.updatedAt } }
+            .filter { entry -> local[entry.externalId]?.let { entry.updatedAt > it } ?: true }
+
+    /** Les programmes Woodpecker : même règle, le plus récemment joué l'emporte. */
+    fun mergeWoodpecker(
+        local: Map<String, Long>,
+        incoming: List<TransferFile.WoodpeckerEntry>,
+    ): List<TransferFile.WoodpeckerEntry> =
+        incoming.groupBy { it.id }
+            .map { (_, entries) -> entries.maxBy { it.updatedAt } }
+            .filter { entry -> local[entry.id]?.let { entry.updatedAt > it } ?: true }
 }

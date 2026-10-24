@@ -871,6 +871,14 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d position</item>
         <item quantity="other">%1$d positions</item>
     </plurals>
+    <plurals name="transfer_imported_puzzles">
+        <item quantity="one">progress on %1$d puzzle</item>
+        <item quantity="other">progress on %1$d puzzles</item>
+    </plurals>
+    <plurals name="transfer_imported_woodpecker">
+        <item quantity="one">%1$d Woodpecker programme</item>
+        <item quantity="other">%1$d Woodpecker programmes</item>
+    </plurals>
     <plurals name="transfer_imported_repertoires">
         <item quantity="one">%1$d repertoire</item>
         <item quantity="other">%1$d repertoires</item>

@@ -70,6 +70,29 @@ enum class GamePhase(val raw: String, @StringRes val labelRes: Int) {
 
     companion object {
         fun of(raw: String?): GamePhase? = entries.firstOrNull { it.raw == raw }
+
+        /**
+         * La phase d'une position, lue sur sa FEN. Pendant EXACT de
+         * `GamePhaseClassifier.classify` (iOS), mêmes seuils :
+         * - finale : peu de pièces hors pions et rois — 2 au plus avec une
+         *   dame sur l'échiquier, 6 sans ;
+         * - ouverture : coup ≤ 10, au moins 14 pions et 12 pièces ;
+         * - milieu de partie : tout le reste.
+         *
+         * Sert aux puzzles MAISON, qui n'avaient pas de phase sur Android :
+         * un filtre de phase les excluait tous (PARITE.md, 23/10/2026).
+         */
+        fun classify(fen: String): GamePhase {
+            val position = chesskit.Position.fromFen(fen) ?: return middlegame
+            val pieces = position.pieces
+            val hasQueen = pieces.any { it.kind == chesskit.Piece.Kind.queen }
+            val majorMinor = pieces.count { it.kind != chesskit.Piece.Kind.pawn && it.kind != chesskit.Piece.Kind.king }
+            if (majorMinor <= if (hasQueen) 2 else 6) return endgame
+            val pawns = pieces.count { it.kind == chesskit.Piece.Kind.pawn }
+            val fullmove = fen.trim().split(" ").lastOrNull()?.toIntOrNull() ?: Int.MAX_VALUE
+            if (fullmove <= 10 && pawns >= 14 && majorMinor >= 12) return opening
+            return middlegame
+        }
     }
 }
 

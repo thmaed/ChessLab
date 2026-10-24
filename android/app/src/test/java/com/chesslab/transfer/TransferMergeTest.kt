@@ -213,4 +213,52 @@ class TransferMergeTest {
         val file = TransferFile.decode(text).getOrThrow()
         assertEquals(listOf("bon"), file.reviewLog.map { it.uid })
     }
+
+    // MARK: Puzzles et Woodpecker (24/10/2026)
+
+    private fun progress(id: String, updatedAt: Long, failures: Int = 0) = TransferFile.PuzzleProgressEntry(
+        externalId = id, successCount = 1, failureCount = failures, easinessFactor = 2.5,
+        intervalDays = 1, repetitions = 0, dueAt = updatedAt + 86_400_000, updatedAt = updatedAt,
+        theme = "fork", rating = 1500,
+    )
+
+    @Test fun `la progression d'un puzzle la plus récente l'emporte`() {
+        val local = mapOf("a" to 100L, "b" to 300L)
+        val incoming = listOf(progress("a", 200), progress("b", 200), progress("c", 50))
+        val written = TransferMerge.mergePuzzleProgress(local, incoming).map { it.externalId }.toSet()
+        assertEquals(setOf("a", "c"), written)
+    }
+
+    @Test fun `réimporter la même progression ne change rien`() {
+        val incoming = listOf(progress("a", 200))
+        assertTrue(TransferMerge.mergePuzzleProgress(mapOf("a" to 200L), incoming).isEmpty())
+    }
+
+    @Test fun `un programme Woodpecker plus récemment joué l'emporte`() {
+        fun program(id: String, at: Long) = TransferFile.WoodpeckerEntry(id, 0, at, "10 puzzles", "{}", false)
+        val written = TransferMerge.mergeWoodpecker(
+            mapOf("p" to 500L), listOf(program("p", 400), program("q", 10), program("q", 20)),
+        )
+        assertEquals(listOf("q" to 20L), written.map { it.id to it.updatedAt })
+    }
+
+    @Test fun `progression et programmes survivent à l'écriture puis la relecture`() {
+        val file = TransferFile(
+            exportedAt = 1, device = "Galaxy", reviewLog = emptyList(), games = emptyList(),
+            puzzlesAttempted = 3, puzzlesSolved = 2,
+            puzzleProgress = listOf(progress("abc12", 1_000, failures = 1), progress("maison", 2_000).copy(dueAt = null)),
+            woodpecker = listOf(TransferFile.WoodpeckerEntry("w1", 5, 6, "25 puzzles · Fourchette", "{\"items\":[]}", true)),
+        )
+        val back = TransferFile.decode(TransferFile.encode(file)).getOrThrow()
+        assertEquals(file.puzzleProgress, back.puzzleProgress)
+        assertEquals(file.woodpecker, back.woodpecker)
+    }
+
+    @Test fun `un fichier d'avant le 24 octobre se lit sans progression ni programme`() {
+        val old = """{"format":"chesslab-transfer","version":1,"reviewLog":[],"games":[]}"""
+        val file = TransferFile.decode(old).getOrThrow()
+        assertTrue(file.puzzleProgress.isEmpty())
+        assertTrue(file.woodpecker.isEmpty())
+    }
 }
+

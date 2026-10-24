@@ -8,8 +8,9 @@ import org.json.JSONObject
  *
  * ## Ce qu'il contient, et ce qu'il ne contient PAS
  *
- * Le JOURNAL des révisions, les parties, et les compteurs de puzzles. Rien
- * d'autre — en particulier **pas l'état FSRS des positions** : il se
+ * Le JOURNAL des révisions, les parties, les compteurs de puzzles et — depuis
+ * le 24/10/2026 — la progression puzzle par puzzle et les programmes
+ * Woodpecker. Rien d'autre — en particulier **pas l'état FSRS des positions** : il se
  * RECALCULE en rejouant le journal. C'est la stratégie d'`OpeningProgressSync`
  * côté iOS, et elle a deux mérites ici. Le fichier est deux fois plus léger,
  * et surtout il n'y a plus rien à arbitrer : deux journaux se réunissent, un
@@ -58,7 +59,37 @@ data class TransferFile(
      * un second format, et il se relit par le même analyseur que l'import.
      */
     val repertoires: List<RepertoireEntry> = emptyList(),
+    /**
+     * La progression PUZZLE PAR PUZZLE (répétition espacée, ratés). Sans elle,
+     * la série « Ratés » repartait vide sur le nouvel appareil. Pendant de la
+     * synchro iCloud de `PuzzleProgress` côté iOS (24/10/2026).
+     */
+    val puzzleProgress: List<PuzzleProgressEntry> = emptyList(),
+    /** Les programmes Woodpecker, plan compris — iOS les synchronise par iCloud. */
+    val woodpecker: List<WoodpeckerEntry> = emptyList(),
 ) {
+    data class PuzzleProgressEntry(
+        val externalId: String,
+        val successCount: Int,
+        val failureCount: Int,
+        val easinessFactor: Double,
+        val intervalDays: Int,
+        val repetitions: Int,
+        val dueAt: Long?,
+        val updatedAt: Long,
+        val theme: String,
+        val rating: Int,
+    )
+
+    data class WoodpeckerEntry(
+        val id: String,
+        val createdAt: Long,
+        val updatedAt: Long,
+        val criteria: String,
+        val planJson: String,
+        val archived: Boolean,
+    )
+
     data class LogEntry(
         val uid: String,
         val fenKey: String,
@@ -145,6 +176,28 @@ data class TransferFile(
 
             root.put("puzzles", JSONObject()
                 .put("attempted", file.puzzlesAttempted).put("solved", file.puzzlesSolved))
+
+            val progress = JSONArray()
+            for (p in file.puzzleProgress) {
+                progress.put(
+                    JSONObject()
+                        .put("id", p.externalId).put("success", p.successCount).put("failure", p.failureCount)
+                        .put("easiness", p.easinessFactor).put("interval", p.intervalDays)
+                        .put("repetitions", p.repetitions).put("dueAt", p.dueAt ?: JSONObject.NULL)
+                        .put("updatedAt", p.updatedAt).put("theme", p.theme).put("rating", p.rating)
+                )
+            }
+            root.put("puzzleProgress", progress)
+
+            val woodpecker = JSONArray()
+            for (w in file.woodpecker) {
+                woodpecker.put(
+                    JSONObject()
+                        .put("id", w.id).put("createdAt", w.createdAt).put("updatedAt", w.updatedAt)
+                        .put("criteria", w.criteria).put("plan", w.planJson).put("archived", w.archived)
+                )
+            }
+            root.put("woodpecker", woodpecker)
             return root.toString()
         }
 
@@ -206,6 +259,39 @@ data class TransferFile(
                 }
             }
 
+            // Absents d'un fichier d'avant le 24/10/2026 : listes vides.
+            val progress = ArrayList<PuzzleProgressEntry>()
+            root.optJSONArray("puzzleProgress")?.let { array ->
+                for (i in 0 until array.length()) {
+                    val o = array.getJSONObject(i)
+                    val id = o.optString("id")
+                    if (id.isEmpty()) continue
+                    progress += PuzzleProgressEntry(
+                        externalId = id,
+                        successCount = o.optInt("success"), failureCount = o.optInt("failure"),
+                        easinessFactor = o.optDouble("easiness", 2.5), intervalDays = o.optInt("interval"),
+                        repetitions = o.optInt("repetitions"),
+                        dueAt = if (o.isNull("dueAt") || !o.has("dueAt")) null else o.optLong("dueAt"),
+                        updatedAt = o.optLong("updatedAt"), theme = o.optString("theme", "tactic"),
+                        rating = o.optInt("rating"),
+                    )
+                }
+            }
+
+            val woodpecker = ArrayList<WoodpeckerEntry>()
+            root.optJSONArray("woodpecker")?.let { array ->
+                for (i in 0 until array.length()) {
+                    val o = array.getJSONObject(i)
+                    val id = o.optString("id")
+                    val plan = o.optString("plan")
+                    if (id.isEmpty() || plan.isEmpty()) continue
+                    woodpecker += WoodpeckerEntry(
+                        id, o.optLong("createdAt"), o.optLong("updatedAt"), o.optString("criteria"),
+                        plan, o.optBoolean("archived"),
+                    )
+                }
+            }
+
             val puzzles = root.optJSONObject("puzzles")
             return Result.success(
                 TransferFile(
@@ -216,6 +302,8 @@ data class TransferFile(
                     puzzlesAttempted = puzzles?.optInt("attempted") ?: 0,
                     puzzlesSolved = puzzles?.optInt("solved") ?: 0,
                     repertoires = repertoires,
+                    puzzleProgress = progress,
+                    woodpecker = woodpecker,
                 )
             )
         }

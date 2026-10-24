@@ -87,6 +87,44 @@ class TransferTest {
         }
     }
 
+    /**
+     * Un téléphone neuf retrouve ses puzzles RATÉS et son programme Woodpecker
+     * (24/10/2026) — iOS les fait voyager par iCloud ; Android, par ce fichier.
+     */
+    @Test fun lesRatesEtLesProgrammesWoodpeckerVoyagent() = runBlocking {
+        db.puzzleProgress().clear()
+        db.woodpecker().clear()
+        // Raté à la dernière tentative : échec, répétitions remises à zéro.
+        db.puzzleProgress().put(
+            com.chesslab.puzzles.PuzzleProgress(
+                externalId = "abc12", failureCount = 1, repetitions = 0,
+                dueAt = t0 + Fsrs.DAY_MS, updatedAt = t0, theme = "fork", rating = 1500,
+            )
+        )
+        val plan = com.chesslab.puzzles.WoodpeckerPlan.start(
+            listOf(com.chesslab.puzzles.WoodpeckerPlan.Item("7k/6pp/8/8/8/8/8/RR4K1 w - - 0 1", listOf("a1a8"), "checkmate", "endgame", 0)),
+            now = t0,
+        )!!.record(solved = true, seconds = 12.0, now = t0)
+        db.woodpecker().put(com.chesslab.puzzles.WoodpeckerProgram("prog-1", t0, t0, "10 puzzles", plan.toJson()))
+
+        val file = tempFile("puzzles.clab")
+        TransferService.export(context, android.net.Uri.fromFile(file)).getOrThrow()
+        db.puzzleProgress().clear()
+        db.woodpecker().clear()
+
+        val summary = TransferService.import(context, android.net.Uri.fromFile(file)).getOrThrow()
+        assertEquals(1, summary.puzzlesUpdated)
+        assertEquals(1, summary.woodpeckerUpdated)
+        assertEquals(listOf("abc12"), db.puzzleProgress().missedIds())
+        val restored = db.woodpecker().byId("prog-1")!!.plan!!
+        assertEquals(plan, restored)
+
+        // Réimporter le même fichier ne réécrit rien.
+        val again = TransferService.import(context, android.net.Uri.fromFile(file)).getOrThrow()
+        assertEquals(0, again.puzzlesUpdated)
+        assertEquals(0, again.woodpeckerUpdated)
+    }
+
     @Test fun reimporterLeMemeFichierNeChangeRien() = runBlocking {
         review(e4, FsrsRating.good, t0)
         val file = tempFile("deuxfois.clab")

@@ -68,7 +68,7 @@ réglage habituel ; réussi avec l'indice = réussi.
 - [x] **Même plan des deux côtés** (`WoodpeckerPlan`), copie des puzzles dans le
       plan, plan stocké en un bloc JSON ; Room v10 (`woodpecker_programs`),
       migration vérifiée sur appareil (`MigrationTest`).
-- [ ] **Écart restant — le `.clab` ne transporte pas les programmes Woodpecker**,
+- [x] **Écart restant — le `.clab` ne transporte pas les programmes Woodpecker**,
       pas plus que la progression puzzle par puzzle (voir plus bas) ; iOS les
       fait voyager par iCloud. À traiter avec elle.
 - [x] **Corrigé au passage (Android, lot B)** : la demande « Mats manqués »
@@ -130,14 +130,21 @@ l'ancien plateau sous « Trouvez le meilleur coup ». Corrigé (`EmptySeries`).
       pièce choisie.
 - [x] **Doublons** : iOS ne recrée plus un puzzle maison pour une position
       déjà présente (Android le faisait déjà, `OwnPuzzleDao.countFor`).
-- [ ] **Écart restant — le `.clab` ne transporte pas la progression puzzle
+- [x] **Écart restant — le `.clab` ne transporte pas la progression puzzle
       par puzzle**, seulement deux compteurs. Après un transfert, la série
       « Ratés » est vide sur le nouvel appareil, et la répétition espacée
       repart de zéro. iOS fait voyager cette progression par iCloud
       (`PuzzleProgress`). À ajouter au `TransferFile` (table `puzzle_progress`).
-- [ ] **Écart restant — un puzzle maison Android n'a pas de PHASE**
+- [x] **Écart restant — un puzzle maison Android n'a pas de PHASE**
       (`OwnPuzzle.toPuzzle()` la met à `null`) : un filtre de phase l'exclut,
       alors qu'iOS la calcule à la création (`GamePhaseClassifier`).
+      **Fait le 24/10/2026** : `GamePhase.classify`, pendant exact de
+      `GamePhaseClassifier` (iOS, mêmes seuils, mêmes positions de test),
+      calcule la phase dans `OwnPuzzle.toPuzzle()`. Et le `.clab` transporte
+      désormais la progression puzzle par puzzle ET les programmes Woodpecker
+      (la mise à jour la plus récente l'emporte, comme la synchro iCloud
+      d'iOS) — `TransferTest.lesRatesEtLesProgrammesWoodpeckerVoyagent`, vert
+      sur Galaxy A16 : un téléphone vidé retrouve ses ratés et son programme.
 
 ### iPhone Duo (iOS, 13/10/2026) — rien à porter
 

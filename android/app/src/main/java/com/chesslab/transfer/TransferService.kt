@@ -56,6 +56,15 @@ object TransferService {
                     TransferFile.RepertoireEntry(entry.id, entry.name, it)
                 }
             },
+            puzzleProgress = db.puzzleProgress().all().map {
+                TransferFile.PuzzleProgressEntry(
+                    it.externalId, it.successCount, it.failureCount, it.easinessFactor,
+                    it.intervalDays, it.repetitions, it.dueAt, it.updatedAt, it.theme, it.rating,
+                )
+            },
+            woodpecker = db.woodpecker().all().map {
+                TransferFile.WoodpeckerEntry(it.id, it.createdAt, it.updatedAt, it.criteria, it.planJson, it.archived)
+            },
         )
     }
 
@@ -140,11 +149,39 @@ object TransferService {
                     if (runCatching { store.save(course) }.isSuccess) repertoires++
                 }
 
+                // Progression des puzzles et programmes Woodpecker : la mise à
+                // jour la plus récente l'emporte, comme la synchro iCloud d'iOS.
+                val progressDao = db.puzzleProgress()
+                val localProgress = progressDao.all().associate { it.externalId to it.updatedAt }
+                val progress = TransferMerge.mergePuzzleProgress(localProgress, incoming.puzzleProgress)
+                for (p in progress) {
+                    progressDao.put(
+                        com.chesslab.puzzles.PuzzleProgress(
+                            externalId = p.externalId, successCount = p.successCount,
+                            failureCount = p.failureCount, easinessFactor = p.easinessFactor,
+                            intervalDays = p.intervalDays, repetitions = p.repetitions,
+                            dueAt = p.dueAt, updatedAt = p.updatedAt, theme = p.theme, rating = p.rating,
+                        )
+                    )
+                }
+                val woodpeckerDao = db.woodpecker()
+                val localPrograms = woodpeckerDao.all().associate { it.id to it.updatedAt }
+                val programs = TransferMerge.mergeWoodpecker(localPrograms, incoming.woodpecker)
+                for (w in programs) {
+                    woodpeckerDao.put(
+                        com.chesslab.puzzles.WoodpeckerProgram(
+                            w.id, w.createdAt, w.updatedAt, w.criteria, w.planJson, w.archived,
+                        )
+                    )
+                }
+
                 TransferMerge.Summary(
                     newReviews = added,
                     newGames = fresh.size,
                     positionsAffected = incoming.reviewLog.mapTo(HashSet()) { it.fenKey }.size,
                     newRepertoires = repertoires,
+                    puzzlesUpdated = progress.size,
+                    woodpeckerUpdated = programs.size,
                 )
             }
         }
