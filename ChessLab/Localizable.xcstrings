@@ -22912,6 +22912,16 @@
           }
         }
       }
+    },
+    "Précision %lld %%": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accuracy %lld%%"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

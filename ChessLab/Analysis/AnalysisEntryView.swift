@@ -10,6 +10,8 @@ struct AnalysisEntryView: View {
     let onOpenLibrary: () -> Void
     let onOpenPositionEditor: () -> Void
     let onOpenScanner: () -> Void
+    /// C6 : « Mats manqués » depuis la carte de la dernière partie.
+    var onMissedMates: (String) -> Void = { _ in }
 
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \GameRecord.playedAt, order: .reverse) private var records: [GameRecord]
@@ -56,26 +58,25 @@ struct AnalysisEntryView: View {
                 // Les quatre autres demandent de FOURNIR un texte ou de
                 // composer une position — un travail, pas un raccourci — et
                 // sont donc repliés.
-                entryCard(
-                    title: "Scanner une position", subtitle: "Capture d'écran, photo ou plateau réel",
-                    systemImage: "camera.viewfinder", tint: Theme.accent
-                ) {
-                    onOpenScanner()
+                // C6 : la dernière partie d'abord, avec ses deux gestes — ce
+                // qu'on vient faire ici, le plus souvent.
+                if let last = records.first, let lastGamePGN {
+                    lastGameCard(last, pgn: lastGamePGN)
                 }
-                entryCard(
-                    title: "Bibliothèque", subtitle: "\(records.count) partie(s) enregistrée(s)",
-                    systemImage: "books.vertical", tint: Theme.warning, isEnabled: !records.isEmpty
-                ) {
-                    onOpenLibrary()
-                }
-                .discoveryAnchor(.analysisLibrary)
-                if let lastGamePGN {
-                    entryCard(
-                        title: "Dernière partie", subtitle: "Reprendre l'analyse là où elle s'est arrêtée",
-                        systemImage: "clock.arrow.circlepath", tint: Theme.info
+                HStack(alignment: .top, spacing: 14) {
+                    tileCard(
+                        title: "Scanner une position", subtitle: "Capture d'écran, photo ou plateau réel",
+                        systemImage: "camera.viewfinder", tint: Theme.accent
                     ) {
-                        onSelect(.pgn(lastGamePGN))
+                        onOpenScanner()
                     }
+                    tileCard(
+                        title: "Bibliothèque", subtitle: "\(records.count) partie(s) enregistrée(s)",
+                        systemImage: "books.vertical", tint: Theme.warning, isEnabled: !records.isEmpty
+                    ) {
+                        onOpenLibrary()
+                    }
+                    .discoveryAnchor(.analysisLibrary)
                 }
 
                 disclosureCard
@@ -222,6 +223,112 @@ struct AnalysisEntryView: View {
         .accessibilityLabel(Text("Autres sources"))
         .accessibilityHint(Text(showOtherSources ? "Replier" : "Déplier quatre options"))
         .accessibilityAddTraits(.isButton)
+    }
+
+    /// C6 : la dernière partie, ses chiffres, et les deux gestes qu'on vient
+    /// y faire — l'analyser, ou chercher les mats qu'on a laissés passer.
+    private func lastGameCard(_ record: GameRecord, pgn: String) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                IconBadge(systemImage: "clock.arrow.circlepath", tint: Theme.info, size: 44)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Dernière partie")
+                        .font(.headline)
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("\(record.whiteName ?? "?") – \(record.blackName ?? "?")")
+                        .font(.subheadline)
+                        .foregroundStyle(Theme.textSecondary)
+                        .lineLimit(1)
+                }
+                Spacer(minLength: 0)
+                if let result = record.resultRaw {
+                    Text(result)
+                        .font(.caption.weight(.bold).monospaced())
+                        .foregroundStyle(Theme.textPrimary)
+                        .padding(.horizontal, 8).padding(.vertical, 3)
+                        .background(Theme.surfaceElevated, in: Capsule())
+                }
+            }
+            let chips = lastGameChips(record)
+            if !chips.isEmpty {
+                FlowLayout(spacing: 8, lineSpacing: 6) {
+                    ForEach(chips, id: \.self) { chip in
+                        Text(chip)
+                            .font(.caption)
+                            .foregroundStyle(Theme.textSecondary)
+                            .padding(.horizontal, 9).padding(.vertical, 4)
+                            .background(Theme.surfaceElevated.opacity(0.7), in: Capsule())
+                    }
+                }
+            }
+            HStack(spacing: 10) {
+                Button { onSelect(.pgn(pgn)) } label: {
+                    Label("Analyser", systemImage: "chart.xyaxis.line")
+                        .font(.subheadline.weight(.bold))
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .foregroundStyle(Theme.background)
+                        .background(Theme.accentGradient, in: Theme.controlShape)
+                }
+                .buttonStyle(.pressable)
+                .accessibilityIdentifier("lastGameAnalyze")
+                Button { onMissedMates(pgn) } label: {
+                    Label("Mats manqués", systemImage: "bolt.fill")
+                        .font(.subheadline.weight(.semibold))
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .foregroundStyle(Theme.textPrimary)
+                        .background(Theme.surfaceElevated, in: Theme.controlShape)
+                }
+                .buttonStyle(.pressable)
+                .accessibilityIdentifier("lastGameMissedMates")
+            }
+        }
+        .cardStyle()
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("lastGameCard")
+    }
+
+    /// Les chiffres d'une partie déjà analysée : l'ouverture et la précision
+    /// du joueur (contre l'ordinateur) ; sinon la date seule.
+    private func lastGameChips(_ record: GameRecord) -> [String] {
+        var chips: [String] = []
+        if let date = record.playedAt {
+            chips.append(date.formatted(date: .abbreviated, time: .omitted))
+        }
+        if let name = record.openingName { chips.append(name) }
+        if let metrics = record.analysisMetrics, let engineColor = record.engineColorRaw {
+            let side = engineColor == Piece.Color.black.rawValue ? metrics.white : metrics.black
+            if let accuracy = side.accuracy {
+                chips.append(LocalizationController.string("Précision %lld %%", Int(accuracy.rounded())))
+            }
+        }
+        return chips
+    }
+
+    /// C6 : une tuile haute, pour les deux entrées que l'on choisit à l'œil.
+    private func tileCard(
+        title: LocalizedStringKey, subtitle: LocalizedStringKey, systemImage: String, tint: Color,
+        isEnabled: Bool = true, action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 10) {
+                IconBadge(systemImage: systemImage, tint: tint, size: 52, isEnabled: isEnabled)
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(isEnabled ? Theme.textPrimary : Theme.textTertiary)
+                    .multilineTextAlignment(.leading)
+                Text(subtitle)
+                    .font(.caption)
+                    .foregroundStyle(Theme.textSecondary)
+                    .multilineTextAlignment(.leading)
+                    .lineLimit(3)
+            }
+            .frame(maxWidth: .infinity, minHeight: 150, alignment: .topLeading)
+            .cardStyle()
+            .overlay(tint.opacity(isEnabled ? 0.09 : 0.03).clipShape(Theme.cardShape).allowsHitTesting(false))
+        }
+        .buttonStyle(.pressable)
+        .disabled(!isEnabled)
+        .accessibilityLabel(title)
     }
 
     private func entryCard(

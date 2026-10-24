@@ -35,6 +35,12 @@ import kotlinx.coroutines.withContext
 import com.chesslab.R
 import com.chesslab.library.LibraryDatabase
 import com.chesslab.ui.EntryCard
+import com.chesslab.ui.tintedCardBorder
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import com.chesslab.ui.Palette
 
 /**
@@ -53,6 +59,8 @@ fun AnalysisEntryScreen(
     /** Un PGN ou une FEN saisis à la main, ou lus dans un fichier. */
     onPaste: (String) -> Unit,
     onEditor: () -> Unit,
+    /** C6 : « Mats manqués » depuis la carte de la dernière partie. */
+    onMissedMates: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -86,25 +94,26 @@ fun AnalysisEntryScreen(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
-        EntryCard(
-            stringResource(R.string.entry_scan), stringResource(R.string.entry_scan_sub),
-            Icons.Default.PhotoCamera, Palette.accent, "entree-scanner", onClick = onScan,
-        )
-        EntryCard(
-            stringResource(R.string.analysis_library),
-            pluralStringResource(R.plurals.progress_games_count, games.size, games.size),
-            Icons.Default.MenuBook, Palette.warning, "entree-bibliotheque",
-            // Toujours ouverte, même vide : c'est de là qu'on IMPORTE un
-            // fichier PGN, et une bibliothèque vide est justement le moment
-            // où l'on veut le faire.
-            enabled = true,
-            modifier = Modifier.discoveryAnchor(DiscoverySpot.analysisLibrary), onClick = onLibrary,
-        )
-        if (lastPgn != null && lastPgn.isNotEmpty()) {
-            EntryCard(
-                stringResource(R.string.entry_last_game), stringResource(R.string.entry_last_game_sub),
-                Icons.Default.History, Palette.info, "entree-derniere",
-            ) { onLastGame(lastPgn) }
+        // C6 : la dernière partie d'abord, avec ses deux gestes — ce qu'on vient
+        // faire ici, le plus souvent.
+        val last = games.firstOrNull()
+        if (last != null && last.pgn.isNotEmpty()) {
+            LastGameCard(last, onAnalyze = { onLastGame(last.pgn) }, onMissedMates = { onMissedMates(last.pgn) })
+        }
+        Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+            TileCard(
+                stringResource(R.string.entry_scan), stringResource(R.string.entry_scan_sub),
+                Icons.Default.PhotoCamera, Palette.accent, "entree-scanner", Modifier.weight(1f).fillMaxHeight(), onScan,
+            )
+            TileCard(
+                stringResource(R.string.analysis_library),
+                pluralStringResource(R.plurals.progress_games_count, games.size, games.size),
+                Icons.Default.MenuBook, Palette.warning, "entree-bibliotheque",
+                // Toujours ouverte, même vide : c'est de là qu'on IMPORTE un
+                // fichier PGN, et une bibliothèque vide est justement le moment
+                // où l'on veut le faire.
+                Modifier.weight(1f).fillMaxHeight().discoveryAnchor(DiscoverySpot.analysisLibrary), onLibrary,
+            )
         }
         // Les chemins qui demandent un TRAVAIL — fournir un texte, ouvrir un
         // fichier, composer une position — sont repliés : ce sont des
@@ -161,6 +170,98 @@ fun AnalysisEntryScreen(
             },
             containerColor = Palette.surface,
         )
+    }
+}
+
+/** C6 : une tuile haute, pour les deux entrées que l'on choisit à l'œil. */
+@Composable
+private fun TileCard(
+    title: String, subtitle: String, icon: androidx.compose.ui.graphics.vector.ImageVector,
+    tint: androidx.compose.ui.graphics.Color, tag: String, modifier: Modifier, onClick: () -> Unit,
+) {
+    Column(
+        modifier
+            .clip(com.chesslab.ui.CardShape)
+            .background(tint.copy(alpha = 0.10f))
+            .tintedCardBorder(tint)
+            .clickable(onClick = onClick)
+            .padding(16.dp)
+            .testTag(tag),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        com.chesslab.ui.IconBadge(icon, tint, 52.dp, true)
+        Text(title, fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, color = Palette.textPrimary)
+        Text(subtitle, fontSize = 12.sp, color = Palette.textSecondary, maxLines = 3)
+    }
+}
+
+/**
+ * C6 : la dernière partie, ses chiffres, et les deux gestes qu'on vient y faire
+ * — l'analyser, ou chercher les mats qu'on a laissés passer.
+ */
+@Composable
+private fun LastGameCard(record: com.chesslab.library.GameRecord, onAnalyze: () -> Unit, onMissedMates: () -> Unit) {
+    val chips = ArrayList<String>()
+    chips += java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(java.util.Date(record.playedAt))
+    record.openingName?.let { chips += it }
+    if (record.analysisVersion == AnalysisViewModel.ANALYSIS_VERSION && record.engineColor != null) {
+        val accuracy = if (record.engineColor == "black") record.whiteAccuracy else record.blackAccuracy
+        accuracy?.let { chips += stringResource(R.string.entry_last_accuracy, Math.round(it).toInt()) }
+    }
+    val tint = Palette.info
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .clip(com.chesslab.ui.CardShape)
+            .background(com.chesslab.ui.cardGradient)
+            .tintedCardBorder(tint)
+            .padding(16.dp)
+            .testTag("entree-derniere"),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            com.chesslab.ui.IconBadge(Icons.Default.History, tint, 44.dp, true)
+            Spacer(Modifier.width(12.dp))
+            Column(Modifier.weight(1f)) {
+                Text(stringResource(R.string.entry_last_game), fontSize = 15.sp,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, color = Palette.textPrimary)
+                Text("${record.white} – ${record.black}", fontSize = 13.sp, color = Palette.textSecondary, maxLines = 1)
+            }
+            Text(
+                record.result, fontSize = 12.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace, color = Palette.textPrimary,
+                modifier = Modifier
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(Palette.surfaceElevated)
+                    .padding(horizontal = 8.dp, vertical = 3.dp),
+            )
+        }
+        @OptIn(ExperimentalLayoutApi::class)
+        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            chips.forEach { chip ->
+                Text(
+                    chip, fontSize = 12.sp, color = Palette.textSecondary,
+                    modifier = Modifier
+                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .background(Palette.surfaceElevated.copy(alpha = 0.7f))
+                        .padding(horizontal = 9.dp, vertical = 4.dp),
+                )
+            }
+        }
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            androidx.compose.material3.Button(
+                onClick = onAnalyze,
+                modifier = Modifier.weight(1f).height(44.dp).testTag("derniere-analyser"),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Palette.accent, contentColor = Palette.background),
+            ) { Text(stringResource(R.string.entry_last_analyze), fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) }
+            androidx.compose.material3.Button(
+                onClick = onMissedMates,
+                modifier = Modifier.weight(1f).height(44.dp).testTag("derniere-mats"),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Palette.surfaceElevated, contentColor = Palette.textPrimary),
+            ) { Text(stringResource(R.string.entry_last_mates), fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold) }
+        }
     }
 }
 

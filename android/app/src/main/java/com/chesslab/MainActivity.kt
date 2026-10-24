@@ -213,6 +213,7 @@ private fun App() {
                     }
                 },
                 onEditor = { stack.add(Route.PositionEditor()) },
+                onMissedMates = { pgn -> stack.add(Route.AnalysisBoard(pgn = pgn, findMissedMates = true)) },
             )
             Route.AnalysisLibrary -> com.chesslab.analysis.AnalysisLibraryScreen { pgn ->
                 stack.add(Route.AnalysisBoard(pgn = pgn))

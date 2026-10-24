@@ -1199,4 +1199,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="daily_todo_own">Puzzles tirés de vos erreurs : %1$d</string>
     <string name="daily_todo_endgame">La finale du jour vous attend.</string>
     <string name="course_studied">%1$d / %2$d travaillées</string>
+    <string name="entry_last_accuracy">Précision %1$d %%</string>
+    <string name="entry_last_analyze">Analyser</string>
+    <string name="entry_last_mates">Mats manqués</string>
 </resources>

@@ -854,6 +854,8 @@ struct HomeView: View {
                         path.append(Route.positionEditor(nil))
                     } onOpenScanner: {
                         path.append(Route.scanner)
+                    } onMissedMates: { pgn in
+                        path.append(Route.missedMates(pgn))
                     }
 
                 case .analysisLibrary:

@@ -219,6 +219,17 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
       `RepertoireImportTest` toujours vertes.
 - [ ] Pas de pastille « Débutant » : le catalogue ne porte que Club et Avancé.
 
+### C6 de la 2.0 — l'écran Analyser repensé — 24/10/2026
+
+- [x] La **dernière partie** passe en tête, dans une carte : joueurs, résultat,
+      date, ouverture reconnue et précision du joueur quand elle est analysée,
+      puis deux gestes — « Analyser » et « Mats manqués » (ouvre l'analyse déjà
+      réglée sur la recherche des mats). Scanner et Bibliothèque deviennent deux
+      grandes tuiles côte à côte. « Autres sources » inchangé.
+- [x] Tests : `AnalysisEntryUITests` (iOS), `AnalysisEntryTest` (Galaxy A16) ;
+      `LibraryScreenTest`, `AnalysisReviewTest`, `ScannerFlowUITests` verts.
+- [ ] Aspect Android non vu à l'écran (seul le comportement est testé).
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au
