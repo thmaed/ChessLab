@@ -638,7 +638,6 @@ struct ChessBoardView: View {
             // sélection restait affichée, plus aucun tap ne répondait, et
             // seul le glisser fonctionnait — il part d'une pièce à soi.
             // Invisible sur un déplacement vers une case vide.
-            .allowsHitTesting(isDraggable(piece))
             .animation(.easeInOut(duration: 0.35), value: allPiecesRotated)
             // Une pièce glissable est au-dessus de sa case et capterait le
             // survol : on relaie le hover depuis le glyphe pour que
@@ -648,6 +647,10 @@ struct ChessBoardView: View {
                 if hovering { hoveredSquare = piece.square }
                 else if hoveredSquare == piece.square { hoveredSquare = nil }
             }
+            // EN DERNIER, après `.onHover` : posé avant, iOS 18 rendait la
+            // pièce de nouveau sensible au toucher, et une pièce ADVERSE
+            // avalait le tap de prise (iPhone XS, iOS 18.7.9, 24/10/2026).
+            .allowsHitTesting(isDraggable(piece))
     }
 
     /// Au-dessus des pièces (une pastille sous un glyphe ne se verrait pas)
