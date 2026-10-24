@@ -32,6 +32,8 @@ import com.chesslab.ui.EvalBar
 import com.chesslab.ui.BoardView
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
@@ -274,7 +276,17 @@ fun VariantPlayScreen(
     LaunchedEffect(variantId, chess960Number, twoPlayer, settings) {
         model.load(variantId, chess960Number, twoPlayer, settings)
     }
-    val ui = model.ui
+    val live = model.ui
+    // En consultation, tout ce qui DÉCRIT la position — plateau, réserves,
+    // compteurs d'échecs — montre le coup consulté ; la partie vive continue
+    // dessous, intacte.
+    val ui = live.review?.let { r ->
+        live.copy(
+            position = r.position, pocket = r.pocket, walls = r.walls, lastMove = r.lastMove,
+            checkedKing = null, checksGiven = r.checksGiven, selected = null, selectedDrop = null,
+            legalTargets = emptySet(), hints = emptyList(),
+        )
+    } ?: live
     var confirmResign by remember { mutableStateOf(false) }
 
     // L'écran s'en va : la pendule s'arrête, et repart au retour. Le modèle de
@@ -337,7 +349,7 @@ fun VariantPlayScreen(
                 walls = ui.walls,
                 arrows = ui.hints,
                 draggableColor = ui.position.sideToMove,
-                enabled = ui.ready && !ui.thinking && !ui.gameOver,
+                enabled = ui.ready && !ui.thinking && !ui.gameOver && live.review == null,
                 onSquareTap = model::onSquareTap,
             )
         },
@@ -351,6 +363,18 @@ fun VariantPlayScreen(
             // La NÔTRE, sous le plateau, du côté où l'on joue.
             Reserve(ui, Piece.Color.white, model)
             Spacer(Modifier.height(4.dp))
+            // La consultation, comme iOS : remonter la partie, et en repartir.
+            VariantReviewBar(
+                ui = live,
+                canPrevious = model.canReviewPrevious,
+                canNext = model.canReviewNext,
+                canResume = model.canResumeFromReview,
+                onPrevious = model::reviewPrevious,
+                onNext = model::reviewNext,
+                onResume = model::resumeFromReview,
+                onCancelResume = model::cancelResumeFromReview,
+            )
+            Spacer(Modifier.height(6.dp))
             if (!ui.twoPlayer) {
                 VariantControlBar(
                     ui = ui,
@@ -365,7 +389,9 @@ fun VariantPlayScreen(
             // s'était passé quelque chose.
             com.chesslab.ui.MoveStrip(
                 moves = ui.sanMoves,
-                selected = ui.sanMoves.lastIndex.takeIf { it >= 0 },
+                selected = (model.displayedPly - 1).takeIf { it >= 0 },
+                // Toucher un coup y mène — au demi-coup près, comme sur iOS.
+                onSelect = { index -> model.reviewTo(index + 1) },
             )
             Spacer(Modifier.height(6.dp))
             Text(
@@ -582,5 +608,63 @@ private fun VariantControlBar(
             Icons.Default.Flag, stringResource(R.string.play_resign),
             tint = Palette.danger, enabled = !ui.gameOver, tag = "abandonner", onClick = onResign,
         )
+    }
+}
+
+/**
+ * Précédent / suivant, et « Reprendre ici » en consultation — pendant de la
+ * barre de consultation d'iOS (`PlayControlBar`) sur ses écrans de variantes.
+ * Contre l'ordinateur, les flèches vont par coup complet, vers les positions
+ * du joueur.
+ */
+@Composable
+private fun VariantReviewBar(
+    ui: VariantUiState,
+    canPrevious: Boolean,
+    canNext: Boolean,
+    canResume: Boolean,
+    onPrevious: () -> Unit,
+    onNext: () -> Unit,
+    onResume: () -> Unit,
+    onCancelResume: () -> Unit,
+) {
+    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        ControlButton(
+            Icons.Default.ChevronLeft, stringResource(R.string.previous_move),
+            enabled = canPrevious, tag = "precedent", onClick = onPrevious,
+        )
+        Spacer(Modifier.width(10.dp))
+        ControlButton(
+            Icons.Default.ChevronRight, stringResource(R.string.next_move),
+            enabled = canNext, tag = "suivant", onClick = onNext,
+        )
+        if (canResume) {
+            Spacer(Modifier.width(10.dp))
+            Text(
+                stringResource(R.string.play_resume_here),
+                fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.background,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(Palette.accent)
+                    .clickable(onClick = onResume)
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .testTag("reprendre-ici"),
+            )
+        }
+        // Huit secondes pour se raviser : la reprise écarte des coups sans
+        // rien demander, mais elle ne les jette pas tout de suite.
+        if (ui.resumeUndoCount != null) {
+            Spacer(Modifier.width(10.dp))
+            Text(
+                stringResource(R.string.play_resume_undo),
+                fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.warning,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .border(1.dp, Palette.warning.copy(alpha = 0.6f), CircleShape)
+                    .clickable(onClick = onCancelResume)
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .testTag("annuler-reprise"),
+            )
+        }
     }
 }

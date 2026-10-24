@@ -80,6 +80,25 @@ data class VariantUiState(
      * moteur, qui tient le décompte ; vides ailleurs.
      */
     val checksGiven: Map<Piece.Color, Int> = emptyMap(),
+    /**
+     * La position CONSULTÉE, `null` sur la position vive. Tenue À PART : la
+     * partie vive (position, coups légaux, pendule) n'y est pour rien, et un
+     * coup du moteur qui arrive pendant qu'on regarde ne fait pas sortir de la
+     * consultation. Pendant de `reviewPly` / `reviewBoard` côté iOS.
+     */
+    val review: VariantReview? = null,
+    /** Coups écartés par « Reprendre ici », qu'on peut encore rendre (8 s). */
+    val resumeUndoCount: Int? = null,
+)
+
+/** Ce qu'affiche le plateau quand on consulte un coup passé. */
+data class VariantReview(
+    val ply: Int,
+    val position: Position,
+    val walls: Set<Square>,
+    val pocket: Map<Piece.Color, Map<Piece.Kind, Int>>,
+    val lastMove: Pair<Square, Square>?,
+    val checksGiven: Map<Piece.Color, Int>,
 )
 
 /**
@@ -114,6 +133,15 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
      * affiché, lui, doit continuer de monter.
      */
     private var rebased = 0
+
+    /**
+     * La position après CHAQUE demi-coup depuis le début de la partie — la FEN
+     * rendue par le moteur, et le coup qui y a mené. C'est elle que la
+     * consultation affiche : le moteur ne sait pas « revenir » à un coup, et
+     * aux Barricades aléatoires aucun « départ + coups » ne reproduit un
+     * tirage de murs. `history[p]` = après `p` demi-coups.
+     */
+    private val history = ArrayList<Pair<String, Pair<Square, Square>?>>()
 
     /**
      * Le camp de l'utilisateur, tiré une fois pour toutes au démarrage quand
@@ -176,7 +204,10 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
             blunderWarning = null, plies = 0, drawDeclined = false, outcome = null,
         )
         rebased = 0
+        history.clear()
+        clearResumeUndo()
         startFen = startingFen(variant, number)
+        ui = ui.copy(review = null)
         refresh()
     }
 
@@ -196,6 +227,8 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         // Une NOUVELLE position à chaque partie, sauf si l'on en avait choisi
         // une : on ne remplace pas un choix par un tirage au sort.
         rebased = 0
+        history.clear()
+        clearResumeUndo()
         startFen = startingFen(variant, ui.chess960Number)
         clock.reset(ui.settings.timeControl)
         ui = ui.copy(
@@ -203,7 +236,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
             whiteClockMs = clock.remaining(Piece.Color.white),
             blackClockMs = clock.remaining(Piece.Color.black),
             evalCp = null, evalMate = null, hints = emptyList(), blunderWarning = null,
-            drawDeclined = false, outcome = null,
+            drawDeclined = false, outcome = null, review = null,
         )
         refresh()
     }
@@ -291,6 +324,12 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         }
         previousQuery = answer
         val walls = if (variant.hasWalls) BarricadesFen.wallSquares(answer.fen).toSet() else emptySet()
+
+        // Le journal des positions, tenu à la longueur de la partie : un coup
+        // repris (alerte de gaffe, « Reprendre ici ») le raccourcit d'autant.
+        val ply = rebased + ui.uciLog.size
+        if (history.size > ply) history.subList(ply, history.size).clear()
+        history.add(answer.fen to (afterMove ?: ui.lastMove))
 
         // POURQUOI la partie s'arrête, et qui gagne. Le moteur reste l'arbitre
         // de la légalité ; on ne fait que LIRE la position qu'il rend pour la
@@ -455,8 +494,132 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         val log = ui.uciLog
         if (log.isEmpty()) return
         val back = if (!ui.twoPlayer && ui.position.sideToMove == humanColor && log.size >= 2) 2 else 1
-        ui = ui.copy(blunderWarning = null, uciLog = log.dropLast(back), hints = emptyList())
+        clearResumeUndo()
+        ui = ui.copy(blunderWarning = null, uciLog = log.dropLast(back), hints = emptyList(), review = null)
         refresh()
+    }
+
+    // MARK: Consultation (pendant de la barre de consultation d'iOS)
+
+    /** Le demi-coup affiché : celui qu'on consulte, ou la position vive. */
+    val displayedPly: Int get() = ui.review?.ply ?: ui.plies
+
+    /**
+     * Contre l'ordinateur, par coup COMPLET vers les positions du joueur
+     * (`ReviewStepper`, par la FEN de chaque position) ; à deux, chaque
+     * demi-coup est une étape.
+     */
+    private val stepper: com.chesslab.play.ReviewStepper
+        get() = if (ui.twoPlayer) com.chesslab.play.ReviewStepper.everyPly(ui.plies)
+        else com.chesslab.play.ReviewStepper.fromFens(ui.plies, history.map { it.first }, humanColor)
+
+    val canReviewPrevious: Boolean get() = stepper.previous(displayedPly) != null
+    val canReviewNext: Boolean get() = stepper.next(displayedPly) != null
+
+    fun reviewPrevious() { stepper.previous(displayedPly)?.let(::reviewTo) }
+    fun reviewNext() { stepper.next(displayedPly)?.let(::reviewTo) }
+
+    /** Va au demi-coup demandé — la bande des coups s'en sert. Le dernier = la position vive. */
+    fun reviewTo(ply: Int) {
+        if (ply >= ui.plies || ply < 0 || ply >= history.size) {
+            ui = ui.copy(review = null)
+            return
+        }
+        val variant = ui.variant ?: return
+        val (fen, marks) = history[ply]
+        val position = parse(fen) ?: return
+        ui = ui.copy(
+            selected = null, selectedDrop = null, legalTargets = emptySet(),
+            review = VariantReview(
+                ply = ply, position = position,
+                walls = if (variant.hasWalls) BarricadesFen.wallSquares(fen).toSet() else emptySet(),
+                pocket = CrazyhouseFen.pocket(fen),
+                lastMove = marks,
+                checksGiven = ThreeCheckFen.given(fen),
+            ),
+        )
+    }
+
+    /**
+     * Peut-on repartir du coup consulté ? Jamais avec une pendule — on ne rend
+     * pas du temps écoulé —, ni pendant que le moteur réfléchit, ni sur une
+     * partie finie. Mêmes garde-fous qu'iOS.
+     */
+    val canResumeFromReview: Boolean
+        get() {
+            val review = ui.review ?: return false
+            return !ui.settings.timeControl.hasClock && !ui.gameOver && !ui.thinking && review.ply < ui.plies
+        }
+
+    /** Ce que « Reprendre ici » a écarté, pour le rendre pendant huit secondes. */
+    private data class ResumeSnapshot(
+        val startFen: String?,
+        val rebased: Int,
+        val uciLog: List<String>,
+        val sanMoves: List<String>,
+        val history: List<Pair<String, Pair<Square, Square>?>>,
+        val lastMove: Pair<Square, Square>?,
+    )
+
+    private var resumeSnapshot: ResumeSnapshot? = null
+    private var undoJob: Job? = null
+
+    /**
+     * Repart du coup CONSULTÉ : la suite est écartée, la partie reprend là.
+     *
+     * Deux formes, comme le `resyncEngineChain` d'iOS : une variante
+     * ORDINAIRE repart de son départ en gardant les coups d'avant ; aux
+     * Barricades ALÉATOIRES, aucun « départ + coups » ne reproduit les murs
+     * tirés au fil de la partie — on repart de la position consultée elle-même.
+     */
+    fun resumeFromReview() {
+        if (!canResumeFromReview) return
+        val variant = ui.variant ?: return
+        val ply = ui.review?.ply ?: return
+        resumeSnapshot = ResumeSnapshot(startFen, rebased, ui.uciLog, ui.sanMoves, history.toList(), ui.lastMove)
+        val discarded = ui.plies - ply
+        val (fen, marks) = history[ply]
+        if (variant.wallsMove) {
+            startFen = fen
+            rebased = ply
+            ui = ui.copy(uciLog = emptyList())
+        } else {
+            ui = ui.copy(uciLog = ui.uciLog.take(ply - rebased))
+        }
+        history.subList(ply, history.size).clear()
+        hintJob?.cancel()
+        ui = ui.copy(
+            review = null, sanMoves = ui.sanMoves.take(ply), lastMove = marks,
+            hints = emptyList(), blunderWarning = null, resumeUndoCount = discarded,
+        )
+        refresh()
+        undoJob?.cancel()
+        undoJob = viewModelScope.launch {
+            kotlinx.coroutines.delay(8_000)
+            clearResumeUndo()
+        }
+    }
+
+    /** Rend les coups que « Reprendre ici » venait d'écarter. */
+    fun cancelResumeFromReview() {
+        val snapshot = resumeSnapshot ?: return
+        if (ui.gameOver || ui.thinking) return
+        clearResumeUndo()
+        startFen = snapshot.startFen
+        rebased = snapshot.rebased
+        history.clear()
+        history.addAll(snapshot.history.dropLast(1))
+        ui = ui.copy(
+            uciLog = snapshot.uciLog, sanMoves = snapshot.sanMoves, lastMove = snapshot.lastMove,
+            review = null, hints = emptyList(),
+        )
+        refresh()
+    }
+
+    private fun clearResumeUndo() {
+        undoJob?.cancel()
+        resumeSnapshot = null
+        if (ui.resumeUndoCount != null) ui = ui.copy(resumeUndoCount = null)
     }
 
     // MARK: Abandon et nulle
@@ -526,6 +689,10 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         }
         if (best == null || best == "(none)") { ui = ui.copy(status = s(R.string.engine_silent)); return@launch }
         clock.stopAndIncrement()
+        // N'IMPORTE QUEL coup invalide l'offre d'annulation d'une reprise : la
+        // rendre ensuite réinjecterait une suite qui ignore ce coup (même
+        // piège corrigé côté iOS le 25/08).
+        clearResumeUndo()
         ui = ui.copy(uciLog = ui.uciLog + best)
         // `VariantMoveMarks` et non un découpage à la main : au Crazyhouse le
         // moteur répond `P@e4`, dont les deux premiers caractères ne sont pas
@@ -541,7 +708,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
      * tomber dessus, elle ne se touche pas.
      */
     fun selectPocketPiece(kind: Piece.Kind) {
-        if (ui.thinking || ui.gameOver || !ui.ready) return
+        if (ui.thinking || ui.gameOver || !ui.ready || ui.review != null) return
         if (!humanToMove) return
         if ((ui.pocket[ui.position.sideToMove]?.get(kind) ?: 0) <= 0) return
 
@@ -558,7 +725,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun onSquareTap(square: Square) {
-        if (ui.thinking || ui.gameOver || !ui.ready) return
+        if (ui.thinking || ui.gameOver || !ui.ready || ui.review != null) return
         if (!humanToMove) return
 
         // Une pose : la pièce vient de la main, pas d'une case. Le coup joué
@@ -600,6 +767,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
      * s'effacent, et le coup passe au crible de l'alerte de gaffe.
      */
     private fun commit(move: String, marks: Pair<Square, Square>) {
+        clearResumeUndo()
         val before = ui.uciLog
         clock.stopAndIncrement()
         hintJob?.cancel()
