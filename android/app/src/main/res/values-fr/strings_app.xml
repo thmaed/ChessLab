@@ -1173,4 +1173,29 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="profile_openings">Ouvertures coûteuses</string>
     <string name="profile_opening_line">%1$s points perdus par coup · %2$d parties</string>
     <string name="profile_other">Autres fautes</string>
+    <string name="daily_title">Séance du jour</string>
+    <string name="daily_complete">Séance terminée</string>
+    <string name="daily_todo">À faire aujourd\'hui</string>
+    <string name="daily_streak_none">Pas encore de série — commencez aujourd\'hui.</string>
+    <plurals name="daily_streak_days">
+        <item quantity="one">%1$d jour de suite</item>
+        <item quantity="other">%1$d jours de suite</item>
+    </plurals>
+    <string name="daily_all_done">Tout est fait pour aujourd\'hui.</string>
+    <string name="daily_sum_openings">Ouvertures : %1$d</string>
+    <string name="daily_sum_missed">Puzzles ratés : %1$d</string>
+    <string name="daily_sum_own">Puzzles de vos parties : %1$d</string>
+    <string name="daily_sum_endgame">une finale</string>
+    <string name="daily_step_openings">Ouvertures à revoir</string>
+    <string name="daily_step_missed">Puzzles à retenter</string>
+    <string name="daily_step_own">Puzzles de vos parties</string>
+    <string name="daily_step_endgame">Une finale</string>
+    <string name="daily_done_openings">Rien à revoir aujourd\'hui.</string>
+    <string name="daily_done_missed">Aucun puzzle raté en attente.</string>
+    <string name="daily_done_own">Aucun puzzle de vos parties en attente.</string>
+    <string name="daily_done_endgame">Finale du jour ouverte.</string>
+    <string name="daily_todo_openings">Positions dues : %1$d</string>
+    <string name="daily_todo_missed">Puzzles ratés à rejouer : %1$d</string>
+    <string name="daily_todo_own">Puzzles tirés de vos erreurs : %1$d</string>
+    <string name="daily_todo_endgame">La finale du jour vous attend.</string>
 </resources>

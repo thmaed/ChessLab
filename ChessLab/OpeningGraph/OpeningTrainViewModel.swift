@@ -396,6 +396,7 @@ final class OpeningTrainViewModel {
         var effective = rating
         if usedHint, effective.rawValue > FSRSRating.hard.rawValue { effective = .hard }
         OpeningProgressStore.recordReview(fenKey: currentKey, rating: effective, in: context)
+        TrainingDays.markToday()
     }
 
     private func arrow(for uci: String) -> HintMove {

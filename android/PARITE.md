@@ -183,6 +183,27 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [ ] À vérifier sur appareil : l'aspect de la carte avec de vraies données
       (aucune capture n'a été faite — pas de jeu de données semé).
 
+### A5 de la 2.0 — Séance du jour + série de jours (et accueil C7) — 24/10/2026
+
+- [x] Carte « Séance du jour » en tête de l'accueil (flamme + série) ; un tap
+      ouvre l'écran des étapes : **ouvertures dues** → **puzzles ratés** →
+      **puzzles de vos parties** → **une finale**, chaque étape ouvrant l'écran
+      existant. Une étape est « faite » quand il n'y a plus rien à y revoir
+      (comptes relus au retour) ; la finale l'est une fois ouverte. La finale
+      tourne : une par jour, jours depuis l'epoch modulo le nombre de finales
+      (même règle des deux côtés). iOS `DailySession/`, Android `dailysession/`.
+- [x] Série de jours, locale à l'appareil : un jour compte quand une position
+      d'ouverture est révisée, un puzzle tenté (Woodpecker compris) ou la finale
+      de la séance ouverte. Les révisions auto de A3 n'y comptent pas. Elle vit
+      jusqu'à la fin d'un jour manqué (aujourd'hui vide → on compte jusqu'à hier).
+- [x] Tests : `DailySessionTests` (7) + `DailySessionUITests` (iOS) ;
+      `DailySessionTest` JVM (6) + instrumenté (Galaxy A16).
+- [ ] **Durée réglable (10–15 min) non faite** : la séance sert les écrans
+      existants tels quels, sans plafond de longueur. À décider.
+- [ ] Pas de notification (décision du 24/10). La série n'est pas synchronisée.
+- [ ] À vérifier sur appareil : aspect de la carte Android (iOS vérifié au
+      simulateur), enchaînement réel des étapes.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

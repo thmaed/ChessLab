@@ -145,6 +145,8 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     /** Le hub porte « Variantes d'échecs » ; la tuile d'accueil, « Variantes ». */
     data object Variants : Route(R.string.variants_hub_title)
     data object Progression : Route(R.string.route_progress)
+    /** A5 : la séance du jour, ses étapes et la série de jours. */
+    data object DailySession : Route(R.string.daily_title)
     data object Settings : Route(R.string.route_settings)
     data object Help : Route(R.string.route_help)
     /** Les licences des composants embarqués, depuis les réglages. */

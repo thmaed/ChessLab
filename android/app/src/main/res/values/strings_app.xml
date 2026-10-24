@@ -1176,4 +1176,29 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="profile_openings">Costly openings</string>
     <string name="profile_opening_line">%1$s points lost per move · %2$d games</string>
     <string name="profile_other">Other mistakes</string>
+    <string name="daily_title">Daily session</string>
+    <string name="daily_complete">Session complete</string>
+    <string name="daily_todo">To do today</string>
+    <string name="daily_streak_none">No streak yet — start today.</string>
+    <plurals name="daily_streak_days">
+        <item quantity="one">%1$d day in a row</item>
+        <item quantity="other">%1$d days in a row</item>
+    </plurals>
+    <string name="daily_all_done">All done for today.</string>
+    <string name="daily_sum_openings">Openings: %1$d</string>
+    <string name="daily_sum_missed">Missed puzzles: %1$d</string>
+    <string name="daily_sum_own">Puzzles from your games: %1$d</string>
+    <string name="daily_sum_endgame">an endgame</string>
+    <string name="daily_step_openings">Openings to review</string>
+    <string name="daily_step_missed">Puzzles to retry</string>
+    <string name="daily_step_own">Puzzles from your games</string>
+    <string name="daily_step_endgame">An endgame</string>
+    <string name="daily_done_openings">Nothing to review today.</string>
+    <string name="daily_done_missed">No missed puzzles waiting.</string>
+    <string name="daily_done_own">No puzzles from your games waiting.</string>
+    <string name="daily_done_endgame">Today\'s endgame opened.</string>
+    <string name="daily_todo_openings">Positions due: %1$d</string>
+    <string name="daily_todo_missed">Missed puzzles to replay: %1$d</string>
+    <string name="daily_todo_own">Puzzles drawn from your mistakes: %1$d</string>
+    <string name="daily_todo_endgame">Today\'s endgame is waiting.</string>
 </resources>

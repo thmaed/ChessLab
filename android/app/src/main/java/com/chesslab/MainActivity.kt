@@ -309,6 +309,11 @@ private fun App() {
                     stack.add(Route.AnalysisBoard(fen = fen))
                 }
             }
+            Route.DailySession -> com.chesslab.dailysession.DailySessionScreen(
+                onOpenOpenings = { stack.add(trainRoute(context, "daily")) },
+                onOpenPuzzles = { filter -> stack.add(Route.Puzzles(filter = filter)) },
+                onOpenEndgame = { id, name -> stack.add(Route.EndgameFree(id, name)) },
+            )
             Route.Progression -> ProgressionScreen(onTrainTheme = { stack.add(Route.Puzzles(theme = it)) })
             Route.Help -> HelpScreen(onReplayTour = { tour.start() })
             is Route.PositionEditor -> PositionEditorScreen(

@@ -315,7 +315,7 @@ Essais techniques d'abord, parce qu'ils peuvent changer le périmètre :
 | **A4** | Profil de faiblesses (Progression) — **FAIT 24/10** | A1 | iOS, Android |
 | **B3** | Cote de puzzle personnelle + puzzles « à mon niveau » | — (indépendant) | iOS, Android |
 | **B2** | Niveau estimé + courbe | S2, B1 | iOS, Android |
-| **A5** | Séance du jour + série | A2, A3 | iOS, Android |
+| **A5** | Séance du jour + série — **FAIT 24/10** (sans durée réglable) | A2, A3 | iOS, Android |
 | **V** | Aide, nouveautés, captures, schéma CloudKit, soumissions | tout | iOS, Android |
 
 | **C** | Revue de l'interface : menus modernisés, plus colorés et attractifs | audit, puis lots | iOS, Android |

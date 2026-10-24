@@ -201,6 +201,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     /** La réponse va au PROGRAMME — jamais à la répétition espacée, ni aux stats. */
     private fun recordWoodpecker(solved: Boolean) {
         val plan = ui.woodpeckerPlan ?: return
+        com.chesslab.dailysession.TrainingDays.markToday(getApplication())
         val seconds = elapsedOnPuzzleMs() / 1000.0
         clockStartedAt = null
         clockAccumulatedMs = 0
@@ -301,6 +302,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
      * de rater revient demain ; ce qu'on a résolu s'éloigne.
      */
     private fun recordProgress(puzzle: Puzzle, success: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        com.chesslab.dailysession.TrainingDays.markToday(getApplication())
         val dao = LibraryDatabase.get(getApplication()).puzzleProgress()
         val now = System.currentTimeMillis()
         val current = dao.byId(puzzle.id) ?: PuzzleProgress(externalId = puzzle.id, theme = puzzle.theme)

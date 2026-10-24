@@ -96,6 +96,12 @@ enum PuzzleSessionDrawer {
         }
     }
 
+    /// Combien de puzzles à tirer pour ce filtre (dus, ou ratés en mode
+    /// « ratés ») — la séance du jour (A5) en fait ses étapes.
+    static func count(matching filter: PuzzleSessionFilter, in context: ModelContext) -> Int {
+        (try? context.fetchCount(FetchDescriptor<Puzzle>(predicate: predicate(matching: filter)))) ?? 0
+    }
+
     /// Existe-t-il au moins un puzzle de cette provenance, dû ou non ?
     static func hasAnyPuzzle(from source: PuzzleSource, in context: ModelContext) -> Bool {
         let sourceRaw = source.rawValue

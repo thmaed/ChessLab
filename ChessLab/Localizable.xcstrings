@@ -22672,6 +22672,236 @@
           }
         }
       }
+    },
+    "Séance du jour": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily session"
+          }
+        }
+      }
+    },
+    "Séance terminée": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Session complete"
+          }
+        }
+      }
+    },
+    "À faire aujourd'hui": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To do today"
+          }
+        }
+      }
+    },
+    "Pas encore de série — commencez aujourd'hui.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No streak yet — start today."
+          }
+        }
+      }
+    },
+    "1 jour de suite": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 day in a row"
+          }
+        }
+      }
+    },
+    "%lld jours de suite": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld days in a row"
+          }
+        }
+      }
+    },
+    "Ouvertures à revoir": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Openings to review"
+          }
+        }
+      }
+    },
+    "Rien à revoir aujourd'hui.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing to review today."
+          }
+        }
+      }
+    },
+    "Positions dues : %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Positions due: %lld"
+          }
+        }
+      }
+    },
+    "Puzzles à retenter": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puzzles to retry"
+          }
+        }
+      }
+    },
+    "Aucun puzzle raté en attente.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No missed puzzles waiting."
+          }
+        }
+      }
+    },
+    "Puzzles ratés à rejouer : %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Missed puzzles to replay: %lld"
+          }
+        }
+      }
+    },
+    "Puzzles de vos parties": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puzzles from your games"
+          }
+        }
+      }
+    },
+    "Aucun puzzle de vos parties en attente.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No puzzles from your games waiting."
+          }
+        }
+      }
+    },
+    "Puzzles tirés de vos erreurs : %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puzzles drawn from your mistakes: %lld"
+          }
+        }
+      }
+    },
+    "Une finale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An endgame"
+          }
+        }
+      }
+    },
+    "Finale du jour ouverte.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's endgame opened."
+          }
+        }
+      }
+    },
+    "La finale du jour vous attend.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Today's endgame is waiting."
+          }
+        }
+      }
+    },
+    "Ouvertures : %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Openings: %lld"
+          }
+        }
+      }
+    },
+    "Puzzles ratés : %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Missed puzzles: %lld"
+          }
+        }
+      }
+    },
+    "Puzzles de vos parties : %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puzzles from your games: %lld"
+          }
+        }
+      }
+    },
+    "une finale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "an endgame"
+          }
+        }
+      }
+    },
+    "Tout est fait pour aujourd'hui.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All done for today."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

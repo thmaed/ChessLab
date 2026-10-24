@@ -409,6 +409,7 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
         val effective = if (usedHint && rating.raw > FsrsRating.hard.raw) FsrsRating.hard else rating
         val key = currentKey
         val now = System.currentTimeMillis()
+        com.chesslab.dailysession.TrainingDays.markToday(getApplication())
         viewModelScope.launch(Dispatchers.IO) {
             val existing = dao.progress(key) ?: OpeningProgress(fenKey = key)
             val outcome = fsrs.review(existing.card, effective, now)

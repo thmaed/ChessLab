@@ -469,6 +469,7 @@ final class PuzzleSolveViewModel {
     /// suivant du cycle est prétiré — `nil` en fin de cycle, ce qui fait
     /// apparaître le bilan.
     private func recordWoodpeckerAnswer(success: Bool) {
+        TrainingDays.markToday()
         let seconds = elapsedOnPuzzle()
         clockStartedAt = nil
         clockAccumulated = 0
@@ -481,6 +482,7 @@ final class PuzzleSolveViewModel {
     }
 
     private func updateSchedule(success: Bool) {
+        TrainingDays.markToday()
         // La cote personnelle : seuls les puzzles COTÉS de la bibliothèque
         // comptent (ceux de vos parties n'ont pas de cote).
         if let puzzleRating = puzzle.rating, puzzleRating > 0 {

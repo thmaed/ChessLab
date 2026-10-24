@@ -163,6 +163,8 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     )
                 }
             }
+            // C7 / A5 (2.0) : la séance du jour en tête de l'accueil.
+            com.chesslab.dailysession.DailySessionCard { onOpen(Route.DailySession) }
             // A2 (2.0) : « 2 nouveaux puzzles de votre dernière partie ». Un tap
             // ouvre les puzzles et efface la pastille.
             val newPuzzles = com.chesslab.analysis.AutoAnalysisService.newPuzzleCount

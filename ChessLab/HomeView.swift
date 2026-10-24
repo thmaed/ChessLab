@@ -165,6 +165,7 @@ struct HomeView: View {
         case activeLab(LabGameSettings)
         case resumedLab(LabSeriesState)
         case progression
+        case dailySession
         case settings
         case help
         case licenses
@@ -188,7 +189,7 @@ struct HomeView: View {
                  .analysisEntry, .analysisLibrary, .scanner, .puzzleQueue,
                  .openingList, .endgameList, .labSetup, .variantsHub, .chess960Setup,
                  .fairyVariantSetup, .engineLegalitySetup, .stolenMoveSetup, .duckChessSetup,
-                 .progression, .settings, .help, .licenses, .openingsSources:
+                 .progression, .dailySession, .settings, .help, .licenses, .openingsSources:
                 return false
             }
         }
@@ -336,6 +337,7 @@ struct HomeView: View {
         case "crazyhouse": return .activeEngineLegalityGame(variantID: EngineLegalityVariant.crazyhouse.id, settings: FairyVariantSettings())
         case "chess960TwoPlayer": return .activeChess960TwoPlayerGame(Chess960TwoPlayerSettings(startFEN: "bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w KQkq - 0 1"))
         case "progression": return .progression
+        case "dailySession": return .dailySession
         case "settings": return .settings
         case "help": return .help
         default: return nil
@@ -721,6 +723,7 @@ struct HomeView: View {
                 if seedingState.isSeeding { seedingBanner }
                 // La reprise vit désormais en HAUT de la barre latérale
                 // (persistante) — voir `sidebar` — pour ne pas doublonner ici.
+                dailySessionCard
                 newPuzzlesPill
                 repertoireExitPill
                 modesSection(minTile: ModeGridMetrics.minTileRegular, shortSubtitles: true)
@@ -1136,6 +1139,13 @@ struct HomeView: View {
                         onOpenSources: { path.append(Route.openingsSources) }
                     )
 
+                case .dailySession:
+                    DailySessionView(
+                        onOpenOpenings: { path.append(Route.openingTrainDaily) },
+                        onOpenPuzzles: { filter in path.append(Route.activePuzzleSession(filter)) },
+                        onOpenEndgame: { id in path.append(Route.endgameFreeTrain(id)) }
+                    )
+
                 case .progression:
                     ProgressionView { theme in
                         // « Travailler ce thème » : ouvre une série de
@@ -1286,6 +1296,7 @@ struct HomeView: View {
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 if let resumableGame { resumeBanner(resumableGame) }
+                dailySessionCard
                 newPuzzlesPill
                 repertoireExitPill
                 modesSection(minTile: ModeGridMetrics.minTileIPhone)
@@ -1673,6 +1684,11 @@ struct HomeView: View {
             .buttonStyle(.pressable)
             .accessibilityIdentifier("newPuzzlesPill")
         }
+    }
+
+    /// C7 / A5 (2.0) : la « Séance du jour » en tête de l'accueil.
+    private var dailySessionCard: some View {
+        DailySessionCard { path.append(Route.dailySession) }
     }
 
     /// A3 (2.0) : « Vous avez quitté votre répertoire — 1 position à revoir ».
