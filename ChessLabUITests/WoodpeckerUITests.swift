@@ -104,7 +104,18 @@ final class WoodpeckerUITests: XCTestCase {
             while Date() < deadline, !e8.label.lowercased().contains("noir"), !e8.label.lowercased().contains("black") {
                 RunLoop.current.run(until: Date().addingTimeInterval(0.2))
             }
-            play("e1", "e8")
+            // Sur un vrai téléphone, un tap qui arrive pendant l'animation de
+            // la riposte est ignoré (iPhone XS, 24/10) — un humain ne joue pas
+            // aussi vite. On vérifie que le coup est PRIS, et on le rejoue sinon.
+            let e1 = square("e1")
+            for _ in 0..<4 {
+                play("e1", "e8")
+                let settled = Date().addingTimeInterval(2)
+                while Date() < settled, !e1.label.lowercased().contains("vide"), !e1.label.lowercased().contains("empty") {
+                    RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+                }
+                if e1.label.lowercased().contains("vide") || e1.label.lowercased().contains("empty") { break }
+            }
             if rank < 10 {
                 let next = element(app, "puzzleNext")
                 XCTAssertTrue(next.waitForExistence(timeout: 10), "puzzle \(rank) : « Puzzle suivant » attendu")

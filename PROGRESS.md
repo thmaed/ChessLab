@@ -10680,3 +10680,22 @@ Volé et Duck Chess contre l'ordinateur avancent et reculent par coup COMPLET.
 - `StolenMovePlayViewModelTests` (tour double du moteur) a échoué une fois en
   suite complète (58 s au lieu de 7) : sensible à la charge, vert seul.
 - Tests : `ReviewStepperTests` (+3) ; 11 tests d'interface des variantes verts.
+
+## 24/10 — 🐛 iOS 18 : la prise au tap-tap ne répondait plus ✅
+
+Trouvé en faisant tourner le cycle Woodpecker sur l'iPhone XS (iOS 18.7.9) :
+toucher sa pièce puis la pièce ADVERSE à prendre ne faisait rien ; seul le
+glisser prenait. Invisible en iOS 26, donc sur tous nos simulateurs.
+
+- Cause : dans `ChessBoardView.pieceView`, `.allowsHitTesting(isDraggable)`
+  était posé AVANT `.onHover`. Sous iOS 18, le survol ajouté ensuite rendait
+  la pièce adverse de nouveau touchable : elle avalait le tap destiné à la
+  case. C'est le même défaut que la « case d'origine » corrigée en 1.9.1 :
+  tant que les pièces s'empilaient à l'origine (avant la 1.9.1), il n'y
+  frappait que cette case ; rangées dans leurs cases (1.9.1), il frappe
+  CHAQUE pièce adverse. **La 1.9.1 soumise (build 16) a donc ce défaut sous
+  iOS 18.**
+- Correctif : `.allowsHitTesting` en DERNIER modificateur.
+- Test : `TapCaptureUITests` (puzzle déterministe 00008, qui commence par
+  Txe7) — rouge avant, vert après sur l'iPhone XS ; tous les tests
+  d'échiquier verts sur simulateur.
