@@ -10553,3 +10553,22 @@ reçoit tout par un seul `pointerInput`, rien à porter.
 **Piège rencontré.** Une série de tests UI a échoué en bloc (« le plateau doit
 s'afficher ») : la visite de découverte s'était relancée après une
 réinstallation. Les nouveaux tests passent `-discoveryTourSeen`.
+
+## 1.9.2 — la prise au tap-tap ne répondait plus en iOS 18 (2026-10-24)
+
+Version de correction ISOLÉE, sur la 1.9.1 (build 16, READY_FOR_SALE), sans
+les nouveautés de `main` (Woodpecker, mats manqués…, destinées à la 2.0).
+
+- Défaut : sous iOS 18, toucher sa pièce puis la pièce ADVERSE à prendre ne
+  faisait rien ; seul le glisser prenait. `.allowsHitTesting(isDraggable)`
+  posé avant `.onHover` dans `ChessBoardView.pieceView` : le survol rendait la
+  pièce adverse de nouveau touchable. La 1.9.1, en rangeant chaque pièce dans
+  sa case pour la « case d'origine », l'a étendu à toutes les pièces.
+- Preuve sur iPhone XS (iOS 18.7.9) : `TapCaptureUITests` ROUGE sur la 1.9.1,
+  VERT avec le correctif ; `OriginSquareSelectionUITests` vert.
+- Version 1.9.2, build 17 ; nouveautés FR/EN et notes réviseur dans
+  `AppStoreSubmission/METADATA.md`.
+- Publication : la branche `hotfix/1.9.1-prise-ios18` et le tag `v1.9.2`
+  doivent être POUSSÉS avant l'envoi (GPLv3 : le code du build publié doit
+  être public). `release.sh` vérifie `main` : depuis cette branche, après
+  avoir poussé, `--allow-unpushed`.

@@ -10,30 +10,24 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 ---
 
-## Nouveautés de cette version — 1.9.1 (4000 car. max)
+## Nouveautés de cette version — 1.9.2 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> Version 1.9.1, build 16. Version de correction, née d'un signalement de joueur le 22/10/2026. Depuis la 1.9.0 (build 15, READY_FOR_SALE). Détail dans `RELEASE_NOTES-1.9.1.md`. Captures et aperçus de la 1.9.0 conservés : rien du contenu n'a changé.
+> Version 1.9.2, build 17. Version de correction, sur la 1.9.1 (build 16, READY_FOR_SALE) et rien d'autre : trouvée le 24/10/2026 sur un iPhone XS en iOS 18.7.9. Captures et aperçus de la 1.9.0 conservés : rien du contenu n'a changé.
 
 ### Français
 
 ```
-UNE CASE QUI NE RÉPONDAIT PLUS
-Sur iOS 18, la pièce posée dans le coin haut gauche de l'échiquier ne se laissait plus toucher : h1 quand on joue les Noirs, a8 quand on joue les Blancs. Le défaut a été signalé au moment de jouer une dame depuis h1, partie en cours contre Maia. C'est corrigé, partout où l'échiquier se joue, et vérifié sur un iPhone sous iOS 18. Merci pour ce signalement si précis.
-
-LE SCANNER AUSSI
-Le recadrage manuel avait le même défaut sur iOS 18 : un coin posé tout en haut à gauche de l'image pouvait ne plus répondre. Les quatre coins se saisissent désormais au plus proche du doigt.
+PRENDRE UNE PIÈCE EN TOUCHANT, SUR IOS 18
+Sur iOS 18, toucher sa pièce puis la pièce adverse à prendre ne faisait rien : seul le glissement permettait de prendre. C'est corrigé, partout où l'échiquier se joue — parties, puzzles, analyse, variantes —, et vérifié sur un iPhone sous iOS 18.
 ```
 
 ### English
 
 ```
-A SQUARE THAT STOPPED RESPONDING
-On iOS 18, the piece standing in the top-left corner of the board could no longer be touched: h1 when playing Black, a8 when playing White. It was reported while trying to move a queen from h1, mid-game against Maia. It is fixed, wherever the board is played, and checked on an iPhone running iOS 18. Many thanks for such a precise report.
-
-THE SCANNER TOO
-Manual cropping had the same flaw on iOS 18: a corner placed at the very top left of the image could stop responding. The four corners are now picked up by whichever is closest to your finger.
+CAPTURING BY TAPPING, ON IOS 18
+On iOS 18, tapping your piece and then the opponent's piece to capture did nothing: only dragging could capture. It is fixed, wherever the board is played — games, puzzles, analysis, variants — and checked on an iPhone running iOS 18.
 ```
 
 ---
@@ -260,10 +254,10 @@ Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/0
 
 ## App Review Notes (paste into App Store Connect → App Review Information → Notes)
 
-English, for the Apple reviewer. Opens with the nature of the update (1.9.1 : correctif tactile iOS 18), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
+English, for the Apple reviewer. Opens with the nature of the update (1.9.2 : correctif tactile iOS 18), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
 
 ```
-WHAT'S IN THIS UPDATE (1.9.1): a bug-fix release. On iOS 18 only, the piece standing on the board's top-left square (h1 when playing Black, a8 when playing White) did not respond to touch, and neither did a crop handle placed at the top-left of the image in the Scanner. Both are fixed. No new feature; no change to permissions, privacy or licensing.
+WHAT'S IN THIS UPDATE (1.9.2): a bug-fix release. On iOS 18 only, tapping one of your pieces and then an opponent's piece did not capture it — only dragging did. It is fixed. No new feature; no change to permissions, privacy or licensing.
 
 ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 100,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
 
