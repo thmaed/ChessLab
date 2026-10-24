@@ -29,6 +29,9 @@ struct PuzzleQueueView: View {
     @State private var selectedPhase: GamePhase?
     @State private var selectedTheme: PuzzleTheme?
     @State private var selectedSource: PuzzleSource?
+    /// « À mon niveau » : la cote personnelle fixe la fenêtre de puzzles.
+    @State private var atMyLevel = false
+    @State private var puzzleRating = PuzzleRatingStore.load()
     @State private var missedOnly = false
 
     @State private var hasAnyPuzzle = true
@@ -43,7 +46,8 @@ struct PuzzleQueueView: View {
     private var currentFilter: PuzzleSessionFilter {
         PuzzleSessionFilter(
             difficulty: selectedDifficulty, phase: selectedPhase, theme: selectedTheme,
-            source: selectedSource, missedOnly: missedOnly
+            source: selectedSource, missedOnly: missedOnly,
+            ratingWindow: atMyLevel ? puzzleRating.window : nil
         )
     }
 
@@ -95,10 +99,18 @@ struct PuzzleQueueView: View {
                             // niveau ne retiendrait un seul puzzle.
                             if selectedSource != .ownGames {
                                 filterGroup(title: "Niveau") {
-                                    FilterChip(label: "Tous", tint: Theme.accent, isSelected: selectedDifficulty == nil) {
+                                    FilterChip(label: "Tous", tint: Theme.accent, isSelected: selectedDifficulty == nil && !atMyLevel) {
                                         selectedDifficulty = nil
+                                        atMyLevel = false
                                     }
                                     .accessibilityIdentifier("niveau-tous")
+                                    // Ma cote, plutôt qu'un palier : les puzzles
+                                    // se resserrent autour de ce que je réussis.
+                                    FilterChip(label: "À mon niveau", icon: "scope", tint: Theme.accent, isSelected: atMyLevel) {
+                                        atMyLevel.toggle()
+                                        if atMyLevel { selectedDifficulty = nil }
+                                    }
+                                    .accessibilityIdentifier("niveau-mien")
                                     ForEach(DifficultyTier.allCases, id: \.self) { tier in
                                         FilterChip(
                                             label: LocalizedStringKey(tier.label),
@@ -108,6 +120,7 @@ struct PuzzleQueueView: View {
                                             isSelected: selectedDifficulty == tier
                                         ) {
                                             selectedDifficulty = (selectedDifficulty == tier) ? nil : tier
+                                            atMyLevel = false
                                         }
                                     }
                                 }
@@ -327,9 +340,12 @@ struct PuzzleQueueView: View {
     private var selectionSummary: String {
         // Chaque `.label` est une clé française : on la localise via le bundle
         // détourné (comme partout hors `Text`).
+        let myLevel: String? = atMyLevel
+            ? LocalizationController.string("À mon niveau") + " (\(puzzleRating.window.lowerBound)–\(puzzleRating.window.upperBound))"
+            : nil
         let parts = [
             selectedSource?.label, missedOnly ? "Ratés" : nil,
-            selectedDifficulty?.label, selectedPhase?.label, selectedTheme?.label,
+            selectedDifficulty?.label, myLevel, selectedPhase?.label, selectedTheme?.label,
         ]
             .compactMap { $0 }
             .map { LocalizationController.string($0) }
@@ -377,6 +393,19 @@ struct PuzzleQueueView: View {
             Text("\(stats.successes) réussis sur \(stats.attempts) tentatives")
                 .font(.caption)
                 .foregroundStyle(Theme.textTertiary)
+            if puzzleRating.count > 0 {
+                HStack {
+                    Label("Cote de puzzle", systemImage: "scope")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.textSecondary)
+                    Spacer()
+                    Text((puzzleRating.isSettled ? "" : "≈ ") + "\(puzzleRating.displayed)")
+                        .font(.caption.weight(.bold).monospacedDigit())
+                        .foregroundStyle(Theme.accent)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("puzzleRating")
+            }
 
             if stats.hasEnoughDataForThemes {
                 Divider().overlay(Theme.stroke)
@@ -412,6 +441,7 @@ struct PuzzleQueueView: View {
         // Fusionne la progression synchronisée (dueDate, compteurs) avant de
         // lire la file et les stats — sinon un puzzle déjà résolu ailleurs
         // pourrait être re-servi ici. Voir ``PuzzleProgressSync``.
+        puzzleRating = PuzzleRatingStore.load()
         PuzzleProgressSync.reconcileIfStale(in: modelContext)
         let totalDescriptor = FetchDescriptor<Puzzle>()
         hasAnyPuzzle = ((try? modelContext.fetchCount(totalDescriptor)) ?? 0) > 0

@@ -67,6 +67,8 @@ data class TransferFile(
     val puzzleProgress: List<PuzzleProgressEntry> = emptyList(),
     /** Les programmes Woodpecker, plan compris — iOS les synchronise par iCloud. */
     val woodpecker: List<WoodpeckerEntry> = emptyList(),
+    /** La cote de puzzle personnelle (B3) ; la plus informée l'emporte à l'import. */
+    val puzzleRating: com.chesslab.puzzles.PuzzleRating? = null,
 ) {
     data class PuzzleProgressEntry(
         val externalId: String,
@@ -198,6 +200,10 @@ data class TransferFile(
                 )
             }
             root.put("woodpecker", woodpecker)
+            file.puzzleRating?.let {
+                root.put("puzzleRating", JSONObject()
+                    .put("rating", it.rating).put("deviation", it.deviation).put("count", it.count))
+            }
             return root.toString()
         }
 
@@ -292,6 +298,12 @@ data class TransferFile(
                 }
             }
 
+            val rating = root.optJSONObject("puzzleRating")?.let {
+                com.chesslab.puzzles.PuzzleRating(
+                    it.optDouble("rating", 1500.0), it.optDouble("deviation", 350.0), it.optInt("count"),
+                )
+            }
+
             val puzzles = root.optJSONObject("puzzles")
             return Result.success(
                 TransferFile(
@@ -304,6 +316,7 @@ data class TransferFile(
                     repertoires = repertoires,
                     puzzleProgress = progress,
                     woodpecker = woodpecker,
+                    puzzleRating = rating,
                 )
             )
         }

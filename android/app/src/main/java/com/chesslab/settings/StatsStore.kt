@@ -3,6 +3,8 @@ package com.chesslab.settings
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.doublePreferencesKey
+import com.chesslab.puzzles.PuzzleRating
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +31,9 @@ object StatsStore {
 
     private val attempted = intPreferencesKey("puzzlesAttempted")
     private val solved = intPreferencesKey("puzzlesSolved")
+    private val ratingValue = doublePreferencesKey("puzzleRating")
+    private val ratingDeviation = doublePreferencesKey("puzzleRatingDeviation")
+    private val ratingCount = intPreferencesKey("puzzleRatingCount")
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     fun puzzles(context: Context): Flow<PuzzleStats> =
@@ -51,6 +56,41 @@ object StatsStore {
         context.applicationContext.statsStore.edit {
             it[attempted] = maxOf(it[attempted] ?: 0, attemptedValue)
             it[solved] = maxOf(it[solved] ?: 0, solvedValue)
+        }
+    }
+
+    private fun androidx.datastore.preferences.core.Preferences.toRating() = PuzzleRating(
+        rating = this[ratingValue] ?: 1500.0,
+        deviation = this[ratingDeviation] ?: 350.0,
+        count = this[ratingCount] ?: 0,
+    )
+
+    /** La cote de puzzle personnelle (B3). */
+    suspend fun puzzleRating(context: Context): PuzzleRating =
+        context.applicationContext.statsStore.data.first().toRating()
+
+    private fun androidx.datastore.preferences.core.MutablePreferences.put(rating: PuzzleRating) {
+        this[ratingValue] = rating.rating
+        this[ratingDeviation] = rating.deviation
+        this[ratingCount] = rating.count
+    }
+
+    /** Un puzzle COTÉ de la bibliothèque vient d'être résolu, ou raté. */
+    fun recordRating(context: Context, solvedIt: Boolean, puzzleRating: Int) {
+        if (puzzleRating <= 0) return
+        val store = context.applicationContext.statsStore
+        scope.launch {
+            store.edit { it.put(it.toRating().record(solvedIt, puzzleRating)) }
+        }
+    }
+
+    /**
+     * Après un import : la cote la mieux INFORMÉE (le plus de puzzles) l'emporte.
+     * Elle ne revient pas en arrière quand on réimporte un vieux fichier.
+     */
+    suspend fun adoptRating(context: Context, incoming: PuzzleRating) {
+        context.applicationContext.statsStore.edit {
+            if (incoming.count > it.toRating().count) it.put(incoming)
         }
     }
 

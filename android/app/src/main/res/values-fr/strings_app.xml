@@ -1073,6 +1073,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="woodpecker_cycle_line">%1$d trouvés sur %2$d en %3$s</string>
     <string name="woodpecker_previous_line">Cycle %1$d : %2$d trouvés sur %3$d en %4$s</string>
     <string name="woodpecker_target">Objectif du cycle suivant : moins de %1$s</string>
+    <string name="puzzle_at_my_level">À mon niveau</string>
+    <string name="puzzle_rating">Cote de puzzle</string>
     <string name="puzzle_provenance">Provenance</string>
     <string name="puzzle_history">Historique</string>
     <string name="puzzle_missed">Ratés</string>

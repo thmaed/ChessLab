@@ -39,5 +39,5 @@ object PuzzleAnswer {
     fun accepts(puzzle: Puzzle, filter: PuzzleFilter, isOwn: Boolean): Boolean =
         (filter.theme == null || puzzle.theme == filter.theme.raw) &&
             (filter.phase == null || puzzle.phase == filter.phase.raw) &&
-            (filter.difficulty == null || (!isOwn && puzzle.rating in filter.ratings))
+            ((filter.difficulty == null && filter.ratingWindow == null) || (!isOwn && puzzle.rating in filter.ratings))
 }

@@ -62,6 +62,7 @@ object TransferService {
                     it.intervalDays, it.repetitions, it.dueAt, it.updatedAt, it.theme, it.rating,
                 )
             },
+            puzzleRating = StatsStore.puzzleRating(context).takeIf { it.count > 0 },
             woodpecker = db.woodpecker().all().map {
                 TransferFile.WoodpeckerEntry(it.id, it.createdAt, it.updatedAt, it.criteria, it.planJson, it.archived)
             },
@@ -174,6 +175,8 @@ object TransferService {
                         )
                     )
                 }
+
+                incoming.puzzleRating?.let { StatsStore.adoptRating(context, it) }
 
                 TransferMerge.Summary(
                     newReviews = added,

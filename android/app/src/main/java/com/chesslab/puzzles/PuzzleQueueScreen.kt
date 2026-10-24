@@ -66,9 +66,13 @@ fun PuzzleQueueScreen(
     var theme by remember { mutableStateOf<PuzzleThemeKind?>(null) }
     var source by remember { mutableStateOf<PuzzleSource?>(null) }
     var missedOnly by remember { mutableStateOf(false) }
+    // « À mon niveau » : la cote personnelle fixe la fenêtre de puzzles.
+    var atMyLevel by remember { mutableStateOf(false) }
+    var puzzleRating by remember { mutableStateOf(PuzzleRating()) }
     var stats by remember { mutableStateOf<PuzzleStats?>(null) }
 
     LaunchedEffect(Unit) {
+        puzzleRating = com.chesslab.settings.StatsStore.puzzleRating(context)
         stats = withContext(Dispatchers.IO) {
             runCatching {
                 PuzzleStats.compute(LibraryDatabase.get(context).puzzleProgress().all())
@@ -122,13 +126,20 @@ fun PuzzleQueueScreen(
             // Masqué pour « Mes parties » : sans cote, aucun niveau ne
             // retiendrait un seul puzzle.
             if (source != PuzzleSource.ownGames) Group(stringResource(R.string.puzzle_level)) {
-                ChipButton(stringResource(R.string.filter_all), difficulty == null,
-                    Modifier.testTag("niveau-tous"), tint = Palette.accent) { difficulty = null }
+                ChipButton(stringResource(R.string.filter_all), difficulty == null && !atMyLevel,
+                    Modifier.testTag("niveau-tous"), tint = Palette.accent) { difficulty = null; atMyLevel = false }
+                // Ma cote, plutôt qu'un palier : les puzzles se resserrent
+                // autour de ce que je réussis. Pendant de `niveau-mien` (iOS).
+                ChipButton(stringResource(R.string.puzzle_at_my_level), atMyLevel,
+                    Modifier.testTag("niveau-mien"), tint = Palette.accent) {
+                    atMyLevel = !atMyLevel
+                    if (atMyLevel) difficulty = null
+                }
                 DifficultyTier.entries.forEach { tier ->
                     ChipButton(
                         stringResource(tier.labelRes), difficulty == tier,
                         Modifier.testTag("niveau-${tier.name}"), tint = tier.tint,
-                    ) { difficulty = if (difficulty == tier) null else tier }
+                    ) { difficulty = if (difficulty == tier) null else tier; atMyLevel = false }
                 }
             }
             Group(stringResource(R.string.puzzle_phase)) {
@@ -162,10 +173,18 @@ fun PuzzleQueueScreen(
             }
             WoodpeckerCard(
                 filter = PuzzleFilter(difficulty, phase, theme, source, missedOnly),
-                criteria = summary(source, missedOnly, difficulty, phase, theme),
+                criteria = summary(source, missedOnly, difficulty, phase, theme, if (atMyLevel) puzzleRating.window else null),
                 onOpen = onOpenWoodpecker,
             )
             stats?.takeIf { it.attempts > 0 }?.let { PuzzleStatsCard(it) }
+            if (puzzleRating.count > 0) {
+                Row(Modifier.fillMaxWidth().testTag("cote-puzzle"), verticalAlignment = Alignment.CenterVertically) {
+                    Text(stringResource(R.string.puzzle_rating), fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                        color = Palette.textSecondary, modifier = Modifier.weight(1f))
+                    Text((if (puzzleRating.isSettled) "" else "≈ ") + puzzleRating.displayed,
+                        fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Palette.accent)
+                }
+            }
         }
 
         // Le pied est ÉPINGLÉ : « Commencer » reste accessible quel que soit
@@ -179,7 +198,7 @@ fun PuzzleQueueScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                summary(source, missedOnly, difficulty, phase, theme),
+                summary(source, missedOnly, difficulty, phase, theme, if (atMyLevel) puzzleRating.window else null),
                 fontSize = 11.sp, color = Palette.textTertiary,
                 modifier = Modifier.testTag("resume-selection"),
             )
@@ -191,7 +210,7 @@ fun PuzzleQueueScreen(
                     .fillMaxWidth()
                     .clip(CircleShape)
                     .background(accentGradient)
-                    .clickable { onStart(PuzzleFilter(difficulty, phase, theme, source, missedOnly)) }
+                    .clickable { onStart(PuzzleFilter(difficulty, phase, theme, source, missedOnly, if (atMyLevel) puzzleRating.window else null)) }
                     .padding(vertical = 14.dp)
                     .testTag("commencer-puzzles"),
                 textAlign = TextAlign.Center,
@@ -221,11 +240,13 @@ private fun summary(
     difficulty: DifficultyTier?,
     phase: GamePhase?,
     theme: PuzzleThemeKind?,
+    ratingWindow: IntRange? = null,
 ): String {
     val parts = listOfNotNull(
         source?.let { stringResource(it.labelRes) },
         if (missedOnly) stringResource(R.string.puzzle_missed) else null,
         difficulty?.let { stringResource(it.labelRes) },
+        ratingWindow?.let { stringResource(R.string.puzzle_at_my_level) + " (${it.first}–${it.last})" },
         phase?.let { stringResource(it.labelRes) },
         theme?.let { stringResource(it.labelRes) },
     )

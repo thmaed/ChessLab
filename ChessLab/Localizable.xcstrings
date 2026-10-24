@@ -5584,6 +5584,22 @@
         }
       }
     },
+    "Cote de puzzle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puzzle rating"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cote de puzzle"
+          }
+        }
+      }
+    },
     "Couleur": {
       "localizations": {
         "en": {
@@ -21764,6 +21780,22 @@
       }
     },
     "« %@ »": {},
+    "À mon niveau": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At my level"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À mon niveau"
+          }
+        }
+      }
+    },
     "À mémoriser": {
       "localizations": {
         "en": {

@@ -481,6 +481,11 @@ final class PuzzleSolveViewModel {
     }
 
     private func updateSchedule(success: Bool) {
+        // La cote personnelle : seuls les puzzles COTÉS de la bibliothèque
+        // comptent (ceux de vos parties n'ont pas de cote).
+        if let puzzleRating = puzzle.rating, puzzleRating > 0 {
+            PuzzleRatingStore.record(solved: success, againstPuzzleRated: puzzleRating)
+        }
         let schedule = SpacedRepetition.Schedule(
             easinessFactor: puzzle.easinessFactor ?? 2.5,
             intervalDays: puzzle.intervalDays ?? 0,

@@ -73,6 +73,8 @@ final class SettingsCloudSync {
         "lastTwoPlayerGameSettings",
         // Niveau mémorisé par personnage (mode Contre l'ordinateur).
         "opponentLevels.v1",
+        // Cote de puzzle personnelle (Glicko), dernière écriture gagne.
+        "puzzleRating.v1",
     ]
 
     /// Exclusions explicitement DÉCIDÉES (par opposition à celles qui découlent

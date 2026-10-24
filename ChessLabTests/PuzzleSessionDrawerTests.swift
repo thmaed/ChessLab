@@ -241,5 +241,44 @@ struct PuzzleSessionDrawerTests {
         #expect(program.plan?.currentCycle.number == 2)
         #expect(!viewModel.isFinished)
     }
+
+    // MARK: À mon niveau
+
+    @Test func aRatingWindowKeepsOnlyPuzzlesAroundThePlayer() throws {
+        let context = try makeContext()
+        for rating in [1000, 1400, 1500, 1600, 2000] {
+            let puzzle = insertPuzzle(in: context)
+            puzzle.rating = rating
+        }
+        try context.save()
+        let drawn = Set((0..<80).compactMap {
+            _ in PuzzleSessionDrawer.drawNext(matching: PuzzleSessionFilter(ratingWindow: 1400...1600), in: context)?.rating
+        })
+        #expect(drawn == [1400, 1500, 1600])
+    }
+
+    /// Un puzzle de la bibliothèque, réussi, nourrit la cote ; un puzzle de vos
+    /// parties (sans cote) ne la touche pas.
+    @Test func onlyRatedPuzzlesFeedThePlayerRating() throws {
+        let defaults = UserDefaults.standard
+        let before = PuzzleRatingStore.load(from: defaults)
+        defer { PuzzleRatingStore.save(before, to: defaults) }
+        PuzzleRatingStore.save(.initial, to: defaults)
+
+        let context = try makeContext()
+        let rated = insertPuzzle(in: context)
+        rated.rating = 1500
+        let own = insertPuzzle(in: context, source: .ownGames, fen: "k7/8/8/8/8/8/6RR/K7 w - - 0 1", solution: ["h2h8"])
+        try context.save()
+
+        let first = try #require(PuzzleSolveViewModel(filter: PuzzleSessionFilter(source: .lichess), modelContext: context))
+        first.attemptMove(from: Square("a1"), to: Square("a8"))
+        #expect(PuzzleRatingStore.load(from: defaults).count == 1)
+
+        _ = own
+        let second = try #require(PuzzleSolveViewModel(filter: PuzzleSessionFilter(source: .ownGames), modelContext: context))
+        second.attemptMove(from: Square("h2"), to: Square("h8"))
+        #expect(PuzzleRatingStore.load(from: defaults).count == 1, "pas de cote, pas de mise à jour")
+    }
 }
 

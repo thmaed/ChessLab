@@ -18,6 +18,10 @@ struct PuzzleSessionFilter: Hashable {
     /// Seulement les puzzles RATÉS À LA DERNIÈRE TENTATIVE — voir
     /// ``PuzzleSessionDrawer/predicate(matching:neverOpenedOnly:excluding:)``.
     var missedOnly = false
+    /// Fenêtre de cotes « À mon niveau » (``PuzzleRating/window``), calculée au
+    /// lancement de la série. Prime sur `difficulty` : les deux critères disent
+    /// la même chose, l'un par palier, l'autre par la cote du joueur.
+    var ratingWindow: ClosedRange<Int>?
 }
 
 /// Compte et tire les puzzles dus correspondant à un
@@ -156,8 +160,10 @@ enum PuzzleSessionDrawer {
         // Un puzzle sans rating (vos gaffes) vaut -1 : inclus quand aucun
         // niveau n'est choisi (borne Int.min), exclu sinon — la
         // difficulté n'a de sens que pour la bibliothèque notée.
-        let lowerRating = filter.difficulty?.ratingRange.lowerBound ?? Int.min
-        let upperRating = filter.difficulty?.ratingRange.upperBound ?? Int.max
+        let lowerRating = filter.ratingWindow?.lowerBound
+            ?? filter.difficulty?.ratingRange.lowerBound ?? Int.min
+        let upperRating = filter.ratingWindow?.upperBound
+            ?? filter.difficulty?.ratingRange.upperBound ?? Int.max
         let phaseRaw = filter.phase?.rawValue
         let themeRaw = filter.theme?.rawValue
         // Sentinelle qui ne matche aucun puzzle réel quand rien n'est à

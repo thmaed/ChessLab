@@ -107,6 +107,8 @@ class TransferTest {
         )!!.record(solved = true, seconds = 12.0, now = t0)
         db.woodpecker().put(com.chesslab.puzzles.WoodpeckerProgram("prog-1", t0, t0, "10 puzzles", plan.toJson()))
 
+        // La cote de puzzle voyage aussi : la plus INFORMÉE l'emporte.
+        com.chesslab.settings.StatsStore.adoptRating(context, com.chesslab.puzzles.PuzzleRating(1720.0, 90.0, 40))
         val file = tempFile("puzzles.clab")
         TransferService.export(context, android.net.Uri.fromFile(file)).getOrThrow()
         db.puzzleProgress().clear()
@@ -116,6 +118,9 @@ class TransferTest {
         assertEquals(1, summary.puzzlesUpdated)
         assertEquals(1, summary.woodpeckerUpdated)
         assertEquals(listOf("abc12"), db.puzzleProgress().missedIds())
+        val rating = com.chesslab.settings.StatsStore.puzzleRating(context)
+        assertEquals(40, rating.count)
+        assertEquals(1720, rating.displayed)
         val restored = db.woodpecker().byId("prog-1")!!.plan!!
         assertEquals(plan, restored)
 

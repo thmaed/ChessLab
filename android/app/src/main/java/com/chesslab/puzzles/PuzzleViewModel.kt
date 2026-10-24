@@ -446,6 +446,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             if (ui.woodpeckerPlan != null) recordWoodpecker(solved = false)
             else {
                 StatsStore.recordPuzzle(getApplication(), solvedIt = false)
+                ui.puzzle?.let { StatsStore.recordRating(getApplication(), false, it.rating) }
                 ui.puzzle?.let { recordProgress(it, success = false) }
             }
             ui.copy(
@@ -467,6 +468,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             if (ui.woodpeckerPlan != null) recordWoodpecker(solved = true)
             else {
                 StatsStore.recordPuzzle(getApplication(), solvedIt = true)
+                StatsStore.recordRating(getApplication(), true, puzzle.rating)
                 recordProgress(puzzle, success = true)
             }
             ui = ui.copy(

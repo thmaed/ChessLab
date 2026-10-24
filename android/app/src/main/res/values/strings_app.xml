@@ -1076,6 +1076,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="woodpecker_cycle_line">%1$d solved out of %2$d in %3$s</string>
     <string name="woodpecker_previous_line">Cycle %1$d: %2$d solved out of %3$d in %4$s</string>
     <string name="woodpecker_target">Next cycle target: under %1$s</string>
+    <string name="puzzle_at_my_level">At my level</string>
+    <string name="puzzle_rating">Puzzle rating</string>
     <string name="puzzle_provenance">Source</string>
     <string name="puzzle_history">History</string>
     <string name="puzzle_missed">Missed</string>

@@ -199,5 +199,35 @@ class PuzzleDeviceFlowTest {
         assertTrue("le plateau commence trop bas : $boardTop sur $screenHeight", boardTop < screenHeight * 0.3f)
         compose.onNodeWithTag("indice").assertIsDisplayed()
     }
+
+    /**
+     * « À mon niveau » : la série ne contient que des puzzles dans la fenêtre de
+     * cotes du joueur, et sa cote suit ses réussites (B3, 24/10/2026).
+     */
+    @Test fun laSerieAMonNiveauResteDansLaFenetreDeLaCote() {
+        val window = com.chesslab.puzzles.PuzzleRating().window
+        val model = makeModel()
+        val filter = PuzzleFilter(ratingWindow = window)
+        compose.setContent { PuzzleScreen(filter = filter, model = model) }
+        compose.waitUntil(90_000) { model.ui.puzzle != null && !model.ui.loading }
+        val puzzle = model.ui.puzzle!!
+        assertTrue("cote ${puzzle.rating} hors de $window", puzzle.rating in window)
+
+        // Le résoudre fait bouger la cote.
+        val before = runBlocking { com.chesslab.settings.StatsStore.puzzleRating(app) }
+        for (k in puzzle.solution.indices step 2) {
+            val lan = puzzle.solution[k]
+            tap(lan.substring(0, 2), lan.substring(2, 4))
+            if (k + 1 < puzzle.solution.size) {
+                val reply = puzzle.solution[k + 1]
+                compose.waitUntil(10_000) {
+                    !model.ui.busy && model.ui.lastMove?.let { (a, b) -> a.notation + b.notation == reply.take(4) } == true
+                }
+            }
+        }
+        compose.waitUntil(10_000) { model.ui.outcome == PuzzleOutcome.solved }
+        compose.waitUntil(10_000) { runBlocking { com.chesslab.settings.StatsStore.puzzleRating(app) }.count == before.count + 1 }
+        assertTrue(runBlocking { com.chesslab.settings.StatsStore.puzzleRating(app) }.rating > before.rating)
+    }
 }
 

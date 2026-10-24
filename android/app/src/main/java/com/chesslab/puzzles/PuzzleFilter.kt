@@ -146,8 +146,15 @@ data class PuzzleFilter(
      * réussi. Pendant de `PuzzleSessionFilter.missedOnly`.
      */
     val missedOnly: Boolean = false,
+    /**
+     * Fenêtre de cotes « À mon niveau » ([PuzzleRating.window]), calculée au
+     * lancement de la série. Prime sur [difficulty] : les deux disent la même
+     * chose, l'un par palier, l'autre par la cote du joueur.
+     */
+    val ratingWindow: IntRange? = null,
 ) {
-    val ratings: IntRange get() = difficulty?.range ?: 0..4000
+    val ratings: IntRange get() = ratingWindow ?: difficulty?.range ?: 0..4000
     val isEmpty: Boolean
-        get() = difficulty == null && phase == null && theme == null && source == null && !missedOnly
+        get() = difficulty == null && phase == null && theme == null && source == null &&
+            !missedOnly && ratingWindow == null
 }

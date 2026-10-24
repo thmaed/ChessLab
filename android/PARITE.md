@@ -41,6 +41,19 @@ vérification sur appareil, pas après compilation.
       compris) pour le Coup Volé, journaux tronqués pour le Duck Chess.
       `VariantReviewTest` (cinq cas) vert sur Galaxy A16.
 
+### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
+
+- [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au
+      départ, plancher d'incertitude 60), mise à jour à chaque puzzle COTÉ de
+      la bibliothèque — indice = réussi, puzzles maison et Woodpecker exclus.
+- [x] Chip « À mon niveau » (fenêtre ±100 à ±250 selon l'incertitude), cote
+      affichée sur l'écran de choix (« ≈ » tant que moins de 10 puzzles).
+- [x] Elle voyage : clé iCloud `puzzleRating.v1` (iOS), `.clab` (Android, la
+      cote la mieux informée l'emporte).
+- Tests : `PuzzleRatingTests` / `PuzzleRatingTest`, convergence vérifiée sur
+  600 puzzles simulés ; `PuzzleDeviceFlowTest.laSerieAMonNiveau…` et
+  `TransferTest` sur Galaxy A16.
+
 ### Consultation contre l'ordinateur : par coup complet — 23/10/2026
 
 Demande de l'utilisateur, faite des deux côtés : les flèches « coup
