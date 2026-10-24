@@ -325,7 +325,7 @@ fun VariantSetupScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(ControlShape)
-                    .background(accentGradient)
+                    .background(com.chesslab.ui.tintedActionGradient(variantTint(variantId)))
                     .clickable {
                         val settings = VariantSettings(
                             colorChoice = color,

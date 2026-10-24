@@ -107,5 +107,6 @@ d'action plein en bas (C4).
 - **C1, C2, C3 faits sur iOS** ; **C1 et C3 faits sur Android** (C2 : voir
   `android/PARITE.md`). 20 tests d'interface verts (débordements, Dynamic Type
   AX3/AX5, petits écrans, visite guidée, Woodpecker, filtres).
-- **À venir** : C4 (bouton d'action en bas), puis C7 (accueil personnalisé avec
+- **C4 fait** (iOS : `PrimaryActionBar`, bouton plein teinté en bas des écrans de réglage ; Android : `tintedActionGradient`) ; suites d'interface vertes.
+- **À venir** : C7 (accueil personnalisé avec
   la « Séance du jour », lié à A5).

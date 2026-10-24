@@ -219,7 +219,7 @@ fun TwoPlayerSetupScreen(
               modifier = Modifier
                   .fillMaxWidth()
                   .clip(CircleShape)
-                  .background(accentGradient)
+                  .background(com.chesslab.ui.tintedActionGradient(Palette.info))
                   .clickable {
                       val settings = TwoPlayerSettings(
                           whiteName = white.trim().ifEmpty { defaultWhite },

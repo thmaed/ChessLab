@@ -134,14 +134,7 @@ struct FairyVariantSetupView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Commencer") { start() }
-                    .fontWeight(.semibold)
-                    .tint(variant.tint)
-                    .accessibilityIdentifier("fairyVariant_start")
-            }
-        }
+        .primaryActionBar("Commencer", tint: variant.tint, identifier: "fairyVariant_start") { start() }
     }
 
     private var ruleSummary: some View {

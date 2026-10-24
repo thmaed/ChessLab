@@ -48,6 +48,9 @@ vérification sur appareil, pas après compilation.
       côtés. Vu sur Galaxy A16.
 - [x] **C3 — en-têtes de section avec pastille teintée** : les cinq groupes
       de l'écran de choix des puzzles (`SectionHeader(icon, tint)`).
+- [x] **C4 — bouton d'action plein en bas, teinté du mode** (Nouvelle partie vert,
+      Deux joueurs bleu, Laboratoire rose, variantes) : iOS `PrimaryActionBar`,
+      Android `tintedActionGradient`. Reste à voir sur le Galaxy.
 - [ ] **C2 — un seul style de titre : fait sur iOS seulement.** Les écrans de
       menu iOS (Puzzles, Nouvelle partie, Deux joueurs, Analyser,
       Bibliothèque, Laboratoire, Variantes, Progression) passent en GRAND titre

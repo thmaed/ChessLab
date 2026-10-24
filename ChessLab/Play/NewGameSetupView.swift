@@ -314,13 +314,7 @@ struct NewGameSetupView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Commencer") { start() }
-                    .fontWeight(.semibold)
-                    .tint(Theme.accent)
-            }
-        }
+        .primaryActionBar("Commencer") { start() }
         // `.page` et non la taille par défaut : sur iPad, une feuille sans
         // consigne s'ouvre en FORM SHEET (~540×620), et c'est trop petit pour
         // les deux écrans ci-dessous — le recadrage à quatre poignées du

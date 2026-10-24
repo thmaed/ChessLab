@@ -147,13 +147,7 @@ struct TwoPlayerSetupView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Commencer") { start() }
-                    .fontWeight(.semibold)
-                    .tint(Theme.accent)
-            }
-        }
+        .primaryActionBar("Commencer", tint: Theme.info) { start() }
     }
 
     private func nameField(label: LocalizedStringKey, text: Binding<String>) -> some View {

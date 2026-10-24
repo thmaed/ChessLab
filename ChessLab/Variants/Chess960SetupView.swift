@@ -108,14 +108,11 @@ struct Chess960SetupView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        .primaryActionBar(
+            "Commencer", isEnabled: Chess960Position.number(forBackRank: editableRank) != nil,
+            identifier: "chess960_start"
+        ) { start() }
         .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Commencer") { start() }
-                    .fontWeight(.semibold)
-                    .tint(Theme.accent)
-                    .disabled(Chess960Position.number(forBackRank: editableRank) == nil)
-                    .accessibilityIdentifier("chess960_start")
-            }
             // Le pavé numérique n'offre aucune touche de fermeture par
             // lui-même : sans cette barre, il resterait ouvert tant que
             // l'utilisateur ne touche pas ailleurs à l'aveugle.

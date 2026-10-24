@@ -178,13 +178,7 @@ struct LabSetupView: View {
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
-        .toolbar {
-            ToolbarItem(placement: .confirmationAction) {
-                Button("Lancer") { start() }
-                    .fontWeight(.semibold)
-                    .tint(Theme.accent)
-            }
-        }
+        .primaryActionBar("Lancer", systemImage: "flask.fill", tint: Theme.rose) { start() }
         .onAppear { resumable = LabAutosaveStore.load() }
         // Même raison que dans ``NewGameSetupView`` : la form sheet iPad par
         // défaut (~540×620) est trop petite pour le recadrage à quatre

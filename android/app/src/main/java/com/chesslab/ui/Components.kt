@@ -36,6 +36,13 @@ import androidx.compose.ui.unit.sp
 val accentGradient: Brush
     get() = Brush.linearGradient(listOf(Palette.accent, Palette.accentSecondary))
 
+/**
+ * Le dégradé du bouton d'action plein d'un mode (C4, 24/10/2026) : la teinte du
+ * mode vers sa version assombrie, comme `PrimaryActionBar` d'iOS.
+ */
+fun tintedActionGradient(tint: Color): Brush =
+    Brush.linearGradient(listOf(tint, tint.copy(alpha = 0.72f)))
+
 /** Le dégradé d'une carte : une lumière très légère en haut. */
 val cardGradient: Brush
     get() = Brush.verticalGradient(

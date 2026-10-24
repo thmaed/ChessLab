@@ -119,7 +119,7 @@ fun LabScreen(
                     modifier = Modifier
                         .weight(1f)
                         .clip(CircleShape)
-                        .background(accentGradient)
+                        .background(com.chesslab.ui.tintedActionGradient(Palette.rose))
                         .clickable { model.toggle() }
                         .padding(vertical = 13.dp)
                         .testTag("lancer"),

@@ -379,6 +379,69 @@ struct IconBadge: View {
     }
 }
 
+// MARK: - Action principale (C4, 24/10/2026)
+
+/// Le bouton d'action d'un écran de réglage : plein, dégradé de la teinte du
+/// mode, collé en bas — là où le pouce arrive, et la même forme partout
+/// (Commencer, Lancer). Il remplace la pastille du haut, qui changeait de
+/// place et de forme d'un écran à l'autre.
+struct PrimaryActionBar: View {
+    let title: LocalizedStringKey
+    var systemImage = "play.fill"
+    var tint: Color = Theme.accent
+    var isEnabled = true
+    var identifier: String?
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: systemImage)
+                Text(title)
+            }
+            .font(.headline)
+            .foregroundStyle(Theme.background)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 15)
+            .background(
+                LinearGradient(
+                    colors: [tint, tint.opacity(0.72)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                ),
+                in: RoundedRectangle(cornerRadius: 16, style: .continuous)
+            )
+            .glow(tint, radius: 12, isActive: isEnabled)
+            .opacity(isEnabled ? 1 : 0.4)
+        }
+        .buttonStyle(.pressable)
+        .disabled(!isEnabled)
+        .padding(.horizontal, 20)
+        .padding(.top, 12)
+        .padding(.bottom, 12)
+        .background(Theme.background)
+        // Fin liseré haut : sépare le pied du contenu qui défile dessous.
+        .overlay(alignment: .top) {
+            Rectangle().fill(Theme.stroke).frame(height: 1)
+        }
+        .accessibilityIdentifier(identifier ?? "primaryAction")
+    }
+}
+
+extension View {
+    /// Pose le bouton d'action en pied d'écran, hors du défilement.
+    func primaryActionBar(
+        _ title: LocalizedStringKey, systemImage: String = "play.fill", tint: Color = Theme.accent,
+        isEnabled: Bool = true, identifier: String? = nil, action: @escaping () -> Void
+    ) -> some View {
+        safeAreaInset(edge: .bottom, spacing: 0) {
+            PrimaryActionBar(
+                title: title, systemImage: systemImage, tint: tint,
+                isEnabled: isEnabled, identifier: identifier, action: action
+            )
+        }
+    }
+}
+
 // MARK: - Filtres & chips
 
 /// Groupe de filtre étiqueté : titre en petites capitales suivi de ses
