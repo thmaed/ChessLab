@@ -765,8 +765,26 @@ final class StolenMovePlayViewModel {
         refreshDisplayedEvalBar()
     }
 
-    func reviewPrevious() { review(toPly: displayedPly - 1) }
-    func reviewNext() { review(toPly: displayedPly + 1) }
+    /// Par coup COMPLET, vers les positions où c'est au joueur de jouer —
+    /// voir ``ReviewStepper``. Par la couleur de qui joue chaque coup, et non
+    /// par la FEN : au milieu d'un tour double, la FEN donne le trait à
+    /// l'adversaire alors que le même camp rejoue.
+    private var reviewStepper: ReviewStepper {
+        ReviewStepper(moverColors: moveLog.map(\.piece.color), userColor: userColor)
+    }
+
+    var canReviewPrevious: Bool { reviewStepper.previous(from: displayedPly) != nil }
+    var canReviewNext: Bool { reviewStepper.next(from: displayedPly) != nil }
+
+    func reviewPrevious() {
+        guard let ply = reviewStepper.previous(from: displayedPly) else { return }
+        review(toPly: ply)
+    }
+
+    func reviewNext() {
+        guard let ply = reviewStepper.next(from: displayedPly) else { return }
+        review(toPly: ply)
+    }
 
     func reviewToLive() {
         reviewPly = nil

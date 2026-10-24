@@ -312,6 +312,8 @@ struct EngineLegalityPlayView: View {
             hasMoves: viewModel.totalPlies > 0,
             displayedPly: viewModel.displayedPly,
             totalPlies: viewModel.totalPlies,
+            canGoBack: viewModel.canReviewPrevious,
+            canGoForward: viewModel.canReviewNext,
             isReviewing: viewModel.isReviewing,
             canResumeFromReview: viewModel.canResumeFromReview,
             undoableResumeCount: viewModel.resumeUndo?.discardedCount,

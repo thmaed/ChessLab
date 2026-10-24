@@ -1,3 +1,4 @@
+import ChessKit
 import Testing
 @testable import ChessLab
 
@@ -43,4 +44,46 @@ struct ReviewStepperTests {
         #expect(stepper.previous(from: 3) == 2)
         #expect(stepper.next(from: 3) == 4)
     }
+
+    // MARK: Variantes (24/10)
+
+    /// Par la FEN : le joueur aux Noirs n'a le trait qu'aux positions « b ».
+    @Test func theFenLogTellsWhoIsToMove() {
+        let fens = [
+            "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+            "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+            "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2",
+            "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+            "r1bqkbnr/pppp1ppp/2n5/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3",
+        ]
+        let stepper = ReviewStepper(totalPlies: 4, fenLog: fens, userColor: .black)
+        #expect(stepper.previous(from: 4) == 3)
+        #expect(stepper.previous(from: 3) == 1)
+        #expect(stepper.previous(from: 1) == nil)
+        #expect(stepper.next(from: 1) == 3)
+        #expect(stepper.next(from: 3) == 4)
+    }
+
+    /// Coup Volé : les Blancs (joueur) dépensent un jeton et jouent DEUX coups
+    /// d'affilée (demi-coups 2 et 3). La position du milieu du tour double est
+    /// encore au joueur — la parité, elle, l'aurait donnée au moteur.
+    @Test func aDoubleTurnKeepsBothPositionsForThePlayer() {
+        let movers: [Piece.Color] = [.white, .black, .white, .white, .black, .white]
+        let stepper = ReviewStepper(moverColors: movers, userColor: .white)
+        #expect(stepper.previous(from: 6) == 5)
+        #expect(stepper.previous(from: 5) == 3)
+        #expect(stepper.previous(from: 3) == 2)
+        #expect(stepper.previous(from: 2) == 0)
+        #expect(stepper.next(from: 0) == 2)
+        #expect(stepper.next(from: 2) == 3)
+        #expect(stepper.next(from: 3) == 5)
+        #expect(stepper.next(from: 5) == 6)
+    }
+
+    @Test func readsTheSideToMoveOfAVariantFen() {
+        #expect(ReviewStepper.sideToMove(fen: "8/8/8/8/8/8/8/K6k b - - 0 1") == .black)
+        #expect(ReviewStepper.sideToMove(fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR[] w KQkq - 0 1") == .white)
+        #expect(ReviewStepper.sideToMove(fen: "pas une fen") == nil)
+    }
 }
+

@@ -725,8 +725,28 @@ final class Chess960PlayViewModel {
         refreshDisplayedEvalBar()
     }
 
-    func reviewPrevious() { review(toPly: displayedPly - 1) }
-    func reviewNext() { review(toPly: displayedPly + 1) }
+    /// Par coup COMPLET, vers les positions où c'est au joueur de jouer —
+    /// voir ``ReviewStepper``. Les coups alternent toujours en Chess960 : la
+    /// parité suffit. La liste des coups mène toujours au demi-coup choisi.
+    private var reviewStepper: ReviewStepper {
+        ReviewStepper(
+            totalPlies: totalPlies,
+            userMovesOnEvenPlies: ReviewStepper.sideToMove(fen: startFEN) == userColor
+        )
+    }
+
+    var canReviewPrevious: Bool { reviewStepper.previous(from: displayedPly) != nil }
+    var canReviewNext: Bool { reviewStepper.next(from: displayedPly) != nil }
+
+    func reviewPrevious() {
+        guard let ply = reviewStepper.previous(from: displayedPly) else { return }
+        review(toPly: ply)
+    }
+
+    func reviewNext() {
+        guard let ply = reviewStepper.next(from: displayedPly) else { return }
+        review(toPly: ply)
+    }
 
     func reviewToLive() {
         reviewPly = nil

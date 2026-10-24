@@ -7,6 +7,19 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Variantes contre l'ordinateur : PAS DE CONSULTATION sur Android — relevé le 24/10/2026
+
+- [ ] **Écart (préexistant, jamais inscrit)** : sur iOS, les cinq écrans de
+      variantes contre l'ordinateur (Chess960, variantes Fairy, Barricades &
+      co., Coup Volé, Duck Chess) ont la barre de consultation — précédent /
+      suivant, « Reprendre ici » hors pendule, annulation huit secondes. Sur
+      Android, AUCUN : `VariantScreens`, `StolenMoveScreen` et
+      `DuckChessScreen` n'ont ni historique des positions, ni position
+      consultée, ni reprise. Relevé en étendant aux variantes la navigation
+      par coup complet (iOS, 24/10 — `ReviewStepper`, par la FEN, ou par la
+      couleur de qui joue pour le tour double du Coup Volé). À porter EN BLOC :
+      la barre, puis la même règle de pas.
+
 ### Consultation contre l'ordinateur : par coup complet — 23/10/2026
 
 Demande de l'utilisateur, faite des deux côtés : les flèches « coup

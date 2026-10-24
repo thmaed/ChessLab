@@ -10661,3 +10661,22 @@ Ajustement du même jour : les lots Woodpecker passent à **10, 25 ou 50
 puzzles, 25 par défaut** (demande de l'utilisateur ; ils étaient de 25, 50 ou
 100, 50 par défaut). Des deux côtés, aide comprise.
 
+
+## 24/10 — Navigation par coup complet : aussi dans les variantes contre l'ordinateur ✅ (iOS)
+
+Demande de l'utilisateur. Chess960, variantes Fairy, Barricades & co., Coup
+Volé et Duck Chess contre l'ordinateur avancent et reculent par coup COMPLET.
+
+- `ReviewStepper` gagne deux modes : par la FEN de chaque position
+  (variantes), et par la couleur de qui JOUE chaque coup — indispensable au
+  Coup Volé : au milieu d'un tour double, la FEN donne le trait à l'adversaire
+  alors que le même camp rejoue. Le Chess960 garde la parité.
+- Duck Chess à deux joueurs : chaque demi-coup reste une étape.
+- **Android n'a pas de barre de consultation dans ses variantes** — écart
+  préexistant, jamais inscrit ; ajouté à PARITE.md, à porter en bloc.
+- Piège retrouvé : échec EN BLOC des tests d'interface après une
+  réinstallation sur simulateur = la visite de découverte relancée (mémoire
+  du projet). Lancer l'app une fois avec `-discoveryTourSeen` suffit.
+- `StolenMovePlayViewModelTests` (tour double du moteur) a échoué une fois en
+  suite complète (58 s au lieu de 7) : sensible à la charge, vert seul.
+- Tests : `ReviewStepperTests` (+3) ; 11 tests d'interface des variantes verts.

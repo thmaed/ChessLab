@@ -552,8 +552,28 @@ final class DuckChessViewModel {
         refreshEvalBar()
     }
 
-    func reviewPrevious() { review(toPly: displayedPly - 1) }
-    func reviewNext() { review(toPly: displayedPly + 1) }
+    /// Par coup COMPLET, vers les positions où c'est au joueur de jouer —
+    /// voir ``ReviewStepper``. La liste des coups mène toujours au demi-coup choisi.
+    ///
+    /// À deux joueurs (même écran), chaque demi-coup reste une étape : il n'y
+    /// a pas « un » joueur dont il faudrait retrouver les positions.
+    private var reviewStepper: ReviewStepper {
+        guard isVersusEngine else { return ReviewStepper(totalPlies: totalPlies) { _ in true } }
+        return ReviewStepper(totalPlies: totalPlies, fenLog: fenLog, userColor: userColor)
+    }
+
+    var canReviewPrevious: Bool { reviewStepper.previous(from: displayedPly) != nil }
+    var canReviewNext: Bool { reviewStepper.next(from: displayedPly) != nil }
+
+    func reviewPrevious() {
+        guard let ply = reviewStepper.previous(from: displayedPly) else { return }
+        review(toPly: ply)
+    }
+
+    func reviewNext() {
+        guard let ply = reviewStepper.next(from: displayedPly) else { return }
+        review(toPly: ply)
+    }
 
     func reviewToLive() {
         reviewPly = nil
