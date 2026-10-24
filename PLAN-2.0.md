@@ -177,6 +177,52 @@ Progression, B3 dans le choix de séance des puzzles (un chip « À mon niveau �
 
 ---
 
+## 4 bis. Résultat de l'essai S2 (24/10/2026) — niveau estimé par vraisemblance Maia
+
+**Protocole.** 60 joueurs de la base ouverte Lichess (janvier 2013, parties
+classées non bullet de 40 demi-coups et plus, cotes de 1271 à 2139), au moins
+5 parties chacun ; pour chaque coup joué (hors 8 premiers coups de chaque camp),
+probabilité sous Maia-3 23M à 14 niveaux de 700 à 2700 ; l'estimation est le
+niveau qui rend les coups du joueur les plus probables. Erreur mesurée contre la
+cote Lichess moyenne du joueur, sur 100 tirages de N parties par joueur.
+Script : `tools/maia3-spike/s2_elo_estimate.py` (+ `s2_analyze.py`, résultats
+bruts `s2_results.json`).
+
+| Parties | Erreur moyenne | Écart-type | Dans ±100 | Dans ±200 |
+|---:|---:|---:|---:|---:|
+| 1 | 239 | 324 | 28 % | 53 % |
+| 3 | 146 | 181 | 39 % | 73 % |
+| **5** | **127** | **157** | **46 %** | **77 %** |
+| 8 | 123 | 151 | 47 % | 77 % |
+
+**Lecture.**
+- **Bien meilleur que la méthode abandonnée** (±677 sur une partie, ±214 sur
+  dix) : ici ±324 sur une partie, ±157 sur cinq.
+- **Mais un plancher d'environ ±125** : au-delà de 5 parties, ajouter des
+  parties n'améliore plus. Une partie de ce plancher vient de la mesure elle-même
+  (la cote Lichess d'un joueur bouge d'une partie à l'autre), pas seulement de la
+  méthode.
+- **Un défaut de forme** : l'estimation s'écarte de la moyenne (biais de −66 pour
+  les joueurs de 1300-1600, +75 pour 1600-1900). Échantillon trop petit (60
+  joueurs, très peu aux extrémités) pour conclure à une correction.
+
+**Verdict : GO conditionnel pour B2, en FOURCHETTE et non en chiffre.**
+- Affichée seulement à partir de **5 parties analysées**, sous la forme
+  « environ 1 500, entre 1 350 et 1 650 » (±150) ; avant : « pas assez de
+  parties » avec un compteur.
+- Jamais comme une cote de classement ; titre « Niveau estimé », phrase
+  d'explication.
+- **Limite non levée** : l'essai suppose connu le niveau de l'adversaire (sa
+  cote Lichess). Contre un **personnage Maia**, c'est le cas (niveau consigné sur
+  l'échelle Lichess) ; contre **Stockfish bridé**, l'échelle n'est pas
+  comparable (étude du 05/09) : ces parties devront être exclues du calcul, ou
+  comptées avec un niveau d'adversaire par défaut. À trancher.
+- **Reste à faire pour fiabiliser** : relancer sur davantage de joueurs et un
+  autre mois (2023, cotes actuelles) ; tester l'effet du retrait de l'ouverture
+  (`--skip`) ; décider d'un éventuel étalonnage du biais.
+
+---
+
 ## 5. Décisions
 
 **Tranchées le 24/10/2026** (« tout OK pour ta proposition ») :
