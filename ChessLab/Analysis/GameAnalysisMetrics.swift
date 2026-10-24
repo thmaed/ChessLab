@@ -43,10 +43,18 @@ struct GameAnalysisMetrics: Equatable, Sendable {
         var classifiedCount: Int
         /// Coups de théorie reconnus, écartés des deux mesures ci-dessus.
         var bookCount: Int
+        /// A4 : perte de probabilité de gain par phase, hors théorie.
+        var phases: [GamePhase: PhaseLoss] = [:]
+        /// A4 : fautes par motif tactique (`fork`, `pin`… et `other` quand la
+        /// réfutation ne se résume à aucun motif nommé).
+        var themes: [String: Int] = [:]
     }
 
     var white: Side
     var black: Side
+    /// A4 : l'ouverture reconnue à la fin de la théorie, pour dire lesquelles
+    /// coûtent des points.
+    var openingName: String?
     var version: Int = GameAnalysisMetrics.currentVersion
 
     /// Un coup joué, réduit à ce que les métriques regardent.
@@ -59,12 +67,20 @@ struct GameAnalysisMetrics: Equatable, Sendable {
         /// trait. Sert à reconnaître les positions déjà tranchées, où presque
         /// aucun coup ne coûte rien et où la moyenne se dilue.
         let winPercentBefore: Double
+        /// A4 : phase du coup, et — si c'est une faute — son motif.
+        let phase: GamePhase
+        let faultTheme: String?
 
-        init(mover: Piece.Color, loss: Double, isBook: Bool, winPercentBefore: Double = 50) {
+        init(
+            mover: Piece.Color, loss: Double, isBook: Bool, winPercentBefore: Double = 50,
+            phase: GamePhase = .middlegame, faultTheme: String? = nil
+        ) {
             self.mover = mover
             self.loss = loss
             self.isBook = isBook
             self.winPercentBefore = winPercentBefore
+            self.phase = phase
+            self.faultTheme = faultTheme
         }
     }
 
@@ -77,7 +93,8 @@ struct GameAnalysisMetrics: Equatable, Sendable {
     ///   chiffre finiraient par diverger.
     static func compute(
         moves: [Move],
-        accuracyByColor: [Piece.Color: Double]
+        accuracyByColor: [Piece.Color: Double],
+        openingName: String? = nil
     ) -> GameAnalysisMetrics {
         func side(_ color: Piece.Color) -> Side {
             let mine = moves.filter { $0.mover == color }
@@ -85,13 +102,21 @@ struct GameAnalysisMetrics: Equatable, Sendable {
             let average = scored.isEmpty
                 ? nil
                 : scored.reduce(0.0) { $0 + max(0, $1.loss) } / Double(scored.count)
+            var phases: [GamePhase: PhaseLoss] = [:]
+            for move in scored {
+                phases[move.phase, default: PhaseLoss()].total += max(0, move.loss)
+                phases[move.phase, default: PhaseLoss()].count += 1
+            }
+            var themes: [String: Int] = [:]
+            for move in mine { if let theme = move.faultTheme { themes[theme, default: 0] += 1 } }
             return Side(
                 accuracy: accuracyByColor[color],
                 averageLoss: average,
                 classifiedCount: scored.count,
-                bookCount: mine.count - scored.count
+                bookCount: mine.count - scored.count,
+                phases: phases, themes: themes
             )
         }
-        return GameAnalysisMetrics(white: side(.white), black: side(.black))
+        return GameAnalysisMetrics(white: side(.white), black: side(.black), openingName: openingName)
     }
 }

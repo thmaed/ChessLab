@@ -89,6 +89,17 @@ final class GameRecord: Identifiable {
     var whiteBookCount: Int?
     var blackBookCount: Int?
 
+    // A4 (2.0) — le profil de faiblesses, par camp : perte par phase
+    // (``GameProfileCodec/encode(phases:)``) et fautes par motif tactique, plus
+    // l'ouverture reconnue. Chaînes courtes et optionnelles : migration
+    // additive, synchronisée avec le reste, et `nil` veut dire « analysée avant
+    // A4 », pas « sans faute ».
+    var whitePhaseCSV: String?
+    var blackPhaseCSV: String?
+    var whiteThemesCSV: String?
+    var blackThemesCSV: String?
+    var openingName: String?
+
     init() {}
 
     /// Recopie les métriques d'une analyse terminée. Rend `true` si quelque
@@ -102,6 +113,11 @@ final class GameRecord: Identifiable {
             && blackAverageLoss == metrics.black.averageLoss
             && whiteClassifiedCount == metrics.white.classifiedCount
             && blackClassifiedCount == metrics.black.classifiedCount
+            && whitePhaseCSV == GameProfileCodec.encode(phases: metrics.white.phases)
+            && blackPhaseCSV == GameProfileCodec.encode(phases: metrics.black.phases)
+            && whiteThemesCSV == GameProfileCodec.encode(themes: metrics.white.themes)
+            && blackThemesCSV == GameProfileCodec.encode(themes: metrics.black.themes)
+            && openingName == metrics.openingName
             && (key == nil || analysisKey == key)
         guard !unchanged else { return false }
 
@@ -115,6 +131,11 @@ final class GameRecord: Identifiable {
         blackClassifiedCount = metrics.black.classifiedCount
         whiteBookCount = metrics.white.bookCount
         blackBookCount = metrics.black.bookCount
+        whitePhaseCSV = GameProfileCodec.encode(phases: metrics.white.phases)
+        blackPhaseCSV = GameProfileCodec.encode(phases: metrics.black.phases)
+        whiteThemesCSV = GameProfileCodec.encode(themes: metrics.white.themes)
+        blackThemesCSV = GameProfileCodec.encode(themes: metrics.black.themes)
+        openingName = metrics.openingName
         return true
     }
 
@@ -126,10 +147,15 @@ final class GameRecord: Identifiable {
         return GameAnalysisMetrics(
             white: .init(accuracy: whiteAccuracy, averageLoss: whiteAverageLoss,
                          classifiedCount: whiteClassifiedCount ?? 0,
-                         bookCount: whiteBookCount ?? 0),
+                         bookCount: whiteBookCount ?? 0,
+                         phases: GameProfileCodec.decodePhases(whitePhaseCSV),
+                         themes: GameProfileCodec.decodeThemes(whiteThemesCSV)),
             black: .init(accuracy: blackAccuracy, averageLoss: blackAverageLoss,
                          classifiedCount: blackClassifiedCount ?? 0,
-                         bookCount: blackBookCount ?? 0),
+                         bookCount: blackBookCount ?? 0,
+                         phases: GameProfileCodec.decodePhases(blackPhaseCSV),
+                         themes: GameProfileCodec.decodeThemes(blackThemesCSV)),
+            openingName: openingName,
             version: GameAnalysisMetrics.currentVersion
         )
     }

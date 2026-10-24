@@ -1165,4 +1165,12 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%1$d position de votre répertoire à revoir</item>
         <item quantity="other">%1$d positions de votre répertoire à revoir</item>
     </plurals>
+    <string name="profile_title">Vos parties</string>
+    <string name="profile_accuracy">Précision sur vos %1$d dernières parties</string>
+    <string name="profile_delta">%1$s points par rapport aux dix précédentes</string>
+    <string name="profile_weakest">Votre point faible : %1$s (%2$s points perdus par coup).</string>
+    <string name="profile_themes">Tactiques manquées</string>
+    <string name="profile_openings">Ouvertures coûteuses</string>
+    <string name="profile_opening_line">%1$s points perdus par coup · %2$d parties</string>
+    <string name="profile_other">Autres fautes</string>
 </resources>

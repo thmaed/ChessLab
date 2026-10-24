@@ -19,6 +19,8 @@ data class GameSummary(
      * décompte définitif.
      */
     val isComplete: Boolean = false,
+    /** A4 : l'ouverture reconnue à la fin de la théorie, pour dire lesquelles coûtent des points. */
+    val openingName: String? = null,
 ) {
     data class Side(
         val accuracy: Double? = null,
@@ -36,6 +38,10 @@ data class GameSummary(
         val averageLoss: Double? = null,
         /** Coups de théorie reconnus, écartés de la moyenne ci-dessus. */
         val bookCount: Int = 0,
+        /** A4 : perte de probabilité de gain par phase, hors théorie. */
+        val phases: Map<com.chesslab.puzzles.GamePhase, PhaseLoss> = emptyMap(),
+        /** A4 : fautes par motif tactique (`other` quand la réfutation ne se résume à aucun motif nommé). */
+        val themes: Map<String, Int> = emptyMap(),
     ) {
         fun count(quality: MoveQuality): Int = counts[quality] ?: 0
     }
@@ -49,6 +55,9 @@ data class GameSummary(
             val quality: MoveQuality,
             /** Perte de probabilité de gain pour le joueur qui vient de jouer. */
             val loss: Double,
+            /** A4 : phase du coup, et — si c'est une faute — son motif. */
+            val phase: com.chesslab.puzzles.GamePhase = com.chesslab.puzzles.GamePhase.middlegame,
+            val faultTheme: String? = null,
         )
 
         /**
@@ -59,12 +68,21 @@ data class GameSummary(
             entries: List<Entry>,
             totalMoves: Int,
             accuracyByColor: Map<Piece.Color, Double>,
+            openingName: String? = null,
         ): GameSummary {
             fun side(color: Piece.Color): Side {
                 val mine = entries.filter { it.mover == color }
                 val scored = mine.filter { it.quality != MoveQuality.book }
+                val phases = HashMap<com.chesslab.puzzles.GamePhase, PhaseLoss>()
+                for (entry in scored) {
+                    val current = phases[entry.phase] ?: PhaseLoss()
+                    phases[entry.phase] = PhaseLoss(current.total + maxOf(0.0, entry.loss), current.count + 1)
+                }
+                val themes = HashMap<String, Int>()
+                for (entry in mine) entry.faultTheme?.let { themes[it] = (themes[it] ?: 0) + 1 }
                 return Side(
                     accuracy = accuracyByColor[color],
+                    phases = phases, themes = themes,
                     counts = mine.groupingBy { it.quality }.eachCount(),
                     classifiedCount = mine.size,
                     averageLoss = if (scored.isEmpty()) null
@@ -76,6 +94,7 @@ data class GameSummary(
                 white = side(Piece.Color.white),
                 black = side(Piece.Color.black),
                 isComplete = entries.size >= totalMoves && totalMoves > 0,
+                openingName = openingName,
             )
         }
     }

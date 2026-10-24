@@ -56,10 +56,15 @@ class AutoAnalysisServiceTest {
         kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) { AutoAnalysisService.enqueue(app, pgn) }
         assertEquals(1, AutoAnalysisService.queue.size)
         withTimeout(240_000) {
-            while (dao.allOnce().firstOrNull { it.pgn == pgn }?.whiteAccuracy == null) delay(500)
+            // Le profil (A4) est rangé juste après les métriques : on attend les deux.
+            while (dao.allOnce().firstOrNull { it.pgn == pgn }?.whitePhase == null) delay(500)
         }
         val record = dao.allOnce().first { it.pgn == pgn }
         assertNotNull(record.whiteAccuracy)
+        // A4 : le profil de faiblesses est rangé avec les métriques.
+        assertTrue(record.whitePhase!!.contains("o:"))
+        assertNotNull(record.blackThemes)
+        assertNotNull(record.openingName)
         withTimeout(10_000) { while (AutoAnalysisService.queue.isNotEmpty()) delay(200) }
         SettingsStore.setAutoAnalysis(app, "off")
         dao.allOnce().filter { it.pgn == pgn }.forEach { dao.delete(it.id) }

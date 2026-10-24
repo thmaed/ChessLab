@@ -40,6 +40,10 @@ struct AutoAnalysisServiceTests {
         }
         #expect(record.analysisVersion != nil)
         #expect(record.whiteAccuracy != nil)
+        // A4 : le profil de faiblesses est rangé avec les métriques.
+        #expect(record.whitePhaseCSV?.contains("o:") == true)
+        #expect(record.blackThemesCSV != nil)
+        #expect(record.openingName != nil)
         try await Task.sleep(for: .seconds(2))
         #expect(service.queue.isEmpty)
         AppSettings.shared.autoAnalysisChoice = .off

@@ -65,6 +65,10 @@ struct ProgressionView: View {
                     if !allGames.isEmpty {
                         engineCard(summary)
                     }
+                    let profile = PlayerProfile.compute(games: allGames)
+                    if profile.isMeaningful {
+                        profileCard(profile)
+                    }
                     if summary.puzzleAttempts > 0 {
                         puzzleCard(summary)
                     }
@@ -85,6 +89,117 @@ struct ProgressionView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear(perform: load)
+    }
+
+    // MARK: Vos parties (A4)
+
+    /// Le profil de faiblesses, tiré des parties analysées : où l'on perd des
+    /// points, quelles tactiques on manque, quelles ouvertures coûtent.
+    @ViewBuilder
+    private func profileCard(_ profile: PlayerProfile) -> some View {
+        VStack(alignment: .leading, spacing: 14) {
+            cardHeader("Vos parties", systemImage: "chart.xyaxis.line", tint: Theme.teal)
+
+            if let trend = profile.accuracy {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text("\(Int(trend.recentAverage.rounded())) %")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Précision sur vos \(trend.recent.count) dernières parties")
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.textSecondary)
+                        if let delta = trend.delta {
+                            let sign = delta >= 0 ? "+" : "\u{2212}"
+                            Text(LocalizationController.string(
+                                "%@ points par rapport aux dix précédentes",
+                                "\(sign)\(Int(abs(delta).rounded()))"))
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(delta >= 0 ? Theme.accent : Theme.danger)
+                        }
+                    }
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("profileAccuracy")
+            }
+
+            if let weakest = profile.weakestPhase {
+                Divider().overlay(Theme.stroke)
+                Text(LocalizationController.string(
+                    "Votre point faible : %@ (%@ points perdus par coup).",
+                    LocalizationController.string(weakest.phase.label).lowercased(), Self.oneDecimal(weakest.averageLoss)))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                    .accessibilityIdentifier("profileWeakestPhase")
+                ForEach(profile.phases) { stat in
+                    HStack {
+                        Text(LocalizedStringKey(stat.phase.label))
+                            .font(.footnote)
+                            .foregroundStyle(Theme.textSecondary)
+                        Spacer()
+                        Text(Self.oneDecimal(stat.averageLoss))
+                            .font(.footnote.weight(.semibold).monospacedDigit())
+                            .foregroundStyle(stat.phase == weakest.phase ? Theme.warning : Theme.textPrimary)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+            }
+
+            if !profile.themes.isEmpty {
+                Divider().overlay(Theme.stroke)
+                Text("Tactiques manquées")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.textSecondary)
+                ForEach(profile.themes) { stat in
+                    HStack {
+                        Text(Self.themeLabel(stat.theme))
+                            .font(.footnote)
+                            .foregroundStyle(Theme.textPrimary)
+                        Spacer()
+                        Text("×\(stat.count)")
+                            .font(.footnote.weight(.semibold).monospacedDigit())
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+            }
+
+            if !profile.openings.isEmpty {
+                Divider().overlay(Theme.stroke)
+                Text("Ouvertures coûteuses")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.textSecondary)
+                ForEach(profile.openings) { stat in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(stat.name)
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(Theme.textPrimary)
+                        Text(LocalizationController.string(
+                            "%@ points perdus par coup · %lld parties", Self.oneDecimal(stat.averageLoss), stat.games))
+                            .font(.caption)
+                            .foregroundStyle(Theme.textTertiary)
+                    }
+                    .accessibilityElement(children: .combine)
+                }
+            }
+        }
+        .cardStyle()
+        .accessibilityIdentifier("profileCard")
+    }
+
+    private static func oneDecimal(_ value: Double) -> String {
+        value.formatted(.number.precision(.fractionLength(1)))
+    }
+
+    private static func themeLabel(_ theme: String) -> String {
+        switch theme {
+        case "mate": LocalizationController.string("Mat")
+        case "hanging": LocalizationController.string("Pièce en prise")
+        case "fork": LocalizationController.string("Fourchette")
+        case "discovery": LocalizationController.string("Échec à la découverte")
+        case "pin": LocalizationController.string("Clouage")
+        default: LocalizationController.string("Autres fautes")
+        }
     }
 
     // MARK: Contre Stockfish

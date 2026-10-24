@@ -22582,6 +22582,96 @@
           }
         }
       }
+    },
+    "Vos parties": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your games"
+          }
+        }
+      }
+    },
+    "Précision sur vos %lld dernières parties": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accuracy over your last %lld games"
+          }
+        }
+      }
+    },
+    "%@ points par rapport aux dix précédentes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ points vs the previous ten"
+          }
+        }
+      }
+    },
+    "Votre point faible : %@ (%@ points perdus par coup).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your weak spot: %1$@ (%2$@ points lost per move)."
+          }
+        }
+      }
+    },
+    "Tactiques manquées": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Missed tactics"
+          }
+        }
+      }
+    },
+    "Ouvertures coûteuses": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Costly openings"
+          }
+        }
+      }
+    },
+    "%@ points perdus par coup · %lld parties": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%1$@ points lost per move · %2$lld games"
+          }
+        }
+      }
+    },
+    "Échec à la découverte": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Discovered check"
+          }
+        }
+      }
+    },
+    "Autres fautes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Other mistakes"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

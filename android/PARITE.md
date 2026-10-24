@@ -160,6 +160,29 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [ ] À vérifier sur appareil en conditions réelles : un répertoire personnel,
       une partie qui en sort, la pastille puis la séance du lendemain.
 
+### A4 de la 2.0 — profil de faiblesses dans Progression — 24/10/2026
+
+- [x] Carte « Vos parties » (dès trois parties analysées contre l'ordinateur) :
+      précision sur les dix dernières parties et écart avec les dix d'avant ;
+      **point faible** = la phase (ouverture / milieu de partie / finale, même
+      classifieur que les puzzles) où l'on perd le plus de points de probabilité
+      de gain par coup hors théorie (une phase demande 8 coups pour être jugée) ;
+      **tactiques manquées** (mat, pièce en prise, fourchette, découverte,
+      clouage, autres) ; **ouvertures coûteuses** (deux parties et six coups hors
+      théorie au moins). Mêmes seuils et mêmes libellés des deux côtés.
+- [x] Données par partie, additives : iOS `GameRecord` (+5 champs optionnels,
+      synchronisés), Android Room v11 (`MIGRATION_10_11`, +5 colonnes).
+      Écrites avec les métriques, relues sans recalcul. `nil` = analysée avant
+      A4 : la partie compte pour la précision, pas pour le reste.
+- [x] Tests : `PlayerProfileTests` (iOS, 8) + `AutoAnalysisServiceTests` (avec
+      moteur) ; `PlayerProfileTest` (JVM, 8) + `AutoAnalysisServiceTest` +
+      `MigrationTest` (Galaxy A16).
+- [ ] Les parties déjà analysées avant A4 ne portent pas de profil : elles
+      seront comptées quand elles seront réanalysées. À décider : proposer
+      « Réanalyser mes parties » ?
+- [ ] À vérifier sur appareil : l'aspect de la carte avec de vraies données
+      (aucune capture n'a été faite — pas de jeu de données semé).
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

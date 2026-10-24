@@ -2318,17 +2318,26 @@ final class AnalysisViewModel {
     func analysisMoveSeries() -> [GameAnalysisMetrics.Move] {
         var moves: [GameAnalysisMetrics.Move] = []
         var idx = game.startingIndex
+        var ply = -1
         while game.moves.hasIndex(after: idx) {
             let parentIdx = idx
             idx = game.moves.index(after: idx)
+            ply += 1
             guard let evaluation = moveEvaluations[idx], let evalBefore = evalCache[parentIdx] else { continue }
             let mover = idx.color
             let beforeMoverPOV = mover == .white ? evalBefore.winPercent : 100 - evalBefore.winPercent
+            // A4 : la phase se lit sur la position AVANT le coup ; le motif,
+            // seulement pour une faute (`other` quand rien n'est nommable).
+            let phase = game.positions[parentIdx].map { GamePhaseClassifier.classify(fen: $0.fen) } ?? .middlegame
+            let theme: String? = evaluation.quality.isFault
+                ? (evaluation.explanation?.motif?.profileTheme ?? "other")
+                : nil
             moves.append(GameAnalysisMetrics.Move(
                 mover: mover,
                 loss: max(0, beforeMoverPOV - evaluation.winPercentAfterMover),
                 isBook: evaluation.quality == .book,
-                winPercentBefore: beforeMoverPOV
+                winPercentBefore: beforeMoverPOV,
+                phase: phase, faultTheme: theme
             ))
         }
         return moves
@@ -2340,8 +2349,22 @@ final class AnalysisViewModel {
     var analysisMetrics: GameAnalysisMetrics? {
         guard isGameReview, isMainLineFullyClassified else { return nil }
         return GameAnalysisMetrics.compute(
-            moves: analysisMoveSeries(), accuracyByColor: accuracyByColor
+            moves: analysisMoveSeries(), accuracyByColor: accuracyByColor,
+            openingName: mainLineOpeningName()
         )
+    }
+
+    /// A4 : l'ouverture reconnue sur la ligne principale, la plus précise que
+    /// la partie confirme.
+    private func mainLineOpeningName() -> String? {
+        var sans: [String] = []
+        var idx = game.startingIndex
+        while game.moves.hasIndex(after: idx) {
+            idx = game.moves.index(after: idx)
+            guard let san = game.moves[idx]?.san else { break }
+            sans.append(san)
+        }
+        return EcoOpeningLookup.openingName(for: sans, in: EcoOpeningLoader.standard)?.name
     }
 
     /// Recopie le bilan dans la partie enregistrée correspondante.

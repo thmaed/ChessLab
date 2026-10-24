@@ -1168,4 +1168,12 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d position from your repertoire to review</item>
         <item quantity="other">%1$d positions from your repertoire to review</item>
     </plurals>
+    <string name="profile_title">Your games</string>
+    <string name="profile_accuracy">Accuracy over your last %1$d games</string>
+    <string name="profile_delta">%1$s points vs the previous ten</string>
+    <string name="profile_weakest">Your weak spot: %1$s (%2$s points lost per move).</string>
+    <string name="profile_themes">Missed tactics</string>
+    <string name="profile_openings">Costly openings</string>
+    <string name="profile_opening_line">%1$s points lost per move · %2$d games</string>
+    <string name="profile_other">Other mistakes</string>
 </resources>

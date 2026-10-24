@@ -1207,8 +1207,6 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             qualities[i] = quality
             val loss = max(0.0, winBefore - winAfter)
             deltas[i] = winAfter - winBefore
-            entries += GameSummary.Companion.Entry(mover, quality, loss)
-            lossesByColor[mover]!! += i to loss
 
             // Seulement les fautes : un bon coup n'a rien à expliquer, et la
             // variante d'après un bon coup raconte la suite de la partie, pas
@@ -1217,6 +1215,14 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             if (quality.isFault) {
                 MoveExplainer.explain(positions[i + 1], after.pv)?.let { explanations[i] = it }
             }
+            // A4 : la phase se lit sur la position AVANT le coup ; le motif,
+            // seulement pour une faute (`other` quand rien n'est nommable).
+            entries += GameSummary.Companion.Entry(
+                mover, quality, loss,
+                phase = com.chesslab.puzzles.GamePhase.classify(parent.fen),
+                faultTheme = if (quality.isFault) explanations[i]?.motif?.profileTheme ?: "other" else null,
+            )
+            lossesByColor[mover]!! += i to loss
         }
 
         // Les poids de volatilité se calculent sur TOUTE la partie, POV Blancs,
@@ -1242,7 +1248,10 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
             )
         }
 
-        val summary = GameSummary.compute(entries, moves.size, accuracy)
+        val summary = GameSummary.compute(
+            entries, moves.size, accuracy,
+            openingName = EcoOpeningLookup.openingName(moves.map { it.san }, book)?.name,
+        )
         ui = ui.copy(
             qualities = qualities,
             explanations = explanations,
@@ -1281,6 +1290,14 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                 whiteClassified = summary.white.classifiedCount,
                 blackClassified = summary.black.classifiedCount,
                 whiteBook = summary.white.bookCount, blackBook = summary.black.bookCount,
+            )
+            dao.setProfile(
+                id = record.id,
+                whitePhase = GameProfileCodec.encodePhases(summary.white.phases),
+                blackPhase = GameProfileCodec.encodePhases(summary.black.phases),
+                whiteThemes = GameProfileCodec.encodeThemes(summary.white.themes),
+                blackThemes = GameProfileCodec.encodeThemes(summary.black.themes),
+                openingName = summary.openingName,
             )
         }
     }

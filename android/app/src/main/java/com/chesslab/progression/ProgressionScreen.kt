@@ -15,6 +15,7 @@ import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.QueryStats
 import androidx.compose.material3.Icon
@@ -89,12 +90,101 @@ fun ProgressionScreen(onTrainTheme: (String) -> Unit = {}) {
             EmptyState()
         } else {
             if (games.isNotEmpty()) EngineCard(summary, range, onRange = { range = it })
+            val profile = remember(games) {
+                PlayerProfile.compute(games, com.chesslab.analysis.AnalysisViewModel.ANALYSIS_VERSION)
+            }
+            if (profile.isMeaningful) ProfileCard(profile)
             if (summary.puzzles.attempts > 0) PuzzleCard(summary.puzzles, onTrainTheme)
             training?.takeIf { it.studied > 0 }?.let { MemoryCard(it) }
         }
         Spacer(Modifier.height(12.dp))
     }
 }
+
+// MARK: Vos parties (A4)
+
+/** Le profil de faiblesses : où l'on perd des points, quelles tactiques on manque, quelles ouvertures coûtent. */
+@Composable
+private fun ProfileCard(profile: PlayerProfile) {
+    fun oneDecimal(value: Double) = String.format(java.util.Locale.getDefault(), "%.1f", value)
+    SettingsSection(stringResource(R.string.profile_title), Icons.Default.Timeline, Palette.teal) {
+        Column(Modifier.testTag("carte-profil")) {
+            profile.accuracy?.let { trend ->
+                Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.testTag("profil-precision")) {
+                    Text("${Math.round(trend.recentAverage)} %", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary)
+                    Column {
+                        Text(stringResource(R.string.profile_accuracy, trend.recent.size), fontSize = 13.sp, color = Palette.textSecondary)
+                        trend.delta?.let { delta ->
+                            val sign = if (delta >= 0) "+" else "\u2212"
+                            Text(
+                                stringResource(R.string.profile_delta, "$sign${Math.round(kotlin.math.abs(delta))}"),
+                                fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
+                                color = if (delta >= 0) Palette.accent else Palette.danger,
+                            )
+                        }
+                    }
+                }
+            }
+            profile.weakestPhase?.let { weakest ->
+                Divider()
+                Text(
+                    stringResource(
+                        R.string.profile_weakest,
+                        stringResource(weakest.phase.labelRes).lowercase(), oneDecimal(weakest.averageLoss),
+                    ),
+                    fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                    modifier = Modifier.testTag("profil-point-faible"),
+                )
+                profile.phases.forEach { stat ->
+                    Row(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+                        Text(stringResource(stat.phase.labelRes), fontSize = 12.sp, color = Palette.textSecondary, modifier = Modifier.weight(1f))
+                        Text(
+                            oneDecimal(stat.averageLoss), fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
+                            color = if (stat.phase == weakest.phase) Palette.warning else Palette.textPrimary,
+                        )
+                    }
+                }
+            }
+            if (profile.themes.isNotEmpty()) {
+                Divider()
+                SubHeader(stringResource(R.string.profile_themes))
+                profile.themes.forEach { stat ->
+                    Row(Modifier.fillMaxWidth().padding(vertical = 3.dp)) {
+                        Text(profileThemeLabel(stat.theme), fontSize = 12.sp, color = Palette.textPrimary, modifier = Modifier.weight(1f))
+                        Text("×${stat.count}", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.textSecondary)
+                    }
+                }
+            }
+            if (profile.openings.isNotEmpty()) {
+                Divider()
+                SubHeader(stringResource(R.string.profile_openings))
+                profile.openings.forEach { stat ->
+                    Column(Modifier.padding(vertical = 3.dp)) {
+                        Text(stat.name, fontSize = 12.sp, fontWeight = FontWeight.Medium, color = Palette.textPrimary)
+                        Text(
+                            stringResource(R.string.profile_opening_line, oneDecimal(stat.averageLoss), stat.games),
+                            fontSize = 11.sp, color = Palette.textTertiary,
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun profileThemeLabel(theme: String): String = stringResource(
+    when (theme) {
+        "mate" -> R.string.theme_mate
+        "hanging" -> R.string.theme_hanging
+        "fork" -> R.string.theme_fork
+        "discovery" -> R.string.theme_discovered
+        "pin" -> R.string.theme_pin
+        else -> R.string.profile_other
+    }
+)
 
 // MARK: Contre l'ordinateur
 

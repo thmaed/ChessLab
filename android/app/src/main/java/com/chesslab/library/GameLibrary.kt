@@ -84,6 +84,16 @@ data class GameRecord(
     /** Coups de théorie reconnus, par camp. */
     @ColumnInfo(name = "white_book") val whiteBook: Int? = null,
     @ColumnInfo(name = "black_book") val blackBook: Int? = null,
+    /**
+     * A4 (2.0) — le profil de faiblesses, par camp : perte par phase et fautes
+     * par motif tactique (voir `GameProfileCodec`), plus l'ouverture reconnue.
+     * `NULL` veut dire « analysée avant A4 », pas « sans faute ».
+     */
+    @ColumnInfo(name = "white_phase") val whitePhase: String? = null,
+    @ColumnInfo(name = "black_phase") val blackPhase: String? = null,
+    @ColumnInfo(name = "white_themes") val whiteThemes: String? = null,
+    @ColumnInfo(name = "black_themes") val blackThemes: String? = null,
+    @ColumnInfo(name = "opening_name") val openingName: String? = null,
 ) {
     /** Les étiquettes, découpées et nettoyées. */
     val tagList: List<String>
@@ -131,6 +141,17 @@ interface GameDao {
         whiteLoss: Double?, blackLoss: Double?,
         whiteClassified: Int?, blackClassified: Int?,
         whiteBook: Int?, blackBook: Int?,
+    )
+
+    /** A4 : le profil de faiblesses d'une partie analysée. */
+    @Query(
+        """UPDATE games SET white_phase = :whitePhase, black_phase = :blackPhase,
+           white_themes = :whiteThemes, black_themes = :blackThemes, opening_name = :openingName
+           WHERE id = :id"""
+    )
+    suspend fun setProfile(
+        id: Long, whitePhase: String?, blackPhase: String?,
+        whiteThemes: String?, blackThemes: String?, openingName: String?,
     )
 
     @Query("SELECT COUNT(*) FROM games")
@@ -195,7 +216,7 @@ interface AutosaveDao {
         com.chesslab.puzzles.OwnPuzzle::class, com.chesslab.puzzles.PuzzleProgress::class,
         com.chesslab.puzzles.WoodpeckerProgram::class,
     ],
-    version = 10, exportSchema = false,
+    version = 11, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
@@ -316,8 +337,21 @@ abstract class LibraryDatabase : RoomDatabase() {
          */
         val ALL_MIGRATIONS get() = arrayOf(
             MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
-            MIGRATION_9_10,
+            MIGRATION_9_10, MIGRATION_10_11,
         )
+
+        /**
+         * v10 → v11 : le profil de faiblesses (A4, 24/10/2026). Cinq colonnes
+         * optionnelles ; les parties déjà analysées gardent `NULL` et comptent
+         * pour la précision, pas pour le profil.
+         */
+        val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                for (column in listOf("white_phase", "black_phase", "white_themes", "black_themes", "opening_name")) {
+                    db.execSQL("ALTER TABLE games ADD COLUMN $column TEXT")
+                }
+            }
+        }
 
         /**
          * v9 → v10 : les programmes Woodpecker (23/10/2026). Une table neuve,
