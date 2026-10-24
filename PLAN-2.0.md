@@ -223,6 +223,41 @@ bruts `s2_results.json`).
 
 ---
 
+## 4 ter. Résultat de l'essai S1 (24/10/2026) — analyse complète d'une partie
+
+**Protocole.** Trois vraies parties de tournoi (`Fixtures_nils.pgn`), analysées
+de bout en bout (classification de tous les coups, affinage des verdicts
+limites, bilan) par le mode normal de l'app, sur le **Galaxy A16** (téléphone
+d'entrée de gamme, branché en USB). Test :
+`HeadlessAnalysisMeasureTest` (Android) et `HeadlessAnalysisMeasureTests`
+(iOS, écrit mais **pas encore mesuré** : l'iPhone XS était verrouillé).
+
+| Partie | Demi-coups | Durée | Par demi-coup |
+|---|---:|---:|---:|
+| 28 coups | 55 | 63 s | 1,1 s |
+| 52 coups | 104 | 158 s | 1,5 s |
+| 66 coups | 131 | 252 s | 1,9 s |
+
+- **Une partie de 40 coups se classe en 1 à 3 minutes** sur un téléphone d'entrée
+  de gamme (mon estimation de 1 à 3 minutes était juste). Les parties longues et
+  tendues vont jusqu'à 4 minutes.
+- **Chaleur** : +1,2 °C de la batterie sur la partie la plus longue, état
+  thermique du système resté à « normal » : aucune bride sur ce volume.
+- **Batterie** : NON mesurée (le téléphone était alimenté en USB). À mesurer sur
+  batterie avant de rendre l'analyse automatique par défaut.
+
+**Verdict : GO pour A1**, avec ces règles :
+- analyse **proposée au premier lancement** (décision 24/10) et **arrêtable** ;
+- une partie à la fois, avec une barre de progression honnête (« partie en cours
+  d'analyse, environ 2 minutes ») ;
+- **interrompue si l'app passe en arrière-plan sur iOS** (l'arrière-plan
+  `BGProcessingTask` est un second temps, pas un prérequis) ;
+- Android : un service de premier plan avec notification, mêmes garde-fous
+  (thermique, économie d'énergie) ;
+- plafond : ne pas analyser en masse l'historique à l'installation de la 2.0.
+
+---
+
 ## 5. Décisions
 
 **Tranchées le 24/10/2026** (« tout OK pour ta proposition ») :
