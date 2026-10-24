@@ -22472,6 +22472,26 @@
           }
         }
       }
+    },
+    "1 nouveau puzzle de votre dernière partie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 new puzzle from your last game"
+          }
+        }
+      }
+    },
+    "%lld nouveaux puzzles de votre dernière partie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld new puzzles from your last game"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

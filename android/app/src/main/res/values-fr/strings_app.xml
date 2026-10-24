@@ -1150,4 +1150,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="settings_analysis">Analyse</string>
     <string name="auto_analysis_setting">Analyser mes parties automatiquement</string>
     <string name="auto_analysis_setting_note">Après chaque partie contre l\'ordinateur, sur l\'appareil, en tâche de fond : environ 1 à 3 minutes et un peu de batterie. Interrompu en économie d\'énergie ou si l\'appareil chauffe.</string>
+    <plurals name="home_new_puzzles">
+        <item quantity="one">%1$d nouveau puzzle de votre dernière partie</item>
+        <item quantity="other">%1$d nouveaux puzzles de votre dernière partie</item>
+    </plurals>
 </resources>

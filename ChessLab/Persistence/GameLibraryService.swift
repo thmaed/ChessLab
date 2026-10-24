@@ -47,7 +47,7 @@ enum GameLibraryService {
         PersistenceLog.save(context)
         // A1 : la partie rejoint la file d'analyse (si l'utilisateur l'a voulu).
         if let pgn = record.pgn, let key = record.analysisKey {
-            AutoAnalysisService.shared.enqueue(pgn: pgn, key: key, context: context)
+            AutoAnalysisService.shared.enqueue(pgn: pgn, key: key, userColor: userColor, context: context)
         }
     }
 

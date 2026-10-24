@@ -162,6 +162,19 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     )
                 }
             }
+            // A2 (2.0) : « 2 nouveaux puzzles de votre dernière partie ». Un tap
+            // ouvre les puzzles et efface la pastille.
+            val newPuzzles = com.chesslab.analysis.AutoAnalysisService.newPuzzleCount
+            if (newPuzzles > 0) {
+                Banner(
+                    Icons.Default.Extension,
+                    pluralStringResource(R.plurals.home_new_puzzles, newPuzzles, newPuzzles),
+                    "", Palette.violet, "nouveaux-puzzles",
+                ) {
+                    com.chesslab.analysis.AutoAnalysisService.acknowledgeNewPuzzles(context)
+                    onOpen(Route.PuzzleQueue)
+                }
+            }
             SectionHeader(stringResource(R.string.home_modes), Modifier.padding(top = 8.dp))
             modes.chunked(columns).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -248,7 +261,7 @@ private fun Banner(
         Spacer(Modifier.width(10.dp))
         Column(Modifier.weight(1f)) {
             Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = tint)
-            Text(subtitle, fontSize = 11.sp, color = Palette.textSecondary)
+            if (subtitle.isNotEmpty()) Text(subtitle, fontSize = 11.sp, color = Palette.textSecondary)
         }
     }
 }

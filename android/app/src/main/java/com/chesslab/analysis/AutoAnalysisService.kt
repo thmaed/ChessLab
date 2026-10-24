@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
+import chesskit.Piece
 import com.chesslab.engine.ThermalMonitor
 import com.chesslab.settings.SettingsStore
 import kotlinx.coroutines.CoroutineScope
@@ -36,8 +37,27 @@ import kotlinx.coroutines.launch
 object AutoAnalysisService {
 
     /** Parties en attente (le PGN fait foi d'identité), la première étant en cours. */
-    var queue by mutableStateOf<List<String>>(emptyList())
+    var queue by mutableStateOf<List<AnalysisJob>>(emptyList())
         private set
+
+    /** Un travail : le PGN fait foi d'identité ; [userColor] = le camp de l'utilisateur (A2). */
+    data class AnalysisJob(val pgn: String, val userColor: Piece.Color?)
+
+    /** A2 : au plus ce nombre de puzzles tirés d'une partie, les mats d'abord. */
+    const val MAX_PUZZLES_PER_GAME = 3
+
+    /** Puzzles créés depuis la dernière visite des puzzles : la pastille de l'accueil. */
+    var newPuzzleCount by mutableStateOf(0)
+        private set
+
+    fun loadPending(context: Context) {
+        newPuzzleCount = context.getSharedPreferences("auto_analysis", Context.MODE_PRIVATE).getInt("newPuzzles", 0)
+    }
+
+    fun acknowledgeNewPuzzles(context: Context) {
+        newPuzzleCount = 0
+        context.getSharedPreferences("auto_analysis", Context.MODE_PRIVATE).edit().remove("newPuzzles").apply()
+    }
 
     /** Demi-coups classés / total de la partie en cours. */
     var progress by mutableStateOf<Pair<Int, Int>?>(null)
@@ -52,11 +72,11 @@ object AutoAnalysisService {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     /** Ajoute une partie à la file (sans doublon) et démarre si possible. */
-    fun enqueue(context: Context, pgn: String) {
+    fun enqueue(context: Context, pgn: String, userColor: Piece.Color? = null) {
         if (SettingsStore.state.value.autoAnalysis != "on") return
-        if (pgn in queue) return
+        if (queue.any { it.pgn == pgn }) return
         app = context.applicationContext as Application
-        queue = queue + pgn
+        queue = queue + AnalysisJob(pgn, userColor)
         startIfPossible()
     }
 
@@ -99,21 +119,21 @@ object AutoAnalysisService {
 
     private suspend fun drain(application: Application) {
         while (currentCoroutineContext().isActive && queue.isNotEmpty() && mayRun(application)) {
-            val pgn = queue.first()
-            val finished = analyze(application, pgn)
+            val job = queue.first()
+            val finished = analyze(application, job)
             // Interrompue : la partie reste en tête de file, on la reprendra.
             if (!finished) return
-            queue = queue - pgn
+            queue = queue - job
         }
     }
 
     /** Vrai si la partie est terminée (ou irrécupérable) — faux si interrompue. */
-    private suspend fun analyze(application: Application, pgn: String): Boolean {
+    private suspend fun analyze(application: Application, job: AnalysisJob): Boolean {
         val store = ViewModelStore()
         val viewModel = ViewModelProvider(store, ViewModelProvider.AndroidViewModelFactory(application))[AnalysisViewModel::class.java]
         var finished = false
         try {
-            viewModel.onInputChange(pgn)
+            viewModel.onInputChange(job.pgn)
             viewModel.load()
             // Au plus 10 minutes : une partie de 130 demi-coups en prend 4 sur
             // le plus lent des téléphones mesurés.
@@ -123,7 +143,19 @@ object AutoAnalysisService {
                 val ui = viewModel.ui
                 if (ui.error != null) { finished = true; break }
                 progress = ui.reviewDone to maxOf(1, ui.reviewTotal)
-                if (ui.summary?.isComplete == true) { finished = true; break }
+                if (ui.summary?.isComplete == true && !ui.reviewing) {
+                    // A2 : ses erreurs et ses mats manqués deviennent des puzzles.
+                    job.userColor?.let { color ->
+                        val created = viewModel.createOwnPuzzles(color, MAX_PUZZLES_PER_GAME)
+                        if (created > 0) {
+                            newPuzzleCount += created
+                            application.getSharedPreferences("auto_analysis", Context.MODE_PRIVATE)
+                                .edit().putInt("newPuzzles", newPuzzleCount).apply()
+                        }
+                    }
+                    finished = true
+                    break
+                }
                 delay(500)
             }
             if (!finished && System.currentTimeMillis() >= deadline) finished = true   // trop longue : on renonce

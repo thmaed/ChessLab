@@ -81,6 +81,18 @@ vérification sur appareil, pas après compilation.
       `autoAnalysisPrompt` en build débogable ; iOS : réinitialiser le choix)
       et le bandeau pendant une vraie partie.
 
+### A2 de la 2.0 — puzzles automatiques depuis les parties analysées — 24/10/2026
+
+- [x] Quand une partie est analysée, **ses** erreurs (jamais celles de
+      l'ordinateur) et ses mats manqués deviennent des puzzles « Mes parties » :
+      les mats d'abord, puis les fautes les plus coûteuses ; **trois au plus**
+      par partie ; une position déjà présente est sautée. iOS
+      `AutoAnalysisService.createPuzzles`, Android `createOwnPuzzles`.
+- [x] Pastille d'accueil « N nouveaux puzzles de votre dernière partie » (tap =
+      ouvre les puzzles, efface la pastille). Compteur local à l'appareil.
+- [x] Tests : `createsOwnPuzzlesFromUserMistakes` (iOS), `createsOwnPuzzleFromMissedMate`
+      (Android, Galaxy A16), verts.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

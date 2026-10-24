@@ -721,6 +721,7 @@ struct HomeView: View {
                 if seedingState.isSeeding { seedingBanner }
                 // La reprise vit désormais en HAUT de la barre latérale
                 // (persistante) — voir `sidebar` — pour ne pas doublonner ici.
+                newPuzzlesPill
                 modesSection(minTile: ModeGridMetrics.minTileRegular, shortSubtitles: true)
                 homeProgressCard
                 if !recentGames.isEmpty { recentGamesSection }
@@ -1284,6 +1285,7 @@ struct HomeView: View {
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 if let resumableGame { resumeBanner(resumableGame) }
+                newPuzzlesPill
                 modesSection(minTile: ModeGridMetrics.minTileIPhone)
                 if !recentGames.isEmpty { recentGamesSection }
             }
@@ -1631,6 +1633,44 @@ struct HomeView: View {
         let white = PlayerName.display(game.whiteName, fallback: PlayerName.white)
         let black = PlayerName.display(game.blackName, fallback: PlayerName.black)
         return "\(white) – \(black)"
+    }
+
+    /// A2 (2.0) : « 2 nouveaux puzzles de votre dernière partie ». Un tap
+    /// ouvre les puzzles et efface la pastille.
+    @ViewBuilder
+    private var newPuzzlesPill: some View {
+        let count = AutoAnalysisService.shared.newPuzzleCount
+        if count > 0 {
+            Button {
+                AutoAnalysisService.shared.acknowledgeNewPuzzles()
+                open(.puzzles)
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "puzzlepiece.extension.fill")
+                        .font(.title3)
+                        .foregroundStyle(Theme.violet)
+                    Group {
+                        if count == 1 {
+                            Text("1 nouveau puzzle de votre dernière partie")
+                        } else {
+                            Text("\(count) nouveaux puzzles de votre dernière partie")
+                        }
+                    }
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(Theme.textTertiary)
+                }
+                .padding(14)
+                .background(Theme.violet.opacity(0.16), in: Theme.cardShape)
+                .overlay(Theme.cardShape.strokeBorder(Theme.violet.opacity(0.35), lineWidth: 1))
+            }
+            .buttonStyle(.pressable)
+            .accessibilityIdentifier("newPuzzlesPill")
+        }
     }
 
     private func resumeBanner(_ resumable: ResumableGame) -> some View {

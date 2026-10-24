@@ -11,6 +11,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
@@ -41,6 +42,38 @@ class AutoAnalysisServiceTest {
         withTimeout(10_000) { while (AutoAnalysisService.queue.isNotEmpty()) delay(200) }
         SettingsStore.setAutoAnalysis(app, "off")
         dao.allOnce().filter { it.pgn == pgn }.forEach { dao.delete(it.id) }
+        Unit
+    }
+
+    /** A2 : le mat manqué de l'utilisateur (et lui seul) devient un puzzle « Mes parties ». */
+    @Test fun createsOwnPuzzleFromMissedMate() = runBlocking {
+        val missedMatePgn = "[Event \"A2\"]\n[Result \"0-1\"]\n\n1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. d3 Nxh5 5. Bxf7+ Ke7 6. Nc3 Nf4 0-1"
+        val dao = LibraryDatabase.get(app).games()
+        val puzzles = LibraryDatabase.get(app).ownPuzzles()
+        puzzles.clear()   // build débogable : ses données ne sont que celles des essais
+        dao.insert(
+            GameRecord(
+                playedAt = System.currentTimeMillis(), white = "Vous", black = "Ordinateur",
+                result = "0-1", source = "engine", variant = null, moveCount = 12, pgn = missedMatePgn,
+            )
+        )
+        SettingsStore.setAutoAnalysis(app, "on")
+        val before = AutoAnalysisService.newPuzzleCount
+        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+            AutoAnalysisService.enqueue(app, missedMatePgn, chesskit.Piece.Color.white)
+        }
+        withTimeout(240_000) {
+            while (AutoAnalysisService.queue.isEmpty()) delay(100)
+            while (AutoAnalysisService.queue.isNotEmpty()) delay(500)
+        }
+        val created = AutoAnalysisService.newPuzzleCount - before
+        assertTrue("1 à 3 puzzles, eu $created", created in 1..AutoAnalysisService.MAX_PUZZLES_PER_GAME)
+        // Jamais depuis une position où les Noirs (l'ordinateur) avaient le trait.
+        val own = puzzles.all()
+        assertTrue(own.isNotEmpty() && own.all { it.fen.contains(" w ") })
+        SettingsStore.setAutoAnalysis(app, "off")
+        puzzles.clear()
+        dao.allOnce().filter { it.pgn == missedMatePgn }.forEach { dao.delete(it.id) }
         Unit
     }
 }

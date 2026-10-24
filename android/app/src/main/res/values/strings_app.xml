@@ -1153,4 +1153,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="settings_analysis">Analysis</string>
     <string name="auto_analysis_setting">Analyze my games automatically</string>
     <string name="auto_analysis_setting_note">After each game against the computer, on your device, in the background: about 1 to 3 minutes and some battery. Paused in Battery Saver or when the device gets hot.</string>
+    <plurals name="home_new_puzzles">
+        <item quantity="one">%1$d new puzzle from your last game</item>
+        <item quantity="other">%1$d new puzzles from your last game</item>
+    </plurals>
 </resources>

@@ -1350,6 +1350,100 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /**
+     * A2 (2.0) — les erreurs et les mats manqués de [color] deviennent des
+     * puzzles « Mes parties », sans écran ni proposition. Pendant de
+     * `AutoAnalysisService.createPuzzles` côté iOS : les mats d'abord, puis
+     * les fautes les plus COÛTEUSES, [limit] puzzles au plus. À appeler une
+     * fois la revue terminée (le service attend le bilan complet).
+     */
+    suspend fun createOwnPuzzles(color: Piece.Color, limit: Int): Int {
+        val evals = reviewEvals.toMap()
+        if (evals.isEmpty() || limit <= 0) return 0
+        val snapshotPositions = positions.map { it.copy() }
+        val snapshotMoves = moves.toList()
+        val qualities = ui.qualities
+        val sourcePgn = pgn()
+        val dao = LibraryDatabase.get(getApplication()).ownPuzzles()
+        var created = 0
+
+        suspend fun insert(fen: String, playedSan: String, solution: List<String>, theme: String) {
+            dao.insert(
+                OwnPuzzle(
+                    uid = java.util.UUID.randomUUID().toString(),
+                    fen = fen, playedSan = playedSan,
+                    solution = solution.joinToString(" "),
+                    theme = theme, rating = 0,
+                    createdAt = System.currentTimeMillis(), sourcePgn = sourcePgn,
+                )
+            )
+            created++
+        }
+
+        // Probabilité de gain perdue par le coup i, du point de vue de celui qui l'a joué.
+        fun cost(i: Int): Double {
+            val before = evals[i]?.winPercentWhite ?: return 0.0
+            val after = evals[i + 1]?.winPercentWhite ?: return 0.0
+            return if (snapshotPositions[i].sideToMove == Piece.Color.white) before - after else after - before
+        }
+
+        withContext(Dispatchers.IO) {
+            EngineService.use(getApplication()) { e ->
+                // 1. Les mats manqués.
+                e.send("setoption name MultiPV value 1")
+                val childNodes = com.chesslab.engine.DevicePerformance.classificationNodes(getApplication())
+                val childCap = com.chesslab.engine.DevicePerformance.classificationCapMs(getApplication())
+                for (i in snapshotMoves.indices) {
+                    if (created >= limit) break
+                    ensureActive()
+                    val parent = snapshotPositions[i]
+                    if (parent.sideToMove != color) continue
+                    val child = snapshotPositions.getOrNull(i + 1) ?: continue
+                    if (Board(child).state is Board.State.Checkmate) continue
+                    if (dao.countFor(parent.fen) > 0) continue
+                    val winForMover = evals[i]?.let {
+                        if (parent.sideToMove == Piece.Color.white) it.winPercentWhite else 100 - it.winPercentWhite
+                    }
+                    if (winForMover != null && !com.chesslab.puzzles.MissedMateDetector.mightHoldMate(winForMover)) continue
+                    val best = deepEval(e, parent)[1] ?: continue
+                    val mateIn = best.mate ?: continue
+                    if (mateIn <= 0 || mateIn > com.chesslab.puzzles.MissedMateDetector.MAX_MATE_MOVES) continue
+                    val solution = com.chesslab.puzzles.MissedMateDetector.solution(best.pv, parent.fen) ?: continue
+                    if (snapshotMoves[i].lan == best.lan) continue
+                    if ((deepEval(e, child, childNodes, childCap)[1]?.mate ?: 0) < 0) continue
+                    insert(parent.fen, snapshotMoves[i].san, solution, "checkmate")
+                }
+
+                // 2. Les fautes les plus coûteuses, tant qu'il reste de la place.
+                if (created < limit) {
+                    e.send("setoption name MultiPV value 2")
+                    val candidates = snapshotMoves.indices
+                        .filter { snapshotPositions[it].sideToMove == color }
+                        .filter {
+                            qualities[it] == MoveQuality.mistake || qualities[it] == MoveQuality.miss ||
+                                qualities[it] == MoveQuality.blunder
+                        }
+                        .sortedByDescending { cost(it) }
+                        .take(AUTO_PUZZLE_PROBE_LIMIT)
+                    for (i in candidates) {
+                        if (created >= limit) break
+                        ensureActive()
+                        val parent = snapshotPositions[i]
+                        if (dao.countFor(parent.fen) > 0) continue
+                        val deep = deepEval(e, parent)
+                        val best = deep[1] ?: continue
+                        val second = deep[2] ?: continue
+                        if (cpEquivalent(best) - cpEquivalent(second) <= 150) continue
+                        val solution = PuzzleSolutionTrimmer.trim(best.pv, parent.fen)
+                        if (solution.isEmpty()) continue
+                        insert(parent.fen, snapshotMoves[i].san, solution, themeFor(parent, solution))
+                    }
+                }
+            }
+        }
+        return created
+    }
+
     fun clearPuzzleNotice() { ui = ui.copy(puzzlesCreated = null) }
 
     // MARK: Mats manqués
@@ -1662,6 +1756,9 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
         position.pieces.firstOrNull { it.kind == Piece.Kind.king && it.color == color }?.square
 
     companion object {
+        /** Fautes sondées au plus pour remplir `createOwnPuzzles` (comme iOS). */
+        private const val AUTO_PUZZLE_PROBE_LIMIT = 8
+
         // Le budget d'une position de revue et son plafond de temps vivent
         // désormais dans `DevicePerformance` : ils dépendent de l'appareil,
         // comme sur iOS. Un budget unique servait mal les deux bouts — trop

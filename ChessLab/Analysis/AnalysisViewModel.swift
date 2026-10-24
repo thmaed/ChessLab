@@ -1977,30 +1977,54 @@ final class AnalysisViewModel {
     /// s'exécuter — donc avant de pouvoir envoyer le `stop` qui la
     /// terminerait. Interblocage classique, même piège documenté pour
     /// `PlayViewModel.interruptHintAnalysisIfNeeded()`.
+    ///
+    /// - parameter color: ne retient que les coups de ce camp (A2 : « vos »
+    ///   erreurs, pas celles de l'ordinateur). `nil` = les deux, comme à la
+    ///   demande depuis l'écran d'analyse.
+    /// - parameter limit: au plus ce nombre de puzzles, les fautes les plus
+    ///   COÛTEUSES d'abord (A2 : trois par partie).
     @discardableResult
-    func generatePuzzles(in context: ModelContext) async -> Int {
+    func generatePuzzles(in context: ModelContext, color: Piece.Color? = nil, limit: Int? = nil) async -> Int {
         await stopLiveAnalysisIfNeeded()
         return await withCheckedContinuation { continuation in
             enqueueEngineWork { [weak self] in
-                let count = await self?.performPuzzleGeneration(in: context) ?? 0
+                let count = await self?.performPuzzleGeneration(in: context, color: color, limit: limit) ?? 0
                 continuation.resume(returning: count)
             }
         }
     }
 
-    private func performPuzzleGeneration(in context: ModelContext) async -> Int {
+    private func performPuzzleGeneration(
+        in context: ModelContext, color: Piece.Color? = nil, limit: Int? = nil
+    ) async -> Int {
         guard let engine else { return 0 }
         await stopLiveAnalysisIfNeeded()
 
         let sourcePGN = exportedPGN
         // L'occasion manquée est un candidat de choix : par définition, il
         // existait un coup nettement meilleur à retrouver.
-        let candidateIndices = moveEvaluations
+        var candidates = Array(moveEvaluations
             .filter { [.mistake, .miss, .blunder].contains($0.value.quality) }
-            .keys
+            .filter { color == nil || $0.key.color == color })
+        if limit != nil {
+            // Les fautes les plus coûteuses d'abord (probabilité de gain
+            // perdue), et pas plus de quelques-unes à sonder : chaque
+            // candidat écarté coûte une recherche profonde.
+            func cost(_ entry: (key: MoveTree.Index, value: AnalysisMoveEvaluation)) -> Double {
+                guard game.moves.hasIndex(before: entry.key),
+                      let before = evalCache[game.moves.index(before: entry.key)] else { return 0 }
+                let mover = entry.key.color
+                let beforePOV = mover == .white ? before.winPercent : 100 - before.winPercent
+                return beforePOV - entry.value.winPercentAfterMover
+            }
+            candidates = Array(candidates.sorted { cost($0) > cost($1) }.prefix(Self.autoPuzzleProbeLimit))
+        }
+        let candidateIndices = candidates.map(\.key)
 
         var created = 0
         for index in candidateIndices {
+            if let limit, created >= limit { break }
+            if isTornDown { break }
             guard game.moves.hasIndex(before: index), let move = game.moves[index] else { continue }
             let parentIndex = game.moves.index(before: index)
             guard let parentPosition = game.positions[parentIndex] else { continue }
@@ -2055,6 +2079,10 @@ final class AnalysisViewModel {
         return created
     }
 
+    /// Nombre de fautes sondées au plus pour remplir ``generatePuzzles``
+    /// quand un plafond est demandé.
+    private static let autoPuzzleProbeLimit = 8
+
     // MARK: Mats manqués
 
     /// Avancement de la recherche des mats manqués (`nil` hors recherche) —
@@ -2072,11 +2100,13 @@ final class AnalysisViewModel {
     /// attend sa fin — et profite alors de son cache (présélection gratuite).
     /// Même arrêt de l'analyse en continu HORS file que
     /// ``generatePuzzles(in:)``, pour la même raison (interblocage).
-    func findMissedMates(in context: ModelContext) async -> [MissedMate] {
+    ///
+    /// - parameter color: ne regarde que les coups de ce camp (A2).
+    func findMissedMates(in context: ModelContext, color: Piece.Color? = nil) async -> [MissedMate] {
         await stopLiveAnalysisIfNeeded()
         return await withCheckedContinuation { continuation in
             enqueueEngineWork { [weak self] in
-                let found = await self?.performMissedMateScan(in: context) ?? []
+                let found = await self?.performMissedMateScan(in: context, color: color) ?? []
                 continuation.resume(returning: found)
             }
         }
@@ -2093,7 +2123,7 @@ final class AnalysisViewModel {
     ///    pas celui du moteur, la position d'APRÈS : si l'adversaire y est
     ///    toujours maté, le joueur a pris un autre chemin vers le mat — rien
     ///    de manqué.
-    private func performMissedMateScan(in context: ModelContext) async -> [MissedMate] {
+    private func performMissedMateScan(in context: ModelContext, color: Piece.Color? = nil) async -> [MissedMate] {
         guard let engine, !isTornDown else { return [] }
         await stopLiveAnalysisIfNeeded()
 
@@ -2119,6 +2149,7 @@ final class AnalysisViewModel {
             guard let move = game.moves[index],
                   let parent = game.positions[parentIndex],
                   let child = game.positions[index] else { continue }
+            if let color, parent.sideToMove != color { continue }
             // Le coup joué mate lui-même : rien de manqué.
             if case .checkmate = Board(position: child).state { continue }
             // Déjà dans vos puzzles : ne pas le proposer une seconde fois.

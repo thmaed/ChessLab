@@ -1,3 +1,4 @@
+import ChessKit
 import Foundation
 import Observation
 import SwiftData
@@ -25,6 +26,23 @@ final class AutoAnalysisService {
     struct Job: Equatable, Identifiable {
         let id: String   // empreinte de la partie (AnalysisEvalStore.key)
         let pgn: String
+        /// Le camp de l'utilisateur : ses erreurs, pas celles de l'ordinateur.
+        let userColor: Piece.Color?
+    }
+
+    /// A2 : au plus ce nombre de puzzles tirés d'une partie, les mats manqués
+    /// d'abord, puis les fautes les plus coûteuses.
+    static let maxPuzzlesPerGame = 3
+
+    private static let pendingKey = "autoAnalysis.newPuzzles"
+
+    /// Puzzles créés depuis la dernière visite des puzzles : la pastille de
+    /// l'accueil. Local à l'appareil.
+    private(set) var newPuzzleCount = UserDefaults.standard.integer(forKey: pendingKey)
+
+    func acknowledgeNewPuzzles() {
+        newPuzzleCount = 0
+        UserDefaults.standard.removeObject(forKey: Self.pendingKey)
     }
 
     /// Parties en attente, la première étant celle en cours.
@@ -39,11 +57,11 @@ final class AutoAnalysisService {
     var isRunning: Bool { runner != nil }
 
     /// Ajoute une partie à la file (sans doublon) et démarre si possible.
-    func enqueue(pgn: String, key: String, context: ModelContext) {
+    func enqueue(pgn: String, key: String, userColor: Piece.Color? = nil, context: ModelContext) {
         guard AppSettings.shared.autoAnalysisChoice == .on else { return }
         guard !queue.contains(where: { $0.id == key }) else { return }
         self.context = context
-        queue.append(Job(id: key, pgn: pgn))
+        queue.append(Job(id: key, pgn: pgn, userColor: userColor))
         startIfPossible()
     }
 
@@ -91,6 +109,20 @@ final class AutoAnalysisService {
         }
     }
 
+    /// A2 — les erreurs et les mats manqués de l'utilisateur deviennent des
+    /// puzzles « Mes parties », sans qu'il ait à y penser.
+    private func createPuzzles(from viewModel: AnalysisViewModel, color: Piece.Color, context: ModelContext) async {
+        let cap = Self.maxPuzzlesPerGame
+        let mates = await viewModel.findMissedMates(in: context, color: color)
+        var created = viewModel.saveMissedMates(Array(mates.prefix(cap)), in: context)
+        if created < cap, mayRun {
+            created += await viewModel.generatePuzzles(in: context, color: color, limit: cap - created)
+        }
+        guard created > 0 else { return }
+        newPuzzleCount += created
+        UserDefaults.standard.set(newPuzzleCount, forKey: Self.pendingKey)
+    }
+
     /// Vrai si la partie est terminée (ou irrécupérable) — faux si interrompue.
     private func analyze(_ job: Job, context: ModelContext) async -> Bool {
         let viewModel = AnalysisViewModel(source: .pgn(job.pgn))
@@ -106,6 +138,9 @@ final class AutoAnalysisService {
             progress = (min(total, viewModel.moveEvaluations.count), total)
             if viewModel.analysisMetrics != nil {
                 _ = viewModel.persistMetrics(in: context)
+                if let color = job.userColor {
+                    await createPuzzles(from: viewModel, color: color, context: context)
+                }
                 finished = true
                 break
             }

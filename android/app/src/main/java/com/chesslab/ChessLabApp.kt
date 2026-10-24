@@ -10,6 +10,7 @@ class ChessLabApp : Application() {
     override fun onCreate() {
         super.onCreate()
         SettingsStore.start(this)
+        com.chesslab.analysis.AutoAnalysisService.loadPending(this)
         // A1 : l'analyse automatique ne tourne qu'au premier plan, comme sur iOS.
         registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
             private var started = 0

@@ -12,7 +12,7 @@ struct AutoAnalysisServiceTests {
 
     private static let container: ModelContainer = {
         try! ModelContainer(
-            for: GameRecord.self,
+            for: GameRecord.self, Puzzle.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         )
     }()
@@ -42,6 +42,40 @@ struct AutoAnalysisServiceTests {
         #expect(record.whiteAccuracy != nil)
         try await Task.sleep(for: .seconds(2))
         #expect(service.queue.isEmpty)
+        AppSettings.shared.autoAnalysisChoice = .off
+    }
+
+    /// A2 : les fautes de l'utilisateur (et d'elles seules) deviennent des
+    /// puzzles « Mes parties », trois au plus.
+    @Test(.enabled(if: ProcessInfo.processInfo.environment["ENGINE_INTEGRATION"] == "1"))
+    func createsOwnPuzzlesFromUserMistakes() async throws {
+        let context = Self.container.mainContext
+        try context.delete(model: Puzzle.self)
+        // Les Blancs (l'utilisateur) ratent Dxf7# au coup 4 : un mat manqué.
+        let pgn = "[Event \"A2\"]\n[Result \"0-1\"]\n\n1. e4 e5 2. Qh5 Nc6 3. Bc4 Nf6 4. d3 Nxh5 5. Bxf7+ Ke7 6. Nc3 Nf4 0-1"
+        let game = try #require(PGNLoader.game(from: pgn))
+        let key = try #require(AnalysisEvalStore.key(for: game))
+        let record = GameRecord()
+        record.pgn = pgn
+        record.analysisKey = key
+        context.insert(record)
+
+        AppSettings.shared.autoAnalysisChoice = .on
+        let service = AutoAnalysisService.shared
+        service.acknowledgeNewPuzzles()
+        service.enqueue(pgn: pgn, key: key, userColor: .white, context: context)
+        let deadline = Date().addingTimeInterval(300)
+        while Date() < deadline, record.analysisVersion == nil || !service.queue.isEmpty {
+            try await Task.sleep(for: .milliseconds(500))
+        }
+        let puzzles = try context.fetch(FetchDescriptor<Puzzle>())
+        #expect(!puzzles.isEmpty)
+        #expect(puzzles.count <= AutoAnalysisService.maxPuzzlesPerGame)
+        #expect(puzzles.allSatisfy { $0.sourceRaw == PuzzleSource.ownGames.rawValue })
+        // Aucun puzzle ne part d'une position où les Noirs avaient le trait.
+        #expect(puzzles.allSatisfy { ($0.fen ?? "").contains(" w ") })
+        #expect(service.newPuzzleCount == puzzles.count)
+        service.acknowledgeNewPuzzles()
         AppSettings.shared.autoAnalysisChoice = .off
     }
 
