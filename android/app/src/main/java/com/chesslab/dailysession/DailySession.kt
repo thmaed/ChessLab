@@ -94,6 +94,9 @@ data class DailySessionPlan(val steps: List<DailySessionStep>, val streak: Int, 
 }
 
 object DailySessionBuilder {
+    /** Une séance se veut courte : au plus 10 positions d'ouverture et 5 puzzles par étape (comme iOS). */
+    const val OPENINGS_CAP = 10
+    const val PUZZLES_CAP = 5
 
     fun plan(
         openingsDue: Int, missedPuzzles: Int, ownPuzzles: Int,
@@ -101,9 +104,9 @@ object DailySessionBuilder {
         streak: Int, trainedToday: Boolean,
     ): DailySessionPlan {
         val steps = arrayListOf(
-            DailySessionStep(DailySessionStep.Kind.openings, maxOf(0, openingsDue)),
-            DailySessionStep(DailySessionStep.Kind.missedPuzzles, maxOf(0, missedPuzzles)),
-            DailySessionStep(DailySessionStep.Kind.ownPuzzles, maxOf(0, ownPuzzles)),
+            DailySessionStep(DailySessionStep.Kind.openings, minOf(OPENINGS_CAP, maxOf(0, openingsDue))),
+            DailySessionStep(DailySessionStep.Kind.missedPuzzles, minOf(PUZZLES_CAP, maxOf(0, missedPuzzles))),
+            DailySessionStep(DailySessionStep.Kind.ownPuzzles, minOf(PUZZLES_CAP, maxOf(0, ownPuzzles))),
         )
         if (endgameCourseId != null) {
             steps += DailySessionStep(DailySessionStep.Kind.endgame, if (endgameOpenedToday) 0 else 1, endgameCourseId)

@@ -286,6 +286,7 @@ private fun App() {
                 mode = when (current.kind) {
                     "line" -> TrainMode.FullLine(current.courseId ?: "")
                     "hardest" -> TrainMode.Hardest
+                    "session" -> TrainMode.Session(com.chesslab.dailysession.DailySessionBuilder.OPENINGS_CAP)
                     else -> TrainMode.Daily
                 },
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },
@@ -310,7 +311,7 @@ private fun App() {
                 }
             }
             Route.DailySession -> com.chesslab.dailysession.DailySessionScreen(
-                onOpenOpenings = { stack.add(trainRoute(context, "daily")) },
+                onOpenOpenings = { stack.add(trainRoute(context, "session")) },
                 onOpenPuzzles = { filter -> stack.add(Route.Puzzles(filter = filter)) },
                 onOpenEndgame = { id, name -> stack.add(Route.EndgameFree(id, name)) },
             )

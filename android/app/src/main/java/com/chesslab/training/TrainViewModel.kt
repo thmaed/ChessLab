@@ -31,6 +31,8 @@ sealed interface TrainMode {
     data object Hardest : TrainMode
     /** Une ligne précise, du début à la fin. */
     data class FullLine(val courseId: String) : TrainMode
+    /** La séance du jour : les positions dues, au plus [limit] coups du joueur. */
+    data class Session(val limit: Int) : TrainMode
 }
 
 enum class TrainPhase {
@@ -114,8 +116,11 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
     private val course: Course? get() = sessionCourses.getOrNull(courseIndex)?.first
     private val side: String get() = sessionCourses.getOrNull(courseIndex)?.second ?: "white"
 
+    private var reviewLimit: Int? = null
+
     fun start(mode: TrainMode) {
         this.mode = mode
+        reviewLimit = (mode as? TrainMode.Session)?.limit
         viewModelScope.launch {
             ui = ui.copy(loading = true)
             val built = withContext(Dispatchers.IO) { buildSession(mode) }
@@ -209,6 +214,9 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
      * on attend ; sinon l'adversaire répond après un souffle.
      */
     private fun advanceTurn() {
+        reviewLimit?.let { limit ->
+            if (ui.reviewed >= limit) { ui = ui.copy(phase = TrainPhase.complete, remaining = 0); return }
+        }
         if (candidates(currentKey).isEmpty()) { nextCourseOrComplete(); return }
         if (board.position.sideToMove == ui.orientation) {
             ui = ui.copy(phase = TrainPhase.awaiting)

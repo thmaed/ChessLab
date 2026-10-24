@@ -52,10 +52,18 @@ struct DailySessionTests {
             endgameOpenedToday: false, streak: 4, trainedToday: false)
         #expect(plan.steps.map(\.kind) == [.openings, .missedPuzzles, .ownPuzzles, .endgame])
         #expect(plan.pending.map(\.kind) == [.openings, .ownPuzzles, .endgame])
-        #expect(plan.firstPending?.remaining == 12)
+        #expect(plan.firstPending?.remaining == 10)
         #expect(plan.steps.first { $0.kind == .endgame }?.courseID == "eg-lucena")
         #expect(!plan.isComplete)
         #expect(plan.streak == 4)
+    }
+
+    @Test("Une séance reste courte : au plus 10 positions et 5 puzzles par étape")
+    func stepsAreCapped() {
+        let plan = DailySessionBuilder.plan(
+            openingsDue: 80, missedPuzzles: 28, ownPuzzles: 7, endgameCourseID: nil,
+            endgameOpenedToday: false, streak: 0, trainedToday: false)
+        #expect(plan.steps.map(\.remaining) == [10, 5, 5])
     }
 
     @Test("Tout est fait quand il n'y a plus rien à revoir et que la finale est ouverte")

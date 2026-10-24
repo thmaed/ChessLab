@@ -39,6 +39,10 @@ struct DailySessionPlan: Equatable {
 }
 
 enum DailySessionBuilder {
+    /// Une séance se veut courte : au plus 10 positions d'ouverture et 5 puzzles
+    /// par étape (même plafond sur Android). Le reste attend demain.
+    static let openingsCap = 10
+    static let puzzlesCap = 5
 
     static func plan(
         openingsDue: Int, missedPuzzles: Int, ownPuzzles: Int,
@@ -46,9 +50,9 @@ enum DailySessionBuilder {
         streak: Int, trainedToday: Bool
     ) -> DailySessionPlan {
         var steps = [
-            DailySessionStep(kind: .openings, remaining: max(0, openingsDue)),
-            DailySessionStep(kind: .missedPuzzles, remaining: max(0, missedPuzzles)),
-            DailySessionStep(kind: .ownPuzzles, remaining: max(0, ownPuzzles)),
+            DailySessionStep(kind: .openings, remaining: min(openingsCap, max(0, openingsDue))),
+            DailySessionStep(kind: .missedPuzzles, remaining: min(puzzlesCap, max(0, missedPuzzles))),
+            DailySessionStep(kind: .ownPuzzles, remaining: min(puzzlesCap, max(0, ownPuzzles))),
         ]
         if let endgameCourseID {
             steps.append(DailySessionStep(

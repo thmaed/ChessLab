@@ -52,6 +52,11 @@ class DailySessionTest {
         assertEquals(4, plan.streak)
     }
 
+    @Test fun `une seance reste courte`() {
+        val plan = DailySessionBuilder.plan(80, 28, 7, null, false, 0, false)
+        assertEquals(listOf(10, 5, 5), plan.steps.map { it.remaining })
+    }
+
     @Test fun `tout est fait quand il n'y a plus rien a revoir et que la finale est ouverte`() {
         assertTrue(DailySessionBuilder.plan(0, 0, 0, "eg-lucena", true, 1, true).isComplete)
         val none = DailySessionBuilder.plan(0, 0, 0, null, false, 0, false)

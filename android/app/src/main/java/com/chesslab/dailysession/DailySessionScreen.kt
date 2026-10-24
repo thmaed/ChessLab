@@ -162,8 +162,8 @@ fun DailySessionScreen(
                 StepRow(step) {
                     when (step.kind) {
                         DailySessionStep.Kind.openings -> onOpenOpenings()
-                        DailySessionStep.Kind.missedPuzzles -> onOpenPuzzles(PuzzleFilter(missedOnly = true))
-                        DailySessionStep.Kind.ownPuzzles -> onOpenPuzzles(PuzzleFilter(source = PuzzleSource.ownGames))
+                        DailySessionStep.Kind.missedPuzzles -> onOpenPuzzles(PuzzleFilter(missedOnly = true, limit = DailySessionBuilder.PUZZLES_CAP))
+                        DailySessionStep.Kind.ownPuzzles -> onOpenPuzzles(PuzzleFilter(source = PuzzleSource.ownGames, limit = DailySessionBuilder.PUZZLES_CAP))
                         DailySessionStep.Kind.endgame -> step.courseId?.let { id ->
                             TrainingDays.markEndgameOpened(context)
                             onOpenEndgame(id, CourseRepository.cachedName(id) ?: id)

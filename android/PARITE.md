@@ -198,8 +198,10 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
       jusqu'à la fin d'un jour manqué (aujourd'hui vide → on compte jusqu'à hier).
 - [x] Tests : `DailySessionTests` (7) + `DailySessionUITests` (iOS) ;
       `DailySessionTest` JVM (6) + instrumenté (Galaxy A16).
-- [ ] **Durée réglable (10–15 min) non faite** : la séance sert les écrans
-      existants tels quels, sans plafond de longueur. À décider.
+- [x] **Séance courte** (retour utilisateur, 24/10) : au plus 10 positions
+      d'ouverture et 5 puzzles par étape, plafond réellement appliqué aux écrans
+      (`PuzzleSessionFilter.limit`, `reviewLimit` / `TrainMode.Session`) ; le reste
+      attend demain. Durée réglable par l'utilisateur : non faite.
 - [ ] Pas de notification (décision du 24/10). La série n'est pas synchronisée.
 - [ ] À vérifier sur appareil : aspect de la carte Android (iOS vérifié au
       simulateur), enchaînement réel des étapes.

@@ -204,7 +204,15 @@ final class OpeningTrainViewModel {
 
     /// Détermine à qui de jouer à `currentKey` et enchaîne : fin de ligne →
     /// cours suivant ; trait à l'utilisateur → on attend ; sinon l'adversaire joue.
+    /// Nombre de coups du joueur au plus pour la séance (la séance du jour) ;
+    /// `nil` = sans fin.
+    var reviewLimit: Int?
+
     private func advanceTurn() {
+        if let reviewLimit, reviewedCount >= reviewLimit {
+            phase = .complete
+            return
+        }
         if candidates(at: currentKey).isEmpty {
             nextCourseOrComplete()
             return

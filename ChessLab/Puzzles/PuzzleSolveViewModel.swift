@@ -462,7 +462,11 @@ final class PuzzleSolveViewModel {
         // courant n'est alors plus dû (son `dueDate` vient d'avancer) et
         // ne peut pas être retiré ; l'exclusion explicite reste par
         // sécurité.
-        nextPuzzle = PuzzleSessionDrawer.drawNext(matching: filter, excluding: puzzle.id, in: modelContext)
+        if let limit = filter.limit, sessionIndex >= limit {
+            nextPuzzle = nil
+        } else {
+            nextPuzzle = PuzzleSessionDrawer.drawNext(matching: filter, excluding: puzzle.id, in: modelContext)
+        }
     }
 
     /// La réponse va au programme (temps actif compris), puis le puzzle

@@ -278,7 +278,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val stats = withContext(Dispatchers.IO) {
             runCatching { com.chesslab.progression.PuzzleStats.compute(db.puzzleProgress().all()) }.getOrNull()
         }
-        queue = PuzzleDraw.draw(app, filter, own)
+        queue = PuzzleDraw.draw(app, filter, own, count = filter.limit)
         ui = ui.copy(loading = false, dueCount = due, stats = stats)
         if (queue.isEmpty()) {
             ui = ui.copy(

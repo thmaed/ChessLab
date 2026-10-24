@@ -115,6 +115,7 @@ struct HomeView: View {
         /// maîtres, meilleurs coups du moteur.
         case openingLabsReader(String)
         case openingTrainDaily
+        case openingTrainSession
         case openingTrainLine(String)
         /// Réglages Labo, éventuellement pré-remplis avec une position de
         /// départ venue de l'éditeur ou du scanner.
@@ -179,7 +180,7 @@ struct HomeView: View {
             case .activeGame, .resumedGame, .activeTwoPlayerGame, .resumedTwoPlayerGame,
                  .activeAnalysis, .missedMates, .positionEditor, .activePuzzleSession, .woodpecker,
                  .endgameFreeTrain, .endgameReader, .openingEditor, .openingLabsReader,
-                 .openingTrainDaily, .openingTrainLine,
+                 .openingTrainDaily, .openingTrainSession, .openingTrainLine,
                  .activeChess960Game, .activeChess960TwoPlayerGame, .activeChess960Analysis,
                  .activeFairyVariantGame, .activeEngineLegalityGame, .activeVariantAnalysis,
                  .activeStolenMoveGame, .activeDuckChessGame, .activeDuckChessAnalysis,
@@ -1101,6 +1102,12 @@ struct HomeView: View {
                         path.append(Route.endgameFreeTrain(courseID))
                     }
 
+                case .openingTrainSession:
+                    OpeningTrainHost(
+                        mode: .daily, sessionKey: sessionKey(for: route),
+                        reviewLimit: DailySessionBuilder.openingsCap
+                    ) { path.removeLast() }
+
                 case .openingTrainDaily:
                     OpeningTrainHost(mode: .daily, sessionKey: sessionKey(for: route)) { path.removeLast() }
 
@@ -1141,7 +1148,7 @@ struct HomeView: View {
 
                 case .dailySession:
                     DailySessionView(
-                        onOpenOpenings: { path.append(Route.openingTrainDaily) },
+                        onOpenOpenings: { path.append(Route.openingTrainSession) },
                         onOpenPuzzles: { filter in path.append(Route.activePuzzleSession(filter)) },
                         onOpenEndgame: { id in path.append(Route.endgameFreeTrain(id)) }
                     )

@@ -152,6 +152,8 @@ data class PuzzleFilter(
      * chose, l'un par palier, l'autre par la cote du joueur.
      */
     val ratingWindow: IntRange? = null,
+    /** Nombre de puzzles au plus pour la série (la séance du jour) ; `null` = sans fin. */
+    val limit: Int? = null,
 ) {
     val ratings: IntRange get() = ratingWindow ?: difficulty?.range ?: 0..4000
     val isEmpty: Boolean

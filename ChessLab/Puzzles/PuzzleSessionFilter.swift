@@ -22,6 +22,9 @@ struct PuzzleSessionFilter: Hashable {
     /// lancement de la série. Prime sur `difficulty` : les deux critères disent
     /// la même chose, l'un par palier, l'autre par la cote du joueur.
     var ratingWindow: ClosedRange<Int>?
+    /// Nombre de puzzles au plus pour la série (la séance du jour) ; `nil` =
+    /// sans fin.
+    var limit: Int?
 }
 
 /// Compte et tire les puzzles dus correspondant à un

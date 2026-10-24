@@ -105,8 +105,8 @@ struct DailySessionView: View {
     private func start(_ step: DailySessionStep) {
         switch step.kind {
         case .openings: onOpenOpenings()
-        case .missedPuzzles: onOpenPuzzles(PuzzleSessionFilter(source: nil, missedOnly: true))
-        case .ownPuzzles: onOpenPuzzles(PuzzleSessionFilter(source: .ownGames))
+        case .missedPuzzles: onOpenPuzzles(PuzzleSessionFilter(source: nil, missedOnly: true, limit: DailySessionBuilder.puzzlesCap))
+        case .ownPuzzles: onOpenPuzzles(PuzzleSessionFilter(source: .ownGames, limit: DailySessionBuilder.puzzlesCap))
         case .endgame:
             guard let id = step.courseID else { return }
             TrainingDays.markEndgameOpened()

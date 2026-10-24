@@ -333,6 +333,7 @@ struct OpeningTrainHost: View {
     let mode: OpeningTrainViewModel.Mode
     /// Identité de session — voir ``SessionStore``.
     let sessionKey: String
+    var reviewLimit: Int? = nil
     let onExit: () -> Void
     @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
@@ -349,7 +350,9 @@ struct OpeningTrainHost: View {
         .onAppear {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
-                    OpeningTrainViewModel(mode: mode, context: modelContext)
+                    let model = OpeningTrainViewModel(mode: mode, context: modelContext)
+                    model.reviewLimit = reviewLimit
+                    return model
                 }
             }
         }
