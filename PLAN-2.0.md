@@ -230,13 +230,18 @@ de bout en bout (classification de tous les coups, affinage des verdicts
 limites, bilan) par le mode normal de l'app, sur le **Galaxy A16** (téléphone
 d'entrée de gamme, branché en USB). Test :
 `HeadlessAnalysisMeasureTest` (Android) et `HeadlessAnalysisMeasureTests`
-(iOS, écrit mais **pas encore mesuré** : l'iPhone XS était verrouillé).
+(iOS, mesuré le même jour sur l'**iPhone XS**, le plus ancien appareil de la flotte).
 
 | Partie | Demi-coups | Durée | Par demi-coup |
 |---|---:|---:|---:|
 | 28 coups | 55 | 63 s | 1,1 s |
 | 52 coups | 104 | 158 s | 1,5 s |
 | 66 coups | 131 | 252 s | 1,9 s |
+
+**iPhone XS (iOS 18.7.9)** : 36 s (55 demi-coups, 0,66 s/demi-coup), 70 s (104,
+0,67 s) et 126 s (131, 0,96 s), état thermique resté à « normal » — **deux fois
+plus vite que le Galaxy A16**. iOS tient largement la barre ; c'est Android qui
+dimensionne la fonction.
 
 - **Une partie de 40 coups se classe en 1 à 3 minutes** sur un téléphone d'entrée
   de gamme (mon estimation de 1 à 3 minutes était juste). Les parties longues et
@@ -270,6 +275,13 @@ d'entrée de gamme, branché en USB). Test :
 5. Noms : « Coach » (B1) et « Séance du jour » (A5).
 6. Démarrage immédiat de **S1, S2 et B3**.
 7. **Ajout du volet C** (revue de l'interface) — voir §8.
+
+**Volet C, tranché le 24/10/2026 après l'audit** :
+- premier lot **C1 + C2 + C3** lancé (tuiles d'accueil teintées, un seul style
+  de titre, en-têtes de section colorés partout), maquette d'abord ;
+- **identité sombre assumée** : pas de thème clair (C9 abandonné) ;
+- **C4 : bouton d'action plein, teinté du mode, collé en bas** de chaque écran
+  de réglage (Nouvelle partie, Deux joueurs, Laboratoire, Variantes).
 
 Les points d'origine, pour mémoire :
 
