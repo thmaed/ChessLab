@@ -121,3 +121,17 @@ interface TrainingDao {
     @Query("DELETE FROM opening_review_log")
     suspend fun clearLogs()
 }
+
+/** Enregistre une révision FSRS d'une position : la replanifie et l'ajoute au journal. */
+suspend fun TrainingDao.recordReview(
+    fenKey: String, rating: FsrsRating, now: Long = System.currentTimeMillis(), fsrs: Fsrs = Fsrs(),
+) {
+    val existing = progress(fenKey) ?: OpeningProgress(fenKey = fenKey)
+    val outcome = fsrs.review(existing.card, rating, now)
+    put(existing.applying(outcome))
+    log(OpeningReviewLog(
+        fenKey = fenKey, ratingRaw = rating.raw, reviewedAt = outcome.reviewedAt,
+        elapsedDays = outcome.elapsedDays, scheduledDays = outcome.scheduledDays,
+        stabilityAfter = outcome.stabilityAfter,
+    ))
+}

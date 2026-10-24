@@ -1161,4 +1161,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="coach_rare">Coach · coup rare : %1$s des joueurs de niveau %2$d le trouvent.</string>
     <string name="coach_plain">Coach · %1$s des joueurs de niveau %2$d jouent ce coup.</string>
     <string name="coach_caveat">D\'après Maia : ce que jouent les humains, pas ce qui est bon.</string>
+    <plurals name="home_repertoire_exits">
+        <item quantity="one">%1$d position de votre répertoire à revoir</item>
+        <item quantity="other">%1$d positions de votre répertoire à revoir</item>
+    </plurals>
 </resources>

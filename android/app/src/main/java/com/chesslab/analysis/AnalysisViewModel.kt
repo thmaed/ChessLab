@@ -278,6 +278,9 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
 
     private var positions: List<Position> = listOf(Position.standard)
     private var moves: List<Move> = emptyList()
+
+    /** La ligne principale chargée : positions (une de plus que de coups) et coups. */
+    val mainLine: Pair<List<Position>, List<Move>> get() = positions to moves
     private var game: Game? = null
     private var evalJob: Job? = null
     private var reviewJob: Job? = null

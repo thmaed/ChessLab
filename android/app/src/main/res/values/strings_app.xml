@@ -1164,4 +1164,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="coach_rare">Coach · rare move: %1$s of players rated %2$d find it.</string>
     <string name="coach_plain">Coach · %1$s of players rated %2$d play this move.</string>
     <string name="coach_caveat">According to Maia: what humans play, not what is good.</string>
+    <plurals name="home_repertoire_exits">
+        <item quantity="one">%1$d position from your repertoire to review</item>
+        <item quantity="other">%1$d positions from your repertoire to review</item>
+    </plurals>
 </resources>

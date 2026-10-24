@@ -9,6 +9,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStore
 import chesskit.Piece
+import com.chesslab.courses.RepertoireExitDetector
+import com.chesslab.library.LibraryDatabase
+import com.chesslab.training.FsrsRating
+import com.chesslab.training.recordReview
 import com.chesslab.engine.ThermalMonitor
 import com.chesslab.settings.SettingsStore
 import kotlinx.coroutines.CoroutineScope
@@ -76,12 +80,39 @@ object AutoAnalysisService : com.chesslab.engine.EngineService.UserEngineListene
         private set
 
     fun loadPending(context: Context) {
-        newPuzzleCount = context.getSharedPreferences("auto_analysis", Context.MODE_PRIVATE).getInt("newPuzzles", 0)
+        val prefs = context.getSharedPreferences("auto_analysis", Context.MODE_PRIVATE)
+        newPuzzleCount = prefs.getInt("newPuzzles", 0)
+        repertoireExitCount = prefs.getInt("repertoireExits", 0)
     }
 
     fun acknowledgeNewPuzzles(context: Context) {
         newPuzzleCount = 0
         context.getSharedPreferences("auto_analysis", Context.MODE_PRIVATE).edit().remove("newPuzzles").apply()
+    }
+
+    /** A3 : sorties de répertoire repérées depuis la dernière visite des ouvertures. */
+    var repertoireExitCount by mutableStateOf(0)
+        private set
+
+    fun acknowledgeRepertoireExits(context: Context) {
+        repertoireExitCount = 0
+        context.getSharedPreferences("auto_analysis", Context.MODE_PRIVATE).edit().remove("repertoireExits").apply()
+    }
+
+    /**
+     * A3 — la position où l'utilisateur a quitté son répertoire rejoint les
+     * révisions FSRS : ce qu'on a raté en partie est revu. L'adversaire qui
+     * quitte la théorie le premier n'est PAS une sortie. Pendant d'iOS
+     * `AutoAnalysisService.recordRepertoireExit`.
+     */
+    suspend fun recordRepertoireExit(application: Application, viewModel: AnalysisViewModel, color: Piece.Color) {
+        val (positions, moves) = viewModel.mainLine
+        val (courses, studied) = RepertoireExitDetector.followedCourses(application, color)
+        val exit = RepertoireExitDetector.firstExit(positions, moves, color, courses, studied) ?: return
+        LibraryDatabase.get(application).training().recordReview(exit.fenKey, FsrsRating.again)
+        repertoireExitCount += 1
+        application.getSharedPreferences("auto_analysis", Context.MODE_PRIVATE)
+            .edit().putInt("repertoireExits", repertoireExitCount).apply()
     }
 
     /** Demi-coups classés / total de la partie en cours. */
@@ -185,6 +216,9 @@ object AutoAnalysisService : com.chesslab.engine.EngineService.UserEngineListene
                             application.getSharedPreferences("auto_analysis", Context.MODE_PRIVATE)
                                 .edit().putInt("newPuzzles", newPuzzleCount).apply()
                         }
+                        // Après les puzzles, et seulement si rien n'a été interrompu :
+                        // une partie reprise ne doit pas compter deux fois la sortie.
+                        if (currentCoroutineContext().isActive) recordRepertoireExit(application, viewModel, color)
                     }
                     finished = true
                     break

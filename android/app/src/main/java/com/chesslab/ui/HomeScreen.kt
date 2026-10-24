@@ -17,6 +17,7 @@ import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.NorthEast
@@ -173,6 +174,17 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                 ) {
                     com.chesslab.analysis.AutoAnalysisService.acknowledgeNewPuzzles(context)
                     onOpen(Route.PuzzleQueue)
+                }
+            }
+            val repertoireExits = com.chesslab.analysis.AutoAnalysisService.repertoireExitCount
+            if (repertoireExits > 0) {
+                Banner(
+                    Icons.Default.Replay,
+                    pluralStringResource(R.plurals.home_repertoire_exits, repertoireExits, repertoireExits),
+                    "", Palette.warning, "sortie-repertoire",
+                ) {
+                    com.chesslab.analysis.AutoAnalysisService.acknowledgeRepertoireExits(context)
+                    onOpen(Route.Openings)
                 }
             }
             SectionHeader(stringResource(R.string.home_modes), Modifier.padding(top = 8.dp))

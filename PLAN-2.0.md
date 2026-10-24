@@ -311,7 +311,7 @@ Essais techniques d'abord, parce qu'ils peuvent changer le périmètre :
 | **A1** | Service d'analyse sans écran + réglage — **FAIT 24/10** (avant-plan seulement) | S1 | iOS, Android |
 | **A2** | Puzzles automatiques depuis les parties analysées — **FAIT 24/10** | A1 | iOS, Android |
 | **B1** | Analyse « humaine » (probabilité du coup, coup typique, erreur typique ou accident) — **FAIT 24/10** | A1 | iOS, Android |
-| **A3** | Sorties de répertoire → révisions FSRS | A1 | iOS, Android |
+| **A3** | Sorties de répertoire → révisions FSRS — **FAIT 24/10** | A1 | iOS, Android |
 | **A4** | Profil de faiblesses (Progression) | A1 | iOS, Android |
 | **B3** | Cote de puzzle personnelle + puzzles « à mon niveau » | — (indépendant) | iOS, Android |
 | **B2** | Niveau estimé + courbe | S2, B1 | iOS, Android |

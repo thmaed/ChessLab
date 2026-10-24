@@ -41,6 +41,31 @@ final class AutoAnalysisService {
     /// l'accueil. Local à l'appareil.
     private(set) var newPuzzleCount = UserDefaults.standard.integer(forKey: pendingKey)
 
+    private static let exitsKey = "autoAnalysis.repertoireExits"
+
+    /// A3 : sorties de répertoire repérées depuis la dernière visite des
+    /// ouvertures — la pastille de l'accueil. Local à l'appareil.
+    private(set) var repertoireExitCount = UserDefaults.standard.integer(forKey: exitsKey)
+
+    func acknowledgeRepertoireExits() {
+        repertoireExitCount = 0
+        UserDefaults.standard.removeObject(forKey: Self.exitsKey)
+    }
+
+    /// A3 — la position où l'utilisateur a quitté son répertoire rejoint les
+    /// révisions FSRS : ce qu'on a raté en partie est revu. L'adversaire qui
+    /// quitte la théorie le premier n'est PAS une sortie (voir
+    /// ``RepertoireExitDetector``).
+    func recordRepertoireExit(from viewModel: AnalysisViewModel, color: Piece.Color, context: ModelContext) {
+        let followed = RepertoireExitDetector.followedCourses(in: context)
+        guard let exit = RepertoireExitDetector.firstExit(
+            in: viewModel.game, userColor: color, courses: followed.courses, studied: followed.studied)
+        else { return }
+        OpeningProgressStore.recordReview(fenKey: exit.fenKey, rating: .again, in: context)
+        repertoireExitCount += 1
+        UserDefaults.standard.set(repertoireExitCount, forKey: Self.exitsKey)
+    }
+
     func acknowledgeNewPuzzles() {
         newPuzzleCount = 0
         UserDefaults.standard.removeObject(forKey: Self.pendingKey)
@@ -186,6 +211,11 @@ final class AutoAnalysisService {
                     _ = viewModel.persistMetrics(in: context)
                     if let color = job.userColor {
                         await createPuzzles(from: viewModel, color: color, context: context)
+                        // Après les puzzles et seulement si rien n'a été interrompu :
+                        // une partie reprise ne doit pas compter deux fois la sortie.
+                        if !Task.isCancelled {
+                            recordRepertoireExit(from: viewModel, color: color, context: context)
+                        }
                     }
                     finished = !Task.isCancelled
                     break

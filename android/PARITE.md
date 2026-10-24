@@ -134,6 +134,32 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [ ] Écart : le texte d'aide « Analyser » mentionne le Coach côté iOS ; Android
       n'a pas d'écran d'aide équivalent (écart antérieur, voir plus haut).
 
+### A3 de la 2.0 — sorties de répertoire → révisions FSRS — 24/10/2026
+
+- [x] À la fin de l'analyse automatique d'une partie, le premier coup où
+      l'utilisateur QUITTE son répertoire met la position AVANT ce coup dans
+      les révisions (note « encore »). Si l'adversaire a quitté la théorie le
+      premier, ou si la ligne s'arrête, rien n'est signalé. Un coup que le cours
+      note `inaccuracy` ou `refutation` compte comme une sortie. Une sortie par
+      partie au plus. iOS `RepertoireExitDetector`, Android
+      `courses/RepertoireExitDetector.kt`.
+- [x] « Répertoire suivi » = les répertoires **personnels** (tout compte) et les
+      cours livrés **étudiés** (seules comptent les positions réellement
+      révisées : jouer 1.d4 une fois ne « quitte » pas l'Italienne). iOS y ajoute
+      les cours marqués (`RepertoireMembership`).
+- [x] Pastille d'accueil « N positions de votre répertoire à revoir » (tap =
+      ouvre les ouvertures, efface la pastille). Compteur local à l'appareil.
+- [x] Tests : `RepertoireExitDetectorTests` + `RepertoireExitServiceTests` (iOS) ;
+      `RepertoireExitDetectorTest` (JVM, 8) + `RepertoireExitTest` (Galaxy A16).
+- **Constat** : `RepertoireStore.toggle` (l'étoile « mon répertoire ») n'a plus
+  aucun appelant côté iOS — le marquage n'est offert nulle part, donc
+  `RepertoireMembership` reste vide hors données d'un ancien iCloud. Android n'a
+  jamais eu ce marquage. Pas un écart : les deux apps se comportent pareil.
+- [ ] Non affiché dans l'analyse du coup (« Coup 6 : vous avez quitté votre
+      répertoire… ») : seule la pastille et la révision existent. À décider.
+- [ ] À vérifier sur appareil en conditions réelles : un répertoire personnel,
+      une partie qui en sort, la pastille puis la séance du lendemain.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

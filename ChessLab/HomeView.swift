@@ -722,6 +722,7 @@ struct HomeView: View {
                 // La reprise vit désormais en HAUT de la barre latérale
                 // (persistante) — voir `sidebar` — pour ne pas doublonner ici.
                 newPuzzlesPill
+                repertoireExitPill
                 modesSection(minTile: ModeGridMetrics.minTileRegular, shortSubtitles: true)
                 homeProgressCard
                 if !recentGames.isEmpty { recentGamesSection }
@@ -1286,6 +1287,7 @@ struct HomeView: View {
                 if seedingState.isSeeding { seedingBanner }
                 if let resumableGame { resumeBanner(resumableGame) }
                 newPuzzlesPill
+                repertoireExitPill
                 modesSection(minTile: ModeGridMetrics.minTileIPhone)
                 if !recentGames.isEmpty { recentGamesSection }
             }
@@ -1670,6 +1672,44 @@ struct HomeView: View {
             }
             .buttonStyle(.pressable)
             .accessibilityIdentifier("newPuzzlesPill")
+        }
+    }
+
+    /// A3 (2.0) : « Vous avez quitté votre répertoire — 1 position à revoir ».
+    /// La position est déjà dans les révisions ; un tap ouvre les ouvertures.
+    @ViewBuilder
+    private var repertoireExitPill: some View {
+        let count = AutoAnalysisService.shared.repertoireExitCount
+        if count > 0 {
+            Button {
+                AutoAnalysisService.shared.acknowledgeRepertoireExits()
+                open(.openings)
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "arrow.uturn.backward.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(Theme.warning)
+                    Group {
+                        if count == 1 {
+                            Text("1 position de votre répertoire à revoir")
+                        } else {
+                            Text("\(count) positions de votre répertoire à revoir")
+                        }
+                    }
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(Theme.textTertiary)
+                }
+                .padding(14)
+                .background(Theme.warning.opacity(0.16), in: Theme.cardShape)
+                .overlay(Theme.cardShape.strokeBorder(Theme.warning.opacity(0.35), lineWidth: 1))
+            }
+            .buttonStyle(.pressable)
+            .accessibilityIdentifier("repertoireExitPill")
         }
     }
 

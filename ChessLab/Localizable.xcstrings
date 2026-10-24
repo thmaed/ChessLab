@@ -22562,6 +22562,26 @@
           }
         }
       }
+    },
+    "1 position de votre répertoire à revoir": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 position from your repertoire to review"
+          }
+        }
+      }
+    },
+    "%lld positions de votre répertoire à revoir": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld positions from your repertoire to review"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
