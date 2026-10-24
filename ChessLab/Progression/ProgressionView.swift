@@ -81,7 +81,7 @@ struct ProgressionView: View {
         }
         .appBackground()
         .navigationTitle("Progression")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear(perform: load)

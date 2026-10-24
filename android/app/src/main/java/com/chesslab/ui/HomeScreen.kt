@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -344,6 +345,17 @@ private fun ModeCard(mode: Mode, onOpen: (Route) -> Unit) {
             .height(132.dp)
             .clip(CardShape)
             .background(cardGradient)
+            // Voile de la TEINTE du mode sur toute la carte (C1, 24/10/2026),
+            // comme l'accueil iOS : plus dense en haut à gauche, il s'efface vers
+            // le coin opposé ; le texte reste lisible.
+            .background(
+                Brush.linearGradient(
+                    listOf(
+                        mode.tint.copy(alpha = if (mode.enabled) 0.30f else 0.05f),
+                        mode.tint.copy(alpha = if (mode.enabled) 0.05f else 0.01f),
+                    )
+                )
+            )
             .tintedCardBorder(mode.tint, mode.enabled)
             .clickable(enabled = mode.enabled) { onOpen(mode.route) }
     ) {
@@ -351,7 +363,7 @@ private fun ModeCard(mode: Mode, onOpen: (Route) -> Unit) {
         // dans le coin. Elle donne un caractère illustré sans image.
         Icon(
             mode.icon, null,
-            tint = mode.tint.copy(alpha = if (mode.enabled) 0.08f else 0.03f),
+            tint = mode.tint.copy(alpha = if (mode.enabled) 0.14f else 0.03f),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .offset(x = 28.dp, y = 22.dp)

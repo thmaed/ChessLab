@@ -2388,13 +2388,13 @@ struct ModeCard: View {
     @ViewBuilder
     private var ghostIcon: some View {
         if let customGlyph {
-            tint.opacity(isEnabled ? 0.10 : 0.04)
+            tint.opacity(isEnabled ? 0.16 : 0.04)
                 .frame(width: ghostIconSize, height: ghostIconSize)
                 .mask { customGlyph.view(outlined: false) }
         } else {
             Image(systemName: systemImage)
                 .font(.system(size: ghostIconSize, weight: .semibold))
-                .foregroundStyle(tint.opacity(isEnabled ? 0.08 : 0.03))
+                .foregroundStyle(tint.opacity(isEnabled ? 0.14 : 0.03))
         }
     }
 
@@ -2430,6 +2430,15 @@ struct ModeCard: View {
             .background {
                 ZStack {
                     Theme.cardGradient
+                    // Voile de la TEINTE du mode sur toute la carte (C1, 24/10) :
+                    // la couleur n'était qu'une petite icône sur un gris
+                    // quasi identique d'un mode à l'autre. Plus dense en haut à
+                    // gauche, il s'efface vers le coin opposé — le texte, blanc,
+                    // reste lisible (contraste vérifié sur les huit teintes).
+                    LinearGradient(
+                        colors: [tint.opacity(isEnabled ? 0.30 : 0.05), tint.opacity(isEnabled ? 0.05 : 0.01)],
+                        startPoint: .topLeading, endPoint: .bottomTrailing
+                    )
                     // Grande icône décorative "fantôme" débordant dans le
                     // coin, dans la teinte du mode — donne un caractère
                     // illustré à chaque tuile sans image bitmap.

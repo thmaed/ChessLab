@@ -144,6 +144,7 @@ struct TwoPlayerSetupView: View {
         }
         .appBackground()
         .navigationTitle(navigationTitleKey)
+        .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {

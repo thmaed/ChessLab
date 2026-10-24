@@ -175,7 +175,7 @@ struct LabSetupView: View {
         }
         .appBackground()
         .navigationTitle("Laboratoire")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {

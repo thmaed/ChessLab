@@ -311,6 +311,7 @@ struct NewGameSetupView: View {
         }
         .appBackground()
         .navigationTitle(navigationTitleKey)
+        .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {

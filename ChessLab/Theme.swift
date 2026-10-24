@@ -384,13 +384,29 @@ struct IconBadge: View {
 /// Groupe de filtre étiqueté : titre en petites capitales suivi de ses
 /// chips en retour à la ligne automatique — même gabarit pour tout écran
 /// de sélection par facettes (``PuzzleQueueView``).
-func filterGroup(title: LocalizedStringKey, @ViewBuilder chips: () -> some View) -> some View {
+func filterGroup(
+    title: LocalizedStringKey, systemImage: String? = nil, tint: Color = Theme.accent,
+    @ViewBuilder chips: () -> some View
+) -> some View {
     VStack(alignment: .leading, spacing: 12) {
-        Text(title)
-            .font(.footnote.weight(.semibold))
-            .foregroundStyle(Theme.textSecondary)
-            .textCase(.uppercase)
-            .tracking(0.4)
+        // Même en-tête que ``SettingsSection`` (C3, 24/10/2026) : une pastille
+        // teintée devant le titre. Les groupes de puzzles étaient les seuls à
+        // n'en pas avoir.
+        HStack(spacing: 8) {
+            if let systemImage {
+                Image(systemName: systemImage)
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(tint)
+                    .frame(width: 22, height: 22)
+                    .background(tint.opacity(0.14), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                    .accessibilityHidden(true)
+            }
+            Text(title)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Theme.textSecondary)
+                .textCase(.uppercase)
+                .tracking(0.4)
+        }
         FlowLayout(spacing: 8, lineSpacing: 8) {
             chips()
         }

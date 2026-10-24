@@ -67,7 +67,7 @@ struct PuzzleQueueView: View {
                 VStack(spacing: 0) {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
-                            filterGroup(title: "Provenance") {
+                            filterGroup(title: "Provenance", systemImage: "square.stack.3d.up.fill", tint: Theme.violet) {
                                 FilterChip(label: "Toutes", tint: Theme.violet, isSelected: selectedSource == nil) {
                                     selectedSource = nil
                                 }
@@ -84,7 +84,7 @@ struct PuzzleQueueView: View {
                                 }
                             }
 
-                            filterGroup(title: "Historique") {
+                            filterGroup(title: "Historique", systemImage: "clock.arrow.circlepath", tint: Theme.rose) {
                                 FilterChip(label: "Tous", tint: Theme.rose, isSelected: !missedOnly) {
                                     missedOnly = false
                                 }
@@ -98,7 +98,7 @@ struct PuzzleQueueView: View {
                             // Masqué pour « Mes parties » : sans cote, aucun
                             // niveau ne retiendrait un seul puzzle.
                             if selectedSource != .ownGames {
-                                filterGroup(title: "Niveau") {
+                                filterGroup(title: "Niveau", systemImage: "cellularbars", tint: Theme.accent) {
                                     FilterChip(label: "Tous", tint: Theme.accent, isSelected: selectedDifficulty == nil && !atMyLevel) {
                                         selectedDifficulty = nil
                                         atMyLevel = false
@@ -126,7 +126,7 @@ struct PuzzleQueueView: View {
                                 }
                             }
 
-                            filterGroup(title: "Phase") {
+                            filterGroup(title: "Phase", systemImage: "flag.checkered", tint: Theme.info) {
                                 FilterChip(label: "Toutes", tint: Theme.info, isSelected: selectedPhase == nil) {
                                     selectedPhase = nil
                                 }
@@ -137,7 +137,7 @@ struct PuzzleQueueView: View {
                                 }
                             }
 
-                            filterGroup(title: "Type de puzzle") {
+                            filterGroup(title: "Type de puzzle", systemImage: "puzzlepiece.fill", tint: Theme.warning) {
                                 FilterChip(label: "Tous", tint: Theme.warning, isSelected: selectedTheme == nil) {
                                     selectedTheme = nil
                                 }
@@ -181,7 +181,7 @@ struct PuzzleQueueView: View {
         }
         .appBackground()
         .navigationTitle("Puzzles")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {

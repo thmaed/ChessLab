@@ -93,14 +93,27 @@ fun IconBadge(
  * en capitales espacées. C'est ce qui rythme les écrans longs.
  */
 @Composable
-fun SectionHeader(title: String, modifier: Modifier = Modifier) {
+fun SectionHeader(
+    title: String,
+    modifier: Modifier = Modifier,
+    /** Pastille teintée devant le titre (C3, 24/10/2026) — comme `SettingsSection` et `filterGroup` d'iOS. */
+    icon: ImageVector? = null,
+    tint: Color = Palette.accent,
+) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
-        Box(
-            Modifier
-                .size(width = 18.dp, height = 3.dp)
-                .clip(CircleShape)
-                .background(accentGradient)
-        )
+        if (icon != null) {
+            Box(
+                Modifier.size(22.dp).clip(RoundedCornerShape(6.dp)).background(tint.copy(alpha = 0.14f)),
+                contentAlignment = Alignment.Center,
+            ) { Icon(icon, null, tint = tint, modifier = Modifier.size(13.dp)) }
+        } else {
+            Box(
+                Modifier
+                    .size(width = 18.dp, height = 3.dp)
+                    .clip(CircleShape)
+                    .background(accentGradient)
+            )
+        }
         Spacer(Modifier.width(8.dp))
         Text(
             title.uppercase(),

@@ -96,3 +96,16 @@ après arbitrage : ils changent des habitudes et ont un coût de tests.
    choix assumé ?
 3. **C4** : un bouton d'action unique en bas de chaque écran de réglage, ou
    garder les pastilles du haut ?
+
+---
+
+## 7. Avancement (24/10/2026)
+
+Décisions : lot C1+C2+C3 lancé, identité sombre assumée (C9 abandonné), bouton
+d'action plein en bas (C4).
+
+- **C1, C2, C3 faits sur iOS** ; **C1 et C3 faits sur Android** (C2 : voir
+  `android/PARITE.md`). 20 tests d'interface verts (débordements, Dynamic Type
+  AX3/AX5, petits écrans, visite guidée, Woodpecker, filtres).
+- **À venir** : C4 (bouton d'action en bas), puis C7 (accueil personnalisé avec
+  la « Séance du jour », lié à A5).

@@ -41,6 +41,20 @@ vérification sur appareil, pas après compilation.
       compris) pour le Coup Volé, journaux tronqués pour le Duck Chess.
       `VariantReviewTest` (cinq cas) vert sur Galaxy A16.
 
+### Volet C de la 2.0 — premier lot visuel — 24/10/2026
+
+- [x] **C1 — tuiles d'accueil teintées** : voile de la teinte du mode sur toute
+      la carte (30 % → 5 %), filigrane plus présent. Mêmes valeurs des deux
+      côtés. Vu sur Galaxy A16.
+- [x] **C3 — en-têtes de section avec pastille teintée** : les cinq groupes
+      de l'écran de choix des puzzles (`SectionHeader(icon, tint)`).
+- [ ] **C2 — un seul style de titre : fait sur iOS seulement.** Les écrans de
+      menu iOS (Puzzles, Nouvelle partie, Deux joueurs, Analyser,
+      Bibliothèque, Laboratoire, Variantes, Progression) passent en GRAND titre
+      à gauche, comme Ouvertures et Finales. Android garde sa barre d'app
+      unique, déjà cohérente d'un écran à l'autre : le grand titre y demande une
+      `LargeTopAppBar` qui se réduit au défilement, à décider avec C4.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

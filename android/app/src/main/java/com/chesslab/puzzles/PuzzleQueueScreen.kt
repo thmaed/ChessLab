@@ -8,6 +8,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Extension
+import androidx.compose.material.icons.filled.Flag
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.SignalCellularAlt
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -98,7 +105,7 @@ fun PuzzleQueueScreen(
             // et chaque puce son icône. Des rangées de puces toutes vertes se
             // ressemblent trop pour qu'on retrouve la sienne d'un coup d'œil ;
             // c'est le parti pris d'iOS.
-            Group(stringResource(R.string.puzzle_provenance)) {
+            Group(stringResource(R.string.puzzle_provenance), Icons.Default.Layers, Palette.violet) {
                 ChipButton(stringResource(R.string.filter_all_f), source == null,
                     Modifier.testTag("provenance-toutes"), tint = Palette.violet) { source = null }
                 PuzzleSource.entries.forEach { value ->
@@ -114,7 +121,7 @@ fun PuzzleQueueScreen(
                     }
                 }
             }
-            Group(stringResource(R.string.puzzle_history)) {
+            Group(stringResource(R.string.puzzle_history), Icons.Default.History, Palette.rose) {
                 ChipButton(stringResource(R.string.filter_all), !missedOnly,
                     Modifier.testTag("historique-tous"), tint = Palette.rose) { missedOnly = false }
                 ChipButton(
@@ -125,7 +132,7 @@ fun PuzzleQueueScreen(
             }
             // Masqué pour « Mes parties » : sans cote, aucun niveau ne
             // retiendrait un seul puzzle.
-            if (source != PuzzleSource.ownGames) Group(stringResource(R.string.puzzle_level)) {
+            if (source != PuzzleSource.ownGames) Group(stringResource(R.string.puzzle_level), Icons.Default.SignalCellularAlt, Palette.accent) {
                 ChipButton(stringResource(R.string.filter_all), difficulty == null && !atMyLevel,
                     Modifier.testTag("niveau-tous"), tint = Palette.accent) { difficulty = null; atMyLevel = false }
                 // Ma cote, plutôt qu'un palier : les puzzles se resserrent
@@ -142,7 +149,7 @@ fun PuzzleQueueScreen(
                     ) { difficulty = if (difficulty == tier) null else tier; atMyLevel = false }
                 }
             }
-            Group(stringResource(R.string.puzzle_phase)) {
+            Group(stringResource(R.string.puzzle_phase), Icons.Default.Flag, Palette.info) {
                 ChipButton(stringResource(R.string.filter_all_f), phase == null,
                     Modifier.testTag("phase-toutes"), tint = Palette.info) { phase = null }
                 GamePhase.entries.forEach { value ->
@@ -153,7 +160,7 @@ fun PuzzleQueueScreen(
                     ) { phase = if (phase == value) null else value }
                 }
             }
-            Group(stringResource(R.string.puzzle_type)) {
+            Group(stringResource(R.string.puzzle_type), Icons.Default.Extension, Palette.warning) {
                 ChipButton(stringResource(R.string.filter_all), theme == null,
                     Modifier.testTag("theme-tous"), tint = Palette.warning) { theme = null }
                 PuzzleThemeKind.entries.forEach { value ->
@@ -221,9 +228,14 @@ fun PuzzleQueueScreen(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun Group(title: String, content: @Composable FlowRowScope.() -> Unit) {
+private fun Group(
+    title: String,
+    icon: ImageVector,
+    tint: Color,
+    content: @Composable FlowRowScope.() -> Unit,
+) {
     Column {
-        SectionHeader(title)
+        SectionHeader(title, icon = icon, tint = tint)
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),

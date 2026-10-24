@@ -121,7 +121,7 @@ struct VariantsHubView: View {
         }
         .appBackground()
         .navigationTitle("Variantes d'échecs")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
     }

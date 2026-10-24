@@ -181,7 +181,7 @@ struct AnalysisLibraryView: View {
         }
         .animation(Theme.gentle, value: importProgress != nil)
         .navigationTitle("Bibliothèque")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .toolbar {

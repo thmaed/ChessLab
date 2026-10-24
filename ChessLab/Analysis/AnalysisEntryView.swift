@@ -114,7 +114,7 @@ struct AnalysisEntryView: View {
         // sème. Idempotent, donc sans effet au second passage.
         .onAppear { LibrarySampleSeeder.seedIfRequested(in: modelContext) }
         .navigationTitle("Analyser")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .sheet(isPresented: $showTextSheet) {
