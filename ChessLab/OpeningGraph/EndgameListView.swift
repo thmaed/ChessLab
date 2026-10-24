@@ -22,6 +22,7 @@ struct EndgameListView: View {
     var onOpenTwoPlayer: () -> Void = {}
 
     @Environment(\.modelContext) private var modelContext
+    @State private var cardInfos = CourseCardInfoStore()
     /// Même lien que dans l'écran Ouvertures : le catalogue des cours
     /// personnels est un CACHE, recalculé par `reload()` seulement, et
     /// CloudKit ne prévient personne. Sans ce `@Query`, une finale personnelle
@@ -141,6 +142,7 @@ struct EndgameListView: View {
             }
         }
         .onAppear { refresh() }
+        .task { await cardInfos.load(ids: OpeningCatalog.all.filter { $0.kind == "endgame" }.map(\.id), in: modelContext) }
         .onChange(of: recordsSignature) { _, _ in UserOpeningStore.shared.reload() }
     }
 
@@ -240,7 +242,11 @@ struct EndgameListView: View {
     }
 
     private func row(_ entry: OpeningCatalogEntry) -> some View {
-        HStack(spacing: 12) {
+        let info = cardInfos.infos[entry.id]
+        return HStack(spacing: 12) {
+            if let info {
+                MiniBoardView(fen: info.fen).frame(width: 56, height: 56)
+            }
             VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 6) {
                     Text(LocalizedStringKey(entry.name))
@@ -257,6 +263,13 @@ struct EndgameListView: View {
                 if let summary = entry.summary?.resolved(languageCode) {
                     Text(summary).font(.caption).foregroundStyle(Theme.textTertiary)
                         .lineLimit(3).fixedSize(horizontal: false, vertical: true)
+                }
+                if let info, info.total > 0 {
+                    HStack(spacing: 8) {
+                        CourseMasteryBar(progress: info.progress, tint: Theme.rose)
+                        Text(LocalizationController.string("%lld / %lld travaillées", info.studied, info.total))
+                            .font(.caption2).foregroundStyle(Theme.textTertiary).fixedSize()
+                    }
                 }
             }
             Spacer()

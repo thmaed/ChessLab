@@ -94,6 +94,12 @@ fun CourseListScreen(
     var levelFilter by remember { mutableStateOf<String?>(null) }
     var due by remember { mutableStateOf(0) }
     var hard by remember { mutableStateOf(0) }
+    // C5 : vignette et maîtrise de chaque cours, lues hors du dessin.
+    var cardInfos by remember { mutableStateOf<Map<String, CourseCardInfo>>(emptyMap()) }
+
+    LaunchedEffect(entries) {
+        entries?.let { cardInfos = CourseCardInfo.load(context, it) }
+    }
 
     LaunchedEffect(endgames, storeVersion) {
         val dao = com.chesslab.library.LibraryDatabase.get(context).training()
@@ -183,7 +189,7 @@ fun CourseListScreen(
             if (mine.isNotEmpty()) {
                 item(key = "entete-miens") { GroupHeader(stringResource(R.string.courses_my_repertoires)) }
                 items(mine, key = { it.id }) { entry ->
-                    CourseRow(entry, onOpen, onEdit = { onEdit(entry.id, entry.name) }, onDelete = { pendingDeletion = entry }, onShare = {
+                    CourseRow(entry, onOpen, cardInfos[entry.id], onEdit = { onEdit(entry.id, entry.name) }, onDelete = { pendingDeletion = entry }, onShare = {
                         // Le presse-papiers EN PLUS du partage, comme partout :
                         // la feuille dépend des apps installées, pas lui.
                         UserOpeningStore.exportJson(entry.id)?.let { json ->
@@ -203,11 +209,11 @@ fun CourseListScreen(
             val black = filtered.filter { it.side != "white" && !UserOpeningStore.isUserCourse(it.id) }
             if (white.isNotEmpty()) {
                 item(key = "entete-blancs") { GroupHeader(stringResource(R.string.courses_white_repertoire)) }
-                items(white, key = { it.id }) { CourseRow(it, onOpen) }
+                items(white, key = { it.id }) { CourseRow(it, onOpen, cardInfos[it.id]) }
             }
             if (black.isNotEmpty()) {
                 item(key = "entete-noirs") { GroupHeader(stringResource(R.string.courses_black_repertoire)) }
-                items(black, key = { it.id }) { CourseRow(it, onOpen) }
+                items(black, key = { it.id }) { CourseRow(it, onOpen, cardInfos[it.id]) }
             }
             if (filtered.isEmpty()) {
                 item(key = "vide") {
@@ -377,13 +383,14 @@ private fun SessionChip(
 private fun CourseRow(
     entry: CatalogEntry,
     onOpen: (String) -> Unit,
+    info: CourseCardInfo? = null,
     /** Les actions d'un répertoire PERSONNEL, toujours visibles : une fonction qu'il faut deviner n'existe pas vraiment. */
     onEdit: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
     onShare: (() -> Unit)? = null,
 ) {
     var menu by remember { mutableStateOf(false) }
-    Column(
+    Row(
         Modifier
             .fillMaxWidth()
             .clip(CardShape)
@@ -392,8 +399,12 @@ private fun CourseRow(
             .clickable { onOpen(entry.id) }
             .padding(14.dp)
             .testTag("cours-${entry.id}"),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+    if (info != null) {
+        com.chesslab.ui.MiniBoard(info.fen, flipped = entry.side == "black", modifier = Modifier.size(64.dp).testTag("vignette-${entry.id}"))
+    }
+    Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 entry.name, fontSize = 15.sp, fontWeight = FontWeight.SemiBold,
@@ -425,6 +436,19 @@ private fun CourseRow(
                 }
                 Spacer(Modifier.width(4.dp))
             }
+            if (!entry.isEndgame || entry.level == "advanced") {
+                if (!UserOpeningStore.isUserCourse(entry.id)) {
+                    val tint = if (entry.level == "advanced") Palette.rose else Palette.warning
+                    Text(
+                        stringResource(entry.levelLabel), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = tint,
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(tint.copy(alpha = 0.16f))
+                            .padding(horizontal = 7.dp, vertical = 2.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                }
+            }
             ecoLabel(entry)?.let { eco ->
                 Text(
                     eco, fontSize = 11.sp, fontWeight = FontWeight.SemiBold,
@@ -455,6 +479,19 @@ private fun CourseRow(
                 Stat(pluralStringResource(R.plurals.course_moves, it / 2, it / 2), null, Icons.Default.VerticalAlignBottom)
             }
         }
+        if (info != null && info.total > 0) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Box(Modifier.weight(1f).height(5.dp).clip(CircleShape).background(Palette.surfaceElevated)) {
+                    Box(
+                        Modifier.fillMaxWidth(if (info.progress > 0f) maxOf(info.progress, 0.02f) else 0f).height(5.dp)
+                            .clip(CircleShape).background(if (entry.isEndgame) Palette.rose else Palette.accent)
+                            .testTag("maitrise-${entry.id}"),
+                    )
+                }
+                Text(stringResource(R.string.course_studied, info.studied, info.total), fontSize = 11.sp, color = Palette.textTertiary)
+            }
+        }
+    }
     }
 }
 

@@ -206,6 +206,19 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [ ] À vérifier sur appareil : aspect de la carte Android (iOS vérifié au
       simulateur), enchaînement réel des étapes.
 
+### C5 de la 2.0 — Ouvertures et Finales vivantes — 24/10/2026
+
+- [x] Chaque carte de cours porte une **vignette de plateau** (ouverture : la
+      position après dix demi-coups de la ligne principale ; finale : la position
+      de départ), une **pastille de niveau** (Club ambre, Avancé rose) et une
+      **barre de maîtrise** « N / M travaillées » (positions révisées / positions
+      à réviser du cours). iOS `MiniBoardView` + `CourseCardInfo`, Android
+      `ui/MiniBoard.kt` + `courses/CourseCardInfo.kt`. Vérifié sur simulateur et
+      Galaxy A16.
+- [x] Tests : `CourseCardsTest` (Galaxy A16) ; suites `AppTest`, `TrainingTest`,
+      `RepertoireImportTest` toujours vertes.
+- [ ] Pas de pastille « Débutant » : le catalogue ne porte que Club et Avancé.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

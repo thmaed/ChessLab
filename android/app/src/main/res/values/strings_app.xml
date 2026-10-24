@@ -1201,4 +1201,5 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="daily_todo_missed">Missed puzzles to replay: %1$d</string>
     <string name="daily_todo_own">Puzzles drawn from your mistakes: %1$d</string>
     <string name="daily_todo_endgame">Today\'s endgame is waiting.</string>
+    <string name="course_studied">%1$d / %2$d studied</string>
 </resources>

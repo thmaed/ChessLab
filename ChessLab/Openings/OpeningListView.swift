@@ -27,6 +27,8 @@ struct OpeningListView: View {
     /// Observé : la liste se rafraîchit d'elle-même après un import.
     @State private var store = UserOpeningStore.shared
     @State private var pendingDeletion: OpeningCatalogEntry?
+    @State private var cardInfos = CourseCardInfoStore()
+    @Environment(\.modelContext) private var modelContext
 
     /// Les répertoires personnels tels que la BASE les voit.
     ///
@@ -137,6 +139,7 @@ struct OpeningListView: View {
             // d'appel vivait dans l'écran Ouvertures d'origine ; il suit ici.
             UserOpeningSeeder.seedIfRequested()
         }
+        .task { await cardInfos.load(ids: OpeningCatalogFeature.catalog.map(\.id), in: modelContext) }
         .onChange(of: recordsSignature) { _, _ in store.reload() }
         .confirmationDialog(
             "Supprimer ce répertoire ?",
@@ -261,7 +264,14 @@ struct OpeningListView: View {
     }
 
     private func row(_ entry: OpeningCatalogEntry) -> some View {
-        Button { onSelect(entry.id) } label: {
+        let info = cardInfos.infos[entry.id]
+        return Button { onSelect(entry.id) } label: {
+            HStack(alignment: .top, spacing: 12) {
+                if let info {
+                    MiniBoardView(fen: info.fen, flipped: entry.side == .black)
+                        .frame(width: 64, height: 64)
+                        .accessibilityIdentifier("thumb_\(entry.id)")
+                }
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 10) {
                     Text(LocalizedStringKey(entry.name))
@@ -269,6 +279,7 @@ struct OpeningListView: View {
                         .foregroundStyle(Theme.textPrimary)
                         .multilineTextAlignment(.leading)
                     Spacer(minLength: 0)
+                    if !UserOpeningStore.isUserCourse(id: entry.id) { CourseLevelPill(level: entry.level) }
                     if let eco = ecoLabel(entry) {
                         Text(eco)
                             .font(.caption2.weight(.semibold).monospaced())
@@ -305,6 +316,14 @@ struct OpeningListView: View {
                         stat(LocalizationController.string("%lld coups", depth / 2), "arrow.down.to.line")
                     }
                 }
+                if let info, info.total > 0 {
+                    HStack(spacing: 8) {
+                        CourseMasteryBar(progress: info.progress, tint: Theme.accent)
+                        Text(LocalizationController.string("%lld / %lld travaillées", info.studied, info.total))
+                            .font(.caption2).foregroundStyle(Theme.textTertiary).fixedSize()
+                    }
+                }
+            }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle(padding: 14)
