@@ -37,13 +37,19 @@ final class BoardHitTestUITests: XCTestCase {
     /// ou iPad.
     @MainActor
     private func openVsEngineGame(in app: XCUIApplication) throws {
+        // La grille des modes est paresseuse : à très grande taille de texte la
+        // tuile est sous le pli et n'existe pas encore. On défile jusqu'à elle
+        // (sans quoi le texte « Contre l'ordinateur » d'une partie récente,
+        // plus haut, fait défiler dans le mauvais sens).
+        for _ in 0..<12 where !app.buttons["mode_play"].exists { app.swipeUp() }
         for candidate in [
+            app.buttons["mode_play"],
             app.buttons["Contre l'ordinateur"],
             app.cells["Contre l'ordinateur"],
             app.staticTexts["Contre l'ordinateur"],
         ] {
             guard candidate.waitForExistence(timeout: 6) else { continue }
-            for _ in 0..<4 {
+            for _ in 0..<10 {
                 if candidate.isHittable { candidate.tap(); break }
                 app.swipeUp()
             }

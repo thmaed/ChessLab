@@ -31,7 +31,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import com.chesslab.R
-import com.chesslab.play.TimeControl
+import com.chesslab.play.TimeLimitSection
+import com.chesslab.play.rememberTimeLimit
 import com.chesslab.ui.BasicTextFieldWithPlaceholder
 import com.chesslab.ui.CardShape
 import com.chesslab.ui.ChipButton
@@ -66,21 +67,16 @@ fun TwoPlayerSetupScreen(
     var white by remember { mutableStateOf(saved?.whiteName?.ifBlank { defaultWhite } ?: defaultWhite) }
     var black by remember { mutableStateOf(saved?.blackName?.ifBlank { defaultBlack } ?: defaultBlack) }
     var rotation by remember { mutableStateOf(saved?.rotation ?: TwoPlayerSettings.RotationMode.faceToFace) }
-    var timeId by remember { mutableStateOf(saved?.timeControlId ?: "none") }
-    var customMinutes by remember { mutableStateOf(saved?.customMinutes ?: 15) }
-    var customIncrement by remember { mutableStateOf(saved?.customIncrementSeconds ?: 0) }
-    var category by remember {
-        mutableStateOf(
-            if (timeId == "custom") "custom" else TimeControl.byId(timeId).category
-        )
-    }
+    val timeLimit = rememberTimeLimit(
+        saved?.timeControlId ?: "none", saved?.customMinutes ?: 15, saved?.customIncrementSeconds ?: 0, "twoPlayer",
+    )
 
     Column(Modifier.fillMaxSize()) {
       Column(
         Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
       ) {
-        SettingsSection(stringResource(R.string.two_setup_players), Icons.Default.People) {
+        SettingsSection(stringResource(R.string.two_setup_players), Icons.Default.People, Palette.info) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 // Le champ porte son étiquette AU-DESSUS et non seulement en
                 // filigrane : dès qu'un nom est tapé, le filigrane disparaît
@@ -112,7 +108,7 @@ fun TwoPlayerSetupScreen(
             }
         }
 
-        SettingsSection(stringResource(R.string.two_setup_rotation), Icons.Default.ScreenRotation) {
+        SettingsSection(stringResource(R.string.two_setup_rotation), Icons.Default.ScreenRotation, Palette.violet) {
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                 TwoPlayerSettings.RotationMode.entries.forEach { mode ->
                     val titre: Int
@@ -133,7 +129,7 @@ fun TwoPlayerSetupScreen(
                         Modifier
                             .fillMaxWidth()
                             .clip(CardShape)
-                            .background(if (active) Palette.accent.copy(alpha = 0.16f) else Palette.surface)
+                            .background(if (active) Palette.violet.copy(alpha = 0.16f) else Palette.surface)
                             .clickable { rotation = mode }
                             .padding(horizontal = 12.dp, vertical = 10.dp)
                             .testTag("rotation-${mode.name}"),
@@ -141,7 +137,7 @@ fun TwoPlayerSetupScreen(
                         Text(
                             stringResource(titre),
                             fontSize = 14.sp,
-                            color = if (active) Palette.accent else Palette.textPrimary,
+                            color = if (active) Palette.violet else Palette.textPrimary,
                         )
                         Text(stringResource(note), fontSize = 11.sp, color = Palette.textTertiary)
                     }
@@ -149,56 +145,7 @@ fun TwoPlayerSetupScreen(
             }
         }
 
-        // Le même modèle à deux niveaux que « Nouvelle partie » : la famille,
-        // puis la cadence dans la famille. Onze pastilles en file indienne ne
-        // se lisaient pas.
-        SettingsSection(stringResource(R.string.setup_time), Icons.Default.Timer) {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                TimeControl.categories.forEach { c ->
-                    ChipButton(
-                        stringResource(timeCategoryLabel(c)), category == c,
-                        Modifier.testTag("cadence-$c"), icon = timeCategoryIcon(c),
-                    ) {
-                        // Retaper la famille DÉJÀ choisie ne fait rien : sans
-                        // ce garde, on retombait sur sa première cadence en
-                        // effaçant celle qu'on venait de régler.
-                        if (category != c) {
-                            category = c
-                            timeId = if (c == "custom") "custom"
-                            else TimeControl.presets.first { it.category == c }.id
-                        }
-                    }
-                }
-            }
-            Spacer(Modifier.height(10.dp))
-            when (category) {
-                "none" -> Text(
-                    stringResource(R.string.setup_no_clock),
-                    fontSize = 12.sp, color = Palette.textSecondary,
-                )
-                "custom" -> {
-                    Stepper(stringResource(R.string.setup_custom_minutes), customMinutes, 1..180, "minutes-perso") {
-                        customMinutes = it
-                    }
-                    Spacer(Modifier.height(8.dp))
-                    Stepper(stringResource(R.string.setup_custom_increment), customIncrement, 0..60, "increment-perso") {
-                        customIncrement = it
-                    }
-                }
-                else -> FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    TimeControl.presets.filter { it.category == category }.forEach { tc ->
-                        val label = if (tc.id == "none") stringResource(R.string.time_no_limit) else tc.label
-                        ChipButton(label, timeId == tc.id, Modifier.testTag("preset-${tc.id}")) { timeId = tc.id }
-                    }
-                }
-            }
-        }
+        TimeLimitSection(timeLimit, Palette.warning)
 
         Spacer(Modifier.height(4.dp))
       }
@@ -225,11 +172,12 @@ fun TwoPlayerSetupScreen(
                           whiteName = white.trim().ifEmpty { defaultWhite },
                           blackName = black.trim().ifEmpty { defaultBlack },
                           rotation = rotation,
-                          timeControlId = timeId,
-                          customMinutes = customMinutes,
-                          customIncrementSeconds = customIncrement,
+                          timeControlId = timeLimit.effectiveId,
+                          customMinutes = timeLimit.customMinutes,
+                          customIncrementSeconds = timeLimit.customIncrement,
                           startFen = startFen,
                       )
+                      timeLimit.remember()
                       TwoPlayerSettingsStore.save(context, settings)
                       onStart(settings)
                   }
@@ -239,24 +187,6 @@ fun TwoPlayerSetupScreen(
           )
       }
     }
-}
-
-private fun timeCategoryLabel(category: String): Int = when (category) {
-    "bullet" -> R.string.time_bullet
-    "blitz" -> R.string.time_blitz
-    "rapid" -> R.string.time_rapid
-    "classical" -> R.string.time_classical
-    "custom" -> R.string.time_custom
-    else -> R.string.time_none
-}
-
-private fun timeCategoryIcon(category: String) = when (category) {
-    "bullet" -> Icons.Default.Speed
-    "blitz" -> Icons.Default.Bolt
-    "rapid" -> Icons.Default.Timer
-    "classical" -> Icons.Default.FlagCircle
-    "custom" -> Icons.Default.Tune
-    else -> Icons.Default.AllInclusive
 }
 
 /** Un nom de joueur, son étiquette au-dessus. */

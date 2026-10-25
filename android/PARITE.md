@@ -248,6 +248,23 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
       `GameOverMaterialCurveUITests` (iOS), `PlaySetupTest` (Galaxy A16).
 - [ ] Aspect Android non vu à l'écran.
 
+### Écrans de réglage de partie — Limite de temps et options colorées — 25/10/2026
+
+- [x] Interrupteur **« Limite de temps »**, éteint par défaut, dans les quatre
+      écrans (ordinateur, deux joueurs, Chess960, variantes) : les familles de
+      cadence (chacune sa couleur) et leurs préréglages n'apparaissent qu'une
+      fois allumé. `TimeLimitSelection` / `TimeLimitSection` (iOS),
+      `TimeLimitState` / `TimeLimitSection` (Android).
+- [x] La **dernière cadence** est mémorisée par écran, même interrupteur éteint
+      (clé `timeLimit.<écran>` côté iOS, préférences `time_limit` côté Android).
+- [x] Options **colorisées** par groupe (couleur ambre, livre or, départ violet,
+      aides rose, orientation violette…) : puces et interrupteurs prennent la
+      teinte de leur section.
+- [x] Plafond d'ouvertures de la séance du jour **réglable** (3 / 5 / 10,
+      5 par défaut) dans les Réglages.
+- [x] Correctifs trouvés par les suites complètes : relecture des métriques de
+      partie (phases vides), cache des cours Android (accès concurrent).
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

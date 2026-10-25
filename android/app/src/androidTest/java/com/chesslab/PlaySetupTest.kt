@@ -74,6 +74,10 @@ class PlaySetupTest {
         // Le livre d'ouvertures, et sa largeur.
         compose.onNodeWithTag("livre-actif").performScrollTo().assertIsDisplayed()
         compose.onNodeWithTag("livre-mainLinesOnly").performScrollTo().assertIsDisplayed()
+        // La limite de temps est éteinte : aucune cadence tant qu'on ne l'allume pas.
+        compose.onNodeWithTag("limite-de-temps").performScrollTo().assertIsDisplayed()
+        assertEquals(0, compose.onAllNodesWithTag("cadence-custom").fetchSemanticsNodes().size)
+        compose.onNodeWithTag("limite-de-temps").performClick()
         // La cadence personnalisée : minutes et incrément.
         compose.onNodeWithTag("cadence-custom").performScrollTo().performClick()
         compose.onNodeWithTag("minutes-perso").performScrollTo().assertIsDisplayed()
@@ -92,6 +96,7 @@ class PlaySetupTest {
         openSetup()
         compose.onNodeWithTag("segment-1").performScrollTo().performClick()
         compose.onNodeWithTag("couleur-black").performScrollTo().performClick()
+        compose.onNodeWithTag("limite-de-temps").performScrollTo().performClick()
         compose.onNodeWithTag("cadence-blitz").performScrollTo().performClick()
         compose.onNodeWithTag("commencer").performClick()
         compose.waitForIdle()
@@ -218,5 +223,26 @@ class PlaySetupTest {
         compose.onNodeWithTag("abandonner-oui").performClick()
         awaitTag("courbe-materiel")
         compose.onNodeWithTag("courbe-materiel").assertIsDisplayed()
+    }
+
+    /**
+     * L'interrupteur « Limite de temps » : éteint, la partie est sans pendule ;
+     * la dernière cadence choisie est gardée pour la rallumer.
+     */
+    @Test fun laLimiteDeTempsSeSouvientDeLaDerniereCadence() {
+        openSetup()
+        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
+        compose.onNodeWithTag("limite-de-temps").performScrollTo().performClick()
+        compose.onNodeWithTag("cadence-bullet").performScrollTo().performClick()
+        // On l'éteint avant de commencer : la partie est sans limite.
+        compose.onNodeWithTag("limite-de-temps").performScrollTo().performClick()
+        compose.onNodeWithTag("commencer").performClick()
+        compose.waitForIdle()
+        val saved = PlaySettingsStore.load(context)
+        assertEquals("none", saved!!.timeControlId)
+        assertEquals(
+            "bullet_1_0",
+            context.getSharedPreferences("time_limit", android.content.Context.MODE_PRIVATE).getString("play", null),
+        )
     }
 }

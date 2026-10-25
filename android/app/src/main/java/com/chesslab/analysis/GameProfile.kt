@@ -41,7 +41,8 @@ object GameProfileCodec {
             val phase = GamePhase.entries.firstOrNull { it.code == fields[0] } ?: continue
             val total = fields[1].toDoubleOrNull() ?: continue
             val count = fields[2].toIntOrNull() ?: continue
-            result[phase] = PhaseLoss(total, count)
+            // Une phase sans coup est écrite mais pas relue (comme iOS).
+            if (count > 0) result[phase] = PhaseLoss(total, count)
         }
         return result
     }

@@ -43,7 +43,8 @@ enum GameProfileCodec {
             guard fields.count == 3, let phase = GamePhase.allCases.first(where: { $0.code == fields[0] }),
                   let total = Double(fields[1]), let count = Int(fields[2])
             else { continue }
-            result[phase] = PhaseLoss(total: total, count: count)
+            // Une phase sans coup est écrite mais n'est pas relue : le calcul d'origine ne la porte pas non plus.
+            if count > 0 { result[phase] = PhaseLoss(total: total, count: count) }
         }
         return result
     }

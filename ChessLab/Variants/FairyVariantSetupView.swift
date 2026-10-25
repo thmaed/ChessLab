@@ -11,11 +11,7 @@ struct FairyVariantSetupView: View {
 
     @State private var colorChoice: PlayerColorChoice
     @State private var eloSlider: Double
-    @State private var timeControl: TimeControl
-    @State private var isCustomTimeControlSelected: Bool
-    @State private var timeCategory: TimeControlCategory
-    @State private var customMinutes: Int
-    @State private var customIncrement: Int
+    @State private var timeLimit: TimeLimitSelection
     @State private var showEvalBar: Bool
     @State private var hintsEnabled: Bool
     @State private var blunderAlertEnabled: Bool
@@ -38,13 +34,9 @@ struct FairyVariantSetupView: View {
             max(saved.eloSliderValue, EngineStrength.playSliderRange.lowerBound),
             EngineStrength.playSliderRange.upperBound
         ))
-        _isCustomTimeControlSelected = State(initialValue: saved.timeControlID == "custom")
-        _timeControl = State(initialValue: TimeControl.presets.first { $0.id == saved.timeControlID } ?? .none)
-        _timeCategory = State(initialValue: saved.timeControlID == "custom"
-            ? .custom
-            : (TimeControl.presets.first { $0.id == saved.timeControlID }?.category ?? TimeControlCategory.none))
-        _customMinutes = State(initialValue: saved.customMinutes)
-        _customIncrement = State(initialValue: saved.customIncrementSeconds)
+        _timeLimit = State(initialValue: TimeLimitSelection(
+            savedID: saved.timeControlID, customMinutes: saved.customMinutes,
+            customIncrement: saved.customIncrementSeconds, memoryKey: "fairy.\(variant.id)"))
         _showEvalBar = State(initialValue: saved.showEvalBar)
         _hintsEnabled = State(initialValue: saved.hintsEnabled)
         _blunderAlertEnabled = State(initialValue: saved.blunderAlertEnabled)
@@ -110,7 +102,7 @@ struct FairyVariantSetupView: View {
 
                 }
 
-                cadenceSection
+                TimeLimitSection(selection: $timeLimit, tint: variant.tint)
 
                 if isStolenMove {
                     stolenMoveSection
@@ -146,54 +138,6 @@ struct FairyVariantSetupView: View {
         }
     }
 
-    // MARK: Cadence — même double niveau que « Contre l'ordinateur »
-
-    private var cadenceSection: some View {
-        SettingsSection(title: "Cadence", systemImage: "timer", tint: variant.tint) {
-            VStack(alignment: .leading, spacing: 12) {
-                FlowLayout(spacing: 8, lineSpacing: 8) {
-                    ForEach(TimeControlCategory.allCases, id: \.self) { category in
-                        ChipButton(
-                            label: LocalizedStringKey(category.label),
-                            systemImage: category.symbolName,
-                            isSelected: timeCategory == category
-                        ) {
-                            select(category)
-                        }
-                    }
-                }
-                switch timeCategory {
-                case .none:
-                    Text("Aucune pendule : les deux camps jouent sans contrainte de temps.")
-                        .font(.caption)
-                        .foregroundStyle(Theme.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                case .custom:
-                    HStack(spacing: 16) {
-                        Stepper("\(customMinutes) min", value: $customMinutes, in: 1...120)
-                        Stepper("+\(customIncrement) s", value: $customIncrement, in: 0...60)
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.textPrimary)
-                default:
-                    FlowLayout(spacing: 8, lineSpacing: 8) {
-                        ForEach(TimeControl.presets.filter { $0.category == timeCategory }) { control in
-                            ChipButton(
-                                label: LocalizedStringKey(control.label),
-                                systemImage: nil,
-                                isSelected: !isCustomTimeControlSelected && timeControl == control
-                            ) {
-                                isCustomTimeControlSelected = false
-                                timeControl = control
-                            }
-                        }
-                    }
-                }
-            }
-            .animation(Theme.gentle, value: timeCategory)
-        }
-    }
-
     // MARK: Coup Volé — cadence des jetons
 
     private var stolenMoveSection: some View {
@@ -213,31 +157,16 @@ struct FairyVariantSetupView: View {
         }
     }
 
-    private func select(_ category: TimeControlCategory) {
-        timeCategory = category
-        switch category {
-        case .custom:
-            isCustomTimeControlSelected = true
-        case .none:
-            isCustomTimeControlSelected = false
-            timeControl = .none
-        default:
-            isCustomTimeControlSelected = false
-            if let first = TimeControl.presets.first(where: { $0.category == category }) {
-                timeControl = first
-            }
-        }
-    }
-
     // MARK: Départ
 
     private func start() {
         var settings = FairyVariantSettings()
         settings.colorChoice = colorChoice.rawValue
         settings.eloSliderValue = eloSlider
-        settings.timeControlID = isCustomTimeControlSelected ? "custom" : timeControl.id
-        settings.customMinutes = customMinutes
-        settings.customIncrementSeconds = customIncrement
+        settings.timeControlID = timeLimit.effective.id
+        settings.customMinutes = timeLimit.customMinutes
+        settings.customIncrementSeconds = timeLimit.customIncrement
+        timeLimit.remember(memoryKey: "fairy.\(variant.id)")
         settings.showEvalBar = showEvalBar
         settings.hintsEnabled = hintsEnabled
         settings.blunderAlertEnabled = blunderAlertEnabled

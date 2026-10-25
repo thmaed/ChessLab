@@ -53,6 +53,8 @@ data class AppSettings(
      * propose), "on" ou "off". Reste local à l'appareil : un coût de batterie.
      */
     val autoAnalysis: String = "undecided",
+    /** Plafond des positions d'ouverture de la séance du jour : 3, 5 ou 10. Pendant du réglage d'iOS. */
+    val dailyOpeningsCap: Int = 5,
 )
 
 /** La langue dans laquelle un coup s'écrit. Pendant de `PieceNotation`. */
@@ -78,6 +80,10 @@ object SettingsStore {
     private val keyArrowMode = stringPreferencesKey("analysisArrowMode")
     private val keyPlayerName = stringPreferencesKey("playerName")
     private val keyAutoAnalysis = stringPreferencesKey("autoAnalysis")
+    private val keyDailyOpeningsCap = intPreferencesKey("dailyOpeningsCap")
+
+    /** Les plafonds proposés pour les ouvertures de la séance du jour. */
+    val DAILY_OPENINGS_CHOICES = listOf(3, 5, 10)
 
     /** Longueur maximale retenue pour le nom du joueur, comme sur iOS. */
     const val PLAYER_NAME_MAX_LENGTH = 40
@@ -115,6 +121,7 @@ object SettingsStore {
                     analysisArrowMode = prefs[keyArrowMode] ?: "best",
                     playerName = sanitizedPlayerName(prefs[keyPlayerName] ?: ""),
                     autoAnalysis = prefs[keyAutoAnalysis] ?: "undecided",
+                    dailyOpeningsCap = (prefs[keyDailyOpeningsCap] ?: 5).takeIf { it in DAILY_OPENINGS_CHOICES } ?: 5,
                 )
             }.collect { _state.value = it }
         }
@@ -129,6 +136,7 @@ object SettingsStore {
     fun setPieceSet(context: Context, id: String) = update(context) { it[keyPieceSet] = id }
     fun setAutoFlip(context: Context, on: Boolean) = update(context) { it[keyAutoFlip] = on }
     fun setPuzzleAttempts(context: Context, n: Int) = update(context) { it[keyAttempts] = n }
+    fun setDailyOpeningsCap(context: Context, n: Int) = update(context) { it[keyDailyOpeningsCap] = n }
     fun setSounds(context: Context, on: Boolean) = update(context) { it[keySounds] = on }
     fun setHaptics(context: Context, on: Boolean) = update(context) { it[keyHaptics] = on }
     fun setPieceNotation(context: Context, notation: PieceNotation) =

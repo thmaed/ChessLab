@@ -230,7 +230,7 @@ class TrainingTest {
         // Deux positions vues, une ratée : c'est ce que l'écran doit dire, et
         // aucune n'est encore due, donc il annonce la prochaine échéance.
         awaitText("à consolider")
-        compose.onNodeWithTag("prochaine-revision").assertIsDisplayed()
+        compose.onNodeWithTag("prochaine-revision").performScrollTo().assertIsDisplayed()
     }
 
     private companion object {

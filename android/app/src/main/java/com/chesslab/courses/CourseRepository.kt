@@ -267,7 +267,7 @@ object CourseRepository {
         }
         catalog = out
         catalogLanguage = language()
-        cache.clear()
+        synchronized(cache) { cache.clear() }
         return out
     }
 
@@ -277,7 +277,7 @@ object CourseRepository {
 
     fun course(assets: AssetManager, id: String): Course? {
         if (UserOpeningStore.isUserCourse(id)) return UserOpeningStore.course(id)
-        cache[id]?.let { return it }
+        synchronized(cache) { cache[id] }?.let { return it }
         val text = runCatching {
             assets.open("$DIR/$id.json").bufferedReader().use { it.readText() }
         }.getOrNull() ?: return null
@@ -285,8 +285,12 @@ object CourseRepository {
         // tests et aux répertoires personnels, qui n'ont pas d'assets — et un
         // nom choisi par l'utilisateur n'a rien à traduire.
         val course = parse(text).let { it.copy(name = translated(assets, it.name)) }
-        if (cache.size > 3) cache.remove(cache.keys.first())   // quelques cours suffisent en mémoire
-        cache[id] = course
+        // Plusieurs fils lisent des cours à la fois (séance, liste, entraînement) : sans verrou,
+        // l'itération des clés levait ConcurrentModificationException.
+        synchronized(cache) {
+            if (cache.size > 3) cache.remove(cache.keys.first())   // quelques cours suffisent en mémoire
+            cache[id] = course
+        }
         return course
     }
 

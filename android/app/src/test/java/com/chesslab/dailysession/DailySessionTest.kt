@@ -53,8 +53,10 @@ class DailySessionTest {
     }
 
     @Test fun `une seance reste courte`() {
-        val plan = DailySessionBuilder.plan(80, 28, 7, null, false, 0, false)
-        assertEquals(listOf(10, 5, 5), plan.steps.map { it.remaining })
+        fun remaining(cap: Int) = DailySessionBuilder.plan(80, 28, 7, null, false, 0, false, openingsCap = cap).steps.map { it.remaining }
+        assertEquals(listOf(5, 5, 5), DailySessionBuilder.plan(80, 28, 7, null, false, 0, false).steps.map { it.remaining })
+        assertEquals(listOf(3, 5, 5), remaining(3))
+        assertEquals(listOf(10, 5, 5), remaining(10))
     }
 
     @Test fun `tout est fait quand il n'y a plus rien a revoir et que la finale est ouverte`() {

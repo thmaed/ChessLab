@@ -248,7 +248,7 @@ fun ChipButton(
             .clip(CircleShape)
             .then(
                 if (selected) Modifier.background(tintGradient(tint))
-                else Modifier.background(Palette.surfaceElevated).border(1.dp, Palette.stroke, CircleShape)
+                else Modifier.background(tint.copy(alpha = 0.10f)).border(1.dp, tint.copy(alpha = 0.28f), CircleShape)
             )
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 9.dp),
@@ -277,15 +277,15 @@ fun ChipButton(
  * interrupteurs violets à côté de ceux, verts, des écrans de partie.
  */
 @Composable
-fun chessLabSwitchColors(): androidx.compose.material3.SwitchColors =
+fun chessLabSwitchColors(tint: Color = Palette.accent): androidx.compose.material3.SwitchColors =
     androidx.compose.material3.SwitchDefaults.colors(
-        checkedTrackColor = Palette.accent,
+        checkedTrackColor = tint,
         checkedThumbColor = Palette.background,
         checkedBorderColor = Color.Transparent,
         uncheckedTrackColor = Palette.surfaceElevated,
         uncheckedThumbColor = Palette.textTertiary,
         uncheckedBorderColor = Palette.stroke,
-        disabledCheckedTrackColor = Palette.accent.copy(alpha = 0.35f),
+        disabledCheckedTrackColor = tint.copy(alpha = 0.35f),
         disabledCheckedThumbColor = Palette.background.copy(alpha = 0.6f),
         disabledUncheckedTrackColor = Palette.surface,
         disabledUncheckedThumbColor = Palette.textTertiary.copy(alpha = 0.5f),
@@ -315,7 +315,7 @@ fun chessLabSliderColors(tint: Color = Palette.accent): androidx.compose.materia
 
 /** Une rangée à bascule : le libellé, puis l'interrupteur. */
 @Composable
-fun ToggleRow(label: String, checked: Boolean, tag: String = "", onChange: (Boolean) -> Unit) {
+fun ToggleRow(label: String, checked: Boolean, tag: String = "", tint: Color = Palette.accent, onChange: (Boolean) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -332,7 +332,7 @@ fun ToggleRow(label: String, checked: Boolean, tag: String = "", onChange: (Bool
         Spacer(Modifier.width(12.dp))
         androidx.compose.material3.Switch(
             checked = checked, onCheckedChange = onChange,
-            colors = chessLabSwitchColors(),
+            colors = chessLabSwitchColors(tint),
         )
     }
 }

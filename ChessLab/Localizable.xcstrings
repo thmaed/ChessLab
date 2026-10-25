@@ -23032,6 +23032,36 @@
           }
         }
       }
+    },
+    "Ouvertures par séance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Openings per session"
+          }
+        }
+      }
+    },
+    "Au plus ce nombre de positions d'ouverture à revoir par jour ; le reste attend le lendemain.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At most this many opening positions to review per day; the rest waits until tomorrow."
+          }
+        }
+      }
+    },
+    "Limite de temps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time limit"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

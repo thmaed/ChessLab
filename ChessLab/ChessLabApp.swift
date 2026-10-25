@@ -34,6 +34,10 @@ struct ChessLabApp: App {
         // même défaut, en silence).
         if CommandLine.arguments.contains("-resetPlaySettings") {
             PlaySettingsStore.clear()
+            // La dernière cadence retenue par chaque écran (Limite de temps).
+            for key in UserDefaults.standard.dictionaryRepresentation().keys where key.hasPrefix("timeLimit.") {
+                UserDefaults.standard.removeObject(forKey: key)
+            }
             AutosaveStore.clearPlay()
             AutosaveStore.clearTwoPlayer()
             // Repartir sur la langue du SYSTÈME : sans ça, un choix de langue

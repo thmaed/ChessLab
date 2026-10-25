@@ -19,10 +19,7 @@ struct NewGameSetupView: View {
     @State private var eloSlider: Double
     @State private var opponentMode: OpponentMode
     @State private var opponentProfileID: String
-    @State private var timeControl: TimeControl
-    @State private var isCustomTimeControlSelected: Bool
-    @State private var customMinutes: Int
-    @State private var customIncrement: Int
+    @State private var timeLimit: TimeLimitSelection
     @State private var hintsEnabled: Bool
     @State private var blunderAlertEnabled: Bool
     @State private var showEvalBar: Bool
@@ -31,9 +28,6 @@ struct NewGameSetupView: View {
     @State private var bookEnabled: Bool
     @State private var bookWidth: OpeningBookWidth
     @State private var useCustomFEN = false
-    /// Famille de cadence affichée. Dérivée des réglages mémorisés à
-    /// l'ouverture, puis pilotée par les chips.
-    @State private var timeCategory: TimeControlCategory
     @State private var fenText = ""
     @State private var fenError = false
     @State private var showPositionEditor = false
@@ -75,13 +69,9 @@ struct NewGameSetupView: View {
             let maia = OpponentProfile.maia
             _eloSlider = State(initialValue: maia.clampedLevel(OpponentLevelStore.level(for: maia.id) ?? saved.eloSliderValue))
         }
-        _isCustomTimeControlSelected = State(initialValue: saved.timeControlID == "custom")
-        _timeControl = State(initialValue: TimeControl.presets.first { $0.id == saved.timeControlID } ?? .none)
-        _timeCategory = State(initialValue: saved.timeControlID == "custom"
-            ? .custom
-            : (TimeControl.presets.first { $0.id == saved.timeControlID }?.category ?? TimeControlCategory.none))
-        _customMinutes = State(initialValue: saved.customMinutes)
-        _customIncrement = State(initialValue: saved.customIncrementSeconds)
+        _timeLimit = State(initialValue: TimeLimitSelection(
+            savedID: saved.timeControlID, customMinutes: saved.customMinutes,
+            customIncrement: saved.customIncrementSeconds, memoryKey: "play"))
         _hintsEnabled = State(initialValue: saved.hintsEnabled)
         _blunderAlertEnabled = State(initialValue: saved.blunderAlertEnabled)
         _showEvalBar = State(initialValue: saved.showEvalBar)
@@ -104,7 +94,7 @@ struct NewGameSetupView: View {
     private var scrollBody: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                SettingsSection(title: "Couleur", systemImage: "circle.lefthalf.filled", tint: Theme.accent) {
+                SettingsSection(title: "Couleur", systemImage: "circle.lefthalf.filled", tint: Theme.warning) {
                     // FlowLayout et non HStack : en français les trois
                     // puces réclament ~323 pt pour 303 disponibles à 375, et
                     // 248 en Display Zoom. Elles passent maintenant à la ligne
@@ -114,7 +104,8 @@ struct NewGameSetupView: View {
                             ChipButton(
                                 label: LocalizedStringKey(choice.label),
                                 systemImage: choice.symbolName,
-                                isSelected: colorChoice == choice
+                                isSelected: colorChoice == choice,
+                                tint: Theme.warning
                             ) {
                                 colorChoice = choice
                             }
@@ -182,23 +173,25 @@ struct NewGameSetupView: View {
                 // Un personnage joue son propre répertoire : le livre général
                 // ne concerne que le mode Niveau Elo.
                 if opponentMode == .elo {
-                SettingsSection(title: "Livre d'ouvertures", systemImage: "book.closed.fill", tint: Theme.accent) {
+                SettingsSection(title: "Livre d'ouvertures", systemImage: "book.closed.fill", tint: Theme.gold) {
                     VStack(alignment: .leading, spacing: 12) {
-                        ToggleRow(label: "Le moteur pioche dans un livre d'ouvertures", isOn: $bookEnabled.animation())
+                        ToggleRow(label: "Le moteur pioche dans un livre d'ouvertures", isOn: $bookEnabled.animation(), tint: Theme.gold)
 
                         if bookEnabled {
                             HStack(spacing: 8) {
                                 ChipButton(
                                     label: "Lignes principales",
                                     systemImage: nil,
-                                    isSelected: bookWidth == .mainLinesOnly
+                                    isSelected: bookWidth == .mainLinesOnly,
+                                    tint: Theme.gold
                                 ) {
                                     bookWidth = .mainLinesOnly
                                 }
                                 ChipButton(
                                     label: "Avec variantes",
                                     systemImage: nil,
-                                    isSelected: bookWidth == .includeSidelines
+                                    isSelected: bookWidth == .includeSidelines,
+                                    tint: Theme.gold
                                 ) {
                                     bookWidth = .includeSidelines
                                 }
@@ -208,58 +201,11 @@ struct NewGameSetupView: View {
                 }
                 }
 
-                SettingsSection(title: "Cadence", systemImage: "timer", tint: Theme.accent) {
+                TimeLimitSection(selection: $timeLimit, tint: Theme.info)
+
+                SettingsSection(title: "Départ", systemImage: "flag.fill", tint: Theme.violet) {
                     VStack(alignment: .leading, spacing: 12) {
-                        // Deux niveaux plutôt qu'un empilement. Avant : un chip
-                        // isolé, puis QUATRE blocs « en-tête + flot de chips »,
-                        // puis le bloc perso — cinq en-têtes et une vingtaine
-                        // de chips déroulés en permanence, pour un réglage dont
-                        // une seule valeur compte. On choisit la famille, puis
-                        // la cadence DANS cette famille : deux lignes, et le
-                        // vocabulaire des sites d'échecs.
-                        FlowLayout(spacing: 8, lineSpacing: 8) {
-                            ForEach(TimeControlCategory.allCases, id: \.self) { category in
-                                ChipButton(
-                                    label: LocalizedStringKey(category.label),
-                                    systemImage: category.symbolName,
-                                    isSelected: timeCategory == category
-                                ) {
-                                    select(category)
-                                }
-                            }
-                        }
-
-                        switch timeCategory {
-                        case .none:
-                            Text("Aucune pendule : les deux camps jouent sans contrainte de temps.")
-                                .font(.caption)
-                                .foregroundStyle(Theme.textSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-
-                        case .custom:
-                            customTimeControlEditor
-
-                        default:
-                            FlowLayout(spacing: 8, lineSpacing: 8) {
-                                ForEach(TimeControl.presets.filter { $0.category == timeCategory }) { control in
-                                    ChipButton(
-                                        label: LocalizedStringKey(control.label),
-                                        systemImage: nil,
-                                        isSelected: !isCustomTimeControlSelected && timeControl == control
-                                    ) {
-                                        isCustomTimeControlSelected = false
-                                        timeControl = control
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .animation(Theme.gentle, value: timeCategory)
-                }
-
-                SettingsSection(title: "Départ", systemImage: "flag.fill", tint: Theme.accent) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ToggleRow(label: "Position personnalisée (FEN)", isOn: $useCustomFEN.animation())
+                        ToggleRow(label: "Position personnalisée (FEN)", isOn: $useCustomFEN.animation(), tint: Theme.violet)
                             .accessibilityIdentifier("useCustomFEN")
 
                         if useCustomFEN {
@@ -282,10 +228,10 @@ struct NewGameSetupView: View {
                             }
 
                             HStack(spacing: 8) {
-                                ChipButton(label: "Ouvrir l'éditeur", systemImage: "square.and.pencil", isSelected: false) {
+                                ChipButton(label: "Ouvrir l'éditeur", systemImage: "square.and.pencil", isSelected: false, tint: Theme.violet) {
                                     showPositionEditor = true
                                 }
-                                ChipButton(label: "Scanner", systemImage: "camera.viewfinder", isSelected: false) {
+                                ChipButton(label: "Scanner", systemImage: "camera.viewfinder", isSelected: false, tint: Theme.violet) {
                                     showScanner = true
                                 }
                                 .accessibilityIdentifier("scanStartPosition")
@@ -294,12 +240,12 @@ struct NewGameSetupView: View {
                     }
                 }
 
-                SettingsSection(title: "Aides", systemImage: "lightbulb.fill", tint: Theme.accent, discoverySpot: .aidToggles) {
+                SettingsSection(title: "Aides", systemImage: "lightbulb.fill", tint: Theme.rose, discoverySpot: .aidToggles) {
                     VStack(spacing: 12) {
-                        ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled)
-                        ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled)
-                        ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar)
-                        ToggleRow(label: "L'ordinateur peut abandonner s'il est perdu", isOn: $engineResignationEnabled)
+                        ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled, tint: Theme.rose)
+                        ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled, tint: Theme.rose)
+                        ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar, tint: Theme.rose)
+                        ToggleRow(label: "L'ordinateur peut abandonner s'il est perdu", isOn: $engineResignationEnabled, tint: Theme.rose)
                         Text(effectiveTimeControl.hasClock ? "Reprise de coup indisponible avec pendule." : "Parcourez la partie avec la barre sous le plateau ; sans pendule, « Reprendre ici » relance depuis le coup consulté.")
                             .font(.caption)
                             .foregroundStyle(Theme.textTertiary)
@@ -383,60 +329,9 @@ struct NewGameSetupView: View {
         fenText.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
-    /// Change de famille en gardant TOUJOURS une cadence valide : sans ça,
-    /// passer sur « Blitz » n'aurait rien sélectionné et « Commencer » aurait
-    /// lancé la cadence de la famille précédente, invisible à l'écran.
-    private func select(_ category: TimeControlCategory) {
-        timeCategory = category
-        switch category {
-        case .none:
-            isCustomTimeControlSelected = false
-            timeControl = .none
-        case .custom:
-            isCustomTimeControlSelected = true
-        default:
-            isCustomTimeControlSelected = false
-            if timeControl.category != category {
-                timeControl = TimeControl.presets.first { $0.category == category } ?? .none
-            }
-        }
-    }
-
-    private var effectiveTimeControl: TimeControl {
-        isCustomTimeControlSelected ? .custom(minutes: customMinutes, incrementSeconds: customIncrement) : timeControl
-    }
-
-    /// Répartit `total` préréglages sur 5 paliers de jauge (1...5), en
-    /// ordre croissant, pour donner un repère visuel rapide de la force
-    /// relative sans avoir à mémoriser les valeurs Elo.
-    private var customTimeControlEditor: some View {
-        VStack(spacing: 10) {
-            Stepper(value: $customMinutes, in: 1...180) {
-                HStack {
-                    Text("Minutes par joueur")
-                        .foregroundStyle(Theme.textPrimary)
-                    Spacer()
-                    Text("\(customMinutes)")
-                        .foregroundStyle(Theme.textSecondary)
-                        .monospacedDigit()
-                }
-            }
-            Stepper(value: $customIncrement, in: 0...60) {
-                HStack {
-                    Text("Incrément par coup (s)")
-                        .foregroundStyle(Theme.textPrimary)
-                    Spacer()
-                    Text("\(customIncrement)")
-                        .foregroundStyle(Theme.textSecondary)
-                        .monospacedDigit()
-                }
-            }
-        }
-        .tint(Theme.accent)
-        .padding(12)
-        .background(Theme.surfaceElevated, in: Theme.controlShape)
-        .overlay(Theme.controlShape.strokeBorder(Theme.stroke, lineWidth: 1))
-    }
+    private var effectiveTimeControl: TimeControl { timeLimit.effective }
+    private var customMinutes: Int { timeLimit.customMinutes }
+    private var customIncrement: Int { timeLimit.customIncrement }
 
     private func start() {
         // Trimé AVANT stockage et pas seulement pour la validation :
@@ -471,6 +366,7 @@ struct NewGameSetupView: View {
         if opponentMode == .profile {
             OpponentLevelStore.save(level: eloSlider, for: opponentProfileID)
         }
+        timeLimit.remember(memoryKey: "play")
         PlaySettingsStore.save(settings)
         onStart(settings)
     }
@@ -557,6 +453,9 @@ struct ChipButton: View {
     let label: LocalizedStringKey
     let systemImage: String?
     let isSelected: Bool
+    /// La teinte de la puce : celle de sa section ou de sa famille, au repos
+    /// (icône colorée, liseré pâle) comme sélectionnée (dégradé plein).
+    var tint: Color = Theme.accent
     let action: () -> Void
 
     var body: some View {
@@ -573,13 +472,13 @@ struct ChipButton: View {
             .padding(.vertical, 9)
             .background {
                 if isSelected {
-                    Capsule().fill(Theme.accentGradient)
+                    Capsule().fill(LinearGradient(colors: [tint, tint.opacity(0.78)], startPoint: .topLeading, endPoint: .bottomTrailing))
                 } else {
-                    Capsule().fill(Theme.surfaceElevated)
+                    Capsule().fill(tint.opacity(0.10))
                 }
             }
-            .overlay(Capsule().strokeBorder(isSelected ? Color.clear : Theme.stroke, lineWidth: 1))
-            .glow(Theme.accent, radius: 7, isActive: isSelected)
+            .overlay(Capsule().strokeBorder(isSelected ? Color.clear : tint.opacity(0.28), lineWidth: 1))
+            .glow(tint, radius: 7, isActive: isSelected)
         }
         .buttonStyle(.pressable)
         .accessibilityAddTraits(isSelected ? [.isSelected] : [])
@@ -590,13 +489,14 @@ struct ChipButton: View {
 struct ToggleRow: View {
     let label: LocalizedStringKey
     @Binding var isOn: Bool
+    var tint: Color = Theme.accent
 
     var body: some View {
         Toggle(isOn: $isOn) {
             Text(label)
                 .foregroundStyle(Theme.textPrimary)
         }
-        .tint(Theme.accent)
+        .tint(tint)
     }
 }
 
@@ -612,6 +512,7 @@ struct OptionRow: View {
     let caption: LocalizedStringKey
     let systemImage: String
     let isSelected: Bool
+    var tint: Color = Theme.accent
     let action: () -> Void
 
     var body: some View {
@@ -619,10 +520,10 @@ struct OptionRow: View {
             HStack(spacing: 12) {
                 Image(systemName: systemImage)
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(isSelected ? Theme.accent : Theme.textSecondary)
+                    .foregroundStyle(isSelected ? tint : Theme.textSecondary)
                     .frame(width: 34, height: 34)
                     .background(
-                        isSelected ? Theme.accent.opacity(0.16) : Theme.surfaceElevated,
+                        isSelected ? tint.opacity(0.16) : Theme.surfaceElevated,
                         in: RoundedRectangle(cornerRadius: 9, style: .continuous)
                     )
                     .accessibilityHidden(true)
@@ -640,18 +541,18 @@ struct OptionRow: View {
 
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 20))
-                    .foregroundStyle(isSelected ? Theme.accent : Theme.textTertiary.opacity(0.5))
+                    .foregroundStyle(isSelected ? tint : Theme.textTertiary.opacity(0.5))
                     .accessibilityHidden(true)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
             .background(
-                isSelected ? Theme.accent.opacity(0.07) : Theme.surfaceElevated.opacity(0.5),
+                isSelected ? tint.opacity(0.07) : Theme.surfaceElevated.opacity(0.5),
                 in: RoundedRectangle(cornerRadius: 12, style: .continuous)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .strokeBorder(isSelected ? Theme.accent.opacity(0.5) : Theme.stroke, lineWidth: 1)
+                    .strokeBorder(isSelected ? tint.opacity(0.5) : Theme.stroke, lineWidth: 1)
             )
         }
         .buttonStyle(.pressable)

@@ -94,17 +94,21 @@ data class DailySessionPlan(val steps: List<DailySessionStep>, val streak: Int, 
 }
 
 object DailySessionBuilder {
-    /** Une séance se veut courte : au plus 10 positions d'ouverture et 5 puzzles par étape (comme iOS). */
-    const val OPENINGS_CAP = 10
+    /**
+     * Une séance se veut courte : au plus 5 puzzles par étape, et un plafond
+     * RÉGLABLE de positions d'ouverture — 3, 5 ou 10, 5 par défaut (comme iOS).
+     */
+    const val DEFAULT_OPENINGS_CAP = 5
     const val PUZZLES_CAP = 5
 
     fun plan(
         openingsDue: Int, missedPuzzles: Int, ownPuzzles: Int,
         endgameCourseId: String?, endgameOpenedToday: Boolean,
         streak: Int, trainedToday: Boolean,
+        openingsCap: Int = DEFAULT_OPENINGS_CAP,
     ): DailySessionPlan {
         val steps = arrayListOf(
-            DailySessionStep(DailySessionStep.Kind.openings, minOf(OPENINGS_CAP, maxOf(0, openingsDue))),
+            DailySessionStep(DailySessionStep.Kind.openings, minOf(openingsCap, maxOf(0, openingsDue))),
             DailySessionStep(DailySessionStep.Kind.missedPuzzles, minOf(PUZZLES_CAP, maxOf(0, missedPuzzles))),
             DailySessionStep(DailySessionStep.Kind.ownPuzzles, minOf(PUZZLES_CAP, maxOf(0, ownPuzzles))),
         )
@@ -140,6 +144,7 @@ object DailySessionBuilder {
             endgameOpenedToday = TrainingDays.endgameOpenedToday(context, nowMillis),
             streak = TrainingDays.streak(context, nowMillis),
             trainedToday = TrainingDays.didTrainToday(context, nowMillis),
+            openingsCap = com.chesslab.settings.SettingsStore.state.value.dailyOpeningsCap,
         )
     }
 }

@@ -1213,4 +1213,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="woodpecker_bar_time">Temps</string>
     <string name="woodpecker_faster">Plus rapide de %1$s — bien joué</string>
     <string name="play_material_curve">Matériel au fil de la partie</string>
+    <string name="settings_daily_openings">Ouvertures par séance</string>
+    <string name="settings_daily_openings_note">Au plus ce nombre de positions d\'ouverture à revoir par jour ; le reste attend le lendemain.</string>
+    <string name="setup_time_limit">Limite de temps</string>
 </resources>

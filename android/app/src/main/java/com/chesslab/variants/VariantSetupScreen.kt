@@ -70,9 +70,7 @@ fun VariantSetupScreen(
 
     var color by remember { mutableStateOf(saved.colorChoice) }
     var level by remember { mutableStateOf(saved.level) }
-    var timeId by remember { mutableStateOf(saved.timeControlId) }
-    var customMinutes by remember { mutableStateOf(saved.customMinutes) }
-    var customIncrement by remember { mutableStateOf(saved.customIncrementSeconds) }
+    val timeLimit = com.chesslab.play.rememberTimeLimit(saved.timeControlId, saved.customMinutes, saved.customIncrementSeconds, "variant.$variantId")
     var evalBar by remember { mutableStateOf(saved.showEvalBar) }
     var hints by remember { mutableStateOf(saved.hintsEnabled) }
     var blunderAlert by remember { mutableStateOf(saved.blunderAlertEnabled) }
@@ -82,9 +80,6 @@ fun VariantSetupScreen(
         mutableStateOf(saved.chess960Number ?: kotlin.random.Random.nextInt(Chess960Position.range.last + 1))
     }
     var typedNumber by remember { mutableStateOf(number.toString()) }
-    var category by remember {
-        mutableStateOf(if (timeId == "custom") "custom" else TimeControl.byId(timeId).category)
-    }
 
     // À deux sur le même appareil, le moteur n'est plus un adversaire : sa
     // force, la couleur et les aides n'ont plus d'objet.
@@ -130,7 +125,7 @@ fun VariantSetupScreen(
             }
 
             if (!hidesEngineSettings) {
-                SettingsSection(stringResource(R.string.setup_colour), Icons.Default.Contrast) {
+                SettingsSection(stringResource(R.string.setup_colour), Icons.Default.Contrast, Palette.warning) {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -142,7 +137,7 @@ fun VariantSetupScreen(
                         ).forEach { (value, label, icon) ->
                             ChipButton(
                                 stringResource(label), color == value,
-                                Modifier.testTag("couleur-${value.name}"), icon = icon,
+                                Modifier.testTag("couleur-${value.name}"), icon = icon, tint = Palette.warning,
                             ) { color = value }
                         }
                     }
@@ -170,57 +165,14 @@ fun VariantSetupScreen(
                 }
             }
 
-            SettingsSection(stringResource(R.string.setup_time), Icons.Default.Timer) {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    TimeControl.categories.forEach { c ->
-                        ChipButton(
-                            stringResource(timeCategoryLabel(c)), category == c,
-                            Modifier.testTag("cadence-$c"), icon = timeCategoryIcon(c),
-                        ) {
-                            if (category != c) {
-                                category = c
-                                timeId = if (c == "custom") "custom"
-                                else TimeControl.presets.first { it.category == c }.id
-                            }
-                        }
-                    }
-                }
-                Spacer(Modifier.height(10.dp))
-                when (category) {
-                    "none" -> Text(
-                        stringResource(R.string.setup_no_clock),
-                        fontSize = 12.sp, color = Palette.textSecondary,
-                    )
-                    "custom" -> {
-                        Stepper(stringResource(R.string.setup_custom_minutes), customMinutes, 1..180, 1, "minutes-perso") {
-                            customMinutes = it
-                        }
-                        Spacer(Modifier.height(8.dp))
-                        Stepper(stringResource(R.string.setup_custom_increment), customIncrement, 0..60, 1, "increment-perso") {
-                            customIncrement = it
-                        }
-                    }
-                    else -> FlowRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        TimeControl.presets.filter { it.category == category }.forEach { tc ->
-                            val label = if (tc.id == "none") stringResource(R.string.time_no_limit) else tc.label
-                            ChipButton(label, timeId == tc.id, Modifier.testTag("preset-${tc.id}")) { timeId = tc.id }
-                        }
-                    }
-                }
-            }
+            com.chesslab.play.TimeLimitSection(timeLimit, variantTint(variant.id))
 
             // Le numéro de Scharnagl — celui de Lichess et des moteurs :
             // pouvoir le saisir, c'est pouvoir rejouer la position d'hier, ou
             // celle dont un ami parle. Et la position SE VOIT avant de
             // commencer : un numéro seul ne dit rien.
             if (variant.chess960) {
-                SettingsSection(stringResource(R.string.chess960_position), Icons.Default.Casino) {
+                SettingsSection(stringResource(R.string.chess960_position), Icons.Default.Casino, Palette.violet) {
                     val shown = number ?: Chess960Position.classic
                     val preview = remember(shown) {
                         Chess960Position.startingFen(shown)?.let { chesskit.FenParser.parse(it) }
@@ -294,10 +246,10 @@ fun VariantSetupScreen(
             }
 
             if (!hidesEngineSettings) {
-                SettingsSection(stringResource(R.string.setup_aids), Icons.Default.Lightbulb) {
-                    ToggleRow(stringResource(R.string.setup_eval_bar), evalBar, "aide-eval") { evalBar = it }
-                    ToggleRow(stringResource(R.string.setup_hints), hints, "aide-indice") { hints = it }
-                    ToggleRow(stringResource(R.string.setup_blunder_alert), blunderAlert, "aide-alerte") {
+                SettingsSection(stringResource(R.string.setup_aids), Icons.Default.Lightbulb, Palette.rose) {
+                    ToggleRow(stringResource(R.string.setup_eval_bar), evalBar, "aide-eval", Palette.rose) { evalBar = it }
+                    ToggleRow(stringResource(R.string.setup_hints), hints, "aide-indice", Palette.rose) { hints = it }
+                    ToggleRow(stringResource(R.string.setup_blunder_alert), blunderAlert, "aide-alerte", Palette.rose) {
                         blunderAlert = it
                     }
                 }
@@ -330,9 +282,9 @@ fun VariantSetupScreen(
                         val settings = VariantSettings(
                             colorChoice = color,
                             level = level,
-                            timeControlId = timeId,
-                            customMinutes = customMinutes,
-                            customIncrementSeconds = customIncrement,
+                            timeControlId = timeLimit.effectiveId,
+                            customMinutes = timeLimit.customMinutes,
+                            customIncrementSeconds = timeLimit.customIncrement,
                             showEvalBar = evalBar,
                             hintsEnabled = hints,
                             blunderAlertEnabled = blunderAlert,
@@ -340,6 +292,7 @@ fun VariantSetupScreen(
                             twoPlayers = twoPlayers,
                             chess960Number = if (variant.chess960) number else null,
                         )
+                        timeLimit.remember()
                         VariantSettingsStore.save(context, variantId, settings)
                         onStart(settings)
                     }

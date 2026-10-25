@@ -10,11 +10,7 @@ struct Chess960SetupView: View {
 
     @State private var colorChoice: PlayerColorChoice
     @State private var eloSlider: Double
-    @State private var timeControl: TimeControl
-    @State private var isCustomTimeControlSelected: Bool
-    @State private var timeCategory: TimeControlCategory
-    @State private var customMinutes: Int
-    @State private var customIncrement: Int
+    @State private var timeLimit: TimeLimitSelection
     @State private var showEvalBar: Bool
     @State private var hintsEnabled: Bool
     @State private var blunderAlertEnabled: Bool
@@ -43,13 +39,9 @@ struct Chess960SetupView: View {
             max(saved.eloSliderValue, EngineStrength.playSliderRange.lowerBound),
             EngineStrength.playSliderRange.upperBound
         ))
-        _isCustomTimeControlSelected = State(initialValue: saved.timeControlID == "custom")
-        _timeControl = State(initialValue: TimeControl.presets.first { $0.id == saved.timeControlID } ?? .none)
-        _timeCategory = State(initialValue: saved.timeControlID == "custom"
-            ? .custom
-            : (TimeControl.presets.first { $0.id == saved.timeControlID }?.category ?? TimeControlCategory.none))
-        _customMinutes = State(initialValue: saved.customMinutes)
-        _customIncrement = State(initialValue: saved.customIncrementSeconds)
+        _timeLimit = State(initialValue: TimeLimitSelection(
+            savedID: saved.timeControlID, customMinutes: saved.customMinutes,
+            customIncrement: saved.customIncrementSeconds, memoryKey: "chess960"))
         _showEvalBar = State(initialValue: saved.showEvalBar)
         _hintsEnabled = State(initialValue: saved.hintsEnabled)
         _blunderAlertEnabled = State(initialValue: saved.blunderAlertEnabled)
@@ -63,13 +55,14 @@ struct Chess960SetupView: View {
             VStack(alignment: .leading, spacing: 22) {
                 positionSection
 
-                SettingsSection(title: "Couleur", systemImage: "circle.lefthalf.filled", tint: Theme.accent) {
+                SettingsSection(title: "Couleur", systemImage: "circle.lefthalf.filled", tint: Theme.warning) {
                     FlowLayout(spacing: 8, lineSpacing: 8) {
                         ForEach(PlayerColorChoice.allCases) { choice in
                             ChipButton(
                                 label: LocalizedStringKey(choice.label),
                                 systemImage: choice.symbolName,
-                                isSelected: colorChoice == choice
+                                isSelected: colorChoice == choice,
+                                tint: Theme.warning
                             ) {
                                 colorChoice = choice
                             }
@@ -91,13 +84,13 @@ struct Chess960SetupView: View {
                     }
                 }
 
-                cadenceSection
+                TimeLimitSection(selection: $timeLimit, tint: Theme.info)
 
-                SettingsSection(title: "Aides", systemImage: "lifepreserver", tint: Theme.accent) {
+                SettingsSection(title: "Aides", systemImage: "lifepreserver", tint: Theme.rose) {
                     VStack(alignment: .leading, spacing: 10) {
-                        ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar)
-                        ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled)
-                        ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled)
+                        ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar, tint: Theme.rose)
+                        ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled, tint: Theme.rose)
+                        ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled, tint: Theme.rose)
                     }
                 }
             }
@@ -131,7 +124,7 @@ struct Chess960SetupView: View {
         SettingsSection(title: "Position de départ", systemImage: "die.face.5.fill", tint: Theme.violet) {
             VStack(alignment: .leading, spacing: 12) {
                 HStack(spacing: 10) {
-                    ChipButton(label: "Aléatoire", systemImage: "die.face.5", isSelected: false) {
+                    ChipButton(label: "Aléatoire", systemImage: "die.face.5", isSelected: false, tint: Theme.rose) {
                         setNumber(Int.random(in: 0...959))
                     }
                     .accessibilityIdentifier("chess960_random")
@@ -279,79 +272,16 @@ struct Chess960SetupView: View {
         selectedFileForEdit = nil
     }
 
-    // MARK: Cadence — même double niveau que « Contre l'ordinateur »
-
-    private var cadenceSection: some View {
-        SettingsSection(title: "Cadence", systemImage: "timer", tint: Theme.accent) {
-            VStack(alignment: .leading, spacing: 12) {
-                FlowLayout(spacing: 8, lineSpacing: 8) {
-                    ForEach(TimeControlCategory.allCases, id: \.self) { category in
-                        ChipButton(
-                            label: LocalizedStringKey(category.label),
-                            systemImage: category.symbolName,
-                            isSelected: timeCategory == category
-                        ) {
-                            select(category)
-                        }
-                    }
-                }
-                switch timeCategory {
-                case .none:
-                    Text("Aucune pendule : les deux camps jouent sans contrainte de temps.")
-                        .font(.caption)
-                        .foregroundStyle(Theme.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                case .custom:
-                    HStack(spacing: 16) {
-                        Stepper("\(customMinutes) min", value: $customMinutes, in: 1...120)
-                        Stepper("+\(customIncrement) s", value: $customIncrement, in: 0...60)
-                    }
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.textPrimary)
-                default:
-                    FlowLayout(spacing: 8, lineSpacing: 8) {
-                        ForEach(TimeControl.presets.filter { $0.category == timeCategory }) { control in
-                            ChipButton(
-                                label: LocalizedStringKey(control.label),
-                                systemImage: nil,
-                                isSelected: !isCustomTimeControlSelected && timeControl == control
-                            ) {
-                                isCustomTimeControlSelected = false
-                                timeControl = control
-                            }
-                        }
-                    }
-                }
-            }
-            .animation(Theme.gentle, value: timeCategory)
-        }
-    }
-
-    private func select(_ category: TimeControlCategory) {
-        timeCategory = category
-        switch category {
-        case .custom:
-            isCustomTimeControlSelected = true
-        case .none:
-            isCustomTimeControlSelected = false
-            timeControl = .none
-        default:
-            isCustomTimeControlSelected = false
-            if let first = TimeControl.presets.first(where: { $0.category == category }) {
-                timeControl = first
-            }
-        }
-    }
-
     // MARK: Départ
 
     private func start() {
         var settings = Chess960Settings()
         settings.colorChoice = colorChoice.rawValue
         settings.eloSliderValue = eloSlider
-        settings.timeControlID = isCustomTimeControlSelected ? "custom" : timeControl.id
-        settings.customMinutes = customMinutes
-        settings.customIncrementSeconds = customIncrement
+        settings.timeControlID = timeLimit.effective.id
+        settings.customMinutes = timeLimit.customMinutes
+        settings.customIncrementSeconds = timeLimit.customIncrement
+        timeLimit.remember(memoryKey: "chess960")
         settings.showEvalBar = showEvalBar
         settings.hintsEnabled = hintsEnabled
         settings.blunderAlertEnabled = blunderAlertEnabled

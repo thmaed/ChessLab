@@ -98,10 +98,7 @@ fun NewGameScreen(
             }
         )
     }
-    var timeId by remember { mutableStateOf(initial.timeControlId) }
-    var category by remember { mutableStateOf(initial.timeControl.category) }
-    var customMinutes by remember { mutableStateOf(initial.customMinutes) }
-    var customIncrement by remember { mutableStateOf(initial.customIncrementSeconds) }
+    val timeLimit = rememberTimeLimit(initial.timeControlId, initial.customMinutes, initial.customIncrementSeconds, "play")
     var hints by remember { mutableStateOf(initial.hintsEnabled) }
     var blunderAlert by remember { mutableStateOf(initial.blunderAlertEnabled) }
     var evalBar by remember { mutableStateOf(initial.showEvalBar) }
@@ -113,16 +110,14 @@ fun NewGameScreen(
 
     val profile = OpponentGallery.byId(opponentId)
     val fenIsLegal = remember(fenText) { FenValidator.errors(fenText.trim()).isEmpty() }
-    val hasClock = remember(timeId, customMinutes) {
-        if (timeId == "custom") customMinutes > 0 else TimeControl.byId(timeId).hasClock
-    }
+    val hasClock = timeLimit.hasClock
 
     Column(Modifier.fillMaxSize()) {
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(22.dp),
         ) {
-            SettingsSection(stringResource(R.string.setup_colour), Icons.Default.Contrast) {
+            SettingsSection(stringResource(R.string.setup_colour), Icons.Default.Contrast, Palette.warning) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
                         Triple(PlayerColorChoice.white, R.string.color_white_side, Icons.Filled.Circle),
@@ -131,7 +126,7 @@ fun NewGameScreen(
                     ).forEach { (value, label, icon) ->
                         ChipButton(
                             stringResource(label), color == value,
-                            Modifier.testTag("couleur-${value.name}"), icon = icon,
+                            Modifier.testTag("couleur-${value.name}"), icon = icon, tint = Palette.warning,
                         ) { color = value }
                     }
                 }
@@ -200,8 +195,8 @@ fun NewGameScreen(
             // Le livre n'a de sens que pour Stockfish : le répertoire d'un
             // personnage ne se coupe pas, c'est son caractère.
             if (!useCharacter || !maiaAvailable) {
-                SettingsSection(stringResource(R.string.setup_book), Icons.Default.MenuBook) {
-                    ToggleRow(stringResource(R.string.setup_book_enabled), bookEnabled, "livre-actif") { bookEnabled = it }
+                SettingsSection(stringResource(R.string.setup_book), Icons.Default.MenuBook, Palette.gold) {
+                    ToggleRow(stringResource(R.string.setup_book_enabled), bookEnabled, "livre-actif", Palette.gold) { bookEnabled = it }
                     if (bookEnabled) {
                         Spacer(Modifier.height(8.dp))
                         FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -209,7 +204,7 @@ fun NewGameScreen(
                                 BookWidth.mainLinesOnly to R.string.setup_book_main,
                                 BookWidth.includeSidelines to R.string.setup_book_sidelines,
                             ).forEach { (width, label) ->
-                                ChipButton(stringResource(label), bookWidth == width, Modifier.testTag("livre-${width.name}")) {
+                                ChipButton(stringResource(label), bookWidth == width, Modifier.testTag("livre-${width.name}"), tint = Palette.gold) {
                                     bookWidth = width
                                 }
                             }
@@ -218,55 +213,18 @@ fun NewGameScreen(
                 }
             }
 
-            SettingsSection(stringResource(R.string.setup_time), Icons.Default.Timer) {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    TimeControl.categories.forEach { c ->
-                        ChipButton(
-                            stringResource(timeCategoryLabel(c)), category == c,
-                            Modifier.testTag("cadence-$c"), icon = timeCategoryIcon(c),
-                        ) {
-                            // Retaper la famille DÉJÀ choisie ne fait rien :
-                            // sans ce garde, on retombait sur sa première
-                            // cadence en effaçant celle qu'on venait de régler.
-                            if (category != c) {
-                                category = c
-                                timeId = if (c == "custom") "custom"
-                                else TimeControl.presets.first { it.category == c }.id
-                            }
-                        }
-                    }
-                }
-                Spacer(Modifier.height(10.dp))
-                when (category) {
-                    "none" -> Text(stringResource(R.string.setup_no_clock), fontSize = 12.sp, color = Palette.textSecondary)
-                    "custom" -> {
-                        Stepper(stringResource(R.string.setup_custom_minutes), customMinutes, 1..180, "minutes-perso") {
-                            customMinutes = it
-                        }
-                        Spacer(Modifier.height(8.dp))
-                        Stepper(stringResource(R.string.setup_custom_increment), customIncrement, 0..60, "increment-perso") {
-                            customIncrement = it
-                        }
-                    }
-                    else -> FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        TimeControl.presets.filter { it.category == category }.forEach { tc ->
-                            val label = if (tc.id == "none") stringResource(R.string.time_no_limit) else tc.label
-                            ChipButton(label, timeId == tc.id, Modifier.testTag("preset-${tc.id}")) { timeId = tc.id }
-                        }
-                    }
-                }
-            }
+            TimeLimitSection(timeLimit, Palette.info)
 
             SettingsSection(
-                stringResource(R.string.setup_aids), Icons.Default.Lightbulb,
+                stringResource(R.string.setup_aids), Icons.Default.Lightbulb, Palette.rose,
                 modifier = Modifier.discoveryAnchor(DiscoverySpot.aidToggles),
             ) {
-                ToggleRow(stringResource(R.string.setup_hints), hints, "aide-indice") { hints = it }
-                ToggleRow(stringResource(R.string.setup_blunder_alert), blunderAlert, "aide-alerte") {
+                ToggleRow(stringResource(R.string.setup_hints), hints, "aide-indice", Palette.rose) { hints = it }
+                ToggleRow(stringResource(R.string.setup_blunder_alert), blunderAlert, "aide-alerte", Palette.rose) {
                     blunderAlert = it
                 }
-                ToggleRow(stringResource(R.string.setup_eval_bar), evalBar, "aide-eval") { evalBar = it }
-                ToggleRow(stringResource(R.string.setup_engine_resigns), engineResigns, "aide-abandon") { engineResigns = it }
+                ToggleRow(stringResource(R.string.setup_eval_bar), evalBar, "aide-eval", Palette.rose) { evalBar = it }
+                ToggleRow(stringResource(R.string.setup_engine_resigns), engineResigns, "aide-abandon", Palette.rose) { engineResigns = it }
                 Spacer(Modifier.height(8.dp))
                 Text(
                     stringResource(if (hasClock) R.string.setup_aids_note_clock else R.string.setup_aids_note),
@@ -275,8 +233,8 @@ fun NewGameScreen(
                 )
             }
 
-            SettingsSection(stringResource(R.string.setup_start_section), Icons.Default.Tune) {
-                ToggleRow(stringResource(R.string.setup_custom_position), useCustomFen, "position-perso") {
+            SettingsSection(stringResource(R.string.setup_start_section), Icons.Default.Tune, Palette.violet) {
+                ToggleRow(stringResource(R.string.setup_custom_position), useCustomFen, "position-perso", Palette.violet) {
                     useCustomFen = it
                 }
                 if (useCustomFen) {
@@ -298,10 +256,10 @@ fun NewGameScreen(
                     }
                     Spacer(Modifier.height(10.dp))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ChipButton(stringResource(R.string.setup_open_editor), false, Modifier.testTag("ouvrir-editeur"), icon = Icons.Default.Edit) {
+                        ChipButton(stringResource(R.string.setup_open_editor), false, Modifier.testTag("ouvrir-editeur"), icon = Icons.Default.Edit, tint = Palette.violet) {
                             onOpenEditor()
                         }
-                        ChipButton(stringResource(R.string.setup_scan), false, Modifier.testTag("ouvrir-scanner"), icon = Icons.Default.PhotoCamera) {
+                        ChipButton(stringResource(R.string.setup_scan), false, Modifier.testTag("ouvrir-scanner"), icon = Icons.Default.PhotoCamera, tint = Palette.violet) {
                             onOpenScanner()
                         }
                     }
@@ -330,9 +288,9 @@ fun NewGameScreen(
                             colorChoice = color,
                             opponentId = if (useCharacter && maiaAvailable) opponentId else null,
                             level = level,
-                            timeControlId = timeId,
-                            customMinutes = customMinutes,
-                            customIncrementSeconds = customIncrement,
+                            timeControlId = timeLimit.effectiveId,
+                            customMinutes = timeLimit.customMinutes,
+                            customIncrementSeconds = timeLimit.customIncrement,
                             hintsEnabled = hints,
                             blunderAlertEnabled = blunderAlert,
                             showEvalBar = evalBar,
@@ -343,6 +301,7 @@ fun NewGameScreen(
                         )
                         // Les réglages survivent à la fermeture de l'app ; le
                         // niveau, lui, se mémorise PAR personnage.
+                        timeLimit.remember()
                         PlaySettingsStore.save(context, settings)
                         if (useCharacter && maiaAvailable) OpponentLevelStore.save(context, level, opponentId)
                         onStart(settings)
@@ -366,25 +325,6 @@ private fun levelFor(context: android.content.Context, profileId: String): Doubl
     val profile = OpponentGallery.byId(profileId) ?: return 1200.0
     val saved = OpponentLevelStore.level(context, profileId) ?: profile.defaultLevel
     return saved.coerceIn(profile.recommendedLevels.first.toDouble(), profile.recommendedLevels.last.toDouble())
-}
-
-private fun timeCategoryLabel(category: String): Int = when (category) {
-    "bullet" -> R.string.time_bullet
-    "blitz" -> R.string.time_blitz
-    "rapid" -> R.string.time_rapid
-    "classical" -> R.string.time_classical
-    "custom" -> R.string.time_custom
-    else -> R.string.time_none
-}
-
-/** Un repère visuel qui se lit plus vite que le mot, du plus rapide au plus lent. */
-private fun timeCategoryIcon(category: String) = when (category) {
-    "bullet" -> Icons.Default.Speed
-    "blitz" -> Icons.Default.Bolt
-    "rapid" -> Icons.Default.Timer
-    "classical" -> Icons.Default.FlagCircle
-    "custom" -> Icons.Default.Tune
-    else -> Icons.Default.AllInclusive
 }
 
 /** Le contrôle segmenté à deux choix : Personnage ou Stockfish. */

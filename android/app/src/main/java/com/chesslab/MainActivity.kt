@@ -287,7 +287,7 @@ private fun App() {
                 mode = when (current.kind) {
                     "line" -> TrainMode.FullLine(current.courseId ?: "")
                     "hardest" -> TrainMode.Hardest
-                    "session" -> TrainMode.Session(com.chesslab.dailysession.DailySessionBuilder.OPENINGS_CAP)
+                    "session" -> TrainMode.Session(com.chesslab.settings.SettingsStore.state.value.dailyOpeningsCap)
                     else -> TrainMode.Daily
                 },
                 onPlayVsEngine = { stack.add(Route.NewGame(startFen = it)) },

@@ -12,12 +12,7 @@ struct TwoPlayerSetupView: View {
     @State private var whiteName: String
     @State private var blackName: String
     @State private var rotationMode: TwoPlayerGameSettings.RotationMode
-    @State private var timeControl: TimeControl
-    @State private var isCustomTimeControlSelected: Bool
-    @State private var customMinutes: Int
-    @State private var customIncrement: Int
-    /// Famille de cadence affichée — voir `NewGameSetupView`.
-    @State private var timeCategory: TimeControlCategory
+    @State private var timeLimit: TimeLimitSelection
 
     init(initialFEN: String? = nil, onStart: @escaping (TwoPlayerGameSettings) -> Void) {
         self.onStart = onStart
@@ -35,13 +30,9 @@ struct TwoPlayerSetupView: View {
         _whiteName = State(initialValue: stored == nil ? LocalizationController.string("Blancs") : saved.whiteName)
         _blackName = State(initialValue: stored == nil ? LocalizationController.string("Noirs") : saved.blackName)
         _rotationMode = State(initialValue: saved.rotationMode)
-        _isCustomTimeControlSelected = State(initialValue: saved.timeControlID == "custom")
-        _timeControl = State(initialValue: TimeControl.presets.first { $0.id == saved.timeControlID } ?? .none)
-        _timeCategory = State(initialValue: saved.timeControlID == "custom"
-            ? .custom
-            : (TimeControl.presets.first { $0.id == saved.timeControlID }?.category ?? TimeControlCategory.none))
-        _customMinutes = State(initialValue: saved.customMinutes)
-        _customIncrement = State(initialValue: saved.customIncrementSeconds)
+        _timeLimit = State(initialValue: TimeLimitSelection(
+            savedID: saved.timeControlID, customMinutes: saved.customMinutes,
+            customIncrement: saved.customIncrementSeconds, memoryKey: "twoPlayer"))
     }
 
     var body: some View {
@@ -72,7 +63,8 @@ struct TwoPlayerSetupView: View {
                             title: "Face à face",
                             caption: "Le plateau pivote vers le joueur au trait — on se passe l'appareil.",
                             systemImage: "arrow.triangle.2.circlepath",
-                            isSelected: rotationMode == .faceToFace
+                            isSelected: rotationMode == .faceToFace,
+                            tint: Theme.violet
                         ) {
                             rotationMode = .faceToFace
                         }
@@ -80,7 +72,8 @@ struct TwoPlayerSetupView: View {
                             title: "Côte à côte",
                             caption: "Le plateau ne bouge pas — vous regardez du même côté.",
                             systemImage: "person.2.fill",
-                            isSelected: rotationMode == .fixed
+                            isSelected: rotationMode == .fixed,
+                            tint: Theme.violet
                         ) {
                             rotationMode = .fixed
                         }
@@ -88,56 +81,15 @@ struct TwoPlayerSetupView: View {
                             title: "Autour d'une table",
                             caption: "Appareil posé à plat : nom, pendule et boutons d'en face sont retournés.",
                             systemImage: "table.furniture",
-                            isSelected: rotationMode == .tabletop
+                            isSelected: rotationMode == .tabletop,
+                            tint: Theme.violet
                         ) {
                             rotationMode = .tabletop
                         }
                     }
                 }
 
-                SettingsSection(title: "Cadence", systemImage: "timer", tint: Theme.info) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        // Même modèle à deux niveaux que « Nouvelle partie » :
-                        // famille, puis cadence dans la famille.
-                        FlowLayout(spacing: 8, lineSpacing: 8) {
-                            ForEach(TimeControlCategory.allCases, id: \.self) { category in
-                                ChipButton(
-                                    label: LocalizedStringKey(category.label),
-                                    systemImage: category.symbolName,
-                                    isSelected: timeCategory == category
-                                ) {
-                                    select(category)
-                                }
-                            }
-                        }
-
-                        switch timeCategory {
-                        case .none:
-                            Text("Aucune pendule : les deux camps jouent sans contrainte de temps.")
-                                .font(.caption)
-                                .foregroundStyle(Theme.textSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-
-                        case .custom:
-                            customTimeControlEditor
-
-                        default:
-                            FlowLayout(spacing: 8, lineSpacing: 8) {
-                                ForEach(TimeControl.presets.filter { $0.category == timeCategory }) { control in
-                                    ChipButton(
-                                        label: LocalizedStringKey(control.label),
-                                        systemImage: nil,
-                                        isSelected: !isCustomTimeControlSelected && timeControl == control
-                                    ) {
-                                        isCustomTimeControlSelected = false
-                                        timeControl = control
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .animation(Theme.gentle, value: timeCategory)
-                }
+                TimeLimitSection(selection: $timeLimit, tint: Theme.warning)
             }
             .padding(20)
             .padding(.bottom, 20)
@@ -165,55 +117,9 @@ struct TwoPlayerSetupView: View {
         }
     }
 
-    /// Change de famille en gardant toujours une cadence valide.
-    private func select(_ category: TimeControlCategory) {
-        timeCategory = category
-        switch category {
-        case .none:
-            isCustomTimeControlSelected = false
-            timeControl = .none
-        case .custom:
-            isCustomTimeControlSelected = true
-        default:
-            isCustomTimeControlSelected = false
-            if timeControl.category != category {
-                timeControl = TimeControl.presets.first { $0.category == category } ?? .none
-            }
-        }
-    }
-
-    private var customTimeControlEditor: some View {
-        VStack(spacing: 10) {
-            Stepper(value: $customMinutes, in: 1...180) {
-                HStack {
-                    Text("Minutes par joueur")
-                        .foregroundStyle(Theme.textPrimary)
-                    Spacer()
-                    Text("\(customMinutes)")
-                        .foregroundStyle(Theme.textSecondary)
-                        .monospacedDigit()
-                }
-            }
-            Stepper(value: $customIncrement, in: 0...60) {
-                HStack {
-                    Text("Incrément par coup (s)")
-                        .foregroundStyle(Theme.textPrimary)
-                    Spacer()
-                    Text("\(customIncrement)")
-                        .foregroundStyle(Theme.textSecondary)
-                        .monospacedDigit()
-                }
-            }
-        }
-        .tint(Theme.accent)
-        .padding(12)
-        .background(Theme.surfaceElevated, in: Theme.controlShape)
-        .overlay(Theme.controlShape.strokeBorder(Theme.stroke, lineWidth: 1))
-    }
-
-    private var effectiveTimeControl: TimeControl {
-        isCustomTimeControlSelected ? .custom(minutes: customMinutes, incrementSeconds: customIncrement) : timeControl
-    }
+    private var effectiveTimeControl: TimeControl { timeLimit.effective }
+    private var customMinutes: Int { timeLimit.customMinutes }
+    private var customIncrement: Int { timeLimit.customIncrement }
 
     private func start() {
         let settings = TwoPlayerGameSettings(
@@ -225,6 +131,7 @@ struct TwoPlayerSetupView: View {
             customIncrementSeconds: customIncrement,
             startFEN: initialFEN
         )
+        timeLimit.remember(memoryKey: "twoPlayer")
         TwoPlayerSettingsStore.save(settings)
         onStart(settings)
     }

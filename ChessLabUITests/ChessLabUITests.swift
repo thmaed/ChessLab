@@ -69,6 +69,8 @@ final class ChessLabUITests: XCTestCase {
         _ = app.buttons["Commencer"].waitForExistence(timeout: 5)
         // La cadence se choisit en deux temps depuis le 18/07/2026 : la
         // famille, puis la cadence dans cette famille.
+        // L'interrupteur « Limite de temps » est éteint par défaut : on l'allume.
+        app.switches["timeLimitToggle"].tap()
         app.buttons["Blitz"].tap()
         XCTAssertTrue(app.buttons["3+2"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["3+2"].isSelected, "Réglages vierges : 3+2 ne doit pas être présélectionné")
@@ -144,6 +146,7 @@ final class ChessLabUITests: XCTestCase {
 
         // Cadence "3+0" (blitz) + barre d'évaluation, pour vérifier
         // pendules et barre d'éval à l'écran. Famille d'abord.
+        app.switches["timeLimitToggle"].tap()
         app.buttons["Blitz"].tap()
         _ = app.buttons["3+0"].waitForExistence(timeout: 5)
         app.buttons["3+0"].tap()

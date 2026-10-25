@@ -49,7 +49,7 @@ struct DailySessionTests {
     func planOrdersTheSteps() {
         let plan = DailySessionBuilder.plan(
             openingsDue: 12, missedPuzzles: 0, ownPuzzles: 2, endgameCourseID: "eg-lucena",
-            endgameOpenedToday: false, streak: 4, trainedToday: false)
+            endgameOpenedToday: false, streak: 4, trainedToday: false, openingsCap: 10)
         #expect(plan.steps.map(\.kind) == [.openings, .missedPuzzles, .ownPuzzles, .endgame])
         #expect(plan.pending.map(\.kind) == [.openings, .ownPuzzles, .endgame])
         #expect(plan.firstPending?.remaining == 10)
@@ -58,12 +58,29 @@ struct DailySessionTests {
         #expect(plan.streak == 4)
     }
 
-    @Test("Une séance reste courte : au plus 10 positions et 5 puzzles par étape")
+    @Test("Une séance reste courte : le plafond d'ouvertures est réglable, 5 puzzles par étape")
     func stepsAreCapped() {
-        let plan = DailySessionBuilder.plan(
-            openingsDue: 80, missedPuzzles: 28, ownPuzzles: 7, endgameCourseID: nil,
-            endgameOpenedToday: false, streak: 0, trainedToday: false)
-        #expect(plan.steps.map(\.remaining) == [10, 5, 5])
+        func remaining(cap: Int) -> [Int] {
+            DailySessionBuilder.plan(
+                openingsDue: 80, missedPuzzles: 28, ownPuzzles: 7, endgameCourseID: nil,
+                endgameOpenedToday: false, streak: 0, trainedToday: false, openingsCap: cap).steps.map(\.remaining)
+        }
+        #expect(remaining(cap: 5) == [5, 5, 5])
+        #expect(remaining(cap: 3) == [3, 5, 5])
+        #expect(remaining(cap: 10) == [10, 5, 5])
+    }
+
+    @Test("Le plafond réglé est relu, et une valeur inconnue retombe sur 5")
+    func openingsCapSetting() {
+        let key = DailySessionBuilder.openingsCapKey
+        let saved = UserDefaults.standard.object(forKey: key)
+        defer { UserDefaults.standard.set(saved, forKey: key) }
+        UserDefaults.standard.set(3, forKey: key)
+        #expect(DailySessionBuilder.openingsCap == 3)
+        UserDefaults.standard.set(7, forKey: key)
+        #expect(DailySessionBuilder.openingsCap == 5)
+        UserDefaults.standard.removeObject(forKey: key)
+        #expect(DailySessionBuilder.openingsCap == 5)
     }
 
     @Test("Tout est fait quand il n'y a plus rien à revoir et que la finale est ouverte")
