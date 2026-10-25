@@ -1107,7 +1107,7 @@ struct HomeView: View {
                 case .openingTrainSession:
                     OpeningTrainHost(
                         mode: .daily, sessionKey: sessionKey(for: route),
-                        reviewLimit: DailySessionBuilder.openingsCap
+                        reviewLimit: max(1, DailySessionBuilder.openingsCap - TrainingDays.openingsReviewedToday())
                     ) { path.removeLast() }
 
                 case .openingTrainDaily:

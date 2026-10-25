@@ -38,6 +38,7 @@ object TrainingDays {
     private const val FILE = "training_days"
     private const val DAYS = "days"
     private const val ENDGAME = "endgame_day"
+    private const val OPENINGS_DONE = "openings_done"
 
     /** Au-delà, les jours les plus anciens ne changent plus rien à une série. */
     private const val RETAINED = 400
@@ -59,6 +60,22 @@ object TrainingDays {
 
     fun didTrainToday(context: Context, nowMillis: Long = System.currentTimeMillis()): Boolean =
         TrainingStreak.key(nowMillis) in all(context)
+
+    /**
+     * Combien de positions d'ouverture DUES ont été révisées aujourd'hui dans la
+     * séance. C'est ce compteur — et non le nombre de positions encore dues — qui
+     * dit que l'objectif du jour est atteint : avec un plafond, il reste presque
+     * toujours des positions dues après les avoir faites. Pendant d'iOS.
+     */
+    fun openingsReviewedToday(context: Context, nowMillis: Long = System.currentTimeMillis()): Int {
+        val parts = prefs(context).getString(OPENINGS_DONE, "")!!.split(":")
+        return if (parts.size == 2 && parts[0] == TrainingStreak.key(nowMillis)) parts[1].toIntOrNull() ?: 0 else 0
+    }
+
+    fun addOpeningsReviewed(context: Context, n: Int = 1, nowMillis: Long = System.currentTimeMillis()) {
+        val total = openingsReviewedToday(context, nowMillis) + n
+        prefs(context).edit().putString(OPENINGS_DONE, "${TrainingStreak.key(nowMillis)}:$total").apply()
+    }
 
     /** La finale de la séance a-t-elle été ouverte aujourd'hui ? */
     fun endgameOpenedToday(context: Context, nowMillis: Long = System.currentTimeMillis()): Boolean =
@@ -106,9 +123,10 @@ object DailySessionBuilder {
         endgameCourseId: String?, endgameOpenedToday: Boolean,
         streak: Int, trainedToday: Boolean,
         openingsCap: Int = DEFAULT_OPENINGS_CAP,
+        openingsDoneToday: Int = 0,
     ): DailySessionPlan {
         val steps = arrayListOf(
-            DailySessionStep(DailySessionStep.Kind.openings, minOf(openingsCap, maxOf(0, openingsDue))),
+            DailySessionStep(DailySessionStep.Kind.openings, minOf(maxOf(0, openingsCap - openingsDoneToday), maxOf(0, openingsDue))),
             DailySessionStep(DailySessionStep.Kind.missedPuzzles, minOf(PUZZLES_CAP, maxOf(0, missedPuzzles))),
             DailySessionStep(DailySessionStep.Kind.ownPuzzles, minOf(PUZZLES_CAP, maxOf(0, ownPuzzles))),
         )
@@ -145,6 +163,7 @@ object DailySessionBuilder {
             streak = TrainingDays.streak(context, nowMillis),
             trainedToday = TrainingDays.didTrainToday(context, nowMillis),
             openingsCap = com.chesslab.settings.SettingsStore.state.value.dailyOpeningsCap,
+            openingsDoneToday = TrainingDays.openingsReviewedToday(context, nowMillis),
         )
     }
 }

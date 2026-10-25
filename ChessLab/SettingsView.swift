@@ -19,7 +19,6 @@ struct SettingsView: View {
     /// (`cloudKitSyncEnabled`), que ``ChessLabApp`` relit au lancement pour
     /// construire le `ModelContainer` en `.automatic` (iCloud) ou `.none`.
     @AppStorage("cloudKitSyncEnabled") private var cloudSyncEnabled = false
-    @AppStorage(DailySessionBuilder.openingsCapKey) private var dailyOpeningsCap = DailySessionBuilder.defaultOpeningsCap
     /// Horodatage de la dernière vérification/fusion locale (pour l'affichage).
     @AppStorage("openingsLastReconcileAt") private var lastReconcileAt = 0.0
     /// État du compte iCloud (chargé à l'apparition).
@@ -35,7 +34,6 @@ struct SettingsView: View {
                 notationSection
                 puzzleSection
                 analysisSection
-                dailySessionSection
                 feedbackSection
                 syncSection
                 if OpeningsGraphFeature.hasBundledCourses { previewSection }
@@ -397,26 +395,6 @@ struct SettingsView: View {
                 ))
                 .accessibilityIdentifier("auto_analysis_toggle")
                 Text("Après chaque partie contre l'ordinateur, sur l'appareil, en tâche de fond : environ 1 à 3 minutes et un peu de batterie. Interrompu en économie d'énergie ou si l'appareil chauffe.")
-                    .font(.caption)
-                    .foregroundStyle(Theme.textTertiary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .cardStyle()
-        }
-    }
-
-    /// Combien de positions d'ouverture la séance du jour propose au plus.
-    private var dailySessionSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("Séance du jour")
-            VStack(alignment: .leading, spacing: 8) {
-                Picker("Ouvertures par séance", selection: $dailyOpeningsCap) {
-                    ForEach(DailySessionBuilder.openingsCapChoices, id: \.self) { Text("\($0)").tag($0) }
-                }
-                .pickerStyle(.segmented)
-                .accessibilityIdentifier("daily_openings_cap")
-                Text("Au plus ce nombre de positions d'ouverture à revoir par jour ; le reste attend le lendemain.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)

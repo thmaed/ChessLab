@@ -7,6 +7,7 @@ import SwiftUI
 struct DailySessionView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var plan: DailySessionPlan?
+    @AppStorage(DailySessionBuilder.openingsCapKey) private var openingsCap = DailySessionBuilder.defaultOpeningsCap
 
     var onOpenOpenings: () -> Void
     var onOpenPuzzles: (PuzzleSessionFilter) -> Void
@@ -18,6 +19,7 @@ struct DailySessionView: View {
                 if let plan {
                     header(plan)
                     ForEach(plan.steps) { step in stepRow(step, plan: plan) }
+                    capPicker
                 }
             }
             .padding(20)
@@ -35,6 +37,28 @@ struct DailySessionView: View {
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear(perform: reload)
         .accessibilityIdentifier("dailySessionScreen")
+    }
+
+    /// Combien de positions d'ouverture la séance propose au plus par jour.
+    private var capPicker: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Ouvertures par séance")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Theme.textPrimary)
+            Picker("Ouvertures par séance", selection: $openingsCap) {
+                ForEach(DailySessionBuilder.openingsCapChoices, id: \.self) { Text("\($0)").tag($0) }
+            }
+            .pickerStyle(.segmented)
+            .accessibilityIdentifier("daily_openings_cap")
+            .onChange(of: openingsCap) { reload() }
+            Text("Au plus ce nombre de positions d'ouverture à revoir par jour ; le reste attend le lendemain.")
+                .font(.caption)
+                .foregroundStyle(Theme.textTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
     }
 
     private func reload() {

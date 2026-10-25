@@ -77,4 +77,13 @@ class DailySessionTest {
         )
         assertNull(DailySessionBuilder.endgameCourseId(emptyList(), at(24), paris))
     }
+
+    @Test fun `le plafond atteint l'etape des ouvertures est faite meme s'il reste des positions dues`() {
+        fun remaining(done: Int, due: Int) =
+            DailySessionBuilder.plan(due, 0, 0, null, false, 0, false, openingsCap = 5, openingsDoneToday = done).steps.first().remaining
+        assertEquals(5, remaining(0, 12))
+        assertEquals(2, remaining(3, 12))
+        assertEquals(0, remaining(5, 12))
+        assertEquals(1, remaining(2, 1))
+    }
 }

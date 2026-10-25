@@ -59,6 +59,23 @@ enum TrainingDays {
         all(defaults: defaults).contains(TrainingStreak.key(for: now))
     }
 
+    private static let openingsDoneKey = "dailySession.openingsDone"
+
+    /// Combien de positions d'ouverture DUES ont été révisées aujourd'hui dans
+    /// la séance. C'est ce compteur — et non le nombre de positions encore dues —
+    /// qui dit que l'objectif du jour est atteint : avec un plafond, il reste
+    /// presque toujours des positions dues après les avoir faites.
+    static func openingsReviewedToday(now: Date = Date(), defaults: UserDefaults = .standard) -> Int {
+        let parts = (defaults.string(forKey: openingsDoneKey) ?? "").split(separator: ":")
+        guard parts.count == 2, parts[0] == TrainingStreak.key(for: now), let count = Int(parts[1]) else { return 0 }
+        return count
+    }
+
+    static func addOpeningsReviewed(_ n: Int = 1, now: Date = Date(), defaults: UserDefaults = .standard) {
+        let total = openingsReviewedToday(now: now, defaults: defaults) + n
+        defaults.set("\(TrainingStreak.key(for: now)):\(total)", forKey: openingsDoneKey)
+    }
+
     /// La finale de la séance a-t-elle été ouverte aujourd'hui ?
     static func endgameOpenedToday(now: Date = Date(), defaults: UserDefaults = .standard) -> Bool {
         defaults.string(forKey: endgameKey) == TrainingStreak.key(for: now)

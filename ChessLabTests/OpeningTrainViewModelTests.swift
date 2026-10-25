@@ -68,6 +68,40 @@ struct OpeningTrainViewModelTests {
         #expect(model.courseName == "Italienne")
     }
 
+    /// Séance du jour : seules les positions DUES comptent pour le plafond —
+    /// parcourir la ligne jusqu'à la position à revoir ne l'épuise pas.
+    @Test func sessionLimitCountsOnlyDuePositions() throws {
+        let context = try makeContext()
+        let course = OpeningGraphFixtures.linearCourse(id: "c", name: "Italienne", sans: ["e4", "e5", "Nf3", "Nc6", "Bc4"], side: .white)
+        // La position AVANT Bc4 est due ; les deux premières ne le sont pas.
+        var board = Board(position: .standard)
+        for (from, to) in [("e2", "e4"), ("e7", "e5"), ("g1", "f3"), ("b8", "c6")] {
+            _ = board.move(pieceAt: Square(from), to: Square(to))
+        }
+        let dueKey = OpeningFENKey.key(for: board.position)
+        let due = OpeningPositionProgress(fenKey: dueKey)
+        due.reps = 1
+        due.stateRaw = FSRSState.review.rawValue
+        due.dueDate = Date().addingTimeInterval(-3600)
+        context.insert(due)
+        try context.save()
+
+        let before = TrainingDays.openingsReviewedToday()
+        let model = vm(.daily, context, course: course)
+        model.reviewLimit = 1
+
+        model.attemptMove(from: Square("e2"), to: Square("e4"))
+        model.attemptMove(from: Square("g1"), to: Square("f3"))
+        #expect(model.reviewedCount == 2)
+        #expect(model.dueReviewedCount == 0, "deux coups joués, mais aucune position due")
+        #expect(model.phase == .awaiting)
+
+        model.attemptMove(from: Square("f1"), to: Square("c4"))
+        #expect(model.dueReviewedCount == 1)
+        #expect(model.phase == .complete)
+        #expect(TrainingDays.openingsReviewedToday() == before + 1)
+    }
+
     @Test func correctMoveRecordsGoodAndFlows() throws {
         let context = try makeContext()
         let model = vm(.daily, context, course: singleCardCourse())

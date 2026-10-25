@@ -23062,6 +23062,16 @@
           }
         }
       }
+    },
+    "%lld position(s) revue(s) — objectif du jour atteint.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld position(s) reviewed — today's goal reached."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

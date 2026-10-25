@@ -67,6 +67,8 @@ data class TrainUiState(
     val note: String? = null,
     val playedSans: List<String> = emptyList(),
     val reviewed: Int = 0,
+    /** Séance du jour : positions DUES révisées (seules elles comptent pour le plafond). */
+    val dueReviewed: Int = 0,
     val correct: Int = 0,
     /** Positions restant à voir dans la séance, séance comprise. */
     val remaining: Int = 0,
@@ -117,6 +119,8 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
     private val side: String get() = sessionCourses.getOrNull(courseIndex)?.second ?: "white"
 
     private var reviewLimit: Int? = null
+    private var dueKeysAtStart: Set<String> = emptySet()
+    private val countedDueKeys = HashSet<String>()
 
     fun start(mode: TrainMode) {
         this.mode = mode
@@ -124,6 +128,7 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             ui = ui.copy(loading = true)
             val built = withContext(Dispatchers.IO) { buildSession(mode) }
+            countedDueKeys.clear()
             sessionCourses = built.first
             plannedSize = built.second
             courseIndex = 0
@@ -157,6 +162,9 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
         // séance, pas un marathon.
         val progress = kotlinx.coroutines.runBlocking { dao.allProgress() }.associate { it.fenKey to it.snapshot }
         val now = System.currentTimeMillis()
+        dueKeysAtStart = progress.filter { (it.value.dueAt ?: Long.MAX_VALUE) <= now }.keys
+        // En séance du jour : uniquement les positions dues, pas de nouvelles.
+        val newLimit = if (mode is TrainMode.Session) 0 else 20
         val entries = CourseRepository.catalog(assets)
         val loaded = ArrayList<Pair<Course, String>>()
         val cards = ArrayList<TrainCard>()
@@ -165,7 +173,7 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
             val mine = TrainingQueue.trainableCards(c, entry.side)
             val useful = when (mode) {
                 TrainMode.Hardest -> TrainingQueue.hardest(mine, progress)
-                else -> TrainingQueue.daily(mine, progress, now, newLimit = 20)
+                else -> TrainingQueue.daily(mine, progress, now, newLimit = newLimit)
             }
             if (useful.isEmpty()) continue
             loaded += c to entry.side
@@ -174,7 +182,7 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
         }
         val queue = when (mode) {
             TrainMode.Hardest -> TrainingQueue.hardest(cards, progress)
-            else -> TrainingQueue.daily(cards, progress, now, newLimit = 20)
+            else -> TrainingQueue.daily(cards, progress, now, newLimit = newLimit)
         }
         return loaded to queue.size
     }
@@ -215,7 +223,7 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
      */
     private fun advanceTurn() {
         reviewLimit?.let { limit ->
-            if (ui.reviewed >= limit) { ui = ui.copy(phase = TrainPhase.complete, remaining = 0); return }
+            if (ui.dueReviewed >= limit) { ui = ui.copy(phase = TrainPhase.complete, remaining = 0); return }
         }
         if (candidates(currentKey).isEmpty()) { nextCourseOrComplete(); return }
         if (board.position.sideToMove == ui.orientation) {
@@ -402,7 +410,8 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
 
     fun restart() {
         courseIndex = 0
-        ui = ui.copy(reviewed = 0, correct = 0, remaining = plannedSize)
+        countedDueKeys.clear()
+        ui = ui.copy(reviewed = 0, dueReviewed = 0, correct = 0, remaining = plannedSize)
         if (sessionCourses.isEmpty()) ui = ui.copy(phase = TrainPhase.empty) else startCourse()
     }
 
@@ -418,6 +427,10 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
         val key = currentKey
         val now = System.currentTimeMillis()
         com.chesslab.dailysession.TrainingDays.markToday(getApplication())
+        if (reviewLimit != null && key in dueKeysAtStart && countedDueKeys.add(key)) {
+            ui = ui.copy(dueReviewed = ui.dueReviewed + 1)
+            com.chesslab.dailysession.TrainingDays.addOpeningsReviewed(getApplication())
+        }
         viewModelScope.launch(Dispatchers.IO) {
             val existing = dao.progress(key) ?: OpeningProgress(fenKey = key)
             val outcome = fsrs.review(existing.card, effective, now)

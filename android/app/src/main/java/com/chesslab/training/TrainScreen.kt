@@ -141,7 +141,14 @@ fun TrainScreen(
                 TrainPhase.complete -> Panel(Palette.accent) {
                     Text(stringResource(R.string.train_session_done), color = Palette.accent, fontWeight = FontWeight.SemiBold,
                         modifier = Modifier.testTag("seance-terminee"))
-                    Text(
+                    if (mode is TrainMode.Session) {
+                        // En séance du jour, ce qui compte est le nombre de positions à revoir faites.
+                        Text(
+                            stringResource(R.string.train_session_goal, ui.dueReviewed),
+                            fontSize = 13.sp, color = Palette.textSecondary,
+                            modifier = Modifier.testTag("seance-objectif"),
+                        )
+                    } else Text(
                         stringResource(
                             R.string.train_session_score,
                             pluralStringResource(R.plurals.train_correct, ui.correct, ui.correct),

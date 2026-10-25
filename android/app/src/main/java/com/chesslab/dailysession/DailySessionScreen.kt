@@ -29,6 +29,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -151,7 +152,8 @@ fun DailySessionScreen(
         resumes++
         onPauseOrDispose { }
     }
-    LaunchedEffect(resumes) { plan = DailySessionBuilder.load(context) }
+    val cap = com.chesslab.settings.SettingsStore.state.collectAsState().value.dailyOpeningsCap
+    LaunchedEffect(resumes, cap) { plan = DailySessionBuilder.load(context) }
     val current = plan
     Box(Modifier.fillMaxSize()) {
     Column(
@@ -195,6 +197,21 @@ fun DailySessionScreen(
                         }
                     }
                 }
+            }
+            // Combien de positions d'ouverture la séance propose au plus par jour.
+            Column(
+                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Palette.surface).padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Text(stringResource(R.string.settings_daily_openings), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    com.chesslab.settings.SettingsStore.DAILY_OPENINGS_CHOICES.forEach { n ->
+                        com.chesslab.ui.ChipButton(
+                            n.toString(), n == cap, Modifier.testTag("seance-ouvertures-$n"), tint = Palette.warning,
+                        ) { com.chesslab.settings.SettingsStore.setDailyOpeningsCap(context, n) }
+                    }
+                }
+                Text(stringResource(R.string.settings_daily_openings_note), fontSize = 11.sp, color = Palette.textTertiary)
             }
         }
     }

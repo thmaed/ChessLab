@@ -56,10 +56,11 @@ enum DailySessionBuilder {
         openingsDue: Int, missedPuzzles: Int, ownPuzzles: Int,
         endgameCourseID: String?, endgameOpenedToday: Bool,
         streak: Int, trainedToday: Bool,
-        openingsCap: Int = DailySessionBuilder.openingsCap
+        openingsCap: Int = DailySessionBuilder.openingsCap,
+        openingsDoneToday: Int = 0
     ) -> DailySessionPlan {
         var steps = [
-            DailySessionStep(kind: .openings, remaining: min(openingsCap, max(0, openingsDue))),
+            DailySessionStep(kind: .openings, remaining: min(max(0, openingsCap - openingsDoneToday), max(0, openingsDue))),
             DailySessionStep(kind: .missedPuzzles, remaining: min(puzzlesCap, max(0, missedPuzzles))),
             DailySessionStep(kind: .ownPuzzles, remaining: min(puzzlesCap, max(0, ownPuzzles))),
         ]
@@ -92,7 +93,8 @@ enum DailySessionBuilder {
             openingsDue: due, missedPuzzles: missed, ownPuzzles: own,
             endgameCourseID: endgameCourseID(ids: endgames, now: now),
             endgameOpenedToday: TrainingDays.endgameOpenedToday(now: now),
-            streak: TrainingDays.streak(now: now), trainedToday: TrainingDays.didTrainToday(now: now)
+            streak: TrainingDays.streak(now: now), trainedToday: TrainingDays.didTrainToday(now: now),
+            openingsDoneToday: TrainingDays.openingsReviewedToday(now: now)
         )
     }
 }

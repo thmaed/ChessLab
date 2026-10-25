@@ -83,6 +83,30 @@ struct DailySessionTests {
         #expect(DailySessionBuilder.openingsCap == 5)
     }
 
+    @Test("Le plafond atteint, l'étape des ouvertures est faite même s'il reste des positions dues")
+    func openingsStepDoneOnceCapReached() {
+        func remaining(done: Int, due: Int) -> Int {
+            DailySessionBuilder.plan(
+                openingsDue: due, missedPuzzles: 0, ownPuzzles: 0, endgameCourseID: nil,
+                endgameOpenedToday: false, streak: 0, trainedToday: false,
+                openingsCap: 5, openingsDoneToday: done).steps.first!.remaining
+        }
+        #expect(remaining(done: 0, due: 12) == 5)
+        #expect(remaining(done: 3, due: 12) == 2)
+        #expect(remaining(done: 5, due: 12) == 0)
+        #expect(remaining(done: 2, due: 1) == 1)
+    }
+
+    @Test("Le compteur du jour repart de zéro le lendemain")
+    func openingsCounterResetsEachDay() {
+        let defaults = UserDefaults(suiteName: "DailySessionTests.\(UUID().uuidString)")!
+        let monday = Date(timeIntervalSince1970: 1_790_000_000)
+        TrainingDays.addOpeningsReviewed(3, now: monday, defaults: defaults)
+        TrainingDays.addOpeningsReviewed(2, now: monday, defaults: defaults)
+        #expect(TrainingDays.openingsReviewedToday(now: monday, defaults: defaults) == 5)
+        #expect(TrainingDays.openingsReviewedToday(now: monday.addingTimeInterval(86_400 * 2), defaults: defaults) == 0)
+    }
+
     @Test("Tout est fait quand il n'y a plus rien à revoir et que la finale est ouverte")
     func planIsCompleteWhenNothingRemains() {
         let plan = DailySessionBuilder.plan(

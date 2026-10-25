@@ -61,6 +61,12 @@ final class OpeningTrainViewModel {
 
     private(set) var phase: Phase = .awaiting
     private(set) var reviewedCount = 0
+    /// Positions DUES au lancement de la séance, et combien ont été révisées.
+    /// Seules elles comptent pour le plafond de la séance du jour : parcourir une
+    /// ligne jusqu'à la position à revoir ne doit pas épuiser le quota.
+    private var dueKeysAtStart: Set<String> = []
+    private var countedDueKeys: Set<String> = []
+    private(set) var dueReviewedCount = 0
 
     // Variante en attente de choix ; coup correct à rejouer après une erreur.
     private var pendingVariation: (played: MoveEdge, main: MoveEdge)?
@@ -125,6 +131,9 @@ final class OpeningTrainViewModel {
         self.board = Board(position: .standard)
 
         OpeningProgressSync.reconcile(in: context)
+        dueKeysAtStart = Set(Self.snapshots(in: context).compactMap { key, snap in
+            (snap.dueDate ?? .distantFuture) <= now ? key : nil
+        })
         sessionCourses = Self.buildSession(mode: mode, courses: courses, context: context, newLimit: newLimit, now: now)
         if let first = sessionCourses.first {
             startCourse(first)
@@ -209,7 +218,7 @@ final class OpeningTrainViewModel {
     var reviewLimit: Int?
 
     private func advanceTurn() {
-        if let reviewLimit, reviewedCount >= reviewLimit {
+        if let reviewLimit, dueReviewedCount >= reviewLimit {
             phase = .complete
             return
         }
@@ -389,6 +398,8 @@ final class OpeningTrainViewModel {
     func restart() {
         courseIndex = 0
         reviewedCount = 0
+        dueReviewedCount = 0
+        countedDueKeys = []
         if let first = sessionCourses.first {
             startCourse(first)
         } else {
@@ -405,6 +416,10 @@ final class OpeningTrainViewModel {
         if usedHint, effective.rawValue > FSRSRating.hard.rawValue { effective = .hard }
         OpeningProgressStore.recordReview(fenKey: currentKey, rating: effective, in: context)
         TrainingDays.markToday()
+        if reviewLimit != nil, dueKeysAtStart.contains(currentKey), countedDueKeys.insert(currentKey).inserted {
+            dueReviewedCount += 1
+            TrainingDays.addOpeningsReviewed()
+        }
     }
 
     private func arrow(for uci: String) -> HintMove {

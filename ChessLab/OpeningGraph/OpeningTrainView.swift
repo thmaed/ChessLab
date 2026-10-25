@@ -279,8 +279,16 @@ struct OpeningTrainView: View {
         VStack(spacing: 12) {
             Image(systemName: "party.popper").font(.largeTitle).foregroundStyle(Theme.accent)
             Text("Séance terminée !").font(.title3.bold()).foregroundStyle(Theme.textPrimary)
-            Text("\(viewModel.reviewedCount) coup(s) joué(s).")
-                .font(.subheadline).foregroundStyle(Theme.textSecondary)
+            if viewModel.reviewLimit != nil {
+                // En séance du jour, ce qui compte est le nombre de positions à revoir faites.
+                Text("\(viewModel.dueReviewedCount) position(s) revue(s) — objectif du jour atteint.")
+                    .font(.subheadline).foregroundStyle(Theme.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .accessibilityIdentifier("sessionDoneSummary")
+            } else {
+                Text("\(viewModel.reviewedCount) coup(s) joué(s).")
+                    .font(.subheadline).foregroundStyle(Theme.textSecondary)
+            }
             HStack(spacing: 12) {
                 Button { viewModel.restart() } label: {
                     Label("Recommencer", systemImage: "arrow.clockwise")
@@ -350,7 +358,8 @@ struct OpeningTrainHost: View {
         .onAppear {
             if viewModel == nil {
                 viewModel = sessionStore.value(for: sessionKey) {
-                    let model = OpeningTrainViewModel(mode: mode, context: modelContext)
+                    // En séance du jour : uniquement les positions dues, pas de nouvelles.
+                    let model = OpeningTrainViewModel(mode: mode, context: modelContext, newLimit: reviewLimit == nil ? 20 : 0)
                     model.reviewLimit = reviewLimit
                     return model
                 }

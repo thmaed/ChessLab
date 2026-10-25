@@ -40,7 +40,6 @@ import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.Vibration
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Visibility
@@ -204,19 +203,6 @@ fun SettingsScreen(
                 stringResource(R.string.settings_puzzle_attempts_note),
                 fontSize = 11.sp, color = Palette.textTertiary,
             )
-        }
-
-        SettingsSection(stringResource(R.string.daily_title), Icons.Default.LocalFireDepartment) {
-            Text(stringResource(R.string.settings_daily_openings), fontSize = 13.sp, color = Palette.textPrimary)
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                SettingsStore.DAILY_OPENINGS_CHOICES.forEach { n ->
-                    Choice(n.toString(), n == settings.dailyOpeningsCap, "seance-ouvertures-$n") {
-                        SettingsStore.setDailyOpeningsCap(context, n)
-                    }
-                }
-            }
-            Spacer(Modifier.height(6.dp))
-            Text(stringResource(R.string.settings_daily_openings_note), fontSize = 11.sp, color = Palette.textTertiary)
         }
 
         SettingsSection(stringResource(R.string.settings_analysis), Icons.Default.ShowChart) {
