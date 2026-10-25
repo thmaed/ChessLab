@@ -1338,7 +1338,7 @@ struct HomeView: View {
                 ModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", subtitle: "Sur le même appareil", shortSubtitle: "Même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.twoPlayerSetup)
                 }
-                ModeCard(title: "Puzzles", subtitle: "Tactique et bibliothèque Lichess", shortSubtitle: "Tactique et Lichess", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
+                ModeCard(title: "Puzzles", subtitle: "Tactique et problèmes", shortSubtitle: "Tactique et problèmes", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.puzzleQueue)
                 }
                 .discoveryAnchor(.puzzlesTile, priority: 1)

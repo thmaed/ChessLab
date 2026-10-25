@@ -89,8 +89,8 @@
     <string name="home_openings_sub">Apprends et révise</string>
     <string name="home_play_long">Neuf personnages, ou Stockfish</string>
     <string name="home_play_sub">Personnages</string>
-    <string name="home_puzzles_long">Tactique et bibliothèque Lichess</string>
-    <string name="home_puzzles_sub">Tactique et Lichess</string>
+    <string name="home_puzzles_long">Tactique et problèmes</string>
+    <string name="home_puzzles_sub">Tactique et problèmes</string>
     <string name="home_tagline">Jouez, analysez, progressez.</string>
     <string name="home_two_long">Sur le même appareil</string>
     <string name="home_two_sub">Même appareil</string>

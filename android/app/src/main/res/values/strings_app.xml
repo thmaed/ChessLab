@@ -92,8 +92,8 @@
     <string name="home_openings_sub">Learn and review</string>
     <string name="home_play_long">Nine characters, or Stockfish</string>
     <string name="home_play_sub">Characters</string>
-    <string name="home_puzzles_long">Tactics and Lichess library</string>
-    <string name="home_puzzles_sub">Tactics and Lichess</string>
+    <string name="home_puzzles_long">Tactics and problems</string>
+    <string name="home_puzzles_sub">Tactics and problems</string>
     <string name="home_tagline">Play, analyze, improve.</string>
     <string name="home_two_long">On the same device</string>
     <string name="home_two_sub">Same device</string>

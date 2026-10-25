@@ -23092,6 +23092,16 @@
           }
         }
       }
+    },
+    "Tactique et problèmes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tactics and problems"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
