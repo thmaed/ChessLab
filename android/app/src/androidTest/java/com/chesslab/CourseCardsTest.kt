@@ -37,4 +37,19 @@ class CourseCardsTest {
             compose.runOnUiThread { compose.activity.onBackPressedDispatcher.onBackPressed() }
         }
     }
+
+    /** Le filtre « Classiques » ne garde que les ouvertures les plus courantes. */
+    @Test fun leFiltreClassiquesReduitLaListe() {
+        compose.waitUntil(20_000) { compose.onAllNodesWithTag("mode-openings").fetchSemanticsNodes().isNotEmpty() }
+        compose.onNodeWithTag("mode-openings").performScrollTo().performClick()
+        compose.waitUntil(20_000) { compose.onAllNodesWithTag("filtre-classiques").fetchSemanticsNodes().isNotEmpty() }
+        fun total() = compose.onAllNodesWithTag("compte").fetchSemanticsNodes().sumOf {
+            (if (SemanticsProperties.Text in it.config) it.config[SemanticsProperties.Text].joinToString("") else "").trim().toIntOrNull() ?: 0
+        }
+        val all = total()
+        compose.onNodeWithTag("filtre-classiques").performClick()
+        compose.waitForIdle()
+        val classics = total()
+        assertTrue("classiques ($classics) < toutes ($all)", classics in 15..25 && classics < all)
+    }
 }

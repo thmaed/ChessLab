@@ -20,6 +20,31 @@ enum OpeningCatalogFeature {
     /// variantes), ni statistiques de maîtres (une position de finale théorique
     /// n'a jamais été jouée telle quelle en tournoi). L'y faire figurer
     /// donnerait un écran dont les trois quarts diraient « aucune donnée ».
+    /// Les « classiques » : les ouvertures les plus jouées, celles qu'on
+    /// rencontre à tous les niveaux. Liste choisie à la main, identique sur
+    /// Android (`CourseRepository.CLASSIC_IDS`).
+    static let classicIDs: Set<String> = [
+        "italian-game",
+        "ruy-lopez",
+        "scotch-game",
+        "kings-gambit",
+        "london-system",
+        "queens-gambit-declined",
+        "queens-gambit-accepted",
+        "english-opening",
+        "reti-opening",
+        "catalan-opening",
+        "sicilian-najdorf",
+        "sicilian-dragon",
+        "french-defense",
+        "caro-kann",
+        "scandinavian",
+        "petrov-defense",
+        "kings-indian",
+        "nimzo-indian",
+        "slav-defense"
+    ]
+
     static var catalog: [OpeningCatalogEntry] {
         OpeningCatalog.all.filter { !$0.isEndgame }
     }

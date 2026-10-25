@@ -97,6 +97,33 @@ object CourseRepository {
     private const val DIR = "openings"
     private var catalog: List<CatalogEntry>? = null
     private var catalogLanguage: String? = null
+    /**
+     * Les « classiques » : les ouvertures les plus jouées, celles qu'on rencontre
+     * à tous les niveaux. Liste choisie à la main, identique à iOS
+     * (`OpeningCatalogFeature.classicIDs`).
+     */
+    val CLASSIC_IDS: Set<String> = setOf(
+        "italian-game",
+        "ruy-lopez",
+        "scotch-game",
+        "kings-gambit",
+        "london-system",
+        "queens-gambit-declined",
+        "queens-gambit-accepted",
+        "english-opening",
+        "reti-opening",
+        "catalan-opening",
+        "sicilian-najdorf",
+        "sicilian-dragon",
+        "french-defense",
+        "caro-kann",
+        "scandinavian",
+        "petrov-defense",
+        "kings-indian",
+        "nimzo-indian",
+        "slav-defense",
+    )
+
     private val cache = LinkedHashMap<String, Course>()
 
     /**

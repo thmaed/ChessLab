@@ -265,6 +265,18 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [x] Correctifs trouvés par les suites complètes : relecture des métriques de
       partie (phases vides), cache des cours Android (accès concurrent).
 
+### Filtre « Classiques » des Ouvertures — 25/10/2026
+
+- [x] Une puce **« Classiques »** à côté de Club et Avancé : les 19 ouvertures
+      les plus jouées (Italienne, Espagnole, Écossaise, Gambit du Roi, London,
+      Gambit-Dame accepté et refusé, Anglaise, Réti, Catalane, Najdorf, Dragon,
+      Française, Caro-Kann, Scandinave, Petrov, Est-Indienne, Nimzo-Indienne,
+      Slave). Liste identique : `OpeningCatalogFeature.classicIDs` (iOS) et
+      `CourseRepository.CLASSIC_IDS` (Android). Se combine avec le camp et le
+      niveau ; les répertoires importés y échappent. Absente pour les finales.
+- [x] Tests : `ClassicOpeningsTests`, `OpeningsModuleUITests` (iOS),
+      `CourseCardsTest` (Galaxy A16).
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

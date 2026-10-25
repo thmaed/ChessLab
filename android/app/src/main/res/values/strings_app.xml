@@ -1220,4 +1220,5 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="settings_daily_openings_note">At most this many opening positions to review per day; the rest waits until tomorrow.</string>
     <string name="setup_time_limit">Time limit</string>
     <string name="train_session_goal">%1$d position(s) reviewed — today\'s goal reached.</string>
+    <string name="filter_classics">Classics</string>
 </resources>

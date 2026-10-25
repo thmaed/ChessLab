@@ -66,6 +66,23 @@ final class OpeningsModuleUITests: XCTestCase {
                       "aucun point d'entrée vers les Ouvertures")
     }
 
+    /// Le filtre « Classiques » ne garde que les ouvertures les plus courantes.
+    func testTheClassicsFilterKeepsOnlyCommonOpenings() {
+        let app = launchWithLabs()
+        XCTAssertTrue(openLabs(app))
+        let chip = app.buttons["filter_classics"]
+        XCTAssertTrue(chip.waitForExistence(timeout: 10))
+        chip.tap()
+        // La liste est paresseuse : on la parcourt en entier avant de conclure.
+        var sawItalian = false
+        for _ in 0..<10 {
+            if app.buttons["opening_italian-game"].exists { sawItalian = true }
+            XCTAssertFalse(app.buttons["opening_stafford-gambit"].exists, "Hors classiques")
+            app.swipeUp()
+        }
+        XCTAssertTrue(sawItalian, "L'Italienne est un classique")
+    }
+
     /// Le parcours du prompt : choisir une ouverture, arriver sur l'index des
     /// lignes, taper un coup au milieu d'une variante, atterrir dessus.
     func testJumpingFromTheLineIndexLandsOnThePosition() {

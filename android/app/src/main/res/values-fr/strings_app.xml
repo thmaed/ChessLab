@@ -1217,4 +1217,5 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="settings_daily_openings_note">Au plus ce nombre de positions d\'ouverture à revoir par jour ; le reste attend le lendemain.</string>
     <string name="setup_time_limit">Limite de temps</string>
     <string name="train_session_goal">%1$d position(s) revue(s) — objectif du jour atteint.</string>
+    <string name="filter_classics">Classiques</string>
 </resources>

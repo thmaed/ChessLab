@@ -92,6 +92,7 @@ fun CourseListScreen(
     var query by remember { mutableStateOf("") }
     var sideFilter by remember { mutableStateOf<String?>(null) }
     var levelFilter by remember { mutableStateOf<String?>(null) }
+    var classicsOnly by remember { mutableStateOf(false) }
     var due by remember { mutableStateOf(0) }
     var hard by remember { mutableStateOf(0) }
     // C5 : vignette et maîtrise de chaque cours, lues hors du dessin.
@@ -132,7 +133,8 @@ fun CourseListScreen(
             // Les répertoires IMPORTÉS échappent au filtre de niveau : ils n'en
             // portent pas de significatif, et ce que l'utilisateur a apporté
             // ne doit pas disparaître derrière un filtre qu'il n'a pas renseigné.
-            (levelFilter == null || entry.level == levelFilter || UserOpeningStore.isUserCourse(entry.id))
+            (levelFilter == null || entry.level == levelFilter || UserOpeningStore.isUserCourse(entry.id)) &&
+            (!classicsOnly || entry.id in CourseRepository.CLASSIC_IDS || UserOpeningStore.isUserCourse(entry.id))
     }
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -176,7 +178,9 @@ fun CourseListScreen(
             item(key = "filtres") {
                 FilterBar(
                     tint, sideFilter, levelFilter,
-                    onAll = { sideFilter = null; levelFilter = null },
+                    classics = if (endgames) null else classicsOnly,
+                    onClassics = { classicsOnly = !classicsOnly },
+                    onAll = { sideFilter = null; levelFilter = null; classicsOnly = false },
                     onSide = { sideFilter = if (sideFilter == it) null else it },
                     onLevel = { levelFilter = if (levelFilter == it) null else it },
                 )
@@ -302,6 +306,8 @@ private fun FilterBar(
     tint: Color,
     side: String?,
     level: String?,
+    classics: Boolean?,
+    onClassics: () -> Unit,
     onAll: () -> Unit,
     onSide: (String) -> Unit,
     onLevel: (String) -> Unit,
@@ -310,7 +316,8 @@ private fun FilterBar(
         Modifier.horizontalScroll(rememberScrollState()),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        FilterChip(stringResource(R.string.filter_all), side == null && level == null, tint, "filtre-tous", onAll)
+        FilterChip(stringResource(R.string.filter_all), side == null && level == null && classics != true, tint, "filtre-tous", onAll)
+        if (classics != null) FilterChip(stringResource(R.string.filter_classics), classics, Palette.violet, "filtre-classiques", onClassics)
         GlyphFilterChip("♙", side == "white", tint, "filtre-blancs") { onSide("white") }
         GlyphFilterChip("♟", side == "black", tint, "filtre-noirs") { onSide("black") }
         FilterChip(stringResource(R.string.level_club), level == "club", Palette.accent, "filtre-club") { onLevel("club") }

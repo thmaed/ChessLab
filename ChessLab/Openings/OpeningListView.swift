@@ -22,6 +22,7 @@ struct OpeningListView: View {
     @State private var search = ""
     @State private var sideFilter: OpeningSide?
     @State private var levelFilter: OpeningLevel?
+    @State private var classicsOnly = false
     @State private var showImport = false
     @State private var appSettings = AppSettings.shared
     /// Observé : la liste se rafraîchit d'elle-même après un import.
@@ -57,6 +58,7 @@ struct OpeningListView: View {
             // défaut), et ce que l'utilisateur a apporté lui-même ne doit pas
             // disparaître derrière un filtre qu'il n'a pas renseigné.
             .filter { levelFilter == nil || $0.level == levelFilter || UserOpeningStore.isUserCourse(id: $0.id) }
+            .filter { !classicsOnly || OpeningCatalogFeature.classicIDs.contains($0.id) || UserOpeningStore.isUserCourse(id: $0.id) }
             .filter { matches($0, query: search) }
     }
 
@@ -191,10 +193,15 @@ struct OpeningListView: View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 FilterChip(label: "Tous", tint: Theme.warning,
-                           isSelected: sideFilter == nil && levelFilter == nil) {
+                           isSelected: sideFilter == nil && levelFilter == nil && !classicsOnly) {
                     sideFilter = nil
                     levelFilter = nil
+                    classicsOnly = false
                 }
+                FilterChip(label: "Classiques", tint: Theme.violet, isSelected: classicsOnly) {
+                    classicsOnly.toggle()
+                }
+                .accessibilityIdentifier("filter_classics")
                 PieceFilterChip(glyph: "♙", isSelected: sideFilter == .white,
                                 accessibilityLabel: "Répertoire blanc") {
                     sideFilter = sideFilter == .white ? nil : .white
