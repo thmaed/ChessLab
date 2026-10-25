@@ -452,6 +452,9 @@ private struct WoodpeckerCycleSummary: View {
                 Text(LocalizationController.string("Cycle %lld : ", previous.number) + line(for: previous))
                     .font(.caption.monospacedDigit())
                     .foregroundStyle(Theme.textSecondary)
+                if let comparison = plan.cycleComparison {
+                    comparisonBars(comparison, previous: previous.number, current: cycle.number)
+                }
             }
             if let target = plan.nextCycleTargetSeconds {
                 Text(LocalizationController.string("Objectif du cycle suivant : moins de %@", WoodpeckerPlan.formatDuration(target)))
@@ -462,6 +465,34 @@ private struct WoodpeckerCycleSummary: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("woodpeckerCycleSummary")
+    }
+
+    private func comparisonBars(_ c: CycleComparison, previous: Int, current: Int) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            bar(LocalizationController.string("Trouvés"), c.previousScore, c.currentScore, tint: Theme.accent, previous: previous, current: current)
+            bar(LocalizationController.string("Temps"), c.previousTime, c.currentTime, tint: Theme.info, previous: previous, current: current)
+            if c.isProgress {
+                Label(LocalizationController.string("Plus rapide de %@ — bien joué", WoodpeckerPlan.formatDuration(c.secondsSaved)), systemImage: "medal.fill")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.warning)
+                    .accessibilityIdentifier("woodpeckerCycleProgress")
+            }
+        }
+        .accessibilityIdentifier("woodpeckerCycleBars")
+    }
+
+    private func bar(_ title: String, _ before: Double, _ after: Double, tint: Color, previous: Int, current: Int) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title).font(.caption2.weight(.semibold)).foregroundStyle(Theme.textTertiary)
+            GeometryReader { geo in
+                VStack(alignment: .leading, spacing: 3) {
+                    Capsule().fill(tint.opacity(0.35)).frame(width: max(4, geo.size.width * before), height: 6)
+                    Capsule().fill(tint).frame(width: max(4, geo.size.width * after), height: 6)
+                }
+            }
+            .frame(height: 15)
+        }
+        .accessibilityHidden(true)
     }
 
     private func line(for cycle: WoodpeckerPlan.Cycle) -> String {

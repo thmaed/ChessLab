@@ -3,6 +3,7 @@ package com.chesslab.dailysession
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.Verified
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +49,7 @@ import com.chesslab.R
 import com.chesslab.courses.CourseRepository
 import com.chesslab.puzzles.PuzzleFilter
 import com.chesslab.puzzles.PuzzleSource
+import com.chesslab.ui.CelebrationOverlay
 import com.chesslab.ui.ControlShape
 import com.chesslab.ui.Palette
 import com.chesslab.ui.tintedCardBorder
@@ -56,6 +59,18 @@ import com.chesslab.ui.tintedCardBorder
 private fun streakText(days: Int): String =
     if (days == 0) stringResource(R.string.daily_streak_none)
     else pluralStringResource(R.plurals.daily_streak_days, days, days)
+
+/** « Médaille d'argent · prochaine à 30 jours », ou la première à gagner. */
+@Composable
+private fun medalCaption(streak: Int): String? {
+    val medal = StreakMedal.earned(streak)
+    val next = StreakMedal.next(streak)
+    return when {
+        medal == null -> next?.let { stringResource(R.string.medal_first, it.days) }
+        next == null -> stringResource(medal.nameRes)
+        else -> stringResource(R.string.medal_caption, stringResource(medal.nameRes), next.days)
+    }
+}
 
 private data class StepStyle(val icon: ImageVector, val tint: Color)
 
@@ -97,8 +112,10 @@ fun DailySessionCard(onOpen: () -> Unit) {
             )
         }
         plan?.streak?.takeIf { it > 0 }?.let { streak ->
-            Icon(Icons.Default.LocalFireDepartment, null, tint = tint, modifier = Modifier.size(18.dp))
-            Text("$streak", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = tint, modifier = Modifier.padding(start = 2.dp, end = 8.dp))
+            val medal = StreakMedal.earned(streak)
+            val badgeTint = medal?.color ?: tint
+            Icon(if (medal == null) Icons.Default.LocalFireDepartment else Icons.Default.WorkspacePremium, null, tint = badgeTint, modifier = Modifier.size(18.dp))
+            Text("$streak", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = badgeTint, modifier = Modifier.padding(start = 2.dp, end = 8.dp))
         }
         Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, null, tint = Palette.textTertiary)
     }
@@ -136,6 +153,7 @@ fun DailySessionScreen(
     }
     LaunchedEffect(resumes) { plan = DailySessionBuilder.load(context) }
     val current = plan
+    Box(Modifier.fillMaxSize()) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp).testTag("ecran-seance"),
         verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -156,6 +174,13 @@ fun DailySessionScreen(
                         fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary,
                     )
                     Text(streakText(current.streak), fontSize = 13.sp, color = Palette.textSecondary, modifier = Modifier.testTag("seance-serie"))
+                    medalCaption(current.streak)?.let { caption ->
+                        val medal = StreakMedal.earned(current.streak)
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.testTag("seance-medaille")) {
+                            Icon(Icons.Default.WorkspacePremium, null, tint = medal?.color ?: Palette.textTertiary, modifier = Modifier.size(14.dp))
+                            Text(caption, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = medal?.color ?: Palette.textTertiary, modifier = Modifier.padding(start = 4.dp))
+                        }
+                    }
                 }
             }
             current.steps.forEach { step ->
@@ -172,6 +197,9 @@ fun DailySessionScreen(
                 }
             }
         }
+    }
+    // Un palier de série franchi et la séance finie : on le fête.
+    if (current != null && current.isComplete && StreakMedal.isMilestone(current.streak)) CelebrationOverlay(Modifier.fillMaxSize())
     }
 }
 

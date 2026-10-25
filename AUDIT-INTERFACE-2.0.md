@@ -110,3 +110,6 @@ d'action plein en bas (C4).
 - **C4 fait** (iOS : `PrimaryActionBar`, bouton plein teinté en bas des écrans de réglage ; Android : `tintedActionGradient`) ; suites d'interface vertes.
 - **À venir** : C7 (accueil personnalisé avec
   la « Séance du jour », lié à A5).
+- **C5, C6 faits** (iOS + Android), **C8 en partie** (25/10) : médailles de série
+  et comparaison des cycles Woodpecker ; le récapitulatif de fin de partie reste
+  à décider (voir `android/PARITE.md`).

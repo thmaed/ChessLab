@@ -76,6 +76,14 @@ data class WoodpeckerPlan(
 
     val previousCycle: Cycle? get() = if (cycles.size >= 2) cycles[cycles.size - 2] else null
 
+    /** C8 : les deux cycles à comparer en barres. `null` sans cycle précédent bouclé. */
+    val cycleComparison: CycleComparison?
+        get() {
+            val previous = previousCycle ?: return null
+            if (!currentCycle.isComplete || !previous.isComplete) return null
+            return CycleComparison.of(previous, currentCycle)
+        }
+
     /** Enregistre la réponse au puzzle courant ; sans effet sur un cycle fini. */
     fun record(solved: Boolean, seconds: Double, now: Long = System.currentTimeMillis()): WoodpeckerPlan {
         if (currentCycle.isComplete) return this
@@ -213,4 +221,34 @@ interface WoodpeckerDao {
 
     @Query("DELETE FROM woodpecker_programs")
     suspend fun clear()
+}
+
+/**
+ * C8 : comparaison de deux cycles bouclés. Pendant de `CycleComparison` (iOS) —
+ * mêmes chiffres, même règle de progrès.
+ */
+data class CycleComparison(
+    val previousScore: Double,
+    val currentScore: Double,
+    /** Temps ramenés à 0..1 par le plus long des deux. */
+    val previousTime: Double,
+    val currentTime: Double,
+    /** Secondes gagnées (positif) ou perdues (négatif) sur le cycle d'avant. */
+    val secondsSaved: Double,
+) {
+    /** Vrai quand le nouveau cycle est à la fois plus rapide et au moins aussi juste. */
+    val isProgress: Boolean get() = secondsSaved > 0 && currentScore >= previousScore
+
+    companion object {
+        fun of(previous: WoodpeckerPlan.Cycle, current: WoodpeckerPlan.Cycle): CycleComparison {
+            val longest = maxOf(1.0, previous.activeSeconds, current.activeSeconds)
+            return CycleComparison(
+                previousScore = previous.solvedCount.toDouble() / maxOf(1, previous.order.size),
+                currentScore = current.solvedCount.toDouble() / maxOf(1, current.order.size),
+                previousTime = previous.activeSeconds / longest,
+                currentTime = current.activeSeconds / longest,
+                secondsSaved = previous.activeSeconds - current.activeSeconds,
+            )
+        }
+    }
 }

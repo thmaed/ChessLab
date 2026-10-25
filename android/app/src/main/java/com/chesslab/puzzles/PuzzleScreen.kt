@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.WorkspacePremium
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.*
@@ -602,6 +603,7 @@ private fun WoodpeckerCycleSummary(plan: WoodpeckerPlan) {
                 ),
                 fontSize = 12.sp, color = Palette.textSecondary,
             )
+            plan.cycleComparison?.let { CycleBars(it) }
         }
         plan.nextCycleTargetSeconds?.let { target ->
             Text(
@@ -609,6 +611,34 @@ private fun WoodpeckerCycleSummary(plan: WoodpeckerPlan) {
                 fontSize = 12.sp, color = Palette.textTertiary,
             )
         }
+    }
+}
+
+/** C8 : l'ancien cycle (pâle) contre le nouveau, en barres — trouvés, puis temps. */
+@Composable
+private fun CycleBars(c: CycleComparison) {
+    Column(Modifier.testTag("woodpecker-barres"), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        CycleBar(stringResource(R.string.woodpecker_bar_solved), c.previousScore, c.currentScore, Palette.accent)
+        CycleBar(stringResource(R.string.woodpecker_bar_time), c.previousTime, c.currentTime, Palette.info)
+        if (c.isProgress) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.testTag("woodpecker-progres")) {
+                Icon(Icons.Default.WorkspacePremium, null, tint = Palette.warning, modifier = Modifier.size(14.dp))
+                Text(
+                    stringResource(R.string.woodpecker_faster, WoodpeckerPlan.formatDuration(c.secondsSaved)),
+                    fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.warning,
+                    modifier = Modifier.padding(start = 4.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CycleBar(title: String, before: Double, after: Double, tint: Color) {
+    Column(verticalArrangement = Arrangement.spacedBy(3.dp)) {
+        Text(title, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Palette.textTertiary)
+        Box(Modifier.fillMaxWidth(before.toFloat().coerceIn(0.02f, 1f)).height(6.dp).clip(CircleShape).background(tint.copy(alpha = 0.35f)))
+        Box(Modifier.fillMaxWidth(after.toFloat().coerceIn(0.02f, 1f)).height(6.dp).clip(CircleShape).background(tint))
     }
 }
 

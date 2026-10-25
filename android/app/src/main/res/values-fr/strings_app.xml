@@ -1202,4 +1202,14 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="entry_last_accuracy">Précision %1$d %%</string>
     <string name="entry_last_analyze">Analyser</string>
     <string name="entry_last_mates">Mats manqués</string>
+    <string name="medal_bronze">Médaille de bronze</string>
+    <string name="medal_silver">Médaille d\'argent</string>
+    <string name="medal_gold">Médaille d\'or</string>
+    <string name="medal_platinum">Médaille de platine</string>
+    <string name="medal_diamond">Médaille de diamant</string>
+    <string name="medal_first">Première médaille à %1$d jours</string>
+    <string name="medal_caption">%1$s · prochaine à %2$d jours</string>
+    <string name="woodpecker_bar_solved">Trouvés</string>
+    <string name="woodpecker_bar_time">Temps</string>
+    <string name="woodpecker_faster">Plus rapide de %1$s — bien joué</string>
 </resources>

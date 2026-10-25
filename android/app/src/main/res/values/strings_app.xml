@@ -1205,4 +1205,14 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="entry_last_accuracy">Accuracy %1$d%%</string>
     <string name="entry_last_analyze">Analyze</string>
     <string name="entry_last_mates">Missed mates</string>
+    <string name="medal_bronze">Bronze medal</string>
+    <string name="medal_silver">Silver medal</string>
+    <string name="medal_gold">Gold medal</string>
+    <string name="medal_platinum">Platinum medal</string>
+    <string name="medal_diamond">Diamond medal</string>
+    <string name="medal_first">First medal at %1$d days</string>
+    <string name="medal_caption">%1$s · next at %2$d days</string>
+    <string name="woodpecker_bar_solved">Solved</string>
+    <string name="woodpecker_bar_time">Time</string>
+    <string name="woodpecker_faster">%1$s faster — well done</string>
 </resources>

@@ -230,6 +230,24 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
       `LibraryScreenTest`, `AnalysisReviewTest`, `ScannerFlowUITests` verts.
 - [ ] Aspect Android non vu à l'écran (seul le comportement est testé).
 
+### C8 de la 2.0 — médailles de série et comparaison Woodpecker — 25/10/2026
+
+- [x] **Médailles de série** (3 bronze, 7 argent, 30 or, 100 platine, 365
+      diamant) : sous la série dans la Séance du jour, en pastille colorée sur
+      la carte d'accueil, confettis le jour où un palier est franchi et la
+      séance terminée. `StreakMedal` des deux côtés, mêmes paliers et teintes.
+- [x] **Bilan de cycle Woodpecker** : barres « Trouvés » et « Temps » (ancien
+      cycle pâle contre le nouveau) et mention « Plus rapide de … » quand le
+      cycle est à la fois plus rapide et au moins aussi juste. `CycleComparison`.
+- [x] Tests : `StreakMedalTests` / `StreakMedalTest` (JVM), `DailySessionTest`
+      et `PuzzleDeviceFlowTest` (Galaxy A16), `WoodpeckerUITests` et
+      `DailySessionUITests` (iOS) verts.
+- [ ] **Non fait : récapitulatif visuel de fin de partie** (courbe d'évaluation,
+      coups clés). Le moteur est tenu par l'écran de jeu : l'analyse n'existe
+      qu'après la sortie, la courbe est déjà dans l'écran Analyser. Un bilan
+      sans moteur (courbe de matériel) reste possible, à décider.
+- [ ] Aspect Android non vu à l'écran.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

@@ -25,6 +25,10 @@ struct DailySessionView: View {
             .frame(maxWidth: .infinity, alignment: .center)
         }
         .appBackground()
+        .overlay {
+            // Un palier de série franchi et la séance finie : on le fête.
+            if let plan, plan.isComplete, StreakMedal.isMilestone(plan.streak) { CelebrationView() }
+        }
         .navigationTitle("Séance du jour")
         .navigationBarTitleDisplayMode(.large)
         .toolbarBackground(Theme.background, for: .navigationBar)
@@ -51,6 +55,12 @@ struct DailySessionView: View {
                     .font(.subheadline)
                     .foregroundStyle(Theme.textSecondary)
                     .accessibilityIdentifier("dailySessionStreak")
+                if let caption = StreakMedal.caption(forStreak: plan.streak) {
+                    Label(caption, systemImage: "medal.fill")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(StreakMedal.earned(forStreak: plan.streak)?.color ?? Theme.textTertiary)
+                        .accessibilityIdentifier("dailySessionMedal")
+                }
             }
             Spacer()
         }
@@ -176,9 +186,9 @@ struct DailySessionCard: View {
                 }
                 Spacer()
                 if let streak = plan?.streak, streak > 0 {
-                    Label("\(streak)", systemImage: "flame.fill")
+                    Label("\(streak)", systemImage: StreakMedal.earned(forStreak: streak) == nil ? "flame.fill" : "medal.fill")
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(Theme.warning)
+                        .foregroundStyle(StreakMedal.earned(forStreak: streak)?.color ?? Theme.warning)
                         .accessibilityLabel(DailySessionView.streakText(streak))
                 }
                 Image(systemName: "chevron.right")

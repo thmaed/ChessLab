@@ -118,6 +118,14 @@ struct WoodpeckerPlan: Codable, Equatable {
             : String(format: "%d:%02d", minutes, secs)
     }
 
+    /// Les deux cycles à comparer en barres (C8) : la part de puzzles trouvés
+    /// et le temps, l'ancien cycle contre le nouveau. Barres de temps ramenées
+    /// au plus long des deux. `nil` sans cycle précédent.
+    var cycleComparison: CycleComparison? {
+        guard let previous = previousCycle, currentCycle.isComplete, previous.isComplete else { return nil }
+        return CycleComparison(previous: previous, current: currentCycle)
+    }
+
     /// L'objectif classique de la méthode : boucler le cycle suivant en la
     /// moitié du temps du précédent. `nil` tant qu'aucun cycle n'est fini.
     var nextCycleTargetSeconds: Double? {
@@ -176,4 +184,29 @@ final class WoodpeckerProgram {
             updatedAt = Date()
         }
     }
+}
+
+
+/// Comparaison de deux cycles bouclés : mêmes chiffres, mêmes seuils sur
+/// Android (`CycleComparison` dans `WoodpeckerPlan.kt`).
+struct CycleComparison: Equatable {
+    let previousScore: Double
+    let currentScore: Double
+    /// Temps ramenés à 0...1 par le plus long des deux.
+    let previousTime: Double
+    let currentTime: Double
+    /// Secondes gagnées (positif) ou perdues (négatif) sur le cycle d'avant.
+    let secondsSaved: Double
+
+    init(previous: WoodpeckerPlan.Cycle, current: WoodpeckerPlan.Cycle) {
+        previousScore = Double(previous.solvedCount) / Double(max(1, previous.order.count))
+        currentScore = Double(current.solvedCount) / Double(max(1, current.order.count))
+        let longest = max(1, previous.activeSeconds, current.activeSeconds)
+        previousTime = previous.activeSeconds / longest
+        currentTime = current.activeSeconds / longest
+        secondsSaved = previous.activeSeconds - current.activeSeconds
+    }
+
+    /// Vrai quand le nouveau cycle est à la fois plus rapide et au moins aussi juste.
+    var isProgress: Bool { secondsSaved > 0 && currentScore >= previousScore }
 }

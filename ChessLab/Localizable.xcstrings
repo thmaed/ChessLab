@@ -22922,6 +22922,106 @@
           }
         }
       }
+    },
+    "Médaille de bronze": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bronze medal"
+          }
+        }
+      }
+    },
+    "Médaille d'argent": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Silver medal"
+          }
+        }
+      }
+    },
+    "Médaille d'or": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gold medal"
+          }
+        }
+      }
+    },
+    "Médaille de platine": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Platinum medal"
+          }
+        }
+      }
+    },
+    "Médaille de diamant": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diamond medal"
+          }
+        }
+      }
+    },
+    "Trouvés": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solved"
+          }
+        }
+      }
+    },
+    "Temps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time"
+          }
+        }
+      }
+    },
+    "Plus rapide de %@ — bien joué": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ faster — well done"
+          }
+        }
+      }
+    },
+    "Première médaille à %lld jours": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First medal at %lld days"
+          }
+        }
+      }
+    },
+    "prochaine à %lld jours": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "next at %lld days"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
