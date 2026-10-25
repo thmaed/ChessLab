@@ -304,8 +304,9 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
       vient de finir rejoint la file si on accepte. Texte du réglage reformulé.
 - [x] Tests : `DiscoveryTourStepsTests`, `DiscoveryTourUITests`,
       `GameOverMaterialCurveUITests` (iOS) ; `DiscoveryTourTest` (JVM et Galaxy A16).
-- [ ] Numéro de version (1.10 ou 2.0, build ≥ 18) non encore posé : la carte « Nouveautés de la
-      version … » de l'aide iOS affiche la version du bundle.
+- [x] **Version 2.0** posée le 25/10/2026 : iOS `MARKETING_VERSION` 2.0, build 18 (la 1.9.2 build 17 est
+      soumise) ; Android `versionName` « 2.0 » (le `versionCode` s'incrémente seul, prochain : voir
+      `version.properties`). Le correctif tactile iOS 18 de la 1.9.2 est déjà dans `main` (commit c093460).
 
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
