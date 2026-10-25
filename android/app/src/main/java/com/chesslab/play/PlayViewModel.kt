@@ -28,6 +28,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlinx.coroutines.withContext
 import com.chesslab.R
+import com.chesslab.analysis.CurvePoint
 import com.chesslab.ui.HintArrowBuilder
 import com.chesslab.ui.q
 import com.chesslab.ui.s
@@ -1264,6 +1265,19 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      * du standard, donc les joueurs, la date et le résultat (« * » tant que la
      * partie court). Le PGN nu de `recorder.pgn` ne portait que les coups.
      */
+    /**
+     * C8 : le matériel au fil de la partie (Blancs moins Noirs, en pions), un
+     * point par demi-coup. Bilan de fin de partie SANS moteur. Pendant de
+     * `materialCurvePoints` (iOS).
+     */
+    fun materialCurve(): List<CurvePoint> = history.mapIndexed { ply, position ->
+        CurvePoint(
+            ply,
+            position.pieces.sumOf { (if (it.color == Piece.Color.white) 1 else -1) * CapturedMaterial.value(it.kind) }.toDouble(),
+            null,
+        )
+    }
+
     fun currentPgn(): String = recorder.pgn(
         PgnExport.Metadata.vsEngine(getApplication(), humanColor, opponentName(), recorder.finalResult)
     )

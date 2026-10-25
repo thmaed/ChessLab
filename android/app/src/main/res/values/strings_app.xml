@@ -1215,4 +1215,5 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="woodpecker_bar_solved">Solved</string>
     <string name="woodpecker_bar_time">Time</string>
     <string name="woodpecker_faster">%1$s faster — well done</string>
+    <string name="play_material_curve">Material over the game</string>
 </resources>

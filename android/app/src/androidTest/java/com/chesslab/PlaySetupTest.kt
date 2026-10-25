@@ -176,5 +176,47 @@ class PlaySetupTest {
 
         awaitTag("mats-manques-resultat", 120_000)
     }
-}
 
+    /** C8 : après quatre demi-coups et un abandon, la fin de partie montre la courbe du matériel. */
+    @Test fun laFinDePartieMontreLaCourbeDuMateriel() {
+        openSetup()
+        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
+        compose.onNodeWithTag("commencer").performClick()
+        compose.waitUntil(120_000) {
+            compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+        // Le moteur répond : le statut quitte « À vous de jouer » puis y revient.
+        runCatching {
+            compose.waitUntil(10_000) {
+                compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isEmpty()
+            }
+        }
+        compose.waitUntil(120_000) {
+            compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        // Laisse le moteur finir de répondre : un clic trop tôt est ignoré.
+        Thread.sleep(4_000)
+        compose.waitForIdle()
+        compose.onNodeWithTag("case-d2").performClick()
+        compose.onNodeWithTag("case-d4").performClick()
+        // Le moteur répond : le statut quitte « À vous de jouer » puis y revient.
+        runCatching {
+            compose.waitUntil(10_000) {
+                compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isEmpty()
+            }
+        }
+        compose.waitUntil(120_000) {
+            compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.waitUntil(60_000) {
+            compose.onAllNodes(hasTestTag("abandonner") and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithTag("abandonner").performClick()
+        awaitTag("abandonner-oui")
+        compose.onNodeWithTag("abandonner-oui").performClick()
+        awaitTag("courbe-materiel")
+        compose.onNodeWithTag("courbe-materiel").assertIsDisplayed()
+    }
+}

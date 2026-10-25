@@ -603,6 +603,19 @@ struct PlayView: View {
                     Spacer(minLength: 0)
                 }
 
+                if viewModel.sanMoveList.count >= 3 {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Matériel au fil de la partie")
+                            .font(.caption2.weight(.semibold))
+                            .foregroundStyle(Theme.textTertiary)
+                        EvalCurveView(points: viewModel.materialCurvePoints, currentPly: nil, onSelect: { _ in }, height: 48)
+                            .allowsHitTesting(false)
+                    }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(Text("Matériel au fil de la partie"))
+                    .accessibilityIdentifier("gameOverMaterialCurve")
+                }
+
                 HStack(spacing: 10) {
                     panelButton("Accueil", icon: "house.fill") { onExit() }
                     // Le PGN D'EXPORT et non `game.pgn` brut : ChessKit n'émet

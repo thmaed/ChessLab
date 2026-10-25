@@ -1346,7 +1346,7 @@ final class PlayViewModel {
     /// l'historique dont Maia a besoin (voir ``MaiaEncoder``). Rejoué depuis
     /// `moveLog` à chaque coup : quelques dizaines de microsecondes, et aucun
     /// état de plus à tenir synchronisé.
-    private func recentPositions() -> [Position] {
+    func recentPositions() -> [Position] {
         var replay = Board(position: settings.startingPosition)
         var positions = [replay.position]
         for move in moveLog {
@@ -2029,5 +2029,17 @@ final class PlayViewModel {
 
     var sanMoveList: [String] {
         moveLog.map(\.san)
+    }
+
+    /// C8 : le matériel au fil de la partie (Blancs moins Noirs, en pions),
+    /// un point par demi-coup. Bilan de fin de partie SANS moteur : celui-ci
+    /// reste tenu par l'écran de jeu, la précision vient avec l'analyse.
+    var materialCurvePoints: [EvalCurvePoint<Int>] {
+        recentPositions().enumerated().map { ply, position in
+            let diff = position.pieces.reduce(0) { sum, piece in
+                piece.kind == .king ? sum : sum + (piece.color == .white ? 1 : -1) * pieceValue(piece.kind)
+            }
+            return EvalCurvePoint(id: ply, ply: ply, pawns: Double(diff))
+        }
     }
 }

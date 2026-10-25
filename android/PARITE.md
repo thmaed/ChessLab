@@ -242,10 +242,10 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [x] Tests : `StreakMedalTests` / `StreakMedalTest` (JVM), `DailySessionTest`
       et `PuzzleDeviceFlowTest` (Galaxy A16), `WoodpeckerUITests` et
       `DailySessionUITests` (iOS) verts.
-- [ ] **Non fait : récapitulatif visuel de fin de partie** (courbe d'évaluation,
-      coups clés). Le moteur est tenu par l'écran de jeu : l'analyse n'existe
-      qu'après la sortie, la courbe est déjà dans l'écran Analyser. Un bilan
-      sans moteur (courbe de matériel) reste possible, à décider.
+- [x] **Fin de partie** : mini-courbe du **matériel** au fil de la partie sous
+      le résultat (dès 3 demi-coups), sans moteur — celui-ci reste tenu par
+      l'écran de jeu. Précision et coups clés restent dans Analyser.
+      `GameOverMaterialCurveUITests` (iOS), `PlaySetupTest` (Galaxy A16).
 - [ ] Aspect Android non vu à l'écran.
 
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026

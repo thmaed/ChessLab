@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import chesskit.Piece
 import com.chesslab.R
+import com.chesslab.analysis.EvalCurve
+import com.chesslab.analysis.CurvePoint
 import com.chesslab.ui.*
 import com.chesslab.ui.QuickSwitchMenu
 import com.chesslab.ui.TopBarActions
@@ -184,6 +186,7 @@ fun PlayScreen(
         if (ui.gameOver) GameOverPanel(
             gutter, ui.outcome ?: ui.status,
             summary = model.opponentSummaryLine(),
+            materialCurve = model.materialCurve(),
             onAnalyze = { onAnalyzeGame(model.currentPgn()) },
             onMissedMates = { onFindMissedMates(model.currentPgn()) },
             onHome = onHome,
@@ -560,6 +563,7 @@ private fun GameOverPanel(
     modifier: Modifier,
     message: String,
     summary: String,
+    materialCurve: List<CurvePoint>,
     onAnalyze: () -> Unit,
     onMissedMates: () -> Unit,
     onHome: () -> Unit,
@@ -581,6 +585,14 @@ private fun GameOverPanel(
             modifier = Modifier.padding(top = 2.dp).testTag("resume-adversaire"),
         )
         Spacer(Modifier.height(10.dp))
+        // C8 : le matériel au fil de la partie, sans moteur (celui-ci reste tenu par l'écran de jeu).
+        if (materialCurve.size >= 4) {
+            Column(Modifier.testTag("courbe-materiel")) {
+                Text(stringResource(R.string.play_material_curve), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Palette.textTertiary)
+                EvalCurve(materialCurve, currentPly = null, onSelect = {})
+            }
+            Spacer(Modifier.height(10.dp))
+        }
         Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             stringResource(R.string.play_home),

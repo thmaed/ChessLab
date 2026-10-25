@@ -1212,4 +1212,5 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="woodpecker_bar_solved">Trouvés</string>
     <string name="woodpecker_bar_time">Temps</string>
     <string name="woodpecker_faster">Plus rapide de %1$s — bien joué</string>
+    <string name="play_material_curve">Matériel au fil de la partie</string>
 </resources>
