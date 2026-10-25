@@ -185,39 +185,47 @@ struct OpeningListView: View {
         .cardStyle(padding: 14)
     }
 
-    /// Les filtres, rangés EN PLUSIEURS LIGNES au lieu d'un défilement
-    /// horizontal : six puces ne tiennent pas sur un iPhone, et une barre qui
-    /// dépasse de l'écran cache la moitié des choix. Elles passent à la ligne.
+    /// Deux sélecteurs libellés plutôt qu'une rangée de six puces : le CAMP
+    /// (qui on joue) et le NIVEAU (quelles ouvertures montrer) sont deux
+    /// questions distinctes, et chacune a un seul choix à la fois.
     private var filterBar: some View {
-        FlowLayout(spacing: 8, lineSpacing: 8) {
-            FilterChip(label: "Tous", tint: Theme.warning,
-                       isSelected: sideFilter == nil && levelFilter == nil && !classicsOnly) {
-                sideFilter = nil
-                levelFilter = nil
-                classicsOnly = false
-            }
-            PieceFilterChip(glyph: "♙", isSelected: sideFilter == .white,
-                            accessibilityLabel: "Répertoire blanc") {
-                sideFilter = sideFilter == .white ? nil : .white
-            }
-            PieceFilterChip(glyph: "♟\u{FE0E}", isSelected: sideFilter == .black,
-                            accessibilityLabel: "Répertoire noir") {
-                sideFilter = sideFilter == .black ? nil : .black
-            }
-            FilterChip(label: "Classiques", tint: Theme.violet, isSelected: classicsOnly) {
-                classicsOnly.toggle()
-            }
-            .accessibilityIdentifier("filter_classics")
-            FilterChip(label: "Club", tint: Theme.accent, isSelected: levelFilter == .club) {
-                levelFilter = levelFilter == .club ? nil : .club
-            }
-            FilterChip(label: "Avancé", tint: Theme.warning, isSelected: levelFilter == .advanced) {
-                levelFilter = levelFilter == .advanced ? nil : .advanced
-            }
+        VStack(alignment: .leading, spacing: 12) {
+            SegmentedFilter(title: "Camp", options: [
+                .init(value: Optional<OpeningSide>.none, label: "Tous", systemImage: "square.grid.2x2", tint: Theme.warning, identifier: "filter_side_all"),
+                .init(value: .white, label: "Blancs", disc: .white, tint: Theme.warning, identifier: "filter_side_white"),
+                .init(value: .black, label: "Noirs", disc: .black, tint: Theme.warning, identifier: "filter_side_black"),
+            ], selection: $sideFilter)
+            SegmentedFilter(title: "Niveau", options: [
+                .init(value: LevelChoice.all, label: "Tous", tint: Theme.warning, identifier: "filter_level_all"),
+                .init(value: .classics, label: "Classiques", systemImage: "star.fill", tint: Theme.violet, identifier: "filter_classics"),
+                .init(value: .club, label: "Club", tint: Theme.accent, identifier: "filter_club"),
+                .init(value: .advanced, label: "Avancé", tint: Theme.rose, identifier: "filter_advanced"),
+            ], selection: levelChoice)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Filtres des ouvertures")
+    }
+
+    /// Le niveau affiché : un seul des quatre choix, rangé dans les deux états
+    /// que la liste lit (« Classiques » d'un côté, club/avancé de l'autre).
+    private enum LevelChoice: Hashable { case all, classics, club, advanced }
+
+    private var levelChoice: Binding<LevelChoice> {
+        Binding(
+            get: {
+                if classicsOnly { return .classics }
+                switch levelFilter {
+                case .club: return .club
+                case .advanced: return .advanced
+                default: return .all
+                }
+            },
+            set: { choice in
+                classicsOnly = choice == .classics
+                levelFilter = choice == .club ? .club : (choice == .advanced ? .advanced : nil)
+            }
+        )
     }
 
     @ViewBuilder

@@ -1221,4 +1221,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="setup_time_limit">Time limit</string>
     <string name="train_session_goal">%1$d position(s) reviewed — today\'s goal reached.</string>
     <string name="filter_classics">Classics</string>
+    <string name="filter_side">Side</string>
+    <string name="filter_level">Level</string>
+    <string name="filter_white">White</string>
+    <string name="filter_black">Black</string>
 </resources>

@@ -1218,4 +1218,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="setup_time_limit">Limite de temps</string>
     <string name="train_session_goal">%1$d position(s) revue(s) — objectif du jour atteint.</string>
     <string name="filter_classics">Classiques</string>
+    <string name="filter_side">Camp</string>
+    <string name="filter_level">Niveau</string>
+    <string name="filter_white">Blancs</string>
+    <string name="filter_black">Noirs</string>
 </resources>

@@ -272,8 +272,9 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
       Gambit-Dame accepté et refusé, Anglaise, Réti, Catalane, Najdorf, Dragon,
       Française, Caro-Kann, Scandinave, Petrov, Est-Indienne, Nimzo-Indienne,
       Slave). Liste identique : `OpeningCatalogFeature.classicIDs` (iOS) et
-      `CourseRepository.CLASSIC_IDS` (Android). Se combine avec le camp et le
-      niveau ; les répertoires importés y échappent. Absente pour les finales.
+      `CourseRepository.CLASSIC_IDS` (Android). Se range dans le sélecteur **Niveau** (Tous / Classiques / Club / Avancé, un seul
+      choix), à côté du sélecteur **Camp** (Tous / Blancs / Noirs, pastilles blanche
+      et noire) ; les répertoires importés y échappent. Absente pour les finales.
 - [x] Tests : `ClassicOpeningsTests`, `OpeningsModuleUITests` (iOS),
       `CourseCardsTest` (Galaxy A16).
 

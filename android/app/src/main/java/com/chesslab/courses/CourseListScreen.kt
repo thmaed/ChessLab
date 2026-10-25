@@ -13,6 +13,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.VerifiedUser
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronRight
@@ -301,6 +303,11 @@ private fun IntroCard(icon: ImageVector, tint: Color, title: String, body: Strin
     }
 }
 
+/**
+ * Deux sélecteurs libellés plutôt qu'une rangée de puces : le CAMP (qui on joue)
+ * et le NIVEAU (quelles ouvertures montrer) sont deux questions distinctes, et
+ * chacune a un seul choix à la fois. Pendant de `SegmentedFilter` (iOS).
+ */
 @Composable
 private fun FilterBar(
     tint: Color,
@@ -312,20 +319,96 @@ private fun FilterBar(
     onSide: (String) -> Unit,
     onLevel: (String) -> Unit,
 ) {
-    // Sur plusieurs lignes plutôt qu'en défilement horizontal : six puces ne
-    // tiennent pas sur un téléphone, et une barre qui dépasse cache des choix.
-    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
-    androidx.compose.foundation.layout.FlowRow(
-        Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        FilterChip(stringResource(R.string.filter_all), side == null && level == null && classics != true, tint, "filtre-tous", onAll)
-        GlyphFilterChip("♙", side == "white", tint, "filtre-blancs") { onSide("white") }
-        GlyphFilterChip("♟", side == "black", tint, "filtre-noirs") { onSide("black") }
-        if (classics != null) FilterChip(stringResource(R.string.filter_classics), classics, Palette.violet, "filtre-classiques", onClassics)
-        FilterChip(stringResource(R.string.level_club), level == "club", Palette.accent, "filtre-club") { onLevel("club") }
-        FilterChip(stringResource(R.string.level_advanced), level == "advanced", Palette.warning, "filtre-avance") { onLevel("advanced") }
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        SegmentedFilter(
+            stringResource(R.string.filter_side),
+            listOf(
+                Segment(stringResource(R.string.filter_all), side == null, tint, "filtre-tous", icon = Icons.Default.GridView) {
+                    if (side != null) onSide(side)
+                },
+                Segment(stringResource(R.string.filter_white), side == "white", tint, "filtre-blancs", disc = Color.White) { if (side != "white") onSide("white") },
+                Segment(stringResource(R.string.filter_black), side == "black", tint, "filtre-noirs", disc = Color.Black) { if (side != "black") onSide("black") },
+            ),
+        )
+        val noLevel = level == null && classics != true
+        SegmentedFilter(
+            stringResource(R.string.filter_level),
+            listOfNotNull(
+                Segment(stringResource(R.string.filter_all), noLevel, tint, "filtre-niveau-tous") {
+                    if (classics == true) onClassics()
+                    if (level != null) onLevel(level)
+                },
+                if (classics != null) Segment(
+                    stringResource(R.string.filter_classics), classics, Palette.violet, "filtre-classiques", icon = Icons.Default.Star,
+                ) {
+                    if (level != null) onLevel(level)
+                    if (!classics) onClassics()
+                } else null,
+                Segment(stringResource(R.string.level_club), level == "club", Palette.accent, "filtre-club") {
+                    if (classics == true) onClassics()
+                    if (level != "club") onLevel("club")
+                },
+                Segment(stringResource(R.string.level_advanced), level == "advanced", Palette.rose, "filtre-avance") {
+                    if (classics == true) onClassics()
+                    if (level != "advanced") onLevel("advanced")
+                },
+            ),
+        )
+    }
+}
+
+private class Segment(
+    val label: String,
+    val selected: Boolean,
+    val tint: Color,
+    val tag: String,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    val disc: Color? = null,
+    val onClick: () -> Unit,
+)
+
+@Composable
+private fun SegmentedFilter(title: String, segments: List<Segment>) {
+    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Text(
+            title.uppercase(), fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+            letterSpacing = 0.4.sp, color = Palette.textTertiary,
+        )
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clip(CircleShape)
+                .background(Palette.surface)
+                .border(1.dp, Palette.stroke, CircleShape)
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            segments.forEach { seg ->
+                Row(
+                    Modifier
+                        .weight(1f)
+                        .heightIn(min = 36.dp)
+                        .clip(CircleShape)
+                        .then(if (seg.selected) Modifier.background(com.chesslab.ui.tintGradient(seg.tint)) else Modifier)
+                        .clickable(onClick = seg.onClick)
+                        .padding(horizontal = 6.dp)
+                        .testTag(seg.tag),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    val ink = if (seg.selected) Palette.background else Palette.textSecondary
+                    when {
+                        seg.disc != null -> Box(
+                            Modifier.size(13.dp).clip(CircleShape).background(seg.disc)
+                                .border(1.dp, Color.White.copy(alpha = 0.7f), CircleShape)
+                        )
+                        seg.icon != null -> Icon(seg.icon, null, tint = ink, modifier = Modifier.size(14.dp))
+                    }
+                    if (seg.disc != null || seg.icon != null) Spacer(Modifier.width(5.dp))
+                    Text(seg.label, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = ink, maxLines = 1)
+                }
+            }
+        }
     }
 }
 
