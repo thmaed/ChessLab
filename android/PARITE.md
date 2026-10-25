@@ -278,6 +278,14 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [x] Tests : `ClassicOpeningsTests`, `OpeningsModuleUITests` (iOS),
       `CourseCardsTest` (Galaxy A16).
 
+### Cote de puzzle : l'indice coûte des points — 25/10/2026
+
+- [x] Un puzzle **réussi avec l'indice** ne fait plus monter la cote : son score vaut
+      le score attendu moins 0,15 (`hintPenalty` / `HINT_PENALTY`), soit environ −3
+      points sur un puzzle de son niveau (un échec franc : environ −10). Le puzzle
+      reste « réussi » pour la répétition espacée. Même règle des deux côtés.
+- [x] Tests : `PuzzleRatingTests` (iOS), `PuzzleRatingTest` (JVM).
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

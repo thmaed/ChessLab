@@ -66,4 +66,16 @@ class PuzzleRatingTest {
         assertTrue(!PuzzleAnswer.accepts(library.copy(rating = 1800), filter, isOwn = false))
         assertTrue(!filter.isEmpty)
     }
+
+    @Test fun `reussi avec indice la cote ne monte jamais et perd quelques points`() {
+        val settled = PuzzleRating(rating = 1500.0, deviation = 60.0, count = 40)
+        val plain = settled.record(solved = true, puzzleRating = 1500)
+        val hinted = settled.record(solved = true, puzzleRating = 1500, usedHint = true)
+        val failed = settled.record(solved = false, puzzleRating = 1500)
+        assertTrue(plain.rating > 1500)
+        assertTrue(hinted.rating < 1500)
+        assertTrue(hinted.rating > failed.rating)
+        assertTrue(1500 - hinted.rating < 6)
+        assertTrue(settled.record(solved = true, puzzleRating = 2100, usedHint = true).rating <= 1500.0001)
+    }
 }

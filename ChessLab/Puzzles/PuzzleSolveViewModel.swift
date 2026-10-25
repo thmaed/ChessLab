@@ -74,6 +74,8 @@ final class PuzzleSolveViewModel {
     /// empêche un coup de l'utilisateur de s'intercaler.
     private(set) var isAutoPlaying = false
     var hintMoves: [HintMove] = []
+    /// L'indice a été demandé pendant CE puzzle (la flèche, elle, s'efface à chaque coup).
+    private var hintUsed = false
 
     var isFinished: Bool { isSolved || isFailed }
     private var solutionMoves: [String] { puzzle.solutionLANs ?? [] }
@@ -208,6 +210,7 @@ final class PuzzleSolveViewModel {
         isFailed = false
         isAutoPlaying = false
         hintMoves = []
+        hintUsed = false
         rejectedMove = nil
 
         if isWoodpecker {
@@ -254,6 +257,7 @@ final class PuzzleSolveViewModel {
         let start = Square(String(lan.prefix(2)))
         let end = Square(String(lan.dropFirst(2).prefix(2)))
         hintMoves = [HintMove(rank: 1, from: start, to: end, strength: 1)]
+        hintUsed = true
     }
 
     /// - important: Le garde de COULEUR évite qu'un drag manifestement
@@ -490,7 +494,7 @@ final class PuzzleSolveViewModel {
         // La cote personnelle : seuls les puzzles COTÉS de la bibliothèque
         // comptent (ceux de vos parties n'ont pas de cote).
         if let puzzleRating = puzzle.rating, puzzleRating > 0 {
-            PuzzleRatingStore.record(solved: success, againstPuzzleRated: puzzleRating)
+            PuzzleRatingStore.record(solved: success, usedHint: hintUsed, againstPuzzleRated: puzzleRating)
         }
         let schedule = SpacedRepetition.Schedule(
             easinessFactor: puzzle.easinessFactor ?? 2.5,

@@ -76,11 +76,11 @@ object StatsStore {
     }
 
     /** Un puzzle COTÉ de la bibliothèque vient d'être résolu, ou raté. */
-    fun recordRating(context: Context, solvedIt: Boolean, puzzleRating: Int) {
+    fun recordRating(context: Context, solvedIt: Boolean, puzzleRating: Int, usedHint: Boolean = false) {
         if (puzzleRating <= 0) return
         val store = context.applicationContext.statsStore
         scope.launch {
-            store.edit { it.put(it.toRating().record(solvedIt, puzzleRating)) }
+            store.edit { it.put(it.toRating().record(solvedIt, puzzleRating, usedHint)) }
         }
     }
 

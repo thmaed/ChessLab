@@ -21,6 +21,23 @@ struct PuzzleRatingTests {
         #expect(vsEasy.rating > 1500)
     }
 
+    @Test func solvingWithAHintNeverRaisesTheRatingAndCostsAFewPoints() {
+        var plain = PuzzleRating(rating: 1500, deviation: 60, count: 40)
+        var hinted = plain
+        var failed = plain
+        plain.record(solved: true, againstPuzzleRated: 1500)
+        hinted.record(solved: true, usedHint: true, againstPuzzleRated: 1500)
+        failed.record(solved: false, againstPuzzleRated: 1500)
+        #expect(plain.rating > 1500)
+        #expect(hinted.rating < 1500, "réussi avec indice : aucun gain, une petite perte")
+        #expect(hinted.rating > failed.rating, "moins sévère qu'un échec")
+        #expect(1500 - hinted.rating < 6)
+        // Même sur un puzzle très difficile, l'indice ne fait jamais monter la cote.
+        var hard = PuzzleRating(rating: 1500, deviation: 60, count: 40)
+        hard.record(solved: true, usedHint: true, againstPuzzleRated: 2100)
+        #expect(hard.rating <= 1500.0001)
+    }
+
     @Test func failingLowersTheRating() {
         var rating = PuzzleRating.initial
         rating.record(solved: false, againstPuzzleRated: 1500)

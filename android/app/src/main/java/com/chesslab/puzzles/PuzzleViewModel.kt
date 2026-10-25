@@ -133,6 +133,8 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     private var cursor = 0
     private var board = Board()
     private var step = 0
+    /** L'indice a été demandé pendant CE puzzle (la flèche, elle, s'efface à chaque coup). */
+    private var hintUsed = false
 
     var ui by mutableStateOf(PuzzleUiState(status = s(R.string.puzzle_loading)))
         private set
@@ -317,6 +319,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val position = Position.fromFen(puzzle.fen) ?: return
         board = Board(position)
         step = 0
+        hintUsed = false
 
         ui = ui.copy(
             puzzle = puzzle,
@@ -470,7 +473,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             if (ui.woodpeckerPlan != null) recordWoodpecker(solved = true)
             else {
                 StatsStore.recordPuzzle(getApplication(), solvedIt = true)
-                StatsStore.recordRating(getApplication(), true, puzzle.rating)
+                StatsStore.recordRating(getApplication(), true, puzzle.rating, usedHint = hintUsed)
                 recordProgress(puzzle, success = true)
             }
             ui = ui.copy(
@@ -505,6 +508,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val puzzle = ui.puzzle ?: return
         val lan = puzzle.solution.getOrNull(step) ?: return
         if (lan.length < 4) return
+        hintUsed = true
         ui = ui.copy(hint = Square(lan.substring(0, 2)) to Square(lan.substring(2, 4)))
     }
 

@@ -11,8 +11,8 @@ import Foundation
 ///
 /// Valeur pure : aucune horloge, aucune base — vérifiable en test.
 ///
-/// - note: Un puzzle réussi AVEC l'indice compte comme réussi (décision du
-///   23/10/2026) ; les puzzles tirés de vos parties n'ont pas de cote et ne
+/// - note: Un puzzle réussi AVEC l'indice ne rapporte rien et coûte quelques
+///   points (décision du 25/10/2026, voir ``hintPenalty``) ; les puzzles tirés de vos parties n'ont pas de cote et ne
 ///   comptent pas ; un programme Woodpecker n'y touche pas (rejouer les mêmes
 ///   puzzles gonflerait la cote).
 struct PuzzleRating: Codable, Equatable {
@@ -34,13 +34,22 @@ struct PuzzleRating: Codable, Equatable {
         1 / sqrt(1 + 3 * q * q * deviation * deviation / (.pi * .pi))
     }
 
+    /// Un puzzle réussi avec l'indice vaut ce que la formule attendait MOINS cette
+    /// part : la cote ne peut pas monter, et perd quelques points (environ 3 sur
+    /// un puzzle de son niveau, contre 10 pour un échec franc). Sans cela l'indice
+    /// serait gratuit, et gonflerait la cote de qui hésite.
+    static let hintPenalty = 0.15
+
     /// Enregistre un puzzle de cote `puzzleRating`, réussi ou non.
-    mutating func record(solved: Bool, againstPuzzleRated puzzleRating: Int) {
+    /// - Parameter usedHint: l'indice a été demandé ; ne compte que si le puzzle
+    ///   est réussi (un échec reste un échec).
+    mutating func record(solved: Bool, usedHint: Bool = false, againstPuzzleRated puzzleRating: Int) {
         let gj = Self.g(Self.puzzleDeviation)
         let expected = 1 / (1 + pow(10, -gj * (rating - Double(puzzleRating)) / 400))
         let dSquared = 1 / (Self.q * Self.q * gj * gj * expected * (1 - expected))
         let precision = 1 / (deviation * deviation) + 1 / dSquared
-        let score = solved ? 1.0 : 0.0
+        let score: Double
+        if !solved { score = 0 } else if usedHint { score = max(0, expected - Self.hintPenalty) } else { score = 1 }
         rating += Self.q / precision * gj * (score - expected)
         deviation = max(Self.minDeviation, sqrt(1 / precision))
         count += 1
@@ -84,10 +93,10 @@ enum PuzzleRatingStore {
     /// Lit, met à jour, écrit. Rend la cote d'APRÈS.
     @discardableResult
     static func record(
-        solved: Bool, againstPuzzleRated puzzleRating: Int, in defaults: UserDefaults = .standard
+        solved: Bool, usedHint: Bool = false, againstPuzzleRated puzzleRating: Int, in defaults: UserDefaults = .standard
     ) -> PuzzleRating {
         var current = load(from: defaults)
-        current.record(solved: solved, againstPuzzleRated: puzzleRating)
+        current.record(solved: solved, usedHint: usedHint, againstPuzzleRated: puzzleRating)
         save(current, to: defaults)
         return current
     }
