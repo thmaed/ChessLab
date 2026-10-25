@@ -83,8 +83,12 @@ final class OpeningsModuleUITests: XCTestCase {
     func testTheClassicsFilterKeepsOnlyCommonOpenings() {
         let app = launchWithLabs()
         XCTAssertTrue(openLabs(app))
+        // Le filtre de niveau est un menu replié : on l'ouvre, puis on choisit.
+        let menu = app.buttons["filter_menu_filter_level_all"]
+        XCTAssertTrue(menu.waitForExistence(timeout: 10))
+        menu.tap()
         let chip = app.buttons["filter_classics"]
-        XCTAssertTrue(chip.waitForExistence(timeout: 10))
+        XCTAssertTrue(chip.waitForExistence(timeout: 5))
         chip.tap()
         // La liste est paresseuse : on la parcourt en entier avant de conclure.
         var sawItalian = false

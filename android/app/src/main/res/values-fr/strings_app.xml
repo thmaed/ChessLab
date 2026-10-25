@@ -1222,4 +1222,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="filter_level">Niveau</string>
     <string name="filter_white">Blancs</string>
     <string name="filter_black">Noirs</string>
+    <string name="filter_all_sides">Tous les camps</string>
+    <string name="filter_all_levels">Tous niveaux</string>
 </resources>

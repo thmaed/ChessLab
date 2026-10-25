@@ -96,7 +96,6 @@ struct OpeningListView: View {
     var body: some View {
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 12) {
-                intro
                 filterBar
                 if entries.isEmpty {
                     ContentUnavailableView(
@@ -168,43 +167,25 @@ struct OpeningListView: View {
         }
     }
 
-    private var intro: some View {
-        HStack(alignment: .top, spacing: 12) {
-            IconBadge(systemImage: "books.vertical.fill", tint: Theme.warning, size: 36)
-            VStack(alignment: .leading, spacing: 4) {
-                Text("Chaque position, disséquée")
-                    .font(.subheadline.weight(.bold))
-                    .foregroundStyle(Theme.textPrimary)
-                Text("L'index de toutes les lignes, les coups des maîtres avec leurs pourcentages, et les trois meilleurs coups de Stockfish — calculés d'avance.")
-                    .font(.caption)
-                    .foregroundStyle(Theme.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .cardStyle(padding: 14)
-    }
-
-    /// Deux sélecteurs libellés plutôt qu'une rangée de six puces : le CAMP
-    /// (qui on joue) et le NIVEAU (quelles ouvertures montrer) sont deux
-    /// questions distinctes, et chacune a un seul choix à la fois.
+    /// Deux menus repliés sur UNE ligne : le CAMP (qui on joue) et le NIVEAU
+    /// (quelles ouvertures montrer). Chacun affiche son choix courant, et se
+    /// teinte dès qu'il filtre.
     private var filterBar: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            SegmentedFilter(title: "Camp", options: [
-                .init(value: Optional<OpeningSide>.none, label: "Tous", systemImage: "square.grid.2x2", tint: Theme.warning, identifier: "filter_side_all"),
+        HStack(spacing: 10) {
+            FilterMenu(options: [
+                .init(value: Optional<OpeningSide>.none, label: "Tous les camps", systemImage: "square.grid.2x2", tint: Theme.warning, identifier: "filter_side_all"),
                 .init(value: .white, label: "Blancs", disc: .white, tint: Theme.warning, identifier: "filter_side_white"),
                 .init(value: .black, label: "Noirs", disc: .black, tint: Theme.warning, identifier: "filter_side_black"),
-            ], selection: $sideFilter)
-            SegmentedFilter(title: "Niveau", options: [
-                .init(value: LevelChoice.all, label: "Tous", tint: Theme.warning, identifier: "filter_level_all"),
+            ], selection: $sideFilter, accessibilityLabel: "Camp")
+            FilterMenu(options: [
+                .init(value: LevelChoice.all, label: "Tous niveaux", systemImage: "line.3.horizontal.decrease", tint: Theme.accent, identifier: "filter_level_all"),
                 .init(value: .classics, label: "Classiques", systemImage: "star.fill", tint: Theme.violet, identifier: "filter_classics"),
-                .init(value: .club, label: "Club", tint: Theme.accent, identifier: "filter_club"),
-                .init(value: .advanced, label: "Avancé", tint: Theme.rose, identifier: "filter_advanced"),
-            ], selection: levelChoice)
+                .init(value: .club, label: "Club", systemImage: "person.2.fill", tint: Theme.accent, identifier: "filter_club"),
+                .init(value: .advanced, label: "Avancé", systemImage: "flame.fill", tint: Theme.rose, identifier: "filter_advanced"),
+            ], selection: levelChoice, accessibilityLabel: "Niveau")
+            Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel("Filtres des ouvertures")
     }
 
     /// Le niveau affiché : un seul des quatre choix, rangé dans les deux états

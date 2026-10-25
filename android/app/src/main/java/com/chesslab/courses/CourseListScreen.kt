@@ -13,6 +13,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.VerifiedUser
@@ -156,7 +160,9 @@ fun CourseListScreen(
                     fontSize = 34.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary,
                 )
             }
-            item(key = "intro") {
+            // Le bloc d'introduction ne reste que pour les finales : sur les ouvertures il
+            // mangeait le haut de l'écran avant même la première carte (comme sur iOS).
+            if (endgames) item(key = "intro") {
                 IntroCard(
                     if (endgames) Icons.Default.EmojiEvents else Icons.Default.MenuBook, tint,
                     stringResource(if (endgames) R.string.courses_intro_endgames_title else R.string.courses_intro_openings_title),
@@ -304,9 +310,9 @@ private fun IntroCard(icon: ImageVector, tint: Color, title: String, body: Strin
 }
 
 /**
- * Deux sélecteurs libellés plutôt qu'une rangée de puces : le CAMP (qui on joue)
- * et le NIVEAU (quelles ouvertures montrer) sont deux questions distinctes, et
- * chacune a un seul choix à la fois. Pendant de `SegmentedFilter` (iOS).
+ * Deux menus repliés sur UNE ligne : le CAMP (qui on joue) et le NIVEAU
+ * (quelles ouvertures montrer). Chacun affiche son choix courant et se teinte
+ * dès qu'il filtre. Pendant de `FilterMenu` (iOS).
  */
 @Composable
 private fun FilterBar(
@@ -319,95 +325,105 @@ private fun FilterBar(
     onSide: (String) -> Unit,
     onLevel: (String) -> Unit,
 ) {
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        SegmentedFilter(
-            stringResource(R.string.filter_side),
-            listOf(
-                Segment(stringResource(R.string.filter_all), side == null, tint, "filtre-tous", icon = Icons.Default.GridView) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+        FilterMenu(
+            options = listOf(
+                MenuOption(stringResource(R.string.filter_all_sides), side == null, tint, "filtre-tous", icon = Icons.Default.GridView) {
                     if (side != null) onSide(side)
                 },
-                Segment(stringResource(R.string.filter_white), side == "white", tint, "filtre-blancs", disc = Color.White) { if (side != "white") onSide("white") },
-                Segment(stringResource(R.string.filter_black), side == "black", tint, "filtre-noirs", disc = Color.Black) { if (side != "black") onSide("black") },
+                MenuOption(stringResource(R.string.filter_white), side == "white", tint, "filtre-blancs", disc = Color.White) { if (side != "white") onSide("white") },
+                MenuOption(stringResource(R.string.filter_black), side == "black", tint, "filtre-noirs", disc = Color.Black) { if (side != "black") onSide("black") },
             ),
+            tag = "menu-camp",
         )
-        val noLevel = level == null && classics != true
-        SegmentedFilter(
-            stringResource(R.string.filter_level),
-            listOfNotNull(
-                Segment(stringResource(R.string.filter_all), noLevel, tint, "filtre-niveau-tous") {
+        FilterMenu(
+            options = listOfNotNull(
+                MenuOption(stringResource(R.string.filter_all_levels), level == null && classics != true, Palette.accent, "filtre-niveau-tous", icon = Icons.Default.FilterList) {
                     if (classics == true) onClassics()
                     if (level != null) onLevel(level)
                 },
-                if (classics != null) Segment(
+                if (classics != null) MenuOption(
                     stringResource(R.string.filter_classics), classics, Palette.violet, "filtre-classiques", icon = Icons.Default.Star,
                 ) {
                     if (level != null) onLevel(level)
                     if (!classics) onClassics()
                 } else null,
-                Segment(stringResource(R.string.level_club), level == "club", Palette.accent, "filtre-club") {
+                MenuOption(stringResource(R.string.level_club), level == "club", Palette.accent, "filtre-club", icon = Icons.Default.People) {
                     if (classics == true) onClassics()
                     if (level != "club") onLevel("club")
                 },
-                Segment(stringResource(R.string.level_advanced), level == "advanced", Palette.rose, "filtre-avance") {
+                MenuOption(stringResource(R.string.level_advanced), level == "advanced", Palette.rose, "filtre-avance", icon = Icons.Default.LocalFireDepartment) {
                     if (classics == true) onClassics()
                     if (level != "advanced") onLevel("advanced")
                 },
             ),
+            tag = "menu-niveau",
         )
     }
 }
 
-private class Segment(
+private class MenuOption(
     val label: String,
     val selected: Boolean,
     val tint: Color,
     val tag: String,
-    val icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    val icon: ImageVector? = null,
     val disc: Color? = null,
     val onClick: () -> Unit,
 )
 
+/** Un filtre « un parmi n » replié en capsule : le choix courant, et un menu pour changer. */
 @Composable
-private fun SegmentedFilter(title: String, segments: List<Segment>) {
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        Text(
-            title.uppercase(), fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
-            letterSpacing = 0.4.sp, color = Palette.textTertiary,
-        )
+private fun FilterMenu(options: List<MenuOption>, tag: String) {
+    var open by remember { mutableStateOf(false) }
+    val current = options.firstOrNull { it.selected } ?: options.first()
+    val active = current !== options.first()
+    val ink = if (active) Palette.background else Palette.textPrimary
+    Box {
         Row(
             Modifier
-                .fillMaxWidth()
+                .heightIn(min = 36.dp)
                 .clip(CircleShape)
-                .background(Palette.surface)
-                .border(1.dp, Palette.stroke, CircleShape)
-                .padding(4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                .then(
+                    if (active) Modifier.background(com.chesslab.ui.tintGradient(current.tint))
+                    else Modifier.background(current.tint.copy(alpha = 0.10f)).border(1.dp, current.tint.copy(alpha = 0.28f), CircleShape)
+                )
+                .clickable { open = true }
+                .padding(horizontal = 12.dp)
+                .testTag(tag),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            segments.forEach { seg ->
-                Row(
-                    Modifier
-                        .weight(1f)
-                        .heightIn(min = 36.dp)
-                        .clip(CircleShape)
-                        .then(if (seg.selected) Modifier.background(com.chesslab.ui.tintGradient(seg.tint)) else Modifier)
-                        .clickable(onClick = seg.onClick)
-                        .padding(horizontal = 6.dp)
-                        .testTag(seg.tag),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    val ink = if (seg.selected) Palette.background else Palette.textSecondary
-                    when {
-                        seg.disc != null -> Box(
-                            Modifier.size(13.dp).clip(CircleShape).background(seg.disc)
-                                .border(1.dp, Color.White.copy(alpha = 0.7f), CircleShape)
-                        )
-                        seg.icon != null -> Icon(seg.icon, null, tint = ink, modifier = Modifier.size(14.dp))
-                    }
-                    if (seg.disc != null || seg.icon != null) Spacer(Modifier.width(5.dp))
-                    Text(seg.label, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = ink, maxLines = 1)
-                }
+            MenuGlyph(current, ink)
+            Text(current.label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = ink, maxLines = 1)
+            Icon(Icons.Default.KeyboardArrowDown, null, tint = ink.copy(alpha = 0.7f), modifier = Modifier.size(16.dp))
+        }
+        androidx.compose.material3.DropdownMenu(expanded = open, onDismissRequest = { open = false }) {
+            options.forEach { option ->
+                androidx.compose.material3.DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            MenuGlyph(option, Palette.textPrimary)
+                            Text(option.label, fontWeight = if (option.selected) FontWeight.Bold else FontWeight.Normal)
+                        }
+                    },
+                    onClick = { open = false; option.onClick() },
+                    modifier = Modifier.testTag(option.tag),
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun MenuGlyph(option: MenuOption, ink: Color) {
+    when {
+        option.disc != null -> {
+            Box(Modifier.size(12.dp).clip(CircleShape).background(option.disc).border(1.dp, Color.White.copy(alpha = 0.7f), CircleShape))
+            Spacer(Modifier.width(6.dp))
+        }
+        option.icon != null -> {
+            Icon(option.icon, null, tint = ink, modifier = Modifier.size(14.dp))
+            Spacer(Modifier.width(6.dp))
         }
     }
 }

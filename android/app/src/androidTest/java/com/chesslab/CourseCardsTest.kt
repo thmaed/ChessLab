@@ -42,11 +42,14 @@ class CourseCardsTest {
     @Test fun leFiltreClassiquesReduitLaListe() {
         compose.waitUntil(20_000) { compose.onAllNodesWithTag("mode-openings").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("mode-openings").performScrollTo().performClick()
-        compose.waitUntil(20_000) { compose.onAllNodesWithTag("filtre-classiques").fetchSemanticsNodes().isNotEmpty() }
+        compose.waitUntil(20_000) { compose.onAllNodesWithTag("menu-niveau").fetchSemanticsNodes().isNotEmpty() }
         fun total() = compose.onAllNodesWithTag("compte").fetchSemanticsNodes().sumOf {
             (if (SemanticsProperties.Text in it.config) it.config[SemanticsProperties.Text].joinToString("") else "").trim().toIntOrNull() ?: 0
         }
         val all = total()
+        // Le niveau est un menu replié : on l'ouvre, puis on choisit.
+        compose.onNodeWithTag("menu-niveau").performClick()
+        compose.waitUntil(5_000) { compose.onAllNodesWithTag("filtre-classiques").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("filtre-classiques").performClick()
         compose.waitForIdle()
         val classics = total()

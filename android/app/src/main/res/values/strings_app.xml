@@ -1225,4 +1225,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="filter_level">Level</string>
     <string name="filter_white">White</string>
     <string name="filter_black">Black</string>
+    <string name="filter_all_sides">Both sides</string>
+    <string name="filter_all_levels">All levels</string>
 </resources>

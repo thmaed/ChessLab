@@ -23072,6 +23072,26 @@
           }
         }
       }
+    },
+    "Tous les camps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Both sides"
+          }
+        }
+      }
+    },
+    "Tous niveaux": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All levels"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
