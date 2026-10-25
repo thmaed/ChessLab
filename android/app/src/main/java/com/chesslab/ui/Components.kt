@@ -234,6 +234,8 @@ fun ChipButton(
     selected: Boolean,
     modifier: Modifier = Modifier,
     icon: ImageVector? = null,
+    /** Une pastille pleine (blanche ou noire) à la place de l'icône — les puces de couleur. */
+    disc: Color? = null,
     /**
      * La couleur du groupe. Elle remplit la puce quand elle est choisie et
      * teinte son icône sinon — c'est ce qui distingue trois rangées de filtres
@@ -254,7 +256,10 @@ fun ChipButton(
             .padding(horizontal = 14.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (icon != null) {
+        if (disc != null) {
+            Box(Modifier.size(14.dp).clip(CircleShape).background(disc).border(1.dp, Color.White.copy(alpha = 0.7f), CircleShape))
+            Spacer(Modifier.width(6.dp))
+        } else if (icon != null) {
             Icon(
                 icon, null, modifier = Modifier.size(15.dp),
                 tint = if (selected) Palette.background else tint,

@@ -72,7 +72,8 @@ struct FairyVariantSetupView: View {
                             ChipButton(
                                 label: LocalizedStringKey(choice.label),
                                 systemImage: choice.symbolName,
-                                isSelected: colorChoice == choice
+                                isSelected: colorChoice == choice,
+                                disc: choice.disc
                             ) {
                                 colorChoice = choice
                             }

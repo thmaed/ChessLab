@@ -105,6 +105,7 @@ struct NewGameSetupView: View {
                                 label: LocalizedStringKey(choice.label),
                                 systemImage: choice.symbolName,
                                 isSelected: colorChoice == choice,
+                                disc: choice.disc,
                                 tint: Theme.warning
                             ) {
                                 colorChoice = choice
@@ -453,6 +454,10 @@ struct ChipButton: View {
     let label: LocalizedStringKey
     let systemImage: String?
     let isSelected: Bool
+    /// Une pastille pleine (blanche ou noire) à la place de l'icône : un disque
+    /// plein ou un anneau, selon la sélection, se lisait à l'envers (Blancs avait
+    /// le disque NOIR). Sert aux puces de couleur.
+    var disc: Color? = nil
     /// La teinte de la puce : celle de sa section ou de sa famille, au repos
     /// (icône colorée, liseré pâle) comme sélectionnée (dégradé plein).
     var tint: Color = Theme.accent
@@ -461,7 +466,10 @@ struct ChipButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 6) {
-                if let systemImage {
+                if let disc {
+                    Circle().fill(disc).frame(width: 13, height: 13)
+                        .overlay(Circle().strokeBorder(Color.white.opacity(0.7), lineWidth: 1))
+                } else if let systemImage {
                     Image(systemName: systemImage)
                 }
                 Text(label)

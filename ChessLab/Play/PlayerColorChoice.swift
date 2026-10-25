@@ -1,4 +1,5 @@
 import ChessKit
+import SwiftUI
 
 /// Couleur choisie par l'utilisateur avant une partie contre le moteur.
 enum PlayerColorChoice: String, CaseIterable, Identifiable {
@@ -21,6 +22,15 @@ enum PlayerColorChoice: String, CaseIterable, Identifiable {
         case .white: "circle.fill"
         case .black: "circle"
         case .random: "shuffle"
+        }
+    }
+
+    /// La pastille de la puce : blanche pour les Blancs, noire pour les Noirs, aucune pour « Aléatoire ».
+    var disc: Color? {
+        switch self {
+        case .white: .white
+        case .black: .black
+        case .random: nil
         }
     }
 

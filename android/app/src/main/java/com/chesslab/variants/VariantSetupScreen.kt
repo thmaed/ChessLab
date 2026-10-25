@@ -138,6 +138,7 @@ fun VariantSetupScreen(
                             ChipButton(
                                 stringResource(label), color == value,
                                 Modifier.testTag("couleur-${value.name}"), icon = icon, tint = Palette.warning,
+                                disc = when (value) { PlayerColorChoice.white -> androidx.compose.ui.graphics.Color.White; PlayerColorChoice.black -> androidx.compose.ui.graphics.Color.Black; else -> null },
                             ) { color = value }
                         }
                     }

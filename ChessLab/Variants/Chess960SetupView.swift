@@ -62,6 +62,7 @@ struct Chess960SetupView: View {
                                 label: LocalizedStringKey(choice.label),
                                 systemImage: choice.symbolName,
                                 isSelected: colorChoice == choice,
+                                disc: choice.disc,
                                 tint: Theme.warning
                             ) {
                                 colorChoice = choice

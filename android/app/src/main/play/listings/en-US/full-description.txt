@@ -1,7 +1,15 @@
 ChessLab is a complete chess companion: play, analyse, train and experiment, with the Stockfish engine built in and without ever leaving the app. Nothing is sent to a server.
 
+NEW IN 2.0
+• Daily session: every day, what to review — opening positions due, missed puzzles, an endgame — with your streak of days and medals.
+• Automatic analysis, offered at the end of a game: your mistakes become puzzles and a weakness profile builds up in Progress.
+• The Coach: under a mistake, the share of players at your level who play that move.
+• A personal puzzle rating, and “At my level” for puzzles that fit you.
+• Openings: illustrated cards, Side and Level filters, and the 19 “classics”.
+• Time limit is optional: one switch, and the app remembers your last choice.
+
 OPPONENTS THAT PLAY LIKE PEOPLE
-Nine characters played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play — blunders included at the lower levels. Each has a style, an opening repertoire, a temperament and a portrait, and a level set on the human scale. Or face Stockfish itself, from beginner to full strength. With or without a clock: bullet, blitz, rapid, classical, with increment.
+Nine characters played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play — blunders included at the lower levels. Each has a style, an opening repertoire, a temperament and a portrait, and a level set on the human scale. Or face Stockfish itself, from beginner to full strength. Clock is optional: bullet, blitz, rapid, classical, with increment.
 
 REALLY ANALYSE YOUR GAMES
 Every move is graded — excellent, good, inaccuracy, mistake, blunder, missed chance — and each player gets an accuracy out of a hundred. The evaluation curve shows at a glance where the game turned.
@@ -10,7 +18,7 @@ Above all, the app tells you WHY a move was bad, in one sentence: "back-rank mat
 
 And what you missed becomes an exercise: the positions where you went wrong are filed next to the puzzles, to work on again.
 
-Load a game by PGN, by FEN, from the position editor, or by photographing a board.
+Load a game by PGN, FEN, the position editor, or a photo of a board. The position on screen travels to another mode at the touch of a button.
 
 OPENINGS
 58 openings written by hand, in English and French, all checked against the engine. Walk through them move by move: each move is explained, the alternatives are offered, and coloured arrows tie the board to the move list. Spaced repetition makes them stick.
@@ -29,9 +37,6 @@ Two people on one device, the board flipping each move so it reads right from bo
 
 LABORATORY
 Set two configurations against each other over a series of games to compare their strength.
-
-SWITCH MODE WITHOUT LOSING YOUR PLACE
-The position you are looking at travels to another mode at the touch of a button: a move intrigues you during an analysis, try it against the computer, then come back.
 
 PRIVACY
 No account, no server, no advertising, no analytics. The app does not even hold permission to reach the internet: your games and settings stay on your phone. To move to another device, a single file you write and reopen wherever you like.

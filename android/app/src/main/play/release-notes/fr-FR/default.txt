@@ -1,0 +1,7 @@
+ChessLab 2.0
+• Séance du jour : ce qu'il faut revoir chaque jour, une série de jours et des médailles.
+• Analyse automatique proposée en fin de partie : vos erreurs deviennent des puzzles, et un profil de faiblesses apparaît dans Progrès.
+• Le Coach dit ce que jouent les joueurs de votre niveau.
+• Cote de puzzle personnelle et « À mon niveau ».
+• Ouvertures : cartes illustrées, filtres Camp et Niveau, « Classiques ».
+• Limite de temps en option, dernier choix retenu.
