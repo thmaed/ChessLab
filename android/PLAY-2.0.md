@@ -16,6 +16,7 @@ console, ou automatiquement une fois la clé posée.
 | Textes de la fiche | `app/src/main/play/listings/{fr-FR,en-US}/` | titre, description courte (76 / 70 car.), description complète (3989 / 3692 car., limite 4000) |
 | Notes de version | `app/src/main/play/release-notes/{fr-FR,en-US}/default.txt` | 471 / 427 car. (limite 500) |
 | Captures téléphone | `listings/*/graphics/phone-screenshots/` | **sept** par langue, 1080 × 2340, prises sur le Galaxy A16 : accueil, séance du jour, nouvelle partie, analyse + Coach, ouvertures (filtre Classiques), puzzle, finales |
+| Captures tablette 7" et 10" | `listings/*/graphics/tablet-screenshots` (1200 × 1920) et `large-tablet-screenshots` (2560 × 1600) | **sept** par langue et par taille, prises sur émulateur avec l'APK de debug (`tools/captures-tablette-2.0.py`), notation anglaise réglée pour la fiche anglaise |
 | Icône, image de présentation | `listings/*/graphics/icon`, `feature-graphic` | inchangées |
 
 ## À faire, dans l'ordre
