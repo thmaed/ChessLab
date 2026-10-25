@@ -198,20 +198,30 @@ fun DailySessionScreen(
                     }
                 }
             }
-            // Combien de positions d'ouverture la séance propose au plus par jour.
-            Column(
-                Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(Palette.surface).padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+            // Combien de positions d'ouverture la séance propose au plus par jour :
+            // une seule ligne discrète, sans carte ni phrase d'explication.
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(stringResource(R.string.settings_daily_openings), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    com.chesslab.settings.SettingsStore.DAILY_OPENINGS_CHOICES.forEach { n ->
-                        com.chesslab.ui.ChipButton(
-                            n.toString(), n == cap, Modifier.testTag("seance-ouvertures-$n"), tint = Palette.warning,
-                        ) { com.chesslab.settings.SettingsStore.setDailyOpeningsCap(context, n) }
-                    }
+                Text(
+                    stringResource(R.string.settings_daily_openings), fontSize = 13.sp, color = Palette.textSecondary,
+                    modifier = Modifier.weight(1f),
+                )
+                com.chesslab.settings.SettingsStore.DAILY_OPENINGS_CHOICES.forEach { n ->
+                    val active = n == cap
+                    Text(
+                        n.toString(), fontSize = 13.sp, fontWeight = FontWeight.SemiBold,
+                        color = if (active) Palette.background else Palette.textSecondary,
+                        modifier = Modifier
+                            .padding(start = 6.dp)
+                            .clip(androidx.compose.foundation.shape.CircleShape)
+                            .background(if (active) Palette.warning else Palette.surface)
+                            .clickable { com.chesslab.settings.SettingsStore.setDailyOpeningsCap(context, n) }
+                            .padding(horizontal = 12.dp, vertical = 5.dp)
+                            .testTag("seance-ouvertures-$n"),
+                    )
                 }
-                Text(stringResource(R.string.settings_daily_openings_note), fontSize = 11.sp, color = Palette.textTertiary)
             }
         }
     }

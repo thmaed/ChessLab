@@ -260,7 +260,7 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [x] Options **colorisées** par groupe (couleur ambre, livre or, départ violet,
       aides rose, orientation violette…) : puces et interrupteurs prennent la
       teinte de leur section.
-- [x] Plafond d'ouvertures de la séance du jour **réglable** (3 / 5 / 10,
+- [x] Plafond d'ouvertures de la séance du jour **réglable** (2 / 5 / 8,
       5 par défaut) dans les Réglages.
 - [x] Correctifs trouvés par les suites complètes : relecture des métriques de
       partie (phases vides), cache des cours Android (accès concurrent).

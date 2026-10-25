@@ -185,40 +185,37 @@ struct OpeningListView: View {
         .cardStyle(padding: 14)
     }
 
-    /// Les mêmes filtres que l'écran Ouvertures, avec les mêmes puces : c'est
-    /// la même bibliothèque, on ne réapprend pas une commande en changeant
-    /// d'écran. Défilement horizontal — cinq puces tiennent sur un iPhone
-    /// standard, mais pas en Display Zoom ni aux grandes tailles de texte.
+    /// Les filtres, rangés EN PLUSIEURS LIGNES au lieu d'un défilement
+    /// horizontal : six puces ne tiennent pas sur un iPhone, et une barre qui
+    /// dépasse de l'écran cache la moitié des choix. Elles passent à la ligne.
     private var filterBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                FilterChip(label: "Tous", tint: Theme.warning,
-                           isSelected: sideFilter == nil && levelFilter == nil && !classicsOnly) {
-                    sideFilter = nil
-                    levelFilter = nil
-                    classicsOnly = false
-                }
-                FilterChip(label: "Classiques", tint: Theme.violet, isSelected: classicsOnly) {
-                    classicsOnly.toggle()
-                }
-                .accessibilityIdentifier("filter_classics")
-                PieceFilterChip(glyph: "♙", isSelected: sideFilter == .white,
-                                accessibilityLabel: "Répertoire blanc") {
-                    sideFilter = sideFilter == .white ? nil : .white
-                }
-                PieceFilterChip(glyph: "♟\u{FE0E}", isSelected: sideFilter == .black,
-                                accessibilityLabel: "Répertoire noir") {
-                    sideFilter = sideFilter == .black ? nil : .black
-                }
-                FilterChip(label: "Club", tint: Theme.accent, isSelected: levelFilter == .club) {
-                    levelFilter = levelFilter == .club ? nil : .club
-                }
-                FilterChip(label: "Avancé", tint: Theme.warning, isSelected: levelFilter == .advanced) {
-                    levelFilter = levelFilter == .advanced ? nil : .advanced
-                }
+        FlowLayout(spacing: 8, lineSpacing: 8) {
+            FilterChip(label: "Tous", tint: Theme.warning,
+                       isSelected: sideFilter == nil && levelFilter == nil && !classicsOnly) {
+                sideFilter = nil
+                levelFilter = nil
+                classicsOnly = false
             }
-            .padding(.vertical, 2)
+            PieceFilterChip(glyph: "♙", isSelected: sideFilter == .white,
+                            accessibilityLabel: "Répertoire blanc") {
+                sideFilter = sideFilter == .white ? nil : .white
+            }
+            PieceFilterChip(glyph: "♟\u{FE0E}", isSelected: sideFilter == .black,
+                            accessibilityLabel: "Répertoire noir") {
+                sideFilter = sideFilter == .black ? nil : .black
+            }
+            FilterChip(label: "Classiques", tint: Theme.violet, isSelected: classicsOnly) {
+                classicsOnly.toggle()
+            }
+            .accessibilityIdentifier("filter_classics")
+            FilterChip(label: "Club", tint: Theme.accent, isSelected: levelFilter == .club) {
+                levelFilter = levelFilter == .club ? nil : .club
+            }
+            FilterChip(label: "Avancé", tint: Theme.warning, isSelected: levelFilter == .advanced) {
+                levelFilter = levelFilter == .advanced ? nil : .advanced
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Filtres des ouvertures")
     }

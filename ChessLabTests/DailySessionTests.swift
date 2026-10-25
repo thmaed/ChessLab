@@ -49,10 +49,10 @@ struct DailySessionTests {
     func planOrdersTheSteps() {
         let plan = DailySessionBuilder.plan(
             openingsDue: 12, missedPuzzles: 0, ownPuzzles: 2, endgameCourseID: "eg-lucena",
-            endgameOpenedToday: false, streak: 4, trainedToday: false, openingsCap: 10)
+            endgameOpenedToday: false, streak: 4, trainedToday: false, openingsCap: 8)
         #expect(plan.steps.map(\.kind) == [.openings, .missedPuzzles, .ownPuzzles, .endgame])
         #expect(plan.pending.map(\.kind) == [.openings, .ownPuzzles, .endgame])
-        #expect(plan.firstPending?.remaining == 10)
+        #expect(plan.firstPending?.remaining == 8)
         #expect(plan.steps.first { $0.kind == .endgame }?.courseID == "eg-lucena")
         #expect(!plan.isComplete)
         #expect(plan.streak == 4)
@@ -66,8 +66,8 @@ struct DailySessionTests {
                 endgameOpenedToday: false, streak: 0, trainedToday: false, openingsCap: cap).steps.map(\.remaining)
         }
         #expect(remaining(cap: 5) == [5, 5, 5])
-        #expect(remaining(cap: 3) == [3, 5, 5])
-        #expect(remaining(cap: 10) == [10, 5, 5])
+        #expect(remaining(cap: 2) == [2, 5, 5])
+        #expect(remaining(cap: 8) == [8, 5, 5])
     }
 
     @Test("Le plafond réglé est relu, et une valeur inconnue retombe sur 5")
@@ -75,8 +75,8 @@ struct DailySessionTests {
         let key = DailySessionBuilder.openingsCapKey
         let saved = UserDefaults.standard.object(forKey: key)
         defer { UserDefaults.standard.set(saved, forKey: key) }
-        UserDefaults.standard.set(3, forKey: key)
-        #expect(DailySessionBuilder.openingsCap == 3)
+        UserDefaults.standard.set(2, forKey: key)
+        #expect(DailySessionBuilder.openingsCap == 2)
         UserDefaults.standard.set(7, forKey: key)
         #expect(DailySessionBuilder.openingsCap == 5)
         UserDefaults.standard.removeObject(forKey: key)

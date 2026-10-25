@@ -312,14 +312,18 @@ private fun FilterBar(
     onSide: (String) -> Unit,
     onLevel: (String) -> Unit,
 ) {
-    Row(
-        Modifier.horizontalScroll(rememberScrollState()),
+    // Sur plusieurs lignes plutôt qu'en défilement horizontal : six puces ne
+    // tiennent pas sur un téléphone, et une barre qui dépasse cache des choix.
+    @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+    androidx.compose.foundation.layout.FlowRow(
+        Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         FilterChip(stringResource(R.string.filter_all), side == null && level == null && classics != true, tint, "filtre-tous", onAll)
-        if (classics != null) FilterChip(stringResource(R.string.filter_classics), classics, Palette.violet, "filtre-classiques", onClassics)
         GlyphFilterChip("♙", side == "white", tint, "filtre-blancs") { onSide("white") }
         GlyphFilterChip("♟", side == "black", tint, "filtre-noirs") { onSide("black") }
+        if (classics != null) FilterChip(stringResource(R.string.filter_classics), classics, Palette.violet, "filtre-classiques", onClassics)
         FilterChip(stringResource(R.string.level_club), level == "club", Palette.accent, "filtre-club") { onLevel("club") }
         FilterChip(stringResource(R.string.level_advanced), level == "advanced", Palette.warning, "filtre-avance") { onLevel("advanced") }
     }

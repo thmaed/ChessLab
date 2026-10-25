@@ -113,7 +113,7 @@ data class DailySessionPlan(val steps: List<DailySessionStep>, val streak: Int, 
 object DailySessionBuilder {
     /**
      * Une séance se veut courte : au plus 5 puzzles par étape, et un plafond
-     * RÉGLABLE de positions d'ouverture — 3, 5 ou 10, 5 par défaut (comme iOS).
+     * RÉGLABLE de positions d'ouverture — 2, 5 ou 8, 5 par défaut (comme iOS).
      */
     const val DEFAULT_OPENINGS_CAP = 5
     const val PUZZLES_CAP = 5

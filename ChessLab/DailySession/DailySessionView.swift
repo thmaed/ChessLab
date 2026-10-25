@@ -39,26 +39,24 @@ struct DailySessionView: View {
         .accessibilityIdentifier("dailySessionScreen")
     }
 
-    /// Combien de positions d'ouverture la séance propose au plus par jour.
+    /// Combien de positions d'ouverture la séance propose au plus par jour :
+    /// une seule ligne discrète, sans carte ni phrase d'explication.
     private var capPicker: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        HStack(spacing: 12) {
             Text("Ouvertures par séance")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Theme.textPrimary)
+                .font(.footnote)
+                .foregroundStyle(Theme.textSecondary)
+                .lineLimit(2)
+            Spacer(minLength: 8)
             Picker("Ouvertures par séance", selection: $openingsCap) {
                 ForEach(DailySessionBuilder.openingsCapChoices, id: \.self) { Text("\($0)").tag($0) }
             }
             .pickerStyle(.segmented)
+            .frame(maxWidth: 150)
             .accessibilityIdentifier("daily_openings_cap")
             .onChange(of: openingsCap) { reload() }
-            Text("Au plus ce nombre de positions d'ouverture à revoir par jour ; le reste attend le lendemain.")
-                .font(.caption)
-                .foregroundStyle(Theme.textTertiary)
-                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .cardStyle()
+        .padding(.horizontal, 4)
     }
 
     private func reload() {

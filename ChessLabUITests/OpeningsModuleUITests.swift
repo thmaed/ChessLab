@@ -30,7 +30,20 @@ final class OpeningsModuleUITests: XCTestCase {
     @discardableResult
     private func openLabs(_ app: XCUIApplication) -> Bool {
         let tile = app.buttons["mode_openings"]
+        // La grille est paresseuse : à très grande taille de texte la tuile
+        // n'existe pas tant qu'on n'a pas défilé jusqu'à elle.
+        for _ in 0..<12 where !tile.exists && !sidebarRow(app).exists {
+            _ = tile.waitForExistence(timeout: 1)
+            if !tile.exists { app.swipeUp() }
+        }
         if tile.waitForExistence(timeout: 10) {
+            // À très grande taille de texte la grille (paresseuse) place la tuile
+            // sous le pli : on défile jusqu'à ce qu'elle soit touchable.
+            var scrolls = 0
+            while !tile.isHittable, scrolls < 12 {
+                app.swipeUp()
+                scrolls += 1
+            }
             tile.tap()
             return true
         }

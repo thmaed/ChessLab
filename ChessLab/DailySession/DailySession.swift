@@ -40,11 +40,11 @@ struct DailySessionPlan: Equatable {
 
 enum DailySessionBuilder {
     /// Une séance se veut courte : au plus 5 puzzles par étape, et un plafond
-    /// RÉGLABLE de positions d'ouverture — 3, 5 ou 10, 5 par défaut (même
+    /// RÉGLABLE de positions d'ouverture — 2, 5 ou 8, 5 par défaut (même
     /// plafond sur Android). Le reste attend demain.
     static let puzzlesCap = 5
     static let openingsCapKey = "dailySession.openingsCap"
-    static let openingsCapChoices = [3, 5, 10]
+    static let openingsCapChoices = [2, 5, 8]
     static let defaultOpeningsCap = 5
 
     static var openingsCap: Int {

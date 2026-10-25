@@ -53,7 +53,7 @@ data class AppSettings(
      * propose), "on" ou "off". Reste local à l'appareil : un coût de batterie.
      */
     val autoAnalysis: String = "undecided",
-    /** Plafond des positions d'ouverture de la séance du jour : 3, 5 ou 10. Pendant du réglage d'iOS. */
+    /** Plafond des positions d'ouverture de la séance du jour : 2, 5 ou 8. Pendant du réglage d'iOS. */
     val dailyOpeningsCap: Int = 5,
 )
 
@@ -83,7 +83,7 @@ object SettingsStore {
     private val keyDailyOpeningsCap = intPreferencesKey("dailyOpeningsCap")
 
     /** Les plafonds proposés pour les ouvertures de la séance du jour. */
-    val DAILY_OPENINGS_CHOICES = listOf(3, 5, 10)
+    val DAILY_OPENINGS_CHOICES = listOf(2, 5, 8)
 
     /** Longueur maximale retenue pour le nom du joueur, comme sur iOS. */
     const val PLAYER_NAME_MAX_LENGTH = 40

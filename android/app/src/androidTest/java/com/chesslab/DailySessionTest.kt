@@ -33,8 +33,8 @@ class DailySessionTest {
         compose.waitUntil(20_000) { compose.onAllNodesWithTag("seance-du-jour").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("seance-du-jour").performScrollTo().performClick()
         compose.waitUntil(10_000) { compose.onAllNodesWithTag("ecran-seance").fetchSemanticsNodes().isNotEmpty() }
-        compose.onNodeWithTag("seance-ouvertures-3").performScrollTo().performClick()
-        compose.waitUntil(10_000) { com.chesslab.settings.SettingsStore.state.value.dailyOpeningsCap == 3 }
+        compose.onNodeWithTag("seance-ouvertures-2").performScrollTo().performClick()
+        compose.waitUntil(10_000) { com.chesslab.settings.SettingsStore.state.value.dailyOpeningsCap == 2 }
         compose.onNodeWithTag("seance-ouvertures-5").performScrollTo().performClick()
         compose.waitUntil(10_000) { com.chesslab.settings.SettingsStore.state.value.dailyOpeningsCap == 5 }
     }
