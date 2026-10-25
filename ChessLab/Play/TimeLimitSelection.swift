@@ -104,7 +104,7 @@ struct TimeLimitSection: View {
     var tint: Color = Theme.accent
 
     var body: some View {
-        SettingsSection(title: "Limite de temps", systemImage: "timer", tint: tint) {
+        SettingsSection(title: "Limite de temps", systemImage: "timer", tint: tint, discoverySpot: .timeLimit) {
             VStack(alignment: .leading, spacing: 12) {
                 ToggleRow(label: "Limite de temps", isOn: $selection.isEnabled.animation(Theme.gentle), tint: tint)
                     .accessibilityIdentifier("timeLimitToggle")

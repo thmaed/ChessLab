@@ -46,8 +46,14 @@ struct ChessLabApp: App {
             UserDefaults.standard.removeObject(forKey: "settings.appLanguage")
             // Même raison pour le nom du joueur.
             UserDefaults.standard.removeObject(forKey: "settings.playerName")
-            // Les tests ne doivent jamais voir la proposition d'analyse (A1).
-            UserDefaults.standard.set("off", forKey: "settings.autoAnalysis")
+            // Les tests ne doivent jamais voir la proposition d'analyse (A1), sauf
+            // celui qui la vérifie (`-autoAnalysisUndecided`).
+            if CommandLine.arguments.contains("-autoAnalysisUndecided") {
+                UserDefaults.standard.removeObject(forKey: "settings.autoAnalysis")
+                UserDefaults.standard.removeObject(forKey: "autoAnalysisOfferShowings")
+            } else {
+                UserDefaults.standard.set("off", forKey: "settings.autoAnalysis")
+            }
         }
 
         // Toucher le singleton AVANT tout rendu : son init applique la langue

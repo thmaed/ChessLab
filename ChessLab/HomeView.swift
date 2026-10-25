@@ -389,6 +389,9 @@ struct HomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: .replayDiscoveryTour)) { _ in
             discoveryTour.start()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .replayWhatsNewTour)) { _ in
+            discoveryTour.startWhatsNew()
+        }
         .task {
             // Une NOUVELLE installation montre la visite — l'empreinte est la
             // date de création du conteneur Documents, pas un booléen
@@ -398,15 +401,23 @@ struct HomeView: View {
             #if DEBUG
             // Crochet de vérification : `-discoveryStep N` saute à l'étape N
             // sans attendre ni empreinte — captures d'écran et outillage.
+            if UserDefaults.standard.bool(forKey: "discoveryWhatsNew") {
+                discoveryTour.startWhatsNew()
+                return
+            }
             if UserDefaults.standard.object(forKey: "discoveryStep") != nil {
                 discoveryTour.start(at: UserDefaults.standard.integer(forKey: "discoveryStep"))
                 return
             }
             #endif
             try? await Task.sleep(for: .seconds(1))
-            guard DiscoveryTourMemory.shouldOffer, !seedingState.isSeeding,
-                  resumableGame == nil, !discoveryTour.isActive else { return }
-            discoveryTour.start()
+            guard !seedingState.isSeeding, resumableGame == nil, !discoveryTour.isActive else { return }
+            if DiscoveryTourMemory.shouldOffer {
+                discoveryTour.start()
+            } else if DiscoveryTourMemory.shouldOfferWhatsNew() {
+                // Une MISE À JOUR depuis la 1.x : le court parcours des nouveautés.
+                discoveryTour.startWhatsNew()
+            }
         }
         .onChange(of: menuCommands.requested) { _, destination in
             guard let destination else { return }
@@ -1698,6 +1709,7 @@ struct HomeView: View {
     /// C7 / A5 (2.0) : la « Séance du jour » en tête de l'accueil.
     private var dailySessionCard: some View {
         DailySessionCard { path.append(Route.dailySession) }
+            .discoveryAnchor(.dailySession)
     }
 
     /// A3 (2.0) : « Vous avez quitté votre répertoire — 1 position à revoir ».

@@ -26,6 +26,9 @@ enum DiscoverySpot: Hashable {
     case recentGames     // section « Parties récentes » (accueil)
     case variantsTile    // tuile « Variantes »
     case puzzlesTile     // tuile « Puzzles »
+    case dailySession    // carte « Séance du jour » (accueil)
+    case timeLimit       // section « Limite de temps » (réglages de partie)
+    case openingFilters  // filtres Camp / Niveau de la liste des ouvertures
     case helpButton      // « Aide » — barre latérale iPad/Mac uniquement :
                          // le bouton iPhone vit dans un ToolbarItem UIKit,
                          // d'où les préférences d'ancrage ne remontent pas.
@@ -88,7 +91,20 @@ private struct DiscoveryAutoScroll: ViewModifier {
     @Environment(\.discoveryTour) private var tour
 
     func body(content: Content) -> some View {
-        content.onChange(of: tour?.currentStepIndex) { _, _ in
+        content
+        // L'écran peut apparaître APRÈS le changement d'étape (la visite vient de
+        // changer de destination : l'écran se monte, ses ids ne sont pas encore
+        // posés quand l'étape défile) — on recentre alors à l'apparition.
+        .onAppear {
+            guard let spot = tour?.currentStep?.spot else { return }
+            Task { @MainActor in
+                try? await Task.sleep(for: .milliseconds(450))
+                withAnimation(.easeInOut(duration: 0.35)) {
+                    proxy.scrollTo(spot, anchor: .center)
+                }
+            }
+        }
+        .onChange(of: tour?.currentStepIndex) { _, _ in
             guard let spot = tour?.currentStep?.spot else { return }
             // Petit délai : la navigation de l'étape vient parfois d'être
             // appliquée, et l'écran cible n'a pas encore posé ses ids.
@@ -140,6 +156,8 @@ extension Notification.Name {
     /// Le rejeu depuis l'Aide passe par une notification, pas un singleton :
     /// l'Aide est poussée plus bas dans la pile, la demande doit REMONTER.
     static let replayDiscoveryTour = Notification.Name("ChessLab.replayDiscoveryTour")
+    /// Rejouer le court parcours des nouveautés (depuis l'Aide).
+    static let replayWhatsNewTour = Notification.Name("ChessLab.replayWhatsNewTour")
 }
 
 @Observable
@@ -148,7 +166,12 @@ final class DiscoveryTourController {
     private(set) var isActive = false
     private(set) var currentStepIndex = 0
 
-    let steps: [DiscoveryStep] = DiscoveryTourController.buildSteps()
+    /// Deux parcours : la visite COMPLÈTE d'une nouvelle installation, et le
+    /// court parcours des NOUVEAUTÉS de la 2.0 pour qui met à jour depuis la 1.x.
+    enum Kind { case full, whatsNew }
+
+    private(set) var kind: Kind = .full
+    private(set) var steps: [DiscoveryStep] = DiscoveryTourController.buildSteps()
 
     var currentStep: DiscoveryStep? {
         guard isActive, steps.indices.contains(currentStepIndex) else { return nil }
@@ -156,7 +179,16 @@ final class DiscoveryTourController {
     }
 
     func start(at index: Int = 0) {
+        if kind != .full { kind = .full; steps = Self.buildSteps() }
         currentStepIndex = min(max(0, index), steps.count - 1)
+        isActive = true
+    }
+
+    /// Le parcours des nouveautés de la 2.0 — pour qui a déjà vu la visite.
+    func startWhatsNew() {
+        kind = .whatsNew
+        steps = Self.buildWhatsNewSteps()
+        currentStepIndex = 0
         isActive = true
     }
 
@@ -178,7 +210,10 @@ final class DiscoveryTourController {
 
     private func finish() {
         isActive = false
+        // Les deux parcours comptent comme vus : la visite complète présente déjà
+        // les nouveautés, et le parcours des nouveautés ne se rejoue pas seul.
         DiscoveryTourMemory.markSeen()
+        DiscoveryTourMemory.markWhatsNewSeen()
     }
 
     private static func buildSteps() -> [DiscoveryStep] {
@@ -223,63 +258,113 @@ final class DiscoveryTourController {
                 body: "Cette tuile lance une partie contre neuf personnages joués par Maia-3, un réseau qui joue comme un humain — ou contre Stockfish. Les autres attendront la fin de la visite — deux minutes, promis."
             ),
             DiscoveryStep(
-                id: 1, section: "Jouer", spot: .strengthSlider, destination: .newGame,
+                id: 1, section: "Jouer", spot: .dailySession, destination: .home,
+                title: "Votre séance du jour",
+                body: "Chaque jour, l'app prépare ce qu'il faut revoir : positions d'ouverture dues, puzzles ratés, une finale. Terminez-la pour allonger votre série de jours."
+            ),
+            DiscoveryStep(
+                id: 2, section: "Jouer", spot: .strengthSlider, destination: .newGame,
                 title: "Choisissez votre adversaire",
                 body: "Un personnage d'abord : chacun a son style, son répertoire et son caractère, et joue comme un vrai joueur de son niveau — gaffes comprises. Ou Stockfish, au curseur, avec le nom du palier à côté. Le piège du premier soir : jouer à pleine force."
             ),
             DiscoveryStep(
-                id: 2, section: "Jouer", spot: .aidToggles, destination: .newGame,
+                id: 3, section: "Jouer", spot: .aidToggles, destination: .newGame,
                 title: "Les aides se choisissent avant",
                 body: "Les flèches d'indice et la barre d'évaluation s'activent ici, avant la partie. On les découvre souvent trop tard."
+            ),
+            DiscoveryStep(
+                id: 4, section: "Jouer", spot: .timeLimit, destination: .newGame,
+                title: "Une pendule, si vous voulez",
+                body: "« Limite de temps » est éteinte par défaut : allumez-la pour choisir une cadence (Bullet, Blitz, Rapide…). L'app retient votre dernier choix."
             ),
             // Sans cible : « Commencer » vit dans un ToolbarItem UIKit,
             // hors de portée des préférences d'ancrage — et les contrôles
             // décrits vivent de toute façon UN ÉCRAN PLUS LOIN : c'est le
             // cas d'usage exact des chips.
             DiscoveryStep(
-                id: 3, section: "Jouer", spot: nil, destination: .newGame,
+                id: 5, section: "Jouer", spot: nil, destination: .newGame,
                 title: "Pendant la partie",
                 body: "La barre du bas de l'écran de jeu cache cinq gestes — les voici, pour les reconnaître :",
                 chips: playControls
             ),
             // ---- COMPRENDRE : les affichages, ensuite.
             DiscoveryStep(
-                id: 4, section: "Comprendre", spot: .analysisLibrary, destination: .analysisEntry,
+                id: 6, section: "Comprendre", spot: .analysisLibrary, destination: .analysisEntry,
                 title: "Chaque partie s'analyse",
                 body: "Courbe d'évaluation, précision, coups en capsules colorées — et la courbe comme les capsules se touchent pour naviguer dans la partie. La bibliothèque garde tout."
             ),
             DiscoveryStep(
-                id: 5, section: "Comprendre", spot: .recentGames, destination: .home,
+                id: 7, section: "Comprendre", spot: .recentGames, destination: .home,
                 title: "Le raccourci de l'accueil",
                 body: "Vos dernières parties vivent aussi ici : un tap ouvre directement leur analyse, sans passer par la bibliothèque."
             ),
             DiscoveryStep(
-                id: 6, section: "Comprendre", spot: nil, destination: .home,
+                id: 8, section: "Comprendre", spot: nil, destination: .home,
                 title: "Partez sans crainte",
                 body: "La partie en cours se sauvegarde toute seule. À votre retour, « Reprendre la partie » vous attend en haut de l'accueil."
             ),
             // ---- EXPLORER : les autres écrans, puis le « ? » qui ramène tout.
             DiscoveryStep(
-                id: 7, section: "Explorer", spot: nil, destination: .openings,
+                id: 9, section: "Explorer", spot: nil, destination: .openings,
                 title: "La recherche flotte",
                 body: "Dans les Ouvertures, le champ de recherche flotte AU-DESSUS de l'arbre. Cherchez, puis fermez le clavier pour toucher les résultats en dessous."
             ),
             DiscoveryStep(
-                id: 8, section: "Explorer", spot: .variantsTile, destination: .home,
+                id: 10, section: "Explorer", spot: .variantsTile, destination: .home,
                 title: "Douze façons de jouer",
                 body: "Chaque variante explique ses règles sur son écran de réglages — inutile de les connaître d'avance :",
                 chips: variantChips
             ),
             DiscoveryStep(
-                id: 9, section: "Explorer", spot: .puzzlesTile, destination: .home,
+                id: 11, section: "Explorer", spot: .puzzlesTile, destination: .home,
                 title: "Trois salles d'entraînement",
                 body: "La tactique, le répertoire, et les fins de partie prouvées :",
                 chips: trainingChips
             ),
             DiscoveryStep(
-                id: 10, section: "Explorer", spot: .helpButton, destination: .home,
+                id: 12, section: "Explorer", spot: .helpButton, destination: .home,
                 title: "Et pour y revenir",
                 body: "Le « ? » en haut de l'accueil rassemble l'aide — et cette visite, à rejouer quand vous voulez."
+            ),
+        ]
+    }
+}
+
+extension DiscoveryTourController {
+    /// Le court parcours des NOUVEAUTÉS de la 2.0, montré une seule fois à qui met
+    /// à jour depuis la 1.x : chaque étape pointe un vrai contrôle nouveau, à
+    /// l'endroit où il vit.
+    static func buildWhatsNewSteps() -> [DiscoveryStep] {
+        [
+            DiscoveryStep(
+                id: 0, section: "Nouveautés 2.0", spot: .dailySession, destination: .home,
+                title: "Votre séance du jour",
+                body: "L'app prépare chaque jour ce qu'il faut revoir — ouvertures, puzzles ratés, une finale — et compte votre série de jours, avec des médailles. Le plafond d'ouvertures se règle sur son écran."
+            ),
+            DiscoveryStep(
+                id: 1, section: "Nouveautés 2.0", spot: .puzzlesTile, destination: .home,
+                title: "Une cote de puzzle personnelle",
+                body: "Vos puzzles vous donnent maintenant une cote, comme aux échecs, et la puce « À mon niveau » propose des puzzles à votre mesure. Prendre l'indice ne rapporte plus de points."
+            ),
+            DiscoveryStep(
+                id: 2, section: "Nouveautés 2.0", spot: nil, destination: .analysisEntry,
+                title: "Analyse automatique et Coach",
+                body: "Après une partie, l'app propose d'analyser vos parties d'elle-même pour dessiner votre profil de faiblesses dans Progrès. Dans l'analyse, le Coach dit ce que jouent les joueurs de votre niveau. La dernière partie passe en tête de cet écran."
+            ),
+            DiscoveryStep(
+                id: 3, section: "Nouveautés 2.0", spot: .openingFilters, destination: .openings,
+                title: "Classiques, Camp, Niveau",
+                body: "Deux menus filtrent les ouvertures : Camp (Blancs ou Noirs) et Niveau — dont « Classiques », les 19 ouvertures les plus jouées. Chaque carte montre la position clé et votre maîtrise."
+            ),
+            DiscoveryStep(
+                id: 4, section: "Nouveautés 2.0", spot: .timeLimit, destination: .newGame,
+                title: "La limite de temps, en option",
+                body: "Les cadences n'apparaissent que si vous allumez « Limite de temps » — éteinte par défaut, et l'app retient votre dernier réglage, écran par écran."
+            ),
+            DiscoveryStep(
+                id: 5, section: "Nouveautés 2.0", spot: .helpButton, destination: .home,
+                title: "Tout est dans l'aide",
+                body: "Le « ? » rassemble le détail des nouveautés, et vous pouvez rejouer cette visite quand vous voulez."
             ),
         ]
     }
@@ -332,6 +417,25 @@ enum DiscoveryTourMemory {
     static func markSeen() {
         guard let stamp = installStamp else { return }
         UserDefaults.standard.set(stamp, forKey: key)
+    }
+
+    // MARK: Les nouveautés d'une version
+
+    /// L'identifiant du parcours des nouveautés en cours. Se change à la version
+    /// majeure suivante : tout le monde le revoit alors une fois.
+    static let whatsNewID = "2.0"
+    private static let whatsNewKey = "whatsNewSeenVersion"
+
+    /// À mettre à jour depuis la 1.x : la visite complète a déjà été vue sur CETTE
+    /// installation (donc ce n'est pas une installation neuve), mais pas encore
+    /// le parcours des nouveautés de cette version.
+    static func shouldOfferWhatsNew(defaults: UserDefaults = .standard) -> Bool {
+        guard !shouldOffer else { return false }
+        return defaults.string(forKey: whatsNewKey) != whatsNewID
+    }
+
+    static func markWhatsNewSeen(defaults: UserDefaults = .standard) {
+        defaults.set(whatsNewID, forKey: whatsNewKey)
     }
 }
 

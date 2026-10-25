@@ -36,52 +36,15 @@ import com.chesslab.settings.SettingsStore
 import kotlinx.coroutines.delay
 
 /**
- * A1 (2.0) — l'interface de l'analyse automatique : la PROPOSITION (une fois,
- * une fois la visite guidée passée) et l'indicateur d'avancement quand une
- * partie est en cours. Pendant de `AutoAnalysisHost.swift`.
+ * A1 (2.0) — l'interface de l'analyse automatique : l'indicateur d'avancement
+ * quand une partie est en cours. Pendant de `AutoAnalysisHost.swift`.
  *
- * Les builds débogables ne proposent rien (les tests d'interface ne doivent
- * jamais voir la boîte), sauf si l'intent porte l'extra `autoAnalysisPrompt`.
+ * La PROPOSITION n'est plus une boîte au démarrage (25/10/2026 : hors contexte,
+ * jargon, aucun bénéfice dit) : elle vit sur l'écran de fin de partie —
+ * [AutoAnalysisOfferCard] — au moment où l'utilisateur a une partie à analyser.
  */
 @Composable
 fun AutoAnalysisHost(tour: DiscoveryTourController) {
-    val context = LocalContext.current
-    val settings by SettingsStore.state.collectAsState()
-    var showProposal by remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        val debuggable = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
-        val forced = (context as? android.app.Activity)?.intent?.getBooleanExtra("autoAnalysisPrompt", false) == true
-        if (debuggable && !forced) return@LaunchedEffect
-        // Attend la fin de la visite guidée : une seule question à la fois.
-        delay(3000)
-        if (settings.autoAnalysis == "undecided" && !DiscoveryTourMemory.shouldOffer(context) && !tour.isActive) {
-            showProposal = true
-        }
-    }
-
-    if (showProposal) {
-        AlertDialog(
-            onDismissRequest = { showProposal = false },
-            title = { Text(stringResource(R.string.auto_analysis_title)) },
-            text = { Text(stringResource(R.string.auto_analysis_message)) },
-            confirmButton = {
-                TextButton(
-                    onClick = { SettingsStore.setAutoAnalysis(context, "on"); showProposal = false },
-                    modifier = Modifier.testTag("auto_analysis_enable"),
-                ) { Text(stringResource(R.string.auto_analysis_enable)) }
-            },
-            dismissButton = {
-                Row {
-                    TextButton(onClick = { showProposal = false }) { Text(stringResource(R.string.auto_analysis_later)) }
-                    TextButton(onClick = { SettingsStore.setAutoAnalysis(context, "off"); showProposal = false }) {
-                        Text(stringResource(R.string.auto_analysis_no))
-                    }
-                }
-            },
-        )
-    }
-
     if (AutoAnalysisService.isRunning || AutoAnalysisService.queue.isNotEmpty()) {
         Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomCenter) {
             Row(

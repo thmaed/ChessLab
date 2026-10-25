@@ -36,6 +36,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chesslab.R
+import com.chesslab.discovery.discoveryAnchor
 import com.chesslab.ui.ChipButton
 import com.chesslab.ui.Palette
 import com.chesslab.ui.SettingsSection
@@ -181,7 +182,10 @@ private fun TimeStepper(title: String, value: Int, range: IntRange, tag: String,
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TimeLimitSection(state: TimeLimitState, tint: Color = Palette.accent) {
-    SettingsSection(stringResource(R.string.setup_time_limit), Icons.Default.Timer, tint) {
+    SettingsSection(
+        stringResource(R.string.setup_time_limit), Icons.Default.Timer, tint,
+        modifier = Modifier.discoveryAnchor(com.chesslab.discovery.DiscoverySpot.timeLimit),
+    ) {
         ToggleRow(stringResource(R.string.setup_time_limit), state.enabled, "limite-de-temps", tint) { state.enabled = it }
         if (state.enabled) {
             Spacer(Modifier.height(10.dp))

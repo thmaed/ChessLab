@@ -186,6 +186,7 @@ struct OpeningListView: View {
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .discoveryAnchor(.openingFilters)
     }
 
     /// Le niveau affiché : un seul des quatre choix, rangé dans les deux états

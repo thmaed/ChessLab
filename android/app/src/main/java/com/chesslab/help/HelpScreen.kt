@@ -28,6 +28,10 @@ import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.Speed
+import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Star
 import com.chesslab.ui.CardShape
 import com.chesslab.ui.IconBadge
 import com.chesslab.ui.cardGradient
@@ -44,7 +48,7 @@ import com.chesslab.R
  * signifient. Une aide qui ne dit que le bon côté ne sert à personne.
  */
 @Composable
-fun HelpScreen(onReplayTour: () -> Unit = {}) {
+fun HelpScreen(onReplayTour: () -> Unit = {}, onReplayWhatsNew: () -> Unit = {}) {
     Column(
         Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
@@ -69,6 +73,27 @@ fun HelpScreen(onReplayTour: () -> Unit = {}) {
                     fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
                 )
                 Text(stringResource(R.string.discovery_replay_sub), fontSize = 12.sp, color = Palette.textSecondary)
+            }
+            Icon(Icons.Default.ChevronRight, null, tint = Palette.textTertiary, modifier = Modifier.size(16.dp))
+        }
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(14.dp))
+                .background(Palette.surface)
+                .clickable(onClick = onReplayWhatsNew)
+                .padding(14.dp)
+                .testTag("revoir-nouveautes"),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconBadge(Icons.Default.Star, Palette.violet, 42.dp)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    stringResource(R.string.discovery_replay_news_title), fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                )
+                Text(stringResource(R.string.discovery_replay_news_sub), fontSize = 12.sp, color = Palette.textSecondary)
             }
             Icon(Icons.Default.ChevronRight, null, tint = Palette.textTertiary, modifier = Modifier.size(16.dp))
         }
@@ -102,10 +127,14 @@ fun HelpScreen(onReplayTour: () -> Unit = {}) {
  * langues.
  */
 private val sections = listOf(
+    Triple(R.string.help_news_title, R.string.help_news_body, Icons.Default.AutoAwesome to Palette.accent),
+    Triple(R.string.help_daily_title, R.string.help_daily_body, Icons.Default.LocalFireDepartment to Palette.warning),
     Triple(R.string.help_characters_title, R.string.help_characters_body, Icons.Default.Groups to Palette.accent),
     Triple(R.string.help_level_title, R.string.help_level_body, Icons.Default.Speed to Palette.info),
     Triple(R.string.help_safety_title, R.string.help_safety_body, Icons.Default.Shield to Palette.teal),
     Triple(R.string.help_puzzles_title, R.string.help_puzzles_body, Icons.Default.Extension to Palette.violet),
+    Triple(R.string.help_rating_title, R.string.help_rating_body, Icons.Default.TrendingUp to Palette.violet),
+    Triple(R.string.help_analysis_title, R.string.help_analysis_body, Icons.Default.ShowChart to Palette.teal),
     Triple(R.string.help_courses_title, R.string.help_courses_body, Icons.Default.MenuBook to Palette.warning),
     Triple(R.string.help_training_title, R.string.help_training_body, Icons.Default.Psychology to Palette.gold),
     Triple(R.string.help_variants_title, R.string.help_variants_body, Icons.Default.Casino to Palette.rose),

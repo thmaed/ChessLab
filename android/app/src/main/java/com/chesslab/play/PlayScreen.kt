@@ -187,6 +187,9 @@ fun PlayScreen(
             gutter, ui.outcome ?: ui.status,
             summary = model.opponentSummaryLine(),
             materialCurve = model.materialCurve(),
+            onEnableAutoAnalysis = { ctx ->
+                com.chesslab.analysis.AutoAnalysisService.enqueue(ctx, model.currentPgn(), model.userColor)
+            },
             onAnalyze = { onAnalyzeGame(model.currentPgn()) },
             onMissedMates = { onFindMissedMates(model.currentPgn()) },
             onHome = onHome,
@@ -564,6 +567,7 @@ private fun GameOverPanel(
     message: String,
     summary: String,
     materialCurve: List<CurvePoint>,
+    onEnableAutoAnalysis: (android.content.Context) -> Unit,
     onAnalyze: () -> Unit,
     onMissedMates: () -> Unit,
     onHome: () -> Unit,
@@ -591,6 +595,14 @@ private fun GameOverPanel(
                 Text(stringResource(R.string.play_material_curve), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Palette.textTertiary)
                 EvalCurve(materialCurve, currentPly = null, onSelect = {})
             }
+            Spacer(Modifier.height(10.dp))
+        }
+        // L'offre d'analyse automatique : ici, pas au démarrage. Comptée une fois par apparition.
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val offer = androidx.compose.runtime.remember { com.chesslab.ui.AutoAnalysisOffer.shouldShow(context) }
+        if (offer) {
+            androidx.compose.runtime.LaunchedEffect(Unit) { com.chesslab.ui.AutoAnalysisOffer.noteShown(context) }
+            com.chesslab.ui.AutoAnalysisOfferCard(onAccept = { onEnableAutoAnalysis(context) })
             Spacer(Modifier.height(10.dp))
         }
         Row(verticalAlignment = Alignment.CenterVertically) {

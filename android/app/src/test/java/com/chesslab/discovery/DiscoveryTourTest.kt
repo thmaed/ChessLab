@@ -69,8 +69,8 @@ class DiscoveryTourStepsTest {
 
     @Test fun `les etapes forment trois sections ordonnees, ids croissants`() {
         val tour = DiscoveryTourController()
-        assertEquals(11, tour.steps.size)
-        assertEquals((0 until 11).toList(), tour.steps.map { it.id })
+        assertEquals(13, tour.steps.size)
+        assertEquals((0 until 13).toList(), tour.steps.map { it.id })
         // L'ordre du contrat : ce qu'on s'apprête à toucher, puis les
         // affichages, puis les autres écrans, et le « ? » qui ramène tout.
         assertEquals(DiscoverySpot.playTile, tour.steps.first().spot)
@@ -78,7 +78,7 @@ class DiscoveryTourStepsTest {
         // Les étapes sans cible sont VOULUES — pas plus de trois.
         assertEquals(3, tour.steps.count { it.spot == null })
         // Les chips des variantes suivent le catalogue, et le titre les compte.
-        val variants = tour.steps[8]
+        val variants = tour.steps[10]
         assertTrue(variants.chips.size >= 7)
         assertEquals(variants.chips.size, variants.titleArg)
     }
@@ -101,8 +101,28 @@ class DiscoveryTourStepsTest {
         assertEquals(2, seen)
         // Hors bornes : ramené dans la liste, jamais planté.
         tour.start(at = 99)
-        assertEquals(10, tour.currentStepIndex)
+        assertEquals(12, tour.currentStepIndex)
         tour.start(at = -3)
         assertEquals(0, tour.currentStepIndex)
+    }
+
+    @Test fun `les nouveautes 2_0 forment un court parcours distinct`() {
+        var seen = 0
+        var newsSeen = 0
+        val tour = DiscoveryTourController(onSeen = { seen++ }, onWhatsNewSeen = { newsSeen++ })
+        tour.startWhatsNew()
+        assertTrue(tour.isActive)
+        assertEquals(DiscoveryTourController.Kind.whatsNew, tour.kind)
+        assertEquals(6, tour.steps.size)
+        assertEquals((0 until 6).toList(), tour.steps.map { it.id })
+        assertEquals(DiscoverySpot.dailySession, tour.steps.first().spot)
+        assertEquals(DiscoverySpot.helpButton, tour.steps.last().spot)
+        repeat(tour.steps.size) { tour.advance() }
+        assertFalse(tour.isActive)
+        assertEquals(1, newsSeen)
+        // Rejouer la visite complète repart sur les étapes complètes.
+        tour.start()
+        assertEquals(DiscoveryTourController.Kind.full, tour.kind)
+        assertEquals(13, tour.steps.size)
     }
 }

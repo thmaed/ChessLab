@@ -39,12 +39,17 @@ class DiscoveryTourTest {
         awaitText("Tout part d'ici")
         compose.onNodeWithTag("mode-play").assertExists()
 
-        // Étape 2 : la visite a OUVERT l'écran de réglages de partie.
+        // Étape 2 : la séance du jour, sur l'accueil.
+        compose.onNodeWithTag("visite-suivant").performClick()
+        awaitText("Votre séance du jour")
+
+        // Étape 3 : la visite a OUVERT l'écran de réglages de partie.
         compose.onNodeWithTag("visite-suivant").performClick()
         awaitText("Choisissez votre adversaire")
         compose.onNodeWithTag("commencer").assertExists()
 
-        // Étape 4 : les chips des gestes de la partie.
+        // Étape 6 : les chips des gestes de la partie (après les aides et la limite de temps).
+        compose.onNodeWithTag("visite-suivant").performClick()
         compose.onNodeWithTag("visite-suivant").performClick()
         compose.onNodeWithTag("visite-suivant").performClick()
         awaitText("Pendant la partie")
@@ -52,7 +57,7 @@ class DiscoveryTourTest {
 
         // Retour d'une étape.
         compose.onNodeWithTag("visite-retour").performClick()
-        awaitText("Les aides se choisissent avant")
+        awaitText("Une pendule, si vous voulez")
 
         // Passer : la carte disparaît, l'écran où l'on était RESTE (comme sur
         // iOS, la visite ne ramène pas à l'accueil en partant), et la visite
@@ -63,5 +68,19 @@ class DiscoveryTourTest {
         compose.onNodeWithTag("retour").performClick()
         compose.onNodeWithTag("mode-play").assertIsDisplayed()
         assertFalse(DiscoveryTourMemory.shouldOffer(InstrumentationRegistry.getInstrumentation().targetContext))
+    }
+
+    /** Le court parcours des nouveautés 2.0 : six étapes, rejouables depuis l'Aide, et il se termine. */
+    @Test fun theWhatsNewTourReplaysFromHelpAndEnds() {
+        compose.onNodeWithTag("aide").performClick()
+        compose.onNodeWithTag("revoir-nouveautes").performScrollTo().performClick()
+        awaitText("Votre séance du jour")
+        repeat(5) {
+            compose.onNodeWithTag("visite-suivant").performClick()
+            compose.waitForIdle()
+        }
+        awaitText("Tout est dans l'aide")
+        compose.onNodeWithTag("visite-suivant").performClick()
+        compose.waitUntil(10_000) { compose.onAllNodesWithTag("visite").fetchSemanticsNodes().isEmpty() }
     }
 }

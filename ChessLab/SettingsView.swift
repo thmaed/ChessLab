@@ -394,7 +394,7 @@ struct SettingsView: View {
                     }
                 ))
                 .accessibilityIdentifier("auto_analysis_toggle")
-                Text("Après chaque partie contre l'ordinateur, sur l'appareil, en tâche de fond : environ 1 à 3 minutes et un peu de batterie. Interrompu en économie d'énergie ou si l'appareil chauffe.")
+                Text("Analyse chacune de vos parties contre l'ordinateur pour repérer vos erreurs, en tirer des puzzles et suivre votre progression. Tout se passe sur l'appareil : 1 à 3 minutes par partie et un peu de batterie, suspendu en économie d'énergie ou si l'appareil chauffe.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)

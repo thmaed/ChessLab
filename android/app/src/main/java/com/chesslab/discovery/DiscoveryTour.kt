@@ -57,6 +57,9 @@ enum class DiscoverySpot {
     recentGames,     // section « Parties récentes » (accueil)
     variantsTile,    // tuile « Variantes »
     puzzlesTile,     // tuile « Puzzles »
+    dailySession,    // carte « Séance du jour » (accueil)
+    timeLimit,       // section « Limite de temps » (réglages de partie)
+    openingFilters,  // menus Camp / Niveau de la liste des ouvertures
     helpButton,      // le « ? » de l'accueil — taguable ici, contrairement
                      // au ToolbarItem UIKit d'iPhone : l'étape 11 a sa flèche
 }
@@ -95,19 +98,38 @@ data class DiscoveryStep(
  * Le contrôleur : l'état d'avancement, et rien d'autre. [onSeen] pose
  * l'empreinte « vue » à la fin — injectée pour que la JVM puisse le tester.
  */
-class DiscoveryTourController(private val onSeen: () -> Unit = {}) {
+class DiscoveryTourController(
+    private val onSeen: () -> Unit = {},
+    /** Posé à la fin de l'un OU l'autre parcours : la visite complète présente déjà les nouveautés. */
+    private val onWhatsNewSeen: () -> Unit = {},
+) {
+    /** Deux parcours : la visite COMPLÈTE d'une nouvelle installation, et le court parcours des NOUVEAUTÉS de la 2.0. */
+    enum class Kind { full, whatsNew }
+
+    var kind by mutableStateOf(Kind.full)
+        private set
     var isActive by mutableStateOf(false)
         private set
     var currentStepIndex by mutableStateOf(0)
         private set
 
-    val steps: List<DiscoveryStep> = buildSteps()
+    var steps: List<DiscoveryStep> by mutableStateOf(buildSteps())
+        private set
 
     val currentStep: DiscoveryStep?
         get() = if (isActive && currentStepIndex in steps.indices) steps[currentStepIndex] else null
 
     fun start(at: Int = 0) {
+        if (kind != Kind.full) { kind = Kind.full; steps = buildSteps() }
         currentStepIndex = at.coerceIn(0, steps.size - 1)
+        isActive = true
+    }
+
+    /** Le parcours des nouveautés de la 2.0 — pour qui a déjà vu la visite. */
+    fun startWhatsNew() {
+        kind = Kind.whatsNew
+        steps = buildWhatsNewSteps()
+        currentStepIndex = 0
         isActive = true
     }
 
@@ -128,6 +150,7 @@ class DiscoveryTourController(private val onSeen: () -> Unit = {}) {
     private fun finish() {
         isActive = false
         onSeen()
+        onWhatsNewSeen()
     }
 
     private fun buildSteps(): List<DiscoveryStep> {
@@ -155,31 +178,54 @@ class DiscoveryTourController(private val onSeen: () -> Unit = {}) {
             // ---- JOUER : d'abord ce que l'utilisateur s'apprête à toucher.
             DiscoveryStep(0, play, DiscoverySpot.playTile, DiscoveryDestination.home,
                 R.string.discovery_0_title, R.string.discovery_0_body),
-            DiscoveryStep(1, play, DiscoverySpot.strengthSlider, DiscoveryDestination.newGame,
+            DiscoveryStep(1, play, DiscoverySpot.dailySession, DiscoveryDestination.home,
+                R.string.discovery_daily_title, R.string.discovery_daily_body),
+            DiscoveryStep(2, play, DiscoverySpot.strengthSlider, DiscoveryDestination.newGame,
                 R.string.discovery_1_title, R.string.discovery_1_body),
-            DiscoveryStep(2, play, DiscoverySpot.aidToggles, DiscoveryDestination.newGame,
+            DiscoveryStep(3, play, DiscoverySpot.aidToggles, DiscoveryDestination.newGame,
                 R.string.discovery_2_title, R.string.discovery_2_body),
+            DiscoveryStep(4, play, DiscoverySpot.timeLimit, DiscoveryDestination.newGame,
+                R.string.discovery_timelimit_title, R.string.discovery_timelimit_body),
             // Sans cible : les contrôles décrits vivent UN ÉCRAN PLUS LOIN —
             // c'est le cas d'usage exact des chips.
-            DiscoveryStep(3, play, null, DiscoveryDestination.newGame,
+            DiscoveryStep(5, play, null, DiscoveryDestination.newGame,
                 R.string.discovery_3_title, R.string.discovery_3_body, chips = playControls),
             // ---- COMPRENDRE : les affichages, ensuite.
-            DiscoveryStep(4, understand, DiscoverySpot.analysisLibrary, DiscoveryDestination.analysisEntry,
+            DiscoveryStep(6, understand, DiscoverySpot.analysisLibrary, DiscoveryDestination.analysisEntry,
                 R.string.discovery_4_title, R.string.discovery_4_body),
-            DiscoveryStep(5, understand, DiscoverySpot.recentGames, DiscoveryDestination.home,
+            DiscoveryStep(7, understand, DiscoverySpot.recentGames, DiscoveryDestination.home,
                 R.string.discovery_5_title, R.string.discovery_5_body),
-            DiscoveryStep(6, understand, null, DiscoveryDestination.home,
+            DiscoveryStep(8, understand, null, DiscoveryDestination.home,
                 R.string.discovery_6_title, R.string.discovery_6_body),
             // ---- EXPLORER : les autres écrans, puis le « ? » qui ramène tout.
-            DiscoveryStep(7, explore, null, DiscoveryDestination.openings,
+            DiscoveryStep(9, explore, null, DiscoveryDestination.openings,
                 R.string.discovery_7_title, R.string.discovery_7_body),
-            DiscoveryStep(8, explore, DiscoverySpot.variantsTile, DiscoveryDestination.home,
+            DiscoveryStep(10, explore, DiscoverySpot.variantsTile, DiscoveryDestination.home,
                 R.string.discovery_8_title, R.string.discovery_8_body, chips = variantChips,
                 titleArg = variantChips.size),
-            DiscoveryStep(9, explore, DiscoverySpot.puzzlesTile, DiscoveryDestination.home,
+            DiscoveryStep(11, explore, DiscoverySpot.puzzlesTile, DiscoveryDestination.home,
                 R.string.discovery_9_title, R.string.discovery_9_body, chips = trainingChips),
-            DiscoveryStep(10, explore, DiscoverySpot.helpButton, DiscoveryDestination.home,
+            DiscoveryStep(12, explore, DiscoverySpot.helpButton, DiscoveryDestination.home,
                 R.string.discovery_10_title, R.string.discovery_10_body),
+        )
+    }
+
+    /** Le court parcours des NOUVEAUTÉS de la 2.0 : chaque étape pointe un vrai contrôle nouveau, là où il vit. */
+    private fun buildWhatsNewSteps(): List<DiscoveryStep> {
+        val news = R.string.discovery_section_whatsnew
+        return listOf(
+            DiscoveryStep(0, news, DiscoverySpot.dailySession, DiscoveryDestination.home,
+                R.string.discovery_wn_0_title, R.string.discovery_wn_0_body),
+            DiscoveryStep(1, news, DiscoverySpot.puzzlesTile, DiscoveryDestination.home,
+                R.string.discovery_wn_1_title, R.string.discovery_wn_1_body),
+            DiscoveryStep(2, news, null, DiscoveryDestination.analysisEntry,
+                R.string.discovery_wn_2_title, R.string.discovery_wn_2_body),
+            DiscoveryStep(3, news, DiscoverySpot.openingFilters, DiscoveryDestination.openings,
+                R.string.discovery_wn_3_title, R.string.discovery_wn_3_body),
+            DiscoveryStep(4, news, DiscoverySpot.timeLimit, DiscoveryDestination.newGame,
+                R.string.discovery_wn_4_title, R.string.discovery_wn_4_body),
+            DiscoveryStep(5, news, DiscoverySpot.helpButton, DiscoveryDestination.home,
+                R.string.discovery_wn_5_title, R.string.discovery_wn_5_body),
         )
     }
 
@@ -230,6 +276,26 @@ object DiscoveryTourMemory {
     fun markSeen(context: Context) {
         val stamp = installStamp(context) ?: return
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putLong(KEY, stamp).apply()
+    }
+
+    // ---- Les nouveautés d'une version
+
+    /** L'identifiant du parcours des nouveautés en cours ; se change à la version majeure suivante. */
+    const val WHATS_NEW_ID = "2.0"
+    private const val WHATS_NEW_KEY = "whatsNewSeenVersion"
+
+    /**
+     * À mettre à jour depuis la 1.x : la visite complète a déjà été vue sur CETTE
+     * installation (donc ce n'est pas une installation neuve), mais pas encore le
+     * parcours des nouveautés de cette version.
+     */
+    fun shouldOfferWhatsNew(context: Context): Boolean {
+        if (shouldOffer(context)) return false
+        return context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getString(WHATS_NEW_KEY, null) != WHATS_NEW_ID
+    }
+
+    fun markWhatsNewSeen(context: Context) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).edit().putString(WHATS_NEW_KEY, WHATS_NEW_ID).apply()
     }
 }
 

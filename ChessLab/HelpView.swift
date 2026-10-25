@@ -26,12 +26,17 @@ struct HelpView: View {
         .init(
             icon: "sparkles", tint: Theme.accent,
             title: "Nouveautés de la version \(Self.appVersion)",
-            body: "• Neuf personnages à affronter, joués par Maia-3, un réseau entraîné sur des millions de parties humaines : Lena l'attaquante, Nils le mur, Milo le gambiteur, Nadia la technicienne, Sacha le piégeur, Ana la contre-attaquante, Yuri le matérialiste, Pablo l'impulsif — et Maia elle-même, l'étalon sans style. Chacun a son style, son répertoire d'ouvertures, son caractère et son illustration ; leur niveau se règle sur l'échelle humaine (proche de Lichess) et se mémorise par personnage.\n• Stockfish reste l'analyste : indice, alerte gaffe, barre d'évaluation et analyse de partie inchangés. Derrière un personnage, il n'intervient que pour un mat court, une finale à peu de pièces ou une répétition en position gagnée.\n• Progrès : votre bilan par personnage, avec le plus haut niveau battu.\n• Laboratoire : un camp peut être joué par Maia, pour mesurer un personnage contre Stockfish.\n• Variantes : au-delà de 2850, la force de Fairy-Stockfish n'est plus bridée au lieu de retomber en silence à 1350."
+            body: "• Séance du jour : chaque jour, l'app prépare ce qu'il faut revoir — positions d'ouverture dues, puzzles ratés, puzzles de vos parties et une finale. Elle est plafonnée (2, 5 ou 8 ouvertures, au choix sur son écran) et compte votre série de jours, avec des médailles.\n• Analyse automatique : vos parties contre l'ordinateur s'analysent d'elles-mêmes en tâche de fond (réglable). Elle crée des puzzles de vos erreurs, repère le moment où vous quittez votre répertoire, et dessine votre profil de faiblesses dans Progrès.\n• Coach : dans l'analyse, sous l'explication d'une faute, la part des joueurs de votre niveau qui jouent ce coup.\n• Puzzles : une cote personnelle, la puce « À mon niveau », et un indice qui ne rapporte plus de points.\n• Ouvertures : cartes vivantes (position clé, niveau, maîtrise), menus Camp et Niveau, et le filtre « Classiques ».\n• Analyser : la dernière partie en tête de l'écran, et un accès direct aux mats manqués.\n• Réglages de partie : l'interrupteur « Limite de temps », éteint par défaut, retient votre dernier choix ; options colorées.\n• Fin de partie : courbe du matériel. Woodpecker : comparaison des cycles et médailles de série."
+        ),
+        .init(
+            icon: "flame.fill", tint: Theme.warning,
+            title: "Séance du jour",
+            body: "Chaque jour, l'app rassemble ce qu'il faut revoir, dans l'ordre : positions d'ouverture dues (répétition espacée), puzzles ratés, puzzles tirés de vos parties, et une finale du jour. Elle se veut courte : 5 puzzles au plus par étape et un plafond d'ouvertures que vous réglez en bas de l'écran (2, 5 ou 8). Seules les positions DUES comptent : parcourir une ligne jusqu'à la position à revoir n'épuise pas votre quota. Une étape passe à « fait » quand son objectif du jour est atteint. Votre série compte les jours d'entraînement de suite ; des médailles marquent 3, 7, 30, 100 et 365 jours. Les révisions que l'app planifie après une partie ne comptent pas dans la série."
         ),
         .init(
             icon: "cpu", tint: Theme.accent,
             title: "Contre l'ordinateur",
-            body: "Choisissez d'abord votre adversaire : un personnage, ou Stockfish. Neuf personnages sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines qui ne cherche pas le meilleur coup mais celui qu'un humain de ce niveau jouerait — gaffes comprises. Chacun a son style, son répertoire d'ouvertures et son tempérament, et son niveau se règle sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. Sinon, Stockfish lui-même, bridé au niveau de votre choix, du débutant au maximum. Réglez ensuite votre couleur, la cadence, et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
+            body: "Choisissez d'abord votre adversaire : un personnage, ou Stockfish. Neuf personnages sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines qui ne cherche pas le meilleur coup mais celui qu'un humain de ce niveau jouerait — gaffes comprises. Chacun a son style, son répertoire d'ouvertures et son tempérament, et son niveau se règle sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. Sinon, Stockfish lui-même, bridé au niveau de votre choix, du débutant au maximum. Réglez ensuite votre couleur, la limite de temps (éteinte par défaut : allumez-la pour choisir une cadence — l'app retient votre dernier choix) et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
         ),
         .init(
             icon: "person.2.fill", tint: Theme.info,
@@ -46,17 +51,17 @@ struct HelpView: View {
         .init(
             icon: "puzzlepiece.fill", tint: Theme.violet,
             title: "Puzzles",
-            body: "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs."
+            body: "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. Votre cote personnelle, sur l'échelle des puzzles Lichess, suit vos réussites : elle bouge vite au début puis se stabilise ; réussi avec l'indice, un puzzle ne rapporte rien et coûte quelques points ; la puce « À mon niveau » propose des puzzles proches de votre cote. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs."
         ),
         .init(
             icon: "chart.bar.fill", tint: Theme.rose,
             title: "Progrès",
-            body: "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler."
+            body: "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler. Votre profil de faiblesses — phase de partie, ouvertures qui vous coûtent des points, motifs tactiques manqués — se construit d'après l'analyse automatique de vos parties."
         ),
         .init(
             icon: "books.vertical.fill", tint: Theme.warning,
             title: "Ouvertures",
-            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un index en arbre montre toutes les variantes sans doublon : touchez n'importe quel coup pour ouvrir sa position. Sous le plateau, les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish et une barre d'évaluation ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
+            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un index en arbre montre toutes les variantes sans doublon : touchez n'importe quel coup pour ouvrir sa position. Sous le plateau, les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish et une barre d'évaluation ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Deux menus filtrent la liste : Camp (Blancs ou Noirs) et Niveau (Classiques — les 19 ouvertures les plus jouées —, Club, Avancé). Chaque carte montre la position clé, le niveau et votre maîtrise. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
         ),
         .init(
             icon: "crown.fill", tint: Theme.gold,
@@ -71,7 +76,7 @@ struct HelpView: View {
         .init(
             icon: "chart.xyaxis.line", tint: Theme.teal,
             title: "Analyser",
-            body: "Analysez une partie ou une position avec Stockfish : classification des coups (imprécision, erreur, gaffe), courbe d'évaluation, flèches des meilleurs coups et flèche rouge de la menace adverse, lecture automatique, création de puzzles depuis les erreurs, et recherche des mats manqués par l'un ou l'autre camp. Export PGN rechargeable. Entrée par PGN, FEN, éditeur ou scanner. Le Coach ajoute, sous l'explication d'une faute, la part des joueurs de votre niveau qui jouent ce coup (d'après Maia : ce que jouent les humains, pas ce qui est bon)."
+            body: "Analysez une partie ou une position avec Stockfish : classification des coups (imprécision, erreur, gaffe), courbe d'évaluation, flèches des meilleurs coups et flèche rouge de la menace adverse, lecture automatique, création de puzzles depuis les erreurs, et recherche des mats manqués par l'un ou l'autre camp. Export PGN rechargeable. L'analyse peut se lancer automatiquement après chaque partie contre l'ordinateur (Réglages) ; l'écran Analyser met la dernière partie en tête, avec un accès direct aux mats manqués. Entrée par PGN, FEN, éditeur ou scanner. Le Coach ajoute, sous l'explication d'une faute, la part des joueurs de votre niveau qui jouent ce coup (d'après Maia : ce que jouent les humains, pas ce qui est bon)."
         ),
         .init(
             icon: "flask", tint: Theme.rose,
@@ -107,6 +112,7 @@ struct HelpView: View {
                 // retrouver la visite ne doit pas la chercher sous douze
                 // modules.
                 discoveryReplayCard
+                whatsNewReplayCard
 
                 ForEach(modules) { module in
                     moduleCard(module)
@@ -155,6 +161,35 @@ struct HelpView: View {
         }
         .buttonStyle(.pressable)
         .accessibilityIdentifier("replayDiscoveryTour")
+    }
+
+    /// Rejouer le court parcours des nouveautés de la 2.0.
+    private var whatsNewReplayCard: some View {
+        Button {
+            NotificationCenter.default.post(name: .replayWhatsNewTour, object: nil)
+        } label: {
+            HStack(alignment: .top, spacing: 14) {
+                IconBadge(systemImage: "star.fill", tint: Theme.violet, size: 42)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Revoir les nouveautés")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Un court parcours des nouveautés de la 2.0, là où elles vivent.")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Theme.surface, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+        .buttonStyle(.pressable)
+        .accessibilityIdentifier("replayWhatsNewTour")
     }
 
     private func moduleCard(_ module: Module) -> some View {

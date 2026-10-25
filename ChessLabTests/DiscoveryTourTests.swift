@@ -98,8 +98,8 @@ import Testing
     @Test("Les étapes forment trois sections ordonnées, ids croissants")
     @MainActor func stepsAreWellFormed() {
         let tour = DiscoveryTourController()
-        #expect(tour.steps.count == 11)
-        #expect(tour.steps.map(\.id) == Array(0..<11))
+        #expect(tour.steps.count == 13)
+        #expect(tour.steps.map(\.id) == Array(0..<13))
         // L'ordre du contrat : ce qu'on s'apprête à toucher, puis les
         // affichages, puis les autres écrans, et le « ? » qui ramène tout.
         #expect(tour.steps.first?.spot == .playTile)
@@ -124,6 +124,7 @@ import Testing
         // Nettoyage : ces deux fins ont posé l'empreinte « vue » dans les
         // UserDefaults du processus de test.
         UserDefaults.standard.removeObject(forKey: "discoveryTourSeenInstallStamp")
+        UserDefaults.standard.removeObject(forKey: "whatsNewSeenVersion")
     }
 
     @Test("L'empreinte d'installation, pas un booléen : vue ↔ plus proposée")
@@ -135,6 +136,43 @@ import Testing
         #expect(DiscoveryTourMemory.shouldOffer, "conteneur jamais estampillé → proposer")
         DiscoveryTourMemory.markSeen()
         #expect(!DiscoveryTourMemory.shouldOffer, "même conteneur → silence")
+        UserDefaults.standard.removeObject(forKey: "discoveryTourSeenInstallStamp")
+    }
+
+    @Test("Les nouveautés 2.0 : un court parcours, proposé une seule fois à qui met à jour")
+    @MainActor func whatsNewTour() {
+        let tour = DiscoveryTourController()
+        tour.startWhatsNew()
+        #expect(tour.isActive)
+        #expect(tour.kind == .whatsNew)
+        #expect(tour.steps.count == 6)
+        #expect(tour.steps.map(\.id) == Array(0..<6))
+        #expect(tour.steps.first?.spot == .dailySession)
+        #expect(tour.steps.last?.spot == .helpButton)
+        // Le rejeu de la visite complète repart sur les étapes complètes.
+        tour.skip()
+        tour.start()
+        #expect(tour.kind == .full)
+        #expect(tour.steps.count == 13)
+        tour.skip()
+        UserDefaults.standard.removeObject(forKey: "discoveryTourSeenInstallStamp")
+        UserDefaults.standard.removeObject(forKey: "whatsNewSeenVersion")
+    }
+
+    @Test("Mise à jour depuis la 1.x : visite déjà vue, nouveautés pas encore")
+    func whatsNewIsOfferedOnlyToUpgraders() {
+        let name = "DiscoveryTourStepsTests.\(UUID().uuidString)"
+        let defaults = UserDefaults(suiteName: name)!
+        defer { defaults.removePersistentDomain(forName: name) }
+        UserDefaults.standard.removeObject(forKey: "discoveryTourSeenInstallStamp")
+        // Installation neuve : on montre la visite complète, pas les nouveautés.
+        #expect(DiscoveryTourMemory.shouldOffer)
+        #expect(!DiscoveryTourMemory.shouldOfferWhatsNew(defaults: defaults))
+        // Mise à jour : visite vue sur cette installation, nouveautés jamais vues.
+        DiscoveryTourMemory.markSeen()
+        #expect(DiscoveryTourMemory.shouldOfferWhatsNew(defaults: defaults))
+        DiscoveryTourMemory.markWhatsNewSeen(defaults: defaults)
+        #expect(!DiscoveryTourMemory.shouldOfferWhatsNew(defaults: defaults))
         UserDefaults.standard.removeObject(forKey: "discoveryTourSeenInstallStamp")
     }
 }

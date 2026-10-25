@@ -4,6 +4,8 @@ import SwiftUI
 /// Écran de jeu contre Stockfish, avec layouts adaptatifs iPhone/iPad.
 struct PlayView: View {
     @Bindable var viewModel: PlayViewModel
+    @Environment(\.modelContext) private var modelContext
+    @State private var showsAutoAnalysisOffer = false
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
     /// Ouvre l'analyse de la partie, qui cherche aussitôt les mats manqués
@@ -616,6 +618,17 @@ struct PlayView: View {
                     .accessibilityIdentifier("gameOverMaterialCurve")
                 }
 
+                // L'offre d'analyse automatique : ici, pas au démarrage.
+                if showsAutoAnalysisOffer {
+                    AutoAnalysisOfferCard {
+                        guard let key = AnalysisEvalStore.key(for: viewModel.game) else { return }
+                        AutoAnalysisService.shared.enqueue(
+                            pgn: viewModel.exportedPGN, key: key,
+                            userColor: viewModel.userColor, context: modelContext
+                        )
+                    }
+                }
+
                 HStack(spacing: 10) {
                     panelButton("Accueil", icon: "house.fill") { onExit() }
                     // Le PGN D'EXPORT et non `game.pgn` brut : ChessKit n'émet
@@ -634,6 +647,11 @@ struct PlayView: View {
             .cardStyle()
             .overlay(Theme.cardShape.strokeBorder(Theme.strokeStrong, lineWidth: 1))
             .transition(.move(edge: .bottom).combined(with: .opacity))
+            .onAppear {
+                guard !showsAutoAnalysisOffer, AutoAnalysisOfferCard.shouldShow() else { return }
+                showsAutoAnalysisOffer = true
+                AutoAnalysisOfferCard.noteShown()
+            }
         }
     }
 

@@ -20,13 +20,17 @@ final class DiscoveryTourUITests: XCTestCase {
         return app
     }
 
-    private func walkThroughEntireTour(_ app: XCUIApplication) {
+    private func walkThroughEntireTour(_ app: XCUIApplication, stepCount: Int = 13) {
         let next = app.buttons["discoveryNext"]
-        for stepIndex in 0..<11 {
+        for stepIndex in 0..<stepCount {
             XCTAssertTrue(
                 next.waitForExistence(timeout: 8),
                 "étape \(stepIndex + 1) : « Suivant » introuvable"
             )
+            // L'écran de l'étape peut encore glisser (la visite pilote la navigation) :
+            // on laisse l'animation finir avant de juger le bouton inatteignable.
+            let hittable = NSPredicate(format: "isHittable == true")
+            _ = XCTWaiter.wait(for: [XCTNSPredicateExpectation(predicate: hittable, object: next)], timeout: 5)
             XCTAssertTrue(
                 next.isHittable,
                 "étape \(stepIndex + 1) : « Suivant » présent mais inatteignable"
@@ -73,5 +77,14 @@ final class DiscoveryTourUITests: XCTestCase {
         XCTAssertTrue(replay.isHittable, "la carte de rejeu doit être atteignable sans défiler")
         replay.tap()
         XCTAssertTrue(next.waitForExistence(timeout: 8), "le rejeu doit rouvrir la visite")
+    }
+
+    /// Le court parcours des nouveautés 2.0 (mise à jour depuis la 1.x) : six
+    /// étapes, « Suivant » atteignable à chacune, et il se termine.
+    func testWhatsNewTourTraversesAllStepsAndEnds() {
+        let app = XCUIApplication()
+        app.launchArguments = ["-discoveryWhatsNew", "YES"]
+        app.launch()
+        walkThroughEntireTour(app, stepCount: 6)
     }
 }

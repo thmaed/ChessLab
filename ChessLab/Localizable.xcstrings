@@ -23102,6 +23102,316 @@
           }
         }
       }
+    },
+    "Choisissez d'abord votre adversaire : un personnage, ou Stockfish. Neuf personnages sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines qui ne cherche pas le meilleur coup mais celui qu'un humain de ce niveau jouerait — gaffes comprises. Chacun a son style, son répertoire d'ouvertures et son tempérament, et son niveau se règle sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. Sinon, Stockfish lui-même, bridé au niveau de votre choix, du débutant au maximum. Réglez ensuite votre couleur, la limite de temps (éteinte par défaut : allumez-la pour choisir une cadence — l'app retient votre dernier choix) et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First choose your opponent: a character, or Stockfish. Nine characters are played by Maia-3, a network trained on millions of human games that does not look for the best move but for the one a human of that level would play — blunders included. Each has a style, an opening repertoire and a temperament, and their level is set on the human scale (close to Lichess, not comparable to Stockfish's Elo). Behind them Stockfish only steps in for short mates, endgames with few pieces and repetitions. Otherwise, Stockfish itself, limited to the level of your choice, from beginner to maximum. Then set your colour, the time limit (off by default: switch it on to pick a time control — the app remembers your last choice) and the aids: hints (arrows for the best moves), a warning before risky moves and an evaluation bar. After the game, a button leads straight to the analysis. During a game, \"Switch mode\" (top right) sends the displayed position to analysis, the Lab or a two-player game — the game waits for you when you come back."
+          }
+        }
+      }
+    },
+    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. Votre cote personnelle, sur l'échelle des puzzles Lichess, suit vos réussites : elle bouge vite au début puis se stabilise ; réussi avec l'indice, un puzzle ne rapporte rien et coûte quelques points ; la puce « À mon niveau » propose des puzzles proches de votre cote. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by source (your games or the library), level, game phase and theme, or replay only the puzzles you missed on your last attempt. A checkmating move is always accepted, even if it differs from the solution. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Your personal rating, on the Lichess puzzle scale, follows your results: it moves fast at first then settles; a puzzle solved with the hint earns nothing and costs a few points; the “At my level” chip offers puzzles close to your rating. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. The Woodpecker method replays a fixed set of 10, 25 or 50 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
+          }
+        }
+      }
+    },
+    "Un tableau de bord accessible depuis l'accueil : votre bilan face à l'ordinateur (victoires, nulles, défaites) et vos statistiques de puzzles par thème. Le bilan contre l'ordinateur se filtre sur les 7 ou 30 derniers jours, ou sur tout l'historique. En un tap sur un thème faible, l'app vous prépare un set de puzzles ciblé pour le travailler. Votre profil de faiblesses — phase de partie, ouvertures qui vous coûtent des points, motifs tactiques manqués — se construit d'après l'analyse automatique de vos parties.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A dashboard reachable from the home screen: your record against the computer (wins, draws, losses) and your puzzle statistics by theme. The record against the computer can be filtered to the last 7 or 30 days, or the whole history. One tap on a weak theme and the app lines up a targeted puzzle set to work on it. Your weakness profile — game phase, openings that cost you points, missed tactical motifs — is built from the automatic analysis of your games."
+          }
+        }
+      }
+    },
+    "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un index en arbre montre toutes les variantes sans doublon : touchez n'importe quel coup pour ouvrir sa position. Sous le plateau, les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish et une barre d'évaluation ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Deux menus filtrent la liste : Camp (Blancs ou Noirs) et Niveau (Classiques — les 19 ouvertures les plus jouées —, Club, Avancé). Chaque carte montre la position clé, le niveau et votre maîtrise. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progress through 58 hand-written, bilingual openings, all engine-checked. A tree index shows every variation without duplicates: tap any move to open its position. Below the board, the masters' moves with their percentages, Stockfish's three best moves and an evaluation bar; coloured arrows flag the recommended move, traps and inaccuracies. Two menus filter the list: Side (White or Black) and Level (Classics — the 19 most played openings —, Club, Advanced). Each card shows the key position, the level and your mastery. Train them with spaced repetition — the app schedules your reviews by itself — and find your progress on all your devices via iCloud. From the reader, “Switch mode” sends the position you reached to the Laboratory, the computer or a two-player game."
+          }
+        }
+      }
+    },
+    "Analysez une partie ou une position avec Stockfish : classification des coups (imprécision, erreur, gaffe), courbe d'évaluation, flèches des meilleurs coups et flèche rouge de la menace adverse, lecture automatique, création de puzzles depuis les erreurs, et recherche des mats manqués par l'un ou l'autre camp. Export PGN rechargeable. L'analyse peut se lancer automatiquement après chaque partie contre l'ordinateur (Réglages) ; l'écran Analyser met la dernière partie en tête, avec un accès direct aux mats manqués. Entrée par PGN, FEN, éditeur ou scanner. Le Coach ajoute, sous l'explication d'une faute, la part des joueurs de votre niveau qui jouent ce coup (d'après Maia : ce que jouent les humains, pas ce qui est bon).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyse a game or position with Stockfish: move classification (inaccuracy, mistake, blunder), evaluation graph, best-move arrows and a red arrow for the opponent's threat, auto-play, puzzle creation from mistakes, and a search for mates either side let slip. Reloadable PGN export. Analysis can start automatically after each game against the computer (Settings); the Analyse screen puts the latest game first, with direct access to missed mates. Enter via PGN, FEN, editor or scanner. The Coach adds, under a mistake's explanation, the share of players at your level who play that move (according to Maia: what humans play, not what is good)."
+          }
+        }
+      }
+    },
+    "• Séance du jour : chaque jour, l'app prépare ce qu'il faut revoir — positions d'ouverture dues, puzzles ratés, puzzles de vos parties et une finale. Elle est plafonnée (2, 5 ou 8 ouvertures, au choix sur son écran) et compte votre série de jours, avec des médailles.\n• Analyse automatique : vos parties contre l'ordinateur s'analysent d'elles-mêmes en tâche de fond (réglable). Elle crée des puzzles de vos erreurs, repère le moment où vous quittez votre répertoire, et dessine votre profil de faiblesses dans Progrès.\n• Coach : dans l'analyse, sous l'explication d'une faute, la part des joueurs de votre niveau qui jouent ce coup.\n• Puzzles : une cote personnelle, la puce « À mon niveau », et un indice qui ne rapporte plus de points.\n• Ouvertures : cartes vivantes (position clé, niveau, maîtrise), menus Camp et Niveau, et le filtre « Classiques ».\n• Analyser : la dernière partie en tête de l'écran, et un accès direct aux mats manqués.\n• Réglages de partie : l'interrupteur « Limite de temps », éteint par défaut, retient votre dernier choix ; options colorées.\n• Fin de partie : courbe du matériel. Woodpecker : comparaison des cycles et médailles de série.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Daily session: every day the app prepares what to review — opening positions due, missed puzzles, puzzles from your games and an endgame. It is capped (2, 5 or 8 openings, your choice on its screen) and counts your streak of days, with medals.\n• Automatic analysis: your games against the computer analyse themselves in the background (adjustable). It creates puzzles from your mistakes, spots the moment you leave your repertoire, and draws your weakness profile in Progress.\n• Coach: in the analysis, under the explanation of a mistake, the share of players at your level who play that move.\n• Puzzles: a personal rating, the “At my level” chip, and a hint that no longer earns points.\n• Openings: lively cards (key position, level, mastery), Side and Level menus, and the “Classics” filter.\n• Analyse: the latest game at the top of the screen, and direct access to missed mates.\n• Game setup: the “Time limit” switch, off by default, remembers your last choice; colourful options.\n• End of game: material curve. Woodpecker: cycle comparison and streak medals."
+          }
+        }
+      }
+    },
+    "Chaque jour, l'app rassemble ce qu'il faut revoir, dans l'ordre : positions d'ouverture dues (répétition espacée), puzzles ratés, puzzles tirés de vos parties, et une finale du jour. Elle se veut courte : 5 puzzles au plus par étape et un plafond d'ouvertures que vous réglez en bas de l'écran (2, 5 ou 8). Seules les positions DUES comptent : parcourir une ligne jusqu'à la position à revoir n'épuise pas votre quota. Une étape passe à « fait » quand son objectif du jour est atteint. Votre série compte les jours d'entraînement de suite ; des médailles marquent 3, 7, 30, 100 et 365 jours. Les révisions que l'app planifie après une partie ne comptent pas dans la série.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every day the app gathers what to review, in order: opening positions due (spaced repetition), missed puzzles, puzzles from your games, and an endgame of the day. It aims to be short: at most 5 puzzles per step and an opening cap you set at the bottom of the screen (2, 5 or 8). Only DUE positions count: walking a line to reach the position to review does not use up your quota. A step turns to “done” once its goal for the day is reached. Your streak counts consecutive training days; medals mark 3, 7, 30, 100 and 365 days. Reviews the app schedules after a game do not count towards the streak."
+          }
+        }
+      }
+    },
+    "Revoir les nouveautés": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replay what's new"
+          }
+        }
+      }
+    },
+    "Un court parcours des nouveautés de la 2.0, là où elles vivent.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A short tour of what's new in 2.0, where it lives."
+          }
+        }
+      }
+    },
+    "Nouveautés 2.0": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's new in 2.0"
+          }
+        }
+      }
+    },
+    "Votre séance du jour": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your daily session"
+          }
+        }
+      }
+    },
+    "Chaque jour, l'app prépare ce qu'il faut revoir : positions d'ouverture dues, puzzles ratés, une finale. Terminez-la pour allonger votre série de jours.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every day the app prepares what to review: opening positions due, missed puzzles, an endgame. Finish it to extend your streak of days."
+          }
+        }
+      }
+    },
+    "Une pendule, si vous voulez": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A clock, if you like"
+          }
+        }
+      }
+    },
+    "« Limite de temps » est éteinte par défaut : allumez-la pour choisir une cadence (Bullet, Blitz, Rapide…). L'app retient votre dernier choix.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Time limit” is off by default: switch it on to pick a time control (Bullet, Blitz, Rapid…). The app remembers your last choice."
+          }
+        }
+      }
+    },
+    "L'app prépare chaque jour ce qu'il faut revoir — ouvertures, puzzles ratés, une finale — et compte votre série de jours, avec des médailles. Le plafond d'ouvertures se règle sur son écran.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Every day the app prepares what to review — openings, missed puzzles, an endgame — and counts your streak of days, with medals. The opening cap is set on its screen."
+          }
+        }
+      }
+    },
+    "Une cote de puzzle personnelle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A personal puzzle rating"
+          }
+        }
+      }
+    },
+    "Vos puzzles vous donnent maintenant une cote, comme aux échecs, et la puce « À mon niveau » propose des puzzles à votre mesure. Prendre l'indice ne rapporte plus de points.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your puzzles now give you a rating, as in chess, and the “At my level” chip offers puzzles that fit you. Taking the hint no longer earns points."
+          }
+        }
+      }
+    },
+    "Analyse automatique et Coach": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic analysis and Coach"
+          }
+        }
+      }
+    },
+    "Vos parties s'analysent d'elles-mêmes en tâche de fond (réglable), pour dessiner votre profil de faiblesses dans Progrès. Dans l'analyse, le Coach dit ce que jouent les joueurs de votre niveau. La dernière partie passe en tête de cet écran.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your games analyse themselves in the background (adjustable) to draw your weakness profile in Progress. In the analysis, the Coach tells you what players at your level play. The latest game now sits at the top of this screen."
+          }
+        }
+      }
+    },
+    "Classiques, Camp, Niveau": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Classics, Side, Level"
+          }
+        }
+      }
+    },
+    "Deux menus filtrent les ouvertures : Camp (Blancs ou Noirs) et Niveau — dont « Classiques », les 19 ouvertures les plus jouées. Chaque carte montre la position clé et votre maîtrise.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two menus filter the openings: Side (White or Black) and Level — including “Classics”, the 19 most played openings. Each card shows the key position and your mastery."
+          }
+        }
+      }
+    },
+    "La limite de temps, en option": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The time limit, optional"
+          }
+        }
+      }
+    },
+    "Les cadences n'apparaissent que si vous allumez « Limite de temps » — éteinte par défaut, et l'app retient votre dernier réglage, écran par écran.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Time controls only appear if you switch on “Time limit” — off by default, and the app remembers your last setting, screen by screen."
+          }
+        }
+      }
+    },
+    "Tout est dans l'aide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It's all in the help"
+          }
+        }
+      }
+    },
+    "Le « ? » rassemble le détail des nouveautés, et vous pouvez rejouer cette visite quand vous voulez.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The “?” gathers the details of what's new, and you can replay this tour whenever you like."
+          }
+        }
+      }
+    },
+    "Voir vos erreurs sans rien faire ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See your mistakes without lifting a finger?"
+          }
+        }
+      }
+    },
+    "ChessLab peut analyser chacune de vos parties pour repérer vos erreurs, en tirer des puzzles et suivre votre progression. Cela se fait sur l'appareil, en 1 à 3 minutes par partie.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChessLab can analyse each of your games to spot your mistakes, turn them into puzzles and track your progress. It happens on the device, in 1 to 3 minutes per game."
+          }
+        }
+      }
+    },
+    "Oui, automatiquement": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes, automatically"
+          }
+        }
+      }
+    },
+    "Modifiable à tout moment dans les Réglages.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can change this at any time in Settings."
+          }
+        }
+      }
+    },
+    "Analyse chacune de vos parties contre l'ordinateur pour repérer vos erreurs, en tirer des puzzles et suivre votre progression. Tout se passe sur l'appareil : 1 à 3 minutes par partie et un peu de batterie, suspendu en économie d'énergie ou si l'appareil chauffe.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyses each of your games against the computer to spot your mistakes, turn them into puzzles and track your progress. Everything happens on the device: 1 to 3 minutes per game and a little battery, paused in Low Power Mode or when the device gets warm."
+          }
+        }
+      }
+    },
+    "Après une partie, l'app propose d'analyser vos parties d'elle-même pour dessiner votre profil de faiblesses dans Progrès. Dans l'analyse, le Coach dit ce que jouent les joueurs de votre niveau. La dernière partie passe en tête de cet écran.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After a game, the app offers to analyse your games by itself to draw your weakness profile in Progress. In the analysis, the Coach tells you what players at your level play. The latest game now sits at the top of this screen."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

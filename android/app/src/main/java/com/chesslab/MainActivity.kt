@@ -103,18 +103,31 @@ private fun App() {
     // est `firstInstallTime`, pas un booléen : voir `DiscoveryTourMemory`.
     // Le crochet `discoveryStep` (extra d'intent, builds débogables
     // seulement) saute à une étape sans attendre : captures et outillage.
-    val tour = remember { DiscoveryTourController(onSeen = { DiscoveryTourMemory.markSeen(context) }) }
+    val tour = remember {
+        DiscoveryTourController(
+            onSeen = { DiscoveryTourMemory.markSeen(context) },
+            onWhatsNewSeen = { DiscoveryTourMemory.markWhatsNewSeen(context) },
+        )
+    }
     val anchors = remember { DiscoveryAnchors() }
     LaunchedEffect(Unit) {
         val debuggable = (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE) != 0
         val requested = (context as? android.app.Activity)?.intent?.getIntExtra("discoveryStep", -1) ?: -1
+        if (debuggable && (context as? android.app.Activity)?.intent?.getBooleanExtra("discoveryWhatsNew", false) == true) {
+            tour.startWhatsNew()
+            return@LaunchedEffect
+        }
         if (debuggable && requested >= 0) {
             tour.start(requested)
             return@LaunchedEffect
         }
         delay(1000)
         val resumable = com.chesslab.library.LibraryDatabase.get(context).autosaves().all().first()
-        if (DiscoveryTourMemory.shouldOffer(context) && resumable.isEmpty() && !tour.isActive) tour.start()
+        if (resumable.isEmpty() && !tour.isActive) {
+            if (DiscoveryTourMemory.shouldOffer(context)) tour.start()
+            // Une MISE À JOUR depuis la 1.x : le court parcours des nouveautés.
+            else if (DiscoveryTourMemory.shouldOfferWhatsNew(context)) tour.startWhatsNew()
+        }
     }
     // La visite PILOTE la navigation : chaque étape déclare son écran, et la
     // bascule qui se joue sous les yeux EST l'explication.
@@ -317,7 +330,7 @@ private fun App() {
                 onOpenEndgame = { id, name -> stack.add(Route.EndgameFree(id, name)) },
             )
             Route.Progression -> ProgressionScreen(onTrainTheme = { stack.add(Route.Puzzles(theme = it)) })
-            Route.Help -> HelpScreen(onReplayTour = { tour.start() })
+            Route.Help -> HelpScreen(onReplayTour = { tour.start() }, onReplayWhatsNew = { tour.startWhatsNew() })
             is Route.PositionEditor -> PositionEditorScreen(
                 confirmLabel = if (current.forSetup) R.string.setup_use_position else R.string.route_analysis,
             ) { fen ->

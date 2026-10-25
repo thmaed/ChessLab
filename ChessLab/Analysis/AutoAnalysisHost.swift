@@ -1,39 +1,22 @@
 import SwiftUI
 
-/// A1 (2.0) — l'interface de l'analyse automatique : la PROPOSITION (une fois,
-/// à l'accueil, une fois la visite guidée passée) et l'indicateur d'avancement
+/// A1 (2.0) — l'interface de l'analyse automatique : l'indicateur d'avancement
 /// quand une partie est en cours. Posé à la racine de l'accueil.
+///
+/// La PROPOSITION n'est plus une alerte au démarrage (25/10/2026 : hors contexte,
+/// jargon, aucun bénéfice dit). Elle vit sur l'écran de fin de partie —
+/// ``AutoAnalysisOfferCard`` — au moment où l'utilisateur a une partie à analyser.
 struct AutoAnalysisHost: ViewModifier {
     @Environment(\.scenePhase) private var scenePhase
-    @Environment(\.discoveryTour) private var tour
-    @State private var settings = AppSettings.shared
     @State private var service = AutoAnalysisService.shared
-    @State private var showProposal = false
 
     func body(content: Content) -> some View {
         content
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 if service.isRunning || !service.queue.isEmpty { banner }
             }
-            .task {
-                // Attend la fin de la visite guidée : une seule question à la fois.
-                try? await Task.sleep(for: .seconds(3))
-                guard settings.autoAnalysisChoice == .undecided,
-                      !DiscoveryTourMemory.shouldOffer, tour?.isActive != true else { return }
-                showProposal = true
-            }
             .onChange(of: scenePhase) { _, phase in
                 service.setActive(phase == .active)
-            }
-            .alert("Analyser vos parties automatiquement ?", isPresented: $showProposal) {
-                Button("Activer") {
-                    settings.autoAnalysisChoice = .on
-                    service.settingChanged()
-                }
-                Button("Plus tard", role: .cancel) {}
-                Button("Non merci") { settings.autoAnalysisChoice = .off }
-            } message: {
-                Text("Après chaque partie contre l'ordinateur, ChessLab peut l'analyser en tâche de fond, sur l'appareil : environ 1 à 3 minutes par partie, avec un peu de batterie. Interrompu en économie d'énergie ou si l'appareil chauffe. Modifiable dans les Réglages.")
             }
     }
 

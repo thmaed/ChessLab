@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.chesslab.R
+import com.chesslab.discovery.discoveryAnchor
 import com.chesslab.ui.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -325,7 +326,10 @@ private fun FilterBar(
     onSide: (String) -> Unit,
     onLevel: (String) -> Unit,
 ) {
-    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+    Row(
+        Modifier.fillMaxWidth().discoveryAnchor(com.chesslab.discovery.DiscoverySpot.openingFilters),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
         FilterMenu(
             options = listOf(
                 MenuOption(stringResource(R.string.filter_all_sides), side == null, tint, "filtre-tous", icon = Icons.Default.GridView) {

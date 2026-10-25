@@ -286,6 +286,27 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
       reste « réussi » pour la répétition espacée. Même règle des deux côtés.
 - [x] Tests : `PuzzleRatingTests` (iOS), `PuzzleRatingTest` (JVM).
 
+### Aide, visite guidée et nouveautés 2.0 — 25/10/2026
+
+- [x] **Aide** mise à jour : nouveautés 2.0, Séance du jour, cote de puzzle et indice,
+      analyse/Coach/profil, limite de temps, filtres des Ouvertures ; cartes
+      « Revoir la visite guidée » et « Revoir les nouveautés ».
+- [x] **Visite guidée** complète : treize étapes (séance du jour et limite de temps
+      s'ajoutent) ; `DiscoveryTourController` a deux parcours (`full`, `whatsNew`).
+- [x] **Parcours des nouveautés 2.0** (six étapes, mêmes cibles) proposé une seule fois
+      à qui met à jour depuis la 1.x : visite complète déjà vue sur cette installation et
+      `whatsNewSeenVersion` ≠ « 2.0 ». Une installation neuve voit la visite complète
+      seulement. L'identifiant `whatsNewID` / `WHATS_NEW_ID` se change à la version
+      majeure suivante.
+- [x] **Analyse automatique : plus de question au démarrage.** L'offre vit sur l'écran
+      de fin de partie (« Voir vos erreurs sans rien faire ? », [Oui, automatiquement] /
+      [Non merci]), au plus deux fois, tant que le choix n'est pas fait ; la partie qui
+      vient de finir rejoint la file si on accepte. Texte du réglage reformulé.
+- [x] Tests : `DiscoveryTourStepsTests`, `DiscoveryTourUITests`,
+      `GameOverMaterialCurveUITests` (iOS) ; `DiscoveryTourTest` (JVM et Galaxy A16).
+- [ ] Numéro de version (1.10 ou 2.0, build ≥ 18) non encore posé : la carte « Nouveautés de la
+      version … » de l'aide iOS affiche la version du bundle.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

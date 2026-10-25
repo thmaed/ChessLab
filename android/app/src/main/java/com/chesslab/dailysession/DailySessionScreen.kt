@@ -84,13 +84,13 @@ private fun style(kind: DailySessionStep.Kind): StepStyle = when (kind) {
 
 /** C7 / A5 : la carte « Séance du jour » en tête de l'accueil. Pendant de `DailySessionCard` (iOS). */
 @Composable
-fun DailySessionCard(onOpen: () -> Unit) {
+fun DailySessionCard(modifier: Modifier = Modifier, onOpen: () -> Unit) {
     val context = LocalContext.current
     var plan by remember { mutableStateOf<DailySessionPlan?>(null) }
     LaunchedEffect(Unit) { plan = DailySessionBuilder.load(context) }
     val tint = Palette.warning
     Row(
-        Modifier
+        modifier
             .fillMaxWidth()
             .testTag("seance-du-jour")
             .clip(ControlShape)

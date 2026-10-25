@@ -8,10 +8,32 @@ final class GameOverMaterialCurveUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// L'offre d'analyse automatique vit sur l'écran de fin de partie (plus d'alerte
+    /// au démarrage), tant que le choix n'est pas fait.
+    func testResignedGameOffersAutomaticAnalysisOnce() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-resetPlaySettings", "-discoveryTourSeen", "-autoAnalysisUndecided"]
+        app.launch()
+        // Aucune alerte au démarrage.
+        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 5))
+        try playTwoMovesAndResign(app)
+        let offer = app.otherElements["autoAnalysisOffer"]
+        XCTAssertTrue(offer.waitForExistence(timeout: 10), "l'offre d'analyse automatique doit apparaître")
+        app.buttons["autoAnalysisOfferNo"].tap()
+        XCTAssertFalse(offer.waitForExistence(timeout: 2), "refusée, elle disparaît")
+    }
+
     func testResignedGameShowsMaterialCurve() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-resetPlaySettings", "-discoveryTourSeen"]
         app.launch()
+        try playTwoMovesAndResign(app)
+        XCTAssertTrue(app.otherElements["gameOverMaterialCurve"].waitForExistence(timeout: 10))
+        // Sans `-autoAnalysisUndecided`, l'analyse est éteinte : pas d'offre.
+        XCTAssertFalse(app.otherElements["autoAnalysisOffer"].exists)
+    }
+
+    private func playTwoMovesAndResign(_ app: XCUIApplication) throws {
 
         app.buttons["Contre l'ordinateur"].tap()
         XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
@@ -36,7 +58,5 @@ final class GameOverMaterialCurveUITests: XCTestCase {
             ? app.sheets.buttons["Abandonner"]
             : app.buttons.matching(identifier: "Abandonner").element(boundBy: 1)
         confirm.tap()
-
-        XCTAssertTrue(app.otherElements["gameOverMaterialCurve"].waitForExistence(timeout: 10))
     }
 }
