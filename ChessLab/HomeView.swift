@@ -302,7 +302,39 @@ struct HomeView: View {
     private static var debugLaunchRoute: Route? {
         let args = CommandLine.arguments
         guard let index = args.firstIndex(of: "-openRoute"), index + 1 < args.count else { return nil }
-        switch args[index + 1] {
+        return debugRoute(named: args[index + 1])
+    }
+
+    /// Le parcours de l'aperçu iPhone Duo (`duoTour`) : l'app passe d'un écran à l'autre TOUTE SEULE, sans
+    /// relance — relancer entre deux scènes montrait des flashs blancs. Un seul enregistrement continu.
+    @MainActor
+    private func runDuoTour() async {
+        func pause(_ seconds: Double) async { try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000)) }
+        await pause(5)
+        let scenes: [(route: String?, seconds: Double)] = [
+            (nil, 0), ("analysisCoach", 13), ("puzzleOffer", 9), ("openings", 8.5), ("endgameReader", 9.5),
+            ("puzzleSession", 9), ("variants", 10),
+        ]
+        for scene in scenes {
+            if let name = scene.route {
+                if name == "puzzleOffer" {
+                    debugPuzzleOffer = Self.debugOffer
+                    await pause(scene.seconds)
+                    debugPuzzleOffer = nil
+                    await pause(1.2)
+                    continue
+                }
+                path = NavigationPath()
+                await pause(1.0)
+                if let route = Self.debugRoute(named: name) { path.append(route) }
+                await pause(scene.seconds)
+            }
+        }
+        path = NavigationPath()
+    }
+
+    private static func debugRoute(named name: String) -> Route? {
+        switch name {
         case "newGame": return .newGame
         case "game": return .activeGame(PlayGameSettings())
         // Une partie ENTAMÉE (Italienne, 14 demi-coups, aux Blancs de jouer) :
@@ -399,6 +431,7 @@ struct HomeView: View {
         .task {
             if let route = Self.debugLaunchRoute, path.isEmpty { path.append(route) }
             if CommandLine.arguments.contains("puzzleOffer") { debugPuzzleOffer = Self.debugOffer }
+            if CommandLine.arguments.contains("duoTour") { await runDuoTour() }
         }
         .sheet(item: $debugPuzzleOffer) { offer in
             PuzzleOfferSheet(offer: offer, onAccept: { debugPuzzleOffer = nil }, onDecline: { debugPuzzleOffer = nil })
