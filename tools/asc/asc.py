@@ -101,7 +101,18 @@ class Client:
     def call(self, method, path, **kw):
         url = path if path.startswith("http") else API + path
         headers = {"Authorization": f"Bearer {self.token()}"}
-        r = requests.request(method, url, headers=headers, timeout=120, **kw)
+        # Les 5xx d'Apple sont fréquents et passagers (constaté le 27/10) : on réessaie avant d'abandonner.
+        for attempt in range(6):
+            try:
+                r = requests.request(method, url, headers=headers, timeout=120, **kw)
+            except requests.exceptions.RequestException:
+                if attempt == 5:
+                    raise
+                time.sleep(5 * (attempt + 1))
+                continue
+            if r.status_code < 500 or attempt == 5:
+                break
+            time.sleep(5 * (attempt + 1))
         if r.status_code >= 400:
             try:
                 errors = r.json().get("errors", [])
@@ -340,7 +351,8 @@ def wait_asset_state(c, path, ids, label):
         if pending:
             time.sleep(5)
     if pending:
-        sys.exit(f"{label} : {len(pending)} fichier(s) toujours en traitement après 15 min")
+        # Apple traite parfois très lentement : ne pas faire échouer le reste de l'envoi pour autant.
+        print(f"  ⚠️ {label} : {len(pending)} fichier(s) toujours en traitement après 15 min — à revérifier avec `status`")
 
 
 def cmd_screenshots(c, args):
@@ -367,7 +379,13 @@ def cmd_screenshots(c, args):
                 files = files[:10]
             if display_type in sets:
                 set_id = sets[display_type]["id"]
-                for shot in c.get_all(f"/appScreenshotSets/{set_id}/appScreenshots"):
+                current = c.get_all(f"/appScreenshotSets/{set_id}/appScreenshots")
+                # Déjà là, dans le même ordre et traité (ou en cours de traitement) : on n'y touche pas.
+                if [x["attributes"]["fileName"] for x in current] == [f.name for f in files] and all(
+                        x["attributes"]["assetDeliveryState"]["state"] in ("COMPLETE", "UPLOAD_COMPLETE") for x in current):
+                    print(f"  {locale} {display_type}: {len(files)} captures déjà en place")
+                    continue
+                for shot in current:
                     c.delete(f"/appScreenshots/{shot['id']}")
             else:
                 set_id = c.post("/appScreenshotSets", {
