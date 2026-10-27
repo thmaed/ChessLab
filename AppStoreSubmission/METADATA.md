@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 1.9.1, build 16** (fixés dans `project.pbxproj` le 23/10/2026). Voir `RELEASE_NOTES-1.9.1.md` pour le détail des changements depuis la 1.9.0.
+**Version courante : 2.0, build 18** (fixés dans `project.pbxproj`). La 1.9.2 (build 17) est la dernière soumise. Voir `RELEASE_NOTES-2.0.md` pour le détail des changements depuis la 1.9.x. **Préparée le 27/10/2026 : fiche, captures et notes de révision prêtes ; le build n'est PAS archivé ni téléversé (attendre l'accord de Thierry).**
 
 Tout ce qui suit est à copier-coller directement dans les champs correspondants d'App Store Connect. Les limites de caractères d'Apple sont respectées (vérifiées).
 
@@ -10,30 +10,72 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 ---
 
-## Nouveautés de cette version — 1.9.1 (4000 car. max)
+## Nouveautés de cette version — 2.0 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> Version 1.9.1, build 16. Version de correction, née d'un signalement de joueur le 22/10/2026. Depuis la 1.9.0 (build 15, READY_FOR_SALE). Détail dans `RELEASE_NOTES-1.9.1.md`. Captures et aperçus de la 1.9.0 conservés : rien du contenu n'a changé.
+> Version 2.0, build 18. Gros changement de contenu depuis la 1.9.x : captures refaites pour tous les appareils (iPhone, iPhone Duo fermé et ouvert, iPad), en français et en anglais. Détail dans `RELEASE_NOTES-2.0.md`.
 
 ### Français
 
 ```
-UNE CASE QUI NE RÉPONDAIT PLUS
-Sur iOS 18, la pièce posée dans le coin haut gauche de l'échiquier ne se laissait plus toucher : h1 quand on joue les Noirs, a8 quand on joue les Blancs. Le défaut a été signalé au moment de jouer une dame depuis h1, partie en cours contre Maia. C'est corrigé, partout où l'échiquier se joue, et vérifié sur un iPhone sous iOS 18. Merci pour ce signalement si précis.
+CHESSLAB 2.0
 
-LE SCANNER AUSSI
-Le recadrage manuel avait le même défaut sur iOS 18 : un coin posé tout en haut à gauche de l'image pouvait ne plus répondre. Les quatre coins se saisissent désormais au plus proche du doigt.
+SÉANCE DU JOUR
+Chaque jour, l'app rassemble ce qu'il faut revoir : positions d'ouverture dues, puzzles ratés, une finale. Une série de jours, des médailles — et un compteur qui s'arrête quand vous avez fait votre part.
+
+VOS ERREURS DEVIENNENT DES PUZZLES
+À la fin d'une analyse, l'app propose de créer des puzzles depuis la partie : les mats que vous avez laissés filer et vos erreurs les plus coûteuses, présentés sur de petits échiquiers. Vous acceptez ou non, rien n'est créé sans vous. Un profil de faiblesses se dessine dans Progrès : phases, thèmes, tendances.
+
+LE COACH
+Sous une faute, une phrase dit quelle part des joueurs de votre niveau jouent ce coup : erreur typique, accident, ou coup rare que peu de joueurs trouvent. Calculé sur l'appareil par Maia-3.
+
+VOTRE COTE DE PUZZLE
+Une cote personnelle qui évolue à chaque puzzle, et « À mon niveau » pour tomber sur des problèmes à votre mesure.
+
+OUVERTURES
+Cartes illustrées, filtres par camp et par niveau, et les 19 « classiques » regroupés.
+
+REPRENDRE UNE PARTIE
+Une partie interrompue se reprend d'un geste depuis l'écran de réglages, et l'app demande confirmation avant de la remplacer par une nouvelle.
+
+LIMITE DE TEMPS EN OPTION
+Un interrupteur, et l'app retient votre dernier choix.
+
+CORRECTIFS
+• Une partie reprise après la capture d'une tour dans son coin pouvait faire planter l'app : corrigé.
+• Une partie terminée par un mat n'était jamais notée jusqu'au bout : la précision et les puzzles de vos erreurs manquaient. Corrigé.
 ```
 
 ### English
 
 ```
-A SQUARE THAT STOPPED RESPONDING
-On iOS 18, the piece standing in the top-left corner of the board could no longer be touched: h1 when playing Black, a8 when playing White. It was reported while trying to move a queen from h1, mid-game against Maia. It is fixed, wherever the board is played, and checked on an iPhone running iOS 18. Many thanks for such a precise report.
+CHESSLAB 2.0
 
-THE SCANNER TOO
-Manual cropping had the same flaw on iOS 18: a corner placed at the very top left of the image could stop responding. The four corners are now picked up by whichever is closest to your finger.
+DAILY SESSION
+Every day, the app gathers what to review: opening positions that are due, missed puzzles, an endgame. A streak of days, medals — and a counter that stops once you have done your part.
+
+YOUR MISTAKES BECOME PUZZLES
+When an analysis ends, the app offers to create puzzles from the game: the mates you let slip and your costliest mistakes, shown on small boards. You accept or decline; nothing is created without you. A weakness profile builds up in Progress: phases, themes, trends.
+
+THE COACH
+Under a mistake, one sentence tells you what share of players at your level play that move: a typical mistake, an accident, or a rare find that few players spot. Computed on your device by Maia-3.
+
+YOUR PUZZLE RATING
+A personal rating that moves with every puzzle, and “At my level” to meet problems that fit you.
+
+OPENINGS
+Illustrated cards, filters by side and by level, and the 19 “classics” grouped together.
+
+RESUME A GAME
+An interrupted game resumes in one tap from the settings screen, and the app asks before replacing it with a new one.
+
+OPTIONAL TIME LIMIT
+One switch, and the app remembers your last choice.
+
+FIXES
+• A game resumed after a rook was captured on its corner could crash the app: fixed.
+• A game ending in checkmate was never graded to the end, so its accuracy and the puzzles from your mistakes were missing. Fixed.
 ```
 
 ---
@@ -45,19 +87,19 @@ Manual cropping had the same flaw on iOS 18: a corner placed at the very top lef
 ChessLab
 ```
 
-**Sous-titre** (30 car. max — 28 utilisés) :
+**Sous-titre** (30 car. max — 27 utilisés) :
 ```
-Adversaires humains, analyse
+Échecs, adversaires humains
 ```
 
-**Mots-clés** (100 car. max — 94 utilisés, séparés par des virgules, sans espace) :
+**Mots-clés** (100 car. max — 100 utilisés, séparés par des virgules, sans espace) :
 ```
-stockfish,maia,tactique,ouverture,puzzle,gambit,fen,pgn,elo,entrainement,scanner,analyse,ia,plateau
+echecs,stockfish,maia,tactique,ouverture,puzzle,finale,gambit,fen,pgn,elo,entrainement,scanner,coach
 ```
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
 ```
-Prêt pour l'iPhone Duo, ouvert comme fermé. Neuf adversaires qui jouent comme des humains (Maia-3), analyse Stockfish, 58 ouvertures, 100 000+ puzzles — 100 % local.
+Nouveau : séance du jour, Coach, vos erreurs deviennent des puzzles. Neuf adversaires qui jouent comme des humains (Maia-3), analyse Stockfish — 100 % local.
 ```
 
 **Description** (4000 car. max) :
@@ -65,16 +107,16 @@ Prêt pour l'iPhone Duo, ouvert comme fermé. Neuf adversaires qui jouent comme 
 ChessLab est un compagnon d'échecs complet pour iPhone et iPad : jouer, analyser, s'entraîner et expérimenter, avec le moteur Stockfish intégré, sans jamais quitter l'app.
 
 DES ADVERSAIRES HUMAINS
-Neuf personnages joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait, gaffes comprises. Chacun a son style, son répertoire, son tempérament, son portrait, et un niveau réglable sur l'échelle humaine. Ou affrontez Stockfish lui-même, du débutant (~900 Elo) au niveau maximal (~3190 Elo). Avec ou sans pendule. Indice, alerte avant un coup risqué et barre d'évaluation sont activables à tout moment.
+Neuf personnages joués par Maia-3, un réseau entraîné sur des millions de parties humaines : il ne cherche pas le meilleur coup, il joue celui qu'un humain de ce niveau jouerait, gaffes comprises. Chacun a son style, son répertoire, son tempérament, son portrait, et un niveau réglable sur l'échelle humaine. Ou affrontez Stockfish lui-même, du débutant (~900 Elo) au niveau maximal (~3190 Elo). Pendule en option, indice, alerte avant un coup risqué et barre d'évaluation à volonté.
 
 DEUX JOUEURS
 Jouez à deux sur le même appareil, avec un mode « table » qui retourne les pièces pour rester lisible face à face.
 
 ANALYSER
-Passez une partie ou une position au crible de Stockfish : classification de chaque coup (imprécision, erreur, gaffe, coup brillant…), courbe d'évaluation, flèches du meilleur coup et de la menace adverse, lecture automatique. Entrée par PGN, FEN, éditeur de position ou scanner photo.
+Passez une partie ou une position au crible de Stockfish : classification de chaque coup (imprécision, erreur, gaffe, coup brillant…), précision de chaque joueur, courbe d'évaluation, flèches du meilleur coup et de la menace adverse, lecture automatique. Le Coach dit ce que jouent les joueurs de votre niveau, et l'app propose de créer des puzzles depuis vos erreurs et vos mats manqués. Entrée par PGN, FEN, éditeur ou scanner photo.
 
 OUVERTURES
-Choisissez une ouverture et avancez coup par coup : chaque coup est expliqué, les variantes sont proposées, et des flèches colorées relient le plateau à la liste des coups. 58 ouvertures rédigées à la main (bilingues), toutes relues au moteur, avec un entraînement en répétition espacée simplifié pour les mémoriser.
+Choisissez une ouverture et avancez coup par coup : chaque coup est expliqué, les variantes sont proposées, et des flèches colorées relient le plateau à la liste des coups. 58 ouvertures rédigées à la main (bilingues), toutes relues au moteur, en cartes illustrées, avec un entraînement en répétition espacée.
 
 LE COIN DES FINALES
 78 cours prouvés par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Neuf familles, de l'opposition aux études célèbres. Et l'entraînement libre : concluez la position contre la meilleure défense, tout coup qui préserve le verdict est accepté — pas seulement celui de la leçon.
@@ -86,22 +128,19 @@ VOS PROPRES RÉPERTOIRES
 Importez vos ouvertures au format PGN, variantes comprises, et entraînez-les avec le même système. Partagez un répertoire par simple fichier — aucun compte, aucun serveur. Ce que vous avez déjà mémorisé sur une position vaut aussitôt dans le répertoire importé.
 
 PUZZLES
-Plus de 100 000 problèmes tactiques issus de la base Lichess, filtrables par niveau et par thème, plus des puzzles générés depuis vos propres erreurs en analyse. Répétition espacée et suivi de vos points forts.
+Plus de 100 000 problèmes tactiques issus de la base Lichess, filtrables par niveau et par thème, plus des puzzles tirés de vos propres erreurs. Cote personnelle, « À mon niveau », répétition espacée et suivi de vos points forts.
 
 LABORATOIRE
 Faites s'affronter deux réglages de Stockfish sur une série de parties pour comparer leur force, avec estimation de l'écart Elo et intervalle de confiance.
 
-ÉDITEUR ET SCANNER
-Composez une position à la main, ou scannez-la depuis une capture d'écran ou une photo d'écran — la reconnaissance se corrige avant de jouer ou d'analyser.
-
-CONÇU POUR IPAD
-Échiquier grand format et panneaux côte à côte (coups, courbe, MultiPV), clavier et trackpad, portrait, paysage et fenêtre partagée.
+ÉDITEUR, SCANNER ET IPAD
+Composez une position à la main ou scannez-la depuis une capture ou une photo, puis corrigez-la. Sur iPad : grand échiquier, panneaux côte à côte, clavier et trackpad, portrait, paysage et fenêtre partagée.
 
 SYNCHRONISATION iCLOUD (optionnelle)
-Activez-la dans les Réglages pour que vos parties suivent vos appareils, via votre iCloud privé. Aucun compte, aucun serveur. Désactivée par défaut.
+Activez-la dans les Réglages pour que vos parties suivent vos appareils, via votre iCloud privé. Désactivée par défaut.
 
 VIE PRIVÉE
-Hors ligne par défaut : aucun serveur ChessLab, aucune mesure d'audience, aucune publicité. Vos parties et réglages restent sur votre appareil, et ne sont jamais partagés avec le développeur. Bilingue français/anglais.
+Hors ligne par défaut : aucun serveur ChessLab, aucune mesure d'audience, aucune publicité. Vos parties et réglages restent sur votre appareil, jamais partagés avec le développeur. Bilingue français/anglais.
 
 ChessLab intègre le moteur Stockfish (licence GPLv3), le réseau Maia-3 de l'Université de Toronto (licence AGPLv3) et des jeux de pièces vectorielles libres — cburnett (GPLv2+/CC BY-SA), chessnut (Apache 2.0) et merida (GPLv2+). Code source complet et mentions de licence disponibles depuis l'app (Réglages → Licences).
 ```
@@ -115,19 +154,19 @@ ChessLab intègre le moteur Stockfish (licence GPLv3), le réseau Maia-3 de l'Un
 ChessLab
 ```
 
-**Subtitle** (30 char. max — 25 used):
+**Subtitle** (30 char. max — 27 used):
 ```
-Human opponents, analysis
+Chess vs human-like players
 ```
 
-**Keywords** (100 char. max — 92 used):
+**Keywords** (100 char. max — 94 used):
 ```
-stockfish,maia,tactics,openings,puzzle,gambit,fen,pgn,elo,training,scanner,analysis,offline
+chess,stockfish,maia,tactics,openings,puzzle,endgame,gambit,fen,pgn,elo,training,scanner,coach
 ```
 
 **Promotional text** (170 char. max):
 ```
-Ready for iPhone Duo, open or closed. Nine opponents that play like humans (Maia-3), Stockfish analysis, 58 openings, 100,000+ puzzles — fully offline, no ads.
+New: daily session, Coach, your mistakes become puzzles. Nine opponents that play like humans (Maia-3), Stockfish analysis — fully offline, no ads.
 ```
 
 **Description** (4000 char. max):
@@ -141,7 +180,7 @@ TWO PLAYERS
 Play locally on the same device, with a "pass-and-play" mode that flips the pieces so both players read the board comfortably.
 
 ANALYZE
-Run a game or a position through Stockfish: move-by-move classification (inaccuracy, mistake, blunder, brilliant move…), an evaluation graph, best-move and opponent-threat arrows, and auto-play through the moves. Import by PGN, FEN, position editor, or photo scanner.
+Run a game or a position through Stockfish: move-by-move classification (inaccuracy, mistake, blunder, brilliant move…), each player's accuracy, an evaluation graph, best-move and opponent-threat arrows, and auto-play through the moves. The Coach shows what players at your level play, and the app offers to turn your mistakes and missed mates into puzzles. Import by PGN, FEN, editor or photo scanner.
 
 OPENINGS
 Pick an opening and step through it move by move: every move is explained, the alternatives are offered, and colored arrows link the board to the move list. 58 hand-written openings (bilingual), all reviewed by the engine, with simplified spaced-repetition training to memorize them.
@@ -156,16 +195,13 @@ YOUR OWN REPERTOIRES
 Import your openings as PGN, variations included, and drill them with the same system. Share a repertoire as a single file — no account, no server. What you already know about a position counts right away in the imported repertoire.
 
 PUZZLES
-Over 100,000 tactics puzzles from the Lichess database, filterable by rating and theme, plus puzzles generated automatically from your own mistakes in analysis. Spaced repetition and progress tracking included.
+Over 100,000 tactics puzzles from the Lichess database, filterable by rating and theme, plus puzzles drawn from your own mistakes. Personal rating, “At my level”, spaced repetition and progress tracking included.
 
 LABORATORY
 Pit two Stockfish configurations against each other over a series of games to compare their strength, with an estimated Elo gap and confidence interval.
 
-EDITOR AND SCANNER
-Set up a position by hand, or scan it from a screenshot or a photo — review and correct the recognized position before playing or analyzing it.
-
-BUILT FOR IPAD
-Full-size board with move list, graph and MultiPV visible at once, keyboard and trackpad support, polished portrait and landscape layouts.
+EDITOR, SCANNER AND IPAD
+Set up a position by hand or scan it from a screenshot or photo, then correct it. On iPad: a full-size board, side-by-side panels, keyboard and trackpad, portrait, landscape and split-window layouts.
 
 iCLOUD SYNC (optional)
 Turn on iCloud sync in Settings so your games follow you across all your devices, via your private iCloud. No account to create, no ChessLab server. Off by default: the app works fully offline.
@@ -210,6 +246,8 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
+**2.0, build 18** — `MARKETING_VERSION = 2.0`, `CURRENT_PROJECT_VERSION = 18` (la 1.9.2, build 17, est la dernière soumise : le 18 est le premier numéro libre, à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.0.md`.
+
 **1.9.1, build 16** — fixés le 23/10/2026, aux deux configurations de la cible applicative. La 1.9.0 (build 15) est **READY_FOR_SALE** : le 16 est le premier numéro libre (vérifié par l'API le 23/10). Version de correction : la case d'origine de l'échiquier et un coin du recadrage ne répondaient plus en iOS 18.
 
 **1.9.0, build 15** — fixés le 13/10/2026 (`MARKETING_VERSION = 1.9.0`, `CURRENT_PROJECT_VERSION = 15`), aux deux configurations de la cible applicative. La 1.8.1 (build 14) est **READY_FOR_SALE** : le 15 est le premier numéro libre (vérifié par l'API le 13/10). Nouveautés détaillées dans `RELEASE_NOTES-1.9.0.md`, texte prêt à coller ci-dessus.
@@ -244,6 +282,8 @@ git push origin main
 Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) : soumettre sans pousser publierait un binaire dont les sources annoncées ne correspondent pas.
 
 ### Historique des versions
+- **2.0** — build 18 : séance du jour, analyse → puzzles avec récapitulatif, Coach (Maia-3), cote de puzzle, ouvertures illustrées, reprise de partie, limite de temps en option ; correctifs (reprise après capture d'une tour, coup de mat noté) (`RELEASE_NOTES-2.0.md`).
+- **1.9.2** — build 17, soumise : correctif de la prise au tap-tap sous iOS 18.
 - **1.9.1** — build 16 : la pièce du coin haut gauche de l'échiquier (h1 aux Noirs, a8 aux Blancs) et un coin du recadrage du scanner ne répondaient plus au toucher en iOS 18 (`RELEASE_NOTES-1.9.1.md`).
 - **1.9.0** — build 15, en ligne : iPhone Duo, dispositions pour écrans plus larges que hauts (`RELEASE_NOTES-1.9.0.md`).
 - **1.8.1** — build 14, en ligne : nom du joueur traduit et réglable, PGN exporté avec ses sept balises, disposition iPhone dans une fenêtre d'iPad plus étroite que 744 pt, échiquier servi en premier (`RELEASE_NOTES-1.8.1.md`).
@@ -260,10 +300,10 @@ Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/0
 
 ## App Review Notes (paste into App Store Connect → App Review Information → Notes)
 
-English, for the Apple reviewer. Opens with the nature of the update (1.9.1 : correctif tactile iOS 18), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
+English, for the Apple reviewer. Opens with the nature of the update (2.0 : major content update), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
 
 ```
-WHAT'S IN THIS UPDATE (1.9.1): a bug-fix release. On iOS 18 only, the piece standing on the board's top-left square (h1 when playing Black, a8 when playing White) did not respond to touch, and neither did a crop handle placed at the top-left of the image in the Scanner. Both are fixed. No new feature; no change to permissions, privacy or licensing.
+WHAT'S IN THIS UPDATE (2.0): a major content update. New: a Daily session (what to review each day, a streak of days and medals, all stored locally); after a game analysis the app offers to turn the user's mistakes and missed mates into puzzles, shown on a confirmation sheet (nothing is created without a tap on "Create"); a "Coach" line under mistakes, computed on-device by the bundled Maia-3 Core ML model; a personal puzzle rating; illustrated opening cards with filters; resuming an interrupted game from the game settings screen; an optional time limit. Fixes: a crash when resuming a game after a rook was captured on its corner, and games ending in checkmate not being graded to the end. No change to permissions, privacy or licensing. Nothing to set up to see the new features: finish or import any game and tap Analyse.
 
 ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 100,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
 

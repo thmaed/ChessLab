@@ -353,9 +353,12 @@ def cmd_screenshots(c, args):
         sets = {s["attributes"]["screenshotDisplayType"]: s
                 for s in c.get_all(f"/appStoreVersionLocalizations/{locs[locale]['id']}/appScreenshotSets")}
         for display_type, folder in SCREENSHOT_SETS.items():
-            files = sorted((folder / "en").glob("*.png"))
+            # Un jeu par langue (dossier `fr` / `en`) ; à défaut, le jeu anglais
+            # sert aux deux, comme avant la 2.0.
+            lang = "fr" if locale.startswith("fr") else "en"
+            files = sorted((folder / lang).glob("*.png")) or sorted((folder / "en").glob("*.png"))
             if not files:
-                sys.exit(f"aucune capture dans {folder}/en")
+                sys.exit(f"aucune capture dans {folder}/{lang}")
             if len(files) > 10:
                 # App Store Connect n'accepte que dix captures par format ;
                 # les suivantes vont dans hors-fiche/, pas sur la fiche.
@@ -462,15 +465,21 @@ def cmd_duo(c, args):
                 for placement in c.get_all(f"/{kind}/{item['id']}/placements"):
                     c.delete(f"/appAssetLibraryPlacements/{placement['id']}")
                 c.delete(f"/{kind}/{item['id']}")
-    shots = sorted(DUO_SCREENSHOTS.glob("*.png"))[:10]
     videos = [SUBMISSION / "videos" / n for n in DUO_PREVIEWS if (SUBMISSION / "videos" / n).exists()][:3]
-    image_ids = [library_upload(c, "appAssetLibraryImages", library_id, f, prefix + f.stem) for f in shots]
     video_ids = [library_upload(c, "appAssetLibraryVideos", library_id, f, prefix + f.stem) for f in videos]
-    wait_library(c, "appAssetLibraryImages", image_ids, "capture Duo")
+    # Un jeu de captures par langue (dossier `fr` / `en`, repli sur `en`) : chaque
+    # jeu est déposé une fois, puis placé sur la ou les localisations de sa langue.
+    image_ids = {}
+    for lang in sorted({"fr" if loc.startswith("fr") else "en" for loc in locs}):
+        folder = DUO_SCREENSHOTS.parent / lang
+        shots = sorted((folder if folder.exists() else DUO_SCREENSHOTS).glob("*.png"))[:10]
+        image_ids[lang] = [library_upload(c, "appAssetLibraryImages", library_id, f, f"{prefix}{lang}-{f.stem}") for f in shots]
+    wait_library(c, "appAssetLibraryImages", [i for ids in image_ids.values() for i in ids], "capture Duo")
     wait_library(c, "appAssetLibraryVideos", video_ids, "aperçu Duo")
     for locale, loc in locs.items():
+        lang = "fr" if locale.startswith("fr") else "en"
         for placement_type, rel_name, kind, ids in (
-            ("APP_SCREENSHOT", "image", "appAssetLibraryImages", image_ids),
+            ("APP_SCREENSHOT", "image", "appAssetLibraryImages", image_ids[lang]),
             ("APP_PREVIEW", "video", "appAssetLibraryVideos", video_ids),
         ):
             placed = []

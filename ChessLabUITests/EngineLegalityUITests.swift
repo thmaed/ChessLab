@@ -14,8 +14,15 @@ final class EngineLegalityUITests: XCTestCase {
     @MainActor
     func testAtomicStartsAndAcceptsAMove() throws {
         let app = XCUIApplication()
+        // Sans cela, le voile des nouveautés 2.0 couvre l'accueil au premier lancement.
+        app.launchArguments += ["-discoveryTourSeen"]
         app.launch()
         _ = app.buttons["mode_variants"].waitForExistence(timeout: 5)
+        // Hors écran, la tuile n'existe pas encore (grille paresseuse) : défiler d'abord.
+        for _ in 0..<6 where !app.buttons["mode_variants"].isHittable {
+            app.swipeUp()
+            RunLoop.current.run(until: Date().addingTimeInterval(0.4))
+        }
         app.buttons["mode_variants"].tap()
 
         _ = app.buttons["variant_atomic"].waitForExistence(timeout: 5)

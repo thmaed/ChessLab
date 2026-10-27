@@ -20,7 +20,7 @@ final class EngineLeakUITests: XCTestCase {
     @MainActor
     func testNoEngineSurvivesATourOfEveryMode() throws {
         let app = XCUIApplication()
-        app.launchArguments += ["-resetPlaySettings"]
+        app.launchArguments += ["-resetPlaySettings", "-discoveryTourSeen"]
         app.launch()
 
         let marker = app.otherElements["engineInstances"]
@@ -176,13 +176,18 @@ final class EngineLeakUITests: XCTestCase {
 
     @MainActor
     private func tapEntry(_ app: XCUIApplication, _ label: String) -> Bool {
-        for candidate in [app.buttons[label], app.cells[label], app.staticTexts[label]] {
-            guard candidate.waitForExistence(timeout: 5) else { continue }
-            for _ in 0..<4 {
-                if candidate.isHittable { candidate.tap(); return true }
-                app.swipeUp()
-                RunLoop.current.run(until: Date().addingTimeInterval(0.4))
+        // La grille de l'accueil est paresseuse : une tuile hors écran n'existe pas encore dans la hiérarchie
+        // (depuis la 2.0, la carte de la séance du jour en pousse plusieurs sous le pli). On fait donc défiler
+        // AVANT de conclure qu'elle manque.
+        _ = app.buttons[label].waitForExistence(timeout: 5)
+        for _ in 0..<6 {
+            for candidate in [app.buttons[label], app.cells[label], app.staticTexts[label]]
+            where candidate.exists && candidate.isHittable {
+                candidate.tap()
+                return true
             }
+            app.swipeUp()
+            RunLoop.current.run(until: Date().addingTimeInterval(0.4))
         }
         return false
     }

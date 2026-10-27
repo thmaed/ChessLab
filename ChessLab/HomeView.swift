@@ -282,6 +282,23 @@ struct HomeView: View {
     /// tombent à côté et ses captures sortent NOIRES. On ouvre donc l'écran
     /// par l'app elle-même, et on le photographie avec `simctl io screenshot`,
     /// qui voit juste.
+    /// Le récapitulatif de fin d'analyse, pour les captures : `-openRoute puzzleOffer` l'ouvre en feuille.
+    /// Un mat laissé filer et deux erreurs, sur des positions réelles.
+    @State private var debugPuzzleOffer: PuzzleOffer?
+    private static var debugOffer: PuzzleOffer {
+        PuzzleOffer(key: "debug", candidates: [
+            PuzzleCandidate(fen: "r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 23", playedSAN: "Ra3",
+                            solutionLANs: ["e3e8", "a8e8", "e1e8"], themeRaw: PuzzleTheme.checkmate.rawValue,
+                            isMate: true, moveNumber: 23, mover: .white),
+            PuzzleCandidate(fen: "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 4 4", playedSAN: "d3",
+                            solutionLANs: ["f3g5", "d7d5", "e4d5"], themeRaw: PuzzleTheme.fork.rawValue,
+                            isMate: false, moveNumber: 4, mover: .white),
+            PuzzleCandidate(fen: "r2q1rk1/ppp2ppp/2np1n2/2b1p1B1/2B1P1b1/2NP1N2/PPP2PPP/R2Q1RK1 w - - 0 8", playedSAN: "h3",
+                            solutionLANs: ["g5f6", "g7f6", "c3d5"], themeRaw: PuzzleTheme.fork.rawValue,
+                            isMate: false, moveNumber: 8, mover: .white),
+        ])
+    }
+
     private static var debugLaunchRoute: Route? {
         let args = CommandLine.arguments
         guard let index = args.firstIndex(of: "-openRoute"), index + 1 < args.count else { return nil }
@@ -310,6 +327,10 @@ struct HomeView: View {
         case "analysisEntry": return .analysisEntry
         case "analysis":
             return .activeAnalysis(.pgn("1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O"))
+        // La Fried Liver à l'envers : 5...Cxd5? est LA faute typique de ce niveau, celle que le Coach commente.
+        // À ouvrir avec `-analysisPly 10`.
+        case "analysisCoach":
+            return .activeAnalysis(.pgn("1. e4 e5 2. Nf3 Nc6 3. Bc4 Nf6 4. Ng5 d5 5. exd5 Nxd5 6. Nxf7 Kxf7 7. Qf3+ Ke6 8. Nc3 Ncb4 9. O-O c6 10. d4 Bg4"))
         case "library": return .analysisLibrary
         // Les Blancs tenaient 1.Te8+ Txe8 2.Txe8# et ont joué 1.Ta3.
         case "missedMates":
@@ -377,6 +398,11 @@ struct HomeView: View {
         #if DEBUG
         .task {
             if let route = Self.debugLaunchRoute, path.isEmpty { path.append(route) }
+            if CommandLine.arguments.contains("puzzleOffer") { debugPuzzleOffer = Self.debugOffer }
+        }
+        .sheet(item: $debugPuzzleOffer) { offer in
+            PuzzleOfferSheet(offer: offer, onAccept: { debugPuzzleOffer = nil }, onDecline: { debugPuzzleOffer = nil })
+                .presentationDetents([.large])
         }
         #endif
         .onChange(of: discoveryTour.currentStepIndex) { _, _ in

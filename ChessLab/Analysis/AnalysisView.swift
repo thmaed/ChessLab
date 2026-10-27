@@ -114,6 +114,17 @@ struct AnalysisView: View {
         )
         .onAppear {
             viewModel.handleViewAppear()
+            #if DEBUG
+            // Outil de capture : `-analysisPly N` ouvre l'analyse sur le N-ième demi-coup.
+            if let arg = CommandLine.arguments.firstIndex(of: "-analysisPly"),
+               arg + 1 < CommandLine.arguments.count, let ply = Int(CommandLine.arguments[arg + 1]) {
+                var index = viewModel.game.startingIndex
+                for _ in 0..<ply where viewModel.game.moves.hasIndex(after: index) {
+                    index = viewModel.game.moves.index(after: index)
+                }
+                viewModel.goTo(index: index)
+            }
+            #endif
             // Une seule fois par écran : un retour depuis un autre écran ne
             // relance pas la recherche.
             if findsMissedMatesOnAppear, !didStartMissedMateSearch {
