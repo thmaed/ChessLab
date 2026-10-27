@@ -627,7 +627,7 @@ struct PlayView: View {
                 }
                 // Une phrase permanente plutôt qu'une infobulle : c'est le moment où l'on a une partie à
                 // analyser, et on ne sait pas qu'« Analyser » fabrique aussi des puzzles de ses erreurs.
-                Label("Analysez pour créer des puzzles avec vos erreurs.", systemImage: "puzzlepiece.fill")
+                Label("Analyser = revoir vos coups et créer des puzzles avec vos erreurs.", systemImage: "puzzlepiece.fill")
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(Theme.violet)
                     .padding(.horizontal, 12).padding(.vertical, 9)

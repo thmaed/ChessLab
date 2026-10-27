@@ -1248,7 +1248,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="setup_replace_message">Starting a new game will erase the game in progress (%1$d half-move(s) played).</string>
     <string name="setup_replace_confirm">Replace</string>
     <string name="setup_replace_cancel">Cancel</string>
-    <string name="play_analyze_hint">Analyse to create puzzles from your mistakes.</string>
+    <string name="play_analyze_hint">Analyse = review your moves and create puzzles from your mistakes.</string>
     <string name="offer_title">Create puzzles from this game?</string>
     <string name="offer_subtitle">They will join “My games”, under Puzzles.</string>
     <string name="offer_row_mate">Move %1$d: a mate was available (you played %2$s).</string>

@@ -1245,7 +1245,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="setup_replace_message">Commencer une nouvelle partie effacera la partie en cours (%1$d demi-coup(s) joué(s)).</string>
     <string name="setup_replace_confirm">Remplacer</string>
     <string name="setup_replace_cancel">Annuler</string>
-    <string name="play_analyze_hint">Analysez pour créer des puzzles avec vos erreurs.</string>
+    <string name="play_analyze_hint">Analyser = revoir vos coups et créer des puzzles avec vos erreurs.</string>
     <string name="offer_title">Créer des puzzles de cette partie ?</string>
     <string name="offer_subtitle">Ils rejoindront « Mes parties », dans Puzzles.</string>
     <string name="offer_row_mate">Coup %1$d : un mat était possible (vous avez joué %2$s).</string>

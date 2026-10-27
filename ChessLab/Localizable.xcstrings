@@ -23523,12 +23523,12 @@
         }
       }
     },
-    "Analysez pour créer des puzzles avec vos erreurs.": {
+    "Analyser = revoir vos coups et créer des puzzles avec vos erreurs.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Analyse to create puzzles from your mistakes."
+            "value": "Analyse = review your moves and create puzzles from your mistakes."
           }
         }
       }

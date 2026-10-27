@@ -153,6 +153,17 @@ struct DailySessionTests {
 
     @Test("Le plan lu dans les bases compte les positions dues, les puzzles ratés et ceux de vos parties")
     func loadReadsTheStores() throws {
+        // `load` lit le compteur du jour et le plafond dans les réglages STANDARD : sur un simulateur où des
+        // révisions ont déjà eu lieu aujourd'hui, le plan sortait vide. On les isole le temps du test.
+        let defaults = UserDefaults.standard
+        let savedDone = defaults.object(forKey: "dailySession.openingsDone")
+        let savedCap = defaults.object(forKey: DailySessionBuilder.openingsCapKey)
+        defaults.removeObject(forKey: "dailySession.openingsDone")
+        defaults.removeObject(forKey: DailySessionBuilder.openingsCapKey)
+        defer {
+            defaults.set(savedDone, forKey: "dailySession.openingsDone")
+            defaults.set(savedCap, forKey: DailySessionBuilder.openingsCapKey)
+        }
         let container = try ModelContainer(
             for: Schema([OpeningPositionProgress.self, Puzzle.self]),
             configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
