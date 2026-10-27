@@ -16,7 +16,9 @@ shoot() { # nom route attente [args...]
   [[ -n $route ]] && launch+=(-openRoute $route)   # un tableau : zsh ne découpe pas une variable non quotée
   xcrun simctl launch "$UDID" $BUNDLE "${launch[@]}" "$@" >/dev/null
   sleep "$wait"
-  xcrun simctl io "$UDID" screenshot --type=png "$OUT/$name.png" >/dev/null
+  local -a display=()
+  [[ -n ${DISPLAY_ID:-} ]] && display=(--display "$DISPLAY_ID")   # Duo ouvert : l'écran intérieur se nomme par son UUID
+  xcrun simctl io "$UDID" screenshot "${display[@]}" --type=png "$OUT/$name.png" >/dev/null 2>&1
   echo "  $name"
 }
 
