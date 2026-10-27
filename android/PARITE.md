@@ -1789,3 +1789,12 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
       puce `fil-4` du fil d'Ariane existe mais sort de sa rangée défilante.
       Probablement le test qui ne la fait pas venir, pas l'écran qui casse —
       à trancher en le regardant.
+
+## Publication Play de la 2.0 (27/10/2026)
+
+- [ ] **Le binaire publié sur Play est une version INTERMÉDIAIRE (AAB versionCode 33), laissée en l'état
+      par décision du 27/10.** Le code d'`android/` est, lui, à jour avec iOS 2.0 build 19 : il contient en
+      plus le garde-fou de roque (`UciPositionSanitizer`), le récapitulatif « Créer des puzzles ? », le
+      libellé « Analyser = revoir vos coups et créer des puzzles avec vos erreurs » et la puce « Ratés »
+      grisée quand il n'y en a aucun. Ces changements ne seront dans le binaire qu'à la prochaine
+      publication (versionCode ≥ 34, voir `PLAY-2.0.md`).
