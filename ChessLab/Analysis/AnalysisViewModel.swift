@@ -1671,6 +1671,26 @@ final class AnalysisViewModel {
         return Board(position: position)
     }
 
+    /// L'état de la partie APRÈS le coup `index` : mat ou nulle, ou rien de terminal.
+    private func boardState(at index: MoveTree.Index) -> Board.State? {
+        game.positions[index].map(Self.terminalState(of:))
+    }
+
+    /// `Board(position:)` ne sait PAS dire si le camp AU TRAIT est maté : sans coup joué, il examine les
+    /// coups de l'autre camp (le dernier à avoir « joué »). Lu tel quel, un plateau reconstruit sur une
+    /// position matée restait `.active` — Stockfish ne répond rien sur une position matée, le coup de mat
+    /// n'avait donc aucun verdict, le bilan de la partie ne se complétait jamais, et ni précision ni
+    /// puzzles n'étaient proposés. On donne donc le trait à l'autre camp : le plateau examine alors
+    /// les coups du camp réellement au trait.
+    static func terminalState(of position: Position) -> Board.State {
+        var fields = position.fen.split(separator: " ", omittingEmptySubsequences: true).map(String.init)
+        guard fields.count >= 4 else { return Board(position: position).state }
+        fields[1] = fields[1] == "w" ? "b" : "w"
+        fields[3] = "-"
+        guard let flipped = Position(fen: fields.joined(separator: " ")) else { return Board(position: position).state }
+        return Board(position: flipped).state
+    }
+
     /// Éval CERTAINE d'une position terminale (mat/pat), sans requête moteur —
     /// Stockfish ne renvoie ni pv ni cp sur un `bestmove (none)`, ce qui
     /// laissait le coup de mat sans classification et la courbe tronquée d'un
@@ -1680,8 +1700,8 @@ final class AnalysisViewModel {
     /// (``evaluatePosition``), pour que la logique reste UNIQUE — pas de
     /// divergence de verdict entre les deux.
     private func terminalCachedEval(at index: MoveTree.Index) -> CachedEval? {
-        guard let position = game.positions[index] else { return nil }
-        switch Board(position: position).state {
+        guard let state = boardState(at: index) else { return nil }
+        switch state {
         case let .checkmate(matedColor):
             return CachedEval(
                 winPercent: matedColor == .white ? 0 : 100,
@@ -2262,7 +2282,7 @@ final class AnalysisViewModel {
                   let child = game.positions[index] else { continue }
             if let color, parent.sideToMove != color { continue }
             // Le coup joué mate lui-même : rien de manqué.
-            if case .checkmate = Board(position: child).state { continue }
+            if case .checkmate = boardState(at: index) { continue }
             // Déjà dans vos puzzles : ne pas le proposer une seconde fois.
             if PuzzleSessionDrawer.hasOwnPuzzle(fen: parent.fen, in: context) { continue }
 
