@@ -186,6 +186,10 @@ final class AnalysisViewModel {
 
     private(set) var moveEvaluations: [MoveTree.Index: AnalysisMoveEvaluation] = [:]
     private(set) var isClassifying = false
+    /// Passes de classification terminées. `isClassifying` ne suffit pas à l'écran : quand tout est déjà en cache
+    /// (réouverture d'une partie dont il ne manquait qu'un coup), il passe à vrai puis à faux sans qu'aucun
+    /// rendu ne l'ait vu — l'écran ne réagissait plus. Ce compteur, lui, ne revient jamais en arrière.
+    private(set) var classificationPassCount = 0
     private(set) var classificationProgress: (done: Int, total: Int)?
     /// Éval de la position de chaque nœud déjà évalué, point de vue
     /// BLANCS — mise en cache pour ne jamais interroger deux fois le
@@ -1439,6 +1443,7 @@ final class AnalysisViewModel {
             self.classificationProgress = nil
             self.refreshDerivedData()
             self.persistAnalysisIfNeeded()
+            self.classificationPassCount += 1
             // Moteur déclaré indisponible en cours de route : inutile de faire
             // quoi que ce soit sur une instance morte — la bannière est levée,
             // « Réessayer » relancera tout.

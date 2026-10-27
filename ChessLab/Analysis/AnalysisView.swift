@@ -130,10 +130,9 @@ struct AnalysisView: View {
             // ici, pas dans le view model.
             viewModel.persistMetrics(in: modelContext)
         }
-        .onChange(of: viewModel.isClassifying) { _, isClassifying in
+        .onChange(of: viewModel.classificationPassCount) { _, _ in
             // Fin de classification écran ouvert : on écrit sans attendre la
             // sortie, pour que la bibliothèque montre la précision tout de suite.
-            guard !isClassifying else { return }
             viewModel.persistMetrics(in: modelContext)
             // Les suites (puzzles de vos erreurs, sortie de répertoire), une fois par partie.
             Task { puzzleOffer = await AnalysisFollowUpService.shared.followUp(after: viewModel, context: modelContext) }
