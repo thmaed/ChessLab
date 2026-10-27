@@ -33,6 +33,8 @@ struct PuzzleQueueView: View {
     @State private var atMyLevel = false
     @State private var puzzleRating = PuzzleRatingStore.load()
     @State private var missedOnly = false
+    /// Puzzles ratés à la dernière tentative : à zéro, la puce « Ratés » est grisée (rien à y retrouver).
+    @State private var missedCount = 0
 
     @State private var hasAnyPuzzle = true
     /// Bilan (Lot 5.B), recalculé à l'apparition — voir ``refresh()``.
@@ -92,6 +94,8 @@ struct PuzzleQueueView: View {
                                 FilterChip(label: "Ratés", icon: "xmark.circle.fill", tint: Theme.rose, isSelected: missedOnly) {
                                     missedOnly.toggle()
                                 }
+                                .disabled(missedCount == 0)
+                                .opacity(missedCount == 0 ? 0.35 : 1)
                                 .accessibilityIdentifier("historique-rates")
                             }
 
@@ -445,6 +449,8 @@ struct PuzzleQueueView: View {
         PuzzleProgressSync.reconcileIfStale(in: modelContext)
         let totalDescriptor = FetchDescriptor<Puzzle>()
         hasAnyPuzzle = ((try? modelContext.fetchCount(totalDescriptor)) ?? 0) > 0
+        missedCount = PuzzleSessionDrawer.count(matching: PuzzleSessionFilter(source: nil, missedOnly: true), in: modelContext)
+        if missedCount == 0 { missedOnly = false }
 
         // ⚠️ Ne charge QUE les puzzles réellement tentés : la bibliothèque
         // Lichess embarquée en compte des dizaines de milliers, et les

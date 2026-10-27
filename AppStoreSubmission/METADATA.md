@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 2.0, build 18** (fixés dans `project.pbxproj`). La 1.9.2 (build 17) est la dernière soumise. Voir `RELEASE_NOTES-2.0.md` pour le détail des changements depuis la 1.9.x. **Préparée le 27/10/2026 : fiche, captures et notes de révision prêtes ; le build n'est PAS archivé ni téléversé (attendre l'accord de Thierry).**
+**Version courante : 2.0, build 19** (le 18, téléversé le 27/10, est écarté : il n'avait pas la puce « Ratés » grisée) (fixés dans `project.pbxproj`). La 1.9.2 (build 17) est la dernière soumise. Voir `RELEASE_NOTES-2.0.md` pour le détail des changements depuis la 1.9.x. **Préparée le 27/10/2026 : fiche, captures et notes de révision prêtes ; le build n'est PAS archivé ni téléversé (attendre l'accord de Thierry).**
 
 Tout ce qui suit est à copier-coller directement dans les champs correspondants d'App Store Connect. Les limites de caractères d'Apple sont respectées (vérifiées).
 
@@ -228,7 +228,7 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**2.0, build 18** — `MARKETING_VERSION = 2.0`, `CURRENT_PROJECT_VERSION = 18` (la 1.9.2, build 17, est la dernière soumise : le 18 est le premier numéro libre, à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.0.md`.
+**2.0, build 19** — `MARKETING_VERSION = 2.0`, `CURRENT_PROJECT_VERSION = 19` (la 1.9.2, build 17, est la dernière soumise : le 18 est le premier numéro libre, à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.0.md`.
 
 **1.9.1, build 16** — fixés le 23/10/2026, aux deux configurations de la cible applicative. La 1.9.0 (build 15) est **READY_FOR_SALE** : le 16 est le premier numéro libre (vérifié par l'API le 23/10). Version de correction : la case d'origine de l'échiquier et un coin du recadrage ne répondaient plus en iOS 18.
 

@@ -33,13 +33,25 @@ final class PuzzleFiltersUITests: XCTestCase {
         XCTAssertTrue(level.waitForExistence(timeout: 3), "désélectionner « Mes parties » rend le niveau")
     }
 
+    /// Sans puzzle raté, la puce « Ratés » est grisée ; avec, elle répond.
+    func testMissedChipIsGreyedOutWhenNothingWasMissed() throws {
+        let app = launchOnPuzzleQueue()
+        let missed = element(app, "historique-rates")
+        XCTAssertTrue(missed.waitForExistence(timeout: 15))
+        let counted = Date().addingTimeInterval(5)
+        while Date() < counted { RunLoop.current.run(until: Date().addingTimeInterval(0.25)) }
+        // Le simulateur de test n'a, au départ, aucun puzzle raté : la puce doit être inactive.
+        XCTAssertFalse(missed.isEnabled, "aucun puzzle raté : « Ratés » doit être grisée")
+    }
+
     /// « Ratés » mène soit à un puzzle (il y en a), soit au message dédié —
     /// jamais à un écran vide ni à « Aucun puzzle dû ».
     func testMissedSessionOpensAPuzzleOrSaysNoneIsMissed() throws {
         let app = launchOnPuzzleQueue()
         let missed = element(app, "historique-rates")
         XCTAssertTrue(missed.waitForExistence(timeout: 15))
-        missed.tap()
+        // Aucun puzzle raté : la puce est GRISÉE, on ne peut pas la choisir. Sinon, on la choisit.
+        if missed.isEnabled { missed.tap() }
         element(app, "startPuzzleSession").tap()
 
         let puzzle = element(app, "puzzleHint")

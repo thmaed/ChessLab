@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -243,16 +244,19 @@ fun ChipButton(
      * paramètre que le `FilterChip` d'iOS ; Android les peignait toutes en vert.
      */
     tint: Color = Palette.accent,
+    /** Grisée et sans effet : le filtre ne retiendrait rien (ex. « Ratés » quand il n'y en a aucun). */
+    enabled: Boolean = true,
     onClick: () -> Unit,
 ) {
     Row(
         modifier
+            .alpha(if (enabled) 1f else 0.35f)
             .clip(CircleShape)
             .then(
                 if (selected) Modifier.background(tintGradient(tint))
                 else Modifier.background(tint.copy(alpha = 0.10f)).border(1.dp, tint.copy(alpha = 0.28f), CircleShape)
             )
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 9.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

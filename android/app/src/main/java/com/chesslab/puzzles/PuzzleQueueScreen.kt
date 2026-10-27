@@ -73,6 +73,8 @@ fun PuzzleQueueScreen(
     var theme by remember { mutableStateOf<PuzzleThemeKind?>(null) }
     var source by remember { mutableStateOf<PuzzleSource?>(null) }
     var missedOnly by remember { mutableStateOf(false) }
+    // Ratés à la dernière tentative : à zéro, la puce « Ratés » est grisée.
+    var missedCount by remember { mutableStateOf(0) }
     // « À mon niveau » : la cote personnelle fixe la fenêtre de puzzles.
     var atMyLevel by remember { mutableStateOf(false) }
     var puzzleRating by remember { mutableStateOf(PuzzleRating()) }
@@ -80,6 +82,10 @@ fun PuzzleQueueScreen(
 
     LaunchedEffect(Unit) {
         puzzleRating = com.chesslab.settings.StatsStore.puzzleRating(context)
+        missedCount = withContext(Dispatchers.IO) {
+            runCatching { LibraryDatabase.get(context).puzzleProgress().missedIds().size }.getOrDefault(0)
+        }
+        if (missedCount == 0) missedOnly = false
         stats = withContext(Dispatchers.IO) {
             runCatching {
                 PuzzleStats.compute(LibraryDatabase.get(context).puzzleProgress().all())
@@ -128,6 +134,7 @@ fun PuzzleQueueScreen(
                     stringResource(R.string.puzzle_missed), missedOnly,
                     Modifier.testTag("historique-rates"),
                     icon = Icons.Default.Cancel, tint = Palette.rose,
+                    enabled = missedCount > 0,
                 ) { missedOnly = !missedOnly }
             }
             // Masqué pour « Mes parties » : sans cote, aucun niveau ne
