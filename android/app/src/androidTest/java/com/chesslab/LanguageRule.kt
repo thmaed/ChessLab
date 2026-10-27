@@ -29,9 +29,15 @@ class LanguageRule(private val tag: String = "fr") : TestRule {
                 // test et recouvrirait l'écran d'un voile qui avale les
                 // taps : on la marque vue avant que l'activité démarre. Le
                 // test qui la vérifie la rejoue depuis l'Aide.
-                com.chesslab.discovery.DiscoveryTourMemory.markSeen(
-                    InstrumentationRegistry.getInstrumentation().targetContext
-                )
+                val target = InstrumentationRegistry.getInstrumentation().targetContext
+                com.chesslab.discovery.DiscoveryTourMemory.markSeen(target)
+                // Idem pour le court parcours des nouveautés 2.0 (mise à jour depuis la 1.x).
+                com.chesslab.discovery.DiscoveryTourMemory.markWhatsNewSeen(target)
+                // Une partie laissée en cours par le test précédent ferait demander « remplacer ? »
+                // à chaque « Commencer » : chaque test repart sans partie en cours.
+                kotlinx.coroutines.runBlocking {
+                    com.chesslab.library.LibraryDatabase.get(target).autosaves().clear("engine")
+                }
                 val before = set(tag)
                 try {
                     base.evaluate()

@@ -11,6 +11,13 @@ import SwiftUI
 /// aux derniers réglages.
 struct NewGameSetupView: View {
     let onStart: (PlayGameSettings) -> Void
+    /// Reprendre la partie contre l'ordinateur laissée en cours — fournie par l'accueil.
+    private let onResume: (PlayGameAutosave) -> Void
+    /// La partie en cours, relue à l'ouverture de l'écran. Lancer une nouvelle partie
+    /// l'EFFACE : l'écran le dit, au lieu de le laisser découvrir (retour d'un joueur,
+    /// 27/10/2026 : la flèche de retour mène ici, et « Commencer » perdait sa partie).
+    @State private var resumable: PlayGameAutosave?
+    @State private var confirmReplace = false
     /// Titre de barre : « Nouvelle partie » par défaut, « Continuer la partie »
     /// quand on prolonge une position existante.
     private let navigationTitleKey: LocalizedStringKey
@@ -41,8 +48,13 @@ struct NewGameSetupView: View {
     ///   Stockfish »). Quand elle est fournie, la case « Position personnalisée »
     ///   est cochée, le champ FEN pré-rempli, et le camp au trait dans la FEN
     ///   devient celui de l'utilisateur — l'autre est joué par le moteur.
-    init(initialFEN: String? = nil, onStart: @escaping (PlayGameSettings) -> Void) {
+    init(
+        initialFEN: String? = nil,
+        onResume: @escaping (PlayGameAutosave) -> Void = { _ in },
+        onStart: @escaping (PlayGameSettings) -> Void
+    ) {
         self.onStart = onStart
+        self.onResume = onResume
         self.navigationTitleKey = initialFEN == nil ? "Nouvelle partie" : "Continuer la partie"
         let saved = PlaySettingsStore.load() ?? .default
 
@@ -94,6 +106,8 @@ struct NewGameSetupView: View {
     private var scrollBody: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
+                if let resumable { resumeCard(resumable) }
+
                 SettingsSection(title: "Couleur", systemImage: "circle.lefthalf.filled", tint: Theme.warning) {
                     // FlowLayout et non HStack : en français les trois
                     // puces réclament ~323 pt pour 303 disponibles à 375, et
@@ -256,6 +270,16 @@ struct NewGameSetupView: View {
             .padding(20)
             .padding(.bottom, 20)
         }
+        .onAppear { resumable = AutosaveStore.loadPlay() }
+        .alert("Une partie est en cours", isPresented: $confirmReplace) {
+            Button("Reprendre la partie en cours") {
+                if let resumable { onResume(resumable) }
+            }
+            Button("Remplacer par une nouvelle partie", role: .destructive) { launch() }
+            Button("Annuler", role: .cancel) {}
+        } message: {
+            Text("Commencer une nouvelle partie effacera la partie en cours (\(resumable?.moveLANs.count ?? 0) coup(s) joué(s)).")
+        }
         .appBackground()
         .navigationTitle(navigationTitleKey)
         .navigationBarTitleDisplayMode(.large)
@@ -334,7 +358,53 @@ struct NewGameSetupView: View {
     private var customMinutes: Int { timeLimit.customMinutes }
     private var customIncrement: Int { timeLimit.customIncrement }
 
+    /// Garde-fou : une partie en cours serait effacée par la nouvelle.
     private func start() {
+        let trimmed = trimmedFENText
+        if useCustomFEN, !FENValidator.isLegal(trimmed) {
+            fenError = true
+            return
+        }
+        if resumable != nil {
+            confirmReplace = true
+        } else {
+            launch()
+        }
+    }
+
+    /// La carte « Reprendre » : c'est ici qu'on atterrit en quittant une partie par la flèche.
+    private func resumeCard(_ autosave: PlayGameAutosave) -> some View {
+        Button {
+            onResume(autosave)
+        } label: {
+            HStack(spacing: 14) {
+                Image(systemName: "play.circle.fill")
+                    .font(.system(size: 30))
+                    .foregroundStyle(Theme.accent)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Reprendre la partie en cours")
+                        .font(.headline)
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Votre partie vous attend : \(autosave.moveLANs.count) coup(s) joué(s).")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+            .padding(16)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Theme.accent.opacity(0.14), in: Theme.cardShape)
+            .overlay(Theme.cardShape.strokeBorder(Theme.accent.opacity(0.4), lineWidth: 1))
+        }
+        .buttonStyle(.pressable)
+        .accessibilityIdentifier("setupResumeGame")
+    }
+
+    private func launch() {
         // Trimé AVANT stockage et pas seulement pour la validation :
         // `FENValidator` trime en interne, mais `PlayGameSettings.startingPosition`
         // parse le FEN stocké tel quel — un FEN collé avec un retour à la

@@ -5,6 +5,7 @@ import com.chesslab.discovery.discoveryAnchor
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.filled.FlagCircle
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Timer
@@ -69,9 +71,17 @@ fun NewGameScreen(
     initial: PlayGameSettings,
     onOpenEditor: () -> Unit = {},
     onOpenScanner: () -> Unit = {},
+    /** Reprendre la partie contre l'ordinateur laissée en cours. */
+    onResume: () -> Unit = {},
     onStart: (PlayGameSettings) -> Unit,
 ) {
     val context = LocalContext.current
+    // La partie en cours (mode « engine ») : lancer une nouvelle partie l'EFFACE, et l'écran le dit
+    // au lieu de le laisser découvrir (retour d'un joueur, 27/10/2026). Pendant d'iOS.
+    val autosaves by remember { com.chesslab.library.LibraryDatabase.get(context).autosaves().all() }
+        .collectAsState(initial = emptyList())
+    val resumable = autosaves.firstOrNull { it.mode == "engine" }
+    var confirmReplace by remember { mutableStateOf(false) }
 
     var color by remember { mutableStateOf(initial.colorChoice) }
     var useCharacter by remember { mutableStateOf(maiaAvailable && initial.opponentId != null) }
@@ -112,11 +122,81 @@ fun NewGameScreen(
     val fenIsLegal = remember(fenText) { FenValidator.errors(fenText.trim()).isEmpty() }
     val hasClock = timeLimit.hasClock
 
+    val launchNew: () -> Unit = {
+                val settings = PlayGameSettings(
+                    colorChoice = color,
+                    opponentId = if (useCharacter && maiaAvailable) opponentId else null,
+                    level = level,
+                    timeControlId = timeLimit.effectiveId,
+                    customMinutes = timeLimit.customMinutes,
+                    customIncrementSeconds = timeLimit.customIncrement,
+                    hintsEnabled = hints,
+                    blunderAlertEnabled = blunderAlert,
+                    showEvalBar = evalBar,
+                    engineResigns = engineResigns,
+                    bookEnabled = bookEnabled,
+                    bookWidth = bookWidth,
+                    startFen = if (useCustomFen) fenText.trim() else null,
+                )
+                // Les réglages survivent à la fermeture de l'app ; le
+                // niveau, lui, se mémorise PAR personnage.
+                timeLimit.remember()
+                PlaySettingsStore.save(context, settings)
+                if (useCharacter && maiaAvailable) OpponentLevelStore.save(context, level, opponentId)
+                onStart(settings)
+    }
+
+    if (confirmReplace) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { confirmReplace = false },
+            title = { Text(stringResource(R.string.setup_replace_title)) },
+            text = { Text(stringResource(R.string.setup_replace_message, resumable?.moveList?.size ?: 0)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { confirmReplace = false; onResume() },
+                    modifier = Modifier.testTag("remplacer-reprendre"),
+                ) { Text(stringResource(R.string.home_resume_title)) }
+            },
+            dismissButton = {
+                Row {
+                    androidx.compose.material3.TextButton(onClick = { confirmReplace = false }) { Text(stringResource(R.string.setup_replace_cancel)) }
+                    androidx.compose.material3.TextButton(
+                        onClick = { confirmReplace = false; launchNew() },
+                        modifier = Modifier.testTag("remplacer-confirmer"),
+                    ) { Text(stringResource(R.string.setup_replace_confirm)) }
+                }
+            },
+        )
+    }
+
     Column(Modifier.fillMaxSize()) {
         Column(
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(22.dp),
         ) {
+            resumable?.let { save ->
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .clip(ControlShape)
+                        .background(Palette.accent.copy(alpha = 0.14f))
+                        .border(1.dp, Palette.accent.copy(alpha = 0.4f), ControlShape)
+                        .clickable(onClick = onResume)
+                        .padding(16.dp)
+                        .testTag("reprendre-depuis-reglages"),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(Icons.Default.PlayCircle, null, tint = Palette.accent, modifier = Modifier.size(30.dp))
+                    Spacer(Modifier.width(14.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text(stringResource(R.string.home_resume_title), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+                        Text(
+                            stringResource(R.string.setup_resume_waiting, save.moveList.size),
+                            fontSize = 12.sp, color = Palette.textSecondary,
+                        )
+                    }
+                }
+            }
             SettingsSection(stringResource(R.string.setup_colour), Icons.Default.Contrast, Palette.warning) {
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     listOf(
@@ -285,27 +365,8 @@ fun NewGameScreen(
                     .clip(ControlShape)
                     .then(if (ready) Modifier.background(accentGradient) else Modifier.background(Palette.surfaceElevated))
                     .clickable(enabled = ready) {
-                        val settings = PlayGameSettings(
-                            colorChoice = color,
-                            opponentId = if (useCharacter && maiaAvailable) opponentId else null,
-                            level = level,
-                            timeControlId = timeLimit.effectiveId,
-                            customMinutes = timeLimit.customMinutes,
-                            customIncrementSeconds = timeLimit.customIncrement,
-                            hintsEnabled = hints,
-                            blunderAlertEnabled = blunderAlert,
-                            showEvalBar = evalBar,
-                            engineResigns = engineResigns,
-                            bookEnabled = bookEnabled,
-                            bookWidth = bookWidth,
-                            startFen = if (useCustomFen) fenText.trim() else null,
-                        )
-                        // Les réglages survivent à la fermeture de l'app ; le
-                        // niveau, lui, se mémorise PAR personnage.
-                        timeLimit.remember()
-                        PlaySettingsStore.save(context, settings)
-                        if (useCharacter && maiaAvailable) OpponentLevelStore.save(context, level, opponentId)
-                        onStart(settings)
+                        // Une partie en cours serait effacée par la nouvelle : on demande d'abord.
+                        if (resumable != null) confirmReplace = true else launchNew()
                     }
                     .padding(vertical = 14.dp)
                     .testTag("commencer"),
@@ -399,6 +460,7 @@ fun NewGameSetupRoute(
     startFen: String? = null,
     onOpenEditor: () -> Unit = {},
     onOpenScanner: () -> Unit = {},
+    onResume: () -> Unit = {},
     onStart: (PlayGameSettings) -> Unit,
 ) {
     val context = LocalContext.current
@@ -412,6 +474,7 @@ fun NewGameSetupRoute(
         initial = remembered.copy(startFen = startFen),
         onOpenEditor = onOpenEditor,
         onOpenScanner = onOpenScanner,
+        onResume = onResume,
         onStart = onStart,
     )
 }

@@ -245,4 +245,32 @@ class PlaySetupTest {
             context.getSharedPreferences("time_limit", android.content.Context.MODE_PRIVATE).getString("play", null),
         )
     }
+
+    /**
+     * Depuis l'écran de réglages : la partie en cours se voit (carte « Reprendre »), et « Commencer »
+     * demande avant de l'effacer. Retour d'un joueur (27/10/2026).
+     */
+    @Test fun lEcranDeReglagesProposeDeReprendreEtDemandeAvantDeRemplacer() {
+        openSetup()
+        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
+        assertEquals(0, compose.onAllNodesWithTag("reprendre-depuis-reglages").fetchSemanticsNodes().size)
+        compose.onNodeWithTag("commencer").performClick()
+        compose.waitUntil(120_000) {
+            compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+        Thread.sleep(2_000)
+        compose.waitForIdle()
+        // Retour à l'accueil par la flèche, puis de nouveau l'écran de réglages.
+        compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        compose.waitForIdle()
+        awaitTag("mode-play")
+        compose.onNodeWithTag("mode-play").performScrollTo().performClick()
+        awaitTag("reprendre-depuis-reglages")
+        compose.onNodeWithTag("commencer").performClick()
+        awaitTag("remplacer-reprendre")
+        compose.onNodeWithTag("remplacer-reprendre").performClick()
+        awaitTag("case-e4")
+    }
 }

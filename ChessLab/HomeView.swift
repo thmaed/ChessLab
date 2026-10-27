@@ -763,7 +763,12 @@ struct HomeView: View {
     private func destination(for route: Route) -> some View {
                 switch route {
                 case .newGame:
-                    NewGameSetupView { settings in
+                    NewGameSetupView(onResume: { autosave in
+                        // La partie en cours, depuis l'écran de réglages : on repart d'une pile
+                        // vide (iPhone : l'accueil ; iPad : la racine de détail).
+                        path = NavigationPath()
+                        path.append(Route.resumedGame(autosave))
+                    }) { settings in
                         // Remplace l'écran de réglages par la partie. En pile
                         // (iPhone) il est empilé ; en racine de détail (iPad) la
                         // pile est vide — d'où la garde, sinon `removeLast`
@@ -774,7 +779,10 @@ struct HomeView: View {
                 case let .continueVsStockfish(fen):
                     // Même écran que « Nouvelle partie », pré-rempli avec la
                     // position atteinte : le joueur règle l'Elo puis lance.
-                    NewGameSetupView(initialFEN: fen) { settings in
+                    NewGameSetupView(initialFEN: fen, onResume: { autosave in
+                        path = NavigationPath()
+                        path.append(Route.resumedGame(autosave))
+                    }) { settings in
                         startNewGame(settings)
                     }
 

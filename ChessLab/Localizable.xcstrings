@@ -23412,6 +23412,46 @@
           }
         }
       }
+    },
+    "Une partie est en cours": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A game is in progress"
+          }
+        }
+      }
+    },
+    "Remplacer par une nouvelle partie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Replace with a new game"
+          }
+        }
+      }
+    },
+    "Commencer une nouvelle partie effacera la partie en cours (%lld coup(s) joué(s)).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starting a new game will erase the game in progress (%lld move(s) played)."
+          }
+        }
+      }
+    },
+    "Votre partie vous attend : %lld coup(s) joué(s).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your game is waiting: %lld move(s) played."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

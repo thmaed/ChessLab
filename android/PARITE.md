@@ -308,6 +308,16 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
       soumise) ; Android `versionName` « 2.0 » (le `versionCode` s'incrémente seul, prochain : voir
       `version.properties`). Le correctif tactile iOS 18 de la 1.9.2 est déjà dans `main` (commit c093460).
 
+### Reprise de partie depuis l'écran de réglages — 27/10/2026
+
+- [x] Retour d'un joueur : la flèche de retour le menait à « Nouvelle partie », où « Commencer »
+      effaçait sa partie sans prévenir. L'écran de réglages montre désormais une carte
+      **« Reprendre la partie en cours »** (nombre de coups), et « Commencer » **demande** :
+      Reprendre / Remplacer / Annuler. iOS : `NewGameSetupView` (`setupResumeGame`,
+      alerte « Une partie est en cours ») ; Android : `NewGameScreen` (`reprendre-depuis-reglages`).
+- [x] Test iOS `ResumeGameUITests` vert. **Test Android `PlaySetupTest` écrit mais NON exécuté** :
+      le Galaxy n'était pas branché au moment de l'écrire. À lancer.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

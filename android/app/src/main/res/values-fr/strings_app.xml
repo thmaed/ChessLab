@@ -1256,4 +1256,9 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="auto_analysis_offer_yes">Oui, automatiquement</string>
     <string name="auto_analysis_offer_no">Non merci</string>
     <string name="auto_analysis_offer_note">Modifiable à tout moment dans les Réglages.</string>
+    <string name="setup_resume_waiting">Votre partie vous attend : %1$d demi-coup(s) joué(s).</string>
+    <string name="setup_replace_title">Une partie est en cours</string>
+    <string name="setup_replace_message">Commencer une nouvelle partie effacera la partie en cours (%1$d demi-coup(s) joué(s)).</string>
+    <string name="setup_replace_confirm">Remplacer</string>
+    <string name="setup_replace_cancel">Annuler</string>
 </resources>

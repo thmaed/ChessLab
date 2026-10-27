@@ -167,6 +167,8 @@ private fun App() {
                 startFen = current.startFen,
                 onOpenEditor = { stack.add(Route.PositionEditor(forSetup = true)) },
                 onOpenScanner = { stack.add(Route.Scanner(forSetup = true)) },
+                // La partie en cours, depuis l'écran de réglages : elle remplace les réglages dans la pile.
+                onResume = { stack[stack.lastIndex] = Route.PlayVsEngine(resume = true) },
             ) { settings ->
                 // On REMPLACE la configuration dans la pile : revenir depuis
                 // la partie doit ramener à l'accueil, pas à l'écran qu'on
