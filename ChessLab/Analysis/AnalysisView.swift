@@ -26,6 +26,8 @@ struct AnalysisView: View {
     @State private var boardOrientation: Piece.Color = .white
     @State private var showExportSheet = false
     @State private var showSummarySheet = false
+    /// Le récapitulatif de fin d'analyse : les puzzles que l'app propose de créer.
+    @State private var puzzleOffer: PuzzleOffer?
     @State private var isGeneratingPuzzles = false
     @State private var puzzleGenerationMessage: String?
     @State private var isFindingMissedMates = false
@@ -131,11 +133,29 @@ struct AnalysisView: View {
         .onChange(of: viewModel.isClassifying) { _, isClassifying in
             // Fin de classification écran ouvert : on écrit sans attendre la
             // sortie, pour que la bibliothèque montre la précision tout de suite.
-            if !isClassifying { viewModel.persistMetrics(in: modelContext) }
+            guard !isClassifying else { return }
+            viewModel.persistMetrics(in: modelContext)
+            // Les suites (puzzles de vos erreurs, sortie de répertoire), une fois par partie.
+            Task { puzzleOffer = await AnalysisFollowUpService.shared.followUp(after: viewModel, context: modelContext) }
         }
         .sheet(isPresented: $showExportSheet) {
             ShareSheet(items: [viewModel.exportedPGN])
                 .presentationDetents([.medium])
+        }
+        .sheet(item: $puzzleOffer, onDismiss: nil) { offer in
+            PuzzleOfferSheet(
+                offer: offer,
+                onAccept: {
+                    let created = viewModel.savePuzzles(offer.candidates, in: modelContext)
+                    AnalysisFollowUpService.shared.puzzlesDecided(key: offer.key, created: created)
+                    puzzleOffer = nil
+                },
+                onDecline: {
+                    AnalysisFollowUpService.shared.puzzlesDecided(key: offer.key, created: 0)
+                    puzzleOffer = nil
+                }
+            )
+            .presentationDetents([.large])
         }
         .sheet(isPresented: $showSummarySheet) {
             GameSummaryView(

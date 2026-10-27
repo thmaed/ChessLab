@@ -8,29 +8,13 @@ final class GameOverMaterialCurveUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    /// L'offre d'analyse automatique vit sur l'écran de fin de partie (plus d'alerte
-    /// au démarrage), tant que le choix n'est pas fait.
-    func testResignedGameOffersAutomaticAnalysisOnce() throws {
-        let app = XCUIApplication()
-        app.launchArguments += ["-resetPlaySettings", "-discoveryTourSeen", "-autoAnalysisUndecided"]
-        app.launch()
-        // Aucune alerte au démarrage.
-        XCTAssertFalse(app.alerts.firstMatch.waitForExistence(timeout: 5))
-        try playTwoMovesAndResign(app)
-        let offer = app.otherElements["autoAnalysisOffer"]
-        XCTAssertTrue(offer.waitForExistence(timeout: 10), "l'offre d'analyse automatique doit apparaître")
-        app.buttons["autoAnalysisOfferNo"].tap()
-        XCTAssertFalse(offer.waitForExistence(timeout: 2), "refusée, elle disparaît")
-    }
-
     func testResignedGameShowsMaterialCurve() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-resetPlaySettings", "-discoveryTourSeen"]
         app.launch()
         try playTwoMovesAndResign(app)
         XCTAssertTrue(app.otherElements["gameOverMaterialCurve"].waitForExistence(timeout: 10))
-        // Sans `-autoAnalysisUndecided`, l'analyse est éteinte : pas d'offre.
-        XCTAssertFalse(app.otherElements["autoAnalysisOffer"].exists)
+        attachScreenshot(app, "fin-de-partie")
     }
 
     private func playTwoMovesAndResign(_ app: XCUIApplication) throws {
@@ -58,5 +42,28 @@ final class GameOverMaterialCurveUITests: XCTestCase {
             ? app.sheets.buttons["Abandonner"]
             : app.buttons.matching(identifier: "Abandonner").element(boundBy: 1)
         confirm.tap()
+    }
+
+    /// Le panneau de fin de partie, aux grandes tailles de texte : les bandeaux d'aide ne doivent pas
+    /// repousser les boutons hors de l'écran (vérifié aussi sur iOS 18).
+    func testGameOverPanelStaysUsableAtLargeTextSize() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-resetPlaySettings", "-discoveryTourSeen",
+                                "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]
+        app.launch()
+        try playTwoMovesAndResign(app)
+        XCTAssertTrue(app.otherElements["gameOverMaterialCurve"].waitForExistence(timeout: 10)
+                      || app.buttons["Analyser"].waitForExistence(timeout: 10))
+        attachScreenshot(app, "fin-de-partie-AXL")
+        let analyze = app.buttons["Analyser"]
+        XCTAssertTrue(analyze.exists)
+        XCTAssertTrue(analyze.isHittable, "« Analyser » doit rester atteignable sous le bandeau d'aide")
+    }
+
+    private func attachScreenshot(_ app: XCUIApplication, _ name: String) {
+        let attachment = XCTAttachment(screenshot: app.screenshot())
+        attachment.name = name
+        attachment.lifetime = .keepAlways
+        add(attachment)
     }
 }

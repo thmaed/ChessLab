@@ -67,8 +67,8 @@ class EnglishTest {
         openMode("openings")
         awaitText("Today's review")
         compose.onNodeWithText("Hard positions").assertIsDisplayed()
-        // La carte d'introduction de la liste, en anglais.
-        awaitText("Every position, dissected")
+        // Les menus Camp / Niveau de la liste, en anglais (le bloc d'introduction n'y est plus).
+        awaitText("All levels")
         // Et le CONTENU des cours suit la langue, pas seulement le décor :
         // les fichiers portent les deux, et n'en lire qu'un serait pire que
         // de ne rien traduire. Une ouverture BLANCHE : la liste groupe par

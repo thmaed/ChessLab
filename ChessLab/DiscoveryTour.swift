@@ -348,8 +348,8 @@ extension DiscoveryTourController {
             ),
             DiscoveryStep(
                 id: 2, section: "Nouveautés 2.0", spot: nil, destination: .analysisEntry,
-                title: "Analyse automatique et Coach",
-                body: "Après une partie, l'app propose d'analyser vos parties d'elle-même pour dessiner votre profil de faiblesses dans Progrès. Dans l'analyse, le Coach dit ce que jouent les joueurs de votre niveau. La dernière partie passe en tête de cet écran."
+                title: "Analyse et Coach",
+                body: "Analysez une partie : vos erreurs deviennent des puzzles et votre profil de faiblesses se dessine dans Progrès. Dans l'analyse, le Coach dit ce que jouent les joueurs de votre niveau. La dernière partie passe en tête de cet écran."
             ),
             DiscoveryStep(
                 id: 3, section: "Nouveautés 2.0", spot: .openingFilters, destination: .openings,

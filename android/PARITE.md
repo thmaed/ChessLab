@@ -318,6 +318,20 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [x] Test iOS `ResumeGameUITests` vert. **Test Android `PlaySetupTest` écrit mais NON exécuté** :
       le Galaxy n'était pas branché au moment de l'écrire. À lancer.
 
+### Plantage à la reprise d'une partie : droit de roque périmé — 27/10/2026
+
+- [x] Retour d'un joueur : l'app plantait **à chaque reprise** de sa partie, dans Stockfish (`Position::set`).
+      Cause : la FEN de la bibliothèque d'échecs (ChessKit, et son pendant Kotlin) **garde le droit de roque
+      d'un camp quand sa tour est prise dans son coin** (ici la tour a8, prise par Fxa8). Stockfish balaie alors la
+      rangée à la recherche de la tour, sans borne, et lit hors de l'échiquier. Corrigé des deux côtés par un
+      garde-fou avant le moteur : `UCIPositionSanitizer` (iOS, Stockfish et Fairy) / `UciPositionSanitizer`
+      (Android, Stockfish et Fairy) — un droit n'est gardé que si un roi et une tour du camp, du bon côté,
+      sont sur la rangée de fond.
+- [x] Tests : `CastlingRightsTests`, `UCIPositionSanitizerTests`, `ResumeFromDiskUITests` (la partie réelle du
+      joueur, rejouée sur simulateur) ; `UciPositionSanitizerTest` (JVM).
+- [ ] La cause racine (la bibliothèque qui garde le droit) n'est PAS corrigée : le garde-fou la masque pour le moteur.
+      D'autres usages de la FEN (export, partage) la gardent telle quelle.
+
 ### B3 de la 2.0 — cote de puzzle personnelle et « À mon niveau » — 24/10/2026
 
 - [x] Cote Glicko (`PuzzleRating`, mêmes formules des deux côtés, 1500 ±350 au

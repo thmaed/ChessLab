@@ -2061,10 +2061,39 @@ final class AnalysisViewModel {
     private func performPuzzleGeneration(
         in context: ModelContext, color: Piece.Color? = nil, limit: Int? = nil
     ) async -> Int {
-        guard let engine else { return 0 }
+        let found = await collectMistakePuzzles(in: context, color: color, limit: limit)
+        return savePuzzles(found, in: context)
+    }
+
+    /// Écrit des puzzles ACCEPTÉS dans « Mes parties ». Rend le nombre créé.
+    @discardableResult
+    func savePuzzles(_ candidates: [PuzzleCandidate], in context: ModelContext) -> Int {
+        let sourcePGN = exportedPGN
+        var created = 0
+        for candidate in candidates where !PuzzleSessionDrawer.hasOwnPuzzle(fen: candidate.fen, in: context) {
+            let puzzle = Puzzle()
+            puzzle.fen = candidate.fen
+            puzzle.playedMoveSAN = candidate.playedSAN
+            puzzle.solutionLANs = candidate.solutionLANs
+            puzzle.themeRaw = candidate.themeRaw
+            puzzle.phaseRaw = GamePhaseClassifier.classify(fen: candidate.fen).rawValue
+            puzzle.sourceGamePGN = sourcePGN
+            puzzle.sourceRaw = PuzzleSource.ownGames.rawValue
+            context.insert(puzzle)
+            created += 1
+        }
+        if created > 0 { PersistenceLog.save(context) }
+        return created
+    }
+
+    /// Les erreurs de l'utilisateur dont on PEUT faire des puzzles — sans rien créer (voir
+    /// ``AnalysisViewModel/proposePuzzles(in:color:limit:)``).
+    private func collectMistakePuzzles(
+        in context: ModelContext, color: Piece.Color? = nil, limit: Int? = nil
+    ) async -> [PuzzleCandidate] {
+        guard let engine else { return [] }
         await stopLiveAnalysisIfNeeded()
 
-        let sourcePGN = exportedPGN
         // L'occasion manquée est un candidat de choix : par définition, il
         // existait un coup nettement meilleur à retrouver.
         var candidates = Array(moveEvaluations
@@ -2085,6 +2114,7 @@ final class AnalysisViewModel {
         }
         let candidateIndices = candidates.map(\.key)
 
+        var found: [PuzzleCandidate] = []
         var created = 0
         for index in candidateIndices {
             if let limit, created >= limit { break }
@@ -2122,25 +2152,42 @@ final class AnalysisViewModel {
             // gagnant alternatif compté faux) — voir instructions.md §G7.
             let solutionLANs = PuzzleSolutionTrimmer.trim(pv: best.pv, startFEN: parentPosition.fen)
             guard !solutionLANs.isEmpty else { continue }
-            let puzzle = Puzzle()
-            puzzle.fen = parentPosition.fen
-            puzzle.playedMoveSAN = move.san
-            puzzle.solutionLANs = solutionLANs
-            puzzle.themeRaw = PuzzleThemeDetector.detect(startFEN: parentPosition.fen, solutionLANs: solutionLANs).rawValue
-            puzzle.phaseRaw = GamePhaseClassifier.classify(fen: parentPosition.fen).rawValue
-            puzzle.sourceGamePGN = sourcePGN
-            puzzle.sourceRaw = PuzzleSource.ownGames.rawValue
-            context.insert(puzzle)
+            found.append(PuzzleCandidate(
+                fen: parentPosition.fen, playedSAN: move.san, solutionLANs: solutionLANs,
+                themeRaw: PuzzleThemeDetector.detect(startFEN: parentPosition.fen, solutionLANs: solutionLANs).rawValue,
+                isMate: false, moveNumber: MissedMateDetector.moveNumber(fen: parentPosition.fen), mover: parentPosition.sideToMove
+            ))
             created += 1
         }
 
-        if created > 0 {
-            PersistenceLog.save(context)
-        }
         if !isEngineUnavailable {
             startLiveAnalysis()
         }
-        return created
+        return found
+    }
+
+    /// Ce que l'app PEUT créer depuis les erreurs et les mats manqués de `color` : les mats d'abord, puis
+    /// les fautes les plus coûteuses, `limit` au plus. Ne crée RIEN — le récapitulatif de fin d'analyse
+    /// propose, l'utilisateur décide (voir ``savePuzzles(_:in:)``).
+    func proposePuzzles(in context: ModelContext, color: Piece.Color, limit: Int) async -> [PuzzleCandidate] {
+        let mates = await findMissedMates(in: context, color: color)
+        var found = mates.prefix(limit).map {
+            PuzzleCandidate(
+                fen: $0.fen, playedSAN: $0.playedMoveSAN, solutionLANs: $0.solutionLANs,
+                themeRaw: PuzzleTheme.checkmate.rawValue, isMate: true, moveNumber: $0.moveNumber, mover: $0.mover
+            )
+        }
+        if found.count < limit {
+            await stopLiveAnalysisIfNeeded()
+            let mistakes = await withCheckedContinuation { continuation in
+                enqueueEngineWork { [weak self] in
+                    let result = await self?.collectMistakePuzzles(in: context, color: color, limit: limit - found.count) ?? []
+                    continuation.resume(returning: result)
+                }
+            }
+            found.append(contentsOf: mistakes)
+        }
+        return Array(found)
     }
 
     /// Nombre de fautes sondées au plus pour remplir ``generatePuzzles``
@@ -2373,6 +2420,19 @@ final class AnalysisViewModel {
     /// empreinte que le cache disque, donc insensible aux en-têtes PGN. Une
     /// partie ouverte depuis un fichier extérieur n'a pas d'enregistrement :
     /// il n'y a alors rien à écrire, et ce n'est pas une erreur.
+    /// L'empreinte de la partie (cache disque, bibliothèque).
+    var analysisPersistenceKey: String? { persistenceKey }
+
+    /// La couleur de l'utilisateur dans la partie ENREGISTRÉE contre l'ordinateur qui correspond à
+    /// cette analyse — `nil` pour une partie importée, à deux, ou absente de la bibliothèque.
+    func userColorInRecordedGame(in context: ModelContext) -> Piece.Color? {
+        guard let key = persistenceKey, let record = Self.record(matching: key, in: context),
+              record.mode == .vsEngine, let raw = record.engineColorRaw,
+              let engineColor = Piece.Color(rawValue: raw)
+        else { return nil }
+        return engineColor.opposite
+    }
+
     @discardableResult
     func persistMetrics(in context: ModelContext) -> Bool {
         guard let metrics = analysisMetrics, let key = persistenceKey else { return false }

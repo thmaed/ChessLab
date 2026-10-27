@@ -47,7 +47,6 @@ import com.chesslab.R
 import androidx.compose.ui.res.stringResource
 import androidx.compose.runtime.LaunchedEffect
 import com.chesslab.discovery.DiscoveryAnchors
-import com.chesslab.ui.AutoAnalysisHost
 import com.chesslab.discovery.DiscoveryDestination
 import com.chesslab.discovery.DiscoveryTourController
 import com.chesslab.discovery.DiscoveryTourMemory
@@ -181,7 +180,6 @@ private fun App() {
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
                 onAnalyzeGame = { stack.add(Route.AnalysisBoard(pgn = it)) },
-                onFindMissedMates = { stack.add(Route.AnalysisBoard(pgn = it, findMissedMates = true)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
                 onHome = { stack.removeRange(1, stack.size) },
             )
@@ -228,7 +226,6 @@ private fun App() {
                     }
                 },
                 onEditor = { stack.add(Route.PositionEditor()) },
-                onMissedMates = { pgn -> stack.add(Route.AnalysisBoard(pgn = pgn, findMissedMates = true)) },
             )
             Route.AnalysisLibrary -> com.chesslab.analysis.AnalysisLibraryScreen { pgn ->
                 stack.add(Route.AnalysisBoard(pgn = pgn))
@@ -415,7 +412,6 @@ private fun App() {
     }
     // Par-dessus les écrans ET leurs barres : à la racine, pas dans un écran.
     DiscoveryTourOverlay(tour, anchors)
-    AutoAnalysisHost(tour)
     }
 }
 

@@ -167,25 +167,25 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
             com.chesslab.dailysession.DailySessionCard(Modifier.discoveryAnchor(DiscoverySpot.dailySession)) { onOpen(Route.DailySession) }
             // A2 (2.0) : « 2 nouveaux puzzles de votre dernière partie ». Un tap
             // ouvre les puzzles et efface la pastille.
-            val newPuzzles = com.chesslab.analysis.AutoAnalysisService.newPuzzleCount
+            val newPuzzles = com.chesslab.analysis.AnalysisFollowUpService.newPuzzleCount
             if (newPuzzles > 0) {
                 Banner(
                     Icons.Default.Extension,
                     pluralStringResource(R.plurals.home_new_puzzles, newPuzzles, newPuzzles),
                     "", Palette.violet, "nouveaux-puzzles",
                 ) {
-                    com.chesslab.analysis.AutoAnalysisService.acknowledgeNewPuzzles(context)
+                    com.chesslab.analysis.AnalysisFollowUpService.acknowledgeNewPuzzles(context)
                     onOpen(Route.PuzzleQueue)
                 }
             }
-            val repertoireExits = com.chesslab.analysis.AutoAnalysisService.repertoireExitCount
+            val repertoireExits = com.chesslab.analysis.AnalysisFollowUpService.repertoireExitCount
             if (repertoireExits > 0) {
                 Banner(
                     Icons.Default.Replay,
                     pluralStringResource(R.plurals.home_repertoire_exits, repertoireExits, repertoireExits),
                     "", Palette.warning, "sortie-repertoire",
                 ) {
-                    com.chesslab.analysis.AutoAnalysisService.acknowledgeRepertoireExits(context)
+                    com.chesslab.analysis.AnalysisFollowUpService.acknowledgeRepertoireExits(context)
                     onOpen(Route.Openings)
                 }
             }

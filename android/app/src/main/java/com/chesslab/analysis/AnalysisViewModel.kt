@@ -149,6 +149,26 @@ private fun terminalWinWhite(position: Position): Double? =
 /** Un point de la courbe d'évaluation. */
 data class CurvePoint(val ply: Int, val pawns: Double, val quality: MoveQuality?)
 
+/** Un puzzle que l'app PEUT créer depuis la partie analysée — rien n'est écrit tant que l'utilisateur n'a pas accepté. */
+data class PuzzleCandidate(
+    val fen: String,
+    val playedSan: String,
+    val solution: List<String>,
+    val theme: String,
+    /** Un mat forcé laissé filer (sinon : une erreur à retravailler). */
+    val isMate: Boolean,
+    /** Numéro du coup dans la partie (1 pour le premier coup des Blancs). */
+    val moveNumber: Int,
+    /** Le camp qui doit jouer la solution (retourne la miniature pour les Noirs). */
+    val blackToMove: Boolean,
+)
+
+/** Le récapitulatif de fin d'analyse : les puzzles proposés pour [key]. */
+data class PuzzleOffer(val key: String, val candidates: List<PuzzleCandidate>) {
+    val mates: List<PuzzleCandidate> get() = candidates.filter { it.isMate }
+    val mistakes: List<PuzzleCandidate> get() = candidates.filterNot { it.isMate }
+}
+
 data class AnalysisUiState(
     val position: Position = Position.standard,
     val sanMoves: List<String> = emptyList(),
@@ -205,6 +225,8 @@ data class AnalysisUiState(
     val reviewEval: PositionEval? = null,
     /** Le nombre de puzzles que la dernière génération a créés, à annoncer. */
     val puzzlesCreated: Int? = null,
+    /** Le récapitulatif proposé à la fin d'une analyse : ce que l'app peut créer, à accepter ou refuser. */
+    val puzzleOffer: PuzzleOffer? = null,
     /** La recherche des mats manqués tourne (sa progression : `reviewDone`/`reviewTotal`). */
     val scanningMates: Boolean = false,
     /**
@@ -1299,6 +1321,14 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                 blackThemes = GameProfileCodec.encodeThemes(summary.black.themes),
                 openingName = summary.openingName,
             )
+            // Les suites (puzzles de vos erreurs, sortie de répertoire), une fois par partie contre l'ordinateur.
+            if (record.source == "engine" && record.variant == null) {
+                val engine = when (record.engineColor) { "white" -> Piece.Color.white; "black" -> Piece.Color.black; else -> null }
+                if (engine != null) {
+                    val offer = AnalysisFollowUpService.followUp(getApplication(), this@AnalysisViewModel, key, engine.opposite)
+                    if (offer != null) withContext(Dispatchers.Main) { showPuzzleOffer(offer) }
+                }
+            }
         }
     }
 
@@ -1410,31 +1440,25 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /**
-     * A2 (2.0) — les erreurs et les mats manqués de [color] deviennent des
-     * puzzles « Mes parties », sans écran ni proposition. Pendant de
-     * `AutoAnalysisService.createPuzzles` côté iOS : les mats d'abord, puis
-     * les fautes les plus COÛTEUSES, [limit] puzzles au plus. À appeler une
-     * fois la revue terminée (le service attend le bilan complet).
+     * A2 (2.0) — ce que l'app PEUT créer depuis les erreurs et les mats manqués de [color] :
+     * les mats d'abord, puis les fautes les plus COÛTEUSES, [limit] au plus. Ne crée RIEN : le
+     * récapitulatif de fin d'analyse propose, l'utilisateur accepte ou refuse (voir [saveCandidates]).
+     * À appeler une fois la revue terminée.
      */
-    suspend fun createOwnPuzzles(color: Piece.Color, limit: Int): Int {
+    suspend fun proposePuzzles(color: Piece.Color, limit: Int): List<PuzzleCandidate> {
         val evals = reviewEvals.toMap()
-        if (evals.isEmpty() || limit <= 0) return 0
+        if (evals.isEmpty() || limit <= 0) return emptyList()
         val snapshotPositions = positions.map { it.copy() }
         val snapshotMoves = moves.toList()
         val qualities = ui.qualities
-        val sourcePgn = pgn()
         val dao = LibraryDatabase.get(getApplication()).ownPuzzles()
+        val found = ArrayList<PuzzleCandidate>()
         var created = 0
 
-        suspend fun insert(fen: String, playedSan: String, solution: List<String>, theme: String) {
-            dao.insert(
-                OwnPuzzle(
-                    uid = java.util.UUID.randomUUID().toString(),
-                    fen = fen, playedSan = playedSan,
-                    solution = solution.joinToString(" "),
-                    theme = theme, rating = 0,
-                    createdAt = System.currentTimeMillis(), sourcePgn = sourcePgn,
-                )
+        fun add(i: Int, fen: String, playedSan: String, solution: List<String>, theme: String, isMate: Boolean) {
+            found += PuzzleCandidate(
+                fen = fen, playedSan = playedSan, solution = solution, theme = theme, isMate = isMate,
+                moveNumber = i / 2 + 1, blackToMove = snapshotPositions[i].sideToMove == Piece.Color.black,
             )
             created++
         }
@@ -1470,7 +1494,7 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                     val solution = com.chesslab.puzzles.MissedMateDetector.solution(best.pv, parent.fen) ?: continue
                     if (snapshotMoves[i].lan == best.lan) continue
                     if ((deepEval(e, child, childNodes, childCap)[1]?.mate ?: 0) < 0) continue
-                    insert(parent.fen, snapshotMoves[i].san, solution, "checkmate")
+                    add(i, parent.fen, snapshotMoves[i].san, solution, "checkmate", true)
                 }
 
                 // 2. Les fautes les plus coûteuses, tant qu'il reste de la place.
@@ -1495,12 +1519,53 @@ class AnalysisViewModel(app: Application) : AndroidViewModel(app) {
                         if (cpEquivalent(best) - cpEquivalent(second) <= 150) continue
                         val solution = PuzzleSolutionTrimmer.trim(best.pv, parent.fen)
                         if (solution.isEmpty()) continue
-                        insert(parent.fen, snapshotMoves[i].san, solution, themeFor(parent, solution))
+                        add(i, parent.fen, snapshotMoves[i].san, solution, themeFor(parent, solution), false)
                     }
                 }
             }
         }
+        return found
+    }
+
+    /** Écrit les puzzles ACCEPTÉS dans « Mes parties ». Rend le nombre créé. */
+    suspend fun saveCandidates(candidates: List<PuzzleCandidate>): Int {
+        if (candidates.isEmpty()) return 0
+        val sourcePgn = pgn()
+        val dao = LibraryDatabase.get(getApplication()).ownPuzzles()
+        var created = 0
+        for (c in candidates) {
+            if (dao.countFor(c.fen) > 0) continue
+            dao.insert(
+                OwnPuzzle(
+                    uid = java.util.UUID.randomUUID().toString(),
+                    fen = c.fen, playedSan = c.playedSan,
+                    solution = c.solution.joinToString(" "),
+                    theme = c.theme, rating = 0,
+                    createdAt = System.currentTimeMillis(), sourcePgn = sourcePgn,
+                )
+            )
+            created++
+        }
         return created
+    }
+
+    fun showPuzzleOffer(offer: PuzzleOffer) { ui = ui.copy(puzzleOffer = offer) }
+
+    /** L'utilisateur accepte : les puzzles sont créés, et la partie n'est plus proposée. */
+    fun acceptPuzzleOffer() {
+        val offer = ui.puzzleOffer ?: return
+        ui = ui.copy(puzzleOffer = null)
+        viewModelScope.launch(Dispatchers.IO) {
+            val created = saveCandidates(offer.candidates)
+            AnalysisFollowUpService.puzzlesDecided(getApplication(), offer.key, created)
+        }
+    }
+
+    /** L'utilisateur refuse : rien n'est créé, et la partie n'est plus proposée. */
+    fun declinePuzzleOffer() {
+        val offer = ui.puzzleOffer ?: return
+        ui = ui.copy(puzzleOffer = null)
+        AnalysisFollowUpService.puzzlesDecided(getApplication(), offer.key, 0)
     }
 
     fun clearPuzzleNotice() { ui = ui.copy(puzzlesCreated = null) }

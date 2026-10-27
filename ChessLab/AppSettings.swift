@@ -23,7 +23,6 @@ final class AppSettings {
         static let appLanguage = "settings.appLanguage"
         static let puzzleAttempts = "settings.puzzleAttempts"
         static let playerName = "settings.playerName"
-        static let autoAnalysis = "settings.autoAnalysis"
     }
 
     /// Essais accordés par puzzle, avant que la solution ne soit fléchée.
@@ -37,11 +36,6 @@ final class AppSettings {
         didSet { UserDefaults.standard.set(puzzleAttempts, forKey: Keys.puzzleAttempts) }
     }
 
-    /// Analyse automatique des parties (A1, 2.0). Reste LOCAL à l'appareil (hors
-    /// ``SettingsCloudSync``) : c'est un coût de batterie, propre à chacun.
-    var autoAnalysisChoice: AutoAnalysisChoice {
-        didSet { UserDefaults.standard.set(autoAnalysisChoice.rawValue, forKey: Keys.autoAnalysis) }
-    }
 
     /// Les deux régimes proposés — un essai (par défaut) ou trois.
     nonisolated static let puzzleAttemptChoices = [1, 3]
@@ -197,8 +191,6 @@ final class AppSettings {
         let storedAttempts = (defaults.object(forKey: Keys.puzzleAttempts) as? Int) ?? 1
         puzzleAttempts = Self.puzzleAttemptChoices.contains(storedAttempts) ? storedAttempts : 1
 
-        autoAnalysisChoice = defaults.string(forKey: Keys.autoAnalysis)
-            .flatMap(AutoAnalysisChoice.init(rawValue:)) ?? .undecided
 
         analysisArrowMode = defaults.string(forKey: Keys.analysisArrowMode)
             .flatMap(ArrowMode.init(rawValue:)) ?? .best
@@ -264,8 +256,3 @@ final class AppSettings {
 }
 
 
-/// Où en est la décision sur l'analyse automatique : tant qu'elle n'est pas
-/// prise, l'accueil la propose (jamais de défaut silencieux).
-enum AutoAnalysisChoice: String {
-    case undecided, on, off
-}

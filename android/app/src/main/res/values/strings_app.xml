@@ -1142,17 +1142,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="stolen_tokens">Tokens</string>
     <string name="stolen_interval_label">Moves between tokens</string>
     <string name="stolen_interval_note">The shorter the interval, the more often double turns come round.</string>
-    <string name="auto_analysis_title">Analyze your games automatically?</string>
-    <string name="auto_analysis_message">After each game against the computer, ChessLab can analyze it in the background, on your device: about 1 to 3 minutes per game, using some battery. Paused in Battery Saver or when the device gets hot. You can change this in Settings.</string>
-    <string name="auto_analysis_enable">Turn on</string>
-    <string name="auto_analysis_later">Later</string>
-    <string name="auto_analysis_no">No thanks</string>
-    <string name="auto_analysis_running">Analyzing your game</string>
-    <string name="auto_analysis_progress">%1$d / %2$d moves</string>
-    <string name="auto_analysis_stop">Stop</string>
-    <string name="settings_analysis">Analysis</string>
-    <string name="auto_analysis_setting">Analyze my games automatically</string>
-    <string name="auto_analysis_setting_note">Analyses each of your games against the computer to spot your mistakes, turn them into puzzles and track your progress. Everything happens on the device: 1 to 3 minutes per game and a little battery, paused in battery saver mode or when the device gets warm.</string>
     <plurals name="home_new_puzzles">
         <item quantity="one">%1$d new puzzle from your last game</item>
         <item quantity="other">%1$d new puzzles from your last game</item>
@@ -1236,8 +1225,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="discovery_wn_0_body">Every day the app prepares what to review — openings, missed puzzles, an endgame — and counts your streak of days, with medals. The opening cap is set on its screen.</string>
     <string name="discovery_wn_1_title">A personal puzzle rating</string>
     <string name="discovery_wn_1_body">Your puzzles now give you a rating, as in chess, and the “At my level” chip offers puzzles that fit you. Taking the hint no longer earns points.</string>
-    <string name="discovery_wn_2_title">Automatic analysis and Coach</string>
-    <string name="discovery_wn_2_body">After a game, the app offers to analyse your games by itself to draw your weakness profile in Progress. In the analysis, the Coach tells you what players at your level play. The latest game now sits at the top of this screen.</string>
+    <string name="discovery_wn_2_title">Analysis and Coach</string>
+    <string name="discovery_wn_2_body">Analyse a game: your mistakes become puzzles and your weakness profile builds up in Progress. In the analysis, the Coach tells you what players at your level play. The latest game now sits at the top of this screen.</string>
     <string name="discovery_wn_3_title">Classics, Side, Level</string>
     <string name="discovery_wn_3_body">Two menus filter the openings: Side (White or Black) and Level — including “Classics”, the 19 most played openings. Each card shows the key position and your mastery.</string>
     <string name="discovery_wn_4_title">The time limit, optional</string>
@@ -1247,21 +1236,34 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="discovery_replay_news_title">Replay what\'s new</string>
     <string name="discovery_replay_news_sub">A short tour of what\'s new in 2.0, where it lives.</string>
     <string name="help_news_title">What\'s new in 2.0</string>
-    <string name="help_news_body">• Daily session: every day, what to review — opening positions due, missed puzzles, puzzles from your games, an endgame — capped (2, 5 or 8 openings) with a streak of days and medals.\n• Automatic analysis: offered at the end of a game, it spots your mistakes, turns them into puzzles and draws your weakness profile in Progress.\n• Coach: in the analysis, the share of players at your level who play that move.\n• Puzzles: a personal rating, the “At my level” chip, and a hint that no longer earns points.\n• Openings: lively cards, Side and Level menus, “Classics” filter.\n• Game setup: “Time limit” off by default, your last choice remembered.</string>
+    <string name="help_news_body">• Daily session: every day, what to review — opening positions due, missed puzzles, puzzles from your games, an endgame — capped (2, 5 or 8 openings) with a streak of days and medals.\n• Analysis: when you analyse one of your games against the computer, the app turns your mistakes into puzzles and draws your weakness profile in Progress.\n• Coach: in the analysis, the share of players at your level who play that move.\n• Puzzles: a personal rating, the “At my level” chip, and a hint that no longer earns points.\n• Openings: lively cards, Side and Level menus, “Classics” filter.\n• Game setup: “Time limit” off by default, your last choice remembered.</string>
     <string name="help_daily_title">Daily session</string>
     <string name="help_daily_body">Every day the app gathers what to review, in order: opening positions due (spaced repetition), missed puzzles, puzzles from your games, and an endgame. It aims to be short: at most 5 puzzles per step and an opening cap you set at the bottom of the screen (2, 5 or 8). Only DUE positions count. A step turns to “done” once its goal for the day is reached. Your streak counts consecutive training days; medals mark 3, 7, 30, 100 and 365 days.</string>
     <string name="help_rating_title">Your puzzle rating</string>
     <string name="help_rating_body">A personal rating, on the Lichess puzzle scale, follows your results: it moves fast at first then settles. Solved with the hint, a puzzle earns nothing and costs a few points; a failed puzzle or a revealed solution costs more. The “At my level” chip offers puzzles close to your rating. Puzzles from your games and Woodpecker cycles do not count.</string>
     <string name="help_analysis_title">Analysis, Coach and profile</string>
-    <string name="help_analysis_body">Analysis can start by itself after each game against the computer: the app spots your mistakes, turns them into puzzles, notes the moment you leave your repertoire and draws your weakness profile (game phase, openings, missed motifs) in Progress. Under the explanation of a mistake, the Coach shows the share of players at your level who play that move — from Maia: what humans play, not what is good. The Analyse screen puts your latest game first.</string>
-    <string name="auto_analysis_offer_title">See your mistakes without lifting a finger?</string>
-    <string name="auto_analysis_offer_body">ChessLab can analyse each of your games to spot your mistakes, turn them into puzzles and track your progress. It happens on the device, in 1 to 3 minutes per game.</string>
-    <string name="auto_analysis_offer_yes">Yes, automatically</string>
-    <string name="auto_analysis_offer_no">No thanks</string>
-    <string name="auto_analysis_offer_note">You can change this at any time in Settings.</string>
+    <string name="help_analysis_body">When you analyse one of your games against the computer, the app spots your mistakes, turns them into puzzles, notes the moment you leave your repertoire and draws your weakness profile (game phase, openings, missed motifs) in Progress. Under the explanation of a mistake, the Coach shows the share of players at your level who play that move — from Maia: what humans play, not what is good. The Analyse screen puts your latest game first.</string>
     <string name="setup_resume_waiting">Your game is waiting: %1$d half-move(s) played.</string>
     <string name="setup_replace_title">A game is in progress</string>
     <string name="setup_replace_message">Starting a new game will erase the game in progress (%1$d half-move(s) played).</string>
     <string name="setup_replace_confirm">Replace</string>
     <string name="setup_replace_cancel">Cancel</string>
+    <string name="play_analyze_hint">Analyse to create puzzles from your mistakes.</string>
+    <string name="offer_title">Create puzzles from this game?</string>
+    <string name="offer_subtitle">They will join “My games”, under Puzzles.</string>
+    <string name="offer_row_mate">Move %1$d: a mate was available (you played %2$s).</string>
+    <string name="offer_row_mistake">Move %1$d: %2$s was a mistake.</string>
+    <string name="offer_decline">No thanks</string>
+    <plurals name="offer_mates">
+        <item quantity="one">%1$d missed mate</item>
+        <item quantity="other">%1$d missed mates</item>
+    </plurals>
+    <plurals name="offer_mistakes">
+        <item quantity="one">%1$d mistake to work on</item>
+        <item quantity="other">%1$d mistakes to work on</item>
+    </plurals>
+    <plurals name="offer_create">
+        <item quantity="one">Create %1$d puzzle</item>
+        <item quantity="other">Create %1$d puzzles</item>
+    </plurals>
 </resources>

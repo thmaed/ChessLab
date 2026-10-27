@@ -10,22 +10,7 @@ class ChessLabApp : Application() {
     override fun onCreate() {
         super.onCreate()
         SettingsStore.start(this)
-        com.chesslab.analysis.AutoAnalysisService.loadPending(this)
-        // A1 : l'analyse automatique ne tourne qu'au premier plan, comme sur iOS.
-        registerActivityLifecycleCallbacks(object : ActivityLifecycleCallbacks {
-            private var started = 0
-            override fun onActivityStarted(activity: android.app.Activity) {
-                if (started++ == 0) com.chesslab.analysis.AutoAnalysisService.setForeground(true)
-            }
-            override fun onActivityStopped(activity: android.app.Activity) {
-                if (--started == 0) com.chesslab.analysis.AutoAnalysisService.setForeground(false)
-            }
-            override fun onActivityCreated(activity: android.app.Activity, savedInstanceState: android.os.Bundle?) {}
-            override fun onActivityResumed(activity: android.app.Activity) {}
-            override fun onActivityPaused(activity: android.app.Activity) {}
-            override fun onActivitySaveInstanceState(activity: android.app.Activity, outState: android.os.Bundle) {}
-            override fun onActivityDestroyed(activity: android.app.Activity) {}
-        })
+        com.chesslab.analysis.AnalysisFollowUpService.loadPending(this)
         // Trouver le vibreur coûte un peu : on le fait une fois, ici, pour que
         // le premier coup ne soit pas plus lent que les suivants.
         com.chesslab.sound.Haptics.prepare(this)

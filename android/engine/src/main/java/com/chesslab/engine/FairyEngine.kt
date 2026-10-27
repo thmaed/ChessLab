@@ -50,7 +50,7 @@ class FairyEngine private constructor(private val binaryPath: String) {
         return true
     }
 
-    fun send(command: String) = FairyStockfish.nativeSend(command)
+    fun send(command: String) = FairyStockfish.nativeSend(UciPositionSanitizer.sanitize(command))
 
     fun drain() { while (incoming.tryReceive().isSuccess) Unit }
 

@@ -48,7 +48,8 @@ class StockfishEngine(private val binaryPath: String) {
         return true
     }
 
-    fun send(command: String) = Stockfish.nativeSend(command)
+    /** Une FEN aux droits de roque impossibles fait planter le moteur : voir [UciPositionSanitizer]. */
+    fun send(command: String) = Stockfish.nativeSend(UciPositionSanitizer.sanitize(command))
 
     /**
      * Jette les lignes en attente.

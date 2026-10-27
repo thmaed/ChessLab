@@ -357,7 +357,6 @@ struct HomeView: View {
         // Injecté AUTOUR du `Group`, donc au-dessus de la branche : le coffre
         // appartient à `HomeView`, que la bascule d'ossature n'atteint pas.
         .environment(\.sessionStore, sessionStore)
-        .autoAnalysisHost()
         .environment(\.discoveryTour, discoveryTour)
         // L'overlay vit à la RACINE : monté sur le Group, il dessine
         // par-dessus la barre latérale, la pile ET leurs barres — pas dans
@@ -792,8 +791,6 @@ struct HomeView: View {
                         refreshResumableGame()
                     } onAnalyze: { pgn in
                         path.append(Route.activeAnalysis(.pgn(pgn)))
-                    } onFindMissedMates: { pgn in
-                        path.append(Route.missedMates(pgn))
                     } onAnalyzePosition: { fen in
                         // EMPILÉ au-dessus de la partie, qui reste vivante en
                         // dessous : le retour la retrouve telle quelle.
@@ -810,8 +807,6 @@ struct HomeView: View {
                         refreshResumableGame()
                     } onAnalyze: { pgn in
                         path.append(Route.activeAnalysis(.pgn(pgn)))
-                    } onFindMissedMates: { pgn in
-                        path.append(Route.missedMates(pgn))
                     } onAnalyzePosition: { fen in
                         path.append(Route.activeAnalysis(.fen(fen)))
                     } onOpenLab: { fen in
@@ -873,8 +868,6 @@ struct HomeView: View {
                         path.append(Route.positionEditor(nil))
                     } onOpenScanner: {
                         path.append(Route.scanner)
-                    } onMissedMates: { pgn in
-                        path.append(Route.missedMates(pgn))
                     }
 
                 case .analysisLibrary:
@@ -1680,10 +1673,10 @@ struct HomeView: View {
     /// ouvre les puzzles et efface la pastille.
     @ViewBuilder
     private var newPuzzlesPill: some View {
-        let count = AutoAnalysisService.shared.newPuzzleCount
+        let count = AnalysisFollowUpService.shared.newPuzzleCount
         if count > 0 {
             Button {
-                AutoAnalysisService.shared.acknowledgeNewPuzzles()
+                AnalysisFollowUpService.shared.acknowledgeNewPuzzles()
                 open(.puzzles)
             } label: {
                 HStack(spacing: 12) {
@@ -1724,10 +1717,10 @@ struct HomeView: View {
     /// La position est déjà dans les révisions ; un tap ouvre les ouvertures.
     @ViewBuilder
     private var repertoireExitPill: some View {
-        let count = AutoAnalysisService.shared.repertoireExitCount
+        let count = AnalysisFollowUpService.shared.repertoireExitCount
         if count > 0 {
             Button {
-                AutoAnalysisService.shared.acknowledgeRepertoireExits()
+                AnalysisFollowUpService.shared.acknowledgeRepertoireExits()
                 open(.openings)
             } label: {
                 HStack(spacing: 12) {
@@ -1820,7 +1813,6 @@ private struct ActiveGameHost: View {
     let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
-    let onFindMissedMates: (String) -> Void
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
@@ -1834,7 +1826,6 @@ private struct ActiveGameHost: View {
             if let viewModel {
                 PlayView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onFindMissedMates: onFindMissedMates,
                     onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
                     onOpenTwoPlayer: onOpenTwoPlayer
                 )
@@ -1860,7 +1851,6 @@ private struct ResumedGameHost: View {
     let sessionKey: String
     let onExit: () -> Void
     let onAnalyze: (String) -> Void
-    let onFindMissedMates: (String) -> Void
     /// Passerelles « Continuer ailleurs » du menu d'export — voir ``PlayView``.
     var onAnalyzePosition: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
@@ -1874,7 +1864,6 @@ private struct ResumedGameHost: View {
             if let viewModel {
                 PlayView(
                     viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze,
-                    onFindMissedMates: onFindMissedMates,
                     onAnalyzePosition: onAnalyzePosition, onOpenLab: onOpenLab,
                     onOpenTwoPlayer: onOpenTwoPlayer
                 )

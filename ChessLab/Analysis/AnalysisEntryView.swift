@@ -10,8 +10,6 @@ struct AnalysisEntryView: View {
     let onOpenLibrary: () -> Void
     let onOpenPositionEditor: () -> Void
     let onOpenScanner: () -> Void
-    /// C6 : « Mats manqués » depuis la carte de la dernière partie.
-    var onMissedMates: (String) -> Void = { _ in }
 
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \GameRecord.playedAt, order: .reverse) private var records: [GameRecord]
@@ -271,15 +269,6 @@ struct AnalysisEntryView: View {
                 }
                 .buttonStyle(.pressable)
                 .accessibilityIdentifier("lastGameAnalyze")
-                Button { onMissedMates(pgn) } label: {
-                    Label("Mats manqués", systemImage: "bolt.fill")
-                        .font(.subheadline.weight(.semibold))
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                        .foregroundStyle(Theme.textPrimary)
-                        .background(Theme.surfaceElevated, in: Theme.controlShape)
-                }
-                .buttonStyle(.pressable)
-                .accessibilityIdentifier("lastGameMissedMates")
             }
         }
         .cardStyle()

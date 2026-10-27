@@ -11,6 +11,7 @@ import com.chesslab.library.GameRecord
 import com.chesslab.library.LibraryDatabase
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -40,14 +41,16 @@ class AnalysisEntryTest {
         dao.allOnce().filter { it.white == "C6Blanc" }.forEach { dao.delete(it.id) }
     }
 
-    @Test fun laCarteDeLaDernierePartieProposeAnalyseEtMats() {
+    @Test fun laCarteDeLaDernierePartieProposeAnalyse() {
         compose.waitUntil(20_000) { compose.onAllNodesWithTag("mode-analysis").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("mode-analysis").performScrollTo().performClick()
         compose.waitUntil(10_000) { compose.onAllNodesWithTag("entree-derniere").fetchSemanticsNodes().isNotEmpty() }
         compose.onNodeWithTag("derniere-analyser").assertExists()
         compose.onNodeWithTag("entree-scanner").assertExists()
         compose.onNodeWithTag("entree-bibliotheque").assertExists()
-        compose.onNodeWithTag("derniere-mats").performClick()
+        // « Mats manqués » n'a plus de bouton : tout passe par « Analyser ».
+        assertEquals(0, compose.onAllNodesWithTag("derniere-mats").fetchSemanticsNodes().size)
+        compose.onNodeWithTag("derniere-analyser").performClick()
         // L'écran d'analyse s'ouvre sur la partie : sa liste de coups apparaît.
         compose.waitUntil(30_000) { compose.onAllNodesWithTag("coup-0").fetchSemanticsNodes().isNotEmpty() }
     }

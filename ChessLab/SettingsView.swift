@@ -33,7 +33,6 @@ struct SettingsView: View {
                 pieceSetSection
                 notationSection
                 puzzleSection
-                analysisSection
                 feedbackSection
                 syncSection
                 if OpeningsGraphFeature.hasBundledCourses { previewSection }
@@ -372,29 +371,6 @@ struct SettingsView: View {
                     }
                 }
                 Text("Avec un seul essai, on calcule la variante jusqu'au bout avant de jouer — c'est tout l'intérêt de l'exercice. Trois essais laissent chercher en tâtonnant.")
-                    .font(.caption)
-                    .foregroundStyle(Theme.textTertiary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .cardStyle()
-        }
-    }
-
-    /// Analyse automatique des parties (A1, 2.0).
-    private var analysisSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("Analyse")
-            VStack(alignment: .leading, spacing: 8) {
-                Toggle("Analyser mes parties automatiquement", isOn: Binding(
-                    get: { settings.autoAnalysisChoice == .on },
-                    set: {
-                        settings.autoAnalysisChoice = $0 ? .on : .off
-                        AutoAnalysisService.shared.settingChanged()
-                    }
-                ))
-                .accessibilityIdentifier("auto_analysis_toggle")
-                Text("Analyse chacune de vos parties contre l'ordinateur pour repérer vos erreurs, en tirer des puzzles et suivre votre progression. Tout se passe sur l'appareil : 1 à 3 minutes par partie et un peu de batterie, suspendu en économie d'énergie ou si l'appareil chauffe.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)

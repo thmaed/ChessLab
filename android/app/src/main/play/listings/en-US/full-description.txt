@@ -2,7 +2,7 @@ ChessLab is a complete chess companion: play, analyse, train and experiment, wit
 
 NEW IN 2.0
 • Daily session: every day, what to review — opening positions due, missed puzzles, an endgame — with your streak of days and medals.
-• Automatic analysis, offered at the end of a game: your mistakes become puzzles and a weakness profile builds up in Progress.
+• Analysis: your mistakes become puzzles and a weakness profile builds up in Progress.
 • The Coach: under a mistake, the share of players at your level who play that move.
 • A personal puzzle rating, and “At my level” for puzzles that fit you.
 • Openings: illustrated cards, Side and Level filters, and the 19 “classics”.

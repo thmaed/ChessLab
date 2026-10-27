@@ -80,19 +80,16 @@ actor FairyEngineController {
     private func takeUserLease() async {
         guard !holdsUserLease else { return }
         holdsUserLease = true
-        await AutoAnalysisService.shared.acquireUserEngine()
     }
 
     private func giveUserLease() async {
         guard holdsUserLease else { return }
         holdsUserLease = false
-        await AutoAnalysisService.shared.releaseUserEngine()
     }
 
     deinit {
         engine.stop()
         if holdsUserLease {
-            Task { @MainActor in AutoAnalysisService.shared.releaseUserEngine() }
         }
         readerTask?.cancel()
         for continuation in responseSubscribers.values { continuation.finish() }
@@ -300,7 +297,7 @@ actor FairyEngineController {
         let positionCmd = uciLog.isEmpty
             ? "position fen \(startFEN)"
             : "position fen \(startFEN) moves \(uciLog.joined(separator: " "))"
-        engine.send(positionCmd)
+        engine.send(UCIPositionSanitizer.sanitize(positionCmd))
 
         let dLines = await captureRawLines(sending: "d", until: { $0.hasPrefix("Checkers:") })
         guard let fenLine = dLines.first(where: { $0.hasPrefix("Fen: ") }) else {
@@ -448,7 +445,7 @@ actor FairyEngineController {
 
     func send(_ command: EngineCommand) async {
         guard engine.isRunning else { return }
-        engine.send(command.uciString)
+        engine.send(UCIPositionSanitizer.sanitize(command.uciString))
     }
 
     private func sendRaw(_ command: EngineCommand) async {

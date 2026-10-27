@@ -25,13 +25,11 @@ actor EngineController {
     private func takeUserLease() async {
         guard !isBackground, !holdsUserLease else { return }
         holdsUserLease = true
-        await AutoAnalysisService.shared.acquireUserEngine()
     }
 
     private func giveUserLease() async {
         guard holdsUserLease else { return }
         holdsUserLease = false
-        await AutoAnalysisService.shared.releaseUserEngine()
     }
 
     /// Chemin FICTIF dont le DOSSIER (les ressources du bundle) contient les
@@ -96,7 +94,6 @@ actor EngineController {
         // que si CETTE instance le possède.
         engine.stop()
         if holdsUserLease {
-            Task { @MainActor in AutoAnalysisService.shared.releaseUserEngine() }
         }
         readerTask?.cancel()
         moveReaderTask?.cancel()
@@ -247,7 +244,8 @@ actor EngineController {
         sentCommands.append(command)
         #endif
         guard engine.isRunning else { return }
-        engine.send(command.uciString)
+        // Une FEN aux droits de roque impossibles fait planter le moteur : voir ``UCIPositionSanitizer``.
+        engine.send(UCIPositionSanitizer.sanitize(command.uciString))
     }
 
     /// Envoi interne (handshake) : ne trace pas dans `sentCommands` et

@@ -2,7 +2,7 @@ ChessLab est un compagnon d'échecs complet : jouer, analyser, s'entraîner et e
 
 NOUVEAU DANS LA 2.0
 • Séance du jour : chaque jour, ce qu'il faut revoir — positions d'ouverture dues, puzzles ratés, une finale — avec votre série de jours et des médailles.
-• Analyse automatique, proposée à la fin d'une partie : vos erreurs deviennent des puzzles et un profil de faiblesses se dessine dans Progrès.
+• Analyse : vos erreurs deviennent des puzzles et un profil de faiblesses se dessine dans Progrès.
 • Le Coach : sous une faute, la part des joueurs de votre niveau qui jouent ce coup.
 • Une cote de puzzle personnelle, et « À mon niveau » pour des puzzles à votre mesure.
 • Ouvertures : cartes illustrées, filtres Camp et Niveau, et les 19 « classiques ».

@@ -150,8 +150,6 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
     /** Le camp de l'utilisateur : il change d'une partie à l'autre. */
     private var humanColor = Piece.Color.white
 
-    /** La couleur de l'utilisateur — pour l'analyse automatique de la partie qui vient de finir. */
-    val userColor: Piece.Color get() = humanColor
 
     /**
      * La position d'où la partie part. Standard, sauf quand « Changer de

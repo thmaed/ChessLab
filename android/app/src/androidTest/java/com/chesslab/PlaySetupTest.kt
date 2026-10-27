@@ -150,8 +150,7 @@ class PlaySetupTest {
     }
 
     /**
-     * Fin de partie : « Mats manqués » rejoint « Accueil » et « Analyser », et
-     * mène à l'analyse qui cherche d'elle-même. Abandon au premier coup : aucun
+     * Fin de partie : « Accueil » et « Analyser », et la phrase qui dit que l'analyse crée des puzzles. Abandon au premier coup : aucun
      * coup joué, donc rien à trouver — la proposition le dit.
      */
     @Test fun laFinDePartieProposeLesMatsManques() {
@@ -176,10 +175,9 @@ class PlaySetupTest {
         compose.onNodeWithTag("fin-de-partie").assertIsDisplayed()
         compose.onNodeWithTag("accueil").assertIsDisplayed()
         compose.onNodeWithTag("analyser-la-partie").assertIsDisplayed()
-        compose.onNodeWithTag("mats-manques-partie").assertIsDisplayed()
-        compose.onNodeWithTag("mats-manques-partie").performClick()
-
-        awaitTag("mats-manques-resultat", 120_000)
+        // « Mats manqués » n'a plus de bouton : tout passe par « Analyser », dont le récapitulatif propose les puzzles.
+        assertEquals(0, compose.onAllNodesWithTag("mats-manques-partie").fetchSemanticsNodes().size)
+        compose.onNodeWithTag("indice-analyser-puzzles").assertIsDisplayed()
     }
 
     /** C8 : après quatre demi-coups et un abandon, la fin de partie montre la courbe du matériel. */

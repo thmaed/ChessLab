@@ -135,7 +135,7 @@ struct RepertoireExitServiceTests {
         }.first)
         RepertoireStore.toggle(courseID: course.id, side: .white, in: context)
 
-        let service = AutoAnalysisService.shared
+        let service = AnalysisFollowUpService.shared
         service.acknowledgeRepertoireExits()
         let viewModel = AnalysisViewModel(source: .pgn("1. a3 e5 2. h3 d5"), isBackground: true)
         service.recordRepertoireExit(from: viewModel, color: .white, context: context)

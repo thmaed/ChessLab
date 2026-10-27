@@ -60,7 +60,6 @@ fun AnalysisEntryScreen(
     onPaste: (String) -> Unit,
     onEditor: () -> Unit,
     /** C6 : « Mats manqués » depuis la carte de la dernière partie. */
-    onMissedMates: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -98,7 +97,7 @@ fun AnalysisEntryScreen(
         // faire ici, le plus souvent.
         val last = games.firstOrNull()
         if (last != null && last.pgn.isNotEmpty()) {
-            LastGameCard(last, onAnalyze = { onLastGame(last.pgn) }, onMissedMates = { onMissedMates(last.pgn) })
+            LastGameCard(last, onAnalyze = { onLastGame(last.pgn) })
         }
         Row(Modifier.fillMaxWidth().height(IntrinsicSize.Max), horizontalArrangement = Arrangement.spacedBy(14.dp)) {
             TileCard(
@@ -196,11 +195,11 @@ private fun TileCard(
 }
 
 /**
- * C6 : la dernière partie, ses chiffres, et les deux gestes qu'on vient y faire
- * — l'analyser, ou chercher les mats qu'on a laissés passer.
+ * C6 : la dernière partie, ses chiffres, et le geste qu'on vient y faire — l'analyser (le récapitulatif
+ * de fin d'analyse propose alors les puzzles, mats manqués compris).
  */
 @Composable
-private fun LastGameCard(record: com.chesslab.library.GameRecord, onAnalyze: () -> Unit, onMissedMates: () -> Unit) {
+private fun LastGameCard(record: com.chesslab.library.GameRecord, onAnalyze: () -> Unit) {
     val chips = ArrayList<String>()
     chips += java.text.DateFormat.getDateInstance(java.text.DateFormat.MEDIUM).format(java.util.Date(record.playedAt))
     record.openingName?.let { chips += it }
@@ -255,12 +254,6 @@ private fun LastGameCard(record: com.chesslab.library.GameRecord, onAnalyze: () 
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                     containerColor = Palette.accent, contentColor = Palette.background),
             ) { Text(stringResource(R.string.entry_last_analyze), fontWeight = androidx.compose.ui.text.font.FontWeight.Bold) }
-            androidx.compose.material3.Button(
-                onClick = onMissedMates,
-                modifier = Modifier.weight(1f).height(44.dp).testTag("derniere-mats"),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Palette.surfaceElevated, contentColor = Palette.textPrimary),
-            ) { Text(stringResource(R.string.entry_last_mates), fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold) }
         }
     }
 }

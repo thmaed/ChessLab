@@ -48,11 +48,6 @@ data class AppSettings(
      * comment signer ses parties ; porté ici par la règle des deux apps.
      */
     val playerName: String = "",
-    /**
-     * Analyse automatique des parties (A1, 2.0) : "undecided" (l'accueil la
-     * propose), "on" ou "off". Reste local à l'appareil : un coût de batterie.
-     */
-    val autoAnalysis: String = "undecided",
     /** Plafond des positions d'ouverture de la séance du jour : 2, 5 ou 8. Pendant du réglage d'iOS. */
     val dailyOpeningsCap: Int = 5,
 )
@@ -79,7 +74,6 @@ object SettingsStore {
     private val keyNotation = stringPreferencesKey("pieceNotation")
     private val keyArrowMode = stringPreferencesKey("analysisArrowMode")
     private val keyPlayerName = stringPreferencesKey("playerName")
-    private val keyAutoAnalysis = stringPreferencesKey("autoAnalysis")
     private val keyDailyOpeningsCap = intPreferencesKey("dailyOpeningsCap")
 
     /** Les plafonds proposés pour les ouvertures de la séance du jour. */
@@ -120,7 +114,6 @@ object SettingsStore {
                     else PieceNotation.french,
                     analysisArrowMode = prefs[keyArrowMode] ?: "best",
                     playerName = sanitizedPlayerName(prefs[keyPlayerName] ?: ""),
-                    autoAnalysis = prefs[keyAutoAnalysis] ?: "undecided",
                     dailyOpeningsCap = (prefs[keyDailyOpeningsCap] ?: 5).takeIf { it in DAILY_OPENINGS_CHOICES } ?: 5,
                 )
             }.collect { _state.value = it }
@@ -141,12 +134,6 @@ object SettingsStore {
     fun setHaptics(context: Context, on: Boolean) = update(context) { it[keyHaptics] = on }
     fun setPieceNotation(context: Context, notation: PieceNotation) =
         update(context) { it[keyNotation] = notation.name }
-    /** Pose le choix ("on" / "off"), en mémoire TOUT DE SUITE : le service le relit aussitôt. */
-    fun setAutoAnalysis(context: Context, choice: String) {
-        _state.value = _state.value.copy(autoAnalysis = choice)
-        update(context) { it[keyAutoAnalysis] = choice }
-        com.chesslab.analysis.AutoAnalysisService.settingChanged()
-    }
     fun setArrowMode(context: Context, mode: String) = update(context) { it[keyArrowMode] = mode }
 
     /**

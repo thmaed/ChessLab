@@ -1,6 +1,6 @@
 ChessLab 2.0
 • Daily session: what to review each day, a streak of days and medals.
-• Automatic analysis offered at the end of a game: your mistakes become puzzles and a weakness profile appears in Progress.
+• Analysis: your mistakes become puzzles and a weakness profile appears in Progress.
 • The Coach shows what players at your level play.
 • Personal puzzle rating and “At my level”.
 • Openings: illustrated cards, Side and Level filters, “Classics”.

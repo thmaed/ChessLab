@@ -143,6 +143,10 @@ fun AnalysisScreen(
         )
     }
 
+    ui.puzzleOffer?.let { offer ->
+        PuzzleOfferSheet(offer, onAccept = model::acceptPuzzleOffer, onDecline = model::declinePuzzleOffer)
+    }
+
     BoardScaffold(
         header = {
             com.chesslab.ui.ThermalBadge()

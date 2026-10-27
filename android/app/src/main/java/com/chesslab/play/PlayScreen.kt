@@ -11,6 +11,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Flag
@@ -61,7 +62,6 @@ fun PlayScreen(
     onAnalyze: (String) -> Unit = {},
     onAnalyzeGame: (String) -> Unit = {},
     /** L'analyse de la partie, qui cherche aussitôt les mats manqués. */
-    onFindMissedMates: (String) -> Unit = {},
     onOpenLab: (String) -> Unit = {},
     /** Revenir à l'accueil depuis le panneau de fin de partie. */
     onHome: () -> Unit = {},
@@ -187,11 +187,7 @@ fun PlayScreen(
             gutter, ui.outcome ?: ui.status,
             summary = model.opponentSummaryLine(),
             materialCurve = model.materialCurve(),
-            onEnableAutoAnalysis = { ctx ->
-                com.chesslab.analysis.AutoAnalysisService.enqueue(ctx, model.currentPgn(), model.userColor)
-            },
             onAnalyze = { onAnalyzeGame(model.currentPgn()) },
-            onMissedMates = { onFindMissedMates(model.currentPgn()) },
             onHome = onHome,
         )
         else ControlBar(
@@ -567,9 +563,7 @@ private fun GameOverPanel(
     message: String,
     summary: String,
     materialCurve: List<CurvePoint>,
-    onEnableAutoAnalysis: (android.content.Context) -> Unit,
     onAnalyze: () -> Unit,
-    onMissedMates: () -> Unit,
     onHome: () -> Unit,
 ) {
     Column(
@@ -597,14 +591,6 @@ private fun GameOverPanel(
             }
             Spacer(Modifier.height(10.dp))
         }
-        // L'offre d'analyse automatique : ici, pas au démarrage. Comptée une fois par apparition.
-        val context = androidx.compose.ui.platform.LocalContext.current
-        val offer = androidx.compose.runtime.remember { com.chesslab.ui.AutoAnalysisOffer.shouldShow(context) }
-        if (offer) {
-            androidx.compose.runtime.LaunchedEffect(Unit) { com.chesslab.ui.AutoAnalysisOffer.noteShown(context) }
-            com.chesslab.ui.AutoAnalysisOfferCard(onAccept = { onEnableAutoAnalysis(context) })
-            Spacer(Modifier.height(10.dp))
-        }
         Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             stringResource(R.string.play_home),
@@ -629,19 +615,23 @@ private fun GameOverPanel(
                 .padding(horizontal = 14.dp, vertical = 8.dp)
                 .testTag("analyser-la-partie"),
         )
-        Spacer(Modifier.width(8.dp))
-        // Les positions où l'un des camps tenait un mat forcé et l'a laissé
-        // filer, proposées comme puzzles « Mat ». Pendant du bouton d'iOS.
-        Text(
-            stringResource(R.string.play_missed_mates),
-            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.teal,
-            modifier = Modifier
-                .clip(CircleShape)
-                .border(1.dp, Palette.teal.copy(alpha = 0.5f), CircleShape)
-                .clickable(onClick = onMissedMates)
-                .padding(horizontal = 14.dp, vertical = 8.dp)
-                .testTag("mats-manques-partie"),
-        )
+        }
+        // Une phrase permanente plutôt qu'une infobulle : c'est le moment où l'on a une partie à analyser,
+        // et on ne sait pas qu'« Analyser » fabrique aussi des puzzles de ses erreurs.
+        Row(
+            Modifier
+                .padding(top = 10.dp)
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(10.dp))
+                .background(Palette.violet.copy(alpha = 0.12f))
+                .border(1.dp, Palette.violet.copy(alpha = 0.3f), RoundedCornerShape(10.dp))
+                .padding(horizontal = 12.dp, vertical = 9.dp)
+                .testTag("indice-analyser-puzzles"),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(Icons.Default.Extension, null, tint = Palette.violet, modifier = Modifier.size(14.dp))
+            Spacer(Modifier.width(8.dp))
+            Text(stringResource(R.string.play_analyze_hint), fontSize = 12.sp, fontWeight = FontWeight.Medium, color = Palette.violet)
         }
     }
 }
