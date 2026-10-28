@@ -108,6 +108,12 @@ enum PuzzleSessionDrawer {
         (try? context.fetchCount(FetchDescriptor<Puzzle>(predicate: predicate(matching: filter)))) ?? 0
     }
 
+    /// Tous les puzzles qui correspondent, DUS OU NON — ce dans quoi puise un
+    /// programme Woodpecker (voir ``sample(matching:count:in:)``).
+    static func countIgnoringSchedule(matching filter: PuzzleSessionFilter, in context: ModelContext) -> Int {
+        (try? context.fetchCount(FetchDescriptor<Puzzle>(predicate: predicate(matching: filter, ignoresSchedule: true)))) ?? 0
+    }
+
     /// Existe-t-il au moins un puzzle de cette provenance, dû ou non ?
     static func hasAnyPuzzle(from source: PuzzleSource, in context: ModelContext) -> Bool {
         let sourceRaw = source.rawValue

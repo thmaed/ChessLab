@@ -10775,3 +10775,24 @@ les fonctions existaient, personne ne les trouvait.
 - Tests : suite iOS complète verte (1149) ; tests d'interface iOS touchés verts (dont les 6
   qui dépliaient « Autres sources », adaptés) ; Android JVM verts, `AppTest` 50/50 (un test
   Woodpecker dépasse 90 s en fin de longue série sur émulateur, vert seul en 11 s).
+
+## 28/10 — Écran Puzzles repensé : lancer en un geste, régler à part, Woodpecker à sa place (iOS + Android)
+
+Retour de l'utilisateur sur la version « Plus de filtres » : pas clair, et la carte Woodpecker,
+grosse et rarement utilisée, collée sous le dépliant. Analyse : deux usages de poids très
+différents (série quotidienne / programme de semaines) pesaient pareil ; Woodpecker reprenait
+des critères en partie cachés ; il fallait régler avant de jouer ; « Ratés » et « À revoir »
+étaient des filtres alors que ce sont des séances ; la cote et le thème faible étaient en bas.
+- **En-tête** (dès qu'un puzzle a été tenté) : cote, réussite, thème à travailler — un toucher
+  lance une série sur ce thème.
+- **Quatre séries prêtes, qui démarrent au toucher** : À mon niveau (fenêtre de cote), Ratés,
+  À revoir, Mes parties — compte affiché, grisées à zéro. Plus de bouton « Commencer » épinglé.
+- **« Série sur mesure »** : feuille avec niveau, phase, type, provenance ; rien de coché = tout,
+  plus de puce « Tous » ; « Réinitialiser » ; « Commencer · N puzzles ».
+- **Programme Woodpecker** : une ligne ; la création (critères + taille du lot) vit dans sa
+  propre feuille ; un programme en cours s'affiche avec « Reprendre » / « Arrêter ».
+- Android compte les puzzles via un index compact construit une fois (cote, thème, phase dans
+  un entier par puzzle) ; iOS compte en base. Écart mineur : iOS compte les puzzles DUS, Android
+  tous ceux qui correspondent (quasi identiques tant que la bibliothèque est peu entamée).
+- Tests : iOS `PuzzleFiltersUITests` + `WoodpeckerUITests` verts (adaptés) ; Android JVM verts,
+  `AppTest` (puzzles, filtres, Woodpecker) et `StaleAnswerTest` verts sur émulateur.

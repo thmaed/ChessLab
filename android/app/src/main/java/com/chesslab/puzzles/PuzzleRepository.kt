@@ -100,6 +100,51 @@ object PuzzleRepository {
         return kept.sortedBy { it.rating }
     }
 
+    /**
+     * Combien de puzzles de la bibliothèque correspondent — le compte qu'affiche
+     * « Série sur mesure » avant de lancer (28/10/2026), pendant de
+     * `PuzzleSessionDrawer.count` (iOS, qui compte en base).
+     *
+     * Relire 23 Mo à chaque puce touchée serait trop lent : la première demande
+     * construit un INDEX compact — cote, thème et phase tassés dans un entier par
+     * puzzle, un demi-mégaoctet pour 130 000 — et les suivantes y comptent.
+     */
+    fun count(assets: AssetManager, ratings: IntRange, theme: String?, phase: String?): Int {
+        val packed = index ?: buildIndex(assets).also { index = it }
+        val themeCode = theme?.let { THEMES.indexOf(it) }
+        val phaseCode = phase?.let { PHASES.indexOf(it) }
+        var n = 0
+        for (entry in packed) {
+            val rating = entry ushr 8
+            if (rating !in ratings) continue
+            if (themeCode != null && (entry ushr 3) and 0x1F != themeCode) continue
+            if (phaseCode != null && entry and 0x7 != phaseCode) continue
+            n++
+        }
+        return n
+    }
+
+    @Volatile private var index: IntArray? = null
+    private val THEMES = listOf("checkmate", "hangingPiece", "fork", "pin", "skewer", "discoveredAttack", "sacrifice", "tactic")
+    private val PHASES = listOf("opening", "middlegame", "endgame")
+
+    private fun buildIndex(assets: AssetManager): IntArray {
+        val out = ArrayList<Int>(140_000)
+        assets.open(ASSET).reader().use { stream ->
+            JsonReader(stream).use { json ->
+                json.beginArray()
+                while (json.hasNext()) {
+                    val puzzle = readPuzzle(json) ?: continue
+                    val theme = THEMES.indexOf(puzzle.theme).let { if (it < 0) THEMES.lastIndex else it }
+                    val phase = PHASES.indexOf(puzzle.phase).let { if (it < 0) 7 else it }
+                    out += (puzzle.rating shl 8) or (theme shl 3) or phase
+                }
+                json.endArray()
+            }
+        }
+        return out.toIntArray()
+    }
+
     /** Les puzzles de la bibliothèque dont l'identifiant est demandé, en une passe. */
     fun byIds(assets: AssetManager, ids: Set<String>): List<Puzzle> {
         if (ids.isEmpty()) return emptyList()

@@ -27,8 +27,13 @@ final class WoodpeckerUITests: XCTestCase {
         app.launchArguments += ["-discoveryTourSeen", "-openRoute", "puzzles"]
         app.launch()
 
+        // La ligne de création, ou un programme laissé par un essai précédent.
         let card = element(app, "woodpeckerCard")
-        XCTAssertTrue(card.waitForExistence(timeout: 15))
+        let leftoverProgramme = element(app, "woodpeckerProgramme")
+        let opened = Date().addingTimeInterval(15)
+        while Date() < opened, !card.exists, !leftoverProgramme.exists {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+        }
 
         // Un programme laissé par un essai précédent : on l'arrête d'abord.
         let leftover = element(app, "woodpeckerArchive")
@@ -38,10 +43,13 @@ final class WoodpeckerUITests: XCTestCase {
             app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'programme'")).firstMatch.tap()
         }
 
+        // La ligne Woodpecker ouvre sa feuille : critères, taille du lot, création (28/10/2026).
+        element(app, "woodpeckerCard").tap()
         let create = element(app, "woodpeckerCreate")
-        scrollTo(create, in: app)
-        // 25 : le plus petit lot.
-        app.segmentedControls.buttons["25"].tap()
+        XCTAssertTrue(create.waitForExistence(timeout: 5))
+        let size25 = app.segmentedControls.buttons["25"]
+        scrollTo(size25, in: app)
+        size25.tap()
         create.tap()
 
         // L'écran de résolution, en mode programme : chrono et rang dans le lot.
@@ -60,12 +68,12 @@ final class WoodpeckerUITests: XCTestCase {
         let resume = element(app, "woodpeckerResume")
         XCTAssertTrue(resume.waitForExistence(timeout: 10), "le programme en cours doit être proposé")
 
-        // Et on l'arrête : la carte revient à la création.
+        // Et on l'arrête : la ligne de création revient.
         let archive = element(app, "woodpeckerArchive")
         scrollTo(archive, in: app)
         archive.tap()
         app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'programme'")).firstMatch.tap()
-        XCTAssertTrue(element(app, "woodpeckerCreate").waitForExistence(timeout: 5))
+        XCTAssertTrue(element(app, "woodpeckerCard").waitForExistence(timeout: 5))
     }
 
     /// Un cycle ENTIER (lot connu de dix mats en deux, riposte comprise) :
@@ -76,16 +84,22 @@ final class WoodpeckerUITests: XCTestCase {
         app.launchArguments += ["-discoveryTourSeen", "-openRoute", "puzzles", "-uiTestWoodpeckerDemo"]
         app.launch()
 
-        XCTAssertTrue(element(app, "woodpeckerCard").waitForExistence(timeout: 15))
+        let opened = Date().addingTimeInterval(15)
+        while Date() < opened, !element(app, "woodpeckerCard").exists, !element(app, "woodpeckerProgramme").exists {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+        }
         let leftover = element(app, "woodpeckerArchive")
         if leftover.exists {
             scrollTo(leftover, in: app)
             leftover.tap()
             app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'programme'")).firstMatch.tap()
         }
+        element(app, "woodpeckerCard").tap()
         let create = element(app, "woodpeckerCreate")
-        scrollTo(create, in: app)
-        app.segmentedControls.buttons["10"].tap()
+        XCTAssertTrue(create.waitForExistence(timeout: 5))
+        let size10 = app.segmentedControls.buttons["10"]
+        scrollTo(size10, in: app)
+        size10.tap()
         create.tap()
         XCTAssertTrue(element(app, "woodpeckerClock").waitForExistence(timeout: 15))
 

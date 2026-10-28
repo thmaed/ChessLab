@@ -1062,7 +1062,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="puzzle_view_source">See it in the original game</string>
 
     <string name="woodpecker_title">Woodpecker method</string>
-    <string name="woodpecker_intro">A fixed set of puzzles, solved in full then replayed in a new order, cycle after cycle, to find more of them, faster. It uses the criteria chosen above.</string>
     <string name="woodpecker_create">Create the programme</string>
     <string name="woodpecker_resume">Resume</string>
     <string name="woodpecker_stop">Stop</string>
@@ -1085,8 +1084,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="puzzle_history">History</string>
     <string name="puzzle_missed">Missed</string>
     <string name="puzzle_review">Review</string>
-    <string name="puzzle_more_filters">More filters: source, phase, type</string>
-    <string name="puzzle_more_filters_active">More filters (%1$d active)</string>
     <string name="puzzle_no_review">No puzzles to review — you solved every puzzle matching these filters cleanly on your last attempt.</string>
     <string name="puzzle_partial_note">To review: it will come back in 2 days.</string>
     <string name="puzzle_no_missed">No missed puzzles — you solved every puzzle matching these filters on your last attempt.</string>
@@ -1290,4 +1287,21 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="faq_open_editor">Open the editor</string>
     <string name="faq_open_puzzles">Open puzzles</string>
     <string name="faq_open_settings">Open Settings</string>
+    <!-- Écran Puzzles, refonte du 28/10/2026 -->
+    <string name="puzzle_section_start">Start</string>
+    <string name="puzzle_tile_missed_sub">to redo</string>
+    <string name="puzzle_tile_review_sub">half found</string>
+    <string name="puzzle_tile_own_sub">your mistakes</string>
+    <string name="puzzle_custom_title">Custom series</string>
+    <string name="puzzle_custom_sub">Level, phase, type, source</string>
+    <string name="puzzle_section_programme">Programme</string>
+    <string name="woodpecker_row_sub">A fixed set of puzzles, repeated in ever faster cycles</string>
+    <string name="puzzle_your_rating">Your rating</string>
+    <string name="puzzle_success">Success</string>
+    <string name="puzzle_to_work_on">To work on:</string>
+    <string name="puzzle_failure_rate">%1$d%% missed</string>
+    <string name="puzzle_reset">Reset</string>
+    <string name="woodpecker_sheet_intro">A fixed set of puzzles, solved in full then repeated in a new order, cycle after cycle, to find more of them, faster. Choose its puzzles, then its size.</string>
+    <string name="puzzle_lot_size">Set size</string>
+    <string name="puzzle_start_count">Start · %1$s puzzles</string>
 </resources>

@@ -584,22 +584,6 @@
         }
       }
     },
-    "%lld %% d'échecs sur %lld": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld %% failed out of %lld"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$lld %% d'échecs sur %2$lld"
-          }
-        }
-      }
-    },
     "%lld %@ en réserve": {
       "localizations": {
         "en": {
@@ -908,22 +892,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld puzzles"
-          }
-        }
-      }
-    },
-    "%lld réussis sur %lld tentatives": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%lld solved out of %lld attempts"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "new",
-            "value": "%1$lld réussis sur %2$lld tentatives"
           }
         }
       }
@@ -19500,22 +19468,6 @@
         }
       }
     },
-    "Un lot fixe de puzzles, résolu en entier puis repris dans un nouvel ordre, cycle après cycle, pour en trouver plus et plus vite. Il reprend les critères choisis au-dessus.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A fixed set of puzzles, solved in full then replayed in a new order, cycle after cycle, to find more of them, faster. It uses the criteria chosen above."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un lot fixe de puzzles, résolu en entier puis repris dans un nouvel ordre, cycle après cycle, pour en trouver plus et plus vite. Il reprend les critères choisis au-dessus."
-          }
-        }
-      }
-    },
     "Un mat manqué": {
       "localizations": {
         "en": {
@@ -23783,46 +23735,6 @@
         }
       }
     },
-    "Ratés (%lld)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Missed (%lld)"
-          }
-        }
-      }
-    },
-    "À revoir (%lld)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Review (%lld)"
-          }
-        }
-      }
-    },
-    "Plus de filtres (%lld actif)": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "More filters (%lld active)"
-          }
-        }
-      }
-    },
-    "Plus de filtres : provenance, phase, type": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "More filters: source, phase, type"
-          }
-        }
-      }
-    },
     "Avec une pendule, pas de retour en arrière : « Reprendre ici » n'est pas proposé.": {
       "localizations": {
         "en": {
@@ -23869,6 +23781,126 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hold the verdict: any move that keeps it is accepted (checked by the engine)."
+          }
+        }
+      }
+    },
+    "Votre cote": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your rating"
+          }
+        }
+      }
+    },
+    "À travailler :": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To work on:"
+          }
+        }
+      }
+    },
+    "à refaire": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "to redo"
+          }
+        }
+      }
+    },
+    "trouvés à moitié": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "half found"
+          }
+        }
+      }
+    },
+    "vos erreurs": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "your mistakes"
+          }
+        }
+      }
+    },
+    "Série sur mesure": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom series"
+          }
+        }
+      }
+    },
+    "Niveau, phase, type, provenance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Level, phase, type, source"
+          }
+        }
+      }
+    },
+    "Programme": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programme"
+          }
+        }
+      }
+    },
+    "Un lot fixe de puzzles, repris en cycles de plus en plus rapides": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fixed set of puzzles, repeated in ever faster cycles"
+          }
+        }
+      }
+    },
+    "Réinitialiser": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset"
+          }
+        }
+      }
+    },
+    "Commencer · %lld puzzles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start · %lld puzzles"
+          }
+        }
+      }
+    },
+    "Un lot fixe de puzzles, résolu en entier puis repris dans un nouvel ordre, cycle après cycle, pour en trouver plus et plus vite. Choisissez ses puzzles, puis sa taille.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A fixed set of puzzles, solved in full then repeated in a new order, cycle after cycle, to find more of them, faster. Choose its puzzles, then its size."
           }
         }
       }

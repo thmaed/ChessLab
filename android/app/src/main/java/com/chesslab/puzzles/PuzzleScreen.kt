@@ -510,53 +510,6 @@ private fun ResultCard(
 }
 
 
-/**
- * Le bilan de vos puzzles : taux de réussite et thèmes d'erreurs récurrents —
- * « vous ratez souvent des fourchettes ». Pendant de `statsCard` dans
- * `PuzzleQueueView`. Ne s'affiche qu'une fois quelques puzzles tentés : ni
- * « 0 % » ni thème désigné sur trois essais.
- */
-@Composable
-internal fun PuzzleStatsCard(stats: com.chesslab.progression.PuzzleStats) {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 6.dp)
-            .clip(com.chesslab.ui.CardShape)
-            .background(Palette.surface)
-            .padding(12.dp)
-            .testTag("bilan-puzzles"),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(stringResource(R.string.puzzle_stats_title), fontSize = 13.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, color = Palette.textPrimary,
-                modifier = Modifier.weight(1f))
-            Text(
-                stats.successRate?.let { "${kotlin.math.round(it * 100).toInt()}" + stringResource(R.string.percent_suffix) } ?: "—",
-                fontSize = 18.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold, color = Palette.accent,
-            )
-        }
-        Text(
-            stringResource(R.string.puzzle_stats_solved_of, stats.successes, stats.attempts),
-            fontSize = 11.sp, color = Palette.textTertiary,
-        )
-        if (stats.weakestThemes.isNotEmpty()) {
-            Text(stringResource(R.string.progress_to_work_on), fontSize = 11.sp,
-                fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold, color = Palette.textSecondary,
-                modifier = Modifier.padding(top = 4.dp))
-            stats.weakestThemes.take(3).forEach { record ->
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(stringResource(record.labelRes), fontSize = 11.sp, color = Palette.textPrimary, modifier = Modifier.weight(1f))
-                    Text(
-                        stringResource(R.string.progress_failed_of, kotlin.math.round(record.failureRate * 100).toInt(), record.attempts),
-                        fontSize = 11.sp, color = Palette.textTertiary,
-                    )
-                }
-            }
-        }
-    }
-}
 
 /**
  * Programme Woodpecker : le rang dans le lot et le chrono du CYCLE, sur leur

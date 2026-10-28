@@ -7,6 +7,15 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Écran Puzzles repensé — 28/10/2026
+
+- [ ] Séries prêtes au toucher, « Série sur mesure » en feuille, Woodpecker en ligne + feuille de
+      création, en-tête cote/réussite/thème. **À vérifier sur le Galaxy** (rendu téléphone ; la
+      tablette d'émulateur est vérifiée).
+- Écart mineur assumé : le compte de la feuille est celui des puzzles DUS sur iOS (base), de
+  tous les puzzles correspondants sur Android (index du JSON).
+- La ligne « Plus de filtres » de la revue UX du même jour est REMPLACÉE par cette refonte.
+
 ### Revue UX : la découvrabilité — 28/10/2026
 
 Portée des deux côtés, **à vérifier sur le Galaxy** avant de cocher.

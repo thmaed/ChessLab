@@ -85,8 +85,8 @@ class StaleAnswerTest {
 
     @Test fun passerUnPuzzlePendantLaRiposteNeLaJouePasSurLeSuivant() {
         openMode("puzzles")
-        awaitTag("commencer-puzzles", 15_000)
-        compose.onNodeWithTag("commencer-puzzles").performClick()
+        awaitTag("serie-mon-niveau", 15_000)
+        compose.onNodeWithTag("serie-mon-niveau").performClick()
         awaitText("Trouvez le meilleur coup")
 
         // On passe plusieurs fois de suite, plus vite que la riposte de 450 ms.

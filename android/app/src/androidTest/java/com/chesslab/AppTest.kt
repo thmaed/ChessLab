@@ -257,10 +257,9 @@ class AppTest {
 
     @Test fun puzzlesLoadFromTheLibrary() {
         open("puzzles")
-        // Les puzzles passent d'abord par le CHOIX de la séance, comme sur
-        // iOS : on décide ce qu'on travaille avant de résoudre.
-        awaitTag("commencer-puzzles", 15_000)
-        compose.onNodeWithTag("commencer-puzzles").performClick()
+        // Les séries prêtes démarrent au toucher (28/10/2026), comme sur iOS.
+        awaitTag("serie-mon-niveau", 15_000)
+        compose.onNodeWithTag("serie-mon-niveau").performClick()
         // la bibliothèque fait 19 Mo : on laisse le temps de la parcourir
         awaitTag("score", 60_000)
         compose.onNodeWithTag("case-e4").assertIsDisplayed()
@@ -271,18 +270,16 @@ class AppTest {
 
     @Test fun ownGamesHideTheLevelFilter() {
         open("puzzles")
-        awaitTag("commencer-puzzles", 15_000)
-        // Vos puzzles n'ont pas de cote : choisir « Mes parties » retire le
-        // niveau, le désélectionner le rend — comme sur iOS.
-        compose.onNodeWithTag("niveau-tous").performScrollTo().assertIsDisplayed()
-        // La provenance vit sous « Plus de filtres », replié par défaut (28/10/2026).
-        compose.onNodeWithTag("plus-de-filtres").performScrollTo().performClick()
+        // Dans la feuille « Série sur mesure » (28/10/2026) : vos puzzles n'ont pas
+        // de cote, choisir « Mes parties » retire le niveau, le désélectionner le rend.
+        awaitTag("historique-rates", 15_000)
+        compose.onNodeWithTag("serie-sur-mesure").performScrollTo().performClick()
+        awaitTag("niveau-beginner", 10_000)
         compose.onNodeWithTag("provenance-ownGames").performScrollTo().performClick()
         compose.waitForIdle()
-        assert(compose.onAllNodesWithTag("niveau-tous").fetchSemanticsNodes().isEmpty())
+        assert(compose.onAllNodesWithTag("niveau-beginner").fetchSemanticsNodes().isEmpty())
         compose.onNodeWithTag("provenance-ownGames").performScrollTo().performClick()
-        compose.onNodeWithTag("niveau-tous").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithTag("historique-rates").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("niveau-beginner").performScrollTo().assertIsDisplayed()
     }
 
     /**
@@ -292,9 +289,12 @@ class AppTest {
      */
     @Test fun aWoodpeckerProgrammeCanBeCreatedResumedAndStopped() {
         open("puzzles")
-        awaitTag("commencer-puzzles", 15_000)
+        // La ligne Woodpecker ouvre sa feuille : critères, taille du lot, création (28/10/2026).
+        awaitTag("woodpecker-carte", 15_000)
+        compose.onNodeWithTag("woodpecker-carte").performScrollTo().performClick()
+        awaitTag("woodpecker-taille-25", 10_000)
         compose.onNodeWithTag("woodpecker-taille-25").performScrollTo().performClick()
-        compose.onNodeWithTag("woodpecker-creer").performScrollTo().performClick()
+        compose.onNodeWithTag("woodpecker-creer").performClick()
 
         // La bibliothèque fait 19 Mo : composer le lot la parcourt une fois.
         awaitTag("woodpecker-chrono", 90_000)
@@ -308,7 +308,7 @@ class AppTest {
         compose.onNodeWithTag("woodpecker-arreter").performScrollTo().performClick()
         awaitTag("woodpecker-arreter-oui")
         compose.onNodeWithTag("woodpecker-arreter-oui").performClick()
-        awaitTag("woodpecker-creer", 10_000)
+        awaitTag("woodpecker-carte", 10_000)
     }
 
     @Test fun openingCoursesCanBeRead() {

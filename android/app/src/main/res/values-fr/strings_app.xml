@@ -1059,7 +1059,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_view_source">Voir dans la partie d\'origine</string>
 
     <string name="woodpecker_title">Méthode Woodpecker</string>
-    <string name="woodpecker_intro">Un lot fixe de puzzles, résolu en entier puis repris dans un nouvel ordre, cycle après cycle, pour en trouver plus et plus vite. Il reprend les critères choisis au-dessus.</string>
     <string name="woodpecker_create">Créer le programme</string>
     <string name="woodpecker_resume">Reprendre</string>
     <string name="woodpecker_stop">Arrêter</string>
@@ -1082,8 +1081,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_history">Historique</string>
     <string name="puzzle_missed">Ratés</string>
     <string name="puzzle_review">À revoir</string>
-    <string name="puzzle_more_filters">Plus de filtres : provenance, phase, type</string>
-    <string name="puzzle_more_filters_active">Plus de filtres (%1$d actif)</string>
     <string name="puzzle_no_review">Aucun puzzle à revoir — vous avez trouvé proprement chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.</string>
     <string name="puzzle_partial_note">À revoir : il reviendra dans 2 jours.</string>
     <string name="puzzle_no_missed">Aucun puzzle raté — vous avez réussi chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.</string>
@@ -1287,4 +1284,21 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="faq_open_editor">Ouvrir l\'éditeur</string>
     <string name="faq_open_puzzles">Ouvrir les puzzles</string>
     <string name="faq_open_settings">Ouvrir les Réglages</string>
+    <!-- Écran Puzzles, refonte du 28/10/2026 -->
+    <string name="puzzle_section_start">Commencer</string>
+    <string name="puzzle_tile_missed_sub">à refaire</string>
+    <string name="puzzle_tile_review_sub">trouvés à moitié</string>
+    <string name="puzzle_tile_own_sub">vos erreurs</string>
+    <string name="puzzle_custom_title">Série sur mesure</string>
+    <string name="puzzle_custom_sub">Niveau, phase, type, provenance</string>
+    <string name="puzzle_section_programme">Programme</string>
+    <string name="woodpecker_row_sub">Un lot fixe de puzzles, repris en cycles de plus en plus rapides</string>
+    <string name="puzzle_your_rating">Votre cote</string>
+    <string name="puzzle_success">Réussite</string>
+    <string name="puzzle_to_work_on">À travailler :</string>
+    <string name="puzzle_failure_rate">%1$d %% d\'échecs</string>
+    <string name="puzzle_reset">Réinitialiser</string>
+    <string name="woodpecker_sheet_intro">Un lot fixe de puzzles, résolu en entier puis repris dans un nouvel ordre, cycle après cycle, pour en trouver plus et plus vite. Choisissez ses puzzles, puis sa taille.</string>
+    <string name="puzzle_lot_size">Taille du lot</string>
+    <string name="puzzle_start_count">Commencer · %1$s puzzles</string>
 </resources>
