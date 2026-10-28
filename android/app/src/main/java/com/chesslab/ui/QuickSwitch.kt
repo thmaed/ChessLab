@@ -1,7 +1,9 @@
 package com.chesslab.ui
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.Memory
@@ -11,8 +13,8 @@ import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -27,8 +29,12 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.chesslab.R
 
 /**
@@ -54,12 +60,18 @@ fun QuickSwitchMenu(
     onOpenLab: (() -> Unit)? = null,
 ) {
     var open by remember { mutableStateOf(false) }
-    IconButton(onClick = { open = true }, modifier = Modifier.testTag("changer-de-mode")) {
-        Icon(
-            Icons.Default.GridView,
-            stringResource(R.string.switch_mode),
-            tint = Palette.violet,
-            modifier = Modifier.size(22.dp),
+    // L'icône SEULE ne disait rien (retour d'un utilisateur, 28/10/2026) : un mot court
+    // l'accompagne, comme sur iOS. Le nom complet reste la description lue par TalkBack.
+    val description = stringResource(R.string.switch_mode)
+    TextButton(
+        onClick = { open = true },
+        modifier = Modifier.testTag("changer-de-mode").semantics { contentDescription = description },
+    ) {
+        Icon(Icons.Default.GridView, null, tint = Palette.violet, modifier = Modifier.size(20.dp))
+        Spacer(Modifier.width(5.dp))
+        Text(
+            stringResource(R.string.switch_mode_short),
+            color = Palette.violet, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
         )
     }
     DropdownMenu(expanded = open, onDismissRequest = { open = false }) {

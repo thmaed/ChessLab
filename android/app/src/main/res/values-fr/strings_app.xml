@@ -238,6 +238,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_wrong_solution">Ce n\'est pas le coup — la solution commençait par %1$s</string>
     <string name="rival_silent">L\'adversaire n\'a pas répondu</string>
     <string name="switch_mode">Changer de mode</string>
+    <string name="switch_mode_short">Modes</string>
+    <string name="settings_version">Version %1$s</string>
     <string name="route_analysis">Analyser</string>
     <string name="route_editor">Éditeur de position</string>
     <string name="route_endgames">Finales</string>
@@ -515,7 +517,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="setup_eval_bar">Barre d\'évaluation</string>
     <string name="setup_engine_resigns">L\'ordinateur peut abandonner s\'il est perdu</string>
     <string name="setup_start">Commencer</string>
-    <string name="setup_no_clock">Aucune pendule : les deux camps jouent sans contrainte de temps.</string>
+    <string name="setup_no_clock">Aucune pendule : les deux camps jouent sans contrainte de temps, et l\'on peut revenir sur un coup (‹ sous le plateau, puis « Reprendre ici »).</string>
+    <string name="setup_clock_no_takeback">Avec une pendule, pas de retour en arrière : « Reprendre ici » n\'est pas proposé.</string>
     <string name="setup_level_note">Échelle humaine (proche de Lichess), différente de l\'Elo de Stockfish. Stockfish n\'intervient que pour les mats courts, les finales à peu de pièces et les répétitions.</string>
     <string name="setup_strength_note">Stockfish, bridé. Non comparable à l\'échelle humaine des personnages.</string>
     <string name="time_none">Sans limite</string>
@@ -755,7 +758,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="settings_notation">Notation des coups</string>
     <string name="settings_notation_french">Française</string>
     <string name="settings_notation_english">Anglaise</string>
-    <string name="play_takeback">Annuler</string>
     <string name="blunder_title">Coup risqué</string>
     <string name="blunder_missed_mate">Ce coup laisse passer un mat forcé.</string>
     <string name="blunder_allows_mate">Ce coup permet un mat forcé à l\'adversaire.</string>
@@ -792,7 +794,9 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="verdict_draw">nulle</string>
     <string name="verdict_loss">perdant</string>
     <string name="endgame_free">Entraînement libre</string>
-    <string name="endgame_free_note">Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur.</string>
+    <string name="endgame_free_note">Tenez le verdict : tout coup qui le préserve est accepté (vérifié par le moteur).</string>
+    <string name="endgame_free_note_win">Gardez le gain : tout coup qui reste gagnant est accepté (vérifié par le moteur).</string>
+    <string name="endgame_free_note_draw">Gardez la nulle : tout coup qui la conserve est accepté (vérifié par le moteur).</string>
     <string name="endgame_slip">%1$s → %2$s</string>
     <string name="endgame_slip_title">Ce coup lâche le verdict</string>
     <string name="endgame_retry">Réessayer</string>
@@ -930,8 +934,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="setup_book_enabled">Le moteur pioche dans un livre d\'ouvertures</string>
     <string name="setup_book_main">Lignes principales</string>
     <string name="setup_book_sidelines">Avec variantes</string>
-    <string name="setup_aids_note_clock">Reprise de coup indisponible avec pendule.</string>
-    <string name="setup_aids_note">Parcourez la partie avec la barre sous le plateau ; sans pendule, « Reprendre ici » relance depuis le coup consulté.</string>
     <string name="route_continue_game">Continuer la partie</string>
     <string name="outcome_opponent_resigned">Votre adversaire abandonne</string>
     <string name="play_draw_offered">Le moteur propose nulle</string>
@@ -1080,6 +1082,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_history">Historique</string>
     <string name="puzzle_missed">Ratés</string>
     <string name="puzzle_review">À revoir</string>
+    <string name="puzzle_more_filters">Plus de filtres : provenance, phase, type</string>
+    <string name="puzzle_more_filters_active">Plus de filtres (%1$d actif)</string>
     <string name="puzzle_no_review">Aucun puzzle à revoir — vous avez trouvé proprement chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.</string>
     <string name="puzzle_partial_note">À revoir : il reviendra dans 2 jours.</string>
     <string name="puzzle_no_missed">Aucun puzzle raté — vous avez réussi chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.</string>
@@ -1267,4 +1271,20 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">Créer %1$d puzzle</item>
         <item quantity="other">Créer %1$d puzzles</item>
     </plurals>
+    <!-- FAQ de l'Aide (28/10/2026) -->
+    <string name="faq_title">Questions fréquentes</string>
+    <string name="faq_takeback_q">Comment revenir sur un coup ?</string>
+    <string name="faq_takeback_a">Dans une partie sans pendule, touchez ‹ sous le plateau pour remonter jusqu\'au coup voulu, puis « Reprendre ici » : la partie repart de là (« Annuler la reprise » rattrape une erreur pendant quelques secondes). Avec une pendule, la reprise n\'existe pas : « Analyser ici » ouvre la position dans l\'Analyse.</string>
+    <string name="faq_variation_q">Comment essayer une autre variante ?</string>
+    <string name="faq_variation_a">Dans Analyser, jouez librement sur le plateau : chaque coup devient une variante, à côté de la partie, que vous quittez et retrouvez à volonté. En fin de partie, le bouton « Analyser » y ouvre toute la partie ; pendant une partie, « Modes » › Analyser y ouvre la position affichée.</string>
+    <string name="faq_position_q">Comment étudier une position précise ?</string>
+    <string name="faq_position_a">L\'Éditeur de position (dans Analyser) compose n\'importe quelle position, ou la reprend d\'une FEN. Ensuite, analysez-la, ou touchez « Jouer cette position » pour la jouer contre l\'ordinateur et revenir en arrière autant qu\'il faut.</string>
+    <string name="faq_missed_q">Où retrouver mes puzzles ratés ?</string>
+    <string name="faq_missed_a">Dans Puzzles, rubrique Historique : « Ratés » pour les puzzles manqués dès le premier coup, « À revoir » pour ceux trouvés à moitié. Les ratés reviennent aussi dans la Séance du jour.</string>
+    <string name="faq_version_q">Quelle version de l\'app ai-je ?</string>
+    <string name="faq_version_a">Le numéro de version est en bas des Réglages — utile pour signaler un problème.</string>
+    <string name="faq_open_analysis">Ouvrir Analyser</string>
+    <string name="faq_open_editor">Ouvrir l\'éditeur</string>
+    <string name="faq_open_puzzles">Ouvrir les puzzles</string>
+    <string name="faq_open_settings">Ouvrir les Réglages</string>
 </resources>

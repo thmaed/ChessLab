@@ -1234,7 +1234,14 @@ struct HomeView: View {
                     }
 
                 case .help:
-                    HelpView()
+                    HelpView { destination in
+                        switch destination {
+                        case .analysis: path.append(Route.analysisEntry)
+                        case .positionEditor: path.append(Route.positionEditor(nil))
+                        case .puzzles: path.append(Route.puzzleQueue)
+                        case .settings: path.append(Route.settings)
+                        }
+                    }
 
                 case .licenses:
                     LicensesView()

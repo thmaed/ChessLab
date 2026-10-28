@@ -7,12 +7,16 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material3.Icon
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Replay
+import androidx.compose.material.icons.filled.ExpandMore
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -75,6 +79,9 @@ fun PuzzleQueueScreen(
     var source by remember { mutableStateOf<PuzzleSource?>(null) }
     var missedOnly by remember { mutableStateOf(false) }
     var reviewOnly by remember { mutableStateOf(false) }
+    // Provenance, phase et type, repliés par défaut ; dépliés d'office quand l'un
+    // d'eux est déjà choisi, pour ne jamais cacher un filtre actif.
+    var showMoreFilters by remember { mutableStateOf(false) }
     // Ratés à la dernière tentative : à zéro, la puce « Ratés » est grisée.
     var missedCount by remember { mutableStateOf(0) }
     var reviewCount by remember { mutableStateOf(0) }
@@ -118,38 +125,10 @@ fun PuzzleQueueScreen(
             // et chaque puce son icône. Des rangées de puces toutes vertes se
             // ressemblent trop pour qu'on retrouve la sienne d'un coup d'œil ;
             // c'est le parti pris d'iOS.
-            Group(stringResource(R.string.puzzle_provenance), Icons.Default.Layers, Palette.violet) {
-                ChipButton(stringResource(R.string.filter_all_f), source == null,
-                    Modifier.testTag("provenance-toutes"), tint = Palette.violet) { source = null }
-                PuzzleSource.entries.forEach { value ->
-                    ChipButton(
-                        stringResource(value.labelRes), source == value,
-                        Modifier.testTag("provenance-${value.name}"),
-                        icon = value.icon, tint = Palette.violet,
-                    ) {
-                        source = if (source == value) null else value
-                        // Vos puzzles n'ont pas de cote : un niveau choisi
-                        // les exclurait TOUS.
-                        if (source == PuzzleSource.ownGames) difficulty = null
-                    }
-                }
-            }
-            Group(stringResource(R.string.puzzle_history), Icons.Default.History, Palette.rose) {
-                ChipButton(stringResource(R.string.filter_all), !missedOnly && !reviewOnly,
-                    Modifier.testTag("historique-tous"), tint = Palette.rose) { missedOnly = false; reviewOnly = false }
-                ChipButton(
-                    stringResource(R.string.puzzle_missed), missedOnly,
-                    Modifier.testTag("historique-rates"),
-                    icon = Icons.Default.Cancel, tint = Palette.rose,
-                    enabled = missedCount > 0,
-                ) { missedOnly = !missedOnly; reviewOnly = false }
-                ChipButton(
-                    stringResource(R.string.puzzle_review), reviewOnly,
-                    Modifier.testTag("historique-a-revoir"),
-                    icon = Icons.Default.Replay, tint = Palette.rose,
-                    enabled = reviewCount > 0,
-                ) { reviewOnly = !reviewOnly; missedOnly = false }
-            }
+            val activeMoreFilters = listOf(source != null, phase != null, theme != null).count { it }
+            // Le plus utile d'abord (28/10/2026), comme iOS : le niveau — « À mon
+            // niveau » — et l'historique ; provenance, phase et type se replient
+            // sous « Plus de filtres ».
             // Masqué pour « Mes parties » : sans cote, aucun niveau ne
             // retiendrait un seul puzzle.
             if (source != PuzzleSource.ownGames) Group(stringResource(R.string.puzzle_level), Icons.Default.SignalCellularAlt, Palette.accent) {
@@ -169,33 +148,69 @@ fun PuzzleQueueScreen(
                     ) { difficulty = if (difficulty == tier) null else tier; atMyLevel = false }
                 }
             }
-            Group(stringResource(R.string.puzzle_phase), Icons.Default.Flag, Palette.info) {
-                ChipButton(stringResource(R.string.filter_all_f), phase == null,
-                    Modifier.testTag("phase-toutes"), tint = Palette.info) { phase = null }
-                GamePhase.entries.forEach { value ->
-                    ChipButton(
-                        stringResource(value.labelRes), phase == value,
-                        Modifier.testTag("phase-${value.name}"),
-                        icon = value.icon, tint = Palette.info,
-                    ) { phase = if (phase == value) null else value }
-                }
+            Group(stringResource(R.string.puzzle_history), Icons.Default.History, Palette.rose) {
+                ChipButton(stringResource(R.string.filter_all), !missedOnly && !reviewOnly,
+                    Modifier.testTag("historique-tous"), tint = Palette.rose) { missedOnly = false; reviewOnly = false }
+                ChipButton(
+                    // Le nombre dans la puce : grisée, elle dit pourquoi (zéro).
+                    stringResource(R.string.puzzle_missed) + if (missedCount > 0) " ($missedCount)" else "", missedOnly,
+                    Modifier.testTag("historique-rates"),
+                    icon = Icons.Default.Cancel, tint = Palette.rose,
+                    enabled = missedCount > 0,
+                ) { missedOnly = !missedOnly; reviewOnly = false }
+                ChipButton(
+                    stringResource(R.string.puzzle_review) + if (reviewCount > 0) " ($reviewCount)" else "", reviewOnly,
+                    Modifier.testTag("historique-a-revoir"),
+                    icon = Icons.Default.Replay, tint = Palette.rose,
+                    enabled = reviewCount > 0,
+                ) { reviewOnly = !reviewOnly; missedOnly = false }
             }
-            Group(stringResource(R.string.puzzle_type), Icons.Default.Extension, Palette.warning) {
-                ChipButton(stringResource(R.string.filter_all), theme == null,
-                    Modifier.testTag("theme-tous"), tint = Palette.warning) { theme = null }
-                PuzzleThemeKind.entries.forEach { value ->
-                    ChipButton(
-                        // « Attaque à la découverte » déborde à côté des
-                        // autres puces : raccourci ICI SEULEMENT, comme iOS.
-                        // Le libellé entier reste sur l'écran de résolution.
-                        stringResource(
-                            if (value.labelRes == R.string.theme_discovered) R.string.theme_discovered_short
-                            else value.labelRes
-                        ),
-                        theme == value,
-                        Modifier.testTag("theme-${value.name}"),
-                        icon = value.icon, tint = Palette.warning,
-                    ) { theme = if (theme == value) null else value }
+            MoreFiltersToggle(showMoreFilters, activeMoreFilters) { showMoreFilters = !showMoreFilters }
+            if (showMoreFilters) {
+                Group(stringResource(R.string.puzzle_provenance), Icons.Default.Layers, Palette.violet) {
+                    ChipButton(stringResource(R.string.filter_all_f), source == null,
+                        Modifier.testTag("provenance-toutes"), tint = Palette.violet) { source = null }
+                    PuzzleSource.entries.forEach { value ->
+                        ChipButton(
+                            stringResource(value.labelRes), source == value,
+                            Modifier.testTag("provenance-${value.name}"),
+                            icon = value.icon, tint = Palette.violet,
+                        ) {
+                            source = if (source == value) null else value
+                            // Vos puzzles n'ont pas de cote : un niveau choisi
+                            // les exclurait TOUS.
+                            if (source == PuzzleSource.ownGames) difficulty = null
+                        }
+                    }
+                }
+                Group(stringResource(R.string.puzzle_phase), Icons.Default.Flag, Palette.info) {
+                    ChipButton(stringResource(R.string.filter_all_f), phase == null,
+                        Modifier.testTag("phase-toutes"), tint = Palette.info) { phase = null }
+                    GamePhase.entries.forEach { value ->
+                        ChipButton(
+                            stringResource(value.labelRes), phase == value,
+                            Modifier.testTag("phase-${value.name}"),
+                            icon = value.icon, tint = Palette.info,
+                        ) { phase = if (phase == value) null else value }
+                    }
+                }
+                Group(stringResource(R.string.puzzle_type), Icons.Default.Extension, Palette.warning) {
+                    ChipButton(stringResource(R.string.filter_all), theme == null,
+                        Modifier.testTag("theme-tous"), tint = Palette.warning) { theme = null }
+                    PuzzleThemeKind.entries.forEach { value ->
+                        ChipButton(
+                            // « Attaque à la découverte » déborde à côté des
+                            // autres puces : raccourci ICI SEULEMENT, comme iOS.
+                            // Le libellé entier reste sur l'écran de résolution.
+                            stringResource(
+                                if (value.labelRes == R.string.theme_discovered) R.string.theme_discovered_short
+                                else value.labelRes
+                            ),
+                            theme == value,
+                            Modifier.testTag("theme-${value.name}"),
+                            icon = value.icon, tint = Palette.warning,
+                        ) { theme = if (theme == value) null else value }
+                    }
                 }
             }
             WoodpeckerCard(
@@ -260,6 +275,32 @@ private fun Group(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             content = content,
+        )
+    }
+}
+
+/** L'en-tête qui déplie provenance, phase et type. Pendant de `moreFiltersToggle` (iOS). */
+@Composable
+private fun MoreFiltersToggle(open: Boolean, active: Int, onToggle: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onToggle)
+            .padding(vertical = 6.dp)
+            .testTag("plus-de-filtres"),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Icon(Icons.Default.FilterList, null, tint = Palette.textSecondary, modifier = Modifier.size(18.dp))
+        Spacer(Modifier.width(8.dp))
+        Text(
+            if (active > 0) stringResource(R.string.puzzle_more_filters_active, active)
+            else stringResource(R.string.puzzle_more_filters),
+            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+            modifier = Modifier.weight(1f),
+        )
+        Icon(
+            if (open) Icons.Default.ExpandLess else Icons.Default.ExpandMore, null,
+            tint = Palette.textTertiary, modifier = Modifier.size(18.dp),
         )
     }
 }

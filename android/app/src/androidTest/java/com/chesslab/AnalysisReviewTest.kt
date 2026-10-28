@@ -88,7 +88,7 @@ class AnalysisReviewTest {
         // FEUILLE : on colle avant d'analyser, et l'écran d'analyse ne porte
         // plus de formulaire.
         awaitTag("entree-autres")
-        compose.onNodeWithTag("entree-autres").performScrollTo().performClick()
+        // Les sources sont dépliées par défaut (28/10/2026) : plus rien à toucher.
         awaitTag("entree-coller")
         compose.onNodeWithTag("entree-coller").performScrollTo().performClick()
         awaitTag("saisie")

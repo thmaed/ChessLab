@@ -123,6 +123,15 @@ struct TimeLimitSection: View {
                         }
                     }
 
+                    // Ce que la pendule coûte, dit là où on la choisit (28/10/2026) : la
+                    // note vivait sous « Aides », hors de vue, et un utilisateur l'a
+                    // découvert en cherchant comment revenir sur un coup.
+                    Text("Avec une pendule, pas de retour en arrière : « Reprendre ici » n'est pas proposé.")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("clockNoTakeback")
+
                     if selection.isCustom {
                         customEditor
                     } else {
@@ -140,7 +149,7 @@ struct TimeLimitSection: View {
                         }
                     }
                 } else {
-                    Text("Aucune pendule : les deux camps jouent sans contrainte de temps.")
+                    Text("Aucune pendule : les deux camps jouent sans contrainte de temps, et l'on peut revenir sur un coup (‹ sous le plateau, puis « Reprendre ici »).")
                         .font(.caption)
                         .foregroundStyle(Theme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)

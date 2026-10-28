@@ -2792,22 +2792,6 @@
         }
       }
     },
-    "Aucune pendule : les deux camps jouent sans contrainte de temps.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No clock: both sides play without time pressure."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune pendule : les deux camps jouent sans contrainte de temps."
-          }
-        }
-      }
-    },
     "Aucune position due pour l'instant. Explore ou apprends une ouverture pour remplir ta file.": {
       "extractionState": "stale",
       "localizations": {
@@ -13516,22 +13500,6 @@
         }
       }
     },
-    "Parcourez la partie avec la barre sous le plateau ; sans pendule, « Reprendre ici » relance depuis le coup consulté.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Browse the game with the bar below the board; without a clock, \"Resume here\" restarts from the reviewed move."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Parcourez la partie avec la barre sous le plateau ; sans pendule, « Reprendre ici » relance depuis le coup consulté."
-          }
-        }
-      }
-    },
     "Partager": {
       "localizations": {
         "en": {
@@ -15755,22 +15723,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Reprise au coup %lld — %lld coups écartés"
-          }
-        }
-      }
-    },
-    "Reprise de coup indisponible avec pendule.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Take-back is unavailable with a clock."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Reprise de coup indisponible avec pendule."
           }
         }
       }
@@ -19076,22 +19028,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "All"
-          }
-        }
-      }
-    },
-    "Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Any move that preserves the verdict is accepted — engine-checked arbitration."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur."
           }
         }
       }
@@ -23683,6 +23619,256 @@
           "stringUnit": {
             "state": "translated",
             "value": "Opens the analysis on the displayed position so you can try other moves"
+          }
+        }
+      }
+    },
+    "Version %@ (%@)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version %@ (%@)"
+          }
+        }
+      }
+    },
+    "Questions fréquentes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Frequently asked questions"
+          }
+        }
+      }
+    },
+    "Afficher la réponse": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show the answer"
+          }
+        }
+      }
+    },
+    "Comment revenir sur un coup ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How do I take back a move?"
+          }
+        }
+      }
+    },
+    "Dans une partie sans pendule, touchez ‹ sous le plateau pour remonter jusqu'au coup voulu, puis « Reprendre ici » : la partie repart de là (« Annuler la reprise » rattrape une erreur pendant quelques secondes). Avec une pendule, la reprise n'existe pas : « Analyser ici » ouvre la position dans l'Analyse.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In a game without a clock, tap ‹ below the board to step back to the move you want, then “Resume here”: the game restarts from there (“Undo resume” fixes a mistake for a few seconds). With a clock, there is no resume: “Analyse here” opens the position in Analysis."
+          }
+        }
+      }
+    },
+    "Comment essayer une autre variante ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How do I try another line?"
+          }
+        }
+      }
+    },
+    "Dans Analyser, jouez librement sur le plateau : chaque coup devient une variante, à côté de la partie, que vous quittez et retrouvez à volonté. En fin de partie, le bouton « Analyser » y ouvre toute la partie ; pendant une partie, « Modes » › Analyser y ouvre la position affichée.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Analysis, play freely on the board: each move becomes a variation next to the game, which you can leave and come back to at will. At the end of a game, the “Analyse” button opens the whole game there; during a game, “Modes” › Analyse opens the position on screen."
+          }
+        }
+      }
+    },
+    "Ouvrir Analyser": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Analysis"
+          }
+        }
+      }
+    },
+    "Comment étudier une position précise ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "How do I study a specific position?"
+          }
+        }
+      }
+    },
+    "L'Éditeur de position (dans Analyser) compose n'importe quelle position, ou la reprend d'une FEN. Ensuite, analysez-la, ou touchez « Jouer cette position » pour la jouer contre l'ordinateur et revenir en arrière autant qu'il faut.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Position editor (in Analysis) sets up any position, or takes one from a FEN. Then analyse it, or tap “Play this position” to play it against the computer and step back as often as you like."
+          }
+        }
+      }
+    },
+    "Où retrouver mes puzzles ratés ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Where are my missed puzzles?"
+          }
+        }
+      }
+    },
+    "Dans Puzzles, rubrique Historique : « Ratés » pour les puzzles manqués dès le premier coup, « À revoir » pour ceux trouvés à moitié. Les ratés reviennent aussi dans la Séance du jour.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Puzzles, under History: “Missed” for puzzles missed from the first move, “Review” for those half found. Missed puzzles also come back in the Daily session."
+          }
+        }
+      }
+    },
+    "Ouvrir les puzzles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open puzzles"
+          }
+        }
+      }
+    },
+    "Quelle version de l'app ai-je ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Which version of the app do I have?"
+          }
+        }
+      }
+    },
+    "Le numéro de version est en bas des Réglages — utile pour signaler un problème.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The version number is at the bottom of Settings — useful when reporting a problem."
+          }
+        }
+      }
+    },
+    "Ouvrir les Réglages": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings"
+          }
+        }
+      }
+    },
+    "Ratés (%lld)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Missed (%lld)"
+          }
+        }
+      }
+    },
+    "À revoir (%lld)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review (%lld)"
+          }
+        }
+      }
+    },
+    "Plus de filtres (%lld actif)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More filters (%lld active)"
+          }
+        }
+      }
+    },
+    "Plus de filtres : provenance, phase, type": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More filters: source, phase, type"
+          }
+        }
+      }
+    },
+    "Avec une pendule, pas de retour en arrière : « Reprendre ici » n'est pas proposé.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "With a clock there is no going back: “Resume here” is not offered."
+          }
+        }
+      }
+    },
+    "Aucune pendule : les deux camps jouent sans contrainte de temps, et l'on peut revenir sur un coup (‹ sous le plateau, puis « Reprendre ici »).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No clock: both sides play without time pressure, and you can take back a move (‹ below the board, then “Resume here”)."
+          }
+        }
+      }
+    },
+    "Gardez le gain : tout coup qui reste gagnant est accepté (vérifié par le moteur).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep the win: any move that stays winning is accepted (checked by the engine)."
+          }
+        }
+      }
+    },
+    "Gardez la nulle : tout coup qui la conserve est accepté (vérifié par le moteur).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep the draw: any move that holds it is accepted (checked by the engine)."
+          }
+        }
+      }
+    },
+    "Tenez le verdict : tout coup qui le préserve est accepté (vérifié par le moteur).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hold the verdict: any move that keeps it is accepted (checked by the engine)."
           }
         }
       }

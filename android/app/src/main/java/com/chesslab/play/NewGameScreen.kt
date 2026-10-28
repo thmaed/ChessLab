@@ -306,12 +306,8 @@ fun NewGameScreen(
                 }
                 ToggleRow(stringResource(R.string.setup_eval_bar), evalBar, "aide-eval", Palette.rose) { evalBar = it }
                 ToggleRow(stringResource(R.string.setup_engine_resigns), engineResigns, "aide-abandon", Palette.rose) { engineResigns = it }
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    stringResource(if (hasClock) R.string.setup_aids_note_clock else R.string.setup_aids_note),
-                    fontSize = 11.sp, color = Palette.textTertiary,
-                    modifier = Modifier.testTag("note-aides"),
-                )
+                // La note sur la reprise de coup a rejoint « Limite de temps » (28/10/2026),
+                // comme iOS : c'est la pendule qui décide, c'est là qu'on doit le lire.
             }
 
             SettingsSection(stringResource(R.string.setup_start_section), Icons.Default.Tune, Palette.violet) {

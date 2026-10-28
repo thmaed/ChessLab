@@ -232,7 +232,7 @@ class AppTest {
         // « Coller » vit sous « Autres sources » — les chemins qui demandent
         // un travail sont repliés.
         awaitTag("entree-autres", 15_000)
-        compose.onNodeWithTag("entree-autres").performScrollTo().performClick()
+        // Les sources sont dépliées par défaut (28/10/2026) : plus rien à toucher.
         awaitTag("entree-coller", 10_000)
         compose.onNodeWithTag("entree-coller").performScrollTo().performClick()
         awaitTag("saisie", 10_000)
@@ -275,6 +275,8 @@ class AppTest {
         // Vos puzzles n'ont pas de cote : choisir « Mes parties » retire le
         // niveau, le désélectionner le rend — comme sur iOS.
         compose.onNodeWithTag("niveau-tous").performScrollTo().assertIsDisplayed()
+        // La provenance vit sous « Plus de filtres », replié par défaut (28/10/2026).
+        compose.onNodeWithTag("plus-de-filtres").performScrollTo().performClick()
         compose.onNodeWithTag("provenance-ownGames").performScrollTo().performClick()
         compose.waitForIdle()
         assert(compose.onAllNodesWithTag("niveau-tous").fetchSemanticsNodes().isEmpty())
@@ -601,7 +603,7 @@ class AppTest {
         // sources » : composer une position est un travail, pas un raccourci.
         open("analysis")
         awaitTag("entree-autres", 15_000)
-        compose.onNodeWithTag("entree-autres").performScrollTo().performClick()
+        // Les sources sont dépliées par défaut (28/10/2026) : plus rien à toucher.
         awaitTag("entree-editeur", 10_000)
         compose.onNodeWithTag("entree-editeur").performScrollTo().performClick()
         awaitTag("fen", 10_000)

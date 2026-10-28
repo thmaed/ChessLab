@@ -7,6 +7,54 @@ import UIKit
 /// fait. Tous les libellés sont des `LocalizedStringKey` : ils basculent
 /// FR/EN comme le reste de l'app.
 struct HelpView: View {
+    /// Les écrans qu'une réponse de la FAQ sait ouvrir — c'est l'accueil, qui tient
+    /// la pile, qui les ouvre (voir ``HomeView``).
+    enum Destination { case analysis, positionEditor, puzzles, settings }
+    var onOpen: (Destination) -> Void = { _ in }
+
+    /// Une question PRATIQUE, telle qu'on se la pose, et sa réponse. Née des
+    /// retours d'utilisateurs (28/10/2026) : les fonctions existaient, l'Aide les
+    /// décrivait par module, et personne ne les trouvait par la tâche.
+    private struct Question: Identifiable {
+        let id: String
+        let question: LocalizedStringKey
+        let answer: LocalizedStringKey
+        var action: (label: LocalizedStringKey, destination: Destination)?
+    }
+
+    private let questions: [Question] = [
+        .init(
+            id: "takeback",
+            question: "Comment revenir sur un coup ?",
+            answer: "Dans une partie sans pendule, touchez ‹ sous le plateau pour remonter jusqu'au coup voulu, puis « Reprendre ici » : la partie repart de là (« Annuler la reprise » rattrape une erreur pendant quelques secondes). Avec une pendule, la reprise n'existe pas : « Analyser ici » ouvre la position dans l'Analyse."
+        ),
+        .init(
+            id: "variation",
+            question: "Comment essayer une autre variante ?",
+            answer: "Dans Analyser, jouez librement sur le plateau : chaque coup devient une variante, à côté de la partie, que vous quittez et retrouvez à volonté. En fin de partie, le bouton « Analyser » y ouvre toute la partie ; pendant une partie, « Modes » › Analyser y ouvre la position affichée.",
+            action: ("Ouvrir Analyser", .analysis)
+        ),
+        .init(
+            id: "position",
+            question: "Comment étudier une position précise ?",
+            answer: "L'Éditeur de position (dans Analyser) compose n'importe quelle position, ou la reprend d'une FEN. Ensuite, analysez-la, ou touchez « Jouer cette position » pour la jouer contre l'ordinateur et revenir en arrière autant qu'il faut.",
+            action: ("Ouvrir l'éditeur", .positionEditor)
+        ),
+        .init(
+            id: "missed",
+            question: "Où retrouver mes puzzles ratés ?",
+            answer: "Dans Puzzles, rubrique Historique : « Ratés » pour les puzzles manqués dès le premier coup, « À revoir » pour ceux trouvés à moitié. Les ratés reviennent aussi dans la Séance du jour.",
+            action: ("Ouvrir les puzzles", .puzzles)
+        ),
+        .init(
+            id: "version",
+            question: "Quelle version de l'app ai-je ?",
+            answer: "Le numéro de version est en bas des Réglages — utile pour signaler un problème.",
+            action: ("Ouvrir les Réglages", .settings)
+        ),
+    ]
+    @State private var openQuestion: String?
+
     private struct Module: Identifiable {
         let id = UUID()
         let icon: String
@@ -114,6 +162,8 @@ struct HelpView: View {
                 discoveryReplayCard
                 whatsNewReplayCard
 
+                faqSection
+
                 ForEach(modules) { module in
                     moduleCard(module)
                 }
@@ -190,6 +240,69 @@ struct HelpView: View {
         }
         .buttonStyle(.pressable)
         .accessibilityIdentifier("replayWhatsNewTour")
+    }
+
+    /// Questions fréquentes : une ligne par question, la réponse se déplie au toucher.
+    private var faqSection: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Text("Questions fréquentes")
+                .font(.headline)
+                .foregroundStyle(Theme.textPrimary)
+                .padding(.bottom, 8)
+            ForEach(Array(questions.enumerated()), id: \.element.id) { index, item in
+                if index > 0 { Divider().overlay(Theme.stroke) }
+                faqRow(item)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
+    }
+
+    private func faqRow(_ item: Question) -> some View {
+        let isOpen = openQuestion == item.id
+        return VStack(alignment: .leading, spacing: 8) {
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) { openQuestion = isOpen ? nil : item.id }
+            } label: {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text(item.question)
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 0)
+                    Image(systemName: "chevron.down")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.textTertiary)
+                        .rotationEffect(.degrees(isOpen ? 0 : -90))
+                }
+                .padding(.vertical, 10)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("faq-\(item.id)")
+            .accessibilityHint(Text(isOpen ? "Replier" : "Afficher la réponse"))
+
+            if isOpen {
+                Text(item.answer)
+                    .font(.callout)
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let action = item.action {
+                    Button { onOpen(action.destination) } label: {
+                        HStack(spacing: 4) {
+                            Text(action.label)
+                            Image(systemName: "arrow.right")
+                        }
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.accent)
+                    }
+                    .buttonStyle(.pressable)
+                    .accessibilityIdentifier("faq-\(item.id)-open")
+                }
+                Spacer().frame(height: 6)
+            }
+        }
     }
 
     private func moduleCard(_ module: Module) -> some View {

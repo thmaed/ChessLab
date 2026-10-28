@@ -227,7 +227,7 @@ final class LayoutOverflowUITests: XCTestCase {
             throw LayoutProbeError.markerMissing("Analyser")
         }
         XCTAssertTrue(app.buttons["Autres sources"].waitForExistence(timeout: 10))
-        app.buttons["Autres sources"].tap()
+        // Les sources sont dépliées par défaut (28/10/2026) : plus rien à toucher.
         XCTAssertTrue(app.buttons["Analyser PGN / FEN"].waitForExistence(timeout: 10))
         app.buttons["Analyser PGN / FEN"].tap()
 

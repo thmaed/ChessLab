@@ -40,7 +40,10 @@ struct AnalysisEntryView: View {
     @State private var fileImportMode: FileImportMode = .analyse
     @State private var showFileImporter = false
     @State private var importError: String?
-    @State private var showOtherSources = false
+    /// Dépliées par défaut (28/10/2026) : repliées, elles cachaient l'Éditeur de
+    /// position et le collage PGN/FEN à ceux qui les cherchaient — un utilisateur
+    /// a conclu qu'il fallait passer par Lichess. On peut toujours les replier.
+    @State private var showOtherSources = true
     @State private var libraryImportSummary: String?
 
     private var lastGamePGN: String? {
@@ -54,8 +57,7 @@ struct AnalysisEntryView: View {
                 // Les trois chemins courts d'abord : scanner une position sous
                 // les yeux, rouvrir une partie rangée, reprendre la dernière.
                 // Les quatre autres demandent de FOURNIR un texte ou de
-                // composer une position — un travail, pas un raccourci — et
-                // sont donc repliés.
+                // composer une position ; ils suivent, dépliés par défaut.
                 // C6 : la dernière partie d'abord, avec ses deux gestes — ce
                 // qu'on vient faire ici, le plus souvent.
                 if let last = records.first, let lastGamePGN {
@@ -70,7 +72,10 @@ struct AnalysisEntryView: View {
                     }
                     tileCard(
                         title: "Bibliothèque", subtitle: "\(records.count) partie(s) enregistrée(s)",
-                        systemImage: "books.vertical", tint: Theme.warning, isEnabled: !records.isEmpty
+                        // Toujours ouverte, même vide, comme sur Android : c'est de là
+                        // qu'on IMPORTE un fichier PGN, et une bibliothèque vide est
+                        // justement le moment où l'on veut le faire.
+                        systemImage: "books.vertical", tint: Theme.warning
                     ) {
                         onOpenLibrary()
                     }

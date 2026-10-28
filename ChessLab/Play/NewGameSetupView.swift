@@ -261,9 +261,8 @@ struct NewGameSetupView: View {
                         ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled, tint: Theme.rose)
                         ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar, tint: Theme.rose)
                         ToggleRow(label: "L'ordinateur peut abandonner s'il est perdu", isOn: $engineResignationEnabled, tint: Theme.rose)
-                        Text(effectiveTimeControl.hasClock ? "Reprise de coup indisponible avec pendule." : "Parcourez la partie avec la barre sous le plateau ; sans pendule, « Reprendre ici » relance depuis le coup consulté.")
-                            .font(.caption)
-                            .foregroundStyle(Theme.textTertiary)
+                        // La note sur la reprise de coup a rejoint « Limite de temps » (28/10/2026) :
+                        // c'est la pendule qui décide, c'est là qu'on doit le lire.
                     }
                 }
             }

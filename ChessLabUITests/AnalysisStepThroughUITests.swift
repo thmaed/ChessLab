@@ -69,7 +69,7 @@ final class AnalysisStepThroughUITests: XCTestCase {
 
         app.buttons["Analyser"].tap()
         XCTAssertTrue(app.buttons["Autres sources"].waitForExistence(timeout: 5))
-        app.buttons["Autres sources"].tap()
+        // Les sources sont dépliées par défaut (28/10/2026) : plus rien à toucher.
         XCTAssertTrue(app.buttons["Analyser PGN / FEN"].waitForExistence(timeout: 5))
         app.buttons["Analyser PGN / FEN"].tap()
 

@@ -34,6 +34,12 @@ struct PuzzleQueueView: View {
     @State private var puzzleRating = PuzzleRatingStore.load()
     @State private var missedOnly = false
     @State private var reviewOnly = false
+    /// Provenance, phase et type, repliés par défaut ; dépliés d'office quand l'un
+    /// d'eux est déjà choisi, pour ne jamais cacher un filtre actif.
+    @State private var showMoreFilters = false
+    private var activeMoreFilters: Int {
+        [selectedSource != nil, selectedPhase != nil, selectedTheme != nil].filter { $0 }.count
+    }
     /// Puzzles ratés à la dernière tentative : à zéro, la puce « Ratés » est grisée (rien à y retrouver).
     @State private var missedCount = 0
     /// Puzzles partiels : même règle, la puce « À revoir » est grisée à zéro.
@@ -72,45 +78,10 @@ struct PuzzleQueueView: View {
                 VStack(spacing: 0) {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 24) {
-                            filterGroup(title: "Provenance", systemImage: "square.stack.3d.up.fill", tint: Theme.violet) {
-                                FilterChip(label: "Toutes", tint: Theme.violet, isSelected: selectedSource == nil) {
-                                    selectedSource = nil
-                                }
-                                .accessibilityIdentifier("provenance-toutes")
-                                ForEach(PuzzleSource.allCases, id: \.self) { source in
-                                    FilterChip(label: LocalizedStringKey(source.label), icon: source.icon, tint: Theme.violet, isSelected: selectedSource == source) {
-                                        selectedSource = (selectedSource == source) ? nil : source
-                                        // Vos puzzles n'ont pas de cote : un niveau
-                                        // choisi les exclurait TOUS (voir le
-                                        // prédicat du tirage).
-                                        if selectedSource == .ownGames { selectedDifficulty = nil }
-                                    }
-                                    .accessibilityIdentifier("provenance-\(source.rawValue)")
-                                }
-                            }
-
-                            filterGroup(title: "Historique", systemImage: "clock.arrow.circlepath", tint: Theme.rose) {
-                                FilterChip(label: "Tous", tint: Theme.rose, isSelected: !missedOnly && !reviewOnly) {
-                                    missedOnly = false
-                                    reviewOnly = false
-                                }
-                                .accessibilityIdentifier("historique-tous")
-                                FilterChip(label: "Ratés", icon: "xmark.circle.fill", tint: Theme.rose, isSelected: missedOnly) {
-                                    missedOnly.toggle()
-                                    reviewOnly = false
-                                }
-                                .disabled(missedCount == 0)
-                                .opacity(missedCount == 0 ? 0.35 : 1)
-                                .accessibilityIdentifier("historique-rates")
-                                FilterChip(label: "À revoir", icon: "arrow.counterclockwise.circle.fill", tint: Theme.rose, isSelected: reviewOnly) {
-                                    reviewOnly.toggle()
-                                    missedOnly = false
-                                }
-                                .disabled(reviewCount == 0)
-                                .opacity(reviewCount == 0 ? 0.35 : 1)
-                                .accessibilityIdentifier("historique-a-revoir")
-                            }
-
+                            // Le plus utile d'abord (28/10/2026) : le niveau — « À mon niveau » —
+                            // et l'historique ; provenance, phase et type se replient sous
+                            // « Plus de filtres ». Cinq groupes avant « Commencer », c'était
+                            // beaucoup pour qui veut juste s'entraîner.
                             // Masqué pour « Mes parties » : sans cote, aucun
                             // niveau ne retiendrait un seul puzzle.
                             if selectedSource != .ownGames {
@@ -142,26 +113,69 @@ struct PuzzleQueueView: View {
                                 }
                             }
 
-                            filterGroup(title: "Phase", systemImage: "flag.checkered", tint: Theme.info) {
-                                FilterChip(label: "Toutes", tint: Theme.info, isSelected: selectedPhase == nil) {
-                                    selectedPhase = nil
+                            filterGroup(title: "Historique", systemImage: "clock.arrow.circlepath", tint: Theme.rose) {
+                                FilterChip(label: "Tous", tint: Theme.rose, isSelected: !missedOnly && !reviewOnly) {
+                                    missedOnly = false
+                                    reviewOnly = false
                                 }
-                                ForEach(GamePhase.allCases, id: \.self) { phase in
-                                    FilterChip(label: LocalizedStringKey(phase.label), icon: phase.icon, tint: Theme.info, isSelected: selectedPhase == phase) {
-                                        selectedPhase = (selectedPhase == phase) ? nil : phase
-                                    }
+                                .accessibilityIdentifier("historique-tous")
+                                FilterChip(label: missedCount > 0 ? "Ratés (\(missedCount))" : "Ratés", icon: "xmark.circle.fill", tint: Theme.rose, isSelected: missedOnly) {
+                                    missedOnly.toggle()
+                                    reviewOnly = false
                                 }
+                                .disabled(missedCount == 0)
+                                .opacity(missedCount == 0 ? 0.35 : 1)
+                                .accessibilityIdentifier("historique-rates")
+                                FilterChip(label: reviewCount > 0 ? "À revoir (\(reviewCount))" : "À revoir", icon: "arrow.counterclockwise.circle.fill", tint: Theme.rose, isSelected: reviewOnly) {
+                                    reviewOnly.toggle()
+                                    missedOnly = false
+                                }
+                                .disabled(reviewCount == 0)
+                                .opacity(reviewCount == 0 ? 0.35 : 1)
+                                .accessibilityIdentifier("historique-a-revoir")
                             }
 
-                            filterGroup(title: "Type de puzzle", systemImage: "puzzlepiece.fill", tint: Theme.warning) {
-                                FilterChip(label: "Tous", tint: Theme.warning, isSelected: selectedTheme == nil) {
-                                    selectedTheme = nil
-                                }
-                                ForEach(PuzzleTheme.allCases, id: \.self) { theme in
-                                    FilterChip(label: LocalizedStringKey(chipLabel(for: theme)), icon: theme.icon, tint: Theme.warning, isSelected: selectedTheme == theme) {
-                                        selectedTheme = (selectedTheme == theme) ? nil : theme
+                            moreFiltersToggle
+                            if showMoreFilters {
+                                filterGroup(title: "Provenance", systemImage: "square.stack.3d.up.fill", tint: Theme.violet) {
+                                    FilterChip(label: "Toutes", tint: Theme.violet, isSelected: selectedSource == nil) {
+                                        selectedSource = nil
+                                    }
+                                    .accessibilityIdentifier("provenance-toutes")
+                                    ForEach(PuzzleSource.allCases, id: \.self) { source in
+                                        FilterChip(label: LocalizedStringKey(source.label), icon: source.icon, tint: Theme.violet, isSelected: selectedSource == source) {
+                                            selectedSource = (selectedSource == source) ? nil : source
+                                            // Vos puzzles n'ont pas de cote : un niveau
+                                            // choisi les exclurait TOUS (voir le
+                                            // prédicat du tirage).
+                                            if selectedSource == .ownGames { selectedDifficulty = nil }
+                                        }
+                                        .accessibilityIdentifier("provenance-\(source.rawValue)")
                                     }
                                 }
+
+                                filterGroup(title: "Phase", systemImage: "flag.checkered", tint: Theme.info) {
+                                    FilterChip(label: "Toutes", tint: Theme.info, isSelected: selectedPhase == nil) {
+                                        selectedPhase = nil
+                                    }
+                                    ForEach(GamePhase.allCases, id: \.self) { phase in
+                                        FilterChip(label: LocalizedStringKey(phase.label), icon: phase.icon, tint: Theme.info, isSelected: selectedPhase == phase) {
+                                            selectedPhase = (selectedPhase == phase) ? nil : phase
+                                        }
+                                    }
+                                }
+
+                                filterGroup(title: "Type de puzzle", systemImage: "puzzlepiece.fill", tint: Theme.warning) {
+                                    FilterChip(label: "Tous", tint: Theme.warning, isSelected: selectedTheme == nil) {
+                                        selectedTheme = nil
+                                    }
+                                    ForEach(PuzzleTheme.allCases, id: \.self) { theme in
+                                        FilterChip(label: LocalizedStringKey(chipLabel(for: theme)), icon: theme.icon, tint: Theme.warning, isSelected: selectedTheme == theme) {
+                                            selectedTheme = (selectedTheme == theme) ? nil : theme
+                                        }
+                                    }
+                                }
+
                             }
 
                             woodpeckerCard
@@ -207,7 +221,10 @@ struct PuzzleQueueView: View {
                 )
             }
         }
-        .onAppear { refresh() }
+        .onAppear {
+            refresh()
+            if activeMoreFilters > 0 { showMoreFilters = true }
+        }
         .confirmationDialog(
             "Arrêter ce programme ?",
             isPresented: $confirmsWoodpeckerArchive,
@@ -351,6 +368,30 @@ struct PuzzleQueueView: View {
     /// utilisé sur l'écran de résolution, où il a la place).
     private func chipLabel(for theme: PuzzleTheme) -> String {
         theme == .discoveredAttack ? LocalizationController.string("Découverte") : theme.label
+    }
+
+    private var moreFiltersToggle: some View {
+        Button {
+            withAnimation(.easeInOut(duration: 0.2)) { showMoreFilters.toggle() }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "line.3.horizontal.decrease.circle")
+                    .foregroundStyle(Theme.textSecondary)
+                Text(activeMoreFilters > 0
+                     ? "Plus de filtres (\(activeMoreFilters) actif)"
+                     : "Plus de filtres : provenance, phase, type")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                Spacer(minLength: 0)
+                Image(systemName: "chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.textTertiary)
+                    .rotationEffect(.degrees(showMoreFilters ? 0 : -90))
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("plus-de-filtres")
     }
 
     private var selectionSummary: String {

@@ -329,7 +329,20 @@ private fun App() {
                 onOpenEndgame = { id, name -> stack.add(Route.EndgameFree(id, name)) },
             )
             Route.Progression -> ProgressionScreen(onTrainTheme = { stack.add(Route.Puzzles(theme = it)) })
-            Route.Help -> HelpScreen(onReplayTour = { tour.start() }, onReplayWhatsNew = { tour.startWhatsNew() })
+            Route.Help -> HelpScreen(
+                onReplayTour = { tour.start() },
+                onReplayWhatsNew = { tour.startWhatsNew() },
+                onOpen = { destination ->
+                    stack.add(
+                        when (destination) {
+                            com.chesslab.help.HelpDestination.analysis -> Route.Analysis
+                            com.chesslab.help.HelpDestination.positionEditor -> Route.PositionEditor()
+                            com.chesslab.help.HelpDestination.puzzles -> Route.PuzzleQueue
+                            com.chesslab.help.HelpDestination.settings -> Route.Settings
+                        }
+                    )
+                },
+            )
             is Route.PositionEditor -> PositionEditorScreen(
                 confirmLabel = if (current.forSetup) R.string.setup_use_position else R.string.route_analysis,
             ) { fen ->

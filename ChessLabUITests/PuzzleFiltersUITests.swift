@@ -26,6 +26,10 @@ final class PuzzleFiltersUITests: XCTestCase {
         let level = element(app, "niveau-tous")
         XCTAssertTrue(level.waitForExistence(timeout: 15), "le niveau doit s'afficher par défaut")
 
+        // La provenance vit sous « Plus de filtres », replié par défaut (28/10/2026).
+        XCTAssertFalse(element(app, "provenance-ownGames").exists, "la provenance doit être repliée par défaut")
+        element(app, "plus-de-filtres").tap()
+        XCTAssertTrue(element(app, "provenance-ownGames").waitForExistence(timeout: 3))
         element(app, "provenance-ownGames").tap()
         XCTAssertTrue(level.waitForNonExistence(timeout: 3), "vos puzzles n'ont pas de cote : le niveau doit disparaître")
 

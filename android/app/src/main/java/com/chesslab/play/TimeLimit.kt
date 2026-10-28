@@ -197,6 +197,12 @@ fun TimeLimitSection(state: TimeLimitState, tint: Color = Palette.accent) {
                     ) { state.select(c) }
                 }
             }
+            // Ce que la pendule coûte, dit là où on la choisit (28/10/2026), comme iOS.
+            Spacer(Modifier.height(10.dp))
+            Text(
+                stringResource(R.string.setup_clock_no_takeback), fontSize = 12.sp, color = Palette.textSecondary,
+                modifier = Modifier.testTag("pendule-sans-reprise"),
+            )
             Spacer(Modifier.height(10.dp))
             if (state.isCustom) {
                 TimeStepper(stringResource(R.string.setup_custom_minutes), state.customMinutes, 1..180, "minutes-perso") {

@@ -7,6 +7,19 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Revue UX : la découvrabilité — 28/10/2026
+
+Portée des deux côtés, **à vérifier sur le Galaxy** avant de cocher.
+
+- [ ] Bouton « Annuler » de la barre de partie RETIRÉ (iOS ne l'a pas, iOS fait foi).
+- [ ] « Modes » : icône + mot dans les barres du haut.
+- [ ] Analyser : « Autres sources » dépliées par défaut.
+- [ ] Version en bas des Réglages.
+- [ ] Aide : « Questions fréquentes » avec ouverture de l'écran concerné.
+- [ ] Puzzles : « Plus de filtres » (provenance, phase, type) ; compteurs sur « Ratés » / « À revoir ».
+- [ ] « Limite de temps » : la note sur la reprise de coup (retirée de « Aides »).
+- [ ] Finales libres : consigne selon le verdict.
+
 ### Barre de progression du préchargement — 28/10/2026
 
 - Écart ASSUMÉ, sans objet côté Android : iOS précharge les puzzles dans sa base au premier

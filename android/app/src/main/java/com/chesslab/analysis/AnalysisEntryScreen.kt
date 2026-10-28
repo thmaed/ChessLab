@@ -67,7 +67,9 @@ fun AnalysisEntryScreen(
         .collectAsState(initial = emptyList())
     val lastPgn = games.firstOrNull()?.pgn
 
-    var showOthers by remember { mutableStateOf(false) }
+    // Dépliées par défaut (28/10/2026), comme sur iOS : repliées, elles cachaient
+    // l'Éditeur de position et le collage PGN/FEN à ceux qui les cherchaient.
+    var showOthers by remember { mutableStateOf(true) }
     var showPasteSheet by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
 
@@ -115,8 +117,7 @@ fun AnalysisEntryScreen(
             )
         }
         // Les chemins qui demandent un TRAVAIL — fournir un texte, ouvrir un
-        // fichier, composer une position — sont repliés : ce sont des
-        // exceptions, pas la façon ordinaire d'arriver sur l'analyse.
+        // fichier, composer une position — suivent, dépliés par défaut.
         EntryCard(
             stringResource(R.string.entry_other_sources),
             stringResource(R.string.entry_other_sources_sub),

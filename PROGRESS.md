@@ -10753,3 +10753,25 @@ indéterminée ; avec 130 935 puzzles, l'attente dure plusieurs dizaines de seco
   ne dépasse jamais ce qui est écrit. Une mise à niveau V4 → V5 ne compte que les NOUVEAUX puzzles.
 - Mesuré sur simulateur neuf : 8 % à 4 s, 52 % à 12 s.
 - Android : aucun équivalent à porter, il n'y a pas de préchargement (le JSON est lu à la demande).
+
+## 28/10 — Revue UX : la découvrabilité (iOS + Android)
+
+Revue de 19 écrans (simulateur, `-openRoute`) à la lumière de deux retours d'utilisateurs :
+les fonctions existaient, personne ne les trouvait.
+- **« Annuler » retiré d'Android** : iOS n'a pas ce bouton (iOS fait foi, décision du 28/10) ;
+  revenir sur un coup passe par ‹ puis « Reprendre ici », des deux côtés.
+- **« Modes »** : le menu à quatre carrés porte un mot à côté de l'icône (le nom complet reste
+  « Changer de mode » pour VoiceOver / TalkBack).
+- **Analyser** : les « Autres sources » (PGN/FEN, fichier, Éditeur de position) sont dépliées
+  par défaut ; sur iOS la tuile Bibliothèque reste active même vide (comme Android : c'est là
+  qu'on importe).
+- **Version** en bas des Réglages (« Version 2.0 (19) »).
+- **Aide** : « Questions fréquentes » par tâche — revenir sur un coup, essayer une variante,
+  étudier une position, retrouver ses ratés, connaître sa version — avec un bouton qui ouvre l'écran.
+- **Puzzles** : niveau et historique d'abord ; provenance, phase et type sous « Plus de filtres »
+  (déplié d'office si l'un est actif) ; « Ratés (n) » / « À revoir (n) ».
+- **Pendule** : ce qu'elle coûte (pas de reprise) est écrit dans « Limite de temps », plus sous « Aides ».
+- **Finales** : la consigne dit quoi faire selon le verdict (« Gardez la nulle : … »).
+- Tests : suite iOS complète verte (1149) ; tests d'interface iOS touchés verts (dont les 6
+  qui dépliaient « Autres sources », adaptés) ; Android JVM verts, `AppTest` 50/50 (un test
+  Woodpecker dépasse 90 s en fin de longue série sur émulateur, vert seul en 11 s).

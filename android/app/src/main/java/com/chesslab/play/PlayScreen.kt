@@ -17,7 +17,6 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.automirrored.filled.Undo
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -199,7 +198,6 @@ fun PlayScreen(
             onAnalyzeHere = { onAnalyze(ui.position.fen) },
             onCancelResume = model::cancelResumeFromReview,
             onHint = { model.toggleHint() },
-            onTakeback = { model.takeback() },
             onMoves = { showMoves = true },
             showMovesButton = !movesInline,
             onDraw = { model.offerDraw() },
@@ -483,7 +481,6 @@ private fun ControlBar(
     onAnalyzeHere: () -> Unit = {},
     onCancelResume: () -> Unit,
     onHint: () -> Unit,
-    onTakeback: () -> Unit,
     onMoves: () -> Unit,
     /** Faux quand la liste des coups est déjà affichée à côté ou dessous. */
     showMovesButton: Boolean = true,
@@ -546,14 +543,8 @@ private fun ControlBar(
         }
 
         Spacer(Modifier.weight(1f))
-        // Annuler n'a de sens que sans pendule : on ne reprend pas du temps
-        // déjà écoulé. Le bouton disparaît alors plutôt que de rester grisé
-        // sans qu'on sache pourquoi.
-        if (!ui.settings.timeControl.hasClock && !ui.isReviewing) {
-            ControlButton(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.play_takeback),
-                enabled = ui.canTakeback, tag = "annuler", onClick = onTakeback)
-            Spacer(Modifier.width(10.dp))
-        }
+        // Pas de bouton « Annuler » : comme sur iOS (qui fait foi, décision du 28/10/2026),
+        // revenir sur un coup passe par ← puis « Reprendre ici ».
         // L'indice est un ÉTAT : allumé, il suit la partie et se repose après
         // chaque coup. Le bouton le dit par son fond, pas seulement sa teinte.
         ControlButton(Icons.Default.Lightbulb, stringResource(R.string.train_hint),

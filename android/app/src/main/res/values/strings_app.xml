@@ -241,6 +241,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="puzzle_wrong_solution">Not the move — the solution began with %1$s</string>
     <string name="rival_silent">The opponent did not answer</string>
     <string name="switch_mode">Switch mode</string>
+    <string name="switch_mode_short">Modes</string>
+    <string name="settings_version">Version %1$s</string>
     <string name="route_analysis">Analyse</string>
     <string name="route_editor">Position editor</string>
     <string name="route_endgames">Endgames</string>
@@ -518,7 +520,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="setup_eval_bar">Evaluation bar</string>
     <string name="setup_engine_resigns">The computer may resign when lost</string>
     <string name="setup_start">Start</string>
-    <string name="setup_no_clock">No clock: both sides play without time pressure.</string>
+    <string name="setup_no_clock">No clock: both sides play without time pressure, and you can take back a move (‹ below the board, then “Resume here”).</string>
+    <string name="setup_clock_no_takeback">With a clock there is no going back: “Resume here” is not offered.</string>
     <string name="setup_level_note">Human scale (close to Lichess), different from Stockfish\'s Elo. Stockfish steps in only for short mates, few-piece endgames and repetitions.</string>
     <string name="setup_strength_note">Stockfish, throttled. Not comparable to the human scale of the characters.</string>
     <string name="time_none">Unlimited</string>
@@ -758,7 +761,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="settings_notation">Move notation</string>
     <string name="settings_notation_french">French</string>
     <string name="settings_notation_english">English</string>
-    <string name="play_takeback">Take back</string>
     <string name="blunder_title">Risky move</string>
     <string name="blunder_missed_mate">That move lets a forced mate slip away.</string>
     <string name="blunder_allows_mate">That move gives your opponent a forced mate.</string>
@@ -795,7 +797,9 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="verdict_draw">drawn</string>
     <string name="verdict_loss">losing</string>
     <string name="endgame_free">Free training</string>
-    <string name="endgame_free_note">Any move that preserves the verdict is accepted — engine-checked.</string>
+    <string name="endgame_free_note">Hold the verdict: any move that keeps it is accepted (checked by the engine).</string>
+    <string name="endgame_free_note_win">Keep the win: any move that stays winning is accepted (checked by the engine).</string>
+    <string name="endgame_free_note_draw">Keep the draw: any move that holds it is accepted (checked by the engine).</string>
     <string name="endgame_slip">%1$s → %2$s</string>
     <string name="endgame_slip_title">That move gives the verdict away</string>
     <string name="endgame_retry">Try again</string>
@@ -933,8 +937,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="setup_book_enabled">The engine draws from an opening book</string>
     <string name="setup_book_main">Main lines</string>
     <string name="setup_book_sidelines">With sidelines</string>
-    <string name="setup_aids_note_clock">Take-back is unavailable with a clock.</string>
-    <string name="setup_aids_note">Browse the game with the bar below the board; without a clock, “Resume here” restarts from the reviewed move.</string>
     <string name="route_continue_game">Continue the game</string>
     <string name="outcome_opponent_resigned">Your opponent resigns</string>
     <string name="play_draw_offered">The engine offers a draw</string>
@@ -1083,6 +1085,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="puzzle_history">History</string>
     <string name="puzzle_missed">Missed</string>
     <string name="puzzle_review">Review</string>
+    <string name="puzzle_more_filters">More filters: source, phase, type</string>
+    <string name="puzzle_more_filters_active">More filters (%1$d active)</string>
     <string name="puzzle_no_review">No puzzles to review — you solved every puzzle matching these filters cleanly on your last attempt.</string>
     <string name="puzzle_partial_note">To review: it will come back in 2 days.</string>
     <string name="puzzle_no_missed">No missed puzzles — you solved every puzzle matching these filters on your last attempt.</string>
@@ -1270,4 +1274,20 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">Create %1$d puzzle</item>
         <item quantity="other">Create %1$d puzzles</item>
     </plurals>
+    <!-- FAQ de l'Aide (28/10/2026) -->
+    <string name="faq_title">Frequently asked questions</string>
+    <string name="faq_takeback_q">How do I take back a move?</string>
+    <string name="faq_takeback_a">In a game without a clock, tap ‹ below the board to step back to the move you want, then “Resume here”: the game restarts from there (“Undo the resume” fixes a mistake for a few seconds). With a clock, there is no resume: “Analyse here” opens the position in Analysis.</string>
+    <string name="faq_variation_q">How do I try another line?</string>
+    <string name="faq_variation_a">In Analysis, play freely on the board: each move becomes a variation next to the game, which you can leave and come back to at will. At the end of a game, the “Analyse” button opens the whole game there; during a game, “Modes” › Analyse opens the position on screen.</string>
+    <string name="faq_position_q">How do I study a specific position?</string>
+    <string name="faq_position_a">The Position editor (in Analysis) sets up any position, or takes one from a FEN. Then analyse it, or tap “Play this position” to play it against the computer and step back as often as you like.</string>
+    <string name="faq_missed_q">Where are my missed puzzles?</string>
+    <string name="faq_missed_a">In Puzzles, under History: “Missed” for puzzles missed from the first move, “Review” for those half found. Missed puzzles also come back in the Daily session.</string>
+    <string name="faq_version_q">Which version of the app do I have?</string>
+    <string name="faq_version_a">The version number is at the bottom of Settings — useful when reporting a problem.</string>
+    <string name="faq_open_analysis">Open Analysis</string>
+    <string name="faq_open_editor">Open the editor</string>
+    <string name="faq_open_puzzles">Open puzzles</string>
+    <string name="faq_open_settings">Open Settings</string>
 </resources>

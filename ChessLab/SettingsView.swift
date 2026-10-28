@@ -38,6 +38,7 @@ struct SettingsView: View {
                 if OpeningsGraphFeature.hasBundledCourses { previewSection }
                 helpSection
                 licensesSection
+                versionFooter
             }
             .padding(20)
             .frame(maxWidth: Theme.readableWidth, alignment: .leading)
@@ -264,6 +265,22 @@ struct SettingsView: View {
         .task {
             iCloudStatus = try? await CKContainer(identifier: "iCloud.com.chesslab.ChessLab").accountStatus()
         }
+    }
+
+    /// Le numéro de version, là où on le cherche (retour d'un utilisateur,
+    /// 28/10/2026 : il n'apparaissait que dans le titre des nouveautés de l'Aide).
+    /// Lu dans le BUNDLE, comme ``HelpView`` : un numéro écrit en dur périme.
+    private var versionFooter: some View {
+        let info = Bundle.main.infoDictionary
+        let version = info?["CFBundleShortVersionString"] as? String ?? "?"
+        let build = info?["CFBundleVersion"] as? String ?? "?"
+        return Text("Version \(version) (\(build))")
+            .font(.footnote.monospacedDigit())
+            .foregroundStyle(Theme.textTertiary)
+            .frame(maxWidth: .infinity, alignment: .center)
+            .padding(.top, 4)
+            .textSelection(.enabled)
+            .accessibilityIdentifier("settingsVersion")
     }
 
     /// État du compte iCloud, message clair si l'utilisateur n'est pas connecté.

@@ -69,9 +69,18 @@ struct QuickSwitchMenu: View {
                 }
             }
         } label: {
-            // « Changer de mode » et pas « Continuer ailleurs » : c'est le nom
-            // sous lequel l'aide le présente déjà, à trois endroits.
-            Label("Changer de mode", systemImage: "square.grid.2x2")
+            // L'icône SEULE ne disait rien (retour d'un utilisateur, 28/10/2026 : il
+            // n'a pas deviné que les quatre carrés menaient à l'Analyse) : un mot
+            // court l'accompagne. Le nom complet reste celui que lit VoiceOver et
+            // que l'aide emploie : « Changer de mode ».
+            HStack(spacing: 5) {
+                Image(systemName: "square.grid.2x2")
+                Text("Modes")
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("Changer de mode"))
         }
         .tint(Theme.violet)
         .accessibilityIdentifier("quickSwitchMenu")

@@ -15,6 +15,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -286,6 +287,23 @@ fun SettingsScreen(
                 stringResource(R.string.settings_licences_subtitle), "licences", onOpenLicences,
             )
         }
+
+        // Le numéro de version, là où on le cherche — comme iOS (28/10/2026).
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val version = remember {
+            runCatching {
+                val info = context.packageManager.getPackageInfo(context.packageName, 0)
+                val code = if (android.os.Build.VERSION.SDK_INT >= 28) info.longVersionCode
+                    else @Suppress("DEPRECATION") info.versionCode.toLong()
+                "${info.versionName} ($code)"
+            }.getOrDefault("?")
+        }
+        Text(
+            stringResource(R.string.settings_version, version),
+            fontSize = 12.sp, color = Palette.textTertiary,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(top = 4.dp).testTag("version"),
+        )
 
         Spacer(Modifier.height(12.dp))
     }

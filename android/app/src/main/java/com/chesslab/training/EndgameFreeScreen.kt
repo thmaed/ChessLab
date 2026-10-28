@@ -83,9 +83,16 @@ fun EndgameFreeScreen(
                     )
                 }
             }
+            // La consigne dit CE QU'IL FAUT FAIRE, selon le verdict (28/10/2026), comme iOS.
             Text(
-                stringResource(R.string.endgame_free_note),
-                fontSize = 11.sp, color = Palette.textTertiary,
+                stringResource(
+                    when (ui.baseline) {
+                        EndgameVerdict.win -> R.string.endgame_free_note_win
+                        EndgameVerdict.draw -> R.string.endgame_free_note_draw
+                        else -> R.string.endgame_free_note
+                    }
+                ),
+                fontSize = 12.sp, color = Palette.textSecondary,
             )
             // Rien pendant que c'est à l'utilisateur : le bandeau dit déjà
             // tout, et l'écran reste calme le temps qu'il cherche.

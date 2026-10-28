@@ -83,12 +83,25 @@ struct EndgameFreeTrainView: View {
                         .foregroundStyle(Theme.textPrimary)
                 }
             }
-            Text("Tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur.")
-                .font(.caption2)
-                .foregroundStyle(Theme.textTertiary)
+            // La consigne dit CE QU'IL FAUT FAIRE, selon le verdict (28/10/2026) ; avant,
+            // « tout coup qui préserve le verdict est accepté — arbitrage vérifié moteur »,
+            // juste mais abstrait, en très petit. La nuance « vérifié par le moteur » reste.
+            Text(goalInstruction)
+                .font(.caption)
+                .foregroundStyle(Theme.textSecondary)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(.horizontal, 20)
         .accessibilityElement(children: .combine)
+    }
+
+    private var goalInstruction: LocalizedStringKey {
+        switch viewModel.baselineVerdict {
+        case .win: "Gardez le gain : tout coup qui reste gagnant est accepté (vérifié par le moteur)."
+        case .draw: "Gardez la nulle : tout coup qui la conserve est accepté (vérifié par le moteur)."
+        case .loss, nil: "Tenez le verdict : tout coup qui le préserve est accepté (vérifié par le moteur)."
+        }
     }
 
     private func tint(for verdict: EndgameVerdict) -> Color {
