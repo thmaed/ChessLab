@@ -2385,7 +2385,13 @@ private struct PuzzleSessionHost: View {
                 // ``PuzzleQueueView``) : une combinaison vide arrive ICI, et
                 // le message dit laquelle des raisons s'applique.
                 Group {
-                    if filter.missedOnly {
+                    if filter.reviewOnly {
+                        ContentUnavailableView(
+                            "Aucun puzzle à revoir",
+                            systemImage: "checkmark.seal",
+                            description: Text("Vous avez trouvé proprement chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.")
+                        )
+                    } else if filter.missedOnly {
                         ContentUnavailableView(
                             "Aucun puzzle raté",
                             systemImage: "checkmark.seal",

@@ -66,6 +66,14 @@ struct PlayControlBar: View {
     /// ne tient pas ; mieux vaut ne pas le montrer.
     let onOfferDraw: (() -> Void)?
     let onResign: () -> Void
+    /// En consultation AVEC PENDULE, « Reprendre ici » n'existe pas : cette
+    /// pastille prend sa place et mène à l'Analyse, où l'on peut essayer
+    /// d'autres coups (retour d'un utilisateur, 28/10/2026 : le bouton
+    /// disparaissait sans un mot). `nil` : l'écran n'en propose pas.
+    var onAnalyzeHere: (() -> Void)? = nil
+    /// Vrai quand SEULE la pendule interdit la reprise — sans quoi la pastille
+    /// clignoterait chaque fois que le moteur réfléchit.
+    var resumeBlockedByClock = false
 
     /// Côté d'un bouton rond. Le minimum des Human Interface Guidelines est
     /// 44 pt : ces 46 ne se négocient pas quand la place manque, ce sont les
@@ -113,6 +121,28 @@ struct PlayControlBar: View {
                 }
                 .buttonStyle(.pressable)
                 .transition(.opacity)
+            }
+
+            // Pendule : pas de reprise possible, mais une porte vers l'Analyse à la
+            // MÊME place — texte seul et court, comme « Reprendre ici », pour ne
+            // rien coûter en largeur (voir `PlayControlBarLayoutTests`).
+            if isReviewing, !canResumeFromReview, resumeBlockedByClock, let onAnalyzeHere {
+                elasticGap
+                Button(action: onAnalyzeHere) {
+                    Text("Analyser ici")
+                        .font(.caption.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .foregroundStyle(Theme.violet)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Theme.violet.opacity(0.14), in: Capsule())
+                        .overlay(Capsule().strokeBorder(Theme.violet.opacity(0.4), lineWidth: 1))
+                }
+                .buttonStyle(.pressable)
+                .transition(.opacity)
+                .accessibilityIdentifier("analyzeHereButton")
+                .accessibilityHint("Ouvre l'analyse sur la position affichée pour essayer d'autres coups")
             }
 
             // Juste après la reprise, la même place accueille l'annulation :

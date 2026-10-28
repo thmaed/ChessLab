@@ -24,6 +24,9 @@ final class PuzzleProgress {
     var externalID: String = ""
     var successCount: Int = 0
     var failureCount: Int = 0
+    /// Issue de la dernière tentative (``PuzzleOutcome/rawValue``) ; `nil` si
+    /// elle date d'avant ce champ.
+    var lastOutcomeRaw: Int?
     var easinessFactor: Double = 2.5
     var intervalDays: Int = 0
     var repetitions: Int = 0

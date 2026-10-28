@@ -149,6 +149,9 @@ fun PuzzleScreen(
             val plan = ui.woodpeckerPlan
             ResultCard(
                 solved = ui.outcome == PuzzleOutcome.solved,
+                // Un puzzle partiel revient vite : le dire, plutôt que de laisser
+                // « Résolu ! » promettre un puzzle acquis (pas dans un programme).
+                partial = ui.result == PuzzleResult.partial && plan == null,
                 modifier = Modifier.padding(horizontal = 20.dp),
                 onNext = if (plan?.currentCycle?.isComplete == true) model::startNextCycle else model::next,
                 sourcePgn = ui.puzzle?.sourcePgn,
@@ -430,6 +433,7 @@ private fun HintButton(onClick: () -> Unit) {
 @Composable
 private fun ResultCard(
     solved: Boolean,
+    partial: Boolean = false,
     modifier: Modifier,
     onNext: () -> Unit,
     sourcePgn: String? = null,
@@ -460,10 +464,19 @@ private fun ResultCard(
                 )
             }
             Spacer(Modifier.width(12.dp))
-            Text(
-                stringResource(if (solved) R.string.puzzle_solved_bang else R.string.puzzle_revealed),
-                fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary,
-            )
+            Column {
+                Text(
+                    stringResource(if (solved) R.string.puzzle_solved_bang else R.string.puzzle_revealed),
+                    fontSize = 19.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary,
+                )
+                if (partial) {
+                    Text(
+                        stringResource(R.string.puzzle_partial_note),
+                        fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Palette.warning,
+                        modifier = Modifier.testTag("puzzlePartialNote"),
+                    )
+                }
+            }
         }
         cycleSummary?.let { WoodpeckerCycleSummary(it) }
         Text(

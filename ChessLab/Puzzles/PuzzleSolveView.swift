@@ -359,9 +359,19 @@ struct PuzzleSolveView: View {
                         .foregroundStyle(viewModel.isSolved ? Theme.accent : Theme.textSecondary)
                 }
                 .glow(Theme.accent, radius: 10, isActive: viewModel.isSolved)
-                Text(viewModel.isSolved ? "Résolu !" : "Solution révélée")
-                    .font(.title3.bold())
-                    .foregroundStyle(Theme.textPrimary)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(viewModel.isSolved ? "Résolu !" : "Solution révélée")
+                        .font(.title3.bold())
+                        .foregroundStyle(Theme.textPrimary)
+                    // Un puzzle partiel revient vite : le dire, plutôt que de
+                    // laisser « Résolu ! » promettre un puzzle acquis.
+                    if viewModel.outcome == .partial, !viewModel.isWoodpecker {
+                        Text("À revoir : il reviendra dans 2 jours.")
+                            .font(.footnote.weight(.medium))
+                            .foregroundStyle(Theme.warning)
+                            .accessibilityIdentifier("puzzlePartialNote")
+                    }
+                }
                 Spacer()
             }
 

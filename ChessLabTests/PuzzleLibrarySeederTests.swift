@@ -41,12 +41,34 @@ struct PuzzleLibrarySeederTests {
         }
     }
 
+    /// La bibliothèque embarquée reste équilibrée : une régénération qui viderait une
+    /// cellule (tranche de cote × thème) ou casserait la forme d'une solution se voit ici.
+    @Test func bundledLibraryCoversEveryThemeAtEveryMainLevel() {
+        let entries = LichessPuzzleLoader.standard
+        #expect(entries.count >= 130_000)
+        #expect(Set(entries.map(\.id)).count == entries.count)
+        // Solution = coup du joueur, puis (riposte, coup)* : toujours un nombre impair.
+        #expect(entries.allSatisfy { $0.solutionLANs.count % 2 == 1 })
+
+        var cells: [String: Int] = [:]
+        for entry in entries { cells["\((entry.rating / 200) * 200)|\(entry.theme)", default: 0] += 1 }
+        let themes = Set(entries.map(\.theme))
+        #expect(themes.count == 8)
+        for bucket in stride(from: 800, through: 2200, by: 200) {
+            for theme in themes {
+                #expect((cells["\(bucket)|\(theme)"] ?? 0) >= 500, "tranche \(bucket), thème \(theme)")
+            }
+        }
+        // Les séquences de 4 coups du joueur ou plus restent représentées.
+        #expect(entries.filter { $0.solutionLANs.count >= 7 }.count >= 10_000)
+    }
+
     @MainActor
     @Test func seedInsertsBundledPuzzlesIntoEmptyContext() throws {
         // Le marqueur "déjà semé" vit dans `UserDefaults.standard`, qui
         // persiste entre les exécutions de test sur le même simulateur —
         // réinitialisé ici pour ne pas dépendre de l'ordre d'exécution.
-        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
+        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV5")
 
         let schema = Schema([Puzzle.self])
         let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
@@ -60,7 +82,7 @@ struct PuzzleLibrarySeederTests {
         #expect(items.allSatisfy { $0.externalID != nil })
         #expect(items.allSatisfy { $0.phaseRaw != nil })
 
-        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
+        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV5")
     }
 
     /// 🐛 Régression « Aucun puzzle » : après la séparation des stores
@@ -90,7 +112,7 @@ struct PuzzleLibrarySeederTests {
 
     @MainActor
     @Test func seedingTwiceDoesNotDuplicatePuzzles() throws {
-        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
+        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV5")
 
         let schema = Schema([Puzzle.self])
         let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
@@ -100,7 +122,7 @@ struct PuzzleLibrarySeederTests {
         // n'ait pu faire effet (ex. deux `.onAppear` rapprochés) : réinit
         // manuellement pour forcer le passage du garde-fou et vérifier
         // que la déduplication par `externalID` protège quand même.
-        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
+        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV5")
         PuzzleLibrarySeeder.seedSynchronously(container: container)
 
         let items = try ModelContext(container).fetch(FetchDescriptor<Puzzle>())
@@ -108,7 +130,7 @@ struct PuzzleLibrarySeederTests {
         let externalIDs = items.compactMap(\.externalID)
         #expect(Set(externalIDs).count == externalIDs.count)
 
-        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
+        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV5")
     }
 
     /// Migration V2 → V3 : un puzzle bibliothèque déjà travaillé
@@ -117,7 +139,7 @@ struct PuzzleLibrarySeederTests {
     /// remplacé ; `phaseRaw` est rattrapé partout.
     @MainActor
     @Test func reseedingKeepsAttemptedPuzzlesAndBackfillsPhase() throws {
-        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
+        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV5")
 
         let schema = Schema([Puzzle.self])
         let container = try ModelContainer(for: schema, configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
@@ -148,6 +170,6 @@ struct PuzzleLibrarySeederTests {
         #expect(items.count == LichessPuzzleLoader.standard.count + 1)
         #expect(items.allSatisfy { $0.phaseRaw != nil })
 
-        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV4")
+        UserDefaults.standard.removeObject(forKey: "lichessPuzzleLibrarySeededV5")
     }
 }

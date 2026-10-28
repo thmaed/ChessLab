@@ -533,6 +533,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="play_offer_draw">Proposer nulle</string>
     <string name="play_resign">Abandonner</string>
     <string name="play_resume_here">Reprendre ici</string>
+    <string name="play_analyze_here">Analyser ici</string>
     <string name="play_close">Fermer</string>
     <string name="play_resign_confirm">Abandonner cette partie ?</string>
     <string name="cancel">Annuler</string>
@@ -1078,6 +1079,9 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_provenance">Provenance</string>
     <string name="puzzle_history">Historique</string>
     <string name="puzzle_missed">Ratés</string>
+    <string name="puzzle_review">À revoir</string>
+    <string name="puzzle_no_review">Aucun puzzle à revoir — vous avez trouvé proprement chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.</string>
+    <string name="puzzle_partial_note">À revoir : il reviendra dans 2 jours.</string>
     <string name="puzzle_no_missed">Aucun puzzle raté — vous avez réussi chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.</string>
     <string name="puzzle_level">Niveau</string>
     <string name="puzzle_phase">Phase</string>
@@ -1245,7 +1249,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="setup_replace_message">Commencer une nouvelle partie effacera la partie en cours (%1$d demi-coup(s) joué(s)).</string>
     <string name="setup_replace_confirm">Remplacer</string>
     <string name="setup_replace_cancel">Annuler</string>
-    <string name="play_analyze_hint">Analyser = revoir vos coups et créer des puzzles avec vos erreurs.</string>
+    <string name="play_analyze_hint">Analyser = revoir vos coups, essayer d\'autres lignes et créer des puzzles avec vos erreurs.</string>
     <string name="offer_title">Créer des puzzles de cette partie ?</string>
     <string name="offer_subtitle">Ils rejoindront « Mes parties », dans Puzzles.</string>
     <string name="offer_row_mate">Coup %1$d : un mat était possible (vous avez joué %2$s).</string>

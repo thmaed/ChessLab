@@ -222,6 +222,18 @@ class TransferMergeTest {
         theme = "fork", rating = 1500,
     )
 
+    @Test fun `l'issue d'un puzzle voyage dans le fichier, et son absence se lit null`() {
+        val file = TransferFile(
+            exportedAt = 1, device = "Galaxy", reviewLog = emptyList(), games = emptyList(),
+            puzzlesAttempted = 0, puzzlesSolved = 0,
+            puzzleProgress = listOf(progress("partiel", 1_000).copy(lastOutcome = 1), progress("ancien", 2_000)),
+            woodpecker = emptyList(),
+        )
+        val back = TransferFile.decode(TransferFile.encode(file)).getOrThrow()
+        assertEquals(1, back.puzzleProgress.first { it.externalId == "partiel" }.lastOutcome)
+        assertEquals(null, back.puzzleProgress.first { it.externalId == "ancien" }.lastOutcome)
+    }
+
     @Test fun `la progression d'un puzzle la plus récente l'emporte`() {
         val local = mapOf("a" to 100L, "b" to 300L)
         val incoming = listOf(progress("a", 200), progress("b", 200), progress("c", 50))

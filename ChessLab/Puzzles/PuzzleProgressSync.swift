@@ -30,6 +30,7 @@ enum PuzzleProgressSync {
         }()
         record.successCount = puzzle.successCount ?? 0
         record.failureCount = puzzle.failureCount ?? 0
+        record.lastOutcomeRaw = puzzle.lastOutcomeRaw
         record.easinessFactor = puzzle.easinessFactor ?? 2.5
         record.intervalDays = puzzle.intervalDays ?? 0
         record.repetitions = puzzle.repetitions ?? 0
@@ -77,6 +78,7 @@ enum PuzzleProgressSync {
             puzzle.failureCount = mergedFailure
             // L'état SRS le plus AVANCÉ (plus de répétitions) fait foi.
             if progress.repetitions > (puzzle.repetitions ?? 0) {
+                puzzle.lastOutcomeRaw = progress.lastOutcomeRaw
                 puzzle.easinessFactor = progress.easinessFactor
                 puzzle.intervalDays = progress.intervalDays
                 puzzle.repetitions = progress.repetitions

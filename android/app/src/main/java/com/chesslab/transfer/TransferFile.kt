@@ -81,6 +81,8 @@ data class TransferFile(
         val updatedAt: Long,
         val theme: String,
         val rating: Int,
+        /** Issue de la dernière tentative ; `null` pour un fichier d'avant le 28/10/2026. */
+        val lastOutcome: Int? = null,
     )
 
     data class WoodpeckerEntry(
@@ -187,6 +189,7 @@ data class TransferFile(
                         .put("easiness", p.easinessFactor).put("interval", p.intervalDays)
                         .put("repetitions", p.repetitions).put("dueAt", p.dueAt ?: JSONObject.NULL)
                         .put("updatedAt", p.updatedAt).put("theme", p.theme).put("rating", p.rating)
+                        .put("outcome", p.lastOutcome ?: JSONObject.NULL)
                 )
             }
             root.put("puzzleProgress", progress)
@@ -280,6 +283,8 @@ data class TransferFile(
                         dueAt = if (o.isNull("dueAt") || !o.has("dueAt")) null else o.optLong("dueAt"),
                         updatedAt = o.optLong("updatedAt"), theme = o.optString("theme", "tactic"),
                         rating = o.optInt("rating"),
+                        // Absent d'un fichier d'avant le 28/10/2026 : `null`.
+                        lastOutcome = if (o.isNull("outcome") || !o.has("outcome")) null else o.optInt("outcome"),
                     )
                 }
             }

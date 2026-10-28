@@ -7,6 +7,40 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Bibliothèque de puzzles : +24 841 — 28/10/2026
+
+- [ ] Même fichier des deux côtés (`ChessLab/Resources/lichess_puzzles.json`, copié au
+      build) : 130 935 puzzles. Rien à porter ; **à vérifier sur le Galaxy** : la durée
+      d'un tirage (le JSON de 23 Mo est lu en flux à chaque série) et la taille de l'APK.
+
+### Réussite partielle des puzzles et « Analyser ici » — 28/10/2026
+
+Portés dans le même chantier que iOS. **Rien n'est coché sur appareil** : à
+vérifier sur le Galaxy avant de cocher.
+
+- [ ] **Trois issues** (maîtrisé / partiel / raté) au lieu du binaire. Partiel =
+      séquence où au moins un coup est juste puis échec, OU résolu après une
+      fausse tentative (réglage 3 essais). L'indice ne rend PAS partiel (décision
+      du 23/10 : réussi avec indice = réussi). iOS `PuzzleOutcome`, Android
+      `PuzzleResult` (l'autre nom y désigne l'état de l'écran).
+- [ ] SM-2 : qualité 3, retour à 2 jours, `repetitions` inchangé. Compteurs
+      succès/échec inchangés (stats stables) ; cote Glicko inchangée.
+- [ ] Puce **« À revoir »** (EN « Review ») à côté de « Ratés », grisée à zéro,
+      exclusive avec elle. « Ratés » = issue `missed`, ou ancienne ligne sans issue
+      lue comme avant.
+- [ ] Base v11 → v12 (`lastOutcome`), fichier `.clab` : champ `outcome` optionnel,
+      pas de changement de `version` (un fichier ancien se lit, un nouveau lu par
+      une ancienne version est ignoré). Tests JVM + `MigrationTest` verts.
+- [ ] **« Analyser ici »** : en consultation AVEC pendule, pastille à la place de
+      « Reprendre ici » (qui n'existe pas), vers l'Analyse sur la position
+      affichée. Retour d'un utilisateur : le bouton disparaissait sans un mot.
+- [ ] Phrase de fin de partie : « … essayer d'autres lignes … ».
+- Écart connu : la séance du jour (`DailySession`) ne compte que les « Ratés » ;
+  les partiels n'y sont pas encore proposés (iOS et Android pareil).
+- Écart de synchro iOS : le miroir CloudKit adopte l'issue avec l'état de
+  révision « le plus avancé » (`repetitions`) ; un partiel, qui ne change pas ce
+  compteur, ne se propage pas d'un appareil à l'autre avant la prochaine réussite.
+
 ### Puzzles Android : l'en-tête qui repoussait le plateau — 24/10/2026
 
 - [x] **Signalé par l'utilisateur sur le Galaxy** : un puzzle « Attaque à la

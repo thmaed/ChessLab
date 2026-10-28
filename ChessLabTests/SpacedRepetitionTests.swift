@@ -51,4 +51,35 @@ struct SpacedRepetitionTests {
         let due = SpacedRepetition.dueDate(for: schedule, from: reference)
         #expect(due.timeIntervalSince(reference) == 6 * 24 * 3600)
     }
+
+    // MARK: Partiel
+
+    @Test func partialReturnsInTwoDaysAndKeepsRepetitions() {
+        let acquired = SpacedRepetition.Schedule(easinessFactor: 2.5, intervalDays: 6, repetitions: 2)
+        let result = SpacedRepetition.next(after: acquired, outcome: .partial)
+        #expect(result.intervalDays == SpacedRepetition.partialIntervalDays)
+        #expect(result.repetitions == 2)
+    }
+
+    @Test func partialLowersEasinessLessThanMissedAndMoreThanMastered() {
+        let start = SpacedRepetition.Schedule.initial
+        let mastered = SpacedRepetition.next(after: start, outcome: .mastered).easinessFactor
+        let partial = SpacedRepetition.next(after: start, outcome: .partial).easinessFactor
+        let missed = SpacedRepetition.next(after: start, outcome: .missed).easinessFactor
+        #expect(mastered > partial)
+        #expect(partial > missed)
+    }
+
+    @Test func booleanOverloadStillMapsToMasteredAndMissed() {
+        let start = SpacedRepetition.Schedule.initial
+        #expect(SpacedRepetition.next(after: start, success: true) == SpacedRepetition.next(after: start, outcome: .mastered))
+        #expect(SpacedRepetition.next(after: start, success: false) == SpacedRepetition.next(after: start, outcome: .missed))
+    }
+
+    @Test func outcomeClassification() {
+        #expect(PuzzleOutcome.classify(solved: true, hadWrongAttempt: false, playerMovesFound: 3) == .mastered)
+        #expect(PuzzleOutcome.classify(solved: true, hadWrongAttempt: true, playerMovesFound: 3) == .partial)
+        #expect(PuzzleOutcome.classify(solved: false, hadWrongAttempt: true, playerMovesFound: 1) == .partial)
+        #expect(PuzzleOutcome.classify(solved: false, hadWrongAttempt: true, playerMovesFound: 0) == .missed)
+    }
 }

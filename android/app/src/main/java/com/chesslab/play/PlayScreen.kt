@@ -196,6 +196,7 @@ fun PlayScreen(
             onPrevious = model::reviewPrevious,
             onNext = model::reviewNext,
             onResumeHere = model::resumeFromReview,
+            onAnalyzeHere = { onAnalyze(ui.position.fen) },
             onCancelResume = model::cancelResumeFromReview,
             onHint = { model.toggleHint() },
             onTakeback = { model.takeback() },
@@ -478,6 +479,8 @@ private fun ControlBar(
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     onResumeHere: () -> Unit,
+    /** Consultation AVEC pendule : la porte vers l'Analyse, à la place de « Reprendre ici ». */
+    onAnalyzeHere: () -> Unit = {},
     onCancelResume: () -> Unit,
     onHint: () -> Unit,
     onTakeback: () -> Unit,
@@ -507,6 +510,23 @@ private fun ControlBar(
                     .clickable(onClick = onResumeHere)
                     .padding(horizontal = 12.dp, vertical = 6.dp)
                     .testTag("reprendre-ici"),
+            )
+        }
+        // Pendule : pas de reprise possible, mais une porte vers l'Analyse à la
+        // MÊME place, en texte court comme « Reprendre ici » (retour d'un
+        // utilisateur, 28/10/2026 : le bouton disparaissait sans un mot).
+        if (ui.isReviewing && !ui.canResumeFromReview && ui.settings.timeControl.hasClock) {
+            Spacer(Modifier.width(10.dp))
+            Text(
+                stringResource(R.string.play_analyze_here),
+                fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.violet,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(Palette.violet.copy(alpha = 0.14f))
+                    .border(1.dp, Palette.violet.copy(alpha = 0.4f), CircleShape)
+                    .clickable(onClick = onAnalyzeHere)
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .testTag("analyser-ici"),
             )
         }
         // Huit secondes pour se raviser : la reprise écarte des coups sans

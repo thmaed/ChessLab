@@ -33,8 +33,11 @@ struct PuzzleQueueView: View {
     @State private var atMyLevel = false
     @State private var puzzleRating = PuzzleRatingStore.load()
     @State private var missedOnly = false
+    @State private var reviewOnly = false
     /// Puzzles ratés à la dernière tentative : à zéro, la puce « Ratés » est grisée (rien à y retrouver).
     @State private var missedCount = 0
+    /// Puzzles partiels : même règle, la puce « À revoir » est grisée à zéro.
+    @State private var reviewCount = 0
 
     @State private var hasAnyPuzzle = true
     /// Bilan (Lot 5.B), recalculé à l'apparition — voir ``refresh()``.
@@ -48,7 +51,7 @@ struct PuzzleQueueView: View {
     private var currentFilter: PuzzleSessionFilter {
         PuzzleSessionFilter(
             difficulty: selectedDifficulty, phase: selectedPhase, theme: selectedTheme,
-            source: selectedSource, missedOnly: missedOnly,
+            source: selectedSource, missedOnly: missedOnly, reviewOnly: reviewOnly,
             ratingWindow: atMyLevel ? puzzleRating.window : nil
         )
     }
@@ -87,16 +90,25 @@ struct PuzzleQueueView: View {
                             }
 
                             filterGroup(title: "Historique", systemImage: "clock.arrow.circlepath", tint: Theme.rose) {
-                                FilterChip(label: "Tous", tint: Theme.rose, isSelected: !missedOnly) {
+                                FilterChip(label: "Tous", tint: Theme.rose, isSelected: !missedOnly && !reviewOnly) {
                                     missedOnly = false
+                                    reviewOnly = false
                                 }
                                 .accessibilityIdentifier("historique-tous")
                                 FilterChip(label: "Ratés", icon: "xmark.circle.fill", tint: Theme.rose, isSelected: missedOnly) {
                                     missedOnly.toggle()
+                                    reviewOnly = false
                                 }
                                 .disabled(missedCount == 0)
                                 .opacity(missedCount == 0 ? 0.35 : 1)
                                 .accessibilityIdentifier("historique-rates")
+                                FilterChip(label: "À revoir", icon: "arrow.counterclockwise.circle.fill", tint: Theme.rose, isSelected: reviewOnly) {
+                                    reviewOnly.toggle()
+                                    missedOnly = false
+                                }
+                                .disabled(reviewCount == 0)
+                                .opacity(reviewCount == 0 ? 0.35 : 1)
+                                .accessibilityIdentifier("historique-a-revoir")
                             }
 
                             // Masqué pour « Mes parties » : sans cote, aucun
@@ -348,7 +360,7 @@ struct PuzzleQueueView: View {
             ? LocalizationController.string("À mon niveau") + " (\(puzzleRating.window.lowerBound)–\(puzzleRating.window.upperBound))"
             : nil
         let parts = [
-            selectedSource?.label, missedOnly ? "Ratés" : nil,
+            selectedSource?.label, missedOnly ? "Ratés" : nil, reviewOnly ? "À revoir" : nil,
             selectedDifficulty?.label, myLevel, selectedPhase?.label, selectedTheme?.label,
         ]
             .compactMap { $0 }
@@ -451,6 +463,8 @@ struct PuzzleQueueView: View {
         hasAnyPuzzle = ((try? modelContext.fetchCount(totalDescriptor)) ?? 0) > 0
         missedCount = PuzzleSessionDrawer.count(matching: PuzzleSessionFilter(source: nil, missedOnly: true), in: modelContext)
         if missedCount == 0 { missedOnly = false }
+        reviewCount = PuzzleSessionDrawer.count(matching: PuzzleSessionFilter(source: nil, reviewOnly: true), in: modelContext)
+        if reviewCount == 0 { reviewOnly = false }
 
         // ⚠️ Ne charge QUE les puzzles réellement tentés : la bibliothèque
         // Lichess embarquée en compte des dizaines de milliers, et les

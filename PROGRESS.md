@@ -10699,3 +10699,46 @@ glisser prenait. Invisible en iOS 26, donc sur tous nos simulateurs.
 - Test : `TapCaptureUITests` (puzzle déterministe 00008, qui commence par
   Txe7) — rouge avant, vert après sur l'iPhone XS ; tous les tests
   d'échiquier verts sur simulateur.
+
+## 28/10 — Puzzles : réussite partielle, et « Analyser ici » avec pendule (iOS + Android)
+
+Deux retours d'utilisateurs le même jour.
+
+- **Réussite partielle.** Un puzzle avait deux issues ; il en a trois
+  (`PuzzleOutcome` iOS, `PuzzleResult` Android) : maîtrisé, partiel (un coup juste
+  au moins puis échec, ou résolu après une fausse tentative en mode 3 essais),
+  raté. SM-2 : qualité 3, retour à 2 jours, `repetitions` inchangé. Nouvelle puce
+  « À revoir » à côté de « Ratés ». Stats et cote inchangées. L'indice ne rend
+  pas partiel (décision du 23/10 maintenue). Champ `lastOutcomeRaw` optionnel
+  (SwiftData/CloudKit), colonne `lastOutcome` (Room v12), `outcome` dans `.clab`.
+- **« Analyser ici ».** En consultation d'une partie AVEC pendule, « Reprendre
+  ici » n'existe pas et rien ne le disait. Une pastille « Analyser ici » prend sa
+  place et ouvre l'Analyse sur la position affichée ; la phrase de fin de partie
+  parle désormais d'« essayer d'autres lignes ».
+- Tests : iOS `SpacedRepetitionTests` (+4), `PuzzleSessionDrawerTests` (+5),
+  `PuzzleProgressSyncTests` (+1), `PlayControlBarLayoutTests` (+1) ; Android
+  `PuzzleScheduleTest` (+5), `TransferMergeTest` (+1), `MigrationTest` (v12).
+- Piège : le prédicat « Ratés » d'un seul bloc dépasse le typeur Swift — le
+  découper en sous-prédicats.
+
+## 28/10 — Bibliothèque de puzzles : +24 841 (130 935 au total), iOS + Android
+
+Le script qui avait produit la bibliothèque n'avait jamais été versionné ; le nouveau l'est :
+`tools/puzzles-library/extend.py` (python-chess + zstd, tirage reproductible, `--dry-run`).
+Il AJOUTE sans rien retirer (les 106 094 identifiants et toute progression restent).
+
+- **Ce qui manquait, mesuré :** sous 600 : 445 puzzles ; au-dessus de 2400 : ~3 700 ;
+  cellules creuses (« Sacrifice » à 600 : 150) ; séquences de 4 coups du joueur ou plus :
+  ~6 500 seulement (celles à 3 coups sont 37 000 — première lecture fausse, corrigée).
+- **Plan :** planchers par tranche (1 000 par thème sous 600, 1 100 de 600 à 800,
+  1 000 / 600 / 200 à 2400 / 2600 / 2800), puis le reste en séquences longues entre 800 et
+  2200, les plus longues d'abord ; phases à tour de rôle avec l'ouverture comptée deux fois.
+- **Résultat :** séquences de 4 coups et plus 6 500 → ~18 000 ; 2400+ : ~3 700 → ~13 700 ;
+  ouverture 26 387 → 27 908 (les puzzles d'ouverture de qualité sont rares dans la base) ;
+  sous 600 seulement 445 → 3 161 (peu de puzzles très faciles passent les filtres).
+- **Contrôles :** 0 solution illégale (vérifiée coup par coup), 0 doublon, anciens conservés.
+- **Poids :** JSON 18,7 → 23,4 Mo ; la base iOS grossit d'environ 14 Mo. Android lit le JSON
+  en flux (`JsonReader`) : un tirage parcourt 25 % de données en plus.
+- **iOS :** marqueur de préchargement V4 → V5 (une installation existante n'ajoute que les
+  nouveaux). Test `bundledLibraryCoversEveryThemeAtEveryMainLevel`.
+- **Android :** même fichier (copié au build), aucun changement de code.

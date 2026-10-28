@@ -1,10 +1,10 @@
 import Foundation
 
 /// SM-2 simplifié (algorithme de répétition espacée popularisé par
-/// Anki/SuperMemo) : au lieu d'une note qualité 0...5, on ne retient que
-/// réussi/échoué (mappé respectivement à qualité 5 et 2) — suffisant
-/// pour un puzzle "trouvé du premier coup" vs "raté", pas de note
-/// intermédiaire à demander à l'utilisateur.
+/// Anki/SuperMemo) : au lieu d'une note qualité 0...5 à demander à
+/// l'utilisateur, la qualité se déduit de l'issue (``PuzzleOutcome``) :
+/// maîtrisé = 5, partiel = 3, raté = 2. Le partiel revient vite (deux jours)
+/// sans effacer la série de réussites d'un puzzle déjà acquis.
 enum SpacedRepetition {
     struct Schedule: Equatable {
         var easinessFactor: Double
@@ -16,17 +16,39 @@ enum SpacedRepetition {
 
     private static let minimumEasinessFactor = 1.3
     private static let successQuality = 5.0
+    private static let partialQuality = 3.0
     private static let failureQuality = 2.0
+    /// Délai de retour d'un puzzle partiel : entre le lendemain d'un échec et
+    /// les six jours de la deuxième réussite.
+    static let partialIntervalDays = 2
 
     /// Calcule le prochain intervalle après une tentative — un échec
     /// remet `repetitions` à zéro et impose une révision dès le
     /// lendemain, sans jamais faire chuter `easinessFactor` sous le
     /// plancher SM-2 standard (1.3).
     static func next(after schedule: Schedule, success: Bool) -> Schedule {
-        let quality = success ? successQuality : failureQuality
+        next(after: schedule, outcome: success ? .mastered : .missed)
+    }
+
+    /// Même calcul, avec l'issue à trois états. Un partiel garde `repetitions`
+    /// tel quel (ni remis à zéro, ni incrémenté) et revient dans
+    /// ``partialIntervalDays`` jours.
+    static func next(after schedule: Schedule, outcome: PuzzleOutcome) -> Schedule {
+        let success = outcome == .mastered
+        let quality: Double
+        switch outcome {
+        case .mastered: quality = successQuality
+        case .partial: quality = partialQuality
+        case .missed: quality = failureQuality
+        }
         let delta = 0.1 - (5 - quality) * (0.08 + (5 - quality) * 0.02)
         let easinessFactor = max(minimumEasinessFactor, schedule.easinessFactor + delta)
 
+        if outcome == .partial {
+            return Schedule(
+                easinessFactor: easinessFactor, intervalDays: partialIntervalDays, repetitions: schedule.repetitions
+            )
+        }
         guard success else {
             return Schedule(easinessFactor: easinessFactor, intervalDays: 1, repetitions: 0)
         }

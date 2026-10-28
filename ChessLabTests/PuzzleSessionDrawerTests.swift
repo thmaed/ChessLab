@@ -36,6 +36,7 @@ struct PuzzleSessionDrawerTests {
         source: PuzzleSource? = .lichess,
         failures: Int = 0,
         repetitions: Int = 0,
+        outcome: PuzzleOutcome? = nil,
         dueInDays: Int = 0,
         fen: String = "7k/6pp/8/8/8/8/8/RR4K1 w - - 0 1",
         solution: [String] = ["a1a8"]
@@ -44,6 +45,7 @@ struct PuzzleSessionDrawerTests {
         puzzle.sourceRaw = source?.rawValue
         puzzle.failureCount = failures
         puzzle.repetitions = repetitions
+        puzzle.lastOutcomeRaw = outcome?.rawValue
         puzzle.dueDate = Calendar.current.date(byAdding: .day, value: dueInDays, to: Date())
         puzzle.fen = fen
         puzzle.solutionLANs = solution
@@ -92,6 +94,82 @@ struct PuzzleSessionDrawerTests {
         #expect(viewModel.isSolved)
         #expect(puzzle.repetitions == 1)
         #expect(PuzzleSessionDrawer.drawNext(matching: filter, in: context) == nil)
+    }
+
+    // MARK: À revoir (réussite partielle)
+
+    @Test func reviewOnlyKeepsPartialPuzzlesAndMissedOnlyLeavesThemOut() throws {
+        let context = try makeContext()
+        let partial = insertPuzzle(in: context, failures: 1, repetitions: 0, outcome: .partial, dueInDays: 2)
+        let missed = insertPuzzle(in: context, failures: 1, repetitions: 0, outcome: .missed, dueInDays: 1)
+        insertPuzzle(in: context, failures: 1, repetitions: 1, outcome: .mastered, dueInDays: 1)
+        try context.save()
+
+        #expect(drawnIDs(PuzzleSessionFilter(reviewOnly: true), in: context) == [partial.id])
+        #expect(drawnIDs(PuzzleSessionFilter(missedOnly: true), in: context) == [missed.id])
+    }
+
+    @Test func aPuzzleTriedBeforeTheOutcomeFieldIsStillReadAsMissed() throws {
+        let context = try makeContext()
+        // `lastOutcomeRaw == nil` : ancien enregistrement, lu par `failureCount`/`repetitions`.
+        let legacy = insertPuzzle(in: context, failures: 1, repetitions: 0, outcome: nil, dueInDays: 1)
+        try context.save()
+
+        #expect(drawnIDs(PuzzleSessionFilter(missedOnly: true), in: context) == [legacy.id])
+        #expect(PuzzleSessionDrawer.drawNext(matching: PuzzleSessionFilter(reviewOnly: true), in: context) == nil)
+    }
+
+    @Test func missingTheFirstMoveIsMissedNotPartial() throws {
+        let context = try makeContext()
+        AppSettings.shared.puzzleAttempts = 1
+        let puzzle = insertPuzzle(in: context)
+        try context.save()
+
+        let viewModel = try #require(PuzzleSolveViewModel(filter: PuzzleSessionFilter(), modelContext: context))
+        viewModel.attemptMove(from: Square("a1"), to: Square("a2"))
+        viewModel.finishRejectedAttempt()
+
+        #expect(viewModel.isFailed)
+        #expect(viewModel.outcome == .missed)
+        #expect(puzzle.lastOutcomeRaw == PuzzleOutcome.missed.rawValue)
+    }
+
+    @Test func failingLaterInTheSequenceIsPartial() async throws {
+        let context = try makeContext()
+        AppSettings.shared.puzzleAttempts = 1
+        // Ta2, riposte forcée Rg8, puis Ta8+ : on joue juste, puis on se trompe.
+        let puzzle = insertPuzzle(in: context, solution: ["a1a2", "h8g8", "a2a8"])
+        try context.save()
+
+        let viewModel = try #require(PuzzleSolveViewModel(filter: PuzzleSessionFilter(), modelContext: context))
+        viewModel.attemptMove(from: Square("a1"), to: Square("a2"))
+        try await Task.sleep(for: .seconds(1.2))   // la riposte adverse est différée
+        viewModel.attemptMove(from: Square("a2"), to: Square("a3"))
+        viewModel.finishRejectedAttempt()
+
+        #expect(viewModel.isFailed)
+        #expect(viewModel.outcome == .partial)
+        #expect(puzzle.lastOutcomeRaw == PuzzleOutcome.partial.rawValue)
+        #expect(puzzle.repetitions == 0)
+        #expect(puzzle.intervalDays == SpacedRepetition.partialIntervalDays)
+    }
+
+    @Test func solvingAfterAWrongAttemptIsPartial() throws {
+        let context = try makeContext()
+        AppSettings.shared.puzzleAttempts = 3
+        defer { AppSettings.shared.puzzleAttempts = 1 }
+        let puzzle = insertPuzzle(in: context)
+        try context.save()
+
+        let viewModel = try #require(PuzzleSolveViewModel(filter: PuzzleSessionFilter(), modelContext: context))
+        viewModel.attemptMove(from: Square("a1"), to: Square("a2"))
+        viewModel.finishRejectedAttempt()
+        viewModel.attemptMove(from: Square("a1"), to: Square("a8"))
+
+        #expect(viewModel.isSolved)
+        #expect(viewModel.outcome == .partial)
+        #expect(puzzle.successCount == 1)
+        #expect(puzzle.lastOutcomeRaw == PuzzleOutcome.partial.rawValue)
     }
 
     // MARK: Provenance

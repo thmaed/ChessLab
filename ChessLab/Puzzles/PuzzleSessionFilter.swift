@@ -18,6 +18,9 @@ struct PuzzleSessionFilter: Hashable {
     /// Seulement les puzzles RATÉS À LA DERNIÈRE TENTATIVE — voir
     /// ``PuzzleSessionDrawer/predicate(matching:neverOpenedOnly:excluding:)``.
     var missedOnly = false
+    /// Seulement les puzzles PARTIELS de la dernière tentative (``PuzzleOutcome/partial``) :
+    /// un coup juste au moins, mais pas la séquence propre. Exclusif avec `missedOnly`.
+    var reviewOnly = false
     /// Fenêtre de cotes « À mon niveau » (``PuzzleRating/window``), calculée au
     /// lancement de la série. Prime sur `difficulty` : les deux critères disent
     /// la même chose, l'un par palier, l'autre par la cote du joueur.
@@ -143,10 +146,12 @@ enum PuzzleSessionDrawer {
     /// Prédicat unique couvrant toutes les combinaisons de filtres, via
     /// des bornes/valeurs neutres pour les critères absents.
     ///
-    /// « Raté » se lit sans nouveau champ : un échec remet `repetitions` à
-    /// zéro (``SpacedRepetition``), un succès l'incrémente. `failureCount > 0
-    /// && repetitions == 0` dit donc exactement « la dernière tentative a
-    /// échoué » — et le puzzle quitte la liste dès qu'on le réussit. Un puzzle
+    /// « Raté » se lit sur `lastOutcomeRaw` (``PuzzleOutcome``) ; pour un
+    /// puzzle tenté AVANT ce champ (`nil`), l'ancienne lecture reste valable :
+    /// un échec remet `repetitions` à zéro (``SpacedRepetition``), un succès
+    /// l'incrémente, donc `failureCount > 0 && repetitions == 0` dit « la
+    /// dernière tentative a échoué ». « À revoir » = `partial`. Dans les deux
+    /// cas le puzzle quitte la liste dès qu'on le réussit proprement. Un puzzle
     /// réussi avec l'indice compte comme réussi (décision du 23/10/2026).
     ///
     /// En mode « ratés », l'échéance est IGNORÉE : un échec fixe la révision
@@ -191,8 +196,17 @@ enum PuzzleSessionDrawer {
         // Trois prédicats composés plutôt qu'un seul : d'un bloc, le
         // compilateur renonçait à typer l'expression.
         let schedule: Predicate<Puzzle>
+        let missedRaw = PuzzleOutcome.missed.rawValue
+        let partialRaw = PuzzleOutcome.partial.rawValue
         if filter.missedOnly {
-            schedule = #Predicate { ($0.failureCount ?? 0) > 0 && ($0.repetitions ?? 0) == 0 }
+            // Découpé : d'un bloc, le compilateur renonce à typer l'expression.
+            let byOutcome = #Predicate<Puzzle> { $0.lastOutcomeRaw == missedRaw }
+            let byLegacyReading = #Predicate<Puzzle> {
+                $0.lastOutcomeRaw == nil && ($0.failureCount ?? 0) > 0 && ($0.repetitions ?? 0) == 0
+            }
+            schedule = #Predicate { byOutcome.evaluate($0) || byLegacyReading.evaluate($0) }
+        } else if filter.reviewOnly {
+            schedule = #Predicate { $0.lastOutcomeRaw == partialRaw }
         } else if ignoresSchedule {
             schedule = #Predicate { _ in true }
         } else {

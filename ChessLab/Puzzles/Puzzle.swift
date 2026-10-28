@@ -132,6 +132,9 @@ final class Puzzle {
     var dueDate: Date? = Date()
     var successCount: Int? = 0
     var failureCount: Int? = 0
+    /// Issue de la dernière tentative (``PuzzleOutcome/rawValue``) ; `nil`
+    /// pour un puzzle tenté avant ce champ.
+    var lastOutcomeRaw: Int?
 
     init() {}
 

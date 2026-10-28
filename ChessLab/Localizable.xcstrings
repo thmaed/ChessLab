@@ -23523,16 +23523,6 @@
         }
       }
     },
-    "Analyser = revoir vos coups et créer des puzzles avec vos erreurs.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Analyse = review your moves and create puzzles from your mistakes."
-          }
-        }
-      }
-    },
     "Créer des puzzles de cette partie ?": {
       "localizations": {
         "en": {
@@ -23599,6 +23589,100 @@
           "stringUnit": {
             "state": "translated",
             "value": "Move %lld: %@ was a mistake."
+          }
+        }
+      }
+    },
+    "À revoir": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Review"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À revoir"
+          }
+        }
+      }
+    },
+    "Aucun puzzle à revoir": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No puzzles to review"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun puzzle à revoir"
+          }
+        }
+      }
+    },
+    "Vous avez trouvé proprement chaque puzzle qui correspond à ces filtres lors de votre dernière tentative.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You solved every puzzle matching these filters cleanly on your last attempt."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vous avez trouvé proprement chaque puzzle qui correspond à ces filtres lors de votre dernière tentative."
+          }
+        }
+      }
+    },
+    "À revoir : il reviendra dans 2 jours.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "To review: it will come back in 2 days."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À revoir : il reviendra dans 2 jours."
+          }
+        }
+      }
+    },
+    "Analyser = revoir vos coups, essayer d'autres lignes et créer des puzzles avec vos erreurs.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyse = review your moves, try other lines and create puzzles from your mistakes."
+          }
+        }
+      }
+    },
+    "Analyser ici": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyse here"
+          }
+        }
+      }
+    },
+    "Ouvre l'analyse sur la position affichée pour essayer d'autres coups": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Opens the analysis on the displayed position so you can try other moves"
           }
         }
       }

@@ -208,6 +208,7 @@ final class PuzzleSolveViewModel {
         attemptsRemaining = allowedAttempts
         isSolved = false
         isFailed = false
+        outcome = .mastered
         isAutoPlaying = false
         hintMoves = []
         hintUsed = false
@@ -450,7 +451,16 @@ final class PuzzleSolveViewModel {
         Haptics.move()
     }
 
+    /// Issue de cette tentative — voir ``PuzzleOutcome``. `currentStep` compte
+    /// coups du joueur ET ripostes : le joueur joue aux pas pairs.
+    private(set) var outcome: PuzzleOutcome = .mastered
+
     private func finish(success: Bool) {
+        outcome = PuzzleOutcome.classify(
+            solved: success,
+            hadWrongAttempt: attemptsRemaining < allowedAttempts,
+            playerMovesFound: (currentStep + 1) / 2
+        )
         if success {
             isSolved = true
         } else {
@@ -461,7 +471,7 @@ final class PuzzleSolveViewModel {
             recordWoodpeckerAnswer(success: success)
             return
         }
-        updateSchedule(success: success)
+        updateSchedule(success: success, outcome: outcome)
         // Prétire le puzzle suivant APRÈS la mise à jour SM-2 : le puzzle
         // courant n'est alors plus dû (son `dueDate` vient d'avancer) et
         // ne peut pas être retiré ; l'exclusion explicite reste par
@@ -489,7 +499,7 @@ final class PuzzleSolveViewModel {
         nextPuzzle = plan.currentItemIndex.map { plan.items[$0].makePuzzle() }
     }
 
-    private func updateSchedule(success: Bool) {
+    private func updateSchedule(success: Bool, outcome: PuzzleOutcome) {
         TrainingDays.markToday()
         // La cote personnelle : seuls les puzzles COTÉS de la bibliothèque
         // comptent (ceux de vos parties n'ont pas de cote).
@@ -501,7 +511,8 @@ final class PuzzleSolveViewModel {
             intervalDays: puzzle.intervalDays ?? 0,
             repetitions: puzzle.repetitions ?? 0
         )
-        let next = SpacedRepetition.next(after: schedule, success: success)
+        let next = SpacedRepetition.next(after: schedule, outcome: outcome)
+        puzzle.lastOutcomeRaw = outcome.rawValue
         puzzle.easinessFactor = next.easinessFactor
         puzzle.intervalDays = next.intervalDays
         puzzle.repetitions = next.repetitions

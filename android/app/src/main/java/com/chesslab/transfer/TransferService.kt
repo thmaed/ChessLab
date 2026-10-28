@@ -59,7 +59,7 @@ object TransferService {
             puzzleProgress = db.puzzleProgress().all().map {
                 TransferFile.PuzzleProgressEntry(
                     it.externalId, it.successCount, it.failureCount, it.easinessFactor,
-                    it.intervalDays, it.repetitions, it.dueAt, it.updatedAt, it.theme, it.rating,
+                    it.intervalDays, it.repetitions, it.dueAt, it.updatedAt, it.theme, it.rating, it.lastOutcome,
                 )
             },
             puzzleRating = StatsStore.puzzleRating(context).takeIf { it.count > 0 },
@@ -162,6 +162,7 @@ object TransferService {
                             failureCount = p.failureCount, easinessFactor = p.easinessFactor,
                             intervalDays = p.intervalDays, repetitions = p.repetitions,
                             dueAt = p.dueAt, updatedAt = p.updatedAt, theme = p.theme, rating = p.rating,
+                            lastOutcome = p.lastOutcome,
                         )
                     )
                 }

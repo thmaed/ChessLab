@@ -523,7 +523,9 @@ struct PlayView: View {
             onToggleHint: { viewModel.toggleHint() },
             onShowMoveList: { showPanelSheet = true },
             onOfferDraw: { showDrawConfirmation = true },
-            onResign: { showResignConfirmation = true }
+            onResign: { showResignConfirmation = true },
+            onAnalyzeHere: { onAnalyzePosition(viewModel.displayedFEN) },
+            resumeBlockedByClock: viewModel.settings.timeControl.hasClock
         )
     }
 
@@ -627,7 +629,7 @@ struct PlayView: View {
                 }
                 // Une phrase permanente plutôt qu'une infobulle : c'est le moment où l'on a une partie à
                 // analyser, et on ne sait pas qu'« Analyser » fabrique aussi des puzzles de ses erreurs.
-                Label("Analyser = revoir vos coups et créer des puzzles avec vos erreurs.", systemImage: "puzzlepiece.fill")
+                Label("Analyser = revoir vos coups, essayer d'autres lignes et créer des puzzles avec vos erreurs.", systemImage: "puzzlepiece.fill")
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(Theme.violet)
                     .padding(.horizontal, 12).padding(.vertical, 9)

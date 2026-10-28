@@ -216,7 +216,7 @@ interface AutosaveDao {
         com.chesslab.puzzles.OwnPuzzle::class, com.chesslab.puzzles.PuzzleProgress::class,
         com.chesslab.puzzles.WoodpeckerProgram::class,
     ],
-    version = 11, exportSchema = false,
+    version = 12, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
@@ -337,8 +337,20 @@ abstract class LibraryDatabase : RoomDatabase() {
          */
         val ALL_MIGRATIONS get() = arrayOf(
             MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
-            MIGRATION_9_10, MIGRATION_10_11,
+            MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
         )
+
+        /**
+         * v11 → v12 : l'issue de la dernière tentative d'un puzzle (réussite
+         * partielle, 28/10/2026). Une colonne optionnelle ; les puzzles déjà
+         * tentés gardent `NULL` et se lisent comme avant (`failureCount > 0 &&
+         * repetitions = 0` pour « raté »), comme iOS pour `lastOutcomeRaw`.
+         */
+        val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE puzzle_progress ADD COLUMN lastOutcome INTEGER")
+            }
+        }
 
         /**
          * v10 → v11 : le profil de faiblesses (A4, 24/10/2026). Cinq colonnes

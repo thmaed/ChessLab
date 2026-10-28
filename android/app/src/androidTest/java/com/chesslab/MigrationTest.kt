@@ -129,6 +129,15 @@ class MigrationTest {
             )
             assertEquals(1, db.ownPuzzles().count())
             assertEquals(1, db.ownPuzzles().countFor("6k1/8/8/3R4/8/4n3/6PP/6K1 b - - 0 1"))
+
+            // v12 : l'issue de la dernière tentative. Un puzzle sans issue (ancien) se lit
+            // « raté » par failureCount/repetitions ; un partiel n'est PAS dans les ratés.
+            val dao = db.puzzleProgress()
+            dao.put(com.chesslab.puzzles.PuzzleProgress(externalId = "ancien", failureCount = 1))
+            dao.put(com.chesslab.puzzles.PuzzleProgress(externalId = "partiel", failureCount = 1, lastOutcome = 1))
+            dao.put(com.chesslab.puzzles.PuzzleProgress(externalId = "rate", failureCount = 1, lastOutcome = 2))
+            assertEquals(setOf("ancien", "rate"), dao.missedIds().toSet())
+            assertEquals(listOf("partiel"), dao.reviewIds())
         } finally {
             db.close()
             context.deleteDatabase(name)

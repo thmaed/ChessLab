@@ -147,6 +147,12 @@ data class PuzzleFilter(
      */
     val missedOnly: Boolean = false,
     /**
+     * Seulement les puzzles PARTIELS de la dernière tentative ([PuzzleResult.partial]) :
+     * un coup juste au moins, mais pas la séquence propre. Exclusif avec
+     * [missedOnly]. Pendant de `PuzzleSessionFilter.reviewOnly`.
+     */
+    val reviewOnly: Boolean = false,
+    /**
      * Fenêtre de cotes « À mon niveau » ([PuzzleRating.window]), calculée au
      * lancement de la série. Prime sur [difficulty] : les deux disent la même
      * chose, l'un par palier, l'autre par la cote du joueur.
@@ -158,5 +164,5 @@ data class PuzzleFilter(
     val ratings: IntRange get() = ratingWindow ?: difficulty?.range ?: 0..4000
     val isEmpty: Boolean
         get() = difficulty == null && phase == null && theme == null && source == null &&
-            !missedOnly && ratingWindow == null
+            !missedOnly && !reviewOnly && ratingWindow == null
 }

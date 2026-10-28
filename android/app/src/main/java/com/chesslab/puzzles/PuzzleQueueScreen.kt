@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -73,8 +74,10 @@ fun PuzzleQueueScreen(
     var theme by remember { mutableStateOf<PuzzleThemeKind?>(null) }
     var source by remember { mutableStateOf<PuzzleSource?>(null) }
     var missedOnly by remember { mutableStateOf(false) }
+    var reviewOnly by remember { mutableStateOf(false) }
     // Ratés à la dernière tentative : à zéro, la puce « Ratés » est grisée.
     var missedCount by remember { mutableStateOf(0) }
+    var reviewCount by remember { mutableStateOf(0) }
     // « À mon niveau » : la cote personnelle fixe la fenêtre de puzzles.
     var atMyLevel by remember { mutableStateOf(false) }
     var puzzleRating by remember { mutableStateOf(PuzzleRating()) }
@@ -86,6 +89,10 @@ fun PuzzleQueueScreen(
             runCatching { LibraryDatabase.get(context).puzzleProgress().missedIds().size }.getOrDefault(0)
         }
         if (missedCount == 0) missedOnly = false
+        reviewCount = withContext(Dispatchers.IO) {
+            runCatching { LibraryDatabase.get(context).puzzleProgress().reviewIds().size }.getOrDefault(0)
+        }
+        if (reviewCount == 0) reviewOnly = false
         stats = withContext(Dispatchers.IO) {
             runCatching {
                 PuzzleStats.compute(LibraryDatabase.get(context).puzzleProgress().all())
@@ -128,14 +135,20 @@ fun PuzzleQueueScreen(
                 }
             }
             Group(stringResource(R.string.puzzle_history), Icons.Default.History, Palette.rose) {
-                ChipButton(stringResource(R.string.filter_all), !missedOnly,
-                    Modifier.testTag("historique-tous"), tint = Palette.rose) { missedOnly = false }
+                ChipButton(stringResource(R.string.filter_all), !missedOnly && !reviewOnly,
+                    Modifier.testTag("historique-tous"), tint = Palette.rose) { missedOnly = false; reviewOnly = false }
                 ChipButton(
                     stringResource(R.string.puzzle_missed), missedOnly,
                     Modifier.testTag("historique-rates"),
                     icon = Icons.Default.Cancel, tint = Palette.rose,
                     enabled = missedCount > 0,
-                ) { missedOnly = !missedOnly }
+                ) { missedOnly = !missedOnly; reviewOnly = false }
+                ChipButton(
+                    stringResource(R.string.puzzle_review), reviewOnly,
+                    Modifier.testTag("historique-a-revoir"),
+                    icon = Icons.Default.Replay, tint = Palette.rose,
+                    enabled = reviewCount > 0,
+                ) { reviewOnly = !reviewOnly; missedOnly = false }
             }
             // Masqué pour « Mes parties » : sans cote, aucun niveau ne
             // retiendrait un seul puzzle.
@@ -186,8 +199,8 @@ fun PuzzleQueueScreen(
                 }
             }
             WoodpeckerCard(
-                filter = PuzzleFilter(difficulty, phase, theme, source, missedOnly),
-                criteria = summary(source, missedOnly, difficulty, phase, theme, if (atMyLevel) puzzleRating.window else null),
+                filter = PuzzleFilter(difficulty, phase, theme, source, missedOnly, reviewOnly),
+                criteria = summary(source, missedOnly, reviewOnly, difficulty, phase, theme, if (atMyLevel) puzzleRating.window else null),
                 onOpen = onOpenWoodpecker,
             )
             stats?.takeIf { it.attempts > 0 }?.let { PuzzleStatsCard(it) }
@@ -212,7 +225,7 @@ fun PuzzleQueueScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                summary(source, missedOnly, difficulty, phase, theme, if (atMyLevel) puzzleRating.window else null),
+                summary(source, missedOnly, reviewOnly, difficulty, phase, theme, if (atMyLevel) puzzleRating.window else null),
                 fontSize = 11.sp, color = Palette.textTertiary,
                 modifier = Modifier.testTag("resume-selection"),
             )
@@ -224,7 +237,7 @@ fun PuzzleQueueScreen(
                     .fillMaxWidth()
                     .clip(CircleShape)
                     .background(accentGradient)
-                    .clickable { onStart(PuzzleFilter(difficulty, phase, theme, source, missedOnly, if (atMyLevel) puzzleRating.window else null)) }
+                    .clickable { onStart(PuzzleFilter(difficulty, phase, theme, source, missedOnly, reviewOnly, if (atMyLevel) puzzleRating.window else null)) }
                     .padding(vertical = 14.dp)
                     .testTag("commencer-puzzles"),
                 textAlign = TextAlign.Center,
@@ -256,6 +269,7 @@ private fun Group(
 private fun summary(
     source: PuzzleSource?,
     missedOnly: Boolean,
+    reviewOnly: Boolean,
     difficulty: DifficultyTier?,
     phase: GamePhase?,
     theme: PuzzleThemeKind?,
@@ -264,6 +278,7 @@ private fun summary(
     val parts = listOfNotNull(
         source?.let { stringResource(it.labelRes) },
         if (missedOnly) stringResource(R.string.puzzle_missed) else null,
+        if (reviewOnly) stringResource(R.string.puzzle_review) else null,
         difficulty?.let { stringResource(it.labelRes) },
         ratingWindow?.let { stringResource(R.string.puzzle_at_my_level) + " (${it.first}–${it.last})" },
         phase?.let { stringResource(it.labelRes) },

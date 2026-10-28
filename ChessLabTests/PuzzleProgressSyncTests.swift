@@ -61,6 +61,31 @@ struct PuzzleProgressSyncTests {
         #expect(record.intervalDays == 6)
     }
 
+    @Test func theLastOutcomeTravelsThroughTheMirrorAndTheMerge() throws {
+        let context = try makeContext()
+        let puzzle = makeLichessPuzzle(externalID: "outc1")
+        puzzle.lastOutcomeRaw = PuzzleOutcome.partial.rawValue
+        context.insert(puzzle)
+        try context.save()
+
+        PuzzleProgressSync.mirror(puzzle, in: context)
+        let record = try #require(try context.fetch(FetchDescriptor<PuzzleProgress>()).first)
+        #expect(record.lastOutcomeRaw == PuzzleOutcome.partial.rawValue)
+
+        // Un autre appareil, plus avancé : son issue est adoptée avec son état de révision.
+        let other = makeLichessPuzzle(externalID: "outc2")
+        other.repetitions = 0
+        context.insert(other)
+        let ahead = PuzzleProgress(externalID: "outc2")
+        ahead.repetitions = 3
+        ahead.lastOutcomeRaw = PuzzleOutcome.mastered.rawValue
+        context.insert(ahead)
+        try context.save()
+
+        PuzzleProgressSync.reconcile(in: context)
+        #expect(other.lastOutcomeRaw == PuzzleOutcome.mastered.rawValue)
+    }
+
     @Test func mirrorIgnoresOwnGamePuzzles() throws {
         let context = try makeContext()
         // Puzzle issu d'une partie de l'utilisateur : pas d'externalID.

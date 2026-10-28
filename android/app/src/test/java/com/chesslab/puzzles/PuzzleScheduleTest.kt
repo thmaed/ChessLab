@@ -64,6 +64,45 @@ class PuzzleScheduleTest {
         val now = 1_700_000_000_000L
         assertEquals(now + PuzzleSchedule.DAY_MS, PuzzleSchedule.dueAt(un, now))
     }
+
+    // MARK: Partiel — pendant de SpacedRepetitionTests (iOS)
+
+    @Test fun `un partiel revient dans deux jours et garde les répétitions`() {
+        val acquis = PuzzleProgress(externalId = "p", easinessFactor = 2.5, intervalDays = 6, repetitions = 2)
+        val partiel = PuzzleSchedule.next(acquis, PuzzleResult.partial, solved = false)
+        assertEquals(PuzzleSchedule.PARTIAL_INTERVAL_DAYS, partiel.intervalDays)
+        assertEquals(2, partiel.repetitions)
+        assertEquals(PuzzleResult.partial.raw, partiel.lastOutcome)
+    }
+
+    @Test fun `la facilité baisse moins pour un partiel que pour un raté, et plus que pour un maîtrisé`() {
+        val maitrise = PuzzleSchedule.next(neuf, PuzzleResult.mastered).easinessFactor
+        val partiel = PuzzleSchedule.next(neuf, PuzzleResult.partial, solved = false).easinessFactor
+        val rate = PuzzleSchedule.next(neuf, PuzzleResult.missed).easinessFactor
+        assertTrue(maitrise > partiel)
+        assertTrue(partiel > rate)
+    }
+
+    @Test fun `les compteurs de réussite et d'échec suivent résolu ou non, pas l'issue`() {
+        val resoluApresErreur = PuzzleSchedule.next(neuf, PuzzleResult.partial, solved = true)
+        assertEquals(1, resoluApresErreur.successCount)
+        assertEquals(0, resoluApresErreur.failureCount)
+        val rateApresUnBonCoup = PuzzleSchedule.next(neuf, PuzzleResult.partial, solved = false)
+        assertEquals(0, rateApresUnBonCoup.successCount)
+        assertEquals(1, rateApresUnBonCoup.failureCount)
+    }
+
+    @Test fun `la surcharge booléenne reste maîtrisé ou raté`() {
+        assertEquals(PuzzleSchedule.next(neuf, PuzzleResult.mastered), PuzzleSchedule.next(neuf, success = true))
+        assertEquals(PuzzleSchedule.next(neuf, PuzzleResult.missed), PuzzleSchedule.next(neuf, success = false))
+    }
+
+    @Test fun `la classification des issues`() {
+        assertEquals(PuzzleResult.mastered, PuzzleResult.classify(solved = true, hadWrongAttempt = false, playerMovesFound = 3))
+        assertEquals(PuzzleResult.partial, PuzzleResult.classify(solved = true, hadWrongAttempt = true, playerMovesFound = 3))
+        assertEquals(PuzzleResult.partial, PuzzleResult.classify(solved = false, hadWrongAttempt = true, playerMovesFound = 1))
+        assertEquals(PuzzleResult.missed, PuzzleResult.classify(solved = false, hadWrongAttempt = true, playerMovesFound = 0))
+    }
 }
 
 /** Les paliers de difficulté couvrent toute l'échelle, sans trou ni chevauchement. */

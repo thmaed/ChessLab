@@ -58,6 +58,8 @@ data class PuzzleUiState(
     val checkedKing: Square? = null,
     val status: String = "",
     val outcome: PuzzleOutcome = PuzzleOutcome.solving,
+    /** L'issue fine de la tentative terminée ; `null` tant qu'on résout. */
+    val result: PuzzleResult? = null,
     val solvedCount: Int = 0,
     val attemptedCount: Int = 0,
     val pendingPromotion: Move? = null,
@@ -97,8 +99,8 @@ object PuzzleDraw {
             when {
                 // Les ratés, dus ou non : la progression dit lesquels, la
                 // bibliothèque et vos puzzles maison disent ce qu'ils sont.
-                filter.missedOnly -> {
-                    val missed = db.puzzleProgress().missedIds().toSet()
+                filter.missedOnly || filter.reviewOnly -> {
+                    val missed = (if (filter.reviewOnly) db.puzzleProgress().reviewIds() else db.puzzleProgress().missedIds()).toSet()
                     val library = if (filter.source == PuzzleSource.ownGames) emptyList()
                         else PuzzleRepository.byIds(app.assets, missed)
                             .filter { PuzzleAnswer.accepts(it, filter, isOwn = false) }
@@ -287,6 +289,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
                 puzzle = null,
                 status = s(
                     when {
+                        filter.reviewOnly -> R.string.puzzle_no_review
                         filter.missedOnly -> R.string.puzzle_no_missed
                         filter.source == PuzzleSource.ownGames && own.isEmpty() -> R.string.puzzle_no_own
                         !filter.isEmpty -> R.string.puzzle_none_match
@@ -303,12 +306,12 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
      * Range le résultat, et programme la prochaine rencontre. Ce qu'on vient
      * de rater revient demain ; ce qu'on a résolu s'éloigne.
      */
-    private fun recordProgress(puzzle: Puzzle, success: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+    private fun recordProgress(puzzle: Puzzle, success: Boolean, result: PuzzleResult) = viewModelScope.launch(Dispatchers.IO) {
         com.chesslab.dailysession.TrainingDays.markToday(getApplication())
         val dao = LibraryDatabase.get(getApplication()).puzzleProgress()
         val now = System.currentTimeMillis()
         val current = dao.byId(puzzle.id) ?: PuzzleProgress(externalId = puzzle.id, theme = puzzle.theme)
-        val next = PuzzleSchedule.next(current, success)
+        val next = PuzzleSchedule.next(current, result, solved = success)
         dao.put(next.copy(dueAt = PuzzleSchedule.dueAt(next, now), updatedAt = now, theme = puzzle.theme, rating = puzzle.rating))
         ui = ui.copy(stats = com.chesslab.progression.PuzzleStats.compute(dao.all()))
     }
@@ -330,6 +333,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             lastMove = null,
             checkedKing = null,
             outcome = PuzzleOutcome.solving,
+            result = null,
             attemptsLeft = SettingsStore.state.value.puzzleAttempts,
             allowedAttempts = SettingsStore.state.value.puzzleAttempts,
             hint = null,
@@ -350,12 +354,21 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             if (plan.currentItemIndex != null && ui.outcome != PuzzleOutcome.solving) presentWoodpecker()
             return
         }
-        // Série « Ratés » : un puzzle réussi n'est plus raté, il quitte la
-        // file — iOS ne le retirerait plus de la base.
-        if (ui.filter.missedOnly && ui.outcome == PuzzleOutcome.solved) {
+        // Séries « Ratés » et « À revoir ».
+        // Un puzzle qui n'a plus l'issue de la série (raté devenu partiel ou maîtrisé,
+        // partiel devenu maîtrisé) la quitte — iOS ne le retirerait plus de la base.
+        val left = when {
+            ui.filter.missedOnly -> ui.result != null && ui.result != PuzzleResult.missed
+            ui.filter.reviewOnly -> ui.result == PuzzleResult.mastered
+            else -> false
+        }
+        if (left) {
             queue = queue.filterIndexed { index, _ -> index != cursor }
             if (queue.isEmpty()) {
-                ui = ui.copy(puzzle = null, status = s(R.string.puzzle_no_missed))
+                ui = ui.copy(
+                    puzzle = null,
+                    status = s(if (ui.filter.reviewOnly) R.string.puzzle_no_review else R.string.puzzle_no_missed),
+                )
                 return
             }
             present(cursor % queue.size)
@@ -448,15 +461,20 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             )
         } else {
             com.chesslab.sound.Haptics.illegal()
+            // `step` compte coups du joueur ET ripostes : il joue aux pas pairs.
+            val result = PuzzleResult.classify(
+                solved = false, hadWrongAttempt = true, playerMovesFound = (step + 1) / 2,
+            )
             if (ui.woodpeckerPlan != null) recordWoodpecker(solved = false)
             else {
                 StatsStore.recordPuzzle(getApplication(), solvedIt = false)
                 ui.puzzle?.let { StatsStore.recordRating(getApplication(), false, it.rating) }
-                ui.puzzle?.let { recordProgress(it, success = false) }
+                ui.puzzle?.let { recordProgress(it, success = false, result = result) }
             }
             ui.copy(
                 selected = null, legalTargets = emptySet(),
                 outcome = PuzzleOutcome.failed,
+                result = result,
                 attemptedCount = ui.attemptedCount + 1,
                 status = s(R.string.puzzle_wrong_solution, expected),
             )
@@ -470,14 +488,18 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         // Un mat clôt le puzzle même s'il restait des coups à la séquence.
         if (step >= puzzle.solution.size || board.state is Board.State.Checkmate) {
             com.chesslab.sound.Haptics.gameEnded()
+            val result = PuzzleResult.classify(
+                solved = true, hadWrongAttempt = ui.attemptsLeft < ui.allowedAttempts, playerMovesFound = (step + 1) / 2,
+            )
             if (ui.woodpeckerPlan != null) recordWoodpecker(solved = true)
             else {
                 StatsStore.recordPuzzle(getApplication(), solvedIt = true)
                 StatsStore.recordRating(getApplication(), true, puzzle.rating, usedHint = hintUsed)
-                recordProgress(puzzle, success = true)
+                recordProgress(puzzle, success = true, result = result)
             }
             ui = ui.copy(
                 outcome = PuzzleOutcome.solved,
+                result = result,
                 solvedCount = ui.solvedCount + 1,
                 attemptedCount = ui.attemptedCount + 1,
                 status = s(R.string.puzzle_solved),

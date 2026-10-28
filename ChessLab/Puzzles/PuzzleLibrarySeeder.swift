@@ -32,7 +32,13 @@ enum PuzzleLibrarySeeder {
     // doit repasser une fois ici : remplacement des puzzles bibliothèque
     // jamais tentés + rattrapage du champ `phaseRaw` (nouveau) sur tout
     // ce qui reste.
-    private static let seededKey = "lichessPuzzleLibrarySeededV4"
+    //
+    // V5 (28/10/2026) : +24 841 puzzles (130 935 au total) pour combler les niveaux
+    // extrêmes (sous 600, au-dessus de 2400) et les séquences de 4 coups ou plus —
+    // voir `tools/puzzles-library/extend.py`. Les anciens identifiants sont tous
+    // conservés : une installation V4 repasse ici UNE fois et n'ajoute que les nouveaux,
+    // sans rien supprimer ni toucher à une progression.
+    private static let seededKey = "lichessPuzzleLibrarySeededV5"
 
     /// Précharge la bibliothèque si nécessaire, **entièrement en tâche de
     /// fond** : le chargement du JSON embarqué (~18 Mo) comme les ~75 000

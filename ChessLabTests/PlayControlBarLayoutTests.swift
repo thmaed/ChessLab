@@ -87,7 +87,30 @@ final class PlayControlBarLayoutTests: XCTestCase {
         )
     }
 
+    /// En consultation AVEC pendule, la pastille « Analyser ici » remplace
+    /// « Reprendre ici » (qui n'existe pas) : même emplacement, donc même budget
+    /// de largeur — c'est ce que ce test garde.
+    private func analyzeHereBar() -> PlayControlBar {
+        PlayControlBar(
+            hasMoves: true, displayedPly: 2, totalPlies: 4,
+            isReviewing: true, canResumeFromReview: false,
+            undoableResumeCount: nil,
+            showMoveList: true,
+            hintsWanted: false, hintsEnabled: true,
+            isFinished: false, isEngineThinking: false,
+            onPrevious: {}, onNext: {}, onResumeHere: {}, onUndoResume: {}, onToggleHint: {},
+            onShowMoveList: {}, onOfferDraw: {}, onResign: {},
+            onAnalyzeHere: {}, resumeBlockedByClock: true
+        )
+    }
+
     // MARK: Ce qui a cassé chez le testeur
+
+    func testAnalyzeHereBarFitsOnAZoomedIPhone() {
+        let usable = Self.usableWidth(screen: Self.zoomedWidth)
+        let width = measuredWidth(analyzeHereBar(), proposing: usable)
+        XCTAssertLessThanOrEqual(width, usable, "La pastille « Analyser ici » repousse la rangée hors écran.")
+    }
 
     func testLiveBarFitsOnAZoomedIPhone() {
         let usable = Self.usableWidth(screen: Self.zoomedWidth)
@@ -121,6 +144,7 @@ final class PlayControlBarLayoutTests: XCTestCase {
         XCTAssertLessThanOrEqual(measuredWidth(liveBar(), proposing: usable), usable)
         XCTAssertLessThanOrEqual(measuredWidth(reviewingBar(), proposing: usable), usable)
         XCTAssertLessThanOrEqual(measuredWidth(undoOfferedBar(), proposing: usable), usable)
+        XCTAssertLessThanOrEqual(measuredWidth(analyzeHereBar(), proposing: usable), usable)
     }
 
     // MARK: L'écran entier, pas seulement la barre

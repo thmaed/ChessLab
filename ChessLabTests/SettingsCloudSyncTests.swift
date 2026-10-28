@@ -45,7 +45,7 @@ struct SettingsCloudSyncTests {
         // Ces clés disent « où en est CET appareil », pas « ce que l'utilisateur
         // préfère » : les propager ressusciterait des migrations déjà faites ou
         // couperait la synchro partout depuis un seul appareil.
-        for key in ["userOpenings.migratedToDatabase", "lichessPuzzleLibrarySeededV4",
+        for key in ["userOpenings.migratedToDatabase", "lichessPuzzleLibrarySeededV5",
                     "container.openFailures", "openingsLastReconcileAt", "cloudKitSyncEnabled"] {
             #expect(!SettingsCloudSync.syncedKeys.contains(key))
         }
