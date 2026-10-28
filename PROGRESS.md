@@ -10742,3 +10742,14 @@ Il AJOUTE sans rien retirer (les 106 094 identifiants et toute progression reste
 - **iOS :** marqueur de préchargement V4 → V5 (une installation existante n'ajoute que les
   nouveaux). Test `bundledLibraryCoversEveryThemeAtEveryMainLevel`.
 - **Android :** même fichier (copié au build), aucun changement de code.
+
+## 28/10 — Préchargement des puzzles : une vraie barre de progression (iOS)
+
+Le bandeau d'accueil « Préparation de la bibliothèque de puzzles… » n'avait qu'une roue
+indéterminée ; avec 130 935 puzzles, l'attente dure plusieurs dizaines de secondes.
+- `SeedingProgress` (struct pure, testée) : puzzles enregistrés / à enregistrer, part de 0 à 1,
+  `nil` tant que le total est inconnu (la roue reste alors affichée).
+- Le préchargement annonce l'avancement APRÈS chaque enregistrement par lots de 2 000 : la barre
+  ne dépasse jamais ce qui est écrit. Une mise à niveau V4 → V5 ne compte que les NOUVEAUX puzzles.
+- Mesuré sur simulateur neuf : 8 % à 4 s, 52 % à 12 s.
+- Android : aucun équivalent à porter, il n'y a pas de préchargement (le JSON est lu à la demande).

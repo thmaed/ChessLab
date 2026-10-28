@@ -1539,11 +1539,22 @@ struct HomeView: View {
 
     private var seedingBanner: some View {
         HStack(spacing: 14) {
-            ProgressView().tint(Theme.violet)
-            VStack(alignment: .leading, spacing: 2) {
+            // Avant que le total soit connu : l'attente sans chiffre ; ensuite, la barre.
+            if seedingState.fraction == nil { ProgressView().tint(Theme.violet) }
+            VStack(alignment: .leading, spacing: 6) {
                 Text("Préparation de la bibliothèque de puzzles…")
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Theme.textPrimary)
+                if let fraction = seedingState.fraction {
+                    HStack(spacing: 10) {
+                        ProgressView(value: fraction)
+                            .tint(Theme.violet)
+                            .accessibilityIdentifier("seedingProgress")
+                        Text(fraction, format: .percent.precision(.fractionLength(0)))
+                            .font(.caption.monospacedDigit().weight(.semibold))
+                            .foregroundStyle(Theme.textSecondary)
+                    }
+                }
                 Text("Une seule fois, en tâche de fond.")
                     .font(.caption)
                     .foregroundStyle(Theme.textSecondary)

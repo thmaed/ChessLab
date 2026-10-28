@@ -63,6 +63,16 @@ struct PuzzleLibrarySeederTests {
         #expect(entries.filter { $0.solutionLANs.count >= 7 }.count >= 10_000)
     }
 
+    @Test func seedingProgressIsUnknownUntilTheTotalIsKnownThenBounded() {
+        #expect(SeedingProgress().fraction == nil)
+        #expect(SeedingProgress(completed: 0, total: 0).fraction == nil)
+        #expect(SeedingProgress(completed: 0, total: 24_841).fraction == 0)
+        #expect(SeedingProgress(completed: 2_000, total: 4_000).fraction == 0.5)
+        // Jamais au-delà de 100 % ni en dessous de 0, même si le compte déborde.
+        #expect(SeedingProgress(completed: 5_000, total: 4_000).fraction == 1)
+        #expect(SeedingProgress(completed: -3, total: 4_000).fraction == 0)
+    }
+
     @MainActor
     @Test func seedInsertsBundledPuzzlesIntoEmptyContext() throws {
         // Le marqueur "déjà semé" vit dans `UserDefaults.standard`, qui

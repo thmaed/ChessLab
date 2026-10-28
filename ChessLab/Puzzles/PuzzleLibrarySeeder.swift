@@ -1,6 +1,19 @@
 import Foundation
 import SwiftData
 
+/// Avancement du préchargement : puzzles déjà enregistrés / à enregistrer. `total`
+/// reste à zéro tant que le compte n'est pas connu — le bandeau montre alors une
+/// attente sans pourcentage plutôt qu'une barre qui recule ou saute.
+struct SeedingProgress: Equatable {
+    var completed = 0
+    var total = 0
+
+    /// De 0 à 1, jamais au-delà ; `nil` tant que le total est inconnu.
+    var fraction: Double? {
+        total > 0 ? min(1, Double(max(0, completed)) / Double(total)) : nil
+    }
+}
+
 /// État observable du préchargement de la bibliothèque de puzzles, pour
 /// afficher un bandeau « Préparation… » pendant l'opération (premier
 /// lancement).
@@ -9,10 +22,17 @@ import SwiftData
 final class PuzzleSeedingState {
     static let shared = PuzzleSeedingState()
     private(set) var isSeeding = false
+    private(set) var progress = SeedingProgress()
     private init() {}
 
-    fileprivate func begin() { isSeeding = true }
-    fileprivate func end() { isSeeding = false }
+    /// La part faite, de 0 à 1 ; `nil` tant que le total est inconnu.
+    var fraction: Double? { progress.fraction }
+
+    fileprivate func begin() { isSeeding = true; progress = SeedingProgress() }
+    fileprivate func end() { isSeeding = false; progress = SeedingProgress() }
+    fileprivate func report(completed: Int, of total: Int) {
+        progress = SeedingProgress(completed: completed, total: total)
+    }
 }
 
 /// Précharge la bibliothèque de puzzles Lichess embarquée dans la base
@@ -49,11 +69,22 @@ enum PuzzleLibrarySeeder {
     @MainActor
     static func seedIfNeeded(container: ModelContainer) {
         guard !PuzzleSeedingState.shared.isSeeding else { return }
-        let alreadySeeded = UserDefaults.standard.bool(forKey: seededKey)
-        guard needsSeeding(container: container, alreadySeeded: alreadySeeded) else { return }
+        #if DEBUG
+        // `-reseedPuzzles` : revoir le bandeau et sa barre sur un appareil déjà préchargé. Une
+        // seule fois par lancement (l'accueil rappelle cette fonction à chaque apparition).
+        let reseeds = CommandLine.arguments.contains("-reseedPuzzles") && !didDebugReseed
+        if reseeds { didDebugReseed = true }
+        #else
+        let reseeds = false
+        #endif
+        let alreadySeeded = !reseeds && UserDefaults.standard.bool(forKey: seededKey)
+        guard reseeds || needsSeeding(container: container, alreadySeeded: alreadySeeded) else { return }
 
         PuzzleSeedingState.shared.begin()
         Task.detached(priority: .utility) {
+            #if DEBUG
+            if reseeds { removeUntriedLibraryPuzzles(container: container) }
+            #endif
             let didSeed = seedSynchronously(container: container)
             await MainActor.run {
                 if didSeed {
@@ -63,6 +94,24 @@ enum PuzzleLibrarySeeder {
             }
         }
     }
+
+    #if DEBUG
+    @MainActor private static var didDebugReseed = false
+
+    /// Vide la bibliothèque de ses puzzles JAMAIS tentés (ceux qu'un préchargement remet à
+    /// l'identique) : toute progression reste, les puzzles tentés aussi.
+    nonisolated private static func removeUntriedLibraryPuzzles(container: ModelContainer) {
+        let context = ModelContext(container)
+        context.autosaveEnabled = false
+        let library = (try? context.fetch(FetchDescriptor<Puzzle>(
+            predicate: #Predicate<Puzzle> { $0.sourceRaw == "lichess" }
+        ))) ?? []
+        for puzzle in library where ((puzzle.successCount ?? 0) + (puzzle.failureCount ?? 0)) == 0 {
+            context.delete(puzzle)
+        }
+        PersistenceLog.saveInBackground(context)
+    }
+    #endif
 
     /// Faut-il (re)précharger ? Vrai si :
     /// - la version courante n'a jamais été seedée (`alreadySeeded == false`,
@@ -81,6 +130,11 @@ enum PuzzleLibrarySeeder {
         guard alreadySeeded else { return true }
         let count = (try? ModelContext(container).fetchCount(FetchDescriptor<Puzzle>())) ?? 0
         return count == 0
+    }
+
+    /// Remonte l'avancement au fil principal, d'où le bandeau d'accueil le lit.
+    private static func publishProgress(completed: Int, of total: Int) {
+        Task { @MainActor in PuzzleSeedingState.shared.report(completed: completed, of: total) }
     }
 
     /// Effectue le préchargement sur un contexte dédié au `container` donné
@@ -116,6 +170,9 @@ enum PuzzleLibrarySeeder {
                 .filter { ((($0.successCount ?? 0) + ($0.failureCount ?? 0)) > 0) || newIDs.contains($0.externalID ?? "") }
                 .compactMap(\.externalID)
         )
+        let toInsert = entries.reduce(0) { $0 + (keptIDs.contains($1.id) ? 0 : 1) }
+        Self.publishProgress(completed: 0, of: toInsert)
+        var inserted = 0
         var insertedSinceSave = 0
         for entry in entries where !keptIDs.contains(entry.id) {
             let puzzle = Puzzle()
@@ -129,9 +186,16 @@ enum PuzzleLibrarySeeder {
             context.insert(puzzle)
 
             insertedSinceSave += 1
+            inserted += 1
             if insertedSinceSave >= 2_000 {
                 PersistenceLog.saveInBackground(context)
                 insertedSinceSave = 0
+                // Annoncé APRÈS l'enregistrement : la barre ne dépasse jamais ce qui est écrit.
+                Self.publishProgress(completed: inserted, of: toInsert)
+                #if DEBUG
+                // `-reseedPuzzles` : une seconde par lot, pour avoir le temps de regarder la barre.
+                if CommandLine.arguments.contains("-reseedPuzzles") { Thread.sleep(forTimeInterval: 1) }
+                #endif
             }
         }
 

@@ -7,6 +7,12 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Barre de progression du préchargement — 28/10/2026
+
+- Écart ASSUMÉ, sans objet côté Android : iOS précharge les puzzles dans sa base au premier
+  lancement (bandeau « Préparation… » avec barre) ; Android lit le JSON à la demande, rien
+  à attendre au démarrage.
+
 ### Bibliothèque de puzzles : +24 841 — 28/10/2026
 
 - [ ] Même fichier des deux côtés (`ChessLab/Resources/lichess_puzzles.json`, copié au
