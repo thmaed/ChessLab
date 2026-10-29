@@ -185,99 +185,122 @@ fun CourseScreen(
                 Palette.accent, "entrainer") { onTrain(loaded.id, loaded.name) }
         }
 
-        Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
-            BoardView(
-                position = position,
-                enabled = false,
-                lastMove = incoming?.let {
-                    Square(it.uci.substring(0, 2)) to Square(it.uci.substring(2, 4))
-                },
-                arrows = coloured.map { (move, tint, rank) ->
-                    BoardArrow(
-                        Square(move.uci.substring(0, 2)), Square(move.uci.substring(2, 4)),
-                        tint, if (rank == 0) 1f else 0.45f,
-                    )
-                },
+        // L'échiquier, et tout ce qui l'accompagne : écrits UNE fois, agencés selon
+        // l'orientation.
+        val board: @Composable () -> Unit = {
+        BoardView(
+            position = position,
+            enabled = false,
+            lastMove = incoming?.let {
+                Square(it.uci.substring(0, 2)) to Square(it.uci.substring(2, 4))
+            },
+            arrows = coloured.map { (move, tint, rank) ->
+                BoardArrow(
+                    Square(move.uci.substring(0, 2)), Square(move.uci.substring(2, 4)),
+                    tint, if (rank == 0) 1f else 0.45f,
+                )
+            },
+        )
+
+        }
+        val details: @Composable ColumnScope.() -> Unit = {
+        // L'évaluation : la ligne de tête du moteur pré-calculé d'abord —
+        // c'est celle de la position, à profondeur connue — sinon celle
+        // portée par le coup qui a mené ici. Même règle qu'iOS.
+        val labs = stats.data(currentKey)
+        val lead = labs?.engine?.firstOrNull()
+        when {
+            lead?.mate != null -> EvalBar(if (lead.mate > 0) 10.0 else -10.0, mateIn = lead.mate, depth = stats.engineDepth)
+            lead?.cp != null -> EvalBar(lead.cp / 100.0, depth = stats.engineDepth)
+            incoming?.eval != null -> EvalBar(incoming.eval)
+        }
+
+        Spacer(Modifier.height(10.dp))
+        Breadcrumb(path, Modifier.padding(horizontal = 20.dp)) { index -> path = path.take(index) }
+
+        // Le nom de la variante atteinte — le sous-titre de la position.
+        loaded.ecoNames[currentKey]?.let { name ->
+            Spacer(Modifier.height(8.dp))
+            Text(
+                name, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.info,
+                modifier = Modifier.padding(horizontal = 20.dp).testTag("nom-position"),
             )
+        }
 
-            // L'évaluation : la ligne de tête du moteur pré-calculé d'abord —
-            // c'est celle de la position, à profondeur connue — sinon celle
-            // portée par le coup qui a mené ici. Même règle qu'iOS.
-            val labs = stats.data(currentKey)
-            val lead = labs?.engine?.firstOrNull()
-            when {
-                lead?.mate != null -> EvalBar(if (lead.mate > 0) 10.0 else -10.0, mateIn = lead.mate, depth = stats.engineDepth)
-                lead?.cp != null -> EvalBar(lead.cp / 100.0, depth = stats.engineDepth)
-                incoming?.eval != null -> EvalBar(incoming.eval)
-            }
+        incoming?.comment?.let { comment ->
+            Spacer(Modifier.height(12.dp))
+            CommentCard(comment, Modifier.padding(horizontal = 20.dp))
+        }
 
-            Spacer(Modifier.height(10.dp))
-            Breadcrumb(path, Modifier.padding(horizontal = 20.dp)) { index -> path = path.take(index) }
-
-            // Le nom de la variante atteinte — le sous-titre de la position.
-            loaded.ecoNames[currentKey]?.let { name ->
-                Spacer(Modifier.height(8.dp))
+        // La ligne s'arrête ici : le dire, plutôt que de laisser un écran
+        // où plus rien ne répond. C'est aussi une invitation à revenir en
+        // arrière, là où les variantes se trouvent.
+        if (coloured.isEmpty()) {
+            Spacer(Modifier.height(16.dp))
+            Row(
+                Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    Icons.Default.Flag, null,
+                    tint = Palette.textTertiary, modifier = Modifier.size(16.dp),
+                )
+                Spacer(Modifier.width(10.dp))
                 Text(
-                    name, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.info,
-                    modifier = Modifier.padding(horizontal = 20.dp).testTag("nom-position"),
+                    stringResource(R.string.course_line_end),
+                    fontSize = 13.sp, color = Palette.textTertiary,
+                    modifier = Modifier.testTag("fin-de-ligne"),
                 )
             }
+        }
 
-            incoming?.comment?.let { comment ->
-                Spacer(Modifier.height(12.dp))
-                CommentCard(comment, Modifier.padding(horizontal = 20.dp))
-            }
-
-            // La ligne s'arrête ici : le dire, plutôt que de laisser un écran
-            // où plus rien ne répond. C'est aussi une invitation à revenir en
-            // arrière, là où les variantes se trouvent.
-            if (coloured.isEmpty()) {
-                Spacer(Modifier.height(16.dp))
-                Row(
-                    Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        Icons.Default.Flag, null,
-                        tint = Palette.textTertiary, modifier = Modifier.size(16.dp),
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        stringResource(R.string.course_line_end),
-                        fontSize = 13.sp, color = Palette.textTertiary,
-                        modifier = Modifier.testTag("fin-de-ligne"),
-                    )
-                }
-            }
-
-            if (coloured.isNotEmpty()) {
-                Spacer(Modifier.height(16.dp))
-                SectionHeader(stringResource(R.string.course_repertoire), Modifier.padding(horizontal = 16.dp))
-                Spacer(Modifier.height(8.dp))
-                Column(
-                    Modifier.padding(horizontal = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    coloured.forEach { (move, tint, _) ->
-                        MoveRow(move, tint, branchNames[CourseRepository.fenKey(move.toFEN)]) {
-                            path = path + (currentKey to move)
-                        }
+        if (coloured.isNotEmpty()) {
+            Spacer(Modifier.height(16.dp))
+            SectionHeader(stringResource(R.string.course_repertoire), Modifier.padding(horizontal = 16.dp))
+            Spacer(Modifier.height(8.dp))
+            Column(
+                Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                coloured.forEach { (move, tint, _) ->
+                    MoveRow(move, tint, branchNames[CourseRepository.fenKey(move.toFEN)]) {
+                        path = path + (currentKey to move)
                     }
                 }
             }
+        }
 
-            // Ce que les maîtres jouent ici, et ce que le moteur préfère —
-            // seulement pour une ouverture : une finale n'a pas de sidecar.
-            if (!estFinale) {
-                Spacer(Modifier.height(16.dp))
-                StatsColumns(
-                    labs, stats.engineDepth, position.sideToMove,
-                    inRepertoire = { uci -> options.firstOrNull { it.uci == uci } },
-                    onPlay = { edge -> path = path + (currentKey to edge) },
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                )
+        // Ce que les maîtres jouent ici, et ce que le moteur préfère —
+        // seulement pour une ouverture : une finale n'a pas de sidecar.
+        if (!estFinale) {
+            Spacer(Modifier.height(16.dp))
+            StatsColumns(
+                labs, stats.engineDepth, position.sideToMove,
+                inRepertoire = { uci -> options.firstOrNull { it.uci == uci } },
+                onPlay = { edge -> path = path + (currentKey to edge) },
+                modifier = Modifier.padding(horizontal = 20.dp),
+            )
+        }
+        Spacer(Modifier.height(20.dp))
+        }
+        if (com.chesslab.ui.isLandscape()) {
+            // PAYSAGE (tablette) : l'échiquier à gauche, borné par la hauteur, le
+            // reste dans un panneau qui défile à droite — comme l'écran de partie.
+            // Empilés, l'échiquier prenait la largeur, dépassait la hauteur de
+            // l'écran, et le fil des coups tombait dessous (29/10/2026).
+            BoxWithConstraints(Modifier.weight(1f).fillMaxWidth().padding(horizontal = 16.dp)) {
+                val panelWidth = com.chesslab.ui.BoardLayout.panelWidth(maxWidth.value, maxHeight.value, gap = 12f).dp
+                Row(Modifier.fillMaxSize()) {
+                    Box(Modifier.weight(1f).fillMaxHeight(), Alignment.Center) { board() }
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.width(panelWidth).fillMaxHeight().verticalScroll(rememberScrollState())) {
+                        details()
+                    }
+                }
             }
-            Spacer(Modifier.height(20.dp))
+        } else Column(Modifier.weight(1f).verticalScroll(rememberScrollState())) {
+            board()
+            details()
         }
 
         if (indexOpen) {
@@ -327,8 +350,16 @@ private fun Breadcrumb(
     modifier: Modifier,
     onGoTo: (Int) -> Unit,
 ) {
+    // Le coup COURANT (le dernier, surligné) reste en vue : après un saut de
+    // plusieurs coups — depuis l'index des lignes, par exemple — le fil restait
+    // calé à gauche et le coup où l'on se trouve sortait de l'écran (29/10/2026).
+    val scroll = rememberScrollState()
+    // Relancé aussi quand la largeur change : au moment où le chemin s'allonge,
+    // la rangée n'est pas encore mesurée et `maxValue` est l'ancienne. Comme iOS
+    // (`OpeningReaderView`, `scrollTo(count - 1, anchor: .trailing)`).
+    LaunchedEffect(path.size, scroll.maxValue) { scroll.animateScrollTo(scroll.maxValue) }
     Row(
-        modifier.horizontalScroll(rememberScrollState()),
+        modifier.horizontalScroll(scroll),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

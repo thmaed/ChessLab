@@ -10796,3 +10796,19 @@ des critères en partie cachés ; il fallait régler avant de jouer ; « Ratés 
   tous ceux qui correspondent (quasi identiques tant que la bibliothèque est peu entamée).
 - Tests : iOS `PuzzleFiltersUITests` + `WoodpeckerUITests` verts (adaptés) ; Android JVM verts,
   `AppTest` (puzzles, filtres, Woodpecker) et `StaleAnswerTest` verts sur émulateur.
+
+## 29/10 — Android en paysage : puzzles et lecteur de cours (Android ; iOS le faisait déjà)
+
+Les trois tests instrumentés « qui échouaient déjà » (`PuzzleDeviceFlowTest` ×2,
+`OpeningIndexTest`) n'étaient pas fragiles : ils montraient deux vrais défauts sur tablette
+en PAYSAGE, que le Galaxy (portrait) ne voyait pas.
+- **Résolution des puzzles** : empilé, l'échiquier prenait toute la hauteur ; « Indice »,
+  « Passer » et « Puzzle suivant » tombaient sous l'écran, SANS défilement — un puzzle résolu
+  ne menait plus nulle part. Désormais `BoardScaffold` en paysage : échiquier à gauche, panneau
+  défilant à droite (iOS : `PuzzleSolveView`, mise en page `.regular`).
+- **Lecteur de cours** : l'échiquier prenait la largeur et dépassait la hauteur ; même partage
+  côte à côte en paysage. Le fil des coups défile désormais jusqu'au coup courant (iOS :
+  `OpeningReaderView`, `scrollTo(… anchor: .trailing)`) — après un saut depuis l'index, le coup
+  où l'on se trouve sortait de l'écran.
+- Portrait inchangé. Vérifié à l'œil sur la tablette d'émulateur ; tests : `PuzzleDeviceFlowTest`
+  4/4 et `OpeningIndexTest` 3/3.

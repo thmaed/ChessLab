@@ -7,6 +7,13 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Paysage : résolution des puzzles et lecteur de cours — 29/10/2026
+
+- [x] Résolution des puzzles en paysage : échiquier à gauche, commandes à droite (« Puzzle
+      suivant » était inaccessible sur tablette). Vérifié sur la tablette d'émulateur.
+- [x] Lecteur de cours en paysage : même partage ; le fil des coups suit le coup courant.
+      Vérifié sur la tablette d'émulateur.
+
 ### Écran Puzzles repensé — 28/10/2026
 
 - [ ] Séries prêtes au toucher, « Série sur mesure » en feuille, Woodpecker en ligne + feuille de

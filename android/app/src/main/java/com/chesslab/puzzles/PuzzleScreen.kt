@@ -97,24 +97,12 @@ fun PuzzleScreen(
         )
     }
 
-    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        // Les filtres, la provenance et le bilan ont quitté cet écran pour
-        // celui du CHOIX de la séance : on décide ce qu'on travaille avant de
-        // résoudre, et le puzzle courant ne change plus sous les doigts. Ne
-        // reste ici que le compte des révisions.
-        DueBadge(ui)
-        // Série VIDE (aucun raté, aucun puzzle maison, rien pour ces critères) :
-        // on le DIT, comme l'écran vide d'iOS. Le plateau de l'ancien puzzle
-        // restait affiché sous « Trouvez le meilleur coup », et le message
-        // d'état — préparé par le view model — n'était montré nulle part.
-        if (!ui.loading && ui.puzzle == null) {
-            EmptySeries(ui.status)
-            return@Column
-        }
+    // Les morceaux de l'écran, écrits UNE fois et agencés selon l'orientation.
+    val header: @Composable () -> Unit = {
         Header(ui)
         ui.woodpeckerPlan?.let { WoodpeckerLine(it, ui.outcome == PuzzleOutcome.solving, model) }
-        Spacer(Modifier.height(12.dp))
-
+    }
+    val board: @Composable () -> Unit = {
         BoardView(
             position = ui.position,
             orientation = ui.orientation,
@@ -129,42 +117,78 @@ fun PuzzleScreen(
             enabled = ui.outcome == PuzzleOutcome.solving && !ui.busy,
             onSquareTap = model::onSquareTap,
         )
-
-        Spacer(Modifier.height(14.dp))
-        if (ui.outcome == PuzzleOutcome.solving) {
-            AttemptsIndicator(ui.attemptsLeft, ui.allowedAttempts)
-            if (ui.hint == null) {
-                Spacer(Modifier.height(12.dp))
-                HintButton { model.showHint() }
-            }
-            // Pas de « Passer » dans un programme : chaque puzzle du lot
-            // reçoit une réponse, comme sur iOS.
-            if (ui.woodpeckerPlan == null) {
-                Spacer(Modifier.height(12.dp))
-                TextButton(onClick = model::next, modifier = Modifier.testTag("passer")) {
-                    Text(stringResource(R.string.puzzle_skip), color = Palette.textSecondary)
+    }
+    val controls: @Composable () -> Unit = {
+        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            if (ui.outcome == PuzzleOutcome.solving) {
+                AttemptsIndicator(ui.attemptsLeft, ui.allowedAttempts)
+                if (ui.hint == null) {
+                    Spacer(Modifier.height(12.dp))
+                    HintButton { model.showHint() }
                 }
+                // Pas de « Passer » dans un programme : chaque puzzle du lot
+                // reçoit une réponse, comme sur iOS.
+                if (ui.woodpeckerPlan == null) {
+                    Spacer(Modifier.height(12.dp))
+                    TextButton(onClick = model::next, modifier = Modifier.testTag("passer")) {
+                        Text(stringResource(R.string.puzzle_skip), color = Palette.textSecondary)
+                    }
+                }
+            } else {
+                val plan = ui.woodpeckerPlan
+                ResultCard(
+                    solved = ui.outcome == PuzzleOutcome.solved,
+                    // Un puzzle partiel revient vite : le dire, plutôt que de laisser
+                    // « Résolu ! » promettre un puzzle acquis (pas dans un programme).
+                    partial = ui.result == PuzzleResult.partial && plan == null,
+                    modifier = Modifier.padding(horizontal = 20.dp),
+                    onNext = if (plan?.currentCycle?.isComplete == true) model::startNextCycle else model::next,
+                    sourcePgn = ui.puzzle?.sourcePgn,
+                    onViewSourceGame = onViewSourceGame,
+                    nextLabel = when {
+                        plan == null -> stringResource(R.string.puzzle_next)
+                        plan.currentCycle.isComplete ->
+                            stringResource(R.string.woodpecker_start_cycle, plan.currentCycle.number + 1)
+                        else -> stringResource(R.string.woodpecker_next_puzzle)
+                    },
+                    cycleSummary = plan?.takeIf { it.currentCycle.isComplete },
+                )
             }
-        } else {
-            val plan = ui.woodpeckerPlan
-            ResultCard(
-                solved = ui.outcome == PuzzleOutcome.solved,
-                // Un puzzle partiel revient vite : le dire, plutôt que de laisser
-                // « Résolu ! » promettre un puzzle acquis (pas dans un programme).
-                partial = ui.result == PuzzleResult.partial && plan == null,
-                modifier = Modifier.padding(horizontal = 20.dp),
-                onNext = if (plan?.currentCycle?.isComplete == true) model::startNextCycle else model::next,
-                sourcePgn = ui.puzzle?.sourcePgn,
-                onViewSourceGame = onViewSourceGame,
-                nextLabel = when {
-                    plan == null -> stringResource(R.string.puzzle_next)
-                    plan.currentCycle.isComplete ->
-                        stringResource(R.string.woodpecker_start_cycle, plan.currentCycle.number + 1)
-                    else -> stringResource(R.string.woodpecker_next_puzzle)
-                },
-                cycleSummary = plan?.takeIf { it.currentCycle.isComplete },
-            )
         }
+    }
+
+    // Série VIDE (aucun raté, aucun puzzle maison, rien pour ces critères) :
+    // on le DIT, comme l'écran vide d'iOS. Le plateau de l'ancien puzzle
+    // restait affiché sous « Trouvez le meilleur coup », et le message
+    // d'état — préparé par le view model — n'était montré nulle part.
+    if (!ui.loading && ui.puzzle == null) {
+        Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            DueBadge(ui)
+            EmptySeries(ui.status)
+        }
+    } else if (com.chesslab.ui.isLandscape()) {
+        // PAYSAGE (tablette, téléphone couché) : l'échiquier à gauche, borné par la
+        // hauteur, et le reste dans un panneau qui défile à droite. Empilés, le
+        // plateau prenait toute la hauteur et « Indice », « Passer » et « Puzzle
+        // suivant » tombaient SOUS l'écran, sans défilement pour les atteindre —
+        // un puzzle résolu ne menait plus nulle part (trouvé par les tests
+        // instrumentés sur tablette, 29/10/2026). Comme l'écran de partie.
+        com.chesslab.ui.BoardScaffold(
+            header = { DueBadge(ui); header(); Spacer(Modifier.height(12.dp)) },
+            board = board,
+            panel = { controls() },
+        )
+    } else Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        // Les filtres, la provenance et le bilan ont quitté cet écran pour
+        // celui du CHOIX de la séance : on décide ce qu'on travaille avant de
+        // résoudre, et le puzzle courant ne change plus sous les doigts. Ne
+        // reste ici que le compte des révisions.
+        DueBadge(ui)
+        header()
+        Spacer(Modifier.height(12.dp))
+        board()
+        Spacer(Modifier.height(14.dp))
+        controls()
     }
 
     if (ui.pendingPromotion != null) {
