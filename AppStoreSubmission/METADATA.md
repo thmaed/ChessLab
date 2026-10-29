@@ -101,6 +101,8 @@ stockfish,maia,tactique,ouverture,finale,entrainement,chess960,coach,elo,pgn,adv
 ```
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
+_En ligne sur la 2.0 depuis le 29/10/2026 avec « plus de 100 000 puzzles » (la 2.0 en a 106 094) ;
+le texte ci-dessous, à 130 000, part avec la version suivante._
 ```
 Sans publicité, sans compte, sans réseau. Neuf adversaires qui jouent comme des humains, l'analyse Stockfish et plus de 130 000 puzzles — tout sur votre appareil.
 ```

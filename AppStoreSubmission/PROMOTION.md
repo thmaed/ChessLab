@@ -11,6 +11,10 @@ Liens à employer partout :
 - Site : <https://thmaed.github.io/ChessLab/>
 - Code source : <https://github.com/thmaed/ChessLab>
 
+**Chiffre des puzzles** : la 2.0 en vente en compte 106 094 ; les messages disent donc
+« plus de 100 000 ». Passer à « plus de 130 000 » seulement quand la version suivante
+(130 935 puzzles) sera en vente — comme le texte promotionnel de l'App Store.
+
 Trois principes, pour que ces messages aident au lieu de lasser :
 
 1. **Dire qu'on est le développeur**, dès la première ligne. Une promotion déguisée se
@@ -47,7 +51,7 @@ Show HN pour un jour de semaine, vers 15 h (heure de Paris).
 > - **Game analysis that explains why** a move was bad, in one sentence, and turns your
 >   mistakes into puzzles.
 > - **A daily session**: openings due for review, missed puzzles, one endgame.
-> - **130,000+ puzzles**, filtered by level and theme, and the ones you half-solved come
+> - **100,000+ puzzles**, filtered by level and theme, and the ones you half-solved come
 >   back sooner.
 >
 > Everything runs on the phone: no account, nothing sent anywhere. iPhone, iPad and
@@ -80,7 +84,7 @@ Show HN pour un jour de semaine, vers 15 h (heure de Paris).
 >   Stockfish.
 > - **Stockfish analysis** with every move graded and the mistake explained in plain words.
 > - **58 opening courses** with spaced repetition, **78 endgame lessons** checked against
->   tablebases, **130k+ Lichess puzzles**, and 12 variants (Chess960, Atomic, Crazyhouse,
+>   tablebases, **100k+ Lichess puzzles**, and 12 variants (Chess960, Atomic, Crazyhouse,
 >   Duck Chess…).
 > - Photo/screenshot **board scanner**, also on-device.
 >
@@ -107,7 +111,7 @@ Show HN pour un jour de semaine, vers 15 h (heure de Paris).
 > Store's permission list.
 >
 > What's inside: opponents that play like humans (Maia-3 neural network), Stockfish
-> analysis that explains mistakes, opening and endgame courses, 130k+ puzzles, a daily
+> analysis that explains mistakes, opening and endgame courses, 100k+ puzzles, a daily
 > review session and 12 variants. Free, no ads, no in-app purchases, open source (GPLv3).
 >
 > Play Store: https://play.google.com/store/apps/details?id=com.maeder.chesslab
@@ -143,7 +147,7 @@ Show HN pour un jour de semaine, vers 15 h (heure de Paris).
 > - A **board scanner** reads a photo or screenshot with an on-device detector.
 > - The iOS app is the reference and the Android port follows it feature for feature;
 >   the parity list is a document in the repo.
-> - GPLv3, source on GitHub. The 130k puzzles come from the Lichess CC0 database.
+> - GPLv3, source on GitHub. The 100k+ puzzles come from the Lichess CC0 database.
 >
 > I'd love feedback on the training design, and on anything that feels off.
 
@@ -162,7 +166,7 @@ Show HN pour un jour de semaine, vers 15 h (heure de Paris).
 **Texte**
 
 > Hello! I'm the developer of ChessLab, a free and open-source (GPLv3) chess trainer for
-> iPhone, iPad and Android. Its 130,000+ puzzles come from the Lichess puzzle database
+> iPhone, iPad and Android. Its 100,000+ puzzles come from the Lichess puzzle database
 > (CC0) — thank you for publishing it; the app credits it.
 >
 > It's meant as an offline companion: human-like opponents (Maia-3), Stockfish analysis
@@ -223,7 +227,7 @@ Show HN pour un jour de semaine, vers 15 h (heure de Paris).
 >   gaffes comprises.
 > - Une **analyse qui explique** pourquoi un coup était mauvais, et qui transforme vos
 >   erreurs en puzzles.
-> - 58 ouvertures et 78 finales en cours, plus de **130 000 puzzles**, une séance du jour.
+> - 58 ouvertures et 78 finales en cours, plus de **100 000 puzzles**, une séance du jour.
 >
 > Tout tourne sur l'appareil : aucun compte, rien n'est envoyé. Code ouvert (GPLv3).
 >
@@ -249,7 +253,7 @@ Show HN pour un jour de semaine, vers 15 h (heure de Paris).
 > Android, sans publicité et sans compte — rien n'est collecté, ce qui la rend simple à
 > recommander à des jeunes.
 >
-> Elle propose des cours d'ouvertures et de finales, plus de 130 000 puzzles classés par
+> Elle propose des cours d'ouvertures et de finales, plus de 100 000 puzzles classés par
 > niveau, une analyse qui explique les erreurs, et des adversaires à la mesure de chaque
 > joueur. Un mode deux joueurs sur le même appareil permet aussi de jouer au club.
 >
