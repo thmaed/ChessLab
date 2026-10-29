@@ -53,3 +53,21 @@ td { color: var(--texte-doux); }
 .liens { list-style: none; padding: 0; margin: 2rem 0; }
 .liens li { padding: .35rem 0; }
 code { background: var(--surface); border: 1px solid var(--trait); border-radius: 5px; padding: .1em .4em; font-size: .88em; }
+
+/* Les arguments, les boutons des stores et les captures (29/10/2026). */
+.atouts { font-weight: 600; color: var(--texte); margin: 0 0 1.2rem; }
+.atouts span { color: var(--texte-tenu); padding: 0 .25rem; }
+.stores { display: flex; flex-wrap: wrap; gap: .7rem; margin: 0 0 2rem; }
+.store {
+  display: inline-block; padding: .7rem 1.15rem; border-radius: 12px;
+  background: var(--accent); color: var(--fond); font-weight: 600; text-decoration: none;
+}
+.store:hover { background: var(--accent2); color: var(--fond); }
+.galerie {
+  display: flex; gap: .8rem; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding-bottom: .6rem; margin: 0 0 1rem;
+}
+.galerie img {
+  flex: 0 0 auto; width: 13rem; height: auto; border-radius: 16px;
+  border: 1px solid var(--trait); scroll-snap-align: start;
+}

@@ -10812,3 +10812,20 @@ en PAYSAGE, que le Galaxy (portrait) ne voyait pas.
   où l'on se trouve sortait de l'écran.
 - Portrait inchangé. Vérifié à l'œil sur la tablette d'émulateur ; tests : `PuzzleDeviceFlowTest`
   4/4 et `OpeningIndexTest` 3/3.
+
+## 29/10 — Promotion : demande d'avis, fiches des stores, site, messages (iOS + Android)
+
+La 2.0 n'avait aucune note sur l'App Store (vérifié via l'API publique iTunes).
+- **Demande d'avis** : `ReviewPrompt` (règle pure, testée des deux côtés) — après une réussite,
+  à quelqu'un qui revient, une fois par version, 120 jours d'écart. iOS : `requestReview`
+  (jamais en Debug sauf `-allowReviewPrompt`, pour ne pas gêner les tests d'interface) ; Android :
+  invitation qui ouvre la fiche Play (écart assumé, voir PARITE).
+- **Fiches (ASO)** : sous-titres App Store « Jeu d'échecs, analyse, puzzles » / « Chess game,
+  analysis, puzzles » ; mots-clés sans doublon avec le titre ; texte promotionnel et tête de
+  description sur « sans publicité, sans compte, sans réseau » ; 130 000 puzzles. Pas de
+  « gratuit » dans titre, sous-titre ni mots-clés (App Store 2.3.7, règle Métadonnées de Play).
+  Rien n'est poussé vers les stores : `tools/asc` et le dossier `play/` le feront à la prochaine
+  version.
+- **Site** (`docs/`) : arguments, boutons App Store / Google Play, quatre captures par langue
+  (`docs/img/`, 570 Ko), balises de partage Open Graph, bannière Safari (`apple-itunes-app`).
+- **Messages** prêts à publier, un par communauté : `AppStoreSubmission/PROMOTION.md`.

@@ -179,16 +179,29 @@ fun PlayScreen(
             tag = "joueur-vous",
         )
     }
+    // Une victoire contre l'ordinateur : le bon moment, le cas échéant, pour
+    // inviter à laisser un avis (voir [com.chesslab.review.ReviewPrompt]).
+    val appContext = androidx.compose.ui.platform.LocalContext.current
+    var reviewInvite by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
+    LaunchedEffect(ui.gameOver && ui.userWon) {
+        if (ui.gameOver && ui.userWon) reviewInvite = com.chesslab.review.ReviewPrompt.recordPositiveMoment(appContext)
+    }
     // `movesInline` : la liste des coups est-elle déjà à l'écran ? Le bouton
     // « Coups » ne sert alors à rien, et iOS ne le montre pas.
     val actions: @Composable (movesInline: Boolean) -> Unit = { movesInline ->
-        if (ui.gameOver) GameOverPanel(
-            gutter, ui.outcome ?: ui.status,
-            summary = model.opponentSummaryLine(),
-            materialCurve = model.materialCurve(),
-            onAnalyze = { onAnalyzeGame(model.currentPgn()) },
-            onHome = onHome,
-        )
+        if (ui.gameOver) {
+            GameOverPanel(
+                gutter, ui.outcome ?: ui.status,
+                summary = model.opponentSummaryLine(),
+                materialCurve = model.materialCurve(),
+                onAnalyze = { onAnalyzeGame(model.currentPgn()) },
+                onHome = onHome,
+            )
+            if (reviewInvite) {
+                Spacer(Modifier.height(10.dp))
+                com.chesslab.review.ReviewInvite(gutter) { reviewInvite = false }
+            }
+        }
         else ControlBar(
             modifier = gutter,
             ui = ui,

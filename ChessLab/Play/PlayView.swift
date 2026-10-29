@@ -1,4 +1,5 @@
 import ChessKit
+import StoreKit
 import SwiftUI
 
 /// Écran de jeu contre Stockfish, avec layouts adaptatifs iPhone/iPad.
@@ -20,6 +21,7 @@ struct PlayView: View {
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.requestReview) private var requestReview
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
     @State private var showPanelSheet = false
@@ -122,6 +124,12 @@ struct PlayView: View {
         // d'ossature), il faut donc lui rendre son moteur au retour.
         .onAppear { viewModel.handleViewAppear() }
         .onDisappear { viewModel.handleViewDisappear() }
+        // Une victoire contre l'ordinateur : le bon moment, le cas échéant, pour
+        // demander un avis (voir ``ReviewPrompt``).
+        .onChange(of: viewModel.outcome) { previous, outcome in
+            guard previous == nil, let outcome, outcome.winner == viewModel.userColor else { return }
+            ReviewPrompt.celebrate(with: requestReview)
+        }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .background, .inactive:

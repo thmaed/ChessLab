@@ -1,4 +1,4 @@
-ChessLab est un compagnon d'échecs complet : jouer, analyser, s'entraîner et expérimenter, avec le moteur Stockfish embarqué et sans jamais quitter l'application. Rien ne part sur un serveur.
+ChessLab est un compagnon d'échecs complet : jouer, analyser, s'entraîner et expérimenter, avec le moteur Stockfish embarqué et sans jamais quitter l'application. Rien ne part sur un serveur : ni compte, ni publicité.
 
 NOUVEAU DANS LA 2.0
 • Séance du jour : chaque jour, ce qu'il faut revoir — positions d'ouverture dues, puzzles ratés, une finale — avec votre série de jours et des médailles.
@@ -27,7 +27,7 @@ LE COIN DES FINALES
 78 cours prouvés par table de finales — le verdict mathématique exact : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. De l'opposition aux études célèbres.
 
 PUZZLES
-Plus de 100 000 problèmes tactiques de la base Lichess, filtrables par niveau et par thème — plus les vôtres, tirés de vos propres erreurs.
+Plus de 130 000 problèmes tactiques de la base Lichess, filtrables par niveau et par thème — plus les vôtres, tirés de vos propres erreurs.
 
 VARIANTES
 Douze : Chess960 (échecs Fischer Random), Roi de la colline, Trois échecs, Horde, Course des rois, Atomique, Crazyhouse, Antiéchecs, les Barricades et leur version aléatoire, le Duck Chess et le Coup Volé. Chacune se règle comme une vraie partie — camp, force du moteur, cadence, aides — et se revoit ensuite aux règles de la variante, pas à celles des échecs ordinaires.

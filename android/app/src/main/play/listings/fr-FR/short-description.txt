@@ -1,1 +1,1 @@
-Jouer, analyser, progresser. Séance du jour, Stockfish et Maia, sans réseau.
+Jouer, analyser, progresser : Stockfish, Maia, 130 000 puzzles. Sans compte.

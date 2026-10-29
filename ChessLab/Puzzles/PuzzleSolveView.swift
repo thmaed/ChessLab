@@ -1,4 +1,5 @@
 import ChessKit
+import StoreKit
 import SwiftUI
 
 /// Écran de résolution d'un puzzle : plateau + bandeau "Trouvez mieux
@@ -16,6 +17,7 @@ struct PuzzleSolveView: View {
     private var boardTheme: BoardTheme { appSettings.boardTheme }
     /// Le chrono d'un programme Woodpecker ne compte que le temps ACTIF.
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.requestReview) private var requestReview
     /// iPad plein écran & Mac en paysage : deux colonnes (plateau | infos).
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
 
@@ -52,6 +54,11 @@ struct PuzzleSolveView: View {
         .onDisappear { viewModel.pauseClock() }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { viewModel.resumeClock() } else { viewModel.pauseClock() }
+        }
+        // Un cycle Woodpecker bouclé : une réussite, et le bon moment, le cas
+        // échéant, pour demander un avis (voir ``ReviewPrompt``).
+        .onChange(of: viewModel.isCycleComplete) { _, complete in
+            if complete { ReviewPrompt.celebrate(with: requestReview) }
         }
         .overlay {
             // Confettis par-dessus tout l'écran à la résolution (une seule

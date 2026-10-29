@@ -153,6 +153,18 @@ fun PuzzleScreen(
                     },
                     cycleSummary = plan?.takeIf { it.currentCycle.isComplete },
                 )
+                // Un cycle Woodpecker bouclé : une réussite, et le bon moment, le cas
+                // échéant, pour inviter à laisser un avis (voir `ReviewPrompt`).
+                val cycleDone = plan?.currentCycle?.takeIf { it.isComplete }?.number
+                var reviewInvite by androidx.compose.runtime.saveable.rememberSaveable(cycleDone) { mutableStateOf(false) }
+                val appContext = androidx.compose.ui.platform.LocalContext.current
+                LaunchedEffect(cycleDone) {
+                    if (cycleDone != null) reviewInvite = com.chesslab.review.ReviewPrompt.recordPositiveMoment(appContext)
+                }
+                if (reviewInvite) {
+                    Spacer(Modifier.height(10.dp))
+                    com.chesslab.review.ReviewInvite(Modifier.padding(horizontal = 20.dp)) { reviewInvite = false }
+                }
             }
         }
     }

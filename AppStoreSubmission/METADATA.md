@@ -87,23 +87,28 @@ FIXES
 ChessLab
 ```
 
-**Sous-titre** (30 car. max — 27 utilisés) :
+**Sous-titre** (30 car. max — 30 utilisés) :
 ```
-Échecs, adversaires humains
+Jeu d'échecs, analyse, puzzles
 ```
+_29/10/2026 (ASO) : les mots que l'on CHERCHE (« jeu d'échecs », « analyse », « puzzles ») plutôt
+qu'une formule ; ils comptent comme mots-clés, qui n'ont donc plus à les répéter. Pas de « gratuit »
+ici : Apple refuse les informations tarifaires dans le sous-titre et les mots-clés (règle 2.3.7)._
 
-**Mots-clés** (100 car. max — 100 utilisés, séparés par des virgules, sans espace) :
+**Mots-clés** (100 car. max — 95 utilisés, séparés par des virgules, sans espace) :
 ```
-echecs,stockfish,maia,tactique,ouverture,puzzle,finale,gambit,fen,pgn,elo,entrainement,scanner,coach
+stockfish,maia,tactique,ouverture,finale,entrainement,chess960,coach,elo,pgn,adversaire,scanner
 ```
 
 **Texte promotionnel** (170 car. max — modifiable sans nouvelle revue) :
 ```
-Nouveau : séance du jour, Coach, vos erreurs deviennent des puzzles. Neuf adversaires qui jouent comme des humains (Maia-3), analyse Stockfish — 100 % local.
+Sans publicité, sans compte, sans réseau. Neuf adversaires qui jouent comme des humains, l'analyse Stockfish et plus de 130 000 puzzles — tout sur votre appareil.
 ```
 
 **Description** (4000 car. max) :
 ```
+Entièrement gratuite, sans publicité, sans compte : rien ne quitte votre appareil.
+
 ChessLab est un compagnon d'échecs complet pour iPhone et iPad : jouer, analyser, s'entraîner et expérimenter, avec Stockfish intégré, sans jamais quitter l'app.
 
 DES ADVERSAIRES QUI JOUENT COMME DES HUMAINS
@@ -122,7 +127,7 @@ FINALES
 78 cours prouvés par table de finales : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Et l'entraînement libre, où tout coup qui préserve le verdict est accepté.
 
 PUZZLES
-Plus de 100 000 problèmes de la base Lichess, filtrables par niveau et par thème, plus les vôtres, tirés de vos erreurs. Cote personnelle et « À mon niveau ».
+Plus de 130 000 problèmes de la base Lichess, filtrables par niveau et par thème, plus les vôtres, tirés de vos erreurs. Cote personnelle et « À mon niveau ».
 
 VARIANTES ET PLUS
 Chess960 et onze variantes contre l'ordinateur (Roi de la colline, Trois échecs, Horde, Atomique, Crazyhouse, Duck Chess, Barricades…), chacune avec sa propre analyse. Mode deux joueurs, et Laboratoire pour comparer deux réglages de Stockfish.
@@ -145,23 +150,25 @@ ChessLab intègre le moteur Stockfish (licence GPLv3), le réseau Maia-3 de l'Un
 ChessLab
 ```
 
-**Subtitle** (30 char. max — 27 used):
+**Subtitle** (30 char. max — 29 used):
 ```
-Chess vs human-like players
+Chess game, analysis, puzzles
 ```
 
-**Keywords** (100 char. max — 94 used):
+**Keywords** (100 char. max — 97 used):
 ```
-chess,stockfish,maia,tactics,openings,puzzle,endgame,gambit,fen,pgn,elo,training,scanner,coach
+stockfish,maia,tactics,openings,endgame,training,chess960,coach,elo,pgn,opponent,scanner,variants
 ```
 
 **Promotional text** (170 char. max):
 ```
-New: daily session, Coach, your mistakes become puzzles. Nine opponents that play like humans (Maia-3), Stockfish analysis — fully offline, no ads.
+No ads, no account, no network. Nine opponents who play like humans, Stockfish analysis and over 130,000 puzzles — all on your device.
 ```
 
 **Description** (4000 char. max):
 ```
+Completely free, no ads, no account: nothing leaves your device.
+
 ChessLab is a complete chess companion for iPhone and iPad: play, analyse, train and experiment, with Stockfish built in, without ever leaving the app.
 
 OPPONENTS THAT PLAY LIKE HUMANS
@@ -180,7 +187,7 @@ ENDGAMES
 78 courses proven by endgame tablebases: no move taught gives up a win, no defence offered loses a draw. Plus free training, where any move that keeps the verdict is accepted.
 
 PUZZLES
-Over 100,000 problems from the Lichess database, filtered by level and theme, plus your own, drawn from your mistakes. Personal rating and “At my level”.
+Over 130,000 problems from the Lichess database, filtered by level and theme, plus your own, drawn from your mistakes. Personal rating and “At my level”.
 
 VARIANTS AND MORE
 Chess960 and eleven variants against the computer (King of the Hill, Three-Check, Horde, Atomic, Crazyhouse, Duck Chess, Barricades…), each with its own analysis. Two-player mode, and a Laboratory to compare two Stockfish settings.
@@ -287,7 +294,7 @@ English, for the Apple reviewer. Opens with the nature of the update (2.0 : majo
 ```
 WHAT'S IN THIS UPDATE (2.0): a major content update. New: a Daily session (what to review each day, a streak of days and medals, all stored locally); after a game analysis the app offers to turn the user's mistakes and missed mates into puzzles, shown on a confirmation sheet (nothing is created without a tap on "Create"); a "Coach" line under mistakes, computed on-device by the bundled Maia-3 Core ML model; a personal puzzle rating; illustrated opening cards with filters; resuming an interrupted game from the game settings screen; an optional time limit. Fixes: a crash when resuming a game after a rook was captured on its corner, and games ending in checkmate not being graded to the end. No change to permissions, privacy or licensing. Nothing to set up to see the new features: finish or import any game and tap Analyse.
 
-ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 100,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
+ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 130,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
 
 CAMERA: the Scanner uses the camera only to photograph a chess diagram — a screenshot or a physical board seen from above — and reconstruct the position with on-device recognition. Photos never leave the device. On Simulator (no camera), use the "Paste" entry in the Scanner screen with any chess diagram in the clipboard: it skips the camera and exercises the same recognition.
 

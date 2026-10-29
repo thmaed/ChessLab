@@ -1,4 +1,4 @@
-ChessLab is a complete chess companion: play, analyse, train and experiment, with the Stockfish engine built in and without ever leaving the app. Nothing is sent to a server.
+ChessLab is a complete chess companion: play, analyse, train and experiment, with the Stockfish engine built in and without ever leaving the app. Nothing is sent to a server: no account, no ads, no data collected.
 
 NEW IN 2.0
 • Daily session: every day, what to review — opening positions due, missed puzzles, an endgame — with your streak of days and medals.
@@ -27,7 +27,7 @@ THE ENDGAME CORNER
 78 courses proved by tablebase — the exact mathematical verdict: no move taught throws away a win, no defence offered loses a draw. From the opposition to the famous studies.
 
 PUZZLES
-Over 100,000 tactical problems from the Lichess database, filtered by level and by theme — plus your own, drawn from your own mistakes.
+Over 130,000 tactical problems from the Lichess database, filtered by level and by theme — plus your own, drawn from your own mistakes.
 
 VARIANTS
 Twelve: Chess960 (Fischer Random), King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Crazyhouse, Antichess, Barricades and its random version, Duck Chess and Stolen Move. Each is set up like a real game — side, engine strength, clock, assistance — and reviewed afterwards by the variant's own rules, not by ordinary chess ones.

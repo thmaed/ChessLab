@@ -1301,4 +1301,9 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="woodpecker_sheet_intro">Un lot fixe de puzzles, résolu en entier puis repris dans un nouvel ordre, cycle après cycle, pour en trouver plus et plus vite. Choisissez ses puzzles, puis sa taille.</string>
     <string name="puzzle_lot_size">Taille du lot</string>
     <string name="puzzle_start_count">Commencer · %1$s puzzles</string>
+    <!-- Invitation à laisser un avis (29/10/2026) -->
+    <string name="review_invite_title">Vous aimez ChessLab ?</string>
+    <string name="review_invite_body">Un avis sur le Play Store aide d\'autres joueurs à la découvrir. Ça prend une minute.</string>
+    <string name="review_invite_rate">Donner un avis</string>
+    <string name="review_invite_later">Plus tard</string>
 </resources>

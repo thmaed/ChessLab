@@ -7,6 +7,16 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Demande d'avis — 29/10/2026
+
+- [ ] Même RÈGLE des deux côtés (`ReviewPrompt.swift` / `ReviewPrompt.kt`) : après une réussite
+      (partie gagnée contre l'ordinateur, cycle Woodpecker bouclé), 3 jours d'entraînement et 2
+      réussites au moins, une fois par version, pas plus d'une fois tous les 120 jours.
+- Écart ASSUMÉ dans la FORME : iOS présente la demande système d'Apple (seule permise par la
+  règle 1.1.7 de l'App Store) ; Android montre une invitation dans l'app qui ouvre la fiche
+  Play, plutôt que l'API In-App Review de Google, bibliothèque propriétaire (GPLv3, F-Droid).
+  Aucune permission réseau ajoutée (vérifié dans le manifeste fusionné).
+
 ### Paysage : résolution des puzzles et lecteur de cours — 29/10/2026
 
 - [x] Résolution des puzzles en paysage : échiquier à gauche, commandes à droite (« Puzzle
