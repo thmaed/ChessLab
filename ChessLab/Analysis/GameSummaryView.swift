@@ -50,7 +50,7 @@ struct GameSummaryView: View {
                 .padding(.horizontal, 7)
                 .padding(.vertical, 3)
                 .background(Theme.accentGradient, in: Capsule())
-            Text(opening.name)
+            Text(opening.displayName(AppSettings.shared.appLanguage.resolvedCode))
                 .font(.caption.weight(.medium))
                 .foregroundStyle(Theme.textSecondary)
                 .lineLimit(1)

@@ -1306,4 +1306,11 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="review_invite_body">Un avis sur le Play Store aide d\'autres joueurs à la découvrir. Ça prend une minute.</string>
     <string name="review_invite_rate">Donner un avis</string>
     <string name="review_invite_later">Plus tard</string>
+
+    <!-- Aide : contact et remerciements (pendants de contactCard / thanksCard dans HelpView.swift) -->
+    <string name="help_contact_title">Contactez le développeur</string>
+    <string name="help_contact_body">Vos retours et suggestions pour améliorer l\'app sont toujours les bienvenus : tout est lu, et chaque message compte. En cas de bug ou de comportement inattendu, n\'hésitez pas à écrire par e-mail, en précisant le modèle de votre téléphone ou tablette, la version d\'Android, et une courte description du problème.</string>
+    <string name="help_contact_mail_missing">Aucune application de messagerie. Écrivez à %1$s.</string>
+    <string name="help_thanks_title">Remerciements</string>
+    <string name="help_thanks_body">Un grand merci à Nils Gauthey pour tout le travail accompli sur ChessLab. Ses relectures, ses corrections et ses idées ont fait progresser l\'app dans son ensemble, et tout particulièrement la qualité des ouvertures et des finales : les lignes que vous étudiez ici lui doivent beaucoup.</string>
 </resources>

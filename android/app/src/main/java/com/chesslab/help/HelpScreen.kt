@@ -15,6 +15,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.foundation.clickable
@@ -126,7 +128,88 @@ fun HelpScreen(
                 }
             }
         }
+        ContactCard()
+        InfoCard(
+            Icons.Default.Favorite, Palette.rose,
+            R.string.help_thanks_title, R.string.help_thanks_body,
+        )
         Spacer(Modifier.height(12.dp))
+    }
+}
+
+/** Adresse de contact — la même que l'Aide iOS. */
+private const val CONTACT_EMAIL = "variospeed67@gmail.com"
+
+/**
+ * « Contactez le développeur ». Pendant de `contactCard` (HelpView.swift) :
+ * un lien `mailto:` ouvre l'application de messagerie du téléphone, sans
+ * aucune permission — la promesse « pas d'INTERNET » reste intacte. La photo
+ * de l'auteur que montre iOS n'est pas portée (voir `PARITE.md`).
+ */
+@Composable
+private fun ContactCard() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val missing = stringResource(R.string.help_contact_mail_missing, CONTACT_EMAIL)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(CardShape)
+            .background(cardGradient)
+            .subtleBorder()
+            .padding(14.dp)
+            .testTag("aide-contact"),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        IconBadge(Icons.Default.Email, Palette.accent, 36.dp)
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                stringResource(R.string.help_contact_title), fontSize = 14.sp,
+                fontWeight = FontWeight.Bold, color = Palette.textPrimary,
+            )
+            Text(stringResource(R.string.help_contact_body), fontSize = 12.sp, color = Palette.textSecondary)
+            Text(
+                CONTACT_EMAIL, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Palette.accent,
+                modifier = Modifier
+                    .clickable {
+                        val mail = android.content.Intent(
+                            android.content.Intent.ACTION_SENDTO, android.net.Uri.parse("mailto:$CONTACT_EMAIL"),
+                        )
+                        try {
+                            context.startActivity(mail)
+                        } catch (_: android.content.ActivityNotFoundException) {
+                            android.widget.Toast.makeText(context, missing, android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    .padding(vertical = 4.dp)
+                    .testTag("aide-contact-mail"),
+            )
+        }
+    }
+}
+
+/** Une carte de texte simple : icône, titre, corps. */
+@Composable
+private fun InfoCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector, tint: androidx.compose.ui.graphics.Color,
+    title: Int, body: Int,
+) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(CardShape)
+            .background(cardGradient)
+            .subtleBorder()
+            .padding(14.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        IconBadge(icon, tint, 36.dp)
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                stringResource(title), fontSize = 14.sp,
+                fontWeight = FontWeight.Bold, color = Palette.textPrimary,
+            )
+            Text(stringResource(body), fontSize = 12.sp, color = Palette.textSecondary)
+        }
     }
 }
 

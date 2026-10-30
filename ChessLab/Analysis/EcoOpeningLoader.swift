@@ -20,6 +20,18 @@ enum EcoOpeningLoader {
     /// bien plus profondément.
     static let bookLines: [EcoOpening] = standard + libraryLines()
 
+    /// Nom français (la clé enregistrée dans les parties) → nom anglais.
+    private static let englishByStoredName: [String: String] = Dictionary(
+        standard.compactMap { entry in entry.nameEn.map { (entry.name, $0) } },
+        uniquingKeysWith: { first, _ in first }
+    )
+
+    /// Le nom d'ouverture ENREGISTRÉ (français) dans la langue demandée. Un
+    /// nom inconnu — partie importée d'ailleurs — reste tel quel.
+    static func displayName(forStored name: String, _ languageCode: String) -> String {
+        languageCode == "fr" ? name : (englishByStoredName[name] ?? name)
+    }
+
     static func load(from bundle: Bundle) -> [EcoOpening] {
         guard
             let url = bundle.url(forResource: "eco_openings", withExtension: "json"),

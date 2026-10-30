@@ -1309,4 +1309,11 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="review_invite_body">A review on the Play Store helps other players find it. It takes a minute.</string>
     <string name="review_invite_rate">Leave a review</string>
     <string name="review_invite_later">Not now</string>
+
+    <!-- Aide : contact et remerciements (pendants de contactCard / thanksCard dans HelpView.swift) -->
+    <string name="help_contact_title">Contact the developer</string>
+    <string name="help_contact_body">Any feedback or suggestions aimed at improving the app are genuinely welcome — the developer reads everything and appreciates hearing from users. If you encounter a bug or an unexpected issue, you are welcome to reach out by email. Please include your phone or tablet model, Android version, and a short description of the problem.</string>
+    <string name="help_contact_mail_missing">No email app found. Write to %1$s.</string>
+    <string name="help_thanks_title">Acknowledgements</string>
+    <string name="help_thanks_body">Many thanks to Nils Gauthey for all the work he has put into ChessLab. His reviews, his corrections and his ideas moved the app forward as a whole, and above all the quality of the openings and the endgames: the lines you study here owe him a great deal.</string>
 </resources>

@@ -10829,3 +10829,20 @@ La 2.0 n'avait aucune note sur l'App Store (vérifié via l'API publique iTunes)
 - **Site** (`docs/`) : arguments, boutons App Store / Google Play, quatre captures par langue
   (`docs/img/`, 570 Ko), balises de partage Open Graph, bannière Safari (`apple-itunes-app`).
 - **Messages** prêts à publier, un par communauté : `AppStoreSubmission/PROMOTION.md`.
+
+## 30/10 — Noms d'ouvertures traduits (iOS) ; contact et remerciements dans l'Aide Android
+
+Relevé en préparant un post pour r/chess : la capture de l'analyse en anglais affichait « Italienne, défense
+des deux cavaliers ». Android avait déjà la colonne anglaise (`name_en`, `tools/android-eco/make_eco.py`) ;
+iOS, qui FAIT FOI, ne l'avait jamais reçue — un écart à l'envers de la règle habituelle.
+
+- **iOS** : `eco_openings.json` reçoit `name_en` (76 noms, repris du catalogue Android, vérifiés à
+  l'identique : mêmes codes, mêmes coups). `EcoOpening.displayName(_:)` choisit la langue ; le nom
+  FRANÇAIS reste la clé enregistrée dans les parties (`GameRecord.openingName`) et regroupée par le Progrès,
+  donc aucune migration : on traduit à l'affichage (`EcoOpeningLoader.displayName(forStored:_:)`) dans
+  l'en-tête d'analyse, le bilan de partie, les puces de la bibliothèque et « Ouvertures coûteuses ».
+  Tests : `EcoOpeningLocalizationTests` (76 noms, repli, clé stockée).
+- **Android** : l'Aide gagne les cartes « Contactez le développeur » (lien `mailto:`, aucune permission) et
+  « Remerciements », que l'Aide iOS avait et pas elle — utile maintenant qu'on demande des retours sur
+  r/AndroidApps. Texte « téléphone ou tablette / version d'Android ». Photo de l'auteur NON portée
+  (écart inscrit dans PARITE).

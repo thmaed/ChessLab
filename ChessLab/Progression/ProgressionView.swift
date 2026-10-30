@@ -171,7 +171,7 @@ struct ProgressionView: View {
                     .foregroundStyle(Theme.textSecondary)
                 ForEach(profile.openings) { stat in
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(stat.name)
+                        Text(EcoOpeningLoader.displayName(forStored: stat.name, AppSettings.shared.appLanguage.resolvedCode))
                             .font(.footnote.weight(.medium))
                             .foregroundStyle(Theme.textPrimary)
                         Text(LocalizationController.string(

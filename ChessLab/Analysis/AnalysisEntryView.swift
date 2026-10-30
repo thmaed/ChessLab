@@ -288,7 +288,9 @@ struct AnalysisEntryView: View {
         if let date = record.playedAt {
             chips.append(date.formatted(date: .abbreviated, time: .omitted))
         }
-        if let name = record.openingName { chips.append(name) }
+        if let name = record.openingName {
+            chips.append(EcoOpeningLoader.displayName(forStored: name, AppSettings.shared.appLanguage.resolvedCode))
+        }
         if let metrics = record.analysisMetrics, let engineColor = record.engineColorRaw {
             let side = engineColor == Piece.Color.black.rawValue ? metrics.white : metrics.black
             if let accuracy = side.accuracy {

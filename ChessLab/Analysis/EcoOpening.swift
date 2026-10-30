@@ -2,10 +2,29 @@ import Foundation
 
 /// Une ouverture nommée de la base ECO (Encyclopaedia of Chess Openings) :
 /// code, nom, et la ligne principale (SAN) qui l'identifie.
+///
+/// Le nom existe en deux langues. `name` (français) reste la CLÉ : c'est lui
+/// qu'enregistrent les parties (`GameRecord.openingName`) et que regroupe le
+/// Progrès ; on ne traduit qu'à l'affichage, par ``displayName(_:)`` ou
+/// ``EcoOpeningLoader/displayName(forStored:_:)``. Pendant : `EcoOpening.kt`
+/// (`displayName`, colonne `name_en`).
 struct EcoOpening: Codable, Equatable, Sendable {
     let eco: String
     let name: String
     let moves: [String]
+    /// Absent des lignes de la bibliothèque d'ouvertures (noms de familles,
+    /// jamais affichés comme nom d'ouverture) : repli sur `name`.
+    var nameEn: String? = nil
+
+    private enum CodingKeys: String, CodingKey {
+        case eco, name, moves
+        case nameEn = "name_en"
+    }
+
+    /// Le nom dans la langue demandée (`"fr"` ou `"en"`).
+    func displayName(_ languageCode: String) -> String {
+        languageCode == "fr" ? name : (nameEn ?? name)
+    }
 }
 
 /// Recherche l'ouverture nommée pour une ligne jouée, par plus long

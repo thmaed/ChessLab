@@ -31,34 +31,45 @@ Show HN pour un jour de semaine, vers 15 h (heure de Paris).
 
 ## 1. Reddit — r/chessbeginners (anglais)
 
-> **Avant de poster** : lire la règle sur l'auto-promotion de la communauté ; certaines
-> n'autorisent les apps que dans un fil dédié. Poster en texte, pas en lien seul.
+> **NE PAS POSTER** (vérifié le 29/10/2026) : la règle 3 de r/chessbeginners interdit
+> toute auto-promotion, retrait automatique, bannissement des comptes qui en vivent.
+> Seule voie : demander d'abord l'accord des modérateurs par message (modmail).
 
 **Titre**
 
-> I made a free chess app to train like I wish I had as a beginner — no ads, no account
+> I'm building a 100% free chess trainer as a hobby: bots that play like humans, Stockfish to explain your mistakes, 100k puzzles. What should I improve?
 
 **Texte**
 
-> Hi! I'm the developer, so take this with the bias it deserves.
+> Hi everyone! I'm the developer, so I'm biased. But one thing first: this is a pure
+> hobby project. No ads, no subscription, no in-app purchases, no account. I don't make
+> a cent from it and I don't intend to. My goal is simply to build the best chess
+> training app I can, and keep it completely free.
 >
-> I built ChessLab because I wanted one app that does the boring-but-useful parts of
-> improving, without ads or a subscription:
+> **How it works**
 >
-> - **Opponents that play like humans** at your level (they're played by Maia-3, a
->   neural network trained on human games, so they blunder like real people instead of
->   playing perfect-then-random moves like a throttled engine).
-> - **Game analysis that explains why** a move was bad, in one sentence, and turns your
->   mistakes into puzzles.
-> - **A daily session**: openings due for review, missed puzzles, one endgame.
-> - **100,000+ puzzles**, filtered by level and theme, and the ones you half-solved come
->   back sooner.
+> - **The bots play like humans.** They're powered by Maia-3, a neural network from the
+>   University of Toronto trained on millions of real games. You pick a level and the bot
+>   plays the moves a human of that rating would play, mistakes included. It feels very
+>   different from a weakened engine that plays perfectly for ten moves and then hangs
+>   its queen for no reason.
+> - **Stockfish does the evaluation.** After the game, every move is graded, and when you
+>   went wrong the app tells you why in one plain sentence. Your own mistakes can then be
+>   replayed as puzzles.
 >
-> Everything runs on the phone: no account, nothing sent anywhere. iPhone, iPad and
-> Android, free. It's open source (GPLv3).
+> **Puzzles**
 >
-> I'd really like feedback from people learning right now: what's confusing, what's
-> missing. Links in the first comment.
+> - Over 100,000 puzzles from the Lichess database, sorted by level and by theme.
+> - Your puzzle rating follows your results, so the series stay at your level.
+> - The puzzles you miss come back a few days later until they stick.
+> - A Woodpecker mode if you like drilling the same set again and again.
+>
+> There are also opening and endgame courses and a short daily session. Everything runs
+> on the device, offline: iPhone, iPad and Android. The code is open source (GPLv3).
+>
+> **This is where I need you.** What's confusing? What's missing? What would make you
+> open it every day? I read everything, and several features in the app already came
+> from players' emails. Links in the first comment.
 
 *(Premier commentaire : les deux liens des stores et le site.)*
 

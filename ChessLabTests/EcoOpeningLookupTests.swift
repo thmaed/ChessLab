@@ -52,3 +52,35 @@ struct EcoOpeningLookupTests {
         }
     }
 }
+
+/// Les noms d'ouverture existent en deux langues (pendant d'`EcoOpening.kt`) :
+/// la base française reste la clé enregistrée, on ne traduit qu'à l'affichage.
+struct EcoOpeningLocalizationTests {
+
+    @Test func everyBundledOpeningHasAnEnglishName() {
+        for entry in EcoOpeningLoader.standard {
+            #expect(entry.nameEn?.isEmpty == false, "\(entry.eco) \(entry.name)")
+        }
+        #expect(EcoOpeningLoader.standard.count == 76)
+    }
+
+    @Test func displayNameFollowsTheLanguage() {
+        let opening = EcoOpening(
+            eco: "C57", name: "Italienne, défense des deux cavaliers", moves: [],
+            nameEn: "Italian, Two Knights Defence")
+        #expect(opening.displayName("fr") == "Italienne, défense des deux cavaliers")
+        #expect(opening.displayName("en") == "Italian, Two Knights Defence")
+    }
+
+    @Test func missingEnglishNameFallsBackToFrench() {
+        let opening = EcoOpening(eco: "", name: "Famille", moves: [])
+        #expect(opening.displayName("en") == "Famille")
+    }
+
+    @Test func storedFrenchNameIsTranslatedOnlyForEnglish() {
+        let stored = "Défense sicilienne"
+        #expect(EcoOpeningLoader.displayName(forStored: stored, "fr") == stored)
+        #expect(EcoOpeningLoader.displayName(forStored: stored, "en") == "Sicilian Defence")
+        #expect(EcoOpeningLoader.displayName(forStored: "Nom inconnu", "en") == "Nom inconnu")
+    }
+}

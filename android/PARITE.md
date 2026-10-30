@@ -1869,6 +1869,14 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
       Probablement le test qui ne la fait pas venir, pas l'écran qui casse —
       à trancher en le regardant.
 
+### Noms d'ouvertures, contact, remerciements — 30/10/2026
+
+- [ ] Noms d'ouvertures traduits à l'affichage des DEUX côtés (iOS : `name_en` + `displayName`, la clé
+      enregistrée reste le nom français ; Android l'avait déjà). À vérifier en anglais sur appareil :
+      en-tête d'analyse, bilan, puces de la bibliothèque, « Ouvertures coûteuses ».
+- [ ] Aide : cartes « Contactez le développeur » (ouvre la messagerie) et « Remerciements ».
+- [ ] **Écart** : la photo de l'auteur sous le contact (iOS) n'est pas portée sur Android.
+
 ## Publication Play de la 2.0 (27/10/2026)
 
 - [ ] **Le binaire publié sur Play est une version INTERMÉDIAIRE (AAB versionCode 33), laissée en l'état
