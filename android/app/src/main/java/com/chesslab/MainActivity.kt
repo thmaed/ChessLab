@@ -286,8 +286,8 @@ private fun App() {
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup(startFen = it)) },
                 onOpenLab = { stack.add(Route.Laboratory(it)) },
                 onFreeTrain = { id, name -> stack.add(Route.EndgameFree(id, name)) },
-            ) { id, name ->
-                stack.add(Route.Train("line", id, context.getString(R.string.route_train_named, name)))
+            ) { id, name, path ->
+                stack.add(Route.Train("line", id, context.getString(R.string.route_train_named, name), path))
             }
             is Route.EndgameFree -> com.chesslab.training.EndgameFreeScreen(
                 courseId = current.courseId,
@@ -297,7 +297,7 @@ private fun App() {
             )
             is Route.Train -> TrainScreen(
                 mode = when (current.kind) {
-                    "line" -> TrainMode.FullLine(current.courseId ?: "")
+                    "line" -> TrainMode.FullLine(current.courseId ?: "", current.path)
                     "hardest" -> TrainMode.Hardest
                     "session" -> TrainMode.Session(maxOf(1, com.chesslab.settings.SettingsStore.state.value.dailyOpeningsCap - com.chesslab.dailysession.TrainingDays.openingsReviewedToday(context)))
                     else -> TrainMode.Daily

@@ -10846,3 +10846,23 @@ iOS, qui FAIT FOI, ne l'avait jamais reçue — un écart à l'envers de la règ
   « Remerciements », que l'Aide iOS avait et pas elle — utile maintenant qu'on demande des retours sur
   r/AndroidApps. Texte « téléphone ou tablette / version d'Android ». Photo de l'auteur NON portée
   (écart inscrit dans PARITE).
+
+## 01/11 — « S'entraîner » travaille la variante affichée (iOS + Android)
+
+Demande d'Olivier Gechter (e-mail du 01/11) : le chapeau d'étudiant du lecteur d'ouvertures
+n'entraînait que la ligne principale, même quand on explorait une variante.
+
+- **Règle** : l'entraînement part TOUJOURS de la racine (on rejoue les coups qui mènent à la
+  variante), suit les coups de la variante affichée — ceux de l'adversaire comme les nôtres —
+  puis reprend la ligne principale là où elle s'arrête. À la racine : comportement inchangé.
+- **iOS** : `Mode.fullLine(courseID:path:)` (chemin UCI, vide par défaut) ; `targetEdge(at:)`
+  remplace « le premier candidat » pour le coup adverse, le coup attendu, l'indice et la
+  correction ; `playedUCIs` dit si l'on est encore sur la variante. `Route.openingTrainLine`
+  porte le chemin ; les deux lecteurs (ouvertures : `viewModel.path`, finales :
+  `playedUCIs`, nouveau) le transmettent. Quand on joue autre chose que la variante travaillée,
+  le choix s'intitule « Rester sur ma ligne » au lieu de « Rester sur la principale ».
+  6 tests ajoutés (`OpeningTrainViewModelTests`, 17 au total, verts).
+- **Android** : même règle (`TrainMode.FullLine(courseId, path)`, `Route.Train.path`,
+  `CourseScreen.onTrain` reçoit `currentPath`), logique pure `expectedMove` testée en JVM
+  (`ExpectedMoveTest`, 7 tests). Le bouton « Rester sur %s » nomme déjà le coup : seul le texte
+  du message change (`train_variation_other`).

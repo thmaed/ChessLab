@@ -161,8 +161,12 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     /**
      * Une séance d'entraînement. [courseId] n'est rempli que pour « une
      * ligne » ; sinon la séance est quotidienne ou ciblée sur les difficiles.
+     * [path] : les coups UCI de la variante affichée par le lecteur (vide = principale).
      */
-    data class Train(val kind: String, val courseId: String? = null, val label: String? = null) :
+    data class Train(
+        val kind: String, val courseId: String? = null, val label: String? = null,
+        val path: List<String> = emptyList(),
+    ) :
         Route(R.string.route_training, label)
 
     /**

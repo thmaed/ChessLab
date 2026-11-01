@@ -16,7 +16,8 @@ import SwiftUI
 struct EndgameReaderView: View {
     @Bindable var viewModel: EndgameReaderViewModel
     let onExit: () -> Void
-    var onTrain: () -> Void = {}
+    /// Reçoit les coups UCI de la ligne affichée (vide à la racine).
+    var onTrain: ([String]) -> Void = { _ in }
     /// Continue la partie CONTRE STOCKFISH depuis la position affichée :
     /// l'écran de réglages s'ouvre pré-rempli (l'utilisateur choisit l'Elo).
     var onContinueVsStockfish: (String) -> Void = { _ in }
@@ -63,7 +64,7 @@ struct EndgameReaderView: View {
                 // direct, elles n'ont qu'un seul mode.
                 if viewModel.course.kind == "endgame" {
                     Menu {
-                        Button { onTrain() } label: {
+                        Button { onTrain(viewModel.playedUCIs) } label: {
                             Label("Ligne guidée", systemImage: "graduationcap.fill")
                         }
                         Button { onFreeTrain() } label: {
@@ -75,7 +76,7 @@ struct EndgameReaderView: View {
                     .tint(Theme.accent)
                     .accessibilityIdentifier("reader_trainMenu")
                 } else {
-                    Button { onTrain() } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
+                    Button { onTrain(viewModel.playedUCIs) } label: { Label("S'entraîner", systemImage: "graduationcap.fill") }
                         .tint(Theme.accent)
                 }
                 QuickSwitchMenu(
@@ -355,7 +356,8 @@ struct EndgameReaderHost: View {
     /// Identité de session — voir ``SessionStore``.
     let sessionKey: String
     let onExit: () -> Void
-    var onTrain: () -> Void = {}
+    /// Reçoit les coups UCI de la ligne affichée (vide à la racine).
+    var onTrain: ([String]) -> Void = { _ in }
     var onContinueVsStockfish: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }

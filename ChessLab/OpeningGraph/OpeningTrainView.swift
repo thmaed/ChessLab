@@ -146,6 +146,7 @@ struct OpeningTrainView: View {
                             .background(isCurrent ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Theme.surface),
                                         in: Capsule())
                             .id(index)
+                            .accessibilityIdentifier("train_move_\(index)")
                     }
                 }
                 .padding(.horizontal, 16)
@@ -196,18 +197,20 @@ struct OpeningTrainView: View {
                 Text(variationMessage)
                     .font(.subheadline).foregroundStyle(Theme.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("train_variationMessage")
                 Spacer(minLength: 0)
             }
             .cardStyle()
             HStack(spacing: 10) {
                 Button { viewModel.keepMainLine() } label: {
-                    Text("Rester sur la principale")
+                    Text(viewModel.variationTargetIsMainLine ? "Rester sur la principale" : "Rester sur ma ligne")
                         .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.textPrimary)
                         .frame(maxWidth: .infinity).padding(.vertical, 12)
                         .background(Theme.surface, in: Capsule())
                         .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
                 }
                 .buttonStyle(.pressable)
+                .accessibilityIdentifier("train_keepMain")
                 Button { viewModel.playVariation() } label: {
                     Text("Jouer la variante")
                         .font(.subheadline.weight(.bold)).foregroundStyle(Theme.background)
@@ -224,6 +227,12 @@ struct OpeningTrainView: View {
         let played = viewModel.variationPlayedSAN ?? "?"
         let main = viewModel.variationMainSAN ?? "?"
         let fr = AppSettings.shared.appLanguage.resolvedCode == "fr"
+        if !viewModel.variationTargetIsMainLine {
+            // Entraînement d'une variante choisie : le coup attendu n'est pas la principale.
+            return fr
+                ? "« \(played) » est une autre variante du répertoire — la ligne que tu travailles passe par \(main). Que veux-tu faire ?"
+                : "“\(played)” is another repertoire line — the line you are practising goes through \(main). What would you like to do?"
+        }
         return fr
             ? "« \(played) » est une variante du répertoire — la ligne principale est \(main). Que veux-tu faire ?"
             : "“\(played)” is a repertoire sideline — the main line is \(main). What would you like to do?"

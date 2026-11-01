@@ -116,7 +116,9 @@ struct HomeView: View {
         case openingLabsReader(String)
         case openingTrainDaily
         case openingTrainSession
-        case openingTrainLine(String)
+        /// Entraînement d'une ligne : l'identifiant du cours et, quand le lecteur
+        /// affichait une variante, ses coups UCI depuis la racine (vide = principale).
+        case openingTrainLine(String, path: [String] = [])
         /// Réglages Labo, éventuellement pré-remplis avec une position de
         /// départ venue de l'éditeur ou du scanner.
         case labSetup(startFEN: String?)
@@ -387,7 +389,7 @@ struct HomeView: View {
             return .activeChess960Analysis("[Variant \"Chess960\"]\n[SetUp \"1\"]\n[FEN \"bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w KQkq - 0 1\"]\n\n1. e4 e5 2. Nc3 Nc6 3. Nf3 Nf6 *")
         case "endgameReader": return .endgameReader("eg-bahr-rule-flaw")
         case "endgameTrain": return .endgameFreeTrain("eg-bahr-rule-flaw")
-        case "openingTrain": return .openingTrainLine("italian-game")
+        case "openingTrain": return .openingTrainLine("italian-game", path: [])
         case "crazyhouse": return .activeEngineLegalityGame(variantID: EngineLegalityVariant.crazyhouse.id, settings: FairyVariantSettings())
         case "chess960TwoPlayer": return .activeChess960TwoPlayerGame(Chess960TwoPlayerSettings(startFEN: "bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w KQkq - 0 1"))
         case "progression": return .progression
@@ -1145,8 +1147,8 @@ struct HomeView: View {
                 case let .openingLabsReader(courseID):
                     OpeningReaderHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
-                    } onTrain: {
-                        path.append(Route.openingTrainLine(courseID))
+                    } onTrain: { linePath in
+                        path.append(Route.openingTrainLine(courseID, path: linePath))
                     } onContinueVsStockfish: { fen in
                         path.append(Route.continueVsStockfish(fen))
                     } onOpenLab: { fen in
@@ -1163,8 +1165,8 @@ struct HomeView: View {
                 case let .endgameReader(courseID):
                     EndgameReaderHost(courseID: courseID, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
-                    } onTrain: {
-                        path.append(Route.openingTrainLine(courseID))
+                    } onTrain: { linePath in
+                        path.append(Route.openingTrainLine(courseID, path: linePath))
                     } onContinueVsStockfish: { fen in
                         path.append(Route.continueVsStockfish(fen))
                     } onOpenLab: { fen in
@@ -1184,9 +1186,9 @@ struct HomeView: View {
                 case .openingTrainDaily:
                     OpeningTrainHost(mode: .daily, sessionKey: sessionKey(for: route)) { path.removeLast() }
 
-                case let .openingTrainLine(courseID):
+                case let .openingTrainLine(courseID, linePath):
                     OpeningTrainHost(
-                        mode: .fullLine(courseID: courseID), sessionKey: sessionKey(for: route)
+                        mode: .fullLine(courseID: courseID, path: linePath), sessionKey: sessionKey(for: route)
                     ) { path.removeLast() }
 
                 case let .labSetup(startFEN):

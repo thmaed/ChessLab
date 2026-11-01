@@ -123,7 +123,10 @@ fun TrainScreen(
 
                 TrainPhase.variation -> Panel(Palette.info) {
                     Text(
-                        stringResource(R.string.train_variation, ui.variationPlayed ?: "", ui.variationMain ?: ""),
+                        stringResource(
+                            if (ui.variationMainIsMainLine) R.string.train_variation else R.string.train_variation_other,
+                            ui.variationPlayed ?: "", ui.variationMain ?: "",
+                        ),
                         color = Palette.textPrimary, fontSize = 13.sp,
                         modifier = Modifier.testTag("variante"),
                     )

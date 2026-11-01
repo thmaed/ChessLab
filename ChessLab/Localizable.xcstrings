@@ -15743,6 +15743,22 @@
         }
       }
     },
+    "Rester sur ma ligne": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stay on my line"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rester sur ma ligne"
+          }
+        }
+      }
+    },
     "Retour": {
       "localizations": {
         "en": {

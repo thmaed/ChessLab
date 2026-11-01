@@ -419,6 +419,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="train_session_done">Séance terminée</string>
     <string name="train_session_score">%1$s sur %2$s.</string>
     <string name="train_variation">%1$s est au répertoire, mais la ligne principale est %2$s.</string>
+    <string name="train_variation_other">%1$s est une autre variante du répertoire ; la ligne travaillée passe par %2$s.</string>
     <string name="variant_3check">Trois échecs</string>
     <string name="variant_3check_blurb">Les règles sont celles du jeu classique, échec et mat compris. En plus, vous gagnez dès que vous avez mis le roi adverse en échec TROIS FOIS au cours de la partie — chaque échec compte, qu\'il soit paré, capturé ou fui au coup suivant.</string>
     <string name="variant_antichess">Antéchecs</string>

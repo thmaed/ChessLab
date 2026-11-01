@@ -66,7 +66,8 @@ fun CourseScreen(
      * n'a pas de verdict théorique à préserver, la question n'a pas de sens.
      */
     onFreeTrain: (id: String, name: String) -> Unit = { _, _ -> },
-    onTrain: (id: String, name: String) -> Unit = { _, _ -> },
+    /** Reçoit aussi les coups UCI de la variante affichée (vide à la racine). */
+    onTrain: (id: String, name: String, path: List<String>) -> Unit = { _, _, _ -> },
 ) {
     val context = LocalContext.current
     var course by remember(courseId) { mutableStateOf<Course?>(null) }
@@ -182,7 +183,7 @@ fun CourseScreen(
                 Spacer(Modifier.width(8.dp))
             }
             CircleIconButton(Icons.Default.School, stringResource(R.string.course_train),
-                Palette.accent, "entrainer") { onTrain(loaded.id, loaded.name) }
+                Palette.accent, "entrainer") { onTrain(loaded.id, loaded.name, currentPath) }
         }
 
         // L'échiquier, et tout ce qui l'accompagne : écrits UNE fois, agencés selon

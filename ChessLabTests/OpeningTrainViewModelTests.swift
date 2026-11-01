@@ -177,6 +177,80 @@ struct OpeningTrainViewModelTests {
         #expect(model.phase == .complete)
     }
 
+    /// Arbre à deux niveaux : blancs e4 (principale) ou d4 ; après e4, les noirs
+    /// e5 (principale) ou c5.
+    private func treeCourse() -> OpeningCourse {
+        func key(_ moves: [(String, String)]) -> String {
+            var b = Board(position: .standard)
+            for (from, to) in moves { _ = b.move(pieceAt: Square(from), to: Square(to)) }
+            return OpeningFENKey.key(for: b.position)
+        }
+        let root = OpeningFENKey.key(for: .standard)
+        let kE = key([("e2", "e4")]), kD = key([("d2", "d4")])
+        let kE5 = key([("e2", "e4"), ("e7", "e5")]), kC5 = key([("e2", "e4"), ("c7", "c5")])
+        let e4 = MoveEdge(san: "e4", uci: "e2e4", toFEN: kE, role: .mainLine)
+        let d4 = MoveEdge(san: "d4", uci: "d2d4", toFEN: kD, role: .sideline)
+        let e5 = MoveEdge(san: "e5", uci: "e7e5", toFEN: kE5, role: .mainLine)
+        let c5 = MoveEdge(san: "c5", uci: "c7c5", toFEN: kC5, role: .sideline)
+        return OpeningCourse(id: "c", name: "C", side: .white, rootFEN: root, positions: [
+            root: PositionNode(fen: root, moves: [e4, d4]),
+            kE: PositionNode(fen: kE, moves: [e5, c5]),
+            kD: PositionNode(fen: kD), kE5: PositionNode(fen: kE5), kC5: PositionNode(fen: kC5),
+        ])
+    }
+
+    private func line(path: [String], _ context: ModelContext) -> OpeningTrainViewModel {
+        OpeningTrainViewModel(mode: .fullLine(courseID: "c", path: path), context: context,
+                              courses: ["c": treeCourse()], synchronousOpponent: true)
+    }
+
+    @Test func trainingWithoutPathFollowsTheMainLine() throws {
+        let model = line(path: [], try makeContext())
+        model.attemptMove(from: Square("e2"), to: Square("e4"))
+        #expect(model.playedSANs == ["e4", "e5"])                  // la riposte principale
+    }
+
+    @Test func trainingFollowsTheOpponentSideOfTheChosenVariation() throws {
+        let model = line(path: ["e2e4", "c7c5"], try makeContext())
+        model.attemptMove(from: Square("e2"), to: Square("e4"))
+        #expect(model.playedSANs == ["e4", "c5"])                  // la variante demandée, pas e5
+        #expect(model.phase == .complete)
+    }
+
+    @Test func trainingExpectsTheChosenVariationFromTheUser() throws {
+        let model = line(path: ["d2d4"], try makeContext())
+        model.attemptMove(from: Square("d2"), to: Square("d4"))    // le coup de la variante : juste
+        #expect(model.phase == .complete)
+        #expect(model.playedSANs == ["d4"])
+    }
+
+    @Test func playingTheMainLineWhileTrainingAVariationAsksWhichToKeep() throws {
+        let model = line(path: ["d2d4"], try makeContext())
+        model.attemptMove(from: Square("e2"), to: Square("e4"))    // la principale, mais on travaille d4
+        #expect(model.phase == .variation)
+        #expect(model.variationMainSAN == "d4")                    // le coup ATTENDU est celui de la variante
+        #expect(model.variationTargetIsMainLine == false)
+
+        model.keepMainLine()                                        // « Rester sur ma ligne »
+        #expect(model.playedSANs == ["d4"])
+    }
+
+    @Test func hintPointsAtTheChosenVariation() throws {
+        let model = line(path: ["d2d4"], try makeContext())
+        model.showHint()
+        #expect(model.hintMoves.count == 1)
+        model.attemptMove(from: Square("d2"), to: Square("d4"))
+        #expect(model.phase == .complete)
+        #expect(model.usedHint)
+    }
+
+    @Test func mainLineTargetKeepsTheOriginalWording() throws {
+        let model = line(path: [], try makeContext())
+        model.attemptMove(from: Square("d2"), to: Square("d4"))
+        #expect(model.phase == .variation)
+        #expect(model.variationTargetIsMainLine)
+    }
+
     @Test func opponentAutoPlaysBetweenUserMoves() throws {
         let context = try makeContext()
         let course = OpeningGraphFixtures.linearCourse(id: "c", name: "Ligne", sans: ["e4", "e5", "Nf3"], side: .white)

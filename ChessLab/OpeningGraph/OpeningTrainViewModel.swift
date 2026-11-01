@@ -23,7 +23,12 @@ final class OpeningTrainViewModel {
     enum Mode: Equatable {
         case daily
         case hardest
-        case fullLine(courseID: String)
+        /// Une ligne d'un cours. `path` : les coups (UCI, depuis la racine) de la
+        /// variante que le lecteur affichait quand on a appuyé sur « S'entraîner » ;
+        /// vide = la ligne principale. L'entraînement part TOUJOURS de la racine
+        /// (on rejoue les coups qui mènent à la variante), suit `path`, puis
+        /// reprend la ligne principale là où `path` s'arrête.
+        case fullLine(courseID: String, path: [String] = [])
     }
 
     enum Phase: Equatable {
@@ -77,6 +82,17 @@ final class OpeningTrainViewModel {
 
     private var opponentToken = 0
 
+    /// Coups (UCI) joués depuis la racine du cours courant, par nous comme par
+    /// l'adversaire : ce qui dit si l'on est encore SUR la variante demandée.
+    private var playedUCIs: [String] = []
+    private var preferredPath: [String] {
+        if case let .fullLine(_, path) = mode { path } else { [] }
+    }
+    /// Vrai quand le coup attendu à ce stade est la ligne principale du cours
+    /// (et non une variante travaillée à dessein) — change la formulation du
+    /// choix proposé quand on s'écarte de la ligne attendue.
+    var variationTargetIsMainLine: Bool { pendingVariation?.main.role == .mainLine }
+
     var courseName: String { course?.name ?? "" }
     var isUserTurn: Bool { phase == .awaiting && pendingPromotion == nil }
 
@@ -84,7 +100,7 @@ final class OpeningTrainViewModel {
 
     convenience init(mode: Mode, context: ModelContext, newLimit: Int = 20, now: Date = Date()) {
         var loaded: [String: OpeningCourse] = [:]
-        if case let .fullLine(courseID) = mode {
+        if case let .fullLine(courseID, _) = mode {
             if let c = OpeningCatalog.course(id: courseID) { loaded[courseID] = c }
         } else {
             loaded = Self.reviewableCourses(in: context)
@@ -149,7 +165,7 @@ final class OpeningTrainViewModel {
         mode: Mode, courses: [String: OpeningCourse], context: ModelContext, newLimit: Int, now: Date
     ) -> [OpeningCourse] {
         switch mode {
-        case let .fullLine(id):
+        case let .fullLine(id, _):
             return courses[id].map { [$0] } ?? []
         case .daily, .hardest:
             let snapshots = snapshots(in: context)
@@ -188,7 +204,19 @@ final class OpeningTrainViewModel {
         }
     }
 
-    private var mainEdge: MoveEdge? { candidates(at: currentKey).first }
+    /// Le coup ATTENDU ici : celui de la variante demandée tant qu'on la suit
+    /// (`playedUCIs` en est un préfixe), sinon la ligne principale. Hors
+    /// `.fullLine` avec chemin, c'est exactement l'ancien « coup principal ».
+    private func targetEdge(at key: String) -> MoveEdge? {
+        let cands = candidates(at: key)
+        if playedUCIs.count < preferredPath.count, preferredPath.starts(with: playedUCIs),
+           let edge = cands.first(where: { $0.uci == preferredPath[playedUCIs.count] }) {
+            return edge
+        }
+        return cands.first
+    }
+
+    private var mainEdge: MoveEdge? { targetEdge(at: currentKey) }
 
     private func startCourse(_ c: OpeningCourse) {
         course = c
@@ -196,6 +224,7 @@ final class OpeningTrainViewModel {
         board = Board(position: OpeningFENKey.position(from: c.rootFEN) ?? .standard)
         currentKey = c.rootFEN
         playedSANs = []
+        playedUCIs = []
         lastMove = nil
         currentComment = c.summary?.resolved(languageCode)
         clearTurnState()
@@ -271,6 +300,7 @@ final class OpeningTrainViewModel {
         currentKey = edge.toFEN
         currentComment = edge.displayableComment(languageCode)
         playedSANs.append(edge.san)
+        playedUCIs.append(edge.uci)
         hintMoves = []
         if isUser { reviewedCount += 1 }
         Haptics.move()
@@ -335,7 +365,7 @@ final class OpeningTrainViewModel {
     /// Classe le coup joué : principal, variante, ou hors répertoire.
     private func evaluate(uci: String) {
         let cands = candidates(at: currentKey)
-        guard let main = cands.first else { return }
+        guard let main = targetEdge(at: currentKey) else { return }
         if let edge = cands.first(where: { $0.uci == uci }) {
             if edge.uci == main.uci {
                 recordReview(usedHint ? .hard : .good)

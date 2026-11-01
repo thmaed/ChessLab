@@ -31,7 +31,8 @@ import SwiftUI
 struct OpeningReaderView: View {
     @Bindable var viewModel: OpeningReaderViewModel
     /// Entraînement de la LIGNE affichée, en répétition espacée.
-    var onTrain: () -> Void = {}
+    /// Reçoit les coups UCI de la variante affichée (vide à la racine).
+    var onTrain: ([String]) -> Void = { _ in }
     var onContinueVsStockfish: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }
@@ -69,7 +70,7 @@ struct OpeningReaderView: View {
                 .tint(Theme.info)
                 .accessibilityIdentifier("opening_openIndex")
 
-                Button { onTrain() } label: {
+                Button { onTrain(viewModel.path) } label: {
                     Label("S'entraîner", systemImage: "graduationcap.fill")
                 }
                 .tint(Theme.accent)
@@ -762,7 +763,8 @@ struct OpeningReaderHost: View {
     /// Identité de session — voir ``SessionStore``.
     let sessionKey: String
     let onExit: () -> Void
-    var onTrain: () -> Void = {}
+    /// Reçoit les coups UCI de la variante affichée (vide à la racine).
+    var onTrain: ([String]) -> Void = { _ in }
     var onContinueVsStockfish: (String) -> Void = { _ in }
     var onOpenLab: (String) -> Void = { _ in }
     var onOpenTwoPlayer: (String) -> Void = { _ in }

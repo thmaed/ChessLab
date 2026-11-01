@@ -422,6 +422,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="train_session_done">Session complete</string>
     <string name="train_session_score">%1$s out of %2$s.</string>
     <string name="train_variation">%1$s is in the repertoire, but the main line is %2$s.</string>
+    <string name="train_variation_other">%1$s is another line in the repertoire; the line you are practising goes through %2$s.</string>
     <string name="variant_3check">Three-Check</string>
     <string name="variant_3check_blurb">The rules are those of classical chess, checkmate included. In addition, you win as soon as you have checked the opponent\'s king THREE TIMES during the game — every check counts, whether it\'s blocked, captured, or escaped on the next move.</string>
     <string name="variant_antichess">Antichess</string>

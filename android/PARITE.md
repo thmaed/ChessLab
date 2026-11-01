@@ -1869,6 +1869,13 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
       Probablement le test qui ne la fait pas venir, pas l'écran qui casse —
       à trancher en le regardant.
 
+### « S'entraîner » sur la variante affichée — 01/11/2026
+
+- [ ] Lecteur d'ouvertures ET de finales : le chapeau entraîne la variante en cours (depuis la
+      racine, puis la principale quand elle s'arrête) ; à la racine, la ligne principale comme avant.
+      À vérifier sur appareil : jouer la principale pendant qu'on travaille une variante affiche le
+      message « autre variante » et propose de rester sur la ligne travaillée.
+
 ### Noms d'ouvertures, contact, remerciements — 30/10/2026
 
 - [ ] Noms d'ouvertures traduits à l'affichage des DEUX côtés (iOS : `name_en` + `displayName`, la clé

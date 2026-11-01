@@ -29,8 +29,14 @@ sealed interface TrainMode {
     data object Daily : TrainMode
     /** Uniquement les positions déjà ratées. */
     data object Hardest : TrainMode
-    /** Une ligne précise, du début à la fin. */
-    data class FullLine(val courseId: String) : TrainMode
+    /**
+     * Une ligne précise, du début à la fin. [path] : les coups (UCI, depuis la
+     * racine) de la variante que le lecteur affichait au toucher de « S'entraîner » ;
+     * vide = la ligne principale. L'entraînement part TOUJOURS de la racine, suit
+     * [path], puis reprend la principale là où il s'arrête. Pendant de
+     * `Mode.fullLine(courseID:path:)` côté iOS.
+     */
+    data class FullLine(val courseId: String, val path: List<String> = emptyList()) : TrainMode
     /** La séance du jour : les positions dues, au plus [limit] coups du joueur. */
     data class Session(val limit: Int) : TrainMode
 }
@@ -74,6 +80,8 @@ data class TrainUiState(
     val remaining: Int = 0,
     val variationPlayed: String? = null,
     val variationMain: String? = null,
+    /** Le coup attendu est-il celui de la ligne principale (et non d'une variante travaillée à dessein) ? */
+    val variationMainIsMainLine: Boolean = true,
     val wrongCorrect: String? = null,
     val pendingPromotion: Move? = null,
     val loading: Boolean = true,
@@ -194,7 +202,15 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
         course?.positions?.get(key).orEmpty()
             .sortedWith(compareByDescending<CourseMove> { it.isMainLine }.thenByDescending { it.popularity ?: 0.0 })
 
-    private val mainEdge: CourseMove? get() = candidates(currentKey).firstOrNull()
+    /** Coups (UCI) joués depuis la racine du cours courant, par nous comme par l'adversaire. */
+    private val playedUcis = ArrayList<String>()
+
+    /**
+     * Le coup ATTENDU ici : celui de la variante demandée tant qu'on la suit,
+     * sinon la ligne principale. Pendant de `targetEdge(at:)` côté iOS.
+     */
+    private val mainEdge: CourseMove? get() =
+        expectedMove(candidates(currentKey), playedUcis, (mode as? TrainMode.FullLine)?.path.orEmpty())
 
     private fun startCourse() {
         val c = course ?: return
@@ -202,6 +218,7 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
         val position = CourseRepository.position(c.rootFEN) ?: Position.standard
         board = Board(position)
         currentKey = root
+        playedUcis.clear()
         pendingVariation = null
         wrongMain = null
         usedHint = false
@@ -261,6 +278,7 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
         } else move
 
         currentKey = CourseRepository.fenKey(edge.toFEN)
+        playedUcis.add(edge.uci)
         val state = board.state
         val checked = when (state) {
             is Board.State.Check -> kingSquare(state.color)
@@ -344,7 +362,7 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
     /** Classe le coup joué : principal, variante, ou hors répertoire. */
     private fun evaluate(uci: String) {
         val cands = candidates(currentKey)
-        val main = cands.firstOrNull() ?: return
+        val main = mainEdge ?: return
         val edge = cands.firstOrNull { it.uci == uci }
         when {
             edge == null -> {
@@ -366,7 +384,10 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
             }
             else -> {
                 pendingVariation = edge to main
-                ui = ui.copy(phase = TrainPhase.variation, variationPlayed = edge.san, variationMain = main.san)
+                ui = ui.copy(
+                    phase = TrainPhase.variation, variationPlayed = edge.san, variationMain = main.san,
+                    variationMainIsMainLine = main.isMainLine,
+                )
             }
         }
     }
@@ -442,4 +463,16 @@ class TrainViewModel(app: Application) : AndroidViewModel(app) {
             ))
         }
     }
+}
+
+/**
+ * Le coup attendu parmi [candidates] (la principale d'abord) : celui de [path]
+ * tant que les coups déjà joués, [played], en sont un préfixe et que [path] n'est
+ * pas épuisé ; sinon la ligne principale. Pur, donc testé sans appareil.
+ */
+internal fun expectedMove(candidates: List<CourseMove>, played: List<String>, path: List<String>): CourseMove? {
+    if (played.size < path.size && path.subList(0, played.size) == played) {
+        candidates.firstOrNull { it.uci == path[played.size] }?.let { return it }
+    }
+    return candidates.firstOrNull()
 }

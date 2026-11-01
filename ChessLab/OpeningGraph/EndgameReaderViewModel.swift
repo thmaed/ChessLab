@@ -24,6 +24,9 @@ final class EndgameReaderViewModel {
     private(set) var currentComment: String?
     /// Fil des coups joués (SAN), pour se repérer et sauter en arrière.
     private(set) var playedSANs: [String] = []
+    /// Les mêmes coups en UCI, depuis la racine : ce que « S'entraîner » passe à
+    /// l'entraînement pour travailler la variante affichée.
+    private(set) var playedUCIs: [String] = []
 
     private var undo: [(key: String, board: Board, lastMove: Move?, comment: String?)] = []
     private var languageCode: String { AppSettings.shared.appLanguage.resolvedCode }
@@ -81,6 +84,7 @@ final class EndgameReaderViewModel {
         currentKey = edge.toFEN
         currentComment = edge.displayableComment(languageCode)
         playedSANs.append(edge.san)
+        playedUCIs.append(edge.uci)
         Haptics.move()
     }
 
@@ -91,6 +95,7 @@ final class EndgameReaderViewModel {
         currentKey = previous.key
         currentComment = previous.comment
         if !playedSANs.isEmpty { playedSANs.removeLast() }
+        if !playedUCIs.isEmpty { playedUCIs.removeLast() }
     }
 
     func reset() {
