@@ -1869,19 +1869,26 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
       Probablement le test qui ne la fait pas venir, pas l'écran qui casse —
       à trancher en le regardant.
 
-### « S'entraîner » sur la variante affichée — 01/11/2026
+### Densité : interligne et rangées de choix — 02/11/2026 (vérifié sur Galaxy A16 le 02/11)
 
-- [ ] Lecteur d'ouvertures ET de finales : le chapeau entraîne la variante en cours (depuis la
+- [x] Typographie sans l'interligne fixe de Material (`ui/Typography.kt`) : à police égale, le texte a le
+      même interligne qu'iOS sur tous les écrans (Aide, Réglages, Puzzles, Ouvertures, Nouvelle partie,
+      Séance du jour, lecteur de cours).
+- [x] Rangées de choix des Réglages (langue, pièces, essais) : libellé + coche, plus de bouton radio.
+
+### « S'entraîner » sur la variante affichée — 01/11/2026 (vérifié sur Galaxy A16 le 01/11)
+
+- [x] Lecteur d'ouvertures ET de finales : le chapeau entraîne la variante en cours (depuis la
       racine, puis la principale quand elle s'arrête) ; à la racine, la ligne principale comme avant.
       À vérifier sur appareil : jouer la principale pendant qu'on travaille une variante affiche le
       message « autre variante » et propose de rester sur la ligne travaillée.
 
-### Noms d'ouvertures, contact, remerciements — 30/10/2026
+### Noms d'ouvertures, contact, remerciements — 30/10/2026 (vérifié sur Galaxy A16 le 01/11)
 
-- [ ] Noms d'ouvertures traduits à l'affichage des DEUX côtés (iOS : `name_en` + `displayName`, la clé
+- [x] Noms d'ouvertures traduits à l'affichage des DEUX côtés (iOS : `name_en` + `displayName`, la clé
       enregistrée reste le nom français ; Android l'avait déjà). À vérifier en anglais sur appareil :
       en-tête d'analyse, bilan, puces de la bibliothèque, « Ouvertures coûteuses ».
-- [ ] Aide : cartes « Contactez le développeur » (ouvre la messagerie) et « Remerciements ».
+- [x] Aide : cartes « Contactez le développeur » (ouvre la messagerie) et « Remerciements ».
 - [ ] **Écart** : la photo de l'auteur sous le contact (iOS) n'est pas portée sur Android.
 
 ## Publication Play de la 2.0 (27/10/2026)

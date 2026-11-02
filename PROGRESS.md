@@ -10866,3 +10866,23 @@ n'entraînait que la ligne principale, même quand on explorait une variante.
   `CourseScreen.onTrain` reçoit `currentPath`), logique pure `expectedMove` testée en JVM
   (`ExpectedMoveTest`, 7 tests). Le bouton « Rester sur %s » nomme déjà le coup : seul le texte
   du message change (`train_variation_other`).
+
+## 01/11 — Android resserré comme l'iPhone : interligne et rangées de choix (Android)
+
+Retour de Thierry : sur Android, les tuiles étaient « dilatées verticalement » et les interlignes
+importants, sur presque tous les écrans. Comparé image par image (Galaxy A16 en USB, simulateur
+iPhone 17 Pro, mêmes écrans, même langue, ramenés à la même échelle).
+
+- **Cause** : l'app utilisait la typographie Material 3 par défaut, qui fixe l'interligne à 24 sp et
+  l'espacement des lettres à 0,5 sp pour le corps de texte. Or l'app écrit `Text(fontSize = 12.sp)`
+  presque partout : la police rétrécit, l'interligne reste à 24 sp. Un texte de 12 sp avait donc
+  48 px d'interligne là où iOS en a 32 ; chaque tuile ou carte à texte sur plusieurs lignes grandissait.
+- **Correction** : `ui/Typography.kt` — la typographie Material sans son interligne fixe, remplacé par
+  un interligne PROPORTIONNEL de 1,3 em (le rapport d'iOS) et un espacement nul. Branchée dans
+  `MaterialTheme` ; tout l'écran en profite d'un coup (Aide, Réglages, Puzzles, Ouvertures, carte de
+  personnage, séance du jour…).
+- **Rangées de choix** (`SettingsScreen.Choice`: langue, jeu de pièces, nombre d'essais) : le
+  `RadioButton` imposait 48 dp de zone tactile, soit des rangées de 67 dp contre 44 pt sur iOS. Remplacé
+  par le libellé et une coche à droite (comme les thèmes d'échiquier juste en dessous), la rangée entière
+  restant touchable et déclarée « bouton radio » à TalkBack (`selectable`).
+- L'accueil, lui, était déjà identique : tuiles de 131 dp de haut, même cadence.

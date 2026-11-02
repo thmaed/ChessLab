@@ -7,6 +7,7 @@ import androidx.compose.ui.res.painterResource
 import chesskit.Piece
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -415,6 +416,14 @@ private fun ThemeRow(
     }
 }
 
+/**
+ * Un choix parmi plusieurs (langue, jeu de pièces, nombre d'essais). Pendant des
+ * rangées de choix d'iOS : le libellé, et une coche à droite sur le choix actif.
+ *
+ * Il portait un `RadioButton`, dont la zone tactile minimale de 48 dp faisait
+ * des rangées de 67 dp là où iOS tient en 44 pt ; la rangée entière reste
+ * touchable, et son rôle de bouton radio est dit à TalkBack par `selectable`.
+ */
 @Composable
 private fun Choice(label: String, selected: Boolean, tag: String, onPick: () -> Unit) {
     Row(
@@ -423,13 +432,19 @@ private fun Choice(label: String, selected: Boolean, tag: String, onPick: () -> 
             .testTag(tag)
             .clip(RoundedCornerShape(8.dp))
             .background(if (selected) Palette.accent.copy(alpha = 0.12f) else Palette.surface)
-            .clickable(onClick = onPick)
-            .padding(horizontal = 12.dp, vertical = 10.dp),
+            .selectable(selected = selected, role = androidx.compose.ui.semantics.Role.RadioButton, onClick = onPick)
+            .padding(horizontal = 14.dp, vertical = 11.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        RadioButton(selected = selected, onClick = onPick, colors = RadioButtonDefaults.colors(selectedColor = Palette.accent))
-        Spacer(Modifier.width(6.dp))
-        Text(label, fontSize = 13.sp, color = if (selected) Palette.accent else Palette.textPrimary)
+        Text(
+            label, fontSize = 14.sp,
+            color = if (selected) Palette.accent else Palette.textPrimary,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+            modifier = Modifier.weight(1f),
+        )
+        if (selected) {
+            Icon(Icons.Default.CheckCircle, null, tint = Palette.accent, modifier = Modifier.size(18.dp))
+        }
     }
 }
 

@@ -60,14 +60,8 @@ class TrainVariationTest {
         awaitTag("racine")
     }
 
-    /** Choisit un coup dans l'index (la position s'affiche), puis touche le chapeau. */
-    private fun trainFromIndexMove(tag: String?) {
-        if (tag != null) {
-            compose.onNodeWithTag("index-des-lignes").performClick()
-            awaitTag("index-rangee-0", 20_000)
-            compose.onNodeWithTag(tag).performScrollTo().performClick()
-            compose.waitUntil(10_000) { compose.onAllNodesWithTag("index-fermer").fetchSemanticsNodes().isEmpty() }
-        }
+    /** Touche le chapeau d'étudiant depuis la racine du lecteur, sans rien choisir. */
+    private fun trainFromRoot() {
         compose.onNodeWithTag("entrainer").performClick()
         awaitTag("consigne")
     }
@@ -93,7 +87,7 @@ class TrainVariationTest {
 
     @Test fun aLaRacineLEntrainementSuitLaLignePrincipale() {
         openItalianGame()
-        trainFromIndexMove(null)
+        trainFromRoot()
         play("e2", "e4"); awaitText("1. e4 e5")
         play("g1", "f3"); awaitText("2. ♞f3 ♞c6")
         play("f1", "c4"); awaitText("3. ♝c4 ♝c5")        // Fc5, la principale
@@ -109,7 +103,7 @@ class TrainVariationTest {
 
     @Test fun lEntrainementAttendLeCoupDeLaVarianteAffichee() {
         openItalianGame()
-        trainFromIndexMove("index-coup-7-b2b4")                     // le gambit Evans
+        trainFromReaderVariation(steps = 6, uci = "b2b4")           // le gambit Evans
         play("e2", "e4"); awaitText("1. e4 e5")
         play("g1", "f3"); awaitText("2. ♞f3 ♞c6")
         play("f1", "c4"); awaitText("3. ♝c4 ♝c5")
@@ -120,7 +114,7 @@ class TrainVariationTest {
 
     @Test fun jouerLaPrincipalePendantUneVarianteProposeDeRester() {
         openItalianGame()
-        trainFromIndexMove("index-coup-7-b2b4")
+        trainFromReaderVariation(steps = 6, uci = "b2b4")
         play("e2", "e4"); awaitText("1. e4 e5")
         play("g1", "f3"); awaitText("2. ♞f3 ♞c6")
         play("f1", "c4"); awaitText("3. ♝c4 ♝c5")
@@ -136,7 +130,7 @@ class TrainVariationTest {
     @Test fun uneVarianteQuiN_EstPasLaPrincipaleGardeLeTexteHabituel() {
         // Sans variante demandée, jouer un coup non principal garde l'ancien message.
         openItalianGame()
-        trainFromIndexMove(null)
+        trainFromRoot()
         play("e2", "e4"); awaitText("1. e4 e5")
         play("g1", "f3"); awaitText("2. ♞f3 ♞c6")
         play("f1", "c4"); awaitText("3. ♝c4 ♝c5")

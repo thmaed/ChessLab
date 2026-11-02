@@ -71,7 +71,8 @@ class MainActivity : ComponentActivity() {
                     background = Palette.background,
                     surface = Palette.surface,
                     primary = Palette.accent,
-                )
+                ),
+                typography = com.chesslab.ui.ChessLabTypography,
             ) {
                 // Le fond signature remplace la surface unie : c'est lui qui
                 // donne à l'app son atmosphère, sur Android comme sur iOS.
