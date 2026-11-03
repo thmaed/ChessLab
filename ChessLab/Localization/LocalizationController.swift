@@ -40,6 +40,20 @@ final class LocalizationController {
         String(format: string(frenchKey), arguments: arguments)
     }
 
+    /// Un nombre qui s'accorde au SINGULIER : 1 partout, et 0 en français
+    /// (« 0 puzzle ajouté »), comme les catégories de pluriel qu'Android applique
+    /// de lui-même — mêmes mots des deux côtés.
+    static func isSingular(_ count: Int) -> Bool {
+        if count == 1 { return true }
+        return count == 0 && overrideBundle?.bundleURL.lastPathComponent == "fr.lproj"
+    }
+
+    /// `one` et `other` sont deux clés françaises à un `%lld` ; celle qui
+    /// convient au nombre est traduite puis remplie.
+    static func counted(_ count: Int, one: String, other: String) -> String {
+        string(isSingular(count) ? one : other, count)
+    }
+
     private static nonisolated(unsafe) var installed = false
 
     private static func installOverrideOnce() {

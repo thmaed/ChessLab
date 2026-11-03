@@ -1874,19 +1874,21 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
 Pendant de `PuzzleCollectionImporter`/`Store`/`ImportSheet` (iOS). Même format de fichier, mêmes
 libellés, même parcours (Puzzles → Mes collections).
 
-- [ ] Importer un ou plusieurs fichiers `.pgn` (sélecteur du système) et un texte collé ; le bilan
-      affiche ajoutés / déjà présents / doublons / parties écartées avec la raison.
-      Vérifié sur Galaxy A16 le 03/11 : UN fichier par le sélecteur Samsung (3 ajoutés, 1 doublon,
-      2 écartées avec leur raison). RESTE à voir à la main : plusieurs fichiers d'un coup, le texte
-      collé (couverts seulement par les tests instrumentés).
+- [x] Importer un ou plusieurs fichiers `.pgn` (sélecteur du système) et un texte collé ; le bilan
+      affiche ajoutés / déjà présents / doublons / parties écartées avec la raison. (vérifié sur
+      Galaxy A16 le 03/11 : un fichier, puis DEUX d'un coup — une carte de bilan chacun —, puis un
+      texte collé avec nom de collection)
 - [x] Une collection : un toucher l'entraîne ; le menu propose Refaire les ratés, Programme
       Woodpecker (TOUTE la collection), Renommer, Supprimer. (vérifié sur Galaxy A16 le 03/11 :
       résolution et raté, « 1 missed » puis disparu, Woodpecker « Cycle 1 · 1/3 », refus d'un
       second programme, renommage, suppression avec annulation)
-- [ ] Les collections restent hors de la série ordinaire, de « Ratés », de la séance du jour et des
-      statistiques. Vérifié sur Galaxy A16 le 03/11 : les compteurs « Missed » et « Review » de
-      l'écran Puzzles restent à 0 malgré un raté dans la collection. RESTE à voir : séance du
-      jour et écran Progression.
+- [x] Les collections restent hors de la série ordinaire, de « Ratés », de la séance du jour et des
+      statistiques. (vérifié sur Galaxy A16 le 03/11 : après un puzzle réussi et un raté dans une
+      collection, l'accueil — carte de la séance du jour comprise — et l'écran Progress sont
+      STRICTEMENT identiques à leur état d'avant, et les compteurs Missed / Review restent à 0)
+- [x] Les comptes s'accordent : « 1 puzzle », « 1 puzzle added », « 1 game skipped » (vrais pluriels
+      Android ; iOS : `LocalizationController.counted`, 1 singulier partout et 0 en français).
+      Relu sur Galaxy A16 : « 1 puzzle » ; les autres formes ne sont vues que dans le code.
 - Écart assumé : les collections ne voyagent PAS dans le `.clab` — comme iOS, où elles restent dans
   le store local « Puzzles », jamais synchronisé. Le fichier PGN d'origine est la sauvegarde.
 

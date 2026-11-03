@@ -271,3 +271,21 @@ struct PuzzleCollectionStoreTests {
         #expect(PuzzleCollectionStore.suggestedName(fromFile: URL(fileURLWithPath: "/x/Forks 2026.pgn")) == "Forks 2026")
     }
 }
+
+/// « 1 puzzle » contre « 5 puzzles » : les comptes de l'import et des collections
+/// s'accordent. (Le 0, singulier en français seulement, dépend de la langue
+/// active : on ne la change pas ici, elle est globale.)
+struct CountedWordingTests {
+    @Test func oneIsSingularAndManyArePlural() {
+        #expect(LocalizationController.isSingular(1))
+        #expect(!LocalizationController.isSingular(2))
+        #expect(!LocalizationController.isSingular(947))
+    }
+
+    @Test func theRightFormIsPickedAndFilled() {
+        let one = LocalizationController.counted(1, one: "%lld puzzle", other: "%lld puzzles")
+        let many = LocalizationController.counted(5, one: "%lld puzzle", other: "%lld puzzles")
+        #expect(one == "1 puzzle")
+        #expect(many == "5 puzzles")
+    }
+}

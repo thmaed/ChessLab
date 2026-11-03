@@ -1328,18 +1328,30 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_import_reading">Lecture en cours…</string>
     <string name="puzzle_import_unreadable">Impossible de lire « %1$s ».</string>
     <string name="puzzle_import_default_name">Collection importée</string>
-    <string name="puzzle_import_more">… et %1$d autres parties écartées.</string>
+    <plurals name="puzzle_import_more">
+        <item quantity="one">… et %1$d autre partie écartée.</item>
+        <item quantity="other">… et %1$d autres parties écartées.</item>
+    </plurals>
     <string name="puzzle_import_none">Aucun puzzle trouvé dans ce fichier.</string>
-    <string name="puzzle_import_added">%1$d puzzles ajoutés</string>
+    <plurals name="puzzle_import_added">
+        <item quantity="one">%1$d puzzle ajouté</item>
+        <item quantity="other">%1$d puzzles ajoutés</item>
+    </plurals>
     <string name="puzzle_import_already">%1$d déjà présents</string>
     <string name="puzzle_import_dupes">%1$d en double dans le fichier</string>
-    <string name="puzzle_import_skipped">%1$d parties écartées</string>
+    <plurals name="puzzle_import_skipped">
+        <item quantity="one">%1$d partie écartée</item>
+        <item quantity="other">%1$d parties écartées</item>
+    </plurals>
     <string name="puzzle_skip_missing_fen">Partie %1$d : pas de position de départ (FEN).</string>
     <string name="puzzle_skip_invalid_fen">Partie %1$d : position de départ (FEN) illisible.</string>
     <string name="puzzle_skip_no_moves">Partie %1$d : aucun coup.</string>
     <string name="puzzle_skip_illegal">Partie %1$d : le coup %2$s ne se joue pas.</string>
     <string name="puzzle_import_close">Fermer</string>
-    <string name="puzzle_collection_count">%1$d puzzles</string>
+    <plurals name="puzzle_collection_count">
+        <item quantity="one">%1$d puzzle</item>
+        <item quantity="other">%1$d puzzles</item>
+    </plurals>
     <string name="puzzle_collection_missed">%1$d ratés</string>
     <string name="puzzle_collection_actions">Actions de la collection</string>
     <string name="puzzle_collection_practice">S\'entraîner</string>

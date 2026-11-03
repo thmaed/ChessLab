@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -535,7 +536,7 @@ private fun CollectionRow(
     onDelete: () -> Unit,
 ) {
     var menu by remember { mutableStateOf(false) }
-    val subtitle = stringResource(R.string.puzzle_collection_count, collection.count) +
+    val subtitle = pluralStringResource(R.plurals.puzzle_collection_count, collection.count, collection.count) +
         if (collection.missedCount > 0) " · " + stringResource(R.string.puzzle_collection_missed, collection.missedCount) else ""
     Row(
         Modifier

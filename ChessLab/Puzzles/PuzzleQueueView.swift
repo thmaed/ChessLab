@@ -487,7 +487,7 @@ struct PuzzleQueueView: View {
     }
 
     private func collectionSubtitle(_ collection: PuzzleCollectionStore.Summary) -> String {
-        let count = LocalizationController.string("%lld puzzles", collection.count)
+        let count = LocalizationController.counted(collection.count, one: "%lld puzzle", other: "%lld puzzles")
         guard collection.missedCount > 0 else { return count }
         return count + " · " + LocalizationController.string("%lld ratés", collection.missedCount)
     }
@@ -502,7 +502,7 @@ struct PuzzleQueueView: View {
         }
         let items = PuzzleCollectionStore.puzzles(inCollection: collection.name, in: modelContext)
             .map(WoodpeckerPlan.Item.init)
-        let criteria = LocalizationController.string("%lld puzzles", items.count) + " · " + collection.name
+        let criteria = LocalizationController.counted(items.count, one: "%lld puzzle", other: "%lld puzzles") + " · " + collection.name
         if let id = makeProgramme(items: items, criteria: criteria) { onOpenWoodpecker(id) }
     }
 

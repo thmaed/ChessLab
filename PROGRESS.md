@@ -10936,3 +10936,10 @@ bibliothèque.
 - **Piège Android** : le moteur d'expressions régulières d'Android refuse `}` et `]` non échappés, que
   la JVM des tests unitaires accepte — le défaut n'est apparu que sur l'appareil.
 - Aide (iOS et Android, deux langues) : une phrase sur l'import.
+- **Vérifié sur Galaxy A16** (03/11) : import par le sélecteur système (un fichier, deux d'un coup, texte
+  collé), entraînement, ratés, Woodpecker, renommage, suppression ; accueil et Progress strictement
+  inchangés après des tentatives dans une collection.
+- **Accord des nombres** (« 1 puzzle », « 1 puzzle ajouté », « 1 partie écartée ») : trouvé sur appareil
+  (« 1 puzzles »). Android : vrais pluriels (`<plurals>`). iOS : `LocalizationController.counted` /
+  `isSingular` (1 singulier partout, 0 aussi en français, comme les catégories qu'applique Android) et
+  quatre clés au singulier dans le catalogue.

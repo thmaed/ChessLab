@@ -196,8 +196,9 @@ struct PuzzleImportSheet: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             if report.parsed.skipped.count > Self.skippedShown {
-                Text(LocalizationController.string(
-                    "… et %lld autres parties écartées.", report.parsed.skipped.count - Self.skippedShown
+                Text(LocalizationController.counted(
+                    report.parsed.skipped.count - Self.skippedShown,
+                    one: "… et %lld autre partie écartée.", other: "… et %lld autres parties écartées."
                 ))
                 .font(.caption)
                 .foregroundStyle(Theme.textTertiary)
@@ -224,7 +225,7 @@ struct PuzzleImportSheet: View {
         if report.parsed.gameCount == 0 || (report.added == 0 && report.alreadyThere == 0 && report.parsed.skipped.isEmpty) {
             return LocalizationController.string("Aucun puzzle trouvé dans ce fichier.")
         }
-        var parts = [LocalizationController.string("%lld puzzles ajoutés", report.added)]
+        var parts = [LocalizationController.counted(report.added, one: "%lld puzzle ajouté", other: "%lld puzzles ajoutés")]
         if report.alreadyThere > 0 {
             parts.append(LocalizationController.string("%lld déjà présents", report.alreadyThere))
         }
@@ -232,7 +233,7 @@ struct PuzzleImportSheet: View {
             parts.append(LocalizationController.string("%lld en double dans le fichier", report.parsed.duplicates))
         }
         if !report.parsed.skipped.isEmpty {
-            parts.append(LocalizationController.string("%lld parties écartées", report.parsed.skipped.count))
+            parts.append(LocalizationController.counted(report.parsed.skipped.count, one: "%lld partie écartée", other: "%lld parties écartées"))
         }
         return parts.joined(separator: " · ")
     }

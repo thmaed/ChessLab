@@ -38,6 +38,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -214,7 +215,7 @@ private fun ReportCard(report: PuzzleCollectionStore.ImportReport) {
             Text("• " + describe(it), fontSize = 12.sp, color = Palette.textTertiary)
         }
         val more = report.parsed.skipped.size - SKIPPED_SHOWN
-        if (more > 0) Text(stringResource(R.string.puzzle_import_more, more), fontSize = 12.sp, color = Palette.textTertiary)
+        if (more > 0) Text(pluralStringResource(R.plurals.puzzle_import_more, more, more), fontSize = 12.sp, color = Palette.textTertiary)
     }
 }
 
@@ -228,10 +229,10 @@ private fun summaryLine(report: PuzzleCollectionStore.ImportReport): String {
         return stringResource(R.string.puzzle_import_none)
     }
     val parts = ArrayList<String>()
-    parts += stringResource(R.string.puzzle_import_added, report.added)
+    parts += pluralStringResource(R.plurals.puzzle_import_added, report.added, report.added)
     if (report.alreadyThere > 0) parts += stringResource(R.string.puzzle_import_already, report.alreadyThere)
     if (report.parsed.duplicates > 0) parts += stringResource(R.string.puzzle_import_dupes, report.parsed.duplicates)
-    if (report.parsed.skipped.isNotEmpty()) parts += stringResource(R.string.puzzle_import_skipped, report.parsed.skipped.size)
+    if (report.parsed.skipped.isNotEmpty()) parts += pluralStringResource(R.plurals.puzzle_import_skipped, report.parsed.skipped.size, report.parsed.skipped.size)
     return parts.joinToString(" · ")
 }
 

@@ -1331,18 +1331,30 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="puzzle_import_reading">Reading…</string>
     <string name="puzzle_import_unreadable">Couldn’t read “%1$s”.</string>
     <string name="puzzle_import_default_name">Imported collection</string>
-    <string name="puzzle_import_more">… and %1$d more games skipped.</string>
+    <plurals name="puzzle_import_more">
+        <item quantity="one">… and %1$d more game skipped.</item>
+        <item quantity="other">… and %1$d more games skipped.</item>
+    </plurals>
     <string name="puzzle_import_none">No puzzle found in this file.</string>
-    <string name="puzzle_import_added">%1$d puzzles added</string>
+    <plurals name="puzzle_import_added">
+        <item quantity="one">%1$d puzzle added</item>
+        <item quantity="other">%1$d puzzles added</item>
+    </plurals>
     <string name="puzzle_import_already">%1$d already there</string>
     <string name="puzzle_import_dupes">%1$d duplicated in the file</string>
-    <string name="puzzle_import_skipped">%1$d games skipped</string>
+    <plurals name="puzzle_import_skipped">
+        <item quantity="one">%1$d game skipped</item>
+        <item quantity="other">%1$d games skipped</item>
+    </plurals>
     <string name="puzzle_skip_missing_fen">Game %1$d: no starting position (FEN).</string>
     <string name="puzzle_skip_invalid_fen">Game %1$d: starting position (FEN) unreadable.</string>
     <string name="puzzle_skip_no_moves">Game %1$d: no moves.</string>
     <string name="puzzle_skip_illegal">Game %1$d: the move %2$s is not playable.</string>
     <string name="puzzle_import_close">Close</string>
-    <string name="puzzle_collection_count">%1$d puzzles</string>
+    <plurals name="puzzle_collection_count">
+        <item quantity="one">%1$d puzzle</item>
+        <item quantity="other">%1$d puzzles</item>
+    </plurals>
     <string name="puzzle_collection_missed">%1$d missed</string>
     <string name="puzzle_collection_actions">Collection actions</string>
     <string name="puzzle_collection_practice">Practice</string>
