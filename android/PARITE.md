@@ -1869,6 +1869,27 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
       Probablement le test qui ne la fait pas venir, pas l'écran qui casse —
       à trancher en le regardant.
 
+### Collections de puzzles importées d'un fichier PGN — 03/11/2026
+
+Pendant de `PuzzleCollectionImporter`/`Store`/`ImportSheet` (iOS). Même format de fichier, mêmes
+libellés, même parcours (Puzzles → Mes collections).
+
+- [ ] Importer un ou plusieurs fichiers `.pgn` (sélecteur du système) et un texte collé ; le bilan
+      affiche ajoutés / déjà présents / doublons / parties écartées avec la raison.
+      Vérifié sur Galaxy A16 le 03/11 : UN fichier par le sélecteur Samsung (3 ajoutés, 1 doublon,
+      2 écartées avec leur raison). RESTE à voir à la main : plusieurs fichiers d'un coup, le texte
+      collé (couverts seulement par les tests instrumentés).
+- [x] Une collection : un toucher l'entraîne ; le menu propose Refaire les ratés, Programme
+      Woodpecker (TOUTE la collection), Renommer, Supprimer. (vérifié sur Galaxy A16 le 03/11 :
+      résolution et raté, « 1 missed » puis disparu, Woodpecker « Cycle 1 · 1/3 », refus d'un
+      second programme, renommage, suppression avec annulation)
+- [ ] Les collections restent hors de la série ordinaire, de « Ratés », de la séance du jour et des
+      statistiques. Vérifié sur Galaxy A16 le 03/11 : les compteurs « Missed » et « Review » de
+      l'écran Puzzles restent à 0 malgré un raté dans la collection. RESTE à voir : séance du
+      jour et écran Progression.
+- Écart assumé : les collections ne voyagent PAS dans le `.clab` — comme iOS, où elles restent dans
+  le store local « Puzzles », jamais synchronisé. Le fichier PGN d'origine est la sauvegarde.
+
 ### Densité : interligne et rangées de choix — 02/11/2026 (vérifié sur Galaxy A16 le 02/11)
 
 - [x] Typographie sans l'interligne fixe de Material (`ui/Typography.kt`) : à police égale, le texte a le

@@ -75,24 +75,42 @@ interface PuzzleProgressDao {
     suspend fun byId(id: String): PuzzleProgress?
 
     /** Les puzzles à revoir, les plus en retard d'abord. */
-    @Query("SELECT * FROM puzzle_progress WHERE dueAt IS NOT NULL AND dueAt <= :now ORDER BY dueAt ASC LIMIT :limit")
+    @Query("SELECT * FROM puzzle_progress WHERE dueAt IS NOT NULL AND dueAt <= :now AND externalId NOT LIKE 'imp-%' ORDER BY dueAt ASC LIMIT :limit")
     suspend fun due(now: Long, limit: Int): List<PuzzleProgress>
 
     @Query("SELECT * FROM puzzle_progress")
     suspend fun all(): List<PuzzleProgress>
 
+    /**
+     * Pour les statistiques : SANS les collections importées (``imp-…``). « À
+     * travailler » propose une série, et une série n'y puise pas — pendant du
+     * `sourceRaw != imported` d'iOS.
+     */
+    @Query("SELECT * FROM puzzle_progress WHERE externalId NOT LIKE 'imp-%'")
+    suspend fun allForStats(): List<PuzzleProgress>
+
     /** Ratés à la dernière tentative, dus ou non — voir `PuzzleFilter.missedOnly`. */
     @Query(
-        """SELECT externalId FROM puzzle_progress WHERE lastOutcome = 2
-           OR (lastOutcome IS NULL AND failureCount > 0 AND repetitions = 0)"""
+        """SELECT externalId FROM puzzle_progress WHERE externalId NOT LIKE 'imp-%'
+           AND (lastOutcome = 2 OR (lastOutcome IS NULL AND failureCount > 0 AND repetitions = 0))"""
     )
     suspend fun missedIds(): List<String>
 
     /** Partiels à la dernière tentative (« À revoir »), dus ou non. */
-    @Query("SELECT externalId FROM puzzle_progress WHERE lastOutcome = 1")
+    @Query("SELECT externalId FROM puzzle_progress WHERE lastOutcome = 1 AND externalId NOT LIKE 'imp-%'")
     suspend fun reviewIds(): List<String>
 
-    @Query("SELECT COUNT(*) FROM puzzle_progress WHERE dueAt IS NOT NULL AND dueAt <= :now")
+    /** Les mêmes, pour les collections importées SEULES (voir [missedIds]). */
+    @Query(
+        """SELECT externalId FROM puzzle_progress WHERE externalId LIKE 'imp-%'
+           AND (lastOutcome = 2 OR (lastOutcome IS NULL AND failureCount > 0 AND repetitions = 0))"""
+    )
+    suspend fun missedImportedIds(): List<String>
+
+    @Query("SELECT externalId FROM puzzle_progress WHERE lastOutcome = 1 AND externalId LIKE 'imp-%'")
+    suspend fun reviewImportedIds(): List<String>
+
+    @Query("SELECT COUNT(*) FROM puzzle_progress WHERE dueAt IS NOT NULL AND dueAt <= :now AND externalId NOT LIKE 'imp-%'")
     suspend fun dueCount(now: Long): Int
 
     @Upsert

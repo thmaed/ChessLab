@@ -72,7 +72,7 @@
     <string name="help_level_title">The level shown</string>
     <string name="help_offline_body">Everything. No account, no network, no data leaving the device. The engine, the puzzles, the courses and the opponents are all embedded.</string>
     <string name="help_offline_title">What stays offline</string>
-    <string name="help_puzzles_body">One try by default. Three invite you to try a move « just to see », exactly the opposite of what a puzzle trains: you calculate the line to the end BEFORE you touch the piece. The three-try net is still in the settings. “Missed” replays only what you got wrong on your last attempt, and a checkmating move is always accepted, even when it is not the stored solution. At the end of a game, “Missed mates” looks for the forced mates either side let slip and offers to make puzzles of them. The Woodpecker method replays a fixed set of 10, 25 or 50 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone.</string>
+    <string name="help_puzzles_body">One try by default. Three invite you to try a move « just to see », exactly the opposite of what a puzzle trains: you calculate the line to the end BEFORE you touch the piece. The three-try net is still in the settings. “Missed” replays only what you got wrong on your last attempt, and a checkmating move is always accepted, even when it is not the stored solution. At the end of a game, “Missed mates” looks for the forced mates either side let slip and offers to make puzzles of them. The Woodpecker method replays a fixed set of 10, 25 or 50 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone. Your own puzzles (a PGN file where each game is a puzzle, with its FEN header) can be imported from the Puzzles screen: each file becomes a collection, kept apart, which you can work through as a series or as a full Woodpecker programme.</string>
     <string name="help_puzzles_title">The puzzles</string>
     <string name="help_safety_body">Maia does not calculate: it can miss a mate in two or spoil an elementary endgame. Above a certain level, Stockfish takes over in FOUR cases only — a mate in one or two, an endgame with few pieces, a repetition in a winning position, and the case where the model does not answer. Below that level, missing a mate is PART of the character.</string>
     <string name="help_safety_title">The safety net</string>
@@ -1317,4 +1317,44 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="help_contact_mail_missing">No email app found. Write to %1$s.</string>
     <string name="help_thanks_title">Acknowledgements</string>
     <string name="help_thanks_body">Many thanks to Nils Gauthey for all the work he has put into ChessLab. His reviews, his corrections and his ideas moved the app forward as a whole, and above all the quality of the openings and the endgames: the lines you study here owe him a great deal.</string>
+
+    <!-- Collections de puzzles importées d'un fichier PGN (01/11/2026) -->
+    <string name="puzzle_source_imported">My collections</string>
+    <string name="puzzle_section_collections">My collections</string>
+    <string name="puzzle_import_row_title">Import puzzles</string>
+    <string name="puzzle_import_row_sub">PGN files: your own problems, kept apart from the library</string>
+    <string name="puzzle_import_intro">A PGN file where each game is a puzzle: the FEN header gives the position and the main line gives the solution (the first move is the one to find). Each file becomes a collection, kept apart from the library.</string>
+    <string name="puzzle_import_files">Open PGN files</string>
+    <string name="puzzle_import_paste_title">Or paste PGN text</string>
+    <string name="puzzle_import_name_hint">Collection name</string>
+    <string name="puzzle_import_text_btn">Import the text</string>
+    <string name="puzzle_import_reading">Reading…</string>
+    <string name="puzzle_import_unreadable">Couldn’t read “%1$s”.</string>
+    <string name="puzzle_import_default_name">Imported collection</string>
+    <string name="puzzle_import_more">… and %1$d more games skipped.</string>
+    <string name="puzzle_import_none">No puzzle found in this file.</string>
+    <string name="puzzle_import_added">%1$d puzzles added</string>
+    <string name="puzzle_import_already">%1$d already there</string>
+    <string name="puzzle_import_dupes">%1$d duplicated in the file</string>
+    <string name="puzzle_import_skipped">%1$d games skipped</string>
+    <string name="puzzle_skip_missing_fen">Game %1$d: no starting position (FEN).</string>
+    <string name="puzzle_skip_invalid_fen">Game %1$d: starting position (FEN) unreadable.</string>
+    <string name="puzzle_skip_no_moves">Game %1$d: no moves.</string>
+    <string name="puzzle_skip_illegal">Game %1$d: the move %2$s is not playable.</string>
+    <string name="puzzle_import_close">Close</string>
+    <string name="puzzle_collection_count">%1$d puzzles</string>
+    <string name="puzzle_collection_missed">%1$d missed</string>
+    <string name="puzzle_collection_actions">Collection actions</string>
+    <string name="puzzle_collection_practice">Practice</string>
+    <string name="puzzle_collection_redo_missed">Redo the missed ones</string>
+    <string name="puzzle_collection_woodpecker">Woodpecker programme</string>
+    <string name="puzzle_collection_rename">Rename</string>
+    <string name="puzzle_collection_delete">Delete</string>
+    <string name="puzzle_collection_rename_title">Rename the collection</string>
+    <string name="puzzle_collection_name_hint">Name</string>
+    <string name="puzzle_collection_name_bad_title">That name won’t do</string>
+    <string name="puzzle_collection_name_bad_body">It is empty, or already used by another collection.</string>
+    <string name="puzzle_collection_delete_title">Delete the collection “%1$s”?</string>
+    <string name="puzzle_collection_delete_body">Its puzzles are removed from this device. The original file is not touched.</string>
+    <string name="puzzle_collection_programme_running">A programme is already running. Stop it first to start another.</string>
 </resources>

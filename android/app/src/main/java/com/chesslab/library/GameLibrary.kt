@@ -214,9 +214,9 @@ interface AutosaveDao {
         GameRecord::class, Autosave::class,
         com.chesslab.training.OpeningProgress::class, com.chesslab.training.OpeningReviewLog::class,
         com.chesslab.puzzles.OwnPuzzle::class, com.chesslab.puzzles.PuzzleProgress::class,
-        com.chesslab.puzzles.WoodpeckerProgram::class,
+        com.chesslab.puzzles.WoodpeckerProgram::class, com.chesslab.puzzles.ImportedPuzzle::class,
     ],
-    version = 12, exportSchema = false,
+    version = 13, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
@@ -225,6 +225,7 @@ abstract class LibraryDatabase : RoomDatabase() {
     abstract fun ownPuzzles(): com.chesslab.puzzles.OwnPuzzleDao
     abstract fun puzzleProgress(): com.chesslab.puzzles.PuzzleProgressDao
     abstract fun woodpecker(): com.chesslab.puzzles.WoodpeckerDao
+    abstract fun importedPuzzles(): com.chesslab.puzzles.ImportedPuzzleDao
 
     companion object {
         @Volatile private var instance: LibraryDatabase? = null
@@ -337,8 +338,31 @@ abstract class LibraryDatabase : RoomDatabase() {
          */
         val ALL_MIGRATIONS get() = arrayOf(
             MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
-            MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12,
+            MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
         )
+
+        /**
+         * v12 → v13 : les collections de puzzles importées d'un fichier PGN
+         * (01/11/2026). Une table neuve, rien à convertir. L'index porte sur
+         * `collection` : c'est par lui qu'on liste, renomme et supprime.
+         */
+        val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    """CREATE TABLE IF NOT EXISTS imported_puzzles (
+                        uid TEXT NOT NULL PRIMARY KEY,
+                        collection TEXT NOT NULL,
+                        fen TEXT NOT NULL,
+                        solution TEXT NOT NULL,
+                        theme TEXT NOT NULL,
+                        phase TEXT NOT NULL,
+                        position INTEGER NOT NULL,
+                        createdAt INTEGER NOT NULL
+                    )"""
+                )
+                db.execSQL("CREATE INDEX IF NOT EXISTS index_imported_puzzles_collection ON imported_puzzles (collection)")
+            }
+        }
 
         /**
          * v11 → v12 : l'issue de la dernière tentative d'un puzzle (réussite

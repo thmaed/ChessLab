@@ -1508,8 +1508,11 @@ struct HomeView: View {
     /// réellement tentés (jamais les dizaines de milliers de la bibliothèque).
     private func loadProgressSummary() {
         let games = (try? modelContext.fetch(FetchDescriptor<GameRecord>())) ?? []
+        // Hors collections importées : voir ``PuzzleQueueView/refresh()``.
+        let importedRaw = PuzzleSource.imported.rawValue
         var attempted = FetchDescriptor<Puzzle>(predicate: #Predicate { puzzle in
-            (puzzle.successCount ?? 0) > 0 || (puzzle.failureCount ?? 0) > 0
+            ((puzzle.successCount ?? 0) > 0 || (puzzle.failureCount ?? 0) > 0)
+                && (puzzle.sourceRaw ?? "") != importedRaw
         })
         attempted.propertiesToFetch = [\.successCount, \.failureCount, \.themeRaw, \.rating]
         let puzzles = (try? modelContext.fetch(attempted)) ?? []

@@ -10886,3 +10886,53 @@ iPhone 17 Pro, mêmes écrans, même langue, ramenés à la même échelle).
   par le libellé et une coche à droite (comme les thèmes d'échiquier juste en dessous), la rangée entière
   restant touchable et déclarée « bouton radio » à TalkBack (`selectable`).
 - L'accueil, lui, était déjà identique : tuiles de 131 dp de haut, même cadence.
+
+## 03/11 — Collections de puzzles importées d'un fichier PGN (iOS + Android)
+
+Demande de Ron (utilisateur de l'iPad) : importer ses propres problèmes — ceux qu'il rate en jouant
+des parties lentes, et ceux de chess.com / Lichess / ChessTempo qu'il a classés par motif — pour
+s'en faire un programme Woodpecker de ~1000 puzzles (son fichier : environ 400 Ko), à part de la
+bibliothèque.
+
+- **Format** : une partie du fichier = un puzzle. L'en-tête `[FEN]` donne la position (sans lui, la
+  partie est écartée et le dit : sans position, la ligne principale n'est pas un puzzle) ; la ligne
+  principale donne la solution, le premier coup étant celui de CELUI QUI TROUVE ; variantes,
+  commentaires, annotations et NAG sont ignorés. Une riposte adverse en queue de ligne est retirée
+  (une solution se termine sur le coup de celui qui trouve). Un coup illégal écarte toute la partie :
+  une solution tronquée serait un autre puzzle. Le découpage ne suppose aucun `[Event]` (un fichier de
+  puzzles n'a souvent que `[FEN]`) et ne se laisse pas tromper par un commentaire `[%clk …]` en début
+  de ligne. Fichier : `PuzzleCollectionImporter.swift` / `.kt`.
+- **Une collection par fichier** : `PuzzleSource.imported` + `Puzzle.collection` (nom). Pas
+  d'enregistrement de collection : c'est l'ensemble des puzzles qui portent son nom (renommer réécrit
+  le champ, supprimer retire les puzzles). Réimporter un fichier n'ajoute que ce qui manque.
+  `PuzzleCollectionStore.swift` / `ImportedPuzzle.kt`.
+- **Hors du tirage général** : sans critère de provenance, ni la série, ni « À mon niveau », ni la
+  séance du jour, ni « Ratés » ne puisent dans les collections — mille puzzles noieraient le reste.
+  Elles sont aussi hors des statistiques (« À travailler » propose une série qui n'y puiserait pas).
+  Android : table `imported_puzzles` (Room v13), progression sous un identifiant `imp-…` que les
+  requêtes générales écartent.
+- **Écran Puzzles → « Mes collections »** : une ligne par collection (compte, ratés) ; un toucher
+  l'entraîne en série ; le menu propose Refaire les ratés, Programme Woodpecker, Renommer, Supprimer.
+  « Importer des puzzles » ouvre un ou plusieurs fichiers `.pgn` à la fois (sélecteur du système) ou
+  un texte collé, et affiche un BILAN : puzzles ajoutés, déjà présents, doublons, parties écartées avec
+  la raison des cinq premières.
+- **Woodpecker sur TOUTE la collection** (pas de choix 10/25/50 : la méthode est un lot fixe repris en
+  entier ; ce choix sert à tirer un lot dans la bibliothèque). Un programme à la fois : si un est en
+  cours, un message demande de l'arrêter d'abord. Mesuré : le plan de 1000 puzzles après 7 cycles pèse
+  moins de 800 Ko en JSON (test) ; sur iOS il voyage dans le store synchronisé (limite CloudKit : 1 Mo
+  par enregistrement) — marge à surveiller si quelqu'un dépasse 1000 puzzles.
+- **Choix assumés** :
+  - les collections sont LOCALES, comme les puzzles de « Mes parties » (store « Puzzles » sur iOS,
+    jamais synchronisé ; non emportées par le `.clab` sur Android). Ce store est détruit si SwiftData le
+    déclare corrompu : le fichier d'origine est la sauvegarde ;
+  - 40 demi-coups au plus par solution ;
+  - le thème est deviné comme pour une gaffe de « Mes parties » (mat / pièce en prise / fourchette /
+    tactique) ; Ron les a déjà classés lui-même, un fichier par motif donne une collection par motif.
+- **Tests** : iOS — `PuzzleCollectionTests.swift` (importeur + magasin, 1000 puzzles lus en moins de
+  10 s, plan Woodpecker de 1000 puzzles) et `PuzzleCollectionUITests` (coller → série → Woodpecker →
+  suppression, argument de lancement DEBUG `-uiTestPuzzleImportText` : le clavier logiciel « corrige »
+  les guillemets d'un en-tête PGN). Android — `PuzzleCollectionImporterTest` (17, miroir), `MigrationTest`
+  étendu à la v13, `PuzzleCollectionTest` (même parcours).
+- **Piège Android** : le moteur d'expressions régulières d'Android refuse `}` et `]` non échappés, que
+  la JVM des tests unitaires accepte — le défaut n'est apparu que sur l'appareil.
+- Aide (iOS et Android, deux langues) : une phrase sur l'import.

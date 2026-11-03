@@ -15,17 +15,23 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.GpsFixed
+import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Numbers
+import androidx.compose.material.icons.filled.SaveAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SignalCellularAlt
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -67,8 +73,10 @@ import kotlinx.coroutines.withContext
  * De haut en bas : où j'en suis (cote, réussite, thème à travailler) ; quatre
  * séries prêtes qui démarrent au toucher (à mon niveau, ratés, à revoir, mes
  * parties) ; « Série sur mesure », tous les filtres dans une feuille avec le
- * nombre de puzzles avant de lancer ; et le programme Woodpecker, dont la
- * création (critères compris) vit dans sa propre feuille.
+ * nombre de puzzles avant de lancer ; le programme Woodpecker, dont la
+ * création (critères compris) vit dans sa propre feuille ; et « Mes collections »,
+ * les fichiers PGN de puzzles importés (01/11/2026), chacun avec sa série, ses
+ * ratés et son programme Woodpecker complet.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -91,6 +99,21 @@ fun PuzzleQueueScreen(
     var confirmStop by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     var sheet by remember { mutableStateOf<CriteriaMode?>(null) }
+    // Les collections importées, et ce qu'on en fait (importer, renommer, supprimer).
+    var collections by remember { mutableStateOf<List<CollectionSummary>>(emptyList()) }
+    var showImport by remember { mutableStateOf(false) }
+    var renaming by remember { mutableStateOf<CollectionSummary?>(null) }
+    var renameFailed by remember { mutableStateOf(false) }
+    var deleting by remember { mutableStateOf<CollectionSummary?>(null) }
+
+    suspend fun reloadCollections() {
+        val db = LibraryDatabase.get(context)
+        collections = withContext(Dispatchers.IO) {
+            runCatching {
+                PuzzleCollectionStore.collections(db.importedPuzzles(), db.puzzleProgress().missedImportedIds().toSet())
+            }.getOrDefault(emptyList())
+        }
+    }
 
     LaunchedEffect(Unit) {
         puzzleRating = com.chesslab.settings.StatsStore.puzzleRating(context)
@@ -99,9 +122,10 @@ fun PuzzleQueueScreen(
             missedCount = runCatching { db.puzzleProgress().missedIds().size }.getOrDefault(0)
             reviewCount = runCatching { db.puzzleProgress().reviewIds().size }.getOrDefault(0)
             ownCount = runCatching { db.ownPuzzles().count() }.getOrDefault(0)
-            stats = runCatching { PuzzleStats.compute(db.puzzleProgress().all()) }.getOrNull()
+            stats = runCatching { PuzzleStats.compute(db.puzzleProgress().allForStats()) }.getOrNull()
             programme = runCatching { db.woodpecker().active() }.getOrNull()
         }
+        reloadCollections()
     }
 
     TopBarActions {
@@ -168,6 +192,125 @@ fun PuzzleQueueScreen(
                 ) { sheet = CriteriaMode.woodpecker }
             }
         }
+
+        // Mes collections : une ligne par fichier importé, et l'import toujours proposé.
+        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            SectionTitle(stringResource(R.string.puzzle_section_collections))
+            collections.forEach { collection ->
+                CollectionRow(
+                    collection,
+                    onPractice = { onStart(PuzzleFilter(collection = collection.name)) },
+                    onRedoMissed = { onStart(PuzzleFilter(collection = collection.name, missedOnly = true)) },
+                    onWoodpecker = {
+                        if (programme != null) {
+                            message = context.getString(R.string.puzzle_collection_programme_running)
+                        } else scope.launch {
+                            val app = context.applicationContext as android.app.Application
+                            val items = withContext(Dispatchers.IO) {
+                                LibraryDatabase.get(app).importedPuzzles().inCollection(collection.name)
+                            }.map { WoodpeckerPlan.Item.of(it.toPuzzle()) }
+                            val plan = WoodpeckerPlan.start(items)
+                            if (plan == null) {
+                                message = context.getString(R.string.woodpecker_none_match)
+                            } else {
+                                val now = System.currentTimeMillis()
+                                val created = WoodpeckerProgram(
+                                    id = java.util.UUID.randomUUID().toString(),
+                                    createdAt = now, updatedAt = now,
+                                    criteria = context.getString(R.string.woodpecker_criteria, plan.items.size) + " · " + collection.name,
+                                    planJson = plan.toJson(),
+                                )
+                                withContext(Dispatchers.IO) { LibraryDatabase.get(app).woodpecker().put(created) }
+                                programme = created
+                                onOpenWoodpecker(created.id)
+                            }
+                        }
+                    },
+                    onRename = { renaming = collection },
+                    onDelete = { deleting = collection },
+                )
+            }
+            LinkRow(
+                Icons.Default.SaveAlt, Palette.violet,
+                stringResource(R.string.puzzle_import_row_title), stringResource(R.string.puzzle_import_row_sub),
+                tag = "puzzleImportRow",
+            ) { showImport = true }
+        }
+    }
+
+    if (showImport) {
+        val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ModalBottomSheet(
+            onDismissRequest = { showImport = false; scope.launch { reloadCollections() } },
+            sheetState = state,
+            containerColor = Palette.background,
+        ) {
+            PuzzleImportSheet(onClose = { showImport = false; scope.launch { reloadCollections() } })
+        }
+    }
+
+    renaming?.let { target ->
+        var text by remember(target) { mutableStateOf(target.name) }
+        AlertDialog(
+            onDismissRequest = { renaming = null },
+            title = { Text(stringResource(R.string.puzzle_collection_rename_title)) },
+            text = {
+                OutlinedTextField(
+                    value = text, onValueChange = { text = it }, singleLine = true,
+                    label = { Text(stringResource(R.string.puzzle_collection_name_hint)) },
+                    modifier = Modifier.fillMaxWidth().testTag("collection-renommer-nom"),
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        renaming = null
+                        scope.launch {
+                            val ok = withContext(Dispatchers.IO) {
+                                PuzzleCollectionStore.rename(LibraryDatabase.get(context).importedPuzzles(), target.name, text)
+                            }
+                            if (!ok) renameFailed = true
+                            reloadCollections()
+                        }
+                    },
+                    modifier = Modifier.testTag("collection-renommer-oui"),
+                ) { Text(stringResource(R.string.puzzle_collection_rename), color = Palette.accent) }
+            },
+            dismissButton = { TextButton(onClick = { renaming = null }) { Text(stringResource(R.string.cancel)) } },
+            containerColor = Palette.surfaceElevated,
+        )
+    }
+    if (renameFailed) {
+        AlertDialog(
+            onDismissRequest = { renameFailed = false },
+            title = { Text(stringResource(R.string.puzzle_collection_name_bad_title)) },
+            text = { Text(stringResource(R.string.puzzle_collection_name_bad_body)) },
+            confirmButton = { TextButton(onClick = { renameFailed = false }) { Text("OK", color = Palette.accent) } },
+            containerColor = Palette.surfaceElevated,
+        )
+    }
+    deleting?.let { target ->
+        AlertDialog(
+            onDismissRequest = { deleting = null },
+            title = { Text(stringResource(R.string.puzzle_collection_delete_title, target.name)) },
+            text = { Text(stringResource(R.string.puzzle_collection_delete_body)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        deleting = null
+                        scope.launch {
+                            withContext(Dispatchers.IO) {
+                                PuzzleCollectionStore.delete(LibraryDatabase.get(context).importedPuzzles(), target.name)
+                            }
+                            reloadCollections()
+                        }
+                    },
+                    modifier = Modifier.testTag("collection-supprimer-oui"),
+                ) { Text(stringResource(R.string.puzzle_collection_delete), color = Palette.danger) }
+            },
+            dismissButton = { TextButton(onClick = { deleting = null }) { Text(stringResource(R.string.cancel)) } },
+            containerColor = Palette.surfaceElevated,
+        )
     }
 
     sheet?.let { mode ->
@@ -377,6 +520,90 @@ private fun LinkRow(icon: ImageVector, tint: Color, title: String, subtitle: Str
     }
 }
 
+/**
+ * Une collection importée : un toucher la travaille en série ; le menu propose
+ * les ratés, le programme Woodpecker complet, renommer et supprimer. Pendant de
+ * `collectionRow` (iOS).
+ */
+@Composable
+private fun CollectionRow(
+    collection: CollectionSummary,
+    onPractice: () -> Unit,
+    onRedoMissed: () -> Unit,
+    onWoodpecker: () -> Unit,
+    onRename: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    var menu by remember { mutableStateOf(false) }
+    val subtitle = stringResource(R.string.puzzle_collection_count, collection.count) +
+        if (collection.missedCount > 0) " · " + stringResource(R.string.puzzle_collection_missed, collection.missedCount) else ""
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(CardShape)
+            .background(cardGradient)
+            .subtleBorder()
+            .padding(start = 14.dp, top = 8.dp, bottom = 8.dp, end = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Row(
+            Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(10.dp))
+                .clickable(onClick = onPractice)
+                .padding(vertical = 4.dp)
+                .testTag("collection-${collection.name}"),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            IconBadge(PuzzleSource.imported.icon, Palette.violet, 40.dp)
+            Column(Modifier.weight(1f)) {
+                Text(collection.name, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary, maxLines = 1)
+                Text(subtitle, fontSize = 12.sp, color = Palette.textSecondary, maxLines = 1)
+            }
+        }
+        androidx.compose.foundation.layout.Box {
+            Icon(
+                Icons.Default.MoreVert, stringResource(R.string.puzzle_collection_actions),
+                tint = Palette.textSecondary,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable { menu = true }
+                    .padding(8.dp)
+                    .testTag("collectionMenu-${collection.name}"),
+            )
+            DropdownMenu(expanded = menu, onDismissRequest = { menu = false }, containerColor = Palette.surfaceElevated) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.puzzle_collection_practice)) },
+                    onClick = { menu = false; onPractice() },
+                )
+                if (collection.missedCount > 0) {
+                    DropdownMenuItem(
+                        text = { Text(stringResource(R.string.puzzle_collection_redo_missed)) },
+                        onClick = { menu = false; onRedoMissed() },
+                    )
+                }
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.puzzle_collection_woodpecker)) },
+                    onClick = { menu = false; onWoodpecker() },
+                    modifier = Modifier.testTag("collection-woodpecker"),
+                )
+                HorizontalDivider()
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.puzzle_collection_rename)) },
+                    onClick = { menu = false; onRename() },
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.puzzle_collection_delete), color = Palette.danger) },
+                    onClick = { menu = false; onDelete() },
+                    modifier = Modifier.testTag("collection-supprimer"),
+                )
+            }
+        }
+    }
+}
+
 /** Un programme en cours : où il en est, et la reprise d'un toucher. */
 @Composable
 private fun RunningProgramme(program: WoodpeckerProgram, plan: WoodpeckerPlan, onResume: () -> Unit, onStop: () -> Unit) {
@@ -468,14 +695,19 @@ private fun CriteriaSheet(mode: CriteriaMode, rating: PuzzleRating, onConfirm: (
     LaunchedEffect(filter) {
         matching = null
         matching = withContext(Dispatchers.Default) {
-            val own = if (filter.source == PuzzleSource.lichess) 0 else runCatching {
+            val own = if (filter.source == PuzzleSource.lichess || filter.source == PuzzleSource.imported) 0 else runCatching {
                 LibraryDatabase.get(context).ownPuzzles().all().map { it.toPuzzle() }
                     .count { PuzzleAnswer.accepts(it, filter, isOwn = true) }
             }.getOrDefault(0)
-            val library = if (filter.source == PuzzleSource.ownGames) 0 else runCatching {
+            val library = if (filter.source == PuzzleSource.ownGames || filter.source == PuzzleSource.imported) 0 else runCatching {
                 PuzzleRepository.count(context.assets, filter.ratings, filter.theme?.raw, filter.phase?.raw)
             }.getOrDefault(0)
-            own + library
+            // Les collections importées n'entrent dans le compte que si on les demande.
+            val imported = if (filter.source != PuzzleSource.imported) 0 else runCatching {
+                LibraryDatabase.get(context).importedPuzzles().all().map { it.toPuzzle() }
+                    .count { PuzzleAnswer.accepts(it, filter, isOwn = true) }
+            }.getOrDefault(0)
+            own + library + imported
         }
     }
 
@@ -499,7 +731,7 @@ private fun CriteriaSheet(mode: CriteriaMode, rating: PuzzleRating, onConfirm: (
                 Text(stringResource(R.string.woodpecker_sheet_intro), fontSize = 13.sp, color = Palette.textSecondary)
             }
             // Vos puzzles n'ont pas de cote : un niveau les exclurait tous.
-            if (source != PuzzleSource.ownGames) Group(stringResource(R.string.puzzle_level), Icons.Default.SignalCellularAlt, Palette.accent) {
+            if (source?.isRated != false) Group(stringResource(R.string.puzzle_level), Icons.Default.SignalCellularAlt, Palette.accent) {
                 ChipButton(stringResource(R.string.puzzle_at_my_level), atMyLevel, Modifier.testTag("niveau-mien"), tint = Palette.accent) {
                     atMyLevel = !atMyLevel
                     if (atMyLevel) difficulty = null
@@ -532,7 +764,7 @@ private fun CriteriaSheet(mode: CriteriaMode, rating: PuzzleRating, onConfirm: (
                 PuzzleSource.entries.forEach { value ->
                     ChipButton(stringResource(value.labelRes), source == value, Modifier.testTag("provenance-${value.name}"), icon = value.icon, tint = Palette.violet) {
                         source = if (source == value) null else value
-                        if (source == PuzzleSource.ownGames) { difficulty = null; atMyLevel = false }
+                        if (source?.isRated == false) { difficulty = null; atMyLevel = false }
                     }
                 }
             }

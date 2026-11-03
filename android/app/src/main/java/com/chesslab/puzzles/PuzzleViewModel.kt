@@ -2,6 +2,7 @@ package com.chesslab.puzzles
 
 import android.app.Application
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Inbox
 import androidx.compose.material.icons.filled.LibraryBooks
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -38,14 +39,23 @@ enum class PuzzleOutcome { solving, solved, failed }
  */
 enum class PuzzleSource(val labelRes: Int) {
     ownGames(R.string.puzzle_source_own),
-    lichess(R.string.puzzle_source_lichess);
+    lichess(R.string.puzzle_source_lichess),
+    /**
+     * Une collection importée d'un fichier PGN ([ImportedPuzzle]) : hors du tirage
+     * général, on la travaille à part — voir [PuzzleFilter.collection].
+     */
+    imported(R.string.puzzle_source_imported);
 
     /** Les mêmes symboles qu'iOS (`person.fill`, `books.vertical.fill`). */
     val icon: ImageVector
         get() = when (this) {
             ownGames -> Icons.Default.Person
             lichess -> Icons.Default.LibraryBooks
+            imported -> Icons.Default.Inbox
         }
+
+    /** Seuls les puzzles de la bibliothèque sont cotés : un niveau n'a de sens que pour eux. */
+    val isRated: Boolean get() = this == lichess
 }
 
 data class PuzzleUiState(
@@ -93,10 +103,23 @@ object PuzzleDraw {
         count: Int? = null,
     ): List<Puzzle> = withContext(Dispatchers.IO) {
         val db = LibraryDatabase.get(app)
-        val mine = if (filter.source == PuzzleSource.lichess) emptyList()
+        val fromCollection = filter.collection != null || filter.source == PuzzleSource.imported
+        val mine = if (filter.source == PuzzleSource.lichess || fromCollection) emptyList()
             else own.map { it.toPuzzle() }.filter { PuzzleAnswer.accepts(it, filter, isOwn = true) }
         runCatching {
             when {
+                // Une collection importée (ou toutes) : jamais mêlée au tirage général.
+                fromCollection -> {
+                    val collection = if (filter.collection != null) db.importedPuzzles().inCollection(filter.collection)
+                        else db.importedPuzzles().all()
+                    val pool = collection.map { it.toPuzzle() }.filter { PuzzleAnswer.accepts(it, filter, isOwn = true) }
+                    val kept = when {
+                        filter.missedOnly -> db.puzzleProgress().missedImportedIds().toSet().let { ids -> pool.filter { it.id in ids } }
+                        filter.reviewOnly -> db.puzzleProgress().reviewImportedIds().toSet().let { ids -> pool.filter { it.id in ids } }
+                        else -> pool
+                    }.shuffled()
+                    if (count != null) kept.take(count) else kept
+                }
                 // Les ratés, dus ou non : la progression dit lesquels, la
                 // bibliothèque et vos puzzles maison disent ce qu'ils sont.
                 filter.missedOnly || filter.reviewOnly -> {
@@ -280,7 +303,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         // Le bilan, recalculé depuis la progression — jamais un compteur qui
         // dérive de ce qu'il compte.
         val stats = withContext(Dispatchers.IO) {
-            runCatching { com.chesslab.progression.PuzzleStats.compute(db.puzzleProgress().all()) }.getOrNull()
+            runCatching { com.chesslab.progression.PuzzleStats.compute(db.puzzleProgress().allForStats()) }.getOrNull()
         }
         queue = PuzzleDraw.draw(app, filter, own, count = filter.limit)
         ui = ui.copy(loading = false, dueCount = due, stats = stats)
@@ -313,7 +336,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
         val current = dao.byId(puzzle.id) ?: PuzzleProgress(externalId = puzzle.id, theme = puzzle.theme)
         val next = PuzzleSchedule.next(current, result, solved = success)
         dao.put(next.copy(dueAt = PuzzleSchedule.dueAt(next, now), updatedAt = now, theme = puzzle.theme, rating = puzzle.rating))
-        ui = ui.copy(stats = com.chesslab.progression.PuzzleStats.compute(dao.all()))
+        ui = ui.copy(stats = com.chesslab.progression.PuzzleStats.compute(dao.allForStats()))
     }
 
     private fun present(index: Int) {

@@ -138,6 +138,29 @@ class MigrationTest {
             dao.put(com.chesslab.puzzles.PuzzleProgress(externalId = "rate", failureCount = 1, lastOutcome = 2))
             assertEquals(setOf("ancien", "rate"), dao.missedIds().toSet())
             assertEquals(listOf("partiel"), dao.reviewIds())
+
+            // v13 : les collections importées. La table existe, s'écrit, et la progression
+            // de ses puzzles (« imp-… ») reste HORS des ratés, des statistiques et des échéances
+            // générales — mais se retrouve par les requêtes de collection.
+            val imported = db.importedPuzzles()
+            val report = com.chesslab.puzzles.PuzzleCollectionStore.add(
+                imported,
+                com.chesslab.puzzles.PuzzleCollectionImporter.parse(
+                    "[FEN \"r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 23\"]\n\n1. Re8+ Rxe8 2. Rxe8#\n"
+                ),
+                "Mats",
+            )
+            assertEquals(1, report.added)
+            val id = imported.inCollection("Mats").single().uid
+            assertTrue(com.chesslab.puzzles.ImportedPuzzle.isImportedId(id))
+            dao.put(com.chesslab.puzzles.PuzzleProgress(externalId = id, failureCount = 1, lastOutcome = 2, dueAt = 1L))
+            assertEquals(setOf("ancien", "rate"), dao.missedIds().toSet())
+            assertEquals(listOf(id), dao.missedImportedIds())
+            assertTrue(dao.allForStats().none { it.externalId == id })
+            assertEquals(0, dao.dueCount(Long.MAX_VALUE))
+            com.chesslab.puzzles.PuzzleCollectionStore.delete(imported, "Mats")
+            assertEquals(0, imported.countIn("Mats"))
+            assertTrue("sa progression part avec elle", dao.byId(id) == null)
         } finally {
             db.close()
             context.deleteDatabase(name)

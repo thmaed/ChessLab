@@ -537,8 +537,11 @@ struct ProgressionView: View {
         allGames = (try? modelContext.fetch(FetchDescriptor<GameRecord>())) ?? []
 
         // Puzzles : UNIQUEMENT ceux tentés (voir l'avertissement d'en-tête).
+        // Hors collections importées : voir ``PuzzleQueueView/refresh()``.
+        let importedRaw = PuzzleSource.imported.rawValue
         var attempted = FetchDescriptor<Puzzle>(predicate: #Predicate { puzzle in
-            (puzzle.successCount ?? 0) > 0 || (puzzle.failureCount ?? 0) > 0
+            ((puzzle.successCount ?? 0) > 0 || (puzzle.failureCount ?? 0) > 0)
+                && (puzzle.sourceRaw ?? "") != importedRaw
         })
         attempted.propertiesToFetch = [\.successCount, \.failureCount, \.themeRaw, \.rating]
         puzzles = (try? modelContext.fetch(attempted)) ?? []

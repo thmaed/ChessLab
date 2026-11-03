@@ -139,6 +139,13 @@ data class PuzzleFilter(
      */
     val source: PuzzleSource? = null,
     /**
+     * Une collection importée ([PuzzleSource.imported]), par son nom. Prime sur
+     * [source]. Sans elle, les collections restent HORS du tirage : un fichier de
+     * mille puzzles noierait sinon la bibliothèque, la séance du jour et « À mon
+     * niveau ». Pendant de `PuzzleSessionFilter.collection`.
+     */
+    val collection: String? = null,
+    /**
      * Seulement les puzzles ratés à la DERNIÈRE tentative : un échec remet
      * `repetitions` à zéro, un succès l'incrémente — `failureCount > 0 &&
      * repetitions == 0` le dit sans champ nouveau. L'échéance est ignorée :
@@ -163,6 +170,6 @@ data class PuzzleFilter(
 ) {
     val ratings: IntRange get() = ratingWindow ?: difficulty?.range ?: 0..4000
     val isEmpty: Boolean
-        get() = difficulty == null && phase == null && theme == null && source == null &&
+        get() = difficulty == null && phase == null && theme == null && source == null && collection == null &&
             !missedOnly && !reviewOnly && ratingWindow == null
 }

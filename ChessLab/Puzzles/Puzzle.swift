@@ -52,12 +52,18 @@ enum PuzzleTheme: String, Codable, CaseIterable {
 enum PuzzleSource: String, Codable, CaseIterable {
     case ownGames
     case lichess
+    /// Une collection importée d'un fichier PGN (voir
+    /// ``PuzzleCollectionImporter``) : le nom de la collection est dans
+    /// ``Puzzle/collection``. Hors du tirage général (voir
+    /// ``PuzzleSessionDrawer``) : on la travaille à part, ou pas du tout.
+    case imported
 
     /// Clé française, localisée par l'appelant (comme ``PuzzleTheme/label``).
     var label: String {
         switch self {
         case .ownGames: "Mes parties"
         case .lichess: "Bibliothèque"
+        case .imported: "Mes collections"
         }
     }
 
@@ -65,8 +71,13 @@ enum PuzzleSource: String, Codable, CaseIterable {
         switch self {
         case .ownGames: "person.fill"
         case .lichess: "books.vertical.fill"
+        case .imported: "tray.full.fill"
         }
     }
+
+    /// Seuls les puzzles de la bibliothèque sont cotés : un niveau n'a de sens
+    /// que pour eux.
+    var isRated: Bool { self == .lichess }
 }
 
 /// Un puzzle généré depuis une gaffe/erreur détectée en mode Analyser.
@@ -110,6 +121,11 @@ final class Puzzle {
     /// la partie d'origine" masqué si `nil`).
     var sourceGamePGN: String?
     var sourceRaw: String?
+    /// Nom de la collection d'un puzzle importé (``PuzzleSource/imported``) ;
+    /// `nil` pour tous les autres. Une collection n'a pas d'enregistrement à
+    /// elle : c'est l'ensemble des puzzles qui portent ce nom (voir
+    /// ``PuzzleCollectionStore``).
+    var collection: String?
     /// Identifiant Lichess (`PuzzleId`) pour un puzzle de la
     /// bibliothèque embarquée — `nil` pour une gaffe issue de vos
     /// parties. Sert de clé naturelle pour un réamorçage idempotent de

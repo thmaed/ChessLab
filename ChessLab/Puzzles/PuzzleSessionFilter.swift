@@ -11,10 +11,16 @@ struct PuzzleSessionFilter: Hashable {
     var difficulty: DifficultyTier?
     var phase: GamePhase?
     var theme: PuzzleTheme?
-    /// `nil` = les deux. Sans ce critère, vos puzzles maison (quelques
+    /// `nil` = vos parties ET la bibliothèque — jamais les collections importées
+    /// (voir `collection`). Sans ce critère, vos puzzles maison (quelques
     /// dizaines) se noyaient dans les ~100 000 de la bibliothèque : tirés
     /// au hasard parmi eux, ils ne sortaient pour ainsi dire jamais.
     var source: PuzzleSource?
+    /// Une collection importée (``PuzzleSource/imported``), par son nom. Prime
+    /// sur `source`. Sans elle, les collections restent HORS du tirage : un
+    /// fichier de mille puzzles noierait sinon la bibliothèque, la séance du
+    /// jour et « À mon niveau ».
+    var collection: String?
     /// Seulement les puzzles RATÉS À LA DERNIÈRE TENTATIVE — voir
     /// ``PuzzleSessionDrawer/predicate(matching:neverOpenedOnly:excluding:)``.
     var missedOnly = false
@@ -221,11 +227,17 @@ enum PuzzleSessionDrawer {
         // Un puzzle sans `sourceRaw` date d'avant ce champ : il venait
         // forcément de vos parties (voir ``Puzzle/source``).
         let legacySourceRaw = PuzzleSource.ownGames.rawValue
+        let importedRaw = PuzzleSource.imported.rawValue
         let provenance: Predicate<Puzzle>
-        if let sourceRaw = filter.source?.rawValue {
+        if let collection = filter.collection {
+            // Optionnel contre optionnel : voir le `Puzzle.externalID` de
+            // ``PuzzleProgressSync`` (le contraire trappe).
+            let target: String? = collection
+            provenance = #Predicate { $0.collection == target }
+        } else if let sourceRaw = filter.source?.rawValue {
             provenance = #Predicate { ($0.sourceRaw ?? legacySourceRaw) == sourceRaw }
         } else {
-            provenance = #Predicate { _ in true }
+            provenance = #Predicate { ($0.sourceRaw ?? legacySourceRaw) != importedRaw }
         }
 
         return #Predicate<Puzzle> {

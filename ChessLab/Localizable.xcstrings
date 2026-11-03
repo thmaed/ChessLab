@@ -632,6 +632,38 @@
         }
       }
     },
+    "%lld déjà présents": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld already there"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld déjà présents"
+          }
+        }
+      }
+    },
+    "%lld en double dans le fichier": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld duplicated in the file"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld en double dans le fichier"
+          }
+        }
+      }
+    },
     "%lld Mo": {
       "extractionState": "stale",
       "localizations": {
@@ -788,6 +820,22 @@
         }
       }
     },
+    "%lld parties écartées": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld games skipped"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld parties écartées"
+          }
+        }
+      }
+    },
     "%lld pièce(s) à préciser — case %@, pièce %@.": {
       "localizations": {
         "en": {
@@ -892,6 +940,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "%lld puzzles"
+          }
+        }
+      }
+    },
+    "%lld puzzles ajoutés": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld puzzles added"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld puzzles ajoutés"
+          }
+        }
+      }
+    },
+    "%lld ratés": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld missed"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld ratés"
           }
         }
       }
@@ -1325,6 +1405,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "?"
+          }
+        }
+      }
+    },
+    "Actions de la collection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collection actions"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actions de la collection"
           }
         }
       }
@@ -2557,6 +2653,22 @@
         }
       }
     },
+    "Aucun puzzle trouvé dans ce fichier.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No puzzle found in this file."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun puzzle trouvé dans ce fichier."
+          }
+        }
+      }
+    },
     "Aucun répertoire": {
       "extractionState": "stale",
       "localizations": {
@@ -3677,6 +3789,38 @@
           "stringUnit": {
             "state": "translated",
             "value": "Béton"
+          }
+        }
+      }
+    },
+    "Collection importée": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imported collection"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collection importée"
+          }
+        }
+      }
+    },
+    "Ce nom ne convient pas": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That name won't do"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce nom ne convient pas"
           }
         }
       }
@@ -6436,6 +6580,22 @@
         }
       }
     },
+    "Des fichiers PGN : vos problèmes, rangés à part de la bibliothèque": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PGN files: your own problems, kept apart from the library"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des fichiers PGN : vos problèmes, rangés à part de la bibliothèque"
+          }
+        }
+      }
+    },
     "Deux cases murées": {
       "localizations": {
         "en": {
@@ -8648,6 +8808,22 @@
         }
       }
     },
+    "Il est vide, ou déjà pris par une autre collection.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "It is empty, or already used by another collection."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il est vide, ou déjà pris par une autre collection."
+          }
+        }
+      }
+    },
     "Il faut exactement un roi blanc et un roi noir.": {
       "localizations": {
         "en": {
@@ -8846,6 +9022,38 @@
         }
       }
     },
+    "Importer des puzzles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import puzzles"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer des puzzles"
+          }
+        }
+      }
+    },
+    "Importer le texte": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import the text"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importer le texte"
+          }
+        }
+      }
+    },
     "Importer un PGN": {
       "extractionState": "stale",
       "localizations": {
@@ -8928,6 +9136,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Imported"
+          }
+        }
+      }
+    },
+    "Impossible de lire « %@ ».": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't read “%@”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de lire « %@ »."
           }
         }
       }
@@ -10161,6 +10385,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "L'ordinateur réfléchit"
+          }
+        }
+      }
+    },
+    "Lecture en cours…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lecture en cours…"
           }
         }
       }
@@ -12042,6 +12282,22 @@
         }
       }
     },
+    "Mes collections": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "My collections"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mes collections"
+          }
+        }
+      }
+    },
     "Mes parties": {
       "localizations": {
         "en": {
@@ -12710,6 +12966,22 @@
         }
       }
     },
+    "Nom de la collection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collection name"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nom de la collection"
+          }
+        }
+      }
+    },
     "Nom du répertoire": {
       "localizations": {
         "en": {
@@ -13201,6 +13473,22 @@
         }
       }
     },
+    "Ou coller du texte PGN": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Or paste PGN text"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ou coller du texte PGN"
+          }
+        }
+      }
+    },
     "Ouverture": {
       "extractionState": "stale",
       "localizations": {
@@ -13267,6 +13555,22 @@
         }
       }
     },
+    "Ouvrir des fichiers PGN": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open PGN files"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrir des fichiers PGN"
+          }
+        }
+      }
+    },
     "Ouvrir l'éditeur": {
       "localizations": {
         "en": {
@@ -13329,6 +13633,70 @@
           "stringUnit": {
             "state": "translated",
             "value": "Défense Owen"
+          }
+        }
+      }
+    },
+    "Partie %lld : pas de position de départ (FEN).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game %lld: no starting position (FEN)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie %lld : pas de position de départ (FEN)."
+          }
+        }
+      }
+    },
+    "Partie %lld : position de départ (FEN) illisible.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game %lld: starting position (FEN) unreadable."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie %lld : position de départ (FEN) illisible."
+          }
+        }
+      }
+    },
+    "Partie %lld : aucun coup.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game %lld: no moves."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie %lld : aucun coup."
+          }
+        }
+      }
+    },
+    "Partie %lld : le coup %@ ne se joue pas.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game %lld: the move %@ is not playable."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie %lld : le coup %@ ne se joue pas."
           }
         }
       }
@@ -14677,6 +15045,22 @@
         }
       }
     },
+    "Programme Woodpecker": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woodpecker programme"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Programme Woodpecker"
+          }
+        }
+      }
+    },
     "Progressez sur 58 ouvertures rédigées à la main et bilingues, aux grandes lignes vérifiées. Un lecteur guidé avance coup par coup, explique chaque coup et propose les autres coups jouables ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud.": {
       "extractionState": "stale",
       "localizations": {
@@ -15494,6 +15878,22 @@
         }
       }
     },
+    "Refaire les ratés": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Redo the missed ones"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Refaire les ratés"
+          }
+        }
+      }
+    },
     "Refuser": {
       "localizations": {
         "en": {
@@ -15565,6 +15965,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Rename"
+          }
+        }
+      }
+    },
+    "Renommer la collection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename the collection"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Renommer la collection"
           }
         }
       }
@@ -17257,6 +17673,22 @@
         }
       }
     },
+    "Ses puzzles sont retirés de cet appareil. Le fichier d'origine n'est pas touché.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Its puzzles are removed from this device. The original file is not touched."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ses puzzles sont retirés de cet appareil. Le fichier d'origine n'est pas touché."
+          }
+        }
+      }
+    },
     "Session de révision espacée": {
       "extractionState": "stale",
       "localizations": {
@@ -17883,6 +18315,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Delete this game?"
+          }
+        }
+      }
+    },
+    "Supprimer la collection « %@ » ?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete the collection “%@”?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer la collection « %@ » ?"
           }
         }
       }
@@ -19436,6 +19884,22 @@
         }
       }
     },
+    "Un fichier PGN dont chaque partie est un puzzle : l'en-tête FEN donne la position, la ligne principale donne la solution (le premier coup est celui à trouver). Chaque fichier devient une collection, rangée à part de la bibliothèque.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A PGN file where each game is a puzzle: the FEN header gives the position and the main line gives the solution (the first move is the one to find). Each file becomes a collection, kept apart from the library."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un fichier PGN dont chaque partie est un puzzle : l'en-tête FEN donne la position, la ligne principale donne la solution (le premier coup est celui à trouver). Chaque fichier devient une collection, rangée à part de la bibliothèque."
+          }
+        }
+      }
+    },
     "Un grand merci à Nils Gauthey pour tout le travail accompli sur ChessLab. Ses relectures, ses corrections et ses idées ont fait progresser l'app dans son ensemble, et tout particulièrement la qualité des ouvertures et des finales : les lignes que vous étudiez ici lui doivent beaucoup.": {
       "localizations": {
         "en": {
@@ -19544,6 +20008,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Un pion offert est un pion pris. Il accepte tous les gambits, défend pendant quarante coups sans se plaindre, puis vous rappelle qu'il a un pion de plus."
+          }
+        }
+      }
+    },
+    "Un programme est déjà en cours. Arrêtez-le d'abord pour en commencer un autre.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A programme is already running. Stop it first to start another."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un programme est déjà en cours. Arrêtez-le d'abord pour en commencer un autre."
           }
         }
       }
@@ -23017,12 +23497,12 @@
         }
       }
     },
-    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. Votre cote personnelle, sur l'échelle des puzzles Lichess, suit vos réussites : elle bouge vite au début puis se stabilise ; réussi avec l'indice, un puzzle ne rapporte rien et coûte quelques points ; la puce « À mon niveau » propose des puzzles proches de votre cote. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs.": {
+    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. Votre cote personnelle, sur l'échelle des puzzles Lichess, suit vos réussites : elle bouge vite au début puis se stabilise ; réussi avec l'indice, un puzzle ne rapporte rien et coûte quelques points ; la puce « À mon niveau » propose des puzzles proches de votre cote. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. Vos propres puzzles (un fichier PGN dont chaque partie est un puzzle, avec son en-tête FEN) s'importent depuis l'écran Puzzles : chaque fichier devient une collection, rangée à part, qu'on travaille en série ou en programme Woodpecker complet. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by source (your games or the library), level, game phase and theme, or replay only the puzzles you missed on your last attempt. A checkmating move is always accepted, even if it differs from the solution. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Your personal rating, on the Lichess puzzle scale, follows your results: it moves fast at first then settles; a puzzle solved with the hint earns nothing and costs a few points; the “At my level” chip offers puzzles close to your rating. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. The Woodpecker method replays a fixed set of 10, 25 or 50 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
+            "value": "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by source (your games or the library), level, game phase and theme, or replay only the puzzles you missed on your last attempt. A checkmating move is always accepted, even if it differs from the solution. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Your personal rating, on the Lichess puzzle scale, follows your results: it moves fast at first then settles; a puzzle solved with the hint earns nothing and costs a few points; the “At my level” chip offers puzzles close to your rating. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. The Woodpecker method replays a fixed set of 10, 25 or 50 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone. Your own puzzles (a PGN file where each game is a puzzle, with its FEN header) can be imported from the Puzzles screen: each file becomes a collection, kept apart, which you can work through as a series or as a full Woodpecker programme. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
           }
         }
       }
@@ -23917,6 +24397,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "A fixed set of puzzles, solved in full then repeated in a new order, cycle after cycle, to find more of them, faster. Choose its puzzles, then its size."
+          }
+        }
+      }
+    },
+    "… et %lld autres parties écartées.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "… and %lld more games skipped."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "… et %lld autres parties écartées."
           }
         }
       }

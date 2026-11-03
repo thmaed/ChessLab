@@ -17,7 +17,9 @@ import SwiftUI
 /// - **série sur mesure** : tous les filtres dans une feuille, avec le nombre
 ///   de puzzles avant de lancer ;
 /// - **programme Woodpecker** : une ligne ; sa création (critères compris) vit
-///   dans sa propre feuille, et un programme en cours s'y reprend.
+///   dans sa propre feuille, et un programme en cours s'y reprend ;
+/// - **mes collections** : les fichiers PGN de puzzles importés (01/11/2026),
+///   chacun avec sa série, ses ratés et son programme Woodpecker complet.
 struct PuzzleQueueView: View {
     /// Démarre une série OUVERTE de puzzles selon ces critères — voir
     /// ``PuzzleSolveViewModel``, qui tire les puzzles un à un tant que
@@ -44,6 +46,18 @@ struct PuzzleQueueView: View {
     @State private var confirmsWoodpeckerArchive = false
     @State private var woodpeckerMessage: String?
 
+    /// Les collections importées, et ce qu'on en fait (renommer, supprimer).
+    @State private var collections: [PuzzleCollectionStore.Summary] = []
+    @State private var showsImport = false
+    /// La collection visée par « Renommer » ou « Supprimer » : gardée À PART des
+    /// booléens de présentation, que SwiftUI remet à faux avant (ou pendant)
+    /// l'exécution du bouton.
+    @State private var actionTarget: PuzzleCollectionStore.Summary?
+    @State private var showsRename = false
+    @State private var showsDelete = false
+    @State private var renameText = ""
+    @State private var renameFailed = false
+
     @State private var sheet: CriteriaSheetMode?
     /// Ce que la feuille a décidé, exécuté APRÈS sa fermeture : pousser un écran
     /// pendant qu'une feuille se ferme le fait disparaître sans bruit.
@@ -64,6 +78,7 @@ struct PuzzleQueueView: View {
                         readySeries
                         customSeriesRow
                         programmeSection
+                        collectionsSection
                     }
                     .padding(20)
                     .frame(maxWidth: Theme.readableWidth, alignment: .leading)
@@ -116,6 +131,35 @@ struct PuzzleQueueView: View {
             Button("OK") {}
         } message: {
             Text(woodpeckerMessage ?? "")
+        }
+        .sheet(isPresented: $showsImport, onDismiss: refresh) { PuzzleImportSheet() }
+        .alert("Renommer la collection", isPresented: $showsRename) {
+            TextField("Nom", text: $renameText)
+            Button("Annuler", role: .cancel) {}
+            Button("Renommer") {
+                if let target = actionTarget,
+                   !PuzzleCollectionStore.rename(target.name, to: renameText, in: modelContext) {
+                    renameFailed = true
+                }
+                refresh()
+            }
+        }
+        .alert("Ce nom ne convient pas", isPresented: $renameFailed) {
+            Button("OK") {}
+        } message: {
+            Text("Il est vide, ou déjà pris par une autre collection.")
+        }
+        .confirmationDialog(
+            actionTarget.map { LocalizationController.string("Supprimer la collection « %@ » ?", $0.name) } ?? "",
+            isPresented: $showsDelete,
+            titleVisibility: .visible
+        ) {
+            Button("Supprimer", role: .destructive) {
+                if let target = actionTarget { PuzzleCollectionStore.delete(target.name, in: modelContext) }
+                refresh()
+            }
+        } message: {
+            Text("Ses puzzles sont retirés de cet appareil. Le fichier d'origine n'est pas touché.")
         }
     }
 
@@ -330,13 +374,18 @@ struct PuzzleQueueView: View {
             ), count: size)
         }
         #endif
+        return makeProgramme(items: items, criteria: LocalizationController.string("%lld puzzles", items.count)
+            + " · " + PuzzleCriteriaSheet.summary(of: filter))
+    }
+
+    /// Crée et enregistre le programme. `nil` si le lot est vide.
+    private func makeProgramme(items: [WoodpeckerPlan.Item], criteria: String) -> UUID? {
         guard let plan = WoodpeckerPlan.start(items: items) else {
             woodpeckerMessage = LocalizationController.string("Aucun puzzle ne correspond à ces critères.")
             return nil
         }
         let program = WoodpeckerProgram()
-        program.criteria = LocalizationController.string("%lld puzzles", plan.items.count)
-            + " · " + PuzzleCriteriaSheet.summary(of: filter)
+        program.criteria = criteria
         program.plan = plan
         modelContext.insert(program)
         PersistenceLog.save(modelContext)
@@ -348,6 +397,113 @@ struct PuzzleQueueView: View {
         woodpecker?.isArchived = true
         PersistenceLog.save(modelContext)
         woodpecker = nil
+    }
+
+    // MARK: Mes collections
+
+    /// Les fichiers PGN de puzzles importés. Rien tant qu'aucun n'est importé,
+    /// sinon une ligne par collection ; l'import est toujours proposé.
+    @ViewBuilder
+    private var collectionsSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Mes collections")
+            ForEach(collections) { collection in
+                collectionRow(collection)
+            }
+            Button { showsImport = true } label: {
+                linkRow(
+                    systemImage: "square.and.arrow.down", tint: Theme.violet,
+                    title: "Importer des puzzles",
+                    subtitle: "Des fichiers PGN : vos problèmes, rangés à part de la bibliothèque"
+                )
+            }
+            .buttonStyle(.pressable)
+            .accessibilityIdentifier("puzzleImportRow")
+        }
+    }
+
+    private func collectionRow(_ collection: PuzzleCollectionStore.Summary) -> some View {
+        HStack(spacing: 12) {
+            Button { onStartSession(PuzzleSessionFilter(collection: collection.name)) } label: {
+                HStack(spacing: 12) {
+                    IconBadge(systemImage: PuzzleSource.imported.icon, tint: Theme.violet, size: 40)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(collection.name)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.textPrimary)
+                            .lineLimit(1)
+                        Text(collectionSubtitle(collection))
+                            .font(.caption.monospacedDigit())
+                            .foregroundStyle(Theme.textSecondary)
+                            .lineLimit(1)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("collection-\(collection.name)")
+
+            Menu {
+                Button { onStartSession(PuzzleSessionFilter(collection: collection.name)) } label: {
+                    Label("S'entraîner", systemImage: "play.fill")
+                }
+                if collection.missedCount > 0 {
+                    Button {
+                        onStartSession(PuzzleSessionFilter(collection: collection.name, missedOnly: true))
+                    } label: {
+                        Label("Refaire les ratés", systemImage: "xmark.circle")
+                    }
+                }
+                Button { startCollectionWoodpecker(collection) } label: {
+                    Label("Programme Woodpecker", systemImage: "arrow.triangle.2.circlepath")
+                }
+                Divider()
+                Button {
+                    actionTarget = collection
+                    renameText = collection.name
+                    showsRename = true
+                } label: {
+                    Label("Renommer", systemImage: "pencil")
+                }
+                Button(role: .destructive) {
+                    actionTarget = collection
+                    showsDelete = true
+                } label: {
+                    Label("Supprimer", systemImage: "trash")
+                }
+            } label: {
+                Image(systemName: "ellipsis.circle")
+                    .font(.title3)
+                    .foregroundStyle(Theme.textSecondary)
+                    .frame(width: 36, height: 36)
+                    .contentShape(Rectangle())
+            }
+            .accessibilityLabel("Actions de la collection")
+            .accessibilityIdentifier("collectionMenu-\(collection.name)")
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .cardStyle()
+    }
+
+    private func collectionSubtitle(_ collection: PuzzleCollectionStore.Summary) -> String {
+        let count = LocalizationController.string("%lld puzzles", collection.count)
+        guard collection.missedCount > 0 else { return count }
+        return count + " · " + LocalizationController.string("%lld ratés", collection.missedCount)
+    }
+
+    /// Un programme Woodpecker sur TOUTE la collection : c'est la méthode — un
+    /// lot fixe, repris en entier à chaque cycle — et la seule taille qui y
+    /// convienne (le choix 10/25/50 sert à tirer un lot dans la bibliothèque).
+    private func startCollectionWoodpecker(_ collection: PuzzleCollectionStore.Summary) {
+        guard woodpecker == nil else {
+            woodpeckerMessage = LocalizationController.string("Un programme est déjà en cours. Arrêtez-le d'abord pour en commencer un autre.")
+            return
+        }
+        let items = PuzzleCollectionStore.puzzles(inCollection: collection.name, in: modelContext)
+            .map(WoodpeckerPlan.Item.init)
+        let criteria = LocalizationController.string("%lld puzzles", items.count) + " · " + collection.name
+        if let id = makeProgramme(items: items, criteria: criteria) { onOpenWoodpecker(id) }
     }
 
     // MARK: Briques
@@ -392,12 +548,17 @@ struct PuzzleQueueView: View {
         missedCount = PuzzleSessionDrawer.count(matching: PuzzleSessionFilter(missedOnly: true), in: modelContext)
         reviewCount = PuzzleSessionDrawer.count(matching: PuzzleSessionFilter(reviewOnly: true), in: modelContext)
         ownCount = PuzzleSessionDrawer.count(matching: PuzzleSessionFilter(source: .ownGames), in: modelContext)
+        collections = PuzzleCollectionStore.collections(in: modelContext)
 
         // ⚠️ Ne charge QUE les puzzles réellement tentés : la bibliothèque
         // embarquée en compte plus de cent mille, et les matérialiser tous pour
         // un pourcentage rendrait cet écran inutilisable. SQLite fait le tri.
+        // Les collections importées n'entrent PAS dans ces chiffres : « À travailler »
+        // propose une série, et une série n'y puise pas (voir ``PuzzleSessionFilter/collection``).
+        let importedRaw = PuzzleSource.imported.rawValue
         var attempted = FetchDescriptor<Puzzle>(predicate: #Predicate { puzzle in
-            (puzzle.successCount ?? 0) > 0 || (puzzle.failureCount ?? 0) > 0
+            ((puzzle.successCount ?? 0) > 0 || (puzzle.failureCount ?? 0) > 0)
+                && (puzzle.sourceRaw ?? "") != importedRaw
         })
         attempted.propertiesToFetch = [\.successCount, \.failureCount, \.themeRaw]
         stats = (try? modelContext.fetch(attempted)).map { PuzzleStats.compute(from: $0) }
@@ -508,7 +669,7 @@ struct PuzzleCriteriaSheet: View {
                                 .fixedSize(horizontal: false, vertical: true)
                         }
                         // Vos puzzles n'ont pas de cote : un niveau les exclurait tous.
-                        if source != .ownGames {
+                        if source?.isRated != false {
                             filterGroup(title: "Niveau", systemImage: "cellularbars", tint: Theme.accent) {
                                 FilterChip(label: "À mon niveau", icon: "scope", tint: Theme.accent, isSelected: atMyLevel) {
                                     atMyLevel.toggle()
@@ -546,7 +707,7 @@ struct PuzzleCriteriaSheet: View {
                             ForEach(PuzzleSource.allCases, id: \.self) { value in
                                 FilterChip(label: LocalizedStringKey(value.label), icon: value.icon, tint: Theme.violet, isSelected: source == value) {
                                     source = source == value ? nil : value
-                                    if source == .ownGames { difficulty = nil; atMyLevel = false }
+                                    if source?.isRated == false { difficulty = nil; atMyLevel = false }
                                 }
                                 .accessibilityIdentifier("provenance-\(value.rawValue)")
                             }

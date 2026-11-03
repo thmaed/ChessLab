@@ -37,7 +37,9 @@ struct PlayExportTests {
     @Test func thereIsNoGameToExportBeforeTheFirstMove() throws {
         let viewModel = try makeViewModel()
         #expect(viewModel.hasGameToExport == false)
-        #expect(!viewModel.exportedPGN.contains("1."))
+        // « 1. » AVEC l'espace : la balise `[Date "2026.11.03"]` contient « 1. » à
+        // partir de novembre, et ce test échouait alors sans qu'aucun coup n'existe.
+        #expect(!viewModel.exportedPGN.contains("1. "))
         // La POSITION, elle, existe toujours.
         #expect(!viewModel.displayedFEN.isEmpty)
     }

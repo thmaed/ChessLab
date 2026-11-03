@@ -64,7 +64,7 @@ fun ProgressionScreen(onTrainTheme: (String) -> Unit = {}) {
     LaunchedEffect(Unit) {
         training = TrainingStats.read(context)
         puzzleRows = withContext(Dispatchers.IO) {
-            runCatching { LibraryDatabase.get(context).puzzleProgress().all() }.getOrDefault(emptyList())
+            runCatching { LibraryDatabase.get(context).puzzleProgress().allForStats() }.getOrDefault(emptyList())
         }
     }
 
