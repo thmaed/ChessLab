@@ -1873,7 +1873,7 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
 
 Pendant de `DailySessionStep.Kind.woodpecker` (iOS). Même règle : étape présente si un programme non arrêté a un cycle courant non bouclé ; « faite » dès qu'on a répondu à un puzzle d'un programme aujourd'hui ; avant la finale.
 
-- [ ] À voir sur le Galaxy : lancer un programme Woodpecker, ouvrir la séance du jour : « Cycle N : X puzzles restants » ; un toucher reprend le programme ; après une réponse, l'étape passe à « Woodpecker travaillé aujourd'hui ». (Vérifié seulement par test instrumenté sur émulateur.)
+- [x] Un programme Woodpecker en cours est une étape de la séance du jour : « Cycle N : X puzzles restants » ; un toucher reprend le programme ; après une réponse, l'étape passe à « Woodpecker travaillé aujourd'hui ». (vérifié sur Galaxy A16 le 04/11 : étape avant la finale, carte d'accueil « Woodpecker : 25 », reprise du programme, passage à « practised today » après un puzzle ; test instrumenté vert sur émulateur)
 
 ### Collections de puzzles importées d'un fichier PGN — 03/11/2026
 
