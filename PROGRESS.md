@@ -10956,3 +10956,8 @@ position ? ») ; la solution commence après. C'est la convention Lichess, déj�
   Android) ; elle voyage dans le plan Woodpecker (`Item.setupLAN`, JSON additif).
 - Android : base v14 (`MIGRATION_13_14`, colonne `setup`).
 - Tests : le fichier réel de Ron est un test des deux côtés (six puzzles, riposte au milieu, promotion).
+
+### Séance du jour : le cycle Woodpecker en cours (suggestion d'Olivier, 04/11) — iOS + Android
+
+Un cycle Woodpecker en cours est une étape de la séance du jour (`DailySessionStep.Kind.woodpecker`, après les puzzles de vos parties, avant la finale) : « Cycle N : X puzzles restants », un toucher rouvre le programme. Le programme est le plus récemment travaillé parmi ceux qui ne sont pas arrêtés et dont le cycle courant n'est pas bouclé (`DailySessionBuilder.woodpeckerInfo`). L'étape est « faite » pour la journée dès qu'on a répondu à un puzzle d'un programme (`TrainingDays.markWoodpeckerPracticed`, posé dans `recordWoodpeckerAnswer`) : un cycle dure des jours et ne doit pas empêcher la séance de se terminer. Aide et textes FR/EN des deux côtés ; carte d'accueil « Woodpecker : N ».
+Tests : iOS DailySessionTests (+5) et DailySessionWoodpeckerStoreTests (4, base en mémoire) ; Android JVM (+3), instrumenté `unCycleWoodpeckerEnCoursEstUneEtapeDeLaSeance` vert sur l'émulateur. Build 21 (le 20 est écarté).

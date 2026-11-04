@@ -328,6 +328,7 @@ private fun App() {
                 onOpenOpenings = { stack.add(trainRoute(context, "session")) },
                 onOpenPuzzles = { filter -> stack.add(Route.Puzzles(filter = filter)) },
                 onOpenEndgame = { id, name -> stack.add(Route.EndgameFree(id, name)) },
+                onOpenWoodpecker = { id -> stack.add(Route.Woodpecker(id)) },
             )
             Route.Progression -> ProgressionScreen(onTrainTheme = { stack.add(Route.Puzzles(theme = it)) })
             Route.Help -> HelpScreen(

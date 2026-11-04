@@ -1181,14 +1181,21 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="daily_sum_missed">Puzzles ratés : %1$d</string>
     <string name="daily_sum_own">Puzzles de vos parties : %1$d</string>
     <string name="daily_sum_endgame">une finale</string>
+    <string name="daily_sum_woodpecker">Woodpecker : %1$d</string>
+    <plurals name="daily_todo_woodpecker">
+        <item quantity="one">Cycle %1$d : %2$d puzzle restant</item>
+        <item quantity="other">Cycle %1$d : %2$d puzzles restants</item>
+    </plurals>
     <string name="daily_step_openings">Ouvertures à revoir</string>
     <string name="daily_step_missed">Puzzles à retenter</string>
     <string name="daily_step_own">Puzzles de vos parties</string>
     <string name="daily_step_endgame">Une finale</string>
+    <string name="daily_step_woodpecker">Cycle Woodpecker</string>
     <string name="daily_done_openings">Rien à revoir aujourd\'hui.</string>
     <string name="daily_done_missed">Aucun puzzle raté en attente.</string>
     <string name="daily_done_own">Aucun puzzle de vos parties en attente.</string>
     <string name="daily_done_endgame">Finale du jour ouverte.</string>
+    <string name="daily_done_woodpecker">Woodpecker travaillé aujourd\'hui.</string>
     <string name="daily_todo_openings">Positions dues : %1$d</string>
     <string name="daily_todo_missed">Puzzles ratés à rejouer : %1$d</string>
     <string name="daily_todo_own">Puzzles tirés de vos erreurs : %1$d</string>
@@ -1241,7 +1248,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="help_news_title">Nouveautés de la 2.0</string>
     <string name="help_news_body">• Séance du jour : chaque jour, ce qu\'il faut revoir — positions d\'ouverture dues, puzzles ratés, puzzles de vos parties, une finale — plafonnée (2, 5 ou 8 ouvertures) et avec une série de jours et des médailles.\n• Analyse : quand vous analysez une de vos parties contre l\'ordinateur, l\'app repère vos erreurs, en tire des puzzles et dessine votre profil de faiblesses dans Progrès.\n• Coach : dans l\'analyse, la part des joueurs de votre niveau qui jouent ce coup.\n• Puzzles : une cote personnelle, la puce « À mon niveau », et un indice qui ne rapporte plus de points.\n• Ouvertures : cartes vivantes, menus Camp et Niveau, filtre « Classiques ».\n• Réglages de partie : « Limite de temps » éteinte par défaut, dernier choix retenu.</string>
     <string name="help_daily_title">Séance du jour</string>
-    <string name="help_daily_body">Chaque jour, l\'app rassemble ce qu\'il faut revoir, dans l\'ordre : positions d\'ouverture dues (répétition espacée), puzzles ratés, puzzles tirés de vos parties, et une finale. Elle se veut courte : 5 puzzles au plus par étape et un plafond d\'ouvertures que vous réglez en bas de l\'écran (2, 5 ou 8). Seules les positions DUES comptent. Une étape passe à « fait » quand son objectif du jour est atteint. Votre série compte les jours d\'entraînement de suite ; des médailles marquent 3, 7, 30, 100 et 365 jours.</string>
+    <string name="help_daily_body">Chaque jour, l\'app rassemble ce qu\'il faut revoir, dans l\'ordre : positions d\'ouverture dues (répétition espacée), puzzles ratés, puzzles tirés de vos parties, votre cycle Woodpecker s\'il est en cours (fait dès que vous y avez travaillé aujourd\'hui), et une finale. Elle se veut courte : 5 puzzles au plus par étape et un plafond d\'ouvertures que vous réglez en bas de l\'écran (2, 5 ou 8). Seules les positions DUES comptent. Une étape passe à « fait » quand son objectif du jour est atteint. Votre série compte les jours d\'entraînement de suite ; des médailles marquent 3, 7, 30, 100 et 365 jours.</string>
     <string name="help_rating_title">Votre cote de puzzle</string>
     <string name="help_rating_body">Une cote personnelle, sur l\'échelle des puzzles Lichess, suit vos réussites : elle bouge vite au début puis se stabilise. Réussi avec l\'indice, un puzzle ne rapporte rien et coûte quelques points ; un puzzle raté ou la solution révélée en font perdre davantage. La puce « À mon niveau » propose des puzzles proches de votre cote. Les puzzles tirés de vos parties et les cycles Woodpecker n\'y comptent pas.</string>
     <string name="help_analysis_title">Analyse, Coach et profil</string>

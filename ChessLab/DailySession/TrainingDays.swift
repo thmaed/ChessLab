@@ -76,6 +76,18 @@ enum TrainingDays {
         defaults.set("\(TrainingStreak.key(for: now)):\(total)", forKey: openingsDoneKey)
     }
 
+    private static let woodpeckerKey = "dailySession.woodpeckerDay"
+
+    /// A-t-on répondu à un puzzle d'un programme Woodpecker aujourd'hui ? C'est ce qui rend « faite » la
+    /// tâche Woodpecker de la séance : un cycle dure des jours, il ne se termine pas en une séance.
+    static func woodpeckerPracticedToday(now: Date = Date(), defaults: UserDefaults = .standard) -> Bool {
+        defaults.string(forKey: woodpeckerKey) == TrainingStreak.key(for: now)
+    }
+
+    static func markWoodpeckerPracticed(now: Date = Date(), defaults: UserDefaults = .standard) {
+        defaults.set(TrainingStreak.key(for: now), forKey: woodpeckerKey)
+    }
+
     /// La finale de la séance a-t-elle été ouverte aujourd'hui ?
     static func endgameOpenedToday(now: Date = Date(), defaults: UserDefaults = .standard) -> Bool {
         defaults.string(forKey: endgameKey) == TrainingStreak.key(for: now)

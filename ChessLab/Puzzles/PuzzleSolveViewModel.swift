@@ -501,6 +501,7 @@ final class PuzzleSolveViewModel {
     /// apparaître le bilan.
     private func recordWoodpeckerAnswer(success: Bool) {
         TrainingDays.markToday()
+        TrainingDays.markWoodpeckerPracticed()
         let seconds = elapsedOnPuzzle()
         clockStartedAt = nil
         clockAccumulated = 0

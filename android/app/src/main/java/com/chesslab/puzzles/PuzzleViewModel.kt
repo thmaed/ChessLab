@@ -229,6 +229,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
     private fun recordWoodpecker(solved: Boolean) {
         val plan = ui.woodpeckerPlan ?: return
         com.chesslab.dailysession.TrainingDays.markToday(getApplication())
+        com.chesslab.dailysession.TrainingDays.markWoodpeckerPracticed(getApplication())
         val seconds = elapsedOnPuzzleMs() / 1000.0
         clockStartedAt = null
         clockAccumulatedMs = 0

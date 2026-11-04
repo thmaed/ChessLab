@@ -12,6 +12,7 @@ struct DailySessionView: View {
     var onOpenOpenings: () -> Void
     var onOpenPuzzles: (PuzzleSessionFilter) -> Void
     var onOpenEndgame: (String) -> Void
+    var onOpenWoodpecker: (UUID) -> Void = { _ in }
 
     var body: some View {
         ScrollView {
@@ -139,6 +140,9 @@ struct DailySessionView: View {
         case .openings: onOpenOpenings()
         case .missedPuzzles: onOpenPuzzles(PuzzleSessionFilter(source: nil, missedOnly: true, limit: DailySessionBuilder.puzzlesCap))
         case .ownPuzzles: onOpenPuzzles(PuzzleSessionFilter(source: .ownGames, limit: DailySessionBuilder.puzzlesCap))
+        case .woodpecker:
+            guard let id = step.programID else { return }
+            onOpenWoodpecker(id)
         case .endgame:
             guard let id = step.courseID else { return }
             TrainingDays.markEndgameOpened()
@@ -171,6 +175,16 @@ struct DailySessionView: View {
                 title: LocalizationController.string("Puzzles de vos parties"), icon: "puzzlepiece.extension.fill",
                 tint: Theme.accent, doneText: LocalizationController.string("Aucun puzzle de vos parties en attente."),
                 todoText: { LocalizationController.string("Puzzles tirés de vos erreurs : %lld", $0) })
+        case .woodpecker:
+            StepInfo(
+                title: LocalizationController.string("Cycle Woodpecker"), icon: "arrow.triangle.2.circlepath",
+                tint: Theme.teal, doneText: LocalizationController.string("Woodpecker travaillé aujourd'hui."),
+                todoText: { left in
+                    let cycle = step.cycleNumber ?? 1
+                    return left == 1
+                        ? LocalizationController.string("Cycle %lld : 1 puzzle restant", cycle)
+                        : LocalizationController.string("Cycle %lld : %lld puzzles restants", cycle, left)
+                })
         case .endgame:
             StepInfo(
                 title: LocalizationController.string("Une finale"), icon: "crown.fill",
@@ -234,6 +248,7 @@ struct DailySessionCard: View {
             case .openings: LocalizationController.string("Ouvertures : %lld", step.remaining)
             case .missedPuzzles: LocalizationController.string("Puzzles ratés : %lld", step.remaining)
             case .ownPuzzles: LocalizationController.string("Puzzles de vos parties : %lld", step.remaining)
+            case .woodpecker: LocalizationController.string("Woodpecker : %lld", step.remaining)
             case .endgame: LocalizationController.string("une finale")
             }
         }

@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 2.1, build 20** (fixés dans `project.pbxproj`). La 2.0 (build 19) est EN VENTE. Voir `RELEASE_NOTES-2.1.md` pour le détail des changements depuis la 2.0. **Préparée le 03/11/2026 : fiche, nouveautés et notes de révision posées dans App Store Connect (version 2.1, PREPARE_FOR_SUBMISSION) ; le build n'est PAS archivé ni téléversé, la version n'est PAS soumise (attendre l'accord de Thierry).**
+**Version courante : 2.1, build 21** (fixés dans `project.pbxproj`). La 2.0 (build 19) est EN VENTE. Voir `RELEASE_NOTES-2.1.md` pour le détail des changements depuis la 2.0. **Préparée le 03/11/2026 : fiche, nouveautés et notes de révision posées dans App Store Connect (version 2.1, PREPARE_FOR_SUBMISSION) ; le build n'est PAS archivé ni téléversé, la version n'est PAS soumise (attendre l'accord de Thierry).**
 
 Tout ce qui suit est à copier-coller directement dans les champs correspondants d'App Store Connect. Les limites de caractères d'Apple sont respectées (vérifiées).
 
@@ -30,6 +30,9 @@ Quatre séries démarrent au toucher : À mon niveau, Ratés, À revoir, Mes par
 RÉUSSITE PARTIELLE
 Un puzzle dont vous trouvez le début sans la fin n'est plus compté comme raté : il rejoint « À revoir » et revient bientôt.
 
+SÉANCE DU JOUR
+Un cycle Woodpecker en cours s'affiche désormais parmi les tâches du jour, avec le nombre de puzzles qu'il reste à faire : un toucher et vous reprenez là où vous en étiez.
+
 PLUS DE 24 000 PUZZLES
 La bibliothèque passe à 130 935 problèmes, surtout aux niveaux extrêmes et pour les solutions de quatre coups ou plus. Une barre de progression suit son préchargement au premier lancement.
 
@@ -53,6 +56,9 @@ Four series start with a tap: At my level, Missed, Review, My games. “Custom s
 
 PARTIAL SUCCESS
 A puzzle where you find the start but not the end no longer counts as missed: it joins “Review” and comes back soon.
+
+DAILY SESSION
+A Woodpecker cycle under way now appears among the day's tasks, with the number of puzzles still to do: one tap and you pick up where you left off.
 
 OVER 24,000 MORE PUZZLES
 The library grows to 130,935 problems, especially at the extreme levels and for solutions of four moves or more. A progress bar follows its loading on first launch.
@@ -223,7 +229,7 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**2.1, build 20** — `MARKETING_VERSION = 2.1`, `CURRENT_PROJECT_VERSION = 20` (la 2.0, build 19, est en vente ; le 20 est le premier numéro libre, vérifié par l'API le 03/11/2026). Nouveautés détaillées dans `RELEASE_NOTES-2.1.md`.
+**2.1, build 21** — `MARKETING_VERSION = 2.1`, `CURRENT_PROJECT_VERSION = 21` (la 2.0, build 19, est en vente ; le build 20, téléversé le 04/11 sans la tâche Woodpecker de la séance, est écarté). Nouveautés détaillées dans `RELEASE_NOTES-2.1.md`.
 
 **2.0, build 19** — `MARKETING_VERSION = 2.0`, `CURRENT_PROJECT_VERSION = 19` (la 1.9.2, build 17, est la dernière soumise : le 18 est le premier numéro libre, à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.0.md`.
 

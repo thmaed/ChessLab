@@ -39,6 +39,7 @@ object TrainingDays {
     private const val DAYS = "days"
     private const val ENDGAME = "endgame_day"
     private const val OPENINGS_DONE = "openings_done"
+    private const val WOODPECKER = "woodpecker_day"
 
     /** Au-delà, les jours les plus anciens ne changent plus rien à une série. */
     private const val RETAINED = 400
@@ -77,6 +78,17 @@ object TrainingDays {
         prefs(context).edit().putString(OPENINGS_DONE, "${TrainingStreak.key(nowMillis)}:$total").apply()
     }
 
+    /**
+     * A-t-on répondu à un puzzle d'un programme Woodpecker aujourd'hui ? C'est ce qui rend « faite » la
+     * tâche Woodpecker de la séance : un cycle dure des jours, il ne se termine pas en une séance. Pendant d'iOS.
+     */
+    fun woodpeckerPracticedToday(context: Context, nowMillis: Long = System.currentTimeMillis()): Boolean =
+        prefs(context).getString(WOODPECKER, null) == TrainingStreak.key(nowMillis)
+
+    fun markWoodpeckerPracticed(context: Context, nowMillis: Long = System.currentTimeMillis()) {
+        prefs(context).edit().putString(WOODPECKER, TrainingStreak.key(nowMillis)).apply()
+    }
+
     /** La finale de la séance a-t-elle été ouverte aujourd'hui ? */
     fun endgameOpenedToday(context: Context, nowMillis: Long = System.currentTimeMillis()): Boolean =
         prefs(context).getString(ENDGAME, null) == TrainingStreak.key(nowMillis)
@@ -94,11 +106,20 @@ data class DailySessionStep(
     val remaining: Int,
     /** Pour la finale : le cours choisi. */
     val courseId: String? = null,
+    /** Pour Woodpecker : le programme à reprendre et le numéro de son cycle en cours. */
+    val programId: String? = null,
+    val cycleNumber: Int? = null,
 ) {
-    enum class Kind { openings, missedPuzzles, ownPuzzles, endgame }
+    enum class Kind { openings, missedPuzzles, ownPuzzles, woodpecker, endgame }
 
     val isDone: Boolean get() = remaining == 0
 }
+
+/**
+ * Un cycle Woodpecker en cours, tel que la séance le voit : le programme, son cycle, ce qu'il reste dedans,
+ * et si l'on y a déjà travaillé aujourd'hui. Pendant de `WoodpeckerSessionInfo` (iOS).
+ */
+data class WoodpeckerSessionInfo(val programId: String, val cycle: Int, val puzzlesLeft: Int, val practicedToday: Boolean)
 
 /**
  * La séance du jour : un agrégateur, pas un nouveau contenu. Ouvertures dues →
@@ -124,12 +145,21 @@ object DailySessionBuilder {
         streak: Int, trainedToday: Boolean,
         openingsCap: Int = DEFAULT_OPENINGS_CAP,
         openingsDoneToday: Int = 0,
+        woodpecker: WoodpeckerSessionInfo? = null,
     ): DailySessionPlan {
         val steps = arrayListOf(
             DailySessionStep(DailySessionStep.Kind.openings, minOf(maxOf(0, openingsCap - openingsDoneToday), maxOf(0, openingsDue))),
             DailySessionStep(DailySessionStep.Kind.missedPuzzles, minOf(PUZZLES_CAP, maxOf(0, missedPuzzles))),
             DailySessionStep(DailySessionStep.Kind.ownPuzzles, minOf(PUZZLES_CAP, maxOf(0, ownPuzzles))),
         )
+        // Un cycle Woodpecker en cours : sa tâche reste faite pour la journée dès qu'on y a répondu à un puzzle,
+        // sinon un cycle de mille puzzles empêcherait la séance de jamais se terminer.
+        if (woodpecker != null && woodpecker.puzzlesLeft > 0) {
+            steps += DailySessionStep(
+                DailySessionStep.Kind.woodpecker, if (woodpecker.practicedToday) 0 else woodpecker.puzzlesLeft,
+                programId = woodpecker.programId, cycleNumber = woodpecker.cycle,
+            )
+        }
         if (endgameCourseId != null) {
             steps += DailySessionStep(DailySessionStep.Kind.endgame, if (endgameOpenedToday) 0 else 1, endgameCourseId)
         }
@@ -144,6 +174,24 @@ object DailySessionBuilder {
         if (ids.isEmpty()) return null
         val days = Instant.ofEpochMilli(nowMillis).atZone(zone).toLocalDate().toEpochDay()
         return ids[Math.floorMod(days, ids.size.toLong()).toInt()]
+    }
+
+    /**
+     * Le cycle Woodpecker EN COURS, s'il y en a un : le programme le plus récemment travaillé parmi ceux qui
+     * n'ont pas été arrêtés, dont le cycle courant n'est pas bouclé. Pendant d'iOS (`woodpeckerInfo`).
+     */
+    suspend fun woodpeckerInfo(context: Context, nowMillis: Long = System.currentTimeMillis()): WoodpeckerSessionInfo? {
+        val programs = runCatching { LibraryDatabase.get(context).woodpecker().all() }.getOrDefault(emptyList())
+        for (program in programs.filter { !it.archived }.sortedByDescending { it.updatedAt }.take(8)) {
+            val plan = program.plan ?: continue
+            val cycle = plan.currentCycle
+            if (cycle.isComplete) continue
+            return WoodpeckerSessionInfo(
+                program.id, cycle.number, cycle.order.size - cycle.attempts.size,
+                TrainingDays.woodpeckerPracticedToday(context, nowMillis),
+            )
+        }
+        return null
     }
 
     /** Le plan d'aujourd'hui, lu dans les bases locales. */
@@ -164,6 +212,7 @@ object DailySessionBuilder {
             trainedToday = TrainingDays.didTrainToday(context, nowMillis),
             openingsCap = com.chesslab.settings.SettingsStore.state.value.dailyOpeningsCap,
             openingsDoneToday = TrainingDays.openingsReviewedToday(context, nowMillis),
+            woodpecker = woodpeckerInfo(context, nowMillis),
         )
     }
 }

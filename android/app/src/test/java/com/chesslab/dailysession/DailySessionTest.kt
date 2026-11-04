@@ -86,4 +86,36 @@ class DailySessionTest {
         assertEquals(0, remaining(5, 12))
         assertEquals(1, remaining(2, 1))
     }
+
+    // Un cycle Woodpecker en cours (suggestion d'Olivier, 2.1). Pendant des tests de `DailySessionTests.swift`.
+
+    private fun planWith(woodpecker: WoodpeckerSessionInfo?) =
+        DailySessionBuilder.plan(0, 0, 0, "eg-lucena", false, 0, false, woodpecker = woodpecker)
+
+    @Test fun `un cycle Woodpecker en cours devient une etape avant la finale`() {
+        val plan = planWith(WoodpeckerSessionInfo("p1", cycle = 2, puzzlesLeft = 340, practicedToday = false))
+        assertEquals(
+            listOf(
+                DailySessionStep.Kind.openings, DailySessionStep.Kind.missedPuzzles, DailySessionStep.Kind.ownPuzzles,
+                DailySessionStep.Kind.woodpecker, DailySessionStep.Kind.endgame,
+            ),
+            plan.steps.map { it.kind },
+        )
+        val step = plan.steps.first { it.kind == DailySessionStep.Kind.woodpecker }
+        assertEquals(340, step.remaining)
+        assertEquals("p1", step.programId)
+        assertEquals(2, step.cycleNumber)
+        assertEquals(listOf(DailySessionStep.Kind.woodpecker, DailySessionStep.Kind.endgame), plan.pending.map { it.kind })
+    }
+
+    @Test fun `travailler son cycle aujourd'hui rend l'etape faite`() {
+        val plan = planWith(WoodpeckerSessionInfo("p1", 1, 340, practicedToday = true))
+        assertTrue(plan.steps.first { it.kind == DailySessionStep.Kind.woodpecker }.isDone)
+        assertEquals(listOf(DailySessionStep.Kind.endgame), plan.pending.map { it.kind })
+    }
+
+    @Test fun `sans cycle en cours ou cycle boucle pas d'etape Woodpecker`() {
+        assertFalse(planWith(null).steps.any { it.kind == DailySessionStep.Kind.woodpecker })
+        assertFalse(planWith(WoodpeckerSessionInfo("p1", 3, 0, false)).steps.any { it.kind == DailySessionStep.Kind.woodpecker })
+    }
 }

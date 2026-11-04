@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Extension
@@ -79,6 +80,7 @@ private fun style(kind: DailySessionStep.Kind): StepStyle = when (kind) {
     DailySessionStep.Kind.openings -> StepStyle(Icons.Default.MenuBook, Palette.warning)
     DailySessionStep.Kind.missedPuzzles -> StepStyle(Icons.Default.Replay, Palette.violet)
     DailySessionStep.Kind.ownPuzzles -> StepStyle(Icons.Default.Extension, Palette.accent)
+    DailySessionStep.Kind.woodpecker -> StepStyle(Icons.Default.Autorenew, Palette.teal)
     DailySessionStep.Kind.endgame -> StepStyle(Icons.Default.EmojiEvents, Palette.rose)
 }
 
@@ -130,6 +132,7 @@ private fun summary(plan: DailySessionPlan): String {
             DailySessionStep.Kind.openings -> stringResource(R.string.daily_sum_openings, step.remaining)
             DailySessionStep.Kind.missedPuzzles -> stringResource(R.string.daily_sum_missed, step.remaining)
             DailySessionStep.Kind.ownPuzzles -> stringResource(R.string.daily_sum_own, step.remaining)
+            DailySessionStep.Kind.woodpecker -> stringResource(R.string.daily_sum_woodpecker, step.remaining)
             DailySessionStep.Kind.endgame -> stringResource(R.string.daily_sum_endgame)
         }
     }
@@ -143,6 +146,7 @@ fun DailySessionScreen(
     onOpenOpenings: () -> Unit,
     onOpenPuzzles: (PuzzleFilter) -> Unit,
     onOpenEndgame: (String, String) -> Unit,
+    onOpenWoodpecker: (String) -> Unit = {},
 ) {
     val context = LocalContext.current
     var plan by remember { mutableStateOf<DailySessionPlan?>(null) }
@@ -191,6 +195,7 @@ fun DailySessionScreen(
                         DailySessionStep.Kind.openings -> onOpenOpenings()
                         DailySessionStep.Kind.missedPuzzles -> onOpenPuzzles(PuzzleFilter(missedOnly = true, limit = DailySessionBuilder.PUZZLES_CAP))
                         DailySessionStep.Kind.ownPuzzles -> onOpenPuzzles(PuzzleFilter(source = PuzzleSource.ownGames, limit = DailySessionBuilder.PUZZLES_CAP))
+                        DailySessionStep.Kind.woodpecker -> step.programId?.let(onOpenWoodpecker)
                         DailySessionStep.Kind.endgame -> step.courseId?.let { id ->
                             TrainingDays.markEndgameOpened(context)
                             onOpenEndgame(id, CourseRepository.cachedName(id) ?: id)
@@ -238,6 +243,7 @@ private fun StepRow(step: DailySessionStep, onStart: () -> Unit) {
             DailySessionStep.Kind.openings -> R.string.daily_step_openings
             DailySessionStep.Kind.missedPuzzles -> R.string.daily_step_missed
             DailySessionStep.Kind.ownPuzzles -> R.string.daily_step_own
+            DailySessionStep.Kind.woodpecker -> R.string.daily_step_woodpecker
             DailySessionStep.Kind.endgame -> R.string.daily_step_endgame
         }
     )
@@ -246,12 +252,15 @@ private fun StepRow(step: DailySessionStep, onStart: () -> Unit) {
             DailySessionStep.Kind.openings -> R.string.daily_done_openings
             DailySessionStep.Kind.missedPuzzles -> R.string.daily_done_missed
             DailySessionStep.Kind.ownPuzzles -> R.string.daily_done_own
+            DailySessionStep.Kind.woodpecker -> R.string.daily_done_woodpecker
             DailySessionStep.Kind.endgame -> R.string.daily_done_endgame
         }
     ) else when (step.kind) {
         DailySessionStep.Kind.openings -> stringResource(R.string.daily_todo_openings, step.remaining)
         DailySessionStep.Kind.missedPuzzles -> stringResource(R.string.daily_todo_missed, step.remaining)
         DailySessionStep.Kind.ownPuzzles -> stringResource(R.string.daily_todo_own, step.remaining)
+        DailySessionStep.Kind.woodpecker ->
+            pluralStringResource(R.plurals.daily_todo_woodpecker, step.remaining, step.cycleNumber ?: 1, step.remaining)
         DailySessionStep.Kind.endgame -> stringResource(R.string.daily_todo_endgame)
     }
     val tint = look.tint

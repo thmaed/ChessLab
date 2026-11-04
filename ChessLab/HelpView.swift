@@ -79,7 +79,7 @@ struct HelpView: View {
         .init(
             icon: "flame.fill", tint: Theme.warning,
             title: "Séance du jour",
-            body: "Chaque jour, l'app rassemble ce qu'il faut revoir, dans l'ordre : positions d'ouverture dues (répétition espacée), puzzles ratés, puzzles tirés de vos parties, et une finale du jour. Elle se veut courte : 5 puzzles au plus par étape et un plafond d'ouvertures que vous réglez en bas de l'écran (2, 5 ou 8). Seules les positions DUES comptent : parcourir une ligne jusqu'à la position à revoir n'épuise pas votre quota. Une étape passe à « fait » quand son objectif du jour est atteint. Votre série compte les jours d'entraînement de suite ; des médailles marquent 3, 7, 30, 100 et 365 jours. Les révisions que l'app planifie après une partie ne comptent pas dans la série."
+            body: "Chaque jour, l'app rassemble ce qu'il faut revoir, dans l'ordre : positions d'ouverture dues (répétition espacée), puzzles ratés, puzzles tirés de vos parties, votre cycle Woodpecker s'il est en cours (fait dès que vous y avez travaillé aujourd'hui), et une finale du jour. Elle se veut courte : 5 puzzles au plus par étape et un plafond d'ouvertures que vous réglez en bas de l'écran (2, 5 ou 8). Seules les positions DUES comptent : parcourir une ligne jusqu'à la position à revoir n'épuise pas votre quota. Une étape passe à « fait » quand son objectif du jour est atteint. Votre série compte les jours d'entraînement de suite ; des médailles marquent 3, 7, 30, 100 et 365 jours. Les révisions que l'app planifie après une partie ne comptent pas dans la série."
         ),
         .init(
             icon: "cpu", tint: Theme.accent,

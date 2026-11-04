@@ -1869,6 +1869,12 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
       Probablement le test qui ne la fait pas venir, pas l'écran qui casse —
       à trancher en le regardant.
 
+### Séance du jour : le cycle Woodpecker en cours — 04/11/2026 (suggestion d'Olivier)
+
+Pendant de `DailySessionStep.Kind.woodpecker` (iOS). Même règle : étape présente si un programme non arrêté a un cycle courant non bouclé ; « faite » dès qu'on a répondu à un puzzle d'un programme aujourd'hui ; avant la finale.
+
+- [ ] À voir sur le Galaxy : lancer un programme Woodpecker, ouvrir la séance du jour : « Cycle N : X puzzles restants » ; un toucher reprend le programme ; après une réponse, l'étape passe à « Woodpecker travaillé aujourd'hui ». (Vérifié seulement par test instrumenté sur émulateur.)
+
 ### Collections de puzzles importées d'un fichier PGN — 03/11/2026
 
 Pendant de `PuzzleCollectionImporter`/`Store`/`ImportSheet` (iOS). Même format de fichier, mêmes

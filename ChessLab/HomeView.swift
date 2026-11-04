@@ -1225,7 +1225,8 @@ struct HomeView: View {
                     DailySessionView(
                         onOpenOpenings: { path.append(Route.openingTrainSession) },
                         onOpenPuzzles: { filter in path.append(Route.activePuzzleSession(filter)) },
-                        onOpenEndgame: { id in path.append(Route.endgameFreeTrain(id)) }
+                        onOpenEndgame: { id in path.append(Route.endgameFreeTrain(id)) },
+                        onOpenWoodpecker: { id in path.append(Route.woodpecker(id)) }
                     )
 
                 case .progression:

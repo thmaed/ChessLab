@@ -6257,6 +6257,22 @@
         }
       }
     },
+    "Cycle %lld : %lld puzzles restants": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld: %lld puzzles left"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld : %lld puzzles restants"
+          }
+        }
+      }
+    },
     "Cycle %lld : %lld trouvés sur %lld en %@": {
       "localizations": {
         "en": {
@@ -6269,6 +6285,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cycle %lld : %lld trouvés sur %lld en %@"
+          }
+        }
+      }
+    },
+    "Cycle %lld : 1 puzzle restant": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld: 1 puzzle left"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle %lld : 1 puzzle restant"
           }
         }
       }
@@ -6301,6 +6333,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cycle %lld · %lld/%lld"
+          }
+        }
+      }
+    },
+    "Cycle Woodpecker": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woodpecker cycle"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cycle Woodpecker"
           }
         }
       }
@@ -20952,6 +21000,38 @@
         }
       }
     },
+    "Woodpecker travaillé aujourd'hui.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woodpecker practised today."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woodpecker travaillé aujourd'hui."
+          }
+        }
+      }
+    },
+    "Woodpecker : %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woodpecker: %lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woodpecker : %lld"
+          }
+        }
+      }
+    },
     "Yolo": {
       "localizations": {
         "en": {
@@ -23611,12 +23691,12 @@
         }
       }
     },
-    "Chaque jour, l'app rassemble ce qu'il faut revoir, dans l'ordre : positions d'ouverture dues (répétition espacée), puzzles ratés, puzzles tirés de vos parties, et une finale du jour. Elle se veut courte : 5 puzzles au plus par étape et un plafond d'ouvertures que vous réglez en bas de l'écran (2, 5 ou 8). Seules les positions DUES comptent : parcourir une ligne jusqu'à la position à revoir n'épuise pas votre quota. Une étape passe à « fait » quand son objectif du jour est atteint. Votre série compte les jours d'entraînement de suite ; des médailles marquent 3, 7, 30, 100 et 365 jours. Les révisions que l'app planifie après une partie ne comptent pas dans la série.": {
+    "Chaque jour, l'app rassemble ce qu'il faut revoir, dans l'ordre : positions d'ouverture dues (répétition espacée), puzzles ratés, puzzles tirés de vos parties, votre cycle Woodpecker s'il est en cours (fait dès que vous y avez travaillé aujourd'hui), et une finale du jour. Elle se veut courte : 5 puzzles au plus par étape et un plafond d'ouvertures que vous réglez en bas de l'écran (2, 5 ou 8). Seules les positions DUES comptent : parcourir une ligne jusqu'à la position à revoir n'épuise pas votre quota. Une étape passe à « fait » quand son objectif du jour est atteint. Votre série compte les jours d'entraînement de suite ; des médailles marquent 3, 7, 30, 100 et 365 jours. Les révisions que l'app planifie après une partie ne comptent pas dans la série.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Every day the app gathers what to review, in order: opening positions due (spaced repetition), missed puzzles, puzzles from your games, and an endgame of the day. It aims to be short: at most 5 puzzles per step and an opening cap you set at the bottom of the screen (2, 5 or 8). Only DUE positions count: walking a line to reach the position to review does not use up your quota. A step turns to “done” once its goal for the day is reached. Your streak counts consecutive training days; medals mark 3, 7, 30, 100 and 365 days. Reviews the app schedules after a game do not count towards the streak."
+            "value": "Every day the app gathers what to review, in order: opening positions due (spaced repetition), missed puzzles, puzzles from your games, your Woodpecker cycle if one is under way (done as soon as you have worked on it today), and an endgame of the day. It aims to be short: at most 5 puzzles per step and an opening cap you set at the bottom of the screen (2, 5 or 8). Only DUE positions count: walking a line to reach the position to review does not use up your quota. A step turns to “done” once its goal for the day is reached. Your streak counts consecutive training days; medals mark 3, 7, 30, 100 and 365 days. Reviews the app schedules after a game do not count towards the streak."
           }
         }
       }

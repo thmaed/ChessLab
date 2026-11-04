@@ -45,6 +45,57 @@ struct DailySessionTests {
         #expect(TrainingStreak.current(days: set, now: november1, calendar: calendar) == 2)
     }
 
+    // MARK: Un cycle Woodpecker en cours (suggestion d'Olivier, 2.1)
+
+    private func planWith(woodpecker: WoodpeckerSessionInfo?) -> DailySessionPlan {
+        DailySessionBuilder.plan(
+            openingsDue: 0, missedPuzzles: 0, ownPuzzles: 0, endgameCourseID: "eg-lucena",
+            endgameOpenedToday: false, streak: 0, trainedToday: false, woodpecker: woodpecker)
+    }
+
+    @Test("Un cycle Woodpecker en cours devient une étape, avant la finale")
+    func aWoodpeckerCycleIsAStep() throws {
+        let id = UUID()
+        let plan = planWith(woodpecker: .init(programID: id, cycle: 2, puzzlesLeft: 340, practicedToday: false))
+        #expect(plan.steps.map(\.kind) == [.openings, .missedPuzzles, .ownPuzzles, .woodpecker, .endgame])
+        let step = try #require(plan.steps.first { $0.kind == .woodpecker })
+        #expect(step.remaining == 340)
+        #expect(step.programID == id)
+        #expect(step.cycleNumber == 2)
+        #expect(plan.pending.map(\.kind) == [.woodpecker, .endgame])
+    }
+
+    @Test("Travailler son cycle aujourd'hui rend l'étape faite — un cycle dure des jours")
+    func practisingTodayMakesTheStepDone() {
+        let plan = planWith(woodpecker: .init(programID: UUID(), cycle: 1, puzzlesLeft: 340, practicedToday: true))
+        #expect(plan.steps.first { $0.kind == .woodpecker }?.isDone == true)
+        #expect(plan.pending.map(\.kind) == [.endgame])
+    }
+
+    @Test("Sans cycle en cours, ou cycle bouclé, pas d'étape Woodpecker")
+    func noWoodpeckerStepWithoutAnOpenCycle() {
+        #expect(!planWith(woodpecker: nil).steps.contains { $0.kind == .woodpecker })
+        let finished = WoodpeckerSessionInfo(programID: UUID(), cycle: 3, puzzlesLeft: 0, practicedToday: false)
+        #expect(!planWith(woodpecker: finished).steps.contains { $0.kind == .woodpecker })
+    }
+
+    @Test("Le travail du jour sur Woodpecker se retient jusqu'à minuit")
+    func woodpeckerPracticeIsRememberedForTheDay() throws {
+        let suite = "DailySessionTests.woodpecker.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        #expect(!TrainingDays.woodpeckerPracticedToday(now: date(24), defaults: defaults))
+        TrainingDays.markWoodpeckerPracticed(now: date(24), defaults: defaults)
+        #expect(TrainingDays.woodpeckerPracticedToday(now: date(24, hour: 23), defaults: defaults))
+        #expect(!TrainingDays.woodpeckerPracticedToday(now: date(25), defaults: defaults))
+    }
+
+    @Test("Le plan nomme le résumé de la carte d'accueil")
+    func theHomeCardMentionsTheCycle() {
+        let plan = planWith(woodpecker: .init(programID: UUID(), cycle: 1, puzzlesLeft: 12, practicedToday: false))
+        #expect(DailySessionCard.summary(plan).contains("12"))
+    }
+
     @Test("Le plan ordonne les étapes et compte ce qui reste")
     func planOrdersTheSteps() {
         let plan = DailySessionBuilder.plan(
@@ -196,5 +247,69 @@ struct DailySessionTests {
         #expect(plan.steps.first { $0.kind == .openings }?.remaining == 1)
         #expect(plan.steps.first { $0.kind == .missedPuzzles }?.remaining == 1)
         #expect(plan.steps.first { $0.kind == .ownPuzzles }?.remaining == 1)
+    }
+}
+
+/// Les programmes Woodpecker lus en base : seul un programme NON arrêté, au cycle courant non bouclé,
+/// donne une étape à la séance.
+///
+/// - important: UN SEUL `ModelContainer`, `.serialized` — voir ``PuzzleSessionDrawerTests``.
+@MainActor
+@Suite(.serialized)
+struct DailySessionWoodpeckerStoreTests {
+    private static let container: ModelContainer = {
+        try! ModelContainer(
+            for: WoodpeckerProgram.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        )
+    }()
+
+    private func makeContext() throws -> ModelContext {
+        let context = ModelContext(Self.container)
+        try context.delete(model: WoodpeckerProgram.self)
+        try context.save()
+        return context
+    }
+
+    private func program(attempts: Int, of total: Int = 5, archived: Bool = false, in context: ModelContext) throws -> WoodpeckerProgram {
+        let items = (0..<total).map { WoodpeckerPlan.Item(fen: "8/8/8/8/8/8/8/K6k w - - 0 \($0 + 1)", solutionLANs: ["a1a2"]) }
+        var generator = SystemRandomNumberGenerator()
+        var plan = try #require(WoodpeckerPlan.start(items: items, using: &generator))
+        plan.cycles[0].attempts = (0..<attempts).map { _ in .init(solved: true, seconds: 5) }
+        let program = WoodpeckerProgram()
+        program.plan = plan
+        program.isArchived = archived
+        context.insert(program)
+        try context.save()
+        return program
+    }
+
+    @Test("Un cycle en cours : le programme, son cycle et ce qu'il reste")
+    func anOpenCycleIsFound() throws {
+        let context = try makeContext()
+        let created = try program(attempts: 2, in: context)
+        let info = try #require(DailySessionBuilder.woodpeckerInfo(in: context))
+        #expect(info.programID == created.id)
+        #expect(info.cycle == 1)
+        #expect(info.puzzlesLeft == 3)
+    }
+
+    @Test("Un cycle bouclé n'est pas « en cours »")
+    func aFinishedCycleIsNotInProgress() throws {
+        let context = try makeContext()
+        _ = try program(attempts: 5, in: context)
+        #expect(DailySessionBuilder.woodpeckerInfo(in: context) == nil)
+    }
+
+    @Test("Un programme arrêté n'est plus proposé")
+    func anArchivedProgrammeIsIgnored() throws {
+        let context = try makeContext()
+        _ = try program(attempts: 1, archived: true, in: context)
+        #expect(DailySessionBuilder.woodpeckerInfo(in: context) == nil)
+    }
+
+    @Test("Sans programme, rien")
+    func noProgrammeNoStep() throws {
+        #expect(DailySessionBuilder.woodpeckerInfo(in: try makeContext()) == nil)
     }
 }

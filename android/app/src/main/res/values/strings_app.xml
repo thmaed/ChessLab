@@ -1184,14 +1184,21 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="daily_sum_missed">Missed puzzles: %1$d</string>
     <string name="daily_sum_own">Puzzles from your games: %1$d</string>
     <string name="daily_sum_endgame">an endgame</string>
+    <string name="daily_sum_woodpecker">Woodpecker: %1$d</string>
+    <plurals name="daily_todo_woodpecker">
+        <item quantity="one">Cycle %1$d: %2$d puzzle left</item>
+        <item quantity="other">Cycle %1$d: %2$d puzzles left</item>
+    </plurals>
     <string name="daily_step_openings">Openings to review</string>
     <string name="daily_step_missed">Puzzles to retry</string>
     <string name="daily_step_own">Puzzles from your games</string>
     <string name="daily_step_endgame">An endgame</string>
+    <string name="daily_step_woodpecker">Woodpecker cycle</string>
     <string name="daily_done_openings">Nothing to review today.</string>
     <string name="daily_done_missed">No missed puzzles waiting.</string>
     <string name="daily_done_own">No puzzles from your games waiting.</string>
     <string name="daily_done_endgame">Today\'s endgame opened.</string>
+    <string name="daily_done_woodpecker">Woodpecker practised today.</string>
     <string name="daily_todo_openings">Positions due: %1$d</string>
     <string name="daily_todo_missed">Missed puzzles to replay: %1$d</string>
     <string name="daily_todo_own">Puzzles drawn from your mistakes: %1$d</string>
@@ -1244,7 +1251,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="help_news_title">What\'s new in 2.0</string>
     <string name="help_news_body">• Daily session: every day, what to review — opening positions due, missed puzzles, puzzles from your games, an endgame — capped (2, 5 or 8 openings) with a streak of days and medals.\n• Analysis: when you analyse one of your games against the computer, the app turns your mistakes into puzzles and draws your weakness profile in Progress.\n• Coach: in the analysis, the share of players at your level who play that move.\n• Puzzles: a personal rating, the “At my level” chip, and a hint that no longer earns points.\n• Openings: lively cards, Side and Level menus, “Classics” filter.\n• Game setup: “Time limit” off by default, your last choice remembered.</string>
     <string name="help_daily_title">Daily session</string>
-    <string name="help_daily_body">Every day the app gathers what to review, in order: opening positions due (spaced repetition), missed puzzles, puzzles from your games, and an endgame. It aims to be short: at most 5 puzzles per step and an opening cap you set at the bottom of the screen (2, 5 or 8). Only DUE positions count. A step turns to “done” once its goal for the day is reached. Your streak counts consecutive training days; medals mark 3, 7, 30, 100 and 365 days.</string>
+    <string name="help_daily_body">Every day the app gathers what to review, in order: opening positions due (spaced repetition), missed puzzles, puzzles from your games, your Woodpecker cycle if one is under way (done as soon as you have worked on it today), and an endgame. It aims to be short: at most 5 puzzles per step and an opening cap you set at the bottom of the screen (2, 5 or 8). Only DUE positions count. A step turns to “done” once its goal for the day is reached. Your streak counts consecutive training days; medals mark 3, 7, 30, 100 and 365 days.</string>
     <string name="help_rating_title">Your puzzle rating</string>
     <string name="help_rating_body">A personal rating, on the Lichess puzzle scale, follows your results: it moves fast at first then settles. Solved with the hint, a puzzle earns nothing and costs a few points; a failed puzzle or a revealed solution costs more. The “At my level” chip offers puzzles close to your rating. Puzzles from your games and Woodpecker cycles do not count.</string>
     <string name="help_analysis_title">Analysis, Coach and profile</string>

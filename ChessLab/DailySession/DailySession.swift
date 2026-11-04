@@ -10,6 +10,8 @@ struct DailySessionStep: Identifiable, Equatable {
         case missedPuzzles
         /// Les puzzles tirés de vos parties, dus.
         case ownPuzzles
+        /// Un cycle Woodpecker en cours : le programme à reprendre (suggestion d'Olivier, 2.1).
+        case woodpecker
         /// Une finale, tournante.
         case endgame
     }
@@ -20,6 +22,9 @@ struct DailySessionStep: Identifiable, Equatable {
     let remaining: Int
     /// Pour la finale : le cours choisi.
     var courseID: String?
+    /// Pour Woodpecker : le programme à reprendre et le numéro de son cycle en cours.
+    var programID: UUID?
+    var cycleNumber: Int?
 
     var id: String { kind.rawValue }
     var isDone: Bool { remaining == 0 }
@@ -36,6 +41,15 @@ struct DailySessionPlan: Equatable {
     var pending: [DailySessionStep] { steps.filter { !$0.isDone } }
     var isComplete: Bool { pending.isEmpty }
     var firstPending: DailySessionStep? { pending.first }
+}
+
+/// Un cycle Woodpecker en cours, tel que la séance le voit : le programme, son cycle,
+/// ce qu'il reste dedans, et si l'on y a déjà travaillé aujourd'hui.
+struct WoodpeckerSessionInfo: Equatable {
+    let programID: UUID
+    let cycle: Int
+    let puzzlesLeft: Int
+    let practicedToday: Bool
 }
 
 enum DailySessionBuilder {
@@ -57,13 +71,21 @@ enum DailySessionBuilder {
         endgameCourseID: String?, endgameOpenedToday: Bool,
         streak: Int, trainedToday: Bool,
         openingsCap: Int = DailySessionBuilder.openingsCap,
-        openingsDoneToday: Int = 0
+        openingsDoneToday: Int = 0,
+        woodpecker: WoodpeckerSessionInfo? = nil
     ) -> DailySessionPlan {
         var steps = [
             DailySessionStep(kind: .openings, remaining: min(max(0, openingsCap - openingsDoneToday), max(0, openingsDue))),
             DailySessionStep(kind: .missedPuzzles, remaining: min(puzzlesCap, max(0, missedPuzzles))),
             DailySessionStep(kind: .ownPuzzles, remaining: min(puzzlesCap, max(0, ownPuzzles))),
         ]
+        // Un cycle Woodpecker en cours : sa tâche reste faite pour la journée dès qu'on y a répondu à un puzzle,
+        // sinon un cycle de mille puzzles empêcherait la séance de jamais se terminer.
+        if let woodpecker, woodpecker.puzzlesLeft > 0 {
+            steps.append(DailySessionStep(
+                kind: .woodpecker, remaining: woodpecker.practicedToday ? 0 : woodpecker.puzzlesLeft,
+                programID: woodpecker.programID, cycleNumber: woodpecker.cycle))
+        }
         if let endgameCourseID {
             steps.append(DailySessionStep(
                 kind: .endgame, remaining: endgameOpenedToday ? 0 : 1, courseID: endgameCourseID))
@@ -81,6 +103,24 @@ enum DailySessionBuilder {
         return ids[((days % ids.count) + ids.count) % ids.count]
     }
 
+    /// Le cycle Woodpecker EN COURS, s'il y en a un : le programme le plus récemment travaillé parmi ceux
+    /// qui n'ont pas été arrêtés, dont le cycle courant n'est pas bouclé.
+    @MainActor
+    static func woodpeckerInfo(in context: ModelContext, now: Date = Date()) -> WoodpeckerSessionInfo? {
+        var descriptor = FetchDescriptor<WoodpeckerProgram>(
+            predicate: #Predicate { !$0.isArchived }, sortBy: [SortDescriptor(\.updatedAt, order: .reverse)])
+        descriptor.fetchLimit = 8
+        for program in (try? context.fetch(descriptor)) ?? [] {
+            guard let plan = program.plan else { continue }
+            let cycle = plan.currentCycle
+            guard !cycle.isComplete else { continue }
+            return WoodpeckerSessionInfo(
+                programID: program.id, cycle: cycle.number, puzzlesLeft: cycle.order.count - cycle.attempts.count,
+                practicedToday: TrainingDays.woodpeckerPracticedToday(now: now))
+        }
+        return nil
+    }
+
     /// Le plan d'aujourd'hui, lu dans les bases locales.
     @MainActor
     static func load(in context: ModelContext, now: Date = Date()) -> DailySessionPlan {
@@ -94,7 +134,8 @@ enum DailySessionBuilder {
             endgameCourseID: endgameCourseID(ids: endgames, now: now),
             endgameOpenedToday: TrainingDays.endgameOpenedToday(now: now),
             streak: TrainingDays.streak(now: now), trainedToday: TrainingDays.didTrainToday(now: now),
-            openingsDoneToday: TrainingDays.openingsReviewedToday(now: now)
+            openingsDoneToday: TrainingDays.openingsReviewedToday(now: now),
+            woodpecker: woodpeckerInfo(in: context, now: now)
         )
     }
 }
