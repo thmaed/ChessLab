@@ -26,6 +26,7 @@ shoot 01-seance        ""             20
 shoot 02-coach         analysisCoach  100 -analysisPly 10
 shoot 03-puzzles-offre  puzzleOffer   6   puzzleOffer
 shoot 04-adversaires   newGame        6
+shoot 05-puzzles-ecran puzzles        6
 shoot 06-ouvertures    openings       6
 shoot 07-lecteur       endgameReader  9
 shoot 08-puzzle-cote   puzzleSession  8
