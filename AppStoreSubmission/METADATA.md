@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 2.0, build 19** (le 18, téléversé le 27/10, est écarté : il n'avait pas la puce « Ratés » grisée) (fixés dans `project.pbxproj`). La 1.9.2 (build 17) est la dernière soumise. Voir `RELEASE_NOTES-2.0.md` pour le détail des changements depuis la 1.9.x. **Préparée le 27/10/2026 : fiche, captures et notes de révision prêtes ; le build n'est PAS archivé ni téléversé (attendre l'accord de Thierry).**
+**Version courante : 2.1, build 20** (fixés dans `project.pbxproj`). La 2.0 (build 19) est EN VENTE. Voir `RELEASE_NOTES-2.1.md` pour le détail des changements depuis la 2.0. **Préparée le 03/11/2026 : fiche, nouveautés et notes de révision posées dans App Store Connect (version 2.1, PREPARE_FOR_SUBMISSION) ; le build n'est PAS archivé ni téléversé, la version n'est PAS soumise (attendre l'accord de Thierry).**
 
 Tout ce qui suit est à copier-coller directement dans les champs correspondants d'App Store Connect. Les limites de caractères d'Apple sont respectées (vérifiées).
 
@@ -10,72 +10,58 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 ---
 
-## Nouveautés de cette version — 2.0 (4000 car. max)
+## Nouveautés de cette version — 2.1 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> Version 2.0, build 18. Gros changement de contenu depuis la 1.9.x : captures refaites pour tous les appareils (iPhone, iPhone Duo fermé et ouvert, iPad), en français et en anglais. Détail dans `RELEASE_NOTES-2.0.md`.
+> Version 2.1, build 20. Contenu : collections de puzzles importées d'un fichier PGN (demande d'un utilisateur, format validé sur son fichier réel), écran Puzzles repensé, réussite partielle, 130 935 puzzles, « S'entraîner » sur la variante affichée, découvrabilité. Détail dans `RELEASE_NOTES-2.1.md`.
 
 ### Français
 
 ```
-CHESSLAB 2.0
+CHESSLAB 2.1
 
-SÉANCE DU JOUR
-Chaque jour, l'app rassemble ce qu'il faut revoir : positions d'ouverture dues, puzzles ratés, une finale. Une série de jours, des médailles — et un compteur qui s'arrête quand vous avez fait votre part.
+VOS PROPRES PUZZLES
+Importez vos fichiers PGN : chaque fichier devient une collection, rangée à part de la bibliothèque, et chaque partie du fichier un puzzle. Le premier coup est joué d'avance et surligné — à vous de voir ce qui a changé —, puis de trouver la suite. Travaillez une collection en série, refaites ses ratés, ou lancez un programme Woodpecker sur toute la collection.
 
-VOS ERREURS DEVIENNENT DES PUZZLES
-À la fin d'une analyse, l'app propose de créer des puzzles depuis la partie : les mats que vous avez laissés filer et vos erreurs les plus coûteuses, présentés sur de petits échiquiers. Vous acceptez ou non, rien n'est créé sans vous. Un profil de faiblesses se dessine dans Progrès : phases, thèmes, tendances.
+UN ÉCRAN PUZZLES PLUS CLAIR
+Quatre séries démarrent au toucher : À mon niveau, Ratés, À revoir, Mes parties. « Série sur mesure » règle le niveau, la phase, le type et la provenance, et le thème à travailler vous est proposé en tête d'écran.
 
-LE COACH
-Sous une faute, une phrase dit quelle part des joueurs de votre niveau jouent ce coup : erreur typique, accident, ou coup rare que peu de joueurs trouvent. Calculé sur l'appareil par Maia-3.
+RÉUSSITE PARTIELLE
+Un puzzle dont vous trouvez le début sans la fin n'est plus compté comme raté : il rejoint « À revoir » et revient bientôt.
 
-VOTRE COTE DE PUZZLE
-Une cote personnelle qui évolue à chaque puzzle, et « À mon niveau » pour tomber sur des problèmes à votre mesure.
+PLUS DE 24 000 PUZZLES
+La bibliothèque passe à 130 935 problèmes, surtout aux niveaux extrêmes et pour les solutions de quatre coups ou plus. Une barre de progression suit son préchargement au premier lancement.
 
-OUVERTURES
-Cartes illustrées, filtres par camp et par niveau, et les 19 « classiques » regroupés.
+OUVERTURES ET FINALES
+« S'entraîner » travaille la variante que vous êtes en train de lire, et non plus seulement la ligne principale. Les noms d'ouvertures s'affichent dans la langue de l'app.
 
-REPRENDRE UNE PARTIE
-Une partie interrompue se reprend d'un geste depuis l'écran de réglages, et l'app demande confirmation avant de la remplacer par une nouvelle.
-
-LIMITE DE TEMPS EN OPTION
-Un interrupteur, et l'app retient votre dernier choix.
-
-CORRECTIFS
-• Une partie reprise après la capture d'une tour dans son coin pouvait faire planter l'app : corrigé.
-• Une partie terminée par un mat n'était jamais notée jusqu'au bout : la précision et les puzzles de vos erreurs manquaient. Corrigé.
+MIEUX S'Y RETROUVER
+Un bouton « Modes » pour changer de mode, les sources d'Analyse dépliées, des « Questions fréquentes » dans l'Aide, la version en bas des Réglages. Et dans une partie chronométrée relue après coup, « Analyser ici » ouvre l'analyse sur la position affichée.
 ```
 
 ### English
 
 ```
-CHESSLAB 2.0
+CHESSLAB 2.1
 
-DAILY SESSION
-Every day, the app gathers what to review: opening positions that are due, missed puzzles, an endgame. A streak of days, medals — and a counter that stops once you have done your part.
+YOUR OWN PUZZLES
+Import your PGN files: each file becomes a collection, kept apart from the library, and each game in it a puzzle. The first move is played for you and highlighted — spot what changed — and then you find the rest. Work through a collection as a series, redo its misses, or start a Woodpecker programme on the whole collection.
 
-YOUR MISTAKES BECOME PUZZLES
-When an analysis ends, the app offers to create puzzles from the game: the mates you let slip and your costliest mistakes, shown on small boards. You accept or decline; nothing is created without you. A weakness profile builds up in Progress: phases, themes, trends.
+A CLEARER PUZZLES SCREEN
+Four series start with a tap: At my level, Missed, Review, My games. “Custom series” sets the level, phase, type and source, and the theme to work on is suggested at the top of the screen.
 
-THE COACH
-Under a mistake, one sentence tells you what share of players at your level play that move: a typical mistake, an accident, or a rare find that few players spot. Computed on your device by Maia-3.
+PARTIAL SUCCESS
+A puzzle where you find the start but not the end no longer counts as missed: it joins “Review” and comes back soon.
 
-YOUR PUZZLE RATING
-A personal rating that moves with every puzzle, and “At my level” to meet problems that fit you.
+OVER 24,000 MORE PUZZLES
+The library grows to 130,935 problems, especially at the extreme levels and for solutions of four moves or more. A progress bar follows its loading on first launch.
 
-OPENINGS
-Illustrated cards, filters by side and by level, and the 19 “classics” grouped together.
+OPENINGS AND ENDGAMES
+“Practice” works on the variation you are reading, not only the main line. Opening names now appear in the app's language.
 
-RESUME A GAME
-An interrupted game resumes in one tap from the settings screen, and the app asks before replacing it with a new one.
-
-OPTIONAL TIME LIMIT
-One switch, and the app remembers your last choice.
-
-FIXES
-• A game resumed after a rook was captured on its corner could crash the app: fixed.
-• A game ending in checkmate was never graded to the end, so its accuracy and the puzzles from your mistakes were missing. Fixed.
+EASIER TO FIND YOUR WAY
+A “Modes” button to switch mode, Analyse sources open by default, “Frequently asked questions” in Help, the version at the bottom of Settings. And in a timed game reviewed afterwards, “Analyse here” opens the analysis on the position shown.
 ```
 
 ---
@@ -129,7 +115,7 @@ FINALES
 78 cours prouvés par table de finales : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Et l'entraînement libre, où tout coup qui préserve le verdict est accepté.
 
 PUZZLES
-Plus de 130 000 problèmes de la base Lichess, filtrables par niveau et par thème, plus les vôtres, tirés de vos erreurs. Cote personnelle et « À mon niveau ».
+Plus de 130 000 problèmes de la base Lichess, filtrables par niveau et par thème, plus les vôtres : tirés de vos erreurs, ou importés de vos propres fichiers PGN. Cote personnelle et « À mon niveau ».
 
 VARIANTES ET PLUS
 Chess960 et onze variantes contre l'ordinateur (Roi de la colline, Trois échecs, Horde, Atomique, Crazyhouse, Duck Chess, Barricades…), chacune avec sa propre analyse. Mode deux joueurs, et Laboratoire pour comparer deux réglages de Stockfish.
@@ -189,7 +175,7 @@ ENDGAMES
 78 courses proven by endgame tablebases: no move taught gives up a win, no defence offered loses a draw. Plus free training, where any move that keeps the verdict is accepted.
 
 PUZZLES
-Over 130,000 problems from the Lichess database, filtered by level and theme, plus your own, drawn from your mistakes. Personal rating and “At my level”.
+Over 130,000 problems from the Lichess database, filtered by level and theme, plus your own: drawn from your mistakes, or imported from your own PGN files. Personal rating and “At my level”.
 
 VARIANTS AND MORE
 Chess960 and eleven variants against the computer (King of the Hill, Three-Check, Horde, Atomic, Crazyhouse, Duck Chess, Barricades…), each with its own analysis. Two-player mode, and a Laboratory to compare two Stockfish settings.
@@ -236,6 +222,8 @@ Réponses déduites du code (vérifié, pas deviné) :
 - **Captions** : non applicable, pas de contenu audio/vidéo narratif.
 
 ### Version et build
+
+**2.1, build 20** — `MARKETING_VERSION = 2.1`, `CURRENT_PROJECT_VERSION = 20` (la 2.0, build 19, est en vente ; le 20 est le premier numéro libre, vérifié par l'API le 03/11/2026). Nouveautés détaillées dans `RELEASE_NOTES-2.1.md`.
 
 **2.0, build 19** — `MARKETING_VERSION = 2.0`, `CURRENT_PROJECT_VERSION = 19` (la 1.9.2, build 17, est la dernière soumise : le 18 est le premier numéro libre, à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.0.md`.
 
@@ -294,7 +282,10 @@ Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/0
 English, for the Apple reviewer. Opens with the nature of the update (2.0 : major content update), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
 
 ```
-WHAT'S IN THIS UPDATE (2.0): a major content update. New: a Daily session (what to review each day, a streak of days and medals, all stored locally); after a game analysis the app offers to turn the user's mistakes and missed mates into puzzles, shown on a confirmation sheet (nothing is created without a tap on "Create"); a "Coach" line under mistakes, computed on-device by the bundled Maia-3 Core ML model; a personal puzzle rating; illustrated opening cards with filters; resuming an interrupted game from the game settings screen; an optional time limit. Fixes: a crash when resuming a game after a rook was captured on its corner, and games ending in checkmate not being graded to the end. No change to permissions, privacy or licensing. Nothing to set up to see the new features: finish or import any game and tap Analyse.
+WHAT'S IN THIS UPDATE (2.1): a feature update. New: the user can import their own chess puzzles from PGN files (Puzzles → My collections → Import puzzles). The files are chosen with the standard system document picker, or the text can be pasted; they are read on the device and never uploaded. Each file becomes a collection kept apart from the bundled library. To try it without a file: tap "Import puzzles", paste the two lines below in the text area, give any name and tap "Import the text" — each game is one puzzle, the first move being played for you:
+[FEN "6k1/p4ppp/8/8/8/8/5PPP/4R1K1 b - - 0 1"]
+1...a6 2.Re8#
+Also new: a redesigned Puzzles screen (four ready-made series and a custom-series sheet), partial credit for a puzzle solved only in part, 24,841 more bundled puzzles (130,935 in all, from the Lichess database, CC0), "Practice" in the opening and endgame courses now follows the variation being read, a "Modes" button on the mode screens, and a frequently-asked-questions section in Help. A standard system rating request (StoreKit) may appear at most once per version, after the user has played and trained for a few days. No change to permissions, privacy or licensing; still no network call, no account, no data collected.
 
 ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 130,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
 
