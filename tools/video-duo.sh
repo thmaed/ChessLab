@@ -23,11 +23,11 @@ scene() { # nom route attente [args...]
   sleep "$wait"
 }
 scene seance        ""             7
+scene puzzles       puzzles        7
+scene puzzle        puzzleSession  7
 scene coach         analysisCoach  11 -analysisPly 10
-scene offre         puzzleOffer    7  puzzleOffer
 scene ouvertures    openings       7
 scene lecteur       endgameReader  7
-scene puzzle        puzzleSession  7
 scene variantes     variants       7
 kill -INT $REC 2>/dev/null || true
 wait $REC 2>/dev/null || true

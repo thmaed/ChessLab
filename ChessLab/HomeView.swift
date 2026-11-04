@@ -313,9 +313,12 @@ struct HomeView: View {
     private func runDuoTour() async {
         func pause(_ seconds: Double) async { try? await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000)) }
         await pause(5)
+        // 2.1 : une prise de moins de 30 s (limite d'Apple), accueil compris — l'écran Puzzles refait, un
+        // puzzle, les ouvertures, un cours de finale, les variantes. Le retour à la racine entre deux
+        // scènes (0,6 s) garde les enchaînements vifs sans noir ni relance.
         let scenes: [(route: String?, seconds: Double)] = [
-            (nil, 0), ("analysisCoach", 13), ("puzzleOffer", 9), ("openings", 8.5), ("endgameReader", 9.5),
-            ("puzzleSession", 9), ("variants", 10),
+            (nil, 0), ("puzzles", 4.5), ("puzzleSession", 4.5), ("openings", 4), ("endgameReader", 4.5),
+            ("variants", 4),
         ]
         for scene in scenes {
             if let name = scene.route {
@@ -327,7 +330,7 @@ struct HomeView: View {
                     continue
                 }
                 path = NavigationPath()
-                await pause(1.0)
+                await pause(0.6)
                 if let route = Self.debugRoute(named: name) { path.append(route) }
                 await pause(scene.seconds)
             }

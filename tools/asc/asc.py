@@ -525,6 +525,44 @@ def cmd_duo(c, args):
             print(f"  {locale} {placement_type}: {len(placed)} placé(s), groupe {group}")
 
 
+def cmd_duo_previews(c, args):
+    """Remplace l'aperçu vidéo iPhone Duo de la version, SANS toucher aux captures : un fichier par langue
+    (`videos/duo-outer-tour-<fr|en>.mov`), déposé dans l'asset library puis placé sur les localisations de sa
+    langue. L'aperçu hérité de la version précédente est retiré d'abord (trois au plus par langue)."""
+    app = find_app(c)
+    v = find_version(c, app["id"], args.version)
+    locs = version_localizations(c, v["id"])
+    if not locs:
+        sys.exit("aucune localisation sur la version : lancer `metadata` d'abord")
+    library_id = c.get(f"/apps/{app['id']}/assetLibrary")["data"]["id"]
+    prefix = f"duo-prev-{args.version}-"
+    for item in c.get_all(f"/appAssetLibraries/{library_id}/videos"):
+        if (item["attributes"].get("referenceName") or "").startswith(prefix):
+            for placement in c.get_all(f"/appAssetLibraryVideos/{item['id']}/placements"):
+                c.delete(f"/appAssetLibraryPlacements/{placement['id']}")
+            c.delete(f"/appAssetLibraryVideos/{item['id']}")
+    uploaded = {}
+    for lang in sorted({"fr" if loc.startswith("fr") else "en" for loc in locs}):
+        path = SUBMISSION / "videos" / f"duo-outer-tour-{lang}.mov"
+        if not path.exists():
+            sys.exit(f"aperçu Duo introuvable : {path}")
+        uploaded[lang] = library_upload(c, "appAssetLibraryVideos", library_id, path, prefix + lang)
+    wait_library(c, "appAssetLibraryVideos", list(uploaded.values()), "aperçu Duo")
+    for locale, loc in locs.items():
+        lang = "fr" if locale.startswith("fr") else "en"
+        for s in c.get_all(f"/appStoreVersionLocalizations/{loc['id']}/appPreviewSets"):
+            if s["attributes"]["previewType"] == "IPHONE_DUO":
+                for p in c.get_all(f"/appPreviewSets/{s['id']}/appPreviews"):
+                    c.delete(f"/appPreviews/{p['id']}")
+        placed = c.post("/appAssetLibraryPlacements", {
+            "type": "appAssetLibraryPlacements",
+            "attributes": {"placementType": "APP_PREVIEW", "placementGroup": DUO_GROUP},
+            "relationships": {"video": rel("appAssetLibraryVideos", uploaded[lang]),
+                              "appStoreVersionLocalization": rel("appStoreVersionLocalizations", loc["id"])},
+        })["data"]
+        print(f"  {locale} APP_PREVIEW: placé, groupe {placed['attributes'].get('placementGroup')}")
+
+
 def find_build(c, app_id, version, build):
     builds = c.get_all("/builds", **{
         "filter[app]": app_id, "filter[version]": build,
@@ -648,7 +686,7 @@ def cmd_all(c, args):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("command", choices=["apps", "version", "metadata", "screenshots", "previews", "duo", "build", "attach", "review", "status", "all", "submit"])
+    p.add_argument("command", choices=["apps", "version", "metadata", "screenshots", "previews", "duo", "duo_previews", "build", "attach", "review", "status", "all", "submit"])
     p.add_argument("--version", default=None, help="version marketing (défaut : MARKETING_VERSION du projet)")
     p.add_argument("--build", default=None, help="numéro de build (défaut : CURRENT_PROJECT_VERSION du projet)")
     p.add_argument("--wait", action="store_true", help="build : attendre le traitement par Apple (1 h max)")
