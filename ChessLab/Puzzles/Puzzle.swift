@@ -126,6 +126,11 @@ final class Puzzle {
     /// elle : c'est l'ensemble des puzzles qui portent ce nom (voir
     /// ``PuzzleCollectionStore``).
     var collection: String?
+    /// Le coup de PRÉPARATION d'un puzzle importé, en LAN : le coup adverse déjà
+    /// joué dans ``fen`` avant que le puzzle ne commence (convention Lichess).
+    /// Sert à le MONTRER sur le plateau — « qu'est-ce qui a changé ? ». `nil`
+    /// pour tous les autres puzzles.
+    var setupLAN: String?
     /// Identifiant Lichess (`PuzzleId`) pour un puzzle de la
     /// bibliothèque embarquée — `nil` pour une gaffe issue de vos
     /// parties. Sert de clé naturelle pour un réamorçage idempotent de

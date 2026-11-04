@@ -20,6 +20,13 @@ data class Puzzle(
      * `null` pour les 106 094 puzzles de Lichess, qui n'ont pas de partie.
      */
     val sourcePgn: String? = null,
+    /**
+     * Le coup de PRÉPARATION d'un puzzle importé, en LAN : le coup adverse déjà
+     * joué dans [fen] avant que le puzzle ne commence (convention Lichess). Sert
+     * à le MONTRER sur le plateau — « qu'est-ce qui a changé ? ». `null` pour
+     * tous les autres puzzles.
+     */
+    val setup: String? = null,
 ) {
     /** Le thème en toutes lettres. Repris de `PuzzleTheme.label`. */
     @get:StringRes

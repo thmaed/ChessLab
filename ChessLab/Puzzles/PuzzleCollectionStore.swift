@@ -62,6 +62,7 @@ enum PuzzleCollectionStore {
             puzzle.phaseRaw = item.phaseRaw
             puzzle.sourceRaw = PuzzleSource.imported.rawValue
             puzzle.collection = name
+            puzzle.setupLAN = item.setupLAN
             // L'ordre du fichier : `createdAt` croît d'une milliseconde par puzzle.
             puzzle.createdAt = now.addingTimeInterval(Double(added) / 1000)
             context.insert(puzzle)

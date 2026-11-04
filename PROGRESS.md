@@ -10943,3 +10943,16 @@ bibliothèque.
   (« 1 puzzles »). Android : vrais pluriels (`<plurals>`). iOS : `LocalizationController.counted` /
   `isSingular` (1 singulier partout, 0 aussi en français, comme les catégories qu'applique Android) et
   quatre clés au singulier dans le catalogue.
+
+### Le format réel de Ron (03/11) — le premier coup est la PRÉPARATION (iOS + Android)
+
+Son échantillon (sept puzzles) a corrigé l'hypothèse de départ. Chaque partie a bien un `[FEN]`, mais le
+premier coup de la ligne est celui de l'ADVERSAIRE, joué d'avance (« qu'est-ce qui a changé dans la
+position ? ») ; la solution commence après. C'est la convention Lichess, déjà celle de la bibliothèque.
+- Importeur (Swift et Kotlin) : le premier coup est appliqué ; le FEN enregistré est la position APRÈS lui ;
+  le coup est gardé à part (`Puzzle.setupLAN` / `ImportedPuzzle.setup`). Rien après lui → partie écartée
+  (nouvelle raison `noSolution`). Le puzzle 6 de Ron (PlyCount 1) est dans ce cas.
+- Plateau : la préparation est surlignée au départ (`PuzzleSolveViewModel.setupMove`, `lastMove`
+  Android) ; elle voyage dans le plan Woodpecker (`Item.setupLAN`, JSON additif).
+- Android : base v14 (`MIGRATION_13_14`, colonne `setup`).
+- Tests : le fichier réel de Ron est un test des deux côtés (six puzzles, riposte au milieu, promotion).

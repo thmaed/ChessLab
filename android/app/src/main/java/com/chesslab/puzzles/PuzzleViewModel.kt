@@ -284,6 +284,16 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
      */
     private var loading: Job? = null
 
+    /**
+     * Les deux cases du coup de PRÉPARATION d'un puzzle importé, à surligner au
+     * départ : « qu'est-ce qui a changé ? ». `null` sans préparation.
+     */
+    private fun setupSquares(puzzle: Puzzle): Pair<Square, Square>? {
+        val lan = puzzle.setup ?: return null
+        if (lan.length < 4) return null
+        return Square(lan.substring(0, 2)) to Square(lan.substring(2, 4))
+    }
+
     private fun load(filter: PuzzleFilter) {
         program = null
         clockStartedAt = null
@@ -353,7 +363,7 @@ class PuzzleViewModel(app: Application) : AndroidViewModel(app) {
             orientation = board.position.sideToMove,
             selected = null,
             legalTargets = emptySet(),
-            lastMove = null,
+            lastMove = setupSquares(puzzle),
             checkedKing = null,
             outcome = PuzzleOutcome.solving,
             result = null,

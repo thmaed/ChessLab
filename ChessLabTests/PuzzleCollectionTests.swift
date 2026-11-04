@@ -1,3 +1,4 @@
+import ChessKit
 import Foundation
 import SwiftData
 import Testing
@@ -6,19 +7,28 @@ import Testing
 /// L'import d'un fichier PGN de puzzles (``PuzzleCollectionImporter``) : ce qu'il
 /// lit, ce qu'il refuse et pourquoi.
 struct PuzzleCollectionImporterTests {
-    /// Le mat en deux du couloir : Te8+ Txe8 Txe8#.
-    private static let corridorFEN = "r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 23"
+    /// Le mat en deux du couloir (Te8+ Txe8 Txe8#), précédé de sa PRÉPARATION : le
+    /// coup adverse a6, joué d'avance. Le FEN du fichier est la position AVANT ce
+    /// coup ; celle du puzzle est ``corridorFEN``, APRÈS lui.
+    private static let corridorBefore = "r5k1/p4ppp/8/8/8/4R3/5PPP/4R1K1 b - - 0 22"
+    private static let corridorFEN = "r5k1/5ppp/p7/8/8/4R3/5PPP/4R1K1 w - - 0 23"
+    /// Un mat en un : sa préparation (a6), puis Te8#.
+    private static let shortBefore = "6k1/p4ppp/8/8/8/8/5PPP/4R1K1 b - - 0 1"
 
-    private func game(_ moves: String, fen: String? = corridorFEN, extra: String = "") -> String {
+    private func game(
+        _ moves: String, fen: String? = corridorBefore, extra: String = "", setup: String = "22...a6"
+    ) -> String {
         var text = ""
         if let fen { text += "[SetUp \"1\"]\n[FEN \"\(fen)\"]\n" }
-        return text + extra + "\n\(moves)\n"
+        return text + extra + "\n\(setup) \(moves)\n"
     }
 
     @Test func readsTheSolutionFromTheMainLine() {
         let result = PuzzleCollectionImporter.parse(game("1. Re8+ Rxe8 2. Rxe8# 1-0"))
         #expect(result.puzzles.count == 1)
+        // Le puzzle commence APRÈS la préparation, qui est gardée à part pour être montrée.
         #expect(result.puzzles[0].fen == Self.corridorFEN)
+        #expect(result.puzzles[0].setupLAN == "a7a6")
         #expect(result.puzzles[0].solutionLANs == ["e3e8", "a8e8", "e1e8"])
         #expect(result.puzzles[0].themeRaw == PuzzleTheme.checkmate.rawValue)
         #expect(result.skipped.isEmpty)
@@ -31,7 +41,7 @@ struct PuzzleCollectionImporterTests {
     }
 
     @Test func aSingleMoveIsAValidPuzzle() {
-        let result = PuzzleCollectionImporter.parse(game("1. Re8#", fen: "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1"))
+        let result = PuzzleCollectionImporter.parse(game("1. Re8#", fen: Self.shortBefore))
         #expect(result.puzzles.map(\.solutionLANs) == [["e1e8"]])
     }
 
@@ -42,7 +52,7 @@ struct PuzzleCollectionImporterTests {
     }
 
     @Test func aPromotionKeepsItsPiece() {
-        let result = PuzzleCollectionImporter.parse(game("1. e8=N", fen: "8/4P2k/8/8/8/8/8/K7 w - - 0 1"))
+        let result = PuzzleCollectionImporter.parse(game("1. e8=N", fen: "8/4P3/7k/8/8/8/8/K7 b - - 0 1", setup: "1...Kh7"))
         #expect(result.puzzles.map(\.solutionLANs) == [["e7e8n"]])
     }
 
@@ -58,7 +68,7 @@ struct PuzzleCollectionImporterTests {
     }
 
     @Test func refusesAGameWithoutMoves() {
-        let result = PuzzleCollectionImporter.parse(game("*"))
+        let result = PuzzleCollectionImporter.parse(game("*", setup: ""))
         #expect(result.skipped.map(\.reason) == [.noMoves])
     }
 
@@ -70,7 +80,7 @@ struct PuzzleCollectionImporterTests {
     }
 
     @Test func oneBadGameDoesNotStopTheOthers() {
-        let text = game("1. Re8+ Rxe8 2. Rxe8#") + "\n" + game("1. Kd4") + "\n" + game("1. Re8#", fen: "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1")
+        let text = game("1. Re8+ Rxe8 2. Rxe8#") + "\n" + game("1. Kd4") + "\n" + game("1. Re8#", fen: Self.shortBefore)
         let result = PuzzleCollectionImporter.parse(text)
         #expect(result.gameCount == 3)
         #expect(result.puzzles.count == 2)
@@ -79,7 +89,7 @@ struct PuzzleCollectionImporterTests {
 
     @Test func splitsGamesWithoutEventHeaders() {
         // Un fichier de puzzles n'a souvent que [FEN] : pas de [Event] pour couper.
-        let text = game("1. Re8+ Rxe8 2. Rxe8#") + game("1. Re8#", fen: "6k1/5ppp/8/8/8/8/5PPP/4R1K1 w - - 0 1")
+        let text = game("1. Re8+ Rxe8 2. Rxe8#") + game("1. Re8#", fen: Self.shortBefore)
         #expect(PuzzleCollectionImporter.splitIntoGames(text).count == 2)
     }
 
@@ -106,11 +116,47 @@ struct PuzzleCollectionImporterTests {
         #expect(result.puzzles.isEmpty)
     }
 
+    @Test func aGameWithOnlyItsSetupMoveHasNoSolution() {
+        let result = PuzzleCollectionImporter.parse(game("", setup: "22...a6"))
+        #expect(result.puzzles.isEmpty)
+        #expect(result.skipped.map(\.reason) == [.noSolution])
+    }
+
+    /// Le fichier RÉEL de Ron (sept puzzles), tel quel. Son « premier coup » est la
+    /// préparation : le coup de l'adversaire, joué d'avance — le puzzle commence après.
+    /// Le sixième n'a que sa préparation (PlyCount 1) : il est écarté, et le dit.
+    @Test func readsRonsFile() {
+        func entry(_ n: Int, _ fen: String, _ moves: String) -> String {
+            "[Event \"?\"]\n[Site \"ThePuzzle\"]\n[Round \"?\"]\n[White \"\(n)\"]\n[Result \"*\"]\n"
+                + "[FEN \"\(fen)\"]\n[SetUp \"1\"]\n\n\(moves) *\n\n"
+        }
+        let text = entry(1, "rr4k1/p1R2p1p/4pnpn/R2pN3/3P1P2/1q3N2/1P2QPP1/6K1 b - - 0 1", "1...Qxb2 2.Rc8+ Rxc8 3.Qxb2")
+            + entry(2, "8/5R2/1p2B1pk/1p1P4/4nP1p/1P2q2P/P5P1/2R4K w - - 0 1", "1.Rg1 Nf2+ 2.Kh2 Qg3#")
+            + entry(3, "4Bk2/2r2pp1/1nRqp2p/p6P/P2P4/2P2Q2/5PP1/6K1 b - - 0 1", "1...Rxc6 2.Qxf7#")
+            + entry(4, "r4k1Q/p3p3/2p1bbB1/3pp3/1PP5/4q3/P5PP/5R1K b - - 0 1", "1...Bg8 2.Rxf6+ exf6 3.Qxf6+ Bf7 4.Qxf7#")
+            + entry(5, "Q7/5pkp/3rn1p1/2qR4/2P4P/6P1/p4P2/6K1 w - - 0 1", "1.Rxc5 Rd1+ 2.Kh2 a1=Q")
+            + entry(6, "r1bqk1nr/1ppp1ppp/p1n5/2b1p1N1/2B1P3/3P4/PPP2PPP/RNBQK2R b KQkq - 0 1", "1...Bb4+")
+            + entry(7, "r4rk1/1p4b1/3q2B1/p5Bn/P2P2nN/8/1P1Q4/R3R1K1 w - - 0 1", "1.Re4 Rf2 2.Qxf2 Nxf2")
+        let result = PuzzleCollectionImporter.parse(text)
+        #expect(result.gameCount == 7)
+        #expect(result.skipped == [.init(gameNumber: 6, reason: .noSolution)])
+        // Les préparations : le coup adverse de chaque énoncé.
+        #expect(result.puzzles.map(\.setupLAN) == ["b3b2", "c1g1", "c7c6", "e6g8", "d5c5", "e1e4"])
+        // Chaque solution se termine sur un coup de CELUI QUI TROUVE, la riposte comprise au milieu.
+        #expect(result.puzzles[0].solutionLANs == ["c7c8", "b8c8", "e2b2"])
+        #expect(result.puzzles[2].solutionLANs == ["f3f7"])
+        #expect(result.puzzles[3].solutionLANs == ["f1f6", "e7f6", "h8f6", "g8f7", "f6f7"])
+        #expect(result.puzzles[4].solutionLANs == ["d6d1", "g1h2", "a2a1q"])
+        // À l'ouverture du puzzle, le trait est à CELUI QUI TROUVE : l'inverse du FEN du fichier.
+        #expect(result.puzzles[0].fen.contains(" w "))
+        #expect(result.puzzles[1].fen.contains(" b "))
+    }
+
     /// Le fichier de Ron : environ mille puzzles, 400 Ko. Il doit se lire vite.
     @Test func aThousandPuzzlesReadQuickly() {
         let text = (0..<1000).map { index in
             // FEN distinctes : le compteur de coups change.
-            game("1. Re8+ Rxe8 2. Rxe8#", fen: "r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 \(index + 1)")
+            game("1. Re8+ Rxe8 2. Rxe8#", fen: "r5k1/p4ppp/8/8/8/4R3/5PPP/4R1K1 b - - 0 \(index + 1)")
         }.joined(separator: "\n")
         let started = Date()
         let result = PuzzleCollectionImporter.parse(text)
@@ -168,7 +214,7 @@ struct PuzzleCollectionStoreTests {
         PuzzleCollectionImporter.Result(
             puzzles: (firstIndex..<(firstIndex + count)).map { index in
                 .init(
-                    fen: "r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 \(index + 1)",
+                    fen: "r5k1/5ppp/p7/8/8/4R3/5PPP/4R1K1 w - - 0 \(index + 1)", setupLAN: "a7a6",
                     solutionLANs: ["e3e8", "a8e8", "e1e8"], themeRaw: "checkmate", phaseRaw: "endgame"
                 )
             },
@@ -287,5 +333,40 @@ struct CountedWordingTests {
         let many = LocalizationController.counted(5, one: "%lld puzzle", other: "%lld puzzles")
         #expect(one == "1 puzzle")
         #expect(many == "5 puzzles")
+    }
+}
+
+/// La PRÉPARATION d'un puzzle importé est montrée sur le plateau : les deux cases
+/// du coup adverse déjà joué. Sans préparation, rien n'est surligné.
+@MainActor
+struct PuzzleSetupHighlightTests {
+    /// Le puzzle 3 de Ron, APRÈS sa préparation `…Txc6` (la tour noire est en c6).
+    private let fen = "4Bk2/5pp1/1nrqp2p/p6P/P2P4/2P2Q2/5PP1/6K1 w - - 0 2"
+
+    @Test func theSetupMoveIsHighlighted() throws {
+        let puzzle = Puzzle()
+        puzzle.fen = fen
+        puzzle.setupLAN = "c7c6"
+        let board = Board(position: try #require(Position(fen: fen)))
+        let move = try #require(PuzzleSolveViewModel.setupMove(of: puzzle, on: board))
+        #expect(move.start.notation == "c7")
+        #expect(move.end.notation == "c6")
+    }
+
+    @Test func aPuzzleWithoutSetupHighlightsNothing() throws {
+        let puzzle = Puzzle()
+        puzzle.fen = fen
+        let board = Board(position: try #require(Position(fen: fen)))
+        #expect(PuzzleSolveViewModel.setupMove(of: puzzle, on: board) == nil)
+    }
+
+    @Test func theSetupTravelsInTheWoodpeckerPlan() {
+        let puzzle = Puzzle()
+        puzzle.fen = fen
+        puzzle.solutionLANs = ["f3f7"]
+        puzzle.setupLAN = "c7c6"
+        let item = WoodpeckerPlan.Item(puzzle)
+        #expect(item.setupLAN == "c7c6")
+        #expect(item.makePuzzle().setupLAN == "c7c6")
     }
 }

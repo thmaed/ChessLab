@@ -29,6 +29,8 @@ data class ImportedPuzzle(
     val solution: String,
     val theme: String,
     val phase: String,
+    /** Le coup de préparation (adverse) déjà joué dans [fen], en LAN. */
+    val setup: String?,
     /** Le rang dans le fichier : l'ordre d'origine se garde. */
     val position: Int,
     val createdAt: Long,
@@ -41,6 +43,7 @@ data class ImportedPuzzle(
         // Sans cote : 0, comme un puzzle maison.
         rating = 0,
         phase = phase,
+        setup = setup,
     )
 
     companion object {
@@ -144,6 +147,7 @@ object PuzzleCollectionStore {
                 solution = item.solution.joinToString(" "),
                 theme = item.theme,
                 phase = item.phase,
+                setup = item.setup,
                 position = next++,
                 createdAt = now,
             )

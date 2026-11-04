@@ -32,6 +32,9 @@ struct WoodpeckerPlan: Codable, Equatable {
         var phaseRaw: String?
         var rating: Int?
         var playedMoveSAN: String?
+        /// Le coup de préparation d'un puzzle importé (voir ``Puzzle/setupLAN``) :
+        /// absent des plans écrits avant lui, qui se lisent donc comme avant.
+        var setupLAN: String?
     }
 
     /// Une réponse : trouvée ou non, et le temps passé dessus.
@@ -139,7 +142,8 @@ extension WoodpeckerPlan.Item {
         self.init(
             fen: puzzle.fen ?? "", solutionLANs: puzzle.solutionLANs ?? [],
             themeRaw: puzzle.themeRaw, phaseRaw: puzzle.phaseRaw,
-            rating: puzzle.rating, playedMoveSAN: puzzle.playedMoveSAN
+            rating: puzzle.rating, playedMoveSAN: puzzle.playedMoveSAN,
+            setupLAN: puzzle.setupLAN
         )
     }
 
@@ -154,6 +158,7 @@ extension WoodpeckerPlan.Item {
         puzzle.phaseRaw = phaseRaw
         puzzle.rating = rating
         puzzle.playedMoveSAN = playedMoveSAN
+        puzzle.setupLAN = setupLAN
         return puzzle
     }
 }

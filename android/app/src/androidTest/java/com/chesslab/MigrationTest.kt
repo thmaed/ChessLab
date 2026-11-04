@@ -146,12 +146,17 @@ class MigrationTest {
             val report = com.chesslab.puzzles.PuzzleCollectionStore.add(
                 imported,
                 com.chesslab.puzzles.PuzzleCollectionImporter.parse(
-                    "[FEN \"r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 23\"]\n\n1. Re8+ Rxe8 2. Rxe8#\n"
+                    "[FEN \"4Bk2/2r2pp1/1nRqp2p/p6P/P2P4/2P2Q2/5PP1/6K1 b - - 0 1\"]\n\n1...Rxc6 2.Qxf7# *\n"
                 ),
                 "Mats",
             )
             assertEquals(1, report.added)
-            val id = imported.inCollection("Mats").single().uid
+            val stored = imported.inCollection("Mats").single()
+            val id = stored.uid
+            // v14 : le coup de préparation (adverse) est gardé à part, et le FEN est celui d'APRÈS lui.
+            assertEquals("c7c6", stored.setup)
+            assertEquals("f3f7", stored.solution)
+            assertEquals("c7c6", stored.toPuzzle().setup)
             assertTrue(com.chesslab.puzzles.ImportedPuzzle.isImportedId(id))
             dao.put(com.chesslab.puzzles.PuzzleProgress(externalId = id, failureCount = 1, lastOutcome = 2, dueAt = 1L))
             assertEquals(setOf("ancien", "rate"), dao.missedIds().toSet())

@@ -69,7 +69,7 @@
     <string name="help_level_title">Le niveau affiché</string>
     <string name="help_offline_body">Tout. Aucun compte, aucun réseau, aucune donnée qui sort de l\'appareil. Le moteur, les puzzles, les cours et les adversaires sont embarqués.</string>
     <string name="help_offline_title">Ce qui reste hors ligne</string>
-    <string name="help_puzzles_body">Un seul essai par défaut. Trois invitent à tenter un coup « pour voir », exactement l\'inverse de ce qu\'un puzzle entraîne : on calcule la variante jusqu\'au bout AVANT de poser la pièce. Le filet à trois essais reste dans les réglages. « Ratés » ne rejoue que ce que vous avez manqué à la dernière tentative, et un coup qui mate est toujours accepté, même s\'il n\'est pas la solution enregistrée. En fin de partie, « Mats manqués » cherche les mats forcés que l\'un ou l\'autre camp a laissé filer, et propose d\'en faire des puzzles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. Vos propres puzzles (un fichier PGN dont chaque partie est un puzzle, avec son en-tête FEN) s\'importent depuis l\'écran Puzzles : chaque fichier devient une collection, rangée à part, qu\'on travaille en série ou en programme Woodpecker complet.</string>
+    <string name="help_puzzles_body">Un seul essai par défaut. Trois invitent à tenter un coup « pour voir », exactement l\'inverse de ce qu\'un puzzle entraîne : on calcule la variante jusqu\'au bout AVANT de poser la pièce. Le filet à trois essais reste dans les réglages. « Ratés » ne rejoue que ce que vous avez manqué à la dernière tentative, et un coup qui mate est toujours accepté, même s\'il n\'est pas la solution enregistrée. En fin de partie, « Mats manqués » cherche les mats forcés que l\'un ou l\'autre camp a laissé filer, et propose d\'en faire des puzzles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. Vos propres puzzles (un fichier PGN dont chaque partie est un puzzle, avec son en-tête FEN ; le premier coup est joué d\'avance, comme sur Lichess) s\'importent depuis l\'écran Puzzles : chaque fichier devient une collection, rangée à part, qu\'on travaille en série ou en programme Woodpecker complet.</string>
     <string name="help_puzzles_title">Les puzzles</string>
     <string name="help_safety_body">Maia ne calcule pas : il peut rater un mat en deux ou gâcher une finale élémentaire. À partir d\'un certain niveau, Stockfish reprend la main dans QUATRE cas seulement — un mat en un ou deux, une finale à peu de pièces, une répétition en position gagnée, et le cas où le modèle ne répond pas. En dessous de ce niveau, rater un mat fait partie du personnage.</string>
     <string name="help_safety_title">Le filet de sécurité</string>
@@ -1320,7 +1320,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_section_collections">Mes collections</string>
     <string name="puzzle_import_row_title">Importer des puzzles</string>
     <string name="puzzle_import_row_sub">Des fichiers PGN : vos problèmes, rangés à part de la bibliothèque</string>
-    <string name="puzzle_import_intro">Un fichier PGN dont chaque partie est un puzzle : l\'en-tête FEN donne la position, la ligne principale donne la solution (le premier coup est celui à trouver). Chaque fichier devient une collection, rangée à part de la bibliothèque.</string>
+    <string name="puzzle_import_intro">Un fichier PGN dont chaque partie est un puzzle : l\'en-tête FEN donne la position, le premier coup est joué d\'avance (la préparation : à vous de voir ce qui a changé), la suite est la solution. Chaque fichier devient une collection, rangée à part de la bibliothèque.</string>
     <string name="puzzle_import_files">Ouvrir des fichiers PGN</string>
     <string name="puzzle_import_paste_title">Ou coller du texte PGN</string>
     <string name="puzzle_import_name_hint">Nom de la collection</string>
@@ -1346,6 +1346,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_skip_missing_fen">Partie %1$d : pas de position de départ (FEN).</string>
     <string name="puzzle_skip_invalid_fen">Partie %1$d : position de départ (FEN) illisible.</string>
     <string name="puzzle_skip_no_moves">Partie %1$d : aucun coup.</string>
+    <string name="puzzle_skip_no_solution">Partie %1$d : rien après le premier coup (la solution manque).</string>
     <string name="puzzle_skip_illegal">Partie %1$d : le coup %2$s ne se joue pas.</string>
     <string name="puzzle_import_close">Fermer</string>
     <plurals name="puzzle_collection_count">

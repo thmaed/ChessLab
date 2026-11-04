@@ -216,7 +216,7 @@ interface AutosaveDao {
         com.chesslab.puzzles.OwnPuzzle::class, com.chesslab.puzzles.PuzzleProgress::class,
         com.chesslab.puzzles.WoodpeckerProgram::class, com.chesslab.puzzles.ImportedPuzzle::class,
     ],
-    version = 13, exportSchema = false,
+    version = 14, exportSchema = false,
 )
 abstract class LibraryDatabase : RoomDatabase() {
     abstract fun games(): GameDao
@@ -338,8 +338,20 @@ abstract class LibraryDatabase : RoomDatabase() {
          */
         val ALL_MIGRATIONS get() = arrayOf(
             MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9,
-            MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13,
+            MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12, MIGRATION_12_13, MIGRATION_13_14,
         )
+
+        /**
+         * v13 → v14 : le coup de PRÉPARATION d'un puzzle importé (03/11/2026) —
+         * le coup adverse déjà joué dans `fen`, que l'écran surligne au départ.
+         * Une colonne optionnelle : un puzzle plus ancien garde `NULL` et n'a
+         * rien à montrer.
+         */
+        val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE imported_puzzles ADD COLUMN setup TEXT")
+            }
+        }
 
         /**
          * v12 → v13 : les collections de puzzles importées d'un fichier PGN

@@ -92,6 +92,7 @@ final class PuzzleSolveViewModel {
         let position = Position(fen: first.fen ?? "") ?? .standard
         board = Board(position: position)
         orientation = position.sideToMove
+        lastMove = Self.setupMove(of: first, on: board)
         markFirstOpenIfNeeded(first)
     }
 
@@ -115,7 +116,19 @@ final class PuzzleSolveViewModel {
         let position = Position(fen: first.fen ?? "") ?? .standard
         board = Board(position: position)
         orientation = position.sideToMove
+        lastMove = Self.setupMove(of: first, on: board)
         clockStartedAt = Date()
+    }
+
+    /// Le coup de PRÉPARATION d'un puzzle importé, tel que le plateau le montre
+    /// (case de départ et d'arrivée surlignées) : « qu'est-ce qui a changé ? ».
+    /// `nil` pour un puzzle sans préparation, ou si le coup ne se lit pas.
+    static func setupMove(of puzzle: Puzzle, on board: Board) -> Move? {
+        guard let lan = puzzle.setupLAN, lan.count >= 4 else { return nil }
+        let start = Square(String(lan.prefix(2)))
+        let end = Square(String(lan.dropFirst(2).prefix(2)))
+        guard let piece = board.position.piece(at: end) else { return nil }
+        return Move(result: .move, piece: piece, start: start, end: end)
     }
 
     var isWoodpecker: Bool { program != nil }
@@ -201,7 +214,7 @@ final class PuzzleSolveViewModel {
 
         selectedSquare = nil
         legalTargetSquares = []
-        lastMove = nil
+        lastMove = Self.setupMove(of: next, on: board)
         pendingPromotion = nil
         currentStep = 0
         allowedAttempts = AppSettings.shared.puzzleAttempts

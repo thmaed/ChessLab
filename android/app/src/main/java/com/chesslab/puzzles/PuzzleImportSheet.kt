@@ -241,6 +241,7 @@ private fun describe(skip: PuzzleCollectionImporter.Skip): String = when (val re
     PuzzleCollectionImporter.SkipReason.MissingFen -> stringResource(R.string.puzzle_skip_missing_fen, skip.gameNumber)
     PuzzleCollectionImporter.SkipReason.InvalidFen -> stringResource(R.string.puzzle_skip_invalid_fen, skip.gameNumber)
     PuzzleCollectionImporter.SkipReason.NoMoves -> stringResource(R.string.puzzle_skip_no_moves, skip.gameNumber)
+    PuzzleCollectionImporter.SkipReason.NoSolution -> stringResource(R.string.puzzle_skip_no_solution, skip.gameNumber)
     is PuzzleCollectionImporter.SkipReason.IllegalMove -> stringResource(R.string.puzzle_skip_illegal, skip.gameNumber, reason.san)
 }
 

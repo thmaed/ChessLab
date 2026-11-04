@@ -13,9 +13,10 @@ final class PuzzleCollectionUITests: XCTestCase {
     private lazy var collectionName = "Mats \(Int(Date().timeIntervalSince1970))"
 
     /// Deux mats en deux du couloir, le premier avec un FEN différent du second.
+    /// Chacun commence par sa PRÉPARATION, le coup adverse a6, joué d'avance.
     private let pgn = [
-        "[FEN \"r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 23\"]", "1. Re8+ Rxe8 2. Rxe8#", "",
-        "[FEN \"r5k1/5ppp/8/8/8/4R3/5PPP/4R1K1 w - - 0 24\"]", "1. Re8+ Rxe8 2. Rxe8#", "",
+        "[FEN \"r5k1/p4ppp/8/8/8/4R3/5PPP/4R1K1 b - - 0 22\"]", "22...a6 23. Re8+ Rxe8 24. Rxe8#", "",
+        "[FEN \"r5k1/p4ppp/8/8/8/4R3/5PPP/4R1K1 b - - 0 23\"]", "23...a6 24. Re8+ Rxe8 25. Rxe8#", "",
         "[FEN \"pas une position\"]", "1. e4",
     ].joined(separator: "|")
 

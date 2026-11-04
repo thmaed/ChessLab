@@ -1889,6 +1889,12 @@ libellés, même parcours (Puzzles → Mes collections).
 - [x] Les comptes s'accordent : « 1 puzzle », « 1 puzzle added », « 1 game skipped » (vrais pluriels
       Android ; iOS : `LocalizationController.counted`, 1 singulier partout et 0 en français).
       Relu sur Galaxy A16 : « 1 puzzle » ; les autres formes ne sont vues que dans le code.
+- [x] Le format de Ron (03/11, fichier réel de sept puzzles) : le PREMIER COUP est la PRÉPARATION (coup
+      adverse joué d'avance, convention Lichess), la solution commence après ; elle est SURLIGNÉE au
+      départ du puzzle et suit dans le programme Woodpecker. Une partie qui n'a que sa préparation est
+      écartée (« Game 6: nothing after the first move »). Base Android v14 (colonne `setup`). Vérifié
+      sur Galaxy A16 le 03/11 avec son vrai fichier : 6 puzzles ajoutés, 1 écartée ; préparation
+      surlignée ; un puzzle à riposte forcée et promotion résolu en programme Woodpecker.
 - Écart assumé : les collections ne voyagent PAS dans le `.clab` — comme iOS, où elles restent dans
   le store local « Puzzles », jamais synchronisé. Le fichier PGN d'origine est la sauvegarde.
 

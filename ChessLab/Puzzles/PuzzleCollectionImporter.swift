@@ -8,17 +8,23 @@ import Foundation
 /// ## Le format attendu
 ///
 /// Une PARTIE du fichier = UN puzzle :
-/// - l'en-tête `[FEN "…"]` donne la position de départ ; **sans lui, la partie
-///   est écartée** (sans position, la ligne principale n'est pas un puzzle mais
-///   une partie entière, et on n'invente pas où commence l'énoncé) ;
-/// - la ligne PRINCIPALE donne la solution, le premier coup étant celui de
-///   CELUI QUI TROUVE (le camp au trait dans le FEN), les suivants alternant
-///   riposte forcée et réponse — le modèle de ``Puzzle/solutionLANs`` ;
+/// - l'en-tête `[FEN "…"]` donne la position AVANT le premier coup ; **sans lui,
+///   la partie est écartée** (sans position, la ligne principale n'est pas un
+///   puzzle mais une partie entière, et on n'invente pas où commence l'énoncé) ;
+/// - le PREMIER coup de la ligne principale est la PRÉPARATION : celui de
+///   l'adversaire (le camp au trait dans le FEN), joué d'avance — c'est la
+///   convention de Lichess, celle de la bibliothèque de l'app, et celle des
+///   fichiers de Ron (« qu'est-ce qui a changé dans la position ? »). Le
+///   puzzle commence APRÈS lui : le FEN enregistré est la position qui suit,
+///   et ce coup est gardé à part (``ParsedPuzzle/setupLAN``) pour être montré ;
+/// - les coups suivants sont la solution, en alternant celui qui trouve et la
+///   riposte forcée — le modèle de ``Puzzle/solutionLANs`` ;
 /// - variantes, commentaires et annotations (`!`, `?`, `$1`) sont ignorés.
 ///
 /// Une solution se termine sur un coup de celui qui trouve (comme
 /// ``PuzzleSolutionTrimmer``) : une riposte adverse en queue de ligne est
-/// retirée, sinon le dernier geste demandé serait un coup auto-joué.
+/// retirée, sinon le dernier geste demandé serait un coup auto-joué. Une partie
+/// qui n'a QUE sa préparation n'a pas de solution : elle est écartée.
 ///
 /// ## Ce qui est refusé, et dit pourquoi
 ///
@@ -29,7 +35,10 @@ import Foundation
 enum PuzzleCollectionImporter {
     /// Un puzzle lu, pas encore enregistré.
     struct ParsedPuzzle: Equatable {
+        /// La position où le puzzle COMMENCE : celle qui suit la préparation.
         var fen: String
+        /// Le coup de préparation (adverse), en LAN, joué avant l'énoncé.
+        var setupLAN: String
         /// En LAN, le premier coup étant celui à trouver.
         var solutionLANs: [String]
         var themeRaw: String
@@ -43,6 +52,8 @@ enum PuzzleCollectionImporter {
         case invalidFEN
         /// Aucun coup dans la partie.
         case noMoves
+        /// La préparation est là mais rien après : pas de coup à trouver.
+        case noSolution
         /// Ce coup (SAN, tel qu'écrit dans le fichier) ne se joue pas.
         case illegalMove(String)
     }
@@ -144,7 +155,9 @@ enum PuzzleCollectionImporter {
 
         var board = Board(position: start)
         var lans: [String] = []
-        for token in tokens.prefix(maxSolutionPlies) {
+        var startFEN = fen
+        // La préparation compte pour un coup de plus que le plafond de la solution.
+        for (index, token) in tokens.prefix(maxSolutionPlies + 1).enumerated() {
             guard let move = Move(san: token, position: board.position),
                   let applied = board.move(pieceAt: move.start, to: move.end)
             else { return .failure(.illegalMove(token)) }
@@ -153,15 +166,20 @@ enum PuzzleCollectionImporter {
             if case .promotion = board.state {
                 _ = board.completePromotion(of: applied, to: move.promotedPiece?.kind ?? .queen)
             }
+            // Le puzzle commence ICI : après la préparation.
+            if index == 0 { startFEN = board.position.fen }
         }
+        guard lans.count >= 2 else { return .failure(.noSolution) }
+        let setup = lans.removeFirst()
         // Se termine sur le coup de celui qui trouve : longueur impaire.
         if lans.count > 1, lans.count.isMultiple(of: 2) { lans.removeLast() }
 
         return .success(ParsedPuzzle(
-            fen: fen,
+            fen: startFEN,
+            setupLAN: setup,
             solutionLANs: lans,
-            themeRaw: PuzzleThemeDetector.detect(startFEN: fen, solutionLANs: lans).rawValue,
-            phaseRaw: GamePhaseClassifier.classify(fen: fen).rawValue
+            themeRaw: PuzzleThemeDetector.detect(startFEN: startFEN, solutionLANs: lans).rawValue,
+            phaseRaw: GamePhaseClassifier.classify(fen: startFEN).rawValue
         ))
     }
 

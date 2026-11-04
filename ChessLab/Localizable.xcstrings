@@ -13749,6 +13749,22 @@
         }
       }
     },
+    "Partie %lld : rien après le premier coup (la solution manque).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game %lld: nothing after the first move (no solution)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partie %lld : rien après le premier coup (la solution manque)."
+          }
+        }
+      }
+    },
     "PGN": {
       "localizations": {
         "en": {
@@ -19932,18 +19948,18 @@
         }
       }
     },
-    "Un fichier PGN dont chaque partie est un puzzle : l'en-tête FEN donne la position, la ligne principale donne la solution (le premier coup est celui à trouver). Chaque fichier devient une collection, rangée à part de la bibliothèque.": {
+    "Un fichier PGN dont chaque partie est un puzzle : l'en-tête FEN donne la position, le premier coup est joué d'avance (la préparation : à vous de voir ce qui a changé), la suite est la solution. Chaque fichier devient une collection, rangée à part de la bibliothèque.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "A PGN file where each game is a puzzle: the FEN header gives the position and the main line gives the solution (the first move is the one to find). Each file becomes a collection, kept apart from the library."
+            "value": "A PGN file where each game is a puzzle: the FEN header gives the position, the first move is played for you (the set-up: spot what changed) and the rest is the solution. Each file becomes a collection, kept apart from the library."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un fichier PGN dont chaque partie est un puzzle : l'en-tête FEN donne la position, la ligne principale donne la solution (le premier coup est celui à trouver). Chaque fichier devient une collection, rangée à part de la bibliothèque."
+            "value": "Un fichier PGN dont chaque partie est un puzzle : l'en-tête FEN donne la position, le premier coup est joué d'avance (la préparation : à vous de voir ce qui a changé), la suite est la solution. Chaque fichier devient une collection, rangée à part de la bibliothèque."
           }
         }
       }
@@ -23545,12 +23561,12 @@
         }
       }
     },
-    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. Votre cote personnelle, sur l'échelle des puzzles Lichess, suit vos réussites : elle bouge vite au début puis se stabilise ; réussi avec l'indice, un puzzle ne rapporte rien et coûte quelques points ; la puce « À mon niveau » propose des puzzles proches de votre cote. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. Vos propres puzzles (un fichier PGN dont chaque partie est un puzzle, avec son en-tête FEN) s'importent depuis l'écran Puzzles : chaque fichier devient une collection, rangée à part, qu'on travaille en série ou en programme Woodpecker complet. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs.": {
+    "Résolvez des problèmes tactiques, issus de la bibliothèque Lichess embarquée ou générés depuis vos propres erreurs en analyse. Filtrez par provenance (vos parties ou la bibliothèque), niveau, phase de partie et thème, ou ne rejouez que les puzzles ratés à votre dernière tentative. Un coup qui mate est toujours accepté, même s'il diffère de la solution. Vous avez UN essai : un puzzle se résout en calculant la variante jusqu'au bout, pas en tentant un coup pour voir. Si vous préférez chercher en tâtonnant, repassez à trois essais dans les Réglages. Votre cote personnelle, sur l'échelle des puzzles Lichess, suit vos réussites : elle bouge vite au début puis se stabilise ; réussi avec l'indice, un puzzle ne rapporte rien et coûte quelques points ; la puce « À mon niveau » propose des puzzles proches de votre cote. La répétition espacée planifie les révisions et un bilan suit votre réussite et vos thèmes faibles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. Vos propres puzzles (un fichier PGN dont chaque partie est un puzzle, avec son en-tête FEN ; le premier coup est joué d'avance, comme sur Lichess) s'importent depuis l'écran Puzzles : chaque fichier devient une collection, rangée à part, qu'on travaille en série ou en programme Woodpecker complet. « Changer de mode » (en haut à droite) emporte la position du puzzle vers le Laboratoire, l'ordinateur ou Deux joueurs.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by source (your games or the library), level, game phase and theme, or replay only the puzzles you missed on your last attempt. A checkmating move is always accepted, even if it differs from the solution. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Your personal rating, on the Lichess puzzle scale, follows your results: it moves fast at first then settles; a puzzle solved with the hint earns nothing and costs a few points; the “At my level” chip offers puzzles close to your rating. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. The Woodpecker method replays a fixed set of 10, 25 or 50 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone. Your own puzzles (a PGN file where each game is a puzzle, with its FEN header) can be imported from the Puzzles screen: each file becomes a collection, kept apart, which you can work through as a series or as a full Woodpecker programme. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
+            "value": "Solve tactical problems, from the built-in Lichess library or generated from your own mistakes in analysis. Filter by source (your games or the library), level, game phase and theme, or replay only the puzzles you missed on your last attempt. A checkmating move is always accepted, even if it differs from the solution. You get ONE attempt: a puzzle is solved by calculating the line to the end, not by trying a move to see. If you prefer to explore, switch back to three attempts in Settings. Your personal rating, on the Lichess puzzle scale, follows your results: it moves fast at first then settles; a puzzle solved with the hint earns nothing and costs a few points; the “At my level” chip offers puzzles close to your rating. Spaced repetition schedules your reviews, and a report tracks your success rate and weak themes. The Woodpecker method replays a fixed set of 10, 25 or 50 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone. Your own puzzles (a PGN file where each game is a puzzle, with its FEN header; the first move is played for you, as on Lichess) can be imported from the Puzzles screen: each file becomes a collection, kept apart, which you can work through as a series or as a full Woodpecker programme. \"Switch mode\" (top right) carries the puzzle position to the Laboratory, the computer or Two players."
           }
         }
       }

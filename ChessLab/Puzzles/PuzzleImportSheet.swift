@@ -43,7 +43,7 @@ struct PuzzleImportSheet: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 18) {
-                    Text("Un fichier PGN dont chaque partie est un puzzle : l'en-tête FEN donne la position, la ligne principale donne la solution (le premier coup est celui à trouver). Chaque fichier devient une collection, rangée à part de la bibliothèque.")
+                    Text("Un fichier PGN dont chaque partie est un puzzle : l'en-tête FEN donne la position, le premier coup est joué d'avance (la préparation : à vous de voir ce qui a changé), la suite est la solution. Chaque fichier devient une collection, rangée à part de la bibliothèque.")
                         .font(.callout)
                         .foregroundStyle(Theme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -247,6 +247,8 @@ struct PuzzleImportSheet: View {
             return LocalizationController.string("Partie %lld : position de départ (FEN) illisible.", number)
         case .noMoves:
             return LocalizationController.string("Partie %lld : aucun coup.", number)
+        case .noSolution:
+            return LocalizationController.string("Partie %lld : rien après le premier coup (la solution manque).", number)
         case .illegalMove(let san):
             return LocalizationController.string("Partie %lld : le coup %@ ne se joue pas.", number, san)
         }

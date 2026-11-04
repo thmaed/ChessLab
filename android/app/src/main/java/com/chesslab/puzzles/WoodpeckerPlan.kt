@@ -38,15 +38,18 @@ data class WoodpeckerPlan(
         val phase: String?,
         /** 0 = sans cote (puzzle maison), comme [Puzzle.rating]. */
         val rating: Int,
+        /** Le coup de préparation d'un puzzle importé ([Puzzle.setup]) ; absent des plans plus anciens. */
+        val setup: String? = null,
     ) {
         /** Le puzzle que l'écran de résolution sait jouer. */
         fun toPuzzle(index: Int) = Puzzle(
             id = "woodpecker-$index", fen = fen, solution = solution,
-            theme = theme, rating = rating, phase = phase,
+            theme = theme, rating = rating, phase = phase, setup = setup,
         )
 
         companion object {
-            fun of(puzzle: Puzzle) = Item(puzzle.fen, puzzle.solution, puzzle.theme, puzzle.phase, puzzle.rating)
+            fun of(puzzle: Puzzle) =
+                Item(puzzle.fen, puzzle.solution, puzzle.theme, puzzle.phase, puzzle.rating, puzzle.setup)
         }
     }
 
@@ -111,6 +114,7 @@ data class WoodpeckerPlan(
                     put("solution", JSONArray(item.solution))
                     put("theme", item.theme)
                     item.phase?.let { put("phase", it) }
+                    item.setup?.let { put("setup", it) }
                     put("rating", item.rating)
                 })
             }
@@ -160,6 +164,7 @@ data class WoodpeckerPlan(
                         solution = (0 until solution.length()).map { solution.getString(it) },
                         theme = o.optString("theme", "tactic"),
                         phase = if (o.has("phase")) o.getString("phase") else null,
+                        setup = if (o.has("setup")) o.getString("setup") else null,
                         rating = o.optInt("rating", 0),
                     )
                 }
