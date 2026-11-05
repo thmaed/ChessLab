@@ -115,3 +115,33 @@ object Chess960Position {
         return "$black/pppppppp/8/8/8/8/PPPPPPPP/$white w $rights${rights.lowercase()} - 0 1"
     }
 }
+
+/**
+ * Le roque Chess960 tel que le moteur l'écrit : « le roi prend sa propre tour »
+ * (`e1h1`). Pendant de `Chess960Game.displaySquares(forUCI:)` côté iOS.
+ */
+object Chess960Castling {
+
+    /** Ce coup UCI est-il un roque : un roi qui « prend » une tour de sa couleur ? */
+    fun isCastle(lan: String, position: chesskit.Position): Boolean {
+        if (lan.length < 4) return false
+        val king = position.piece(chesskit.Square(lan.take(2))) ?: return false
+        val target = position.piece(chesskit.Square(lan.drop(2).take(2))) ?: return false
+        return king.kind == chesskit.Piece.Kind.king &&
+            target.kind == chesskit.Piece.Kind.rook && target.color == king.color
+    }
+
+    /**
+     * Les cases à surligner : la case d'arrivée affichée est celle du ROI (g ou
+     * c), jamais celle de la tour, où rien n'atterrit. À appeler AVANT le coup,
+     * sur la position qui le précède.
+     */
+    fun displaySquares(lan: String, position: chesskit.Position): Pair<chesskit.Square, chesskit.Square>? {
+        if (lan.length < 4) return null
+        val from = chesskit.Square(lan.take(2))
+        val to = chesskit.Square(lan.drop(2).take(2))
+        if (!isCastle(lan, position)) return from to to
+        val file = if (to.file.number > from.file.number) 'g' else 'c'
+        return from to chesskit.Square("$file${from.rank.value}")
+    }
+}

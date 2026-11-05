@@ -10961,3 +10961,27 @@ position ? ») ; la solution commence après. C'est la convention Lichess, déj�
 
 Un cycle Woodpecker en cours est une étape de la séance du jour (`DailySessionStep.Kind.woodpecker`, après les puzzles de vos parties, avant la finale) : « Cycle N : X puzzles restants », un toucher rouvre le programme. Le programme est le plus récemment travaillé parmi ceux qui ne sont pas arrêtés et dont le cycle courant n'est pas bouclé (`DailySessionBuilder.woodpeckerInfo`). L'étape est « faite » pour la journée dès qu'on a répondu à un puzzle d'un programme (`TrainingDays.markWoodpeckerPracticed`, posé dans `recordWoodpeckerAnswer`) : un cycle dure des jours et ne doit pas empêcher la séance de se terminer. Aide et textes FR/EN des deux côtés ; carte d'accueil « Woodpecker : N ».
 Tests : iOS DailySessionTests (+5) et DailySessionWoodpeckerStoreTests (4, base en mémoire) ; Android JVM (+3), instrumenté `unCycleWoodpeckerEnCoursEstUneEtapeDeLaSeance` vert sur l'émulateur. Build 21 (le 20 est écarté).
+
+### Export PGN d'une collection, plan Woodpecker compressé, Laboratoire Chess960 (05/11) — iOS + Android
+
+Les trois points laissés ouverts après la 2.1 (aucun n'est dans le build 21).
+
+**Export PGN d'une collection.** Menu ⋯ → « Exporter en PGN ». `PuzzleCollectionExporter` (Swift et Kotlin)
+écrit une partie par puzzle : `[FEN]` = la position où le puzzle COMMENCE, `[PuzzleSetup]` = la préparation en
+LAN (`-` s'il n'y en a pas), solution en SAN. La position d'AVANT la préparation n'est pas gardée et ne se
+retrouve pas en défaisant le coup (prise, droit de roque) : l'en-tête dit donc à l'importeur de ChessLab de ne
+PAS prendre le premier coup pour une préparation. Sans lui, la convention de Lichess s'applique toujours.
+Réimporter l'export dans la même collection n'ajoute rien (même position). Un puzzle dont la solution ne se
+rejoue pas est sauté plutôt que de faire refuser le fichier.
+
+**Plan Woodpecker compressé (iOS).** 1 000 puzzles × 20 cycles ≈ 1 Mo de JSON, au plafond d'un enregistrement
+CloudKit ; zlib le ramène à 133 Ko (mesuré). Format : octet nul + JSON compressé ; un plan écrit avant (JSON
+brut, commence par `{`) se relit tel quel. Android n'est pas concerné (base locale).
+
+**Laboratoire Chess960.** `LabGameSettings.chess960Enabled/Number/Seed` (optionnels : une série sauvegardée
+avant eux se relit classique), `LabViewModel.playOneChess960Game`, `chess960Number(forGame:)` : une position
+par paire de parties, tirée d'une graine SplitMix64 gardée avec la série. Android : mêmes réglages
+(`LabSeriesSettings`), partie jouée et arbitrée par Fairy-Stockfish (`runChess960Series`). Test iOS contre le
+vrai moteur : une série de deux parties, PGN relus coup pour coup par `Chess960PGNParser`. Voir
+`android/PARITE.md` pour les écarts relevés (surbrillance du roque à l'écran Chess960 d'Android, aide du Labo).
+

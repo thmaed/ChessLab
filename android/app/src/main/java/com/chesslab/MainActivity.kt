@@ -358,6 +358,15 @@ private fun App() {
             is Route.Laboratory -> LabScreen(
                 startFen = current.startFen,
                 onAnalyze = { stack.add(Route.AnalysisBoard(pgn = it)) },
+                onAnalyzeChess960 = { fen, log, result ->
+                    stack.add(
+                        Route.VariantAnalysis(
+                            "chess960", fen, log,
+                            variantName = context.getString(R.string.variant_chess960),
+                            result = result,
+                        )
+                    )
+                },
             )
             // TOUTES les variantes passent par un réglage : on y choisit son
             // camp, la force du moteur, la cadence et les aides — exactement

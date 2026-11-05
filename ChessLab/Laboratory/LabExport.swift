@@ -9,7 +9,8 @@ enum LabExport {
     /// quoi une partie adjugée (abandon / nulle d'accord) sortait sans
     /// résultat ni joueurs, inexploitable dans un autre outil. Les tags de
     /// position de départ (`[SetUp]`/`[FEN]`) émis par ChessKit pour une
-    /// série à FEN personnalisé sont préservés.
+    /// série à FEN personnalisé sont préservés, ainsi que `[Variant]` d'une
+    /// série Chess960 (qui dit au logiciel d'arrivée de lire le FEN en Shredder).
     static func pgn(_ games: [LabCompletedGame], settings: LabGameSettings) -> String {
         let aElo = Int(settings.sideAEloSlider)
         let bElo = Int(settings.sideBEloSlider)
@@ -19,7 +20,7 @@ enum LabExport {
 
             let lines = game.pgn.trimmingCharacters(in: .whitespacesAndNewlines)
                 .split(separator: "\n", omittingEmptySubsequences: false)
-            let setupTags = lines.filter { $0.hasPrefix("[SetUp") || $0.hasPrefix("[FEN") }
+            let setupTags = lines.filter { $0.hasPrefix("[SetUp") || $0.hasPrefix("[FEN") || $0.hasPrefix("[Variant") }
             var movetext = lines.filter { !$0.hasPrefix("[") }
                 .joined(separator: "\n")
                 .trimmingCharacters(in: .whitespacesAndNewlines)

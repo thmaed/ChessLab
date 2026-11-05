@@ -1869,6 +1869,45 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
       Probablement le test qui ne la fait pas venir, pas l'écran qui casse —
       à trancher en le regardant.
 
+### Export PGN d'une collection, plan Woodpecker compressé, Laboratoire Chess960 — 05/11/2026
+
+- [ ] **Export PGN d'une collection** (menu ⋯ de la collection, « Exporter en PGN »). iOS : fichier `.pgn`
+      temporaire et feuille de partage ; Android : sélecteur de fichier du système (`CreateDocument`), puis
+      message « Collection exportée ». Le fichier se réimporte à l'identique : chaque partie porte
+      `[FEN]` = la position de départ du puzzle, `[PuzzleSetup "e7e5"]` (ou `-`) = la préparation, et la
+      solution en SAN. Sans cet en-tête, l'importeur garde la convention de Lichess (premier coup =
+      préparation). Tests : `PuzzleCollectionExporterTests` (iOS, 9) / `PuzzleCollectionExporterTest` (Android,
+      9), dont l'aller-retour export → import. **À vérifier sur le Galaxy** (sélecteur système, nom de
+      fichier proposé, réimport du fichier produit).
+- [x] **Écart ASSUMÉ — plan Woodpecker compressé : iOS SEULEMENT.** Le plan voyage en un bloc dans un
+      enregistrement CloudKit (1 Mo au plus) : 1 000 puzzles × 20 cycles font ~1 Mo en JSON brut, 133 Ko
+      compressés (zlib, octet nul en tête ; les anciens plans, du JSON brut, se relisent tels quels).
+      Android garde le JSON dans sa base locale, sans cette limite : aucun effet visible, rien à porter.
+- [ ] **Laboratoire en Chess960.** Un interrupteur « Chess960 » dans la section « Départ » (iOS) / sous la
+      position imposée (Android), exclusif de la position personnalisée : Stockfish seul (ni livre ni Maia),
+      une position tirée par PAIRE de parties (les deux parties d'une paire ont la même, couleurs inversées)
+      ou un numéro de Scharnagl imposé ; le numéro de la partie en cours est affiché ; la graine est
+      sauvegardée avec la série (une reprise rejoue les mêmes positions). L'export garde `[Variant "Chess960"]`
+      et le FEN ; « Analyser la dernière partie » ouvre l'analyse Chess960 (iOS) / l'analyse de variante
+      (Android). Le tirage est un SplitMix64 : les deux côtés calculent 482, 853, 451, 18, 84, 370 pour la
+      graine 42 (valeurs calculées à part en Python, testées des deux côtés).
+      Vérifié : iOS — une vraie série de deux parties contre Stockfish (`LabChess960SeriesTests`), PGN
+      relus par `Chess960PGNParser` coup pour coup ; Android — `LabChess960SeriesTest` (une partie complète
+      jouée par Fairy-Stockfish, puis ouverte dans l'analyse) vert sur l'émulateur, 11 tests JVM.
+      **À vérifier sur le Galaxy.**
+- **Mécanisme différent, comportement identique** : iOS arbitre avec sa couche `Chess960Game` (prouvée par
+  perft) et parle à Stockfish sous `UCI_Chess960` ; Android, comme son écran Chess960, fait arbitrer ET jouer
+  Fairy-Stockfish. Fins reconnues des deux côtés : mat, pat, matériel insuffisant, 50 coups, triple
+  répétition, abandon et nulle par accord (mêmes seuils), plafond de 400 demi-coups.
+- [x] **Corrigé au passage (Android)** : le roque Chess960 s'écrivait « Kxh1 » dans le PGN (le moteur le
+      donne « roi prend sa tour ») ; `VariantSan` écrit maintenant O-O / O-O-O, comme iOS.
+- [ ] **Écart relevé, NON corrigé (Android)** : à l'écran Chess960 contre l'ordinateur, la surbrillance d'un
+      roque tombe sur la case de la TOUR d'origine ; iOS surligne la case du roi (`displaySquares`). Le
+      Laboratoire, lui, surligne la case du roi (`Chess960Castling.displaySquares`) : brancher la même
+      fonction dans `VariantPlayViewModel`.
+- [ ] **Écart relevé, préexistant (Android)** : l'aide n'a pas de section « Laboratoire » (iOS en a une,
+      qui parle désormais du Chess960).
+
 ### Séance du jour : le cycle Woodpecker en cours — 04/11/2026 (suggestion d'Olivier)
 
 Pendant de `DailySessionStep.Kind.woodpecker` (iOS). Même règle : étape présente si un programme non arrêté a un cycle courant non bouclé ; « faite » dès qu'on a répondu à un puzzle d'un programme aujourd'hui ; avant la finale.

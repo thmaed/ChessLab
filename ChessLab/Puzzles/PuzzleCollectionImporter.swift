@@ -16,7 +16,10 @@ import Foundation
 ///   convention de Lichess, celle de la bibliothèque de l'app, et celle des
 ///   fichiers de Ron (« qu'est-ce qui a changé dans la position ? »). Le
 ///   puzzle commence APRÈS lui : le FEN enregistré est la position qui suit,
-///   et ce coup est gardé à part (``ParsedPuzzle/setupLAN``) pour être montré ;
+///   et ce coup est gardé à part (``ParsedPuzzle/setupLAN``) pour être montré.
+///   Exception : un fichier écrit par ChessLab lui-même (``PuzzleCollectionExporter``)
+///   porte l'en-tête `[PuzzleSetup "…"]` — son `[FEN]` est alors DÉJÀ la
+///   position de départ du puzzle, et toute la ligne principale est la solution ;
 /// - les coups suivants sont la solution, en alternant celui qui trouve et la
 ///   riposte forcée — le modèle de ``Puzzle/solutionLANs`` ;
 /// - variantes, commentaires et annotations (`!`, `?`, `$1`) sont ignorés.
@@ -37,8 +40,9 @@ enum PuzzleCollectionImporter {
     struct ParsedPuzzle: Equatable {
         /// La position où le puzzle COMMENCE : celle qui suit la préparation.
         var fen: String
-        /// Le coup de préparation (adverse), en LAN, joué avant l'énoncé.
-        var setupLAN: String
+        /// Le coup de préparation (adverse), en LAN, joué avant l'énoncé. `nil`
+        /// pour un puzzle exporté qui n'en avait pas.
+        var setupLAN: String?
         /// En LAN, le premier coup étant celui à trouver.
         var solutionLANs: [String]
         var themeRaw: String
@@ -153,11 +157,16 @@ enum PuzzleCollectionImporter {
         let tokens = PGNLoader.movetext(of: game).map(cleaned).filter { !$0.isEmpty }
         guard !tokens.isEmpty else { return .failure(.noMoves) }
 
+        // Un fichier de ChessLab dit lui-même où le puzzle commence.
+        let exportedSetup = tag("PuzzleSetup", in: game)
+        let startsAfterSetup = exportedSetup != nil
+
         var board = Board(position: start)
         var lans: [String] = []
         var startFEN = fen
         // La préparation compte pour un coup de plus que le plafond de la solution.
-        for (index, token) in tokens.prefix(maxSolutionPlies + 1).enumerated() {
+        let plyLimit = maxSolutionPlies + (startsAfterSetup ? 0 : 1)
+        for (index, token) in tokens.prefix(plyLimit).enumerated() {
             guard let move = Move(san: token, position: board.position),
                   let applied = board.move(pieceAt: move.start, to: move.end)
             else { return .failure(.illegalMove(token)) }
@@ -167,10 +176,16 @@ enum PuzzleCollectionImporter {
                 _ = board.completePromotion(of: applied, to: move.promotedPiece?.kind ?? .queen)
             }
             // Le puzzle commence ICI : après la préparation.
-            if index == 0 { startFEN = board.position.fen }
+            if index == 0, !startsAfterSetup { startFEN = board.position.fen }
         }
-        guard lans.count >= 2 else { return .failure(.noSolution) }
-        let setup = lans.removeFirst()
+        let setup: String?
+        if let exportedSetup {
+            guard !lans.isEmpty else { return .failure(.noSolution) }
+            setup = isLAN(exportedSetup) ? exportedSetup : nil
+        } else {
+            guard lans.count >= 2 else { return .failure(.noSolution) }
+            setup = lans.removeFirst()
+        }
         // Se termine sur le coup de celui qui trouve : longueur impaire.
         if lans.count > 1, lans.count.isMultiple(of: 2) { lans.removeLast() }
 
@@ -181,6 +196,12 @@ enum PuzzleCollectionImporter {
             themeRaw: PuzzleThemeDetector.detect(startFEN: startFEN, solutionLANs: lans).rawValue,
             phaseRaw: GamePhaseClassifier.classify(fen: startFEN).rawValue
         ))
+    }
+
+    /// Un coup en notation de l'engin (`e7e5`, `e7e8q`) : le seul format que
+    /// l'en-tête `PuzzleSetup` accepte (`-` : pas de préparation).
+    private static func isLAN(_ text: String) -> Bool {
+        text.range(of: #"^[a-h][1-8][a-h][1-8][qrbn]?$"#, options: .regularExpression) != nil
     }
 
     /// Retire ce qui reste collé au coup après le nettoyage de ``PGNLoader``:

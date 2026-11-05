@@ -121,6 +121,15 @@ struct LabRunView: View {
                 Text(viewModel.isFinished ? "Série terminée" : "Partie \(min(viewModel.completed.count + 1, viewModel.settings.gameCount)) / \(viewModel.settings.gameCount)")
                     .font(.headline)
                     .foregroundStyle(Theme.textPrimary)
+                if viewModel.settings.isChess960, !viewModel.isFinished {
+                    Text(LocalizationController.string(
+                        "Chess960 · n° %lld",
+                        viewModel.settings.chess960Number(forGame: min(viewModel.completed.count, viewModel.settings.gameCount - 1))
+                    ))
+                    .font(.caption.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(Theme.textSecondary)
+                    .accessibilityIdentifier("labChess960Number")
+                }
                 Spacer()
                 if viewModel.isFinished {
                     Image(systemName: "checkmark.seal.fill")

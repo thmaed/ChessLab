@@ -49,6 +49,15 @@ object VariantSan {
         val piece = position.piece(from) ?: return uci
         val promotion = if (uci.length == 5) uci.takeLast(1).uppercase() else null
 
+        // Chess960 : le moteur écrit le roque « roi prend sa tour » (`e1h1`). Un
+        // roi n'a aucun autre moyen d'aboutir sur une pièce de sa couleur : le
+        // SAN est donc O-O / O-O-O, comme `Chess960Game` côté iOS — et non
+        // « Kxh1 », que personne d'autre ne sait relire.
+        if (Chess960Castling.isCastle(uci, position)) {
+            val base = if (to.file.number > from.file.number) "O-O" else "O-O-O"
+            return base + suffix(isCheck, isMate)
+        }
+
         // Le roque se reconnaît au ROI qui saute deux colonnes. Chess960 mis à
         // part : là le roi peut bouger d'une seule case, et le moteur écrit
         // alors le roque « roi prend sa tour ». Ce cas-là tombe dans la règle

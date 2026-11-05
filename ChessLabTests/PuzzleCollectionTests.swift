@@ -370,3 +370,82 @@ struct PuzzleSetupHighlightTests {
         #expect(item.makePuzzle().setupLAN == "c7c6")
     }
 }
+
+/// L'export d'une collection (``PuzzleCollectionExporter``) : ce qu'il écrit, et
+/// que l'import le relit à l'identique.
+struct PuzzleCollectionExporterTests {
+    private static let corridorFEN = "r5k1/5ppp/p7/8/8/4R3/5PPP/4R1K1 w - - 0 23"
+
+    private func entry(
+        fen: String = corridorFEN, setup: String? = "a7a6", solution: [String] = ["e3e8", "a8e8", "e1e8"]
+    ) -> PuzzleCollectionExporter.Entry {
+        .init(fen: fen, setupLAN: setup, solutionLANs: solution)
+    }
+
+    @Test func writesTheSolutionInSANWithItsHeaders() {
+        let pgn = PuzzleCollectionExporter.pgn(collection: "Couloirs", entries: [entry()])
+        #expect(pgn.contains("[Event \"Couloirs\"]"))
+        #expect(pgn.contains("[FEN \"\(Self.corridorFEN)\"]"))
+        #expect(pgn.contains("[PuzzleSetup \"a7a6\"]"))
+        #expect(pgn.contains("23. Re8+ Rxe8 24. Rxe8# *"))
+    }
+
+    @Test func numbersABlackFirstMoveWithEllipsis() {
+        // Le trait est aux Noirs : « 1... », puis les coups suivants sans numéro avant le Blanc.
+        let pgn = PuzzleCollectionExporter.pgn(
+            collection: "N", entries: [entry(fen: "6k1/5ppp/8/8/8/8/5PPP/4R1K1 b - - 0 7", setup: nil, solution: ["g8f8", "e1e8", "f8e8"])]
+        )
+        #expect(pgn.contains("7... Kf8 8. Re8+ Kxe8 *"))
+        #expect(pgn.contains("[PuzzleSetup \"-\"]"))
+    }
+
+    @Test func aPromotionIsWrittenWithItsPiece() {
+        let pgn = PuzzleCollectionExporter.pgn(
+            collection: "P", entries: [entry(fen: "8/4P3/7k/8/8/8/8/K7 w - - 0 1", setup: nil, solution: ["e7e8n"])]
+        )
+        #expect(pgn.contains("1. e8=N"))
+    }
+
+    @Test func importingTheExportGivesBackTheSamePuzzles() {
+        let entries = [
+            entry(),
+            entry(fen: "6k1/5ppp/8/8/8/8/5PPP/4R1K1 b - - 0 7", setup: "h2h3", solution: ["g8f8", "e1e8", "f8e8"]),
+            entry(fen: "8/4P3/7k/8/8/8/8/K7 w - - 0 1", setup: nil, solution: ["e7e8n"]),
+        ]
+        let result = PuzzleCollectionImporter.parse(PuzzleCollectionExporter.pgn(collection: "C", entries: entries))
+        #expect(result.skipped.isEmpty)
+        #expect(result.puzzles.map(\.fen) == entries.map(\.fen))
+        #expect(result.puzzles.map(\.setupLAN) == entries.map(\.setupLAN))
+        #expect(result.puzzles.map(\.solutionLANs) == entries.map(\.solutionLANs))
+    }
+
+    @Test func aPuzzleThatCannotBeReplayedIsLeftOut() {
+        let pgn = PuzzleCollectionExporter.pgn(
+            collection: "X", entries: [entry(solution: ["a1a8"]), entry(), entry(fen: "n'importe quoi")]
+        )
+        #expect(PuzzleCollectionImporter.parse(pgn).puzzles.count == 1)
+    }
+
+    @Test func anEmptyCollectionWritesNothing() {
+        #expect(PuzzleCollectionExporter.pgn(collection: "Vide", entries: []).isEmpty)
+    }
+
+    @Test func theFileNameIsSafeForTheFileSystem() {
+        #expect(PuzzleCollectionExporter.fileName(forCollection: "Fourchettes") == "Fourchettes.pgn")
+        #expect(PuzzleCollectionExporter.fileName(forCollection: "a/b:c") == "a-b-c.pgn")
+        #expect(PuzzleCollectionExporter.fileName(forCollection: "  ") == "ChessLab.pgn")
+    }
+
+    @Test func aFileWithoutTheHeaderStillReadsTheFirstMoveAsPreparation() {
+        // Le fichier d'un autre site : la convention de Lichess s'applique toujours.
+        let text = "[FEN \"r5k1/p4ppp/8/8/8/4R3/5PPP/4R1K1 b - - 0 22\"]\n\n22... a6 23. Re8+ Rxe8 24. Rxe8# *"
+        let result = PuzzleCollectionImporter.parse(text)
+        #expect(result.puzzles.first?.setupLAN == "a7a6")
+        #expect(result.puzzles.first?.solutionLANs == ["e3e8", "a8e8", "e1e8"])
+    }
+
+    @Test func anExportWithOnlyThePreparationAndNoMovesIsRefused() {
+        let text = "[FEN \"\(Self.corridorFEN)\"]\n[PuzzleSetup \"a7a6\"]\n\n*"
+        #expect(PuzzleCollectionImporter.parse(text).skipped.map(\.reason) == [.noMoves])
+    }
+}

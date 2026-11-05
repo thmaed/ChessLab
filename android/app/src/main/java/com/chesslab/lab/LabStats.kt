@@ -26,6 +26,11 @@ data class LabCompletedGame(
     val reasonLabel: String,
     val plyCount: Int,
     val pgn: String,
+    /** Le numéro de la position de départ, pour une série Chess960. */
+    val chess960Number: Int? = null,
+    /** Chess960 : la position de départ (FEN Shredder) et les coups UCI, séparés par des espaces — de quoi rouvrir la partie dans l'analyse de variante. */
+    val chess960StartFen: String? = null,
+    val chess960Moves: String? = null,
 ) {
     /** Le résultat rapporté au camp A, indépendant de la couleur. */
     val labResult: LabGameResult

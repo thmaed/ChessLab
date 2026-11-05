@@ -40,6 +40,9 @@ object LabAutosave {
                     .put("reasonLabel", game.reasonLabel)
                     .put("plyCount", game.plyCount)
                     .put("pgn", game.pgn)
+                    .put("chess960Number", game.chess960Number ?: JSONObject.NULL)
+                    .put("chess960StartFen", game.chess960StartFen ?: JSONObject.NULL)
+                    .put("chess960Moves", game.chess960Moves ?: JSONObject.NULL)
             )
         }
         val root = JSONObject()
@@ -64,6 +67,9 @@ object LabAutosave {
                 reasonLabel = o.optString("reasonLabel", ""),
                 plyCount = o.optInt("plyCount", 0),
                 pgn = o.optString("pgn", ""),
+                chess960Number = if (o.has("chess960Number") && !o.isNull("chess960Number")) o.optInt("chess960Number") else null,
+                chess960StartFen = o.optString("chess960StartFen", "").ifEmpty { null },
+                chess960Moves = o.optString("chess960Moves", "").ifEmpty { null },
             )
         }
         Snapshot(settings, games)
@@ -94,7 +100,22 @@ data class LabSeriesSettings(
     val bookWidth: BookWidth = BookWidth.includeSidelines,
     val keepAwakeSetting: Boolean? = null,
     val startFen: String? = null,
+    /** Série de Chess960 : Stockfish seul, une position par paire de parties (voir [chess960Number]). */
+    val chess960: Boolean = false,
+    /** Le numéro imposé à TOUTES les parties ; `null` = une position par paire, tirée de [chess960Seed]. */
+    val chess960Number: Int? = null,
+    val chess960Seed: Long = 0L,
 ) {
+    /**
+     * Le numéro de Scharnagl de la partie [index]. Quand les couleurs alternent,
+     * les DEUX parties d'une paire partent de la même position. Pendant de
+     * `LabGameSettings.chess960Number(forGame:)`.
+     */
+    fun chess960NumberFor(index: Int): Int {
+        chess960Number?.let { return it.coerceIn(0, 959) }
+        return scharnagl(chess960Seed, if (alternateColors) index / 2 else index)
+    }
+
     fun toJson(): JSONObject = JSONObject()
         .put("sideAProfileId", sideAProfileId ?: JSONObject.NULL)
         .put("sideBProfileId", sideBProfileId ?: JSONObject.NULL)
@@ -111,8 +132,20 @@ data class LabSeriesSettings(
         .put("bookWidth", bookWidth.name)
         .put("keepAwakeSetting", keepAwakeSetting ?: JSONObject.NULL)
         .put("startFen", startFen ?: JSONObject.NULL)
+        .put("chess960", chess960)
+        .put("chess960Number", chess960Number ?: JSONObject.NULL)
+        .put("chess960Seed", chess960Seed.toString())
 
     companion object {
+        /** Un tirage déterministe (SplitMix64), la même suite que `LabGameSettings.scharnagl` (iOS). */
+        fun scharnagl(seed: Long, pair: Int): Int {
+            var z = seed + pair.toLong() * -0x61c8864680b583ebL
+            z = (z xor (z ushr 30)) * -0x40a7b892e31b1a47L
+            z = (z xor (z ushr 27)) * -0x6b2fb644ecceee15L
+            z = z xor (z ushr 31)
+            return java.lang.Long.remainderUnsigned(z, 960L).toInt()
+        }
+
         fun fromJson(o: JSONObject): LabSeriesSettings {
             val d = LabSeriesSettings()
             fun text(key: String): String? =
@@ -135,6 +168,9 @@ data class LabSeriesSettings(
                 keepAwakeSetting = if (o.has("keepAwakeSetting") && !o.isNull("keepAwakeSetting"))
                     o.optBoolean("keepAwakeSetting") else null,
                 startFen = text("startFen"),
+                chess960 = o.optBoolean("chess960", false),
+                chess960Number = if (o.has("chess960Number") && !o.isNull("chess960Number")) o.optInt("chess960Number") else null,
+                chess960Seed = o.optString("chess960Seed", "0").toLongOrNull() ?: 0L,
             )
         }
     }

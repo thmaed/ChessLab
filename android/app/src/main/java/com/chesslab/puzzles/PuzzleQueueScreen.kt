@@ -106,6 +106,29 @@ fun PuzzleQueueScreen(
     var renaming by remember { mutableStateOf<CollectionSummary?>(null) }
     var renameFailed by remember { mutableStateOf(false) }
     var deleting by remember { mutableStateOf<CollectionSummary?>(null) }
+    // La collection qu'on exporte : le sélecteur de fichier du système répond plus tard.
+    var exporting by remember { mutableStateOf<CollectionSummary?>(null) }
+    val exportPicker = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/x-chess-pgn"),
+    ) { uri ->
+        val target = exporting
+        exporting = null
+        if (uri == null || target == null) return@rememberLauncherForActivityResult
+        scope.launch {
+            val written = withContext(Dispatchers.IO) {
+                runCatching {
+                    val entries = LibraryDatabase.get(context).importedPuzzles().inCollection(target.name).map {
+                        PuzzleCollectionExporter.Entry(it.fen, it.setup, it.solution.split(" ").filter(String::isNotEmpty))
+                    }
+                    val text = PuzzleCollectionExporter.pgn(target.name, entries)
+                    context.contentResolver.openOutputStream(uri, "wt")!!.use { it.write(text.toByteArray(Charsets.UTF_8)) }
+                }.isSuccess
+            }
+            message = context.getString(
+                if (written) R.string.puzzle_collection_exported else R.string.puzzle_collection_export_failed
+            )
+        }
+    }
 
     suspend fun reloadCollections() {
         val db = LibraryDatabase.get(context)
@@ -226,6 +249,10 @@ fun PuzzleQueueScreen(
                                 onOpenWoodpecker(created.id)
                             }
                         }
+                    },
+                    onExport = {
+                        exporting = collection
+                        exportPicker.launch(PuzzleCollectionExporter.fileName(collection.name))
                     },
                     onRename = { renaming = collection },
                     onDelete = { deleting = collection },
@@ -532,6 +559,7 @@ private fun CollectionRow(
     onPractice: () -> Unit,
     onRedoMissed: () -> Unit,
     onWoodpecker: () -> Unit,
+    onExport: () -> Unit,
     onRename: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -589,6 +617,11 @@ private fun CollectionRow(
                     text = { Text(stringResource(R.string.puzzle_collection_woodpecker)) },
                     onClick = { menu = false; onWoodpecker() },
                     modifier = Modifier.testTag("collection-woodpecker"),
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.puzzle_collection_export)) },
+                    onClick = { menu = false; onExport() },
+                    modifier = Modifier.testTag("collection-exporter"),
                 )
                 HorizontalDivider()
                 DropdownMenuItem(

@@ -72,7 +72,7 @@
     <string name="help_level_title">The level shown</string>
     <string name="help_offline_body">Everything. No account, no network, no data leaving the device. The engine, the puzzles, the courses and the opponents are all embedded.</string>
     <string name="help_offline_title">What stays offline</string>
-    <string name="help_puzzles_body">One try by default. Three invite you to try a move « just to see », exactly the opposite of what a puzzle trains: you calculate the line to the end BEFORE you touch the piece. The three-try net is still in the settings. “Missed” replays only what you got wrong on your last attempt, and a checkmating move is always accepted, even when it is not the stored solution. At the end of a game, “Missed mates” looks for the forced mates either side let slip and offers to make puzzles of them. The Woodpecker method replays a fixed set of 10, 25 or 50 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone. Your own puzzles (a PGN file where each game is a puzzle, with its FEN header; the first move is played for you, as on Lichess) can be imported from the Puzzles screen: each file becomes a collection, kept apart, which you can work through as a series or as a full Woodpecker programme.</string>
+    <string name="help_puzzles_body">One try by default. Three invite you to try a move « just to see », exactly the opposite of what a puzzle trains: you calculate the line to the end BEFORE you touch the piece. The three-try net is still in the settings. “Missed” replays only what you got wrong on your last attempt, and a checkmating move is always accepted, even when it is not the stored solution. At the end of a game, “Missed mates” looks for the forced mates either side let slip and offers to make puzzles of them. The Woodpecker method replays a fixed set of 10, 25 or 50 puzzles, cycle after cycle in a new order, to find more of them, faster; it leaves spaced repetition alone. Your own puzzles (a PGN file where each game is a puzzle, with its FEN header; the first move is played for you, as on Lichess) can be imported from the Puzzles screen: each file becomes a collection, kept apart, which you can work through as a series or as a full Woodpecker programme. A collection\'s menu exports it as PGN: that is also its backup, and the file imports back as it is.</string>
     <string name="help_puzzles_title">The puzzles</string>
     <string name="help_safety_body">Maia does not calculate: it can miss a mate in two or spoil an elementary endgame. Above a certain level, Stockfish takes over in FOUR cases only — a mate in one or two, an endgame with few pieces, a repetition in a winning position, and the case where the model does not answer. Below that level, missing a mate is PART of the character.</string>
     <string name="help_safety_title">The safety net</string>
@@ -116,6 +116,12 @@
     <string name="lab_export_pgn">PGN of every game</string>
     <string name="lab_export_csv">CSV of the results</string>
     <string name="lab_copied">Copied</string>
+    <string name="lab_end_too_long">Game too long</string>
+    <string name="lab_chess960">Chess960</string>
+    <string name="lab_chess960_sub">Stockfish only: no opening book and no Maia. The two games of a pair start from the same position, with colours reversed.</string>
+    <string name="lab_chess960_random">A different position for each pair of games</string>
+    <string name="lab_chess960_number">Number (0 to 959)</string>
+    <string name="lab_chess960_position">Chess960 · no. %1$d</string>
     <string name="lab_start_position">Set start position</string>
     <string name="lab_start_position_sub">Paste a FEN or a PGN — a PGN starts the series from its final position.</string>
     <string name="lab_start_standard">Standard position</string>
@@ -1368,6 +1374,9 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="puzzle_collection_practice">Practice</string>
     <string name="puzzle_collection_redo_missed">Redo the missed ones</string>
     <string name="puzzle_collection_woodpecker">Woodpecker programme</string>
+    <string name="puzzle_collection_export">Export as PGN</string>
+    <string name="puzzle_collection_exported">Collection exported.</string>
+    <string name="puzzle_collection_export_failed">The collection could not be exported.</string>
     <string name="puzzle_collection_rename">Rename</string>
     <string name="puzzle_collection_delete">Delete</string>
     <string name="puzzle_collection_rename_title">Rename the collection</string>

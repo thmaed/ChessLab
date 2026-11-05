@@ -174,7 +174,9 @@ final class LabViewModel {
             var attempts = 0
             while completed.count < settings.gameCount, attempts < maxAttempts, !Task.isCancelled {
                 attempts += 1
-                let outcome = await playOneGame(engine: controller, maia: maia, gameIndex: completed.count)
+                let outcome = settings.isChess960
+                    ? await playOneChess960Game(engine: controller, gameIndex: completed.count)
+                    : await playOneGame(engine: controller, maia: maia, gameIndex: completed.count)
                 if Task.isCancelled { break }
 
                 switch outcome {
@@ -425,6 +427,124 @@ final class LabViewModel {
         return .completed
     }
 
+    // MARK: Une partie de Chess960
+
+    /// Une partie de la série en Chess960 : même déroulé que ``playOneGame``,
+    /// mais les règles viennent de ``Chess960Game`` (roque roi-prend-tour, FEN
+    /// Shredder) et le moteur parle sous `UCI_Chess960`. Stockfish seul : ni
+    /// livre d'ouvertures (aucune théorie en 960), ni Maia (entraîné aux échecs
+    /// classiques). Les deux parties d'une paire partent de la même position
+    /// (voir ``LabGameSettings/chess960Number(forGame:)``).
+    private func playOneChess960Game(engine: EngineController, gameIndex: Int) async -> GameLoopOutcome {
+        let aWhite = !settings.alternateColors || gameIndex.isMultiple(of: 2)
+        let number = settings.chess960Number(forGame: gameIndex)
+        guard var game = Chess960Game(number: number) else { return .interrupted }
+        let startFEN = game.shredderFEN
+
+        board = game.board
+        lastMove = nil
+        currentPlyCount = 0
+        currentEvalCp = nil
+        await engine.send(.ucinewgame)
+
+        var sanLog: [String] = []
+        var whiteEvalHistory: [Int] = []
+        var seen: [String: Int] = [game.repetitionKey: 1]
+        var end: GameEnd?
+
+        while end == nil, currentPlyCount < maxPlies, !Task.isCancelled {
+            while isPaused, !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: 120_000_000)
+            }
+            if Task.isCancelled { return .interrupted }
+
+            let mover = game.board.position.sideToMove
+            let moverIsA = (mover == .white) == aWhite
+            let strength = moverIsA ? settings.sideAStrength : settings.sideBStrength
+            let movetime = strength.maxDepth == nil
+                ? Int(Double(settings.movetimeMs) * ThermalMonitor.shared.movetimeFactor)
+                : nil
+            // `UCI_Chess960` AVANT chaque recherche : la commutation entre les
+            // deux camps repousse déjà leurs réglages, et un moteur redémarré
+            // après un raté repart sans lui.
+            let result = await engine.computeBestMove(
+                fen: game.shredderFEN,
+                setupCommands: [.setoption(id: "UCI_Chess960", value: "true")] + strength.setupCommands,
+                movetimeMs: movetime, depth: strength.maxDepth
+            )
+            if Task.isCancelled { return .interrupted }
+
+            // Raté moteur : aucun coup, ou un coup que la couche de règles refuse.
+            guard let lan = result?.lan, lan != "(none)",
+                  let squares = game.displaySquares(forUCI: lan),
+                  let piece = game.board.position.piece(at: squares.from),
+                  let san = game.apply(uci: lan)
+            else { return .interrupted }
+
+            sanLog.append(san)
+            board = game.board
+            lastMove = Move(result: .move, piece: piece, start: squares.from, end: squares.to)
+            currentPlyCount += 1
+            if let moverCp = result?.moverCp {
+                let whiteEval = mover == .white ? moverCp : -moverCp
+                currentEvalCp = whiteEval
+                whiteEvalHistory.append(whiteEval)
+            }
+            seen[game.repetitionKey, default: 0] += 1
+
+            if settings.liveVisualization {
+                try? await Task.sleep(nanoseconds: 90_000_000)
+            } else {
+                await Task.yield()
+            }
+
+            end = chess960End(of: game, repetitions: seen[game.repetitionKey] ?? 1)
+            if end == nil {
+                end = resignationOrAgreedDraw(whiteEvalHistory, ply: currentPlyCount)
+            }
+        }
+
+        if Task.isCancelled { return .interrupted }
+
+        let finalEnd = end ?? GameEnd(pgnResult: "1/2-1/2", reasonLabel: "Partie trop longue")
+        var moves = ""
+        for (index, san) in sanLog.enumerated() {
+            if index % 2 == 0 { moves += "\(index / 2 + 1). " }
+            moves += san + " "
+        }
+        let tags = PGNExport.tagLines(
+            event: "ChessLab Lab", white: aWhite ? "A" : "B", black: aWhite ? "B" : "A",
+            result: finalEnd.pgnResult, variant: "Chess960", startFEN: startFEN
+        )
+        completed.append(
+            LabCompletedGame(
+                index: gameIndex,
+                aWasWhite: aWhite,
+                pgnResult: finalEnd.pgnResult,
+                reasonLabel: finalEnd.reasonLabel,
+                plyCount: currentPlyCount,
+                pgn: tags.joined(separator: "\n") + "\n\n" + moves + finalEnd.pgnResult,
+                chess960Number: number
+            )
+        )
+        return .completed
+    }
+
+    /// Les fins « sur l'échiquier » de la couche 960 (mat, pat, matériel
+    /// insuffisant, 50 coups) et la répétition, que la couche laisse à l'appelant.
+    private func chess960End(of game: Chess960Game, repetitions: Int) -> GameEnd? {
+        if let boardEnd = game.boardEnd {
+            switch boardEnd {
+            case let .checkmate(winner): return end(of: GameOutcome(winner: winner, reason: .checkmate))
+            case .stalemate: return end(of: GameOutcome(winner: nil, reason: .draw(.stalemate)))
+            case .insufficientMaterial: return end(of: GameOutcome(winner: nil, reason: .draw(.insufficientMaterial)))
+            case .fiftyMoves: return end(of: GameOutcome(winner: nil, reason: .draw(.fiftyMoves)))
+            }
+        }
+        if repetitions >= 3 { return end(of: GameOutcome(winner: nil, reason: .draw(.repetition))) }
+        return nil
+    }
+
     // MARK: Fin de partie
 
     private struct GameEnd {
@@ -433,7 +553,10 @@ final class LabViewModel {
     }
 
     private func terminalEnd(for state: Board.State) -> GameEnd? {
-        guard let outcome = GameOutcome.fromBoardState(state) else { return nil }
+        GameOutcome.fromBoardState(state).map(end(of:))
+    }
+
+    private func end(of outcome: GameOutcome) -> GameEnd {
         let reason: String
         switch outcome.reason {
         case .checkmate: reason = "Mat"

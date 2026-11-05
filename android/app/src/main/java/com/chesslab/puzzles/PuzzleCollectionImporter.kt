@@ -23,7 +23,10 @@ import com.chesslab.analysis.PgnSanitizer
  *   l'adversaire (le camp au trait dans le FEN), joué d'avance — convention de
  *   Lichess, de la bibliothèque de l'app et des fichiers de Ron. Le puzzle
  *   commence APRÈS lui : le FEN enregistré est la position qui suit, et ce coup
- *   est gardé à part ([ParsedPuzzle.setup]) pour être montré ;
+ *   est gardé à part ([ParsedPuzzle.setup]) pour être montré. Exception : un
+ *   fichier écrit par ChessLab ([PuzzleCollectionExporter]) porte l'en-tête
+ *   `[PuzzleSetup "…"]` — son `[FEN]` est alors DÉJÀ la position de départ du
+ *   puzzle, et toute la ligne principale est la solution ;
  * - les coups suivants sont la solution, en alternant celui qui trouve et la
  *   riposte forcée ;
  * - variantes, commentaires et annotations (`!`, `?`, `$1`) sont ignorés.
@@ -43,8 +46,8 @@ object PuzzleCollectionImporter {
     data class ParsedPuzzle(
         /** La position où le puzzle COMMENCE : celle qui suit la préparation. */
         val fen: String,
-        /** Le coup de préparation (adverse), en LAN, joué avant l'énoncé. */
-        val setup: String,
+        /** Le coup de préparation (adverse), en LAN, joué avant l'énoncé ; `null` pour un puzzle exporté qui n'en avait pas. */
+        val setup: String?,
         /** En LAN, le premier coup étant celui à trouver. */
         val solution: List<String>,
         val theme: String,
@@ -135,6 +138,8 @@ object PuzzleCollectionImporter {
 
     /** `[Clé "valeur"]` — et PAS une ligne de commentaire qui commencerait par un crochet (`[%clk 0:03:00]`). */
     private val TAG_LINE = Regex("""^\[[A-Za-z0-9_]+\s+"""")
+    private val SETUP_TAG = Regex("""(?im)^\s*\[PuzzleSetup\s+"([^"]*)"\s*\]""")
+    private val LAN = Regex("^[a-h][1-8][a-h][1-8][qrbn]?$")
     private val FEN_TAG = Regex("""(?im)^\s*\[FEN\s+"([^"]*)"\s*\]""")
 
     // MARK: Une partie
@@ -153,11 +158,16 @@ object PuzzleCollectionImporter {
         val tokens = movetext(game).map(::cleaned).filter { it.isNotEmpty() }
         if (tokens.isEmpty()) return Outcome.Refused(SkipReason.NoMoves)
 
+        // Un fichier de ChessLab dit lui-même où le puzzle commence.
+        val exportedSetup = SETUP_TAG.find(game)?.groupValues?.get(1)?.trim()
+        val startsAfterSetup = exportedSetup != null
+
         val board = Board(start)
         val lans = ArrayList<String>()
         var startFen: String = fen
         // La préparation compte pour un coup de plus que le plafond de la solution.
-        for ((index, token) in tokens.take(MAX_SOLUTION_PLIES + 1).withIndex()) {
+        val plyLimit = MAX_SOLUTION_PLIES + if (startsAfterSetup) 0 else 1
+        for ((index, token) in tokens.take(plyLimit).withIndex()) {
             val move = SanParser.parse(token, board.position)
                 ?: return Outcome.Refused(SkipReason.IllegalMove(token))
             val applied = board.move(move.start, move.end)
@@ -168,10 +178,16 @@ object PuzzleCollectionImporter {
                 board.completePromotion(applied, move.promotedPiece?.kind ?: Piece.Kind.queen)
             }
             // Le puzzle commence ICI : après la préparation.
-            if (index == 0) startFen = board.position.fen
+            if (index == 0 && !startsAfterSetup) startFen = board.position.fen
         }
-        if (lans.size < 2) return Outcome.Refused(SkipReason.NoSolution)
-        val setup = lans.removeAt(0)
+        val setup: String?
+        if (exportedSetup != null) {
+            if (lans.isEmpty()) return Outcome.Refused(SkipReason.NoSolution)
+            setup = exportedSetup.takeIf { LAN.matches(it) }
+        } else {
+            if (lans.size < 2) return Outcome.Refused(SkipReason.NoSolution)
+            setup = lans.removeAt(0)
+        }
         // Se termine sur le coup de celui qui trouve : longueur impaire.
         if (lans.size > 1 && lans.size % 2 == 0) lans.removeAt(lans.lastIndex)
 

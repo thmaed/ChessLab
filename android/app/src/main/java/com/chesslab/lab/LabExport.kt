@@ -8,7 +8,8 @@ package com.chesslab.lab
  * le résultat : sans cela, une partie sortait sans joueurs ni score, donc
  * inexploitable ailleurs. Les tags de position de départ (`SetUp`/`FEN`) émis
  * pour une série à FEN personnalisé sont conservés — sans eux, l'autre outil
- * rejouerait les coups depuis la position standard.
+ * rejouerait les coups depuis la position standard — ainsi que `Variant` d'une
+ * série Chess960, qui dit à l'outil d'arrivée de lire le FEN en Shredder.
  */
 object LabExport {
 
@@ -18,7 +19,7 @@ object LabExport {
             val black = if (game.aWasWhite) nameB else nameA
 
             val lines = game.pgn.trim().split("\n")
-            val setupTags = lines.filter { it.startsWith("[SetUp") || it.startsWith("[FEN") }
+            val setupTags = lines.filter { it.startsWith("[SetUp") || it.startsWith("[FEN") || it.startsWith("[Variant") }
             var movetext = lines.filterNot { it.startsWith("[") }.joinToString("\n").trim()
             if (!movetext.endsWith(game.pgnResult)) {
                 movetext += (if (movetext.isEmpty()) "" else " ") + game.pgnResult

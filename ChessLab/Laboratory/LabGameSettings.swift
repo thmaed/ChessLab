@@ -39,6 +39,16 @@ struct LabGameSettings: Codable, Hashable {
     var alternateColors: Bool = true
     /// Position de départ personnalisée (FEN) ; `nil` = position standard.
     var startFEN: String?
+    /// Série de CHESS960 : Stockfish seul (ni livre ni Maia, qui ne connaissent
+    /// que les échecs classiques). Optionnels comme les autres ajouts — une série
+    /// sauvegardée avant eux n'a pas ces clés, et se lit donc comme une série classique.
+    var chess960Enabled: Bool?
+    /// Le numéro de Scharnagl (0…959) imposé à TOUTES les parties ; `nil` = une
+    /// position différente par paire de parties, tirée de ``chess960Seed``.
+    var chess960Number: Int?
+    /// Graine de la série : fixée au lancement, gardée avec la sauvegarde — une
+    /// série reprise rejoue les MÊMES positions que si elle n'avait pas été interrompue.
+    var chess960Seed: UInt64?
     /// Autorise l'abandon : un camp nettement perdant (|éval| ≥ 8 pions de
     /// façon prolongée) abandonne au lieu de jouer jusqu'au mat.
     var resignationEnabled: Bool = true
@@ -74,9 +84,34 @@ struct LabGameSettings: Codable, Hashable {
     var sideBStrength: EngineStrength { EngineStrength(sliderValue: sideBEloSlider) }
     var sideAProfile: OpponentProfile? { sideAOpponentProfileID.flatMap(OpponentProfile.named) }
     var sideBProfile: OpponentProfile? { sideBOpponentProfileID.flatMap(OpponentProfile.named) }
-    var usesMaia: Bool { sideAProfile != nil || sideBProfile != nil }
+    var usesMaia: Bool { !isChess960 && (sideAProfile != nil || sideBProfile != nil) }
+
+    var isChess960: Bool { chess960Enabled == true }
+
+    /// Le numéro de la position de la partie `index`. Quand les couleurs
+    /// alternent, les DEUX parties d'une paire partent de la même position :
+    /// sans cela, A jouerait « sa » position avec les blancs et B une autre,
+    /// et l'écart mesuré mélangerait la force et la chance du tirage.
+    func chess960Number(forGame index: Int) -> Int {
+        if let chess960Number { return min(max(chess960Number, 0), 959) }
+        let pair = alternateColors ? index / 2 : index
+        return Self.scharnagl(seed: chess960Seed ?? 0, pair: pair)
+    }
+
+    /// Un tirage déterministe (SplitMix64) : le même couple graine/paire donne
+    /// toujours le même numéro. Même suite sur Android.
+    static func scharnagl(seed: UInt64, pair: Int) -> Int {
+        var z = seed &+ UInt64(pair) &* 0x9E37_79B9_7F4A_7C15
+        z = (z ^ (z >> 30)) &* 0xBF58_476D_1CE4_E5B9
+        z = (z ^ (z >> 27)) &* 0x94D0_49BB_1331_11EB
+        z ^= z >> 31
+        return Int(z % 960)
+    }
 
     var startingPosition: Position {
+        if isChess960, let game = Chess960Game(number: chess960Number(forGame: 0)) {
+            return game.board.position
+        }
         if let startFEN, let position = Position(fen: startFEN) {
             return position
         }
@@ -96,6 +131,9 @@ struct LabCompletedGame: Codable, Hashable, Identifiable {
     var reasonLabel: String
     var plyCount: Int
     var pgn: String
+    /// Le numéro de la position de départ, pour une série Chess960 ; absent des
+    /// séries sauvegardées avant elle.
+    var chess960Number: Int?
 
     var id: Int { index }
 

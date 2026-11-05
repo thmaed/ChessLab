@@ -90,6 +90,16 @@ data class LabUiState(
     /** La position imposée à la série, quand elle n'est pas la position standard. */
     val startFen: String? = null,
     /**
+     * Une série de CHESS960 : Stockfish seul (ni livre ni personnage), une position
+     * par paire de parties — ou le numéro [chess960Number] pour toutes. Pendant de
+     * `LabGameSettings.chess960Enabled`.
+     */
+    val chess960: Boolean = false,
+    val chess960Number: Int? = null,
+    val chess960Seed: Long = 0L,
+    /** Le numéro de la position de la partie EN COURS, pour l'afficher. */
+    val chess960Current: Int? = null,
+    /**
      * Une série INTERROMPUE retrouvée sur le disque : une bannière propose de
      * la reprendre. `null` dès qu'on a tranché — repris ou écarté.
      */
@@ -113,6 +123,7 @@ data class LabUiState(
             drawAgreementEnabled = drawAgreementEnabled, liveVisualization = liveVisualization,
             bookA = bookA, bookB = bookB, bookWidth = bookWidth,
             keepAwakeSetting = keepAwakeSetting, startFen = startFen,
+            chess960 = chess960, chess960Number = chess960Number, chess960Seed = chess960Seed,
         )
 
     /**
@@ -174,7 +185,7 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
         val position = Position.fromFen(fen) ?: return
         if (ui.running || position.fen == startPosition.fen) return
         startPosition = position
-        ui = ui.copy(startFen = position.fen.takeIf { it != Position.standard.fen })
+        ui = ui.copy(startFen = position.fen.takeIf { it != Position.standard.fen }, chess960 = false, chess960Current = null)
         reset()
     }
 
@@ -201,10 +212,33 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     fun setLiveVisualization(on: Boolean) { ui = ui.copy(liveVisualization = on) }
     fun setKeepAwake(on: Boolean) { ui = ui.copy(keepAwakeSetting = on) }
 
+    /**
+     * Chess960 : un choix de série, sans effet en cours de route (changer de jeu
+     * au milieu d'un bilan le fausserait). Il remplace la position personnalisée,
+     * et la graine est tirée ICI — une série reprise rejoue les mêmes positions.
+     */
+    fun setChess960(on: Boolean) {
+        if (ui.running || ui.chess960 == on) return
+        if (on) {
+            startPosition = Position.standard
+            ui = ui.copy(chess960 = true, startFen = null, chess960Seed = kotlin.random.Random.nextLong())
+        } else {
+            ui = ui.copy(chess960 = false, chess960Current = null)
+        }
+        reset()
+    }
+
+    /** `null` : une position différente par paire de parties. */
+    fun setChess960Number(number: Int?) {
+        if (ui.running) return
+        ui = ui.copy(chess960Number = number?.coerceIn(0, 959))
+        reset()
+    }
+
     fun toggle() {
         if (ui.running) { stop(); return }
         ui = ui.copy(running = true, status = s(R.string.lab_running))
-        loop = viewModelScope.launch { runSeries() }
+        loop = viewModelScope.launch { if (ui.chess960) runChess960Series() else runSeries() }
     }
 
     fun stop() {
@@ -216,11 +250,12 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     fun reset() {
         stop()
         LabAutosave.clear(getApplication())
+        c960Start = null
         ui = ui.copy(
             completed = emptyList(), gameNumber = 0, aPlaysWhite = true,
             resumable = null, status = s(R.string.lab_ready),
         )
-        newGame()
+        if (ui.chess960) previewChess960(0) else newGame()
     }
 
     private fun newGame() {
@@ -443,6 +478,201 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
         LabAutosave.save(getApplication(), ui.seriesSettings, ui.completed)
     }
 
+    // MARK: Chess960
+
+    /** La partie de Chess960 en cours : sa position de départ, ses coups UCI, et les positions déjà vues. */
+    private var c960Start: String? = null
+    private val c960Log = mutableListOf<String>()
+    private val c960Seen = HashMap<String, Int>()
+
+    private enum class GameState { Finished, Paused, Failed }
+
+    private fun positionOf(fen: String): Position =
+        Position.fromFen(com.chesslab.variants.VariantFen.forChessKit(fen)) ?: Position.standard
+
+    private fun settings960(): LabSeriesSettings = ui.seriesSettings
+
+    /** Montre la position de la partie [index] avant qu'elle ne commence. */
+    private fun previewChess960(index: Int) {
+        val number = settings960().chess960NumberFor(index)
+        val fen = com.chesslab.variants.Chess960Position.startingFen(number) ?: return
+        ui = ui.copy(position = positionOf(fen), lastMove = null, sanMoves = emptyList(), chess960Current = number)
+    }
+
+    /**
+     * La série en Chess960 : même déroulé que [runSeries], mais Fairy-Stockfish
+     * ARBITRE (coups légaux, mat, pat) et joue — comme dans l'écran Chess960 de
+     * l'app, sous `UCI_Chess960`. Pendant de `playOneChess960Game` (iOS). Stockfish
+     * seul : ni livre, ni personnage.
+     */
+    private suspend fun runChess960Series() {
+        while (viewModelScope.isActive && ui.running) {
+            if (ui.completed.size >= ui.gameCount) {
+                ui = ui.copy(running = false, status = s(R.string.lab_series_done, ui.completed.size))
+                return
+            }
+            when (playChess960Game()) {
+                GameState.Finished -> ui = ui.copy(
+                    gameNumber = ui.gameNumber + 1,
+                    aPlaysWhite = if (ui.alternateColors) !ui.aPlaysWhite else ui.aPlaysWhite,
+                )
+                GameState.Paused -> return
+                GameState.Failed -> { stop(); return }
+            }
+        }
+    }
+
+    private suspend fun <T> fairy(block: suspend (com.chesslab.engine.FairyEngine) -> T): T? =
+        withContext(Dispatchers.IO) {
+            com.chesslab.engine.FairyEngine.use(getApplication()) { engine ->
+                engine.send("setoption name UCI_Chess960 value true")
+                block(engine)
+            }
+        }
+
+    private suspend fun playChess960Game(): GameState {
+        val index = ui.completed.size
+        if (c960Start == null) {
+            val number = settings960().chess960NumberFor(index)
+            val fen = com.chesslab.variants.Chess960Position.startingFen(number) ?: return GameState.Failed
+            c960Start = fen
+            c960Log.clear()
+            c960Seen.clear()
+            recentEvals.clear()
+            ui = ui.copy(position = positionOf(fen), lastMove = null, sanMoves = emptyList(), chess960Current = number)
+        }
+        val start = c960Start ?: return GameState.Failed
+
+        var query = fairy { it.queryPosition("chess", start, c960Log) } ?: return GameState.Failed
+        if (c960Seen.isEmpty()) c960Seen[repetitionKey(query.fen)] = 1
+
+        while (viewModelScope.isActive && ui.running) {
+            val position = positionOf(query.fen)
+            val mover = position.sideToMove
+
+            chess960End(query, position)?.let { (result, reason) ->
+                finishChess960(index, start, result, reason)
+                return GameState.Finished
+            }
+            if (c960Log.size >= MAX_PLIES) {
+                finishChess960(index, start, "1/2-1/2", s(R.string.lab_end_too_long))
+                return GameState.Finished
+            }
+
+            val isA = (mover == Piece.Color.white) == ui.aPlaysWhite
+            val side = if (isA) ui.sideA else ui.sideB
+            val strength = com.chesslab.variants.VariantSettings(level = side.level).strength
+            val budget = com.chesslab.engine.ThermalMonitor.movetimeMs(ui.movetimeMs)
+            val answer = fairy {
+                it.search("chess", start, c960Log, budget, strength.maxDepth, strength.fairySetupCommands)
+            } ?: return GameState.Failed
+            if (!viewModelScope.isActive || !ui.running) return GameState.Paused
+
+            val best = answer.bestLan
+            if (best == null || best == "(none)") return GameState.Failed
+
+            // La sonde de l'abandon et de la nulle : le score du camp au trait, tenu sur plusieurs coups.
+            answer.cp?.let { recentEvals.addLast(it) } ?: answer.mate?.let { recentEvals.addLast(if (it > 0) 10_000 else -10_000) }
+            while (recentEvals.size > RESIGN_PLIES) recentEvals.removeFirst()
+            forcedChess960(mover)?.let { (result, reason) ->
+                finishChess960(index, start, result, reason)
+                return GameState.Finished
+            }
+
+            val marks = com.chesslab.variants.Chess960Castling.displaySquares(best, position)
+            c960Log += best
+            val after = fairy { it.queryPosition("chess", start, c960Log) } ?: return GameState.Failed
+            val san = com.chesslab.variants.VariantSan.build(
+                uci = best, beforeFen = query.fen, legalMovesBefore = query.legalMoves,
+                isCheck = after.inCheck, isMate = after.inCheck && after.legalMoves.isEmpty(),
+            )
+            val key = repetitionKey(after.fen)
+            c960Seen[key] = (c960Seen[key] ?: 0) + 1
+            ui = ui.copy(
+                position = positionOf(after.fen),
+                lastMove = marks,
+                sanMoves = ui.sanMoves + san,
+                status = s(R.string.lab_played, side.label(getApplication()), san),
+            )
+            query = after
+            if (ui.liveVisualization) kotlinx.coroutines.delay(120)
+        }
+        return GameState.Paused
+    }
+
+    /** Les quatre premiers champs de la FEN : position, trait, droits, en passant. */
+    private fun repetitionKey(fen: String) = fen.trim().split(" ").take(4).joinToString(" ")
+
+    /**
+     * Les fins « sur l'échiquier » : mat, pat (les coups légaux du moteur), matériel
+     * insuffisant, cinquante coups et triple répétition. Même ordre qu'iOS.
+     */
+    private fun chess960End(query: com.chesslab.engine.PositionQuery, position: Position): Pair<String, String>? {
+        if (query.legalMoves.isEmpty()) {
+            return if (query.inCheck) {
+                (if (position.sideToMove == Piece.Color.white) "0-1" else "1-0") to s(R.string.lab_end_checkmate)
+            } else {
+                "1/2-1/2" to s(R.string.draw_stalemate)
+            }
+        }
+        if (com.chesslab.variants.VariantDrawRules.isInsufficientMaterial(query.fen, "chess960", true)) {
+            return "1/2-1/2" to s(R.string.draw_material)
+        }
+        val halfmove = query.fen.trim().split(" ").getOrNull(4)?.toIntOrNull() ?: 0
+        if (halfmove >= 100) return "1/2-1/2" to s(R.string.draw_fifty)
+        if ((c960Seen[repetitionKey(query.fen)] ?: 0) >= 3) return "1/2-1/2" to s(R.string.draw_repetition)
+        return null
+    }
+
+    /** L'abandon et la nulle par accord, aux mêmes seuils que la série classique. */
+    private fun forcedChess960(mover: Piece.Color): Pair<String, String>? {
+        if (recentEvals.size < RESIGN_PLIES) return null
+        val last = recentEvals.takeLast(RESIGN_PLIES)
+        if (ui.resignationEnabled && last.all { it <= -RESIGN_CP }) {
+            return (if (mover == Piece.Color.white) "0-1" else "1-0") to s(R.string.reason_resignation)
+        }
+        if (ui.resignationEnabled && last.all { it >= RESIGN_CP }) {
+            return (if (mover == Piece.Color.white) "1-0" else "0-1") to s(R.string.reason_resignation)
+        }
+        if (ui.drawAgreementEnabled && ui.sanMoves.size >= DRAW_MIN_PLIES && last.all { kotlin.math.abs(it) <= DRAW_CP }) {
+            return "1/2-1/2" to s(R.string.draw_agreement)
+        }
+        return null
+    }
+
+    /** La partie finie entre au bilan, avec son PGN de variante (`Variant`, `SetUp`, `FEN`). */
+    private fun finishChess960(index: Int, start: String, result: String, reason: String) {
+        val app = getApplication<Application>()
+        val tags = com.chesslab.library.PgnExport.tagLines(
+            event = "ChessLab Lab",
+            white = if (ui.aPlaysWhite) "A" else "B", black = if (ui.aPlaysWhite) "B" else "A",
+            result = result, variant = "Chess960", startFen = start,
+        )
+        val moves = StringBuilder()
+        ui.sanMoves.forEachIndexed { i, san ->
+            if (i % 2 == 0) moves.append("${i / 2 + 1}. ")
+            moves.append(san).append(' ')
+        }
+        moves.append(result)
+        ui = ui.copy(
+            completed = ui.completed + LabCompletedGame(
+                index = index,
+                aWasWhite = ui.aPlaysWhite,
+                pgnResult = result,
+                reasonLabel = reason,
+                plyCount = ui.sanMoves.size,
+                pgn = tags.joinToString("\n") + "\n\n" + moves,
+                chess960Number = ui.chess960Current,
+                chess960StartFen = start,
+                chess960Moves = c960Log.joinToString(" "),
+            )
+        )
+        c960Start = null
+        LabAutosave.save(app, ui.seriesSettings, ui.completed)
+        // La position de la partie SUIVANTE, montrée dès maintenant.
+        if (ui.completed.size < ui.gameCount) previewChess960(ui.completed.size)
+    }
+
     // MARK: Reprise
 
     /**
@@ -471,6 +701,8 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
             liveVisualization = settings.liveVisualization,
             bookA = settings.bookA, bookB = settings.bookB, bookWidth = settings.bookWidth,
             keepAwakeSetting = settings.keepAwakeSetting, startFen = settings.startFen,
+            chess960 = settings.chess960, chess960Number = settings.chess960Number,
+            chess960Seed = settings.chess960Seed,
             completed = snapshot.completed,
             gameNumber = snapshot.completed.size,
             // La couleur de A suit l'alternance : la reprendre au hasard
@@ -479,7 +711,8 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
             resumable = null,
             status = s(R.string.lab_resumed, snapshot.completed.size),
         )
-        newGame()
+        c960Start = null
+        if (settings.chess960) previewChess960(snapshot.completed.size) else newGame()
     }
 
     /** Écarter : on repart de zéro, et le fichier s'en va avec. */
@@ -537,5 +770,8 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
         /** Zéro tenu sur huit demi-coups, après vingt : c'est nul. */
         const val DRAW_CP = 15
         const val DRAW_MIN_PLIES = 40
+
+        /** Sécurité anti-partie-infinie : 400 demi-coups, comme iOS. */
+        const val MAX_PLIES = 400
     }
 }

@@ -57,6 +57,8 @@ struct PuzzleQueueView: View {
     @State private var showsDelete = false
     @State private var renameText = ""
     @State private var renameFailed = false
+    /// Le fichier PGN d'une collection exportée, offert à la feuille de partage.
+    @State private var exportedFile: ExportedPGNFile?
 
     @State private var sheet: CriteriaSheetMode?
     /// Ce que la feuille a décidé, exécuté APRÈS sa fermeture : pousser un écran
@@ -133,6 +135,7 @@ struct PuzzleQueueView: View {
             Text(woodpeckerMessage ?? "")
         }
         .sheet(isPresented: $showsImport, onDismiss: refresh) { PuzzleImportSheet() }
+        .sheet(item: $exportedFile) { file in PuzzleShareSheet(items: [file.url]) }
         .alert("Renommer la collection", isPresented: $showsRename) {
             TextField("Nom", text: $renameText)
             Button("Annuler", role: .cancel) {}
@@ -458,6 +461,10 @@ struct PuzzleQueueView: View {
                 Button { startCollectionWoodpecker(collection) } label: {
                     Label("Programme Woodpecker", systemImage: "arrow.triangle.2.circlepath")
                 }
+                Button { exportCollection(collection) } label: {
+                    Label("Exporter en PGN", systemImage: "square.and.arrow.up")
+                }
+                .accessibilityIdentifier("collectionExport-\(collection.name)")
                 Divider()
                 Button {
                     actionTarget = collection
@@ -484,6 +491,18 @@ struct PuzzleQueueView: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .cardStyle()
+    }
+
+    /// Écrit la collection dans un fichier `.pgn` temporaire et ouvre la feuille de
+    /// partage : Fichiers, AirDrop, Mail… Le fichier se réimporte tel quel.
+    private func exportCollection(_ collection: PuzzleCollectionStore.Summary) {
+        let entries = PuzzleCollectionStore.puzzles(inCollection: collection.name, in: modelContext)
+            .map(PuzzleCollectionExporter.Entry.init)
+        let text = PuzzleCollectionExporter.pgn(collection: collection.name, entries: entries)
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent(PuzzleCollectionExporter.fileName(forCollection: collection.name))
+        guard (try? text.write(to: url, atomically: true, encoding: .utf8)) != nil else { return }
+        exportedFile = ExportedPGNFile(url: url)
     }
 
     private func collectionSubtitle(_ collection: PuzzleCollectionStore.Summary) -> String {
@@ -826,4 +845,20 @@ private extension DifficultyTier {
         case .expert: 1.0
         }
     }
+}
+
+private struct ExportedPGNFile: Identifiable {
+    let url: URL
+    var id: String { url.path }
+}
+
+/// Feuille de partage système pour le fichier PGN d'une collection.
+private struct PuzzleShareSheet: UIViewControllerRepresentable {
+    let items: [Any]
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: items, applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }

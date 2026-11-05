@@ -183,11 +183,45 @@ final class WoodpeckerProgram {
     init() {}
 
     var plan: WoodpeckerPlan? {
-        get { planData.flatMap { try? JSONDecoder().decode(WoodpeckerPlan.self, from: $0) } }
+        get { planData.flatMap(WoodpeckerPlan.init(storedData:)) }
         set {
-            planData = newValue.flatMap { try? JSONEncoder().encode($0) }
+            planData = newValue?.storedData
             updatedAt = Date()
         }
+    }
+}
+
+/// Le plan tel qu'il est GARDÉ : son JSON, compressé.
+///
+/// Un enregistrement CloudKit pèse au plus 1 Mo, et le plan voyage en un seul
+/// bloc. Un programme de 1 000 puzzles pèse ~210 Ko au premier cycle et y ajoute
+/// ~45 Ko par cycle bouclé (réponses + ordre) : ~1 Mo au vingtième, trop pour
+/// iCloud. Le JSON, très répétitif, se réduit par zlib à ~15 % (mesuré : 133 Ko
+/// au vingtième cycle). Android n'est pas concerné : sa base est locale, sans cette limite.
+///
+/// Format : un octet nul, puis le JSON compressé. Un plan écrit avant la
+/// compression est du JSON brut — il commence par `{`, jamais par un octet nul —
+/// et se relit donc tel quel ; il est recompressé à sa prochaine écriture.
+extension WoodpeckerPlan {
+    private static let compressedMarker: UInt8 = 0
+
+    var storedData: Data? {
+        guard let json = try? JSONEncoder().encode(self),
+              let packed = try? (json as NSData).compressed(using: .zlib)
+        else { return nil }
+        return Data([Self.compressedMarker]) + (packed as Data)
+    }
+
+    init?(storedData data: Data) {
+        let json: Data
+        if data.first == Self.compressedMarker {
+            guard let unpacked = try? (data.dropFirst() as NSData).decompressed(using: .zlib) else { return nil }
+            json = unpacked as Data
+        } else {
+            json = data
+        }
+        guard let plan = try? JSONDecoder().decode(WoodpeckerPlan.self, from: json) else { return nil }
+        self = plan
     }
 }
 

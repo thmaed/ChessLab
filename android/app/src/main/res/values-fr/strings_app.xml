@@ -69,7 +69,7 @@
     <string name="help_level_title">Le niveau affiché</string>
     <string name="help_offline_body">Tout. Aucun compte, aucun réseau, aucune donnée qui sort de l\'appareil. Le moteur, les puzzles, les cours et les adversaires sont embarqués.</string>
     <string name="help_offline_title">Ce qui reste hors ligne</string>
-    <string name="help_puzzles_body">Un seul essai par défaut. Trois invitent à tenter un coup « pour voir », exactement l\'inverse de ce qu\'un puzzle entraîne : on calcule la variante jusqu\'au bout AVANT de poser la pièce. Le filet à trois essais reste dans les réglages. « Ratés » ne rejoue que ce que vous avez manqué à la dernière tentative, et un coup qui mate est toujours accepté, même s\'il n\'est pas la solution enregistrée. En fin de partie, « Mats manqués » cherche les mats forcés que l\'un ou l\'autre camp a laissé filer, et propose d\'en faire des puzzles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. Vos propres puzzles (un fichier PGN dont chaque partie est un puzzle, avec son en-tête FEN ; le premier coup est joué d\'avance, comme sur Lichess) s\'importent depuis l\'écran Puzzles : chaque fichier devient une collection, rangée à part, qu\'on travaille en série ou en programme Woodpecker complet.</string>
+    <string name="help_puzzles_body">Un seul essai par défaut. Trois invitent à tenter un coup « pour voir », exactement l\'inverse de ce qu\'un puzzle entraîne : on calcule la variante jusqu\'au bout AVANT de poser la pièce. Le filet à trois essais reste dans les réglages. « Ratés » ne rejoue que ce que vous avez manqué à la dernière tentative, et un coup qui mate est toujours accepté, même s\'il n\'est pas la solution enregistrée. En fin de partie, « Mats manqués » cherche les mats forcés que l\'un ou l\'autre camp a laissé filer, et propose d\'en faire des puzzles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. Vos propres puzzles (un fichier PGN dont chaque partie est un puzzle, avec son en-tête FEN ; le premier coup est joué d\'avance, comme sur Lichess) s\'importent depuis l\'écran Puzzles : chaque fichier devient une collection, rangée à part, qu\'on travaille en série ou en programme Woodpecker complet. Le menu d\'une collection l\'exporte en PGN : c\'est aussi sa sauvegarde, et le fichier se réimporte tel quel.</string>
     <string name="help_puzzles_title">Les puzzles</string>
     <string name="help_safety_body">Maia ne calcule pas : il peut rater un mat en deux ou gâcher une finale élémentaire. À partir d\'un certain niveau, Stockfish reprend la main dans QUATRE cas seulement — un mat en un ou deux, une finale à peu de pièces, une répétition en position gagnée, et le cas où le modèle ne répond pas. En dessous de ce niveau, rater un mat fait partie du personnage.</string>
     <string name="help_safety_title">Le filet de sécurité</string>
@@ -113,6 +113,12 @@
     <string name="lab_export_pgn">PGN de toutes les parties</string>
     <string name="lab_export_csv">CSV des résultats</string>
     <string name="lab_copied">Copié</string>
+    <string name="lab_end_too_long">Partie trop longue</string>
+    <string name="lab_chess960">Chess960</string>
+    <string name="lab_chess960_sub">Stockfish seul : pas de livre d\'ouvertures ni de Maia. Les deux parties d\'une paire partent de la même position, couleurs inversées.</string>
+    <string name="lab_chess960_random">Une position différente par paire de parties</string>
+    <string name="lab_chess960_number">Numéro (0 à 959)</string>
+    <string name="lab_chess960_position">Chess960 · n° %1$d</string>
     <string name="lab_start_position">Imposer la position de départ</string>
     <string name="lab_start_position_sub">Collez un FEN ou un PGN — un PGN fait partir la série de sa position finale.</string>
     <string name="lab_start_standard">Position standard</string>
@@ -1365,6 +1371,9 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_collection_practice">S\'entraîner</string>
     <string name="puzzle_collection_redo_missed">Refaire les ratés</string>
     <string name="puzzle_collection_woodpecker">Programme Woodpecker</string>
+    <string name="puzzle_collection_export">Exporter en PGN</string>
+    <string name="puzzle_collection_exported">Collection exportée.</string>
+    <string name="puzzle_collection_export_failed">La collection n\'a pas pu être exportée.</string>
     <string name="puzzle_collection_rename">Renommer</string>
     <string name="puzzle_collection_delete">Supprimer</string>
     <string name="puzzle_collection_rename_title">Renommer la collection</string>

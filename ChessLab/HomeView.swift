@@ -1205,14 +1205,14 @@ struct HomeView: View {
                     LabHost(settings: settings, resumeState: nil, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
                     } onAnalyze: { pgn in
-                        path.append(Route.activeAnalysis(.pgn(pgn)))
+                        path.append(Self.analysisRoute(forLabPGN: pgn))
                     }
 
                 case let .resumedLab(state):
                     LabHost(settings: nil, resumeState: state, sessionKey: sessionKey(for: route)) {
                         path.removeLast()
                     } onAnalyze: { pgn in
-                        path.append(Route.activeAnalysis(.pgn(pgn)))
+                        path.append(Self.analysisRoute(forLabPGN: pgn))
                     }
 
                 case .settings:
@@ -1270,6 +1270,13 @@ struct HomeView: View {
     /// analyses de PGN différents ont des routes différentes, donc des
     /// sessions distinctes. Une seule fonction pour les douze hôtes, plutôt
     /// qu'une dérivation par type de charge utile.
+    /// Où ouvre « Analyser la dernière partie » du Laboratoire : une partie de
+    /// Chess960 va à SON analyse (le roque et la position de départ n'existent
+    /// pas pour celle des échecs classiques), les autres à l'analyse ordinaire.
+    private static func analysisRoute(forLabPGN pgn: String) -> Route {
+        pgn.contains("[Variant \"Chess960\"]") ? .activeChess960Analysis(pgn) : .activeAnalysis(.pgn(pgn))
+    }
+
     private func sessionKey(for route: Route) -> String {
         String(describing: route)
     }

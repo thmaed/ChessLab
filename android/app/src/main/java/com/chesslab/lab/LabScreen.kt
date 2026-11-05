@@ -47,6 +47,8 @@ fun LabScreen(
     startFen: String? = null,
     /** Revoir une partie de la série dans l'écran d'analyse. */
     onAnalyze: (String) -> Unit = {},
+    /** Revoir une partie de CHESS960 : sa position de départ, ses coups UCI et son résultat. */
+    onAnalyzeChess960: (startFen: String, uciLog: List<String>, result: String) -> Unit = { _, _, _ -> },
     model: LabViewModel = viewModel(),
 ) {
     val ui = model.ui
@@ -77,6 +79,13 @@ fun LabScreen(
 
             Spacer(Modifier.height(8.dp))
             StatusRow(ui.status, busy = ui.running)
+            if (ui.chess960 && ui.chess960Current != null) {
+                Text(
+                    stringResource(R.string.lab_chess960_position, ui.chess960Current),
+                    fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.textSecondary,
+                    modifier = Modifier.testTag("chess960-position"),
+                )
+            }
             Spacer(Modifier.height(8.dp))
         },
         board = {
@@ -105,9 +114,12 @@ fun LabScreen(
             Spacer(Modifier.height(12.dp))
             StartPositionField(ui, model::startFrom, model::clearStartPosition)
 
+            Spacer(Modifier.height(12.dp))
+            Chess960Field(ui, model)
+
             if (ui.completed.isNotEmpty()) {
                 Spacer(Modifier.height(12.dp))
-                ExportRow(model, onAnalyze)
+                ExportRow(model, onAnalyze, onAnalyzeChess960)
             }
 
             Spacer(Modifier.height(12.dp))
@@ -430,9 +442,54 @@ private fun StartPositionField(
     }
 }
 
+/**
+ * Chess960 : une série de positions mélangées. Remplace la position personnalisée,
+ * et passe Stockfish seul (ni livre ni personnage). Pendant de `chess960Editor`
+ * dans `LabSetupView` (iOS).
+ */
+@Composable
+private fun Chess960Field(ui: LabUiState, model: LabViewModel) {
+    var text by remember { mutableStateOf("518") }
+    Column(Modifier.fillMaxWidth()) {
+        Toggle(stringResource(R.string.lab_chess960), ui.chess960, "chess960", !ui.running, model::setChess960)
+        if (ui.chess960) {
+            Text(
+                stringResource(R.string.lab_chess960_sub),
+                fontSize = 10.sp, color = Palette.textTertiary,
+                modifier = Modifier.padding(top = 2.dp),
+            )
+            Toggle(
+                stringResource(R.string.lab_chess960_random), ui.chess960Number == null, "chess960-hasard", !ui.running,
+            ) { random ->
+                model.setChess960Number(if (random) null else text.toIntOrNull() ?: 518)
+            }
+            if (ui.chess960Number != null) {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = { input ->
+                        text = input.filter { it.isDigit() }.take(3)
+                        model.setChess960Number(text.toIntOrNull() ?: 518)
+                    },
+                    label = { Text(stringResource(R.string.lab_chess960_number)) },
+                    singleLine = true,
+                    enabled = !ui.running,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                    ),
+                    modifier = Modifier.fillMaxWidth().testTag("chess960-numero"),
+                )
+            }
+        }
+    }
+}
+
 /** Exporter la série : le PGN de toutes les parties, ou le CSV des résultats. */
 @Composable
-private fun ExportRow(model: LabViewModel, onAnalyze: (String) -> Unit) {
+private fun ExportRow(
+    model: LabViewModel,
+    onAnalyze: (String) -> Unit,
+    onAnalyzeChess960: (String, List<String>, String) -> Unit,
+) {
     val context = LocalContext.current
     val clipboard = LocalClipboardManager.current
     val chooserTitle = stringResource(R.string.lab_export)
@@ -465,7 +522,15 @@ private fun ExportRow(model: LabViewModel, onAnalyze: (String) -> Unit) {
         if (model.ui.completed.isNotEmpty()) {
             Spacer(Modifier.height(8.dp))
             SmallPill(stringResource(R.string.lab_analyse_last), "analyser-derniere") {
-                model.lastGamePgn().takeIf { it.isNotEmpty() }?.let(onAnalyze)
+                val last = model.ui.completed.lastOrNull()
+                val start = last?.chess960StartFen
+                if (last != null && start != null) {
+                    // Une partie de Chess960 va à SON analyse : le roque et la position de
+                    // départ n'existent pas dans celle des échecs classiques.
+                    onAnalyzeChess960(start, last.chess960Moves.orEmpty().split(" ").filter { it.isNotEmpty() }, last.pgnResult)
+                } else {
+                    model.lastGamePgn().takeIf { it.isNotEmpty() }?.let(onAnalyze)
+                }
             }
         }
     }

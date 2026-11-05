@@ -11,6 +11,11 @@ struct LabSetupView: View {
     @State private var settings: LabGameSettings
     @State private var resumable: LabSeriesState?
     @State private var useCustomFEN: Bool
+    /// Une série de Chess960 : un choix ponctuel comme la position, donc jamais mémorisé.
+    @State private var chess960On = false
+    /// Une position différente à chaque paire de parties, ou un numéro fixe.
+    @State private var chess960Random = true
+    @State private var chess960Text = "518"
     @State private var fenText: String
     @State private var fenError = false
     @State private var showPositionEditor = false
@@ -93,9 +98,18 @@ struct LabSetupView: View {
                 SettingsSection(title: "Départ", systemImage: "flag.fill", tint: Theme.rose) {
                     VStack(alignment: .leading, spacing: 12) {
                         ToggleRow(label: "Position personnalisée", isOn: $useCustomFEN.animation())
+                            .onChange(of: useCustomFEN) { _, on in if on { chess960On = false } }
 
                         if useCustomFEN {
                             customPositionEditor
+                        }
+
+                        ToggleRow(label: "Chess960", isOn: $chess960On.animation())
+                            .accessibilityIdentifier("labChess960Toggle")
+                            .onChange(of: chess960On) { _, on in if on { useCustomFEN = false } }
+
+                        if chess960On {
+                            chess960Editor
                         }
                     }
                 }
@@ -347,13 +361,68 @@ struct LabSetupView: View {
 
         var launched = settings
         launched.startFEN = useCustomFEN ? trimmedFEN : nil
+        if chess960On {
+            launched.chess960Enabled = true
+            launched.chess960Number = chess960Random ? nil : Self.chess960Number(from: chess960Text)
+            // La graine est fixée ICI et sauvegardée avec la série : une reprise rejoue les mêmes positions.
+            launched.chess960Seed = UInt64.random(in: 0...UInt64.max)
+        }
 
-        // On mémorise tout SAUF la position : voir l'init.
+        // On mémorise tout SAUF la position et le choix Chess960 : voir l'init.
         var persisted = launched
         persisted.startFEN = nil
+        persisted.chess960Enabled = nil
+        persisted.chess960Number = nil
+        persisted.chess960Seed = nil
         LabSettingsStore.save(persisted)
         LabAutosaveStore.clear()
         onStart(launched)
+    }
+
+    /// Le numéro saisi, ramené à 0…959 (518 quand le champ est vide ou illisible).
+    static func chess960Number(from text: String) -> Int {
+        min(max(Int(text.trimmingCharacters(in: .whitespaces)) ?? 518, 0), 959)
+    }
+
+    /// Chess960 : une position pour chaque paire de parties, ou toujours la même.
+    @ViewBuilder
+    private var chess960Editor: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Stockfish seul : pas de livre d'ouvertures ni de Maia. Les deux parties d'une paire partent de la même position, couleurs inversées.")
+                .font(.caption)
+                .foregroundStyle(Theme.textTertiary)
+            ToggleRow(label: "Une position différente par paire de parties", isOn: $chess960Random.animation())
+                .accessibilityIdentifier("labChess960Random")
+            if !chess960Random {
+                HStack {
+                    Text("Numéro (0 à 959)")
+                        .foregroundStyle(Theme.textPrimary)
+                    Spacer()
+                    TextField("518", text: $chess960Text)
+                        .keyboardType(.numberPad)
+                        .multilineTextAlignment(.trailing)
+                        .frame(width: 80)
+                        .accessibilityIdentifier("labChess960Number")
+                }
+                if let game = Chess960Game(number: Self.chess960Number(from: chess960Text)) {
+                    ChessBoardView(
+                        board: game.board,
+                        orientation: .white,
+                        theme: boardTheme,
+                        selectedSquare: nil,
+                        legalTargetSquares: [],
+                        lastMove: nil,
+                        hintMoves: [],
+                        interactionEnabled: false,
+                        showCoordinates: false,
+                        onTapSquare: { _ in },
+                        onDropPiece: { _, _ in }
+                    )
+                    .frame(width: 180, height: 180)
+                    .frame(maxWidth: .infinity)
+                }
+            }
+        }
     }
 
     /// Éditeur/scanner en FEUILLE, qui RAPPORTE sa position dans le champ :
@@ -443,15 +512,18 @@ struct LabSetupView: View {
             }
             Slider(value: elo, in: EngineStrength.sliderRange, step: 10)
                 .tint(tint)
-            FlowLayout(spacing: 8, lineSpacing: 8) {
-                ChipButton(label: "Livre d'ouvertures", systemImage: "book.closed", isSelected: bookOn.wrappedValue) {
-                    bookOn.wrappedValue.toggle()
-                }
-                // Le camp joue Camille (Maia-3) avec son filet Stockfish, au
-                // lieu de Stockfish bridé : c'est ainsi qu'un personnage se
-                // mesure contre l'étalon.
-                ChipButton(label: "Maia (réseau)", systemImage: "person.crop.circle", isSelected: isMaia) {
-                    profileID.wrappedValue = isMaia ? nil : OpponentProfile.maia.id
+            // En Chess960, ni livre (aucune théorie) ni Maia (échecs classiques seulement).
+            if !chess960On {
+                FlowLayout(spacing: 8, lineSpacing: 8) {
+                    ChipButton(label: "Livre d'ouvertures", systemImage: "book.closed", isSelected: bookOn.wrappedValue) {
+                        bookOn.wrappedValue.toggle()
+                    }
+                    // Le camp joue Camille (Maia-3) avec son filet Stockfish, au
+                    // lieu de Stockfish bridé : c'est ainsi qu'un personnage se
+                    // mesure contre l'étalon.
+                    ChipButton(label: "Maia (réseau)", systemImage: "person.crop.circle", isSelected: isMaia) {
+                        profileID.wrappedValue = isMaia ? nil : OpponentProfile.maia.id
+                    }
                 }
             }
         }

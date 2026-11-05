@@ -93,6 +93,70 @@ struct WoodpeckerPlanTests {
         #expect(try JSONDecoder().decode(WoodpeckerPlan.self, from: data) == plan)
     }
 
+    // MARK: Le plan tel qu'il est gardé (compressé, sous la limite d'iCloud)
+
+    /// 1 000 puzzles réalistes (FEN de 40 caractères, solution de 1 à 5 coups), `cycles` cycles bouclés.
+    private func bigPlan(cycles: Int) -> WoodpeckerPlan {
+        var generator = SeededGenerator(state: 7)
+        let big = (0..<1000).map { index in
+            WoodpeckerPlan.Item(
+                fen: "r5k1/5ppp/p7/8/8/4R3/5PPP/4R1K1 w - - 0 \(index + 1)",
+                solutionLANs: Array(["e3e8", "a8e8", "e1e8", "g8f7", "e8e7"].prefix(1 + 2 * (index % 3))),
+                themeRaw: "checkmate", phaseRaw: "endgame", rating: 800 + index, setupLAN: "a7a6"
+            )
+        }
+        var plan = WoodpeckerPlan.start(items: big, at: start, using: &generator)!
+        for cycle in 0..<cycles {
+            for step in 0..<1000 {
+                plan.record(solved: step % 5 != 0, seconds: 3.7 + Double((step * 7919) % 5300) / 100, at: start)
+            }
+            if cycle < cycles - 1 { plan.startNextCycle(at: start, using: &generator) }
+        }
+        return plan
+    }
+
+    @Test func storedDataReadsBackTheSamePlan() throws {
+        var plan = try #require(WoodpeckerPlan.start(items: items(5), at: start))
+        plan.record(solved: true, seconds: 12.5, at: start)
+        let data = try #require(plan.storedData)
+        #expect(WoodpeckerPlan(storedData: data) == plan)
+    }
+
+    @Test func aPlanWrittenBeforeCompressionStillReads() throws {
+        // Du JSON brut, comme avant : il commence par « { », jamais par l'octet nul du format compressé.
+        let plan = try #require(WoodpeckerPlan.start(items: items(5), at: start))
+        let legacy = try JSONEncoder().encode(plan)
+        #expect(legacy.first == UInt8(ascii: "{"))
+        #expect(WoodpeckerPlan(storedData: legacy) == plan)
+    }
+
+    @Test func garbageDoesNotReadAsAPlan() {
+        #expect(WoodpeckerPlan(storedData: Data([0, 1, 2, 3])) == nil)
+        #expect(WoodpeckerPlan(storedData: Data()) == nil)
+    }
+
+    @Test func theProgramKeepsItsPlanCompressedAndReadsALegacyOne() throws {
+        let plan = try #require(WoodpeckerPlan.start(items: items(20), at: start))
+        let program = WoodpeckerProgram()
+        program.plan = plan
+        #expect(program.planData?.first == 0)
+        #expect(program.plan == plan)
+        program.planData = try JSONEncoder().encode(plan)
+        #expect(program.plan == plan)
+    }
+
+    @Test func aThousandPuzzlesStayWellUnderTheCloudKitLimit() throws {
+        // Un enregistrement CloudKit pèse au plus 1 Mo : vingt cycles de 1 000 puzzles en font ~1 Mo en JSON brut (970 Ko ici, davantage avec des temps réels
+        // à longues décimales) et ~130 Ko une fois compressés.
+        let plan = bigPlan(cycles: 20)
+        let raw = try JSONEncoder().encode(plan).count
+        #expect(raw > 900_000)
+        let stored = try #require(plan.storedData).count
+        #expect(stored < 500_000)
+        #expect(stored < raw / 3)
+        #expect(WoodpeckerPlan(storedData: try #require(plan.storedData)) == plan)
+    }
+
     @Test func formatsDurations() {
         #expect(WoodpeckerPlan.formatDuration(0) == "0:00")
         #expect(WoodpeckerPlan.formatDuration(425) == "7:05")
