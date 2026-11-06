@@ -84,9 +84,18 @@ struct YOLOBoardClassifier: BoardClassifying {
             let topLeftBox = CGRect(
                 x: box.minX, y: 1 - box.maxY, width: box.width, height: box.height
             )
+            // Les autres classes que le modèle juge plausibles : de quoi
+            // proposer « cavalier ou fou ? » sur une case douteuse.
+            let alternatives = observation.labels.dropFirst()
+                .filter { Double($0.confidence) >= YOLODetectionMapper.alternativeMinimumConfidence }
+                .compactMap { label in
+                    PieceLabelResolver.resolve(label.identifier).map { PieceChoice(color: $0.color, kind: $0.kind) }
+                }
+                .prefix(YOLODetectionMapper.maximumAlternatives)
             return YOLODetectionMapper.Detection(
                 color: piece.color, kind: piece.kind,
-                confidence: Double(top.confidence), boundingBox: topLeftBox
+                confidence: Double(top.confidence), boundingBox: topLeftBox,
+                alternatives: Array(alternatives)
             )
         }
 
@@ -109,7 +118,14 @@ enum YOLODetectionMapper {
         /// Boîte normalisée 0...1, **origine en haut à gauche** (déjà
         /// convertie depuis Vision).
         let boundingBox: CGRect
+        /// Les autres classes plausibles de cette boîte, de la plus sûre à la moins sûre.
+        var alternatives: [PieceChoice] = []
     }
+
+    /// Score minimal d'une classe pour être proposée en alternative.
+    static let alternativeMinimumConfidence = 0.05
+    /// Nombre d'alternatives gardées par case.
+    static let maximumAlternatives = 2
 
     /// Confiance attribuée à une case laissée VIDE (aucune détection dessus).
     /// L'absence n'est pas une preuve — une pièce ratée ressemble à une case
@@ -163,7 +179,8 @@ enum YOLODetectionMapper {
             confidence[row][column] = detection.confidence
             grid[row][column] = SquareReading(
                 occupancy: .piece(color: detection.color, kind: detection.kind),
-                confidence: calibrated(detection.confidence)
+                confidence: calibrated(detection.confidence),
+                alternatives: detection.alternatives
             )
         }
 

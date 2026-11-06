@@ -43,7 +43,8 @@ enum BoardConsistency {
                 guard suspects.contains(Cell(row: row, column: column)) else { return reading }
                 return SquareReading(
                     occupancy: reading.occupancy,
-                    confidence: min(reading.confidence, violationConfidence)
+                    confidence: min(reading.confidence, violationConfidence),
+                    alternatives: reading.alternatives
                 )
             }
         }

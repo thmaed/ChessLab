@@ -11048,3 +11048,12 @@ et lit 64/64. Écart inscrit dans `android/PARITE.md`, tolérance `androidMaxSil
 **Limites.** Les dégradations sont synthétiques : aucune vraie photo d'écran n'a été mesurée. Sur
 Galaxy A16 : 4 captures `lichess_ui_*` + 3 photos simulées lues, `ScannerPipelineTest` 3/3.
 
+## 06/11 (nuit) — Scanner : revue des cases douteuses (iOS + Android)
+
+Premier lot « UX du scanner » : (1) la vignette de l'image d'origine à côté de chaque case douteuse, (2) la
+deuxième hypothèse du détecteur proposée d'un tap (« cavalier ou fou ? », « case vide »), (3) le parcours des
+cases douteuses une par une, les moins sûres d'abord, (4) le trait deviné quand un roi est en échec.
+`ScanReviewSection` (iOS), `ScanReviewPanel` (Android), `SquareReading.alternatives`, `PieceChoice`,
+`reviewSquares`, `suggestedSideToMove`, `PositionEditorViewModel.place` / `EditorActions.place`. Tests :
+`ScanReviewTests` (iOS), `ScanCrossCheckTest`, `BoardReaderTest`, `ScannerReviewTest` (Android).
+

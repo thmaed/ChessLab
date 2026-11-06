@@ -115,6 +115,19 @@ final class PositionEditorViewModel {
         boardDidChange()
     }
 
+    /// Pose une pièce sur une case — ou la retire si `piece` est `nil` — sans
+    /// passer par l'outil actif de la palette. Sert à la revue des cases
+    /// douteuses du scanner, où l'on choisit la lecture d'une case précise.
+    func place(_ piece: (kind: Piece.Kind, color: Piece.Color)?, at square: Square) {
+        unknownPieces[square] = nil
+        if let piece {
+            pieces[square] = Piece(piece.kind, color: piece.color, square: square)
+        } else {
+            pieces[square] = nil
+        }
+        boardDidChange()
+    }
+
     func clearBoard() {
         pieces = [:]
         unknownPieces = [:]

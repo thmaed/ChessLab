@@ -12,23 +12,45 @@ import SwiftUI
 struct ScanConfirmationView: View {
     let reading: BoardScanReading
     @Binding var rotation: BoardReadingRotation
+    /// Les 64 vignettes de l'image d'origine, `[ligne][colonne]`, avant toute
+    /// rotation : de quoi montrer, à côté d'une case douteuse, ce que l'image
+    /// contient vraiment.
+    var squareImages: [[CGImage]]? = nil
     let exit: PositionEditorExit
     let onBackToCrop: () -> Void
 
+    /// Les cases douteuses déjà passées en revue, et celle qu'on regarde.
+    @State private var reviewed: Set<Square> = []
+    @State private var focusedIndex = 0
+
+    /// Les cases douteuses restant à vérifier, les moins sûres d'abord.
+    private var pending: [Square] {
+        reading.reviewSquares(rotation: rotation).filter { !reviewed.contains($0) }
+    }
+
+    private var focusedSquare: Square? {
+        let squares = pending
+        guard !squares.isEmpty else { return nil }
+        return squares[min(focusedIndex, squares.count - 1)]
+    }
+
     var body: some View {
         PositionEditorView(
-            // Trait aux blancs par défaut (le prompt) : il n'est JAMAIS
-            // déductible d'une image. C'est ensuite la section « Trait » de
+            // Le trait ne se lit JAMAIS sur une image, mais un roi en échec le
+            // trahit (``BoardScanReading/suggestedSideToMove(rotation:)``) ;
+            // sans indice, les Blancs. C'est ensuite la section « Trait » de
             // l'éditeur qui fait autorité — un second contrôle ici créerait
             // deux sources de vérité pour la même donnée.
-            initialFEN: reading.fen(rotation: rotation, sideToMove: .white),
+            initialFEN: reading.fen(rotation: rotation, sideToMove: reading.suggestedSideToMove(rotation: rotation)),
             exit: exit,
             title: "Vérifier la position",
-            lowConfidenceSquares: reading.lowConfidenceSquares(rotation: rotation),
-            unknownPieces: reading.unknownPieces(rotation: rotation)
+            lowConfidenceSquares: Set(pending),
+            unknownPieces: reading.unknownPieces(rotation: rotation),
+            focusedSquare: focusedSquare
         ) { vm in
             VStack(alignment: .leading, spacing: 12) {
                 kindCompletionSection(vm)
+                reviewSection(vm)
                 confidenceBanner
                 rotationControls
             }
@@ -38,6 +60,51 @@ struct ScanConfirmationView: View {
                 Button("Recadrer", action: onBackToCrop)
             }
         }
+        // Une rotation relit tout : les cases vérifiées ne sont plus les mêmes.
+        .onChange(of: rotation) { _, _ in
+            reviewed = []
+            focusedIndex = 0
+        }
+    }
+
+    // MARK: Revue des cases douteuses
+
+    @ViewBuilder
+    private func reviewSection(_ vm: PositionEditorViewModel) -> some View {
+        let squares = pending
+        if let square = focusedSquare, let current = reading.squares(rotation: rotation)[square] {
+            let index = min(focusedIndex, squares.count - 1)
+            ScanReviewSection(
+                square: square, reading: current,
+                image: thumbnail(of: square),
+                remaining: squares.count, position: index + 1,
+                onChoose: { choice in
+                    withAnimation(Theme.gentle) { vm.place(choice, at: square) }
+                    resolve(square)
+                },
+                onKeep: { resolve(square) },
+                onPrevious: { focusedIndex = (index - 1 + squares.count) % squares.count },
+                onNext: { focusedIndex = (index + 1) % squares.count }
+            )
+        }
+    }
+
+    /// La case est réglée : on passe à la suivante (la liste raccourcit, l'indice pointe déjà dessus).
+    private func resolve(_ square: Square) {
+        withAnimation(Theme.gentle) { _ = reviewed.insert(square) }
+        focusedIndex = min(focusedIndex, max(pending.count - 1, 0))
+    }
+
+    /// La vignette de l'image d'origine pour une case de l'échiquier, une fois
+    /// la rotation de lecture appliquée.
+    private func thumbnail(of square: Square) -> CGImage? {
+        guard let squareImages else { return nil }
+        let rotated = BoardScanReading.rotate(squareImages, quarterTurns: rotation.rawValue)
+        let row = 8 - square.rank.value
+        guard let column = Square.File.allCases.firstIndex(of: square.file),
+              rotated.indices.contains(row), rotated[row].indices.contains(column)
+        else { return nil }
+        return rotated[row][column]
     }
 
     // MARK: Complétion assistée des types (plateau réel)
@@ -90,8 +157,11 @@ struct ScanConfirmationView: View {
 
     // MARK: Confiance
 
-    private var lowConfidenceCount: Int {
-        reading.lowConfidenceSquares(rotation: rotation).count
+    private var lowConfidenceCount: Int { pending.count }
+
+    /// Des cases ont été signalées au départ et toutes ont été passées en revue.
+    private var allReviewed: Bool {
+        !reviewed.isEmpty && pending.isEmpty
     }
 
     @ViewBuilder
@@ -108,6 +178,15 @@ struct ScanConfirmationView: View {
             .cardStyle(padding: 12)
             .accessibilityIdentifier("scanLowConfidenceBanner")
             .accessibilityElement(children: .combine)
+        } else if allReviewed {
+            Label("Toutes les cases douteuses ont été vérifiées — relisez le plateau une dernière fois.", systemImage: "checkmark.circle.fill")
+                .font(.caption)
+                .foregroundStyle(Theme.accent)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .cardStyle(padding: 12)
+                .accessibilityIdentifier("scanReviewedBanner")
+                .accessibilityElement(children: .combine)
         } else {
             Label("Toutes les cases ont été lues avec certitude — vérifiez tout de même.", systemImage: "checkmark.circle.fill")
                 .font(.caption)

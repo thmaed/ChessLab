@@ -2008,3 +2008,21 @@ libellés, même parcours (Puzzles → Mes collections).
       assouplit les seuils des gabarits pour une photo (0,32 / 0,05 au lieu de 0,45 / 0,035). Android n'a qu'un
       seul chemin : toujours les seuils d'une capture. Sans conséquence sur les fixtures ; à mesurer sur de vraies
       photos d'écran avant d'y toucher.
+
+## 06/11 (nuit) — Scanner : revue des cases douteuses, deuxième hypothèse, trait deviné — FAIT des deux côtés
+
+- [x] **Revue des cases douteuses** : une case à la fois (les moins sûres d'abord), avec la VIGNETTE de l'image
+      d'origine à côté de la lecture, flèches précédente / suivante, la case cernée sur le plateau.
+      iOS `ScanReviewSection` ; Android `ScanReviewPanel`. Les cases passées en revue cessent d'être surlignées ;
+      une rotation de lecture repart de zéro.
+- [x] **Deuxième hypothèse** : sur une case douteuse, on propose les autres classes plausibles du détecteur
+      (jusqu'à 2, score ≥ 0,05) ; quand le second avis (gabarits) contredit, sa lecture passe EN PREMIER. Choix
+      d'un tap : « C'est bien ça », une alternative, ou « Case vide ». `SquareReading.alternatives` (iOS,
+      Android) ; Android ajoute aussi la détection perdante d'une même case (sa NMS est par classe).
+- [x] **Trait deviné** : un roi en échec trahit le camp au trait ; si un seul des deux traits donne une position
+      légale, c'est lui, sinon les Blancs. `suggestedSideToMove`. L'éditeur fait toujours autorité.
+- [x] Tests : iOS `ScanReviewTests` (10) ; Android JVM `ScanCrossCheckTest`, `BoardReaderTest`, et instrumenté
+      `ScannerReviewTest` — verts sur Galaxy A16 (SM-A165F). Libellés FR/EN des deux côtés.
+- [ ] **À regarder sur appareil** : la mise en page de la revue sur iPhone (iOS vérifié par tests unitaires et
+      compilation, pas encore à l'œil sur écran) et sur le Galaxy A16.
+

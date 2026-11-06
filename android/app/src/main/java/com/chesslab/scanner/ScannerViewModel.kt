@@ -12,6 +12,8 @@ import androidx.lifecycle.viewModelScope
 import chesskit.Piece
 import chesskit.Square
 import com.chesslab.vision.BoardAutoFrame
+import com.chesslab.vision.BoardGridFinder
+import com.chesslab.vision.BoardRectifier
 import com.chesslab.vision.BoardReader
 import com.chesslab.vision.Homography
 import com.chesslab.vision.PieceDetector
@@ -33,14 +35,35 @@ data class ScannerUiState(
     /** La lecture des 64 cases, et l'orientation retenue pour la lire. */
     val reading: ScanReading? = null,
     val rotation: ScanRotation = ScanRotation.none,
+    /** L'image redressée et sa grille : de quoi montrer la vignette d'origine d'une case douteuse. */
+    val board: Bitmap? = null,
+    val boardGrid: BoardGridFinder.Grid? = null,
     val busy: Boolean = false,
     val status: String = "",
 ) {
     /**
-     * La FEN à confirmer. Trait aux Blancs par défaut : il n'est JAMAIS
-     * déductible d'une image, et c'est l'éditeur qui fait ensuite autorité.
+     * La FEN à confirmer. Le trait ne se lit JAMAIS sur une image, mais un roi
+     * en échec le trahit (`ScanReading.suggestedSideToMove`) ; sans indice, les
+     * Blancs. C'est l'éditeur qui fait ensuite autorité.
      */
-    val fen: String? get() = reading?.fen(rotation, Piece.Color.white)
+    val fen: String? get() = reading?.let { it.fen(rotation, it.suggestedSideToMove(rotation)) }
+
+    /** Les cases à passer en revue, les moins sûres d'abord. */
+    val reviewSquares: List<Square> get() = reading?.reviewSquares(rotation).orEmpty()
+
+    /**
+     * La vignette d'origine d'une case de l'échiquier, une fois la rotation de
+     * lecture appliquée. `null` si l'image redressée n'est plus là.
+     */
+    fun thumbnail(square: Square): Bitmap? {
+        val board = board ?: return null
+        val grid = boardGrid ?: return null
+        val row = 8 - square.rank.value
+        val column = square.file.number - 1
+        // Un demi-tour : la case (r, c) de l'échiquier vient de (7 − r, 7 − c) dans l'image.
+        val (r, c) = if (rotation == ScanRotation.half) (7 - row) to (7 - column) else row to column
+        return BoardRectifier.squareBitmap(board, grid, r, c)
+    }
 
     /** Les cases à surligner : celles dont la lecture est douteuse. */
     val lowConfidence: Set<Square> get() = reading?.lowConfidenceSquares(rotation).orEmpty()
@@ -146,6 +169,8 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
             stage = ScanStage.confirm,
             reading = reading,
             rotation = rotation,
+            board = result.board,
+            boardGrid = result.grid,
             status = q(R.plurals.scan_pieces, count, count) +
                 (if (uncertain > 0) " · " + q(R.plurals.scan_uncertain, uncertain, uncertain) else ""),
         )
@@ -155,5 +180,5 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
     fun flipReading() { ui = ui.copy(rotation = ui.rotation.flipped) }
 
     /** Retour au cadrage : la lecture est jetée, l'image et les coins restent. */
-    fun backToCrop() { ui = ui.copy(stage = ScanStage.adjustCrop, reading = null) }
+    fun backToCrop() { ui = ui.copy(stage = ScanStage.adjustCrop, reading = null, board = null, boardGrid = null) }
 }

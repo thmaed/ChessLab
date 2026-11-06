@@ -25,12 +25,23 @@ enum SquareOccupancy: Equatable {
     var isEmpty: Bool { self == .empty }
 }
 
+/// Une pièce possible sur une case : couleur et type.
+struct PieceChoice: Equatable, Hashable {
+    let color: Piece.Color
+    let kind: Piece.Kind
+}
+
 /// Lecture d'une case, avec sa confiance.
 struct SquareReading: Equatable {
     var occupancy: SquareOccupancy
     /// 0...1. Sert à surligner les cases douteuses à la confirmation plutôt
     /// qu'à les corriger en silence.
     var confidence: Double
+    /// Les autres lectures plausibles de cette case, de la plus à la moins
+    /// probable (jamais celle de `occupancy`). Elles ne changent RIEN à la
+    /// lecture : elles servent à la confirmation, qui propose « Cavalier ou
+    /// fou ? » sur une case douteuse au lieu de rouvrir toute la palette.
+    var alternatives: [PieceChoice] = []
 
     static let empty = SquareReading(occupancy: .empty, confidence: 1)
 

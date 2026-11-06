@@ -1386,4 +1386,28 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="puzzle_collection_delete_title">Delete the collection “%1$s”?</string>
     <string name="puzzle_collection_delete_body">Its puzzles are removed from this device. The original file is not touched.</string>
     <string name="puzzle_collection_programme_running">A programme is already running. Stop it first to start another.</string>
+
+    <!-- Revue des cases douteuses du scanner (06/11/2026) — pendant de ScanReviewSection (iOS) -->
+    <string name="scan_review_title">Squares to check</string>
+    <string name="scan_review_square">Square %1$s — %2$d of %3$d</string>
+    <string name="scan_review_read">Read: %1$s</string>
+    <string name="scan_review_keep">That\'s right</string>
+    <string name="scan_review_keep_empty">Empty, that\'s right</string>
+    <string name="scan_review_empty">Empty square</string>
+    <string name="scan_review_prev">Previous square</string>
+    <string name="scan_review_next">Next square</string>
+    <string name="scan_read_empty_name">empty square</string>
+    <string name="scan_reviewed_banner">All doubtful squares have been checked — read the board over one last time.</string>
+    <string name="scan_piece_white_pawn">White pawn</string>
+    <string name="scan_piece_white_knight">White knight</string>
+    <string name="scan_piece_white_bishop">White bishop</string>
+    <string name="scan_piece_white_rook">White rook</string>
+    <string name="scan_piece_white_queen">White queen</string>
+    <string name="scan_piece_white_king">White king</string>
+    <string name="scan_piece_black_pawn">Black pawn</string>
+    <string name="scan_piece_black_knight">Black knight</string>
+    <string name="scan_piece_black_bishop">Black bishop</string>
+    <string name="scan_piece_black_rook">Black rook</string>
+    <string name="scan_piece_black_queen">Black queen</string>
+    <string name="scan_piece_black_king">Black king</string>
 </resources>

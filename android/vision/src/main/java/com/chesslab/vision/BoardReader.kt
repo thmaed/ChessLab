@@ -2,6 +2,9 @@ package com.chesslab.vision
 
 import chesskit.Piece
 
+/** Une pièce possible sur une case : couleur et type (`PieceChoice`, iOS). */
+data class PieceChoice(val color: Piece.Color, val kind: Piece.Kind)
+
 /** Une pièce détectée sur le plateau redressé. */
 data class Detection(
     val color: Piece.Color,
@@ -12,12 +15,24 @@ data class Detection(
     val top: Double,
     val right: Double,
     val bottom: Double,
+    /** Les autres classes plausibles de cette boîte, de la plus à la moins sûre. */
+    val alternatives: List<PieceChoice> = emptyList(),
 ) {
     val midX: Double get() = (left + right) / 2
 }
 
-/** Ce qu'on lit sur une case. */
-data class SquareReading(val piece: Piece.Kind?, val color: Piece.Color?, val confidence: Double) {
+/**
+ * Ce qu'on lit sur une case. [alternatives] : les autres lectures plausibles,
+ * de la plus à la moins probable (jamais celle de la case). Elles ne changent
+ * RIEN à la lecture : la confirmation les propose, au lieu de rouvrir toute la
+ * palette.
+ */
+data class SquareReading(
+    val piece: Piece.Kind?,
+    val color: Piece.Color?,
+    val confidence: Double,
+    val alternatives: List<PieceChoice> = emptyList(),
+) {
     val isEmpty: Boolean get() = piece == null
 }
 
@@ -62,10 +77,17 @@ object BoardReader {
 
     private const val HALF_CELL = 1.0 / 16
 
+    /** Nombre d'alternatives gardées par case (`YOLODetectionMapper.maximumAlternatives`, iOS). */
+    const val MAX_ALTERNATIVES = 2
+
     /** La grille `[ligne][colonne]`, ligne 0 en HAUT de l'image. */
     fun grid(detections: List<Detection>): Array<Array<SquareReading>> {
         val grid = Array(8) { Array(8) { SquareReading(null, null, 0.0) } }
         val best = Array(8) { DoubleArray(8) }
+
+        // Les détections perdantes d'une case (une autre classe au même endroit)
+        // sont ses premières alternatives : le détecteur hésite entre deux pièces.
+        val losers = Array(8) { Array(8) { ArrayList<Detection>() } }
 
         for (detection in detections) {
             // La pièce « pose » près du BAS de sa boîte : on l'ancre sur le bas
@@ -76,9 +98,30 @@ object BoardReader {
             val column = clamp((detection.midX * 8).toInt())
             val row = clamp(((detection.bottom - HALF_CELL) * 8).toInt())
 
-            if (detection.confidence <= best[row][column]) continue
+            if (detection.confidence <= best[row][column]) { losers[row][column] += detection; continue }
+            // L'ancienne gagnante passe côté perdantes.
+            val previous = grid[row][column]
+            if (!previous.isEmpty) {
+                losers[row][column] += Detection(
+                    previous.color!!, previous.piece!!, best[row][column], 0.0, 0.0, 0.0, 0.0,
+                )
+            }
             best[row][column] = detection.confidence
-            grid[row][column] = SquareReading(detection.kind, detection.color, calibrated(detection.confidence))
+            grid[row][column] = SquareReading(
+                detection.kind, detection.color, calibrated(detection.confidence),
+                alternatives = detection.alternatives,
+            )
+        }
+
+        for (row in 0 until 8) for (column in 0 until 8) {
+            val winner = grid[row][column]
+            if (winner.isEmpty) continue
+            val choices = (losers[row][column].sortedByDescending { it.confidence }.map { PieceChoice(it.color, it.kind) } +
+                winner.alternatives)
+                .filter { !(it.kind == winner.piece && it.color == winner.color) }
+                .distinct()
+                .take(MAX_ALTERNATIVES)
+            grid[row][column] = winner.copy(alternatives = choices)
         }
 
         for (row in 0 until 8) {

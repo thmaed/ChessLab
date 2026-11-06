@@ -24,6 +24,9 @@ class PieceDetector private constructor(private val session: OrtSession) {
         private const val CONF = 0.25f
         private const val IOU = 0.7f
 
+        /** Score minimal d'une classe pour être proposée en alternative (iOS : 0,05). */
+        private const val ALTERNATIVE_MIN = 0.05f
+
         /** L'ordre des classes du dataset — le contrat entre le modèle et l'app. */
         private val labels = listOf(
             Piece.Color.white to Piece.Kind.pawn,
@@ -147,9 +150,16 @@ class PieceDetector private constructor(private val session: OrtSession) {
             val cy = raw[1][a].toDouble() / SIZE
             val w = raw[2][a].toDouble() / SIZE
             val hh = raw[3][a].toDouble() / SIZE
+            // Les autres classes que le modèle juge plausibles pour cette boîte.
+            val alternatives = (0 until classes)
+                .filter { it != bestClass && raw[4 + it][a] >= ALTERNATIVE_MIN }
+                .sortedByDescending { raw[4 + it][a] }
+                .take(BoardReader.MAX_ALTERNATIVES)
+                .map { PieceChoice(labels[it].first, labels[it].second) }
             kept += Detection(
                 color, kind, bestScore.toDouble(),
                 left = cx - w / 2, top = cy - hh / 2, right = cx + w / 2, bottom = cy + hh / 2,
+                alternatives = alternatives,
             )
         }
         kept.sortByDescending { it.confidence }

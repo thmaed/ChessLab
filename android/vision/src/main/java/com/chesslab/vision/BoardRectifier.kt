@@ -105,4 +105,17 @@ object BoardRectifier {
                 )
             }
         }
+
+    /**
+     * La vignette COULEUR de la case ([row], [column]) de [board] (l'image
+     * redressée), pour la revue des cases douteuses : ce que l'image contient
+     * vraiment, à côté de ce qu'on en a lu. Mêmes bornes que [patches].
+     */
+    fun squareBitmap(board: Bitmap, grid: BoardGridFinder.Grid, row: Int, column: Int): Bitmap? {
+        val x0 = floor(grid.columns[column]).toInt().coerceIn(0, board.width - 1)
+        val y0 = floor(grid.rows[row]).toInt().coerceIn(0, board.height - 1)
+        val x1 = ceil(grid.columns[column + 1]).toInt().coerceIn(x0 + 1, board.width)
+        val y1 = ceil(grid.rows[row + 1]).toInt().coerceIn(y0 + 1, board.height)
+        return runCatching { Bitmap.createBitmap(board, x0, y0, x1 - x0, y1 - y0) }.getOrNull()
+    }
 }

@@ -3,6 +3,7 @@ package com.chesslab.scanner
 import chesskit.Piece
 import chesskit.Square
 import com.chesslab.editor.FenValidator
+import com.chesslab.vision.PieceChoice
 import com.chesslab.vision.SquareReading
 
 /**
@@ -38,6 +39,29 @@ class ScanReading(val grid: Array<Array<SquareReading>>) {
             out[Square(Square.File(column + 1), Square.Rank(8 - row))] = rotated[row][column]
         }
         return out
+    }
+
+    /**
+     * Les cases à passer en revue, les MOINS sûres d'abord (à égalité, dans
+     * l'ordre du plateau : 8e rangée vers la 1re, colonne a vers h).
+     * Pendant de `BoardScanReading.reviewSquares` (iOS).
+     */
+    fun reviewSquares(rotation: ScanRotation): List<Square> {
+        val flagged = squares(rotation).filterValues { !it.isConfident }
+        return flagged.keys.sortedWith(
+            compareBy<Square>({ flagged.getValue(it).confidence }, { -it.rank.value }, { it.file.number })
+        )
+    }
+
+    /**
+     * Trait à proposer par défaut. Une image ne le dit JAMAIS — mais un roi en
+     * échec le trahit : seul le camp au trait peut être en échec. Si exactement
+     * un des deux traits donne une position légale, c'est celui-là ; sinon les
+     * Blancs. L'utilisateur garde la main (`BoardScanReading.suggestedSideToMove`, iOS).
+     */
+    fun suggestedSideToMove(rotation: ScanRotation): Piece.Color {
+        val legal = Piece.Color.entries.filter { FenValidator.isLegal(fen(rotation, it)) }
+        return if (legal.size == 1) legal[0] else Piece.Color.white
     }
 
     fun pieces(rotation: ScanRotation): Map<Square, Piece> {
@@ -138,7 +162,13 @@ class ScanReading(val grid: Array<Array<SquareReading>>) {
                 val theirs = other.grid[row][column]
                 val agree = theirs.piece == mine.piece && theirs.color == mine.color
                 if (theirs.confidence < CONFIDENCE_THRESHOLD || agree) mine
-                else mine.copy(confidence = minOf(mine.confidence, CROSS_CHECK_CONFIDENCE))
+                else {
+                    // Ce que lit le second avis devient la PREMIÈRE alternative
+                    // proposée : c'est la contradiction qui a fait douter.
+                    val theirChoice = theirs.piece?.let { kind -> theirs.color?.let { PieceChoice(it, kind) } }
+                    val alternatives = listOfNotNull(theirChoice) + mine.alternatives.filter { it != theirChoice }
+                    mine.copy(confidence = minOf(mine.confidence, CROSS_CHECK_CONFIDENCE), alternatives = alternatives)
+                }
             }
         }
         return ScanReading(merged)

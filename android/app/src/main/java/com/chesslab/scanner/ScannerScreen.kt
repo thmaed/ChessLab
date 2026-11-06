@@ -214,24 +214,54 @@ private fun CornerPicker(
  */
 @Composable
 private fun ScanConfirmation(ui: ScannerUiState, model: ScannerViewModel, onAnalyse: (String) -> Unit) {
-    val uncertain = ui.lowConfidence.size
+    // Les cases douteuses déjà passées en revue, et celle qu'on regarde. Une
+    // nouvelle lecture ou une rotation relit tout : on repart de zéro.
+    var reviewed by remember(ui.reading, ui.rotation) { mutableStateOf(emptySet<chesskit.Square>()) }
+    var focusedIndex by remember(ui.reading, ui.rotation) { mutableStateOf(0) }
+    val pending = ui.reviewSquares.filter { it !in reviewed }
+    val index = if (pending.isEmpty()) 0 else focusedIndex.coerceIn(0, pending.size - 1)
+    val focus = pending.getOrNull(index)
+    val uncertain = pending.size
+    val allReviewed = reviewed.isNotEmpty() && pending.isEmpty()
+
     com.chesslab.editor.PositionEditorScreen(
         initialFen = ui.fen,
-        marked = ui.lowConfidence,
+        marked = pending.toSet(),
+        focused = focus,
         onBack = model::backToCrop,
         backLabel = "‹ " + stringResource(R.string.scan_recrop),
         onAnalyse = onAnalyse,
-        extra = {
+        extra = { editor ->
             Text(
                 stringResource(R.string.scan_confirm_title),
                 fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
                 color = Palette.textPrimary,
             )
             Spacer(Modifier.height(8.dp))
-            // La bannière de confiance : combien de cases méritent un regard.
+            // La revue : une case douteuse à la fois, avec sa vignette d'origine.
+            val current = focus?.let { ui.reading?.squares(ui.rotation)?.get(it) }
+            if (focus != null && current != null) {
+                ScanReviewPanel(
+                    square = focus, reading = current,
+                    thumbnail = remember(focus, ui.rotation, ui.board) { ui.thumbnail(focus) },
+                    remaining = pending.size, position = index + 1,
+                    onChoose = { choice ->
+                        editor.place(focus, choice?.let { chesskit.Piece(it.kind, it.color, focus) })
+                        reviewed = reviewed + focus
+                    },
+                    onKeep = { reviewed = reviewed + focus },
+                    onPrevious = { focusedIndex = (index - 1 + pending.size) % pending.size },
+                    onNext = { focusedIndex = (index + 1) % pending.size },
+                )
+                Spacer(Modifier.height(10.dp))
+            }
+            // La bannière de confiance : combien de cases méritent encore un regard.
             Text(
-                if (uncertain > 0) androidx.compose.ui.res.pluralStringResource(R.plurals.scan_uncertain_banner, uncertain, uncertain)
-                else stringResource(R.string.scan_confident_banner),
+                when {
+                    uncertain > 0 -> androidx.compose.ui.res.pluralStringResource(R.plurals.scan_uncertain_banner, uncertain, uncertain)
+                    allReviewed -> stringResource(R.string.scan_reviewed_banner)
+                    else -> stringResource(R.string.scan_confident_banner)
+                },
                 fontSize = 12.sp,
                 color = if (uncertain > 0) Palette.warning else Palette.accent,
                 modifier = Modifier
@@ -239,7 +269,7 @@ private fun ScanConfirmation(ui: ScannerUiState, model: ScannerViewModel, onAnal
                     .clip(RoundedCornerShape(12.dp))
                     .background(Palette.surface)
                     .padding(12.dp)
-                    .testTag(if (uncertain > 0) "banniere-incertaine" else "banniere-sure"),
+                    .testTag(if (uncertain > 0) "banniere-incertaine" else if (allReviewed) "banniere-verifiee" else "banniere-sure"),
             )
             Spacer(Modifier.height(10.dp))
             // Le sens de lecture : deux orientations plausibles, un bouton.

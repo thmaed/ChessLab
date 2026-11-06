@@ -3,6 +3,7 @@ package com.chesslab.scanner
 import android.content.Context
 import android.graphics.Bitmap
 import com.chesslab.vision.BoardConsistency
+import com.chesslab.vision.BoardGridFinder
 import com.chesslab.vision.BoardReader
 import com.chesslab.vision.BoardRectifier
 import com.chesslab.vision.Homography
@@ -21,7 +22,11 @@ import com.chesslab.vision.PieceDetector
  */
 object ScanPipeline {
 
-    class Result(val reading: ScanReading, val detections: Int)
+    /**
+     * [board] et [grid] : l'image redressée et sa grille recalée, gardées pour
+     * montrer, à la confirmation, la vignette d'origine d'une case douteuse.
+     */
+    class Result(val reading: ScanReading, val detections: Int, val board: Bitmap, val grid: BoardGridFinder.Grid)
 
     /** `null` si le modèle de reconnaissance est absent — le scanner le dit plutôt que de mentir. */
     fun read(context: Context, source: Bitmap, corners: List<Homography.Point>): Result? {
@@ -38,6 +43,6 @@ object ScanPipeline {
         val secondary = ScanReading(
             BoardConsistency.reconciled(templates.classify(BoardRectifier.patches(luminance, grid)))
         )
-        return Result(primary.crossChecked(secondary), detections.size)
+        return Result(primary.crossChecked(secondary), detections.size, rectified, grid)
     }
 }

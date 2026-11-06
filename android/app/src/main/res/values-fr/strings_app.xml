@@ -1383,4 +1383,28 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="puzzle_collection_delete_title">Supprimer la collection « %1$s » ?</string>
     <string name="puzzle_collection_delete_body">Ses puzzles sont retirés de cet appareil. Le fichier d\'origine n\'est pas touché.</string>
     <string name="puzzle_collection_programme_running">Un programme est déjà en cours. Arrêtez-le d\'abord pour en commencer un autre.</string>
+
+    <!-- Revue des cases douteuses du scanner (06/11/2026) — pendant de ScanReviewSection (iOS) -->
+    <string name="scan_review_title">Cases à vérifier</string>
+    <string name="scan_review_square">Case %1$s — %2$d sur %3$d</string>
+    <string name="scan_review_read">Lu : %1$s</string>
+    <string name="scan_review_keep">C\'est bien ça</string>
+    <string name="scan_review_keep_empty">Vide, c\'est bon</string>
+    <string name="scan_review_empty">Case vide</string>
+    <string name="scan_review_prev">Case précédente</string>
+    <string name="scan_review_next">Case suivante</string>
+    <string name="scan_read_empty_name">case vide</string>
+    <string name="scan_reviewed_banner">Toutes les cases douteuses ont été vérifiées — relisez le plateau une dernière fois.</string>
+    <string name="scan_piece_white_pawn">Pion blanc</string>
+    <string name="scan_piece_white_knight">Cavalier blanc</string>
+    <string name="scan_piece_white_bishop">Fou blanc</string>
+    <string name="scan_piece_white_rook">Tour blanche</string>
+    <string name="scan_piece_white_queen">Dame blanche</string>
+    <string name="scan_piece_white_king">Roi blanc</string>
+    <string name="scan_piece_black_pawn">Pion noir</string>
+    <string name="scan_piece_black_knight">Cavalier noir</string>
+    <string name="scan_piece_black_bishop">Fou noir</string>
+    <string name="scan_piece_black_rook">Tour noire</string>
+    <string name="scan_piece_black_queen">Dame noire</string>
+    <string name="scan_piece_black_king">Roi noir</string>
 </resources>

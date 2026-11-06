@@ -94,4 +94,26 @@ class BoardReaderTest {
             BoardReader.placement(BoardReader.grid(detections)),
         )
     }
+
+    // --- Deuxième hypothèse (pendant de ScanReviewTests, iOS) ---
+
+    @Test fun theDetectorsOtherClassesBecomeAlternatives() {
+        val alt = listOf(PieceChoice(Piece.Color.white, Piece.Kind.bishop))
+        val d = box(2, 2, Piece.Kind.knight, Piece.Color.white, 0.6).copy(alternatives = alt)
+        assertEquals(alt, BoardReader.grid(listOf(d))[2][2].alternatives)
+    }
+
+    @Test fun aLosingDetectionOnTheSameSquareIsTheFirstAlternative() {
+        val winner = box(2, 2, Piece.Kind.knight, Piece.Color.white, 0.9)
+        val loser = box(2, 2, Piece.Kind.bishop, Piece.Color.white, 0.5)
+        val reading = BoardReader.grid(listOf(winner, loser))[2][2]
+        assertEquals(Piece.Kind.knight, reading.piece)
+        assertEquals(listOf(PieceChoice(Piece.Color.white, Piece.Kind.bishop)), reading.alternatives)
+    }
+
+    @Test fun theMainPieceIsNeverItsOwnAlternative() {
+        val a = box(2, 2, Piece.Kind.knight, Piece.Color.white, 0.9)
+        val b = box(2, 2, Piece.Kind.knight, Piece.Color.white, 0.5)
+        assertTrue(BoardReader.grid(listOf(a, b))[2][2].alternatives.isEmpty())
+    }
 }

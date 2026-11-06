@@ -41,6 +41,9 @@ import com.chesslab.R
  * palette, on tape les cases ; la gomme vide. Le trait et les roques sont des
  * interrupteurs, parce qu'ils ne se déduisent pas d'un plateau.
  */
+/** Ce que l'éditeur laisse faire à l'écran qui l'habille : poser (ou retirer) une pièce sur une case. */
+class EditorActions(val place: (Square, Piece?) -> Unit)
+
 @Composable
 fun PositionEditorScreen(
     /**
@@ -51,8 +54,14 @@ fun PositionEditorScreen(
     initialFen: String? = null,
     /** Les cases à surligner : les lectures douteuses du scanner. */
     marked: Set<Square> = emptySet(),
-    /** Ce que l'appelant veut ajouter au panneau : bannière de confiance, sens de lecture. */
-    extra: @Composable ColumnScope.() -> Unit = {},
+    /** La case que le scanner fait vérifier en ce moment : cernée sur le plateau. */
+    focused: Square? = null,
+    /**
+     * Ce que l'appelant veut ajouter au panneau : bannière de confiance, sens
+     * de lecture, revue des cases douteuses. Reçoit de quoi poser une pièce sur
+     * une case sans passer par la palette.
+     */
+    extra: @Composable ColumnScope.(EditorActions) -> Unit = {},
     /** Un retour vers l'écran d'avant (« Recadrer »), quand il y en a un. */
     onBack: (() -> Unit)? = null,
     backLabel: String? = null,
@@ -104,6 +113,7 @@ fun PositionEditorScreen(
             BoardView(
                 position = position,
                 marked = marked,
+                selected = focused,
                 enabled = true,
                 onSquareTap = { square ->
                     val kind = brush
@@ -114,7 +124,7 @@ fun PositionEditorScreen(
         },
         panel = {
             Spacer(Modifier.height(10.dp))
-            extra()
+            extra(EditorActions { square, piece -> if (piece == null) pieces.remove(square) else pieces[square] = piece })
             Palette(brush, brushColor, onKind = { brush = it }, onColor = { brushColor = it })
 
             Spacer(Modifier.height(10.dp))

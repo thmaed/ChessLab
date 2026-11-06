@@ -56,6 +56,8 @@ struct PositionEditorView<Header: View>: View {
     /// Pièces lues sur un plateau réel dont le type reste à préciser
     /// (Lot 1.E). Vide hors scanner.
     let unknownPieces: [Square: Piece.Color]
+    /// La case que le scanner fait vérifier en ce moment : cernée sur le plateau.
+    let focusedSquare: Square?
     /// Contenu propre à l'appelant, inséré sous le plateau (bandeaux et
     /// contrôles du scanner). `EmptyView` dans l'éditeur autonome.
     ///
@@ -80,6 +82,7 @@ struct PositionEditorView<Header: View>: View {
         title: LocalizedStringKey = "Éditeur de position",
         lowConfidenceSquares: Set<Square> = [],
         unknownPieces: [Square: Piece.Color] = [:],
+        focusedSquare: Square? = nil,
         @ViewBuilder header: @escaping (PositionEditorViewModel) -> Header
     ) {
         self.initialFEN = initialFEN
@@ -87,6 +90,7 @@ struct PositionEditorView<Header: View>: View {
         self.title = title
         self.lowConfidenceSquares = lowConfidenceSquares
         self.unknownPieces = unknownPieces
+        self.focusedSquare = focusedSquare
         self.header = header
         // Aucun effet de bord dans ce ViewModel (pas de moteur) : la règle
         // de l'hôte paresseux (`ActiveGameHost`) ne s'applique pas ici.
@@ -107,7 +111,7 @@ struct PositionEditorView<Header: View>: View {
                     theme: appSettings.boardTheme,
                     highlightedSquares: highlightedSquares,
                     unknownPieces: vm.unknownPieces,
-                    selectedSquare: vm.selectedUnknownSquare
+                    selectedSquare: vm.selectedUnknownSquare ?? focusedSquare
                 ) { square in
                     withAnimation(Theme.gentle) { vm.apply(at: square) }
                 }

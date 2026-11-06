@@ -133,6 +133,31 @@ struct BoardScanReading {
         return ranked.max { $0.score < $1.score }?.rotation ?? .none
     }
 
+    /// Trait à proposer par défaut. Une image ne le dit JAMAIS — mais un roi en
+    /// échec le trahit : seul le camp au trait peut être en échec (l'autre
+    /// camp a joué le coup qui l'en aurait tiré). Si exactement un des deux
+    /// traits donne une position légale, c'est celui-là ; sinon les Blancs,
+    /// comme avant. L'utilisateur garde la main : la section « Trait » de
+    /// l'éditeur fait toujours autorité.
+    func suggestedSideToMove(rotation: BoardReadingRotation) -> Piece.Color {
+        let legal = [Piece.Color.white, .black].filter {
+            FENValidator.isLegal(fen(rotation: rotation, sideToMove: $0))
+        }
+        return legal.count == 1 ? legal[0] : .white
+    }
+
+    /// Les cases à passer en revue, les MOINS sûres d'abord (à égalité, dans
+    /// l'ordre du plateau : 8e rangée vers la 1re, colonne a vers h).
+    func reviewSquares(rotation: BoardReadingRotation) -> [Square] {
+        let flagged = squares(rotation: rotation).filter { !$0.value.isConfident }
+        return flagged.keys.sorted { first, second in
+            let a = flagged[first]!.confidence, b = flagged[second]!.confidence
+            if a != b { return a < b }
+            if first.rank.value != second.rank.value { return first.rank.value > second.rank.value }
+            return first.file.number < second.file.number
+        }
+    }
+
     private func pawnPlausibility(rotation: BoardReadingRotation) -> Int {
         var score = 0
         for (square, reading) in squares(rotation: rotation) {
@@ -226,9 +251,18 @@ extension BoardScanReading {
                 let mine = grid[row][column]
                 let theirs = other.grid[row][column]
                 guard theirs.isConfident, theirs.occupancy != mine.occupancy else { return mine }
+                // Ce que lit le second avis devient la PREMIÈRE alternative
+                // proposée : c'est la contradiction qui a fait douter.
+                var alternatives = mine.alternatives
+                if case let .piece(color, kind?) = theirs.occupancy {
+                    let choice = PieceChoice(color: color, kind: kind)
+                    alternatives.removeAll { $0 == choice }
+                    alternatives.insert(choice, at: 0)
+                }
                 return SquareReading(
                     occupancy: mine.occupancy,
-                    confidence: min(mine.confidence, Self.crossCheckConfidence)
+                    confidence: min(mine.confidence, Self.crossCheckConfidence),
+                    alternatives: alternatives
                 )
             }
         }

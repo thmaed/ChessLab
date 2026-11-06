@@ -229,6 +229,7 @@ struct ScannerView: View {
             ScanConfirmationView(
                 reading: reading,
                 rotation: Binding(get: { vm.rotation }, set: { vm.rotation = $0 }),
+                squareImages: vm.squareImages,
                 exit: exit,
                 onBackToCrop: { vm.backToCrop() }
             )

@@ -1,6 +1,198 @@
 {
   "sourceLanguage": "fr",
   "strings": {
+    "Cases à vérifier": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Squares to check"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cases à vérifier"
+          }
+        }
+      }
+    },
+    "Case %@ — %lld sur %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Square %@ — %lld of %lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Case %@ — %lld sur %lld"
+          }
+        }
+      }
+    },
+    "Lu : %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Read: %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lu : %@"
+          }
+        }
+      }
+    },
+    "Vide, c'est bon": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empty, that's right"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vide, c'est bon"
+          }
+        }
+      }
+    },
+    "C'est bien ça": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "That's right"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "C'est bien ça"
+          }
+        }
+      }
+    },
+    "Case vide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empty square"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Case vide"
+          }
+        }
+      }
+    },
+    "Case précédente": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Previous square"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Case précédente"
+          }
+        }
+      }
+    },
+    "Case suivante": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next square"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Case suivante"
+          }
+        }
+      }
+    },
+    "Toutes les cases douteuses ont été vérifiées — relisez le plateau une dernière fois.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All doubtful squares have been checked — read the board over one last time."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toutes les cases douteuses ont été vérifiées — relisez le plateau une dernière fois."
+          }
+        }
+      }
+    },
+    "case vide": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "empty square"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "case vide"
+          }
+        }
+      }
+    },
+    "pièce blanche": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "white piece"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pièce blanche"
+          }
+        }
+      }
+    },
+    "pièce noire": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "black piece"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "pièce noire"
+          }
+        }
+      }
+    },
     "": {
       "localizations": {
         "en": {
