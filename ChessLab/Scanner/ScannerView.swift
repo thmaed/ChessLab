@@ -40,6 +40,9 @@ struct ScannerView: View {
         // tourne HORS fil principal (voir ``ScannerViewModel``), donc
         // l'indicateur s'anime vraiment.
         .overlay { processingOverlay }
+        // Les gabarits du second avis se rendent pendant que l'utilisateur
+        // choisit son image : la première lecture n'attend plus après eux.
+        .task { TemplateSquareClassifier.prewarm() }
         .onAppear {
             // Porte dérobée des tests UI : les sélecteurs système sont hors
             // process, donc intestables. Sans l'argument de lancement, rien

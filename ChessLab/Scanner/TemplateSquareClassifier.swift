@@ -55,7 +55,29 @@ struct TemplateSquareClassifier: SquareClassifying {
         matchThreshold = source == .screenshot ? 0.45 : 0.32
         flatnessThreshold = source == .screenshot ? 0.035 : 0.05
 
-        templates = Self.makeTemplates(themes: themes)
+        templates = Self.cachedTemplates(themes: themes)
+    }
+
+    /// Les gabarits ne dépendent que des thèmes : on les rend UNE fois (≈ 300
+    /// glyphes) et on les réutilise à chaque scan. Sans cela, chaque lecture
+    /// payait ce rendu avant de commencer — sur le chemin où l'utilisateur
+    /// attend devant un indicateur d'activité.
+    @MainActor private static var templateCache: (key: [String], templates: [Template])?
+
+    @MainActor
+    private static func cachedTemplates(themes: [BoardTheme]) -> [Template] {
+        let key = themes.map(\.id)
+        if let cache = templateCache, cache.key == key { return cache.templates }
+        let rendered = makeTemplates(themes: themes)
+        templateCache = (key, rendered)
+        return rendered
+    }
+
+    /// Rend les gabarits d'avance, quand l'écran du scanner s'ouvre : le temps que
+    /// l'utilisateur choisisse une image et cadre le plateau, c'est fait.
+    @MainActor
+    static func prewarm() {
+        _ = cachedTemplates(themes: BoardTheme.all)
     }
 
     // MARK: Gabarits

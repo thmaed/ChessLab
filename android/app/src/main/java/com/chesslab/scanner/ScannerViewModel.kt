@@ -92,6 +92,18 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
     var ui by mutableStateOf(ScannerUiState(status = s(R.string.scan_pick_photo)))
         private set
 
+    init {
+        // Le modèle et les gabarits se chargent pendant que l'utilisateur choisit
+        // son image et cadre le plateau : la première lecture n'attend plus après
+        // eux (≈ 300 gabarits à rendre). Pendant d'`ScannerView.task` côté iOS.
+        viewModelScope.launch(Dispatchers.Default) {
+            runCatching {
+                PieceDetector.shared(getApplication())
+                TemplateSquareClassifier.shared(getApplication())
+            }
+        }
+    }
+
     fun load(uri: Uri) = viewModelScope.launch {
         val bitmap = withContext(Dispatchers.IO) {
             runCatching {

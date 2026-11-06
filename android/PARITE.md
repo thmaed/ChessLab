@@ -2025,4 +2025,9 @@ libellés, même parcours (Puzzles → Mes collections).
       `ScannerReviewTest` — verts sur Galaxy A16 (SM-A165F). Libellés FR/EN des deux côtés.
 - [ ] **À regarder sur appareil** : la mise en page de la revue sur iPhone (iOS vérifié par tests unitaires et
       compilation, pas encore à l'œil sur écran) et sur le Galaxy A16.
+- [x] **Gabarits préchargés (07/11)** : le scanner rend ses ≈ 300 gabarits quand l'écran s'ouvre, pendant que
+      l'utilisateur choisit son image — la première lecture n'attend plus après eux. iOS : cache des gabarits
+      (`TemplateSquareClassifier.prewarm`, `.task` de `ScannerView`), en plus, les lectures suivantes ne les
+      refont plus. Android : `ScannerViewModel.init` (modèle + gabarits, en arrière-plan) ; prêts 0,6 s après
+      l'ouverture sur Galaxy A16 (`ScannerWarmupTest`).
 

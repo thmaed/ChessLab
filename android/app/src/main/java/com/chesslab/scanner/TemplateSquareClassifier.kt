@@ -89,6 +89,9 @@ class TemplateSquareClassifier private constructor(private val templates: List<T
 
         @Volatile private var instance: TemplateSquareClassifier? = null
 
+        /** Vrai quand les gabarits sont déjà rendus : la prochaine lecture n'a rien à attendre. */
+        val isReady: Boolean get() = instance != null
+
         /** Construit une fois (≈ 300 gabarits rendus) puis réutilise. */
         @Synchronized
         fun shared(context: Context): TemplateSquareClassifier =
