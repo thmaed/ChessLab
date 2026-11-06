@@ -11,9 +11,11 @@ import SwiftData
 ///
 /// ## Où ils vivent
 ///
-/// Dans le store local « Puzzles », avec les puzzles de vos parties : jamais
-/// synchronisés. Ce store est détruit si SwiftData le déclare corrompu (voir
-/// ``LocalStoreMaintenance``) : le fichier d'origine reste la sauvegarde, et
+/// Dans le store local « Puzzles », avec les puzzles de vos parties : ce store
+/// n'est jamais synchronisé. Chaque collection a donc une COPIE, un PGN compressé
+/// dans le store synchronisé (``PuzzleCollectionSync``), qui la fait suivre d'un
+/// appareil à l'autre et la rend si SwiftData déclare le store corrompu (voir
+/// ``LocalStoreMaintenance``). Le fichier d'origine reste une sauvegarde de plus, et
 /// réimporter un fichier déjà importé n'ajoute que ce qui manque.
 ///
 /// Ces puzzles n'ont volontairement PAS d'`externalID` : c'est lui qui les
@@ -85,13 +87,23 @@ enum PuzzleCollectionStore {
 
     // MARK: Lire
 
-    /// Les collections, par ordre alphabétique.
-    static func collections(in context: ModelContext) -> [Summary] {
+    /// Le nom de chaque puzzle importé (un nom revient autant de fois que la
+    /// collection a de puzzles) : ni les FEN ni les solutions ne sont lus.
+    private static func importedNames(in context: ModelContext) -> [String] {
         let importedRaw = PuzzleSource.imported.rawValue
         var descriptor = FetchDescriptor<Puzzle>(predicate: #Predicate { ($0.sourceRaw ?? "") == importedRaw })
-        // Le nom suffit pour compter ; les FEN et les solutions restent en base.
         descriptor.propertiesToFetch = [\.collection]
-        let names = ((try? context.fetch(descriptor)) ?? []).compactMap(\.collection)
+        return ((try? context.fetch(descriptor)) ?? []).compactMap(\.collection)
+    }
+
+    /// Les noms des collections, sans les compter ni les trier.
+    static func names(in context: ModelContext) -> Set<String> {
+        Set(importedNames(in: context))
+    }
+
+    /// Les collections, par ordre alphabétique.
+    static func collections(in context: ModelContext) -> [Summary] {
+        let names = importedNames(in: context)
         let counts = Dictionary(names.map { ($0, 1) }, uniquingKeysWith: +)
         return counts.keys.sorted { $0.localizedStandardCompare($1) == .orderedAscending }.map { name in
             Summary(

@@ -163,7 +163,9 @@ struct PuzzleImportSheet: View {
         let parsed = await Task.detached(priority: .userInitiated) {
             PuzzleCollectionImporter.parse(text)
         }.value
-        reports.append(PuzzleCollectionStore.add(parsed, toCollection: name, in: modelContext))
+        let report = PuzzleCollectionStore.add(parsed, toCollection: name, in: modelContext)
+        if report.added > 0 { PuzzleCollectionSync.backup(report.collection, in: modelContext) }
+        reports.append(report)
     }
 
     /// UTF-8, à défaut Latin-1 : les fichiers venus de Windows ou d'un vieux

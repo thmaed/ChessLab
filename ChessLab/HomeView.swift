@@ -497,6 +497,9 @@ struct HomeView: View {
             // dans les Puzzle locaux AVANT de calculer le bilan — voir
             // ``PuzzleProgressSync``. No-op si rien n'est encore synchronisé.
             PuzzleProgressSync.reconcileIfStale(in: modelContext)
+            // Rend les collections de puzzles importées venues d'un autre appareil
+            // (ou perdues avec un store détruit) — voir ``PuzzleCollectionSync``.
+            Task { await PuzzleCollectionSync.sync(in: modelContext) }
             // Fusionne de même la progression d'ouvertures synchronisée : dédup
             // des enregistrements par clé FEN et recalcul de l'état FSRS en
             // rejouant le journal fusionné — voir ``OpeningProgressSync``. No-op

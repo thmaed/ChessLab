@@ -140,9 +140,16 @@ struct PuzzleQueueView: View {
             TextField("Nom", text: $renameText)
             Button("Annuler", role: .cancel) {}
             Button("Renommer") {
-                if let target = actionTarget,
-                   !PuzzleCollectionStore.rename(target.name, to: renameText, in: modelContext) {
-                    renameFailed = true
+                if let target = actionTarget {
+                    if PuzzleCollectionStore.rename(target.name, to: renameText, in: modelContext) {
+                        PuzzleCollectionSync.renamed(
+                            from: target.name,
+                            to: renameText.trimmingCharacters(in: .whitespacesAndNewlines),
+                            in: modelContext
+                        )
+                    } else {
+                        renameFailed = true
+                    }
                 }
                 refresh()
             }
@@ -158,11 +165,14 @@ struct PuzzleQueueView: View {
             titleVisibility: .visible
         ) {
             Button("Supprimer", role: .destructive) {
-                if let target = actionTarget { PuzzleCollectionStore.delete(target.name, in: modelContext) }
+                if let target = actionTarget {
+                    PuzzleCollectionStore.delete(target.name, in: modelContext)
+                    PuzzleCollectionSync.deleted(target.name, in: modelContext)
+                }
                 refresh()
             }
         } message: {
-            Text("Ses puzzles sont retirés de cet appareil. Le fichier d'origine n'est pas touché.")
+            Text("Ses puzzles sont retirés de cet appareil et de leur copie iCloud ; vos autres appareils gardent la leur. Le fichier d'origine n'est pas touché.")
         }
     }
 
@@ -568,6 +578,11 @@ struct PuzzleQueueView: View {
         reviewCount = PuzzleSessionDrawer.count(matching: PuzzleSessionFilter(reviewOnly: true), in: modelContext)
         ownCount = PuzzleSessionDrawer.count(matching: PuzzleSessionFilter(source: .ownGames), in: modelContext)
         collections = PuzzleCollectionStore.collections(in: modelContext)
+        // Ce que les autres appareils ont envoyé arrive APRÈS le premier affichage.
+        Task {
+            await PuzzleCollectionSync.sync(in: modelContext)
+            collections = PuzzleCollectionStore.collections(in: modelContext)
+        }
 
         // ⚠️ Ne charge QUE les puzzles réellement tentés : la bibliothèque
         // embarquée en compte plus de cent mille, et les matérialiser tous pour

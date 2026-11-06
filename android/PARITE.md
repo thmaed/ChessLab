@@ -1883,6 +1883,12 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
       enregistrement CloudKit (1 Mo au plus) : 1 000 puzzles × 20 cycles font ~1 Mo en JSON brut, 133 Ko
       compressés (zlib, octet nul en tête ; les anciens plans, du JSON brut, se relisent tels quels).
       Android garde le JSON dans sa base locale, sans cette limite : aucun effet visible, rien à porter.
+- [x] **Écart ASSUMÉ — copie iCloud des collections importées : iOS SEULEMENT** (iCloud hors périmètre,
+      décision du 12/09). iOS garde, dans le store synchronisé, un PGN compressé par collection (le même que
+      l'export) : elle suit l'utilisateur d'un appareil à l'autre, un renommage aussi, et se reconstruit si le
+      store local est détruit. Sur Android, l'export PGN (ci-dessus) est la sauvegarde et le moyen de passer à
+      un autre appareil ; la boîte de suppression garde son texte « retirés de cet appareil » (celui d'iOS
+      ajoute « et de leur copie iCloud »). Rien à porter.
 - [ ] **Laboratoire en Chess960.** Un interrupteur « Chess960 » dans la section « Départ » (iOS) / sous la
       position imposée (Android), exclusif de la position personnalisée : Stockfish seul (ni livre ni Maia),
       une position tirée par PAIRE de parties (les deux parties d'une paire ont la même, couleurs inversées)

@@ -10985,6 +10985,19 @@ par paire de parties, tirée d'une graine SplitMix64 gardée avec la série. And
 vrai moteur : une série de deux parties, PGN relus coup pour coup par `Chess960PGNParser`. Voir
 `android/PARITE.md` pour les écarts relevés (surbrillance du roque à l'écran Chess960 d'Android, aide du Labo).
 
+**Copie iCloud des collections importées (iOS seulement).** Le store « Puzzles » n'est jamais synchronisé ;
+`SyncedPuzzleCollection` (`@Model`, store « Games ») garde donc, par collection, le PGN de l'export compressé
+(zlib, `@Attribute(.externalStorage)`). `PuzzleCollectionSync` : `backup` après un import, `renamed` et
+`deleted` suivent les actions locales, `restore` rend ce qui est arrivé (collection absente recréée,
+présente complétée sans doublon, renommage fait ailleurs suivi), `backfillIfNeeded` envoie UNE fois par
+appareil les collections déjà là. Chaque appareil retient dans `UserDefaults` quel enregistrement va à quelle
+collection locale et la date de ce qu'il a rendu. Ne voyage PAS : la progression sur ces puzzles, ni la
+suppression (les autres appareils gardent leur copie). Un store « Puzzles » détruit est reconstruit depuis les
+copies. Appelée à l'ouverture de l'accueil et de l'écran Puzzles. Tests : `PuzzleCollectionSyncTests` (13).
+⚠️ **Nouveau type d'enregistrement : déployer le schéma CloudKit en production avant la version publiée**,
+sinon les collections ne voyageront pas.
+
+
 
 ## 06/11 — Scanner : les fausses pièces éliminées, et les cases douteuses mieux jugées (iOS + Android)
 
@@ -11035,12 +11048,3 @@ et lit 64/64. Écart inscrit dans `android/PARITE.md`, tolérance `androidMaxSil
 **Limites.** Les dégradations sont synthétiques : aucune vraie photo d'écran n'a été mesurée. Sur
 Galaxy A16 : 4 captures `lichess_ui_*` + 3 photos simulées lues, `ScannerPipelineTest` 3/3.
 
-## 06/11 (soir) — Scanner Android : la chaîne d'iOS portée en entier
-
-Trois écarts jamais inscrits, découverts en cherchant pourquoi une photo simulée se lisait moins bien sur
-Android : pas de recalage de la grille avant le détecteur, pas de contrôles de cohérence d'échecs, pas de
-recroisement par gabarits. Portés : `BoardGridFinder`, `BoardConsistency`, `ImagePatch`, `BoardRectifier`,
-`TemplateSquareClassifier`, `ScanReading.crossChecked`, `ScanPipeline`. Effet mesuré sur la fixture photo
-`celtic_black` : 62/64 avec une erreur sûre (a1) → 63/64, la case fausse signalée. Reste ouverte la déduction
-capture/photo (seuils des gabarits), inscrite dans `android/PARITE.md`. La suite iOS complète : 1 245 tests sur
-1 246 ; l'échec (un test d'intégration Maia, 125 s) venait de la charge, il passe seul en 3,9 s.
