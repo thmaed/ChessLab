@@ -1985,3 +1985,10 @@ libellés, même parcours (Puzzles → Mes collections).
       `lichess_ui_*` lues à l'identique), vérifiés sur émulateur ET sur le Galaxy A16 (SM-A165F, Android 16, 06/11) :
       les 4 captures `lichess_ui_*` lues à 64/64 en 1,5 s modèle chargé compris,
       `ScannerPipelineTest` 3/3 (vraie capture chess.com comprise), `ScannerConfirmTest` 1/1.
+
+- [ ] **Écart OUVERT — recroisement YOLO × gabarits (scanner)** : iOS recroise la lecture du détecteur avec
+      celle de `TemplateSquareClassifier` (`BoardScanReading.crossChecked`) et signale toute case où le second,
+      sûr de lui, contredit le premier ; Android n'a que le détecteur. Constaté le 06/11 sur la fixture
+      `lichess_ui_photo_celtic_black.jpg` (photo d'écran simulée) : iOS 64/64, Android 62/64 dont une dame lue
+      à la place d'une tour (a1) donnée pour sûre. Tolérance explicite dans le manifeste
+      (`androidMaxSilentlyWrong`) ; à lever en portant les gabarits.

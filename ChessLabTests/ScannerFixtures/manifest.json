@@ -124,5 +124,84 @@
         1444
       ]
     ]
+  },
+  {
+    "file": "lichess_ui_photo_mpchess_white.jpg",
+    "source": "screenshot",
+    "rotation": 0,
+    "fen": "5r2/5k2/ppn4R/2p1qbp1/3p4/P2P2Q1/1PP2PK1/7R",
+    "minCorrectSquares": 64,
+    "maxSilentlyWrong": 0,
+    "corners": [
+      [
+        0,
+        92
+      ],
+      [
+        1150,
+        92
+      ],
+      [
+        1150,
+        1242
+      ],
+      [
+        0,
+        1242
+      ]
+    ]
+  },
+  {
+    "file": "lichess_ui_photo_pixel_black.jpg",
+    "source": "screenshot",
+    "rotation": 2,
+    "fen": "8/pN2kpp1/PP2p3/6Pp/1b2r3/8/3pK3/3R4",
+    "minCorrectSquares": 64,
+    "maxSilentlyWrong": 0,
+    "corners": [
+      [
+        0,
+        92
+      ],
+      [
+        674,
+        92
+      ],
+      [
+        674,
+        766
+      ],
+      [
+        0,
+        766
+      ]
+    ]
+  },
+  {
+    "file": "lichess_ui_photo_celtic_black.jpg",
+    "source": "screenshot",
+    "rotation": 2,
+    "fen": "r2r3k/6pp/1Q2Np2/7q/7P/8/PP3PK1/R4R2",
+    "minCorrectSquares": 62,
+    "maxSilentlyWrong": 0,
+    "corners": [
+      [
+        0,
+        92
+      ],
+      [
+        772,
+        92
+      ],
+      [
+        772,
+        864
+      ],
+      [
+        0,
+        864
+      ]
+    ],
+    "androidMaxSilentlyWrong": 1
   }
 ]

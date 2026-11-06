@@ -47,3 +47,14 @@ Pièges payés cher :
 Résultats (500 captures, jeux INCONNUS) : fausses pièces 5,25 % → 0,016 % des cases,
 plateaux sans aucune erreur ~45 % → 97,6 %. Sur vraies captures chess.com avec points
 et flèches peints par PIL : 124 fausses pièces sur 768 cases → 0.
+
+## Photos d'écran (06/11, 2e ajustement)
+
+    python degrade.py HELD 150          # table par dégradation (WEIGHTS=...pt)
+    python photo_dataset.py DS DS2      # copie dégradée de chaque image d'entraînement
+    BASE=final.pt DATA=DS2/data.yaml NAME=ft4 python finetune.py 4
+    WEIGHTS=...pt python calib_photo.py HELD 150   # seuil de doute sur photos
+
+Cumul « photo » : 28,0 % → 80,7 % de plateaux exacts (moiré 74,7 → 95,3, reflet 82,7 → 94,7).
+Les dégradations sont synthétiques ; une vraie photo d'écran reste à mesurer.
+

@@ -11012,3 +11012,26 @@ des deux côtés (`ScannerLichessUiTest` instrumenté, 5/5 sur émulateur).
 photos d'écran (moiré, reflets) ne sont pas encore dans le banc. Le modèle descend de
 poids entraînés avec des jeux chess.com (décision de licence toujours en suspens, voir
 mémoire) ; l'ajustement fin n'a utilisé que des jeux libres.
+
+## 06/11 (suite) — Scanner : les photos d'écran (iOS + Android)
+
+**Mesure.** `tools/scanner-eval/degrade.py` abîme les captures du banc comme le ferait une photo
+d'écran (flou, basse résolution, moiré, reflet, bruit, JPEG, tonalité, et le cumul). Sur 150 plateaux de
+jeux inconnus, le modèle du matin faisait 28 % de plateaux exacts sur le cumul (3,2 % de pièces
+manquées, 2 % d'erreurs de type/couleur), 74,7 % sur le moiré, 82,7 % sur le reflet.
+
+**Correctif.** Deuxième ajustement fin (4 époques, `photo_dataset.py` : chaque image d'entraînement
+gagne une copie dégradée, mêmes étiquettes). Résultat sur les mêmes plateaux : cumul 28,0 % → 80,7 %,
+moiré 74,7 % → 95,3 %, reflet 82,7 % → 94,7 %, propre 96,7 % → 98,0 % (500 plateaux : 98,4 %, zéro
+fausse pièce). Flou 88,0 % → 86,0 % et basse résolution 96,7 % → 94,7 % reculent légèrement
+(écart de 2 à 3 plateaux sur 150, non tranché). Vraies captures chess.com surchargées : 0 fausse
+pièce. Seuil de doute 0,87 conservé (calibré aussi sur les photos : 31 erreurs sur 79 attrapées pour
+1,5 % de pièces justes signalées).
+
+**Fixtures.** Trois photos simulées `lichess_ui_photo_*.jpg` (iOS et Android). Côté Android le
+détecteur seul lit `celtic_black` à 62/64 avec une erreur sûre (a1) : iOS recroise avec les gabarits
+et lit 64/64. Écart inscrit dans `android/PARITE.md`, tolérance `androidMaxSilentlyWrong`.
+
+**Limites.** Les dégradations sont synthétiques : aucune vraie photo d'écran n'a été mesurée. Sur
+Galaxy A16 : 4 captures `lichess_ui_*` + 3 photos simulées lues, `ScannerPipelineTest` 3/3.
+

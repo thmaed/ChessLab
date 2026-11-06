@@ -38,5 +38,5 @@ def run(weights, seed):
                     if t=='.' and read!='.': tot['fp']+=1
                     elif t!=read: tot['other']+=1
     return tot
-for name,w in (('actuel (train-6)','/Users/thierry/Developer/ChessLab/runs/detect/runs/detect/train-6/weights/best.pt'),('candidat','exp/cand1.pt')):
+for name,w in (('actuel (train-6)','/Users/thierry/Developer/ChessLab/runs/detect/runs/detect/train-6/weights/best.pt'),('candidat',os.environ.get('CANDIDATE','exp/cand1.pt'))):
     print(name, run(w,3))
