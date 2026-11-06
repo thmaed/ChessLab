@@ -20,5 +20,109 @@
     "rotation": 0,
     "fen": "rnbqkbnr/pp1ppppp/8/2p5/4P3/8/PPPP1PPP/RNBQKBNR",
     "minCorrectSquares": 64
+  },
+  {
+    "file": "lichess_ui_mpchess_white.png",
+    "source": "screenshot",
+    "rotation": 0,
+    "fen": "5r2/5k2/ppn4R/2p1qbp1/3p4/P2P2Q1/1PP2PK1/7R",
+    "minCorrectSquares": 64,
+    "maxSilentlyWrong": 0,
+    "corners": [
+      [
+        0,
+        92
+      ],
+      [
+        1150,
+        92
+      ],
+      [
+        1150,
+        1242
+      ],
+      [
+        0,
+        1242
+      ]
+    ]
+  },
+  {
+    "file": "lichess_ui_pixel_black.png",
+    "source": "screenshot",
+    "rotation": 2,
+    "fen": "8/pN2kpp1/PP2p3/6Pp/1b2r3/8/3pK3/3R4",
+    "minCorrectSquares": 64,
+    "maxSilentlyWrong": 0,
+    "corners": [
+      [
+        0,
+        92
+      ],
+      [
+        674,
+        92
+      ],
+      [
+        674,
+        766
+      ],
+      [
+        0,
+        766
+      ]
+    ]
+  },
+  {
+    "file": "lichess_ui_celtic_black.png",
+    "source": "screenshot",
+    "rotation": 2,
+    "fen": "r2r3k/6pp/1Q2Np2/7q/7P/8/PP3PK1/R4R2",
+    "minCorrectSquares": 64,
+    "maxSilentlyWrong": 0,
+    "corners": [
+      [
+        0,
+        92
+      ],
+      [
+        772,
+        92
+      ],
+      [
+        772,
+        864
+      ],
+      [
+        0,
+        864
+      ]
+    ]
+  },
+  {
+    "file": "lichess_ui_xkcd_white.png",
+    "source": "screenshot",
+    "rotation": 0,
+    "fen": "8/1pk5/3R4/P5P1/P1p2P2/n2p4/8/4K3",
+    "minCorrectSquares": 64,
+    "maxSilentlyWrong": 0,
+    "corners": [
+      [
+        0,
+        92
+      ],
+      [
+        1352,
+        92
+      ],
+      [
+        1352,
+        1444
+      ],
+      [
+        0,
+        1444
+      ]
+    ]
   }
 ]

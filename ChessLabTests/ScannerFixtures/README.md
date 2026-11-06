@@ -68,3 +68,16 @@ généralisation. À compléter, par ordre de valeur :
 4. **1 photo d'un écran** (`screenPhoto`) : moiré, reflets, exposition inégale.
 
 Chacune avec son FEN exact.
+
+## Captures `lichess_ui_*` (06/11/2026) — générées, pas photographiées
+
+Quatre captures rendues par `tools/scanner-eval/` (chessground, la bibliothèque
+d'échiquier de Lichess) sur des jeux de pièces que le modèle n'a JAMAIS vus
+pendant son réentraînement (mpchess, pixel, celtic, xkcd), avec points de coups
+légaux, flèches, surbrillances, coordonnées et miniatures de pièces capturées.
+Vérité terrain exacte par construction ; coins donnés par le manifeste.
+
+Elles existent parce que l'ancien modèle lisait les points de coups légaux comme
+des pions (50/64 et 54/64 sur deux d'entre elles, erreurs données pour sûres).
+Une régression sur ce point fait échouer ces fixtures, avec 0 erreur silencieuse
+tolérée. Mêmes fichiers lus côté Android (`ScannerLichessUiTest`).

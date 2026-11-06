@@ -1973,3 +1973,14 @@ libellés, même parcours (Puzzles → Mes collections).
       libellé « Analyser = revoir vos coups et créer des puzzles avec vos erreurs » et la puce « Ratés »
       grisée quand il n'y en a aucun. Ces changements ne seront dans le binaire qu'à la prochaine
       publication (versionCode ≥ 34, voir `PLAY-2.0.md`).
+
+
+## 06/11 — Scanner : fausses pièces éliminées, doute recalibré — FAIT des deux côtés
+
+- [x] Nouveau détecteur (ajustement fin sur les points de coups légaux, flèches,
+      surbrillances) : `ChessPiecesYOLO.mlpackage` (iOS) et `chess_pieces_yolo.onnx`
+      (Android, non versionné, régénéré par `tools/scanner-eval/`).
+- [x] Seuil de doute des pièces à 0,87 : `BoardReader.PIECE_DOUBT_BELOW` = `pieceDoubtBelow` iOS.
+- [x] Tests : `BoardReaderTest` (2 cas), `ScannerLichessUiTest` (instrumenté, 4 captures
+      `lichess_ui_*` lues à l'identique), vérifiés sur émulateur ; à REJOUER sur le Galaxy A16
+      (latence et lecture réelles) avant de cocher définitivement.

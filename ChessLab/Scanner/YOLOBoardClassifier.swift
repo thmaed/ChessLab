@@ -117,6 +117,27 @@ enum YOLODetectionMapper {
     /// confirmation. On la garde confiante sans être certaine.
     static let emptyConfidence = 0.9
 
+    /// Sous cette confiance brute, une pièce détectée est DOUTEUSE et doit être
+    /// signalée à la confirmation.
+    ///
+    /// Le seuil général du scanner (``SquareReading/confidenceThreshold``, 0,55)
+    /// est bien trop bas pour ce détecteur : mesuré le 06/11/2026 sur 500
+    /// captures à jeux de pièces inconnus, les pièces justes sont lues à 0,95 et
+    /// plus, et 11 erreurs résiduelles sur 13 tombent entre 0,31 et 0,87. À 0,87,
+    /// on attrape ces 11 en ne signalant que 0,3 % des pièces justes (une planche
+    /// sur vingt environ) ; à 0,55 on n'en attrapait que 3. Voir
+    /// `tools/scanner-eval/calib.py`.
+    static let pieceDoubtBelow = 0.87
+
+    /// Confiance à porter dans ``SquareReading`` : inchangée au-dessus de
+    /// ``pieceDoubtBelow``, ramenée sous le seuil de signalement en dessous.
+    /// Reste croissante dans chaque tranche (le tri des cases les moins sûres
+    /// de ``BoardConsistency`` s'y fie).
+    static func calibrated(_ confidence: Double) -> Double {
+        guard confidence < pieceDoubtBelow else { return confidence }
+        return confidence * (SquareReading.confidenceThreshold - 0.01) / pieceDoubtBelow
+    }
+
     static func grid(from detections: [Detection]) -> [[SquareReading]] {
         var grid = [[SquareReading]](
             repeating: [SquareReading](repeating: .empty, count: 8), count: 8
@@ -142,7 +163,7 @@ enum YOLODetectionMapper {
             confidence[row][column] = detection.confidence
             grid[row][column] = SquareReading(
                 occupancy: .piece(color: detection.color, kind: detection.kind),
-                confidence: detection.confidence
+                confidence: calibrated(detection.confidence)
             )
         }
 

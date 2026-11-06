@@ -56,6 +56,22 @@ class BoardReaderTest {
         assertEquals(0.95, grid[5][2].confidence)
     }
 
+    /** Le détecteur lit ses pièces justes à 0,95 et plus : 0,80 est douteux. */
+    @Test fun aPieceBelowTheDetectorsDoubtLineIsFlagged() {
+        val grid = BoardReader.grid(listOf(
+            box(0, 0, Piece.Kind.rook, Piece.Color.white, confidence = 0.80),
+            box(0, 1, Piece.Kind.rook, Piece.Color.white, confidence = 0.90),
+        ))
+        assertTrue(grid[0][0].confidence < 0.55, "0,80 est sous la ligne de doute du détecteur")
+        assertTrue(grid[0][1].confidence >= 0.55, "0,90 est au-dessus : aucune fausse alerte")
+    }
+
+    @Test fun doubtCalibrationNeverReordersConfidences() {
+        val samples = (30..99).map { BoardReader.calibrated(it / 100.0) }
+        assertTrue(samples.zipWithNext().all { (a, b) -> a <= b }, "la calibration reste croissante")
+        assertEquals(0.95, BoardReader.calibrated(0.95))
+    }
+
     @Test fun emptySquaresAreAConfidentAbsence() {
         val grid = BoardReader.grid(emptyList())
         assertTrue(grid.all { row -> row.all { it.isEmpty } })

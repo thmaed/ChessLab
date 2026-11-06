@@ -247,7 +247,7 @@ kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
 // tools/yolo-spike, servent au test de bout en bout du scanner.
 val testAssets = layout.buildDirectory.dir("testAssets")
 val copyTestAssets by tasks.registering(Copy::class) {
-    from(rootProject.file("../ChessLabTests/ScannerFixtures")) { include("*.png") }
+    from(rootProject.file("../ChessLabTests/ScannerFixtures")) { include("*.png", "manifest.json") }
     into(testAssets)
 }
 android.sourceSets["androidTest"].assets.srcDir(testAssets)

@@ -67,6 +67,23 @@ struct YOLODetectionMapperTests {
         #expect(!grid[2][6].isConfident, "une détection peu sûre doit être signalée à la confirmation")
     }
 
+    /// Le détecteur lit ses pièces justes à 0,95 et plus : une pièce à 0,80 est
+    /// douteuse alors qu'elle dépasserait le seuil général du scanner (0,55).
+    @Test func aPieceBelowTheDetectorsDoubtLineIsFlagged() {
+        let grid = YOLODetectionMapper.grid(from: [
+            detection(.white, .rook, row: 0, column: 0, confidence: 0.80),
+            detection(.white, .rook, row: 0, column: 1, confidence: 0.90)
+        ])
+        #expect(!grid[0][0].isConfident, "0,80 est sous la ligne de doute du détecteur")
+        #expect(grid[0][1].isConfident, "0,90 est au-dessus : aucune fausse alerte")
+    }
+
+    @Test func doubtCalibrationNeverReordersConfidences() {
+        let samples = stride(from: 0.30, through: 0.99, by: 0.01).map(YOLODetectionMapper.calibrated)
+        #expect(zip(samples, samples.dropFirst()).allSatisfy { $0 <= $1 }, "la calibration reste croissante")
+        #expect(YOLODetectionMapper.calibrated(0.95) == 0.95, "au-dessus de la ligne : inchangée")
+    }
+
     @Test func emptySquaresAreConfidentAbsence() {
         let grid = YOLODetectionMapper.grid(from: [])
         #expect(grid.flatMap { $0 }.allSatisfy { $0.occupancy.isEmpty })

@@ -37,6 +37,29 @@ object BoardReader {
      */
     const val EMPTY_CONFIDENCE = 0.9
 
+    /**
+     * Sous cette confiance brute, une pièce détectée est DOUTEUSE et doit être
+     * signalée à la confirmation. Pendant de `YOLODetectionMapper.pieceDoubtBelow`
+     * (iOS) : le seuil général du scanner (0,55) est bien trop bas pour ce
+     * détecteur, qui lit ses pièces justes à 0,95 et plus. Mesuré le
+     * 06/11/2026 sur 500 captures à jeux de pièces inconnus : à 0,87, 11 erreurs
+     * résiduelles sur 13 sont attrapées pour 0,3 % de pièces justes signalées ;
+     * à 0,55, 3 seulement. Voir `tools/scanner-eval/calib.py`.
+     */
+    const val PIECE_DOUBT_BELOW = 0.87
+
+    /** Seuil de signalement du scanner (`ScanReading.CONFIDENCE_THRESHOLD`). */
+    private const val FLAG_THRESHOLD = 0.55
+
+    /**
+     * Confiance à porter dans la lecture : inchangée au-dessus de
+     * [PIECE_DOUBT_BELOW], ramenée sous le seuil de signalement en dessous.
+     * Croissante dans chaque tranche.
+     */
+    fun calibrated(confidence: Double): Double =
+        if (confidence >= PIECE_DOUBT_BELOW) confidence
+        else confidence * (FLAG_THRESHOLD - 0.01) / PIECE_DOUBT_BELOW
+
     private const val HALF_CELL = 1.0 / 16
 
     /** La grille `[ligne][colonne]`, ligne 0 en HAUT de l'image. */
@@ -55,7 +78,7 @@ object BoardReader {
 
             if (detection.confidence <= best[row][column]) continue
             best[row][column] = detection.confidence
-            grid[row][column] = SquareReading(detection.kind, detection.color, detection.confidence)
+            grid[row][column] = SquareReading(detection.kind, detection.color, calibrated(detection.confidence))
         }
 
         for (row in 0 until 8) {

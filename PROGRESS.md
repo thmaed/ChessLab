@@ -10985,3 +10985,30 @@ par paire de parties, tirée d'une graine SplitMix64 gardée avec la série. And
 vrai moteur : une série de deux parties, PGN relus coup pour coup par `Chess960PGNParser`. Voir
 `android/PARITE.md` pour les écarts relevés (surbrillance du roque à l'écran Chess960 d'Android, aide du Labo).
 
+
+## 06/11 — Scanner : les fausses pièces éliminées, et les cases douteuses mieux jugées (iOS + Android)
+
+**Constat (mesuré, pas supposé).** Sur 300 captures de l'interface Lichess avec vérité
+terrain exacte, 5,9 % des cases étaient des FAUSSES PIÈCES (case vide lue pleine, 85 %
+d'entre elles données pour sûres) contre 0,3 % d'erreurs de type ou de couleur. Cause :
+les points de coups légaux et les pointes de flèches, lus comme des pions à 90-98 %.
+Toutes les boîtes du modèle font exactement une case : aucun filtre géométrique possible.
+
+**Correctif.** Banc de mesure `tools/scanner-eval/` (chessground + jeux de pièces libres
++ positions de la base de problèmes Lichess CC0), réentraînement par ajustement fin des
+poids livrés (6 époques, SGD, 4 400 captures, 6 jeux de pièces GARDÉS DE CÔTÉ), puis
+calibration du doute : une pièce lue sous 0,87 est signalée (`pieceDoubtBelow`), au lieu
+de 0,55 — 11 erreurs résiduelles sur 13 attrapées pour 0,3 % de pièces justes signalées.
+
+**Résultats.** Jeux inconnus : fausses pièces 5,25 % → 0,016 %, 97,6 % de plateaux sans
+aucune erreur. Vraies captures chess.com surchargées (PIL) : 124 → 0. Les 3 fixtures réelles
+passent ; 4 nouvelles fixtures `lichess_ui_*` que l'ancien modèle ÉCHOUE (50/64, 54/64).
+
+**Livré des deux côtés.** `ChessPiecesYOLO.mlpackage` et `chess_pieces_yolo.onnx` (non
+versionné, régénéré), `YOLODetectionMapper.calibrated` / `BoardReader.calibrated`, tests
+des deux côtés (`ScannerLichessUiTest` instrumenté, 5/5 sur émulateur).
+
+**Limites assumées.** Mesure sur un rendu Lichess, pas sur toutes les interfaces ; les
+photos d'écran (moiré, reflets) ne sont pas encore dans le banc. Le modèle descend de
+poids entraînés avec des jeux chess.com (décision de licence toujours en suspens, voir
+mémoire) ; l'ajustement fin n'a utilisé que des jeux libres.
