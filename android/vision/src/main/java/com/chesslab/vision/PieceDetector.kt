@@ -65,6 +65,27 @@ class PieceDetector private constructor(private val session: OrtSession) {
      * on va chercher d'où il vient — ce qui évite les trous qu'un parcours
      * direct laisserait.
      */
+    /**
+     * Détecte les pièces sur un plateau DÉJÀ redressé et recalé sur la grille
+     * (voir [BoardRectifier.alignedToGrid]) : l'image est simplement ramenée à
+     * 640 × 640, comme le fait `VNCoreMLRequest` côté iOS.
+     */
+    fun detect(board: Bitmap): List<Detection> {
+        val scaled = if (board.width == SIZE && board.height == SIZE) board
+        else Bitmap.createScaledBitmap(board, SIZE, SIZE, true)
+        val pixels = IntArray(SIZE * SIZE)
+        scaled.getPixels(pixels, 0, SIZE, 0, 0, SIZE, SIZE)
+        val plane = SIZE * SIZE
+        val tensor = FloatArray(3 * plane)
+        for (i in 0 until plane) {
+            val argb = pixels[i]
+            tensor[i] = ((argb shr 16) and 0xFF) / 255f
+            tensor[plane + i] = ((argb shr 8) and 0xFF) / 255f
+            tensor[2 * plane + i] = (argb and 0xFF) / 255f
+        }
+        return run(tensor)
+    }
+
     fun detect(source: Bitmap, corners: List<Homography.Point>): List<Detection> {
         val h = Homography.fromSquare(corners, SIZE.toDouble())
         val width = source.width
@@ -87,6 +108,10 @@ class PieceDetector private constructor(private val session: OrtSession) {
             }
         }
 
+        return run(tensor)
+    }
+
+    private fun run(tensor: FloatArray): List<Detection> {
         val env = OrtEnvironment.getEnvironment()
         val raw = OnnxTensor.createTensor(
             env, FloatBuffer.wrap(tensor), longArrayOf(1, 3, SIZE.toLong(), SIZE.toLong()),

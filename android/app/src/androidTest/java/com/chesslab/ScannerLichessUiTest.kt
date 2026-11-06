@@ -5,9 +5,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import chesskit.Piece
 import chesskit.Square
-import com.chesslab.scanner.ScanReading
+import com.chesslab.scanner.ScanPipeline
 import com.chesslab.scanner.ScanRotation
-import com.chesslab.vision.BoardReader
 import com.chesslab.vision.Homography
 import com.chesslab.vision.PieceDetector
 import org.json.JSONArray
@@ -35,8 +34,7 @@ class ScannerLichessUiTest {
     private val assets get() = InstrumentationRegistry.getInstrumentation().context.assets
 
     @Test fun lichessInterfaceCapturesAreReadExactly() {
-        val detector = PieceDetector.shared(context)
-        assumeTrue("modèle de reconnaissance absent", detector != null)
+        assumeTrue("modèle de reconnaissance absent", PieceDetector.shared(context) != null)
 
         val manifest = JSONArray(assets.open("manifest.json").bufferedReader().use { it.readText() })
         var checked = 0
@@ -49,7 +47,7 @@ class ScannerLichessUiTest {
             val c = entry.getJSONArray("corners")
             val corners = (0 until 4).map { Homography.Point(c.getJSONArray(it).getDouble(0), c.getJSONArray(it).getDouble(1)) }
 
-            val reading = ScanReading(BoardReader.grid(detector!!.detect(bitmap, corners)))
+            val reading = ScanPipeline.read(context, bitmap, corners)!!.reading
             val rotation = if (entry.optInt("rotation", 0) == 2) ScanRotation.half else ScanRotation.none
             val read = reading.fen(rotation, Piece.Color.white).substringBefore(' ')
             val expected = entry.getString("fen")
@@ -66,8 +64,7 @@ class ScannerLichessUiTest {
             // Comme iOS : une case fausse doit au moins être SIGNALÉE à l'écran de confirmation.
             val flagged = reading.lowConfidenceSquares(rotation)
             val silentlyWrong = wrong.filter { it !in flagged }
-            // `androidMaxSilentlyWrong` : écart connu, voir PARITE.md (pas de recroisement par gabarits côté Android).
-            val maxSilent = entry.optInt("androidMaxSilentlyWrong", entry.optInt("maxSilentlyWrong", 2))
+            val maxSilent = entry.optInt("maxSilentlyWrong", 2)
             assertTrue(
                 "$file : ${silentlyWrong.size} cases fausses ET données pour sûres : ${silentlyWrong.map { it.notation }}",
                 silentlyWrong.size <= maxSilent

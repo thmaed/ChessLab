@@ -182,7 +182,7 @@
     "source": "screenshot",
     "rotation": 2,
     "fen": "r2r3k/6pp/1Q2Np2/7q/7P/8/PP3PK1/R4R2",
-    "minCorrectSquares": 62,
+    "minCorrectSquares": 63,
     "maxSilentlyWrong": 0,
     "corners": [
       [
@@ -201,7 +201,6 @@
         0,
         864
       ]
-    ],
-    "androidMaxSilentlyWrong": 1
+    ]
   }
 ]

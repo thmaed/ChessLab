@@ -124,9 +124,32 @@ class ScanReading(val grid: Array<Array<SquareReading>>) {
         return if (piece.color == Piece.Color.white) l else l.lowercase()
     }
 
+    /**
+     * Recroise cette lecture (la principale, le détecteur) avec une seconde,
+     * obtenue par un classifieur indépendant (les gabarits) : là où le second
+     * est SÛR et contredit le principal, la case est signalée. On garde
+     * l'occupation du principal — on ne fait que douter tout haut, jamais
+     * réécrire. Pendant de `BoardScanReading.crossChecked` (iOS).
+     */
+    fun crossChecked(other: ScanReading): ScanReading {
+        val merged = Array(8) { row ->
+            Array(8) { column ->
+                val mine = grid[row][column]
+                val theirs = other.grid[row][column]
+                val agree = theirs.piece == mine.piece && theirs.color == mine.color
+                if (theirs.confidence < CONFIDENCE_THRESHOLD || agree) mine
+                else mine.copy(confidence = minOf(mine.confidence, CROSS_CHECK_CONFIDENCE))
+            }
+        }
+        return ScanReading(merged)
+    }
+
     companion object {
         /** Sous ce seuil, la case est signalée à l'utilisateur. Même valeur qu'iOS. */
         const val CONFIDENCE_THRESHOLD = 0.55
+
+        /** Confiance imposée à une case où un second classifieur, sûr de lui, lit autre chose. */
+        const val CROSS_CHECK_CONFIDENCE = 0.4
 
         /** Un demi-tour : la case (r, c) va en (7 − r, 7 − c). */
         fun rotated180(grid: Array<Array<SquareReading>>): Array<Array<SquareReading>> =
@@ -134,6 +157,13 @@ class ScanReading(val grid: Array<Array<SquareReading>>) {
     }
 }
 
-/** Confiant = au-dessus du seuil ; une case vide est réputée sûre. */
+/**
+ * Confiant = au-dessus du seuil, vide ou non (`SquareReading.isConfident`, iOS).
+ *
+ * Une case VIDE peut être douteuse : le recroisement par gabarits abaisse celle
+ * où le détecteur n'a rien vu et où le second voit une pièce — la « pièce
+ * manquée », le pire défaut d'un détecteur d'objets. Les cases vides du
+ * détecteur seul valent 0,9 : rien ne change pour elles.
+ */
 val SquareReading.isConfident: Boolean
-    get() = isEmpty || confidence >= ScanReading.CONFIDENCE_THRESHOLD
+    get() = confidence >= ScanReading.CONFIDENCE_THRESHOLD

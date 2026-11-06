@@ -124,12 +124,10 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(busy = true, status = s(R.string.scan_reading))
 
         val result = withContext(Dispatchers.IO) {
-            val detector = PieceDetector.shared(getApplication()) ?: return@withContext null
             val points = ui.corners.map { (fx, fy) ->
                 Homography.Point((fx * bitmap.width).toDouble(), (fy * bitmap.height).toDouble())
             }
-            val detections = detector.detect(bitmap, points)
-            ScanReading(BoardReader.grid(detections)) to detections.size
+            ScanPipeline.read(getApplication(), bitmap, points)
         }
         ui = ui.copy(busy = false)
 
@@ -137,7 +135,8 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
             ui = ui.copy(status = s(R.string.scan_model_unavailable))
             return@launch
         }
-        val (reading, count) = result
+        val reading = result.reading
+        val count = result.detections
         // Rien ne part vers le moteur sans passer sous les yeux de
         // l'utilisateur : la lecture s'ouvre dans l'éditeur, pré-rempli, avec
         // l'orientation la plus plausible et les cases douteuses surlignées.

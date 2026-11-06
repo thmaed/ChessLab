@@ -1986,9 +1986,19 @@ libellés, même parcours (Puzzles → Mes collections).
       les 4 captures `lichess_ui_*` lues à 64/64 en 1,5 s modèle chargé compris,
       `ScannerPipelineTest` 3/3 (vraie capture chess.com comprise), `ScannerConfirmTest` 1/1.
 
-- [ ] **Écart OUVERT — recroisement YOLO × gabarits (scanner)** : iOS recroise la lecture du détecteur avec
-      celle de `TemplateSquareClassifier` (`BoardScanReading.crossChecked`) et signale toute case où le second,
-      sûr de lui, contredit le premier ; Android n'a que le détecteur. Constaté le 06/11 sur la fixture
-      `lichess_ui_photo_celtic_black.jpg` (photo d'écran simulée) : iOS 64/64, Android 62/64 dont une dame lue
-      à la place d'une tour (a1) donnée pour sûre. Tolérance explicite dans le manifeste
-      (`androidMaxSilentlyWrong`) ; à lever en portant les gabarits.
+- [x] **Recroisement YOLO × gabarits, recalage de grille, cohérence d'échecs — PORTÉS (06/11)**. Android n'avait
+      ni `BoardGridFinder` (iOS recale l'image sur les lignes du damier avant le détecteur), ni
+      `BoardConsistency` (pion sur la rangée de fond, deux rois…), ni `TemplateSquareClassifier` +
+      `crossChecked` : ces trois écarts n'étaient inscrits nulle part. Maintenant : `vision/BoardGridFinder.kt`,
+      `BoardConsistency.kt`, `ImagePatch.kt`, `BoardRectifier.kt` (redressement bilinéaire 800×800, grille,
+      vignettes), `app/scanner/TemplateSquareClassifier.kt` (288 gabarits rendus depuis les drawables `piece_*`),
+      `ScanReading.crossChecked`, et `ScanPipeline` qui enchaîne le tout comme `rectifyAndScan` iOS. Tests : JVM
+      (`BoardGridFinderTest`, `BoardConsistencyTest`, `ImagePatchTest`, `ScanCrossCheckTest`) et instrumentés
+      (`TemplateSquareClassifierTest`, `ScannerLichessUiTest` sur les 7 fixtures, `ScannerPipelineTest` sur la
+      vraie capture chess.com) — verts sur Galaxy A16 (SM-A165F). `isConfident` suit désormais iOS : une case
+      VIDE à faible confiance est signalée (la pièce manquée que les gabarits rattrapent).
+      Fixture photo `celtic_black` : 63/64 (iOS 64/64), la case fausse est signalée.
+- [ ] **Écart OUVERT — déduction de la source (scanner)** : iOS devine capture d'écran ou photo d'un écran et
+      assouplit les seuils des gabarits pour une photo (0,32 / 0,05 au lieu de 0,45 / 0,035). Android n'a qu'un
+      seul chemin : toujours les seuils d'une capture. Sans conséquence sur les fixtures ; à mesurer sur de vraies
+      photos d'écran avant d'y toucher.

@@ -11035,3 +11035,12 @@ et lit 64/64. Écart inscrit dans `android/PARITE.md`, tolérance `androidMaxSil
 **Limites.** Les dégradations sont synthétiques : aucune vraie photo d'écran n'a été mesurée. Sur
 Galaxy A16 : 4 captures `lichess_ui_*` + 3 photos simulées lues, `ScannerPipelineTest` 3/3.
 
+## 06/11 (soir) — Scanner Android : la chaîne d'iOS portée en entier
+
+Trois écarts jamais inscrits, découverts en cherchant pourquoi une photo simulée se lisait moins bien sur
+Android : pas de recalage de la grille avant le détecteur, pas de contrôles de cohérence d'échecs, pas de
+recroisement par gabarits. Portés : `BoardGridFinder`, `BoardConsistency`, `ImagePatch`, `BoardRectifier`,
+`TemplateSquareClassifier`, `ScanReading.crossChecked`, `ScanPipeline`. Effet mesuré sur la fixture photo
+`celtic_black` : 62/64 avec une erreur sûre (a1) → 63/64, la case fausse signalée. Reste ouverte la déduction
+capture/photo (seuils des gabarits), inscrite dans `android/PARITE.md`. La suite iOS complète : 1 245 tests sur
+1 246 ; l'échec (un test d'intégration Maia, 125 s) venait de la charge, il passe seul en 3,9 s.

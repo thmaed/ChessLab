@@ -46,15 +46,14 @@ class ScannerPipelineTest {
             Homography.Point(0.0, 1930.0),
         )
 
-        val detections = detector!!.detect(bitmap!!, corners)
-        val grid = BoardReader.grid(detections)
+        val reading = com.chesslab.scanner.ScanPipeline.read(context, bitmap!!, corners)!!.reading
+        val grid = reading.grid
         val placement = BoardReader.placement(grid)
 
         // L'orientation devinée ne promet qu'une chose : une position LÉGALE.
         // Sur cette finale, les deux sens le sont, et le départage par les
         // pions retient l'envers (un pion blanc en h2 y pèse plus qu'un pion
         // blanc en a7) — iOS devine pareil, et l'utilisateur inverse d'un tap.
-        val reading = com.chesslab.scanner.ScanReading(grid)
         org.junit.Assert.assertTrue(
             com.chesslab.editor.FenValidator.isLegal(
                 reading.fen(reading.suggestedRotation(), chesskit.Piece.Color.white)
@@ -124,7 +123,7 @@ class ScannerPipelineTest {
         val points = corners!!.map { (fx, fy) ->
             Homography.Point((fx * bitmap.width).toDouble(), (fy * bitmap.height).toDouble())
         }
-        val placement = BoardReader.placement(BoardReader.grid(detector!!.detect(bitmap, points)))
+        val placement = BoardReader.placement(com.chesslab.scanner.ScanPipeline.read(context, bitmap, points)!!.reading.grid)
         val correct = squaresInCommon("5rk1/P7/2R5/5P1p/8/4b3/6K1/8", placement)
         assertTrue("cadrage automatique : $correct/64 cases\n  lu $placement", correct >= 60)
     }
