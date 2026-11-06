@@ -1982,5 +1982,6 @@ libellés, même parcours (Puzzles → Mes collections).
       (Android, non versionné, régénéré par `tools/scanner-eval/`).
 - [x] Seuil de doute des pièces à 0,87 : `BoardReader.PIECE_DOUBT_BELOW` = `pieceDoubtBelow` iOS.
 - [x] Tests : `BoardReaderTest` (2 cas), `ScannerLichessUiTest` (instrumenté, 4 captures
-      `lichess_ui_*` lues à l'identique), vérifiés sur émulateur ; à REJOUER sur le Galaxy A16
-      (latence et lecture réelles) avant de cocher définitivement.
+      `lichess_ui_*` lues à l'identique), vérifiés sur émulateur ET sur le Galaxy A16 (SM-A165F, Android 16, 06/11) :
+      les 4 captures `lichess_ui_*` lues à 64/64 en 1,5 s modèle chargé compris,
+      `ScannerPipelineTest` 3/3 (vraie capture chess.com comprise), `ScannerConfirmTest` 1/1.
