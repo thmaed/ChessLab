@@ -43,7 +43,7 @@ class ScannerConfirmTest {
 
     @Test fun uneLectureSeConfirmeDansLEditeurAvantDePartir() {
         assumeTrue("modèle de reconnaissance absent", PieceDetector.shared(context) != null)
-        val bitmap = assets.open("chesscom_endgame_rook.png").use { BitmapFactory.decodeStream(it) }
+        val bitmap = runCatching { assets.open("chesscom_endgame_rook.png").use { BitmapFactory.decodeStream(it) } }.getOrNull()
         assumeTrue("image de fixture absente", bitmap != null)
 
         var analysed: String? = null

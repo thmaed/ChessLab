@@ -43,7 +43,14 @@ enum ScannerFixtures {
             let data = try? Data(contentsOf: url),
             let fixtures = try? JSONDecoder().decode([ScannerFixture].self, from: data)
         else { return [] }
-        return fixtures
+        // Les captures de chess.com ne sont PAS dans le dépôt (décision du
+        // 07/11/2026 : locales seulement, `.gitignore`). Une fixture dont
+        // l'image manque — un clone depuis GitHub — est simplement écartée.
+        let bundle = Bundle(for: ScannerFixtureBundleToken.self)
+        return fixtures.filter { fixture in
+            let name = fixture.file as NSString
+            return bundle.url(forResource: name.deletingPathExtension, withExtension: name.pathExtension) != nil
+        }
     }()
 
     static var isAvailable: Bool { !all.isEmpty }

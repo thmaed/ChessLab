@@ -35,7 +35,7 @@ class ScannerPipelineTest {
         val detector = PieceDetector.shared(context)
         assumeTrue("modèle de reconnaissance absent", detector != null)
 
-        val bitmap = assets.open("chesscom_endgame_rook.png").use { BitmapFactory.decodeStream(it) }
+        val bitmap = runCatching { assets.open("chesscom_endgame_rook.png").use { BitmapFactory.decodeStream(it) } }.getOrNull()
         assumeTrue("image de fixture absente", bitmap != null)
 
         // relevés sur l'image : le plateau va de bord à bord, de y=724 à y=1930
@@ -94,7 +94,7 @@ class ScannerPipelineTest {
      * en dessous.
      */
     @Test fun leCadreEstTrouveToutSeul() {
-        val bitmap = assets.open("chesscom_endgame_rook.png").use { BitmapFactory.decodeStream(it) }
+        val bitmap = runCatching { assets.open("chesscom_endgame_rook.png").use { BitmapFactory.decodeStream(it) } }.getOrNull()
         assumeTrue("image de fixture absente", bitmap != null)
 
         val found = BoardAutoFrame.rect(bitmap!!)
@@ -115,7 +115,7 @@ class ScannerPipelineTest {
     @Test fun leCadreTrouveSeulSeLitAussiBien() {
         val detector = PieceDetector.shared(context)
         assumeTrue("modèle de reconnaissance absent", detector != null)
-        val bitmap = assets.open("chesscom_endgame_rook.png").use { BitmapFactory.decodeStream(it) }
+        val bitmap = runCatching { assets.open("chesscom_endgame_rook.png").use { BitmapFactory.decodeStream(it) } }.getOrNull()
         assumeTrue("image de fixture absente", bitmap != null)
 
         val corners = BoardAutoFrame.corners(bitmap!!)

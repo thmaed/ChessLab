@@ -86,3 +86,8 @@ android/keystore.properties
 # votre nom. Elle vit dans ~/.private_keys/, comme la clé App Store Connect.
 play-service-account.json
 android/play-service-account.json
+
+# Captures et jeux de pièces de chess.com : LOCAUX seulement (décision du 07/11/2026).
+# Les tests qui s'en servent s'ignorent quand les fichiers manquent (clone depuis GitHub).
+ChessLabTests/ScannerFixtures/chesscom_*
+piece-sets/

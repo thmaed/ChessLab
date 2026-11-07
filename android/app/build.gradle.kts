@@ -246,7 +246,7 @@ kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_17) } }
 // Les images de fixtures du scanner, déjà mises au format d'entrée par
 // tools/yolo-spike, servent au test de bout en bout du scanner.
 val testAssets = layout.buildDirectory.dir("testAssets")
-val copyTestAssets by tasks.registering(Copy::class) {
+val copyTestAssets by tasks.registering(Sync::class) {
     from(rootProject.file("../ChessLabTests/ScannerFixtures")) { include("*.png", "*.jpg", "manifest.json") }
     into(testAssets)
 }

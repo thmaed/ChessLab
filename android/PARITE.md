@@ -2074,3 +2074,9 @@ libellés, même parcours (Puzzles → Mes collections).
       montré l'accueil au lieu du scanner, l'image consommée puis perdue ; non reproduit depuis, cause exacte non
       établie. 9 lancements d'affilée corrects après le correctif.
 - [ ] **À regarder sur appareil** : les trois boutons de sortie sur le Galaxy A16 (testés, pas vus à l'écran).
+
+## 07/11 (suite) — chess.com : captures de test locales seulement
+
+- [x] Les deux captures chess.com des fixtures ne sont plus dans Git (locales, ignorées). iOS : `ScannerFixtures.all`
+      écarte les fixtures sans image ; Android : `ScannerPipelineTest` / `ScannerConfirmTest` s'ignorent (4 tests
+      ignorés, 0 échec, vérifiés sans les fichiers). `copyTestAssets` est une `Sync`.

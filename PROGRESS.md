@@ -11088,3 +11088,13 @@ sélecteur.
   prochaine version portera un nouveau numéro, à décider). Android : `versionCode` 34 déjà prévu.
 - **CloudKit** : `CD_SyncedPuzzleCollection` n'existe ni en développement ni en production (vérifié par
   `cktool export-schema`) ; à générer sur appareil puis à déployer par la console AVANT de publier.
+
+## 07/11 (suite) — chess.com : accepté tel quel, mais rien de leur dans le dépôt
+
+Décision de l'auteur : le détecteur reste tel quel (il descend de poids entraînés avec des jeux chess.com ; risque
+assumé). **Mais aucun matériel chess.com n'entre dans Git** : les jeux de pièces (SVG, `~/scripts/yolo/piece-sets`)
+n'ont jamais été dans le dépôt et l'app n'en embarque aucun ; les deux captures d'écran chess.com
+(`chesscom_endgame_*.png`) qui servaient de fixtures sont sorties du suivi et ignorées (`.gitignore`), gardées en
+LOCAL. Les tests qui s'en servent s'ignorent quand elles manquent (iOS : manifeste filtré ; Android : test ignoré),
+et la copie des fixtures Android est une `Sync` (une `Copy` laissait traîner les fichiers retirés).
+Elles restent dans l'HISTORIQUE déjà publié sur GitHub (depuis la 1.0.1) tant qu'il n'est pas réécrit.
