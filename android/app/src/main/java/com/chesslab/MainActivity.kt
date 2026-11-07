@@ -13,6 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import com.chesslab.ui.LargeTitleBar
+import com.chesslab.ui.LargeTitleHeight
+import com.chesslab.ui.TitleCollapse
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import com.chesslab.analysis.AnalysisEntryScreen
@@ -161,13 +165,30 @@ private fun App(sharedImage: android.net.Uri? = null) {
     // du texte gèrent l'encart du clavier eux-mêmes.
     Box(Modifier.fillMaxSize()) {
     CompositionLocalProvider(LocalDiscoveryAnchors provides anchors, LocalDiscoveryTour provides tour) {
-    Column(Modifier.fillMaxSize().systemBarsPadding()) {
+    // Les écrans de menu portent un GRAND titre qui se réduit au défilement,
+    // comme iOS : l'état repart de zéro à chaque écran, et le défilement de
+    // l'écran le pilote par `nestedScroll`, sans que l'écran le sache.
+    val largeTitleHeightPx = with(androidx.compose.ui.platform.LocalDensity.current) { LargeTitleHeight.toPx() }
+    val collapse = remember(current) { TitleCollapse(if (current.hasLargeTitle) largeTitleHeightPx else 0f) }
+    Column(
+        Modifier.fillMaxSize().systemBarsPadding()
+            .then(if (current.hasLargeTitle) Modifier.nestedScroll(collapse.connection) else Modifier)
+    ) {
         if (current != Route.Home) {
-            TopBar(
-                title = if (current.hasOwnTitle) "" else current.title(context),
-                actions = topBar.content,
-                onBack = { stack.removeAt(stack.lastIndex) },
-            )
+            if (current.hasLargeTitle) {
+                LargeTitleBar(
+                    title = current.title(context),
+                    collapse = collapse,
+                    actions = topBar.content,
+                    onBack = { stack.removeAt(stack.lastIndex) },
+                )
+            } else {
+                TopBar(
+                    title = if (current.hasOwnTitle) "" else current.title(context),
+                    actions = topBar.content,
+                    onBack = { stack.removeAt(stack.lastIndex) },
+                )
+            }
         }
         CompositionLocalProvider(LocalTopBarSlot provides topBar) {
         when (current) {

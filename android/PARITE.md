@@ -130,12 +130,15 @@ vérifier sur le Galaxy avant de cocher.
 - [x] **C4 — bouton d'action plein en bas, teinté du mode** (Nouvelle partie vert,
       Deux joueurs bleu, Laboratoire rose, variantes) : iOS `PrimaryActionBar`,
       Android `tintedActionGradient`. Reste à voir sur le Galaxy.
-- [ ] **C2 — un seul style de titre : fait sur iOS seulement.** Les écrans de
-      menu iOS (Puzzles, Nouvelle partie, Deux joueurs, Analyser,
-      Bibliothèque, Laboratoire, Variantes, Progression) passent en GRAND titre
-      à gauche, comme Ouvertures et Finales. Android garde sa barre d'app
-      unique, déjà cohérente d'un écran à l'autre : le grand titre y demande une
-      `LargeTopAppBar` qui se réduit au défilement, à décider avec C4.
+- [x] **C2 — un seul style de titre : PORTÉ sur Android le 07/11.** Les écrans de menu (Nouvelle partie, Deux
+      joueurs, Analyser, Bibliothèque, Puzzles, Séance du jour, Progression, Variantes, Laboratoire) passent en GRAND
+      titre à gauche (34 sp, gras), comme iOS, et se réduisent en titre en ligne quand on fait défiler, puis se
+      rouvrent en haut (`LargeTitleBar` + `TitleCollapse`, branchés dans `MainActivity` par `nestedScroll` : aucun
+      écran n'a été modifié). `Route.hasLargeTitle` désigne les écrans concernés ; Ouvertures et Finales, qui
+      dessinent déjà leur titre, sont inchangés. Vu à l'écran sur Galaxy A16 (expansion, réduction, réouverture ;
+      « Variantes d'échecs » tient sur une ligne). Écarts MINEURS : le Laboratoire Android réunit réglages et série
+      sur un seul écran, donc le grand titre y couvre aussi la série en cours (iOS : réglages seulement) ; le titre
+      en ligne n'est pas encore vérifié sur la tablette ni en anglais.
 
 ### A1 de la 2.0 — analyse automatique des parties — 24/10/2026
 
@@ -2106,3 +2109,8 @@ libellés, même parcours (Puzzles → Mes collections).
       · **C2 — grands titres** (iOS seulement) : change l'ossature de tous les écrans Android (`LargeTopAppBar`) ;
         décision de design à prendre avant, pas à la volée ;
       · publication Play : binaire intermédiaire (versionCode 33), à l'auteur de décider.
+
+- [ ] **`PuzzleCollectionTest.aCollectionCanBeImportedPracticedWorkedAsAProgrammeAndDeleted` échoue — ANTÉRIEUR à
+      la session du 07/11** (même échec au commit `4629083`, avant tout ce travail, et sans les grands titres) : la ligne
+      de la collection importée n'apparaît pas dans les 10 s après la fermeture du bilan d'import (ligne 77). 184 tests
+      instrumentés sur 185 verts sur Galaxy A16 le 07/11. Cause non établie ; à regarder à l'écran.

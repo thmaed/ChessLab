@@ -24,6 +24,14 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
      */
     open val hasOwnTitle: Boolean get() = false
 
+    /**
+     * Vrai pour les écrans de MENU : leur titre s'affiche en GRAND, à gauche,
+     * sous la barre, et se réduit dans la barre quand on fait défiler — comme les
+     * grands titres d'iOS (`navigationBarTitleDisplayMode(.large)`). Les écrans de
+     * jeu, d'édition et de détail gardent le titre en ligne.
+     */
+    open val hasLargeTitle: Boolean get() = false
+
     data object Home : Route(R.string.route_home)
     /**
      * La CONFIGURATION d'une partie, comme sur iOS : on choisit couleur,
@@ -32,7 +40,9 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data class NewGame(
         /** La position venue d'un autre écran, ou rapportée par l'éditeur. */
         val startFen: String? = null,
-    ) : Route(if (startFen == null) R.string.route_new_game else R.string.route_continue_game)
+    ) : Route(if (startFen == null) R.string.route_new_game else R.string.route_continue_game) {
+        override val hasLargeTitle get() = true
+    }
 
     /**
      * La partie elle-même. [settings] vient de l'écran de configuration ;
@@ -57,7 +67,9 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
          * dit alors qu'on CONTINUE une partie — comme sur iOS.
          */
         val startFen: String? = null,
-    ) : Route(if (startFen == null) R.string.route_two_players else R.string.route_continue_game)
+    ) : Route(if (startFen == null) R.string.route_two_players else R.string.route_continue_game) {
+        override val hasLargeTitle get() = true
+    }
 
     /**
      * La partie à deux elle-même. [startFen] la fait commencer à la position
@@ -104,14 +116,18 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     }
 
     /** Le CHOIX de la source : scanner, bibliothèque, dernière partie, coller. */
-    data object Analysis : Route(R.string.route_analysis)
+    data object Analysis : Route(R.string.route_analysis) {
+        override val hasLargeTitle get() = true
+    }
 
     /**
      * La BIBLIOTHÈQUE des parties : rechercher, filtrer, étiqueter, supprimer,
      * importer. Un écran à part, et non une liste coincée sous l'analyse :
      * c'est un classeur, pas un raccourci vers la dernière partie.
      */
-    data object AnalysisLibrary : Route(R.string.analysis_library)
+    data object AnalysisLibrary : Route(R.string.analysis_library) {
+        override val hasLargeTitle get() = true
+    }
 
     /**
      * L'analyse elle-même. [fen] vient du scanner ou de l'éditeur, [pgn]
@@ -126,7 +142,9 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
      * qu'on travaille avant de résoudre — sans quoi le puzzle courant change
      * sous les doigts à chaque réglage.
      */
-    data object PuzzleQueue : Route(R.string.route_puzzles)
+    data object PuzzleQueue : Route(R.string.route_puzzles) {
+        override val hasLargeTitle get() = true
+    }
 
     data class Puzzles(
         val theme: String? = null,
@@ -141,12 +159,20 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
         override val hasOwnTitle get() = true
     }
     /** Le Laboratoire. [startFen] impose la position de départ de la série. */
-    data class Laboratory(val startFen: String? = null) : Route(R.string.route_lab)
+    data class Laboratory(val startFen: String? = null) : Route(R.string.route_lab) {
+        override val hasLargeTitle get() = true
+    }
     /** Le hub porte « Variantes d'échecs » ; la tuile d'accueil, « Variantes ». */
-    data object Variants : Route(R.string.variants_hub_title)
-    data object Progression : Route(R.string.route_progress)
+    data object Variants : Route(R.string.variants_hub_title) {
+        override val hasLargeTitle get() = true
+    }
+    data object Progression : Route(R.string.route_progress) {
+        override val hasLargeTitle get() = true
+    }
     /** A5 : la séance du jour, ses étapes et la série de jours. */
-    data object DailySession : Route(R.string.daily_title)
+    data object DailySession : Route(R.string.daily_title) {
+        override val hasLargeTitle get() = true
+    }
     data object Settings : Route(R.string.route_settings)
     data object Help : Route(R.string.route_help)
     /** Les licences des composants embarqués, depuis les réglages. */
