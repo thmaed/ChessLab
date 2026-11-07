@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ChevronRight
@@ -143,14 +144,17 @@ private const val CONTACT_EMAIL = "variospeed67@gmail.com"
 /**
  * « Contactez le développeur ». Pendant de `contactCard` (HelpView.swift) :
  * un lien `mailto:` ouvre l'application de messagerie du téléphone, sans
- * aucune permission — la promesse « pas d'INTERNET » reste intacte. La photo
- * de l'auteur que montre iOS n'est pas portée (voir `PARITE.md`).
+ * aucune permission — la promesse « pas d'INTERNET » reste intacte. Sous le
+ * texte, la photo de l'auteur, comme iOS : 60 % de la largeur de la FENÊTRE (pas
+ * de l'écran : en multi-fenêtre, l'image sortirait du cadre), alignée sous le
+ * même retrait que le titre.
  */
 @Composable
 private fun ContactCard() {
     val context = androidx.compose.ui.platform.LocalContext.current
     val missing = stringResource(R.string.help_contact_mail_missing, CONTACT_EMAIL)
-    Row(
+    val windowWidth = androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp
+    Column(
         Modifier
             .fillMaxWidth()
             .clip(CardShape)
@@ -158,30 +162,45 @@ private fun ContactCard() {
             .subtleBorder()
             .padding(14.dp)
             .testTag("aide-contact"),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        IconBadge(Icons.Default.Email, Palette.accent, 36.dp)
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-            Text(
-                stringResource(R.string.help_contact_title), fontSize = 14.sp,
-                fontWeight = FontWeight.Bold, color = Palette.textPrimary,
-            )
-            Text(stringResource(R.string.help_contact_body), fontSize = 12.sp, color = Palette.textSecondary)
-            Text(
-                CONTACT_EMAIL, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Palette.accent,
-                modifier = Modifier
-                    .clickable {
-                        val mail = android.content.Intent(
-                            android.content.Intent.ACTION_SENDTO, android.net.Uri.parse("mailto:$CONTACT_EMAIL"),
-                        )
-                        try {
-                            context.startActivity(mail)
-                        } catch (_: android.content.ActivityNotFoundException) {
-                            android.widget.Toast.makeText(context, missing, android.widget.Toast.LENGTH_LONG).show()
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            IconBadge(Icons.Default.Email, Palette.accent, 36.dp)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(
+                    stringResource(R.string.help_contact_title), fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold, color = Palette.textPrimary,
+                )
+                Text(stringResource(R.string.help_contact_body), fontSize = 12.sp, color = Palette.textSecondary)
+                Text(
+                    CONTACT_EMAIL, fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Palette.accent,
+                    modifier = Modifier
+                        .clickable {
+                            val mail = android.content.Intent(
+                                android.content.Intent.ACTION_SENDTO, android.net.Uri.parse("mailto:$CONTACT_EMAIL"),
+                            )
+                            try {
+                                context.startActivity(mail)
+                            } catch (_: android.content.ActivityNotFoundException) {
+                                android.widget.Toast.makeText(context, missing, android.widget.Toast.LENGTH_LONG).show()
+                            }
                         }
-                    }
-                    .padding(vertical = 4.dp)
-                    .testTag("aide-contact-mail"),
+                        .padding(vertical = 4.dp)
+                        .testTag("aide-contact-mail"),
+                )
+            }
+        }
+        Row {
+            // Le retrait de la colonne d'icône (36 dp) et de son espacement (12 dp).
+            Spacer(Modifier.width(48.dp))
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(R.drawable.author),
+                contentDescription = null,
+                contentScale = androidx.compose.ui.layout.ContentScale.Fit,
+                modifier = Modifier
+                    .width((windowWidth * 0.6f).dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .testTag("aide-auteur"),
             )
         }
     }
@@ -306,6 +325,7 @@ private val sections = listOf(
     Triple(R.string.help_analysis_title, R.string.help_analysis_body, Icons.Default.ShowChart to Palette.teal),
     Triple(R.string.help_courses_title, R.string.help_courses_body, Icons.Default.MenuBook to Palette.warning),
     Triple(R.string.help_training_title, R.string.help_training_body, Icons.Default.Psychology to Palette.gold),
+    Triple(R.string.help_lab_title, R.string.help_lab_body, Icons.Default.Science to Palette.rose),
     Triple(R.string.help_variants_title, R.string.help_variants_body, Icons.Default.Casino to Palette.rose),
     Triple(R.string.help_scanner_title, R.string.help_scanner_body, Icons.Default.PhotoCamera to Palette.accentSecondary),
     Triple(R.string.help_offline_title, R.string.help_offline_body, Icons.Default.CloudOff to Palette.textSecondary),

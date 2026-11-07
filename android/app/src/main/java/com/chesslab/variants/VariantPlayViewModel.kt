@@ -446,7 +446,10 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
                 }
             } ?: return@launch
             if (log != ui.uciLog || !ui.hintWanted) return@launch
-            ui = ui.copy(hints = com.chesslab.ui.HintArrowBuilder.build(lines.first, lines.second))
+            // Une flèche sur un roque Chess960 dirait « le roi prend sa tour » : elle
+            // doit viser la case où le roi atterrit vraiment, comme iOS (`remappedForCastle`).
+            val lans = lines.first.mapValues { (_, lan) -> displayLan(lan) }
+            ui = ui.copy(hints = com.chesslab.ui.HintArrowBuilder.build(lans, lines.second))
         }
     }
 
@@ -697,7 +700,7 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         // `VariantMoveMarks` et non un découpage à la main : au Crazyhouse le
         // moteur répond `P@e4`, dont les deux premiers caractères ne sont pas
         // une case.
-        refresh(VariantMoveMarks.of(best))
+        refresh(marksFor(best, VariantMoveMarks.of(best)))
     }
 
 
@@ -773,8 +776,23 @@ class VariantPlayViewModel(app: Application) : AndroidViewModel(app) {
         hintJob?.cancel()
         ui = ui.copy(uciLog = before + move, hints = emptyList(), blunderWarning = null)
         checkBlunder(before, ui.uciLog)
-        refresh(marks)
+        refresh(marksFor(move, marks))
     }
+
+    /**
+     * Les cases à surligner pour [move], joué depuis la position AFFICHÉE (à
+     * appeler avant `refresh`). Au Chess960 le moteur écrit un roque « le roi
+     * prend sa tour » (`e1h1`) : la surbrillance doit tomber sur la case du ROI
+     * (g ou c), là où il atterrit, pas sur la tour d'origine — comme iOS
+     * (`Chess960Game.displaySquares`). Hors Chess960, [fallback] tel quel.
+     */
+    private fun marksFor(move: String, fallback: Pair<Square, Square>?): Pair<Square, Square>? =
+        if (ui.variant?.chess960 == true) Chess960Castling.displaySquares(move, ui.position) ?: fallback else fallback
+
+    /** Le coup UCI [lan] écrit avec la case d'arrivée AFFICHÉE (voir [marksFor]). */
+    private fun displayLan(lan: String): String =
+        if (ui.variant?.chess960 != true) lan
+        else Chess960Castling.displaySquares(lan, ui.position)?.let { it.first.notation + it.second.notation } ?: lan
 
     /**
      * La FEN d'une variante peut porter des champs en plus (« +0+0 » aux Trois

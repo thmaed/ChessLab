@@ -210,7 +210,7 @@ moteur est UNIQUE (iOS) / le verrou du moteur est tenu pendant toute la revue
 - [x] Tests : `HumanMoveCoachTests` + `CoachExplanationUITests` (iOS),
       `HumanMoveCoachTest` + `AnalysisReviewTest.leCoachDitCeQueJouentLesHumains`
       (Android, Galaxy A16).
-- [ ] Écart : le texte d'aide « Analyser » mentionne le Coach côté iOS ; Android
+- [x] (Périmé : Android a depuis son aide, carte « Analyse, Coach et profil ».) Écart : le texte d'aide « Analyser » mentionne le Coach côté iOS ; Android
       n'a pas d'écran d'aide équivalent (écart antérieur, voir plus haut).
 
 ### A3 de la 2.0 — sorties de répertoire → révisions FSRS — 24/10/2026
@@ -1863,7 +1863,7 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
 - [x] **`VariantVictoryTest` n'avait pas de règle de langue** : il ne passait
       que sur un appareil réglé en français. Échouait à l'identique sur le code
       d'AVANT la passe. `LanguageRule` ajoutée, il passe sur l'émulateur anglais.
-- [ ] **`OpeningIndexTest.taperUnCoupDeLIndexAmeneASaPosition` échoue sur la
+- [x] **PLUS D'ÉCHEC (07/11)** — `OpeningIndexTest` vert sur Galaxy A16 ET sur la tablette émulée 2560 × 1600 en paysage. Ancien constat : **`OpeningIndexTest.taperUnCoupDeLIndexAmeneASaPosition` échoue sur la
       tablette en paysage**, à l'identique sur le code d'avant la passe : la
       puce `fil-4` du fil d'Ariane existe mais sort de sa rangée défilante.
       Probablement le test qui ne la fait pas venir, pas l'écran qui casse —
@@ -1907,11 +1907,11 @@ pas branché) : 119 réussis, 6 échecs, tous expliqués.
   répétition, abandon et nulle par accord (mêmes seuils), plafond de 400 demi-coups.
 - [x] **Corrigé au passage (Android)** : le roque Chess960 s'écrivait « Kxh1 » dans le PGN (le moteur le
       donne « roi prend sa tour ») ; `VariantSan` écrit maintenant O-O / O-O-O, comme iOS.
-- [ ] **Écart relevé, NON corrigé (Android)** : à l'écran Chess960 contre l'ordinateur, la surbrillance d'un
+- [x] **CORRIGÉ le 07/11 (Android)** : à l'écran Chess960 contre l'ordinateur, la surbrillance d'un
       roque tombe sur la case de la TOUR d'origine ; iOS surligne la case du roi (`displaySquares`). Le
       Laboratoire, lui, surligne la case du roi (`Chess960Castling.displaySquares`) : brancher la même
       fonction dans `VariantPlayViewModel`.
-- [ ] **Écart relevé, préexistant (Android)** : l'aide n'a pas de section « Laboratoire » (iOS en a une,
+- [x] **CORRIGÉ le 07/11 (Android)** : l'aide n'avait pas de section « Laboratoire » (iOS en a une,
       qui parle désormais du Chess960).
 
 ### Séance du jour : le cycle Woodpecker en cours — 04/11/2026 (suggestion d'Olivier)
@@ -1969,7 +1969,8 @@ libellés, même parcours (Puzzles → Mes collections).
       enregistrée reste le nom français ; Android l'avait déjà). À vérifier en anglais sur appareil :
       en-tête d'analyse, bilan, puces de la bibliothèque, « Ouvertures coûteuses ».
 - [x] Aide : cartes « Contactez le développeur » (ouvre la messagerie) et « Remerciements ».
-- [ ] **Écart** : la photo de l'auteur sous le contact (iOS) n'est pas portée sur Android.
+- [x] **PORTÉE le 07/11** : la photo de l'auteur sous le contact (`res/drawable-nodpi/author.jpg`, 60 % de la largeur
+      de la fenêtre comme iOS) ; vue à l'écran sur Galaxy A16. Elle n'était pas portée jusque-là.
 
 ## Publication Play de la 2.0 (27/10/2026)
 
@@ -2086,3 +2087,22 @@ libellés, même parcours (Puzzles → Mes collections).
 - [x] Les deux captures chess.com des fixtures ne sont plus dans Git (locales, ignorées). iOS : `ScannerFixtures.all`
       écarte les fixtures sans image ; Android : `ScannerPipelineTest` / `ScannerConfirmTest` s'ignorent (4 tests
       ignorés, 0 échec, vérifiés sans les fichiers). `copyTestAssets` est une `Sync`.
+
+## 07/11 (suite) — Alignement d'Android sur ce fichier : ce qui est fait, ce qui reste
+
+- [x] **Corrigés dans ce passage** (code, tests, et vérifiés quand c'est visible) : déduction capture / photo d'écran ;
+      surbrillance du roque Chess960 contre l'ordinateur (`VariantPlayViewModel.marksFor` / `displayLan`, pour le coup
+      joué, le coup de l'ordinateur et les flèches d'indice) ; section « Laboratoire » de l'aide ; photo de l'auteur ;
+      sorties jouer / analyser / Laboratoire de l'éditeur. 59 tests instrumentés ciblés + JVM verts sur Galaxy A16.
+- [ ] **Roque Chess960 : à regarder sur appareil** — aucune position de départ Chess960 n'autorise un roque au premier
+      coup, donc pas de test de bout en bout ; `Chess960Castling.displaySquares` est testé, le câblage non.
+- [ ] **Retour de Ron (« Reprendre ici » introuvable avec pendule) : DÉJÀ LIVRÉ des deux côtés** (`80e1aa2`, 28/10 :
+      « Analyser ici » avec pendule, phrase de fin de partie ; `1e016d1` : version en bas des Réglages), donc dans la 2.1.
+- [ ] **Reste ouvert, et pourquoi** — aucun de ces points n'est du code à porter :
+      · contrôles VISUELS sur appareil (une quarantaine de cases « à vérifier sur le Galaxy ») : seul l'œil de
+        l'auteur les coche ;
+      · écarts de PLATEFORME ou décisions : extension de partage (iOS ne peut pas lancer l'app), invitation d'avis,
+        précharge des puzzles, pas de notification, pas de tâche de fond, détection de rectangles de Vision ;
+      · **C2 — grands titres** (iOS seulement) : change l'ossature de tous les écrans Android (`LargeTopAppBar`) ;
+        décision de design à prendre avant, pas à la volée ;
+      · publication Play : binaire intermédiaire (versionCode 33), à l'auteur de décider.

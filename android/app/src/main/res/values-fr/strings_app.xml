@@ -65,6 +65,8 @@
     <string name="help_characters_title">Les neuf personnages</string>
     <string name="help_courses_body">136 cours, chacun découpé en chapitres. Les commentaires viennent des positions elles-mêmes, et les pourcentages sont ceux des parties de club. Les finales suivent le même format que les ouvertures : ce sont des positions à comprendre, pas à retenir.</string>
     <string name="help_courses_title">Ouvertures et finales</string>
+    <string name="help_lab_body">Faites s\'affronter deux instances de Stockfish sur une série de parties pour comparer des réglages. Statistiques, écart Elo estimé avec intervalle de confiance, courbe de progression et répartition des résultats. On y arrive aussi depuis une partie ou une analyse — « Changer de mode », puis « Laboratoire » : la série démarre alors sur votre position. En fin de série, la dernière partie s\'ouvre d\'un tap dans l\'analyse. En Chess960, une position différente est tirée pour chaque paire de parties (ou un numéro de votre choix), Stockfish seul ; la dernière partie s\'ouvre alors dans l\'analyse Chess960.</string>
+    <string name="help_lab_title">Laboratoire</string>
     <string name="help_level_body">C\'est l\'échelle humaine de Maia, proche de celle de Lichess. Elle n\'est PAS comparable à un « niveau Stockfish » : un Stockfish bridé à 1100 bat un Maia réglé à 2200, parce qu\'il calcule là où l\'autre reconnaît. Deux échelles, deux choses.</string>
     <string name="help_level_title">Le niveau affiché</string>
     <string name="help_offline_body">Tout. Aucun compte, aucun réseau, aucune donnée qui sort de l\'appareil. Le moteur, les puzzles, les cours et les adversaires sont embarqués.</string>

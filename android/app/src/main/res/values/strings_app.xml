@@ -68,6 +68,8 @@
     <string name="help_characters_title">The nine characters</string>
     <string name="help_courses_body">136 courses, each split into chapters. The comments come from the positions themselves, and the percentages are those of club games. Endgames follow the same format as openings: they are positions to understand, not to memorise.</string>
     <string name="help_courses_title">Openings and endgames</string>
+    <string name="help_lab_body">Pit two Stockfish instances against each other over a series of games to compare settings. Statistics, estimated Elo gap with confidence interval, progression chart and result distribution. You can also get here from a game or an analysis — “Switch mode”, then “Laboratory”: the series then starts from your position. Once the series is over, one tap opens the last game in analysis. In Chess960, a different position is drawn for each pair of games (or a number of your choice), Stockfish only; the last game then opens in the Chess960 analysis.</string>
+    <string name="help_lab_title">Laboratory</string>
     <string name="help_level_body">It is Maia\'s human scale, close to Lichess\'s. It is NOT comparable to a « Stockfish level »: a Stockfish throttled to 1100 beats a Maia set to 2200, because it calculates where the other recognises. Two scales, two different things.</string>
     <string name="help_level_title">The level shown</string>
     <string name="help_offline_body">Everything. No account, no network, no data leaving the device. The engine, the puzzles, the courses and the opponents are all embedded.</string>
