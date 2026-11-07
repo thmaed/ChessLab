@@ -70,12 +70,23 @@ enum SharedImageInbox {
         return true
     }
 
-    /// Les octets de l'image en attente — et la boîte est vidée : une image ne
-    /// se lit qu'une fois, même si sa lecture échoue en aval.
-    static func take(in directory: URL? = defaultDirectory, now: Date = .now) -> Data? {
+    /// Les octets de l'image en attente, SANS vider la boîte : l'app ne la vide
+    /// (``discard(in:)``) qu'une fois l'image chargée, pour qu'une vue reconstruite
+    /// en cours de route ne la perde pas.
+    static func peek(in directory: URL? = defaultDirectory, now: Date = .now) -> Data? {
         guard let directory, hasPending(in: directory, now: now) else { return nil }
-        let url = file(in: directory)
-        defer { try? FileManager.default.removeItem(at: url) }
-        return try? Data(contentsOf: url)
+        return try? Data(contentsOf: file(in: directory))
+    }
+
+    /// Vide la boîte.
+    static func discard(in directory: URL? = defaultDirectory) {
+        guard let directory else { return }
+        try? FileManager.default.removeItem(at: file(in: directory))
+    }
+
+    /// Lit puis vide, d'un seul geste : une image ne se lit qu'une fois.
+    static func take(in directory: URL? = defaultDirectory, now: Date = .now) -> Data? {
+        defer { discard(in: directory) }
+        return peek(in: directory, now: now)
     }
 }

@@ -323,7 +323,13 @@ private fun App(sharedImage: android.net.Uri? = null) {
             )
             Route.Sources -> com.chesslab.settings.SourcesScreen()
             Route.Licences -> com.chesslab.settings.LicencesScreen()
-            is Route.Scanner -> ScannerScreen(sharedImage = current.sharedImage) { fen ->
+            is Route.Scanner -> ScannerScreen(
+                sharedImage = current.sharedImage,
+                // Comme iOS (`Exit.standalone`) : jouer, analyser ou partir du Laboratoire —
+                // sauf depuis le réglage d'une partie, qui n'attend qu'une position.
+                onPlay = if (current.forSetup) null else { fen -> stack.add(Route.NewGame(startFen = fen)) },
+                onUseAsLabStart = if (current.forSetup) null else { fen -> stack.add(Route.Laboratory(fen)) },
+            ) { fen ->
                 // Le scanner appelé DEPUIS le réglage d'une partie y rapporte
                 // sa position, au lieu de filer vers l'analyse.
                 if (current.forSetup) {
@@ -356,6 +362,8 @@ private fun App(sharedImage: android.net.Uri? = null) {
             )
             is Route.PositionEditor -> PositionEditorScreen(
                 confirmLabel = if (current.forSetup) R.string.setup_use_position else R.string.route_analysis,
+                onPlay = if (current.forSetup) null else { fen -> stack.add(Route.NewGame(startFen = fen)) },
+                onUseAsLabStart = if (current.forSetup) null else { fen -> stack.add(Route.Laboratory(fen)) },
             ) { fen ->
                 if (current.forSetup) {
                     stack.removeAt(stack.lastIndex)

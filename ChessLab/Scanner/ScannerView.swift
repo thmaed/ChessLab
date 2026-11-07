@@ -17,6 +17,8 @@ struct ScannerView: View {
     @State private var showCamera = false
     @State private var showFileImporter = false
     @Environment(\.scenePhase) private var scenePhase
+    /// Une image partagée est en cours de lecture : ni `onAppear` ni le retour au premier plan ne la relancent.
+    @State private var loadingSharedImage = false
 
     var body: some View {
         Group {
@@ -68,11 +70,17 @@ struct ScannerView: View {
         }
     }
 
-    /// Prend l'image déposée par l'extension de partage, s'il y en a une —
-    /// la boîte est vidée dans le même geste (voir ``SharedImageInbox/take(in:now:)``).
+    /// Lit l'image déposée par l'extension de partage, s'il y en a une — et ne
+    /// vide la boîte qu'une fois l'image CHARGÉE : si l'écran disparaît entre-temps
+    /// (pile refaite, vue reconstruite), l'image n'est pas perdue.
     private func takeSharedImage() {
-        guard let data = SharedImageInbox.take() else { return }
-        Task { await vm.loadFromDropped(data: data) }
+        guard !loadingSharedImage, let data = SharedImageInbox.peek() else { return }
+        loadingSharedImage = true
+        Task {
+            await vm.loadFromDropped(data: data)
+            SharedImageInbox.discard()
+            loadingSharedImage = false
+        }
     }
 
     // MARK: Étape 1 — source

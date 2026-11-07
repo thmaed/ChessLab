@@ -246,6 +246,9 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="switch_mode">Changer de mode</string>
     <string name="switch_mode_short">Modes</string>
     <string name="settings_version">Version %1$s</string>
+    <string name="editor_exit_play">Jouer cette position</string>
+    <string name="editor_exit_analyse">Analyser cette position</string>
+    <string name="editor_exit_lab">Départ du Laboratoire</string>
     <string name="route_analysis">Analyser</string>
     <string name="route_editor">Éditeur de position</string>
     <string name="route_endgames">Finales</string>

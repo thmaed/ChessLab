@@ -226,7 +226,11 @@ struct ScanConfirmationView: View {
     }
 
     private var rotationHint: String {
-        let base = "Lecture pivotée de \(rotation.degrees)°."
-        return "\(base) Si le plateau apparaît à l'envers, inversez la lecture."
+        // Une clé du catalogue, pas un `String` interpolé : ce dernier n'est jamais
+        // traduit, et l'anglais affichait cette phrase en français.
+        LocalizationController.string(
+            "Lecture pivotée de %lld°. Si le plateau apparaît à l'envers, inversez la lecture.",
+            rotation.degrees
+        )
     }
 }

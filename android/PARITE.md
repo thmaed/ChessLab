@@ -2055,3 +2055,22 @@ libellés, même parcours (Puzzles → Mes collections).
 - [ ] **À regarder sur appareil** : le partage depuis l'app Photos de l'iPhone réel (le simulateur n'a pas de
       feuille de partage pilotable ici : seule la boîte aux lettres a été vérifiée de bout en bout). Build de
       développement poussé sur l'iPhone3 le 07/11.
+
+## 07/11 (suite) — Sorties de l'éditeur et du scanner, phrase de rotation, partage plus robuste
+
+- [x] **Écart découvert et PORTÉ** : sur iOS, l'éditeur de position autonome et la confirmation du scanner offrent
+      trois sorties (« Jouer cette position », « Analyser cette position », « Départ du Laboratoire ») ; Android
+      n'avait que l'analyse. `PositionEditorScreen` (`onPlay`, `onUseAsLabStart`) et `ScannerScreen` les portent ;
+      depuis le réglage d'une partie (`forSetup`), un seul bouton « Utiliser cette position », comme `Exit.picker`
+      d'iOS. Boutons grisés tant que la position est illégale. Test instrumenté `EditorExitsTest` (4).
+- [ ] **Écart MINEUR conservé** : « Jouer » ouvre le réglage d'une partie pré-rempli de la position
+      (`Route.NewGame(startFen)`, comme partout ailleurs sur Android) ; iOS lance la partie directement avec les
+      derniers réglages.
+- [x] iOS : la phrase « Lecture pivotée de N° … » de la confirmation du scanner passait en français dans
+      l'interface anglaise (interpolation non traduite, depuis la 1.0.1) ; elle est dans le catalogue. Android
+      l'avait déjà (`scan_rotation_hint`).
+- [x] iOS, partage : l'image n'est retirée de la boîte qu'une fois CHARGÉE (`SharedImageInbox.peek`/`discard`), et
+      l'accueil la rend au scanner si la pile se vide avant. Cause : sur simulateur, 2 lancements à froid sur ~17 ont
+      montré l'accueil au lieu du scanner, l'image consommée puis perdue ; non reproduit depuis, cause exacte non
+      établie. 9 lancements d'affilée corrects après le correctif.
+- [ ] **À regarder sur appareil** : les trois boutons de sortie sur le Galaxy A16 (testés, pas vus à l'écran).

@@ -1,6 +1,22 @@
 {
   "sourceLanguage": "fr",
   "strings": {
+    "Lecture pivotée de %lld°. Si le plateau apparaît à l'envers, inversez la lecture.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reading rotated by %lld°. If the board looks upside down, flip the reading."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lecture pivotée de %lld°. Si le plateau apparaît à l'envers, inversez la lecture."
+          }
+        }
+      }
+    },
     "Cases à vérifier": {
       "localizations": {
         "en": {

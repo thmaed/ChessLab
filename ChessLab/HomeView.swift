@@ -449,6 +449,11 @@ struct HomeView: View {
         .onChange(of: scenePhase, initial: true) { _, phase in
             if phase == .active { openSharedImageIfAny() }
         }
+        // Le scanner a disparu avant d'avoir lu l'image (pile refaite, écran
+        // reconstruit) : elle est encore dans la boîte, on la lui rend.
+        .onChange(of: path.isEmpty) { _, isEmpty in
+            if isEmpty { openSharedImageIfAny() }
+        }
         .onChange(of: discoveryTour.currentStepIndex) { _, _ in
             applyDiscoveryDestination()
         }

@@ -42,6 +42,8 @@ import com.chesslab.R
 fun ScannerScreen(
     model: ScannerViewModel = viewModel(),
     sharedImage: android.net.Uri? = null,
+    onPlay: ((String) -> Unit)? = null,
+    onUseAsLabStart: ((String) -> Unit)? = null,
     onAnalyse: (String) -> Unit = {},
 ) {
     val ui = model.ui
@@ -72,7 +74,7 @@ fun ScannerScreen(
     // Étape 3 — la confirmation, OBLIGATOIRE : rien de ce qui sort du scanner
     // n'a échappé au regard de l'utilisateur. C'est l'éditeur, pré-rempli.
     if (ui.stage == ScanStage.confirm && ui.fen != null) {
-        ScanConfirmation(ui, model, onAnalyse)
+        ScanConfirmation(ui, model, onAnalyse, onPlay, onUseAsLabStart)
         return
     }
 
@@ -220,7 +222,10 @@ private fun CornerPicker(
  * se fait à la palette, comme dans l'éditeur. Pendant de `ScanConfirmationView`.
  */
 @Composable
-private fun ScanConfirmation(ui: ScannerUiState, model: ScannerViewModel, onAnalyse: (String) -> Unit) {
+private fun ScanConfirmation(
+    ui: ScannerUiState, model: ScannerViewModel, onAnalyse: (String) -> Unit,
+    onPlay: ((String) -> Unit)?, onUseAsLabStart: ((String) -> Unit)?,
+) {
     // Les cases douteuses déjà passées en revue, et celle qu'on regarde. Une
     // nouvelle lecture ou une rotation relit tout : on repart de zéro.
     var reviewed by remember(ui.reading, ui.rotation) { mutableStateOf(emptySet<chesskit.Square>()) }
@@ -238,6 +243,8 @@ private fun ScanConfirmation(ui: ScannerUiState, model: ScannerViewModel, onAnal
         onBack = model::backToCrop,
         backLabel = "‹ " + stringResource(R.string.scan_recrop),
         onAnalyse = onAnalyse,
+        onPlay = onPlay,
+        onUseAsLabStart = onUseAsLabStart,
         extra = { editor ->
             Text(
                 stringResource(R.string.scan_confirm_title),

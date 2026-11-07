@@ -11,6 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -67,6 +70,14 @@ fun PositionEditorScreen(
     backLabel: String? = null,
     /** Le libellé du bouton de sortie : « Analyser », ou « Utiliser cette position ». */
     @androidx.annotation.StringRes confirmLabel: Int = R.string.route_analysis,
+    /**
+     * Les deux autres sorties de l'écran autonome, comme iOS (`Exit.standalone`) :
+     * jouer la position, ou en faire le départ du Laboratoire. Absentes (le
+     * réglage d'une partie, qui n'attend qu'une position), l'écran n'a qu'un
+     * bouton, [confirmLabel] — l'`Exit.picker` d'iOS.
+     */
+    onPlay: ((String) -> Unit)? = null,
+    onUseAsLabStart: ((String) -> Unit)? = null,
     onAnalyse: (String) -> Unit = {},
 ) {
     // La position initiale est SEMÉE à la composition, pas versée par un effet
@@ -214,7 +225,7 @@ fun PositionEditorScreen(
                     onClick = { Position.standard.pieces.forEach { pieces[it.square] = it } },
                     modifier = Modifier.testTag("depart"),
                 ) { Text(stringResource(R.string.editor_start_position), color = Palette.textSecondary) }
-                TextButton(
+                if (onPlay == null && onUseAsLabStart == null) TextButton(
                     onClick = { onAnalyse(position.fen) }, enabled = faults.isEmpty(),
                     modifier = Modifier.testTag("analyser"),
                 ) {
@@ -224,8 +235,50 @@ fun PositionEditorScreen(
                     )
                 }
             }
+
+            // Les sorties de l'écran autonome : trois boutons pleins, dans l'ordre d'iOS
+            // (jouer, analyser, départ du Laboratoire), grisés tant que la position est illégale.
+            if (onPlay != null || onUseAsLabStart != null) {
+                Spacer(Modifier.height(10.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                    onPlay?.let {
+                        ExitButton(R.string.editor_exit_play, Icons.Default.PlayArrow, Palette.accent, faults.isEmpty(), "jouer") { it(position.fen) }
+                    }
+                    ExitButton(R.string.editor_exit_analyse, Icons.Default.Timeline, Palette.info, faults.isEmpty(), "analyser") { onAnalyse(position.fen) }
+                    onUseAsLabStart?.let {
+                        ExitButton(R.string.editor_exit_lab, Icons.Default.Science, Palette.violet, faults.isEmpty(), "labo") { it(position.fen) }
+                    }
+                }
+            }
         },
     )
+}
+
+/** Un bouton de sortie : icône + libellé sur un fond teinté, gris et inerte tant que la position est illégale. */
+@Composable
+private fun ExitButton(
+    @androidx.annotation.StringRes label: Int,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    tint: androidx.compose.ui.graphics.Color,
+    enabled: Boolean,
+    tag: String,
+    onClick: () -> Unit,
+) {
+    val content = if (enabled) Palette.background else Palette.textTertiary
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(if (enabled) com.chesslab.ui.tintGradient(tint) else androidx.compose.ui.graphics.SolidColor(Palette.surfaceElevated))
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp)
+            .testTag(tag),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Icon(icon, contentDescription = null, tint = content, modifier = Modifier.size(20.dp))
+        Text(stringResource(label), color = content, fontSize = 15.sp, fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold)
+    }
 }
 
 @Composable

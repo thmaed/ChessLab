@@ -11077,3 +11077,10 @@ sélecteur.
 - **Côté Apple (fait le 07/11)** : identifiant de l'extension, groupe d'app (créé à la main sur le portail),
   profils de l'app et de l'extension (par l'API), `ExportOptions.plist`. Archive + export signé vérifiés en
   local, rien téléversé ; voir `tools/asc/README.md`.
+
+## 07/11 (suite) — Sorties de l'éditeur sur Android, phrase de rotation, partage plus robuste
+
+- Android avait un écart non inscrit : l'éditeur et la confirmation du scanner ne menaient qu'à l'analyse, là où
+  iOS propose jouer / analyser / départ du Laboratoire. Porté (`EditorExitsTest`).
+- iOS : « Lecture pivotée de N° » traduite (elle restait en français sous l'interface anglaise depuis la 1.0.1).
+- iOS : le partage ne vide la boîte qu'une fois l'image chargée ; l'accueil la rend au scanner si la pile se vide.

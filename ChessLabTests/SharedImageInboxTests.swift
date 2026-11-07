@@ -38,6 +38,18 @@ struct SharedImageInboxTests {
         #expect(SharedImageInbox.take(in: inbox) == nil)
     }
 
+    /// Lire sans vider : l'image survit à un écran qui disparaît avant de l'avoir chargée.
+    @Test func peekingLeavesTheImageUntilItIsDiscarded() throws {
+        let inbox = try makeDirectory()
+        try SharedImageInbox.deposit(contentsOf: source([4, 5], in: inbox), in: inbox)
+
+        #expect(SharedImageInbox.peek(in: inbox) == Data([4, 5]))
+        #expect(SharedImageInbox.peek(in: inbox) == Data([4, 5]), "lue deux fois, toujours là")
+        #expect(SharedImageInbox.hasPending(in: inbox))
+        SharedImageInbox.discard(in: inbox)
+        #expect(SharedImageInbox.peek(in: inbox) == nil)
+    }
+
     @Test func aSecondShareReplacesTheFirst() throws {
         let inbox = try makeDirectory()
         try SharedImageInbox.deposit(contentsOf: source([1], in: inbox), in: inbox)
