@@ -31,19 +31,24 @@ reste. L'iPad 13" est `APP_IPAD_PRO_3GEN_129`.
 
 L'app embarque une extension, `ChessLabShare` (identifiant
 `com.chesslab.ChessLab.Share`), qui reçoit les images de « Partager ». Elle
-change la signature, et `release.sh` ne passera pas tant que ceci n'est pas
-fait, UNE fois :
+a son propre identifiant, son propre profil, et le groupe d'app
+`group.com.chesslab.ChessLab` est porté par les DEUX. État au 07/11/2026,
+tout est en place et l'export signé a été vérifié (archive → `.ipa`, groupe
+présent dans les droits de l'app et de l'extension) :
 
-1. créer l'identifiant d'app `com.chesslab.ChessLab.Share` ;
-2. créer le groupe d'app `group.com.chesslab.ChessLab` et l'activer sur les
-   DEUX identifiants (l'app et l'extension) ;
-3. régénérer le profil « ChessLab App Store 2026 » de l'app (il doit porter le
-   groupe) et en créer un pour l'extension ;
-4. déclarer ce second profil dans `ExportOptions.plist`, sous
-   `provisioningProfiles`, avec l'identifiant de l'extension.
+- identifiant de l'extension et capacité « App Groups » sur les deux
+  identifiants : créés par l'API ;
+- le groupe lui-même : créé et rattaché sur developer.apple.com — l'API n'a
+  pas de point d'entrée pour cela, et Xcode refuse la clé d'API en signature
+  automatique ;
+- profils « ChessLab App Store 2026 » (régénéré : un changement de
+  capacité invalide le profil) et « ChessLab Share App Store 2026 », créés par
+  l'API et déclarés dans `ExportOptions.plist`.
 
-Version et build de l'extension sont ceux de l'app (2.1 / 21) : les monter
-ENSEMBLE, sinon App Store Connect refuse le téléversement.
+À retenir : toute NOUVELLE capacité d'app invalide le profil de distribution,
+qu'il faut alors recréer (même procédure, par l'API). Version et build de
+l'extension sont ceux de l'app (2.1 / 21) : les monter ENSEMBLE, sinon
+App Store Connect refuse le téléversement.
 
 ## Secrets, hors dépôt
 

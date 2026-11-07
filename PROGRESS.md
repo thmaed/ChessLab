@@ -11074,5 +11074,6 @@ sélecteur.
 - **Réglages du projet** : la cible porte la même version et le même build que l'app (2.1 / 21) — à monter
   ENSEMBLE ; groupe d'app ajouté aux droits de l'app (`ChessLab.entitlements`). Build vérifié : simulateur, Mac
   Catalyst ; extension embarquée dans `ChessLab.app/PlugIns`.
-- **Avant la prochaine publication** : identifiant, groupe et profil de l'extension à créer (voir
-  `tools/asc/README.md`).
+- **Côté Apple (fait le 07/11)** : identifiant de l'extension, groupe d'app (créé à la main sur le portail),
+  profils de l'app et de l'extension (par l'API), `ExportOptions.plist`. Archive + export signé vérifiés en
+  local, rien téléversé ; voir `tools/asc/README.md`.

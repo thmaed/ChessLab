@@ -2048,9 +2048,10 @@ libellés, même parcours (Puzzles → Mes collections).
       L'écran de l'extension dit « Image envoyée à ChessLab — ouvrez ChessLab » et le scanner s'ouvre au
       réveil ; Android ouvre l'app tout seul. Le contournement par la chaîne de répondeurs
       (`UIApplication.open` retrouvé à la main) est tenu pour un risque de refus à la révision : non fait.
-- [ ] **À faire avant la PROCHAINE publication iOS** : l'extension est une cible de plus, donc un identifiant
-      d'app (`com.chesslab.ChessLab.Share`), un groupe d'app (`group.com.chesslab.ChessLab`, à ajouter AUSSI à
-      l'app) et un profil de distribution de plus ; l'export de `tools/asc/` signe à la main avec UN seul profil
-      (`ExportOptions.plist`) et échouera tant que ceux-ci n'existent pas. Voir `tools/asc/README.md`.
+- [x] **Côté Apple, fait (07/11)** : identifiant `com.chesslab.ChessLab.Share`, groupe d'app
+      `group.com.chesslab.ChessLab` rattaché aux deux identifiants, profils de l'app (régénéré) et de
+      l'extension, `ExportOptions.plist` à jour. Archive + export signé vérifiés en local (groupe présent
+      dans les droits de l'app et de l'extension) ; `release.sh` n'a PAS été lancé (rien téléversé).
 - [ ] **À regarder sur appareil** : le partage depuis l'app Photos de l'iPhone réel (le simulateur n'a pas de
-      feuille de partage pilotable ici : seule la boîte aux lettres a été vérifiée de bout en bout).
+      feuille de partage pilotable ici : seule la boîte aux lettres a été vérifiée de bout en bout). Build de
+      développement poussé sur l'iPhone3 le 07/11.

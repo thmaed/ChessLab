@@ -19,6 +19,10 @@
 	<dict>
 		<key>com.chesslab.ChessLab</key>
 		<string>ChessLab App Store 2026</string>
+		<!-- L'extension de partage (07/11/2026) : son propre profil, et le groupe
+		     d'app group.com.chesslab.ChessLab porté par les DEUX. -->
+		<key>com.chesslab.ChessLab.Share</key>
+		<string>ChessLab Share App Store 2026</string>
 	</dict>
 	<key>teamID</key>
 	<string>3N3BN259H6</string>
