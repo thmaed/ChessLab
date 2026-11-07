@@ -16,6 +16,7 @@ struct HomeView: View {
     /// latérale + détail (``NavigationSplitView``) ; `.compact` (iPhone, iPad
     /// en multitâche étroit) → pile + grille de modes, inchangée.
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.scenePhase) private var scenePhase
     /// La visite guidée en coach marks — possédée ICI parce que l'overlay
     /// doit dessiner par-dessus les deux ossatures, barres comprises.
     @State private var discoveryTour = DiscoveryTourController()
@@ -443,6 +444,11 @@ struct HomeView: View {
                 .presentationDetents([.large])
         }
         #endif
+        // « Partager › ChessLab » depuis Photos : l'extension dépose l'image, et
+        // l'app s'ouvre dessus à son réveil (ou au lancement à froid, d'où `initial`).
+        .onChange(of: scenePhase, initial: true) { _, phase in
+            if phase == .active { openSharedImageIfAny() }
+        }
         .onChange(of: discoveryTour.currentStepIndex) { _, _ in
             applyDiscoveryDestination()
         }
@@ -474,7 +480,9 @@ struct HomeView: View {
             }
             #endif
             try? await Task.sleep(for: .seconds(1))
-            guard !seedingState.isSeeding, resumableGame == nil, !discoveryTour.isActive else { return }
+            // Ni par-dessus une image partagée qui attend dans le scanner.
+            guard !seedingState.isSeeding, resumableGame == nil, !discoveryTour.isActive,
+                  !SharedImageInbox.hasPending(), !SharedImageRouting.scannerIsOpen else { return }
             if DiscoveryTourMemory.shouldOffer {
                 discoveryTour.start()
             } else if DiscoveryTourMemory.shouldOfferWhatsNew() {
@@ -555,6 +563,13 @@ struct HomeView: View {
                 path = newPath
             }
         }
+    }
+
+    /// Une image reçue par le partage attend : le scanner s'ouvre dessus et la
+    /// prend à son apparition (voir ``ScannerView``).
+    private func openSharedImageIfAny() {
+        guard SharedImageInbox.hasPending(), !SharedImageRouting.scannerIsOpen else { return }
+        path.append(Route.scanner)
     }
 
     // MARK: Ossature iPhone (pile + grille)

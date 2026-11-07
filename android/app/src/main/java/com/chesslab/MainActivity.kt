@@ -65,6 +65,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        // Une image envoyée par « Partager » : l'app s'ouvre directement sur le scanner.
+        val sharedImage = com.chesslab.scanner.SharedImage.from(intent)
         setContent {
             MaterialTheme(
                 colorScheme = darkColorScheme(
@@ -76,7 +78,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 // Le fond signature remplace la surface unie : c'est lui qui
                 // donne à l'app son atmosphère, sur Android comme sur iOS.
-                AppBackground { App() }
+                AppBackground { App(sharedImage) }
             }
         }
     }
@@ -88,8 +90,13 @@ class MainActivity : ComponentActivity() {
  * n'est empilé en double.
  */
 @Composable
-private fun App() {
-    val stack = remember { mutableStateListOf<Route>(Route.Home) }
+private fun App(sharedImage: android.net.Uri? = null) {
+    // Accueil dessous : « retour » depuis le scanner y ramène, comme partout.
+    val stack = remember {
+        mutableStateListOf<Route>(Route.Home).also {
+            if (sharedImage != null) it.add(Route.Scanner(sharedImage = sharedImage))
+        }
+    }
     val current = stack.last()
     val context = LocalContext.current
     // Les écrans sont composés SOUS la barre : ils y déposent leurs boutons
@@ -121,6 +128,8 @@ private fun App() {
             tour.start(requested)
             return@LaunchedEffect
         }
+        // Une image partagée attend dans le scanner : ni visite ni reprise par-dessus.
+        if (sharedImage != null) return@LaunchedEffect
         delay(1000)
         val resumable = com.chesslab.library.LibraryDatabase.get(context).autosaves().all().first()
         if (resumable.isEmpty() && !tour.isActive) {
@@ -314,7 +323,7 @@ private fun App() {
             )
             Route.Sources -> com.chesslab.settings.SourcesScreen()
             Route.Licences -> com.chesslab.settings.LicencesScreen()
-            is Route.Scanner -> ScannerScreen { fen ->
+            is Route.Scanner -> ScannerScreen(sharedImage = current.sharedImage) { fen ->
                 // Le scanner appelé DEPUIS le réglage d'une partie y rapporte
                 // sa position, au lieu de filer vers l'analyse.
                 if (current.forSetup) {

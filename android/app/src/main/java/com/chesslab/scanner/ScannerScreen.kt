@@ -39,9 +39,16 @@ import androidx.compose.ui.res.stringResource
 import com.chesslab.R
 
 @Composable
-fun ScannerScreen(model: ScannerViewModel = viewModel(), onAnalyse: (String) -> Unit = {}) {
+fun ScannerScreen(
+    model: ScannerViewModel = viewModel(),
+    sharedImage: android.net.Uri? = null,
+    onAnalyse: (String) -> Unit = {},
+) {
     val ui = model.ui
     val context = androidx.compose.ui.platform.LocalContext.current
+    // L'image reçue par « Partager » : lue une fois, quel que soit le nombre de
+    // fois où l'écran se recompose ou se rouvre (voir `loadShared`).
+    LaunchedEffect(sharedImage) { sharedImage?.let(model::loadShared) }
     val pick = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         uri?.let(model::load)
     }

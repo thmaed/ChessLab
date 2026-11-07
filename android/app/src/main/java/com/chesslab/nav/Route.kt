@@ -154,8 +154,11 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data object Sources : Route(R.string.sources_title)
 
     data object Licences : Route(R.string.licences_title)
-    /** [forSetup] : la position lue repart vers l'écran de réglage d'une partie. */
-    data class Scanner(val forSetup: Boolean = false) : Route(R.string.route_scanner)
+    /**
+     * [forSetup] : la position lue repart vers l'écran de réglage d'une partie.
+     * [sharedImage] : l'image reçue par « Partager », lue dès l'ouverture.
+     */
+    data class Scanner(val forSetup: Boolean = false, val sharedImage: android.net.Uri? = null) : Route(R.string.route_scanner)
     data class PositionEditor(val forSetup: Boolean = false) : Route(R.string.route_editor)
 
     /**

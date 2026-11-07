@@ -27,6 +27,24 @@ reste. L'iPad 13" est `APP_IPAD_PRO_3GEN_129`.
 - Version et build : `MARKETING_VERSION` et `CURRENT_PROJECT_VERSION` de la
   cible applicative.
 
+## L'extension de partage (depuis le 07/11/2026)
+
+L'app embarque une extension, `ChessLabShare` (identifiant
+`com.chesslab.ChessLab.Share`), qui reçoit les images de « Partager ». Elle
+change la signature, et `release.sh` ne passera pas tant que ceci n'est pas
+fait, UNE fois :
+
+1. créer l'identifiant d'app `com.chesslab.ChessLab.Share` ;
+2. créer le groupe d'app `group.com.chesslab.ChessLab` et l'activer sur les
+   DEUX identifiants (l'app et l'extension) ;
+3. régénérer le profil « ChessLab App Store 2026 » de l'app (il doit porter le
+   groupe) et en créer un pour l'extension ;
+4. déclarer ce second profil dans `ExportOptions.plist`, sous
+   `provisioningProfiles`, avec l'identifiant de l'extension.
+
+Version et build de l'extension sont ceux de l'app (2.1 / 21) : les monter
+ENSEMBLE, sinon App Store Connect refuse le téléversement.
+
 ## Secrets, hors dépôt
 
 `~/.private_keys/` (permissions 700, ignoré par Git où qu'il soit) :

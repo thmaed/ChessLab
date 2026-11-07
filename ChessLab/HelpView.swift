@@ -134,7 +134,7 @@ struct HelpView: View {
         .init(
             icon: "camera.viewfinder", tint: Theme.accent,
             title: "Éditeur et scanner de position",
-            body: "Composez une position à la main sur le plateau, ou scannez-la depuis une capture d'écran, la photo d'un écran, ou un plateau réel vu du dessus. Un écran de confirmation vous laisse corriger la lecture avant de jouer ou d'analyser la position."
+            body: "Composez une position à la main sur le plateau, ou scannez-la depuis une capture d'écran, la photo d'un écran, ou un plateau réel vu du dessus. Un écran de confirmation vous laisse corriger la lecture avant de jouer ou d'analyser la position. Depuis Photos, Partager › ChessLab envoie l'image au scanner : ouvrez ensuite ChessLab, il la lit tout de suite."
         ),
         .init(
             icon: "gearshape.fill", tint: Theme.textSecondary,

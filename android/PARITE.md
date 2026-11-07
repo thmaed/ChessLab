@@ -2031,3 +2031,26 @@ libellés, même parcours (Puzzles → Mes collections).
       refont plus. Android : `ScannerViewModel.init` (modèle + gabarits, en arrière-plan) ; prêts 0,6 s après
       l'ouverture sur Galaxy A16 (`ScannerWarmupTest`).
 
+
+## 07/11 — Scanner : recevoir une image par « Partager » — FAIT des deux côtés, avec UN écart de plateforme
+
+- [x] **Android** : filtre `ACTION_SEND` `image/*` sur `MainActivity` ; `SharedImage.from(intent)` lit l'image,
+      l'app s'ouvre sur l'accueil + le scanner, qui charge l'image (`ScannerViewModel.loadShared`, une seule
+      fois par image). Pas de visite guidée par-dessus. Aucune permission : le droit de lecture vient de l'intent.
+      Test instrumenté `ScannerShareTest` (3) vert sur Galaxy A16 ; parcours réel vérifié par un `SEND` lancé
+      depuis le système sur un `content://` de la galerie.
+- [x] **iOS** : extension de partage `ChessLabShare` (nouvelle cible, `ChessLabShare/`) qui dépose l'image dans
+      le conteneur de groupe `group.com.chesslab.ChessLab` (`Shared/SharedImageInbox.swift`) ; l'app l'y prend à
+      son réveil (`HomeView` pousse le scanner, `ScannerView` charge). Tests `SharedImageInboxTests` (7) ;
+      parcours vérifié sur simulateur (image déposée dans le conteneur → lancement → scanner → lecture).
+- [x] Aide : une phrase de plus dans la carte « scanner », des deux côtés.
+- [ ] **Écart ASSUMÉ (plateforme)** : une extension de partage iOS ne peut pas lancer l'app qui la contient.
+      L'écran de l'extension dit « Image envoyée à ChessLab — ouvrez ChessLab » et le scanner s'ouvre au
+      réveil ; Android ouvre l'app tout seul. Le contournement par la chaîne de répondeurs
+      (`UIApplication.open` retrouvé à la main) est tenu pour un risque de refus à la révision : non fait.
+- [ ] **À faire avant la PROCHAINE publication iOS** : l'extension est une cible de plus, donc un identifiant
+      d'app (`com.chesslab.ChessLab.Share`), un groupe d'app (`group.com.chesslab.ChessLab`, à ajouter AUSSI à
+      l'app) et un profil de distribution de plus ; l'export de `tools/asc/` signe à la main avec UN seul profil
+      (`ExportOptions.plist`) et échouera tant que ceux-ci n'existent pas. Voir `tools/asc/README.md`.
+- [ ] **À regarder sur appareil** : le partage depuis l'app Photos de l'iPhone réel (le simulateur n'a pas de
+      feuille de partage pilotable ici : seule la boîte aux lettres a été vérifiée de bout en bout).

@@ -11057,3 +11057,22 @@ cases douteuses une par une, les moins sûres d'abord, (4) le trait deviné quan
 `reviewSquares`, `suggestedSideToMove`, `PositionEditorViewModel.place` / `EditorActions.place`. Tests :
 `ScanReviewTests` (iOS), `ScanCrossCheckTest`, `BoardReaderTest`, `ScannerReviewTest` (Android).
 
+
+## 07/11 — Scanner : « Partager › ChessLab » (iOS + Android)
+
+Depuis Photos (ou toute app), partager une image vers ChessLab ouvre le scanner dessus, sans repasser par le
+sélecteur.
+
+- **Android** : filtre d'intention `SEND` `image/*`, `SharedImage`, `Route.Scanner(sharedImage)`,
+  `ScannerViewModel.loadShared`. Test `ScannerShareTest`.
+- **iOS** : nouvelle cible `ChessLabShare` (extension de partage, `com.apple.share-services`, une seule image),
+  qui copie le fichier dans le conteneur de groupe ; `Shared/SharedImageInbox.swift` (compilé dans les deux
+  cibles) en est la boîte aux lettres — une image à la fois, oubliée au bout de 24 h, lue une seule fois.
+  `HomeView` ouvre le scanner à l'activation de la scène (et au lancement à froid), `ScannerView` prend l'image ;
+  si le scanner est déjà ouvert, c'est lui qui la prend, sans empilement (`SharedImageRouting`).
+- **Écart de plateforme** : l'extension ne peut pas lancer l'app ; elle affiche « Ouvrez ChessLab ».
+- **Réglages du projet** : la cible porte la même version et le même build que l'app (2.1 / 21) — à monter
+  ENSEMBLE ; groupe d'app ajouté aux droits de l'app (`ChessLab.entitlements`). Build vérifié : simulateur, Mac
+  Catalyst ; extension embarquée dans `ChessLab.app/PlugIns`.
+- **Avant la prochaine publication** : identifiant, groupe et profil de l'extension à créer (voir
+  `tools/asc/README.md`).

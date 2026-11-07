@@ -40,6 +40,15 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Partager › ChessLab depuis Photos ou n'importe quelle app : le
+                 scanner s'ouvre sur l'image reçue (`SharedImage`). Une seule
+                 image, et rien d'autre : pas de texte, pas de lot. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
         </activity>
     </application>
 </manifest>

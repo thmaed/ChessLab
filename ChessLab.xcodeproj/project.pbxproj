@@ -10,6 +10,7 @@
 		2ED6801DCC7EEAFA63245706 /* CFairyStockfishKit in Frameworks */ = {isa = PBXBuildFile; productRef = 1E56F3F3E8F36B001280F756 /* CFairyStockfishKit */; };
 		CD00CD00CD00CD00CD00CD03 /* CStockfishKit in Frameworks */ = {isa = PBXBuildFile; productRef = CD00CD00CD00CD00CD00CD02 /* CStockfishKit */; };
 		F69740317DA442B4A58BAD99 /* ChessKit in Frameworks */ = {isa = PBXBuildFile; productRef = 3DE236CC84514D2D9F36A9FE /* ChessKit */; };
+		E5A0000000000000000000A3 /* ChessLabShare.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E5A0000000000000000000A2 /* ChessLabShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -27,18 +28,55 @@
 			remoteGlobalIDString = 51405F5149AB490EB5C9AD85;
 			remoteInfo = ChessLab;
 		};
+		E5A0000000000000000000A5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5625A5157FBC48528193F71B /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E5A0000000000000000000A1;
+			remoteInfo = ChessLabShare;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E5A0000000000000000000A4 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				E5A0000000000000000000A3 /* ChessLabShare.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0558AD0B73974786AAA982AF /* ChessLab.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ChessLab.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCE75956E83746B897ECE109 /* ChessLabUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChessLabUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F5B5CC8CC9724ABDB65BFD9A /* ChessLabTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChessLabTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E5A0000000000000000000A2 /* ChessLabShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ChessLabShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E5A0000000000000000000A9 /* Exceptions for "ChessLabShare" folder in "ChessLabShare" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				ChessLabShare.entitlements,
+				Info.plist,
+			);
+			target = E5A0000000000000000000A1 /* ChessLabShare */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		11A14EC29ACB49BD983060A3 /* ChessLab */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ChessLab; sourceTree = "<group>"; };
 		214B3D5B62DE4DEF9FFB5730 /* ChessLabUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ChessLabUITests; sourceTree = "<group>"; };
 		B521C50684074516AD83BECE /* ChessLabTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ChessLabTests; sourceTree = "<group>"; };
+		E5A0000000000000000000A7 /* ChessLabShare */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (
+			E5A0000000000000000000A9 /* Exceptions for "ChessLabShare" folder in "ChessLabShare" target */,
+		); explicitFileTypes = {}; explicitFolders = (); path = ChessLabShare; sourceTree = "<group>"; };
+		E5A0000000000000000000A8 /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -66,6 +104,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E5A0000000000000000000B2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -73,6 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				0558AD0B73974786AAA982AF /* ChessLab.app */,
+				E5A0000000000000000000A2 /* ChessLabShare.appex */,
 				F5B5CC8CC9724ABDB65BFD9A /* ChessLabTests.xctest */,
 				DCE75956E83746B897ECE109 /* ChessLabUITests.xctest */,
 			);
@@ -83,6 +129,8 @@
 			isa = PBXGroup;
 			children = (
 				11A14EC29ACB49BD983060A3 /* ChessLab */,
+				E5A0000000000000000000A7 /* ChessLabShare */,
+				E5A0000000000000000000A8 /* Shared */,
 				B521C50684074516AD83BECE /* ChessLabTests */,
 				214B3D5B62DE4DEF9FFB5730 /* ChessLabUITests */,
 				40D432D46DF142A38448265D /* Products */,
@@ -99,13 +147,16 @@
 				8430D6C67D9C4AFB90CD38AB /* Sources */,
 				F3DA1088BCB1480FA195DFF6 /* Frameworks */,
 				F99CAE6F9D9C45109AAE35F1 /* Resources */,
+				E5A0000000000000000000A4 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				E5A0000000000000000000A6 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				11A14EC29ACB49BD983060A3 /* ChessLab */,
+				E5A0000000000000000000A8 /* Shared */,
 			);
 			name = ChessLab;
 			packageProductDependencies = (
@@ -163,6 +214,29 @@
 			productReference = F5B5CC8CC9724ABDB65BFD9A /* ChessLabTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		E5A0000000000000000000A1 /* ChessLabShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E5A0000000000000000000B4 /* Build configuration list for PBXNativeTarget "ChessLabShare" */;
+			buildPhases = (
+				E5A0000000000000000000B1 /* Sources */,
+				E5A0000000000000000000B2 /* Frameworks */,
+				E5A0000000000000000000B3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				E5A0000000000000000000A7 /* ChessLabShare */,
+				E5A0000000000000000000A8 /* Shared */,
+			);
+			name = ChessLabShare;
+			packageProductDependencies = (
+			);
+			productName = ChessLabShare;
+			productReference = E5A0000000000000000000A2 /* ChessLabShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -174,6 +248,9 @@
 				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					51405F5149AB490EB5C9AD85 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					E5A0000000000000000000A1 = {
 						CreatedOnToolsVersion = 16.2;
 					};
 					9002F2377430484FAB303498 = {
@@ -206,6 +283,7 @@
 			projectRoot = "";
 			targets = (
 				51405F5149AB490EB5C9AD85 /* ChessLab */,
+				E5A0000000000000000000A1 /* ChessLabShare */,
 				F63D1E2CB3D34FE785A7D672 /* ChessLabTests */,
 				9002F2377430484FAB303498 /* ChessLabUITests */,
 			);
@@ -228,6 +306,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F99CAE6F9D9C45109AAE35F1 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E5A0000000000000000000B3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -258,6 +343,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E5A0000000000000000000B1 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -270,6 +362,11 @@
 			isa = PBXTargetDependency;
 			target = 51405F5149AB490EB5C9AD85 /* ChessLab */;
 			targetProxy = A1540A42B75B4FAD8A501522 /* PBXContainerItemProxy */;
+		};
+		E5A0000000000000000000A6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = E5A0000000000000000000A1 /* ChessLabShare */;
+			targetProxy = E5A0000000000000000000A5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -533,6 +630,62 @@
 			};
 			name = Release;
 		};
+		E5A0000000000000000000B5 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ChessLabShare/ChessLabShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 21;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChessLabShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ChessLab;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 2.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chesslab.ChessLab.Share;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		E5A0000000000000000000B6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ChessLabShare/ChessLabShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 21;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ChessLabShare/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = ChessLab;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MARKETING_VERSION = 2.1;
+				PRODUCT_BUNDLE_IDENTIFIER = com.chesslab.ChessLab.Share;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -568,6 +721,15 @@
 			buildConfigurations = (
 				4218725CEA7446B69F037BFD /* Debug */,
 				B806C028520B4F65AD226A3A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E5A0000000000000000000B4 /* Build configuration list for PBXNativeTarget "ChessLabShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E5A0000000000000000000B5 /* Debug */,
+				E5A0000000000000000000B6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

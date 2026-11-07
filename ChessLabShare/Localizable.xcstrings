@@ -1,0 +1,70 @@
+{
+  "sourceLanguage": "fr",
+  "strings": {
+    "Image envoyée à ChessLab": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image sent to ChessLab"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image envoyée à ChessLab"
+          }
+        }
+      }
+    },
+    "Impossible d'envoyer l'image": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Couldn't send the image"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'envoyer l'image"
+          }
+        }
+      }
+    },
+    "Ouvrez ChessLab : la position s'y lira.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open ChessLab: the position will be read there."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez ChessLab : la position s'y lira."
+          }
+        }
+      }
+    },
+    "Partagez une image depuis Photos, puis réessayez.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share an image from Photos, then try again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partagez une image depuis Photos, puis réessayez."
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

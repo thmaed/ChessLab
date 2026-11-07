@@ -104,6 +104,16 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    /** La dernière image reçue par « Partager » : la même ne se relit pas en revenant sur l'écran. */
+    private var sharedLoaded: Uri? = null
+
+    /** Charge l'image envoyée par une autre app, une seule fois par image. */
+    fun loadShared(uri: Uri) {
+        if (sharedLoaded == uri) return
+        sharedLoaded = uri
+        load(uri)
+    }
+
     fun load(uri: Uri) = viewModelScope.launch {
         val bitmap = withContext(Dispatchers.IO) {
             runCatching {

@@ -16,6 +16,7 @@ struct ScannerView: View {
     @State private var photoItem: PhotosPickerItem?
     @State private var showCamera = false
     @State private var showFileImporter = false
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
@@ -43,6 +44,16 @@ struct ScannerView: View {
         // Les gabarits du second avis se rendent pendant que l'utilisateur
         // choisit son image : la première lecture n'attend plus après eux.
         .task { TemplateSquareClassifier.prewarm() }
+        // L'image reçue par « Partager › ChessLab » : prise à l'ouverture, et à
+        // chaque retour au premier plan quand l'écran est déjà là.
+        .onAppear {
+            SharedImageRouting.scannerIsOpen = true
+            takeSharedImage()
+        }
+        .onDisappear { SharedImageRouting.scannerIsOpen = false }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { takeSharedImage() }
+        }
         .onAppear {
             // Porte dérobée des tests UI : les sélecteurs système sont hors
             // process, donc intestables. Sans l'argument de lancement, rien
@@ -55,6 +66,13 @@ struct ScannerView: View {
                 Task { await vm.load(testImage) }
             }
         }
+    }
+
+    /// Prend l'image déposée par l'extension de partage, s'il y en a une —
+    /// la boîte est vidée dans le même geste (voir ``SharedImageInbox/take(in:now:)``).
+    private func takeSharedImage() {
+        guard let data = SharedImageInbox.take() else { return }
+        Task { await vm.loadFromDropped(data: data) }
     }
 
     // MARK: Étape 1 — source

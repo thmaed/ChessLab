@@ -5488,18 +5488,18 @@
         }
       }
     },
-    "Composez une position à la main sur le plateau, ou scannez-la depuis une capture d'écran, la photo d'un écran, ou un plateau réel vu du dessus. Un écran de confirmation vous laisse corriger la lecture avant de jouer ou d'analyser la position.": {
+    "Composez une position à la main sur le plateau, ou scannez-la depuis une capture d'écran, la photo d'un écran, ou un plateau réel vu du dessus. Un écran de confirmation vous laisse corriger la lecture avant de jouer ou d'analyser la position. Depuis Photos, Partager › ChessLab envoie l'image au scanner : ouvrez ensuite ChessLab, il la lit tout de suite.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Compose a position by hand on the board, or scan one from a screenshot, a photo of a screen, or a real board seen from above. A confirmation screen lets you correct the reading before playing or analysing the position."
+            "value": "Compose a position by hand on the board, or scan one from a screenshot, a photo of a screen, or a real board seen from above. A confirmation screen lets you correct the reading before playing or analysing the position. From Photos, Share › ChessLab sends the image to the scanner: then open ChessLab and it reads it right away."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Composez une position à la main sur le plateau, ou scannez-la depuis une capture d'écran, la photo d'un écran, ou un plateau réel vu du dessus. Un écran de confirmation vous laisse corriger la lecture avant de jouer ou d'analyser la position."
+            "value": "Composez une position à la main sur le plateau, ou scannez-la depuis une capture d'écran, la photo d'un écran, ou un plateau réel vu du dessus. Un écran de confirmation vous laisse corriger la lecture avant de jouer ou d'analyser la position. Depuis Photos, Partager › ChessLab envoie l'image au scanner : ouvrez ensuite ChessLab, il la lit tout de suite."
           }
         }
       }
