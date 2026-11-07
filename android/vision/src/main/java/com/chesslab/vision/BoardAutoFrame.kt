@@ -21,8 +21,11 @@ object BoardAutoFrame {
      *   Ce n'est jamais une vérité : cela pré-positionne les poignées, que
      *   l'utilisateur garde la main de corriger.
      */
-    fun corners(bitmap: Bitmap, minimumScore: Double = 0.55): List<Pair<Float, Float>>? {
-        val r = rect(bitmap, minimumScore) ?: return null
+    fun corners(bitmap: Bitmap, minimumScore: Double = 0.55): List<Pair<Float, Float>>? =
+        rect(bitmap, minimumScore)?.let { corners(bitmap, it) }
+
+    /** Les quatre coins (fractions de l'image) d'un cadre déjà trouvé. */
+    fun corners(bitmap: Bitmap, r: BoardRect): List<Pair<Float, Float>> {
         val w = bitmap.width.toDouble()
         val h = bitmap.height.toDouble()
         val left = (r.x / w).toFloat()

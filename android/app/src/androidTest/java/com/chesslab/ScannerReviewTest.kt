@@ -56,7 +56,7 @@ class ScannerReviewTest {
         }
         compose.setContent { ScannerScreen(model = model, onAnalyse = {}) }
 
-        InstrumentationRegistry.getInstrumentation().runOnMainSync { model.loadBitmap(bitmap!!) }
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { model.loadBitmap(bitmap!!, autoRead = false) }
         compose.waitUntil(30_000) { model.ui.stage == ScanStage.adjustCrop }
         InstrumentationRegistry.getInstrumentation().runOnMainSync {
             for (i in 0 until 4) {

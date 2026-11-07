@@ -55,7 +55,8 @@ class ScannerConfirmTest {
 
         // La capture, cadrée comme dans le test du pipeline : le plateau va de
         // bord à bord, de y = 724 à y = 1930 sur une image de 1206 × H.
-        InstrumentationRegistry.getInstrumentation().runOnMainSync { model.loadBitmap(bitmap!!) }
+        // Sans lecture automatique : ce test fixe lui-même les coins du plateau.
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { model.loadBitmap(bitmap!!, autoRead = false) }
         compose.waitUntil(30_000) { model.ui.stage == ScanStage.adjustCrop }
         val h = bitmap!!.height.toFloat()
         InstrumentationRegistry.getInstrumentation().runOnMainSync {

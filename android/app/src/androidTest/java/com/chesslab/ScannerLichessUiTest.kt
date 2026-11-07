@@ -7,6 +7,7 @@ import chesskit.Piece
 import chesskit.Square
 import com.chesslab.scanner.ScanPipeline
 import com.chesslab.scanner.ScanRotation
+import com.chesslab.scanner.ScanSource
 import com.chesslab.vision.Homography
 import com.chesslab.vision.PieceDetector
 import org.json.JSONArray
@@ -47,7 +48,10 @@ class ScannerLichessUiTest {
             val c = entry.getJSONArray("corners")
             val corners = (0 until 4).map { Homography.Point(c.getJSONArray(it).getDouble(0), c.getJSONArray(it).getDouble(1)) }
 
-            val reading = ScanPipeline.read(context, bitmap, corners)!!.reading
+            // La source du manifeste, comme `fixture.scanSource` côté iOS : une photo d'écran se lit
+            // avec les seuils d'une photo.
+            val source = if (entry.optString("source") == "screenPhoto") ScanSource.screenPhoto else ScanSource.screenshot
+            val reading = ScanPipeline.read(context, bitmap, corners, source)!!.reading
             val rotation = if (entry.optInt("rotation", 0) == 2) ScanRotation.half else ScanRotation.none
             val read = reading.fen(rotation, Piece.Color.white).substringBefore(' ')
             val expected = entry.getString("fen")

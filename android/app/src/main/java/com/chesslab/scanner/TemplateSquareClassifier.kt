@@ -21,24 +21,33 @@ import com.chesslab.vision.SquareReading
  * confiance, mêmes gabarits (12 pièces × 2 fonds × 4 thèmes × 3 échelles de
  * glyphe, cburnett). Les gabarits se rendent ici depuis les drawables `piece_*`.
  *
- * - note: écart assumé — iOS déduit la source (capture ou photo d'un écran) et
- *   assouplit ses seuils pour une photo. Android n'a pas cette déduction : ce
- *   sont toujours les seuils d'une capture (0,45 / 0,035). Voir `PARITE.md`.
+ * La SOURCE (capture ou photo d'un écran, déduite à l'ouverture de l'image)
+ * règle les seuils, comme iOS : une photo, plus floue et moins contrastée, est
+ * jugée avec des seuils plus souples (0,32 / 0,05 au lieu de 0,45 / 0,035).
  */
-class TemplateSquareClassifier private constructor(private val templates: List<Template>) {
+class TemplateSquareClassifier private constructor(
+    private val templates: List<Template>,
+    source: ScanSource,
+) {
+
+    /** Score minimal pour retenir une pièce. */
+    private val matchThreshold = if (source == ScanSource.screenshot) MATCH_THRESHOLD else MATCH_THRESHOLD_PHOTO
+
+    /** Écart-type en deçà duquel une vignette est un aplat (une case vide). */
+    private val flatnessThreshold = if (source == ScanSource.screenshot) FLATNESS_THRESHOLD else FLATNESS_THRESHOLD_PHOTO
 
     class Template(val color: Piece.Color, val kind: Piece.Kind, val normalized: DoubleArray)
 
     /** Lecture d'une vignette `PATCH_SIDE × PATCH_SIDE` (luminance 0…1). */
     fun classify(patch: DoubleArray): SquareReading {
         // Une case vide est un aplat : rien à corréler.
-        if (ImagePatch.standardDeviation(patch) < FLATNESS_THRESHOLD) return SquareReading(null, null, 1.0)
+        if (ImagePatch.standardDeviation(patch) < flatnessThreshold) return SquareReading(null, null, 1.0)
 
         // Coordonnées incrustées : un « 8 » dans le COIN d'une case vide la rend
         // contrastée, mais son CENTRE reste un aplat — une pièce couvre toujours
         // le centre.
         val central = ImagePatch.centralRegion(patch, BoardRectifier.PATCH_SIDE, 0.6)
-        if (ImagePatch.standardDeviation(central) < FLATNESS_THRESHOLD) return SquareReading(null, null, 0.9)
+        if (ImagePatch.standardDeviation(central) < flatnessThreshold) return SquareReading(null, null, 0.9)
 
         val normalized = ImagePatch.normalize(patch) ?: return SquareReading(null, null, 1.0)
 
@@ -63,7 +72,7 @@ class TemplateSquareClassifier private constructor(private val templates: List<T
 
         val found = best
         // Du contraste, mais qui ne ressemble à aucune pièce : « vide », confiance basse.
-        if (found == null || bestScore < MATCH_THRESHOLD) return SquareReading(null, null, 0.3)
+        if (found == null || bestScore < matchThreshold) return SquareReading(null, null, 0.3)
         return SquareReading(found.kind, found.color, confidence(bestScore, bestOtherPieceScore))
     }
 
@@ -85,17 +94,24 @@ class TemplateSquareClassifier private constructor(private val templates: List<T
         /** Écart-type en deçà duquel la case est jugée vide (capture d'écran). */
         const val FLATNESS_THRESHOLD = 0.035
 
+        /** Les mêmes, pour une photo d'écran (plus floue, moins contrastée) — valeurs d'iOS. */
+        const val MATCH_THRESHOLD_PHOTO = 0.32
+        const val FLATNESS_THRESHOLD_PHOTO = 0.05
+
         private const val GLYPH_SCALES = 3
 
-        @Volatile private var instance: TemplateSquareClassifier? = null
+        /** Les gabarits rendus, une seule fois : seuls les seuils changent avec la source. */
+        @Volatile private var rendered: List<Template>? = null
 
         /** Vrai quand les gabarits sont déjà rendus : la prochaine lecture n'a rien à attendre. */
-        val isReady: Boolean get() = instance != null
+        val isReady: Boolean get() = rendered != null
 
-        /** Construit une fois (≈ 300 gabarits rendus) puis réutilise. */
+        /** Rend les gabarits une fois (≈ 300) puis réutilise ; un classifieur par source, sans nouveau rendu. */
         @Synchronized
-        fun shared(context: Context): TemplateSquareClassifier =
-            instance ?: TemplateSquareClassifier(makeTemplates(context.applicationContext)).also { instance = it }
+        fun shared(context: Context, source: ScanSource = ScanSource.screenshot): TemplateSquareClassifier {
+            val templates = rendered ?: makeTemplates(context.applicationContext).also { rendered = it }
+            return TemplateSquareClassifier(templates, source)
+        }
 
         /** `piece_wp`, `piece_bk`… : le nom du drawable d'une pièce. */
         private fun drawableName(color: Piece.Color, kind: Piece.Kind): String {

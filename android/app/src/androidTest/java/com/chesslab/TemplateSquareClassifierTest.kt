@@ -7,6 +7,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import chesskit.Piece
 import com.chesslab.scanner.ScanReading
+import com.chesslab.scanner.ScanSource
 import com.chesslab.scanner.TemplateSquareClassifier
 import com.chesslab.vision.BoardRectifier
 import com.chesslab.vision.ImagePatch
@@ -87,5 +88,41 @@ class TemplateSquareClassifierTest {
         val read = TemplateSquareClassifier.shared(context).classify(patch)
         assertNull(read.piece)
         assertTrue("sûre, ou au moins non signalée", read.confidence >= ScanReading.CONFIDENCE_THRESHOLD)
+    }
+
+    /**
+     * La source règle les seuils, comme iOS (`TemplateSquareClassifier(source:)`) : une
+     * photo accepte un score plus bas qu'une capture (0,32 contre 0,45). Un gabarit
+     * bruité — plus ou moins, selon l'amplitude — finit dans la bande entre les deux :
+     * la photo y lit la pièce, la capture la refuse.
+     */
+    @Test fun aPhotoAcceptsAWeakerMatchThanAScreenshot() {
+        val shot = TemplateSquareClassifier.shared(context, ScanSource.screenshot)
+        val photo = TemplateSquareClassifier.shared(context, ScanSource.screenPhoto)
+        val clean = render(Piece.Color.white to Piece.Kind.rook, unknownLight, scale = 0.85)
+        var found = false
+        var amplitude = 0.05
+        while (amplitude <= 1.5 && !found) {
+            val rng = java.util.Random(7)
+            val noisy = DoubleArray(clean.size) { (clean[it] + (rng.nextDouble() - 0.5) * amplitude).coerceIn(0.0, 1.0) }
+            val a = shot.classify(noisy)
+            val b = photo.classify(noisy)
+            found = a.piece == null && b.piece == Piece.Kind.rook && b.color == Piece.Color.white
+            amplitude += 0.05
+        }
+        assertTrue("aucune amplitude de bruit où la photo lit la tour et la capture non", found)
+    }
+
+    /**
+     * Et une photo juge « vide » un aplat un peu plus agité qu'une capture (écart-type
+     * 0,05 contre 0,035) : le grain d'un écran photographié n'y fait pas une pièce.
+     */
+    @Test fun aPhotoTreatsAGrainyFlatSquareAsEmptyAndSure() {
+        val n = BoardRectifier.PATCH_SIDE
+        val grainy = DoubleArray(n * n) { 0.5 + (if (it % 2 == 0) 0.04 else -0.04) }   // écart-type 0,04
+        val shot = TemplateSquareClassifier.shared(context, ScanSource.screenshot).classify(grainy)
+        val photo = TemplateSquareClassifier.shared(context, ScanSource.screenPhoto).classify(grainy)
+        assertEquals("photo : un aplat, vide et sûr", 1.0, photo.confidence, 0.0)
+        assertTrue("capture : pas un aplat, donc moins sûre", shot.confidence < ScanReading.CONFIDENCE_THRESHOLD)
     }
 }

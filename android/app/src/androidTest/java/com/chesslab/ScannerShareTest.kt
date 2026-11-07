@@ -6,7 +6,6 @@ import android.net.Uri
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.chesslab.scanner.ScanStage
 import com.chesslab.scanner.ScannerScreen
 import com.chesslab.scanner.ScannerViewModel
 import com.chesslab.scanner.SharedImage
@@ -69,17 +68,17 @@ class ScannerShareTest {
         }
         compose.setContent { ScannerScreen(model = model, sharedImage = uri, onAnalyse = {}) }
 
-        compose.waitUntil(30_000) { model.ui.stage == ScanStage.adjustCrop }
-        assertNotNull("l'image reçue est affichée", model.ui.image)
+        // Selon l'image, la lecture s'enchaîne (capture) ou s'arrête au cadrage (photo) :
+        // dans les deux cas l'image reçue est chargée, sans repasser par le sélecteur.
+        compose.waitUntil(60_000) { model.ui.image != null && !model.ui.busy }
+        val loaded = model.ui.image
+        assertNotNull("l'image reçue est affichée", loaded)
 
-        // Revenir sur l'écran ne doit pas relire l'image : le cadrage de
-        // l'utilisateur serait écrasé par une nouvelle détection.
-        val moved = model.ui.corners.toMutableList().also { it[0] = 0.5f to 0.5f }
-        InstrumentationRegistry.getInstrumentation().runOnMainSync {
-            model.moveCorner(0, moved[0].first, moved[0].second)
-            model.loadShared(uri)
-        }
+        // Revenir sur l'écran ne doit pas relire l'image : la détection, relancée,
+        // écraserait le cadrage de l'utilisateur. Une relecture produirait un NOUVEAU bitmap.
+        InstrumentationRegistry.getInstrumentation().runOnMainSync { model.loadShared(uri) }
+        Thread.sleep(3_000)
         compose.waitForIdle()
-        assertTrue("le coin déplacé est conservé", model.ui.corners[0] == moved[0])
+        assertTrue("la même image, pas relue", model.ui.image === loaded)
     }
 }

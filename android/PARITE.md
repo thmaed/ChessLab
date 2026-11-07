@@ -2004,10 +2004,16 @@ libellés, même parcours (Puzzles → Mes collections).
       vraie capture chess.com) — verts sur Galaxy A16 (SM-A165F). `isConfident` suit désormais iOS : une case
       VIDE à faible confiance est signalée (la pièce manquée que les gabarits rattrapent).
       Fixture photo `celtic_black` : 63/64 (iOS 64/64), la case fausse est signalée.
-- [ ] **Écart OUVERT — déduction de la source (scanner)** : iOS devine capture d'écran ou photo d'un écran et
-      assouplit les seuils des gabarits pour une photo (0,32 / 0,05 au lieu de 0,45 / 0,035). Android n'a qu'un
-      seul chemin : toujours les seuils d'une capture. Sans conséquence sur les fixtures ; à mesurer sur de vraies
-      photos d'écran avant d'y toucher.
+- [x] **Déduction de la source (scanner) — PORTÉE le 07/11** : capture d'écran ou photo d'un écran se déduit de
+      l'image, comme iOS (`ScanSource`, `ScannerViewModel.loadBitmap`) : un damier reconnu avec certitude est une
+      capture, et la lecture s'ENCHAÎNE sans demander de recadrer ; sinon c'est une photo d'écran et l'on s'arrête au
+      cadrage. La source règle les seuils des gabarits (0,45 / 0,035 pour une capture, 0,32 / 0,05 pour une photo,
+      `TemplateSquareClassifier.shared(context, source)`) et se passe à `ScanPipeline.read`. Tests : `ScannerSourceTest`
+      (4), deux cas dans `TemplateSquareClassifierTest`, `ScannerLichessUiTest` lit la source du manifeste.
+- [ ] **Écart de PLATEFORME conservé** : pour une photo, iOS retombe sur `VNDetectRectanglesRequest` (rectangle de
+      l'écran, puis plateau à l'intérieur) ; Android n'a que le détecteur de damier, donc une photo en perspective
+      repart du cadre par défaut à ajuster à la main. Non portable sans bibliothèque de vision (aucune n'est
+      embarquée) ; à reprendre si les retours montrent que les photos d'écran sont fréquentes.
 
 ## 06/11 (nuit) — Scanner : revue des cases douteuses, deuxième hypothèse, trait deviné — FAIT des deux côtés
 

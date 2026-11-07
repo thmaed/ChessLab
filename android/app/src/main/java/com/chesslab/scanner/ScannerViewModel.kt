@@ -38,6 +38,8 @@ data class ScannerUiState(
     /** L'image redressée et sa grille : de quoi montrer la vignette d'origine d'une case douteuse. */
     val board: Bitmap? = null,
     val boardGrid: BoardGridFinder.Grid? = null,
+    /** Capture ou photo d'écran — déduite de l'image à son ouverture, jamais demandée. */
+    val source: ScanSource = ScanSource.screenshot,
     val busy: Boolean = false,
     val status: String = "",
 ) {
@@ -77,15 +79,14 @@ data class ScannerUiState(
 }
 
 /**
- * Le scanner : une photo, quatre coins, une position.
+ * Le scanner : une photo, quatre coins, une position — pendant de
+ * `ScannerViewModel.swift`.
  *
- * **Le cadrage est MANUEL**, là où l'app iOS détecte d'abord le plateau avec
- * `VNDetectRectanglesRequest`. C'est délibéré pour ce premier jet : la
- * détection automatique demande un pipeline de vision complet (contours,
- * quadrilatères, choix du meilleur), et rien n'oblige à l'avoir avant que le
- * reste fonctionne. Quatre poignées que l'on pose soi-même donnent un résultat
- * juste tout de suite — c'est d'ailleurs le repli que l'app iOS propose déjà
- * quand sa détection échoue.
+ * Le plateau est CHERCHÉ d'abord (motif de damier). Trouvé avec certitude,
+ * l'image est une capture : la lecture s'enchaîne sans demander de recadrer.
+ * Sinon c'est une photo d'écran, et l'utilisateur ajuste les quatre poignées
+ * avant de lire. La source se déduit donc de l'image, comme sur iOS, et règle
+ * les seuils du second avis ([TemplateSquareClassifier]).
  */
 class ScannerViewModel(app: Application) : AndroidViewModel(app) {
 
@@ -103,6 +104,12 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
             }
         }
     }
+
+    /**
+     * Source imposée — porte dérobée des tests, qui doivent pouvoir viser un
+     * chemin précis sans dépendre de la déduction (comme `forcedSource` iOS).
+     */
+    var forcedSource: ScanSource? = null
 
     /** La dernière image reçue par « Partager » : la même ne se relit pas en revenant sur l'écran. */
     private var sharedLoaded: Uri? = null
@@ -135,15 +142,30 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
     /**
      * Charge une image déjà décodée. Séparé de [load] pour les tests, qui
      * n'ont pas de sélecteur de photos à piloter — mais ont la capture.
+     *
+     * Déduit la source de l'image : un damier reconnu avec certitude est une
+     * capture, et la lecture s'enchaîne aussitôt ([autoRead]) ; sinon c'est une
+     * photo d'écran, et l'on s'arrête au cadrage. Ce n'est jamais une vérité :
+     * un échec de la lecture automatique laisse le cadrage manuel, pas un cul-de-sac.
      */
-    fun loadBitmap(bitmap: Bitmap) = viewModelScope.launch {
-        // On CHERCHE le plateau avant de demander quoi que ce soit. Ce n'est
-        // jamais une vérité : cela pose les quatre poignées à peu près au bon
-        // endroit, et l'utilisateur garde la main.
-        val found = withContext(Dispatchers.IO) { runCatching { BoardAutoFrame.corners(bitmap) }.getOrNull() }
+    fun loadBitmap(bitmap: Bitmap, autoRead: Boolean = true) = viewModelScope.launch {
+        ui = ui.copy(busy = true, status = s(R.string.scan_reading))
+        val detection = withContext(Dispatchers.IO) { runCatching { BoardAutoFrame.detect(bitmap) }.getOrNull() }
+        val source = forcedSource ?: if (detection != null) ScanSource.screenshot else ScanSource.screenPhoto
+        val found = detection?.let { BoardAutoFrame.corners(bitmap, it.rect) }
+
+        if (autoRead && found != null) {
+            val result = readBoard(bitmap, found, source)
+            if (result != null) {
+                showReading(bitmap, found, source, result)
+                return@launch
+            }
+        }
         ui = ui.copy(
+            busy = false,
             stage = ScanStage.adjustCrop,
             image = bitmap,
+            source = source,
             corners = found ?: ScannerUiState.defaultCorners,
             reading = null, rotation = ScanRotation.none,
             status = s(if (found != null) R.string.scan_found else R.string.scan_place_corners),
@@ -167,28 +189,42 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
     fun scan() = viewModelScope.launch {
         val bitmap = ui.image ?: return@launch
         ui = ui.copy(busy = true, status = s(R.string.scan_reading))
-
-        val result = withContext(Dispatchers.IO) {
-            val points = ui.corners.map { (fx, fy) ->
-                Homography.Point((fx * bitmap.width).toDouble(), (fy * bitmap.height).toDouble())
-            }
-            ScanPipeline.read(getApplication(), bitmap, points)
-        }
-        ui = ui.copy(busy = false)
-
+        val result = readBoard(bitmap, ui.corners, ui.source)
         if (result == null) {
             ui = ui.copy(status = s(R.string.scan_model_unavailable))
             return@launch
         }
+        showReading(bitmap, ui.corners, ui.source, result)
+    }
+
+    /** La lecture, hors fil principal. `null` si le modèle de reconnaissance est absent. */
+    private suspend fun readBoard(
+        bitmap: Bitmap, corners: List<Pair<Float, Float>>, source: ScanSource,
+    ): ScanPipeline.Result? = withContext(Dispatchers.IO) {
+        val points = corners.map { (fx, fy) ->
+            Homography.Point((fx * bitmap.width).toDouble(), (fy * bitmap.height).toDouble())
+        }
+        ScanPipeline.read(getApplication(), bitmap, points, source)
+    }
+
+    /**
+     * Ouvre la confirmation. Rien ne part vers le moteur sans passer sous les
+     * yeux de l'utilisateur : la lecture s'ouvre dans l'éditeur, pré-rempli, avec
+     * l'orientation la plus plausible et les cases douteuses surlignées.
+     */
+    private fun showReading(
+        bitmap: Bitmap, corners: List<Pair<Float, Float>>, source: ScanSource, result: ScanPipeline.Result,
+    ) {
         val reading = result.reading
         val count = result.detections
-        // Rien ne part vers le moteur sans passer sous les yeux de
-        // l'utilisateur : la lecture s'ouvre dans l'éditeur, pré-rempli, avec
-        // l'orientation la plus plausible et les cases douteuses surlignées.
         val rotation = reading.suggestedRotation()
         val uncertain = reading.lowConfidenceSquares(rotation).size
         ui = ui.copy(
+            busy = false,
             stage = ScanStage.confirm,
+            image = bitmap,
+            corners = corners,
+            source = source,
             reading = reading,
             rotation = rotation,
             board = result.board,

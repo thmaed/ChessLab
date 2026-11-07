@@ -18,7 +18,8 @@ import com.chesslab.vision.PieceDetector
  * détecteur (sur l'image recadrée sur la grille) et les gabarits (sur les
  * 64 vignettes). Chacun passe par les contrôles de cohérence d'échecs
  * ([BoardConsistency]) ; la lecture du détecteur est ensuite RECROISÉE avec
- * celle des gabarits, qui ne fait que signaler, jamais réécrire.
+ * celle des gabarits, qui ne fait que signaler, jamais réécrire. [scanSource]
+ * règle les seuils des gabarits, comme iOS.
  */
 object ScanPipeline {
 
@@ -29,7 +30,10 @@ object ScanPipeline {
     class Result(val reading: ScanReading, val detections: Int, val board: Bitmap, val grid: BoardGridFinder.Grid)
 
     /** `null` si le modèle de reconnaissance est absent — le scanner le dit plutôt que de mentir. */
-    fun read(context: Context, source: Bitmap, corners: List<Homography.Point>): Result? {
+    fun read(
+        context: Context, source: Bitmap, corners: List<Homography.Point>,
+        scanSource: ScanSource = ScanSource.screenshot,
+    ): Result? {
         val detector = PieceDetector.shared(context) ?: return null
 
         val rectified = BoardRectifier.rectify(source, corners)
@@ -39,7 +43,7 @@ object ScanPipeline {
         val detections = detector.detect(BoardRectifier.alignedToGrid(rectified, grid))
         val primary = ScanReading(BoardConsistency.reconciled(BoardReader.grid(detections)))
 
-        val templates = TemplateSquareClassifier.shared(context)
+        val templates = TemplateSquareClassifier.shared(context, scanSource)
         val secondary = ScanReading(
             BoardConsistency.reconciled(templates.classify(BoardRectifier.patches(luminance, grid)))
         )
