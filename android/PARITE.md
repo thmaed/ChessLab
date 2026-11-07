@@ -2110,7 +2110,9 @@ libellés, même parcours (Puzzles → Mes collections).
         décision de design à prendre avant, pas à la volée ;
       · publication Play : binaire intermédiaire (versionCode 33), à l'auteur de décider.
 
-- [ ] **`PuzzleCollectionTest.aCollectionCanBeImportedPracticedWorkedAsAProgrammeAndDeleted` échoue — ANTÉRIEUR à
-      la session du 07/11** (même échec au commit `4629083`, avant tout ce travail, et sans les grands titres) : la ligne
-      de la collection importée n'apparaît pas dans les 10 s après la fermeture du bilan d'import (ligne 77). 184 tests
-      instrumentés sur 185 verts sur Galaxy A16 le 07/11. Cause non établie ; à regarder à l'écran.
+- [x] **CORRIGÉ le 07/11 — `PuzzleCollectionTest.aCollectionCanBeImportedPracticedWorkedAsAProgrammeAndDeleted`**
+      (échouait déjà avant la session). Cause : dans la feuille d'import de puzzles, l'en-tête (titre et « Fermer »)
+      faisait partie du contenu qui défile ; en descendant vers « Importer le texte » ou vers le bilan, « Fermer » sortait
+      de l'écran (position négative) et un tap à sa place ne fermait rien. Un VRAI défaut de l'app sur téléphone, pas
+      seulement du test : l'en-tête est maintenant fixe, seul le contenu défile — comme iOS, dont « Fermer » est dans la
+      barre. 5 tests verts (`PuzzleCollectionTest`, `PuzzleDeviceFlowTest`).

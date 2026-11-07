@@ -106,10 +106,10 @@ fun PuzzleImportSheet(onClose: () -> Unit) {
         }
     }
 
-    Column(
-        Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
-    ) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+        // L'en-tête reste FIXE : « Fermer » ne doit pas défiler hors de l'écran quand on
+        // descend vers le bouton d'import ou vers le bilan, sur un téléphone où la feuille
+        // est plus courte que son contenu.
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 stringResource(R.string.puzzle_import_row_title),
@@ -119,6 +119,10 @@ fun PuzzleImportSheet(onClose: () -> Unit) {
                 Text(stringResource(R.string.puzzle_import_close), color = Palette.accent)
             }
         }
+        Column(
+            Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(top = 18.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
+        ) {
         Text(stringResource(R.string.puzzle_import_intro), fontSize = 13.sp, color = Palette.textSecondary)
 
         Text(
@@ -187,6 +191,7 @@ fun PuzzleImportSheet(onClose: () -> Unit) {
         }
         reports.forEach { ReportCard(it) }
         Spacer(Modifier.height(24.dp))
+        }
     }
 }
 
