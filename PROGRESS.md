@@ -11086,8 +11086,10 @@ sélecteur.
 - iOS : le partage ne vide la boîte qu'une fois l'image chargée ; l'accueil la rend au scanner si la pile se vide.
 - **Prochaine publication iOS** : build monté à 22 (app + extension ; marketing resté 2.1, déjà en vente — la
   prochaine version portera un nouveau numéro, à décider). Android : `versionCode` 34 déjà prévu.
-- **CloudKit** : `CD_SyncedPuzzleCollection` n'existe ni en développement ni en production (vérifié par
-  `cktool export-schema`) ; à générer sur appareil puis à déployer par la console AVANT de publier.
+- **CloudKit (réglé le 07/11)** : `CD_SyncedPuzzleCollection` manquait en développement ET en production. Généré
+  depuis l'iPhone3, puis déployé en production par l'auteur ; vérifié par `cktool export-schema` : le type est dans
+  les deux environnements, schémas identiques (champs `CD_id`, `CD_name`, `CD_pgnData`, `CD_puzzleCount`,
+  `CD_updatedAt`).
 
 ## 07/11 (suite) — chess.com : accepté tel quel, mais rien de leur dans le dépôt
 
