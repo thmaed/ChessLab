@@ -2052,8 +2052,8 @@ libellés, même parcours (Puzzles → Mes collections).
       `group.com.chesslab.ChessLab` rattaché aux deux identifiants, profils de l'app (régénéré) et de
       l'extension, `ExportOptions.plist` à jour. Archive + export signé vérifiés en local (groupe présent
       dans les droits de l'app et de l'extension) ; `release.sh` n'a PAS été lancé (rien téléversé).
-- [ ] **À regarder sur appareil** : le partage depuis l'app Photos de l'iPhone réel (le simulateur n'a pas de
-      feuille de partage pilotable ici : seule la boîte aux lettres a été vérifiée de bout en bout). Build de
+- [x] **Vérifié sur appareil (07/11)** : le partage depuis l'app Photos de l'iPhone3 fonctionne (constaté par
+      l'auteur). Il ne reste à regarder que l'extension elle-même sur d'autres sources (Fichiers, Safari).
       développement poussé sur l'iPhone3 le 07/11.
 
 ## 07/11 (suite) — Sorties de l'éditeur et du scanner, phrase de rotation, partage plus robuste
