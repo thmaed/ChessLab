@@ -11084,3 +11084,7 @@ sélecteur.
   iOS propose jouer / analyser / départ du Laboratoire. Porté (`EditorExitsTest`).
 - iOS : « Lecture pivotée de N° » traduite (elle restait en français sous l'interface anglaise depuis la 1.0.1).
 - iOS : le partage ne vide la boîte qu'une fois l'image chargée ; l'accueil la rend au scanner si la pile se vide.
+- **Prochaine publication iOS** : build monté à 22 (app + extension ; marketing resté 2.1, déjà en vente — la
+  prochaine version portera un nouveau numéro, à décider). Android : `versionCode` 34 déjà prévu.
+- **CloudKit** : `CD_SyncedPuzzleCollection` n'existe ni en développement ni en production (vérifié par
+  `cktool export-schema`) ; à générer sur appareil puis à déployer par la console AVANT de publier.
