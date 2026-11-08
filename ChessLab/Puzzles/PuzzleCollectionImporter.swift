@@ -208,9 +208,7 @@ enum PuzzleCollectionImporter {
     /// annotations (`!`, `?`), point d'interrogation d'un coup douteux, `e.p.`,
     /// et le tiret de « coup nul » qui n'est pas un coup.
     private static func cleaned(_ token: String) -> String {
-        var text = token
-        while let last = text.last, "!?".contains(last) { text.removeLast() }
-        text = text.replacingOccurrences(of: "e.p.", with: "")
+        let text = PGNLoader.cleanedMoveToken(token)
         return text == "--" || text == "Z0" ? "" : text
     }
 }

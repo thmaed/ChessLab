@@ -1280,19 +1280,6 @@ struct HomeView: View {
                 }
     }
 
-    /// Réglages pour "Jouer / Continuer contre Stockfish depuis cette
-    /// position" : on repart des derniers réglages mémorisés (force,
-    /// cadence, aides) — sinon l'Elo retombait silencieusement au défaut
-    /// 1200 — et on attribue à l'utilisateur **le camp au trait dans la
-    /// FEN** (celui qu'on veut jouer). Corrige l'ancien comportement qui
-    /// donnait toujours les Blancs, y compris pour un répertoire/une ligne
-    /// des Noirs.
-    /// Clé de session d'une route — voir ``SessionStore``.
-    ///
-    /// La route EST l'identité de l'écran : même route, même partie. Deux
-    /// analyses de PGN différents ont des routes différentes, donc des
-    /// sessions distinctes. Une seule fonction pour les douze hôtes, plutôt
-    /// qu'une dérivation par type de charge utile.
     /// Où ouvre « Analyser la dernière partie » du Laboratoire : une partie de
     /// Chess960 va à SON analyse (le roque et la position de départ n'existent
     /// pas pour celle des échecs classiques), les autres à l'analyse ordinaire.
@@ -1300,6 +1287,12 @@ struct HomeView: View {
         pgn.contains("[Variant \"Chess960\"]") ? .activeChess960Analysis(pgn) : .activeAnalysis(.pgn(pgn))
     }
 
+    /// Clé de session d'une route — voir ``SessionStore``.
+    ///
+    /// La route EST l'identité de l'écran : même route, même partie. Deux
+    /// analyses de PGN différents ont des routes différentes, donc des
+    /// sessions distinctes. Une seule fonction pour les douze hôtes, plutôt
+    /// qu'une dérivation par type de charge utile.
     private func sessionKey(for route: Route) -> String {
         String(describing: route)
     }

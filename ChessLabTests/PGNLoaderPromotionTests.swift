@@ -43,4 +43,20 @@ struct PGNLoaderPromotionTests {
         #expect(fens[96].hasPrefix("8/7R/2p5/3p4/4p1k1/2Pb1r2/3K4/6q1 "), "g1=Q : \(fens[96])")
         #expect(fens.last?.hasPrefix("8/8/8/2pR4/K4k2/8/8/qr6 ") == true, "\(fens.last ?? "")")
     }
+
+    /// Les annotations d'un PGN commenté (« ! », « ? », « !? ») collées à une capture désambiguïsée ne
+    /// doivent pas faire tronquer la partie : le chargeur compare chaque coup à sa lecture corrigée.
+    @Test func anAnnotatedDisambiguatedCaptureStillLoadsInFull() throws {
+        let annotated = Self.pgn
+            .replacingOccurrences(of: "Rbxd4", with: "Rbxd4!")
+            .replacingOccurrences(of: "g1=Q", with: "g1=Q?!")
+            .replacingOccurrences(of: " Rxd4 Rxd4", with: " Rxd4! Rxd4?")
+        #expect(annotated != Self.pgn)
+        let game = try #require(PGNLoader.game(from: annotated))
+        var index = game.startingIndex
+        var plies = 0
+        while game.moves.hasIndex(after: index) { index = game.moves.index(after: index); plies += 1 }
+        #expect(plies == 126, "partie tronquée à \(plies) demi-coups")
+        #expect(game.positions[index]?.fen.hasPrefix("8/8/8/2pR4/K4k2/8/8/qr6 ") == true)
+    }
 }

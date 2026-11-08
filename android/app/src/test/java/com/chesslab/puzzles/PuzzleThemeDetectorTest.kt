@@ -53,4 +53,9 @@ class PuzzleThemeDetectorTest {
         // Cavalier e6 vise dame et tour, mais le pion f7 le prend.
         assertEquals("tactic", theme("3q2k1/2r2p2/8/2N5/8/8/8/4K3 w - - 0 1", "c5e6"))
     }
+
+    @Test fun `un echec a la decouverte n'est pas une fourchette`() {
+        // Le cavalier e5 démasque le fou a1 (échec au roi h8) et n'attaque, en c6, que la dame d8.
+        assertEquals("tactic", theme("3q3k/8/8/4N3/8/8/8/B3K3 w - - 0 1", "e5c6"))
+    }
 }

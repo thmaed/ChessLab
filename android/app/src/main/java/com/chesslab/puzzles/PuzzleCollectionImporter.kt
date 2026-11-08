@@ -301,10 +301,20 @@ object PuzzleThemeDetector {
      */
     private fun isFork(move: Move, after: Board): Boolean {
         if (!forkerSurvives(move, after)) return false
-        // Le roi attaqué (échec) est une cible : la fourchette classique roi + pièce.
+        // Le roi attaqué est une cible : la fourchette classique roi + pièce. Mais SEULEMENT si c'est la
+        // pièce qui vient de bouger qui donne l'échec : un échec à la DÉCOUVERTE (une autre pièce
+        // démasquée) n'est pas une fourchette (revue du 08/11/2026).
         var targets = realTargets(move, after)
-        if (after.state is Board.State.Check) targets += 1
+        if (after.state is Board.State.Check && movedPieceGivesCheck(move, after)) targets += 1
         return targets >= 2
+    }
+
+    /** La pièce arrivée en `move.end` attaque-t-elle le roi adverse ? */
+    private fun movedPieceGivesCheck(move: Move, after: Board): Boolean {
+        val king = after.position.pieces.firstOrNull {
+            it.kind == Piece.Kind.king && it.color != move.piece.color
+        } ?: return false
+        return king.square in after.legalMoves(move.end)
     }
 
     /** Les pièces de valeur que le fourchetteur peut prendre sans y perdre : plus précieuses que lui, ou sans défense. */

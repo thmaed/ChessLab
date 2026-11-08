@@ -10,7 +10,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -66,6 +69,20 @@ class MainActivity : ComponentActivity() {
         super.attachBaseContext(com.chesslab.settings.AppLanguage.wrap(newBase))
     }
 
+    /** Une image partagée PENDANT que l'app tourne (voir [onNewIntent]), en attente d'être ouverte. */
+    private var incomingImage by mutableStateOf<android.net.Uri?>(null)
+
+    /**
+     * « Partager › ChessLab » alors que l'app est déjà ouverte : `singleTask` fait arriver l'image ICI,
+     * dans l'activité existante, au lieu d'en créer une seconde — avec ses propres moteurs, alors que
+     * l'app n'en tient qu'un à la fois (revue du 08/11/2026).
+     */
+    public override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        com.chesslab.scanner.SharedImage.from(intent)?.let { incomingImage = it }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
@@ -82,7 +99,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 // Le fond signature remplace la surface unie : c'est lui qui
                 // donne à l'app son atmosphère, sur Android comme sur iOS.
-                AppBackground { App(sharedImage) }
+                AppBackground { App(sharedImage, incomingImage) { incomingImage = null } }
             }
         }
     }
@@ -94,11 +111,22 @@ class MainActivity : ComponentActivity() {
  * n'est empilé en double.
  */
 @Composable
-private fun App(sharedImage: android.net.Uri? = null) {
+private fun App(
+    sharedImage: android.net.Uri? = null,
+    incomingImage: android.net.Uri? = null,
+    onIncomingConsumed: () -> Unit = {},
+) {
     // Accueil dessous : « retour » depuis le scanner y ramène, comme partout.
     val stack = remember {
         mutableStateListOf<Route>(Route.Home).also {
             if (sharedImage != null) it.add(Route.Scanner(sharedImage = sharedImage))
+        }
+    }
+    // Une image partagée pendant que l'app tourne : le scanner s'ouvre par-dessus l'écran courant.
+    androidx.compose.runtime.LaunchedEffect(incomingImage) {
+        incomingImage?.let {
+            stack.add(Route.Scanner(sharedImage = it))
+            onIncomingConsumed()
         }
     }
     val current = stack.last()

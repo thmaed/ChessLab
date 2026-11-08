@@ -20,8 +20,13 @@ enum SAN {
     /// Pièce, colonne et/ou rangée de départ, puis `x` : « Rfx », « R1x », « Ra1x ».
     private static let disambiguatedCapture = #"^[KQRBN]([a-h][1-8]?|[1-8])x"#
 
+    /// Ce coup est-il une capture dont le départ est nommé (`Rfxd7+`, `R1xa3`) ?
+    static func isDisambiguatedCapture(_ san: String) -> Bool {
+        san.range(of: disambiguatedCapture, options: .regularExpression) != nil
+    }
+
     static func move(_ san: String, in position: Position) -> Move? {
-        guard san.range(of: disambiguatedCapture, options: .regularExpression) != nil else {
+        guard isDisambiguatedCapture(san) else {
             return Move(san: san, position: position)
         }
         guard let quiet = Move(san: san.replacingOccurrences(of: "x", with: ""), position: position),

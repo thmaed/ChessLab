@@ -199,16 +199,23 @@ final class WoodpeckerProgram {
 /// iCloud. Le JSON, très répétitif, se réduit par zlib à ~15 % (mesuré : 133 Ko
 /// au vingtième cycle). Android n'est pas concerné : sa base est locale, sans cette limite.
 ///
-/// Format : un octet nul, puis le JSON compressé. Un plan écrit avant la
-/// compression est du JSON brut — il commence par `{`, jamais par un octet nul —
-/// et se relit donc tel quel ; il est recompressé à sa prochaine écriture.
+/// Format : le JSON brut tant qu'il tient sous ``compressionThreshold``, et SEULEMENT
+/// au-delà un octet nul puis le JSON compressé. Les versions 2.0 et 2.1 lisent le plan
+/// d'un enregistrement iCloud comme du JSON : un plan compressé leur serait illisible, elles
+/// verraient un programme vide, en proposeraient un neuf et écraseraient l'historique des
+/// cycles (revue du 08/11/2026). Le JSON brut, lui, se relit sur toutes les versions ; il ne
+/// commence jamais par un octet nul (`{`), ce qui distingue les deux formats.
 extension WoodpeckerPlan {
     private static let compressedMarker: UInt8 = 0
 
+    /// Au-delà de ce poids de JSON brut, on compresse : le plan voyage en UN enregistrement
+    /// CloudKit, d'au plus 1 Mo en tout ; 600 Ko laissent la marge aux autres champs.
+    static let compressionThreshold = 600_000
+
     var storedData: Data? {
-        guard let json = try? JSONEncoder().encode(self),
-              let packed = try? (json as NSData).compressed(using: .zlib)
-        else { return nil }
+        guard let json = try? JSONEncoder().encode(self) else { return nil }
+        guard json.count > Self.compressionThreshold else { return json }
+        guard let packed = try? (json as NSData).compressed(using: .zlib) else { return nil }
         return Data([Self.compressedMarker]) + (packed as Data)
     }
 

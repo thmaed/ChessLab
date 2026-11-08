@@ -81,4 +81,32 @@ class ScannerShareTest {
         compose.waitForIdle()
         assertTrue("la même image, pas relue", model.ui.image === loaded)
     }
+
+    /**
+     * « Partager › ChessLab » alors que l'app est déjà ouverte : l'image arrive dans l'activité
+     * EXISTANTE (`singleTask` + `onNewIntent`), le scanner s'ouvre par-dessus, et « retour » ramène à
+     * l'écran d'où l'on venait (revue du 08/11/2026 : l'app se dédoublait, moteurs compris).
+     */
+    @Test fun uneImagePartageePendantQueLAppTourneOuvreLeScannerSansDedoubler() {
+        val scenario = androidx.test.core.app.ActivityScenario.launch(MainActivity::class.java)
+        try {
+            val share = Intent(Intent.ACTION_SEND).apply {
+                type = "image/png"
+                putExtra(Intent.EXTRA_STREAM, Uri.parse("content://com.chesslab.inexistant/image.png"))
+            }
+            var instances = 0
+            scenario.onActivity { it.onNewIntent(share) }
+            Thread.sleep(1_500)
+            scenario.onActivity { activity ->
+                val am = activity.getSystemService(android.app.ActivityManager::class.java)
+                instances = am!!.appTasks.sumOf { it.taskInfo?.numActivities ?: 0 }
+            }
+            assertEquals("une seule activité, pas deux", 1, instances)
+        } finally {
+            // La fermeture peut attendre en vain la destruction d'une activité `singleTask` (limite de
+            // l'outil de test, pas de l'app) : l'assertion utile est faite plus haut.
+            scenario.onActivity { it.finish() }
+            runCatching { scenario.close() }
+        }
+    }
 }

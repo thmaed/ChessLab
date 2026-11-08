@@ -98,4 +98,22 @@ struct PuzzleThemeDetectorTests {
             solutionLANs: ["c5e6"]
         ) == .tactic)
     }
+
+    @Test func aDiscoveredCheckIsNotAFork() {
+        // Le cavalier e5 démasque le fou a1 (échec au roi h8) et n'attaque, en c6, que la dame d8 :
+        // une seule cible. L'échec vient du FOU, pas du cavalier : pas une fourchette (revue du 08/11/2026).
+        #expect(PuzzleThemeDetector.detect(
+            startFEN: "3q3k/8/8/4N3/8/8/8/B3K3 w - - 0 1",
+            solutionLANs: ["e5c6"]
+        ) == .tactic)
+    }
+
+    @Test func aCheckGivenByTheMovedPieceStillCountsAsATarget() {
+        // Cavalier c6 donne lui-même l'échec en e7 (roi g8) ET attaque la dame c8... voir la tour a8 :
+        // cavalier en c7+ : échec au roi e8, tour a8 attaquée — la fourchette classique.
+        #expect(PuzzleThemeDetector.detect(
+            startFEN: "r3k3/8/8/3N4/8/8/8/4K3 w - - 0 1",
+            solutionLANs: ["d5c7"]
+        ) == .fork)
+    }
 }

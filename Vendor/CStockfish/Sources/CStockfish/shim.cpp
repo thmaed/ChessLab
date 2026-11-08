@@ -99,8 +99,6 @@ private:
     std::string current_;
 };
 
-/// Flux de SORTIE : accumule les caractères et remet chaque LIGNE complète au
-/// callback (sans le '\n').
 // ---------------------------------------------------------------------------
 // ÉCHELLE DES CENTIPIONS : Stockfish 19 → équivalent Stockfish 17.1
 //
@@ -168,6 +166,8 @@ std::string rescaleScores(const std::string &line) {
 
 }  // namespace
 
+/// Flux de SORTIE : accumule les caractères et remet chaque LIGNE complète au
+/// callback (sans le '\n').
 class OutputBuffer : public std::streambuf {
 public:
     void configure(cstockfish_output_callback callback, void *context) {

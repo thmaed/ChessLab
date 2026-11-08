@@ -71,10 +71,22 @@ enum PuzzleThemeDetector {
     /// vaut plus que le fourchetteur, ou si elle n'est pas défendue.
     private static func isFork(_ move: Move, boardAfterMove: Board) -> Bool {
         guard forkerSurvives(move, boardAfterMove: boardAfterMove) else { return false }
-        // Le roi attaqué (échec) est une cible : la fourchette classique roi + pièce.
+        // Le roi attaqué est une cible : la fourchette classique roi + pièce. Mais SEULEMENT si c'est la
+        // pièce qui vient de bouger qui donne l'échec : un échec à la DÉCOUVERTE (une autre pièce
+        // démasquée) n'est pas une fourchette (revue du 08/11/2026).
         var targets = realTargets(of: move, boardAfterMove: boardAfterMove)
-        if case .check = boardAfterMove.state { targets += 1 }
+        if case .check = boardAfterMove.state, movedPieceGivesCheck(move, boardAfterMove: boardAfterMove) {
+            targets += 1
+        }
         return targets >= 2
+    }
+
+    /// La pièce arrivée en `move.end` attaque-t-elle le roi adverse ?
+    private static func movedPieceGivesCheck(_ move: Move, boardAfterMove: Board) -> Bool {
+        guard let king = boardAfterMove.position.pieces.first(where: {
+            $0.kind == .king && $0.color != move.piece.color
+        }) else { return false }
+        return boardAfterMove.legalMoves(forPieceAt: move.end).contains(king.square)
     }
 
     /// Les pièces de valeur que le fourchetteur peut prendre sans y perdre :

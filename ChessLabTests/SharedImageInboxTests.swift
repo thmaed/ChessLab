@@ -22,6 +22,20 @@ struct SharedImageInboxTests {
         return url
     }
 
+    /// Une photo PRISE IL Y A UN MOIS, partagée aujourd'hui, ne doit pas être jugée « trop vieille »
+    /// (revue du 08/11/2026 : constat qui ne se reproduit pas sur iOS, test gardé comme filet).
+    @Test func anOldPhotoSharedTodayIsNotTakenForForgotten() throws {
+        let inbox = try makeDirectory()
+        let photo = try source([9, 9, 9], in: inbox)
+        let lastMonth = Date.now.addingTimeInterval(-30 * 24 * 60 * 60)
+        try FileManager.default.setAttributes([.modificationDate: lastMonth], ofItemAtPath: photo.path)
+
+        try SharedImageInbox.deposit(contentsOf: photo, in: inbox)
+
+        #expect(SharedImageInbox.hasPending(in: inbox), "l'image vient d'être partagée")
+        #expect(SharedImageInbox.take(in: inbox) == Data([9, 9, 9]))
+    }
+
     @Test func anEmptyInboxHoldsNothing() throws {
         let inbox = try makeDirectory()
         #expect(!SharedImageInbox.hasPending(in: inbox))

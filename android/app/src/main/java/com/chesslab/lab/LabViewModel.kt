@@ -299,22 +299,17 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
      * plusieurs coups conviennent d'une nulle. Sans cela, une série de cent
      * parties passe l'essentiel de son temps sur des finales déjà jouées.
      */
-    private fun forcedOutcome(): String? {
-        if (recentEvals.size < RESIGN_PLIES) return null
-        val last = recentEvals.takeLast(RESIGN_PLIES)
-        if (ui.resignationEnabled && last.all { it <= -RESIGN_CP }) {
-            return if (board.position.sideToMove == Piece.Color.white) "0-1" else "1-0"
-        }
-        if (ui.resignationEnabled && last.all { it >= RESIGN_CP }) {
-            return if (board.position.sideToMove == Piece.Color.white) "1-0" else "0-1"
-        }
-        if (ui.drawAgreementEnabled && ui.sanMoves.size >= DRAW_MIN_PLIES &&
-            last.all { kotlin.math.abs(it) <= DRAW_CP }
-        ) {
-            return "1/2-1/2"
-        }
-        return null
-    }
+    private fun forcedOutcome(): String? = agreedOutcome(recentEvals, ui.sanMoves.size)
+
+    /**
+     * L'abandon et la nulle par accord sur des évaluations au point de vue des BLANCS — comme iOS
+     * (`resignationOrAgreedDraw`) : fenêtre de 6 demi-coups à ±8 pions pour l'abandon, de 10 à ±15 cp
+     * après 60 demi-coups pour la nulle. Les évaluations arrivaient au point de vue du camp AU TRAIT,
+     * donc de signe alternant : « toutes ≤ −800 » n'était jamais vrai, et l'abandon ne se déclenchait
+     * pas (revue du 08/11/2026).
+     */
+    private fun agreedOutcome(whiteEvals: List<Int>, plies: Int): String? =
+        AgreedOutcome.of(whiteEvals, plies, ui.resignationEnabled, ui.drawAgreementEnabled)
 
     /** Les dernières évaluations, DU POINT DE VUE du camp au trait. */
     private val recentEvals = ArrayDeque<Int>()
@@ -442,8 +437,9 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
                 score
             }
         } ?: return
-        recentEvals.addLast(cp)
-        while (recentEvals.size > RESIGN_PLIES) recentEvals.removeFirst()
+        // La sonde rend le score du camp AU TRAIT : on le range au point de vue des Blancs.
+        recentEvals.addLast(if (board.position.sideToMove == Piece.Color.white) cp else -cp)
+        while (recentEvals.size > DRAW_PLIES) recentEvals.removeFirst()
     }
 
     /**
@@ -572,9 +568,11 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
             if (best == null || best == "(none)") return GameState.Failed
 
             // La sonde de l'abandon et de la nulle : le score du camp au trait, tenu sur plusieurs coups.
-            answer.cp?.let { recentEvals.addLast(it) } ?: answer.mate?.let { recentEvals.addLast(if (it > 0) 10_000 else -10_000) }
-            while (recentEvals.size > RESIGN_PLIES) recentEvals.removeFirst()
-            forcedChess960(mover)?.let { (result, reason) ->
+            // Le score du camp au trait (`mover`), rangé au point de vue des Blancs.
+            val moverCp = answer.cp ?: answer.mate?.let { if (it > 0) 10_000 else -10_000 }
+            moverCp?.let { recentEvals.addLast(if (mover == Piece.Color.white) it else -it) }
+            while (recentEvals.size > DRAW_PLIES) recentEvals.removeFirst()
+            forcedChess960()?.let { (result, reason) ->
                 finishChess960(index, start, result, reason)
                 return GameState.Finished
             }
@@ -625,19 +623,9 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     /** L'abandon et la nulle par accord, aux mêmes seuils que la série classique. */
-    private fun forcedChess960(mover: Piece.Color): Pair<String, String>? {
-        if (recentEvals.size < RESIGN_PLIES) return null
-        val last = recentEvals.takeLast(RESIGN_PLIES)
-        if (ui.resignationEnabled && last.all { it <= -RESIGN_CP }) {
-            return (if (mover == Piece.Color.white) "0-1" else "1-0") to s(R.string.reason_resignation)
-        }
-        if (ui.resignationEnabled && last.all { it >= RESIGN_CP }) {
-            return (if (mover == Piece.Color.white) "1-0" else "0-1") to s(R.string.reason_resignation)
-        }
-        if (ui.drawAgreementEnabled && ui.sanMoves.size >= DRAW_MIN_PLIES && last.all { kotlin.math.abs(it) <= DRAW_CP }) {
-            return "1/2-1/2" to s(R.string.draw_agreement)
-        }
-        return null
+    private fun forcedChess960(): Pair<String, String>? {
+        val result = agreedOutcome(recentEvals, ui.sanMoves.size) ?: return null
+        return result to s(if (result == "1/2-1/2") R.string.draw_agreement else R.string.reason_resignation)
     }
 
     /** La partie finie entre au bilan, avec son PGN de variante (`Variant`, `SetUp`, `FEN`). */
@@ -763,13 +751,9 @@ class LabViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private companion object {
-        /** Huit pions d'écart, tenus sur autant de demi-coups : c'est perdu. */
-        const val RESIGN_CP = 800
-        const val RESIGN_PLIES = 8
+        /** Fenêtre des évaluations gardées : la plus longue des deux (la nulle). */
+        const val DRAW_PLIES = AgreedOutcome.DRAW_PLIES
 
-        /** Zéro tenu sur huit demi-coups, après vingt : c'est nul. */
-        const val DRAW_CP = 15
-        const val DRAW_MIN_PLIES = 40
 
         /** Sécurité anti-partie-infinie : 400 demi-coups, comme iOS. */
         const val MAX_PLIES = 400

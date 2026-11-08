@@ -45,6 +45,11 @@ enum SharedImageInbox {
         let temporary = directory.appendingPathComponent("\(fileName).\(UUID().uuidString).tmp")
         try FileManager.default.copyItem(at: source, to: temporary)
         do {
+            // Daté d'AUJOURD'HUI, explicitement : ``hasPending`` juge l'âge à cette date, et une copie qui
+            // garderait celle du fichier d'origine ferait jeter une vieille photo avant lecture. Sur iOS la
+            // copie prend déjà la date du jour (vérifié sur iPhone le 08/11/2026) ; macOS, lui, garde
+            // l'ancienne — on ne dépend pas de ce détail de `copyItem`.
+            try FileManager.default.setAttributes([.modificationDate: Date.now], ofItemAtPath: temporary.path)
             if FileManager.default.fileExists(atPath: destination.path) {
                 try FileManager.default.removeItem(at: destination)
             }

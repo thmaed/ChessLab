@@ -191,20 +191,32 @@ class ScannerViewModel(app: Application) : AndroidViewModel(app) {
         ui = ui.copy(busy = true, status = s(R.string.scan_reading))
         val result = readBoard(bitmap, ui.corners, ui.source)
         if (result == null) {
-            ui = ui.copy(status = s(R.string.scan_model_unavailable))
+            ui = ui.copy(busy = false, status = s(R.string.scan_model_unavailable))
             return@launch
         }
         showReading(bitmap, ui.corners, ui.source, result)
     }
 
-    /** La lecture, hors fil principal. `null` si le modèle de reconnaissance est absent. */
+    /**
+     * La lecture, hors fil principal. `null` si le modèle de reconnaissance est absent OU si la
+     * lecture échoue (homographie dégénérée, image énorme, erreur d'inférence) : l'appelant retombe
+     * alors sur le cadrage manuel, jamais sur un plantage — une image PARTAGÉE déclenche cette
+     * lecture toute seule, au lancement (revue du 08/11/2026).
+     */
     private suspend fun readBoard(
         bitmap: Bitmap, corners: List<Pair<Float, Float>>, source: ScanSource,
     ): ScanPipeline.Result? = withContext(Dispatchers.IO) {
-        val points = corners.map { (fx, fy) ->
-            Homography.Point((fx * bitmap.width).toDouble(), (fy * bitmap.height).toDouble())
+        try {
+            val points = corners.map { (fx, fy) ->
+                Homography.Point((fx * bitmap.width).toDouble(), (fy * bitmap.height).toDouble())
+            }
+            ScanPipeline.read(getApplication(), bitmap, points, source)
+        } catch (cancelled: kotlinx.coroutines.CancellationException) {
+            throw cancelled
+        } catch (failure: Throwable) {
+            android.util.Log.w("Scanner", "lecture du plateau impossible", failure)
+            null
         }
-        ScanPipeline.read(getApplication(), bitmap, points, source)
     }
 
     /**

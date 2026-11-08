@@ -135,13 +135,23 @@ struct WoodpeckerPlanTests {
         #expect(WoodpeckerPlan(storedData: Data()) == nil)
     }
 
-    @Test func theProgramKeepsItsPlanCompressedAndReadsALegacyOne() throws {
+    /// Un petit plan reste du JSON BRUT : les versions 2.0 et 2.1 le relisent via iCloud (revue du 08/11/2026).
+    @Test func aSmallPlanStaysPlainJSONForOlderVersions() throws {
         let plan = try #require(WoodpeckerPlan.start(items: items(20), at: start))
         let program = WoodpeckerProgram()
         program.plan = plan
-        #expect(program.planData?.first == 0)
+        #expect(program.planData?.first == UInt8(ascii: "{"), "du JSON brut, lisible partout")
         #expect(program.plan == plan)
-        program.planData = try JSONEncoder().encode(plan)
+        // Ce que lit une ancienne version : le JSON, tel quel.
+        let olderBuild = try JSONDecoder().decode(WoodpeckerPlan.self, from: try #require(program.planData))
+        #expect(olderBuild == plan)
+    }
+
+    @Test func aHugePlanIsCompressedAndReadsBack() throws {
+        let plan = bigPlan(cycles: 20)
+        let program = WoodpeckerProgram()
+        program.plan = plan
+        #expect(program.planData?.first == 0, "au-delà du seuil : l'octet nul puis le JSON compressé")
         #expect(program.plan == plan)
     }
 
@@ -152,6 +162,7 @@ struct WoodpeckerPlanTests {
         let raw = try JSONEncoder().encode(plan).count
         #expect(raw > 900_000)
         let stored = try #require(plan.storedData).count
+        #expect(raw > WoodpeckerPlan.compressionThreshold)
         #expect(stored < 500_000)
         #expect(stored < raw / 3)
         #expect(WoodpeckerPlan(storedData: try #require(plan.storedData)) == plan)

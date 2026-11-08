@@ -158,16 +158,22 @@ enum PuzzleCollectionSync {
     static func restore(in context: ModelContext, defaults: UserDefaults = .standard) async {
         let all = records(in: context).sorted { $0.updatedAt < $1.updatedAt }
         guard !all.isEmpty else { return }
-        var names = readNames(defaults)
-        var stamps = readStamps(defaults)
         var present = PuzzleCollectionStore.names(in: context)
 
+        // Les tables de noms et de dates sont LUES ET ÉCRITES record par record, jamais gardées
+        // d'un bout à l'autre de la boucle : l'analyse d'un PGN SUSPEND cette fonction, et pendant ce
+        // temps un import, un renommage ou une suppression peut passer par `backup`, `renamed` ou
+        // `deleted`. Réécrire à la fin des copies lues avant l'attente effaçait leur travail (revue
+        // du 08/11/2026).
         for record in all {
+            // Supprimée par `deleted` pendant une attente précédente : rien à lire, et la lire planterait.
+            guard !record.isDeleted, record.modelContext != nil else { continue }
             guard let data = record.pgnData, let text = unpack(data) else { continue }
             let key = record.id.uuidString
+            let known = readNames(defaults)[key]
 
             var target = record.name
-            if let old = names[key], old != record.name, present.contains(old) {
+            if let old = known, old != record.name, present.contains(old) {
                 if !present.contains(record.name),
                    PuzzleCollectionStore.rename(old, to: record.name, in: context) {
                     present.remove(old)
@@ -176,22 +182,21 @@ enum PuzzleCollectionSync {
                     target = old
                 }
             }
-            let changed = record.updatedAt.timeIntervalSince1970 - (stamps[key] ?? 0) > 1
+            let changed = record.updatedAt.timeIntervalSince1970 - (readStamps(defaults)[key] ?? 0) > 1
             guard changed || !present.contains(target) else {
-                names[key] = target
+                setName(target, for: key, defaults)
                 continue
             }
 
+            let updatedAt = record.updatedAt.timeIntervalSince1970
             let parsed = await Task.detached(priority: .utility) {
                 PuzzleCollectionImporter.parse(text)
             }.value
             PuzzleCollectionStore.add(parsed, toCollection: target, in: context)
             present.insert(target)
-            names[key] = target
-            stamps[key] = record.updatedAt.timeIntervalSince1970
+            setName(target, for: key, defaults)
+            setStamp(updatedAt, for: key, defaults)
         }
-        writeNames(names, defaults)
-        writeStamps(stamps, defaults)
     }
 
     // MARK: Le PGN compressé
@@ -231,5 +236,18 @@ enum PuzzleCollectionSync {
 
     private static func writeStamps(_ stamps: [String: Double], _ defaults: UserDefaults) {
         defaults.set(stamps, forKey: stampsKey)
+    }
+
+    /// Une entrée à la fois : relit la table AVANT d'écrire (voir ``restore(in:defaults:)``).
+    private static func setName(_ name: String, for key: String, _ defaults: UserDefaults) {
+        var names = readNames(defaults)
+        names[key] = name
+        writeNames(names, defaults)
+    }
+
+    private static func setStamp(_ stamp: Double, for key: String, _ defaults: UserDefaults) {
+        var stamps = readStamps(defaults)
+        stamps[key] = stamp
+        writeStamps(stamps, defaults)
     }
 }

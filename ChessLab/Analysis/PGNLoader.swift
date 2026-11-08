@@ -38,17 +38,13 @@ enum PGNLoader {
         return reconstruct(cleaned)
     }
 
-    /// Une capture avec départ nommé : `Rfxd7`, `R1xa3`, `Nbxd5`, `Qh4xe1`.
-    private static let disambiguatedCapture = #"^[KQRBN]([a-h][1-8]?|[1-8])x"#
-
     /// Contre-épreuve de `Game(pgn:)` : chaque coup de sa ligne principale doit être
     /// celui que ``SAN`` lit dans le texte. Ne sert que si le texte contient une
     /// capture désambiguïsée, le seul cas où ChessKit se trompe (voir ``SAN``) ;
     /// sans elle, la partie, variantes et commentaires compris, est gardée telle quelle.
     private static func mainLineAgrees(_ game: Game, with pgn: String) -> Bool {
         let tokens = movetext(of: pgn)
-        guard tokens.contains(where: { $0.range(of: disambiguatedCapture, options: .regularExpression) != nil })
-        else { return true }
+        guard tokens.contains(where: SAN.isDisambiguatedCapture) else { return true }
 
         let line = game.moves.indices
             .filter { $0.variation == MoveTree.Index.mainVariation }
@@ -133,7 +129,17 @@ enum PGNLoader {
                     of: "^\\d+\\.(\\.\\.)?", with: "", options: .regularExpression
                 )
             }
+            .map(cleanedMoveToken)
             .filter { !$0.isEmpty && !results.contains($0) }
+    }
+
+    /// Un coup SANS ses annotations de fin (« Rfxd7! » → « Rfxd7 », « Nbxd5?! » → « Nbxd5 ») ni
+    /// « e.p. » : ChessKit lit « Rfxd7 » et rejette « Rfxd7! ». Sans ce nettoyage, une partie
+    /// commentée qui contient une capture désambiguïsée était tronquée à ce coup.
+    static func cleanedMoveToken(_ token: String) -> String {
+        var text = token
+        while let last = text.last, "!?".contains(last) { text.removeLast() }
+        return text.replacingOccurrences(of: "e.p.", with: "")
     }
 
     /// En-têtes du PGN, pour ne pas perdre joueurs, date et résultat quand on
