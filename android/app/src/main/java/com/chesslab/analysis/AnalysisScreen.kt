@@ -873,45 +873,14 @@ private fun GameSummarySheet(ui: AnalysisUiState, onDismiss: () -> Unit) {
  */
 @Composable
 private fun EngineStatusBadge(ui: AnalysisUiState) {
-    // Pendant l'analyse de la partie : la jauge (même hauteur, rien ne bouge). Pendant exact de
-    // `ClassificationProgressBadge` (iOS).
+    // La place de la jauge d'analyse. Elle ne montre RIEN hors analyse : la capsule d'état
+    // (« Moteur en attente », « L'ordinateur calcule — N coups d'avance ») est retirée, la jauge
+    // dit déjà tout (demandé le 08/11/2026) ; la panne du moteur a sa propre bannière. Hauteur
+    // fixe, même vide : le plateau ne saute pas. Pendant de `analyzingBadge` (iOS).
     if (ui.reviewing && ui.reviewTotal > 0) {
         com.chesslab.ui.ReviewProgressBadge(ui.reviewDone, ui.reviewTotal)
-        return
-    }
-    // Une ligne d'état NEUTRE, qui nomme ce qui travaille et jusqu'où il a
-    // calculé. Elle disait « profondeur 18 » : le mot ne veut rien dire pour
-    // qui ne connaît pas les moteurs, alors qu'un nombre de coups d'avance se
-    // comprend. iOS l'a changé pour cette raison, commentaire à l'appui.
-    // L'ordinateur calcule la position affichée : AUCUNE légende (« N coups d'avance » n'apprenait
-    // rien, retour du 08/11/2026). La place est gardée pour que rien ne bouge au retour de la capsule.
-    if (!ui.engineUnavailable && ui.depth > 0) {
+    } else {
         Spacer(Modifier.height(26.dp))
-        return
-    }
-    val texte = if (ui.engineUnavailable) stringResource(R.string.analysis_engine_off)
-    else stringResource(R.string.analysis_engine_idle)
-    Row(
-        Modifier
-            .clip(CircleShape)
-            .background(Palette.surface)
-            .subtleBorder(CircleShape)
-            .padding(horizontal = 10.dp, vertical = 4.dp)
-            // FUSIONNÉE : sans cela, la rangée ne porte que son étiquette et
-            // le texte reste dans l'enfant — invisible au lecteur d'écran
-            // comme aux tests d'interface, qui lisaient une capsule vide.
-            .semantics(mergeDescendants = true) {}
-            .testTag("moteur-etat"),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            Modifier
-                .size(6.dp)
-                .clip(CircleShape)
-                .background(Palette.textTertiary.copy(alpha = 0.5f))
-        )
-        Spacer(Modifier.width(7.dp))
-        Text(texte, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Palette.textSecondary, maxLines = 1)
     }
 }
 

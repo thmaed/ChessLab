@@ -464,57 +464,18 @@ struct AnalysisView: View {
         }
     }
 
-    /// Dans le flux (au-dessus du plateau, qu'elle pousse légèrement vers
-    /// le bas) plutôt qu'en superposition, qui recouvrait les cases du
-    /// haut. Hauteur fixe + opacité (plutôt qu'un `if`) pour ne pas
-    /// décaler la mise en page quand la profondeur apparaît/disparaît.
+    /// La place de la jauge d'analyse, au-dessus du plateau. Elle ne montre RIEN hors analyse : la
+    /// capsule d'état (« Moteur en attente », « L'ordinateur calcule — N coups d'avance ») est
+    /// retirée, la jauge dit déjà tout (demandé le 08/11/2026) ; la panne du moteur a sa propre
+    /// bannière (``EngineUnavailableBanner``). Hauteur fixe, même vide : le plateau ne saute pas
+    /// quand la jauge apparaît ou disparaît.
     @ViewBuilder
     private var analyzingBadge: some View {
         if viewModel.isClassifying, let progress = viewModel.classificationProgress {
-            // Pendant l'analyse de la partie : la jauge (même hauteur, rien ne bouge).
             ClassificationProgressBadge(done: progress.done, total: progress.total)
-        } else if viewModel.isLiveAnalyzing, viewModel.liveDepth != nil, !viewModel.isEngineUnavailable {
-            // L'ordinateur calcule la position affichée : AUCUNE légende. « N coups d'avance »
-            // n'apprenait rien à l'utilisateur (retour du 08/11/2026) ; la place est gardée,
-            // pour que rien ne bouge quand la capsule revient.
-            Color.clear.frame(height: 26)
         } else {
-            engineStatusBadge
+            Color.clear.frame(height: 26)
         }
-    }
-
-    private var engineStatusBadge: some View {
-        // L'ancien bandeau disait « Analyse en continu — profondeur 18 » en
-        // ORANGE, la couleur des avertissements de l'app : il se lisait comme
-        // un problème, alors qu'il décrit le fonctionnement NORMAL. Et
-        // « profondeur » ne veut rien dire pour qui ne connaît pas les
-        // moteurs. Devient une ligne d'état neutre, qui nomme ce qui
-        // travaille et jusqu'où il a calculé.
-        HStack(spacing: 7) {
-            Circle()
-                .fill(Theme.textTertiary)
-                .frame(width: 6, height: 6)
-                .opacity(0.5)
-
-            Text(engineStatusText)
-                .font(.caption2.weight(.medium))
-                .foregroundStyle(Theme.textSecondary)
-                .lineLimit(1)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 4)
-        .background(Theme.surface, in: Capsule())
-        .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
-        .frame(height: 26)
-        .accessibilityLabel(Text(engineStatusText))
-    }
-
-    /// Le texte de la capsule d'état, hors calcul : « Moteur indisponible » ou « Moteur en
-    /// attente ». Pendant le calcul, il n'y en a pas (voir ``analyzingBadge``).
-    private var engineStatusText: String {
-        viewModel.isEngineUnavailable
-            ? LocalizationController.string("Moteur indisponible")
-            : LocalizationController.string("Moteur en attente")
     }
 
     @ViewBuilder

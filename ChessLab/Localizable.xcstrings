@@ -13002,23 +13002,6 @@
         }
       }
     },
-    "Moteur en attente": {
-      "extractionState": "stale",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Engine idle"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Moteur en attente"
-          }
-        }
-      }
-    },
     "Moteur indisponible": {
       "localizations": {
         "en": {
