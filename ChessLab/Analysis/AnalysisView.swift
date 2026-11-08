@@ -473,6 +473,11 @@ struct AnalysisView: View {
         if viewModel.isClassifying, let progress = viewModel.classificationProgress {
             // Pendant l'analyse de la partie : la jauge (même hauteur, rien ne bouge).
             ClassificationProgressBadge(done: progress.done, total: progress.total)
+        } else if viewModel.isLiveAnalyzing, viewModel.liveDepth != nil, !viewModel.isEngineUnavailable {
+            // L'ordinateur calcule la position affichée : AUCUNE légende. « N coups d'avance »
+            // n'apprenait rien à l'utilisateur (retour du 08/11/2026) ; la place est gardée,
+            // pour que rien ne bouge quand la capsule revient.
+            Color.clear.frame(height: 26)
         } else {
             engineStatusBadge
         }
@@ -487,9 +492,9 @@ struct AnalysisView: View {
         // travaille et jusqu'où il a calculé.
         HStack(spacing: 7) {
             Circle()
-                .fill(viewModel.isLiveAnalyzing ? Theme.accent : Theme.textTertiary)
+                .fill(Theme.textTertiary)
                 .frame(width: 6, height: 6)
-                .opacity(viewModel.isLiveAnalyzing ? 1 : 0.5)
+                .opacity(0.5)
 
             Text(engineStatusText)
                 .font(.caption2.weight(.medium))
@@ -501,18 +506,15 @@ struct AnalysisView: View {
         .background(Theme.surface, in: Capsule())
         .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
         .frame(height: 26)
-        .animation(Theme.gentle, value: viewModel.isLiveAnalyzing)
         .accessibilityLabel(Text(engineStatusText))
     }
 
-    /// « Stockfish calcule — 18 coups d'avance » plutôt que « profondeur 18 » :
-    /// la profondeur EST un nombre de demi-coups explorés, autant le dire.
+    /// Le texte de la capsule d'état, hors calcul : « Moteur indisponible » ou « Moteur en
+    /// attente ». Pendant le calcul, il n'y en a pas (voir ``analyzingBadge``).
     private var engineStatusText: String {
-        if viewModel.isEngineUnavailable { return LocalizationController.string("Moteur indisponible") }
-        guard viewModel.isLiveAnalyzing, let depth = viewModel.liveDepth else {
-            return LocalizationController.string("Moteur en attente")
-        }
-        return LocalizationController.string("L'ordinateur calcule — %lld coups d'avance", depth)
+        viewModel.isEngineUnavailable
+            ? LocalizationController.string("Moteur indisponible")
+            : LocalizationController.string("Moteur en attente")
     }
 
     @ViewBuilder

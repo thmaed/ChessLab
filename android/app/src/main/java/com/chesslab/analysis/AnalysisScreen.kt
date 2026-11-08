@@ -883,12 +883,14 @@ private fun EngineStatusBadge(ui: AnalysisUiState) {
     // calculé. Elle disait « profondeur 18 » : le mot ne veut rien dire pour
     // qui ne connaît pas les moteurs, alors qu'un nombre de coups d'avance se
     // comprend. iOS l'a changé pour cette raison, commentaire à l'appui.
-    val texte = when {
-        ui.engineUnavailable -> stringResource(R.string.analysis_engine_off)
-        ui.depth > 0 -> stringResource(R.string.analysis_engine_working, ui.depth)
-        else -> stringResource(R.string.analysis_engine_idle)
+    // L'ordinateur calcule la position affichée : AUCUNE légende (« N coups d'avance » n'apprenait
+    // rien, retour du 08/11/2026). La place est gardée pour que rien ne bouge au retour de la capsule.
+    if (!ui.engineUnavailable && ui.depth > 0) {
+        Spacer(Modifier.height(26.dp))
+        return
     }
-    val vivant = !ui.engineUnavailable && ui.depth > 0
+    val texte = if (ui.engineUnavailable) stringResource(R.string.analysis_engine_off)
+    else stringResource(R.string.analysis_engine_idle)
     Row(
         Modifier
             .clip(CircleShape)
@@ -906,10 +908,7 @@ private fun EngineStatusBadge(ui: AnalysisUiState) {
             Modifier
                 .size(6.dp)
                 .clip(CircleShape)
-                .background(
-                    (if (vivant) Palette.accent else Palette.textTertiary)
-                        .copy(alpha = if (vivant) 1f else 0.5f)
-                )
+                .background(Palette.textTertiary.copy(alpha = 0.5f))
         )
         Spacer(Modifier.width(7.dp))
         Text(texte, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Palette.textSecondary, maxLines = 1)

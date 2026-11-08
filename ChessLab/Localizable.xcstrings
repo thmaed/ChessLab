@@ -10661,22 +10661,6 @@
         }
       }
     },
-    "L'ordinateur calcule — %lld coups d'avance": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The computer is calculating — %lld moves ahead"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "L'ordinateur calcule — %lld coups d'avance"
-          }
-        }
-      }
-    },
     "L'ordinateur contre lui-même": {
       "localizations": {
         "en": {
