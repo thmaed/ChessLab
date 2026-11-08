@@ -26,7 +26,7 @@ kotlin { compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarg
 
 dependencies {
     // @StringRes : les personnages portent des ressources, pas des chaînes.
-    implementation("androidx.annotation:annotation:1.9.1")
+    implementation("androidx.annotation:annotation:1.11.0")
     api(project(":chesskit"))
     // ONNX Runtime ÉPINGLÉ à 1.22.0 — ne pas « mettre à jour » sans remesurer (08/11/2026,
     // Galaxy A16, les 56 cas de tools/maia3-spike/android_fixture.json) : la 1.31.1 est
