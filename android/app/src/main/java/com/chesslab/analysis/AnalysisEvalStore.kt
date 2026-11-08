@@ -54,13 +54,13 @@ class AnalysisEvalStore(
          * pas l'affinage.
          */
         /** Le profil d'un appareil de palier haut — le repli, et celui des tests. */
-        const val DEFAULT_PROFILE = "SF17.1/high/300000n+1600ms/MPV2+refine"
+        const val DEFAULT_PROFILE = "SF19/high/300000n+1600ms/MPV2+refine"
 
         fun engineProfile(context: android.content.Context): String {
             val tier = com.chesslab.engine.DevicePerformance.tier(context)
             val nodes = com.chesslab.engine.DevicePerformance.classificationNodes(context)
             val cap = com.chesslab.engine.DevicePerformance.classificationCapMs(context)
-            return "SF17.1/$tier/${nodes}n+${cap}ms/MPV2+refine"
+            return "SF19/$tier/${nodes}n+${cap}ms/MPV2+refine"
         }
 
         /** Nombre de parties conservées (LRU par date de modification). Un cache n'est pas une base. */

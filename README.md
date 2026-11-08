@@ -37,12 +37,12 @@ Voir [Copying.txt de Stockfish](https://github.com/official-stockfish/Stockfish/
 
 ## Réseaux de neurones (NNUE)
 
-Stockfish 17.1 nécessite des fichiers de réseau NNUE pour évaluer les
-positions ; `ChessKitEngine` ne les embarque pas (taille du paquet).
-Ils sont donc téléchargés et bundlés manuellement dans
-`ChessLab/Resources/` :
-- `nn-1c0000000000.nnue` — réseau principal
-- `nn-37f18f62d772.nnue` — réseau small (finales)
+Stockfish 19 a besoin d'un fichier de réseau NNUE pour évaluer les
+positions ; il n'est pas compilé dans le binaire (taille). Il est donc
+bundlé à la main dans `ChessLab/Resources/` (Stockfish 19 n'en a plus qu'un) :
+- `nn-1a298aa575a0.nnue` — le réseau, téléchargé depuis
+  https://data.stockfishchess.org/nn/ ; les 12 premiers chiffres de son
+  SHA-256 sont son nom, à vérifier après téléchargement.
 
 Source : https://tests.stockfishchess.org (réseaux officiels Stockfish).
 `ChessKitEngine` les résout automatiquement dans le bundle de l'app via

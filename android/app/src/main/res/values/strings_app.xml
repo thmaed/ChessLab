@@ -663,7 +663,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="lic_gplv2plus">GPLv2+ licence</string>
     <string name="lic_cc0">Public domain (CC0)</string>
     <string name="lic_stockfish_name">Stockfish</string>
-    <string name="lic_stockfish_body">Chess engine (Stockfish 17.1), compiled from its C++ sources directly into the app. This licence requires the complete ChessLab source code to be made available, which is published to comply.</string>
+    <string name="lic_stockfish_body">Chess engine (Stockfish 19), compiled from its C++ sources directly into the app. This licence requires the complete ChessLab source code to be made available, which is published to comply.</string>
     <string name="lic_fairy_name">Fairy-Stockfish</string>
     <string name="lic_fairy_body">Chess engine for the variants (King of the Hill, Three-Check, Horde), a fork of Stockfish compiled from its C++ sources directly into the app. Same license obligation: ChessLab\'s complete source code is published to comply with it.</string>
     <string name="lic_maia_name">Maia-3 (Chessformer)</string>

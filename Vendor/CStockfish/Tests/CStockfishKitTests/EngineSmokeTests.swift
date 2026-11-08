@@ -34,9 +34,8 @@ final class EngineSmokeTests: XCTestCase {
     }
 
     func testFullUCICycleProducesABestMove() async throws {
-        let netExists = FileManager.default.fileExists(
-            atPath: resourcesDir + "/nn-1c0000000000.nnue"
-        )
+        let nets = (try? FileManager.default.contentsOfDirectory(atPath: resourcesDir)) ?? []
+        let netExists = nets.contains { $0.hasPrefix("nn-") && $0.hasSuffix(".nnue") }
         try XCTSkipUnless(netExists, "Réseau NNUE introuvable dans \(resourcesDir)")
 
         let engine = StockfishEngine()

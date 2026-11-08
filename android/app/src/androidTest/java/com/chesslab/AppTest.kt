@@ -634,7 +634,7 @@ class AppTest {
     @Test fun licencesListWhatTheAppEmbeds() {
         compose.onNodeWithTag("reglages").performClick()
         compose.onNodeWithTag("licences").performScrollTo().performClick()
-        awaitText("Stockfish 17.1", 10_000)
+        awaitText("Stockfish 19", 10_000)
         awaitText("Fairy-Stockfish", 10_000)
         // le dépôt des sources, tout en bas : c'est LUI que la GPLv3 exige
         compose.onNodeWithTag("licence-source").performScrollTo().assertIsDisplayed()

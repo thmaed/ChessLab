@@ -1,4 +1,4 @@
-# Stockfish 17.1 compilé pour Android, à partir des MÊMES sources que l'app
+# Stockfish 19 compilé pour Android, à partir des MÊMES sources que l'app
 # iOS (Vendor/CStockfish) — aucun fichier n'est dupliqué ni modifié.
 #
 # Les options reproduisent celles de Vendor/CStockfish/Package.swift, avec
@@ -39,6 +39,7 @@ endif()
 
 set(SF_SOURCES
     ${SF_ROOT}/stockfish/_main.cpp
+    ${SF_ROOT}/stockfish/attacks.cpp
     ${SF_ROOT}/stockfish/benchmark.cpp
     ${SF_ROOT}/stockfish/bitboard.cpp
     ${SF_ROOT}/stockfish/engine.cpp
@@ -59,7 +60,9 @@ set(SF_SOURCES
     ${SF_ROOT}/stockfish/nnue/network.cpp
     ${SF_ROOT}/stockfish/nnue/nnue_accumulator.cpp
     ${SF_ROOT}/stockfish/nnue/nnue_misc.cpp
+    ${SF_ROOT}/stockfish/nnue/features/full_threats.cpp
     ${SF_ROOT}/stockfish/nnue/features/half_ka_v2_hm.cpp
+    ${SF_ROOT}/stockfish/nnue/features/pp_3wide.cpp
     ${SF_ROOT}/stockfish/syzygy/tbprobe.cpp
 )
 

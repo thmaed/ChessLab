@@ -26,6 +26,9 @@ val copyAssets by tasks.registering(Copy::class) {
     from(rootProject.file("../tools/maia3-spike")) { include("maia3_23m_fp16.onnx") }
     from(rootProject.file("../tools/yolo-spike")) { include("chess_pieces_yolo.onnx") }
     into(generatedAssets)
+    // `Copy` n'efface rien : un réseau d'une ancienne version de Stockfish resterait
+    // dans l'APK (75 Mo pour rien) après un changement de moteur.
+    doFirst { delete(fileTree(generatedAssets) { include("nn-*.nnue") }) }
 }
 
 /**
