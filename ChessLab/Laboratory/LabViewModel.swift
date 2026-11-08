@@ -316,7 +316,7 @@ final class LabViewModel {
 
             if bookEnabled,
                let san = OpeningBookEngine.pickNextMove(book: OpeningBookLoader.standard, sanPath: sanPath, width: settings.bookWidth),
-               let bookMove = Move(san: san, position: board.position) {
+               let bookMove = SAN.move(san, in: board.position) {
                 moveLAN = bookMove.lan
             } else if let profile, let maia,
                       let turn = await maiaTurn(

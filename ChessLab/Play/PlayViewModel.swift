@@ -1323,7 +1323,7 @@ final class PlayViewModel {
             sanPath: moveLog.map(\.san),
             width: width
         ) else { return nil }
-        guard let move = Move(san: san, position: board.position) else { return nil }
+        guard let move = SAN.move(san, in: board.position) else { return nil }
         return move.lan
     }
 

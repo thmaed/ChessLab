@@ -167,7 +167,7 @@ enum PuzzleCollectionImporter {
         // La préparation compte pour un coup de plus que le plafond de la solution.
         let plyLimit = maxSolutionPlies + (startsAfterSetup ? 0 : 1)
         for (index, token) in tokens.prefix(plyLimit).enumerated() {
-            guard let move = Move(san: token, position: board.position),
+            guard let move = SAN.move(token, in: board.position),
                   let applied = board.move(pieceAt: move.start, to: move.end)
             else { return .failure(.illegalMove(token)) }
             lans.append(move.lan)
