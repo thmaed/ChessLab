@@ -17,6 +17,8 @@ import androidx.compose.material3.*
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import com.chesslab.settings.SettingsStore
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -370,11 +372,14 @@ private fun Header(ui: PuzzleUiState) {
             horizontalArrangement = Arrangement.spacedBy(7.dp, Alignment.CenterHorizontally),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            Text(
-                stringResource(puzzle.themeLabel).uppercase(),
-                fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Palette.accent,
-                maxLines = 1,
-            )
+            // Réglage « Afficher le thème du puzzle » : le thème est un indice.
+            if (SettingsStore.state.collectAsState().value.showPuzzleTheme) {
+                Text(
+                    stringResource(puzzle.themeLabel).uppercase(),
+                    fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Palette.accent,
+                    maxLines = 1,
+                )
+            }
             // Le PALIER, pas la cote brute : « Confirmé » se lit, « 1 742 » se
             // décode. Quatre paliers, quatre couleurs, du vert au rose — c'est
             // le choix d'iOS, et Android montrait encore le nombre.

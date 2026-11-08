@@ -169,10 +169,12 @@ struct PuzzleSolveView: View {
             .accessibilityValue(Text(instruction))
 
             HStack(spacing: 7) {
-                Text(LocalizedStringKey(viewModel.puzzle.theme.label))
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Theme.accent)
-                    .textCase(.uppercase)
+                if appSettings.showPuzzleTheme {
+                    Text(LocalizedStringKey(viewModel.puzzle.theme.label))
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Theme.accent)
+                        .textCase(.uppercase)
+                }
 
                 // Niveau et phase en PASTILLES colorées (plus grandes que
                 // l'ancien texte gris minuscule, à la demande) : la difficulté

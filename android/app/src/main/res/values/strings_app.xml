@@ -337,6 +337,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <!-- Deux notes d'iOS qui manquaient, et le titre de la section qui
          réunit sons et vibrations — iOS n'en fait qu'une. -->
     <string name="settings_notation_note">The exported PGN stays in English notation — that is the standard, readable by every other program.</string>
+    <string name="settings_show_puzzle_theme">Show the puzzle theme</string>
+    <string name="settings_show_puzzle_theme_note">Checkmate, fork, pin… Hide it to look for the idea without a clue.</string>
     <string name="settings_puzzle_attempts_note">With a single try, you work the line out to the end before playing — that is the whole point of the exercise. Three tries let you grope your way there.</string>
     <string name="settings_feedback">Sounds and vibration</string>
     <string name="variant_accuracy_caption">accuracy</string>

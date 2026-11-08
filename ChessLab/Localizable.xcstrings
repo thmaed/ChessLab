@@ -3337,6 +3337,38 @@
         }
       }
     },
+    "Afficher le thème du puzzle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show the puzzle theme"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher le thème du puzzle"
+          }
+        }
+      }
+    },
+    "Mat, fourchette, clouage… Masquez-le pour chercher l'idée sans indice.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checkmate, fork, pin… Hide it to look for the idea without a clue."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mat, fourchette, clouage… Masquez-le pour chercher l'idée sans indice."
+          }
+        }
+      }
+    },
     "Avec un seul essai, on calcule la variante jusqu'au bout avant de jouer — c'est tout l'intérêt de l'exercice. Trois essais laissent chercher en tâtonnant.": {
       "localizations": {
         "en": {

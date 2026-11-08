@@ -22,6 +22,7 @@ final class AppSettings {
         static let pieceNotation = "settings.pieceNotation"
         static let appLanguage = "settings.appLanguage"
         static let puzzleAttempts = "settings.puzzleAttempts"
+        static let showPuzzleTheme = "settings.showPuzzleTheme"
         static let playerName = "settings.playerName"
     }
 
@@ -36,6 +37,15 @@ final class AppSettings {
         didSet { UserDefaults.standard.set(puzzleAttempts, forKey: Keys.puzzleAttempts) }
     }
 
+
+    /// Le thème du puzzle (« Mat », « Fourchette »…) s'affiche-t-il au-dessus du plateau ?
+    ///
+    /// Activé par défaut. Le thème est DÉDUIT par l'app (``PuzzleThemeDetector``), il ne
+    /// vient pas du fichier : pour qui veut trouver l'idée lui-même, il est un indice
+    /// (retour de Ron, 08/11/2026). Ne voyage pas par iCloud, comme les sons.
+    var showPuzzleTheme: Bool {
+        didSet { UserDefaults.standard.set(showPuzzleTheme, forKey: Keys.showPuzzleTheme) }
+    }
 
     /// Les deux régimes proposés — un essai (par défaut) ou trois.
     nonisolated static let puzzleAttemptChoices = [1, 3]
@@ -190,6 +200,7 @@ final class AppSettings {
         // insoluble ou infini.
         let storedAttempts = (defaults.object(forKey: Keys.puzzleAttempts) as? Int) ?? 1
         puzzleAttempts = Self.puzzleAttemptChoices.contains(storedAttempts) ? storedAttempts : 1
+        showPuzzleTheme = (defaults.object(forKey: Keys.showPuzzleTheme) as? Bool) ?? true
 
 
         analysisArrowMode = defaults.string(forKey: Keys.analysisArrowMode)

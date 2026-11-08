@@ -205,6 +205,30 @@ fun SettingsScreen(
                 stringResource(R.string.settings_puzzle_attempts_note),
                 fontSize = 11.sp, color = Palette.textTertiary,
             )
+            Spacer(Modifier.height(10.dp))
+            Row(
+                Modifier
+                    .fillMaxWidth()
+                    .testTag("theme-puzzle")
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Palette.surface)
+                    .clickable { SettingsStore.setShowPuzzleTheme(context, !settings.showPuzzleTheme) }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Switch(
+                    checked = settings.showPuzzleTheme,
+                    onCheckedChange = { SettingsStore.setShowPuzzleTheme(context, it) },
+                    colors = com.chesslab.ui.chessLabSwitchColors(),
+                )
+                Spacer(Modifier.width(10.dp))
+                Text(stringResource(R.string.settings_show_puzzle_theme), fontSize = 13.sp, color = Palette.textPrimary)
+            }
+            Spacer(Modifier.height(6.dp))
+            Text(
+                stringResource(R.string.settings_show_puzzle_theme_note),
+                fontSize = 11.sp, color = Palette.textTertiary,
+            )
         }
 
         // Sons et vibrations dans la MÊME section, comme iOS : ce sont les

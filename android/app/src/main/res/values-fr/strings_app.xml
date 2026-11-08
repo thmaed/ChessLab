@@ -334,6 +334,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <!-- Deux notes d'iOS qui manquaient, et le titre de la section qui
          réunit sons et vibrations — iOS n'en fait qu'une. -->
     <string name="settings_notation_note">Le PGN exporté reste en notation anglaise — c\'est le standard, lisible par tous les autres logiciels.</string>
+    <string name="settings_show_puzzle_theme">Afficher le thème du puzzle</string>
+    <string name="settings_show_puzzle_theme_note">Mat, fourchette, clouage… Masquez-le pour chercher l\'idée sans indice.</string>
     <string name="settings_puzzle_attempts_note">Avec un seul essai, on calcule la variante jusqu\'au bout avant de jouer — c\'est tout l\'intérêt de l\'exercice. Trois essais laissent chercher en tâtonnant.</string>
     <string name="settings_feedback">Sons et vibrations</string>
     <string name="variant_accuracy_caption">précision</string>

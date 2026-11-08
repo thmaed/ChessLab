@@ -26,6 +26,12 @@ data class AppSettings(
      * entraîne.
      */
     val puzzleAttempts: Int = 1,
+    /**
+     * Le thème du puzzle (« Mat », « Fourchette »…) s'affiche-t-il au-dessus du plateau ?
+     * Déduit par l'app, il est un indice pour qui veut trouver l'idée seul (retour de
+     * Ron, 08/11/2026). Pendant de `AppSettings.showPuzzleTheme` (iOS).
+     */
+    val showPuzzleTheme: Boolean = true,
     val soundsEnabled: Boolean = true,
     /** Le plateau vibre-t-il ? Coup, prise, échec, fin, coup refusé. */
     val hapticsEnabled: Boolean = true,
@@ -69,6 +75,7 @@ object SettingsStore {
     private val keyPieceSet = stringPreferencesKey("pieceSetId")
     private val keyAutoFlip = booleanPreferencesKey("autoFlipTwoPlayer")
     private val keyAttempts = intPreferencesKey("puzzleAttempts")
+    private val keyShowPuzzleTheme = booleanPreferencesKey("showPuzzleTheme")
     private val keySounds = booleanPreferencesKey("soundsEnabled")
     private val keyHaptics = booleanPreferencesKey("hapticsEnabled")
     private val keyNotation = stringPreferencesKey("pieceNotation")
@@ -108,6 +115,7 @@ object SettingsStore {
                     pieceSetId = prefs[keyPieceSet] ?: "classic",
                     autoFlipTwoPlayer = prefs[keyAutoFlip] ?: true,
                     puzzleAttempts = prefs[keyAttempts] ?: 1,
+                    showPuzzleTheme = prefs[keyShowPuzzleTheme] ?: true,
                     soundsEnabled = prefs[keySounds] ?: true,
                     hapticsEnabled = prefs[keyHaptics] ?: true,
                     pieceNotation = if (prefs[keyNotation] == "english") PieceNotation.english
@@ -129,6 +137,7 @@ object SettingsStore {
     fun setPieceSet(context: Context, id: String) = update(context) { it[keyPieceSet] = id }
     fun setAutoFlip(context: Context, on: Boolean) = update(context) { it[keyAutoFlip] = on }
     fun setPuzzleAttempts(context: Context, n: Int) = update(context) { it[keyAttempts] = n }
+    fun setShowPuzzleTheme(context: Context, on: Boolean) = update(context) { it[keyShowPuzzleTheme] = on }
     fun setDailyOpeningsCap(context: Context, n: Int) = update(context) { it[keyDailyOpeningsCap] = n }
     fun setSounds(context: Context, on: Boolean) = update(context) { it[keySounds] = on }
     fun setHaptics(context: Context, on: Boolean) = update(context) { it[keyHaptics] = on }
