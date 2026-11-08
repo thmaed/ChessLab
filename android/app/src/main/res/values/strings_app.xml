@@ -309,6 +309,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <!-- La ligne d'état du moteur, au-dessus du plateau d'analyse. iOS a
          renoncé au mot « profondeur » : il ne dit rien à qui ne connaît
          pas les moteurs, alors qu'un nombre de coups d'avance se comprend. -->
+    <string name="analysis_progress">Analysis: move %1$d/%2$d</string>
     <string name="analysis_engine_idle">Engine idle</string>
     <string name="analysis_engine_off">Engine unavailable</string>
     <string name="analysis_engine_working">The computer is calculating — %1$d moves ahead</string>

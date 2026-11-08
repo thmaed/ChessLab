@@ -468,7 +468,17 @@ struct AnalysisView: View {
     /// le bas) plutôt qu'en superposition, qui recouvrait les cases du
     /// haut. Hauteur fixe + opacité (plutôt qu'un `if`) pour ne pas
     /// décaler la mise en page quand la profondeur apparaît/disparaît.
+    @ViewBuilder
     private var analyzingBadge: some View {
+        if viewModel.isClassifying, let progress = viewModel.classificationProgress {
+            // Pendant l'analyse de la partie : la jauge (même hauteur, rien ne bouge).
+            ClassificationProgressBadge(done: progress.done, total: progress.total)
+        } else {
+            engineStatusBadge
+        }
+    }
+
+    private var engineStatusBadge: some View {
         // L'ancien bandeau disait « Analyse en continu — profondeur 18 » en
         // ORANGE, la couleur des avertissements de l'app : il se lisait comme
         // un problème, alors qu'il décrit le fonctionnement NORMAL. Et
@@ -557,9 +567,9 @@ struct AnalysisView: View {
             bestMoveButton
 
             Spacer()
-            if viewModel.isClassifying, let progress = viewModel.classificationProgress {
-                classificationIndicator(progress)
-            } else if let progress = viewModel.missedMateScanProgress {
+            // L'avancement de l'ANALYSE est dans la jauge au-dessus du plateau
+            // (``ClassificationProgressBadge``) : ici il manquait de place.
+            if let progress = viewModel.missedMateScanProgress {
                 missedMateScanIndicator(progress)
             }
         }
@@ -751,43 +761,6 @@ struct AnalysisView: View {
         .keyboardShortcut(.rightArrow, modifiers: .command)
         .accessibilityLabel("Jouer le meilleur coup")
         .accessibilityIdentifier("playBestMove")
-    }
-
-    /// Indicateur de classification, qui **renonce à du contenu** plutôt que
-    /// de pousser les boutons de transport hors de l'écran (Lot 3.2).
-    ///
-    /// La barre porte cinq boutons de 44 pt et leurs espacements, soit 268 pt
-    /// incompressibles ; il reste environ 75 pt utiles sur un iPhone SE, et
-    /// à peine 20 en Display Zoom — alors que « Analyse : coup 12/40 » en
-    /// réclame ~125. Le libellé était donc écrasé jusqu'à une lettre. Et ce
-    /// n'est pas un cas rare : la classification démarre à l'ouverture de
-    /// n'importe quel PGN et dure des dizaines de secondes.
-    ///
-    /// `ViewThatFits` choisit la première version qui tient : phrase complète,
-    /// puis compteur seul, puis le seul rouet. Aucune de ces étapes ne ment
-    /// sur l'état — l'analyse tourne, et ça se voit.
-    private func classificationIndicator(
-        _ progress: (done: Int, total: Int)
-    ) -> some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 6) {
-                classificationSpinner
-                Text("Analyse : coup \(progress.done)/\(progress.total)")
-                    .font(.caption2)
-                    .foregroundStyle(Theme.textTertiary)
-                    .lineLimit(1)
-                    .fixedSize()
-            }
-            HStack(spacing: 6) {
-                classificationSpinner
-                Text("\(progress.done)/\(progress.total)")
-                    .font(.caption2.monospacedDigit())
-                    .foregroundStyle(Theme.textTertiary)
-                    .lineLimit(1)
-                    .fixedSize()
-            }
-            classificationSpinner
-        }
     }
 
     private func missedMateScanIndicator(_ progress: (done: Int, total: Int)) -> some View {

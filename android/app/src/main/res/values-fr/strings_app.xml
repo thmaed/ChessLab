@@ -306,6 +306,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <!-- La ligne d'état du moteur, au-dessus du plateau d'analyse. iOS a
          renoncé au mot « profondeur » : il ne dit rien à qui ne connaît
          pas les moteurs, alors qu'un nombre de coups d'avance se comprend. -->
+    <string name="analysis_progress">Analyse : coup %1$d/%2$d</string>
     <string name="analysis_engine_idle">Moteur en attente</string>
     <string name="analysis_engine_off">Moteur indisponible</string>
     <string name="analysis_engine_working">L\'ordinateur calcule — %1$d coups d\'avance</string>

@@ -2155,6 +2155,38 @@
         }
       }
     },
+    "Analyse de la partie": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Game analysis"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Analyse de la partie"
+          }
+        }
+      }
+    },
+    "coup %lld sur %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "move %1$lld of %2$lld"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "coup %1$lld sur %2$lld"
+          }
+        }
+      }
+    },
     "Analyse en continu — profondeur %lld": {
       "extractionState": "stale",
       "localizations": {

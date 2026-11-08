@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -230,7 +231,9 @@ fun AnalysisScreen(
                     )
                 }
                 Spacer(Modifier.weight(1f))
-                if (ui.reviewing || ui.scanningMates) {
+                // L'avancement de l'ANALYSE est dans la jauge au-dessus du plateau
+                // ([ReviewProgressBadge]) ; ici, seulement la recherche des mats manqués.
+                if (ui.scanningMates) {
                     CircularProgressIndicator(
                         Modifier.size(12.dp), strokeWidth = 2.dp, color = Palette.textTertiary,
                     )
@@ -870,6 +873,12 @@ private fun GameSummarySheet(ui: AnalysisUiState, onDismiss: () -> Unit) {
  */
 @Composable
 private fun EngineStatusBadge(ui: AnalysisUiState) {
+    // Pendant l'analyse de la partie : la jauge (même hauteur, rien ne bouge). Pendant exact de
+    // `ClassificationProgressBadge` (iOS).
+    if (ui.reviewing && ui.reviewTotal > 0) {
+        ReviewProgressBadge(ui.reviewDone, ui.reviewTotal)
+        return
+    }
     // Une ligne d'état NEUTRE, qui nomme ce qui travaille et jusqu'où il a
     // calculé. Elle disait « profondeur 18 » : le mot ne veut rien dire pour
     // qui ne connaît pas les moteurs, alors qu'un nombre de coups d'avance se
@@ -904,6 +913,44 @@ private fun EngineStatusBadge(ui: AnalysisUiState) {
         )
         Spacer(Modifier.width(7.dp))
         Text(texte, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = Palette.textSecondary, maxLines = 1)
+    }
+}
+
+/**
+ * L'avancement de l'analyse d'une partie : une capsule qui SE REMPLIT d'accent, coup par coup.
+ *
+ * Pendant de `ClassificationProgressBadge` (iOS). Elle remplace le petit compteur de la barre de
+ * boutons : une ligne grise de 11 sp se lit à peine, et la place y manque (retour d'un
+ * utilisateur, 08/11/2026 : « l'avancement est peu visible »). Largeur FIXE : la jauge ne change
+ * pas de longueur quand le compteur gagne un chiffre.
+ */
+@Composable
+private fun ReviewProgressBadge(done: Int, total: Int) {
+    val fraction = (done.toFloat() / total).coerceIn(0f, 1f)
+    val label = stringResource(R.string.analysis_progress, done, total)
+    Box(
+        Modifier
+            .width(250.dp)
+            .height(26.dp)
+            .clip(CircleShape)
+            .background(Palette.surface)
+            .border(1.dp, Palette.accent.copy(alpha = 0.55f), CircleShape)
+            .semantics(mergeDescendants = true) { contentDescription = label }
+            .testTag("progression-analyse"),
+        contentAlignment = Alignment.Center,
+    ) {
+        Box(
+            Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxHeight()
+                .fillMaxWidth(fraction)
+                .background(Palette.accent.copy(alpha = 0.35f))
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            CircularProgressIndicator(Modifier.size(12.dp), strokeWidth = 2.dp, color = Palette.accent)
+            Spacer(Modifier.width(8.dp))
+            Text(label, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary, maxLines = 1)
+        }
     }
 }
 
