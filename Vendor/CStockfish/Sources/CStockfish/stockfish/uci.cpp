@@ -51,6 +51,16 @@
 // Un flux dédié par moteur supprime la classe entière de problèmes.
 extern std::istream* chesslab_sf_stdin;
 
+// ChessLab — Stockfish 19 TERMINE LE PROCESS (`std::exit(1)`) sur une commande `position`
+// invalide (FEN refusé, pion sur la première rangée, coup illégal…) ; la 17.1 l'ignorait.
+// Dans une app, quitter le process, c'est planter (constaté le 08/11/2026 : une partie dont
+// les promotions avaient été oubliées par un chargeur). Une position invalide ne doit
+// JAMAIS tuer l'app : on le dit (`info string ERROR …`), et le `go` suivant répond
+// `bestmove (none)`, comme pour une position sans coup, sans chercher sur n'importe quoi.
+namespace {
+bool chesslabPositionInvalid = false;
+}
+
 namespace Stockfish {
 
 using Time = std::chrono::steady_clock;
@@ -245,6 +255,13 @@ Search::LimitsType UCIEngine::parse_limits(std::istream& is) {
 }
 
 void UCIEngine::go(std::istringstream& is) {
+
+    // Position refusée par le `position` précédent : rien à chercher (voir plus haut).
+    if (chesslabPositionInvalid)
+    {
+        sync_cout << "bestmove (none)" << sync_endl;
+        return;
+    }
 
     Search::LimitsType limits = parse_limits(is);
 
@@ -532,8 +549,12 @@ void UCIEngine::position(std::istringstream& is) {
     auto err = engine.set_position(fen, moves);
     if (err.has_value())
     {
-        terminate_on_critical_error(err->what());
+        chesslabPositionInvalid = true;
+        sync_cout << "info string ERROR: Command `" << currentCmd
+                  << "` failed. Reason: " << err->what() << sync_endl;
+        return;
     }
+    chesslabPositionInvalid = false;
 }
 
 namespace {

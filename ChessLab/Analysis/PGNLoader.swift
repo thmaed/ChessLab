@@ -90,7 +90,15 @@ enum PGNLoader {
                 // tronquée.
                 break
             }
-            index = game.make(move: applied, from: index)
+            // ChessKit laisse une promotion en suspens jusqu'au choix de la pièce : sans
+            // elle, la partie GARDAIT UN PION sur la dernière rangée (« …g1=Q » restait
+            // un pion en g1), et Stockfish 19 refuse une telle position — en quittant
+            // le process. Constaté le 08/11/2026 sur une partie jouée dans l'app.
+            var finalMove = applied
+            if case .promotion = board.state {
+                finalMove = board.completePromotion(of: applied, to: move.promotedPiece?.kind ?? .queen)
+            }
+            index = game.make(move: finalMove, from: index)
             played += 1
         }
         guard played > 0 else { return nil }
