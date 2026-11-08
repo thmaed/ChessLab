@@ -37,6 +37,33 @@ sa vitesse et parfois sa mémoire, et rien de cela ne fait échouer un test.
   à peu près égale en milieu de partie ; Mac Apple Silicon +21 %.
 - **Mémoire** : pas de différence (pic 365 contre 362 Mo, hash 128 Mo).
 
+## La force du moteur bridé (mesure du 08/11/2026, `strength_match.py`)
+
+78 parties par niveau, la 19 contre la 17.1 **aux mêmes réglages que l'app** (`EngineStrength.swift`),
+150 ms par coup, un fil, ouvertures tirées des parties de `Fixtures_nils.pgn` et du banc Maia,
+couleurs échangées. Score de la 19 (50 % = même force) :
+
+| Niveau | Score de la 19 | Écart Elo (IC 95 %) |
+|---|---|---|
+| Elo 1500 (bridé) | 55,8 % | +40 (−35 à +119) — non significatif |
+| Elo 2000 (bridé) | 69,2 % | +141 (+68 à +227) |
+| Elo 2500 (bridé) | 62,2 % | +86 (+15 à +166) |
+| Elo 3000 (bridé) | 60,3 % | +72 (+21 à +127) |
+| Elo ~1000 (Skill 2, profondeur 3) | 70,5 % | +151 (+79 à +240) |
+| Elo ~1200 (Skill 4, profondeur 5) | 73,1 % | +173 (+101 à +263) |
+| Maximum | 58,3 % | +58 (+22 à +96) |
+
+**À réglage égal, la 19 joue plus fort que la 17.1**, de 40 à 170 Elo : le meilleur réseau pèse
+surtout quand la recherche est courte (niveaux bridés et débutants). Les curseurs d'Elo de l'app n'ont
+jamais été des Elo absolus (le niveau des personnages suit l'échelle Maia/Lichess, pas Stockfish),
+mais un joueur retrouve un adversaire plus dur au même cran.
+
+Compensation mesurée (`strength_compensation.py`, la 19 réglée plus bas contre la 17.1 inchangée) :
+débutants, **un cran de Skill ET un de profondeur en moins** ramène la parité (~1000 : Skill 1,
+profondeur 2 → +45 ; ~1200 : Skill 3, profondeur 4 → +40, intervalles compatibles avec 0) ; bridé à
+2000 : `UCI_Elo` 1850 → +27 (1900 → +91). **Non appliquée** : le même `EngineStrength` sert Fairy-Stockfish
+(inchangé), et les mesures bridées sont trop bruitées pour fonder une règle. Décision produit à prendre.
+
 ## Les pièges rencontrés
 
 - `make clean` dans le dossier d'un binaire en cours d'utilisation le détruit : une
