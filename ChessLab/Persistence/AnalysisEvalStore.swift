@@ -30,13 +30,13 @@ enum AnalysisEvalStore {
 
     static let currentSchema = 1
     /// À INCRÉMENTER à chaque changement de moteur, de budget ou de seuils.
-    static let engineProfile = "SF19/300k+3Mx2/2-5-10-20"
+    static let engineProfile = "SF19c/300k+3Mx2/2-5-10-20"
     /// Profil de ``Chess960AnalysisViewModel`` : passe de base SEULE (pas
     /// d'affinage ×10, pas de livre d'ouvertures) — un profil distinct pour
     /// que le fichier reste auto-descriptif, même si la clé (qui inclut déjà
     /// la FEN de départ) ne permettrait de toute façon aucune collision avec
     /// une partie standard.
-    static let chess960Profile = "SF19-Chess960/300k×1"
+    static let chess960Profile = "SF19c-Chess960/300k×1"
     /// Profil de ``VariantAnalysisViewModel`` — les six variantes Fairy-
     /// Stockfish (lots A et B) partagent un seul profil : la clé inclut déjà
     /// la FEN de départ ET l'identifiant UCI de la variante n'a pas besoin

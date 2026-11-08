@@ -54,6 +54,11 @@ int cstockfish_is_running(void);
 /// 1 si aucun fil moteur détaché ne traîne (voir shim.cpp).
 int cstockfish_is_settled(void);
 
+/// Ramène un score en centipions de Stockfish 19 sur l'échelle de la 17.1 (voir
+/// `shim.cpp`). Le moteur le fait déjà seul pour chaque ligne `info` ; exposée
+/// pour les tests.
+int cstockfish_legacy_cp(int cp);
+
 #ifdef __cplusplus
 }
 #endif

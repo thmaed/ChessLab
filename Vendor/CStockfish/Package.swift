@@ -45,7 +45,7 @@ let package = Package(
         ),
         .testTarget(
             name: "CStockfishKitTests",
-            dependencies: ["CStockfishKit"],
+            dependencies: ["CStockfishKit", "CStockfish"],
             path: "Tests/CStockfishKitTests"
         )
     ],

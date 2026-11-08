@@ -22,6 +22,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
+#include <cstdlib>
 #include <deque>
 #include <mutex>
 #include <streambuf>
@@ -100,6 +101,73 @@ private:
 
 /// Flux de SORTIE : accumule les caractères et remet chaque LIGNE complète au
 /// callback (sans le '\n').
+// ---------------------------------------------------------------------------
+// ÉCHELLE DES CENTIPIONS : Stockfish 19 → équivalent Stockfish 17.1
+//
+// Stockfish 19 annonce des avantages plus GRANDS que la 17.1 pour la même
+// position (mesuré le 08/11/2026 sur 3 513 positions de vraies parties, 150 000
+// nœuds chacune) : à peu près égal près de l'égalité, puis +30 à +45 % entre +2 et
+// +6 pions. Or toute l'app (classification gaffe/erreur/imprécision, barre
+// d'éval, seuils « position gagnée ») lit les centipions à travers une sigmoïde
+// réglée sur l'ancienne échelle : sans correction, les « gaffes » passent de
+// 2,2 % à 3,4 % des coups (68 contre 105) sur le même corpus.
+//
+// On ramène donc chaque `score cp` de la 19 sur l'échelle de la 17.1, ICI, une
+// fois pour toutes, pour iOS et Android (ce fichier est compilé des deux côtés) :
+// courbe par tranches ajustée sur la moitié des parties, vérifiée sur l'autre
+// (gaffes 41/43 et 27/30 contre 41/63 et 27/42 sans correction). Les scores de
+// mat et de tables de finales (|cp| >= 10000) ne sont pas touchés.
+//
+// À REFAIRE à chaque changement de version de Stockfish : mesurer d'abord,
+// avec tools/stockfish-compare (méthode et résultats du 08/11/2026 dans son README).
+namespace {
+
+struct ScaleKnot { int from; int to; };
+
+constexpr ScaleKnot kLegacyScale[] = {
+    {0, 0}, {36, 40}, {70, 72}, {120, 114}, {175, 156}, {250, 209},
+    {350, 264}, {450, 319}, {610, 441}, {810, 615},
+};
+constexpr int kLegacyScaleCount = sizeof(kLegacyScale) / sizeof(kLegacyScale[0]);
+/// Pente au-delà du dernier point (à ce niveau la sigmoïde est saturée).
+constexpr double kLegacyTailSlope = 0.85;
+
+int legacyCp(int cp) {
+    if (cp >= 10000 || cp <= -10000) return cp;  // tables de finales : intouchés
+    const int sign = cp < 0 ? -1 : 1;
+    const int magnitude = cp < 0 ? -cp : cp;
+    const ScaleKnot &last = kLegacyScale[kLegacyScaleCount - 1];
+    double scaled;
+    if (magnitude >= last.from) {
+        scaled = last.to + (magnitude - last.from) * kLegacyTailSlope;
+    } else {
+        int i = 0;
+        while (i + 1 < kLegacyScaleCount - 1 && magnitude >= kLegacyScale[i + 1].from) ++i;
+        const ScaleKnot &a = kLegacyScale[i];
+        const ScaleKnot &b = kLegacyScale[i + 1];
+        scaled = a.to + double(magnitude - a.from) * (b.to - a.to) / (b.from - a.from);
+    }
+    return sign * int(scaled + 0.5);
+}
+
+/// « info depth 20 … score cp 250 nodes … » → le même texte avec le score ramené
+/// à l'échelle de la 17.1. Les autres lignes passent telles quelles.
+std::string rescaleScores(const std::string &line) {
+    static const char kMarker[] = " score cp ";
+    if (line.compare(0, 5, "info ") != 0) return line;
+    const std::size_t at = line.find(kMarker);
+    if (at == std::string::npos) return line;
+    const std::size_t numberStart = at + sizeof(kMarker) - 1;
+    char *end = nullptr;
+    const long value = std::strtol(line.c_str() + numberStart, &end, 10);
+    if (end == line.c_str() + numberStart) return line;
+    const std::size_t numberEnd = static_cast<std::size_t>(end - line.c_str());
+    return line.substr(0, numberStart) + std::to_string(legacyCp(static_cast<int>(value)))
+         + line.substr(numberEnd);
+}
+
+}  // namespace
+
 class OutputBuffer : public std::streambuf {
 public:
     void configure(cstockfish_output_callback callback, void *context) {
@@ -143,7 +211,8 @@ protected:
         // Le callback est appelé HORS du verrou : il remonte en Swift, et le
         // tenir pendant ce trajet inviterait l'interblocage.
         if (c == '\n' && callback_) {
-            callback_(finished.c_str(), context_);
+            const std::string rescaled = rescaleScores(finished);
+            callback_(rescaled.c_str(), context_);
         }
         return ch;
     }
@@ -312,3 +381,8 @@ int cstockfish_is_running(void) {
 }
 
 } // extern "C"
+
+/// Exposée pour les tests : la courbe d'échelle ci-dessus, sur un entier.
+extern "C" int cstockfish_legacy_cp(int cp) {
+    return legacyCp(cp);
+}
