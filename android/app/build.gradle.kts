@@ -3,7 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.compose")
     id("com.google.devtools.ksp")
     id("com.github.triplet.play")
@@ -143,7 +142,7 @@ android {
     // 36 = Android 16. Google exige que toute NOUVELLE app vise au moins ce
     // niveau ; la console refuse le fichier sinon, et c'est une erreur, pas un
     // avertissement.
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         // L'identifiant sous lequel Google Play connaît l'app, et sous lequel
@@ -166,7 +165,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    sourceSets["main"].assets.srcDir(generatedAssets)
+    sourceSets["main"].assets.srcDir(generatedAssets.get().asFile)
 
     signingConfigs {
         if (keystoreProps.getProperty("storeFile") != null) {
@@ -253,7 +252,7 @@ val copyTestAssets by tasks.registering(Sync::class) {
     from(rootProject.file("../ChessLabTests/ScannerFixtures")) { include("*.png", "*.jpg", "manifest.json") }
     into(testAssets)
 }
-android.sourceSets["androidTest"].assets.srcDir(testAssets)
+android.sourceSets["androidTest"].assets.srcDir(testAssets.get().asFile)
 
 tasks.named("preBuild") { dependsOn(copyAssets, copyTestAssets, generateCourseNames) }
 
@@ -263,15 +262,15 @@ dependencies {
     implementation(project(":maia"))
     implementation(project(":vision"))
 
-    implementation(platform("androidx.compose:compose-bom:2024.10.01"))
+    implementation(platform("androidx.compose:compose-bom:2026.09.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.material3:material3")
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.activity:activity-compose:1.13.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.10.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-    implementation("androidx.datastore:datastore-preferences:1.2.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    implementation("androidx.datastore:datastore-preferences:1.3.0")
     implementation("androidx.room:room-runtime:2.8.5")
     implementation("androidx.room:room-ktx:2.8.5")
     ksp("androidx.room:room-compiler:2.8.5")
@@ -285,7 +284,7 @@ dependencies {
     // émulateur.
     testImplementation("org.json:json:20240303")
 
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.10.01"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2026.09.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

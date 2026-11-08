@@ -1,6 +1,5 @@
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
 }
 
 android {
@@ -31,5 +30,8 @@ dependencies {
     // max 0,0258 au lieu de 0,0026) ; la 1.24.3 n'ouvre même pas le modèle. Aucun niveau
     // d'optimisation de session n'y change rien.
     implementation("com.microsoft.onnxruntime:onnxruntime-android:1.22.0")
-    testImplementation(kotlin("test"))
+    testImplementation(kotlin("test-junit5"))
+    // Gradle 9 n'ajoute plus le lanceur JUnit Platform tout seul.
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.13.4")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.13.4")
 }
