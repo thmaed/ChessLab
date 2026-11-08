@@ -62,12 +62,70 @@ enum PuzzleThemeDetector {
         return !canRecapture
     }
 
-    /// Après le premier coup, la pièce qui vient de bouger attaque au
-    /// moins deux pièces adverses de valeur — une fourchette typique.
+    /// Une VRAIE fourchette : après le premier coup, la pièce qui vient de bouger
+    /// attaque au moins deux cibles réelles, et ne peut pas être prise à son désavantage.
+    ///
+    /// « Attaque deux pièces » ne suffit pas : une dame qui prend et vise deux pièces
+    /// PROTÉGÉES ne fourche rien (retour de Ron, 08/11/2026 : sur douze « fourchettes »
+    /// détectées dans son fichier, cinq n'en étaient pas). Une cible est réelle si elle
+    /// vaut plus que le fourchetteur, ou si elle n'est pas défendue.
     private static func isFork(_ move: Move, boardAfterMove: Board) -> Bool {
-        let attackedValuableTargets = boardAfterMove.legalMoves(forPieceAt: move.end)
-            .compactMap { boardAfterMove.position.piece(at: $0) }
-            .filter { $0.color != move.piece.color && pieceValue($0.kind) >= valuablePieceThreshold }
-        return attackedValuableTargets.count >= 2
+        guard forkerSurvives(move, boardAfterMove: boardAfterMove) else { return false }
+        // Le roi attaqué (échec) est une cible : la fourchette classique roi + pièce.
+        var targets = realTargets(of: move, boardAfterMove: boardAfterMove)
+        if case .check = boardAfterMove.state { targets += 1 }
+        return targets >= 2
+    }
+
+    /// Les pièces de valeur que le fourchetteur peut prendre sans y perdre :
+    /// plus précieuses que lui, ou sans défense.
+    private static func realTargets(of move: Move, boardAfterMove: Board) -> Int {
+        let mover = move.piece.color
+        let forkerValue = pieceValue(move.piece.kind)
+        // Après le coup, c'est à l'ADVERSAIRE de jouer : on rend le trait au fourchetteur
+        // pour simuler sa prise.
+        let withForkerToMove = positionWithSideToMoveFlipped(boardAfterMove.position)
+        var count = 0
+        for square in boardAfterMove.legalMoves(forPieceAt: move.end) {
+            guard let target = boardAfterMove.position.piece(at: square),
+                  target.color != mover, pieceValue(target.kind) >= valuablePieceThreshold
+            else { continue }
+            if pieceValue(target.kind) > forkerValue { count += 1; continue }
+            guard let position = withForkerToMove else { continue }
+            var simulation = Board(position: position)
+            guard simulation.move(pieceAt: move.end, to: square) != nil else { continue }
+            let recaptured = simulation.position.pieces
+                .filter { $0.color == mover.opposite }
+                .contains { simulation.canMove(pieceAt: $0.square, to: square) }
+            if !recaptured { count += 1 }
+        }
+        return count
+    }
+
+    /// Le fourchetteur n'est pas pris à son désavantage : toute prise de sa case est
+    /// refusée à l'adversaire, soit parce que la pièce est défendue ET que le preneur
+    /// vaut plus qu'elle (un échange égal défait la fourchette).
+    private static func forkerSurvives(_ move: Move, boardAfterMove: Board) -> Bool {
+        let mover = move.piece.color
+        let forkerValue = pieceValue(move.piece.kind)
+        for attacker in boardAfterMove.position.pieces where attacker.color != mover {
+            guard boardAfterMove.canMove(pieceAt: attacker.square, to: move.end) else { continue }
+            var simulation = boardAfterMove
+            guard simulation.move(pieceAt: attacker.square, to: move.end) != nil else { continue }
+            let defended = simulation.position.pieces
+                .filter { $0.color == mover }
+                .contains { simulation.canMove(pieceAt: $0.square, to: move.end) }
+            if !defended || pieceValue(attacker.kind) <= forkerValue { return false }
+        }
+        return true
+    }
+
+    /// La même position, avec le trait à l'autre camp (et sans prise en passant).
+    private static func positionWithSideToMoveFlipped(_ position: Position) -> Position? {
+        var fields = position.fen.split(separator: " ").map(String.init)
+        guard fields.count >= 4 else { return nil }
+        fields[1] = fields[1] == "w" ? "b" : "w"
+        fields[3] = "-"
+        return Position(fen: fields.joined(separator: " "))
     }
 }

@@ -290,9 +290,72 @@ object PuzzleThemeDetector {
         return !canRecapture
     }
 
-    /** Après le premier coup, la pièce qui vient de bouger attaque au moins deux pièces adverses de valeur. */
-    private fun isFork(move: Move, after: Board): Boolean =
-        after.legalMoves(move.end)
-            .mapNotNull { after.position.piece(it) }
-            .count { it.color != move.piece.color && value(it.kind) >= VALUABLE } >= 2
+    /**
+     * Une VRAIE fourchette : après le premier coup, la pièce qui vient de bouger attaque au
+     * moins deux cibles réelles et ne peut pas être prise à son désavantage.
+     *
+     * « Attaque deux pièces » ne suffit pas : une dame qui prend et vise deux pièces PROTÉGÉES
+     * ne fourche rien (retour de Ron, 08/11/2026 : sur douze « fourchettes » détectées dans son
+     * fichier, cinq n'en étaient pas). Une cible est réelle si elle vaut plus que le
+     * fourchetteur, ou si elle n'est pas défendue. Pendant exact de `isFork` (iOS).
+     */
+    private fun isFork(move: Move, after: Board): Boolean {
+        if (!forkerSurvives(move, after)) return false
+        // Le roi attaqué (échec) est une cible : la fourchette classique roi + pièce.
+        var targets = realTargets(move, after)
+        if (after.state is Board.State.Check) targets += 1
+        return targets >= 2
+    }
+
+    /** Les pièces de valeur que le fourchetteur peut prendre sans y perdre : plus précieuses que lui, ou sans défense. */
+    private fun realTargets(move: Move, after: Board): Int {
+        val mover = move.piece.color
+        val forkerValue = value(move.piece.kind)
+        // Après le coup, c'est à l'ADVERSAIRE de jouer : on rend le trait au fourchetteur
+        // pour simuler sa prise.
+        val withForkerToMove = positionWithSideToMoveFlipped(after.position)
+        var count = 0
+        for (square in after.legalMoves(move.end)) {
+            val target = after.position.piece(square) ?: continue
+            if (target.color == mover || value(target.kind) < VALUABLE) continue
+            if (value(target.kind) > forkerValue) { count++; continue }
+            val position = withForkerToMove ?: continue
+            val simulation = Board(position.copy())
+            if (simulation.move(move.end, square) == null) continue
+            val recaptured = simulation.position.pieces
+                .filter { it.color == mover.opposite }
+                .any { simulation.canMove(it.square, square) }
+            if (!recaptured) count++
+        }
+        return count
+    }
+
+    /**
+     * Le fourchetteur n'est pas pris à son désavantage : toute prise de sa case est refusée à
+     * l'adversaire, parce que la pièce est défendue ET que le preneur vaut plus qu'elle (un
+     * échange égal défait la fourchette).
+     */
+    private fun forkerSurvives(move: Move, after: Board): Boolean {
+        val mover = move.piece.color
+        val forkerValue = value(move.piece.kind)
+        for (attacker in after.position.pieces.filter { it.color != mover }) {
+            if (!after.canMove(attacker.square, move.end)) continue
+            val simulation = Board(after.position.copy())
+            if (simulation.move(attacker.square, move.end) == null) continue
+            val defended = simulation.position.pieces
+                .filter { it.color == mover }
+                .any { simulation.canMove(it.square, move.end) }
+            if (!defended || value(attacker.kind) <= forkerValue) return false
+        }
+        return true
+    }
+
+    /** La même position, avec le trait à l'autre camp (et sans prise en passant). */
+    private fun positionWithSideToMoveFlipped(position: Position): Position? {
+        val fields = position.fen.split(" ").toMutableList()
+        if (fields.size < 4) return null
+        fields[1] = if (fields[1] == "w") "b" else "w"
+        fields[3] = "-"
+        return Position.fromFen(fields.joinToString(" "))
+    }
 }
