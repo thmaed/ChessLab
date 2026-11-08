@@ -18,6 +18,10 @@ struct DuckChessAnalysisView: View {
             BoardWithPanel {
                 boardBlock(size: geo.size)
             } panel: {
+                // L'avancement de l'analyse : la même jauge que l'écran principal.
+                if viewModel.isClassifying, let progress = viewModel.classificationProgress {
+                    ClassificationProgressBadge(done: progress.done, total: progress.total)
+                }
                 navigationBar
                     .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { height in
                         navigationBarHeight = height
@@ -136,9 +140,7 @@ struct DuckChessAnalysisView: View {
             navButton("chevron.left", label: "Coup précédent") { viewModel.reviewPrevious() }
                 .disabled(viewModel.displayedPly == 0)
             Spacer(minLength: 0)
-            if viewModel.isClassifying, let progress = viewModel.classificationProgress {
-                classificationIndicator(progress)
-            } else if viewModel.isAnalyzing {
+            if viewModel.isAnalyzing {
                 ProgressView().controlSize(.small).tint(Theme.textSecondary)
             }
             Text("\(viewModel.displayedPly) / \(viewModel.totalPlies)")
@@ -153,17 +155,6 @@ struct DuckChessAnalysisView: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(Theme.surface, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-    }
-
-    private func classificationIndicator(_ progress: (done: Int, total: Int)) -> some View {
-        HStack(spacing: 6) {
-            ProgressView().controlSize(.small).tint(Theme.textTertiary)
-            Text("\(progress.done)/\(progress.total)")
-                .font(.caption2.monospacedDigit())
-                .foregroundStyle(Theme.textTertiary)
-                .lineLimit(1)
-                .fixedSize()
-        }
     }
 
     private func navButton(_ systemImage: String, label: LocalizedStringKey, action: @escaping () -> Void) -> some View {

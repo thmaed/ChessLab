@@ -18,6 +18,8 @@ object Palette {
     val accentSecondary = Color(0.24f, 0.72f, 0.72f)
     val danger = Color(0.92f, 0.38f, 0.38f)
     val warning = Color(0.95f, 0.75f, 0.30f)
+    /** Orange vif de la jauge d'analyse (demandé le 08/11/2026) : distinct de [warning] (ambre). */
+    val progress = Color(1.0f, 0.55f, 0.10f)
     val info = Color(0.36f, 0.58f, 0.95f)
     val violet = Color(0.62f, 0.51f, 0.96f)
     val rose = Color(0.96f, 0.46f, 0.62f)

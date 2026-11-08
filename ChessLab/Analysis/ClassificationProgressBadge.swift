@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// L'avancement de l'analyse d'une partie : une capsule qui SE REMPLIT d'accent, coup par coup.
+/// L'avancement de l'analyse d'une partie : une capsule qui SE REMPLIT d'orange vif, coup par coup.
 ///
 /// Elle remplace le petit compteur de la barre de boutons : il n'avait que ~75 pt de large, se
 /// repliait sur le seul rouet dès que le nombre passait à trois chiffres (« 100/126 »), et une
@@ -15,7 +15,7 @@ struct ClassificationProgressBadge: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            ProgressView().tint(Theme.accent).scaleEffect(0.6)
+            ProgressView().tint(Theme.textPrimary).scaleEffect(0.6)
             Text("Analyse : coup \(done)/\(total)")
                 .font(.caption.weight(.semibold).monospacedDigit())
                 .foregroundStyle(Theme.textPrimary)
@@ -28,13 +28,13 @@ struct ClassificationProgressBadge: View {
             GeometryReader { geometry in
                 ZStack(alignment: .leading) {
                     Theme.surface
-                    Theme.accent.opacity(0.35)
+                    Theme.progress.opacity(0.65)
                         .frame(width: geometry.size.width * fraction)
                 }
             }
         }
         .clipShape(Capsule())
-        .overlay(Capsule().strokeBorder(Theme.accent.opacity(0.55), lineWidth: 1))
+        .overlay(Capsule().strokeBorder(Theme.progress, lineWidth: 1.5))
         // Même hauteur que la ligne d'état qu'elle remplace : rien ne bouge sur l'écran. Largeur
         // FIXE : la jauge ne doit pas changer de longueur quand le compteur gagne un chiffre.
         .frame(width: 250, height: 26)

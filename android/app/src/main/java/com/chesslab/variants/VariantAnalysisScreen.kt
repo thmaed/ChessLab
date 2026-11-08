@@ -84,6 +84,11 @@ fun VariantAnalysisScreen(
                 )
                 Spacer(Modifier.height(8.dp))
             }
+            // L'avancement de l'analyse : la même jauge que l'écran principal.
+            if (ui.classifying && ui.total > 0) {
+                com.chesslab.ui.ReviewProgressBadge(ui.done, ui.total)
+                Spacer(Modifier.height(8.dp))
+            }
             // La barre d'évaluation JUSTE au-dessus du plateau, et le score
             // écrit dedans — comme iOS. Le nom de la variante est dans le
             // titre (« Analyse — Horde »), et le score n'est plus répété en
@@ -170,18 +175,8 @@ private fun NavigationCard(ui: VariantAnalysisUiState, model: VariantAnalysisVie
         ) { Icon(Icons.Default.ChevronLeft, stringResource(R.string.previous_move), tint = Palette.textPrimary) }
 
         Spacer(Modifier.weight(1f))
-        if (ui.classifying) {
-            CircularProgressIndicator(
-                Modifier.size(12.dp), strokeWidth = 2.dp, color = Palette.textTertiary,
-            )
-            Spacer(Modifier.width(6.dp))
-            Text(
-                "${ui.done}/${ui.total}",
-                fontSize = 11.sp, color = Palette.textTertiary,
-                modifier = Modifier.testTag("revue-en-cours"),
-            )
-            Spacer(Modifier.width(8.dp))
-        } else if (ui.thinking) {
+        // L'avancement de l'analyse est dans la jauge de l'en-tête (`ReviewProgressBadge`).
+        if (ui.thinking && !ui.classifying) {
             CircularProgressIndicator(
                 Modifier.size(12.dp), strokeWidth = 2.dp, color = Palette.textSecondary,
             )

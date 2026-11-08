@@ -28,6 +28,9 @@ enum Theme {
 
     static let danger = Color(red: 0.92, green: 0.38, blue: 0.38)
     static let warning = Color(red: 0.95, green: 0.75, blue: 0.30)
+    /// Orange vif de la jauge d'analyse : doit se voir d'un coup d'œil pendant qu'une partie se
+    /// classe (demandé le 08/11/2026). Distinct de ``warning`` (ambre) : ce n'est pas un avertissement.
+    static let progress = Color(red: 1.0, green: 0.55, blue: 0.10)
     static let info = Color(red: 0.36, green: 0.58, blue: 0.95)
     /// Teintes d'appoint pour l'identité par section (cartes de mode…).
     static let violet = Color(red: 0.62, green: 0.51, blue: 0.96)
