@@ -1,3 +1,7 @@
-Première version Android de ChessLab.
-
-Jouer contre neuf personnages ou contre Stockfish, analyser ses parties coup par coup avec la raison de chaque faute, 58 ouvertures, 78 finales, plus de 100 000 puzzles, douze variantes. Tout tourne sur le téléphone, sans compte ni réseau.
+ChessLab 2.2
+• Scanner plus fiable : captures d'écran, photos d'écran et plateaux réels.
+• Partager vers ChessLab : envoyez une image depuis la galerie, le scanner la lit.
+• Collections de puzzles : importez un PGN, travaillez en série ou en Woodpecker, exportez-le. Le thème du puzzle peut se masquer.
+• Laboratoire : séries en Chess960.
+• Stockfish 19, avec une jauge de progression pendant l'analyse.
+• Coup Volé : prise en passant corrigée au second coup.

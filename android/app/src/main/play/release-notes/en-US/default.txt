@@ -1,7 +1,7 @@
-ChessLab 2.0
-• Daily session: what to review each day, a streak of days and medals.
-• Analysis: your mistakes become puzzles and a weakness profile appears in Progress.
-• The Coach shows what players at your level play.
-• Personal puzzle rating and “At my level”.
-• Openings: illustrated cards, Side and Level filters, “Classics”.
-• Time limit is optional, your last choice is remembered.
+ChessLab 2.2
+• More reliable scanner: screenshots, photos of a screen and real boards.
+• Share to ChessLab: send an image from your gallery and the scanner reads it.
+• Puzzle collections: import a PGN, work in series or as a Woodpecker programme, export it. The puzzle theme can be hidden.
+• Laboratory: Chess960 series.
+• Stockfish 19, with a progress gauge during analysis.
+• Stolen Move: en-passant fixed on the second move.

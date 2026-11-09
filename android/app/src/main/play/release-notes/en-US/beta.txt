@@ -1,5 +1,7 @@
-First Android release of ChessLab, for testing.
-
-Play nine characters or Stockfish, analyse your games move by move with the reason behind each mistake, 58 openings, 78 endgames, over 100,000 puzzles, twelve variants.
-
-Everything runs on the phone: no account, no network, no data leaving the device. The app works in airplane mode — the simplest way to check that claim.
+ChessLab 2.2
+• More reliable scanner: screenshots, photos of a screen and real boards.
+• Share to ChessLab: send an image from your gallery and the scanner reads it.
+• Puzzle collections: import a PGN, work in series or as a Woodpecker programme, export it. The puzzle theme can be hidden.
+• Laboratory: Chess960 series.
+• Stockfish 19, with a progress gauge during analysis.
+• Stolen Move: en-passant fixed on the second move.
