@@ -74,7 +74,7 @@ struct HelpView: View {
         .init(
             icon: "sparkles", tint: Theme.accent,
             title: "Nouveautés de la version \(Self.appVersion)",
-            body: "• Séance du jour : chaque jour, l'app prépare ce qu'il faut revoir — positions d'ouverture dues, puzzles ratés, puzzles de vos parties et une finale. Elle est plafonnée (2, 5 ou 8 ouvertures, au choix sur son écran) et compte votre série de jours, avec des médailles.\n• Analyse : quand vous analysez une de vos parties contre l'ordinateur, l'app crée des puzzles de vos erreurs, repère le moment où vous quittez votre répertoire et dessine votre profil de faiblesses dans Progrès.\n• Coach : dans l'analyse, sous l'explication d'une faute, la part des joueurs de votre niveau qui jouent ce coup.\n• Puzzles : une cote personnelle, la puce « À mon niveau », et un indice qui ne rapporte plus de points.\n• Ouvertures : cartes vivantes (position clé, niveau, maîtrise), menus Camp et Niveau, et le filtre « Classiques ».\n• Analyser : la dernière partie en tête de l'écran, et un accès direct aux mats manqués.\n• Réglages de partie : l'interrupteur « Limite de temps », éteint par défaut, retient votre dernier choix ; options colorées.\n• Fin de partie : courbe du matériel. Woodpecker : comparaison des cycles et médailles de série."
+            body: "• Scanner : lecture plus fiable des captures d'écran, des photos d'écran et des plateaux réels.\n• Partager : depuis Photos, Partager › ChessLab envoie l'image au scanner.\n• Puzzles : vos collections s'importent en PGN, se travaillent en série ou en programme Woodpecker et s'exportent ; un réglage masque le thème du puzzle.\n• Laboratoire : séries en Chess960, une position tirée pour chaque paire de parties.\n• Moteur : Stockfish 19 ; une jauge de progression suit l'analyse en cours.\n• Coup Volé : correction de la prise en passant au second coup."
         ),
         .init(
             icon: "flame.fill", tint: Theme.warning,
@@ -139,7 +139,7 @@ struct HelpView: View {
         .init(
             icon: "gearshape.fill", tint: Theme.textSecondary,
             title: "Réglages",
-            body: "Langue de l'interface (français, anglais, ou celle du système), thème du plateau — choisi ici une fois pour tous les écrans —, notation des pièces (française R D T F C ou anglaise), et synchronisation iCloud."
+            body: "Langue de l'interface (français, anglais, ou celle du système), thème du plateau — choisi ici une fois pour tous les écrans —, notation des pièces (française R D T F C ou anglaise), affichage du thème d'un puzzle (mat, fourchette, clouage… à masquer pour chercher sans indice), et synchronisation iCloud."
         ),
         .init(
             icon: "icloud", tint: Theme.info,

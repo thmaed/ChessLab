@@ -113,9 +113,9 @@ class DiscoveryTourStepsTest {
         tour.startWhatsNew()
         assertTrue(tour.isActive)
         assertEquals(DiscoveryTourController.Kind.whatsNew, tour.kind)
-        assertEquals(6, tour.steps.size)
-        assertEquals((0 until 6).toList(), tour.steps.map { it.id })
-        assertEquals(DiscoverySpot.dailySession, tour.steps.first().spot)
+        assertEquals(5, tour.steps.size)
+        assertEquals((0 until 5).toList(), tour.steps.map { it.id })
+        assertEquals(null, tour.steps.first().spot)
         assertEquals(DiscoverySpot.helpButton, tour.steps.last().spot)
         repeat(tour.steps.size) { tour.advance() }
         assertFalse(tour.isActive)

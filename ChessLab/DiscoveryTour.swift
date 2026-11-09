@@ -331,38 +331,33 @@ final class DiscoveryTourController {
 }
 
 extension DiscoveryTourController {
-    /// Le court parcours des NOUVEAUTÉS de la 2.0, montré une seule fois à qui met
+    /// Le court parcours des NOUVEAUTÉS de la 2.2, montré une seule fois à qui met
     /// à jour depuis la 1.x : chaque étape pointe un vrai contrôle nouveau, à
     /// l'endroit où il vit.
     static func buildWhatsNewSteps() -> [DiscoveryStep] {
         [
             DiscoveryStep(
-                id: 0, section: "Nouveautés 2.0", spot: .dailySession, destination: .home,
-                title: "Votre séance du jour",
-                body: "L'app prépare chaque jour ce qu'il faut revoir — ouvertures, puzzles ratés, une finale — et compte votre série de jours, avec des médailles. Le plafond d'ouvertures se règle sur son écran."
+                id: 0, section: "Nouveautés 2.2", spot: nil, destination: .analysisEntry,
+                title: "Un scanner plus fiable",
+                body: "Le scanner lit mieux les captures, les photos d'écran et les plateaux réels. Depuis Photos, « Partager › ChessLab » envoie l'image directement au scanner."
             ),
             DiscoveryStep(
-                id: 1, section: "Nouveautés 2.0", spot: .puzzlesTile, destination: .home,
-                title: "Une cote de puzzle personnelle",
-                body: "Vos puzzles vous donnent maintenant une cote, comme aux échecs, et la puce « À mon niveau » propose des puzzles à votre mesure. Prendre l'indice ne rapporte plus de points."
+                id: 1, section: "Nouveautés 2.2", spot: .puzzlesTile, destination: .home,
+                title: "Vos collections de puzzles",
+                body: "Importez un PGN : chaque fichier devient une collection, travaillée en série ou en programme Woodpecker complet, et exportable en PGN. Un réglage permet de masquer le thème du puzzle."
             ),
             DiscoveryStep(
-                id: 2, section: "Nouveautés 2.0", spot: nil, destination: .analysisEntry,
-                title: "Analyse et Coach",
-                body: "Analysez une partie : vos erreurs deviennent des puzzles et votre profil de faiblesses se dessine dans Progrès. Dans l'analyse, le Coach dit ce que jouent les joueurs de votre niveau. La dernière partie passe en tête de cet écran."
+                id: 2, section: "Nouveautés 2.2", spot: .variantsTile, destination: .home,
+                title: "Chess960 au Laboratoire",
+                body: "Le Laboratoire joue aussi des séries en Chess960 : une position différente pour chaque paire de parties, ou le numéro de votre choix."
             ),
             DiscoveryStep(
-                id: 3, section: "Nouveautés 2.0", spot: .openingFilters, destination: .openings,
-                title: "Classiques, Camp, Niveau",
-                body: "Deux menus filtrent les ouvertures : Camp (Blancs ou Noirs) et Niveau — dont « Classiques », les 19 ouvertures les plus jouées. Chaque carte montre la position clé et votre maîtrise."
+                id: 3, section: "Nouveautés 2.2", spot: nil, destination: .analysisEntry,
+                title: "Stockfish 19",
+                body: "Le moteur passe à Stockfish 19, et une jauge de progression suit l'analyse en cours."
             ),
             DiscoveryStep(
-                id: 4, section: "Nouveautés 2.0", spot: .timeLimit, destination: .newGame,
-                title: "La limite de temps, en option",
-                body: "Les cadences n'apparaissent que si vous allumez « Limite de temps » — éteinte par défaut, et l'app retient votre dernier réglage, écran par écran."
-            ),
-            DiscoveryStep(
-                id: 5, section: "Nouveautés 2.0", spot: .helpButton, destination: .home,
+                id: 4, section: "Nouveautés 2.2", spot: .helpButton, destination: .home,
                 title: "Tout est dans l'aide",
                 body: "Le « ? » rassemble le détail des nouveautés, et vous pouvez rejouer cette visite quand vous voulez."
             ),
@@ -423,7 +418,7 @@ enum DiscoveryTourMemory {
 
     /// L'identifiant du parcours des nouveautés en cours. Se change à la version
     /// majeure suivante : tout le monde le revoit alors une fois.
-    static let whatsNewID = "2.0"
+    static let whatsNewID = "2.2"
     private static let whatsNewKey = "whatsNewSeenVersion"
 
     /// À mettre à jour depuis la 1.x : la visite complète a déjà été vue sur CETTE

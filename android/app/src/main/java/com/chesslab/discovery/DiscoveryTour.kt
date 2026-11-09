@@ -210,22 +210,20 @@ class DiscoveryTourController(
         )
     }
 
-    /** Le court parcours des NOUVEAUTÉS de la 2.0 : chaque étape pointe un vrai contrôle nouveau, là où il vit. */
+    /** Le court parcours des NOUVEAUTÉS de la 2.2 : chaque étape pointe un vrai contrôle nouveau, là où il vit. */
     private fun buildWhatsNewSteps(): List<DiscoveryStep> {
         val news = R.string.discovery_section_whatsnew
         return listOf(
-            DiscoveryStep(0, news, DiscoverySpot.dailySession, DiscoveryDestination.home,
+            DiscoveryStep(0, news, null, DiscoveryDestination.analysisEntry,
                 R.string.discovery_wn_0_title, R.string.discovery_wn_0_body),
             DiscoveryStep(1, news, DiscoverySpot.puzzlesTile, DiscoveryDestination.home,
                 R.string.discovery_wn_1_title, R.string.discovery_wn_1_body),
-            DiscoveryStep(2, news, null, DiscoveryDestination.analysisEntry,
+            DiscoveryStep(2, news, DiscoverySpot.variantsTile, DiscoveryDestination.home,
                 R.string.discovery_wn_2_title, R.string.discovery_wn_2_body),
-            DiscoveryStep(3, news, DiscoverySpot.openingFilters, DiscoveryDestination.openings,
+            DiscoveryStep(3, news, null, DiscoveryDestination.analysisEntry,
                 R.string.discovery_wn_3_title, R.string.discovery_wn_3_body),
-            DiscoveryStep(4, news, DiscoverySpot.timeLimit, DiscoveryDestination.newGame,
+            DiscoveryStep(4, news, DiscoverySpot.helpButton, DiscoveryDestination.home,
                 R.string.discovery_wn_4_title, R.string.discovery_wn_4_body),
-            DiscoveryStep(5, news, DiscoverySpot.helpButton, DiscoveryDestination.home,
-                R.string.discovery_wn_5_title, R.string.discovery_wn_5_body),
         )
     }
 
@@ -281,7 +279,7 @@ object DiscoveryTourMemory {
     // ---- Les nouveautés d'une version
 
     /** L'identifiant du parcours des nouveautés en cours ; se change à la version majeure suivante. */
-    const val WHATS_NEW_ID = "2.0"
+    const val WHATS_NEW_ID = "2.2"
     private const val WHATS_NEW_KEY = "whatsNewSeenVersion"
 
     /**

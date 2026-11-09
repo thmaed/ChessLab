@@ -24171,6 +24171,12 @@
             "state": "translated",
             "value": "It's all in the help"
           }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout est dans l'aide"
+          }
         }
       }
     },
@@ -24180,6 +24186,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "The “?” gathers the details of what's new, and you can replay this tour whenever you like."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le « ? » rassemble le détail des nouveautés, et vous pouvez rejouer cette visite quand vous voulez."
           }
         }
       }
@@ -24876,6 +24888,182 @@
           "stringUnit": {
             "state": "translated",
             "value": "… et %lld autres parties écartées."
+          }
+        }
+      }
+    },
+    "• Scanner : lecture plus fiable des captures d'écran, des photos d'écran et des plateaux réels.\n• Partager : depuis Photos, Partager › ChessLab envoie l'image au scanner.\n• Puzzles : vos collections s'importent en PGN, se travaillent en série ou en programme Woodpecker et s'exportent ; un réglage masque le thème du puzzle.\n• Laboratoire : séries en Chess960, une position tirée pour chaque paire de parties.\n• Moteur : Stockfish 19 ; une jauge de progression suit l'analyse en cours.\n• Coup Volé : correction de la prise en passant au second coup.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Scanner: more reliable reading of screenshots, photos of a screen and real boards.\n• Share: from Photos, Share › ChessLab sends the image to the scanner.\n• Puzzles: your collections import from PGN, are worked in series or as a full Woodpecker programme, and export; a setting hides the puzzle theme.\n• Laboratory: Chess960 series, one position drawn for each pair of games.\n• Engine: Stockfish 19; a progress gauge follows the analysis in progress.\n• Stolen Move: en-passant fix on the second move."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Scanner : lecture plus fiable des captures d'écran, des photos d'écran et des plateaux réels.\n• Partager : depuis Photos, Partager › ChessLab envoie l'image au scanner.\n• Puzzles : vos collections s'importent en PGN, se travaillent en série ou en programme Woodpecker et s'exportent ; un réglage masque le thème du puzzle.\n• Laboratoire : séries en Chess960, une position tirée pour chaque paire de parties.\n• Moteur : Stockfish 19 ; une jauge de progression suit l'analyse en cours.\n• Coup Volé : correction de la prise en passant au second coup."
+          }
+        }
+      }
+    },
+    "Langue de l'interface (français, anglais, ou celle du système), thème du plateau — choisi ici une fois pour tous les écrans —, notation des pièces (française R D T F C ou anglaise), affichage du thème d'un puzzle (mat, fourchette, clouage… à masquer pour chercher sans indice), et synchronisation iCloud.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Interface language (French, English, or the system one), board theme — chosen here once for every screen —, piece notation (French R D T F C or English), display of a puzzle's theme (checkmate, fork, pin… hide it to search without a clue), and iCloud sync."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Langue de l'interface (français, anglais, ou celle du système), thème du plateau — choisi ici une fois pour tous les écrans —, notation des pièces (française R D T F C ou anglaise), affichage du thème d'un puzzle (mat, fourchette, clouage… à masquer pour chercher sans indice), et synchronisation iCloud."
+          }
+        }
+      }
+    },
+    "Nouveautés 2.2": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's new in 2.2"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveautés 2.2"
+          }
+        }
+      }
+    },
+    "Un scanner plus fiable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A more reliable scanner"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un scanner plus fiable"
+          }
+        }
+      }
+    },
+    "Le scanner lit mieux les captures, les photos d'écran et les plateaux réels. Depuis Photos, « Partager › ChessLab » envoie l'image directement au scanner.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The scanner reads screenshots, photos of a screen and real boards better. From Photos, “Share › ChessLab” sends the image straight to the scanner."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le scanner lit mieux les captures, les photos d'écran et les plateaux réels. Depuis Photos, « Partager › ChessLab » envoie l'image directement au scanner."
+          }
+        }
+      }
+    },
+    "Vos collections de puzzles": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your puzzle collections"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos collections de puzzles"
+          }
+        }
+      }
+    },
+    "Importez un PGN : chaque fichier devient une collection, travaillée en série ou en programme Woodpecker complet, et exportable en PGN. Un réglage permet de masquer le thème du puzzle.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import a PGN: each file becomes a collection, worked in series or as a full Woodpecker programme, and exportable to PGN. A setting lets you hide the puzzle theme."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importez un PGN : chaque fichier devient une collection, travaillée en série ou en programme Woodpecker complet, et exportable en PGN. Un réglage permet de masquer le thème du puzzle."
+          }
+        }
+      }
+    },
+    "Chess960 au Laboratoire": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chess960 in the Laboratory"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chess960 au Laboratoire"
+          }
+        }
+      }
+    },
+    "Le Laboratoire joue aussi des séries en Chess960 : une position différente pour chaque paire de parties, ou le numéro de votre choix.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Laboratory now plays Chess960 series too: a different position for each pair of games, or a number of your choice."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le Laboratoire joue aussi des séries en Chess960 : une position différente pour chaque paire de parties, ou le numéro de votre choix."
+          }
+        }
+      }
+    },
+    "Stockfish 19": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockfish 19"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockfish 19"
+          }
+        }
+      }
+    },
+    "Le moteur passe à Stockfish 19, et une jauge de progression suit l'analyse en cours.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The engine moves to Stockfish 19, and a progress gauge follows the analysis in progress."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le moteur passe à Stockfish 19, et une jauge de progression suit l'analyse en cours."
           }
         }
       }

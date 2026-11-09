@@ -139,15 +139,15 @@ import Testing
         UserDefaults.standard.removeObject(forKey: "discoveryTourSeenInstallStamp")
     }
 
-    @Test("Les nouveautés 2.0 : un court parcours, proposé une seule fois à qui met à jour")
+    @Test("Les nouveautés 2.2 : un court parcours, proposé une seule fois à qui met à jour")
     @MainActor func whatsNewTour() {
         let tour = DiscoveryTourController()
         tour.startWhatsNew()
         #expect(tour.isActive)
         #expect(tour.kind == .whatsNew)
-        #expect(tour.steps.count == 6)
-        #expect(tour.steps.map(\.id) == Array(0..<6))
-        #expect(tour.steps.first?.spot == .dailySession)
+        #expect(tour.steps.count == 5)
+        #expect(tour.steps.map(\.id) == Array(0..<5))
+        #expect(tour.steps.first?.spot == nil)
         #expect(tour.steps.last?.spot == .helpButton)
         // Le rejeu de la visite complète repart sur les étapes complètes.
         tour.skip()
