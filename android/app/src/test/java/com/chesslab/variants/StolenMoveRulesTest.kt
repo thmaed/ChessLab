@@ -44,7 +44,21 @@ class StolenMoveRulesTest {
         // Après 1.e4, chesskit a passé le trait aux Noirs.
         val afterE4 = "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1"
         val second = StolenMoveRules.fenForSecondMove(afterE4, Piece.Color.white, null)!!
-        assertEquals("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq e3 0 1", second)
+        // La case « e3 » est celle que e2-e4 a laissée POUR LES NOIRS : avec le trait aux Blancs elle
+        // est incohérente, et Stockfish 19 refuserait la position — on l'efface.
+        assertEquals("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1", second)
+    }
+
+    @Test fun `une poussee de deux cases du premier coup ne laisse pas de prise en passant incoherente`() {
+        // Les Noirs jouent e7-e5 comme PREMIER coup de leur tour double : ChessKit écrit « e6 » avec le trait
+        // aux Blancs ; remis aux Noirs, « e6 » ne vaut plus rien (la 3e rangée est la leur).
+        val afterE5 = "rnbqkbnr/pppp1ppp/8/4p3/8/5N2/PPPPPPPP/RNBQKB1R w KQkq e6 0 2"
+        val second = StolenMoveRules.fenForSecondMove(afterE5, Piece.Color.black, null)!!
+        assertEquals("-", second.split(" ")[3])
+        assertEquals("b", second.split(" ")[1])
+        // …et la règle 5 reste servie : la case d'avant le tour est rendue si elle l'était.
+        val withOverride = StolenMoveRules.fenForSecondMove(afterE5, Piece.Color.black, "d3")!!
+        assertEquals("d3", withOverride.split(" ")[3])
     }
 
     /**

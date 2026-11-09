@@ -222,6 +222,28 @@ struct StolenMovePlayViewModelTests {
         }
     }
 
+    /// `preferred` s'il est légal pour les Blancs, sinon le premier coup légal trouvé.
+    private static func legalWhiteMove(preferred: String, in board: Board) -> String {
+        func legal(_ from: Square, _ to: Square) -> Bool { board.legalMoves(forPieceAt: from).contains(to) }
+        if preferred.count >= 4,
+           legal(Square(String(preferred.prefix(2))), Square(String(preferred.dropFirst(2).prefix(2)))) {
+            return preferred
+        }
+        for piece in board.position.pieces where piece.color == .white {
+            if let target = board.legalMoves(forPieceAt: piece.square).first(where: {
+                board.position.piece(at: $0) == nil
+            }) {
+                return piece.square.notation + target.notation
+            }
+        }
+        return preferred
+    }
+
+    private static func isCheck(_ board: Board) -> Bool {
+        if case .check = board.state { return true }
+        return false
+    }
+
     @Test("L'ordinateur dépense automatiquement son jeton et joue deux coups d'affilée")
     func engineAutomaticallySpendsItsToken() async throws {
         try await EngineIntegrationGate.shared.withExclusiveAccess {
@@ -239,16 +261,24 @@ struct StolenMovePlayViewModelTests {
             let whiteMoves = ["g1f3", "b1c3", "a2a3", "h2h3", "a3a4"]
             for (index, uci) in whiteMoves.enumerated() {
                 let plyBefore = vm.totalPlies
-                vm.forceMove(uci: uci)
-                try #require(vm.totalPlies == plyBefore + 1, "le coup blanc n°\(index + 1) doit tenir")
+                // Le coup prévu, ou n'importe quel coup légal si l'ordinateur a mis le roi blanc en échec
+                // (ses coups sont aléatoires : le test ne peut pas supposer une réponse précise).
+                let chosen = Self.legalWhiteMove(preferred: uci, in: vm.board)
+                vm.forceMove(uci: chosen)
+                try #require(vm.totalPlies == plyBefore + 1, "le coup blanc n°\(index + 1) doit tenir (\(chosen), \(vm.board.position.fen), trait \(vm.effectiveMover), outcome \(String(describing: vm.outcome)), thinking \(vm.isEngineThinking))")
 
                 let expectedReplies = index < 4 ? 1 : 2 // le 5e coup rend la main à un moteur qui a un jeton
                 let deadline = Date().addingTimeInterval(30)
                 while Date() < deadline, vm.totalPlies < plyBefore + 1 + expectedReplies {
                     try await Task.sleep(for: .milliseconds(200))
+                    // Règle 4 : si le PREMIER coup du tour double met échec, le tour s'arrête là — le
+                    // moteur n'a alors rendu qu'UN coup, légitimement (un coup sur huit environ).
+                    if index == 4, vm.totalPlies == plyBefore + 2, Self.isCheck(vm.board), vm.awaitingSecondMoveBy == nil { break }
                 }
+                let replies = vm.totalPlies - (plyBefore + 1)
+                let stoppedByCheck = index == 4 && replies == 1 && Self.isCheck(vm.board)
                 #expect(
-                    vm.totalPlies >= plyBefore + 1 + expectedReplies,
+                    replies >= expectedReplies || stoppedByCheck,
                     "réponse(s) noire(s) manquante(s) après le coup blanc n°\(index + 1)"
                 )
             }
@@ -258,5 +288,23 @@ struct StolenMovePlayViewModelTests {
 
             vm.handleViewDisappear()
         }
+    }
+
+    /// Stockfish 19 refuse une position dont la case de prise en passant ne correspond pas au trait :
+    /// après un premier coup « pion de deux cases », le trait remis au même camp laissait celle de
+    /// l'adversaire, et l'ordinateur ne jouait jamais son second coup (constaté le 08/11/2026).
+    @Test func theSecondMovePositionNeverCarriesAnEnPassantSquareOfTheWrongSide() {
+        // Les Noirs viennent de jouer e7-e5 (premier coup de leur tour double) : « e6 » pour les Blancs.
+        let afterE5 = "rnbqkbnr/pppp1ppp/8/4p3/8/5N2/PPPPPPPP/RNBQKB1R w KQkq e6 0 2"
+        let second = StolenMovePlayViewModel.secondMoveFEN(from: afterE5, mover: .black, enPassantOverride: nil)
+        #expect(second?.split(separator: " ")[1] == "b")
+        #expect(second?.split(separator: " ")[3] == "-")
+        // La règle 5 reste servie : la case d'avant le tour est rendue.
+        let withOverride = StolenMovePlayViewModel.secondMoveFEN(from: afterE5, mover: .black, enPassantOverride: Square("d3"))
+        #expect(withOverride?.split(separator: " ")[3] == "d3")
+        // Une case valable pour le camp qui joue est gardée (e6 pour les Blancs).
+        let kept = StolenMovePlayViewModel.secondMoveFEN(
+            from: "rnbqkbnr/pppp1ppp/8/4pP2/8/8/PPPPP1PP/RNBQKBNR b KQkq e6 0 2", mover: .white, enPassantOverride: nil)
+        #expect(kept?.split(separator: " ")[3] == "e6")
     }
 }

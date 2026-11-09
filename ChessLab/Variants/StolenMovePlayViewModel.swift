@@ -197,14 +197,27 @@ final class StolenMovePlayViewModel {
     /// théorie, créer SA PROPRE poussée de deux cases, sans rapport avec
     /// la règle 5).
     private func flippedBoard(to color: Piece.Color, enPassantOverride: Square?) -> Board {
-        var fields = board.position.fen.split(separator: " ").map(String.init)
-        guard fields.count == 6 else { return board }
-        fields[1] = color == .white ? "w" : "b"
-        if fields[3] == "-", let enPassantOverride {
-            fields[3] = enPassantOverride.notation
-        }
-        guard let flipped = Position(fen: fields.joined(separator: " ")) else { return board }
+        guard let fen = Self.secondMoveFEN(from: board.position.fen, mover: color, enPassantOverride: enPassantOverride),
+              let flipped = Position(fen: fen) else { return board }
         return Board(position: flipped)
+    }
+
+    /// La FEN du plateau, trait remis à `mover` pour son second coup.
+    ///
+    /// La case de prise en passant que ChessKit a écrite est celle que le PREMIER coup a laissée, pour
+    /// l'ADVERSAIRE : une fois le trait remis à celui qui joue, elle est incohérente (« trait aux Blancs,
+    /// prise en passant en e3 »), et Stockfish 19 REFUSE une telle position — la 17.1 l'ignorait — si
+    /// bien que le second coup de l'ordinateur ne venait jamais (constaté le 08/11/2026, une fois sur
+    /// deux). Une case n'est valable que sur la 6e rangée pour les Blancs, la 3e pour les Noirs ;
+    /// sinon on l'efface, puis on rend celle d'avant le tour (règle 5).
+    static func secondMoveFEN(from fen: String, mover: Piece.Color, enPassantOverride: Square?) -> String? {
+        var fields = fen.split(separator: " ").map(String.init)
+        guard fields.count == 6 else { return nil }
+        fields[1] = mover == .white ? "w" : "b"
+        let validRank: Character = mover == .white ? "6" : "3"
+        if fields[3] != "-", !(fields[3].count == 2 && fields[3].last == validRank) { fields[3] = "-" }
+        if fields[3] == "-", let enPassantOverride { fields[3] = enPassantOverride.notation }
+        return fields.joined(separator: " ")
     }
 
     func selectSquare(_ square: Square) {

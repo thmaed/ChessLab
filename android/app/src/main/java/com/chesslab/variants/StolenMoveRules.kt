@@ -55,6 +55,15 @@ object StolenMoveRules {
         if (fields.size != 6) return null
         val rebuilt = fields.toMutableList()
         rebuilt[1] = if (mover == Piece.Color.white) "w" else "b"
+        // La case de prise en passant de la FEN est celle que le PREMIER coup a laissée, pour
+        // l'adversaire : une fois le trait remis à celui qui joue, elle est incohérente (« trait aux
+        // Blancs, prise en passant en e3 »), et Stockfish 19 REFUSE une telle position (la 17.1
+        // l'ignorait) — le second coup de l'ordinateur ne venait jamais (constaté le 08/11/2026,
+        // une fois sur deux). Une case n'est valable que sur la 6e rangée pour les Blancs, la 3e
+        // pour les Noirs ; sinon on l'efface, puis on rend celle d'avant le tour (règle 5).
+        val validRank = if (mover == Piece.Color.white) '6' else '3'
+        val current = rebuilt[3]
+        if (current != "-" && !(current.length == 2 && current[1] == validRank)) rebuilt[3] = "-"
         if (rebuilt[3] == "-" && enPassantOverride != null) rebuilt[3] = enPassantOverride
         return rebuilt.joinToString(" ")
     }
