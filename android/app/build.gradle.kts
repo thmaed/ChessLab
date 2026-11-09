@@ -160,7 +160,7 @@ android {
         // partis ainsi, chacun coûtant un aller-retour.
         versionCode = prochainVersionCode
         // Celui-ci reste à la main : c'est ce que les gens LISENT.
-        versionName = "2.0"
+        versionName = "2.2"
         ndk { abiFilters += listOf("arm64-v8a") }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
