@@ -481,7 +481,8 @@ def cmd_duo(c, args):
     prefix = f"duo-{args.version}-"
     # Relancer remplace : les fichiers de CETTE version déposés auparavant
     # sont retirés de la bibliothèque, et leurs placements avec eux.
-    for kind in ("appAssetLibraryImages", "appAssetLibraryVideos"):
+    resume = getattr(args, "resume", False)  # --resume : reprendre après un traitement trop lent, sans rien redéposer
+    for kind in () if resume else ("appAssetLibraryImages", "appAssetLibraryVideos"):
         for item in c.get_all(f"/appAssetLibraries/{library_id}/{kind.replace('appAssetLibrary', '').lower()}"):
             if (item["attributes"].get("referenceName") or "").startswith(prefix):
                 for placement in c.get_all(f"/{kind}/{item['id']}/placements"):
@@ -495,7 +496,12 @@ def cmd_duo(c, args):
     for lang in sorted({"fr" if loc.startswith("fr") else "en" for loc in locs}):
         folder = DUO_SCREENSHOTS.parent / lang
         shots = sorted((folder if folder.exists() else DUO_SCREENSHOTS).glob("*.png"))[:10]
-        image_ids[lang] = [library_upload(c, "appAssetLibraryImages", library_id, f, f"{prefix}{lang}-{f.stem}") for f in shots]
+        if resume:
+            existing = {(i["attributes"].get("referenceName") or ""): i["id"]
+                        for i in c.get_all(f"/appAssetLibraries/{library_id}/images")}
+            image_ids[lang] = [existing[f"{prefix}{lang}-{f.stem}"] for f in shots]
+        else:
+            image_ids[lang] = [library_upload(c, "appAssetLibraryImages", library_id, f, f"{prefix}{lang}-{f.stem}") for f in shots]
     wait_library(c, "appAssetLibraryImages", [i for ids in image_ids.values() for i in ids], "capture Duo")
     wait_library(c, "appAssetLibraryVideos", video_ids, "aperçu Duo")
     for locale, loc in locs.items():
@@ -693,6 +699,7 @@ def main():
     p.add_argument("command", choices=["apps", "version", "metadata", "screenshots", "previews", "duo", "duo_previews", "build", "attach", "review", "status", "all", "submit"])
     p.add_argument("--version", default=None, help="version marketing (défaut : MARKETING_VERSION du projet)")
     p.add_argument("--build", default=None, help="numéro de build (défaut : CURRENT_PROJECT_VERSION du projet)")
+    p.add_argument("--resume", action="store_true", help="duo : reprendre les fichiers déjà déposés (traitement Apple trop lent)")
     p.add_argument("--wait", action="store_true", help="build : attendre le traitement par Apple (1 h max)")
     args = p.parse_args()
     # Version et build de la CIBLE APPLICATIVE : les cibles de test portent
