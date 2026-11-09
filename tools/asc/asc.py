@@ -380,8 +380,12 @@ def cmd_screenshots(c, args):
             if display_type in sets:
                 set_id = sets[display_type]["id"]
                 current = c.get_all(f"/appScreenshotSets/{set_id}/appScreenshots")
-                # Déjà là, dans le même ordre et traité (ou en cours de traitement) : on n'y touche pas.
-                if [x["attributes"]["fileName"] for x in current] == [f.name for f in files] and all(
+                # Déjà là, dans le même ordre, avec le MÊME contenu (somme MD5) et traité (ou en cours de
+                # traitement) : on n'y touche pas. Le nom seul ne suffit pas : une capture refaite garde le sien,
+                # et la version suivante hérite des anciennes images de la précédente.
+                if [x["attributes"]["fileName"] for x in current] == [f.name for f in files] and [
+                        x["attributes"].get("sourceFileChecksum") for x in current
+                ] == [hashlib.md5(f.read_bytes()).hexdigest() for f in files] and all(
                         x["attributes"]["assetDeliveryState"]["state"] in ("COMPLETE", "UPLOAD_COMPLETE") for x in current):
                     print(f"  {locale} {display_type}: {len(files)} captures déjà en place")
                     continue

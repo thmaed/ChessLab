@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 2.1, build 21** (fixés dans `project.pbxproj`). La 2.0 (build 19) est EN VENTE. Voir `RELEASE_NOTES-2.1.md` pour le détail des changements depuis la 2.0. **Préparée le 03/11/2026 : fiche, nouveautés et notes de révision posées dans App Store Connect (version 2.1, PREPARE_FOR_SUBMISSION) ; le build n'est PAS archivé ni téléversé, la version n'est PAS soumise (attendre l'accord de Thierry).**
+**Version courante : 2.2, build 22** (fixés dans `project.pbxproj`). La 2.1 (build 21) est EN VENTE depuis le 05/11/2026 ; le build 22 n'a jamais été téléversé (App Store Connect ne l'a pas reçu : vérifié par `asc.py build`). Voir `RELEASE_NOTES-2.2.md` pour le détail des changements depuis la 2.1. **Préparée le 09/11/2026 : fiche, nouveautés et notes de révision à poser dans App Store Connect (version 2.2) ; le build n'est PAS archivé ni téléversé, la version n'est PAS soumise (attendre l'accord de Thierry).**
 
 Tout ce qui suit est à copier-coller directement dans les champs correspondants d'App Store Connect. Les limites de caractères d'Apple sont respectées (vérifiées).
 
@@ -10,64 +10,58 @@ Tout ce qui suit est à copier-coller directement dans les champs correspondants
 
 ---
 
-## Nouveautés de cette version — 2.1 (4000 car. max)
+## Nouveautés de cette version — 2.2 (4000 car. max)
 
 C'est le champ « What's New in This Version ». Rédigé pour l'utilisateur final : ce qu'il va sentir, pas ce qui a été refactorisé.
 
-> Version 2.1, build 20. Contenu : collections de puzzles importées d'un fichier PGN (demande d'un utilisateur, format validé sur son fichier réel), écran Puzzles repensé, réussite partielle, 130 935 puzzles, « S'entraîner » sur la variante affichée, découvrabilité. Détail dans `RELEASE_NOTES-2.1.md`.
+> Version 2.2, build 22. Contenu : scanner fiabilisé (photos d'écran, revue des cases douteuses, partage depuis Photos), export PGN et copie iCloud des collections de puzzles, réglage du thème du puzzle, Laboratoire Chess960, Stockfish 19, jauge d'avancement de l'analyse. Détail dans `RELEASE_NOTES-2.2.md`.
 
 ### Français
 
 ```
-CHESSLAB 2.1
+CHESSLAB 2.2
 
-VOS PROPRES PUZZLES
-Importez vos fichiers PGN : chaque fichier devient une collection, rangée à part de la bibliothèque, et chaque partie du fichier un puzzle. Le premier coup est joué d'avance et surligné — à vous de voir ce qui a changé —, puis de trouver la suite. Travaillez une collection en série, refaites ses ratés, ou lancez un programme Woodpecker sur toute la collection.
+UN SCANNER PLUS FIABLE
+Les photos d'écran (flou, moiré, reflets) sont bien mieux lues, et les points de coups légaux ou les pointes de flèches ne sont plus pris pour des pions. Les cases douteuses se vérifient une à une, avec la vignette de l'image à côté, et une deuxième lecture possible se choisit d'un toucher. Le camp qui a le trait est deviné quand un roi est en échec.
 
-UN ÉCRAN PUZZLES PLUS CLAIR
-Quatre séries démarrent au toucher : À mon niveau, Ratés, À revoir, Mes parties. « Série sur mesure » règle le niveau, la phase, le type et la provenance, et le thème à travailler vous est proposé en tête d'écran.
+PARTAGER VERS CHESSLAB
+Depuis Photos ou n'importe quelle app : Partager, puis ChessLab. L'image arrive directement dans le scanner.
 
-RÉUSSITE PARTIELLE
-Un puzzle dont vous trouvez le début sans la fin n'est plus compté comme raté : il rejoint « À revoir » et revient bientôt.
+VOS COLLECTIONS DE PUZZLES
+Une collection s'exporte en fichier PGN depuis son menu, et se réimporte à l'identique. Avec la synchronisation iCloud activée, vos collections importées passent d'un appareil à l'autre. Un nouveau réglage, « Afficher le thème du puzzle », permet de chercher sans indice. Les fourchettes annoncées sont plus justes, et les fichiers où une prise est précisée (Tfxd7+) sont lus sur la bonne pièce.
 
-SÉANCE DU JOUR
-Un cycle Woodpecker en cours s'affiche désormais parmi les tâches du jour, avec le nombre de puzzles qu'il reste à faire : un toucher et vous reprenez là où vous en étiez.
+LABORATOIRE CHESS960
+Faites jouer des séries de parties de Chess960 : un numéro de position de 0 à 959, ou une position tirée pour chaque paire de parties. Les parties s'exportent et s'analysent.
 
-PLUS DE 24 000 PUZZLES
-La bibliothèque passe à 130 935 problèmes, surtout aux niveaux extrêmes et pour les solutions de quatre coups ou plus. Une barre de progression suit son préchargement au premier lancement.
+STOCKFISH 19
+Le moteur passe à Stockfish 19, plus rapide. Les analyses déjà enregistrées sont refaites à leur prochaine ouverture avec le nouveau moteur.
 
-OUVERTURES ET FINALES
-« S'entraîner » travaille la variante que vous êtes en train de lire, et non plus seulement la ligne principale. Les noms d'ouvertures s'affichent dans la langue de l'app.
-
-MIEUX S'Y RETROUVER
-Un bouton « Modes » pour changer de mode, les sources d'Analyse dépliées, des « Questions fréquentes » dans l'Aide, la version en bas des Réglages. Et dans une partie chronométrée relue après coup, « Analyser ici » ouvre l'analyse sur la position affichée.
+ANALYSE
+Une jauge d'avancement, bien visible au-dessus du plateau, montre où en est le calcul. Une partie rechargée garde ses promotions.
 ```
 
 ### English
 
 ```
-CHESSLAB 2.1
+CHESSLAB 2.2
 
-YOUR OWN PUZZLES
-Import your PGN files: each file becomes a collection, kept apart from the library, and each game in it a puzzle. The first move is played for you and highlighted — spot what changed — and then you find the rest. Work through a collection as a series, redo its misses, or start a Woodpecker programme on the whole collection.
+A MORE RELIABLE SCANNER
+Screen photos (blur, moiré, glare) are read far better, and the dots showing legal moves or arrow heads are no longer mistaken for pawns. Doubtful squares are checked one at a time, with a thumbnail of the picture beside them, and a second possible reading can be chosen with a tap. The side to move is guessed when a king is in check.
 
-A CLEARER PUZZLES SCREEN
-Four series start with a tap: At my level, Missed, Review, My games. “Custom series” sets the level, phase, type and source, and the theme to work on is suggested at the top of the screen.
+SHARE TO CHESSLAB
+From Photos or any app: Share, then ChessLab. The picture goes straight into the scanner.
 
-PARTIAL SUCCESS
-A puzzle where you find the start but not the end no longer counts as missed: it joins “Review” and comes back soon.
+YOUR PUZZLE COLLECTIONS
+A collection can be exported as a PGN file from its menu, and imported back as it was. With iCloud sync turned on, your imported collections travel between your devices. A new setting, “Show the puzzle theme”, lets you search without a hint. The forks it reports are more accurate, and files where a capture is specified (Rfxd7+) are read on the right piece.
 
-DAILY SESSION
-A Woodpecker cycle under way now appears among the day's tasks, with the number of puzzles still to do: one tap and you pick up where you left off.
+CHESS960 LABORATORY
+Run series of Chess960 games: a position number from 0 to 959, or a position drawn for each pair of games. The games can be exported and analysed.
 
-OVER 24,000 MORE PUZZLES
-The library grows to 130,935 problems, especially at the extreme levels and for solutions of four moves or more. A progress bar follows its loading on first launch.
+STOCKFISH 19
+The engine moves to Stockfish 19, which is faster. Analyses already saved are redone with the new engine the next time you open them.
 
-OPENINGS AND ENDGAMES
-“Practice” works on the variation you are reading, not only the main line. Opening names now appear in the app's language.
-
-EASIER TO FIND YOUR WAY
-A “Modes” button to switch mode, Analyse sources open by default, “Frequently asked questions” in Help, the version at the bottom of Settings. And in a timed game reviewed afterwards, “Analyse here” opens the analysis on the position shown.
+ANALYSIS
+A progress gauge, clearly visible above the board, shows how far the calculation has got. A reloaded game keeps its promotions.
 ```
 
 ---
@@ -229,6 +223,8 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
+**2.2, build 22** — `MARKETING_VERSION = 2.2`, `CURRENT_PROJECT_VERSION = 22` (aux quatre configurations, app et extension de partage ; la 2.1, build 21, est en vente et le 22 n'a jamais quitté le dépôt : à revérifier par `asc.py build` avant l'archive, et à monter si Xcode en a envoyé un à l'insu du dépôt). Nouveautés détaillées dans `RELEASE_NOTES-2.2.md`.
+
 **2.1, build 21** — `MARKETING_VERSION = 2.1`, `CURRENT_PROJECT_VERSION = 21` (la 2.0, build 19, est en vente ; le build 20, téléversé le 04/11 sans la tâche Woodpecker de la séance, est écarté). Nouveautés détaillées dans `RELEASE_NOTES-2.1.md`.
 
 **2.0, build 19** — `MARKETING_VERSION = 2.0`, `CURRENT_PROJECT_VERSION = 19` (la 1.9.2, build 17, est la dernière soumise : le 18 est le premier numéro libre, à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.0.md`.
@@ -267,6 +263,8 @@ git push origin main
 Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/08 a été poussée commit par commit). Vérifier malgré tout au moment de soumettre (`git log --oneline origin/main..HEAD | wc -l` doit rendre 0) : soumettre sans pousser publierait un binaire dont les sources annoncées ne correspondent pas.
 
 ### Historique des versions
+- **2.2** — build 22, préparée (non soumise) : scanner fiabilisé (photos d'écran, revue des cases douteuses, partage depuis Photos par l'extension ChessLabShare), export PGN et copie iCloud des collections de puzzles, réglage « Afficher le thème du puzzle », Laboratoire Chess960, Stockfish 19, jauge d'avancement de l'analyse (`RELEASE_NOTES-2.2.md`).
+- **2.1** — build 21, en vente depuis le 05/11/2026 : collections de puzzles importées, écran Puzzles repensé, réussite partielle, 130 935 puzzles (`RELEASE_NOTES-2.1.md`).
 - **2.0** — build 18 : séance du jour, analyse → puzzles avec récapitulatif, Coach (Maia-3), cote de puzzle, ouvertures illustrées, reprise de partie, limite de temps en option ; correctifs (reprise après capture d'une tour, coup de mat noté) (`RELEASE_NOTES-2.0.md`).
 - **1.9.2** — build 17, soumise : correctif de la prise au tap-tap sous iOS 18.
 - **1.9.1** — build 16 : la pièce du coin haut gauche de l'échiquier (h1 aux Noirs, a8 aux Blancs) et un coin du recadrage du scanner ne répondaient plus au toucher en iOS 18 (`RELEASE_NOTES-1.9.1.md`).
@@ -288,10 +286,7 @@ Au 19/08/2026, `main` est poussé au fil de l'eau (la nuit de travail du 18-19/0
 English, for the Apple reviewer. Opens with the nature of the update (2.0 : major content update), puis la proposition de valeur (sept modes, entièrement gratuits), la permission caméra, le seul appel réseau, la situation de licence (moteur GPLv3, sources publiques), et qu'aucun compte de test n'est nécessaire.
 
 ```
-WHAT'S IN THIS UPDATE (2.1): a feature update. New: the user can import their own chess puzzles from PGN files (Puzzles → My collections → Import puzzles). The files are chosen with the standard system document picker, or the text can be pasted; they are read on the device and never uploaded. Each file becomes a collection kept apart from the bundled library. To try it without a file: tap "Import puzzles", paste the two lines below in the text area, give any name and tap "Import the text" — each game is one puzzle, the first move being played for you:
-[FEN "6k1/p4ppp/8/8/8/8/5PPP/4R1K1 b - - 0 1"]
-1...a6 2.Re8#
-Also new: a redesigned Puzzles screen (four ready-made series and a custom-series sheet), partial credit for a puzzle solved only in part, 24,841 more bundled puzzles (130,935 in all, from the Lichess database, CC0), "Practice" in the opening and endgame courses now follows the variation being read, a "Modes" button on the mode screens, and a frequently-asked-questions section in Help. A standard system rating request (StoreKit) may appear at most once per version, after the user has played and trained for a few days. No change to permissions, privacy or licensing; still no network call, no account, no data collected.
+WHAT'S IN THIS UPDATE (2.2): a feature update. New: (1) a Share extension — in Photos (or any app), Share → ChessLab sends a picture of a chess diagram to the Scanner; the extension only copies the picture into an App Group container shared with the app (group.com.chesslab.ChessLab) and asks the user to open ChessLab; it has no network access and nothing leaves the device. To try it: in Photos open any screenshot of a chess position, tap Share, choose ChessLab, then open ChessLab — the Scanner opens on that picture. (2) A more reliable Scanner (screen photos, review of doubtful squares one at a time). (3) A puzzle collection can be exported as a PGN file from its menu (standard share sheet) and re-imported as it was; with the user's optional iCloud sync on, imported collections are also kept in their own private iCloud database. (4) A "Show the puzzle theme" setting. (5) Chess960 series in the Laboratory. (6) The engine is updated from Stockfish 17.1 to Stockfish 19 (same licence, GPLv3; sources published, see below). (7) A progress gauge during game analysis. No change to permissions, privacy or licensing: no new permission, still no network call of ours, no account, no data collected.
 
 ChessLab is a free chess app — no paywall, no ads, no in-app purchases, no account, no login, no server. Nothing to set up before reviewing. It bundles seven modes: play against the embedded Stockfish engine (Elo ~900 to ~3190) or against one of nine "characters" played by the Maia-3 neural network (University of Toronto, AGPLv3), which predicts human moves at a given level and runs entirely on-device via Core ML; two players on one device; full game analysis with Stockfish; 58 hand-written opening courses with spaced-repetition training; over 130,000 Lichess puzzles; an engine-vs-engine laboratory; and twelve variants (Chess960, King of the Hill, Three-Check, Horde, Racing Kings, Atomic, Antichess, Crazyhouse, Duck Chess, two Barricades, and a house variant, Stolen Move).
 
