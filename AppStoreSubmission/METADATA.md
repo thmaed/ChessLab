@@ -1,6 +1,6 @@
 # Métadonnées App Store Connect — ChessLab
 
-**Version courante : 2.3, build 23** (fixés dans `project.pbxproj`). La 2.2 (build 22) est EN VENTE (READY_FOR_SALE, vérifié par `asc.py status` le 14/11/2026). Voir `RELEASE_NOTES-2.3.md` pour le détail. **Préparée le 14/11/2026 : fiche à cinq langues (fr-FR, en-GB, es-ES, de-DE, it-IT), nouveautés et notes de révision posées dans App Store Connect (version 2.3) ; le build n'est PAS archivé ni téléversé, la version n'est PAS soumise (attendre l'accord de Thierry). Les textes es/de/it attendent une relecture par un locuteur natif ; leurs captures et aperçus ne sont pas faits.**
+**Version courante : 2.3, build 24** (fixés dans `project.pbxproj`). La 2.2 (build 22) est EN VENTE (READY_FOR_SALE, vérifié par `asc.py status` le 14/11/2026). Voir `RELEASE_NOTES-2.3.md` pour le détail. **Préparée le 14/11/2026 : fiche à cinq langues (fr-FR, en-GB, es-ES, de-DE, it-IT), nouveautés et notes de révision posées dans App Store Connect (version 2.3) ; le build n'est PAS archivé ni téléversé, la version n'est PAS soumise (attendre l'accord de Thierry). Les textes es/de/it attendent une relecture par un locuteur natif ; leurs captures et aperçus ne sont pas faits.**
 
 > **Variantes régionales (14/11/2026)** — en-AU, en-CA (texte de l'anglais UK), es-MX (texte de es-ES), fr-CA (texte de fr-FR) et **en-US** reprennent le texte de leur langue-source, sans rien réécrire (`VARIANTS` dans `tools/asc/asc.py`). « ChessLab » seul est PRIS en en-US, en allemand et en italien : la fiche américaine s'appelle **« ChessLab: Chess Trainer »**, l'allemande « ChessLab Schach », l'italienne « ChessLab Scacchi ». Le nom sous l'icône reste « ChessLab ». Visuels : es-MX et fr-CA ont leur jeu (celui de es-ES / fr-FR) ; les variantes anglaises reprennent ceux de la langue principale (en-GB).
 
@@ -442,7 +442,7 @@ Réponses déduites du code (vérifié, pas deviné) :
 
 ### Version et build
 
-**2.3, build 23** — `MARKETING_VERSION = 2.3`, `CURRENT_PROJECT_VERSION = 23` (aux quatre configurations, app et extension de partage ; la 2.2, build 22, est en vente : à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.3.md`.
+**2.3, build 24** (le 23, téléversé le 14/11, est remplacé : il affichait « 2.3 » au-dessus des nouveautés 2.2 dans l'Aide) — `MARKETING_VERSION = 2.3`, `CURRENT_PROJECT_VERSION = 24` (aux quatre configurations, app et extension de partage ; la 2.2, build 22, est en vente : à revérifier par `asc.py build` avant l'archive). Nouveautés détaillées dans `RELEASE_NOTES-2.3.md`.
 
 **2.2, build 22** — `MARKETING_VERSION = 2.2`, `CURRENT_PROJECT_VERSION = 22` (aux quatre configurations, app et extension de partage ; la 2.1, build 21, est en vente et le 22 n'a jamais quitté le dépôt : à revérifier par `asc.py build` avant l'archive, et à monter si Xcode en a envoyé un à l'insu du dépôt). Nouveautés détaillées dans `RELEASE_NOTES-2.2.md`.
 

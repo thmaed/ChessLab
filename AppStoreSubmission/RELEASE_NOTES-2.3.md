@@ -2,7 +2,7 @@
 
 Notes DÉTAILLÉES pour le dépôt. Les textes à coller dans App Store Connect sont dans la section « Nouveautés de cette version » de `METADATA.md` (un par langue : fr-FR, en-GB, es-ES, de-DE, it-IT).
 
-> Version `2.3`, build `23` (la 2.2, build 22, est en vente). iOS et Android partent ensemble (Play : fiches dans `android/app/src/main/play/listings/`, état dans `android/PARITE.md`). Préparée le 14/11/2026 ; le build n'est pas archivé, la version n'est pas soumise.
+> Version `2.3`, build `24` (la 2.2, build 22, est en vente). iOS et Android partent ensemble (Play : fiches dans `android/app/src/main/play/listings/`, état dans `android/PARITE.md`). Préparée le 14/11/2026 ; le build n'est pas archivé, la version n'est pas soumise.
 
 ## Ce qui est nouveau
 
