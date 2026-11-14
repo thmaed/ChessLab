@@ -2144,8 +2144,8 @@ Fait des deux côtés : pastille « Automatique » par défaut, notation = langu
 - Forme : six tuiles en 3 × 2 sur Android, pastilles qui se replient (`FlowLayout`) sur iOS — écart de forme déjà assumé.
 
 ## Ergonomie 2.3 (14/11/2026) — à vérifier SUR APPAREIL (Galaxy)
-- [ ] Barre de jeu : « ½ Nulle » en pastille (Jouer, variantes), rond « ½ » seul dans Deux joueurs.
-- [ ] Accueil en deux étages (4 grandes tuiles + « Plus ») : téléphone et tablette.
-- [ ] Réglages : vignettes des thèmes (2 par ligne, 4 sur tablette) et des jeux de pièces (3).
+- [x] Barre de jeu : « ½ Nulle » en pastille (Jouer) — vu sur Galaxy A16 le 14/11 ; variantes et Deux joueurs non revus.
+- [x] Accueil en deux étages (4 grandes tuiles + « Plus ») : vu sur Galaxy A16 le 14/11 ; tablette non revue.
+- [x] Réglages : vignettes des thèmes et des jeux de pièces, tuile « Automatique » de la notation active par défaut — vu sur Galaxy A16 le 14/11.
 - [ ] Analyser : un fichier de plusieurs parties part dans la bibliothèque, un fichier d'une partie s'ouvre en analyse.
 - [ ] Aide : bloc « Nouveautés 2.3 » en tête.

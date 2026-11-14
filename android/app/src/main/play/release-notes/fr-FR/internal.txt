@@ -1,7 +1,7 @@
-ChessLab 2.2
-• Scanner plus fiable : captures d'écran, photos d'écran et plateaux réels.
-• Partager vers ChessLab : envoyez une image depuis la galerie, le scanner la lit.
-• Collections de puzzles : importez un PGN, travaillez en série ou en Woodpecker, exportez-le. Le thème du puzzle peut se masquer.
-• Laboratoire : séries en Chess960.
-• Stockfish 19, avec une jauge de progression pendant l'analyse.
-• Coup Volé : prise en passant corrigée au second coup.
+ChessLab 2.3
+• Cinq langues : français, anglais, espagnol, allemand et italien, partout dans l'app, cours compris.
+• Notation des coups « Automatique » : elle suit la langue ; un autre choix reste mémorisé.
+• Accueil en deux étages : quatre grandes tuiles, les autres modes sous « Plus ».
+• Bouton « ½ Nulle » plus clair dans la barre de jeu.
+• Analyser : un seul « Importer un fichier » (partie, position ou base de parties).
+• Réglages : thèmes du plateau et jeux de pièces en vignettes.

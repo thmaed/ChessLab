@@ -1,7 +1,7 @@
-ChessLab 2.2
-• More reliable scanner: screenshots, photos of a screen and real boards.
-• Share to ChessLab: send an image from your gallery and the scanner reads it.
-• Puzzle collections: import a PGN, work in series or as a Woodpecker programme, export it. The puzzle theme can be hidden.
-• Laboratory: Chess960 series.
-• Stockfish 19, with a progress gauge during analysis.
-• Stolen Move: en-passant fixed on the second move.
+ChessLab 2.3
+• Five languages: French, English, Spanish, German and Italian, everywhere in the app, courses included.
+• “Automatic” move notation: it follows the language; any other choice is remembered.
+• Home in two tiers: four large tiles, the other modes under “More”.
+• A clearer “½ Draw” button in the game bar.
+• Analyse: a single “Import a file” (one game, a position or a games database).
+• Settings: board themes and piece sets as thumbnails.

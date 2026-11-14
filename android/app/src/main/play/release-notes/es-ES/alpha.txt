@@ -1,0 +1,7 @@
+ChessLab 2.3
+• Cinco idiomas: francés, inglés, español, alemán e italiano, en toda la app, cursos incluidos.
+• Notación de las jugadas «Automática»: sigue el idioma; cualquier otra elección se recuerda.
+• Inicio en dos niveles: cuatro tarjetas grandes y los demás modos en «Más».
+• Botón «½ Tablas» más claro en la barra de juego.
+• Analizar: un único «Importar un archivo» (una partida, una posición o una base de partidas).
+• Ajustes: temas del tablero y juegos de piezas en miniaturas.
