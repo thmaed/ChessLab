@@ -495,13 +495,13 @@ def cmd_previews(c, args):
             print(f"  {locale} {preview_type}: {len(files)} aperçu(s)")
 
 
-def library_upload(c, kind, library_id, path, reference):
+def library_upload(c, kind, library_id, path, reference, category="APP_SCREENSHOTS_AND_PREVIEWS"):
     """Dépose un fichier dans l'asset library : réservation, téléversement
     par morceaux, confirmation."""
     data = path.read_bytes()
     reservation = c.post(f"/{kind}", {
         "type": kind,
-        "attributes": {"category": "APP_SCREENSHOTS_AND_PREVIEWS", "fileName": path.name,
+        "attributes": {"category": category, "fileName": path.name,
                        "fileSize": len(data), "referenceName": reference},
         "relationships": {"assetLibrary": rel("appAssetLibraries", library_id)},
     })["data"]
@@ -748,6 +748,45 @@ def cmd_submit(c, args):
     cmd_status(c, args)
 
 
+HEADER_SLOTS = (
+    # (type de placement, fichier de AppStoreSubmission/entete/, libellé) — un seul visuel par emplacement (DEFAULT_PROFILE, max 1).
+    ("PRODUCT_PAGE_HEADER_ASSET", "entete-{lang}-3840x1646.png", "en-tête de la page produit"),
+    ("APP_STORE_SEARCH_RESULTS_ASSET", "recherche-{lang}-5244x2950.png", "résultats de recherche"),
+)
+
+
+def cmd_headers(c, args):
+    """L'en-tête de la page produit et le visuel des RÉSULTATS DE RECHERCHE, par langue : l'API les accepte
+    par l'asset library (`PRODUCT_PAGE_HEADER_ASSET`, `APP_STORE_SEARCH_RESULTS_ASSET`, groupe DEFAULT_PROFILE,
+    un seul chacun), en catégorie CREATIVE_ASSETS. Fichiers : AppStoreSubmission/entete/. Avec --langs."""
+    app = find_app(c)
+    v = find_version(c, app["id"], args.version)
+    locs = visual_localizations(c, v["id"])
+    library_id = c.get(f"/apps/{app['id']}/assetLibrary")["data"]["id"]
+    uploaded = {}   # (langue, créneau) -> id dans la bibliothèque : un fichier par langue, placé sur chaque localisation
+    for locale, loc in locs.items():
+        if not locale_has_own_visuals(locale):
+            continue
+        lang = visuals_lang(locale)
+        for placement_type, pattern, label in HEADER_SLOTS:
+            path = SUBMISSION / "entete" / pattern.format(lang=lang)
+            if not path.exists():
+                print(f"  {locale} {label}: {path.name} introuvable")
+                continue
+            key = (lang, placement_type)
+            if key not in uploaded:
+                uploaded[key] = library_upload(c, "appAssetLibraryImages", library_id, path,
+                                               f"hdr-{args.version}-{path.stem}", category="CREATIVE_ASSETS")
+                wait_library(c, "appAssetLibraryImages", [uploaded[key]], label)
+            placed = c.try_post("/appAssetLibraryPlacements", {
+                "type": "appAssetLibraryPlacements",
+                "attributes": {"placementType": placement_type, "placementGroup": "DEFAULT_PROFILE"},
+                "relationships": {"image": rel("appAssetLibraryImages", uploaded[key]),
+                                  "appStoreVersionLocalization": rel("appStoreVersionLocalizations", loc["id"])},
+            })
+            print(f"  {locale} {label}: {'placé' if placed else 'refusé (voir ci-dessus)'}")
+
+
 def cmd_all(c, args):
     args.wait = True
     print("version"); cmd_version(c, args)
@@ -763,7 +802,7 @@ def cmd_all(c, args):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("command", choices=["apps", "version", "metadata", "screenshots", "previews", "duo", "duo_previews", "build", "attach", "review", "status", "all", "submit"])
+    p.add_argument("command", choices=["apps", "version", "metadata", "screenshots", "previews", "duo", "duo_previews", "headers", "build", "attach", "review", "status", "all", "submit"])
     p.add_argument("--version", default=None, help="version marketing (défaut : MARKETING_VERSION du projet)")
     p.add_argument("--build", default=None, help="numéro de build (défaut : CURRENT_PROJECT_VERSION du projet)")
     p.add_argument("--resume", action="store_true", help="duo : reprendre les fichiers déjà déposés (traitement Apple trop lent)")

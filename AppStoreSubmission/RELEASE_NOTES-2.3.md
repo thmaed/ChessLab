@@ -15,7 +15,7 @@ Notes DÉTAILLÉES pour le dépôt. Les textes à coller dans App Store Connect 
 ## À savoir avant de publier
 
 - Les textes es/de/it n'ont PAS été relus par un locuteur natif.
-- Visuels es / de / it (+ es-MX, fr-CA) : captures iPhone et iPad (10 + 10), écran EXTÉRIEUR du Duo (6), aperçu Duo dans la langue, aperçus iPhone/iPad communs (anglais, comme en français), en-têtes et résultats de recherche (`AppStoreSubmission/entete/`, à déposer à la main). NON faits : écran INTÉRIEUR du Duo (posture non pilotable), aperçus iPhone/iPad réenregistrés par langue. en-AU, en-CA, en-US : visuels de la langue principale (en-GB), à vérifier à la soumission.
+- Visuels es / de / it (+ es-MX, fr-CA) : captures iPhone et iPad (10 + 10), écran EXTÉRIEUR du Duo (6), aperçu Duo dans la langue, aperçus iPhone/iPad communs (anglais, comme en français), en-têtes de page produit et visuels de résultats de recherche (`AppStoreSubmission/entete/`, déposés par `asc.py headers --langs …`). NON faits : écran INTÉRIEUR du Duo (posture non pilotable), aperçus iPhone/iPad réenregistrés par langue. en-AU, en-CA, en-US : visuels de la langue principale (en-GB), à vérifier à la soumission.
 - Noms de l'app : « ChessLab » est libre en es-ES mais PRIS en de-DE et en it (comme en en-US) ; la fiche porte donc « ChessLab Schach » (de-DE) et « ChessLab Scacchi » (it). Le nom sous l'icône reste « ChessLab ». Code de langue Apple pour l'italien : `it` (pas `it-IT`).
 - Vérifié : tests unitaires iOS, tests d'interface sur simulateurs et sur iPhone 11 / XS Max / iPhone3, Galaxy A16 (voir `android/PARITE.md` pour ce qui reste à cocher).
 

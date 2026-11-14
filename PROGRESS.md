@@ -11166,3 +11166,8 @@ Un choix explicite déjà stocké est conservé tel quel.
 - Android : versionName 2.3 (le versionCode suit le fichier de build, prochain 37).
 - **Reste** : noms d'ouvertures des cours (`ecoName`, 113 noms anglais affichés tels quels dans toutes les langues), Duo
   intérieur, aperçus iPhone/iPad par langue, relecture native, build 23, Play (`publishListing` / `publishBundle`).
+- **Correction (14/11, soir)** : l'API d'App Store Connect accepte bel et bien l'EN-TÊTE de page produit et le visuel des
+  RÉSULTATS DE RECHERCHE — par l'asset library, `placementType` `PRODUCT_PAGE_HEADER_ASSET` (3840×1646 ou 5244×2950) et
+  `APP_STORE_SEARCH_RESULTS_ASSET` (5244×2950), groupe `DEFAULT_PROFILE`, UN seul de chaque par localisation, catégorie
+  `CREATIVE_ASSETS`. Nouvelle commande `asc.py headers --langs es,de,it,fr-CA` ; les groupes valides se lisent dans
+  `GET /appAssetLibraryRefData`. J'avais affirmé « pas d'API » sans l'avoir vérifié.

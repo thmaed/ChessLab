@@ -67,6 +67,13 @@ Pourquoi une signature manuelle : la clé d'API n'a pas accès aux certificats
 gérés dans le nuage par Xcode (« Cloud signing permission error »), donc
 `ExportOptions.plist` désigne explicitement le certificat et le profil.
 
+## Visuels de marque (en-tête, résultats de recherche)
+
+`asc.py headers [--langs es,de,it]` dépose `AppStoreSubmission/entete/entete-<langue>-3840x1646.png` (en-tête de la
+page produit) et `recherche-<langue>-5244x2950.png` (résultats de recherche) par l'asset library : placements
+`PRODUCT_PAGE_HEADER_ASSET` et `APP_STORE_SEARCH_RESULTS_ASSET`, groupe `DEFAULT_PROFILE`, un seul de chaque par
+localisation. Les valeurs acceptées se lisent dans `GET /appAssetLibraryRefData`. `asc.py status` ne les compte pas.
+
 ## Ce que l'API ne fait pas
 
 - L'étiquette de confidentialité (« Data Not Collected ») : pas d'API.
