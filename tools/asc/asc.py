@@ -66,12 +66,12 @@ LOCALES = {"fr-FR": "Français", "en-GB": "English", "es-ES": "Español", "de-DE
 
 # Variantes régionales : elles reprennent TEXTE pour TEXTE celui de leur langue-source (14/11/2026 : créées
 # sans rien réécrire). « en-US » porte un nom à lui (NAME_OVERRIDES) : « ChessLab » seul y est pris.
-# Les variantes de l'anglais n'ont pas de visuels à elles : Apple reprend ceux de la langue principale (en-GB).
+# Les variantes de l'anglais reçoivent le jeu de l'anglais UK (dossiers `en`).
 VARIANTS = {"en-AU": "en-GB", "en-CA": "en-GB", "en-US": "en-GB", "es-MX": "es-ES", "fr-CA": "fr-FR"}
 # « ChessLab » seul est pris en en-US (et en de, it) : la fiche américaine porte un nom à elle.
 NAME_OVERRIDES = {"en-US": "ChessLab: Chess Trainer"}
 LOCALES.update({"en-US": "English (U.S.)", "en-AU": "English (Australia)", "en-CA": "English (Canada)", "es-MX": "Español (México)", "fr-CA": "Français (Canada)"})
-VISUALS_INHERITED = {"en-AU", "en-CA", "en-US"}
+VISUALS_INHERITED = set()   # vide depuis le 14/11 : en-AU, en-CA, en-US reçoivent aussi les visuels de l'anglais UK (Apple devrait les reprendre seul ; on ne parie pas dessus)
 
 
 # Langue du dossier de captures d'une localisation : `fr`, `en`, `es`, `de` ou `it` (le code court de la
