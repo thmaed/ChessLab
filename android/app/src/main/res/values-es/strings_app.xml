@@ -391,7 +391,7 @@
     <string name="train_variation">%1$s está en el repertorio, pero la línea principal es %2$s.</string>
     <string name="train_variation_other">%1$s es otra variante del repertorio; la línea que trabajas pasa por %2$s.</string>
     <string name="variant_3check">Tres jaques</string>
-    <string name="variant_3check_blurb">Las reglas son las del juego clásico, mate incluido. Además, ganas en cuanto hayas dado jaque al rey rival TRES VECES durante la partida: cada jaque cuenta, tanto si se para, se captura o se huye en la jugada siguiente.</string>
+    <string name="variant_3check_blurb">Las reglas son las del juego clásico, mate incluido. Además, ganas en cuanto hayas dado jaque al rey rival TRES VECES durante la partida: cada jaque cuenta, ya se pare, se capture la pieza que lo da o se esquive en la jugada siguiente.</string>
     <string name="variant_antichess">Antiajedrez</string>
     <string name="variant_antichess_blurb">El objetivo está INVERTIDO: ganas perdiendo todas tus piezas o quedándote sin poder mover. Capturar es OBLIGATORIO siempre que sea posible; si hay varias capturas, eliges cuál. No hay jaque ni mate: el rey se captura como cualquier otra pieza y el enroque no existe.</string>
     <string name="variant_atomic">Atómico</string>
@@ -795,7 +795,7 @@
     <string name="discovery_section_understand">Comprender</string>
     <string name="discovery_section_explore">Explorar</string>
     <string name="discovery_0_title">Todo empieza aquí</string>
-    <string name="discovery_0_body">Este mosaico inicia una partida contra nueve personajes interpretados por Maia-3, una red que juega como un humano, o contra Stockfish. Los demás esperarán al final de la visita: dos minutos, lo prometemos.</string>
+    <string name="discovery_0_body">Esta tarjeta inicia una partida contra nueve personajes interpretados por Maia-3, una red que juega como un humano, o contra Stockfish. Los demás esperarán al final de la visita: dos minutos, lo prometemos.</string>
     <string name="discovery_1_title">Elige a tu adversario</string>
     <string name="discovery_1_body">Primero un personaje: cada uno tiene su estilo, su repertorio y su carácter, y juega como un jugador real de su nivel, errores incluidos. O Stockfish, con el deslizador, con el nombre del nivel al lado. La trampa de la primera noche: jugar a plena fuerza.</string>
     <string name="discovery_2_title">Las ayudas se eligen antes</string>

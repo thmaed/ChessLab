@@ -775,7 +775,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@: inchiodatura del tuo %@ davanti al tuo %@."
+            "value": "%@: inchiodatura — %@ davanti a %@."
           }
         }
       }
@@ -845,7 +845,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@: forchetta sul tuo %@ e sul tuo %@."
+            "value": "%@: forchetta su %@ e %@."
           }
         }
       }
@@ -1020,7 +1020,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@: il tuo %@ era in presa."
+            "value": "%1$@: %2$@ in presa."
           }
         }
       }
@@ -1553,7 +1553,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld%% di fallimenti"
+            "value": "%lld%% di insuccessi"
           }
         }
       }
@@ -1876,7 +1876,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld semimosse"
+            "value": "%lld mosse"
           }
         }
       }
@@ -2644,7 +2644,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld von 3 Schachs"
+            "value": "%lld von 3 Schachgeboten"
           }
         },
         "it": {
@@ -5298,7 +5298,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Arbitraggio…"
+            "value": "Verifica…"
           }
         }
       }
@@ -5736,7 +5736,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nessuno dei due lati ha lasciato sfuggire un matto forzato in 5 mosse o meno in questa partita."
+            "value": "Nessuno dei due giocatori ha lasciato sfuggire un matto forzato in 5 mosse o meno in questa partita."
           }
         }
       }
@@ -8309,7 +8309,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Brillante en la jugada 15, deja una pieza en prise en la 16. Juega rápido, lo ataca todo y se olvida de su rey. El principiante humano que Stockfish no sabe imitar."
+            "value": "Brillante en la jugada 15, deja una pieza colgando en la 16. Juega rápido, lo ataca todo y se olvida de su rey. El principiante humano que Stockfish no sabe imitar."
           }
         },
         "de": {
@@ -9595,7 +9595,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Questo testo non ha potuto essere letto né come una partita (PGN) né come una posizione (FEN)."
+            "value": "Non è stato possibile leggere questo testo né come partita (PGN) né come posizione (FEN)."
           }
         }
       }
@@ -9926,7 +9926,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Este mosaico inicia una partida contra nueve personajes interpretados por Maia-3, una red que juega como un humano, o contra Stockfish. Los demás esperarán al final de la visita: dos minutos, lo prometemos."
+            "value": "Esta tarjeta inicia una partida contra nueve personajes interpretados por Maia-3, una red que juega como un humano, o contra Stockfish. Los demás esperarán al final de la visita: dos minutos, lo prometemos."
           }
         },
         "de": {
@@ -13974,7 +13974,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Otras formas de jugar al ajedrez, presentadas en mosaicos: doce en total. Chess960 (Fischer Random): posición inicial sorteada, elegida por número (0-959) o compuesta por ti, contra el ordenador o a dos, con análisis al final de la partida. Contra el ordenador: Rey de la colina (gana el primer rey que llegue al centro), Tres jaques, Horda (las blancas solo tienen peones), Carrera de reyes, Atómico (cada captura explota), Antiajedrez (pierde todo para ganar), Crazyhouse (las piezas capturadas se unen a tu reserva y se vuelven a colocar en el tablero), Jugada Robada (juega una jugada con una pieza del rival), Duck Chess (un pato bloquea una casilla y se mueve en cada turno), Barricadas (d4 y e5 bloqueadas) y Barricadas aleatorias (los muros cambian de casilla en cada jugada). Cada mosaico explica sus reglas en su pantalla de ajustes; pista, aviso de jugada arriesgada, barra de evaluación y análisis en todas partes, y la fuerza del ordenador se ajusta como en el resto."
+            "value": "Otras formas de jugar al ajedrez, presentadas en tarjetas: doce en total. Chess960 (Fischer Random): posición inicial sorteada, elegida por número (0-959) o compuesta por ti, contra el ordenador o a dos, con análisis al final de la partida. Contra el ordenador: Rey de la colina (gana el primer rey que llegue al centro), Tres jaques, Horda (las blancas solo tienen peones), Carrera de reyes, Atómico (cada captura explota), Antiajedrez (pierde todo para ganar), Crazyhouse (las piezas capturadas se unen a tu reserva y se vuelven a colocar en el tablero), Jugada Robada (juega una jugada con una pieza del rival), Duck Chess (un pato bloquea una casilla y se mueve en cada turno), Barricadas (d4 y e5 bloqueadas) y Barricadas aleatorias (los muros cambian de casilla en cada jugada). Cada tarjeta explica sus reglas en su pantalla de ajustes; pista, aviso de jugada arriesgada, barra de evaluación y análisis en todas partes, y la fuerza del ordenador se ajusta como en el resto."
           }
         },
         "de": {
@@ -13986,7 +13986,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Altri modi di giocare a scacchi, presentati in riquadri — dodici in tutto. Chess960 (Fischer Random): posizione di partenza estratta a sorte, scelta per numero (0-959) o composta da te — contro il computer o in due, con analisi a fine partita. Contro il computer: Re della collina (il primo re al centro vince), Tre scacchi, Orda (il Bianco ha solo pedoni), Corsa dei re, Atomico (ogni cattura esplode), Antiscacchi (perdi tutto per vincere), Crazyhouse (i pezzi catturati entrano nella tua riserva e si rimettono sulla scacchiera), Mossa Rubata (gioca una mossa con un pezzo avversario), Duck Chess (un'anatra blocca una casa e si sposta a ogni turno), Barricate (d4 ed e5 murate) e Barricate casuali (i muri cambiano casa a ogni mossa). Ogni riquadro spiega le sue regole nella propria schermata delle impostazioni; suggerimento, avviso di errore grave, barra di valutazione e analisi ovunque, forza del computer regolabile come altrove."
+            "value": "Altri modi di giocare a scacchi, presentati in riquadri — dodici in tutto. Chess960 (Fischer Random): posizione di partenza estratta a sorte, scelta per numero (0-959) o composta da te — contro il computer o in due, con analisi a fine partita. Contro il computer: Re della collina (il primo re al centro vince), Tre scacchi, Orda (il Bianco ha solo pedoni), Corsa dei re, Atomico (ogni cattura esplode), Antiscacchi (perdi tutto per vincere), Crazyhouse (i pezzi catturati entrano nella tua riserva e si rimettono sulla scacchiera), Mossa Rubata (gioca una mossa con un pezzo avversario), Duck Chess (un'anatra blocca una casa e si sposta a ogni turno), Barricate (d4 ed e5 murate) e Barricate casuali (i muri cambiano casa a ogni mossa). Ogni riquadro spiega le sue regole nella propria schermata delle impostazioni; suggerimento, avviso di mossa rischiosa, barra di valutazione e analisi ovunque, forza del computer regolabile come altrove."
           }
         }
       }
@@ -22079,7 +22079,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "L'analisi non ha potuto avviarsi: il motore non è disponibile."
+            "value": "Impossibile avviare l'analisi: il motore non è disponibile."
           }
         }
       }
@@ -24901,7 +24901,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las reglas son las del juego clásico, mate incluido. Además, ganas en cuanto hayas dado jaque al rey rival TRES VECES durante la partida: cada jaque cuenta, tanto si se para, se captura o se huye en la jugada siguiente."
+            "value": "Las reglas son las del juego clásico, mate incluido. Además, ganas en cuanto hayas dado jaque al rey rival TRES VECES durante la partida: cada jaque cuenta, ya se pare, se capture la pieza que lo da o se esquive en la jugada siguiente."
           }
         },
         "de": {
@@ -25554,7 +25554,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Leggi la partita"
+            "value": "Riproduci la partita"
           }
         }
       }
@@ -29829,7 +29829,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Geh ohne Sorge"
+            "value": "Ruhig unterbrechen"
           }
         },
         "it": {
@@ -30191,7 +30191,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Übergehen"
+            "value": "Überspringen"
           }
         },
         "it": {
@@ -35992,7 +35992,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nochmal"
+            "value": "Erneut versuchen"
           }
         },
         "it": {
@@ -37874,7 +37874,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Seine Züge sehen falsch aus. Die Hälfte ist es wirklich, die andere Hälfte kostet jeden eine Figur, der das glaubt. Tappt selbst aus Prinzip in die Fallen der anderen."
+            "value": "Seine Züge sehen falsch aus. Die Hälfte davon ist es wirklich, die andere Hälfte kostet jeden eine Figur, der das glaubt. Tappt selbst aus Prinzip in die Fallen der anderen."
           }
         },
         "it": {
@@ -39112,7 +39112,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tracking"
+            "value": "Überblick"
           }
         },
         "it": {
@@ -39956,7 +39956,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tocca una casa per posare un %@; toccalo di nuovo per cancellarlo."
+            "value": "Tocca una casa per posare il pezzo (%@); toccala di nuovo per cancellarlo."
           }
         }
       }
@@ -40139,7 +40139,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fine"
+            "value": "Termina"
           }
         }
       }
@@ -44799,7 +44799,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Woodpecker allenato oggi."
+            "value": "Woodpecker svolto oggi."
           }
         }
       }
@@ -47526,7 +47526,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "drei Schachs gegeben"
+            "value": "drei Schachgebote erteilt"
           }
         },
         "it": {
@@ -47868,7 +47868,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tausch"
+            "value": "Abtausch"
           }
         },
         "it": {
@@ -49112,7 +49112,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Coach · %@ dei giocatori di livello %lld giocano questa mossa: un incidente, non un'abitudine."
+            "value": "Coach · %@ dei giocatori di livello %lld giocano questa mossa: una svista, non un'abitudine."
           }
         }
       }
@@ -49196,7 +49196,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Secondo Maia: ciò che giocano gli umani, non ciò che è buono."
+            "value": "Secondo Maia: ciò che giocano gli umani, non ciò che è giusto."
           }
         }
       }
@@ -49778,7 +49778,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Erneut versuchen"
+            "value": "Puzzles zum Wiederholen"
           }
         },
         "it": {
@@ -50652,7 +50652,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tutti i lati"
+            "value": "Entrambi i lati"
           }
         }
       }
@@ -50850,7 +50850,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ogni giorno l'app raccoglie ciò che c'è da ripassare, in ordine: posizioni d'apertura da ripassare (ripetizione dilazionata), puzzle sbagliati, puzzle tratti dalle tue partite, il tuo ciclo Woodpecker se è in corso (fatto non appena ci hai lavorato oggi) e un finale del giorno. Vuole essere breve: al massimo 5 puzzle per passaggio e un tetto di aperture che regoli in basso nella schermata (2, 5 o 8). Contano solo le posizioni DA RIPASSARE: percorrere una linea fino alla posizione da ripassare non esaurisce la tua quota. Un passaggio diventa «fatto» quando il suo obiettivo del giorno è raggiunto. La tua serie conta i giorni di allenamento di fila; le medaglie segnano 3, 7, 30, 100 e 365 giorni. I ripassi che l'app pianifica dopo una partita non contano nella serie."
+            "value": "Ogni giorno l'app raccoglie ciò che c'è da ripassare, in ordine: posizioni d'apertura in scadenza (ripetizione dilazionata), puzzle sbagliati, puzzle tratti dalle tue partite, il tuo ciclo Woodpecker se è in corso (fatto non appena ci hai lavorato oggi) e un finale del giorno. Vuole essere breve: al massimo 5 puzzle per passaggio e un tetto di aperture che regoli in basso nella schermata (2, 5 o 8). Contano solo le posizioni DA RIPASSARE: percorrere una linea fino alla posizione da ripassare non esaurisce la tua quota. Un passaggio diventa «fatto» quando il suo obiettivo del giorno è raggiunto. La tua serie conta i giorni di allenamento di fila; le medaglie segnano 3, 7, 30, 100 e 365 giorni. I ripassi che l'app pianifica dopo una partita non contano nella serie."
           }
         }
       }
@@ -50996,7 +50996,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ogni giorno l'app prepara ciò che c'è da ripassare: posizioni d'apertura da ripassare, puzzle sbagliati, un finale. Completala per allungare la tua serie di giorni."
+            "value": "Ogni giorno l'app prepara ciò che c'è da ripassare: posizioni d'apertura in scadenza, puzzle sbagliati, un finale. Completala per allungare la tua serie di giorni."
           }
         }
       }
@@ -51248,7 +51248,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tutto è nell'aiuto"
+            "value": "Trovi tutto nell'Aiuto"
           }
         }
       }
@@ -51574,7 +51574,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Analizza una partita o una posizione con Stockfish: classificazione delle mosse (imprecisione, errore, errore grave), curva di valutazione, frecce delle mosse migliori e freccia rossa della minaccia avversaria, riproduzione automatica, creazione di puzzle dagli errori e ricerca dei matti mancati da uno dei due lati. Esportazione PGN ricaricabile. Alla fine dell'analisi di una tua partita contro il computer, i tuoi errori diventano puzzle; la schermata Analizza mette l'ultima partita in cima, con accesso diretto ai matti mancati. Inserimento tramite PGN, FEN, editor o scanner. Il Coach aggiunge, sotto la spiegazione di un errore, la quota di giocatori del tuo livello che giocano questa mossa (secondo Maia: ciò che giocano gli umani, non ciò che è buono)."
+            "value": "Analizza una partita o una posizione con Stockfish: classificazione delle mosse (imprecisione, errore, errore grave), curva di valutazione, frecce delle mosse migliori e freccia rossa della minaccia avversaria, riproduzione automatica, creazione di puzzle dagli errori e ricerca dei matti mancati da uno dei due lati. Esportazione PGN ricaricabile. Alla fine dell'analisi di una tua partita contro il computer, i tuoi errori diventano puzzle; la schermata Analizza mette l'ultima partita in cima, con accesso diretto ai matti mancati. Inserimento tramite PGN, FEN, editor o scanner. Il Coach aggiunge, sotto la spiegazione di un errore, la quota di giocatori del tuo livello che giocano questa mossa (secondo Maia: ciò che giocano gli umani, non ciò che è giusto)."
           }
         }
       }
@@ -53485,7 +53485,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "«%@» è un'altra variante del repertorio — la linea che stai lavorando passa per %@. Cosa vuoi fare?"
+            "value": "«%@» è un'altra variante del repertorio — la linea che stai allenando passa per %@. Cosa vuoi fare?"
           }
         }
       }

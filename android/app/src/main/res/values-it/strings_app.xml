@@ -192,7 +192,7 @@
     <string name="progress_level_reached">"Livello raggiunto: "</string>
     <string name="progress_by_difficulty">Successo per difficoltà</string>
     <string name="progress_to_work_on">Da lavorare</string>
-    <string name="progress_failed">%d%% di fallimenti</string>
+    <string name="progress_failed">%d%% di insuccessi</string>
     <string name="progress_failed_of">%1$d %% di fallimenti su %2$d</string>
     <string name="progress_train_theme">Avvia una serie su questo tema</string>
     <string name="progress_empty_title">Niente da mostrare per ora</string>
@@ -415,8 +415,8 @@
     <string name="your_turn">Tocca a te</string>
     <plurals name="analysis_move_count">
         <item quantity="one">%1$d mossa</item>
-        <item quantity="other">%d semimosse</item>
-        <item quantity="many">%d semimosse</item>
+        <item quantity="other">%d mosse</item>
+        <item quantity="many">%d mosse</item>
     </plurals>
     <plurals name="course_count_endgames">
         <item quantity="one">%1$d finale</item>
@@ -532,8 +532,8 @@
     <string name="filter_all">Tutti</string>
     <plurals name="course_moves">
         <item quantity="one">%1$d mossa</item>
-        <item quantity="other">%d semimosse</item>
-        <item quantity="many">%d semimosse</item>
+        <item quantity="other">%d mosse</item>
+        <item quantity="many">%d mosse</item>
     </plurals>
     <string name="import_title">Repertorio</string>
     <string name="import_add">Aggiungi un repertorio</string>
@@ -681,11 +681,11 @@
     <string name="explain_mate">%s: ed è scacco matto.</string>
     <string name="explain_back_rank_in">%1$s: matto di corridoio in %2$d mosse.</string>
     <string name="explain_mate_in">%1$s: matto in %2$d mosse.</string>
-    <string name="explain_hanging">%1$s: il tuo %2$s era in presa.</string>
-    <string name="explain_fork_two">%1$s: forchetta sul tuo %2$s e sul tuo %3$s.</string>
+    <string name="explain_hanging">%1$s: %2$s in presa.</string>
+    <string name="explain_fork_two">%1$s: forchetta su %2$s e %3$s.</string>
     <string name="explain_fork">%s: forchetta.</string>
     <string name="explain_discovered">%s: scacco di scoperta.</string>
-    <string name="explain_pin">%1$s: inchiodatura del tuo %2$s davanti al tuo %3$s.</string>
+    <string name="explain_pin">%1$s: inchiodatura — %2$s davanti a %3$s.</string>
     <string name="explain_cost">Perdi %d punti.</string>
     <string name="analysis_summary">Bilancio della partita</string>
     <string name="analysis_export_pgn">Esporta il PGN</string>
@@ -703,7 +703,7 @@
     <string name="missed_mates_many_title">%d matti mancati</string>
     <string name="missed_mate_line_white">Mossa %1$d, Bianco: matto in %2$d</string>
     <string name="missed_mate_line_black">Mossa %1$d, Nero: matto in %2$d</string>
-    <string name="missed_mates_none_body">Nessuno dei due lati ha lasciato sfuggire un matto forzato in 5 mosse o meno in questa partita.</string>
+    <string name="missed_mates_none_body">Nessuno dei due giocatori ha lasciato sfuggire un matto forzato in 5 mosse o meno in questa partita.</string>
     <string name="missed_mates_add_one">Aggiungerla ai tuoi puzzle? La ritroverai in Puzzle, «Le mie partite».</string>
     <string name="missed_mates_add_many">Aggiungerli ai tuoi puzzle? Li ritroverai in Puzzle, «Le mie partite».</string>
     <string name="missed_mates_add">Aggiungi ai miei puzzle</string>
@@ -823,7 +823,7 @@
     <string name="discovery_chip_resign">Abbandona</string>
     <string name="discovery_skip">Salta</string>
     <string name="discovery_next">Avanti</string>
-    <string name="discovery_done">Fine</string>
+    <string name="discovery_done">Termina</string>
     <string name="discovery_previous">Passaggio precedente</string>
     <string name="discovery_replay_title">Rivedi il tour guidato</string>
     <string name="discovery_replay_sub">Due minuti per orientarti tra i comandi essenziali.</string>
@@ -983,7 +983,7 @@
     <string name="play_engine_down">Il computer non si è avviato: non giocherà.</string>
     <string name="play_engine_retry">Riprova</string>
     <string name="thermal_throttled">Dispositivo caldo — motore limitato</string>
-    <string name="analysis_play">Leggi la partita</string>
+    <string name="analysis_play">Riproduci la partita</string>
     <string name="analysis_pause">Metti in pausa</string>
     <string name="analysis_play_best">Gioca la mossa migliore</string>
     <string name="library_search">Cerca un giocatore o un tag</string>
@@ -1128,10 +1128,10 @@
     <string name="coach_less_than_one">meno dell\'1%</string>
     <string name="coach_most_common">Il più frequente: %1$s (%2$s).</string>
     <string name="coach_typical">Coach · %1$s dei giocatori di livello %2$d giocano questa mossa: errore tipico.</string>
-    <string name="coach_accident">Coach · %1$s dei giocatori di livello %2$d giocano questa mossa: un incidente, non un\'abitudine.</string>
+    <string name="coach_accident">Coach · %1$s dei giocatori di livello %2$d giocano questa mossa: una svista, non un\'abitudine.</string>
     <string name="coach_rare">Coach · mossa rara: %1$s dei giocatori di livello %2$d la trovano.</string>
     <string name="coach_plain">Coach · %1$s dei giocatori di livello %2$d giocano questa mossa.</string>
-    <string name="coach_caveat">Secondo Maia: ciò che giocano gli umani, non ciò che è buono.</string>
+    <string name="coach_caveat">Secondo Maia: ciò che giocano gli umani, non ciò che è giusto.</string>
     <plurals name="home_repertoire_exits">
         <item quantity="one">%1$d posizione del tuo repertorio da ripassare</item>
         <item quantity="other">%d posizioni del tuo repertorio da ripassare</item>
@@ -1174,7 +1174,7 @@
     <string name="daily_done_missed">Nessun puzzle sbagliato in attesa.</string>
     <string name="daily_done_own">Nessun puzzle dalle tue partite in attesa.</string>
     <string name="daily_done_endgame">Finale del giorno aperto.</string>
-    <string name="daily_done_woodpecker">Woodpecker allenato oggi.</string>
+    <string name="daily_done_woodpecker">Woodpecker svolto oggi.</string>
     <string name="daily_todo_openings">Posizioni da ripassare: %d</string>
     <string name="daily_todo_missed">Puzzle sbagliati da rigiocare: %d</string>
     <string name="daily_todo_own">Puzzle tratti dai tuoi errori: %d</string>
@@ -1203,11 +1203,11 @@
     <string name="filter_level">Livello</string>
     <string name="filter_white">Bianco</string>
     <string name="filter_black">Nero</string>
-    <string name="filter_all_sides">Tutti i lati</string>
+    <string name="filter_all_sides">Entrambi i lati</string>
     <string name="filter_all_levels">Tutti i livelli</string>
     <string name="discovery_section_whatsnew">Novità della 2.2</string>
     <string name="discovery_daily_title">La tua sessione del giorno</string>
-    <string name="discovery_daily_body">Ogni giorno l\'app prepara ciò che c\'è da ripassare: posizioni d\'apertura da ripassare, puzzle sbagliati, un finale. Completala per allungare la tua serie di giorni.</string>
+    <string name="discovery_daily_body">Ogni giorno l\'app prepara ciò che c\'è da ripassare: posizioni d\'apertura in scadenza, puzzle sbagliati, un finale. Completala per allungare la tua serie di giorni.</string>
     <string name="discovery_timelimit_title">Un orologio, se vuoi</string>
     <string name="discovery_timelimit_body">«Limite di tempo» è spento per impostazione predefinita: accendilo per scegliere una cadenza (Bullet, Blitz, Rapid…). L\'app ricorda la tua ultima scelta.</string>
     <string name="discovery_wn_0_title">Uno scanner più affidabile</string>
@@ -1218,7 +1218,7 @@
     <string name="discovery_wn_2_body">Il Laboratorio gioca anche serie in Chess960: una posizione diversa per ogni coppia di partite, o il numero che preferisci.</string>
     <string name="discovery_wn_3_title">Stockfish 19</string>
     <string name="discovery_wn_3_body">Il motore passa a Stockfish 19, e un indicatore di avanzamento segue l\'analisi in corso.</string>
-    <string name="discovery_wn_4_title">Tutto è nell\'aiuto</string>
+    <string name="discovery_wn_4_title">Trovi tutto nell\'Aiuto</string>
     <string name="discovery_wn_4_body">Il «?» raccoglie il dettaglio delle novità, e puoi rivedere questo tour quando vuoi.</string>
     <string name="discovery_replay_news_title">Rivedi le novità</string>
     <string name="discovery_replay_news_sub">Un breve percorso tra le novità, dove vivono.</string>
@@ -1282,7 +1282,7 @@
     <string name="puzzle_your_rating">Il tuo punteggio</string>
     <string name="puzzle_success">Successo</string>
     <string name="puzzle_to_work_on">Da lavorare:</string>
-    <string name="puzzle_failure_rate">%d%% di fallimenti</string>
+    <string name="puzzle_failure_rate">%d%% di insuccessi</string>
     <string name="puzzle_reset">Reimposta</string>
     <string name="woodpecker_sheet_intro">Un lotto fisso di puzzle, risolto per intero e poi ripreso in un nuovo ordine, ciclo dopo ciclo, per trovarne di più e più in fretta. Scegli i suoi puzzle, poi la sua dimensione.</string>
     <string name="puzzle_lot_size">Dimensione del lotto</string>

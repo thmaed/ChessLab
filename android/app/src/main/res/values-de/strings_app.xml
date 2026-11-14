@@ -225,7 +225,7 @@
     <string name="puzzle_next">Nächstes Puzzle</string>
     <string name="puzzle_prompt">%1$s · %2$d – finde den besten Zug</string>
     <string name="puzzle_score">%1$d/%2$d gelöst</string>
-    <string name="puzzle_skip">Übergehen</string>
+    <string name="puzzle_skip">Überspringen</string>
     <string name="puzzle_solved">Gelöst</string>
     <string name="puzzle_wrong_solution">Das ist nicht der Zug – die Lösung begann mit %1$s</string>
     <string name="rival_silent">Der Gegner hat nicht geantwortet</string>
@@ -260,7 +260,7 @@
     <string name="eval_a11y_score">%1$s für %2$s</string>
     <string name="reason_stalemate">Patt</string>
     <string name="reason_king_of_the_hill">König im Zentrum</string>
-    <string name="reason_three_checks">drei Schachs gegeben</string>
+    <string name="reason_three_checks">drei Schachgebote erteilt</string>
     <string name="reason_horde_extinct">keine Figur mehr</string>
     <string name="reason_racing_goal">König auf der 8. Reihe angekommen</string>
     <string name="reason_racing_draw">beide Könige kommen gleichzeitig an</string>
@@ -271,7 +271,7 @@
     <string name="variant_draw">Remis (%1$s)</string>
     <string name="variant_side_won">%1$s hat gewonnen (%2$s)</string>
     <string name="variant_three_checks_badge">%1$d/3</string>
-    <string name="variant_three_checks_a11y">%d von 3 Schachs</string>
+    <string name="variant_three_checks_a11y">%d von 3 Schachgeboten</string>
     <string name="variant_player_you">Du</string>
     <string name="variant_player_engine">Computer</string>
     <string name="analysis_progress">Analyse: Zug %1$d/%2$d</string>
@@ -761,7 +761,7 @@
     <string name="endgame_free_note_draw">Halte das Remis: Jeder Zug, der es hält, wird akzeptiert (von der Engine geprüft).</string>
     <string name="endgame_slip">%1$s → %2$s</string>
     <string name="endgame_slip_title">Dieser Zug gibt das Urteil aus der Hand</string>
-    <string name="endgame_retry">Nochmal</string>
+    <string name="endgame_retry">Erneut versuchen</string>
     <string name="endgame_free_drawn">Remis.</string>
     <string name="endgame_arbitrating">Prüfung…</string>
     <string name="endgame_unavailable">Die Engine konnte diese Stellung nicht beurteilen.</string>
@@ -787,7 +787,7 @@
     <string name="discovery_4_body">Bewertungskurve, Genauigkeit, Züge in farbigen Kapseln – und sowohl die Kurve als auch die Kapseln lassen sich antippen, um durch die Partie zu navigieren. Die Bibliothek behält alles.</string>
     <string name="discovery_5_title">Die Start-Verknüpfung</string>
     <string name="discovery_5_body">Auch deine letzten Partien findest du hier: Ein Tipp öffnet direkt ihre Analyse, ohne Umweg über die Bibliothek.</string>
-    <string name="discovery_6_title">Geh ohne Sorge</string>
+    <string name="discovery_6_title">Ruhig unterbrechen</string>
     <string name="discovery_6_body">Die laufende Partie wird automatisch gespeichert. Wenn du zurückkommst, wartet „Partie fortsetzen“ oben auf dem Startbildschirm.</string>
     <string name="discovery_7_title">Die Suche schwebt</string>
     <string name="discovery_7_body">Unter „Eröffnungen“ schwebt das Suchfeld ÜBER dem Baum. Suche, schließe dann die Tastatur und tippe unten auf die Ergebnisse.</string>
@@ -802,7 +802,7 @@
     <string name="discovery_chip_moves">Gespielte Züge</string>
     <string name="discovery_chip_back">Zurück + „Hier fortsetzen“</string>
     <string name="discovery_chip_resign">Aufgeben</string>
-    <string name="discovery_skip">Übergehen</string>
+    <string name="discovery_skip">Überspringen</string>
     <string name="discovery_next">Weiter</string>
     <string name="discovery_done">Fertig</string>
     <string name="discovery_previous">Vorheriger Schritt</string>
@@ -905,7 +905,7 @@
     <string name="play_accept">Annehmen</string>
     <string name="play_decline">Ablehnen</string>
     <string name="play_engine_unavailable">Engine nicht verfügbar</string>
-    <string name="play_retry">Nochmal</string>
+    <string name="play_retry">Erneut versuchen</string>
     <string name="play_summary_character">Gegen %1$s, Stufe %2$d</string>
     <string name="play_summary_engine">Gegen Stockfish, Stufe %1$d</string>
     <string name="play_summary_maia_down">Maia nicht verfügbar, Stockfish hat gespielt</string>
@@ -957,7 +957,7 @@
     <string name="narration_mate">%s, Schachmatt</string>
     <string name="narration_move_by">%1$s: %2$s</string>
     <string name="play_engine_down">Der Computer ist nicht gestartet: Er wird nicht spielen.</string>
-    <string name="play_engine_retry">Nochmal</string>
+    <string name="play_engine_retry">Erneut versuchen</string>
     <string name="thermal_throttled">Gerät heiß – Engine gedrosselt</string>
     <string name="analysis_play">Partie abspielen</string>
     <string name="analysis_pause">Pausieren</string>
@@ -1134,7 +1134,7 @@
         <item quantity="other">Zyklus %1$d: noch %2$d Puzzles</item>
     </plurals>
     <string name="daily_step_openings">Eröffnungen zu wiederholen</string>
-    <string name="daily_step_missed">Erneut versuchen</string>
+    <string name="daily_step_missed">Puzzles zum Wiederholen</string>
     <string name="daily_step_own">Puzzles aus deinen Partien</string>
     <string name="daily_step_endgame">Ein Endspiel</string>
     <string name="daily_step_woodpecker">Woodpecker-Zyklus</string>

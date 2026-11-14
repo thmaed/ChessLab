@@ -230,7 +230,7 @@ ChessLab embeds the Stockfish engine (GPLv3 license), the University of Toronto'
 
 ---
 
-## Español (España) — es-ES (2.3 — localisation à ajouter dans App Store Connect ; relecture par un locuteur natif À FAIRE)
+## Español (España) — es-ES (2.3 — localisation à ajouter dans App Store Connect ; relue le 14/11/2026 par Claude Opus 5.5, faute de locuteur natif)
 
 **Nombre** (30 car. max) :
 ```
@@ -264,7 +264,7 @@ Nueve personajes interpretados por Maia-3, una red entrenada con millones de par
 ANALIZAR Y ENTENDER
 Cada jugada se clasifica (imprecisión, error, error grave, jugada brillante…), cada jugador recibe su precisión y la app explica por qué una jugada era mala. El Coach añade la proporción de jugadores de tu nivel que la juegan. Al final propone convertir tus errores y tus mates perdidos en puzles. Entrada por PGN, FEN, editor de posiciones o escáner de fotos.
 
-SESIÓN DEL DÍA
+SESIÓN DIARIA
 Cada día, lo que hay que repasar: posiciones de apertura pendientes, puzles fallados, un final. Una racha de días y medallas para mantener el ritmo.
 
 APERTURAS
@@ -280,7 +280,7 @@ VARIANTES Y MÁS
 Chess960 y once variantes contra el ordenador (Rey de la colina, Tres jaques, Horda, Atómico, Crazyhouse, Duck Chess, Barricadas…), cada una con su propio análisis. Modo de dos jugadores y Laboratorio para comparar dos ajustes de Stockfish.
 
 IPHONE Y IPAD
-Tablero grande y paneles en paralelo en iPad, teclado y trackpad, vertical y horizontal. En francés, inglés, español, alemán e italiano. Sincronización iCloud opcional, desactivada por defecto.
+Tablero grande y paneles lado a lado en iPad, teclado y trackpad, vertical y horizontal. En francés, inglés, español, alemán e italiano. Sincronización iCloud opcional, desactivada por defecto.
 
 PRIVACIDAD
 Sin conexión por defecto: ningún servidor de ChessLab, ninguna medición de audiencia, ninguna publicidad. Tus partidas se quedan en tu dispositivo.
@@ -290,7 +290,7 @@ ChessLab integra el motor Stockfish (licencia GPLv3), la red Maia-3 de la Univer
 
 ---
 
-## Deutsch — de-DE (2.3 — localisation à ajouter dans App Store Connect ; relecture par un locuteur natif À FAIRE)
+## Deutsch — de-DE (2.3 — localisation à ajouter dans App Store Connect ; relue le 14/11/2026 par Claude Opus 5.5, faute de locuteur natif)
 
 **Name** (30 car. max — « ChessLab » seul est déjà pris par une autre app en allemand, constaté le 14/11/2026, comme en en-US) :
 ```
@@ -340,7 +340,7 @@ VARIANTEN UND MEHR
 Chess960 und elf Varianten gegen den Computer (King of the Hill, Drei-Schach, Horde, Atomschach, Crazyhouse, Duck Chess, Barrikaden …), jede mit eigener Analyse. Zwei-Spieler-Modus und Labor, um zwei Stockfish-Einstellungen zu vergleichen.
 
 IPHONE UND IPAD
-Großes Brett und Bereiche nebeneinander auf dem iPad, Tastatur und Trackpad, Hoch- und Querformat. Auf Französisch, Englisch, Spanisch, Deutsch und Italienisch. Optionale iCloud-Synchronisierung, standardmäßig aus.
+Großes Brett und Bedienfelder nebeneinander auf dem iPad, Tastatur und Trackpad, Hoch- und Querformat. Auf Französisch, Englisch, Spanisch, Deutsch und Italienisch. Optionale iCloud-Synchronisierung, standardmäßig aus.
 
 DATENSCHUTZ
 Standardmäßig offline: kein ChessLab-Server, keine Reichweitenmessung, keine Werbung. Deine Partien bleiben auf deinem Gerät.
@@ -350,7 +350,7 @@ ChessLab enthält die Engine Stockfish (Lizenz GPLv3), das Netz Maia-3 der Unive
 
 ---
 
-## Italiano — it (2.3 — localisation à ajouter dans App Store Connect ; relecture par un locuteur natif À FAIRE)
+## Italiano — it (2.3 — localisation à ajouter dans App Store Connect ; relue le 14/11/2026 par Claude Opus 5.5, faute de locuteur natif)
 
 **Nome** (30 car. max — « ChessLab » seul est déjà pris par une autre app en italien, constaté le 14/11/2026 ; le code de langue Apple est `it`, pas `it-IT`) :
 ```
@@ -382,10 +382,10 @@ AVVERSARI CHE GIOCANO COME UMANI
 Nove personaggi interpretati da Maia-3, una rete addestrata su milioni di partite umane: non cerca la mossa migliore, ma quella che giocherebbe un umano di quel livello, errori compresi. Ognuno ha il suo stile, il suo repertorio e il suo temperamento, e un livello regolabile sulla scala umana. Oppure affronta Stockfish, dal principiante (~900 Elo) al massimo (~3190). Orologio facoltativo, suggerimento, avviso prima di una mossa rischiosa e barra di valutazione a piacere.
 
 ANALIZZARE E CAPIRE
-Ogni mossa è classificata (imprecisione, errore, errore grave, mossa brillante…), ogni giocatore riceve la sua precisione e l'app spiega perché una mossa era cattiva. Il Coach aggiunge la quota di giocatori del tuo livello che la giocano. Alla fine propone di trasformare i tuoi errori e i tuoi matti mancati in puzzle. Inserimento tramite PGN, FEN, editor di posizioni o scanner di foto.
+Ogni mossa è classificata (imprecisione, errore, errore grave, mossa brillante…), ogni giocatore riceve la sua precisione e l'app spiega perché una mossa era debole. Il Coach aggiunge la quota di giocatori del tuo livello che la giocano. Alla fine propone di trasformare i tuoi errori e i tuoi matti mancati in puzzle. Inserimento tramite PGN, FEN, editor di posizioni o scanner di foto.
 
 SESSIONE DEL GIORNO
-Ogni giorno, ciò che c'è da ripassare: posizioni d'apertura da ripassare, puzzle sbagliati, un finale. Una serie di giorni e medaglie per mantenere il ritmo.
+Ogni giorno, ciò che c'è da ripassare: posizioni d'apertura in scadenza, puzzle sbagliati, un finale. Una serie di giorni e medaglie per mantenere il ritmo.
 
 APERTURE
 58 aperture scritte a mano (in cinque lingue) e riviste con il motore: ogni mossa è spiegata, frecce colorate collegano la scacchiera all'elenco e la ripetizione dilazionata le fissa. Importa anche i tuoi repertori in PGN.
