@@ -27,8 +27,10 @@ struct TwoPlayerSetupView: View {
         let stored = TwoPlayerSettingsStore.load()
         let saved = stored ?? .default
 
-        _whiteName = State(initialValue: stored == nil ? LocalizationController.string("Blancs") : saved.whiteName)
-        _blackName = State(initialValue: stored == nil ? LocalizationController.string("Noirs") : saved.blackName)
+        _whiteName = State(initialValue: stored == nil
+            ? PlayerName.white : PlayerName.display(saved.whiteName, fallback: PlayerName.white))
+        _blackName = State(initialValue: stored == nil
+            ? PlayerName.black : PlayerName.display(saved.blackName, fallback: PlayerName.black))
         _rotationMode = State(initialValue: saved.rotationMode)
         _timeLimit = State(initialValue: TimeLimitSelection(
             savedID: saved.timeControlID, customMinutes: saved.customMinutes,

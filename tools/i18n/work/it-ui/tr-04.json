@@ -1,0 +1,434 @@
+[
+{
+"id": 440,
+"it": "Gioca una partita o risolvi dei puzzle per vedere i tuoi progressi."
+},
+{
+"id": 441,
+"it": "Gioca, analizza, migliora."
+},
+{
+"id": 442,
+"it": "L'avversario sta giocando…"
+},
+{
+"id": 443,
+"it": "Aggiungerla ai tuoi puzzle? La ritroverai in Puzzle, «Le mie partite»."
+},
+{
+"id": 444,
+"it": "L'analisi non ha potuto avviarsi: il motore non è disponibile."
+},
+{
+"id": 445,
+"it": "L'arbitro e la difesa si basano sul motore — riavvialo per continuare."
+},
+{
+"id": 447,
+"it": "L'integrazione di Stockfish fa di ChessLab, nel suo insieme, un'opera derivata sotto GPLv3. Il codice sorgente, corrispondente al binario distribuito, è pubblicato qui."
+},
+{
+"id": 448,
+"it": "Il computer contro sé stesso"
+},
+{
+"id": 449,
+"it": "Il computer non si è avviato: non giocherà."
+},
+{
+"id": 450,
+"it": "Il computer non si è avviato: né valutazione né classificazione. La partita resta consultabile."
+},
+{
+"id": 451,
+"it": "Il computer può abbandonare se è in svantaggio"
+},
+{
+"id": 452,
+"it": "Il computer sta pensando"
+},
+{
+"id": 453,
+"it": "Lettura in corso…"
+},
+{
+"id": 454,
+"it": "LOS (A > B)"
+},
+{
+"id": 455,
+"it": "LOS — Likelihood of Superiority"
+},
+{
+"id": 456,
+"it": "La 518 è la posizione della partita classica."
+},
+{
+"id": 457,
+"it": "La barra in basso nella schermata di gioco nasconde cinque gesti — eccoli, per riconoscerli:"
+},
+{
+"id": 458,
+"it": "Non è stato possibile aprire il database — i tuoi dati esistenti sono intatti. Riavvia l'app per riprovare."
+},
+{
+"id": 459,
+"it": "La differenza di forza tra A e B, convertita dal punteggio in punti Elo. Positiva se A è avanti.\n\nIl «±» è il margine dell'intervallo di confidenza al 95%: il valore reale ha 19 probabilità su 20 di trovarsi al suo interno. Questo margine si restringe man mano che le partite si accumulano — è lui, e non il divario in sé, a dire se la serie è andata avanti abbastanza."
+},
+{
+"id": 460,
+"it": "La difesa sta pensando…"
+},
+{
+"id": 461,
+"it": "La lunghezza media delle partite terminate, in mosse complete (una mossa = una semimossa del Bianco più una semimossa del Nero).\n\nLe partite brevi vanno spesso con vittorie nette; quelle lunghe, con posizioni equilibrate o finali combattuti."
+},
+{
+"id": 462,
+"it": "La stessa cosa di «V · P · S», vista come una barra: la parte verde è ciò che A ha vinto, la grigia le patte, la rossa ciò che B ha vinto.\n\nUna banda grigia molto larga segnala impostazioni troppo vicine per distinguersi — o un tempo di riflessione troppo breve perché la differenza emerga."
+},
+{
+"id": 463,
+"it": "La partita in corso si salva da sola. Al tuo ritorno, «Riprendi la partita» ti aspetta in cima alla home."
+},
+{
+"id": 464,
+"it": "Non è stato possibile ripristinare la partita salvata."
+},
+{
+"id": 465,
+"it": "La partita verrà rimossa dalla libreria. Questa azione è definitiva."
+},
+{
+"id": 466,
+"it": "La probabilità che A sia DAVVERO più forte di B, e non che il divario osservato sia dovuto al caso.\n\nViene calcolata solo sulle partite decisive: le patte non vi rientrano. Sotto il 95%, la serie non ha ancora deciso, anche se il divario Elo sembra netto. Al 50%, i due lati sono indistinguibili."
+},
+{
+"id": 467,
+"it": "La ricerca fluttua"
+},
+{
+"id": 468,
+"it": "La tattica, il repertorio e i finali dimostrati:"
+},
+{
+"id": 469,
+"it": "Laboratorio"
+},
+{
+"id": 470,
+"it": "Lascia venire, incassa, sorride. Più attacchi, più è pericolosa; la sua posizione preferita è leggermente inferiore."
+},
+{
+"id": 471,
+"it": "Avvia"
+},
+{
+"id": 472,
+"it": "Avvia l'analisi"
+},
+{
+"id": 473,
+"it": "Avvia una serie su questo tema"
+},
+{
+"id": 474,
+"it": "Lingua"
+},
+{
+"id": 476,
+"it": "Lingua del sistema"
+},
+{
+"id": 477,
+"it": "Il PGN esportato resta in notazione inglese — è lo standard, leggibile da tutti gli altri programmi."
+},
+{
+"id": 478,
+"it": "L'obiettivo è CAPOVOLTO: vinci perdendo tutti i tuoi pezzi, oppure non avendo più alcuna mossa da giocare. Catturare è OBBLIGATORIO ogni volta che è possibile — se ci sono più catture, scegli tu quale. Non ci sono né scacco né matto: il re si cattura come qualsiasi altro pezzo, e l'arrocco non esiste."
+},
+{
+"id": 479,
+"it": "Il lato al tratto non ha alcuna mossa legale: la posizione è già terminata (matto o stallo)."
+},
+{
+"id": 480,
+"it": "Il lato che non ha il tratto non può essere già sotto scacco."
+},
+{
+"id": 481,
+"it": "L'anatra blocca"
+},
+{
+"id": 482,
+"it": "Il dettaglio dei risultati, sempre dal punto di vista di A.\n\nLe patte contano come mezza vittoria nel punteggio, ma sono ignorate dal LOS: non dicono nulla su chi sia il più forte."
+},
+{
+"id": 483,
+"it": "Il file lascia questo dispositivo. I tuoi progressi su queste posizioni vengono conservati."
+},
+{
+"id": 484,
+"it": "La migliore"
+},
+{
+"id": 485,
+"it": "Il modello Maia-3 così com'è, senza alcun adattamento: gioca come un umano di questo livello, senza uno stile particolare."
+},
+{
+"id": 486,
+"it": "Il motore attinge a un libro di aperture"
+},
+{
+"id": 487,
+"it": "Il motore propone patta"
+},
+{
+"id": 488,
+"it": "Il motore preferisce continuare la partita."
+},
+{
+"id": 489,
+"it": "Il numero di partite terminate, sul totale richiesto all'avvio della serie.\n\nLe statistiche qui sopra si ricalcolano dopo ciascuna: sono volatili all'inizio e poi si stabilizzano."
+},
+{
+"id": 490,
+"it": "La scacchiera non si muove — guardate dallo stesso lato."
+},
+{
+"id": 491,
+"it": "La scacchiera ruota verso il giocatore al tratto — ci si passa il dispositivo."
+},
+{
+"id": 492,
+"it": "Gli appunti non contengono alcuna immagine."
+},
+{
+"id": 493,
+"it": "La prossima mossa spenderà il tuo gettone — due mosse di fila."
+},
+{
+"id": 494,
+"it": "La scorciatoia della home"
+},
+{
+"id": 495,
+"it": "Il re deve restare tra le due torri."
+},
+{
+"id": 496,
+"it": "Il re in 8ª"
+},
+{
+"id": 497,
+"it": "Il punteggio di A ricalcolato dopo ogni partita, e non partita per partita: la curva parte quindi da molto in alto o molto in basso, poi si calma.\n\nLa zona chiara attorno è l'intervallo di confidenza al 95%. Finché si sovrappone alla linea del 50%, la serie non ha deciso. È il restringimento di questa banda a dire quando fermarsi."
+},
+{
+"id": 498,
+"it": "Il «?» in cima alla home raccoglie l'aiuto — e questo tour, da rivedere quando vuoi."
+},
+{
+"id": 499,
+"it": "Gli Elo di Stockfish sono calibrati per la partita classica: in 960, senza teoria da recitare, il livello reale può differire leggermente."
+},
+{
+"id": 500,
+"it": "Gli Elo di Stockfish sono calibrati a ~2-3 s per mossa: al di sotto, i livelli reali sono più bassi, soprattutto vicino al massimo. Il divario tra A e B resta comparativo."
+},
+{
+"id": 501,
+"it": "Gli Elo sono calibrati per la partita classica: senza una rete neurale dedicata a questa variante, il livello reale può differire."
+},
+{
+"id": 502,
+"it": "Gli aiuti si scelgono prima"
+},
+{
+"id": 503,
+"it": "Aggiungerli ai tuoi puzzle? Li ritroverai in Puzzle, «Le mie partite»."
+},
+{
+"id": 504,
+"it": "Gli angoli si incrociano: rimettili in ordine attorno alla scacchiera."
+},
+{
+"id": 505,
+"it": "I due alfieri devono trovarsi su case di colore diverso."
+},
+{
+"id": 506,
+"it": "I due giocatori sono d'accordo per la patta?"
+},
+{
+"id": 507,
+"it": "Le frecce del suggerimento e la barra di valutazione si attivano qui, prima della partita. Spesso le si scopre troppo tardi."
+},
+{
+"id": 508,
+"it": "Le patte per regola (stallo, materiale insufficiente, 50 mosse, ripetizione) vengono sempre dichiarate."
+},
+{
+"id": 509,
+"it": "Le aperture sono pre-generate da fonti aperte, poi incorporate. Le mosse e le statistiche sono fatti; le spiegazioni, quando esistono, sono scritte a mano."
+},
+{
+"id": 510,
+"it": "Le partite terminate (modalità Gioca e Due giocatori) compariranno qui."
+},
+{
+"id": 511,
+"it": "I punti totalizzati dal lato A, in percentuale del massimo possibile: una vittoria vale 1 punto, una patta ½, una sconfitta 0.\n\nIl 50% significa che le due impostazioni si equivalgono. È la misura da cui tutto il resto è dedotto, divario Elo compreso."
+},
+{
+"id": 512,
+"it": "Le catture tornano"
+},
+{
+"id": 513,
+"it": "I puzzle tattici proposti nell'app provengono dal database pubblico di Lichess."
+},
+{
+"id": 514,
+"it": "Le regole degli scacchi, con TRE muri che non stanno fermi. Dopo ogni mossa, due di essi — estratti a sorte, mai gli stessi — saltano su case vuote tra la 2ª e la 7ª traversa; il terzo resta dov'è. Nessun pezzo può fermarcisi né attraversarli, e non si catturano. Un alfiere che teneva una diagonale la perde alla mossa successiva, una torre inchioda e poi non inchioda più: nulla è acquisito, e calcolare lontano non serve a molto."
+},
+{
+"id": 515,
+"it": "Le regole degli scacchi, con un solo dettaglio: le case d4 ed e5 sono MURATE fin dall'inizio. Nessun pezzo può fermarcisi né attraversarle, e un muro non si cattura — non si sposterà mai per tutta la partita. Torri, alfieri e donne vi sbattono quindi contro come contro un pezzo, mentre i cavalli le scavalcano senza potersi fermare. Tutto il resto — scacco, matto, stallo, arrocco, presa en passant, promozione — è invariato."
+},
+{
+"id": 516,
+"it": "Le regole sono quelle del gioco classico, scacco matto compreso. In più, vinci non appena hai dato scacco al re avversario TRE VOLTE nel corso della partita — ogni scacco conta, che sia parato, catturato o evitato alla mossa successiva."
+},
+{
+"id": 517,
+"it": "Le regole sono quelle del gioco classico. In più: ogni 7 mosse giocate (regolabile da 4 a 8), guadagni un gettone. Non ne tieni mai più di UNO: il nuovo cancella il vecchio se non è stato speso, ed è impossibile spenderlo se sei tu stesso sotto scacco. Spenderlo ti fa giocare DUE mosse di fila — a meno che la prima dia scacco all'avversario, nel qual caso il turno si ferma lì. Una presa en passant resa possibile dall'ultima mossa avversaria resta valida anche se la tua prima mossa del turno doppio si interpone."
+},
+{
+"id": 518,
+"it": "Le regole sono quelle del gioco classico. Vinci anche IMMEDIATAMENTE se il tuo re raggiunge una delle quattro case centrali — d4, e4, d5 o e5 — qualunque sia lo stato del resto della scacchiera, anche in pieno mediogioco."
+},
+{
+"id": 519,
+"it": "Licenza AGPLv3"
+},
+{
+"id": 520,
+"it": "Licenza Apache 2.0"
+},
+{
+"id": 521,
+"it": "Licenza CC BY-SA 3.0"
+},
+{
+"id": 522,
+"it": "Licenza GPLv2+"
+},
+{
+"id": 523,
+"it": "Licenza GPLv3"
+},
+{
+"id": 524,
+"it": "Licenza MIT"
+},
+{
+"id": 525,
+"it": "Licenze"
+},
+{
+"id": 526,
+"it": "Linea guidata"
+},
+{
+"id": 527,
+"it": "Linee principali"
+},
+{
+"id": 528,
+"it": "Leggi la partita"
+},
+{
+"id": 529,
+"it": "Libro di aperture"
+},
+{
+"id": 530,
+"it": "Lucena, Philidor, opposizione — dimostrati"
+},
+{
+"id": 531,
+"it": "Legenda"
+},
+{
+"id": 532,
+"it": "Maia (rete)"
+},
+{
+"id": 533,
+"it": "Maia non disponibile, ha giocato Stockfish"
+},
+{
+"id": 534,
+"it": "Maia-3"
+},
+{
+"id": 535,
+"it": "Maia-3 (Chessformer)"
+},
+{
+"id": 536,
+"it": "Matti"
+},
+{
+"id": 537,
+"it": "Matti mancati"
+},
+{
+"id": 538,
+"it": "Matti mancati: mossa %lld/%lld"
+},
+{
+"id": 539,
+"it": "Matti elementari"
+},
+{
+"id": 540,
+"it": "Materiale"
+},
+{
+"id": 541,
+"it": "Massimo"
+},
+{
+"id": 542,
+"it": "Maestri"
+},
+{
+"id": 543,
+"it": "Mossa migliore"
+},
+{
+"id": 544,
+"it": "Miglior vittoria: ~%lld Elo"
+},
+{
+"id": 545,
+"it": "Miglior vittoria ~%lld Elo"
+},
+{
+"id": 546,
+"it": "Le mie raccolte"
+},
+{
+"id": 547,
+"it": "Le mie partite"
+},
+{
+"id": 548,
+"it": "I miei repertori"
+},
+{
+"id": 549,
+"it": "Minuti per giocatore"
+}
+]

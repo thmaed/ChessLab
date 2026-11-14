@@ -1,0 +1,442 @@
+[
+{
+"id": 0,
+"it": "Lettura ruotata di %lld°. Se la scacchiera appare capovolta, inverti la lettura."
+},
+{
+"id": 1,
+"it": "Case da verificare"
+},
+{
+"id": 2,
+"it": "Casa %@ — %lld di %lld"
+},
+{
+"id": 3,
+"it": "Letto: %@"
+},
+{
+"id": 4,
+"it": "Vuota, va bene"
+},
+{
+"id": 5,
+"it": "È proprio così"
+},
+{
+"id": 6,
+"it": "Casa vuota"
+},
+{
+"id": 7,
+"it": "Casa precedente"
+},
+{
+"id": 8,
+"it": "Casa successiva"
+},
+{
+"id": 9,
+"it": "Tutte le case dubbie sono state verificate — rileggi la scacchiera un'ultima volta."
+},
+{
+"id": 10,
+"it": "casa vuota"
+},
+{
+"id": 11,
+"it": "pezzo bianco"
+},
+{
+"id": 12,
+"it": "pezzo nero"
+},
+{
+"id": 13,
+"it": "%@ (altro dispositivo)"
+},
+{
+"id": 14,
+"it": "%1$@: %2$lld%% di successo su %3$lld"
+},
+{
+"id": 15,
+"it": "%1$@: %2$lld per il Bianco, %3$lld per il Nero"
+},
+{
+"id": 16,
+"it": "%1$@: %2$lld vittorie, %3$lld patte, %4$lld sconfitte"
+},
+{
+"id": 17,
+"it": "%@: inchiodatura del tuo %@ davanti al tuo %@."
+},
+{
+"id": 18,
+"it": "%@: ed è scacco matto."
+},
+{
+"id": 19,
+"it": "%@: forchetta sul tuo %@ e sul tuo %@."
+},
+{
+"id": 20,
+"it": "%@: forchetta."
+},
+{
+"id": 21,
+"it": "%@: matto di corridoio in %lld mosse."
+},
+{
+"id": 22,
+"it": "%@: matto di corridoio."
+},
+{
+"id": 23,
+"it": "%@: matto in %lld mosse."
+},
+{
+"id": 24,
+"it": "%@: il tuo %@ era in presa."
+},
+{
+"id": 25,
+"it": "%@: perdi %lld punti di materiale."
+},
+{
+"id": 26,
+"it": "%@: scacco di scoperta."
+},
+{
+"id": 27,
+"it": "%@ in %@"
+},
+{
+"id": 28,
+"it": "%1$@ per %2$@"
+},
+{
+"id": 29,
+"it": "%@ prende in %@"
+},
+{
+"id": 30,
+"it": "%@, %@ delle partite dei maestri"
+},
+{
+"id": 31,
+"it": "%@, casa vuota"
+},
+{
+"id": 32,
+"it": "%@, pezzo %@ da precisare"
+},
+{
+"id": 33,
+"it": "%@, promozione in %@"
+},
+{
+"id": 34,
+"it": "%@, scacco"
+},
+{
+"id": 35,
+"it": "%@, scacco matto"
+},
+{
+"id": 36,
+"it": "%lld%% di fallimenti"
+},
+{
+"id": 37,
+"it": "%lld %@ in riserva"
+},
+{
+"id": 38,
+"it": "%1$lld / %2$lld partite giocate"
+},
+{
+"id": 39,
+"it": "%lld già presenti"
+},
+{
+"id": 40,
+"it": "%lld doppioni nel file"
+},
+{
+"id": 41,
+"it": "%lld case incerte, evidenziate sulla scacchiera: verificale prima di continuare."
+},
+{
+"id": 42,
+"it": "%lld mosse giocate"
+},
+{
+"id": 43,
+"it": "%lld mosse giocate."
+},
+{
+"id": 44,
+"it": "%lld semimosse"
+},
+{
+"id": 45,
+"it": "%lld semimosse"
+},
+{
+"id": 46,
+"it": "%lld matti mancati"
+},
+{
+"id": 47,
+"it": "%lld min"
+},
+{
+"id": 48,
+"it": "%lld partita scartata"
+},
+{
+"id": 49,
+"it": "%lld partite salvate"
+},
+{
+"id": 50,
+"it": "%lld partite scartate"
+},
+{
+"id": 51,
+"it": "%1$lld pezzi da precisare — casa %2$@, pezzo %3$@."
+},
+{
+"id": 52,
+"it": "%lld posizioni da ripassare"
+},
+{
+"id": 53,
+"it": "%lld posizioni"
+},
+{
+"id": 54,
+"it": "%lld puzzle"
+},
+{
+"id": 55,
+"it": "%lld puzzle aggiunto"
+},
+{
+"id": 56,
+"it": "%lld puzzle creati — ritrovali nella modalità Puzzle."
+},
+{
+"id": 57,
+"it": "%lld puzzle"
+},
+{
+"id": 58,
+"it": "%lld puzzle aggiunti"
+},
+{
+"id": 59,
+"it": "%lld sbagliati"
+},
+{
+"id": 60,
+"it": "%1$lld su %2$lld tentativi"
+},
+{
+"id": 61,
+"it": "%lld risolti su %lld in %@"
+},
+{
+"id": 62,
+"it": "%lld varianti"
+},
+{
+"id": 63,
+"it": "%lld scacchi su 3"
+},
+{
+"id": 64,
+"it": "+%lld s"
+},
+{
+"id": 65,
+"it": "1 tentativo"
+},
+{
+"id": 66,
+"it": "1. e4 e5 2. Cf3 …\n\noppure\n\nrnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+},
+{
+"id": 67,
+"it": "1. e4 e5 2. Nf3 …\n\noppure\n\nrnbqkbnr/pppppppp/…"
+},
+{
+"id": 68,
+"it": "2 giocatori"
+},
+{
+"id": 69,
+"it": "2ª mossa"
+},
+{
+"id": 70,
+"it": "3 tentativi"
+},
+{
+"id": 71,
+"it": "3 scacchi"
+},
+{
+"id": 72,
+"it": "30 giorni"
+},
+{
+"id": 73,
+"it": "36 pedoni"
+},
+{
+"id": 74,
+"it": "7 giorni"
+},
+{
+"id": 75,
+"it": "78 corsi per convertire i tuoi finali, raggruppati per famiglia: pedoni, torri, alfieri, cavalli, squilibri, donne, matti elementari, studi celebri (Réti, Saavedra, Lasker, Troitsky, Kubbel…) e temi trasversali (due debolezze, dominio, stallo come risorsa…). Ogni linea è verificata con le tablebase dei finali — il verdetto matematico esatto: nessuna mossa insegnata lascia sfuggire la vittoria, nessuna difesa proposta perde la patta. Dal lettore, il menu «Allenati» propone la linea guidata OPPURE l'allenamento libero — concludere la posizione contro la migliore difesa, dove è accettata ogni mossa che conserva il verdetto, non solo quella della lezione, e una mossa che lo lascia sfuggire viene ripresa con la spiegazione. Ripasso dilazionato e sincronizzazione iCloud, come per le aperture."
+},
+{
+"id": 76,
+"it": "960 posizioni di partenza, zero teoria"
+},
+{
+"id": 77,
+"it": "Azioni della raccolta"
+},
+{
+"id": 78,
+"it": "AGGIUNGI IL TUO\nIn Aperture, tocca «+» in alto a destra. Incolla un PGN, oppure apri un file .pgn: le varianti tra parentesi vengono conservate, quindi ottieni l'albero completo e non solo la linea principale. Indica il lato che studi — è l'unica informazione che un PGN non contiene. Le tue annotazioni seguono: ? e ?? diventano trappole segnalate, ?! imprecisioni, e i tuoi commenti compaiono sotto la scacchiera.\n\nCONDIVIDERLO\nTocca il pulsante «…» a destra di uno dei tuoi repertori, poi «Condividi»: l'app invia un semplice file, con AirDrop, Messaggi, File o quello che preferisci. Chi lo riceve tocca «+» e poi «Apri un file». Non c'è nessun account da creare, nessun server ChessLab: il file È il repertorio, e passa solo da dove lo invii.\n\nCOSA VIENE CONDIVISO, E COSA NO\nIl file contiene le mosse, i tuoi commenti e le tue annotazioni. NON contiene i tuoi progressi: ciò che hai memorizzato resta da te. Al contrario, un repertorio che importi beneficia subito di ciò che già sai delle posizioni che contiene, anche se imparate in un'apertura fornita con l'app — la memorizzazione è legata alle posizioni, non ai file.\n\nELIMINARE\nLo stesso pulsante «…», poi «Elimina». Il file lascia questo dispositivo; i tuoi progressi su quelle posizioni vengono conservati. Le 58 aperture fornite, invece, non possono essere né eliminate né condivise.\n\nSU TUTTI I TUOI DISPOSITIVI\nI tuoi repertori seguono la sincronizzazione iCloud, come le tue partite e i tuoi progressi: importato su iPhone, un repertorio appare su iPad. Attiva la sincronizzazione nelle Impostazioni — è disattivata per impostazione predefinita, perché l'app funziona interamente offline.\n\nE IL DIRITTO D'AUTORE\nIl contenuto di un libro o di un corso a pagamento appartiene al suo autore. Trascriverlo per uso personale è una cosa; ridistribuirlo è un'altra. Condividi ciò che hai scritto, o ciò che hai il diritto di condividere."
+},
+{
+"id": 79,
+"it": "API Lichess Opening Explorer: partite di maestri e partite online filtrate per livello (≈1400-2000). Popolarità e punteggi delle mosse."
+},
+{
+"id": 80,
+"it": "Abbandono consentito (lato in svantaggio)"
+},
+{
+"id": 81,
+"it": "Abbandona"
+},
+{
+"id": 82,
+"it": "Abbandonare la partita?"
+},
+{
+"id": 83,
+"it": "Accetta"
+},
+{
+"id": 84,
+"it": "Home"
+},
+{
+"id": 85,
+"it": "Azioni del repertorio"
+},
+{
+"id": 86,
+"it": "Attivala nelle Impostazioni perché le tue partite ti seguano su tutti i tuoi dispositivi tramite il tuo iCloud privato — nessun account da creare, nessun server di terzi. Disattivata per impostazione predefinita: l'app funziona interamente offline. La modifica ha effetto al prossimo avvio.\n\nCOSA VIENE SINCRONIZZATO\nLe tue partite terminate, i tuoi progressi su aperture e finali, i tuoi repertori personali, le tue raccolte di puzzle importate (i puzzle, non i tuoi progressi su di essi) e le tue preferenze — tema della scacchiera, set di pezzi, notazione, tentativi per puzzle, impostazioni di partita.\n\nCOSA RESTA SU OGNI DISPOSITIVO\nLa lingua e i suoni, perché ogni dispositivo conservi i propri. E la tua partita IN CORSO: resta dove la giochi. Due dispositivi, due partite iniziate: bisognerebbe sacrificarne una — meglio che ciascuna ti aspetti dove l'hai lasciata."
+},
+{
+"id": 87,
+"it": "Avversario"
+},
+{
+"id": 88,
+"it": "Aiuto"
+},
+{
+"id": 89,
+"it": "Aiuto di ChessLab"
+},
+{
+"id": 90,
+"it": "Aiuti"
+},
+{
+"id": 91,
+"it": "Aggiungi anche alla libreria"
+},
+{
+"id": 92,
+"it": "Aggiungi un repertorio"
+},
+{
+"id": 93,
+"it": "Aggiungi ai miei puzzle"
+},
+{
+"id": 94,
+"it": "Avviso in caso di mossa rischiosa"
+},
+{
+"id": 95,
+"it": "Vai alla linea che continua questa posizione"
+},
+{
+"id": 96,
+"it": "Alterna i colori a ogni partita"
+},
+{
+"id": 97,
+"it": "Casuale"
+},
+{
+"id": 98,
+"it": "Amatore"
+},
+{
+"id": 99,
+"it": "Analisi"
+},
+{
+"id": 100,
+"it": "Analisi: mossa %1$lld/%2$lld"
+},
+{
+"id": 101,
+"it": "Analisi della partita"
+},
+{
+"id": 102,
+"it": "mossa %1$lld di %2$lld"
+},
+{
+"id": 103,
+"it": "Analisi in corso — il bilancio si completa man mano che le mosse vengono classificate."
+},
+{
+"id": 104,
+"it": "Analisi non disponibile per questa posizione."
+},
+{
+"id": 105,
+"it": "Analisi — Chess960"
+},
+{
+"id": 106,
+"it": "Analizza"
+},
+{
+"id": 107,
+"it": "Analizza PGN / FEN"
+},
+{
+"id": 108,
+"it": "Analizza questa posizione"
+},
+{
+"id": 109,
+"it": "Analizza l'ultima partita"
+}
+]

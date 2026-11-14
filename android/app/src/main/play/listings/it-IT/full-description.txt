@@ -1,0 +1,46 @@
+ChessLab è un compagno di scacchi completo: giocare, analizzare, allenarsi e sperimentare, con il motore Stockfish integrato. Nulla viene inviato a un server: niente account, niente pubblicità.
+
+NOVITÀ DELLA 2.0
+• Sessione del giorno: ogni giorno, ciò che c'è da ripassare (posizioni d'apertura da ripassare, puzzle sbagliati, un finale), con la tua serie di giorni e le medaglie.
+• Analisi: i tuoi errori diventano puzzle e in Progressi si disegna un profilo delle debolezze.
+• Il Coach: sotto un errore, la quota di giocatori del tuo livello che giocano quella mossa.
+• Un punteggio personale dei puzzle e «Al mio livello» per puzzle su misura.
+• Aperture: schede illustrate, filtri per Lato e Livello e le 19 «classiche».
+• Limite di tempo facoltativo: un interruttore, e l'app ricorda la tua ultima scelta.
+
+AVVERSARI CHE GIOCANO COME UMANI
+Nove personaggi interpretati da Maia-3, una rete addestrata su milioni di partite umane: non cerca la mossa migliore, ma quella che giocherebbe un umano di quel livello, errori compresi quando il livello è basso. Ognuno ha il suo stile, il suo repertorio di aperture, il suo temperamento e il suo ritratto, e il suo livello si regola sulla scala umana. Oppure affronta Stockfish, dal principiante al massimo. Orologio facoltativo: bullet, blitz, rapid, classico, con incremento.
+
+ANALIZZARE DAVVERO LE TUE PARTITE
+Ogni mossa è valutata (eccellente, buona, imprecisione, errore, errore grave, occasione mancata) e ogni giocatore riceve la sua precisione su cento. La curva mostra a colpo d'occhio dove la partita si è messa male.
+
+E soprattutto, l'app dice PERCHÉ una mossa era cattiva, in una frase: «matto di corridoio», «forchetta sulla tua torre e sul tuo cavallo», «il tuo alfiere era in presa». Non è una spiegazione inventata: la punizione del motore viene riprodotta sulla scacchiera e viene nominato solo ciò che vi si vede.
+
+Ciò che hai mancato diventa esercizio: le posizioni in cui hai sbagliato vengono salvate accanto ai puzzle perché tu le rilavori.
+
+Inserimento tramite PGN, FEN, editor di posizioni o foto di una scacchiera. La posizione mostrata si porta con un pulsante in un'altra modalità.
+
+APERTURE
+58 aperture scritte a mano, in cinque lingue, tutte riviste con il motore. Avanza mossa per mossa: ogni mossa è spiegata, vengono proposte le varianti e frecce colorate collegano la scacchiera all'elenco. Un allenamento a ripetizione dilazionata le fissa davvero.
+
+L'ANGOLO DEI FINALI
+78 corsi dimostrati con le tablebase dei finali: il verdetto matematico esatto. Nessuna mossa insegnata lascia sfuggire la vittoria, nessuna difesa proposta perde la patta. Dall'opposizione agli studi celebri.
+
+PUZZLE
+Oltre 130 000 problemi tattici dal database di Lichess, filtrabili per livello e per tema, più i tuoi, tratti dai tuoi errori.
+
+VARIANTI
+Dodici: Chess960 (scacchi Fischer Random), Re della collina, Tre scacchi, Orda, Corsa dei re, Atomico, Crazyhouse, Antiscacchi, le Barricate e la loro versione casuale, il Duck Chess e la Mossa Rubata. Ognuna si imposta come una partita vera (lato, forza del motore, cadenza, aiuti) e poi si analizza con le regole della variante, non con quelle degli scacchi normali.
+
+DUE GIOCATORI
+Due persone sullo stesso dispositivo; la scacchiera ruota a ogni mossa per leggersi bene faccia a faccia.
+
+LABORATORIO
+Fai affrontare due impostazioni in una serie di partite per confrontarne la forza.
+
+PRIVACY
+Nessun account, nessun server, nessuna pubblicità, nessuna misurazione del pubblico. L'app non ha nemmeno il permesso di accedere a Internet: le tue partite e le tue impostazioni restano sul tuo telefono. Per cambiare dispositivo basta un file da salvare e riaprire dove vuoi.
+
+Francese, inglese, spagnolo, tedesco e italiano, interfaccia e contenuto dei corsi compresi. Verticale e orizzontale.
+
+ChessLab integra il motore Stockfish (GPLv3), la rete Maia-3 dell'Università di Toronto (AGPLv3) e il set di pezzi cburnett (CC BY-SA 3.0). I puzzle provengono dal database di Lichess (CC0).

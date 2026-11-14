@@ -384,7 +384,10 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="settings_language">Language</string>
     <string name="settings_language_en">English</string>
     <string name="settings_language_fr">Français</string>
-    <string name="settings_language_system">System</string>
+    <string name="settings_language_es">Español</string>
+    <string name="settings_language_de">Deutsch</string>
+    <string name="settings_language_it">Italiano</string>
+    <string name="settings_language_system">Automatic</string>
     <string name="settings_one_try">One try</string>
     <string name="settings_piece_set">Piece set</string>
     <string name="settings_puzzle_tries">Puzzle attempts</string>
@@ -773,6 +776,9 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="settings_notation">Move notation</string>
     <string name="settings_notation_french">French</string>
     <string name="settings_notation_english">English</string>
+    <string name="settings_notation_spanish">Spanish</string>
+    <string name="settings_notation_german">German</string>
+    <string name="settings_notation_italian">Italian</string>
     <string name="blunder_title">Risky move</string>
     <string name="blunder_missed_mate">That move lets a forced mate slip away.</string>
     <string name="blunder_allows_mate">That move gives your opponent a forced mate.</string>

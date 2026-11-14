@@ -109,7 +109,7 @@ struct HelpView: View {
         .init(
             icon: "books.vertical.fill", tint: Theme.warning,
             title: "Ouvertures",
-            body: "Progressez sur 58 ouvertures rédigées à la main et bilingues, toutes relues au moteur. Un index en arbre montre toutes les variantes sans doublon : touchez n'importe quel coup pour ouvrir sa position. Sous le plateau, les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish et une barre d'évaluation ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Deux menus filtrent la liste : Camp (Blancs ou Noirs) et Niveau (Classiques — les 19 ouvertures les plus jouées —, Club, Avancé). Chaque carte montre la position clé, le niveau et votre maîtrise. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
+            body: "Progressez sur 58 ouvertures rédigées à la main et multilingues, toutes relues au moteur. Un index en arbre montre toutes les variantes sans doublon : touchez n'importe quel coup pour ouvrir sa position. Sous le plateau, les coups des maîtres avec leurs pourcentages, les trois meilleurs coups de Stockfish et une barre d'évaluation ; des flèches colorées signalent le coup recommandé, les pièges et les imprécisions. Deux menus filtrent la liste : Camp (Blancs ou Noirs) et Niveau (Classiques — les 19 ouvertures les plus jouées —, Club, Avancé). Chaque carte montre la position clé, le niveau et votre maîtrise. Entraînez-les en répétition espacée — l'app planifie vos révisions toute seule — et retrouvez votre progression sur tous vos appareils via iCloud. Depuis le lecteur, « Changer de mode » envoie la position atteinte vers le Laboratoire, l'ordinateur ou une partie à deux."
         ),
         .init(
             icon: "crown.fill", tint: Theme.gold,
@@ -139,7 +139,7 @@ struct HelpView: View {
         .init(
             icon: "gearshape.fill", tint: Theme.textSecondary,
             title: "Réglages",
-            body: "Langue de l'interface (français, anglais, ou celle du système), thème du plateau — choisi ici une fois pour tous les écrans —, notation des pièces (française R D T F C ou anglaise), affichage du thème d'un puzzle (mat, fourchette, clouage… à masquer pour chercher sans indice), et synchronisation iCloud."
+            body: "Langue de l'interface (français, anglais, espagnol, allemand, italien, ou celle du système), thème du plateau — choisi ici une fois pour tous les écrans —, notation des pièces (française R D T F C, anglaise, espagnole, allemande ou italienne), affichage du thème d'un puzzle (mat, fourchette, clouage… à masquer pour chercher sans indice), et synchronisation iCloud."
         ),
         .init(
             icon: "icloud", tint: Theme.info,

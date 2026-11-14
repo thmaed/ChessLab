@@ -1,0 +1,46 @@
+ChessLab ist ein kompletter Schachbegleiter: spielen, analysieren, trainieren, experimentieren – mit der eingebauten Engine Stockfish. Nichts geht an einen Server: kein Konto, keine Werbung.
+
+NEU IN 2.0
+• Tagestraining: Jeden Tag das, was zu wiederholen ist – fällige Eröffnungsstellungen, verfehlte Puzzles, ein Endspiel – mit deiner Tagesserie und Medaillen.
+• Analyse: Deine Fehler werden zu Puzzles, und im Fortschritt zeichnet sich ein Schwächenprofil ab.
+• Der Coach: Unter einem Fehler zeigt er, wie viele Spieler deiner Stufe diesen Zug spielen.
+• Eine persönliche Puzzle-Wertung und „Auf meiner Stufe“ für Puzzles, die zu dir passen.
+• Eröffnungen: illustrierte Karten, Filter für Seite und Stufe und die 19 „Klassiker“.
+• Optionales Zeitlimit: ein Schalter, und die App merkt sich deine letzte Wahl.
+
+GEGNER, DIE WIE MENSCHEN SPIELEN
+Neun Charaktere, gespielt von Maia-3, einem Netz, das auf Millionen menschlicher Partien trainiert wurde: Es sucht nicht den besten Zug, sondern den, den ein Mensch dieser Stärke spielen würde – bei niedriger Stufe samt Patzern. Jeder hat seinen Stil, sein Eröffnungsrepertoire, sein Temperament und sein Porträt, und seine Stärke wird auf der menschlichen Skala eingestellt. Oder tritt gegen Stockfish selbst an, vom Anfänger bis zur Höchststufe. Optionale Schachuhr: Bullet, Blitz, Rapid, klassisch, mit Inkrement.
+
+PARTIEN WIRKLICH ANALYSIEREN
+Jeder Zug wird bewertet – ausgezeichnet, gut, Ungenauigkeit, Fehler, Patzer, verpasste Chance – , und jeder Spieler erhält seine Genauigkeit auf hundert. Die Kurve der Partie zeigt auf einen Blick, wo sie gekippt ist.
+
+Vor allem sagt die App in einem Satz, WARUM ein Zug schlecht war: „Grundreihenmatt“, „Gabel auf deinen Turm und deinen Springer“, „dein Läufer stand ungedeckt“. Keine erfundene Erklärung: Die Strafe der Engine wird auf dem Brett nachgespielt, genannt wird nur, was man dort sieht.
+
+Was du verpasst hast, wird zur Übung: Stellungen mit deinen Fehlern landen neben den Puzzles.
+
+Eingabe per PGN, FEN, Stellungseditor oder Foto eines Bretts. Die angezeigte Stellung nimmst du per Knopfdruck in einen anderen Modus mit.
+
+ERÖFFNUNGEN
+58 von Hand geschriebene Eröffnungen in fünf Sprachen, alle von der Engine geprüft. Zug für Zug: Jeder Zug wird erklärt, Varianten werden vorgeschlagen, farbige Pfeile verbinden Brett und Liste. Ein Training mit verteilter Wiederholung verankert sie wirklich.
+
+DIE ENDSPIEL-ECKE
+78 mit Endspieltabellen bewiesene Kurse – das exakte mathematische Urteil: Kein gelehrter Zug gibt den Gewinn aus der Hand, keine empfohlene Verteidigung verliert das Remis. Von der Opposition bis zu berühmten Studien.
+
+PUZZLES
+Mehr als 130 000 taktische Aufgaben aus der Lichess-Datenbank, filterbar nach Stufe und Thema – dazu deine eigenen, aus deinen eigenen Fehlern erzeugt.
+
+VARIANTEN
+Zwölf: Chess960 (Fischer Random), King of the Hill, Drei-Schach, Horde, Königsrennen, Atomschach, Crazyhouse, Schlagschach, die Barrikaden und ihre zufällige Version, Duck Chess und der Gestohlene Zug. Jede wird wie eine echte Partie eingestellt (Seite, Stärke, Bedenkzeit, Hilfen) und nach ihren eigenen Regeln analysiert.
+
+ZWEI SPIELER
+Zu zweit am selben Gerät; das Brett dreht sich bei jedem Zug, damit es sich gegenüber gut lesen lässt.
+
+LABOR
+Lass zwei Einstellungen in einer Partienserie gegeneinander antreten, um ihre Stärke zu vergleichen.
+
+DATENSCHUTZ
+Kein Konto, kein Server, keine Werbung, keine Reichweitenmessung. Die App hat nicht einmal die Berechtigung, auf das Internet zuzugreifen: Deine Partien und Einstellungen bleiben auf deinem Telefon. Für den Gerätewechsel genügt eine Datei, die du speicherst und öffnest, wo du willst.
+
+Französisch, Englisch, Spanisch, Deutsch und Italienisch, Oberfläche und Kursinhalte inbegriffen. Hoch- und Querformat.
+
+ChessLab enthält die Engine Stockfish (GPLv3), das Netz Maia-3 der University of Toronto (AGPLv3) und den Figurensatz cburnett (CC BY-SA 3.0). Die Puzzles stammen aus der Lichess-Datenbank (CC0).

@@ -59,7 +59,24 @@ data class AppSettings(
 )
 
 /** La langue dans laquelle un coup s'écrit. Pendant de `PieceNotation`. */
-enum class PieceNotation { french, english }
+enum class PieceNotation {
+    french, english, spanish, german, italian;
+
+    companion object {
+        /**
+         * La notation que l'usage de la langue appelle (pendant de
+         * `PieceNotation.defaultFor(languageCode:)` côté iOS) : espagnole en
+         * espagnol, allemande en allemand, italienne en italien, française sinon. Ne sert qu'à un
+         * réglage JAMAIS touché.
+         */
+        fun defaultFor(languageCode: String): PieceNotation = when (languageCode) {
+            "es" -> spanish
+            "de" -> german
+            "it" -> italian
+            else -> french
+        }
+    }
+}
 
 private val Context.dataStore by preferencesDataStore("settings")
 
@@ -118,8 +135,8 @@ object SettingsStore {
                     showPuzzleTheme = prefs[keyShowPuzzleTheme] ?: true,
                     soundsEnabled = prefs[keySounds] ?: true,
                     hapticsEnabled = prefs[keyHaptics] ?: true,
-                    pieceNotation = if (prefs[keyNotation] == "english") PieceNotation.english
-                    else PieceNotation.french,
+                    pieceNotation = PieceNotation.entries.firstOrNull { it.name == prefs[keyNotation] }
+                        ?: PieceNotation.defaultFor(java.util.Locale.getDefault().language),
                     analysisArrowMode = prefs[keyArrowMode] ?: "best",
                     playerName = sanitizedPlayerName(prefs[keyPlayerName] ?: ""),
                     dailyOpeningsCap = (prefs[keyDailyOpeningsCap] ?: 5).takeIf { it in DAILY_OPENINGS_CHOICES } ?: 5,

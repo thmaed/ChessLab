@@ -18,6 +18,13 @@ struct Chess960TwoPlayerSettings: Codable, Equatable, Hashable {
     /// ce mode n'a pas de raison d'exister (voir le commentaire de tête).
     var startFEN: String
 
+    /// « Blancs » / « Noirs » enregistrés dans une autre langue : on les rend dans la langue active.
+    @MainActor
+    mutating func localizeDefaultNames() {
+        whiteName = PlayerName.display(whiteName, fallback: PlayerName.white)
+        blackName = PlayerName.display(blackName, fallback: PlayerName.black)
+    }
+
     var timeControl: TimeControl {
         if timeControlID == "custom" {
             return .custom(minutes: customMinutes, incrementSeconds: customIncrementSeconds)

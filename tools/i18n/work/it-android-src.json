@@ -1,0 +1,1514 @@
+[
+[
+"against_someone",
+"Contre %1$s"
+],
+[
+"analysis_game_loaded",
+"Partie chargée"
+],
+[
+"analysis_input_label",
+"PGN ou FEN"
+],
+[
+"analysis_load",
+"Charger"
+],
+[
+"analysis_no_moves",
+"Aucun coup trouvé dans ce PGN"
+],
+[
+"analysis_paste",
+"Colle un PGN ou une FEN"
+],
+[
+"analysis_position_loaded",
+"Position chargée"
+],
+[
+"analysis_versus",
+"%1$s — %2$s"
+],
+[
+"autosave_label",
+"Contre %1$s · %2$d demi-coups"
+],
+[
+"black_to_move",
+"Aux noirs de jouer"
+],
+[
+"check",
+"Échec"
+],
+[
+"check_black",
+"aux noirs"
+],
+[
+"check_side",
+"Échec — %1$s"
+],
+[
+"check_white",
+"aux blancs"
+],
+[
+"checkmate_side",
+"Échec et mat — %1$s"
+],
+[
+"checkmate_you_lose",
+"Échec et mat — vous perdez"
+],
+[
+"checkmate_you_win",
+"Échec et mat — vous gagnez"
+],
+[
+"color_black_one",
+"Noir"
+],
+[
+"color_white_one",
+"Blanc"
+],
+[
+"course_next_moves",
+"Suites possibles"
+],
+[
+"course_next_position",
+"Position suivante"
+],
+[
+"course_no_chapter",
+"Ce cours n'a pas de chapitre"
+],
+[
+"course_previous_position",
+"Position précédente"
+],
+[
+"course_progress",
+"%1$d / %2$d"
+],
+[
+"course_search_endgame",
+"Chercher une finale"
+],
+[
+"course_search_opening",
+"Chercher une ouverture"
+],
+[
+"draw_fifty",
+"règle des cinquante coups"
+],
+[
+"draw_reason",
+"Nulle — %1$s"
+],
+[
+"draw_repetition",
+"triple répétition"
+],
+[
+"editor_black_long",
+"Noirs ⌐⌐"
+],
+[
+"editor_black_short",
+"Noirs ⌐"
+],
+[
+"editor_castling",
+"Roques encore possibles"
+],
+[
+"editor_eraser_hint",
+"Gomme : tapez une case pour la vider"
+],
+[
+"editor_place_hint",
+"Posez des pièces en tapant les cases"
+],
+[
+"editor_white_long",
+"Blancs ⌐⌐"
+],
+[
+"editor_white_short",
+"Blancs ⌐"
+],
+[
+"engine_silent",
+"Le moteur n'a pas répondu"
+],
+[
+"engine_starting",
+"Démarrage du moteur…"
+],
+[
+"engine_thinking",
+"Le moteur réfléchit…"
+],
+[
+"flip_each_move",
+"Retourner à chaque coup"
+],
+[
+"game_resumed",
+"Partie reprise"
+],
+[
+"help_characters_body",
+"Ce ne sont pas des Stockfish bridés mais Maia-3, un réseau entraîné sur des parties HUMAINES : il joue les coups que des joueurs de votre niveau jouent réellement, erreurs comprises. Chaque personnage ajoute un style — attaque, échanges, gambits — qui COLORE cette distribution sans la remplacer : il n'achète jamais une gaffe que Maia jugeait improbable."
+],
+[
+"help_characters_title",
+"Les neuf personnages"
+],
+[
+"help_courses_body",
+"136 cours, chacun découpé en chapitres. Les commentaires viennent des positions elles-mêmes, et les pourcentages sont ceux des parties de club. Les finales suivent le même format que les ouvertures : ce sont des positions à comprendre, pas à retenir."
+],
+[
+"help_courses_title",
+"Ouvertures et finales"
+],
+[
+"help_level_body",
+"C'est l'échelle humaine de Maia, proche de celle de Lichess. Elle n'est PAS comparable à un « niveau Stockfish » : un Stockfish bridé à 1100 bat un Maia réglé à 2200, parce qu'il calcule là où l'autre reconnaît. Deux échelles, deux choses."
+],
+[
+"help_level_title",
+"Le niveau affiché"
+],
+[
+"help_offline_body",
+"Tout. Aucun compte, aucun réseau, aucune donnée qui sort de l'appareil. Le moteur, les puzzles, les cours et les adversaires sont embarqués."
+],
+[
+"help_offline_title",
+"Ce qui reste hors ligne"
+],
+[
+"help_puzzles_body",
+"Un seul essai par défaut. Trois invitent à tenter un coup « pour voir », exactement l'inverse de ce qu'un puzzle entraîne : on calcule la variante jusqu'au bout AVANT de poser la pièce. Le filet à trois essais reste dans les réglages. « Ratés » ne rejoue que ce que vous avez manqué à la dernière tentative, et un coup qui mate est toujours accepté, même s'il n'est pas la solution enregistrée. En fin de partie, « Mats manqués » cherche les mats forcés que l'un ou l'autre camp a laissé filer, et propose d'en faire des puzzles. La méthode Woodpecker reprend un lot fixe de 10, 25 ou 50 puzzles, cycle après cycle dans un nouvel ordre, pour en trouver plus et plus vite ; elle ne touche pas à la répétition espacée. Vos propres puzzles (un fichier PGN dont chaque partie est un puzzle, avec son en-tête FEN ; le premier coup est joué d'avance, comme sur Lichess) s'importent depuis l'écran Puzzles : chaque fichier devient une collection, rangée à part, qu'on travaille en série ou en programme Woodpecker complet. Le menu d'une collection l'exporte en PGN : c'est aussi sa sauvegarde, et le fichier se réimporte tel quel."
+],
+[
+"help_puzzles_title",
+"Les puzzles"
+],
+[
+"help_safety_body",
+"Maia ne calcule pas : il peut rater un mat en deux ou gâcher une finale élémentaire. À partir d'un certain niveau, Stockfish reprend la main dans QUATRE cas seulement — un mat en un ou deux, une finale à peu de pièces, une répétition en position gagnée, et le cas où le modèle ne répond pas. En dessous de ce niveau, rater un mat fait partie du personnage."
+],
+[
+"help_safety_title",
+"Le filet de sécurité"
+],
+[
+"help_scanner_body",
+"Le plateau est trouvé tout seul par son motif de damier, et vous ajustez les quatre coins si besoin. La reconnaissance des pièces est automatique ; le TRAIT, les ROQUES et la PRISE EN PASSANT ne se lisent pas sur une image, et l'app ne les invente pas — à vous de les corriger. Depuis Photos ou toute autre app, Partager › ChessLab ouvre le scanner sur l'image."
+],
+[
+"help_scanner_title",
+"Le scanner"
+],
+[
+"help_training_body",
+"L'entraînement joue un cours sur un seul échiquier continu : vous jouez VOTRE camp, le partenaire répond sur la ligne principale. Chaque position jouée est notée toute seule — une erreur vaut « encore », un indice plafonne à « difficile » — et FSRS planifie quand vous la reverrez. L'unité est la POSITION, jamais la ligne : une position apprise dans une ouverture compte dans toutes celles où elle transpose."
+],
+[
+"help_training_title",
+"La répétition espacée"
+],
+[
+"help_variants_body",
+"Elles ne sont pas jouées par les règles des échecs classiques mais ARBITRÉES par un moteur qui les connaît : la position et les coups légaux viennent de lui. C'est ce qui permet l'Atomique ou l'Antichecs sans réécrire sept jeux de règles."
+],
+[
+"help_variants_title",
+"Les variantes"
+],
+[
+"lab_a_black",
+"A a les noirs"
+],
+[
+"lab_a_white",
+"A a les blancs"
+],
+[
+"lab_game_n",
+"partie %1$d · %2$s"
+],
+[
+"lab_legend",
+"A / nulles / B"
+],
+[
+"lab_end_checkmate",
+"Échec et mat"
+],
+[
+"lab_stat_los",
+"LOS"
+],
+[
+"lab_export",
+"Exporter la série"
+],
+[
+"lab_export_pgn",
+"PGN de toutes les parties"
+],
+[
+"lab_export_csv",
+"CSV des résultats"
+],
+[
+"lab_end_too_long",
+"Partie trop longue"
+],
+[
+"lab_start_position",
+"Imposer la position de départ"
+],
+[
+"lab_start_position_sub",
+"Collez un FEN ou un PGN — un PGN fait partir la série de sa position finale."
+],
+[
+"lab_start_standard",
+"Position standard"
+],
+[
+"lab_start_from_pgn",
+"Position de départ tirée d'un PGN (%1$d demi-coups)."
+],
+[
+"lab_game_number",
+"partie %1$d"
+],
+[
+"lab_explain_score",
+"Les points marqués par le camp A, en pourcentage du maximum possible : un gain vaut 1 point, une nulle ½, une défaite 0.\n\n50 %% veut dire que les deux réglages font jeu égal. C'est la mesure d'où tout le reste est déduit, écart Elo compris."
+],
+[
+"lab_explain_elo",
+"La différence de force entre A et B, convertie du score en points Elo. Positive si A est devant.\n\nLe « ± » est la marge de l'intervalle de confiance à 95 %% : la vraie valeur a 19 chances sur 20 de s'y trouver. Cette marge se resserre à mesure que les parties s'accumulent — c'est elle, et non l'écart lui-même, qui dit si la série a assez tourné."
+],
+[
+"lab_explain_los",
+"La probabilité que A soit RÉELLEMENT plus fort que B, et non que l'écart observé vienne du hasard.\n\nElle ne se calcule que sur les parties décisives : les nulles n'y entrent pas. En dessous de 95 %%, la série n'a pas encore tranché, même si l'écart Elo paraît net. À 50 %%, les deux camps sont indiscernables."
+],
+[
+"lab_explain_progression",
+"Le score de A recalculé après chaque partie, et non partie par partie : la courbe part donc de très haut ou de très bas, puis se calme.\n\nLa zone claire autour d'elle est l'intervalle de confiance à 95 %%. Tant qu'elle chevauche la ligne des 50 %%, la série n'a pas tranché. C'est le rétrécissement de cette bande qui dit quand s'arrêter."
+],
+[
+"lab_explain_games",
+"Le nombre de parties terminées.\n\nLes statistiques ci-dessus se recalculent après chacune : elles sont volatiles au début et se stabilisent ensuite."
+],
+[
+"lab_played",
+"%1$s a joué %2$s"
+],
+[
+"lab_ready",
+"Prêt"
+],
+[
+"lab_reset",
+"Remettre à zéro"
+],
+[
+"lab_running",
+"En cours…"
+],
+[
+"lab_score",
+"%1$d — %2$d — %3$d"
+],
+[
+"lab_side_a",
+"Camp A"
+],
+[
+"lab_side_b",
+"Camp B"
+],
+[
+"maia_scale_note",
+"Niveau sur l'échelle humaine de Maia, proche de celle de Lichess."
+],
+[
+"mate_black_wins",
+"les noirs gagnent"
+],
+[
+"mate_in",
+"+M%1$d"
+],
+[
+"mate_white_wins",
+"les blancs gagnent"
+],
+[
+"mated_in",
+"−M%1$d"
+],
+[
+"model_unavailable_stockfish",
+"Modèle indisponible — Stockfish prend le relais"
+],
+[
+"move_refused",
+"Coup refusé : %1$s"
+],
+[
+"partner_thinking",
+"Le partenaire réfléchit…"
+],
+[
+"progress_attempted",
+"tentés"
+],
+[
+"progress_drawn",
+"nulles"
+],
+[
+"progress_due",
+"à revoir"
+],
+[
+"progress_favourite",
+"Adversaire le plus affronté : %1$s (%2$s)"
+],
+[
+"progress_failed_of",
+"%1$d %% d'échecs sur %2$d"
+],
+[
+"puzzle_stats_solved_of",
+"%1$d réussis sur %2$d tentatives"
+],
+[
+"progress_games",
+"Parties"
+],
+[
+"progress_lost",
+"perdues"
+],
+[
+"progress_next_days",
+"Prochaine révision dans %1$d jours."
+],
+[
+"progress_next_today",
+"Prochaine révision aujourd'hui."
+],
+[
+"progress_next_tomorrow",
+"Prochaine révision demain."
+],
+[
+"progress_no_games",
+"Aucune partie enregistrée pour l'instant."
+],
+[
+"progress_no_memory",
+"Aucune position travaillée pour l'instant."
+],
+[
+"progress_no_puzzles",
+"Aucun puzzle tenté pour l'instant."
+],
+[
+"progress_played",
+"jouées"
+],
+[
+"progress_reviews_week",
+"révisions (7 j)"
+],
+[
+"progress_solved",
+"résolus"
+],
+[
+"progress_to_firm",
+"à consolider"
+],
+[
+"progress_won",
+"gagnées"
+],
+[
+"promote_to",
+"En quelle pièce promouvoir le pion ?"
+],
+[
+"puzzle_failed",
+"Raté"
+],
+[
+"puzzle_good",
+"Bien joué — continuez"
+],
+[
+"puzzle_library_unavailable",
+"Bibliothèque indisponible"
+],
+[
+"puzzle_loading",
+"Chargement de la bibliothèque…"
+],
+[
+"puzzle_prompt",
+"%1$s · %2$d — trouvez le meilleur coup"
+],
+[
+"puzzle_score",
+"%1$d/%2$d résolus"
+],
+[
+"puzzle_solved",
+"Résolu"
+],
+[
+"puzzle_wrong_solution",
+"Ce n'est pas le coup — la solution commençait par %1$s"
+],
+[
+"rival_silent",
+"L'adversaire n'a pas répondu"
+],
+[
+"settings_version",
+"Version %1$s"
+],
+[
+"route_scanner",
+"Scanner un échiquier"
+],
+[
+"route_train_named",
+"Entraîner : %1$s"
+],
+[
+"route_training",
+"Entraînement"
+],
+[
+"route_variant_analysis",
+"Analyse — %1$s"
+],
+[
+"variant_you_won",
+"Vous avez gagné (%1$s)"
+],
+[
+"variant_you_lost",
+"Vous avez perdu (%1$s)"
+],
+[
+"variant_draw",
+"Partie nulle (%1$s)"
+],
+[
+"variant_side_won",
+"%1$s a gagné (%2$s)"
+],
+[
+"variant_three_checks_badge",
+"%1$d/3"
+],
+[
+"home_resume_moves#one",
+"%1$d coup joué"
+],
+[
+"home_resume_moves#other",
+"%1$d coups joués"
+],
+[
+"fen_error_opponent_in_check",
+"Le camp qui n'a pas le trait est déjà en échec."
+],
+[
+"scan_uncertain_banner#one",
+"%1$d case incertaine, surlignée sur le plateau : vérifiez-la avant de continuer."
+],
+[
+"scan_uncertain_banner#other",
+"%1$d cases incertaines, surlignées sur le plateau : vérifiez-les avant de continuer."
+],
+[
+"scan_choose",
+"Choisir une photo"
+],
+[
+"scan_fen_note",
+"Le trait, les roques et la prise en passant ne se lisent pas sur une photo : à vous de les corriger."
+],
+[
+"scan_found",
+"Plateau trouvé — ajustez si besoin"
+],
+[
+"scan_model_unavailable",
+"Modèle de reconnaissance indisponible"
+],
+[
+"scan_not_found",
+"Plateau introuvable — placez les coins à la main"
+],
+[
+"scan_photo_to_frame",
+"Photo à cadrer"
+],
+[
+"scan_pick_photo",
+"Choisissez une photo d'échiquier"
+],
+[
+"scan_place_corners",
+"Placez les quatre coins sur le plateau"
+],
+[
+"scan_read",
+"Lire le plateau"
+],
+[
+"scan_reading",
+"Lecture du plateau…"
+],
+[
+"scan_reframe",
+"Retrouver le plateau"
+],
+[
+"scan_result",
+"Position lue"
+],
+[
+"scan_unreadable",
+"Image illisible"
+],
+[
+"settings_language_es",
+"Español"
+],
+[
+"settings_language_de",
+"Deutsch"
+],
+[
+"settings_language_it",
+"Italiano"
+],
+[
+"settings_language_system",
+"Système"
+],
+[
+"settings_one_try",
+"Un essai"
+],
+[
+"settings_puzzle_tries",
+"Essais par puzzle"
+],
+[
+"settings_sounds",
+"Sons"
+],
+[
+"settings_sounds_note",
+"Synthétisés, aucun fichier audio embarqué."
+],
+[
+"settings_three_tries",
+"Trois essais"
+],
+[
+"someone_thinking",
+"%1$s réfléchit…"
+],
+[
+"soon",
+"%1$s — bientôt"
+],
+[
+"square_piece",
+"%1$s %2$s en %3$s"
+],
+[
+"starting",
+"Démarrage…"
+],
+[
+"train_continuation_is",
+"La suite est %1$s."
+],
+[
+"train_daily",
+"Révisions du jour"
+],
+[
+"train_daily_new",
+"de nouvelles positions"
+],
+[
+"train_hard_count",
+"%1$d à consolider"
+],
+[
+"train_hard_none",
+"aucune"
+],
+[
+"train_keep_main",
+"Rester sur %1$s"
+],
+[
+"train_no_hard",
+"Aucune position ratée"
+],
+[
+"train_no_hard_body",
+"Les positions difficiles apparaissent ici dès qu'un coup est manqué."
+],
+[
+"train_not_repertoire",
+"Ce n'était pas le coup du répertoire."
+],
+[
+"train_nothing_today",
+"Rien à réviser aujourd'hui"
+],
+[
+"train_nothing_today_body",
+"Revenez demain, ou ouvrez un cours pour travailler une ligne."
+],
+[
+"train_play_and_continue",
+"Jouer %1$s et continuer"
+],
+[
+"train_play_variation",
+"Jouer %1$s"
+],
+[
+"train_session_score",
+"%1$s sur %2$s."
+],
+[
+"train_variation",
+"%1$s est au répertoire, mais la ligne principale est %2$s."
+],
+[
+"train_variation_other",
+"%1$s est une autre variante du répertoire ; la ligne travaillée passe par %2$s."
+],
+[
+"variant_chess960_blurb",
+"Les pièces du fond sont mélangées, identiquement des deux côtés. La théorie d'ouverture ne sert plus à rien : il faut jouer."
+],
+[
+"variant_engine_unavailable",
+"Moteur de variantes indisponible"
+],
+[
+"white_to_move",
+"Aux blancs de jouer"
+],
+[
+"analysis_move_count#one",
+"%1$d coup"
+],
+[
+"course_count_endgames#one",
+"%1$d finale"
+],
+[
+"course_count_endgames#other",
+"%1$d finales"
+],
+[
+"course_count_openings#one",
+"%1$d ouverture"
+],
+[
+"course_count_openings#other",
+"%1$d ouvertures"
+],
+[
+"course_positions#one",
+"%1$d position"
+],
+[
+"progress_games_count#one",
+"%1$d partie"
+],
+[
+"progress_games_count#other",
+"%1$d parties"
+],
+[
+"puzzle_wrong_tries#one",
+"Ce n'est pas le coup — il vous reste %1$d essai"
+],
+[
+"puzzle_wrong_tries#other",
+"Ce n'est pas le coup — il vous reste %1$d essais"
+],
+[
+"scan_pieces#one",
+"%1$d pièce reconnue"
+],
+[
+"scan_pieces#other",
+"%1$d pièces reconnues"
+],
+[
+"scan_uncertain#one",
+"%1$d douteuse"
+],
+[
+"scan_uncertain#other",
+"%1$d douteuses"
+],
+[
+"train_correct#one",
+"%1$d juste"
+],
+[
+"train_correct#other",
+"%1$d justes"
+],
+[
+"train_reviewed#one",
+"%1$d révisée"
+],
+[
+"train_reviewed#other",
+"%1$d révisées"
+],
+[
+"variant_halfmoves#one",
+"%1$d demi-coup"
+],
+[
+"piece_initial_knight",
+"C"
+],
+[
+"piece_initial_bishop",
+"F"
+],
+[
+"piece_initial_rook",
+"T"
+],
+[
+"piece_initial_queen",
+"D"
+],
+[
+"piece_initial_king",
+"R"
+],
+[
+"course_commented",
+"commenté"
+],
+[
+"opponent_nickname_quoted",
+"« %1$s »"
+],
+[
+"setup_strength",
+"Force"
+],
+[
+"setup_strength_note",
+"Stockfish, bridé. Non comparable à l'échelle humaine des personnages."
+],
+[
+"time_bullet",
+"Bullet"
+],
+[
+"time_blitz",
+"Blitz"
+],
+[
+"outcome_flag_you",
+"Temps écoulé — vous perdez"
+],
+[
+"outcome_flag_opponent",
+"Temps écoulé — vous gagnez"
+],
+[
+"outcome_resigned",
+"Vous avez abandonné"
+],
+[
+"outcome_draw_agreed",
+"Nulle acceptée"
+],
+[
+"play_resign_confirm",
+"Abandonner cette partie ?"
+],
+[
+"courses_intro_openings_body",
+"L'index de toutes les lignes, les coups des maîtres avec leurs pourcentages, et les trois meilleurs coups de Stockfish — calculés d'avance."
+],
+[
+"courses_intro_endgames_title",
+"Des fins que l'on prouve"
+],
+[
+"courses_intro_endgames_body",
+"Lucena, Philidor, opposition : des positions à comprendre, pas à retenir — chacune avec le coup qui gagne, et pourquoi."
+],
+[
+"courses_none",
+"Rien ne correspond à cette recherche."
+],
+[
+"course_moves#one",
+"%1$d coup"
+],
+[
+"percent_suffix",
+"\" %\""
+],
+[
+"index_variants#one",
+"%1$d variante"
+],
+[
+"lic_maia_body",
+"Réseau de neurones qui prédit le coup qu'un humain jouerait, entraîné par le CSSLab de l'Université de Toronto sur des millions de parties Lichess. C'est lui qui joue les personnages du mode Contre l'ordinateur ; ses poids (modèle 23M) sont convertis en ONNX. Licence AGPLv3, compatible avec la GPLv3 de l'app, qui ne fournit aucun service réseau."
+],
+[
+"lic_yolo_body",
+"Réseau de neurones qui repère les pièces sur la photo d'un plateau : architecture YOLO11 d'Ultralytics, entraîné pour ChessLab sur des photos de vrais jeux, converti en ONNX. Licence AGPLv3, compatible avec la GPLv3 de l'app."
+],
+[
+"lic_chesskit_body",
+"Règles du jeu (FEN/PGN/SAN), portées en Kotlin depuis la bibliothèque Swift sous licence MIT."
+],
+[
+"lic_onnx_name",
+"ONNX Runtime"
+],
+[
+"lic_onnx_body",
+"Exécute sur l'appareil les réseaux de neurones de l'app — Maia-3 et le détecteur du scanner. Bibliothèque de Microsoft sous licence MIT."
+],
+[
+"transfer_title",
+"Transfert entre appareils"
+],
+[
+"transfer_explanation",
+"Aucun compte, aucun serveur : un fichier que vous enregistrez où vous voulez et rouvrez où vous voulez. L'import FUSIONNE — il ne remplace jamais — si bien qu'importer deux fois le même fichier ne change rien."
+],
+[
+"transfer_exported_one",
+"Exporté."
+],
+[
+"transfer_exported_many",
+"Exporté : %%d révisions."
+],
+[
+"transfer_nothing_new",
+"Rien de nouveau dans ce fichier."
+],
+[
+"transfer_failed",
+"Le fichier n'a pas pu être lu."
+],
+[
+"transfer_not_ours",
+"Ce n'est pas un fichier de transfert ChessLab."
+],
+[
+"transfer_too_new",
+"Ce fichier vient d'une version plus récente de l'app."
+],
+[
+"transfer_imported#one",
+"%1$d révision ajoutée"
+],
+[
+"transfer_imported#other",
+"%1$d révisions ajoutées"
+],
+[
+"transfer_imported_games#one",
+"%1$d partie"
+],
+[
+"transfer_imported_games#other",
+"%1$d parties"
+],
+[
+"arrows_three",
+"Trois"
+],
+[
+"analysis_accuracy",
+"Précision"
+],
+[
+"analysis_reviewing",
+"Analyse… %1$d/%2$d"
+],
+[
+"analysis_no_review",
+"Chargez une partie pour voir son bilan."
+],
+[
+"analysis_moves_counted",
+"%1$d coups classés"
+],
+[
+"analysis_book_moves",
+"dont %1$d de théorie"
+],
+[
+"analysis_copied",
+"PGN copié"
+],
+[
+"analysis_threat",
+"Menace"
+],
+[
+"analysis_review_hint",
+"Classer chaque coup et noter les deux joueurs."
+],
+[
+"analysis_puzzles_created#one",
+"%1$d puzzle créé — retrouvez-le dans le mode Puzzles."
+],
+[
+"analysis_puzzles_created#other",
+"%1$d puzzles créés — retrouvez-les dans le mode Puzzles."
+],
+[
+"puzzle_no_own",
+"Aucun puzzle tiré de vos parties — analysez-en une et utilisez « Créer des puzzles depuis les erreurs »."
+],
+[
+"puzzle_prompt_unrated",
+"%1$s — trouvez le meilleur coup"
+],
+[
+"analysis_pgn_unreadable",
+"Ce PGN n'a pas pu être lu."
+],
+[
+"settings_haptics",
+"Vibration"
+],
+[
+"settings_board_haptics",
+"Vibrations du plateau"
+],
+[
+"settings_haptics_note",
+"Un toucher au coup, plus franc à la prise, un double battement à l'échec."
+],
+[
+"setup_blunder_alert",
+"Me prévenir des coups risqués"
+],
+[
+"two_setup_rotation",
+"Présentation du plateau"
+],
+[
+"two_resume",
+"Reprendre la partie"
+],
+[
+"two_flag_fell",
+"Le drapeau de %1$s est tombé."
+],
+[
+"autosave_two_label",
+"%1$s contre %2$s · %3$d demi-coups"
+],
+[
+"puzzle_filters",
+"Filtres"
+],
+[
+"puzzle_none_match",
+"Aucun puzzle ne correspond à ces filtres."
+],
+[
+"endgame_slip",
+"%1$s → %2$s"
+],
+[
+"endgame_slip_title",
+"Ce coup lâche le verdict"
+],
+[
+"endgame_free_drawn",
+"Nulle."
+],
+[
+"endgame_arbitrating",
+"Vérification…"
+],
+[
+"endgame_unavailable",
+"Le moteur n'a pas pu juger cette position."
+],
+[
+"endgame_slips",
+"%1$d faux pas"
+],
+[
+"endgame_free_goal",
+"Verdict à tenir :"
+],
+[
+"discovery_8_title",
+"%1$d façons de jouer"
+],
+[
+"repedit_err_save",
+"Enregistrement refusé : %1$s"
+],
+[
+"repedit_positions#one",
+"%1$d position"
+],
+[
+"transfer_imported_puzzles#one",
+"progression de %1$d puzzle"
+],
+[
+"transfer_imported_puzzles#other",
+"progression de %1$d puzzles"
+],
+[
+"transfer_imported_woodpecker#one",
+"%1$d programme Woodpecker"
+],
+[
+"transfer_imported_woodpecker#other",
+"%1$d programmes Woodpecker"
+],
+[
+"transfer_imported_repertoires#one",
+"%1$d répertoire"
+],
+[
+"transfer_imported_repertoires#other",
+"%1$d répertoires"
+],
+[
+"chess960_number_hint",
+"0 à 959 — la numérotation de Lichess et des moteurs."
+],
+[
+"chess960_random",
+"Au hasard"
+],
+[
+"chess960_classic",
+"Classique (518)"
+],
+[
+"chess960_invalid",
+"Il n'y a que 960 positions, numérotées de 0 à 959."
+],
+[
+"duck_engine_places",
+"Le canard se pose…"
+],
+[
+"variant_stolen_blurb",
+"Les règles sont celles du jeu classique. En plus : tous les %1$d coups joués, vous gagnez un jeton. Vous n'en gardez jamais plus d'UN : le nouveau efface l'ancien s'il n'a pas été dépensé, et impossible de le dépenser si vous êtes vous-même en échec. Le dépenser vous fait jouer DEUX coups d'affilée — sauf si le premier met l'adversaire en échec, auquel cas le tour s'arrête là. Une prise en passant rendue possible par le dernier coup adverse reste valable même si votre premier coup du tour double s'intercale."
+],
+[
+"stolen_spend",
+"Dépenser le jeton"
+],
+[
+"stolen_spending",
+"Jeton dépensé : jouez votre premier coup"
+],
+[
+"stolen_second_move",
+"À vous, second coup"
+],
+[
+"strength_elo",
+"Elo %1$d"
+],
+[
+"strength_elo_approx",
+"Elo ~%1$d"
+],
+[
+"outcome_opponent_resigned",
+"Votre adversaire abandonne"
+],
+[
+"play_draw_offered_body",
+"Accepter la nulle ?"
+],
+[
+"play_summary_engine",
+"Contre Stockfish, niveau %1$d"
+],
+[
+"play_resume_undone",
+"Reprise au coup %1$d"
+],
+[
+"play_resume_failed",
+"Reprise impossible : la partie enregistrée ne se rejoue pas."
+],
+[
+"two_outcome_won",
+"%1$s a gagné (%2$s)"
+],
+[
+"two_outcome_draw",
+"Partie nulle (%1$s)"
+],
+[
+"two_first_move",
+"Premier coup"
+],
+[
+"two_last_move",
+"Revenir au direct"
+],
+[
+"narration_move_by",
+"%1$s : %2$s"
+],
+[
+"analysis_pause",
+"Mettre en pause"
+],
+[
+"library_empty_body",
+"Les parties terminées — contre l'ordinateur ou à deux — apparaîtront ici."
+],
+[
+"library_imported_none",
+"Rien à importer : aucune partie lisible dans ce fichier."
+],
+[
+"library_import_failed",
+"Ce fichier n'a pas pu être lu."
+],
+[
+"library_tags_hint",
+"Séparez les étiquettes par des virgules."
+],
+[
+"library_tags_placeholder",
+"ouverture, à revoir"
+],
+[
+"library_select",
+"Sélectionner"
+],
+[
+"library_accuracy",
+"Précision %1$d %% / %2$d %%"
+],
+[
+"library_duplicates#one",
+"%d déjà présente, non réimportée."
+],
+[
+"library_duplicates#other",
+"%d déjà présentes, non réimportées."
+],
+[
+"library_imported#one",
+"%d partie importée."
+],
+[
+"library_imported#other",
+"%d parties importées."
+],
+[
+"library_delete_many#one",
+"Supprimer %d partie ?"
+],
+[
+"library_games#one",
+"%d partie"
+],
+[
+"library_games#other",
+"%d parties"
+],
+[
+"entry_other_sources_sub",
+"Coller, ouvrir un fichier, composer une position"
+],
+[
+"puzzle_no_review",
+"Aucun puzzle à revoir — vous avez trouvé proprement chaque puzzle qui correspond à ces filtres lors de votre dernière tentative."
+],
+[
+"puzzle_no_missed",
+"Aucun puzzle raté — vous avez réussi chaque puzzle qui correspond à ces filtres lors de votre dernière tentative."
+],
+[
+"puzzle_start_session",
+"Commencer la séance"
+],
+[
+"lab_series_done",
+"Série terminée — %1$d parties."
+],
+[
+"lab_resume_title",
+"Reprendre la série ?"
+],
+[
+"lab_resume_body",
+"%1$d parties sur %2$d déjà jouées."
+],
+[
+"lab_resumed",
+"Série reprise — %1$d parties déjà jouées"
+],
+[
+"lab_short_time_warning",
+"Un camp proche du maximum et moins de 0,5 s par coup : le temps court bride surtout le camp fort — l'écart réel sera plus petit que l'écart affiché."
+],
+[
+"lab_book_a",
+"Livre pour A"
+],
+[
+"lab_book_b",
+"Livre pour B"
+],
+[
+"lab_book_note",
+"Sans livre, deux moteurs rejouent la même ouverture et la série mesure une position plutôt qu'une force. Un personnage joue TOUJOURS son propre répertoire."
+],
+[
+"lab_draw_rules_note",
+"Les nulles selon les RÈGLES (pat, matériel insuffisant, 50 coups, répétition) sont toujours déclarées."
+],
+[
+"lab_keep_awake_note",
+"Une série tourne plusieurs minutes sans qu'on touche l'écran : sans ça, l'appareil s'endort et la série s'arrête avec lui."
+],
+[
+"lab_keep_awake",
+"Garder l'écran allumé"
+],
+[
+"lab_level_a",
+"Niveau du camp A"
+],
+[
+"lab_level_b",
+"Niveau du camp B"
+],
+[
+"scan_photo",
+"Prendre une photo"
+],
+[
+"chess960_choose",
+"Choisir un numéro"
+],
+[
+"stolen_interval_label",
+"Coups entre deux jetons"
+],
+[
+"home_new_puzzles#one",
+"%1$d nouveau puzzle de votre dernière partie"
+],
+[
+"home_repertoire_exits#one",
+"%1$d position de votre répertoire à revoir"
+],
+[
+"daily_streak_days#one",
+"%1$d jour de suite"
+],
+[
+"daily_todo_woodpecker#one",
+"Cycle %1$d : %2$d puzzle restant"
+],
+[
+"medal_caption",
+"%1$s · prochaine à %2$d jours"
+],
+[
+"help_news_title",
+"Nouveautés de la 2.2"
+],
+[
+"help_daily_body",
+"Chaque jour, l'app rassemble ce qu'il faut revoir, dans l'ordre : positions d'ouverture dues (répétition espacée), puzzles ratés, puzzles tirés de vos parties, votre cycle Woodpecker s'il est en cours (fait dès que vous y avez travaillé aujourd'hui), et une finale. Elle se veut courte : 5 puzzles au plus par étape et un plafond d'ouvertures que vous réglez en bas de l'écran (2, 5 ou 8). Seules les positions DUES comptent. Une étape passe à « fait » quand son objectif du jour est atteint. Votre série compte les jours d'entraînement de suite ; des médailles marquent 3, 7, 30, 100 et 365 jours."
+],
+[
+"help_rating_title",
+"Votre cote de puzzle"
+],
+[
+"help_rating_body",
+"Une cote personnelle, sur l'échelle des puzzles Lichess, suit vos réussites : elle bouge vite au début puis se stabilise. Réussi avec l'indice, un puzzle ne rapporte rien et coûte quelques points ; un puzzle raté ou la solution révélée en font perdre davantage. La puce « À mon niveau » propose des puzzles proches de votre cote. Les puzzles tirés de vos parties et les cycles Woodpecker n'y comptent pas."
+],
+[
+"help_analysis_title",
+"Analyse, Coach et profil"
+],
+[
+"help_analysis_body",
+"Quand vous analysez une de vos parties contre l'ordinateur, l'app repère vos erreurs, en tire des puzzles, note le moment où vous quittez votre répertoire et dessine votre profil de faiblesses (phase de partie, ouvertures, motifs manqués) dans Progrès. Sous l'explication d'une faute, le Coach indique la part des joueurs de votre niveau qui jouent ce coup — d'après Maia : ce que jouent les humains, pas ce qui est bon. L'écran Analyser met votre dernière partie en tête."
+],
+[
+"setup_resume_waiting",
+"Votre partie vous attend : %1$d demi-coup(s) joué(s)."
+],
+[
+"setup_replace_message",
+"Commencer une nouvelle partie effacera la partie en cours (%1$d demi-coup(s) joué(s))."
+],
+[
+"setup_replace_confirm",
+"Remplacer"
+],
+[
+"offer_mates#one",
+"%1$d mat manqué"
+],
+[
+"offer_mistakes#one",
+"%1$d erreur à retravailler"
+],
+[
+"offer_mistakes#other",
+"%1$d erreurs à retravailler"
+],
+[
+"offer_create#one",
+"Créer %1$d puzzle"
+],
+[
+"offer_create#other",
+"Créer %1$d puzzles"
+],
+[
+"puzzle_start_count",
+"Commencer · %1$s puzzles"
+],
+[
+"review_invite_title",
+"Vous aimez ChessLab ?"
+],
+[
+"review_invite_body",
+"Un avis sur le Play Store aide d'autres joueurs à la découvrir. Ça prend une minute."
+],
+[
+"review_invite_rate",
+"Donner un avis"
+],
+[
+"help_contact_body",
+"Vos retours et suggestions pour améliorer l'app sont toujours les bienvenus : tout est lu, et chaque message compte. En cas de bug ou de comportement inattendu, n'hésitez pas à écrire par e-mail, en précisant le modèle de votre téléphone ou tablette, la version d'Android, et une courte description du problème."
+],
+[
+"help_contact_mail_missing",
+"Aucune application de messagerie. Écrivez à %1$s."
+],
+[
+"puzzle_collection_exported",
+"Collection exportée."
+],
+[
+"puzzle_collection_export_failed",
+"La collection n'a pas pu être exportée."
+],
+[
+"puzzle_collection_delete_body",
+"Ses puzzles sont retirés de cet appareil. Le fichier d'origine n'est pas touché."
+],
+[
+"scan_piece_white_pawn",
+"Pion blanc"
+],
+[
+"scan_piece_white_knight",
+"Cavalier blanc"
+],
+[
+"scan_piece_white_bishop",
+"Fou blanc"
+],
+[
+"scan_piece_white_rook",
+"Tour blanche"
+],
+[
+"scan_piece_white_queen",
+"Dame blanche"
+],
+[
+"scan_piece_white_king",
+"Roi blanc"
+],
+[
+"scan_piece_black_pawn",
+"Pion noir"
+],
+[
+"scan_piece_black_knight",
+"Cavalier noir"
+],
+[
+"scan_piece_black_bishop",
+"Fou noir"
+],
+[
+"scan_piece_black_rook",
+"Tour noire"
+],
+[
+"scan_piece_black_queen",
+"Dame noire"
+],
+[
+"scan_piece_black_king",
+"Roi noir"
+]
+]

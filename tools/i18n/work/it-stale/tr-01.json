@@ -1,0 +1,538 @@
+[
+{
+"id": 150,
+"it": "Forza e cadenza"
+},
+{
+"id": 151,
+"it": "Forza, cadenza, aiuti"
+},
+{
+"id": 152,
+"it": "Formazione"
+},
+{
+"id": 153,
+"it": "Partita dei Quattro Cavalli"
+},
+{
+"id": 154,
+"it": "Forchetta"
+},
+{
+"id": 155,
+"it": "Difesa Francese"
+},
+{
+"id": 156,
+"it": "Difesa Fried Fox"
+},
+{
+"id": 157,
+"it": "Difesa Frontale"
+},
+{
+"id": 158,
+"it": "Apertura Globale"
+},
+{
+"id": 159,
+"it": "Difesa Goldsmith"
+},
+{
+"id": 160,
+"it": "Grande Maestro"
+},
+{
+"id": 161,
+"it": "Principiante assoluto"
+},
+{
+"id": 162,
+"it": "Arrocco lungo bianco (O-O-O)"
+},
+{
+"id": 163,
+"it": "Arrocco lungo nero (O-O-O)"
+},
+{
+"id": 164,
+"it": "La marcia verso h8 (Grigoriev, 1930)"
+},
+{
+"id": 165,
+"it": "Studio di Grigoriev — l'unica mossa di re"
+},
+{
+"id": 166,
+"it": "Attacco Grob"
+},
+{
+"id": 167,
+"it": "Difesa Grünfeld"
+},
+{
+"id": 168,
+"it": "Difesa Gunderam"
+},
+{
+"id": 169,
+"it": "Difesa Ippopotamo"
+},
+{
+"id": 170,
+"it": "Difesa Horwitz"
+},
+{
+"id": 171,
+"it": "Apertura Ungherese"
+},
+{
+"id": 172,
+"it": "Ipermoderne"
+},
+{
+"id": 173,
+"it": "Importa"
+},
+{
+"id": 174,
+"it": "Importa da Lichess"
+},
+{
+"id": 175,
+"it": "Importa un PGN"
+},
+{
+"id": 176,
+"it": "Importa un PGN o aggiungi mosse dal costruttore."
+},
+{
+"id": 177,
+"it": "Indice delle linee, maestri, Stockfish"
+},
+{
+"id": 178,
+"it": "Difesa Indiana"
+},
+{
+"id": 179,
+"it": "Intermedio"
+},
+{
+"id": 180,
+"it": "Intermedio avanzato"
+},
+{
+"id": 181,
+"it": "Gambetto Irlandese"
+},
+{
+"id": 182,
+"it": "Irregolari"
+},
+{
+"id": 183,
+"it": "Partita Italiana"
+},
+{
+"id": 184,
+"it": "Mai viste"
+},
+{
+"id": 186,
+"it": "Gioca contro il computer da qui"
+},
+{
+"id": 187,
+"it": "Gioca una mossa per iniziare il repertorio."
+},
+{
+"id": 192,
+"it": "Fino a 5 s/mossa — utile per lasciar respirare il motore a Elo alto."
+},
+{
+"id": 193,
+"it": "Difesa Canguro"
+},
+{
+"id": 194,
+"it": "Gambetto di Re"
+},
+{
+"id": 195,
+"it": "Gambetto di Re accettato"
+},
+{
+"id": 196,
+"it": "Gambetto di Re rifiutato"
+},
+{
+"id": 197,
+"it": "Attacco Est-Indiano"
+},
+{
+"id": 198,
+"it": "Attacco Est-Indiano, con Af5"
+},
+{
+"id": 199,
+"it": "Attacco Est-Indiano, con e6"
+},
+{
+"id": 200,
+"it": "Difesa Est-Indiana"
+},
+{
+"id": 201,
+"it": "Apertura del Cavallo di Re"
+},
+{
+"id": 202,
+"it": "Partita di Pedone di Re"
+},
+{
+"id": 203,
+"it": "Apertura di Pedone di Re"
+},
+{
+"id": 204,
+"it": "Maggioranza di pedoni all'ala di re"
+},
+{
+"id": 205,
+"it": "Cavallo e pedone contro cavallo"
+},
+{
+"id": 206,
+"it": "Pedoni su entrambe le ali contro cavallo"
+},
+{
+"id": 207,
+"it": "Cavallo contro pedone di torre — il difensore solitario"
+},
+{
+"id": 208,
+"it": "Cavallo contro due pedoni separati"
+},
+{
+"id": 209,
+"it": "Il pedone che passa oltre (Kubbel, 1927)"
+},
+{
+"id": 210,
+"it": "Apertura Kádas"
+},
+{
+"id": 211,
+"it": "Il suggerimento e l'avviso di errore grave arriveranno in una prossima versione della modalità."
+},
+{
+"id": 212,
+"it": "La linea riprende da una posizione precedente"
+},
+{
+"id": 213,
+"it": "Il seguito è sviluppato altrove (trasposizione)"
+},
+{
+"id": 214,
+"it": "Labs"
+},
+{
+"id": 215,
+"it": "Avvia la serie (%lld)"
+},
+{
+"id": 217,
+"it": "Simultanea speciale di Lasker"
+},
+{
+"id": 218,
+"it": "La scala di Lasker (1890)"
+},
+{
+"id": 219,
+"it": "Gambetto Lettone"
+},
+{
+"id": 220,
+"it": "Gambetto Lettone accettato"
+},
+{
+"id": 221,
+"it": "La mossa era %@"
+},
+{
+"id": 223,
+"it": "La migliore era "
+},
+{
+"id": 225,
+"it": "Difesa Lemming"
+},
+{
+"id": 227,
+"it": "Link o identificativo di uno studio pubblico"
+},
+{
+"id": 228,
+"it": "Linea completa, senza rete"
+},
+{
+"id": 229,
+"it": "Linea principale"
+},
+{
+"id": 230,
+"it": "Linea terminata!"
+},
+{
+"id": 231,
+"it": "Linee e maestri"
+},
+{
+"id": 232,
+"it": "Linee, maestri, motore"
+},
+{
+"id": 233,
+"it": "Difesa del Leone"
+},
+{
+"id": 234,
+"it": "Sistema London"
+},
+{
+"id": 235,
+"it": "Sistema London, con Ad3"
+},
+{
+"id": 236,
+"it": "Sistema London, con Ae2"
+},
+{
+"id": 237,
+"it": "Maia-3 così com'è: gioca come un umano di questo livello, senza uno stile particolare."
+},
+{
+"id": 238,
+"it": "Sistema Marienbad"
+},
+{
+"id": 239,
+"it": "Matto"
+},
+{
+"id": 240,
+"it": "L'alfiere dalle due vite (Mattison, 1914)"
+},
+{
+"id": 241,
+"it": "Maestro Nazionale"
+},
+{
+"id": 242,
+"it": "Difesa Messicana"
+},
+{
+"id": 243,
+"it": "Apertura Mieses"
+},
+{
+"id": 244,
+"it": "Difesa Mikenas"
+},
+{
+"id": 245,
+"it": "Mediogioco"
+},
+{
+"id": 246,
+"it": "Benoni moderna"
+},
+{
+"id": 247,
+"it": "Difesa Moderna"
+},
+{
+"id": 248,
+"it": "Modifica"
+},
+{
+"id": 249,
+"it": "Difesa Montevideo"
+},
+{
+"id": 250,
+"it": "Motore"
+},
+{
+"id": 252,
+"it": "Difesa Neo-Grünfeld"
+},
+{
+"id": 253,
+"it": "Difesa Nimzo-Indiana"
+},
+{
+"id": 254,
+"it": "Attacco Nimzo-Larsen"
+},
+{
+"id": 255,
+"it": "Difesa Nimzowitsch"
+},
+{
+"id": 256,
+"it": "Livello Elo"
+},
+{
+"id": 257,
+"it": "Livello di riferimento"
+},
+{
+"id": 258,
+"it": "Nuovo repertorio"
+},
+{
+"id": 263,
+"it": "Noce"
+},
+{
+"id": 264,
+"it": "Difesa Vecchio-Indiana"
+},
+{
+"id": 265,
+"it": "Apertura"
+},
+{
+"id": 266,
+"it": "Aperture — Labs"
+},
+{
+"id": 267,
+"it": "Difesa Owen"
+},
+{
+"id": 268,
+"it": "Difesa Owen"
+},
+{
+"id": 269,
+"it": "PGN, posizione FEN, editor"
+},
+{
+"id": 270,
+"it": "Attacco Paleface"
+},
+{
+"id": 271,
+"it": "Tavolozza"
+},
+{
+"id": 272,
+"it": "Tuo"
+},
+{
+"id": 273,
+"it": "Personalizzato"
+},
+{
+"id": 274,
+"it": "Arrocco corto bianco (O-O)"
+},
+{
+"id": 275,
+"it": "Arrocco corto nero (O-O)"
+},
+{
+"id": 276,
+"it": "Difesa Petrov"
+},
+{
+"id": 277,
+"it": "Difesa Russa"
+},
+{
+"id": 278,
+"it": "Difesa Philidor"
+},
+{
+"id": 279,
+"it": "Foto di uno schermo"
+},
+{
+"id": 280,
+"it": "Fotografa lo schermo ben di fronte, senza riflessi. Inquadra la scacchiera il più da vicino possibile."
+},
+{
+"id": 281,
+"it": "Attinge al libro di aperture"
+},
+{
+"id": 282,
+"it": "Pedone"
+},
+{
+"id": 283,
+"it": "Difesa Pirc"
+},
+{
+"id": 284,
+"it": "Ruota di 90°"
+},
+{
+"id": 285,
+"it": "Pezzo in presa"
+},
+{
+"id": 286,
+"it": "Scacchiera reale"
+},
+{
+"id": 287,
+"it": "Difesa Polacca"
+},
+{
+"id": 288,
+"it": "Apertura Polacca"
+},
+{
+"id": 289,
+"it": "Apertura Polacca, con d5"
+},
+{
+"id": 290,
+"it": "Apertura Ponziani"
+},
+{
+"id": 291,
+"it": "Apertura Portoghese"
+},
+{
+"id": 292,
+"it": "Posizione FEN"
+},
+{
+"id": 293,
+"it": "Posizioni padroneggiate"
+},
+{
+"id": 294,
+"it": "Perché non qualcos'altro?"
+},
+{
+"id": 295,
+"it": "Presa en passant"
+},
+{
+"id": 298,
+"it": "Progredisci su 58 aperture scritte a mano e multilingue, tutte riviste con il motore. Un lettore guidato avanza mossa per mossa, spiega ogni mossa e propone le altre mosse giocabili; frecce colorate segnalano la mossa consigliata, le trappole e le imprecisioni. Allenale con la ripetizione dilazionata — l'app pianifica i tuoi ripassi da sola — e ritrova i tuoi progressi su tutti i tuoi dispositivi tramite iCloud. Dal lettore, «Cambia modalità» invia la posizione raggiunta al Laboratorio, al computer o a una partita a due."
+},
+{
+"id": 299,
+"it": "Pseudo-Difesa Ovest-Indiana"
+}
+]

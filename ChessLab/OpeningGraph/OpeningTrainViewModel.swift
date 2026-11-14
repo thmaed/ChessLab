@@ -405,7 +405,7 @@ final class OpeningTrainViewModel {
         let alt = pv.played.san
         pendingVariation = nil
         apply(pv.main, isUser: true)
-        let note = languageCode == "fr" ? "Aussi jouable : \(alt)." : "Also playable: \(alt)."
+        let note = LocalizationController.string("Aussi jouable : %@.", alt)
         currentComment = [note, currentComment].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " ")
         advanceTurn()
     }

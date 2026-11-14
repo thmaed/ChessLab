@@ -1,0 +1,442 @@
+[
+{
+"id": 550,
+"it": "Moderno"
+},
+{
+"id": 551,
+"it": "Modalità"
+},
+{
+"id": 552,
+"it": "Modifica impossibile"
+},
+{
+"id": 553,
+"it": "Modifica il repertorio"
+},
+{
+"id": 554,
+"it": "Modifica i tag"
+},
+{
+"id": 555,
+"it": "Il mio repertorio"
+},
+{
+"id": 556,
+"it": "Motore A"
+},
+{
+"id": 557,
+"it": "Motore B"
+},
+{
+"id": 558,
+"it": "Motore Stockfish, a monte, per annotare le mosse critiche e individuare le trappole."
+},
+{
+"id": 559,
+"it": "Motore di scacchi (Stockfish 19), compilato dai suoi sorgenti C++ direttamente nell'app. Questa licenza impone la messa a disposizione del codice sorgente completo di ChessLab, pubblicato per conformarsi."
+},
+{
+"id": 560,
+"it": "Motore di scacchi per le varianti (Re della collina, Tre scacchi, Orda), fork di Stockfish compilato dai suoi sorgenti C++ direttamente nell'app. Stesso obbligo di licenza: il codice sorgente completo di ChessLab è pubblicato per conformarsi."
+},
+{
+"id": 561,
+"it": "Motore non disponibile"
+},
+{
+"id": 562,
+"it": "Motori"
+},
+{
+"id": 563,
+"it": "Muri mobili"
+},
+{
+"id": 564,
+"it": "Memorizzazione"
+},
+{
+"id": 565,
+"it": "Metodo Woodpecker"
+},
+{
+"id": 566,
+"it": "Stesso dispositivo"
+},
+{
+"id": 567,
+"it": "Nove personaggi, oppure Stockfish"
+},
+{
+"id": 568,
+"it": "Neutro"
+},
+{
+"id": 569,
+"it": "Né un FEN né un PGN riconoscibile."
+},
+{
+"id": 570,
+"it": "Livello"
+},
+{
+"id": 571,
+"it": "Livello raggiunto: "
+},
+{
+"id": 572,
+"it": "Nero"
+},
+{
+"id": 573,
+"it": "Nome"
+},
+{
+"id": 574,
+"it": "Nome della raccolta"
+},
+{
+"id": 575,
+"it": "Nome del repertorio"
+},
+{
+"id": 576,
+"it": "Numero di partite"
+},
+{
+"id": 577,
+"it": "Nomi e codici ECO"
+},
+{
+"id": 578,
+"it": "Non connesso a iCloud — la sincronizzazione è in pausa"
+},
+{
+"id": 579,
+"it": "No, grazie"
+},
+{
+"id": 580,
+"it": "Notazione delle mosse"
+},
+{
+"id": 581,
+"it": "Nuovo puzzle"
+},
+{
+"id": 582,
+"it": "Novità della versione %@"
+},
+{
+"id": 583,
+"it": "Nuova partita"
+},
+{
+"id": 584,
+"it": "Nuova serie"
+},
+{
+"id": 585,
+"it": "Nuovo tag"
+},
+{
+"id": 586,
+"it": "Patta per accordo consentita"
+},
+{
+"id": 587,
+"it": "Patta"
+},
+{
+"id": 588,
+"it": "Patta rifiutata"
+},
+{
+"id": 589,
+"it": "Patte"
+},
+{
+"id": 590,
+"it": "Patte %lld"
+},
+{
+"id": 591,
+"it": "Numero di posizione"
+},
+{
+"id": 592,
+"it": "O-O ⚪"
+},
+{
+"id": 593,
+"it": "O-O ⚫"
+},
+{
+"id": 594,
+"it": "O-O-O ⚪"
+},
+{
+"id": 595,
+"it": "O-O-O ⚫"
+},
+{
+"id": 596,
+"it": "OK"
+},
+{
+"id": 597,
+"it": "Obiettivo del ciclo successivo: meno di %@"
+},
+{
+"id": 598,
+"it": "Occasione mancata"
+},
+{
+"id": 599,
+"it": "Offre un pedone alla seconda mossa, un altro alla terza, e cerca il matto prima di aver sviluppato la donna. I suoi finali sembrano incidenti."
+},
+{
+"id": 600,
+"it": "Computer"
+},
+{
+"id": 601,
+"it": "Orientamento della scacchiera"
+},
+{
+"id": 602,
+"it": "Oppure incolla del testo PGN"
+},
+{
+"id": 603,
+"it": "Apertura non disponibile"
+},
+{
+"id": 604,
+"it": "Aperture"
+},
+{
+"id": 605,
+"it": "Apri file PGN"
+},
+{
+"id": 606,
+"it": "Apri l'editor"
+},
+{
+"id": 607,
+"it": "Apri un file"
+},
+{
+"id": 608,
+"it": "Partita %lld: nessuna posizione di partenza (FEN)."
+},
+{
+"id": 609,
+"it": "Partita %lld: posizione di partenza (FEN) illeggibile."
+},
+{
+"id": 610,
+"it": "Partita %lld: nessuna mossa."
+},
+{
+"id": 611,
+"it": "Partita %lld: la mossa %@ non è giocabile."
+},
+{
+"id": 612,
+"it": "Partita %lld: niente dopo la prima mossa (manca la soluzione)."
+},
+{
+"id": 613,
+"it": "PGN"
+},
+{
+"id": 614,
+"it": "PGN illeggibile: %@"
+},
+{
+"id": 615,
+"it": "PGN, FEN"
+},
+{
+"id": 616,
+"it": "PGN, FEN, libreria"
+},
+{
+"id": 617,
+"it": "Per livello dell'avversario"
+},
+{
+"id": 618,
+"it": "Per personaggio"
+},
+{
+"id": 619,
+"it": "Condividi"
+},
+{
+"id": 620,
+"it": "Condividi la partita"
+},
+{
+"id": 621,
+"it": "Condividi la posizione"
+},
+{
+"id": 622,
+"it": "Parti senza timori"
+},
+{
+"id": 623,
+"it": "Partita"
+},
+{
+"id": 624,
+"it": "Partita %1$lld / %2$lld"
+},
+{
+"id": 625,
+"it": "Partita (PGN) copiata negli appunti."
+},
+{
+"id": 626,
+"it": "Partita patta"
+},
+{
+"id": 627,
+"it": "Partita ripresa, %lld mosse scartate. Annullamento possibile."
+},
+{
+"id": 628,
+"it": "Partita terminata"
+},
+{
+"id": 629,
+"it": "Partita a due giocatori"
+},
+{
+"id": 630,
+"it": "Partite giocate"
+},
+{
+"id": 631,
+"it": "Partite recenti"
+},
+{
+"id": 632,
+"it": "Niente pedoni, niente arrocco. Nessuna mossa può dare scacco al re avversario — a meno che non vinca la partita all'istante. L'obiettivo: portare il tuo re sull'8ª traversa prima dell'avversario. Se il Bianco ci arriva per primo, il Nero ha ESATTAMENTE una mossa per pareggiare arrivandoci a sua volta — altrimenti il Bianco ha vinto."
+},
+{
+"id": 633,
+"it": "Salta"
+},
+{
+"id": 634,
+"it": "Paziente"
+},
+{
+"id": 635,
+"it": "Pausa"
+},
+{
+"id": 636,
+"it": "Durante la partita"
+},
+{
+"id": 637,
+"it": "Perdere per vincere"
+},
+{
+"id": 638,
+"it": "Perse"
+},
+{
+"id": 639,
+"it": "Perse %lld"
+},
+{
+"id": 640,
+"it": "Personaggio"
+},
+{
+"id": 641,
+"it": "Personaggi"
+},
+{
+"id": 642,
+"it": "Fase"
+},
+{
+"id": 643,
+"it": "Libreria foto"
+},
+{
+"id": 644,
+"it": "Pedoni"
+},
+{
+"id": 645,
+"it": "Pezzi della scacchiera (cburnett)"
+},
+{
+"id": 646,
+"it": "Pezzi da precisare"
+},
+{
+"id": 647,
+"it": "Trappola"
+},
+{
+"id": 648,
+"it": "Trappole"
+},
+{
+"id": 649,
+"it": "Scacchiera rilevata. Regola gli angoli se serve: le linee della griglia devono seguire le traverse della scacchiera."
+},
+{
+"id": 650,
+"it": "Scacchiera non rilevata automaticamente. Posiziona i quattro angoli: le linee della griglia devono seguire le traverse della scacchiera."
+},
+{
+"id": 651,
+"it": "Nessun altro puzzle da fare corrisponde a questi filtri."
+},
+{
+"id": 652,
+"it": "Altre opzioni"
+},
+{
+"id": 653,
+"it": "Più l'intervallo è breve, più spesso tornano i doppi turni."
+},
+{
+"id": 654,
+"it": "Posa l'anatra su una casa vuota"
+},
+{
+"id": 655,
+"it": "Posizione"
+},
+{
+"id": 656,
+"it": "Posizione %lld su 960 — la numerazione standard, la stessa di Lichess."
+},
+{
+"id": 657,
+"it": "Posizione (FEN) copiata negli appunti."
+},
+{
+"id": 658,
+"it": "Posizione dopo %lld semimossa di un PGN"
+},
+{
+"id": 659,
+"it": "Posizione dopo %lld semimosse di un PGN"
+}
+]

@@ -15,6 +15,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -516,7 +517,7 @@ private fun OverflowMenu(
 @Composable
 private fun OpeningHeader(ui: AnalysisUiState) {
     val opening = ui.opening ?: return
-    val french = java.util.Locale.getDefault().language == "fr"
+    val language = LocalConfiguration.current.locales[0].language
     Row(
         Modifier.fillMaxWidth().padding(bottom = 6.dp).testTag("ouverture"),
         verticalAlignment = Alignment.CenterVertically,
@@ -534,7 +535,7 @@ private fun OpeningHeader(ui: AnalysisUiState) {
             Spacer(Modifier.width(8.dp))
         }
         Text(
-            opening.displayName(french),
+            opening.displayName(language),
             fontSize = 12.sp, color = Palette.textSecondary, maxLines = 1,
         )
     }
@@ -806,9 +807,7 @@ private fun GameSummarySheet(ui: AnalysisUiState, onDismiss: () -> Unit) {
                                 Spacer(Modifier.width(6.dp))
                             }
                             Text(
-                                opening.displayName(
-                                    java.util.Locale.getDefault().language == "fr"
-                                ),
+                                opening.displayName(LocalConfiguration.current.locales[0].language),
                                 fontSize = 12.sp, color = Palette.textSecondary,
                             )
                         }

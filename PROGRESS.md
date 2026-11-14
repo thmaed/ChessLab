@@ -11100,3 +11100,29 @@ n'ont jamais été dans le dépôt et l'app n'en embarque aucun ; les deux captu
 LOCAL. Les tests qui s'en servent s'ignorent quand elles manquent (iOS : manifeste filtré ; Android : test ignoré),
 et la copie des fixtures Android est une `Sync` (une `Copy` laissait traîner les fichiers retirés).
 Elles restent dans l'HISTORIQUE déjà publié sur GitHub (depuis la 1.0.1) tant qu'il n'est pas réécrit.
+
+## 09/11 — 2.3 : espagnol et allemand, partout (iOS + Android)
+
+Décision de l'auteur : deux langues de plus, complètes, des deux côtés (CLAUDE.md : iOS fait foi, Android suit).
+
+- **Code** : `AppLanguage` (5 choix), `PieceNotation` (.spanish R D T A C, .german K D T L S, défaut dérivé de la
+  langue), `LocalizedText` {fr,en,es,de} avec repli demandée → en → fr → es → de, `EcoOpening.nameEs/nameDe`,
+  catalogues `knownRegions` es/de. Android : `values-es`, `values-de`, `locales_config`, `SanFormatter`,
+  `CourseRepository`, `EcoOpening`.
+- **Contenu** : 1 133 entrées actives + 445 entrées « stale » (noms de cours, familles d'ouvertures, libellés
+  dynamiques — *stale ne veut pas dire inutilisé*), 137 cours (2 656 segments), 76 noms ECO, aide, InfoPlist,
+  extension de partage ; fiches Play (es-ES, de-DE) et App Store (sections es-ES, de-DE de METADATA.md).
+- **Outillage** : `tools/i18n/` (export/merge du catalogue et des cours avec validation des coups, des cases et des
+  formats ; génération des `strings_app.xml` Android depuis le catalogue iOS ; `GLOSSAIRE.md`).
+- **Longueurs allemandes** : libellés raccourcis à la source (Patzer, Experte+, Zuschneiden, Rapid…), pastilles de
+  notation repliables ; vu à l'écran, un défaut trouvé et corrigé (« Französisch » coupé en pleine syllabe).
+- **Non fait** : relecture par un locuteur natif ; captures d'écran des fiches es/de (les fiches reprennent le jeu
+  de captures par défaut) ; passage sur le Galaxy A16 (débranché pendant le chantier).
+
+## 10/11 — 2.3 : l'italien s'ajoute (iOS + Android)
+
+Cinquième langue, mêmes méthodes (`tools/i18n`, désormais paramétrées par `--langs`). Notation italienne R D T A C
+(= espagnole). Catalogue iOS 100 % traduit (1 155 libellés + 443 « stale »), 137 cours (2 457 textes uniques,
+coups et cases vérifiés mécaniquement), 76 noms ECO (`name_it`), extension de partage, InfoPlist, `values-it` Android
+(1 219 éléments), fiches Play it-IT et App Store it. Glossaire `tools/i18n/GLOSSAIRE.md` (section italien).
+- **Non fait** : relecture par un locuteur natif (es, de, it) ; captures de fiche italiennes ; passage sur le Galaxy A16.

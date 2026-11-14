@@ -50,6 +50,8 @@ final class Chess960TwoPlayerViewModel {
     // MARK: Cycle de vie
 
     init(settings: Chess960TwoPlayerSettings) {
+        var settings = settings
+        settings.localizeDefaultNames()
         self.settings = settings
         startFEN = settings.startFEN
         game = Chess960Game(fen: settings.startFEN)!

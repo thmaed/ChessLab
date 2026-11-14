@@ -1,0 +1,538 @@
+[
+{
+"id": 0,
+"it": "%@ (Bianco)"
+},
+{
+"id": 1,
+"it": "%@ (Nero)"
+},
+{
+"id": 2,
+"it": "%@ partite"
+},
+{
+"id": 3,
+"it": "%lld MB"
+},
+{
+"id": 4,
+"it": "%lld linee"
+},
+{
+"id": 5,
+"it": "%lld posizioni ripassate."
+},
+{
+"id": 6,
+"it": "%lld posizioni da ripassare"
+},
+{
+"id": 7,
+"it": "%lld da rivedere"
+},
+{
+"id": 11,
+"it": "Attivala nelle Impostazioni perché le tue partite ti seguano su tutti i tuoi dispositivi tramite il tuo iCloud privato — nessun account da creare, nessun server di terzi. Disattivata per impostazione predefinita: l'app funziona interamente offline. La modifica ha effetto al prossimo avvio."
+},
+{
+"id": 12,
+"it": "Aggiungi mosse al repertorio"
+},
+{
+"id": 13,
+"it": "Contro-gambetto Albin"
+},
+{
+"id": 14,
+"it": "Difesa Alekhine"
+},
+{
+"id": 15,
+"it": "Apertura Amar"
+},
+{
+"id": 16,
+"it": "Attacco Amazzone"
+},
+{
+"id": 17,
+"it": "Attacco di Amsterdam"
+},
+{
+"id": 18,
+"it": "Analisi continua — profondità %lld"
+},
+{
+"id": 19,
+"it": "Analizza da una posizione data"
+},
+{
+"id": 20,
+"it": "Apertura Anderssen"
+},
+{
+"id": 21,
+"it": "Anti-siciliane"
+},
+{
+"id": 22,
+"it": "Anteprime"
+},
+{
+"id": 23,
+"it": "Applicato al prossimo avvio del motore (nuova partita, analisi o serie)."
+},
+{
+"id": 25,
+"it": "Ardesia"
+},
+{
+"id": 26,
+"it": "Attacco di scoperta"
+},
+{
+"id": 27,
+"it": "Nessun repertorio"
+},
+{
+"id": 28,
+"it": "Nessuna"
+},
+{
+"id": 31,
+"it": "Nessuna presa en passant possibile in questa posizione."
+},
+{
+"id": 32,
+"it": "Difesa Australiana"
+},
+{
+"id": 33,
+"it": "Altre mosse possibili"
+},
+{
+"id": 34,
+"it": "Al Bianco"
+},
+{
+"id": 35,
+"it": "Al Nero"
+},
+{
+"id": 36,
+"it": "Avanzato / Esperto"
+},
+{
+"id": 37,
+"it": "Difesa Barnes"
+},
+{
+"id": 38,
+"it": "Apertura Barnes"
+},
+{
+"id": 39,
+"it": "Apertura Basca"
+},
+{
+"id": 40,
+"it": "Gambetto Benko"
+},
+{
+"id": 41,
+"it": "Gambetto Benko accettato"
+},
+{
+"id": 42,
+"it": "Gambetto Benko rifiutato"
+},
+{
+"id": 43,
+"it": "Difesa Benoni"
+},
+{
+"id": 44,
+"it": "Buona"
+},
+{
+"id": 45,
+"it": "Apertura Bird"
+},
+{
+"id": 46,
+"it": "Apertura Bird"
+},
+{
+"id": 47,
+"it": "Alfiere contro cavallo — la fortezza di Sam Loyd"
+},
+{
+"id": 48,
+"it": "Alfiere contro cavallo — la lunga diagonale"
+},
+{
+"id": 49,
+"it": "Alfiere contro due pedoni separati"
+},
+{
+"id": 50,
+"it": "Partita dell'Alfiere"
+},
+{
+"id": 51,
+"it": "Gambetto Blackmar-Diemer"
+},
+{
+"id": 52,
+"it": "Gambetto Blackmar-Diemer accettato"
+},
+{
+"id": 53,
+"it": "Gambetto Blackmar-Diemer rifiutato"
+},
+{
+"id": 54,
+"it": "Contro-gambetto Blumenfeld"
+},
+{
+"id": 55,
+"it": "Contro-gambetto Blumenfeld accettato"
+},
+{
+"id": 56,
+"it": "Difesa Bogo-Indiana"
+},
+{
+"id": 57,
+"it": "Attacco Bongcloud"
+},
+{
+"id": 58,
+"it": "Difesa Borg"
+},
+{
+"id": 59,
+"it": "Bravo!"
+},
+{
+"id": 60,
+"it": "Gambetto Budapest"
+},
+{
+"id": 61,
+"it": "Camille (Maia)"
+},
+{
+"id": 62,
+"it": "Lato"
+},
+{
+"id": 63,
+"it": "Apertura Canard"
+},
+{
+"id": 64,
+"it": "Screenshot"
+},
+{
+"id": 66,
+"it": "Difesa Caro-Kann"
+},
+{
+"id": 67,
+"it": "Difesa Carr"
+},
+{
+"id": 68,
+"it": "Scheda successiva"
+},
+{
+"id": 69,
+"it": "Casa attraversata dall'ultimo pedone avanzato di due case."
+},
+{
+"id": 70,
+"it": "Apertura Catalana"
+},
+{
+"id": 71,
+"it": "Categoria"
+},
+{
+"id": 72,
+"it": "Partita del Centro"
+},
+{
+"id": 73,
+"it": "Partita del Centro accettata"
+},
+{
+"id": 74,
+"it": "Centurini — due diagonali, una troppo corta"
+},
+{
+"id": 75,
+"it": "Centurini — la casa giusta"
+},
+{
+"id": 77,
+"it": "Capitolo completato!"
+},
+{
+"id": 78,
+"it": "ChessKit e ChessKitEngine"
+},
+{
+"id": 79,
+"it": "Difesa Čigorin"
+},
+{
+"id": 80,
+"it": "Scegli…"
+},
+{
+"id": 81,
+"it": "Scegli uno screenshot di scacchiera dalla tua libreria foto. La scacchiera deve essere interamente visibile."
+},
+{
+"id": 82,
+"it": "Classico"
+},
+{
+"id": 83,
+"it": "Classiche"
+},
+{
+"id": 84,
+"it": "Apertura Clemenz"
+},
+{
+"id": 85,
+"it": "Inchiodatura"
+},
+{
+"id": 86,
+"it": "Chiave"
+},
+{
+"id": 87,
+"it": "Sistema Colle"
+},
+{
+"id": 88,
+"it": "Incolla un PGN"
+},
+{
+"id": 89,
+"it": "Incolla il link di uno studio Lichess pubblico, oppure il suo identificativo."
+},
+{
+"id": 90,
+"it": "Abile"
+},
+{
+"id": 91,
+"it": "Pedoni uniti in 5ª — la torre colpisce per prima"
+},
+{
+"id": 92,
+"it": "Pedoni uniti in 6ª contro torre"
+},
+{
+"id": 93,
+"it": "Due pedoni uniti contro torre"
+},
+{
+"id": 94,
+"it": "Costruisci"
+},
+{
+"id": 96,
+"it": "Continua contro il computer da qui"
+},
+{
+"id": 97,
+"it": "Case corrispondenti"
+},
+{
+"id": 98,
+"it": "Mossa commentata"
+},
+{
+"id": 99,
+"it": "Mossa da memorizzare"
+},
+{
+"id": 100,
+"it": "Corso non disponibile"
+},
+{
+"id": 101,
+"it": "Formazione Creepy Crawly"
+},
+{
+"id": 102,
+"it": "Credibile da %lld a %lld"
+},
+{
+"id": 103,
+"it": "Credibile da %lld a %lld."
+},
+{
+"id": 104,
+"it": "Crea"
+},
+{
+"id": 105,
+"it": "Crea un repertorio, poi importa un PGN annotato o costruiscilo mossa per mossa."
+},
+{
+"id": 106,
+"it": "Tagliare prima di spingere"
+},
+{
+"id": 107,
+"it": "Difesa Ceca"
+},
+{
+"id": 108,
+"it": "Fianco a fianco (fisso)"
+},
+{
+"id": 110,
+"it": "Gambetto Danese"
+},
+{
+"id": 111,
+"it": "Gambetto Danese accettato"
+},
+{
+"id": 112,
+"it": "Gambetto Danese rifiutato"
+},
+{
+"id": 117,
+"it": "Dagli appunti o digitato"
+},
+{
+"id": 118,
+"it": "Difficile"
+},
+{
+"id": 119,
+"it": "Il dominio — il cavallo senza case"
+},
+{
+"id": 121,
+"it": "Apertura Dresda"
+},
+{
+"id": 122,
+"it": "Gambetto Duras"
+},
+{
+"id": 123,
+"it": "Difesa Olandese"
+},
+{
+"id": 124,
+"it": "Ramificazione, livello %lld"
+},
+{
+"id": 125,
+"it": "Principiante"
+},
+{
+"id": 126,
+"it": "Principiante avanzato"
+},
+{
+"id": 127,
+"it": "Difesa Döry"
+},
+{
+"id": 128,
+"it": "Difesa Est-Indiana (fianchetto)"
+},
+{
+"id": 129,
+"it": "Pedoni elettrici"
+},
+{
+"id": 130,
+"it": "Gambetto dell'Elefante"
+},
+{
+"id": 132,
+"it": "Ancora"
+},
+{
+"id": 133,
+"it": "Infilata"
+},
+{
+"id": 134,
+"it": "Difesa Inglese"
+},
+{
+"id": 135,
+"it": "Apertura Inglese"
+},
+{
+"id": 136,
+"it": "Orango inglese"
+},
+{
+"id": 137,
+"it": "Gambetto Englund"
+},
+{
+"id": 138,
+"it": "Gambetto Englund rifiutato"
+},
+{
+"id": 139,
+"it": "Allenamento del giorno"
+},
+{
+"id": 140,
+"it": "Prova un'altra categoria."
+},
+{
+"id": 141,
+"it": "Esperto"
+},
+{
+"id": 142,
+"it": "Esploratore"
+},
+{
+"id": 143,
+"it": "FEN"
+},
+{
+"id": 144,
+"it": "Faccia a faccia (ruota)"
+},
+{
+"id": 145,
+"it": "Facile"
+},
+{
+"id": 146,
+"it": "Chiuso"
+},
+{
+"id": 147,
+"it": "File .pgn"
+},
+{
+"id": 148,
+"it": "Fine della linea conosciuta"
+},
+{
+"id": 149,
+"it": "Finale"
+}
+]

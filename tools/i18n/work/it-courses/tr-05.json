@@ -1,0 +1,526 @@
+[
+{
+"id": 762,
+"it": "Il re nero finalmente raccoglie il pedone. Gli sarà costato quattro tempi — e la partita."
+},
+{
+"id": 763,
+"it": "Primo pedone. Il re nero è a sei colonne di distanza: non tornerà mai indietro."
+},
+{
+"id": 764,
+"it": "Secondo pedone, e due pedoni collegati scortati dal loro re contro un re nudo. L'esca ha fatto tutto: non ha mai minacciato di far donna, ha solo comprato quattro tempi — esattamente ciò che serviva."
+},
+{
+"id": 765,
+"it": "Torre e alfiere contro torre è in genere patta — tre corsi di questo catalogo insegnano a tenerla. Ecco l'eccezione che Philidor analizzò già nel 1749: il re difensore intrappolato sull'ultima traversa, DI FRONTE al re attaccante, perde anche con la migliore difesa. Solo una delle 23 mosse del Bianco vince qui — e ogni passo della manovra ha un significato preciso."
+},
+{
+"id": 766,
+"it": "La manovra di Philidor, mossa per mossa"
+},
+{
+"id": 767,
+"it": "La mossa naturale che fa sfuggire tutto"
+},
+{
+"id": 768,
+"it": "L'UNICA mossa vincente su 23 (verificata con le tablebase — tutto il resto è patta). Lo scacco costringe la torre nera a interporsi in e8, dove blocca la casa di fuga del suo stesso re."
+},
+{
+"id": 769,
+"it": "Costruire una minaccia di matto con l'alfiere sembra naturale — e PAREGGIA soltanto (verificato: la posizione scende da vinta a patta). La torre nera ha una risorsa stupefacente."
+},
+{
+"id": 770,
+"it": "Il cuore dell'idea: la torre bianca si impadronisce della 7ª traversa e minaccia matto di lato. La torre nera è in zugzwang — non può restare in e8 (deve rispondere a Ra7-a8), quindi deve lasciare l'8ª traversa e abbandonare il suo re."
+},
+{
+"id": 771,
+"it": "La difesa più dura secondo la tablebase: la torre corre il più lontano possibile, pronta a molestare da dietro."
+},
+{
+"id": 772,
+"it": "La torre nera deve custodire la colonna c — altrimenti Rb8+ seguita da matto. Ora è legata a un'unica colonna: esattamente ciò che voleva il Bianco."
+},
+{
+"id": 773,
+"it": "Primo passo del triangolo d'alfiere (b3-e6-d5): l'alfiere lascia d5 GUADAGNANDO un tempo — da b3 controlla ancora e6, preparandosi a tornare in d5 nel momento esatto in cui dà più fastidio alla torre nera."
+},
+{
+"id": 774,
+"it": "Il triangolo è completo: stessa posizione di prima, ma la torre nera è stata spinta da c1 a d3 — una casa ben peggiore, come mostra il seguito. Perdere un tempo per restituire la mossa: l'arma stessa della triangolazione nei finali di pedoni."
+},
+{
+"id": 775,
+"it": "Ora che la torre nera non sta più in c1, il re nero viene sfrattato da d8 — verso il lato dove lo attende la torre bianca."
+},
+{
+"id": 776,
+"it": "La rete finale: la torre punta a4, poi a8. Contro la minaccia di Be6+ seguita da Rb8 matto, la difesa è ridotta a risorse da una mossa."
+},
+{
+"id": 777,
+"it": "Minaccia di Ra8 matto (l'alfiere in d5 copre la casa di fuga b7). Alla torre nera resta una sola risorsa: gettarsi sull'alfiere."
+},
+{
+"id": 778,
+"it": "Il sacrificio disperato — letteralmente la miglior difesa secondo la tablebase: tutto il resto subisce matto più in fretta."
+},
+{
+"id": 779,
+"it": "Ciò che resta è re e torre contro re: il matto elementare, insegnato nel suo corso. La lezione di Philidor finisce qui — ricorda il trio: lo scacco che forza l'interposizione, la 7ª traversa, il triangolo d'alfiere."
+},
+{
+"id": 780,
+"it": "Il contrattacco: uno scacco E un'offerta di torre. Rifiutarla costringe il re bianco a rinunciare a d6, e tutta la pressione evapora."
+},
+{
+"id": 781,
+"it": "Stallo! Il re nero non ha più case (l'alfiere in d7 copre c8 ed e8, il re bianco copre il resto) né pezzi da muovere. Ecco perché vince solo 1.Rf8+: non lascia mai nascere questo controgioco."
+},
+{
+"id": 782,
+"it": "Un pedone in meno in un finale di torri? Philidor mostrò nel 1749 che la patta si GIOCA, in due tempi: la torre sbarra la sesta traversa, poi — nel momento in cui il pedone vi mette piede — passa dietro per scacchi senza fine. La difesa più redditizia degli scacchi."
+},
+{
+"id": 783,
+"it": "La barriera, poi gli scacchi"
+},
+{
+"id": 784,
+"it": "La barriera regge da sola"
+},
+{
+"id": 785,
+"it": "Il cambio che perde tutto"
+},
+{
+"id": 786,
+"it": "Prendere il pedone troppo presto"
+},
+{
+"id": 787,
+"it": "La BARRIERA: la torre si accampa sulla stessa traversa che il re bianco deve attraversare, e gliela nega interamente. Finché il pedone non avanza, NON c'è modo di passare."
+},
+{
+"id": 788,
+"it": "«Cambiamo le torri e respiriamo.» Si guardi il finale di pedoni PRIMA di cambiare: il re bianco sta DAVANTI al suo pedone — una vittoria da manuale per lui (si veda «L'opposizione»). Cambiare le torri è l'ULTIMA decisione di un finale di torri: dopo, non resta alcuna difesa."
+},
+{
+"id": 789,
+"it": "L'unico tentativo: spingere il pedone per restituire la sesta traversa al re. Ma quel pedone ha appena perso la sua ultima ombra — nulla ripara più il re bianco dagli scacchi."
+},
+{
+"id": 790,
+"it": "Inseguire il re nero? Gli bastano due case."
+},
+{
+"id": 791,
+"it": "Il PERNO — tutto Philidor vive in questa mossa: il compito della barriera è finito, la torre corre ALL'ESTREMITÀ OPPOSTA per mitragliare da dietro. Né prima né dopo: esattamente quando il pedone tocca la sesta traversa."
+},
+{
+"id": 792,
+"it": "Il pedone è libero? No: è un'ESCA. Il re bianco lo copriva — la torre nera si è appena venduta per un pedone."
+},
+{
+"id": 793,
+"it": "E così comincia. Si contino i ripari del re bianco: non ce n'è nessuno."
+},
+{
+"id": 794,
+"it": "La torre dà scacco dalla DISTANZA MASSIMA: a otto traverse di distanza, il re non può mai avvicinarsi per scacciarla."
+},
+{
+"id": 795,
+"it": "Perpetuo. Il re bianco può vagare dove vuole: senza riparo, ogni casa vale esattamente uno scacco in più. La patta è ormai un fatto, non una speranza."
+},
+{
+"id": 796,
+"it": "Il re resta in contatto con la casa di promozione — mai più lontano della traversa successiva."
+},
+{
+"id": 797,
+"it": "E non esiste di meglio: la sesta traversa resta sigillata, la posizione si ripete."
+},
+{
+"id": 798,
+"it": "Di nuovo esattamente dove eravamo partiti. È la bellezza della barriera: non esige NIENTE se non pazienza."
+},
+{
+"id": 799,
+"it": "Resta solo una lezione di opposizione — dalla parte sbagliata."
+},
+{
+"id": 800,
+"it": "Torre per pedone. Il resto è il corso «Il matto di torre», giocato contro di te."
+},
+{
+"id": 801,
+"it": "Una pura corsa di pedoni: tre tempi a testa, entrambi i pedoni promuovono — patta, dice il conteggio. Sbagliato: il re nero sta sulla lunga diagonale a8-h1, quella che collega ENTRAMBE le case di promozione. Così la donna bianca nasce con scacco, e divora il pedone g2 lungo quella stessa diagonale una mossa dopo. Contare i tempi non basta mai: guardare sempre cosa vedrà la nuova donna dalla sua casa di nascita."
+},
+{
+"id": 802,
+"it": "Spingi, spingi, promuovi con scacco"
+},
+{
+"id": 803,
+"it": "Un tempo di scorta — e lo scacco cambia lato"
+},
+{
+"id": 804,
+"it": "L'UNICA mossa vincente su otto (verificato: quattro mosse di re pareggiano, tre perdono). In una pura corsa ogni tempo di re è un tempo rubato alla corsa — e il re in b5 fa già tutto il suo lavoro da fermo: copre c6, la casa di cui il re nero avrebbe bisogno per raggiungere il pedone."
+},
+{
+"id": 805,
+"it": "Scortare il pedone con il re: il giusto istinto nei finali di donna… e qui, l'errore che butta via la vittoria (verificato: la posizione scende da vinta a patta). La corsa non aspetta nessuno."
+},
+{
+"id": 806,
+"it": "Corre anche il Nero — la miglior difesa secondo la tablebase. Tre tempi contro tre: sulla carta, nessuno vince questa corsa."
+},
+{
+"id": 807,
+"it": "La promozione arriva con SCACCO — e l'intero finale si è deciso proprio lì, fin dall'inizio: il re nero sta sulla lunga diagonale a8-h1, quella che collega le due case di promozione. Si contino i tempi, poi si controlli SEMPRE questa geometria."
+},
+{
+"id": 808,
+"it": "Il re deve rispondere allo scacco — si noti che sulla diagonale non resta alcuna casa di fuga: la donna che dà scacco le spazza tutte da sola. Il pedone g2 attende, a un passo dalla gloria, un passo che non farà mai."
+},
+{
+"id": 809,
+"it": "La stessa linea della donna che ha dato lo scacco ora raccoglie il pedone: g2 sta SULLA diagonale a8-h1. Uno scacco = un tempo = l'intera corsa. Ciò che segue è il matto di donna, insegnato nel suo corso."
+},
+{
+"id": 810,
+"it": "Esatta immagine speculare della linea principale: stavolta è la promozione del NERO ad arrivare con scacco — il re bianco si è messo sulla diagonale g1-a7 giocando Kb6. Il tempo «perso» non si è dissolto: ha cambiato proprietario."
+},
+{
+"id": 811,
+"it": "E la nuovissima donna si concede persino il lusso di restituire il materiale: compra il pedone a7 e la patta più pulita che esista."
+},
+{
+"id": 812,
+"it": "Due re nudi. L'intera storia delle corse di pedoni sta in questo dittico: un tempo di differenza, due diagonali — e decide lo scacco, mai il solo conteggio."
+},
+{
+"id": 813,
+"it": "Due pedoni battono uno — soprattutto quando uno protegge l'altro. Un pedone passato PROTETTO non è solo un pedone in più: è intoccabile, e il lato più debole può logorarsi ad avvicinarlo, il risultato non cambia."
+},
+{
+"id": 814,
+"it": "Prenderlo accelera solo la fine"
+},
+{
+"id": 815,
+"it": "Anche senza prenderlo: perso lo stesso"
+},
+{
+"id": 816,
+"it": "Il riflesso: «prendo ciò che c'è da prendere» — salvo che il pedone c4 era lì solo per proteggere d5. Una volta sparito, d5 corre da solo, e il re nero se ne è appena andato per sempre."
+},
+{
+"id": 817,
+"it": "Il re nero si limita ad avvicinarsi, senza catturare subito — la sfumatura non cambia nulla: nel momento in cui il Bianco spinge d6, la guardia c4 non ha più bisogno di protezione, e la stessa corsa ricomincia."
+},
+{
+"id": 818,
+"it": "Si ricordi il quadro, non la linea: un pedone passato protetto non si combatte CORPO A CORPO — lo si ignora, si gioca altrove, e fa il lavoro da solo quando arriva il momento."
+},
+{
+"id": 819,
+"it": "Lo prende comunque, alla fine — un tempo dopo, il che peggiora solo il suo ritardo rispetto al pedone d, già ben avanti."
+},
+{
+"id": 820,
+"it": "Il matto più comune degli scacchi — e il più pasticciato: una sola mossa di donna troppo zelante è stallo, e ore di gioco evaporano. Il metodo sta in un'immagine: la donna sta a una MOSSA DI CAVALLO dal re nemico, e quasi mai dà scacco."
+},
+{
+"id": 821,
+"it": "La distanza di una mossa di cavallo"
+},
+{
+"id": 822,
+"it": "Lo stallo dello zelo"
+},
+{
+"id": 823,
+"it": "Niente scacco! La donna prende il re con una L di cavallo e gli ruba mezza scacchiera: la 7ª traversa, la colonna c, entrambe le diagonali. Ogni fuga reale verrà accolta dalla stessa L."
+},
+{
+"id": 824,
+"it": "Il re si è mosso, la donna riprende la sua L (e4-c5: un salto di cavallo). Non è sfuggito: è entrato in una scatola più piccola."
+},
+{
+"id": 825,
+"it": "Ancora la L. La donna non insegue il re: gli restringe il mondo."
+},
+{
+"id": 826,
+"it": "La donna confina da sola — dunque tocca al RE avvicinarsi. Un matto di donna è sempre un lavoro di squadra: lei imprigiona, lui conclude."
+},
+{
+"id": 827,
+"it": "Il re bianco prende la casa chiave. Attenzione: È QUI che la donna troppo zelante dà stallo — si veda l'altro capitolo."
+},
+{
+"id": 828,
+"it": "«Ancora una piccola stretta…» — STALLO. Si contino le case dell'avversario PRIMA di stringere: b1, b2, c2, d1 prese dalla donna, d2 dal re. Zero case. Ore di gioco, mezzo punto. La regola d'oro: quando il re nemico tocca il bordo, cerca il MATTO, non più confinamento."
+},
+{
+"id": 829,
+"it": "Scacco E matto — il primo scacco dell'intero finale, ed è l'ultima mossa. Si ricordi questo rapporto: il cento per cento degli scacchi erano utili."
+},
+{
+"id": 830,
+"it": "Il finale di donna per eccellenza: un pedone in più, un avversario che vivrà di soli scacchi. La corsa non si vince fuggendo gli scacchi ma riparandosi da essi: il re scivola sotto un «ombrello» fatto del suo stesso pedone e della sua donna, mentre gli scacchi del Bianco guadagnano i tempi per la promozione. Una posizione da manuale (Müller e Lamprecht): al Bianco di muovere vince, al Nero di muovere pareggia — un solo tempo separa i due mondi."
+},
+{
+"id": 831,
+"it": "L'ombrello, la promozione scortata, la liquidazione"
+},
+{
+"id": 832,
+"it": "Ripararsi prima che ci sia un tetto"
+},
+{
+"id": 833,
+"it": "Prima il pedone — la conversione più rapida di dodici mosse (verificato: altre due mosse vincono pure, ma in 32 e 65 mosse). In un finale di donna il pedone passato è l'unico argomento: tutto il resto è solo gestire gli scacchi nemici."
+},
+{
+"id": 834,
+"it": "Aprire l'ombrello PRIMA di lanciare il pedone: sembra prudente, e butta via la vittoria (verificato: la posizione torna patta). Il tetto dell'ombrello è il pedone in h7 — finché sta in h5, il re esce sotto la pioggia."
+},
+{
+"id": 835,
+"it": "La miglior difesa: il re nero accorre — una donna sola non può dare lo scacco perpetuo, ha bisogno del suo re per stringere la rete."
+},
+{
+"id": 836,
+"it": "La tempesta comincia. Si contino gli scacchi del Nero da qui: saranno solo due prima che il pozzo si prosciughi."
+},
+{
+"id": 837,
+"it": "La prima tela dell'ombrello: la donna si interpone sulla colonna g E si mette di guardia accanto al pedone in h7. Una mossa, due compiti — il marchio delle buone mosse nei finali di donna."
+},
+{
+"id": 838,
+"it": "L'ombrello è aperto: pedone in h7 sopra la testa, donna in g6 sul fianco — il re è all'asciutto. Si controlli ogni linea verso h6: tutte bloccate o coperte. IL quadro da ricordare di questo finale."
+},
+{
+"id": 839,
+"it": "Nemmeno uno scacco rimasto — la donna nera si ritira sulla lunga diagonale, un'ultima occhiata a h8, la casa di promozione."
+},
+{
+"id": 840,
+"it": "Tocca a te: gli scacchi del BIANCO, invece, pagano. Ognuno porta la donna verso il suo posto finale rubando il tempo."
+},
+{
+"id": 841,
+"it": "Un secondo scacco-tempo, e si guardi la casa di arrivo: f8 controlla h8 lungo la traversa. La promozione ora è scortata — la diagonale b2-h8 della donna nera non basterà."
+},
+{
+"id": 842,
+"it": "Due donne contro una. Resta solo da superare l'ultima salva di scacchi — con due interposizioni disponibili, è una semplice questione di tecnica."
+},
+{
+"id": 843,
+"it": "Il re rientra al riparo tra le sue due donne — g6, h7, g8: ogni passo resta al coperto."
+},
+{
+"id": 844,
+"it": "Il primo dovere della nuova donna: interporsi. Una donna in più è uno scudo in più — gli scacchi del Nero ora si logorano contro il materiale, non più contro il re."
+},
+{
+"id": 845,
+"it": "La seconda interposizione — e questa non si può aggirare: ogni linea verso g8 passa per una donna bianca."
+},
+{
+"id": 846,
+"it": "La difesa è ridotta al suo ultimo gesto: riprendere una donna."
+},
+{
+"id": 847,
+"it": "…e ne resta una. Donna contro re nudo: il matto elementare, insegnato nel suo corso. Si ricordi il meccanismo in tre parti: il pedone corre, il re si ripara sotto l'ombrello, e gli scacchi del BIANCO pagano la promozione."
+},
+{
+"id": 848,
+"it": "L'acquazzone, subito — la diagonale e3-h6 è spalancata, senza tela che la chiuda."
+},
+{
+"id": 849,
+"it": "E la mossa più elegante della difesa: non uno scacco — un'INCHIODATURA. Il pedone h5 è inchiodato contro il suo stesso re, congelato per sempre; qualsiasi mossa di re per sbloccarlo rientra negli scacchi. La patta è sigillata: un ombrello senza tetto non ripara nessuno."
+},
+{
+"id": 850,
+"it": "Lo stesso finale di «Donna contro pedone»… tranne che il pedone sta in c2, e tutto si ribalta: è PATTA, purché si conosca la vera risorsa — che non è quella della leggenda. La tablebase ha sorprese per entrambi i lati."
+},
+{
+"id": 851,
+"it": "Promuovere per cambiare"
+},
+{
+"id": 852,
+"it": "La vite gira a vuoto"
+},
+{
+"id": 853,
+"it": "La leggenda dell'angolo a1"
+},
+{
+"id": 854,
+"it": "Lo stallo esiste — per loro"
+},
+{
+"id": 855,
+"it": "Il Bianco si mette davanti al pedone. Contro un pedone centrale la vite senza fine vincerebbe — qui, si osservi l'antidoto."
+},
+{
+"id": 856,
+"it": "L'attacco «normale»: la donna arriva da dietro, come contro il pedone centrale."
+},
+{
+"id": 857,
+"it": "Il re resta INCOLLATO al suo pedone, pronto a riprendere in c1. È la guardia del corpo del cambio in arrivo."
+},
+{
+"id": 858,
+"it": "Il re bianco accorre — non farà mai in tempo."
+},
+{
+"id": 859,
+"it": "LA risorsa, e non è lo stallo: promuovere PER CAMBIARE. La colonna c ora è vuota, la donna bianca deve prendere — e il re nero riprende. Resteranno solo due re."
+},
+{
+"id": 860,
+"it": "Rifiutare il cambio lascia donna contro donna: anch'essa patta."
+},
+{
+"id": 861,
+"it": "Re contro re. Si ricordi il duo che tiene questa patta: re incollato al pedone + promozione-cambio nel momento in cui la donna si avvicina a c1."
+},
+{
+"id": 862,
+"it": "La donna tocca la zona di promozione. Contro un pedone d, il Nero sarebbe perso. Qui…"
+},
+{
+"id": 863,
+"it": "…ANCORA la promozione-cambio — ed è l'UNICA mossa che tiene: tutto il resto perde, compresa la celebre Ka1 (capitolo seguente). La donna in d2 sta troppo vicina: non può né rifiutare il cambio né vincerlo."
+},
+{
+"id": 864,
+"it": "La mossa da manuale: «nell'angolo, e Qxc2 è stallo». La tablebase è categorica: giocata QUI, PERDE. Lo stallo è una risorsa solo se l'avversario accetta di catturare — e non lo farà, non così."
+},
+{
+"id": 865,
+"it": "La deviazione letale: la donna passa PER c1 — proprio la casa che il re ha ceduto lasciando b1."
+},
+{
+"id": 866,
+"it": "Se il Bianco DIVORA il pedone… STALLO — a2, b1 e b2 tutte coperte dalla donna, e il re non respira. Da qui nasce la leggenda: la trappola è reale, ma intrappola un ATTACCANTE SBADATO — non è una difesa affidabile."
+},
+{
+"id": 867,
+"it": "E il pedone cade CON SCACCO: nessuno stallo da nessuna parte. Il divario tra leggenda e verità era un tempo — quello che Ka1 ha regalato."
+},
+{
+"id": 868,
+"it": "Donna contro re nudo: si veda «Il matto di donna»."
+},
+{
+"id": 869,
+"it": "Hai promosso per primo; il tuo avversario è A UNA casa dal fare lo stesso. La donna batte un pedone centrale — ma non di corsa: con una vite senza fine di scacchi che costringe il re nemico davanti al suo pedone, rubando un tempo a ogni giro della spirale."
+},
+{
+"id": 870,
+"it": "La vite senza fine"
+},
+{
+"id": 871,
+"it": "E se promuove?"
+},
+{
+"id": 872,
+"it": "Prima il re? No."
+},
+{
+"id": 873,
+"it": "La donna non si precipita sul pedone: dà scacco STRINGENDO — ogni scacco la porta una casa più vicina, a zigzag."
+},
+{
+"id": 874,
+"it": "«Il mio re è a quattro passi, corriamo.» Un tempo troppo lento: il pedone fa donna, e donna contro donna non è più una vittoria. SEMPRE prima la vite — solo lei congela il pedone."
+},
+{
+"id": 875,
+"it": "Sempre lo scacco che guadagna una casa."
+},
+{
+"id": 876,
+"it": "Stavolta niente scacco: la donna punta d1 DA DIETRO. Il re nero ha una sola via per mantenere in vita il suo pedone…"
+},
+{
+"id": 877,
+"it": "…ed ecco la chiave di tutto il finale: questo scacco costringe il re DAVANTI al suo stesso pedone."
+},
+{
+"id": 878,
+"it": "Il pedone è imbavagliato dal suo stesso re: il Nero non ha più minacce. Quella tregua di UN tempo è tutto ciò che la vite produce — e tutto ciò che serve."
+},
+{
+"id": 879,
+"it": "IL tempo rubato: il re bianco fa un passo. Poi la vite riparte — scacchi, re davanti, un passo. Si contino i passi che servono: quello è il tuo margine."
+},
+{
+"id": 880,
+"it": "Il re entra SENZA prendere il pedone: sì, d2 può promuovere — e allora? Si osservi cosa segue: la promozione non salva nulla, e ignorarla è la via più breve."
+},
+{
+"id": 881,
+"it": "Il CAVALLO disperato — davvero la miglior difesa secondo la tablebase: una donna nascerebbe morta (si veda l'altro capitolo). Il cavallo almeno dà scacco… rimandando le cose di due mosse."
+},
+{
+"id": 882,
+"it": "La promozione «naturale»… e la donna nasce per morire: una casa, una mossa, un matto."
+},
+{
+"id": 883,
+"it": "Il cavallo fugge, minacciando… assolutamente nulla."
+},
+{
+"id": 884,
+"it": "Il fuggitivo è inchiodato a metà falcata — e la rete si chiude."
+},
+{
+"id": 885,
+"it": "Matto, con il cavallo che guarda dal balcone. La vite senza fine, il re che entra, il disperato confutato: il metodo completo in dodici mosse."
+},
+{
+"id": 886,
+"it": "La nuovissima donna guarda, impotente: b2 era l'unica casa che contava. ECCO perché il cavallo era la difesa migliore."
+},
+{
+"id": 887,
+"it": "Una patta teorica. L'intero finale si è deciso con la prima mossa del Bianco."
+},
+{
+"id": 888,
+"it": "Senza pedoni, la donna di solito vince contro torre e alfiere — separandoli con scacchi a distanza fino allo zugzwang. La difesa: tenere tutti e tre i pezzi neri ammassati, ciascuno a proteggerne un altro — un triangolo che la sola donna non può mai spezzare."
+},
+{
+"id": 889,
+"it": "Il triangolo regge"
+},
+{
+"id": 890,
+"it": "Il re si allontana, il triangolo si rompe"
+},
+{
+"id": 891,
+"it": "Uno scacco a distanza — il metodo abituale per cercare di separare i pezzi neri."
+},
+{
+"id": 892,
+"it": "Il re nero resta incollato a torre e alfiere — il triangolo re-torre-alfiere non si rompe. Patta verificata: nessun tentativo bianco provato dall'oracolo da questo incrocio ha mai fatto meglio."
+}
+]

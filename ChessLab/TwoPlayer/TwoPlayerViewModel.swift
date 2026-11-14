@@ -64,6 +64,8 @@ final class TwoPlayerViewModel {
     /// Démarre une nouvelle partie — position standard, ou celle imposée par
     /// ``TwoPlayerGameSettings/startFEN`` (reprise depuis un autre mode).
     init(settings: TwoPlayerGameSettings, modelContext: ModelContext) {
+        var settings = settings
+        settings.localizeDefaultNames()
         self.settings = settings
         self.modelContext = modelContext
 
@@ -84,7 +86,9 @@ final class TwoPlayerViewModel {
     /// Reprend une partie sauvegardée. `nil` si la sauvegarde est
     /// irrécupérable (voir ``replay(lans:)``).
     init?(resuming autosave: TwoPlayerGameAutosave, modelContext: ModelContext) {
-        settings = autosave.settings
+        var restored = autosave.settings
+        restored.localizeDefaultNames()
+        settings = restored
         self.modelContext = modelContext
 
         // 🐛 Corrigé (revue du 19/08) : depuis que « Changer de mode » peut

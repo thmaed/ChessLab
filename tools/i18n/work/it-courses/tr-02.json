@@ -1,0 +1,506 @@
+[
+{
+"id": 357,
+"it": "Stonewall"
+},
+{
+"id": 358,
+"it": "Classica — …e6 …Be7"
+},
+{
+"id": 359,
+"it": "Anti-Olandese — 2.Bg5"
+},
+{
+"id": 360,
+"it": "Gambetto Staunton — 2.e4"
+},
+{
+"id": 361,
+"it": "2.c4 — la linea principale"
+},
+{
+"id": 362,
+"it": "2.Bf4 — il London contro l'Olandese"
+},
+{
+"id": 363,
+"it": "L'Olandese: prendere il controllo di e4 fin dalla prima mossa."
+},
+{
+"id": 364,
+"it": "Un tentativo di infastidire: l'alfiere inchioda e ostacola …Nf6. …g6 mantiene l'ordine."
+},
+{
+"id": 365,
+"it": "Il Gambetto Staunton: un pedone per uno sviluppo rapido. Restituire il pedone e sviluppare per neutralizzarlo."
+},
+{
+"id": 366,
+"it": "La seconda mossa più giocata contro l'Olandese, e il corso non la copriva. Senza una risposta qui, il repertorio fallisce in una partita su tre."
+},
+{
+"id": 367,
+"it": "Una partita su cinque: il Bianco sviluppa l'alfiere prima di e3 per non imprigionarlo."
+},
+{
+"id": 368,
+"it": "Lo schieramento Leningrado: alfiere in g7, struttura da Est-Indiana, gioco dinamico."
+},
+{
+"id": 369,
+"it": "La manovra chiave: la donna va verso h5/g6 per sostenere …e5 e l'attacco."
+},
+{
+"id": 370,
+"it": "La Stonewall: pedoni d5-e6-f5, un muro che blocca e4 e prepara un attacco sul lato di re."
+},
+{
+"id": 371,
+"it": "Il piano Iljin-Ženevskij: …Qe8-g6/h5 e …e5 per lanciare l'attacco sul lato di re."
+},
+{
+"id": 372,
+"it": "Scegliamo la Stonewall: una struttura chiusa, un piano chiaro, e l'alfiere in g2 morde il granito."
+},
+{
+"id": 373,
+"it": "Il fianchetto dell'ala di donna è il metodo giusto qui: controlla e4 e prepara …Be7 e l'arrocco, senza indebolire nulla."
+},
+{
+"id": 374,
+"it": "Pedoni di torre bloccati all'ala di donna, un pedone in più sul lato di re: la regola di Bahr sostiene che le tre condizioni qui soddisfatte bastino al Bianco per vincere. Santelli ne ha trovato la falla — è patta. Notevole: se il Nero avesse la mossa in questa stessa identica posizione, il Bianco vincerebbe."
+},
+{
+"id": 375,
+"it": "Il pedone in più non basta"
+},
+{
+"id": 376,
+"it": "Il pedone in più avanza, scortato verso un cambio invece di essere tenuto in riserva — la regola di Bahr vorrebbe che questo pedone decida da solo la partita."
+},
+{
+"id": 377,
+"it": "Il pedone prosegue fino al cambio."
+},
+{
+"id": 378,
+"it": "Il re nero lo prende, e non resta che la corsa simmetrica dei pedoni di torre — una semplice patta per opposizione, come se il pedone in più non fosse mai esistito. La falla di Bahr, dimostrata: le tre condizioni insieme non bastavano."
+},
+{
+"id": 379,
+"it": "Il più difficile dei quattro matti elementari — e l'unico in cui conta l'ANGOLO: un alfiere campo-scuro può dare matto solo in un angolo scuro (a1 o h8). Il re nero si è rifugiato in a8, un angolo chiaro dove non esiste matto: va scacciato, poi intercettato nella sua corsa verso l'altro angolo chiaro, h1. L'intera linea è ottimale secondo le tablebase, dallo sfratto al matto."
+},
+{
+"id": 380,
+"it": "Sfrattare, sbarrare la strada, matto nell'angolo giusto"
+},
+{
+"id": 381,
+"it": "Lo sfratto: a8 è un angolo del colore SBAGLIATO per l'alfiere — lì non esiste matto, quindi il re va cacciato. Lo fa il cavallo: tra i pezzi del Bianco è l'unico che può attaccare le case chiare."
+},
+{
+"id": 382,
+"it": "L'alfiere prende la lunga diagonale e inchioda il re nero all'ultima traversa: b8 e le case scure vicine sono vietate. La gabbia è pronta — ora scivolerà verso h8."
+},
+{
+"id": 383,
+"it": "Come in ogni matto elementare, i pezzi da soli non bastano: il re bianco avanza spalla a spalla con il suo omologo, una traversa alla volta."
+},
+{
+"id": 384,
+"it": "Lo scacco che spinge il re nero fuori dall'ala di donna — verso est. Da qui in poi, il Nero gioca LA difesa classica: una corsa verso h1, l'altro angolo del colore sbagliato, all'estremità opposta della scacchiera."
+},
+{
+"id": 385,
+"it": "Inizia l'intercettazione: il re bianco taglia la via meridionale mentre l'alfiere, ancora in f6, tiene l'intera diagonale verso l'angolo h8. Il re nero voleva h1 — non raggiungerà nemmeno la metà bassa della scacchiera."
+},
+{
+"id": 386,
+"it": "Il blocco spalla a spalla: i due re si fronteggiano, e il Bianco ruba g4 e g6 al Nero. Resta solo la colonna h — un corridoio che riporta dritto in alto… verso h8, l'angolo del colore dell'alfiere."
+},
+{
+"id": 387,
+"it": "Il cavallo parte per il suo ultimo viaggio, verso e6: da lì coprirà g7 e f8, le ultime due vie di fuga. Si noti il ritmo senza fretta — un cavallo impiega tempo a ridispiegarsi, e tutta l'arte di questo matto sta nel ridispiegarlo al momento giusto."
+},
+{
+"id": 388,
+"it": "L'alfiere lascia per un attimo la lunga diagonale per spingere il re nero sulla 7ª traversa — dritto nella rete che re e cavallo hanno appena teso."
+},
+{
+"id": 389,
+"it": "Il quadro penultimo: il cavallo spinge il re nero in h8 mentre il re bianco custodisce g6, g7 e g8. Resta una sola casa — quella scura, l'angolo dell'alfiere."
+},
+{
+"id": 390,
+"it": "Matto — e si noti CHI lo dà: l'alfiere, nell'angolo del proprio colore, esattamente come promette la teoria. Re e cavallo sigillano tutto il resto. Ricorda le tre fasi: sfrattare dall'angolo sbagliato, sbarrare la corsa verso l'altro angolo sbagliato, stringere su quello giusto."
+},
+{
+"id": 391,
+"it": "Re e due alfieri di colore opposto contro re solo: il terzo matto elementare, dopo la torre e la donna. I due alfieri avanzano INCOLLATI l'uno all'altro su diagonali adiacenti — una barriera che il re nero non può mai attraversare — mentre il re bianco arriva per l'affondo."
+},
+{
+"id": 392,
+"it": "La barriera diagonale, poi il re conclude"
+},
+{
+"id": 393,
+"it": "I soli alfieri non possono forzare NULLA — come la torre, hanno bisogno del re per dare il colpo finale. Così parte dalla prima mossa."
+},
+{
+"id": 394,
+"it": "I due alfieri puntano due diagonali VICINE — a una casa di distanza. Insieme sbarrano una doppia fila di case che il re nero non potrà più attraversare."
+},
+{
+"id": 395,
+"it": "La barriera è alzata: c5 e tutto ciò che sta oltre è vietato a nord-est. Come la torre che taglia una traversa, gli alfieri ora tagliano in diagonale — e proprio come la torre, non hanno bisogno di muoversi ancora per tenerla."
+},
+{
+"id": 396,
+"it": "La barriera avanza di un gradino, esattamente come la torre che restringe la sua scatola: nel momento in cui il re nero indietreggia, un alfiere scivola di una diagonale più in là."
+},
+{
+"id": 397,
+"it": "Il re bianco si è unito al fronte: non resta che spingere il re nero sulla colonna a, poi scegliere la casa esatta del matto — qui qualsiasi casa di bordo andrebbe bene, a differenza del matto con alfiere e cavallo, che esige UN solo angolo giusto."
+},
+{
+"id": 398,
+"it": "Nessuna casa rimasta: a8 e a6 sono coperte da questo alfiere, b8 e b6 dal re bianco. Al re nero resta solo a7 — ed è esattamente dove lo si sta spingendo."
+},
+{
+"id": 399,
+"it": "Il quadro finale: ogni alfiere copre la propria diagonale, il re bianco copre le due case rimaste — a7 è sotto scacco senza via di fuga. Ricorda questo quadro: è quello a cui miri fin dalla prima mossa."
+},
+{
+"id": 400,
+"it": "Un pedone a un passo dalla promozione, un cavallo a sostenerlo, e un alfiere solitario di fronte. La ritirata naturale perde sempre — l'unica difesa è un sacrificio che intrappola il re nero dietro il suo stesso pedone."
+},
+{
+"id": 401,
+"it": "Il sacrificio che incastra il pedone"
+},
+{
+"id": 402,
+"it": "La ritirata naturale che perde"
+},
+{
+"id": 403,
+"it": "L'unica mossa che tiene la patta fin dall'inizio — ogni ritirata provata dall'oracolo perde. L'alfiere mantiene le distanze senza impegnarsi ancora."
+},
+{
+"id": 404,
+"it": "Il pedone è a un passo dalla promozione."
+},
+{
+"id": 405,
+"it": "Scacco — il re nero deve impegnarsi prima che l'alfiere giochi la sua carta."
+},
+{
+"id": 406,
+"it": "La mossa dello studio: l'alfiere si pianta SULLA casa di promozione, in presa. Il re nero non ha scelta ragionevole se non prenderlo — e prendendolo si murerà nell'angolo, proprio davanti al suo stesso pedone."
+},
+{
+"id": 407,
+"it": "L'istinto: mettere l'alfiere al riparo, lontano dalla casa di promozione. Ma g2 è proprio accanto al re nero — e nulla difende l'alfiere."
+},
+{
+"id": 408,
+"it": "Forzata in pratica: rifiutare lascia l'alfiere a sorvegliare per sempre la casa di promozione. Ma accettare costa caro — il re nero non lascerà più l'angolo finché il pedone h2 gli sta dietro."
+},
+{
+"id": 409,
+"it": "Il re bianco viene a custodire l'ingresso — g1 e g2 restano coperte, l'unica via d'uscita del re nero."
+},
+{
+"id": 410,
+"it": "Fortezza: il re bianco fa la spola tra f1 e f2; il cavallo può girare quanto vuole, non può né scacciare il re bianco né liberare quello nero. Patta per ripetizione — verificata: nessun tentativo nero provato dall'oracolo da questo incrocio ha mai fatto meglio."
+},
+{
+"id": 411,
+"it": "Il re nero divora l'alfiere gratis ed esce dall'angolo invece di restarci intrappolato. Senza il sacrificio sulla casa di promozione, nulla ferma più il pedone."
+},
+{
+"id": 412,
+"it": "Lo studio di Hall (1988): il pedone c6 è già a un passo dalla promozione, protetto dal re bianco. All'alfiere basta togliere al cavallo ogni casa utile — la lunga diagonale fa ciò che nessun cavallo può eguagliare."
+},
+{
+"id": 413,
+"it": "La manovra che soffoca il cavallo"
+},
+{
+"id": 414,
+"it": "La trappola della cattura gratuita"
+},
+{
+"id": 415,
+"it": "Spingere subito il pedone?"
+},
+{
+"id": 416,
+"it": "Nessuna fretta: il re resta in d7, a custodire c6. Solo l'alfiere va a caccia — sulla lunga diagonale a1-h8 toglierà case al cavallo e al re nero, una mossa alla volta."
+},
+{
+"id": 417,
+"it": "Allettante: prendere il cavallo che sembra a portata di mano. Ma il re bianco abbandona allora la sorveglianza di c6, e il re nero — già lì accanto — lo riprende subito. Alfiere solo contro re: patta, materiale insufficiente."
+},
+{
+"id": 418,
+"it": "Il pedone sembra maturo per avanzare — ma il re nero è ancora abbastanza vicino da reagire, e il cavallo controlla c7 da e8."
+},
+{
+"id": 419,
+"it": "Il re nero cerca aria; non ce n'è molta."
+},
+{
+"id": 420,
+"it": "Scacco e un tempo — il re nero viene spinto più lontano dal pedone che non potrà mai raggiungere finché d7 tiene."
+},
+{
+"id": 421,
+"it": "L'alfiere cambia diagonale senza mai perdere il suo scopo: tagliare ogni via di ritorno."
+},
+{
+"id": 422,
+"it": "Manovra paziente — l'alfiere ora mira alla diagonale g5-d8, quella che chiuderà il cavallo per sempre."
+},
+{
+"id": 423,
+"it": "Un altro scacco per guadagnare un tempo: il re nero non ha più una zona sicura dove accamparsi."
+},
+{
+"id": 424,
+"it": "La rete si chiude: il re nero non si avvicinerà mai più a c6, e il cavallo deve ora spostarsi su una casa che non aiuta in nulla. È lo zugzwang verso cui tendeva l'intera manovra."
+},
+{
+"id": 425,
+"it": "Finalmente! Il pedone avanza solo ora che è davvero al sicuro — protetto dal re, con il cavallo troppo lontano per intervenire in tempo."
+},
+{
+"id": 426,
+"it": "Promozione. La tecnica donna contro cavallo che segue è un esercizio a sé — ma la parte difficile, liberare il pedone, è fatta."
+},
+{
+"id": 427,
+"it": "Il pedone cade, e con esso la vittoria. È la lezione: in questi finali, il pezzo nemico offerto conta meno del pedone che bisogna scortare."
+},
+{
+"id": 428,
+"it": "Il cavallo inghiotte il pedone: non resta nulla da vincere. L'alfiere non aveva ancora finito il suo lavoro preparatorio — spingere troppo presto annulla tutto."
+},
+{
+"id": 429,
+"it": "Un alfiere spazza un'intera diagonale a colpo d'occhio — viene da pensare che controlli entrambe le ali insieme. Ma una diagonale corre in UNA sola direzione: il pedone che fugge dall'altra parte non è mai stato in pericolo."
+},
+{
+"id": 430,
+"it": "Il lato giusto da spingere"
+},
+{
+"id": 431,
+"it": "Il pedone h carica — l'alfiere in d4 controlla sì la diagonale fino ad a7 (può arrivarci in una mossa), ma NON ha alcuna presa sulla strada del pedone h. Una diagonale, una direzione: mai entrambe insieme."
+},
+{
+"id": 432,
+"it": "Il re nero si precipita sull'ala che conta — troppo tardi, anche lui può trovarsi in un solo posto."
+},
+{
+"id": 433,
+"it": "E il SECONDO pedone avanza senza alcuna opposizione — l'alfiere, occupato a sorvegliare la sua diagonale naturale, non l'ha visto arrivare."
+},
+{
+"id": 434,
+"it": "L'alfiere finalmente lo mangia — decisamente troppo tardi: l'altro è già sull'8ª."
+},
+{
+"id": 435,
+"it": "Una donna appare dal lato che l'alfiere non poteva mai coprire. Ricorda il principio, non la linea: sulla 5ª traversa (un gradino prima), questo stesso alfiere TERREBBE entrambi i pedoni — qui decide quanto sono avanzati, non la geometria dell'alfiere."
+},
+{
+"id": 436,
+"it": "Tre pedoni contro tre, re a un mondo di distanza: chi sa SFONDARE fa donna in tre mosse. Eppure delle tre spinte possibili, ne vince esattamente una — le altre due perdono la partita. Questo sacrificio si impara nell'ordine giusto."
+},
+{
+"id": 437,
+"it": "L'ariete centrale"
+},
+{
+"id": 438,
+"it": "L'altra cattura, l'altro corridoio"
+},
+{
+"id": 439,
+"it": "L'ordine sbagliato PERDE"
+},
+{
+"id": 440,
+"it": "SEMPRE il pedone centrale per primo: attacca due case, COSTRINGE a una cattura, e ogni cattura nera apre l'autostrada a un pedone laterale. a6 o c6 per primo? L'avversario sigilla tutto con b6 — e vince (vedi le trappole)."
+},
+{
+"id": 441,
+"it": "Il pedone laterale per primo? Il Nero ha DUE risposte vincenti — la più pulita: catturare, e ora lo sfondamento appartiene al NERO. Si noti bene: non patta, PERDENTE (il motore annuncia matto in 31). Tre pedoni sacrificati nell'ordine sbagliato sono solo tre pedoni persi."
+},
+{
+"id": 442,
+"it": "L'altra cattura (cxb6) rispecchia esattamente: a6! invece di c6 — il pedone che corre è allora il pedone c. Stesso meccanismo, altro corridoio."
+},
+{
+"id": 443,
+"it": "Catturando verso c: il corridoio libero sarà l'altro."
+},
+{
+"id": 444,
+"it": "Secondo sacrificio, stessa logica: deviare il pedone b7, ultimo doganiere della colonna a."
+},
+{
+"id": 445,
+"it": "Forzata — altrimenti c7-c8 passa senza aiuti."
+},
+{
+"id": 446,
+"it": "E il pedone a non ha più nessuno davanti. Conto per il Nero: il suo re è cinque case fuori, i suoi pedoni a cinque tempi dalla promozione. Il pedone a arriva in tre."
+},
+{
+"id": 447,
+"it": "La contro-corsa — SEMPRE ciò che va calcolato prima di cedere due pedoni."
+},
+{
+"id": 448,
+"it": "Donna — CON scacco, il dettaglio che uccide la contro-corsa: il Nero perde proprio il tempo che già gli mancava. Ciò che segue è il corso «Donna contro pedone»."
+},
+{
+"id": 449,
+"it": "Immagine speculare: stavolta b7 viene deviato da SINISTRA. Stesso principio: aprire il corridoio del pedone rimasto indietro."
+},
+{
+"id": 450,
+"it": "Di nuovo con scacco — la geometria dell'angolo h8 è spietata per il Nero."
+},
+{
+"id": 451,
+"it": "Il doganiere prende — nessuna deviazione funziona, perché nulla minaccia alle sue spalle."
+},
+{
+"id": 452,
+"it": "Riprendere mantiene viva l'illusione ancora una mossa…"
+},
+{
+"id": 453,
+"it": "…ed ecco il catenaccio: a5 è morto, c6 è morto (c7 lo blocca), e il re nero passeggerà per la scacchiera a raccogliere tutto. Lo sfondamento era a senso unico — dall'altra parte."
+},
+{
+"id": 454,
+"it": "Alfiere e pedone contro alfiere dello stesso colore: la regola di Centurini (1856) dice che il difensore tiene se il suo alfiere ha due diagonali praticabili verso la casa di promozione — e perde se una delle due è troppo corta. Qui la lunga diagonale b8-h2 è sana, ma quella corta (a7-b8) ha UNA sola casa d'attacco, a7 — e il re bianco sta per prenderla. Il piano in tre atti: occupare a7, interporre in b8, poi spazzare l'intera lunga diagonale da una sola casa."
+},
+{
+"id": 455,
+"it": "a7, b8, e ritorno — l'alfiere nero resta senza diagonali"
+},
+{
+"id": 456,
+"it": "Cambiare la guardia? La ripresa avviene al suo posto"
+},
+{
+"id": 457,
+"it": "Il pedone si pianta a un passo dalla gloria. Da ora l'alfiere nero fa la guardia eterna sulla diagonale b8-h2 — tutto il corso consiste nel rendere impossibile quella guardia."
+},
+{
+"id": 458,
+"it": "Il re nero attaccava il pedone — la spinta gli è passata davanti. Per la regola di Centurini, un re difensore DIETRO il pedone non partecipa più: l'alfiere deve tenere da solo."
+},
+{
+"id": 459,
+"it": "La mossa da capire prima di tutte: sulla corta diagonale a7-b8, UNA sola casa attacca b8 — a7. Il re la sequestra per sempre, e proteggerà per inciso la futura interposizione. La diagonale corta è appena morta."
+},
+{
+"id": 460,
+"it": "Il riflesso più umano del mondo: offrire il cambio per eliminare il guardiano di b8. Verificato dalle tablebase: la posizione vincente diventa PATTA con questa sola mossa."
+},
+{
+"id": 461,
+"it": "L'alfiere bianco parte per il suo grande giro verso a7 — passando dall'altra estremità della scacchiera. Il Nero può solo attendere: il suo re è fuori gioco, il suo alfiere è di guardia."
+},
+{
+"id": 462,
+"it": "Prima tappa completata: l'alfiere è piazzato sulla diagonale corta, sotto la protezione del re, pronto a interporsi in b8. L'alfiere nero, intanto, va su e giù — non ha dove andare."
+},
+{
+"id": 463,
+"it": "L'interposizione, protetta dal re: la porta b8 si chiude in faccia all'alfiere nero. La sua lunga diagonale ora conduce solo alle spalle di un alfiere bianco intoccabile."
+},
+{
+"id": 464,
+"it": "L'unica risorsa: cambiare diagonale — puntare a7, l'unica casa della diagonale corta che attacca b8. Una sola mossa d'alfiere ci arriverebbe… se la casa non appartenesse già al re bianco."
+},
+{
+"id": 465,
+"it": "Il capolavoro silenzioso della manovra: missione compiuta in b8, l'alfiere bianco si ritira a occupare la LUNGA diagonale — e si guardi: da g3 copre da solo h2, f4, e5, d6 e c7, tutte le case di rientro. Una diagonale morta per parte: è dominio."
+},
+{
+"id": 466,
+"it": "L'alfiere nero si ferma a metà, in mancanza di meglio: b6 e c5 non attaccano b8 — sulla diagonale corta lo fa solo a7, ed è protetta. «Due diagonali, una troppo corta»: è la posizione che dà senso a questa espressione."
+},
+{
+"id": 467,
+"it": "Promozione, dieci mosse dopo la spinta iniziale. Ricorda il trittico: il re confisca l'unica casa della diagonale corta, l'alfiere si interpone in b8, poi spazza l'intera lunga diagonale da g3."
+},
+{
+"id": 468,
+"it": "Ed ecco la falla nascosta: la cattura avviene SULLA lunga diagonale — l'alfiere nero riprende senza lasciare il suo posto per un solo istante, e nulla può riprendere in f4. Un alfiere di guardia non si può cambiare: va aggirato — ed è tutta la manovra del capitolo principale."
+},
+{
+"id": 469,
+"it": "Alfiere e pedone contro un alfiere dello stesso colore: il principio di Centurini in una frase — patta se il re difensore raggiunge davanti al pedone una casa che NON è del colore degli alfieri. Qui b7 non è del colore degli alfieri (chiaro): la fortezza è già in piedi."
+},
+{
+"id": 470,
+"it": "Tenere la casa, tenere la diagonale"
+},
+{
+"id": 471,
+"it": "Abbandonare la casa fa crollare la fortezza"
+},
+{
+"id": 472,
+"it": "Il Bianco manovra l'alfiere senza cambiare nulla — il re nero blocca già l'unica casa che conta."
+},
+{
+"id": 473,
+"it": "L'alfiere nero deve restare su una diagonale che continua a sorvegliare la casa di blocco — qui bastano due case di ritirata. Patta verificata: nessun tentativo bianco provato dall'oracolo da questo incrocio ha mai fatto meglio."
+},
+{
+"id": 474,
+"it": "Una ritirata che sembra prudente — rintanarsi nell'angolo, lontano da tutto. Ma lasciare b7 permette al re bianco di entrare direttamente."
+},
+{
+"id": 475,
+"it": "Il re bianco si sistema davanti al suo pedone — la casa che il re nero ha appena abbandonato. La fortezza esisteva solo finché quell'unica casa restava occupata dal lato giusto."
+},
+{
+"id": 476,
+"it": "Torre e alfiere contro torre sola — di solito vincente, tranne qui: la torre nera inchioda l'alfiere bianco contro il suo stesso re sulla colonna d, con i re a una sana distanza. Finché l'inchiodatura regge, la posizione non si sposta di un millimetro."
+},
+{
+"id": 477,
+"it": "L'inchiodatura regge, qualunque cosa accada"
+},
+{
+"id": 478,
+"it": "Sciogliere l'inchiodatura fa perdere la torre"
+},
+{
+"id": 479,
+"it": "La torre bianca cerca attività altrove — l'alfiere non può comunque muoversi senza lasciare il suo re sotto scacco."
+},
+{
+"id": 480,
+"it": "La torre nera resta sulla colonna d: fa tutto il lavoro. Potrebbe persino catturare la torre bianca per semplificare — torre contro alfiere solo è già una patta, come visto altrove — ma non c'è fretta. Patta verificata: nessun tentativo bianco provato dall'oracolo da questo incrocio ha mai fatto meglio."
+},
+{
+"id": 481,
+"it": "Sembra attivo — andare a caccia della torre bianca sull'ultima traversa. Ma lasciare la colonna d libera l'alfiere, che non è più inchiodato a nulla."
+},
+{
+"id": 482,
+"it": "La torre bianca cattura la torre nera con scacco — gratis. Senza l'inchiodatura, non c'era più motivo di lasciar vagare la torre nera sull'ultima traversa."
+}
+]

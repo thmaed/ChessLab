@@ -109,7 +109,7 @@ SÉANCE DU JOUR
 Chaque jour, ce qu'il faut revoir : positions d'ouverture dues, puzzles ratés, une finale. Une série de jours et des médailles pour tenir la durée.
 
 OUVERTURES
-58 ouvertures rédigées à la main (bilingues) et relues au moteur : chaque coup est expliqué, des flèches colorées relient le plateau à la liste, et la répétition espacée les ancre. Importez aussi vos propres répertoires en PGN.
+58 ouvertures rédigées à la main (multilingues) et relues au moteur : chaque coup est expliqué, des flèches colorées relient le plateau à la liste, et la répétition espacée les ancre. Importez aussi vos propres répertoires en PGN.
 
 FINALES
 78 cours prouvés par table de finales : aucun coup enseigné ne lâche le gain, aucune défense proposée ne perd la nulle. Et l'entraînement libre, où tout coup qui préserve le verdict est accepté.
@@ -121,7 +121,7 @@ VARIANTES ET PLUS
 Chess960 et onze variantes contre l'ordinateur (Roi de la colline, Trois échecs, Horde, Atomique, Crazyhouse, Duck Chess, Barricades…), chacune avec sa propre analyse. Mode deux joueurs, et Laboratoire pour comparer deux réglages de Stockfish.
 
 IPHONE ET IPAD
-Grand échiquier et panneaux côte à côte sur iPad, clavier et trackpad, portrait et paysage. Bilingue français/anglais. Synchronisation iCloud optionnelle, désactivée par défaut.
+Grand échiquier et panneaux côte à côte sur iPad, clavier et trackpad, portrait et paysage. En français, anglais, espagnol, allemand et italien. Synchronisation iCloud optionnelle, désactivée par défaut.
 
 VIE PRIVÉE
 Hors ligne par défaut : aucun serveur ChessLab, aucune mesure d'audience, aucune publicité. Vos parties restent sur votre appareil.
@@ -169,7 +169,7 @@ DAILY SESSION
 Every day, what to review: opening positions that are due, missed puzzles, an endgame. A streak of days and medals to keep you going.
 
 OPENINGS
-58 hand-written openings (bilingual), checked against the engine: every move is explained, coloured arrows tie the board to the move list, and spaced repetition makes them stick. Import your own repertoires as PGN too.
+58 hand-written openings (multilingual), checked against the engine: every move is explained, coloured arrows tie the board to the move list, and spaced repetition makes them stick. Import your own repertoires as PGN too.
 
 ENDGAMES
 78 courses proven by endgame tablebases: no move taught gives up a win, no defence offered loses a draw. Plus free training, where any move that keeps the verdict is accepted.
@@ -181,12 +181,192 @@ VARIANTS AND MORE
 Chess960 and eleven variants against the computer (King of the Hill, Three-Check, Horde, Atomic, Crazyhouse, Duck Chess, Barricades…), each with its own analysis. Two-player mode, and a Laboratory to compare two Stockfish settings.
 
 IPHONE AND IPAD
-A large board with side-by-side panels on iPad, keyboard and trackpad, portrait and landscape. Fully bilingual, French and English. Optional iCloud sync, off by default.
+A large board with side-by-side panels on iPad, keyboard and trackpad, portrait and landscape. In French, English, Spanish, German and Italian. Optional iCloud sync, off by default.
 
 PRIVACY
 Offline by default: no ChessLab server, no analytics, no ads. Your games stay on your device.
 
 ChessLab embeds the Stockfish engine (GPLv3 license), the University of Toronto's Maia-3 network (AGPLv3 license) and free vector piece sets — cburnett (GPLv2+/CC BY-SA), chessnut (Apache 2.0) and merida (GPLv2+). Full source code and license notices are available from within the app (Settings → Licenses).
+```
+
+---
+
+## Español (España) — es-ES (2.3 — localisation à ajouter dans App Store Connect ; relecture par un locuteur natif À FAIRE)
+
+**Nombre** (30 car. max) :
+```
+ChessLab
+```
+
+**Subtítulo** (30 car. max — 26 utilisés) :
+```
+Ajedrez, análisis y puzles
+```
+
+**Palabras clave** (100 car. max — 90 utilisés) :
+```
+stockfish,maia,táctica,apertura,finales,entrenamiento,chess960,coach,elo,pgn,rival,escáner
+```
+
+**Texto promocional** (170 car. max — 149 utilisés) :
+```
+Sin publicidad, sin cuenta, sin red. Nueve rivales que juegan como humanos, el análisis de Stockfish y más de 130 000 puzles: todo en tu dispositivo.
+```
+
+**Descripción** (4000 car. max — 2888 utilisés) :
+```
+Totalmente gratuita, sin publicidad, sin cuenta: nada sale de tu dispositivo.
+
+ChessLab es un compañero de ajedrez completo para iPhone y iPad: jugar, analizar, entrenar y experimentar, con Stockfish integrado, sin salir nunca de la app.
+
+ADVERSARIOS QUE JUEGAN COMO HUMANOS
+Nueve personajes interpretados por Maia-3, una red entrenada con millones de partidas humanas: no busca la mejor jugada, sino la que jugaría un humano de ese nivel, errores incluidos. Cada uno tiene su estilo, su repertorio y su temperamento, y un nivel ajustable en la escala humana. O enfréntate a Stockfish, del principiante (~900 Elo) al máximo (~3190). Reloj opcional, pista, aviso antes de una jugada arriesgada y barra de evaluación a voluntad.
+
+ANALIZAR Y ENTENDER
+Cada jugada se clasifica (imprecisión, error, error grave, jugada brillante…), cada jugador recibe su precisión y la app explica por qué una jugada era mala. El Coach añade la proporción de jugadores de tu nivel que la juegan. Al final propone convertir tus errores y tus mates perdidos en puzles. Entrada por PGN, FEN, editor de posiciones o escáner de fotos.
+
+SESIÓN DEL DÍA
+Cada día, lo que hay que repasar: posiciones de apertura pendientes, puzles fallados, un final. Una racha de días y medallas para mantener el ritmo.
+
+APERTURAS
+58 aperturas escritas a mano (en cinco idiomas) y revisadas con el motor: cada jugada se explica, unas flechas de colores unen el tablero con la lista y la repetición espaciada las fija. Importa también tus propios repertorios en PGN.
+
+FINALES
+78 cursos demostrados con tablas de finales: ninguna jugada enseñada deja escapar la victoria, ninguna defensa propuesta pierde las tablas. Y el entrenamiento libre, donde se acepta toda jugada que conserve el veredicto.
+
+PUZLES
+Más de 130 000 problemas de la base de Lichess, filtrables por nivel y por tema, más los tuyos: sacados de tus errores o importados de tus propios archivos PGN. Puntuación personal y «A mi nivel».
+
+VARIANTES Y MÁS
+Chess960 y once variantes contra el ordenador (Rey de la colina, Tres jaques, Horda, Atómico, Crazyhouse, Duck Chess, Barricadas…), cada una con su propio análisis. Modo de dos jugadores y Laboratorio para comparar dos ajustes de Stockfish.
+
+IPHONE Y IPAD
+Tablero grande y paneles en paralelo en iPad, teclado y trackpad, vertical y horizontal. En francés, inglés, español, alemán e italiano. Sincronización iCloud opcional, desactivada por defecto.
+
+PRIVACIDAD
+Sin conexión por defecto: ningún servidor de ChessLab, ninguna medición de audiencia, ninguna publicidad. Tus partidas se quedan en tu dispositivo.
+
+ChessLab integra el motor Stockfish (licencia GPLv3), la red Maia-3 de la Universidad de Toronto (licencia AGPLv3) y juegos de piezas vectoriales libres: cburnett (GPLv2+/CC BY-SA), chessnut (Apache 2.0) y merida (GPLv2+). Código fuente completo y avisos de licencia disponibles desde la app (Ajustes → Licencias).
+```
+
+---
+
+## Deutsch — de-DE (2.3 — localisation à ajouter dans App Store Connect ; relecture par un locuteur natif À FAIRE)
+
+**Name** (30 car. max) :
+```
+ChessLab
+```
+
+**Untertitel** (30 car. max — 24 utilisés) :
+```
+Schach, Analyse, Puzzles
+```
+
+**Schlüsselwörter** (100 car. max — 87 utilisés) :
+```
+stockfish,maia,taktik,eröffnung,endspiel,training,chess960,coach,elo,pgn,gegner,scanner
+```
+
+**Werbetext** (170 car. max — 148 utilisés) :
+```
+Ohne Werbung, ohne Konto, ohne Netz. Neun Gegner, die wie Menschen spielen, die Stockfish-Analyse und über 130 000 Puzzles – alles auf deinem Gerät.
+```
+
+**Beschreibung** (4000 car. max — 2985 utilisés) :
+```
+Völlig kostenlos, ohne Werbung, ohne Konto: Nichts verlässt dein Gerät.
+
+ChessLab ist ein kompletter Schachbegleiter für iPhone und iPad: spielen, analysieren, trainieren und experimentieren – mit eingebautem Stockfish, ohne die App je zu verlassen.
+
+GEGNER, DIE WIE MENSCHEN SPIELEN
+Neun Charaktere, gespielt von Maia-3, einem Netz, das auf Millionen menschlicher Partien trainiert wurde: Es sucht nicht den besten Zug, sondern den, den ein Mensch dieser Stärke spielen würde – Patzer inklusive. Jeder hat seinen Stil, sein Repertoire und sein Temperament, mit einstellbarer Stärke auf der menschlichen Skala. Oder tritt gegen Stockfish an, vom Anfänger (~900 Elo) bis zum Maximum (~3190). Optionale Uhr, Hinweis, Warnung vor einem riskanten Zug und Bewertungsbalken nach Wunsch.
+
+ANALYSIEREN UND VERSTEHEN
+Jeder Zug wird bewertet (Ungenauigkeit, Fehler, Patzer, brillanter Zug …), jeder Spieler erhält seine Genauigkeit, und die App sagt, warum ein Zug schlecht war. Der Coach ergänzt den Anteil der Spieler deiner Stufe, die ihn spielen. Am Ende schlägt sie vor, deine Fehler und verpassten Matts in Puzzles zu verwandeln. Eingabe per PGN, FEN, Stellungseditor oder Foto-Scanner.
+
+TAGESTRAINING
+Jeden Tag das, was zu wiederholen ist: fällige Eröffnungsstellungen, verfehlte Puzzles, ein Endspiel. Eine Tagesserie und Medaillen helfen dir, dranzubleiben.
+
+ERÖFFNUNGEN
+58 von Hand geschriebene Eröffnungen (in fünf Sprachen), von der Engine geprüft: Jeder Zug wird erklärt, farbige Pfeile verbinden Brett und Liste, und die verteilte Wiederholung verankert sie. Importiere auch eigene Repertoires als PGN.
+
+ENDSPIELE
+78 mit Endspieltabellen bewiesene Kurse: Kein gelehrter Zug gibt den Gewinn aus der Hand, keine empfohlene Verteidigung verliert das Remis. Dazu das freie Training, in dem jeder Zug zählt, der das Urteil bewahrt.
+
+PUZZLES
+Mehr als 130 000 Aufgaben aus der Lichess-Datenbank, filterbar nach Stufe und Thema, plus deine eigenen: aus deinen Fehlern erzeugt oder aus eigenen PGN-Dateien importiert. Persönliche Wertung und „Auf meiner Stufe“.
+
+VARIANTEN UND MEHR
+Chess960 und elf Varianten gegen den Computer (King of the Hill, Drei-Schach, Horde, Atomschach, Crazyhouse, Duck Chess, Barrikaden …), jede mit eigener Analyse. Zwei-Spieler-Modus und Labor, um zwei Stockfish-Einstellungen zu vergleichen.
+
+IPHONE UND IPAD
+Großes Brett und Bereiche nebeneinander auf dem iPad, Tastatur und Trackpad, Hoch- und Querformat. Auf Französisch, Englisch, Spanisch, Deutsch und Italienisch. Optionale iCloud-Synchronisierung, standardmäßig aus.
+
+DATENSCHUTZ
+Standardmäßig offline: kein ChessLab-Server, keine Reichweitenmessung, keine Werbung. Deine Partien bleiben auf deinem Gerät.
+
+ChessLab enthält die Engine Stockfish (Lizenz GPLv3), das Netz Maia-3 der University of Toronto (Lizenz AGPLv3) und freie Vektor-Figurensätze: cburnett (GPLv2+/CC BY-SA), chessnut (Apache 2.0) und merida (GPLv2+). Vollständiger Quellcode und Lizenzhinweise sind in der App abrufbar (Einstellungen → Lizenzen).
+```
+
+---
+
+## Italiano — it-IT (2.3 — localisation à ajouter dans App Store Connect ; relecture par un locuteur natif À FAIRE)
+
+**Nome** (30 car. max) :
+```
+ChessLab
+```
+
+**Sottotitolo** (30 car. max — 24 utilisés) :
+```
+Scacchi, analisi, puzzle
+```
+
+**Parole chiave** (100 car. max — 92 utilisés) :
+```
+stockfish,maia,tattica,apertura,finale,allenamento,chess960,coach,elo,pgn,avversario,scanner
+```
+
+**Testo promozionale** (170 car. max — 154 utilisés) :
+```
+Senza pubblicità, senza account, senza rete. Nove avversari che giocano come umani, l'analisi Stockfish e oltre 130 000 puzzle: tutto sul tuo dispositivo.
+```
+
+**Descrizione** (4000 car. max — 2987 utilisés) :
+```
+Totalmente gratuita, senza pubblicità, senza account: nulla esce dal tuo dispositivo.
+
+ChessLab è un compagno di scacchi completo per iPhone e iPad: giocare, analizzare, allenarsi e sperimentare, con Stockfish integrato, senza mai uscire dall'app.
+
+AVVERSARI CHE GIOCANO COME UMANI
+Nove personaggi interpretati da Maia-3, una rete addestrata su milioni di partite umane: non cerca la mossa migliore, ma quella che giocherebbe un umano di quel livello, errori compresi. Ognuno ha il suo stile, il suo repertorio e il suo temperamento, e un livello regolabile sulla scala umana. Oppure affronta Stockfish, dal principiante (~900 Elo) al massimo (~3190). Orologio facoltativo, suggerimento, avviso prima di una mossa rischiosa e barra di valutazione a piacere.
+
+ANALIZZARE E CAPIRE
+Ogni mossa è classificata (imprecisione, errore, errore grave, mossa brillante…), ogni giocatore riceve la sua precisione e l'app spiega perché una mossa era cattiva. Il Coach aggiunge la quota di giocatori del tuo livello che la giocano. Alla fine propone di trasformare i tuoi errori e i tuoi matti mancati in puzzle. Inserimento tramite PGN, FEN, editor di posizioni o scanner di foto.
+
+SESSIONE DEL GIORNO
+Ogni giorno, ciò che c'è da ripassare: posizioni d'apertura da ripassare, puzzle sbagliati, un finale. Una serie di giorni e medaglie per mantenere il ritmo.
+
+APERTURE
+58 aperture scritte a mano (in cinque lingue) e riviste con il motore: ogni mossa è spiegata, frecce colorate collegano la scacchiera all'elenco e la ripetizione dilazionata le fissa. Importa anche i tuoi repertori in PGN.
+
+FINALI
+78 corsi dimostrati con le tablebase dei finali: nessuna mossa insegnata lascia sfuggire la vittoria, nessuna difesa proposta perde la patta. E l'allenamento libero, dove si accetta ogni mossa che conserva il verdetto.
+
+PUZZLE
+Oltre 130 000 problemi dal database di Lichess, filtrabili per livello e per tema, più i tuoi: tratti dai tuoi errori o importati dai tuoi file PGN. Punteggio personale e «Al mio livello».
+
+VARIANTI E ALTRO
+Chess960 e undici varianti contro il computer (Re della collina, Tre scacchi, Orda, Atomico, Crazyhouse, Duck Chess, Barricate…), ognuna con la propria analisi. Modalità a due giocatori e Laboratorio per confrontare due impostazioni di Stockfish.
+
+IPHONE E IPAD
+Scacchiera grande e pannelli affiancati su iPad, tastiera e trackpad, verticale e orizzontale. In francese, inglese, spagnolo, tedesco e italiano. Sincronizzazione iCloud facoltativa, disattivata per impostazione predefinita.
+
+PRIVACY
+Offline per impostazione predefinita: nessun server ChessLab, nessuna misurazione del pubblico, nessuna pubblicità. Le tue partite restano sul tuo dispositivo.
+
+ChessLab integra il motore Stockfish (licenza GPLv3), la rete Maia-3 dell'Università di Toronto (licenza AGPLv3) e set di pezzi vettoriali liberi: cburnett (GPLv2+/CC BY-SA), chessnut (Apache 2.0) e merida (GPLv2+). Codice sorgente completo e avvisi di licenza disponibili dall'app (Impostazioni → Licenze).
 ```
 
 ---

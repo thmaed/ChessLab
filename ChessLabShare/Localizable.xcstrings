@@ -14,6 +14,24 @@
             "state": "translated",
             "value": "Image envoyée à ChessLab"
           }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imagen enviada a ChessLab"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bild an ChessLab gesendet"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Immagine inviata a ChessLab"
+          }
         }
       }
     },
@@ -29,6 +47,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Impossible d'envoyer l'image"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo enviar la imagen"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bild konnte nicht gesendet werden"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile inviare l'immagine"
           }
         }
       }
@@ -46,6 +82,24 @@
             "state": "translated",
             "value": "Ouvrez ChessLab : la position s'y lira."
           }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre ChessLab: allí se leerá la posición."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne ChessLab: Dort wird die Stellung gelesen."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri ChessLab: la posizione verrà letta lì."
+          }
         }
       }
     },
@@ -61,6 +115,24 @@
           "stringUnit": {
             "state": "translated",
             "value": "Partagez une image depuis Photos, puis réessayez."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comparte una imagen desde Fotos y vuelve a intentarlo."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Teile ein Bild aus Fotos und versuche es erneut."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi un'immagine da Foto, poi riprova."
           }
         }
       }

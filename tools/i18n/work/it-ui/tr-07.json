@@ -1,0 +1,442 @@
+[
+{
+"id": 770,
+"it": "I suoi puzzle vengono rimossi da questo dispositivo e dalla loro copia iCloud; gli altri tuoi dispositivi conservano la loro. Il file originale non viene toccato."
+},
+{
+"id": 771,
+"it": "Sessione senza salvataggio"
+},
+{
+"id": 772,
+"it": "Solido"
+},
+{
+"id": 773,
+"it": "Soluzione rivelata"
+},
+{
+"id": 774,
+"it": "Suoni della scacchiera"
+},
+{
+"id": 775,
+"it": "Suoni e vibrazioni"
+},
+{
+"id": 776,
+"it": "Fonti"
+},
+{
+"id": 777,
+"it": "Fonti dei dati"
+},
+{
+"id": 778,
+"it": "Standard"
+},
+{
+"id": 779,
+"it": "Archiviazione non disponibile su questo dispositivo."
+},
+{
+"id": 780,
+"it": "Stockfish"
+},
+{
+"id": 781,
+"it": "Stockfish è intervenuto %lld volte"
+},
+{
+"id": 782,
+"it": "Stockfish, ChessKit, pezzi, puzzle."
+},
+{
+"id": 783,
+"it": "Avanti"
+},
+{
+"id": 784,
+"it": "Monitoraggio"
+},
+{
+"id": 785,
+"it": "Elimina"
+},
+{
+"id": 786,
+"it": "Elimina %@"
+},
+{
+"id": 787,
+"it": "Eliminare %lld partite?"
+},
+{
+"id": 788,
+"it": "Elimina (%lld)"
+},
+{
+"id": 789,
+"it": "Eliminare questo repertorio?"
+},
+{
+"id": 790,
+"it": "Eliminare questa partita?"
+},
+{
+"id": 791,
+"it": "Eliminare la raccolta «%@»?"
+},
+{
+"id": 792,
+"it": "Elimina la partita"
+},
+{
+"id": 793,
+"it": "Su questa partita"
+},
+{
+"id": 794,
+"it": "Su iPad puoi anche trascinare un'immagine direttamente su questa schermata."
+},
+{
+"id": 795,
+"it": "Sullo stesso dispositivo"
+},
+{
+"id": 796,
+"it": "Sincronizzazione"
+},
+{
+"id": 797,
+"it": "Sincronizzazione iCloud"
+},
+{
+"id": 798,
+"it": "Sincronizza ora"
+},
+{
+"id": 799,
+"it": "Sincronizza tramite iCloud"
+},
+{
+"id": 800,
+"it": "Sistema London, arrocco alla mossa 6, zero debolezze. Conosce benissimo la teoria e non perde da mesi. Dorme bene."
+},
+{
+"id": 801,
+"it": "Sessione terminata!"
+},
+{
+"id": 802,
+"it": "Seleziona partite"
+},
+{
+"id": 803,
+"it": "Serie"
+},
+{
+"id": 804,
+"it": "Serie terminata"
+},
+{
+"id": 805,
+"it": "Tattica e Lichess"
+},
+{
+"id": 806,
+"it": "Tattica e libreria Lichess"
+},
+{
+"id": 807,
+"it": "Dimensione del lotto"
+},
+{
+"id": 808,
+"it": "Tocca una casa per posare un %@; toccalo di nuovo per cancellarlo."
+},
+{
+"id": 809,
+"it": "Tocca un pezzo per rimuoverlo."
+},
+{
+"id": 810,
+"it": "Tenace"
+},
+{
+"id": 811,
+"it": "Fine"
+},
+{
+"id": 812,
+"it": "Termina la selezione"
+},
+{
+"id": 813,
+"it": "Terminato"
+},
+{
+"id": 814,
+"it": "Tema della scacchiera"
+},
+{
+"id": 815,
+"it": "Temi"
+},
+{
+"id": 816,
+"it": "Temi trasversali"
+},
+{
+"id": 817,
+"it": "Teoria"
+},
+{
+"id": 818,
+"it": "Tornado"
+},
+{
+"id": 819,
+"it": "Tocca per sapere cosa misura questa statistica"
+},
+{
+"id": 820,
+"it": "Tocca per sapere cosa mostra questa sezione"
+},
+{
+"id": 821,
+"it": "Torre"
+},
+{
+"id": 822,
+"it": "Torri"
+},
+{
+"id": 823,
+"it": "Tutti"
+},
+{
+"id": 824,
+"it": "Tutte le modalità"
+},
+{
+"id": 825,
+"it": "Tutti i risultati"
+},
+{
+"id": 826,
+"it": "Tutto"
+},
+{
+"id": 827,
+"it": "Deseleziona tutto"
+},
+{
+"id": 828,
+"it": "Tutto parte da qui"
+},
+{
+"id": 829,
+"it": "Seleziona tutto"
+},
+{
+"id": 830,
+"it": "Ogni cattura fa esplodere la casa di arrivo: il pezzo che cattura E il pezzo catturato scompaiono, insieme a ogni pezzo TRANNE i pedoni sulle otto case vicine. La partita termina non appena un re esplode — una mossa che farebbe esplodere il TUO re è vietata. Due re possono toccarsi senza rischio: nessuno dei due può catturare l'altro senza distruggersi."
+},
+{
+"id": 831,
+"it": "Ogni pezzo che catturi cambia lato ed entra nella tua RISERVA. Al tuo turno, invece di muovere un pezzo, puoi posarne uno della tua riserva su qualsiasi casa vuota — anche per dare scacco o matto. Un pedone non può essere posato né sulla 1ª né sull'8ª traversa. Un pedone promosso che viene catturato torna a essere un semplice pedone nella riserva avversaria. Per tutto il resto, le regole sono quelle del gioco classico."
+},
+{
+"id": 832,
+"it": "Tutte"
+},
+{
+"id": 833,
+"it": "Tutte le case sono state lette con certezza — verifica comunque."
+},
+{
+"id": 834,
+"it": "Tutti i tag"
+},
+{
+"id": 835,
+"it": "Tratto"
+},
+{
+"id": 836,
+"it": "Tratto al Bianco"
+},
+{
+"id": 837,
+"it": "Tratto al Nero"
+},
+{
+"id": 838,
+"it": "Elaborazione dell'immagine in corso"
+},
+{
+"id": 839,
+"it": "Elaborazione dell'immagine…"
+},
+{
+"id": 840,
+"it": "Trasposizione: tocca per vedere il seguito"
+},
+{
+"id": 841,
+"it": "Tranello"
+},
+{
+"id": 842,
+"it": "Tre sale di allenamento"
+},
+{
+"id": 843,
+"it": "Tre scacchi"
+},
+{
+"id": 844,
+"it": "Trova la mossa migliore"
+},
+{
+"id": 845,
+"it": "Trova di meglio di %@"
+},
+{
+"id": 846,
+"it": "Tipo di puzzle"
+},
+{
+"id": 847,
+"it": "Un file PGN in cui ogni partita è un puzzle: l'intestazione FEN dà la posizione, la prima mossa è giocata in anticipo (la preparazione: a te vedere cosa è cambiato), il seguito è la soluzione. Ogni file diventa una raccolta, tenuta separata dalla libreria."
+},
+{
+"id": 848,
+"it": "Un grande grazie a Nils Gauthey per tutto il lavoro svolto su ChessLab. Le sue riletture, le sue correzioni e le sue idee hanno fatto progredire l'app nel suo insieme, e in particolare la qualità delle aperture e dei finali: le linee che studi qui gli devono molto."
+},
+{
+"id": 849,
+"it": "Un gettone ogni %lld mosse"
+},
+{
+"id": 850,
+"it": "Un gettone, 2 mosse"
+},
+{
+"id": 851,
+"it": "Un matto mancato"
+},
+{
+"id": 852,
+"it": "Prima un personaggio: ognuno ha il suo stile, il suo repertorio e il suo carattere, e gioca come un vero giocatore del suo livello — errori compresi. Oppure Stockfish, con il cursore e il nome del livello accanto. La trappola della prima sera: giocare a piena forza."
+},
+{
+"id": 853,
+"it": "Un pedone non può trovarsi sulla 1ª o sull'8ª traversa."
+},
+{
+"id": 854,
+"it": "Un pedone offerto è un pedone preso. Accetta tutti i gambetti, difende per quaranta mosse senza lamentarsi, poi ti ricorda che ha un pedone in più."
+},
+{
+"id": 855,
+"it": "Un programma è già in corso. Interrompilo prima per iniziarne un altro."
+},
+{
+"id": 856,
+"it": "Un solo tentativo"
+},
+{
+"id": 857,
+"it": "Una dashboard raggiungibile dalla home: il tuo bilancio contro il computer (vittorie, patte, sconfitte) e le tue statistiche di puzzle per tema. Il bilancio contro il computer si filtra sugli ultimi 7 o 30 giorni, o su tutta la cronologia. Con un tocco su un tema debole, l'app ti prepara una serie di puzzle mirata per lavorarci."
+},
+{
+"id": 858,
+"it": "Una foto scattata dall'alto non dice quale pezzo sia quale: il colore è stato letto, il tipo spetta a te."
+},
+{
+"id": 859,
+"it": "Una sola volta, in background."
+},
+{
+"id": 860,
+"it": "Una serie gira per diversi minuti senza che si tocchi lo schermo: senza questo, il dispositivo si addormenta e la serie si ferma."
+},
+{
+"id": 861,
+"it": "Usa questa posizione"
+},
+{
+"id": 862,
+"it": "Usa la posizione"
+},
+{
+"id": 863,
+"it": "V · P · S (A)"
+},
+{
+"id": 864,
+"it": "Conferma l'inquadratura"
+},
+{
+"id": 865,
+"it": "Variante: riparte dalla mossa indicata"
+},
+{
+"id": 866,
+"it": "Varianti"
+},
+{
+"id": 867,
+"it": "Varianti degli scacchi"
+},
+{
+"id": 868,
+"it": "Verdetto da mantenere: "
+},
+{
+"id": 869,
+"it": "Vittorie"
+},
+{
+"id": 870,
+"it": "Vittorie · Patte · Sconfitte"
+},
+{
+"id": 871,
+"it": "Svuota"
+},
+{
+"id": 872,
+"it": "Vedi nella partita originale"
+},
+{
+"id": 873,
+"it": "Vedi tutto"
+},
+{
+"id": 874,
+"it": "Anche le tue ultime partite vivono qui: un tocco apre direttamente la loro analisi, senza passare dalla libreria."
+},
+{
+"id": 875,
+"it": "I tuoi dati non vengono più salvati"
+},
+{
+"id": 876,
+"it": "Le tue partite ti seguono su tutti i dispositivi tramite il tuo iCloud privato. Disattivata per impostazione predefinita; l'app funziona interamente offline. La modifica ha effetto al prossimo avvio."
+},
+{
+"id": 877,
+"it": "I tuoi riscontri e suggerimenti per migliorare l'app sono sempre i benvenuti: tutto viene letto, e ogni messaggio conta. In caso di bug o di comportamento inatteso, non esitare a scrivere via e-mail, indicando il modello del tuo iPhone o iPad, la versione di iOS e una breve descrizione del problema."
+},
+{
+"id": 878,
+"it": "I tuoi repertori e la condivisione"
+},
+{
+"id": 879,
+"it": "Il tuo nome"
+}
+]

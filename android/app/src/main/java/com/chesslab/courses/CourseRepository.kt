@@ -133,8 +133,10 @@ object CourseRepository {
      * ne lisait que `fr`, une app en anglais montrait des commentaires en
      * français : le décor traduit et le contenu non, ce qui est pire que rien.
      */
+    private val SUPPORTED_LANGUAGES = setOf("fr", "en", "es", "de", "it")
+
     private fun language(): String =
-        if (java.util.Locale.getDefault().language == "fr") "fr" else "en"
+        java.util.Locale.getDefault().language.takeIf { it in SUPPORTED_LANGUAGES } ?: "en"
 
     /**
      * Le NOM d'un cours, traduit.
@@ -163,11 +165,18 @@ object CourseRepository {
         return localized(table[name]) ?: name
     }
 
-    /** Le texte dans la langue courante, avec repli sur le français. */
+    /**
+     * Le texte dans la langue courante, avec repli : anglais, puis français,
+     * puis les autres (pendant de `LocalizedText.resolved(_:)` côté iOS). Un
+     * cours encore sans traduction espagnole s'affiche donc en anglais, pas en blanc.
+     */
     private fun localized(o: JSONObject?): String? {
         if (o == null) return null
-        val value = o.optString(language()).ifEmpty { o.optString("fr") }
-        return value.ifEmpty { null }
+        for (code in listOf(language(), "en", "fr", "es", "de", "it")) {
+            val value = o.optString(code)
+            if (value.isNotEmpty()) return value
+        }
+        return null
     }
 
     /** La clé d'indexation : les quatre premiers champs d'une FEN. */

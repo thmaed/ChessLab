@@ -1,0 +1,430 @@
+[
+{
+"id": 880,
+"it": "I tuoi progressi di allenamento (puzzle e aperture) si sincronizzano allo stesso modo."
+},
+{
+"id": 881,
+"it": "Hai vinto"
+},
+{
+"id": 882,
+"it": "Hai perso"
+},
+{
+"id": 883,
+"it": "Hai risolto ogni puzzle che corrisponde a questi filtri nel tuo ultimo tentativo."
+},
+{
+"id": 884,
+"it": "Hai un gettone: spendilo per giocare due mosse di fila."
+},
+{
+"id": 885,
+"it": "Perdi %lld punti."
+},
+{
+"id": 886,
+"it": "Verifica dell'account iCloud…"
+},
+{
+"id": 887,
+"it": "Verifica la posizione"
+},
+{
+"id": 888,
+"it": "Controlla lo spazio sul disco. Le tue ultime azioni rischiano di andare perse."
+},
+{
+"id": 889,
+"it": "V–P–S"
+},
+{
+"id": 890,
+"it": "Woodpecker"
+},
+{
+"id": 891,
+"it": "Woodpecker allenato oggi."
+},
+{
+"id": 892,
+"it": "Woodpecker: %lld"
+},
+{
+"id": 893,
+"it": "Yolo"
+},
+{
+"id": 894,
+"it": "Zero teoria"
+},
+{
+"id": 895,
+"it": "ha vinto"
+},
+{
+"id": 896,
+"it": "abbandono"
+},
+{
+"id": 897,
+"it": "accordo reciproco"
+},
+{
+"id": 898,
+"it": "acquisite"
+},
+{
+"id": 899,
+"it": "al tratto"
+},
+{
+"id": 900,
+"it": "cavallo"
+},
+{
+"id": 901,
+"it": "questa settimana"
+},
+{
+"id": 902,
+"it": "commenta"
+},
+{
+"id": 903,
+"it": "mosse / partita"
+},
+{
+"id": 904,
+"it": "donna"
+},
+{
+"id": 905,
+"it": "nel repertorio"
+},
+{
+"id": 906,
+"it": "di successo"
+},
+{
+"id": 907,
+"it": "alfiere"
+},
+{
+"id": 908,
+"it": "vincente"
+},
+{
+"id": 909,
+"it": "arrocco lungo"
+},
+{
+"id": 910,
+"it": "fuori repertorio"
+},
+{
+"id": 911,
+"it": "il Bianco"
+},
+{
+"id": 912,
+"it": "i due re arrivano insieme"
+},
+{
+"id": 913,
+"it": "il Nero"
+},
+{
+"id": 914,
+"it": "matto in %1$lld per %2$@"
+},
+{
+"id": 915,
+"it": "materiale insufficiente"
+},
+{
+"id": 916,
+"it": "max"
+},
+{
+"id": 917,
+"it": "min"
+},
+{
+"id": 918,
+"it": "patta"
+},
+{
+"id": 919,
+"it": "n."
+},
+{
+"id": 920,
+"it": "p%lld"
+},
+{
+"id": 921,
+"it": "partite giocate"
+},
+{
+"id": 922,
+"it": "stallo"
+},
+{
+"id": 923,
+"it": "perdente"
+},
+{
+"id": 924,
+"it": "arrocco corto"
+},
+{
+"id": 925,
+"it": "pedone"
+},
+{
+"id": 926,
+"it": "nessuna mossa possibile"
+},
+{
+"id": 927,
+"it": "nessun pezzo rimasto"
+},
+{
+"id": 928,
+"it": "posizione pari"
+},
+{
+"id": 929,
+"it": "posizioni"
+},
+{
+"id": 930,
+"it": "precisione"
+},
+{
+"id": 931,
+"it": "rnbqkbnr/pppppppp/…"
+},
+{
+"id": 932,
+"it": "re"
+},
+{
+"id": 933,
+"it": "re arrivato sull'8ª traversa"
+},
+{
+"id": 934,
+"it": "re al centro"
+},
+{
+"id": 935,
+"it": "re catturato"
+},
+{
+"id": 936,
+"it": "re esploso"
+},
+{
+"id": 937,
+"it": "regola delle 50 mosse"
+},
+{
+"id": 938,
+"it": "ripetizione di posizione"
+},
+{
+"id": 939,
+"it": "successo"
+},
+{
+"id": 940,
+"it": "punteggio di A"
+},
+{
+"id": 941,
+"it": "elimina la variante"
+},
+{
+"id": 942,
+"it": "tempo scaduto"
+},
+{
+"id": 943,
+"it": "torre"
+},
+{
+"id": 944,
+"it": "trasposizione"
+},
+{
+"id": 945,
+"it": "tre scacchi dati"
+},
+{
+"id": 946,
+"it": "variospeed67@gmail.com"
+},
+{
+"id": 947,
+"it": "Al mio livello"
+},
+{
+"id": 948,
+"it": "Da memorizzare"
+},
+{
+"id": 949,
+"it": "Informazioni"
+},
+{
+"id": 950,
+"it": "Da lavorare"
+},
+{
+"id": 951,
+"it": "Tocca a te"
+},
+{
+"id": 952,
+"it": "Divario Elo"
+},
+{
+"id": 953,
+"it": "Cambia le donne alla mossa 12, propone patta alla mossa 30 se è pari, e ti dà matto alla mossa 65 se non lo è. Nessuna fantasia."
+},
+{
+"id": 954,
+"it": "Scambi"
+},
+{
+"id": 955,
+"it": "Salvataggio non riuscito: %@"
+},
+{
+"id": 956,
+"it": "Scacco tre volte"
+},
+{
+"id": 957,
+"it": "Scala umana (vicina a Lichess), diversa dall'Elo di Stockfish. Stockfish interviene solo per i matti brevi, i finali con pochi pezzi e le ripetizioni."
+},
+{
+"id": 958,
+"it": "Modifica scacchiera"
+},
+{
+"id": 959,
+"it": "Editor"
+},
+{
+"id": 960,
+"it": "Editor di posizione"
+},
+{
+"id": 961,
+"it": "Editor e scanner di posizione"
+},
+{
+"id": 962,
+"it": "Parità"
+},
+{
+"id": 963,
+"it": "Equilibrio"
+},
+{
+"id": 964,
+"it": "Riferimento"
+},
+{
+"id": 965,
+"it": "Passaggio precedente"
+},
+{
+"id": 966,
+"it": "Tag"
+},
+{
+"id": 967,
+"it": "Studi"
+},
+{
+"id": 968,
+"it": "Studi celebri"
+},
+{
+"id": 969,
+"it": "Val."
+},
+{
+"id": 970,
+"it": "Valutazione"
+},
+{
+"id": 971,
+"it": "Valutazioni"
+},
+{
+"id": 972,
+"it": "da consolidare"
+},
+{
+"id": 973,
+"it": "da ripassare"
+},
+{
+"id": 974,
+"it": "divario Elo A−B"
+},
+{
+"id": 975,
+"it": "divario Elo ±%@"
+},
+{
+"id": 976,
+"it": "scacco matto"
+},
+{
+"id": 978,
+"it": "Analizzare automaticamente le tue partite?"
+},
+{
+"id": 979,
+"it": "Attiva"
+},
+{
+"id": 980,
+"it": "Più tardi"
+},
+{
+"id": 982,
+"it": "Analisi della tua partita in corso"
+},
+{
+"id": 983,
+"it": "%lld / %lld mosse"
+},
+{
+"id": 984,
+"it": "Analizza automaticamente le mie partite"
+},
+{
+"id": 986,
+"it": "1 nuovo puzzle dalla tua ultima partita"
+},
+{
+"id": 987,
+"it": "%lld nuovi puzzle dalla tua ultima partita"
+},
+{
+"id": 988,
+"it": "meno dell'1%"
+},
+{
+"id": 989,
+"it": "Il più frequente: %@ (%@)."
+}
+]

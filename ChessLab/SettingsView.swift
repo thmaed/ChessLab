@@ -57,31 +57,21 @@ struct SettingsView: View {
     private var languageSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Langue")
-            VStack(spacing: 4) {
+            // Des pastilles qui se replient, plutôt que six rangées : le choix tient en deux lignes
+            // (2.3 : cinq langues + « système »).
+            FlowLayout(spacing: 8, lineSpacing: 8) {
                 ForEach(AppLanguage.allCases) { language in
-                    Button {
+                    ChipButton(
+                        label: language.settingsLabel,
+                        systemImage: language == .system ? "globe" : nil,
+                        isSelected: settings.appLanguage == language
+                    ) {
                         settings.appLanguage = language
-                    } label: {
-                        HStack(spacing: 12) {
-                            Text(language.settingsLabel)
-                                .font(.body.weight(.medium))
-                                .foregroundStyle(Theme.textPrimary)
-                            Spacer()
-                            if settings.appLanguage == language {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .foregroundStyle(Theme.accent)
-                            }
-                        }
-                        .padding(.vertical, 8)
-                        .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)
                     .accessibilityIdentifier("language_\(language.rawValue)")
-                    if language != AppLanguage.allCases.last {
-                        Divider().overlay(Theme.stroke)
-                    }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle()
         }
     }
@@ -342,7 +332,9 @@ struct SettingsView: View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Notation des coups")
             VStack(alignment: .leading, spacing: 8) {
-                HStack(spacing: 8) {
+                // Quatre notations (2.3) : « Französisch » ne tient plus sur
+                // une ligne à quatre de front — la rangée se replie.
+                FlowLayout(spacing: 8, lineSpacing: 8) {
                     ForEach(PieceNotation.allCases) { notation in
                         ChipButton(
                             label: LocalizedStringKey(notation.label), systemImage: nil,

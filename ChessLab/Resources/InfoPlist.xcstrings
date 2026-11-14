@@ -27,6 +27,24 @@
             "state" : "translated",
             "value" : "L'appareil photo sert à scanner un échiquier (écran ou plateau réel vu du dessus)."
           }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La cámara sirve para escanear un tablero (pantalla o tablero real visto desde arriba)."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Kamera dient zum Scannen eines Schachbretts (Bildschirm oder echtes Brett von oben)."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La fotocamera serve a scansionare una scacchiera (schermo o scacchiera reale vista dall'alto)."
+          }
         }
       }
     }

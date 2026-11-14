@@ -37,6 +37,12 @@ enum PlayerName {
     static var white: String { LocalizationController.string("Blancs") }
     static var black: String { LocalizationController.string("Noirs") }
 
+    /// Les noms par défaut des deux camps, dans les cinq langues de l'app. Un réglage de partie à deux
+    /// les enregistre EN CLAIR : retrouvés dans une autre langue que celle de leur enregistrement, ils
+    /// doivent se traduire, comme « Vous » (2.3 : espagnol, allemand, italien).
+    private static let whiteDefaults: Set<String> = ["Blancs", "White", "Blancas", "Weiß", "Bianco"]
+    private static let blackDefaults: Set<String> = ["Noirs", "Black", "Negras", "Schwarz", "Nero"]
+
     /// Nom de l'adversaire machine, dans la langue active.
     static var computer: String { LocalizationController.string("Ordinateur") }
 
@@ -52,8 +58,8 @@ enum PlayerName {
         guard !trimmed.isEmpty, trimmed != "?" else { return nil }
         switch trimmed {
         case "Vous", "You": return you
-        case "Blancs", "White": return white
-        case "Noirs", "Black": return black
+        case _ where whiteDefaults.contains(trimmed): return white
+        case _ where blackDefaults.contains(trimmed): return black
         // « Stockfish » : nom stocké par les parties antérieures au renommage —
         // affiché « Ordinateur » comme les nouvelles, pour l'uniformité.
         case "Ordinateur", "Computer", "Stockfish": return computer

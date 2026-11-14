@@ -27,6 +27,14 @@ import com.chesslab.settings.SettingsStore
  */
 object PlayerName {
 
+    /**
+     * Les noms par défaut des deux camps dans les cinq langues de l'app (pendant de `PlayerName.whiteDefaults`
+     * côté iOS). Un réglage de partie à deux les range EN CLAIR : relus dans une autre langue, ils doivent
+     * se traduire.
+     */
+    private val WHITE_DEFAULTS = setOf("Blancs", "White", "Blancas", "Weiß", "Bianco")
+    private val BLACK_DEFAULTS = setOf("Noirs", "Black", "Negras", "Schwarz", "Nero")
+
     /** Le nom de l'utilisateur : le sien s'il s'en est donné un, sinon « Vous ». */
     fun you(context: Context): String {
         val chosen = SettingsStore.state.value.playerName.trim()
@@ -47,8 +55,8 @@ object PlayerName {
         if (trimmed.isEmpty() || trimmed == "?") return null
         return when (trimmed) {
             "Vous", "You" -> you(context)
-            "Blancs", "White" -> white(context)
-            "Noirs", "Black" -> black(context)
+            in WHITE_DEFAULTS -> white(context)
+            in BLACK_DEFAULTS -> black(context)
             // « Stockfish » : nom rangé par les parties d'avant le renommage,
             // affiché « Ordinateur » comme les nouvelles.
             "Ordinateur", "Computer", "Stockfish" -> computer(context)

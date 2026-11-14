@@ -105,11 +105,9 @@ enum OpeningCourseEditor {
         let trimmed = text?.trimmingCharacters(in: .whitespacesAndNewlines)
         let cleared = (trimmed?.isEmpty ?? true)
         let existing = node.moves[index].comment
-        let updated = LocalizedText(
-            fr: code == "fr" ? (cleared ? nil : trimmed) : existing?.fr,
-            en: code == "fr" ? existing?.en : (cleared ? nil : trimmed)
-        )
-        let isEmpty = updated.fr == nil && updated.en == nil
+        let updated = (existing ?? LocalizedText())
+            .setting(cleared ? nil : trimmed, for: code)
+        let isEmpty = updated.isEmpty
 
         var moves = node.moves
         moves[index] = moves[index].replacing(

@@ -1,0 +1,442 @@
+[
+{
+"id": 330,
+"it": "Squilibri"
+},
+{
+"id": 331,
+"it": "Squilibri materiali"
+},
+{
+"id": 332,
+"it": "Rilevatore di pezzi dello scanner (YOLO11)"
+},
+{
+"id": 333,
+"it": "Impedisci la sospensione"
+},
+{
+"id": 334,
+"it": "In pausa"
+},
+{
+"id": 335,
+"it": "Sta giocando la sua seconda mossa"
+},
+{
+"id": 336,
+"it": "English"
+},
+{
+"id": 337,
+"it": "Salva"
+},
+{
+"id": 338,
+"it": "Allenamento libero"
+},
+{
+"id": 339,
+"it": "Allena"
+},
+{
+"id": 340,
+"it": "Allena la linea"
+},
+{
+"id": 341,
+"it": "Errore"
+},
+{
+"id": 342,
+"it": "Tentativi"
+},
+{
+"id": 343,
+"it": "E per tornarci"
+},
+{
+"id": 344,
+"it": "Eccellente"
+},
+{
+"id": 345,
+"it": "Esperto e oltre"
+},
+{
+"id": 346,
+"it": "Esplora, impara e allena le tue aperture dalla scheda Aperture: lettore passo passo, richiamo attivo e ripetizione dilazionata. Il contenuto si arricchisce con gli aggiornamenti."
+},
+{
+"id": 347,
+"it": "Esplora"
+},
+{
+"id": 348,
+"it": "Esporta"
+},
+{
+"id": 349,
+"it": "Esporta il PGN"
+},
+{
+"id": 350,
+"it": "FEN non valido"
+},
+{
+"id": 351,
+"it": "FEN malformato: attesi 6 campi (posizione, tratto, arrocchi, en passant, semimosse, mosse)."
+},
+{
+"id": 352,
+"it": "FEN o PGN non valido"
+},
+{
+"id": 353,
+"it": "Faccia a faccia"
+},
+{
+"id": 354,
+"it": "Contro sé stesso"
+},
+{
+"id": 355,
+"it": "Fairy-Stockfish"
+},
+{
+"id": 356,
+"it": "Fai affrontare due istanze di Stockfish su una serie di partite per confrontare le impostazioni. Statistiche, differenza Elo stimata con intervallo di confidenza, curva di progressione e distribuzione dei risultati. Ci si arriva anche da una partita o da un'analisi — «Cambia modalità», poi «Laboratorio»: la serie parte allora dalla tua posizione. A fine serie, l'ultima partita si apre con un tocco nell'analisi. In Chess960, per ogni coppia di partite viene estratta una posizione diversa (o un numero a tua scelta), solo Stockfish; l'ultima partita si apre poi nell'analisi Chess960."
+},
+{
+"id": 357,
+"it": "Chiudi"
+},
+{
+"id": 358,
+"it": "File .pgn o .fen"
+},
+{
+"id": 359,
+"it": "File illeggibile."
+},
+{
+"id": 360,
+"it": "Filtri dei finali"
+},
+{
+"id": 361,
+"it": "Filtri delle aperture"
+},
+{
+"id": 362,
+"it": "Fine"
+},
+{
+"id": 363,
+"it": "Fine della linea. Torna indietro o apri l'indice per esplorare un'altra variante."
+},
+{
+"id": 364,
+"it": "Fine della linea. Torna indietro per esplorare una variante."
+},
+{
+"id": 365,
+"it": "Finali"
+},
+{
+"id": 366,
+"it": "Finali di cavalli"
+},
+{
+"id": 367,
+"it": "Finali di donna"
+},
+{
+"id": 368,
+"it": "Finali di alfieri"
+},
+{
+"id": 369,
+"it": "Finali di pedoni"
+},
+{
+"id": 370,
+"it": "Finali di torre"
+},
+{
+"id": 371,
+"it": "Finali fragili"
+},
+{
+"id": 372,
+"it": "Finali vincenti"
+},
+{
+"id": 373,
+"it": "Frecce del motore"
+},
+{
+"id": 374,
+"it": "Forza del motore"
+},
+{
+"id": 375,
+"it": "Alfiere"
+},
+{
+"id": 376,
+"it": "Alfieri"
+},
+{
+"id": 377,
+"it": "Français"
+},
+{
+"id": 378,
+"it": "GPLv3 (l'intera app)"
+},
+{
+"id": 379,
+"it": "Errore grave"
+},
+{
+"id": 380,
+"it": "Errori gravi"
+},
+{
+"id": 381,
+"it": "Vinte"
+},
+{
+"id": 382,
+"it": "Vinte %lld"
+},
+{
+"id": 383,
+"it": "Gambetto"
+},
+{
+"id": 384,
+"it": "Gambetti"
+},
+{
+"id": 385,
+"it": "Gomma"
+},
+{
+"id": 386,
+"it": "Gran mossa"
+},
+{
+"id": 387,
+"it": "Taccagno"
+},
+{
+"id": 388,
+"it": "Cronologia"
+},
+{
+"id": 389,
+"it": "Orda"
+},
+{
+"id": 390,
+"it": "Ignora"
+},
+{
+"id": 391,
+"it": "È vuoto, o già occupato da un'altra raccolta."
+},
+{
+"id": 392,
+"it": "Serve esattamente un re bianco e un re nero."
+},
+{
+"id": 393,
+"it": "Manca un re."
+},
+{
+"id": 394,
+"it": "Compare sulla tua targhetta di giocatore, nella libreria e nei tag PGN delle partite esportate. Lascia vuoto per «Tu»."
+},
+{
+"id": 395,
+"it": "Si spostano a ogni mossa"
+},
+{
+"id": 396,
+"it": "Immagine"
+},
+{
+"id": 397,
+"it": "Importazione: %1$lld/%2$lld partite…"
+},
+{
+"id": 398,
+"it": "Importazione in corso…"
+},
+{
+"id": 399,
+"it": "Importazione impossibile: %@"
+},
+{
+"id": 400,
+"it": "Importazione terminata"
+},
+{
+"id": 401,
+"it": "Importa"
+},
+{
+"id": 402,
+"it": "Importa partite"
+},
+{
+"id": 403,
+"it": "Importa puzzle"
+},
+{
+"id": 404,
+"it": "Importa il testo"
+},
+{
+"id": 405,
+"it": "Importa un file"
+},
+{
+"id": 406,
+"it": "Importa un file PGN"
+},
+{
+"id": 407,
+"it": "Importato, ma %d partite e %d mosse illeggibili sono state ignorate."
+},
+{
+"id": 408,
+"it": "Importate"
+},
+{
+"id": 409,
+"it": "Impossibile leggere «%@»."
+},
+{
+"id": 410,
+"it": "Imprecisione"
+},
+{
+"id": 411,
+"it": "Imprevedibile"
+},
+{
+"id": 412,
+"it": "Impulsivo"
+},
+{
+"id": 413,
+"it": "Incremento per mossa (s)"
+},
+{
+"id": 414,
+"it": "Indice delle linee"
+},
+{
+"id": 415,
+"it": "Suggerimento"
+},
+{
+"id": 416,
+"it": "Suggerimento (frecce delle mosse migliori)"
+},
+{
+"id": 417,
+"it": "Iniziativa"
+},
+{
+"id": 418,
+"it": "Inverti"
+},
+{
+"id": 419,
+"it": "Inverti la lettura"
+},
+{
+"id": 420,
+"it": "Inverti i colori"
+},
+{
+"id": 421,
+"it": "Gettone disponibile"
+},
+{
+"id": 422,
+"it": "Gettoni"
+},
+{
+"id": 423,
+"it": "Set di dati pubblico lichess-org/chess-openings (pubblico dominio). Serve a dare un nome a ogni posizione raggiunta."
+},
+{
+"id": 424,
+"it": "Set di pezzi"
+},
+{
+"id": 425,
+"it": "Set di pezzi vettoriale moderno di Alexis Luengas, tratto dalla raccolta open source di Lichess. Compatibile con la licenza GPLv3 dell'app."
+},
+{
+"id": 426,
+"it": "Set di pezzi vettoriale di Armando Hernandez Marroquin, tratto dalla raccolta open source di Lichess. Compatibile con la licenza GPLv3 dell'app."
+},
+{
+"id": 427,
+"it": "Set di pezzi vettoriale di Colin M. L. Burnett, lo stesso di Wikipedia e Lichess. Attribuzione richiesta, condivisione alle stesse condizioni."
+},
+{
+"id": 428,
+"it": "Set di pezzi «chessnut»"
+},
+{
+"id": 429,
+"it": "Set di pezzi «merida»"
+},
+{
+"id": 430,
+"it": "Gioca un'altra mossa sulla scacchiera per aggiungere una variante."
+},
+{
+"id": 431,
+"it": "Gioca una mossa sulla scacchiera per aggiungerla al tuo repertorio."
+},
+{
+"id": 432,
+"it": "Gioca"
+},
+{
+"id": 433,
+"it": "Gioca %1$@, valutazione %2$@"
+},
+{
+"id": 434,
+"it": "Gioca questa posizione"
+},
+{
+"id": 435,
+"it": "Gioca la variante"
+},
+{
+"id": 436,
+"it": "Gioca la mossa migliore"
+},
+{
+"id": 437,
+"it": "Giocatore di club"
+},
+{
+"id": 438,
+"it": "Giocatori"
+},
+{
+"id": 439,
+"it": "Gioca una partita contro il computer o risolvi qualche puzzle: i tuoi progressi compariranno qui."
+}
+]

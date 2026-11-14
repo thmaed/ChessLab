@@ -1,0 +1,590 @@
+[
+{
+"id": 615,
+"it": "Il re bianco continua a inseguire: attacca c8 e sogna di scortare il pedone da b7."
+},
+{
+"id": 616,
+"it": "Il re bianco rinuncia allo sfratto e si ritira, sperando di spingere il pedone sotto la propria protezione."
+},
+{
+"id": 617,
+"it": "Seconda mossa unica, secondo scacco. Si noti il percorso: a7-c8-d6 — ogni casa del circuito tiene d'occhio a8 o le case di scorta del re bianco."
+},
+{
+"id": 618,
+"it": "Fuggire in e7 sembra ragionevole — il cavallo «resta in contatto» con c8 e c6. La tablebase è definitiva: la posizione passa da patta a PERSA. Da e7 il cavallo ha bisogno di DUE salti per riprendere il controllo del percorso di promozione… e al Bianco bastano due mosse."
+},
+{
+"id": 619,
+"it": "E il cerchio si chiude: la posizione identica di due mosse fa. Il re bianco può percorrere il circuito quante volte vuole — c8, d6 e b5 si alternano per sempre. Patta per ripetizione, un cavallo contro un re intero."
+},
+{
+"id": 620,
+"it": "L'unica mossa tranquilla della danza — e comunque l'unica che tiene: da d6 il cavallo controlla sia b7 CHE c8, le due case di cui il re bianco ha bisogno per scortare il suo pedone."
+},
+{
+"id": 621,
+"it": "Il re si allontana di una casa? Il cavallo torna subito al suo posto. Il blocco riprende come se nulla fosse."
+},
+{
+"id": 622,
+"it": "Ancora meglio: con il re andato via, il cavallo può persino lasciare il blocco per ATTACCARE. Da c6 prende di mira a7 — se il pedone vi si avventura, non ne uscirà."
+},
+{
+"id": 623,
+"it": "La spinta preparata da tempo…"
+},
+{
+"id": 624,
+"it": "…perde il pedone sul posto. Cavallo contro re nudo: la patta più pulita del manuale. Si ricordino i due registri del cavallo: bloccante quando il re preme, cacciatore appena lo lascia."
+},
+{
+"id": 625,
+"it": "Il pedone attraversa la frontiera della 6ª traversa — proprio la linea oltre la quale un cavallo solo non può più raggiungere un pedone di torre."
+},
+{
+"id": 626,
+"it": "Il cavallo accorre e attacca persino il pedone — ma a7 è difesa dal re, e c6 NON controlla a8."
+},
+{
+"id": 627,
+"it": "Un tempo di ritardo. L'intero finale vive in questo contrasto: c8-d6-b5 tengono la patta alla mossa esatta, e7 perde alla mossa esatta."
+},
+{
+"id": 628,
+"it": "Un cavallo può bloccare un singolo pedone per sempre — ma esiste in un solo posto alla volta. Due pedoni passati alle estremità opposte della scacchiera gli pongono una domanda a cui non ha risposta, purché siano abbastanza avanzati."
+},
+{
+"id": 629,
+"it": "La 6ª traversa da entrambi i lati: troppo tardi"
+},
+{
+"id": 630,
+"it": "Avanza solo uno dei due pedoni — ma il cavallo può affrontare UNA sola minaccia alla volta, e l'altro pedone, ancora in h6, attende il suo turno senza nulla sul cammino. Una traversa prima (5ª anziché 6ª), la STESSA posizione tiene: il cavallo piazzato al centro ha allora il tempo di galoppare da un'ala all'altra. Decide la sola traversa."
+},
+{
+"id": 631,
+"it": "Il cavallo prova a intercettare lungo il percorso — ma può trovarsi in un solo posto, e c'è sempre un pedone di troppo."
+},
+{
+"id": 632,
+"it": "Troppo tardi per fermare il primo pedone, e il secondo (h6) non ha ancora nessuno davanti."
+},
+{
+"id": 633,
+"it": "Appare una donna con scacco — e c'è ANCORA un pedone h6 libero, spinto da un re che non ha mai dovuto scegliere un lato."
+},
+{
+"id": 634,
+"it": "Kubbel, 1927: cinque pedoni, due re, e una sola domanda — catturare in b6, o passare oltre? La cattura, riflesso di una vita, pareggia soltanto; le mosse di re perdono; solo a5-a6!! vince, perché una donna nata in a8 vedrà diagonali che sua sorella nata in b8 non otterrà mai. Uno studio su dove nascono le donne."
+},
+{
+"id": 635,
+"it": "Passare oltre"
+},
+{
+"id": 636,
+"it": "La corsa delle due donne"
+},
+{
+"id": 637,
+"it": "La cattura naturale"
+},
+{
+"id": 638,
+"it": "Il re che «migliora»"
+},
+{
+"id": 639,
+"it": "Non la cattura (axb6? pareggia soltanto — si veda la trappola), non una mossa di re (tutte e sei perdono: il pedone e corre). Il pedone PASSA OLTRE b6: i pedoni neri catturano solo in discesa, quindi a6 è intoccabile — passato per sempre."
+},
+{
+"id": 640,
+"it": "Il riflesso di una vita: catturare, e il pedone passato è lì. Eppure si conti la corsa che segue —"
+},
+{
+"id": 641,
+"it": "Attaccare e4, «tenendo aperte tutte le opzioni»? Lo studio è questione di tempi, e questo PERDE:"
+},
+{
+"id": 642,
+"it": "La migliore difesa: correre incontro alla futura donna, sperando di evitare il suo primo scacco."
+},
+{
+"id": 643,
+"it": "L'altra difesa principale: una donna a testa, vinca la migliore."
+},
+{
+"id": 644,
+"it": "In a2 il re nero spera di nascondersi… sulla colonna a, di tutti i posti."
+},
+{
+"id": 645,
+"it": "Niente da fare: la donna nasce dando scacco."
+},
+{
+"id": 646,
+"it": "Il secondo punto dello studio: la donna appena nata raccoglie il pedone e CON scacco. La contro-promozione è morta prima ancora di esistere."
+},
+{
+"id": 647,
+"it": "Un po' di pulizia: …b4 è vietata per sempre, b5 e b6 congelati — spettatori fino al matto."
+},
+{
+"id": 648,
+"it": "Si prepara la scatola: il re nero è ridotto ad a1-b1."
+},
+{
+"id": 649,
+"it": "La donna tiene la scatola da lontano; il resto spetta al re bianco, che passeggia per la scacchiera (lo schema del corso «Matto di donna»)."
+},
+{
+"id": 650,
+"it": "A casa."
+},
+{
+"id": 651,
+"it": "Matto — mentre b5 e b6 guardano, intatti. I pedoni neri non sono mai serviti a nulla: era il verdetto nascosto dietro la prima mossa."
+},
+{
+"id": 652,
+"it": "Entrambe le donne nascono nella stessa mossa. Patta? No — si guardino le loro culle:"
+},
+{
+"id": 653,
+"it": "Da a8 la lunga diagonale concede uno scacco IMMEDIATO — il tempo che decide tutto. (Nata in b8 dopo axb6?, la donna non ha tale scacco: le sue linee sbattono contro i pedoni b — si veda la trappola.)"
+},
+{
+"id": 654,
+"it": "La mossa tranquilla nella tempesta: il re nero è in gabbia (a4/b4), Qc3+ incombe, e contro di essa la donna in e1 non ha UNA sola risorsa — la tablebase giudica persa ogni risposta."
+},
+{
+"id": 655,
+"it": "Attendere — disperato quanto tutto il resto."
+},
+{
+"id": 656,
+"it": "Il pedone b2, silenzioso dall'inizio dello studio, dà lo scacco decisivo."
+},
+{
+"id": 657,
+"it": "E la donna nera muore a cinque mosse di vita."
+},
+{
+"id": 658,
+"it": "Donna contro due pedoni congelati: una vittoria elementare. La corsa era truccata fin da 1.a6 — dalla geometria."
+},
+{
+"id": 659,
+"it": "Lo stesso conteggio di dopo 1.a6: donna per donna nella stessa mossa. Ma questa è nata in b8 — e da b8, NESSUNO scacco: la colonna b è tappata dai pedoni neri, la diagonale non porta da nessuna parte. Senza quel primo tempo non c'è geometria: patta da cima a fondo. Tutto Kubbel vive nel divario tra a8 e b8."
+},
+{
+"id": 660,
+"it": "Il pedone a5 — l'eroe della soluzione — svanisce, e l'ala di donna nera diventa una valanga."
+},
+{
+"id": 661,
+"it": "Il re bianco è a una casa di distanza ovunque: il pedone a fa donna. La posizione di partenza, verificata dall'oracolo, in una riga: dieci mosse legali — sette perdono (tutte e sei le mosse di re, e persino b4), axb6 e b3+ pareggiano soltanto, solo a6 vince. Una mossa corretta su dieci: ecco cos'è uno studio."
+},
+{
+"id": 662,
+"it": "Quattro anni prima del suo titolo mondiale, Emanuel Lasker compose questo (1890): un pedone bianco pronto a far donna, un pedone nero pronto a far donna, e una macchina guadagna-tempi. Re e torre bianchi scendono la scacchiera come una scala — e in fondo, il pedone h cade insieme alla torre nera."
+},
+{
+"id": 663,
+"it": "La scala"
+},
+{
+"id": 664,
+"it": "Prendere subito h2"
+},
+{
+"id": 665,
+"it": "Prendere h2 un istante troppo presto"
+},
+{
+"id": 666,
+"it": "L'UNICA mossa vincente — persino Rh6+ subito pareggia soltanto. Il re lascia c8: la promozione diventa una minaccia reale, e la torre nera dovrà inseguire due lepri."
+},
+{
+"id": 667,
+"it": "Il pedone nero stava per far donna — rimuoverlo sembra urgente. Ma si guardi il re bianco: sta su c8, la SUA stessa casa di promozione."
+},
+{
+"id": 668,
+"it": "L'unica risorsa: scacciare il re con gli scacchi."
+},
+{
+"id": 669,
+"it": "E di nuovo c8=Q è minacciata — la torre deve tornare indietro."
+},
+{
+"id": 670,
+"it": "Forzata. Ora si osservi il meccanismo: mentre la torre nera fa la spola tra b2 e c2, la torre BIANCA scende di un piano — con scacco, quindi gratis."
+},
+{
+"id": 671,
+"it": "Primo piano sceso. Il re nero deve muoversi, e l'intero scambio (scacco in b2, ritorno in c2) ricomincia un gradino più in basso."
+},
+{
+"id": 672,
+"it": "Stavolta il re ha lasciato c8 — dunque maturo per essere preso? No: la torre bianca sta lasciando la SETTIMA traversa, dove svolgeva un secondo lavoro."
+},
+{
+"id": 673,
+"it": "Secondo piano. Si conti cosa ottengono gli scacchi del Nero: nulla — il re bianco torna sempre; e a ogni ciclo, la torre bianca guadagna una traversa."
+},
+{
+"id": 674,
+"it": "Il re torna al lavoro — si noti come sceglie la casa in base alla traversa della torre nera: mai in linea con uno scacco utile."
+},
+{
+"id": 675,
+"it": "L'ultimo piano che conta: questo scacco spinge il re nero SULLA seconda traversa — la traversa della sua stessa torre."
+},
+{
+"id": 676,
+"it": "Dove andare? a4 e b4 appartengono al re bianco. Il re si unisce alla sua torre… e ne diventa il problema."
+},
+{
+"id": 677,
+"it": "Tempo di raccolto. La torre in c2 è attaccata e senza case: restare significa Rxc2+ seguita da c8=Q+; cambiare significa lasciar promuovere il pedone. Il pedone h che il Bianco ha «trascurato» per dodici mosse cade esattamente nel momento in cui la sua caduta vince."
+},
+{
+"id": 678,
+"it": "Donna contro torre: una vittoria nota — è il corso «Donna contro torre». Lo studio in sé è finito: la scala ha trasformato due pedoni affrontati in un punto di pura geometria."
+},
+{
+"id": 679,
+"it": "E non resta nulla: senza la torre bianca non ci sono scacchi discendenti, quindi niente macchina dei tempi. La torre nera fa la spola b2-c2 per sempre; il pedone c non farà mai donna. Patta."
+},
+{
+"id": 680,
+"it": "Ecco: h7 proteggeva c7. Il pedone cade, torre contro torre, patta. (Certo non 5…Rxh2?? 6.c8=Q+ e la donna vince.) La scala non era un ornamento: ogni scacco da Rh6+ a Rh3+ teneva c7 protetta A DISTANZA."
+},
+{
+"id": 681,
+"it": "Il tuo re sta davanti al suo pedone in 7ª, la torre nemica molesta: è la posizione che TUTTI i tuoi finali di torre vincenti cercano di raggiungere. Si vince con una celebre manovra — il ponte — vecchia di quattro secoli."
+},
+{
+"id": 682,
+"it": "Costruire il ponte"
+},
+{
+"id": 683,
+"it": "L'altra casa del re"
+},
+{
+"id": 684,
+"it": "Senza il ponte: la ruota gira a vuoto"
+},
+{
+"id": 685,
+"it": "La trappola del sollievo"
+},
+{
+"id": 686,
+"it": "Prima spingere il re nero di UNA colonna più in là: il ponte avrà bisogno di d7 e d8 libere da trucchi. Ogni mossa della manovra ha il suo perché."
+},
+{
+"id": 687,
+"it": "«Cambiare le torri, vincere il finale di pedoni» — NO: dopo Rxc2 il re nero è dentro il quadrato e custodisce la porta. Nemmeno una patta: una SCONFITTA — re e pedone sepolti in b7/b8, la torre nera li raccoglie. Controllare sempre il finale DOPO il cambio."
+},
+{
+"id": 688,
+"it": "Ke8 equivale alla stessa cosa — si veda il capitolo successivo."
+},
+{
+"id": 689,
+"it": "Una casa o l'altra sulla stessa traversa: non cambia nulla."
+},
+{
+"id": 690,
+"it": "LA mossa del corso, sconcertante a prima vista: la torre si parcheggia sulla QUARTA traversa, né più in alto né più in basso. Aspetta il suo re — è il pilastro del ponte."
+},
+{
+"id": 691,
+"it": "Uscire SENZA il ponte non perde — ma non vince nulla: gli scacchi non finiscono mai, e l'unico riparo del re è… b8, da dove è venuto."
+},
+{
+"id": 692,
+"it": "Il Nero può solo attendere: la torre deve restare sulla colonna a — lasciarla fa uscire il re gratis."
+},
+{
+"id": 693,
+"it": "Il re FINALMENTE esce — non avrebbe mai potuto senza la preparazione. Gli scacchi cominciano, e il piano li aspetta."
+},
+{
+"id": 694,
+"it": "Verso la torre che dà scacco? No: verso b5, a un passo dal ponte."
+},
+{
+"id": 695,
+"it": "Uno zigzag misurato: il re non fugge gli scacchi, li consuma."
+},
+{
+"id": 696,
+"it": "Il PONTE si chiude: la torre in d4 si interpone, gli scacchi sono finiti per sempre, il pedone fa donna alla mossa successiva. Questa manovra vince da quattro secoli — ha appena vinto per te."
+},
+{
+"id": 697,
+"it": "Il ponte si alza in modo identico."
+},
+{
+"id": 698,
+"it": "Di nuovo al punto di partenza. Si conti: tre mosse giocate, zero progressi. Il ponte, dimostrato per assurdo."
+},
+{
+"id": 699,
+"it": "E la torre nera riprende il suo posto. Resta tutto da fare — nel modo giusto, stavolta."
+},
+{
+"id": 700,
+"it": "Il Nero ringrazia. Kb8 e b7 non si muoveranno mai più; il re nero scorta la sua torre al banchetto."
+},
+{
+"id": 701,
+"it": "Mattison, 1914: un pedone bianco a due passi dalla promozione, una torre nera che conosce ogni strada per fermarlo — di fronte, da dietro, con infilata. L'alfiere bianco le blocca TUTTE, una dopo l'altra, vendendosi due volte lungo il cammino. Uno studio prediletto da chiunque ami i pezzi con più vite."
+},
+{
+"id": 702,
+"it": "Le due vite dell'alfiere"
+},
+{
+"id": 703,
+"it": "Il pedone di fretta"
+},
+{
+"id": 704,
+"it": "Difendere l'alfiere attaccato"
+},
+{
+"id": 705,
+"it": "Il re che fugge gli scacchi"
+},
+{
+"id": 706,
+"it": "L'unica vittoria — e non per lo scacco: l'alfiere viene a TAPPARE la colonna e. La diretta 1.e7? urta in …Re1+! e …Rxe7 (si veda la trappola); da ora quello scacco non esiste più."
+},
+{
+"id": 707,
+"it": "Un tempo troppo presto: la colonna e è ancora aperta."
+},
+{
+"id": 708,
+"it": "Ora sì. La torre non può più fermare il pedone da dietro… su quella colonna, almeno."
+},
+{
+"id": 709,
+"it": "Un'idea doppia: prendere un pedone, e soprattutto attaccare l'alfiere in e3 lungo la terza traversa — se si muove senza pensare, …Ra8-e8 o …Re3 riprende il controllo del pedone."
+},
+{
+"id": 710,
+"it": "La prima vendita dell'alfiere, e che contropiede: si mette IN PRESA al re per tagliare la colonna a! La strada a3-a8-e8 è chiusa; e prendere costa il tempo decisivo: 3…Kxa7 4.e8=Q e la torre è in ritardo."
+},
+{
+"id": 711,
+"it": "L'alfiere in e3 è in presa: difenderlo con il re — cosa c'è di più solido? Ma lo studio non si decide su QUELLA traversa:"
+},
+{
+"id": 712,
+"it": "La torre cambia piano: da sotto minaccia …Re1+ — l'alfiere ha lasciato e3, la colonna è di nuovo aperta."
+},
+{
+"id": 713,
+"it": "Ancora l'unica vittoria — qui persino tutte e quattro le promozioni pareggiano soltanto (e8=Q? Rf1+! e l'infilata e1-e8 raccoglie la donna). Il re cammina VERSO lo scacco annunciato."
+},
+{
+"id": 714,
+"it": "…Re1+ incombe: allontanarsi dalla torre sembra prudente. È l'esatto contrario della soluzione — e la vittoria svanisce:"
+},
+{
+"id": 715,
+"it": "Lo scacco arriva comunque…"
+},
+{
+"id": 716,
+"it": "…e l'alfiere si vende una seconda volta, di traverso! La torre deve prendere: altrimenti l'alfiere continua a coprire e1 e il pedone fa donna in pace."
+},
+{
+"id": 717,
+"it": "Ecco il vero prezzo dell'alfiere: questo tempo. Il re attacca la torre…"
+},
+{
+"id": 718,
+"it": "…e ancora. Braccata due volte, la torre non troverà mai il tempo di tornare sulla colonna e."
+},
+{
+"id": 719,
+"it": "Incoronazione. Donna contro torre è una vittoria nota — si veda il corso «Donna contro torre». L'alfiere è morto due volte per questo diagramma: in a7 per tagliare una colonna, in f2 per comprare due tempi."
+},
+{
+"id": 720,
+"it": "Lo zwischenschach fa tutto il lavoro:"
+},
+{
+"id": 721,
+"it": "La torre si dà per il pedone — il cambio GIUSTO:"
+},
+{
+"id": 722,
+"it": "…perché ciò che resta è un alfiere campo-scuro e il pedone a — la cui casa di promozione a8 è CHIARA. L'alfiere sbagliato! Il re nero bivacca in a8-a7: una patta da manuale (si veda «L'alfiere sbagliato»)."
+},
+{
+"id": 723,
+"it": "…la torre scivola DIETRO: a8 poi e8, e il pedone viene raccolto sulla sua stessa casa di incoronazione. Patta. Solo 3.Ba7!!, tappando quella strada a spese dell'alfiere, vinceva."
+},
+{
+"id": 724,
+"it": "Ora il Nero PUÒ permettersi l'alfiere: il Bianco non sa più come far pagare il tempo che costa."
+},
+{
+"id": 725,
+"it": "E la promozione sognata fa persino perdere la partita:"
+},
+{
+"id": 726,
+"it": "L'infilata e1-e8 — proprio quella che 4.Kf4! aveva disinnescato camminandole incontro:"
+},
+{
+"id": 727,
+"it": "La donna nasce e muore sulla stessa casa; torre contro re nudo, vince il NERO. L'intero studio in negativo: senza l'alfiere e il re giusto, ogni strada della torre si riapre."
+},
+{
+"id": 728,
+"it": "Re e pedone contro re: il finale in cui ogni altro finale finisce per trasformarsi. Esattamente una casa vince qui — quella che prende l'opposizione. Capiscila e converti i tuoi finali; tira a indovinare e dividi il punto."
+},
+{
+"id": 729,
+"it": "L'unica casa vincente"
+},
+{
+"id": 730,
+"it": "Lo specchio: cedere dall'altra parte"
+},
+{
+"id": 731,
+"it": "Il pedone partito troppo presto"
+},
+{
+"id": 732,
+"it": "Il re mangia persino il pedone"
+},
+{
+"id": 733,
+"it": "Il pedone frettoloso, più avanti"
+},
+{
+"id": 734,
+"it": "L'UNICA casa che vince — tutto il resto pareggia, compresa la spinta del pedone. Re faccia a faccia, a una casa di distanza, tocca all'avversario: è l'OPPOSIZIONE, e chi non la possiede deve cedere il passo."
+},
+{
+"id": 735,
+"it": "L'errore UNIVERSALE: spingere perché i pedoni spingono. La vittoria è appena evaporata — il Nero riprende l'opposizione e la manterrà fino allo stallo."
+},
+{
+"id": 736,
+"it": "Il Nero cede da un lato (Kf6 rispecchia esattamente). Il re bianco passa dalla porta appena aperta."
+},
+{
+"id": 737,
+"it": "Cedere sul lato di re non cambia nulla: l'aggiramento passa allora da d5, uno specchio perfetto di Kf5."
+},
+{
+"id": 738,
+"it": "L'AGGIRAMENTO: avanzare in diagonale sul lato abbandonato, guadagnando terreno a ogni passo. Il pedone può aspettare — prima il re, sempre."
+},
+{
+"id": 739,
+"it": "Solo ora: il pedone avanza CON scacco, quindi senza perdere l'opposizione. Si confronti il capitolo «pedone frettoloso», dove la stessa spinta un tempo troppo presto pareggia."
+},
+{
+"id": 740,
+"it": "L'opposizione riconquistata, una traversa più in alto. Il meccanismo si ripete: opposizione, aggiramento, pedone."
+},
+{
+"id": 741,
+"it": "Anche a metà manovra vincente, BASTA una spinta frettolosa: questa mossa spinge il re nero in e7… da dove riprende l'opposizione."
+},
+{
+"id": 742,
+"it": "Il pedone segue il suo re — mai il contrario."
+},
+{
+"id": 743,
+"it": "Di nuovo l'opposizione, decisiva stavolta: il re nero non ha più spazio dietro di sé."
+},
+{
+"id": 744,
+"it": "Il re conquista e8: il corridoio di promozione è comprato e pagato. Il resto è una scorta."
+},
+{
+"id": 745,
+"it": "Il pedone fa donna CON scacco. Dare matto con la donna è un altro corso — questo ti ha insegnato come arrivarci."
+},
+{
+"id": 746,
+"it": "Opposizione riconquistata. Da qui, rigiocare il capitolo principale in specchio."
+},
+{
+"id": 747,
+"it": "L'unica difesa, e basta: il re nero è pronto a prendere l'opposizione nel momento in cui il re bianco avanza."
+},
+{
+"id": 748,
+"it": "Spingere ancora non minaccia nulla: il re nero si pianta DAVANTI al pedone."
+},
+{
+"id": 749,
+"it": "Cercare di aggirare dall'ala non è meglio."
+},
+{
+"id": 750,
+"it": "Il blocco. Il re bianco arriva, prende l'opposizione… e la trova inutile: il pedone in e5 ha rubato proprio la casa di cui l'aggiramento avrebbe avuto bisogno."
+},
+{
+"id": 751,
+"it": "Il re nero attacca il pedone abbandonato: il Bianco lo difenderà per sempre — quando non lo perde semplicemente."
+},
+{
+"id": 752,
+"it": "L'unica difesa — e tiene. Davanti al pedone, a distanza di opposizione."
+},
+{
+"id": 753,
+"it": "Incollato al pedone: il re bianco non può più avanzare per pastorarlo, né aggirare. Patta da manuale."
+},
+{
+"id": 754,
+"it": "Un pedone passato isolato sul lato lontano non è lì per promuovere: è un'ESCA, e viene sacrificato. Il re nero deve andare a prenderlo da solo; in quei quattro tempi, il re bianco attraversa la scacchiera e si mangia tutto il lato di re."
+},
+{
+"id": 755,
+"it": "Il pedone si sacrifica, il re attraversa"
+},
+{
+"id": 756,
+"it": "Il pedone parte da solo, sul lato opposto a tutto il resto. Non farà donna — il re nero ha giusto il tempo — e non è il suo compito: il suo compito è ATTIRARE."
+},
+{
+"id": 757,
+"it": "Il re nero parte. Non ha scelta: lasciar correre il pedone perde sul posto."
+},
+{
+"id": 758,
+"it": "Due case percorse, e il re nero è già a cinque colonne dai suoi pedoni."
+},
+{
+"id": 759,
+"it": "Il pedone va fin dove può. È perso, ed è il piano: ogni casa che guadagna è un tempo che il re nero dovrà spendere per tornare."
+},
+{
+"id": 760,
+"it": "Il blocco. Il pedone non passerà — ma il re nero è ora inchiodato all'angolo."
+},
+{
+"id": 761,
+"it": "IL momento. Il re bianco non aspetta che il pedone cada: parte ORA, mentre l'altro re è occupato. Si noti che non può passare da f6 — il pedone g7 la copre — ma f7 è libera."
+}
+]

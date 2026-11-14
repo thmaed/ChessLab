@@ -52,44 +52,92 @@ enum OpeningCommentStatus: String, Codable, Hashable, Sendable {
     case validated
 }
 
-/// Texte BILINGUE (français / anglais) porté par la DONNÉE d'ouverture — les
-/// commentaires, plans et résumés sont rédigés dans les deux langues et résolus
-/// à l'exécution selon la langue de l'app (``AppLanguage/resolvedCode``).
+/// Texte MULTILINGUE (français / anglais / espagnol / allemand / italien) porté par la
+/// DONNÉE d'ouverture — les commentaires, plans et résumés sont rédigés dans
+/// chaque langue et résolus à l'exécution selon la langue de l'app
+/// (``AppLanguage/resolvedCode``).
 ///
-/// Décodage souple : accepte soit un objet `{"fr": "...", "en": "..."}`, soit
-/// une simple chaîne (appliquée aux deux langues) — pratique pour l'ébauche.
+/// Décodage souple : accepte soit un objet `{"fr": "...", "en": "...", "es":
+/// "...", "de": "...", "it": "..."}` (toute langue peut manquer), soit une simple chaîne
+/// (appliquée aux cinq langues) — pratique pour l'ébauche.
 struct LocalizedText: Codable, Hashable, Sendable {
     var fr: String?
     var en: String?
+    var es: String?
+    var de: String?
+    var it: String?
 
-    init(fr: String? = nil, en: String? = nil) {
+    init(fr: String? = nil, en: String? = nil, es: String? = nil, de: String? = nil, it: String? = nil) {
         self.fr = fr
         self.en = en
+        self.es = es
+        self.de = de
+        self.it = it
     }
 
-    /// Même texte dans les deux langues (utilitaire d'écriture/tests).
-    static func both(_ text: String) -> LocalizedText { LocalizedText(fr: text, en: text) }
+    /// Même texte dans toutes les langues (utilitaire d'écriture/tests).
+    static func both(_ text: String) -> LocalizedText {
+        LocalizedText(fr: text, en: text, es: text, de: text, it: text)
+    }
 
-    enum CodingKeys: String, CodingKey { case fr, en }
+    enum CodingKeys: String, CodingKey { case fr, en, es, de, it }
 
     init(from decoder: Decoder) throws {
         if let single = try? decoder.singleValueContainer().decode(String.self) {
             fr = single
             en = single
+            es = single
+            de = single
+            it = single
             return
         }
         let container = try decoder.container(keyedBy: CodingKeys.self)
         fr = try container.decodeIfPresent(String.self, forKey: .fr)
         en = try container.decodeIfPresent(String.self, forKey: .en)
+        es = try container.decodeIfPresent(String.self, forKey: .es)
+        de = try container.decodeIfPresent(String.self, forKey: .de)
+        it = try container.decodeIfPresent(String.self, forKey: .it)
     }
 
-    /// Texte pour un code langue (« fr »/« en »), avec repli sur l'autre langue,
-    /// puis `nil` si les deux sont vides.
+    /// Le texte d'UNE langue, sans repli (`nil` pour un code inconnu).
+    func text(for code: String) -> String? {
+        switch code {
+        case "fr": fr
+        case "en": en
+        case "es": es
+        case "de": de
+        case "it": it
+        default: nil
+        }
+    }
+
+    /// Une copie où la langue `code` vaut `value`, les autres INTACTES.
+    func setting(_ value: String?, for code: String) -> LocalizedText {
+        var copy = self
+        switch code {
+        case "fr": copy.fr = value
+        case "en": copy.en = value
+        case "es": copy.es = value
+        case "de": copy.de = value
+        case "it": copy.it = value
+        default: break
+        }
+        return copy
+    }
+
+    /// Aucune langue renseignée.
+    var isEmpty: Bool {
+        [fr, en, es, de, it].allSatisfy { ($0 ?? "").isEmpty }
+    }
+
+    /// Texte pour un code langue, avec repli : la langue demandée, puis
+    /// l'anglais (langue pivot de l'app), puis le français, puis n'importe
+    /// laquelle des autres ; `nil` si toutes sont vides. Un cours encore sans
+    /// traduction espagnole s'affiche donc en anglais plutôt qu'en blanc.
     func resolved(_ code: String) -> String? {
-        let primary = code == "fr" ? fr : en
-        let fallback = code == "fr" ? en : fr
-        if let primary, !primary.isEmpty { return primary }
-        if let fallback, !fallback.isEmpty { return fallback }
+        for candidate in [code, "en", "fr", "es", "de", "it"] {
+            if let text = text(for: candidate), !text.isEmpty { return text }
+        }
         return nil
     }
 }

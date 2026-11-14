@@ -226,16 +226,15 @@ struct OpeningTrainView: View {
     private var variationMessage: String {
         let played = viewModel.variationPlayedSAN ?? "?"
         let main = viewModel.variationMainSAN ?? "?"
-        let fr = AppSettings.shared.appLanguage.resolvedCode == "fr"
         if !viewModel.variationTargetIsMainLine {
             // Entraînement d'une variante choisie : le coup attendu n'est pas la principale.
-            return fr
-                ? "« \(played) » est une autre variante du répertoire — la ligne que tu travailles passe par \(main). Que veux-tu faire ?"
-                : "“\(played)” is another repertoire line — the line you are practising goes through \(main). What would you like to do?"
+            return LocalizationController.string(
+                "« %@ » est une autre variante du répertoire — la ligne que tu travailles passe par %@. Que veux-tu faire ?",
+                played, main)
         }
-        return fr
-            ? "« \(played) » est une variante du répertoire — la ligne principale est \(main). Que veux-tu faire ?"
-            : "“\(played)” is a repertoire sideline — the main line is \(main). What would you like to do?"
+        return LocalizationController.string(
+            "« %@ » est une variante du répertoire — la ligne principale est %@. Que veux-tu faire ?",
+            played, main)
     }
 
     @ViewBuilder
@@ -256,9 +255,7 @@ struct OpeningTrainView: View {
     }
 
     private func wrongMessage(_ correct: String) -> String {
-        AppSettings.shared.appLanguage.resolvedCode == "fr"
-            ? "Le bon coup était \(correct)."
-            : "The right move was \(correct)."
+        LocalizationController.string("Le bon coup était %@.", correct)
     }
 
     private func commentCard(_ comment: String) -> some View {

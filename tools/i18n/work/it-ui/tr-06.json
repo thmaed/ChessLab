@@ -1,0 +1,434 @@
+[
+{
+"id": 660,
+"it": "Posizione asimmetrica: il Bianco inizia con pedoni che occupano gran parte della scacchiera e NESSUN altro pezzo — nemmeno il re. Il Nero ha un esercito classico completo, con i suoi diritti di arrocco. Il Bianco vince dando scacco matto al re nero — un pedone promosso può contribuire. Il Nero vince catturando l'ultimissimo pezzo bianco."
+},
+{
+"id": 661,
+"it": "Posizione di partenza"
+},
+{
+"id": 662,
+"it": "Posizione di partenza (FEN)"
+},
+{
+"id": 663,
+"it": "Posizione di partenza di un PGN"
+},
+{
+"id": 664,
+"it": "Posizione personalizzata"
+},
+{
+"id": 665,
+"it": "Posizione personalizzata (FEN)"
+},
+{
+"id": 666,
+"it": "Posizioni difficili"
+},
+{
+"id": 667,
+"it": "Principale"
+},
+{
+"id": 668,
+"it": "Catture esplosive"
+},
+{
+"id": 669,
+"it": "Prossimo ripasso oggi"
+},
+{
+"id": 670,
+"it": "Prossimo ripasso tra %lld giorni"
+},
+{
+"id": 671,
+"it": "Prossimo ripasso domani"
+},
+{
+"id": 672,
+"it": "Programma non trovato"
+},
+{
+"id": 673,
+"it": "Esporta in PGN"
+},
+{
+"id": 674,
+"it": "Numero (da 0 a 959)"
+},
+{
+"id": 675,
+"it": "Solo Stockfish: niente libro di aperture né Maia. Le due partite di una coppia partono dalla stessa posizione, a colori invertiti."
+},
+{
+"id": 676,
+"it": "Una posizione diversa per ogni coppia di partite"
+},
+{
+"id": 677,
+"it": "Programma Woodpecker"
+},
+{
+"id": 679,
+"it": "Progressi"
+},
+{
+"id": 680,
+"it": "Progressione di A"
+},
+{
+"id": 681,
+"it": "Progressi"
+},
+{
+"id": 682,
+"it": "Promozione"
+},
+{
+"id": 683,
+"it": "Proponi patta"
+},
+{
+"id": 684,
+"it": "Proporre patta al motore?"
+},
+{
+"id": 685,
+"it": "Provenienza"
+},
+{
+"id": 686,
+"it": "Precisa"
+},
+{
+"id": 687,
+"it": "Precedente"
+},
+{
+"id": 688,
+"it": "Preparazione della libreria di puzzle…"
+},
+{
+"id": 689,
+"it": "Puzzle"
+},
+{
+"id": 690,
+"it": "Puzzle successivo"
+},
+{
+"id": 691,
+"it": "Puzzle"
+},
+{
+"id": 692,
+"it": "Chi abbandona?"
+},
+{
+"id": 693,
+"it": "Sbagliati"
+},
+{
+"id": 694,
+"it": "Ritaglia"
+},
+{
+"id": 695,
+"it": "Cerca un giocatore o un tag"
+},
+{
+"id": 696,
+"it": "Cerca un finale"
+},
+{
+"id": 697,
+"it": "Cerca un'apertura o un codice ECO"
+},
+{
+"id": 698,
+"it": "Ricomincia"
+},
+{
+"id": 699,
+"it": "Rifai quelli sbagliati"
+},
+{
+"id": 700,
+"it": "Rifiuta"
+},
+{
+"id": 701,
+"it": "Rigioca"
+},
+{
+"id": 702,
+"it": "Ringraziamenti"
+},
+{
+"id": 703,
+"it": "Rinomina"
+},
+{
+"id": 704,
+"it": "Rinomina la raccolta"
+},
+{
+"id": 705,
+"it": "Rinomina il repertorio"
+},
+{
+"id": 706,
+"it": "Comprimi"
+},
+{
+"id": 707,
+"it": "Riprendi"
+},
+{
+"id": 708,
+"it": "Riprendi da qui"
+},
+{
+"id": 709,
+"it": "Riprendi l'analisi da dove si era fermata"
+},
+{
+"id": 710,
+"it": "Riprendi la partita in corso"
+},
+{
+"id": 711,
+"it": "Riprendi la serie"
+},
+{
+"id": 712,
+"it": "Ritira la mossa"
+},
+{
+"id": 713,
+"it": "Ripresa alla mossa %lld — %lld mosse scartate"
+},
+{
+"id": 714,
+"it": "Ripresa impossibile"
+},
+{
+"id": 715,
+"it": "Molla"
+},
+{
+"id": 716,
+"it": "Resta sulla principale"
+},
+{
+"id": 717,
+"it": "Resta sulla mia linea"
+},
+{
+"id": 718,
+"it": "Indietro"
+},
+{
+"id": 719,
+"it": "Feedback aptico"
+},
+{
+"id": 720,
+"it": "Capovolgi la scacchiera"
+},
+{
+"id": 721,
+"it": "Rivincita"
+},
+{
+"id": 722,
+"it": "Torna indietro + «Riprendi da qui»"
+},
+{
+"id": 723,
+"it": "Rivedi il tour guidato"
+},
+{
+"id": 724,
+"it": "Niente da mostrare per ora"
+},
+{
+"id": 725,
+"it": "Niente da ripassare"
+},
+{
+"id": 726,
+"it": "Re al centro"
+},
+{
+"id": 727,
+"it": "Re collina"
+},
+{
+"id": 728,
+"it": "Re della collina"
+},
+{
+"id": 729,
+"it": "Arrocca sul lato opposto e lancia i pedoni: il tuo re è un indirizzo di consegna. Semplifica male, anche con due pedoni di vantaggio."
+},
+{
+"id": 730,
+"it": "Arrocchi"
+},
+{
+"id": 731,
+"it": "Regola"
+},
+{
+"id": 732,
+"it": "Regole del gioco (FEN/PGN/SAN). Libreria Swift con licenza MIT."
+},
+{
+"id": 733,
+"it": "Riprova"
+},
+{
+"id": 734,
+"it": "Tempo di riflessione per mossa"
+},
+{
+"id": 735,
+"it": "Confutazione"
+},
+{
+"id": 736,
+"it": "Impostazioni"
+},
+{
+"id": 737,
+"it": "Impostazioni avanzate"
+},
+{
+"id": 738,
+"it": "Impostazioni…"
+},
+{
+"id": 739,
+"it": "Ripartizione"
+},
+{
+"id": 740,
+"it": "Ripartizione (A)"
+},
+{
+"id": 741,
+"it": "Repertorio"
+},
+{
+"id": 742,
+"it": "Repertorio del Bianco"
+},
+{
+"id": 743,
+"it": "Repertorio importato"
+},
+{
+"id": 744,
+"it": "Repertorio incoerente: %@"
+},
+{
+"id": 745,
+"it": "Repertorio del Nero"
+},
+{
+"id": 746,
+"it": "Rete neurale che prevede la mossa che giocherebbe un umano, addestrata dal CSSLab dell'Università di Toronto su milioni di partite Lichess. È lei a interpretare i personaggi della modalità Contro il computer; i suoi pesi (modello 23M) sono convertiti per Core ML. Licenza AGPLv3, compatibile con la GPLv3 dell'app, che non fornisce alcun servizio di rete."
+},
+{
+"id": 747,
+"it": "Rete neurale che individua i pezzi nella foto di una scacchiera: architettura YOLO11 di Ultralytics, addestrata per ChessLab su foto di set reali, convertita per Core ML. Licenza AGPLv3, compatibile con la GPLv3 dell'app."
+},
+{
+"id": 748,
+"it": "Reti NNUE di Stockfish"
+},
+{
+"id": 749,
+"it": "Reti neurali usate dal motore per valutare le posizioni, pubblicate dal progetto Stockfish."
+},
+{
+"id": 750,
+"it": "Risolto!"
+},
+{
+"id": 752,
+"it": "Risultato sconosciuto"
+},
+{
+"id": 753,
+"it": "Ripristina le %lld mosse scartate"
+},
+{
+"id": 754,
+"it": "Successo"
+},
+{
+"id": 755,
+"it": "Successo per difficoltà"
+},
+{
+"id": 756,
+"it": "Ripassa oggi"
+},
+{
+"id": 757,
+"it": "Ripasso del giorno"
+},
+{
+"id": 758,
+"it": "Allenati"
+},
+{
+"id": 759,
+"it": "Sacrifici"
+},
+{
+"id": 760,
+"it": "Sangue freddo"
+},
+{
+"id": 761,
+"it": "Senza adattamento"
+},
+{
+"id": 762,
+"it": "Nessun effetto su una posizione FEN — la libreria conserva partite."
+},
+{
+"id": 763,
+"it": "Scansiona"
+},
+{
+"id": 764,
+"it": "Scansiona una posizione"
+},
+{
+"id": 765,
+"it": "Punteggio A"
+},
+{
+"id": 766,
+"it": "Punteggio di A"
+},
+{
+"id": 767,
+"it": "Verso di lettura"
+},
+{
+"id": 768,
+"it": "Le sue mosse sembrano sbagliate. Metà lo sono davvero, l'altra metà costa un pezzo a chi ci crede. Cade lui stesso nelle trappole altrui, per principio."
+},
+{
+"id": 769,
+"it": "I suoi cicli restano registrati, ma non verrà più proposto."
+}
+]

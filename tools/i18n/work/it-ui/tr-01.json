@@ -1,0 +1,442 @@
+[
+{
+"id": 110,
+"it": "Analizza la partita"
+},
+{
+"id": 111,
+"it": "Analizza…"
+},
+{
+"id": 112,
+"it": "Analizza una partita con errori per creare puzzle (menu «...» della modalità Analizza)."
+},
+{
+"id": 113,
+"it": "Analizza una partita o una posizione con Stockfish: classificazione delle mosse (imprecisione, errore, errore grave), curva di valutazione, frecce delle mosse migliori e freccia rossa della minaccia avversaria, riproduzione automatica e creazione di puzzle dagli errori. Esportazione PGN ricaricabile. Inserimento tramite PGN, FEN, editor o scanner."
+},
+{
+"id": 114,
+"it": "Anima la scacchiera (altrimenti modalità rapida)"
+},
+{
+"id": 115,
+"it": "Annulla"
+},
+{
+"id": 116,
+"it": "Annulla la ripresa"
+},
+{
+"id": 117,
+"it": "Antiscacchi"
+},
+{
+"id": 118,
+"it": "Dispositivo caldo — motore limitato"
+},
+{
+"id": 119,
+"it": "Fotocamera"
+},
+{
+"id": 120,
+"it": "Dispositivo appoggiato in piano: nome, orologio e pulsanti del lato opposto sono capovolti."
+},
+{
+"id": 121,
+"it": "Impara e ripassa"
+},
+{
+"id": 122,
+"it": "Impara e ripassa le tue aperture"
+},
+{
+"id": 123,
+"it": "Arbitraggio…"
+},
+{
+"id": 124,
+"it": "Interrompi"
+},
+{
+"id": 125,
+"it": "Interrompere questo programma?"
+},
+{
+"id": 126,
+"it": "Ferma il suggerimento"
+},
+{
+"id": 127,
+"it": "Interrompi la riproduzione"
+},
+{
+"id": 128,
+"it": "Interrompi il programma"
+},
+{
+"id": 129,
+"it": "Atomico"
+},
+{
+"id": 130,
+"it": "Attacco"
+},
+{
+"id": 131,
+"it": "Nessuna mossa giocata"
+},
+{
+"id": 132,
+"it": "Nessuna mossa ritirata — conversione pulita."
+},
+{
+"id": 133,
+"it": "Nessun corso corrisponde ai filtri o alla ricerca."
+},
+{
+"id": 134,
+"it": "Nessuno dei due lati ha lasciato sfuggire un matto forzato in 5 mosse o meno in questa partita."
+},
+{
+"id": 135,
+"it": "Nessun matto mancato"
+},
+{
+"id": 136,
+"it": "Nessun puzzle"
+},
+{
+"id": 137,
+"it": "Nessun puzzle dalle tue partite"
+},
+{
+"id": 138,
+"it": "Nessun puzzle da fare"
+},
+{
+"id": 139,
+"it": "Nessun puzzle corrisponde a questi criteri."
+},
+{
+"id": 140,
+"it": "Nessun puzzle sbagliato"
+},
+{
+"id": 141,
+"it": "Nessun puzzle trovato in questo file."
+},
+{
+"id": 142,
+"it": "Nessun risultato"
+},
+{
+"id": 143,
+"it": "Nessun testo da importare."
+},
+{
+"id": 144,
+"it": "Nessun dato di apertura viene scaricato durante l'uso: tutto funziona offline."
+},
+{
+"id": 145,
+"it": "Nessuna freccia"
+},
+{
+"id": 146,
+"it": "Nessun errore grave abbastanza netto per un puzzle senza ambiguità in questa partita."
+},
+{
+"id": 147,
+"it": "Nessuna apertura"
+},
+{
+"id": 148,
+"it": "Nessuna apertura corrisponde a questa ricerca."
+},
+{
+"id": 149,
+"it": "Nessuna partita di maestri nota per questa posizione."
+},
+{
+"id": 150,
+"it": "Nessuna partita salvata"
+},
+{
+"id": 151,
+"it": "Nessuna partita corrisponde alla ricerca o ai filtri."
+},
+{
+"id": 152,
+"it": "Nessuna partita in questo periodo."
+},
+{
+"id": 153,
+"it": "Nessuna posizione da ripassare per ora. Apri un'apertura e allenala per riempire la tua coda."
+},
+{
+"id": 154,
+"it": "Nessun tag. Aggiungine per ritrovare e raggruppare le tue partite (es. «apertura», «da rivedere»)."
+},
+{
+"id": 155,
+"it": "Attorno a un tavolo"
+},
+{
+"id": 156,
+"it": "Altre mosse a questo punto"
+},
+{
+"id": 157,
+"it": "Altre fonti"
+},
+{
+"id": 158,
+"it": "Avanzato"
+},
+{
+"id": 159,
+"it": "Mostra il tema del puzzle"
+},
+{
+"id": 160,
+"it": "Matto, forchetta, inchiodatura… Nascondilo per cercare l'idea senza suggerimenti."
+},
+{
+"id": 161,
+"it": "Con un solo tentativo si calcola la variante fino in fondo prima di muovere — è tutto il senso dell'esercizio. Tre tentativi permettono di cercare a tentoni."
+},
+{
+"id": 162,
+"it": "Con varianti"
+},
+{
+"id": 163,
+"it": "Barra di valutazione"
+},
+{
+"id": 164,
+"it": "Barricate"
+},
+{
+"id": 165,
+"it": "Barricate casuali"
+},
+{
+"id": 166,
+"it": "Database .pgn (più partite) → libreria"
+},
+{
+"id": 167,
+"it": "Database di puzzle Lichess"
+},
+{
+"id": 168,
+"it": "Battuto fino a %lld"
+},
+{
+"id": 169,
+"it": "Libreria"
+},
+{
+"id": 170,
+"it": "Librerie, set di dati e risorse di terze parti usati da ChessLab."
+},
+{
+"id": 171,
+"it": "Presto"
+},
+{
+"id": 172,
+"it": "Bilancio"
+},
+{
+"id": 173,
+"it": "Bilancio della partita"
+},
+{
+"id": 174,
+"it": "Bianco"
+},
+{
+"id": 175,
+"it": "Blu"
+},
+{
+"id": 176,
+"it": "Buona mossa"
+},
+{
+"id": 177,
+"it": "Brillante"
+},
+{
+"id": 178,
+"it": "Brillante alla mossa 15, pezzo in presa alla mossa 16. Gioca veloce, attacca tutto, dimentica il suo re. Il principiante umano che Stockfish non sa imitare."
+},
+{
+"id": 179,
+"it": "Cemento"
+},
+{
+"id": 180,
+"it": "Raccolta importata"
+},
+{
+"id": 181,
+"it": "Questo nome non va bene"
+},
+{
+"id": 182,
+"it": "CSV"
+},
+{
+"id": 183,
+"it": "Cadenza"
+},
+{
+"id": 184,
+"it": "Un lato vicino al massimo e meno di 0,5 s per mossa: il tempo breve limita soprattutto il lato forte — il divario reale sarà più piccolo di quello mostrato."
+},
+{
+"id": 185,
+"it": "Lato studiato"
+},
+{
+"id": 186,
+"it": "Anatra"
+},
+{
+"id": 187,
+"it": "Screenshot, foto o scacchiera reale"
+},
+{
+"id": 188,
+"it": "Casa en passant incoerente: nessun pedone catturabile in quel punto."
+},
+{
+"id": 189,
+"it": "Casa en passant non valida: deve trovarsi sulla 3ª o sulla 6ª traversa."
+},
+{
+"id": 190,
+"it": "Cavallo"
+},
+{
+"id": 191,
+"it": "Cavalli"
+},
+{
+"id": 192,
+"it": "Questo PGN non contiene alcuna mossa."
+},
+{
+"id": 193,
+"it": "Non è stato possibile raddrizzare questa inquadratura — verifica che i quattro angoli circondino bene la scacchiera."
+},
+{
+"id": 194,
+"it": "Questa mossa è già nel repertorio: %@"
+},
+{
+"id": 195,
+"it": "Questa mossa fa perdere circa %lld pedoni di valutazione."
+},
+{
+"id": 196,
+"it": "Questa mossa lascia sfuggire un matto forzato."
+},
+{
+"id": 197,
+"it": "Questa mossa fa sfuggire il verdetto: "
+},
+{
+"id": 198,
+"it": "Questa mossa permette all'avversario un matto forzato."
+},
+{
+"id": 199,
+"it": "Questo file mescola posizioni di partenza diverse: importale separatamente."
+},
+{
+"id": 200,
+"it": "Questo file non è un'immagine leggibile."
+},
+{
+"id": 201,
+"it": "Questo programma Woodpecker non esiste più su questo dispositivo."
+},
+{
+"id": 202,
+"it": "Cosa fa ciascuna modalità."
+},
+{
+"id": 203,
+"it": "Questo repertorio non è stato trovato."
+},
+{
+"id": 204,
+"it": "Questo testo non ha potuto essere letto né come una partita (PGN) né come una posizione (FEN)."
+},
+{
+"id": 205,
+"it": "Questo testo comparirà sotto la mossa %@ durante il ripasso."
+},
+{
+"id": 206,
+"it": "Questa azione è definitiva."
+},
+{
+"id": 207,
+"it": "Questa disposizione non è una posizione Chess960 valida."
+},
+{
+"id": 208,
+"it": "Non è stato possibile leggere questa immagine."
+},
+{
+"id": 209,
+"it": "Questa posizione non è nel repertorio."
+},
+{
+"id": 210,
+"it": "Questo riquadro avvia una partita contro nove personaggi interpretati da Maia-3, una rete che gioca come un umano — oppure contro Stockfish. Gli altri aspetteranno la fine del tour — due minuti, promesso."
+},
+{
+"id": 211,
+"it": "A turno sullo stesso schermo, senza computer."
+},
+{
+"id": 212,
+"it": "Cambia"
+},
+{
+"id": 213,
+"it": "Cambia immagine"
+},
+{
+"id": 214,
+"it": "Cambia modalità"
+},
+{
+"id": 215,
+"it": "Capitolo %d"
+},
+{
+"id": 216,
+"it": "Ogni linea di questi corsi è verificata con le tablebase dei finali (Syzygy): nessuna mossa insegnata lascia sfuggire la vittoria, nessuna difesa proposta perde la patta."
+},
+{
+"id": 217,
+"it": "Ogni modalità di ChessLab in breve."
+},
+{
+"id": 218,
+"it": "Ogni partita si analizza"
+},
+{
+"id": 219,
+"it": "Ogni posizione, sezionata"
+}
+]

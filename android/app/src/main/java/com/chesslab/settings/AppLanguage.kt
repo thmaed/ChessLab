@@ -30,7 +30,10 @@ import java.util.Locale
 enum class AppLanguage(val tag: String) {
     system(""),
     french("fr"),
-    english("en");
+    english("en"),
+    spanish("es"),
+    german("de"),
+    italian("it");
 
     companion object {
         private const val PREFS = "chesslab.language"
@@ -40,6 +43,9 @@ enum class AppLanguage(val tag: String) {
             tag == null -> system
             tag.startsWith("fr") -> french
             tag.startsWith("en") -> english
+            tag.startsWith("es") -> spanish
+            tag.startsWith("de") -> german
+            tag.startsWith("it") -> italian
             else -> system
         }
 

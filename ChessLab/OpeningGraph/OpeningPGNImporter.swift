@@ -146,7 +146,7 @@ enum OpeningPGNImporter {
             }
             chapters.append(OpeningChapter(
                 id: "chapter-\(offset + 1)",
-                title: LocalizedText(fr: chapterTitle(game, index: offset), en: chapterTitle(game, index: offset)),
+                title: .both(chapterTitle(game, index: offset)),
                 positionFENs: outcome.spine
             ))
         }
@@ -292,7 +292,7 @@ enum OpeningPGNImporter {
     private static func comment(of move: Move) -> LocalizedText? {
         let text = move.comment.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return nil }
-        return LocalizedText(fr: text, en: text)
+        return .both(text)
     }
 
     private static func chapterTitle(_ game: Game, index: Int) -> String {

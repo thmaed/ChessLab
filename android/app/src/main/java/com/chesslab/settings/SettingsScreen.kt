@@ -75,13 +75,21 @@ fun SettingsScreen(
         SettingsSection(stringResource(R.string.settings_language), Icons.Default.Language) {
         val activity = LocalContext.current as? android.app.Activity
         var language by remember { mutableStateOf(AppLanguage.current(context)) }
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        // Des pastilles qui se replient plutôt que six rangées (pendant de la rangée de pastilles d'iOS).
+        @OptIn(androidx.compose.foundation.layout.ExperimentalLayoutApi::class)
+        androidx.compose.foundation.layout.FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
             listOf(
                 AppLanguage.system to R.string.settings_language_system,
                 AppLanguage.french to R.string.settings_language_fr,
                 AppLanguage.english to R.string.settings_language_en,
+                AppLanguage.spanish to R.string.settings_language_es,
+                AppLanguage.german to R.string.settings_language_de,
+                AppLanguage.italian to R.string.settings_language_it,
             ).forEach { (value, label) ->
-                Choice(stringResource(label), value == language, "langue-${value.name}") {
+                LanguageChip(stringResource(label), value == language, "langue-${value.name}") {
                     language = value
                     AppLanguage.apply(context, value) { activity?.recreate() }
                 }
@@ -152,13 +160,20 @@ fun SettingsScreen(
         }
 
         SettingsSection(stringResource(R.string.settings_notation), Icons.Default.Abc) {
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        // Deux par ligne : à quatre de front, « Französisch » se coupait en
+        // pleine syllabe (allemand, 2.3).
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             // Le libellé porte son propre EXEMPLE : « Cf3 » explique mieux que
             // n'importe quelle phrase ce que le réglage change.
             listOf(
                 com.chesslab.settings.PieceNotation.french to "Cf3, Dxd5, O-O",
                 com.chesslab.settings.PieceNotation.english to "Nf3, Qxd5, O-O",
-            ).forEach { (notation, exemple) ->
+                com.chesslab.settings.PieceNotation.spanish to "Cf3, Dxd5, O-O",
+                com.chesslab.settings.PieceNotation.german to "Sf3, Dxd5, O-O",
+                com.chesslab.settings.PieceNotation.italian to "Cf3, Dxd5, O-O",
+            ).chunked(2).forEach { pair ->
+              Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+              pair.forEach { (notation, exemple) ->
                 val active = settings.pieceNotation == notation
                 Column(
                     Modifier
@@ -171,14 +186,23 @@ fun SettingsScreen(
                 ) {
                     Text(
                         stringResource(
-                            if (notation == com.chesslab.settings.PieceNotation.french)
-                                R.string.settings_notation_french else R.string.settings_notation_english
+                            when (notation) {
+                                com.chesslab.settings.PieceNotation.french -> R.string.settings_notation_french
+                                com.chesslab.settings.PieceNotation.english -> R.string.settings_notation_english
+                                com.chesslab.settings.PieceNotation.spanish -> R.string.settings_notation_spanish
+                                com.chesslab.settings.PieceNotation.german -> R.string.settings_notation_german
+                                com.chesslab.settings.PieceNotation.italian -> R.string.settings_notation_italian
+                            }
                         ),
                         fontSize = 13.sp,
                         color = if (active) Palette.accent else Palette.textPrimary,
                     )
                     Text(exemple, fontSize = 11.sp, color = Palette.textTertiary)
                 }
+              }
+              // Cinq notations : la dernière ligne n'en a qu'une, qui garde la largeur d'une demi-ligne.
+              if (pair.size == 1) Spacer(Modifier.weight(1f))
+              }
             }
         }
 
@@ -469,6 +493,26 @@ private fun Choice(label: String, selected: Boolean, tag: String, onPick: () -> 
         if (selected) {
             Icon(Icons.Default.CheckCircle, null, tint = Palette.accent, modifier = Modifier.size(18.dp))
         }
+    }
+}
+
+/** Une pastille de choix de langue : capsule teintée quand elle est choisie. */
+@Composable
+private fun LanguageChip(label: String, selected: Boolean, tag: String, onPick: () -> Unit) {
+    Box(
+        Modifier
+            .testTag(tag)
+            .clip(RoundedCornerShape(50))
+            .background(if (selected) Palette.accent.copy(alpha = 0.18f) else Palette.surface)
+            .border(1.dp, if (selected) Palette.accent else Palette.stroke, RoundedCornerShape(50))
+            .selectable(selected = selected, role = androidx.compose.ui.semantics.Role.RadioButton, onClick = onPick)
+            .padding(horizontal = 16.dp, vertical = 9.dp),
+    ) {
+        Text(
+            label, fontSize = 14.sp,
+            color = if (selected) Palette.accent else Palette.textPrimary,
+            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+        )
     }
 }
 

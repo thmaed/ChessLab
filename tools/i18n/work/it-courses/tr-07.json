@@ -1,0 +1,538 @@
+[
+{
+"id": 1037,
+"it": "Il pedone continua, quasi in promozione. La torre può solo seguirlo, impotente."
+},
+{
+"id": 1038,
+"it": "Il re bianco evita lo scacco senza fretta — il pedone sulla 7ª traversa non ha bisogno di aiuto immediato, e il secondo pedone resta in riserva. Verificato: la posizione resta vincente qualunque continuazione provi l'oracolo."
+},
+{
+"id": 1039,
+"it": "Re e alfiere strizzati nell'angolo — ma è l'angolo GIUSTO, quello opposto al colore dell'alfiere. La torre può avvicinarsi, tornare indietro, persino divorare l'alfiere: nulla funziona, la posizione ricade sempre sulla stessa fortezza."
+},
+{
+"id": 1040,
+"it": "La fortezza che si richiude su sé stessa"
+},
+{
+"id": 1041,
+"it": "Prendere subito l'alfiere?"
+},
+{
+"id": 1042,
+"it": "L'approccio diretto: stallo immediato"
+},
+{
+"id": 1043,
+"it": "La torre lascia l'8ª traversa: restare lì inchioderebbe l'alfiere contro il suo stesso re (Rc8-Kh8 sulla stessa traversa) senza lasciargli alcuna mossa — stallo immediato. Quindi per sperare serve una valvola di sicurezza per l'alfiere."
+},
+{
+"id": 1044,
+"it": "Allettante: l'alfiere sembra maturo per essere preso. Ma il re bianco, in g6, non difende g8 — la torre ci entra senza alcuna protezione."
+},
+{
+"id": 1045,
+"it": "Il re bianco si avvicina ancora — e sbatte subito contro il muro: il re nero non ha case (g7 e h7 sono controllate, g8 è occupata), e l'alfiere, inchiodato sull'8ª traversa tra la torre e il suo stesso re, non può muoversi nemmeno lui. Stallo immediato."
+},
+{
+"id": 1046,
+"it": "L'alfiere si sgranchisce le gambe, senza mai lasciare la diagonale che protegge il suo re."
+},
+{
+"id": 1047,
+"it": "La torre torna per un altro tentativo — invano: il re nero non ha dove andare (g7 e h7 sono controllate dal re bianco, g8 dal suo alfiere), ma l'alfiere può sempre intervenire."
+},
+{
+"id": 1048,
+"it": "E si ricade ESATTAMENTE nella posizione di partenza. Il ciclo è la prova: qualunque cosa tenti il lato forte, nulla si muove di un millimetro."
+},
+{
+"id": 1049,
+"it": "Il re nero riprende, e sulla scacchiera non resta altro pezzo che i due re. Patta immediata, materiale insufficiente da entrambe le parti — catturare l'alfiere è costato subito la torre."
+},
+{
+"id": 1050,
+"it": "Stesso verdetto che contro il cavallo: senza pedoni sulla scacchiera, una torre sola non batte un alfiere solo. Re e alfiere restano insieme, e letteralmente non c'è nulla che la torre possa fare per forzare qualcosa."
+},
+{
+"id": 1051,
+"it": "La stessa storia del cavallo"
+},
+{
+"id": 1052,
+"it": "Il re bianco si avvicina, come sempre in questi finali senza pedoni — l'unica carta rimasta da giocare, e strutturalmente non basta."
+},
+{
+"id": 1053,
+"it": "Il re nero resta incollato al suo alfiere. L'intera difesa sta in una parola: insieme."
+},
+{
+"id": 1054,
+"it": "Patta, verificata: ogni mossa di torre provata da questa posizione ricade sullo stesso risultato."
+},
+{
+"id": 1055,
+"it": "Il corso gemello l'ha mostrato: due pedoni passati collegati sulla 6ª traversa battono una torre sola. Gli STESSI pedoni una traversa prima, e tutto si ribalta — la torre non solo tiene, vince. Ma la tecnica ha due registri: finché entrambi i pedoni stanno sulla 5ª, la torre fa merenda; nel momento in cui uno tocca la 6ª, si congela sulla traversa di promozione e lascia che sia il RE a fare le pulizie. Confondere i due momenti costa l'intera partita."
+},
+{
+"id": 1056,
+"it": "La spinta confutata — dal re, non dalla torre"
+},
+{
+"id": 1057,
+"it": "Finché stanno sulla 5ª, la torre si serve"
+},
+{
+"id": 1058,
+"it": "La stessa Ra5, con un tempo di ritardo"
+},
+{
+"id": 1059,
+"it": "L'unico sogno dei pedoni: correre. Sulla 5ª mancano esattamente una traversa — questo corso mostra cosa cambia quella traversa."
+},
+{
+"id": 1060,
+"it": "La miglior difesa secondo la tablebase: NON spingere (la spinta perde più in fretta, capitolo precedente) e riportare a casa il re. Un'ammissione notevole: due passati collegati sulla 5ª, lasciati soli, non osano nemmeno avanzare."
+},
+{
+"id": 1061,
+"it": "La mossa regina, e la più controintuitiva del corso: la torre NON SI MUOVE. Verificato con le tablebase: dopo e6, ogni mossa di torre lungo la colonna a PERDE — i pedoni la supererebbero. Da a8 la torre spazza già ENTRAMBE le case di promozione; l'operaio mancante è il re."
+},
+{
+"id": 1062,
+"it": "La mossa che vinceva nel capitolo precedente — giocata con UN tempo di ritardo, perde l'intera partita (verificato: da vinta, la posizione diventa PERSA). Il pedone e ha varcato la frontiera della 6ª traversa: la torre non deve mai più lasciare l'ultima traversa."
+},
+{
+"id": 1063,
+"it": "I pedoni fanno ciò che fanno i pedoni — ma si guardi la divisione del lavoro sulla scacchiera: la torre tiene l'ultima traversa, il re si avvicina."
+},
+{
+"id": 1064,
+"it": "Il re nero mette una mano su ciascun pedone: e7 è attaccato, d7 è coperto. Nessuno dei due passerà — la traversa di promozione appartiene alla torre, le case di contatto al re."
+},
+{
+"id": 1065,
+"it": "Il primo pedone cade nel momento preciso in cui tocca la 7ª."
+},
+{
+"id": 1066,
+"it": "E il secondo. Due passati collegati, una traversa di meno, zero donne. Ciò che segue — torre e re contro re — è il matto elementare di torre, insegnato nel suo corso."
+},
+{
+"id": 1067,
+"it": "La torre attacca la traversa dei pedoni dal fianco. Fianco a fianco sulla 5ª, NON si proteggono a vicenda — un pedone non difende mai il suo vicino di traversa. Si noti il tempismo: questa stessa mossa perde non appena un pedone ha toccato la 6ª (si veda la trappola)."
+},
+{
+"id": 1068,
+"it": "Un pedone intascato — per giunta con scacco. Il duo era esattamente questo: un duo; non resta che un pedone isolato."
+},
+{
+"id": 1069,
+"it": "La torre ripiega a distanza di sicurezza, fuori dalla portata del re — attiva, mai impigliata."
+},
+{
+"id": 1070,
+"it": "Lo scacco prima allontana il re dai suoi compiti di scorta — la torre si allinea dietro il pedone solo quando il re è stato spinto via."
+},
+{
+"id": 1071,
+"it": "E il re nero parte, come nel capitolo precedente. Un pedone solitario, una torre attiva, un re in cammino: la conversione è una formalità."
+},
+{
+"id": 1072,
+"it": "E la torre scopre la trappola geometrica: nessuna via di ritorno lungo la 5ª traversa — il suo stesso bottino, il pedone d5, blocca la strada verso la colonna e. Gli scacchi laterali si esaurirebbero allo stesso modo: il re bianco sale e si nasconde dietro i propri pedoni."
+},
+{
+"id": 1073,
+"it": "Strisciare indietro verso la traversa di promozione — con un tempo di ritardo, ancora una volta."
+},
+{
+"id": 1074,
+"it": "Si riconosca il quadro: pedoni sulla 6ª e sulla 7ª, torre ridotta a spettatrice — la posizione esatta del corso gemello, quella in cui i pedoni BATTONO la torre. Una traversa e un tempo: era tutta la partita."
+},
+{
+"id": 1075,
+"it": "Una torre vale due punti più di un cavallo — sulla carta. Senza un solo pedone sulla scacchiera, è solo un numero: il lato del cavallo tiene la patta senza particolare sforzo, e saperlo ti evita di lottare per nulla, o di abbandonare troppo presto."
+},
+{
+"id": 1076,
+"it": "Niente da fare, letteralmente"
+},
+{
+"id": 1077,
+"it": "Il re bianco si avvicina — senza pedoni da spingere, una torre sola non ha altro da offrire che un avvicinamento del re, e strutturalmente non basta contro re e cavallo che restano insieme."
+},
+{
+"id": 1078,
+"it": "Il re nero resta incollato al suo cavallo — è l'intera difesa, ed è più che sufficiente."
+},
+{
+"id": 1079,
+"it": "Specchio, ancora e ancora. Non esiste mossa di torre che spezzi questa coppia — verificato: ogni tentativo ricade sulla stessa patta."
+},
+{
+"id": 1080,
+"it": "Una torre contro un pedone in corsa: vincente, certo? Dipende tutto da IL TUO re. Qui esattamente una prima mossa vince — e non è una mossa di torre. Il finale che insegna una volta per tutte: la torre ferma, non cattura."
+},
+{
+"id": 1081,
+"it": "Prima il re — ancora lui"
+},
+{
+"id": 1082,
+"it": "La scorta immediata"
+},
+{
+"id": 1083,
+"it": "Lo scacco che fa un favore"
+},
+{
+"id": 1084,
+"it": "«Dietro il pedone passato» non basta"
+},
+{
+"id": 1085,
+"it": "L'UNICA mossa vincente della posizione — e non tocca la torre. Lei possiede già la traversa h1 e taglierà la promozione in c1; ciò che manca è un re da CATTURARE. Sono disponibili dodici mosse di torre: tutte pareggiano."
+},
+{
+"id": 1086,
+"it": "Il riflesso: «scacco!». Ma si guardi dove va il re nero: DIETRO il suo pedone, esattamente dove sognava di stare. Lo scacco gli ha regalato il tempo che il tuo re non poteva risparmiare. Verdetto della tablebase: patta."
+},
+{
+"id": 1087,
+"it": "La celebre regola — «torre dietro il pedone passato» — debitamente applicata… e resta patta: quella regola riguarda i finali di TORRE, non la pura corsa. Qui la torre dietro non attacca nulla che il re nero non custodisca, e il tuo stesso re resta spettatore."
+},
+{
+"id": 1088,
+"it": "Il pedone corre — cos'altro?"
+},
+{
+"id": 1089,
+"it": "Il Nero prepara il corridoio PRIMA di spingere: stessa cura."
+},
+{
+"id": 1090,
+"it": "La diagonale, come nello studio di Réti: ogni passo si avvicina al pedone E alla casa di promozione insieme."
+},
+{
+"id": 1091,
+"it": "Il re nero scorta il suo pedone, di spalla."
+},
+{
+"id": 1092,
+"it": "La contro-spallata: i due re si sfiorano, e il Bianco ha la precedenza — il re nero non può custodire c3 e sbarrare e3-d3 insieme."
+},
+{
+"id": 1093,
+"it": "Il re è scivolato DIETRO la scorta: il pedone è condannato. La torre non si è ancora mossa — non ha mai dovuto."
+},
+{
+"id": 1094,
+"it": "Torre e re contro re: la continuazione esatta è nel corso «Il matto di torre». Si porti via una cosa da qui: la torre congela, il re raccoglie."
+},
+{
+"id": 1095,
+"it": "A una casa dalla gloria…"
+},
+{
+"id": 1096,
+"it": "…e una casa è esattamente ciò che la torre ha sorvegliato da h1 fin dall'inizio: c1 è coperta, il pedone è congelato, il re bianco arriva."
+},
+{
+"id": 1097,
+"it": "Re davanti, pedone dietro: il convoglio è blindato. La torre finirà per vendersi per il pedone — patta."
+},
+{
+"id": 1098,
+"it": "La scorta si forma, il pedone avanzerà sotto blindatura: c3, c2, e la torre dovrà comprarlo. Una sola mossa vinceva qui: Kf6."
+},
+{
+"id": 1099,
+"it": "Torre e alfiere contro torre sola: di solito materiale vincente, ma non qui. La posizione di Szén — re e torre difensori ben piazzati — ha tenuto quattro volte in una partita reale (Pintér-Razuvaev, 1982) prima della patta."
+},
+{
+"id": 1100,
+"it": "La fortezza regge, mossa dopo mossa"
+},
+{
+"id": 1101,
+"it": "La casa sbagliata prende matto"
+},
+{
+"id": 1102,
+"it": "Il Nero centralizza l'alfiere — il tentativo più naturale per cercare una crepa."
+},
+{
+"id": 1103,
+"it": "La torre bianca resta attiva invece che passiva: lo scacco guadagna un tempo prezioso per riposizionare il re."
+},
+{
+"id": 1104,
+"it": "Una casa ragionevole quanto e7 — la torre resta attiva sulla 7ª traversa. Ma abbandona la colonna b al suo destino."
+},
+{
+"id": 1105,
+"it": "La torre trova una casa sicura dove nulla la disturba. Patta verificata: nessun tentativo nero provato dall'oracolo da questo incrocio ha mai fatto meglio."
+},
+{
+"id": 1106,
+"it": "Matto immediato: il re bianco, bloccato in d1 senza case di fuga, non può fare più nulla. La differenza tra una patta e un matto in uno si è ridotta a UNA casa di torre."
+},
+{
+"id": 1107,
+"it": "Lo specchio di «torre e alfiere contro torre»: qui, il cavallo in più non cambia quasi mai il verdetto. Da una posizione neutra, ogni tentativo bianco provato dall'oracolo ricade in una patta — compreso regalare del tutto il cavallo."
+},
+{
+"id": 1108,
+"it": "Il cavallo non cambia nulla, nemmeno perso"
+},
+{
+"id": 1109,
+"it": "Il cavallo cerca attività — senza che esista un piano che trasformi davvero la posizione in una vittoria. Fin dall'inizio, tutte e venti le mosse legali del Bianco ricadono nella stessa identica patta."
+},
+{
+"id": 1110,
+"it": "Scacco, e la torre nera attacca il cavallo lungo il cammino."
+},
+{
+"id": 1111,
+"it": "Il re bianco si mette al riparo senza difendere il cavallo — non serve: perderlo non cambia nulla del risultato."
+},
+{
+"id": 1112,
+"it": "Il Nero vince il cavallo gratis — e la posizione, già patta prima, resta esattamente patta: torre contro torre, nulla da convertire per nessuno dei due lati."
+},
+{
+"id": 1113,
+"it": "Un'intera torre in più, eppure: il pedone h è il pedone di torre sbagliato per questo alfiere, e il re nero tiene l'angolo di promozione. La fortezza già vista contro l'alfiere solo resiste esattamente allo stesso modo contro la torre — materiale in più, stesso risultato."
+},
+{
+"id": 1114,
+"it": "La fortezza regge, con o senza torre"
+},
+{
+"id": 1115,
+"it": "Cedere la torre non cambia nulla"
+},
+{
+"id": 1116,
+"it": "Il re bianco cerca attività — la torre, intanto, non ha dove infiltrarsi finché il re nero tiene h8."
+},
+{
+"id": 1117,
+"it": "Una provocazione: la torre si offre in h7, dove né il re (troppo lontano) né il pedone (che cattura solo verso g6) la difendono."
+},
+{
+"id": 1118,
+"it": "L'alfiere si riposiziona senza mai dover muovere il suo re. Patta verificata: da questo incrocio, nessun tentativo bianco provato dall'oracolo ha mai fatto progressi."
+},
+{
+"id": 1119,
+"it": "Il re nero la prende gratis — e la posizione ricade esattamente sulla già nota fortezza dell'alfiere sbagliato: re e alfiere soli contro re e pedone di torre. Cedere l'intera torre non cambia nulla del verdetto: era già patta anche senza."
+},
+{
+"id": 1120,
+"it": "Un pedone contro una torre, e la più bella battuta finale della storia dei finali: nel 1895 un prete spagnolo di passaggio a Glasgow trovò la mossa che tutti avevano mancato. Promozione… ma non a donna."
+},
+{
+"id": 1121,
+"it": "La scala e la battuta finale"
+},
+{
+"id": 1122,
+"it": "La donna che dà stallo"
+},
+{
+"id": 1123,
+"it": "La deviazione che pareggia"
+},
+{
+"id": 1124,
+"it": "E senza gli scacchi?"
+},
+{
+"id": 1125,
+"it": "Il pedone carica — alla torre restano solo gli scacchi per fermarlo. Si guardi il re bianco: ogni passo della sua discesa è l'UNICO che funziona."
+},
+{
+"id": 1126,
+"it": "Rinunciare subito agli scacchi è inutile QUI: il re bianco tocca ancora il suo pedone."
+},
+{
+"id": 1127,
+"it": "Non Kb7/Ka7 (…Rd7 inchioda il pedone), non Kc5 — si veda il capitolo della deviazione. Il re scende ABBRACCIANDO la colonna c."
+},
+{
+"id": 1128,
+"it": "Attaccare la torre sembra attivo — ma il re lascia l'ombra della colonna c: …Rd1! e la torre passerà in c1 dietro il pedone. La discesa b5-b4-b3 non era una scelta di stile, era LA strada."
+},
+{
+"id": 1129,
+"it": "La discesa finisce: nessuno scacco utile rimasto, la torre ha finito le traverse. Resta un trucco — il più fine mai giocato."
+},
+{
+"id": 1130,
+"it": "La trappola di Barbier: la torre ATTENDE. Se appare una donna in c8, …Rc4+! costringe a QxT — STALLO, con il re nero in a1 senza fiato. Per settimane il mondo credette questo studio patta."
+},
+{
+"id": 1131,
+"it": "La trovata di Saavedra: una TORRE. Minaccia Ra8-a1 matto, e lo stallo è svanito — una torre in c4 si potrebbe catturare senza soffocare nessuno. Esattamente un solo pezzo al mondo vince qui, e non è la donna."
+},
+{
+"id": 1132,
+"it": "Il riflesso di ogni giocatore — e la patta immediata che Barbier aveva pubblicato come verdetto finale dello studio."
+},
+{
+"id": 1133,
+"it": "L'ultima difesa: fermare il matto tenendo d'occhio …Ra4-a2+ o un altro tentativo di stallo."
+},
+{
+"id": 1134,
+"it": "Il doppio colpo che chiude lo studio: è minacciato Rc1 MATTO, e la torre in a4 è in presa. Il Nero può dare uno scacco per dispetto (…Rb4+), il re prende, e ciò che segue è «Il matto di torre»."
+},
+{
+"id": 1135,
+"it": "Lo scacco suicida: la torre si getta sulla donna."
+},
+{
+"id": 1136,
+"it": "Forzata (fuggire abbandona torre e vittoria allo stesso modo)… ed è STALLO: a2 e b1 coperte dalla donna, b2 da entrambi i re. L'intero studio vive nel divario tra questo quadro e c8=R."
+},
+{
+"id": 1137,
+"it": "Minaccia Rc1(+): il pedone è condannato a darsi per nulla. Patta."
+},
+{
+"id": 1138,
+"it": "La donna nasce in pace — …Rc1 arriva troppo tardi, e Qxc1 non è nemmeno stallo (il re bianco è lontano dall'angolo). Gli scacchi del Nero nella linea principale erano l'UNICO tentativo; quella purezza è la bellezza dello studio."
+},
+{
+"id": 1139,
+"it": "Gli alfieri dello STESSO colore, a differenza di quelli di colore opposto, non regalano automaticamente la patta — il lato più forte ha reali possibilità di vittoria. Ma un re difensore davanti al percorso del suo pedone, sostenuto dall'alfiere giusto, tiene una fortezza che nulla può spezzare."
+},
+{
+"id": 1140,
+"it": "Il re davanti, e nulla passa"
+},
+{
+"id": 1141,
+"it": "L'alfiere bianco prova a sfrattare il re nero dalla sua casa di controllo — uno scacco che sembra guadagnare un tempo."
+},
+{
+"id": 1142,
+"it": "Il re nero cede una sola casa, ancora davanti al pedone, ancora padrone della casa di promozione."
+},
+{
+"id": 1143,
+"it": "L'alfiere bianco deve ritirarsi — non c'è dove andare che minacci qualcosa di nuovo."
+},
+{
+"id": 1144,
+"it": "E siamo tornati ESATTAMENTE dove eravamo partiti. Si ricordi la coppia che regge questa fortezza: il re davanti al pedone, l'alfiere che non lo perde mai di vista."
+},
+{
+"id": 1145,
+"it": "Il secondo grande metodo contro torre e alfiere, accanto all'inchiodatura Cochrane: la torre difensora resta sulla propria 7ª traversa, fuori dalla portata del re attaccante, e fa semplicemente la spola lungo di essa."
+},
+{
+"id": 1146,
+"it": "Resta sulla tua traversa, lontano dal re"
+},
+{
+"id": 1147,
+"it": "Lasciare la propria traversa fa perdere la torre"
+},
+{
+"id": 1148,
+"it": "Il re bianco si avvicina per preparare un'infiltrazione."
+},
+{
+"id": 1149,
+"it": "La torre nera scivola sul lato opposto senza mai lasciare la 7ª traversa — il re bianco, pur vicinissimo, non può raggiungerla. Patta verificata: nessun tentativo bianco provato dall'oracolo da questo incrocio ha mai fatto meglio."
+},
+{
+"id": 1150,
+"it": "Sembra attivo — andare a disturbare da vicino il re bianco. Ma lasciare la 7ª traversa porta la torre alla portata immediata del re nemico."
+},
+{
+"id": 1151,
+"it": "Il re bianco la prende semplicemente. Il principio della seconda traversa esiste proprio per evitare questo tipo di incidente: mantenere sempre le distanze."
+},
+{
+"id": 1152,
+"it": "Il pedone sta già sulla 7ª, la posizione di Philidor non è stata presa: non tutto è perduto. Il re difensore corre sul lato CORTO, la torre mantiene le distanze — e stavolta gli scacchi non servono a fermare la promozione, servono a mangiare il pedone."
+},
+{
+"id": 1153,
+"it": "Il lato corto, e la torre lontana"
+},
+{
+"id": 1154,
+"it": "Il re nero è già dove deve stare — il lato g, il lato corto — e la torre è già dove deve stare: quattro colonne indietro (a, lontana dal pedone e). In a6 (il lato LUNGO), la stessa ricetta perde: il re bianco trova spazio per ripararsi dagli scacchi e scortare il suo pedone. Non resta che spingere, ancora e ancora."
+},
+{
+"id": 1155,
+"it": "Fuggire verso il pedone non lo protegge di più — semmai il re se ne allontana."
+},
+{
+"id": 1156,
+"it": "Sempre la stessa distanza, sempre la stessa molestia."
+},
+{
+"id": 1157,
+"it": "Il re ha finalmente lasciato il suo pedone — nessuno lo difende più. La torre aspettava esattamente questo: lo MANGIA, non gli gira intorno in punta di piedi."
+},
+{
+"id": 1158,
+"it": "Torre e re contro re: la patta più asciutta che esista, vinta da un banchetto anziché da una fortezza."
+},
+{
+"id": 1159,
+"it": "Un pedone corre e il tuo re è lontano: inseguirlo, o rinunciare alla corsa? La regola del quadrato risponde A COLPO D'OCCHIO, senza contare — e mostra che la diagonale del re è veloce quanto la linea retta."
+},
+{
+"id": 1160,
+"it": "Entrare nel quadrato"
+},
+{
+"id": 1161,
+"it": "La diagonale è altrettanto veloce"
+},
+{
+"id": 1162,
+"it": "Un passo fuori, e tutto è perduto"
+},
+{
+"id": 1163,
+"it": "Si disegni il quadrato: dal pedone a4 alla traversa di promozione, a4-a8-e8-e4. Il re ENTRA nel quadrato, quindi raggiunge il pedone — è tutto il teorema, applicato a colpo d'occhio, senza contare i tempi."
+},
+{
+"id": 1164,
+"it": "L'altra porta. Sulla scacchiera la diagonale NON costa più della linea retta: e5-d6-c7-b7, quattro tempi, come via e4. È la geometria del re — proprio il fatto che rende possibile lo studio di Réti."
+},
+{
+"id": 1165,
+"it": "Un passo nella direzione sbagliata — verso il pedone ma FUORI dal quadrato — e la corsa è matematicamente persa. Il riflesso «corri e basta» non sostituisce il colpo d'occhio."
+},
+{
+"id": 1166,
+"it": "A ogni spinta il quadrato si restringe — e il re resta al suo interno. Si noti il percorso: punta al pedone E alla casa di promozione insieme."
+},
+{
+"id": 1167,
+"it": "Preso. Il pedone è inchiodato a una casa dalla gloria; il re bianco in questa storia non è mai esistito."
+},
+{
+"id": 1168,
+"it": "Nemmeno promuovere salva qualcosa: la donna nasce catturata. Re contro re, patta."
+},
+{
+"id": 1169,
+"it": "Il pedone è fermato di colpo e cade alla mossa seguente. La corsa era perduta per lui nel momento in cui il re è entrato nel quadrato."
+},
+{
+"id": 1170,
+"it": "Il re muore a una casa di distanza: aveva sempre ESATTAMENTE un tempo di ritardo — il tempo di quella prima mossa."
+}
+]

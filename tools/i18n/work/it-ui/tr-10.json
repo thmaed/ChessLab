@@ -1,0 +1,222 @@
+[
+{
+"id": 1100,
+"it": "Hai trovato in modo pulito ogni puzzle che corrisponde a questi filtri nel tuo ultimo tentativo."
+},
+{
+"id": 1101,
+"it": "Da rivedere: tornerà tra 2 giorni."
+},
+{
+"id": 1102,
+"it": "Analizzare = rivedere le tue mosse, provare altre linee e creare puzzle con i tuoi errori."
+},
+{
+"id": 1103,
+"it": "Analizza qui"
+},
+{
+"id": 1104,
+"it": "Apre l'analisi sulla posizione mostrata per provare altre mosse"
+},
+{
+"id": 1105,
+"it": "Versione %@ (%@)"
+},
+{
+"id": 1106,
+"it": "Domande frequenti"
+},
+{
+"id": 1107,
+"it": "Mostra la risposta"
+},
+{
+"id": 1108,
+"it": "Come si torna su una mossa?"
+},
+{
+"id": 1109,
+"it": "In una partita senza orologio, tocca ‹ sotto la scacchiera per risalire fino alla mossa voluta, poi «Riprendi da qui»: la partita riparte da lì («Annulla la ripresa» rimedia a un errore per qualche secondo). Con un orologio, la ripresa non esiste: «Analizza qui» apre la posizione nell'Analisi."
+},
+{
+"id": 1110,
+"it": "Come provare un'altra variante?"
+},
+{
+"id": 1111,
+"it": "In Analizza, gioca liberamente sulla scacchiera: ogni mossa diventa una variante, accanto alla partita, che lasci e ritrovi a piacere. A fine partita, il pulsante «Analizza» vi apre l'intera partita; durante una partita, «Modalità» › Analizza vi apre la posizione mostrata."
+},
+{
+"id": 1112,
+"it": "Apri Analizza"
+},
+{
+"id": 1113,
+"it": "Come studiare una posizione precisa?"
+},
+{
+"id": 1114,
+"it": "L'Editor di posizione (in Analizza) compone qualsiasi posizione, o la riprende da un FEN. Poi analizzala, oppure tocca «Gioca questa posizione» per giocarla contro il computer e tornare indietro quanto serve."
+},
+{
+"id": 1115,
+"it": "Dove ritrovo i miei puzzle sbagliati?"
+},
+{
+"id": 1116,
+"it": "In Puzzle, sezione Cronologia: «Sbagliati» per i puzzle falliti fin dalla prima mossa, «Da rivedere» per quelli trovati a metà. Gli sbagliati tornano anche nella Sessione del giorno."
+},
+{
+"id": 1117,
+"it": "Apri i puzzle"
+},
+{
+"id": 1118,
+"it": "Che versione dell'app ho?"
+},
+{
+"id": 1119,
+"it": "Il numero di versione è in fondo alle Impostazioni — utile per segnalare un problema."
+},
+{
+"id": 1120,
+"it": "Apri le Impostazioni"
+},
+{
+"id": 1121,
+"it": "Con un orologio, niente ritorno indietro: «Riprendi da qui» non viene proposto."
+},
+{
+"id": 1122,
+"it": "Nessun orologio: i due lati giocano senza vincoli di tempo, e si può tornare su una mossa (‹ sotto la scacchiera, poi «Riprendi da qui»)."
+},
+{
+"id": 1123,
+"it": "Mantieni la vittoria: ogni mossa che resta vincente è accettata (verificato dal motore)."
+},
+{
+"id": 1124,
+"it": "Mantieni la patta: ogni mossa che la conserva è accettata (verificato dal motore)."
+},
+{
+"id": 1125,
+"it": "Mantieni il verdetto: ogni mossa che lo preserva è accettata (verificato dal motore)."
+},
+{
+"id": 1126,
+"it": "Il tuo punteggio"
+},
+{
+"id": 1127,
+"it": "Da lavorare:"
+},
+{
+"id": 1128,
+"it": "da rifare"
+},
+{
+"id": 1129,
+"it": "trovati a metà"
+},
+{
+"id": 1130,
+"it": "i tuoi errori"
+},
+{
+"id": 1131,
+"it": "Serie su misura"
+},
+{
+"id": 1132,
+"it": "Livello, fase, tipo, provenienza"
+},
+{
+"id": 1133,
+"it": "Programma"
+},
+{
+"id": 1134,
+"it": "Un lotto fisso di puzzle, ripreso in cicli sempre più rapidi"
+},
+{
+"id": 1135,
+"it": "Reimposta"
+},
+{
+"id": 1136,
+"it": "Inizia · %lld puzzle"
+},
+{
+"id": 1137,
+"it": "Un lotto fisso di puzzle, risolto per intero e poi ripreso in un nuovo ordine, ciclo dopo ciclo, per trovarne di più e più in fretta. Scegli i suoi puzzle, poi la sua dimensione."
+},
+{
+"id": 1138,
+"it": "… e %lld altra partita scartata."
+},
+{
+"id": 1139,
+"it": "… e %lld altre partite scartate."
+},
+{
+"id": 1140,
+"it": "• Scanner: lettura più affidabile di screenshot, foto di schermo e scacchiere reali.\n• Condividi: da Foto, Condividi › ChessLab invia l'immagine allo scanner.\n• Puzzle: le tue raccolte si importano in PGN, si lavorano in serie o con un programma Woodpecker e si esportano; un'impostazione nasconde il tema del puzzle.\n• Laboratorio: serie in Chess960, una posizione estratta per ogni coppia di partite.\n• Motore: Stockfish 19; un indicatore di avanzamento segue l'analisi in corso.\n• Mossa Rubata: correzione della presa en passant alla seconda mossa."
+},
+{
+"id": 1141,
+"it": "Lingua dell'interfaccia (francese, inglese, spagnolo, tedesco, italiano o quella del sistema), tema della scacchiera — scelto qui una volta per tutte le schermate —, notazione dei pezzi (francese R D T F C, inglese, spagnola, tedesca o italiana), visualizzazione del tema di un puzzle (matto, forchetta, inchiodatura… da nascondere per cercare senza suggerimenti) e sincronizzazione iCloud."
+},
+{
+"id": 1142,
+"it": "Novità della 2.2"
+},
+{
+"id": 1143,
+"it": "Uno scanner più affidabile"
+},
+{
+"id": 1144,
+"it": "Lo scanner legge meglio screenshot, foto di schermo e scacchiere reali. Da Foto, «Condividi › ChessLab» invia l'immagine direttamente allo scanner."
+},
+{
+"id": 1145,
+"it": "Le tue raccolte di puzzle"
+},
+{
+"id": 1146,
+"it": "Importa un PGN: ogni file diventa una raccolta, che si lavora in serie o con un programma Woodpecker completo, ed è esportabile in PGN. Un'impostazione permette di nascondere il tema del puzzle."
+},
+{
+"id": 1147,
+"it": "Chess960 nel Laboratorio"
+},
+{
+"id": 1148,
+"it": "Il Laboratorio gioca anche serie in Chess960: una posizione diversa per ogni coppia di partite, o il numero che preferisci."
+},
+{
+"id": 1149,
+"it": "Stockfish 19"
+},
+{
+"id": 1150,
+"it": "Il motore passa a Stockfish 19, e un indicatore di avanzamento segue l'analisi in corso."
+},
+{
+"id": 1151,
+"it": "«%@» è un'altra variante del repertorio — la linea che stai lavorando passa per %@. Cosa vuoi fare?"
+},
+{
+"id": 1152,
+"it": "«%@» è una variante del repertorio — la linea principale è %@. Cosa vuoi fare?"
+},
+{
+"id": 1153,
+"it": "La mossa giusta era %@."
+},
+{
+"id": 1154,
+"it": "Giocabile anche: %@."
+}
+]

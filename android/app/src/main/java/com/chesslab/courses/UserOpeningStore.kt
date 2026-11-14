@@ -213,5 +213,6 @@ object CourseJson {
         return root.toString(2)
     }
 
-    private fun both(text: String) = JSONObject().put("fr", text).put("en", text)
+    private fun both(text: String) =
+        JSONObject().put("fr", text).put("en", text).put("es", text).put("de", text).put("it", text)
 }

@@ -36,6 +36,13 @@ struct TwoPlayerGameSettings: Codable, Equatable, Hashable {
     /// ``PlayGameSettings/startFEN``, même contrat.
     var startFEN: String?
 
+    /// « Blancs » / « Noirs » enregistrés dans une autre langue : on les rend dans la langue active.
+    @MainActor
+    mutating func localizeDefaultNames() {
+        whiteName = PlayerName.display(whiteName, fallback: PlayerName.white)
+        blackName = PlayerName.display(blackName, fallback: PlayerName.black)
+    }
+
     var timeControl: TimeControl {
         if timeControlID == "custom" {
             return .custom(minutes: customMinutes, incrementSeconds: customIncrementSeconds)

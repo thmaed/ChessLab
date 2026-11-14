@@ -103,6 +103,23 @@ struct NewGameSetupView: View {
         }
     }
 
+    /// Les trois puces de couleur ; `compact` resserre le remplissage pour tenir sur une ligne.
+    @ViewBuilder
+    private func colorChips(compact: Bool) -> some View {
+        ForEach(PlayerColorChoice.allCases) { choice in
+            ChipButton(
+                label: LocalizedStringKey(choice.label),
+                systemImage: choice.symbolName,
+                isSelected: colorChoice == choice,
+                disc: choice.disc,
+                tint: Theme.warning,
+                compact: compact
+            ) {
+                colorChoice = choice
+            }
+        }
+    }
+
     private var scrollBody: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
@@ -113,18 +130,16 @@ struct NewGameSetupView: View {
                     // puces réclament ~323 pt pour 303 disponibles à 375, et
                     // 248 en Display Zoom. Elles passent maintenant à la ligne
                     // au lieu d'être comprimées (Lot 3.5).
-                    FlowLayout(spacing: 8, lineSpacing: 8) {
-                        ForEach(PlayerColorChoice.allCases) { choice in
-                            ChipButton(
-                                label: LocalizedStringKey(choice.label),
-                                systemImage: choice.symbolName,
-                                isSelected: colorChoice == choice,
-                                disc: choice.disc,
-                                tint: Theme.warning
-                            ) {
-                                colorChoice = choice
-                            }
-                        }
+                    //
+                    // Espagnol et allemand (2.3) : « Blancas · Negras ·
+                    // Aleatorio » réclamait un rien trop, et la troisième
+                    // puce tombait seule sur une deuxième ligne, d'un effet
+                    // bancal. On essaie d'abord UNE ligne, avec des puces
+                    // plus serrées ; le repli à la ligne reste la sécurité
+                    // (Display Zoom, texte agrandi).
+                    ViewThatFits(in: .horizontal) {
+                        HStack(spacing: 6) { colorChips(compact: true) }
+                        FlowLayout(spacing: 8, lineSpacing: 8) { colorChips(compact: false) }
                     }
                 }
 
@@ -530,6 +545,8 @@ struct ChipButton: View {
     /// La teinte de la puce : celle de sa section ou de sa famille, au repos
     /// (icône colorée, liseré pâle) comme sélectionnée (dégradé plein).
     var tint: Color = Theme.accent
+    /// Remplissage horizontal resserré (10 pt au lieu de 14) et texte sur une ligne : pour une rangée qui doit tenir.
+    var compact: Bool = false
     let action: () -> Void
 
     var body: some View {
@@ -541,11 +558,11 @@ struct ChipButton: View {
                 } else if let systemImage {
                     Image(systemName: systemImage)
                 }
-                Text(label)
+                Text(label).lineLimit(compact ? 1 : nil).fixedSize(horizontal: compact, vertical: false)
             }
             .font(.subheadline.weight(.medium))
             .foregroundStyle(isSelected ? Theme.background : Theme.textPrimary)
-            .padding(.horizontal, 14)
+            .padding(.horizontal, compact ? 10 : 14)
             .padding(.vertical, 9)
             .background {
                 if isSelected {

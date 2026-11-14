@@ -1,0 +1,742 @@
+[
+{
+"id": 0,
+"it": "Un fastidioso contro-gambetto: si sacrifica e5 per piantare un pedone in d4, una spina permanente nel campo del Bianco, e attaccare in fretta. In fondo dubbio, ma mordace e pieno di trappole."
+},
+{
+"id": 1,
+"it": "Principale — 3.dxe5 d4 4.Nf3"
+},
+{
+"id": 2,
+"it": "Trappola di Lasker — 4.e3??"
+},
+{
+"id": 3,
+"it": "5.a3"
+},
+{
+"id": 4,
+"it": "Se il Bianco non gioca c4"
+},
+{
+"id": 5,
+"it": "Il London. Niente c4, quindi niente Albin: …e5 non sarebbe più un gambetto ma un pedone regalato."
+},
+{
+"id": 6,
+"it": "Il Contro-gambetto Albin: si offre e5 per spingere …d4 e prendere l'iniziativa."
+},
+{
+"id": 7,
+"it": "Il pedone d4 è il cuore dell'Albin: avanzato e protetto, ingabbia tutto lo sviluppo del Bianco."
+},
+{
+"id": 8,
+"it": "La mossa naturale… ma perdente: aprire con e3 cade nella celebre Trappola di Lasker."
+},
+{
+"id": 9,
+"it": "Il Bianco prepara b4 per guadagnare spazio; …a5 congela l'ala di donna e mantiene un buon gioco."
+},
+{
+"id": 10,
+"it": "Il secondo errore, quello fatale: riprendere con l'alfiere lascia correre il pedone e3. fxe3 era forzata."
+},
+{
+"id": 11,
+"it": "Il pedone corre ancora: scacco, e segue la sottopromozione."
+},
+{
+"id": 12,
+"it": "SOTTOPROMOZIONE a cavallo con scacco! (Una donna permetterebbe Rxg1.) Il Nero vince materiale — la Trappola di Lasker."
+},
+{
+"id": 13,
+"it": "Lo stesso spirito del contro-gambetto — colpire d4 senza indugio — ma con una mossa solida."
+},
+{
+"id": 14,
+"it": "Si inchioda il difensore di d4. È il metodo contro ogni sistema che costruisce questo pedone senza sostenerlo in tempo con c3."
+},
+{
+"id": 15,
+"it": "Provocatoria: il cavallo invita i pedoni del Bianco ad avanzare… per trasformarli in bersagli. Un'arma ipermoderna velenosa."
+},
+{
+"id": 16,
+"it": "Moderna — 4.Nf3 Bg4"
+},
+{
+"id": 17,
+"it": "Moderna — 4.Nf3 g6"
+},
+{
+"id": 18,
+"it": "Attacco dei Quattro Pedoni"
+},
+{
+"id": 19,
+"it": "Variante di Cambio"
+},
+{
+"id": 20,
+"it": "Variante dell'Inseguimento — 4.c5"
+},
+{
+"id": 21,
+"it": "2.Nc3 — il Bianco rifiuta l'inseguimento"
+},
+{
+"id": 22,
+"it": "Il cavallo colpisce e4 alla prima mossa e provoca l'avanzata dei pedoni del Bianco."
+},
+{
+"id": 23,
+"it": "Un terzo delle partite. Il Bianco rifiuta di spingere e5 e dunque di giocare l'Alekhine: nessun cavallo inseguito, nessun contrattacco."
+},
+{
+"id": 24,
+"it": "Il Bianco insegue subito il cavallo…"
+},
+{
+"id": 25,
+"it": "La linea moderna solida: il Bianco si accontenta di un centro ragionevole."
+},
+{
+"id": 26,
+"it": "Il Bianco si prende tutto lo spazio…"
+},
+{
+"id": 27,
+"it": "Inchiodare il cavallo in f3, difensore di d4 ed e5."
+},
+{
+"id": 28,
+"it": "Il fianchetto: l'alfiere in g7 morderà il centro del Bianco e la casa e5."
+},
+{
+"id": 29,
+"it": "Il cavallo si ritira; il Nero attaccherà il centro con …d5 o …dxe5."
+},
+{
+"id": 30,
+"it": "L'Attacco dei Quattro Pedoni: impressionante, ma quei pedoni diventano bersagli dopo …dxe5 e …c5."
+},
+{
+"id": 31,
+"it": "Il cambio: gioco tranquillo in cui il Nero si ritrova ben sviluppato e solido."
+},
+{
+"id": 32,
+"it": "L'inseguimento: il pedone spinge ancora. Il cavallo trova rifugio e il pedone c5 sarà debole."
+},
+{
+"id": 33,
+"it": "La risposta che ripristina il gioco: si colpisce e4 al centro invece di subire uno sviluppo tranquillo."
+},
+{
+"id": 34,
+"it": "I pedoni doppiati del Bianco contro un ampio centro: si colpisce subito d4 — la debolezza duratura di questa struttura."
+},
+{
+"id": 35,
+"it": "Tre giocatori neri su cinque giocano questo qui, e il capitolo andava altrove. Colpire il centro PRIMA che si consolidi."
+},
+{
+"id": 36,
+"it": "Il Bianco impedisce …Bg4. Senza questa precauzione, l'inchiodatura renderebbe d4 indifendibile."
+},
+{
+"id": 37,
+"it": "La maggior parte degli avversari da club evita la Siciliana Aperta. Ecco risposte solide ad Alapin, Rossolimo, Grand Prix, Smith-Morra e compagnia."
+},
+{
+"id": 38,
+"it": "Alapin — 2.c3"
+},
+{
+"id": 39,
+"it": "Alapin — 2…Nf6"
+},
+{
+"id": 40,
+"it": "Rossolimo — 3.Bb5 g6"
+},
+{
+"id": 41,
+"it": "Rossolimo — 3.Bb5 e6"
+},
+{
+"id": 42,
+"it": "Mosca — 3.Bb5+ Bd7"
+},
+{
+"id": 43,
+"it": "Mosca — 3.Bb5+ Nd7"
+},
+{
+"id": 44,
+"it": "Gambetto Smith-Morra — 2.d4"
+},
+{
+"id": 45,
+"it": "Attacco Grand Prix — 2.Nc3 e f4"
+},
+{
+"id": 46,
+"it": "Siciliana Chiusa — 2.Nc3 e g3"
+},
+{
+"id": 47,
+"it": "Gambetto d'Ala — 2.b4"
+},
+{
+"id": 48,
+"it": "Se il Bianco gioca d4"
+},
+{
+"id": 49,
+"it": "2.Bc4 — l'alfiere precoce"
+},
+{
+"id": 50,
+"it": "Se il Bianco apre — 3.d4"
+},
+{
+"id": 51,
+"it": "contro 3.Bc4"
+},
+{
+"id": 52,
+"it": "Rossolimo — 3.Bb5"
+},
+{
+"id": 53,
+"it": "L'Alapin: il Bianco prepara d4 senza permettere i trucchi con …cxd4. Colpire il centro è la chiave."
+},
+{
+"id": 54,
+"it": "Il Gambetto Smith-Morra: un pedone in cambio di sviluppo rapido e colonne aperte."
+},
+{
+"id": 55,
+"it": "Il Gambetto d'Ala: un pedone laterale per deviare il pedone c e prendere il centro."
+},
+{
+"id": 56,
+"it": "Visto in una partita da club su otto: il Bianco sviluppa prima l'alfiere. Giocabile, ma senza mordente."
+},
+{
+"id": 57,
+"it": "La risposta più semplice: aprire e pareggiare in modo pulito."
+},
+{
+"id": 58,
+"it": "L'altra risposta principale: colpire subito e4."
+},
+{
+"id": 59,
+"it": "Il Bianco guadagna un tempo sulla donna spingendo d4."
+},
+{
+"id": 60,
+"it": "Entrambi sviluppano; nasce una struttura equilibrata con pedone di donna isolato (IQP)."
+},
+{
+"id": 61,
+"it": "Il pedone avanza; il cavallo deve andare in d5, dove viene molestato."
+},
+{
+"id": 62,
+"it": "L'alfiere colpisce il cavallo in d5; il Nero lo scaccia e attacca e5."
+},
+{
+"id": 63,
+"it": "Un ordine di mosse comune che lascia aperte tutte le opzioni."
+},
+{
+"id": 64,
+"it": "Il Rossolimo: il Bianco cambia in c6 per giocare sulla struttura. …g6 è affidabile."
+},
+{
+"id": 65,
+"it": "La Siciliana APERTA, giocata quasi la metà delle volte — e questo corso non ne parla: tratta le anti-siciliane. Ciò che segue ti tiene a galla, non è una trattazione. La Siciliana Aperta è un repertorio a sé."
+},
+{
+"id": 66,
+"it": "Un giocatore bianco su cinque mette l'alfiere in c4, e il corso aveva previsto solo il Rossolimo 3.Bb5. L'alfiere punta f7 ma disturba poco: ne faremo un bersaglio."
+},
+{
+"id": 67,
+"it": "L'Alapin per trasposizione: il Bianco prepara d4 senza mai permettere …cxd4 e Nxd4. Il corso non l'aveva previsto in quest'ordine."
+},
+{
+"id": 68,
+"it": "Mantenere intatta la struttura e scacciare l'alfiere con …a6/…b5."
+},
+{
+"id": 69,
+"it": "Con le donne probabilmente in uscita, la coppia di alfieri del Nero compensa il pedone doppiato."
+},
+{
+"id": 70,
+"it": "Quasi un giocatore bianco su due cambia qui, e il corso aveva previsto solo l'arrocco. Ci cedono la coppia di alfieri in cambio di pedoni doppiati."
+},
+{
+"id": 71,
+"it": "La Mosca: lo scacco in b5. …Bd7 è pulita e senza problemi."
+},
+{
+"id": 72,
+"it": "Il Bianco rifiuta le linee laterali ed entra nella Siciliana Aperta: questo corso si ferma qui. Ciò che segue appartiene ai corsi Dragone, Najdorf e Scheveningen."
+},
+{
+"id": 73,
+"it": "Lo stesso alfiere, contro il nostro ordine di mosse con …d6. Il corso conosceva solo 3.Bb5+ e 3.d4."
+},
+{
+"id": 74,
+"it": "La versione combattiva: tenere l'alfiere campochiaro per …e5 e …Be7."
+},
+{
+"id": 75,
+"it": "Accettare, poi difendersi con precisione per neutralizzare il gambetto."
+},
+{
+"id": 76,
+"it": "L'alfiere punta f7; il Nero adotta lo schieramento difensivo standard."
+},
+{
+"id": 77,
+"it": "Contro la pressione su e5/d5, lo schieramento …a6, …Nf6, …Be7, …0-0 tiene saldo."
+},
+{
+"id": 78,
+"it": "La donna PRIMA dell'alfiere: …Be7 subito permette e5! e il Bianco si riprende tutto con gli interessi."
+},
+{
+"id": 79,
+"it": "Il Grand Prix: il Bianco vuole f4-f5 e un attacco sul lato di re. …g6 e …Bg7 lo contengono."
+},
+{
+"id": 80,
+"it": "La Chiusa: una partita di manovra. Il Nero prende spazio all'ala di donna con …Rb8 e …b5."
+},
+{
+"id": 81,
+"it": "L'alfiere arriva per inchiodare/cambiare in c6 e indebolire la presa del Nero sul centro."
+},
+{
+"id": 82,
+"it": "La confutazione pulita: restituire il pedone per aprire il centro e prendere l'iniziativa."
+},
+{
+"id": 83,
+"it": "Il punto di partenza di tutta la Siciliana Aperta. Se giochi seriamente la Siciliana, questo è l'incrocio da studiare dopo."
+},
+{
+"id": 84,
+"it": "La confutazione posizionale: …e6 prepara …d5 e l'alfiere in c4 dovrà muoversi una seconda volta."
+},
+{
+"id": 85,
+"it": "L'alfiere si sta già riposizionando — due tempi persi. Il Nero pareggia senza sforzo."
+},
+{
+"id": 86,
+"it": "Lo Sveshnikov: si scaccia subito il cavallo in d4 e si accetta il buco in d5 in cambio di un gioco di pezzi molto attivo. La linea più facile da ricordare per chi viene dalle anti-siciliane."
+},
+{
+"id": 87,
+"it": "Si colpisce subito e4. Se il Bianco spinge e5, quel pedone sarà debole e il nostro cavallo troverà buone case."
+},
+{
+"id": 88,
+"it": "La posizione si apre e ne beneficiamo noi: il pedone avanzato in e5 è sparito, e l'alfiere in c4 affronta un muro di pedoni neri."
+},
+{
+"id": 89,
+"it": "La mossa Najdorf, doppiamente utile qui: prepara …b5, che scaccerà l'alfiere in c4 dalla sua diagonale con tempo."
+},
+{
+"id": 90,
+"it": "La risposta di principio: si colpisce al centro prima che esista il grande centro del Bianco. Contro l'Alapin, aspettare è sempre un errore."
+},
+{
+"id": 91,
+"it": "Si cambiano le donne di proposito: senza di esse, il pedone avanzato in c5 smette di essere un punto di forza e diventa una debolezza da raccogliere con calma."
+},
+{
+"id": 92,
+"it": "Si riprende con il pedone b, non con il pedone d: la colonna b si apre per la nostra torre, e il pedone c6 sosterrà …d5 al momento giusto."
+},
+{
+"id": 93,
+"it": "Il Bianco prepara d4 per aprire prima che i nostri alfieri respirino. È la corsa in questa struttura: i nostri due alfieri contro la loro migliore struttura pedonale."
+},
+{
+"id": 94,
+"it": "Un pedone sacrificato per una pressione permanente all'ala di donna: colonne a e b aperte, l'alfiere in g7 sulla lunga diagonale. Il compenso dura fino al finale."
+},
+{
+"id": 95,
+"it": "Accettato — fianchetto"
+},
+{
+"id": 96,
+"it": "Accettato — passeggiata del re 7.e4"
+},
+{
+"id": 97,
+"it": "Rifiutato — 4.Nf3"
+},
+{
+"id": 98,
+"it": "Rifiutato — 4.a4 (Sosonko)"
+},
+{
+"id": 99,
+"it": "Il London. Il Benko presuppone 2.c4 c5 3.d5 b5: senza il pedone c4 non c'è nulla da minare, e il sacrificio perde il suo senso."
+},
+{
+"id": 100,
+"it": "Il Bianco ritarda c4. Si sviluppa senza impegnarsi: se c4 arriva più tardi, il Benko torna in gioco."
+},
+{
+"id": 101,
+"it": "Il Bianco spinge; il Nero minerà la base c4/d5 con …b5."
+},
+{
+"id": 102,
+"it": "Il Gambetto Benko: si offre b5 per aprire le colonne a e b."
+},
+{
+"id": 103,
+"it": "Rifiutare sviluppando: il Nero prende in c4 e mantiene un gioco comodo."
+},
+{
+"id": 104,
+"it": "Il Bianco tenta di congelare l'ala di donna. …b4 mantiene lo spazio e un buon gioco."
+},
+{
+"id": 105,
+"it": "L'alfiere in a6 intralcia l'alfiere in f1 del Bianco: è l'essenza del gambetto."
+},
+{
+"id": 106,
+"it": "Il Bianco conserva l'alfiere in f1 prendendo il centro: il re deve camminare a mano."
+},
+{
+"id": 107,
+"it": "Si cambia l'alfiere buono del Bianco. Nessun gambetto disponibile, quindi si gioca sulla struttura — ed è il modo giusto di affrontare il London."
+},
+{
+"id": 108,
+"it": "Il cavallo prende il suo avamposto. Rispondiamo con …O-O poi …c5, e la partita diventa una normale lotta strutturale."
+},
+{
+"id": 109,
+"it": "1.f4: un'Olandese con il Bianco, un tempo avanti. Controllare e5, fare il fianchetto o impostare una Stonewall, poi attaccare il re avversario."
+},
+{
+"id": 110,
+"it": "Classica — Olandese rovesciata"
+},
+{
+"id": 111,
+"it": "Gambetto From — 1…e5"
+},
+{
+"id": 112,
+"it": "Schieramento solido contro …e6"
+},
+{
+"id": 113,
+"it": "contro …c5"
+},
+{
+"id": 114,
+"it": "contro …d5 — il Bird classico"
+},
+{
+"id": 115,
+"it": "Prendere subito il controllo di e5: è un'Olandese con un tempo in più."
+},
+{
+"id": 116,
+"it": "Il Gambetto From: un pedone per l'attacco. La strada giusta è restituire il pedone e ritrovarsi ben piazzati."
+},
+{
+"id": 117,
+"it": "Più di un quarto delle partite, e il capitolo non ne parlava. Il Nero prepara …Bg4 e …e5."
+},
+{
+"id": 118,
+"it": "Il Nero gioca a sua volta un'Olandese rovesciata. La partita diventa una battaglia di piani, non di teoria."
+},
+{
+"id": 119,
+"it": "Il Nero chiude prima la diagonale. Il corso conosceva …Nf6, …Nc6 e …c5, ma non questa mossa del tutto naturale."
+},
+{
+"id": 120,
+"it": "L'alfiere buono fuori prima di …e6 — la regola d'oro, che qui il Nero applica contro di noi."
+},
+{
+"id": 121,
+"it": "La versione moderna del gambetto: invece di …d6 subito, il Nero sviluppa e mantiene viva la minaccia."
+},
+{
+"id": 122,
+"it": "Un giocatore nero su tre inchioda subito — la mossa più frequente nel Gambetto From, e il corso conosceva solo …g5. Il cavallo in f3 protegge h4 e g5: inchiodarlo prepara …Qh4+."
+},
+{
+"id": 123,
+"it": "Sviluppo tranquillo invece di un'inchiodatura. Un giocatore nero su cinque, e il corso non ne diceva nulla."
+},
+{
+"id": 124,
+"it": "L'alfiere esce prima di …e6 per non restare imprigionato — buon metodo, ma ci regala un tempo."
+},
+{
+"id": 125,
+"it": "Colpiamo il difensore di e5: il punto dolente di ogni schieramento nero contro il Bird."
+},
+{
+"id": 126,
+"it": "Pedoni doppiati, e la casa e5 è nostra per sempre."
+},
+{
+"id": 127,
+"it": "Restituire il pedone al momento giusto invece di aggrapparvisi: è l'errore classico contro il From."
+},
+{
+"id": 128,
+"it": "Quasi tre giocatori neri su quattro sviluppano qui questo cavallo, e il corso aveva previsto solo …a6."
+},
+{
+"id": 129,
+"it": "Doppio fianchetto contro lo sviluppo classico: giocheremo Nh4 per cambiare quell'alfiere, il miglior pezzo dell'avversario."
+},
+{
+"id": 130,
+"it": "Modesta e sufficiente: si apre l'alfiere in f1 per arroccare in fretta. Contro un gambetto, finire lo sviluppo vale più che cercare di confutare."
+},
+{
+"id": 131,
+"it": "Il Nero tiene l'alfiere per l'attacco. Noi abbiamo il pedone in più e un re al sicuro: proprio il patto del gambetto, e ci va bene."
+},
+{
+"id": 132,
+"it": "Il salto che colpisce e3: il Nero cerca di recuperare il pedone con gli scacchi. Bisogna sapere cosa segue — è forzato."
+},
+{
+"id": 133,
+"it": "Ed ecco il punto: offriamo il cambio delle donne. Senza donne l'attacco del gambetto non esiste più, e il nostro centro in d4 resta sulla scacchiera."
+},
+{
+"id": 134,
+"it": "L'inchiodatura usata al contrario: cambiamo di proposito il nostro alfiere buono per indebolire la presa del Nero su e5 — la casa attorno a cui ruota tutto il Bird."
+},
+{
+"id": 135,
+"it": "Il cavallo si installa sull'avamposto, e nessun pezzo minore può più scacciarlo. È il senso di tutto ciò che precede."
+},
+{
+"id": 136,
+"it": "Il Bird «Larsen»: l'alfiere di donna va in b2, puntando e5 e la lunga diagonale. I nostri due pezzi più lenti mirano allora alla stessa casa."
+},
+{
+"id": 137,
+"it": "Facciamo il fianchetto dal nostro lato: l'alfiere in g2 contenderà f5 sulle case chiare, ed è l'unico modo per non cedere quella diagonale."
+},
+{
+"id": 138,
+"it": "Il Nero spinge sul lato di re dato che il centro è bloccato. Rispondiamo h3: il pedone h5 non va oltre senza concedere qualcosa."
+},
+{
+"id": 139,
+"it": "L'alfiere colpisce c4 alla seconda mossa, puntando f7 senza impegnare il cavallo di re. Spesso un'Italiana reindirizzata, con l'opzione di un centro in d4 o di un gioco tranquillo con d3."
+},
+{
+"id": 140,
+"it": "2…Nf6 — 3.d3"
+},
+{
+"id": 141,
+"it": "2…Bc5 — 3.c3 e d4"
+},
+{
+"id": 142,
+"it": "Gambetto Urusov — 3.d4"
+},
+{
+"id": 143,
+"it": "2…Nc6 — nei Due Cavalli"
+},
+{
+"id": 144,
+"it": "Apertura dell'Alfiere"
+},
+{
+"id": 145,
+"it": "Linea tranquilla — 4.d3"
+},
+{
+"id": 146,
+"it": "L'alfiere italiano senza …Nf3: si mantiene la scelta tra il tranquillo d3 e l'acuto d4."
+},
+{
+"id": 147,
+"it": "Un terzo delle partite, e il corso partiva da …Nf6 o …Bc5. La mossa più naturale non era trattata."
+},
+{
+"id": 148,
+"it": "Una risposta modesta — un giocatore su dieci — che il corso ignorava: vedeva solo …Nf6, …Bc5 e …Nc6. Il Nero chiude con un pedone la diagonale dell'alfiere in c4."
+},
+{
+"id": 149,
+"it": "Il Gambetto Urusov: un pedone in cambio di uno sviluppo fulmineo e di un attacco su f7."
+},
+{
+"id": 150,
+"it": "Oltre un terzo delle partite dopo 3.d3, e il capitolo andava altrove. Posizione simmetrica e gioco lento: decidono i piani."
+},
+{
+"id": 151,
+"it": "Un giocatore nero su cinque sviluppa così, e il corso vedeva solo …c6 e …Bc5."
+},
+{
+"id": 152,
+"it": "Preparare d4 per costruire un centro: lo spirito del Gambetto Evans, senza …b4."
+},
+{
+"id": 153,
+"it": "Un giocatore nero su cinque prende il pedone e4 invece di d4 — un'imprecisione che il corso non segnalava. Il cavallo si ritrova solo in territorio nemico."
+},
+{
+"id": 154,
+"it": "Si traspone nell'Italiana, ed è il caso più frequente — un giocatore nero su tre. Il corso aveva previsto solo …Nf6."
+},
+{
+"id": 155,
+"it": "La mossa d'attesa che non sviluppa nulla. Un giocatore nero su sette la gioca, e si paga in contanti."
+},
+{
+"id": 156,
+"it": "Si passa ai Due Cavalli, la linea più acuta: f7 è colpita due volte."
+},
+{
+"id": 157,
+"it": "La difesa giusta. Riprendere in d5 perderebbe a causa di Nxf7 — la trappola che ogni giocatore di 3.Ng5 spera di vedere."
+},
+{
+"id": 158,
+"it": "Il Nero inchioda prima che entri Nbd2. Rispondiamo Bg5: l'inchiodatura taglia da entrambe le parti."
+},
+{
+"id": 159,
+"it": "Prima il re al sicuro. In queste posizioni tranquille, chi arrocca per primo decide poi dove si giocherà la partita."
+},
+{
+"id": 160,
+"it": "Il cavallo va a caccia dell'alfiere in c5, il miglior pezzo del Nero. Cambiarlo vale il viaggio, anche passando dal bordo della scacchiera."
+},
+{
+"id": 161,
+"it": "Poiché loro giocano in piccolo, noi prendiamo in grande: il Nero ha speso due mosse a contendere il nulla al centro."
+},
+{
+"id": 162,
+"it": "Apriamo la colonna d e scacciamo il cavallo con un pedone. Il Bianco sta nettamente meglio: la punizione silenziosa di …Nxe4."
+},
+{
+"id": 163,
+"it": "La lenta struttura italiana: prepariamo d4 passo dopo passo, e l'alfiere in c5 dovrà un giorno scegliere tra ritirarsi e cambiare."
+},
+{
+"id": 164,
+"it": "Il Nero riprende con il RE: niente più arrocco, e un finale in cui il tempo speso per …h6 conta doppio."
+},
+{
+"id": 165,
+"it": "Un pedone per un attacco immediato: colonna f aperta, sviluppo rapido e il re avversario nel mirino. L'arma dell'attaccante contro 1…d5."
+},
+{
+"id": 166,
+"it": "Bogoljubov — 5…g6"
+},
+{
+"id": 167,
+"it": "Teichmann — 5…Bf5"
+},
+{
+"id": 168,
+"it": "Teichmann — 8…h6, l'errore naturale"
+},
+{
+"id": 169,
+"it": "Gambetto Ryder — 5.Qxf3"
+},
+{
+"id": 170,
+"it": "Rifiutato — 2…e6"
+},
+{
+"id": 171,
+"it": "Accettato — linea principale"
+},
+{
+"id": 172,
+"it": "contro 3…Bf5"
+},
+{
+"id": 173,
+"it": "contro 3…f5 — il contro-gambetto"
+},
+{
+"id": 174,
+"it": "Il Nero accetta; il Bianco si riprenderà l'iniziativa con f3."
+},
+{
+"id": 175,
+"it": "Il rifiuto più comune — un giocatore su dieci — e il corso aveva previsto solo la presa …dxe4. Si finisce in una Francese, dove il nostro gambetto non esiste più."
+},
+{
+"id": 176,
+"it": "Il Nero sviluppa l'alfiere prima di restituire il pedone. Un giocatore su otto, e il corso vedeva solo …Nf6."
+},
+{
+"id": 177,
+"it": "Il contro-gambetto: il Nero cementa e4 con un pedone invece di restituirlo. Un giocatore su otto, assente dal corso — e la linea in cui improvvisare costa di più."
+},
+{
+"id": 178,
+"it": "Il Gambetto Ryder: un SECONDO pedone sacrificato per un attacco immediato. Oggettivamente dubbio, temibile in pratica — e il corso non ne diceva nulla."
+},
+{
+"id": 179,
+"it": "Il Nero sviluppa l'alfiere prima di …e6. Il Bianco lo scaccia con Ne5 e g4."
+},
+{
+"id": 180,
+"it": "La difesa più giocata contro il gambetto — quasi una partita su due — e l'unica che il corso non copriva. Il Nero inchioda il cavallo che protegge d4."
+},
+{
+"id": 181,
+"it": "Quasi tre giocatori neri su dieci chiudono la diagonale invece di sviluppare un alfiere, e il corso aveva previsto solo …g6, …Bf5 e …Bg4. È la difesa più solida contro il gambetto."
+},
+{
+"id": 182,
+"it": "La manovra chiave: la donna si sposta in h4 per attaccare il re con Bh6 e Ne5."
+},
+{
+"id": 183,
+"it": "Il Nero tappa d5 e tiene. Qui il pedone non torna indietro: il gambetto si gioca per l'iniziativa, non per pareggiare il materiale."
+},
+{
+"id": 184,
+"it": "Il vero banco di prova, e va detto chiaramente: questa inchiodatura restituisce il vantaggio al Nero (≈ +0,7). Il corso insegnava 8…h6 qui, che perde — imparare un attacco contro la difesa sbagliata significa imparare a perdere contro quella giusta."
+}
+]

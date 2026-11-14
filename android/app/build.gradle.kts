@@ -62,7 +62,7 @@ val generateCourseNames by tasks.registering {
             val entry = table[name] as? Map<String, Any?> ?: continue
             val localizations = entry["localizations"] as? Map<String, Any?> ?: continue
             val byLanguage = LinkedHashMap<String, String>()
-            for (language in listOf("fr", "en")) {
+            for (language in listOf("fr", "en", "es", "de", "it")) {
                 val unit = (localizations[language] as? Map<String, Any?>)
                     ?.get("stringUnit") as? Map<String, Any?> ?: continue
                 (unit["value"] as? String)?.let { byLanguage[language] = it }

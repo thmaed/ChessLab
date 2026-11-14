@@ -1,0 +1,578 @@
+[
+{
+"id": 300,
+"it": "Difesa Pterodattilo"
+},
+{
+"id": 301,
+"it": "Cosa stai scansionando?"
+},
+{
+"id": 302,
+"it": "Donna e pedone contro donna — l'ombrello"
+},
+{
+"id": 303,
+"it": "Donna contro pedone in 7ª"
+},
+{
+"id": 304,
+"it": "Donna contro pedone di alfiere"
+},
+{
+"id": 305,
+"it": "Donna contro torre"
+},
+{
+"id": 306,
+"it": "Donna contro torre e alfiere"
+},
+{
+"id": 307,
+"it": "Donna contro torre e cavallo"
+},
+{
+"id": 308,
+"it": "Donna contro torre e pedone — la fortezza"
+},
+{
+"id": 309,
+"it": "Donna contro pedone di torre in 7ª — la patta dell'angolo"
+},
+{
+"id": 310,
+"it": "Donna contro due torri"
+},
+{
+"id": 311,
+"it": "Gambetto di Donna"
+},
+{
+"id": 312,
+"it": "Gambetto di Donna accettato"
+},
+{
+"id": 313,
+"it": "Gambetto di Donna rifiutato"
+},
+{
+"id": 314,
+"it": "Ovest-Indiana accelerata"
+},
+{
+"id": 315,
+"it": "Difesa Ovest-Indiana"
+},
+{
+"id": 316,
+"it": "Difesa Ovest-Indiana, con e3"
+},
+{
+"id": 317,
+"it": "Difesa Ovest-Indiana, con e3, linea Ab4+"
+},
+{
+"id": 318,
+"it": "Partita di Pedone di Donna"
+},
+{
+"id": 319,
+"it": "Pedone di Donna, attacco Mengarini"
+},
+{
+"id": 320,
+"it": "Rapid"
+},
+{
+"id": 321,
+"it": "Sistema Rapport-Jobava"
+},
+{
+"id": 322,
+"it": "Sistema Rapport-Jobava, con e6"
+},
+{
+"id": 323,
+"it": "Difesa del Ratto"
+},
+{
+"id": 324,
+"it": "Cerca un'apertura"
+},
+{
+"id": 325,
+"it": "Sostituisce l'albero di varianti attuale"
+},
+{
+"id": 326,
+"it": "Ritrova la mossa"
+},
+{
+"id": 327,
+"it": "Ritrova la mossa migliore"
+},
+{
+"id": 328,
+"it": "Rivedi la linea"
+},
+{
+"id": 329,
+"it": "Attacco Richter-Veresov"
+},
+{
+"id": 330,
+"it": "Il dominio di Rinck (1920)"
+},
+{
+"id": 331,
+"it": "Difesa Robatsch"
+},
+{
+"id": 332,
+"it": "Re"
+},
+{
+"id": 333,
+"it": "Torre e alfiere contro torre — la vittoria di Philidor"
+},
+{
+"id": 334,
+"it": "Torre e pedone contro cavallo"
+},
+{
+"id": 335,
+"it": "Torre e due pedoni uniti contro torre"
+},
+{
+"id": 336,
+"it": "Torre e cattivo pedone di torre contro alfiere"
+},
+{
+"id": 337,
+"it": "Torre contro alfiere"
+},
+{
+"id": 338,
+"it": "Torre contro alfiere — l'angolo giusto"
+},
+{
+"id": 339,
+"it": "Torre contro cavallo"
+},
+{
+"id": 340,
+"it": "Torre contro pedone"
+},
+{
+"id": 341,
+"it": "Torre contro torre e alfiere — la posizione di Szén"
+},
+{
+"id": 342,
+"it": "Torre contro torre e cavallo"
+},
+{
+"id": 343,
+"it": "Apertura Rubinstein"
+},
+{
+"id": 344,
+"it": "Partita Spagnola"
+},
+{
+"id": 346,
+"it": "Imposta il tuo avversario"
+},
+{
+"id": 347,
+"it": "Repertorio del Bianco"
+},
+{
+"id": 348,
+"it": "Repertorio del Nero"
+},
+{
+"id": 349,
+"it": "Repertorio vuoto"
+},
+{
+"id": 350,
+"it": "Repertori PGN"
+},
+{
+"id": 353,
+"it": "Apertura Réti"
+},
+{
+"id": 354,
+"it": "Successo complessivo"
+},
+{
+"id": 355,
+"it": "Ripassa"
+},
+{
+"id": 356,
+"it": "Ripassa questo repertorio"
+},
+{
+"id": 357,
+"it": "Si adatta ai miei risultati"
+},
+{
+"id": 358,
+"it": "Sacrificio"
+},
+{
+"id": 359,
+"it": "Alfieri dello stesso colore: la fortezza"
+},
+{
+"id": 360,
+"it": "Senza limite"
+},
+{
+"id": 361,
+"it": "Senza limite di tempo"
+},
+{
+"id": 362,
+"it": "Apertura Saragozza"
+},
+{
+"id": 363,
+"it": "Difesa Scandinava"
+},
+{
+"id": 364,
+"it": "Partita Scozzese"
+},
+{
+"id": 365,
+"it": "Sezione"
+},
+{
+"id": 366,
+"it": "Difesa Semi-Slava"
+},
+{
+"id": 367,
+"it": "Difesa Semi-Slava accettata"
+},
+{
+"id": 368,
+"it": "Sessione di ripasso dilazionato"
+},
+{
+"id": 369,
+"it": "La difesa del lato corto"
+},
+{
+"id": 370,
+"it": "Difesa Siciliana"
+},
+{
+"id": 371,
+"it": "Difesa Siciliana: Classica"
+},
+{
+"id": 372,
+"it": "Difesa Siciliana: Dragone"
+},
+{
+"id": 373,
+"it": "Difesa Siciliana: Kan"
+},
+{
+"id": 374,
+"it": "Difesa Siciliana: Najdorf"
+},
+{
+"id": 375,
+"it": "Difesa Siciliana: Scheveningen"
+},
+{
+"id": 376,
+"it": "Difesa Siciliana: Sveshnikov"
+},
+{
+"id": 377,
+"it": "Difesa Siciliana: Taimanov"
+},
+{
+"id": 378,
+"it": "Difesa Slava"
+},
+{
+"id": 379,
+"it": "Slava-Indiana"
+},
+{
+"id": 380,
+"it": "Attacco Sodio"
+},
+{
+"id": 381,
+"it": "Sparring"
+},
+{
+"id": 382,
+"it": "Sparring: il personaggio resta al tuo livello"
+},
+{
+"id": 383,
+"it": "Difesa San Giorgio"
+},
+{
+"id": 384,
+"it": "Gambetto Stafford"
+},
+{
+"id": 385,
+"it": "Lo stallo come risorsa — l'ultimo giro della torre"
+},
+{
+"id": 386,
+"it": "Statistiche"
+},
+{
+"id": 387,
+"it": "Stile"
+},
+{
+"id": 388,
+"it": "Tavolo (icone capovolte)"
+},
+{
+"id": 389,
+"it": "Tattica"
+},
+{
+"id": 390,
+"it": "Difesa Tarrasch"
+},
+{
+"id": 391,
+"it": "Tecniche dimostrate"
+},
+{
+"id": 393,
+"it": "Il re attivo in un finale di torri"
+},
+{
+"id": 394,
+"it": "Il matto con i due alfieri"
+},
+{
+"id": 395,
+"it": "Il matto con alfiere e cavallo"
+},
+{
+"id": 396,
+"it": "La difesa Cochrane"
+},
+{
+"id": 397,
+"it": "La falla della regola di Bahr"
+},
+{
+"id": 398,
+"it": "La fortezza di Horwitz-Kling che non esiste"
+},
+{
+"id": 399,
+"it": "La fortezza di Karstedt"
+},
+{
+"id": 400,
+"it": "La posizione di Lucena"
+},
+{
+"id": 401,
+"it": "L'opposizione"
+},
+{
+"id": 402,
+"it": "Il pedone passato lontano"
+},
+{
+"id": 403,
+"it": "Lo sfondamento"
+},
+{
+"id": 404,
+"it": "La posizione di Philidor"
+},
+{
+"id": 405,
+"it": "Il principio delle due debolezze"
+},
+{
+"id": 406,
+"it": "La corsa alla promozione e il primo scacco"
+},
+{
+"id": 407,
+"it": "Il pedone passato protetto"
+},
+{
+"id": 408,
+"it": "Il matto con la donna"
+},
+{
+"id": 409,
+"it": "Il matto con la torre"
+},
+{
+"id": 410,
+"it": "L'eccezione del pedone di torre"
+},
+{
+"id": 411,
+"it": "La regola del quadrato"
+},
+{
+"id": 412,
+"it": "Lo studio di Réti"
+},
+{
+"id": 413,
+"it": "La posizione di Saavedra"
+},
+{
+"id": 414,
+"it": "La difesa della 2ª traversa"
+},
+{
+"id": 415,
+"it": "La celebre eccezione alla regola di Tarrasch"
+},
+{
+"id": 416,
+"it": "Il trabocchetto"
+},
+{
+"id": 417,
+"it": "La posizione di Vančura"
+},
+{
+"id": 418,
+"it": "Il taglio verticale"
+},
+{
+"id": 419,
+"it": "L'alfiere cattivo"
+},
+{
+"id": 420,
+"it": "L'alfiere cattivo che vince"
+},
+{
+"id": 421,
+"it": "Partita dei Tre Cavalli"
+},
+{
+"id": 422,
+"it": "Tema %@"
+},
+{
+"id": 423,
+"it": "Attacco Torre"
+},
+{
+"id": 424,
+"it": "Tutti i puzzle, mescolati"
+},
+{
+"id": 425,
+"it": "Tutto è aggiornato — bella regolarità 👏"
+},
+{
+"id": 426,
+"it": "Tutte le partite della serie partiranno da questa posizione."
+},
+{
+"id": 427,
+"it": "Triangolazione"
+},
+{
+"id": 428,
+"it": "Il giro del cavallo (Troickij, 1906)"
+},
+{
+"id": 429,
+"it": "Attacco Trompowsky"
+},
+{
+"id": 430,
+"it": "Trova la mossa del repertorio"
+},
+{
+"id": 431,
+"it": "Due cavalli contro un pedone"
+},
+{
+"id": 432,
+"it": "Tipo di immagine"
+},
+{
+"id": 433,
+"it": "Un arrocco diventa indisponibile non appena il suo re o la sua torre lasciano la casa di partenza."
+},
+{
+"id": 436,
+"it": "Apertura Valencia"
+},
+{
+"id": 437,
+"it": "Apertura Van Geet"
+},
+{
+"id": 438,
+"it": "Apertura Van't Kruijs"
+},
+{
+"id": 439,
+"it": "Variante: la linea riparte dalla mossa indicata"
+},
+{
+"id": 440,
+"it": "Attacco Veresov"
+},
+{
+"id": 441,
+"it": "Gambetto Viennese, con difesa Max Lange"
+},
+{
+"id": 442,
+"it": "Partita Viennese"
+},
+{
+"id": 443,
+"it": "Tu"
+},
+{
+"id": 444,
+"it": "Hai lasciato il tuo repertorio alla mossa %1$lld — mossa prevista: %2$@"
+},
+{
+"id": 445,
+"it": "Giochi con il Bianco"
+},
+{
+"id": 446,
+"it": "Giochi con il Nero"
+},
+{
+"id": 447,
+"it": "Difesa dell'Avvoltoio"
+},
+{
+"id": 448,
+"it": "Difesa Wade"
+},
+{
+"id": 449,
+"it": "Difesa Ware"
+}
+]

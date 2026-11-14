@@ -1,0 +1,390 @@
+[
+{
+"id": 990,
+"it": "Coach · %@ dei giocatori di livello %lld giocano questa mossa: errore tipico."
+},
+{
+"id": 991,
+"it": "Coach · %@ dei giocatori di livello %lld giocano questa mossa: un incidente, non un'abitudine."
+},
+{
+"id": 992,
+"it": "Coach · mossa rara: %@ dei giocatori di livello %lld la trovano."
+},
+{
+"id": 993,
+"it": "Coach · %@ dei giocatori di livello %lld giocano questa mossa."
+},
+{
+"id": 994,
+"it": "Secondo Maia: ciò che giocano gli umani, non ciò che è buono."
+},
+{
+"id": 995,
+"it": "1 posizione del tuo repertorio da ripassare"
+},
+{
+"id": 996,
+"it": "%lld posizioni del tuo repertorio da ripassare"
+},
+{
+"id": 997,
+"it": "Le tue partite"
+},
+{
+"id": 998,
+"it": "Precisione nelle tue ultime %lld partite"
+},
+{
+"id": 999,
+"it": "%@ punti rispetto alle dieci precedenti"
+},
+{
+"id": 1000,
+"it": "Il tuo punto debole: %@ (%@ punti persi per mossa)."
+},
+{
+"id": 1001,
+"it": "Tattiche mancate"
+},
+{
+"id": 1002,
+"it": "Aperture costose"
+},
+{
+"id": 1003,
+"it": "%@ punti persi per mossa · %lld partite"
+},
+{
+"id": 1004,
+"it": "Scacco di scoperta"
+},
+{
+"id": 1005,
+"it": "Altri errori"
+},
+{
+"id": 1006,
+"it": "Sessione del giorno"
+},
+{
+"id": 1007,
+"it": "Sessione terminata"
+},
+{
+"id": 1008,
+"it": "Da fare oggi"
+},
+{
+"id": 1009,
+"it": "Ancora nessuna serie — inizia oggi."
+},
+{
+"id": 1010,
+"it": "1 giorno di fila"
+},
+{
+"id": 1011,
+"it": "%lld giorni di fila"
+},
+{
+"id": 1012,
+"it": "Aperture da ripassare"
+},
+{
+"id": 1013,
+"it": "Niente da ripassare oggi."
+},
+{
+"id": 1014,
+"it": "Posizioni da ripassare: %lld"
+},
+{
+"id": 1015,
+"it": "Puzzle da riprovare"
+},
+{
+"id": 1016,
+"it": "Nessun puzzle sbagliato in attesa."
+},
+{
+"id": 1017,
+"it": "Puzzle sbagliati da rigiocare: %lld"
+},
+{
+"id": 1018,
+"it": "Puzzle dalle tue partite"
+},
+{
+"id": 1019,
+"it": "Nessun puzzle dalle tue partite in attesa."
+},
+{
+"id": 1020,
+"it": "Puzzle tratti dai tuoi errori: %lld"
+},
+{
+"id": 1021,
+"it": "Un finale"
+},
+{
+"id": 1022,
+"it": "Finale del giorno aperto."
+},
+{
+"id": 1023,
+"it": "Il finale del giorno ti aspetta."
+},
+{
+"id": 1024,
+"it": "Aperture: %lld"
+},
+{
+"id": 1025,
+"it": "Puzzle sbagliati: %lld"
+},
+{
+"id": 1026,
+"it": "Puzzle dalle tue partite: %lld"
+},
+{
+"id": 1027,
+"it": "un finale"
+},
+{
+"id": 1028,
+"it": "Tutto fatto per oggi."
+},
+{
+"id": 1029,
+"it": "%lld / %lld studiate"
+},
+{
+"id": 1030,
+"it": "Precisione %lld%%"
+},
+{
+"id": 1031,
+"it": "Medaglia di bronzo"
+},
+{
+"id": 1032,
+"it": "Medaglia d'argento"
+},
+{
+"id": 1033,
+"it": "Medaglia d'oro"
+},
+{
+"id": 1034,
+"it": "Medaglia di platino"
+},
+{
+"id": 1035,
+"it": "Medaglia di diamante"
+},
+{
+"id": 1036,
+"it": "Trovati"
+},
+{
+"id": 1037,
+"it": "Tempo"
+},
+{
+"id": 1038,
+"it": "Più veloce di %@ — ben giocato"
+},
+{
+"id": 1039,
+"it": "Prima medaglia a %lld giorni"
+},
+{
+"id": 1040,
+"it": "prossima a %lld giorni"
+},
+{
+"id": 1041,
+"it": "Materiale nel corso della partita"
+},
+{
+"id": 1042,
+"it": "Aperture per sessione"
+},
+{
+"id": 1043,
+"it": "Al massimo questo numero di posizioni d'apertura da ripassare al giorno; il resto aspetta il giorno dopo."
+},
+{
+"id": 1044,
+"it": "Limite di tempo"
+},
+{
+"id": 1045,
+"it": "%lld posizioni ripassate — obiettivo del giorno raggiunto."
+},
+{
+"id": 1046,
+"it": "Tutti i lati"
+},
+{
+"id": 1047,
+"it": "Tutti i livelli"
+},
+{
+"id": 1048,
+"it": "Tattica e problemi"
+},
+{
+"id": 1049,
+"it": "Scegli prima il tuo avversario: un personaggio, oppure Stockfish. Nove personaggi sono interpretati da Maia-3, una rete addestrata su milioni di partite umane che non cerca la mossa migliore ma quella che un umano di quel livello giocherebbe — errori compresi. Ognuno ha il suo stile, il suo repertorio di aperture e il suo temperamento, e il suo livello si regola sulla scala umana (vicina a Lichess, non paragonabile all'Elo di Stockfish). Stockfish interviene alle loro spalle solo per i matti brevi, i finali con pochi pezzi e le ripetizioni. Altrimenti, Stockfish stesso, limitato al livello che preferisci, dal principiante al massimo. Imposta poi il tuo colore, il limite di tempo (spento per impostazione predefinita: accendilo per scegliere una cadenza — l'app ricorda la tua ultima scelta) e gli aiuti: suggerimento (frecce delle mosse migliori), avviso in caso di mossa rischiosa e barra di valutazione. Dopo la partita, un pulsante porta direttamente all'analisi. Durante la partita, «Cambia modalità» (in alto a destra) invia la posizione mostrata all'analisi, al Laboratorio o a una partita a due — la partita ti aspetta al ritorno."
+},
+{
+"id": 1050,
+"it": "Risolvi problemi tattici, tratti dalla libreria Lichess incorporata o generati dai tuoi stessi errori in analisi. Filtra per provenienza (le tue partite o la libreria), livello, fase della partita e tema, oppure rigioca solo i puzzle sbagliati al tuo ultimo tentativo. Una mossa che dà matto è sempre accettata, anche se differisce dalla soluzione. Hai UN tentativo: un puzzle si risolve calcolando la variante fino in fondo, non tentando una mossa per vedere. Se preferisci cercare a tentoni, torna a tre tentativi nelle Impostazioni. Il tuo punteggio personale, sulla scala dei puzzle Lichess, segue i tuoi successi: si muove in fretta all'inizio e poi si stabilizza; risolto con il suggerimento, un puzzle non porta nulla e costa qualche punto; il chip «Al mio livello» propone puzzle vicini al tuo punteggio. La ripetizione dilazionata pianifica i ripassi e un bilancio segue il tuo successo e i tuoi temi deboli. Il metodo Woodpecker riprende un lotto fisso di 10, 25 o 50 puzzle, ciclo dopo ciclo in un nuovo ordine, per trovarne di più e più in fretta; non tocca la ripetizione dilazionata. I tuoi puzzle (un file PGN in cui ogni partita è un puzzle, con la sua intestazione FEN; la prima mossa è giocata in anticipo, come su Lichess) si importano dalla schermata Puzzle: ogni file diventa una raccolta, tenuta a parte, che si lavora in serie o con un programma Woodpecker completo. «Cambia modalità» (in alto a destra) porta la posizione del puzzle al Laboratorio, al computer o a Due giocatori. Il menu di una raccolta la esporta in PGN: è anche il suo backup, e il file si reimporta così com'è."
+},
+{
+"id": 1052,
+"it": "Progredisci su 58 aperture scritte a mano e multilingue, tutte riviste con il motore. Un indice ad albero mostra tutte le varianti senza doppioni: tocca una mossa qualsiasi per aprire la sua posizione. Sotto la scacchiera, le mosse dei maestri con le loro percentuali, le tre migliori mosse di Stockfish e una barra di valutazione; frecce colorate segnalano la mossa consigliata, le trappole e le imprecisioni. Due menu filtrano l'elenco: Lato (Bianco o Nero) e Livello (Classiche — le 19 aperture più giocate —, Club, Avanzato). Ogni scheda mostra la posizione chiave, il livello e la tua padronanza. Allenale con la ripetizione dilazionata — l'app pianifica i tuoi ripassi da sola — e ritrova i tuoi progressi su tutti i tuoi dispositivi tramite iCloud. Dal lettore, «Cambia modalità» invia la posizione raggiunta al Laboratorio, al computer o a una partita a due."
+},
+{
+"id": 1055,
+"it": "Ogni giorno l'app raccoglie ciò che c'è da ripassare, in ordine: posizioni d'apertura da ripassare (ripetizione dilazionata), puzzle sbagliati, puzzle tratti dalle tue partite, il tuo ciclo Woodpecker se è in corso (fatto non appena ci hai lavorato oggi) e un finale del giorno. Vuole essere breve: al massimo 5 puzzle per passaggio e un tetto di aperture che regoli in basso nella schermata (2, 5 o 8). Contano solo le posizioni DA RIPASSARE: percorrere una linea fino alla posizione da ripassare non esaurisce la tua quota. Un passaggio diventa «fatto» quando il suo obiettivo del giorno è raggiunto. La tua serie conta i giorni di allenamento di fila; le medaglie segnano 3, 7, 30, 100 e 365 giorni. I ripassi che l'app pianifica dopo una partita non contano nella serie."
+},
+{
+"id": 1056,
+"it": "Rivedi le novità"
+},
+{
+"id": 1057,
+"it": "Un breve percorso tra le novità della 2.0, dove vivono."
+},
+{
+"id": 1058,
+"it": "Novità della 2.0"
+},
+{
+"id": 1059,
+"it": "La tua sessione del giorno"
+},
+{
+"id": 1060,
+"it": "Ogni giorno l'app prepara ciò che c'è da ripassare: posizioni d'apertura da ripassare, puzzle sbagliati, un finale. Completala per allungare la tua serie di giorni."
+},
+{
+"id": 1061,
+"it": "Un orologio, se vuoi"
+},
+{
+"id": 1062,
+"it": "«Limite di tempo» è spento per impostazione predefinita: accendilo per scegliere una cadenza (Bullet, Blitz, Rapid…). L'app ricorda la tua ultima scelta."
+},
+{
+"id": 1064,
+"it": "Un punteggio di puzzle personale"
+},
+{
+"id": 1066,
+"it": "Analisi automatica e Coach"
+},
+{
+"id": 1068,
+"it": "Classiche, Lato, Livello"
+},
+{
+"id": 1070,
+"it": "Il limite di tempo, facoltativo"
+},
+{
+"id": 1072,
+"it": "Tutto è nell'aiuto"
+},
+{
+"id": 1073,
+"it": "Il «?» raccoglie il dettaglio delle novità, e puoi rivedere questo tour quando vuoi."
+},
+{
+"id": 1074,
+"it": "Vedere i tuoi errori senza far nulla?"
+},
+{
+"id": 1076,
+"it": "Sì, automaticamente"
+},
+{
+"id": 1077,
+"it": "Modificabile in qualsiasi momento nelle Impostazioni."
+},
+{
+"id": 1080,
+"it": "Una partita è in corso"
+},
+{
+"id": 1081,
+"it": "Sostituisci con una nuova partita"
+},
+{
+"id": 1082,
+"it": "Iniziare una nuova partita cancellerà la partita in corso (%lld mosse giocate)."
+},
+{
+"id": 1083,
+"it": "La tua partita ti aspetta: %lld mosse giocate."
+},
+{
+"id": 1085,
+"it": "Una dashboard raggiungibile dalla home: il tuo bilancio contro il computer (vittorie, patte, sconfitte) e le tue statistiche di puzzle per tema. Il bilancio contro il computer si filtra sugli ultimi 7 o 30 giorni, o su tutta la cronologia. Con un tocco su un tema debole, l'app ti prepara una serie di puzzle mirata per lavorarci. Il tuo profilo di debolezze — fase della partita, aperture che ti costano punti, schemi tattici mancati — si costruisce man mano che analizzi le tue partite."
+},
+{
+"id": 1086,
+"it": "Analizza una partita o una posizione con Stockfish: classificazione delle mosse (imprecisione, errore, errore grave), curva di valutazione, frecce delle mosse migliori e freccia rossa della minaccia avversaria, riproduzione automatica, creazione di puzzle dagli errori e ricerca dei matti mancati da uno dei due lati. Esportazione PGN ricaricabile. Alla fine dell'analisi di una tua partita contro il computer, i tuoi errori diventano puzzle; la schermata Analizza mette l'ultima partita in cima, con accesso diretto ai matti mancati. Inserimento tramite PGN, FEN, editor o scanner. Il Coach aggiunge, sotto la spiegazione di un errore, la quota di giocatori del tuo livello che giocano questa mossa (secondo Maia: ciò che giocano gli umani, non ciò che è buono)."
+},
+{
+"id": 1088,
+"it": "Analisi e Coach"
+},
+{
+"id": 1089,
+"it": "Analizza: i tuoi errori diventano puzzle «Le mie partite»."
+},
+{
+"id": 1090,
+"it": "Matti mancati: i matti forzati che hai lasciato sfuggire, in puzzle «Matto»."
+},
+{
+"id": 1091,
+"it": "Creare puzzle da questa partita?"
+},
+{
+"id": 1092,
+"it": "Si aggiungeranno a «Le mie partite», in Puzzle."
+},
+{
+"id": 1093,
+"it": "%lld matti mancati"
+},
+{
+"id": 1094,
+"it": "%lld errori da rilavorare"
+},
+{
+"id": 1095,
+"it": "Crea %lld puzzle"
+},
+{
+"id": 1096,
+"it": "Mossa %lld: era possibile un matto (hai giocato %@)."
+},
+{
+"id": 1097,
+"it": "Mossa %lld: %@ era un errore."
+},
+{
+"id": 1098,
+"it": "Da rivedere"
+},
+{
+"id": 1099,
+"it": "Nessun puzzle da rivedere"
+}
+]

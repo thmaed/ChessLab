@@ -31,6 +31,24 @@ object SanFormatter {
         'N' to 'C',  // Knight → Cavalier
     )
 
+    /** Espagnol : Rey, Dama, Torre, Alfil, Caballo. */
+    private val spanish = mapOf('K' to 'R', 'Q' to 'D', 'R' to 'T', 'B' to 'A', 'N' to 'C')
+
+    /** Italien : Re, Donna, Torre, Alfiere, Cavallo (mêmes lettres que l'espagnol). */
+    private val italian = mapOf('K' to 'R', 'Q' to 'D', 'R' to 'T', 'B' to 'A', 'N' to 'C')
+
+    /** Allemand : König, Dame, Turm, Läufer, Springer. */
+    private val german = mapOf('K' to 'K', 'Q' to 'D', 'R' to 'T', 'B' to 'L', 'N' to 'S')
+
+    /** La table de la notation, `null` pour l'anglaise (rien à traduire). */
+    private fun letters(notation: PieceNotation): Map<Char, Char>? = when (notation) {
+        PieceNotation.english -> null
+        PieceNotation.french -> french
+        PieceNotation.spanish -> spanish
+        PieceNotation.german -> german
+        PieceNotation.italian -> italian
+    }
+
     /**
      * Conversion CARACTÈRE PAR CARACTÈRE, en une seule passe. Des
      * remplacements successifs seraient faux : « R → T » puis « K → R »
@@ -40,9 +58,10 @@ object SanFormatter {
      * dans aucune table : ils traversent intacts. `=Q` devient `=D` par la
      * même passe, et c'est voulu.
      */
-    fun display(san: String, notation: PieceNotation): String =
-        if (notation == PieceNotation.english) san
-        else san.map { french[it] ?: it }.joinToString("")
+    fun display(san: String, notation: PieceNotation): String {
+        val table = letters(notation) ?: return san
+        return san.map { table[it] ?: it }.joinToString("")
+    }
 
     fun display(sans: List<String>, notation: PieceNotation): List<String> =
         if (notation == PieceNotation.english) sans else sans.map { display(it, notation) }

@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import com.chesslab.library.PlayerName
 import com.chesslab.R
 import com.chesslab.play.TimeLimitSection
 import com.chesslab.play.rememberTimeLimit
@@ -64,8 +65,8 @@ fun TwoPlayerSetupScreen(
     val saved = remember { TwoPlayerSettingsStore.load(context) }
     val defaultWhite = stringResource(R.string.color_white)
     val defaultBlack = stringResource(R.string.color_black)
-    var white by remember { mutableStateOf(saved?.whiteName?.ifBlank { defaultWhite } ?: defaultWhite) }
-    var black by remember { mutableStateOf(saved?.blackName?.ifBlank { defaultBlack } ?: defaultBlack) }
+    var white by remember { mutableStateOf(PlayerName.display(context, saved?.whiteName) ?: defaultWhite) }
+    var black by remember { mutableStateOf(PlayerName.display(context, saved?.blackName) ?: defaultBlack) }
     var rotation by remember { mutableStateOf(saved?.rotation ?: TwoPlayerSettings.RotationMode.faceToFace) }
     val timeLimit = rememberTimeLimit(
         saved?.timeControlId ?: "none", saved?.customMinutes ?: 15, saved?.customIncrementSeconds ?: 0, "twoPlayer",

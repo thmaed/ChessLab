@@ -206,13 +206,17 @@ final class AppSettings {
         analysisArrowMode = defaults.string(forKey: Keys.analysisArrowMode)
             .flatMap(ArrowMode.init(rawValue:)) ?? .best
 
+        let storedLanguage = defaults.string(forKey: Keys.appLanguage)
+            .flatMap(AppLanguage.init(rawValue:)) ?? .system
+        // Réglage jamais touché : la notation suit l'usage de la langue
+        // (espagnole en espagnol, allemande en allemand, française sinon).
         pieceNotation = defaults.string(forKey: Keys.pieceNotation)
-            .flatMap(PieceNotation.init(rawValue:)) ?? .french
+            .flatMap(PieceNotation.init(rawValue:))
+            ?? PieceNotation.defaultFor(languageCode: storedLanguage.resolvedCode)
 
         storedPlayerName = Self.sanitizedPlayerName(defaults.string(forKey: Keys.playerName) ?? "")
 
-        appLanguage = defaults.string(forKey: Keys.appLanguage)
-            .flatMap(AppLanguage.init(rawValue:)) ?? .system
+        appLanguage = storedLanguage
         // Appliquer DÈS l'init du singleton : le tout premier écran doit
         // déjà s'afficher dans la bonne langue.
         LocalizationController.apply(languageCode: appLanguage.resolvedCode)
@@ -246,7 +250,8 @@ final class AppSettings {
         if arrows != analysisArrowMode { analysisArrowMode = arrows }
 
         let notation = defaults.string(forKey: Keys.pieceNotation)
-            .flatMap(PieceNotation.init(rawValue:)) ?? .french
+            .flatMap(PieceNotation.init(rawValue:))
+            ?? PieceNotation.defaultFor(languageCode: appLanguage.resolvedCode)
         if notation != pieceNotation { pieceNotation = notation }
 
         // Le nom voyage, lui : c'est la même personne sur les deux appareils.

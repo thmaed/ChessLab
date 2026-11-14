@@ -21,7 +21,7 @@ And what you missed becomes an exercise: the positions where you went wrong are 
 Load a game by PGN, FEN, the position editor, or a photo of a board. The position on screen travels to another mode at the touch of a button.
 
 OPENINGS
-58 openings written by hand, in English and French, all checked against the engine. Walk through them move by move: each move is explained, the alternatives are offered, and coloured arrows tie the board to the move list. Spaced repetition makes them stick.
+58 openings written by hand, in five languages, all checked against the engine. Walk through them move by move: each move is explained, the alternatives are offered, and coloured arrows tie the board to the move list. Spaced repetition makes them stick.
 
 THE ENDGAME CORNER
 78 courses proved by tablebase — the exact mathematical verdict: no move taught throws away a win, no defence offered loses a draw. From the opposition to the famous studies.
@@ -41,6 +41,6 @@ Set two configurations against each other over a series of games to compare thei
 PRIVACY
 No account, no server, no advertising, no analytics. The app does not even hold permission to reach the internet: your games and settings stay on your phone. To move to another device, a single file you write and reopen wherever you like.
 
-English and French, interface and course content alike. Portrait and landscape.
+English, French, Spanish, German and Italian, interface and course content alike. Portrait and landscape.
 
 ChessLab embeds the Stockfish engine (GPLv3), the Maia-3 network from the University of Toronto (AGPLv3) and the cburnett piece set (CC BY-SA 3.0). Puzzles come from the Lichess database (CC0).

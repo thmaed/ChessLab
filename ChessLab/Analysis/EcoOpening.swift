@@ -15,15 +15,29 @@ struct EcoOpening: Codable, Equatable, Sendable {
     /// Absent des lignes de la bibliothèque d'ouvertures (noms de familles,
     /// jamais affichés comme nom d'ouverture) : repli sur `name`.
     var nameEn: String? = nil
+    /// Noms espagnol, allemand et italien (colonnes `name_es`, `name_de`, `name_it`) : absents →
+    /// repli sur l'anglais, puis sur le français.
+    var nameEs: String? = nil
+    var nameDe: String? = nil
+    var nameIt: String? = nil
 
     private enum CodingKeys: String, CodingKey {
         case eco, name, moves
         case nameEn = "name_en"
+        case nameEs = "name_es"
+        case nameDe = "name_de"
+        case nameIt = "name_it"
     }
 
-    /// Le nom dans la langue demandée (`"fr"` ou `"en"`).
+    /// Le nom dans la langue demandée (`"fr"`, `"en"`, `"es"`, `"de"` ou `"it"`).
     func displayName(_ languageCode: String) -> String {
-        languageCode == "fr" ? name : (nameEn ?? name)
+        switch languageCode {
+        case "fr": return name
+        case "es": return nameEs ?? nameEn ?? name
+        case "de": return nameDe ?? nameEn ?? name
+        case "it": return nameIt ?? nameEn ?? name
+        default: return nameEn ?? name
+        }
     }
 }
 

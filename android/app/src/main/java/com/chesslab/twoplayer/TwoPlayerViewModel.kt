@@ -1,6 +1,7 @@
 package com.chesslab.twoplayer
 
 import com.chesslab.library.PgnExport
+import com.chesslab.library.PlayerName
 
 import android.app.Application
 import androidx.compose.runtime.getValue
@@ -283,8 +284,8 @@ class TwoPlayerViewModel(app: Application) : AndroidViewModel(app) {
     // MARK: Les noms
 
     /** Le nom d'un camp, ou sa couleur si personne ne s'est nommé. */
-    fun whiteName(): String = ui.settings.whiteName.ifBlank { s(R.string.color_white) }
-    fun blackName(): String = ui.settings.blackName.ifBlank { s(R.string.color_black) }
+    fun whiteName(): String = PlayerName.display(getApplication(), ui.settings.whiteName) ?: s(R.string.color_white)
+    fun blackName(): String = PlayerName.display(getApplication(), ui.settings.blackName) ?: s(R.string.color_black)
 
     private fun nameOf(color: Piece.Color): String =
         if (color == Piece.Color.white) whiteName() else blackName()

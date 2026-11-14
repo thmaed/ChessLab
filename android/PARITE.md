@@ -7,6 +7,24 @@ Android passe par un fichier).
 Ce document est une liste de travail : chaque ligne cochée l'a été après
 vérification sur appareil, pas après compilation.
 
+### Espagnol, allemand et italien (2.3) — 09-10/11/2026 — FAIT des deux côtés, VÉRIFICATION EN COURS
+
+- [x] Mêmes langues des deux côtés : français, anglais, espagnol, allemand, italien. Réglage de langue à
+      6 choix (Système + 5), notation des pièces à 5 choix (R D T F C / anglaise / R D T A C / K D T L S / R D T A C italienne),
+      notation par défaut dérivée de la langue (`PieceNotation.defaultFor`), noms d'ouvertures ECO,
+      textes des 137 cours, aide, libellés d'interface (`values-es`, `values-de`, `locales_config`).
+- [x] Tests : iOS `MoreLanguagesSupportTests` ; Android `SanFormatterTest` (es/de/it), `CourseNameTranslationTest`.
+      Allemand relu à l'écran sur émulateur Android (API 35) et simulateur iPhone 17 Pro Max.
+- [ ] **À vérifier sur le Galaxy A16** (l'émulateur n'a pas la police ni la densité de l'appareil réel) :
+      longueurs des libellés allemands, surtout les pastilles, les boutons d'en-tête et les cartes d'accueil.
+- [ ] **Relecture par un locuteur natif (es, de, it) : PAS FAITE.** Les traductions suivent `tools/i18n/GLOSSAIRE.md`
+      et sont contrôlées par machine (coups, cases, formats), pas par une oreille native.
+- Écart de FORME assumé : les cinq pastilles de notation sont en grille 2×2 (3 lignes) sur Android, en rangée
+  repliable (`FlowLayout`) sur iOS — « Französisch » ne tenait plus à quatre de front.
+- Écart connu, hérité des deux côtés (non corrigé) : les noms d'ouvertures du lecteur (« Italian Game:
+  Giuoco Piano ») et le libellé figé d'un programme Woodpecker (« Tous les puzzles, mélangés ») restent
+  dans la langue où ils ont été écrits.
+
 ### Demande d'avis — 29/10/2026
 
 - [ ] Même RÈGLE des deux côtés (`ReviewPrompt.swift` / `ReviewPrompt.kt`) : après une réussite

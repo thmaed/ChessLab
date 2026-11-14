@@ -17,9 +17,18 @@ data class EcoOpening(
     val name: String,
     val nameEn: String,
     val moves: List<String>,
+    val nameEs: String? = null,
+    val nameDe: String? = null,
+    val nameIt: String? = null,
 ) {
-    /** Le nom dans la langue active. */
-    fun displayName(french: Boolean): String = if (french) name else nameEn
+    /** Le nom dans la langue demandée (`fr`, `en`, `es`, `de`, `it`) ; repli : anglais, puis français. */
+    fun displayName(languageCode: String): String = when (languageCode) {
+        "fr" -> name
+        "es" -> nameEs ?: nameEn
+        "de" -> nameDe ?: nameEn
+        "it" -> nameIt ?: nameEn
+        else -> nameEn
+    }
 }
 
 /**
@@ -79,6 +88,9 @@ object EcoOpeningLoader {
                 name = o.getString("name"),
                 nameEn = o.optString("name_en", o.getString("name")),
                 moves = (0 until moves.length()).map { moves.getString(it) },
+                nameEs = o.optString("name_es").ifEmpty { null },
+                nameDe = o.optString("name_de").ifEmpty { null },
+                nameIt = o.optString("name_it").ifEmpty { null },
             )
         }
     }.getOrDefault(emptyList()).also { cached = it }

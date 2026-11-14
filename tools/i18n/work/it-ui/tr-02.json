@@ -1,0 +1,442 @@
+[
+{
+"id": 220,
+"it": "Ogni turno si gioca in DUE tempi: muovi un pezzo, poi posi l'anatra su una casa vuota a tua scelta. L'anatra non appartiene a nessuno e blocca completamente la sua casa — nessun pezzo può fermarcisi né attraversarla, e non si cattura. Deve cambiare casa a ogni turno. NON ci sono SCACCO NÉ MATTO: un re ha il diritto di restare sotto attacco, e si vince catturandolo. Il computer gioca questa variante con Stockfish, limitato alle mosse che l'anatra lascia passare: gioca bene, ma non vede l'anatra nella sua valutazione."
+},
+{
+"id": 221,
+"it": "Ogni variante spiega le sue regole nella propria schermata delle impostazioni — inutile conoscerle in anticipo:"
+},
+{
+"id": 222,
+"it": "Cerca i matti mancati"
+},
+{
+"id": 223,
+"it": "Chess960"
+},
+{
+"id": 224,
+"it": "Chess960 e altri modi di giocare"
+},
+{
+"id": 225,
+"it": "Chess960 e altro"
+},
+{
+"id": 226,
+"it": "Chess960 · n. %lld"
+},
+{
+"id": 227,
+"it": "ChessKit"
+},
+{
+"id": 228,
+"it": "ChessLab"
+},
+{
+"id": 229,
+"it": "Scegli prima il tuo avversario: un personaggio, oppure Stockfish. Nove personaggi sono interpretati da Maia-3, una rete addestrata su milioni di partite umane che non cerca la mossa migliore ma quella che un umano di quel livello giocherebbe — errori compresi. Ognuno ha il suo stile, il suo repertorio di aperture e il suo temperamento, e il suo livello si regola sulla scala umana (vicina a Lichess, non paragonabile all'Elo di Stockfish). Stockfish interviene alle loro spalle solo per i matti brevi, i finali con pochi pezzi e le ripetizioni. Altrimenti, Stockfish stesso, limitato al livello che preferisci, dal principiante al massimo. Imposta poi il tuo colore, la cadenza e gli aiuti: suggerimento (frecce delle mosse migliori), avviso in caso di mossa rischiosa e barra di valutazione. Dopo la partita, un pulsante porta direttamente all'analisi. Durante la partita, «Cambia modalità» (in alto a destra) invia la posizione mostrata all'analisi, al Laboratorio o a una partita a due — la partita ti aspetta al ritorno."
+},
+{
+"id": 230,
+"it": "Scegli il tuo avversario"
+},
+{
+"id": 231,
+"it": "Club"
+},
+{
+"id": 232,
+"it": "Codice sorgente di ChessLab"
+},
+{
+"id": 233,
+"it": "Incolla"
+},
+{
+"id": 234,
+"it": "Incolla / digita"
+},
+{
+"id": 235,
+"it": "Incolla un PGN o un FEN"
+},
+{
+"id": 236,
+"it": "Incolla o importa un **FEN** o un **PGN** (viene usata la posizione finale del PGN). Tutte le partite della serie partiranno da questa posizione."
+},
+{
+"id": 237,
+"it": "Incolla il PGN di un repertorio (le varianti tra parentesi vengono conservate), apri un file .pgn, oppure ricevi il repertorio che un amico ha condiviso con te."
+},
+{
+"id": 238,
+"it": "Incolla una partita (PGN) o una posizione (FEN)."
+},
+{
+"id": 239,
+"it": "Incolla una partita o una posizione — il formato viene riconosciuto da solo"
+},
+{
+"id": 240,
+"it": "Inizia"
+},
+{
+"id": 241,
+"it": "Inizia il ciclo %lld"
+},
+{
+"id": 242,
+"it": "Come funziona"
+},
+{
+"id": 243,
+"it": "Commenta %@"
+},
+{
+"id": 244,
+"it": "Componi una posizione sulla scacchiera"
+},
+{
+"id": 245,
+"it": "Componi una posizione a mano sulla scacchiera, oppure scansionala da uno screenshot, dalla foto di uno schermo o da una scacchiera reale vista dall'alto. Una schermata di conferma ti lascia correggere la lettura prima di giocare o analizzare la posizione. Da Foto, Condividi › ChessLab invia l'immagine allo scanner: apri poi ChessLab, che la legge subito."
+},
+{
+"id": 246,
+"it": "Capire"
+},
+{
+"id": 247,
+"it": "Account iCloud connesso"
+},
+{
+"id": 248,
+"it": "Conferma la patta"
+},
+{
+"id": 249,
+"it": "Obiettivo %lld"
+},
+{
+"id": 250,
+"it": "Consultazione di una mossa passata"
+},
+{
+"id": 251,
+"it": "Consultazione — mossa %1$lld/%2$lld"
+},
+{
+"id": 252,
+"it": "Contatta lo sviluppatore"
+},
+{
+"id": 253,
+"it": "Continua"
+},
+{
+"id": 254,
+"it": "Continua la partita"
+},
+{
+"id": 255,
+"it": "Contrasto elevato"
+},
+{
+"id": 256,
+"it": "Marcato"
+},
+{
+"id": 257,
+"it": "Contro %@, livello %lld"
+},
+{
+"id": 258,
+"it": "Contro il computer"
+},
+{
+"id": 259,
+"it": "Contrattacco"
+},
+{
+"id": 260,
+"it": "Copia"
+},
+{
+"id": 261,
+"it": "Copia la partita (PGN)"
+},
+{
+"id": 262,
+"it": "Copia la posizione (FEN)"
+},
+{
+"id": 263,
+"it": "Copia la posizione FEN"
+},
+{
+"id": 264,
+"it": "Copiato"
+},
+{
+"id": 265,
+"it": "Punteggio dei puzzle"
+},
+{
+"id": 266,
+"it": "Colore"
+},
+{
+"id": 267,
+"it": "Mossa"
+},
+{
+"id": 268,
+"it": "Mossa %lld, Bianco: matto in %lld"
+},
+{
+"id": 269,
+"it": "Mossa %lld, Nero: matto in %lld"
+},
+{
+"id": 270,
+"it": "Mossa Rubata"
+},
+{
+"id": 271,
+"it": "Mossa impossibile in questa posizione: %@"
+},
+{
+"id": 272,
+"it": "Mossa precedente"
+},
+{
+"id": 273,
+"it": "Mossa rischiosa"
+},
+{
+"id": 274,
+"it": "Mossa successiva"
+},
+{
+"id": 275,
+"it": "Mossa in arrivo"
+},
+{
+"id": 276,
+"it": "Mosse"
+},
+{
+"id": 277,
+"it": "Mosse da questa posizione"
+},
+{
+"id": 278,
+"it": "Mosse e statistiche"
+},
+{
+"id": 279,
+"it": "Mosse giocate"
+},
+{
+"id": 280,
+"it": "Mosse per partita"
+},
+{
+"id": 281,
+"it": "Mosse ritirate lungo il percorso: %lld"
+},
+{
+"id": 282,
+"it": "Curva di valutazione"
+},
+{
+"id": 283,
+"it": "Curva di valutazione, precisione, mosse in capsule colorate — e sia la curva sia le capsule si toccano per navigare nella partita. La libreria conserva tutto."
+},
+{
+"id": 284,
+"it": "Corsa dei re"
+},
+{
+"id": 285,
+"it": "Corsa dei re"
+},
+{
+"id": 286,
+"it": "Crazyhouse"
+},
+{
+"id": 287,
+"it": "Crea puzzle dagli errori"
+},
+{
+"id": 288,
+"it": "Crea il programma"
+},
+{
+"id": 289,
+"it": "Ciclo %lld: "
+},
+{
+"id": 290,
+"it": "Ciclo %lld: %lld puzzle rimanenti"
+},
+{
+"id": 291,
+"it": "Ciclo %lld: %lld risolti su %lld in %@"
+},
+{
+"id": 292,
+"it": "Ciclo %lld: 1 puzzle rimanente"
+},
+{
+"id": 293,
+"it": "Ciclo %lld completato"
+},
+{
+"id": 294,
+"it": "Ciclo %lld · %lld/%lld"
+},
+{
+"id": 295,
+"it": "Ciclo Woodpecker"
+},
+{
+"id": 296,
+"it": "Fianco a fianco"
+},
+{
+"id": 297,
+"it": "Lato bianco"
+},
+{
+"id": 298,
+"it": "Lato nero"
+},
+{
+"id": 299,
+"it": "Altri modi di giocare a scacchi, contro il computer — stesse impostazioni di forza e di cadenza della modalità classica."
+},
+{
+"id": 300,
+"it": "Altri modi di giocare a scacchi, presentati in riquadri — dodici in tutto. Chess960 (Fischer Random): posizione di partenza estratta a sorte, scelta per numero (0-959) o composta da te — contro il computer o in due, con analisi a fine partita. Contro il computer: Re della collina (il primo re al centro vince), Tre scacchi, Orda (il Bianco ha solo pedoni), Corsa dei re, Atomico (ogni cattura esplode), Antiscacchi (perdi tutto per vincere), Crazyhouse (i pezzi catturati entrano nella tua riserva e si rimettono sulla scacchiera), Mossa Rubata (gioca una mossa con un pezzo avversario), Duck Chess (un'anatra blocca una casa e si sposta a ogni turno), Barricate (d4 ed e5 murate) e Barricate casuali (i muri cambiano casa a ogni mossa). Ogni riquadro spiega le sue regole nella propria schermata delle impostazioni; suggerimento, avviso di errore grave, barra di valutazione e analisi ovunque, forza del computer regolabile come altrove."
+},
+{
+"id": 301,
+"it": "Donna"
+},
+{
+"id": 302,
+"it": "Donne"
+},
+{
+"id": 303,
+"it": "In Aperture, il campo di ricerca fluttua SOPRA l'albero. Cerca, poi chiudi la tastiera per toccare i risultati qui sotto."
+},
+{
+"id": 304,
+"it": "Ultima partita"
+},
+{
+"id": 305,
+"it": "Ultima verifica: %@"
+},
+{
+"id": 306,
+"it": "File PGN: i tuoi problemi, tenuti separati dalla libreria"
+},
+{
+"id": 307,
+"it": "Due case murate"
+},
+{
+"id": 308,
+"it": "Due giocatori"
+},
+{
+"id": 309,
+"it": "Due giocatori su questo dispositivo"
+},
+{
+"id": 310,
+"it": "Due giocatori — Chess960"
+},
+{
+"id": 311,
+"it": "Due minuti per orientarti tra i comandi essenziali."
+},
+{
+"id": 312,
+"it": "Due persone giocano sullo stesso dispositivo. La modalità «tavolo» capovolge i pezzi per restare leggibili faccia a faccia. La partita terminata viene salvata nella libreria."
+},
+{
+"id": 313,
+"it": "Pubblico dominio (CC0)"
+},
+{
+"id": 314,
+"it": "Dodici modi di giocare"
+},
+{
+"id": 315,
+"it": "Diritto di arrocco lungo bianco incoerente con la posizione del re/della torre."
+},
+{
+"id": 316,
+"it": "Diritto di arrocco lungo nero incoerente con la posizione del re/della torre."
+},
+{
+"id": 317,
+"it": "Diritto di arrocco corto bianco incoerente con la posizione del re/della torre."
+},
+{
+"id": 318,
+"it": "Diritto di arrocco corto nero incoerente con la posizione del re/della torre."
+},
+{
+"id": 319,
+"it": "Duck Chess"
+},
+{
+"id": 320,
+"it": "Inizio"
+},
+{
+"id": 321,
+"it": "Scoperta"
+},
+{
+"id": 322,
+"it": "Sconfitte"
+},
+{
+"id": 323,
+"it": "Difesa"
+},
+{
+"id": 324,
+"it": "Già usate"
+},
+{
+"id": 325,
+"it": "Partenza"
+},
+{
+"id": 326,
+"it": "Partenza del Laboratorio"
+},
+{
+"id": 327,
+"it": "Spendi il gettone sulla prossima mossa"
+},
+{
+"id": 328,
+"it": "Muovi un pezzo"
+},
+{
+"id": 329,
+"it": "Espandi quattro opzioni"
+}
+]

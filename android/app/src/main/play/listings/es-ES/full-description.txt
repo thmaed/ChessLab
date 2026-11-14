@@ -1,0 +1,46 @@
+ChessLab es un compañero de ajedrez completo: jugar, analizar, entrenar y experimentar, con el motor Stockfish integrado y sin salir nunca de la aplicación. Nada se envía a ningún servidor: ni cuenta, ni publicidad.
+
+NOVEDADES DE LA 2.0
+• Sesión diaria: cada día, lo que hay que repasar (posiciones de apertura pendientes, puzles fallados, un final), con tu racha de días y medallas.
+• Análisis: tus errores se convierten en puzles y en Progreso se dibuja un perfil de debilidades.
+• El Coach: bajo un error, la proporción de jugadores de tu nivel que juegan esa jugada.
+• Una puntuación personal de puzles y «A mi nivel» para puzles a tu medida.
+• Aperturas: tarjetas ilustradas, filtros de Bando y Nivel, y las 19 «clásicas».
+• Límite de tiempo opcional: un interruptor, y la app recuerda tu última elección.
+
+ADVERSARIOS QUE JUEGAN COMO HUMANOS
+Nueve personajes interpretados por Maia-3, una red entrenada con millones de partidas humanas: no busca la mejor jugada, sino la que jugaría un humano de ese nivel, errores incluidos cuando el nivel es bajo. Cada uno tiene su estilo, su repertorio de aperturas, su temperamento y su retrato, y su nivel se ajusta en la escala humana. O enfréntate al propio Stockfish, del principiante al nivel máximo. Reloj opcional: bullet, blitz, rápida, clásica, con incremento.
+
+ANALIZAR DE VERDAD TUS PARTIDAS
+Cada jugada se puntúa (excelente, buena, imprecisión, error, error grave, oportunidad perdida) y cada jugador recibe su precisión sobre cien. La curva de la partida muestra de un vistazo dónde se torció.
+
+Y sobre todo, la app dice POR QUÉ una jugada fue mala, en una frase: «mate del pasillo», «horquilla sobre tu torre y tu caballo», «tu alfil quedaba sin defensa». No es una explicación inventada: el castigo del motor se reproduce en el tablero y solo se nombra lo que allí se ve.
+
+Y lo que fallaste se convierte en ejercicio: las posiciones en las que te equivocaste se guardan junto a los puzles para que las vuelvas a trabajar.
+
+Entrada por PGN, FEN, editor de posiciones o foto de un tablero. La posición mostrada se lleva con un botón a otro modo.
+
+APERTURAS
+58 aperturas escritas a mano, en cinco idiomas, todas revisadas con el motor. Avanza jugada a jugada: cada jugada se explica, se proponen las variantes y unas flechas de colores unen el tablero con la lista. Un entrenamiento por repetición espaciada las fija de verdad.
+
+EL RINCÓN DE LOS FINALES
+78 cursos demostrados con tablas de finales: el veredicto matemático exacto. Ninguna jugada que se enseña deja escapar la victoria, ninguna defensa propuesta pierde las tablas. De la oposición a los estudios famosos.
+
+PUZLES
+Más de 130 000 problemas tácticos de la base de Lichess, filtrables por nivel y por tema, más los tuyos, sacados de tus propios errores.
+
+VARIANTES
+Doce: Chess960 (ajedrez Fischer Random), Rey de la colina, Tres jaques, Horda, Carrera de reyes, Atómico, Crazyhouse, Antiajedrez, las Barricadas y su versión aleatoria, el Duck Chess y la Jugada Robada. Cada una se ajusta como una partida de verdad (bando, fuerza del motor, ritmo, ayudas) y luego se revisa con las reglas de la variante, no con las del ajedrez normal.
+
+DOS JUGADORES
+Dos personas en el mismo dispositivo; el tablero gira en cada jugada para que se lea bien cara a cara.
+
+LABORATORIO
+Enfrenta dos ajustes en una serie de partidas para comparar su fuerza.
+
+PRIVACIDAD
+Sin cuenta, sin servidor, sin publicidad, sin medición de audiencia. La aplicación ni siquiera tiene permiso para acceder a Internet: tus partidas y tus ajustes se quedan en tu teléfono. Para cambiar de dispositivo, basta un archivo que guardas y vuelves a abrir donde quieras.
+
+Francés, inglés, español, alemán e italiano, incluidos la interfaz y el contenido de los cursos. Vertical y horizontal.
+
+ChessLab integra el motor Stockfish (GPLv3), la red Maia-3 de la Universidad de Toronto (AGPLv3) y el juego de piezas cburnett (CC BY-SA 3.0). Los puzles proceden de la base de Lichess (CC0).
