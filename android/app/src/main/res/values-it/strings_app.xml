@@ -1221,7 +1221,7 @@
     <string name="discovery_wn_4_title">Tutto è nell\'aiuto</string>
     <string name="discovery_wn_4_body">Il «?» raccoglie il dettaglio delle novità, e puoi rivedere questo tour quando vuoi.</string>
     <string name="discovery_replay_news_title">Rivedi le novità</string>
-    <string name="discovery_replay_news_sub">Un breve percorso tra le novità della 2.0, dove vivono.</string>
+    <string name="discovery_replay_news_sub">Un breve percorso tra le novità, dove vivono.</string>
     <string name="help_news_title">Novità della 2.2</string>
     <string name="help_news_body">• Scanner: lettura più affidabile di screenshot, foto di schermo e scacchiere reali.\n• Condividi: da Foto, Condividi › ChessLab invia l\'immagine allo scanner.\n• Puzzle: le tue raccolte si importano in PGN, si lavorano in serie o con un programma Woodpecker e si esportano; un\'impostazione nasconde il tema del puzzle.\n• Laboratorio: serie in Chess960, una posizione estratta per ogni coppia di partite.\n• Motore: Stockfish 19; un indicatore di avanzamento segue l\'analisi in corso.\n• Mossa Rubata: correzione della presa en passant alla seconda mossa.</string>
     <string name="help_daily_title">Sessione del giorno</string>

@@ -213,7 +213,7 @@ struct HelpView: View {
         .accessibilityIdentifier("replayDiscoveryTour")
     }
 
-    /// Rejouer le court parcours des nouveautés de la 2.0.
+    /// Rejouer le court parcours des nouveautés de la dernière version.
     private var whatsNewReplayCard: some View {
         Button {
             NotificationCenter.default.post(name: .replayWhatsNewTour, object: nil)
@@ -224,7 +224,7 @@ struct HelpView: View {
                     Text("Revoir les nouveautés")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Theme.textPrimary)
-                    Text("Un court parcours des nouveautés de la 2.0, là où elles vivent.")
+                    Text("Un court parcours des nouveautés, là où elles vivent.")
                         .font(.caption)
                         .foregroundStyle(Theme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)

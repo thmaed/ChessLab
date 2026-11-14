@@ -125,7 +125,7 @@ class DiscoveryTourController(
         isActive = true
     }
 
-    /** Le parcours des nouveautés de la 2.0 — pour qui a déjà vu la visite. */
+    /** Le parcours des nouveautés de la version courante — pour qui a déjà vu la visite. */
     fun startWhatsNew() {
         kind = Kind.whatsNew
         steps = buildWhatsNewSteps()

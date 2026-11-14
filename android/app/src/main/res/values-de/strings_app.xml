@@ -1189,7 +1189,7 @@
     <string name="discovery_wn_4_title">Alles steht in der Hilfe</string>
     <string name="discovery_wn_4_body">Das „?“ bündelt die Einzelheiten der Neuheiten, und du kannst diese Tour jederzeit wiederholen.</string>
     <string name="discovery_replay_news_title">Neuheiten ansehen</string>
-    <string name="discovery_replay_news_sub">Ein kurzer Rundgang durch die Neuheiten der 2.0, dort, wo sie zu finden sind.</string>
+    <string name="discovery_replay_news_sub">Ein kurzer Rundgang durch die Neuheiten, dort, wo sie zu finden sind.</string>
     <string name="help_news_title">Neu in 2.2</string>
     <string name="help_news_body">• Scanner: zuverlässigeres Lesen von Screenshots, Bildschirmfotos und echten Brettern.\n• Teilen: Aus Fotos sendet Teilen › ChessLab das Bild an den Scanner.\n• Puzzles: Deine Sammlungen lassen sich per PGN importieren, in Serie oder im vollständigen Woodpecker-Programm üben und exportieren; eine Einstellung blendet das Puzzle-Thema aus.\n• Labor: Serien in Chess960, mit einer gezogenen Stellung für jedes Partienpaar.\n• Engine: Stockfish 19; ein Fortschrittsbalken begleitet die laufende Analyse.\n• Gestohlener Zug: Korrektur des en-passant-Schlags im zweiten Zug.</string>
     <string name="help_daily_title">Tagestraining</string>

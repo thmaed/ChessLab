@@ -1262,7 +1262,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="discovery_wn_4_title">It\'s all in the help</string>
     <string name="discovery_wn_4_body">The “?” gathers the details of what\'s new, and you can replay this tour whenever you like.</string>
     <string name="discovery_replay_news_title">Replay what\'s new</string>
-    <string name="discovery_replay_news_sub">A short tour of what\'s new in 2.0, where it lives.</string>
+    <string name="discovery_replay_news_sub">A short tour of what\'s new, where it lives.</string>
     <string name="help_news_title">What\'s new in 2.2</string>
     <string name="help_news_body">• Scanner: more reliable reading of screenshots, photos of a screen and real boards.\n• Share: from Photos, Share › ChessLab sends the image to the scanner.\n• Puzzles: your collections import from PGN, are worked in series or as a full Woodpecker programme, and export; a setting hides the puzzle theme.\n• Laboratory: Chess960 series, one position drawn for each pair of games.\n• Engine: Stockfish 19; a progress gauge follows the analysis in progress.\n• Stolen Move: en-passant fix on the second move.</string>
     <string name="help_daily_title">Daily session</string>

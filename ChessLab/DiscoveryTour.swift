@@ -167,7 +167,7 @@ final class DiscoveryTourController {
     private(set) var currentStepIndex = 0
 
     /// Deux parcours : la visite COMPLÈTE d'une nouvelle installation, et le
-    /// court parcours des NOUVEAUTÉS de la 2.0 pour qui met à jour depuis la 1.x.
+    /// court parcours des NOUVEAUTÉS de la version courante pour qui met à jour.
     enum Kind { case full, whatsNew }
 
     private(set) var kind: Kind = .full
@@ -184,7 +184,7 @@ final class DiscoveryTourController {
         isActive = true
     }
 
-    /// Le parcours des nouveautés de la 2.0 — pour qui a déjà vu la visite.
+    /// Le parcours des nouveautés de la version courante (`whatsNewID`) — pour qui a déjà vu la visite.
     func startWhatsNew() {
         kind = .whatsNew
         steps = Self.buildWhatsNewSteps()

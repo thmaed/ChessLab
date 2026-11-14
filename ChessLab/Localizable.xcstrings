@@ -50883,30 +50883,36 @@
         }
       }
     },
-    "Un court parcours des nouveautés de la 2.0, là où elles vivent.": {
+    "Un court parcours des nouveautés, là où elles vivent.": {
       "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un court parcours des nouveautés, là où elles vivent."
+          }
+        },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "A short tour of what's new in 2.0, where it lives."
+            "value": "A short tour of what's new, where it lives."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un breve recorrido por las novedades de la 2.0, allí donde viven."
+            "value": "Un breve recorrido por las novedades, allí donde viven."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ein kurzer Rundgang durch die Neuheiten der 2.0, dort, wo sie zu finden sind."
+            "value": "Ein kurzer Rundgang durch die Neuheiten, dort, wo sie zu finden sind."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Un breve percorso tra le novità della 2.0, dove vivono."
+            "value": "Un breve percorso tra le novità, dove vivono."
           }
         }
       }
