@@ -2142,3 +2142,10 @@ Fait des deux côtés : pastille « Automatique » par défaut, notation = langu
 - [ ] À vérifier SUR APPAREIL (Galaxy) : Réglages › Notation, tuile « Automatique » active par défaut ; choisir « Allemande »,
   quitter l'app, la rouvrir (choix gardé) ; revenir à « Automatique » après un changement de langue.
 - Forme : six tuiles en 3 × 2 sur Android, pastilles qui se replient (`FlowLayout`) sur iOS — écart de forme déjà assumé.
+
+## Ergonomie 2.3 (14/11/2026) — à vérifier SUR APPAREIL (Galaxy)
+- [ ] Barre de jeu : « ½ Nulle » en pastille (Jouer, variantes), rond « ½ » seul dans Deux joueurs.
+- [ ] Accueil en deux étages (4 grandes tuiles + « Plus ») : téléphone et tablette.
+- [ ] Réglages : vignettes des thèmes (2 par ligne, 4 sur tablette) et des jeux de pièces (3).
+- [ ] Analyser : un fichier de plusieurs parties part dans la bibliothèque, un fichier d'une partie s'ouvre en analyse.
+- [ ] Aide : bloc « Nouveautés 2.3 » en tête.
