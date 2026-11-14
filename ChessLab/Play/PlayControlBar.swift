@@ -82,7 +82,17 @@ struct PlayControlBar: View {
     /// Écart nominal entre deux boutons, **plafond** et non plancher.
     static let nominalGap: CGFloat = 10
 
+    /// La rangée avec « ½ Nulle » en toutes lettres quand la place le permet, sinon le rond « ½ » seul :
+    /// le symbole n'est pas aussi parlant que l'ampoule ou le drapeau, mais six boutons ronds remplissent
+    /// déjà un iPhone en Zoom d'affichage (voir `PlayControlBarLayoutTests`) — le mot ne s'impose donc jamais.
     var body: some View {
+        ViewThatFits(in: .horizontal) {
+            row(drawLabeled: true)
+            row(drawLabeled: false)
+        }
+    }
+
+    private func row(drawLabeled: Bool) -> some View {
         HStack(spacing: 0) {
             controlButton(
                 "chevron.left",
@@ -198,13 +208,17 @@ struct PlayControlBar: View {
             }
             if let onOfferDraw {
                 elasticGap
-                controlButton(
-                    text: "½",
-                    label: "Proposer nulle",
-                    tint: Theme.info,
-                    disabled: isFinished || isEngineThinking,
-                    action: onOfferDraw
-                )
+                if drawLabeled {
+                    labeledDrawButton(disabled: isFinished || isEngineThinking, action: onOfferDraw)
+                } else {
+                    controlButton(
+                        text: "½",
+                        label: "Proposer nulle",
+                        tint: Theme.info,
+                        disabled: isFinished || isEngineThinking,
+                        action: onOfferDraw
+                    )
+                }
             }
             elasticGap
             controlButton(
@@ -226,6 +240,25 @@ struct PlayControlBar: View {
     /// le rendu est celui d'avant ; quand elle manque, il cède avant l'écran.
     private var elasticGap: some View {
         Spacer(minLength: 0).frame(maxWidth: Self.nominalGap)
+    }
+
+    /// « ½ Nulle » : le rond « ½ » allongé en pastille, avec le mot à côté.
+    private func labeledDrawButton(disabled: Bool, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 5) {
+                Text("½").font(.system(size: 19, weight: .bold, design: .rounded))
+                Text("Nulle").font(.caption.weight(.semibold)).lineLimit(1).fixedSize()
+            }
+            .foregroundStyle(disabled ? Theme.textTertiary : Theme.info)
+            .padding(.horizontal, 13)
+            .frame(height: Self.buttonSide)
+            .background(Theme.surface, in: Capsule())
+            .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
+        }
+        .buttonStyle(.pressable)
+        .disabled(disabled)
+        .accessibilityLabel("Proposer nulle")
+        .accessibilityIdentifier("offer_draw_labeled")
     }
 
     private func controlButton(

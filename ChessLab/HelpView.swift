@@ -71,9 +71,17 @@ struct HelpView: View {
     ) as? String ?? ""
 
     private let modules: [Module] = [
+        // Le titre prend le numéro de version TOUT SEUL : le corps doit donc être celui de la version courante.
+        // (Build 23 : ce bloc annonçait « 2.3 » au-dessus des nouveautés de la 2.2.) À chaque version, écrire
+        // ici ses nouveautés et faire descendre les précédentes dans un bloc au titre FIGÉ, comme ci-dessous.
         .init(
             icon: "sparkles", tint: Theme.accent,
             title: "Nouveautés de la version \(Self.appVersion)",
+            body: "• Langues : l'app parle aussi espagnol, allemand et italien — interface, aide, cours d'ouvertures et de finales.\n• Notation des coups : « Automatique » suit la langue de l'app ; un autre choix reste mémorisé.\n• Accueil : quatre grandes tuiles, les autres modes sous « Plus ».\n• Analyser : un seul « Importer un fichier », qui reconnaît une partie, une position ou une base de parties.\n• Réglages : thèmes et jeux de pièces en vignettes."
+        ),
+        .init(
+            icon: "sparkles", tint: Theme.teal,
+            title: "Nouveautés 2.2",
             body: "• Scanner : lecture plus fiable des captures d'écran, des photos d'écran et des plateaux réels.\n• Partager : depuis Photos, Partager › ChessLab envoie l'image au scanner.\n• Puzzles : vos collections s'importent en PGN, se travaillent en série ou en programme Woodpecker et s'exportent ; un réglage masque le thème du puzzle.\n• Laboratoire : séries en Chess960, une position tirée pour chaque paire de parties.\n• Moteur : Stockfish 19 ; une jauge de progression suit l'analyse en cours.\n• Coup Volé : correction de la prise en passant au second coup."
         ),
         .init(

@@ -1431,20 +1431,24 @@ struct HomeView: View {
     /// `minTile` : largeur mini d'une tuile, qui décide du nombre de colonnes
     /// — voir ``ModeGridMetrics/minTileIPhone`` pour le choix de la valeur et
     /// ce qu'elle garantit sur un écran de 320 pt.
+    /// L'accueil en DEUX ÉTAGES (2.3) : quatre grandes tuiles pour ce qu'on vient faire le plus souvent —
+    /// jouer, les puzzles, les ouvertures, l'analyse — puis une rangée « Plus » de tuiles basses pour le reste.
+    /// Huit tuiles égales mettaient le Laboratoire (un outil d'expert) au rang des Puzzles.
+    ///
+    /// Deux colonnes PARTOUT : sur iPhone la grille adaptative en donnait déjà deux ; sur iPad, Mac et l'écran
+    /// intérieur du Duo (classe régulière, colonne bornée à 680 pt), trois colonnes auraient rangé quatre tuiles
+    /// en 3 + 1. Les deux étages gardent ainsi les mêmes colonnes, sur tous les appareils.
     private func modesSection(minTile: CGFloat, shortSubtitles: Bool = false) -> some View {
-        VStack(alignment: .leading, spacing: 14) {
+        let columns = horizontalSizeClass == .regular
+            ? Array(repeating: GridItem(.flexible(), spacing: ModeGridMetrics.spacing), count: 2)
+            : [GridItem(.adaptive(minimum: minTile), spacing: ModeGridMetrics.spacing)]
+        return VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Modes")
-            LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: minTile), spacing: ModeGridMetrics.spacing)],
-                spacing: ModeGridMetrics.spacing
-            ) {
+            LazyVGrid(columns: columns, spacing: ModeGridMetrics.spacing) {
                 ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Neuf personnages, ou Stockfish", shortSubtitle: "Personnages", systemImage: "cpu", tint: Theme.accent, isEnabled: true, accessibilityID: "mode_play", prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.newGame)
                 }
                 .discoveryAnchor(.playTile, priority: 1)
-                ModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", subtitle: "Sur le même appareil", shortSubtitle: "Même appareil", systemImage: "person.2.fill", tint: Theme.info, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
-                    path.append(Route.twoPlayerSetup)
-                }
                 ModeCard(title: "Puzzles", subtitle: "Tactique et problèmes", shortSubtitle: "Tactique et problèmes", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.puzzleQueue)
                 }
@@ -1452,19 +1456,26 @@ struct HomeView: View {
                 ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings", prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.openingList)
                 }
-                ModeCard(title: "Finales", subtitle: "Lucena, Philidor, opposition — prouvées", shortSubtitle: "Fins gagnantes", systemImage: "crown.fill", tint: Theme.gold, isEnabled: true, accessibilityID: "mode_endgames", prefersShortSubtitle: shortSubtitles) {
-                    path.append(Route.endgameList)
-                }
                 ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", shortSubtitle: "PGN, FEN", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
                     path.append(Route.analysisEntry)
                 }
-                ModeCard(title: "Laboratoire", subtitle: "L'ordinateur contre lui-même", shortSubtitle: "Face à lui-même", systemImage: "flask", tint: Theme.rose, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
-                    path.append(Route.labSetup(startFEN: nil))
+            }
+            sectionHeader("Plus")
+                .padding(.top, 6)
+            LazyVGrid(columns: columns, spacing: ModeGridMetrics.spacing) {
+                CompactModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", systemImage: "person.2.fill", tint: Theme.info) {
+                    path.append(Route.twoPlayerSetup)
                 }
-                ModeCard(title: "Variantes", subtitle: "Chess960 et autres façons de jouer", shortSubtitle: "Chess960 et plus", systemImage: "die.face.5.fill", tint: Theme.violet, isEnabled: true, accessibilityID: "mode_variants", prefersShortSubtitle: shortSubtitles) {
+                CompactModeCard(title: "Finales", systemImage: "crown.fill", tint: Theme.gold, accessibilityID: "mode_endgames") {
+                    path.append(Route.endgameList)
+                }
+                CompactModeCard(title: "Variantes", systemImage: "die.face.5.fill", tint: Theme.violet, accessibilityID: "mode_variants") {
                     path.append(Route.variantsHub)
                 }
                 .discoveryAnchor(.variantsTile, priority: 1)
+                CompactModeCard(title: "Laboratoire", systemImage: "flask", tint: Theme.rose) {
+                    path.append(Route.labSetup(startFEN: nil))
+                }
             }
         }
     }
@@ -2563,6 +2574,49 @@ enum ModeGridMetrics {
     /// Vrai si `count` colonnes de `tile` points tiennent sur cet écran.
     static func fits(columns count: Int, tile: CGFloat, screen: CGFloat) -> Bool {
         CGFloat(count) * tile + CGFloat(count - 1) * spacing <= usableWidth(screen: screen)
+    }
+}
+
+/// Tuile BASSE de l'étage « Plus » de l'accueil : icône et titre sur une ligne, sans sous-titre. Même teinte,
+/// même identifiant d'accessibilité que la grande tuile qu'elle remplace.
+struct CompactModeCard: View {
+    let title: LocalizedStringKey
+    var shortTitle: LocalizedStringKey? = nil
+    let systemImage: String
+    var tint: Color = Theme.accent
+    var accessibilityID: String? = nil
+    let action: () -> Void
+
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    private var isRegular: Bool { horizontalSizeClass == .regular }
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 10) {
+                IconBadge(systemImage: systemImage, tint: tint, size: isRegular ? 38 : 32)
+                Text(isRegular ? title : (shortTitle ?? title))
+                    .font(isRegular ? .headline : .subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                Spacer(minLength: 0)
+            }
+            .padding(.horizontal, isRegular ? 16 : 12)
+            .frame(maxWidth: .infinity, minHeight: isRegular ? 64 : 56, alignment: .leading)
+            .background {
+                ZStack {
+                    Theme.cardGradient
+                    LinearGradient(colors: [tint.opacity(0.24), tint.opacity(0.04)],
+                                   startPoint: .leading, endPoint: .trailing)
+                }
+                .accessibilityHidden(true)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(Theme.stroke, lineWidth: 1))
+            .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+        .buttonStyle(.pressable)
+        .accessibilityIdentifier(accessibilityID ?? "")
     }
 }
 

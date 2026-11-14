@@ -571,7 +571,7 @@ private fun ControlBar(
                 tag = "coups-joues", onClick = onMoves)
         }
         Spacer(Modifier.width(10.dp))
-        ControlButton(text = "½", label = stringResource(R.string.play_offer_draw),
+        ControlButton(text = "½", caption = stringResource(R.string.two_draw_button), label = stringResource(R.string.play_offer_draw),
             tint = Palette.info, enabled = !ui.gameOver && !ui.thinking, tag = "nulle", onClick = onDraw)
         Spacer(Modifier.width(10.dp))
         ControlButton(Icons.Default.Flag, stringResource(R.string.play_resign),

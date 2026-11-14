@@ -85,7 +85,22 @@ fun AnalysisEntryScreen(
                     context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
                 }.getOrNull()
             }
-            if (text.isNullOrBlank()) message = unreadable else onPaste(text)
+            when {
+                text.isNullOrBlank() -> message = unreadable
+                // UNE entrée (2.3, comme iOS) : une partie ou une position s'ouvre en analyse ; un fichier
+                // de PLUSIEURS parties est une base, il part dans la bibliothèque et on dit combien.
+                PgnSanitizer.splitIntoGames(PgnSanitizer.sanitize(text)).size > 1 -> {
+                    val outcome = withContext(Dispatchers.IO) {
+                        importPgnText(text, LibraryDatabase.get(context).games())
+                    }
+                    val res = context.resources
+                    message = if (outcome == null) unreadable else listOfNotNull(
+                        outcome.added.takeIf { it > 0 }?.let { res.getQuantityString(R.plurals.library_imported, it, it) },
+                        outcome.duplicates.takeIf { it > 0 }?.let { res.getQuantityString(R.plurals.library_duplicates, it, it) },
+                    ).joinToString(" ").ifBlank { unreadable }
+                }
+                else -> onPaste(text)
+            }
         }
     }
 

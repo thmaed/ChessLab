@@ -126,7 +126,6 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
         // orpheline, et laissait les deux tiers du bas vides. iOS borne de la
         // même façon (`Theme.readableWidth`).
         val largeur = minOf(maxWidth, Metrics.readableWidth)
-        val columns = tileColumns(largeur, padding = 20.dp, spacing = 14.dp)
         Column(
             Modifier
                 .fillMaxSize()
@@ -190,10 +189,19 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                 }
             }
             SectionHeader(stringResource(R.string.home_modes), Modifier.padding(top = 8.dp))
-            modes.chunked(columns).forEach { row ->
+            // L'accueil en DEUX ÉTAGES (2.3, comme iOS) : quatre grandes tuiles — jouer, puzzles, ouvertures,
+            // analyser — puis « Plus », des tuiles basses pour le reste. Deux colonnes partout : quatre tuiles
+            // sur trois colonnes se rangeaient en 3 + 1.
+            val (primary, secondary) = modes.partition { it.tag in PRIMARY_MODE_TAGS }
+            primary.chunked(2).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     row.forEach { mode -> Box(Modifier.weight(1f)) { ModeCard(mode, onOpen) } }
-                    repeat(columns - row.size) { Spacer(Modifier.weight(1f)) }
+                }
+            }
+            SectionHeader(stringResource(R.string.home_more), Modifier.padding(top = 6.dp))
+            secondary.chunked(2).forEach { row ->
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    row.forEach { mode -> Box(Modifier.weight(1f)) { CompactModeCard(mode, onOpen) } }
                 }
             }
             if (recent.isNotEmpty()) RecentGames(recent, onOpen)
@@ -361,6 +369,36 @@ private fun recentGameTitle(game: GameRecord): String {
     val white = PlayerName.display(context, game.white, PlayerName.white(context))
     val black = PlayerName.display(context, game.black, PlayerName.black(context))
     return "$white – $black"
+}
+
+/** Les quatre modes du premier étage de l'accueil ; les autres vont sous « Plus ». */
+private val PRIMARY_MODE_TAGS = setOf("play", "puzzles", "openings", "analysis")
+
+/** Tuile BASSE de l'étage « Plus » : icône et titre sur une ligne. Pendant de `CompactModeCard` (iOS). */
+@Composable
+private fun CompactModeCard(mode: Mode, onOpen: (Route) -> Unit) {
+    Row(
+        Modifier
+            .testTag("mode-${mode.tag}")
+            .then(if (mode.spot != null) Modifier.discoveryAnchor(mode.spot) else Modifier)
+            .fillMaxWidth()
+            .height(56.dp)
+            .clip(CardShape)
+            .background(cardGradient)
+            .background(Brush.horizontalGradient(listOf(mode.tint.copy(alpha = 0.24f), mode.tint.copy(alpha = 0.04f))))
+            .tintedCardBorder(mode.tint, mode.enabled)
+            .clickable(enabled = mode.enabled) { onOpen(mode.route) }
+            .padding(horizontal = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        IconBadge(mode.icon, mode.tint, size = 32.dp, enabled = mode.enabled)
+        Spacer(Modifier.width(10.dp))
+        Text(
+            stringResource(mode.shortTitle),
+            fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+            maxLines = 1, overflow = TextOverflow.Ellipsis,
+        )
+    }
 }
 
 @Composable

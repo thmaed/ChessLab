@@ -113,18 +113,21 @@ struct SettingsView: View {
     private var boardThemeSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Thème du plateau")
-            VStack(spacing: 8) {
-                ForEach(Array(BoardTheme.all.enumerated()), id: \.element.id) { index, theme in
+            // Des VIGNETTES côte à côte (2.3) au lieu d'une liste : quatre lignes pleine largeur repoussaient
+            // la notation et la synchronisation loin sous le pli. La grille adaptative donne 2 colonnes sur
+            // iPhone, toutes les vignettes sur une rangée sur iPad, Mac et l'écran intérieur du Duo.
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 128), spacing: 10)], spacing: 10) {
+                ForEach(BoardTheme.all, id: \.id) { theme in
                     Button { settings.boardThemeID = theme.id } label: {
-                        selectableRow(
-                            preview: piecePreview(theme: theme, setPrefix: settings.pieceSet.assetPrefix),
+                        selectableTile(
+                            preview: piecePreview(theme: theme, setPrefix: settings.pieceSet.assetPrefix,
+                                                  samples: ["wK", "bQ", "wN", "bK"]),
                             label: theme.label,
                             isSelected: settings.boardThemeID == theme.id
                         )
                     }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("boardTheme_\(theme.id)")
-                    if index != BoardTheme.all.count - 1 { Divider().overlay(Theme.stroke) }
                 }
             }
             .cardStyle()
@@ -137,49 +140,57 @@ struct SettingsView: View {
     private var pieceSetSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Jeu de pièces")
-            VStack(spacing: 8) {
-                ForEach(Array(PieceSet.all.enumerated()), id: \.element.id) { index, set in
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 92), spacing: 10)], spacing: 10) {
+                ForEach(PieceSet.all, id: \.id) { set in
                     Button { settings.pieceSetID = set.id } label: {
-                        selectableRow(
-                            preview: piecePreview(theme: settings.boardTheme, setPrefix: set.assetPrefix),
+                        selectableTile(
+                            preview: piecePreview(theme: settings.boardTheme, setPrefix: set.assetPrefix,
+                                                  samples: ["wK", "bQ", "wN"]),
                             label: set.label,
                             isSelected: settings.pieceSetID == set.id
                         )
                     }
                     .buttonStyle(.plain)
                     .accessibilityIdentifier("pieceSet_\(set.id)")
-                    if index != PieceSet.all.count - 1 { Divider().overlay(Theme.stroke) }
                 }
             }
             .cardStyle()
         }
     }
 
-    /// Ligne commune aux deux sélecteurs : aperçu à gauche, libellé, coche.
-    private func selectableRow(preview: some View, label: String, isSelected: Bool) -> some View {
-        HStack(spacing: 14) {
+    /// Vignette commune aux deux sélecteurs : aperçu, libellé dessous, contour et coche quand elle est choisie.
+    private func selectableTile(preview: some View, label: String, isSelected: Bool) -> some View {
+        VStack(spacing: 6) {
             preview
-            Text(LocalizedStringKey(label))
-                .font(.body.weight(.medium))
-                .foregroundStyle(Theme.textPrimary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-            Spacer()
-            if isSelected {
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(Theme.accent)
+            HStack(spacing: 4) {
+                if isSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.caption)
+                        .foregroundStyle(Theme.accent)
+                }
+                Text(LocalizedStringKey(label))
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(isSelected ? Theme.textPrimary : Theme.textSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
         }
-        .padding(.vertical, 6)
-        .contentShape(Rectangle())
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 6)
+        .background(isSelected ? Theme.accent.opacity(0.12) : Color.clear,
+                    in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+            .strokeBorder(isSelected ? Theme.accent.opacity(0.6) : Theme.stroke, lineWidth: 1))
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     /// Bandeau d'aperçu : quelques pièces réelles (`<prefix>_wK`…) posées sur
     /// des cases alternées aux couleurs du thème. Charge directement les assets
     /// (pas de `Piece` à construire) et sert plateau ET jeu de pièces.
-    private func piecePreview(theme: BoardTheme, setPrefix: String) -> some View {
-        let samples = ["wK", "wQ", "wN", "bK", "bQ", "bN"]
-        return HStack(spacing: 0) {
+    private func piecePreview(theme: BoardTheme, setPrefix: String, samples: [String]) -> some View {
+        HStack(spacing: 0) {
             ForEach(Array(samples.enumerated()), id: \.offset) { i, name in
                 ZStack {
                     Rectangle().fill(i.isMultiple(of: 2) ? theme.lightSquare : theme.darkSquare)

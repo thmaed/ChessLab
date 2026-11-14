@@ -135,25 +135,37 @@ fun SettingsScreen(
         // échiquier d'aperçu à part : deux endroits pour une seule question,
         // et aucun des deux ne disait à quoi ressemble une pièce sur ce thème.
         SettingsSection(stringResource(R.string.settings_board_theme), Icons.Default.Palette) {
-            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                BoardTheme.all.forEach { theme ->
-                    ThemeRow(theme, settings.pieceSetId, theme.id == settings.boardThemeId) {
-                        SettingsStore.setBoardTheme(context, theme.id)
+            // Des VIGNETTES côte à côte (2.3, comme iOS) au lieu d'une liste : deux par ligne sur un téléphone,
+            // toutes sur une rangée dès qu'il y a la place (tablette, écran déplié).
+            val parLigne = if (androidx.compose.ui.platform.LocalConfiguration.current.screenWidthDp >= 600) 4 else 2
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                BoardTheme.all.chunked(parLigne).forEach { ligne ->
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ligne.forEach { theme ->
+                            PreviewTile(
+                                theme, settings.pieceSetId, 4, stringResource(theme.labelRes),
+                                theme.id == settings.boardThemeId, "theme-${theme.id}", Modifier.weight(1f),
+                            ) { SettingsStore.setBoardTheme(context, theme.id) }
+                        }
+                        repeat(parLigne - ligne.size) { Spacer(Modifier.weight(1f)) }
                     }
                 }
             }
         }
 
                 SettingsSection(stringResource(R.string.settings_piece_set), Icons.Default.Category) {
-        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        // Trois vignettes sur une rangée, chacune avec SES pièces posées sur le thème courant.
+        val themeCourant = BoardTheme.all.firstOrNull { it.id == settings.boardThemeId } ?: BoardTheme.all.first()
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             listOf(
                 "classic" to R.string.pieces_classic,
                 "chessnut" to R.string.pieces_modern,
                 "merida" to R.string.pieces_bold,
             ).forEach { (id, label) ->
-                Choice(stringResource(label), id == settings.pieceSetId, "piece-$id") {
-                    SettingsStore.setPieceSet(context, id)
-                }
+                PreviewTile(
+                    themeCourant, id, 3, stringResource(label),
+                    id == settings.pieceSetId, "piece-$id", Modifier.weight(1f),
+                ) { SettingsStore.setPieceSet(context, id) }
             }
         }
 
@@ -403,25 +415,32 @@ private fun Section(title: String) {
     )
 }
 
+/**
+ * Une vignette de choix : quelques pièces RÉELLES sur les cases du thème, le libellé dessous, un contour et une
+ * coche quand elle est choisie. Sert au thème du plateau et au jeu de pièces. Pendant de `selectableTile` (iOS).
+ */
 @Composable
-private fun ThemeRow(
+private fun PreviewTile(
     theme: BoardTheme,
     pieceSetId: String,
+    /** Combien de cases dans l'aperçu : 4 pour un thème, 3 pour un jeu de pièces (vignettes plus étroites). */
+    cases: Int,
+    label: String,
     selected: Boolean,
+    tag: String,
+    modifier: Modifier = Modifier,
     onPick: () -> Unit,
 ) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .testTag("theme-${theme.id}")
-            .clip(RoundedCornerShape(8.dp))
+    Column(
+        modifier
+            .testTag(tag)
+            .clip(RoundedCornerShape(12.dp))
             .background(if (selected) Palette.accent.copy(alpha = 0.12f) else Palette.surface)
-            .clickable(onClick = onPick)
-            .padding(horizontal = 10.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+            .border(1.dp, if (selected) Palette.accent.copy(alpha = 0.6f) else Palette.stroke, RoundedCornerShape(12.dp))
+            .selectable(selected = selected, role = androidx.compose.ui.semantics.Role.RadioButton, onClick = onPick)
+            .padding(horizontal = 6.dp, vertical = 10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // Six cases, six pièces : un roi, une dame et un cavalier de chaque
-        // camp. C'est l'échantillon d'iOS, et il suffit à juger un thème.
         Row(
             Modifier
                 .clip(RoundedCornerShape(7.dp))
@@ -429,24 +448,20 @@ private fun ThemeRow(
         ) {
             val exemples = listOf(
                 Piece.Color.white to Piece.Kind.king,
-                Piece.Color.white to Piece.Kind.queen,
+                Piece.Color.black to Piece.Kind.queen,
                 Piece.Color.white to Piece.Kind.knight,
                 Piece.Color.black to Piece.Kind.king,
-                Piece.Color.black to Piece.Kind.queen,
-                Piece.Color.black to Piece.Kind.knight,
-            )
+            ).take(cases)
             exemples.forEachIndexed { index, (couleur, genre) ->
                 Box(
                     Modifier
-                        .size(30.dp)
+                        .size(28.dp)
                         .background(if (index % 2 == 0) theme.lightSquare else theme.darkSquare),
                     contentAlignment = Alignment.Center,
                 ) {
                     Image(
                         painterResource(
-                            com.chesslab.ui.drawableFor(
-                                Piece(genre, couleur, chesskit.Square.e1), pieceSetId,
-                            )
+                            com.chesslab.ui.drawableFor(Piece(genre, couleur, chesskit.Square.e1), pieceSetId)
                         ),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize().padding(3.dp),
@@ -454,17 +469,17 @@ private fun ThemeRow(
                 }
             }
         }
-        Spacer(Modifier.width(12.dp))
-        Text(
-            stringResource(theme.labelRes), fontSize = 13.sp,
-            color = if (selected) Palette.accent else Palette.textPrimary,
-            fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
-            modifier = Modifier.weight(1f),
-        )
-        if (selected) {
-            Icon(
-                Icons.Default.CheckCircle, null,
-                tint = Palette.accent, modifier = Modifier.size(18.dp),
+        Spacer(Modifier.height(6.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            if (selected) {
+                Icon(Icons.Default.CheckCircle, null, tint = Palette.accent, modifier = Modifier.size(13.dp))
+                Spacer(Modifier.width(4.dp))
+            }
+            Text(
+                label, fontSize = 12.sp, maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                color = if (selected) Palette.textPrimary else Palette.textSecondary,
+                fontWeight = FontWeight.Medium,
             )
         }
     }

@@ -464,6 +464,7 @@
     <string name="colour_white_adj">weiß</string>
     <string name="colour_black_adj">schwarz</string>
     <string name="home_modes">Modi</string>
+    <string name="home_more">Mehr</string>
     <string name="home_play_short">Computer</string>
     <string name="home_two_short">2 Spieler</string>
     <string name="opponent_nickname_quoted">„%1$s“</string>
@@ -1190,6 +1191,8 @@
     <string name="discovery_wn_4_body">Das „?“ bündelt die Einzelheiten der Neuheiten, und du kannst diese Tour jederzeit wiederholen.</string>
     <string name="discovery_replay_news_title">Neuheiten ansehen</string>
     <string name="discovery_replay_news_sub">Ein kurzer Rundgang durch die Neuheiten, dort, wo sie zu finden sind.</string>
+    <string name="help_news23_title">Neu in 2.3</string>
+    <string name="help_news23_body">• Sprachen: Die App spricht jetzt auch Spanisch, Deutsch und Italienisch – Oberfläche, Hilfe, Eröffnungs- und Endspielkurse.\n• Zugnotation: „Automatisch“ folgt der Sprache der App; eine andere Wahl bleibt gespeichert.\n• Start: vier große Kacheln, die übrigen Modi unter „Mehr“.\n• Analysieren: ein einziges „Datei importieren“, das eine Partie, eine Stellung oder eine Partiendatenbank erkennt.\n• Einstellungen: Brettdesigns und Figurensätze als Vorschaubilder.</string>
     <string name="help_news_title">Neu in 2.2</string>
     <string name="help_news_body">• Scanner: zuverlässigeres Lesen von Screenshots, Bildschirmfotos und echten Brettern.\n• Teilen: Aus Fotos sendet Teilen › ChessLab das Bild an den Scanner.\n• Puzzles: Deine Sammlungen lassen sich per PGN importieren, in Serie oder im vollständigen Woodpecker-Programm üben und exportieren; eine Einstellung blendet das Puzzle-Thema aus.\n• Labor: Serien in Chess960, mit einer gezogenen Stellung für jedes Partienpaar.\n• Engine: Stockfish 19; ein Fortschrittsbalken begleitet die laufende Analyse.\n• Gestohlener Zug: Korrektur des en-passant-Schlags im zweiten Zug.</string>
     <string name="help_daily_title">Tagestraining</string>

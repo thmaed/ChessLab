@@ -517,6 +517,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="colour_white_adj">blanc</string>
     <string name="colour_black_adj">noir</string>
     <string name="home_modes">Modes</string>
+    <string name="home_more">Plus</string>
     <string name="home_play_short">Ordinateur</string>
     <string name="home_two_short">2 joueurs</string>
     <string name="opponent_nickname_quoted">« %1$s »</string>
@@ -1260,6 +1261,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="discovery_wn_4_body">Le « ? » rassemble le détail des nouveautés, et vous pouvez rejouer cette visite quand vous voulez.</string>
     <string name="discovery_replay_news_title">Revoir les nouveautés</string>
     <string name="discovery_replay_news_sub">Un court parcours des nouveautés, là où elles vivent.</string>
+    <string name="help_news23_title">Nouveautés 2.3</string>
+    <string name="help_news23_body">• Langues : l\'app parle aussi espagnol, allemand et italien — interface, aide, cours d\'ouvertures et de finales.\n• Notation des coups : « Automatique » suit la langue de l\'app ; un autre choix reste mémorisé.\n• Accueil : quatre grandes tuiles, les autres modes sous « Plus ».\n• Analyser : un seul « Importer un fichier », qui reconnaît une partie, une position ou une base de parties.\n• Réglages : thèmes et jeux de pièces en vignettes.</string>
     <string name="help_news_title">Nouveautés de la 2.2</string>
     <string name="help_news_body">• Scanner : lecture plus fiable des captures d\'écran, des photos d\'écran et des plateaux réels.\n• Partager : depuis Photos, Partager › ChessLab envoie l\'image au scanner.\n• Puzzles : vos collections s\'importent en PGN, se travaillent en série ou en programme Woodpecker et s\'exportent ; un réglage masque le thème du puzzle.\n• Laboratoire : séries en Chess960, une position tirée pour chaque paire de parties.\n• Moteur : Stockfish 19 ; une jauge de progression suit l\'analyse en cours.\n• Coup Volé : correction de la prise en passant au second coup.</string>
     <string name="help_daily_title">Séance du jour</string>

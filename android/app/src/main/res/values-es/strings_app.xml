@@ -477,6 +477,7 @@
     <string name="colour_white_adj">blanco</string>
     <string name="colour_black_adj">negro</string>
     <string name="home_modes">Modos</string>
+    <string name="home_more">Más</string>
     <string name="home_play_short">Ordenador</string>
     <string name="home_two_short">2 jugadores</string>
     <string name="opponent_nickname_quoted">«%1$s»</string>
@@ -1222,6 +1223,8 @@
     <string name="discovery_wn_4_body">El «?» reúne el detalle de las novedades, y puedes repetir esta visita cuando quieras.</string>
     <string name="discovery_replay_news_title">Repasar las novedades</string>
     <string name="discovery_replay_news_sub">Un breve recorrido por las novedades, allí donde viven.</string>
+    <string name="help_news23_title">Novedades 2.3</string>
+    <string name="help_news23_body">• Idiomas: la app también habla español, alemán e italiano: interfaz, ayuda, cursos de aperturas y de finales.\n• Notación de las jugadas: «Automático» sigue el idioma de la app; cualquier otra elección se recuerda.\n• Inicio: cuatro tarjetas grandes; los demás modos, en «Más».\n• Analizar: un único «Importar un archivo», que reconoce una partida, una posición o una base de partidas.\n• Ajustes: temas y juegos de piezas en miniaturas.</string>
     <string name="help_news_title">Novedades de la 2.2</string>
     <string name="help_news_body">• Escáner: lectura más fiable de capturas de pantalla, fotos de pantalla y tableros reales.\n• Compartir: desde Fotos, Compartir › ChessLab envía la imagen al escáner.\n• Puzles: tus colecciones se importan desde PGN, se trabajan en serie o en programa Woodpecker completo y se exportan; un ajuste oculta el tema del puzle.\n• Laboratorio: series en Chess960, con una posición sorteada para cada pareja de partidas.\n• Motor: Stockfish 19; un indicador de progreso sigue el análisis en curso.\n• Jugada Robada: corrección de la captura al paso en la segunda jugada.</string>
     <string name="help_daily_title">Sesión diaria</string>

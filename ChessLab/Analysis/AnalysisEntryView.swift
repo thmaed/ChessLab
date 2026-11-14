@@ -25,19 +25,8 @@ struct AnalysisEntryView: View {
     /// qu'on coche, jamais une conséquence surprise.
     @State private var alsoImportToLibrary = false
 
-    /// 🐛 Bug corrigé : il y avait DEUX `.fileImporter` sur cette vue, chacun
-    /// avec son booléen. SwiftUI n'en présente qu'un — celui déclaré en
-    /// dernier — et « Importer un fichier » ne s'ouvrait donc jamais. Un seul
-    /// importeur, dont le MODE dit quoi faire du résultat.
-    private enum FileImportMode { case analyse, library }
-    /// 🐛 Bug corrigé : le mode vivait dans l'`Optional` qui pilotait aussi la
-    /// présentation. À la fermeture du sélecteur, SwiftUI remet `isPresented`
-    /// à `false`, ce qui EFFAÇAIT le mode — et le gestionnaire, appelé
-    /// ensuite, lisait `nil` et retombait sur l'import simple. Un fichier
-    /// destiné à la bibliothèque partait donc dans l'analyse, sans rien
-    /// importer et sans rien dire. Deux états distincts : la présentation, et
-    /// le mode, que la fermeture ne touche pas.
-    @State private var fileImportMode: FileImportMode = .analyse
+    /// UN seul `.fileImporter` (SwiftUI n'en présente qu'un par vue) et, depuis la 2.3, une seule entrée :
+    /// c'est le CONTENU du fichier qui dit quoi en faire — voir `handleFileImport`.
     @State private var showFileImporter = false
     @State private var importError: String?
     /// Dépliées par défaut (28/10/2026) : repliées, elles cachaient l'Éditeur de
@@ -56,7 +45,7 @@ struct AnalysisEntryView: View {
             VStack(spacing: 14) {
                 // Les trois chemins courts d'abord : scanner une position sous
                 // les yeux, rouvrir une partie rangée, reprendre la dernière.
-                // Les quatre autres demandent de FOURNIR un texte ou de
+                // Les trois autres demandent de FOURNIR un texte ou de
                 // composer une position ; ils suivent, dépliés par défaut.
                 // C6 : la dernière partie d'abord, avec ses deux gestes — ce
                 // qu'on vient faire ici, le plus souvent.
@@ -90,13 +79,12 @@ struct AnalysisEntryView: View {
                         importText = ""
                         showTextSheet = true
                     }
-                    entryCard(title: "Importer un fichier", subtitle: "Fichier .pgn ou .fen", systemImage: "doc.badge.plus", tint: Theme.teal) {
+                    // UNE entrée (2.3) au lieu de deux : « Importer un fichier » et « Importer des parties » se
+                    // ressemblaient trop, et obligeaient à savoir d'avance ce que contenait le fichier. Le contenu
+                    // décide : une partie ou une position s'ouvre en analyse, plusieurs parties (ou plusieurs
+                    // fichiers) vont dans la bibliothèque — voir `handleFileImport`.
+                    entryCard(title: "Importer un fichier", subtitle: "Une partie, une position ou une base de parties — reconnu tout seul", systemImage: "doc.badge.plus", tint: Theme.teal) {
                         importError = nil
-                        fileImportMode = .analyse
-                        showFileImporter = true
-                    }
-                    entryCard(title: "Importer des parties", subtitle: "Base .pgn (plusieurs parties) → bibliothèque", systemImage: "square.and.arrow.down.on.square", tint: Theme.warning) {
-                        fileImportMode = .library
                         showFileImporter = true
                     }
                     entryCard(
@@ -151,12 +139,9 @@ struct AnalysisEntryView: View {
                 UTType(filenameExtension: "fen") ?? .plainText,
                 .plainText,
             ],
-            allowsMultipleSelection: fileImportMode == .library
+            allowsMultipleSelection: true
         ) { result in
-            switch fileImportMode {
-            case .library: handleLibraryImport(result)
-            case .analyse: handleFileImport(result)
-            }
+            handleFileImport(result)
         }
         .alert("Import terminé", isPresented: Binding(
             get: { libraryImportSummary != nil },
@@ -201,7 +186,7 @@ struct AnalysisEntryView: View {
                     // Le filet est élastique, pas le titre : sans cela il se
                     // coupait en deux lignes pour laisser de la place au trait.
                     .fixedSize(horizontal: true, vertical: false)
-                Text("4")
+                Text("3")
                     .fixedSize()
                     .font(.caption2.weight(.bold).monospacedDigit())
                     .foregroundStyle(Theme.textTertiary)
@@ -224,7 +209,7 @@ struct AnalysisEntryView: View {
         .buttonStyle(.plain)
         .accessibilityIdentifier("analysisOtherSources")
         .accessibilityLabel(Text("Autres sources"))
-        .accessibilityHint(Text(showOtherSources ? "Replier" : "Déplier quatre options"))
+        .accessibilityHint(Text(showOtherSources ? "Replier" : "Déplier trois options"))
         .accessibilityAddTraits(.isButton)
     }
 
@@ -420,6 +405,9 @@ struct AnalysisEntryView: View {
         return first.contains("/")
     }
 
+    /// Le fichier choisi décide de sa destination : UN fichier d'une seule partie (ou d'une position FEN)
+    /// s'ouvre en analyse ; plusieurs fichiers, ou un fichier de plusieurs parties, sont une BASE — elle part
+    /// dans la bibliothèque, et un compte rendu dit ce qui a été rangé.
     private func handleFileImport(_ result: Result<[URL], Error>) {
         // L'échec était avalé en silence : l'écran ne bougeait pas et rien
         // n'expliquait pourquoi.
@@ -428,16 +416,31 @@ struct AnalysisEntryView: View {
             return
         }
         guard case let .success(urls) = result, let url = urls.first else { return }
-        let accessed = url.startAccessingSecurityScopedResource()
-        defer { if accessed { url.stopAccessingSecurityScopedResource() } }
-
-        guard let data = try? Data(contentsOf: url), let text = String(data: data, encoding: .utf8) else {
-            importError = "Impossible de lire ce fichier."
-            return
+        if urls.count == 1 {
+            let accessed = url.startAccessingSecurityScopedResource()
+            defer { if accessed { url.stopAccessingSecurityScopedResource() } }
+            guard let data = try? Data(contentsOf: url), let text = String(data: data, encoding: .utf8) else {
+                importError = "Impossible de lire ce fichier."
+                return
+            }
+            if Self.gameCount(inPGN: text) <= 1 {
+                // Même détection que la saisie : un fichier contenant une FEN
+                // s'analyse aussi bien qu'un .pgn.
+                validate(text: text)
+                return
+            }
         }
-        // Même détection que la saisie : un fichier contenant une FEN
-        // s'analyse aussi bien qu'un .pgn.
-        validate(text: text)
+        handleLibraryImport(result)
+    }
+
+    /// Combien de parties dans ce texte PGN : une par balise `[Event …]` en début de ligne (à défaut, par
+    /// balise `[White …]`). Un PGN sans en-tête — une simple suite de coups — et une FEN comptent pour une.
+    static func gameCount(inPGN text: String) -> Int {
+        func count(_ tag: String) -> Int {
+            text.split(whereSeparator: \.isNewline)
+                .filter { $0.drop(while: { $0 == " " || $0 == "\t" }).hasPrefix("[\(tag) ") }.count
+        }
+        return max(1, count("Event") > 0 ? count("Event") : count("White"))
     }
 
     /// Importe UNE OU PLUSIEURS bases .pgn d'un coup dans la bibliothèque

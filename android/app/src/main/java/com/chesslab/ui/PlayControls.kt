@@ -50,6 +50,11 @@ fun ControlButton(
     icon: ImageVector? = null,
     label: String,
     text: String? = null,
+    /**
+     * Un MOT à côté du glyphe : le bouton s'allonge en pastille. Sert au « ½ » de la nulle, moins parlant
+     * que l'ampoule ou le drapeau (pendant de `labeledDrawButton` côté iOS).
+     */
+    caption: String? = null,
     tint: Color = Palette.textPrimary,
     /** Le fond : c'est lui qui dit qu'un bouton à BASCULE est allumé. */
     background: Color = Palette.surfaceElevated,
@@ -57,6 +62,26 @@ fun ControlButton(
     tag: String,
     onClick: () -> Unit,
 ) {
+    val colour = if (enabled) tint else Palette.textTertiary
+    if (text != null && caption != null) {
+        androidx.compose.foundation.layout.Row(
+            Modifier
+                .height(46.dp)
+                .clip(CircleShape)
+                .background(background)
+                .border(1.dp, Palette.stroke, CircleShape)
+                .clickable(enabled = enabled, onClick = onClick)
+                .semantics { contentDescription = label }
+                .testTag(tag)
+                .padding(horizontal = 13.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(5.dp),
+        ) {
+            Text(text, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = colour)
+            Text(caption, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = colour, maxLines = 1)
+        }
+        return
+    }
     Box(
         Modifier
             .size(46.dp)
@@ -67,7 +92,6 @@ fun ControlButton(
             .testTag(tag),
         contentAlignment = Alignment.Center,
     ) {
-        val colour = if (enabled) tint else Palette.textTertiary
         if (text != null) Text(text, fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = colour)
         else if (icon != null) Icon(icon, label, tint = colour, modifier = Modifier.size(21.dp))
     }

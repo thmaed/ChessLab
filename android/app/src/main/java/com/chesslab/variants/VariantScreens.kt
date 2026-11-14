@@ -599,7 +599,7 @@ private fun VariantControlBar(
         )
         Spacer(Modifier.weight(1f))
         ControlButton(
-            text = "½", label = stringResource(R.string.play_offer_draw),
+            text = "½", caption = stringResource(R.string.two_draw_button), label = stringResource(R.string.play_offer_draw),
             tint = Palette.info, enabled = !ui.gameOver && !ui.thinking,
             tag = "nulle", onClick = onDraw,
         )

@@ -315,7 +315,8 @@ private fun FaqSection(onOpen: (HelpDestination) -> Unit) {
  * langues.
  */
 private val sections = listOf(
-    Triple(R.string.help_news_title, R.string.help_news_body, Icons.Default.AutoAwesome to Palette.accent),
+    Triple(R.string.help_news23_title, R.string.help_news23_body, Icons.Default.AutoAwesome to Palette.accent),
+    Triple(R.string.help_news_title, R.string.help_news_body, Icons.Default.AutoAwesome to Palette.teal),
     Triple(R.string.help_daily_title, R.string.help_daily_body, Icons.Default.LocalFireDepartment to Palette.warning),
     Triple(R.string.help_characters_title, R.string.help_characters_body, Icons.Default.Groups to Palette.accent),
     Triple(R.string.help_level_title, R.string.help_level_body, Icons.Default.Speed to Palette.info),

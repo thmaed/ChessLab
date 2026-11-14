@@ -580,7 +580,7 @@ private fun EmptyLibrary(onImport: () -> Unit) {
 }
 
 /** Ce qu'un import a fait : ajouté, et écarté parce que déjà présent. */
-private data class ImportOutcome(val added: Int, val duplicates: Int)
+internal data class ImportOutcome(val added: Int, val duplicates: Int)
 
 /**
  * Importe un fichier PGN — une partie, ou cent. `null` si le fichier est
@@ -591,13 +591,18 @@ private data class ImportOutcome(val added: Int, val duplicates: Int)
  * celles du lot en cours : un fichier qui contient deux fois la même partie
  * n'en range qu'une. Pendant d'`importPGNCollection` côté iOS.
  */
-private suspend fun importPgn(
+internal suspend fun importPgn(
     context: android.content.Context,
     uri: Uri,
     dao: com.chesslab.library.GameDao,
 ): ImportOutcome? = runCatching {
     val text = context.contentResolver.openInputStream(uri)?.bufferedReader()?.use { it.readText() }
         ?: return null
+    return importPgnText(text, dao)
+}.getOrNull()
+
+/** Le même import, depuis un texte déjà lu — l'écran Analyser l'emploie pour un fichier de PLUSIEURS parties. */
+internal suspend fun importPgnText(text: String, dao: com.chesslab.library.GameDao): ImportOutcome? = runCatching {
     val games = PgnSanitizer.splitIntoGames(PgnSanitizer.sanitize(text))
     val seen = dao.allOnce().mapNotNull { com.chesslab.library.GameSignature.of(it.pgn) }.toMutableSet()
     var added = 0

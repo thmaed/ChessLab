@@ -53699,6 +53699,176 @@
           }
         }
       }
+    },
+    "Plus": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Más"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehr"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Altro"
+          }
+        }
+      }
+    },
+    "Une partie, une position ou une base de parties — reconnu tout seul": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une partie, une position ou une base de parties — reconnu tout seul"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One game, a position or a games database — recognised automatically"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una partida, una posición o una base de partidas: se reconoce solo"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Partie, eine Stellung oder eine Partiendatenbank – automatisch erkannt"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una partita, una posizione o un database di partite — riconosciuto da solo"
+          }
+        }
+      }
+    },
+    "Déplier trois options": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Déplier trois options"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expand three options"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desplegar tres opciones"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drei Optionen aufklappen"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Espandi tre opzioni"
+          }
+        }
+      }
+    },
+    "• Langues : l'app parle aussi espagnol, allemand et italien — interface, aide, cours d'ouvertures et de finales.\n• Notation des coups : « Automatique » suit la langue de l'app ; un autre choix reste mémorisé.\n• Accueil : quatre grandes tuiles, les autres modes sous « Plus ».\n• Analyser : un seul « Importer un fichier », qui reconnaît une partie, une position ou une base de parties.\n• Réglages : thèmes et jeux de pièces en vignettes.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Langues : l'app parle aussi espagnol, allemand et italien — interface, aide, cours d'ouvertures et de finales.\n• Notation des coups : « Automatique » suit la langue de l'app ; un autre choix reste mémorisé.\n• Accueil : quatre grandes tuiles, les autres modes sous « Plus ».\n• Analyser : un seul « Importer un fichier », qui reconnaît une partie, une position ou une base de parties.\n• Réglages : thèmes et jeux de pièces en vignettes."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Languages: the app now also speaks Spanish, German and Italian — interface, help, opening and endgame courses.\n• Move notation: “Automatic” follows the app's language; any other choice is remembered.\n• Home: four large tiles, the other modes under “More”.\n• Analyse: a single “Import a file”, which recognises one game, a position or a games database.\n• Settings: board themes and piece sets shown as thumbnails."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Idiomas: la app también habla español, alemán e italiano: interfaz, ayuda, cursos de aperturas y de finales.\n• Notación de las jugadas: «Automático» sigue el idioma de la app; cualquier otra elección se recuerda.\n• Inicio: cuatro tarjetas grandes; los demás modos, en «Más».\n• Analizar: un único «Importar un archivo», que reconoce una partida, una posición o una base de partidas.\n• Ajustes: temas y juegos de piezas en miniaturas."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Sprachen: Die App spricht jetzt auch Spanisch, Deutsch und Italienisch – Oberfläche, Hilfe, Eröffnungs- und Endspielkurse.\n• Zugnotation: „Automatisch“ folgt der Sprache der App; eine andere Wahl bleibt gespeichert.\n• Start: vier große Kacheln, die übrigen Modi unter „Mehr“.\n• Analysieren: ein einziges „Datei importieren“, das eine Partie, eine Stellung oder eine Partiendatenbank erkennt.\n• Einstellungen: Brettdesigns und Figurensätze als Vorschaubilder."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "• Lingue: l'app parla anche spagnolo, tedesco e italiano — interfaccia, aiuto, corsi di aperture e di finali.\n• Notazione delle mosse: «Automatico» segue la lingua dell'app; un'altra scelta resta memorizzata.\n• Home: quattro riquadri grandi, le altre modalità sotto «Altro».\n• Analizza: un solo «Importa un file», che riconosce una partita, una posizione o un database di partite.\n• Impostazioni: temi e set di pezzi in miniatura."
+          }
+        }
+      }
+    },
+    "Nouveautés 2.3": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nouveautés 2.3"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What's new in 2.3"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novedades 2.3"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Neu in 2.3"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Novità della 2.3"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
