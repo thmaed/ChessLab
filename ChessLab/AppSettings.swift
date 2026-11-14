@@ -116,10 +116,22 @@ final class AppSettings {
         didSet { UserDefaults.standard.set(hapticsEnabled, forKey: Keys.hapticsEnabled) }
     }
 
-    /// Notation des pièces AFFICHÉE. Française par défaut (le prompt).
-    /// N'affecte jamais le PGN stocké ou exporté — voir ``SANFormatter``.
+    /// Le CHOIX de notation des pièces : `nil` = « Automatique » (défaut) — la notation suit la
+    /// langue de l'interface (espagnole en espagnol, allemande en allemand, française sinon) et la
+    /// suit encore quand on change de langue ; une valeur = un choix explicite, mémorisé. Stocké sous
+    /// `settings.pieceNotation` : le nom de la notation, ou `auto`.
+    var pieceNotationChoice: PieceNotation? {
+        didSet { UserDefaults.standard.set(pieceNotationChoice?.rawValue ?? Self.automaticNotationStorageValue, forKey: Keys.pieceNotation) }
+    }
+
+    static let automaticNotationStorageValue = "auto"
+
+    /// Notation des pièces AFFICHÉE : le choix, sinon celle de la langue de l'interface.
+    /// N'affecte jamais le PGN stocké ou exporté — voir ``SANFormatter``. Écrire une valeur la
+    /// fixe (choix explicite) ; pour revenir à « Automatique », assigner `pieceNotationChoice = nil`.
     var pieceNotation: PieceNotation {
-        didSet { UserDefaults.standard.set(pieceNotation.rawValue, forKey: Keys.pieceNotation) }
+        get { PieceNotation.resolve(stored: pieceNotationChoice?.rawValue, languageCode: appLanguage.resolvedCode) }
+        set { pieceNotationChoice = newValue }
     }
 
     /// Langue de l'interface (français / anglais / système). Appliquée
@@ -208,11 +220,9 @@ final class AppSettings {
 
         let storedLanguage = defaults.string(forKey: Keys.appLanguage)
             .flatMap(AppLanguage.init(rawValue:)) ?? .system
-        // Réglage jamais touché : la notation suit l'usage de la langue
-        // (espagnole en espagnol, allemande en allemand, française sinon).
-        pieceNotation = defaults.string(forKey: Keys.pieceNotation)
-            .flatMap(PieceNotation.init(rawValue:))
-            ?? PieceNotation.defaultFor(languageCode: storedLanguage.resolvedCode)
+        // Rien de stocké, ou « auto » : la notation suit la langue de l'interface ; un nom de notation
+        // stocké est un choix explicite de l'utilisateur, qui l'emporte toujours.
+        pieceNotationChoice = defaults.string(forKey: Keys.pieceNotation).flatMap(PieceNotation.init(rawValue:))
 
         storedPlayerName = Self.sanitizedPlayerName(defaults.string(forKey: Keys.playerName) ?? "")
 
@@ -249,10 +259,8 @@ final class AppSettings {
             .flatMap(ArrowMode.init(rawValue:)) ?? .best
         if arrows != analysisArrowMode { analysisArrowMode = arrows }
 
-        let notation = defaults.string(forKey: Keys.pieceNotation)
-            .flatMap(PieceNotation.init(rawValue:))
-            ?? PieceNotation.defaultFor(languageCode: appLanguage.resolvedCode)
-        if notation != pieceNotation { pieceNotation = notation }
+        let notationChoice = defaults.string(forKey: Keys.pieceNotation).flatMap(PieceNotation.init(rawValue:))
+        if notationChoice != pieceNotationChoice { pieceNotationChoice = notationChoice }
 
         // Le nom voyage, lui : c'est la même personne sur les deux appareils.
         let name = Self.sanitizedPlayerName(defaults.string(forKey: Keys.playerName) ?? "")

@@ -43,6 +43,11 @@ data class AppSettings(
      * serait lu par personne.
      */
     val pieceNotation: PieceNotation = PieceNotation.french,
+    /**
+     * « Automatique » (défaut) : [pieceNotation] suit la langue de l'application. Faux = un choix
+     * explicite, mémorisé. Pendant de `pieceNotationChoice == nil` côté iOS.
+     */
+    val pieceNotationAuto: Boolean = true,
     /** Les flèches du moteur en analyse — le réglage SURVIT à la fermeture. */
     val analysisArrowMode: String = "best",
     /**
@@ -66,10 +71,11 @@ enum class PieceNotation {
         /**
          * La notation que l'usage de la langue appelle (pendant de
          * `PieceNotation.defaultFor(languageCode:)` côté iOS) : espagnole en
-         * espagnol, allemande en allemand, italienne en italien, française sinon. Ne sert qu'à un
-         * réglage JAMAIS touché.
+         * espagnol, allemande en allemand, italienne en italien, anglaise en anglais, française
+         * sinon. C'est ce que donne le mode « Automatique » des Réglages.
          */
         fun defaultFor(languageCode: String): PieceNotation = when (languageCode) {
+            "en" -> english
             "es" -> spanish
             "de" -> german
             "it" -> italian
@@ -135,8 +141,11 @@ object SettingsStore {
                     showPuzzleTheme = prefs[keyShowPuzzleTheme] ?: true,
                     soundsEnabled = prefs[keySounds] ?: true,
                     hapticsEnabled = prefs[keyHaptics] ?: true,
+                    // Rien de stocké, ou « auto » : la notation suit la langue de l'app ; un nom de
+                    // notation stocké est un choix explicite.
                     pieceNotation = PieceNotation.entries.firstOrNull { it.name == prefs[keyNotation] }
                         ?: PieceNotation.defaultFor(java.util.Locale.getDefault().language),
+                    pieceNotationAuto = PieceNotation.entries.none { it.name == prefs[keyNotation] },
                     analysisArrowMode = prefs[keyArrowMode] ?: "best",
                     playerName = sanitizedPlayerName(prefs[keyPlayerName] ?: ""),
                     dailyOpeningsCap = (prefs[keyDailyOpeningsCap] ?: 5).takeIf { it in DAILY_OPENINGS_CHOICES } ?: 5,
@@ -158,8 +167,9 @@ object SettingsStore {
     fun setDailyOpeningsCap(context: Context, n: Int) = update(context) { it[keyDailyOpeningsCap] = n }
     fun setSounds(context: Context, on: Boolean) = update(context) { it[keySounds] = on }
     fun setHaptics(context: Context, on: Boolean) = update(context) { it[keyHaptics] = on }
-    fun setPieceNotation(context: Context, notation: PieceNotation) =
-        update(context) { it[keyNotation] = notation.name }
+    /** `null` = « Automatique » (suit la langue de l'app). */
+    fun setPieceNotation(context: Context, notation: PieceNotation?) =
+        update(context) { it[keyNotation] = notation?.name ?: "auto" }
     fun setArrowMode(context: Context, mode: String) = update(context) { it[keyArrowMode] = mode }
 
     /**

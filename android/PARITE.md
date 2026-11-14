@@ -2134,3 +2134,11 @@ libellés, même parcours (Puzzles → Mes collections).
       de l'écran (position négative) et un tap à sa place ne fermait rien. Un VRAI défaut de l'app sur téléphone, pas
       seulement du test : l'en-tête est maintenant fixe, seul le contenu défile — comme iOS, dont « Fermer » est dans la
       barre. 5 tests verts (`PuzzleCollectionTest`, `PuzzleDeviceFlowTest`).
+
+## Notation des coups : « Automatique » (14/11/2026)
+
+Fait des deux côtés : pastille « Automatique » par défaut, notation = langue de l'interface, choix explicite mémorisé.
+- [x] Code et tests JVM (`SanFormatterTest`).
+- [ ] À vérifier SUR APPAREIL (Galaxy) : Réglages › Notation, tuile « Automatique » active par défaut ; choisir « Allemande »,
+  quitter l'app, la rouvrir (choix gardé) ; revenir à « Automatique » après un changement de langue.
+- Forme : six tuiles en 3 × 2 sur Android, pastilles qui se replient (`FlowLayout`) sur iOS — écart de forme déjà assumé.

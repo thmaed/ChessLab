@@ -62,7 +62,30 @@ DUO_PREVIEWS = ["duo-inner-tour.mov", "duo-outer-tour.mov"]
 # Les langues de la fiche : le français, et l'anglais du ROYAUME-UNI — c'est
 # celui que la fiche a depuis l'origine ; un « en-US » neuf est refusé parce
 # que le nom « ChessLab » y est déjà pris par une autre app.
-LOCALES = {"fr-FR": "Français", "en-GB": "English"}
+LOCALES = {"fr-FR": "Français", "en-GB": "English", "es-ES": "Español", "de-DE": "Deutsch", "it": "Italiano"}  # Apple nomme l'italien « it » tout court : « it-IT » est refusé (« not a valid locale »)
+
+# Variantes régionales : elles reprennent TEXTE pour TEXTE celui de leur langue-source (14/11/2026 : créées
+# sans rien réécrire). « en-US » porte un nom à lui (NAME_OVERRIDES) : « ChessLab » seul y est pris.
+# Les variantes de l'anglais n'ont pas de visuels à elles : Apple reprend ceux de la langue principale (en-GB).
+VARIANTS = {"en-AU": "en-GB", "en-CA": "en-GB", "en-US": "en-GB", "es-MX": "es-ES", "fr-CA": "fr-FR"}
+# « ChessLab » seul est pris en en-US (et en de, it) : la fiche américaine porte un nom à elle.
+NAME_OVERRIDES = {"en-US": "ChessLab: Chess Trainer"}
+LOCALES.update({"en-US": "English (U.S.)", "en-AU": "English (Australia)", "en-CA": "English (Canada)", "es-MX": "Español (México)", "fr-CA": "Français (Canada)"})
+VISUALS_INHERITED = {"en-AU", "en-CA", "en-US"}
+
+
+# Langue du dossier de captures d'une localisation : `fr`, `en`, `es`, `de` ou `it` (le code court de la
+# locale). Une localisation n'a ses visuels à elle que si son dossier de captures existe
+# (`screenshots/iphone-6.7/<langue>/`) ; sinon on ne lui en téléverse AUCUN et Apple affiche ceux de la
+# langue principale. Les aperçus iPhone/iPad classiques (`videos/*.mov`) sont communs à toutes les langues.
+def visuals_lang(locale):
+    return locale[:2]
+
+
+def locale_has_own_visuals(locale):
+    if locale in VISUALS_INHERITED:
+        return False
+    return (SUBMISSION / "screenshots" / "iphone-6.7" / visuals_lang(locale)).is_dir()
 
 
 # ---------------------------------------------------------------- client
@@ -187,6 +210,9 @@ def read_metadata():
 
     fr = section(r"Français \(langue principale\)")
     en = section(r"English")
+    es = section(r"Español")
+    de = section(r"Deutsch")
+    it = section(r"Italiano")
     news = section(r"Nouveautés de cette version")
     common = section(r"Champs communs")
     notes = section(r"App Review Notes")
@@ -206,11 +232,30 @@ def read_metadata():
             "keywords": field(en, "Keywords"), "promotionalText": field(en, "Promotional text"),
             "description": field(en, "Description"), "whatsNew": subsection(news, "English"),
         },
+        "es-ES": {
+            "name": field(es, "Nombre"), "subtitle": field(es, "Subtítulo"),
+            "keywords": field(es, "Palabras clave"), "promotionalText": field(es, "Texto promocional"),
+            "description": field(es, "Descripción"), "whatsNew": subsection(news, "Español"),
+        },
+        "de-DE": {
+            "name": field(de, "Name"), "subtitle": field(de, "Untertitel"),
+            "keywords": field(de, "Schlüsselwörter"), "promotionalText": field(de, "Werbetext"),
+            "description": field(de, "Beschreibung"), "whatsNew": subsection(news, "Deutsch"),
+        },
+        "it": {
+            "name": field(it, "Nome"), "subtitle": field(it, "Sottotitolo"),
+            "keywords": field(it, "Parole chiave"), "promotionalText": field(it, "Testo promozionale"),
+            "description": field(it, "Descrizione"), "whatsNew": subsection(news, "Italiano"),
+        },
         "supportUrl": url("URL du support"),
         "marketingUrl": url("URL marketing"),
         "privacyPolicyUrl": url("URL de la politique de confidentialité"),
         "reviewNotes": re.search(r"```\n(.*?)```", notes, re.S).group(1).strip("\n"),
     }
+    for variant, source in VARIANTS.items():
+        meta[variant] = dict(meta[source])
+        if variant in NAME_OVERRIDES:
+            meta[variant]["name"] = NAME_OVERRIDES[variant]
     limits = {"name": 30, "subtitle": 30, "keywords": 100, "promotionalText": 170, "description": 4000, "whatsNew": 4000}
     for locale in LOCALES:
         for key, limit in limits.items():
@@ -249,8 +294,20 @@ def find_version(c, app_id, version_string, create=False):
     })["data"]
 
 
+ONLY_LANGS = None   # --langs es,de,it : ne toucher QUE ces langues (codes courts) pour captures, aperçus et Duo
+
+
 def version_localizations(c, version_id):
-    return {l["attributes"]["locale"]: l for l in c.get_all(f"/appStoreVersions/{version_id}/appStoreVersionLocalizations")}
+    locs = {l["attributes"]["locale"]: l for l in c.get_all(f"/appStoreVersions/{version_id}/appStoreVersionLocalizations")}
+    return locs
+
+
+def visual_localizations(c, version_id):
+    """Les localisations dont les visuels sont à (re)poser : toutes, ou celles de --langs."""
+    locs = version_localizations(c, version_id)
+    if ONLY_LANGS:
+        locs = {k: v for k, v in locs.items() if k in ONLY_LANGS or k[:2] in ONLY_LANGS}
+    return locs
 
 
 # ---------------------------------------------------------------- commandes
@@ -358,16 +415,19 @@ def wait_asset_state(c, path, ids, label):
 def cmd_screenshots(c, args):
     app = find_app(c)
     v = find_version(c, app["id"], args.version)
-    locs = version_localizations(c, v["id"])
+    locs = visual_localizations(c, v["id"])
     if not locs:
         sys.exit("aucune localisation sur la version : lancer `metadata` d'abord")
     for locale in locs:
+        if not locale_has_own_visuals(locale):
+            print(f"  {locale}: pas de captures à lui (repli sur la langue principale)")
+            continue
         sets = {s["attributes"]["screenshotDisplayType"]: s
                 for s in c.get_all(f"/appStoreVersionLocalizations/{locs[locale]['id']}/appScreenshotSets")}
         for display_type, folder in SCREENSHOT_SETS.items():
             # Un jeu par langue (dossier `fr` / `en`) ; à défaut, le jeu anglais
             # sert aux deux, comme avant la 2.0.
-            lang = "fr" if locale.startswith("fr") else "en"
+            lang = visuals_lang(locale)
             files = sorted((folder / lang).glob("*.png")) or sorted((folder / "en").glob("*.png"))
             if not files:
                 sys.exit(f"aucune capture dans {folder}/{lang}")
@@ -407,10 +467,13 @@ def cmd_screenshots(c, args):
 def cmd_previews(c, args):
     app = find_app(c)
     v = find_version(c, app["id"], args.version)
-    locs = version_localizations(c, v["id"])
+    locs = visual_localizations(c, v["id"])
     if not locs:
         sys.exit("aucune localisation sur la version : lancer `metadata` d'abord")
     for locale in locs:
+        if not locale_has_own_visuals(locale):
+            print(f"  {locale}: pas d'aperçus à lui (repli sur la langue principale)")
+            continue
         sets = {s["attributes"]["previewType"]: s
                 for s in c.get_all(f"/appStoreVersionLocalizations/{locs[locale]['id']}/appPreviewSets")}
         for preview_type, names in PREVIEW_SETS.items():
@@ -474,7 +537,7 @@ def wait_library(c, kind, ids, label):
 def cmd_duo(c, args):
     app = find_app(c)
     v = find_version(c, app["id"], args.version)
-    locs = version_localizations(c, v["id"])
+    locs = visual_localizations(c, v["id"])
     if not locs:
         sys.exit("aucune localisation sur la version : lancer `metadata` d'abord")
     library_id = c.get(f"/apps/{app['id']}/assetLibrary")["data"]["id"]
@@ -493,7 +556,7 @@ def cmd_duo(c, args):
     # Un jeu de captures par langue (dossier `fr` / `en`, repli sur `en`) : chaque
     # jeu est déposé une fois, puis placé sur la ou les localisations de sa langue.
     image_ids = {}
-    for lang in sorted({"fr" if loc.startswith("fr") else "en" for loc in locs}):
+    for lang in sorted({visuals_lang(loc) for loc in locs if locale_has_own_visuals(loc)}):
         folder = DUO_SCREENSHOTS.parent / lang
         shots = sorted((folder if folder.exists() else DUO_SCREENSHOTS).glob("*.png"))[:10]
         if resume:
@@ -505,7 +568,9 @@ def cmd_duo(c, args):
     wait_library(c, "appAssetLibraryImages", [i for ids in image_ids.values() for i in ids], "capture Duo")
     wait_library(c, "appAssetLibraryVideos", video_ids, "aperçu Duo")
     for locale, loc in locs.items():
-        lang = "fr" if locale.startswith("fr") else "en"
+        if not locale_has_own_visuals(locale):
+            continue
+        lang = visuals_lang(locale)
         for placement_type, rel_name, kind, ids in (
             ("APP_SCREENSHOT", "image", "appAssetLibraryImages", image_ids[lang]),
             ("APP_PREVIEW", "video", "appAssetLibraryVideos", video_ids),
@@ -541,7 +606,7 @@ def cmd_duo_previews(c, args):
     langue. L'aperçu hérité de la version précédente est retiré d'abord (trois au plus par langue)."""
     app = find_app(c)
     v = find_version(c, app["id"], args.version)
-    locs = version_localizations(c, v["id"])
+    locs = visual_localizations(c, v["id"])
     if not locs:
         sys.exit("aucune localisation sur la version : lancer `metadata` d'abord")
     library_id = c.get(f"/apps/{app['id']}/assetLibrary")["data"]["id"]
@@ -552,14 +617,16 @@ def cmd_duo_previews(c, args):
                 c.delete(f"/appAssetLibraryPlacements/{placement['id']}")
             c.delete(f"/appAssetLibraryVideos/{item['id']}")
     uploaded = {}
-    for lang in sorted({"fr" if loc.startswith("fr") else "en" for loc in locs}):
+    for lang in sorted({visuals_lang(loc) for loc in locs if locale_has_own_visuals(loc)}):
         path = SUBMISSION / "videos" / f"duo-outer-tour-{lang}.mov"
         if not path.exists():
             sys.exit(f"aperçu Duo introuvable : {path}")
         uploaded[lang] = library_upload(c, "appAssetLibraryVideos", library_id, path, prefix + lang)
     wait_library(c, "appAssetLibraryVideos", list(uploaded.values()), "aperçu Duo")
     for locale, loc in locs.items():
-        lang = "fr" if locale.startswith("fr") else "en"
+        if not locale_has_own_visuals(locale):
+            continue
+        lang = visuals_lang(locale)
         for s in c.get_all(f"/appStoreVersionLocalizations/{loc['id']}/appPreviewSets"):
             if s["attributes"]["previewType"] == "IPHONE_DUO":
                 for p in c.get_all(f"/appPreviewSets/{s['id']}/appPreviews"):
@@ -700,8 +767,11 @@ def main():
     p.add_argument("--version", default=None, help="version marketing (défaut : MARKETING_VERSION du projet)")
     p.add_argument("--build", default=None, help="numéro de build (défaut : CURRENT_PROJECT_VERSION du projet)")
     p.add_argument("--resume", action="store_true", help="duo : reprendre les fichiers déjà déposés (traitement Apple trop lent)")
+    p.add_argument("--langs", default=None, help="captures/aperçus/Duo : ne traiter que ces langues (codes courts, ex. es,de,it)")
     p.add_argument("--wait", action="store_true", help="build : attendre le traitement par Apple (1 h max)")
     args = p.parse_args()
+    global ONLY_LANGS
+    ONLY_LANGS = set(args.langs.split(",")) if args.langs else None
     # Version et build de la CIBLE APPLICATIVE : les cibles de test portent
     # leurs propres numéros (1.2.0 / 3), sans rapport avec la soumission.
     pbx = (ROOT / "ChessLab.xcodeproj" / "project.pbxproj").read_text()

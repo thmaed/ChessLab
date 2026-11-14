@@ -4,7 +4,7 @@
 Tailles acceptées par App Store Connect : 5244 × 2950 et 3840 × 1646. Un seul visuel de marque, des captures
 réelles, une phrase ; les éléments importants restent dans le centre (zone sûre), le reste est de l'ambiance.
 
-    tools/entete-fiche.py <dossier des captures brutes> <sortie> <fr|en> <largeur> <hauteur>
+    tools/entete-fiche.py <dossier des captures brutes> <sortie> <fr|en|es|de|it> <largeur> <hauteur>
 """
 import sys, math, random
 from pathlib import Path
@@ -14,6 +14,9 @@ ICON = Path(__file__).resolve().parent.parent / "ChessLab/Assets.xcassets/AppIco
 TEXT = {
     "fr": ("Jouez, analysez, progressez.", "Neuf adversaires qui jouent comme des humains"),
     "en": ("Play, analyse, improve.", "Nine opponents that play like humans"),
+    "es": ("Juega, analiza, progresa.", "Nueve rivales que juegan como humanos"),
+    "de": ("Spielen, analysieren, besser werden.", "Neun Gegner, die wie Menschen spielen"),
+    "it": ("Gioca, analizza, migliora.", "Nove avversari che giocano come umani"),
 }
 SHOTS = ["02-coach", "01-seance", "03-puzzles-offre"]   # gauche, centre (au premier plan), droite
 TEAL = (52, 211, 163)
@@ -21,6 +24,9 @@ TEAL = (52, 211, 163)
 SEARCH = {
     "fr": ("Jouez contre des adversaires qui pensent comme des humains", ["Analyse", "Coach", "Puzzles", "Ouvertures"]),
     "en": ("Play opponents that think like humans", ["Analysis", "Coach", "Puzzles", "Openings"]),
+    "es": ("Juega contra rivales que piensan como humanos", ["Análisis", "Coach", "Puzles", "Aperturas"]),
+    "de": ("Spiele gegen Gegner, die wie Menschen denken", ["Analyse", "Coach", "Puzzles", "Eröffnungen"]),
+    "it": ("Gioca contro avversari che pensano come umani", ["Analisi", "Coach", "Puzzle", "Aperture"]),
 }
 
 
@@ -90,8 +96,15 @@ def main(raw, out, lang, W, H):
     d.text((x, ty), "Chess", font=title_f, fill=(255, 255, 255))
     d.text((x + d.textlength("Chess", font=title_f), ty), "Lab", font=title_f, fill=TEAL)
     tag, sub = TEXT[lang]
-    d.text((left, top + icon_s + int(u * 0.07)), tag, font=font(int(u * 0.068), 2), fill=(255, 255, 255))
-    d.text((left, top + icon_s + int(u * 0.175)), sub, font=font(int(u * 0.042), 5), fill=(170, 185, 215))
+    # Les textes se réduisent pour tenir à gauche des téléphones (l'allemand est plus long que le français).
+    maxw = int(W * 0.40)
+
+    def fitted(text, size, index):
+        while d.textlength(text, font=font(size, index)) > maxw and size > 10:
+            size = int(size * 0.97)
+        return font(size, index)
+    d.text((left, top + icon_s + int(u * 0.07)), tag, font=fitted(tag, int(u * 0.068), 2), fill=(255, 255, 255))
+    d.text((left, top + icon_s + int(u * 0.175)), sub, font=fitted(sub, int(u * 0.042), 5), fill=(170, 185, 215))
     # Bloc de droite : trois captures réelles, celle du milieu devant, rognées par le bas du cadre.
     pw = int(u * 0.37)
     cx = int(W * 0.725)

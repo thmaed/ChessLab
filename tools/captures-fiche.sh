@@ -1,11 +1,11 @@
 #!/bin/zsh
 # Captures de la fiche App Store (2.0) par `simctl` : l'app s'ouvre sur l'écran voulu (`-openRoute`, Debug),
-# on attend, on photographie. Usage : tools/captures-fiche.sh <udid> <iphone|ipad|duo> <fr|en> <dossier de sortie>
+# on attend, on photographie. Usage : tools/captures-fiche.sh <udid> <iphone|ipad|duo> <fr|en|es|de|it> <dossier de sortie>
 # Le build Debug doit être installé sur le simulateur (voir CAPTURES dans AppStoreSubmission/README.md).
 set -eu
 UDID=$1 KIND=$2 LANG_=$3 OUT=$4
 BUNDLE=com.chesslab.ChessLab
-LOCALE=$([[ $LANG_ == fr ]] && echo fr_FR || echo en_US)
+case $LANG_ in fr) LOCALE=fr_FR;; es) LOCALE=es_ES;; de) LOCALE=de_DE;; it) LOCALE=it_IT;; *) LOCALE=en_US;; esac
 mkdir -p "$OUT"
 
 shoot() { # nom route attente [args...]
@@ -13,6 +13,8 @@ shoot() { # nom route attente [args...]
   [[ -n ${ONLY:-} && $name != *$ONLY* ]] && return 0   # ONLY=07 ne refait que la septième
   xcrun simctl terminate "$UDID" $BUNDLE >/dev/null 2>&1 || true
   local -a launch=(-resetPlaySettings -discoveryTourSeen -AppleLanguages "($LANG_)" -AppleLocale $LOCALE)
+  # Es/de/it : la notation des coups suit la langue ; sans cet argument, un réglage resté dans le simulateur l'emporte.
+  case $LANG_ in es) launch+=(-settings.pieceNotation spanish);; de) launch+=(-settings.pieceNotation german);; it) launch+=(-settings.pieceNotation italian);; esac
   [[ -n $route ]] && launch+=(-openRoute $route)   # un tableau : zsh ne découpe pas une variable non quotée
   xcrun simctl launch "$UDID" $BUNDLE "${launch[@]}" "$@" >/dev/null
   sleep "$wait"

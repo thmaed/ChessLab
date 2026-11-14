@@ -165,16 +165,22 @@ fun SettingsScreen(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             // Le libellé porte son propre EXEMPLE : « Cf3 » explique mieux que
             // n'importe quelle phrase ce que le réglage change.
-            listOf(
+            val exemples = mapOf(
                 com.chesslab.settings.PieceNotation.french to "Cf3, Dxd5, O-O",
                 com.chesslab.settings.PieceNotation.english to "Nf3, Qxd5, O-O",
                 com.chesslab.settings.PieceNotation.spanish to "Cf3, Dxd5, O-O",
                 com.chesslab.settings.PieceNotation.german to "Sf3, Dxd5, O-O",
                 com.chesslab.settings.PieceNotation.italian to "Cf3, Dxd5, O-O",
-            ).chunked(2).forEach { pair ->
+            )
+            // « Automatique » d'abord (défaut) : la notation suit la langue de l'app ; il montre l'exemple de
+            // la notation qu'il donne en ce moment. Six tuiles : trois lignes pleines.
+            (listOf<com.chesslab.settings.PieceNotation?>(null) + com.chesslab.settings.PieceNotation.entries)
+                .map { it to exemples.getValue(it ?: settings.pieceNotation) }
+                .chunked(2).forEach { pair ->
               Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
               pair.forEach { (notation, exemple) ->
-                val active = settings.pieceNotation == notation
+                val active = if (notation == null) settings.pieceNotationAuto
+                    else !settings.pieceNotationAuto && settings.pieceNotation == notation
                 Column(
                     Modifier
                         .weight(1f)
@@ -182,11 +188,12 @@ fun SettingsScreen(
                         .background(if (active) Palette.accent.copy(alpha = 0.18f) else Palette.surface)
                         .clickable { SettingsStore.setPieceNotation(context, notation) }
                         .padding(horizontal = 12.dp, vertical = 10.dp)
-                        .testTag("notation-${notation.name}"),
+                        .testTag("notation-${notation?.name ?: "auto"}"),
                 ) {
                     Text(
                         stringResource(
                             when (notation) {
+                                null -> R.string.settings_language_system
                                 com.chesslab.settings.PieceNotation.french -> R.string.settings_notation_french
                                 com.chesslab.settings.PieceNotation.english -> R.string.settings_notation_english
                                 com.chesslab.settings.PieceNotation.spanish -> R.string.settings_notation_spanish
@@ -200,7 +207,6 @@ fun SettingsScreen(
                     Text(exemple, fontSize = 11.sp, color = Palette.textTertiary)
                 }
               }
-              // Cinq notations : la dernière ligne n'en a qu'une, qui garde la largeur d'une demi-ligne.
               if (pair.size == 1) Spacer(Modifier.weight(1f))
               }
             }

@@ -87,7 +87,7 @@ class SanFormatterTest {
         assertEquals(PieceNotation.spanish, PieceNotation.defaultFor("es"))
         assertEquals(PieceNotation.german, PieceNotation.defaultFor("de"))
         assertEquals(PieceNotation.french, PieceNotation.defaultFor("fr"))
-        assertEquals(PieceNotation.french, PieceNotation.defaultFor("en"))
+        assertEquals(PieceNotation.english, PieceNotation.defaultFor("en"))
     }
 
     // Italien (2.3) — mêmes lettres que l'espagnol : Re, Donna, Torre, Alfiere, Cavallo.

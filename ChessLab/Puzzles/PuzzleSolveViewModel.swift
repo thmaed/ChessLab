@@ -144,7 +144,7 @@ final class PuzzleSolveViewModel {
             let rank = min(cycle.order.count, cycle.attempts.count + (isFinished ? 0 : 1))
             return LocalizationController.string("Cycle %lld · %lld/%lld", cycle.number, rank, cycle.order.count)
         }
-        return "Puzzle n°\(sessionIndex)"
+        return LocalizationController.string("Puzzle n°%lld", sessionIndex)
     }
 
     // MARK: Chrono (programme Woodpecker)

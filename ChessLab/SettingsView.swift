@@ -335,12 +335,20 @@ struct SettingsView: View {
                 // Quatre notations (2.3) : « Französisch » ne tient plus sur
                 // une ligne à quatre de front — la rangée se replie.
                 FlowLayout(spacing: 8, lineSpacing: 8) {
+                    // « Automatique » d'abord, et par défaut : la notation suit la langue de l'app.
+                    ChipButton(
+                        label: LocalizedStringKey("Automatique"), systemImage: nil,
+                        isSelected: settings.pieceNotationChoice == nil
+                    ) {
+                        settings.pieceNotationChoice = nil
+                    }
+                    .accessibilityIdentifier("notation_auto")
                     ForEach(PieceNotation.allCases) { notation in
                         ChipButton(
                             label: LocalizedStringKey(notation.label), systemImage: nil,
-                            isSelected: settings.pieceNotation == notation
+                            isSelected: settings.pieceNotationChoice == notation
                         ) {
-                            settings.pieceNotation = notation
+                            settings.pieceNotationChoice = notation
                         }
                         .accessibilityIdentifier("notation_\(notation.rawValue)")
                     }

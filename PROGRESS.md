@@ -11126,3 +11126,43 @@ Cinquième langue, mêmes méthodes (`tools/i18n`, désormais paramétrées par 
 coups et cases vérifiés mécaniquement), 76 noms ECO (`name_it`), extension de partage, InfoPlist, `values-it` Android
 (1 219 éléments), fiches Play it-IT et App Store it. Glossaire `tools/i18n/GLOSSAIRE.md` (section italien).
 - **Non fait** : relecture par un locuteur natif (es, de, it) ; captures de fiche italiennes ; passage sur le Galaxy A16.
+
+## 14/11 — 2.3 préparée dans App Store Connect (non soumise, build non téléversé)
+
+Version 2.3 créée (PREPARE_FOR_SUBMISSION), `MARKETING_VERSION 2.3` / build 23 (app + extension), fiche à CINQ
+localisations : fr-FR, en-GB, es-ES, de-DE, it (textes, mots-clés, promo, nouveautés, notes de révision ;
+`tools/asc/asc.py` étendu, `METADATA.md` et `RELEASE_NOTES-2.3.md` à jour).
+- **Pièges rencontrés** : « ChessLab » est PRIS en allemand et en italien (comme en en-US) → noms de fiche « ChessLab
+  Schach » et « ChessLab Scacchi » (es-ES accepte « ChessLab ») ; l'italien se code `it`, pas `it-IT` ; il faut créer le
+  nom (appInfo) AVANT la localisation de version pour une langue neuve (la commande `metadata` se relance deux fois).
+- **Non fait** : captures et aperçus es/de/it (0 dans ASC), build 23 (archive + `attach`), relecture native, Android
+  versionName/versionCode (toujours 2.2 / 36), commit de ces changements.
+
+## 14/11 — Notation des coups : mode « Automatique » (iOS + Android)
+
+Réglages › Notation : une pastille « Automatique » en premier, **par défaut** — la notation suit la langue de
+l'interface (anglaise en anglais, espagnole en es, allemande en de, italienne en it, française en fr) et la suit
+encore quand on change de langue ; toucher une autre pastille fixe un choix **mémorisé**, « Automatique » le
+défait. iOS : `AppSettings.pieceNotationChoice` (`nil` = auto, stocké sous `settings.pieceNotation` : nom ou `auto`),
+`PieceNotation.resolve(stored:languageCode:)` ; Android : `AppSettings.pieceNotationAuto`, `setPieceNotation(null)`.
+Un choix explicite déjà stocké est conservé tel quel.
+- **Changement de comportement** : un utilisateur ANGLAIS qui n'avait jamais touché le réglage voyait des lettres
+  françaises (« Cf3 ») ; en automatique il voit « Nf3 ». `defaultFor("en")` passe de française à anglaise des deux côtés.
+- Tests : `MoreLanguagesSupportTests` (9 cas + mémorisation), `SanFormatterTest` Android ; 27 tests iOS verts.
+
+## 14/11 (suite) — visuels de la fiche es / de / it, variantes régionales, « Puzzle n° »
+
+- **Visuels** (`tools/captures-fiche.sh` étendu à es/de/it avec `-settings.pieceNotation`, `habiller-captures.py` et
+  `entete-fiche.py` avec leurs textes ; le texte d'en-tête se réduit pour tenir à gauche des téléphones) : captures iPhone +
+  iPad (10 + 10), Duo extérieur (6), aperçu Duo par langue, en-têtes et résultats de recherche (12 images). Déposés par
+  `asc.py screenshots|previews|duo|duo_previews --langs …` (nouvelle option).
+- **Pièges** : un simulateur fraîchement lancé affiche parfois l'îlot dynamique (contour noir) ou la bannière « Préparation de la
+  bibliothèque » → captures détectées par pixels et reprises ; un iPad après tests porte des collections et parties → effacé
+  (`simctl erase`) ; la langue de la barre d'état de l'iPad = langue du simulateur (défauts globaux + redémarrage) ; l'UUID de
+  l'écran extérieur du Duo change à CHAQUE démarrage (`simctl io enumerate`, taille 11 468 800) ; une vidéo simulateur dont
+  l'écran ne bouge plus s'arrête à la dernière image (de : 25,3 s) ; le runtime Duo fait planter SpringBoard (inoffensif).
+- **Variantes** en-AU, en-CA, en-US (« ChessLab: Chess Trainer »), es-MX, fr-CA créées sans réécriture ; l'italien se code `it`.
+- **« Puzzle n° »** (écran de puzzle) était écrit en dur : clé `Puzzle n°%lld` traduite ; Android n'a pas ce libellé.
+- Android : versionName 2.3 (le versionCode suit le fichier de build, prochain 37).
+- **Reste** : noms d'ouvertures des cours (`ecoName`, 113 noms anglais affichés tels quels dans toutes les langues), Duo
+  intérieur, aperçus iPhone/iPad par langue, relecture native, build 23, Play (`publishListing` / `publishBundle`).

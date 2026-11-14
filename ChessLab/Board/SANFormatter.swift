@@ -26,12 +26,21 @@ enum PieceNotation: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// La notation que l'usage de la langue appelle : espagnole pour `es`,
-    /// allemande pour `de`, italienne pour `it`, française sinon (le défaut historique de l'app).
-    /// Ne sert qu'à choisir la valeur d'un réglage JAMAIS touché : un choix
-    /// explicite de l'utilisateur l'emporte toujours.
+    /// La notation EFFECTIVE : le choix stocké (le nom d'une notation) s'il existe, sinon — rien de
+    /// stocké, ou « auto » — celle que la langue appelle. Cœur du mode « Automatique » des Réglages.
+    static func resolve(stored: String?, languageCode: String) -> PieceNotation {
+        stored.flatMap(PieceNotation.init(rawValue:)) ?? defaultFor(languageCode: languageCode)
+    }
+
+    /// La notation que l'usage de la langue appelle : anglaise pour `en`, espagnole pour `es`,
+    /// allemande pour `de`, italienne pour `it`, française pour `fr` (et par repli).
+    /// C'est ce que donne le mode « Automatique » des Réglages ; un choix explicite de
+    /// l'utilisateur l'emporte toujours. Jusqu'à la 2.2, un utilisateur ANGLAIS qui n'avait rien
+    /// touché voyait des lettres françaises (le défaut historique) : l'automatique les aligne
+    /// sur sa langue.
     static func defaultFor(languageCode: String) -> PieceNotation {
         switch languageCode {
+        case "en": .english
         case "es": .spanish
         case "de": .german
         case "it": .italian

@@ -5,7 +5,7 @@ Bonnes pratiques d'Apple (asset-best-practices) : les trois premières captures 
 recherche, on ouvre donc sur ce qui compte ; une courte phrase qui souligne l'écran sans le décrire ; texte
 localisé ; élément principal au centre, dans la zone sûre.
 
-    tools/habiller-captures.py <dossier brut> <dossier sortie> <fr|en> <largeur> <hauteur>
+    tools/habiller-captures.py <dossier brut> <dossier sortie> <fr|en|es|de|it> <largeur> <hauteur>
 """
 import sys
 from pathlib import Path
@@ -37,6 +37,45 @@ CAPTIONS = {
         "08-puzzle-cote": "100,000+ puzzles",
         "09-finales": "78 proven endgames",
         "10-variantes": "Twelve variants",
+    },
+    "es": {
+        "01-seance": "Tu sesión del día",
+        "02-coach": "Lo que juegan los jugadores de tu nivel",
+        "03-puzzles-offre": "Tus errores se convierten en puzles",
+        "04-adversaires": "Nueve rivales que juegan como humanos",
+        "05-partie": "Una partida de verdad, analizada en directo",
+        "05-puzzles-ecran": "Tus puzles, tus colecciones",
+        "06-ouvertures": "58 aperturas ilustradas",
+        "07-lecteur": "Cada jugada, explicada",
+        "08-puzzle-cote": "Más de 130 000 puzles",
+        "09-finales": "78 finales demostrados",
+        "10-variantes": "Doce variantes",
+    },
+    "de": {
+        "01-seance": "Dein Tagestraining",
+        "02-coach": "Was Spieler deiner Stufe spielen",
+        "03-puzzles-offre": "Aus deinen Fehlern werden Puzzles",
+        "04-adversaires": "Neun Gegner, die wie Menschen spielen",
+        "05-partie": "Eine echte Partie, live analysiert",
+        "05-puzzles-ecran": "Deine Puzzles, deine Sammlungen",
+        "06-ouvertures": "58 illustrierte Eröffnungen",
+        "07-lecteur": "Jeder Zug wird erklärt",
+        "08-puzzle-cote": "Über 130 000 Puzzles",
+        "09-finales": "78 bewiesene Endspiele",
+        "10-variantes": "Zwölf Varianten",
+    },
+    "it": {
+        "01-seance": "La tua sessione del giorno",
+        "02-coach": "Cosa giocano i giocatori del tuo livello",
+        "03-puzzles-offre": "I tuoi errori diventano puzzle",
+        "04-adversaires": "Nove avversari che giocano come umani",
+        "05-partie": "Una vera partita, analizzata dal vivo",
+        "05-puzzles-ecran": "I tuoi puzzle, le tue raccolte",
+        "06-ouvertures": "58 aperture illustrate",
+        "07-lecteur": "Ogni mossa è spiegata",
+        "08-puzzle-cote": "Oltre 130 000 puzzle",
+        "09-finales": "78 finali dimostrati",
+        "10-variantes": "Dodici varianti",
     },
 }
 TOP, BOTTOM = (14, 18, 34), (30, 40, 74)   # le fond sombre de l'app, légèrement bleuté

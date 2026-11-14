@@ -75,7 +75,8 @@ struct MoreLanguagesSupportTests {
         #expect(PieceNotation.defaultFor(languageCode: "de") == .german)
         #expect(PieceNotation.defaultFor(languageCode: "it") == .italian)
         #expect(PieceNotation.defaultFor(languageCode: "fr") == .french)
-        #expect(PieceNotation.defaultFor(languageCode: "en") == .french)   // le défaut historique
+        #expect(PieceNotation.defaultFor(languageCode: "en") == .english)
+        #expect(PieceNotation.defaultFor(languageCode: "xx") == .french)   // repli
     }
 
     // MARK: Les textes de cours
@@ -199,5 +200,35 @@ struct MoreLanguagesSupportTests {
         #expect(bare.displayName("es") == "X Opening")
         #expect(bare.displayName("de") == "X Opening")
         #expect(bare.displayName("it") == "X Opening")
+    }
+
+    // MARK: Notation « Automatique »
+
+    @Test("Auto : rien de stocké, ou « auto », suit la langue ; un nom stocké est un choix explicite", arguments: [
+        (nil as String?, "es", PieceNotation.spanish),
+        ("auto", "de", .german),
+        (nil, "it", .italian),
+        (nil, "en", .english),
+        (nil, "fr", .french),
+        ("english", "es", .english),      // choix explicite : la langue ne compte plus
+        ("french", "de", .french),
+        ("german", "fr", .german),
+        ("n'importe quoi", "it", .italian),   // valeur illisible : retombe sur l'automatique
+    ])
+    func autoFollowsTheLanguageUnlessExplicit(stored: String?, language: String, expected: PieceNotation) {
+        #expect(PieceNotation.resolve(stored: stored, languageCode: language) == expected)
+    }
+
+    @MainActor
+    @Test func theNotationChoiceIsRememberedAndAutoComesBack() {
+        let settings = AppSettings.shared
+        let previousChoice = settings.pieceNotationChoice
+        defer { settings.pieceNotationChoice = previousChoice }
+        settings.pieceNotationChoice = .german
+        #expect(settings.pieceNotation == .german)
+        #expect(UserDefaults.standard.string(forKey: "settings.pieceNotation") == "german")
+        settings.pieceNotationChoice = nil
+        #expect(UserDefaults.standard.string(forKey: "settings.pieceNotation") == AppSettings.automaticNotationStorageValue)
+        #expect(settings.pieceNotation == PieceNotation.defaultFor(languageCode: settings.appLanguage.resolvedCode))
     }
 }

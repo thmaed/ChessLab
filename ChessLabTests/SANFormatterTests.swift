@@ -93,9 +93,9 @@ struct SANFormatterTests {
     /// celui où l'erreur coûterait le plus cher.
     @MainActor
     @Test func theExportedPGNStaysEnglishEvenWhenTheAppDisplaysFrench() throws {
-        let previous = AppSettings.shared.pieceNotation
-        defer { AppSettings.shared.pieceNotation = previous }
-        AppSettings.shared.pieceNotation = .french
+        let previous = AppSettings.shared.pieceNotationChoice
+        defer { AppSettings.shared.pieceNotationChoice = previous }
+        AppSettings.shared.pieceNotationChoice = .french
 
         var game = Game()
         var index = game.startingIndex
