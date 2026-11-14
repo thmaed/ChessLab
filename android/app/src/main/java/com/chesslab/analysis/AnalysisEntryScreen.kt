@@ -89,7 +89,7 @@ fun AnalysisEntryScreen(
                 text.isNullOrBlank() -> message = unreadable
                 // UNE entrée (2.3, comme iOS) : une partie ou une position s'ouvre en analyse ; un fichier
                 // de PLUSIEURS parties est une base, il part dans la bibliothèque et on dit combien.
-                PgnSanitizer.splitIntoGames(PgnSanitizer.sanitize(text)).size > 1 -> {
+                PgnSanitizer.splitIntoGames(text).size > 1 -> {
                     val outcome = withContext(Dispatchers.IO) {
                         importPgnText(text, LibraryDatabase.get(context).games())
                     }

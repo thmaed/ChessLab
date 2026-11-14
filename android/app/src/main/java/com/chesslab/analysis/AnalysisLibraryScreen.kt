@@ -603,7 +603,11 @@ internal suspend fun importPgn(
 
 /** Le même import, depuis un texte déjà lu — l'écran Analyser l'emploie pour un fichier de PLUSIEURS parties. */
 internal suspend fun importPgnText(text: String, dao: com.chesslab.library.GameDao): ImportOutcome? = runCatching {
-    val games = PgnSanitizer.splitIntoGames(PgnSanitizer.sanitize(text))
+    // DÉCOUPER d'abord, nettoyer CHAQUE partie ensuite, comme iOS (`importPGNCollection`). Nettoyer le fichier
+    // entier avant de le découper ne gardait qu'UNE ligne vide pour tout le fichier : les parties 2, 3… perdaient
+    // la séparation tags/coups et ChessKit les refusait (« invalidMove: Event ») — un fichier de trois parties
+    // n'en rangeait qu'une. Défaut Android d'avant la 2.3, relevé sur Galaxy le 14/11.
+    val games = PgnSanitizer.cleanGames(text)
     val seen = dao.allOnce().mapNotNull { com.chesslab.library.GameSignature.of(it.pgn) }.toMutableSet()
     var added = 0
     var duplicates = 0

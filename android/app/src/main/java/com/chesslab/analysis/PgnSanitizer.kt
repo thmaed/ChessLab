@@ -95,6 +95,13 @@ object PgnSanitizer {
      * `[Event …]`. Un fichier `.pgn` en contient souvent plusieurs, et l'écran
      * d'analyse n'en montre qu'une — la première.
      */
+    /**
+     * Les parties d'un fichier, DÉCOUPÉES d'abord puis NETTOYÉES une à une — dans cet ordre. Nettoyer le fichier
+     * entier avant de le découper ne gardait qu'UNE ligne vide au total : les parties 2, 3… perdaient la
+     * séparation tags/coups et n'étaient plus lisibles. Pendant du `importPGNCollection` d'iOS.
+     */
+    fun cleanGames(pgnText: String): List<String> = splitIntoGames(pgnText).map { sanitize(it) }
+
     fun splitIntoGames(pgnText: String): List<String> {
         val games = ArrayList<String>()
         val current = ArrayList<String>()
