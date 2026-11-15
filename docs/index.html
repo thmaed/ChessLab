@@ -1,155 +1,178 @@
 <!doctype html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ChessLab — Jouer, analyser, progresser</title>
-<meta name="description" content="Une app d'échecs gratuite, sans publicité, qui tourne entièrement sur votre appareil : adversaires qui jouent comme des humains, analyse Stockfish, plus de 100 000 puzzles. iPhone, iPad et Android.">
+<title>ChessLab — Free chess trainer: play like humans, analyse, puzzles, openings</title>
+<meta name="description" content="A free chess app with no ads and no account. Nine opponents who play like humans, Stockfish analysis that explains your mistakes, 58 openings, 78 proven endgames and over 130,000 puzzles. Everything stays on your device. iPhone, iPad and Android.">
 <link rel="canonical" href="https://thmaed.github.io/ChessLab/">
-<!-- Aperçu quand le lien est partagé (messageries, réseaux, forums). -->
+<link rel="alternate" hreflang="en" href="https://thmaed.github.io/ChessLab/"><link rel="alternate" hreflang="fr" href="https://thmaed.github.io/ChessLab/fr/"><link rel="alternate" hreflang="es" href="https://thmaed.github.io/ChessLab/es/"><link rel="alternate" hreflang="de" href="https://thmaed.github.io/ChessLab/de/"><link rel="alternate" hreflang="it" href="https://thmaed.github.io/ChessLab/it/"><link rel="alternate" hreflang="x-default" href="https://thmaed.github.io/ChessLab/">
+<meta name="theme-color" content="#0d1512">
 <meta property="og:type" content="website">
+<meta property="og:site_name" content="ChessLab">
+<meta property="og:locale" content="en_GB">
 <meta property="og:url" content="https://thmaed.github.io/ChessLab/">
-<meta property="og:title" content="ChessLab — échecs gratuits, sans pub, sans compte">
-<meta property="og:description" content="Jouer contre des adversaires qui jouent comme des humains, analyser avec Stockfish, plus de 100 000 puzzles. Tout reste sur l'appareil. iPhone, iPad et Android.">
-<meta property="og:image" content="https://thmaed.github.io/ChessLab/img/partage.jpg">
+<meta property="og:title" content="ChessLab — free chess trainer, no ads, no account">
+<meta property="og:description" content="Play, analyse, improve. The chess trainer that lives entirely on your device. Nine opponents who play like real people, Stockfish to explain your mistakes, and over 130,000 puzzles — with no account and no network.">
+<meta property="og:image" content="https://thmaed.github.io/ChessLab/img/en/partage.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="apple-itunes-app" content="app-id=6793097336">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="site.css">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ChessLab", "applicationCategory": "GameApplication", "operatingSystem": "iOS, iPadOS, Android", "description": "A free chess app with no ads and no account. Nine opponents who play like humans, Stockfish analysis that explains your mistakes, 58 openings, 78 proven endgames and over 130,000 puzzles. Everything stays on your device. iPhone, iPad and Android.", "inLanguage": ["en", "fr", "es", "de", "it"], "url": "https://thmaed.github.io/ChessLab/", "image": "https://thmaed.github.io/ChessLab/img/en/partage.jpg", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "downloadUrl": ["https://apps.apple.com/app/id6793097336", "https://play.google.com/store/apps/details?id=com.maeder.chesslab"], "license": "https://www.gnu.org/licenses/gpl-3.0.html", "isAccessibleForFree": true}</script>
+<script>document.documentElement.classList.add("js")</script>
 </head>
-<body>
-<main class="page" id="top">
+<body id="top">
+<a class="skip" href="#main">Skip to content</a>
 
-<p class="langues"><strong>Français</strong> &nbsp;&middot;&nbsp; <a href="#english">English</a></p>
-
-<h1>Chess<span class="lab">Lab</span></h1>
-<p class="accroche">Jouer, analyser, progresser — sur votre appareil, et nulle part ailleurs.<br>
-<span style="color:var(--texte-tenu)">iPhone, iPad et Android.</span></p>
-
-<p class="atouts">Gratuite <span>·</span> sans publicité <span>·</span> sans compte <span>·</span> open source</p>
-
-<p class="stores">
-<a class="store" href="https://apps.apple.com/app/id6793097336">Télécharger sur l'App Store</a>
-<a class="store" href="https://play.google.com/store/apps/details?id=com.maeder.chesslab">Disponible sur Google Play</a>
-</p>
-
-<div class="galerie" aria-label="Captures d'écran">
-<img src="img/fr-04-adversaires.jpg" alt="Neuf adversaires qui jouent comme des humains" loading="lazy" width="560" height="1211">
-<img src="img/fr-02-coach.jpg" alt="L'analyse explique chaque faute" loading="lazy" width="560" height="1211">
-<img src="img/fr-01-seance.jpg" alt="La séance du jour" loading="lazy" width="560" height="1211">
-<img src="img/fr-09-finales.jpg" alt="Des finales prouvées par les tables" loading="lazy" width="560" height="1211">
+<header class="bar">
+<div class="bar-in">
+<a class="logo" href="#top" aria-label="ChessLab">Chess<span>Lab</span></a>
+<nav aria-label="Menu"><a href="#features">Features</a><a href="#screens">Screens</a><a href="#devices">Devices</a><a href="#privacy">Privacy</a><a href="#faq">FAQ</a></nav>
+<details class="lang"><summary aria-label="Language"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg>EN</summary><ul><li><a href="./" hreflang="en" lang="en" aria-current="true">English</a></li><li><a href="fr/" hreflang="fr" lang="fr">Français</a></li><li><a href="es/" hreflang="es" lang="es">Español</a></li><li><a href="de/" hreflang="de" lang="de">Deutsch</a></li><li><a href="it/" hreflang="it" lang="it">Italiano</a></li></ul></details>
 </div>
+</header>
 
-<div class="promesse">
-<p><strong>Aucun compte. Aucun réseau. Aucune donnée qui sort de l'appareil.</strong></p>
-<p>Ce n'est pas une intention, c'est vérifiable : l'application Android ne
-demande pas la permission <code>INTERNET</code>, sans laquelle aucun programme
-ne peut ouvrir la moindre connexion. Mettez-la en mode avion — tout fonctionne,
-y compris l'analyse et les adversaires, qui calculent sur l'appareil.</p>
+<main id="main">
+
+<section class="hero">
+<div class="hero-in">
+<div class="hero-text">
+<p class="kicker">Free · No ads · No account · Open source</p>
+<h1>Play, analyse, improve.</h1>
+<p class="lead">The chess trainer that lives entirely on your device. Nine opponents who play like real people, Stockfish to explain your mistakes, and over 130,000 puzzles — with no account and no network.</p>
+<div class="stores"><a class="store" href="https://apps.apple.com/app/id6793097336"><span class="s1">Download on the</span><span class="s2">App Store</span></a><a class="store" href="https://play.google.com/store/apps/details?id=com.maeder.chesslab"><span class="s1">Get it on</span><span class="s2">Google Play</span></a></div>
+<p class="platforms">iPhone · iPad · iPhone Duo · Android</p>
 </div>
-
-<h2>Ce qu'elle fait</h2>
-
-<h3>Jouer</h3>
-<p>Contre neuf personnages qui jouent comme de vrais joueurs de leur niveau,
-gaffes comprises, ou contre Stockfish bridé au curseur. À deux sur le même
-appareil aussi. Douze variantes : Chess960, Roi de la colline, Horde, Atomique,
-Crazyhouse, Duck Chess…</p>
-
-<h3>Analyser</h3>
-<p>Chaque coup classé, chaque faute expliquée — pas seulement signalée. L'app
-dit <em>pourquoi</em> un coup était mauvais, en une phrase, et ne nomme que ce
-qui se voit sur l'échiquier. Vos erreurs deviennent des exercices.</p>
-
-<h3>Apprendre</h3>
-<p>58 ouvertures et 78 finales, en cours jouables plutôt qu'en listes à retenir.
-Plus de 100 000 puzzles. La répétition espacée décide de ce que vous revoyez et
-quand.</p>
-
-<h3>Scanner</h3>
-<p>Photographiez un échiquier réel ou une capture d'écran : la position arrive
-sur le plateau. La reconnaissance se fait sur l'appareil.</p>
-
-<h2>Liens</h2>
-<ul class="liens">
-<li><a href="privacy-policy.html">Politique de confidentialité</a></li>
-<li><a href="support.html">Aide</a></li>
-<li><a href="https://github.com/thmaed/ChessLab">Code source</a> — GPLv3</li>
-<li><a href="mailto:thmaed@icloud.com">thmaed@icloud.com</a></li>
-</ul>
-
-<hr style="border:0;border-top:1px solid var(--trait);margin:4rem 0 0">
-
-<div id="english" lang="en">
-
-<p class="langues"><a href="#top">Français</a> &nbsp;&middot;&nbsp; <strong>English</strong></p>
-
-<h1>Chess<span class="lab">Lab</span></h1>
-<p class="accroche">Play, analyse, improve — on your device, and nowhere else.<br>
-<span style="color:var(--texte-tenu)">iPhone, iPad and Android.</span></p>
-
-<p class="atouts">Free <span>·</span> no ads <span>·</span> no account <span>·</span> open source</p>
-
-<p class="stores">
-<a class="store" href="https://apps.apple.com/app/id6793097336">Download on the App Store</a>
-<a class="store" href="https://play.google.com/store/apps/details?id=com.maeder.chesslab">Get it on Google Play</a>
-</p>
-
-<div class="galerie" aria-label="Screenshots">
-<img src="img/en-04-adversaires.jpg" alt="Nine opponents who play like humans" loading="lazy" width="560" height="1211">
-<img src="img/en-02-coach.jpg" alt="Analysis explains every mistake" loading="lazy" width="560" height="1211">
-<img src="img/en-01-seance.jpg" alt="The daily session" loading="lazy" width="560" height="1211">
-<img src="img/en-09-finales.jpg" alt="Endgames proven by tablebases" loading="lazy" width="560" height="1211">
+<div class="hero-phones" aria-hidden="false">
+<img src="img/en/02-coach.jpg" alt="What players at your level play" width="640" height="1385" fetchpriority="high" class="p1">
+<img src="img/en/04-adversaires.jpg" alt="Nine opponents that play like humans" width="640" height="1385" fetchpriority="high" class="p2">
+<img src="img/en/01-seance.jpg" alt="Your daily session" width="640" height="1385" fetchpriority="high" class="p3">
 </div>
-
-<div class="promesse">
-<p><strong>No account. No network. No data leaving the device.</strong></p>
-<p>This is not a promise, it is verifiable: the Android app does not request the
-<code>INTERNET</code> permission, without which no program can open a connection
-at all. Put it in airplane mode — everything works, including analysis and the
-computer opponents, which compute on the device.</p>
 </div>
+</section>
 
-<h2>What it does</h2>
+<section class="stats" aria-label="ChessLab"><ul><li><strong>9</strong><span>opponents who play like humans</span></li><li><strong>58</strong><span>illustrated openings</span></li><li><strong>78</strong><span>endgames proven by tablebases</span></li><li><strong>130,000+</strong><span>puzzles</span></li><li><strong>12</strong><span>chess variants</span></li><li><strong>5</strong><span>languages</span></li></ul></section>
 
-<h3>Play</h3>
-<p>Against nine characters who play like real players of their level, blunders
-included, or against Stockfish throttled by a slider. Two players on one device
-too. Twelve variants: Chess960, King of the Hill, Horde, Atomic, Crazyhouse,
-Duck Chess…</p>
-
-<h3>Analyse</h3>
-<p>Every move graded, every mistake explained — not merely flagged. The app says
-<em>why</em> a move was bad, in one sentence, and names only what can be seen on
-the board. Your mistakes become exercises.</p>
-
-<h3>Learn</h3>
-<p>58 openings and 78 endgames, as courses you play rather than lists you
-memorise. Over 100,000 puzzles. Spaced repetition decides what you review, and
-when.</p>
-
-<h3>Scan</h3>
-<p>Photograph a real chessboard or read a screenshot: the position lands on the
-board. Recognition runs on the device.</p>
-
-<h2>Links</h2>
-<ul class="liens">
-<li><a href="privacy-policy.html#english">Privacy Policy</a></li>
-<li><a href="support.html">Support</a></li>
-<li><a href="https://github.com/thmaed/ChessLab">Source code</a> — GPLv3</li>
-<li><a href="mailto:thmaed@icloud.com">thmaed@icloud.com</a></li>
-</ul>
-
+<section class="promise" id="privacy">
+<div class="wrap">
+<p class="eyebrow">Privacy</p>
+<h2>Nothing leaves your device.</h2>
+<p class="intro">Most chess apps want an account, a connection and your data. ChessLab wants none of them — and you can check.</p>
+<ul class="pillars"><li class="reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg><h3>Works in airplane mode</h3><p>The engine, the human-like opponents, the analysis, the courses and the puzzles are all built in and compute on your device.</p></li><li class="reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><h3>No account, no tracking</h3><p>No sign-up, no analytics, no ads, no third-party service. We have no server, so there is nothing to collect your data.</p></li><li class="reveal"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></svg><h3>Verifiable, open source</h3><p>The Android app does not even request the INTERNET permission, so it cannot connect to anything. The full source code is public (GPLv3).</p></li></ul>
+<p class="more"><a href="privacy-policy.html#english">Read the full privacy policy →</a></p>
 </div>
+</section>
 
-<div class="pied">
-<p>ChessLab embarque <a href="https://stockfishchess.org">Stockfish</a>, publié
-sous licence GPLv3 — le code source de l'application est donc disponible, comme
-cette licence l'exige.</p>
-<p lang="en">ChessLab embeds <a href="https://stockfishchess.org">Stockfish</a>,
-released under the GPLv3 licence — the app's source code is therefore available,
-as that licence requires.</p>
+<section class="who">
+<div class="wrap">
+<h2>For every kind of player</h2>
+<p class="intro">ChessLab runs several engines, including ones that play like humans, so the same app suits a first game and a club tournament.</p>
+<ul class="cards"><li class="reveal"><h3>Just starting out</h3><p>Play against a gentle character who makes human mistakes, ask for a hint when you are stuck, and let the Coach explain what went wrong — in one plain sentence.</p></li><li class="reveal"><h3>Improving at the club</h3><p>Build your repertoire with explained openings, drill it with spaced repetition, and turn your own mistakes into puzzles.</p></li><li class="reveal"><h3>Curious and tinkering</h3><p>Twelve variants, Chess960, a laboratory that pits two Stockfish settings against each other, and PGN, FEN and photo import.</p></li></ul>
 </div>
+</section>
+
+<section class="features" id="features">
+<div class="wrap">
+<p class="eyebrow">Features</p>
+<h2>Everything you need to get better</h2>
+<p class="intro">Play, understand, remember. Each part works on its own, and together they make a daily habit.</p>
+<article class="feature reveal" id="f1"><div class="feature-text"><span class="num">01</span><h3>Opponents that play like humans</h3><p>Nine characters played by Maia-3, a network trained on millions of human games: it does not look for the best move, it plays the one a human of that level would play, blunders included. Each has a style, a repertoire and a temperament, and a level set on the human scale. Or take on Stockfish, from beginner (~900 Elo) to maximum (~3190). Optional clock, hints, a warning before risky moves and an evaluation bar, all on demand.</p></div><div class="feature-shot"><img src="img/en/04-adversaires.jpg" alt="Nine opponents that play like humans" width="640" height="1385" loading="lazy" decoding="async"></div></article>
+<article class="feature reveal alt" id="f2"><div class="feature-text"><span class="num">02</span><h3>Analyse and understand</h3><p>Every move is graded (inaccuracy, mistake, blunder, brilliant…), each player gets an accuracy score, and the app tells you why a move was bad. The Coach adds the share of players at your level who play it. At the end, it offers to turn your mistakes and missed mates into puzzles. Load a game by PGN, FEN, position editor or photo scanner.</p></div><div class="feature-shot"><img src="img/en/02-coach.jpg" alt="What players at your level play" width="640" height="1385" loading="lazy" decoding="async"></div></article>
+<article class="feature reveal" id="f3"><div class="feature-text"><span class="num">03</span><h3>Daily session</h3><p>Every day, what to review: opening positions that are due, missed puzzles, an endgame. A streak of days and medals to keep you going.</p></div><div class="feature-shot"><img src="img/en/01-seance.jpg" alt="Your daily session" width="640" height="1385" loading="lazy" decoding="async"></div></article>
+<article class="feature reveal alt" id="f4"><div class="feature-text"><span class="num">04</span><h3>Openings</h3><p>58 hand-written openings (multilingual), checked against the engine: every move is explained, coloured arrows tie the board to the move list, and spaced repetition makes them stick. Import your own repertoires as PGN too.</p></div><div class="feature-shot"><img src="img/en/06-ouvertures.jpg" alt="58 illustrated openings" width="640" height="1385" loading="lazy" decoding="async"></div></article>
+<article class="feature reveal" id="f5"><div class="feature-text"><span class="num">05</span><h3>Endgames</h3><p>78 courses proven by endgame tablebases: no move taught gives up a win, no defence offered loses a draw. Plus free training, where any move that keeps the verdict is accepted.</p></div><div class="feature-shot"><img src="img/en/09-finales.jpg" alt="78 proven endgames" width="640" height="1385" loading="lazy" decoding="async"></div></article>
+<article class="feature reveal alt" id="f6"><div class="feature-text"><span class="num">06</span><h3>Puzzles</h3><p>Over 130,000 problems from the Lichess database, filtered by level and theme, plus your own: drawn from your mistakes, or imported from your own PGN files. Personal rating and “At my level”.</p></div><div class="feature-shot"><img src="img/en/08-puzzle-cote.jpg" alt="Over 130,000 puzzles" width="640" height="1385" loading="lazy" decoding="async"></div></article>
+<article class="feature reveal" id="f7"><div class="feature-text"><span class="num">07</span><h3>Variants and more</h3><p>Chess960 and eleven variants against the computer (King of the Hill, Three-Check, Horde, Atomic, Crazyhouse, Duck Chess, Barricades…), each with its own analysis. Two-player mode, and a Laboratory to compare two Stockfish settings.</p></div><div class="feature-shot"><img src="img/en/10-variantes.jpg" alt="Twelve variants" width="640" height="1385" loading="lazy" decoding="async"></div></article>
+</div>
+</section>
+
+<section class="screens" id="screens">
+<div class="wrap">
+<p class="eyebrow">Screens</p>
+<h2>See it in action</h2>
+<p class="intro">Real screens from the app, in English. Swipe to browse.</p>
+</div>
+<ul class="strip" tabindex="0" aria-label="See it in action"><li><img src="img/en/04-adversaires.jpg" alt="Nine opponents that play like humans" width="640" height="1385" loading="lazy" decoding="async"></li><li><img src="img/en/02-coach.jpg" alt="What players at your level play" width="640" height="1385" loading="lazy" decoding="async"></li><li><img src="img/en/01-seance.jpg" alt="Your daily session" width="640" height="1385" loading="lazy" decoding="async"></li><li><img src="img/en/07-lecteur.jpg" alt="Every move explained" width="640" height="1385" loading="lazy" decoding="async"></li><li><img src="img/en/06-ouvertures.jpg" alt="58 illustrated openings" width="640" height="1385" loading="lazy" decoding="async"></li><li><img src="img/en/09-finales.jpg" alt="78 proven endgames" width="640" height="1385" loading="lazy" decoding="async"></li><li><img src="img/en/03-puzzles-offre.jpg" alt="Your mistakes become puzzles" width="640" height="1385" loading="lazy" decoding="async"></li><li><img src="img/en/08-puzzle-cote.jpg" alt="Over 130,000 puzzles" width="640" height="1385" loading="lazy" decoding="async"></li><li><img src="img/en/05-puzzles-ecran.jpg" alt="Your puzzles, your collections" width="640" height="1385" loading="lazy" decoding="async"></li><li><img src="img/en/10-variantes.jpg" alt="Twelve variants" width="640" height="1385" loading="lazy" decoding="async"></li></ul>
+</section>
+
+<section class="devices" id="devices">
+<div class="wrap">
+<p class="eyebrow">Devices</p>
+<h2>One app, every screen you own</h2>
+<p class="intro">The same features and the same look on iPhone, iPad, the foldable iPhone Duo and Android.</p>
+<div class="family reveal"><img src="img/en/banniere.jpg" alt="One app, every screen you own" width="1800" height="771" loading="lazy" decoding="async"></div>
+<div class="device-grid">
+<article class="device reveal"><div class="device-media"><img src="img/en/ipad.jpg" alt="ChessLab on iPad, with the board and the analysis side by side" width="1000" height="1333" loading="lazy" decoding="async"></div><h3>iPhone &amp; iPad</h3><p>A large board with the panels side by side on iPad, keyboard and trackpad support, portrait and landscape. Optional iCloud sync between your own Apple devices — off by default.</p></article><article class="device reveal"><div class="device-media duo"><img src="img/en/duo-inner.jpg" alt="ChessLab on the inner screen of the iPhone Duo" width="1300" height="914" loading="lazy" decoding="async"><img src="img/en/duo-outer.jpg" alt="ChessLab on the outer screen of the iPhone Duo" width="560" height="815" loading="lazy" decoding="async"></div><h3>iPhone Duo</h3><p>Full support for both screens: the compact outer display for a quick game, and the wide inner display with the board and the analysis next to each other.</p></article><article class="device reveal"><div class="device-media android"><img src="img/en/android-1.jpg" alt="ChessLab on Android: new game" width="460" height="997" loading="lazy" decoding="async"><img src="img/en/android-2.jpg" alt="ChessLab on Android: analysis" width="460" height="997" loading="lazy" decoding="async"><img src="img/en/android-3.jpg" alt="ChessLab on Android: puzzle" width="460" height="997" loading="lazy" decoding="async"></div><h3>Android</h3><p>Phones and tablets from Android 8.0. The same courses, the same opponents, the same analysis. Move your data between Android devices with an exported file — no cloud involved.</p></article>
+</div>
+</div>
+</section>
+
+<section class="maker">
+<div class="wrap narrow">
+<h2>Made by one person, with care</h2>
+<p>I make ChessLab alone, and I try to build the app I would want to use: no account, no ads, no tracking, no network.</p><p>I care about getting things right. The endgame lessons are checked against tablebases, the opponents are trained on real human games, and the whole app is available in five languages so more people can enjoy it. If something is off, I want to hear about it.</p>
+</div>
+</section>
+
+<section class="credits">
+<div class="wrap narrow">
+<h2>Open source, built on great work</h2>
+<p class="intro">ChessLab stands on free software and openly licensed data. The complete source code and every licence notice are public, and also available inside the app (Settings → Licences).</p>
+<table class="reveal"><thead><tr><th>Component</th><th>Licence</th></tr></thead><tbody><tr><td><a href="https://stockfishchess.org" rel="noopener">Stockfish 19</a></td><td>GPLv3</td></tr><tr><td><a href="https://fairy-stockfish.github.io" rel="noopener">Fairy-Stockfish</a></td><td>GPLv3</td></tr><tr><td><a href="https://github.com/CSSLab/maia3" rel="noopener">Maia-3 (Chessformer) — CSSLab, University of Toronto</a></td><td>AGPLv3</td></tr><tr><td><a href="https://github.com/ultralytics/ultralytics" rel="noopener">YOLO11 — Ultralytics (scanner)</a></td><td>AGPLv3</td></tr><tr><td><a href="https://github.com/chesskit-app/chesskit-swift" rel="noopener">ChessKit</a></td><td>MIT</td></tr><tr><td><a href="https://database.lichess.org/#puzzles" rel="noopener">Lichess puzzle database</a></td><td>CC0</td></tr><tr><td><a href="https://commons.wikimedia.org/wiki/User:Cburnett" rel="noopener">cburnett pieces</a></td><td>CC BY-SA 3.0</td></tr><tr><td><a href="https://github.com/LexLuengas/chessnut-pieces" rel="noopener">chessnut pieces</a></td><td>Apache 2.0</td></tr><tr><td><a href="https://github.com/lichess-org/lila/tree/master/public/piece/merida" rel="noopener">merida pieces</a></td><td>GPLv2+</td></tr><tr><td><a href="https://github.com/thmaed/ChessLab" rel="noopener">ChessLab</a></td><td>GPLv3</td></tr></tbody></table>
+</div>
+</section>
+
+<section class="faq" id="faq">
+<div class="wrap narrow">
+<p class="eyebrow">FAQ</p>
+<h2>Questions, answered</h2>
+<details class="reveal"><summary>Is ChessLab really free?</summary><p>Yes. It is free, with no ads and no account. It is a one-person project, and the source code is open.</p></details><details class="reveal"><summary>Does it need an internet connection?</summary><p>No. Everything works offline, in airplane mode: the engines, the analysis, the courses and the puzzles are all inside the app. The Android app does not even declare the INTERNET permission.</p></details><details class="reveal"><summary>What happens to my games and progress?</summary><p>They stay on your device, in the app&#x27;s private storage. On iPhone and iPad you can optionally sync them between your own devices through iCloud (off by default). On Android you can export a backup file and import it on another Android device.</p></details><details class="reveal"><summary>Can I move my data between iPhone and Android?</summary><p>No. The two apps do not exchange data: iCloud sync works between Apple devices, and the backup file is for Android devices only.</p></details><details class="reveal"><summary>How do the human-like opponents work?</summary><p>Nine characters are played by Maia-3, a neural network from the University of Toronto trained on millions of human games. It does not look for the best move: it plays the move a human of that level would play, mistakes included. Each character adds a style — attack, trades, gambits — without ever buying itself a blunder the model found unlikely.</p></details><details class="reveal"><summary>What level are the opponents?</summary><p>They use the human scale of Maia, close to the Lichess scale. It is not comparable with a Stockfish level: a Stockfish throttled to 1100 beats a Maia set at 2200, because it calculates where Maia recognises. Two scales, two different things. You can also play Stockfish itself, from about 900 to about 3190 Elo.</p></details><details class="reveal"><summary>Which variants are included?</summary><p>Chess960 and eleven others against the computer: King of the Hill, Three-Check, Horde, Atomic, Crazyhouse, Duck Chess, Barricades and more, each with its own analysis. There is also a two-player mode on one device.</p></details><details class="reveal"><summary>Can I import my own games, repertoires and puzzles?</summary><p>Yes. Load a game or a collection of games from a PGN file, paste a PGN or a FEN, build a position in the editor, or scan one from a photo. You can import your own opening repertoires as PGN, and your own puzzles as PGN files, which become collections you can drill, including with the Woodpecker method.</p></details><details class="reveal"><summary>How does the scanner work?</summary><p>Photograph a real board, or open a screenshot, and the position lands on the board. The recognition runs on your device and the image is sent nowhere. Whose turn it is, castling rights and en passant cannot be read from a picture, so the app does not guess: you set them.</p></details><details class="reveal"><summary>How does the spaced repetition work?</summary><p>Openings use FSRS-5, puzzles use SM-2. The unit is the position, not the line: a position you learned in one opening counts in every opening that reaches it. A daily session tells you what is due.</p></details><details class="reveal"><summary>Which languages are supported?</summary><p>French, English, Spanish, German and Italian, fully, including the opening and endgame courses and the coaching comments. The piece letters follow the language (K, Q, R… or R, D, T…), or you can choose them in the settings.</p></details><details class="reveal"><summary>Why is it open source?</summary><p>ChessLab embeds Stockfish, which is released under the GPLv3 licence. That licence requires the complete source code to be available, so it is, and so are the notices for the other components.</p></details><details class="reveal"><summary>I found a bug, or I have an idea.</summary><p>Write to thmaed@icloud.com or open an issue on GitHub. It is a one-person project with no guaranteed response time, but everything is read.</p></details>
+</div>
+</section>
+
+<section class="cta">
+<div class="wrap narrow center">
+<h2>Ready for your first game?</h2>
+<p class="intro">Free, with no account. Download it and play.</p>
+<div class="stores center"><a class="store" href="https://apps.apple.com/app/id6793097336"><span class="s1">Download on the</span><span class="s2">App Store</span></a><a class="store" href="https://play.google.com/store/apps/details?id=com.maeder.chesslab"><span class="s1">Get it on</span><span class="s2">Google Play</span></a></div>
+</div>
+</section>
 
 </main>
+
+<footer class="foot">
+<div class="wrap">
+<div class="foot-top">
+<a class="logo" href="#top">Chess<span>Lab</span></a>
+<ul>
+<li><a href="privacy-policy.html#english">Privacy policy</a></li>
+<li><a href="support.html">Support</a></li>
+<li><a href="https://github.com/thmaed/ChessLab" rel="noopener">Source code — GPLv3</a></li>
+<li><a href="mailto:thmaed@icloud.com">Contact</a></li>
+</ul>
+</div>
+<p class="note">ChessLab embeds Stockfish, released under the GPLv3 licence — the app&#x27;s source code is therefore available, as that licence requires.</p>
+<p class="note"><a href="#top">↑ Back to top</a></p>
+</div>
+</footer>
+
+<script>
+(function () {
+  var els = document.querySelectorAll(".reveal");
+  if (!("IntersectionObserver" in window) || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    els.forEach(function (e) { e.classList.add("in"); }); return;
+  }
+  var io = new IntersectionObserver(function (es) {
+    es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  els.forEach(function (e) { io.observe(e); });
+  document.addEventListener("click", function (ev) {
+    var d = document.querySelector(".lang[open]");
+    if (d && !d.contains(ev.target)) d.removeAttribute("open");
+  });
+})();
+</script>
 </body>
 </html>
