@@ -23,7 +23,6 @@ RACINE = Path(__file__).resolve().parents[2]
 DOCS = RACINE / "docs"
 BASE = "https://thmaed.github.io/ChessLab/"
 APPSTORE = "https://apps.apple.com/app/id6793097336"
-PLAY = "https://play.google.com/store/apps/details?id=com.maeder.chesslab"
 GITHUB = "https://github.com/thmaed/ChessLab"
 EMAIL = "thmaed@icloud.com"
 ORDRE = ["en", "fr", "es", "de", "it"]
@@ -36,6 +35,25 @@ GALERIE = ["04-adversaires", "02-coach", "01-seance", "07-lecteur", "06-ouvertur
 FONCTIONS = ["04-adversaires", "02-coach", "01-seance", "06-ouvertures", "09-finales", "08-puzzle-cote", "10-variantes"]
 SECTION_METADATA = {"fr": 107, "en": 172, "es": 232, "de": 292, "it": 352}
 FIN_METADATA = {"fr": 172, "en": 232, "es": 292, "de": 352, "it": 412}
+
+# Page racine (anglais) seulement : envoie le visiteur vers sa langue, SAUF s'il en a déjà choisi une au sélecteur
+# (mémorisée dans le navigateur, sur l'appareil — rien ne part nulle part). La première langue prise en charge,
+# dans l'ordre de préférence du navigateur, l'emporte ; si c'est l'anglais, on reste. Les moteurs de recherche
+# n'exécutent pas ce script : ils indexent la racine, et les pages de langue via hreflang.
+DETECTION = """<script>(function () {
+  try {
+    var L = ["fr", "es", "de", "it"], p = null;
+    try { p = localStorage.getItem("chesslab-lang"); } catch (e) {}
+    if (p) { if (L.indexOf(p) > -1) location.replace(p + "/" + location.hash); return; }
+    var l = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || "en"];
+    for (var i = 0; i < l.length; i++) {
+      var c = String(l[i]).toLowerCase().slice(0, 2);
+      if (c === "en") return;
+      if (L.indexOf(c) > -1) { location.replace(c + "/" + location.hash); return; }
+    }
+  } catch (e) {}
+})();</script>
+"""
 
 ICONES = {
     "plane": '<path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/>',
@@ -99,7 +117,6 @@ def page(lang):
     def boutons(extra=""):
         return (f'<div class="stores{extra}">'
                 f'<a class="store" href="{APPSTORE}"><span class="s1">{esc(t["appstore_small"])}</span><span class="s2">{esc(t["appstore"])}</span></a>'
-                f'<a class="store" href="{PLAY}"><span class="s1">{esc(t["play_small"])}</span><span class="s2">{esc(t["play"])}</span></a>'
                 f'</div>')
 
     stats = "".join(f'<li><strong>{esc(n)}</strong><span>{esc(l)}</span></li>' for n, l in t["stats"])
@@ -118,15 +135,13 @@ def page(lang):
 
     galerie = "".join(f'<li>{image(pre, lang, n, alt[n], 640, H)}</li>' for n in GALERIE)
 
-    a1, a2, a3 = t["alt_android"]
     appareils = [
-        f'<article class="device reveal"><div class="device-media">{image(pre, lang, "ipad", t["alt_ipad"], 1000, 1333)}</div>'
+        f'<article class="device reveal"><div class="device-media iphone">{image(pre, lang, "07-lecteur", alt["07-lecteur"], 640, H)}</div>'
         f'<h3>{esc(t["devices"][0][0])}</h3><p>{esc(t["devices"][0][1])}</p></article>',
+        f'<article class="device reveal"><div class="device-media">{image(pre, lang, "ipad", t["alt_ipad"], 1000, 1333)}</div>'
+        f'<h3>{esc(t["devices"][1][0])}</h3><p>{esc(t["devices"][1][1])}</p></article>',
         f'<article class="device reveal"><div class="device-media duo">{image(pre, lang, "duo-inner", t["alt_duo_inner"], 1300, 914)}'
         f'{image(pre, lang, "duo-outer", t["alt_duo_outer"], 560, 815)}</div>'
-        f'<h3>{esc(t["devices"][1][0])}</h3><p>{esc(t["devices"][1][1])}</p></article>',
-        f'<article class="device reveal"><div class="device-media android">{image(pre, lang, "android-1", a1, 460, 997)}'
-        f'{image(pre, lang, "android-2", a2, 460, 997)}{image(pre, lang, "android-3", a3, 460, 997)}</div>'
         f'<h3>{esc(t["devices"][2][0])}</h3><p>{esc(t["devices"][2][1])}</p></article>',
     ]
 
@@ -139,14 +154,15 @@ def page(lang):
 
     donnees = {
         "@context": "https://schema.org", "@type": "SoftwareApplication", "name": "ChessLab",
-        "applicationCategory": "GameApplication", "operatingSystem": "iOS, iPadOS, Android",
+        "applicationCategory": "GameApplication", "operatingSystem": "iOS, iPadOS",
         "description": t["desc"], "inLanguage": ORDRE, "url": url,
         "image": f"{BASE}img/{lang}/partage.jpg",
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"},
-        "downloadUrl": [APPSTORE, PLAY], "license": "https://www.gnu.org/licenses/gpl-3.0.html",
+        "downloadUrl": APPSTORE, "license": "https://www.gnu.org/licenses/gpl-3.0.html",
         "isAccessibleForFree": True,
     }
 
+    detection = DETECTION if lang == "en" else ""
     return f"""<!doctype html>
 <html lang="{t["html"]}">
 <head>
@@ -170,7 +186,7 @@ def page(lang):
 <meta name="apple-itunes-app" content="app-id=6793097336">
 <link rel="stylesheet" href="{pre}site.css">
 <script type="application/ld+json">{json.dumps(donnees, ensure_ascii=False)}</script>
-<script>document.documentElement.classList.add("js")</script>
+{detection}<script>document.documentElement.classList.add("js")</script>
 </head>
 <body id="top">
 <a class="skip" href="#main">{esc(t["skip"])}</a>
@@ -311,6 +327,11 @@ def page(lang):
     es.forEach(function (e) {{ if (e.isIntersecting) {{ e.target.classList.add("in"); io.unobserve(e.target); }} }});
   }}, {{ rootMargin: "0px 0px -8% 0px" }});
   els.forEach(function (e) {{ io.observe(e); }});
+  document.querySelectorAll(".lang a").forEach(function (a) {{
+    a.addEventListener("click", function () {{
+      try {{ localStorage.setItem("chesslab-lang", (a.getAttribute("lang") || "en").slice(0, 2)); }} catch (e) {{}}
+    }});
+  }});
   document.addEventListener("click", function (ev) {{
     var d = document.querySelector(".lang[open]");
     if (d && !d.contains(ev.target)) d.removeAttribute("open");

@@ -168,8 +168,7 @@ h3 { font-size: 1.22rem; font-weight: 700; letter-spacing: -.015em; margin-botto
 .device-media { height: 16rem; margin-bottom: 1.4rem; border-radius: 14px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center; gap: .6rem;
   background: radial-gradient(closest-side at 50% 70%, var(--lueur), transparent), var(--fond2); }
 .device-media img { height: 100%; width: auto; max-width: 100%; object-fit: cover; object-position: top; border-radius: 12px 12px 0 0; }
-.device-media.android { gap: .5rem; padding-inline: .6rem; }
-.device-media.android img { width: calc((100% - 1rem) / 3); height: auto; max-height: 100%; object-fit: cover; border-radius: 12px 12px 0 0; border: 1px solid var(--trait); }
+.device-media.iphone img { width: min(11rem, 70%); height: auto; }
 .device-media.duo { align-items: center; }
 .device-media.duo img { height: auto; width: auto; max-height: 100%; border-radius: 10px; }
 .device-media.duo img:first-child { max-width: 62%; }

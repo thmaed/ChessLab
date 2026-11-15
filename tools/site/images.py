@@ -7,9 +7,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 RACINE = Path(__file__).resolve().parents[2]
 SHOTS = RACINE / "AppStoreSubmission/screenshots"
-PLAY = RACINE / "android/app/src/main/play/listings"
 SORTIE = RACINE / "docs/img"
-LANGS = {"fr": "fr-FR", "en": "en-US", "es": "es-ES", "de": "de-DE", "it": "it-IT"}
+LANGS = {"fr": "fr-FR", "en": "en-US", "es": "es-ES", "de": "de-DE", "it": "it-IT"}   # uniquement du matériel Apple
 NOMS = ["01-seance", "02-coach", "03-puzzles-offre", "04-adversaires", "05-puzzles-ecran",
         "06-ouvertures", "07-lecteur", "08-puzzle-cote", "09-finales", "10-variantes"]
 
@@ -26,8 +25,6 @@ for lang, loc in LANGS.items():
     sauve(SHOTS / "ipad-13" / lang / "02-coach.png", d / "ipad.jpg", 1000)
     sauve(SHOTS / "iphone-duo" / lang / "inner-01-seance.png", d / "duo-inner.jpg", 1300)
     sauve(SHOTS / "iphone-duo" / lang / "outer-02-coach.png", d / "duo-outer.jpg", 560)
-    for i, n in enumerate(["3-jouer", "4-analyse", "6-puzzles"], 1):
-        sauve(PLAY / loc / "graphics/phone-screenshots" / f"{n}.png", d / f"android-{i}.jpg", 460)
     sauve(RACINE / f"AppStoreSubmission/entete/entete-{lang}-3840x1646.png", d / "banniere.jpg", 1800, 80)
     # Aperçu des réseaux et messageries : 1200 × 630.
     b = Image.open(RACINE / f"AppStoreSubmission/entete/entete-{lang}-3840x1646.png").convert("RGB")

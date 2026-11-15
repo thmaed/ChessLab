@@ -19,7 +19,7 @@ T = {}
 T["en"] = dict(
     name="English", html="en", og_locale="en_GB",
     title="ChessLab — Free chess trainer: play like humans, analyse, puzzles, openings",
-    desc="A free chess app with no ads and no account. Nine opponents who play like humans, Stockfish analysis that explains your mistakes, 58 openings, 78 proven endgames and over 130,000 puzzles. Everything stays on your device. iPhone, iPad and Android.",
+    desc="A free chess app with no ads and no account. Nine opponents who play like humans, Stockfish analysis that explains your mistakes, 58 openings, 78 proven endgames and over 130,000 puzzles. Everything stays on your device. For iPhone and iPad.",
     og_title="ChessLab — free chess trainer, no ads, no account",
     nav=dict(features="Features", screens="Screens", devices="Devices", privacy="Privacy", faq="FAQ"),
     skip="Skip to content",
@@ -27,7 +27,7 @@ T["en"] = dict(
     sub="The chess trainer that lives entirely on your device. Nine opponents who play like real people, Stockfish to explain your mistakes, and over 130,000 puzzles — with no account and no network.",
     appstore_small="Download on the", appstore="App Store",
     play_small="Get it on", play="Google Play",
-    platforms="iPhone · iPad · iPhone Duo · Android",
+    platforms="iPhone · iPad · iPhone Duo",
     stats=[("9", "opponents who play like humans"), ("58", "illustrated openings"), ("78", "endgames proven by tablebases"),
            ("130,000+", "puzzles"), ("12", "chess variants"), ("5", "languages")],
     promise_title="Nothing leaves your device.",
@@ -35,7 +35,7 @@ T["en"] = dict(
     pillars=[
         ("plane", "Works in airplane mode", "The engine, the human-like opponents, the analysis, the courses and the puzzles are all built in and compute on your device."),
         ("lock", "No account, no tracking", "No sign-up, no analytics, no ads, no third-party service. We have no server, so there is nothing to collect your data."),
-        ("code", "Verifiable, open source", "The Android app does not even request the INTERNET permission, so it cannot connect to anything. The full source code is public (GPLv3)."),
+        ("code", "Open and checkable", "The full source code is public (GPLv3), and so is the licence of every component inside. On the App Store, the privacy label says it too: no data collected."),
     ],
     who_title="For every kind of player",
     who_lead="ChessLab runs several engines, including ones that play like humans, so the same app suits a first game and a club tournament.",
@@ -49,11 +49,11 @@ T["en"] = dict(
     shots_title="See it in action",
     shots_lead="Real screens from the app, in English. Swipe to browse.",
     devices_title="One app, every screen you own",
-    devices_lead="The same features and the same look on iPhone, iPad, the foldable iPhone Duo and Android.",
+    devices_lead="The same features and the same look on iPhone, iPad and the foldable iPhone Duo.",
     devices=[
-        ("iPhone & iPad", "A large board with the panels side by side on iPad, keyboard and trackpad support, portrait and landscape. Optional iCloud sync between your own Apple devices — off by default."),
+        ("iPhone", "Play, analyse and train anywhere, in portrait or landscape — even in airplane mode. Optional iCloud sync between your own Apple devices, off by default."),
+        ("iPad", "A large board with the panels side by side, keyboard and trackpad support, in portrait and landscape."),
         ("iPhone Duo", "Full support for both screens: the compact outer display for a quick game, and the wide inner display with the board and the analysis next to each other."),
-        ("Android", "Phones and tablets from Android 8.0. The same courses, the same opponents, the same analysis. Move your data between Android devices with an exported file — no cloud involved."),
     ],
     maker_title="Made by one person, with care",
     maker_text=[
@@ -69,9 +69,9 @@ T["en"] = dict(
     faq_title="Questions, answered",
     faq=[
         ("Is ChessLab really free?", "Yes. It is free, with no ads and no account. It is a one-person project, and the source code is open."),
-        ("Does it need an internet connection?", "No. Everything works offline, in airplane mode: the engines, the analysis, the courses and the puzzles are all inside the app. The Android app does not even declare the INTERNET permission."),
-        ("What happens to my games and progress?", "They stay on your device, in the app's private storage. On iPhone and iPad you can optionally sync them between your own devices through iCloud (off by default). On Android you can export a backup file and import it on another Android device."),
-        ("Can I move my data between iPhone and Android?", "No. The two apps do not exchange data: iCloud sync works between Apple devices, and the backup file is for Android devices only."),
+        ("Does it need an internet connection?", "No. Everything works offline, in airplane mode: the engines, the analysis, the courses and the puzzles are all inside the app. The only thing that can use the network is the optional iCloud sync, which is off by default."),
+        ("What happens to my games and progress?", "They stay on your device, in the app's private storage. You can optionally sync them between your own iPhone and iPad through iCloud (off by default); they then live in your private iCloud space, which we cannot access."),
+        ("Can I use it on several devices?", "Yes. With iCloud sync switched on, your games, progress and repertoires follow you between your own iPhone and iPad. It is optional and off by default. Nothing is stored on any server of ours: we have none."),
         ("How do the human-like opponents work?", "Nine characters are played by Maia-3, a neural network from the University of Toronto trained on millions of human games. It does not look for the best move: it plays the move a human of that level would play, mistakes included. Each character adds a style — attack, trades, gambits — without ever buying itself a blunder the model found unlikely."),
         ("What level are the opponents?", "They use the human scale of Maia, close to the Lichess scale. It is not comparable with a Stockfish level: a Stockfish throttled to 1100 beats a Maia set at 2200, because it calculates where Maia recognises. Two scales, two different things. You can also play Stockfish itself, from about 900 to about 3190 Elo."),
         ("Which variants are included?", "Chess960 and eleven others against the computer: King of the Hill, Three-Check, Horde, Atomic, Crazyhouse, Duck Chess, Barricades and more, each with its own analysis. There is also a two-player mode on one device."),
@@ -91,7 +91,6 @@ T["en"] = dict(
                "Your puzzles, your collections", "58 illustrated openings", "Every move explained", "Over 130,000 puzzles", "78 proven endgames", "Twelve variants"],
     alt_ipad="ChessLab on iPad, with the board and the analysis side by side",
     alt_duo_inner="ChessLab on the inner screen of the iPhone Duo", alt_duo_outer="ChessLab on the outer screen of the iPhone Duo",
-    alt_android=["ChessLab on Android: new game", "ChessLab on Android: analysis", "ChessLab on Android: puzzle"],
     privacy_href="privacy-policy.html#english",
 )
 
@@ -99,7 +98,7 @@ T["en"] = dict(
 T["fr"] = dict(
     name="Français", html="fr", og_locale="fr_FR",
     title="ChessLab — Échecs gratuits : adversaires humains, analyse, puzzles, ouvertures",
-    desc="Une app d'échecs gratuite, sans publicité ni compte. Neuf adversaires qui jouent comme des humains, une analyse Stockfish qui explique vos erreurs, 58 ouvertures, 78 finales prouvées et plus de 130 000 puzzles. Tout reste sur votre appareil. iPhone, iPad et Android.",
+    desc="Une app d'échecs gratuite, sans publicité ni compte. Neuf adversaires qui jouent comme des humains, une analyse Stockfish qui explique vos erreurs, 58 ouvertures, 78 finales prouvées et plus de 130 000 puzzles. Tout reste sur votre appareil. Pour iPhone et iPad.",
     og_title="ChessLab — échecs gratuits, sans pub, sans compte",
     nav=dict(features="Fonctions", screens="Écrans", devices="Appareils", privacy="Vie privée", faq="FAQ"),
     skip="Aller au contenu",
@@ -107,7 +106,7 @@ T["fr"] = dict(
     sub="L'entraîneur d'échecs qui vit entièrement sur votre appareil. Neuf adversaires qui jouent comme de vraies personnes, Stockfish pour expliquer vos erreurs, plus de 130 000 puzzles — sans compte et sans réseau.",
     appstore_small="Télécharger sur", appstore="l'App Store",
     play_small="Disponible sur", play="Google Play",
-    platforms="iPhone · iPad · iPhone Duo · Android",
+    platforms="iPhone · iPad · iPhone Duo",
     stats=[("9", "adversaires qui jouent comme des humains"), ("58", "ouvertures illustrées"), ("78", "finales prouvées par les tables"),
            ("130 000+", "puzzles"), ("12", "variantes"), ("5", "langues")],
     promise_title="Rien ne sort de votre appareil.",
@@ -115,7 +114,7 @@ T["fr"] = dict(
     pillars=[
         ("plane", "Fonctionne en mode avion", "Le moteur, les adversaires, l'analyse, les cours et les puzzles sont embarqués et calculent sur votre appareil."),
         ("lock", "Aucun compte, aucun pistage", "Pas d'inscription, pas de mesure d'audience, pas de publicité, aucun service tiers. Nous n'avons pas de serveur : rien ne peut collecter vos données."),
-        ("code", "Vérifiable, open source", "L'application Android ne demande même pas la permission INTERNET : elle ne peut se connecter à rien. Le code source complet est public (GPLv3)."),
+        ("code", "Ouvert et vérifiable", "Le code source complet est public (GPLv3), tout comme la licence de chaque composant embarqué. Sur l'App Store, l'étiquette de confidentialité le dit aussi : aucune donnée collectée."),
     ],
     who_title="Pour tous les joueurs",
     who_lead="ChessLab embarque plusieurs moteurs, dont certains jouent comme des humains : la même app convient à une première partie et à un tournoi de club.",
@@ -129,11 +128,11 @@ T["fr"] = dict(
     shots_title="L'app en images",
     shots_lead="De vrais écrans de l'app, en français. Faites défiler pour parcourir.",
     devices_title="Une app, tous vos écrans",
-    devices_lead="Les mêmes fonctions et la même allure sur iPhone, iPad, l'iPhone Duo pliable et Android.",
+    devices_lead="Les mêmes fonctions et la même allure sur iPhone, iPad et l'iPhone Duo pliable.",
     devices=[
-        ("iPhone et iPad", "Un grand échiquier avec les panneaux côte à côte sur iPad, clavier et trackpad, portrait et paysage. Synchronisation iCloud facultative entre vos propres appareils Apple — désactivée par défaut."),
+        ("iPhone", "Jouez, analysez et entraînez-vous partout, en portrait ou en paysage — même en mode avion. Synchronisation iCloud facultative entre vos propres appareils Apple, désactivée par défaut."),
+        ("iPad", "Un grand échiquier avec les panneaux côte à côte, clavier et trackpad, en portrait et en paysage."),
         ("iPhone Duo", "Les deux écrans sont pris en charge : l'écran extérieur compact pour une partie rapide, et le grand écran intérieur avec l'échiquier et l'analyse côte à côte."),
-        ("Android", "Téléphones et tablettes, à partir d'Android 8.0. Les mêmes cours, les mêmes adversaires, la même analyse. Vos données passent d'un appareil Android à l'autre par un fichier exporté — sans cloud."),
     ],
     maker_title="Fait par une seule personne, avec soin",
     maker_text=[
@@ -149,9 +148,9 @@ T["fr"] = dict(
     faq_title="Vos questions",
     faq=[
         ("ChessLab est-elle vraiment gratuite ?", "Oui. Elle est gratuite, sans publicité et sans compte. C'est un projet d'une seule personne, et le code source est ouvert."),
-        ("Faut-il une connexion internet ?", "Non. Tout fonctionne hors ligne, en mode avion : les moteurs, l'analyse, les cours et les puzzles sont dans l'app. L'application Android ne déclare même pas la permission INTERNET."),
-        ("Que deviennent mes parties et ma progression ?", "Elles restent sur votre appareil, dans l'espace privé de l'app. Sur iPhone et iPad, vous pouvez en option les synchroniser entre vos propres appareils par iCloud (désactivé par défaut). Sur Android, vous exportez un fichier de sauvegarde que vous importez sur un autre appareil Android."),
-        ("Puis-je passer mes données d'un iPhone à un Android ?", "Non. Les deux apps n'échangent pas de données : iCloud fonctionne entre appareils Apple, et le fichier de sauvegarde ne vaut que pour les appareils Android."),
+        ("Faut-il une connexion internet ?", "Non. Tout fonctionne hors ligne, en mode avion : les moteurs, l'analyse, les cours et les puzzles sont dans l'app. Seule la synchronisation iCloud, facultative et désactivée par défaut, peut utiliser le réseau."),
+        ("Que deviennent mes parties et ma progression ?", "Elles restent sur votre appareil, dans l'espace privé de l'app. Vous pouvez en option les synchroniser entre vos propres iPhone et iPad par iCloud (désactivé par défaut) ; elles vivent alors dans votre espace iCloud privé, auquel nous n'avons pas accès."),
+        ("Puis-je l'utiliser sur plusieurs appareils ?", "Oui. Avec la synchronisation iCloud activée, vos parties, votre progression et vos répertoires vous suivent entre vos propres iPhone et iPad. C'est facultatif et désactivé par défaut. Rien n'est stocké sur un serveur à nous : nous n'en avons pas."),
         ("Comment fonctionnent les adversaires qui jouent comme des humains ?", "Neuf personnages sont joués par Maia-3, un réseau de neurones de l'Université de Toronto entraîné sur des millions de parties humaines. Il ne cherche pas le meilleur coup : il joue celui qu'un humain de ce niveau jouerait, erreurs comprises. Chaque personnage ajoute un style — attaque, échanges, gambits — sans jamais s'offrir une gaffe que le modèle jugeait improbable."),
         ("Quel est le niveau des adversaires ?", "Ils suivent l'échelle humaine de Maia, proche de celle de Lichess. Elle n'est pas comparable à un niveau de Stockfish : un Stockfish bridé à 1100 bat un Maia réglé à 2200, car il calcule là où Maia reconnaît. Deux échelles, deux choses différentes. Vous pouvez aussi jouer Stockfish lui-même, d'environ 900 à environ 3190 Elo."),
         ("Quelles variantes sont incluses ?", "Chess960 et onze autres contre l'ordinateur : Roi de la colline, Trois échecs, Horde, Atomique, Crazyhouse, Duck Chess, Barricades et d'autres, chacune avec sa propre analyse. Il y a aussi un mode deux joueurs sur le même appareil."),
@@ -171,7 +170,6 @@ T["fr"] = dict(
                "Vos puzzles, vos collections", "58 ouvertures illustrées", "Chaque coup est expliqué", "Plus de 130 000 puzzles", "78 finales prouvées", "Douze variantes"],
     alt_ipad="ChessLab sur iPad, avec l'échiquier et l'analyse côte à côte",
     alt_duo_inner="ChessLab sur l'écran intérieur de l'iPhone Duo", alt_duo_outer="ChessLab sur l'écran extérieur de l'iPhone Duo",
-    alt_android=["ChessLab sur Android : nouvelle partie", "ChessLab sur Android : analyse", "ChessLab sur Android : puzzle"],
     privacy_href="privacy-policy.html",
 )
 
@@ -179,7 +177,7 @@ T["fr"] = dict(
 T["es"] = dict(
     name="Español", html="es", og_locale="es_ES",
     title="ChessLab — Ajedrez gratis: rivales humanos, análisis, puzles, aperturas",
-    desc="Una app de ajedrez gratuita, sin anuncios ni cuenta. Nueve rivales que juegan como humanos, un análisis con Stockfish que explica tus errores, 58 aperturas, 78 finales demostrados y más de 130 000 puzles. Todo se queda en tu dispositivo. iPhone, iPad y Android.",
+    desc="Una app de ajedrez gratuita, sin anuncios ni cuenta. Nueve rivales que juegan como humanos, un análisis con Stockfish que explica tus errores, 58 aperturas, 78 finales demostrados y más de 130 000 puzles. Todo se queda en tu dispositivo. Para iPhone y iPad.",
     og_title="ChessLab — ajedrez gratis, sin anuncios, sin cuenta",
     nav=dict(features="Funciones", screens="Pantallas", devices="Dispositivos", privacy="Privacidad", faq="Preguntas"),
     skip="Ir al contenido",
@@ -187,7 +185,7 @@ T["es"] = dict(
     sub="El entrenador de ajedrez que vive por completo en tu dispositivo. Nueve rivales que juegan como personas reales, Stockfish para explicar tus errores y más de 130 000 puzles — sin cuenta y sin red.",
     appstore_small="Descárgala en el", appstore="App Store",
     play_small="Disponible en", play="Google Play",
-    platforms="iPhone · iPad · iPhone Duo · Android",
+    platforms="iPhone · iPad · iPhone Duo",
     stats=[("9", "rivales que juegan como humanos"), ("58", "aperturas ilustradas"), ("78", "finales demostrados con tablas"),
            ("130 000+", "puzles"), ("12", "variantes"), ("5", "idiomas")],
     promise_title="Nada sale de tu dispositivo.",
@@ -195,7 +193,7 @@ T["es"] = dict(
     pillars=[
         ("plane", "Funciona en modo avión", "El motor, los rivales, el análisis, los cursos y los puzles están integrados y se calculan en tu dispositivo."),
         ("lock", "Sin cuenta, sin rastreo", "Sin registro, sin analíticas, sin anuncios, sin servicios de terceros. No tenemos servidor: nada puede recopilar tus datos."),
-        ("code", "Verificable, de código abierto", "La app de Android ni siquiera solicita el permiso INTERNET, así que no puede conectarse a nada. El código fuente completo es público (GPLv3)."),
+        ("code", "Abierto y comprobable", "El código fuente completo es público (GPLv3), igual que la licencia de cada componente incluido. En el App Store, la etiqueta de privacidad lo dice también: ningún dato recopilado."),
     ],
     who_title="Para todo tipo de jugador",
     who_lead="ChessLab incluye varios motores, entre ellos algunos que juegan como humanos: la misma app sirve para una primera partida y para un torneo de club.",
@@ -209,11 +207,11 @@ T["es"] = dict(
     shots_title="La app en imágenes",
     shots_lead="Pantallas reales de la app, en español. Desliza para verlas.",
     devices_title="Una app, todas tus pantallas",
-    devices_lead="Las mismas funciones y el mismo aspecto en iPhone, iPad, el iPhone Duo plegable y Android.",
+    devices_lead="Las mismas funciones y el mismo aspecto en iPhone, iPad y el iPhone Duo plegable.",
     devices=[
-        ("iPhone y iPad", "Un tablero grande con los paneles en paralelo en iPad, compatible con teclado y trackpad, en vertical y horizontal. Sincronización opcional con iCloud entre tus propios dispositivos Apple, desactivada por defecto."),
+        ("iPhone", "Juega, analiza y entrena en cualquier lugar, en vertical o en horizontal, incluso en modo avión. Sincronización opcional con iCloud entre tus propios dispositivos Apple, desactivada por defecto."),
+        ("iPad", "Un tablero grande con los paneles en paralelo, compatible con teclado y trackpad, en vertical y horizontal."),
         ("iPhone Duo", "Compatibilidad total con las dos pantallas: la exterior, compacta, para una partida rápida, y la interior, amplia, con el tablero y el análisis uno al lado del otro."),
-        ("Android", "Teléfonos y tabletas desde Android 8.0. Los mismos cursos, los mismos rivales, el mismo análisis. Tus datos pasan de un dispositivo Android a otro con un archivo exportado, sin nube."),
     ],
     maker_title="Hecha por una sola persona, con cuidado",
     maker_text=[
@@ -229,9 +227,9 @@ T["es"] = dict(
     faq_title="Preguntas frecuentes",
     faq=[
         ("¿ChessLab es realmente gratis?", "Sí. Es gratis, sin anuncios y sin cuenta. Es un proyecto de una sola persona y el código fuente es abierto."),
-        ("¿Necesita conexión a internet?", "No. Todo funciona sin conexión, en modo avión: los motores, el análisis, los cursos y los puzles están dentro de la app. La app de Android ni siquiera declara el permiso INTERNET."),
-        ("¿Qué pasa con mis partidas y mi progreso?", "Se quedan en tu dispositivo, en el espacio privado de la app. En iPhone y iPad puedes sincronizarlos opcionalmente entre tus propios dispositivos mediante iCloud (desactivado por defecto). En Android exportas un archivo de copia y lo importas en otro dispositivo Android."),
-        ("¿Puedo pasar mis datos de iPhone a Android?", "No. Las dos apps no intercambian datos: iCloud funciona entre dispositivos Apple, y el archivo de copia solo sirve entre dispositivos Android."),
+        ("¿Necesita conexión a internet?", "No. Todo funciona sin conexión, en modo avión: los motores, el análisis, los cursos y los puzles están dentro de la app. Lo único que puede usar la red es la sincronización con iCloud, opcional y desactivada por defecto."),
+        ("¿Qué pasa con mis partidas y mi progreso?", "Se quedan en tu dispositivo, en el espacio privado de la app. Opcionalmente puedes sincronizarlas entre tu iPhone y tu iPad mediante iCloud (desactivado por defecto); entonces viven en tu espacio privado de iCloud, al que no tenemos acceso."),
+        ("¿Puedo usarla en varios dispositivos?", "Sí. Con la sincronización de iCloud activada, tus partidas, tu progreso y tus repertorios te siguen entre tu iPhone y tu iPad. Es opcional y está desactivada por defecto. No se guarda nada en ningún servidor nuestro: no tenemos ninguno."),
         ("¿Cómo funcionan los rivales que juegan como humanos?", "Nueve personajes los juega Maia-3, una red neuronal de la Universidad de Toronto entrenada con millones de partidas humanas. No busca la mejor jugada: juega la que haría un humano de ese nivel, errores incluidos. Cada personaje añade un estilo —ataque, cambios, gambitos— sin comprarse nunca un error que el modelo juzgaba improbable."),
         ("¿Qué nivel tienen los rivales?", "Siguen la escala humana de Maia, cercana a la de Lichess. No es comparable con un nivel de Stockfish: un Stockfish limitado a 1100 vence a un Maia ajustado a 2200, porque calcula donde Maia reconoce. Dos escalas, dos cosas distintas. También puedes jugar contra Stockfish, de unos 900 a unos 3190 Elo."),
         ("¿Qué variantes incluye?", "Chess960 y otras once contra el ordenador: Rey de la colina, Tres jaques, Horda, Atómico, Crazyhouse, Duck Chess, Barricadas y más, cada una con su propio análisis. También hay un modo de dos jugadores en el mismo dispositivo."),
@@ -251,7 +249,6 @@ T["es"] = dict(
                "Tus puzles, tus colecciones", "58 aperturas ilustradas", "Cada jugada, explicada", "Más de 130 000 puzles", "78 finales demostrados", "Doce variantes"],
     alt_ipad="ChessLab en iPad, con el tablero y el análisis uno al lado del otro",
     alt_duo_inner="ChessLab en la pantalla interior del iPhone Duo", alt_duo_outer="ChessLab en la pantalla exterior del iPhone Duo",
-    alt_android=["ChessLab en Android: nueva partida", "ChessLab en Android: análisis", "ChessLab en Android: puzle"],
     privacy_href="privacy-policy.html#english",
 )
 
@@ -259,7 +256,7 @@ T["es"] = dict(
 T["de"] = dict(
     name="Deutsch", html="de", og_locale="de_DE",
     title="ChessLab — Kostenlos Schach trainieren: menschliche Gegner, Analyse, Puzzles, Eröffnungen",
-    desc="Eine kostenlose Schach-App ohne Werbung und ohne Konto. Neun Gegner, die wie Menschen spielen, eine Stockfish-Analyse, die deine Fehler erklärt, 58 Eröffnungen, 78 bewiesene Endspiele und über 130 000 Puzzles. Alles bleibt auf deinem Gerät. iPhone, iPad und Android.",
+    desc="Eine kostenlose Schach-App ohne Werbung und ohne Konto. Neun Gegner, die wie Menschen spielen, eine Stockfish-Analyse, die deine Fehler erklärt, 58 Eröffnungen, 78 bewiesene Endspiele und über 130 000 Puzzles. Alles bleibt auf deinem Gerät. Für iPhone und iPad.",
     og_title="ChessLab — kostenlos Schach trainieren, ohne Werbung, ohne Konto",
     nav=dict(features="Funktionen", screens="Bildschirme", devices="Geräte", privacy="Datenschutz", faq="FAQ"),
     skip="Zum Inhalt springen",
@@ -267,7 +264,7 @@ T["de"] = dict(
     sub="Der Schachtrainer, der ganz auf deinem Gerät lebt. Neun Gegner, die wie echte Menschen spielen, Stockfish, der deine Fehler erklärt, und über 130 000 Puzzles — ohne Konto und ohne Netz.",
     appstore_small="Laden im", appstore="App Store",
     play_small="Jetzt bei", play="Google Play",
-    platforms="iPhone · iPad · iPhone Duo · Android",
+    platforms="iPhone · iPad · iPhone Duo",
     stats=[("9", "Gegner, die wie Menschen spielen"), ("58", "illustrierte Eröffnungen"), ("78", "Endspiele, per Tablebase bewiesen"),
            ("130 000+", "Puzzles"), ("12", "Schachvarianten"), ("5", "Sprachen")],
     promise_title="Nichts verlässt dein Gerät.",
@@ -275,7 +272,7 @@ T["de"] = dict(
     pillars=[
         ("plane", "Funktioniert im Flugmodus", "Engine, menschenähnliche Gegner, Analyse, Kurse und Puzzles sind eingebaut und rechnen auf deinem Gerät."),
         ("lock", "Kein Konto, kein Tracking", "Keine Anmeldung, keine Analysen, keine Werbung, keine Drittdienste. Wir haben keinen Server: Nichts kann deine Daten sammeln."),
-        ("code", "Überprüfbar, Open Source", "Die Android-App fordert nicht einmal die Berechtigung INTERNET an, kann also nirgendwohin verbinden. Der vollständige Quellcode ist öffentlich (GPLv3)."),
+        ("code", "Offen und überprüfbar", "Der vollständige Quellcode ist öffentlich (GPLv3), ebenso die Lizenz jeder enthaltenen Komponente. Im App Store sagt es auch das Datenschutz-Label: keine Daten erhoben."),
     ],
     who_title="Für jede Art von Spieler",
     who_lead="ChessLab bringt mehrere Engines mit, darunter solche, die wie Menschen spielen: Dieselbe App passt zur ersten Partie wie zum Vereinsturnier.",
@@ -289,11 +286,11 @@ T["de"] = dict(
     shots_title="Die App in Bildern",
     shots_lead="Echte Bildschirme aus der App, auf Deutsch. Wische zum Durchblättern.",
     devices_title="Eine App, alle deine Bildschirme",
-    devices_lead="Dieselben Funktionen und dasselbe Aussehen auf iPhone, iPad, dem faltbaren iPhone Duo und Android.",
+    devices_lead="Dieselben Funktionen und dasselbe Aussehen auf iPhone, iPad und dem faltbaren iPhone Duo.",
     devices=[
-        ("iPhone & iPad", "Ein großes Brett mit nebeneinander liegenden Bereichen auf dem iPad, Unterstützung für Tastatur und Trackpad, hoch und quer. Optionale iCloud-Synchronisierung zwischen deinen eigenen Apple-Geräten — standardmäßig aus."),
+        ("iPhone", "Spiele, analysiere und trainiere überall, hoch oder quer — sogar im Flugmodus. Optionale iCloud-Synchronisierung zwischen deinen eigenen Apple-Geräten, standardmäßig aus."),
+        ("iPad", "Ein großes Brett mit nebeneinander liegenden Bereichen, Unterstützung für Tastatur und Trackpad, hoch und quer."),
         ("iPhone Duo", "Volle Unterstützung für beide Bildschirme: der kompakte Außenbildschirm für eine schnelle Partie und der große Innenbildschirm mit Brett und Analyse nebeneinander."),
-        ("Android", "Smartphones und Tablets ab Android 8.0. Dieselben Kurse, dieselben Gegner, dieselbe Analyse. Deine Daten wechseln per exportierter Datei zwischen Android-Geräten — ganz ohne Cloud."),
     ],
     maker_title="Von einer Person gemacht, mit Sorgfalt",
     maker_text=[
@@ -309,9 +306,9 @@ T["de"] = dict(
     faq_title="Fragen und Antworten",
     faq=[
         ("Ist ChessLab wirklich kostenlos?", "Ja. Sie ist kostenlos, ohne Werbung und ohne Konto. Es ist ein Ein-Personen-Projekt, und der Quellcode ist offen."),
-        ("Braucht sie eine Internetverbindung?", "Nein. Alles funktioniert offline, im Flugmodus: Engines, Analyse, Kurse und Puzzles stecken in der App. Die Android-App deklariert nicht einmal die Berechtigung INTERNET."),
-        ("Was passiert mit meinen Partien und meinem Fortschritt?", "Sie bleiben auf deinem Gerät, im privaten Speicher der App. Auf iPhone und iPad kannst du sie optional über iCloud zwischen deinen eigenen Geräten synchronisieren (standardmäßig aus). Auf Android exportierst du eine Sicherungsdatei und importierst sie auf einem anderen Android-Gerät."),
-        ("Kann ich meine Daten vom iPhone auf Android übertragen?", "Nein. Die beiden Apps tauschen keine Daten aus: iCloud funktioniert zwischen Apple-Geräten, die Sicherungsdatei gilt nur zwischen Android-Geräten."),
+        ("Braucht sie eine Internetverbindung?", "Nein. Alles funktioniert offline, im Flugmodus: Engines, Analyse, Kurse und Puzzles stecken in der App. Nur die optionale iCloud-Synchronisierung, standardmäßig aus, kann das Netz nutzen."),
+        ("Was passiert mit meinen Partien und meinem Fortschritt?", "Sie bleiben auf deinem Gerät, im privaten Speicher der App. Optional kannst du sie über iCloud zwischen deinem iPhone und iPad synchronisieren (standardmäßig aus); sie liegen dann in deinem privaten iCloud-Bereich, auf den wir keinen Zugriff haben."),
+        ("Kann ich sie auf mehreren Geräten nutzen?", "Ja. Mit eingeschalteter iCloud-Synchronisierung folgen dir deine Partien, dein Fortschritt und deine Repertoires zwischen deinem iPhone und iPad. Sie ist optional und standardmäßig aus. Nichts wird auf einem Server von uns gespeichert: Wir haben keinen."),
         ("Wie funktionieren die Gegner, die wie Menschen spielen?", "Neun Charaktere werden von Maia-3 gespielt, einem neuronalen Netz der Universität Toronto, trainiert auf Millionen menschlicher Partien. Es sucht nicht den besten Zug: Es spielt den Zug, den ein Mensch dieser Stärke spielen würde, Fehler eingeschlossen. Jeder Charakter fügt einen Stil hinzu — Angriff, Abtäusche, Gambits —, ohne sich je einen Patzer zu leisten, den das Modell für unwahrscheinlich hielt."),
         ("Welche Stärke haben die Gegner?", "Sie folgen der menschlichen Skala von Maia, nahe an der von Lichess. Sie ist nicht mit einer Stockfish-Stufe vergleichbar: Ein auf 1100 gedrosselter Stockfish schlägt ein auf 2200 eingestelltes Maia, weil er rechnet, wo Maia erkennt. Zwei Skalen, zwei verschiedene Dinge. Du kannst auch gegen Stockfish selbst spielen, von etwa 900 bis etwa 3190 Elo."),
         ("Welche Varianten sind enthalten?", "Chess960 und elf weitere gegen den Computer: King of the Hill, Three-Check, Horde, Atomic, Crazyhouse, Duck Chess, Barricades und mehr, jede mit eigener Analyse. Dazu gibt es einen Zwei-Spieler-Modus auf einem Gerät."),
@@ -331,7 +328,6 @@ T["de"] = dict(
                "Deine Puzzles, deine Sammlungen", "58 illustrierte Eröffnungen", "Jeder Zug wird erklärt", "Über 130 000 Puzzles", "78 bewiesene Endspiele", "Zwölf Varianten"],
     alt_ipad="ChessLab auf dem iPad, Brett und Analyse nebeneinander",
     alt_duo_inner="ChessLab auf dem Innenbildschirm des iPhone Duo", alt_duo_outer="ChessLab auf dem Außenbildschirm des iPhone Duo",
-    alt_android=["ChessLab auf Android: neue Partie", "ChessLab auf Android: Analyse", "ChessLab auf Android: Puzzle"],
     privacy_href="privacy-policy.html#english",
 )
 
@@ -339,7 +335,7 @@ T["de"] = dict(
 T["it"] = dict(
     name="Italiano", html="it", og_locale="it_IT",
     title="ChessLab — Scacchi gratis: avversari umani, analisi, puzzle, aperture",
-    desc="Un'app di scacchi gratuita, senza pubblicità né account. Nove avversari che giocano come umani, un'analisi con Stockfish che spiega i tuoi errori, 58 aperture, 78 finali dimostrati e oltre 130 000 puzzle. Tutto resta sul tuo dispositivo. iPhone, iPad e Android.",
+    desc="Un'app di scacchi gratuita, senza pubblicità né account. Nove avversari che giocano come umani, un'analisi con Stockfish che spiega i tuoi errori, 58 aperture, 78 finali dimostrati e oltre 130 000 puzzle. Tutto resta sul tuo dispositivo. Per iPhone e iPad.",
     og_title="ChessLab — scacchi gratis, senza pubblicità, senza account",
     nav=dict(features="Funzioni", screens="Schermate", devices="Dispositivi", privacy="Privacy", faq="FAQ"),
     skip="Vai al contenuto",
@@ -347,7 +343,7 @@ T["it"] = dict(
     sub="L'allenatore di scacchi che vive interamente sul tuo dispositivo. Nove avversari che giocano come persone vere, Stockfish per spiegare i tuoi errori e oltre 130 000 puzzle — senza account e senza rete.",
     appstore_small="Scarica su", appstore="App Store",
     play_small="Disponibile su", play="Google Play",
-    platforms="iPhone · iPad · iPhone Duo · Android",
+    platforms="iPhone · iPad · iPhone Duo",
     stats=[("9", "avversari che giocano come umani"), ("58", "aperture illustrate"), ("78", "finali dimostrati con le tablebase"),
            ("130 000+", "puzzle"), ("12", "varianti"), ("5", "lingue")],
     promise_title="Niente esce dal tuo dispositivo.",
@@ -355,7 +351,7 @@ T["it"] = dict(
     pillars=[
         ("plane", "Funziona in modalità aereo", "Il motore, gli avversari, l'analisi, i corsi e i puzzle sono integrati e calcolano sul tuo dispositivo."),
         ("lock", "Nessun account, nessun tracciamento", "Niente registrazione, niente statistiche, niente pubblicità, nessun servizio di terzi. Non abbiamo un server: nulla può raccogliere i tuoi dati."),
-        ("code", "Verificabile, open source", "L'app Android non richiede nemmeno il permesso INTERNET, quindi non può connettersi a nulla. Il codice sorgente completo è pubblico (GPLv3)."),
+        ("code", "Aperto e verificabile", "Il codice sorgente completo è pubblico (GPLv3), così come la licenza di ogni componente incluso. Sull'App Store lo dice anche l'etichetta della privacy: nessun dato raccolto."),
     ],
     who_title="Per ogni tipo di giocatore",
     who_lead="ChessLab include diversi motori, alcuni dei quali giocano come umani: la stessa app va bene per la prima partita e per un torneo di circolo.",
@@ -369,11 +365,11 @@ T["it"] = dict(
     shots_title="L'app in immagini",
     shots_lead="Schermate reali dell'app, in italiano. Scorri per sfogliarle.",
     devices_title="Un'app, tutti i tuoi schermi",
-    devices_lead="Le stesse funzioni e lo stesso aspetto su iPhone, iPad, l'iPhone Duo pieghevole e Android.",
+    devices_lead="Le stesse funzioni e lo stesso aspetto su iPhone, iPad e l'iPhone Duo pieghevole.",
     devices=[
-        ("iPhone e iPad", "Una grande scacchiera con i pannelli affiancati su iPad, supporto per tastiera e trackpad, in verticale e in orizzontale. Sincronizzazione iCloud facoltativa tra i tuoi dispositivi Apple, disattivata per impostazione predefinita."),
+        ("iPhone", "Gioca, analizza e allenati ovunque, in verticale o in orizzontale, anche in modalità aereo. Sincronizzazione iCloud facoltativa tra i tuoi dispositivi Apple, disattivata per impostazione predefinita."),
+        ("iPad", "Una grande scacchiera con i pannelli affiancati, supporto per tastiera e trackpad, in verticale e in orizzontale."),
         ("iPhone Duo", "Supporto completo per entrambi gli schermi: quello esterno, compatto, per una partita veloce, e quello interno, ampio, con scacchiera e analisi affiancate."),
-        ("Android", "Telefoni e tablet da Android 8.0. Gli stessi corsi, gli stessi avversari, la stessa analisi. I tuoi dati passano da un dispositivo Android all'altro con un file esportato, senza cloud."),
     ],
     maker_title="Fatta da una sola persona, con cura",
     maker_text=[
@@ -389,9 +385,9 @@ T["it"] = dict(
     faq_title="Domande e risposte",
     faq=[
         ("ChessLab è davvero gratuita?", "Sì. È gratuita, senza pubblicità e senza account. È un progetto di una sola persona e il codice sorgente è aperto."),
-        ("Serve una connessione a internet?", "No. Tutto funziona offline, in modalità aereo: motori, analisi, corsi e puzzle sono dentro l'app. L'app Android non dichiara nemmeno il permesso INTERNET."),
-        ("Che fine fanno le mie partite e i miei progressi?", "Restano sul tuo dispositivo, nello spazio privato dell'app. Su iPhone e iPad puoi sincronizzarli facoltativamente tra i tuoi dispositivi tramite iCloud (disattivato per impostazione predefinita). Su Android esporti un file di backup e lo importi su un altro dispositivo Android."),
-        ("Posso passare i miei dati da iPhone ad Android?", "No. Le due app non si scambiano dati: iCloud funziona tra dispositivi Apple, e il file di backup vale solo tra dispositivi Android."),
+        ("Serve una connessione a internet?", "No. Tutto funziona offline, in modalità aereo: motori, analisi, corsi e puzzle sono dentro l'app. Solo la sincronizzazione iCloud, facoltativa e disattivata per impostazione predefinita, può usare la rete."),
+        ("Che fine fanno le mie partite e i miei progressi?", "Restano sul tuo dispositivo, nello spazio privato dell'app. Facoltativamente puoi sincronizzarli tra il tuo iPhone e il tuo iPad tramite iCloud (disattivato per impostazione predefinita); vivono allora nel tuo spazio iCloud privato, a cui non abbiamo accesso."),
+        ("Posso usarla su più dispositivi?", "Sì. Con la sincronizzazione iCloud attiva, le tue partite, i tuoi progressi e i tuoi repertori ti seguono tra il tuo iPhone e il tuo iPad. È facoltativa e disattivata per impostazione predefinita. Non viene salvato nulla su un nostro server: non ne abbiamo."),
         ("Come funzionano gli avversari che giocano come umani?", "Nove personaggi sono giocati da Maia-3, una rete neurale dell'Università di Toronto addestrata su milioni di partite umane. Non cerca la mossa migliore: gioca quella che un umano di quel livello giocherebbe, errori compresi. Ogni personaggio aggiunge uno stile — attacco, scambi, gambetti — senza mai concedersi una svista che il modello riteneva improbabile."),
         ("Che livello hanno gli avversari?", "Seguono la scala umana di Maia, vicina a quella di Lichess. Non è paragonabile a un livello di Stockfish: uno Stockfish limitato a 1100 batte un Maia impostato a 2200, perché calcola dove Maia riconosce. Due scale, due cose diverse. Puoi anche giocare contro Stockfish stesso, da circa 900 a circa 3190 Elo."),
         ("Quali varianti sono incluse?", "Chess960 e altre undici contro il computer: Re della collina, Tre scacchi, Horde, Atomica, Crazyhouse, Duck Chess, Barricate e altre, ciascuna con la propria analisi. C'è anche una modalità a due giocatori sullo stesso dispositivo."),
@@ -411,7 +407,6 @@ T["it"] = dict(
                "I tuoi puzzle, le tue raccolte", "58 aperture illustrate", "Ogni mossa è spiegata", "Oltre 130 000 puzzle", "78 finali dimostrati", "Dodici varianti"],
     alt_ipad="ChessLab su iPad, con scacchiera e analisi affiancate",
     alt_duo_inner="ChessLab sullo schermo interno dell'iPhone Duo", alt_duo_outer="ChessLab sullo schermo esterno dell'iPhone Duo",
-    alt_android=["ChessLab su Android: nuova partita", "ChessLab su Android: analisi", "ChessLab su Android: puzzle"],
     privacy_href="privacy-policy.html#english",
 )
 
