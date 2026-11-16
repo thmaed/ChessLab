@@ -11338,3 +11338,11 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
     latérale de l'iPad Pro 13" ne trouvent plus les libellés (« Automation type mismatch… StaticText ») — ils passent
     sous iOS 26.5 ; `IPadEntryPointsUITests.testReportModeTileFrames` bute sur des libellés en double (barre +
     tuile).
+- **Même soir, iPad : retour à l'accueil** (retour : « une fois que j'ai cliqué sur une option je ne peux plus
+  revenir à l'écran d'accueil », iPad Pro 11"). Pas une régression : choisir un mode dans la barre latérale
+  remplaçait le tableau de bord (séance du jour, progression, parties récentes) sans plus aucun chemin pour y
+  revenir. Entrée **« Accueil »** en tête de la barre (`SidebarItem.home`, sélectionnée au lancement ; la visite
+  guidée y ramène aussi). Vaut pour iPad, Mac et Duo déplié. `IPadHomeEntryUITests` (iPad mini, iOS 26.5) vert,
+  avec les tests de barre latérale et des tuiles basses. Android : rien à porter (pas de barre latérale, l'accueil
+  est une pile avec retour). Relevé au passage, PRÉEXISTANT : `OpeningsModuleUITests.testTheModuleSurvivesTheLargestTextSize`
+  échoue sur iPad mini en AX5 (même échec sans ce changement).

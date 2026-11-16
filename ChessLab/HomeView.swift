@@ -22,7 +22,8 @@ struct HomeView: View {
     @State private var discoveryTour = DiscoveryTourController()
     /// Mode sélectionné dans la barre latérale (iPad/Mac). `nil` = tableau de
     /// bord d'accueil (reprise, progression, parties récentes).
-    @State private var sidebarSelection: SidebarItem?
+    /// `.home` au lancement : l'entrée « Accueil » surlignée, le tableau de bord affiché.
+    @State private var sidebarSelection: SidebarItem? = .home
     @State private var resumableGame: ResumableGame?
     /// L'appareil où a été joué le dernier coup de la partie proposée, si ce n'est pas celui-ci
     /// (« Dernier coup joué sur votre iPad »).
@@ -213,6 +214,9 @@ struct HomeView: View {
     /// Entrées de la barre latérale iPad/Mac. Chacune enracine la colonne de
     /// détail sur l'écran d'entrée du mode correspondant (voir ``detailRoot``).
     enum SidebarItem: Hashable {
+        /// Le tableau de bord. Sans cette entrée, choisir un mode dans la barre remplaçait l'accueil (séance du
+        /// jour, progression, parties récentes) sans plus aucun chemin pour y revenir (retour du 16/11/2026).
+        case home
         case vsEngine, twoPlayer, puzzles, openings, endgames, analysis, laboratory, variants
         case progression, settings, help
     }
@@ -618,7 +622,7 @@ struct HomeView: View {
         let route: Route?
         let item: SidebarItem?
         switch step.destination {
-        case .home: route = nil; item = nil
+        case .home: route = nil; item = .home
         case .newGame: route = .newGame; item = .vsEngine
         case .analysisEntry: route = .analysisEntry; item = .analysis
         case .openings: route = .openingList; item = .openings
@@ -758,6 +762,9 @@ struct HomeView: View {
 
     private var sidebar: some View {
         List(selection: $sidebarSelection) {
+            Section {
+                sidebarLabel(.home, "Accueil", "house.fill", Theme.accent, accessibilityID: "sidebar_home")
+            }
             // Reprise EN HAUT et PERSISTANTE (au-dessus des modes) : sur iPad,
             // le tableau de bord de détail disparaît dès qu'on choisit un mode ;
             // la reprise, elle, doit rester accessible quoi qu'on regarde.
@@ -892,7 +899,7 @@ struct HomeView: View {
         case .progression: destination(for: .progression)
         case .settings: destination(for: .settings)
         case .help: destination(for: .help)
-        case nil: iPadDashboard
+        case .home, nil: iPadDashboard
         }
     }
 
