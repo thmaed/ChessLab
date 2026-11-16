@@ -17,4 +17,9 @@ enum CloudSyncSettingsStore {
         get { UserDefaults.standard.bool(forKey: key) }
         set { UserDefaults.standard.set(newValue, forKey: key) }
     }
+
+    /// Vrai si le conteneur de CE lancement a été construit avec CloudKit. L'interrupteur peut changer en
+    /// cours de session, le conteneur non : l'écart entre les deux, c'est « fermez et rouvrez l'app »
+    /// (voir ``SettingsView``). Posé par ``ChessLabApp`` à la construction ; faux en session dégradée.
+    nonisolated(unsafe) static var activeAtLaunch = false
 }

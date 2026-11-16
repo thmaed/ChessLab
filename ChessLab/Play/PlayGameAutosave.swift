@@ -14,30 +14,28 @@ struct PlayGameAutosave: Codable, Hashable {
     var savedAt: Date
 }
 
-/// Persistance locale simple (JSON dans Documents) de la partie en cours
-/// du mode Jouer.
+/// Persistance de la partie en cours du mode Jouer : un fichier JSON dans `Documents/`, que
+/// ``SyncedAutosave`` recopie dans le magasin clé-valeur iCloud quand la synchronisation est allumée —
+/// la partie se reprend alors sur un autre appareil de l'utilisateur, à l'accueil.
 ///
-/// - note: Chaque mode aura son propre autosave suivant le même principe ;
-/// un magasin SwiftData partagé arrivera avec le mode Analyser (étape 3)
-/// quand une bibliothèque de parties devient nécessaire.
+/// - note: Chaque mode a son propre autosave suivant le même principe ; un magasin SwiftData partagé sert
+/// à la bibliothèque de parties terminées.
 enum AutosaveStore {
-    private static var playFileURL: URL {
+    static func documentURL(_ name: String) -> URL {
         FileManager.default
             .urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("autosave_play.json")
+            .appendingPathComponent(name)
     }
 
     static func savePlay(_ record: PlayGameAutosave) {
-        guard let data = try? JSONEncoder().encode(record) else { return }
-        try? data.write(to: playFileURL, options: .atomic)
+        SyncedAutosave.play.save(record)
     }
 
     static func loadPlay() -> PlayGameAutosave? {
-        guard let data = try? Data(contentsOf: playFileURL) else { return nil }
-        return try? JSONDecoder().decode(PlayGameAutosave.self, from: data)
+        SyncedAutosave.play.load()
     }
 
     static func clearPlay() {
-        try? FileManager.default.removeItem(at: playFileURL)
+        SyncedAutosave.play.clear()
     }
 }

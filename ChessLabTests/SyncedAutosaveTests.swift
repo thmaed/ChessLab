@@ -1,0 +1,209 @@
+import Foundation
+import Testing
+@testable import ChessLab
+
+/// La partie en cours qui suit l'utilisateur d'un appareil à l'autre, éprouvée SANS iCloud : un magasin
+/// clé-valeur factice joue le nuage, un fichier temporaire joue le `Documents/` de chaque appareil. Deux
+/// appareils = deux fichiers, UN magasin partagé.
+@MainActor
+struct SyncedAutosaveTests {
+
+    private struct FakeGame: Codable, Equatable {
+        var moves: [String]
+        var savedAt: Date
+    }
+
+    private final class FakeStore: KeyValueStoring {
+        var values: [String: Any] = [:]
+        private(set) var synchronizeCount = 0
+        func object(forKey key: String) -> Any? { values[key] }
+        func set(_ value: Any?, forKey key: String) { values[key] = value }
+        var storedKeys: [String] { Array(values.keys) }
+        @discardableResult func synchronize() -> Bool { synchronizeCount += 1; return true }
+    }
+
+    /// Un « appareil » : son fichier, son interrupteur, le nuage commun.
+    private final class Device {
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("autosave-\(UUID().uuidString).json")
+        var enabled = true
+        let autosave: () -> SyncedAutosave<FakeGame>
+        init(store: KeyValueStoring) {
+            var holder: Device?
+            autosave = {
+                SyncedAutosave(key: "test.autosave", fileURL: { holder!.url }, savedAt: \.savedAt,
+                               store: store, isEnabled: { holder!.enabled })
+            }
+            holder = self
+        }
+        deinit { try? FileManager.default.removeItem(at: url) }
+        var hasFile: Bool { FileManager.default.fileExists(atPath: url.path) }
+    }
+
+    private func at(_ secondsAgo: Double) -> Date { Date(timeIntervalSinceNow: -secondsAgo) }
+    private func game(_ moves: [String], _ savedAt: Date) -> FakeGame { FakeGame(moves: moves, savedAt: savedAt) }
+
+    // MARK: La règle de fusion
+
+    @Test func withoutRemote_keepLocal() {
+        #expect(AutosaveMerge.resolve(localSavedAt: at(10), remote: nil) == .keepLocal)
+        #expect(AutosaveMerge.resolve(localSavedAt: nil, remote: nil) == .keepLocal)
+    }
+
+    @Test func newerRemoteGame_isAdopted_olderOrEqual_isNot() {
+        let data = Data([1, 2, 3])
+        #expect(AutosaveMerge.resolve(localSavedAt: at(10), remote: .init(at: at(5), game: data)) == .adoptRemote(data))
+        #expect(AutosaveMerge.resolve(localSavedAt: nil, remote: .init(at: at(5), game: data)) == .adoptRemote(data))
+        #expect(AutosaveMerge.resolve(localSavedAt: at(5), remote: .init(at: at(10), game: data)) == .keepLocal)
+        let same = at(7)
+        #expect(AutosaveMerge.resolve(localSavedAt: same, remote: .init(at: same, game: data)) == .keepLocal)
+    }
+
+    @Test func tombstone_dropsOnlyAnOlderLocalGame() {
+        // La partie s'est terminée ailleurs APRÈS le dernier coup d'ici : on l'oublie.
+        #expect(AutosaveMerge.resolve(localSavedAt: at(10), remote: .init(at: at(5), game: nil)) == .dropLocal)
+        // Un coup joué ICI après la fin de l'autre partie : c'est une nouvelle partie, on la garde.
+        #expect(AutosaveMerge.resolve(localSavedAt: at(1), remote: .init(at: at(5), game: nil)) == .keepLocal)
+        // Rien à oublier.
+        #expect(AutosaveMerge.resolve(localSavedAt: nil, remote: .init(at: at(5), game: nil)) == .keepLocal)
+    }
+
+    // MARK: Interrupteur éteint : silence complet
+
+    @Test func disabled_neverTouchesTheCloud() {
+        let store = FakeStore()
+        let device = Device(store: store)
+        device.enabled = false
+        device.autosave().save(game(["e2e4"], at(5)))
+        device.autosave().clear()
+        _ = device.autosave().load()
+        device.autosave().publishLocalIfCloudIsEmpty()
+        #expect(store.values.isEmpty)
+        #expect(store.synchronizeCount == 0)
+    }
+
+    @Test func disabled_ignoresWhateverTheCloudHolds() {
+        let store = FakeStore()
+        let other = Device(store: store), mine = Device(store: store)
+        other.autosave().save(game(["d2d4"], at(5)))
+        mine.enabled = false
+        #expect(mine.autosave().load() == nil)
+    }
+
+    // MARK: Un appareil
+
+    @Test func save_writesTheFileAndPublishesWhenEnabled() throws {
+        let store = FakeStore()
+        let device = Device(store: store)
+        let g = game(["e2e4", "e7e5"], at(5))
+        device.autosave().save(g)
+        #expect(device.hasFile)
+        let envelope = try #require(device.autosave().remoteEnvelope())
+        #expect(envelope.at == g.savedAt)
+        #expect(try JSONDecoder().decode(FakeGame.self, from: #require(envelope.game)) == g)
+        #expect(device.autosave().load() == g)
+    }
+
+    @Test func clear_removesTheFileAndLeavesATombstone() throws {
+        let store = FakeStore()
+        let device = Device(store: store)
+        device.autosave().save(game(["e2e4"], at(5)))
+        device.autosave().clear()
+        #expect(!device.hasFile)
+        let envelope = try #require(device.autosave().remoteEnvelope())
+        #expect(envelope.game == nil)
+        #expect(device.autosave().load() == nil)
+    }
+
+    // MARK: Deux appareils
+
+    @Test func aGameStartedOnOneDevice_resumesOnTheOther() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        let g = game(["e2e4", "e7e5", "g1f3"], at(30))
+        ipad.autosave().save(g)
+        #expect(iphone.autosave().load() == g)
+        #expect(iphone.hasFile)            // adoptée : la reprise la relit comme n'importe quelle autre
+    }
+
+    @Test func continuingOnTheOtherDevice_movesTheGameBack() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        ipad.autosave().save(game(["e2e4"], at(60)))
+        _ = iphone.autosave().load()
+        let longer = game(["e2e4", "e7e5"], at(30))
+        iphone.autosave().save(longer)
+        #expect(ipad.autosave().load() == longer)
+    }
+
+    @Test func aGameFinishedOnOneDevice_disappearsFromTheOther() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        ipad.autosave().save(game(["e2e4"], at(60)))
+        _ = iphone.autosave().load()
+        iphone.autosave().clear()                     // la partie se termine sur l'iPhone
+        #expect(ipad.autosave().load() == nil)
+        #expect(!ipad.hasFile)
+    }
+
+    @Test func aNewGameAfterTheEnd_isNotKilledByTheOldTombstone() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        iphone.autosave().clear()                     // pierre tombale à « maintenant »
+        let fresh = game(["d2d4"], Date().addingTimeInterval(5))   // un coup joué APRÈS
+        ipad.autosave().save(fresh)
+        #expect(iphone.autosave().load() == fresh)
+    }
+
+    @Test func twoDifferentGames_theMostRecentlyPlayedWins() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        let older = game(["e2e4"], at(120)), newer = game(["d2d4", "d7d5"], at(20))
+        // Chacun a la sienne, avant que la synchro ne les voie.
+        ipad.autosave().save(older)
+        iphone.autosave().save(newer)
+        #expect(ipad.autosave().load() == newer)
+        #expect(iphone.autosave().load() == newer)
+    }
+
+    // MARK: Premier lancement avec la synchro
+
+    @Test func aLocalGameNewerThanTheCloud_isTaughtToTheCloud() throws {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        ipad.autosave().save(game(["e2e4"], at(300)))
+        // L'iPhone a joué plus tard avec la synchro éteinte, puis l'allume.
+        iphone.enabled = false
+        let later = game(["d2d4"], at(10))
+        iphone.autosave().save(later)
+        iphone.enabled = true
+        #expect(iphone.autosave().load() == later)
+        #expect(try #require(iphone.autosave().remoteEnvelope()).at == later.savedAt)
+        #expect(ipad.autosave().load() == later)
+    }
+
+    @Test func publishLocalIfCloudIsEmpty_onlyFoundsAnEmptyCloud() throws {
+        let store = FakeStore()
+        let first = Device(store: store), second = Device(store: store)
+        first.enabled = false
+        first.autosave().save(game(["e2e4"], at(50)))
+        first.enabled = true
+        first.autosave().publishLocalIfCloudIsEmpty()
+        #expect(store.values["test.autosave"] != nil)
+
+        // Un nuage déjà garni n'est pas écrasé par un appareil qui rejoint.
+        let before = try #require(second.autosave().remoteEnvelope())
+        second.enabled = false
+        second.autosave().save(game(["a2a3"], at(1)))
+        second.enabled = true
+        second.autosave().publishLocalIfCloudIsEmpty()
+        #expect(try #require(second.autosave().remoteEnvelope()) == before)
+    }
+
+    // MARK: Les vraies clés
+
+    @Test func theRealStoresUseDistinctKeysListedForRemoteNotification() {
+        let keys = [SyncedAutosave.play.key, SyncedAutosave.twoPlayer.key]
+        #expect(Set(keys).count == 2)
+        #expect(Set(keys) == Set(AutosaveCloud.keys))
+    }
+}

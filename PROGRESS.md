@@ -11171,3 +11171,32 @@ Un choix explicite déjà stocké est conservé tel quel.
   `APP_STORE_SEARCH_RESULTS_ASSET` (5244×2950), groupe `DEFAULT_PROFILE`, UN seul de chaque par localisation, catégorie
   `CREATIVE_ASSETS`. Nouvelle commande `asc.py headers --langs es,de,it,fr-CA` ; les groupes valides se lisent dans
   `GET /appAssetLibraryRefData`. J'avais affirmé « pas d'API » sans l'avoir vérifié.
+
+## 16/11 — synchronisation iCloud : la voir, la comprendre, la déclencher ; la partie en cours qui suit
+
+Origine : retour de Ron (iPad et iPhone, interrupteur allumé des deux côtés, chacun dans son état : partie à reprendre sur
+l'un, étape 1 puis 2 du cycle Woodpecker). Trois constats dans le code : (1) la partie EN COURS était locale par décision
+(l'aide le disait) ; (2) le changement d'interrupteur ne prend effet qu'au lancement suivant, signalé en petit seulement ;
+(3) l'app n'écoutait AUCUN événement CloudKit — la ligne « Dernière vérification » datait une fusion locale, pas un échange
+iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est complet (`CD_WoodpeckerProgram` présent).
+
+- **`CloudSyncMonitor`** (nouveau) : écoute `NSPersistentCloudKitContainer.eventChangedNotification` (SwiftData en pilote un
+  en interne) ; garde le dernier ENVOI et la dernière RÉCEPTION réussis (persistés, locaux), et la dernière erreur, traduite en
+  clair (`CloudSyncErrorText` : pas de compte, pas de réseau, iCloud plein, occupé, indisponible, code inconnu — les erreurs
+  arrivent enveloppées, on déballe l'erreur CloudKit sous-jacente). Un échange réussi lave l'erreur d'avant.
+- **Bouton « Synchroniser maintenant »** : fusionne ce qui est arrivé, enregistre ce qui attend, rafraîchit le magasin
+  clé-valeur, puis ATTEND jusqu'à 20 s un échange CloudKit et dit ce qu'il a vu (réussi / erreur / rien de nouveau). Il ne
+  peut PAS forcer CloudKit : iOS décide du moment, SwiftData n'expose aucune commande. Le texte ne promet rien.
+- **Bandeau « Fermez complètement ChessLab puis rouvrez-le »** tant que l'interrupteur et le conteneur de CE lancement
+  divergent (`CloudSyncSettingsStore.activeAtLaunch`, posé à la construction du conteneur ; faux en session dégradée).
+- **Partie en cours synchronisée** (`SyncedAutosave`, `Persistence/SyncedAutosave.swift`) : modes Jouer et Deux joueurs, par le
+  magasin clé-valeur iCloud (quelques ko, secondes, aucun type CloudKit donc aucun « Deploy Schema »). Dernière écriture
+  gagne, avec PIERRE TOMBALE datée pour la fin de partie (sinon l'autre appareil la reproposerait). Le fichier local garde
+  son format. Interrupteur éteint = RIEN n'est écrit dans le nuage. L'accueil relit la reprise au retour au premier plan et
+  à l'arrivée d'un changement distant. Limite assumée : deux parties DIFFÉRENTES sur deux appareils, la plus récemment jouée
+  remplace l'autre (l'aide le dit — elle affirmait l'inverse jusqu'ici). Dépend de l'horloge des appareils.
+- Aide (bloc « Synchronisation iCloud », 5 langues) et Réglages réécrits ; 13 libellés ajoutés au catalogue.
+- Tests : `SyncedAutosaveTests` (règle de fusion, silence interrupteur éteint, deux appareils simulés par un magasin partagé,
+  fin de partie, nouvelle partie après pierre tombale), `CloudSyncMonitorTests`.
+- **Android : rien à porter** — iCloud est hors périmètre (décision du 12/09, voir `android/PARITE.md`).
+- **À valider sur DEUX vrais appareils** (la fusion est prouvée, pas la latence du nuage) : iPhone3 + iPhone XS/11.

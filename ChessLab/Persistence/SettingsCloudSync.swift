@@ -161,6 +161,16 @@ final class SettingsCloudSync {
         return (pulled, pushed)
     }
 
+    /// Le bouton « Synchroniser maintenant » : demande au magasin de se rafraîchir, tire ce que le nuage a
+    /// déjà et pousse ce qui lui manque. Rend `true` si une préférence locale a changé (il faut alors
+    /// rafraîchir ``AppSettings``). Sans effet si la synchro est éteinte.
+    @discardableResult
+    func syncNow() -> Bool {
+        guard CloudSyncSettingsStore.isEnabled else { return false }
+        store.synchronize()
+        return !reconcileAtLaunch().pulled.isEmpty
+    }
+
     /// Applique les clés qu'un autre appareil vient de modifier. Rend `true`
     /// si quelque chose a bougé localement — donc s'il faut rafraîchir l'UI.
     @discardableResult

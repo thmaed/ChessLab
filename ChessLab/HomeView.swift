@@ -447,7 +447,15 @@ struct HomeView: View {
         // « Partager › ChessLab » depuis Photos : l'extension dépose l'image, et
         // l'app s'ouvre dessus à son réveil (ou au lancement à froid, d'où `initial`).
         .onChange(of: scenePhase, initial: true) { _, phase in
-            if phase == .active { openSharedImageIfAny() }
+            if phase == .active {
+                openSharedImageIfAny()
+                // Une partie commencée sur un autre appareil a pu arriver pendant que l'app dormait.
+                refreshResumableGame()
+            }
+        }
+        // …ou pendant que l'accueil était affiché : le magasin clé-valeur le dit en quelques secondes.
+        .onReceive(NotificationCenter.default.publisher(for: AutosaveCloud.didChangeRemotely)) { _ in
+            refreshResumableGame()
         }
         // Le scanner a disparu avant d'avoir lu l'image (pile refaite, écran
         // reconstruit) : elle est encore dans la boîte, on la lui rend.

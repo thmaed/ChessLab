@@ -92,6 +92,11 @@ struct ChessLabApp: App {
 
                     }
 
+                    // Les parties en cours suivent le même interrupteur (magasin clé-valeur), et le
+                    // moniteur écoute les VRAIS échanges CloudKit pour les Réglages.
+                    AutosaveCloud.start()
+                    CloudSyncMonitor.shared.start()
+
                 }
                 // Traits réels de la fenêtre (classes de taille, taille,
                 // encoches) exposés aux tests de mise en page — et affichés
@@ -189,6 +194,7 @@ struct ChessLabApp: App {
         // 1) Tentative normale.
         if let container = try? ModelContainer(for: schema, configurations: configurations) {
             UserDefaults.standard.removeObject(forKey: Self.openFailureKey)
+            CloudSyncSettingsStore.activeAtLaunch = CloudSyncSettingsStore.isEnabled
             // Ménage, une fois les stores nommés ouverts avec succès — donc
             // seulement quand on est SÛR que la séparation Games/Puzzles est
             // bien celle en vigueur. Voir ``LocalStoreMaintenance`` : l'ancien
@@ -219,6 +225,7 @@ struct ChessLabApp: App {
             quarantineLocalStore()
             if let container = try? ModelContainer(for: schema, configurations: configurations) {
                 UserDefaults.standard.removeObject(forKey: Self.openFailureKey)
+                CloudSyncSettingsStore.activeAtLaunch = CloudSyncSettingsStore.isEnabled
                 return container
             }
         }

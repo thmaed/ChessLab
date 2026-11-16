@@ -14,23 +14,15 @@ struct TwoPlayerGameAutosave: Codable, Hashable {
 }
 
 extension AutosaveStore {
-    private static var twoPlayerFileURL: URL {
-        FileManager.default
-            .urls(for: .documentDirectory, in: .userDomainMask)[0]
-            .appendingPathComponent("autosave_twoplayer.json")
-    }
-
     static func saveTwoPlayer(_ record: TwoPlayerGameAutosave) {
-        guard let data = try? JSONEncoder().encode(record) else { return }
-        try? data.write(to: twoPlayerFileURL, options: .atomic)
+        SyncedAutosave.twoPlayer.save(record)
     }
 
     static func loadTwoPlayer() -> TwoPlayerGameAutosave? {
-        guard let data = try? Data(contentsOf: twoPlayerFileURL) else { return nil }
-        return try? JSONDecoder().decode(TwoPlayerGameAutosave.self, from: data)
+        SyncedAutosave.twoPlayer.load()
     }
 
     static func clearTwoPlayer() {
-        try? FileManager.default.removeItem(at: twoPlayerFileURL)
+        SyncedAutosave.twoPlayer.clear()
     }
 }
