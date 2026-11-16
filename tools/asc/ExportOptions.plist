@@ -17,8 +17,11 @@
 	<string>Apple Distribution</string>
 	<key>provisioningProfiles</key>
 	<dict>
+		<!-- « … Push » depuis le 16/11/2026 : la capacité Push Notifications (notifications
+		     SILENCIEUSES de CloudKit, sans lesquelles un changement fait ailleurs n'arrive qu'au
+		     lancement à froid) a été ajoutée à l'identifiant, ce qui invalide l'ancien profil. -->
 		<key>com.chesslab.ChessLab</key>
-		<string>ChessLab App Store 2026</string>
+		<string>ChessLab App Store 2026 Push</string>
 		<!-- L'extension de partage (07/11/2026) : son propre profil, et le groupe
 		     d'app group.com.chesslab.ChessLab porté par les DEUX. -->
 		<key>com.chesslab.ChessLab.Share</key>

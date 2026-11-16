@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import UIKit
 
 @main
 struct ChessLabApp: App {
@@ -89,6 +90,15 @@ struct ChessLabApp: App {
                     KeyValueSyncSwitch.apply()
                     // Le moniteur écoute les VRAIS échanges CloudKit pour les Réglages.
                     CloudSyncMonitor.shared.start()
+                    // Ce qui arrive d'iCloud est fusionné À L'ARRIVÉE (voir CloudImportResponder).
+                    CloudImportResponder.start(context: modelContainer.mainContext)
+                    // Les notifications SILENCIEUSES de CloudKit : sans elles, un changement fait sur un
+                    // autre appareil n'arrive qu'au prochain lancement à froid — et iOS garde l'app en
+                    // mémoire des jours entiers (cause probable du retour du 16/11/2026). Aucune
+                    // autorisation demandée : rien ne s'affiche, iOS réveille seulement l'app.
+                    if CloudSyncSettingsStore.activeAtLaunch {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
 
                 }
                 // Traits réels de la fenêtre (classes de taille, taille,

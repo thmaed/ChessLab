@@ -11234,3 +11234,17 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   - **Android : rien à porter** (iCloud hors périmètre, décision du 12/09).
   - À faire à la sortie : une phrase dans la politique de confidentialité sur la fiche d'appareil (type, version,
     dernière activité, dans l'iCloud privé) ; valider sur deux vrais appareils.
+- **Même jour, synchro EFFICACE** — la cause probable du retour du 16/11 trouvée : l'identifiant d'app n'avait PAS la
+  capacité Push Notifications (ni `aps-environment` dans les droits). CloudKit ne pouvait donc pas réveiller l'app
+  par notification silencieuse : un changement fait sur un autre appareil n'arrivait qu'au lancement à FROID — et
+  iOS garde l'app en mémoire des jours. Corrigé :
+  - capacité PUSH_NOTIFICATIONS ajoutée par l'API ; nouveau profil « ChessLab App Store 2026 Push » (l'ancien reste,
+    invalide) ; `ExportOptions.plist` et `tools/asc/README.md` à jour ; `aps-environment` dans `ChessLab.entitlements` ;
+    `registerForRemoteNotifications()` au lancement quand CloudKit est actif (aucune autorisation demandée).
+  - **Fusion à l'arrivée** (`Persistence/CloudImportResponder.swift`) : chaque réception CloudKit réussie déclenche,
+    après 1,5 s de regroupement, les fusions puzzles / ouvertures / collections, puis `didApply` — l'accueil, la
+    séance du jour, Puzzles (Woodpecker), Progression et Finales se relisent SANS quitter l'écran. Avant : fusions
+    seulement à l'apparition des écrans, au plus toutes les 5 min.
+  - **Envoi avant suspension** : passage en arrière-plan → enregistrement du contexte s'il a des changements (l'envoi
+    CloudKit suit l'enregistrement).
+  - **Android : rien à porter** (iCloud hors périmètre).

@@ -142,6 +142,7 @@ struct EndgameListView: View {
             }
         }
         .onAppear { refresh() }
+        .onReceive(NotificationCenter.default.publisher(for: CloudImportResponder.didApply)) { _ in refresh() }
         .task { await cardInfos.load(ids: OpeningCatalog.all.filter { $0.kind == "endgame" }.map(\.id), in: modelContext) }
         .onChange(of: recordsSignature) { _, _ in UserOpeningStore.shared.reload() }
     }

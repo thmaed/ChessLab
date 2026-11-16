@@ -32,8 +32,12 @@ if [[ "${1:-}" != "--no-build" ]]; then
   ARCHIVE="$WORK/ChessLab-$VERSION-$BUILD.xcarchive"
   rm -rf "$ARCHIVE" "$WORK/export"
   echo "→ archive"
+  # La clé d'API signe aussi l'archive (16/11/2026) : sans compte Xcode connecté, la signature
+  # automatique ne peut pas régénérer le profil de développement après l'ajout d'une capacité (Push).
   xcodebuild archive -project ChessLab.xcodeproj -scheme ChessLab -configuration Release \
-    -destination 'generic/platform=iOS' -archivePath "$ARCHIVE" -allowProvisioningUpdates -quiet
+    -destination 'generic/platform=iOS' -archivePath "$ARCHIVE" -allowProvisioningUpdates \
+    -authenticationKeyPath ~/.private_keys/AuthKey_$ASC_KEY_ID.p8 \
+    -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID" -quiet
   echo "→ export et téléversement"
   xcodebuild -exportArchive -archivePath "$ARCHIVE" -exportOptionsPlist tools/asc/ExportOptions.plist \
     -exportPath "$WORK/export" \

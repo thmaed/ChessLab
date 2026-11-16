@@ -89,6 +89,7 @@ struct ProgressionView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .onAppear(perform: load)
+        .onReceive(NotificationCenter.default.publisher(for: CloudImportResponder.didApply)) { _ in load() }
     }
 
     // MARK: Vos parties (A4)

@@ -97,6 +97,8 @@ final class CloudSyncMonitor {
     private var observer: NSObjectProtocol?
     private var accountObserver: NSObjectProtocol?
     static let containerID = "iCloud.com.chesslab.ChessLab"
+    /// Postée après chaque RÉCEPTION réussie : ``CloudImportResponder`` fusionne alors ce qui est arrivé.
+    static let didReceive = Notification.Name("chesslab.cloudDidReceive")
 
     private enum Key {
         static let receive = "sync.lastReceiveAt"
@@ -199,6 +201,7 @@ final class CloudSyncMonitor {
             case .receive:
                 lastReceiveAt = endedAt
                 defaults.set(endedAt.timeIntervalSince1970, forKey: Key.receive)
+                NotificationCenter.default.post(name: Self.didReceive, object: nil)
             case .send:
                 lastSendAt = endedAt
                 defaults.set(endedAt.timeIntervalSince1970, forKey: Key.send)
@@ -229,10 +232,9 @@ final class CloudSyncMonitor {
         KeyValueSyncSwitch.apply()
         Task { await refreshAccount() }
         CloudDeviceRegistry.live.checkIn(force: true)
-        // 1. Les données SwiftData : fusionner ce qui est arrivé, enregistrer ce qui attend (l'envoi
-        //    suit l'enregistrement).
-        PuzzleProgressSync.reconcile(in: context)
-        OpeningProgressSync.reconcile(in: context)
+        // 1. Les données SwiftData : fusionner ce qui est arrivé (et rafraîchir les écrans), enregistrer ce
+        //    qui attend (l'envoi suit l'enregistrement).
+        await CloudImportResponder.applyNow()
         try? context.save()
         // 2. Les réglages et les parties en cours : le magasin clé-valeur, qu'on peut rafraîchir.
         if SettingsCloudSync.shared.syncNow() {

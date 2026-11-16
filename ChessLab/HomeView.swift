@@ -460,7 +460,16 @@ struct HomeView: View {
                 refreshResumableGame()
                 KeyValueSyncSwitch.appBecameActive()
                 refreshSyncInvitation()
+            } else if phase == .background, modelContext.hasChanges {
+                // Ce qui attend part AVANT qu'iOS suspende l'app : l'envoi vers iCloud suit
+                // l'enregistrement, et l'autre appareil le reçoit sans attendre notre retour.
+                PersistenceLog.save(modelContext)
             }
+        }
+        // Des données arrivées d'un autre appareil viennent d'être fusionnées : relire l'accueil.
+        .onReceive(NotificationCenter.default.publisher(for: CloudImportResponder.didApply)) { _ in
+            loadProgressSummary()
+            refreshResumableGame()
         }
         .onReceive(NotificationCenter.default.publisher(for: CloudDevices.didChange)) { _ in
             refreshSyncInvitation()

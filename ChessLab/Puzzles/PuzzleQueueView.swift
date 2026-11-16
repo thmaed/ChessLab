@@ -101,6 +101,8 @@ struct PuzzleQueueView: View {
             }
         }
         .onAppear { refresh() }
+        // Progression, Woodpecker ou collection arrivés d'un autre appareil : relire sans quitter l'écran.
+        .onReceive(NotificationCenter.default.publisher(for: CloudImportResponder.didApply)) { _ in refresh() }
         .sheet(item: $sheet, onDismiss: {
             afterSheet?()
             afterSheet = nil

@@ -45,6 +45,18 @@ présent dans les droits de l'app et de l'extension) :
   capacité invalide le profil) et « ChessLab Share App Store 2026 », créés par
   l'API et déclarés dans `ExportOptions.plist`.
 
+## Push Notifications (depuis le 16/11/2026)
+
+L'identifiant `com.chesslab.ChessLab` porte la capacité **Push Notifications** (`aps-environment` dans
+`ChessLab.entitlements`). Ce n'est pas pour afficher des notifications — ChessLab n'en montre aucune —
+mais pour les notifications SILENCIEUSES de CloudKit : sans elles, un changement fait sur un autre
+appareil n'arrive qu'au prochain lancement à froid (cause probable d'un retour du 16/11/2026). Aucune
+autorisation n'est demandée à l'utilisateur.
+
+Ajoutée par l'API, comme App Groups ; le profil de distribution s'appelle désormais **« ChessLab App
+Store 2026 Push »** (créé à côté de l'ancien, qui reste dans le compte mais n'est plus valide pour cet
+identifiant). `ExportOptions.plist` le désigne.
+
 À retenir : toute NOUVELLE capacité d'app invalide le profil de distribution,
 qu'il faut alors recréer (même procédure, par l'API). Version et build de
 l'extension sont ceux de l'app (2.1 / 21) : les monter ENSEMBLE, sinon

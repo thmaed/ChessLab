@@ -95,6 +95,24 @@ struct CloudSyncMonitorTests {
         #expect(monitor.lastExchange != nil)
     }
 
+    /// Seule une RÉCEPTION réussie déclenche la fusion de ce qui est arrivé (voir ``CloudImportResponder``) :
+    /// ni un envoi, ni une mise en place, ni un échec.
+    @Test func onlyASuccessfulReceive_announcesArrivedData() {
+        let monitor = CloudSyncMonitor(defaults: makeDefaults())
+        var announced = 0
+        let token = NotificationCenter.default.addObserver(
+            forName: CloudSyncMonitor.didReceive, object: nil, queue: nil
+        ) { _ in announced += 1 }
+        defer { NotificationCenter.default.removeObserver(token) }
+
+        monitor.record(kind: .send, endedAt: at(5), succeeded: true, errorMessage: nil)
+        monitor.record(kind: .setup, endedAt: at(4), succeeded: true, errorMessage: nil)
+        monitor.record(kind: .receive, endedAt: at(3), succeeded: false, errorMessage: "réseau")
+        #expect(announced == 0)
+        monitor.record(kind: .receive, endedAt: at(2), succeeded: true, errorMessage: nil)
+        #expect(announced == 1)
+    }
+
     @Test func anExchangeThatNeverEnds_stopsCountingAfterTwoMinutes() {
         let monitor = CloudSyncMonitor(defaults: makeDefaults())
         monitor.recordStart(id: UUID(), at: at(121))

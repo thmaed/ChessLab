@@ -238,6 +238,10 @@ struct DailySessionCard: View {
         .buttonStyle(.pressable)
         .accessibilityIdentifier("dailySessionCard")
         .onAppear { plan = DailySessionBuilder.load(in: modelContext) }
+        // Un autre appareil a avancé la séance (Woodpecker, révisions) : relire.
+        .onReceive(NotificationCenter.default.publisher(for: CloudImportResponder.didApply)) { _ in
+            plan = DailySessionBuilder.load(in: modelContext)
+        }
     }
 
     /// « 12 positions à revoir · 3 puzzles à retenter · une finale », ou le
