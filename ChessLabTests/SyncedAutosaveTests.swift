@@ -26,16 +26,25 @@ struct SyncedAutosaveTests {
     private final class Device {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("autosave-\(UUID().uuidString).json")
         var enabled = true
+        let defaults: UserDefaults
+        private let suite = UUID().uuidString
         let autosave: () -> SyncedAutosave<FakeGame>
-        init(store: KeyValueStoring) {
+        init(store: KeyValueStoring, kind: String = "iPhone") {
             var holder: Device?
+            let defaults = UserDefaults(suiteName: suite)!
+            self.defaults = defaults
+            let identity = CloudDeviceIdentity(id: UUID().uuidString, kind: kind)
             autosave = {
                 SyncedAutosave(key: "test.autosave", fileURL: { holder!.url }, savedAt: \.savedAt,
-                               store: store, isEnabled: { holder!.enabled })
+                               store: store, isEnabled: { holder!.enabled },
+                               identity: identity, originDefaults: defaults)
             }
             holder = self
         }
-        deinit { try? FileManager.default.removeItem(at: url) }
+        deinit {
+            try? FileManager.default.removeItem(at: url)
+            defaults.removePersistentDomain(forName: suite)
+        }
         var hasFile: Bool { FileManager.default.fileExists(atPath: url.path) }
     }
 
@@ -205,5 +214,42 @@ struct SyncedAutosaveTests {
         let keys = [SyncedAutosave.play.key, SyncedAutosave.twoPlayer.key]
         #expect(Set(keys).count == 2)
         #expect(Set(keys) == Set(AutosaveCloud.keys))
+    }
+
+    // MARK: D'où vient la partie
+
+    @Test func adoptedGame_remembersTheOtherDevice_untilAMoveIsPlayedHere() {
+        let store = FakeStore()
+        let pad = Device(store: store, kind: "iPad")
+        let phone = Device(store: store, kind: "iPhone")
+        pad.autosave().save(game(["e2e4", "e7e5"], at(30)))
+        #expect(phone.autosave().load()?.moves == ["e2e4", "e7e5"])
+        #expect(phone.autosave().origin() == "iPad")
+        // Un coup joué ICI : la partie est désormais « d'ici ».
+        phone.autosave().save(game(["e2e4", "e7e5", "g1f3"], at(10)))
+        #expect(phone.autosave().origin() == nil)
+        // Et c'est l'iPad qui la voit venir de l'iPhone.
+        _ = pad.autosave().load()
+        #expect(pad.autosave().origin() == "iPhone")
+    }
+
+    @Test func ownGame_hasNoOrigin() {
+        let store = FakeStore()
+        let phone = Device(store: store)
+        phone.autosave().save(game(["d2d4"], at(5)))
+        _ = phone.autosave().load()
+        #expect(phone.autosave().origin() == nil)
+    }
+
+    @Test func envelopesFromEarlierVersions_stillDecode_withoutOrigin() throws {
+        let store = FakeStore()
+        let old = AutosaveEnvelope(at: at(5), game: try JSONEncoder().encode(game(["c2c4"], at(5))))
+        // Format des premières enveloppes : pas de champ d'appareil.
+        let json = try JSONEncoder().encode(old)
+        #expect(String(decoding: json, as: UTF8.self).contains("device") == false)
+        store.values["test.autosave"] = json
+        let phone = Device(store: store)
+        #expect(phone.autosave().load()?.moves == ["c2c4"])
+        #expect(phone.autosave().origin() == nil)
     }
 }

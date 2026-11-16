@@ -24,6 +24,13 @@ struct HomeView: View {
     /// bord d'accueil (reprise, progression, parties récentes).
     @State private var sidebarSelection: SidebarItem?
     @State private var resumableGame: ResumableGame?
+    /// L'appareil où a été joué le dernier coup de la partie proposée, si ce n'est pas celui-ci
+    /// (« Dernier coup joué sur votre iPad »).
+    @State private var resumableOrigin: String?
+    /// Synchro éteinte ici, allumée sur un autre appareil : la proposition (voir ``CloudDeviceRegistry``).
+    @State private var syncInvitation: CloudDeviceRecord?
+    @State private var showsSyncRestartSheet = false
+    @AppStorage("cloudKitSyncEnabled") private var cloudSyncEnabled = false
     /// Bilan de progression compact du panneau iPad — recalculé à l'apparition.
     @State private var progressSummary: ProgressionSummary?
     @State private var path = NavigationPath()
@@ -451,8 +458,14 @@ struct HomeView: View {
                 openSharedImageIfAny()
                 // Une partie commencée sur un autre appareil a pu arriver pendant que l'app dormait.
                 refreshResumableGame()
+                KeyValueSyncSwitch.appBecameActive()
+                refreshSyncInvitation()
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: CloudDevices.didChange)) { _ in
+            refreshSyncInvitation()
+        }
+        .sheet(isPresented: $showsSyncRestartSheet) { CloudRestartSheet() }
         // …ou pendant que l'accueil était affiché : le magasin clé-valeur le dit en quelques secondes.
         .onReceive(NotificationCenter.default.publisher(for: AutosaveCloud.didChangeRemotely)) { _ in
             refreshResumableGame()
@@ -514,6 +527,7 @@ struct HomeView: View {
             // la bannière le lit ici.
             if SessionDegradation.isInMemory { persistenceHealth.isDegradedSession = true }
             refreshResumableGame()
+            refreshSyncInvitation()
             // Fusionne la progression puzzles synchronisée (autres appareils)
             // dans les Puzzle locaux AVANT de calculer le bilan — voir
             // ``PuzzleProgressSync``. No-op si rien n'est encore synchronisé.
@@ -723,6 +737,11 @@ struct HomeView: View {
                                 Text("\(resumableGame.moveCount) coup(s) joué(s)")
                                     .font(.caption)
                                     .foregroundStyle(Theme.textSecondary)
+                                if let resumableOrigin {
+                                    Text("Dernier coup joué sur votre \(resumableOrigin)")
+                                        .font(.caption2)
+                                        .foregroundStyle(Theme.textTertiary)
+                                }
                             }
                         } icon: {
                             Image(systemName: "play.circle.fill")
@@ -827,6 +846,7 @@ struct HomeView: View {
                 homeHeader()
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
+                syncHomeCard
                 // La reprise vit désormais en HAUT de la barre latérale
                 // (persistante) — voir `sidebar` — pour ne pas doublonner ici.
                 dailySessionCard
@@ -1375,6 +1395,35 @@ struct HomeView: View {
         case let (.some(a), .some(b)):
             resumableGame = a.savedAt > b.savedAt ? a : b
         }
+        resumableOrigin = switch resumableGame {
+        case .vsEngine: SyncedAutosave.play.origin()
+        case .twoPlayer: SyncedAutosave.twoPlayer.origin()
+        case nil: nil
+        }
+    }
+
+    private func refreshSyncInvitation() {
+        syncInvitation = CloudDeviceRegistry.live.invitation(dismissed: CloudDevices.dismissed)
+    }
+
+    /// La synchro, à l'accueil : la proposer quand un autre appareil l'a déjà, ou rappeler la dernière
+    /// étape quand elle attend un relancement. Jamais pendant la visite guidée.
+    @ViewBuilder private var syncHomeCard: some View {
+        if !discoveryTour.isActive {
+            if let syncInvitation {
+                CloudSyncInvitationCard(device: syncInvitation) {
+                    cloudSyncEnabled = true
+                    KeyValueSyncSwitch.apply()
+                    self.syncInvitation = nil
+                    showsSyncRestartSheet = true
+                } onDismiss: {
+                    CloudDevices.dismissInvitation(from: syncInvitation)
+                    self.syncInvitation = nil
+                }
+            } else if cloudSyncEnabled, !CloudSyncSettingsStore.activeAtLaunch, !SessionDegradation.isInMemory {
+                CloudRestartReminderCard { showsSyncRestartSheet = true }
+            }
+        }
     }
 
     // MARK: Dispositions iPhone / iPad
@@ -1420,6 +1469,7 @@ struct HomeView: View {
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 if let resumableGame { resumeBanner(resumableGame) }
+                syncHomeCard
                 dailySessionCard
                 newPuzzlesPill
                 repertoireExitPill
@@ -1907,6 +1957,11 @@ struct HomeView: View {
                     Text("\(resumable.moveCount) coup(s) joué(s)")
                         .font(.caption)
                         .foregroundStyle(Theme.background.opacity(0.72))
+                    if let resumableOrigin {
+                        Label("Dernier coup joué sur votre \(resumableOrigin)", systemImage: "icloud")
+                            .font(.caption2.weight(.medium))
+                            .foregroundStyle(Theme.background.opacity(0.72))
+                    }
                 }
                 Spacer()
                 Image(systemName: "chevron.right")

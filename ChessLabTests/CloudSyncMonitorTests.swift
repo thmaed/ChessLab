@@ -85,6 +85,22 @@ struct CloudSyncMonitorTests {
 
     // MARK: Les messages d'erreur
 
+    @Test func anExchangeInFlight_showsAsSyncing_untilItEnds() {
+        let monitor = CloudSyncMonitor(defaults: makeDefaults())
+        let id = UUID()
+        monitor.recordStart(id: id, at: at(3))
+        #expect(monitor.isExchanging())
+        monitor.record(kind: .send, endedAt: at(1), succeeded: true, errorMessage: nil, id: id)
+        #expect(!monitor.isExchanging())
+        #expect(monitor.lastExchange != nil)
+    }
+
+    @Test func anExchangeThatNeverEnds_stopsCountingAfterTwoMinutes() {
+        let monitor = CloudSyncMonitor(defaults: makeDefaults())
+        monitor.recordStart(id: UUID(), at: at(121))
+        #expect(!monitor.isExchanging())
+    }
+
     @Test func commonCloudKitErrors_getDistinctReadableMessages() {
         let codes: [CKError.Code] = [.notAuthenticated, .networkUnavailable, .quotaExceeded, .zoneBusy, .accountTemporarilyUnavailable]
         let messages = codes.map { CloudSyncErrorText.describe(code: $0.rawValue) }

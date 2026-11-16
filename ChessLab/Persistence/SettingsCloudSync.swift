@@ -10,6 +10,13 @@ protocol KeyValueStoring: AnyObject {
     func set(_ value: Any?, forKey key: String)
     var storedKeys: [String] { get }
     @discardableResult func synchronize() -> Bool
+    func removeObject(forKey key: String)
+}
+
+extension KeyValueStoring {
+    /// Par défaut, effacer = écrire `nil` (les magasins factices des tests). Le vrai magasin iCloud a sa
+    /// propre méthode, qui l'emporte.
+    func removeObject(forKey key: String) { set(nil, forKey: key) }
 }
 
 extension NSUbiquitousKeyValueStore: KeyValueStoring {

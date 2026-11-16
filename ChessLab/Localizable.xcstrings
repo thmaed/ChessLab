@@ -11556,34 +11556,6 @@
         }
       }
     },
-    "Compte iCloud connecté": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iCloud account connected"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cuenta de iCloud conectada"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iCloud-Account verbunden"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Account iCloud connesso"
-          }
-        }
-      }
-    },
     "Confirmer la nulle": {
       "localizations": {
         "en": {
@@ -27960,34 +27932,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Nomi e codici ECO"
-          }
-        }
-      }
-    },
-    "Non connecté à iCloud — la synchro est en pause": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Not signed in to iCloud — sync is paused"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sin sesión en iCloud: la sincronización está en pausa"
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nicht bei iCloud angemeldet – Synchronisierung pausiert"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Non connesso a iCloud — la sincronizzazione è in pausa"
           }
         }
       }
@@ -54346,40 +54290,6 @@
         }
       }
     },
-    "Les réglages et la partie en cours se synchronisent dès maintenant. Pour le reste (parties enregistrées, ouvertures, puzzles), fermez complètement ChessLab puis rouvrez-le.": {
-      "localizations": {
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Les réglages et la partie en cours se synchronisent dès maintenant. Pour le reste (parties enregistrées, ouvertures, puzzles), fermez complètement ChessLab puis rouvrez-le."
-          }
-        },
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settings and the game in progress sync right away. For everything else (saved games, openings, puzzles), quit ChessLab completely and reopen it."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Los ajustes y la partida en curso se sincronizan ya. Para el resto (partidas guardadas, aperturas, puzles), cierra ChessLab por completo y vuelve a abrirlo."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Einstellungen und die laufende Partie werden sofort synchronisiert. Für alles andere (gespeicherte Partien, Eröffnungen, Puzzles) beende ChessLab vollständig und öffne es erneut."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le impostazioni e la partita in corso si sincronizzano subito. Per il resto (partite salvate, aperture, puzzle), chiudi completamente ChessLab e riaprilo."
-          }
-        }
-      }
-    },
     "Les réglages et la partie en cours ne sont plus partagés. Pour arrêter aussi le reste, fermez complètement ChessLab puis rouvrez-le.": {
       "localizations": {
         "fr": {
@@ -54448,36 +54358,1158 @@
         }
       }
     },
-    "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. Dès que vous changez l'interrupteur, vos réglages et votre partie en cours se synchronisent (ou s'arrêtent). Pour le reste — parties enregistrées, ouvertures, puzzles, programmes — fermez complètement ChessLab puis rouvrez-le : c'est alors seulement que cette partie-là s'allume ou s'éteint.\n\nCE QUI SUIT\nVos parties terminées, votre partie EN COURS (contre l'ordinateur ou à deux : l'accueil de l'autre appareil la propose à la reprise), votre progression sur les ouvertures et les finales, vos répertoires personnels, vos programmes Woodpecker, vos collections de puzzles importées (les puzzles, pas votre progression dessus), et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens.\n\nÀ SAVOIR\niOS choisit le moment de l'échange : comptez de quelques secondes à quelques minutes. Les Réglages montrent le dernier envoi et la dernière réception, et « Synchroniser maintenant » relance ce qui peut l'être. Si vous avez commencé deux parties différentes sur deux appareils, la plus récemment jouée l'emporte.": {
+    "Pour retrouver vos parties et votre progression sur votre iPhone, votre iPad et votre Mac. Tout passe par votre iCloud privé : aucun compte ChessLab, aucun serveur tiers. Désactivée par défaut ; l'app fonctionne entièrement hors ligne.\n\nACTIVER\nRéglages › Synchronisation › « Synchroniser via iCloud », sur chacun de vos appareils. Vos réglages et la partie en cours suivent aussitôt ; pour le reste, fermez ChessLab puis rouvrez-le une fois — l'app vous montre comment. Si un autre de vos appareils synchronise déjà, l'accueil vous propose de le rejoindre.\n\nVÉRIFIER\nLa carte Synchronisation dit en un mot où en est l'échange (« À jour », « Synchronisation en cours… », ou ce qui bloque), et « Vos appareils » liste ceux qui sont reliés. Un appareil manque ? Même compte Apple, ChessLab à jour, synchronisation activée sur lui aussi.\n\nCE QUI SUIT\nVos parties terminées, la partie EN COURS (contre l'ordinateur ou à deux : l'accueil de l'autre appareil la propose à la reprise), votre progression sur les ouvertures et les finales, vos répertoires personnels, vos programmes Woodpecker, vos collections de puzzles importées (les puzzles, pas votre progression dessus) et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie. La langue et les sons restent propres à chaque appareil.\n\nÀ SAVOIR\niOS choisit le moment des échanges : comptez de quelques secondes à quelques minutes ; « Synchroniser maintenant » relance ce qui peut l'être. Si deux parties différentes sont en cours sur deux appareils, la plus récemment jouée l'emporte.": {
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn it on in Settings so your games follow you across all your devices via your private iCloud — no account to create, no third-party server. Off by default: the app works fully offline. As soon as you flip the switch, your settings and the game in progress start (or stop) syncing. For the rest — saved games, openings, puzzles, programs — quit ChessLab completely and reopen it: only then does that part start or stop.\n\nWHAT FOLLOWS YOU\nYour finished games, your game IN PROGRESS (against the computer or two-player: the other device's home screen offers it to resume), your progress on openings and endgames, your personal repertoires, your Woodpecker programs, your imported puzzle collections (the puzzles, not your progress on them), and your preferences — board theme, piece set, notation, puzzle attempts, game settings.\n\nWHAT STAYS ON EACH DEVICE\nThe language and the sounds, so each device keeps its own.\n\nGOOD TO KNOW\niOS chooses when to exchange: allow anything from a few seconds to a few minutes. Settings shows the last send and the last receive, and “Sync now” triggers what can be triggered. If you started two different games on two devices, the one played most recently wins."
-          }
-        },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. Dès que vous changez l'interrupteur, vos réglages et votre partie en cours se synchronisent (ou s'arrêtent). Pour le reste — parties enregistrées, ouvertures, puzzles, programmes — fermez complètement ChessLab puis rouvrez-le : c'est alors seulement que cette partie-là s'allume ou s'éteint.\n\nCE QUI SUIT\nVos parties terminées, votre partie EN COURS (contre l'ordinateur ou à deux : l'accueil de l'autre appareil la propose à la reprise), votre progression sur les ouvertures et les finales, vos répertoires personnels, vos programmes Woodpecker, vos collections de puzzles importées (les puzzles, pas votre progression dessus), et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens.\n\nÀ SAVOIR\niOS choisit le moment de l'échange : comptez de quelques secondes à quelques minutes. Les Réglages montrent le dernier envoi et la dernière réception, et « Synchroniser maintenant » relance ce qui peut l'être. Si vous avez commencé deux parties différentes sur deux appareils, la plus récemment jouée l'emporte."
+            "value": "Pour retrouver vos parties et votre progression sur votre iPhone, votre iPad et votre Mac. Tout passe par votre iCloud privé : aucun compte ChessLab, aucun serveur tiers. Désactivée par défaut ; l'app fonctionne entièrement hors ligne.\n\nACTIVER\nRéglages › Synchronisation › « Synchroniser via iCloud », sur chacun de vos appareils. Vos réglages et la partie en cours suivent aussitôt ; pour le reste, fermez ChessLab puis rouvrez-le une fois — l'app vous montre comment. Si un autre de vos appareils synchronise déjà, l'accueil vous propose de le rejoindre.\n\nVÉRIFIER\nLa carte Synchronisation dit en un mot où en est l'échange (« À jour », « Synchronisation en cours… », ou ce qui bloque), et « Vos appareils » liste ceux qui sont reliés. Un appareil manque ? Même compte Apple, ChessLab à jour, synchronisation activée sur lui aussi.\n\nCE QUI SUIT\nVos parties terminées, la partie EN COURS (contre l'ordinateur ou à deux : l'accueil de l'autre appareil la propose à la reprise), votre progression sur les ouvertures et les finales, vos répertoires personnels, vos programmes Woodpecker, vos collections de puzzles importées (les puzzles, pas votre progression dessus) et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie. La langue et les sons restent propres à chaque appareil.\n\nÀ SAVOIR\niOS choisit le moment des échanges : comptez de quelques secondes à quelques minutes ; « Synchroniser maintenant » relance ce qui peut l'être. Si deux parties différentes sont en cours sur deux appareils, la plus récemment jouée l'emporte."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick up your games and progress on your iPhone, iPad and Mac. Everything goes through your private iCloud: no ChessLab account, no third-party server. Off by default; the app works fully offline.\n\nTURNING IT ON\nSettings › Sync › “Sync via iCloud”, on each of your devices. Your settings and the game in progress follow right away; for the rest, quit ChessLab and reopen it once — the app shows you how. If another of your devices already syncs, the home screen offers to join it.\n\nCHECKING\nThe Sync card says in a word where things stand (“Up to date”, “Syncing…”, or what is blocking), and “Your devices” lists the ones that are connected. A device missing? Same Apple Account, ChessLab up to date, sync turned on there too.\n\nWHAT SYNCS\nYour finished games, the game IN PROGRESS (against the computer or two-player: the other device's home screen offers to resume it), your opening and endgame progress, your personal repertoires, your Woodpecker programs, your imported puzzle collections (the puzzles, not your progress on them) and your preferences — board theme, piece set, notation, attempts per puzzle, game settings. Language and sounds stay specific to each device.\n\nGOOD TO KNOW\niOS decides when the exchange happens: allow anything from a few seconds to a few minutes; “Sync now” nudges whatever can be nudged. If two different games are in progress on two devices, the most recently played one wins."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Actívala en Ajustes para que tus partidas te sigan en todos tus dispositivos a través de tu iCloud privado: sin cuenta que crear, sin servidores de terceros. Desactivada por defecto: la app funciona totalmente sin conexión. En cuanto cambias el interruptor, tus ajustes y la partida en curso empiezan (o dejan) de sincronizarse. Para el resto —partidas guardadas, aperturas, puzles, programas— cierra ChessLab por completo y vuelve a abrirlo: solo entonces esa parte se activa o se detiene.\n\nQUÉ SE SINCRONIZA\nTus partidas terminadas, tu partida EN CURSO (contra el ordenador o de dos jugadores: la pantalla de inicio del otro dispositivo te la ofrece para reanudarla), tu progreso en aperturas y finales, tus repertorios personales, tus programas Woodpecker, tus colecciones de puzles importadas (los puzles, no tu progreso en ellos) y tus preferencias: tema del tablero, juego de piezas, notación, intentos por puzle, ajustes de partida.\n\nQUÉ SE QUEDA EN CADA DISPOSITIVO\nEl idioma y los sonidos, para que cada dispositivo conserve los suyos.\n\nCONVIENE SABER\niOS elige el momento del intercambio: puede tardar desde unos segundos hasta unos minutos. Ajustes muestra el último envío y la última recepción, y «Sincronizar ahora» lanza lo que se puede lanzar. Si empezaste dos partidas distintas en dos dispositivos, gana la que se jugó más recientemente."
+            "value": "Para encontrar tus partidas y tu progreso en tu iPhone, tu iPad y tu Mac. Todo pasa por tu iCloud privado: sin cuenta de ChessLab, sin servidores de terceros. Desactivada por defecto; la app funciona totalmente sin conexión.\n\nACTIVARLA\nAjustes › Sincronización › «Sincronizar con iCloud», en cada uno de tus dispositivos. Tus ajustes y la partida en curso se sincronizan al momento; para el resto, cierra ChessLab y vuelve a abrirlo una vez (la app te muestra cómo). Si otro de tus dispositivos ya sincroniza, la pantalla de inicio te propone unirte.\n\nCOMPROBARLA\nLa tarjeta Sincronización dice en una palabra cómo va el intercambio («Todo al día», «Sincronizando…» o lo que lo bloquea), y «Tus dispositivos» muestra los que están conectados. ¿Falta uno? Misma cuenta de Apple, ChessLab actualizado y sincronización activada también en él.\n\nQUÉ SE SINCRONIZA\nTus partidas terminadas, la partida EN CURSO (contra el ordenador o a dos: la pantalla de inicio del otro dispositivo te la ofrece para reanudarla), tu progreso en aperturas y finales, tus repertorios personales, tus programas Woodpecker, tus colecciones de puzles importadas (los puzles, no tu progreso en ellos) y tus preferencias: tema del tablero, juego de piezas, notación, intentos por puzle, ajustes de partida. El idioma y los sonidos se quedan en cada dispositivo.\n\nBUENO SABERLO\niOS elige el momento del intercambio: puede tardar desde unos segundos hasta unos minutos; «Sincronizar ahora» relanza lo que se puede relanzar. Si hay dos partidas distintas en curso en dos dispositivos, gana la que se jugó más recientemente."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktiviere die Synchronisierung in den Einstellungen, damit deine Partien dir über dein privates iCloud auf allen Geräten folgen – kein Konto nötig, keine Server von Drittanbietern. Standardmäßig deaktiviert: Die App funktioniert vollständig offline. Sobald du den Schalter änderst, beginnt (oder endet) die Synchronisierung deiner Einstellungen und der laufenden Partie. Für den Rest – gespeicherte Partien, Eröffnungen, Puzzles, Programme – beende ChessLab vollständig und öffne es erneut: erst dann beginnt oder endet dieser Teil.\n\nWAS SYNCHRONISIERT WIRD\nDeine beendeten Partien, deine LAUFENDE Partie (gegen den Computer oder zu zweit: der Startbildschirm des anderen Geräts bietet sie zum Fortsetzen an), dein Fortschritt bei Eröffnungen und Endspielen, deine persönlichen Repertoires, deine Woodpecker-Programme, deine importierten Puzzle-Sammlungen (die Puzzles, nicht dein Fortschritt darin) und deine Einstellungen – Brettdesign, Figurensatz, Notation, Versuche pro Puzzle, Partieeinstellungen.\n\nWAS AUF JEDEM GERÄT BLEIBT\nSprache und Töne, damit jedes Gerät seine eigenen behält.\n\nGUT ZU WISSEN\niOS wählt den Zeitpunkt des Austauschs: rechne mit einigen Sekunden bis einigen Minuten. Die Einstellungen zeigen das letzte Senden und das letzte Empfangen, und „Jetzt synchronisieren“ stößt an, was sich anstoßen lässt. Hast du auf zwei Geräten zwei verschiedene Partien begonnen, gewinnt die zuletzt gespielte."
+            "value": "Damit du deine Partien und deinen Fortschritt auf iPhone, iPad und Mac wiederfindest. Alles läuft über dein privates iCloud: kein ChessLab-Konto, keine Server von Drittanbietern. Standardmäßig deaktiviert; die App funktioniert vollständig offline.\n\nEINSCHALTEN\nEinstellungen › Sync › „Über iCloud synchronisieren“, auf jedem deiner Geräte. Deine Einstellungen und die laufende Partie folgen sofort; für den Rest beendest du ChessLab einmal und öffnest es erneut – die App zeigt dir, wie. Synchronisiert schon ein anderes deiner Geräte, schlägt dir der Startbildschirm vor, dich anzuschließen.\n\nPRÜFEN\nDie Sync-Karte sagt in einem Wort, wo der Austausch steht („Alles aktuell“, „Synchronisierung läuft …“ oder was ihn blockiert), und „Deine Geräte“ zeigt, welche verbunden sind. Fehlt ein Gerät? Derselbe Apple Account, ChessLab aktuell, Synchronisierung auch dort aktiviert.\n\nWAS SYNCHRONISIERT WIRD\nDeine beendeten Partien, die LAUFENDE Partie (gegen den Computer oder zu zweit: Der Startbildschirm des anderen Geräts bietet sie zum Fortsetzen an), dein Fortschritt bei Eröffnungen und Endspielen, deine eigenen Repertoires, deine Woodpecker-Programme, deine importierten Puzzle-Sammlungen (die Puzzles, nicht dein Fortschritt darin) und deine Vorlieben – Brettdesign, Figurensatz, Notation, Versuche pro Puzzle, Partieeinstellungen. Sprache und Töne bleiben auf jedem Gerät für sich.\n\nGUT ZU WISSEN\niOS bestimmt den Zeitpunkt des Austauschs: Rechne mit wenigen Sekunden bis einigen Minuten; „Jetzt synchronisieren“ stößt an, was sich anstoßen lässt. Laufen auf zwei Geräten zwei verschiedene Partien, gewinnt die zuletzt gespielte."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Attivala nelle Impostazioni perché le tue partite ti seguano su tutti i tuoi dispositivi tramite il tuo iCloud privato — nessun account da creare, nessun server di terzi. Disattivata per impostazione predefinita: l'app funziona interamente offline. Non appena cambi l'interruttore, le impostazioni e la partita in corso iniziano (o smettono) di sincronizzarsi. Per il resto — partite salvate, aperture, puzzle, programmi — chiudi completamente ChessLab e riaprilo: solo allora quella parte si attiva o si ferma.\n\nCOSA VIENE SINCRONIZZATO\nLe tue partite terminate, la tua partita IN CORSO (contro il computer o in due: la schermata iniziale dell'altro dispositivo te la propone per riprenderla), i tuoi progressi su aperture e finali, i tuoi repertori personali, i tuoi programmi Woodpecker, le tue raccolte di puzzle importate (i puzzle, non i tuoi progressi su di essi) e le tue preferenze — tema della scacchiera, set di pezzi, notazione, tentativi per puzzle, impostazioni di partita.\n\nCOSA RESTA SU OGNI DISPOSITIVO\nLa lingua e i suoni, perché ogni dispositivo conservi i propri.\n\nDA SAPERE\niOS sceglie il momento dello scambio: calcola da alcuni secondi a qualche minuto. Le Impostazioni mostrano l'ultimo invio e l'ultima ricezione, e «Sincronizza ora» avvia ciò che si può avviare. Se hai iniziato due partite diverse su due dispositivi, vince quella giocata più di recente."
+            "value": "Per ritrovare le tue partite e i tuoi progressi su iPhone, iPad e Mac. Tutto passa dal tuo iCloud privato: nessun account ChessLab, nessun server di terzi. Disattivata per impostazione predefinita; l'app funziona interamente offline.\n\nATTIVARLA\nImpostazioni › Sincronizzazione › «Sincronizza tramite iCloud», su ciascuno dei tuoi dispositivi. Le impostazioni e la partita in corso si sincronizzano subito; per il resto, chiudi ChessLab e riaprilo una volta (l'app ti mostra come). Se un altro tuo dispositivo sincronizza già, la schermata iniziale ti propone di unirti.\n\nVERIFICARLA\nLa scheda Sincronizzazione dice in una parola a che punto è lo scambio («Tutto aggiornato», «Sincronizzazione in corso…» o cosa lo blocca), e «I tuoi dispositivi» elenca quelli collegati. Manca un dispositivo? Stesso Account Apple, ChessLab aggiornato, sincronizzazione attiva anche lì.\n\nCOSA SI SINCRONIZZA\nLe partite concluse, la partita IN CORSO (contro il computer o a due: la schermata iniziale dell'altro dispositivo te la propone per riprenderla), i progressi su aperture e finali, i tuoi repertori personali, i programmi Woodpecker, le raccolte di puzzle importate (i puzzle, non i tuoi progressi) e le preferenze: tema della scacchiera, set di pezzi, notazione, tentativi per puzzle, impostazioni di partita. Lingua e suoni restano propri di ogni dispositivo.\n\nBUONO A SAPERSI\niOS sceglie il momento dello scambio: da pochi secondi a qualche minuto; «Sincronizza ora» rilancia ciò che si può rilanciare. Se su due dispositivi ci sono due partite diverse in corso, vince quella giocata più di recente."
+          }
+        }
+      }
+    },
+    "Désactivée": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivée"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivada"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aus"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disattivata"
+          }
+        }
+      }
+    },
+    "Dernière étape : relancer ChessLab": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dernière étape : relancer ChessLab"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last step: restart ChessLab"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Último paso: reinicia ChessLab"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzter Schritt: ChessLab neu starten"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ultimo passo: riavvia ChessLab"
+          }
+        }
+      }
+    },
+    "Arrêt complet au prochain lancement": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Arrêt complet au prochain lancement"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fully stops at next launch"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se detiene del todo en el próximo arranque"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Endet vollständig beim nächsten Start"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si ferma del tutto al prossimo avvio"
+          }
+        }
+      }
+    },
+    "Connectez-vous à iCloud": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connectez-vous à iCloud"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to iCloud"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicia sesión en iCloud"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bei iCloud anmelden"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accedi a iCloud"
+          }
+        }
+      }
+    },
+    "iCloud indisponible": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud indisponible"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud unavailable"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud no disponible"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud nicht verfügbar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud non disponibile"
+          }
+        }
+      }
+    },
+    "Synchronisation en pause": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisation en pause"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sync paused"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronización en pausa"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Synchronisierung pausiert"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sincronizzazione in pausa"
+          }
+        }
+      }
+    },
+    "À jour": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À jour"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Up to date"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo al día"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles aktuell"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutto aggiornato"
+          }
+        }
+      }
+    },
+    "Tout reste sur cet appareil.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tout reste sur cet appareil."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Everything stays on this device."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Todo se queda en este dispositivo."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alles bleibt auf diesem Gerät."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tutto resta su questo dispositivo."
+          }
+        }
+      }
+    },
+    "Vos réglages et la partie en cours se synchronisent déjà. Le reste démarrera à la réouverture.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos réglages et la partie en cours se synchronisent déjà. Le reste démarrera à la réouverture."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your settings and the game in progress already sync. The rest will start when you reopen the app."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus ajustes y la partida en curso ya se sincronizan. El resto empezará al volver a abrir la app."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Einstellungen und die laufende Partie werden bereits synchronisiert. Der Rest startet beim erneuten Öffnen."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le impostazioni e la partita in corso si sincronizzano già. Il resto partirà alla riapertura."
+          }
+        }
+      }
+    },
+    "Dans Réglages Système, cliquez en haut à gauche pour vous connecter avec votre compte Apple. La synchronisation reprendra d'elle-même.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans Réglages Système, cliquez en haut à gauche pour vous connecter avec votre compte Apple. La synchronisation reprendra d'elle-même."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In System Settings, click at the top left to sign in with your Apple Account. Syncing will resume on its own."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En Ajustes del Sistema, haz clic arriba a la izquierda para iniciar sesión con tu cuenta de Apple. La sincronización se reanudará sola."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Klicke in den Systemeinstellungen oben links, um dich mit deinem Apple Account anzumelden. Die Synchronisierung läuft dann von selbst weiter."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Impostazioni di Sistema, fai clic in alto a sinistra per accedere con il tuo Account Apple. La sincronizzazione riprenderà da sola."
+          }
+        }
+      }
+    },
+    "Dans les Réglages de l'appareil, touchez la ligne tout en haut et connectez-vous avec votre compte Apple. La synchronisation reprendra d'elle-même.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans les Réglages de l'appareil, touchez la ligne tout en haut et connectez-vous avec votre compte Apple. La synchronisation reprendra d'elle-même."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In the device's Settings, tap the row at the very top and sign in with your Apple Account. Syncing will resume on its own."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En los Ajustes del dispositivo, toca la fila de arriba del todo e inicia sesión con tu cuenta de Apple. La sincronización se reanudará sola."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tippe in den Einstellungen des Geräts ganz oben auf die erste Zeile und melde dich mit deinem Apple Account an. Die Synchronisierung läuft dann von selbst weiter."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nelle Impostazioni del dispositivo, tocca la riga in alto e accedi con il tuo Account Apple. La sincronizzazione riprenderà da sola."
+          }
+        }
+      }
+    },
+    "iCloud ne répond pas pour le moment. La synchronisation reprendra d'elle-même.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud ne répond pas pour le moment. La synchronisation reprendra d'elle-même."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud isn't responding right now. Syncing will resume on its own."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud no responde por ahora. La sincronización se reanudará sola."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud antwortet gerade nicht. Die Synchronisierung läuft dann von selbst weiter."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iCloud non risponde al momento. La sincronizzazione riprenderà da sola."
+          }
+        }
+      }
+    },
+    "Échange avec iCloud.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Échange avec iCloud."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Exchanging with iCloud."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Intercambiando datos con iCloud."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Datenaustausch mit iCloud."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scambio con iCloud in corso."
+          }
+        }
+      }
+    },
+    "Dernier échange : %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dernier échange : %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last exchange: %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Último intercambio: %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzter Austausch: %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ultimo scambio: %@"
+          }
+        }
+      }
+    },
+    "Premier échange en attente : iOS s'en charge dans les minutes qui viennent.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Premier échange en attente : iOS s'en charge dans les minutes qui viennent."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First exchange pending: iOS will handle it within the next few minutes."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primer intercambio pendiente: iOS se encargará en los próximos minutos."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Erster Austausch ausstehend: iOS erledigt ihn in den nächsten Minuten."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Primo scambio in attesa: iOS se ne occuperà nei prossimi minuti."
+          }
+        }
+      }
+    },
+    "Quittez ChessLab (⌘Q).": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quittez ChessLab (⌘Q)."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit ChessLab (⌘Q)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sal de ChessLab (⌘Q)."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beende ChessLab (⌘Q)."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esci da ChessLab (⌘Q)."
+          }
+        }
+      }
+    },
+    "Rouvrez ChessLab : la synchronisation démarre.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rouvrez ChessLab : la synchronisation démarre."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reopen ChessLab: syncing starts."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vuelve a abrir ChessLab: la sincronización empieza."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne ChessLab erneut: Die Synchronisierung startet."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riapri ChessLab: la sincronizzazione parte."
+          }
+        }
+      }
+    },
+    "Ouvrez le sélecteur d'apps : balayez vers le haut depuis le bas de l'écran et marquez une pause (ou appuyez deux fois sur le bouton principal).": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ouvrez le sélecteur d'apps : balayez vers le haut depuis le bas de l'écran et marquez une pause (ou appuyez deux fois sur le bouton principal)."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open the app switcher: swipe up from the bottom of the screen and pause (or double-press the Home button)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abre el selector de apps: desliza hacia arriba desde la parte inferior de la pantalla y haz una pausa (o pulsa dos veces el botón de inicio)."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Öffne den App-Umschalter: Streiche vom unteren Bildschirmrand nach oben und halte kurz inne (oder drücke zweimal die Home-Taste)."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apri il selettore delle app: scorri verso l'alto dal fondo dello schermo e fai una pausa (o premi due volte il tasto Home)."
+          }
+        }
+      }
+    },
+    "Faites glisser ChessLab vers le haut pour le fermer.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Faites glisser ChessLab vers le haut pour le fermer."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Swipe ChessLab up to close it."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desliza ChessLab hacia arriba para cerrarlo."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schiebe ChessLab nach oben, um es zu schließen."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scorri ChessLab verso l'alto per chiuderlo."
+          }
+        }
+      }
+    },
+    "Une seule fois, pour brancher vos parties et votre progression sur iCloud.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une seule fois, pour brancher vos parties et votre progression sur iCloud."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Just once, to connect your games and progress to iCloud."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solo una vez, para conectar tus partidas y tu progreso a iCloud."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nur einmal, um deine Partien und deinen Fortschritt mit iCloud zu verbinden."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una volta sola, per collegare le tue partite e i tuoi progressi a iCloud."
+          }
+        }
+      }
+    },
+    "Vos appareils": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vos appareils"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your devices"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tus dispositivos"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deine Geräte"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I tuoi dispositivi"
+          }
+        }
+      }
+    },
+    "Un appareil manque ? Vérifiez sur lui : même compte Apple, ChessLab à jour, synchronisation activée.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un appareil manque ? Vérifiez sur lui : même compte Apple, ChessLab à jour, synchronisation activée."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A device missing? Check on it: same Apple Account, ChessLab up to date, sync turned on."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Falta un dispositivo? Comprueba en él: misma cuenta de Apple, ChessLab actualizado y sincronización activada."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fehlt ein Gerät? Prüfe dort: derselbe Apple Account, ChessLab aktuell, Synchronisierung aktiviert."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manca un dispositivo? Controlla su di esso: stesso Account Apple, ChessLab aggiornato, sincronizzazione attiva."
+          }
+        }
+      }
+    },
+    "Aucun autre appareil relié pour l'instant. Sur l'autre appareil : même compte Apple, ChessLab à jour, synchronisation activée.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun autre appareil relié pour l'instant. Sur l'autre appareil : même compte Apple, ChessLab à jour, synchronisation activée."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No other device connected yet. On the other device: same Apple Account, ChessLab up to date, sync turned on."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún no hay otro dispositivo conectado. En el otro dispositivo: misma cuenta de Apple, ChessLab actualizado y sincronización activada."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch kein anderes Gerät verbunden. Auf dem anderen Gerät: derselbe Apple Account, ChessLab aktuell, Synchronisierung aktiviert."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun altro dispositivo collegato per ora. Sull'altro dispositivo: stesso Account Apple, ChessLab aggiornato, sincronizzazione attiva."
+          }
+        }
+      }
+    },
+    "Cet appareil": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet appareil"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This device"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este dispositivo"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Gerät"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo dispositivo"
+          }
+        }
+      }
+    },
+    "Dernière activité : %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dernière activité : %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last active %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Última actividad: %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuletzt aktiv %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ultima attività: %@"
+          }
+        }
+      }
+    },
+    "ChessLab %@ — à mettre à jour": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChessLab %@ — à mettre à jour"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChessLab %@ — needs updating"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChessLab %@: hay que actualizarlo"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChessLab %@ – bitte aktualisieren"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ChessLab %@ — da aggiornare"
+          }
+        }
+      }
+    },
+    "Votre %@ synchronise déjà ChessLab": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre %@ synchronise déjà ChessLab"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your %@ already syncs ChessLab"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu %@ ya sincroniza ChessLab"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein %@ synchronisiert ChessLab bereits"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il tuo %@ sincronizza già ChessLab"
+          }
+        }
+      }
+    },
+    "Activez iCloud ici aussi pour retrouver vos parties et votre progression.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activez iCloud ici aussi pour retrouver vos parties et votre progression."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on iCloud here too to find your games and progress."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activa iCloud también aquí para encontrar tus partidas y tu progreso."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktiviere iCloud auch hier, um deine Partien und deinen Fortschritt wiederzufinden."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attiva iCloud anche qui per ritrovare le tue partite e i tuoi progressi."
+          }
+        }
+      }
+    },
+    "Pas maintenant": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pas maintenant"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not now"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ahora no"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht jetzt"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non ora"
+          }
+        }
+      }
+    },
+    "Fermez ChessLab puis rouvrez-le pour que vos parties et votre progression suivent vos appareils.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fermez ChessLab puis rouvrez-le pour que vos parties et votre progression suivent vos appareils."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit ChessLab and reopen it so your games and progress follow you across devices."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cierra ChessLab y vuelve a abrirlo para que tus partidas y tu progreso te sigan en tus dispositivos."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Beende ChessLab und öffne es erneut, damit deine Partien und dein Fortschritt dir auf deine Geräte folgen."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chiudi ChessLab e riaprilo perché le tue partite e i tuoi progressi ti seguano sui tuoi dispositivi."
+          }
+        }
+      }
+    },
+    "Dernier coup joué sur votre %@": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dernier coup joué sur votre %@"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Last move played on your %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Última jugada en tu %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Letzter Zug auf deinem %@ gespielt"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ultima mossa giocata sul tuo %@"
+          }
+        }
+      }
+    },
+    "Votre %@ synchronise déjà ChessLab. Activez l'interrupteur pour le rejoindre.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Votre %@ synchronise déjà ChessLab. Activez l'interrupteur pour le rejoindre."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your %@ already syncs ChessLab. Turn on the switch to join it."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tu %@ ya sincroniza ChessLab. Activa el interruptor para unirte."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dein %@ synchronisiert ChessLab bereits. Aktiviere den Schalter, um dich anzuschließen."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il tuo %@ sincronizza già ChessLab. Attiva l'interruttore per unirti."
+          }
+        }
+      }
+    },
+    "Détails": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Détails"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detalles"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Details"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dettagli"
           }
         }
       }

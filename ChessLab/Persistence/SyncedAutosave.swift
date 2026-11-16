@@ -12,6 +12,10 @@ struct AutosaveEnvelope: Codable, Equatable {
     /// L'instant de l'écriture : le `savedAt` de la partie, ou l'instant de sa fin.
     var at: Date
     var game: Data?
+    /// L'appareil qui a écrit (voir ``CloudDeviceIdentity``) — pour dire à l'accueil « dernier coup joué sur
+    /// votre iPad ». Optionnels : les enveloppes des premières versions n'en ont pas.
+    var deviceID: String? = nil
+    var device: String? = nil
 }
 
 /// La règle de fusion, isolée et pure pour être éprouvée sans appareil : **la dernière écriture gagne**.
@@ -67,19 +71,38 @@ struct SyncedAutosave<Record: Codable> {
     let savedAt: (Record) -> Date
     let store: KeyValueStoring
     let isEnabled: () -> Bool
+    /// Cet appareil, pour signer ce qu'il publie (absent dans les tests qui n'en ont pas besoin).
+    var identity: CloudDeviceIdentity? = nil
+    /// Où retenir de quel AUTRE appareil vient la partie adoptée (voir ``origin()``).
+    var originDefaults: UserDefaults? = nil
+
+    private var originKey: String { key + ".origin" }
+
+    /// L'appareil (« iPad », « Mac »…) où a été joué le dernier coup de la partie proposée, s'il ne s'agit
+    /// pas de celui-ci. Effacé dès qu'on joue ici.
+    func origin() -> String? {
+        originDefaults?.string(forKey: originKey)
+    }
+
+    private func setOrigin(_ kind: String?) {
+        guard let originDefaults else { return }
+        if let kind { originDefaults.set(kind, forKey: originKey) } else { originDefaults.removeObject(forKey: originKey) }
+    }
 
     // MARK: Écriture
 
     func save(_ record: Record) {
         guard let data = try? JSONEncoder().encode(record) else { return }
         try? data.write(to: fileURL(), options: .atomic)
+        setOrigin(nil)
         publish(data, at: savedAt(record))
     }
 
     func clear() {
         try? FileManager.default.removeItem(at: fileURL())
+        setOrigin(nil)
         guard isEnabled() else { return }
-        write(AutosaveEnvelope(at: Date(), game: nil))
+        write(AutosaveEnvelope(at: Date(), game: nil, deviceID: identity?.id, device: identity?.kind))
     }
 
     // MARK: Lecture
@@ -102,10 +125,13 @@ struct SyncedAutosave<Record: Codable> {
             return local
         case .dropLocal:
             try? FileManager.default.removeItem(at: fileURL())
+            setOrigin(nil)
             return nil
         case let .adoptRemote(data):
             guard let record = try? JSONDecoder().decode(Record.self, from: data) else { return local }
             try? data.write(to: fileURL(), options: .atomic)
+            let fromElsewhere = remote?.deviceID != nil && remote?.deviceID != identity?.id
+            setOrigin(fromElsewhere ? remote?.device : nil)
             return record
         }
     }
@@ -128,7 +154,7 @@ struct SyncedAutosave<Record: Codable> {
 
     private func publish(_ data: Data, at date: Date) {
         guard isEnabled() else { return }
-        write(AutosaveEnvelope(at: date, game: data))
+        write(AutosaveEnvelope(at: date, game: data, deviceID: identity?.id, device: identity?.kind))
     }
 
     private func write(_ envelope: AutosaveEnvelope) {
@@ -146,7 +172,9 @@ extension SyncedAutosave where Record == PlayGameAutosave {
             fileURL: { AutosaveStore.documentURL("autosave_play.json") },
             savedAt: \.savedAt,
             store: NSUbiquitousKeyValueStore.default,
-            isEnabled: { CloudSyncSettingsStore.isEnabled })
+            isEnabled: { CloudSyncSettingsStore.isEnabled },
+            identity: .current,
+            originDefaults: .standard)
     }
 }
 
@@ -158,7 +186,9 @@ extension SyncedAutosave where Record == TwoPlayerGameAutosave {
             fileURL: { AutosaveStore.documentURL("autosave_twoplayer.json") },
             savedAt: \.savedAt,
             store: NSUbiquitousKeyValueStore.default,
-            isEnabled: { CloudSyncSettingsStore.isEnabled })
+            isEnabled: { CloudSyncSettingsStore.isEnabled },
+            identity: .current,
+            originDefaults: .standard)
     }
 }
 

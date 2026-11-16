@@ -25,5 +25,16 @@ enum KeyValueSyncSwitch {
             SettingsCloudSync.shared.stop()
             AutosaveCloud.stop()
         }
+        // « Vos appareils » : la fiche de cet appareil suit l'interrupteur (déposée allumé, retirée éteint) ;
+        // l'écoute, elle, est en LECTURE et reste branchée — c'est elle qui permet de proposer la synchro.
+        let registry = CloudDeviceRegistry.live
+        if CloudSyncSettingsStore.isEnabled { registry.checkIn() } else { registry.checkOut() }
+        CloudDevices.startObserving()
+        NotificationCenter.default.post(name: CloudDevices.didChange, object: nil)
+    }
+
+    /// Retour au premier plan : rafraîchir la fiche (au plus toutes les 10 minutes).
+    static func appBecameActive() {
+        CloudDeviceRegistry.live.checkIn()
     }
 }

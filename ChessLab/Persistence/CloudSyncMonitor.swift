@@ -4,6 +4,48 @@ import Foundation
 import Observation
 import SwiftData
 
+/// L'état de la synchronisation, en UN mot pour l'utilisateur — la carte des Réglages n'affiche que lui
+/// (plus le détail qui va avec). Résolu par une fonction pure, pour être éprouvé sans iCloud.
+enum CloudSyncState: Equatable {
+    /// Interrupteur éteint, et rien ne tourne.
+    case off
+    /// Interrupteur allumé, mais le conteneur SwiftData de ce lancement est local : il faut relancer.
+    case startsAfterRestart
+    /// Interrupteur éteint, mais CloudKit tourne encore jusqu'au prochain lancement.
+    case stopsAfterRestart
+    case checkingAccount
+    /// Aucun compte iCloud sur l'appareil.
+    case noAccount
+    /// Compte présent mais iCloud indisponible (vérification en cours côté iOS, restriction…).
+    case accountUnavailable
+    /// Le dernier échange a échoué ; le message dit pourquoi, en clair.
+    case paused(String)
+    case syncing
+    /// Rien en cours, aucune erreur : le dernier échange réussi, s'il y en a eu un.
+    case upToDate(Date?)
+
+    enum Account: Equatable { case unknown, available, signedOut, unavailable }
+
+    static func resolve(enabled: Bool, activeAtLaunch: Bool, account: Account, failure: String?,
+                        isExchanging: Bool, lastExchange: Date?) -> CloudSyncState {
+        switch (enabled, activeAtLaunch) {
+        case (false, false): return .off
+        case (false, true): return .stopsAfterRestart
+        case (true, false): return .startsAfterRestart
+        case (true, true): break
+        }
+        switch account {
+        case .unknown: return .checkingAccount
+        case .signedOut: return .noAccount
+        case .unavailable: return .accountUnavailable
+        case .available: break
+        }
+        if let failure { return .paused(failure) }
+        if isExchanging { return .syncing }
+        return .upToDate(lastExchange)
+    }
+}
+
 /// Ce qu'on sait, RÉELLEMENT, de la synchronisation CloudKit — par opposition à ce qu'on supposait.
 ///
 /// Jusqu'à la 2.3, les Réglages affichaient « Dernière vérification : il y a 2 minutes », qui datait la
@@ -47,9 +89,14 @@ final class CloudSyncMonitor {
     private(set) var failure: Failure?
     private(set) var isManualSyncRunning = false
     private(set) var manualResult: ManualResult?
+    private(set) var account: CloudSyncState.Account = .unknown
+    /// Les échanges commencés et pas encore terminés, avec l'heure de leur début.
+    private(set) var inFlight: [UUID: Date] = [:]
 
     private let defaults: UserDefaults
     private var observer: NSObjectProtocol?
+    private var accountObserver: NSObjectProtocol?
+    static let containerID = "iCloud.com.chesslab.ChessLab"
 
     private enum Key {
         static let receive = "sync.lastReceiveAt"
@@ -78,8 +125,14 @@ final class CloudSyncMonitor {
             object: nil, queue: .main
         ) { [weak self] notification in
             guard let event = notification.userInfo?[NSPersistentCloudKitContainer.eventNotificationUserInfoKey]
-                    as? NSPersistentCloudKitContainer.Event,
-                  let end = event.endDate else { return }   // seuls les échanges TERMINÉS comptent
+                    as? NSPersistentCloudKitContainer.Event else { return }
+            let id = event.identifier
+            let start = event.startDate
+            guard let end = event.endDate else {
+                // Un échange COMMENCE : « Synchronisation… » jusqu'à sa fin.
+                MainActor.assumeIsolated { self?.recordStart(id: id, at: start) }
+                return
+            }
             let kind: Kind
             switch event.type {
             case .setup: kind = .setup
@@ -90,13 +143,57 @@ final class CloudSyncMonitor {
             let succeeded = event.succeeded
             let message = event.error.map { CloudSyncErrorText.describe($0) }
             MainActor.assumeIsolated {
-                self?.record(kind: kind, endedAt: end, succeeded: succeeded, errorMessage: message)
+                self?.record(kind: kind, endedAt: end, succeeded: succeeded, errorMessage: message, id: id)
             }
+        }
+        accountObserver = NotificationCenter.default.addObserver(
+            forName: .CKAccountChanged, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self else { return }
+                Task { await self.refreshAccount() }
+            }
+        }
+        Task { await refreshAccount() }
+    }
+
+    /// Relit l'état du compte iCloud de l'appareil.
+    func refreshAccount() async {
+        do {
+            let status = try await CKContainer(identifier: Self.containerID).accountStatus()
+            account = switch status {
+            case .available: .available
+            case .noAccount: .signedOut
+            default: .unavailable
+            }
+        } catch {
+            account = .unavailable
         }
     }
 
+    /// L'état à afficher. `enabled` vient de l'interrupteur tel que la vue le voit.
+    func state(enabled: Bool, now: Date = Date()) -> CloudSyncState {
+        CloudSyncState.resolve(
+            enabled: enabled, activeAtLaunch: CloudSyncSettingsStore.activeAtLaunch, account: account,
+            failure: failure?.message, isExchanging: isExchanging(now: now), lastExchange: lastExchange)
+    }
+
+    /// Le plus récent des échanges réussis, dans un sens ou dans l'autre.
+    var lastExchange: Date? { [lastSendAt, lastReceiveAt].compactMap { $0 }.max() }
+
+    /// Un échange est en cours. Garde-fou : un échange dont la fin n'est jamais annoncée cesse de compter au
+    /// bout de deux minutes — la carte ne doit pas tourner à vide indéfiniment.
+    func isExchanging(now: Date = Date()) -> Bool {
+        inFlight.values.contains { now.timeIntervalSince($0) < 120 }
+    }
+
+    func recordStart(id: UUID, at start: Date) {
+        inFlight[id] = start
+    }
+
     /// Le cœur testable : un échange terminé entre dans l'état affiché.
-    func record(kind: Kind, endedAt: Date, succeeded: Bool, errorMessage: String?) {
+    func record(kind: Kind, endedAt: Date, succeeded: Bool, errorMessage: String?, id: UUID? = nil) {
+        if let id { inFlight[id] = nil }
         if succeeded {
             switch kind {
             case .receive:
@@ -130,6 +227,8 @@ final class CloudSyncMonitor {
         let started = Date()
         // 0. Le magasin clé-valeur suit l'interrupteur en direct : on s'assure que l'écoute est posée.
         KeyValueSyncSwitch.apply()
+        Task { await refreshAccount() }
+        CloudDeviceRegistry.live.checkIn(force: true)
         // 1. Les données SwiftData : fusionner ce qui est arrivé, enregistrer ce qui attend (l'envoi
         //    suit l'enregistrement).
         PuzzleProgressSync.reconcile(in: context)
@@ -151,6 +250,9 @@ final class CloudSyncMonitor {
         // 4. Regarder si CloudKit a bougé.
         manualResult = await watchForExchange(since: started, patience: patience)
     }
+
+    /// L'interrupteur a bougé : le résultat du dernier appui ne veut plus rien dire.
+    func clearManualResult() { manualResult = nil }
 
     /// Attend jusqu'à `patience` secondes qu'un échange (ou une erreur) se produise après `started`.
     func watchForExchange(since started: Date, patience: Int) async -> ManualResult {

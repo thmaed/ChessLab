@@ -133,6 +133,15 @@ struct ChessLabApp: App {
     /// interactive/réseau qu'on ne peut pas fiabiliser via `xcodebuild` seul
     /// dans cet environnement. Voir PROGRESS.md.
     private static func makeModelContainer() -> ModelContainer {
+        // Tests UI : repartir synchro ÉTEINTE et sans proposition déclinée. Ici, et non dans `init` : le
+        // conteneur est construit AVANT le corps de `init`, et doit voir l'interrupteur déjà remis à zéro.
+        if CommandLine.arguments.contains("-resetPlaySettings") {
+            CloudSyncSettingsStore.isEnabled = false
+            UserDefaults.standard.removeObject(forKey: "sync.invitationDismissed")
+        }
+        #if DEBUG && targetEnvironment(simulator)
+        DebugSyncDevice.apply()
+        #endif
         let schema = Schema([
             GameRecord.self, Puzzle.self, PuzzleProgress.self,
             OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self, UserOpeningRecord.self,

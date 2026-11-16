@@ -11212,3 +11212,25 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   garde un contexte, imports et amorçage de puzzles tiennent le conteneur dans des tâches détachées ; remplacer le conteneur
   imposerait de reconstruire toute la racine (retour à l'accueil) avec le risque de deux conteneurs sur le même fichier.
   Le gain (un relancement épargné) ne vaut pas le risque pour les données.
+- **Même jour, refonte « pratique et compréhensible »** (décision : synchro toujours ÉTEINTE par défaut, + proposition) :
+  - **Un état en un mot** (`CloudSyncState`, fonction pure) : Désactivée · Dernière étape : relancer · Arrêt complet au
+    prochain lancement · Vérification du compte · Connectez-vous à iCloud (gestes iPhone/iPad ou Mac) · iCloud indisponible ·
+    En pause (raison en clair) · Synchronisation en cours (événements CloudKit COMMENCÉS, garde-fou 2 min) · À jour
+    (dernier échange). Les deux lignes envoi/réception passent sous « Détails », replié.
+  - **« Vos appareils »** (`Persistence/CloudDevices.swift`) : une fiche par appareil dans le magasin clé-valeur (type,
+    version de ChessLab, dernière activité ; UUID au trousseau `ThisDeviceOnly`, aucun nom ni identifiant matériel),
+    écrite seulement synchro ALLUMÉE (au plus toutes les 10 min), retirée à l'extinction ; version plus ancienne signalée.
+  - **La proposition** : synchro éteinte ici et allumée sur un autre appareil actif depuis moins de 30 jours → carte à
+    l'accueil « Votre iPad synchronise déjà ChessLab » (Activer / Pas maintenant, mémorisé par appareil). Lecture seule
+    du magasin : rien n'est écrit tant que l'utilisateur n'a pas dit oui.
+  - **Relancer, avec les gestes** (sélecteur d'apps, ou ⌘Q sur Mac) : dans les Réglages, en feuille après « Activer »,
+    et en rappel à l'accueil tant que le relancement n'est pas fait.
+  - **Reprise** : « Dernier coup joué sur votre iPad » (enveloppe signée de l'appareil, champs optionnels : les
+    enveloppes précédentes se lisent toujours).
+  - Aide réécrite (Activer / Vérifier / Ce qui suit / À savoir), « compte Apple » au lieu d'« identifiant Apple ».
+    ~35 libellés × 5 langues. Tests : `CloudDeviceRegistryTests`, `CloudSyncStateTests`, origine dans
+    `SyncedAutosaveTests`, en-cours dans `CloudSyncMonitorTests` (54 au total) ; `CloudSyncUITests` (3, iPhone + iPad)
+    avec un iPad fictif (`-fakeSyncDevice`, simulateur Debug seulement) ; `-resetPlaySettings` remet la synchro éteinte.
+  - **Android : rien à porter** (iCloud hors périmètre, décision du 12/09).
+  - À faire à la sortie : une phrase dans la politique de confidentialité sur la fiche d'appareil (type, version,
+    dernière activité, dans l'iCloud privé) ; valider sur deux vrais appareils.

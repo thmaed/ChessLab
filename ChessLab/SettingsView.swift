@@ -1,4 +1,3 @@
-import CloudKit
 import SwiftData
 import SwiftUI
 
@@ -21,8 +20,8 @@ struct SettingsView: View {
     @AppStorage("cloudKitSyncEnabled") private var cloudSyncEnabled = false
     /// Les VRAIS échanges avec iCloud (voir ``CloudSyncMonitor``).
     private let monitor = CloudSyncMonitor.shared
-    /// État du compte iCloud (chargé à l'apparition).
-    @State private var iCloudStatus: CKAccountStatus?
+    /// « Vos appareils » (voir ``CloudDeviceRegistry``), relu à l'apparition et à chaque changement.
+    @State private var syncDevices: [CloudDeviceRecord] = []
 
     var body: some View {
         ScrollView {
@@ -223,39 +222,52 @@ struct SettingsView: View {
 
     /// Synchronisation iCloud (optionnelle, désactivée par défaut).
     ///
-    /// Bascule la clé `cloudKitSyncEnabled` que ``ChessLabApp`` lit au
-    /// lancement : le `ModelContainer` ne peut pas changer de base à chaud.
-    /// Les réglages et les parties en cours (magasin clé-valeur) suivent l'interrupteur À CHAUD
-    /// (``KeyValueSyncSwitch``). Tant que l'interrupteur et le conteneur de CE lancement ne s'accordent
-    /// pas, un bandeau dit de fermer et rouvrir l'app pour le reste — une mention en petit
-    /// n'avait pas suffi (retour d'un utilisateur, 16/11/2026). Utilise
-    /// l'iCloud PRIVÉ de l'utilisateur (aucun serveur ChessLab, aucun compte à
-    /// créer) ; l'app reste entièrement fonctionnelle hors ligne.
+    /// Refonte du 16/11/2026 (un utilisateur, deux appareils, chacun dans son état sans que rien ne le
+    /// montre) : UN état en clair (``CloudSyncState``), les gestes quand il y a quelque chose à faire, et
+    /// « Vos appareils » pour vérifier d'un coup d'œil que l'autre est relié.
     ///
-    /// Ce qu'on affiche des échanges vient de ``CloudSyncMonitor`` : des
-    /// événements CloudKit réels, plus une « vérification » locale qui n'en
-    /// prouvait aucun.
+    /// L'interrupteur (`cloudKitSyncEnabled`) commande À CHAUD les réglages et la partie en cours
+    /// (``KeyValueSyncSwitch``) ; le conteneur SwiftData, lui, est choisi au lancement — d'où la « dernière
+    /// étape » de relancement, une seule fois. Utilise l'iCloud PRIVÉ de l'utilisateur (aucun serveur
+    /// ChessLab, aucun compte à créer) ; l'app reste entièrement fonctionnelle hors ligne.
     private var syncSection: some View {
-        let needsRestart = cloudSyncEnabled != CloudSyncSettingsStore.activeAtLaunch
+        let state = monitor.state(enabled: cloudSyncEnabled)
+        let registry = CloudDeviceRegistry.live
         return VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Synchronisation")
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
                 Toggle("Synchroniser via iCloud", isOn: $cloudSyncEnabled)
                     .tint(Theme.accent)
                     .foregroundStyle(Theme.textPrimary)
+                    .accessibilityIdentifier("syncToggle")
                 Text("Vos parties, votre progression d'entraînement et la partie en cours suivent tous vos appareils via votre iCloud privé. Désactivée par défaut ; l'app fonctionne entièrement hors ligne.")
                     .font(.caption)
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if needsRestart { restartBanner }
-                if cloudSyncEnabled {
+                Divider().overlay(Theme.stroke)
+                CloudSyncStatusRow(state: state)
+
+                if state == .startsAfterRestart { CloudRestartSteps() }
+
+                if !cloudSyncEnabled, let other = syncDevices.first(where: { $0.id != registry.identity.id }) {
+                    // Synchro éteinte ici, allumée ailleurs : le dire, c'est la moitié de l'explication.
+                    Text("Votre \(other.kind) synchronise déjà ChessLab. Activez l'interrupteur pour le rejoindre.")
+                        .font(.caption)
+                        .foregroundStyle(Theme.info)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                if cloudSyncEnabled, !syncDevices.isEmpty {
                     Divider().overlay(Theme.stroke)
-                    syncStatusRow
-                    if let failure = monitor.failure { failureRow(failure) }
-                    exchangeLines
+                    CloudDevicesList(devices: syncDevices, ownID: registry.identity.id, appVersion: registry.appVersion)
+                }
+
+                if showsManualSync(state) {
+                    Divider().overlay(Theme.stroke)
                     manualSyncButton
                     manualSyncResult
+                    syncDetails
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -263,68 +275,60 @@ struct SettingsView: View {
         }
         // Les réglages et les parties en cours suivent l'interrupteur tout de suite ; seul le conteneur
         // SwiftData attend le prochain lancement.
-        .onChange(of: cloudSyncEnabled) { _, _ in KeyValueSyncSwitch.apply() }
+        .onChange(of: cloudSyncEnabled) { _, _ in
+            monitor.clearManualResult()
+            KeyValueSyncSwitch.apply()
+            refreshSyncDevices()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: CloudDevices.didChange)) { _ in refreshSyncDevices() }
         .task {
-            iCloudStatus = try? await CKContainer(identifier: "iCloud.com.chesslab.ChessLab").accountStatus()
+            refreshSyncDevices()
+            await monitor.refreshAccount()
         }
     }
 
-    /// « Fermez et rouvrez » : le conteneur SwiftData de ce lancement n'est plus celui que l'interrupteur
-    /// demande.
-    private var restartBanner: some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "arrow.clockwise.circle.fill").foregroundStyle(Theme.warning)
-            Group {
-                if cloudSyncEnabled {
-                    Text("Les réglages et la partie en cours se synchronisent dès maintenant. Pour le reste (parties enregistrées, ouvertures, puzzles), fermez complètement ChessLab puis rouvrez-le.")
+    private func refreshSyncDevices() {
+        syncDevices = CloudDeviceRegistry.live.devices()
+    }
+
+    /// Le bouton n'a de sens que quand CloudKit tourne et qu'un compte est là.
+    private func showsManualSync(_ state: CloudSyncState) -> Bool {
+        switch state {
+        case .syncing, .upToDate, .paused: true
+        default: false
+        }
+    }
+
+    /// Pour l'assistance : les deux sens, séparément. Replié par défaut — l'état du dessus suffit.
+    private var syncDetails: some View {
+        DisclosureGroup {
+            VStack(alignment: .leading, spacing: 2) {
+                if monitor.lastSendAt == nil, monitor.lastReceiveAt == nil {
+                    Text("Aucun échange avec iCloud pour l'instant")
                 } else {
-                    Text("Les réglages et la partie en cours ne sont plus partagés. Pour arrêter aussi le reste, fermez complètement ChessLab puis rouvrez-le.")
+                    if let sent = monitor.lastSendAt {
+                        Text("Dernier envoi vers iCloud : \(Text(sent, format: .relative(presentation: .named)))")
+                    }
+                    if let received = monitor.lastReceiveAt {
+                        Text("Dernière réception depuis iCloud : \(Text(received, format: .relative(presentation: .named)))")
+                    }
                 }
             }
-            .font(.caption.weight(.semibold))
-            .foregroundStyle(Theme.warning)
-            .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
+            .font(.caption2)
+            .foregroundStyle(Theme.textTertiary)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.top, 4)
+        } label: {
+            Text("Détails").font(.caption).foregroundStyle(Theme.textSecondary)
         }
-        .padding(10)
-        .background(Theme.warning.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
-        .accessibilityIdentifier("syncRestartBanner")
-    }
-
-    private func failureRow(_ failure: CloudSyncMonitor.Failure) -> some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(Theme.warning)
-            Text(verbatim: failure.message)
-                .font(.caption).foregroundStyle(Theme.warning)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
-        }
-        .accessibilityIdentifier("syncFailureRow")
-    }
-
-    /// Les derniers échanges RÉUSSIS, relevés dans les événements CloudKit.
-    private var exchangeLines: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            if monitor.lastSendAt == nil, monitor.lastReceiveAt == nil {
-                Text("Aucun échange avec iCloud pour l'instant")
-            } else {
-                if let sent = monitor.lastSendAt {
-                    Text("Dernier envoi vers iCloud : \(sent.formatted(.relative(presentation: .named)))")
-                }
-                if let received = monitor.lastReceiveAt {
-                    Text("Dernière réception depuis iCloud : \(received.formatted(.relative(presentation: .named)))")
-                }
-            }
-        }
-        .font(.caption2)
-        .foregroundStyle(Theme.textTertiary)
+        .tint(Theme.textSecondary)
     }
 
     private var manualSyncButton: some View {
         Button {
             Task {
                 await monitor.syncNow(context: modelContext)
-                iCloudStatus = try? await CKContainer(identifier: "iCloud.com.chesslab.ChessLab").accountStatus()
+                refreshSyncDevices()
                 Haptics.move()
             }
         } label: {
@@ -340,7 +344,6 @@ struct SettingsView: View {
         }
         .buttonStyle(.pressable)
         .disabled(monitor.isManualSyncRunning)
-        .padding(.top, 2)
         .accessibilityIdentifier("syncNowButton")
     }
 
@@ -379,22 +382,6 @@ struct SettingsView: View {
             .padding(.top, 4)
             .textSelection(.enabled)
             .accessibilityIdentifier("settingsVersion")
-    }
-
-    /// État du compte iCloud, message clair si l'utilisateur n'est pas connecté.
-    private var syncStatusRow: some View {
-        let connected = iCloudStatus == .available
-        let (icon, tint, text): (String, Color, LocalizedStringKey) = switch iCloudStatus {
-        case .available: ("checkmark.icloud", Theme.accent, "Compte iCloud connecté")
-        case nil: ("icloud", Theme.textTertiary, "Vérification du compte iCloud…")
-        default: ("exclamationmark.icloud", Theme.warning, "Non connecté à iCloud — la synchro est en pause")
-        }
-        return HStack(spacing: 8) {
-            Image(systemName: icon).foregroundStyle(tint)
-            Text(text).font(.caption).foregroundStyle(connected ? Theme.textSecondary : Theme.warning)
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
-        }
     }
 
     /// Module d'ouvertures en graphe : accessible via le bouton « Explorateur »
