@@ -126,20 +126,25 @@ enum PuzzleLibrarySeeder {
     #if DEBUG
     @MainActor private static var didDebugReseed = false
 
-    /// Simule une MISE À JOUR de la bibliothèque : retire un puzzle jamais tenté sur cinq (ceux qu'un
-    /// préchargement remet à l'identique). Le préchargement relit alors les autres — l'étape qui tournait
-    /// sans barre avant le 16/11/2026 — puis réinsère les manquants. Toute progression reste.
+    /// Simule une MISE À JOUR de la bibliothèque : retire les puzzles jamais tentés du cinquième le plus facile
+    /// (ceux qu'un préchargement remet à l'identique). Le préchargement relit alors les autres — l'étape qui
+    /// tournait sans barre avant le 16/11/2026 — puis réinsère les manquants. Toute progression reste.
+    ///
+    /// Une suppression GROUPÉE, faite dans la base : retirer 26 000 puzzles un par un, après les avoir tous
+    /// chargés, prenait plus d'une minute et demie sur un iPad de 2018 — avant même le bandeau.
     nonisolated private static func removeSomeUntriedLibraryPuzzles(container: ModelContainer) {
-        let context = ModelContext(container)
-        context.autosaveEnabled = false
-        let library = (try? context.fetch(FetchDescriptor<Puzzle>(
-            predicate: #Predicate<Puzzle> { $0.sourceRaw == "lichess" }
-        ))) ?? []
-        let untried = library.filter { (($0.successCount ?? 0) + ($0.failureCount ?? 0)) == 0 }
-        for (index, puzzle) in untried.enumerated() where index % 5 == 0 {
-            context.delete(puzzle)
+        let ratings = LichessPuzzleLoader.standard.map(\.rating).sorted()
+        guard !ratings.isEmpty else { return }
+        let cutoff = ratings[ratings.count / 5]
+        let untriedAndEasy = #Predicate<Puzzle> { puzzle in
+            puzzle.sourceRaw == "lichess"
+                && puzzle.successCount.flatMap { $0 == 0 } != false
+                && puzzle.failureCount.flatMap { $0 == 0 } != false
+                && puzzle.rating.flatMap { $0 < cutoff } == true
         }
-        PersistenceLog.saveInBackground(context)
+        let context = ModelContext(container)
+        try? context.delete(model: Puzzle.self, where: untriedAndEasy)
+        try? context.save()
     }
     #endif
 

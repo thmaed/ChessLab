@@ -11360,3 +11360,9 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
     classement ; pondération ; barre monotone) 12 verts ; `PuzzleSeedingBannerUITests` (barre dès l'apparition, qui
     avance).
   - Android : rien à porter (la bibliothèque y est lue directement depuis l'asset, sans préchargement ni bandeau).
+  - Essai sur l'iPadt : rien n'apparaissait — le crochet de débogage retirait 26 000 puzzles UN PAR UN après les
+    avoir tous chargés (plus d'une minute et demie avant le bandeau). Suppression GROUPÉE dans la base (les puzzles
+    jamais tentés du cinquième le plus facile) : bandeau en quelques secondes. `PuzzleSeedingBannerUITests` vert
+    SUR l'iPadt (barre à 2 % dès l'apparition, qui avance). Au passage : iOS tue une app en ARRIÈRE-PLAN qui
+    dépasse 80 % de processeur sur 60 s (rapport `cpu_resource_fatal` pendant une mesure, iPad verrouillé) — le
+    préchargement interrompu reprend au lancement suivant, sans doublon.
