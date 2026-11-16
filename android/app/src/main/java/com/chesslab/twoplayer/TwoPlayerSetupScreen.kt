@@ -55,9 +55,18 @@ import com.chesslab.ui.accentGradient
 fun TwoPlayerSetupScreen(
     /** La position imposée par un autre mode, ou `null` pour une partie neuve. */
     startFen: String? = null,
+    /** Reprendre la partie à deux laissée en cours. */
+    onResume: () -> Unit = {},
     onStart: (TwoPlayerSettings) -> Unit,
 ) {
     val context = LocalContext.current
+    // La partie à deux en cours : « Commencer » l'EFFACERAIT, l'écran le dit d'abord — il ne le faisait
+    // pas (relevé le 16/11/2026, des deux côtés). Même dialogue que le mode Jouer (`NewGameScreen`).
+    // Pendant de `TwoPlayerSetupView` + `ReplaceGameAlert`.
+    val autosaves by remember { com.chesslab.library.LibraryDatabase.get(context).autosaves().all() }
+        .collectAsState(initial = emptyList())
+    val resumable = autosaves.firstOrNull { it.mode == "twoPlayer" }
+    var confirmReplace by remember { mutableStateOf(false) }
     // Les réglages d'usine portent des noms VIDES : au tout premier
     // lancement, on les remplit avec « Blancs » / « Noirs » dans la langue
     // active plutôt que de laisser deux champs vides. Un nom déjà enregistré,
@@ -71,6 +80,44 @@ fun TwoPlayerSetupScreen(
     val timeLimit = rememberTimeLimit(
         saved?.timeControlId ?: "none", saved?.customMinutes ?: 15, saved?.customIncrementSeconds ?: 0, "twoPlayer",
     )
+
+    fun launchNew() {
+        val settings = TwoPlayerSettings(
+            whiteName = white.trim().ifEmpty { defaultWhite },
+            blackName = black.trim().ifEmpty { defaultBlack },
+            rotation = rotation,
+            timeControlId = timeLimit.effectiveId,
+            customMinutes = timeLimit.customMinutes,
+            customIncrementSeconds = timeLimit.customIncrement,
+            startFen = startFen,
+        )
+        timeLimit.remember()
+        TwoPlayerSettingsStore.save(context, settings)
+        onStart(settings)
+    }
+
+    if (confirmReplace) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { confirmReplace = false },
+            title = { Text(stringResource(R.string.setup_replace_title)) },
+            text = { Text(stringResource(R.string.setup_replace_message, resumable?.moveList?.size ?: 0)) },
+            confirmButton = {
+                androidx.compose.material3.TextButton(
+                    onClick = { confirmReplace = false; onResume() },
+                    modifier = Modifier.testTag("remplacer-reprendre"),
+                ) { Text(stringResource(R.string.home_resume_title)) }
+            },
+            dismissButton = {
+                Row {
+                    androidx.compose.material3.TextButton(onClick = { confirmReplace = false }) { Text(stringResource(R.string.setup_replace_cancel)) }
+                    androidx.compose.material3.TextButton(
+                        onClick = { confirmReplace = false; launchNew() },
+                        modifier = Modifier.testTag("remplacer-confirmer"),
+                    ) { Text(stringResource(R.string.setup_replace_confirm)) }
+                }
+            },
+        )
+    }
 
     Column(Modifier.fillMaxSize()) {
       Column(
@@ -168,20 +215,7 @@ fun TwoPlayerSetupScreen(
                   .fillMaxWidth()
                   .clip(CircleShape)
                   .background(com.chesslab.ui.tintedActionGradient(Palette.info))
-                  .clickable {
-                      val settings = TwoPlayerSettings(
-                          whiteName = white.trim().ifEmpty { defaultWhite },
-                          blackName = black.trim().ifEmpty { defaultBlack },
-                          rotation = rotation,
-                          timeControlId = timeLimit.effectiveId,
-                          customMinutes = timeLimit.customMinutes,
-                          customIncrementSeconds = timeLimit.customIncrement,
-                          startFen = startFen,
-                      )
-                      timeLimit.remember()
-                      TwoPlayerSettingsStore.save(context, settings)
-                      onStart(settings)
-                  }
+                  .clickable { if (resumable != null) confirmReplace = true else launchNew() }
                   .padding(vertical = 14.dp)
                   .testTag("commencer"),
               textAlign = androidx.compose.ui.text.style.TextAlign.Center,

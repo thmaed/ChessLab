@@ -61,6 +61,9 @@ final class PlayViewModel {
     // MARK: Rôles
 
     let settings: PlayGameSettings
+    /// L'identité de la partie (voir ``AutosaveRecord/gameID``) : distingue, entre deux appareils, la suite
+    /// de cette partie d'une autre.
+    let gameID: UUID
     let userColor: Piece.Color
     let engineColor: Piece.Color
     private let modelContext: ModelContext
@@ -254,6 +257,7 @@ final class PlayViewModel {
     ///   affamait les tests Fairy, qui exigent les DEUX moteurs libres.
     init(settings: PlayGameSettings, modelContext: ModelContext, startsEngine: Bool = true) {
         self.settings = settings
+        gameID = UUID()
         self.modelContext = modelContext
         let startPosition = settings.startingPosition
         let resolvedColor = settings.resolvedColorChoice.resolved()
@@ -303,6 +307,8 @@ final class PlayViewModel {
         }
 
         settings = autosave.settings
+        // Une sauvegarde d'avant l'identifiant en reçoit un ici, gardé ensuite.
+        gameID = autosave.gameID ?? UUID()
         self.modelContext = modelContext
         userColor = resolvedColor
         engineColor = resolvedColor.opposite
@@ -2014,7 +2020,8 @@ final class PlayViewModel {
             // réserve les temps précis à la logique et à l'autosauvegarde.
             whiteRemaining: clock?.remaining(for: .white),
             blackRemaining: clock?.remaining(for: .black),
-            savedAt: Date()
+            savedAt: Date(),
+            gameID: gameID
         )
         AutosaveStore.savePlay(record)
     }

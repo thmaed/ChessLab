@@ -8,9 +8,11 @@ import Testing
 @MainActor
 struct SyncedAutosaveTests {
 
-    private struct FakeGame: Codable, Equatable {
+    private struct FakeGame: Codable, Equatable, AutosaveRecord {
         var moves: [String]
         var savedAt: Date
+        var gameID: UUID? = nil
+        var moveLANs: [String] { moves }
     }
 
     private final class FakeStore: KeyValueStoring {
@@ -25,31 +27,36 @@ struct SyncedAutosaveTests {
     /// Un « appareil » : son fichier, son interrupteur, le nuage commun.
     private final class Device {
         let url = FileManager.default.temporaryDirectory.appendingPathComponent("autosave-\(UUID().uuidString).json")
+        let asideURL = FileManager.default.temporaryDirectory.appendingPathComponent("aside-\(UUID().uuidString).json")
         var enabled = true
         let defaults: UserDefaults
         private let suite = UUID().uuidString
         let autosave: () -> SyncedAutosave<FakeGame>
-        init(store: KeyValueStoring, kind: String = "iPhone", model: String? = nil) {
+        init(store: KeyValueStoring, kind: String = "iPhone", model: String? = nil, name: String? = nil) {
             var holder: Device?
             let defaults = UserDefaults(suiteName: suite)!
             self.defaults = defaults
-            let identity = CloudDeviceIdentity(id: UUID().uuidString, kind: kind, model: model)
+            let identity = CloudDeviceIdentity(id: UUID().uuidString, kind: kind, model: model, name: name)
             autosave = {
-                SyncedAutosave(key: "test.autosave", fileURL: { holder!.url }, savedAt: \.savedAt,
+                SyncedAutosave(key: "test.autosave", fileURL: { holder!.url },
                                store: store, isEnabled: { holder!.enabled },
-                               identity: identity, originDefaults: defaults)
+                               identity: identity, originDefaults: defaults,
+                               asideURL: { holder!.asideURL })
             }
             holder = self
         }
         deinit {
             try? FileManager.default.removeItem(at: url)
+            try? FileManager.default.removeItem(at: asideURL)
             defaults.removePersistentDomain(forName: suite)
         }
         var hasFile: Bool { FileManager.default.fileExists(atPath: url.path) }
     }
 
     private func at(_ secondsAgo: Double) -> Date { Date(timeIntervalSinceNow: -secondsAgo) }
-    private func game(_ moves: [String], _ savedAt: Date) -> FakeGame { FakeGame(moves: moves, savedAt: savedAt) }
+    private func game(_ moves: [String], _ savedAt: Date, id: UUID? = nil) -> FakeGame {
+        FakeGame(moves: moves, savedAt: savedAt, gameID: id)
+    }
 
     // MARK: La règle de fusion
 
@@ -172,6 +179,107 @@ struct SyncedAutosaveTests {
         iphone.autosave().save(newer)
         #expect(ipad.autosave().load() == newer)
         #expect(iphone.autosave().load() == newer)
+        // …et celle de l'iPad n'est pas perdue : mise de côté, sur l'iPad seulement.
+        #expect(ipad.autosave().aside() == older)
+        #expect(iphone.autosave().aside() == nil)
+    }
+
+    // MARK: Mise de côté (essai sur trois iPhone, 16/11/2026)
+
+    @Test func theSameGameAfterATakeback_isAdopted_notSetAside() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        let id = UUID()
+        ipad.autosave().save(game(["e2e4", "e7e5", "g1f3"], at(60), id: id))
+        _ = iphone.autosave().load()
+        // Sur l'iPhone : reprise du dernier coup, puis un autre — la ligne n'est plus un prolongement.
+        let otherLine = game(["e2e4", "e7e5", "f1c4"], at(20), id: id)
+        iphone.autosave().save(otherLine)
+        #expect(ipad.autosave().load() == otherLine)
+        #expect(ipad.autosave().aside() == nil)
+    }
+
+    @Test func aDifferentGameEndedElsewhere_leavesOursAlone() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        let mine = game(["e2e4"], at(120), id: UUID())
+        ipad.enabled = false
+        ipad.autosave().save(mine)                    // jouée synchro éteinte : le nuage ne la connaît pas
+        ipad.enabled = true
+        iphone.autosave().save(game(["d2d4"], at(60), id: UUID()))
+        iphone.autosave().clear()                     // l'iPhone termine SA partie
+        #expect(ipad.autosave().load() == mine)
+        #expect(ipad.hasFile)
+    }
+
+    /// « Remplacer par une nouvelle partie » sur un appareil : la partie remplacée ne ressurgit pas, mise de
+    /// côté, sur l'autre — l'avertissement avait dit « sur tous vos appareils ».
+    @Test func anExplicitReplacement_isNotSetAside() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        ipad.autosave().save(game(["e2e4"], at(120), id: UUID()))
+        _ = iphone.autosave().load()
+        iphone.autosave().clear()
+        let fresh = game(["c2c4"], at(10), id: UUID())
+        iphone.autosave().save(fresh)
+        #expect(ipad.autosave().load() == fresh)
+        #expect(ipad.autosave().aside() == nil)
+    }
+
+    @Test func resumingTheSetAsideGame_swaps_andTheOtherDeviceKeepsItsOwnAside() throws {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        let a = game(["e2e4"], at(120), id: UUID()), b = game(["d2d4"], at(60), id: UUID())
+        ipad.autosave().save(a)
+        _ = iphone.autosave().load()                  // l'iPhone suit A…
+        iphone.autosave().save(b)                     // …puis commence B
+        _ = iphone.autosave().load()
+        #expect(ipad.autosave().load() == b)
+        #expect(ipad.autosave().aside() == a)
+
+        // L'iPad reprend A : échange — A en cours, B de côté.
+        let resumed = try #require(ipad.autosave().resumeAside())
+        #expect(resumed.gameID == a.gameID)
+        #expect(ipad.autosave().aside()?.gameID == b.gameID)
+        // L'iPhone reçoit A, plus récente : B y est mise de côté à son tour. Rien ne se perd.
+        #expect(iphone.autosave().load()?.gameID == a.gameID)
+        #expect(iphone.autosave().aside()?.gameID == b.gameID)
+    }
+
+    @Test func oneAsidePlace_theMoreRecentStays() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        let first = game(["e2e4"], at(300), id: UUID())
+        ipad.autosave().save(first)
+        iphone.autosave().save(game(["d2d4"], at(200), id: UUID()))
+        _ = ipad.autosave().load()                    // first → de côté
+        let second = game(["d2d4", "g8f6"], at(150), id: UUID())
+        ipad.enabled = false
+        ipad.autosave().save(second)                  // une autre partie, ici, hors synchro
+        ipad.enabled = true
+        iphone.autosave().save(game(["g1f3"], at(100), id: UUID()))
+        _ = ipad.autosave().load()                    // second → de côté, à la place de first (plus ancienne)
+        #expect(ipad.autosave().aside() == second)
+    }
+
+    @Test func discardAside_forgetsIt() {
+        let store = FakeStore()
+        let ipad = Device(store: store), iphone = Device(store: store)
+        ipad.autosave().save(game(["e2e4"], at(120), id: UUID()))
+        iphone.autosave().save(game(["d2d4"], at(60), id: UUID()))
+        _ = ipad.autosave().load()
+        #expect(ipad.autosave().aside() != nil)
+        ipad.autosave().discardAside()
+        #expect(ipad.autosave().aside() == nil)
+    }
+
+    @Test func savesFromBeforeTheIdentifier_areMatchedByTheirMoves() {
+        let legacy = game(["e2e4", "e7e5"], at(60))
+        #expect(legacy.isSameGame(as: game(["e2e4", "e7e5", "g1f3"], at(30))))
+        #expect(game(["e2e4", "e7e5", "g1f3"], at(30)).isSameGame(as: legacy))
+        #expect(!legacy.isSameGame(as: game(["d2d4"], at(30))))
+        // Deux identifiants : seuls eux comptent.
+        #expect(!game(["e2e4"], at(60), id: UUID()).isSameGame(as: game(["e2e4"], at(60), id: UUID())))
     }
 
     // MARK: Premier lancement avec la synchro
@@ -243,6 +351,15 @@ struct SyncedAutosaveTests {
         _ = duo.autosave().load()
         #expect(duo.autosave().origin() == "iPhone12,1")
         #expect(duo.autosave().origin().map { DeviceModelName.display($0, language: "fr") } == "iPhone 11")
+    }
+
+    @Test func aNamedDevice_isNamedInTheOrigin() {
+        let store = FakeStore()
+        let pad = Device(store: store, kind: "iPad", model: "iPad16,6", name: "iPad du salon")
+        let phone = Device(store: store)
+        pad.autosave().save(game(["e2e4"], at(20)))
+        _ = phone.autosave().load()
+        #expect(phone.autosave().origin().map { DeviceModelName.display($0, language: "fr") } == "iPad du salon")
     }
 
     @Test func ownGame_hasNoOrigin() {

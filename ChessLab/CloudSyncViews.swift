@@ -188,6 +188,10 @@ struct CloudDevicesList: View {
     let devices: [CloudDeviceRecord]
     let ownID: String
     let appVersion: String
+    /// Donner un nom à CET appareil (`nil` ou vide : reprendre le nom du modèle). Voir ``CloudDeviceName``.
+    var onRename: (String?) -> Void = { _ in }
+    @State private var renaming = false
+    @State private var draftName = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -204,6 +208,14 @@ struct CloudDevicesList: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("syncDevicesList")
+        .alert("Nommer cet appareil", isPresented: $renaming) {
+            TextField(devices.first { $0.id == ownID }?.modelName ?? "", text: $draftName)
+                .accessibilityIdentifier("deviceNameField")
+            Button("Enregistrer") { onRename(draftName) }
+            Button("Annuler", role: .cancel) {}
+        } message: {
+            Text("Pour le reconnaître parmi vos appareils, par exemple « iPad du salon ». Laissez vide pour reprendre le nom du modèle.")
+        }
     }
 
     private func row(_ device: CloudDeviceRecord) -> some View {
@@ -226,6 +238,12 @@ struct CloudDevicesList: View {
                             .padding(.horizontal, 6).padding(.vertical, 1)
                             .background(Theme.accent.opacity(0.15), in: Capsule())
                     }
+                }
+                // Un nom donné ne cache pas le modèle : il passe dessous.
+                if device.name != nil {
+                    Text(verbatim: device.modelName)
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
                 }
                 if !isOwn {
                     Text("Dernière activité : \(Text(device.lastSeen, format: .relative(presentation: .named)))")
@@ -251,8 +269,23 @@ struct CloudDevicesList: View {
                 }
             }
             Spacer(minLength: 0)
+            if isOwn {
+                Button {
+                    draftName = device.name ?? ""
+                    renaming = true
+                } label: {
+                    Image(systemName: "pencil")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.accent)
+                        .frame(width: 32, height: 32)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text("Renommer"))
+                .accessibilityIdentifier("renameThisDevice")
+            }
         }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: isOwn ? .contain : .combine)
     }
 }
 
@@ -307,6 +340,149 @@ struct CloudSyncInvitationCard: View {
 }
 
 /// Synchro allumée, relancement pas encore fait : un rappel discret à l'accueil, qui ouvre les gestes.
+// MARK: - Échiquier ouvert
+
+/// « Rattraper » une partie qui a continué sur un autre appareil pendant que son échiquier était ouvert ici :
+/// l'accueil la reprend telle que le nuage la porte. Fournie par ``HomeView`` dans l'environnement, lue par
+/// les écrans de jeu (pas de fonction à faire passer par chaque hôte).
+struct RemoteGameTakeOver {
+    var play: () -> Void
+    var twoPlayer: () -> Void
+}
+
+extension EnvironmentValues {
+    @Entry var remoteGameTakeOver: RemoteGameTakeOver?
+}
+
+/// Ce que le bandeau montre : la partie telle qu'elle est ailleurs.
+struct RemoteAdvance: Equatable {
+    /// Le nom de l'appareil (« iPhone 11 »), ou `nil` si l'envoi ne le disait pas.
+    let origin: String?
+    let moveCount: Int
+}
+
+/// « Cette partie a continué sur votre iPhone 11 » — sur l'échiquier ouvert, quand l'autre appareil a joué
+/// pendant ce temps (essai sur trois iPhone, 16/11/2026). Deux choix, rien d'imposé : rattraper ses coups,
+/// ou continuer ici (le prochain coup joué ici l'emporte, et c'est l'autre appareil qui verra ce bandeau).
+struct RemoteAdvanceBanner: View {
+    let advance: RemoteAdvance
+    let onCatchUp: () -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "icloud.and.arrow.down")
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(Theme.info)
+                VStack(alignment: .leading, spacing: 1) {
+                    Group {
+                        if let origin = advance.origin {
+                            Text("Cette partie a continué sur votre \(origin)")
+                        } else {
+                            Text("Cette partie a continué sur un autre appareil")
+                        }
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    Text("\(advance.moveCount) coup(s) joué(s)")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Spacer(minLength: 0)
+            }
+            HStack(spacing: 10) {
+                Spacer(minLength: 0)
+                Button(action: onDismiss) {
+                    Text("Continuer ici")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(Theme.textSecondary)
+                        .padding(.horizontal, 12).padding(.vertical, 7)
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("remoteAdvanceDismiss")
+                Button(action: onCatchUp) {
+                    Text("Rattraper")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.background)
+                        .padding(.horizontal, 16).padding(.vertical, 7)
+                        .background(Theme.info, in: Capsule())
+                }
+                .buttonStyle(.pressable)
+                .accessibilityIdentifier("remoteAdvanceCatchUp")
+            }
+        }
+        .padding(14)
+        .background(Theme.surfaceElevated, in: Theme.cardShape)
+        .overlay(Theme.cardShape.strokeBorder(Theme.info.opacity(0.45), lineWidth: 1))
+        .shadow(color: .black.opacity(0.35), radius: 12, y: 4)
+        .padding(.horizontal, 12)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("remoteAdvanceBanner")
+    }
+}
+
+// MARK: - Mise de côté
+
+/// « Partie mise de côté » : une AUTRE partie est arrivée d'un autre appareil, celle d'ici a été gardée au
+/// lieu d'être effacée (voir ``SyncedAutosave``). La reprendre l'échange avec la partie en cours.
+struct AsideGameCard: View {
+    let mode: LocalizedStringKey
+    let moveCount: Int
+    let onResume: () -> Void
+    let onDiscard: () -> Void
+    @State private var confirmsDiscard = false
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Button(action: onResume) {
+                HStack(spacing: 14) {
+                    IconBadge(systemImage: "pause.circle", tint: Theme.accent, size: 34)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Partie mise de côté")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.textPrimary)
+                        HStack(spacing: 4) {
+                            Text(mode)
+                            Text(verbatim: "·")
+                            Text("\(moveCount) coup(s) joué(s)")
+                        }
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                        Text("Gardée ici quand une autre partie est arrivée d'un autre appareil. Touchez pour la reprendre.")
+                            .font(.caption2)
+                            .foregroundStyle(Theme.textTertiary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.pressable)
+            .accessibilityIdentifier("resumeAsideGame")
+
+            Button { confirmsDiscard = true } label: {
+                Image(systemName: "xmark")
+                    .font(.footnote.weight(.semibold))
+                    .foregroundStyle(Theme.textTertiary)
+                    .frame(width: 30, height: 30)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("Oublier la partie mise de côté"))
+            .accessibilityIdentifier("discardAsideGame")
+        }
+        .cardStyle()
+        .confirmationDialog("Oublier la partie mise de côté ?", isPresented: $confirmsDiscard, titleVisibility: .visible) {
+            Button("Oublier", role: .destructive, action: onDiscard)
+            Button("Annuler", role: .cancel) {}
+        } message: {
+            Text("Elle ne pourra plus être reprise.")
+        }
+    }
+}
+
 struct CloudRestartReminderCard: View {
     let onTap: () -> Void
 

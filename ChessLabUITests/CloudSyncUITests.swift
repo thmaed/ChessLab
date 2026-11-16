@@ -91,11 +91,8 @@ final class CloudSyncUITests: XCTestCase {
         snapshot(app, "reglages-appareils")
     }
 
-    /// Synchro allumée, la partie en cours est la MÊME sur tous les appareils : l'avertissement de
-    /// « Commencer » le dit (essai sur trois iPhone, 16/11/2026 : une partie lancée sur l'un a remplacé celle
-    /// d'un autre, et l'avertissement ne parlait que de « la partie en cours »).
-    func testNewGameWarning_mentionsAllDevices_whenSyncIsOn() throws {
-        let app = launch()
+    /// Allume la synchro dans les Réglages, puis revient à l'accueil.
+    private func enableSyncAndGoHome(_ app: XCUIApplication) {
         openSettings(app)
         let toggle = app.switches["syncToggle"]
         XCTAssertTrue(toggle.waitForExistence(timeout: 10))
@@ -103,19 +100,35 @@ final class CloudSyncUITests: XCTestCase {
         toggle.switches.firstMatch.tap()
         XCTAssertTrue(app.staticTexts["Cet appareil"].waitForExistence(timeout: 5))
         app.navigationBars.buttons.firstMatch.tap()
+    }
 
+    private func waitForMoveCount(_ expected: String, in app: XCUIApplication, timeout: TimeInterval = 15) {
+        let moveCount = app.otherElements["moveCount"]
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline, moveCount.value as? String != expected {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+        }
+        XCTAssertEqual(moveCount.value as? String, expected)
+    }
+
+    /// Contre l'ordinateur : 1.e4, et la réponse du moteur.
+    private func startGameAndPlayE4(_ app: XCUIApplication) {
         app.buttons["Contre l'ordinateur"].tap()
         XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
         app.buttons["Commencer"].tap()
         XCTAssertTrue(app.otherElements["square_e2"].waitForExistence(timeout: 20))
         app.otherElements["square_e2"].tap()
         app.otherElements["square_e4"].tap()
-        let moveCount = app.otherElements["moveCount"]
-        let deadline = Date().addingTimeInterval(15)
-        while Date() < deadline, moveCount.value as? String != "2" {
-            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
-        }
-        XCTAssertEqual(moveCount.value as? String, "2")
+        waitForMoveCount("2", in: app)
+    }
+
+    /// Synchro allumée, la partie en cours est la MÊME sur tous les appareils : l'avertissement de
+    /// « Commencer » le dit (essai sur trois iPhone, 16/11/2026 : une partie lancée sur l'un a remplacé celle
+    /// d'un autre, et l'avertissement ne parlait que de « la partie en cours »).
+    func testNewGameWarning_mentionsAllDevices_whenSyncIsOn() throws {
+        let app = launch()
+        enableSyncAndGoHome(app)
+        startGameAndPlayE4(app)
 
         app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(app.buttons["resumeGame"].waitForExistence(timeout: 5))
@@ -128,6 +141,67 @@ final class CloudSyncUITests: XCTestCase {
             .firstMatch.exists, "l'avertissement doit dire que la partie disparaîtra de tous les appareils")
         snapshot(app, "nouvelle-partie-avertissement")
         alert.buttons["Annuler"].tap()
+    }
+
+    /// L'« iPad » reprend deux demi-coups de la MÊME partie pendant que l'échiquier est ouvert ici : un
+    /// bandeau le dit, et « Rattraper » rouvre la partie telle qu'elle est là-bas.
+    func testRemoteTakeback_bannerOffersToCatchUp() throws {
+        let app = launch(["-fakeRemoteTakeback"])
+        enableSyncAndGoHome(app)
+        startGameAndPlayE4(app)
+
+        let banner = app.otherElements["remoteAdvanceBanner"]
+        XCTAssertTrue(banner.waitForExistence(timeout: 15), "le bandeau doit apparaître sur l'échiquier")
+        XCTAssertTrue(app.staticTexts["Cette partie a continué sur votre iPad Pro 13″ (M4)"].exists)
+        RunLoop.current.run(until: Date().addingTimeInterval(1))   // fin de l'animation d'entrée
+        XCTAssertTrue(app.buttons["remoteAdvanceCatchUp"].isHittable, "« Rattraper » doit être touchable")
+        XCTAssertTrue(app.navigationBars.buttons.firstMatch.isHittable, "le bandeau ne doit pas couvrir la barre")
+        snapshot(app, "echiquier-bandeau")
+        app.buttons["remoteAdvanceCatchUp"].tap()
+        // Rouverte telle que l'iPad la porte : plus aucun coup, et le bandeau est parti.
+        waitForMoveCount("0", in: app)
+        XCTAssertFalse(app.otherElements["remoteAdvanceBanner"].exists)
+    }
+
+    /// L'« iPad » commence une AUTRE partie : elle devient la partie en cours, et la nôtre est mise de côté
+    /// au lieu d'être perdue. La reprendre l'échange avec l'autre.
+    func testOtherGameFromElsewhere_setsOursAside_andResumingSwaps() throws {
+        let app = launch(["-fakeRemoteOtherGame"])
+        enableSyncAndGoHome(app)
+        startGameAndPlayE4(app)
+        app.navigationBars.buttons.firstMatch.tap()
+
+        let aside = app.buttons["resumeAsideGame"]
+        XCTAssertTrue(aside.waitForExistence(timeout: 15), "notre partie doit être mise de côté, pas perdue")
+        XCTAssertTrue(app.staticTexts["Dernier coup joué sur votre iPad Pro 13″ (M4)"].exists)
+        snapshot(app, "accueil-mise-de-cote")
+        aside.tap()
+        // C'est bien la nôtre : ses deux demi-coups.
+        waitForMoveCount("2", in: app)
+        app.navigationBars.buttons.firstMatch.tap()
+        // Et celle de l'iPad a pris sa place de côté.
+        XCTAssertTrue(app.buttons["resumeAsideGame"].waitForExistence(timeout: 10))
+    }
+
+    /// « Vos appareils » : on peut nommer cet appareil, le nom remplace le modèle dans la liste.
+    func testRenameThisDevice() throws {
+        let app = launch()
+        openSettings(app)
+        let toggle = app.switches["syncToggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10))
+        scrollTo(toggle, in: app)
+        toggle.switches.firstMatch.tap()
+        let rename = app.buttons["renameThisDevice"]
+        XCTAssertTrue(rename.waitForExistence(timeout: 5))
+        scrollTo(rename, in: app)
+        rename.tap()
+        let field = app.alerts.textFields.firstMatch
+        XCTAssertTrue(field.waitForExistence(timeout: 5))
+        field.tap()
+        field.typeText("Téléphone de test")
+        app.alerts.buttons["Enregistrer"].tap()
+        XCTAssertTrue(app.staticTexts["Téléphone de test"].waitForExistence(timeout: 5))
+        snapshot(app, "reglages-appareil-renomme")
     }
 
     /// « Pas maintenant » : la proposition disparaît et ne revient pas au lancement suivant.

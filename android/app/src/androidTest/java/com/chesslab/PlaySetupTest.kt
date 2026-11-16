@@ -271,4 +271,29 @@ class PlaySetupTest {
         compose.onNodeWithTag("remplacer-reprendre").performClick()
         awaitTag("case-e4")
     }
+
+    /**
+     * Deux joueurs : « Commencer » effaçait la partie en cours SANS rien demander (relevé le
+     * 16/11/2026, iOS et Android). Il demande désormais, comme le mode Jouer, et « Reprendre » rouvre
+     * la partie. Pendant d'iOS : `ReplaceGameAlert` sur `TwoPlayerSetupView`.
+     */
+    @Test fun deuxJoueursDemandeAvantDeRemplacerLaPartieEnCours() {
+        compose.onNodeWithTag("mode-two").performScrollTo().performClick()
+        awaitTag("commencer")
+        compose.onNodeWithTag("commencer").performClick()
+        awaitTag("case-e2")
+        compose.onNodeWithTag("case-e2").performClick()
+        compose.onNodeWithTag("case-e4").performClick()
+        awaitTag("transport")
+        compose.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+        compose.waitForIdle()
+        awaitTag("mode-two")
+        compose.onNodeWithTag("mode-two").performScrollTo().performClick()
+        awaitTag("commencer")
+        compose.onNodeWithTag("commencer").performClick()
+        awaitTag("remplacer-reprendre")
+        compose.onNodeWithTag("remplacer-reprendre").performClick()
+        // La partie reprise : son premier coup est là (barre de consultation).
+        awaitTag("transport")
+    }
 }

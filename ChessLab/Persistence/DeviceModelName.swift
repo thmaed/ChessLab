@@ -34,14 +34,13 @@ enum DeviceModelName {
         model(for: identifier).map { format($0, language: language) }
     }
 
-    /// Ce qu'on affiche pour une valeur qui est SOIT un identifiant (« iPhone12,1 »), SOIT déjà un type
-    /// (« iPad », tel que l'écrivaient les premières versions) : le nom s'il est connu, sinon la famille.
+    /// Ce qu'on affiche pour une valeur qui est SOIT un identifiant (« iPhone12,1 »), SOIT un nom déjà
+    /// lisible — un type (« iPad », tel que l'écrivaient les premières versions) ou le nom que l'utilisateur
+    /// a donné à l'appareil, rendu tel quel : le nom du modèle s'il est connu, sinon la famille.
     static func display(_ value: String, language: String = LocalizationController.activeLanguageCode) -> String {
         if let name = name(for: value, language: language) { return name }
-        guard value.contains(",") else { return value }
-        if value.hasPrefix("iPad") { return "iPad" }
-        if value.hasPrefix("iPhone") { return "iPhone" }
-        return value
+        guard value.wholeMatch(of: #/(iPhone|iPad)\d+,\d+/#) != nil else { return value }
+        return value.hasPrefix("iPad") ? "iPad" : "iPhone"
     }
 
     static func model(for identifier: String) -> Model? {

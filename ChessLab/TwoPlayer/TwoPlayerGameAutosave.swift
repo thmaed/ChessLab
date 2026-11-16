@@ -4,13 +4,15 @@ import Foundation
 /// reprendre si l'app est tuée — même principe que ``PlayGameAutosave``,
 /// dans un fichier séparé (les deux autosaves cohabitent : démarrer une
 /// partie dans un mode n'efface jamais l'autosauvegarde de l'autre).
-struct TwoPlayerGameAutosave: Codable, Hashable {
+struct TwoPlayerGameAutosave: Codable, Hashable, AutosaveRecord {
     var settings: TwoPlayerGameSettings
     /// Coups joués jusqu'ici, en notation LAN moteur (ex. "e2e4").
     var moveLANs: [String]
     var whiteRemaining: TimeInterval?
     var blackRemaining: TimeInterval?
     var savedAt: Date
+    /// Voir ``PlayGameAutosave/gameID``.
+    var gameID: UUID? = nil
 }
 
 extension AutosaveStore {

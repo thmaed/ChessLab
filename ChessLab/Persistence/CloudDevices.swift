@@ -28,12 +28,17 @@ struct CloudDeviceRecord: Codable, Equatable, Identifiable {
     var model: String? = nil
     /// Le système et sa version (« iOS 18.6 »), utile pour l'entraide. Optionnel, même raison.
     var system: String? = nil
+    /// Le nom que l'utilisateur lui a donné (« iPad cuisine »), voir ``CloudDeviceName``.
+    var name: String? = nil
 
-    /// Le nom à montrer : « iPhone 11 », « iPad Pro 13″ (M4) »… ou, à défaut (fiche ancienne, modèle trop
+    /// Le nom du MODÈLE : « iPhone 11 », « iPad Pro 13″ (M4) »… ou, à défaut (fiche ancienne, modèle trop
     /// récent pour la table), le type.
-    var displayName: String {
+    var modelName: String {
         model.flatMap { DeviceModelName.name(for: $0) } ?? kind
     }
+
+    /// Le nom à montrer : celui que l'utilisateur a donné, sinon le modèle.
+    var displayName: String { name ?? modelName }
 
     /// Le symbole SF qui le représente.
     var symbol: String {
@@ -58,11 +63,20 @@ struct CloudDeviceIdentity: Equatable {
     var model: String? = nil
     /// Voir ``CloudDeviceRecord/system``.
     var system: String? = nil
+    /// Voir ``CloudDeviceRecord/name``.
+    var name: String? = nil
 
-    /// L'identité réelle. L'UUID vit dans le trousseau, réservé à cet appareil
+    /// L'identité réelle, relue à chaque fois pour suivre le nom que l'utilisateur donne à l'appareil.
+    static var current: CloudDeviceIdentity {
+        var identity = hardware
+        identity.name = CloudDeviceName.custom
+        return identity
+    }
+
+    /// Ce qui ne change pas pendant une session. L'UUID vit dans le trousseau, réservé à cet appareil
     /// (`…ThisDeviceOnly`) : il survit à une réinstallation (pas de fiche en double pour le même iPhone),
     /// et ne suit pas une sauvegarde restaurée sur un AUTRE appareil.
-    static let current = CloudDeviceIdentity(
+    private static let hardware = CloudDeviceIdentity(
         id: KeychainDeviceID.value(), kind: currentKind(),
         model: currentModelIdentifier(), system: currentSystem())
 
@@ -98,6 +112,27 @@ struct CloudDeviceIdentity: Equatable {
             : "\(version.majorVersion).\(version.minorVersion)"
         let name = info.isMacCatalystApp ? "macOS" : (currentKind() == "iPad" ? "iPadOS" : "iOS")
         return "\(name) \(number)"
+    }
+}
+
+/// Le nom que l'utilisateur donne à CET appareil dans « Vos appareils » (« iPad cuisine »), pour s'y
+/// retrouver entre deux appareils du même modèle. Sans autorisation particulière d'Apple : c'est lui qui le
+/// tape. Gardé sur l'appareil ; publié dans sa fiche, synchro allumée seulement.
+enum CloudDeviceName {
+    private static let key = "sync.deviceName"
+    static let maxLength = 30
+
+    /// `nil` : pas de nom donné (on montre le modèle). Un nom vide ou blanc l'efface.
+    static var custom: String? {
+        get { UserDefaults.standard.string(forKey: key) }
+        set {
+            let trimmed = (newValue ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            if trimmed.isEmpty {
+                UserDefaults.standard.removeObject(forKey: key)
+            } else {
+                UserDefaults.standard.set(String(trimmed.prefix(maxLength)), forKey: key)
+            }
+        }
     }
 }
 
@@ -177,12 +212,12 @@ struct CloudDeviceRegistry {
         // Une fiche à jour (même version de ChessLab, même modèle, même système) n'est réécrite qu'au-delà
         // de l'intervalle ; une mise à jour d'iOS ou de l'app se voit tout de suite.
         if !force, let mine = record(forKey: ownKey), mine.appVersion == appVersion, mine.kind == identity.kind,
-           mine.model == identity.model, mine.system == identity.system,
+           mine.model == identity.model, mine.system == identity.system, mine.name == identity.name,
            now.timeIntervalSince(mine.lastSeen) < Self.checkInInterval {
             return false
         }
         let record = CloudDeviceRecord(id: identity.id, kind: identity.kind, appVersion: appVersion, lastSeen: now,
-                                       model: identity.model, system: identity.system)
+                                       model: identity.model, system: identity.system, name: identity.name)
         guard let data = try? JSONEncoder().encode(record) else { return false }
         store.set(data, forKey: ownKey)
         store.synchronize()
@@ -280,6 +315,42 @@ enum DebugSyncDevice {
             store.set(try? JSONEncoder().encode(record), forKey: key)
         } else if store.object(forKey: key) != nil {
             store.removeObject(forKey: key)
+        }
+    }
+
+    /// Crochets de test de la partie en cours, joués par l'« iPad » fictif dès qu'une partie Jouer d'au
+    /// moins deux coups a été publiée ici :
+    /// - `-fakeRemoteTakeback` : il reprend les deux derniers demi-coups de la MÊME partie (bandeau de
+    ///   l'échiquier ; l'utilisateur a de nouveau le trait, rien ne bouge ensuite) ;
+    /// - `-fakeRemoteOtherGame` : il commence une AUTRE partie (mise de côté à l'accueil).
+    /// Une seule fois par lancement.
+    @MainActor
+    static func startFakeRemoteActivity(arguments: [String] = CommandLine.arguments) {
+        let takeback = arguments.contains("-fakeRemoteTakeback")
+        guard takeback || arguments.contains("-fakeRemoteOtherGame") else { return }
+        Task { @MainActor in
+            while true {
+                try? await Task.sleep(for: .seconds(2))
+                let autosave = SyncedAutosave.play
+                guard CloudSyncSettingsStore.isEnabled,
+                      let data = try? Data(contentsOf: AutosaveStore.documentURL("autosave_play.json")),
+                      let local = try? JSONDecoder().decode(PlayGameAutosave.self, from: data),
+                      local.moveLANs.count >= 2,
+                      autosave.remoteEnvelope()?.deviceID == CloudDeviceIdentity.current.id else { continue }
+                var remote = local
+                remote.savedAt = Date()
+                if takeback {
+                    remote.moveLANs.removeLast(2)
+                } else {
+                    remote.gameID = UUID()
+                    remote.moveLANs = ["d2d4", "d7d5"]
+                }
+                let envelope = AutosaveEnvelope(at: remote.savedAt, game: try? JSONEncoder().encode(remote),
+                                                deviceID: id, device: "iPad", model: "iPad16,6")
+                NSUbiquitousKeyValueStore.default.set(try? JSONEncoder().encode(envelope), forKey: autosave.key)
+                NotificationCenter.default.post(name: AutosaveCloud.didChangeRemotely, object: nil)
+                return
+            }
         }
     }
 }

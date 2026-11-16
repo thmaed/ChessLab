@@ -3,6 +3,8 @@ import SwiftUI
 /// Écran de configuration d'une partie "deux humains sur le même appareil".
 struct TwoPlayerSetupView: View {
     let onStart: (TwoPlayerGameSettings) -> Void
+    /// Reprendre la partie à deux laissée en cours — fournie par l'accueil.
+    private let onResume: (TwoPlayerGameAutosave) -> Void
     /// Position de départ imposée — reprise depuis un autre mode (lecteur
     /// d'ouverture/finale, partie contre le moteur) via le sélecteur rapide.
     /// `nil` : partie neuve, position standard, comme avant.
@@ -13,9 +15,17 @@ struct TwoPlayerSetupView: View {
     @State private var blackName: String
     @State private var rotationMode: TwoPlayerGameSettings.RotationMode
     @State private var timeLimit: TimeLimitSelection
+    /// La partie en cours, relue à l'ouverture de l'écran : « Commencer » l'EFFACERAIT, l'écran le dit
+    /// d'abord (il ne le faisait pas, même sur un seul appareil — relevé le 16/11/2026, comme sur Android).
+    @State private var resumable: TwoPlayerGameAutosave?
+    @State private var resumableOrigin: String?
+    @State private var confirmReplace = false
 
-    init(initialFEN: String? = nil, onStart: @escaping (TwoPlayerGameSettings) -> Void) {
+    init(initialFEN: String? = nil,
+         onResume: @escaping (TwoPlayerGameAutosave) -> Void = { _ in },
+         onStart: @escaping (TwoPlayerGameSettings) -> Void) {
         self.onStart = onStart
+        self.onResume = onResume
         self.initialFEN = initialFEN
         self.navigationTitleKey = initialFEN == nil ? "Deux joueurs" : "Continuer la partie"
         // Pas de réglages sauvegardés (tout premier lancement) : le défaut du
@@ -102,6 +112,15 @@ struct TwoPlayerSetupView: View {
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .primaryActionBar("Commencer", tint: Theme.info) { start() }
+        .onAppear {
+            resumable = AutosaveStore.loadTwoPlayer()
+            resumableOrigin = resumable == nil ? nil
+                : SyncedAutosave.twoPlayer.origin().map { DeviceModelName.display($0) }
+        }
+        .replaceGameAlert(isPresented: $confirmReplace, moveCount: resumable?.moveLANs.count ?? 0,
+                          origin: resumableOrigin, onResume: {
+            if let resumable { onResume(resumable) }
+        }, onReplace: { launch() })
     }
 
     private func nameField(label: LocalizedStringKey, text: Binding<String>) -> some View {
@@ -123,7 +142,16 @@ struct TwoPlayerSetupView: View {
     private var customMinutes: Int { timeLimit.customMinutes }
     private var customIncrement: Int { timeLimit.customIncrement }
 
+    /// Garde-fou : une partie en cours serait effacée par la nouvelle.
     private func start() {
+        if resumable != nil {
+            confirmReplace = true
+        } else {
+            launch()
+        }
+    }
+
+    private func launch() {
         let settings = TwoPlayerGameSettings(
             whiteName: whiteName.trimmingCharacters(in: .whitespaces).isEmpty ? LocalizationController.string("Blancs") : whiteName,
             blackName: blackName.trimmingCharacters(in: .whitespaces).isEmpty ? LocalizationController.string("Noirs") : blackName,

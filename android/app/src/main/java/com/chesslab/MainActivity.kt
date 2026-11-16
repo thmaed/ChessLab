@@ -244,6 +244,8 @@ private fun App(
             )
             is Route.TwoPlayerSetup -> com.chesslab.twoplayer.TwoPlayerSetupScreen(
                 startFen = current.startFen,
+                // La partie à deux en cours, depuis l'écran de réglages : elle remplace les réglages dans la pile.
+                onResume = { stack[stack.lastIndex] = Route.TwoPlayer(resume = true) },
             ) { settings ->
                 // On REMPLACE la configuration dans la pile : revenir depuis la
                 // partie doit ramener à l'accueil, pas à l'écran qu'on valide.

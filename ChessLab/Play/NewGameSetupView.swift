@@ -290,21 +290,10 @@ struct NewGameSetupView: View {
             resumable = AutosaveStore.loadPlay()
             resumableOrigin = resumable == nil ? nil : SyncedAutosave.play.origin().map { DeviceModelName.display($0) }
         }
-        .alert(replaceTitle, isPresented: $confirmReplace) {
-            Button("Reprendre la partie en cours") {
-                if let resumable { onResume(resumable) }
-            }
-            Button("Remplacer par une nouvelle partie", role: .destructive) { launch() }
-            Button("Annuler", role: .cancel) {}
-        } message: {
-            // Synchro allumée : la partie en cours est la MÊME sur tous les appareils (retour du 16/11 : une
-            // partie lancée sur un iPhone a remplacé celle d'un autre, sans que l'avertissement le dise).
-            if CloudSyncSettingsStore.isEnabled {
-                Text("Commencer une nouvelle partie l'effacera sur tous vos appareils (\(resumable?.moveLANs.count ?? 0) coup(s) joué(s)).")
-            } else {
-                Text("Commencer une nouvelle partie effacera la partie en cours (\(resumable?.moveLANs.count ?? 0) coup(s) joué(s)).")
-            }
-        }
+        .replaceGameAlert(isPresented: $confirmReplace, moveCount: resumable?.moveLANs.count ?? 0,
+                          origin: resumableOrigin, onResume: {
+            if let resumable { onResume(resumable) }
+        }, onReplace: { launch() })
         .appBackground()
         .navigationTitle(navigationTitleKey)
         .navigationBarTitleDisplayMode(.large)
@@ -382,12 +371,6 @@ struct NewGameSetupView: View {
     private var effectiveTimeControl: TimeControl { timeLimit.effective }
     private var customMinutes: Int { timeLimit.customMinutes }
     private var customIncrement: Int { timeLimit.customIncrement }
-
-    /// « Une partie est en cours », ou « … sur votre iPhone 11 » quand son dernier coup vient d'ailleurs.
-    private var replaceTitle: Text {
-        if let resumableOrigin { Text("Une partie est en cours sur votre \(resumableOrigin)") }
-        else { Text("Une partie est en cours") }
-    }
 
     /// Garde-fou : une partie en cours serait effacée par la nouvelle.
     private func start() {

@@ -113,6 +113,24 @@ struct CloudDeviceRegistryTests {
         #expect(eleven("iOS 18.6").devices(now: now).first?.system == "iOS 18.6")
     }
 
+    @Test func aGivenName_isShown_withTheModelUnderneath_andRewritesTheRecord() {
+        let store = FakeStore()
+        let on = Switch(true)
+        func pad(_ name: String?) -> CloudDeviceRegistry {
+            CloudDeviceRegistry(store: store,
+                                identity: CloudDeviceIdentity(id: "P", kind: "iPad", model: "iPad16,6",
+                                                              system: "iPadOS 26.1", name: name),
+                                appVersion: "2.4", isEnabled: { on.on })
+        }
+        #expect(pad(nil).checkIn(now: now))
+        #expect(pad(nil).devices(now: now).first?.displayName == "iPad Pro 13″ (M4)")
+        // Renommé une minute plus tard : la fiche est réécrite sans attendre l'intervalle.
+        #expect(pad("iPad du salon").checkIn(now: now.addingTimeInterval(60)))
+        let record = pad("iPad du salon").devices(now: now).first
+        #expect(record?.displayName == "iPad du salon")
+        #expect(record?.modelName == "iPad Pro 13″ (M4)")
+    }
+
     /// Les fiches déposées par la version précédente (sans modèle ni système) se lisent encore, et se nomment
     /// par leur type.
     @Test func recordsFromEarlierVersions_decode_andFallBackToTheKind() throws {

@@ -103,6 +103,9 @@ struct ChessLabApp: App {
                     if CloudSyncSettingsStore.activeAtLaunch {
                         UIApplication.shared.registerForRemoteNotifications()
                     }
+                    #if DEBUG && targetEnvironment(simulator)
+                    DebugSyncDevice.startFakeRemoteActivity()
+                    #endif
 
                 }
                 // Traits réels de la fenêtre (classes de taille, taille,
@@ -152,6 +155,7 @@ struct ChessLabApp: App {
         if CommandLine.arguments.contains("-resetPlaySettings") {
             CloudSyncSettingsStore.isEnabled = false
             UserDefaults.standard.removeObject(forKey: "sync.invitationDismissed")
+            CloudDeviceName.custom = nil
         }
         #if DEBUG && targetEnvironment(simulator)
         DebugSyncDevice.apply()

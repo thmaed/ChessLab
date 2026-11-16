@@ -27,6 +27,8 @@ struct HomeView: View {
     /// L'appareil où a été joué le dernier coup de la partie proposée, si ce n'est pas celui-ci
     /// (« Dernier coup joué sur votre iPad »).
     @State private var resumableOrigin: String?
+    /// La partie mise de côté quand une AUTRE est arrivée d'un autre appareil (voir ``SyncedAutosave``).
+    @State private var asideGame: ResumableGame?
     /// Synchro éteinte ici, allumée sur un autre appareil : la proposition (voir ``CloudDeviceRegistry``).
     @State private var syncInvitation: CloudDeviceRecord?
     @State private var showsSyncRestartSheet = false
@@ -280,6 +282,13 @@ struct HomeView: View {
             case let .twoPlayer(autosave): autosave.moveLANs.count
             }
         }
+
+        var mode: LocalizedStringKey {
+            switch self {
+            case .vsEngine: "Contre l'ordinateur"
+            case .twoPlayer: "Deux joueurs"
+            }
+        }
     }
 
     #if DEBUG
@@ -424,6 +433,21 @@ struct HomeView: View {
         // appartient à `HomeView`, que la bascule d'ossature n'atteint pas.
         .environment(\.sessionStore, sessionStore)
         .environment(\.discoveryTour, discoveryTour)
+        // « Rattraper » depuis l'échiquier ouvert : la partie telle que le nuage la porte (le rapprochement
+        // l'adopte), rouverte par le même chemin qu'une reprise depuis l'accueil.
+        .environment(\.remoteGameTakeOver, RemoteGameTakeOver(
+            play: {
+                guard let adopted = AutosaveStore.loadPlay() else { return }
+                sessionStore.clear()
+                path = NavigationPath()
+                path.append(Route.resumedGame(adopted))
+            },
+            twoPlayer: {
+                guard let adopted = AutosaveStore.loadTwoPlayer() else { return }
+                sessionStore.clear()
+                path = NavigationPath()
+                path.append(Route.resumedTwoPlayerGame(adopted))
+            }))
         // L'overlay vit à la RACINE : monté sur le Group, il dessine
         // par-dessus la barre latérale, la pile ET leurs barres — pas dans
         // un écran, qui ne pourrait couvrir que lui-même. C'est AUSSI ici
@@ -761,6 +785,37 @@ struct HomeView: View {
                     .accessibilityIdentifier("resumeGame")
                 }
             }
+            // La partie mise de côté, juste dessous : même rang, même persistance.
+            if let asideGame {
+                Section {
+                    Button {
+                        path = NavigationPath()
+                        resumeAsideGame(asideGame)
+                    } label: {
+                        Label {
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("Partie mise de côté")
+                                    .font(.subheadline.weight(.semibold))
+                                    .foregroundStyle(Theme.textPrimary)
+                                Text("\(asideGame.moveCount) coup(s) joué(s)")
+                                    .font(.caption)
+                                    .foregroundStyle(Theme.textSecondary)
+                            }
+                        } icon: {
+                            Image(systemName: "pause.circle")
+                                .foregroundStyle(Theme.accent)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("resumeAsideGame")
+                    .contextMenu {
+                        Button("Oublier", systemImage: "xmark", role: .destructive) { discardAsideGame(asideGame) }
+                    }
+                    .swipeActions {
+                        Button("Oublier", role: .destructive) { discardAsideGame(asideGame) }
+                    }
+                }
+            }
             Section("Modes") {
                 sidebarLabel(.vsEngine, "Contre l'ordinateur", "cpu", Theme.accent, discoverySpot: .playTile)
                 sidebarLabel(.twoPlayer, "Deux joueurs", "person.2.fill", Theme.info)
@@ -940,14 +995,20 @@ struct HomeView: View {
                     }
 
                 case .twoPlayerSetup:
-                    TwoPlayerSetupView { settings in
+                    TwoPlayerSetupView(onResume: { autosave in
+                        path = NavigationPath()
+                        path.append(Route.resumedTwoPlayerGame(autosave))
+                    }) { settings in
                         startNewTwoPlayerGame(settings, replacingCurrent: true)
                     }
 
                 case let .continueTwoPlayer(fen):
                     // Même écran, pré-rempli avec la position atteinte — miroir
                     // de `.continueVsStockfish`.
-                    TwoPlayerSetupView(initialFEN: fen) { settings in
+                    TwoPlayerSetupView(initialFEN: fen, onResume: { autosave in
+                        path = NavigationPath()
+                        path.append(Route.resumedTwoPlayerGame(autosave))
+                    }) { settings in
                         startNewTwoPlayerGame(settings)
                     }
 
@@ -1410,6 +1471,35 @@ struct HomeView: View {
         case nil: nil
         }
         resumableOrigin = origin.map { DeviceModelName.display($0) }
+
+        // APRÈS les `load` ci-dessus : c'est en rapprochant qu'une partie se met de côté.
+        let asides = [SyncedAutosave.play.aside().map(ResumableGame.vsEngine),
+                      SyncedAutosave.twoPlayer.aside().map(ResumableGame.twoPlayer)].compactMap { $0 }
+        asideGame = asides.max { $0.savedAt < $1.savedAt }
+    }
+
+    /// Reprendre la partie mise de côté : elle devient la partie en cours, la partie en cours prend sa place.
+    private func resumeAsideGame(_ aside: ResumableGame) {
+        switch aside {
+        case .vsEngine:
+            if let resumed = SyncedAutosave.play.resumeAside() { path.append(Route.resumedGame(resumed)) }
+        case .twoPlayer:
+            if let resumed = SyncedAutosave.twoPlayer.resumeAside() { path.append(Route.resumedTwoPlayerGame(resumed)) }
+        }
+        refreshResumableGame()
+    }
+
+    private func discardAsideGame(_ aside: ResumableGame) {
+        switch aside {
+        case .vsEngine: SyncedAutosave.play.discardAside()
+        case .twoPlayer: SyncedAutosave.twoPlayer.discardAside()
+        }
+        refreshResumableGame()
+    }
+
+    private func asideCard(_ aside: ResumableGame) -> some View {
+        AsideGameCard(mode: aside.mode, moveCount: aside.moveCount,
+                      onResume: { resumeAsideGame(aside) }, onDiscard: { discardAsideGame(aside) })
     }
 
     private func refreshSyncInvitation() {
@@ -1479,6 +1569,7 @@ struct HomeView: View {
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 if let resumableGame { resumeBanner(resumableGame) }
+                if let asideGame { asideCard(asideGame) }
                 syncHomeCard
                 dailySessionCard
                 newPuzzlesPill
@@ -1531,7 +1622,7 @@ struct HomeView: View {
             sectionHeader("Plus")
                 .padding(.top, 6)
             LazyVGrid(columns: columns, spacing: ModeGridMetrics.spacing) {
-                CompactModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", systemImage: "person.2.fill", tint: Theme.info) {
+                CompactModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", systemImage: "person.2.fill", tint: Theme.info, accessibilityID: "mode_twoPlayer") {
                     path.append(Route.twoPlayerSetup)
                 }
                 CompactModeCard(title: "Finales", systemImage: "crown.fill", tint: Theme.gold, accessibilityID: "mode_endgames") {

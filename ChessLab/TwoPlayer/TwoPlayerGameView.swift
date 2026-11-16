@@ -26,7 +26,21 @@ struct TwoPlayerGameView: View {
     @State private var showResignConfirmation = false
     @State private var showDrawConfirmation = false
     @State private var copiedMessage: String?
+    /// La partie a continué sur un autre appareil pendant que cet échiquier était ouvert (synchro iCloud).
+    @State private var remoteAdvance: RemoteAdvance?
+    @Environment(\.remoteGameTakeOver) private var remoteGameTakeOver
 
+
+    private func checkRemoteAdvance() {
+        guard viewModel.outcome == nil,
+              let remote = SyncedAutosave.twoPlayer.remoteGameFromElsewhere(),
+              remote.record.gameID == viewModel.gameID,
+              remote.record.moveLANs != viewModel.moveLog.map(\.lan) else { return }
+        withAnimation {
+            remoteAdvance = RemoteAdvance(origin: remote.origin.map { DeviceModelName.display($0) },
+                                          moveCount: remote.record.moveLANs.count)
+        }
+    }
     var body: some View {
         VStack(spacing: 0) {
             topZone
@@ -50,6 +64,23 @@ struct TwoPlayerGameView: View {
         }
         .padding(.top, 6)
         .padding(.bottom, 12)
+        // Voir ``PlayView`` : dans la zone sûre, sous la barre de navigation.
+        .safeAreaInset(edge: .top, spacing: 8) {
+            if let remoteAdvance, let remoteGameTakeOver {
+                RemoteAdvanceBanner(advance: remoteAdvance, onCatchUp: {
+                    self.remoteAdvance = nil
+                    remoteGameTakeOver.twoPlayer()
+                }, onDismiss: {
+                    withAnimation { self.remoteAdvance = nil }
+                })
+                .transition(.move(edge: .top).combined(with: .opacity))
+            }
+        }
+        // Voir ``PlayView`` : un autre appareil a joué dans CETTE partie.
+        .onReceive(NotificationCenter.default.publisher(for: AutosaveCloud.didChangeRemotely)) { _ in
+            checkRemoteAdvance()
+        }
+        .onChange(of: viewModel.moveLog.count) { _, _ in remoteAdvance = nil }
         .appBackground()
         // Le décompte démarre à l'APPARITION, pas à l'init : voir
         // ``TwoPlayerViewModel/handleViewAppear()``. Le couple avec

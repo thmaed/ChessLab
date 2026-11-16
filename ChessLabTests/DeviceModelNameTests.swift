@@ -36,6 +36,9 @@ struct DeviceModelNameTests {
         // Ce qu'écrivaient les premières versions : le type seul.
         #expect(DeviceModelName.display("iPad", language: "fr") == "iPad")
         #expect(DeviceModelName.display("Mac", language: "fr") == "Mac")
+        // Un nom donné par l'utilisateur passe tel quel, même s'il commence comme un modèle.
+        #expect(DeviceModelName.display("iPad du salon", language: "fr") == "iPad du salon")
+        #expect(DeviceModelName.display("iPhone, le vieux", language: "fr") == "iPhone, le vieux")
     }
 
     /// Chaque appareil que Xcode 27.1 sait simuler ET qu'iOS 18 fait tourner (relevé des `modelIdentifier`

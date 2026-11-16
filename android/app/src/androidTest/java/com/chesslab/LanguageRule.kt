@@ -34,9 +34,12 @@ class LanguageRule(private val tag: String = "fr") : TestRule {
                 // Idem pour le court parcours des nouveautés 2.0 (mise à jour depuis la 1.x).
                 com.chesslab.discovery.DiscoveryTourMemory.markWhatsNewSeen(target)
                 // Une partie laissée en cours par le test précédent ferait demander « remplacer ? »
-                // à chaque « Commencer » : chaque test repart sans partie en cours.
+                // à chaque « Commencer » : chaque test repart sans partie en cours — dans les deux modes,
+                // Deux joueurs ayant son garde-fou depuis le 16/11/2026.
                 kotlinx.coroutines.runBlocking {
-                    com.chesslab.library.LibraryDatabase.get(target).autosaves().clear("engine")
+                    val autosaves = com.chesslab.library.LibraryDatabase.get(target).autosaves()
+                    autosaves.clear("engine")
+                    autosaves.clear("twoPlayer")
                 }
                 val before = set(tag)
                 try {

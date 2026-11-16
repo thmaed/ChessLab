@@ -90,4 +90,39 @@ final class ResumeGameUITests: XCTestCase {
         XCTAssertTrue(app.otherElements["square_e4"].waitForExistence(timeout: 20))
         XCTAssertEqual(app.otherElements["moveCount"].value as? String, "2")
     }
+
+    /// Deux joueurs : « Commencer » effaçait la partie en cours SANS rien demander, même sur un seul
+    /// appareil (relevé le 16/11/2026, iOS et Android). Il demande désormais, comme le mode Jouer.
+    @MainActor
+    func testTwoPlayerSetupAsksBeforeReplacing() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-resetPlaySettings", "-discoveryTourSeen"]
+        app.launch()
+
+        // La tuile vit dans une grille PARESSEUSE, sous le pli : elle n'existe qu'une fois défilée.
+        func openTwoPlayer() {
+            let tile = app.buttons["mode_twoPlayer"]
+            var swipes = 0
+            while !tile.isHittable, swipes < 8 { app.swipeUp(velocity: .slow); swipes += 1 }
+            XCTAssertTrue(tile.waitForExistence(timeout: 5))
+            tile.tap()
+        }
+        openTwoPlayer()
+        XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
+        app.buttons["Commencer"].tap()
+        XCTAssertTrue(app.otherElements["square_e2"].waitForExistence(timeout: 20))
+        app.otherElements["square_e2"].tap()
+        app.otherElements["square_e4"].tap()
+        RunLoop.current.run(until: Date().addingTimeInterval(1))
+
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.buttons["resumeGame"].waitForExistence(timeout: 5))
+        openTwoPlayer()
+        XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
+        app.buttons["Commencer"].tap()
+        XCTAssertTrue(app.alerts["Une partie est en cours"].waitForExistence(timeout: 5),
+                      "« Commencer » doit demander avant d'effacer la partie à deux en cours")
+        app.alerts.buttons["Reprendre la partie en cours"].tap()
+        XCTAssertTrue(app.otherElements["square_e4"].waitForExistence(timeout: 10))
+    }
 }

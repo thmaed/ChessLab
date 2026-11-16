@@ -2,7 +2,7 @@ import Foundation
 
 /// État persisté d'une partie du mode Jouer, pour pouvoir la reprendre
 /// si l'app est tuée (elle peut l'être à tout moment sur iOS).
-struct PlayGameAutosave: Codable, Hashable {
+struct PlayGameAutosave: Codable, Hashable, AutosaveRecord {
     var settings: PlayGameSettings
     /// Couleur effectivement attribuée à l'utilisateur (résolue une seule
     /// fois si le choix était "aléatoire").
@@ -12,6 +12,9 @@ struct PlayGameAutosave: Codable, Hashable {
     var whiteRemaining: TimeInterval?
     var blackRemaining: TimeInterval?
     var savedAt: Date
+    /// L'identité de la partie (voir ``AutosaveRecord/gameID``) : née avec elle, gardée à chaque coup et à
+    /// chaque reprise. Optionnelle : les sauvegardes d'avant le 16/11/2026 n'en ont pas.
+    var gameID: UUID? = nil
 }
 
 /// Persistance de la partie en cours du mode Jouer : un fichier JSON dans `Documents/`, que

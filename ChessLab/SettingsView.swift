@@ -260,7 +260,12 @@ struct SettingsView: View {
 
                 if cloudSyncEnabled, !syncDevices.isEmpty {
                     Divider().overlay(Theme.stroke)
-                    CloudDevicesList(devices: syncDevices, ownID: registry.identity.id, appVersion: registry.appVersion)
+                    CloudDevicesList(devices: syncDevices, ownID: registry.identity.id, appVersion: registry.appVersion) { name in
+                        CloudDeviceName.custom = name
+                        // Tout de suite dans la fiche : les autres appareils le verront au prochain échange.
+                        CloudDeviceRegistry.live.checkIn(force: true)
+                        refreshSyncDevices()
+                    }
                 }
 
                 if showsManualSync(state) {

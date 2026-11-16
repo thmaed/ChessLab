@@ -11270,3 +11270,25 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   - **Android : rien à porter** — les deux textes et le nom d'appareil n'existent qu'avec la synchro iCloud (hors
     périmètre) ; sans synchro, l'avertissement est inchangé des deux côtés.
   - Politique de confidentialité, à la sortie : la fiche d'appareil contient aussi le modèle et la version du système.
+- **Même soir, aucune partie perdue en silence + garde-fou Deux joueurs + nom d'appareil + bandeau** (réponses de
+  l'utilisateur : une seule place de côté, même règle pour Deux joueurs) :
+  - **Identité de partie** (`gameID`, optionnel : les sauvegardes d'avant se rapprochent par leurs coups). Une partie
+    DIFFÉRENTE arrivée d'ailleurs devient la partie en cours, la nôtre est **mise de côté** sur cet appareil (une
+    place, la plus récente des deux reste) ; l'accueil la propose (« Partie mise de côté », Reprendre = échange,
+    ✕ = oublier). L'enveloppe porte `endedGameID` : une partie terminée ou remplacée SCIEMMENT ailleurs n'est pas
+    mise de côté (l'avertissement avait dit « sur tous vos appareils »), et une pierre tombale ne vise plus que SA
+    partie. `AutosaveRecord`, `SyncedAutosave.aside/resumeAside/discardAside`.
+  - **Bandeau sur l'échiquier ouvert** (Jouer et Deux joueurs) : « Cette partie a continué sur votre iPad… »,
+    Rattraper (l'accueil la rouvre telle que le nuage la porte, via l'environnement `remoteGameTakeOver`) / Continuer
+    ici. Dans la zone sûre, sous la barre (en superposition il couvrait le titre — vu sur capture).
+  - **Renommer cet appareil** (crayon dans « Vos appareils », 30 caractères, vide = le modèle) : publié dans la fiche
+    et l'enveloppe, le modèle passe dessous.
+  - **Deux joueurs : garde-fou « Une partie est en cours »** — il n'existait pas, même sur un appareil. Alerte
+    commune `ReplaceGameAlert` (iOS) ; **porté sur Android** (`TwoPlayerSetupScreen`, même dialogue que le mode
+    Jouer ; `LanguageRule` vide aussi la partie à deux entre les tests).
+  - Aide (À SAVOIR) réécrite en 5 langues ; 12 libellés × 5 langues.
+  - Crochets de test (simulateur Debug) : `-fakeRemoteTakeback`, `-fakeRemoteOtherGame`.
+  - Tests : 104 unitaires ciblés verts (dont 8 nouveaux de mise de côté) ; `CloudSyncUITests` 7 + `ResumeGameUITests`
+    3 verts ; Android `PlaySetupTest` 9/9 sur émulateur (dont le nouveau Deux joueurs).
+  - Preuve préalable au relancement intérieur : `StoreHostTests` — une base SwiftData que plus personne ne tient est
+    libérée (< 0,1 s) et ses données se rouvrent intactes.

@@ -21,6 +21,8 @@ final class TwoPlayerViewModel {
     private(set) var moveLog: [Move] = []
 
     let settings: TwoPlayerGameSettings
+    /// Voir ``PlayViewModel/gameID``.
+    let gameID: UUID
     private let modelContext: ModelContext
 
     // MARK: Pendule
@@ -67,6 +69,7 @@ final class TwoPlayerViewModel {
         var settings = settings
         settings.localizeDefaultNames()
         self.settings = settings
+        gameID = UUID()
         self.modelContext = modelContext
 
         let startPosition = settings.startingPosition
@@ -89,6 +92,7 @@ final class TwoPlayerViewModel {
         var restored = autosave.settings
         restored.localizeDefaultNames()
         settings = restored
+        gameID = autosave.gameID ?? UUID()
         self.modelContext = modelContext
 
         // 🐛 Corrigé (revue du 19/08) : depuis que « Changer de mode » peut
@@ -577,7 +581,8 @@ final class TwoPlayerViewModel {
             // réserve les temps précis à la logique et à l'autosauvegarde.
             whiteRemaining: clock?.remaining(for: .white),
             blackRemaining: clock?.remaining(for: .black),
-            savedAt: Date()
+            savedAt: Date(),
+            gameID: gameID
         )
         AutosaveStore.saveTwoPlayer(record)
     }

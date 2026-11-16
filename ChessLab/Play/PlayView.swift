@@ -28,6 +28,9 @@ struct PlayView: View {
     @State private var copiedMessage: String?
     @State private var showResignConfirmation = false
     @State private var showDrawConfirmation = false
+    /// La partie a continué sur un autre appareil pendant que cet échiquier était ouvert (synchro iCloud).
+    @State private var remoteAdvance: RemoteAdvance?
+    @Environment(\.remoteGameTakeOver) private var remoteGameTakeOver
 
     var body: some View {
         Group {
@@ -111,6 +114,15 @@ struct PlayView: View {
             Text(copiedMessage ?? "")
         }
         .overlay(alignment: .top) { engineUnavailableBanner }
+        // Dans la zone sûre, SOUS la barre de navigation : en superposition, il couvrait le titre et les
+        // boutons. Le plateau se resserre le temps qu'il est là.
+        .safeAreaInset(edge: .top, spacing: 8) { remoteAdvanceBanner }
+        // Un autre appareil a joué dans CETTE partie : le dire, sans rien imposer.
+        .onReceive(NotificationCenter.default.publisher(for: AutosaveCloud.didChangeRemotely)) { _ in
+            checkRemoteAdvance()
+        }
+        // Un coup joué ici l'emporte : le bandeau n'a plus lieu d'être.
+        .onChange(of: viewModel.moveLog.count) { _, _ in remoteAdvance = nil }
         .overlay { promotionOverlay }
         .overlay { gameOverOverlay }
         .background(moveCountMarker)
@@ -535,6 +547,31 @@ struct PlayView: View {
             onAnalyzeHere: { onAnalyzePosition(viewModel.displayedFEN) },
             resumeBlockedByClock: viewModel.settings.timeControl.hasClock
         )
+    }
+
+    /// La partie a continué sur un autre appareil : voir ``RemoteAdvanceBanner``.
+    @ViewBuilder
+    private var remoteAdvanceBanner: some View {
+        if let remoteAdvance, let remoteGameTakeOver {
+            RemoteAdvanceBanner(advance: remoteAdvance, onCatchUp: {
+                self.remoteAdvance = nil
+                remoteGameTakeOver.play()
+            }, onDismiss: {
+                withAnimation { self.remoteAdvance = nil }
+            })
+            .transition(.move(edge: .top).combined(with: .opacity))
+        }
+    }
+
+    private func checkRemoteAdvance() {
+        guard viewModel.outcome == nil,
+              let remote = SyncedAutosave.play.remoteGameFromElsewhere(),
+              remote.record.gameID == viewModel.gameID,
+              remote.record.moveLANs != viewModel.moveLog.map(\.lan) else { return }
+        withAnimation {
+            remoteAdvance = RemoteAdvance(origin: remote.origin.map { DeviceModelName.display($0) },
+                                          moveCount: remote.record.moveLANs.count)
+        }
     }
 
     /// Sans ce signalement, un échec de démarrage de Stockfish donnait un
