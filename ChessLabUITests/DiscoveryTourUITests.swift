@@ -85,6 +85,7 @@ final class DiscoveryTourUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = ["-discoveryWhatsNew", "YES"]
         app.launch()
-        walkThroughEntireTour(app, stepCount: 6)
+        // Cinq étapes depuis le parcours de la 2.2 (1dc0bd1, 09/11/2026) ; le test en attendait encore six.
+        walkThroughEntireTour(app, stepCount: 5)
     }
 }

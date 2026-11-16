@@ -278,12 +278,15 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle()
         }
-        // Les réglages et les parties en cours suivent l'interrupteur tout de suite ; seul le conteneur
-        // SwiftData attend le prochain lancement.
+        // Les réglages et les parties en cours suivent l'interrupteur tout de suite ; la base SwiftData,
+        // elle, est remplacée sans quitter l'app (écran de passage, puis retour ici — voir StoreHost). Si
+        // quelque chose la retient, elle reste telle quelle et la carte dit « fermez et rouvrez ».
         .onChange(of: cloudSyncEnabled) { _, _ in
             monitor.clearManualResult()
             KeyValueSyncSwitch.apply()
             refreshSyncDevices()
+            // Tâche NON structurée : elle survit à cet écran, que l'échange démonte.
+            Task { await StoreHost.shared.followSyncSwitch() }
         }
         .onReceive(NotificationCenter.default.publisher(for: CloudDevices.didChange)) { _ in refreshSyncDevices() }
         .task {

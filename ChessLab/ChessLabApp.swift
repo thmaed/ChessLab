@@ -4,7 +4,22 @@ import UIKit
 
 @main
 struct ChessLabApp: App {
-    private let modelContainer: ModelContainer = Self.makeModelContainer()
+    /// La base, REMPLAÇABLE en cours de session (voir ``StoreHost``). Ouverte ICI, avant le corps de `init` :
+    /// les remises à zéro des tests UI (``prepareStoreLaunch()``) doivent précéder son ouverture.
+    private let storeHost: StoreHost = {
+        ChessLabApp.prepareStoreLaunch()
+        let host = StoreHost.shared
+        host.install(ChessLabApp.openModelContainer(), open: { ChessLabApp.openModelContainer() })
+        host.willRelease = {
+            UserOpeningStore.shared.detach()
+            CloudImportResponder.stop()
+        }
+        host.didOpen = { container in
+            UserOpeningStore.shared.attach(context: container.mainContext)
+            CloudImportResponder.start(context: container.mainContext)
+        }
+        return host
+    }()
     @State private var settings = AppSettings.shared
     #if targetEnvironment(macCatalyst)
     /// Uniquement pour élaguer la barre de menus — voir ``MacMenuDelegate``.
@@ -77,15 +92,17 @@ struct ChessLabApp: App {
 
     var body: some Scene {
         WindowGroup {
+          // La base peut changer en cours de session (synchro iCloud allumée ou éteinte) : le portail rend
+          // l'interface sur la base du moment, ou l'écran de passage pendant l'échange (voir StoreHost).
+          StoreGate {
             HomeView()
-
                 .task {
-
                     // Répertoires personnels : la base remplace les fichiers, et
-
-                    // reprend au passage ceux des versions précédentes.
-
-                    UserOpeningStore.shared.attach(context: modelContainer.mainContext)
+                    // reprend au passage ceux des versions précédentes. Rejoué
+                    // après un changement de base (nouvelle interface, nouvelle tâche).
+                    if let container = storeHost.container {
+                        UserOpeningStore.shared.attach(context: container.mainContext)
+                    }
 
                     // Réglages et parties en cours : le même interrupteur iCloud
                     // que les données (magasin clé-valeur, branché ET débranché à
@@ -95,7 +112,9 @@ struct ChessLabApp: App {
                     // Le moniteur écoute les VRAIS échanges CloudKit pour les Réglages.
                     CloudSyncMonitor.shared.start()
                     // Ce qui arrive d'iCloud est fusionné À L'ARRIVÉE (voir CloudImportResponder).
-                    CloudImportResponder.start(context: modelContainer.mainContext)
+                    if let container = storeHost.container {
+                        CloudImportResponder.start(context: container.mainContext)
+                    }
                     // Les notifications SILENCIEUSES de CloudKit : sans elles, un changement fait sur un
                     // autre appareil n'arrive qu'au prochain lancement à froid — et iOS garde l'app en
                     // mémoire des jours entiers (cause probable du retour du 16/11/2026). Aucune
@@ -125,16 +144,16 @@ struct ChessLabApp: App {
                 // elle force une classe.
                 .narrowWindowSizeClass()
                 .refreshesSupportedOrientations()
-                .preferredColorScheme(.dark)
-                // `Text` dépend de la locale de l'environnement : la changer
-                // force SwiftUI à re-rendre chaque `Text`, qui re-résout alors
-                // sa clé via le bundle détourné (langue in-app). On NE force
-                // PAS un `.id()` sur toute la racine : cela reconstruirait la
-                // `NavigationStack` et renverrait l'utilisateur à l'accueil au
-                // moindre changement de langue.
-                .environment(\.locale, settings.locale)
+          }
+          .preferredColorScheme(.dark)
+          // `Text` dépend de la locale de l'environnement : la changer
+          // force SwiftUI à re-rendre chaque `Text`, qui re-résout alors
+          // sa clé via le bundle détourné (langue in-app). On NE force
+          // PAS un `.id()` sur toute la racine : cela reconstruirait la
+          // `NavigationStack` et renverrait l'utilisateur à l'accueil au
+          // moindre changement de langue.
+          .environment(\.locale, settings.locale)
         }
-        .modelContainer(modelContainer)
         // Barre de menus macOS. Sur iOS/iPadOS, `commands` alimente le menu
         // matériel du clavier (⌘ maintenu) — utile là aussi, donc pas de
         // garde de plateforme.
@@ -149,9 +168,10 @@ struct ChessLabApp: App {
     /// capacité iCloud dans Xcode (Signing & Capabilities), une étape
     /// interactive/réseau qu'on ne peut pas fiabiliser via `xcodebuild` seul
     /// dans cet environnement. Voir PROGRESS.md.
-    private static func makeModelContainer() -> ModelContainer {
-        // Tests UI : repartir synchro ÉTEINTE et sans proposition déclinée. Ici, et non dans `init` : le
-        // conteneur est construit AVANT le corps de `init`, et doit voir l'interrupteur déjà remis à zéro.
+    /// Une fois par lancement, AVANT d'ouvrir la base. Tests UI : repartir synchro ÉTEINTE et sans
+    /// proposition déclinée. Ici, et non dans `init` : la base est ouverte AVANT le corps de `init`, et doit
+    /// voir l'interrupteur déjà remis à zéro.
+    private static func prepareStoreLaunch() {
         if CommandLine.arguments.contains("-resetPlaySettings") {
             CloudSyncSettingsStore.isEnabled = false
             UserDefaults.standard.removeObject(forKey: "sync.invitationDismissed")
@@ -160,6 +180,11 @@ struct ChessLabApp: App {
         #if DEBUG && targetEnvironment(simulator)
         DebugSyncDevice.apply()
         #endif
+    }
+
+    /// Ouvre la base selon l'interrupteur iCloud du moment — au lancement, et à chaque changement de base en
+    /// cours de session (``StoreHost``).
+    static func openModelContainer() -> ModelContainer {
         let schema = Schema([
             GameRecord.self, Puzzle.self, PuzzleProgress.self,
             OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self, UserOpeningRecord.self,

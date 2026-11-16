@@ -31,6 +31,16 @@ enum CloudImportResponder {
         }
     }
 
+    /// Lâche la base (changement de base en cours de session, voir ``StoreHost``). Idempotent ; `start`
+    /// rebranche.
+    static func stop() {
+        pending?.cancel()
+        pending = nil
+        if let observer { NotificationCenter.default.removeObserver(observer) }
+        observer = nil
+        context = nil
+    }
+
     /// Fusionne bientôt (les appels rapprochés se regroupent en un seul).
     static func schedule(after delay: Duration = .milliseconds(1500)) {
         pending?.cancel()

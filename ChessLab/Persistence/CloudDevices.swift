@@ -324,10 +324,13 @@ enum DebugSyncDevice {
     ///   l'échiquier ; l'utilisateur a de nouveau le trait, rien ne bouge ensuite) ;
     /// - `-fakeRemoteOtherGame` : il commence une AUTRE partie (mise de côté à l'accueil).
     /// Une seule fois par lancement.
+    @MainActor private static var fakeRemoteStarted = false
+
     @MainActor
     static func startFakeRemoteActivity(arguments: [String] = CommandLine.arguments) {
         let takeback = arguments.contains("-fakeRemoteTakeback")
-        guard takeback || arguments.contains("-fakeRemoteOtherGame") else { return }
+        guard takeback || arguments.contains("-fakeRemoteOtherGame"), !fakeRemoteStarted else { return }
+        fakeRemoteStarted = true
         Task { @MainActor in
             while true {
                 try? await Task.sleep(for: .seconds(2))

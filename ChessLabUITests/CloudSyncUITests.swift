@@ -37,32 +37,43 @@ final class CloudSyncUITests: XCTestCase {
         while !element.isHittable, tries < 12 { app.swipeUp(velocity: .slow); tries += 1 }
     }
 
-    /// Éteinte → « Désactivée » ; allumée → la dernière étape et ses gestes, sans relancer pour rien
-    /// le reste ; éteinte de nouveau → retour à « Désactivée ».
-    func testSettingsCard_saysWhereThingsStand() throws {
+    /// Éteinte → « Désactivée » ; allumée → la base change SANS quitter l'app (écran de passage, retour
+    /// aux Réglages), plus de « dernière étape : relancer » ; éteinte de nouveau → « Désactivée ».
+    func testSettingsCard_switchesWithoutRestart() throws {
         let app = launch()
         openSettings(app)
-        let toggle = app.switches["syncToggle"]
+        var toggle = app.switches["syncToggle"]
         XCTAssertTrue(toggle.waitForExistence(timeout: 10))
         scrollTo(toggle, in: app)
         XCTAssertTrue(app.staticTexts["Désactivée"].exists, "l'état doit dire « Désactivée »")
         snapshot(app, "reglages-eteinte")
 
         toggle.switches.firstMatch.tap()
-        XCTAssertTrue(app.otherElements["syncRestartBanner"].waitForExistence(timeout: 5)
-                      || app.staticTexts["Dernière étape : relancer ChessLab"].waitForExistence(timeout: 1))
-        XCTAssertTrue(app.staticTexts["Cet appareil"].waitForExistence(timeout: 5),
-                      "la liste « Vos appareils » doit montrer cet appareil dès l'activation")
+        // Retour aux Réglages, sur la nouvelle base : la liste des appareils, et pas de relancement demandé.
+        XCTAssertTrue(app.staticTexts["Cet appareil"].waitForExistence(timeout: 15),
+                      "après l'échange, les Réglages doivent montrer « Vos appareils »")
         scrollTo(app.staticTexts["Cet appareil"], in: app)
-        snapshot(app, "reglages-derniere-etape")
+        XCTAssertFalse(app.staticTexts["Dernière étape : relancer ChessLab"].exists,
+                       "la base a changé à chaud : plus rien à relancer")
+        XCTAssertFalse(app.otherElements["syncRestartBanner"].exists)
+        snapshot(app, "reglages-allumee-sans-relancer")
 
+        toggle = app.switches["syncToggle"]
+        scrollTo(toggle, in: app)
         toggle.switches.firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["Désactivée"].waitForExistence(timeout: 5))
+        let off = app.staticTexts["Désactivée"]
+        let deadline = Date().addingTimeInterval(15)
+        while !off.exists, Date() < deadline {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+            if app.switches["syncToggle"].exists, !app.switches["syncToggle"].isHittable { app.swipeUp(velocity: .slow) }
+        }
+        XCTAssertTrue(off.exists, "éteinte de nouveau : « Désactivée », sans relancement")
+        XCTAssertFalse(app.staticTexts["Dernière étape : relancer ChessLab"].exists)
     }
 
-    /// Un autre appareil synchronise : l'accueil le propose ; « Activer » mène aux gestes, puis un rappel
-    /// reste à l'accueil tant que l'app n'a pas été relancée.
-    func testHomeInvitation_leadsToTheRestartSteps() throws {
+    /// Un autre appareil synchronise : l'accueil le propose ; « Activer » change la base sans quitter l'app
+    /// et mène aux Réglages, où l'iPad fictif est listé avec son modèle et son système.
+    func testHomeInvitation_switchesWithoutRestart() throws {
         let app = launch(["-fakeSyncDevice"])
         let card = app.otherElements["syncInvitationCard"]
         XCTAssertTrue(card.waitForExistence(timeout: 15), "la proposition doit apparaître à l'accueil")
@@ -71,24 +82,22 @@ final class CloudSyncUITests: XCTestCase {
         snapshot(app, "accueil-proposition")
 
         app.buttons["syncInvitationAccept"].tap()
-        XCTAssertTrue(app.buttons["syncRestartSheetOK"].waitForExistence(timeout: 5))
-        snapshot(app, "accueil-feuille-relancer")
-        app.buttons["syncRestartSheetOK"].tap()
-
-        XCTAssertTrue(app.buttons["syncRestartReminder"].waitForExistence(timeout: 5),
-                      "le rappel doit rester à l'accueil tant que l'app n'est pas relancée")
-        XCTAssertFalse(card.exists)
-        snapshot(app, "accueil-rappel")
-
-        // Les Réglages listent l'iPad fictif — son modèle, son système — avec sa version plus ancienne
-        // signalée.
-        openSettings(app)
         let pad = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "iPad Pro 13″ (M4)")).firstMatch
-        XCTAssertTrue(pad.waitForExistence(timeout: 10))
+        XCTAssertTrue(pad.waitForExistence(timeout: 15), "après l'échange, les Réglages listent l'iPad")
         scrollTo(pad, in: app)
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "iPadOS 26.1")).firstMatch.exists,
                       "la version du système de l'iPad doit être affichée")
+        XCTAssertFalse(app.staticTexts["Dernière étape : relancer ChessLab"].exists)
         snapshot(app, "reglages-appareils")
+
+        // À l'accueil : ni proposition, ni rappel de relancement. Sur iPhone on y revient par la flèche ; sur
+        // iPad, les Réglages occupent la colonne de détail et l'accueil reste à côté.
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            app.navigationBars.buttons.firstMatch.tap()
+            XCTAssertTrue(app.buttons["openSettings"].waitForExistence(timeout: 10))
+        }
+        XCTAssertFalse(card.exists)
+        XCTAssertFalse(app.buttons["syncRestartReminder"].exists)
     }
 
     /// Allume la synchro dans les Réglages, puis revient à l'accueil.
@@ -98,7 +107,8 @@ final class CloudSyncUITests: XCTestCase {
         XCTAssertTrue(toggle.waitForExistence(timeout: 10))
         scrollTo(toggle, in: app)
         toggle.switches.firstMatch.tap()
-        XCTAssertTrue(app.staticTexts["Cet appareil"].waitForExistence(timeout: 5))
+        // La base change (écran de passage), puis les Réglages reviennent.
+        XCTAssertTrue(app.staticTexts["Cet appareil"].waitForExistence(timeout: 15))
         app.navigationBars.buttons.firstMatch.tap()
     }
 
@@ -192,7 +202,7 @@ final class CloudSyncUITests: XCTestCase {
         scrollTo(toggle, in: app)
         toggle.switches.firstMatch.tap()
         let rename = app.buttons["renameThisDevice"]
-        XCTAssertTrue(rename.waitForExistence(timeout: 5))
+        XCTAssertTrue(rename.waitForExistence(timeout: 15))
         scrollTo(rename, in: app)
         rename.tap()
         let field = app.alerts.textFields.firstMatch

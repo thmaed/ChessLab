@@ -54,6 +54,12 @@ final class UserOpeningStore {
         reload()
     }
 
+    /// Lâche la base le temps qu'elle soit remplacée (voir ``StoreHost``) ; ``attach(context:)`` rebranche
+    /// la nouvelle. Les répertoires déjà lus restent en mémoire entre-temps.
+    func detach() {
+        context = nil
+    }
+
     /// Drapeau de migration, par APPAREIL.
     private static let migratedKey = "userOpenings.migratedToDatabase"
 

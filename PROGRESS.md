@@ -11292,3 +11292,22 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
     3 verts ; Android `PlaySetupTest` 9/9 sur émulateur (dont le nouveau Deux joueurs).
   - Preuve préalable au relancement intérieur : `StoreHostTests` — une base SwiftData que plus personne ne tient est
     libérée (< 0,1 s) et ses données se rouvrent intactes.
+- **Même soir, relancement INTÉRIEUR** — allumer ou éteindre la synchro ne demande plus de fermer et rouvrir
+  ChessLab. `Persistence/StoreHost.swift` : la base devient remplaçable. L'échange enregistre, détache les deux
+  services qui gardent un contexte (répertoires, fusion iCloud), remplace l'interface par un écran de passage
+  (« Branchement à iCloud… », `StoreGate`), attend que l'ancienne base soit LIBÉRÉE (référence faible, 4 s au
+  plus), ouvre la nouvelle sur les mêmes fichiers (`ChessLabApp.openModelContainer()`), rebranche, rouvre les
+  Réglages. **Filet** : si quelque chose la retient (import de PGN, chargement de la bibliothèque de puzzles,
+  partie ouverte dans une autre fenêtre), on reprend l'ancienne — jamais deux piles sur les mêmes fichiers — et la
+  carte dit comme avant « fermez et rouvrez ». Déclenché par l'interrupteur des Réglages et par « Activer » de la
+  proposition d'accueil. Session dégradée ou chargement des puzzles : pas d'échange (le message d'avant).
+  - Ce qui a rendu l'idée sûre : `StoreHostTests` prouve qu'une base sans référence est libérée (< 0,1 s) ; l'échange
+    réussi (ce qui n'était pas enregistré l'est, données intactes) et le filet (une référence gardée → aucune
+    seconde base ouverte, l'ancienne reprise telle quelle).
+  - `-resetPlaySettings` et `DebugSyncDevice.apply()` sortis de l'ouverture de base (`prepareStoreLaunch()`, une
+    fois par lancement) : rouvrir la base en cours de session ne doit pas remettre l'interrupteur à zéro.
+  - Aide (ACTIVER) réécrite en 5 langues ; 3 libellés × 5 langues.
+  - Tests : suite unitaire COMPLÈTE verte (1 362, 16 ignorés) ; `CloudSyncUITests` 7 verts, dont « sans relancer »
+    (après l'échange, le simulateur sans compte dit « Connectez-vous à iCloud » : CloudKit est bien actif).
+  - **Android : rien à porter** (iCloud hors périmètre).
+  - Reste : l'essayer sur deux vrais appareils avec un compte iCloud (l'échange réel de données après bascule).

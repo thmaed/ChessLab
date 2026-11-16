@@ -433,6 +433,14 @@ struct HomeView: View {
         // appartient à `HomeView`, que la bascule d'ossature n'atteint pas.
         .environment(\.sessionStore, sessionStore)
         .environment(\.discoveryTour, discoveryTour)
+        // Retour d'un changement de base (synchro allumée ou éteinte, voir StoreHost) : on rouvre les
+        // Réglages, d'où l'on venait et où se lit le résultat.
+        .onAppear {
+            if StoreHost.shared.reopensSettings {
+                StoreHost.shared.reopensSettings = false
+                open(.settings)
+            }
+        }
         // « Rattraper » depuis l'échiquier ouvert : la partie telle que le nuage la porte (le rapprochement
         // l'adopte), rouverte par le même chemin qu'une reprise depuis l'accueil.
         .environment(\.remoteGameTakeOver, RemoteGameTakeOver(
@@ -1515,7 +1523,9 @@ struct HomeView: View {
                     cloudSyncEnabled = true
                     KeyValueSyncSwitch.apply()
                     self.syncInvitation = nil
-                    showsSyncRestartSheet = true
+                    // La base suit sans relancer l'app (écran de passage, puis les Réglages). Si quelque
+                    // chose la retient, le rappel ci-dessous et ses gestes prennent le relais.
+                    Task { await StoreHost.shared.followSyncSwitch() }
                 } onDismiss: {
                     CloudDevices.dismissInvitation(from: syncInvitation)
                     self.syncInvitation = nil
