@@ -11366,3 +11366,9 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
     SUR l'iPadt (barre à 2 % dès l'apparition, qui avance). Au passage : iOS tue une app en ARRIÈRE-PLAN qui
     dépasse 80 % de processeur sur 60 s (rapport `cpu_resource_fatal` pendant une mesure, iPad verrouillé) — le
     préchargement interrompu reprend au lancement suivant, sans doublon.
+- **Même soir, vérification : notation des coups « Automatique » par défaut puis mémorisée.** C'était déjà le cas
+  depuis la 2.3 (`AppSettings.pieceNotationChoice`, `nil` = automatique, stocké `auto` ou le nom de la notation ;
+  Android : `SettingsStore`, même modèle). Pas de piège à la mise à jour : avant la 2.3, la notation n'était écrite
+  QUE sur un choix de l'utilisateur. Prouvé de bout en bout : `NotationSettingUITests` sur installation VIERGE
+  (automatique → anglaise retrouvée après relance → automatique retrouvée après relance) ; Android :
+  `NotationSettingTest` (instrumenté, émulateur) — il n'y avait aucun test côté Android.
