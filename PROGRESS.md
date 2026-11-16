@@ -11311,3 +11311,16 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
     (après l'échange, le simulateur sans compte dit « Connectez-vous à iCloud » : CloudKit est bien actif).
   - **Android : rien à porter** (iCloud hors périmètre).
   - Reste : l'essayer sur deux vrais appareils avec un compte iCloud (l'échange réel de données après bascule).
+- **Même soir, essai RÉEL sur iPhone 11 + iPhone XS Max** (même compte Apple, CloudKit de développement), piloté par
+  `ChessLabUITests/DeviceSyncUITests` + `tools/device-sync-test.sh` (étapes lancées à la main, appareil par
+  appareil ; ignorées sur simulateur et dans la suite ordinaire ; rien n'est remis à zéro) :
+  - Réglages : « À jour, dernier échange il y a 12 s » des deux côtés ; « Vos appareils » liste iPhone 11, iPhone
+    XS Max et iPhone Duo (modèle + iOS).
+  - Partie en cours : reçue dès l'ouverture de l'app sur l'autre appareil (< 15 s après le coup), « Dernier coup joué
+    sur votre iPhone 11 / iPhone XS Max ».
+  - Bandeau sur l'échiquier ouvert : **2 s** après le coup joué sur l'autre iPhone.
+  - Partie TERMINÉE (CloudKit, le chemin du retour de Ron) : dans la bibliothèque de l'autre appareil en < 30 s ; la
+    reprise y disparaît aussitôt.
+  - **Défaut trouvé et corrigé** : « Rattraper » depuis une partie à deux déjà REPRISE laissait l'ancienne position
+    (même type d'écran à la même place de la pile : SwiftUI gardait l'hôte et son modèle de vue). `.id(sessionKey)`
+    sur les hôtes de reprise (Jouer et Deux joueurs) ; revérifié sur les deux iPhone (cavalier bien en c6).

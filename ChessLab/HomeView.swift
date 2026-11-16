@@ -1001,6 +1001,10 @@ struct HomeView: View {
                     } onOpenTwoPlayer: { fen in
                         path.append(Route.continueTwoPlayer(fen))
                     }
+                    // Une AUTRE sauvegarde à la même place de la pile (« Rattraper » une partie reprise) doit
+                    // donner un AUTRE écran : sans cette identité, SwiftUI gardait l'hôte et son modèle de
+                    // vue, et l'échiquier restait sur l'ancienne position (essai sur deux iPhone, 16/11/2026).
+                    .id(sessionKey(for: route))
 
                 case .twoPlayerSetup:
                     TwoPlayerSetupView(onResume: { autosave in
@@ -1051,6 +1055,8 @@ struct HomeView: View {
                     } onPlayVsEngine: { fen in
                         path.append(Route.continueVsStockfish(fen))
                     }
+                    // Voir `.resumedGame` : une autre sauvegarde, un autre écran.
+                    .id(sessionKey(for: route))
 
                 case .analysisEntry:
                     AnalysisEntryView { source in
