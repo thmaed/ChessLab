@@ -96,7 +96,13 @@ enum PuzzleLibrarySeeder {
         // `-reseedPuzzles` : revoir le bandeau et sa barre sur un appareil déjà préchargé. Une
         // seule fois par lancement (l'accueil rappelle cette fonction à chaque apparition).
         let reseeds = CommandLine.arguments.contains("-reseedPuzzles") && !didDebugReseed
-        if reseeds { didDebugReseed = true }
+        if reseeds {
+            didDebugReseed = true
+            // Le repère « déjà préchargée » tombe d'emblée : une simulation interrompue (app quittée en route)
+            // reprend alors d'elle-même au lancement NORMAL suivant, au lieu de laisser une bibliothèque
+            // incomplète qu'on croirait finie.
+            UserDefaults.standard.removeObject(forKey: seededKey)
+        }
         #else
         let reseeds = false
         #endif
