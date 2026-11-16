@@ -53904,74 +53904,6 @@
         }
       }
     },
-    "Fermez complètement ChessLab puis rouvrez-le pour activer la synchronisation.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quit ChessLab completely, then reopen it to turn syncing on."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fermez complètement ChessLab puis rouvrez-le pour activer la synchronisation."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cierra ChessLab por completo y vuelve a abrirlo para activar la sincronización."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Beende ChessLab vollständig und öffne es erneut, um die Synchronisierung zu aktivieren."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chiudi completamente ChessLab e riaprilo per attivare la sincronizzazione."
-          }
-        }
-      }
-    },
-    "Fermez complètement ChessLab puis rouvrez-le pour arrêter la synchronisation.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quit ChessLab completely, then reopen it to turn syncing off."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Fermez complètement ChessLab puis rouvrez-le pour arrêter la synchronisation."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Cierra ChessLab por completo y vuelve a abrirlo para detener la sincronización."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Beende ChessLab vollständig und öffne es erneut, um die Synchronisierung zu beenden."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Chiudi completamente ChessLab e riaprilo per fermare la sincronizzazione."
-          }
-        }
-      }
-    },
     "Dernier envoi vers iCloud : %@": {
       "localizations": {
         "en": {
@@ -54414,36 +54346,138 @@
         }
       }
     },
-    "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. Après avoir changé l'interrupteur, fermez complètement ChessLab puis rouvrez-le : c'est alors seulement que la synchronisation s'allume ou s'éteint.\n\nCE QUI SUIT\nVos parties terminées, votre partie EN COURS (contre l'ordinateur ou à deux : l'accueil de l'autre appareil la propose à la reprise), votre progression sur les ouvertures et les finales, vos répertoires personnels, vos programmes Woodpecker, vos collections de puzzles importées (les puzzles, pas votre progression dessus), et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens.\n\nÀ SAVOIR\niOS choisit le moment de l'échange : comptez de quelques secondes à quelques minutes. Les Réglages montrent le dernier envoi et la dernière réception, et « Synchroniser maintenant » relance ce qui peut l'être. Si vous avez commencé deux parties différentes sur deux appareils, la plus récemment jouée l'emporte.": {
+    "Les réglages et la partie en cours se synchronisent dès maintenant. Pour le reste (parties enregistrées, ouvertures, puzzles), fermez complètement ChessLab puis rouvrez-le.": {
       "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Turn it on in Settings so your games follow you across all your devices via your private iCloud — no account to create, no third-party server. Off by default: the app works fully offline. After changing the switch, quit ChessLab completely and reopen it: only then does syncing start or stop.\n\nWHAT FOLLOWS YOU\nYour finished games, your game IN PROGRESS (against the computer or two-player: the other device's home screen offers it to resume), your progress on openings and endgames, your personal repertoires, your Woodpecker programs, your imported puzzle collections (the puzzles, not your progress on them), and your preferences — board theme, piece set, notation, puzzle attempts, game settings.\n\nWHAT STAYS ON EACH DEVICE\nThe language and the sounds, so each device keeps its own.\n\nGOOD TO KNOW\niOS chooses when to exchange: allow anything from a few seconds to a few minutes. Settings shows the last send and the last receive, and “Sync now” triggers what can be triggered. If you started two different games on two devices, the one played most recently wins."
-          }
-        },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. Après avoir changé l'interrupteur, fermez complètement ChessLab puis rouvrez-le : c'est alors seulement que la synchronisation s'allume ou s'éteint.\n\nCE QUI SUIT\nVos parties terminées, votre partie EN COURS (contre l'ordinateur ou à deux : l'accueil de l'autre appareil la propose à la reprise), votre progression sur les ouvertures et les finales, vos répertoires personnels, vos programmes Woodpecker, vos collections de puzzles importées (les puzzles, pas votre progression dessus), et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens.\n\nÀ SAVOIR\niOS choisit le moment de l'échange : comptez de quelques secondes à quelques minutes. Les Réglages montrent le dernier envoi et la dernière réception, et « Synchroniser maintenant » relance ce qui peut l'être. Si vous avez commencé deux parties différentes sur deux appareils, la plus récemment jouée l'emporte."
+            "value": "Les réglages et la partie en cours se synchronisent dès maintenant. Pour le reste (parties enregistrées, ouvertures, puzzles), fermez complètement ChessLab puis rouvrez-le."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings and the game in progress sync right away. For everything else (saved games, openings, puzzles), quit ChessLab completely and reopen it."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Actívala en Ajustes para que tus partidas te sigan en todos tus dispositivos a través de tu iCloud privado: sin cuenta que crear, sin servidores de terceros. Desactivada por defecto: la app funciona totalmente sin conexión. Después de cambiar el interruptor, cierra ChessLab por completo y vuelve a abrirlo: solo entonces la sincronización se activa o se detiene.\n\nQUÉ SE SINCRONIZA\nTus partidas terminadas, tu partida EN CURSO (contra el ordenador o de dos jugadores: la pantalla de inicio del otro dispositivo te la ofrece para reanudarla), tu progreso en aperturas y finales, tus repertorios personales, tus programas Woodpecker, tus colecciones de puzles importadas (los puzles, no tu progreso en ellos) y tus preferencias: tema del tablero, juego de piezas, notación, intentos por puzle, ajustes de partida.\n\nQUÉ SE QUEDA EN CADA DISPOSITIVO\nEl idioma y los sonidos, para que cada dispositivo conserve los suyos.\n\nCONVIENE SABER\niOS elige el momento del intercambio: puede tardar desde unos segundos hasta unos minutos. Ajustes muestra el último envío y la última recepción, y «Sincronizar ahora» lanza lo que se puede lanzar. Si empezaste dos partidas distintas en dos dispositivos, gana la que se jugó más recientemente."
+            "value": "Los ajustes y la partida en curso se sincronizan ya. Para el resto (partidas guardadas, aperturas, puzles), cierra ChessLab por completo y vuelve a abrirlo."
           }
         },
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aktiviere die Synchronisierung in den Einstellungen, damit deine Partien dir über dein privates iCloud auf allen Geräten folgen – kein Konto nötig, keine Server von Drittanbietern. Standardmäßig deaktiviert: Die App funktioniert vollständig offline. Nachdem du den Schalter geändert hast, beende ChessLab vollständig und öffne es erneut: erst dann beginnt oder endet die Synchronisierung.\n\nWAS SYNCHRONISIERT WIRD\nDeine beendeten Partien, deine LAUFENDE Partie (gegen den Computer oder zu zweit: der Startbildschirm des anderen Geräts bietet sie zum Fortsetzen an), dein Fortschritt bei Eröffnungen und Endspielen, deine persönlichen Repertoires, deine Woodpecker-Programme, deine importierten Puzzle-Sammlungen (die Puzzles, nicht dein Fortschritt darin) und deine Einstellungen – Brettdesign, Figurensatz, Notation, Versuche pro Puzzle, Partieeinstellungen.\n\nWAS AUF JEDEM GERÄT BLEIBT\nSprache und Töne, damit jedes Gerät seine eigenen behält.\n\nGUT ZU WISSEN\niOS wählt den Zeitpunkt des Austauschs: rechne mit einigen Sekunden bis einigen Minuten. Die Einstellungen zeigen das letzte Senden und das letzte Empfangen, und „Jetzt synchronisieren“ stößt an, was sich anstoßen lässt. Hast du auf zwei Geräten zwei verschiedene Partien begonnen, gewinnt die zuletzt gespielte."
+            "value": "Einstellungen und die laufende Partie werden sofort synchronisiert. Für alles andere (gespeicherte Partien, Eröffnungen, Puzzles) beende ChessLab vollständig und öffne es erneut."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Attivala nelle Impostazioni perché le tue partite ti seguano su tutti i tuoi dispositivi tramite il tuo iCloud privato — nessun account da creare, nessun server di terzi. Disattivata per impostazione predefinita: l'app funziona interamente offline. Dopo aver cambiato l'interruttore, chiudi completamente ChessLab e riaprilo: solo allora la sincronizzazione si attiva o si ferma.\n\nCOSA VIENE SINCRONIZZATO\nLe tue partite terminate, la tua partita IN CORSO (contro il computer o in due: la schermata iniziale dell'altro dispositivo te la propone per riprenderla), i tuoi progressi su aperture e finali, i tuoi repertori personali, i tuoi programmi Woodpecker, le tue raccolte di puzzle importate (i puzzle, non i tuoi progressi su di essi) e le tue preferenze — tema della scacchiera, set di pezzi, notazione, tentativi per puzzle, impostazioni di partita.\n\nCOSA RESTA SU OGNI DISPOSITIVO\nLa lingua e i suoni, perché ogni dispositivo conservi i propri.\n\nDA SAPERE\niOS sceglie il momento dello scambio: calcola da alcuni secondi a qualche minuto. Le Impostazioni mostrano l'ultimo invio e l'ultima ricezione, e «Sincronizza ora» avvia ciò che si può avviare. Se hai iniziato due partite diverse su due dispositivi, vince quella giocata più di recente."
+            "value": "Le impostazioni e la partita in corso si sincronizzano subito. Per il resto (partite salvate, aperture, puzzle), chiudi completamente ChessLab e riaprilo."
+          }
+        }
+      }
+    },
+    "Les réglages et la partie en cours ne sont plus partagés. Pour arrêter aussi le reste, fermez complètement ChessLab puis rouvrez-le.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les réglages et la partie en cours ne sont plus partagés. Pour arrêter aussi le reste, fermez complètement ChessLab puis rouvrez-le."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings and the game in progress are no longer shared. To stop everything else too, quit ChessLab completely and reopen it."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Los ajustes y la partida en curso ya no se comparten. Para detener también el resto, cierra ChessLab por completo y vuelve a abrirlo."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen und die laufende Partie werden nicht mehr geteilt. Um auch den Rest zu beenden, beende ChessLab vollständig und öffne es erneut."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le impostazioni e la partita in corso non vengono più condivise. Per fermare anche il resto, chiudi completamente ChessLab e riaprilo."
+          }
+        }
+      }
+    },
+    "Réglages et partie en cours à jour. Le reste attend que vous fermiez et rouvriez ChessLab.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages et partie en cours à jour. Le reste attend que vous fermiez et rouvriez ChessLab."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings and game in progress are up to date. The rest waits until you quit and reopen ChessLab."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes y partida en curso al día. El resto espera a que cierres y vuelvas a abrir ChessLab."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Einstellungen und laufende Partie sind aktuell. Der Rest wartet, bis du ChessLab beendest und neu öffnest."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostazioni e partita in corso aggiornate. Il resto attende che tu chiuda e riapra ChessLab."
+          }
+        }
+      }
+    },
+    "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. Dès que vous changez l'interrupteur, vos réglages et votre partie en cours se synchronisent (ou s'arrêtent). Pour le reste — parties enregistrées, ouvertures, puzzles, programmes — fermez complètement ChessLab puis rouvrez-le : c'est alors seulement que cette partie-là s'allume ou s'éteint.\n\nCE QUI SUIT\nVos parties terminées, votre partie EN COURS (contre l'ordinateur ou à deux : l'accueil de l'autre appareil la propose à la reprise), votre progression sur les ouvertures et les finales, vos répertoires personnels, vos programmes Woodpecker, vos collections de puzzles importées (les puzzles, pas votre progression dessus), et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens.\n\nÀ SAVOIR\niOS choisit le moment de l'échange : comptez de quelques secondes à quelques minutes. Les Réglages montrent le dernier envoi et la dernière réception, et « Synchroniser maintenant » relance ce qui peut l'être. Si vous avez commencé deux parties différentes sur deux appareils, la plus récemment jouée l'emporte.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn it on in Settings so your games follow you across all your devices via your private iCloud — no account to create, no third-party server. Off by default: the app works fully offline. As soon as you flip the switch, your settings and the game in progress start (or stop) syncing. For the rest — saved games, openings, puzzles, programs — quit ChessLab completely and reopen it: only then does that part start or stop.\n\nWHAT FOLLOWS YOU\nYour finished games, your game IN PROGRESS (against the computer or two-player: the other device's home screen offers it to resume), your progress on openings and endgames, your personal repertoires, your Woodpecker programs, your imported puzzle collections (the puzzles, not your progress on them), and your preferences — board theme, piece set, notation, puzzle attempts, game settings.\n\nWHAT STAYS ON EACH DEVICE\nThe language and the sounds, so each device keeps its own.\n\nGOOD TO KNOW\niOS chooses when to exchange: allow anything from a few seconds to a few minutes. Settings shows the last send and the last receive, and “Sync now” triggers what can be triggered. If you started two different games on two devices, the one played most recently wins."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activez-la dans les Réglages pour que vos parties suivent tous vos appareils via votre iCloud privé — aucun compte à créer, aucun serveur tiers. Désactivée par défaut : l'app fonctionne entièrement hors ligne. Dès que vous changez l'interrupteur, vos réglages et votre partie en cours se synchronisent (ou s'arrêtent). Pour le reste — parties enregistrées, ouvertures, puzzles, programmes — fermez complètement ChessLab puis rouvrez-le : c'est alors seulement que cette partie-là s'allume ou s'éteint.\n\nCE QUI SUIT\nVos parties terminées, votre partie EN COURS (contre l'ordinateur ou à deux : l'accueil de l'autre appareil la propose à la reprise), votre progression sur les ouvertures et les finales, vos répertoires personnels, vos programmes Woodpecker, vos collections de puzzles importées (les puzzles, pas votre progression dessus), et vos préférences — thème de plateau, jeu de pièces, notation, essais par puzzle, réglages de partie.\n\nCE QUI RESTE SUR CHAQUE APPAREIL\nLa langue et les sons, pour que chaque appareil garde les siens.\n\nÀ SAVOIR\niOS choisit le moment de l'échange : comptez de quelques secondes à quelques minutes. Les Réglages montrent le dernier envoi et la dernière réception, et « Synchroniser maintenant » relance ce qui peut l'être. Si vous avez commencé deux parties différentes sur deux appareils, la plus récemment jouée l'emporte."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actívala en Ajustes para que tus partidas te sigan en todos tus dispositivos a través de tu iCloud privado: sin cuenta que crear, sin servidores de terceros. Desactivada por defecto: la app funciona totalmente sin conexión. En cuanto cambias el interruptor, tus ajustes y la partida en curso empiezan (o dejan) de sincronizarse. Para el resto —partidas guardadas, aperturas, puzles, programas— cierra ChessLab por completo y vuelve a abrirlo: solo entonces esa parte se activa o se detiene.\n\nQUÉ SE SINCRONIZA\nTus partidas terminadas, tu partida EN CURSO (contra el ordenador o de dos jugadores: la pantalla de inicio del otro dispositivo te la ofrece para reanudarla), tu progreso en aperturas y finales, tus repertorios personales, tus programas Woodpecker, tus colecciones de puzles importadas (los puzles, no tu progreso en ellos) y tus preferencias: tema del tablero, juego de piezas, notación, intentos por puzle, ajustes de partida.\n\nQUÉ SE QUEDA EN CADA DISPOSITIVO\nEl idioma y los sonidos, para que cada dispositivo conserve los suyos.\n\nCONVIENE SABER\niOS elige el momento del intercambio: puede tardar desde unos segundos hasta unos minutos. Ajustes muestra el último envío y la última recepción, y «Sincronizar ahora» lanza lo que se puede lanzar. Si empezaste dos partidas distintas en dos dispositivos, gana la que se jugó más recientemente."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktiviere die Synchronisierung in den Einstellungen, damit deine Partien dir über dein privates iCloud auf allen Geräten folgen – kein Konto nötig, keine Server von Drittanbietern. Standardmäßig deaktiviert: Die App funktioniert vollständig offline. Sobald du den Schalter änderst, beginnt (oder endet) die Synchronisierung deiner Einstellungen und der laufenden Partie. Für den Rest – gespeicherte Partien, Eröffnungen, Puzzles, Programme – beende ChessLab vollständig und öffne es erneut: erst dann beginnt oder endet dieser Teil.\n\nWAS SYNCHRONISIERT WIRD\nDeine beendeten Partien, deine LAUFENDE Partie (gegen den Computer oder zu zweit: der Startbildschirm des anderen Geräts bietet sie zum Fortsetzen an), dein Fortschritt bei Eröffnungen und Endspielen, deine persönlichen Repertoires, deine Woodpecker-Programme, deine importierten Puzzle-Sammlungen (die Puzzles, nicht dein Fortschritt darin) und deine Einstellungen – Brettdesign, Figurensatz, Notation, Versuche pro Puzzle, Partieeinstellungen.\n\nWAS AUF JEDEM GERÄT BLEIBT\nSprache und Töne, damit jedes Gerät seine eigenen behält.\n\nGUT ZU WISSEN\niOS wählt den Zeitpunkt des Austauschs: rechne mit einigen Sekunden bis einigen Minuten. Die Einstellungen zeigen das letzte Senden und das letzte Empfangen, und „Jetzt synchronisieren“ stößt an, was sich anstoßen lässt. Hast du auf zwei Geräten zwei verschiedene Partien begonnen, gewinnt die zuletzt gespielte."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attivala nelle Impostazioni perché le tue partite ti seguano su tutti i tuoi dispositivi tramite il tuo iCloud privato — nessun account da creare, nessun server di terzi. Disattivata per impostazione predefinita: l'app funziona interamente offline. Non appena cambi l'interruttore, le impostazioni e la partita in corso iniziano (o smettono) di sincronizzarsi. Per il resto — partite salvate, aperture, puzzle, programmi — chiudi completamente ChessLab e riaprilo: solo allora quella parte si attiva o si ferma.\n\nCOSA VIENE SINCRONIZZATO\nLe tue partite terminate, la tua partita IN CORSO (contro il computer o in due: la schermata iniziale dell'altro dispositivo te la propone per riprenderla), i tuoi progressi su aperture e finali, i tuoi repertori personali, i tuoi programmi Woodpecker, le tue raccolte di puzzle importate (i puzzle, non i tuoi progressi su di essi) e le tue preferenze — tema della scacchiera, set di pezzi, notazione, tentativi per puzzle, impostazioni di partita.\n\nCOSA RESTA SU OGNI DISPOSITIVO\nLa lingua e i suoni, perché ogni dispositivo conservi i propri.\n\nDA SAPERE\niOS sceglie il momento dello scambio: calcola da alcuni secondi a qualche minuto. Le Impostazioni mostrano l'ultimo invio e l'ultima ricezione, e «Sincronizza ora» avvia ciò che si può avviare. Se hai iniziato due partite diverse su due dispositivi, vince quella giocata più di recente."
           }
         }
       }

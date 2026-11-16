@@ -11200,3 +11200,15 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   fin de partie, nouvelle partie après pierre tombale), `CloudSyncMonitorTests`.
 - **Android : rien à porter** — iCloud est hors périmètre (décision du 12/09, voir `android/PARITE.md`).
 - **À valider sur DEUX vrais appareils** (la fusion est prouvée, pas la latence du nuage) : iPhone3 + iPhone XS/11.
+- **Même jour, suite — le magasin clé-valeur suit l'interrupteur À CHAUD** (`Persistence/KeyValueSyncSwitch.swift`) : réglages
+  et parties en cours ne dépendent pas du `ModelContainer`, leur écoute n'était posée qu'au lancement ; elle est maintenant
+  posée ET retirée à chaque bascule (`AutosaveCloud.stop()`, `SettingsCloudSync.stop()`), et par « Synchroniser maintenant ».
+  Éteint = plus rien n'est écrit ni lu, tout de suite (avant : les observateurs vivaient jusqu'au relancement). Seul le
+  conteneur SwiftData (parties enregistrées, ouvertures, puzzles, Woodpecker) attend encore un relancement : le bandeau le
+  dit précisément, et le bouton répond `.restartNeeded` au lieu de patienter 20 s pour conclure « rien de nouveau » à tort.
+  Le bouton reste visible pendant l'attente du relancement (il servait de rien de le cacher : il rafraîchit la partie en cours).
+  4 libellés ajoutés/remplacés (5 langues), bloc d'aide corrigé. **Android : rien à porter** (iCloud hors périmètre).
+- **Étudié, NON fait : changer de `ModelContainer` à chaud.** 21 vues lisent `@Environment(\.modelContext)`, `UserOpeningStore`
+  garde un contexte, imports et amorçage de puzzles tiennent le conteneur dans des tâches détachées ; remplacer le conteneur
+  imposerait de reconstruire toute la racine (retour à l'accueil) avec le risque de deux conteneurs sur le même fichier.
+  Le gain (un relancement épargné) ne vaut pas le risque pour les données.

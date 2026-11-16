@@ -36,6 +36,9 @@ final class CloudSyncMonitor {
         case exchanged
         /// Aucun échange pendant l'attente : rien à envoyer ni à recevoir, ou iCloud choisira le moment.
         case nothingSeen
+        /// Les réglages et les parties en cours sont à jour, mais le conteneur SwiftData de CE lancement
+        /// n'est pas celui que l'interrupteur demande : le reste attend la fermeture et la réouverture.
+        case restartNeeded
         case failed(String)
     }
 
@@ -125,6 +128,8 @@ final class CloudSyncMonitor {
         defer { isManualSyncRunning = false }
 
         let started = Date()
+        // 0. Le magasin clé-valeur suit l'interrupteur en direct : on s'assure que l'écoute est posée.
+        KeyValueSyncSwitch.apply()
         // 1. Les données SwiftData : fusionner ce qui est arrivé, enregistrer ce qui attend (l'envoi
         //    suit l'enregistrement).
         PuzzleProgressSync.reconcile(in: context)
@@ -137,7 +142,13 @@ final class CloudSyncMonitor {
         SyncedAutosave.play.publishLocalIfCloudIsEmpty()
         SyncedAutosave.twoPlayer.publishLocalIfCloudIsEmpty()
         NotificationCenter.default.post(name: AutosaveCloud.didChangeRemotely, object: nil)
-        // 3. Regarder si CloudKit a bougé.
+        // 3. Si le conteneur SwiftData n'est pas celui de l'interrupteur, aucun échange CloudKit n'est à
+        //    attendre : le dire, plutôt que patienter 20 s pour conclure « rien de nouveau » à tort.
+        if CloudSyncSettingsStore.isEnabled != CloudSyncSettingsStore.activeAtLaunch {
+            manualResult = .restartNeeded
+            return
+        }
+        // 4. Regarder si CloudKit a bougé.
         manualResult = await watchForExchange(since: started, patience: patience)
     }
 

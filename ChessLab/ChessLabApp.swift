@@ -82,19 +82,12 @@ struct ChessLabApp: App {
 
                     UserOpeningStore.shared.attach(context: modelContainer.mainContext)
 
-                    // Réglages : le même interrupteur iCloud commande les
-                    // données et les préférences. La langue et les sons
+                    // Réglages et parties en cours : le même interrupteur iCloud
+                    // que les données (magasin clé-valeur, branché ET débranché à
+                    // chaud — voir KeyValueSyncSwitch). La langue et les sons
                     // restent propres à l'appareil (voir SettingsCloudSync).
-
-                    SettingsCloudSync.shared.start {
-
-                        AppSettings.shared.reloadSyncedValuesFromDefaults()
-
-                    }
-
-                    // Les parties en cours suivent le même interrupteur (magasin clé-valeur), et le
-                    // moniteur écoute les VRAIS échanges CloudKit pour les Réglages.
-                    AutosaveCloud.start()
+                    KeyValueSyncSwitch.apply()
+                    // Le moniteur écoute les VRAIS échanges CloudKit pour les Réglages.
                     CloudSyncMonitor.shared.start()
 
                 }

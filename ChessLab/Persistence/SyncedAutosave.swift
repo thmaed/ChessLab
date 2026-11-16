@@ -171,7 +171,14 @@ enum AutosaveCloud {
 
     nonisolated(unsafe) private static var observer: NSObjectProtocol?
 
-    /// Au lancement, si la synchro est allumée : confie au nuage les parties qu'il ne connaît pas, puis
+    /// Débranche l'écoute (synchro éteinte en cours de session). Idempotent.
+    @MainActor
+    static func stop() {
+        if let observer { NotificationCenter.default.removeObserver(observer) }
+        observer = nil
+    }
+
+    /// Quand la synchro est allumée (au lancement, ou à la bascule de l'interrupteur) : confie au nuage les parties qu'il ne connaît pas, puis
     /// écoute les changements des autres appareils. Idempotent.
     @MainActor
     static func start() {

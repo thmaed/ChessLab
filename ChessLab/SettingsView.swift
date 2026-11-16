@@ -225,8 +225,9 @@ struct SettingsView: View {
     ///
     /// Bascule la clé `cloudKitSyncEnabled` que ``ChessLabApp`` lit au
     /// lancement : le `ModelContainer` ne peut pas changer de base à chaud.
-    /// Tant que l'interrupteur et le conteneur de CE lancement ne s'accordent
-    /// pas, un bandeau dit de fermer et rouvrir l'app — une mention en petit
+    /// Les réglages et les parties en cours (magasin clé-valeur) suivent l'interrupteur À CHAUD
+    /// (``KeyValueSyncSwitch``). Tant que l'interrupteur et le conteneur de CE lancement ne s'accordent
+    /// pas, un bandeau dit de fermer et rouvrir l'app pour le reste — une mention en petit
     /// n'avait pas suffi (retour d'un utilisateur, 16/11/2026). Utilise
     /// l'iCloud PRIVÉ de l'utilisateur (aucun serveur ChessLab, aucun compte à
     /// créer) ; l'app reste entièrement fonctionnelle hors ligne.
@@ -247,9 +248,8 @@ struct SettingsView: View {
                     .foregroundStyle(Theme.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
 
-                if needsRestart {
-                    restartBanner
-                } else if cloudSyncEnabled {
+                if needsRestart { restartBanner }
+                if cloudSyncEnabled {
                     Divider().overlay(Theme.stroke)
                     syncStatusRow
                     if let failure = monitor.failure { failureRow(failure) }
@@ -261,6 +261,9 @@ struct SettingsView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .cardStyle()
         }
+        // Les réglages et les parties en cours suivent l'interrupteur tout de suite ; seul le conteneur
+        // SwiftData attend le prochain lancement.
+        .onChange(of: cloudSyncEnabled) { _, _ in KeyValueSyncSwitch.apply() }
         .task {
             iCloudStatus = try? await CKContainer(identifier: "iCloud.com.chesslab.ChessLab").accountStatus()
         }
@@ -273,9 +276,9 @@ struct SettingsView: View {
             Image(systemName: "arrow.clockwise.circle.fill").foregroundStyle(Theme.warning)
             Group {
                 if cloudSyncEnabled {
-                    Text("Fermez complètement ChessLab puis rouvrez-le pour activer la synchronisation.")
+                    Text("Les réglages et la partie en cours se synchronisent dès maintenant. Pour le reste (parties enregistrées, ouvertures, puzzles), fermez complètement ChessLab puis rouvrez-le.")
                 } else {
-                    Text("Fermez complètement ChessLab puis rouvrez-le pour arrêter la synchronisation.")
+                    Text("Les réglages et la partie en cours ne sont plus partagés. Pour arrêter aussi le reste, fermez complètement ChessLab puis rouvrez-le.")
                 }
             }
             .font(.caption.weight(.semibold))
@@ -349,6 +352,10 @@ struct SettingsView: View {
         case .nothingSeen:
             Text("Rien de nouveau : tout est à jour, ou iCloud choisira lui-même le moment.")
                 .font(.caption2).foregroundStyle(Theme.textTertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        case .restartNeeded:
+            Text("Réglages et partie en cours à jour. Le reste attend que vous fermiez et rouvriez ChessLab.")
+                .font(.caption2).foregroundStyle(Theme.warning)
                 .fixedSize(horizontal: false, vertical: true)
         case let .failed(message):
             Text(verbatim: message).font(.caption2).foregroundStyle(Theme.warning)
