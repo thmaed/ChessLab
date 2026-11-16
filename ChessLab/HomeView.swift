@@ -1404,11 +1404,12 @@ struct HomeView: View {
         case let (.some(a), .some(b)):
             resumableGame = a.savedAt > b.savedAt ? a : b
         }
-        resumableOrigin = switch resumableGame {
+        let origin: String? = switch resumableGame {
         case .vsEngine: SyncedAutosave.play.origin()
         case .twoPlayer: SyncedAutosave.twoPlayer.origin()
         case nil: nil
         }
+        resumableOrigin = origin.map { DeviceModelName.display($0) }
     }
 
     private func refreshSyncInvitation() {

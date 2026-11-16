@@ -55513,6 +55513,74 @@
           }
         }
       }
+    },
+    "Une partie est en cours sur votre %@": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf deinem %@ läuft eine Partie"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A game is in progress on your %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hay una partida en curso en tu %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une partie est en cours sur votre %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una partita è in corso sul tuo %@"
+          }
+        }
+      }
+    },
+    "Commencer une nouvelle partie l'effacera sur tous vos appareils (%lld coup(s) joué(s)).": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine neue Partie zu beginnen löscht sie auf allen deinen Geräten (%lld Zug/Züge gespielt)."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starting a new game will erase it on all your devices (%lld move(s) played)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Empezar una nueva partida la borrará en todos tus dispositivos (%lld jugada(s) realizada(s))."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Commencer une nouvelle partie l'effacera sur tous vos appareils (%lld coup(s) joué(s))."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniziare una nuova partita la cancellerà su tutti i tuoi dispositivi (%lld mosse giocate)."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

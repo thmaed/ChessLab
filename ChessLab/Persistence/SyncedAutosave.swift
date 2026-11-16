@@ -16,6 +16,8 @@ struct AutosaveEnvelope: Codable, Equatable {
     /// votre iPad ». Optionnels : les enveloppes des premières versions n'en ont pas.
     var deviceID: String? = nil
     var device: String? = nil
+    /// Son identifiant matériel (« iPhone12,1 »), pour dire « votre iPhone 11 » plutôt que « votre iPhone ».
+    var model: String? = nil
 }
 
 /// La règle de fusion, isolée et pure pour être éprouvée sans appareil : **la dernière écriture gagne**.
@@ -78,8 +80,9 @@ struct SyncedAutosave<Record: Codable> {
 
     private var originKey: String { key + ".origin" }
 
-    /// L'appareil (« iPad », « Mac »…) où a été joué le dernier coup de la partie proposée, s'il ne s'agit
-    /// pas de celui-ci. Effacé dès qu'on joue ici.
+    /// L'appareil où a été joué le dernier coup de la partie proposée, s'il ne s'agit pas de celui-ci :
+    /// son identifiant matériel (« iPhone12,1 ») ou, d'une version qui ne le donnait pas, son type
+    /// (« iPad »). À montrer par ``DeviceModelName/display(_:language:)``. Effacé dès qu'on joue ici.
     func origin() -> String? {
         originDefaults?.string(forKey: originKey)
     }
@@ -102,7 +105,8 @@ struct SyncedAutosave<Record: Codable> {
         try? FileManager.default.removeItem(at: fileURL())
         setOrigin(nil)
         guard isEnabled() else { return }
-        write(AutosaveEnvelope(at: Date(), game: nil, deviceID: identity?.id, device: identity?.kind))
+        write(AutosaveEnvelope(at: Date(), game: nil, deviceID: identity?.id, device: identity?.kind,
+                               model: identity?.model))
     }
 
     // MARK: Lecture
@@ -131,7 +135,7 @@ struct SyncedAutosave<Record: Codable> {
             guard let record = try? JSONDecoder().decode(Record.self, from: data) else { return local }
             try? data.write(to: fileURL(), options: .atomic)
             let fromElsewhere = remote?.deviceID != nil && remote?.deviceID != identity?.id
-            setOrigin(fromElsewhere ? remote?.device : nil)
+            setOrigin(fromElsewhere ? (remote?.model ?? remote?.device) : nil)
             return record
         }
     }
@@ -154,7 +158,8 @@ struct SyncedAutosave<Record: Codable> {
 
     private func publish(_ data: Data, at date: Date) {
         guard isEnabled() else { return }
-        write(AutosaveEnvelope(at: date, game: data, deviceID: identity?.id, device: identity?.kind))
+        write(AutosaveEnvelope(at: date, game: data, deviceID: identity?.id, device: identity?.kind,
+                               model: identity?.model))
     }
 
     private func write(_ envelope: AutosaveEnvelope) {

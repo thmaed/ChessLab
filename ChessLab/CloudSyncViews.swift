@@ -216,7 +216,7 @@ struct CloudDevicesList: View {
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 1) {
                 HStack(spacing: 6) {
-                    Text(verbatim: device.kind)
+                    Text(verbatim: device.displayName)
                         .font(.subheadline.weight(.medium))
                         .foregroundStyle(Theme.textPrimary)
                     if isOwn {
@@ -232,12 +232,20 @@ struct CloudDevicesList: View {
                         .font(.caption)
                         .foregroundStyle(Theme.textSecondary)
                 }
+                // Le système (« iOS 18.6 ») devant la version de ChessLab : les deux qu'on demande en premier
+                // quand un appareil ne suit pas.
                 if outdated {
+                    if let system = device.system {
+                        Text(verbatim: system)
+                            .font(.caption2)
+                            .foregroundStyle(Theme.textTertiary)
+                    }
                     Text("ChessLab \(device.appVersion) — à mettre à jour")
                         .font(.caption2)
                         .foregroundStyle(Theme.warning)
                 } else {
-                    Text(verbatim: "ChessLab \(device.appVersion)")
+                    Text(verbatim: [device.system, "ChessLab \(device.appVersion)"]
+                        .compactMap { $0 }.joined(separator: " · "))
                         .font(.caption2)
                         .foregroundStyle(Theme.textTertiary)
                 }
@@ -261,7 +269,7 @@ struct CloudSyncInvitationCard: View {
             HStack(alignment: .top, spacing: 14) {
                 IconBadge(systemImage: "icloud", tint: Theme.info, size: 34)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Votre \(device.kind) synchronise déjà ChessLab")
+                    Text("Votre \(device.displayName) synchronise déjà ChessLab")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Theme.textPrimary)
                     Text("Activez iCloud ici aussi pour retrouver vos parties et votre progression.")

@@ -23,6 +23,17 @@ struct CloudDeviceRecord: Codable, Equatable, Identifiable {
     var kind: String
     var appVersion: String
     var lastSeen: Date
+    /// L'identifiant matériel (« iPhone12,1 »), traduit à l'affichage par ``DeviceModelName``. Optionnel :
+    /// les fiches des versions antérieures n'en ont pas, et un Mac n'en donne pas.
+    var model: String? = nil
+    /// Le système et sa version (« iOS 18.6 »), utile pour l'entraide. Optionnel, même raison.
+    var system: String? = nil
+
+    /// Le nom à montrer : « iPhone 11 », « iPad Pro 13″ (M4) »… ou, à défaut (fiche ancienne, modèle trop
+    /// récent pour la table), le type.
+    var displayName: String {
+        model.flatMap { DeviceModelName.name(for: $0) } ?? kind
+    }
 
     /// Le symbole SF qui le représente.
     var symbol: String {
@@ -43,25 +54,50 @@ struct CloudDeviceRecord: Codable, Equatable, Identifiable {
 struct CloudDeviceIdentity: Equatable {
     let id: String
     let kind: String
+    /// Voir ``CloudDeviceRecord/model``.
+    var model: String? = nil
+    /// Voir ``CloudDeviceRecord/system``.
+    var system: String? = nil
 
     /// L'identité réelle. L'UUID vit dans le trousseau, réservé à cet appareil
     /// (`…ThisDeviceOnly`) : il survit à une réinstallation (pas de fiche en double pour le même iPhone),
     /// et ne suit pas une sauvegarde restaurée sur un AUTRE appareil.
-    static let current = CloudDeviceIdentity(id: KeychainDeviceID.value(), kind: currentKind())
+    static let current = CloudDeviceIdentity(
+        id: KeychainDeviceID.value(), kind: currentKind(),
+        model: currentModelIdentifier(), system: currentSystem())
 
     /// iPhone, iPad ou Mac — lu sans `UIDevice` (isolé au fil principal), par le modèle matériel.
     static func currentKind() -> String {
         let info = ProcessInfo.processInfo
         if info.isMacCatalystApp || info.isiOSAppOnMac { return "Mac" }
-        var model = info.environment["SIMULATOR_MODEL_IDENTIFIER"] ?? ""
-        if model.isEmpty {
-            var system = utsname()
-            uname(&system)
-            model = withUnsafeBytes(of: system.machine) { raw in
-                String(decoding: raw.prefix { $0 != 0 }, as: UTF8.self)
-            }
+        return (currentModelIdentifier() ?? "").hasPrefix("iPad") ? "iPad" : "iPhone"
+    }
+
+    /// « iPhone12,1 », « iPad16,6 »… (au simulateur : celui de l'appareil simulé). `nil` sur Mac, où
+    /// l'identifiant ne désigne pas un modèle que la table connaisse.
+    static func currentModelIdentifier() -> String? {
+        let info = ProcessInfo.processInfo
+        if info.isMacCatalystApp || info.isiOSAppOnMac { return nil }
+        if let simulated = info.environment["SIMULATOR_MODEL_IDENTIFIER"], !simulated.isEmpty { return simulated }
+        var system = utsname()
+        uname(&system)
+        let machine = withUnsafeBytes(of: system.machine) { raw in
+            String(decoding: raw.prefix { $0 != 0 }, as: UTF8.self)
         }
-        return model.hasPrefix("iPad") ? "iPad" : "iPhone"
+        return machine.isEmpty ? nil : machine
+    }
+
+    /// « iOS 18.6 », « iPadOS 26.1 », « macOS 26.1 ». `nil` pour une app iPad sur Mac, qui ne voit qu'une
+    /// version d'iOS d'emprunt, trompeuse.
+    static func currentSystem() -> String? {
+        let info = ProcessInfo.processInfo
+        if info.isiOSAppOnMac { return nil }
+        let version = info.operatingSystemVersion
+        let number = version.patchVersion > 0
+            ? "\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)"
+            : "\(version.majorVersion).\(version.minorVersion)"
+        let name = info.isMacCatalystApp ? "macOS" : (currentKind() == "iPad" ? "iPadOS" : "iOS")
+        return "\(name) \(number)"
     }
 }
 
@@ -138,11 +174,15 @@ struct CloudDeviceRegistry {
     @discardableResult
     func checkIn(now: Date = Date(), force: Bool = false) -> Bool {
         guard isEnabled() else { return false }
+        // Une fiche à jour (même version de ChessLab, même modèle, même système) n'est réécrite qu'au-delà
+        // de l'intervalle ; une mise à jour d'iOS ou de l'app se voit tout de suite.
         if !force, let mine = record(forKey: ownKey), mine.appVersion == appVersion, mine.kind == identity.kind,
+           mine.model == identity.model, mine.system == identity.system,
            now.timeIntervalSince(mine.lastSeen) < Self.checkInInterval {
             return false
         }
-        let record = CloudDeviceRecord(id: identity.id, kind: identity.kind, appVersion: appVersion, lastSeen: now)
+        let record = CloudDeviceRecord(id: identity.id, kind: identity.kind, appVersion: appVersion, lastSeen: now,
+                                       model: identity.model, system: identity.system)
         guard let data = try? JSONEncoder().encode(record) else { return false }
         store.set(data, forKey: ownKey)
         store.synchronize()
@@ -235,7 +275,8 @@ enum DebugSyncDevice {
         let key = CloudDeviceRegistry.keyPrefix + id
         if arguments.contains("-fakeSyncDevice") {
             let record = CloudDeviceRecord(id: id, kind: "iPad", appVersion: "2.3",
-                                           lastSeen: Date(timeIntervalSinceNow: -240))
+                                           lastSeen: Date(timeIntervalSinceNow: -240),
+                                           model: "iPad16,6", system: "iPadOS 26.1")
             store.set(try? JSONEncoder().encode(record), forKey: key)
         } else if store.object(forKey: key) != nil {
             store.removeObject(forKey: key)

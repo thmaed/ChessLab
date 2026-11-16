@@ -40,6 +40,13 @@ final class LocalizationController {
         String(format: string(frenchKey), arguments: arguments)
     }
 
+    /// Le code de la langue ACTIVE de l'app (« fr », « en »…), pour le peu qui se compose hors du
+    /// catalogue (le nom des appareils, ``DeviceModelName``).
+    static var activeLanguageCode: String {
+        if let bundle = overrideBundle { return bundle.bundleURL.deletingPathExtension().lastPathComponent }
+        return Bundle.main.preferredLocalizations.first ?? "fr"
+    }
+
     /// Un nombre qui s'accorde au SINGULIER : 1 partout, et 0 en français
     /// (« 0 puzzle ajouté »), comme les catégories de pluriel qu'Android applique
     /// de lui-même — mêmes mots des deux côtés.

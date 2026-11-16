@@ -66,7 +66,8 @@ final class CloudSyncUITests: XCTestCase {
         let app = launch(["-fakeSyncDevice"])
         let card = app.otherElements["syncInvitationCard"]
         XCTAssertTrue(card.waitForExistence(timeout: 15), "la proposition doit apparaître à l'accueil")
-        XCTAssertTrue(app.staticTexts["Votre iPad synchronise déjà ChessLab"].exists)
+        // L'iPad fictif porte un modèle (iPad16,6) : on le nomme, pas seulement « iPad ».
+        XCTAssertTrue(app.staticTexts["Votre iPad Pro 13″ (M4) synchronise déjà ChessLab"].exists)
         snapshot(app, "accueil-proposition")
 
         app.buttons["syncInvitationAccept"].tap()
@@ -79,12 +80,54 @@ final class CloudSyncUITests: XCTestCase {
         XCTAssertFalse(card.exists)
         snapshot(app, "accueil-rappel")
 
-        // Les Réglages listent l'iPad fictif, avec sa version plus ancienne signalée.
+        // Les Réglages listent l'iPad fictif — son modèle, son système — avec sa version plus ancienne
+        // signalée.
         openSettings(app)
-        let pad = app.staticTexts["iPad"]
+        let pad = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "iPad Pro 13″ (M4)")).firstMatch
         XCTAssertTrue(pad.waitForExistence(timeout: 10))
         scrollTo(pad, in: app)
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "iPadOS 26.1")).firstMatch.exists,
+                      "la version du système de l'iPad doit être affichée")
         snapshot(app, "reglages-appareils")
+    }
+
+    /// Synchro allumée, la partie en cours est la MÊME sur tous les appareils : l'avertissement de
+    /// « Commencer » le dit (essai sur trois iPhone, 16/11/2026 : une partie lancée sur l'un a remplacé celle
+    /// d'un autre, et l'avertissement ne parlait que de « la partie en cours »).
+    func testNewGameWarning_mentionsAllDevices_whenSyncIsOn() throws {
+        let app = launch()
+        openSettings(app)
+        let toggle = app.switches["syncToggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10))
+        scrollTo(toggle, in: app)
+        toggle.switches.firstMatch.tap()
+        XCTAssertTrue(app.staticTexts["Cet appareil"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+
+        app.buttons["Contre l'ordinateur"].tap()
+        XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
+        app.buttons["Commencer"].tap()
+        XCTAssertTrue(app.otherElements["square_e2"].waitForExistence(timeout: 20))
+        app.otherElements["square_e2"].tap()
+        app.otherElements["square_e4"].tap()
+        let moveCount = app.otherElements["moveCount"]
+        let deadline = Date().addingTimeInterval(15)
+        while Date() < deadline, moveCount.value as? String != "2" {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+        }
+        XCTAssertEqual(moveCount.value as? String, "2")
+
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.buttons["resumeGame"].waitForExistence(timeout: 5))
+        app.buttons["Contre l'ordinateur"].tap()
+        XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
+        app.buttons["Commencer"].tap()
+        let alert = app.alerts["Une partie est en cours"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        XCTAssertTrue(alert.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "sur tous vos appareils"))
+            .firstMatch.exists, "l'avertissement doit dire que la partie disparaîtra de tous les appareils")
+        snapshot(app, "nouvelle-partie-avertissement")
+        alert.buttons["Annuler"].tap()
     }
 
     /// « Pas maintenant » : la proposition disparaît et ne revient pas au lancement suivant.

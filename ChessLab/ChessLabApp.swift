@@ -41,6 +41,10 @@ struct ChessLabApp: App {
             }
             AutosaveStore.clearPlay()
             AutosaveStore.clearTwoPlayer()
+            // …et leur copie dans le magasin clé-valeur (synchro déjà remise à zéro, donc `clear` n'y touche
+            // pas) : un test qui allume la synchro ne doit pas hériter de la partie d'un test précédent.
+            NSUbiquitousKeyValueStore.default.removeObject(forKey: SyncedAutosave.play.key)
+            NSUbiquitousKeyValueStore.default.removeObject(forKey: SyncedAutosave.twoPlayer.key)
             // Repartir sur la langue du SYSTÈME : sans ça, un choix de langue
             // laissé par un test précédent (le simulateur ne se réinitialise
             // pas entre les runs) rendrait les libellés imprévisibles.

@@ -29,11 +29,11 @@ struct SyncedAutosaveTests {
         let defaults: UserDefaults
         private let suite = UUID().uuidString
         let autosave: () -> SyncedAutosave<FakeGame>
-        init(store: KeyValueStoring, kind: String = "iPhone") {
+        init(store: KeyValueStoring, kind: String = "iPhone", model: String? = nil) {
             var holder: Device?
             let defaults = UserDefaults(suiteName: suite)!
             self.defaults = defaults
-            let identity = CloudDeviceIdentity(id: UUID().uuidString, kind: kind)
+            let identity = CloudDeviceIdentity(id: UUID().uuidString, kind: kind, model: model)
             autosave = {
                 SyncedAutosave(key: "test.autosave", fileURL: { holder!.url }, savedAt: \.savedAt,
                                store: store, isEnabled: { holder!.enabled },
@@ -231,6 +231,18 @@ struct SyncedAutosaveTests {
         // Et c'est l'iPad qui la voit venir de l'iPhone.
         _ = pad.autosave().load()
         #expect(pad.autosave().origin() == "iPhone")
+    }
+
+    /// Deux iPhone : « votre iPhone » ne disait rien (essai sur trois iPhone, 16/11/2026). Le modèle voyage
+    /// avec la partie, et l'accueil le nomme.
+    @Test func twoIPhones_theOriginNamesTheModel() {
+        let store = FakeStore()
+        let eleven = Device(store: store, kind: "iPhone", model: "iPhone12,1")
+        let duo = Device(store: store, kind: "iPhone", model: "iPhone19,4")
+        eleven.autosave().save(game(["e2e4"], at(20)))
+        _ = duo.autosave().load()
+        #expect(duo.autosave().origin() == "iPhone12,1")
+        #expect(duo.autosave().origin().map { DeviceModelName.display($0, language: "fr") } == "iPhone 11")
     }
 
     @Test func ownGame_hasNoOrigin() {

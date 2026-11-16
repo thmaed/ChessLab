@@ -11248,3 +11248,25 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   - **Envoi avant suspension** : passage en arrière-plan → enregistrement du contexte s'il a des changements (l'envoi
     CloudKit suit l'enregistrement).
   - **Android : rien à porter** (iCloud hors périmètre).
+- **Même jour, essai sur trois vrais iPhone** (build Debug installé par `devicectl`, signé par la clé d'API, donc
+  environnement CloudKit de développement) : la synchro fonctionne entre deux appareils (le troisième avait un souci
+  de compte iCloud, sans lien avec ChessLab). Deux défauts relevés, corrigés :
+  - **« votre iPhone » ne disait rien entre deux iPhone.** La fiche d'appareil et l'enveloppe de la partie en cours
+    portent désormais l'identifiant matériel (`iPhone12,1`) et le système (« iOS 18.6 ») — champs optionnels, les
+    fiches et enveloppes précédentes se lisent toujours. `Persistence/DeviceModelName.swift` les traduit en nom
+    commercial (« iPhone 11 », « iPad Pro 12,9″ (5ᵉ génération) », « iPad Pro 13″ (M4) ») ; table relevée dans les
+    profils d'appareils de Xcode 27.1 + variantes Wi-Fi/cellulaire des iPad, pour tout ce qu'iOS 18 fait tourner ;
+    modèle inconnu → « iPhone »/« iPad ». Taille et génération composées dans la langue ACTIVE
+    (`LocalizationController.activeLanguageCode`). « Vos appareils » montre le modèle, puis « iOS 18.6 · ChessLab 2.3 » ;
+    une mise à jour d'iOS réécrit la fiche aussitôt.
+  - **Une partie lancée sur un iPhone a remplacé celle d'un autre, sans que l'avertissement le dise.** Synchro
+    allumée, l'alerte de « Commencer » dit « l'effacera sur tous vos appareils », et son titre nomme l'appareil
+    d'origine (« Une partie est en cours sur votre iPhone 11 ») ; la carte « Reprendre » de l'écran Nouvelle partie
+    aussi. (Le mode Deux joueurs n'a pas de garde-fou du tout, même sur un appareil — à décider, iOS ET Android.)
+  - `-resetPlaySettings` efface aussi la copie iCloud des parties en cours (hygiène des tests).
+  - Tests : `DeviceModelNameTests` (nouveau), modèle/système dans `CloudDeviceRegistryTests`, origine nommée dans
+    `SyncedAutosaveTests` (55 unitaires ciblés verts) ; `CloudSyncUITests` 4 (dont l'avertissement) +
+    `ResumeGameUITests` verts.
+  - **Android : rien à porter** — les deux textes et le nom d'appareil n'existent qu'avec la synchro iCloud (hors
+    périmètre) ; sans synchro, l'avertissement est inchangé des deux côtés.
+  - Politique de confidentialité, à la sortie : la fiche d'appareil contient aussi le modèle et la version du système.

@@ -252,7 +252,7 @@ struct SettingsView: View {
 
                 if !cloudSyncEnabled, let other = syncDevices.first(where: { $0.id != registry.identity.id }) {
                     // Synchro éteinte ici, allumée ailleurs : le dire, c'est la moitié de l'explication.
-                    Text("Votre \(other.kind) synchronise déjà ChessLab. Activez l'interrupteur pour le rejoindre.")
+                    Text("Votre \(other.displayName) synchronise déjà ChessLab. Activez l'interrupteur pour le rejoindre.")
                         .font(.caption)
                         .foregroundStyle(Theme.info)
                         .fixedSize(horizontal: false, vertical: true)

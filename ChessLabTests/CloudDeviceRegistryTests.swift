@@ -92,6 +92,39 @@ struct CloudDeviceRegistryTests {
         #expect(CloudDeviceRecord(id: "B", kind: "iPad", appVersion: "2.10", lastSeen: now).isOlder(than: "2.9") == false)
     }
 
+    // MARK: Modèle et système
+
+    @Test func checkIn_publishesModelAndSystem_andRewritesWhenTheSystemChanges() {
+        let store = FakeStore()
+        let on = Switch(true)
+        func eleven(_ system: String) -> CloudDeviceRegistry {
+            CloudDeviceRegistry(store: store,
+                                identity: CloudDeviceIdentity(id: "A", kind: "iPhone", model: "iPhone12,1", system: system),
+                                appVersion: "2.4", isEnabled: { on.on })
+        }
+        #expect(eleven("iOS 18.5").checkIn(now: now))
+        let mine = eleven("iOS 18.5").devices(now: now).first
+        #expect(mine?.model == "iPhone12,1")
+        #expect(mine?.system == "iOS 18.5")
+        #expect(mine?.displayName == "iPhone 11")
+        // Même système, une minute plus tard : rien à écrire. Une mise à jour d'iOS : tout de suite.
+        #expect(!eleven("iOS 18.5").checkIn(now: now.addingTimeInterval(60)))
+        #expect(eleven("iOS 18.6").checkIn(now: now.addingTimeInterval(60)))
+        #expect(eleven("iOS 18.6").devices(now: now).first?.system == "iOS 18.6")
+    }
+
+    /// Les fiches déposées par la version précédente (sans modèle ni système) se lisent encore, et se nomment
+    /// par leur type.
+    @Test func recordsFromEarlierVersions_decode_andFallBackToTheKind() throws {
+        let store = FakeStore()
+        store.values[CloudDeviceRegistry.keyPrefix + "OLD"] = Data(
+            #"{"id":"OLD","kind":"iPad","appVersion":"2.3","lastSeen":\#(now.timeIntervalSinceReferenceDate)}"#.utf8)
+        let old = try #require(registry(store, id: "A", enabled: Switch(true)).otherDevices(now: now).first)
+        #expect(old.model == nil)
+        #expect(old.system == nil)
+        #expect(old.displayName == "iPad")
+    }
+
     // MARK: La proposition
 
     @Test func invitation_onlyWhenOffHere_andOnElsewhere() {

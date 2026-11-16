@@ -17,6 +17,8 @@ struct NewGameSetupView: View {
     /// l'EFFACE : l'écran le dit, au lieu de le laisser découvrir (retour d'un joueur,
     /// 27/10/2026 : la flèche de retour mène ici, et « Commencer » perdait sa partie).
     @State private var resumable: PlayGameAutosave?
+    /// L'appareil où son dernier coup a été joué, s'il ne s'agit pas de celui-ci (« iPhone 11 »).
+    @State private var resumableOrigin: String?
     @State private var confirmReplace = false
     /// Titre de barre : « Nouvelle partie » par défaut, « Continuer la partie »
     /// quand on prolonge une position existante.
@@ -284,15 +286,24 @@ struct NewGameSetupView: View {
             .padding(20)
             .padding(.bottom, 20)
         }
-        .onAppear { resumable = AutosaveStore.loadPlay() }
-        .alert("Une partie est en cours", isPresented: $confirmReplace) {
+        .onAppear {
+            resumable = AutosaveStore.loadPlay()
+            resumableOrigin = resumable == nil ? nil : SyncedAutosave.play.origin().map { DeviceModelName.display($0) }
+        }
+        .alert(replaceTitle, isPresented: $confirmReplace) {
             Button("Reprendre la partie en cours") {
                 if let resumable { onResume(resumable) }
             }
             Button("Remplacer par une nouvelle partie", role: .destructive) { launch() }
             Button("Annuler", role: .cancel) {}
         } message: {
-            Text("Commencer une nouvelle partie effacera la partie en cours (\(resumable?.moveLANs.count ?? 0) coup(s) joué(s)).")
+            // Synchro allumée : la partie en cours est la MÊME sur tous les appareils (retour du 16/11 : une
+            // partie lancée sur un iPhone a remplacé celle d'un autre, sans que l'avertissement le dise).
+            if CloudSyncSettingsStore.isEnabled {
+                Text("Commencer une nouvelle partie l'effacera sur tous vos appareils (\(resumable?.moveLANs.count ?? 0) coup(s) joué(s)).")
+            } else {
+                Text("Commencer une nouvelle partie effacera la partie en cours (\(resumable?.moveLANs.count ?? 0) coup(s) joué(s)).")
+            }
         }
         .appBackground()
         .navigationTitle(navigationTitleKey)
@@ -372,6 +383,12 @@ struct NewGameSetupView: View {
     private var customMinutes: Int { timeLimit.customMinutes }
     private var customIncrement: Int { timeLimit.customIncrement }
 
+    /// « Une partie est en cours », ou « … sur votre iPhone 11 » quand son dernier coup vient d'ailleurs.
+    private var replaceTitle: Text {
+        if let resumableOrigin { Text("Une partie est en cours sur votre \(resumableOrigin)") }
+        else { Text("Une partie est en cours") }
+    }
+
     /// Garde-fou : une partie en cours serait effacée par la nouvelle.
     private func start() {
         let trimmed = trimmedFENText
@@ -403,6 +420,11 @@ struct NewGameSetupView: View {
                         .font(.caption)
                         .foregroundStyle(Theme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
+                    if let resumableOrigin {
+                        Label("Dernier coup joué sur votre \(resumableOrigin)", systemImage: "icloud")
+                            .font(.caption)
+                            .foregroundStyle(Theme.textSecondary)
+                    }
                 }
                 Spacer(minLength: 0)
                 Image(systemName: "chevron.right")
