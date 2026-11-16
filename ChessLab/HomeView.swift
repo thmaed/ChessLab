@@ -44,6 +44,8 @@ struct HomeView: View {
     /// barre disparaissait aussi de l'accueil et des listes (constaté le
     /// 13/10/2026). `.all` est ce que montrait l'ossature avant la liaison.
     @State private var columnVisibility: NavigationSplitViewVisibility = .all
+    /// La place du tableau de bord de détail (iPad, Mac, Duo déplié) — voir ``isWideLowDashboard``.
+    @State private var dashboardSize: CGSize = .zero
     /// Vrai quand c'est NOUS qui avons replié la barre : on ne la rouvre en
     /// quittant l'échiquier que dans ce cas, jamais contre un choix de
     /// l'utilisateur.
@@ -912,10 +914,19 @@ struct HomeView: View {
         }
     }
 
+    /// Une fenêtre LARGE et BASSE — l'écran intérieur de l'iPhone Duo en paysage (≈ 951 × 669 pt), un iPad
+    /// mini en paysage sans barre latérale : les quatre grandes tuiles prenaient toute la hauteur, « Plus »
+    /// passait sous le pli et la droite restait vide (retour du 16/11/2026). On y élargit la colonne et l'on
+    /// range chaque étage sur UNE rangée de tuiles basses : tout tient sans défiler.
+    private var isWideLowDashboard: Bool {
+        dashboardSize.width >= 860 && dashboardSize.height > 0 && dashboardSize.height < 760
+    }
+
     private var iPadDashboardScroll: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
-                homeHeader()
+        let wideLow = isWideLowDashboard
+        return ScrollView {
+            VStack(alignment: .leading, spacing: wideLow ? 16 : 22) {
+                homeHeader(compact: wideLow)
                 if persistenceHealth.showsBanner { persistenceBanner }
                 if seedingState.isSeeding { seedingBanner }
                 syncHomeCard
@@ -924,13 +935,18 @@ struct HomeView: View {
                 dailySessionCard
                 newPuzzlesPill
                 repertoireExitPill
-                modesSection(minTile: ModeGridMetrics.minTileRegular, shortSubtitles: true)
+                modesSection(minTile: ModeGridMetrics.minTileRegular, shortSubtitles: true, lowRow: wideLow)
                 homeProgressCard
                 if !recentGames.isEmpty { recentGamesSection }
             }
-            .padding(28)
-            .frame(maxWidth: 680, alignment: .leading)
+            .padding(wideLow ? 24 : 28)
+            .frame(maxWidth: wideLow ? 900 : 680, alignment: .leading)
             .frame(maxWidth: .infinity, alignment: .center)
+        }
+        .onGeometryChange(for: CGSize.self) { proxy in
+            proxy.size
+        } action: { newSize in
+            dashboardSize = newSize
         }
         .appBackground()
         // Le damier fantôme ne vit QUE sur ce tableau de bord : c'est le seul
@@ -1613,25 +1629,27 @@ struct HomeView: View {
     /// Deux colonnes PARTOUT : sur iPhone la grille adaptative en donnait déjà deux ; sur iPad, Mac et l'écran
     /// intérieur du Duo (classe régulière, colonne bornée à 680 pt), trois colonnes auraient rangé quatre tuiles
     /// en 3 + 1. Les deux étages gardent ainsi les mêmes colonnes, sur tous les appareils.
-    private func modesSection(minTile: CGFloat, shortSubtitles: Bool = false) -> some View {
+    ///
+    /// `lowRow` : fenêtre large et basse (voir ``isWideLowDashboard``) — quatre colonnes, tuiles BASSES.
+    private func modesSection(minTile: CGFloat, shortSubtitles: Bool = false, lowRow: Bool = false) -> some View {
         let columns = horizontalSizeClass == .regular
-            ? Array(repeating: GridItem(.flexible(), spacing: ModeGridMetrics.spacing), count: 2)
+            ? Array(repeating: GridItem(.flexible(), spacing: ModeGridMetrics.spacing), count: lowRow ? 4 : 2)
             : [GridItem(.adaptive(minimum: minTile), spacing: ModeGridMetrics.spacing)]
         return VStack(alignment: .leading, spacing: 14) {
             sectionHeader("Modes")
             LazyVGrid(columns: columns, spacing: ModeGridMetrics.spacing) {
-                ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Neuf personnages, ou Stockfish", shortSubtitle: "Personnages", systemImage: "cpu", tint: Theme.accent, isEnabled: true, accessibilityID: "mode_play", prefersShortSubtitle: shortSubtitles) {
+                ModeCard(title: "Contre l'ordinateur", shortTitle: "Ordinateur", subtitle: "Neuf personnages, ou Stockfish", shortSubtitle: "Personnages", systemImage: "cpu", tint: Theme.accent, isEnabled: true, accessibilityID: "mode_play", prefersShortSubtitle: shortSubtitles, isLow: lowRow) {
                     path.append(Route.newGame)
                 }
                 .discoveryAnchor(.playTile, priority: 1)
-                ModeCard(title: "Puzzles", subtitle: "Tactique et problèmes", shortSubtitle: "Tactique et problèmes", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
+                ModeCard(title: "Puzzles", subtitle: "Tactique et problèmes", shortSubtitle: "Tactique et problèmes", systemImage: "puzzlepiece.fill", tint: Theme.violet, isEnabled: true, prefersShortSubtitle: shortSubtitles, isLow: lowRow) {
                     path.append(Route.puzzleQueue)
                 }
                 .discoveryAnchor(.puzzlesTile, priority: 1)
-                ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings", prefersShortSubtitle: shortSubtitles) {
+                ModeCard(title: "Ouvertures", subtitle: "Apprends et révise tes ouvertures", shortSubtitle: "Apprends et révise", systemImage: "books.vertical.fill", tint: Theme.warning, isEnabled: true, accessibilityID: "mode_openings", prefersShortSubtitle: shortSubtitles, isLow: lowRow) {
                     path.append(Route.openingList)
                 }
-                ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", shortSubtitle: "PGN, FEN", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true, prefersShortSubtitle: shortSubtitles) {
+                ModeCard(title: "Analyser", subtitle: "PGN, FEN, bibliothèque", shortSubtitle: "PGN, FEN", systemImage: "chart.xyaxis.line", tint: Theme.teal, isEnabled: true, prefersShortSubtitle: shortSubtitles, isLow: lowRow) {
                     path.append(Route.analysisEntry)
                 }
             }
@@ -2827,6 +2845,9 @@ struct ModeCard: View {
     /// suspension. Il demande donc les accroches courtes, sans toucher aux
     /// titres — qui, eux, tiennent.
     var prefersShortSubtitle = false
+    /// Tuile BASSE, quatre par rangée, pour une fenêtre large et basse (Duo déplié en paysage) : libellés
+    /// courts, une ligne chacun.
+    var isLow = false
     let action: () -> Void
 
     /// Sur iPad (classe régulière), la tuile grandit avec la grille à 3
@@ -2835,12 +2856,12 @@ struct ModeCard: View {
     /// et l'écart entre icône et texte se creuse au lieu de rester équilibré.
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     private var isRegular: Bool { horizontalSizeClass == .regular }
-    private var cardHeight: CGFloat { isRegular ? 168 : 132 }
-    private var iconSize: CGFloat { isRegular ? 58 : 48 }
-    private var ghostIconSize: CGFloat { isRegular ? 118 : 96 }
-    private var displayedTitle: LocalizedStringKey { isRegular ? title : (shortTitle ?? title) }
+    private var cardHeight: CGFloat { isLow ? 118 : (isRegular ? 168 : 132) }
+    private var iconSize: CGFloat { isLow ? 40 : (isRegular ? 58 : 48) }
+    private var ghostIconSize: CGFloat { isLow ? 84 : (isRegular ? 118 : 96) }
+    private var displayedTitle: LocalizedStringKey { isRegular && !isLow ? title : (shortTitle ?? title) }
     private var displayedSubtitle: LocalizedStringKey {
-        isRegular && !prefersShortSubtitle
+        isRegular && !prefersShortSubtitle && !isLow
             ? (subtitle ?? "Bientôt")
             : (shortSubtitle ?? subtitle ?? "Bientôt")
     }
@@ -2870,26 +2891,26 @@ struct ModeCard: View {
                     tint: tint, size: iconSize, isEnabled: isEnabled
                 )
 
-                Spacer(minLength: 16)
+                Spacer(minLength: isLow ? 8 : 16)
 
                 // `lineLimit` + `minimumScaleFactor` : la carte a une
                 // hauteur FIGÉE — aux tailles d'accessibilité XXL, un titre
                 // sans borne déborderait de la tuile.
                 Text(displayedTitle)
-                    .font(isRegular ? .title3.weight(.semibold) : .headline)
+                    .font(isRegular && !isLow ? .title3.weight(.semibold) : .headline)
                     .foregroundStyle(isEnabled ? Theme.textPrimary : Theme.textTertiary)
-                    .lineLimit(2)
+                    .lineLimit(isLow ? 1 : 2)
                     .minimumScaleFactor(0.8)
 
                 Text(displayedSubtitle)
-                    .font(.callout)
+                    .font(isLow ? .subheadline : .callout)
                     .foregroundStyle(Theme.textSecondary)
                     .padding(.top, 2)
-                    .lineLimit(2)
+                    .lineLimit(isLow ? 1 : 2)
                     .minimumScaleFactor(0.85)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(isRegular ? 20 : 16)
+            .padding(isLow ? 14 : (isRegular ? 20 : 16))
             .frame(height: cardHeight)
             .background {
                 ZStack {
@@ -2907,7 +2928,7 @@ struct ModeCard: View {
                     // coin, dans la teinte du mode — donne un caractère
                     // illustré à chaque tuile sans image bitmap.
                     ghostIcon
-                        .offset(x: isRegular ? 56 : 46, y: isRegular ? 42 : 34)
+                        .offset(x: isLow ? 50 : (isRegular ? 56 : 46), y: isLow ? 30 : (isRegular ? 42 : 34))
                         // Purement décorative — et invisible au-delà de la
                         // carte, que `clipShape` écrête. L'accessibilité, elle,
                         // ne sait pas qu'elle est écrêtée : sans ce masquage,

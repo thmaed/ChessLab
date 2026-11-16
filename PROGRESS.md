@@ -11324,3 +11324,17 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   - **Défaut trouvé et corrigé** : « Rattraper » depuis une partie à deux déjà REPRISE laissait l'ancienne position
     (même type d'écran à la même place de la pile : SwiftUI gardait l'hôte et son modèle de vue). `.id(sessionKey)`
     sur les hôtes de reprise (Jouer et Deux joueurs) ; revérifié sur les deux iPhone (cavalier bien en c6).
+- **Même soir, iPhone Duo déplié en paysage** (retour : « la disposition n'est pas très heureuse » — quatre grandes
+  tuiles sur toute la hauteur, « Plus » sous le pli, la droite vide). Choix de l'utilisateur : **tuiles basses**.
+  Tableau de bord de détail LARGE (≥ 860 pt) et BAS (< 760 pt) : colonne 900 pt au lieu de 680, en-tête compact, les
+  quatre modes sur UNE rangée de tuiles basses (`ModeCard.isLow`, 118 pt, libellés courts), « Plus » sur une
+  rangée ; tout tient sans défiler. Ailleurs (iPad 11/13 pouces, portrait, barre latérale ouverte) : inchangé.
+  - Vérifié sur iPad mini en paysage, barre repliée (géométrie voisine : le simulateur du Duo ne se tourne qu'à la
+    main) — `WideLowDashboardUITests`, ignoré sur fenêtre haute ; capture par `simctl io` (celle de XCUITest sort
+    pivotée en paysage).
+  - **Android porté** (`HomeScreen` : mêmes seuils en dp, 4 par rangée, tuile basse 118 dp) ; vérifié sur
+    l'émulateur tablette 7 pouces en paysage (960 × 600 dp).
+  - Relevé au passage, PRÉEXISTANT (même échec sans ce changement) : sur le runtime iOS 27.1, les tests de barre
+    latérale de l'iPad Pro 13" ne trouvent plus les libellés (« Automation type mismatch… StaticText ») — ils passent
+    sous iOS 26.5 ; `IPadEntryPointsUITests.testReportModeTileFrames` bute sur des libellés en double (barre +
+    tuile).

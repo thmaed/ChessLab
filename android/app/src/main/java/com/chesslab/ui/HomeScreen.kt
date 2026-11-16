@@ -126,6 +126,11 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
         // orpheline, et laissait les deux tiers du bas vides. iOS borne de la
         // même façon (`Theme.readableWidth`).
         val largeur = minOf(maxWidth, Metrics.readableWidth)
+        // Fenêtre LARGE et BASSE (pliable déplié en paysage, tablette basse) : les quatre grandes tuiles
+        // prenaient toute la hauteur et « Plus » passait sous le pli. On élargit la colonne et l'on range
+        // chaque étage sur UNE rangée de tuiles basses. Pendant de `isWideLowDashboard` (iOS, 16/11/2026).
+        val wideLow = maxWidth >= 860.dp && maxHeight < 760.dp
+        val perRow = if (wideLow) 4 else 2
         Column(
             Modifier
                 .fillMaxSize()
@@ -134,7 +139,7 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
         Column(
-            Modifier.widthIn(max = Metrics.readableWidth).padding(20.dp),
+            Modifier.widthIn(max = if (wideLow) 900.dp else Metrics.readableWidth).padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Header(onOpen)
@@ -193,13 +198,13 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
             // analyser — puis « Plus », des tuiles basses pour le reste. Deux colonnes partout : quatre tuiles
             // sur trois colonnes se rangeaient en 3 + 1.
             val (primary, secondary) = modes.partition { it.tag in PRIMARY_MODE_TAGS }
-            primary.chunked(2).forEach { row ->
+            primary.chunked(perRow).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    row.forEach { mode -> Box(Modifier.weight(1f)) { ModeCard(mode, onOpen) } }
+                    row.forEach { mode -> Box(Modifier.weight(1f)) { ModeCard(mode, onOpen, low = wideLow) } }
                 }
             }
             SectionHeader(stringResource(R.string.home_more), Modifier.padding(top = 6.dp))
-            secondary.chunked(2).forEach { row ->
+            secondary.chunked(perRow).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     row.forEach { mode -> Box(Modifier.weight(1f)) { CompactModeCard(mode, onOpen) } }
                 }
@@ -402,12 +407,13 @@ private fun CompactModeCard(mode: Mode, onOpen: (Route) -> Unit) {
 }
 
 @Composable
-private fun ModeCard(mode: Mode, onOpen: (Route) -> Unit) {
+private fun ModeCard(mode: Mode, onOpen: (Route) -> Unit, low: Boolean = false) {
     Box(
         Modifier
             .testTag("mode-${mode.tag}")
             .then(if (mode.spot != null) Modifier.discoveryAnchor(mode.spot) else Modifier)
-            .height(132.dp)
+            // Basse (118 comme iOS) quand quatre tuiles se partagent une rangée d'une fenêtre large et basse.
+            .height(if (low) 118.dp else 132.dp)
             .clip(CardShape)
             .background(cardGradient)
             // Voile de la TEINTE du mode sur toute la carte (C1, 24/10/2026),
@@ -451,13 +457,13 @@ private fun ModeCard(mode: Mode, onOpen: (Route) -> Unit) {
                 stringResource(mode.shortTitle),
                 fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
                 color = if (mode.enabled) Palette.textPrimary else Palette.textTertiary,
-                maxLines = 2, overflow = TextOverflow.Ellipsis,
+                maxLines = if (low) 1 else 2, overflow = TextOverflow.Ellipsis,
             )
             Text(
                 stringResource(if (mode.enabled) mode.shortSubtitle else R.string.soon_label),
                 fontSize = 12.sp, color = Palette.textSecondary,
                 modifier = Modifier.padding(top = 2.dp),
-                maxLines = 2, overflow = TextOverflow.Ellipsis,
+                maxLines = if (low) 1 else 2, overflow = TextOverflow.Ellipsis,
             )
         }
     }
