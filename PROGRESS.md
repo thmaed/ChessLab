@@ -11346,3 +11346,17 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   avec les tests de barre latérale et des tuiles basses. Android : rien à porter (pas de barre latérale, l'accueil
   est une pile avec retour). Relevé au passage, PRÉEXISTANT : `OpeningsModuleUITests.testTheModuleSurvivesTheLargestTextSize`
   échoue sur iPad mini en AX5 (même échec sans ce changement).
+- **Même soir, barre de « Préparation de la bibliothèque de puzzles »** (retour sur iPad : « ça tourne en rond
+  avec la roulette plus de la moitié du temps, puis la barre progresse »). Mesuré SUR l'iPad Pro 11" (A12X) :
+  lecture du JSON 0,8 s ; préchargement neuf 38-45 s (barre visible) ; mais sur une bibliothèque EXISTANTE (mise à
+  jour d'une version antérieure), ≈ 10 s de relecture d'un bloc AVANT la barre — c'était la roulette. Corrigé :
+  - la barre part à 0 % dès le début (`PuzzleSeedingState.begin`), ne recule jamais (`report` monotone) ;
+  - la relecture se fait PAR TRANCHES DE CLASSEMENT (13 requêtes filtrées, champs utiles seulement) et fait avancer
+    la barre ; des pages triées par identifiant triplaient la durée (29 s) — les tranches la gardent (10,8 s) ;
+  - `SeedingWork` pondère les deux étapes selon leur coût mesuré (une insertion ≈ quatre relectures) ;
+  - le crochet `-reseedPuzzles` simule désormais une vraie mise à jour (un puzzle non tenté sur cinq retiré AVANT le
+    bandeau) ;
+  - tests : `PuzzleLibrarySeederTests` (tranches : chaque puzzle une seule fois, bornes, extrêmes, sans
+    classement ; pondération ; barre monotone) 12 verts ; `PuzzleSeedingBannerUITests` (barre dès l'apparition, qui
+    avance).
+  - Android : rien à porter (la bibliothèque y est lue directement depuis l'asset, sans préchargement ni bandeau).

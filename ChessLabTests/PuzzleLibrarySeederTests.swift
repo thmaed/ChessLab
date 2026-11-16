@@ -73,6 +73,74 @@ struct PuzzleLibrarySeederTests {
         #expect(SeedingProgress(completed: -3, total: 4_000).fraction == 0)
     }
 
+    /// La relecture d'une bibliothèque existante compte aussi (retour du 16/11/2026 : roulette plus de la
+    /// moitié du temps) ; une insertion pèse quatre relectures (mesuré sur iPad Pro 11").
+    @Test func seedingWorkCountsTheRereadAndWeighsInserts() {
+        let upgrade = SeedingWork(toScan: 106_094, toInsert: 24_841)
+        #expect(upgrade.total == 106_094 + 24_841 * SeedingWork.insertCost)
+        #expect(upgrade.done(scanned: 0, inserted: 0) == 0)
+        let afterReread = Double(upgrade.done(scanned: 106_094, inserted: 0)) / Double(upgrade.total)
+        // Mise à jour V4 → V5 : la relecture fait à peu près la moitié du chemin — c'était la moitié sans barre.
+        #expect(afterReread > 0.4 && afterReread < 0.6)
+        #expect(upgrade.done(scanned: 106_094, inserted: 24_841) == upgrade.total)
+        // Bornée, et jamais un total nul (la barre a un sens dès la première seconde).
+        #expect(upgrade.done(scanned: 999_999, inserted: 999_999) == upgrade.total)
+        #expect(SeedingWork(toScan: 0, toInsert: 0).total == 1)
+        // Installation neuve : rien à relire, tout est insertion.
+        #expect(SeedingWork(toScan: 0, toInsert: 130_935).total == 130_935 * SeedingWork.insertCost)
+    }
+
+    /// La relecture par tranches de classement : chaque puzzle Lichess dans UNE tranche et une seule — bornes,
+    /// extrêmes et puzzles sans classement compris ; les autres sources n'y entrent pas.
+    @MainActor
+    @Test func ratingSlicesCoverEveryLichessPuzzleExactlyOnce() throws {
+        let container = try ModelContainer(for: Schema([Puzzle.self]),
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
+        let context = ModelContext(container)
+        let entries = LichessPuzzleLoader.standard
+        let slices = PuzzleLibrarySeeder.ratingSlices(of: entries)
+        let sorted = entries.map(\.rating).sorted()
+        // Des classements piégeux : chaque borne de tranche, ses voisins, les extrêmes, aucun.
+        var ratings: [Int?] = [nil, Int.min, Int.max, 0, -5, 4_000]
+        for index in 1..<12 {
+            let bound = sorted[index * sorted.count / 12]
+            ratings += [bound - 1, bound, bound + 1]
+        }
+        for (index, rating) in ratings.enumerated() {
+            let puzzle = Puzzle()
+            puzzle.sourceRaw = "lichess"
+            puzzle.externalID = "test-\(index)"
+            puzzle.rating = rating
+            context.insert(puzzle)
+        }
+        let other = Puzzle()
+        other.sourceRaw = "collection"
+        other.rating = 1500
+        context.insert(other)
+        try context.save()
+
+        let perSlice = try slices.map { try context.fetchCount(FetchDescriptor<Puzzle>(predicate: $0)) }
+        #expect(perSlice.reduce(0, +) == ratings.count, "chaque puzzle Lichess compté une fois : \(perSlice)")
+        var seen = Set<String>()
+        for slice in slices {
+            for puzzle in try context.fetch(FetchDescriptor<Puzzle>(predicate: slice)) {
+                #expect(seen.insert(puzzle.externalID ?? "?").inserted, "\(puzzle.externalID ?? "?") dans deux tranches")
+            }
+        }
+        #expect(seen.count == ratings.count)
+    }
+
+    @MainActor
+    @Test func theSeedingBarNeverMovesBackwards() {
+        let state = PuzzleSeedingState.shared
+        state.report(completed: 60, of: 100)
+        // Le total se précise en route : la part affichée ne recule pas pour autant.
+        state.report(completed: 60, of: 200)
+        #expect(state.fraction == 0.6)
+        state.report(completed: 150, of: 200)
+        #expect(state.fraction == 0.75)
+    }
+
     @MainActor
     @Test func seedInsertsBundledPuzzlesIntoEmptyContext() throws {
         // Le marqueur "déjà semé" vit dans `UserDefaults.standard`, qui

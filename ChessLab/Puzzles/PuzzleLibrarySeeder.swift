@@ -14,6 +14,24 @@ struct SeedingProgress: Equatable {
     }
 }
 
+/// Le travail du préchargement en UNITÉS de durée comparable, pour une barre qui avance du début à la fin.
+///
+/// Retour du 16/11/2026 : la roulette tournait plus de la moitié du temps avant que la barre ne parte. La
+/// relecture de la bibliothèque déjà en base (mise à jour d'une version antérieure) n'était pas comptée — et
+/// c'est elle qui durait. Mesuré sur un iPad Pro 11" (A12X) : relire un puzzle ≈ 0,08 ms (par tranches),
+/// en insérer un ≈ 0,3 ms. Une insertion vaut donc à peu près quatre relectures.
+struct SeedingWork: Equatable {
+    static let insertCost = 4
+    var toScan: Int
+    var toInsert: Int
+
+    var total: Int { max(1, toScan + toInsert * Self.insertCost) }
+
+    func done(scanned: Int, inserted: Int) -> Int {
+        min(max(0, scanned), toScan) + min(max(0, inserted), toInsert) * Self.insertCost
+    }
+}
+
 /// État observable du préchargement de la bibliothèque de puzzles, pour
 /// afficher un bandeau « Préparation… » pendant l'opération (premier
 /// lancement).
@@ -28,10 +46,15 @@ final class PuzzleSeedingState {
     /// La part faite, de 0 à 1 ; `nil` tant que le total est inconnu.
     var fraction: Double? { progress.fraction }
 
-    fileprivate func begin() { isSeeding = true; progress = SeedingProgress() }
+    /// La barre part à 0 % DÈS le début (plus d'attente sans chiffre).
+    fileprivate func begin() { isSeeding = true; progress = SeedingProgress(completed: 0, total: 1) }
     fileprivate func end() { isSeeding = false; progress = SeedingProgress() }
-    fileprivate func report(completed: Int, of total: Int) {
-        progress = SeedingProgress(completed: completed, total: total)
+    /// Une barre ne recule jamais : le total peut se préciser en route (le compte exact des puzzles à
+    /// insérer n'est connu qu'après la relecture), la part affichée, elle, ne fait que croître.
+    func report(completed: Int, of total: Int) {
+        let next = SeedingProgress(completed: completed, total: total)
+        if let shown = progress.fraction, let candidate = next.fraction, candidate < shown { return }
+        progress = next
     }
 }
 
@@ -80,10 +103,15 @@ enum PuzzleLibrarySeeder {
         let alreadySeeded = !reseeds && UserDefaults.standard.bool(forKey: seededKey)
         guard reseeds || needsSeeding(container: container, alreadySeeded: alreadySeeded) else { return }
 
-        PuzzleSeedingState.shared.begin()
+        // Le bandeau part tout de suite — sauf pour le crochet de débogage, qui prépare d'abord en silence
+        // sa « mise à jour » simulée (le bandeau doit montrer le préchargement, pas ce montage).
+        if !reseeds { PuzzleSeedingState.shared.begin() }
         Task.detached(priority: .utility) {
             #if DEBUG
-            if reseeds { removeUntriedLibraryPuzzles(container: container) }
+            if reseeds {
+                removeSomeUntriedLibraryPuzzles(container: container)
+                await MainActor.run { PuzzleSeedingState.shared.begin() }
+            }
             #endif
             let didSeed = seedSynchronously(container: container)
             await MainActor.run {
@@ -98,15 +126,17 @@ enum PuzzleLibrarySeeder {
     #if DEBUG
     @MainActor private static var didDebugReseed = false
 
-    /// Vide la bibliothèque de ses puzzles JAMAIS tentés (ceux qu'un préchargement remet à
-    /// l'identique) : toute progression reste, les puzzles tentés aussi.
-    nonisolated private static func removeUntriedLibraryPuzzles(container: ModelContainer) {
+    /// Simule une MISE À JOUR de la bibliothèque : retire un puzzle jamais tenté sur cinq (ceux qu'un
+    /// préchargement remet à l'identique). Le préchargement relit alors les autres — l'étape qui tournait
+    /// sans barre avant le 16/11/2026 — puis réinsère les manquants. Toute progression reste.
+    nonisolated private static func removeSomeUntriedLibraryPuzzles(container: ModelContainer) {
         let context = ModelContext(container)
         context.autosaveEnabled = false
         let library = (try? context.fetch(FetchDescriptor<Puzzle>(
             predicate: #Predicate<Puzzle> { $0.sourceRaw == "lichess" }
         ))) ?? []
-        for puzzle in library where ((puzzle.successCount ?? 0) + (puzzle.failureCount ?? 0)) == 0 {
+        let untried = library.filter { (($0.successCount ?? 0) + ($0.failureCount ?? 0)) == 0 }
+        for (index, puzzle) in untried.enumerated() where index % 5 == 0 {
             context.delete(puzzle)
         }
         PersistenceLog.saveInBackground(context)
@@ -137,6 +167,33 @@ enum PuzzleLibrarySeeder {
         Task { @MainActor in PuzzleSeedingState.shared.report(completed: completed, of: total) }
     }
 
+    /// Les tranches de la relecture : les puzzles sans classement, puis douze tranches de classement calées
+    /// sur la répartition de la bibliothèque embarquée (de taille comparable, donc une barre régulière).
+    /// Ensemble, elles couvrent TOUS les puzzles Lichess, chacun une seule fois.
+    static func ratingSlices(of entries: [LichessPuzzleEntry], count: Int = 12) -> [Predicate<Puzzle>] {
+        let ratings = entries.map(\.rating).sorted()
+        var bounds: [Int] = []
+        if !ratings.isEmpty {
+            for index in 1..<count {
+                let bound = ratings[index * ratings.count / count]
+                if bound != bounds.last { bounds.append(bound) }
+            }
+        }
+        var slices: [Predicate<Puzzle>] = [#Predicate<Puzzle> { $0.sourceRaw == "lichess" && $0.rating == nil }]
+        var lower = Int.min
+        for upper in bounds + [Int.max] {
+            let low = lower, high = upper
+            slices.append(#Predicate<Puzzle> { puzzle in
+                puzzle.sourceRaw == "lichess" && puzzle.rating.flatMap { $0 >= low && $0 < high } == true
+            })
+            lower = upper
+        }
+        // Le dernier bord est exclusif : `Int.max` lui-même tomberait hors de toute tranche.
+        let topRating: Int? = Int.max
+        slices.append(#Predicate<Puzzle> { $0.sourceRaw == "lichess" && $0.rating == topRating })
+        return slices
+    }
+
     /// Effectue le préchargement sur un contexte dédié au `container` donné
     /// (de fond en usage réel). Renvoie `false` si la bibliothèque embarquée
     /// est absente (le marqueur n'est alors pas posé — on retentera au
@@ -150,28 +207,49 @@ enum PuzzleLibrarySeeder {
         context.autosaveEnabled = false
         let newIDs = Set(entries.map(\.id))
 
-        // 1. Retire les puzzles bibliothèque absents du nouvel échantillon
-        // ET jamais tentés — aucune progression SM-2 perdue.
-        let lichessDescriptor = FetchDescriptor<Puzzle>(
-            predicate: #Predicate<Puzzle> { $0.sourceRaw == "lichess" }
-        )
-        let existingLibrary = (try? context.fetch(lichessDescriptor)) ?? []
-        for puzzle in existingLibrary {
-            let attempts = (puzzle.successCount ?? 0) + (puzzle.failureCount ?? 0)
-            if attempts == 0, !newIDs.contains(puzzle.externalID ?? "") {
-                context.delete(puzzle)
+        // 1. Relit la bibliothèque déjà en base (mise à jour d'une version antérieure), PAR TRANCHES — et en ne
+        // chargeant que les champs utiles : la barre avance pendant cette étape, qui durait sans rien dire
+        // (≈ 10 s sur un iPad de 2018). Retient ce qui reste ; note les puzzles absents du nouvel échantillon
+        // ET jamais tentés, retirés ensuite — aucune progression SM-2 perdue.
+        //
+        // Tranches de CLASSEMENT, pas pages triées : trier 130 000 identifiants à chaque page triplait la
+        // durée (29 s au lieu de 10 sur l'iPad). Chaque tranche est une requête filtrée, sans tri ni
+        // décalage : elles se partagent la bibliothèque sans recouvrement ni oubli, quoi qu'il arrive.
+        let lichess = #Predicate<Puzzle> { $0.sourceRaw == "lichess" }
+        let existingCount = (try? context.fetchCount(FetchDescriptor<Puzzle>(predicate: lichess))) ?? 0
+        // Estimation d'avant relecture : les anciens identifiants sont conservés d'une version à l'autre.
+        var work = SeedingWork(toScan: existingCount, toInsert: max(0, entries.count - existingCount))
+        Self.publishProgress(completed: 0, of: work.total)
+        var keptIDs = Set<String>()
+        var obsolete: [PersistentIdentifier] = []
+        var scanned = 0
+        if existingCount > 0 {
+            for slice in ratingSlices(of: entries) {
+                var page = FetchDescriptor<Puzzle>(predicate: slice)
+                page.propertiesToFetch = [\.externalID, \.successCount, \.failureCount]
+                for puzzle in (try? context.fetch(page)) ?? [] {
+                    let attempts = (puzzle.successCount ?? 0) + (puzzle.failureCount ?? 0)
+                    let id = puzzle.externalID ?? ""
+                    if attempts > 0 || newIDs.contains(id) {
+                        if puzzle.externalID != nil { keptIDs.insert(id) }
+                    } else {
+                        obsolete.append(puzzle.persistentModelID)
+                    }
+                    scanned += 1
+                }
+                Self.publishProgress(completed: work.done(scanned: scanned, inserted: 0), of: work.total)
             }
+        }
+        for id in obsolete {
+            context.delete(context.model(for: id))
         }
 
         // 2. Insère les nouveaux, dédoublonnés par identifiant Lichess, par
         // lots de 2 000 (save intermédiaire) pour borner le pic mémoire.
-        let keptIDs = Set(
-            existingLibrary
-                .filter { ((($0.successCount ?? 0) + ($0.failureCount ?? 0)) > 0) || newIDs.contains($0.externalID ?? "") }
-                .compactMap(\.externalID)
-        )
         let toInsert = entries.reduce(0) { $0 + (keptIDs.contains($1.id) ? 0 : 1) }
-        Self.publishProgress(completed: 0, of: toInsert)
+        work.toInsert = toInsert
+        work.toScan = scanned
+        Self.publishProgress(completed: work.done(scanned: scanned, inserted: 0), of: work.total)
         var inserted = 0
         var insertedSinceSave = 0
         for entry in entries where !keptIDs.contains(entry.id) {
@@ -191,7 +269,7 @@ enum PuzzleLibrarySeeder {
                 PersistenceLog.saveInBackground(context)
                 insertedSinceSave = 0
                 // Annoncé APRÈS l'enregistrement : la barre ne dépasse jamais ce qui est écrit.
-                Self.publishProgress(completed: inserted, of: toInsert)
+                Self.publishProgress(completed: work.done(scanned: scanned, inserted: inserted), of: work.total)
                 #if DEBUG
                 // `-reseedPuzzles` : une seconde par lot, pour avoir le temps de regarder la barre.
                 if CommandLine.arguments.contains("-reseedPuzzles") { Thread.sleep(forTimeInterval: 1) }
