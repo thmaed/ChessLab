@@ -259,7 +259,7 @@ struct DailySessionTests {
 struct DailySessionWoodpeckerStoreTests {
     private static let container: ModelContainer = {
         try! ModelContainer(
-            for: WoodpeckerProgram.self,
+            for: WoodpeckerProgram.self, WoodpeckerAttemptRecord.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         )
     }()

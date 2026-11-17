@@ -11377,3 +11377,23 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   sous-titre « D'où viennent les ouvertures. » (5 langues). `SettingsAboutUITests` (lien présent, mène à la page ;
   section disparue). **Android porté** (`SettingsScreen` : même déplacement, `settings_sources_subtitle` ×5,
   `settings_openings` retiré).
+- **17/11, trafic iCloud : Woodpecker allégé.** Mesuré : le plan d'un programme (puzzles copiés + cycles) repartait
+  ENTIER vers iCloud après chaque puzzle — 20 Ko pour 50 puzzles × 7 cycles, 200 Ko pour une collection de 500 (des
+  centaines de Mo sur un programme complet ; la partie en cours, elle, pèse 1,5 Ko par coup, le reste quelques
+  centaines d'octets, sans aucun ping-pong de synchro — vérifié dans les trois fusions). Désormais :
+  - chaque réponse est un petit enregistrement `WoodpeckerAttemptRecord` (cycle, place, trouvé, temps) ; le plan
+    n'est écrit qu'à la création et aux débuts de cycle (réponses du cycle passé versées dedans) ; ni le plan ni
+    la date du programme ne bougent à chaque puzzle ;
+  - `program.plan` = plan écrit + réponses journalisées (`WoodpeckerPlan.merge`, sans trou, la plus ancienne
+    gagne à place égale) ; les réponses de deux appareils S'ADDITIONNENT (avant : le dernier plan écrit
+    écrasait l'autre) ;
+  - l'ordre des nouveaux cycles vient d'une GRAINE (programme + numéro, SplitMix64) : identique sur tous les
+    appareils sans être transmis ; un cycle connu seulement par ses réponses s'ouvre de lui-même ;
+  - versions antérieures : elles lisent toujours le plan (progression vue au cycle près), et ce qu'elles y
+    écrivent est repris ;
+  - tests : `WoodpeckerSyncTests` (8) ; suite unitaire COMPLÈTE verte (1 373, 16 ignorés) ; `WoodpeckerUITests`,
+    `DailySessionUITests` verts.
+  - **À FAIRE AVANT LA SORTIE** : nouveau type CloudKit `CD_WoodpeckerAttemptRecord` — le générer en
+    développement (un build de debug, synchro allumée, une réponse Woodpecker), puis « Deploy Schema Changes »
+    en production dans la console CloudKit (procédure du 07/11, mémoire `cloudkit-schema-puzzle-collections`).
+  - Android : rien à porter (pas d'iCloud ; sa base Woodpecker est locale).

@@ -111,6 +111,61 @@ struct WoodpeckerPlan: Codable, Equatable {
         startNextCycle(at: date, using: &generator)
     }
 
+    // MARK: Synchronisation par réponses (17/11/2026)
+
+    /// Une réponse JOURNALISÉE (``WoodpeckerAttemptRecord``) : à quel cycle, à quelle place du cycle.
+    struct LoggedAttempt: Equatable {
+        var cycle: Int
+        var step: Int
+        var attempt: Attempt
+        var at: Date
+    }
+
+    /// L'ordre d'un cycle tiré d'une GRAINE stable — le programme et le numéro du cycle : deux appareils qui
+    /// ouvrent le même cycle tirent le même ordre, sans se le transmettre. Le premier cycle d'un programme et
+    /// ceux des versions précédentes gardent l'ordre écrit dans le plan.
+    static func seededOrder(count: Int, programID: UUID, cycle: Int) -> [Int] {
+        var generator = SeededCycleGenerator(programID: programID, cycle: cycle)
+        return Array(0..<count).shuffled(using: &generator)
+    }
+
+    /// Un nouveau passage dans l'ordre de la graine (voir ``seededOrder(count:programID:cycle:)``).
+    mutating func startNextCycle(at date: Date = Date(), programID: UUID) {
+        guard currentCycle.isComplete else { return }
+        let number = currentCycle.number + 1
+        cycles.append(Cycle(number: number, order: Self.seededOrder(count: items.count, programID: programID, cycle: number),
+                            startedAt: date))
+    }
+
+    /// Verse les réponses journalisées dans le plan : chaque cycle reçoit, à la suite des réponses qu'il porte
+    /// déjà, celles de ses places suivantes — sans trou (une réponse arrivée avant celle qui la précède attend
+    /// la suivante synchronisation). Deux appareils ayant répondu à la même place : la plus ancienne compte.
+    /// Un cycle suivant connu seulement par ses réponses est ouvert, dans l'ordre de sa graine.
+    mutating func merge(_ logged: [LoggedAttempt], programID: UUID) {
+        guard !logged.isEmpty else { return }
+        var byCycle: [Int: [Int: LoggedAttempt]] = [:]
+        for entry in logged.sorted(by: { $0.at < $1.at }) where byCycle[entry.cycle]?[entry.step] == nil {
+            byCycle[entry.cycle, default: [:]][entry.step] = entry
+        }
+        var index = 0
+        while index < cycles.count {
+            var cycle = cycles[index]
+            let steps = byCycle[cycle.number] ?? [:]
+            while !cycle.isComplete, let entry = steps[cycle.attempts.count] {
+                cycle.attempts.append(entry.attempt)
+                if cycle.isComplete { cycle.finishedAt = entry.at }
+            }
+            cycles[index] = cycle
+            if index == cycles.count - 1, cycle.isComplete,
+               let next = byCycle[cycle.number + 1], let first = next.values.map(\.at).min() {
+                cycles.append(Cycle(number: cycle.number + 1,
+                                    order: Self.seededOrder(count: items.count, programID: programID, cycle: cycle.number + 1),
+                                    startedAt: first))
+            }
+            index += 1
+        }
+    }
+
     /// « 7:05 », « 1:02:03 » — minutes et secondes, les heures seulement
     /// quand il y en a.
     static func formatDuration(_ seconds: Double) -> String {
@@ -163,11 +218,39 @@ extension WoodpeckerPlan.Item {
     }
 }
 
+/// Générateur à graine (SplitMix64) : le MÊME ordre de cycle sur tous les appareils.
+struct SeededCycleGenerator: RandomNumberGenerator {
+    private var state: UInt64
+
+    init(programID: UUID, cycle: Int) {
+        var seed: UInt64 = 0x9E37_79B9_7F4A_7C15
+        withUnsafeBytes(of: programID.uuid) { bytes in
+            for byte in bytes { seed = (seed ^ UInt64(byte)) &* 0x100_0000_01B3 }
+        }
+        state = seed ^ (UInt64(truncatingIfNeeded: cycle) &* 0xBF58_476D_1CE4_E5B9)
+    }
+
+    mutating func next() -> UInt64 {
+        state &+= 0x9E37_79B9_7F4A_7C15
+        var z = state
+        z = (z ^ (z >> 30)) &* 0xBF58_476D_1CE4_E5B9
+        z = (z ^ (z >> 27)) &* 0x94D0_49BB_1331_11EB
+        return z ^ (z >> 31)
+    }
+}
+
 /// Un programme Woodpecker enregistré : son plan, et ce qu'il faut pour le
 /// lister. Dans le store « Games » SYNCHRONISÉ, comme la progression des
 /// puzzles — ajout ADDITIF, même discipline CloudKit (valeurs par défaut,
-/// aucune contrainte unique, aucune relation). Le plan voyage en un seul bloc
-/// JSON : un programme se joue sur un appareil à la fois.
+/// aucune contrainte unique, aucune relation).
+///
+/// ## Ce qui voyage, et quand (17/11/2026)
+///
+/// Le plan — les puzzles copiés et les cycles — ne s'écrit qu'à la création et au début de chaque cycle.
+/// Chaque RÉPONSE est un petit enregistrement à part (``WoodpeckerAttemptRecord``, quelques dizaines
+/// d'octets). Avant, le plan entier repartait vers iCloud après chaque puzzle : 20 Ko pour un programme de
+/// 50 puzzles, 200 Ko pour une collection de 500 — des centaines de Mo sur un programme complet. Les réponses
+/// de deux appareils s'additionnent, là où le plan écrit en dernier écrasait l'autre.
 @Model
 final class WoodpeckerProgram {
     var id: UUID = UUID()
@@ -182,13 +265,63 @@ final class WoodpeckerProgram {
 
     init() {}
 
+    /// Le plan ÉCRIT, augmenté des réponses journalisées (d'ici ou d'un autre appareil). L'écrire réécrit le
+    /// plan entier, réponses comprises : à réserver à la création et aux débuts de cycle — une réponse passe
+    /// par ``logAttempt(cycle:step:solved:seconds:at:)``.
     var plan: WoodpeckerPlan? {
-        get { planData.flatMap(WoodpeckerPlan.init(storedData:)) }
+        get {
+            guard var written = planData.flatMap(WoodpeckerPlan.init(storedData:)) else { return nil }
+            written.merge(loggedAttempts(), programID: id)
+            return written
+        }
         set {
             planData = newValue?.storedData
             updatedAt = Date()
         }
     }
+
+    /// Une réponse : UN petit enregistrement. Ni le plan ni la date du programme ne sont touchés — sinon le
+    /// programme entier repartirait vers iCloud.
+    func logAttempt(cycle: Int, step: Int, solved: Bool, seconds: Double, at date: Date = Date()) {
+        guard let modelContext else { return }
+        let record = WoodpeckerAttemptRecord()
+        record.programID = id
+        record.cycleNumber = cycle
+        record.step = step
+        record.solved = solved
+        record.seconds = max(0, seconds)
+        record.answeredAt = date
+        modelContext.insert(record)
+    }
+
+    private func loggedAttempts() -> [WoodpeckerPlan.LoggedAttempt] {
+        guard let modelContext else { return [] }
+        let programID = id
+        let records = (try? modelContext.fetch(FetchDescriptor<WoodpeckerAttemptRecord>(
+            predicate: #Predicate { $0.programID == programID }
+        ))) ?? []
+        return records.map {
+            WoodpeckerPlan.LoggedAttempt(cycle: $0.cycleNumber, step: $0.step,
+                                         attempt: WoodpeckerPlan.Attempt(solved: $0.solved, seconds: $0.seconds),
+                                         at: $0.answeredAt)
+        }
+    }
+}
+
+/// Une réponse d'un programme Woodpecker (voir ``WoodpeckerProgram``) : le cycle, la place dans le cycle,
+/// trouvé ou non, le temps. Store « Games » synchronisé ; ajout ADDITIF, mêmes règles CloudKit (valeurs par
+/// défaut, aucune relation — le programme est désigné par son identifiant).
+@Model
+final class WoodpeckerAttemptRecord {
+    var id: UUID = UUID()
+    var programID: UUID = UUID()
+    var cycleNumber: Int = 0
+    var step: Int = 0
+    var solved: Bool = false
+    var seconds: Double = 0
+    var answeredAt: Date = Date()
+
+    init() {}
 }
 
 /// Le plan tel qu'il est GARDÉ : son JSON, compressé.

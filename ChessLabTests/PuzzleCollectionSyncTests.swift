@@ -16,7 +16,7 @@ import Testing
 struct PuzzleCollectionSyncTests {
     private static let container: ModelContainer = {
         try! ModelContainer(
-            for: Puzzle.self, PuzzleProgress.self, WoodpeckerProgram.self, SyncedPuzzleCollection.self,
+            for: Puzzle.self, PuzzleProgress.self, WoodpeckerProgram.self, WoodpeckerAttemptRecord.self, SyncedPuzzleCollection.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         )
     }()

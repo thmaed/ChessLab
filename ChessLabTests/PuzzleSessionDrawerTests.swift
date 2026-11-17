@@ -16,7 +16,7 @@ struct PuzzleSessionDrawerTests {
 
     private static let container: ModelContainer = {
         try! ModelContainer(
-            for: Puzzle.self, PuzzleProgress.self, WoodpeckerProgram.self,
+            for: Puzzle.self, PuzzleProgress.self, WoodpeckerProgram.self, WoodpeckerAttemptRecord.self,
             configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         )
     }()

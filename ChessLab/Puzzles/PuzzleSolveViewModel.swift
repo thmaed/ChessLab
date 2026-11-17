@@ -102,7 +102,9 @@ final class PuzzleSolveViewModel {
     init?(woodpecker program: WoodpeckerProgram, modelContext: ModelContext) {
         guard var plan = program.plan else { return nil }
         if plan.currentCycle.isComplete {
-            plan.startNextCycle()
+            // Ordre de la graine : le même sur tous les appareils. Le plan est réécrit ici (début de cycle,
+            // réponses du cycle passé comprises) — c'est rare ; les réponses, elles, voyagent une à une.
+            plan.startNextCycle(programID: program.id)
             program.plan = plan
             PersistenceLog.save(modelContext)
         }
@@ -173,7 +175,7 @@ final class PuzzleSolveViewModel {
     /// Lance le cycle suivant sur le même lot, dans un nouvel ordre.
     func startNextCycle() {
         guard var plan, plan.currentCycle.isComplete else { return }
-        plan.startNextCycle()
+        if let program { plan.startNextCycle(programID: program.id) } else { plan.startNextCycle() }
         self.plan = plan
         program?.plan = plan
         PersistenceLog.save(modelContext)
@@ -506,9 +508,12 @@ final class PuzzleSolveViewModel {
         clockStartedAt = nil
         clockAccumulated = 0
         guard var plan else { return }
+        let cycle = plan.currentCycle.number, step = plan.currentCycle.attempts.count
         plan.record(solved: success, seconds: seconds)
         self.plan = plan
-        program?.plan = plan
+        // UNE réponse, un petit enregistrement : le plan entier ne repart plus vers iCloud à chaque puzzle
+        // (voir ``WoodpeckerProgram``).
+        program?.logAttempt(cycle: cycle, step: step, solved: success, seconds: seconds)
         PersistenceLog.save(modelContext)
         nextPuzzle = plan.currentItemIndex.map { plan.items[$0].makePuzzle() }
     }

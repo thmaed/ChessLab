@@ -188,7 +188,7 @@ struct ChessLabApp: App {
         let schema = Schema([
             GameRecord.self, Puzzle.self, PuzzleProgress.self,
             OpeningPositionProgress.self, OpeningReviewLog.self, RepertoireMembership.self, UserOpeningRecord.self,
-            WoodpeckerProgram.self, SyncedPuzzleCollection.self,])
+            WoodpeckerProgram.self, WoodpeckerAttemptRecord.self, SyncedPuzzleCollection.self,])
 
         // Deux stores SÉPARÉS, et non un seul :
         // - « Games » (parties de l'utilisateur + PROGRESSION puzzles) :
@@ -221,6 +221,9 @@ struct ChessLabApp: App {
                 // Programmes Woodpecker (23/10/2026) : progression
                 // personnelle, ajout ADDITIF comme les répertoires.
                 WoodpeckerProgram.self,
+                // Ses réponses, une par enregistrement (17/11/2026) : le plan ne repart plus
+                // entier vers iCloud à chaque puzzle. Ajout ADDITIF.
+                WoodpeckerAttemptRecord.self,
                 // Collections de puzzles importées (05/11/2026) : leur copie
                 // iCloud, un PGN compressé par collection. Ajout ADDITIF.
                 SyncedPuzzleCollection.self,
