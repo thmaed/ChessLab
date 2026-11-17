@@ -164,6 +164,11 @@ final class CloudSyncMonitor {
 
     /// Relit l'état du compte iCloud de l'appareil.
     func refreshAccount() async {
+        #if DEBUG && targetEnvironment(simulator)
+        // Crochet de test : le simulateur n'a pas de compte iCloud, la carte s'y arrête à « Connectez-vous ».
+        // `-fakeICloudAccount` la montre comme sur un appareil relié (état, geste « Synchroniser maintenant »).
+        if CommandLine.arguments.contains("-fakeICloudAccount") { account = .available; return }
+        #endif
         do {
             let status = try await CKContainer(identifier: Self.containerID).accountStatus()
             account = switch status {

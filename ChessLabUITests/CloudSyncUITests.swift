@@ -32,6 +32,15 @@ final class CloudSyncUITests: XCTestCase {
         app.staticTexts["Réglages"].firstMatch.tap()
     }
 
+    /// Le changement de base (écran de passage, puis retour aux Réglages) prend quelques secondes ; pris dans une
+    /// série, le simulateur chargé l'a déjà mené au-delà de 15 s (échec isolé du 17/11/2026, vert seul et en
+    /// classe). On lui laisse 30 s, comme l'essai sur appareil, et un échec dit où en était la carte.
+    private func waitForSwitch(_ element: XCUIElement, in app: XCUIApplication, _ message: String) {
+        if element.waitForExistence(timeout: 30) { return }
+        let status = app.descendants(matching: .any)["syncStatusRow"].firstMatch
+        XCTFail("\(message) — état affiché : \(status.exists ? status.label : "carte absente")")
+    }
+
     private func scrollTo(_ element: XCUIElement, in app: XCUIApplication) {
         var tries = 0
         while !element.isHittable, tries < 12 { app.swipeUp(velocity: .slow); tries += 1 }
@@ -50,7 +59,7 @@ final class CloudSyncUITests: XCTestCase {
 
         toggle.switches.firstMatch.tap()
         // Retour aux Réglages, sur la nouvelle base : la liste des appareils, et pas de relancement demandé.
-        XCTAssertTrue(app.staticTexts["Cet appareil"].waitForExistence(timeout: 15),
+        waitForSwitch(app.staticTexts["Cet appareil"], in: app,
                       "après l'échange, les Réglages doivent montrer « Vos appareils »")
         scrollTo(app.staticTexts["Cet appareil"], in: app)
         XCTAssertFalse(app.staticTexts["Dernière étape : relancer ChessLab"].exists,
@@ -71,6 +80,58 @@ final class CloudSyncUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Dernière étape : relancer ChessLab"].exists)
     }
 
+    /// Retour de l'utilisateur (17/11/2026) : « Synchronisation en cours… » s'affichait deux fois, sur la ligne
+    /// d'état en haut et sur le bouton sous la liste des appareils. Désormais le geste est une icône au bout de
+    /// la ligne d'état, retirée pendant l'appui (la ligne d'état montre la roue), le résultat juste dessous, et
+    /// la liste des appareils ferme la carte. `-fakeICloudAccount` : la carte comme sur un appareil relié.
+    func testSettingsCard_saysSyncOnce() throws {
+        let app = launch(["-fakeICloudAccount", "-fakeSyncDevice"])
+        openSettings(app)
+        let toggle = app.switches["syncToggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10))
+        scrollTo(toggle, in: app)
+        toggle.switches.firstMatch.tap()
+        waitForSwitch(app.staticTexts["Cet appareil"], in: app, "après l'échange, les Réglages doivent revenir")
+
+        let button = app.buttons["syncNowButton"]
+        let list = app.otherElements["syncDevicesList"]
+        XCTAssertTrue(button.waitForExistence(timeout: 10), "le geste « Synchroniser maintenant » doit être là")
+        XCTAssertEqual(button.label, "Synchroniser maintenant", "l'icône garde son nom pour VoiceOver")
+        XCTAssertTrue(list.exists)
+        scrollTo(list, in: app)
+        XCTAssertLessThan(button.frame.maxY, list.frame.minY, "le geste est AU-DESSUS de la liste des appareils")
+        let status = app.descendants(matching: .any)["syncStatusRow"].firstMatch
+        XCTAssertTrue(status.exists)
+        XCTAssertTrue(status.frame.minY <= button.frame.midY && button.frame.midY <= status.frame.maxY + 12,
+                      "le geste est sur la ligne d'état")
+        snapshot(app, "carte-avant")
+
+        /// Combien d'ENDROITS de l'écran le disent : la ligne d'état combinée apparaît deux fois dans l'arbre
+        /// d'accessibilité (la ligne et son conteneur, même hauteur) — on compte les hauteurs distinctes.
+        func inProgressCount() -> Int {
+            let rows = app.descendants(matching: .any)
+                .matching(NSPredicate(format: "label CONTAINS 'Synchronisation en cours'"))
+                .allElementsBoundByIndex.filter(\.exists)
+                .map(\.frame.midY).sorted()
+            // Deux hauteurs à moins de 20 pt l'une de l'autre = le même endroit.
+            return zip(rows, rows.dropFirst()).filter { $1 - $0 > 20 }.count + (rows.isEmpty ? 0 : 1)
+        }
+        button.tap()
+        RunLoop.current.run(until: Date().addingTimeInterval(1))
+        snapshot(app, "carte-pendant")
+        XCTAssertEqual(inProgressCount(), 1, "« Synchronisation en cours… » une fois, sur la ligne d'état")
+        XCTAssertFalse(button.exists, "le geste se retire pendant l'appui")
+
+        XCTAssertTrue(button.waitForExistence(timeout: 40), "le geste revient après l'appui")
+        XCTAssertEqual(inProgressCount(), 0)
+        let result = app.staticTexts.matching(NSPredicate(
+            format: "label BEGINSWITH 'Échange réussi' OR label BEGINSWITH 'Rien de nouveau'")).firstMatch
+        if result.exists {
+            XCTAssertLessThan(result.frame.maxY, list.frame.minY, "le résultat est au-dessus de la liste")
+        }
+        snapshot(app, "carte-apres")
+    }
+
     /// Un autre appareil synchronise : l'accueil le propose ; « Activer » change la base sans quitter l'app
     /// et mène aux Réglages, où l'iPad fictif est listé avec son modèle et son système.
     func testHomeInvitation_switchesWithoutRestart() throws {
@@ -83,7 +144,7 @@ final class CloudSyncUITests: XCTestCase {
 
         app.buttons["syncInvitationAccept"].tap()
         let pad = app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "iPad Pro 13″ (M4)")).firstMatch
-        XCTAssertTrue(pad.waitForExistence(timeout: 15), "après l'échange, les Réglages listent l'iPad")
+        waitForSwitch(pad, in: app, "après l'échange, les Réglages listent l'iPad")
         scrollTo(pad, in: app)
         XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "iPadOS 26.1")).firstMatch.exists,
                       "la version du système de l'iPad doit être affichée")
@@ -108,7 +169,7 @@ final class CloudSyncUITests: XCTestCase {
         scrollTo(toggle, in: app)
         toggle.switches.firstMatch.tap()
         // La base change (écran de passage), puis les Réglages reviennent.
-        XCTAssertTrue(app.staticTexts["Cet appareil"].waitForExistence(timeout: 15))
+        waitForSwitch(app.staticTexts["Cet appareil"], in: app, "après l'échange, les Réglages doivent revenir")
         app.navigationBars.buttons.firstMatch.tap()
     }
 

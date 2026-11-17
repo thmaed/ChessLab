@@ -251,6 +251,14 @@ final class OpeningsModuleUITests: XCTestCase {
         // se rabat donc sur le défilement — ce qu'un lecteur ferait aussi.
         let entry = app.buttons["opening_scandinavian"]
         let field = app.searchFields.firstMatch
+        // iPadOS 26 replie la recherche en un BOUTON loupe dans la barre de navigation : le champ n'existe
+        // qu'après l'avoir touché. Sans ça, le test se rabattait sur le défilement — 40 balayages pour une
+        // liste de 44 000 points en AX5, il n'arrivait jamais à la Scandinave (relevé le 17/11/2026).
+        if !field.waitForExistence(timeout: 5) {
+            let searchButton = app.navigationBars.buttons
+                .matching(NSPredicate(format: "label IN %@", ["Rechercher", "Search"])).firstMatch
+            if searchButton.exists { searchButton.tap() }
+        }
         if field.waitForExistence(timeout: 5) {
             field.tap()
             field.typeText("scandinav")

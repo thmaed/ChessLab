@@ -380,4 +380,63 @@ final class DeviceSyncUITests: XCTestCase {
         note("A : une réponse de plus à \(Date().formatted(date: .omitted, time: .standard)), l'app reste ouverte")
         RunLoop.current.run(until: Date().addingTimeInterval(60))
     }
+
+    // MARK: 4. La carte des Réglages : « synchroniser » une seule fois
+
+    /// Retour de l'utilisateur (17/11/2026) : « Synchronisation en cours… » s'affichait deux fois, en haut
+    /// (l'état) et sous la liste des appareils (le bouton). Désormais : le geste est une icône AU BOUT de la
+    /// ligne d'état, masquée pendant l'appui (la ligne d'état montre la roue), le résultat juste dessous, la
+    /// liste des appareils ferme la carte. Un VRAI compte iCloud est nécessaire — le simulateur n'en a pas.
+    func test30_settingsCard_saysSyncOnce() throws {
+        let app = launch()
+        app.buttons["openSettings"].tap()
+        let toggle = app.switches["syncToggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10))
+        scrollTo(toggle, in: app)
+        try XCTSkipIf((toggle.value as? String) == "0", "synchro éteinte sur cet appareil : test01 l'allume")
+
+        let button = app.buttons["syncNowButton"]
+        let list = app.otherElements["syncDevicesList"]
+        XCTAssertTrue(button.waitForExistence(timeout: 20), "le geste « Synchroniser maintenant » doit être là")
+        XCTAssertTrue(list.waitForExistence(timeout: 10))
+        scrollTo(button, in: app)
+        XCTAssertLessThan(button.frame.maxY, list.frame.minY, "le geste est AU-DESSUS de la liste des appareils")
+        let status = app.descendants(matching: .any)["syncStatusRow"].firstMatch
+        XCTAssertTrue(status.exists)
+        XCTAssertTrue(status.frame.minY <= button.frame.midY && button.frame.midY <= status.frame.maxY + 12,
+                      "le geste est sur la ligne d'état")
+        snapshot(app, "carte-avant")
+
+        func syncWordsOnScreen() -> [String] {
+            app.descendants(matching: .any)
+                .matching(NSPredicate(format: "label CONTAINS[c] 'Synchronis'"))
+                .allElementsBoundByIndex
+                .filter { $0.exists && $0.elementType != .switch }
+                .map(\.label)
+        }
+        button.tap()
+        RunLoop.current.run(until: Date().addingTimeInterval(1))
+        let during = syncWordsOnScreen()
+        note("pendant l'appui : \(during)")
+        snapshot(app, "carte-pendant")
+        // La ligne d'état combinée figure deux fois dans l'arbre (la ligne et son conteneur, même hauteur) :
+        // on compte les ENDROITS de l'écran, pas les nœuds.
+        let heights = app.descendants(matching: .any)
+            .matching(NSPredicate(format: "label CONTAINS 'Synchronisation en cours'"))
+            .allElementsBoundByIndex.filter(\.exists).map(\.frame.midY).sorted()
+        let places = zip(heights, heights.dropFirst()).filter { $1 - $0 > 20 }.count + (heights.isEmpty ? 0 : 1)
+        XCTAssertLessThanOrEqual(places, 1, "« Synchronisation en cours… » une seule fois")
+        XCTAssertFalse(button.exists && button.isHittable, "le geste se retire pendant l'appui")
+
+        let back = wait(upTo: 40) { button.exists && button.isHittable }
+        XCTAssertNotNil(back, "le geste revient après l'appui")
+        let result = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Échange réussi' OR label BEGINSWITH 'Rien de nouveau'"))
+            .firstMatch
+        if result.exists {
+            note("résultat : \(result.label)")
+            XCTAssertLessThan(result.frame.maxY, list.frame.minY, "le résultat est au-dessus de la liste")
+        }
+        note("après l'appui : \(syncWordsOnScreen())")
+        snapshot(app, "carte-apres")
+    }
 }

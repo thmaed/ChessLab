@@ -53,28 +53,31 @@ final class IPadEntryPointsUITests: XCTestCase {
         _ = app.staticTexts["ChessLab"].waitForExistence(timeout: 15)
 
         let window = app.frame
+        // Un même libellé peut exister DEUX fois — l'entrée de la barre latérale et la tuile (iPad avec la barre
+        // ouverte). Lire `.frame` sur une requête à plusieurs réponses fait échouer le test (« Multiple matching
+        // elements ») : on relève CHAQUE occurrence, c'est un inventaire.
         for mode in Self.modes {
-            let button = app.buttons[mode]
-            guard button.exists else { continue }
-            print(
-                String(
-                    format: "TILE|%@|x=[%.1f…%.1f] largeur=%.1f|y=[%.1f…%.1f]|fenêtre=%.0f",
-                    mode, button.frame.minX, button.frame.maxX, button.frame.width,
-                    button.frame.minY, button.frame.maxY, window.width
+            for button in app.buttons.matching(identifier: mode).allElementsBoundByIndex {
+                print(
+                    String(
+                        format: "TILE|%@|x=[%.1f…%.1f] largeur=%.1f|y=[%.1f…%.1f]|fenêtre=%.0f",
+                        mode, button.frame.minX, button.frame.maxX, button.frame.width,
+                        button.frame.minY, button.frame.maxY, window.width
+                    )
                 )
-            )
+            }
         }
         // Et les textes qu'elles contiennent : si c'est le TITRE qui déborde,
         // il le dira lui-même.
         for label in ["Deux joueurs", "Ouvertures", "Sur le même appareil"] {
-            let text = app.staticTexts[label]
-            guard text.exists else { continue }
-            print(
-                String(
-                    format: "TILE-TEXT|%@|x=[%.1f…%.1f] largeur=%.1f",
-                    label, text.frame.minX, text.frame.maxX, text.frame.width
+            for text in app.staticTexts.matching(identifier: label).allElementsBoundByIndex {
+                print(
+                    String(
+                        format: "TILE-TEXT|%@|x=[%.1f…%.1f] largeur=%.1f",
+                        label, text.frame.minX, text.frame.maxX, text.frame.width
+                    )
                 )
-            )
+            }
         }
     }
 

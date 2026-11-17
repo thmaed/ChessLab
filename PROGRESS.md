@@ -11420,3 +11420,27 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
 - **17/11, schéma CloudKit DÉPLOYÉ en production** (par l'utilisateur) : `CD_WoodpeckerAttemptRecord` présent ;
   `cktool export-schema` des deux environnements : 10 types `CD_*` + `Users`, développement et production
   IDENTIQUES. Le préalable « À FAIRE AVANT LA SORTIE » ci-dessus est levé.
+- **17/11, Réglages : « synchroniser » une seule fois** (retour de l'utilisateur : « deux fois synchroniser, au-dessus
+  et au-dessous des appareils »). Pendant un appui sur « Synchroniser maintenant », la ligne d'état disait
+  « Synchronisation en cours… » en haut et le bouton répétait la même chose, roue comprise, sous la liste des
+  appareils. Désormais le geste est une ICÔNE au bout de la ligne d'état (nom « Synchroniser maintenant » pour
+  VoiceOver, infobulle sur Mac), retirée pendant l'appui — c'est la ligne d'état qui montre la roue ; le résultat
+  de l'appui et « Détails » suivent juste dessous ; la liste des appareils ferme la carte. Le mot « Synchroniser »
+  ne reste que dans l'interrupteur.
+  - Crochet de test `-fakeICloudAccount` (simulateur, Debug) : la carte comme sur un appareil relié.
+    `CloudSyncUITests.testSettingsCard_saysSyncOnce` (simulateur) et `DeviceSyncUITests.test30` (appareil réel).
+    Piège : la ligne d'état combinée figure DEUX fois dans l'arbre d'accessibilité (ligne + conteneur, même
+    hauteur) — compter les endroits de l'écran, pas les nœuds.
+  - Android : rien à porter (pas d'iCloud).
+- **17/11, petits restes** :
+  - Politique de confidentialité (17/11) : la fiche d'appareil de « Vos appareils » décrite ; `PRIVACY.md` redevient
+    la source (il avait manqué les ajouts du 15/11 faits à la main dans la page), page réengendrée.
+  - Légende de la capture des puzzles : « Plus de 130 000 » / « 130,000+ » (fr, en) — au prochain habillage.
+  - `PARITE.md` : le binaire Play intermédiaire (33) est réglé, la 2.3 (37) est en production.
+  - Tests : `IPadEntryPointsUITests.testReportModeTileFrames` lisait la frame d'un libellé présent DEUX fois (barre
+    latérale + tuile) → relève chaque occurrence ; `OpeningsModuleUITests.testTheModuleSurvivesTheLargestTextSize`
+    sur iPad : iPadOS 26 replie la recherche en un bouton loupe, le test se rabattait sur 40 balayages d'une liste
+    de 44 000 pt → il touche la loupe. Verts sur iPad mini (26.5). Sur l'iPad Pro 13" (27.1), les 23 tests de barre
+    latérale, Ouvertures, Finales et Import passent tels quels (les échecs du 16/11 ne se reproduisent plus).
+    `CloudSyncUITests` : 30 s au lieu de 15 pour le retour des Réglages après le changement de base, et un échec
+    dit l'état affiché ; la classe deux fois de suite : 14/14.

@@ -230,7 +230,12 @@ struct SettingsView: View {
     /// étape » de relancement, une seule fois. Utilise l'iCloud PRIVÉ de l'utilisateur (aucun serveur
     /// ChessLab, aucun compte à créer) ; l'app reste entièrement fonctionnelle hors ligne.
     private var syncSection: some View {
-        let state = monitor.state(enabled: cloudSyncEnabled)
+        let observed = monitor.state(enabled: cloudSyncEnabled)
+        let canSyncNow = showsManualSync(observed)
+        // Pendant un appui sur « Synchroniser maintenant », c'est la ligne d'état qui le dit — UNE fois. Le
+        // bouton répétait « Synchronisation en cours… » sous la liste des appareils, au-dessous du même texte
+        // en haut (retour de l'utilisateur, 17/11/2026).
+        let state = monitor.isManualSyncRunning && canSyncNow ? CloudSyncState.syncing : observed
         let registry = CloudDeviceRegistry.live
         return VStack(alignment: .leading, spacing: 12) {
             sectionTitle("Synchronisation")
@@ -245,7 +250,16 @@ struct SettingsView: View {
                     .fixedSize(horizontal: false, vertical: true)
 
                 Divider().overlay(Theme.stroke)
-                CloudSyncStatusRow(state: state)
+                // L'état et son geste sur la même ligne, le résultat et les détails juste dessous : tout ce qui
+                // parle de la synchronisation est au même endroit, la liste des appareils ferme la carte.
+                HStack(alignment: .center, spacing: 8) {
+                    CloudSyncStatusRow(state: state)
+                    if canSyncNow, !monitor.isManualSyncRunning { manualSyncButton }
+                }
+                if canSyncNow {
+                    manualSyncResult
+                    syncDetails
+                }
 
                 if state == .startsAfterRestart { CloudRestartSteps() }
 
@@ -265,13 +279,6 @@ struct SettingsView: View {
                         CloudDeviceRegistry.live.checkIn(force: true)
                         refreshSyncDevices()
                     }
-                }
-
-                if showsManualSync(state) {
-                    Divider().overlay(Theme.stroke)
-                    manualSyncButton
-                    manualSyncResult
-                    syncDetails
                 }
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -331,6 +338,8 @@ struct SettingsView: View {
         .tint(Theme.textSecondary)
     }
 
+    /// Le geste, en icône au bout de la ligne d'état (le mot « Synchroniser » est déjà dans l'interrupteur
+    /// au-dessus). Masqué pendant l'appui : la ligne d'état montre alors la roue.
     private var manualSyncButton: some View {
         Button {
             Task {
@@ -339,18 +348,15 @@ struct SettingsView: View {
                 Haptics.move()
             }
         } label: {
-            HStack(spacing: 6) {
-                if monitor.isManualSyncRunning {
-                    ProgressView().controlSize(.small)
-                    Text("Synchronisation en cours…")
-                } else {
-                    Label("Synchroniser maintenant", systemImage: "arrow.triangle.2.circlepath")
-                }
-            }
-            .font(.caption.weight(.semibold)).foregroundStyle(Theme.accent)
+            Image(systemName: "arrow.triangle.2.circlepath")
+                .font(.body.weight(.semibold))
+                .foregroundStyle(Theme.accent)
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
         }
         .buttonStyle(.pressable)
-        .disabled(monitor.isManualSyncRunning)
+        .accessibilityLabel(Text("Synchroniser maintenant"))
+        .help(Text("Synchroniser maintenant"))
         .accessibilityIdentifier("syncNowButton")
     }
 
