@@ -11444,3 +11444,30 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
     latérale, Ouvertures, Finales et Import passent tels quels (les échecs du 16/11 ne se reproduisent plus).
     `CloudSyncUITests` : 30 s au lieu de 15 pour le retour des Réglages après le changement de base, et un échec
     dit l'état affiché ; la classe deux fois de suite : 14/14.
+
+## 17/11 — « Contre la montre » : la série de puzzles chronométrée (iOS + Android)
+
+Étude du jour (« Contre la montre » puis « Vision ») validée par l'utilisateur, avec ses décisions : la série ne touche
+NI la cote NI « Ratés » (bilan seul) ; record synchronisé par iCloud sur iPhone (réglages), local sur Android ; « Vision »
+viendra dans « Plus » de l'accueil, voix à l'aveugle éteinte par défaut.
+
+- **La règle** (`PuzzleRushRun`, pure) : 3 minutes, 3 erreurs, difficulté visée = départ + 30 par réussite ; départ à
+  la cote − 400 (plancher 600) ; puzzles de la BIBLIOTHÈQUE seulement, de 1 ou 2 coups à trouver (≤ 3 demi-coups —
+  mesuré : 1 750 à 11 400 par tranche de 200 de 400 à 2400), jamais deux fois dans une série ; fenêtre ± 75, élargie
+  à 200, 500 puis tout si vide.
+- **L'écran** : la règle en une phrase et « Commencer » ; décompte 3-2-1 ; pendant, le chrono SEUL en gros (rouge dans
+  les 10 dernières secondes), le score avec un « +1 » qui monte, trois croix ; riposte en 0,15 s ; coup faux = une
+  croix, la bonne réponse fléchée 0,7 s, puis la suite ; app en arrière-plan = pause, temps arrêté, plateau MASQUÉ ;
+  bilan : un seul grand chiffre, record (nouveau : trophée et confettis), « Plus difficile trouvé », Terminer /
+  Rejouer, et les ratés avec leur solution numérotée (« 19. Fxh7+ Rf8 20. Txe5 ») et « Analyser ».
+- **Ce qui n'est pas touché** : cote, répétition espacée, « Ratés », ni même le marqueur « déjà ouvert » des puzzles ;
+  seul le jour d'entraînement compte. Le record (`puzzleRush.best.v1`) entre dans la liste blanche des réglages
+  synchronisés ; lu au MAXIMUM appareil / nuage pour qu'un appareil resté hors ligne n'écrase pas un meilleur record.
+- **Android** : mêmes règles et mots ; la bibliothèque étant lue en flux, un LOT est tiré en une passe pendant la
+  règle (≈ 2,1 s sur le Galaxy A16, roue sur « Commencer »). Écarts inscrits dans `android/PARITE.md`.
+- **Tests** : iOS `PuzzleRushRunTests` (6), tirage + parcours complet du modèle dans `PuzzleSessionDrawerTests` (4),
+  `PuzzleRushUITests` (2 : de la règle au bilan, pause voilée) ; Android `PuzzleRushTest` JVM (8) et instrumenté
+  (émulateur + Galaxy A16). Suites complètes : iOS unitaires 1 385/1 385, Android JVM 657/657.
+- Crochets de test : `-puzzleRushSeconds N` (iOS, Debug), `PuzzleRushViewModel.durationOverrideMs` (Android).
+- Reste : aspect sur le Galaxy (le test n'a vérifié que le comportement), ligne dans les Nouveautés de l'Aide à la
+  prochaine version, traductions non relues par un natif (comme le reste).

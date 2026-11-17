@@ -1419,4 +1419,36 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="scan_piece_black_rook">Tour noire</string>
     <string name="scan_piece_black_queen">Dame noire</string>
     <string name="scan_piece_black_king">Roi noir</string>
+
+    <!-- Contre la montre (17/11/2026), mêmes mots qu'iOS -->
+    <string name="rush_title">Contre la montre</string>
+    <string name="rush_card_sub">3 minutes · 3 erreurs au plus</string>
+    <string name="rush_card_best">Record</string>
+    <string name="rush_rule">3 minutes. Chaque puzzle trouvé compte un point. Trois erreurs et c\'est fini.</string>
+    <string name="rush_rule_detail">Les puzzles deviennent plus difficiles à chaque réussite. Pas d\'indice, un seul essai par puzzle.</string>
+    <string name="rush_best">Votre record : %1$d</string>
+    <string name="rush_unavailable">La bibliothèque de puzzles n\'est pas encore prête.</string>
+    <string name="rush_start">Commencer</string>
+    <string name="rush_time_left">Temps restant</string>
+    <string name="rush_found">trouvés</string>
+    <string name="rush_errors">Erreurs : %1$d sur %2$d</string>
+    <string name="rush_paused">En pause</string>
+    <string name="rush_paused_body">Le temps est arrêté et le plateau masqué.</string>
+    <string name="rush_resume">Reprendre</string>
+    <string name="rush_white_to_move">Trait aux blancs</string>
+    <string name="rush_black_to_move">Trait aux noirs</string>
+    <string name="rush_new_record">Nouveau record ! (avant : %1$d)</string>
+    <string name="rush_first_record">Premier record !</string>
+    <string name="rush_hardest">Plus difficile trouvé : %1$d</string>
+    <string name="rush_done">Terminer</string>
+    <string name="rush_again">Rejouer</string>
+    <string name="rush_analyze">Analyser</string>
+    <plurals name="rush_solved_count">
+        <item quantity="one">puzzle trouvé</item>
+        <item quantity="other">puzzles trouvés</item>
+    </plurals>
+    <plurals name="rush_missed_title">
+        <item quantity="one">Votre raté</item>
+        <item quantity="other">Vos ratés</item>
+    </plurals>
 </resources>

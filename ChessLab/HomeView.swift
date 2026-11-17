@@ -109,6 +109,8 @@ struct HomeView: View {
         case scanner
         case puzzleQueue
         case activePuzzleSession(PuzzleSessionFilter)
+        /// « Contre la montre » : trois minutes, trois erreurs (17/11/2026).
+        case puzzleRush
         /// Un programme Woodpecker, repris là où il en est.
         case woodpecker(UUID)
         /// Liste des ouvertures — l'écran d'entrée du module.
@@ -193,7 +195,7 @@ struct HomeView: View {
         var showsBoard: Bool {
             switch self {
             case .activeGame, .resumedGame, .activeTwoPlayerGame, .resumedTwoPlayerGame,
-                 .activeAnalysis, .missedMates, .positionEditor, .activePuzzleSession, .woodpecker,
+                 .activeAnalysis, .missedMates, .positionEditor, .activePuzzleSession, .puzzleRush, .woodpecker,
                  .endgameFreeTrain, .endgameReader, .openingEditor, .openingLabsReader,
                  .openingTrainDaily, .openingTrainSession, .openingTrainLine,
                  .activeChess960Game, .activeChess960TwoPlayerGame, .activeChess960Analysis,
@@ -1248,6 +1250,17 @@ struct HomeView: View {
                         path.append(Route.twoPlayerSetup)
                     } onOpenWoodpecker: { id in
                         path.append(Route.woodpecker(id))
+                    } onStartRush: {
+                        // Une NOUVELLE série à chaque entrée : la précédente (bilan compris) est oubliée.
+                        sessionStore.remove(sessionKey(for: .puzzleRush))
+                        path.append(Route.puzzleRush)
+                    }
+
+                case .puzzleRush:
+                    PuzzleRushHost(sessionKey: sessionKey(for: route)) {
+                        path.removeLast()
+                    } onAnalyze: { fen in
+                        path.append(Route.activeAnalysis(.fen(fen)))
                     }
 
                 case let .woodpecker(id):
@@ -2622,6 +2635,31 @@ private struct WoodpeckerHost: View {
 /// série ouverte (bouton "Commencer" de ``PuzzleQueueView``, une fois
 /// niveau/phase/type choisis) — le modèle tire lui-même les puzzles un à
 /// un selon le filtre, au fil des "Nouveau puzzle".
+/// Héberge la série « Contre la montre » : son modèle survit aux reconstructions de la vue (voir
+/// ``SessionStore``), un raté ouvert dans l'Analyse puis refermé retrouve le bilan.
+private struct PuzzleRushHost: View {
+    let sessionKey: String
+    let onExit: () -> Void
+    var onAnalyze: (String) -> Void = { _ in }
+    @Environment(\.modelContext) private var modelContext
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: PuzzleRushViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                PuzzleRushView(viewModel: viewModel, onExit: onExit, onAnalyze: onAnalyze)
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            guard viewModel == nil else { return }
+            viewModel = sessionStore.value(for: sessionKey) { PuzzleRushViewModel(modelContext: modelContext) }
+        }
+    }
+}
+
 private struct PuzzleSessionHost: View {
     let filter: PuzzleSessionFilter
     /// Identité de session — voir ``SessionStore``.

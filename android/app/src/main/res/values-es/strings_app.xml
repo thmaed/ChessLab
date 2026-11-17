@@ -1379,4 +1379,36 @@
     <string name="scan_piece_black_rook">Torre negra</string>
     <string name="scan_piece_black_queen">Dama negra</string>
     <string name="scan_piece_black_king">Rey negro</string>
+
+    <!-- Contre la montre (17/11/2026), mêmes mots qu'iOS -->
+    <string name="rush_title">Contrarreloj</string>
+    <string name="rush_card_sub">3 minutos · 3 errores como máximo</string>
+    <string name="rush_card_best">Récord</string>
+    <string name="rush_rule">3 minutos. Cada puzle resuelto suma un punto. Tres errores y se acabó.</string>
+    <string name="rush_rule_detail">Los puzles se vuelven más difíciles con cada acierto. Sin pistas, un solo intento por puzle.</string>
+    <string name="rush_best">Tu récord: %1$d</string>
+    <string name="rush_unavailable">La biblioteca de puzles aún no está lista.</string>
+    <string name="rush_start">Empezar</string>
+    <string name="rush_time_left">Tiempo restante</string>
+    <string name="rush_found">resueltos</string>
+    <string name="rush_errors">Errores: %1$d de %2$d</string>
+    <string name="rush_paused">En pausa</string>
+    <string name="rush_paused_body">El tiempo está detenido y el tablero oculto.</string>
+    <string name="rush_resume">Reanudar</string>
+    <string name="rush_white_to_move">Turno de las blancas</string>
+    <string name="rush_black_to_move">Turno de las negras</string>
+    <string name="rush_new_record">¡Nuevo récord! (antes: %1$d)</string>
+    <string name="rush_first_record">¡Primer récord!</string>
+    <string name="rush_hardest">El más difícil resuelto: %1$d</string>
+    <string name="rush_done">Terminar</string>
+    <string name="rush_again">Repetir</string>
+    <string name="rush_analyze">Analizar</string>
+    <plurals name="rush_solved_count">
+        <item quantity="one">puzle resuelto</item>
+        <item quantity="other">puzles resueltos</item>
+    </plurals>
+    <plurals name="rush_missed_title">
+        <item quantity="one">Puzle fallado</item>
+        <item quantity="other">Puzles fallados</item>
+    </plurals>
 </resources>

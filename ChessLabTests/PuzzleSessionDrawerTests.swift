@@ -358,5 +358,81 @@ struct PuzzleSessionDrawerTests {
         second.attemptMove(from: Square("h2"), to: Square("h8"))
         #expect(PuzzleRatingStore.load(from: defaults).count == 1, "pas de cote, pas de mise à jour")
     }
-}
 
+    // MARK: Contre la montre (17/11/2026)
+
+    private func rated(_ rating: Int, plies: Int, source: PuzzleSource = .lichess, in context: ModelContext) -> Puzzle {
+        let puzzle = insertPuzzle(in: context, source: source, solution: Array(repeating: "a1a8", count: plies))
+        puzzle.rating = rating
+        return puzzle
+    }
+
+    @Test func rushDrawsShortLibraryPuzzlesAroundTheTarget() throws {
+        let context = try makeContext()
+        let wanted = rated(1200, plies: 3, in: context)
+        rated(1210, plies: 5, in: context)                      // trop long
+        rated(1190, plies: 1, source: .ownGames, in: context)    // pas de la bibliothèque
+        rated(1800, plies: 1, in: context)                      // trop loin
+        try context.save()
+        let drawn = Set((0..<30).compactMap { _ in PuzzleRushDrawer.next(target: 1200, excluding: [], in: context)?.id })
+        #expect(drawn == [wanted.id])
+    }
+
+    @Test func rushNeverServesTheSamePuzzleTwice_andWidensWhenTheWindowIsEmpty() throws {
+        let context = try makeContext()
+        let near = rated(2000, plies: 1, in: context)
+        let far = rated(2350, plies: 3, in: context)
+        try context.save()
+        #expect(PuzzleRushDrawer.next(target: 2000, excluding: [near.id], in: context)?.id == far.id,
+                "rien de neuf à ± 75 : la fenêtre s'élargit")
+        #expect(PuzzleRushDrawer.next(target: 2000, excluding: [near.id, far.id], in: context) == nil)
+    }
+
+    @Test func rushSolutionReadsAsNumberedMoves() throws {
+        let puzzle = Puzzle()
+        puzzle.fen = "r5k1/1bp2pp1/p3p2p/1p2q3/4B3/2P5/PPQ2PPP/4R1K1 w - - 0 19"
+        puzzle.solutionLANs = ["e4h7", "g8f8", "e1e5"]
+        let text = PuzzleRushViewModel.solutionText(of: puzzle)
+        #expect(text.hasPrefix("19. "))
+        #expect(text.contains(" 20. "))
+        #expect(text.split(separator: " ").count == 5, "19. X Y 20. Z : \(text)")
+    }
+
+    /// Le parcours d'une série sur l'écran : un puzzle trouvé (+1, la difficulté monte), un coup faux
+    /// (une erreur, la bonne réponse fléchée, le puzzle dans les ratés), puis la bibliothèque épuisée clôt la
+    /// série — sans toucher NI la cote NI la répétition espacée (décision du 17/11/2026).
+    @Test func rushRunSolvesMissesAndEndsWithoutTouchingTheLibrary() async throws {
+        let context = try makeContext()
+        let mateInOne = rated(1100, plies: 1, in: context)          // Ta8#
+        let second = rated(1130, plies: 1, in: context)
+        try context.save()
+        let defaults = try #require(UserDefaults(suiteName: "rush.\(UUID().uuidString)"))
+        let model = PuzzleRushViewModel(modelContext: context, duration: 60, playerRating: 1500,
+                                        recordDefaults: defaults, remoteRecord: { nil })
+        model.begin()
+        try await Task.sleep(for: .milliseconds(2_700))
+        #expect(model.phase == .playing)
+        let first = try #require(model.puzzle?.id)
+
+        // Le puzzle servi en premier : on le trouve (Ta8 mate, même si ce n'était pas « sa » solution).
+        model.attemptMove(from: Square("a1"), to: Square("a8"))
+        #expect(model.score == 1)
+        try await Task.sleep(for: .milliseconds(500))
+        #expect(model.puzzle?.id != first, "le suivant arrive")
+
+        // Le second : un coup faux (le roi), puis la fin de l'animation de rejet.
+        model.attemptMove(from: Square("g1"), to: Square("f1"))
+        model.finishRejectedAttempt()
+        #expect(model.errors == 1)
+        #expect(model.missed.count == 1)
+        #expect(!model.hintMoves.isEmpty, "la bonne réponse est fléchée")
+        try await Task.sleep(for: .milliseconds(900))
+        #expect(model.phase == .finished, "plus rien à servir : bilan")
+        #expect(model.isNewRecord)
+        #expect(defaults.integer(forKey: PuzzleRushRecordStore.key) == 1)
+        for puzzle in [mateInOne, second] {
+            #expect(puzzle.successCount == 0 && puzzle.failureCount == 0 && puzzle.firstOpenedAt == nil,
+                    "la bibliothèque sort de la série telle qu'elle y est entrée")
+        }
+    }
+}

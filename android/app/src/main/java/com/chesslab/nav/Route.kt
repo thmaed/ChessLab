@@ -152,6 +152,11 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     ) : Route(R.string.route_puzzles)
     /** Un programme Woodpecker, repris là où il en est. */
     data class Woodpecker(val id: String) : Route(R.string.route_puzzles)
+    /**
+     * « Contre la montre » (17/11/2026). [session] distingue chaque entrée : la précédente série (bilan
+     * compris) est oubliée, mais un raté ouvert dans l'Analyse puis refermé retrouve son bilan.
+     */
+    data class PuzzleRush(val session: Long = System.currentTimeMillis()) : Route(R.string.rush_title)
     data object Openings : Route(R.string.route_openings) {
         override val hasOwnTitle get() = true
     }

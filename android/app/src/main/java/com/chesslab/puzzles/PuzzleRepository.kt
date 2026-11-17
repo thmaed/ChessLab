@@ -169,6 +169,9 @@ object PuzzleRepository {
         return found
     }
 
+    /** Une entrée de la bibliothèque, pour qui la lit lui-même en flux (`PuzzleRushPool`). */
+    internal fun read(json: JsonReader): Puzzle? = readPuzzle(json)
+
     private fun readPuzzle(json: JsonReader): Puzzle? {
         var id = ""; var fen = ""; var theme = ""; var rating = 0
         var phase: String? = null

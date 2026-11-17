@@ -303,6 +303,12 @@ private fun App(
                 onOpenTwoPlayer = { stack.add(Route.TwoPlayerSetup()) },
                 onOpenLab = { stack.add(Route.Laboratory()) },
                 onOpenWoodpecker = { stack.add(Route.Woodpecker(it)) },
+                onStartRush = { stack.add(Route.PuzzleRush()) },
+            )
+            is Route.PuzzleRush -> com.chesslab.puzzles.PuzzleRushScreen(
+                session = current.session,
+                onExit = { stack.removeAt(stack.lastIndex) },
+                onAnalyze = { stack.add(Route.AnalysisBoard(fen = it)) },
             )
             is Route.Woodpecker -> PuzzleScreen(
                 woodpeckerId = current.id,

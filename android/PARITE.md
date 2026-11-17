@@ -2147,3 +2147,23 @@ Fait des deux côtés : pastille « Automatique » par défaut, notation = langu
 - [x] Réglages : vignettes des thèmes et des jeux de pièces, tuile « Automatique » de la notation active par défaut — vu sur Galaxy A16 le 14/11.
 - [ ] Analyser : un fichier de plusieurs parties part dans la bibliothèque, un fichier d'une partie s'ouvre en analyse.
 - [ ] Aide : bloc « Nouveautés 2.3 » en tête.
+
+## Contre la montre (17/11/2026)
+
+Série de puzzles chronométrée : 3 minutes, 3 erreurs au plus, difficulté qui monte de 30 points par réussite (départ
+à la cote − 400, jamais sous 600), puzzles de 1 ou 2 coups à trouver, un seul essai, pas d'indice. Ni la cote, ni la
+répétition espacée, ni « Ratés » ne sont touchés (décision du 17/11) ; les ratés sont au bilan, avec leur solution et
+« Analyser ». Carte pleine largeur sous les quatre tuiles de Puzzles. Mêmes mots dans les cinq langues.
+- [x] Code des deux côtés (`PuzzleRush.swift`/`PuzzleRushViewModel.swift`/`PuzzleRushView.swift` ↔
+      `PuzzleRush.kt`/`PuzzleRushViewModel.kt`/`PuzzleRushScreen.kt`). Tests : iOS `PuzzleRushRunTests` + tirage et
+      parcours dans `PuzzleSessionDrawerTests`, `PuzzleRushUITests` (2) ; Android `PuzzleRushTest` JVM (8) et
+      instrumenté (émulateur ET Galaxy A16 : vert, lot prêt en 2,1 s).
+- [ ] **À vérifier sur le Galaxy : l'ASPECT** (règle, chrono, pause voilée, bilan) — le test n'a vérifié que le
+      comportement.
+- **Écart de PLATEFORME assumé** : le record suit les réglages par iCloud sur iOS ; il reste sur l'appareil Android.
+- **Écart TECHNIQUE, sans effet visible sauf une roue** : iOS tire chaque puzzle dans sa base ; Android lit la
+  bibliothèque en flux et tire donc un LOT au moment de la règle (une passe, ≈ 2 s sur le Galaxy) — « Commencer »
+  montre une roue pendant ce temps.
+- [ ] **Écart relevé, pas propre à ce mode** : un coup faux est rejoué en rouge (aller-retour) sur le plateau iOS,
+      dans les puzzles comme ici ; Android ne l'anime pas (croix, coup juste fléché, vibration). À porter avec
+      l'écran de puzzle, en même temps.

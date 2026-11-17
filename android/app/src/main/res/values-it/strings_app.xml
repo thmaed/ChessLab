@@ -1379,4 +1379,36 @@
     <string name="scan_piece_black_rook">Torre nera</string>
     <string name="scan_piece_black_queen">Donna nera</string>
     <string name="scan_piece_black_king">Re nero</string>
+
+    <!-- Contre la montre (17/11/2026), mêmes mots qu'iOS -->
+    <string name="rush_title">Contro il tempo</string>
+    <string name="rush_card_sub">3 minuti · al massimo 3 errori</string>
+    <string name="rush_card_best">Record</string>
+    <string name="rush_rule">3 minuti. Ogni puzzle risolto vale un punto. Tre errori ed è finita.</string>
+    <string name="rush_rule_detail">I puzzle diventano più difficili a ogni successo. Niente suggerimenti, un solo tentativo per puzzle.</string>
+    <string name="rush_best">Il tuo record: %1$d</string>
+    <string name="rush_unavailable">La libreria dei puzzle non è ancora pronta.</string>
+    <string name="rush_start">Inizia</string>
+    <string name="rush_time_left">Tempo rimasto</string>
+    <string name="rush_found">risolti</string>
+    <string name="rush_errors">Errori: %1$d su %2$d</string>
+    <string name="rush_paused">In pausa</string>
+    <string name="rush_paused_body">Il tempo è fermo e la scacchiera nascosta.</string>
+    <string name="rush_resume">Riprendi</string>
+    <string name="rush_white_to_move">Tratto al Bianco</string>
+    <string name="rush_black_to_move">Tratto al Nero</string>
+    <string name="rush_new_record">Nuovo record! (prima: %1$d)</string>
+    <string name="rush_first_record">Primo record!</string>
+    <string name="rush_hardest">Il più difficile risolto: %1$d</string>
+    <string name="rush_done">Termina</string>
+    <string name="rush_again">Rigioca</string>
+    <string name="rush_analyze">Analizza</string>
+    <plurals name="rush_solved_count">
+        <item quantity="one">puzzle risolto</item>
+        <item quantity="other">puzzle risolti</item>
+    </plurals>
+    <plurals name="rush_missed_title">
+        <item quantity="one">Puzzle sbagliato</item>
+        <item quantity="other">Puzzle sbagliati</item>
+    </plurals>
 </resources>

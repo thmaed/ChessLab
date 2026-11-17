@@ -1422,4 +1422,36 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="scan_piece_black_rook">Black rook</string>
     <string name="scan_piece_black_queen">Black queen</string>
     <string name="scan_piece_black_king">Black king</string>
+
+    <!-- Contre la montre (17/11/2026), mêmes mots qu'iOS -->
+    <string name="rush_title">Against the clock</string>
+    <string name="rush_card_sub">3 minutes · 3 mistakes at most</string>
+    <string name="rush_card_best">Best</string>
+    <string name="rush_rule">3 minutes. Each puzzle you solve scores a point. Three mistakes and it\'s over.</string>
+    <string name="rush_rule_detail">Puzzles get harder with every success. No hints, one attempt per puzzle.</string>
+    <string name="rush_best">Your best: %1$d</string>
+    <string name="rush_unavailable">The puzzle library isn\'t ready yet.</string>
+    <string name="rush_start">Start</string>
+    <string name="rush_time_left">Time left</string>
+    <string name="rush_found">solved</string>
+    <string name="rush_errors">Mistakes: %1$d of %2$d</string>
+    <string name="rush_paused">Paused</string>
+    <string name="rush_paused_body">The clock is stopped and the board hidden.</string>
+    <string name="rush_resume">Resume</string>
+    <string name="rush_white_to_move">White to move</string>
+    <string name="rush_black_to_move">Black to move</string>
+    <string name="rush_new_record">New best! (was %1$d)</string>
+    <string name="rush_first_record">Your first best score!</string>
+    <string name="rush_hardest">Hardest solved: %1$d</string>
+    <string name="rush_done">Done</string>
+    <string name="rush_again">Replay</string>
+    <string name="rush_analyze">Analyse</string>
+    <plurals name="rush_solved_count">
+        <item quantity="one">puzzle solved</item>
+        <item quantity="other">puzzles solved</item>
+    </plurals>
+    <plurals name="rush_missed_title">
+        <item quantity="one">Missed puzzle</item>
+        <item quantity="other">Missed puzzles</item>
+    </plurals>
 </resources>

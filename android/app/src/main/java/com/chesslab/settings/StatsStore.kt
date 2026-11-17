@@ -34,6 +34,8 @@ object StatsStore {
     private val ratingValue = doublePreferencesKey("puzzleRating")
     private val ratingDeviation = doublePreferencesKey("puzzleRatingDeviation")
     private val ratingCount = intPreferencesKey("puzzleRatingCount")
+    /** Record de « Contre la montre » (17/11/2026) — local : Android n'a pas d'iCloud. */
+    private val rushBestKey = intPreferencesKey("puzzleRushBest")
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     fun puzzles(context: Context): Flow<PuzzleStats> =
@@ -64,6 +66,23 @@ object StatsStore {
         deviation = this[ratingDeviation] ?: 350.0,
         count = this[ratingCount] ?: 0,
     )
+
+    /** Le record de « Contre la montre », 0 s'il n'y en a pas. */
+    suspend fun rushBest(context: Context): Int =
+        context.applicationContext.statsStore.data.first()[rushBestKey] ?: 0
+
+    /**
+     * Enregistre le score s'il bat le record. Rend l'ANCIEN record et s'il est battu — pendant de
+     * `PuzzleRushRecordStore.submit` (iOS).
+     */
+    suspend fun submitRush(context: Context, score: Int): Pair<Int, Boolean> {
+        var previous = 0
+        context.applicationContext.statsStore.edit {
+            previous = it[rushBestKey] ?: 0
+            if (score > previous) it[rushBestKey] = score
+        }
+        return previous to (score > previous)
+    }
 
     /** La cote de puzzle personnelle (B3). */
     suspend fun puzzleRating(context: Context): PuzzleRating =

@@ -1340,4 +1340,36 @@
     <string name="scan_piece_black_rook">Schwarzer Turm</string>
     <string name="scan_piece_black_queen">Schwarze Dame</string>
     <string name="scan_piece_black_king">Schwarzer König</string>
+
+    <!-- Contre la montre (17/11/2026), mêmes mots qu'iOS -->
+    <string name="rush_title">Gegen die Uhr</string>
+    <string name="rush_card_sub">3 Minuten · höchstens 3 Fehler</string>
+    <string name="rush_card_best">Rekord</string>
+    <string name="rush_rule">3 Minuten. Jedes gelöste Puzzle zählt einen Punkt. Drei Fehler, und es ist vorbei.</string>
+    <string name="rush_rule_detail">Mit jedem Erfolg werden die Puzzles schwerer. Keine Hinweise, ein Versuch pro Puzzle.</string>
+    <string name="rush_best">Dein Rekord: %1$d</string>
+    <string name="rush_unavailable">Die Puzzle-Bibliothek ist noch nicht bereit.</string>
+    <string name="rush_start">Starten</string>
+    <string name="rush_time_left">Verbleibende Zeit</string>
+    <string name="rush_found">gelöst</string>
+    <string name="rush_errors">Fehler: %1$d von %2$d</string>
+    <string name="rush_paused">Pausiert</string>
+    <string name="rush_paused_body">Die Zeit ist angehalten und das Brett verdeckt.</string>
+    <string name="rush_resume">Fortsetzen</string>
+    <string name="rush_white_to_move">Weiß am Zug</string>
+    <string name="rush_black_to_move">Schwarz am Zug</string>
+    <string name="rush_new_record">Neuer Rekord! (vorher: %1$d)</string>
+    <string name="rush_first_record">Erster Rekord!</string>
+    <string name="rush_hardest">Schwerstes gelöstes: %1$d</string>
+    <string name="rush_done">Fertig</string>
+    <string name="rush_again">Wiederholen</string>
+    <string name="rush_analyze">Analysieren</string>
+    <plurals name="rush_solved_count">
+        <item quantity="one">Puzzle gelöst</item>
+        <item quantity="other">Puzzles gelöst</item>
+    </plurals>
+    <plurals name="rush_missed_title">
+        <item quantity="one">Verfehltes Puzzle</item>
+        <item quantity="other">Verfehlte Puzzles</item>
+    </plurals>
 </resources>

@@ -82,6 +82,9 @@ final class SettingsCloudSync {
         "opponentLevels.v1",
         // Cote de puzzle personnelle (Glicko), dernière écriture gagne.
         "puzzleRating.v1",
+        // Record de « Contre la montre » (décision du 17/11/2026) ; lu au maximum appareil / nuage,
+        // voir ``PuzzleRushRecordStore``.
+        "puzzleRush.best.v1",
     ]
 
     /// Exclusions explicitement DÉCIDÉES (par opposition à celles qui découlent

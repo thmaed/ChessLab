@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Autorenew
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.ChevronRight
@@ -88,6 +89,8 @@ fun PuzzleQueueScreen(
     onOpenLab: () -> Unit = {},
     /** Ouvre un programme Woodpecker (créé ici, ou repris). */
     onOpenWoodpecker: (String) -> Unit = {},
+    /** « Contre la montre » (17/11/2026). */
+    onStartRush: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -97,6 +100,7 @@ fun PuzzleQueueScreen(
     var reviewCount by remember { mutableStateOf(0) }
     var ownCount by remember { mutableStateOf(0) }
     var programme by remember { mutableStateOf<WoodpeckerProgram?>(null) }
+    var rushBest by remember { mutableStateOf(0) }
     var confirmStop by remember { mutableStateOf(false) }
     var message by remember { mutableStateOf<String?>(null) }
     var sheet by remember { mutableStateOf<CriteriaMode?>(null) }
@@ -141,6 +145,7 @@ fun PuzzleQueueScreen(
 
     LaunchedEffect(Unit) {
         puzzleRating = com.chesslab.settings.StatsStore.puzzleRating(context)
+        rushBest = com.chesslab.settings.StatsStore.rushBest(context)
         val db = LibraryDatabase.get(context)
         withContext(Dispatchers.IO) {
             missedCount = runCatching { db.puzzleProgress().missedIds().size }.getOrDefault(0)
@@ -195,6 +200,8 @@ fun PuzzleQueueScreen(
                 ) { onStart(PuzzleFilter(source = PuzzleSource.ownGames)) }
             }
         }
+
+        RushCard(rushBest, onStartRush)
 
         LinkRow(
             Icons.Default.Tune, Palette.info,
@@ -514,6 +521,39 @@ private fun SeriesTile(
             Text(title, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary, maxLines = 1)
             Text(subtitle, fontSize = 12.sp, color = Palette.textSecondary, maxLines = 1)
         }
+    }
+}
+
+/**
+ * « Contre la montre » : pleine largeur, sous les quatre tuiles (une cinquième casserait la grille 2 × 2).
+ * La règle en sous-titre, le record à droite. Pendant de `rushCard` (iOS).
+ */
+@Composable
+private fun RushCard(best: Int, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .clip(CardShape)
+            .background(cardGradient)
+            .subtleBorder()
+            .clickable(onClick = onClick)
+            .padding(14.dp)
+            .testTag("serie-contre-la-montre"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        IconBadge(Icons.Default.Timer, Palette.rose, 40.dp)
+        Column(Modifier.weight(1f)) {
+            Text(stringResource(R.string.rush_title), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+            Text(stringResource(R.string.rush_card_sub), fontSize = 12.sp, color = Palette.textSecondary)
+        }
+        if (best > 0) {
+            Column(horizontalAlignment = Alignment.End) {
+                Text(stringResource(R.string.rush_card_best), fontSize = 11.sp, color = Palette.textTertiary)
+                Text("$best", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent)
+            }
+        }
+        Icon(Icons.Default.ChevronRight, null, tint = Palette.textTertiary, modifier = Modifier.size(18.dp))
     }
 }
 

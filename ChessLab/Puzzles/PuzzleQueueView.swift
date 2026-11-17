@@ -30,8 +30,11 @@ struct PuzzleQueueView: View {
     var onOpenTwoPlayer: () -> Void = {}
     /// Ouvre un programme Woodpecker (créé ici, ou repris).
     var onOpenWoodpecker: (UUID) -> Void = { _ in }
+    /// « Contre la montre » (17/11/2026).
+    var onStartRush: () -> Void = {}
 
     @Environment(\.modelContext) private var modelContext
+    @State private var rushBest = 0
 
     @State private var puzzleRating = PuzzleRatingStore.load()
     @State private var stats: PuzzleStats?
@@ -78,6 +81,7 @@ struct PuzzleQueueView: View {
                     VStack(alignment: .leading, spacing: 22) {
                         if let stats, stats.successRate != nil { statusCard(stats) }
                         readySeries
+                        rushCard
                         customSeriesRow
                         programmeSection
                         collectionsSection
@@ -278,6 +282,43 @@ struct PuzzleQueueView: View {
                 .accessibilityIdentifier("serie-mes-parties")
             }
         }
+    }
+
+    /// Pleine largeur, sous les quatre tuiles : une cinquième casserait la grille 2 × 2. Le record à droite,
+    /// la règle en sous-titre — on sait ce qui attend avant de toucher.
+    private var rushCard: some View {
+        Button(action: onStartRush) {
+            HStack(spacing: 12) {
+                IconBadge(systemImage: "stopwatch.fill", tint: Theme.rose, size: 40)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Contre la montre")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("3 minutes · 3 erreurs au plus")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textSecondary)
+                }
+                Spacer(minLength: 0)
+                if rushBest > 0 {
+                    VStack(alignment: .trailing, spacing: 0) {
+                        Text("Record")
+                            .font(.caption2)
+                            .foregroundStyle(Theme.textTertiary)
+                        Text("\(rushBest)")
+                            .font(.headline.monospacedDigit())
+                            .foregroundStyle(Theme.accent)
+                    }
+                }
+                Image(systemName: "chevron.right")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.textTertiary)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .cardStyle()
+            .accessibilityElement(children: .combine)
+        }
+        .buttonStyle(.pressable)
+        .accessibilityIdentifier("serie-contre-la-montre")
     }
 
     private var customSeriesRow: some View {
@@ -574,6 +615,7 @@ struct PuzzleQueueView: View {
         // lire les comptes et les stats — sinon un puzzle déjà résolu ailleurs
         // pourrait être re-servi ici. Voir ``PuzzleProgressSync``.
         puzzleRating = PuzzleRatingStore.load()
+        rushBest = PuzzleRushRecordStore.best()
         PuzzleProgressSync.reconcileIfStale(in: modelContext)
         hasAnyPuzzle = ((try? modelContext.fetchCount(FetchDescriptor<Puzzle>())) ?? 0) > 0
         missedCount = PuzzleSessionDrawer.count(matching: PuzzleSessionFilter(missedOnly: true), in: modelContext)
