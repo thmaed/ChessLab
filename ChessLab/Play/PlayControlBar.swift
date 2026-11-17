@@ -45,6 +45,8 @@ struct PlayControlBar: View {
     let showMoveList: Bool
     let hintsWanted: Bool
     let hintsEnabled: Bool
+    /// À l'aveugle (17/11/2026), l'indice n'existe pas : le bouton disparaît plutôt que de rester grisé.
+    var showsHint: Bool = true
     let isFinished: Bool
     let isEngineThinking: Bool
 
@@ -186,14 +188,16 @@ struct PlayControlBar: View {
 
             Spacer(minLength: 0)
 
-            controlButton(
-                "lightbulb.fill",
-                label: hintsWanted ? "Arrêter l'indice" : "Indice",
-                tint: hintsWanted ? Theme.accent : Theme.textPrimary,
-                highlighted: hintsWanted,
-                disabled: !hintsEnabled || isFinished,
-                action: onToggleHint
-            )
+            if showsHint {
+                controlButton(
+                    "lightbulb.fill",
+                    label: hintsWanted ? "Arrêter l'indice" : "Indice",
+                    tint: hintsWanted ? Theme.accent : Theme.textPrimary,
+                    highlighted: hintsWanted,
+                    disabled: !hintsEnabled || isFinished,
+                    action: onToggleHint
+                )
+            }
             // « Coups joués » ne coexiste ni avec « Reprendre ici » ni avec
             // « Annuler » : la pastille prend la place de la liste, si bien que
             // la rangée tient sur UNE ligne même sur les iPhone étroits.

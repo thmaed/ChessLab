@@ -580,11 +580,14 @@ private fun ControlBar(
         // revenir sur un coup passe par ← puis « Reprendre ici ».
         // L'indice est un ÉTAT : allumé, il suit la partie et se repose après
         // chaque coup. Le bouton le dit par son fond, pas seulement sa teinte.
-        ControlButton(Icons.Default.Lightbulb, stringResource(R.string.train_hint),
-            enabled = ui.settings.hintsEnabled && !ui.settings.isBlindfold && !ui.gameOver,
-            tint = if (ui.hintsWanted) Palette.background else Palette.textPrimary,
-            background = if (ui.hintsWanted) Palette.accent else Palette.surfaceElevated,
-            tag = "indice", onClick = onHint)
+        // À l'aveugle, l'indice n'existe pas : le bouton disparaît plutôt que de rester grisé. Comme iOS.
+        if (!ui.settings.isBlindfold) {
+            ControlButton(Icons.Default.Lightbulb, stringResource(R.string.train_hint),
+                enabled = ui.settings.hintsEnabled && !ui.gameOver,
+                tint = if (ui.hintsWanted) Palette.background else Palette.textPrimary,
+                background = if (ui.hintsWanted) Palette.accent else Palette.surfaceElevated,
+                tag = "indice", onClick = onHint)
+        }
         if (!ui.isReviewing && showMovesButton) {
             Spacer(Modifier.width(10.dp))
             ControlButton(Icons.AutoMirrored.Filled.List, stringResource(R.string.play_moves),

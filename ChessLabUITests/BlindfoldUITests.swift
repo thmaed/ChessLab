@@ -41,8 +41,9 @@ final class BlindfoldUITests: XCTestCase {
         XCTAssertTrue(allHidden.waitForExistence(timeout: 10), "la section « À l'aveugle » doit être là")
         tries = 0
         while !allHidden.isHittable, tries < 6 { app.swipeUp(); tries += 1 }
-        // Par la carte : un niveau d'emblée — le dernier joué, « Cases occupées » la toute première fois.
-        XCTAssertFalse(app.buttons["blindfold-off"].isSelected, "par la carte, l'aveugle est déjà choisi")
+        // Par la carte : l'interrupteur est déjà allumé, un niveau choisi — le dernier joué, « Cases occupées » la
+        // toute première fois.
+        XCTAssertEqual(app.switches["blindfoldToggle"].value as? String, "1", "par la carte, l'aveugle est déjà choisi")
         allHidden.tap()
         XCTAssertTrue(allHidden.isSelected)
         snapshot(app, "reglage")

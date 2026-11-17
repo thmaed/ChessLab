@@ -11501,3 +11501,12 @@ par défaut ; liste des coups visible.
   (modèle Maia en chargement) → le test attend « À vous de jouer » ; deux appareils Android en parallèle affament
   l'émulateur (vert seul).
 - Reste : la VOIX à écouter sur appareil ; avis de Ron ; traductions non relues par un natif.
+- **17/11 (nuit), à l'aveugle ÉPURÉ** (demande : « une UX jolie et épurée ») : le réglage passe de cinq puces sur trois
+  lignes + texte à un interrupteur « Jouer à l'aveugle », puis QUATRE TUILES 2 × 2 dont chacune montre son niveau sur
+  un petit plateau (coche et liseré sur la choisie), une phrase, la voix ; le conseil « personnage faible » et le rappel
+  du coup d'œil sont retirés. Rallumer l'interrupteur retrouve le dernier niveau. En partie, l'ampoule de l'indice
+  disparaît au lieu de rester grisée. Android : même chose ; DÉFAUT trouvé sur le Galaxy par les captures — les cases
+  du petit plateau d'une tuile, cliquables même éteintes, avalaient le toucher (choisir « Tout caché » en touchant son
+  plateau ne faisait rien) → zone de toucher posée PAR-DESSUS la tuile, plateau muet pour TalkBack ; le test vérifie
+  désormais qu'aucun disque n'est annoncé à « Tout caché ». Verts : iOS `BlindfoldUITests`, `BlindfoldTests`,
+  `PlayControlBarLayoutTests` ; Galaxy `BlindfoldTest` + `PlaySetupTest` (10). Installé sur les trois iPhone.

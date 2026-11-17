@@ -1374,6 +1374,7 @@
     </plurals>
 
     <!-- À l'aveugle (17/11/2026), mêmes mots qu'iOS -->
+    <string name="blind_play">Blind spielen</string>
     <string name="blind_title">Blind</string>
     <string name="blind_off">Nein</string>
     <string name="blind_occupied">Besetzte Felder</string>
@@ -1386,8 +1387,6 @@
     <string name="blind_own_hidden_detail">Du siehst die des Gegners, nicht deine.</string>
     <string name="blind_all_hidden_detail">Das Brett ist leer: Alles wird aus dem Gedächtnis gespielt.</string>
     <string name="blind_aids_off">Blind sind Hinweis, Warnung und Bewertungsbalken ausgeschaltet.</string>
-    <string name="blind_peek_explained">Halte „Blick“ gedrückt, um das Brett wieder zu sehen; jeder Blick wird gezählt.</string>
-    <string name="blind_start_weak">Fang gegen einen schwachen Charakter an: Blind wird alles schwieriger.</string>
     <string name="blind_voice">Züge des Gegners vorlesen</string>
     <string name="your_turn_blind">Du bist dran</string>
     <string name="blind_thinking">%1$s denkt nach…</string>

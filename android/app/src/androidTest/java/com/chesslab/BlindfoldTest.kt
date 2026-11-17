@@ -57,6 +57,9 @@ class BlindfoldTest {
         }
         compose.waitForIdle()
         assertTrue("à l'aveugle, aucune case ne nomme sa pièce", pieceLabels("pion") == 0)
+        // « Tout caché » et non « Cases occupées » : pas même un disque. Le toucher sur la tuile a bien porté (le
+        // petit plateau de la tuile l'avalait, 17/11/2026).
+        assertTrue("« Tout caché » : aucun disque non plus", pieceLabels("pièce") == 0)
 
         // Un coup impossible le dit, sans être joué.
         compose.onNodeWithTag("case-e2").performClick()

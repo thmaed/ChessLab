@@ -19,6 +19,11 @@ import androidx.compose.material.icons.filled.AllInclusive
 import androidx.compose.material.icons.filled.Bolt
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Circle
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.selected
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.material.icons.filled.Contrast
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FlagCircle
@@ -129,6 +134,10 @@ fun NewGameScreen(
         )
     }
     var blindfoldVoice by remember { mutableStateOf(initial.blindfoldVoice) }
+    /** Le niveau retrouvé quand on rallume l'interrupteur. */
+    var lastBlindfold by remember {
+        mutableStateOf(initial.blindfold.takeIf { it != BlindfoldLevel.off } ?: BlindfoldLevel.occupiedSquares)
+    }
     val blindfoldSection = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
     LaunchedEffect(presetBlindfold) {
         if (presetBlindfold) { kotlinx.coroutines.delay(350); blindfoldSection.bringIntoView() }
@@ -314,40 +323,31 @@ fun NewGameScreen(
 
             TimeLimitSection(timeLimit, Palette.info)
 
-            // À l'aveugle (17/11/2026) : cinq choix, un aperçu sur un petit plateau, la voix. Comme iOS.
+            // À l'aveugle (17/11/2026), ÉPURÉ comme iOS : un interrupteur, puis quatre tuiles dont chacune MONTRE son
+            // niveau sur un petit plateau — on choisit en regardant. Une phrase pour le niveau choisi, et la voix.
             SettingsSection(
                 stringResource(R.string.blind_title), Icons.Default.VisibilityOff, Palette.teal,
                 modifier = Modifier.bringIntoViewRequester(blindfoldSection),
             ) {
-                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    (listOf(BlindfoldLevel.off) + BlindfoldLevel.levels).forEach { level ->
-                        ChipButton(
-                            stringResource(level.titleRes), blindfold == level,
-                            Modifier.testTag("aveugle-${level.name}"), tint = Palette.teal,
-                        ) { blindfold = level }
-                    }
-                }
-                Spacer(Modifier.height(14.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    val user = if (color == PlayerColorChoice.black) chesskit.Piece.Color.black else chesskit.Piece.Color.white
-                    Box(Modifier.size(104.dp).clip(RoundedCornerShape(6.dp))) {
-                        com.chesslab.ui.BoardView(
-                            position = chesskit.Position.standard,
-                            orientation = user,
-                            enabled = false,
-                            pieceMask = blindfold.mask(user),
-                        )
-                    }
-                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                        Text(stringResource(blindfold.detailRes), fontSize = 15.sp, color = Palette.textPrimary)
-                        if (blindfold != BlindfoldLevel.off) {
-                            Text(stringResource(R.string.blind_peek_explained), fontSize = 12.sp, color = Palette.textSecondary)
-                        }
-                    }
+                ToggleRow(stringResource(R.string.blind_play), blindfold != BlindfoldLevel.off, "aveugle-actif", Palette.teal) { on ->
+                    blindfold = if (on) lastBlindfold else BlindfoldLevel.off
                 }
                 if (blindfold != BlindfoldLevel.off) {
-                    Spacer(Modifier.height(10.dp))
-                    Text(stringResource(R.string.blind_start_weak), fontSize = 12.sp, color = Palette.textTertiary)
+                    Spacer(Modifier.height(12.dp))
+                    val user = if (color == PlayerColorChoice.black) chesskit.Piece.Color.black else chesskit.Piece.Color.white
+                    BlindfoldLevel.levels.chunked(2).forEach { row ->
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(bottom = 10.dp)) {
+                            row.forEach { level ->
+                                Box(Modifier.weight(1f)) {
+                                    BlindfoldTile(level, user, blindfold == level) {
+                                        blindfold = level
+                                        lastBlindfold = level
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Text(stringResource(blindfold.detailRes), fontSize = 13.sp, color = Palette.textSecondary)
                     Spacer(Modifier.height(6.dp))
                     ToggleRow(stringResource(R.string.blind_voice), blindfoldVoice, "aveugle-voix", Palette.teal) { blindfoldVoice = it }
                 }
@@ -536,4 +536,62 @@ fun NewGameSetupRoute(
         onResume = onResume,
         onStart = onStart,
     )
+}
+
+
+/** Une tuile de niveau : le petit plateau MONTRE le niveau, le titre le nomme. Pendant de `blindfoldTile` (iOS). */
+@Composable
+private fun BlindfoldTile(level: BlindfoldLevel, user: chesskit.Piece.Color, isChosen: Boolean, onClick: () -> Unit) {
+    val selected = isChosen
+    val shape = RoundedCornerShape(12.dp)
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(if (selected) Palette.teal.copy(alpha = 0.14f) else Palette.surfaceElevated)
+            .border(if (selected) 2.dp else 1.dp, if (selected) Palette.teal else Palette.stroke, shape)
+            .testTag("aveugle-${level.name}"),
+    ) {
+        Column(Modifier.padding(8.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            // Le petit plateau est une IMAGE : muet pour le lecteur d'écran (le titre suffit).
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f)
+                    .clip(RoundedCornerShape(6.dp))
+                    .clearAndSetSemantics {},
+            ) {
+                com.chesslab.ui.BoardView(
+                    position = chesskit.Position.standard,
+                    orientation = user,
+                    enabled = false,
+                    pieceMask = level.mask(user),
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            Text(
+                stringResource(level.titleRes), fontSize = 12.sp, fontWeight = FontWeight.SemiBold,
+                color = if (selected) Palette.textPrimary else Palette.textSecondary,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center, minLines = 2, maxLines = 2,
+            )
+        }
+        if (selected) {
+            Icon(
+                Icons.Default.CheckCircle, null, tint = Palette.teal,
+                modifier = Modifier.align(Alignment.TopEnd).padding(4.dp).size(20.dp),
+            )
+        }
+        // La zone de toucher PAR-DESSUS tout : les cases du petit plateau restent cliquables même éteintes,
+        // et avalaient le toucher — choisir une tuile en touchant son plateau ne faisait rien (vu sur le
+        // Galaxy, 17/11/2026).
+        Box(
+            Modifier
+                .matchParentSize()
+                .clickable(onClick = onClick)
+                .semantics {
+                    this.selected = isChosen
+                    role = androidx.compose.ui.semantics.Role.RadioButton
+                },
+        )
+    }
 }

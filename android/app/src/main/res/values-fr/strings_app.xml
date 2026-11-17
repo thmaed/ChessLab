@@ -1453,6 +1453,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     </plurals>
 
     <!-- À l'aveugle (17/11/2026), mêmes mots qu'iOS -->
+    <string name="blind_play">Jouer à l\'aveugle</string>
     <string name="blind_title">À l\'aveugle</string>
     <string name="blind_off">Non</string>
     <string name="blind_occupied">Cases occupées</string>
@@ -1465,8 +1466,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="blind_own_hidden_detail">Vous voyez celles de l\'adversaire, pas les vôtres.</string>
     <string name="blind_all_hidden_detail">Le plateau est vide : tout se joue de mémoire.</string>
     <string name="blind_aids_off">À l\'aveugle, l\'indice, l\'alerte et la barre d\'évaluation sont coupés.</string>
-    <string name="blind_peek_explained">Maintenez « Coup d\'œil » pour revoir l\'échiquier ; chaque coup d\'œil est compté.</string>
-    <string name="blind_start_weak">Commencez contre un personnage faible : à l\'aveugle, tout devient plus difficile.</string>
     <string name="blind_voice">Lire les coups adverses à voix haute</string>
     <string name="your_turn_blind">À vous de jouer</string>
     <string name="blind_thinking">%1$s réfléchit…</string>

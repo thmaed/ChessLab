@@ -44,6 +44,8 @@ struct NewGameSetupView: View {
     /// Partie à l'aveugle (17/11/2026).
     @State private var blindfold: BlindfoldLevel
     @State private var blindfoldVoice: Bool
+    /// Le niveau retenu quand on éteint puis rallume l'interrupteur.
+    @State private var lastBlindfoldChoice: BlindfoldLevel?
     /// Arrivé par la carte « À l'aveugle » de l'accueil : la section est montrée d'emblée.
     private let presetBlindfold: Bool
 
@@ -106,6 +108,7 @@ struct NewGameSetupView: View {
         _blindfold = State(initialValue: presetBlindfold
                            ? (saved.blindfold == .off ? .occupiedSquares : saved.blindfold) : .off)
         _blindfoldVoice = State(initialValue: saved.blindfoldVoice)
+        _lastBlindfoldChoice = State(initialValue: saved.blindfold == .off ? nil : saved.blindfold)
     }
 
     var body: some View {
@@ -454,55 +457,90 @@ struct NewGameSetupView: View {
 
     // MARK: À l'aveugle
 
-    /// Cinq choix, un aperçu sur un petit plateau (on comprend avant de jouer, sans lire), la voix.
+    /// ÉPURÉ (retour de l'utilisateur, 17/11/2026 : « une UX jolie et épurée ») : un interrupteur, puis quatre
+    /// tuiles dont chacune MONTRE son niveau sur un petit plateau — on choisit en regardant, pas en lisant. Une
+    /// phrase pour le niveau choisi, et la voix.
     private var blindfoldSection: some View {
         SettingsSection(title: "À l'aveugle", systemImage: "eye.slash.fill", tint: Theme.teal) {
             VStack(alignment: .leading, spacing: 14) {
-                FlowLayout(spacing: 8) {
-                    ForEach([BlindfoldLevel.off] + BlindfoldLevel.levels) { level in
-                        ChipButton(label: LocalizedStringKey(level.title), systemImage: nil,
-                                   isSelected: blindfold == level, tint: Theme.teal) {
-                            withAnimation(Theme.spring) { blindfold = level }
-                        }
-                        .accessibilityIdentifier("blindfold-\(level.rawValue)")
-                    }
-                }
-                HStack(alignment: .top, spacing: 14) {
-                    ChessBoardView(
-                        board: Board(position: .standard),
-                        orientation: colorChoice == .black ? .black : .white,
-                        theme: AppSettings.shared.boardTheme,
-                        selectedSquare: nil, legalTargetSquares: [], lastMove: nil, hintMoves: [],
-                        interactionEnabled: false, showCoordinates: false,
-                        onTapSquare: { _ in }, onDropPiece: { _, _ in },
-                        pieceMask: blindfold.mask(user: colorChoice == .black ? .black : .white)
-                    )
-                    .frame(width: 104, height: 104)
-                    .clipShape(RoundedRectangle(cornerRadius: 6))
-                    .accessibilityHidden(true)
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(LocalizedStringKey(blindfold.detail))
-                            .font(.subheadline)
-                            .foregroundStyle(Theme.textPrimary)
-                            .fixedSize(horizontal: false, vertical: true)
-                        if blindfold != .off {
-                            Text("Maintenez « Coup d'œil » pour revoir l'échiquier ; chaque coup d'œil est compté.")
-                                .font(.caption)
-                                .foregroundStyle(Theme.textSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }
-                }
+                ToggleRow(label: "Jouer à l'aveugle", isOn: Binding(
+                    get: { blindfold != .off },
+                    set: { on in withAnimation(Theme.spring) { blindfold = on ? lastBlindfoldLevel : .off } }
+                ), tint: Theme.teal)
+                .accessibilityIdentifier("blindfoldToggle")
+
                 if blindfold != .off {
-                    Text("Commencez contre un personnage faible : à l'aveugle, tout devient plus difficile.")
-                        .font(.caption)
-                        .foregroundStyle(Theme.textTertiary)
+                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)],
+                              spacing: 10) {
+                        ForEach(BlindfoldLevel.levels) { level in
+                            blindfoldTile(level)
+                        }
+                    }
+                    Text(LocalizedStringKey(blindfold.detail))
+                        .font(.footnote)
+                        .foregroundStyle(Theme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
+                        .contentTransition(.opacity)
                     ToggleRow(label: "Lire les coups adverses à voix haute", isOn: $blindfoldVoice, tint: Theme.teal)
                         .accessibilityIdentifier("blindfoldVoice")
                 }
             }
         }
+    }
+
+    /// Le dernier niveau choisi dans cet écran (« Cases occupées » au départ) : rallumer l'interrupteur le retrouve.
+    private var lastBlindfoldLevel: BlindfoldLevel {
+        lastBlindfoldChoice ?? .occupiedSquares
+    }
+
+    private func blindfoldTile(_ level: BlindfoldLevel) -> some View {
+        let user: Piece.Color = colorChoice == .black ? .black : .white
+        let selected = blindfold == level
+        return Button {
+            withAnimation(Theme.spring) {
+                blindfold = level
+                lastBlindfoldChoice = level
+            }
+        } label: {
+            VStack(spacing: 8) {
+                ChessBoardView(
+                    board: Board(position: .standard),
+                    orientation: user,
+                    theme: AppSettings.shared.boardTheme,
+                    selectedSquare: nil, legalTargetSquares: [], lastMove: nil, hintMoves: [],
+                    interactionEnabled: false, showCoordinates: false,
+                    onTapSquare: { _ in }, onDropPiece: { _, _ in },
+                    pieceMask: level.mask(user: user)
+                )
+                .aspectRatio(1, contentMode: .fit)
+                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+                .allowsHitTesting(false)
+                Text(LocalizedStringKey(level.title))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(selected ? Theme.textPrimary : Theme.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2, reservesSpace: true)
+            }
+            .padding(8)
+            .background(selected ? Theme.teal.opacity(0.14) : Theme.surfaceElevated,
+                        in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(selected ? Theme.teal : Theme.stroke, lineWidth: selected ? 2 : 1))
+            .overlay(alignment: .topTrailing) {
+                if selected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.body)
+                        .foregroundStyle(Theme.teal, Theme.background)
+                        .padding(4)
+                        .transition(.scale.combined(with: .opacity))
+                }
+            }
+        }
+        .buttonStyle(.pressable)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(LocalizedStringKey(level.title)))
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityIdentifier("blindfold-\(level.rawValue)")
     }
 
     private func launch() {

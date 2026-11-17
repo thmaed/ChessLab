@@ -1413,6 +1413,7 @@
     </plurals>
 
     <!-- À l'aveugle (17/11/2026), mêmes mots qu'iOS -->
+    <string name="blind_play">Jugar a ciegas</string>
     <string name="blind_title">A ciegas</string>
     <string name="blind_off">No</string>
     <string name="blind_occupied">Casillas ocupadas</string>
@@ -1425,8 +1426,6 @@
     <string name="blind_own_hidden_detail">Ves las del adversario, no las tuyas.</string>
     <string name="blind_all_hidden_detail">El tablero está vacío: todo se juega de memoria.</string>
     <string name="blind_aids_off">A ciegas, la pista, el aviso y la barra de evaluación se desactivan.</string>
-    <string name="blind_peek_explained">Mantén pulsado «Vistazo» para volver a ver el tablero; cada vistazo cuenta.</string>
-    <string name="blind_start_weak">Empieza contra un personaje débil: a ciegas, todo se vuelve más difícil.</string>
     <string name="blind_voice">Leer en voz alta las jugadas del adversario</string>
     <string name="your_turn_blind">Te toca jugar</string>
     <string name="blind_thinking">%1$s está pensando…</string>

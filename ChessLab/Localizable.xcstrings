@@ -57389,6 +57389,40 @@
           }
         }
       }
+    },
+    "Jouer à l'aveugle": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Play blindfold"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jouer à l'aveugle"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugar a ciegas"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blind spielen"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gioca alla cieca"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -622,6 +622,7 @@ struct PlayView: View {
             showMoveList: showMoveList,
             hintsWanted: viewModel.hintsWanted,
             hintsEnabled: viewModel.settings.hintsEnabled && !viewModel.isBlindfold,
+            showsHint: !viewModel.isBlindfold,
             isFinished: viewModel.outcome != nil,
             isEngineThinking: viewModel.isEngineThinking,
             onPrevious: { viewModel.reviewPrevious() },
