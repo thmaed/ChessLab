@@ -11417,3 +11417,6 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   `SyncedAutosaveTests` ; `CloudSyncUITests` (7) et `ResumeGameUITests` verts — un échec isolé de
   `testHomeInvitation_switchesWithoutRestart` dans une série, vert seul puis dans la classe entière (instable).
   Android : rien à porter (pas d'iCloud).
+- **17/11, schéma CloudKit DÉPLOYÉ en production** (par l'utilisateur) : `CD_WoodpeckerAttemptRecord` présent ;
+  `cktool export-schema` des deux environnements : 10 types `CD_*` + `Users`, développement et production
+  IDENTIQUES. Le préalable « À FAIRE AVANT LA SORTIE » ci-dessus est levé.
