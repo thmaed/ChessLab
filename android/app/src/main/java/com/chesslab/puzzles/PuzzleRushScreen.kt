@@ -44,7 +44,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -171,7 +170,10 @@ private fun Hud(ui: PuzzleRushUi, model: PuzzleRushViewModel, modifier: Modifier
     val timeLeft = stringResource(R.string.rush_time_left)
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Text(
-            clock(remaining), fontSize = 40.sp, fontWeight = FontWeight.Bold, fontFamily = FontFamily.Monospace,
+            // Chiffres de largeur fixe SANS police à chasse fixe : celle-ci écartait le deux-points (« 0 : 14 »,
+            // vu sur le Galaxy A16) ; iOS affiche « 0:14 ».
+            clock(remaining), fontSize = 40.sp, fontWeight = FontWeight.Bold,
+            style = androidx.compose.ui.text.TextStyle(fontFeatureSettings = "tnum"),
             color = if (remaining <= 10_000) Palette.rose else Palette.textPrimary,
             modifier = Modifier.testTag("rushClock").semantics {
                 contentDescription = timeLeft

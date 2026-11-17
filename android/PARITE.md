@@ -2158,8 +2158,9 @@ répétition espacée, ni « Ratés » ne sont touchés (décision du 17/11) ; l
       `PuzzleRush.kt`/`PuzzleRushViewModel.kt`/`PuzzleRushScreen.kt`). Tests : iOS `PuzzleRushRunTests` + tirage et
       parcours dans `PuzzleSessionDrawerTests`, `PuzzleRushUITests` (2) ; Android `PuzzleRushTest` JVM (8) et
       instrumenté (émulateur ET Galaxy A16 : vert, lot prêt en 2,1 s).
-- [ ] **À vérifier sur le Galaxy : l'ASPECT** (règle, chrono, pause voilée, bilan) — le test n'a vérifié que le
-      comportement.
+- [ ] **À vérifier sur le Galaxy : l'ASPECT** (règle, chrono, pause voilée, bilan). Captures prises SUR le Galaxy le
+      17/11 (carte, règle, série, bilan) : lisibles ; le chrono s'y écrivait « 0 : 14 » (police à chasse fixe) —
+      corrigé en chiffres de largeur fixe, « 0:20 » revu sur l'appareil. Reste le coup d'œil de l'auteur.
 - **Écart de PLATEFORME assumé** : le record suit les réglages par iCloud sur iOS ; il reste sur l'appareil Android.
 - **Écart TECHNIQUE, sans effet visible sauf une roue** : iOS tire chaque puzzle dans sa base ; Android lit la
   bibliothèque en flux et tire donc un LOT au moment de la règle (une passe, ≈ 2 s sur le Galaxy) — « Commencer »

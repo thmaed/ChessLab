@@ -62,8 +62,15 @@ final class PuzzleRushUITests: XCTestCase {
         element(app, "rushStart").tap()
         XCTAssertTrue(element(app, "rushBoard").waitForExistence(timeout: 8))
 
+        // Quitter l'app pour de bon : on ouvre Réglages. Le bouton principal SIMULÉ laisse l'app au premier plan
+        // sur les vrais iPhone (XS sous iOS 18.7 et 11 sous iOS 26, vu sur l'enregistrement d'écran, 17/11/2026).
         XCUIDevice.shared.press(.home)
+        RunLoop.current.run(until: Date().addingTimeInterval(1))
+        if app.state == .runningForeground {
+            XCUIApplication(bundleIdentifier: "com.apple.Preferences").activate()
+        }
         RunLoop.current.run(until: Date().addingTimeInterval(3))
+        try XCTSkipIf(app.state == .runningForeground, "impossible de mettre l'app en arrière-plan sur cet appareil")
         app.activate()
         let resume = app.buttons["rushResume"]
         XCTAssertTrue(resume.waitForExistence(timeout: 10), "au retour : « En pause », plateau masqué")

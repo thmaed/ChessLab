@@ -11471,3 +11471,8 @@ viendra dans « Plus » de l'accueil, voix à l'aveugle éteinte par défaut.
 - Crochets de test : `-puzzleRushSeconds N` (iOS, Debug), `PuzzleRushViewModel.durationOverrideMs` (Android).
 - Reste : aspect sur le Galaxy (le test n'a vérifié que le comportement), ligne dans les Nouveautés de l'Aide à la
   prochaine version, traductions non relues par un natif (comme le reste).
+- **17/11 (soir), Contre la montre fini sur appareils** : `PuzzleRushUITests` verts sur l'iPhone XS (iOS 18.7) et
+  l'iPhone 11 (iOS 26), pause comprise. Piège : sur un VRAI iPhone, le bouton principal simulé
+  (`XCUIDevice.press(.home)`) laisse l'app au premier plan (vu sur l'enregistrement d'écran) — le test ouvre Réglages
+  pour la mettre en arrière-plan, et se déclare sauté s'il n'y parvient pas. Android : sur le Galaxy A16, le chrono
+  s'écrivait « 0 : 14 » (police à chasse fixe) → chiffres de largeur fixe (`tnum`), « 0:20 » revu sur l'appareil.
