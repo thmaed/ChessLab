@@ -1,6 +1,6 @@
 # Politique de confidentialité — ChessLab
 
-*Dernière mise à jour : 19 septembre 2026*
+*Dernière mise à jour : 17 novembre 2026*
 
 ChessLab existe sur **iPhone/iPad** et sur **Android**. Cette politique couvre
 les deux. Elles se ressemblent beaucoup, et là où elles diffèrent, c'est dit.
@@ -18,16 +18,30 @@ importés et vos réglages sont enregistrés dans l'espace privé de l'applicati
 Le système réserve cet espace à ChessLab : aucune autre application n'y accède,
 et il disparaît entièrement quand vous désinstallez l'app.
 
+L'application est disponible en français, anglais, espagnol, allemand et
+italien. Les cinq langues sont **embarquées dans l'application** : rien n'est
+téléchargé et aucun service de traduction n'est appelé. Le choix de la langue
+reste sur l'appareil, comme les autres réglages.
+
 ## La seule chose qui peut sortir : iCloud, sur iPhone et iPad
 
-L'application iOS peut synchroniser vos parties, votre progression et vos
-répertoires **entre vos propres appareils**, par iCloud.
+L'application iOS peut synchroniser vos parties (y compris la partie en cours),
+votre progression, vos répertoires et vos réglages **entre vos propres
+appareils**, par iCloud.
 
 - Elle est **désactivée par défaut**. Rien ne part tant que vous ne l'allumez
   pas vous-même dans les réglages de l'app.
 - Les données vont dans **votre** espace iCloud privé, celui de votre compte
   Apple. Nous n'y avons aucun accès, et il n'existe aucun moyen technique pour
   nous d'en avoir : nous ne détenons ni serveur ni clé.
+- Pour vous montrer quels appareils synchronisent (« Vos appareils », dans les
+  réglages), chaque appareil y dépose une petite fiche : son type et son modèle
+  (par exemple « iPhone 11 »), le nom que vous lui avez éventuellement donné
+  dans l'app, les versions de l'app et du système, la date de sa dernière
+  activité et un identifiant tiré au hasard par l'app. Ni votre nom, ni le nom
+  de l'appareil défini dans les réglages du système, ni aucun identifiant
+  matériel ou publicitaire. Comme le reste, cette fiche ne quitte pas votre
+  espace iCloud privé.
 - L'usage d'iCloud est régi par la politique de confidentialité d'Apple.
 - L'éteindre arrête la synchronisation ; les données déjà copiées s'effacent en
   supprimant les données de l'app depuis les réglages iCloud de votre appareil.
@@ -47,6 +61,10 @@ L'image est traitée **entièrement sur l'appareil** et n'est envoyée nulle par
 Sur Android, l'application ne demande même pas la permission `CAMERA` : elle
 passe par l'application photo du système, qui lui rend une image et garde la
 caméra pour elle.
+
+Vous pouvez aussi envoyer une image à ChessLab depuis une autre application
+(Photos, par exemple) avec le bouton **Partager** : l'image est transmise à
+ChessLab sur l'appareil même, lue par le scanner, et ne va nulle part ailleurs.
 
 ## Quand vous exportez quelque chose
 
@@ -93,7 +111,7 @@ thmaed@icloud.com
 
 # Privacy Policy — ChessLab
 
-*Last updated: 19 September 2026*
+*Last updated: 17 November 2026*
 
 ChessLab exists on **iPhone/iPad** and on **Android**. This policy covers both.
 They are very similar, and where they differ, it is said.
@@ -111,16 +129,28 @@ import and your settings are stored in the app's private storage. The system
 reserves that storage for ChessLab: no other app can reach it, and it is
 removed entirely when you uninstall the app.
 
+The app is available in French, English, Spanish, German and Italian. All five
+languages are **built into the app**: nothing is downloaded and no translation
+service is called. Your language choice stays on the device, like your other
+settings.
+
 ## The one thing that can leave: iCloud, on iPhone and iPad
 
-The iOS app can sync your games, progress and repertoires **between your own
-devices**, through iCloud.
+The iOS app can sync your games (including the game in progress), progress,
+repertoires and settings **between your own devices**, through iCloud.
 
 - It is **off by default**. Nothing leaves until you switch it on yourself in
   the app's settings.
 - The data goes to **your** private iCloud, under your Apple account. We have
   no access to it, and no technical means of ever having any: we hold neither
   server nor key.
+- To show you which devices sync ("Your devices", in the settings), each
+  device leaves a small record there: its type and model (for example
+  "iPhone 11"), the name you may have given it in the app, the app and system
+  versions, when it was last active, and an identifier the app draws at
+  random. Not your name, not the device name set in the system settings, and
+  no hardware or advertising identifier. Like everything else, this record
+  never leaves your private iCloud.
 - Use of iCloud is governed by Apple's privacy policy.
 - Turning it off stops the sync; data already copied is removed by deleting
   ChessLab's data from your device's iCloud settings.
@@ -140,6 +170,10 @@ The image is processed **entirely on the device** and is sent nowhere. On
 Android the app does not even request the `CAMERA` permission: it goes through
 the system's camera app, which hands back an image and keeps the camera to
 itself.
+
+You can also send an image to ChessLab from another app (Photos, for example)
+with the **Share** button: the image is handed to ChessLab on the device itself,
+read by the scanner, and goes nowhere else.
 
 ## When you export something
 
