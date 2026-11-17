@@ -1995,12 +1995,10 @@ libellés, même parcours (Puzzles → Mes collections).
 
 ## Publication Play de la 2.0 (27/10/2026)
 
-- [ ] **Le binaire publié sur Play est une version INTERMÉDIAIRE (AAB versionCode 33), laissée en l'état
-      par décision du 27/10.** Le code d'`android/` est, lui, à jour avec iOS 2.0 build 19 : il contient en
-      plus le garde-fou de roque (`UciPositionSanitizer`), le récapitulatif « Créer des puzzles ? », le
-      libellé « Analyser = revoir vos coups et créer des puzzles avec vos erreurs » et la puce « Ratés »
-      grisée quand il n'y en a aucun. Ces changements ne seront dans le binaire qu'à la prochaine
-      publication (versionCode ≥ 34, voir `PLAY-2.0.md`).
+- [x] **RÉGLÉ — le binaire intermédiaire (versionCode 33, laissé en l'état le 27/10) est remplacé** : la 2.2
+      (versionCode 36, 09/11) puis la **2.3 (versionCode 37) est en production depuis le 15/11/2026**, en cinq
+      langues. Le garde-fou de roque, le récapitulatif « Créer des puzzles ? », le libellé d'« Analyser » et la
+      puce « Ratés » grisée y sont. Prochain versionCode : `android/version.properties`.
 
 
 ## 06/11 — Scanner : fausses pièces éliminées, doute recalibré — FAIT des deux côtés
@@ -2125,8 +2123,8 @@ libellés, même parcours (Puzzles → Mes collections).
       · écarts de PLATEFORME ou décisions : extension de partage (iOS ne peut pas lancer l'app), invitation d'avis,
         précharge des puzzles, pas de notification, pas de tâche de fond, détection de rectangles de Vision ;
       · **C2 — grands titres** (iOS seulement) : change l'ossature de tous les écrans Android (`LargeTopAppBar`) ;
-        décision de design à prendre avant, pas à la volée ;
-      · publication Play : binaire intermédiaire (versionCode 33), à l'auteur de décider.
+        décision de design à prendre avant, pas à la volée.
+      (La publication Play du binaire intermédiaire, versionCode 33, est réglée : la 2.3 est en production.)
 
 - [x] **CORRIGÉ le 07/11 — `PuzzleCollectionTest.aCollectionCanBeImportedPracticedWorkedAsAProgrammeAndDeleted`**
       (échouait déjà avant la session). Cause : dans la feuille d'import de puzzles, l'en-tête (titre et « Fermer »)
