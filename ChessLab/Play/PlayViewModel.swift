@@ -1056,7 +1056,15 @@ final class PlayViewModel {
     /// sans cela, une analyse d'indice infinie survivrait à l'écran — la
     /// tâche retient le view model, qui n'est donc jamais libéré, et
     /// Stockfish continuerait de chercher indéfiniment en arrière-plan.
+    /// La position gardée pour soi (le coup du joueur, sans la réponse de l'ordinateur) part vers iCloud :
+    /// on quitte l'échiquier ou l'app, l'autre appareil doit la retrouver telle quelle.
+    func flushPendingCloudSave() {
+        guard outcome == nil else { return }
+        SyncedAutosave.play.flushToCloud()
+    }
+
     func handleViewDisappear() {
+        flushPendingCloudSave()
         interruptHintAnalysisIfNeeded()
         // Mémorise qu'il y avait bien un moteur à libérer : c'est la SEULE
         // condition qui autorise ``handleViewAppear()`` à en redemander un.
@@ -1178,6 +1186,7 @@ final class PlayViewModel {
     /// serait absurde. L'état est mémorisé pour ne reprendre au retour
     /// que si la pendule tournait effectivement.
     func handleAppBackgrounded() {
+        flushPendingCloudSave()
         guard let clock, outcome == nil, clock.isRunning else { return }
         clock.pause()
         clockPausedForBackground = true
@@ -2023,7 +2032,11 @@ final class PlayViewModel {
             savedAt: Date(),
             gameID: gameID
         )
-        AutosaveStore.savePlay(record)
+        // Sur l'appareil à CHAQUE demi-coup (rien ne se perd si l'app est tuée) ; vers iCloud seulement quand
+        // c'est au joueur — après la réponse de l'ordinateur : la position intermédiaire, remplacée une ou
+        // deux secondes plus tard, ne voyage plus (deux envois par coup auparavant). Elle part quand même en
+        // quittant l'échiquier ou en arrière-plan (``flushPendingCloudSave()``).
+        AutosaveStore.savePlay(record, publish: board.position.sideToMove == userColor)
     }
 
     /// Coups joués, en SAN, pour la liste de coups.

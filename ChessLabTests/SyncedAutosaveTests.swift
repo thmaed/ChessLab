@@ -184,6 +184,42 @@ struct SyncedAutosaveTests {
         #expect(iphone.autosave().aside() == nil)
     }
 
+    // MARK: Position de passage (contre l'ordinateur, 17/11/2026)
+
+    @Test func aPassingPosition_staysOnTheDevice_untilFlushed() throws {
+        let store = FakeStore()
+        let phone = Device(store: store)
+        let id = UUID()
+        phone.autosave().save(game(["e2e4", "e7e5"], at(60), id: id))            // après la réponse : envoyée
+        let afterReply = try #require(phone.autosave().remoteEnvelope())
+        phone.autosave().save(game(["e2e4", "e7e5", "g1f3"], at(30), id: id), publish: false)  // le coup du joueur
+        #expect(try #require(phone.autosave().remoteEnvelope()) == afterReply, "la position de passage ne voyage pas")
+        #expect(phone.hasFile)
+        // On quitte l'échiquier : elle part.
+        phone.autosave().flushToCloud()
+        #expect(try #require(phone.autosave().remoteEnvelope()).at > afterReply.at)
+    }
+
+    @Test func flushingNeverOverwritesANewerGameFromElsewhere() throws {
+        let store = FakeStore()
+        let phone = Device(store: store), pad = Device(store: store)
+        let id = UUID()
+        phone.autosave().save(game(["e2e4"], at(120), id: id), publish: false)
+        let newer = game(["d2d4", "d7d5"], at(10), id: UUID())
+        pad.autosave().save(newer)
+        phone.autosave().flushToCloud()
+        #expect(try #require(phone.autosave().remoteEnvelope()).at == newer.savedAt, "la partie plus récente de l'iPad reste")
+    }
+
+    @Test func flushingDoesNothingWhenSyncIsOff() {
+        let store = FakeStore()
+        let phone = Device(store: store)
+        phone.enabled = false
+        phone.autosave().save(game(["e2e4"], at(5)))
+        phone.autosave().flushToCloud()
+        #expect(store.values.isEmpty)
+    }
+
     // MARK: Mise de côté (essai sur trois iPhone, 16/11/2026)
 
     @Test func theSameGameAfterATakeback_isAdopted_notSetAside() {

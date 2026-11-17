@@ -11409,3 +11409,11 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   - **Outil** (développement seulement) : `CloudEventJournal` écrit chaque événement CloudKit, erreur complète
     comprise, dans `Documents/cloudkit-events.log`, récupérable par `devicectl` (les journaux système ne
     remontent pas d'un vrai appareil).
+- **17/11, partie en cours contre l'ordinateur : un envoi par coup au lieu de deux.** Enregistrée sur l'appareil à
+  CHAQUE demi-coup (rien ne se perd si l'app est tuée) ; vers iCloud seulement quand c'est au joueur, après la
+  réponse de l'ordinateur (`SyncedAutosave.save(_:publish:)`) ; la position de passage part quand même en quittant
+  l'échiquier ou en arrière-plan (`flushToCloud`, jamais par-dessus une partie plus récente venue d'ailleurs).
+  Deux joueurs : inchangé (chaque demi-coup est le coup d'une personne). Tests : 3 de plus dans
+  `SyncedAutosaveTests` ; `CloudSyncUITests` (7) et `ResumeGameUITests` verts — un échec isolé de
+  `testHomeInvitation_switchesWithoutRestart` dans une série, vert seul puis dans la classe entière (instable).
+  Android : rien à porter (pas d'iCloud).

@@ -138,10 +138,23 @@ struct SyncedAutosave<Record: AutosaveRecord> {
 
     // MARK: Écriture
 
-    func save(_ record: Record) {
+    /// Enregistre la partie sur l'appareil — toujours — et, si `publish`, l'envoie aussi vers iCloud.
+    /// `publish: false` : une position de passage (le coup du joueur, avant la réponse de l'ordinateur), qui
+    /// partira avec la suivante ou par ``flushToCloud()``.
+    func save(_ record: Record, publish shouldPublish: Bool = true) {
         guard let data = try? JSONEncoder().encode(record) else { return }
         try? data.write(to: fileURL(), options: .atomic)
         setOrigin(nil)
+        if shouldPublish { publish(data, at: record.savedAt) }
+    }
+
+    /// Envoie la partie de l'appareil si iCloud ne la connaît pas encore — une position gardée pour soi
+    /// (``save(_:publish:)``) au moment de quitter l'échiquier ou de passer en arrière-plan. Jamais par-dessus
+    /// une partie PLUS RÉCENTE venue d'un autre appareil.
+    func flushToCloud() {
+        guard isEnabled(), let data = try? Data(contentsOf: fileURL()),
+              let record = try? JSONDecoder().decode(Record.self, from: data) else { return }
+        if let remote = remoteEnvelope(), remote.at >= record.savedAt { return }
         publish(data, at: record.savedAt)
     }
 

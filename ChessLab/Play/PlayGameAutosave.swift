@@ -30,8 +30,9 @@ enum AutosaveStore {
             .appendingPathComponent(name)
     }
 
-    static func savePlay(_ record: PlayGameAutosave) {
-        SyncedAutosave.play.save(record)
+    /// Voir ``SyncedAutosave/save(_:publish:)``.
+    static func savePlay(_ record: PlayGameAutosave, publish: Bool = true) {
+        SyncedAutosave.play.save(record, publish: publish)
     }
 
     static func loadPlay() -> PlayGameAutosave? {
