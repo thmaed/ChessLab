@@ -91,18 +91,26 @@ struct BlindfoldTests {
         #expect(game.blindNotice == nil)
     }
 
-    @Test func peeksAreCounted_andTheBoardShowsEverythingWhileHeld() throws {
+    @Test func peeksAreCounted_andTheBoardShowsEverythingWhileHeld() async throws {
         let game = try blindGame(.opponentHidden)
         #expect(game.boardMask == .hidden([.black]))
         game.beginPeek()
         #expect(game.boardMask == .none)
-        game.beginPeek()                                      // encore appuyé : ne compte pas deux fois
         game.endPeek()
         game.beginPeek()
         game.endPeek()
         #expect(game.peekCount == 2)
-        #expect(game.boardMask == .hidden([.black]))
         #expect(game.blindSummaryLine.contains("2"))
+        // Relâché tout de suite : l'échiquier reste affiché 0,7 s au moins, puis se recache.
+        #expect(game.boardMask == .none, "un coup d'œil bref reste visible")
+        try await Task.sleep(for: .milliseconds(900))
+        #expect(game.boardMask == .hidden([.black]))
+    }
+
+    @Test func aPeekLastsAtLeastSevenTenthsOfASecond() {
+        let t0 = Date(timeIntervalSince1970: 1_000)
+        #expect(abs(PlayViewModel.peekHoldRemaining(pressedAt: t0, releasedAt: t0.addingTimeInterval(0.2)) - 0.5) < 0.0001)
+        #expect(PlayViewModel.peekHoldRemaining(pressedAt: t0, releasedAt: t0.addingTimeInterval(1.5)) == 0)
     }
 
     @Test func aBoardInViewIsUnchanged() throws {

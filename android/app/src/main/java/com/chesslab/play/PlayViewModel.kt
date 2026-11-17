@@ -24,6 +24,8 @@ import com.chesslab.maia.OpponentProfile
 import com.chesslab.settings.SettingsStore
 import com.chesslab.sound.SoundPlayer
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 import kotlinx.coroutines.withContext
@@ -1250,14 +1252,30 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      */
     // MARK: À l'aveugle (17/11/2026)
 
+    private var peekStartedAt = 0L
+    private var peekEnd: Job? = null
+
     /** On pose le doigt sur « Coup d'œil » : tout se voit, et l'appui compte. */
     fun beginPeek() {
-        if (!ui.settings.isBlindfold || ui.gameOver || ui.isPeeking) return
+        if (!ui.settings.isBlindfold || ui.gameOver) return
+        // Un nouvel appui pendant le délai de fin du précédent : on garde l'échiquier, et l'appui compte.
+        peekEnd?.cancel()
+        peekStartedAt = System.currentTimeMillis()
         ui = ui.copy(isPeeking = true, peekCount = ui.peekCount + 1)
         autosave()
     }
 
-    fun endPeek() { if (ui.isPeeking) ui = ui.copy(isPeeking = false) }
+    /** Un coup d'œil reste affiché AU MOINS 0,7 s, même après un appui bref (demande du 17/11/2026). Comme iOS. */
+    fun endPeek() {
+        if (!ui.isPeeking) return
+        val remaining = PeekTiming.remainingMs(peekStartedAt, System.currentTimeMillis())
+        if (remaining <= 0) { ui = ui.copy(isPeeking = false); return }
+        peekEnd?.cancel()
+        peekEnd = viewModelScope.launch {
+            delay(remaining)
+            ui = ui.copy(isPeeking = false)
+        }
+    }
 
     /** Au bilan : « À l'aveugle · Tout caché · 2 coups d'œil ». */
     fun blindSummaryLine(): String {

@@ -11510,3 +11510,6 @@ par défaut ; liste des coups visible.
   plateau ne faisait rien) → zone de toucher posée PAR-DESSUS la tuile, plateau muet pour TalkBack ; le test vérifie
   désormais qu'aucun disque n'est annoncé à « Tout caché ». Verts : iOS `BlindfoldUITests`, `BlindfoldTests`,
   `PlayControlBarLayoutTests` ; Galaxy `BlindfoldTest` + `PlaySetupTest` (10). Installé sur les trois iPhone.
+- **17/11 (nuit), coup d'œil d'au moins 0,7 s** (demande) : relâché plus tôt, l'échiquier reste affiché jusqu'à 0,7 s
+  après l'appui ; un nouvel appui pendant ce délai le prolonge et compte. iOS `PlayViewModel.minimumPeek`, Android
+  `PeekTiming`. Tests : iOS `BlindfoldTests` (11), Android `BlindfoldTest` JVM (6) ; parcours vert sur simulateur et Galaxy.

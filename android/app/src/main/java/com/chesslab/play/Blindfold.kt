@@ -47,6 +47,18 @@ enum class BlindfoldLevel(@StringRes val titleRes: Int, @StringRes val detailRes
 }
 
 /**
+ * Un coup d'œil reste affiché AU MOINS [MINIMUM_MS], même après un appui bref : en dessous, l'échiquier
+ * clignotait sans qu'on ait le temps de rien voir (demande de l'utilisateur, 17/11/2026). Pendant de
+ * `PlayViewModel.minimumPeek` (iOS).
+ */
+object PeekTiming {
+    const val MINIMUM_MS = 700L
+
+    /** Ce qu'il reste à montrer après un relâchement, pour atteindre [MINIMUM_MS]. */
+    fun remainingMs(pressedAt: Long, releasedAt: Long): Long = (MINIMUM_MS - (releasedAt - pressedAt)).coerceAtLeast(0L)
+}
+
+/**
  * Les coups de l'adversaire lus à voix haute — synthèse vocale de l'APPAREIL (aucune permission réseau),
  * dans la langue de l'app. Pendant de `BlindfoldVoice` (iOS). Si aucune voix n'est installée pour cette
  * langue, le système retombe sur la sienne, ou se tait.

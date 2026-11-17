@@ -195,14 +195,42 @@ final class PlayViewModel {
         return settings.blindfold.mask(user: userColor)
     }
 
+    /// Un coup d'œil reste affiché AU MOINS ce temps, même après un appui bref : en dessous, l'échiquier
+    /// clignotait sans qu'on ait le temps de rien voir (demande de l'utilisateur, 17/11/2026).
+    static let minimumPeek: TimeInterval = 0.7
+    private var peekStartedAt: Date?
+    private var peekEndTask: Task<Void, Never>?
+
+    /// Ce qu'il reste à montrer après un relâchement, pour atteindre ``minimumPeek``.
+    static func peekHoldRemaining(pressedAt: Date, releasedAt: Date) -> TimeInterval {
+        max(0, minimumPeek - releasedAt.timeIntervalSince(pressedAt))
+    }
+
     func beginPeek() {
-        guard isBlindfold, outcome == nil, !isPeeking else { return }
-        isPeeking = true
+        guard isBlindfold, outcome == nil else { return }
+        // Un nouvel appui pendant le délai de fin du précédent : on garde l'échiquier, et l'appui compte.
+        peekEndTask?.cancel()
+        peekEndTask = nil
+        peekStartedAt = Date()
         peekCount += 1
+        isPeeking = true
         persistAutosave()
     }
 
-    func endPeek() { isPeeking = false }
+    func endPeek() {
+        guard isPeeking, let started = peekStartedAt else { return }
+        let remaining = Self.peekHoldRemaining(pressedAt: started, releasedAt: Date())
+        guard remaining > 0 else {
+            isPeeking = false
+            return
+        }
+        peekEndTask?.cancel()
+        peekEndTask = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(remaining))
+            guard !Task.isCancelled else { return }
+            self?.isPeeking = false
+        }
+    }
 
     /// Le dernier coup de l'adversaire, en SAN (notation affichée par l'appelant) — en gros au-dessus du
     /// plateau à l'aveugle. `nil` si le dernier coup est le nôtre.

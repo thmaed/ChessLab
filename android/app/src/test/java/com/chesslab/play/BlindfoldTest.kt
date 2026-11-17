@@ -56,4 +56,9 @@ class BlindfoldTest {
         // Avec les Noirs : l'adversaire ouvre.
         assertEquals("e4", PlayUiState(userMovesOnEvenPlies = false, sanMoves = listOf("e4")).lastOpponentSan)
     }
+
+    @Test fun `un coup d'oeil dure au moins sept dixièmes de seconde`() {
+        assertEquals(500L, PeekTiming.remainingMs(pressedAt = 1_000, releasedAt = 1_200))
+        assertEquals(0L, PeekTiming.remainingMs(pressedAt = 1_000, releasedAt = 2_500))
+    }
 }
