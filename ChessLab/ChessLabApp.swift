@@ -8,6 +8,10 @@ struct ChessLabApp: App {
     /// les remises à zéro des tests UI (``prepareStoreLaunch()``) doivent précéder son ouverture.
     private let storeHost: StoreHost = {
         ChessLabApp.prepareStoreLaunch()
+        // Le moniteur écoute AVANT l'ouverture de la base : la mise en route de CloudKit et l'envoi de ce
+        // qui attendait se jouent dès le lancement — branché après le premier écran, il les manquait, et
+        // l'état « dernier échange » restait celui de la veille (essai sur iPhone, 17/11/2026).
+        CloudSyncMonitor.shared.start()
         let host = StoreHost.shared
         host.install(ChessLabApp.openModelContainer(), open: { ChessLabApp.openModelContainer() })
         host.willRelease = {

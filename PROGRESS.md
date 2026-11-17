@@ -11397,3 +11397,15 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
     développement (un build de debug, synchro allumée, une réponse Woodpecker), puis « Deploy Schema Changes »
     en production dans la console CloudKit (procédure du 07/11, mémoire `cloudkit-schema-puzzle-collections`).
   - Android : rien à porter (pas d'iCloud ; sa base Woodpecker est locale).
+- **17/11, essai Woodpecker sur l'iPhone 11 + le XS** : A crée un programme et répond, B voit « Cycle 1 · 4/10 » dès
+  l'ouverture, reprend au 5e et répond deux fois, A voit « 6/10 » une seconde après l'ouverture — les réponses
+  des deux appareils S'ADDITIONNENT. `CD_WoodpeckerAttemptRecord` est apparu dans le schéma de DÉVELOPPEMENT
+  (vérifié par `cktool`) ; reste son DÉPLOIEMENT en production (console CloudKit, par l'utilisateur).
+  - Diagnostic en route : au lancement, CloudKit REÇOIT d'abord (≈ 25 s sur l'iPhone 11) et n'ENVOIE qu'ensuite ;
+    l'essai fermant l'app juste après, un envoi semblait « perdu ». Rien de bloqué.
+  - **Corrigé** : `CloudSyncMonitor` ne s'abonnait qu'après le premier écran et manquait les échanges du
+    lancement (« dernier échange : il y a 11 heures » alors que ça tournait) — il démarre désormais avant
+    l'ouverture de la base.
+  - **Outil** (développement seulement) : `CloudEventJournal` écrit chaque événement CloudKit, erreur complète
+    comprise, dans `Documents/cloudkit-events.log`, récupérable par `devicectl` (les journaux système ne
+    remontent pas d'un vrai appareil).

@@ -265,4 +265,119 @@ final class DeviceSyncUITests: XCTestCase {
         snapshot(app, "B-bibliotheque")
         XCTAssertTrue(found, "la partie terminée sur A doit arriver dans la bibliothèque de B (CloudKit)")
     }
+
+    // MARK: 7. Woodpecker : une réponse = un petit enregistrement (17/11/2026)
+
+    private func element(_ app: XCUIApplication, _ identifier: String) -> XCUIElement {
+        app.descendants(matching: .any)[identifier].firstMatch
+    }
+
+    private func launchOnPuzzles(extra: [String] = []) -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments += ["-discoveryTourSeen", "-AppleLanguages", "(fr)", "-openRoute", "puzzles"] + extra
+        app.launch()
+        let opened = Date().addingTimeInterval(20)
+        while Date() < opened, !element(app, "woodpeckerCard").exists, !element(app, "woodpeckerProgramme").exists {
+            RunLoop.current.run(until: Date().addingTimeInterval(0.25))
+        }
+        return app
+    }
+
+    private func woodpeckerProgress(_ app: XCUIApplication) -> String {
+        let label = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'Cycle '")).firstMatch
+        return label.exists ? label.label : ""
+    }
+
+    /// Le lot de démonstration (`-uiTestWoodpeckerDemo`) : dix mats en deux, Te3-e8 puis Te1-e8.
+    private func solveDemoPuzzles(_ count: Int, in app: XCUIApplication) {
+        func square(_ name: String) -> XCUIElement { app.otherElements["square_\(name)"] }
+        func play(_ from: String, _ to: String) {
+            XCTAssertTrue(square(from).waitForExistence(timeout: 15))
+            square(from).tap()
+            square(to).tap()
+        }
+        for index in 0..<count {
+            play("e3", "e8")
+            let e8 = square("e8")
+            let deadline = Date().addingTimeInterval(10)
+            while Date() < deadline, !e8.label.lowercased().contains("noir") {
+                RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+            }
+            let e1 = square("e1")
+            for _ in 0..<4 {
+                play("e1", "e8")
+                let settled = Date().addingTimeInterval(2)
+                while Date() < settled, !e1.label.lowercased().contains("vide") {
+                    RunLoop.current.run(until: Date().addingTimeInterval(0.2))
+                }
+                if e1.label.lowercased().contains("vide") { break }
+            }
+            if index < count - 1 {
+                let next = element(app, "puzzleNext")
+                XCTAssertTrue(next.waitForExistence(timeout: 10), "« Puzzle suivant » attendu")
+                next.tap()
+            }
+        }
+        RunLoop.current.run(until: Date().addingTimeInterval(2))
+    }
+
+    func test20_A_woodpeckerStartsAndAnswersThree() throws {
+        let app = launchOnPuzzles(extra: ["-uiTestWoodpeckerDemo"])
+        let leftover = element(app, "woodpeckerArchive")
+        if leftover.exists {
+            note("A : un programme Woodpecker était en cours — archivé (gardé, avec son historique)")
+            scrollTo(leftover, in: app)
+            leftover.tap()
+            app.buttons.matching(NSPredicate(format: "label CONTAINS[c] 'programme'")).firstMatch.tap()
+        }
+        element(app, "woodpeckerCard").tap()
+        let create = element(app, "woodpeckerCreate")
+        XCTAssertTrue(create.waitForExistence(timeout: 10))
+        let size10 = app.segmentedControls.buttons["10"]
+        scrollTo(size10, in: app)
+        size10.tap()
+        create.tap()
+        XCTAssertTrue(element(app, "woodpeckerClock").waitForExistence(timeout: 20))
+        solveDemoPuzzles(3, in: app)
+        goHome(app)
+        note("A : programme de 10 créé, 3 puzzles résolus à \(Date().formatted(date: .omitted, time: .standard))")
+    }
+
+    func test21_B_seesThree_thenAnswersTwo() throws {
+        let app = launchOnPuzzles()
+        // Réponses attendues de A (`CHESSLAB_WP_SEEN`, 3 par défaut).
+        let seen = Int(environment["CHESSLAB_WP_SEEN"] ?? "") ?? 3
+        let elapsed = wait(upTo: 240) { self.woodpeckerProgress(app).contains("\(seen)/10") }
+        note("B : avancement Woodpecker reçu — \(elapsed.map { String(format: "%.0f s après l'ouverture", $0) } ?? "PAS REÇU en 240 s") — « \(woodpeckerProgress(app)) »")
+        snapshot(app, "B-woodpecker-recu")
+        XCTAssertNotNil(elapsed, "les réponses de A doivent arriver sur B")
+        element(app, "woodpeckerResume").tap()
+        XCTAssertTrue(element(app, "woodpeckerClock").waitForExistence(timeout: 20))
+        XCTAssertTrue(app.staticTexts.matching(NSPredicate(format: "label CONTAINS %@", "\(seen + 1)/10")).firstMatch
+                        .waitForExistence(timeout: 10), "B reprend au puzzle suivant du lot")
+        solveDemoPuzzles(2, in: app)
+        goHome(app)
+        note("B : 2 puzzles résolus à \(Date().formatted(date: .omitted, time: .standard))")
+    }
+
+    func test22_A_seesFive() throws {
+        let app = launchOnPuzzles()
+        let total = Int(environment["CHESSLAB_WP_AFTER"] ?? "") ?? 5
+        let elapsed = wait(upTo: 240) { self.woodpeckerProgress(app).contains("\(total)/10") }
+        note("A : réponses de B reçues — \(elapsed.map { String(format: "%.0f s après l'ouverture", $0) } ?? "PAS REÇUES en 240 s") — « \(woodpeckerProgress(app)) »")
+        snapshot(app, "A-woodpecker-additionne")
+        XCTAssertNotNil(elapsed, "les réponses des deux appareils doivent s'additionner")
+    }
+
+    /// Diagnostic : une réponse de plus sur A, puis l'app reste ouverte une minute (le journal CloudKit de
+    /// développement dit si l'envoi part).
+    func test23_A_answerOneMoreAndStay() throws {
+        let app = launchOnPuzzles()
+        XCTAssertTrue(element(app, "woodpeckerResume").waitForExistence(timeout: 20))
+        element(app, "woodpeckerResume").tap()
+        XCTAssertTrue(element(app, "woodpeckerClock").waitForExistence(timeout: 20))
+        solveDemoPuzzles(1, in: app)
+        note("A : une réponse de plus à \(Date().formatted(date: .omitted, time: .standard)), l'app reste ouverte")
+        RunLoop.current.run(until: Date().addingTimeInterval(60))
+    }
 }

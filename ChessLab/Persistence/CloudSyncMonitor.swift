@@ -144,6 +144,9 @@ final class CloudSyncMonitor {
             }
             let succeeded = event.succeeded
             let message = event.error.map { CloudSyncErrorText.describe($0) }
+            #if DEBUG
+            CloudEventJournal.append(type: event.type, start: start, end: end, succeeded: succeeded, error: event.error)
+            #endif
             MainActor.assumeIsolated {
                 self?.record(kind: kind, endedAt: end, succeeded: succeeded, errorMessage: message, id: id)
             }
@@ -305,3 +308,32 @@ enum CloudSyncErrorText {
         }
     }
 }
+
+#if DEBUG
+/// Version de développement seulement : chaque événement CloudKit (mise en route, envoi, réception), erreur
+/// COMPLÈTE comprise, ajouté à `Documents/cloudkit-events.log` — pour diagnostiquer sur un vrai appareil, où
+/// les journaux système ne remontent pas (`xcrun devicectl device copy from --domain-type appDataContainer`).
+enum CloudEventJournal {
+    static func append(type: NSPersistentCloudKitContainer.EventType, start: Date, end: Date,
+                       succeeded: Bool, error: Error?) {
+        let kind = switch type {
+        case .setup: "mise en route"
+        case .import: "réception"
+        case .export: "envoi"
+        @unknown default: "autre"
+        }
+        var line = "\(end.ISO8601Format()) \(kind) \(succeeded ? "OK" : "ÉCHEC") (\(String(format: "%.1f", end.timeIntervalSince(start))) s)"
+        if let error { line += " — \(String(describing: error))" }
+        guard let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("cloudkit-events.log"),
+              let data = (line + "\n").data(using: .utf8) else { return }
+        if let handle = try? FileHandle(forWritingTo: url) {
+            handle.seekToEndOfFile()
+            handle.write(data)
+            try? handle.close()
+        } else {
+            try? data.write(to: url)
+        }
+    }
+}
+#endif

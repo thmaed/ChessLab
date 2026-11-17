@@ -9,6 +9,15 @@
 #   test04_A_seesReply · test05_A_openBoardAndWaitForBanner ET test06_B_playRemoteMove EN MÊME TEMPS
 #   (TEST_RUNNER_CHESSLAB_SYNC_MOVE=g1f3 TEST_RUNNER_CHESSLAB_SYNC_EXPECT=f3 par défaut : un coup de cavalier) ·
 #   test07_A_resign · test08_B_seesFinishedGame
+# Woodpecker (une réponse = un petit enregistrement) : test20_A_woodpeckerStartsAndAnswersThree ·
+#   test21_B_seesThree_thenAnswersTwo · test22_A_seesFive (TEST_RUNNER_CHESSLAB_WP_SEEN / _WP_AFTER si besoin) ;
+#   test23_A_answerOneMoreAndStay pour diagnostiquer.
+#
+# ATTENTION : chaque étape se termine en FERMANT l'app, et au lancement CloudKit reçoit d'abord (jusqu'à
+# ~25 s), n'envoie qu'ensuite. Si l'autre appareil ne voit rien, rouvrir ChessLab une minute sur celui qui a
+# joué. Journal CloudKit de développement : Documents/cloudkit-events.log, récupérable par
+#   xcrun devicectl device copy from --device <UDID> --domain-type appDataContainer \
+#     --domain-identifier com.chesslab.ChessLab --source Documents/cloudkit-events.log --destination <fichier>
 #
 # Les appareils doivent être déverrouillés, sur le même compte Apple. Aucune étape ne remet l'app à zéro.
 # Signature par la clé d'API (~/.private_keys/asc.env), comme tools/asc/release.sh.
