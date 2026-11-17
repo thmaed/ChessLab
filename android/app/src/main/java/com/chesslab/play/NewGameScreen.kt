@@ -36,7 +36,6 @@ import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -76,7 +75,6 @@ import kotlin.math.roundToInt
 fun NewGameScreen(
     maiaAvailable: Boolean,
     initial: PlayGameSettings,
-    presetBlindfold: Boolean = false,
     onOpenEditor: () -> Unit = {},
     onOpenScanner: () -> Unit = {},
     /** Reprendre la partie contre l'ordinateur laissée en cours. */
@@ -125,22 +123,13 @@ fun NewGameScreen(
     var bookWidth by remember { mutableStateOf(initial.bookWidth) }
     var useCustomFen by remember { mutableStateOf(initial.startFen != null) }
     var fenText by remember { mutableStateOf(initial.startFen.orEmpty()) }
-    // L'aveugle ne se RETIENT pas par la porte ordinaire : « Nouvelle partie » ne doit jamais ouvrir sur un
-    // plateau vide sans qu'on l'ait demandé. Par la carte « À l'aveugle », le dernier niveau joué. Comme iOS.
-    var blindfold by remember {
-        mutableStateOf(
-            if (presetBlindfold) initial.blindfold.takeIf { it != BlindfoldLevel.off } ?: BlindfoldLevel.occupiedSquares
-            else BlindfoldLevel.off
-        )
-    }
+    // L'aveugle ne se RETIENT pas d'une partie à l'autre : « Nouvelle partie » ne doit jamais ouvrir sur un plateau
+    // vide sans qu'on l'ait demandé. Le NIVEAU, lui, se retrouve en rallumant l'interrupteur. Comme iOS.
+    var blindfold by remember { mutableStateOf(BlindfoldLevel.off) }
     var blindfoldVoice by remember { mutableStateOf(initial.blindfoldVoice) }
     /** Le niveau retrouvé quand on rallume l'interrupteur. */
     var lastBlindfold by remember {
         mutableStateOf(initial.blindfold.takeIf { it != BlindfoldLevel.off } ?: BlindfoldLevel.occupiedSquares)
-    }
-    val blindfoldSection = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
-    LaunchedEffect(presetBlindfold) {
-        if (presetBlindfold) { kotlinx.coroutines.delay(350); blindfoldSection.bringIntoView() }
     }
 
     val profile = OpponentGallery.byId(opponentId)
@@ -300,34 +289,11 @@ fun NewGameScreen(
                 }
             }
 
-            // Le livre n'a de sens que pour Stockfish : le répertoire d'un
-            // personnage ne se coupe pas, c'est son caractère.
-            if (!useCharacter || !maiaAvailable) {
-                SettingsSection(stringResource(R.string.setup_book), Icons.Default.MenuBook, Palette.gold) {
-                    ToggleRow(stringResource(R.string.setup_book_enabled), bookEnabled, "livre-actif", Palette.gold) { bookEnabled = it }
-                    if (bookEnabled) {
-                        Spacer(Modifier.height(8.dp))
-                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            listOf(
-                                BookWidth.mainLinesOnly to R.string.setup_book_main,
-                                BookWidth.includeSidelines to R.string.setup_book_sidelines,
-                            ).forEach { (width, label) ->
-                                ChipButton(stringResource(label), bookWidth == width, Modifier.testTag("livre-${width.name}"), tint = Palette.gold) {
-                                    bookWidth = width
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            TimeLimitSection(timeLimit, Palette.info)
-
-            // À l'aveugle (17/11/2026), ÉPURÉ comme iOS : un interrupteur, puis quatre tuiles dont chacune MONTRE son
+            // À l'aveugle (17/11/2026) — UNE seule porte, ici, juste sous l'adversaire (c'est une façon de jouer
+            // contre lui, comme une cadence), repliée sur son interrupteur. ÉPURÉ comme iOS : un interrupteur, puis quatre tuiles dont chacune MONTRE son
             // niveau sur un petit plateau — on choisit en regardant. Une phrase pour le niveau choisi, et la voix.
             SettingsSection(
                 stringResource(R.string.blind_title), Icons.Default.VisibilityOff, Palette.teal,
-                modifier = Modifier.bringIntoViewRequester(blindfoldSection),
             ) {
                 ToggleRow(stringResource(R.string.blind_play), blindfold != BlindfoldLevel.off, "aveugle-actif", Palette.teal) { on ->
                     blindfold = if (on) lastBlindfold else BlindfoldLevel.off
@@ -352,6 +318,29 @@ fun NewGameScreen(
                     ToggleRow(stringResource(R.string.blind_voice), blindfoldVoice, "aveugle-voix", Palette.teal) { blindfoldVoice = it }
                 }
             }
+
+            // Le livre n'a de sens que pour Stockfish : le répertoire d'un
+            // personnage ne se coupe pas, c'est son caractère.
+            if (!useCharacter || !maiaAvailable) {
+                SettingsSection(stringResource(R.string.setup_book), Icons.Default.MenuBook, Palette.gold) {
+                    ToggleRow(stringResource(R.string.setup_book_enabled), bookEnabled, "livre-actif", Palette.gold) { bookEnabled = it }
+                    if (bookEnabled) {
+                        Spacer(Modifier.height(8.dp))
+                        FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf(
+                                BookWidth.mainLinesOnly to R.string.setup_book_main,
+                                BookWidth.includeSidelines to R.string.setup_book_sidelines,
+                            ).forEach { (width, label) ->
+                                ChipButton(stringResource(label), bookWidth == width, Modifier.testTag("livre-${width.name}"), tint = Palette.gold) {
+                                    bookWidth = width
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            TimeLimitSection(timeLimit, Palette.info)
 
             SettingsSection(
                 stringResource(R.string.setup_aids), Icons.Default.Lightbulb, Palette.rose,
@@ -515,7 +504,6 @@ private fun Stepper(title: String, value: Int, range: IntRange, tag: String, onC
 fun NewGameSetupRoute(
     model: PlayViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     startFen: String? = null,
-    presetBlindfold: Boolean = false,
     onOpenEditor: () -> Unit = {},
     onOpenScanner: () -> Unit = {},
     onResume: () -> Unit = {},
@@ -530,7 +518,6 @@ fun NewGameSetupRoute(
     NewGameScreen(
         maiaAvailable = ui.maiaAvailable,
         initial = remembered.copy(startFen = startFen),
-        presetBlindfold = presetBlindfold,
         onOpenEditor = onOpenEditor,
         onOpenScanner = onOpenScanner,
         onResume = onResume,

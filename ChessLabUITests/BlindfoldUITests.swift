@@ -1,7 +1,7 @@
 import XCTest
 
-/// Partie À L'AVEUGLE de bout en bout (17/11/2026) : la carte « À l'aveugle » de l'accueil ouvre le réglage,
-/// section cochée ; on choisit « Tout caché » ; le plateau ne dit plus rien de ses pièces ; « Coup d'œil »
+/// Partie À L'AVEUGLE de bout en bout (17/11/2026) : dans le réglage « Contre l'ordinateur », on allume « Jouer
+/// à l'aveugle » et on choisit « Tout caché » ; le plateau ne dit plus rien de ses pièces ; « Coup d'œil »
 /// se compte ; on joue en touchant départ puis arrivée ; un coup impossible le dit ; l'abandon fait
 /// réapparaître les pièces et le bilan dit comment la partie a été jouée.
 ///
@@ -24,26 +24,28 @@ final class BlindfoldUITests: XCTestCase {
         app.otherElements["square_\(name)"]
     }
 
-    func testABlindGameFromTheHomeCardToTheSummary() throws {
+    func testABlindGameFromTheSetupToTheSummary() throws {
         let app = XCUIApplication()
         app.launchArguments += ["-discoveryTourSeen", "-AppleLanguages", "(fr)"]
         app.launch()
 
-        let card = app.buttons["mode_blindfold"]
-        XCTAssertTrue(card.waitForExistence(timeout: 20), "la carte « À l'aveugle » doit être dans « Plus »")
-        var tries = 0
-        while !card.isHittable, tries < 6 { app.swipeUp(); tries += 1 }
+        // UNE seule porte (décision du 17/11/2026) : « Contre l'ordinateur », section juste sous l'adversaire.
+        let play = app.buttons["mode_play"]
+        XCTAssertTrue(play.waitForExistence(timeout: 20))
         snapshot(app, "accueil")
-        card.tap()
+        play.tap()
 
-        // Le réglage s'ouvre sur la section, un niveau déjà choisi.
+        let toggle = app.switches["blindfoldToggle"]
+        XCTAssertTrue(toggle.waitForExistence(timeout: 10), "la section « À l'aveugle » doit être dans le réglage")
+        var tries = 0
+        while !toggle.isHittable, tries < 6 { app.swipeUp(); tries += 1 }
+        XCTAssertEqual(toggle.value as? String, "0", "« Nouvelle partie » ne s'ouvre jamais à l'aveugle")
+        XCTAssertFalse(app.buttons["blindfold-allHidden"].exists, "repliée : les niveaux n'apparaissent qu'allumée")
+        toggle.switches.firstMatch.tap()
         let allHidden = app.buttons["blindfold-allHidden"]
-        XCTAssertTrue(allHidden.waitForExistence(timeout: 10), "la section « À l'aveugle » doit être là")
+        XCTAssertTrue(allHidden.waitForExistence(timeout: 5))
         tries = 0
         while !allHidden.isHittable, tries < 6 { app.swipeUp(); tries += 1 }
-        // Par la carte : l'interrupteur est déjà allumé, un niveau choisi — le dernier joué, « Cases occupées » la
-        // toute première fois.
-        XCTAssertEqual(app.switches["blindfoldToggle"].value as? String, "1", "par la carte, l'aveugle est déjà choisi")
         allHidden.tap()
         XCTAssertTrue(allHidden.isSelected)
         snapshot(app, "reglage")

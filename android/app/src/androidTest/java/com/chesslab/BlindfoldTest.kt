@@ -21,8 +21,8 @@ import org.junit.rules.RuleChain
 import org.junit.runner.RunWith
 
 /**
- * Partie À L'AVEUGLE de bout en bout (17/11/2026). Pendant de `BlindfoldUITests` (iOS) : la carte de
- * l'accueil ouvre le réglage, section cochée ; « Tout caché » ; le plateau ne nomme plus ses pièces ; un coup
+ * Partie À L'AVEUGLE de bout en bout (17/11/2026). Pendant de `BlindfoldUITests` (iOS) : dans le réglage
+ * « Contre l'ordinateur », on allume « Jouer à l'aveugle » ; « Tout caché » ; le plateau ne nomme plus ses pièces ; un coup
  * impossible le dit ; un coup juste se joue en touchant départ puis arrivée ; le coup d'œil se compte ;
  * l'abandon fait réapparaître les pièces et le bilan dit comment la partie a été jouée.
  */
@@ -43,9 +43,15 @@ class BlindfoldTest {
     private fun pieceLabels(word: String) =
         compose.onAllNodesWithContentDescription(word, substring = true, ignoreCase = true).fetchSemanticsNodes().size
 
-    @Test fun aBlindGameFromTheHomeCardToTheSummary() {
-        compose.onNodeWithTag("mode-blindfold").performScrollTo().performClick()
-        awaitTag("aveugle-allHidden", 120_000)
+    @Test fun aBlindGameFromTheSetupToTheSummary() {
+        // UNE seule porte (décision du 17/11/2026) : « Contre l'ordinateur », section juste sous l'adversaire,
+        // repliée sur son interrupteur.
+        compose.onNodeWithTag("mode-play").performScrollTo().performClick()
+        awaitTag("aveugle-actif", 120_000)
+        assertTrue("repliée : les niveaux n'apparaissent qu'allumée",
+            compose.onAllNodesWithTag("aveugle-allHidden").fetchSemanticsNodes().isEmpty())
+        compose.onNodeWithTag("aveugle-actif").performScrollTo().performClick()
+        awaitTag("aveugle-allHidden", 5_000)
         compose.onNodeWithTag("aveugle-allHidden").performScrollTo().performClick()
         compose.onNodeWithTag("commencer").performClick()
 

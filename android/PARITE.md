@@ -2171,8 +2171,9 @@ répétition espacée, ni « Ratés » ne sont touchés (décision du 17/11) ; l
 
 ## Partie à l'aveugle (17/11/2026)
 
-Option du réglage « Contre l'ordinateur » (section « À l'aveugle ») et carte pleine largeur sous « Plus » à l'accueil
-(qui ouvre ce réglage, dernier niveau joué coché, « Cases occupées » la première fois). Quatre niveaux du mail aux
+UNE seule porte (décision du 17/11/2026, la carte d'accueil est retirée) : la section « À l'aveugle » du réglage
+« Contre l'ordinateur », juste sous l'adversaire, repliée sur l'interrupteur « Jouer à l'aveugle » ; allumée, quatre tuiles
+illustrées (le dernier niveau choisi revient). Quatre niveaux du mail aux
 testeurs : Cases occupées (disques À LA COULEUR), Pièces adverses cachées, Vos pièces cachées, Tout caché. Coupés à
 l'aveugle : points de coups légaux, indice, alerte de gaffe, barre d'évaluation, anneau d'échec d'un roi caché. Toute
 case se sélectionne (refuser dirait ce qu'elle contient) ; coup impossible → « Coup impossible ». Dernier coup adverse

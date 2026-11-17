@@ -40,8 +40,6 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
     data class NewGame(
         /** La position venue d'un autre écran, ou rapportée par l'éditeur. */
         val startFen: String? = null,
-        /** Par la carte « À l'aveugle » de l'accueil : section ouverte et cochée (17/11/2026). */
-        val blindfold: Boolean = false,
     ) : Route(if (startFen == null) R.string.route_new_game else R.string.route_continue_game) {
         override val hasLargeTitle get() = true
     }

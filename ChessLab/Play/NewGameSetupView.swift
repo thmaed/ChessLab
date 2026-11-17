@@ -46,8 +46,6 @@ struct NewGameSetupView: View {
     @State private var blindfoldVoice: Bool
     /// Le niveau retenu quand on éteint puis rallume l'interrupteur.
     @State private var lastBlindfoldChoice: BlindfoldLevel?
-    /// Arrivé par la carte « À l'aveugle » de l'accueil : la section est montrée d'emblée.
-    private let presetBlindfold: Bool
 
     /// Préremplit tous les champs avec les derniers réglages utilisés
     /// (ou les défauts à la première partie). Pas d'effet de bord ici :
@@ -59,13 +57,11 @@ struct NewGameSetupView: View {
     ///   devient celui de l'utilisateur — l'autre est joué par le moteur.
     init(
         initialFEN: String? = nil,
-        presetBlindfold: Bool = false,
         onResume: @escaping (PlayGameAutosave) -> Void = { _ in },
         onStart: @escaping (PlayGameSettings) -> Void
     ) {
         self.onStart = onStart
         self.onResume = onResume
-        self.presetBlindfold = presetBlindfold
         self.navigationTitleKey = initialFEN == nil ? "Nouvelle partie" : "Continuer la partie"
         let saved = PlaySettingsStore.load() ?? .default
 
@@ -102,11 +98,9 @@ struct NewGameSetupView: View {
         _multiMoveTakebackEnabled = State(initialValue: saved.multiMoveTakebackEnabled)
         _bookEnabled = State(initialValue: saved.bookEnabled)
         _bookWidth = State(initialValue: saved.bookWidth)
-        // L'aveugle ne se RETIENT pas d'une partie à l'autre par la porte ordinaire : « Nouvelle partie » ne
-        // doit jamais ouvrir sur un plateau vide sans qu'on l'ait demandé. Par la carte « À l'aveugle », on
-        // retrouve le dernier niveau joué (« Cases occupées » la première fois).
-        _blindfold = State(initialValue: presetBlindfold
-                           ? (saved.blindfold == .off ? .occupiedSquares : saved.blindfold) : .off)
+        // L'aveugle ne se RETIENT pas d'une partie à l'autre : « Nouvelle partie » ne doit jamais ouvrir sur un
+        // plateau vide sans qu'on l'ait demandé. Le NIVEAU, lui, se retrouve en rallumant l'interrupteur.
+        _blindfold = State(initialValue: .off)
         _blindfoldVoice = State(initialValue: saved.blindfoldVoice)
         _lastBlindfoldChoice = State(initialValue: saved.blindfold == .off ? nil : saved.blindfold)
     }
@@ -118,12 +112,6 @@ struct NewGameSetupView: View {
         ScrollViewReader { discoveryProxy in
             scrollBody
                 .discoveryAutoScroll(using: discoveryProxy)
-                .task {
-                    // Par la carte « À l'aveugle » : on montre la section tout de suite.
-                    guard presetBlindfold else { return }
-                    try? await Task.sleep(for: .milliseconds(350))
-                    withAnimation { discoveryProxy.scrollTo("blindfoldSection", anchor: .top) }
-                }
         }
     }
 
@@ -224,6 +212,10 @@ struct NewGameSetupView: View {
                     }
                 }
 
+                // UNE seule porte vers l'aveugle (décision du 17/11/2026) : ici, juste sous l'adversaire — c'est une
+                // façon de jouer contre lui, comme une cadence —, repliée sur son interrupteur.
+                blindfoldSection
+
                 // Un personnage joue son propre répertoire : le livre général
                 // ne concerne que le mode Niveau Elo.
                 if opponentMode == .elo {
@@ -293,9 +285,6 @@ struct NewGameSetupView: View {
                         }
                     }
                 }
-
-                blindfoldSection
-                    .id("blindfoldSection")
 
                 SettingsSection(title: "Aides", systemImage: "lightbulb.fill", tint: Theme.rose, discoverySpot: .aidToggles) {
                     VStack(spacing: 12) {

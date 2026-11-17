@@ -11513,3 +11513,10 @@ par défaut ; liste des coups visible.
 - **17/11 (nuit), coup d'œil d'au moins 0,7 s** (demande) : relâché plus tôt, l'échiquier reste affiché jusqu'à 0,7 s
   après l'appui ; un nouvel appui pendant ce délai le prolonge et compte. iOS `PlayViewModel.minimumPeek`, Android
   `PeekTiming`. Tests : iOS `BlindfoldTests` (11), Android `BlindfoldTest` JVM (6) ; parcours vert sur simulateur et Galaxy.
+- **17/11 (nuit), à l'aveugle : UNE seule porte** (retour : « accessible par deux passages, pas génial ; la tuile est
+  beaucoup trop large ») — décision : réglage seul, bien placé. La carte pleine largeur de l'accueil et sa route sont
+  retirées (iOS `Route.blindfoldSetup`, Android `Route.NewGame(blindfold)`) ; la section remonte juste sous
+  « Adversaire », repliée sur son interrupteur ; « Nouvelle partie » ne s'ouvre jamais à l'aveugle, le dernier niveau
+  revient en rallumant. Tests mis à jour (passage par « Contre l'ordinateur ») : iOS `BlindfoldUITests`,
+  `MaiaOpponentUITests`, `ResumeGameUITests`, `WideLowDashboardUITests` (iPad mini) verts ; Galaxy 40 tests verts
+  (aveugle, réglage, app). À faire découvrir par les Nouveautés de l'Aide de la prochaine version.
