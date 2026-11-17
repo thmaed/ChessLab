@@ -57,6 +57,10 @@ final class WideLowDashboardUITests: XCTestCase {
         let moreRows = Set(more.map { Int($0.frame.minY.rounded()) })
         XCTAssertEqual(mainRows.count, 1, "les quatre modes principaux sur UNE rangée : \(main.map(\.frame))")
         XCTAssertEqual(moreRows.count, 1, "« Plus » sur une rangée : \(more.map(\.frame))")
+        // La carte « À l'aveugle » (17/11/2026), pleine largeur sous « Plus » : elle aussi SANS défiler.
+        let blindfold = app.buttons["mode_blindfold"]
+        XCTAssertTrue(blindfold.waitForExistence(timeout: 5))
+        XCTAssertTrue(blindfold.isHittable, "« À l'aveugle » doit être visible SANS défiler")
         // Capture en paysage : celle de XCUITest sort pivotée et rognée. Avec CHESSLAB_HOLD (variable
         // TEST_RUNNER_CHESSLAB_HOLD), l'écran reste affiché le temps d'un `simctl io screenshot`.
         if ProcessInfo.processInfo.environment["CHESSLAB_HOLD"] != nil {

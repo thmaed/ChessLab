@@ -1411,4 +1411,31 @@
         <item quantity="one">Puzzle sbagliato</item>
         <item quantity="other">Puzzle sbagliati</item>
     </plurals>
+
+    <!-- À l'aveugle (17/11/2026), mêmes mots qu'iOS -->
+    <string name="blind_title">Alla cieca</string>
+    <string name="blind_off">No</string>
+    <string name="blind_occupied">Case occupate</string>
+    <string name="blind_opponent_hidden">Pezzi avversari nascosti</string>
+    <string name="blind_own_hidden">I tuoi pezzi nascosti</string>
+    <string name="blind_all_hidden">Tutto nascosto</string>
+    <string name="blind_off_detail">I pezzi sono visibili.</string>
+    <string name="blind_occupied_detail">Un disco bianco o nero al posto di ogni pezzo: sai di chi è, non quale sia.</string>
+    <string name="blind_opponent_hidden_detail">Vedi i tuoi pezzi, non quelli dell\'avversario.</string>
+    <string name="blind_own_hidden_detail">Vedi quelli dell\'avversario, non i tuoi.</string>
+    <string name="blind_all_hidden_detail">La scacchiera è vuota: si gioca tutto a memoria.</string>
+    <string name="blind_aids_off">Alla cieca, suggerimento, avviso e barra di valutazione sono disattivati.</string>
+    <string name="blind_peek_explained">Tieni premuto «Sbirciata» per rivedere la scacchiera; ogni sbirciata viene contata.</string>
+    <string name="blind_start_weak">Inizia contro un personaggio debole: alla cieca, tutto diventa più difficile.</string>
+    <string name="blind_voice">Leggi ad alta voce le mosse dell\'avversario</string>
+    <string name="your_turn_blind">Tocca a te</string>
+    <string name="blind_thinking">%1$s sta pensando…</string>
+    <string name="blind_peek">Sbirciata</string>
+    <string name="blind_illegal">Mossa impossibile</string>
+    <string name="blind_disc_white">Pezzo bianco</string>
+    <string name="blind_disc_black">Pezzo nero</string>
+    <plurals name="blind_peeks">
+        <item quantity="one">%1$d sbirciata</item>
+        <item quantity="other">%1$d sbirciate</item>
+    </plurals>
 </resources>

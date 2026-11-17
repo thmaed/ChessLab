@@ -105,7 +105,30 @@ data class PlayUiState(
     val announcement: com.chesslab.ui.Announcement? = null,
     /** La partie est GAGNÉE — ce qui décide des confettis, et d'eux seuls. */
     val userWon: Boolean = false,
+    /** À l'aveugle : les coups d'œil pris (chaque appui compte), gardés dans la sauvegarde. */
+    val peekCount: Int = 0,
+    /** Le doigt est posé sur « Coup d'œil » : tout se voit. */
+    val isPeeking: Boolean = false,
+    /** Le numéro du dernier « Coup impossible » à montrer (0 = aucun). */
+    val blindNoticeId: Int = 0,
 ) {
+    /**
+     * Ce que le plateau montre : le masque du niveau, sauf pendant un coup d'œil et une fois la partie finie
+     * (les pièces réapparaissent). Pendant de `boardMask` (iOS).
+     */
+    val boardMask: com.chesslab.ui.PieceMask
+        get() = if (!settings.isBlindfold || gameOver || isPeeking) com.chesslab.ui.PieceMask.None
+            else settings.blindfold.mask(userColor)
+
+    /** Le dernier coup de l'ADVERSAIRE, en SAN — en gros au-dessus du plateau à l'aveugle. */
+    val lastOpponentSan: String?
+        get() {
+            val last = sanMoves.size - 1
+            if (last < 0) return null
+            val userPlayedIt = (last % 2 == 0) == userMovesOnEvenPlies
+            return if (userPlayedIt) null else sanMoves[last]
+        }
+
     val isReviewing: Boolean get() = displayedPly < sanMoves.size
 
     /** Les flèches vont par coup COMPLET, vers les positions du joueur. */
@@ -252,6 +275,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             settings = settings, opponent = profile, level = settings.level,
             userColor = color, started = true, outcome = null,
             userMovesOnEvenPlies = startPosition.sideToMove == color,
+            peekCount = 0, isPeeking = false, blindNoticeId = 0,
         )
         newGame()
     }
@@ -333,6 +357,22 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         if (ui.isReviewing) return
         if (board.position.sideToMove != humanColor) return
 
+        // À l'aveugle, toucher une case la sélectionne QUELLE QU'ELLE SOIT : refuser une case vide ou adverse
+        // dirait ce qu'elle contient. Le second toucher tente le coup ; impossible → « Coup impossible ».
+        if (ui.boardMask != com.chesslab.ui.PieceMask.None) {
+            val from = ui.selected
+            when {
+                from == null -> ui = ui.copy(selected = square, legalTargets = emptySet())
+                from == square -> ui = ui.copy(selected = null, legalTargets = emptySet())
+                board.position.piece(from)?.color == humanColor && square in board.legalMoves(from) -> play(from, square)
+                else -> {
+                    com.chesslab.sound.Haptics.illegal()
+                    ui = ui.copy(selected = null, legalTargets = emptySet(), blindNoticeId = ui.blindNoticeId + 1)
+                }
+            }
+            return
+        }
+
         val selected = ui.selected
         if (selected != null && square in ui.legalTargets) {
             play(selected, square)
@@ -407,7 +447,17 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         // jamais. iOS les met dans la même file, pour la même raison ; le
         // joueur attend donc 300 ms de plus, une fois par coup.
         val mustReply = board.position.sideToMove != humanColor
-        if (wasHuman && ui.settings.blunderAlertEnabled && !ui.settings.timeControl.hasClock) {
+        if (!wasHuman && ui.settings.isBlindfold && ui.settings.blindfoldVoice) {
+            val app = getApplication<Application>()
+            BlindfoldVoice.say(
+                app,
+                com.chesslab.ui.MoveNarration.announcement(app, opponentName(), move.san),
+                app.resources.configuration.locales[0].toLanguageTag(),
+            )
+        }
+        // À l'aveugle, l'alerte dirait ce que le plateau cache.
+        if (wasHuman && ui.settings.blunderAlertEnabled && !ui.settings.isBlindfold &&
+            !ui.settings.timeControl.hasClock) {
             val after = board.position.copy()
             val at = moveLog.size
             viewModelScope.launch {
@@ -754,6 +804,12 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
                 timeControlId = ui.settings.timeControlId,
                 whiteMs = clock?.remaining(Piece.Color.white),
                 blackMs = clock?.remaining(Piece.Color.black),
+                // À l'aveugle : le niveau, la voix et les coups d'œil, pour que la reprise soit LA même partie.
+                settingsJson = if (ui.settings.isBlindfold) org.json.JSONObject()
+                    .put("blindfold", ui.settings.blindfold.name)
+                    .put("blindfoldVoice", ui.settings.blindfoldVoice)
+                    .put("peeks", ui.peekCount)
+                    .toString() else null,
             )
         )
     }
@@ -778,12 +834,16 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             runCatching { Piece.Color.valueOf(name) }.getOrNull()?.let { humanColor = it }
         }
         startPosition = autosave.startFen?.let { Position.fromFen(it) } ?: Position.standard
+        val blind = autosave.settingsJson?.let { runCatching { org.json.JSONObject(it) }.getOrNull() }
         val settings = ui.settings.copy(
             startFen = autosave.startFen,
             timeControlId = autosave.timeControlId ?: ui.settings.timeControlId,
             opponentId = autosave.opponentId,
+            blindfold = BlindfoldLevel.fromName(blind?.optString("blindfold")),
+            blindfoldVoice = blind?.optBoolean("blindfoldVoice", false) ?: false,
         )
         ui = ui.copy(
+            peekCount = blind?.optInt("peeks", 0) ?: 0,
             settings = settings, opponent = profile, level = autosave.level,
             userColor = humanColor, started = true,
             userMovesOnEvenPlies = startPosition.sideToMove == humanColor,
@@ -1116,7 +1176,10 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             opponentId = ui.opponent?.id,
             engineElo = ui.level.roundToInt(),
             engineColor = humanColor.opposite,
+            // Retrouvable dans la bibliothèque, comme sur iOS.
+            tags = if (ui.settings.isBlindfold) s(R.string.blind_title) else null,
         )
+        BlindfoldVoice.stop()
         ui = ui.copy(
             gameOver = true, thinking = false, outcome = message, status = message,
             userWon = won,
@@ -1185,8 +1248,29 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
      * ensuite, plutôt que de faire attendre huit secondes un résultat complet.
      * C'est ce que fait iOS, et c'est ce qui rend l'indice utilisable.
      */
+    // MARK: À l'aveugle (17/11/2026)
+
+    /** On pose le doigt sur « Coup d'œil » : tout se voit, et l'appui compte. */
+    fun beginPeek() {
+        if (!ui.settings.isBlindfold || ui.gameOver || ui.isPeeking) return
+        ui = ui.copy(isPeeking = true, peekCount = ui.peekCount + 1)
+        autosave()
+    }
+
+    fun endPeek() { if (ui.isPeeking) ui = ui.copy(isPeeking = false) }
+
+    /** Au bilan : « À l'aveugle · Tout caché · 2 coups d'œil ». */
+    fun blindSummaryLine(): String {
+        val app = getApplication<Application>()
+        return listOf(
+            s(R.string.blind_title),
+            app.getString(ui.settings.blindfold.titleRes),
+            app.resources.getQuantityString(R.plurals.blind_peeks, ui.peekCount, ui.peekCount),
+        ).joinToString(" · ")
+    }
+
     fun toggleHint() {
-        if (!ui.settings.hintsEnabled || ui.gameOver) return
+        if (!ui.settings.hintsEnabled || ui.settings.isBlindfold || ui.gameOver) return
         if (ui.hintsWanted) { ui = ui.copy(hintsWanted = false); stopHint(); return }
         ui = ui.copy(hintsWanted = true)
         startHint()

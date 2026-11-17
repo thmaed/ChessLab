@@ -71,6 +71,10 @@ struct ChessBoardView: View {
     /// même tour, le trait ne passant qu'à la pose. Contredire à l'écran la
     /// règle qu'annonce la variante était le pire des deux maux.
     var showsCheckIndicator: Bool = true
+    /// Partie À L'AVEUGLE (17/11/2026) : quelles pièces se dessinent, et comment — voir ``PieceMask``.
+    /// Partout où une pièce peut apparaître (glissement, coup rejeté, anneau d'échec, libellé VoiceOver),
+    /// le masque s'applique : sinon une animation trahirait ce que le plateau cache.
+    var pieceMask: PieceMask = .none
 
     /// Un essai raté à signaler. Le `id` (nonce fourni par le VM) garantit
     /// que deux essais identiques (mêmes cases) redéclenchent l'animation.
@@ -172,8 +176,12 @@ struct ChessBoardView: View {
                 qualityBadgeLayer(squareSize: squareSize)
                     .zIndex(1)
 
-                if let slidingMove, let piece = board.position.piece(at: slidingMove.end) {
-                    PieceGlyphView(piece: piece)
+                if let slidingMove, let piece = board.position.piece(at: slidingMove.end),
+                   pieceMask.display(piece) != .hidden {
+                    Group {
+                        if pieceMask.display(piece) == .disc { PieceDiscView(color: piece.color) }
+                        else { PieceGlyphView(piece: piece) }
+                    }
                         .frame(width: squareSize, height: squareSize)
                         .rotationEffect(pieceRotation)
                         .position(
@@ -202,7 +210,8 @@ struct ChessBoardView: View {
                     .onTapGesture { onTapArrow?(hint) }
                 }
 
-                if let rejectAnim, let piece = board.position.piece(at: rejectAnim.from) {
+                if let rejectAnim, let piece = board.position.piece(at: rejectAnim.from),
+                   pieceMask.display(piece) == .glyph {
                     // Flash rouge sur la case d'arrivée du coup faux.
                     Rectangle()
                         .fill(Color.red.opacity(rejectFlash ? 0.45 : 0))
@@ -221,7 +230,8 @@ struct ChessBoardView: View {
                         .allowsHitTesting(false)
                 }
 
-                if let dragState, let piece = board.position.piece(at: dragState.square) {
+                if let dragState, let piece = board.position.piece(at: dragState.square),
+                   pieceMask.display(piece) == .glyph {
                     // Fantôme SOULEVÉ : agrandi et décalé hors de la zone de
                     // contact, sinon le doigt le masque entièrement — c'est
                     // toute la pièce qu'on ne voit plus au moment où l'on vise.
@@ -607,8 +617,13 @@ struct ChessBoardView: View {
                 HStack(spacing: 0) {
                     ForEach(0..<8, id: \.self) { col in
                         let sq = square(row: row, col: col)
-                        if let piece = board.position.piece(at: sq) {
+                        if let piece = board.position.piece(at: sq), pieceMask.display(piece) == .glyph {
                             pieceView(piece, squareSize: squareSize)
+                        } else if let piece = board.position.piece(at: sq), pieceMask.display(piece) == .disc {
+                            PieceDiscView(color: piece.color)
+                                .frame(width: squareSize, height: squareSize)
+                                .opacity(slidingMove?.end == piece.square ? 0 : 1)
+                                .allowsHitTesting(false)
                         } else {
                             Color.clear
                                 .frame(width: squareSize, height: squareSize)
@@ -844,6 +859,16 @@ struct ChessBoardView: View {
     }
 
     private func accessibilityLabel(for sq: Square) -> String {
+        // À l'aveugle, le libellé n'en dit pas plus que l'écran : rien sur une case masquée (« vide » serait
+        // faux), la couleur seule sur un disque.
+        if pieceMask != .none {
+            guard let piece = board.position.piece(at: sq) else { return "Case \(sq.notation)" }
+            switch pieceMask.display(piece) {
+            case .hidden: return "Case \(sq.notation)"
+            case .disc: return "Case \(sq.notation), pièce \(piece.color == .white ? "blanche" : "noire")"
+            case .glyph: break
+            }
+        }
         guard let piece = board.position.piece(at: sq) else {
             return "Case \(sq.notation), vide"
         }
@@ -869,8 +894,10 @@ struct ChessBoardView: View {
         default: checkedColor = nil
         }
 
-        guard let checkedColor else { return nil }
-        return board.position.pieces.first { $0.kind == .king && $0.color == checkedColor }?.square
+        guard let checkedColor,
+              let king = board.position.pieces.first(where: { $0.kind == .king && $0.color == checkedColor }),
+              pieceMask.display(king) == .glyph else { return nil }
+        return king.square
     }
 }
 
@@ -972,5 +999,46 @@ private struct ArrowShape: Shape {
         path.closeSubpath()
 
         return path
+    }
+}
+
+/// Ce que le plateau montre des pièces, en partie À L'AVEUGLE (17/11/2026, mail aux testeurs : « tout
+/// l'échiquier, juste tes pièces ou celles de l'adversaire, ou les cases occupées »).
+enum PieceMask: Equatable {
+    /// Tout se voit.
+    case none
+    /// Un disque à la couleur de la pièce, sans dire laquelle (niveau « Cases occupées »).
+    case discs
+    /// Les pièces de ces camps ne se dessinent pas.
+    case hidden(Set<Piece.Color>)
+
+    enum Display: Equatable { case glyph, disc, hidden }
+
+    func display(_ piece: Piece) -> Display {
+        switch self {
+        case .none: .glyph
+        case .discs: .disc
+        case let .hidden(colors): colors.contains(piece.color) ? .hidden : .glyph
+        }
+    }
+}
+
+/// Une pièce dont on ne dit que le camp : un disque blanc ou noir, cerclé pour se détacher des deux couleurs
+/// de cases.
+struct PieceDiscView: View {
+    let color: Piece.Color
+
+    var body: some View {
+        GeometryReader { geometry in
+            let side = min(geometry.size.width, geometry.size.height) * 0.56
+            Circle()
+                .fill(color == .white ? Color.white : Color(white: 0.08))
+                .overlay(Circle().strokeBorder(color == .white ? Color.black.opacity(0.55) : Color.white.opacity(0.35),
+                                               lineWidth: max(1, side * 0.06)))
+                .shadow(color: .black.opacity(0.25), radius: side * 0.06, y: side * 0.03)
+                .frame(width: side, height: side)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .accessibilityHidden(true)
     }
 }

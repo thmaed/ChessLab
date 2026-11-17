@@ -33,6 +33,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.sp
 import chesskit.Piece
 import chesskit.Position
@@ -119,6 +121,12 @@ fun BoardView(
      */
     draggableColor: Piece.Color? = null,
     enabled: Boolean = true,
+    /**
+     * Partie À L'AVEUGLE (17/11/2026) : quelles pièces se dessinent — voir [PieceMask]. Partout où une
+     * pièce peut apparaître (glissement, libellé d'accessibilité), le masque s'applique. Pendant du
+     * `pieceMask` de `ChessBoardView.swift`.
+     */
+    pieceMask: PieceMask = PieceMask.None,
     onSquareTap: (Square) -> Unit = {},
 ) {
     // Le thème et le jeu de pièces viennent des réglages : aucun écran n'a à
@@ -258,6 +266,7 @@ fun BoardView(
                             SquareCell(
                                 square = square,
                                 piece = position.piece(square),
+                                display = position.piece(square)?.let(pieceMask::display) ?: PieceDisplay.glyph,
                                 theme = boardTheme,
                                 pieceSet = pieces,
                                 isSelected = square == selected,
@@ -317,15 +326,11 @@ fun BoardView(
 
             // La pièce qui GLISSE, entre sa case de départ et son arrivée.
             slide?.let { (from, to) ->
-                position.piece(to)?.let { piece ->
+                position.piece(to)?.takeIf { pieceMask.display(it) != PieceDisplay.hidden }?.let { piece ->
                     val start = centerOf(from)
                     val end = centerOf(to)
                     val half = cellPx * 0.46f
-                    Image(
-                        painter = painterResource(drawableFor(piece, pieces)),
-                        contentDescription = null,
-                        modifier = Modifier
-                            // `offset { … }` et non `offset(x =, y =)` : la
+                    val slideModifier = Modifier
                             // lambda est évaluée à la DISPOSITION, donc la
                             // progression de l'animation ne recompose rien.
                             .offset {
@@ -336,8 +341,16 @@ fun BoardView(
                                 )
                             }
                             .size(cellDp * 0.92f)
-                            .then(if (piecesRotated) Modifier.rotate(180f) else Modifier),
-                    )
+                            .then(if (piecesRotated) Modifier.rotate(180f) else Modifier)
+                    if (pieceMask.display(piece) == PieceDisplay.disc) {
+                        Box(slideModifier, Alignment.Center) { PieceDisc(piece.color) }
+                    } else {
+                        Image(
+                            painter = painterResource(drawableFor(piece, pieces)),
+                            contentDescription = null,
+                            modifier = slideModifier,
+                        )
+                    }
                 }
             }
 
@@ -454,6 +467,7 @@ private fun ArrowOverlay(arrows: List<BoardArrow>, orientation: Piece.Color, mod
 private fun SquareCell(
     square: Square,
     piece: Piece?,
+    display: PieceDisplay = PieceDisplay.glyph,
     theme: BoardTheme,
     pieceSet: String,
     isSelected: Boolean,
@@ -493,7 +507,7 @@ private fun SquareCell(
             .clickable(onClick = onTap),
         Alignment.Center,
     ) {
-        if (piece != null && !hidePiece) {
+        if (piece != null && !hidePiece && display == PieceDisplay.glyph) {
             Image(
                 painter = painterResource(drawableFor(piece, pieceSet)),
                 contentDescription = describe(piece),
@@ -501,6 +515,15 @@ private fun SquareCell(
                     .fillMaxSize(0.92f)
                     .then(if (piecesRotated) Modifier.rotate(180f) else Modifier),
             )
+        } else if (piece != null && !hidePiece && display == PieceDisplay.disc) {
+            // À l'aveugle, « Cases occupées » : le camp, pas la pièce — et le libellé n'en dit pas plus.
+            val label = stringResource(
+                if (piece.color == Piece.Color.white) R.string.blind_disc_white else R.string.blind_disc_black
+            )
+            Box(
+                Modifier.fillMaxSize().semantics { contentDescription = label },
+                Alignment.Center,
+            ) { PieceDisc(piece.color) }
         }
 
         // Le canard, en toutes lettres : aucun jeu de pièces n'en a, et
@@ -659,5 +682,51 @@ private fun Color.compositeOver(background: Color): Color {
         green = green * a + background.green * (1 - a),
         blue = blue * a + background.blue * (1 - a),
         alpha = 1f,
+    )
+}
+
+
+/**
+ * Ce que le plateau montre d'une pièce, en partie À L'AVEUGLE (17/11/2026). Pendant de `PieceMask.Display`
+ * (iOS).
+ */
+enum class PieceDisplay { glyph, disc, hidden }
+
+/**
+ * Ce que le plateau montre des pièces, en partie À L'AVEUGLE (17/11/2026, mail aux testeurs : « tout
+ * l'échiquier, juste tes pièces ou celles de l'adversaire, ou les cases occupées »). Pendant de
+ * `PieceMask` (`ChessBoardView.swift`).
+ */
+data class PieceMask(
+    /** Un disque à la couleur de la pièce, sans dire laquelle (niveau « Cases occupées »). */
+    val discs: Boolean = false,
+    /** Les pièces de ces camps ne se dessinent pas. */
+    val hidden: Set<Piece.Color> = emptySet(),
+) {
+    fun display(piece: Piece): PieceDisplay = when {
+        discs -> PieceDisplay.disc
+        piece.color in hidden -> PieceDisplay.hidden
+        else -> PieceDisplay.glyph
+    }
+
+    companion object {
+        val None = PieceMask()
+    }
+}
+
+/** Une pièce dont on ne dit que le camp : un disque blanc ou noir, cerclé — comme `PieceDiscView` (iOS). */
+@Composable
+fun PieceDisc(color: Piece.Color) {
+    val white = color == Piece.Color.white
+    Box(
+        Modifier
+            .fillMaxSize(0.56f)
+            .clip(CircleShape)
+            .background(if (white) Color.White else Color(0.08f, 0.08f, 0.08f))
+            .border(
+                2.dp,
+                if (white) Color.Black.copy(alpha = 0.55f) else Color.White.copy(alpha = 0.35f),
+                CircleShape,
+            ),
     )
 }

@@ -11476,3 +11476,28 @@ viendra dans « Plus » de l'accueil, voix à l'aveugle éteinte par défaut.
   (`XCUIDevice.press(.home)`) laisse l'app au premier plan (vu sur l'enregistrement d'écran) — le test ouvre Réglages
   pour la mettre en arrière-plan, et se déclare sauté s'il n'y parvient pas. Android : sur le Galaxy A16, le chrono
   s'écrivait « 0 : 14 » (police à chasse fixe) → chiffres de largeur fixe (`tnum`), « 0:20 » revu sur l'appareil.
+
+## 17/11 (soir) — Partie à l'aveugle contre l'ordinateur (iOS + Android)
+
+Origine : mail de l'utilisateur à ses testeurs Ron et Nils (tout caché / tes pièces / celles de l'adversaire / cases
+occupées, bouton pour révéler compté) ; Nils « très intéressé ». Décisions : accès par le réglage ET une carte « À
+l'aveugle » dans « Plus » ; les quatre niveaux ; disques à la couleur ; coup d'œil en maintenant le doigt ; voix éteinte
+par défaut ; liste des coups visible.
+- **Plateau** : `pieceMask` (aucun / disques / camps cachés) appliqué partout où une pièce apparaît — dessin,
+  glissement, coup rejeté, fantôme du glisser, anneau d'échec, libellé VoiceOver. Une case dont la pièce est cachée
+  n'a pas de geste : le toucher va à la grille, la saisie marche sans rien changer d'autre.
+- **Partie** : toute case se sélectionne à l'aveugle ; second toucher = tentative ; impossible → « Coup impossible »
+  (rien ne dit pourquoi). Indice, alerte et barre coupés ; coups d'œil comptés et sauvegardés (reprise, et synchro iCloud
+  sur iOS) ; voix par `AVSpeechSynthesizer` / `TextToSpeech` (hors ligne), phrases de VoiceOver ; fin : pièces de retour,
+  bilan, étiquette « À l'aveugle » (tagsCSV, pas de nouveau type CloudKit).
+- **Réglage** : cinq puces, mini-plateau d'aperçu du niveau, phrase du niveau, conseil « personnage faible », voix. Par
+  la porte ordinaire l'aveugle ne se retient pas (jamais de plateau vide par surprise) ; par la carte, le dernier
+  niveau joué.
+- **Accueil** : carte pleine largeur sous la grille « Plus » (une cinquième tuile restait seule) ; tient sans défiler
+  sur fenêtre large et basse (test ajouté).
+- **Tests** : iOS 10 unitaires + `BlindfoldUITests` (simulateur, XS iOS 18, 11 iOS 26) ; suite unitaire complète
+  1 395/1 395 ; Android 5 JVM + instrumenté (Galaxy, émulateur), suite JVM 662/662, 42 instrumentés verts sur le Galaxy
+  (réglage, accueil, visite, aveugle). Pièges : sur le Galaxy le premier toucher arrivait avant que la partie soit prête
+  (modèle Maia en chargement) → le test attend « À vous de jouer » ; deux appareils Android en parallèle affament
+  l'émulateur (vert seul).
+- Reste : la VOIX à écouter sur appareil ; avis de Ron ; traductions non relues par un natif.

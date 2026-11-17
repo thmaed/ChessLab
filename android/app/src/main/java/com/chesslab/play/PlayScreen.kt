@@ -24,6 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -165,6 +173,10 @@ fun PlayScreen(
             thinking = ui.thinking,
             tag = "joueur-adverse",
         )
+        if (ui.settings.isBlindfold && !ui.gameOver) {
+            Spacer(Modifier.height(6.dp))
+            BlindBar(gutter, ui, model)
+        }
     }
     val userRow: @Composable () -> Unit = {
         PlayerRow(
@@ -193,6 +205,7 @@ fun PlayScreen(
             GameOverPanel(
                 gutter, ui.outcome ?: ui.status,
                 summary = model.opponentSummaryLine(),
+                blindLine = if (ui.settings.isBlindfold) model.blindSummaryLine() else null,
                 materialCurve = model.materialCurve(),
                 onAnalyze = { onAnalyzeGame(model.currentPgn()) },
                 onHome = onHome,
@@ -223,14 +236,19 @@ fun PlayScreen(
         )
     }
     val board: @Composable () -> Unit = {
+        val masked = ui.boardMask != com.chesslab.ui.PieceMask.None
         Box(Modifier.fillMaxWidth()) {
             BoardView(
                 position = ui.position,
                 orientation = ui.userColor,
                 selected = ui.selected,
-                legalTargets = ui.legalTargets,
+                // À l'aveugle, jamais de points de coups légaux : ceux d'une tour s'arrêtent devant une pièce cachée.
+                legalTargets = if (masked) emptySet() else ui.legalTargets,
                 lastMove = ui.lastMove,
-                checkedKing = ui.checkedKing,
+                // L'anneau d'échec trahirait un roi caché.
+                checkedKing = ui.checkedKing?.takeIf { square ->
+                    ui.position.piece(square)?.let { ui.boardMask.display(it) == com.chesslab.ui.PieceDisplay.glyph } ?: true
+                },
                 // Pas de flèches en CONSULTATION d'un coup passé : elles
                 // porteraient sur une position qu'on ne joue pas. Comme iOS.
                 arrows = if (ui.isReviewing) emptyList() else ui.hints,
@@ -238,14 +256,16 @@ fun PlayScreen(
                 // et le toucher ne ramène pas au direct par surprise.
                 // On ne traîne que SES pièces : un glissé sur une pièce
                 // adverse jouerait deux coups de la même couleur d'affilée.
-                draggableColor = ui.userColor,
+                draggableColor = if (!masked || ui.settings.blindfold.canDrag(ui.userColor)) ui.userColor else null,
                 enabled = !ui.thinking && !ui.gameOver && !ui.isReviewing,
+                pieceMask = ui.boardMask,
                 onSquareTap = model::onSquareTap,
             )
+            BlindNotice(ui.blindNoticeId, Modifier.align(Alignment.TopCenter))
         }
     }
     val evalBar: @Composable () -> Unit = {
-        if (ui.settings.showEvalBar) {
+        if (ui.settings.showEvalBar && !ui.settings.isBlindfold) {
             Spacer(Modifier.height(6.dp))
             EvalBar(gutter, ui.evalCp, ui.evalMate)
         }
@@ -561,7 +581,7 @@ private fun ControlBar(
         // L'indice est un ÉTAT : allumé, il suit la partie et se repose après
         // chaque coup. Le bouton le dit par son fond, pas seulement sa teinte.
         ControlButton(Icons.Default.Lightbulb, stringResource(R.string.train_hint),
-            enabled = ui.settings.hintsEnabled && !ui.gameOver,
+            enabled = ui.settings.hintsEnabled && !ui.settings.isBlindfold && !ui.gameOver,
             tint = if (ui.hintsWanted) Palette.background else Palette.textPrimary,
             background = if (ui.hintsWanted) Palette.accent else Palette.surfaceElevated,
             tag = "indice", onClick = onHint)
@@ -586,6 +606,8 @@ private fun GameOverPanel(
     modifier: Modifier,
     message: String,
     summary: String,
+    /** À l'aveugle : « À l'aveugle · Tout caché · 2 coups d'œil ». */
+    blindLine: String? = null,
     materialCurve: List<CurvePoint>,
     onAnalyze: () -> Unit,
     onHome: () -> Unit,
@@ -600,6 +622,12 @@ private fun GameOverPanel(
             .testTag("fin-de-partie"),
     ) {
         Text(message, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+        blindLine?.let {
+            Text(
+                it, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.teal,
+                modifier = Modifier.padding(top = 2.dp).testTag("bilan-aveugle"),
+            )
+        }
         // Contre qui, à quel niveau, et ce que le filet a corrigé : la partie
         // ne se juge pas sans savoir qui la jouait en face.
         Text(
@@ -803,3 +831,100 @@ fun PromotionDialog(
  * reste doit valoir au moins 330 dp. Pendant de `PlayView.movesListFitsBelowBoard`.
  */
 internal fun movesListFitsBelowBoard(width: Float, height: Float): Boolean = height - width >= 330f
+
+
+// MARK: À l'aveugle (17/11/2026) — pendant de `blindBar`, `peekButton` et `blindNoticeView` (PlayView.swift)
+
+/**
+ * Au-dessus du plateau : le dernier coup de l'adversaire EN GROS (c'est lui qui permet de suivre la partie),
+ * et « Coup d'œil » — on le maintient, chaque appui compte.
+ */
+@Composable
+private fun BlindBar(modifier: Modifier, ui: PlayUiState, model: PlayViewModel) {
+    val settings by com.chesslab.settings.SettingsStore.state.collectAsState()
+    val name = ui.opponent?.firstName ?: stringResource(R.string.play_computer)
+    val text = ui.lastOpponentSan?.let { "$name : ${com.chesslab.ui.SanFormatter.display(it, settings.pieceNotation)}" }
+        ?: if (ui.position.sideToMove == ui.userColor) stringResource(R.string.your_turn_blind)
+        else stringResource(R.string.blind_thinking, name)
+    Row(
+        modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Palette.surfaceElevated)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary, maxLines = 1,
+            modifier = Modifier.weight(1f).testTag("aveugle-dernier-coup"),
+        )
+        Spacer(Modifier.width(8.dp))
+        PeekButton(ui, model)
+    }
+}
+
+/** Maintenir pour voir : impossible d'oublier de refermer (décision du 17/11/2026). */
+@Composable
+private fun PeekButton(ui: PlayUiState, model: PlayViewModel) {
+    val label = stringResource(R.string.blind_peek)
+    val shape = CircleShape
+    Row(
+        Modifier
+            .clip(shape)
+            .background(if (ui.isPeeking) Palette.teal else Palette.teal.copy(alpha = 0.12f))
+            .border(1.dp, Palette.teal.copy(alpha = 0.4f), shape)
+            .pointerInput(Unit) {
+                detectTapGestures(onPress = {
+                    model.beginPeek()
+                    tryAwaitRelease()
+                    model.endPeek()
+                })
+            }
+            .semantics(mergeDescendants = true) {
+                contentDescription = label
+                stateDescription = "${ui.peekCount}"
+            }
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .testTag("coup-d-oeil"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+        val tint = if (ui.isPeeking) Palette.background else Palette.teal
+        Icon(if (ui.isPeeking) Icons.Default.Visibility else Icons.Outlined.Visibility, null, tint = tint, modifier = Modifier.size(18.dp))
+        Text(label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = tint)
+        if (ui.peekCount > 0) {
+            Text(
+                "${ui.peekCount}", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = tint,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(Palette.teal.copy(alpha = 0.25f))
+                    .padding(horizontal = 6.dp, vertical = 1.dp)
+                    .testTag("coup-d-oeil-compte"),
+            )
+        }
+    }
+}
+
+/** « Coup impossible », un instant, en haut du plateau. */
+@Composable
+private fun BlindNotice(id: Int, modifier: Modifier) {
+    var shown by remember { mutableStateOf(0) }
+    LaunchedEffect(id) {
+        if (id == 0) return@LaunchedEffect
+        shown = id
+        kotlinx.coroutines.delay(1400)
+        shown = 0
+    }
+    if (shown != 0) {
+        Text(
+            stringResource(R.string.blind_illegal), fontSize = 14.sp, fontWeight = FontWeight.SemiBold,
+            color = Color.White,
+            modifier = modifier
+                .padding(top = 10.dp)
+                .clip(CircleShape)
+                .background(Palette.danger.copy(alpha = 0.9f))
+                .padding(horizontal = 14.dp, vertical = 7.dp)
+                .testTag("coup-impossible"),
+        )
+    }
+}

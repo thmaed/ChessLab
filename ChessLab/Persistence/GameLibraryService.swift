@@ -14,10 +14,12 @@ enum GameLibraryService {
         strength: EngineStrength,
         engineName: String = "Ordinateur",
         opponentProfileID: String? = nil,
+        tags: [String] = [],
         in context: ModelContext
     ) {
         let record = GameRecord()
         record.modeRaw = GameRecordMode.vsEngine.rawValue
+        if !tags.isEmpty { record.tags = tags }
         // Le PGN rangé porte les mêmes en-têtes que celui qu'on partage :
         // c'est lui que rouvre l'analyse, et c'est lui qu'on réexporte depuis
         // la bibliothèque.

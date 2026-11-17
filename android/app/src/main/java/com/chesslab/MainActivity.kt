@@ -223,6 +223,7 @@ private fun App(
             Route.Home -> HomeScreen { stack.add(it) }
             is Route.NewGame -> NewGameSetupRoute(
                 startFen = current.startFen,
+                presetBlindfold = current.blindfold,
                 onOpenEditor = { stack.add(Route.PositionEditor(forSetup = true)) },
                 onOpenScanner = { stack.add(Route.Scanner(forSetup = true)) },
                 // La partie en cours, depuis l'écran de réglages : elle remplace les réglages dans la pile.

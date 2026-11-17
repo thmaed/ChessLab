@@ -174,15 +174,66 @@ final class PlayViewModel {
     /// Le moteur ne propose nulle qu'une fois par partie ; sans ce verrou,
     /// une finale égale redéclencherait l'offre à chaque coup après refus.
     private var engineHasOfferedDraw = false
+    // MARK: À l'aveugle (17/11/2026)
+
+    /// Combien de fois l'échiquier a été révélé (« Coup d'œil », chaque appui compte). Gardé dans la
+    /// sauvegarde : une partie reprise, ici ou sur un autre appareil, garde son compte.
+    private(set) var peekCount = 0
+    /// Le doigt est posé sur « Coup d'œil » : tout se voit.
+    private(set) var isPeeking = false
+    /// Un message bref à l'aveugle (« Coup impossible ») ; le numéro relance son affichage.
+    struct BlindNotice: Equatable { let id: Int; let text: String }
+    private(set) var blindNotice: BlindNotice?
+    private var blindNoticeID = 0
+
+    var isBlindfold: Bool { settings.isBlindfold }
+
+    /// Ce que le plateau montre : le masque du niveau, sauf pendant un coup d'œil et une fois la partie
+    /// finie (les pièces réapparaissent).
+    var boardMask: PieceMask {
+        guard isBlindfold, outcome == nil, !isPeeking else { return .none }
+        return settings.blindfold.mask(user: userColor)
+    }
+
+    func beginPeek() {
+        guard isBlindfold, outcome == nil, !isPeeking else { return }
+        isPeeking = true
+        peekCount += 1
+        persistAutosave()
+    }
+
+    func endPeek() { isPeeking = false }
+
+    /// Le dernier coup de l'adversaire, en SAN (notation affichée par l'appelant) — en gros au-dessus du
+    /// plateau à l'aveugle. `nil` si le dernier coup est le nôtre.
+    var lastOpponentMoveSAN: String? {
+        guard let last = moveLog.last, last.piece.color == engineColor else { return nil }
+        return last.san
+    }
+
+    /// Au bilan : « À l'aveugle · Tout caché · 2 coups d'œil ».
+    var blindSummaryLine: String {
+        let peeks = LocalizationController.counted(peekCount, one: "%lld coup d'œil", other: "%lld coups d'œil")
+        return "\(LocalizationController.string("À l'aveugle")) · \(LocalizationController.string(settings.blindfold.title)) · \(peeks)"
+    }
+
+    private func showBlindNotice(_ key: String) {
+        blindNoticeID += 1
+        blindNotice = BlindNotice(id: blindNoticeID, text: LocalizationController.string(key))
+    }
+
     private(set) var outcome: GameOutcome? {
         didSet {
             guard let outcome, oldValue == nil else { return }
+            BlindfoldVoice.shared.stop()
             GameLibraryService.recordVsEngineGame(
                 game: game, outcome: outcome,
                 userColor: userColor, engineColor: engineColor,
                 strength: settings.strength,
                 engineName: opponentProfile?.firstName ?? "Ordinateur",
                 opponentProfileID: settings.opponentProfileID,
+                // Retrouvable dans la bibliothèque : l'étiquette existante, sans changement de schéma iCloud.
+                tags: isBlindfold ? [LocalizationController.string("À l'aveugle")] : [],
                 in: modelContext
             )
             // HORS file, et AVANT `releaseEngine()` : une analyse d'indice
@@ -309,6 +360,7 @@ final class PlayViewModel {
         settings = autosave.settings
         // Une sauvegarde d'avant l'identifiant en reçoit un ici, gardé ensuite.
         gameID = autosave.gameID ?? UUID()
+        peekCount = autosave.blindfoldPeeks ?? 0
         self.modelContext = modelContext
         userColor = resolvedColor
         engineColor = resolvedColor.opposite
@@ -574,6 +626,22 @@ final class PlayViewModel {
     func selectSquare(_ square: Square) {
         guard canUserAct else { return }
 
+        // À l'aveugle, toucher une case la sélectionne QUELLE QU'ELLE SOIT : refuser une case vide ou adverse
+        // dirait ce qu'elle contient. Le second toucher tente le coup ; impossible → « Coup impossible ».
+        if isBlindfold, boardMask != .none {
+            if let selected = selectedSquare {
+                if selected == square {
+                    clearSelection()
+                } else {
+                    attemptUserMove(from: selected, to: square)
+                }
+            } else {
+                selectedSquare = square
+                legalTargetSquares = []
+            }
+            return
+        }
+
         if let selected = selectedSquare {
             if legalTargetSquares.contains(square) {
                 attemptUserMove(from: selected, to: square)
@@ -623,6 +691,7 @@ final class PlayViewModel {
         else {
             Haptics.illegal()
             clearSelection()
+            if isBlindfold, boardMask != .none, canUserAct { showBlindNotice("Coup impossible") }
             return
         }
 
@@ -666,7 +735,8 @@ final class PlayViewModel {
     // MARK: Alerte gaffe (rétroactive)
 
     private func checkForBlunderRetroactively(before: Position, after: Position, atMoveCount: Int) {
-        guard settings.blunderAlertEnabled else { return }
+        // À l'aveugle, l'alerte dirait ce que le plateau cache.
+        guard settings.blunderAlertEnabled, !settings.isBlindfold else { return }
 
         enqueueEngineWork { [weak self] in
             guard let self, let engine = self.engine else { return }
@@ -902,7 +972,7 @@ final class PlayViewModel {
 
     private func startHintAnalysis() {
         guard
-            settings.hintsEnabled, hintsWanted, !isEngineThinking,
+            settings.hintsEnabled, !settings.isBlindfold, hintsWanted, !isEngineThinking,
             board.position.sideToMove == userColor, outcome == nil
         else {
             return
@@ -1225,6 +1295,9 @@ final class PlayViewModel {
 
         playFeedback(for: move, state: board.state)
         announceMove(move)
+        if settings.isBlindfold, settings.blindfoldVoice, move.piece.color == engineColor {
+            BlindfoldVoice.shared.say("\(opponentDisplayName) : \(MoveNarration.describe(san: move.san))")
+        }
         persistAutosave()
 
         if let end = outcomeIfGameEnded() {
@@ -2030,7 +2103,8 @@ final class PlayViewModel {
             whiteRemaining: clock?.remaining(for: .white),
             blackRemaining: clock?.remaining(for: .black),
             savedAt: Date(),
-            gameID: gameID
+            gameID: gameID,
+            blindfoldPeeks: settings.isBlindfold ? peekCount : nil
         )
         // Sur l'appareil à CHAQUE demi-coup (rien ne se perd si l'app est tuée) ; vers iCloud seulement quand
         // c'est au joueur — après la réponse de l'ordinateur : la position intermédiaire, remplacée une ou

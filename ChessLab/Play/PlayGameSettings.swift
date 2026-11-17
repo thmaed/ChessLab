@@ -44,6 +44,14 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
     /// Stockfish (voir `init(from:)`) : on ne change pas l'adversaire de
     /// quelqu'un dans son dos.
     var opponentProfileID: String? = OpponentProfile.maia.id
+    /// Partie À L'AVEUGLE (17/11/2026) : quelles pièces se cachent — voir ``BlindfoldLevel``.
+    var blindfold: BlindfoldLevel = .off
+    /// À l'aveugle : les coups de l'adversaire lus à voix haute (synthèse de l'appareil, hors ligne). Éteint
+    /// par défaut (décision du 17/11/2026).
+    var blindfoldVoice: Bool = false
+
+    /// Vrai pendant une partie à l'aveugle : les aides qui montreraient la position sont coupées.
+    var isBlindfold: Bool { blindfold != .off }
 
     /// Décodage TOLÉRANT aux champs absents.
     ///
@@ -74,6 +82,8 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         // Volontairement SANS repli sur le défaut : la clé absente veut dire
         // « réglage d'avant les personnages », donc Stockfish.
         opponentProfileID = try container.decodeIfPresent(String.self, forKey: .opponentProfileID)
+        blindfold = try container.decodeIfPresent(BlindfoldLevel.self, forKey: .blindfold) ?? fallback.blindfold
+        blindfoldVoice = try container.decodeIfPresent(Bool.self, forKey: .blindfoldVoice) ?? fallback.blindfoldVoice
     }
 
     /// Requis dès qu'un `init(from:)` explicite existe : il masque
@@ -92,7 +102,9 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         bookEnabled: Bool = true,
         bookWidth: OpeningBookWidth = .mainLinesOnly,
         engineResignationEnabled: Bool = true,
-        opponentProfileID: String? = OpponentProfile.maia.id
+        opponentProfileID: String? = OpponentProfile.maia.id,
+        blindfold: BlindfoldLevel = .off,
+        blindfoldVoice: Bool = false
     ) {
         self.colorChoice = colorChoice
         self.eloSliderValue = eloSliderValue
@@ -108,6 +120,8 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         self.bookWidth = bookWidth
         self.engineResignationEnabled = engineResignationEnabled
         self.opponentProfileID = opponentProfileID
+        self.blindfold = blindfold
+        self.blindfoldVoice = blindfoldVoice
     }
 
     var resolvedColorChoice: PlayerColorChoice {

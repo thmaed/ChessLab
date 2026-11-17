@@ -2168,3 +2168,25 @@ répétition espacée, ni « Ratés » ne sont touchés (décision du 17/11) ; l
 - [ ] **Écart relevé, pas propre à ce mode** : un coup faux est rejoué en rouge (aller-retour) sur le plateau iOS,
       dans les puzzles comme ici ; Android ne l'anime pas (croix, coup juste fléché, vibration). À porter avec
       l'écran de puzzle, en même temps.
+
+## Partie à l'aveugle (17/11/2026)
+
+Option du réglage « Contre l'ordinateur » (section « À l'aveugle ») et carte pleine largeur sous « Plus » à l'accueil
+(qui ouvre ce réglage, dernier niveau joué coché, « Cases occupées » la première fois). Quatre niveaux du mail aux
+testeurs : Cases occupées (disques À LA COULEUR), Pièces adverses cachées, Vos pièces cachées, Tout caché. Coupés à
+l'aveugle : points de coups légaux, indice, alerte de gaffe, barre d'évaluation, anneau d'échec d'un roi caché. Toute
+case se sélectionne (refuser dirait ce qu'elle contient) ; coup impossible → « Coup impossible ». Dernier coup adverse
+en gros, « Coup d'œil » maintenu et compté (gardé dans la sauvegarde), voix éteinte par défaut, pièces de retour à la
+fin, bilan « À l'aveugle · niveau · N coups d'œil », étiquette « À l'aveugle » en bibliothèque. Mêmes mots en cinq langues.
+- [x] Code des deux côtés (`Blindfold.swift`, `ChessBoardView` `pieceMask`, `PlayViewModel`, `PlayView`, `NewGameSetupView`,
+      `HomeView` ↔ `Blindfold.kt`, `BoardView` `pieceMask`, `PlayViewModel.kt`, `PlayScreen.kt`, `NewGameScreen.kt`,
+      `HomeScreen.kt`). Tests : iOS `BlindfoldTests` (10), `BlindfoldUITests` (simulateur, iPhone XS iOS 18, iPhone 11
+      iOS 26), `WideLowDashboardUITests` (la carte tient sans défiler) ; Android `BlindfoldTest` JVM (5) et instrumenté
+      (Galaxy A16 et émulateur).
+- [ ] **À vérifier sur appareil, par l'oreille : la VOIX** (aucun test automatique ne l'écoute ; Android : selon les
+      voix installées sur le téléphone).
+- [ ] **À vérifier sur le Galaxy : l'aspect du réglage** (captures prises de la partie et du « Coup impossible » : lisibles).
+- **Écart TECHNIQUE, sans effet visible** : Android garde niveau, voix et coups d'œil de la partie en cours dans la
+  colonne `settings_json` de la sauvegarde (aucune migration) ; iOS dans `PlayGameAutosave`.
+- **Écart relevé, déjà présent** : les libellés VoiceOver des cases sont en français en dur sur iOS (« Case e4, vide »),
+  traduits sur Android — non propre à ce mode.

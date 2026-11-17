@@ -1411,4 +1411,31 @@
         <item quantity="one">Puzle fallado</item>
         <item quantity="other">Puzles fallados</item>
     </plurals>
+
+    <!-- À l'aveugle (17/11/2026), mêmes mots qu'iOS -->
+    <string name="blind_title">A ciegas</string>
+    <string name="blind_off">No</string>
+    <string name="blind_occupied">Casillas ocupadas</string>
+    <string name="blind_opponent_hidden">Piezas del adversario ocultas</string>
+    <string name="blind_own_hidden">Tus piezas ocultas</string>
+    <string name="blind_all_hidden">Todo oculto</string>
+    <string name="blind_off_detail">Las piezas se ven.</string>
+    <string name="blind_occupied_detail">Un disco blanco o negro en lugar de cada pieza: sabes de quién es, no cuál es.</string>
+    <string name="blind_opponent_hidden_detail">Ves tus piezas, no las del adversario.</string>
+    <string name="blind_own_hidden_detail">Ves las del adversario, no las tuyas.</string>
+    <string name="blind_all_hidden_detail">El tablero está vacío: todo se juega de memoria.</string>
+    <string name="blind_aids_off">A ciegas, la pista, el aviso y la barra de evaluación se desactivan.</string>
+    <string name="blind_peek_explained">Mantén pulsado «Vistazo» para volver a ver el tablero; cada vistazo cuenta.</string>
+    <string name="blind_start_weak">Empieza contra un personaje débil: a ciegas, todo se vuelve más difícil.</string>
+    <string name="blind_voice">Leer en voz alta las jugadas del adversario</string>
+    <string name="your_turn_blind">Te toca jugar</string>
+    <string name="blind_thinking">%1$s está pensando…</string>
+    <string name="blind_peek">Vistazo</string>
+    <string name="blind_illegal">Jugada imposible</string>
+    <string name="blind_disc_white">Pieza blanca</string>
+    <string name="blind_disc_black">Pieza negra</string>
+    <plurals name="blind_peeks">
+        <item quantity="one">%1$d vistazo</item>
+        <item quantity="other">%1$d vistazos</item>
+    </plurals>
 </resources>

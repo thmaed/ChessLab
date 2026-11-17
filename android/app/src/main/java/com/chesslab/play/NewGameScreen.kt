@@ -30,6 +30,8 @@ import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.Speed
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
@@ -64,11 +66,12 @@ import kotlin.math.roundToInt
  * position venue d'un autre écran : on repasse ici, l'écran titré « Continuer
  * la partie », plutôt que de repartir en silence aux derniers réglages.
  */
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun NewGameScreen(
     maiaAvailable: Boolean,
     initial: PlayGameSettings,
+    presetBlindfold: Boolean = false,
     onOpenEditor: () -> Unit = {},
     onOpenScanner: () -> Unit = {},
     /** Reprendre la partie contre l'ordinateur laissée en cours. */
@@ -117,6 +120,19 @@ fun NewGameScreen(
     var bookWidth by remember { mutableStateOf(initial.bookWidth) }
     var useCustomFen by remember { mutableStateOf(initial.startFen != null) }
     var fenText by remember { mutableStateOf(initial.startFen.orEmpty()) }
+    // L'aveugle ne se RETIENT pas par la porte ordinaire : « Nouvelle partie » ne doit jamais ouvrir sur un
+    // plateau vide sans qu'on l'ait demandé. Par la carte « À l'aveugle », le dernier niveau joué. Comme iOS.
+    var blindfold by remember {
+        mutableStateOf(
+            if (presetBlindfold) initial.blindfold.takeIf { it != BlindfoldLevel.off } ?: BlindfoldLevel.occupiedSquares
+            else BlindfoldLevel.off
+        )
+    }
+    var blindfoldVoice by remember { mutableStateOf(initial.blindfoldVoice) }
+    val blindfoldSection = remember { androidx.compose.foundation.relocation.BringIntoViewRequester() }
+    LaunchedEffect(presetBlindfold) {
+        if (presetBlindfold) { kotlinx.coroutines.delay(350); blindfoldSection.bringIntoView() }
+    }
 
     val profile = OpponentGallery.byId(opponentId)
     val fenIsLegal = remember(fenText) { FenValidator.errors(fenText.trim()).isEmpty() }
@@ -137,6 +153,8 @@ fun NewGameScreen(
                     bookEnabled = bookEnabled,
                     bookWidth = bookWidth,
                     startFen = if (useCustomFen) fenText.trim() else null,
+                    blindfold = blindfold,
+                    blindfoldVoice = blindfoldVoice,
                 )
                 // Les réglages survivent à la fermeture de l'app ; le
                 // niveau, lui, se mémorise PAR personnage.
@@ -296,10 +314,53 @@ fun NewGameScreen(
 
             TimeLimitSection(timeLimit, Palette.info)
 
+            // À l'aveugle (17/11/2026) : cinq choix, un aperçu sur un petit plateau, la voix. Comme iOS.
+            SettingsSection(
+                stringResource(R.string.blind_title), Icons.Default.VisibilityOff, Palette.teal,
+                modifier = Modifier.bringIntoViewRequester(blindfoldSection),
+            ) {
+                FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    (listOf(BlindfoldLevel.off) + BlindfoldLevel.levels).forEach { level ->
+                        ChipButton(
+                            stringResource(level.titleRes), blindfold == level,
+                            Modifier.testTag("aveugle-${level.name}"), tint = Palette.teal,
+                        ) { blindfold = level }
+                    }
+                }
+                Spacer(Modifier.height(14.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
+                    val user = if (color == PlayerColorChoice.black) chesskit.Piece.Color.black else chesskit.Piece.Color.white
+                    Box(Modifier.size(104.dp).clip(RoundedCornerShape(6.dp))) {
+                        com.chesslab.ui.BoardView(
+                            position = chesskit.Position.standard,
+                            orientation = user,
+                            enabled = false,
+                            pieceMask = blindfold.mask(user),
+                        )
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(stringResource(blindfold.detailRes), fontSize = 15.sp, color = Palette.textPrimary)
+                        if (blindfold != BlindfoldLevel.off) {
+                            Text(stringResource(R.string.blind_peek_explained), fontSize = 12.sp, color = Palette.textSecondary)
+                        }
+                    }
+                }
+                if (blindfold != BlindfoldLevel.off) {
+                    Spacer(Modifier.height(10.dp))
+                    Text(stringResource(R.string.blind_start_weak), fontSize = 12.sp, color = Palette.textTertiary)
+                    Spacer(Modifier.height(6.dp))
+                    ToggleRow(stringResource(R.string.blind_voice), blindfoldVoice, "aveugle-voix", Palette.teal) { blindfoldVoice = it }
+                }
+            }
+
             SettingsSection(
                 stringResource(R.string.setup_aids), Icons.Default.Lightbulb, Palette.rose,
                 modifier = Modifier.discoveryAnchor(DiscoverySpot.aidToggles),
             ) {
+                if (blindfold != BlindfoldLevel.off) {
+                    Text(stringResource(R.string.blind_aids_off), fontSize = 12.sp, color = Palette.textSecondary)
+                    Spacer(Modifier.height(8.dp))
+                }
                 ToggleRow(stringResource(R.string.setup_hints), hints, "aide-indice", Palette.rose) { hints = it }
                 ToggleRow(stringResource(R.string.setup_blunder_alert), blunderAlert, "aide-alerte", Palette.rose) {
                     blunderAlert = it
@@ -454,6 +515,7 @@ private fun Stepper(title: String, value: Int, range: IntRange, tag: String, onC
 fun NewGameSetupRoute(
     model: PlayViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
     startFen: String? = null,
+    presetBlindfold: Boolean = false,
     onOpenEditor: () -> Unit = {},
     onOpenScanner: () -> Unit = {},
     onResume: () -> Unit = {},
@@ -468,6 +530,7 @@ fun NewGameSetupRoute(
     NewGameScreen(
         maiaAvailable = ui.maiaAvailable,
         initial = remembered.copy(startFen = startFen),
+        presetBlindfold = presetBlindfold,
         onOpenEditor = onOpenEditor,
         onOpenScanner = onOpenScanner,
         onResume = onResume,

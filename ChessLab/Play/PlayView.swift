@@ -25,6 +25,8 @@ struct PlayView: View {
     @State private var appSettings = AppSettings.shared
     private var boardTheme: BoardTheme { appSettings.boardTheme }
     @State private var showPanelSheet = false
+    /// Le dernier « Coup impossible » déjà effacé.
+    @State private var dismissedBlindNoticeID = 0
     @State private var copiedMessage: String?
     @State private var showResignConfirmation = false
     @State private var showDrawConfirmation = false
@@ -166,6 +168,7 @@ struct PlayView: View {
             // vous) : identité + pièces prises + avantage + pendule sur une
             // seule ligne chacune, sans marge qui les détacherait du plateau.
             topClock
+            blindBar
             // Plateau de BORD À BORD : il annule la marge horizontale du
             // conteneur pour lui seul. C'est le seul élément dont la taille
             // est utile — chaque point gagné en largeur est un point sur les
@@ -178,7 +181,7 @@ struct PlayView: View {
             // Tout ce qui suit est à HAUTEUR FIXE et toujours présent : le
             // plateau ne rétrécit donc plus quand on joue (avant, la barre de
             // transport n'apparaissait qu'au 1er coup et poussait tout).
-            if viewModel.settings.showEvalBar {
+            if viewModel.settings.showEvalBar && !viewModel.isBlindfold {
                 EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
             }
             if viewModel.outcome == nil {
@@ -216,6 +219,7 @@ struct PlayView: View {
         VStack(spacing: 10) {
             ThermalBadge()
             topClock
+            blindBar
             board
                 // BORD À BORD : annule la marge horizontale du conteneur pour
                 // le seul plateau (même principe qu'en iPhone), qui touche
@@ -230,7 +234,7 @@ struct PlayView: View {
                 .layoutPriority(1)
             bottomClock
 
-            if viewModel.settings.showEvalBar {
+            if viewModel.settings.showEvalBar && !viewModel.isBlindfold {
                 EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
             }
             if viewModel.outcome == nil {
@@ -327,9 +331,10 @@ struct PlayView: View {
                 // Plaques à côté du plateau (voir ``clocksBesideBoard(in:)``) :
                 // l'adversaire en haut, soi en bas, comme sur l'échiquier.
                 if clocksBeside { topClock }
+                blindBar
                 ScrollView {
                     VStack(spacing: 16) {
-                        if viewModel.settings.showEvalBar {
+                        if viewModel.settings.showEvalBar && !viewModel.isBlindfold {
                             EvalBarView(evalCp: viewModel.currentEvalCp, evalMate: viewModel.currentEvalMate)
                         }
                         if viewModel.outcome == nil {
@@ -469,15 +474,101 @@ struct PlayView: View {
             orientation: viewModel.userColor,
             theme: boardTheme,
             selectedSquare: viewModel.selectedSquare,
-            legalTargetSquares: viewModel.legalTargetSquares,
+            // À l'aveugle, jamais de points de coups légaux : ceux d'une tour s'arrêtent devant une pièce cachée.
+            legalTargetSquares: viewModel.boardMask == .none ? viewModel.legalTargetSquares : [],
             lastMove: viewModel.displayedLastMove,
             hintMoves: viewModel.isReviewing ? [] : viewModel.hintMoves,
             interactionEnabled: viewModel.outcome == nil && !viewModel.isReviewing,
             showCoordinates: true,
-            draggableColor: viewModel.userColor,
+            draggableColor: viewModel.boardMask == .none || viewModel.settings.blindfold.canDrag(user: viewModel.userColor)
+                ? viewModel.userColor : nil,
             onTapSquare: { viewModel.selectSquare($0) },
-            onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) }
+            onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) },
+            pieceMask: viewModel.boardMask
         )
+        .overlay(alignment: .top) { blindNoticeView }
+        .animation(.easeInOut(duration: 0.25), value: viewModel.boardMask)
+    }
+
+    // MARK: À l'aveugle (17/11/2026)
+
+    /// Au-dessus du plateau : le dernier coup de l'adversaire EN GROS (c'est lui qui permet de suivre la
+    /// partie), et « Coup d'œil » — on le maintient, chaque appui compte.
+    @ViewBuilder
+    private var blindBar: some View {
+        if viewModel.isBlindfold, viewModel.outcome == nil {
+            HStack(spacing: 12) {
+                Group {
+                    if let san = viewModel.lastOpponentMoveSAN {
+                        Text(verbatim: "\(viewModel.opponentDisplayName) : \(SANFormatter.display(san))")
+                    } else if viewModel.board.position.sideToMove == viewModel.userColor {
+                        Text("À vous de jouer")
+                    } else {
+                        Text("\(viewModel.opponentDisplayName) réfléchit…")
+                    }
+                }
+                .font(.title3.weight(.bold))
+                .foregroundStyle(Theme.textPrimary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .accessibilityIdentifier("blindLastMove")
+                Spacer(minLength: 4)
+                peekButton
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+    }
+
+    /// Maintenir pour voir : impossible d'oublier de refermer (décision du 17/11/2026).
+    private var peekButton: some View {
+        HStack(spacing: 6) {
+            Image(systemName: viewModel.isPeeking ? "eye.fill" : "eye")
+            Text("Coup d'œil")
+            if viewModel.peekCount > 0 {
+                Text(verbatim: "\(viewModel.peekCount)")
+                    .font(.caption.weight(.bold).monospacedDigit())
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 1)
+                    .background(Theme.teal.opacity(0.25), in: Capsule())
+            }
+        }
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(viewModel.isPeeking ? Theme.background : Theme.teal)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
+        .background(viewModel.isPeeking ? Theme.teal : Theme.teal.opacity(0.12), in: Capsule())
+        .overlay(Capsule().strokeBorder(Theme.teal.opacity(0.4), lineWidth: 1))
+        .contentShape(Capsule())
+        .onLongPressGesture(minimumDuration: 0, maximumDistance: 60, pressing: { pressing in
+            if pressing { viewModel.beginPeek() } else { viewModel.endPeek() }
+        }, perform: {})
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text("Coup d'œil"))
+        .accessibilityValue(Text("\(viewModel.peekCount)"))
+        .accessibilityAddTraits(.isButton)
+        .accessibilityIdentifier("blindPeek")
+    }
+
+    /// « Coup impossible », un instant, en haut du plateau.
+    @ViewBuilder
+    private var blindNoticeView: some View {
+        if let notice = viewModel.blindNotice, notice.id != dismissedBlindNoticeID {
+            Text(notice.text)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .background(Theme.danger.opacity(0.9), in: Capsule())
+                .padding(.top, 10)
+                .transition(.opacity)
+                .accessibilityIdentifier("blindNotice")
+                .task(id: notice.id) {
+                    try? await Task.sleep(for: .milliseconds(1400))
+                    withAnimation { dismissedBlindNoticeID = notice.id }
+                }
+        }
     }
 
     private var topClock: some View {
@@ -530,7 +621,7 @@ struct PlayView: View {
             undoableResumeCount: viewModel.resumeUndo?.discardedCount,
             showMoveList: showMoveList,
             hintsWanted: viewModel.hintsWanted,
-            hintsEnabled: viewModel.settings.hintsEnabled,
+            hintsEnabled: viewModel.settings.hintsEnabled && !viewModel.isBlindfold,
             isFinished: viewModel.outcome != nil,
             isEngineThinking: viewModel.isEngineThinking,
             onPrevious: { viewModel.reviewPrevious() },
@@ -638,6 +729,12 @@ struct PlayView: View {
                         Text(outcome.summary(userColor: viewModel.userColor))
                             .font(.headline)
                             .foregroundStyle(Theme.textPrimary)
+                        if viewModel.isBlindfold {
+                            Text(viewModel.blindSummaryLine)
+                                .font(.caption.weight(.semibold))
+                                .foregroundStyle(Theme.teal)
+                                .accessibilityIdentifier("blindSummary")
+                        }
                         if let line = viewModel.opponentSummaryLine {
                             Text(line)
                                 .font(.caption)

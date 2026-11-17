@@ -1451,4 +1451,31 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">Votre raté</item>
         <item quantity="other">Vos ratés</item>
     </plurals>
+
+    <!-- À l'aveugle (17/11/2026), mêmes mots qu'iOS -->
+    <string name="blind_title">À l\'aveugle</string>
+    <string name="blind_off">Non</string>
+    <string name="blind_occupied">Cases occupées</string>
+    <string name="blind_opponent_hidden">Pièces adverses cachées</string>
+    <string name="blind_own_hidden">Vos pièces cachées</string>
+    <string name="blind_all_hidden">Tout caché</string>
+    <string name="blind_off_detail">Les pièces se voient.</string>
+    <string name="blind_occupied_detail">Un disque blanc ou noir à la place de chaque pièce : on sait à qui elle est, pas laquelle c\'est.</string>
+    <string name="blind_opponent_hidden_detail">Vous voyez vos pièces, pas celles de l\'adversaire.</string>
+    <string name="blind_own_hidden_detail">Vous voyez celles de l\'adversaire, pas les vôtres.</string>
+    <string name="blind_all_hidden_detail">Le plateau est vide : tout se joue de mémoire.</string>
+    <string name="blind_aids_off">À l\'aveugle, l\'indice, l\'alerte et la barre d\'évaluation sont coupés.</string>
+    <string name="blind_peek_explained">Maintenez « Coup d\'œil » pour revoir l\'échiquier ; chaque coup d\'œil est compté.</string>
+    <string name="blind_start_weak">Commencez contre un personnage faible : à l\'aveugle, tout devient plus difficile.</string>
+    <string name="blind_voice">Lire les coups adverses à voix haute</string>
+    <string name="your_turn_blind">À vous de jouer</string>
+    <string name="blind_thinking">%1$s réfléchit…</string>
+    <string name="blind_peek">Coup d\'œil</string>
+    <string name="blind_illegal">Coup impossible</string>
+    <string name="blind_disc_white">Pièce blanche</string>
+    <string name="blind_disc_black">Pièce noire</string>
+    <plurals name="blind_peeks">
+        <item quantity="one">%1$d coup d\'œil</item>
+        <item quantity="other">%1$d coups d\'œil</item>
+    </plurals>
 </resources>

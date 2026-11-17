@@ -85,6 +85,8 @@ class GameRecorder(startingPosition: Position = Position.standard) {
         opponentId: String? = null,
         engineElo: Int? = null,
         engineColor: Piece.Color? = null,
+        /** Les étiquettes de la bibliothèque (« À l'aveugle »…), séparées par des virgules. */
+        tags: String? = null,
         scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob()),
     ) {
         if (moveCount == 0) return
@@ -119,6 +121,7 @@ class GameRecorder(startingPosition: Position = Position.standard) {
             opponentId = opponentId,
             engineElo = engineElo,
             engineColor = engineColor?.let { if (it == Piece.Color.white) "white" else "black" },
+            tags = tags,
         )
         scope.launch { LibraryDatabase.get(context).games().insert(record) }
     }

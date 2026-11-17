@@ -1454,4 +1454,31 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">Missed puzzle</item>
         <item quantity="other">Missed puzzles</item>
     </plurals>
+
+    <!-- À l'aveugle (17/11/2026), mêmes mots qu'iOS -->
+    <string name="blind_title">Blindfold</string>
+    <string name="blind_off">No</string>
+    <string name="blind_occupied">Occupied squares</string>
+    <string name="blind_opponent_hidden">Opponent\'s pieces hidden</string>
+    <string name="blind_own_hidden">Your pieces hidden</string>
+    <string name="blind_all_hidden">Everything hidden</string>
+    <string name="blind_off_detail">The pieces are visible.</string>
+    <string name="blind_occupied_detail">A white or black disc in place of each piece: you know whose it is, not which piece it is.</string>
+    <string name="blind_opponent_hidden_detail">You see your pieces, not your opponent\'s.</string>
+    <string name="blind_own_hidden_detail">You see your opponent\'s pieces, not yours.</string>
+    <string name="blind_all_hidden_detail">The board is empty: everything is played from memory.</string>
+    <string name="blind_aids_off">Blindfold, the hint, the warning and the evaluation bar are turned off.</string>
+    <string name="blind_peek_explained">Hold “Peek” to see the board again; every peek is counted.</string>
+    <string name="blind_start_weak">Start against a weak character: blindfold, everything gets harder.</string>
+    <string name="blind_voice">Read the opponent\'s moves aloud</string>
+    <string name="your_turn_blind">Your move</string>
+    <string name="blind_thinking">%1$s is thinking…</string>
+    <string name="blind_peek">Peek</string>
+    <string name="blind_illegal">Illegal move</string>
+    <string name="blind_disc_white">White piece</string>
+    <string name="blind_disc_black">Black piece</string>
+    <plurals name="blind_peeks">
+        <item quantity="one">%1$d peek</item>
+        <item quantity="other">%1$d peeks</item>
+    </plurals>
 </resources>

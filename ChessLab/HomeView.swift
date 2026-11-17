@@ -84,6 +84,8 @@ struct HomeView: View {
 
     private enum Route: Hashable {
         case newGame
+        /// Le réglage « Contre l'ordinateur », section « À l'aveugle » ouverte et cochée (carte de « Plus »).
+        case blindfoldSetup
         /// « Continuer contre Stockfish » depuis une ligne/un répertoire : on
         /// passe par l'écran de réglages (pré-rempli avec la position) pour
         /// que le joueur CHOISISSE l'Elo au lieu de repartir en silence aux
@@ -203,7 +205,7 @@ struct HomeView: View {
                  .activeStolenMoveGame, .activeDuckChessGame, .activeDuckChessAnalysis,
                  .activeLab, .resumedLab:
                 return true
-            case .newGame, .continueVsStockfish, .twoPlayerSetup, .continueTwoPlayer,
+            case .newGame, .blindfoldSetup, .continueVsStockfish, .twoPlayerSetup, .continueTwoPlayer,
                  .analysisEntry, .analysisLibrary, .scanner, .puzzleQueue,
                  .openingList, .endgameList, .labSetup, .variantsHub, .chess960Setup,
                  .fairyVariantSetup, .engineLegalitySetup, .stolenMoveSetup, .duckChessSetup,
@@ -987,6 +989,14 @@ struct HomeView: View {
                         startNewGame(settings, replacingCurrent: true)
                     }
 
+                case .blindfoldSetup:
+                    NewGameSetupView(presetBlindfold: true, onResume: { autosave in
+                        path = NavigationPath()
+                        path.append(Route.resumedGame(autosave))
+                    }) { settings in
+                        startNewGame(settings, replacingCurrent: true)
+                    }
+
                 case let .continueVsStockfish(fen):
                     // Même écran que « Nouvelle partie », pré-rempli avec la
                     // position atteinte : le joueur règle l'Elo puis lance.
@@ -1689,6 +1699,11 @@ struct HomeView: View {
                 CompactModeCard(title: "Laboratoire", systemImage: "flask", tint: Theme.rose) {
                     path.append(Route.labSetup(startFEN: nil))
                 }
+            }
+            // Partie à l'aveugle (17/11/2026) : ouvre le réglage « Contre l'ordinateur », section cochée. PLEINE
+            // largeur sous la grille : une cinquième tuile y serait restée seule sur sa rangée.
+            CompactModeCard(title: "À l'aveugle", systemImage: "eye.slash.fill", tint: Theme.teal, accessibilityID: "mode_blindfold") {
+                path.append(Route.blindfoldSetup)
             }
         }
     }

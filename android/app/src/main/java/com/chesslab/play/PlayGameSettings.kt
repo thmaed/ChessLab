@@ -88,7 +88,14 @@ data class PlayGameSettings(
     val bookWidth: BookWidth = BookWidth.mainLinesOnly,
     /** Position de départ imposée, ou `null` pour la position initiale. */
     val startFen: String? = null,
+    /** Partie À L'AVEUGLE (17/11/2026) : quelles pièces se cachent — voir [BlindfoldLevel]. */
+    val blindfold: BlindfoldLevel = BlindfoldLevel.off,
+    /** À l'aveugle : les coups adverses lus à voix haute. Éteint par défaut (décision du 17/11/2026). */
+    val blindfoldVoice: Boolean = false,
 ) {
+    /** Vrai pendant une partie à l'aveugle : les aides qui montreraient la position sont coupées. */
+    val isBlindfold: Boolean get() = blindfold != BlindfoldLevel.off
+
     val timeControl: TimeControl
         get() = if (timeControlId == "custom") TimeControl.custom(customMinutes, customIncrementSeconds)
         else TimeControl.byId(timeControlId)

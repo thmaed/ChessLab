@@ -41,6 +41,11 @@ struct NewGameSetupView: View {
     @State private var fenError = false
     @State private var showPositionEditor = false
     @State private var showScanner = false
+    /// Partie à l'aveugle (17/11/2026).
+    @State private var blindfold: BlindfoldLevel
+    @State private var blindfoldVoice: Bool
+    /// Arrivé par la carte « À l'aveugle » de l'accueil : la section est montrée d'emblée.
+    private let presetBlindfold: Bool
 
     /// Préremplit tous les champs avec les derniers réglages utilisés
     /// (ou les défauts à la première partie). Pas d'effet de bord ici :
@@ -52,11 +57,13 @@ struct NewGameSetupView: View {
     ///   devient celui de l'utilisateur — l'autre est joué par le moteur.
     init(
         initialFEN: String? = nil,
+        presetBlindfold: Bool = false,
         onResume: @escaping (PlayGameAutosave) -> Void = { _ in },
         onStart: @escaping (PlayGameSettings) -> Void
     ) {
         self.onStart = onStart
         self.onResume = onResume
+        self.presetBlindfold = presetBlindfold
         self.navigationTitleKey = initialFEN == nil ? "Nouvelle partie" : "Continuer la partie"
         let saved = PlaySettingsStore.load() ?? .default
 
@@ -93,6 +100,12 @@ struct NewGameSetupView: View {
         _multiMoveTakebackEnabled = State(initialValue: saved.multiMoveTakebackEnabled)
         _bookEnabled = State(initialValue: saved.bookEnabled)
         _bookWidth = State(initialValue: saved.bookWidth)
+        // L'aveugle ne se RETIENT pas d'une partie à l'autre par la porte ordinaire : « Nouvelle partie » ne
+        // doit jamais ouvrir sur un plateau vide sans qu'on l'ait demandé. Par la carte « À l'aveugle », on
+        // retrouve le dernier niveau joué (« Cases occupées » la première fois).
+        _blindfold = State(initialValue: presetBlindfold
+                           ? (saved.blindfold == .off ? .occupiedSquares : saved.blindfold) : .off)
+        _blindfoldVoice = State(initialValue: saved.blindfoldVoice)
     }
 
     var body: some View {
@@ -102,6 +115,12 @@ struct NewGameSetupView: View {
         ScrollViewReader { discoveryProxy in
             scrollBody
                 .discoveryAutoScroll(using: discoveryProxy)
+                .task {
+                    // Par la carte « À l'aveugle » : on montre la section tout de suite.
+                    guard presetBlindfold else { return }
+                    try? await Task.sleep(for: .milliseconds(350))
+                    withAnimation { discoveryProxy.scrollTo("blindfoldSection", anchor: .top) }
+                }
         }
     }
 
@@ -272,8 +291,18 @@ struct NewGameSetupView: View {
                     }
                 }
 
+                blindfoldSection
+                    .id("blindfoldSection")
+
                 SettingsSection(title: "Aides", systemImage: "lightbulb.fill", tint: Theme.rose, discoverySpot: .aidToggles) {
                     VStack(spacing: 12) {
+                        if blindfold != .off {
+                            Label("À l'aveugle, l'indice, l'alerte et la barre d'évaluation sont coupés.", systemImage: "eye.slash")
+                                .font(.caption)
+                                .foregroundStyle(Theme.textSecondary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                         ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled, tint: Theme.rose)
                         ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled, tint: Theme.rose)
                         ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar, tint: Theme.rose)
@@ -423,6 +452,59 @@ struct NewGameSetupView: View {
         .accessibilityIdentifier("setupResumeGame")
     }
 
+    // MARK: À l'aveugle
+
+    /// Cinq choix, un aperçu sur un petit plateau (on comprend avant de jouer, sans lire), la voix.
+    private var blindfoldSection: some View {
+        SettingsSection(title: "À l'aveugle", systemImage: "eye.slash.fill", tint: Theme.teal) {
+            VStack(alignment: .leading, spacing: 14) {
+                FlowLayout(spacing: 8) {
+                    ForEach([BlindfoldLevel.off] + BlindfoldLevel.levels) { level in
+                        ChipButton(label: LocalizedStringKey(level.title), systemImage: nil,
+                                   isSelected: blindfold == level, tint: Theme.teal) {
+                            withAnimation(Theme.spring) { blindfold = level }
+                        }
+                        .accessibilityIdentifier("blindfold-\(level.rawValue)")
+                    }
+                }
+                HStack(alignment: .top, spacing: 14) {
+                    ChessBoardView(
+                        board: Board(position: .standard),
+                        orientation: colorChoice == .black ? .black : .white,
+                        theme: AppSettings.shared.boardTheme,
+                        selectedSquare: nil, legalTargetSquares: [], lastMove: nil, hintMoves: [],
+                        interactionEnabled: false, showCoordinates: false,
+                        onTapSquare: { _ in }, onDropPiece: { _, _ in },
+                        pieceMask: blindfold.mask(user: colorChoice == .black ? .black : .white)
+                    )
+                    .frame(width: 104, height: 104)
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                    .accessibilityHidden(true)
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(LocalizedStringKey(blindfold.detail))
+                            .font(.subheadline)
+                            .foregroundStyle(Theme.textPrimary)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if blindfold != .off {
+                            Text("Maintenez « Coup d'œil » pour revoir l'échiquier ; chaque coup d'œil est compté.")
+                                .font(.caption)
+                                .foregroundStyle(Theme.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+                if blindfold != .off {
+                    Text("Commencez contre un personnage faible : à l'aveugle, tout devient plus difficile.")
+                        .font(.caption)
+                        .foregroundStyle(Theme.textTertiary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    ToggleRow(label: "Lire les coups adverses à voix haute", isOn: $blindfoldVoice, tint: Theme.teal)
+                        .accessibilityIdentifier("blindfoldVoice")
+                }
+            }
+        }
+    }
+
     private func launch() {
         // Trimé AVANT stockage et pas seulement pour la validation :
         // `FENValidator` trime en interne, mais `PlayGameSettings.startingPosition`
@@ -451,7 +533,9 @@ struct NewGameSetupView: View {
             bookEnabled: bookEnabled,
             bookWidth: bookWidth,
             engineResignationEnabled: engineResignationEnabled,
-            opponentProfileID: opponentMode == .profile ? opponentProfileID : nil
+            opponentProfileID: opponentMode == .profile ? opponentProfileID : nil,
+            blindfold: blindfold,
+            blindfoldVoice: blindfoldVoice
         )
         if opponentMode == .profile {
             OpponentLevelStore.save(level: eloSlider, for: opponentProfileID)

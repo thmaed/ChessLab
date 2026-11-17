@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Memory
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.NorthEast
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material.icons.filled.Science
@@ -209,6 +210,7 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                     row.forEach { mode -> Box(Modifier.weight(1f)) { CompactModeCard(mode, onOpen) } }
                 }
             }
+            CompactModeCard(blindfoldMode, onOpen)
             if (recent.isNotEmpty()) RecentGames(recent, onOpen)
             Spacer(Modifier.height(8.dp))
         }
@@ -378,6 +380,13 @@ private fun recentGameTitle(game: GameRecord): String {
 
 /** Les quatre modes du premier étage de l'accueil ; les autres vont sous « Plus ». */
 private val PRIMARY_MODE_TAGS = setOf("play", "puzzles", "openings", "analysis")
+
+/**
+ * Partie À L'AVEUGLE (17/11/2026) : ouvre le réglage « Contre l'ordinateur », section cochée. Pleine largeur
+ * sous la rangée « Plus » — une cinquième tuile y serait restée seule. Pendant de la carte iOS.
+ */
+private val blindfoldMode = Mode(Route.NewGame(blindfold = true), "blindfold", R.string.blind_title, R.string.blind_title,
+    R.string.blind_title, R.string.blind_title, Icons.Default.VisibilityOff, Palette.teal)
 
 /** Tuile BASSE de l'étage « Plus » : icône et titre sur une ligne. Pendant de `CompactModeCard` (iOS). */
 @Composable

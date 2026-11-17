@@ -15,6 +15,9 @@ struct PlayGameAutosave: Codable, Hashable, AutosaveRecord {
     /// L'identité de la partie (voir ``AutosaveRecord/gameID``) : née avec elle, gardée à chaque coup et à
     /// chaque reprise. Optionnelle : les sauvegardes d'avant le 16/11/2026 n'en ont pas.
     var gameID: UUID? = nil
+    /// À l'aveugle : les coups d'œil déjà pris (``PlayViewModel/peekCount``). Optionnel : absent des
+    /// sauvegardes d'avant le 17/11/2026 et des parties à vue.
+    var blindfoldPeeks: Int? = nil
 }
 
 /// Persistance de la partie en cours du mode Jouer : un fichier JSON dans `Documents/`, que
