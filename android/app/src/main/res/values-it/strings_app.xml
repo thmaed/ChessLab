@@ -1106,8 +1106,8 @@
     <string name="sources_eval_title">Valutazioni</string>
     <string name="sources_eval_body">Motore Stockfish, a monte, per annotare le mosse critiche e individuare le trappole.</string>
     <string name="sources_offline">Nessun dato di apertura viene scaricato durante l\'uso: tutto funziona offline.</string>
-    <string name="settings_openings">Aperture</string>
     <string name="settings_sources">Fonti dei dati</string>
+    <string name="settings_sources_subtitle">Da dove vengono le aperture.</string>
     <string name="settings_help">Aiuto</string>
     <string name="settings_help_sub">Cosa fa ciascuna modalità.</string>
     <string name="scan_photo">Scatta una foto</string>

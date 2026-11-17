@@ -16491,34 +16491,6 @@
         }
       }
     },
-    "Explore, apprends et entraîne tes ouvertures depuis l'onglet Ouvertures : lecteur pas à pas, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Explore, learn and train your openings from the Openings tab: step-by-step reader, active recall and spaced repetition. Content grows with updates."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Explora, aprende y entrena tus aperturas desde la pestaña Aperturas: lector paso a paso, recuerdo activo y repetición espaciada. El contenido crece con las actualizaciones."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Erkunde, lerne und trainiere deine Eröffnungen im Tab „Eröffnungen“: Schritt-für-Schritt-Leser, aktives Abrufen und verteilte Wiederholung. Der Inhalt wächst mit den Updates."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Esplora, impara e allena le tue aperture dalla scheda Aperture: lettore passo passo, richiamo attivo e ripetizione dilazionata. Il contenuto si arricchisce con gli aggiornamenti."
-          }
-        }
-      }
-    },
     "Explorer": {
       "localizations": {
         "en": {
@@ -56088,6 +56060,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Un attimo, ChessLab si riavvia da solo."
+          }
+        }
+      }
+    },
+    "D'où viennent les ouvertures.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Woher die Eröffnungen stammen."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Where the openings come from."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "De dónde vienen las aperturas."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "D'où viennent les ouvertures."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Da dove vengono le aperture."
           }
         }
       }

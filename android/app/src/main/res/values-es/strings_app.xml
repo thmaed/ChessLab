@@ -1106,8 +1106,8 @@
     <string name="sources_eval_title">Evaluaciones</string>
     <string name="sources_eval_body">Motor Stockfish, en una fase previa, para anotar las jugadas críticas y detectar las trampas.</string>
     <string name="sources_offline">No se descarga ningún dato de aperturas durante el uso: todo funciona sin conexión.</string>
-    <string name="settings_openings">Aperturas</string>
     <string name="settings_sources">Fuentes de datos</string>
+    <string name="settings_sources_subtitle">De dónde vienen las aperturas.</string>
     <string name="settings_help">Ayuda</string>
     <string name="settings_help_sub">Qué hace cada modo.</string>
     <string name="scan_photo">Hacer una foto</string>

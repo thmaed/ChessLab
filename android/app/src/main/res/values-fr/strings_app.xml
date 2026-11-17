@@ -1146,8 +1146,8 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="sources_eval_title">Évaluations</string>
     <string name="sources_eval_body">Moteur Stockfish, en amont, pour annoter les coups critiques et repérer les pièges.</string>
     <string name="sources_offline">Aucune donnée d\'ouverture n\'est téléchargée à l\'usage : tout fonctionne hors ligne.</string>
-    <string name="settings_openings">Ouvertures</string>
     <string name="settings_sources">Sources des données</string>
+    <string name="settings_sources_subtitle">D\'où viennent les ouvertures.</string>
     <string name="settings_help">Aide</string>
     <string name="settings_help_sub">Ce que fait chaque mode.</string>
     <string name="scan_photo">Prendre une photo</string>

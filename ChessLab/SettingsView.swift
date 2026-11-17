@@ -34,7 +34,6 @@ struct SettingsView: View {
                 puzzleSection
                 feedbackSection
                 syncSection
-                if OpeningsGraphFeature.hasBundledCourses { previewSection }
                 helpSection
                 licensesSection
                 versionFooter
@@ -392,33 +391,6 @@ struct SettingsView: View {
             .accessibilityIdentifier("settingsVersion")
     }
 
-    /// Module d'ouvertures en graphe : accessible via le bouton « Explorateur »
-    /// (boussole) de l'onglet Ouvertures. Cette section explique et crédite les
-    /// sources des données.
-    private var previewSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            sectionTitle("Ouvertures")
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Explore, apprends et entraîne tes ouvertures depuis l'onglet Ouvertures : lecteur pas à pas, rappel actif et répétition espacée. Le contenu s'enrichit au fil des mises à jour.")
-                    .font(.caption)
-                    .foregroundStyle(Theme.textTertiary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Button(action: onOpenSources) {
-                    HStack(spacing: 6) {
-                        Label("Sources des données", systemImage: "text.book.closed")
-                            .font(.caption.weight(.semibold)).foregroundStyle(Theme.info)
-                        Spacer()
-                        Image(systemName: "chevron.right").font(.caption2).foregroundStyle(Theme.textTertiary)
-                    }
-                }
-                .buttonStyle(.pressable)
-                .padding(.top, 2)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .cardStyle()
-        }
-    }
-
     /// Notation des pièces (Lot 3.A). Française par défaut, comme l'exige le
     /// prompt ; l'app affichait jusqu'ici les lettres anglaises partout.
     private var notationSection: some View {
@@ -527,32 +499,48 @@ struct SettingsView: View {
         }
     }
 
-    /// Licences des composants tiers (Stockfish GPLv3, cburnett CC BY-SA…).
+    /// Licences des composants tiers (Stockfish GPLv3, cburnett CC BY-SA…) et sources des données
+    /// d'ouvertures. Ces dernières avaient leur propre section « Ouvertures », qui ne faisait que répéter ce
+    /// que l'onglet montre (retour du 16/11/2026) : le crédit, lui, reste — ici, avec les licences.
     private var licensesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             sectionTitle("À propos")
-            Button(action: onOpenLicenses) {
-                HStack(spacing: 12) {
-                    IconBadge(systemImage: "doc.text.magnifyingglass", tint: Theme.textSecondary, size: 34)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Licences")
-                            .font(.body.weight(.medium))
-                            .foregroundStyle(Theme.textPrimary)
-                        Text("Stockfish, ChessKit, pièces, puzzles.")
-                            .font(.caption)
-                            .foregroundStyle(Theme.textTertiary)
-                    }
-                    Spacer()
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(Theme.textTertiary)
+            VStack(spacing: 0) {
+                aboutRow(systemImage: "doc.text.magnifyingglass", title: "Licences",
+                         subtitle: "Stockfish, ChessKit, pièces, puzzles.", action: onOpenLicenses)
+                    .accessibilityIdentifier("openLicenses")
+                if OpeningsGraphFeature.hasBundledCourses {
+                    Divider().overlay(Theme.stroke).padding(.vertical, 8)
+                    aboutRow(systemImage: "text.book.closed", title: "Sources des données",
+                             subtitle: "D'où viennent les ouvertures.", action: onOpenSources)
+                        .accessibilityIdentifier("openSources")
                 }
-                .padding(.vertical, 4)
-                .contentShape(Rectangle())
             }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("openLicenses")
             .cardStyle()
         }
+    }
+
+    private func aboutRow(systemImage: String, title: LocalizedStringKey, subtitle: LocalizedStringKey,
+                          action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                IconBadge(systemImage: systemImage, tint: Theme.textSecondary, size: 34)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.body.weight(.medium))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text(subtitle)
+                        .font(.caption)
+                        .foregroundStyle(Theme.textTertiary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(Theme.textTertiary)
+            }
+            .padding(.vertical, 4)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 
     private func sectionTitle(_ text: LocalizedStringKey) -> some View {

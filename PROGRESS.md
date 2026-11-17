@@ -11372,3 +11372,8 @@ iCloud, et pouvait rassurer à tort. Le schéma CloudKit de production est compl
   QUE sur un choix de l'utilisateur. Prouvé de bout en bout : `NotationSettingUITests` sur installation VIERGE
   (automatique → anglaise retrouvée après relance → automatique retrouvée après relance) ; Android :
   `NotationSettingTest` (instrumenté, émulateur) — il n'y avait aucun test côté Android.
+- **Réglages : section « Ouvertures » retirée** (retour : « ne sert à rien » — un texte qui répétait l'onglet, et un
+  lien). Le crédit des données d'ouvertures (« Sources des données ») passe dans « À propos », sous « Licences »,
+  sous-titre « D'où viennent les ouvertures. » (5 langues). `SettingsAboutUITests` (lien présent, mène à la page ;
+  section disparue). **Android porté** (`SettingsScreen` : même déplacement, `settings_sources_subtitle` ×5,
+  `settings_openings` retiré).

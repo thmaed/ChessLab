@@ -1149,8 +1149,8 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="sources_eval_title">Evaluations</string>
     <string name="sources_eval_body">The Stockfish engine, ahead of time, to annotate critical moves and spot traps.</string>
     <string name="sources_offline">No opening data is downloaded in use: everything works offline.</string>
-    <string name="settings_openings">Openings</string>
     <string name="settings_sources">Data sources</string>
+    <string name="settings_sources_subtitle">Where the openings come from.</string>
     <string name="settings_help">Help</string>
     <string name="settings_help_sub">What each mode does.</string>
     <string name="scan_photo">Take a photo</string>

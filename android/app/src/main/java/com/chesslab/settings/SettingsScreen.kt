@@ -334,13 +334,6 @@ fun SettingsScreen(
         
         }
 
-                SettingsSection(stringResource(R.string.settings_openings), Icons.Default.MenuBook) {
-            LinkRow(
-                Icons.Default.Description, stringResource(R.string.settings_sources),
-                stringResource(R.string.sources_intro).take(60) + "…", "sources", onOpenSources,
-            )
-        }
-
         SettingsSection(stringResource(R.string.settings_help), Icons.AutoMirrored.Filled.HelpOutline) {
             LinkRow(
                 Icons.AutoMirrored.Filled.HelpOutline, stringResource(R.string.route_help),
@@ -348,10 +341,16 @@ fun SettingsScreen(
             )
         }
 
+        // « À propos » : les licences, et les sources des données d'ouvertures — elles avaient leur propre
+        // section « Ouvertures », qui ne servait à rien d'autre (retour du 16/11/2026, comme iOS).
         SettingsSection(stringResource(R.string.settings_about), Icons.Default.Info) {
             LinkRow(
                 Icons.Default.Description, stringResource(R.string.licences_title),
                 stringResource(R.string.settings_licences_subtitle), "licences", onOpenLicences,
+            )
+            LinkRow(
+                Icons.Default.Description, stringResource(R.string.settings_sources),
+                stringResource(R.string.settings_sources_subtitle), "sources", onOpenSources,
             )
         }
 

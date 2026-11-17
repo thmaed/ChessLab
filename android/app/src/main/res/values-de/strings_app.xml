@@ -1078,8 +1078,8 @@
     <string name="sources_eval_title">Bewertungen</string>
     <string name="sources_eval_body">Die Engine Stockfish, vorgelagert, um kritische Züge zu kommentieren und Fallen zu erkennen.</string>
     <string name="sources_offline">Beim Gebrauch werden keine Eröffnungsdaten heruntergeladen: Alles funktioniert offline.</string>
-    <string name="settings_openings">Eröffnungen</string>
     <string name="settings_sources">Datenquellen</string>
+    <string name="settings_sources_subtitle">Woher die Eröffnungen stammen.</string>
     <string name="settings_help">Hilfe</string>
     <string name="settings_help_sub">Was jeder Modus macht.</string>
     <string name="scan_photo">Foto aufnehmen</string>
