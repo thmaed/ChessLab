@@ -67,23 +67,7 @@ final class VariantBoardFitUITests: XCTestCase {
     /// libellé, le même que celui des tests de captures d'écran.
     @MainActor
     private func openVariants(_ app: XCUIApplication) -> Bool {
-        let tile = app.buttons["mode_variants"]
-        if tile.waitForExistence(timeout: 8), tile.isHittable {
-            tile.tap()
-            return true
-        }
-        for candidate in [app.buttons["Variantes"], app.cells["Variantes"], app.staticTexts["Variantes"]] {
-            guard candidate.waitForExistence(timeout: 4) else { continue }
-            for _ in 0..<4 {
-                if candidate.isHittable {
-                    candidate.tap()
-                    return true
-                }
-                app.swipeUp()
-                RunLoop.current.run(until: Date().addingTimeInterval(0.4))
-            }
-        }
-        return false
+        HomeTiles.open("mode_variants", sidebarLabel: "Variantes", in: app)
     }
 
     @MainActor

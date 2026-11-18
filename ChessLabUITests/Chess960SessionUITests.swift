@@ -29,8 +29,7 @@ final class Chess960SessionUITests: XCTestCase {
 
     @MainActor
     private func openChess960(_ app: XCUIApplication) {
-        _ = app.buttons["mode_variants"].waitForExistence(timeout: 5)
-        app.buttons["mode_variants"].tap()
+        XCTAssertTrue(HomeTiles.open("mode_variants", sidebarLabel: "Variantes", in: app), "la tuile Variantes")
         _ = app.buttons["variant_chess960"].waitForExistence(timeout: 5)
         app.buttons["variant_chess960"].tap()
         _ = app.buttons["chess960_start"].waitForExistence(timeout: 5)

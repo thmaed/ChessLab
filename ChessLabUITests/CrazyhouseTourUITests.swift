@@ -11,8 +11,7 @@ final class CrazyhouseTourUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["mode_variants"].waitForExistence(timeout: 15))
-        app.buttons["mode_variants"].tap()
+        XCTAssertTrue(HomeTiles.open("mode_variants", sidebarLabel: "Variantes", in: app), "la tuile Variantes")
         settle(1.0)
         app.swipeUp()
         settle(0.6)

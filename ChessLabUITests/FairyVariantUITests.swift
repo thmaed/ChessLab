@@ -12,8 +12,7 @@ final class FairyVariantUITests: XCTestCase {
     @MainActor
     private func openVariantsHub(_ app: XCUIApplication) {
         app.launch()
-        _ = app.buttons["mode_variants"].waitForExistence(timeout: 5)
-        app.buttons["mode_variants"].tap()
+        XCTAssertTrue(HomeTiles.open("mode_variants", sidebarLabel: "Variantes", in: app), "la tuile Variantes")
     }
 
     /// Toutes les tuiles du hub (Chess960 + les trois variantes du lot A + les trois

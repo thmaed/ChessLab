@@ -14,8 +14,7 @@ final class DuckChessUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["mode_variants"].waitForExistence(timeout: 15))
-        app.buttons["mode_variants"].tap()
+        XCTAssertTrue(HomeTiles.open("mode_variants", sidebarLabel: "Variantes", in: app), "la tuile Variantes")
 
         let tile = app.buttons["variant_duck"]
         XCTAssertTrue(tile.waitForExistence(timeout: 8), "la tuile Duck Chess doit exister")
@@ -79,8 +78,7 @@ final class DuckChessUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["mode_variants"].waitForExistence(timeout: 15))
-        app.buttons["mode_variants"].tap()
+        XCTAssertTrue(HomeTiles.open("mode_variants", sidebarLabel: "Variantes", in: app), "la tuile Variantes")
 
         let tile = app.buttons["variant_duck"]
         XCTAssertTrue(tile.waitForExistence(timeout: 8))

@@ -17,8 +17,7 @@ final class BarricadesUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["mode_variants"].waitForExistence(timeout: 15))
-        app.buttons["mode_variants"].tap()
+        XCTAssertTrue(HomeTiles.open("mode_variants", sidebarLabel: "Variantes", in: app), "la tuile Variantes")
 
         let tile = app.buttons["variant_barricades"]
         XCTAssertTrue(tile.waitForExistence(timeout: 8), "la tuile Barricades doit exister")
@@ -61,8 +60,7 @@ final class BarricadesUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["mode_variants"].waitForExistence(timeout: 15))
-        app.buttons["mode_variants"].tap()
+        XCTAssertTrue(HomeTiles.open("mode_variants", sidebarLabel: "Variantes", in: app), "la tuile Variantes")
 
         let tile = app.buttons["variant_randombarricades"]
         XCTAssertTrue(tile.waitForExistence(timeout: 8), "la tuile Barricades aléatoires doit exister")
@@ -126,8 +124,7 @@ final class BarricadesUITests: XCTestCase {
         app.launchArguments += ["-resetPlaySettings"]
         app.launch()
 
-        XCTAssertTrue(app.buttons["mode_variants"].waitForExistence(timeout: 15))
-        app.buttons["mode_variants"].tap()
+        XCTAssertTrue(HomeTiles.open("mode_variants", sidebarLabel: "Variantes", in: app), "la tuile Variantes")
 
         let tile = app.buttons["variant_barricades"]
         XCTAssertTrue(tile.waitForExistence(timeout: 8))

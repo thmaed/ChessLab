@@ -20,14 +20,8 @@ final class EndgameModuleUITests: XCTestCase {
         app.launch()
 
         // Tuile sur iPhone, ligne de barre latérale sur iPad.
-        let tile = app.buttons["mode_endgames"]
-        if tile.waitForExistence(timeout: 10) {
-            tile.tap()
-        } else {
-            let sidebarRow = app.staticTexts["Finales"]
-            XCTAssertTrue(sidebarRow.waitForExistence(timeout: 5), "ni tuile ni entrée latérale « Finales »")
-            sidebarRow.tap()
-        }
+        XCTAssertTrue(HomeTiles.open("mode_endgames", sidebarLabel: "Finales", in: app),
+                      "ni tuile ni entrée latérale « Finales »")
 
         // La liste groupée : la Lucena est dans « Finales de tours », mais la
         // famille « Finales de pions » qui précède a grandi avec le

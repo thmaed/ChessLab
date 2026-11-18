@@ -63,7 +63,7 @@ final class EngineLeakUITests: XCTestCase {
 
     @MainActor
     private func visitFreeEndgameTraining(_ app: XCUIApplication) throws {
-        app.buttons["mode_endgames"].tap()
+        XCTAssertTrue(HomeTiles.open("mode_endgames", sidebarLabel: "Finales", in: app))
         let opposition = app.buttons["endgame_eg-opposition"]
         XCTAssertTrue(opposition.waitForExistence(timeout: 10))
         opposition.tap()
