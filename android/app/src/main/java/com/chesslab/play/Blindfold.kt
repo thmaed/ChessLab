@@ -11,7 +11,7 @@ import java.util.Locale
 
 /**
  * Partie À L'AVEUGLE contre l'ordinateur (17/11/2026). Pendant de `Blindfold.swift`. Les quatre niveaux du
- * mail aux testeurs, du plus facile au plus dur ; décisions de l'utilisateur : les quatre, disques À LA
+ * mail aux testeurs (plus les disques GRIS, ajoutés le 18/11), du plus facile au plus dur ; décisions de l'utilisateur : les quatre, disques À LA
  * COULEUR au niveau « Cases occupées », coup d'œil en MAINTENANT le doigt (chaque appui compte), voix
  * éteinte par défaut.
  *
@@ -21,6 +21,8 @@ import java.util.Locale
 enum class BlindfoldLevel(@StringRes val titleRes: Int, @StringRes val detailRes: Int) {
     off(R.string.blind_off, R.string.blind_off_detail),
     occupiedSquares(R.string.blind_occupied, R.string.blind_occupied_detail),
+    /** Un disque GRIS à la place de chaque pièce : ni à qui, ni laquelle (demande de l'utilisateur, 18/11/2026). */
+    occupiedSquaresGrey(R.string.blind_occupied_grey, R.string.blind_occupied_grey_detail),
     opponentHidden(R.string.blind_opponent_hidden, R.string.blind_opponent_hidden_detail),
     ownHidden(R.string.blind_own_hidden, R.string.blind_own_hidden_detail),
     allHidden(R.string.blind_all_hidden, R.string.blind_all_hidden_detail);
@@ -29,6 +31,7 @@ enum class BlindfoldLevel(@StringRes val titleRes: Int, @StringRes val detailRes
     fun mask(user: Piece.Color): PieceMask = when (this) {
         off -> PieceMask.None
         occupiedSquares -> PieceMask(discs = true)
+        occupiedSquaresGrey -> PieceMask(greyDiscs = true)
         opponentHidden -> PieceMask(hidden = setOf(user.opposite))
         ownHidden -> PieceMask(hidden = setOf(user))
         allHidden -> PieceMask(hidden = setOf(Piece.Color.white, Piece.Color.black))
@@ -40,7 +43,7 @@ enum class BlindfoldLevel(@StringRes val titleRes: Int, @StringRes val detailRes
 
     companion object {
         /** Les niveaux proposés, dans l'ordre de difficulté. */
-        val levels = listOf(occupiedSquares, opponentHidden, ownHidden, allHidden)
+        val levels = listOf(occupiedSquares, occupiedSquaresGrey, opponentHidden, ownHidden, allHidden)
 
         fun fromName(name: String?): BlindfoldLevel = entries.firstOrNull { it.name == name } ?: off
     }

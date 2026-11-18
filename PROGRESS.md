@@ -11520,3 +11520,13 @@ par défaut ; liste des coups visible.
   revient en rallumant. Tests mis à jour (passage par « Contre l'ordinateur ») : iOS `BlindfoldUITests`,
   `MaiaOpponentUITests`, `ResumeGameUITests`, `WideLowDashboardUITests` (iPad mini) verts ; Galaxy 40 tests verts
   (aveugle, réglage, app). À faire découvrir par les Nouveautés de l'Aide de la prochaine version.
+- **18/11, à l'aveugle : cinquième niveau « Cases occupées en gris »** (demande : « une option où les cases occupées
+  sont masquées, en gris au lieu de blanc ou noir ») — juste après les disques à la couleur : un disque GRIS identique
+  pour les deux camps, on sait qu'une case est occupée, ni par qui ni par quoi. iOS `BlindfoldLevel.occupiedSquaresGrey`,
+  `PieceMask.greyDiscs` (`PieceDiscView(color: nil)`, gris moyen cerclé de sombre, lisible sur les deux couleurs de
+  cases) ; VoiceOver dit « Case e2, occupée ». Android : même chose (`PieceDisplay.greyDisc`, libellé TalkBack
+  « Case occupée » traduit), et la grille de tuiles laisse la cinquième à demi-largeur comme iOS. Mots en cinq
+  langues. Tests : iOS `BlindfoldTests` + `BlindfoldGreyDiscTests` (14), `BlindfoldGreyUITests` (nouveau, passe par
+  l'écran actuel ou par le menu de la refonte) et `BlindfoldUITests` (la tuile « Tout caché », cinquième, n'existe dans
+  la grille paresseuse qu'après défilement) verts sur simulateur ; Android `BlindfoldTest` JVM (7) et instrumenté (2)
+  verts sur le Galaxy A16.

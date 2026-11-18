@@ -342,8 +342,11 @@ fun BoardView(
                             }
                             .size(cellDp * 0.92f)
                             .then(if (piecesRotated) Modifier.rotate(180f) else Modifier)
-                    if (pieceMask.display(piece) == PieceDisplay.disc) {
-                        Box(slideModifier, Alignment.Center) { PieceDisc(piece.color) }
+                    val slideDisplay = pieceMask.display(piece)
+                    if (slideDisplay == PieceDisplay.disc || slideDisplay == PieceDisplay.greyDisc) {
+                        Box(slideModifier, Alignment.Center) {
+                            PieceDisc(piece.color.takeIf { slideDisplay == PieceDisplay.disc })
+                        }
                     } else {
                         Image(
                             painter = painterResource(drawableFor(piece, pieces)),
@@ -515,15 +518,21 @@ private fun SquareCell(
                     .fillMaxSize(0.92f)
                     .then(if (piecesRotated) Modifier.rotate(180f) else Modifier),
             )
-        } else if (piece != null && !hidePiece && display == PieceDisplay.disc) {
-            // À l'aveugle, « Cases occupées » : le camp, pas la pièce — et le libellé n'en dit pas plus.
+        } else if (piece != null && !hidePiece && (display == PieceDisplay.disc || display == PieceDisplay.greyDisc)) {
+            // À l'aveugle, « Cases occupées » : le camp, pas la pièce — et le libellé n'en dit pas plus ; en
+            // gris, ni le camp : « case occupée ».
+            val grey = display == PieceDisplay.greyDisc
             val label = stringResource(
-                if (piece.color == Piece.Color.white) R.string.blind_disc_white else R.string.blind_disc_black
+                when {
+                    grey -> R.string.blind_disc_grey
+                    piece.color == Piece.Color.white -> R.string.blind_disc_white
+                    else -> R.string.blind_disc_black
+                }
             )
             Box(
                 Modifier.fillMaxSize().semantics { contentDescription = label },
                 Alignment.Center,
-            ) { PieceDisc(piece.color) }
+            ) { PieceDisc(piece.color.takeIf { !grey }) }
         }
 
         // Le canard, en toutes lettres : aucun jeu de pièces n'en a, et
@@ -690,7 +699,7 @@ private fun Color.compositeOver(background: Color): Color {
  * Ce que le plateau montre d'une pièce, en partie À L'AVEUGLE (17/11/2026). Pendant de `PieceMask.Display`
  * (iOS).
  */
-enum class PieceDisplay { glyph, disc, hidden }
+enum class PieceDisplay { glyph, disc, greyDisc, hidden }
 
 /**
  * Ce que le plateau montre des pièces, en partie À L'AVEUGLE (17/11/2026, mail aux testeurs : « tout
@@ -700,11 +709,14 @@ enum class PieceDisplay { glyph, disc, hidden }
 data class PieceMask(
     /** Un disque à la couleur de la pièce, sans dire laquelle (niveau « Cases occupées »). */
     val discs: Boolean = false,
+    /** Un disque GRIS, le même pour les deux camps (niveau « Cases occupées en gris », 18/11/2026). */
+    val greyDiscs: Boolean = false,
     /** Les pièces de ces camps ne se dessinent pas. */
     val hidden: Set<Piece.Color> = emptySet(),
 ) {
     fun display(piece: Piece): PieceDisplay = when {
         discs -> PieceDisplay.disc
+        greyDiscs -> PieceDisplay.greyDisc
         piece.color in hidden -> PieceDisplay.hidden
         else -> PieceDisplay.glyph
     }
@@ -714,19 +726,22 @@ data class PieceMask(
     }
 }
 
-/** Une pièce dont on ne dit que le camp : un disque blanc ou noir, cerclé — comme `PieceDiscView` (iOS). */
+/**
+ * Une pièce dont on ne dit que le camp : un disque blanc ou noir, cerclé — comme `PieceDiscView` (iOS).
+ * Sans camp (`null`), un disque gris moyen cerclé de sombre, lisible sur les deux couleurs de cases.
+ */
 @Composable
-fun PieceDisc(color: Piece.Color) {
-    val white = color == Piece.Color.white
+fun PieceDisc(color: Piece.Color?) {
+    val (fill, stroke) = when (color) {
+        Piece.Color.white -> Color.White to Color.Black.copy(alpha = 0.55f)
+        Piece.Color.black -> Color(0.08f, 0.08f, 0.08f) to Color.White.copy(alpha = 0.35f)
+        null -> Color(0.55f, 0.55f, 0.55f) to Color.Black.copy(alpha = 0.5f)
+    }
     Box(
         Modifier
             .fillMaxSize(0.56f)
             .clip(CircleShape)
-            .background(if (white) Color.White else Color(0.08f, 0.08f, 0.08f))
-            .border(
-                2.dp,
-                if (white) Color.Black.copy(alpha = 0.55f) else Color.White.copy(alpha = 0.35f),
-                CircleShape,
-            ),
+            .background(fill)
+            .border(2.dp, stroke, CircleShape),
     )
 }

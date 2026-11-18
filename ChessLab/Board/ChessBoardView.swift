@@ -179,7 +179,7 @@ struct ChessBoardView: View {
                 if let slidingMove, let piece = board.position.piece(at: slidingMove.end),
                    pieceMask.display(piece) != .hidden {
                     Group {
-                        if pieceMask.display(piece) == .disc { PieceDiscView(color: piece.color) }
+                        if let disc = pieceMask.disc(piece) { disc }
                         else { PieceGlyphView(piece: piece) }
                     }
                         .frame(width: squareSize, height: squareSize)
@@ -619,8 +619,8 @@ struct ChessBoardView: View {
                         let sq = square(row: row, col: col)
                         if let piece = board.position.piece(at: sq), pieceMask.display(piece) == .glyph {
                             pieceView(piece, squareSize: squareSize)
-                        } else if let piece = board.position.piece(at: sq), pieceMask.display(piece) == .disc {
-                            PieceDiscView(color: piece.color)
+                        } else if let piece = board.position.piece(at: sq), let disc = pieceMask.disc(piece) {
+                            disc
                                 .frame(width: squareSize, height: squareSize)
                                 .opacity(slidingMove?.end == piece.square ? 0 : 1)
                                 .allowsHitTesting(false)
@@ -860,12 +860,13 @@ struct ChessBoardView: View {
 
     private func accessibilityLabel(for sq: Square) -> String {
         // À l'aveugle, le libellé n'en dit pas plus que l'écran : rien sur une case masquée (« vide » serait
-        // faux), la couleur seule sur un disque.
+        // faux), la couleur seule sur un disque, « occupée » seulement sur un disque gris.
         if pieceMask != .none {
             guard let piece = board.position.piece(at: sq) else { return "Case \(sq.notation)" }
             switch pieceMask.display(piece) {
             case .hidden: return "Case \(sq.notation)"
             case .disc: return "Case \(sq.notation), pièce \(piece.color == .white ? "blanche" : "noire")"
+            case .greyDisc: return "Case \(sq.notation), occupée"
             case .glyph: break
             }
         }
@@ -1009,32 +1010,60 @@ enum PieceMask: Equatable {
     case none
     /// Un disque à la couleur de la pièce, sans dire laquelle (niveau « Cases occupées »).
     case discs
+    /// Un disque GRIS, le même pour les deux camps (niveau « Cases occupées en gris », 18/11/2026).
+    case greyDiscs
     /// Les pièces de ces camps ne se dessinent pas.
     case hidden(Set<Piece.Color>)
 
-    enum Display: Equatable { case glyph, disc, hidden }
+    enum Display: Equatable { case glyph, disc, greyDisc, hidden }
 
     func display(_ piece: Piece) -> Display {
         switch self {
         case .none: .glyph
         case .discs: .disc
+        case .greyDiscs: .greyDisc
         case let .hidden(colors): colors.contains(piece.color) ? .hidden : .glyph
+        }
+    }
+
+    /// Le disque à dessiner pour cette pièce, ou `nil` (glyphe ou rien).
+    func disc(_ piece: Piece) -> PieceDiscView? {
+        switch display(piece) {
+        case .disc: PieceDiscView(color: piece.color)
+        case .greyDisc: PieceDiscView(color: nil)
+        case .glyph, .hidden: nil
         }
     }
 }
 
 /// Une pièce dont on ne dit que le camp : un disque blanc ou noir, cerclé pour se détacher des deux couleurs
-/// de cases.
+/// de cases. Sans camp (`nil`), un disque gris moyen, cerclé de sombre, qui se lit sur les cases claires
+/// comme sur les foncées.
 struct PieceDiscView: View {
-    let color: Piece.Color
+    let color: Piece.Color?
+
+    private var fill: Color {
+        switch color {
+        case .white: Color.white
+        case .black: Color(white: 0.08)
+        case nil: Color(white: 0.55)
+        }
+    }
+
+    private var stroke: Color {
+        switch color {
+        case .white: Color.black.opacity(0.55)
+        case .black: Color.white.opacity(0.35)
+        case nil: Color.black.opacity(0.5)
+        }
+    }
 
     var body: some View {
         GeometryReader { geometry in
             let side = min(geometry.size.width, geometry.size.height) * 0.56
             Circle()
-                .fill(color == .white ? Color.white : Color(white: 0.08))
-                .overlay(Circle().strokeBorder(color == .white ? Color.black.opacity(0.55) : Color.white.opacity(0.35),
-                                               lineWidth: max(1, side * 0.06)))
+                .fill(fill)
+                .overlay(Circle().strokeBorder(stroke, lineWidth: max(1, side * 0.06)))
                 .shadow(color: .black.opacity(0.25), radius: side * 0.06, y: side * 0.03)
                 .frame(width: side, height: side)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

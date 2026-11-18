@@ -1465,6 +1465,9 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="blind_opponent_hidden_detail">Vous voyez vos pièces, pas celles de l\'adversaire.</string>
     <string name="blind_own_hidden_detail">Vous voyez celles de l\'adversaire, pas les vôtres.</string>
     <string name="blind_all_hidden_detail">Le plateau est vide : tout se joue de mémoire.</string>
+    <string name="blind_occupied_grey">Cases occupées en gris</string>
+    <string name="blind_occupied_grey_detail">Un disque gris à la place de chaque pièce : on sait qu\'une case est occupée, ni par qui ni par quoi.</string>
+    <string name="blind_disc_grey">Case occupée</string>
     <string name="blind_aids_off">À l\'aveugle, l\'indice, l\'alerte et la barre d\'évaluation sont coupés.</string>
     <string name="blind_voice">Lire les coups adverses à voix haute</string>
     <string name="your_turn_blind">À vous de jouer</string>

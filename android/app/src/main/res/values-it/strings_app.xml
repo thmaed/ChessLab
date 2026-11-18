@@ -1425,6 +1425,9 @@
     <string name="blind_opponent_hidden_detail">Vedi i tuoi pezzi, non quelli dell\'avversario.</string>
     <string name="blind_own_hidden_detail">Vedi quelli dell\'avversario, non i tuoi.</string>
     <string name="blind_all_hidden_detail">La scacchiera è vuota: si gioca tutto a memoria.</string>
+    <string name="blind_occupied_grey">Case occupate in grigio</string>
+    <string name="blind_occupied_grey_detail">Un disco grigio al posto di ogni pezzo: sai che la casa è occupata, ma non da chi né da quale pezzo.</string>
+    <string name="blind_disc_grey">Casa occupata</string>
     <string name="blind_aids_off">Alla cieca, suggerimento, avviso e barra di valutazione sono disattivati.</string>
     <string name="blind_voice">Leggi ad alta voce le mosse dell\'avversario</string>
     <string name="your_turn_blind">Tocca a te</string>

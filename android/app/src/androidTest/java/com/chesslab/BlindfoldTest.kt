@@ -94,4 +94,31 @@ class BlindfoldTest {
         compose.waitForIdle()
         assertTrue("la partie finie, les pièces réapparaissent", pieceLabels("pion") > 0)
     }
+
+    /**
+     * « Cases occupées en gris » (18/11/2026) : trente-deux disques qui ne disent que « case occupée » — ni le camp,
+     * ni la pièce. Pendant de `BlindfoldGreyUITests` (iOS).
+     */
+    @Test fun greyDiscsSayOnlyOccupied() {
+        compose.onNodeWithTag("mode-play").performScrollTo().performClick()
+        awaitTag("aveugle-actif", 120_000)
+        compose.onNodeWithTag("aveugle-actif").performScrollTo().performClick()
+        awaitTag("aveugle-occupiedSquaresGrey", 5_000)
+        compose.onNodeWithTag("aveugle-occupiedSquaresGrey").performScrollTo().performClick()
+        compose.onNodeWithTag("commencer").performClick()
+
+        awaitTag("coup-d-oeil", 60_000)
+        compose.waitUntil(60_000) {
+            compose.onAllNodesWithText("À vous de jouer").fetchSemanticsNodes().size >= 2
+        }
+        compose.waitForIdle()
+        assertTrue("trente-deux cases occupées", pieceLabels("Case occupée") == 32)
+        assertTrue("ni le camp", pieceLabels("pièce") == 0)
+        assertTrue("ni la pièce", pieceLabels("pion") == 0)
+
+        compose.onNodeWithTag("abandonner").performClick()
+        awaitTag("abandonner-oui", 5_000)
+        compose.onNodeWithTag("abandonner-oui").performClick()
+        awaitTag("bilan-aveugle", 10_000)
+    }
 }

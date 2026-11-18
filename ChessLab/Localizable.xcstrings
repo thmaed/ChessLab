@@ -57423,6 +57423,74 @@
           }
         }
       }
+    },
+    "Cases occupées en gris": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Occupied squares in grey"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cases occupées en gris"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Casillas ocupadas en gris"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Besetzte Felder in Grau"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Case occupate in grigio"
+          }
+        }
+      }
+    },
+    "Un disque gris à la place de chaque pièce : on sait qu'une case est occupée, ni par qui ni par quoi.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A grey disc in place of each piece: you know a square is occupied, but not by whom or by what."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un disque gris à la place de chaque pièce : on sait qu'une case est occupée, ni par qui ni par quoi."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un disco gris en lugar de cada pieza: sabes que la casilla está ocupada, pero no por quién ni por qué pieza."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine graue Scheibe statt jeder Figur: Du weißt, dass das Feld besetzt ist, aber nicht von wem und nicht von welcher Figur."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un disco grigio al posto di ogni pezzo: sai che la casa è occupata, ma non da chi né da quale pezzo."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -1425,6 +1425,9 @@
     <string name="blind_opponent_hidden_detail">Ves tus piezas, no las del adversario.</string>
     <string name="blind_own_hidden_detail">Ves las del adversario, no las tuyas.</string>
     <string name="blind_all_hidden_detail">El tablero está vacío: todo se juega de memoria.</string>
+    <string name="blind_occupied_grey">Casillas ocupadas en gris</string>
+    <string name="blind_occupied_grey_detail">Un disco gris en lugar de cada pieza: sabes que la casilla está ocupada, pero no por quién ni por qué pieza.</string>
+    <string name="blind_disc_grey">Casilla ocupada</string>
     <string name="blind_aids_off">A ciegas, la pista, el aviso y la barra de evaluación se desactivan.</string>
     <string name="blind_voice">Leer en voz alta las jugadas del adversario</string>
     <string name="your_turn_blind">Te toca jugar</string>

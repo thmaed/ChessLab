@@ -2,7 +2,8 @@ import AVFoundation
 import ChessKit
 import Foundation
 
-/// Partie À L'AVEUGLE contre l'ordinateur (17/11/2026). Les quatre niveaux du mail aux testeurs, du plus
+/// Partie À L'AVEUGLE contre l'ordinateur (17/11/2026). Les quatre niveaux du mail aux testeurs (plus les disques
+/// GRIS, ajoutés le 18/11), du plus
 /// facile au plus dur ; décisions de l'utilisateur : les quatre, disques À LA COULEUR au niveau
 /// « Cases occupées », coup d'œil en MAINTENANT le doigt (chaque appui compte), voix éteinte par défaut.
 ///
@@ -12,6 +13,8 @@ enum BlindfoldLevel: String, Codable, CaseIterable, Hashable, Identifiable {
     case off
     /// Un disque blanc ou noir à la place de chaque pièce.
     case occupiedSquares
+    /// Un disque GRIS à la place de chaque pièce : ni à qui, ni laquelle (demande de l'utilisateur, 18/11/2026).
+    case occupiedSquaresGrey
     /// On voit ses pièces, pas celles de l'adversaire.
     case opponentHidden
     /// On voit celles de l'adversaire, pas les siennes.
@@ -22,13 +25,14 @@ enum BlindfoldLevel: String, Codable, CaseIterable, Hashable, Identifiable {
     var id: String { rawValue }
 
     /// Les niveaux proposés, dans l'ordre de difficulté.
-    static let levels: [BlindfoldLevel] = [.occupiedSquares, .opponentHidden, .ownHidden, .allHidden]
+    static let levels: [BlindfoldLevel] = [.occupiedSquares, .occupiedSquaresGrey, .opponentHidden, .ownHidden, .allHidden]
 
     /// Clé française (localisée par l'appelant).
     var title: String {
         switch self {
         case .off: "Non"
         case .occupiedSquares: "Cases occupées"
+        case .occupiedSquaresGrey: "Cases occupées en gris"
         case .opponentHidden: "Pièces adverses cachées"
         case .ownHidden: "Vos pièces cachées"
         case .allHidden: "Tout caché"
@@ -40,6 +44,7 @@ enum BlindfoldLevel: String, Codable, CaseIterable, Hashable, Identifiable {
         switch self {
         case .off: "Les pièces se voient."
         case .occupiedSquares: "Un disque blanc ou noir à la place de chaque pièce : on sait à qui elle est, pas laquelle c'est."
+        case .occupiedSquaresGrey: "Un disque gris à la place de chaque pièce : on sait qu'une case est occupée, ni par qui ni par quoi."
         case .opponentHidden: "Vous voyez vos pièces, pas celles de l'adversaire."
         case .ownHidden: "Vous voyez celles de l'adversaire, pas les vôtres."
         case .allHidden: "Le plateau est vide : tout se joue de mémoire."
@@ -51,6 +56,7 @@ enum BlindfoldLevel: String, Codable, CaseIterable, Hashable, Identifiable {
         switch self {
         case .off: .none
         case .occupiedSquares: .discs
+        case .occupiedSquaresGrey: .greyDiscs
         case .opponentHidden: .hidden([user.opposite])
         case .ownHidden: .hidden([user])
         case .allHidden: .hidden([.white, .black])

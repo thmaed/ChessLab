@@ -1468,6 +1468,9 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="blind_opponent_hidden_detail">You see your pieces, not your opponent\'s.</string>
     <string name="blind_own_hidden_detail">You see your opponent\'s pieces, not yours.</string>
     <string name="blind_all_hidden_detail">The board is empty: everything is played from memory.</string>
+    <string name="blind_occupied_grey">Occupied squares in grey</string>
+    <string name="blind_occupied_grey_detail">A grey disc in place of each piece: you know a square is occupied, but not by whom or by what.</string>
+    <string name="blind_disc_grey">Occupied square</string>
     <string name="blind_aids_off">Blindfold, the hint, the warning and the evaluation bar are turned off.</string>
     <string name="blind_voice">Read the opponent\'s moves aloud</string>
     <string name="your_turn_blind">Your move</string>

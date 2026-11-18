@@ -29,6 +29,8 @@ struct BlindfoldTests {
         let pawn = { (c: Piece.Color) in Piece(.pawn, color: c, square: .e4) }
         #expect(BlindfoldLevel.off.mask(user: .white) == .none)
         #expect(BlindfoldLevel.occupiedSquares.mask(user: .white).display(pawn(.black)) == .disc)
+        #expect(BlindfoldLevel.occupiedSquaresGrey.mask(user: .white).display(pawn(.black)) == .greyDisc)
+        #expect(BlindfoldLevel.occupiedSquaresGrey.mask(user: .white).display(pawn(.white)) == .greyDisc)
         #expect(BlindfoldLevel.opponentHidden.mask(user: .white).display(pawn(.black)) == .hidden)
         #expect(BlindfoldLevel.opponentHidden.mask(user: .white).display(pawn(.white)) == .glyph)
         #expect(BlindfoldLevel.ownHidden.mask(user: .white).display(pawn(.white)) == .hidden)
@@ -41,6 +43,7 @@ struct BlindfoldTests {
         #expect(BlindfoldLevel.opponentHidden.canDrag(user: .white))
         #expect(!BlindfoldLevel.ownHidden.canDrag(user: .white))
         #expect(!BlindfoldLevel.occupiedSquares.canDrag(user: .white))
+        #expect(!BlindfoldLevel.occupiedSquaresGrey.canDrag(user: .white))
         #expect(!BlindfoldLevel.allHidden.canDrag(user: .white))
     }
 
@@ -132,5 +135,27 @@ struct BlindfoldTests {
         let game = try #require(PlayViewModel(resuming: decoded, modelContext: try Self.inMemoryContext(), startsEngine: false))
         #expect(game.peekCount == 3)
         #expect(game.isBlindfold)
+    }
+}
+
+/// Le niveau « Cases occupées en gris » (18/11/2026) : le même disque pour les deux camps, et il se range
+/// juste après les disques à la couleur.
+struct BlindfoldGreyDiscTests {
+    @Test func greyDiscsComeRightAfterColouredDiscs() {
+        #expect(BlindfoldLevel.levels.firstIndex(of: .occupiedSquaresGrey)
+                == BlindfoldLevel.levels.firstIndex(of: .occupiedSquares).map { $0 + 1 })
+    }
+
+    @Test func aGreyDiscSaysNothingAboutTheSide() {
+        let white = PieceMask.greyDiscs.disc(Piece(.queen, color: .white, square: .d1))
+        let black = PieceMask.greyDiscs.disc(Piece(.pawn, color: .black, square: .e7))
+        #expect(white?.color == nil && black?.color == nil)
+        #expect(white != nil && black != nil)
+        #expect(PieceMask.discs.disc(Piece(.pawn, color: .black, square: .e7))?.color == .black)
+    }
+
+    @Test func theGreyLevelSurvivesASaveAndReload() throws {
+        let data = try JSONEncoder().encode(BlindfoldLevel.occupiedSquaresGrey)
+        #expect(try JSONDecoder().decode(BlindfoldLevel.self, from: data) == .occupiedSquaresGrey)
     }
 }

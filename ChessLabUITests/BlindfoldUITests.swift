@@ -43,9 +43,11 @@ final class BlindfoldUITests: XCTestCase {
         XCTAssertFalse(app.buttons["blindfold-allHidden"].exists, "repliée : les niveaux n'apparaissent qu'allumée")
         toggle.switches.firstMatch.tap()
         let allHidden = app.buttons["blindfold-allHidden"]
-        XCTAssertTrue(allHidden.waitForExistence(timeout: 5))
+        // Cinquième tuile depuis les disques gris (18/11/2026) : la grille, paresseuse, ne la crée qu'en
+        // approchant — on fait défiler jusqu'à elle avant de l'attendre.
         tries = 0
-        while !allHidden.isHittable, tries < 6 { app.swipeUp(); tries += 1 }
+        while !(allHidden.exists && allHidden.isHittable), tries < 6 { app.swipeUp(); tries += 1 }
+        XCTAssertTrue(allHidden.waitForExistence(timeout: 5))
         allHidden.tap()
         XCTAssertTrue(allHidden.isSelected)
         snapshot(app, "reglage")

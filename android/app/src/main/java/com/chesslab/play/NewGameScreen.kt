@@ -311,6 +311,9 @@ fun NewGameScreen(
                                     }
                                 }
                             }
+                            // Cinq niveaux depuis le 18/11 : la dernière tuile reste à demi-largeur, comme dans la
+                            // grille à deux colonnes d'iOS.
+                            if (row.size == 1) Spacer(Modifier.weight(1f))
                         }
                     }
                     Text(stringResource(blindfold.detailRes), fontSize = 13.sp, color = Palette.textSecondary)
