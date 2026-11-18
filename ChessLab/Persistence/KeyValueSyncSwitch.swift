@@ -18,6 +18,7 @@ enum KeyValueSyncSwitch {
         if CloudSyncSettingsStore.isEnabled {
             SettingsCloudSync.shared.start {
                 AppSettings.shared.reloadSyncedValuesFromDefaults()
+                NotificationCenter.default.post(name: SettingsCloudSync.didApplyRemoteChanges, object: nil)
             }
             AutosaveCloud.start()
         } else {

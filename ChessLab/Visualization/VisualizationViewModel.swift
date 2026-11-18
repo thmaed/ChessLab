@@ -56,6 +56,7 @@ final class VisualizationViewModel {
     /// La bibliothèque de puzzles (marche 5) ; sans elle, les positions de secours.
     private let modelContext: ModelContext?
     private var usedPuzzles = Set<UUID>()
+    private var remoteObserver: NSObjectProtocol?
 
     init(defaults: UserDefaults = .standard, now: @escaping () -> Date = Date.init,
          rng: any RandomNumberGenerator = SystemRandomNumberGenerator(), modelContext: ModelContext? = nil) {
@@ -66,6 +67,24 @@ final class VisualizationViewModel {
         self.now = now()
         settings = VisualizationStore.loadSettings(defaults: defaults)
         stats = VisualizationStore.loadStats(defaults: defaults)
+        remoteObserver = NotificationCenter.default.addObserver(
+            forName: SettingsCloudSync.didApplyRemoteChanges, object: nil, queue: .main
+        ) { [weak self] _ in
+            MainActor.assumeIsolated { self?.reloadFromStore() }
+        }
+    }
+
+    isolated deinit {
+        if let remoteObserver { NotificationCenter.default.removeObserver(remoteObserver) }
+    }
+
+    /// iCloud : un autre appareil a envoyé ses réglages ou ses statistiques. Les statistiques se relisent toujours
+    /// (le pourcentage des marches suit) ; les réglages seulement hors série, pour ne pas changer la série en cours.
+    func reloadFromStore() {
+        stats = VisualizationStore.loadStats(defaults: defaults)
+        guard phase == .setup else { return }
+        let stored = VisualizationStore.loadSettings(defaults: defaults)
+        if stored != settings { settings = stored }
     }
 
     // MARK: Réglages
@@ -223,6 +242,8 @@ final class VisualizationViewModel {
         let item = VisualizationAnswered(id: nextID, question: question, given: given)
         nextID += 1
         answered.append(item)
+        // Relire avant d'écrire : ce qu'un autre appareil a envoyé entre-temps n'est pas écrasé par une copie ancienne.
+        stats = VisualizationStore.loadStats(defaults: defaults)
         stats.record(question, correct: item.isCorrect)
         VisualizationStore.save(stats, defaults: defaults)
         feedback = Feedback(given: given, isCorrect: item.isCorrect)

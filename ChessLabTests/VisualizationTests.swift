@@ -157,6 +157,37 @@ struct VisualizationTests {
         #expect(legacy.accuracy(for: .squares) == 75)
     }
 
+    @MainActor @Test func iCloudCarriesTheSettingsAndTheStats() {
+        #expect(SettingsCloudSync.syncedKeys.contains(VisualizationStore.settingsKey))
+        #expect(SettingsCloudSync.syncedKeys.contains(VisualizationStore.statsKey))
+    }
+
+    /// Un autre appareil envoie ses statistiques et ses réglages : l'écran les relit — les réglages seulement hors
+    /// série, pour ne pas changer la série en cours.
+    @MainActor @Test func theScreenReloadsWhatAnotherDeviceSent() {
+        let defaults = UserDefaults(suiteName: "VisualizationTests.\(UUID().uuidString)")!
+        let viewModel = VisualizationViewModel(defaults: defaults, rng: Seeded(state: 3))
+        #expect(viewModel.stats.accuracy(for: .squares) == nil)
+
+        var remote = VisualizationStats()
+        remote.record(VisualizationGenerator.squareColor(sq("c6")), correct: true)
+        VisualizationStore.save(remote, defaults: defaults)
+        var remoteSettings = viewModel.settings
+        remoteSettings.steps = [.lines]
+        VisualizationStore.save(remoteSettings, defaults: defaults)
+        NotificationCenter.default.post(name: SettingsCloudSync.didApplyRemoteChanges, object: nil)
+        #expect(viewModel.stats.accuracy(for: .squares) == 100)
+        #expect(viewModel.settings.steps == [.lines])
+
+        viewModel.start()
+        var during = viewModel.settings
+        during.steps = [.pieces]
+        VisualizationStore.save(during, defaults: defaults)
+        NotificationCenter.default.post(name: SettingsCloudSync.didApplyRemoteChanges, object: nil)
+        #expect(viewModel.settings.steps == [.lines], "pas pendant la série")
+        viewModel.stop()
+    }
+
     @Test func theDrawerServesMissesAndNeverRepeatsBackToBack() {
         var rng = Seeded(state: 11)
         var stats = VisualizationStats()

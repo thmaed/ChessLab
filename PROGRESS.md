@@ -11607,3 +11607,7 @@ par défaut ; liste des coups visible.
   - Tests : iOS `VisualizationTests` 21, `VisualizationUITests` 3 parcours ; Android JVM 19, instrumenté 3/3
     (émulateur). Piège XCUITest : un identifiant d'accessibilité posé sur `ChessBoardView` se recopie sur ses 64
     cases — l'envelopper (`.accessibilityElement(children: .contain)`).
+- **18/11 (nuit), VISUALISATION** : pourcentage des marches sur les 50 DERNIÈRES questions (iOS + Android) ; réglages
+  et statistiques de Visualisation synchronisés par iCloud (magasin clé-valeur, liste blanche de `SettingsCloudSync`,
+  dernière écriture gagne ; l'écran recharge à l'arrivée ; aide « CE QUI SUIT » en cinq langues ; iOS seul, Android
+  n'a pas d'iCloud par décision) ; marche 5 : le plateau prend toute la place libre (iOS + Android).

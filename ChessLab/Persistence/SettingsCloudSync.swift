@@ -85,7 +85,16 @@ final class SettingsCloudSync {
         // Record de « Contre la montre » (décision du 17/11/2026) ; lu au maximum appareil / nuage,
         // voir ``PuzzleRushRecordStore``.
         "puzzleRush.best.v1",
+        // Visualisation (demande de l'utilisateur, 18/11/2026) : ses réglages, comme ceux des autres modes, et ses
+        // statistiques — réussite par marche sur les 50 dernières questions, questions ratées à revoir. Dernière
+        // écriture gagne, comme la cote de puzzle ; l'écran recharge à l'arrivée (``didApplyRemoteChanges``).
+        "visualization.settings.v1",
+        "visualization.stats.v1",
     ]
+
+    /// Postée quand des réglages venus d'un autre appareil viennent d'être recopiés dans `UserDefaults` : les écrans
+    /// qui gardent une copie en mémoire (Visualisation) la relisent.
+    static let didApplyRemoteChanges = Notification.Name("SettingsCloudSync.didApplyRemoteChanges")
 
     /// Exclusions explicitement DÉCIDÉES (par opposition à celles qui découlent
     /// de la liste blanche). Déclarées pour que les tests puissent vérifier
