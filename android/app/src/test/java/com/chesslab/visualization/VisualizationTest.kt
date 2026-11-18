@@ -45,7 +45,8 @@ class VisualizationTest {
 
     @Test fun `chaque question est juste et propose sa reponse`() {
         val rng = Random(42)
-        for (kind in VisualizationKind.entries) repeat(200) {
+        // La marche 5 vient de la bibliothèque de puzzles : testée à part.
+        for (kind in VisualizationKind.entries.filter { it.step != VisualizationStep.calculation }) repeat(200) {
             val q = VisualizationGenerator.question(kind, rng)
             assertEquals(kind, q.kind)
             if (kind != VisualizationKind.findSquare) {
@@ -86,6 +87,7 @@ class VisualizationTest {
                     assertEquals(q.pieces.size, q.pieces.map { it.square }.toSet().size)
                     assertTrue(q.pieces.filter { it.kind == VPieceKind.pawn }.all { it.square.rank in 1..6 })
                 }
+                VisualizationKind.memorizePlay, VisualizationKind.calculateNext -> Unit
                 VisualizationKind.hangingPiece -> {
                     val hung = VisualizationGenerator.hanging(q.pieces)
                     assertTrue(hung.size <= 1)
@@ -210,6 +212,47 @@ class VisualizationTest {
         assertEquals(120_000L, VisualizationLength.twoMinutes.durationMs)
         assertNull(VisualizationLength.ten.durationMs)
         assertNull(VisualizationLength.twoMinutes.questionCount)
+    }
+
+    // Lot 3 — calculer (mêmes cas qu'iOS)
+
+    private val twoMoveMate = "r5k1/5ppp/8/8/8/8/3Q1PPP/3R2K1 w - - 0 1" to listOf("d2d8", "a8d8", "d1d8")
+
+    @Test fun `calculer la suite donne deux coups et demande le troisieme`() {
+        val q = VisualizationCalc.question(VisualizationKind.calculateNext, twoMoveMate.first, twoMoveMate.second)!!
+        assertEquals(VAnswer.Move("d1d8"), q.answer)
+        assertEquals(listOf("Qd8+", "Rxd8"), VisualizationCalc.givenSans(q))
+        assertEquals(chesskit.Piece.Color.white, VisualizationCalc.sideToFind(q))
+        assertEquals(q.answer, VisualizationCalc.judge(sq("d1"), sq("d8"), q))
+        assertEquals(VAnswer.Move("d1d7"), VisualizationCalc.judge(sq("d1"), sq("d7"), q))
+        assertEquals("Rxd8#", VisualizationCalc.san("d1d8", q))
+        assertNull(VisualizationCalc.question(VisualizationKind.calculateNext, twoMoveMate.first, listOf("d2d8")))
+    }
+
+    @Test fun `memoriser et jouer accepte le coup ou un autre mat`() {
+        val q = VisualizationCalc.question(VisualizationKind.memorizePlay, "6k1/5ppp/8/8/8/8/5PPP/2RR2K1 w - - 0 1", listOf("d1d8"))!!
+        assertEquals(q.answer, VisualizationCalc.judge(sq("d1"), sq("d8"), q))
+        assertEquals(q.answer, VisualizationCalc.judge(sq("c1"), sq("c8"), q))
+        assertTrue(VisualizationCalc.judge(sq("c1"), sq("c7"), q) != q.answer)
+        assertTrue(VisualizationCalc.judge(sq("e1"), sq("e8"), q) != q.answer)
+    }
+
+    @Test fun `les positions de secours sont de vrais mats`() {
+        for ((fen, solution) in VisualizationCalc.fallbacks) {
+            val q = VisualizationCalc.question(VisualizationKind.memorizePlay, fen, solution)!!
+            val board = VisualizationCalc.board(q)!!
+            VisualizationCalc.play(solution[0], board)
+            assertTrue(fen, board.state is chesskit.Board.State.Checkmate)
+        }
+    }
+
+    @Test fun `un puzzle rate revient de sa cle`() {
+        val rng = Random(5)
+        val q = VisualizationCalc.question(VisualizationKind.calculateNext, twoMoveMate.first, twoMoveMate.second)!!
+        assertEquals(q, VisualizationGenerator.question(q.reviewKey, rng))
+        val fallback = VisualizationDrawer.next(listOf(VisualizationKind.calculateNext), VisualizationStats(), null, rng)
+        assertEquals(VisualizationStep.calculation, fallback.kind.step)
+        assertEquals(25, VisualizationKind.calculateNext.seconds(5))
     }
 
     private fun assertEquals(expected: Any?, actual: Any?, message: String) = assertEquals(message, expected, actual)

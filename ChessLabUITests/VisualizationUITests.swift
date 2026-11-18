@@ -178,4 +178,65 @@ final class VisualizationUITests: XCTestCase {
             if row.isSelected { row.tap() }
         }
     }
+
+    /// Lot 3 : la marche 5 seule — la position s'affiche, « J'ai mémorisé » la cache, on joue un coup sur le plateau vide.
+    func testCalculationStep() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-discoveryTourSeen", "-AppleLanguages", "(fr)"]
+        app.launch()
+        XCTAssertTrue(app.buttons["mode_play"].waitForExistence(timeout: 20))
+        let tile = app.buttons["mode_visualization"]
+        var tries = 0
+        while !(tile.exists && tile.isHittable), tries < 8 { app.swipeUp(); tries += 1 }
+        tile.tap()
+        let start = app.buttons["visualizationStart"]
+        XCTAssertTrue(start.waitForExistence(timeout: 10))
+
+        let calculation = app.buttons["visualizationStep_calculation"]
+        NewGameSetupSteps.reveal(calculation, in: app)
+        if !calculation.isSelected { calculation.tap() }
+        for step in ["squares", "lines", "pieces", "position"] {
+            let row = app.buttons["visualizationStep_\(step)"]
+            NewGameSetupSteps.reveal(row, in: app)
+            if row.isSelected { row.tap() }
+        }
+        XCTAssertTrue(calculation.isSelected)
+        tapPill("visualizationLength_0", app)
+        tapPill("visualizationTimer_0", app)
+        start.tap()
+
+        let hide = app.buttons["visualizationHide"]
+        let progress = app.staticTexts["visualizationProgress"]
+        let score = app.staticTexts["visualizationSummaryScore"]
+        for index in 0..<3 {
+            XCTAssertTrue(hide.waitForExistence(timeout: 10), "la position s'affiche d'abord (question \(index + 1))")
+            if index == 0 { snapshot(app, "8-memoriser") }
+            hide.tap()
+            pause(0.6)
+            if index == 0 { snapshot(app, "9-cache") }
+            let board = app.descendants(matching: .any)["visualizationBoard"].firstMatch
+            XCTAssertTrue(board.exists)
+            board.coordinate(withNormalizedOffset: CGVector(dx: 0.56, dy: 0.81)).tap()
+            pause(0.3)
+            board.coordinate(withNormalizedOffset: CGVector(dx: 0.56, dy: 0.56)).tap()
+            pause(0.4)
+            if index == 0 { snapshot(app, "10-reponse") }
+            let next = "\(index + 2) / 10"
+            let deadline = Date().addingTimeInterval(10)
+            while Date() < deadline, !score.exists, !(progress.exists && progress.label == next) { pause(0.2) }
+            XCTAssertTrue(progress.label == next, "la série avance après le coup \(index + 1)")
+        }
+        app.buttons["visualizationStop"].tap()
+        XCTAssertTrue(score.waitForExistence(timeout: 5))
+        snapshot(app, "11-bilan-calcul")
+
+        // Réglages rendus : la marche 1 seule.
+        app.buttons["visualizationSettings"].tap()
+        XCTAssertTrue(start.waitForExistence(timeout: 5))
+        let squares = app.buttons["visualizationStep_squares"]
+        NewGameSetupSteps.reveal(squares, in: app)
+        if !squares.isSelected { squares.tap() }
+        NewGameSetupSteps.reveal(calculation, in: app)
+        if calculation.isSelected { calculation.tap() }
+    }
 }

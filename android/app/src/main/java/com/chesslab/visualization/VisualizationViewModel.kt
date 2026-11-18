@@ -27,6 +27,12 @@ data class VisualizationUi(
     val feedback: VFeedback? = null,
     /** Rafraîchi pendant la série, pour les chronos. */
     val now: Long = 0,
+    /** Marche 5 : la position est montrée — le chrono de la question attend que le joueur la cache. */
+    val isMemorizing: Boolean = false,
+    /** Marche 5 : la case de départ touchée sur le plateau caché. */
+    val selectedFrom: VSquare? = null,
+    /** La bibliothèque de puzzles se charge (marche 5). */
+    val preparing: Boolean = false,
 ) {
     val correctCount: Int get() = answered.count { it.isCorrect }
     val misses: List<VAnswered> get() = answered.filter { !it.isCorrect }
@@ -57,6 +63,10 @@ class VisualizationViewModel(app: Application) : AndroidViewModel(app) {
     private var ticker: Job? = null
     private var advanceJob: Job? = null
     private var nextId = 0
+    /** La bibliothèque de puzzles (marche 5), chargée au premier besoin. */
+    private var pool: com.chesslab.puzzles.PuzzleRushPool? = null
+    private var puzzleTarget = 900
+    private val usedPuzzles = HashSet<String>()
 
     private fun now() = System.currentTimeMillis()
 
@@ -101,6 +111,7 @@ class VisualizationViewModel(app: Application) : AndroidViewModel(app) {
         val base = ui.settings.secondsPerQuestion ?: return null
         if (ui.phase != VisualizationPhase.playing) return null
         val seconds = ui.question?.kind?.seconds(base) ?: return null
+        if (ui.isMemorizing) return 1f
         val elapsed = questionElapsedBefore + (questionSince?.let { ui.now - it } ?: 0L)
         return (1f - elapsed / (seconds * 1000f)).coerceAtLeast(0f)
     }
@@ -108,7 +119,27 @@ class VisualizationViewModel(app: Application) : AndroidViewModel(app) {
     // La série
 
     fun start() {
+        // Marche 5 : la bibliothèque se charge une fois, en arrière-plan, avant la première question.
+        if (ui.settings.steps.contains(VisualizationStep.calculation) && pool == null) {
+            if (ui.preparing) return
+            ui = ui.copy(preparing = true)
+            viewModelScope.launch {
+                val app = getApplication<Application>()
+                puzzleTarget = maxOf(600, Math.round(com.chesslab.settings.StatsStore.puzzleRating(app).rating).toInt() - 300)
+                pool = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    runCatching { com.chesslab.puzzles.PuzzleRushPool.load(app.assets, puzzleTarget) }.getOrNull()
+                }
+                ui = ui.copy(preparing = false)
+                beginSeries()
+            }
+            return
+        }
+        beginSeries()
+    }
+
+    private fun beginSeries() {
         ticker?.cancel(); advanceJob?.cancel()
+        usedPuzzles.clear()
         nextId = 0
         seriesElapsedBefore = 0
         val t = now()
@@ -139,7 +170,7 @@ class VisualizationViewModel(app: Application) : AndroidViewModel(app) {
         if (ui.phase != VisualizationPhase.playing || runningSince != null) return
         val t = now()
         runningSince = t
-        questionSince = t
+        questionSince = if (ui.isMemorizing) null else t
         ui = ui.copy(now = t)
     }
 
@@ -154,10 +185,46 @@ class VisualizationViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     private fun serveNext() {
-        val question = VisualizationDrawer.next(ui.settings.kinds, ui.stats, ui.question, rng)
+        val question = VisualizationDrawer.next(ui.settings.kinds, ui.stats, ui.question, rng) { puzzleQuestion(it) }
+        val memorizing = question.kind.step == VisualizationStep.calculation
         questionElapsedBefore = 0
-        questionSince = if (runningSince != null) now() else null
-        ui = ui.copy(question = question, feedback = null)
+        questionSince = if (runningSince != null && !memorizing) now() else null
+        ui = ui.copy(question = question, feedback = null, isMemorizing = memorizing, selectedFrom = null)
+    }
+
+    // Marche 5
+
+    /** « J'ai mémorisé » : les pièces disparaissent, le chrono de la question part. */
+    fun hidePosition() {
+        if (!ui.isMemorizing || ui.phase != VisualizationPhase.playing) return
+        if (runningSince != null) questionSince = now()
+        ui = ui.copy(isMemorizing = false)
+    }
+
+    /** Un toucher sur le plateau caché : la case de départ, puis la case d'arrivée qui joue le coup. */
+    fun tapCalculationSquare(square: VSquare) {
+        val question = ui.question ?: return
+        if (ui.phase != VisualizationPhase.playing || ui.feedback != null || ui.isMemorizing ||
+            question.kind.step != VisualizationStep.calculation) return
+        val from = ui.selectedFrom
+        if (from == null) {
+            ui = ui.copy(selectedFrom = square)
+            return
+        }
+        ui = ui.copy(selectedFrom = null)
+        if (from == square) return
+        settle(question, VisualizationCalc.judge(from, square, question))
+    }
+
+    /** Un puzzle de la bibliothèque : court, un peu sous le niveau du joueur, jamais deux fois dans la série. */
+    private fun puzzleQuestion(kind: VisualizationKind): VQuestion? {
+        val pool = pool ?: return null
+        repeat(8) {
+            val puzzle = pool.next(puzzleTarget, usedPuzzles) ?: return null
+            usedPuzzles += puzzle.id
+            VisualizationCalc.question(kind, puzzle.fen, puzzle.solution)?.let { return it }
+        }
+        return null
     }
 
     private fun settle(question: VQuestion, given: VAnswer?) {
@@ -205,7 +272,7 @@ class VisualizationViewModel(app: Application) : AndroidViewModel(app) {
         }
         val fraction = questionTimeFraction()
         val question = ui.question
-        if (ui.feedback == null && fraction != null && fraction <= 0f && question != null) settle(question, null)
+        if (ui.feedback == null && !ui.isMemorizing && fraction != null && fraction <= 0f && question != null) settle(question, null)
     }
 
     private fun finish() {

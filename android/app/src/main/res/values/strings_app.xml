@@ -1590,4 +1590,14 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_hero_detail">Endless exercises, from squares to calculation. Your mistakes come back until you know them.</string>
     <string name="vis_len_two_minutes">2 minutes</string>
     <string name="vis_correct_in_two_minutes">correct in two minutes</string>
+    <!-- Visualisation, lot 3 (18/11/2026) -->
+    <string name="vis_step_calc">Calculate</string>
+    <string name="vis_step_calc_detail">Memorise a position and play, calculate the continuation</string>
+    <string name="vis_kind_memorizePlay">Memorise and play</string>
+    <string name="vis_kind_calculateNext">Calculate the continuation</string>
+    <string name="vis_hide">I\'ve memorised it</string>
+    <string name="vis_q_memorize">Memorise the position, then hide it.</string>
+    <string name="vis_q_white_to_move">White to move: play the best move, from memory.</string>
+    <string name="vis_q_black_to_move">Black to move: play the best move, from memory.</string>
+    <string name="vis_q_after">After %1$s, play the next move, from memory.</string>
 </resources>

@@ -11592,3 +11592,18 @@ par défaut ; liste des coups visible.
   - Tests : iOS `VisualizationTests` (14) et `VisualizationUITests` (2 parcours) ; Android `VisualizationTest` JVM (13)
     et instrumenté (2, émulateur), JVM 717/717. Piège Android : une étiquette de test posée APRÈS
     `clearAndSetSemantics` est effacée avec le reste.
+- **18/11 (soir), VISUALISATION, finitions et lot 3 (iOS + Android)** — retours de l'utilisateur sur iPhone3 :
+  - marches cochées teintées, décochées éteintes, « La série mélange : … » ; retour d'une série vers les réglages
+    du module (Android : la flèche de la barre passe désormais par le circuit du retour, qu'un écran intercepte) ;
+  - chrono par question en MOTS (Sans / Court / Moyen / Long = 5, 10, 15 s pour une case) qui GRANDIT avec la marche
+    (× numéro de la marche) ; « Longueur » devient « Durée » et gagne « 2 minutes » ; sélecteurs en PASTILLES ;
+  - plus de couleur : une teinte par marche (sarcelle, bleu, violet, or, rose), question dans une carte teintée,
+    progression en pastilles vertes/rouges, bilan en anneau ;
+  - **marche 5 « Calculer »** : un puzzle de la bibliothèque (court, ~300 points sous la cote du joueur) est montré ;
+    « J'ai mémorisé » cache les pièces (le chrono de la question ne part qu'alors) ; « Mémoriser et jouer » : jouer le
+    premier coup sur le plateau vide ; « Calculer la suite » : l'énoncé donne un coup et la riposte en notation, le
+    coup à trouver se joue dans une position jamais vue. Tout coup qui mate est juste (comme les puzzles). Après la
+    réponse, pièces revenues et bonne réponse fléchée. Sans bibliothèque : trois mats de secours (testés).
+  - Tests : iOS `VisualizationTests` 21, `VisualizationUITests` 3 parcours ; Android JVM 19, instrumenté 3/3
+    (émulateur). Piège XCUITest : un identifiant d'accessibilité posé sur `ChessBoardView` se recopie sur ses 64
+    cases — l'envelopper (`.accessibilityElement(children: .contain)`).

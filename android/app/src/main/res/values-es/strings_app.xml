@@ -1547,4 +1547,14 @@
     <string name="vis_hero_detail">Ejercicios sin fin, de las casillas al cálculo. Tus errores vuelven hasta que los domines.</string>
     <string name="vis_len_two_minutes">2 minutos</string>
     <string name="vis_correct_in_two_minutes">correctas en dos minutos</string>
+    <!-- Visualisation, lot 3 (18/11/2026) -->
+    <string name="vis_step_calc">Calcular</string>
+    <string name="vis_step_calc_detail">Memorizar una posición y jugar, calcular la continuación</string>
+    <string name="vis_kind_memorizePlay">Memorizar y jugar</string>
+    <string name="vis_kind_calculateNext">Calcular la continuación</string>
+    <string name="vis_hide">Ya la memoricé</string>
+    <string name="vis_q_memorize">Memoriza la posición y luego ocúltala.</string>
+    <string name="vis_q_white_to_move">Juegan las blancas: haz la mejor jugada, de memoria.</string>
+    <string name="vis_q_black_to_move">Juegan las negras: haz la mejor jugada, de memoria.</string>
+    <string name="vis_q_after">Después de %1$s, haz la siguiente jugada, de memoria.</string>
 </resources>

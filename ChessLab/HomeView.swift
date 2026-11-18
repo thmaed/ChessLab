@@ -2653,6 +2653,7 @@ private struct WoodpeckerHost: View {
 /// Héberge Visualisation : son modèle (réglages, série en cours, bilan) survit aux reconstructions de la vue.
 private struct VisualizationHost: View {
     let sessionKey: String
+    @Environment(\.modelContext) private var modelContext
     @Environment(\.sessionStore) private var sessionStore
     @State private var viewModel: VisualizationViewModel?
 
@@ -2666,7 +2667,7 @@ private struct VisualizationHost: View {
         }
         .onAppear {
             guard viewModel == nil else { return }
-            viewModel = sessionStore.value(for: sessionKey) { VisualizationViewModel() }
+            viewModel = sessionStore.value(for: sessionKey) { VisualizationViewModel(modelContext: modelContext) }
         }
     }
 }

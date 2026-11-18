@@ -1,3 +1,4 @@
+import ChessKit
 import Foundation
 
 /// VISUALISATION (18/11/2026) — s'entraîner à voir l'échiquier dans sa tête. Né du retour de Ron (testeur,
@@ -140,6 +141,8 @@ enum VisualizationStep: String, Codable, CaseIterable, Identifiable {
     /// Lot 2 (18/11/2026).
     case pieces
     case position
+    /// Lot 3 (18/11/2026) : des puzzles de la bibliothèque, joués de mémoire.
+    case calculation
 
     var id: String { rawValue }
     var number: Int {
@@ -148,6 +151,7 @@ enum VisualizationStep: String, Codable, CaseIterable, Identifiable {
         case .lines: 2
         case .pieces: 3
         case .position: 4
+        case .calculation: 5
         }
     }
     /// Clé française (localisée par l'appelant).
@@ -157,6 +161,7 @@ enum VisualizationStep: String, Codable, CaseIterable, Identifiable {
         case .lines: "Les lignes"
         case .pieces: "Suivre les pièces"
         case .position: "La position sans plateau"
+        case .calculation: "Calculer"
         }
     }
     var detail: String {
@@ -165,6 +170,7 @@ enum VisualizationStep: String, Codable, CaseIterable, Identifiable {
         case .lines: "Diagonales, croisements, trajets du cavalier"
         case .pieces: "Trajets possibles, ce qu'attaque une pièce, deux pièces qui bougent"
         case .position: "Échec, pièce en prise, case attaquée"
+        case .calculation: "Mémoriser une position et jouer, calculer la suite"
         }
     }
     var kinds: [VisualizationKind] { VisualizationKind.allCases.filter { $0.step == self } }
@@ -195,6 +201,10 @@ enum VisualizationKind: String, Codable, CaseIterable, Identifiable {
     case hangingPiece
     /// « La case e5 est-elle attaquée par les Blancs ? »
     case squareAttacked
+    /// Un puzzle montré, puis caché : jouer le premier coup de mémoire.
+    case memorizePlay
+    /// Un puzzle montré, puis caché ; l'énoncé donne un coup et la riposte : jouer le coup suivant de mémoire.
+    case calculateNext
 
     var id: String { rawValue }
 
@@ -204,6 +214,7 @@ enum VisualizationKind: String, Codable, CaseIterable, Identifiable {
         case .sameDiagonal, .lineIntersection, .knightDistance: .lines
         case .pathCheck, .attackAfter, .twoPieces: .pieces
         case .isCheck, .hangingPiece, .squareAttacked: .position
+        case .memorizePlay, .calculateNext: .calculation
         }
     }
 
@@ -222,11 +233,13 @@ enum VisualizationKind: String, Codable, CaseIterable, Identifiable {
         case .isCheck: "Échec ?"
         case .hangingPiece: "Pièce en prise"
         case .squareAttacked: "Case attaquée"
+        case .memorizePlay: "Mémoriser et jouer"
+        case .calculateNext: "Calculer la suite"
         }
     }
 
     /// L'exercice se fait SUR un plateau (sans coordonnées) ; les autres, de tête.
-    var usesBoard: Bool { self == .findSquare || self == .nameSquare }
+    var usesBoard: Bool { self == .findSquare || self == .nameSquare || step == .calculation }
 
     /// Le chrono par question GRANDIT avec la marche (retour de l'utilisateur, 18/11/2026 : « 5 s est bien pour le
     /// repérage des cases, trop court pour les problèmes complexes ») : le réglage est le temps de la marche 1,
@@ -243,6 +256,8 @@ enum VisualizationAnswer: Hashable {
     case number(Int)
     /// « first », « second », « both », « none » (deux pièces) ; « none » aussi pour « aucune pièce en prise ».
     case option(String)
+    /// Un coup, en LAN (« e2e4 ») — marche 5.
+    case move(String)
 }
 
 /// Une question : ce qu'il faut dire, la bonne réponse, et les choix proposés (vides pour « Touchez… » : on
@@ -261,6 +276,13 @@ struct VisualizationQuestion: Equatable {
     var pieces: [VisualizationPiece] = []
     /// Lot 2 — le trajet d'une pièce (départ compris), ou les coups des deux pièces.
     var moves: [VisualizationPiece] = []
+    /// Lot 3 — le puzzle : sa position de départ et sa solution (LAN). « Mémoriser et jouer » en prend le premier
+    /// coup ; « Calculer la suite » en donne deux et demande le troisième.
+    var puzzleFEN: String? = nil
+    var solution: [String] = []
+
+    /// Combien de coups l'énoncé donne avant le coup à trouver.
+    var givenPlies: Int { kind == .calculateNext ? 2 : 0 }
 
     /// Ce qui permet de reposer la MÊME question plus tard (les erreurs reviennent).
     var reviewKey: String {
@@ -275,6 +297,8 @@ struct VisualizationQuestion: Equatable {
             "\(kind.rawValue)|\(VisualizationPiece.codes(pieces))"
         case .squareAttacked:
             "\(kind.rawValue)|\(VisualizationPiece.codes(pieces))|\(squares[0].notation)"
+        case .memorizePlay, .calculateNext:
+            "\(kind.rawValue)|\(puzzleFEN ?? "")|\(solution.joined(separator: ","))"
         case .squareColor, .findSquare, .nameSquare:
             "\(kind.rawValue)|\(squares[0].notation)"
         case .sameDiagonal, .knightDistance:
@@ -316,6 +340,9 @@ enum VisualizationGenerator {
             return randomHangingPiece(one: Double.random(in: 0..<1, using: &rng) < 0.7, using: &rng)
         case .squareAttacked:
             return randomSquareAttacked(attacked: Bool.random(using: &rng), using: &rng)
+        case .memorizePlay, .calculateNext:
+            // Sans bibliothèque de puzzles sous la main (tests, base vide) : les positions de secours.
+            return VisualizationCalc.fallback(kind, using: &rng)
         case .knightDistance:
             var from = VisualizationSquare.all.randomElement(using: &rng)!
             var to = VisualizationSquare.all.randomElement(using: &rng)!
@@ -355,6 +382,9 @@ enum VisualizationGenerator {
             guard parts.count == 4, let starts = VisualizationPiece.parse(parts[1]), starts.count == 2,
                   let moves = VisualizationPiece.parse(parts[2]), let target = VisualizationSquare(parts[3]) else { return nil }
             return twoPieces(starts, moves, target: target)
+        case .memorizePlay, .calculateNext:
+            guard parts.count == 3 else { return nil }
+            return VisualizationCalc.question(kind, fen: parts[1], solution: parts[2].split(separator: ",").map(String.init))
         case .isCheck, .hangingPiece, .squareAttacked:
             guard parts.count >= 2, let position = VisualizationPiece.parse(parts[1]) else { return nil }
             switch kind {
@@ -589,8 +619,14 @@ enum VisualizationDrawer {
     static let reviewShare = 0.3
 
     static func next<R: RandomNumberGenerator>(kinds: [VisualizationKind], stats: VisualizationStats,
-                                              previous: VisualizationQuestion?, using rng: inout R) -> VisualizationQuestion {
+                                              previous: VisualizationQuestion?, using rng: inout R,
+                                              puzzles: ((VisualizationKind) -> VisualizationQuestion?)? = nil) -> VisualizationQuestion {
         precondition(!kinds.isEmpty)
+        // Marche 5 : la bibliothèque de puzzles fournit la question (les positions de secours sinon).
+        func generate(_ kind: VisualizationKind) -> VisualizationQuestion {
+            if kind.step == .calculation, let question = puzzles?(kind) { return question }
+            return VisualizationGenerator.question(kind, using: &rng)
+        }
         let review = stats.reviewKeys(for: kinds).filter { $0 != previous?.reviewKey }
         if !review.isEmpty, Double.random(in: 0..<1, using: &rng) < reviewShare,
            let key = review.randomElement(using: &rng),
@@ -598,10 +634,10 @@ enum VisualizationDrawer {
             return question
         }
         for _ in 0..<20 {
-            let question = VisualizationGenerator.question(kinds.randomElement(using: &rng)!, using: &rng)
+            let question = generate(kinds.randomElement(using: &rng)!)
             if question.reviewKey != previous?.reviewKey { return question }
         }
-        return VisualizationGenerator.question(kinds.randomElement(using: &rng)!, using: &rng)
+        return generate(kinds.randomElement(using: &rng)!)
     }
 }
 
@@ -920,5 +956,88 @@ extension VisualizationGenerator {
             let pool = VisualizationSquare.all.filter { !occupied.contains($0) && byWhite.contains($0) == attacked }
             if let target = pool.randomElement(using: &rng) { return squareAttacked(position, target: target) }
         }
+    }
+}
+
+// MARK: - Lot 3 : calculer — des puzzles joués de mémoire
+
+/// La marche 5 (18/11/2026). La position d'un puzzle s'affiche ; le joueur la cache quand il est prêt, puis joue le coup
+/// sur le plateau vide. « Calculer la suite » donne d'abord un coup et la riposte, en notation seulement : le coup à
+/// trouver se joue dans une position qu'on n'a jamais vue.
+enum VisualizationCalc {
+    static func question(_ kind: VisualizationKind, fen: String, solution: [String]) -> VisualizationQuestion? {
+        let needed = kind == .calculateNext ? 3 : 1
+        guard Position(fen: fen) != nil, solution.count >= needed, solution.allSatisfy({ $0.count >= 4 }) else { return nil }
+        let answer = solution[kind == .calculateNext ? 2 : 0]
+        return VisualizationQuestion(kind: kind, squares: [], line: nil, diagonal: nil, answer: .move(answer), choices: [],
+                                     puzzleFEN: fen, solution: Array(solution.prefix(needed)))
+    }
+
+    /// Le plateau après les coups donnés (aucun pour « Mémoriser et jouer »).
+    static func board(after question: VisualizationQuestion, plies: Int? = nil) -> Board? {
+        guard let position = Position(fen: question.puzzleFEN ?? "") else { return nil }
+        var board = Board(position: position)
+        for lan in question.solution.prefix(plies ?? question.givenPlies) {
+            guard play(lan, on: &board) != nil else { return nil }
+        }
+        return board
+    }
+
+    /// Joue un coup LAN (promotion comprise) ; `nil` s'il est illégal.
+    @discardableResult
+    static func play(_ lan: String, on board: inout Board) -> Move? {
+        guard lan.count >= 4 else { return nil }
+        let from = Square(String(lan.prefix(2)))
+        let to = Square(String(lan.dropFirst(2).prefix(2)))
+        guard board.position.piece(at: from)?.color == board.position.sideToMove,
+              board.canMove(pieceAt: from, to: to),
+              var move = board.move(pieceAt: from, to: to) else { return nil }
+        if case .promotion = board.state {
+            let kind = lan.count == 5 ? (Piece.Kind(rawValue: String(lan.suffix(1)).uppercased()) ?? .queen) : .queen
+            move = board.completePromotion(of: move, to: kind)
+        }
+        return move
+    }
+
+    /// La réponse du joueur, jugée : le coup attendu (départ et arrivée), ou n'importe quel coup qui MATE — comme les
+    /// puzzles. Rend la réponse à enregistrer : l'attendue si c'est juste, le coup joué sinon.
+    static func judge(from: VisualizationSquare, to: VisualizationSquare, in question: VisualizationQuestion) -> VisualizationAnswer {
+        let lan = from.notation + to.notation
+        guard case let .move(expected) = question.answer else { return .move(lan) }
+        if String(expected.prefix(4)) == lan { return question.answer }
+        if var board = board(after: question), play(lan, on: &board) != nil, case .checkmate = board.state {
+            return question.answer
+        }
+        return .move(lan)
+    }
+
+    /// Le coup en notation (SAN brute, à passer à `SANFormatter.display`), joué depuis la position de la question.
+    static func san(of lan: String, in question: VisualizationQuestion) -> String? {
+        guard var board = board(after: question) else { return nil }
+        return play(lan, on: &board)?.san
+    }
+
+    /// Les coups donnés par l'énoncé, en SAN brute.
+    static func givenSANs(_ question: VisualizationQuestion) -> [String] {
+        guard let position = Position(fen: question.puzzleFEN ?? "") else { return [] }
+        var board = Board(position: position)
+        return question.solution.prefix(question.givenPlies).compactMap { play($0, on: &board)?.san }
+    }
+
+    /// Le camp qui joue le coup à trouver (et d'où l'on regarde le plateau).
+    static func sideToFind(_ question: VisualizationQuestion) -> Piece.Color {
+        board(after: question)?.position.sideToMove ?? .white
+    }
+
+    /// Positions de secours, quand la bibliothèque manque : des mats connus.
+    static let fallbacks: [(fen: String, solution: [String])] = [
+        ("6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1", ["d1d8"]),
+        ("r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4", ["h5f7"]),
+        ("6k1/pp3ppp/8/8/8/8/PP3PPP/2R3K1 w - - 0 1", ["c1c8"]),
+    ]
+
+    static func fallback<R: RandomNumberGenerator>(_ kind: VisualizationKind, using rng: inout R) -> VisualizationQuestion {
+        let pick = fallbacks.randomElement(using: &rng)!
+        return question(.memorizePlay, fen: pick.fen, solution: pick.solution)!
     }
 }

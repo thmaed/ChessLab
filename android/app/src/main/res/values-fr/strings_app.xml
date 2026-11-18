@@ -1587,4 +1587,14 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="vis_hero_detail">Des exercices sans fin, des cases jusqu\'au calcul. Vos erreurs reviennent jusqu\'à ce qu\'elles soient sues.</string>
     <string name="vis_len_two_minutes">2 minutes</string>
     <string name="vis_correct_in_two_minutes">justes en deux minutes</string>
+    <!-- Visualisation, lot 3 (18/11/2026) -->
+    <string name="vis_step_calc">Calculer</string>
+    <string name="vis_step_calc_detail">Mémoriser une position et jouer, calculer la suite</string>
+    <string name="vis_kind_memorizePlay">Mémoriser et jouer</string>
+    <string name="vis_kind_calculateNext">Calculer la suite</string>
+    <string name="vis_hide">J\'ai mémorisé</string>
+    <string name="vis_q_memorize">Mémorisez la position, puis cachez-la.</string>
+    <string name="vis_q_white_to_move">Trait aux Blancs : jouez le meilleur coup, de mémoire.</string>
+    <string name="vis_q_black_to_move">Trait aux Noirs : jouez le meilleur coup, de mémoire.</string>
+    <string name="vis_q_after">Après %1$s, jouez le coup suivant, de mémoire.</string>
 </resources>

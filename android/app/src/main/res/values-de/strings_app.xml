@@ -1508,4 +1508,14 @@
     <string name="vis_hero_detail">Endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du sie kannst.</string>
     <string name="vis_len_two_minutes">2 Minuten</string>
     <string name="vis_correct_in_two_minutes">richtig in zwei Minuten</string>
+    <!-- Visualisation, lot 3 (18/11/2026) -->
+    <string name="vis_step_calc">Rechnen</string>
+    <string name="vis_step_calc_detail">Eine Stellung merken und ziehen, die Fortsetzung berechnen</string>
+    <string name="vis_kind_memorizePlay">Merken und ziehen</string>
+    <string name="vis_kind_calculateNext">Die Fortsetzung berechnen</string>
+    <string name="vis_hide">Ich habe sie mir gemerkt</string>
+    <string name="vis_q_memorize">Merke dir die Stellung und verdecke sie dann.</string>
+    <string name="vis_q_white_to_move">Weiß am Zug: Spiele den besten Zug aus dem Gedächtnis.</string>
+    <string name="vis_q_black_to_move">Schwarz am Zug: Spiele den besten Zug aus dem Gedächtnis.</string>
+    <string name="vis_q_after">Nach %1$s spiele den nächsten Zug aus dem Gedächtnis.</string>
 </resources>

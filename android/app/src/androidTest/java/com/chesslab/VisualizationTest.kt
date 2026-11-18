@@ -153,4 +153,38 @@ class VisualizationTest {
             if (selected("marche-$step")) compose.onNodeWithTag("marche-$step").performScrollTo().performClick()
         }
     }
+
+    /** Lot 3 : la marche 5 seule — la position s'affiche, « J'ai mémorisé » la cache, un coup sur le plateau vide. */
+    @Test fun calculationStep() {
+        awaitTag("mode-visualization", 120_000)
+        compose.onNodeWithTag("mode-visualization").performScrollTo().performClick()
+        awaitTag("visualisation-commencer")
+        fun selected(tag: String) =
+            compose.onAllNodesWithTag(tag).fetchSemanticsNodes().first().config.getOrNull(SemanticsProperties.Selected) == true
+        if (!selected("marche-calculation")) compose.onNodeWithTag("marche-calculation").performScrollTo().performClick()
+        for (step in listOf("squares", "lines", "pieces", "position")) {
+            if (selected("marche-$step")) compose.onNodeWithTag("marche-$step").performScrollTo().performClick()
+        }
+        compose.onNodeWithTag("longueur-ten").performScrollTo().performClick()
+        compose.onNodeWithTag("chrono-sans").performScrollTo().performClick()
+        compose.onNodeWithTag("visualisation-commencer").performClick()
+
+        for (index in 0 until 3) {
+            awaitTag("visualisation-cacher", 60_000)
+            compose.onNodeWithTag("visualisation-cacher").performClick()
+            compose.waitForIdle()
+            compose.onNodeWithTag("visualisation-plateau").performTouchInput { click(androidx.compose.ui.geometry.Offset(width * 0.56f, height * 0.81f)) }
+            compose.onNodeWithTag("visualisation-plateau").performTouchInput { click(androidx.compose.ui.geometry.Offset(width * 0.56f, height * 0.56f)) }
+            val next = "${index + 2} / 10"
+            compose.waitUntil(10_000) { text("visualisation-progression") == next }
+        }
+        compose.onNodeWithTag("visualisation-arreter").performClick()
+        awaitTag("visualisation-bilan", 5_000)
+
+        // Réglages rendus : la marche 1 seule.
+        compose.onNodeWithTag("visualisation-reglages").performClick()
+        awaitTag("visualisation-commencer")
+        if (!selected("marche-squares")) compose.onNodeWithTag("marche-squares").performScrollTo().performClick()
+        if (selected("marche-calculation")) compose.onNodeWithTag("marche-calculation").performScrollTo().performClick()
+    }
 }

@@ -302,12 +302,62 @@ struct VisualizationView: View {
                 .strokeBorder(frame, lineWidth: viewModel.feedback == nil ? 1 : 2))
             .animation(Theme.snappySpring, value: viewModel.feedback)
 
-            if q.kind.usesBoard { board(q) }
+            if q.kind.step == .calculation { calculationBoard(q) }
+            else if q.kind.usesBoard { board(q) }
 
             if !q.choices.isEmpty { choices(q) }
 
             feedbackLine(q)
                 .frame(minHeight: 24)
+        }
+    }
+
+    /// Marche 5 : la position du puzzle, montrée le temps de la mémoriser ; puis le plateau CACHÉ, où l'on joue le coup
+    /// en touchant départ et arrivée. Après la réponse, les pièces reviennent et la bonne réponse est fléchée.
+    @ViewBuilder
+    private func calculationBoard(_ q: VisualizationQuestion) -> some View {
+        let memorizing = viewModel.isMemorizing
+        let shown = memorizing ? VisualizationCalc.board(after: q, plies: 0) : VisualizationCalc.board(after: q)
+        let side = VisualizationCalc.sideToFind(q)
+        let revealed = viewModel.feedback != nil
+        let hint: [HintMove] = {
+            guard revealed, case let .move(lan) = q.answer, lan.count >= 4 else { return [] }
+            return [HintMove(rank: 1, from: Square(String(lan.prefix(2))), to: Square(String(lan.dropFirst(2).prefix(2))), strength: 1)]
+        }()
+        VStack(spacing: 14) {
+            ChessBoardView(
+                board: shown ?? Self.emptyBoard,
+                orientation: side,
+                theme: AppSettings.shared.boardTheme,
+                selectedSquare: viewModel.selectedFrom.map { Square($0.notation) },
+                legalTargetSquares: [], lastMove: nil, hintMoves: hint,
+                interactionEnabled: !memorizing && !revealed,
+                showCoordinates: true,
+                onTapSquare: { square in
+                    guard let tapped = VisualizationSquare(square.notation) else { return }
+                    viewModel.tapCalculationSquare(tapped)
+                },
+                onDropPiece: { _, _ in },
+                pieceMask: memorizing || revealed ? .none : .hidden([.white, .black])
+            )
+            .aspectRatio(1, contentMode: .fit)
+            .frame(maxWidth: 420)
+            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            // Un conteneur porte l'identifiant : posé sur le plateau, il se recopiait sur ses 64 cases.
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("visualizationBoard")
+
+            if memorizing {
+                Button { withAnimation(Theme.gentle) { viewModel.hidePosition() } } label: {
+                    Label("J'ai mémorisé", systemImage: "eye.slash")
+                        .font(.headline)
+                        .foregroundStyle(Theme.background)
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .background(q.kind.step.tint, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+                }
+                .buttonStyle(.pressable)
+                .accessibilityIdentifier("visualizationHide")
+            }
         }
     }
 
@@ -332,6 +382,7 @@ struct VisualizationView: View {
         .aspectRatio(1, contentMode: .fit)
         .frame(maxWidth: 420)
         .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("visualizationBoard")
     }
 
@@ -559,7 +610,34 @@ struct VisualizationView: View {
             return LocalizationController.string("Quelle pièce noire est en prise ?")
         case .squareAttacked:
             return LocalizationController.string("La case %@ est-elle attaquée par les Blancs ?", s[0])
+        case .memorizePlay, .calculateNext:
+            if viewModel.isMemorizing && q == viewModel.question {
+                return LocalizationController.string("Mémorisez la position, puis cachez-la.")
+            }
+            let white = VisualizationCalc.sideToFind(q) == .white
+            if q.kind == .memorizePlay {
+                return LocalizationController.string(white ? "Trait aux Blancs : jouez le meilleur coup, de mémoire."
+                                                           : "Trait aux Noirs : jouez le meilleur coup, de mémoire.")
+            }
+            return LocalizationController.string("Après %@, jouez le coup suivant, de mémoire.", givenLine(q))
         }
+    }
+
+    /// « 1. Fxf7+ Rxf7 » : les coups donnés par l'énoncé, numérotés, dans la notation de l'utilisateur.
+    private func givenLine(_ q: VisualizationQuestion) -> String {
+        guard let position = Position(fen: q.puzzleFEN ?? "") else { return "" }
+        let sans = SANFormatter.display(VisualizationCalc.givenSANs(q))
+        var number = position.clock.fullmoves
+        var white = position.sideToMove == .white
+        var parts: [String] = []
+        for (index, san) in sans.enumerated() {
+            if white { parts.append("\(number). \(san)") }
+            else if index == 0 { parts.append("\(number)… \(san)") }
+            else { parts.append(san) }
+            if !white { number += 1 }
+            white.toggle()
+        }
+        return parts.joined(separator: " ")
     }
 
     /// Ce que l'exercice met en scène : un trajet, deux pièces et leurs coups, une position. Les pièces sont les
@@ -678,6 +756,9 @@ struct VisualizationView: View {
             if let piece = q.pieces.first(where: { $0.square == s }) { return piece.label }
             return s.notation
         case let .number(n): return "\(n)"
+        case let .move(lan):
+            if let san = VisualizationCalc.san(of: lan, in: q) { return SANFormatter.display(san) }
+            return "\(lan.prefix(2))–\(lan.dropFirst(2).prefix(2))"
         case let .option(name):
             switch name {
             case "first": return q.pieces.first.map(\.figurine) ?? ""
@@ -697,6 +778,7 @@ struct VisualizationView: View {
         case let .square(s): s.notation
         case let .number(n): "\(n)"
         case let .option(name): name
+        case let .move(lan): lan
         }
     }
 
@@ -820,6 +902,7 @@ extension VisualizationStep {
         case .lines: Theme.info
         case .pieces: Theme.violet
         case .position: Theme.gold
+        case .calculation: Theme.rose
         }
     }
 
@@ -829,6 +912,7 @@ extension VisualizationStep {
         case .lines: "line.diagonal"
         case .pieces: "point.topleft.down.to.point.bottomright.curvepath"
         case .position: "eye"
+        case .calculation: "brain.head.profile"
         }
     }
 }

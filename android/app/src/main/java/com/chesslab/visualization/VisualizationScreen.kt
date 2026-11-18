@@ -21,6 +21,8 @@ import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.filled.Route
 import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
@@ -262,7 +264,8 @@ private fun Playing(model: VisualizationViewModel, ui: VisualizationUi) {
         }
         if (question != null) {
             QuestionCard(model, ui, question)
-            if (question.kind.usesBoard) QuestionBoard(model, ui, question)
+            if (question.kind.step == VisualizationStep.calculation) CalculationBoard(model, ui, question)
+            else if (question.kind.usesBoard) QuestionBoard(model, ui, question)
             if (question.choices.isNotEmpty()) Choices(model, ui, question)
             FeedbackLine(ui, question)
         }
@@ -270,6 +273,43 @@ private fun Playing(model: VisualizationViewModel, ui: VisualizationUi) {
 }
 
 private val emptyPosition: Position = Position.fromFen("8/8/8/8/8/8/8/8 w - - 0 1") ?: Position.standard
+
+/**
+ * Marche 5 : la position du puzzle, montrée le temps de la mémoriser ; puis le plateau CACHÉ, où l'on joue le coup en
+ * touchant départ et arrivée. Après la réponse, les pièces reviennent et la bonne réponse est fléchée. Comme iOS.
+ */
+@Composable
+private fun CalculationBoard(model: VisualizationViewModel, ui: VisualizationUi, question: VQuestion) {
+    val memorizing = ui.isMemorizing
+    val revealed = ui.feedback != null
+    val board = if (memorizing) VisualizationCalc.board(question, plies = 0) else VisualizationCalc.board(question)
+    val expected = (question.answer as? VAnswer.Move)?.lan
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Box(Modifier.widthIn(max = 420.dp).fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(8.dp)).testTag("visualisation-plateau")) {
+            BoardView(
+                position = board?.position ?: emptyPosition,
+                orientation = VisualizationCalc.sideToFind(question),
+                selected = ui.selectedFrom?.let { Square(it.notation) },
+                hint = if (revealed && expected != null) Square(expected.take(2)) to Square(expected.drop(2).take(2)) else null,
+                enabled = !memorizing && !revealed,
+                pieceMask = if (memorizing || revealed) com.chesslab.ui.PieceMask.None
+                    else com.chesslab.ui.PieceMask(hidden = setOf(Piece.Color.white, Piece.Color.black)),
+                onSquareTap = { square -> VSquare.parse(square.notation)?.let { model.tapCalculationSquare(it) } },
+            )
+        }
+        if (memorizing) {
+            Row(
+                Modifier.fillMaxWidth().heightIn(min = 50.dp).clip(RoundedCornerShape(16.dp))
+                    .background(question.kind.step.tint).clickable { model.hidePosition() }.testTag("visualisation-cacher"),
+                horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(Icons.Default.VisibilityOff, null, tint = Palette.background, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(stringResource(R.string.vis_hide), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = Palette.background)
+            }
+        }
+    }
+}
 
 /** Un plateau vide, sans coordonnées — c'est l'exercice. */
 @Composable
@@ -430,7 +470,7 @@ private fun Summary(model: VisualizationViewModel, ui: VisualizationUi) {
 // MARK: Les mots et les briques
 
 @Composable
-private fun prompt(q: VQuestion): String {
+private fun prompt(q: VQuestion, memorizing: Boolean = false): String {
     val s = q.squares.map { it.notation }
     return when (q.kind) {
         VisualizationKind.squareColor -> stringResource(R.string.vis_q_squareColor, s[0])
@@ -449,7 +489,35 @@ private fun prompt(q: VQuestion): String {
         VisualizationKind.isCheck -> stringResource(R.string.vis_q_isCheck)
         VisualizationKind.hangingPiece -> stringResource(R.string.vis_q_hangingPiece)
         VisualizationKind.squareAttacked -> stringResource(R.string.vis_q_squareAttacked, s[0])
+        VisualizationKind.memorizePlay, VisualizationKind.calculateNext -> when {
+            memorizing -> stringResource(R.string.vis_q_memorize)
+            q.kind == VisualizationKind.memorizePlay -> stringResource(
+                if (VisualizationCalc.sideToFind(q) == Piece.Color.white) R.string.vis_q_white_to_move else R.string.vis_q_black_to_move
+            )
+            else -> stringResource(R.string.vis_q_after, givenLine(q))
+        }
     }
+}
+
+/** « 1. Fxf7+ Rxf7 » : les coups donnés par l'énoncé, numérotés, dans la notation de l'utilisateur. */
+@Composable
+private fun givenLine(q: VQuestion): String {
+    val settings by com.chesslab.settings.SettingsStore.state.collectAsState()
+    val position = Position.fromFen(q.puzzleFen.orEmpty()) ?: return ""
+    val sans = com.chesslab.ui.SanFormatter.display(VisualizationCalc.givenSans(q), settings.pieceNotation)
+    var number = position.clock.fullmoves
+    var white = position.sideToMove == Piece.Color.white
+    val parts = mutableListOf<String>()
+    sans.forEachIndexed { index, san ->
+        parts += when {
+            white -> "$number. $san"
+            index == 0 -> "$number… $san"
+            else -> san
+        }
+        if (!white) number++
+        white = !white
+    }
+    return parts.joinToString(" ")
 }
 
 @Composable
@@ -460,6 +528,11 @@ private fun answerLabel(a: VAnswer, q: VQuestion): String = when (a) {
     VAnswer.No -> stringResource(R.string.vis_no)
     is VAnswer.Square -> q.pieces.firstOrNull { it.square == a.square }?.label ?: a.square.notation
     is VAnswer.Number -> "${a.value}"
+    is VAnswer.Move -> {
+        val settings by com.chesslab.settings.SettingsStore.state.collectAsState()
+        VisualizationCalc.san(a.lan, q)?.let { com.chesslab.ui.SanFormatter.display(it, settings.pieceNotation) }
+            ?: "${a.lan.take(2)}–${a.lan.drop(2).take(2)}"
+    }
     is VAnswer.Option -> when (a.name) {
         "first" -> q.pieces.firstOrNull()?.figurine.orEmpty()
         "second" -> q.pieces.getOrNull(1)?.figurine.orEmpty()
@@ -574,12 +647,14 @@ private fun stepTitle(step: VisualizationStep) = when (step) {
     VisualizationStep.lines -> R.string.vis_step_lines
     VisualizationStep.pieces -> R.string.vis_step_pieces
     VisualizationStep.position -> R.string.vis_step_position
+    VisualizationStep.calculation -> R.string.vis_step_calc
 }
 private fun stepDetail(step: VisualizationStep) = when (step) {
     VisualizationStep.squares -> R.string.vis_step_squares_detail
     VisualizationStep.lines -> R.string.vis_step_lines_detail
     VisualizationStep.pieces -> R.string.vis_step_pieces_detail
     VisualizationStep.position -> R.string.vis_step_position_detail
+    VisualizationStep.calculation -> R.string.vis_step_calc_detail
 }
 
 private fun timerTitle(seconds: Int) = when {
@@ -608,6 +683,8 @@ private fun kindTitle(kind: VisualizationKind) = when (kind) {
     VisualizationKind.isCheck -> R.string.vis_kind_isCheck
     VisualizationKind.hangingPiece -> R.string.vis_kind_hangingPiece
     VisualizationKind.squareAttacked -> R.string.vis_kind_squareAttacked
+    VisualizationKind.memorizePlay -> R.string.vis_kind_memorizePlay
+    VisualizationKind.calculateNext -> R.string.vis_kind_calculateNext
 }
 
 private fun clock(ms: Long): String {
@@ -646,6 +723,7 @@ val VisualizationStep.tint: Color
         VisualizationStep.lines -> Palette.info
         VisualizationStep.pieces -> Palette.violet
         VisualizationStep.position -> Palette.gold
+        VisualizationStep.calculation -> Palette.rose
     }
 
 private val VisualizationStep.icon: androidx.compose.ui.graphics.vector.ImageVector
@@ -654,6 +732,7 @@ private val VisualizationStep.icon: androidx.compose.ui.graphics.vector.ImageVec
         VisualizationStep.lines -> Icons.Default.Timeline
         VisualizationStep.pieces -> Icons.Default.Route
         VisualizationStep.position -> Icons.Default.Visibility
+        VisualizationStep.calculation -> Icons.Default.Psychology
     }
 
 /** La question dans une carte à la couleur de sa marche : l'exercice en étiquette, la scène, l'énoncé, le chrono. */
@@ -684,7 +763,7 @@ private fun QuestionCard(model: VisualizationViewModel, ui: VisualizationUi, que
         }
         Scene(question)
         Text(
-            prompt(question), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+            prompt(question, ui.isMemorizing), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
             textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().testTag("visualisation-question"),
         )
         model.questionTimeFraction()?.let { fraction ->

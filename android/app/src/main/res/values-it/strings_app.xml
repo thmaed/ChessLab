@@ -1547,4 +1547,14 @@
     <string name="vis_hero_detail">Esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non li sai.</string>
     <string name="vis_len_two_minutes">2 minuti</string>
     <string name="vis_correct_in_two_minutes">giuste in due minuti</string>
+    <!-- Visualisation, lot 3 (18/11/2026) -->
+    <string name="vis_step_calc">Calcolare</string>
+    <string name="vis_step_calc_detail">Memorizzare una posizione e giocare, calcolare il seguito</string>
+    <string name="vis_kind_memorizePlay">Memorizza e gioca</string>
+    <string name="vis_kind_calculateNext">Calcola il seguito</string>
+    <string name="vis_hide">L\'ho memorizzata</string>
+    <string name="vis_q_memorize">Memorizza la posizione, poi nascondila.</string>
+    <string name="vis_q_white_to_move">Muove il Bianco: gioca la mossa migliore, a memoria.</string>
+    <string name="vis_q_black_to_move">Muove il Nero: gioca la mossa migliore, a memoria.</string>
+    <string name="vis_q_after">Dopo %1$s, gioca la mossa successiva, a memoria.</string>
 </resources>

@@ -55,7 +55,8 @@ struct VisualizationTests {
 
     @Test func eachGeneratedQuestionIsRightAndOffersItsAnswer() {
         var rng = Seeded(state: 42)
-        for kind in VisualizationKind.allCases {
+        // La marche 5 vient de la bibliothèque de puzzles : testée à part.
+        for kind in VisualizationKind.allCases where kind.step != .calculation {
             for _ in 0..<200 {
                 let q = VisualizationGenerator.question(kind, using: &rng)
                 #expect(q.kind == kind)
@@ -90,6 +91,8 @@ struct VisualizationTests {
                     #expect(q.pieces.filter { $0.kind == .king }.count == 2)
                     #expect(Set(q.pieces.map(\.square)).count == q.pieces.count, "une pièce par case")
                     #expect(q.pieces.filter { $0.kind == .pawn }.allSatisfy { (1...6).contains($0.square.rank) })
+                case .memorizePlay, .calculateNext:
+                    break
                 case .hangingPiece:
                     let hung = VisualizationGenerator.hanging(in: q.pieces)
                     #expect(hung.count <= 1, "une réponse, pas deux")
@@ -228,5 +231,53 @@ struct VisualizationTests {
         #expect(VisualizationSettings.Length.twoMinutes.duration == 120)
         #expect(VisualizationSettings.Length.ten.duration == nil && VisualizationSettings.Length.ten.questionCount == 10)
         #expect(VisualizationSettings.Length.twoMinutes.questionCount == nil)
+    }
+
+    // MARK: Lot 3 — calculer
+
+    /// 1. Dd8+ Txd8 2. Txd8# : la batterie dame-tour sur la colonne d.
+    static let twoMoveMate = (fen: "r5k1/5ppp/8/8/8/8/3Q1PPP/3R2K1 w - - 0 1", solution: ["d2d8", "a8d8", "d1d8"])
+
+    @Test func calculateNextGivesTwoMovesAndAsksForTheThird() throws {
+        let q = try #require(VisualizationCalc.question(.calculateNext, fen: Self.twoMoveMate.fen, solution: Self.twoMoveMate.solution))
+        #expect(q.answer == .move("d1d8"))
+        #expect(VisualizationCalc.givenSANs(q) == ["Qd8+", "Rxd8"])
+        #expect(VisualizationCalc.sideToFind(q) == .white)
+        #expect(VisualizationCalc.judge(from: sq("d1"), to: sq("d8"), in: q) == q.answer)
+        #expect(VisualizationCalc.judge(from: sq("d1"), to: sq("d7"), in: q) == .move("d1d7"))
+        #expect(VisualizationCalc.san(of: "d1d8", in: q) == "Rxd8#")
+        // Trop court pour « calculer la suite » : refusé.
+        #expect(VisualizationCalc.question(.calculateNext, fen: Self.twoMoveMate.fen, solution: ["d2d8"]) == nil)
+    }
+
+    @Test func memorizePlayAcceptsTheMoveOrAnyOtherMate() throws {
+        // Deux tours : Td8# attendu, Tc8# mate aussi — juste, comme dans les puzzles.
+        let q = try #require(VisualizationCalc.question(.memorizePlay, fen: "6k1/5ppp/8/8/8/8/5PPP/2RR2K1 w - - 0 1", solution: ["d1d8"]))
+        #expect(VisualizationCalc.judge(from: sq("d1"), to: sq("d8"), in: q) == q.answer)
+        #expect(VisualizationCalc.judge(from: sq("c1"), to: sq("c8"), in: q) == q.answer, "un autre mat est juste")
+        #expect(VisualizationCalc.judge(from: sq("c1"), to: sq("c7"), in: q) != q.answer)
+        #expect(VisualizationCalc.judge(from: sq("e1"), to: sq("e8"), in: q) != q.answer, "un coup impossible est faux")
+    }
+
+    @Test func theFallbackPositionsAreRealMates() {
+        for pick in VisualizationCalc.fallbacks {
+            let q = VisualizationCalc.question(.memorizePlay, fen: pick.fen, solution: pick.solution)
+            #expect(q != nil, "\(pick.fen)")
+            if let q, var board = VisualizationCalc.board(after: q) {
+                VisualizationCalc.play(pick.solution[0], on: &board)
+                if case .checkmate = board.state {} else { Issue.record("pas mat : \(pick.fen)") }
+            }
+        }
+    }
+
+    @Test func aMissedPuzzleComesBackFromItsKey() throws {
+        var rng = Seeded(state: 5)
+        let q = try #require(VisualizationCalc.question(.calculateNext, fen: Self.twoMoveMate.fen, solution: Self.twoMoveMate.solution))
+        let again = VisualizationGenerator.question(reviewKey: q.reviewKey, using: &rng)
+        #expect(again == q)
+        // Sans bibliothèque, la marche 5 sert les positions de secours.
+        let fallback = VisualizationDrawer.next(kinds: [.calculateNext], stats: VisualizationStats(), previous: nil, using: &rng)
+        #expect(fallback.kind.step == .calculation)
+        #expect(VisualizationKind.calculateNext.seconds(base: 5) == 25)
     }
 }

@@ -2207,3 +2207,7 @@ en préférences texte (iOS : JSON dans UserDefaults), aucun des deux côtés ne
 - [x] **Lot 2 (marches 3 et 4)** porté le même jour : mêmes exercices, même équilibre des réponses, pièces en images
       (noires cernées de clair, silhouette teintée derrière la pièce comme le contour d'iOS). JVM `VisualizationTest`
       (13), instrumenté 2/2 sur l'ÉMULATEUR. Même vérification Galaxy à faire que ci-dessus.
+- [x] **Finitions et lot 3 (marche 5 « Calculer »)** portés le même jour : pastilles, couleurs par marche, chrono en
+      mots qui grandit avec la marche, « Durée » + 2 minutes, retour vers les réglages, mémoriser/cacher/jouer sur
+      plateau vide. JVM `VisualizationTest` (19), instrumenté 3/3 sur l'ÉMULATEUR. Galaxy toujours à vérifier : la
+      bibliothèque de puzzles (gros fichier) se charge au lancement d'une série avec la marche 5 — en mesurer le temps.

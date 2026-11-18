@@ -1,5 +1,7 @@
+import ChessKit
 import Foundation
 import Observation
+import SwiftData
 
 /// Une série de Visualisation (voir ``VisualizationSettings`` pour les réglages, ``VisualizationDrawer`` pour le
 /// tirage). L'heure vient de l'extérieur (`now`) : les tests la règlent.
@@ -34,6 +36,10 @@ final class VisualizationViewModel {
     private(set) var feedback: Feedback?
     /// Relu par la vue pour les chronos (rafraîchi pendant la série).
     private(set) var now: Date
+    /// Marche 5 : la position est montrée — le chrono de la question attend que le joueur la cache.
+    private(set) var isMemorizing = false
+    /// Marche 5 : la case de départ touchée sur le plateau caché.
+    private(set) var selectedFrom: VisualizationSquare?
 
     private let defaults: UserDefaults
     private let clock: () -> Date
@@ -47,10 +53,14 @@ final class VisualizationViewModel {
     private var ticker: Task<Void, Never>?
     private var advanceTask: Task<Void, Never>?
     private var nextID = 0
+    /// La bibliothèque de puzzles (marche 5) ; sans elle, les positions de secours.
+    private let modelContext: ModelContext?
+    private var usedPuzzles = Set<UUID>()
 
     init(defaults: UserDefaults = .standard, now: @escaping () -> Date = Date.init,
-         rng: any RandomNumberGenerator = SystemRandomNumberGenerator()) {
+         rng: any RandomNumberGenerator = SystemRandomNumberGenerator(), modelContext: ModelContext? = nil) {
         self.defaults = defaults
+        self.modelContext = modelContext
         self.clock = now
         self.rng = rng
         self.now = now()
@@ -88,6 +98,7 @@ final class VisualizationViewModel {
     /// Chrono par question : la fraction de temps restante (1 → 0). `nil` sans chrono.
     var questionTimeFraction: Double? {
         guard let base = settings.secondsPerQuestion, phase == .playing, let question else { return nil }
+        if isMemorizing { return 1 }
         let seconds = question.kind.seconds(base: base)
         let elapsed = questionElapsedBefore + (questionSince.map { now.timeIntervalSince($0) } ?? 0)
         return max(0, 1 - elapsed / Double(seconds))
@@ -98,6 +109,7 @@ final class VisualizationViewModel {
     // MARK: La série
 
     func start() {
+        usedPuzzles = []
         answered = []
         feedback = nil
         nextID = 0
@@ -115,6 +127,42 @@ final class VisualizationViewModel {
         settle(question, given: given)
     }
 
+    // MARK: Marche 5
+
+    /// « J'ai mémorisé » : les pièces disparaissent, le chrono de la question part.
+    func hidePosition() {
+        guard isMemorizing, phase == .playing else { return }
+        isMemorizing = false
+        if runningSince != nil { questionSince = clock() }
+    }
+
+    /// Un toucher sur le plateau caché : la case de départ, puis la case d'arrivée qui joue le coup.
+    func tapCalculationSquare(_ square: VisualizationSquare) {
+        guard phase == .playing, feedback == nil, !isMemorizing, let question, question.kind.step == .calculation else { return }
+        guard let from = selectedFrom else {
+            selectedFrom = square
+            return
+        }
+        selectedFrom = nil
+        if from == square { return }
+        settle(question, given: VisualizationCalc.judge(from: from, to: square, in: question))
+    }
+
+    /// Un puzzle de la bibliothèque : court, un peu sous le niveau du joueur (de tête, c'est plus dur), jamais deux
+    /// fois dans la série. « Calculer la suite » veut trois coups.
+    private func puzzleQuestion(_ kind: VisualizationKind) -> VisualizationQuestion? {
+        guard let modelContext else { return nil }
+        let target = max(600, Int(PuzzleRatingStore.load().rating.rounded()) - 300)
+        for _ in 0..<8 {
+            guard let puzzle = PuzzleRushDrawer.next(target: target, excluding: usedPuzzles, in: modelContext) else { return nil }
+            usedPuzzles.insert(puzzle.id)
+            if let question = VisualizationCalc.question(kind, fen: puzzle.fen ?? "", solution: puzzle.solutionLANs ?? []) {
+                return question
+            }
+        }
+        return nil
+    }
+
     /// L'app quitte le premier plan : le temps s'arrête.
     func pause() {
         guard let since = runningSince else { return }
@@ -130,7 +178,8 @@ final class VisualizationViewModel {
         guard phase == .playing, runningSince == nil else { return }
         now = clock()
         runningSince = now
-        questionSince = now
+        // Pendant la mémorisation (marche 5), le chrono de la question n'a pas encore commencé.
+        questionSince = isMemorizing ? nil : now
     }
 
     /// Quitter la série en cours : ce qui a été répondu reste compté.
@@ -161,9 +210,12 @@ final class VisualizationViewModel {
     // MARK: Interne
 
     private func serveNext() {
-        question = VisualizationDrawer.next(kinds: settings.kinds, stats: stats, previous: question, using: &rng)
+        question = VisualizationDrawer.next(kinds: settings.kinds, stats: stats, previous: question, using: &rng,
+                                            puzzles: { [weak self] kind in self?.puzzleQuestion(kind) })
         questionElapsedBefore = 0
-        questionSince = runningSince != nil ? clock() : nil
+        selectedFrom = nil
+        isMemorizing = question?.kind.step == .calculation
+        questionSince = runningSince != nil && !isMemorizing ? clock() : nil
         feedback = nil
     }
 
@@ -216,7 +268,7 @@ final class VisualizationViewModel {
             finish()
             return
         }
-        if feedback == nil, let fraction = questionTimeFraction, fraction <= 0, let question {
+        if feedback == nil, !isMemorizing, let fraction = questionTimeFraction, fraction <= 0, let question {
             settle(question, given: nil)
         }
     }

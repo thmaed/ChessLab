@@ -1,6 +1,10 @@
 package com.chesslab.visualization
 
 import android.content.Context
+import chesskit.Board
+import chesskit.Piece
+import chesskit.Position
+import chesskit.Square
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -124,7 +128,9 @@ enum class VisualizationStep(val number: Int) {
     lines(2),
     /** Lot 2 (18/11/2026). */
     pieces(3),
-    position(4);
+    position(4),
+    /** Lot 3 (18/11/2026) : des puzzles de la bibliothèque, joués de mémoire. */
+    calculation(5);
 
     val kinds: List<VisualizationKind> get() = VisualizationKind.entries.filter { it.step == this }
 }
@@ -153,10 +159,14 @@ enum class VisualizationKind(val step: VisualizationStep) {
     /** « Quelle pièce noire est en prise ? » (attaquée et non défendue ; ou aucune) */
     hangingPiece(VisualizationStep.position),
     /** « La case e5 est-elle attaquée par les Blancs ? » */
-    squareAttacked(VisualizationStep.position);
+    squareAttacked(VisualizationStep.position),
+    /** Un puzzle montré, puis caché : jouer le premier coup de mémoire. */
+    memorizePlay(VisualizationStep.calculation),
+    /** Un puzzle montré, puis caché ; l'énoncé donne un coup et la riposte : jouer le coup suivant de mémoire. */
+    calculateNext(VisualizationStep.calculation);
 
     /** L'exercice se fait SUR un plateau (sans coordonnées) ; les autres, de tête. */
-    val usesBoard: Boolean get() = this == findSquare || this == nameSquare
+    val usesBoard: Boolean get() = this == findSquare || this == nameSquare || step == VisualizationStep.calculation
 
     /** Le chrono GRANDIT avec la marche (18/11/2026, comme iOS) : 5 s pour une case, 20 s pour une position. */
     fun seconds(base: Int): Int = base * step.number
@@ -171,6 +181,8 @@ sealed class VAnswer {
     data class Number(val value: Int) : VAnswer()
     /** « first », « second », « both », « none ». */
     data class Option(val name: String) : VAnswer()
+    /** Un coup, en LAN (« e2e4 ») — marche 5. */
+    data class Move(val lan: String) : VAnswer()
 
     /** Étiquette d'essai (tests instrumentés) : « light », « e4 », « 3 »… */
     val tag: String get() = when (this) {
@@ -181,6 +193,7 @@ sealed class VAnswer {
         is Square -> square.notation
         is Number -> "$value"
         is Option -> name
+        is Move -> lan
     }
 }
 
@@ -197,7 +210,13 @@ data class VQuestion(
     val pieces: List<VPiece> = emptyList(),
     /** Lot 2 — le trajet d'une pièce (départ compris), ou les coups des deux pièces. */
     val moves: List<VPiece> = emptyList(),
+    /** Lot 3 — le puzzle : sa position de départ et sa solution (LAN). */
+    val puzzleFen: String? = null,
+    val solution: List<String> = emptyList(),
 ) {
+    /** Combien de coups l'énoncé donne avant le coup à trouver. */
+    val givenPlies: Int get() = if (kind == VisualizationKind.calculateNext) 2 else 0
+
     /** Ce qui permet de reposer la MÊME question plus tard. */
     val reviewKey: String get() = when (kind) {
         VisualizationKind.pathCheck -> "${kind.name}|${moves[0].kind.code}|${moves.joinToString(",") { it.square.notation }}"
@@ -206,6 +225,7 @@ data class VQuestion(
         VisualizationKind.twoPieces -> "${kind.name}|${VPiece.codes(pieces)}|${VPiece.codes(moves)}|${squares[0].notation}"
         VisualizationKind.isCheck, VisualizationKind.hangingPiece -> "${kind.name}|${VPiece.codes(pieces)}"
         VisualizationKind.squareAttacked -> "${kind.name}|${VPiece.codes(pieces)}|${squares[0].notation}"
+        VisualizationKind.memorizePlay, VisualizationKind.calculateNext -> "${kind.name}|${puzzleFen.orEmpty()}|${solution.joinToString(",")}"
         VisualizationKind.squareColor, VisualizationKind.findSquare, VisualizationKind.nameSquare ->
             "${kind.name}|${squares[0].notation}"
         VisualizationKind.sameDiagonal, VisualizationKind.knightDistance ->
@@ -237,6 +257,8 @@ object VisualizationGenerator {
         VisualizationKind.isCheck -> randomIsCheck(rng.nextBoolean(), rng)
         VisualizationKind.hangingPiece -> randomHangingPiece(rng.nextDouble() < 0.7, rng)
         VisualizationKind.squareAttacked -> randomSquareAttacked(rng.nextBoolean(), rng)
+        // Sans bibliothèque sous la main (tests, chargement) : les positions de secours.
+        VisualizationKind.memorizePlay, VisualizationKind.calculateNext -> VisualizationCalc.fallback(rng)
         VisualizationKind.knightDistance -> {
             var from = VSquare.all.random(rng)
             var to = VSquare.all.random(rng)
@@ -290,6 +312,10 @@ object VisualizationGenerator {
                 val starts = VPiece.parse(parts[1])?.takeIf { it.size == 2 } ?: return null
                 val moves = VPiece.parse(parts[2]) ?: return null
                 twoPieces(starts, moves, VSquare.parse(parts[3]) ?: return null)
+            }
+            VisualizationKind.memorizePlay, VisualizationKind.calculateNext -> {
+                if (parts.size != 3) return null
+                VisualizationCalc.question(kind, parts[1], parts[2].split(","))
             }
             VisualizationKind.isCheck, VisualizationKind.hangingPiece, VisualizationKind.squareAttacked -> {
                 if (parts.size < 2) return null
@@ -500,17 +526,24 @@ object VisualizationStore {
 object VisualizationDrawer {
     const val REVIEW_SHARE = 0.3
 
-    fun next(kinds: List<VisualizationKind>, stats: VisualizationStats, previous: VQuestion?, rng: Random): VQuestion {
+    fun next(
+        kinds: List<VisualizationKind>, stats: VisualizationStats, previous: VQuestion?, rng: Random,
+        puzzles: ((VisualizationKind) -> VQuestion?)? = null,
+    ): VQuestion {
         require(kinds.isNotEmpty())
+        // Marche 5 : la bibliothèque de puzzles fournit la question (les positions de secours sinon).
+        fun generate(kind: VisualizationKind): VQuestion =
+            (if (kind.step == VisualizationStep.calculation) puzzles?.invoke(kind) else null)
+                ?: VisualizationGenerator.question(kind, rng)
         val review = stats.reviewKeys(kinds).filter { it != previous?.reviewKey }
         if (review.isNotEmpty() && rng.nextDouble() < REVIEW_SHARE) {
             VisualizationGenerator.question(review.random(rng), rng)?.let { return it }
         }
         repeat(20) {
-            val question = VisualizationGenerator.question(kinds.random(rng), rng)
+            val question = generate(kinds.random(rng))
             if (question.reviewKey != previous?.reviewKey) return question
         }
-        return VisualizationGenerator.question(kinds.random(rng), rng)
+        return generate(kinds.random(rng))
     }
 }
 
@@ -774,5 +807,78 @@ fun VisualizationGenerator.randomSquareAttacked(attacked: Boolean, rng: Random):
         val byWhite = VisualizationAttacks.by(true, position)
         val pool = VSquare.all.filter { it !in occupied && (it in byWhite) == attacked }
         if (pool.isNotEmpty()) return squareAttacked(position, pool.random(rng))
+    }
+}
+
+// MARK: Lot 3 — calculer : des puzzles joués de mémoire (pendant de `VisualizationCalc`, iOS)
+
+object VisualizationCalc {
+    fun question(kind: VisualizationKind, fen: String, solution: List<String>): VQuestion? {
+        val needed = if (kind == VisualizationKind.calculateNext) 3 else 1
+        if (Position.fromFen(fen) == null || solution.size < needed || solution.any { it.length < 4 }) return null
+        val answer = solution[if (kind == VisualizationKind.calculateNext) 2 else 0]
+        return VQuestion(kind, emptyList(), answer = VAnswer.Move(answer), choices = emptyList(),
+            puzzleFen = fen, solution = solution.take(needed))
+    }
+
+    /** Le plateau après les coups donnés (aucun pour « Mémoriser et jouer »). */
+    fun board(question: VQuestion, plies: Int = question.givenPlies): Board? {
+        val position = Position.fromFen(question.puzzleFen.orEmpty()) ?: return null
+        val board = Board(position)
+        for (lan in question.solution.take(plies)) play(lan, board) ?: return null
+        return board
+    }
+
+    /** Joue un coup LAN (promotion comprise) ; `null` s'il est illégal. */
+    fun play(lan: String, board: Board): chesskit.Move? {
+        if (lan.length < 4) return null
+        val from = Square(lan.substring(0, 2))
+        val to = Square(lan.substring(2, 4))
+        if (board.position.piece(from)?.color != board.position.sideToMove || !board.canMove(from, to)) return null
+        var move = board.move(pieceAt = from, to = to) ?: return null
+        if (board.state is Board.State.Promotion) {
+            val kind = when (lan.getOrNull(4)) {
+                'r' -> Piece.Kind.rook
+                'b' -> Piece.Kind.bishop
+                'n' -> Piece.Kind.knight
+                else -> Piece.Kind.queen
+            }
+            move = board.completePromotion(of = move, to = kind)
+        }
+        return move
+    }
+
+    /** Le coup attendu (départ et arrivée), ou n'importe quel coup qui MATE — comme les puzzles. */
+    fun judge(from: VSquare, to: VSquare, question: VQuestion): VAnswer {
+        val lan = from.notation + to.notation
+        val expected = (question.answer as? VAnswer.Move)?.lan ?: return VAnswer.Move(lan)
+        if (expected.take(4) == lan) return question.answer
+        val board = board(question)
+        if (board != null && play(lan, board) != null && board.state is Board.State.Checkmate) return question.answer
+        return VAnswer.Move(lan)
+    }
+
+    /** Le coup en SAN brute, joué depuis la position de la question. */
+    fun san(lan: String, question: VQuestion): String? = board(question)?.let { play(lan, it)?.san }
+
+    /** Les coups donnés par l'énoncé, en SAN brute. */
+    fun givenSans(question: VQuestion): List<String> {
+        val board = board(question, plies = 0) ?: return emptyList()
+        return question.solution.take(question.givenPlies).mapNotNull { play(it, board)?.san }
+    }
+
+    /** Le camp qui joue le coup à trouver (et d'où l'on regarde le plateau). */
+    fun sideToFind(question: VQuestion): Piece.Color = board(question)?.position?.sideToMove ?: Piece.Color.white
+
+    /** Positions de secours, quand la bibliothèque manque : des mats connus (les mêmes qu'iOS). */
+    val fallbacks = listOf(
+        "6k1/5ppp/8/8/8/8/5PPP/3R2K1 w - - 0 1" to listOf("d1d8"),
+        "r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4" to listOf("h5f7"),
+        "6k1/pp3ppp/8/8/8/8/PP3PPP/2R3K1 w - - 0 1" to listOf("c1c8"),
+    )
+
+    fun fallback(rng: Random): VQuestion {
+        val (fen, solution) = fallbacks.random(rng)
+        return question(VisualizationKind.memorizePlay, fen, solution)!!
     }
 }
