@@ -1429,7 +1429,6 @@
     <string name="ng_colour">Farbe</string>
     <!-- Visualisation (18/11/2026), mêmes mots qu'iOS -->
     <string name="route_visualization">Visualisierung</string>
-    <string name="vis_intro">Das Brett im Kopf sehen: endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du sie kannst.</string>
     <string name="vis_steps">Die Stufen</string>
     <string name="vis_series">Serie</string>
     <string name="vis_length">Länge</string>
@@ -1505,4 +1504,6 @@
     <string name="vis_timer_short">Kurz</string>
     <string name="vis_timer_medium">Mittel</string>
     <string name="vis_timer_long">Lang</string>
+    <string name="vis_hero_title">Das Brett im Kopf sehen</string>
+    <string name="vis_hero_detail">Endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du sie kannst.</string>
 </resources>

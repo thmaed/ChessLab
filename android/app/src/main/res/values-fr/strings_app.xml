@@ -1508,7 +1508,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="ng_colour">Couleur</string>
     <!-- Visualisation (18/11/2026), mêmes mots qu'iOS -->
     <string name="route_visualization">Visualisation</string>
-    <string name="vis_intro">Voir l\'échiquier dans sa tête : des exercices sans fin, des cases jusqu\'au calcul. Vos erreurs reviennent jusqu\'à ce qu\'elles soient sues.</string>
     <string name="vis_steps">Les marches</string>
     <string name="vis_series">Série</string>
     <string name="vis_length">Longueur</string>
@@ -1584,4 +1583,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="vis_timer_short">Court</string>
     <string name="vis_timer_medium">Moyen</string>
     <string name="vis_timer_long">Long</string>
+    <string name="vis_hero_title">Voir l\'échiquier dans sa tête</string>
+    <string name="vis_hero_detail">Des exercices sans fin, des cases jusqu\'au calcul. Vos erreurs reviennent jusqu\'à ce qu\'elles soient sues.</string>
 </resources>

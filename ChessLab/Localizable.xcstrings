@@ -58133,40 +58133,6 @@
         }
       }
     },
-    "Voir l'échiquier dans sa tête : des exercices sans fin, des cases jusqu'au calcul. Vos erreurs reviennent jusqu'à ce qu'elles soient sues.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "See the board in your head: endless exercises, from squares to calculation. Your mistakes come back until you know them."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Voir l'échiquier dans sa tête : des exercices sans fin, des cases jusqu'au calcul. Vos erreurs reviennent jusqu'à ce qu'elles soient sues."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ver el tablero en tu cabeza: ejercicios sin fin, de las casillas al cálculo. Tus errores vuelven hasta que los domines."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Das Brett im Kopf sehen: endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du sie kannst."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Vedere la scacchiera nella testa: esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non li sai."
-          }
-        }
-      }
-    },
     "Les marches": {
       "localizations": {
         "en": {
@@ -60373,6 +60339,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Lungo"
+          }
+        }
+      }
+    },
+    "Voir l'échiquier dans sa tête": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "See the board in your head"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voir l'échiquier dans sa tête"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ver el tablero en tu cabeza"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Brett im Kopf sehen"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vedere la scacchiera nella testa"
+          }
+        }
+      }
+    },
+    "Des exercices sans fin, des cases jusqu'au calcul. Vos erreurs reviennent jusqu'à ce qu'elles soient sues.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Endless exercises, from squares to calculation. Your mistakes come back until you know them."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Des exercices sans fin, des cases jusqu'au calcul. Vos erreurs reviennent jusqu'à ce qu'elles soient sues."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ejercicios sin fin, de las casillas al cálculo. Tus errores vuelven hasta que los domines."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du sie kannst."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non li sai."
           }
         }
       }

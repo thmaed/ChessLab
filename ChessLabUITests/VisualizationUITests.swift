@@ -21,6 +21,15 @@ final class VisualizationUITests: XCTestCase {
 
     private func pause(_ s: Double) { RunLoop.current.run(until: Date().addingTimeInterval(s)) }
 
+    /// Les réglages en pastilles (18/11/2026) : 0 = la première (« 10 questions », « Sans »).
+    private func tapPill(_ id: String, _ app: XCUIApplication) {
+        let pill = app.buttons[id]
+        XCTAssertTrue(pill.waitForExistence(timeout: 5), id)
+        NewGameSetupSteps.reveal(pill, in: app)
+        pill.tap()
+        XCTAssertTrue(pill.isSelected, id)
+    }
+
     /// Répond à la question affichée : le premier choix, ou le centre du plateau pour « Touchez… ».
     private func answerCurrent(_ app: XCUIApplication) {
         // Le fondu entre deux questions laisse un instant les boutons, DÉSACTIVÉS, de la précédente : on attend
@@ -56,8 +65,8 @@ final class VisualizationUITests: XCTestCase {
         XCTAssertTrue(lines.exists)
         if !lines.isSelected { lines.tap() }
         XCTAssertTrue(lines.isSelected)
-        NewGameSetupSteps.pick("10 questions", inMenu: "visualizationLengthMenu", app: app)
-        NewGameSetupSteps.pick("Sans", inMenu: "visualizationTimerMenu", app: app)
+        tapPill("visualizationLength_0", app)
+        tapPill("visualizationTimer_0", app)
         snapshot(app, "1-reglages")
         start.tap()
 
@@ -91,7 +100,7 @@ final class VisualizationUITests: XCTestCase {
         }
 
         // Chrono par question : sans réponse, le temps tranche.
-        NewGameSetupSteps.pick("Court", inMenu: "visualizationTimerMenu", app: app)
+        tapPill("visualizationTimer_1", app)
         start.tap()
         XCTAssertTrue(prompt.waitForExistence(timeout: 5))
         let timedOut = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Temps écoulé'")).firstMatch
@@ -109,7 +118,7 @@ final class VisualizationUITests: XCTestCase {
         app.buttons["visualizationBack"].tap()
         XCTAssertTrue(start.waitForExistence(timeout: 5), "le retour d'une série mène aux réglages de Visualisation")
         XCTAssertFalse(app.buttons["mode_play"].exists, "pas à l'accueil")
-        NewGameSetupSteps.pick("Sans", inMenu: "visualizationTimerMenu", app: app)
+        tapPill("visualizationTimer_0", app)
     }
 
     /// Lot 2 : les marches 3 et 4 seules ; chaque question met en scène son trajet ou sa position, en figurines.
@@ -138,8 +147,8 @@ final class VisualizationUITests: XCTestCase {
             if row.isSelected { row.tap() }
             XCTAssertFalse(row.isSelected, step)
         }
-        NewGameSetupSteps.pick("10 questions", inMenu: "visualizationLengthMenu", app: app)
-        NewGameSetupSteps.pick("Sans", inMenu: "visualizationTimerMenu", app: app)
+        tapPill("visualizationLength_0", app)
+        tapPill("visualizationTimer_0", app)
         snapshot(app, "5-reglages-lot2")
         start.tap()
 

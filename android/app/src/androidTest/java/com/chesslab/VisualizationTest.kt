@@ -62,8 +62,8 @@ class VisualizationTest {
         val lines = compose.onAllNodesWithTag("marche-lines").fetchSemanticsNodes().first()
         if (lines.config.getOrNull(SemanticsProperties.Selected) != true) compose.onNodeWithTag("marche-lines").performClick()
         compose.onNodeWithTag("marche-lines").assertIsSelected()
-        compose.pickFromMenu("menu-longueur", "longueur-ten")
-        compose.pickFromMenu("menu-chrono", "chrono-sans")
+        compose.onNodeWithTag("longueur-ten").performScrollTo().performClick()
+        compose.onNodeWithTag("chrono-sans").performScrollTo().performClick()
         compose.onNodeWithTag("visualisation-commencer").performClick()
 
         awaitTag("visualisation-question", 5_000)
@@ -93,7 +93,7 @@ class VisualizationTest {
         if (correct < 10) awaitTag("a-revoir", 3_000)
 
         // Chrono par question : sans réponse, le temps tranche.
-        compose.pickFromMenu("menu-chrono", "chrono-5")
+        compose.onNodeWithTag("chrono-5").performScrollTo().performClick()
         compose.onNodeWithTag("visualisation-commencer").performClick()
         compose.waitUntil(16_000) {
             compose.onAllNodesWithText("Temps écoulé", substring = true).fetchSemanticsNodes().isNotEmpty()
@@ -112,7 +112,7 @@ class VisualizationTest {
         assertTrue("pas à l'accueil", compose.onAllNodesWithTag("mode-visualization").fetchSemanticsNodes().isEmpty())
 
         // Réglages rendus tels qu'un joueur les trouverait.
-        compose.pickFromMenu("menu-chrono", "chrono-sans")
+        compose.onNodeWithTag("chrono-sans").performScrollTo().performClick()
     }
 
     /** Lot 2 : les marches 3 et 4 seules ; chaque question met en scène son trajet ou sa position. */
@@ -129,8 +129,8 @@ class VisualizationTest {
             if (selected("marche-$step")) compose.onNodeWithTag("marche-$step").performScrollTo().performClick()
         }
         assertTrue(selected("marche-pieces") && selected("marche-position") && !selected("marche-squares"))
-        compose.pickFromMenu("menu-longueur", "longueur-ten")
-        compose.pickFromMenu("menu-chrono", "chrono-sans")
+        compose.onNodeWithTag("longueur-ten").performScrollTo().performClick()
+        compose.onNodeWithTag("chrono-sans").performScrollTo().performClick()
         compose.onNodeWithTag("visualisation-commencer").performClick()
 
         for (index in 0 until 10) {

@@ -1511,7 +1511,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="ng_colour">Colour</string>
     <!-- Visualisation (18/11/2026), mêmes mots qu'iOS -->
     <string name="route_visualization">Visualization</string>
-    <string name="vis_intro">See the board in your head: endless exercises, from squares to calculation. Your mistakes come back until you know them.</string>
     <string name="vis_steps">The steps</string>
     <string name="vis_series">Series</string>
     <string name="vis_length">Length</string>
@@ -1587,4 +1586,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_timer_short">Short</string>
     <string name="vis_timer_medium">Medium</string>
     <string name="vis_timer_long">Long</string>
+    <string name="vis_hero_title">See the board in your head</string>
+    <string name="vis_hero_detail">Endless exercises, from squares to calculation. Your mistakes come back until you know them.</string>
 </resources>

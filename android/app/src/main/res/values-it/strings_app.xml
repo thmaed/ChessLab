@@ -1468,7 +1468,6 @@
     <string name="ng_colour">Colore</string>
     <!-- Visualisation (18/11/2026), mêmes mots qu'iOS -->
     <string name="route_visualization">Visualizzazione</string>
-    <string name="vis_intro">Vedere la scacchiera nella testa: esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non li sai.</string>
     <string name="vis_steps">I gradini</string>
     <string name="vis_series">Serie</string>
     <string name="vis_length">Durata</string>
@@ -1544,4 +1543,6 @@
     <string name="vis_timer_short">Breve</string>
     <string name="vis_timer_medium">Medio</string>
     <string name="vis_timer_long">Lungo</string>
+    <string name="vis_hero_title">Vedere la scacchiera nella testa</string>
+    <string name="vis_hero_detail">Esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non li sai.</string>
 </resources>

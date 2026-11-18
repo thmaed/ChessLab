@@ -1468,7 +1468,6 @@
     <string name="ng_colour">Color</string>
     <!-- Visualisation (18/11/2026), mêmes mots qu'iOS -->
     <string name="route_visualization">Visualización</string>
-    <string name="vis_intro">Ver el tablero en tu cabeza: ejercicios sin fin, de las casillas al cálculo. Tus errores vuelven hasta que los domines.</string>
     <string name="vis_steps">Los peldaños</string>
     <string name="vis_series">Serie</string>
     <string name="vis_length">Duración</string>
@@ -1544,4 +1543,6 @@
     <string name="vis_timer_short">Corto</string>
     <string name="vis_timer_medium">Medio</string>
     <string name="vis_timer_long">Largo</string>
+    <string name="vis_hero_title">Ver el tablero en tu cabeza</string>
+    <string name="vis_hero_detail">Ejercicios sin fin, de las casillas al cálculo. Tus errores vuelven hasta que los domines.</string>
 </resources>

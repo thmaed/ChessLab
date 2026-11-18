@@ -46,11 +46,27 @@ struct VisualizationView: View {
     private var setup: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                Text("Voir l'échiquier dans sa tête : des exercices sans fin, des cases jusqu'au calcul. Vos erreurs reviennent jusqu'à ce qu'elles soient sues.")
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                    .padding(.horizontal, 4)
+                // Plus de couleur (retour de l'utilisateur, 18/11/2026) : un en-tête aux teintes des marches.
+                HStack(spacing: 14) {
+                    IconBadge(systemImage: "eye", tint: Theme.teal, size: 46)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Voir l'échiquier dans sa tête")
+                            .font(.headline)
+                            .foregroundStyle(Theme.textPrimary)
+                        Text("Des exercices sans fin, des cases jusqu'au calcul. Vos erreurs reviennent jusqu'à ce qu'elles soient sues.")
+                            .font(.footnote)
+                            .foregroundStyle(Theme.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+                .padding(16)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background {
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(LinearGradient(colors: [Theme.teal.opacity(0.26), Theme.info.opacity(0.14), Theme.violet.opacity(0.10)],
+                                             startPoint: .topLeading, endPoint: .bottomTrailing))
+                }
+                .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(Theme.teal.opacity(0.3), lineWidth: 1))
 
                 // Retour de l'utilisateur (18/11/2026) : on ne voyait pas QUELLES marches la série jouerait — une ligne
                 // décochée restait aussi vive qu'une cochée. Décochée = éteinte ; cochée = teintée ; et une phrase dit
@@ -70,24 +86,14 @@ struct VisualizationView: View {
                     .accessibilityIdentifier("visualizationMix")
 
                 sectionTitle("Série")
+                // Des PASTILLES plutôt que des menus (retour de l'utilisateur, 18/11/2026 : « le sélecteur n'est pas
+                // joli ») : toutes les options se voient, le choix est une pastille pleine.
                 card {
-                    settingRow("number", "Longueur") {
-                        Menu {
-                            ForEach(VisualizationSettings.Length.allCases) { length in
-                                Button {
-                                    viewModel.settings.length = length
-                                } label: {
-                                    if viewModel.settings.length == length {
-                                        Label(LocalizedStringKey(length.title), systemImage: "checkmark")
-                                    } else {
-                                        Text(LocalizedStringKey(length.title))
-                                    }
-                                }
-                            }
-                        } label: {
-                            menuValue(LocalizedStringKey(viewModel.settings.length.title))
-                        }
-                        .accessibilityIdentifier("visualizationLengthMenu")
+                    pickerRow("number", "Longueur") {
+                        SegmentedPills(
+                            options: VisualizationSettings.Length.allCases.map { ($0, LocalizationController.string($0.title)) },
+                            selection: $viewModel.settings.length, identifier: "visualizationLength"
+                        )
                     }
                     rowDivider
                     settingRow("arrow.up.arrow.down", "Vu des Noirs") {
@@ -95,42 +101,26 @@ struct VisualizationView: View {
                             .accessibilityIdentifier("visualizationFromBlack")
                     }
                     rowDivider
-                    settingRow("timer", "Chrono par question") {
-                        Menu {
-                            Button { viewModel.settings.secondsPerQuestion = nil } label: {
-                                if viewModel.settings.secondsPerQuestion == nil { Label("Sans", systemImage: "checkmark") }
-                                else { Text("Sans") }
-                            }
-                            ForEach(VisualizationSettings.secondsChoices, id: \.self) { seconds in
-                                Button { viewModel.settings.secondsPerQuestion = seconds } label: {
-                                    if viewModel.settings.secondsPerQuestion == seconds {
-                                        Label(LocalizedStringKey(VisualizationSettings.timerTitle(seconds)), systemImage: "checkmark")
-                                    } else {
-                                        Text(LocalizedStringKey(VisualizationSettings.timerTitle(seconds)))
-                                    }
-                                }
-                            }
-                        } label: {
-                            if let seconds = viewModel.settings.secondsPerQuestion {
-                                menuValue(LocalizedStringKey(VisualizationSettings.timerTitle(seconds)), highlighted: true)
-                            } else {
-                                menuValue("Sans")
+                    pickerRow("timer", "Chrono par question") {
+                        VStack(alignment: .leading, spacing: 8) {
+                            SegmentedPills(
+                                options: [(Int?.none, LocalizationController.string("Sans"))]
+                                    + VisualizationSettings.secondsChoices.map {
+                                        (Int?.some($0), LocalizationController.string(VisualizationSettings.timerTitle($0)))
+                                    },
+                                selection: $viewModel.settings.secondsPerQuestion, identifier: "visualizationTimer"
+                            )
+                            if let base = viewModel.settings.secondsPerQuestion {
+                                Text(LocalizationController.string(
+                                    "Le chrono grandit avec la marche : %lld s pour une case, %lld s pour une position.",
+                                    base * VisualizationStep.squares.number, base * VisualizationStep.position.number))
+                                    .font(.caption)
+                                    .foregroundStyle(Theme.textSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                                    .accessibilityIdentifier("visualizationTimerScale")
                             }
                         }
-                        .accessibilityIdentifier("visualizationTimerMenu")
                     }
-                }
-
-                if let base = viewModel.settings.secondsPerQuestion {
-                    Label(LocalizationController.string(
-                        "Le chrono grandit avec la marche : %lld s pour une case, %lld s pour une position.",
-                        base * VisualizationStep.squares.number, base * VisualizationStep.position.number),
-                          systemImage: "timer")
-                        .font(.footnote)
-                        .foregroundStyle(Theme.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.horizontal, 4)
-                        .accessibilityIdentifier("visualizationTimerScale")
                 }
 
                 if viewModel.reviewCount > 0 {
@@ -168,7 +158,7 @@ struct VisualizationView: View {
                     .font(.headline.monospacedDigit())
                     .foregroundStyle(isOn ? Theme.background : Theme.textTertiary)
                     .frame(width: 30, height: 30)
-                    .background(Circle().fill(isOn ? Theme.accent : Color.white.opacity(0.06)))
+                    .background(Circle().fill(isOn ? step.tint : Color.white.opacity(0.06)))
                     .overlay(Circle().strokeBorder(isOn ? Color.clear : Theme.stroke, lineWidth: 1))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(LocalizedStringKey(step.title))
@@ -187,11 +177,11 @@ struct VisualizationView: View {
                 }
                 Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
-                    .foregroundStyle(isOn ? Theme.accent : Theme.textTertiary)
+                    .foregroundStyle(isOn ? step.tint : Theme.textTertiary)
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
-            .background(isOn ? Theme.accent.opacity(0.08) : Color.clear)
+            .background(isOn ? step.tint.opacity(0.12) : Color.clear)
             .contentShape(Rectangle())
         }
         .buttonStyle(.pressable)
@@ -226,7 +216,7 @@ struct VisualizationView: View {
     }
 
     private var header: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 10) {
             HStack {
                 if let remaining = viewModel.seriesRemaining {
                     Label(Self.clock(remaining), systemImage: "timer")
@@ -246,31 +236,71 @@ struct VisualizationView: View {
             }
             .font(.headline)
             .foregroundStyle(Theme.textPrimary)
-            if let fraction = viewModel.questionTimeFraction {
-                GeometryReader { geometry in
-                    Capsule().fill(Color.white.opacity(0.1))
-                        .overlay(alignment: .leading) {
-                            Capsule().fill(fraction < 0.3 ? Theme.danger : Theme.accent)
-                                .frame(width: geometry.size.width * fraction)
-                        }
-                }
-                .frame(height: 5)
-                .accessibilityHidden(true)
-            }
+            progressDots
         }
     }
 
+    /// Une pastille par question : verte juste, rouge ratée, blanche en cours, éteinte à venir.
+    private var progressDots: some View {
+        let answered = viewModel.answered
+        let total = viewModel.settings.length.questionCount ?? (answered.count + 1)
+        let shown = viewModel.settings.length.questionCount == nil ? Array(max(0, total - 20)..<total) : Array(0..<total)
+        return HStack(spacing: 4) {
+            ForEach(shown, id: \.self) { i in
+                Capsule()
+                    .fill(i < answered.count
+                          ? (answered[i].isCorrect ? Theme.accent : Theme.danger)
+                          : (i == answered.count ? Color.white.opacity(0.85) : Color.white.opacity(0.12)))
+                    .frame(maxWidth: viewModel.settings.length.questionCount == nil ? 10 : .infinity)
+                    .frame(height: 6)
+            }
+            if viewModel.settings.length.questionCount == nil { Spacer(minLength: 0) }
+        }
+        .animation(Theme.snappySpring, value: answered.count)
+        .accessibilityHidden(true)
+    }
+
     private func questionView(_ q: VisualizationQuestion) -> some View {
-        VStack(spacing: 18) {
-            if !sceneRows(q).isEmpty { scene(q) }
-            Text(prompt(q))
-                .font(.title2.weight(.semibold))
-                .foregroundStyle(Theme.textPrimary)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxWidth: .infinity)
-                .padding(.top, q.kind.usesBoard || !sceneRows(q).isEmpty ? 0 : 24)
-                .accessibilityIdentifier("visualizationPrompt")
+        let tint = q.kind.step.tint
+        let frame: Color = viewModel.feedback.map { $0.isCorrect ? Theme.accent : Theme.danger } ?? tint.opacity(0.35)
+        return VStack(spacing: 16) {
+            VStack(spacing: 14) {
+                Label(LocalizedStringKey(q.kind.title), systemImage: q.kind.step.symbol)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(tint)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(tint.opacity(0.16), in: Capsule())
+                if !sceneRows(q).isEmpty { scene(q) }
+                Text(prompt(q))
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                    .multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityIdentifier("visualizationPrompt")
+                if let fraction = viewModel.questionTimeFraction {
+                    GeometryReader { geometry in
+                        Capsule().fill(Color.white.opacity(0.1))
+                            .overlay(alignment: .leading) {
+                                Capsule().fill(fraction < 0.3 ? Theme.danger : tint)
+                                    .frame(width: geometry.size.width * fraction)
+                            }
+                    }
+                    .frame(height: 5)
+                    .accessibilityHidden(true)
+                }
+            }
+            .padding(18)
+            .frame(maxWidth: .infinity)
+            .background {
+                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                    .fill(LinearGradient(colors: [tint.opacity(0.24), Theme.surfaceElevated],
+                                         startPoint: .top, endPoint: .bottom))
+            }
+            .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .strokeBorder(frame, lineWidth: viewModel.feedback == nil ? 1 : 2))
+            .animation(Theme.snappySpring, value: viewModel.feedback)
 
             if q.kind.usesBoard { board(q) }
 
@@ -320,6 +350,7 @@ struct VisualizationView: View {
         let isAnswer = choice == q.answer
         let isGiven = feedback?.given == choice
         let tint: Color? = feedback == nil ? nil : (isAnswer ? Theme.accent : (isGiven ? Theme.danger : nil))
+        let stepTint = q.kind.step.tint
         return Button {
             viewModel.answer(choice)
         } label: {
@@ -341,10 +372,12 @@ struct VisualizationView: View {
             }
             .foregroundStyle(tint ?? Theme.textPrimary)
             .frame(maxWidth: .infinity, minHeight: 54)
-            .background((tint ?? Theme.surfaceElevated).opacity(tint == nil ? 1 : 0.16),
-                        in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(tint ?? Theme.stroke, lineWidth: tint == nil ? 1 : 2))
+            .background {
+                RoundedRectangle(cornerRadius: 16, style: .continuous).fill(Theme.surfaceElevated)
+                RoundedRectangle(cornerRadius: 16, style: .continuous).fill((tint ?? stepTint).opacity(tint == nil ? 0.10 : 0.18))
+            }
+            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(tint ?? stepTint.opacity(0.32), lineWidth: tint == nil ? 1 : 2))
         }
         .buttonStyle(.pressable)
         .disabled(feedback != nil)
@@ -376,29 +409,29 @@ struct VisualizationView: View {
     private var summary: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                VStack(spacing: 6) {
-                    Text(verbatim: "\(viewModel.correctCount) / \(viewModel.answered.count)")
-                        .font(.system(size: 48, weight: .bold).monospacedDigit())
-                        .foregroundStyle(Theme.textPrimary)
-                        .accessibilityIdentifier("visualizationSummaryScore")
-                    Text(viewModel.settings.length == .oneMinute ? "justes en une minute" : "justes")
-                        .font(.subheadline)
-                        .foregroundStyle(Theme.textSecondary)
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
+                scoreRing
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
 
                 if !viewModel.summaryByKind.isEmpty {
                     sectionTitle("Par exercice")
                     card {
                         ForEach(Array(viewModel.summaryByKind.enumerated()), id: \.offset) { index, row in
                             if index > 0 { rowDivider }
-                            HStack {
+                            HStack(spacing: 10) {
+                                Circle().fill(row.kind.step.tint).frame(width: 8, height: 8)
                                 Text(LocalizedStringKey(row.kind.title)).foregroundStyle(Theme.textPrimary)
                                 Spacer()
+                                Capsule().fill(Color.white.opacity(0.1))
+                                    .frame(width: 56, height: 6)
+                                    .overlay(alignment: .leading) {
+                                        Capsule().fill(row.kind.step.tint)
+                                            .frame(width: 56 * CGFloat(row.correct) / CGFloat(max(row.total, 1)), height: 6)
+                                    }
                                 Text(verbatim: "\(row.correct) / \(row.total)")
                                     .monospacedDigit()
                                     .foregroundStyle(row.correct == row.total ? Theme.accent : Theme.textSecondary)
+                                    .frame(minWidth: 44, alignment: .trailing)
                             }
                             .padding(.horizontal, 14)
                             .frame(minHeight: 46)
@@ -460,6 +493,30 @@ struct VisualizationView: View {
                     .accessibilityIdentifier("visualizationSettings")
             }
         }
+    }
+
+    /// Le score dans un anneau : la part de justes, en dégradé.
+    private var scoreRing: some View {
+        let total = viewModel.answered.count
+        let ratio = total == 0 ? 0 : Double(viewModel.correctCount) / Double(total)
+        return ZStack {
+            Circle().stroke(Color.white.opacity(0.08), lineWidth: 12)
+            Circle()
+                .trim(from: 0, to: ratio)
+                .stroke(AngularGradient(colors: [Theme.teal, Theme.accent, Theme.teal], center: .center),
+                        style: StrokeStyle(lineWidth: 12, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+            VStack(spacing: 2) {
+                Text(verbatim: "\(viewModel.correctCount) / \(total)")
+                    .font(.system(size: 38, weight: .bold).monospacedDigit())
+                    .foregroundStyle(Theme.textPrimary)
+                    .accessibilityIdentifier("visualizationSummaryScore")
+                Text(viewModel.settings.length == .oneMinute ? "justes en une minute" : "justes")
+                    .font(.subheadline)
+                    .foregroundStyle(Theme.textSecondary)
+            }
+        }
+        .frame(width: 180, height: 180)
     }
 
     // MARK: Les mots
@@ -555,10 +612,8 @@ struct VisualizationView: View {
         .lineLimit(1)
         .minimumScaleFactor(0.6)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(compact ? 0 : 16)
-        .background(compact ? Color.clear : Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(compact ? Color.clear : Theme.stroke, lineWidth: 1))
-        .padding(.top, compact ? 0 : 12)
+        .padding(compact ? 0 : 14)
+        .background(compact ? Color.clear : Color.black.opacity(0.22), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(Text(verbatim: sceneDescription(q)))
         .accessibilityIdentifier(compact ? "" : "visualizationScene")
@@ -687,6 +742,23 @@ struct VisualizationView: View {
         .frame(minHeight: 50)
     }
 
+    /// Un réglage à choix : son titre, et les pastilles dessous, sur toute la largeur.
+    private func pickerRow<Control: View>(_ symbol: String, _ title: LocalizedStringKey,
+                                          @ViewBuilder control: () -> Control) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 12) {
+                Image(systemName: symbol)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.accent)
+                    .frame(width: 26)
+                Text(title).font(.body).foregroundStyle(Theme.textPrimary)
+            }
+            control()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+    }
+
     private func menuValue(_ text: LocalizedStringKey, highlighted: Bool = false) -> some View {
         HStack(spacing: 4) {
             Text(text)
@@ -695,5 +767,67 @@ struct VisualizationView: View {
         .font(.subheadline.weight(.semibold))
         .foregroundStyle(highlighted ? Theme.accent : Theme.textSecondary)
         .lineLimit(1)
+    }
+}
+
+/// Un choix parmi quelques options, en pastilles : la choisie est pleine (accent), les autres en texte. Une seule
+/// pastille glisse de l'une à l'autre.
+struct SegmentedPills<Value: Hashable>: View {
+    let options: [(Value, String)]
+    @Binding var selection: Value
+    let identifier: String
+    @Namespace private var namespace
+
+    var body: some View {
+        HStack(spacing: 4) {
+            ForEach(Array(options.enumerated()), id: \.offset) { index, option in
+                let isOn = option.0 == selection
+                Button {
+                    withAnimation(Theme.snappySpring) { selection = option.0 }
+                } label: {
+                    Text(verbatim: option.1)
+                        .font(.subheadline.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                        .foregroundStyle(isOn ? Theme.background : Theme.textSecondary)
+                        .frame(maxWidth: .infinity, minHeight: 36)
+                        .background {
+                            if isOn {
+                                Capsule().fill(Theme.accent).matchedGeometryEffect(id: "pill", in: namespace)
+                            }
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel(Text(verbatim: option.1))
+                .accessibilityAddTraits(isOn ? [.isButton, .isSelected] : .isButton)
+                .accessibilityIdentifier("\(identifier)_\(index)")
+            }
+        }
+        .padding(3)
+        .background(Capsule().fill(Color.black.opacity(0.28)))
+        .overlay(Capsule().strokeBorder(Theme.stroke, lineWidth: 1))
+    }
+}
+
+/// La couleur et le symbole d'une marche (18/11/2026 : « colore un peu mieux l'interface ») — une seule à l'écran
+/// à la fois pendant la série.
+extension VisualizationStep {
+    var tint: Color {
+        switch self {
+        case .squares: Theme.teal
+        case .lines: Theme.info
+        case .pieces: Theme.violet
+        case .position: Theme.gold
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .squares: "square.grid.3x3"
+        case .lines: "line.diagonal"
+        case .pieces: "point.topleft.down.to.point.bottomright.curvepath"
+        case .position: "eye"
+        }
     }
 }

@@ -16,6 +16,10 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.GridOn
+import androidx.compose.material.icons.filled.Timeline
+import androidx.compose.material.icons.filled.Route
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
@@ -102,7 +106,23 @@ private fun Setup(model: VisualizationViewModel, ui: VisualizationUi) {
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(stringResource(R.string.vis_intro), fontSize = 15.sp, color = Palette.textSecondary, modifier = Modifier.padding(horizontal = 4.dp))
+            // Plus de couleur (18/11/2026, comme iOS) : un en-tête aux teintes des marches.
+            val heroShape = RoundedCornerShape(20.dp)
+            Row(
+                Modifier.fillMaxWidth().clip(heroShape)
+                    .background(androidx.compose.ui.graphics.Brush.linearGradient(listOf(
+                        Palette.teal.copy(alpha = 0.26f), Palette.info.copy(alpha = 0.14f), Palette.violet.copy(alpha = 0.10f))))
+                    .border(1.dp, Palette.teal.copy(alpha = 0.3f), heroShape)
+                    .padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
+            ) {
+                com.chesslab.ui.IconBadge(Icons.Default.Visibility, Palette.teal, size = 46.dp)
+                Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(stringResource(R.string.vis_hero_title), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
+                    Text(stringResource(R.string.vis_hero_detail), fontSize = 13.sp, color = Palette.textSecondary)
+                }
+            }
             // On ne voyait pas QUELLES marches la série jouerait (retour du 18/11/2026, comme iOS) : décochée = éteinte,
             // cochée = teintée, et une phrase dit ce que la série mélange.
             SectionTitle(stringResource(R.string.vis_series_steps))
@@ -119,14 +139,12 @@ private fun Setup(model: VisualizationViewModel, ui: VisualizationUi) {
             )
             SectionTitle(stringResource(R.string.vis_series))
             GameCard {
-                SettingRow(Icons.Default.Tag, stringResource(R.string.vis_length)) {
-                    MenuButton(stringResource(lengthLabel(settings.length)), highlighted = false, tag = "menu-longueur") { close ->
-                        VisualizationLength.entries.forEach { length ->
-                            CheckItem(stringResource(lengthLabel(length)), settings.length == length, "longueur-${length.name}") {
-                                model.updateSettings(settings.copy(length = length)); close()
-                            }
-                        }
-                    }
+                // Des PASTILLES plutôt que des menus (18/11/2026, comme iOS) : toutes les options se voient.
+                PickerRow(Icons.Default.Tag, stringResource(R.string.vis_length)) {
+                    SegmentedPills(
+                        VisualizationLength.entries.map { it to stringResource(lengthLabel(it)) }, settings.length,
+                        tag = { "longueur-${it.name}" },
+                    ) { model.updateSettings(settings.copy(length = it)) }
                 }
                 RowDivider()
                 SettingRow(Icons.Default.SwapVert, stringResource(R.string.vis_from_black)) {
@@ -137,31 +155,20 @@ private fun Setup(model: VisualizationViewModel, ui: VisualizationUi) {
                     )
                 }
                 RowDivider()
-                SettingRow(Icons.Default.Timer, stringResource(R.string.vis_timer)) {
-                    val seconds = settings.secondsPerQuestion
-                    MenuButton(
-                        if (seconds == null) stringResource(R.string.vis_timer_none) else stringResource(timerTitle(seconds)),
-                        highlighted = seconds != null, tag = "menu-chrono",
-                    ) { close ->
-                        CheckItem(stringResource(R.string.vis_timer_none), seconds == null, "chrono-sans") {
-                            model.updateSettings(settings.copy(secondsPerQuestion = null)); close()
-                        }
-                        VisualizationSettings.SECONDS_CHOICES.forEach { s ->
-                            CheckItem(stringResource(timerTitle(s)), seconds == s, "chrono-$s") {
-                                model.updateSettings(settings.copy(secondsPerQuestion = s)); close()
-                            }
-                        }
+                PickerRow(Icons.Default.Timer, stringResource(R.string.vis_timer)) {
+                    SegmentedPills(
+                        listOf<Pair<Int?, String>>(null to stringResource(R.string.vis_timer_none)) +
+                            VisualizationSettings.SECONDS_CHOICES.map { it to stringResource(timerTitle(it)) },
+                        settings.secondsPerQuestion,
+                        tag = { if (it == null) "chrono-sans" else "chrono-$it" },
+                    ) { model.updateSettings(settings.copy(secondsPerQuestion = it)) }
+                    settings.secondsPerQuestion?.let { base ->
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            stringResource(R.string.vis_timer_scale, base * VisualizationStep.squares.number, base * VisualizationStep.position.number),
+                            fontSize = 12.sp, color = Palette.textSecondary, modifier = Modifier.testTag("chrono-echelle"),
+                        )
                     }
-                }
-            }
-            settings.secondsPerQuestion?.let { base ->
-                Row(Modifier.padding(horizontal = 4.dp).testTag("chrono-echelle"), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Timer, null, tint = Palette.textSecondary, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        stringResource(R.string.vis_timer_scale, base * VisualizationStep.squares.number, base * VisualizationStep.position.number),
-                        fontSize = 13.sp, color = Palette.textSecondary,
-                    )
                 }
             }
             if (ui.reviewCount > 0) {
@@ -181,7 +188,7 @@ private fun StepRow(step: VisualizationStep, isOn: Boolean, accuracy: Int?, onTo
     Row(
         Modifier
             .fillMaxWidth()
-            .background(if (isOn) Palette.accent.copy(alpha = 0.08f) else Color.Transparent)
+            .background(if (isOn) step.tint.copy(alpha = 0.12f) else Color.Transparent)
             .clickable(onClick = onToggle)
             .semantics(mergeDescendants = true) { selected = isOn; role = Role.Checkbox }
             .padding(horizontal = 14.dp, vertical = 12.dp)
@@ -191,7 +198,7 @@ private fun StepRow(step: VisualizationStep, isOn: Boolean, accuracy: Int?, onTo
     ) {
         Box(
             Modifier.size(30.dp).clip(CircleShape)
-                .background(if (isOn) Palette.accent else Color.White.copy(alpha = 0.06f))
+                .background(if (isOn) step.tint else Color.White.copy(alpha = 0.06f))
                 .border(1.dp, if (isOn) Color.Transparent else Palette.stroke, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
@@ -207,7 +214,7 @@ private fun StepRow(step: VisualizationStep, isOn: Boolean, accuracy: Int?, onTo
         }
         Icon(
             if (isOn) Icons.Default.CheckCircle else Icons.Outlined.Circle, null,
-            tint = if (isOn) Palette.accent else Palette.textTertiary, modifier = Modifier.size(24.dp),
+            tint = if (isOn) step.tint else Palette.textTertiary, modifier = Modifier.size(24.dp),
         )
     }
 }
@@ -250,24 +257,10 @@ private fun Playing(model: VisualizationViewModel, ui: VisualizationUi) {
                 Text("${ui.correctCount}", fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent,
                     modifier = Modifier.testTag("visualisation-score"))
             }
-            model.questionTimeFraction()?.let { fraction ->
-                Box(Modifier.fillMaxWidth().height(5.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))) {
-                    Box(
-                        Modifier.fillMaxWidth(fraction).fillMaxHeight().clip(CircleShape)
-                            .background(if (fraction < 0.3f) Palette.danger else Palette.accent)
-                    )
-                }
-            }
+            ProgressDots(ui)
         }
         if (question != null) {
-            Scene(question)
-            Text(
-                prompt(question), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth()
-                    .padding(top = if (question.kind.usesBoard || question.pieces.isNotEmpty() || question.moves.isNotEmpty()) 0.dp else 24.dp)
-                    .testTag("visualisation-question"),
-            )
+            QuestionCard(model, ui, question)
             if (question.kind.usesBoard) QuestionBoard(model, ui, question)
             if (question.choices.isNotEmpty()) Choices(model, ui, question)
             FeedbackLine(ui, question)
@@ -316,7 +309,8 @@ private fun ChoiceButton(model: VisualizationViewModel, ui: VisualizationUi, que
         feedback.given == choice -> Palette.danger
         else -> null
     }
-    val shape = RoundedCornerShape(14.dp)
+    val shape = RoundedCornerShape(16.dp)
+    val stepTint = question.kind.step.tint
     val spoken = answerLabel(choice, question)
     val settings by com.chesslab.settings.SettingsStore.state.collectAsState()
     val theme = BoardTheme.all.firstOrNull { it.id == settings.boardThemeId } ?: BoardTheme.classic
@@ -325,8 +319,9 @@ private fun ChoiceButton(model: VisualizationViewModel, ui: VisualizationUi, que
             .fillMaxWidth()
             .heightIn(min = 54.dp)
             .clip(shape)
-            .background(tint?.copy(alpha = 0.16f) ?: Palette.surfaceElevated)
-            .border(if (tint == null) 1.dp else 2.dp, tint ?: Palette.stroke, shape)
+            .background(Palette.surfaceElevated)
+            .background((tint ?: stepTint).copy(alpha = if (tint == null) 0.10f else 0.18f))
+            .border(if (tint == null) 1.dp else 2.dp, tint ?: stepTint.copy(alpha = 0.32f), shape)
             .clickable(enabled = feedback == null) { model.answer(choice) }
             .semantics { contentDescription = spoken }
             .testTag("choix-${choice.tag}"),
@@ -377,24 +372,23 @@ private fun Summary(model: VisualizationViewModel, ui: VisualizationUi) {
             Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(bottom = 20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Column(Modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    "${ui.correctCount} / ${ui.answered.size}", fontSize = 48.sp, fontWeight = FontWeight.Bold,
-                    color = Palette.textPrimary, modifier = Modifier.testTag("visualisation-bilan"),
-                )
-                Text(
-                    stringResource(if (ui.settings.length == VisualizationLength.oneMinute) R.string.vis_correct_in_minute else R.string.vis_correct_plain),
-                    fontSize = 15.sp, color = Palette.textSecondary,
-                )
-            }
+            ScoreRing(ui)
             if (ui.summaryByKind.isNotEmpty()) {
                 SectionTitle(stringResource(R.string.vis_by_exercise))
                 GameCard {
                     ui.summaryByKind.forEachIndexed { index, (kind, correct, total) ->
                         if (index > 0) RowDivider()
-                        Row(Modifier.fillMaxWidth().heightIn(min = 46.dp).padding(horizontal = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Row(
+                            Modifier.fillMaxWidth().heightIn(min = 46.dp).padding(horizontal = 14.dp),
+                            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp),
+                        ) {
+                            Box(Modifier.size(8.dp).clip(CircleShape).background(kind.step.tint))
                             Text(stringResource(kindTitle(kind)), fontSize = 16.sp, color = Palette.textPrimary, modifier = Modifier.weight(1f))
-                            Text("$correct / $total", fontSize = 16.sp, color = if (correct == total) Palette.accent else Palette.textSecondary)
+                            Box(Modifier.width(56.dp).height(6.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))) {
+                                Box(Modifier.fillMaxWidth(correct.toFloat() / maxOf(total, 1)).fillMaxHeight().clip(CircleShape).background(kind.step.tint))
+                            }
+                            Text("$correct / $total", fontSize = 16.sp, color = if (correct == total) Palette.accent else Palette.textSecondary,
+                                textAlign = TextAlign.End, modifier = Modifier.widthIn(min = 44.dp))
                         }
                     }
                 }
@@ -547,8 +541,8 @@ private fun Scene(q: VQuestion, compact: Boolean = false) {
     Column(
         Modifier
             .fillMaxWidth()
-            .then(if (compact) Modifier else Modifier.padding(top = 12.dp).clip(RoundedCornerShape(14.dp))
-                .background(Palette.surfaceElevated).border(1.dp, Palette.stroke, RoundedCornerShape(14.dp)).padding(16.dp))
+            .then(if (compact) Modifier else Modifier.clip(RoundedCornerShape(14.dp))
+                .background(Color.Black.copy(alpha = 0.22f)).padding(14.dp))
             // L'étiquette de test AVANT l'effacement des sémantiques : placée après, elle était effacée avec le reste.
             .then(if (compact) Modifier else Modifier.testTag("visualisation-scene"))
             .clearAndSetSemantics { contentDescription = spoken },
@@ -637,6 +631,152 @@ private fun BottomButton(label: String, tag: String, onClick: () -> Unit) {
             contentAlignment = Alignment.Center,
         ) {
             Text(label, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Palette.background)
+        }
+    }
+}
+
+// MARK: Couleurs et briques (18/11/2026 : « colore un peu mieux l'interface », comme iOS)
+
+/** La couleur d'une marche — une seule à l'écran à la fois pendant la série. */
+val VisualizationStep.tint: Color
+    get() = when (this) {
+        VisualizationStep.squares -> Palette.teal
+        VisualizationStep.lines -> Palette.info
+        VisualizationStep.pieces -> Palette.violet
+        VisualizationStep.position -> Palette.gold
+    }
+
+private val VisualizationStep.icon: androidx.compose.ui.graphics.vector.ImageVector
+    get() = when (this) {
+        VisualizationStep.squares -> Icons.Default.GridOn
+        VisualizationStep.lines -> Icons.Default.Timeline
+        VisualizationStep.pieces -> Icons.Default.Route
+        VisualizationStep.position -> Icons.Default.Visibility
+    }
+
+/** La question dans une carte à la couleur de sa marche : l'exercice en étiquette, la scène, l'énoncé, le chrono. */
+@Composable
+private fun QuestionCard(model: VisualizationViewModel, ui: VisualizationUi, question: VQuestion) {
+    val tint = question.kind.step.tint
+    val feedback = ui.feedback
+    val frame = when {
+        feedback == null -> tint.copy(alpha = 0.35f)
+        feedback.isCorrect -> Palette.accent
+        else -> Palette.danger
+    }
+    val shape = RoundedCornerShape(22.dp)
+    Column(
+        Modifier.fillMaxWidth().clip(shape)
+            .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(tint.copy(alpha = 0.24f), Palette.surfaceElevated)))
+            .border(if (feedback == null) 1.dp else 2.dp, frame, shape)
+            .padding(18.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        Row(
+            Modifier.clip(CircleShape).background(tint.copy(alpha = 0.16f)).padding(horizontal = 10.dp, vertical = 5.dp),
+            verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+            Icon(question.kind.step.icon, null, tint = tint, modifier = Modifier.size(14.dp))
+            Text(stringResource(kindTitle(question.kind)), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = tint)
+        }
+        Scene(question)
+        Text(
+            prompt(question), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().testTag("visualisation-question"),
+        )
+        model.questionTimeFraction()?.let { fraction ->
+            Box(Modifier.fillMaxWidth().height(5.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))) {
+                Box(Modifier.fillMaxWidth(fraction).fillMaxHeight().clip(CircleShape).background(if (fraction < 0.3f) Palette.danger else tint))
+            }
+        }
+    }
+}
+
+/** Une pastille par question : verte juste, rouge ratée, blanche en cours, éteinte à venir. */
+@Composable
+private fun ProgressDots(ui: VisualizationUi) {
+    val count = ui.settings.length.questionCount
+    val total = count ?: (ui.answered.size + 1)
+    val shown = if (count == null) (maxOf(0, total - 20) until total).toList() else (0 until total).toList()
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        shown.forEach { i ->
+            val color = when {
+                i < ui.answered.size -> if (ui.answered[i].isCorrect) Palette.accent else Palette.danger
+                i == ui.answered.size -> Color.White.copy(alpha = 0.85f)
+                else -> Color.White.copy(alpha = 0.12f)
+            }
+            Box((if (count == null) Modifier.width(10.dp) else Modifier.weight(1f)).height(6.dp).clip(CircleShape).background(color))
+        }
+    }
+}
+
+/** Le score dans un anneau : la part de justes. */
+@Composable
+private fun ScoreRing(ui: VisualizationUi) {
+    val total = ui.answered.size
+    val ratio = if (total == 0) 0f else ui.correctCount.toFloat() / total
+    Box(Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
+        Box(Modifier.size(180.dp), contentAlignment = Alignment.Center) {
+            androidx.compose.foundation.Canvas(Modifier.fillMaxSize()) {
+                val stroke = 12.dp.toPx()
+                val inset = stroke / 2
+                val arcSize = androidx.compose.ui.geometry.Size(size.width - stroke, size.height - stroke)
+                val topLeft = androidx.compose.ui.geometry.Offset(inset, inset)
+                drawArc(Color.White.copy(alpha = 0.08f), 0f, 360f, false, topLeft, arcSize,
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(stroke))
+                drawArc(
+                    androidx.compose.ui.graphics.Brush.sweepGradient(listOf(Palette.teal, Palette.accent, Palette.teal)),
+                    -90f, 360f * ratio, false, topLeft, arcSize,
+                    style = androidx.compose.ui.graphics.drawscope.Stroke(stroke, cap = androidx.compose.ui.graphics.StrokeCap.Round),
+                )
+            }
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("${ui.correctCount} / $total", fontSize = 38.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary,
+                    modifier = Modifier.testTag("visualisation-bilan"))
+                Text(
+                    stringResource(if (ui.settings.length == VisualizationLength.oneMinute) R.string.vis_correct_in_minute else R.string.vis_correct_plain),
+                    fontSize = 15.sp, color = Palette.textSecondary,
+                )
+            }
+        }
+    }
+}
+
+/** Un réglage à choix : son titre, et les pastilles dessous, sur toute la largeur. */
+@Composable
+private fun PickerRow(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, content: @Composable ColumnScope.() -> Unit) {
+    Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 12.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            Icon(icon, null, tint = Palette.accent, modifier = Modifier.width(26.dp).size(20.dp))
+            Text(title, fontSize = 16.sp, color = Palette.textPrimary)
+        }
+        Spacer(Modifier.height(10.dp))
+        content()
+    }
+}
+
+/** Un choix parmi quelques options, en pastilles : la choisie est pleine (accent). Pendant de `SegmentedPills` (iOS). */
+@Composable
+private fun <T> SegmentedPills(options: List<Pair<T, String>>, selected: T, tag: (T) -> String, onSelect: (T) -> Unit) {
+    Row(
+        Modifier.fillMaxWidth().clip(CircleShape).background(Color.Black.copy(alpha = 0.28f))
+            .border(1.dp, Palette.stroke, CircleShape).padding(3.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        options.forEach { (value, label) ->
+            val isOn = value == selected
+            Box(
+                Modifier.weight(1f).heightIn(min = 36.dp).clip(CircleShape)
+                    .background(if (isOn) Palette.accent else Color.Transparent)
+                    .clickable { onSelect(value) }
+                    .semantics { this.selected = isOn; role = Role.RadioButton }
+                    .testTag(tag(value)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
+                    color = if (isOn) Palette.background else Palette.textSecondary)
+            }
         }
     }
 }
