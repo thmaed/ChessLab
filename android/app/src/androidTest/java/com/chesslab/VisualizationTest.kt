@@ -16,6 +16,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -98,14 +99,12 @@ class VisualizationTest {
         compose.waitUntil(16_000) {
             compose.onAllNodesWithText("Temps écoulé", substring = true).fetchSemanticsNodes().isNotEmpty()
         }
-        compose.onNodeWithTag("visualisation-arreter").performClick()
-        awaitTag("visualisation-bilan", 5_000)
-        assertTrue(text("visualisation-bilan").startsWith("0 /"))
+        // La question manquée compte : la série passe à la suivante, le score reste à zéro.
+        compose.waitUntil(5_000) { text("visualisation-progression") == "2 / 10" }
+        assertEquals("0", text("visualisation-score"))
+        assertTrue("plus de bouton Arrêter", compose.onAllNodesWithTag("visualisation-arreter").fetchSemanticsNodes().isEmpty())
 
         // Le retour (flèche de la barre), d'une série en cours, mène aux réglages du module, pas à l'accueil.
-        compose.onNodeWithTag("visualisation-reglages").performClick()
-        awaitTag("visualisation-commencer")
-        compose.onNodeWithTag("visualisation-commencer").performClick()
         awaitTag("visualisation-question", 5_000)
         compose.onNodeWithTag("retour").performClick()
         awaitTag("visualisation-commencer", 5_000)
@@ -178,11 +177,8 @@ class VisualizationTest {
             val next = "${index + 2} / 10"
             compose.waitUntil(10_000) { text("visualisation-progression") == next }
         }
-        compose.onNodeWithTag("visualisation-arreter").performClick()
-        awaitTag("visualisation-bilan", 5_000)
-
-        // Réglages rendus : la marche 1 seule.
-        compose.onNodeWithTag("visualisation-reglages").performClick()
+        // Réglages rendus : la marche 1 seule (la flèche de la barre ramène aux réglages).
+        compose.onNodeWithTag("retour").performClick()
         awaitTag("visualisation-commencer")
         if (!selected("marche-squares")) compose.onNodeWithTag("marche-squares").performScrollTo().performClick()
         if (selected("marche-calculation")) compose.onNodeWithTag("marche-calculation").performScrollTo().performClick()

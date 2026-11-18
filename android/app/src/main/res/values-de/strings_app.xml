@@ -1443,7 +1443,6 @@
     <string name="vis_len_ten">10 Fragen</string>
     <string name="vis_len_twenty">20 Fragen</string>
     <string name="vis_len_minute">1 Minute</string>
-    <string name="vis_stop">Stopp</string>
     <string name="vis_correct">Richtig</string>
     <string name="vis_timeout_answer">Zeit abgelaufen – die Antwort: %1$s</string>
     <string name="vis_wrong_answer">Nein – die Antwort: %1$s</string>

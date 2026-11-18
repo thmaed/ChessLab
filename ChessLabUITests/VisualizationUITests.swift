@@ -106,15 +106,14 @@ final class VisualizationUITests: XCTestCase {
         let timedOut = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Temps écoulé'")).firstMatch
         XCTAssertTrue(timedOut.waitForExistence(timeout: 16), "au bout de 5 s, le temps est écoulé")
         snapshot(app, "4-temps-ecoule")
-        app.buttons["visualizationStop"].tap()
-        XCTAssertTrue(score.waitForExistence(timeout: 5))
-        XCTAssertTrue(score.label.hasPrefix("0 /"), "la question manquée compte : \(score.label)")
+        // La question manquée compte : la série passe à la suivante, le score reste à zéro.
+        let deadline = Date().addingTimeInterval(5)
+        while Date() < deadline, progress.label != "2 / 10" { pause(0.2) }
+        XCTAssertEqual(progress.label, "2 / 10")
+        XCTAssertEqual(app.staticTexts["visualizationScore"].label, "0")
+        XCTAssertFalse(app.buttons["visualizationStop"].exists, "plus de bouton Arrêter : la flèche suffit")
 
         // Le retour, d'une série en cours, mène aux réglages du module, pas à l'accueil.
-        app.buttons["visualizationSettings"].tap()
-        XCTAssertTrue(start.waitForExistence(timeout: 5))
-        start.tap()
-        XCTAssertTrue(prompt.waitForExistence(timeout: 5))
         app.buttons["visualizationBack"].tap()
         XCTAssertTrue(start.waitForExistence(timeout: 5), "le retour d'une série mène aux réglages de Visualisation")
         XCTAssertFalse(app.buttons["mode_play"].exists, "pas à l'accueil")
@@ -226,12 +225,8 @@ final class VisualizationUITests: XCTestCase {
             while Date() < deadline, !score.exists, !(progress.exists && progress.label == next) { pause(0.2) }
             XCTAssertTrue(progress.label == next, "la série avance après le coup \(index + 1)")
         }
-        app.buttons["visualizationStop"].tap()
-        XCTAssertTrue(score.waitForExistence(timeout: 5))
-        snapshot(app, "11-bilan-calcul")
-
         // Réglages rendus : la marche 1 seule.
-        app.buttons["visualizationSettings"].tap()
+        app.buttons["visualizationBack"].tap()
         XCTAssertTrue(start.waitForExistence(timeout: 5))
         let squares = app.buttons["visualizationStep_squares"]
         NewGameSetupSteps.reveal(squares, in: app)

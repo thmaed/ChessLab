@@ -1525,7 +1525,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_len_ten">10 questions</string>
     <string name="vis_len_twenty">20 questions</string>
     <string name="vis_len_minute">1 minute</string>
-    <string name="vis_stop">Stop</string>
     <string name="vis_correct">Correct</string>
     <string name="vis_timeout_answer">Time\'s up — the answer: %1$s</string>
     <string name="vis_wrong_answer">No — the answer: %1$s</string>

@@ -226,11 +226,7 @@ private fun StepRow(step: VisualizationStep, isOn: Boolean, accuracy: Int?, onTo
 
 @Composable
 private fun Playing(model: VisualizationViewModel, ui: VisualizationUi) {
-    TopBarActions {
-        TextButton(onClick = { model.stop() }, modifier = Modifier.testTag("visualisation-arreter")) {
-            Text(stringResource(R.string.vis_stop), color = Palette.textPrimary)
-        }
-    }
+    // Pas de bouton « Arrêter » : la flèche de retour suffit (retour de l'utilisateur, 18/11/2026). Comme iOS.
     val question = ui.question
     // Marche 5 : le plateau est l'exercice — il prend toute la place libre (retour de l'utilisateur, 18/11), donc pas
     // de défilement : il mesure le plus grand carré qui tient sous l'énoncé. Comme iOS.

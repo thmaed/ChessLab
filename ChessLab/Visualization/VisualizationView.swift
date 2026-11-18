@@ -209,13 +209,8 @@ struct VisualizationView: View {
         .padding(.top, 8)
         .frame(maxWidth: calculating ? 820 : 560)
         .frame(maxWidth: .infinity)
+        // Pas de bouton « Arrêter » : la flèche de retour suffit (retour de l'utilisateur, 18/11/2026).
         .animation(Theme.gentle, value: viewModel.answered.count)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button("Arrêter") { viewModel.stop() }
-                    .accessibilityIdentifier("visualizationStop")
-            }
-        }
     }
 
     private var header: some View {

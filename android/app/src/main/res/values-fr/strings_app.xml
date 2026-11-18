@@ -1522,7 +1522,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="vis_len_ten">10 questions</string>
     <string name="vis_len_twenty">20 questions</string>
     <string name="vis_len_minute">1 minute</string>
-    <string name="vis_stop">Arrêter</string>
     <string name="vis_correct">Juste</string>
     <string name="vis_timeout_answer">Temps écoulé — la réponse : %1$s</string>
     <string name="vis_wrong_answer">Non — la réponse : %1$s</string>
