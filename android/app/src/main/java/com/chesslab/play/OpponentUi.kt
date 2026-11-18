@@ -52,6 +52,36 @@ fun tintColor(tint: OpponentTint): Color = when (tint) {
     OpponentTint.yellow -> Color(0.996f, 0.765f, 0.086f)
 }
 
+/**
+ * La teinte, éclaircie de blanc jusqu'à une luminance perçue d'au moins [MINIMUM_LUMINANCE] : jauges et surnom de
+ * « Nouvelle partie » (18/11/2026). Pendant d'`OpponentTintResolver.vivid` (iOS) — un bleu ou un violet, même à
+ * pleine luminosité, reste sombre à l'œil et se confond avec le fond de la carte ; on mélange donc au blanc juste
+ * ce qu'il faut, beaucoup pour le bleu et le violet, presque rien pour l'orange ou le jaune.
+ */
+fun vividTintColor(tint: OpponentTint): Color {
+    val (r, g, b) = vividComponents(tint)
+    return Color(r.toFloat(), g.toFloat(), b.toFloat())
+}
+
+const val MINIMUM_LUMINANCE = 0.42
+
+fun vividComponents(tint: OpponentTint): Triple<Double, Double, Double> {
+    val c = tintColor(tint)
+    val peak = maxOf(c.red, c.green, c.blue, 0.001f).toDouble()
+    val base = Triple(c.red / peak, c.green / peak, c.blue / peak)
+    fun mixed(t: Double) = Triple(
+        base.first + (1 - base.first) * t, base.second + (1 - base.second) * t, base.third + (1 - base.third) * t,
+    )
+    var t = 0.0
+    while (t < 1 && relativeLuminance(mixed(t)) < MINIMUM_LUMINANCE) t += 0.02
+    return mixed(minOf(t, 1.0))
+}
+
+fun relativeLuminance(c: Triple<Double, Double, Double>): Double {
+    fun linear(v: Double) = if (v <= 0.04045) v / 12.92 else Math.pow((v + 0.055) / 1.055, 2.4)
+    return 0.2126 * linear(c.first) + 0.7152 * linear(c.second) + 0.0722 * linear(c.third)
+}
+
 /** L'illustration d'un personnage. Elle porte déjà son disque de couleur. */
 @Composable
 fun OpponentAvatar(profile: OpponentProfile, size: androidx.compose.ui.unit.Dp = 44.dp, emphasized: Boolean = false) {

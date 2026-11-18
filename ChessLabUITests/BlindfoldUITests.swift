@@ -1,7 +1,7 @@
 import XCTest
 
-/// Partie À L'AVEUGLE de bout en bout (17/11/2026) : dans le réglage « Contre l'ordinateur », on allume « Jouer
-/// à l'aveugle » et on choisit « Tout caché » ; le plateau ne dit plus rien de ses pièces ; « Coup d'œil »
+/// Partie À L'AVEUGLE de bout en bout (17/11/2026) : dans le réglage « Contre l'ordinateur », on choisit « Tout
+/// caché » dans le menu « À l'aveugle » ; le plateau ne dit plus rien de ses pièces ; « Coup d'œil »
 /// se compte ; on joue en touchant départ puis arrivée ; un coup impossible le dit ; l'abandon fait
 /// réapparaître les pièces et le bilan dit comment la partie a été jouée.
 ///
@@ -35,21 +35,15 @@ final class BlindfoldUITests: XCTestCase {
         snapshot(app, "accueil")
         play.tap()
 
-        let toggle = app.switches["blindfoldToggle"]
-        XCTAssertTrue(toggle.waitForExistence(timeout: 10), "la section « À l'aveugle » doit être dans le réglage")
-        var tries = 0
-        while !toggle.isHittable, tries < 6 { app.swipeUp(); tries += 1 }
-        XCTAssertEqual(toggle.value as? String, "0", "« Nouvelle partie » ne s'ouvre jamais à l'aveugle")
-        XCTAssertFalse(app.buttons["blindfold-allHidden"].exists, "repliée : les niveaux n'apparaissent qu'allumée")
-        toggle.switches.firstMatch.tap()
-        let allHidden = app.buttons["blindfold-allHidden"]
-        // Cinquième tuile depuis les disques gris (18/11/2026) : la grille, paresseuse, ne la crée qu'en
-        // approchant — on fait défiler jusqu'à elle avant de l'attendre.
-        tries = 0
-        while !(allHidden.exists && allHidden.isHittable), tries < 6 { app.swipeUp(); tries += 1 }
-        XCTAssertTrue(allHidden.waitForExistence(timeout: 5))
-        allHidden.tap()
-        XCTAssertTrue(allHidden.isSelected)
+        // La ligne « À l'aveugle » de la carte « Partie » (refonte du 18/11/2026) : « Non » à l'ouverture, un menu.
+        XCTAssertTrue(app.buttons["blindfoldMenu"].waitForExistence(timeout: 10),
+                      "la ligne « À l'aveugle » doit être dans le réglage")
+        XCTAssertTrue(NewGameSetupSteps.value(ofMenu: "blindfoldMenu", app: app).contains("Non"),
+                      "« Nouvelle partie » ne s'ouvre jamais à l'aveugle")
+        XCTAssertFalse(app.switches["blindfoldVoice"].exists, "la voix n'apparaît qu'à l'aveugle")
+        NewGameSetupSteps.pick("Tout caché", inMenu: "blindfoldMenu", app: app)
+        XCTAssertTrue(NewGameSetupSteps.value(ofMenu: "blindfoldMenu", app: app).contains("Tout caché"))
+        XCTAssertTrue(app.switches["blindfoldVoice"].waitForExistence(timeout: 3), "la voix, à l'aveugle")
         snapshot(app, "reglage")
 
         app.buttons["Commencer"].tap()

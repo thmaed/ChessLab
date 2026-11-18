@@ -1,6 +1,8 @@
 package com.chesslab
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithTag
@@ -51,16 +53,19 @@ class EnglishTest {
     @Test fun theCharactersSpeakEnglish() {
         openMode("play")
         awaitText("Start", 120_000)
-        // Les réglages sont mémorisés : l'écran peut s'ouvrir sur Stockfish,
-        // et la galerie n'est alors pas là. On demande les personnages.
-        compose.onNodeWithTag("segment-0").performScrollTo().performClick()
-        // Le surnom, l'accroche et les étiquettes viennent tous du module
-        // maia : s'ils sont en français ici, c'est que ses ressources manquent.
-        compose.onNodeWithText("Tornado", substring = true).assertIsDisplayed()
-        compose.onNodeWithTag("adversaire-lea").performClick()
-        awaitText("Attack")
+        // Le surnom et la phrase viennent du module maia : s'ils sont en français ici, c'est que ses ressources
+        // manquent. Les jauges (18/11/2026) parlent aussi anglais.
+        compose.chooseOpponent("lea")
+        awaitText("Tornado")
+        // Les jauges se lisent d'un bloc au lecteur d'écran : « Attack, 5 out of 5 ».
+        compose.waitUntil(10_000) {
+            compose.onAllNodesWithContentDescription("Attack, 5 out of 5").fetchSemanticsNodes().isNotEmpty()
+        }
+        compose.onNodeWithContentDescription("Unpredictable", substring = true).assertExists()
+        // L'en-tête des aides en capitales ne doit pas se lire « AIDS ».
+        awaitText("Assists")
+        compose.onNodeWithTag("info-adversaire").performClick()
         awaitText("Castles on the opposite wing")
-        awaitText("Human scale")
     }
 
     @Test fun theCoursesSpeakEnglish() {

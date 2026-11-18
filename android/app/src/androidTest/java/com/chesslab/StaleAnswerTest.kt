@@ -49,8 +49,7 @@ class StaleAnswerTest {
         // temps, donc la fenêtre « pendant qu'il calcule » est assez large
         // pour être visée sans course. Les réglages étant mémorisés, l'écran
         // peut s'ouvrir sur Stockfish : on redemande les personnages.
-        compose.onNodeWithTag("segment-0").performScrollTo().performClick()
-        compose.onNodeWithTag("adversaire-lea").performScrollTo().performClick()
+        compose.chooseOpponent("lea")
         compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer")
 

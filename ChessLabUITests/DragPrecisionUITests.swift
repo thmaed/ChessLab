@@ -27,13 +27,7 @@ final class DragPrecisionUITests: XCTestCase {
         app.buttons["Contre l'ordinateur"].tap()
 
         if let fen {
-            let toggle = app.switches["useCustomFEN"]
-            XCTAssertTrue(toggle.waitForExistence(timeout: 5))
-            toggle.tap()
-            let field = app.textFields["customFENField"]
-            XCTAssertTrue(field.waitForExistence(timeout: 5))
-            field.tap()
-            field.typeText(fen)
+            NewGameSetupSteps.enterFEN(fen, app: app)
         }
 
         XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))

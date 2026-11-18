@@ -11530,3 +11530,32 @@ par défaut ; liste des coups visible.
   l'écran actuel ou par le menu de la refonte) et `BlindfoldUITests` (la tuile « Tout caché », cinquième, n'existe dans
   la grille paresseuse qu'après défilement) verts sur simulateur ; Android `BlindfoldTest` JVM (7) et instrumenté (2)
   verts sur le Galaxy A16.
+- **18/11, « Nouvelle partie » REFONDUE (iOS + Android)** (demandes du 17/11 : « plus joli, plus compact, moins old
+  style », puis « Stockfish à gauche, Maia par défaut », des indicateurs plutôt que le texte, et « l'interface Android
+  doit être comme sur iOS ») — trois blocs au lieu de sept sections :
+  - **l'adversaire en vedette** : une bande de portraits (Stockfish tout à gauche, Maia choisie à l'ouverture), le
+    nom et le surnom, un « i » pour la phrase du personnage, QUATRE JAUGES de 1 à 5 (Attaque, Solidité, Échanges,
+    Imprévisible) calculées de ses réglages (`OpponentTraits`, même table des deux côtés, testée), le niveau sur une
+    ligne ; halo de la couleur du personnage, couleur ÉCLAIRCIE pour les jauges et le surnom
+    (`OpponentTintResolver.vivid` / `vividTintColor` : mélange au blanc jusqu'à une luminance perçue de 0,42 — les
+    bleus et le violet se lisaient mal) ;
+  - **la carte « Partie »** : Couleur (trois disques), Cadence, À l'aveugle (+ Voix), Départ (initiale, FEN, éditeur,
+    scanner), Livre (Stockfish seul) — chaque ligne montre son choix et s'ouvre en menu ; « Personnalisé… » ouvre la
+    feuille des minutes et de l'incrément ;
+  - **les aides** en quatre pastilles d'une seule couleur, les trois qui montreraient la position éteintes à l'aveugle.
+  - Personnages retouchés pour que les sosies se distinguent : Milo néglige roque et développement (≠ Lena), Pablo
+    oublie davantage son roi et fonce (≠ Sacha). Toucher Stockfish retrouve SA force (et non le niveau du personnage
+    affiché juste avant). Titre en ligne ; visite de découverte (étapes 2 et 4) réécrite ; en anglais, « Aides » se
+    dit « Assists » (en capitales, « AIDS » se lisait mal) et « Départ » « Position » (« Start » doublait
+    « Commencer »). Mots en cinq langues.
+  - Tests : iOS `OpponentTraitsTests` (table complète), unitaires ; tests d'interface passés au nouvel écran par
+    `NewGameSetupSteps` (menus, bande de portraits) : `TimeLimitUITests`, `ChessLabUITests`, `TapToMoveUITests`,
+    `DragPrecisionUITests`, `MaiaOpponentUITests`, `BlindfoldUITests`, `BlindfoldGreyUITests`, `ResumeGameUITests`
+    verts sur simulateur, `IPadSheetSizingUITests` sur iPad mini. Android : `OpponentTraitsTest` (même table), JVM
+    704/704 ; instrumentés passés au nouvel écran par `SetupSteps.kt` — `PlaySetupTest`, `BlindfoldTest`,
+    `EnglishTest`, `StaleAnswerTest`, `DiscoveryTourTest`, `ParityPassTest`, `AppTest#aCharacterPlaysWithMaia`,
+    `StolenMoveTest` verts sur le Galaxy A16. Sur le Galaxy, les captures ont montré deux écarts corrigés : la
+    colonne de jauges de droite perdait son cinquième point (largeur fixe, police agrandie), et le curseur Material
+    (barre verticale, point d'arrêt) ne ressemblait pas à celui d'iOS → poignée blanche en pastille, piste fine.
+  - Hors refonte, relevé en passant : `EnglishTest#theHomeSpeaksEnglish` échoue sur le Galaxy (« Winning endings »
+    pas encore composé dans la grille paresseuse de l'accueil) — l'accueil n'est pas touché par ce chantier.

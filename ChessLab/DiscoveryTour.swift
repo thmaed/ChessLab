@@ -265,7 +265,7 @@ final class DiscoveryTourController {
             DiscoveryStep(
                 id: 2, section: "Jouer", spot: .strengthSlider, destination: .newGame,
                 title: "Choisissez votre adversaire",
-                body: "Un personnage d'abord : chacun a son style, son répertoire et son caractère, et joue comme un vrai joueur de son niveau — gaffes comprises. Ou Stockfish, au curseur, avec le nom du palier à côté. Le piège du premier soir : jouer à pleine force."
+                body: "Stockfish tout à gauche, puis les personnages, Maia en tête : chacun joue comme un vrai joueur de son niveau — gaffes comprises. Ses quatre jauges disent son style, le « i » raconte son caractère. Le piège du premier soir : jouer à pleine force."
             ),
             DiscoveryStep(
                 id: 3, section: "Jouer", spot: .aidToggles, destination: .newGame,
@@ -275,7 +275,7 @@ final class DiscoveryTourController {
             DiscoveryStep(
                 id: 4, section: "Jouer", spot: .timeLimit, destination: .newGame,
                 title: "Une pendule, si vous voulez",
-                body: "« Limite de temps » est éteinte par défaut : allumez-la pour choisir une cadence (Bullet, Blitz, Rapide…). L'app retient votre dernier choix."
+                body: "« Cadence » est sur « Sans limite » par défaut : touchez-la pour choisir une pendule (Bullet, Blitz, Rapide…) ou la régler vous-même. L'app retient votre dernier choix."
             ),
             // Sans cible : « Commencer » vit dans un ToolbarItem UIKit,
             // hors de portée des préférences d'ancrage — et les contrôles

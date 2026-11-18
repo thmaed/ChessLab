@@ -1226,8 +1226,32 @@
       "localizations": {
         "fr": {
           "stringUnit": {
-            "state": "new",
-            "value": "%1$@ « %2$@ »"
+            "state": "translated",
+            "value": "%@ « %@ »"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ “%@”"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ «%@»"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ „%@“"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ «%@»"
           }
         }
       }
@@ -3722,7 +3746,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Aids"
+            "value": "Assists"
           }
         },
         "fr": {
@@ -15264,7 +15288,7 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Start"
+            "value": "Position"
           }
         },
         "fr": {
@@ -42754,40 +42778,6 @@
         }
       }
     },
-    "Un personnage d'abord : chacun a son style, son répertoire et son caractère, et joue comme un vrai joueur de son niveau — gaffes comprises. Ou Stockfish, au curseur, avec le nom du palier à côté. Le piège du premier soir : jouer à pleine force.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "A character first: each has a style, a repertoire and a temper, and plays like a real player of their level — blunders included. Or Stockfish, by slider, with the tier's name next to it. The first-night trap: playing at full strength."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Un personnage d'abord : chacun a son style, son répertoire et son caractère, et joue comme un vrai joueur de son niveau — gaffes comprises. Ou Stockfish, au curseur, avec le nom du palier à côté. Le piège du premier soir : jouer à pleine force."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Primero un personaje: cada uno tiene su estilo, su repertorio y su carácter, y juega como un jugador real de su nivel, errores incluidos. O Stockfish, con el deslizador, con el nombre del nivel al lado. La trampa de la primera noche: jugar a plena fuerza."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Zuerst ein Charakter: Jeder hat seinen Stil, sein Repertoire und sein Temperament und spielt wie ein echter Spieler seiner Stärke – Patzer inklusive. Oder Stockfish, per Regler, mit dem Namen der Stufe daneben. Die Falle des ersten Abends: mit voller Stärke spielen."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Prima un personaggio: ognuno ha il suo stile, il suo repertorio e il suo carattere, e gioca come un vero giocatore del suo livello — errori compresi. Oppure Stockfish, con il cursore e il nome del livello accanto. La trappola della prima sera: giocare a piena forza."
-          }
-        }
-      }
-    },
     "Un pion ne peut pas être sur la 1re ou la 8e rangée.": {
       "localizations": {
         "en": {
@@ -47487,7 +47477,40 @@
         }
       }
     },
-    "« %@ »": {},
+    "« %@ »": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@”"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ »"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@»"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„%@“"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@»"
+          }
+        }
+      }
+    },
     "À mon niveau": {
       "localizations": {
         "en": {
@@ -50941,34 +50964,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Un orologio, se vuoi"
-          }
-        }
-      }
-    },
-    "« Limite de temps » est éteinte par défaut : allumez-la pour choisir une cadence (Bullet, Blitz, Rapide…). L'app retient votre dernier choix.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "“Time limit” is off by default: switch it on to pick a time control (Bullet, Blitz, Rapid…). The app remembers your last choice."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "«Límite de tiempo» está desactivado por defecto: actívalo para elegir un ritmo (Bullet, Blitz, Rápida…). La app recuerda tu última elección."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "„Zeitlimit“ ist standardmäßig aus: Schalte es ein, um eine Bedenkzeit zu wählen (Bullet, Blitz, Schnellschach…). Die App merkt sich deine letzte Wahl."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "«Limite di tempo» è spento per impostazione predefinita: accendilo per scegliere una cadenza (Bullet, Blitz, Rapid…). L'app ricorda la tua ultima scelta."
           }
         }
       }
@@ -57488,6 +57483,618 @@
           "stringUnit": {
             "state": "translated",
             "value": "Un disco grigio al posto di ogni pezzo: sai che la casa è occupata, ma non da chi né da quale pezzo."
+          }
+        }
+      }
+    },
+    "Activé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activé"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activado"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktiviert"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attivato"
+          }
+        }
+      }
+    },
+    "Désactivé": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Off"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Désactivé"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Desactivado"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deaktiviert"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Disattivato"
+          }
+        }
+      }
+    },
+    "Alerte de gaffe": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Blunder alert"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Alerte de gaffe"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aviso de error"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Patzer-Warnung"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avviso di svista"
+          }
+        }
+      }
+    },
+    "Aucun": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ninguno"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keins"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessuno"
+          }
+        }
+      }
+    },
+    "Il peut abandonner": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "May resign"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il peut abandonner"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Puede rendirse"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Darf aufgeben"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Può abbandonare"
+          }
+        }
+      }
+    },
+    "Initiale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Standard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Initiale"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inicial"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grundstellung"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniziale"
+          }
+        }
+      }
+    },
+    "Le moteur, bridé à la force que vous choisissez.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The engine, held back to the strength you choose."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le moteur, bridé à la force que vous choisissez."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El motor, limitado a la fuerza que elijas."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Engine, gedrosselt auf die Stärke, die du wählst."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il motore, limitato alla forza che scegli."
+          }
+        }
+      }
+    },
+    "Livre": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Book"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Livre"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libro"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Buch"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Libro"
+          }
+        }
+      }
+    },
+    "Personnalisée": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personnalisée"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizada"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eigene"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizzata"
+          }
+        }
+      }
+    },
+    "Personnalisé…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personnalisé…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizado…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eigene…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personalizzato…"
+          }
+        }
+      }
+    },
+    "Position initiale": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Starting position"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Position initiale"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posición inicial"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Grundstellung"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Posizione iniziale"
+          }
+        }
+      }
+    },
+    "Saisir une FEN": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a FEN"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisir une FEN"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introducir un FEN"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "FEN eingeben"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci una FEN"
+          }
+        }
+      }
+    },
+    "Solidité": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solidity"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solidité"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solidez"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solidität"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Solidità"
+          }
+        }
+      }
+    },
+    "Voix": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voix"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voz"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stimme"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voce"
+          }
+        }
+      }
+    },
+    "%lld sur 5": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld out of 5"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld sur 5"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld de 5"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld von 5"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld su 5"
+          }
+        }
+      }
+    },
+    "À propos de %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About %@"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À propos de %@"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Acerca de %@"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Über %@"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Informazioni su %@"
+          }
+        }
+      }
+    },
+    "Stockfish tout à gauche, puis les personnages, Maia en tête : chacun joue comme un vrai joueur de son niveau — gaffes comprises. Ses quatre jauges disent son style, le « i » raconte son caractère. Le piège du premier soir : jouer à pleine force.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockfish tout à gauche, puis les personnages, Maia en tête : chacun joue comme un vrai joueur de son niveau — gaffes comprises. Ses quatre jauges disent son style, le « i » raconte son caractère. Le piège du premier soir : jouer à pleine force."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockfish on the far left, then the characters, Maia first: each plays like a real player of their level — blunders included. Four gauges show their style; the “i” tells their temper. The first-night trap: playing at full strength."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockfish a la izquierda del todo, luego los personajes, Maia la primera: cada uno juega como un jugador real de su nivel, errores incluidos. Sus cuatro indicadores muestran su estilo; la «i» cuenta su carácter. La trampa de la primera noche: jugar a plena fuerza."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockfish ganz links, dann die Charaktere, Maia vorneweg: Jeder spielt wie ein echter Spieler seiner Stärke – Patzer inklusive. Vier Balken zeigen seinen Stil, das „i“ verrät sein Temperament. Die Falle des ersten Abends: mit voller Stärke spielen."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stockfish tutto a sinistra, poi i personaggi, Maia per prima: ognuno gioca come un vero giocatore del suo livello — errori compresi. I quattro indicatori mostrano il suo stile, la «i» racconta il suo carattere. La trappola della prima sera: giocare a piena forza."
+          }
+        }
+      }
+    },
+    "« Cadence » est sur « Sans limite » par défaut : touchez-la pour choisir une pendule (Bullet, Blitz, Rapide…) ou la régler vous-même. L'app retient votre dernier choix.": {
+      "localizations": {
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« Cadence » est sur « Sans limite » par défaut : touchez-la pour choisir une pendule (Bullet, Blitz, Rapide…) ou la régler vous-même. L'app retient votre dernier choix."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Time control” is set to “No limit” by default: tap it to pick a clock (Bullet, Blitz, Rapid…) or set your own. The app remembers your last choice."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«Ritmo» está en «Sin límite» por defecto: tócalo para elegir un reloj (Bullet, Blitz, Rápida…) o ajustarlo tú mismo. La app recuerda tu última elección."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "„Bedenkzeit“ steht standardmäßig auf „Unbegrenzt“: Tippe darauf, um eine Uhr zu wählen (Bullet, Blitz, Schnellschach…) oder sie selbst einzustellen. Die App merkt sich deine letzte Wahl."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«Cadenza» è su «Senza limite» per impostazione predefinita: toccala per scegliere un orologio (Bullet, Blitz, Rapid…) o regolarlo tu. L'app ricorda la tua ultima scelta."
           }
         }
       }

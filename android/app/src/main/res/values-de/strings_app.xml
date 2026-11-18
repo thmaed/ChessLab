@@ -779,7 +779,7 @@
     <string name="discovery_0_title">Hier fängt alles an</string>
     <string name="discovery_0_body">Diese Kachel startet eine Partie gegen neun Charaktere, die von Maia-3 gespielt werden – einem Netz, das wie ein Mensch spielt – oder gegen Stockfish. Die anderen warten bis zum Ende der Tour – zwei Minuten, versprochen.</string>
     <string name="discovery_1_title">Wähle deinen Gegner</string>
-    <string name="discovery_1_body">Zuerst ein Charakter: Jeder hat seinen Stil, sein Repertoire und sein Temperament und spielt wie ein echter Spieler seiner Stärke – Patzer inklusive. Oder Stockfish, per Regler, mit dem Namen der Stufe daneben. Die Falle des ersten Abends: mit voller Stärke spielen.</string>
+    <string name="discovery_1_body">Stockfish ganz links, dann die Charaktere, Maia vorneweg: Jeder spielt wie ein echter Spieler seiner Stärke – Patzer inklusive. Vier Balken zeigen seinen Stil, das „i“ verrät sein Temperament. Die Falle des ersten Abends: mit voller Stärke spielen.</string>
     <string name="discovery_2_title">Hilfen wählt man vorher</string>
     <string name="discovery_2_body">Hinweispfeile und Bewertungsbalken schaltest du hier ein, vor der Partie. Oft entdeckt man sie zu spät.</string>
     <string name="discovery_3_title">Während der Partie</string>
@@ -1178,7 +1178,7 @@
     <string name="discovery_daily_title">Dein Tagestraining</string>
     <string name="discovery_daily_body">Jeden Tag stellt die App zusammen, was zu wiederholen ist: fällige Eröffnungsstellungen, verfehlte Puzzles, ein Endspiel. Schließe das Tagestraining ab, um deine Serie von Tagen zu verlängern.</string>
     <string name="discovery_timelimit_title">Eine Uhr, wenn du magst</string>
-    <string name="discovery_timelimit_body">„Zeitlimit“ ist standardmäßig aus: Schalte es ein, um eine Bedenkzeit zu wählen (Bullet, Blitz, Schnellschach…). Die App merkt sich deine letzte Wahl.</string>
+    <string name="discovery_timelimit_body">„Bedenkzeit“ steht standardmäßig auf „Unbegrenzt“: Tippe darauf, um eine Uhr zu wählen (Bullet, Blitz, Schnellschach…) oder sie selbst einzustellen. Die App merkt sich deine letzte Wahl.</string>
     <string name="discovery_wn_0_title">Ein zuverlässigerer Scanner</string>
     <string name="discovery_wn_0_body">Der Scanner liest Screenshots, Bildschirmfotos und echte Bretter besser. Aus Fotos sendet „Teilen › ChessLab“ das Bild direkt an den Scanner.</string>
     <string name="discovery_wn_1_title">Deine Puzzle-Sammlungen</string>
@@ -1401,4 +1401,30 @@
         <item quantity="one">%1$d Blick</item>
         <item quantity="other">%1$d Blicke</item>
     </plurals>
+    <!-- Nouvelle partie refondue (17-18/11/2026), mêmes mots qu'iOS -->
+    <string name="ng_attack">Angriff</string>
+    <string name="ng_solidity">Solidität</string>
+    <string name="ng_trades">Abtausch</string>
+    <string name="ng_unpredictable">Unberechenbar</string>
+    <string name="ng_gauge_value">%1$d von 5</string>
+    <string name="ng_about">Über %1$s</string>
+    <string name="ng_stockfish_blurb">Die Engine, gedrosselt auf die Stärke, die du wählst.</string>
+    <string name="ng_voice">Stimme</string>
+    <string name="ng_start_initial">Grundstellung</string>
+    <string name="ng_start_custom">Eigene</string>
+    <string name="ng_start_position">Grundstellung</string>
+    <string name="ng_start_enter_fen">FEN eingeben</string>
+    <string name="ng_custom_clock">Eigene…</string>
+    <string name="ng_book">Buch</string>
+    <string name="ng_book_none">Keins</string>
+    <string name="ng_aid_hint">Hinweis</string>
+    <string name="ng_aid_blunder">Patzer-Warnung</string>
+    <string name="ng_aid_resign">Darf aufgeben</string>
+    <string name="ng_ok">OK</string>
+    <string name="ng_aids_header">Hilfen</string>
+    <string name="ng_cadence">Bedenkzeit</string>
+    <string name="ng_blind">Blind</string>
+    <string name="ng_start">Start</string>
+    <string name="ng_level">Stufe</string>
+    <string name="ng_colour">Farbe</string>
 </resources>

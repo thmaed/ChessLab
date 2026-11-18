@@ -148,6 +148,9 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         style: StyleProfile(weights: [
             .sacrifice: 0.7, .check: 0.3, .towardKing: 0.4, .capture: 0.1, .materialGain: -0.3,
             .equalTrade: -0.5, .queenTrade: -0.8, .tension: 0.3,
+            // « Cherche le mat avant d'avoir développé sa dame » (17/11/2026) : il néglige le roque et le
+            // développement — ce qui le distingue de Lena, attaquante elle aussi mais qui roque.
+            .castle: -0.3, .development: -0.3,
         ], strength: 1.2),
         temperament: Temperament(pace: 0.6, resignThresholdCp: -1200, resignPatience: 4, offersDraws: false,
                                  temperatureWhenLosing: 1.3),
@@ -225,7 +228,11 @@ struct OpponentProfile: Identifiable, Hashable, Sendable {
         temperature: 1.5, topP: 1.0, recommendedLevels: 800...1400,
         safetyNet: SafetyNetPolicy(mateFromLevel: 1400, endgameFromLevel: nil),
         style: StyleProfile(weights: [
-            .check: 0.4, .capture: 0.3, .towardKing: 0.3, .castle: -0.4, .development: -0.1,
+            // « Joue vite, attaque tout, oublie son roi » (retouché le 17/11/2026) : il oublie davantage son roi
+            // (roque, développement, pions faibles) et fonce davantage sur celui d'en face — ce qui le distingue de
+            // Sacha, dont la marque est le piège plutôt que l'assaut.
+            .check: 0.4, .capture: 0.3, .towardKing: 0.5, .pawnStorm: 0.3,
+            .castle: -0.8, .development: -0.4, .weakPawn: 0.25,
         ], strength: 0.6),
         temperament: Temperament(pace: 0.4, resignThresholdCp: -1500, resignPatience: 5, offersDraws: false),
         bookID: "pablo"

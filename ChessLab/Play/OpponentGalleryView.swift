@@ -94,6 +94,40 @@ struct OpponentAvatar: View {
 /// Les couleurs des disques des illustrations, mesurées sur la planche
 /// (06/09/2026) : la teinte de chaque personnage EST celle de son avatar.
 enum OpponentTintResolver {
+    /// La même teinte, rendue LISIBLE sur le fond sombre de l'app : les couleurs de disque les plus foncées (bleu
+    /// de Maia, bleu profond de Nils, violet de Nadia, ardoise de Yuri) disparaissaient dans les jauges et le
+    /// surnom (retour de l'utilisateur, 17/11/2026). Luminosité relevée, saturation un peu tempérée.
+    static func vivid(_ tint: OpponentTint) -> Color {
+        let rgb = vividComponents(tint)
+        return Color(red: rgb.red, green: rgb.green, blue: rgb.blue)
+    }
+
+    /// La teinte, éclaircie de blanc jusqu'à une luminance perçue d'au moins `minimumLuminance`.
+    /// Plafonner la saturation ne suffisait pas : un bleu ou un violet, même à pleine
+    /// luminosité, reste sombre à l'œil (le bleu ne pèse que 7 % de la luminance) et se
+    /// confond avec le fond marine de la carte. On mélange donc au blanc juste ce qu'il
+    /// faut — beaucoup pour le bleu et le violet, presque rien pour l'orange ou le jaune.
+    static let minimumLuminance: Double = 0.42
+
+    static func vividComponents(_ tint: OpponentTint) -> (red: Double, green: Double, blue: Double) {
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        guard UIColor(color(tint)).getRed(&r, green: &g, blue: &b, alpha: &a) else { return (1, 1, 1) }
+        // D'abord la teinte à pleine luminosité (sa saturation conservée).
+        let peak = max(r, g, b, 0.001)
+        let base = (red: Double(r / peak), green: Double(g / peak), blue: Double(b / peak))
+        func mixed(_ t: Double) -> (red: Double, green: Double, blue: Double) {
+            (base.red + (1 - base.red) * t, base.green + (1 - base.green) * t, base.blue + (1 - base.blue) * t)
+        }
+        var t = 0.0
+        while t < 1, relativeLuminance(mixed(t)) < minimumLuminance { t += 0.02 }
+        return mixed(min(t, 1))
+    }
+
+    static func relativeLuminance(_ c: (red: Double, green: Double, blue: Double)) -> Double {
+        func linear(_ v: Double) -> Double { v <= 0.04045 ? v / 12.92 : pow((v + 0.055) / 1.055, 2.4) }
+        return 0.2126 * linear(c.red) + 0.7152 * linear(c.green) + 0.0722 * linear(c.blue)
+    }
+
     static func color(_ tint: OpponentTint) -> Color {
         switch tint {
         case .maiaBlue: Color(red: 0.200, green: 0.435, blue: 0.675)

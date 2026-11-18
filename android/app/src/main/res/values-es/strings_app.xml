@@ -798,7 +798,7 @@
     <string name="discovery_0_title">Todo empieza aquí</string>
     <string name="discovery_0_body">Esta tarjeta inicia una partida contra nueve personajes interpretados por Maia-3, una red que juega como un humano, o contra Stockfish. Los demás esperarán al final de la visita: dos minutos, lo prometemos.</string>
     <string name="discovery_1_title">Elige a tu adversario</string>
-    <string name="discovery_1_body">Primero un personaje: cada uno tiene su estilo, su repertorio y su carácter, y juega como un jugador real de su nivel, errores incluidos. O Stockfish, con el deslizador, con el nombre del nivel al lado. La trampa de la primera noche: jugar a plena fuerza.</string>
+    <string name="discovery_1_body">Stockfish a la izquierda del todo, luego los personajes, Maia la primera: cada uno juega como un jugador real de su nivel, errores incluidos. Sus cuatro indicadores muestran su estilo; la «i» cuenta su carácter. La trampa de la primera noche: jugar a plena fuerza.</string>
     <string name="discovery_2_title">Las ayudas se eligen antes</string>
     <string name="discovery_2_body">Las flechas de pista y la barra de evaluación se activan aquí, antes de la partida. A menudo se descubren demasiado tarde.</string>
     <string name="discovery_3_title">Durante la partida</string>
@@ -1210,7 +1210,7 @@
     <string name="discovery_daily_title">Tu sesión diaria</string>
     <string name="discovery_daily_body">Cada día, la app prepara lo que hay que repasar: posiciones de apertura pendientes, puzles fallados y un final. Termínala para alargar tu racha de días.</string>
     <string name="discovery_timelimit_title">Un reloj, si quieres</string>
-    <string name="discovery_timelimit_body">«Límite de tiempo» está desactivado por defecto: actívalo para elegir un ritmo (Bullet, Blitz, Rápida…). La app recuerda tu última elección.</string>
+    <string name="discovery_timelimit_body">«Ritmo» está en «Sin límite» por defecto: tócalo para elegir un reloj (Bullet, Blitz, Rápida…) o ajustarlo tú mismo. La app recuerda tu última elección.</string>
     <string name="discovery_wn_0_title">Un escáner más fiable</string>
     <string name="discovery_wn_0_body">El escáner lee mejor las capturas de pantalla, las fotos de pantalla y los tableros reales. Desde Fotos, «Compartir › ChessLab» envía la imagen directamente al escáner.</string>
     <string name="discovery_wn_1_title">Tus colecciones de puzles</string>
@@ -1440,4 +1440,30 @@
         <item quantity="one">%1$d vistazo</item>
         <item quantity="other">%1$d vistazos</item>
     </plurals>
+    <!-- Nouvelle partie refondue (17-18/11/2026), mêmes mots qu'iOS -->
+    <string name="ng_attack">Ataque</string>
+    <string name="ng_solidity">Solidez</string>
+    <string name="ng_trades">Cambios</string>
+    <string name="ng_unpredictable">Impredecible</string>
+    <string name="ng_gauge_value">%1$d de 5</string>
+    <string name="ng_about">Acerca de %1$s</string>
+    <string name="ng_stockfish_blurb">El motor, limitado a la fuerza que elijas.</string>
+    <string name="ng_voice">Voz</string>
+    <string name="ng_start_initial">Inicial</string>
+    <string name="ng_start_custom">Personalizada</string>
+    <string name="ng_start_position">Posición inicial</string>
+    <string name="ng_start_enter_fen">Introducir un FEN</string>
+    <string name="ng_custom_clock">Personalizado…</string>
+    <string name="ng_book">Libro</string>
+    <string name="ng_book_none">Ninguno</string>
+    <string name="ng_aid_hint">Pista</string>
+    <string name="ng_aid_blunder">Aviso de error</string>
+    <string name="ng_aid_resign">Puede rendirse</string>
+    <string name="ng_ok">OK</string>
+    <string name="ng_aids_header">Ayudas</string>
+    <string name="ng_cadence">Ritmo</string>
+    <string name="ng_blind">A ciegas</string>
+    <string name="ng_start">Salida</string>
+    <string name="ng_level">Nivel</string>
+    <string name="ng_colour">Color</string>
 </resources>

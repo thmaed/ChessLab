@@ -1,8 +1,7 @@
 import XCTest
 
-/// Le chemin utilisateur du mode « Personnage » : la bascule sur l'écran
-/// Nouvelle partie, la carte de Camille, et son prénom à la place
-/// d'« Ordinateur » sur l'écran de jeu.
+/// Le chemin utilisateur du mode « Personnage » : la bande de portraits de l'écran Nouvelle partie (Stockfish tout
+/// à gauche, Maia à l'ouverture), la carte de Milo, et son prénom à la place d'« Ordinateur » sur l'écran de jeu.
 @MainActor
 final class MaiaOpponentUITests: XCTestCase {
 
@@ -24,44 +23,21 @@ final class MaiaOpponentUITests: XCTestCase {
             RunLoop.current.run(until: Date().addingTimeInterval(0.6))
         }
 
-        // Le mode Stockfish (à droite, plus le défaut) : capture pour relecture.
-        let stockfish = app.segmentedControls.buttons["Stockfish"].exists ? app.segmentedControls.buttons["Stockfish"] : app.buttons["Stockfish"]
-        XCTAssertTrue(stockfish.waitForExistence(timeout: 5), "la bascule « Stockfish » doit exister")
-        var stockfishScrolls = 0
-        while !stockfish.isHittable, stockfishScrolls < 6 { app.swipeDown(); RunLoop.current.run(until: Date().addingTimeInterval(0.3)); stockfishScrolls += 1 }
-        stockfish.tap()
-        RunLoop.current.run(until: Date().addingTimeInterval(0.5))
+        // La bande de portraits (refonte du 18/11/2026) : Stockfish tout à gauche, Maia choisie à l'ouverture.
+        let maiaCard = app.descendants(matching: .any).matching(identifier: "opponentCard_maia").firstMatch
+        XCTAssertTrue(maiaCard.waitForExistence(timeout: 5), "Maia est l'adversaire à l'ouverture")
+        XCTAssertTrue(maiaCard.label.contains("Maia"))
+
+        NewGameSetupSteps.chooseOpponent("stockfish", app: app)
+        let stockfishCard = app.descendants(matching: .any).matching(identifier: "opponentCard_stockfish").firstMatch
+        XCTAssertTrue(stockfishCard.waitForExistence(timeout: 3), "toucher Stockfish le choisit")
         let eloShot = XCUIScreen.main.screenshot().pngRepresentation
         let eloPath = NSTemporaryDirectory() + "elo-mode.png"
         try? eloShot.write(to: URL(fileURLWithPath: eloPath))
         print("UIDBG elo screenshot:", eloPath)
 
-        // La bascule Niveau Elo / Personnage : un contrôle segmenté.
-        let segment = app.segmentedControls.buttons["Personnage"].exists
-            ? app.segmentedControls.buttons["Personnage"]
-            : app.buttons["Personnage"]
-        XCTAssertTrue(segment.waitForExistence(timeout: 5), "la bascule « Personnage » doit exister")
-        // L'écran peut être défilé (visite guidée, mémoire de position) : on
-        // ramène la bascule à l'écran avant de la toucher, sinon le tap tombe
-        // hors de la fenêtre et « Niveau Elo » reste sélectionné.
-        var scrolls = 0
-        while !segment.isHittable, scrolls < 6 {
-            app.swipeDown()
-            RunLoop.current.run(until: Date().addingTimeInterval(0.3))
-            scrolls += 1
-        }
-        segment.tap()
-        RunLoop.current.run(until: Date().addingTimeInterval(0.5))
-        let card = app.descendants(matching: .any).matching(identifier: "opponentCard_maia").firstMatch
-        XCTAssertTrue(card.waitForExistence(timeout: 3), "la carte de Maia doit apparaître")
-        XCTAssertTrue(card.label.contains("Maia"))
-        // La galerie : choisir Milo, la carte suit.
-        let theo = app.descendants(matching: .any).matching(identifier: "opponentTile_theo").firstMatch
-        XCTAssertTrue(theo.waitForExistence(timeout: 3), "la vignette de Milo doit exister")
-        var tries = 0
-        while !theo.isHittable, tries < 4 { app.swipeUp(); RunLoop.current.run(until: Date().addingTimeInterval(0.3)); tries += 1 }
-        theo.tap()
-        RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+        // Un personnage plus loin dans la bande : Milo ; sa carte suit.
+        NewGameSetupSteps.chooseOpponent("theo", app: app)
         let theoCard = app.descendants(matching: .any).matching(identifier: "opponentCard_theo").firstMatch
         XCTAssertTrue(theoCard.waitForExistence(timeout: 3), "la carte de Milo doit apparaître")
         let shot = XCUIScreen.main.screenshot().pngRepresentation

@@ -104,14 +104,7 @@ final class TapToCaptureUITests: XCTestCase {
         // Position choisie pour qu'une capture soit disponible AU PREMIER coup
         // des Blancs : e4 prend d5. Sans FEN imposée, la réponse du moteur
         // rendrait le test non déterministe.
-        let toggle = app.switches["useCustomFEN"]
-        XCTAssertTrue(toggle.waitForExistence(timeout: 5))
-        toggle.tap()
-
-        let field = app.textFields["customFENField"]
-        XCTAssertTrue(field.waitForExistence(timeout: 5))
-        field.tap()
-        field.typeText("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2")
+        NewGameSetupSteps.enterFEN("rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2", app: app)
 
         app.buttons["Commencer"].tap()
         XCTAssertTrue(app.otherElements["square_e4"].waitForExistence(timeout: 15))

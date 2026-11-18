@@ -31,28 +31,7 @@ final class BlindfoldGreyUITests: XCTestCase {
         XCTAssertTrue(play.waitForExistence(timeout: 20))
         play.tap()
 
-        // Deux écrans possibles tant que la refonte de « Nouvelle partie » n'est pas tranchée : le menu
-        // « À l'aveugle » (refonte), ou l'interrupteur et ses tuiles (écran actuel).
-        let menu = app.buttons["blindfoldMenu"]
-        let toggle = app.switches["blindfoldToggle"]
-        XCTAssertTrue(menu.waitForExistence(timeout: 10) || toggle.exists)
-        var tries = 0
-        if menu.exists {
-            while !menu.isHittable, tries < 6 { app.swipeUp(); tries += 1 }
-            menu.tap()
-            let grey = app.buttons["Cases occupées en gris"]
-            XCTAssertTrue(grey.waitForExistence(timeout: 5), "le niveau gris doit être dans le menu")
-            grey.tap()
-        } else {
-            while !toggle.isHittable, tries < 6 { app.swipeUp(); tries += 1 }
-            toggle.switches.firstMatch.tap()
-            let tile = app.buttons["blindfold-occupiedSquaresGrey"]
-            XCTAssertTrue(tile.waitForExistence(timeout: 5), "le niveau gris doit avoir sa tuile")
-            tries = 0
-            while !tile.isHittable, tries < 6 { app.swipeUp(); tries += 1 }
-            tile.tap()
-            XCTAssertTrue(tile.isSelected)
-        }
+        NewGameSetupSteps.pick("Cases occupées en gris", inMenu: "blindfoldMenu", app: app)
         snapshot(app, "reglage-gris")
 
         app.buttons["Commencer"].tap()

@@ -106,7 +106,13 @@ struct BlindfoldTests {
         #expect(game.blindSummaryLine.contains("2"))
         // Relâché tout de suite : l'échiquier reste affiché 0,7 s au moins, puis se recache.
         #expect(game.boardMask == .none, "un coup d'œil bref reste visible")
-        try await Task.sleep(for: .milliseconds(900))
+        // Puis il se recache. Dans la suite complète, d'autres tests tiennent longtemps le fil principal : la tâche
+        // de fin du coup d'œil n'y passait pas avant une échéance comptée à l'HORLOGE (vu le 18/11/2026, test
+        // suspendu 3 minutes). On compte donc des PASSAGES : chaque attente rend la main, et la tâche finit par
+        // passer.
+        for _ in 0..<100 where game.boardMask != .hidden([.black]) {
+            try await Task.sleep(for: .milliseconds(100))
+        }
         #expect(game.boardMask == .hidden([.black]))
     }
 

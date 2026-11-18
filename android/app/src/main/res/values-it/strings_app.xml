@@ -798,7 +798,7 @@
     <string name="discovery_0_title">Tutto parte da qui</string>
     <string name="discovery_0_body">Questo riquadro avvia una partita contro nove personaggi interpretati da Maia-3, una rete che gioca come un umano — oppure contro Stockfish. Gli altri aspetteranno la fine del tour — due minuti, promesso.</string>
     <string name="discovery_1_title">Scegli il tuo avversario</string>
-    <string name="discovery_1_body">Prima un personaggio: ognuno ha il suo stile, il suo repertorio e il suo carattere, e gioca come un vero giocatore del suo livello — errori compresi. Oppure Stockfish, con il cursore e il nome del livello accanto. La trappola della prima sera: giocare a piena forza.</string>
+    <string name="discovery_1_body">Stockfish tutto a sinistra, poi i personaggi, Maia per prima: ognuno gioca come un vero giocatore del suo livello — errori compresi. I quattro indicatori mostrano il suo stile, la «i» racconta il suo carattere. La trappola della prima sera: giocare a piena forza.</string>
     <string name="discovery_2_title">Gli aiuti si scelgono prima</string>
     <string name="discovery_2_body">Le frecce del suggerimento e la barra di valutazione si attivano qui, prima della partita. Spesso le si scopre troppo tardi.</string>
     <string name="discovery_3_title">Durante la partita</string>
@@ -1210,7 +1210,7 @@
     <string name="discovery_daily_title">La tua sessione del giorno</string>
     <string name="discovery_daily_body">Ogni giorno l\'app prepara ciò che c\'è da ripassare: posizioni d\'apertura in scadenza, puzzle sbagliati, un finale. Completala per allungare la tua serie di giorni.</string>
     <string name="discovery_timelimit_title">Un orologio, se vuoi</string>
-    <string name="discovery_timelimit_body">«Limite di tempo» è spento per impostazione predefinita: accendilo per scegliere una cadenza (Bullet, Blitz, Rapid…). L\'app ricorda la tua ultima scelta.</string>
+    <string name="discovery_timelimit_body">«Cadenza» è su «Senza limite» per impostazione predefinita: toccala per scegliere un orologio (Bullet, Blitz, Rapid…) o regolarlo tu. L\'app ricorda la tua ultima scelta.</string>
     <string name="discovery_wn_0_title">Uno scanner più affidabile</string>
     <string name="discovery_wn_0_body">Lo scanner legge meglio screenshot, foto di schermo e scacchiere reali. Da Foto, «Condividi › ChessLab» invia l\'immagine direttamente allo scanner.</string>
     <string name="discovery_wn_1_title">Le tue raccolte di puzzle</string>
@@ -1440,4 +1440,30 @@
         <item quantity="one">%1$d sbirciata</item>
         <item quantity="other">%1$d sbirciate</item>
     </plurals>
+    <!-- Nouvelle partie refondue (17-18/11/2026), mêmes mots qu'iOS -->
+    <string name="ng_attack">Attacco</string>
+    <string name="ng_solidity">Solidità</string>
+    <string name="ng_trades">Scambi</string>
+    <string name="ng_unpredictable">Imprevedibile</string>
+    <string name="ng_gauge_value">%1$d su 5</string>
+    <string name="ng_about">Informazioni su %1$s</string>
+    <string name="ng_stockfish_blurb">Il motore, limitato alla forza che scegli.</string>
+    <string name="ng_voice">Voce</string>
+    <string name="ng_start_initial">Iniziale</string>
+    <string name="ng_start_custom">Personalizzata</string>
+    <string name="ng_start_position">Posizione iniziale</string>
+    <string name="ng_start_enter_fen">Inserisci una FEN</string>
+    <string name="ng_custom_clock">Personalizzato…</string>
+    <string name="ng_book">Libro</string>
+    <string name="ng_book_none">Nessuno</string>
+    <string name="ng_aid_hint">Suggerimento</string>
+    <string name="ng_aid_blunder">Avviso di svista</string>
+    <string name="ng_aid_resign">Può abbandonare</string>
+    <string name="ng_ok">OK</string>
+    <string name="ng_aids_header">Aiuti</string>
+    <string name="ng_cadence">Cadenza</string>
+    <string name="ng_blind">Alla cieca</string>
+    <string name="ng_start">Partenza</string>
+    <string name="ng_level">Livello</string>
+    <string name="ng_colour">Colore</string>
 </resources>

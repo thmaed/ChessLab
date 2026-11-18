@@ -531,7 +531,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="setup_level">Level</string>
     <string name="setup_strength">Strength</string>
     <string name="setup_time">Time control</string>
-    <string name="setup_aids">Aids</string>
+    <string name="setup_aids">Assists</string>
     <string name="setup_hints">Hint (arrows on the best moves)</string>
     <string name="setup_eval_bar">Evaluation bar</string>
     <string name="setup_engine_resigns">The computer may resign when lost</string>
@@ -838,7 +838,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="discovery_0_title">It all starts here</string>
     <string name="discovery_0_body">This tile starts a game against nine characters played by Maia-3, a network that plays like a human — or against Stockfish. The others will wait until the tour is over — two minutes, promise.</string>
     <string name="discovery_1_title">Choose your opponent</string>
-    <string name="discovery_1_body">A character first: each has a style, a repertoire and a temper, and plays like a real player of their level — blunders included. Or Stockfish, by slider, with the tier\'s name next to it. The first-night trap: playing at full strength.</string>
+    <string name="discovery_1_body">Stockfish on the far left, then the characters, Maia first: each plays like a real player of their level — blunders included. Four gauges show their style; the “i” tells their temper. The first-night trap: playing at full strength.</string>
     <string name="discovery_2_title">Aids are chosen beforehand</string>
     <string name="discovery_2_body">Hint arrows and the evaluation bar are enabled here, before the game. They are often discovered too late.</string>
     <string name="discovery_3_title">During the game</string>
@@ -942,7 +942,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="preset_advanced">Advanced / Expert</string>
     <string name="preset_national_master">National master</string>
     <string name="preset_grandmaster">Grandmaster</string>
-    <string name="setup_start_section">Start</string>
+    <string name="setup_start_section">Position</string>
     <string name="setup_custom_position">Custom position (FEN)</string>
     <string name="setup_invalid_fen">Invalid FEN</string>
     <string name="setup_open_editor">Open the editor</string>
@@ -1251,7 +1251,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="discovery_daily_title">Your daily session</string>
     <string name="discovery_daily_body">Every day the app prepares what to review: opening positions due, missed puzzles, an endgame. Finish it to extend your streak of days.</string>
     <string name="discovery_timelimit_title">A clock, if you like</string>
-    <string name="discovery_timelimit_body">“Time limit” is off by default: switch it on to pick a time control (Bullet, Blitz, Rapid…). The app remembers your last choice.</string>
+    <string name="discovery_timelimit_body">“Time control” is set to “No limit” by default: tap it to pick a clock (Bullet, Blitz, Rapid…) or set your own. The app remembers your last choice.</string>
     <string name="discovery_wn_0_title">A more reliable scanner</string>
     <string name="discovery_wn_0_body">The scanner reads screenshots, photos of a screen and real boards better. From Photos, “Share › ChessLab” sends the image straight to the scanner.</string>
     <string name="discovery_wn_1_title">Your puzzle collections</string>
@@ -1483,4 +1483,30 @@ The statistics above are recomputed after each one: they are volatile at first a
         <item quantity="one">%1$d peek</item>
         <item quantity="other">%1$d peeks</item>
     </plurals>
+    <!-- Nouvelle partie refondue (17-18/11/2026), mêmes mots qu'iOS -->
+    <string name="ng_attack">Attack</string>
+    <string name="ng_solidity">Solidity</string>
+    <string name="ng_trades">Trades</string>
+    <string name="ng_unpredictable">Unpredictable</string>
+    <string name="ng_gauge_value">%1$d out of 5</string>
+    <string name="ng_about">About %1$s</string>
+    <string name="ng_stockfish_blurb">The engine, held back to the strength you choose.</string>
+    <string name="ng_voice">Voice</string>
+    <string name="ng_start_initial">Standard</string>
+    <string name="ng_start_custom">Custom</string>
+    <string name="ng_start_position">Starting position</string>
+    <string name="ng_start_enter_fen">Enter a FEN</string>
+    <string name="ng_custom_clock">Custom…</string>
+    <string name="ng_book">Book</string>
+    <string name="ng_book_none">None</string>
+    <string name="ng_aid_hint">Hint</string>
+    <string name="ng_aid_blunder">Blunder alert</string>
+    <string name="ng_aid_resign">May resign</string>
+    <string name="ng_ok">OK</string>
+    <string name="ng_aids_header">Assists</string>
+    <string name="ng_cadence">Time control</string>
+    <string name="ng_blind">Blindfold</string>
+    <string name="ng_start">Position</string>
+    <string name="ng_level">Level</string>
+    <string name="ng_colour">Colour</string>
 </resources>

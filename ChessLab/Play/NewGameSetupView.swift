@@ -26,6 +26,8 @@ struct NewGameSetupView: View {
 
     @State private var colorChoice: PlayerColorChoice
     @State private var eloSlider: Double
+    /// La force de Stockfish, gardée pendant qu'on regarde les personnages (voir `init`).
+    @State private var stockfishElo: Double
     @State private var opponentMode: OpponentMode
     @State private var opponentProfileID: String
     @State private var timeLimit: TimeLimitSelection
@@ -41,11 +43,13 @@ struct NewGameSetupView: View {
     @State private var fenError = false
     @State private var showPositionEditor = false
     @State private var showScanner = false
+    /// La cadence « Personnalisé… » s'ouvre en feuille (minutes, incrément).
+    @State private var showCustomClock = false
+    /// La phrase du personnage, dans une bulle.
+    @State private var showTagline = false
     /// Partie à l'aveugle (17/11/2026).
     @State private var blindfold: BlindfoldLevel
     @State private var blindfoldVoice: Bool
-    /// Le niveau retenu quand on éteint puis rallume l'interrupteur.
-    @State private var lastBlindfoldChoice: BlindfoldLevel?
 
     /// Préremplit tous les champs avec les derniers réglages utilisés
     /// (ou les défauts à la première partie). Pas d'effet de bord ici :
@@ -71,23 +75,22 @@ struct NewGameSetupView: View {
         } ?? saved.resolvedColorChoice)
         _useCustomFEN = State(initialValue: initialFEN != nil)
         _fenText = State(initialValue: initialFEN ?? "")
-        // Bornage : un réglage mémorisé par une version antérieure peut valoir
-        // 2800 ou 3190, désormais hors plage. Un `Slider` avec une valeur hors
-        // bornes se colle à la butée sans le dire, et l'utilisateur lancerait
-        // une partie à une force qu'il ne voit nulle part.
-        _eloSlider = State(initialValue: min(
-            max(saved.eloSliderValue, EngineStrength.playSliderRange.lowerBound),
-            EngineStrength.playSliderRange.upperBound
-        ))
-        _opponentMode = State(initialValue: saved.opponentProfileID == nil ? .elo : .profile)
+        // La force de Stockfish, mémorisée à part : toucher Stockfish la retrouve, au lieu de garder le niveau du
+        // personnage (échelle humaine) affiché juste avant. Bornage : un réglage mémorisé par une version
+        // antérieure peut valoir 2800 ou 3190, désormais hors plage — un `Slider` hors bornes se colle à la butée
+        // sans le dire. Si la dernière partie était contre un personnage, `eloSliderValue` est SON niveau : on
+        // repart alors de la force par défaut.
+        let stockfishSource = saved.opponentProfileID == nil ? saved.eloSliderValue : PlayGameSettings.default.eloSliderValue
+        _stockfishElo = State(initialValue: min(max(stockfishSource, EngineStrength.playSliderRange.lowerBound),
+                           EngineStrength.playSliderRange.upperBound))
+        // Maia, TOUJOURS, à l'ouverture (demande du 17/11/2026) : Stockfish est à un toucher, tout à gauche.
+        _opponentMode = State(initialValue: .profile)
         // Maia est TOUJOURS la sélection de départ en mode Personnage : on
         // ouvre sur l'étalon, pas sur le dernier personnage affronté (le
         // niveau, lui, reste mémorisé par personnage).
         _opponentProfileID = State(initialValue: OpponentProfile.maia.id)
-        if saved.opponentProfileID != nil {
-            let maia = OpponentProfile.maia
-            _eloSlider = State(initialValue: maia.clampedLevel(OpponentLevelStore.level(for: maia.id) ?? saved.eloSliderValue))
-        }
+        let maia = OpponentProfile.maia
+        _eloSlider = State(initialValue: maia.clampedLevel(OpponentLevelStore.level(for: maia.id) ?? maia.defaultLevel))
         _timeLimit = State(initialValue: TimeLimitSelection(
             savedID: saved.timeControlID, customMinutes: saved.customMinutes,
             customIncrement: saved.customIncrementSeconds, memoryKey: "play"))
@@ -99,10 +102,9 @@ struct NewGameSetupView: View {
         _bookEnabled = State(initialValue: saved.bookEnabled)
         _bookWidth = State(initialValue: saved.bookWidth)
         // L'aveugle ne se RETIENT pas d'une partie à l'autre : « Nouvelle partie » ne doit jamais ouvrir sur un
-        // plateau vide sans qu'on l'ait demandé. Le NIVEAU, lui, se retrouve en rallumant l'interrupteur.
+        // plateau vide sans qu'on l'ait demandé.
         _blindfold = State(initialValue: .off)
         _blindfoldVoice = State(initialValue: saved.blindfoldVoice)
-        _lastBlindfoldChoice = State(initialValue: saved.blindfold == .off ? nil : saved.blindfold)
     }
 
     var body: some View {
@@ -115,197 +117,44 @@ struct NewGameSetupView: View {
         }
     }
 
-    /// Les trois puces de couleur ; `compact` resserre le remplissage pour tenir sur une ligne.
-    @ViewBuilder
-    private func colorChips(compact: Bool) -> some View {
-        ForEach(PlayerColorChoice.allCases) { choice in
-            ChipButton(
-                label: LocalizedStringKey(choice.label),
-                systemImage: choice.symbolName,
-                isSelected: colorChoice == choice,
-                disc: choice.disc,
-                tint: Theme.warning,
-                compact: compact
-            ) {
-                colorChoice = choice
-            }
-        }
-    }
+    // MARK: Présentation (refonte du 17/11/2026 : « plus joli, plus compact, moins old style »)
+    //
+    // Trois blocs au lieu de sept sections : l'ADVERSAIRE en vedette (une bande de portraits, le choisi en grand,
+    // sa phrase, son niveau), une carte PARTIE aux lignes toutes du même style (chacune montre son choix et
+    // s'ouvre en menu), les AIDES en quatre pastilles. Une seule couleur d'accent ; la couleur du personnage ne
+    // vit que sur son portrait. Plus d'interrupteur à phrase.
 
     private var scrollBody: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 22) {
+            VStack(spacing: 16) {
                 if let resumable { resumeCard(resumable) }
-
-                SettingsSection(title: "Couleur", systemImage: "circle.lefthalf.filled", tint: Theme.warning) {
-                    // FlowLayout et non HStack : en français les trois
-                    // puces réclament ~323 pt pour 303 disponibles à 375, et
-                    // 248 en Display Zoom. Elles passent maintenant à la ligne
-                    // au lieu d'être comprimées (Lot 3.5).
-                    //
-                    // Espagnol et allemand (2.3) : « Blancas · Negras ·
-                    // Aleatorio » réclamait un rien trop, et la troisième
-                    // puce tombait seule sur une deuxième ligne, d'un effet
-                    // bancal. On essaie d'abord UNE ligne, avec des puces
-                    // plus serrées ; le repli à la ligne reste la sécurité
-                    // (Display Zoom, texte agrandi).
-                    ViewThatFits(in: .horizontal) {
-                        HStack(spacing: 6) { colorChips(compact: true) }
-                        FlowLayout(spacing: 8, lineSpacing: 8) { colorChips(compact: false) }
-                    }
+                opponentHero
+                    .discoveryAnchor(.strengthSlider)
+                gameCard
+                aidsCard
+                    .discoveryAnchor(.aidToggles)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 4)
+            .padding(.bottom, 20)
+            .frame(maxWidth: Theme.readableWidth)
+            .frame(maxWidth: .infinity)
+        }
+        .sheet(isPresented: $showCustomClock) {
+            NavigationStack {
+                ScrollView {
+                    TimeLimitSection(selection: $timeLimit, tint: Theme.accent)
+                        .padding(20)
                 }
-
-                SettingsSection(title: "Adversaire", systemImage: "person.crop.circle", tint: Theme.accent, discoverySpot: .strengthSlider) {
-                    VStack(alignment: .leading, spacing: 16) {
-                        // Deux façons de choisir l'adversaire : un personnage
-                        // joué par Maia-3 (le plus humain, en premier et par
-                        // défaut), ou Stockfish bridé à un Elo.
-                        Picker("Adversaire", selection: $opponentMode.animation()) {
-                            Text("Personnage").tag(OpponentMode.profile)
-                            Text("Stockfish").tag(OpponentMode.elo)
-                        }
-                        .pickerStyle(.segmented)
-                        .onChange(of: opponentMode) { _, mode in
-                            guard mode == .profile, let profile = OpponentProfile.named(opponentProfileID) else { return }
-                            eloSlider = profile.clampedLevel(OpponentLevelStore.level(for: profile.id) ?? profile.defaultLevel)
-                        }
-
-                        if opponentMode == .profile {
-                            OpponentGalleryView(selectedID: $opponentProfileID) { profile in
-                                // Chaque personnage garde SON niveau, dans SA plage.
-                                eloSlider = profile.clampedLevel(OpponentLevelStore.level(for: profile.id) ?? profile.defaultLevel)
-                            }
-                            OpponentLevelSlider(
-                                profile: OpponentProfile.named(opponentProfileID) ?? .maia,
-                                level: $eloSlider
-                            )
-                        } else {
-                            // Le chiffre, le curseur, et juste dessous le nom
-                            // du palier où l'on est (« Débutant confirmé ») :
-                            // la grille des huit cartes disait la même chose
-                            // en huit fois plus de place.
-                            HStack(alignment: .firstTextBaseline) {
-                                Text(EngineStrength(sliderValue: eloSlider).displayLabel)
-                                    .font(.title2.weight(.bold).monospacedDigit())
-                                    .foregroundStyle(Theme.textPrimary)
-                                    .contentTransition(.numericText())
-                                Spacer()
-                                if let preset = EnginePreset.nearest(toSliderValue: eloSlider) {
-                                    Text(LocalizedStringKey(preset.label))
-                                        .font(.subheadline.weight(.semibold))
-                                        .foregroundStyle(Theme.accent)
-                                        .contentTransition(.opacity)
-                                }
-                            }
-                            .animation(Theme.snappySpring, value: eloSlider)
-
-                            Slider(value: $eloSlider, in: EngineStrength.playSliderRange, step: 50)
-                                .tint(Theme.accent)
-                            HStack {
-                                Text("\(Int(EngineStrength.playSliderRange.lowerBound))")
-                                Spacer()
-                                Text("Maximum")
-                            }
-                            .font(.caption.monospacedDigit())
-                            .foregroundStyle(Theme.textTertiary)
-                        }
-                    }
-                }
-
-                // UNE seule porte vers l'aveugle (décision du 17/11/2026) : ici, juste sous l'adversaire — c'est une
-                // façon de jouer contre lui, comme une cadence —, repliée sur son interrupteur.
-                blindfoldSection
-
-                // Un personnage joue son propre répertoire : le livre général
-                // ne concerne que le mode Niveau Elo.
-                if opponentMode == .elo {
-                SettingsSection(title: "Livre d'ouvertures", systemImage: "book.closed.fill", tint: Theme.gold) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ToggleRow(label: "Le moteur pioche dans un livre d'ouvertures", isOn: $bookEnabled.animation(), tint: Theme.gold)
-
-                        if bookEnabled {
-                            HStack(spacing: 8) {
-                                ChipButton(
-                                    label: "Lignes principales",
-                                    systemImage: nil,
-                                    isSelected: bookWidth == .mainLinesOnly,
-                                    tint: Theme.gold
-                                ) {
-                                    bookWidth = .mainLinesOnly
-                                }
-                                ChipButton(
-                                    label: "Avec variantes",
-                                    systemImage: nil,
-                                    isSelected: bookWidth == .includeSidelines,
-                                    tint: Theme.gold
-                                ) {
-                                    bookWidth = .includeSidelines
-                                }
-                            }
-                        }
-                    }
-                }
-                }
-
-                TimeLimitSection(selection: $timeLimit, tint: Theme.info)
-
-                SettingsSection(title: "Départ", systemImage: "flag.fill", tint: Theme.violet) {
-                    VStack(alignment: .leading, spacing: 12) {
-                        ToggleRow(label: "Position personnalisée (FEN)", isOn: $useCustomFEN.animation(), tint: Theme.violet)
-                            .accessibilityIdentifier("useCustomFEN")
-
-                        if useCustomFEN {
-                            TextField("Position de départ (FEN)", text: $fenText, prompt: Text("rnbqkbnr/pppppppp/…").foregroundStyle(Theme.textTertiary))
-                                .labelsHidden()
-                                .font(.system(.footnote, design: .monospaced))
-                                .foregroundStyle(Theme.textPrimary)
-                                .textInputAutocapitalization(.never)
-                                .autocorrectionDisabled()
-                                .onChange(of: fenText) { fenError = false }
-                                .accessibilityIdentifier("customFENField")
-                                .padding(10)
-                                .background(Theme.surfaceElevated, in: Theme.controlShape)
-                                .overlay(Theme.controlShape.strokeBorder(fenError ? Theme.danger : Theme.stroke, lineWidth: 1))
-
-                            if fenError {
-                                Label("FEN invalide", systemImage: "exclamationmark.triangle.fill")
-                                    .foregroundStyle(Theme.danger)
-                                    .font(.caption)
-                            }
-
-                            HStack(spacing: 8) {
-                                ChipButton(label: "Ouvrir l'éditeur", systemImage: "square.and.pencil", isSelected: false, tint: Theme.violet) {
-                                    showPositionEditor = true
-                                }
-                                ChipButton(label: "Scanner", systemImage: "camera.viewfinder", isSelected: false, tint: Theme.violet) {
-                                    showScanner = true
-                                }
-                                .accessibilityIdentifier("scanStartPosition")
-                            }
-                        }
-                    }
-                }
-
-                SettingsSection(title: "Aides", systemImage: "lightbulb.fill", tint: Theme.rose, discoverySpot: .aidToggles) {
-                    VStack(spacing: 12) {
-                        if blindfold != .off {
-                            Label("À l'aveugle, l'indice, l'alerte et la barre d'évaluation sont coupés.", systemImage: "eye.slash")
-                                .font(.caption)
-                                .foregroundStyle(Theme.textSecondary)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        ToggleRow(label: "Indice (flèches des meilleurs coups)", isOn: $hintsEnabled, tint: Theme.rose)
-                        ToggleRow(label: "Alerte en cas de coup risqué", isOn: $blunderAlertEnabled, tint: Theme.rose)
-                        ToggleRow(label: "Barre d'évaluation", isOn: $showEvalBar, tint: Theme.rose)
-                        ToggleRow(label: "L'ordinateur peut abandonner s'il est perdu", isOn: $engineResignationEnabled, tint: Theme.rose)
-                        // La note sur la reprise de coup a rejoint « Limite de temps » (28/10/2026) :
-                        // c'est la pendule qui décide, c'est là qu'on doit le lire.
-                    }
+                .appBackground()
+                .navigationTitle("Cadence")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) { Button("OK") { showCustomClock = false } }
                 }
             }
-            .padding(20)
-            .padding(.bottom, 20)
+            .preferredColorScheme(.dark)
+            .presentationDetents([.medium, .large])
         }
         .onAppear {
             resumable = AutosaveStore.loadPlay()
@@ -317,7 +166,7 @@ struct NewGameSetupView: View {
         }, onReplace: { launch() })
         .appBackground()
         .navigationTitle(navigationTitleKey)
-        .navigationBarTitleDisplayMode(.large)
+        .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
         .primaryActionBar("Commencer") { start() }
@@ -444,92 +293,497 @@ struct NewGameSetupView: View {
         .accessibilityIdentifier("setupResumeGame")
     }
 
-    // MARK: À l'aveugle
+    // MARK: L'adversaire en vedette
 
-    /// ÉPURÉ (retour de l'utilisateur, 17/11/2026 : « une UX jolie et épurée ») : un interrupteur, puis quatre
-    /// tuiles dont chacune MONTRE son niveau sur un petit plateau — on choisit en regardant, pas en lisant. Une
-    /// phrase pour le niveau choisi, et la voix.
-    private var blindfoldSection: some View {
-        SettingsSection(title: "À l'aveugle", systemImage: "eye.slash.fill", tint: Theme.teal) {
-            VStack(alignment: .leading, spacing: 14) {
-                ToggleRow(label: "Jouer à l'aveugle", isOn: Binding(
-                    get: { blindfold != .off },
-                    set: { on in withAnimation(Theme.spring) { blindfold = on ? lastBlindfoldLevel : .off } }
-                ), tint: Theme.teal)
-                .accessibilityIdentifier("blindfoldToggle")
+    private var selectedProfile: OpponentProfile? {
+        opponentMode == .profile ? (OpponentProfile.named(opponentProfileID) ?? .maia) : nil
+    }
 
-                if blindfold != .off {
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)],
-                              spacing: 10) {
-                        ForEach(BlindfoldLevel.levels) { level in
-                            blindfoldTile(level)
+    private var heroTint: Color {
+        selectedProfile.map { OpponentTintResolver.color($0.tint) } ?? Theme.accent
+    }
+
+    /// La teinte du personnage, éclaircie pour être lue sur fond sombre : jauges et surnom.
+    private var heroVivid: Color {
+        selectedProfile.map { OpponentTintResolver.vivid($0.tint) } ?? Theme.accent
+    }
+
+    private func chooseProfile(_ profile: OpponentProfile) {
+        withAnimation(Theme.snappySpring) {
+            if opponentMode == .elo { stockfishElo = eloSlider }
+            opponentMode = .profile
+            opponentProfileID = profile.id
+            eloSlider = profile.clampedLevel(OpponentLevelStore.level(for: profile.id) ?? profile.defaultLevel)
+        }
+        Haptics.move()
+    }
+
+    private func chooseStockfish() {
+        withAnimation(Theme.snappySpring) {
+            opponentMode = .elo
+            eloSlider = stockfishElo
+        }
+        Haptics.move()
+    }
+
+    private var opponentHero: some View {
+        VStack(spacing: 14) {
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    // Stockfish à GAUCHE, puis les personnages, Maia en tête (demande du 17/11/2026).
+                    HStack(spacing: 10) {
+                        stockfishPortrait.id("stockfish")
+                        ForEach(OpponentProfile.all) { profile in
+                            portrait(profile).id(profile.id)
                         }
                     }
-                    Text(LocalizedStringKey(blindfold.detail))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                }
+                .onAppear {
+                    proxy.scrollTo(opponentMode == .profile ? opponentProfileID : "stockfish", anchor: .center)
+                }
+            }
+
+            VStack(spacing: 4) {
+                if let profile = selectedProfile {
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(verbatim: profile.firstName)
+                            .font(.title2.weight(.bold))
+                            .foregroundStyle(Theme.textPrimary)
+                        Text("« \(LocalizationController.string(profile.nickname)) »")
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(heroVivid)
+                        // La phrase du personnage — son charme — reste à un toucher.
+                        Button { showTagline = true } label: {
+                            Image(systemName: "info.circle")
+                                .font(.subheadline)
+                                .foregroundStyle(Theme.textTertiary)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(Text("À propos de \(profile.firstName)"))
+                        .accessibilityIdentifier("opponentInfo")
+                        .popover(isPresented: $showTagline) {
+                            Text(LocalizedStringKey(profile.tagline))
+                                .font(.subheadline)
+                                .foregroundStyle(Theme.textPrimary)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(width: 280)
+                                .padding(16)
+                                .presentationCompactAdaptation(.popover)
+                                .preferredColorScheme(.dark)
+                        }
+                    }
+                    traitGauges(OpponentTraits(profile))
+                        .padding(.top, 6)
+                } else {
+                    Text(verbatim: "Stockfish")
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(Theme.textPrimary)
+                    Text("Le moteur, bridé à la force que vous choisissez.")
                         .font(.footnote)
                         .foregroundStyle(Theme.textSecondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .contentTransition(.opacity)
-                    ToggleRow(label: "Lire les coups adverses à voix haute", isOn: $blindfoldVoice, tint: Theme.teal)
+                        .multilineTextAlignment(.center)
+                }
+            }
+            .padding(.horizontal, 12)
+            .id(selectedProfile?.id ?? "stockfish")
+            .transition(.opacity)
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("opponentCard_\(selectedProfile?.id ?? "stockfish")")
+
+            levelRow
+                .padding(.horizontal, 12)
+        }
+        .padding(.vertical, 14)
+        .frame(maxWidth: .infinity)
+        .background {
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(Theme.surfaceElevated)
+                .overlay(alignment: .top) {
+                    // Un halo discret de la couleur du personnage, en haut seulement.
+                    RadialGradient(colors: [heroTint.opacity(0.28), .clear], center: .top, startRadius: 0, endRadius: 220)
+                        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                        .allowsHitTesting(false)
+                }
+        }
+        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).strokeBorder(Theme.stroke, lineWidth: 1))
+        .animation(Theme.snappySpring, value: opponentProfileID)
+        .animation(Theme.snappySpring, value: opponentMode)
+    }
+
+    private func portrait(_ profile: OpponentProfile) -> some View {
+        let selected = opponentMode == .profile && profile.id == opponentProfileID
+        let tint = OpponentTintResolver.color(profile.tint)
+        return Button { chooseProfile(profile) } label: {
+            OpponentAvatar(profile: profile, size: selected ? 64 : 48)
+                .padding(3)
+                .overlay(Circle().strokeBorder(selected ? tint : .clear, lineWidth: 2.5))
+                .opacity(selected ? 1 : 0.75)
+                .frame(width: 72, height: 72)
+        }
+        .buttonStyle(.pressable)
+        .accessibilityLabel(Text("\(profile.firstName) « \(LocalizationController.string(profile.nickname)) »"))
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityIdentifier("opponentTile_\(profile.id)")
+    }
+
+    private var stockfishPortrait: some View {
+        let selected = opponentMode == .elo
+        return Button { chooseStockfish() } label: {
+            Image(systemName: "cpu")
+                .font(.system(size: selected ? 26 : 20, weight: .semibold))
+                .foregroundStyle(selected ? Theme.background : Theme.accent)
+                .frame(width: selected ? 64 : 48, height: selected ? 64 : 48)
+                .background(Circle().fill(selected ? AnyShapeStyle(Theme.accent) : AnyShapeStyle(Theme.accent.opacity(0.15))))
+                .padding(3)
+                .overlay(Circle().strokeBorder(selected ? Theme.accent : .clear, lineWidth: 2.5))
+                .opacity(selected ? 1 : 0.75)
+                .frame(width: 72, height: 72)
+        }
+        .buttonStyle(.pressable)
+        .accessibilityLabel(Text(verbatim: "Stockfish"))
+        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+        .accessibilityIdentifier("opponentTile_stockfish")
+    }
+
+    /// Quatre jauges de cinq points : Attaque, Solidité, Échanges, Imprévisible — calculées des réglages du
+    /// personnage (``OpponentTraits``), donc comparables d'un personnage à l'autre.
+    private func traitGauges(_ traits: OpponentTraits) -> some View {
+        Grid(horizontalSpacing: 18, verticalSpacing: 6) {
+            GridRow {
+                traitGauge("Attaque", traits.attack)
+                traitGauge("Solidité", traits.solidity)
+            }
+            GridRow {
+                traitGauge("Échanges", traits.trades)
+                traitGauge("Imprévisible", traits.unpredictability)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("opponentTraits")
+    }
+
+    private func traitGauge(_ title: LocalizedStringKey, _ value: Int) -> some View {
+        HStack(spacing: 8) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Theme.textSecondary)
+                .frame(width: 82, alignment: .leading)
+            HStack(spacing: 3) {
+                ForEach(1...5, id: \.self) { step in
+                    Capsule()
+                        .fill(step <= value ? heroVivid : Color.white.opacity(0.12))
+                        .frame(width: 12, height: 6)
+                }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(title))
+        .accessibilityValue(Text("\(value) sur 5"))
+    }
+
+    /// Le niveau, sur une ligne : le mot, le curseur, le chiffre.
+    private var levelRow: some View {
+        let profile = selectedProfile
+        let range = profile?.levelRange ?? EngineStrength.playSliderRange
+        return HStack(spacing: 12) {
+            Text("Niveau")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Theme.textSecondary)
+            Slider(value: $eloSlider, in: range, step: 50)
+                .tint(Theme.accent)
+            Group {
+                if profile != nil {
+                    Text("\(Int(eloSlider))")
+                } else {
+                    Text(verbatim: EngineStrength(sliderValue: eloSlider).displayLabel)
+                }
+            }
+            .font(.headline.monospacedDigit())
+            .foregroundStyle(Theme.textPrimary)
+            .frame(minWidth: 52, alignment: .trailing)
+            .contentTransition(.numericText())
+        }
+        .animation(Theme.snappySpring, value: eloSlider)
+    }
+
+    // MARK: La carte « Partie »
+
+    private var gameCard: some View {
+        VStack(spacing: 0) {
+            settingRow("circle.lefthalf.filled", "Couleur") { colorPicker }
+            rowDivider
+            settingRow("timer", "Cadence") { clockMenu }
+                .discoveryAnchor(.timeLimit)
+            rowDivider
+            settingRow("eye.slash", "À l'aveugle") { blindfoldMenu }
+            if blindfold != .off {
+                rowDivider
+                settingRow("speaker.wave.2", "Voix") {
+                    Toggle("", isOn: $blindfoldVoice).labelsHidden().tint(Theme.accent)
                         .accessibilityIdentifier("blindfoldVoice")
                 }
             }
+            rowDivider
+            settingRow("flag", "Départ") { startMenu }
+            if useCustomFEN { fenField.padding(.horizontal, 14).padding(.bottom, 12) }
+            if opponentMode == .elo {
+                rowDivider
+                settingRow("book.closed", "Livre") { bookMenu }
+            }
+        }
+        .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Theme.stroke, lineWidth: 1))
+        .animation(Theme.gentle, value: blindfold)
+        .animation(Theme.gentle, value: useCustomFEN)
+        .animation(Theme.gentle, value: opponentMode)
+    }
+
+    private var rowDivider: some View {
+        Divider().overlay(Theme.stroke).padding(.leading, 52)
+    }
+
+    private func settingRow<Trailing: View>(_ symbol: String, _ title: LocalizedStringKey,
+                                            @ViewBuilder trailing: () -> Trailing) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: symbol)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Theme.accent)
+                .frame(width: 26)
+            Text(title)
+                .font(.body)
+                .foregroundStyle(Theme.textPrimary)
+            Spacer(minLength: 8)
+            trailing()
+        }
+        .padding(.horizontal, 14)
+        .frame(minHeight: 50)
+    }
+
+    /// La valeur à droite d'une ligne : le choix, puis la petite flèche des menus.
+    private func menuValue(_ text: LocalizedStringKey, highlighted: Bool = false) -> some View {
+        HStack(spacing: 4) {
+            Text(text)
+            Image(systemName: "chevron.up.chevron.down").font(.caption2.weight(.semibold))
+        }
+        .font(.subheadline.weight(.semibold))
+        .foregroundStyle(highlighted ? Theme.accent : Theme.textSecondary)
+        .lineLimit(1)
+    }
+
+    private var colorPicker: some View {
+        HStack(spacing: 10) {
+            ForEach(PlayerColorChoice.allCases) { choice in
+                let selected = colorChoice == choice
+                Button {
+                    withAnimation(Theme.snappySpring) { colorChoice = choice }
+                } label: {
+                    ZStack {
+                        if let disc = choice.disc {
+                            Circle().fill(disc)
+                        } else {
+                            Circle().fill(Theme.background)
+                            Image(systemName: "shuffle").font(.caption.weight(.bold)).foregroundStyle(Theme.textSecondary)
+                        }
+                    }
+                    .frame(width: 26, height: 26)
+                    .overlay(Circle().strokeBorder(Color.white.opacity(0.35), lineWidth: 1))
+                    .padding(3)
+                    .overlay(Circle().strokeBorder(selected ? Theme.accent : .clear, lineWidth: 2))
+                }
+                .buttonStyle(.pressable)
+                .accessibilityLabel(Text(LocalizedStringKey(choice.label)))
+                .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
+            }
         }
     }
 
-    /// Le dernier niveau choisi dans cet écran (« Cases occupées » au départ) : rallumer l'interrupteur le retrouve.
-    private var lastBlindfoldLevel: BlindfoldLevel {
-        lastBlindfoldChoice ?? .occupiedSquares
-    }
-
-    private func blindfoldTile(_ level: BlindfoldLevel) -> some View {
-        let user: Piece.Color = colorChoice == .black ? .black : .white
-        let selected = blindfold == level
-        return Button {
-            withAnimation(Theme.spring) {
-                blindfold = level
-                lastBlindfoldChoice = level
+    private var clockMenu: some View {
+        Menu {
+            Button {
+                timeLimit.isEnabled = false
+            } label: {
+                Label("Sans limite", systemImage: timeLimit.isEnabled ? "infinity" : "checkmark")
             }
-        } label: {
-            VStack(spacing: 8) {
-                ChessBoardView(
-                    board: Board(position: .standard),
-                    orientation: user,
-                    theme: AppSettings.shared.boardTheme,
-                    selectedSquare: nil, legalTargetSquares: [], lastMove: nil, hintMoves: [],
-                    interactionEnabled: false, showCoordinates: false,
-                    onTapSquare: { _ in }, onDropPiece: { _, _ in },
-                    pieceMask: level.mask(user: user)
-                )
-                .aspectRatio(1, contentMode: .fit)
-                .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-                .allowsHitTesting(false)
-                Text(LocalizedStringKey(level.title))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(selected ? Theme.textPrimary : Theme.textSecondary)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2, reservesSpace: true)
-            }
-            .padding(8)
-            .background(selected ? Theme.teal.opacity(0.14) : Theme.surfaceElevated,
-                        in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .strokeBorder(selected ? Theme.teal : Theme.stroke, lineWidth: selected ? 2 : 1))
-            .overlay(alignment: .topTrailing) {
-                if selected {
-                    Image(systemName: "checkmark.circle.fill")
-                        .font(.body)
-                        .foregroundStyle(Theme.teal, Theme.background)
-                        .padding(4)
-                        .transition(.scale.combined(with: .opacity))
+            ForEach([TimeControlCategory.bullet, .blitz, .rapid, .classical], id: \.self) { category in
+                Section(LocalizedStringKey(category.label)) {
+                    ForEach(TimeControl.presets.filter { $0.category == category }) { control in
+                        Button {
+                            timeLimit.isEnabled = true
+                            timeLimit.select(category)
+                            timeLimit.select(control)
+                        } label: {
+                            if timeLimit.isEnabled, !timeLimit.isCustom, timeLimit.preset == control {
+                                Label(LocalizedStringKey(control.label), systemImage: "checkmark")
+                            } else {
+                                Text(LocalizedStringKey(control.label))
+                            }
+                        }
+                    }
                 }
             }
+            Button {
+                timeLimit.isEnabled = true
+                timeLimit.select(.custom)
+                showCustomClock = true
+            } label: {
+                Label("Personnalisé…", systemImage: "slider.horizontal.3")
+            }
+        } label: {
+            if timeLimit.isEnabled {
+                menuValue(LocalizedStringKey(effectiveTimeControl.label), highlighted: true)
+            } else {
+                menuValue("Sans limite")
+            }
+        }
+        .accessibilityIdentifier("cadenceMenu")
+    }
+
+    private var blindfoldMenu: some View {
+        Menu {
+            ForEach([BlindfoldLevel.off] + BlindfoldLevel.levels) { level in
+                Button {
+                    withAnimation(Theme.gentle) { blindfold = level }
+                } label: {
+                    if blindfold == level {
+                        Label(LocalizedStringKey(level.title), systemImage: "checkmark")
+                    } else {
+                        Text(LocalizedStringKey(level.title))
+                    }
+                }
+            }
+        } label: {
+            menuValue(LocalizedStringKey(blindfold.title), highlighted: blindfold != .off)
+        }
+        .accessibilityIdentifier("blindfoldMenu")
+    }
+
+    private var startMenu: some View {
+        Menu {
+            Button {
+                withAnimation(Theme.gentle) { useCustomFEN = false }
+            } label: {
+                if useCustomFEN { Text("Position initiale") } else { Label("Position initiale", systemImage: "checkmark") }
+            }
+            Button {
+                withAnimation(Theme.gentle) { useCustomFEN = true }
+            } label: {
+                Label("Saisir une FEN", systemImage: "text.cursor")
+            }
+            Button {
+                useCustomFEN = true
+                showPositionEditor = true
+            } label: {
+                Label("Ouvrir l'éditeur", systemImage: "square.and.pencil")
+            }
+            Button {
+                useCustomFEN = true
+                showScanner = true
+            } label: {
+                Label("Scanner", systemImage: "camera.viewfinder")
+            }
+        } label: {
+            menuValue(useCustomFEN ? "Personnalisée" : "Initiale", highlighted: useCustomFEN)
+        }
+        .accessibilityIdentifier("startMenu")
+    }
+
+    private var fenField: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            TextField("Position de départ (FEN)", text: $fenText,
+                      prompt: Text("rnbqkbnr/pppppppp/…").foregroundStyle(Theme.textTertiary))
+                .labelsHidden()
+                .font(.system(.footnote, design: .monospaced))
+                .foregroundStyle(Theme.textPrimary)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled()
+                .onChange(of: fenText) { fenError = false }
+                .accessibilityIdentifier("customFENField")
+                .padding(10)
+                .background(Theme.background.opacity(0.6), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .overlay(RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .strokeBorder(fenError ? Theme.danger : Theme.stroke, lineWidth: 1))
+            if fenError {
+                Label("FEN invalide", systemImage: "exclamationmark.triangle.fill")
+                    .foregroundStyle(Theme.danger)
+                    .font(.caption)
+            }
+        }
+    }
+
+    private var bookMenu: some View {
+        Menu {
+            Button { bookEnabled = false } label: {
+                if bookEnabled { Text("Aucun") } else { Label("Aucun", systemImage: "checkmark") }
+            }
+            Button { bookEnabled = true; bookWidth = .mainLinesOnly } label: {
+                if bookEnabled, bookWidth == .mainLinesOnly { Label("Lignes principales", systemImage: "checkmark") }
+                else { Text("Lignes principales") }
+            }
+            Button { bookEnabled = true; bookWidth = .includeSidelines } label: {
+                if bookEnabled, bookWidth == .includeSidelines { Label("Avec variantes", systemImage: "checkmark") }
+                else { Text("Avec variantes") }
+            }
+        } label: {
+            menuValue(!bookEnabled ? "Aucun" : (bookWidth == .mainLinesOnly ? "Lignes principales" : "Avec variantes"))
+        }
+    }
+
+    // MARK: Les aides
+
+    /// Quatre pastilles d'une seule couleur ; à l'aveugle, les trois qui montreraient la position s'éteignent.
+    private var aidsCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("Aides")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(Theme.textSecondary)
+                .textCase(.uppercase)
+                .tracking(0.5)
+                .padding(.leading, 4)
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                aidChip("lightbulb", "Indice", isOn: $hintsEnabled, blinded: blindfold != .off,
+                        fullLabel: "Indice (flèches des meilleurs coups)")
+                aidChip("exclamationmark.triangle", "Alerte de gaffe", isOn: $blunderAlertEnabled, blinded: blindfold != .off,
+                        fullLabel: "Alerte en cas de coup risqué")
+                aidChip("chart.bar", "Barre d'évaluation", isOn: $showEvalBar, blinded: blindfold != .off,
+                        fullLabel: "Barre d'évaluation")
+                aidChip("flag", "Il peut abandonner", isOn: $engineResignationEnabled, blinded: false,
+                        fullLabel: "L'ordinateur peut abandonner s'il est perdu")
+            }
+        }
+    }
+
+    private func aidChip(_ symbol: String, _ title: LocalizedStringKey, isOn: Binding<Bool>, blinded: Bool,
+                         fullLabel: LocalizedStringKey) -> some View {
+        let lit = isOn.wrappedValue && !blinded
+        return Button {
+            withAnimation(Theme.snappySpring) { isOn.wrappedValue.toggle() }
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: lit ? symbol + ".fill" : symbol)
+                    .font(.subheadline.weight(.semibold))
+                    .frame(width: 20)
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                Spacer(minLength: 0)
+            }
+            .foregroundStyle(lit ? Theme.accent : Theme.textSecondary)
+            .padding(.horizontal, 12)
+            .frame(minHeight: 46)
+            .background((lit ? Theme.accent.opacity(0.14) : Theme.surfaceElevated),
+                        in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(lit ? Theme.accent.opacity(0.55) : Theme.stroke, lineWidth: 1))
+            .opacity(blinded ? 0.4 : 1)
         }
         .buttonStyle(.pressable)
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Text(LocalizedStringKey(level.title)))
-        .accessibilityAddTraits(selected ? [.isButton, .isSelected] : .isButton)
-        .accessibilityIdentifier("blindfold-\(level.rawValue)")
+        .disabled(blinded)
+        .accessibilityLabel(Text(fullLabel))
+        .accessibilityValue(Text(lit ? "Activé" : "Désactivé"))
+        .accessibilityAddTraits(lit ? [.isButton, .isSelected] : .isButton)
     }
 
     private func launch() {

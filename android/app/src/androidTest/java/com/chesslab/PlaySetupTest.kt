@@ -50,42 +50,44 @@ class PlaySetupTest {
     }
 
     /**
-     * Le chiffre du curseur PORTE le réglage réel — « Elo ~1200 » quand la
-     * force est simulée sous la borne de Stockfish — et le palier le nomme.
+     * Le chiffre du curseur PORTE le réglage réel — « Elo ~1200 » quand la force est simulée sous la borne de
+     * Stockfish. Et l'écran s'ouvre sur Maia (17/11/2026), Stockfish tout à gauche de la bande.
      */
-    @Test fun leCurseurDitLaForceReelleEtSonPalier() {
+    @Test fun leCurseurDitLaForceReelle() {
         openSetup()
-        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
+        compose.onNodeWithTag("fiche-maia").assertIsDisplayed()
+        compose.onNodeWithTag("jauges").assertIsDisplayed()
+        compose.chooseOpponent("stockfish")
+        compose.onNodeWithTag("fiche-stockfish").assertIsDisplayed()
         compose.onNodeWithTag("niveau").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithTag("palier").assertIsDisplayed()
         // Le défaut est accueillant, pas la pleine puissance.
         compose.waitUntil(10_000) {
             compose.onAllNodesWithText("~1200", substring = true).fetchSemanticsNodes().isNotEmpty()
         }
-        compose.waitUntil(10_000) {
-            compose.onAllNodesWithText("Débutant confirmé", substring = true).fetchSemanticsNodes().isNotEmpty()
-        }
     }
 
-    /** Les trois sections qui manquaient sont là. */
+    /** Le livre, la cadence libre et la position de départ : chacun dans son menu (refonte du 18/11/2026). */
     @Test fun leLivreLaCadenceLibreEtLaPositionSontProposes() {
         openSetup()
-        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
-        // Le livre d'ouvertures, et sa largeur.
-        compose.onNodeWithTag("livre-actif").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithTag("livre-mainLinesOnly").performScrollTo().assertIsDisplayed()
-        // La limite de temps est éteinte : aucune cadence tant qu'on ne l'allume pas.
-        compose.onNodeWithTag("limite-de-temps").performScrollTo().assertIsDisplayed()
-        assertEquals(0, compose.onAllNodesWithTag("cadence-custom").fetchSemanticsNodes().size)
-        compose.onNodeWithTag("limite-de-temps").performClick()
-        // La cadence personnalisée : minutes et incrément.
-        compose.onNodeWithTag("cadence-custom").performScrollTo().performClick()
-        compose.onNodeWithTag("minutes-perso").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithTag("increment-perso").performScrollTo().assertIsDisplayed()
-        // Et la position de départ.
-        compose.onNodeWithTag("position-perso").performScrollTo().performClick()
+        // Le livre n'existe que pour Stockfish.
+        assertEquals(0, compose.onAllNodesWithTag("menu-livre").fetchSemanticsNodes().size)
+        compose.chooseOpponent("stockfish")
+        compose.pickFromMenu("menu-livre", "livre-mainLinesOnly")
+        // La cadence : « Sans limite » par défaut ; « Personnalisé… » ouvre la feuille des minutes et de l'incrément.
+        compose.onNodeWithTag("menu-cadence").performScrollTo().assertIsDisplayed()
+        compose.pickFromMenu("menu-cadence", "cadence-perso")
+        awaitTag("feuille-cadence", 5_000)
+        compose.onNodeWithTag("minutes-perso").assertIsDisplayed()
+        compose.onNodeWithTag("increment-perso").assertIsDisplayed()
+        compose.onNodeWithTag("cadence-ok").performClick()
+        compose.waitUntil(5_000) { compose.onAllNodesWithTag("feuille-cadence").fetchSemanticsNodes().isEmpty() }
+        // Et la position de départ : le champ FEN, et l'éditeur dans le même menu.
+        compose.pickFromMenu("menu-depart", "depart-fen")
         compose.onNodeWithTag("champ-fen").performScrollTo().assertIsDisplayed()
-        compose.onNodeWithTag("ouvrir-editeur").performScrollTo().assertIsDisplayed()
+        compose.onNodeWithTag("menu-depart").performScrollTo().performClick()
+        awaitTag("ouvrir-editeur", 5_000)
+        compose.onNodeWithTag("depart-initiale").performClick()
+        compose.waitUntil(5_000) { compose.onAllNodesWithTag("champ-fen").fetchSemanticsNodes().isEmpty() }
     }
 
     /**
@@ -94,10 +96,9 @@ class PlaySetupTest {
      */
     @Test fun lesReglagesSurviventALaPartie() {
         openSetup()
-        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
+        compose.chooseOpponent("stockfish")
         compose.onNodeWithTag("couleur-black").performScrollTo().performClick()
-        compose.onNodeWithTag("limite-de-temps").performScrollTo().performClick()
-        compose.onNodeWithTag("cadence-blitz").performScrollTo().performClick()
+        compose.pickFromMenu("menu-cadence", "preset-blitz_3_2")
         compose.onNodeWithTag("commencer").performClick()
         compose.waitForIdle()
 
@@ -117,7 +118,7 @@ class PlaySetupTest {
      */
     @Test fun reprendreIciTronqueLaPartieEtSAnnule() {
         openSetup()
-        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
+        compose.chooseOpponent("stockfish")
         compose.onNodeWithTag("commencer").performClick()
         compose.waitUntil(120_000) {
             compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isNotEmpty()
@@ -183,7 +184,7 @@ class PlaySetupTest {
     /** C8 : après quatre demi-coups et un abandon, la fin de partie montre la courbe du matériel. */
     @Test fun laFinDePartieMontreLaCourbeDuMateriel() {
         openSetup()
-        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
+        compose.chooseOpponent("stockfish")
         compose.onNodeWithTag("commencer").performClick()
         compose.waitUntil(120_000) {
             compose.onAllNodesWithText("À vous de jouer", substring = true).fetchSemanticsNodes().isNotEmpty()
@@ -224,16 +225,14 @@ class PlaySetupTest {
     }
 
     /**
-     * L'interrupteur « Limite de temps » : éteint, la partie est sans pendule ;
-     * la dernière cadence choisie est gardée pour la rallumer.
+     * « Sans limite » : la partie est sans pendule ; la dernière cadence choisie est gardée pour la prochaine fois.
      */
     @Test fun laLimiteDeTempsSeSouvientDeLaDerniereCadence() {
         openSetup()
-        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
-        compose.onNodeWithTag("limite-de-temps").performScrollTo().performClick()
-        compose.onNodeWithTag("cadence-bullet").performScrollTo().performClick()
-        // On l'éteint avant de commencer : la partie est sans limite.
-        compose.onNodeWithTag("limite-de-temps").performScrollTo().performClick()
+        compose.chooseOpponent("stockfish")
+        compose.pickFromMenu("menu-cadence", "preset-bullet_1_0")
+        // On revient à « Sans limite » avant de commencer : la partie est sans pendule.
+        compose.pickFromMenu("menu-cadence", "cadence-none")
         compose.onNodeWithTag("commencer").performClick()
         compose.waitForIdle()
         val saved = PlaySettingsStore.load(context)
@@ -250,7 +249,7 @@ class PlaySetupTest {
      */
     @Test fun lEcranDeReglagesProposeDeReprendreEtDemandeAvantDeRemplacer() {
         openSetup()
-        compose.onNodeWithTag("segment-1").performScrollTo().performClick()
+        compose.chooseOpponent("stockfish")
         assertEquals(0, compose.onAllNodesWithTag("reprendre-depuis-reglages").fetchSemanticsNodes().size)
         compose.onNodeWithTag("commencer").performClick()
         compose.waitUntil(120_000) {

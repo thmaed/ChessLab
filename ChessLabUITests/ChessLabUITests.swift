@@ -67,14 +67,10 @@ final class ChessLabUITests: XCTestCase {
         _ = app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5)
         app.buttons["Contre l'ordinateur"].tap()
         _ = app.buttons["Commencer"].waitForExistence(timeout: 5)
-        // La cadence se choisit en deux temps depuis le 18/07/2026 : la
-        // famille, puis la cadence dans cette famille.
-        // L'interrupteur « Limite de temps » est éteint par défaut : on l'allume.
-        app.switches["timeLimitToggle"].tap()
-        app.buttons["Blitz"].tap()
-        XCTAssertTrue(app.buttons["3+2"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["3+2"].isSelected, "Réglages vierges : 3+2 ne doit pas être présélectionné")
-        app.buttons["3+2"].tap()
+        // La cadence se choisit dans le menu de la ligne « Cadence » (refonte du 18/11/2026).
+        XCTAssertFalse(NewGameSetupSteps.value(ofMenu: "cadenceMenu", app: app).contains("3+2"),
+                       "Réglages vierges : 3+2 ne doit pas être présélectionné")
+        NewGameSetupSteps.pick("3+2", inMenu: "cadenceMenu", app: app)
         app.buttons["Commencer"].tap()
         _ = app.otherElements["square_e2"].waitForExistence(timeout: 10)
 
@@ -84,7 +80,8 @@ final class ChessLabUITests: XCTestCase {
         _ = app.buttons["Contre l'ordinateur"].waitForExistence(timeout: 5)
         app.buttons["Contre l'ordinateur"].tap()
         _ = app.buttons["Commencer"].waitForExistence(timeout: 5)
-        XCTAssertTrue(app.buttons["3+2"].isSelected, "La cadence 3+2 choisie précédemment doit être mémorisée")
+        XCTAssertTrue(NewGameSetupSteps.value(ofMenu: "cadenceMenu", app: app).contains("3+2"),
+                      "La cadence 3+2 choisie précédemment doit être mémorisée")
     }
 
     @MainActor
@@ -146,11 +143,10 @@ final class ChessLabUITests: XCTestCase {
 
         // Cadence "3+0" (blitz) + barre d'évaluation, pour vérifier
         // pendules et barre d'éval à l'écran. Famille d'abord.
-        app.switches["timeLimitToggle"].tap()
-        app.buttons["Blitz"].tap()
-        _ = app.buttons["3+0"].waitForExistence(timeout: 5)
-        app.buttons["3+0"].tap()
-        app.switches.matching(NSPredicate(format: "label CONTAINS 'valuation'")).firstMatch.tap()
+        NewGameSetupSteps.pick("3+0", inMenu: "cadenceMenu", app: app)
+        let evalBar = app.buttons["Barre d'évaluation"]
+        NewGameSetupSteps.reveal(evalBar, in: app)
+        evalBar.tap()
         attach(app, "setup")
         app.buttons["Commencer"].tap()
 

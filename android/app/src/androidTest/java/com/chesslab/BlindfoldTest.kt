@@ -22,7 +22,7 @@ import org.junit.runner.RunWith
 
 /**
  * Partie À L'AVEUGLE de bout en bout (17/11/2026). Pendant de `BlindfoldUITests` (iOS) : dans le réglage
- * « Contre l'ordinateur », on allume « Jouer à l'aveugle » ; « Tout caché » ; le plateau ne nomme plus ses pièces ; un coup
+ * « Contre l'ordinateur », le menu « À l'aveugle » ; « Tout caché » ; le plateau ne nomme plus ses pièces ; un coup
  * impossible le dit ; un coup juste se joue en touchant départ puis arrivée ; le coup d'œil se compte ;
  * l'abandon fait réapparaître les pièces et le bilan dit comment la partie a été jouée.
  */
@@ -47,12 +47,12 @@ class BlindfoldTest {
         // UNE seule porte (décision du 17/11/2026) : « Contre l'ordinateur », section juste sous l'adversaire,
         // repliée sur son interrupteur.
         compose.onNodeWithTag("mode-play").performScrollTo().performClick()
-        awaitTag("aveugle-actif", 120_000)
-        assertTrue("repliée : les niveaux n'apparaissent qu'allumée",
-            compose.onAllNodesWithTag("aveugle-allHidden").fetchSemanticsNodes().isEmpty())
-        compose.onNodeWithTag("aveugle-actif").performScrollTo().performClick()
-        awaitTag("aveugle-allHidden", 5_000)
-        compose.onNodeWithTag("aveugle-allHidden").performScrollTo().performClick()
+        // La ligne « À l'aveugle » de la carte « Partie » (refonte du 18/11/2026) : un menu, « Non » à l'ouverture.
+        awaitTag("menu-aveugle", 120_000)
+        assertTrue("la voix n'apparaît qu'à l'aveugle",
+            compose.onAllNodesWithTag("aveugle-voix").fetchSemanticsNodes().isEmpty())
+        compose.pickFromMenu("menu-aveugle", "aveugle-allHidden")
+        awaitTag("aveugle-voix", 5_000)
         compose.onNodeWithTag("commencer").performClick()
 
         awaitTag("coup-d-oeil", 60_000)
@@ -63,8 +63,7 @@ class BlindfoldTest {
         }
         compose.waitForIdle()
         assertTrue("à l'aveugle, aucune case ne nomme sa pièce", pieceLabels("pion") == 0)
-        // « Tout caché » et non « Cases occupées » : pas même un disque. Le toucher sur la tuile a bien porté (le
-        // petit plateau de la tuile l'avalait, 17/11/2026).
+        // « Tout caché » et non « Cases occupées » : pas même un disque.
         assertTrue("« Tout caché » : aucun disque non plus", pieceLabels("pièce") == 0)
 
         // Un coup impossible le dit, sans être joué.
@@ -101,10 +100,8 @@ class BlindfoldTest {
      */
     @Test fun greyDiscsSayOnlyOccupied() {
         compose.onNodeWithTag("mode-play").performScrollTo().performClick()
-        awaitTag("aveugle-actif", 120_000)
-        compose.onNodeWithTag("aveugle-actif").performScrollTo().performClick()
-        awaitTag("aveugle-occupiedSquaresGrey", 5_000)
-        compose.onNodeWithTag("aveugle-occupiedSquaresGrey").performScrollTo().performClick()
+        awaitTag("menu-aveugle", 120_000)
+        compose.pickFromMenu("menu-aveugle", "aveugle-occupiedSquaresGrey")
         compose.onNodeWithTag("commencer").performClick()
 
         awaitTag("coup-d-oeil", 60_000)

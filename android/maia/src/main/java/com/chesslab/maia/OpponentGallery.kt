@@ -53,7 +53,10 @@ object OpponentGallery {
         topP = 1.0,
         recommendedLevels = 800..1800,
         safetyNet = SafetyNetPolicy(mateFromLevel = 1400, endgameFromLevel = null),
-        style = StyleProfile(mapOf(StyleTrait.sacrifice to 0.7, StyleTrait.check to 0.3, StyleTrait.towardKing to 0.4, StyleTrait.capture to 0.1, StyleTrait.materialGain to -0.3, StyleTrait.equalTrade to -0.5, StyleTrait.queenTrade to -0.8, StyleTrait.tension to 0.3), strength = 1.2),
+        style = StyleProfile(mapOf(StyleTrait.sacrifice to 0.7, StyleTrait.check to 0.3, StyleTrait.towardKing to 0.4, StyleTrait.capture to 0.1, StyleTrait.materialGain to -0.3, StyleTrait.equalTrade to -0.5, StyleTrait.queenTrade to -0.8, StyleTrait.tension to 0.3,
+            // « Cherche le mat avant d'avoir développé sa dame » (17/11/2026) : il néglige le roque et le
+            // développement — ce qui le distingue de Lena, attaquante elle aussi mais qui roque. Comme iOS.
+            StyleTrait.castle to -0.3, StyleTrait.development to -0.3), strength = 1.2),
         temperament = Temperament(pace = 0.6, resignThresholdCp = -1200, resignPatience = 4, offersDraws = false, temperatureWhenLosing = 1.3),
         bookId = "theo",
     )
@@ -133,7 +136,12 @@ object OpponentGallery {
         topP = 1.0,
         recommendedLevels = 800..1400,
         safetyNet = SafetyNetPolicy(mateFromLevel = 1400, endgameFromLevel = null),
-        style = StyleProfile(mapOf(StyleTrait.check to 0.4, StyleTrait.capture to 0.3, StyleTrait.towardKing to 0.3, StyleTrait.castle to -0.4, StyleTrait.development to -0.1), strength = 0.6),
+        style = StyleProfile(mapOf(
+            // « Joue vite, attaque tout, oublie son roi » (retouché le 17/11/2026) : il oublie davantage son roi
+            // (roque, développement, pions faibles) et fonce davantage sur celui d'en face — ce qui le distingue de
+            // Sacha, dont la marque est le piège plutôt que l'assaut. Comme iOS.
+            StyleTrait.check to 0.4, StyleTrait.capture to 0.3, StyleTrait.towardKing to 0.5, StyleTrait.pawnStorm to 0.3,
+            StyleTrait.castle to -0.8, StyleTrait.development to -0.4, StyleTrait.weakPawn to 0.25), strength = 0.6),
         temperament = Temperament(pace = 0.4, resignThresholdCp = -1500, resignPatience = 5, offersDraws = false),
         bookId = "pablo",
     )

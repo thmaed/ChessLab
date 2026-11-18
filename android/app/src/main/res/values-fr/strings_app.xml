@@ -835,7 +835,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="discovery_0_title">Tout part d\'ici</string>
     <string name="discovery_0_body">Cette tuile lance une partie contre neuf personnages joués par Maia-3, un réseau qui joue comme un humain — ou contre Stockfish. Les autres attendront la fin de la visite — deux minutes, promis.</string>
     <string name="discovery_1_title">Choisissez votre adversaire</string>
-    <string name="discovery_1_body">Un personnage d\'abord : chacun a son style, son répertoire et son caractère, et joue comme un vrai joueur de son niveau — gaffes comprises. Ou Stockfish, au curseur, avec le nom du palier à côté. Le piège du premier soir : jouer à pleine force.</string>
+    <string name="discovery_1_body">Stockfish tout à gauche, puis les personnages, Maia en tête : chacun joue comme un vrai joueur de son niveau — gaffes comprises. Ses quatre jauges disent son style, le « i » raconte son caractère. Le piège du premier soir : jouer à pleine force.</string>
     <string name="discovery_2_title">Les aides se choisissent avant</string>
     <string name="discovery_2_body">Les flèches d\'indice et la barre d\'évaluation s\'activent ici, avant la partie. On les découvre souvent trop tard.</string>
     <string name="discovery_3_title">Pendant la partie</string>
@@ -1248,7 +1248,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="discovery_daily_title">Votre séance du jour</string>
     <string name="discovery_daily_body">Chaque jour, l\'app prépare ce qu\'il faut revoir : positions d\'ouverture dues, puzzles ratés, une finale. Terminez-la pour allonger votre série de jours.</string>
     <string name="discovery_timelimit_title">Une pendule, si vous voulez</string>
-    <string name="discovery_timelimit_body">« Limite de temps » est éteinte par défaut : allumez-la pour choisir une cadence (Bullet, Blitz, Rapide…). L\'app retient votre dernier choix.</string>
+    <string name="discovery_timelimit_body">« Cadence » est sur « Sans limite » par défaut : touchez-la pour choisir une pendule (Bullet, Blitz, Rapide…) ou la régler vous-même. L\'app retient votre dernier choix.</string>
     <string name="discovery_wn_0_title">Un scanner plus fiable</string>
     <string name="discovery_wn_0_body">Le scanner lit mieux les captures, les photos d\'écran et les plateaux réels. Depuis Photos, « Partager › ChessLab » envoie l\'image directement au scanner.</string>
     <string name="discovery_wn_1_title">Vos collections de puzzles</string>
@@ -1480,4 +1480,30 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
         <item quantity="one">%1$d coup d\'œil</item>
         <item quantity="other">%1$d coups d\'œil</item>
     </plurals>
+    <!-- Nouvelle partie refondue (17-18/11/2026), mêmes mots qu'iOS -->
+    <string name="ng_attack">Attaque</string>
+    <string name="ng_solidity">Solidité</string>
+    <string name="ng_trades">Échanges</string>
+    <string name="ng_unpredictable">Imprévisible</string>
+    <string name="ng_gauge_value">%1$d sur 5</string>
+    <string name="ng_about">À propos de %1$s</string>
+    <string name="ng_stockfish_blurb">Le moteur, bridé à la force que vous choisissez.</string>
+    <string name="ng_voice">Voix</string>
+    <string name="ng_start_initial">Initiale</string>
+    <string name="ng_start_custom">Personnalisée</string>
+    <string name="ng_start_position">Position initiale</string>
+    <string name="ng_start_enter_fen">Saisir une FEN</string>
+    <string name="ng_custom_clock">Personnalisé…</string>
+    <string name="ng_book">Livre</string>
+    <string name="ng_book_none">Aucun</string>
+    <string name="ng_aid_hint">Indice</string>
+    <string name="ng_aid_blunder">Alerte de gaffe</string>
+    <string name="ng_aid_resign">Il peut abandonner</string>
+    <string name="ng_ok">OK</string>
+    <string name="ng_aids_header">Aides</string>
+    <string name="ng_cadence">Cadence</string>
+    <string name="ng_blind">À l\'aveugle</string>
+    <string name="ng_start">Départ</string>
+    <string name="ng_level">Niveau</string>
+    <string name="ng_colour">Couleur</string>
 </resources>

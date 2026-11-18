@@ -41,7 +41,9 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
         /** La position venue d'un autre écran, ou rapportée par l'éditeur. */
         val startFen: String? = null,
     ) : Route(if (startFen == null) R.string.route_new_game else R.string.route_continue_game) {
-        override val hasLargeTitle get() = true
+        // Titre EN LIGNE depuis la refonte du 18/11/2026, comme iOS (`.inline`) : le grand titre prenait la place
+        // d'une rangée de réglages.
+        override val hasLargeTitle get() = false
     }
 
     /**

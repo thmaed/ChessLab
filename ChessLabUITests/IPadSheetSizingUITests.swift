@@ -25,11 +25,7 @@ final class IPadSheetSizingUITests: XCTestCase {
         let app = try launchOnIPad()
 
         try openVsComputer(in: app)
-        try revealCustomPositionSection(in: app)
-
-        let openEditor = app.buttons["Ouvrir l'éditeur"]
-        XCTAssertTrue(openEditor.waitForExistence(timeout: 10))
-        openEditor.tap()
+        NewGameSetupSteps.pick("Ouvrir l'éditeur", inMenu: "startMenu", app: app)
 
         // Le bouton de sortie de l'éditeur, en mode « picker » : c'est LUI qui
         // n'était jamais visible à l'ouverture.
@@ -55,9 +51,7 @@ final class IPadSheetSizingUITests: XCTestCase {
         let app = try launchOnIPad()
 
         try openVsComputer(in: app)
-        try revealCustomPositionSection(in: app)
-        XCTAssertTrue(app.buttons["scanStartPosition"].waitForExistence(timeout: 10))
-        app.buttons["scanStartPosition"].tap()
+        NewGameSetupSteps.pick("Scanner", inMenu: "startMenu", app: app)
 
         // Le scanner s'ouvre sur son écran de choix de source ; ce qu'on
         // mesure ici, c'est la FEUILLE, pas le pipeline de reconnaissance.
@@ -85,32 +79,6 @@ final class IPadSheetSizingUITests: XCTestCase {
     }
 
     // MARK: Outils
-
-    /// La section « position de départ » est en bas de l'écran de réglages :
-    /// il faut défiler jusqu'à elle, puis l'activer pour que les deux boutons
-    /// d'entrée (éditeur, scanner) apparaissent.
-    @MainActor
-    private func revealCustomPositionSection(in app: XCUIApplication) throws {
-        // Par IDENTIFIANT et tous types confondus : `ToggleRow` n'est pas un
-        // bouton, et sur iPad le contenu défile dans la colonne de détail, pas
-        // dans la fenêtre.
-        let toggle = app.descendants(matching: .any).matching(identifier: "useCustomFEN").firstMatch
-        let scroll = app.scrollViews.element(boundBy: max(app.scrollViews.count - 1, 0))
-        var attempts = 0
-        while !toggle.exists, attempts < 8 {
-            if scroll.exists { scroll.swipeUp() } else { app.swipeUp() }
-            attempts += 1
-        }
-        guard toggle.waitForExistence(timeout: 10) else {
-            let labels = app.descendants(matching: .any).allElementsBoundByAccessibilityElement
-                .filter { $0.frame.width > 0 }
-                .map { $0.identifier.isEmpty ? $0.label : $0.identifier }
-                .filter { !$0.isEmpty }
-            print("FEUILLE-DEBUG|éléments=\(labels.prefix(40).joined(separator: " · "))")
-            throw LayoutProbeError.markerMissing("useCustomFEN")
-        }
-        toggle.tap()
-    }
 
     /// Sur iPad l'ossature est une `NavigationSplitView` : le mode est une
     /// LIGNE de barre latérale, pas un bouton de la grille d'accueil.

@@ -99,8 +99,8 @@ class AppTest {
     private fun startGame(opponent: String? = null) {
         open("play")
         awaitTag("commencer", 120_000)
-        compose.onNodeWithTag(if (opponent == null) "segment-1" else "segment-0").performScrollTo().performClick()
-        if (opponent != null) compose.onNodeWithTag(opponent).performScrollTo().performClick()
+        // La bande de portraits (18/11/2026) : Stockfish tout à gauche, Maia choisie à l'ouverture.
+        compose.chooseOpponent(opponent?.removePrefix("adversaire-") ?: "stockfish")
         compose.onNodeWithTag("commencer").performClick()
         awaitText("À vous de jouer", 120_000)
     }
