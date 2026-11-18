@@ -232,9 +232,13 @@ private fun Playing(model: VisualizationViewModel, ui: VisualizationUi) {
         }
     }
     val question = ui.question
+    // Marche 5 : le plateau est l'exercice — il prend toute la place libre (retour de l'utilisateur, 18/11), donc pas
+    // de défilement : il mesure le plus grand carré qui tient sous l'énoncé. Comme iOS.
+    val calculating = question?.kind?.step == VisualizationStep.calculation
     Column(
-        Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
+        Modifier.fillMaxSize().then(if (calculating) Modifier else Modifier.verticalScroll(rememberScrollState()))
+            .padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(if (calculating) 12.dp else 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -264,7 +268,7 @@ private fun Playing(model: VisualizationViewModel, ui: VisualizationUi) {
         }
         if (question != null) {
             QuestionCard(model, ui, question)
-            if (question.kind.step == VisualizationStep.calculation) CalculationBoard(model, ui, question)
+            if (calculating) CalculationBoard(model, ui, question, Modifier.weight(1f))
             else if (question.kind.usesBoard) QuestionBoard(model, ui, question)
             if (question.choices.isNotEmpty()) Choices(model, ui, question)
             FeedbackLine(ui, question)
@@ -279,13 +283,15 @@ private val emptyPosition: Position = Position.fromFen("8/8/8/8/8/8/8/8 w - - 0 
  * touchant départ et arrivée. Après la réponse, les pièces reviennent et la bonne réponse est fléchée. Comme iOS.
  */
 @Composable
-private fun CalculationBoard(model: VisualizationViewModel, ui: VisualizationUi, question: VQuestion) {
+private fun CalculationBoard(model: VisualizationViewModel, ui: VisualizationUi, question: VQuestion, modifier: Modifier = Modifier) {
     val memorizing = ui.isMemorizing
     val revealed = ui.feedback != null
     val board = if (memorizing) VisualizationCalc.board(question, plies = 0) else VisualizationCalc.board(question)
     val expected = (question.answer as? VAnswer.Move)?.lan
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(14.dp)) {
-        Box(Modifier.widthIn(max = 420.dp).fillMaxWidth().aspectRatio(1f).clip(RoundedCornerShape(8.dp)).testTag("visualisation-plateau")) {
+    Column(modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        // Toute la place libre, en largeur comme en hauteur : le plus grand carré qui y tient.
+        Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+        Box(Modifier.aspectRatio(1f, matchHeightConstraintsFirst = true).clip(RoundedCornerShape(8.dp)).testTag("visualisation-plateau")) {
             BoardView(
                 position = board?.position ?: emptyPosition,
                 orientation = VisualizationCalc.sideToFind(question),
@@ -296,6 +302,7 @@ private fun CalculationBoard(model: VisualizationViewModel, ui: VisualizationUi,
                     else com.chesslab.ui.PieceMask(hidden = setOf(Piece.Color.white, Piece.Color.black)),
                 onSquareTap = { square -> VSquare.parse(square.notation)?.let { model.tapCalculationSquare(it) } },
             )
+        }
         }
         if (memorizing) {
             Row(
@@ -746,13 +753,14 @@ private fun QuestionCard(model: VisualizationViewModel, ui: VisualizationUi, que
         else -> Palette.danger
     }
     val shape = RoundedCornerShape(22.dp)
+    val calculating = question.kind.step == VisualizationStep.calculation
     Column(
         Modifier.fillMaxWidth().clip(shape)
             .background(androidx.compose.ui.graphics.Brush.verticalGradient(listOf(tint.copy(alpha = 0.24f), Palette.surfaceElevated)))
             .border(if (feedback == null) 1.dp else 2.dp, frame, shape)
-            .padding(18.dp),
+            .padding(if (calculating) 14.dp else 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(14.dp),
+        verticalArrangement = Arrangement.spacedBy(if (calculating) 10.dp else 14.dp),
     ) {
         Row(
             Modifier.clip(CircleShape).background(tint.copy(alpha = 0.16f)).padding(horizontal = 10.dp, vertical = 5.dp),
@@ -763,7 +771,7 @@ private fun QuestionCard(model: VisualizationViewModel, ui: VisualizationUi, que
         }
         Scene(question)
         Text(
-            prompt(question, ui.isMemorizing), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+            prompt(question, ui.isMemorizing), fontSize = if (calculating) 19.sp else 22.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
             textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().testTag("visualisation-question"),
         )
         model.questionTimeFraction()?.let { fraction ->

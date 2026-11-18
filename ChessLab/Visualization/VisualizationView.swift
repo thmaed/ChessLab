@@ -193,18 +193,21 @@ struct VisualizationView: View {
     // MARK: La série
 
     private var playing: some View {
-        VStack(spacing: 18) {
+        // Marche 5 : le plateau est l'exercice — il prend toute la place libre (retour de l'utilisateur, 18/11).
+        let calculating = viewModel.question?.kind.step == .calculation
+        return VStack(spacing: 18) {
             header
             if let question = viewModel.question {
                 questionView(question)
                     .id(viewModel.answered.count)
                     .transition(.opacity)
+                    .layoutPriority(calculating ? 1 : 0)
             }
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 16)
         .padding(.top, 8)
-        .frame(maxWidth: 560)
+        .frame(maxWidth: calculating ? 820 : 560)
         .frame(maxWidth: .infinity)
         .animation(Theme.gentle, value: viewModel.answered.count)
         .toolbar {
@@ -263,8 +266,9 @@ struct VisualizationView: View {
     private func questionView(_ q: VisualizationQuestion) -> some View {
         let tint = q.kind.step.tint
         let frame: Color = viewModel.feedback.map { $0.isCorrect ? Theme.accent : Theme.danger } ?? tint.opacity(0.35)
-        return VStack(spacing: 16) {
-            VStack(spacing: 14) {
+        let calculating = q.kind.step == .calculation
+        return VStack(spacing: calculating ? 12 : 16) {
+            VStack(spacing: calculating ? 10 : 14) {
                 Label(LocalizedStringKey(q.kind.title), systemImage: q.kind.step.symbol)
                     .font(.caption.weight(.bold))
                     .foregroundStyle(tint)
@@ -273,7 +277,7 @@ struct VisualizationView: View {
                     .background(tint.opacity(0.16), in: Capsule())
                 if !sceneRows(q).isEmpty { scene(q) }
                 Text(prompt(q))
-                    .font(.title2.weight(.semibold))
+                    .font((calculating ? Font.title3 : .title2).weight(.semibold))
                     .foregroundStyle(Theme.textPrimary)
                     .multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -291,7 +295,7 @@ struct VisualizationView: View {
                     .accessibilityHidden(true)
                 }
             }
-            .padding(18)
+            .padding(calculating ? 14 : 18)
             .frame(maxWidth: .infinity)
             .background {
                 RoundedRectangle(cornerRadius: 22, style: .continuous)
@@ -341,11 +345,13 @@ struct VisualizationView: View {
                 pieceMask: memorizing || revealed ? .none : .hidden([.white, .black])
             )
             .aspectRatio(1, contentMode: .fit)
-            .frame(maxWidth: 420)
             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
             // Un conteneur porte l'identifiant : posé sur le plateau, il se recopiait sur ses 64 cases.
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("visualizationBoard")
+            // Toute la place libre, en largeur comme en hauteur : le plateau est le plus grand carré qui y tient.
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .layoutPriority(1)
 
             if memorizing {
                 Button { withAnimation(Theme.gentle) { viewModel.hidePosition() } } label: {
