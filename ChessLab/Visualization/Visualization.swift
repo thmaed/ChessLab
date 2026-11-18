@@ -483,7 +483,13 @@ struct VisualizationSettings: Codable, Equatable {
     /// Secondes pour répondre à chaque question ; `nil` : pas de chrono.
     var secondsPerQuestion: Int?
 
-    static let secondsChoices = [10, 5]
+    /// « Court », « Moyen », « Long » — 5, 10 et 15 s pour une case : des MOTS plutôt que des secondes dans le menu
+    /// (retour de l'utilisateur, 18/11/2026) ; le temps grandit de toute façon avec la marche (Long : une minute pour
+    /// une position).
+    static let secondsChoices = [5, 10, 15]
+
+    /// Clé française du nom d'un chrono (localisée par l'appelant).
+    static func timerTitle(_ seconds: Int) -> String { seconds <= 5 ? "Court" : seconds <= 10 ? "Moyen" : "Long" }
     static let seriesDuration: TimeInterval = 60
 
     var kinds: [VisualizationKind] {

@@ -1475,7 +1475,6 @@
     <string name="vis_from_black">Dal lato del Nero</string>
     <string name="vis_timer">Tempo per domanda</string>
     <string name="vis_timer_none">Senza</string>
-    <string name="vis_seconds">%1$d s</string>
     <string name="vis_review_waiting">%1$d domanda/e sbagliata/e tornerà/anno nelle tue serie.</string>
     <string name="vis_step_squares">Le case</string>
     <string name="vis_step_lines">Le linee</string>
@@ -1542,4 +1541,7 @@
     <string name="vis_series_steps">Gradini della serie</string>
     <string name="vis_series_mix">La serie mescola: %1$s.</string>
     <string name="vis_timer_scale">Il tempo cresce con il gradino: %1$d s per una casa, %2$d s per una posizione.</string>
+    <string name="vis_timer_short">Breve</string>
+    <string name="vis_timer_medium">Medio</string>
+    <string name="vis_timer_long">Lungo</string>
 </resources>

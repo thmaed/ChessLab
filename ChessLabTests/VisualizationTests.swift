@@ -218,4 +218,8 @@ struct VisualizationTests {
         #expect(VisualizationKind.hangingPiece.seconds(base: 5) == 20)
         #expect(VisualizationKind.isCheck.seconds(base: 10) == 40)
     }
+
+    @Test func timerChoicesAreWordsNotSeconds() {
+        #expect(VisualizationSettings.secondsChoices.map(VisualizationSettings.timerTitle) == ["Court", "Moyen", "Long"])
+    }
 }

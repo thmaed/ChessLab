@@ -1518,7 +1518,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_from_black">From Black\'s side</string>
     <string name="vis_timer">Timer per question</string>
     <string name="vis_timer_none">None</string>
-    <string name="vis_seconds">%1$d s</string>
     <string name="vis_review_waiting">%1$d missed question(s) will come back in your series.</string>
     <string name="vis_step_squares">Squares</string>
     <string name="vis_step_lines">Lines</string>
@@ -1585,4 +1584,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_series_steps">Steps in the series</string>
     <string name="vis_series_mix">The series mixes: %1$s.</string>
     <string name="vis_timer_scale">The timer grows with the step: %1$d s for a square, %2$d s for a position.</string>
+    <string name="vis_timer_short">Short</string>
+    <string name="vis_timer_medium">Medium</string>
+    <string name="vis_timer_long">Long</string>
 </resources>

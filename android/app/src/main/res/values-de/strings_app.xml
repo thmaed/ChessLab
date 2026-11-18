@@ -1436,7 +1436,6 @@
     <string name="vis_from_black">Aus Sicht von Schwarz</string>
     <string name="vis_timer">Zeit pro Frage</string>
     <string name="vis_timer_none">Ohne</string>
-    <string name="vis_seconds">%1$d s</string>
     <string name="vis_review_waiting">%1$d verpasste Frage(n) kommen in deinen Serien wieder.</string>
     <string name="vis_step_squares">Die Felder</string>
     <string name="vis_step_lines">Die Linien</string>
@@ -1503,4 +1502,7 @@
     <string name="vis_series_steps">Stufen der Serie</string>
     <string name="vis_series_mix">Die Serie mischt: %1$s.</string>
     <string name="vis_timer_scale">Die Zeit wächst mit der Stufe: %1$d s für ein Feld, %2$d s für eine Stellung.</string>
+    <string name="vis_timer_short">Kurz</string>
+    <string name="vis_timer_medium">Mittel</string>
+    <string name="vis_timer_long">Lang</string>
 </resources>

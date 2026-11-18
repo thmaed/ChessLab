@@ -137,14 +137,14 @@ private fun Setup(model: VisualizationViewModel, ui: VisualizationUi) {
                 SettingRow(Icons.Default.Timer, stringResource(R.string.vis_timer)) {
                     val seconds = settings.secondsPerQuestion
                     MenuButton(
-                        if (seconds == null) stringResource(R.string.vis_timer_none) else stringResource(R.string.vis_seconds, seconds),
+                        if (seconds == null) stringResource(R.string.vis_timer_none) else stringResource(timerTitle(seconds)),
                         highlighted = seconds != null, tag = "menu-chrono",
                     ) { close ->
                         CheckItem(stringResource(R.string.vis_timer_none), seconds == null, "chrono-sans") {
                             model.updateSettings(settings.copy(secondsPerQuestion = null)); close()
                         }
                         VisualizationSettings.SECONDS_CHOICES.forEach { s ->
-                            CheckItem(stringResource(R.string.vis_seconds, s), seconds == s, "chrono-$s") {
+                            CheckItem(stringResource(timerTitle(s)), seconds == s, "chrono-$s") {
                                 model.updateSettings(settings.copy(secondsPerQuestion = s)); close()
                             }
                         }
@@ -582,6 +582,12 @@ private fun stepDetail(step: VisualizationStep) = when (step) {
     VisualizationStep.lines -> R.string.vis_step_lines_detail
     VisualizationStep.pieces -> R.string.vis_step_pieces_detail
     VisualizationStep.position -> R.string.vis_step_position_detail
+}
+
+private fun timerTitle(seconds: Int) = when {
+    seconds <= 5 -> R.string.vis_timer_short
+    seconds <= 10 -> R.string.vis_timer_medium
+    else -> R.string.vis_timer_long
 }
 
 private fun lengthLabel(length: VisualizationLength) = when (length) {

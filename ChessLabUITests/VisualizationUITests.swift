@@ -91,7 +91,7 @@ final class VisualizationUITests: XCTestCase {
         }
 
         // Chrono par question : sans réponse, le temps tranche.
-        NewGameSetupSteps.pick("5 s", inMenu: "visualizationTimerMenu", app: app)
+        NewGameSetupSteps.pick("Court", inMenu: "visualizationTimerMenu", app: app)
         start.tap()
         XCTAssertTrue(prompt.waitForExistence(timeout: 5))
         let timedOut = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Temps écoulé'")).firstMatch

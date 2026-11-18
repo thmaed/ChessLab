@@ -391,7 +391,8 @@ data class VisualizationSettings(
     val kinds: List<VisualizationKind> get() = VisualizationKind.entries.filter { it.step in steps }
 
     companion object {
-        val SECONDS_CHOICES = listOf(10, 5)
+        /** « Court », « Moyen », « Long » — 5, 10 et 15 s pour une case : des MOTS dans le menu (18/11/2026, comme iOS). */
+        val SECONDS_CHOICES = listOf(5, 10, 15)
         const val SERIES_DURATION_MS = 60_000L
     }
 }

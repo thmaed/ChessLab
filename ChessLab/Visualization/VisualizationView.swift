@@ -90,15 +90,15 @@ struct VisualizationView: View {
                             ForEach(VisualizationSettings.secondsChoices, id: \.self) { seconds in
                                 Button { viewModel.settings.secondsPerQuestion = seconds } label: {
                                     if viewModel.settings.secondsPerQuestion == seconds {
-                                        Label("\(seconds) s", systemImage: "checkmark")
+                                        Label(LocalizedStringKey(VisualizationSettings.timerTitle(seconds)), systemImage: "checkmark")
                                     } else {
-                                        Text("\(seconds) s")
+                                        Text(LocalizedStringKey(VisualizationSettings.timerTitle(seconds)))
                                     }
                                 }
                             }
                         } label: {
                             if let seconds = viewModel.settings.secondsPerQuestion {
-                                menuValue("\(seconds) s", highlighted: true)
+                                menuValue(LocalizedStringKey(VisualizationSettings.timerTitle(seconds)), highlighted: true)
                             } else {
                                 menuValue("Sans")
                             }
