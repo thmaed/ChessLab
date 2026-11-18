@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Casino
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Extension
 import androidx.compose.material.icons.filled.Replay
@@ -96,11 +97,15 @@ private val modes = listOf(
         R.string.home_endgames_long, R.string.home_endgames_sub, Icons.Default.EmojiEvents, Palette.gold),
     Mode(Route.Analysis, "analysis", R.string.route_analysis, R.string.route_analysis,
         R.string.home_analysis_long, R.string.home_analysis_sub, Icons.Default.ShowChart, Palette.teal),
-    Mode(Route.Laboratory(), "lab", R.string.route_lab, R.string.route_lab,
-        R.string.home_lab_long, R.string.home_lab_sub, Icons.Default.Science, Palette.rose),
+    // « Plus » dans l'ordre d'iOS : 2 joueurs, Finales, Visualisation, Variantes, Laboratoire (18/11/2026 —
+    // Laboratoire passait avant Variantes).
+    Mode(Route.Visualization(), "visualization", R.string.route_visualization, R.string.route_visualization,
+        R.string.route_visualization, R.string.route_visualization, Icons.Default.Visibility, Palette.teal),
     Mode(Route.Variants, "variants", R.string.route_variants, R.string.route_variants,
         R.string.home_variants_long, R.string.home_variants_sub, Icons.Default.Casino, Palette.violet,
         spot = DiscoverySpot.variantsTile),
+    Mode(Route.Laboratory(), "lab", R.string.route_lab, R.string.route_lab,
+        R.string.home_lab_long, R.string.home_lab_sub, Icons.Default.Science, Palette.rose),
 )
 
 @Composable
@@ -204,9 +209,15 @@ fun HomeScreen(onOpen: (Route) -> Unit) {
                 }
             }
             SectionHeader(stringResource(R.string.home_more), Modifier.padding(top = 6.dp))
-            secondary.chunked(perRow).forEach { row ->
+            // Cinq tuiles depuis Visualisation (18/11/2026, comme iOS) : trois colonnes (une rangée de trois, une de
+            // deux) plutôt qu'une tuile seule sur sa ligne ; sur téléphone, icône au-dessus du nom pour tenir dans un
+            // tiers. Fenêtre large et basse : les cinq sur une rangée.
+            val morePerRow = if (wideLow) 5 else 3
+            val stacked = !wideLow && largeur < 600.dp
+            secondary.chunked(morePerRow).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    row.forEach { mode -> Box(Modifier.weight(1f)) { CompactModeCard(mode, onOpen) } }
+                    row.forEach { mode -> Box(Modifier.weight(1f)) { CompactModeCard(mode, onOpen, stacked) } }
+                    repeat(morePerRow - row.size) { Spacer(Modifier.weight(1f)) }
                 }
             }
             if (recent.isNotEmpty()) RecentGames(recent, onOpen)
@@ -381,7 +392,33 @@ private val PRIMARY_MODE_TAGS = setOf("play", "puzzles", "openings", "analysis")
 
 /** Tuile BASSE de l'étage « Plus » : icône et titre sur une ligne. Pendant de `CompactModeCard` (iOS). */
 @Composable
-private fun CompactModeCard(mode: Mode, onOpen: (Route) -> Unit) {
+private fun CompactModeCard(mode: Mode, onOpen: (Route) -> Unit, stacked: Boolean = false) {
+    if (stacked) {
+        Column(
+            Modifier
+                .testTag("mode-${mode.tag}")
+                .then(if (mode.spot != null) Modifier.discoveryAnchor(mode.spot) else Modifier)
+                .fillMaxWidth()
+                .height(82.dp)
+                .clip(CardShape)
+                .background(cardGradient)
+                .background(Brush.verticalGradient(listOf(mode.tint.copy(alpha = 0.24f), mode.tint.copy(alpha = 0.04f))))
+                .tintedCardBorder(mode.tint, mode.enabled)
+                .clickable(enabled = mode.enabled) { onOpen(mode.route) }
+                .padding(horizontal = 6.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            IconBadge(mode.icon, mode.tint, size = 32.dp, enabled = mode.enabled)
+            Spacer(Modifier.height(8.dp))
+            Text(
+                stringResource(mode.shortTitle),
+                fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                maxLines = 1, overflow = TextOverflow.Ellipsis,
+            )
+        }
+        return
+    }
     Row(
         Modifier
             .testTag("mode-${mode.tag}")

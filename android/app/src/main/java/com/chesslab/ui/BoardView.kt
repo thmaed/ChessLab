@@ -127,6 +127,8 @@ fun BoardView(
      * `pieceMask` de `ChessBoardView.swift`.
      */
     pieceMask: PieceMask = PieceMask.None,
+    /** Les lettres et chiffres des bords. Coupés pour Visualisation (18/11/2026) : trouver la case EST l'exercice. */
+    showCoordinates: Boolean = true,
     onSquareTap: (Square) -> Unit = {},
 ) {
     // Le thème et le jeu de pièces viennent des réglages : aucun écran n'a à
@@ -281,8 +283,8 @@ fun BoardView(
                                 // dessous en montrerait deux.
                                 hidePiece = drag?.from == square || slide?.second == square,
                                 piecesRotated = piecesRotated,
-                                showFile = rank == ranks.last,
-                                showRank = file == files.first,
+                                showFile = showCoordinates && rank == ranks.last,
+                                showRank = showCoordinates && file == files.first,
                                 modifier = Modifier.weight(1f).fillMaxHeight(),
                                 onTap = { if (enabled) onSquareTap(square) },
                             )

@@ -2191,3 +2191,16 @@ fin, bilan « À l'aveugle · niveau · N coups d'œil », étiquette « À l'av
   colonne `settings_json` de la sauvegarde (aucune migration) ; iOS dans `PlayGameAutosave`.
 - **Écart relevé, déjà présent** : les libellés VoiceOver des cases sont en français en dur sur iOS (« Case e4, vide »),
   traduits sur Android — non propre à ce mode.
+
+## Visualisation, lot 1 (18/11/2026)
+
+Porté à l'identique d'iOS : marches « Les cases » (couleur, trouver, nommer) et « Les lignes » (même diagonale,
+croisements, trajets du cavalier), mêmes leurres, mêmes clés de reprise, même retour des erreurs (deux réussites pour
+sortir de « À revoir »), mêmes réglages (marches, longueur 10 / 20 / 1 minute, vu des Noirs, chrono 10 s / 5 s), même
+bilan. Tuile dans « Plus », trois colonnes, icône au-dessus du nom ; « Plus » remis dans l'ordre d'iOS (Variantes avant
+Laboratoire). Le plateau Android a gagné `showCoordinates`. Différence de forme seulement : réglages et statistiques
+en préférences texte (iOS : JSON dans UserDefaults), aucun des deux côtés ne les synchronise.
+
+- [x] JVM : `VisualizationTest` (9) ; instrumenté : `VisualizationTest` vert sur l'ÉMULATEUR (le Galaxy était débranché).
+- [ ] **À vérifier sur le Galaxy** : le parcours instrumenté, l'aspect de « Plus » à trois colonnes (police agrandie du
+      Galaxy : « Visualisation » doit tenir dans un tiers), et un plateau « Touchez… » au doigt.

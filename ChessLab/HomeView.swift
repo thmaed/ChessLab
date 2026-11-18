@@ -111,6 +111,8 @@ struct HomeView: View {
         case activePuzzleSession(PuzzleSessionFilter)
         /// « Contre la montre » : trois minutes, trois erreurs (17/11/2026).
         case puzzleRush
+        /// Visualisation : voir l'échiquier dans sa tête, par marches (18/11/2026).
+        case visualization
         /// Un programme Woodpecker, repris là où il en est.
         case woodpecker(UUID)
         /// Liste des ouvertures — l'écran d'entrée du module.
@@ -195,7 +197,7 @@ struct HomeView: View {
         var showsBoard: Bool {
             switch self {
             case .activeGame, .resumedGame, .activeTwoPlayerGame, .resumedTwoPlayerGame,
-                 .activeAnalysis, .missedMates, .positionEditor, .activePuzzleSession, .puzzleRush, .woodpecker,
+                 .activeAnalysis, .missedMates, .positionEditor, .activePuzzleSession, .puzzleRush, .visualization, .woodpecker,
                  .endgameFreeTrain, .endgameReader, .openingEditor, .openingLabsReader,
                  .openingTrainDaily, .openingTrainSession, .openingTrainLine,
                  .activeChess960Game, .activeChess960TwoPlayerGame, .activeChess960Analysis,
@@ -219,7 +221,7 @@ struct HomeView: View {
         /// Le tableau de bord. Sans cette entrée, choisir un mode dans la barre remplaçait l'accueil (séance du
         /// jour, progression, parties récentes) sans plus aucun chemin pour y revenir (retour du 16/11/2026).
         case home
-        case vsEngine, twoPlayer, puzzles, openings, endgames, analysis, laboratory, variants
+        case vsEngine, twoPlayer, puzzles, openings, endgames, visualization, analysis, laboratory, variants
         case progression, settings, help
     }
 
@@ -844,6 +846,7 @@ struct HomeView: View {
                     accessibilityID: "sidebar_openings"
                 )
                 sidebarLabel(.endgames, "Finales", "crown.fill", Theme.gold)
+                sidebarLabel(.visualization, "Visualisation", "eye", Theme.teal, accessibilityID: "sidebar_visualization")
                 sidebarLabel(.analysis, "Analyser", "chart.xyaxis.line", Theme.teal)
                 sidebarLabel(.laboratory, "Laboratoire", "flask", Theme.rose)
                 sidebarLabel(.variants, "Variantes", "die.face.5.fill", Theme.violet, accessibilityID: "sidebar_variants", discoverySpot: .variantsTile)
@@ -895,6 +898,7 @@ struct HomeView: View {
         case .puzzles: destination(for: .puzzleQueue)
         case .openings: destination(for: .openingList)
         case .endgames: destination(for: .endgameList)
+        case .visualization: destination(for: .visualization)
         case .analysis: destination(for: .analysisEntry)
         case .laboratory: destination(for: .labSetup(startFEN: nil))
         case .variants: destination(for: .variantsHub)
@@ -1255,6 +1259,9 @@ struct HomeView: View {
                         sessionStore.remove(sessionKey(for: .puzzleRush))
                         path.append(Route.puzzleRush)
                     }
+
+                case .visualization:
+                    VisualizationHost(sessionKey: sessionKey(for: route))
 
                 case .puzzleRush:
                     PuzzleRushHost(sessionKey: sessionKey(for: route)) {
@@ -1675,18 +1682,26 @@ struct HomeView: View {
             }
             sectionHeader("Plus")
                 .padding(.top, 6)
-            LazyVGrid(columns: columns, spacing: ModeGridMetrics.spacing) {
-                CompactModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", systemImage: "person.2.fill", tint: Theme.info, accessibilityID: "mode_twoPlayer") {
+            // Cinq tuiles depuis Visualisation (18/11/2026) : trois colonnes (une rangée de trois, une de deux) plutôt
+            // qu'une tuile seule sur sa ligne ; sur iPhone, icône au-dessus du nom pour tenir dans un tiers. Fenêtre
+            // large et basse : les cinq sur une rangée.
+            LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: ModeGridMetrics.spacing),
+                                     count: lowRow ? 5 : 3),
+                      spacing: ModeGridMetrics.spacing) {
+                CompactModeCard(title: "Deux joueurs", shortTitle: "2 joueurs", systemImage: "person.2.fill", tint: Theme.info, accessibilityID: "mode_twoPlayer", stacked: horizontalSizeClass != .regular) {
                     path.append(Route.twoPlayerSetup)
                 }
-                CompactModeCard(title: "Finales", systemImage: "crown.fill", tint: Theme.gold, accessibilityID: "mode_endgames") {
+                CompactModeCard(title: "Finales", systemImage: "crown.fill", tint: Theme.gold, accessibilityID: "mode_endgames", stacked: horizontalSizeClass != .regular) {
                     path.append(Route.endgameList)
                 }
-                CompactModeCard(title: "Variantes", systemImage: "die.face.5.fill", tint: Theme.violet, accessibilityID: "mode_variants") {
+                CompactModeCard(title: "Visualisation", systemImage: "eye", tint: Theme.teal, accessibilityID: "mode_visualization", stacked: horizontalSizeClass != .regular) {
+                    path.append(Route.visualization)
+                }
+                CompactModeCard(title: "Variantes", systemImage: "die.face.5.fill", tint: Theme.violet, accessibilityID: "mode_variants", stacked: horizontalSizeClass != .regular) {
                     path.append(Route.variantsHub)
                 }
                 .discoveryAnchor(.variantsTile, priority: 1)
-                CompactModeCard(title: "Laboratoire", systemImage: "flask", tint: Theme.rose) {
+                CompactModeCard(title: "Laboratoire", systemImage: "flask", tint: Theme.rose, stacked: horizontalSizeClass != .regular) {
                     path.append(Route.labSetup(startFEN: nil))
                 }
             }
@@ -2635,6 +2650,27 @@ private struct WoodpeckerHost: View {
 /// série ouverte (bouton "Commencer" de ``PuzzleQueueView``, une fois
 /// niveau/phase/type choisis) — le modèle tire lui-même les puzzles un à
 /// un selon le filtre, au fil des "Nouveau puzzle".
+/// Héberge Visualisation : son modèle (réglages, série en cours, bilan) survit aux reconstructions de la vue.
+private struct VisualizationHost: View {
+    let sessionKey: String
+    @Environment(\.sessionStore) private var sessionStore
+    @State private var viewModel: VisualizationViewModel?
+
+    var body: some View {
+        Group {
+            if let viewModel {
+                VisualizationView(viewModel: viewModel, onExit: {})
+            } else {
+                Color.clear
+            }
+        }
+        .onAppear {
+            guard viewModel == nil else { return }
+            viewModel = sessionStore.value(for: sessionKey) { VisualizationViewModel() }
+        }
+    }
+}
+
 /// Héberge la série « Contre la montre » : son modèle survit aux reconstructions de la vue (voir
 /// ``SessionStore``), un raté ouvert dans l'Analyse puis refermé retrouve le bilan.
 private struct PuzzleRushHost: View {
@@ -2828,6 +2864,9 @@ struct CompactModeCard: View {
     let systemImage: String
     var tint: Color = Theme.accent
     var accessibilityID: String? = nil
+    /// Icône AU-DESSUS du nom, pour les trois colonnes de « Plus » sur iPhone (18/11/2026 : cinq tuiles depuis
+    /// Visualisation ; en deux colonnes, la cinquième restait seule sur sa ligne).
+    var stacked = false
     let action: () -> Void
 
     @Environment(\.horizontalSizeClass) private var horizontalSizeClass
@@ -2835,22 +2874,37 @@ struct CompactModeCard: View {
 
     var body: some View {
         Button(action: action) {
-            HStack(spacing: 10) {
-                IconBadge(systemImage: systemImage, tint: tint, size: isRegular ? 38 : 32)
-                Text(isRegular ? title : (shortTitle ?? title))
-                    .font(isRegular ? .headline : .subheadline.weight(.semibold))
-                    .foregroundStyle(Theme.textPrimary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
-                Spacer(minLength: 0)
+            Group {
+                if stacked {
+                    VStack(spacing: 8) {
+                        IconBadge(systemImage: systemImage, tint: tint, size: 32)
+                        Text(shortTitle ?? title)
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(Theme.textPrimary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                    }
+                    .padding(.horizontal, 6)
+                    .frame(maxWidth: .infinity, minHeight: 82)
+                } else {
+                    HStack(spacing: 10) {
+                        IconBadge(systemImage: systemImage, tint: tint, size: isRegular ? 38 : 32)
+                        Text(isRegular ? title : (shortTitle ?? title))
+                            .font(isRegular ? .headline : .subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.textPrimary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.7)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.horizontal, isRegular ? 16 : 12)
+                    .frame(maxWidth: .infinity, minHeight: isRegular ? 64 : 56, alignment: .leading)
+                }
             }
-            .padding(.horizontal, isRegular ? 16 : 12)
-            .frame(maxWidth: .infinity, minHeight: isRegular ? 64 : 56, alignment: .leading)
             .background {
                 ZStack {
                     Theme.cardGradient
                     LinearGradient(colors: [tint.opacity(0.24), tint.opacity(0.04)],
-                                   startPoint: .leading, endPoint: .trailing)
+                                   startPoint: stacked ? .top : .leading, endPoint: stacked ? .bottom : .trailing)
                 }
                 .accessibilityHidden(true)
             }

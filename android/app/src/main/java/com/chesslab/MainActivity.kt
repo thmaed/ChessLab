@@ -305,6 +305,7 @@ private fun App(
                 onOpenWoodpecker = { stack.add(Route.Woodpecker(it)) },
                 onStartRush = { stack.add(Route.PuzzleRush()) },
             )
+            is Route.Visualization -> com.chesslab.visualization.VisualizationScreen(session = current.session)
             is Route.PuzzleRush -> com.chesslab.puzzles.PuzzleRushScreen(
                 session = current.session,
                 onExit = { stack.removeAt(stack.lastIndex) },

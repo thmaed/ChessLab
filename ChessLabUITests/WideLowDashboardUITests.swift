@@ -48,7 +48,7 @@ final class WideLowDashboardUITests: XCTestCase {
 
         let main = [play, app.buttons["Puzzles"].firstMatch, app.buttons["mode_openings"], app.buttons["Analyser"].firstMatch]
         let more = [app.buttons["mode_twoPlayer"], app.buttons["mode_endgames"], app.buttons["mode_variants"],
-                    app.buttons["Laboratoire"].firstMatch]
+                    app.buttons["Laboratoire"].firstMatch, app.buttons["mode_visualization"]]
         for tile in main + more {
             XCTAssertTrue(tile.waitForExistence(timeout: 5), "\(tile) doit exister")
             XCTAssertTrue(tile.isHittable, "\(tile.label) doit être visible SANS défiler")

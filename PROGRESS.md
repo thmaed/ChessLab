@@ -11559,3 +11559,22 @@ par défaut ; liste des coups visible.
     (barre verticale, point d'arrêt) ne ressemblait pas à celui d'iOS → poignée blanche en pastille, piste fine.
   - Hors refonte, relevé en passant : `EnglishTest#theHomeSpeaksEnglish` échoue sur le Galaxy (« Winning endings »
     pas encore composé dans la grille paresseuse de l'accueil) — l'accueil n'est pas touché par ce chantier.
+- **18/11, VISUALISATION, lot 1 (iOS + Android)** — né du retour de Ron (testeur, enseignant ; *Cognitive Chess* de
+  Chernyshov) : une échelle de marches, des exercices générés à l'infini, réglables, et la trace de ce qui est raté.
+  Décisions : nom « Visualisation », tuile dans « Plus », lot 1 d'abord, réglages = marches, longueur (10 / 20 /
+  1 minute), vu des Noirs, chrono par question (10 s / 5 s).
+  - Marche 1 « Les cases » : couleur d'une case (sans plateau), trouver une case (plateau SANS coordonnées), nommer
+    une case surlignée (quatre noms : la bonne et les confusions fréquentes — vue de l'autre côté, reflets, voisine).
+    Marche 2 « Les lignes » : même diagonale ? (oui ou non, jamais deux voisines ; les « non » sont à une colonne
+    près), croisement d'une colonne ou rangée et d'une diagonale (quatre cases), trajet du cavalier (1 à 6 coups,
+    parcours en largeur).
+  - Une question ratée revient environ une fois sur trois dans les séries suivantes, jusqu'à deux réussites ; le
+    réglage l'annonce (« N questions ratées reviendront »), le bilan les liste (réponse, la vôtre). Réussite par
+    marche affichée. Temps arrêté hors du premier plan.
+  - Accueil : cinq tuiles dans « Plus » → TROIS colonnes, icône au-dessus du nom sur iPhone (choix de l'utilisateur
+    plutôt qu'une tuile seule sur sa ligne) ; fenêtre large et basse : les cinq sur une rangée. iPad : entrée dans la
+    barre latérale. Android : même grille, et « Plus » remis dans l'ordre d'iOS.
+  - Défaut trouvé par les tests : le compteur passait à la question suivante dès la réponse, pendant le retour — il
+    garde désormais le numéro de la question en cours (les deux côtés).
+  - Tests : iOS `VisualizationTests` (10) et `VisualizationUITests` (parcours complet, chrono qui tranche) ; Android
+    `VisualizationTest` JVM (9) et instrumenté (émulateur ; Galaxy débranché, à refaire — PARITE.md) ; JVM 713/713.

@@ -704,7 +704,7 @@ private fun LevelRow(profile: OpponentProfile?, level: Double, onLevel: (Double)
 private val CardShape = RoundedCornerShape(18.dp)
 
 @Composable
-private fun GameCard(content: @Composable ColumnScope.() -> Unit) {
+internal fun GameCard(content: @Composable ColumnScope.() -> Unit) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -716,12 +716,12 @@ private fun GameCard(content: @Composable ColumnScope.() -> Unit) {
 }
 
 @Composable
-private fun RowDivider() {
+internal fun RowDivider() {
     HorizontalDivider(Modifier.padding(start = 52.dp), thickness = 0.5.dp, color = Palette.strokeStrong)
 }
 
 @Composable
-private fun SettingRow(icon: ImageVector, title: String, modifier: Modifier = Modifier, trailing: @Composable () -> Unit) {
+internal fun SettingRow(icon: ImageVector, title: String, modifier: Modifier = Modifier, trailing: @Composable () -> Unit) {
     Row(
         modifier.fillMaxWidth().heightIn(min = 50.dp).padding(horizontal = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -735,7 +735,7 @@ private fun SettingRow(icon: ImageVector, title: String, modifier: Modifier = Mo
 
 /** La valeur à droite d'une ligne : le choix, puis la petite flèche des menus. Le menu s'ouvre dessous. */
 @Composable
-private fun MenuButton(
+internal fun MenuButton(
     value: String, highlighted: Boolean, tag: String,
     items: @Composable ColumnScope.(close: () -> Unit) -> Unit,
 ) {
@@ -762,7 +762,7 @@ private fun MenuButton(
 }
 
 @Composable
-private fun CheckItem(label: String, checked: Boolean, tag: String, onClick: () -> Unit) {
+internal fun CheckItem(label: String, checked: Boolean, tag: String, onClick: () -> Unit) {
     DropdownMenuItem(
         text = { Text(label, color = Palette.textPrimary) },
         onClick = onClick,
@@ -784,7 +784,7 @@ private fun IconItem(label: String, icon: ImageVector, tag: String, onClick: () 
 }
 
 @Composable
-private fun SectionLabel(text: String) {
+internal fun SectionLabel(text: String) {
     Text(
         text.uppercase(), fontSize = 11.sp, fontWeight = FontWeight.SemiBold, color = Palette.textTertiary,
         modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 2.dp),

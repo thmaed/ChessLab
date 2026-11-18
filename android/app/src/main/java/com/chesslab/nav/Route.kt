@@ -159,6 +159,11 @@ sealed class Route(@StringRes val titleRes: Int, val dynamicTitle: String? = nul
      * compris) est oubliée, mais un raté ouvert dans l'Analyse puis refermé retrouve son bilan.
      */
     data class PuzzleRush(val session: Long = System.currentTimeMillis()) : Route(R.string.rush_title)
+    /**
+     * Visualisation (18/11/2026) : voir l'échiquier dans sa tête, par marches. [session] : chaque entrée repart des
+     * réglages, comme « Contre la montre ».
+     */
+    data class Visualization(val session: Long = System.currentTimeMillis()) : Route(R.string.route_visualization)
     data object Openings : Route(R.string.route_openings) {
         override val hasOwnTitle get() = true
     }
