@@ -1539,4 +1539,6 @@
     <string name="vis_none">Ninguna</string>
     <string name="vis_answer_label">Respuesta:</string>
     <string name="vis_you_label">Tú:</string>
+    <string name="vis_series_steps">Peldaños de la serie</string>
+    <string name="vis_series_mix">La serie mezcla: %1$s.</string>
 </resources>

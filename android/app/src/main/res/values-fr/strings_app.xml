@@ -1579,4 +1579,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="vis_none">Aucune</string>
     <string name="vis_answer_label">Réponse :</string>
     <string name="vis_you_label">Vous :</string>
+    <string name="vis_series_steps">Marches de la série</string>
+    <string name="vis_series_mix">La série mélange : %1$s.</string>
 </resources>

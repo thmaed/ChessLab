@@ -38,13 +38,22 @@ struct VisualizationView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 4)
 
-                sectionTitle("Les marches")
+                // Retour de l'utilisateur (18/11/2026) : on ne voyait pas QUELLES marches la série jouerait — une ligne
+                // décochée restait aussi vive qu'une cochée. Décochée = éteinte ; cochée = teintée ; et une phrase dit
+                // ce que la série mélange.
+                sectionTitle("Marches de la série")
                 card {
                     ForEach(Array(VisualizationStep.allCases.enumerated()), id: \.element) { index, step in
                         if index > 0 { rowDivider }
                         stepRow(step)
                     }
                 }
+                Text(seriesMix)
+                    .font(.footnote)
+                    .foregroundStyle(Theme.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .padding(.horizontal, 4)
+                    .accessibilityIdentifier("visualizationMix")
 
                 sectionTitle("Série")
                 card {
@@ -116,6 +125,13 @@ struct VisualizationView: View {
         .primaryActionBar("Commencer", identifier: "visualizationStart") { viewModel.start() }
     }
 
+    /// « La série mélange : Les lignes, Suivre les pièces. »
+    private var seriesMix: String {
+        let names = VisualizationStep.allCases.filter { viewModel.settings.steps.contains($0) }
+            .map { LocalizationController.string($0.title) }
+        return LocalizationController.string("La série mélange : %@.", names.joined(separator: ", "))
+    }
+
     private func stepRow(_ step: VisualizationStep) -> some View {
         let isOn = viewModel.settings.steps.contains(step)
         return Button {
@@ -124,23 +140,24 @@ struct VisualizationView: View {
             HStack(spacing: 12) {
                 Text(verbatim: "\(step.number)")
                     .font(.headline.monospacedDigit())
-                    .foregroundStyle(isOn ? Theme.background : Theme.accent)
+                    .foregroundStyle(isOn ? Theme.background : Theme.textTertiary)
                     .frame(width: 30, height: 30)
-                    .background(Circle().fill(isOn ? Theme.accent : Theme.accent.opacity(0.14)))
+                    .background(Circle().fill(isOn ? Theme.accent : Color.white.opacity(0.06)))
+                    .overlay(Circle().strokeBorder(isOn ? Color.clear : Theme.stroke, lineWidth: 1))
                 VStack(alignment: .leading, spacing: 2) {
                     Text(LocalizedStringKey(step.title))
                         .font(.body.weight(.semibold))
-                        .foregroundStyle(Theme.textPrimary)
+                        .foregroundStyle(isOn ? Theme.textPrimary : Theme.textTertiary)
                     Text(LocalizedStringKey(step.detail))
                         .font(.caption)
-                        .foregroundStyle(Theme.textSecondary)
+                        .foregroundStyle(isOn ? Theme.textSecondary : Theme.textTertiary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 Spacer(minLength: 8)
                 if let accuracy = viewModel.stats.accuracy(for: step) {
                     Text(verbatim: "\(accuracy) %")
                         .font(.subheadline.weight(.semibold).monospacedDigit())
-                        .foregroundStyle(Theme.textSecondary)
+                        .foregroundStyle(isOn ? Theme.textSecondary : Theme.textTertiary)
                 }
                 Image(systemName: isOn ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
@@ -148,6 +165,7 @@ struct VisualizationView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
+            .background(isOn ? Theme.accent.opacity(0.08) : Color.clear)
             .contentShape(Rectangle())
         }
         .buttonStyle(.pressable)

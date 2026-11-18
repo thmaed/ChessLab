@@ -1500,4 +1500,6 @@
     <string name="vis_none">Keine</string>
     <string name="vis_answer_label">Antwort:</string>
     <string name="vis_you_label">Du:</string>
+    <string name="vis_series_steps">Stufen der Serie</string>
+    <string name="vis_series_mix">Die Serie mischt: %1$s.</string>
 </resources>

@@ -100,13 +100,20 @@ private fun Setup(model: VisualizationViewModel, ui: VisualizationUi) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Text(stringResource(R.string.vis_intro), fontSize = 15.sp, color = Palette.textSecondary, modifier = Modifier.padding(horizontal = 4.dp))
-            SectionTitle(stringResource(R.string.vis_steps))
+            // On ne voyait pas QUELLES marches la série jouerait (retour du 18/11/2026, comme iOS) : décochée = éteinte,
+            // cochée = teintée, et une phrase dit ce que la série mélange.
+            SectionTitle(stringResource(R.string.vis_series_steps))
             GameCard {
                 VisualizationStep.entries.forEachIndexed { index, step ->
                     if (index > 0) RowDivider()
                     StepRow(step, step in settings.steps, ui.stats.accuracy(step)) { model.toggle(step) }
                 }
             }
+            val mix = VisualizationStep.entries.filter { it in settings.steps }.map { stringResource(stepTitle(it)) }
+            Text(
+                stringResource(R.string.vis_series_mix, mix.joinToString(", ")), fontSize = 13.sp, color = Palette.textSecondary,
+                modifier = Modifier.padding(horizontal = 4.dp).testTag("visualisation-melange"),
+            )
             SectionTitle(stringResource(R.string.vis_series))
             GameCard {
                 SettingRow(Icons.Default.Tag, stringResource(R.string.vis_length)) {
@@ -161,6 +168,7 @@ private fun StepRow(step: VisualizationStep, isOn: Boolean, accuracy: Int?, onTo
     Row(
         Modifier
             .fillMaxWidth()
+            .background(if (isOn) Palette.accent.copy(alpha = 0.08f) else Color.Transparent)
             .clickable(onClick = onToggle)
             .semantics(mergeDescendants = true) { selected = isOn; role = Role.Checkbox }
             .padding(horizontal = 14.dp, vertical = 12.dp)
@@ -169,16 +177,21 @@ private fun StepRow(step: VisualizationStep, isOn: Boolean, accuracy: Int?, onTo
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Box(
-            Modifier.size(30.dp).clip(CircleShape).background(if (isOn) Palette.accent else Palette.accent.copy(alpha = 0.14f)),
+            Modifier.size(30.dp).clip(CircleShape)
+                .background(if (isOn) Palette.accent else Color.White.copy(alpha = 0.06f))
+                .border(1.dp, if (isOn) Color.Transparent else Palette.stroke, CircleShape),
             contentAlignment = Alignment.Center,
         ) {
-            Text("${step.number}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = if (isOn) Palette.background else Palette.accent)
+            Text("${step.number}", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = if (isOn) Palette.background else Palette.textTertiary)
         }
         Column(Modifier.weight(1f)) {
-            Text(stringResource(stepTitle(step)), fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary)
-            Text(stringResource(stepDetail(step)), fontSize = 12.sp, color = Palette.textSecondary)
+            Text(stringResource(stepTitle(step)), fontSize = 16.sp, fontWeight = FontWeight.SemiBold,
+                color = if (isOn) Palette.textPrimary else Palette.textTertiary)
+            Text(stringResource(stepDetail(step)), fontSize = 12.sp, color = if (isOn) Palette.textSecondary else Palette.textTertiary)
         }
-        accuracy?.let { Text("$it %", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Palette.textSecondary) }
+        accuracy?.let {
+            Text("$it %", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = if (isOn) Palette.textSecondary else Palette.textTertiary)
+        }
         Icon(
             if (isOn) Icons.Default.CheckCircle else Icons.Outlined.Circle, null,
             tint = if (isOn) Palette.accent else Palette.textTertiary, modifier = Modifier.size(24.dp),

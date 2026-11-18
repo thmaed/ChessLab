@@ -1539,4 +1539,6 @@
     <string name="vis_none">Nessuna</string>
     <string name="vis_answer_label">Risposta:</string>
     <string name="vis_you_label">Tu:</string>
+    <string name="vis_series_steps">Gradini della serie</string>
+    <string name="vis_series_mix">La serie mescola: %1$s.</string>
 </resources>
