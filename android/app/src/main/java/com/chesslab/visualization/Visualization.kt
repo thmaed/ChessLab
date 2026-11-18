@@ -378,7 +378,10 @@ object VisualizationGenerator {
 
 // MARK: Les réglages
 
-enum class VisualizationLength(val questionCount: Int?) { ten(10), twenty(20), oneMinute(null) }
+/** [durationMs] : série chronométrée (« 2 minutes » ajoutée le 18/11/2026, avec le titre « Durée »). */
+enum class VisualizationLength(val questionCount: Int?, val durationMs: Long?) {
+    ten(10, null), twenty(20, null), oneMinute(null, 60_000L), twoMinutes(null, 120_000L)
+}
 
 data class VisualizationSettings(
     val steps: Set<VisualizationStep> = setOf(VisualizationStep.squares),
@@ -393,7 +396,6 @@ data class VisualizationSettings(
     companion object {
         /** « Court », « Moyen », « Long » — 5, 10 et 15 s pour une case : des MOTS dans le menu (18/11/2026, comme iOS). */
         val SECONDS_CHOICES = listOf(5, 10, 15)
-        const val SERIES_DURATION_MS = 60_000L
     }
 }
 

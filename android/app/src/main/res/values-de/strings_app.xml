@@ -1431,7 +1431,7 @@
     <string name="route_visualization">Visualisierung</string>
     <string name="vis_steps">Die Stufen</string>
     <string name="vis_series">Serie</string>
-    <string name="vis_length">Länge</string>
+    <string name="vis_length">Dauer</string>
     <string name="vis_from_black">Aus Sicht von Schwarz</string>
     <string name="vis_timer">Zeit pro Frage</string>
     <string name="vis_timer_none">Ohne</string>
@@ -1506,4 +1506,6 @@
     <string name="vis_timer_long">Lang</string>
     <string name="vis_hero_title">Das Brett im Kopf sehen</string>
     <string name="vis_hero_detail">Endlose Übungen, von den Feldern bis zum Rechnen. Deine Fehler kommen wieder, bis du sie kannst.</string>
+    <string name="vis_len_two_minutes">2 Minuten</string>
+    <string name="vis_correct_in_two_minutes">richtig in zwei Minuten</string>
 </resources>

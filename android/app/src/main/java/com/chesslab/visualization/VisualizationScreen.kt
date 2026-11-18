@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.Replay
 import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.HourglassEmpty
 import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.filled.Route
@@ -140,7 +141,7 @@ private fun Setup(model: VisualizationViewModel, ui: VisualizationUi) {
             SectionTitle(stringResource(R.string.vis_series))
             GameCard {
                 // Des PASTILLES plutôt que des menus (18/11/2026, comme iOS) : toutes les options se voient.
-                PickerRow(Icons.Default.Tag, stringResource(R.string.vis_length)) {
+                PickerRow(Icons.Default.HourglassEmpty, stringResource(R.string.vis_length)) {
                     SegmentedPills(
                         VisualizationLength.entries.map { it to stringResource(lengthLabel(it)) }, settings.length,
                         tag = { "longueur-${it.name}" },
@@ -591,6 +592,7 @@ private fun lengthLabel(length: VisualizationLength) = when (length) {
     VisualizationLength.ten -> R.string.vis_len_ten
     VisualizationLength.twenty -> R.string.vis_len_twenty
     VisualizationLength.oneMinute -> R.string.vis_len_minute
+    VisualizationLength.twoMinutes -> R.string.vis_len_two_minutes
 }
 
 private fun kindTitle(kind: VisualizationKind) = when (kind) {
@@ -735,7 +737,11 @@ private fun ScoreRing(ui: VisualizationUi) {
                 Text("${ui.correctCount} / $total", fontSize = 38.sp, fontWeight = FontWeight.Bold, color = Palette.textPrimary,
                     modifier = Modifier.testTag("visualisation-bilan"))
                 Text(
-                    stringResource(if (ui.settings.length == VisualizationLength.oneMinute) R.string.vis_correct_in_minute else R.string.vis_correct_plain),
+                    stringResource(when (ui.settings.length) {
+                        VisualizationLength.oneMinute -> R.string.vis_correct_in_minute
+                        VisualizationLength.twoMinutes -> R.string.vis_correct_in_two_minutes
+                        else -> R.string.vis_correct_plain
+                    }),
                     fontSize = 15.sp, color = Palette.textSecondary,
                 )
             }

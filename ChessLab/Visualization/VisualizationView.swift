@@ -89,7 +89,7 @@ struct VisualizationView: View {
                 // Des PASTILLES plutôt que des menus (retour de l'utilisateur, 18/11/2026 : « le sélecteur n'est pas
                 // joli ») : toutes les options se voient, le choix est une pastille pleine.
                 card {
-                    pickerRow("number", "Longueur") {
+                    pickerRow("hourglass", "Durée") {
                         SegmentedPills(
                             options: VisualizationSettings.Length.allCases.map { ($0, LocalizationController.string($0.title)) },
                             selection: $viewModel.settings.length, identifier: "visualizationLength"
@@ -511,7 +511,8 @@ struct VisualizationView: View {
                     .font(.system(size: 38, weight: .bold).monospacedDigit())
                     .foregroundStyle(Theme.textPrimary)
                     .accessibilityIdentifier("visualizationSummaryScore")
-                Text(viewModel.settings.length == .oneMinute ? "justes en une minute" : "justes")
+                Text(viewModel.settings.length == .oneMinute ? "justes en une minute"
+                     : viewModel.settings.length == .twoMinutes ? "justes en deux minutes" : "justes")
                     .font(.subheadline)
                     .foregroundStyle(Theme.textSecondary)
             }

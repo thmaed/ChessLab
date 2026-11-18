@@ -1513,7 +1513,7 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="route_visualization">Visualization</string>
     <string name="vis_steps">The steps</string>
     <string name="vis_series">Series</string>
-    <string name="vis_length">Length</string>
+    <string name="vis_length">Duration</string>
     <string name="vis_from_black">From Black\'s side</string>
     <string name="vis_timer">Timer per question</string>
     <string name="vis_timer_none">None</string>
@@ -1588,4 +1588,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_timer_long">Long</string>
     <string name="vis_hero_title">See the board in your head</string>
     <string name="vis_hero_detail">Endless exercises, from squares to calculation. Your mistakes come back until you know them.</string>
+    <string name="vis_len_two_minutes">2 minutes</string>
+    <string name="vis_correct_in_two_minutes">correct in two minutes</string>
 </resources>

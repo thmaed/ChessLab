@@ -1545,4 +1545,6 @@
     <string name="vis_timer_long">Lungo</string>
     <string name="vis_hero_title">Vedere la scacchiera nella testa</string>
     <string name="vis_hero_detail">Esercizi infiniti, dalle case al calcolo. I tuoi errori tornano finché non li sai.</string>
+    <string name="vis_len_two_minutes">2 minuti</string>
+    <string name="vis_correct_in_two_minutes">giuste in due minuti</string>
 </resources>

@@ -222,4 +222,11 @@ struct VisualizationTests {
     @Test func timerChoicesAreWordsNotSeconds() {
         #expect(VisualizationSettings.secondsChoices.map(VisualizationSettings.timerTitle) == ["Court", "Moyen", "Long"])
     }
+
+    @Test func timedSeriesLastOneOrTwoMinutes() {
+        #expect(VisualizationSettings.Length.oneMinute.duration == 60)
+        #expect(VisualizationSettings.Length.twoMinutes.duration == 120)
+        #expect(VisualizationSettings.Length.ten.duration == nil && VisualizationSettings.Length.ten.questionCount == 10)
+        #expect(VisualizationSettings.Length.twoMinutes.questionCount == nil)
+    }
 }

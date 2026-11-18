@@ -92,8 +92,8 @@ class VisualizationViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Série d'une minute : ce qu'il reste, en millisecondes. `null` pour une série en nombre de questions. */
     fun seriesRemainingMs(): Long? {
-        if (ui.settings.length != VisualizationLength.oneMinute) return null
-        return (VisualizationSettings.SERIES_DURATION_MS - seriesElapsed(ui.now)).coerceAtLeast(0)
+        val duration = ui.settings.length.durationMs ?: return null
+        return (duration - seriesElapsed(ui.now)).coerceAtLeast(0)
     }
 
     /** Chrono par question : la fraction de temps restante (1 → 0). `null` sans chrono. */

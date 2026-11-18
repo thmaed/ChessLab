@@ -81,8 +81,8 @@ final class VisualizationViewModel {
 
     /// Série d'une minute : ce qu'il reste. `nil` pour une série en nombre de questions.
     var seriesRemaining: TimeInterval? {
-        guard settings.length == .oneMinute else { return nil }
-        return max(0, VisualizationSettings.seriesDuration - seriesElapsed)
+        guard let duration = settings.length.duration else { return nil }
+        return max(0, duration - seriesElapsed)
     }
 
     /// Chrono par question : la fraction de temps restante (1 → 0). `nil` sans chrono.

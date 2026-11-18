@@ -205,5 +205,12 @@ class VisualizationTest {
         assertEquals(40, VisualizationKind.isCheck.seconds(10))
     }
 
+    @Test fun `les series chronometrees durent une ou deux minutes`() {
+        assertEquals(60_000L, VisualizationLength.oneMinute.durationMs)
+        assertEquals(120_000L, VisualizationLength.twoMinutes.durationMs)
+        assertNull(VisualizationLength.ten.durationMs)
+        assertNull(VisualizationLength.twoMinutes.questionCount)
+    }
+
     private fun assertEquals(expected: Any?, actual: Any?, message: String) = assertEquals(message, expected, actual)
 }

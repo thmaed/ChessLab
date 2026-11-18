@@ -457,14 +457,24 @@ struct VisualizationSettings: Codable, Equatable {
         case ten
         case twenty
         case oneMinute
+        /// Ajoutée le 18/11/2026 (demande de l'utilisateur), avec le titre « Durée ».
+        case twoMinutes
 
         var id: String { rawValue }
-        /// `nil` : autant de questions qu'en une minute.
+        /// `nil` : autant de questions que le temps en permet.
         var questionCount: Int? {
             switch self {
             case .ten: 10
             case .twenty: 20
-            case .oneMinute: nil
+            case .oneMinute, .twoMinutes: nil
+            }
+        }
+        /// La durée d'une série chronométrée ; `nil` pour une série en nombre de questions.
+        var duration: TimeInterval? {
+            switch self {
+            case .ten, .twenty: nil
+            case .oneMinute: 60
+            case .twoMinutes: 120
             }
         }
         var title: String {
@@ -472,6 +482,7 @@ struct VisualizationSettings: Codable, Equatable {
             case .ten: "10 questions"
             case .twenty: "20 questions"
             case .oneMinute: "1 minute"
+            case .twoMinutes: "2 minutes"
             }
         }
     }
@@ -490,7 +501,6 @@ struct VisualizationSettings: Codable, Equatable {
 
     /// Clé française du nom d'un chrono (localisée par l'appelant).
     static func timerTitle(_ seconds: Int) -> String { seconds <= 5 ? "Court" : seconds <= 10 ? "Moyen" : "Long" }
-    static let seriesDuration: TimeInterval = 60
 
     var kinds: [VisualizationKind] {
         VisualizationKind.allCases.filter { steps.contains($0.step) }

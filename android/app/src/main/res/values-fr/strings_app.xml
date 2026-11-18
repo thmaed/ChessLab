@@ -1510,7 +1510,7 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="route_visualization">Visualisation</string>
     <string name="vis_steps">Les marches</string>
     <string name="vis_series">Série</string>
-    <string name="vis_length">Longueur</string>
+    <string name="vis_length">Durée</string>
     <string name="vis_from_black">Vu des Noirs</string>
     <string name="vis_timer">Chrono par question</string>
     <string name="vis_timer_none">Sans</string>
@@ -1585,4 +1585,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="vis_timer_long">Long</string>
     <string name="vis_hero_title">Voir l\'échiquier dans sa tête</string>
     <string name="vis_hero_detail">Des exercices sans fin, des cases jusqu\'au calcul. Vos erreurs reviennent jusqu\'à ce qu\'elles soient sues.</string>
+    <string name="vis_len_two_minutes">2 minutes</string>
+    <string name="vis_correct_in_two_minutes">justes en deux minutes</string>
 </resources>
