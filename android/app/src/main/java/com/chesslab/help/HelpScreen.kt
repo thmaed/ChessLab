@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Casino
 import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.ChevronRight
@@ -326,6 +327,7 @@ private val sections = listOf(
     Triple(R.string.help_analysis_title, R.string.help_analysis_body, Icons.Default.ShowChart to Palette.teal),
     Triple(R.string.help_courses_title, R.string.help_courses_body, Icons.Default.MenuBook to Palette.warning),
     Triple(R.string.help_training_title, R.string.help_training_body, Icons.Default.Psychology to Palette.gold),
+    Triple(R.string.help_visualization_title, R.string.help_visualization_body, Icons.Default.Visibility to Palette.teal),
     Triple(R.string.help_lab_title, R.string.help_lab_body, Icons.Default.Science to Palette.rose),
     Triple(R.string.help_variants_title, R.string.help_variants_body, Icons.Default.Casino to Palette.rose),
     Triple(R.string.help_scanner_title, R.string.help_scanner_body, Icons.Default.PhotoCamera to Palette.accentSecondary),

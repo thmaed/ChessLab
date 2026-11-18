@@ -410,7 +410,11 @@ struct PuzzleSessionDrawerTests {
         let model = PuzzleRushViewModel(modelContext: context, duration: 60, playerRating: 1500,
                                         recordDefaults: defaults, remoteRecord: { nil })
         model.begin()
-        try await Task.sleep(for: .milliseconds(2_700))
+        // Le compte à rebours dure ~2,5 s : on attend la série au lieu de parier sur une durée fixe — sous la charge
+        // de la suite complète, 2,7 s ne suffisaient pas toujours (18/11/2026).
+        for _ in 0..<100 where model.phase != .playing || model.puzzle == nil {
+            try await Task.sleep(for: .milliseconds(100))
+        }
         #expect(model.phase == .playing)
         let first = try #require(model.puzzle?.id)
 

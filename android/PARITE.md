@@ -2199,7 +2199,8 @@ croisements, trajets du cavalier), mêmes leurres, mêmes clés de reprise, mêm
 sortir de « À revoir »), mêmes réglages (marches, longueur 10 / 20 / 1 minute, vu des Noirs, chrono 10 s / 5 s), même
 bilan. Tuile dans « Plus », trois colonnes, icône au-dessus du nom ; « Plus » remis dans l'ordre d'iOS (Variantes avant
 Laboratoire). Le plateau Android a gagné `showCoordinates`. Différence de forme seulement : réglages et statistiques
-en préférences texte (iOS : JSON dans UserDefaults), aucun des deux côtés ne les synchronise.
+en préférences texte (iOS : JSON dans UserDefaults). Depuis le 18/11 au soir, iOS les synchronise par iCloud
+(magasin clé-valeur) quand la synchro est activée ; Android non — écart ASSUMÉ (pas d'iCloud côté Android, CLAUDE.md).
 
 - [x] JVM : `VisualizationTest` (9) ; instrumenté : `VisualizationTest` vert sur l'ÉMULATEUR (le Galaxy était débranché).
 - [ ] **À vérifier sur le Galaxy** : le parcours instrumenté, l'aspect de « Plus » à trois colonnes (police agrandie du
@@ -2211,3 +2212,10 @@ en préférences texte (iOS : JSON dans UserDefaults), aucun des deux côtés ne
       mots qui grandit avec la marche, « Durée » + 2 minutes, retour vers les réglages, mémoriser/cacher/jouer sur
       plateau vide. JVM `VisualizationTest` (19), instrumenté 3/3 sur l'ÉMULATEUR. Galaxy toujours à vérifier : la
       bibliothèque de puzzles (gros fichier) se charge au lancement d'une série avec la marche 5 — en mesurer le temps.
+- [x] **18/11 (nuit)**, portés le même jour : pourcentage des marches sur les 50 DERNIÈRES questions (quatrième bloc
+      « marche=1101… » dans le texte des statistiques, l'ancien format se relit) ; plateau de la marche 5 en pleine
+      place et de taille FIXE quand on cache (bouton gardé invisible, énoncé sur deux lignes en `autoSize`) ; plus de
+      bouton « Arrêter » (la flèche suffit) ; entrée « Visualisation » dans l'aide (cinq langues). JVM 20/20,
+      instrumenté 3/3 sur l'ÉMULATEUR, vérifiant aussi que les bornes du plateau ne bougent pas.
+- [ ] **Galaxy** : en plus de ce qui précède, la marche 5 au doigt (deux lignes d'énoncé en police agrandie : le texte
+      doit rapetisser, pas se couper).
