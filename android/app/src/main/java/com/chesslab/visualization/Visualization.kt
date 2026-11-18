@@ -121,7 +121,10 @@ object KnightDistance {
 
 enum class VisualizationStep(val number: Int) {
     squares(1),
-    lines(2);
+    lines(2),
+    /** Lot 2 (18/11/2026). */
+    pieces(3),
+    position(4);
 
     val kinds: List<VisualizationKind> get() = VisualizationKind.entries.filter { it.step == this }
 }
@@ -138,7 +141,19 @@ enum class VisualizationKind(val step: VisualizationStep) {
     /** « Quelle case est sur la colonne d et sur la diagonale a1–h8 ? » */
     lineIntersection(VisualizationStep.lines),
     /** « En combien de coups un cavalier va-t-il de b1 à f5 ? » */
-    knightDistance(VisualizationStep.lines);
+    knightDistance(VisualizationStep.lines),
+    /** « ♘ g1 → f3 → d4 → c6 : chaque coup est-il possible ? » */
+    pathCheck(VisualizationStep.pieces),
+    /** « ♗ c1 → g5 → e7 : la pièce attaque-t-elle a3 ? » */
+    attackAfter(VisualizationStep.pieces),
+    /** Deux pièces qui bougent tour à tour : « Quelle pièce attaque f7 ? » */
+    twoPieces(VisualizationStep.pieces),
+    /** Une position : « Les Blancs font-ils échec au roi noir ? » */
+    isCheck(VisualizationStep.position),
+    /** « Quelle pièce noire est en prise ? » (attaquée et non défendue ; ou aucune) */
+    hangingPiece(VisualizationStep.position),
+    /** « La case e5 est-elle attaquée par les Blancs ? » */
+    squareAttacked(VisualizationStep.position);
 
     /** L'exercice se fait SUR un plateau (sans coordonnées) ; les autres, de tête. */
     val usesBoard: Boolean get() = this == findSquare || this == nameSquare
@@ -151,6 +166,8 @@ sealed class VAnswer {
     data object No : VAnswer()
     data class Square(val square: VSquare) : VAnswer()
     data class Number(val value: Int) : VAnswer()
+    /** « first », « second », « both », « none ». */
+    data class Option(val name: String) : VAnswer()
 
     /** Étiquette d'essai (tests instrumentés) : « light », « e4 », « 3 »… */
     val tag: String get() = when (this) {
@@ -160,6 +177,7 @@ sealed class VAnswer {
         No -> "no"
         is Square -> square.notation
         is Number -> "$value"
+        is Option -> name
     }
 }
 
@@ -172,9 +190,19 @@ data class VQuestion(
     val answer: VAnswer,
     /** Vides pour « Touchez… » : on répond sur le plateau. */
     val choices: List<VAnswer>,
+    /** Lot 2 — la position (marche 4), ou les deux pièces de départ (« Deux pièces »). */
+    val pieces: List<VPiece> = emptyList(),
+    /** Lot 2 — le trajet d'une pièce (départ compris), ou les coups des deux pièces. */
+    val moves: List<VPiece> = emptyList(),
 ) {
     /** Ce qui permet de reposer la MÊME question plus tard. */
     val reviewKey: String get() = when (kind) {
+        VisualizationKind.pathCheck -> "${kind.name}|${moves[0].kind.code}|${moves.joinToString(",") { it.square.notation }}"
+        VisualizationKind.attackAfter ->
+            "${kind.name}|${moves[0].kind.code}|${moves.joinToString(",") { it.square.notation }}|${squares[0].notation}"
+        VisualizationKind.twoPieces -> "${kind.name}|${VPiece.codes(pieces)}|${VPiece.codes(moves)}|${squares[0].notation}"
+        VisualizationKind.isCheck, VisualizationKind.hangingPiece -> "${kind.name}|${VPiece.codes(pieces)}"
+        VisualizationKind.squareAttacked -> "${kind.name}|${VPiece.codes(pieces)}|${squares[0].notation}"
         VisualizationKind.squareColor, VisualizationKind.findSquare, VisualizationKind.nameSquare ->
             "${kind.name}|${squares[0].notation}"
         VisualizationKind.sameDiagonal, VisualizationKind.knightDistance ->
@@ -200,6 +228,12 @@ object VisualizationGenerator {
             val line = if (rng.nextBoolean()) VLine.File(square.file) else VLine.Rank(square.rank)
             lineIntersection(line, diagonal, rng)!!
         }
+        VisualizationKind.pathCheck -> randomPathCheck(rng.nextBoolean(), rng)
+        VisualizationKind.attackAfter -> randomAttackAfter(rng.nextBoolean(), rng)
+        VisualizationKind.twoPieces -> randomTwoPieces(rng)
+        VisualizationKind.isCheck -> randomIsCheck(rng.nextBoolean(), rng)
+        VisualizationKind.hangingPiece -> randomHangingPiece(rng.nextDouble() < 0.7, rng)
+        VisualizationKind.squareAttacked -> randomSquareAttacked(rng.nextBoolean(), rng)
         VisualizationKind.knightDistance -> {
             var from = VSquare.all.random(rng)
             var to = VSquare.all.random(rng)
@@ -238,6 +272,30 @@ object VisualizationGenerator {
                 val line = VLine.parse(parts[1]) ?: return null
                 val diagonal = VDiagonal.named(parts[2]) ?: return null
                 lineIntersection(line, diagonal, rng)
+            }
+            VisualizationKind.pathCheck, VisualizationKind.attackAfter -> {
+                if (parts.size < 3) return null
+                val pieceKind = VPieceKind.entries.firstOrNull { it.code == parts[1] } ?: return null
+                val path = parts[2].split(",").map { VSquare.parse(it) ?: return null }
+                if (path.size < 2) return null
+                if (kind == VisualizationKind.pathCheck) return pathCheck(pieceKind, path)
+                if (parts.size != 4) return null
+                attackAfter(pieceKind, path, VSquare.parse(parts[3]) ?: return null)
+            }
+            VisualizationKind.twoPieces -> {
+                if (parts.size != 4) return null
+                val starts = VPiece.parse(parts[1])?.takeIf { it.size == 2 } ?: return null
+                val moves = VPiece.parse(parts[2]) ?: return null
+                twoPieces(starts, moves, VSquare.parse(parts[3]) ?: return null)
+            }
+            VisualizationKind.isCheck, VisualizationKind.hangingPiece, VisualizationKind.squareAttacked -> {
+                if (parts.size < 2) return null
+                val position = VPiece.parse(parts[1]) ?: return null
+                when (kind) {
+                    VisualizationKind.isCheck -> isCheck(position)
+                    VisualizationKind.hangingPiece -> hangingPiece(position, rng)
+                    else -> if (parts.size == 3) squareAttacked(position, VSquare.parse(parts[2]) ?: return null) else null
+                }
             }
         }
     }
@@ -453,4 +511,262 @@ object VisualizationDrawer {
 /** Une réponse donnée, pour le bilan ; `given == null` : le temps s'est écoulé. */
 data class VAnswered(val id: Int, val question: VQuestion, val given: VAnswer?) {
     val isCorrect: Boolean get() = given == question.answer
+}
+
+// MARK: Lot 2 — les pièces, et ce qu'elles attaquent (pendant de la section « Lot 2 » de `Visualization.swift`)
+
+enum class VPieceKind(val code: String, val white: String, val black: String) {
+    king("K", "♔", "♚"), queen("Q", "♕", "♛"), rook("R", "♖", "♜"), bishop("B", "♗", "♝"), knight("N", "♘", "♞"), pawn("P", "♙", "♟");
+}
+
+data class VPiece(val kind: VPieceKind, val isWhite: Boolean, val square: VSquare) {
+    /** La figurine, forcée en TEXTE (pour le lecteur d'écran) ; l'écran montre les images du jeu de pièces. */
+    val figurine: String get() = (if (isWhite) kind.white else kind.black) + "︎"
+    val label: String get() = figurine + square.notation
+    /** « Ng1 » (blanc), « kg8 » (noir). */
+    val code: String get() = (if (isWhite) kind.code else kind.code.lowercase()) + square.notation
+
+    companion object {
+        fun white(kind: VPieceKind, square: VSquare) = VPiece(kind, true, square)
+
+        fun parseOne(code: String): VPiece? {
+            if (code.length != 3) return null
+            val kind = VPieceKind.entries.firstOrNull { it.code == code[0].uppercase() } ?: return null
+            val square = VSquare.parse(code.substring(1)) ?: return null
+            return VPiece(kind, code[0].isUpperCase(), square)
+        }
+
+        fun codes(pieces: List<VPiece>) = pieces.joinToString(",") { it.code }
+        fun parse(text: String): List<VPiece>? = text.split(",").map { parseOne(it) ?: return null }
+    }
+}
+
+object VisualizationAttacks {
+    private val straight = listOf(1 to 0, -1 to 0, 0 to 1, 0 to -1)
+    private val diagonal = listOf(1 to 1, 1 to -1, -1 to 1, -1 to -1)
+    private val jumps = listOf(1 to 2, 2 to 1, 2 to -1, 1 to -2, -1 to -2, -2 to -1, -2 to 1, -1 to 2)
+
+    /** Les cases qu'attaque une pièce ; une ligne s'arrête sur la première case OCCUPÉE (comprise). */
+    fun from(kind: VPieceKind, at: VSquare, white: Boolean = true, occupied: Set<VSquare> = emptySet()): Set<VSquare> {
+        fun rays(directions: List<Pair<Int, Int>>): Set<VSquare> {
+            val result = mutableSetOf<VSquare>()
+            for ((df, dr) in directions) {
+                var current = at
+                while (true) {
+                    val next = current.offset(df, dr) ?: break
+                    result.add(next)
+                    if (next in occupied) break
+                    current = next
+                }
+            }
+            return result
+        }
+        return when (kind) {
+            VPieceKind.king -> (straight + diagonal).mapNotNull { at.offset(it.first, it.second) }.toSet()
+            VPieceKind.queen -> rays(straight + diagonal)
+            VPieceKind.rook -> rays(straight)
+            VPieceKind.bishop -> rays(diagonal)
+            VPieceKind.knight -> jumps.mapNotNull { at.offset(it.first, it.second) }.toSet()
+            VPieceKind.pawn -> listOf(-1, 1).mapNotNull { at.offset(it, if (white) 1 else -1) }.toSet()
+        }
+    }
+
+    /** Tout ce qu'attaque un camp dans une position. */
+    fun by(white: Boolean, position: List<VPiece>): Set<VSquare> {
+        val occupied = position.map { it.square }.toSet()
+        return position.filter { it.isWhite == white }.flatMap { from(it.kind, it.square, it.isWhite, occupied) }.toSet()
+    }
+}
+
+private val travellers = listOf(VPieceKind.knight, VPieceKind.bishop, VPieceKind.rook, VPieceKind.queen, VPieceKind.king)
+
+/** Un trajet LÉGAL sur un plateau vide : le départ, puis [steps] coups, sans repasser par une case. */
+fun VisualizationGenerator.legalPath(kind: VPieceKind, steps: Int, rng: Random): List<VSquare> {
+    while (true) {
+        val path = mutableListOf(VSquare.all.random(rng))
+        for (i in 0 until steps) {
+            val options = (VisualizationAttacks.from(kind, path.last()) - path.toSet()).sorted()
+            if (options.isEmpty()) break
+            path.add(options.random(rng))
+        }
+        if (path.size == steps + 1) return path
+    }
+}
+
+fun VisualizationGenerator.isLegalPath(kind: VPieceKind, path: List<VSquare>): Boolean =
+    path.zipWithNext().all { (a, b) -> b in VisualizationAttacks.from(kind, a) }
+
+fun VisualizationGenerator.pathCheck(kind: VPieceKind, path: List<VSquare>) = VQuestion(
+    VisualizationKind.pathCheck, emptyList(), answer = if (isLegalPath(kind, path)) VAnswer.Yes else VAnswer.No,
+    choices = listOf(VAnswer.Yes, VAnswer.No), moves = path.map { VPiece.white(kind, it) },
+)
+
+/** Trois coups ; « impossible » : UN coup déplacé d'une case — le piège qu'on veut travailler. */
+fun VisualizationGenerator.randomPathCheck(possible: Boolean, rng: Random): VQuestion {
+    val kind = travellers.random(rng)
+    while (true) {
+        val path = legalPath(kind, 3, rng).toMutableList()
+        if (!possible) {
+            val i = rng.nextInt(1, 4)
+            val candidates = listOf(1 to 0, -1 to 0, 0 to 1, 0 to -1, 1 to 1, -1 to -1, 1 to -1, -1 to 1)
+                .mapNotNull { path[i].offset(it.first, it.second) }
+                .filter { it !in path && it !in VisualizationAttacks.from(kind, path[i - 1]) }
+            if (candidates.isEmpty()) continue
+            path[i] = candidates.random(rng)
+        }
+        return pathCheck(kind, path)
+    }
+}
+
+fun VisualizationGenerator.attackAfter(kind: VPieceKind, path: List<VSquare>, target: VSquare) = VQuestion(
+    VisualizationKind.attackAfter, listOf(target),
+    answer = if (target in VisualizationAttacks.from(kind, path.last())) VAnswer.Yes else VAnswer.No,
+    choices = listOf(VAnswer.Yes, VAnswer.No), moves = path.map { VPiece.white(kind, it) },
+)
+
+/** Deux coups ; la case visée est attaquée, ou en est tout près. */
+fun VisualizationGenerator.randomAttackAfter(attacked: Boolean, rng: Random): VQuestion {
+    val kind = travellers.random(rng)
+    while (true) {
+        val path = legalPath(kind, 2, rng)
+        val end = path.last()
+        val attackedSet = VisualizationAttacks.from(kind, end)
+        val pool = if (attacked) attackedSet.sorted() else VSquare.all.filter {
+            it !in attackedSet && it != end && maxOf(abs(it.file - end.file), abs(it.rank - end.rank)) <= 3
+        }
+        if (pool.isEmpty()) continue
+        return attackAfter(kind, path, pool.random(rng))
+    }
+}
+
+/** Les deux pièces après leurs coups, et qui attaque la case visée (l'une peut masquer l'autre). */
+fun VisualizationGenerator.twoPieces(starts: List<VPiece>, moves: List<VPiece>, target: VSquare): VQuestion {
+    var a = starts[0].square
+    var b = starts[1].square
+    for (move in moves) if (move.kind == starts[0].kind) a = move.square else b = move.square
+    val occupied = setOf(a, b)
+    val byA = target in VisualizationAttacks.from(starts[0].kind, a, occupied = occupied)
+    val byB = target in VisualizationAttacks.from(starts[1].kind, b, occupied = occupied)
+    val answer = when {
+        byA && byB -> "both"
+        byA -> "first"
+        byB -> "second"
+        else -> "none"
+    }
+    return VQuestion(
+        VisualizationKind.twoPieces, listOf(target), answer = VAnswer.Option(answer),
+        choices = listOf("first", "second", "both", "none").map { VAnswer.Option(it) }, pieces = starts, moves = moves,
+    )
+}
+
+fun VisualizationGenerator.randomTwoPieces(rng: Random): VQuestion {
+    val wanted = listOf("first", "second", "both", "none").random(rng)
+    while (true) {
+        val kinds = listOf(VPieceKind.knight, VPieceKind.bishop, VPieceKind.rook, VPieceKind.queen).shuffled(rng).take(2)
+        val a0 = VSquare.all.random(rng)
+        val b0 = VSquare.all.random(rng)
+        if (a0 == b0) continue
+        val current = mutableListOf(a0, b0)
+        val moves = mutableListOf<VPiece>()
+        for (mover in listOf(0, 1, 0)) {
+            val other = current[1 - mover]
+            val options = (VisualizationAttacks.from(kinds[mover], current[mover], occupied = setOf(other)) - other).sorted()
+            if (options.isEmpty()) break
+            val next = options.random(rng)
+            current[mover] = next
+            moves.add(VPiece.white(kinds[mover], next))
+        }
+        if (moves.size != 3) continue
+        val starts = listOf(VPiece.white(kinds[0], a0), VPiece.white(kinds[1], b0))
+        val target = VSquare.all.filter { it !in current }.shuffled(rng)
+            .firstOrNull { twoPieces(starts, moves, it).answer == VAnswer.Option(wanted) } ?: continue
+        return twoPieces(starts, moves, target)
+    }
+}
+
+/** Deux rois qui ne se touchent pas, deux ou trois pièces de chaque côté (une dame au plus), pions hors des bords. */
+fun VisualizationGenerator.randomPosition(rng: Random): List<VPiece> {
+    val pool = listOf(VPieceKind.queen, VPieceKind.rook, VPieceKind.rook, VPieceKind.bishop, VPieceKind.bishop,
+        VPieceKind.knight, VPieceKind.knight, VPieceKind.pawn, VPieceKind.pawn)
+    while (true) {
+        val taken = mutableSetOf<VSquare>()
+        fun free(pawn: Boolean): VSquare? =
+            VSquare.all.filter { it !in taken && (!pawn || it.rank in 1..6) }.randomOrNull(rng)
+        val position = mutableListOf<VPiece>()
+        val wk = free(false) ?: continue
+        taken.add(wk); position.add(VPiece(VPieceKind.king, true, wk))
+        val bk = free(false) ?: continue
+        if (maxOf(abs(bk.file - wk.file), abs(bk.rank - wk.rank)) <= 1) continue
+        taken.add(bk); position.add(VPiece(VPieceKind.king, false, bk))
+        for (white in listOf(true, false)) {
+            val count = rng.nextInt(2, 4)
+            var kinds = pool.shuffled(rng).take(count)
+            if (kinds.count { it == VPieceKind.queen } > 1) kinds = kinds.map { if (it == VPieceKind.queen) VPieceKind.rook else it }
+            for (kind in kinds) {
+                val s = free(kind == VPieceKind.pawn) ?: continue
+                taken.add(s); position.add(VPiece(kind, white, s))
+            }
+        }
+        if (wk in VisualizationAttacks.by(false, position)) continue
+        return position
+    }
+}
+
+fun VisualizationGenerator.isCheck(position: List<VPiece>): VQuestion {
+    val blackKing = position.first { it.kind == VPieceKind.king && !it.isWhite }.square
+    val check = blackKing in VisualizationAttacks.by(true, position)
+    return VQuestion(VisualizationKind.isCheck, emptyList(), answer = if (check) VAnswer.Yes else VAnswer.No,
+        choices = listOf(VAnswer.Yes, VAnswer.No), pieces = position)
+}
+
+fun VisualizationGenerator.randomIsCheck(check: Boolean, rng: Random): VQuestion {
+    repeat(400) {
+        val q = isCheck(randomPosition(rng))
+        if (q.answer == (if (check) VAnswer.Yes else VAnswer.No)) return q
+    }
+    return isCheck(randomPosition(rng))
+}
+
+/** Les pièces noires (hors roi) attaquées par les Blancs et que rien de noir ne défend. */
+fun VisualizationGenerator.hanging(position: List<VPiece>): List<VPiece> {
+    val byWhite = VisualizationAttacks.by(true, position)
+    val byBlack = VisualizationAttacks.by(false, position)
+    return position.filter { !it.isWhite && it.kind != VPieceKind.king && it.square in byWhite && it.square !in byBlack }
+}
+
+/** `null` si la position n'a pas UNE réponse (deux pièces en prise) ou trop peu de pièces noires à proposer. */
+fun VisualizationGenerator.hangingPiece(position: List<VPiece>, rng: Random): VQuestion? {
+    val blacks = position.filter { !it.isWhite && it.kind != VPieceKind.king }
+    val hung = hanging(position)
+    if (blacks.size < 2 || hung.size > 1) return null
+    val answer: VAnswer = hung.firstOrNull()?.let { VAnswer.Square(it.square) } ?: VAnswer.Option("none")
+    val choices = blacks.shuffled(rng).map { VAnswer.Square(it.square) } + VAnswer.Option("none")
+    return VQuestion(VisualizationKind.hangingPiece, emptyList(), answer = answer, choices = choices, pieces = position)
+}
+
+fun VisualizationGenerator.randomHangingPiece(one: Boolean, rng: Random): VQuestion {
+    var fallback: VQuestion? = null
+    repeat(600) {
+        val q = hangingPiece(randomPosition(rng), rng) ?: return@repeat
+        if ((q.answer != VAnswer.Option("none")) == one) return q
+        if (fallback == null) fallback = q
+    }
+    fallback?.let { return it }
+    while (true) hangingPiece(randomPosition(rng), rng)?.let { return it }
+}
+
+fun VisualizationGenerator.squareAttacked(position: List<VPiece>, target: VSquare) = VQuestion(
+    VisualizationKind.squareAttacked, listOf(target),
+    answer = if (target in VisualizationAttacks.by(true, position)) VAnswer.Yes else VAnswer.No,
+    choices = listOf(VAnswer.Yes, VAnswer.No), pieces = position,
+)
+
+fun VisualizationGenerator.randomSquareAttacked(attacked: Boolean, rng: Random): VQuestion {
+    while (true) {
+        val position = randomPosition(rng)
+        val occupied = position.map { it.square }.toSet()
+        val byWhite = VisualizationAttacks.by(true, position)
+        val pool = VSquare.all.filter { it !in occupied && (it in byWhite) == attacked }
+        if (pool.isNotEmpty()) return squareAttacked(position, pool.random(rng))
+    }
 }

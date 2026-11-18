@@ -1532,8 +1532,6 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="vis_correct_plain">justes</string>
     <string name="vis_by_exercise">Par exercice</string>
     <string name="vis_to_review">À revoir</string>
-    <string name="vis_answer">Réponse : %1$s</string>
-    <string name="vis_you">Vous : %1$s</string>
     <string name="vis_timeout">Temps écoulé</string>
     <string name="vis_misses_return">Ces questions reviendront dans vos prochaines séries.</string>
     <string name="vis_restart">Recommencer</string>
@@ -1556,4 +1554,29 @@ Les statistiques ci-dessus se recalculent après chacune : elles sont volatiles 
     <string name="vis_dark">Foncée</string>
     <string name="vis_yes">Oui</string>
     <string name="vis_no">Non</string>
+    <!-- Visualisation, lot 2 (18/11/2026) -->
+    <string name="vis_step_pieces">Suivre les pièces</string>
+    <string name="vis_step_position">La position sans plateau</string>
+    <string name="vis_step_pieces_detail">Trajets possibles, ce qu\'attaque une pièce, deux pièces qui bougent</string>
+    <string name="vis_step_position_detail">Échec, pièce en prise, case attaquée</string>
+    <string name="vis_kind_pathCheck">Trajets possibles</string>
+    <string name="vis_kind_attackAfter">Ce qu\'attaque une pièce</string>
+    <string name="vis_kind_twoPieces">Deux pièces</string>
+    <string name="vis_kind_isCheck">Échec ?</string>
+    <string name="vis_kind_hangingPiece">Pièce en prise</string>
+    <string name="vis_kind_squareAttacked">Case attaquée</string>
+    <string name="vis_q_pathCheck">Chacun de ces coups est-il possible ?</string>
+    <string name="vis_q_attackAfter">La pièce attaque-t-elle %1$s ?</string>
+    <string name="vis_q_twoPieces">Quelle pièce attaque %1$s ?</string>
+    <string name="vis_q_isCheck">Les Blancs font-ils échec au roi noir ?</string>
+    <string name="vis_q_hangingPiece">Quelle pièce noire est en prise ?</string>
+    <string name="vis_q_squareAttacked">La case %1$s est-elle attaquée par les Blancs ?</string>
+    <string name="vis_row_start">Départ :</string>
+    <string name="vis_row_moves">Coups :</string>
+    <string name="vis_row_white">Blancs :</string>
+    <string name="vis_row_black">Noirs :</string>
+    <string name="vis_both">Les deux</string>
+    <string name="vis_none">Aucune</string>
+    <string name="vis_answer_label">Réponse :</string>
+    <string name="vis_you_label">Vous :</string>
 </resources>

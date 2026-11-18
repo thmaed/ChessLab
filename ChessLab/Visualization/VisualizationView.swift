@@ -218,13 +218,14 @@ struct VisualizationView: View {
 
     private func questionView(_ q: VisualizationQuestion) -> some View {
         VStack(spacing: 18) {
+            if !sceneRows(q).isEmpty { scene(q) }
             Text(prompt(q))
                 .font(.title2.weight(.semibold))
                 .foregroundStyle(Theme.textPrimary)
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity)
-                .padding(.top, q.kind.usesBoard ? 0 : 24)
+                .padding(.top, q.kind.usesBoard || !sceneRows(q).isEmpty ? 0 : 24)
                 .accessibilityIdentifier("visualizationPrompt")
 
             if q.kind.usesBoard { board(q) }
@@ -279,13 +280,20 @@ struct VisualizationView: View {
             viewModel.answer(choice)
         } label: {
             HStack(spacing: 8) {
-                if choice == .light || choice == .dark {
+                if let piece = piece(for: choice, in: q) {
+                    pieceImage(piece, size: 28)
+                    if case .square = choice {
+                        Text(verbatim: piece.square.notation).font(.title3.weight(.semibold))
+                    }
+                } else if choice == .light || choice == .dark {
                     RoundedRectangle(cornerRadius: 4, style: .continuous)
                         .fill(choice == .light ? AppSettings.shared.boardTheme.lightSquare : AppSettings.shared.boardTheme.darkSquare)
                         .frame(width: 18, height: 18)
                 }
-                Text(answerLabel(choice))
-                    .font(.title3.weight(.semibold))
+                if piece(for: choice, in: q) == nil {
+                    Text(answerLabel(choice, in: q))
+                        .font(.title3.weight(.semibold))
+                }
             }
             .foregroundStyle(tint ?? Theme.textPrimary)
             .frame(maxWidth: .infinity, minHeight: 54)
@@ -296,6 +304,7 @@ struct VisualizationView: View {
         }
         .buttonStyle(.pressable)
         .disabled(feedback != nil)
+        .accessibilityLabel(Text(verbatim: answerLabel(choice, in: q)))
         .accessibilityIdentifier("visualizationChoice_\(Self.identifier(choice))")
     }
 
@@ -306,10 +315,10 @@ struct VisualizationView: View {
                 if feedback.isCorrect {
                     Label("Juste", systemImage: "checkmark.circle.fill").foregroundStyle(Theme.accent)
                 } else if feedback.given == nil {
-                    Label("Temps écoulé — la réponse : \(answerLabel(q.answer))", systemImage: "timer")
+                    Label("Temps écoulé — la réponse : \(answerLabel(q.answer, in: q))", systemImage: "timer")
                         .foregroundStyle(Theme.danger)
                 } else {
-                    Label("Non — la réponse : \(answerLabel(q.answer))", systemImage: "xmark.circle.fill")
+                    Label("Non — la réponse : \(answerLabel(q.answer, in: q))", systemImage: "xmark.circle.fill")
                         .foregroundStyle(Theme.danger)
                 }
             }
@@ -359,15 +368,23 @@ struct VisualizationView: View {
                         ForEach(Array(viewModel.misses.enumerated()), id: \.element.id) { index, item in
                             if index > 0 { rowDivider }
                             VStack(alignment: .leading, spacing: 4) {
+                                if !sceneRows(item.question).isEmpty { scene(item.question, compact: true) }
                                 Text(prompt(item.question))
                                     .font(.subheadline)
                                     .foregroundStyle(Theme.textPrimary)
                                     .fixedSize(horizontal: false, vertical: true)
                                 HStack(spacing: 12) {
-                                    Text("Réponse : \(answerLabel(item.question.answer))")
-                                        .foregroundStyle(Theme.accent)
+                                    HStack(spacing: 4) {
+                                        Text("Réponse :")
+                                        answerInline(item.question.answer, in: item.question)
+                                    }
+                                    .foregroundStyle(Theme.accent)
                                     if let given = item.given {
-                                        Text("Vous : \(answerLabel(given))").foregroundStyle(Theme.danger)
+                                        HStack(spacing: 4) {
+                                            Text("Vous :")
+                                            answerInline(given, in: item.question)
+                                        }
+                                        .foregroundStyle(Theme.danger)
                                     } else {
                                         Text("Temps écoulé").foregroundStyle(Theme.danger)
                                     }
@@ -428,17 +445,146 @@ struct VisualizationView: View {
             }
         case .knightDistance:
             return LocalizationController.string("En combien de coups un cavalier va-t-il de %@ à %@ ?", s[0], s[1])
+        case .pathCheck:
+            return LocalizationController.string("Chacun de ces coups est-il possible ?")
+        case .attackAfter:
+            return LocalizationController.string("La pièce attaque-t-elle %@ ?", s[0])
+        case .twoPieces:
+            return LocalizationController.string("Quelle pièce attaque %@ ?", s[0])
+        case .isCheck:
+            return LocalizationController.string("Les Blancs font-ils échec au roi noir ?")
+        case .hangingPiece:
+            return LocalizationController.string("Quelle pièce noire est en prise ?")
+        case .squareAttacked:
+            return LocalizationController.string("La case %@ est-elle attaquée par les Blancs ?", s[0])
         }
     }
 
-    private func answerLabel(_ answer: VisualizationAnswer) -> String {
+    /// Ce que l'exercice met en scène : un trajet, deux pièces et leurs coups, une position. Les pièces sont les
+    /// IMAGES du jeu de pièces de l'app — les caractères ♘ sortaient minuscules dans la police système.
+    private enum SceneRow: Hashable {
+        case path(VisualizationPiece, [VisualizationSquare])
+        case pieces(title: String, [VisualizationPiece])
+    }
+
+    private func sceneRows(_ q: VisualizationQuestion) -> [SceneRow] {
+        switch q.kind {
+        case .pathCheck, .attackAfter:
+            guard let first = q.moves.first else { return [] }
+            return [.path(first, q.moves.map(\.square))]
+        case .twoPieces:
+            return [.pieces(title: LocalizationController.string("Départ :"), q.pieces),
+                    .pieces(title: LocalizationController.string("Coups :"), q.moves)]
+        case .isCheck, .hangingPiece, .squareAttacked:
+            return [.pieces(title: LocalizationController.string("Blancs :"), q.pieces.filter(\.isWhite)),
+                    .pieces(title: LocalizationController.string("Noirs :"), q.pieces.filter { !$0.isWhite })]
+        default:
+            return []
+        }
+    }
+
+    private func scene(_ q: VisualizationQuestion, compact: Bool = false) -> some View {
+        let glyph: CGFloat = compact ? 20 : 30
+        return VStack(alignment: .leading, spacing: compact ? 4 : 10) {
+            ForEach(sceneRows(q), id: \.self) { row in
+                switch row {
+                case let .path(piece, squares):
+                    HStack(spacing: 6) {
+                        pieceImage(piece, size: glyph)
+                        Text(verbatim: squares.map(\.notation).joined(separator: " → "))
+                    }
+                case let .pieces(title, pieces):
+                    HStack(spacing: 10) {
+                        Text(verbatim: title).foregroundStyle(Theme.textSecondary)
+                        ForEach(pieces, id: \.self) { piece in
+                            HStack(spacing: 1) {
+                                pieceImage(piece, size: glyph)
+                                Text(verbatim: piece.square.notation)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        .font(compact ? .subheadline.weight(.semibold) : .title3.weight(.semibold))
+        .foregroundStyle(Theme.textPrimary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(compact ? 0 : 16)
+        .background(compact ? Color.clear : Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 14, style: .continuous).strokeBorder(compact ? Color.clear : Theme.stroke, lineWidth: 1))
+        .padding(.top, compact ? 0 : 12)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(Text(verbatim: sceneDescription(q)))
+        .accessibilityIdentifier(compact ? "" : "visualizationScene")
+    }
+
+    /// Pour le lecteur d'écran : les figurines, qu'il sait nommer.
+    private func sceneDescription(_ q: VisualizationQuestion) -> String {
+        sceneRows(q).map { row in
+            switch row {
+            case let .path(piece, squares): piece.figurine + " " + squares.map(\.notation).joined(separator: ", ")
+            case let .pieces(title, pieces): title + " " + pieces.map(\.label).joined(separator: ", ")
+            }
+        }.joined(separator: ". ")
+    }
+
+    private func pieceImage(_ piece: VisualizationPiece, size: CGFloat) -> some View {
+        let kind: Piece.Kind = switch piece.kind {
+        case .king: .king
+        case .queen: .queen
+        case .rook: .rook
+        case .bishop: .bishop
+        case .knight: .knight
+        case .pawn: .pawn
+        }
+        return PieceGlyphView(piece: Piece(kind, color: piece.isWhite ? .white : .black, square: .a1),
+                              outline: piece.isWhite ? nil : Color.white.opacity(0.85))
+            .frame(width: size, height: size)
+    }
+
+    /// Une réponse dans une ligne de texte : la pièce en image, sinon le mot.
+    @ViewBuilder
+    private func answerInline(_ answer: VisualizationAnswer, in q: VisualizationQuestion) -> some View {
+        if let piece = piece(for: answer, in: q) {
+            HStack(spacing: 1) {
+                pieceImage(piece, size: 18)
+                if case .square = answer { Text(verbatim: piece.square.notation) }
+            }
+        } else {
+            Text(verbatim: answerLabel(answer, in: q))
+        }
+    }
+
+    /// La pièce que désigne une réponse (« ♞h6 », « le cavalier »), pour la montrer en image dans le bouton.
+    private func piece(for answer: VisualizationAnswer, in q: VisualizationQuestion) -> VisualizationPiece? {
         switch answer {
-        case .light: LocalizationController.string("Claire")
-        case .dark: LocalizationController.string("Foncée")
-        case .yes: LocalizationController.string("Oui")
-        case .no: LocalizationController.string("Non")
-        case let .square(s): s.notation
-        case let .number(n): "\(n)"
+        case let .square(s): q.pieces.first { $0.square == s }
+        case .option("first"): q.pieces.first
+        case .option("second"): q.pieces.dropFirst().first
+        default: nil
+        }
+    }
+
+    private func answerLabel(_ answer: VisualizationAnswer, in q: VisualizationQuestion) -> String {
+        switch answer {
+        case .light: return LocalizationController.string("Claire")
+        case .dark: return LocalizationController.string("Foncée")
+        case .yes: return LocalizationController.string("Oui")
+        case .no: return LocalizationController.string("Non")
+        case let .square(s):
+            // Une pièce en prise se nomme par sa figurine et sa case.
+            if let piece = q.pieces.first(where: { $0.square == s }) { return piece.label }
+            return s.notation
+        case let .number(n): return "\(n)"
+        case let .option(name):
+            switch name {
+            case "first": return q.pieces.first.map(\.figurine) ?? ""
+            case "second": return q.pieces.dropFirst().first.map(\.figurine) ?? ""
+            case "both": return LocalizationController.string("Les deux")
+            default: return LocalizationController.string("Aucune")
+            }
         }
     }
 
@@ -450,6 +596,7 @@ struct VisualizationView: View {
         case .no: "no"
         case let .square(s): s.notation
         case let .number(n): "\(n)"
+        case let .option(name): name
         }
     }
 

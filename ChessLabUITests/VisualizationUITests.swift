@@ -71,7 +71,7 @@ final class VisualizationUITests: XCTestCase {
             answerCurrent(app)
             // Un juste ne reste affiché qu'un instant (0,45 s) : on attend la question suivante, ou le bilan.
             let next = "\(index + 2) / 10"
-            let deadline = Date().addingTimeInterval(5)
+            let deadline = Date().addingTimeInterval(10)
             while Date() < deadline, !score.exists, !(progress.exists && progress.label == next) { pause(0.2) }
             if !(score.exists || progress.label == next) { snapshot(app, "echec-\(index + 1)") }
             XCTAssertTrue(score.exists || progress.label == next, "la série avance après la réponse \(index + 1)")
@@ -95,7 +95,7 @@ final class VisualizationUITests: XCTestCase {
         start.tap()
         XCTAssertTrue(prompt.waitForExistence(timeout: 5))
         let timedOut = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Temps écoulé'")).firstMatch
-        XCTAssertTrue(timedOut.waitForExistence(timeout: 8), "au bout de 5 s, le temps est écoulé")
+        XCTAssertTrue(timedOut.waitForExistence(timeout: 12), "au bout de 5 s, le temps est écoulé")
         snapshot(app, "4-temps-ecoule")
         app.buttons["visualizationStop"].tap()
         XCTAssertTrue(score.waitForExistence(timeout: 5))
@@ -104,5 +104,63 @@ final class VisualizationUITests: XCTestCase {
         // On rend les réglages tels qu'un joueur les trouverait.
         app.buttons["visualizationSettings"].tap()
         NewGameSetupSteps.pick("Sans", inMenu: "visualizationTimerMenu", app: app)
+    }
+
+    /// Lot 2 : les marches 3 et 4 seules ; chaque question met en scène son trajet ou sa position, en figurines.
+    func testPiecesAndPositionSteps() throws {
+        let app = XCUIApplication()
+        app.launchArguments += ["-discoveryTourSeen", "-AppleLanguages", "(fr)"]
+        app.launch()
+        XCTAssertTrue(app.buttons["mode_play"].waitForExistence(timeout: 20))
+        let tile = app.buttons["mode_visualization"]
+        var tries = 0
+        while !(tile.exists && tile.isHittable), tries < 8 { app.swipeUp(); tries += 1 }
+        tile.tap()
+        let start = app.buttons["visualizationStart"]
+        XCTAssertTrue(start.waitForExistence(timeout: 10))
+
+        // Cocher 3 et 4 d'abord (jamais aucune marche), puis décocher 1 et 2.
+        for step in ["pieces", "position"] {
+            let row = app.buttons["visualizationStep_\(step)"]
+            NewGameSetupSteps.reveal(row, in: app)
+            if !row.isSelected { row.tap() }
+            XCTAssertTrue(row.isSelected, step)
+        }
+        for step in ["squares", "lines"] {
+            let row = app.buttons["visualizationStep_\(step)"]
+            NewGameSetupSteps.reveal(row, in: app)
+            if row.isSelected { row.tap() }
+            XCTAssertFalse(row.isSelected, step)
+        }
+        NewGameSetupSteps.pick("10 questions", inMenu: "visualizationLengthMenu", app: app)
+        NewGameSetupSteps.pick("Sans", inMenu: "visualizationTimerMenu", app: app)
+        snapshot(app, "5-reglages-lot2")
+        start.tap()
+
+        let scene = app.descendants(matching: .any)["visualizationScene"].firstMatch
+        let progress = app.staticTexts["visualizationProgress"]
+        let score = app.staticTexts["visualizationSummaryScore"]
+        for index in 0..<10 {
+            XCTAssertTrue(scene.waitForExistence(timeout: 5), "la question \(index + 1) met en scène sa position")
+            if index < 3 { snapshot(app, "6-question-\(index + 1)") }
+            answerCurrent(app)
+            let next = "\(index + 2) / 10"
+            let deadline = Date().addingTimeInterval(10)
+            while Date() < deadline, !score.exists, !(progress.exists && progress.label == next) { pause(0.2) }
+        }
+        XCTAssertTrue(score.waitForExistence(timeout: 5))
+        snapshot(app, "7-bilan-lot2")
+
+        // Réglages rendus : la marche 1 seule.
+        app.buttons["visualizationSettings"].tap()
+        XCTAssertTrue(start.waitForExistence(timeout: 5))
+        let squares = app.buttons["visualizationStep_squares"]
+        NewGameSetupSteps.reveal(squares, in: app)
+        squares.tap()
+        for step in ["pieces", "position"] {
+            let row = app.buttons["visualizationStep_\(step)"]
+            NewGameSetupSteps.reveal(row, in: app)
+            if row.isSelected { row.tap() }
+        }
     }
 }

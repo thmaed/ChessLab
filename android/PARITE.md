@@ -2204,3 +2204,6 @@ en préférences texte (iOS : JSON dans UserDefaults), aucun des deux côtés ne
 - [x] JVM : `VisualizationTest` (9) ; instrumenté : `VisualizationTest` vert sur l'ÉMULATEUR (le Galaxy était débranché).
 - [ ] **À vérifier sur le Galaxy** : le parcours instrumenté, l'aspect de « Plus » à trois colonnes (police agrandie du
       Galaxy : « Visualisation » doit tenir dans un tiers), et un plateau « Touchez… » au doigt.
+- [x] **Lot 2 (marches 3 et 4)** porté le même jour : mêmes exercices, même équilibre des réponses, pièces en images
+      (noires cernées de clair, silhouette teintée derrière la pièce comme le contour d'iOS). JVM `VisualizationTest`
+      (13), instrumenté 2/2 sur l'ÉMULATEUR. Même vérification Galaxy à faire que ci-dessus.

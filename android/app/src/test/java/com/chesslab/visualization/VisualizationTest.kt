@@ -66,6 +66,31 @@ class VisualizationTest {
                 }
                 VisualizationKind.nameSquare -> assertEquals(4, q.choices.size)
                 VisualizationKind.findSquare -> assertEquals(VAnswer.Square(q.squares[0]), q.answer)
+                VisualizationKind.pathCheck -> {
+                    assertEquals(4, q.moves.size)
+                    val legal = VisualizationGenerator.isLegalPath(q.moves[0].kind, q.moves.map { it.square })
+                    assertEquals(if (legal) VAnswer.Yes else VAnswer.No, q.answer)
+                }
+                VisualizationKind.attackAfter -> {
+                    assertEquals(3, q.moves.size)
+                    assertTrue(VisualizationGenerator.isLegalPath(q.moves[0].kind, q.moves.map { it.square }))
+                    val hit = q.squares[0] in VisualizationAttacks.from(q.moves[0].kind, q.moves.last().square)
+                    assertEquals(if (hit) VAnswer.Yes else VAnswer.No, q.answer)
+                }
+                VisualizationKind.twoPieces -> {
+                    assertTrue(q.pieces.size == 2 && q.moves.size == 3)
+                    assertTrue(q.pieces[0].kind != q.pieces[1].kind)
+                }
+                VisualizationKind.isCheck, VisualizationKind.squareAttacked -> {
+                    assertEquals(2, q.pieces.count { it.kind == VPieceKind.king })
+                    assertEquals(q.pieces.size, q.pieces.map { it.square }.toSet().size)
+                    assertTrue(q.pieces.filter { it.kind == VPieceKind.pawn }.all { it.square.rank in 1..6 })
+                }
+                VisualizationKind.hangingPiece -> {
+                    val hung = VisualizationGenerator.hanging(q.pieces)
+                    assertTrue(hung.size <= 1)
+                    assertEquals(hung.firstOrNull()?.let { VAnswer.Square(it.square) } ?: VAnswer.Option("none"), q.answer)
+                }
             }
         }
     }
@@ -129,6 +154,47 @@ class VisualizationTest {
             previous = q
         }
         assertTrue("la question ratée revient souvent : $served", served > 30)
+    }
+
+    // Lot 2 — mêmes cas qu'iOS
+
+    @Test fun `une ligne s'arrete sur la premiere case occupee`() {
+        val rook = VisualizationAttacks.from(VPieceKind.rook, sq("a1"), occupied = setOf(sq("a4")))
+        assertTrue(sq("a4") in rook && sq("a5") !in rook && sq("h1") in rook)
+        assertEquals(setOf(sq("d5"), sq("f5")), VisualizationAttacks.from(VPieceKind.pawn, sq("e4"), white = true))
+        assertEquals(setOf(sq("d4"), sq("f4")), VisualizationAttacks.from(VPieceKind.pawn, sq("e5"), white = false))
+        assertEquals(setOf(sq("b3"), sq("c2")), VisualizationAttacks.from(VPieceKind.knight, sq("a1")))
+    }
+
+    @Test fun `deux pieces se masquent l'une l'autre`() {
+        val starts = listOf(VPiece.white(VPieceKind.rook, sq("a1")), VPiece.white(VPieceKind.bishop, sq("c3")))
+        val moves = listOf(VPiece.white(VPieceKind.rook, sq("a4")), VPiece.white(VPieceKind.bishop, sq("a5")), VPiece.white(VPieceKind.rook, sq("a3")))
+        assertEquals(VAnswer.Option("none"), VisualizationGenerator.twoPieces(starts, moves, sq("a6")).answer)
+        assertEquals(VAnswer.Option("first"), VisualizationGenerator.twoPieces(starts, moves, sq("a4")).answer)
+        assertEquals(VAnswer.Option("second"), VisualizationGenerator.twoPieces(starts, moves, sq("b6")).answer)
+        assertEquals(VAnswer.Option("both"), VisualizationGenerator.twoPieces(starts, moves, sq("c3")).answer)
+    }
+
+    @Test fun `les reponses du lot 2 sont equilibrees`() {
+        val rng = Random(21)
+        val counts = mutableMapOf<VisualizationKind, MutableMap<VAnswer, Int>>()
+        for (kind in listOf(VisualizationKind.pathCheck, VisualizationKind.attackAfter, VisualizationKind.twoPieces,
+            VisualizationKind.isCheck, VisualizationKind.squareAttacked)) repeat(120) {
+            val answer = VisualizationGenerator.question(kind, rng).answer
+            counts.getOrPut(kind) { mutableMapOf() }.merge(answer, 1, Int::plus)
+        }
+        for (kind in listOf(VisualizationKind.pathCheck, VisualizationKind.attackAfter, VisualizationKind.isCheck, VisualizationKind.squareAttacked)) {
+            assertTrue("$kind : ${counts[kind]}", (counts[kind]?.get(VAnswer.Yes) ?: 0) in 30..90)
+        }
+        assertEquals(4, counts[VisualizationKind.twoPieces]?.size, "les quatre réponses sortent")
+    }
+
+    @Test fun `une position se relit de sa cle`() {
+        val position = VPiece.parse("Kg1,Qd1,Rf1,kg8,rd8,bc5")!!
+        assertEquals(VAnswer.No, VisualizationGenerator.isCheck(position).answer)
+        assertEquals(VAnswer.Yes, VisualizationGenerator.isCheck(VPiece.parse("Kg1,Qh7,kg8")!!).answer)
+        assertNull(VPiece.parse("Kg1,Xz9"))
+        assertTrue(VPiece.white(VPieceKind.knight, sq("g1")).figurine.startsWith("♘"))
     }
 
     private fun assertEquals(expected: Any?, actual: Any?, message: String) = assertEquals(message, expected, actual)

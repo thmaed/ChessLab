@@ -1453,8 +1453,6 @@
     <string name="vis_correct_plain">richtig</string>
     <string name="vis_by_exercise">Nach Übung</string>
     <string name="vis_to_review">Wiederholen</string>
-    <string name="vis_answer">Antwort: %1$s</string>
-    <string name="vis_you">Du: %1$s</string>
     <string name="vis_timeout">Zeit abgelaufen</string>
     <string name="vis_misses_return">Diese Fragen kommen in deinen nächsten Serien wieder.</string>
     <string name="vis_restart">Neu starten</string>
@@ -1477,4 +1475,29 @@
     <string name="vis_dark">Dunkel</string>
     <string name="vis_yes">Ja</string>
     <string name="vis_no">Nein</string>
+    <!-- Visualisation, lot 2 (18/11/2026) -->
+    <string name="vis_step_pieces">Figuren verfolgen</string>
+    <string name="vis_step_position">Die Stellung ohne Brett</string>
+    <string name="vis_step_pieces_detail">Mögliche Wege, was eine Figur angreift, zwei ziehende Figuren</string>
+    <string name="vis_step_position_detail">Schach, hängende Figur, angegriffenes Feld</string>
+    <string name="vis_kind_pathCheck">Mögliche Wege</string>
+    <string name="vis_kind_attackAfter">Was eine Figur angreift</string>
+    <string name="vis_kind_twoPieces">Zwei Figuren</string>
+    <string name="vis_kind_isCheck">Schach?</string>
+    <string name="vis_kind_hangingPiece">Hängende Figur</string>
+    <string name="vis_kind_squareAttacked">Angegriffenes Feld</string>
+    <string name="vis_q_pathCheck">Ist jeder dieser Züge möglich?</string>
+    <string name="vis_q_attackAfter">Greift die Figur %1$s an?</string>
+    <string name="vis_q_twoPieces">Welche Figur greift %1$s an?</string>
+    <string name="vis_q_isCheck">Steht der schwarze König im Schach?</string>
+    <string name="vis_q_hangingPiece">Welche schwarze Figur hängt?</string>
+    <string name="vis_q_squareAttacked">Wird %1$s von Weiß angegriffen?</string>
+    <string name="vis_row_start">Start:</string>
+    <string name="vis_row_moves">Züge:</string>
+    <string name="vis_row_white">Weiß:</string>
+    <string name="vis_row_black">Schwarz:</string>
+    <string name="vis_both">Beide</string>
+    <string name="vis_none">Keine</string>
+    <string name="vis_answer_label">Antwort:</string>
+    <string name="vis_you_label">Du:</string>
 </resources>

@@ -1492,8 +1492,6 @@
     <string name="vis_correct_plain">correctas</string>
     <string name="vis_by_exercise">Por ejercicio</string>
     <string name="vis_to_review">Repasar</string>
-    <string name="vis_answer">Respuesta: %1$s</string>
-    <string name="vis_you">Tú: %1$s</string>
     <string name="vis_timeout">Se acabó el tiempo</string>
     <string name="vis_misses_return">Estas preguntas volverán en tus próximas series.</string>
     <string name="vis_restart">Reiniciar</string>
@@ -1516,4 +1514,29 @@
     <string name="vis_dark">Oscura</string>
     <string name="vis_yes">Sí</string>
     <string name="vis_no">No</string>
+    <!-- Visualisation, lot 2 (18/11/2026) -->
+    <string name="vis_step_pieces">Seguir las piezas</string>
+    <string name="vis_step_position">La posición sin tablero</string>
+    <string name="vis_step_pieces_detail">Trayectos posibles, lo que ataca una pieza, dos piezas que se mueven</string>
+    <string name="vis_step_position_detail">Jaque, pieza colgada, casilla atacada</string>
+    <string name="vis_kind_pathCheck">Trayectos posibles</string>
+    <string name="vis_kind_attackAfter">Lo que ataca una pieza</string>
+    <string name="vis_kind_twoPieces">Dos piezas</string>
+    <string name="vis_kind_isCheck">¿Jaque?</string>
+    <string name="vis_kind_hangingPiece">Pieza colgada</string>
+    <string name="vis_kind_squareAttacked">Casilla atacada</string>
+    <string name="vis_q_pathCheck">¿Es posible cada una de estas jugadas?</string>
+    <string name="vis_q_attackAfter">¿Ataca la pieza %1$s?</string>
+    <string name="vis_q_twoPieces">¿Qué pieza ataca %1$s?</string>
+    <string name="vis_q_isCheck">¿Dan jaque las blancas al rey negro?</string>
+    <string name="vis_q_hangingPiece">¿Qué pieza negra está colgada?</string>
+    <string name="vis_q_squareAttacked">¿Está %1$s atacada por las blancas?</string>
+    <string name="vis_row_start">Salida:</string>
+    <string name="vis_row_moves">Jugadas:</string>
+    <string name="vis_row_white">Blancas:</string>
+    <string name="vis_row_black">Negras:</string>
+    <string name="vis_both">Las dos</string>
+    <string name="vis_none">Ninguna</string>
+    <string name="vis_answer_label">Respuesta:</string>
+    <string name="vis_you_label">Tú:</string>
 </resources>

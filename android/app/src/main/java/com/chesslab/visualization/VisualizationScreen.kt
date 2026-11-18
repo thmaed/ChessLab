@@ -34,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
@@ -232,10 +234,13 @@ private fun Playing(model: VisualizationViewModel, ui: VisualizationUi) {
             }
         }
         if (question != null) {
+            Scene(question)
             Text(
                 prompt(question), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.fillMaxWidth().padding(top = if (question.kind.usesBoard) 0.dp else 24.dp).testTag("visualisation-question"),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = if (question.kind.usesBoard || question.pieces.isNotEmpty() || question.moves.isNotEmpty()) 0.dp else 24.dp)
+                    .testTag("visualisation-question"),
             )
             if (question.kind.usesBoard) QuestionBoard(model, ui, question)
             if (question.choices.isNotEmpty()) Choices(model, ui, question)
@@ -286,6 +291,7 @@ private fun ChoiceButton(model: VisualizationViewModel, ui: VisualizationUi, que
         else -> null
     }
     val shape = RoundedCornerShape(14.dp)
+    val spoken = answerLabel(choice, question)
     val settings by com.chesslab.settings.SettingsStore.state.collectAsState()
     val theme = BoardTheme.all.firstOrNull { it.id == settings.boardThemeId } ?: BoardTheme.classic
     Row(
@@ -296,18 +302,23 @@ private fun ChoiceButton(model: VisualizationViewModel, ui: VisualizationUi, que
             .background(tint?.copy(alpha = 0.16f) ?: Palette.surfaceElevated)
             .border(if (tint == null) 1.dp else 2.dp, tint ?: Palette.stroke, shape)
             .clickable(enabled = feedback == null) { model.answer(choice) }
+            .semantics { contentDescription = spoken }
             .testTag("choix-${choice.tag}"),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        if (choice == VAnswer.Light || choice == VAnswer.Dark) {
+        val piece = pieceFor(choice, question)
+        if (piece != null) {
+            PieceImage(piece, 28.dp)
+            if (choice is VAnswer.Square) Text(piece.square.notation, fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = tint ?: Palette.textPrimary)
+        } else if (choice == VAnswer.Light || choice == VAnswer.Dark) {
             Box(
                 Modifier.size(18.dp).clip(RoundedCornerShape(4.dp))
                     .background(if (choice == VAnswer.Light) theme.lightSquare else theme.darkSquare)
             )
             Spacer(Modifier.width(8.dp))
         }
-        Text(answerLabel(choice), fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = tint ?: Palette.textPrimary)
+        if (piece == null) Text(answerLabel(choice, question), fontSize = 20.sp, fontWeight = FontWeight.SemiBold, color = tint ?: Palette.textPrimary)
     }
 }
 
@@ -316,8 +327,8 @@ private fun FeedbackLine(ui: VisualizationUi, question: VQuestion) {
     val feedback = ui.feedback ?: run { Spacer(Modifier.height(24.dp)); return }
     val (icon, text, color) = when {
         feedback.isCorrect -> Triple(Icons.Default.CheckCircle, stringResource(R.string.vis_correct), Palette.accent)
-        feedback.given == null -> Triple(Icons.Default.Timer, stringResource(R.string.vis_timeout_answer, answerLabel(question.answer)), Palette.danger)
-        else -> Triple(Icons.Default.Cancel, stringResource(R.string.vis_wrong_answer, answerLabel(question.answer)), Palette.danger)
+        feedback.given == null -> Triple(Icons.Default.Timer, stringResource(R.string.vis_timeout_answer, answerLabel(question.answer, question)), Palette.danger)
+        else -> Triple(Icons.Default.Cancel, stringResource(R.string.vis_wrong_answer, answerLabel(question.answer, question)), Palette.danger)
     }
     Row(Modifier.testTag("visualisation-retour"), verticalAlignment = Alignment.CenterVertically) {
         Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
@@ -368,15 +379,22 @@ private fun Summary(model: VisualizationViewModel, ui: VisualizationUi) {
                     ui.misses.forEachIndexed { index, item ->
                         if (index > 0) RowDivider()
                         Column(Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Scene(item.question, compact = true)
                             Text(prompt(item.question), fontSize = 14.sp, color = Palette.textPrimary)
-                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                Text(stringResource(R.string.vis_answer, answerLabel(item.question.answer)), fontSize = 13.sp,
-                                    fontWeight = FontWeight.SemiBold, color = Palette.accent)
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Text(stringResource(R.string.vis_answer_label), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Palette.accent)
+                                    AnswerInline(item.question.answer, item.question, Palette.accent)
+                                }
                                 val given = item.given
-                                Text(
-                                    if (given != null) stringResource(R.string.vis_you, answerLabel(given)) else stringResource(R.string.vis_timeout),
-                                    fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Palette.danger,
-                                )
+                                if (given != null) {
+                                    Row(horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                        Text(stringResource(R.string.vis_you_label), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Palette.danger)
+                                        AnswerInline(given, item.question, Palette.danger)
+                                    }
+                                } else {
+                                    Text(stringResource(R.string.vis_timeout), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Palette.danger)
+                                }
                             }
                         }
                     }
@@ -404,22 +422,144 @@ private fun prompt(q: VQuestion): String {
             null -> ""
         }
         VisualizationKind.knightDistance -> stringResource(R.string.vis_q_knight, s[0], s[1])
+        VisualizationKind.pathCheck -> stringResource(R.string.vis_q_pathCheck)
+        VisualizationKind.attackAfter -> stringResource(R.string.vis_q_attackAfter, s[0])
+        VisualizationKind.twoPieces -> stringResource(R.string.vis_q_twoPieces, s[0])
+        VisualizationKind.isCheck -> stringResource(R.string.vis_q_isCheck)
+        VisualizationKind.hangingPiece -> stringResource(R.string.vis_q_hangingPiece)
+        VisualizationKind.squareAttacked -> stringResource(R.string.vis_q_squareAttacked, s[0])
     }
 }
 
 @Composable
-private fun answerLabel(a: VAnswer): String = when (a) {
+private fun answerLabel(a: VAnswer, q: VQuestion): String = when (a) {
     VAnswer.Light -> stringResource(R.string.vis_light)
     VAnswer.Dark -> stringResource(R.string.vis_dark)
     VAnswer.Yes -> stringResource(R.string.vis_yes)
     VAnswer.No -> stringResource(R.string.vis_no)
-    is VAnswer.Square -> a.square.notation
+    is VAnswer.Square -> q.pieces.firstOrNull { it.square == a.square }?.label ?: a.square.notation
     is VAnswer.Number -> "${a.value}"
+    is VAnswer.Option -> when (a.name) {
+        "first" -> q.pieces.firstOrNull()?.figurine.orEmpty()
+        "second" -> q.pieces.getOrNull(1)?.figurine.orEmpty()
+        "both" -> stringResource(R.string.vis_both)
+        else -> stringResource(R.string.vis_none)
+    }
 }
 
-private fun stepTitle(step: VisualizationStep) = if (step == VisualizationStep.squares) R.string.vis_step_squares else R.string.vis_step_lines
-private fun stepDetail(step: VisualizationStep) =
-    if (step == VisualizationStep.squares) R.string.vis_step_squares_detail else R.string.vis_step_lines_detail
+/** La pièce que désigne une réponse (« ♞h6 », « le cavalier »), pour la montrer en image. */
+private fun pieceFor(a: VAnswer, q: VQuestion): VPiece? = when {
+    a is VAnswer.Square -> q.pieces.firstOrNull { it.square == a.square }
+    a == VAnswer.Option("first") -> q.pieces.firstOrNull()
+    a == VAnswer.Option("second") -> q.pieces.getOrNull(1)
+    else -> null
+}
+
+/** Une pièce en image (jeu de pièces des réglages) ; une noire est cernée de clair pour se voir sur le fond sombre. */
+@Composable
+private fun PieceImage(piece: VPiece, size: androidx.compose.ui.unit.Dp) {
+    val kind = when (piece.kind) {
+        VPieceKind.king -> Piece.Kind.king
+        VPieceKind.queen -> Piece.Kind.queen
+        VPieceKind.rook -> Piece.Kind.rook
+        VPieceKind.bishop -> Piece.Kind.bishop
+        VPieceKind.knight -> Piece.Kind.knight
+        VPieceKind.pawn -> Piece.Kind.pawn
+    }
+    val chessPiece = Piece(kind, if (piece.isWhite) Piece.Color.white else Piece.Color.black, Square("a1"))
+    Box(Modifier.size(size), contentAlignment = Alignment.Center) {
+        if (!piece.isWhite) {
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(com.chesslab.ui.drawableFor(chessPiece, pieceSetId())),
+                contentDescription = null,
+                colorFilter = androidx.compose.ui.graphics.ColorFilter.tint(Color.White.copy(alpha = 0.85f)),
+                modifier = Modifier.size(size + 3.dp),
+            )
+        }
+        com.chesslab.ui.PieceIcon(chessPiece, Modifier.size(size).clearAndSetSemantics {})
+    }
+}
+
+@Composable
+private fun pieceSetId(): String {
+    val settings by com.chesslab.settings.SettingsStore.state.collectAsState()
+    return settings.pieceSetId
+}
+
+/** Une réponse dans une ligne : la pièce en image, sinon le mot. */
+@Composable
+private fun AnswerInline(a: VAnswer, q: VQuestion, color: Color) {
+    val piece = pieceFor(a, q)
+    if (piece != null) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            PieceImage(piece, 18.dp)
+            if (a is VAnswer.Square) Text(piece.square.notation, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = color)
+        }
+    } else {
+        Text(answerLabel(a, q), fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = color)
+    }
+}
+
+/** Ce que l'exercice met en scène : un trajet, deux pièces et leurs coups, une position — en images de pièces. */
+@Composable
+private fun Scene(q: VQuestion, compact: Boolean = false) {
+    val glyph = if (compact) 20.dp else 30.dp
+    val font = if (compact) 14.sp else 20.sp
+    val rows: List<Pair<String?, List<VPiece>>> = when (q.kind) {
+        VisualizationKind.pathCheck, VisualizationKind.attackAfter -> listOf(null to q.moves)
+        VisualizationKind.twoPieces -> listOf(stringResource(R.string.vis_row_start) to q.pieces, stringResource(R.string.vis_row_moves) to q.moves)
+        VisualizationKind.isCheck, VisualizationKind.hangingPiece, VisualizationKind.squareAttacked ->
+            listOf(stringResource(R.string.vis_row_white) to q.pieces.filter { it.isWhite },
+                stringResource(R.string.vis_row_black) to q.pieces.filter { !it.isWhite })
+        else -> emptyList()
+    }
+    if (rows.isEmpty()) return
+    val spoken = rows.joinToString(". ") { (title, pieces) ->
+        if (title == null) pieces.first().figurine + " " + pieces.joinToString(", ") { it.square.notation }
+        else title + " " + pieces.joinToString(", ") { it.label }
+    }
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .then(if (compact) Modifier else Modifier.padding(top = 12.dp).clip(RoundedCornerShape(14.dp))
+                .background(Palette.surfaceElevated).border(1.dp, Palette.stroke, RoundedCornerShape(14.dp)).padding(16.dp))
+            // L'étiquette de test AVANT l'effacement des sémantiques : placée après, elle était effacée avec le reste.
+            .then(if (compact) Modifier else Modifier.testTag("visualisation-scene"))
+            .clearAndSetSemantics { contentDescription = spoken },
+        verticalArrangement = Arrangement.spacedBy(if (compact) 4.dp else 10.dp),
+    ) {
+        rows.forEach { (title, pieces) ->
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(if (title == null) 6.dp else 10.dp)) {
+                if (title == null) {
+                    PieceImage(pieces.first(), glyph)
+                    Text(pieces.joinToString(" → ") { it.square.notation }, fontSize = font, fontWeight = FontWeight.SemiBold,
+                        color = Palette.textPrimary, maxLines = 1)
+                } else {
+                    Text(title, fontSize = font, fontWeight = FontWeight.SemiBold, color = Palette.textSecondary)
+                    pieces.forEach { piece ->
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            PieceImage(piece, glyph)
+                            Text(piece.square.notation, fontSize = font, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary, maxLines = 1)
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+private fun stepTitle(step: VisualizationStep) = when (step) {
+    VisualizationStep.squares -> R.string.vis_step_squares
+    VisualizationStep.lines -> R.string.vis_step_lines
+    VisualizationStep.pieces -> R.string.vis_step_pieces
+    VisualizationStep.position -> R.string.vis_step_position
+}
+private fun stepDetail(step: VisualizationStep) = when (step) {
+    VisualizationStep.squares -> R.string.vis_step_squares_detail
+    VisualizationStep.lines -> R.string.vis_step_lines_detail
+    VisualizationStep.pieces -> R.string.vis_step_pieces_detail
+    VisualizationStep.position -> R.string.vis_step_position_detail
+}
 
 private fun lengthLabel(length: VisualizationLength) = when (length) {
     VisualizationLength.ten -> R.string.vis_len_ten
@@ -434,6 +574,12 @@ private fun kindTitle(kind: VisualizationKind) = when (kind) {
     VisualizationKind.sameDiagonal -> R.string.vis_kind_sameDiagonal
     VisualizationKind.lineIntersection -> R.string.vis_kind_lineIntersection
     VisualizationKind.knightDistance -> R.string.vis_kind_knightDistance
+    VisualizationKind.pathCheck -> R.string.vis_kind_pathCheck
+    VisualizationKind.attackAfter -> R.string.vis_kind_attackAfter
+    VisualizationKind.twoPieces -> R.string.vis_kind_twoPieces
+    VisualizationKind.isCheck -> R.string.vis_kind_isCheck
+    VisualizationKind.hangingPiece -> R.string.vis_kind_hangingPiece
+    VisualizationKind.squareAttacked -> R.string.vis_kind_squareAttacked
 }
 
 private fun clock(ms: Long): String {

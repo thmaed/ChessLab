@@ -137,13 +137,35 @@ enum KnightDistance {
 enum VisualizationStep: String, Codable, CaseIterable, Identifiable {
     case squares
     case lines
+    /// Lot 2 (18/11/2026).
+    case pieces
+    case position
 
     var id: String { rawValue }
-    var number: Int { self == .squares ? 1 : 2 }
+    var number: Int {
+        switch self {
+        case .squares: 1
+        case .lines: 2
+        case .pieces: 3
+        case .position: 4
+        }
+    }
     /// Clé française (localisée par l'appelant).
-    var title: String { self == .squares ? "Les cases" : "Les lignes" }
+    var title: String {
+        switch self {
+        case .squares: "Les cases"
+        case .lines: "Les lignes"
+        case .pieces: "Suivre les pièces"
+        case .position: "La position sans plateau"
+        }
+    }
     var detail: String {
-        self == .squares ? "Couleur d'une case, la trouver, la nommer" : "Diagonales, croisements, trajets du cavalier"
+        switch self {
+        case .squares: "Couleur d'une case, la trouver, la nommer"
+        case .lines: "Diagonales, croisements, trajets du cavalier"
+        case .pieces: "Trajets possibles, ce qu'attaque une pièce, deux pièces qui bougent"
+        case .position: "Échec, pièce en prise, case attaquée"
+        }
     }
     var kinds: [VisualizationKind] { VisualizationKind.allCases.filter { $0.step == self } }
 }
@@ -161,6 +183,18 @@ enum VisualizationKind: String, Codable, CaseIterable, Identifiable {
     case lineIntersection
     /// « En combien de coups un cavalier va-t-il de b1 à f5 ? » — sans plateau.
     case knightDistance
+    /// « ♘ g1 → f3 → d4 → c6 : chaque coup est-il possible ? »
+    case pathCheck
+    /// « ♗ c1 → g5 → e7 : la pièce attaque-t-elle a3 ? »
+    case attackAfter
+    /// Deux pièces qui bougent tour à tour : « Quelle pièce attaque f7 ? »
+    case twoPieces
+    /// Une position en figurines : « Les Blancs font-ils échec au roi noir ? »
+    case isCheck
+    /// « Quelle pièce noire est en prise ? » (attaquée et non défendue ; ou aucune)
+    case hangingPiece
+    /// « La case e5 est-elle attaquée par les Blancs ? »
+    case squareAttacked
 
     var id: String { rawValue }
 
@@ -168,6 +202,8 @@ enum VisualizationKind: String, Codable, CaseIterable, Identifiable {
         switch self {
         case .squareColor, .findSquare, .nameSquare: .squares
         case .sameDiagonal, .lineIntersection, .knightDistance: .lines
+        case .pathCheck, .attackAfter, .twoPieces: .pieces
+        case .isCheck, .hangingPiece, .squareAttacked: .position
         }
     }
 
@@ -180,6 +216,12 @@ enum VisualizationKind: String, Codable, CaseIterable, Identifiable {
         case .sameDiagonal: "Même diagonale"
         case .lineIntersection: "Croisements"
         case .knightDistance: "Trajets du cavalier"
+        case .pathCheck: "Trajets possibles"
+        case .attackAfter: "Ce qu'attaque une pièce"
+        case .twoPieces: "Deux pièces"
+        case .isCheck: "Échec ?"
+        case .hangingPiece: "Pièce en prise"
+        case .squareAttacked: "Case attaquée"
         }
     }
 
@@ -194,6 +236,8 @@ enum VisualizationAnswer: Hashable {
     case no
     case square(VisualizationSquare)
     case number(Int)
+    /// « first », « second », « both », « none » (deux pièces) ; « none » aussi pour « aucune pièce en prise ».
+    case option(String)
 }
 
 /// Une question : ce qu'il faut dire, la bonne réponse, et les choix proposés (vides pour « Touchez… » : on
@@ -208,10 +252,24 @@ struct VisualizationQuestion: Equatable {
     let diagonal: VisualizationDiagonal?
     let answer: VisualizationAnswer
     let choices: [VisualizationAnswer]
+    /// Lot 2 — la position (marche 4), ou les deux pièces de départ (« Deux pièces »).
+    var pieces: [VisualizationPiece] = []
+    /// Lot 2 — le trajet d'une pièce (départ compris), ou les coups des deux pièces.
+    var moves: [VisualizationPiece] = []
 
     /// Ce qui permet de reposer la MÊME question plus tard (les erreurs reviennent).
     var reviewKey: String {
         switch kind {
+        case .pathCheck:
+            "\(kind.rawValue)|\(moves[0].kind.rawValue)|\(moves.map(\.square.notation).joined(separator: ","))"
+        case .attackAfter:
+            "\(kind.rawValue)|\(moves[0].kind.rawValue)|\(moves.map(\.square.notation).joined(separator: ","))|\(squares[0].notation)"
+        case .twoPieces:
+            "\(kind.rawValue)|\(VisualizationPiece.codes(pieces))|\(VisualizationPiece.codes(moves))|\(squares[0].notation)"
+        case .isCheck, .hangingPiece:
+            "\(kind.rawValue)|\(VisualizationPiece.codes(pieces))"
+        case .squareAttacked:
+            "\(kind.rawValue)|\(VisualizationPiece.codes(pieces))|\(squares[0].notation)"
         case .squareColor, .findSquare, .nameSquare:
             "\(kind.rawValue)|\(squares[0].notation)"
         case .sameDiagonal, .knightDistance:
@@ -241,6 +299,18 @@ enum VisualizationGenerator {
             let square = diagonal.squares.randomElement(using: &rng)!
             let line: VisualizationLine = Bool.random(using: &rng) ? .file(square.file) : .rank(square.rank)
             return lineIntersection(line, diagonal, using: &rng)!
+        case .pathCheck:
+            return randomPathCheck(possible: Bool.random(using: &rng), using: &rng)
+        case .attackAfter:
+            return randomAttackAfter(attacked: Bool.random(using: &rng), using: &rng)
+        case .twoPieces:
+            return randomTwoPieces(using: &rng)
+        case .isCheck:
+            return randomIsCheck(check: Bool.random(using: &rng), using: &rng)
+        case .hangingPiece:
+            return randomHangingPiece(one: Double.random(in: 0..<1, using: &rng) < 0.7, using: &rng)
+        case .squareAttacked:
+            return randomSquareAttacked(attacked: Bool.random(using: &rng), using: &rng)
         case .knightDistance:
             var from = VisualizationSquare.all.randomElement(using: &rng)!
             var to = VisualizationSquare.all.randomElement(using: &rng)!
@@ -269,6 +339,26 @@ enum VisualizationGenerator {
             guard parts.count == 3, let line = VisualizationLine(key: parts[1]),
                   let diagonal = VisualizationDiagonal.named(parts[2]) else { return nil }
             return lineIntersection(line, diagonal, using: &rng)
+        case .pathCheck, .attackAfter:
+            guard parts.count >= 3, let pieceKind = VisualizationPieceKind(rawValue: parts[1]) else { return nil }
+            let path = parts[2].split(separator: ",").compactMap { VisualizationSquare(String($0)) }
+            guard path.count >= 2 else { return nil }
+            if kind == .pathCheck { return pathCheck(pieceKind, path) }
+            guard parts.count == 4, let target = VisualizationSquare(parts[3]) else { return nil }
+            return attackAfter(pieceKind, path, target: target)
+        case .twoPieces:
+            guard parts.count == 4, let starts = VisualizationPiece.parse(parts[1]), starts.count == 2,
+                  let moves = VisualizationPiece.parse(parts[2]), let target = VisualizationSquare(parts[3]) else { return nil }
+            return twoPieces(starts, moves, target: target)
+        case .isCheck, .hangingPiece, .squareAttacked:
+            guard parts.count >= 2, let position = VisualizationPiece.parse(parts[1]) else { return nil }
+            switch kind {
+            case .isCheck: return isCheck(position)
+            case .hangingPiece: return hangingPiece(position, using: &rng)
+            default:
+                guard parts.count == 3, let target = VisualizationSquare(parts[2]) else { return nil }
+                return squareAttacked(position, target: target)
+            }
         }
     }
 
@@ -501,4 +591,313 @@ struct VisualizationAnswered: Identifiable, Equatable {
     /// `nil` : le temps de la question s'est écoulé.
     let given: VisualizationAnswer?
     var isCorrect: Bool { given == question.answer }
+}
+
+// MARK: - Lot 2 : les pièces, et ce qu'elles attaquent
+
+/// Une pièce, notée en lettres anglaises dans les clés (« N », « b »…) et montrée en FIGURINES (♘) : la même
+/// écriture dans les cinq langues.
+enum VisualizationPieceKind: String, Codable, CaseIterable {
+    case king = "K", queen = "Q", rook = "R", bishop = "B", knight = "N", pawn = "P"
+
+    var whiteFigurine: String {
+        switch self {
+        case .king: "♔"
+        case .queen: "♕"
+        case .rook: "♖"
+        case .bishop: "♗"
+        case .knight: "♘"
+        case .pawn: "♙"
+        }
+    }
+
+    var blackFigurine: String {
+        switch self {
+        case .king: "♚"
+        case .queen: "♛"
+        case .rook: "♜"
+        case .bishop: "♝"
+        case .knight: "♞"
+        case .pawn: "♟"
+        }
+    }
+}
+
+struct VisualizationPiece: Hashable {
+    let kind: VisualizationPieceKind
+    let isWhite: Bool
+    let square: VisualizationSquare
+
+    /// La figurine, forcée en TEXTE (sans le sélecteur, ♟ s'affiche en émoji).
+    var figurine: String { (isWhite ? kind.whiteFigurine : kind.blackFigurine) + "\u{FE0E}" }
+    var label: String { figurine + square.notation }
+    /// « Ng1 » (blanc), « kg8 » (noir).
+    var code: String { (isWhite ? kind.rawValue : kind.rawValue.lowercased()) + square.notation }
+
+    init(_ kind: VisualizationPieceKind, white: Bool = true, _ square: VisualizationSquare) {
+        self.kind = kind
+        isWhite = white
+        self.square = square
+    }
+
+    init?(code: String) {
+        guard code.count == 3, let first = code.first, let kind = VisualizationPieceKind(rawValue: first.uppercased()),
+              let square = VisualizationSquare(String(code.dropFirst())) else { return nil }
+        self.init(kind, white: first.isUppercase, square)
+    }
+
+    static func codes(_ pieces: [VisualizationPiece]) -> String { pieces.map(\.code).joined(separator: ",") }
+
+    static func parse(_ text: String) -> [VisualizationPiece]? {
+        let pieces = text.split(separator: ",").map { VisualizationPiece(code: String($0)) }
+        return pieces.contains(where: { $0 == nil }) ? nil : pieces.compactMap { $0 }
+    }
+}
+
+enum VisualizationAttacks {
+    private static let straight = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    private static let diagonal = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+    /// Les cases qu'attaque une pièce ; une ligne s'arrête sur la première case OCCUPÉE (comprise).
+    static func from(_ kind: VisualizationPieceKind, white: Bool = true, at s: VisualizationSquare,
+                     occupied: Set<VisualizationSquare> = []) -> Set<VisualizationSquare> {
+        func rays(_ directions: [(Int, Int)]) -> Set<VisualizationSquare> {
+            var result = Set<VisualizationSquare>()
+            for (df, dr) in directions {
+                var current = s
+                while let next = current.offset(df, dr) {
+                    result.insert(next)
+                    if occupied.contains(next) { break }
+                    current = next
+                }
+            }
+            return result
+        }
+        switch kind {
+        case .king: return Set((straight + diagonal).compactMap { s.offset($0.0, $0.1) })
+        case .queen: return rays(straight + diagonal)
+        case .rook: return rays(straight)
+        case .bishop: return rays(diagonal)
+        case .knight: return Set(KnightDistance.jumps.compactMap { s.offset($0.0, $0.1) })
+        case .pawn: return Set([-1, 1].compactMap { s.offset($0, white ? 1 : -1) })
+        }
+    }
+
+    /// Tout ce qu'attaque un camp dans une position.
+    static func by(white: Bool, in position: [VisualizationPiece]) -> Set<VisualizationSquare> {
+        let occupied = Set(position.map(\.square))
+        return position.filter { $0.isWhite == white }.reduce(into: Set()) {
+            $0.formUnion(from($1.kind, white: $1.isWhite, at: $1.square, occupied: occupied))
+        }
+    }
+}
+
+extension VisualizationGenerator {
+    // MARK: Marche 3 — suivre les pièces
+
+    static let travellers: [VisualizationPieceKind] = [.knight, .bishop, .rook, .queen, .king]
+
+    /// Un trajet LÉGAL sur un plateau vide : le départ, puis `steps` coups, sans repasser par une case.
+    static func legalPath<R: RandomNumberGenerator>(_ kind: VisualizationPieceKind, steps: Int,
+                                                    using rng: inout R) -> [VisualizationSquare] {
+        while true {
+            var path = [VisualizationSquare.all.randomElement(using: &rng)!]
+            for _ in 0..<steps {
+                let options = VisualizationAttacks.from(kind, at: path.last!).subtracting(path)
+                guard let next = options.sorted().randomElement(using: &rng) else { break }
+                path.append(next)
+            }
+            if path.count == steps + 1 { return path }
+        }
+    }
+
+    static func isLegalPath(_ kind: VisualizationPieceKind, _ path: [VisualizationSquare]) -> Bool {
+        zip(path, path.dropFirst()).allSatisfy { VisualizationAttacks.from(kind, at: $0).contains($1) }
+    }
+
+    static func pathCheck(_ kind: VisualizationPieceKind, _ path: [VisualizationSquare]) -> VisualizationQuestion {
+        VisualizationQuestion(kind: .pathCheck, squares: [], line: nil, diagonal: nil,
+                              answer: isLegalPath(kind, path) ? .yes : .no, choices: [.yes, .no],
+                              moves: path.map { VisualizationPiece(kind, $0) })
+    }
+
+    /// Trois coups ; « impossible » : UN coup déplacé d'une case — le piège qu'on veut travailler.
+    static func randomPathCheck<R: RandomNumberGenerator>(possible: Bool, using rng: inout R) -> VisualizationQuestion {
+        let kind = travellers.randomElement(using: &rng)!
+        while true {
+            var path = legalPath(kind, steps: 3, using: &rng)
+            if !possible {
+                let i = Int.random(in: 1...3, using: &rng)
+                let candidates = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)]
+                    .compactMap { path[i].offset($0.0, $0.1) }
+                    .filter { !path.contains($0) && !VisualizationAttacks.from(kind, at: path[i - 1]).contains($0) }
+                guard let wrong = candidates.randomElement(using: &rng) else { continue }
+                path[i] = wrong
+            }
+            return pathCheck(kind, path)
+        }
+    }
+
+    static func attackAfter(_ kind: VisualizationPieceKind, _ path: [VisualizationSquare],
+                            target: VisualizationSquare) -> VisualizationQuestion {
+        let attacked = VisualizationAttacks.from(kind, at: path.last!).contains(target)
+        return VisualizationQuestion(kind: .attackAfter, squares: [target], line: nil, diagonal: nil,
+                                     answer: attacked ? .yes : .no, choices: [.yes, .no],
+                                     moves: path.map { VisualizationPiece(kind, $0) })
+    }
+
+    /// Deux coups ; la case visée est attaquée, ou en est tout près.
+    static func randomAttackAfter<R: RandomNumberGenerator>(attacked: Bool, using rng: inout R) -> VisualizationQuestion {
+        let kind = travellers.randomElement(using: &rng)!
+        while true {
+            let path = legalPath(kind, steps: 2, using: &rng)
+            let end = path.last!
+            let attackedSet = VisualizationAttacks.from(kind, at: end)
+            let pool: [VisualizationSquare] = attacked
+                ? attackedSet.sorted()
+                : VisualizationSquare.all.filter {
+                    !attackedSet.contains($0) && $0 != end && max(abs($0.file - end.file), abs($0.rank - end.rank)) <= 3
+                }
+            guard let target = pool.randomElement(using: &rng) else { continue }
+            return attackAfter(kind, path, target: target)
+        }
+    }
+
+    /// Les deux pièces après leurs coups, et qui attaque la case visée (l'une peut masquer l'autre).
+    static func twoPieces(_ starts: [VisualizationPiece], _ moves: [VisualizationPiece],
+                          target: VisualizationSquare) -> VisualizationQuestion {
+        var a = starts[0].square
+        var b = starts[1].square
+        for move in moves {
+            if move.kind == starts[0].kind { a = move.square } else { b = move.square }
+        }
+        let occupied: Set = [a, b]
+        let byA = VisualizationAttacks.from(starts[0].kind, at: a, occupied: occupied).contains(target)
+        let byB = VisualizationAttacks.from(starts[1].kind, at: b, occupied: occupied).contains(target)
+        let answer: String = byA && byB ? "both" : byA ? "first" : byB ? "second" : "none"
+        return VisualizationQuestion(kind: .twoPieces, squares: [target], line: nil, diagonal: nil,
+                                     answer: .option(answer),
+                                     choices: ["first", "second", "both", "none"].map { .option($0) },
+                                     pieces: starts, moves: moves)
+    }
+
+    static func randomTwoPieces<R: RandomNumberGenerator>(using rng: inout R) -> VisualizationQuestion {
+        let wanted = ["first", "second", "both", "none"].randomElement(using: &rng)!
+        while true {
+            let kinds = Array([VisualizationPieceKind.knight, .bishop, .rook, .queen].shuffled(using: &rng).prefix(2))
+            let a0 = VisualizationSquare.all.randomElement(using: &rng)!
+            let b0 = VisualizationSquare.all.randomElement(using: &rng)!
+            guard a0 != b0 else { continue }
+            var current = [a0, b0]
+            var moves: [VisualizationPiece] = []
+            for mover in [0, 1, 0] {
+                let other = current[1 - mover]
+                let options = VisualizationAttacks.from(kinds[mover], at: current[mover], occupied: [other])
+                    .subtracting([other]).sorted()
+                guard let next = options.randomElement(using: &rng) else { break }
+                current[mover] = next
+                moves.append(VisualizationPiece(kinds[mover], next))
+            }
+            guard moves.count == 3 else { continue }
+            let starts = [VisualizationPiece(kinds[0], a0), VisualizationPiece(kinds[1], b0)]
+            let targets = VisualizationSquare.all.filter { !current.contains($0) }.shuffled(using: &rng)
+            if let target = targets.first(where: { twoPieces(starts, moves, target: $0).answer == .option(wanted) }) {
+                return twoPieces(starts, moves, target: target)
+            }
+        }
+    }
+
+    // MARK: Marche 4 — la position sans plateau
+
+    /// Deux rois qui ne se touchent pas, deux ou trois pièces de chaque côté (une dame au plus), des pions hors des
+    /// bords ; le roi blanc n'est pas en échec.
+    static func randomPosition<R: RandomNumberGenerator>(using rng: inout R) -> [VisualizationPiece] {
+        let pool: [VisualizationPieceKind] = [.queen, .rook, .rook, .bishop, .bishop, .knight, .knight, .pawn, .pawn]
+        while true {
+            var taken = Set<VisualizationSquare>()
+            func free(pawn: Bool) -> VisualizationSquare? {
+                let candidates = VisualizationSquare.all.filter { !taken.contains($0) && (!pawn || (1...6).contains($0.rank)) }
+                return candidates.randomElement(using: &rng)
+            }
+            var position: [VisualizationPiece] = []
+            guard let wk = free(pawn: false) else { continue }
+            taken.insert(wk)
+            position.append(VisualizationPiece(.king, white: true, wk))
+            guard let bk = free(pawn: false), max(abs(bk.file - wk.file), abs(bk.rank - wk.rank)) > 1 else { continue }
+            taken.insert(bk)
+            position.append(VisualizationPiece(.king, white: false, bk))
+            for white in [true, false] {
+                let count = Int.random(in: 2...3, using: &rng)
+                var kinds = Array(pool.shuffled(using: &rng).prefix(count))
+                if kinds.filter({ $0 == .queen }).count > 1 { kinds = kinds.map { $0 == .queen ? .rook : $0 } }
+                for kind in kinds {
+                    guard let s = free(pawn: kind == .pawn) else { continue }
+                    taken.insert(s)
+                    position.append(VisualizationPiece(kind, white: white, s))
+                }
+            }
+            if VisualizationAttacks.by(white: false, in: position).contains(wk) { continue }
+            return position
+        }
+    }
+
+    static func isCheck(_ position: [VisualizationPiece]) -> VisualizationQuestion {
+        let blackKing = position.first { $0.kind == .king && !$0.isWhite }!.square
+        let check = VisualizationAttacks.by(white: true, in: position).contains(blackKing)
+        return VisualizationQuestion(kind: .isCheck, squares: [], line: nil, diagonal: nil,
+                                     answer: check ? .yes : .no, choices: [.yes, .no], pieces: position)
+    }
+
+    static func randomIsCheck<R: RandomNumberGenerator>(check: Bool, using rng: inout R) -> VisualizationQuestion {
+        for _ in 0..<400 {
+            let q = isCheck(randomPosition(using: &rng))
+            if q.answer == (check ? .yes : .no) { return q }
+        }
+        return isCheck(randomPosition(using: &rng))
+    }
+
+    /// Les pièces noires (hors roi) attaquées par les Blancs et que rien de noir ne défend.
+    static func hanging(in position: [VisualizationPiece]) -> [VisualizationPiece] {
+        let byWhite = VisualizationAttacks.by(white: true, in: position)
+        let byBlack = VisualizationAttacks.by(white: false, in: position)
+        return position.filter { !$0.isWhite && $0.kind != .king && byWhite.contains($0.square) && !byBlack.contains($0.square) }
+    }
+
+    /// `nil` si la position n'a pas UNE réponse (deux pièces en prise) ou trop peu de pièces noires à proposer.
+    static func hangingPiece<R: RandomNumberGenerator>(_ position: [VisualizationPiece], using rng: inout R) -> VisualizationQuestion? {
+        let blacks = position.filter { !$0.isWhite && $0.kind != .king }
+        let hung = hanging(in: position)
+        guard blacks.count >= 2, hung.count <= 1 else { return nil }
+        let answer: VisualizationAnswer = hung.first.map { .square($0.square) } ?? .option("none")
+        let choices = blacks.shuffled(using: &rng).map { VisualizationAnswer.square($0.square) } + [.option("none")]
+        return VisualizationQuestion(kind: .hangingPiece, squares: [], line: nil, diagonal: nil,
+                                     answer: answer, choices: choices, pieces: position)
+    }
+
+    static func randomHangingPiece<R: RandomNumberGenerator>(one: Bool, using rng: inout R) -> VisualizationQuestion {
+        var fallback: VisualizationQuestion?
+        for _ in 0..<600 {
+            guard let q = hangingPiece(randomPosition(using: &rng), using: &rng) else { continue }
+            if (q.answer != .option("none")) == one { return q }
+            fallback = fallback ?? q
+        }
+        if let fallback { return fallback }
+        while true { if let q = hangingPiece(randomPosition(using: &rng), using: &rng) { return q } }
+    }
+
+    static func squareAttacked(_ position: [VisualizationPiece], target: VisualizationSquare) -> VisualizationQuestion {
+        let attacked = VisualizationAttacks.by(white: true, in: position).contains(target)
+        return VisualizationQuestion(kind: .squareAttacked, squares: [target], line: nil, diagonal: nil,
+                                     answer: attacked ? .yes : .no, choices: [.yes, .no], pieces: position)
+    }
+
+    static func randomSquareAttacked<R: RandomNumberGenerator>(attacked: Bool, using rng: inout R) -> VisualizationQuestion {
+        while true {
+            let position = randomPosition(using: &rng)
+            let occupied = Set(position.map(\.square))
+            let byWhite = VisualizationAttacks.by(white: true, in: position)
+            let pool = VisualizationSquare.all.filter { !occupied.contains($0) && byWhite.contains($0) == attacked }
+            if let target = pool.randomElement(using: &rng) { return squareAttacked(position, target: target) }
+        }
+    }
 }

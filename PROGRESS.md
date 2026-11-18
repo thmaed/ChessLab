@@ -11578,3 +11578,17 @@ par défaut ; liste des coups visible.
     garde désormais le numéro de la question en cours (les deux côtés).
   - Tests : iOS `VisualizationTests` (10) et `VisualizationUITests` (parcours complet, chrono qui tranche) ; Android
     `VisualizationTest` JVM (9) et instrumenté (émulateur ; Galaxy débranché, à refaire — PARITE.md) ; JVM 713/713.
+- **18/11, VISUALISATION, lot 2 (iOS + Android)** — marches 3 et 4. Correction de ma proposition : « Cavalier en g1 :
+  Cf3, Ce5, Cd7. Où est-il ? » donnait la réponse dans l'énoncé ; remplacé par des exercices qui obligent à suivre.
+  - Marche 3 « Suivre les pièces » : « chacun de ces coups est-il possible ? » (trajet de trois coups d'une pièce ; le
+    faux est UN coup déplacé d'une case) ; « la pièce attaque-t-elle X ? » après deux coups ; deux pièces qui bougent
+    tour à tour — « quelle pièce attaque X ? » (l'une, l'autre, les deux, aucune ; l'une peut masquer l'autre).
+  - Marche 4 « La position sans plateau » : une position (deux rois, deux ou trois pièces de chaque côté) ;
+    « les Blancs font-ils échec ? », « quelle pièce noire est en prise ? » (attaquée et non défendue ; UNE au plus,
+    ou aucune), « la case X est-elle attaquée par les Blancs ? ». Réponses équilibrées (testé).
+  - Pièces montrées en IMAGES du jeu de pièces de l'app (les figurines ♘ sortaient minuscules dans la police
+    système), les noires cernées de clair ; les réponses qui désignent une pièce aussi, et le bilan ; le lecteur
+    d'écran lit les figurines.
+  - Tests : iOS `VisualizationTests` (14) et `VisualizationUITests` (2 parcours) ; Android `VisualizationTest` JVM (13)
+    et instrumenté (2, émulateur), JVM 717/717. Piège Android : une étiquette de test posée APRÈS
+    `clearAndSetSemantics` est effacée avec le reste.

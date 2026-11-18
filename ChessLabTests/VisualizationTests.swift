@@ -75,6 +75,25 @@ struct VisualizationTests {
                     #expect(q.answer == .number(KnightDistance.between(q.squares[0], q.squares[1])))
                 case .nameSquare: #expect(q.choices.count == 4)
                 case .findSquare: #expect(q.answer == .square(q.squares[0]))
+                case .pathCheck:
+                    #expect(q.moves.count == 4)
+                    #expect(q.answer == (VisualizationGenerator.isLegalPath(q.moves[0].kind, q.moves.map(\.square)) ? .yes : .no))
+                case .attackAfter:
+                    #expect(q.moves.count == 3)
+                    #expect(VisualizationGenerator.isLegalPath(q.moves[0].kind, q.moves.map(\.square)), "le trajet est jouable")
+                    let hit = VisualizationAttacks.from(q.moves[0].kind, at: q.moves.last!.square).contains(q.squares[0])
+                    #expect(q.answer == (hit ? .yes : .no))
+                case .twoPieces:
+                    #expect(q.pieces.count == 2 && q.moves.count == 3)
+                    #expect(q.pieces[0].kind != q.pieces[1].kind)
+                case .isCheck, .squareAttacked:
+                    #expect(q.pieces.filter { $0.kind == .king }.count == 2)
+                    #expect(Set(q.pieces.map(\.square)).count == q.pieces.count, "une pièce par case")
+                    #expect(q.pieces.filter { $0.kind == .pawn }.allSatisfy { (1...6).contains($0.square.rank) })
+                case .hangingPiece:
+                    let hung = VisualizationGenerator.hanging(in: q.pieces)
+                    #expect(hung.count <= 1, "une réponse, pas deux")
+                    #expect(q.answer == (hung.first.map { .square($0.square) } ?? .option("none")))
                 }
             }
         }
@@ -147,5 +166,47 @@ struct VisualizationTests {
         let empty = try JSONDecoder().decode(VisualizationSettings.self, from: Data(#"{"steps":[]}"#.utf8))
         #expect(empty.steps == [.squares], "jamais aucune marche")
         #expect(VisualizationSettings().kinds == [.squareColor, .findSquare, .nameSquare])
+    }
+
+    // MARK: Lot 2
+
+    @Test func attacksStopOnTheFirstOccupiedSquare() {
+        let rook = VisualizationAttacks.from(.rook, at: sq("a1"), occupied: [sq("a4")])
+        #expect(rook.contains(sq("a4")) && !rook.contains(sq("a5")))
+        #expect(rook.contains(sq("h1")))
+        #expect(VisualizationAttacks.from(.pawn, white: true, at: sq("e4")) == [sq("d5"), sq("f5")])
+        #expect(VisualizationAttacks.from(.pawn, white: false, at: sq("e5")) == [sq("d4"), sq("f4")])
+        #expect(VisualizationAttacks.from(.knight, at: sq("a1")) == [sq("b3"), sq("c2")])
+    }
+
+    @Test func twoPiecesSeeEachOtherAsObstacles() {
+        // ♖ a1, ♗ c3 ; la tour monte en a4 ; le fou va en a5 — il masque la tour au-delà.
+        let starts = [VisualizationPiece(.rook, sq("a1")), VisualizationPiece(.bishop, sq("c3"))]
+        let moves = [VisualizationPiece(.rook, sq("a4")), VisualizationPiece(.bishop, sq("a5")), VisualizationPiece(.rook, sq("a3"))]
+        #expect(VisualizationGenerator.twoPieces(starts, moves, target: sq("a6")).answer == .option("none"))
+        #expect(VisualizationGenerator.twoPieces(starts, moves, target: sq("a4")).answer == .option("first"))
+        #expect(VisualizationGenerator.twoPieces(starts, moves, target: sq("b6")).answer == .option("second"))
+        #expect(VisualizationGenerator.twoPieces(starts, moves, target: sq("c3")).answer == .option("both"))
+    }
+
+    @Test func lot2AnswersAreBalanced() {
+        var rng = Seeded(state: 21)
+        var counts: [VisualizationKind: [VisualizationAnswer: Int]] = [:]
+        for kind in [VisualizationKind.pathCheck, .attackAfter, .twoPieces, .isCheck, .squareAttacked] {
+            for _ in 0..<120 { counts[kind, default: [:]][VisualizationGenerator.question(kind, using: &rng).answer, default: 0] += 1 }
+        }
+        for kind in [VisualizationKind.pathCheck, .attackAfter, .isCheck, .squareAttacked] {
+            #expect((30...90).contains(counts[kind]?[.yes] ?? 0), "\(kind) : \(counts[kind] ?? [:])")
+        }
+        #expect(counts[.twoPieces]?.count == 4, "les quatre réponses sortent : \(counts[.twoPieces] ?? [:])")
+    }
+
+    @Test func aPositionReadsTheSameFromItsKey() {
+        let position = VisualizationPiece.parse("Kg1,Qd1,Rf1,kg8,rd8,bc5")!
+        #expect(VisualizationGenerator.isCheck(position).answer == .no)
+        #expect(VisualizationPiece.parse("Kg1,Qh7,kg8")!.count == 3)
+        #expect(VisualizationGenerator.isCheck(VisualizationPiece.parse("Kg1,Qh7,kg8")!).answer == .yes)
+        #expect(VisualizationPiece.parse("Kg1,Xz9") == nil)
+        #expect(VisualizationPiece(.knight, sq("g1")).figurine.unicodeScalars.first == "♘")
     }
 }

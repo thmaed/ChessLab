@@ -1535,8 +1535,6 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_correct_plain">correct</string>
     <string name="vis_by_exercise">By exercise</string>
     <string name="vis_to_review">Review</string>
-    <string name="vis_answer">Answer: %1$s</string>
-    <string name="vis_you">You: %1$s</string>
     <string name="vis_timeout">Time\'s up</string>
     <string name="vis_misses_return">These questions will come back in your next series.</string>
     <string name="vis_restart">Restart</string>
@@ -1559,4 +1557,29 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_dark">Dark</string>
     <string name="vis_yes">Yes</string>
     <string name="vis_no">No</string>
+    <!-- Visualisation, lot 2 (18/11/2026) -->
+    <string name="vis_step_pieces">Following pieces</string>
+    <string name="vis_step_position">The position without a board</string>
+    <string name="vis_step_pieces_detail">Possible routes, what a piece attacks, two moving pieces</string>
+    <string name="vis_step_position_detail">Check, hanging piece, attacked square</string>
+    <string name="vis_kind_pathCheck">Possible routes</string>
+    <string name="vis_kind_attackAfter">What a piece attacks</string>
+    <string name="vis_kind_twoPieces">Two pieces</string>
+    <string name="vis_kind_isCheck">Check?</string>
+    <string name="vis_kind_hangingPiece">Hanging piece</string>
+    <string name="vis_kind_squareAttacked">Attacked square</string>
+    <string name="vis_q_pathCheck">Is every one of these moves possible?</string>
+    <string name="vis_q_attackAfter">Does the piece attack %1$s?</string>
+    <string name="vis_q_twoPieces">Which piece attacks %1$s?</string>
+    <string name="vis_q_isCheck">Is White giving check to the black king?</string>
+    <string name="vis_q_hangingPiece">Which black piece is hanging?</string>
+    <string name="vis_q_squareAttacked">Is %1$s attacked by White?</string>
+    <string name="vis_row_start">Start:</string>
+    <string name="vis_row_moves">Moves:</string>
+    <string name="vis_row_white">White:</string>
+    <string name="vis_row_black">Black:</string>
+    <string name="vis_both">Both</string>
+    <string name="vis_none">None</string>
+    <string name="vis_answer_label">Answer:</string>
+    <string name="vis_you_label">You:</string>
 </resources>

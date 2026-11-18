@@ -105,4 +105,43 @@ class VisualizationTest {
         awaitTag("visualisation-commencer")
         compose.pickFromMenu("menu-chrono", "chrono-sans")
     }
+
+    /** Lot 2 : les marches 3 et 4 seules ; chaque question met en scène son trajet ou sa position. */
+    @Test fun piecesAndPositionSteps() {
+        awaitTag("mode-visualization", 120_000)
+        compose.onNodeWithTag("mode-visualization").performScrollTo().performClick()
+        awaitTag("visualisation-commencer")
+        fun selected(tag: String) =
+            compose.onAllNodesWithTag(tag).fetchSemanticsNodes().first().config.getOrNull(SemanticsProperties.Selected) == true
+        for (step in listOf("pieces", "position")) {
+            if (!selected("marche-$step")) compose.onNodeWithTag("marche-$step").performScrollTo().performClick()
+        }
+        for (step in listOf("squares", "lines")) {
+            if (selected("marche-$step")) compose.onNodeWithTag("marche-$step").performScrollTo().performClick()
+        }
+        assertTrue(selected("marche-pieces") && selected("marche-position") && !selected("marche-squares"))
+        compose.pickFromMenu("menu-longueur", "longueur-ten")
+        compose.pickFromMenu("menu-chrono", "chrono-sans")
+        compose.onNodeWithTag("visualisation-commencer").performClick()
+
+        for (index in 0 until 10) {
+            awaitTag("visualisation-scene", 5_000)
+            answerCurrent()
+            val next = "${index + 2} / 10"
+            compose.waitUntil(5_000) {
+                compose.onAllNodesWithTag("visualisation-bilan").fetchSemanticsNodes().isNotEmpty() ||
+                    (compose.onAllNodesWithTag("visualisation-progression").fetchSemanticsNodes().isNotEmpty() &&
+                        text("visualisation-progression") == next)
+            }
+        }
+        awaitTag("visualisation-bilan", 5_000)
+
+        // Réglages rendus : la marche 1 seule.
+        compose.onNodeWithTag("visualisation-reglages").performClick()
+        awaitTag("visualisation-commencer")
+        compose.onNodeWithTag("marche-squares").performScrollTo().performClick()
+        for (step in listOf("pieces", "position")) {
+            if (selected("marche-$step")) compose.onNodeWithTag("marche-$step").performScrollTo().performClick()
+        }
+    }
 }

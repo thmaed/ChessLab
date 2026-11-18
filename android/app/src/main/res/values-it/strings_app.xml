@@ -1492,8 +1492,6 @@
     <string name="vis_correct_plain">giuste</string>
     <string name="vis_by_exercise">Per esercizio</string>
     <string name="vis_to_review">Da rivedere</string>
-    <string name="vis_answer">Risposta: %1$s</string>
-    <string name="vis_you">Tu: %1$s</string>
     <string name="vis_timeout">Tempo scaduto</string>
     <string name="vis_misses_return">Queste domande torneranno nelle tue prossime serie.</string>
     <string name="vis_restart">Ricomincia</string>
@@ -1516,4 +1514,29 @@
     <string name="vis_dark">Scura</string>
     <string name="vis_yes">Sì</string>
     <string name="vis_no">No</string>
+    <!-- Visualisation, lot 2 (18/11/2026) -->
+    <string name="vis_step_pieces">Seguire i pezzi</string>
+    <string name="vis_step_position">La posizione senza scacchiera</string>
+    <string name="vis_step_pieces_detail">Percorsi possibili, cosa attacca un pezzo, due pezzi che si muovono</string>
+    <string name="vis_step_position_detail">Scacco, pezzo in presa, casa attaccata</string>
+    <string name="vis_kind_pathCheck">Percorsi possibili</string>
+    <string name="vis_kind_attackAfter">Cosa attacca un pezzo</string>
+    <string name="vis_kind_twoPieces">Due pezzi</string>
+    <string name="vis_kind_isCheck">Scacco?</string>
+    <string name="vis_kind_hangingPiece">Pezzo in presa</string>
+    <string name="vis_kind_squareAttacked">Casa attaccata</string>
+    <string name="vis_q_pathCheck">Ognuna di queste mosse è possibile?</string>
+    <string name="vis_q_attackAfter">Il pezzo attacca %1$s?</string>
+    <string name="vis_q_twoPieces">Quale pezzo attacca %1$s?</string>
+    <string name="vis_q_isCheck">Il Bianco dà scacco al re nero?</string>
+    <string name="vis_q_hangingPiece">Quale pezzo nero è in presa?</string>
+    <string name="vis_q_squareAttacked">La casa %1$s è attaccata dal Bianco?</string>
+    <string name="vis_row_start">Partenza:</string>
+    <string name="vis_row_moves">Mosse:</string>
+    <string name="vis_row_white">Bianco:</string>
+    <string name="vis_row_black">Nero:</string>
+    <string name="vis_both">Entrambi</string>
+    <string name="vis_none">Nessuna</string>
+    <string name="vis_answer_label">Risposta:</string>
+    <string name="vis_you_label">Tu:</string>
 </resources>
