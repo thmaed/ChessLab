@@ -275,6 +275,10 @@ struct VisualizationView: View {
                     .font((calculating ? Font.title3 : .title2).weight(.semibold))
                     .foregroundStyle(Theme.textPrimary)
                     .multilineTextAlignment(.center)
+                    // Marche 5 : toujours DEUX lignes réservées (un texte plus long rapetisse) — l'énoncé change
+                    // quand on cache la position, le plateau ne doit pas changer de taille pour autant.
+                    .lineLimit(calculating ? 2 : 8, reservesSpace: calculating)
+                    .minimumScaleFactor(calculating ? 0.7 : 1)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity)
                     .accessibilityIdentifier("visualizationPrompt")
@@ -348,17 +352,20 @@ struct VisualizationView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .layoutPriority(1)
 
-            if memorizing {
-                Button { withAnimation(Theme.gentle) { viewModel.hidePosition() } } label: {
-                    Label("J'ai mémorisé", systemImage: "eye.slash")
-                        .font(.headline)
-                        .foregroundStyle(Theme.background)
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .background(q.kind.step.tint, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
-                }
-                .buttonStyle(.pressable)
-                .accessibilityIdentifier("visualizationHide")
+            // Le bouton GARDE sa place une fois la position cachée (invisible) : sinon le plateau grandit d'un coup
+            // (retour de l'utilisateur, 18/11/2026).
+            Button { withAnimation(Theme.gentle) { viewModel.hidePosition() } } label: {
+                Label("J'ai mémorisé", systemImage: "eye.slash")
+                    .font(.headline)
+                    .foregroundStyle(Theme.background)
+                    .frame(maxWidth: .infinity, minHeight: 50)
+                    .background(q.kind.step.tint, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
             }
+            .buttonStyle(.pressable)
+            .opacity(memorizing ? 1 : 0)
+            .disabled(!memorizing)
+            .accessibilityHidden(!memorizing)
+            .accessibilityIdentifier("visualizationHide")
         }
     }
 

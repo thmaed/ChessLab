@@ -36,6 +36,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
@@ -300,17 +301,18 @@ private fun CalculationBoard(model: VisualizationViewModel, ui: VisualizationUi,
             )
         }
         }
-        if (memorizing) {
-            Row(
-                Modifier.fillMaxWidth().heightIn(min = 50.dp).clip(RoundedCornerShape(16.dp))
-                    .background(question.kind.step.tint).clickable { model.hidePosition() }.testTag("visualisation-cacher"),
+        // Le bouton GARDE sa place une fois la position cachée (invisible) : sinon le plateau grandit d'un coup
+        // (retour de l'utilisateur, 18/11/2026). Comme iOS.
+        Row(
+                Modifier.fillMaxWidth().heightIn(min = 50.dp).alpha(if (memorizing) 1f else 0f).clip(RoundedCornerShape(16.dp))
+                    .background(question.kind.step.tint)
+                    .then(if (memorizing) Modifier.clickable { model.hidePosition() }.testTag("visualisation-cacher") else Modifier),
                 horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(Icons.Default.VisibilityOff, null, tint = Palette.background, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(stringResource(R.string.vis_hide), fontSize = 17.sp, fontWeight = FontWeight.SemiBold, color = Palette.background)
             }
-        }
     }
 }
 
@@ -766,10 +768,22 @@ private fun QuestionCard(model: VisualizationViewModel, ui: VisualizationUi, que
             Text(stringResource(kindTitle(question.kind)), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = tint)
         }
         Scene(question)
-        Text(
-            prompt(question, ui.isMemorizing), fontSize = if (calculating) 19.sp else 22.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
-            textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().testTag("visualisation-question"),
-        )
+        if (calculating) {
+            // Marche 5 : toujours DEUX lignes réservées (un texte plus long rapetisse) — l'énoncé change quand on cache
+            // la position, le plateau ne doit pas changer de taille pour autant. Comme iOS.
+            androidx.compose.foundation.text.BasicText(
+                prompt(question, ui.isMemorizing),
+                style = androidx.compose.ui.text.TextStyle(fontWeight = FontWeight.SemiBold, color = Palette.textPrimary, textAlign = TextAlign.Center),
+                minLines = 2, maxLines = 2,
+                autoSize = androidx.compose.foundation.text.TextAutoSize.StepBased(minFontSize = 13.sp, maxFontSize = 19.sp),
+                modifier = Modifier.fillMaxWidth().testTag("visualisation-question"),
+            )
+        } else {
+            Text(
+                prompt(question, ui.isMemorizing), fontSize = 22.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary,
+                textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth().testTag("visualisation-question"),
+            )
+        }
         model.questionTimeFraction()?.let { fraction ->
             Box(Modifier.fillMaxWidth().height(5.dp).clip(CircleShape).background(Color.White.copy(alpha = 0.1f))) {
                 Box(Modifier.fillMaxWidth(fraction).fillMaxHeight().clip(CircleShape).background(if (fraction < 0.3f) Palette.danger else tint))

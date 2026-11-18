@@ -170,8 +170,11 @@ class VisualizationTest {
 
         for (index in 0 until 3) {
             awaitTag("visualisation-cacher", 60_000)
+            val shown = compose.onNodeWithTag("visualisation-plateau").fetchSemanticsNode().boundsInRoot
             compose.onNodeWithTag("visualisation-cacher").performClick()
             compose.waitForIdle()
+            assertEquals("le plateau garde sa taille quand la position se cache",
+                shown, compose.onNodeWithTag("visualisation-plateau").fetchSemanticsNode().boundsInRoot)
             compose.onNodeWithTag("visualisation-plateau").performTouchInput { click(androidx.compose.ui.geometry.Offset(width * 0.56f, height * 0.81f)) }
             compose.onNodeWithTag("visualisation-plateau").performTouchInput { click(androidx.compose.ui.geometry.Offset(width * 0.56f, height * 0.56f)) }
             val next = "${index + 2} / 10"

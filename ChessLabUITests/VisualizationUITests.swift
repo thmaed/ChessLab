@@ -210,11 +210,14 @@ final class VisualizationUITests: XCTestCase {
         for index in 0..<3 {
             XCTAssertTrue(hide.waitForExistence(timeout: 10), "la position s'affiche d'abord (question \(index + 1))")
             if index == 0 { snapshot(app, "8-memoriser") }
+            let board = app.descendants(matching: .any)["visualizationBoard"].firstMatch
+            XCTAssertTrue(board.exists)
+            let shownFrame = board.frame
             hide.tap()
             pause(0.6)
             if index == 0 { snapshot(app, "9-cache") }
-            let board = app.descendants(matching: .any)["visualizationBoard"].firstMatch
             XCTAssertTrue(board.exists)
+            XCTAssertEqual(board.frame, shownFrame, "le plateau garde sa taille quand la position se cache")
             board.coordinate(withNormalizedOffset: CGVector(dx: 0.56, dy: 0.81)).tap()
             pause(0.3)
             board.coordinate(withNormalizedOffset: CGVector(dx: 0.56, dy: 0.56)).tap()
