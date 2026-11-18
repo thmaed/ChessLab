@@ -101,8 +101,14 @@ final class VisualizationUITests: XCTestCase {
         XCTAssertTrue(score.waitForExistence(timeout: 5))
         XCTAssertTrue(score.label.hasPrefix("0 /"), "la question manquée compte : \(score.label)")
 
-        // On rend les réglages tels qu'un joueur les trouverait.
+        // Le retour, d'une série en cours, mène aux réglages du module, pas à l'accueil.
         app.buttons["visualizationSettings"].tap()
+        XCTAssertTrue(start.waitForExistence(timeout: 5))
+        start.tap()
+        XCTAssertTrue(prompt.waitForExistence(timeout: 5))
+        app.buttons["visualizationBack"].tap()
+        XCTAssertTrue(start.waitForExistence(timeout: 5), "le retour d'une série mène aux réglages de Visualisation")
+        XCTAssertFalse(app.buttons["mode_play"].exists, "pas à l'accueil")
         NewGameSetupSteps.pick("Sans", inMenu: "visualizationTimerMenu", app: app)
     }
 

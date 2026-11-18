@@ -82,6 +82,9 @@ fun VisualizationScreen(session: Long, model: VisualizationViewModel = viewModel
         onDispose { owner.lifecycle.removeObserver(observer) }
     }
     val ui = model.ui
+    // D'une série ou d'un bilan, le retour mène aux réglages de Visualisation, pas à l'accueil (retour de
+    // l'utilisateur, 18/11/2026, comme iOS) ; ce qui a été répondu reste compté.
+    androidx.activity.compose.BackHandler(enabled = ui.phase != VisualizationPhase.setup) { model.backToSetup() }
     when (ui.phase) {
         VisualizationPhase.setup -> Setup(model, ui)
         VisualizationPhase.playing -> Playing(model, ui)

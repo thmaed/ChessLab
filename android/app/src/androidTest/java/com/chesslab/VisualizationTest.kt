@@ -102,9 +102,16 @@ class VisualizationTest {
         awaitTag("visualisation-bilan", 5_000)
         assertTrue(text("visualisation-bilan").startsWith("0 /"))
 
-        // Réglages rendus tels qu'un joueur les trouverait.
+        // Le retour (flèche de la barre), d'une série en cours, mène aux réglages du module, pas à l'accueil.
         compose.onNodeWithTag("visualisation-reglages").performClick()
         awaitTag("visualisation-commencer")
+        compose.onNodeWithTag("visualisation-commencer").performClick()
+        awaitTag("visualisation-question", 5_000)
+        compose.onNodeWithTag("retour").performClick()
+        awaitTag("visualisation-commencer", 5_000)
+        assertTrue("pas à l'accueil", compose.onAllNodesWithTag("mode-visualization").fetchSemanticsNodes().isEmpty())
+
+        // Réglages rendus tels qu'un joueur les trouverait.
         compose.pickFromMenu("menu-chrono", "chrono-sans")
     }
 

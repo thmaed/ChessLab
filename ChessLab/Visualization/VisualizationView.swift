@@ -21,6 +21,20 @@ struct VisualizationView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbarBackground(Theme.background, for: .navigationBar)
         .toolbarColorScheme(.dark, for: .navigationBar)
+        // D'une série ou d'un bilan, la flèche mène aux réglages de Visualisation, pas à l'accueil (retour de
+        // l'utilisateur, 18/11/2026) ; ce qui a été répondu reste compté. Un second retour quitte le module.
+        .navigationBarBackButtonHidden(viewModel.phase != .setup)
+        .toolbar {
+            if viewModel.phase != .setup {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button { withAnimation(Theme.gentle) { viewModel.backToSetup() } } label: {
+                        Image(systemName: "chevron.left").font(.body.weight(.semibold))
+                    }
+                    .accessibilityLabel(Text("Retour"))
+                    .accessibilityIdentifier("visualizationBack")
+                }
+            }
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { viewModel.resume() } else { viewModel.pause() }
         }

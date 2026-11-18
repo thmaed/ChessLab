@@ -136,6 +136,10 @@ private fun App(
     val topBar = remember { TopBarSlot() }
 
     BackHandler(enabled = stack.size > 1) { stack.removeAt(stack.lastIndex) }
+    // La flèche de la barre passe par le MÊME circuit que le retour du téléphone : un écran qui pose son propre
+    // `BackHandler` (Visualisation : d'une série, on revient à ses réglages — 18/11/2026) intercepte les deux.
+    val dispatcher = androidx.activity.compose.LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+    val barBack: () -> Unit = { dispatcher?.onBackPressed() ?: stack.removeAt(stack.lastIndex) }
 
     // La visite guidée. Une NOUVELLE installation la montre, une seconde
     // après l'accueil — jamais par-dessus une reprise proposée. L'empreinte
@@ -208,13 +212,13 @@ private fun App(
                     title = current.title(context),
                     collapse = collapse,
                     actions = topBar.content,
-                    onBack = { stack.removeAt(stack.lastIndex) },
+                    onBack = barBack,
                 )
             } else {
                 TopBar(
                     title = if (current.hasOwnTitle) "" else current.title(context),
                     actions = topBar.content,
-                    onBack = { stack.removeAt(stack.lastIndex) },
+                    onBack = barBack,
                 )
             }
         }
