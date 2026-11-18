@@ -157,6 +157,9 @@ enum class VisualizationKind(val step: VisualizationStep) {
 
     /** L'exercice se fait SUR un plateau (sans coordonnées) ; les autres, de tête. */
     val usesBoard: Boolean get() = this == findSquare || this == nameSquare
+
+    /** Le chrono GRANDIT avec la marche (18/11/2026, comme iOS) : 5 s pour une case, 20 s pour une position. */
+    fun seconds(base: Int): Int = base * step.number
 }
 
 sealed class VAnswer {

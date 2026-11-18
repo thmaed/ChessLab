@@ -1541,4 +1541,5 @@
     <string name="vis_you_label">Tú:</string>
     <string name="vis_series_steps">Peldaños de la serie</string>
     <string name="vis_series_mix">La serie mezcla: %1$s.</string>
+    <string name="vis_timer_scale">El reloj crece con el peldaño: %1$d s para una casilla, %2$d s para una posición.</string>
 </resources>

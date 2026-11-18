@@ -35,8 +35,10 @@ class VisualizationTest {
     private fun awaitTag(tag: String, timeoutMs: Long = 20_000) =
         compose.waitUntil(timeoutMs) { compose.onAllNodesWithTag(tag).fetchSemanticsNodes().isNotEmpty() }
 
+    /** Le texte d'un nœud, ou "" s'il vient de disparaître (la série peut finir entre deux lectures). */
     private fun text(tag: String): String =
-        compose.onNodeWithTag(tag).fetchSemanticsNode().config.getOrNull(SemanticsProperties.Text)?.joinToString("") ?: ""
+        compose.onAllNodesWithTag(tag).fetchSemanticsNodes().firstOrNull()
+            ?.config?.getOrNull(SemanticsProperties.Text)?.joinToString("") ?: ""
 
     private val activeChoice = SemanticsMatcher("un choix") {
         it.config.getOrNull(SemanticsProperties.TestTag)?.startsWith("choix-") == true
@@ -93,7 +95,7 @@ class VisualizationTest {
         // Chrono par question : sans réponse, le temps tranche.
         compose.pickFromMenu("menu-chrono", "chrono-5")
         compose.onNodeWithTag("visualisation-commencer").performClick()
-        compose.waitUntil(9_000) {
+        compose.waitUntil(16_000) {
             compose.onAllNodesWithText("Temps écoulé", substring = true).fetchSemanticsNodes().isNotEmpty()
         }
         compose.onNodeWithTag("visualisation-arreter").performClick()

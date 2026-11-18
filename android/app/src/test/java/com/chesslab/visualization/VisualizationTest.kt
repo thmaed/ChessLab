@@ -197,5 +197,13 @@ class VisualizationTest {
         assertTrue(VPiece.white(VPieceKind.knight, sq("g1")).figurine.startsWith("♘"))
     }
 
+    @Test fun `le chrono grandit avec la marche`() {
+        assertEquals(5, VisualizationKind.squareColor.seconds(5))
+        assertEquals(10, VisualizationKind.knightDistance.seconds(5))
+        assertEquals(15, VisualizationKind.twoPieces.seconds(5))
+        assertEquals(20, VisualizationKind.hangingPiece.seconds(5))
+        assertEquals(40, VisualizationKind.isCheck.seconds(10))
+    }
+
     private fun assertEquals(expected: Any?, actual: Any?, message: String) = assertEquals(message, expected, actual)
 }

@@ -60274,6 +60274,40 @@
           }
         }
       }
+    },
+    "Le chrono grandit avec la marche : %lld s pour une case, %lld s pour une position.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The timer grows with the step: %lld s for a square, %lld s for a position."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le chrono grandit avec la marche : %lld s pour une case, %lld s pour une position."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El reloj crece con el peldaño: %lld s para una casilla, %lld s para una posición."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Zeit wächst mit der Stufe: %lld s für ein Feld, %lld s für eine Stellung."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il tempo cresce con il gradino: %lld s per una casa, %lld s per una posizione."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

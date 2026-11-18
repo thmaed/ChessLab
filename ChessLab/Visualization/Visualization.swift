@@ -227,6 +227,11 @@ enum VisualizationKind: String, Codable, CaseIterable, Identifiable {
 
     /// L'exercice se fait SUR un plateau (sans coordonnées) ; les autres, de tête.
     var usesBoard: Bool { self == .findSquare || self == .nameSquare }
+
+    /// Le chrono par question GRANDIT avec la marche (retour de l'utilisateur, 18/11/2026 : « 5 s est bien pour le
+    /// repérage des cases, trop court pour les problèmes complexes ») : le réglage est le temps de la marche 1,
+    /// multiplié par le numéro de la marche — 5 s pour une case, 20 s pour une position.
+    func seconds(base: Int) -> Int { base * step.number }
 }
 
 enum VisualizationAnswer: Hashable {

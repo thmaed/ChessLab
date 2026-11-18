@@ -107,6 +107,18 @@ struct VisualizationView: View {
                     }
                 }
 
+                if let base = viewModel.settings.secondsPerQuestion {
+                    Label(LocalizationController.string(
+                        "Le chrono grandit avec la marche : %lld s pour une case, %lld s pour une position.",
+                        base * VisualizationStep.squares.number, base * VisualizationStep.position.number),
+                          systemImage: "timer")
+                        .font(.footnote)
+                        .foregroundStyle(Theme.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 4)
+                        .accessibilityIdentifier("visualizationTimerScale")
+                }
+
                 if viewModel.reviewCount > 0 {
                     Label("\(viewModel.reviewCount) question(s) ratée(s) reviendront dans vos séries.",
                           systemImage: "arrow.counterclockwise")

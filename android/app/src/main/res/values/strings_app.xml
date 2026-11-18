@@ -1584,4 +1584,5 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_you_label">You:</string>
     <string name="vis_series_steps">Steps in the series</string>
     <string name="vis_series_mix">The series mixes: %1$s.</string>
+    <string name="vis_timer_scale">The timer grows with the step: %1$d s for a square, %2$d s for a position.</string>
 </resources>

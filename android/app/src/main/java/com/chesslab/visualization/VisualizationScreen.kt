@@ -151,6 +151,16 @@ private fun Setup(model: VisualizationViewModel, ui: VisualizationUi) {
                     }
                 }
             }
+            settings.secondsPerQuestion?.let { base ->
+                Row(Modifier.padding(horizontal = 4.dp).testTag("chrono-echelle"), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Timer, null, tint = Palette.textSecondary, modifier = Modifier.size(16.dp))
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        stringResource(R.string.vis_timer_scale, base * VisualizationStep.squares.number, base * VisualizationStep.position.number),
+                        fontSize = 13.sp, color = Palette.textSecondary,
+                    )
+                }
+            }
             if (ui.reviewCount > 0) {
                 Row(Modifier.padding(horizontal = 4.dp).testTag("a-revoir"), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Replay, null, tint = Palette.textSecondary, modifier = Modifier.size(16.dp))

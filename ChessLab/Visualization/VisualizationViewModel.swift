@@ -87,7 +87,8 @@ final class VisualizationViewModel {
 
     /// Chrono par question : la fraction de temps restante (1 → 0). `nil` sans chrono.
     var questionTimeFraction: Double? {
-        guard let seconds = settings.secondsPerQuestion, phase == .playing else { return nil }
+        guard let base = settings.secondsPerQuestion, phase == .playing, let question else { return nil }
+        let seconds = question.kind.seconds(base: base)
         let elapsed = questionElapsedBefore + (questionSince.map { now.timeIntervalSince($0) } ?? 0)
         return max(0, 1 - elapsed / Double(seconds))
     }

@@ -95,7 +95,7 @@ final class VisualizationUITests: XCTestCase {
         start.tap()
         XCTAssertTrue(prompt.waitForExistence(timeout: 5))
         let timedOut = app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'Temps écoulé'")).firstMatch
-        XCTAssertTrue(timedOut.waitForExistence(timeout: 12), "au bout de 5 s, le temps est écoulé")
+        XCTAssertTrue(timedOut.waitForExistence(timeout: 16), "au bout de 5 s, le temps est écoulé")
         snapshot(app, "4-temps-ecoule")
         app.buttons["visualizationStop"].tap()
         XCTAssertTrue(score.waitForExistence(timeout: 5))

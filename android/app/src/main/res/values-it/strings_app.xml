@@ -1541,4 +1541,5 @@
     <string name="vis_you_label">Tu:</string>
     <string name="vis_series_steps">Gradini della serie</string>
     <string name="vis_series_mix">La serie mescola: %1$s.</string>
+    <string name="vis_timer_scale">Il tempo cresce con il gradino: %1$d s per una casa, %2$d s per una posizione.</string>
 </resources>

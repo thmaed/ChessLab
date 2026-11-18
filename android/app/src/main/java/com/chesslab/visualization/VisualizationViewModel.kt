@@ -98,8 +98,9 @@ class VisualizationViewModel(app: Application) : AndroidViewModel(app) {
 
     /** Chrono par question : la fraction de temps restante (1 → 0). `null` sans chrono. */
     fun questionTimeFraction(): Float? {
-        val seconds = ui.settings.secondsPerQuestion ?: return null
+        val base = ui.settings.secondsPerQuestion ?: return null
         if (ui.phase != VisualizationPhase.playing) return null
+        val seconds = ui.question?.kind?.seconds(base) ?: return null
         val elapsed = questionElapsedBefore + (questionSince?.let { ui.now - it } ?: 0L)
         return (1f - elapsed / (seconds * 1000f)).coerceAtLeast(0f)
     }

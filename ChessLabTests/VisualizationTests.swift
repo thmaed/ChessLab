@@ -209,4 +209,13 @@ struct VisualizationTests {
         #expect(VisualizationPiece.parse("Kg1,Xz9") == nil)
         #expect(VisualizationPiece(.knight, sq("g1")).figurine.unicodeScalars.first == "♘")
     }
+
+    /// Le chrono grandit avec la marche : 5 s pour une case, 20 s pour une position.
+    @Test func theTimerGrowsWithTheStep() {
+        #expect(VisualizationKind.squareColor.seconds(base: 5) == 5)
+        #expect(VisualizationKind.knightDistance.seconds(base: 5) == 10)
+        #expect(VisualizationKind.twoPieces.seconds(base: 5) == 15)
+        #expect(VisualizationKind.hangingPiece.seconds(base: 5) == 20)
+        #expect(VisualizationKind.isCheck.seconds(base: 10) == 40)
+    }
 }

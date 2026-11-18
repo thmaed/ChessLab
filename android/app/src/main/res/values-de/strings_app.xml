@@ -1502,4 +1502,5 @@
     <string name="vis_you_label">Du:</string>
     <string name="vis_series_steps">Stufen der Serie</string>
     <string name="vis_series_mix">Die Serie mischt: %1$s.</string>
+    <string name="vis_timer_scale">Die Zeit wächst mit der Stufe: %1$d s für ein Feld, %2$d s für eine Stellung.</string>
 </resources>
