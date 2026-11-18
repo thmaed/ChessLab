@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -129,6 +130,23 @@ object SettingsStore {
     private val _state = MutableStateFlow(AppSettings())
     val state: StateFlow<AppSettings> = _state
 
+    /**
+     * La langue de l'INTERFACE, donnée par l'activité à chaque création (donc après un changement de langue, qui la
+     * recrée). La notation « Automatique » la suit — même règle qu'iOS (« et la suit encore quand on change de
+     * langue ») : jusqu'au 18/11/2026, elle restait celle de l'ancienne langue jusqu'au relancement, l'état n'étant
+     * recalculé qu'au changement d'un réglage.
+     */
+    @Volatile private var uiLanguage: String? = null
+
+    private fun automaticNotation(): PieceNotation =
+        PieceNotation.defaultFor(uiLanguage ?: java.util.Locale.getDefault().language)
+
+    /** Appelée par l'activité à sa création : recalcule la notation « Automatique » pour la langue affichée. */
+    fun followLanguage(languageCode: String) {
+        uiLanguage = languageCode
+        _state.update { if (it.pieceNotationAuto) it.copy(pieceNotation = automaticNotation()) else it }
+    }
+
     fun start(context: Context) {
         val store = context.applicationContext.dataStore
         scope.launch {
@@ -144,7 +162,7 @@ object SettingsStore {
                     // Rien de stocké, ou « auto » : la notation suit la langue de l'app ; un nom de
                     // notation stocké est un choix explicite.
                     pieceNotation = PieceNotation.entries.firstOrNull { it.name == prefs[keyNotation] }
-                        ?: PieceNotation.defaultFor(java.util.Locale.getDefault().language),
+                        ?: automaticNotation(),
                     pieceNotationAuto = PieceNotation.entries.none { it.name == prefs[keyNotation] },
                     analysisArrowMode = prefs[keyArrowMode] ?: "best",
                     playerName = sanitizedPlayerName(prefs[keyPlayerName] ?: ""),

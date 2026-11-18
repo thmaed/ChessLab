@@ -1,6 +1,8 @@
 package com.chesslab
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -46,8 +48,12 @@ class EnglishTest {
         compose.onNodeWithText("Play, analyze, improve.").assertIsDisplayed()
         compose.onNodeWithText("Computer").assertIsDisplayed()
         compose.onNodeWithText("2 players").assertIsDisplayed()
-        // La grille est paresseuse : les tuiles du bas se font venir.
-        compose.onNodeWithText("Winning endings").performScrollTo().assertIsDisplayed()
+        // La grille est paresseuse : les tuiles du bas se font venir. Sous « Plus », trois colonnes : la tuile ne
+        // porte que son NOM (plus de sous-titre depuis le 18/11/2026).
+        compose.onNodeWithTag("mode-endgames").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasTestTag("mode-endgames") and hasText("Endgames")).assertExists()
+        compose.onNodeWithTag("mode-visualization").performScrollTo().assertIsDisplayed()
+        compose.onNode(hasTestTag("mode-visualization") and hasText("Visualization")).assertExists()
     }
 
     @Test fun theCharactersSpeakEnglish() {

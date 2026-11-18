@@ -86,6 +86,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+        // La notation « Automatique » suit la langue affichée — y compris juste après l'avoir changée (recréation).
+        com.chesslab.settings.SettingsStore.followLanguage(resources.configuration.locales[0].language)
         // Une image envoyée par « Partager » : l'app s'ouvre directement sur le scanner.
         val sharedImage = com.chesslab.scanner.SharedImage.from(intent)
         setContent {

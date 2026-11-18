@@ -27,6 +27,7 @@ class NotationSettingTest {
 
     @After fun reglageRestaure() {
         SettingsStore.setPieceNotation(app, null)
+        SettingsStore.followLanguage(java.util.Locale.getDefault().language)
     }
 
     private fun awaitState(condition: (com.chesslab.settings.AppSettings) -> Boolean) = runBlocking {
@@ -36,16 +37,23 @@ class NotationSettingTest {
     @Test fun automatiqueParDefautPuisChoixMemorise() {
         SettingsStore.start(app)
 
-        // « Automatique » : la notation affichée est celle de la langue.
+        // « Automatique » : la notation affichée est celle de la langue de l'interface (fixée ici, pour ne pas
+        // dépendre de la langue laissée par le test précédent)…
+        SettingsStore.followLanguage("de")
         SettingsStore.setPieceNotation(app, null)
         val auto = awaitState { it.pieceNotationAuto }
         assertTrue(auto.pieceNotationAuto)
-        assertEquals(PieceNotation.defaultFor(java.util.Locale.getDefault().language), auto.pieceNotation)
+        assertEquals(PieceNotation.german, auto.pieceNotation)
+        // … et elle la SUIT quand la langue change, sans attendre un relancement (comme iOS).
+        SettingsStore.followLanguage("es")
+        assertEquals(PieceNotation.spanish, awaitState { it.pieceNotation == PieceNotation.spanish }.pieceNotation)
 
-        // Un choix explicite l'emporte, et c'est lui qui est enregistré.
+        // Un choix explicite l'emporte, et c'est lui qui est enregistré ; un changement de langue n'y touche pas.
         SettingsStore.setPieceNotation(app, PieceNotation.english)
         val chosen = awaitState { !it.pieceNotationAuto && it.pieceNotation == PieceNotation.english }
         assertFalse(chosen.pieceNotationAuto)
+        SettingsStore.followLanguage("de")
+        assertEquals(PieceNotation.english, SettingsStore.state.value.pieceNotation)
 
         // Retour à « Automatique », enregistré de même.
         SettingsStore.setPieceNotation(app, null)

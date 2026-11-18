@@ -11611,3 +11611,18 @@ par défaut ; liste des coups visible.
   et statistiques de Visualisation synchronisés par iCloud (magasin clé-valeur, liste blanche de `SettingsCloudSync`,
   dernière écriture gagne ; l'écran recharge à l'arrivée ; aide « CE QUI SUIT » en cinq langues ; iOS seul, Android
   n'a pas d'iCloud par décision) ; marche 5 : le plateau prend toute la place libre (iOS + Android).
+- **18-19/11 (nuit, en autonomie), VISUALISATION** : « Arrêter » retiré (la flèche suffit) ; plateau de la marche 5 de
+  taille FIXE quand on cache (bouton gardé invisible, énoncé sur deux lignes réservées) ; entrée « Visualisation » dans
+  l'aide, cinq langues, iOS + Android ; vérifié que le lecteur d'écran ne trahit pas les pièces cachées (« Case e4 »
+  seulement, les deux côtés). Test instable stabilisé : `rushRunSolvesMissesAndEndsWithoutTouchingTheLibrary`
+  pariait sur 2,7 s de compte à rebours — attend désormais la série. Point de contrôle : iOS unitaires 1 429 (une
+  instabilité, corrigée puis verte ×3), parcours Visualisation 3/3 et Aide 2/2 ; Android JVM 684/684 (le « 717 »
+  d'hier comptait des XML périmés du dossier de résultats).
+  Suite instrumentée Android complète (émulateur) : 195 tests ; deux échecs RÉELS trouvés et corrigés — (1)
+  `EnglishTest` cherchait le sous-titre « Winning endings », que les tuiles de « Plus » n'affichent plus depuis les
+  trois colonnes (lot 1) ; vérifie désormais les noms « Endgames » et « Visualization ». (2) **Défaut Android** : en
+  notation « Automatique », changer la langue de l'app laissait la notation de l'ANCIENNE langue jusqu'au relancement
+  (iOS la suit, c'est écrit dans `AppSettings.pieceNotationChoice`) : l'activité donne désormais sa langue à
+  `SettingsStore.followLanguage` à chaque création ; `NotationSettingTest` le vérifie (de → es, choix explicite
+  intact). Restent une instabilité interne de Compose (`AnalysisEntryTest`, « multithreaded access to
+  SnapshotStateObserver », 3/3 seul).
