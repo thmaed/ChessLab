@@ -557,13 +557,33 @@ struct VisualizationStats: Codable, Equatable {
     var correct: [String: Int] = [:]
     /// Clé de question → réussites encore nécessaires pour la retirer.
     var review: [String: Int] = [:]
+    /// Marche → ses dernières réponses (juste ou non), de la plus ancienne à la plus récente, `recentWindow` au plus :
+    /// le pourcentage affiché suit le niveau DU MOMENT, pas tout l'historique.
+    var recent: [String: [Bool]] = [:]
 
     static let successesToClear = 2
+    static let recentWindow = 50
+
+    init() {}
+
+    /// Les statistiques d'avant la fenêtre glissante (sans `recent`) se relisent sans perte.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        attempts = try c.decodeIfPresent([String: Int].self, forKey: .attempts) ?? [:]
+        correct = try c.decodeIfPresent([String: Int].self, forKey: .correct) ?? [:]
+        review = try c.decodeIfPresent([String: Int].self, forKey: .review) ?? [:]
+        recent = try c.decodeIfPresent([String: [Bool]].self, forKey: .recent) ?? [:]
+    }
 
     mutating func record(_ question: VisualizationQuestion, correct isCorrect: Bool) {
         let kind = question.kind.rawValue
         attempts[kind, default: 0] += 1
         if isCorrect { correct[kind, default: 0] += 1 }
+        let step = question.kind.step.rawValue
+        recent[step, default: []].append(isCorrect)
+        if let count = recent[step]?.count, count > Self.recentWindow {
+            recent[step]?.removeFirst(count - Self.recentWindow)
+        }
         let key = question.reviewKey
         if !isCorrect {
             review[key] = Self.successesToClear
@@ -575,8 +595,12 @@ struct VisualizationStats: Codable, Equatable {
     func attempts(for step: VisualizationStep) -> Int { step.kinds.reduce(0) { $0 + attempts[$1.rawValue, default: 0] } }
     func correct(for step: VisualizationStep) -> Int { step.kinds.reduce(0) { $0 + correct[$1.rawValue, default: 0] } }
 
-    /// Réussite d'une marche, en pour cent ; `nil` tant qu'elle n'a pas été jouée.
+    /// Réussite d'une marche, en pour cent, sur ses `recentWindow` dernières questions ; `nil` tant qu'elle n'a pas été
+    /// jouée. Des statistiques antérieures à la fenêtre (rien dans `recent`) donnent le total d'alors.
     func accuracy(for step: VisualizationStep) -> Int? {
+        if let last = recent[step.rawValue], !last.isEmpty {
+            return Int((Double(last.filter { $0 }.count) / Double(last.count) * 100).rounded())
+        }
         let n = attempts(for: step)
         guard n > 0 else { return nil }
         return Int((Double(correct(for: step)) / Double(n) * 100).rounded())

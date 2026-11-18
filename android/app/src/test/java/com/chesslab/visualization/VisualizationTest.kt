@@ -141,6 +141,21 @@ class VisualizationTest {
         assertEquals(withCrossing, VisualizationStats.decode(withCrossing.encode()))
     }
 
+    @Test fun `la reussite suit les cinquante dernieres questions de la marche`() {
+        var stats = VisualizationStats()
+        val q = VisualizationGenerator.squareColor(sq("c6"))
+        repeat(100) { stats = stats.record(q, false) }
+        assertEquals(0, stats.accuracy(VisualizationStep.squares))
+        repeat(40) { stats = stats.record(q, true) }
+        assertEquals(80, stats.accuracy(VisualizationStep.squares), "40 justes sur les 50 dernières, pas 40 sur 140")
+        assertEquals(VisualizationStats.RECENT_WINDOW, stats.recent["squares"]?.size)
+        assertEquals(140, stats.attempts(VisualizationStep.squares), "le total, lui, reste")
+        // Relu tel quel ; des statistiques d'avant la fenêtre (trois blocs) se relisent et gardent leur total.
+        assertEquals(stats, VisualizationStats.decode(stats.encode()))
+        val legacy = VisualizationStats.decode("squareColor=4\n\nsquareColor=3\n\n")
+        assertEquals(75, legacy.accuracy(VisualizationStep.squares))
+    }
+
     @Test fun `le tirage ressert les erreurs et ne repete jamais deux fois de suite`() {
         val rng = Random(11)
         val missed = VisualizationGenerator.squareColor(sq("b7"))

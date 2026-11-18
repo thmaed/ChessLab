@@ -141,6 +141,22 @@ struct VisualizationTests {
         #expect(stats.accuracy(for: .lines) == nil)
     }
 
+    @Test func theAccuracyFollowsTheLastFiftyQuestionsOfTheStep() throws {
+        var stats = VisualizationStats()
+        let q = VisualizationGenerator.squareColor(sq("c6"))
+        for _ in 0..<100 { stats.record(q, correct: false) }
+        #expect(stats.accuracy(for: .squares) == 0)
+        for _ in 0..<40 { stats.record(q, correct: true) }
+        #expect(stats.accuracy(for: .squares) == 80, "40 justes sur les 50 dernières, pas 40 sur 140")
+        #expect(stats.recent["squares"]?.count == VisualizationStats.recentWindow)
+        #expect(stats.attempts(for: .squares) == 140, "le total, lui, reste")
+        // Relu tel quel ; des statistiques d'avant la fenêtre (sans « recent ») se relisent et gardent leur total.
+        #expect(try JSONDecoder().decode(VisualizationStats.self, from: JSONEncoder().encode(stats)) == stats)
+        let legacy = try JSONDecoder().decode(VisualizationStats.self,
+                                              from: Data(#"{"attempts":{"squareColor":4},"correct":{"squareColor":3},"review":{}}"#.utf8))
+        #expect(legacy.accuracy(for: .squares) == 75)
+    }
+
     @Test func theDrawerServesMissesAndNeverRepeatsBackToBack() {
         var rng = Seeded(state: 11)
         var stats = VisualizationStats()

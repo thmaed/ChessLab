@@ -433,11 +433,18 @@ data class VisualizationStats(
     val correct: Map<String, Int> = emptyMap(),
     /** Clé de question → réussites encore nécessaires pour la retirer. */
     val review: Map<String, Int> = emptyMap(),
+    /**
+     * Marche → ses dernières réponses (juste ou non), de la plus ancienne à la plus récente, [RECENT_WINDOW] au plus :
+     * le pourcentage affiché suit le niveau DU MOMENT, pas tout l'historique.
+     */
+    val recent: Map<String, List<Boolean>> = emptyMap(),
 ) {
     fun record(question: VQuestion, isCorrect: Boolean): VisualizationStats {
         val kind = question.kind.name
         val newAttempts = attempts + (kind to (attempts[kind] ?: 0) + 1)
         val newCorrect = if (isCorrect) correct + (kind to (correct[kind] ?: 0) + 1) else correct
+        val step = question.kind.step.name
+        val newRecent = recent + (step to ((recent[step] ?: emptyList()) + isCorrect).takeLast(RECENT_WINDOW))
         val key = question.reviewKey
         val newReview = when {
             !isCorrect -> review + (key to SUCCESSES_TO_CLEAR)
@@ -447,14 +454,19 @@ data class VisualizationStats(
             }
             else -> review
         }
-        return VisualizationStats(newAttempts, newCorrect, newReview)
+        return VisualizationStats(newAttempts, newCorrect, newReview, newRecent)
     }
 
     fun attempts(step: VisualizationStep): Int = step.kinds.sumOf { attempts[it.name] ?: 0 }
     fun correct(step: VisualizationStep): Int = step.kinds.sumOf { correct[it.name] ?: 0 }
 
-    /** Réussite d'une marche, en pour cent ; `null` tant qu'elle n'a pas été jouée. */
+    /**
+     * Réussite d'une marche, en pour cent, sur ses [RECENT_WINDOW] dernières questions ; `null` tant qu'elle n'a pas
+     * été jouée. Des statistiques antérieures à la fenêtre (rien dans [recent]) donnent le total d'alors.
+     */
     fun accuracy(step: VisualizationStep): Int? {
+        val last = recent[step.name]
+        if (!last.isNullOrEmpty()) return Math.round(last.count { it }.toDouble() / last.size * 100).toInt()
         val n = attempts(step)
         if (n == 0) return null
         return Math.round(correct(step).toDouble() / n * 100).toInt()
@@ -465,23 +477,37 @@ data class VisualizationStats(
         return review.keys.filter { it.substringBefore("|") in wanted }.sorted()
     }
 
-    /** En texte, une entrée par ligne (« clé=nombre ») : ni JSON ni dépendance, testable hors appareil. */
-    fun encode(): String = listOf(attempts, correct, review).joinToString("\n\n") { map ->
-        map.entries.joinToString("\n") { "${it.key}=${it.value}" }
+    /**
+     * En texte, une entrée par ligne (« clé=nombre ») : ni JSON ni dépendance, testable hors appareil. Le quatrième
+     * bloc, les dernières réponses, s'écrit « marche=1101… » (1 juste, 0 ratée).
+     */
+    fun encode(): String {
+        val numbers = listOf(attempts, correct, review).map { map -> map.entries.joinToString("\n") { "${it.key}=${it.value}" } }
+        val last = recent.entries.joinToString("\n") { (step, answers) ->
+            "$step=" + answers.joinToString("") { if (it) "1" else "0" }
+        }
+        return (numbers + last).joinToString("\n\n")
     }
 
     companion object {
         const val SUCCESSES_TO_CLEAR = 2
+        const val RECENT_WINDOW = 50
 
         fun decode(text: String?): VisualizationStats {
             if (text.isNullOrBlank()) return VisualizationStats()
             val blocks = text.split("\n\n").map { block ->
                 block.lines().mapNotNull { line ->
                     val i = line.lastIndexOf('=')
-                    if (i <= 0) null else line.substring(0, i) to (line.substring(i + 1).toIntOrNull() ?: return@mapNotNull null)
-                }.toMap()
+                    if (i <= 0) null else line.substring(0, i) to line.substring(i + 1)
+                }
             }
-            return VisualizationStats(blocks.getOrElse(0) { emptyMap() }, blocks.getOrElse(1) { emptyMap() }, blocks.getOrElse(2) { emptyMap() })
+            fun numbers(index: Int): Map<String, Int> =
+                blocks.getOrElse(index) { emptyList() }.mapNotNull { (k, v) -> v.toIntOrNull()?.let { k to it } }.toMap()
+            // Absent des statistiques d'avant la fenêtre glissante : elles se relisent sans perte.
+            val recent = blocks.getOrElse(3) { emptyList() }
+                .filter { (_, v) -> v.isNotEmpty() && v.all { it == '0' || it == '1' } }
+                .associate { (k, v) -> k to v.map { it == '1' } }
+            return VisualizationStats(numbers(0), numbers(1), numbers(2), recent)
         }
     }
 }
