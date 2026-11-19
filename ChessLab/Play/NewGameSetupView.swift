@@ -111,7 +111,9 @@ struct NewGameSetupView: View {
         // plateau vide sans qu'on l'ait demandé.
         _blindfold = State(initialValue: .off)
         _blindfoldVoice = State(initialValue: saved.blindfoldVoice)
-        _voiceMoves = State(initialValue: saved.voiceMoves)
+        // Les coups à la voix non plus (19/11/2026, demande de l'utilisateur) : le micro ne s'ouvre jamais sur une
+        // partie qu'on n'a pas demandée à la voix — on rallume l'interrupteur exprès.
+        _voiceMoves = State(initialValue: false)
     }
 
     var body: some View {

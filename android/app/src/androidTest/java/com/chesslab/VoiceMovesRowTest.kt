@@ -30,6 +30,9 @@ class VoiceMovesRowTest {
         // Un appareil sans reconnaissance SUR L'APPAREIL dans la langue grise l'interrupteur et le dit.
         compose.waitForIdle()
         val node = compose.onNodeWithTag("voix-coups").fetchSemanticsNode()
+        assertTrue("Nouvelle partie s'ouvre TOUJOURS voix éteinte, même allumée la fois d'avant (19/11/2026)",
+            node.config.getOrElseNullable(SemanticsProperties.ToggleableState) { null } ==
+                androidx.compose.ui.state.ToggleableState.Off)
         val disabled = node.config.contains(SemanticsProperties.Disabled)
         if (disabled) {
             assertTrue("un interrupteur grisé doit dire pourquoi",

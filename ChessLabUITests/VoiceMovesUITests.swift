@@ -27,6 +27,8 @@ final class VoiceMovesUITests: XCTestCase {
             tries += 1
         }
         XCTAssertTrue(toggle.waitForExistence(timeout: 5), "« Coups à la voix » doit être dans la carte « Partie »")
+        XCTAssertEqual(toggle.value as? String, "0",
+                       "Nouvelle partie s'ouvre TOUJOURS voix éteinte, même allumée la fois d'avant (19/11/2026)")
         // Un appareil sans reconnaissance SUR L'APPAREIL dans la langue (simulateur, par exemple) grise l'interrupteur
         // et le dit ; sinon l'interrupteur est utilisable.
         if !toggle.isEnabled {

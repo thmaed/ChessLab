@@ -148,9 +148,9 @@ fun NewGameScreen(
     // vide sans qu'on l'ait demandé. Comme iOS.
     var blindfold by remember { mutableStateOf(BlindfoldLevel.off) }
     var blindfoldVoice by remember { mutableStateOf(initial.blindfoldVoice) }
-    // Coups à la voix (19/11/2026) : retenu d'une partie à l'autre, comme iOS ; éteint si l'appareil ne sait pas
-    // reconnaître SUR L'APPAREIL dans la langue de l'app.
-    var voiceMoves by remember { mutableStateOf(initial.voiceMoves) }
+    // Coups à la voix (19/11/2026) : pas retenus non plus, comme iOS — le micro ne s'ouvre jamais sur une partie
+    // qu'on n'a pas demandée à la voix ; et éteints si l'appareil ne sait pas reconnaître SUR L'APPAREIL.
+    var voiceMoves by remember { mutableStateOf(false) }
     var voiceAvailability by remember { mutableStateOf<VoiceRecognizers.Availability?>(null) }
     var voicePermissionDenied by remember { mutableStateOf(false) }
     val appLanguage = context.resources.configuration.locales[0].language
