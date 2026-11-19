@@ -2234,14 +2234,17 @@ en préférences texte (iOS : JSON dans UserDefaults). Depuis le 18/11 au soir, 
 ## Coups à la voix (19/11/2026) — iOS FAIT, Android À PORTER
 
 Décisions de l'utilisateur : réglage « Coups à la voix » dans la carte « Partie » de Nouvelle partie (contre
-l'ordinateur, avec ou sans aveugle) ; le micro ÉCOUTE SEUL à mon tour (bouton pause au-dessus du plateau) ; le coup
+l'ordinateur, avec ou sans aveugle) ; le micro ÉCOUTE SEUL à mon tour ; le coup
 compris est JOUÉ DIRECTEMENT et s'affiche À L'ÉCRAN (pas de voix pour mon coup) ; « annule » (et ses pendants) le
 reprend ; coup impossible, phrase incomprise ou ambiguë DITS à voix haute ; une conversation est ignorée ; CINQ
 langues d'emblée ; reconnaissance SUR L'APPAREIL seulement, aucun son gardé. iOS 18-25 : même fonction, note
 « Reconnaissance plus précise à partir d'iOS 26 ». Ajout du 19/11 (après lecture des Règles FIDE, annexe D.2.1 :
 l'adversaire RÉPÈTE le coup annoncé) : À L'AVEUGLE, voix allumée, l'app répète à voix haute le coup dicté ; ailleurs
 le retour reste à l'écran. La voix met le coup de l'ordinateur À LA SUITE au lieu de couper la phrase en cours.
-L'alphabet FIDE (Anna, Bella…) a été écarté par l'utilisateur.
+L'alphabet FIDE (Anna, Bella…) a été écarté par l'utilisateur. Toujours le 19/11 : le bouton pause est REMPLACÉ par
+un interrupteur « Micro » dans la barre au-dessus du plateau — coupé, le micro est LIBÉRÉ (« Micro coupé : jouez sur
+le plateau »), une phrase en retard ne joue rien, et l'état voyage avec la partie en cours (`voiceMicOff` de
+l'autosauvegarde, absent = allumé). Le plateau joue toujours, micro allumé ou non (dit dans l'aide).
 
 iOS : `VoiceMoveParser` (cinq vocabulaires), `VoiceMoveListener` (découpe des phrases au niveau sonore, puis
 transcripteur d'iOS 26 ou reconnaissance classique avec indices), `PlayViewModel.handleVoice`, barre et message dans

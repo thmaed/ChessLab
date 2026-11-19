@@ -18,6 +18,9 @@ struct PlayGameAutosave: Codable, Hashable, AutosaveRecord {
     /// À l'aveugle : les coups d'œil déjà pris (``PlayViewModel/peekCount``). Optionnel : absent des
     /// sauvegardes d'avant le 17/11/2026 et des parties à vue.
     var blindfoldPeeks: Int? = nil
+    /// Coups à la voix : l'interrupteur « Micro » coupé pendant la partie (``PlayViewModel/voiceMicOn``).
+    /// Optionnel : absent quand le micro est allumé et dans les sauvegardes d'avant le 19/11/2026.
+    var voiceMicOff: Bool? = nil
 }
 
 /// Persistance de la partie en cours du mode Jouer : un fichier JSON dans `Documents/`, que

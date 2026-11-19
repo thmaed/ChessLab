@@ -151,6 +151,8 @@ struct PlayView: View {
         .onChange(of: viewModel.isVoiceTurn) { _, _ in syncVoiceTurn() }
         .onChange(of: viewModel.moveLog.count) { _, _ in syncVoiceTurn() }
         .onChange(of: viewModel.outcome) { _, outcome in if outcome != nil { stopVoice() } }
+        // L'interrupteur « Micro » : coupé, le micro est rendu au système ; rallumé, il reprend.
+        .onChange(of: viewModel.voiceMicOn) { _, on in if on { startVoiceIfNeeded() } else { stopVoice() } }
         // Une victoire contre l'ordinateur : le bon moment, le cas échéant, pour
         // demander un avis (voir ``ReviewPrompt``).
         .onChange(of: viewModel.outcome) { previous, outcome in
@@ -577,7 +579,9 @@ struct PlayView: View {
     // MARK: Coups à la voix (19/11/2026)
 
     private func startVoiceIfNeeded() {
-        guard viewModel.settings.voiceMoves, viewModel.outcome == nil, voiceListener == nil else { return }
+        guard viewModel.settings.voiceMoves, viewModel.voiceMicOn, viewModel.outcome == nil, voiceListener == nil else {
+            return
+        }
         let listener = VoiceMoveListener()
         listener.onTranscripts = { transcripts in viewModel.handleVoice(transcripts) }
         voiceListener = listener
@@ -598,37 +602,35 @@ struct PlayView: View {
         voiceListener.setTurn(isMine: mine, hints: mine ? viewModel.voiceHints : [])
     }
 
-    /// Au-dessus du plateau : ce que fait le micro, et de quoi le mettre en pause (une conversation à table).
+    /// Au-dessus du plateau : ce que fait le micro, et l'interrupteur « Micro » pour le couper (une conversation
+    /// à table, envie de jouer au doigt) — le plateau joue dans tous les cas.
     @ViewBuilder
     private var voiceBar: some View {
         if viewModel.settings.voiceMoves, viewModel.outcome == nil {
+            let micOn = viewModel.voiceMicOn
             let status = voiceListener?.status ?? .starting
-            let paused = status == .paused
             HStack(spacing: 10) {
-                Image(systemName: voiceSymbol(status))
+                Image(systemName: micOn ? voiceSymbol(status) : "mic.slash")
                     .font(.body.weight(.semibold))
-                    .foregroundStyle(voiceTint(status))
-                    .symbolEffect(.pulse, isActive: status == .listening)
+                    .foregroundStyle(micOn ? voiceTint(status) : Theme.textSecondary)
+                    .symbolEffect(.pulse, isActive: micOn && status == .listening)
                     .frame(width: 24)
-                Text(LocalizedStringKey(voiceStatusKey(status)))
+                Text(LocalizedStringKey(micOn ? voiceStatusKey(status) : "Micro coupé : jouez sur le plateau"))
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Theme.textPrimary)
                     .lineLimit(2)
                     .minimumScaleFactor(0.8)
+                    .accessibilityIdentifier("voiceStatus")
                 Spacer(minLength: 4)
-                if status != .denied, status != .unavailable, status != .starting {
-                    Button {
-                        voiceListener?.isPaused.toggle()
-                    } label: {
-                        Image(systemName: paused ? "mic.fill" : "pause.fill")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Theme.teal)
-                            .frame(width: 36, height: 30)
-                            .background(Theme.teal.opacity(0.12), in: Capsule())
+                if !micOn || (status != .denied && status != .unavailable) {
+                    Toggle(isOn: Binding(get: { viewModel.voiceMicOn }, set: { viewModel.setVoiceMic($0) })) {
+                        Text("Micro")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Theme.textSecondary)
                     }
-                    .buttonStyle(.plain)
-                    .accessibilityLabel(paused ? Text("Reprendre l'écoute") : Text("Mettre l'écoute en pause"))
-                    .accessibilityIdentifier("voicePause")
+                    .fixedSize()
+                    .tint(Theme.accent)
+                    .accessibilityIdentifier("voiceMic")
                 }
             }
             .padding(.horizontal, 12)

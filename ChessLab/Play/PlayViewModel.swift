@@ -257,8 +257,19 @@ final class PlayViewModel {
         case played(String), undone, cannotUndo, ambiguous, illegal, notUnderstood, ignored
     }
 
-    /// C'est au joueur et la partie se joue : le micro peut écouter.
-    var isVoiceTurn: Bool { settings.voiceMoves && canUserAct && !isReviewing }
+    /// L'interrupteur « Micro » au-dessus du plateau (19/11/2026, à la place de la pause) : coupé, le micro est
+    /// LIBÉRÉ (plus d'écoute, plus de témoin orange) ; l'état voyage avec la partie en cours (autosauvegarde),
+    /// on le retrouve en revenant à la partie. Le plateau, lui, joue toujours.
+    private(set) var voiceMicOn = true
+
+    func setVoiceMic(_ on: Bool) {
+        guard settings.voiceMoves, voiceMicOn != on else { return }
+        voiceMicOn = on
+        persistAutosave()
+    }
+
+    /// C'est au joueur, la partie se joue et le micro est allumé : il peut écouter.
+    var isVoiceTurn: Bool { settings.voiceMoves && voiceMicOn && canUserAct && !isReviewing }
 
     private var voiceVocabulary: VoiceMoveParser.Vocabulary {
         VoiceMoveParser.vocabulary(for: LocalizationController.activeLanguageCode)
@@ -275,7 +286,8 @@ final class PlayViewModel {
     @discardableResult
     func handleVoice(_ transcripts: [String], language: String = LocalizationController.activeLanguageCode,
                      speaks: Bool = true) -> VoiceReply {
-        guard settings.voiceMoves, outcome == nil else { return .ignored }
+        // Micro coupé : une phrase partie juste avant ne joue rien (pas même « annule »).
+        guard settings.voiceMoves, voiceMicOn, outcome == nil else { return .ignored }
         let vocabulary = VoiceMoveParser.vocabulary(for: language)
         if transcripts.contains(where: { VoiceMoveParser.isUndo($0, vocabulary: vocabulary) }) {
             guard canTakeback else {
@@ -487,6 +499,7 @@ final class PlayViewModel {
         // Une sauvegarde d'avant l'identifiant en reçoit un ici, gardé ensuite.
         gameID = autosave.gameID ?? UUID()
         peekCount = autosave.blindfoldPeeks ?? 0
+        voiceMicOn = !(autosave.voiceMicOff ?? false)
         self.modelContext = modelContext
         userColor = resolvedColor
         engineColor = resolvedColor.opposite
@@ -2231,7 +2244,8 @@ final class PlayViewModel {
             blackRemaining: clock?.remaining(for: .black),
             savedAt: Date(),
             gameID: gameID,
-            blindfoldPeeks: settings.isBlindfold ? peekCount : nil
+            blindfoldPeeks: settings.isBlindfold ? peekCount : nil,
+            voiceMicOff: settings.voiceMoves && !voiceMicOn ? true : nil
         )
         // Sur l'appareil à CHAQUE demi-coup (rien ne se perd si l'app est tuée) ; vers iCloud seulement quand
         // c'est au joueur — après la réponse de l'ordinateur : la position intermédiaire, remplacée une ou

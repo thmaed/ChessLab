@@ -124,4 +124,50 @@ struct VoiceMovesGameTests {
         #expect(try JSONDecoder().decode(PlayGameSettings.self, from: data).voiceMoves)
         #expect(try JSONDecoder().decode(PlayGameSettings.self, from: Data("{}".utf8)).voiceMoves == false)
     }
+
+    // MARK: Interrupteur « Micro » (19/11/2026) et plateau
+
+    @Test func theBoardStillPlaysWithTheVoiceOn() throws {
+        let model = try Self.game()
+        model.selectSquare(Square("e2"))
+        model.selectSquare(Square("e4"))
+        #expect(model.moveLog.last?.san == "e4", "voix allumée, le plateau joue comme d'habitude")
+        #expect(!model.isVoiceTurn)
+        #expect(model.handleVoice(["cavalier f6"], language: "fr", speaks: false) == .ignored,
+                "une phrase en retard ne joue pas un second coup")
+    }
+
+    @Test func theMicSwitchOffStopsListeningButNotTheBoard() throws {
+        let model = try Self.game()
+        model.setVoiceMic(false)
+        #expect(!model.voiceMicOn)
+        #expect(!model.isVoiceTurn, "micro coupé : plus d'écoute")
+        #expect(model.handleVoice(["e4"], language: "fr", speaks: false) == .ignored)
+        #expect(model.moveLog.isEmpty)
+        model.selectSquare(Square("d2"))
+        model.selectSquare(Square("d4"))
+        #expect(model.moveLog.last?.san == "d4", "micro coupé, le plateau joue")
+        model.setVoiceMic(true)
+        #expect(model.voiceMicOn)
+    }
+
+    @Test func theMicSwitchTravelsWithTheSavedGame() throws {
+        var settings = PlayGameSettings()
+        settings.voiceMoves = true
+        let autosave = PlayGameAutosave(
+            settings: settings, resolvedUserColorRaw: Piece.Color.white.rawValue, moveLANs: ["e2e4", "e7e5"],
+            whiteRemaining: nil, blackRemaining: nil, savedAt: Date(), gameID: UUID(), voiceMicOff: true
+        )
+        let decoded = try JSONDecoder().decode(PlayGameAutosave.self, from: JSONEncoder().encode(autosave))
+        let container = try ModelContainer(
+            for: Schema([GameRecord.self, Puzzle.self]),
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        )
+        let off = try #require(PlayViewModel(resuming: decoded, modelContext: ModelContext(container), startsEngine: false))
+        #expect(!off.voiceMicOn, "on retrouve le micro coupé en revenant à la partie")
+        var old = autosave
+        old.voiceMicOff = nil
+        let on = try #require(PlayViewModel(resuming: old, modelContext: ModelContext(container), startsEngine: false))
+        #expect(on.voiceMicOn, "sauvegarde d'avant l'interrupteur : micro allumé")
+    }
 }
