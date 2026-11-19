@@ -135,15 +135,18 @@ final class BlindfoldVoice: NSObject, AVSpeechSynthesizerDelegate {
         speak(MoveNarration.describe(san: "Nf3"), voice: Self.voice(identifier: identifier))
     }
 
-    func say(_ text: String) {
-        speak(text, voice: Self.voice(identifier: UserDefaults.standard.string(forKey: Self.voiceKey)))
+    /// `interrupting: false` met la phrase À LA SUITE de celle en cours : le coup de l'ordinateur ne coupe plus la
+    /// répétition du coup qu'on vient de dicter (19/11/2026).
+    func say(_ text: String, interrupting: Bool = true) {
+        speak(text, voice: Self.voice(identifier: UserDefaults.standard.string(forKey: Self.voiceKey)),
+              interrupting: interrupting)
     }
 
-    private func speak(_ text: String, voice: AVSpeechSynthesisVoice?) {
+    private func speak(_ text: String, voice: AVSpeechSynthesisVoice?, interrupting: Bool = true) {
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = voice
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate
-        synthesizer.stopSpeaking(at: .immediate)
+        if interrupting { synthesizer.stopSpeaking(at: .immediate) }
         // Micro ouvert (coups à la voix) : la session « lecture et enregistrement » joue déjà en mode Silencieux, et
         // la changer couperait le micro.
         if !VoiceMoveListener.isCapturing {

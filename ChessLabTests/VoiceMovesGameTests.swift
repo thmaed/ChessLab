@@ -28,6 +28,28 @@ struct VoiceMovesGameTests {
         #expect(!model.isVoiceTurn, "après mon coup, c'est à l'ordinateur : le micro n'écoute plus")
     }
 
+    @Test func blindWithTheVoiceOnTheMoveIsRepeatedAloud() throws {
+        var settings = PlayGameSettings(hintsEnabled: true, blunderAlertEnabled: false)
+        settings.voiceMoves = true
+        settings.blindfold = .allHidden
+        settings.blindfoldVoice = true
+        let container = try ModelContainer(
+            for: Schema([GameRecord.self, Puzzle.self]),
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        )
+        let model = PlayViewModel(settings: settings, modelContext: ModelContext(container), startsEngine: false)
+        #expect(model.handleVoice(["cavalier f3"], language: "fr", speaks: false) == .played("Nf3"))
+        #expect(model.lastSpokenVoiceText == MoveNarration.describe(san: "Nf3"),
+                "comme l'adversaire dans les Règles FIDE (annexe D.2.1), l'app répète le coup")
+    }
+
+    @Test func withoutTheBlindVoiceTheMoveIsOnlyShown() throws {
+        let model = try Self.game()
+        #expect(model.handleVoice(["cavalier f3"], language: "fr", speaks: false) == .played("Nf3"))
+        #expect(model.lastSpokenVoiceText == nil, "retour À L'ÉCRAN seulement (décision du 19/11/2026)")
+        #expect(model.voiceNotice?.text == MoveNarration.describe(san: "Nf3"))
+    }
+
     @Test func anImpossibleMoveIsSaidAndNotPlayed() throws {
         let model = try Self.game()
         #expect(model.handleVoice(["fou c4"], language: "fr", speaks: false) == .illegal)

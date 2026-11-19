@@ -293,7 +293,15 @@ final class PlayViewModel {
         switch VoiceMoveParser.resolve(transcripts: transcripts, among: candidates, vocabulary: vocabulary) {
         case let .move(candidate):
             playVoiceMove(candidate)
-            showVoiceNotice(MoveNarration.describe(san: candidate.san), isError: false)
+            let spoken = MoveNarration.describe(san: candidate.san)
+            showVoiceNotice(spoken, isError: false)
+            // À l'aveugle, voix allumée : l'app RÉPÈTE le coup, comme l'adversaire le fait dans les Règles du jeu
+            // FIDE (annexe D.2.1) — sans regarder l'écran, c'est le seul moyen d'entendre une méprise et de dire
+            // « annule » (décision du 19/11/2026 ; ailleurs, le retour reste à l'écran).
+            if settings.isBlindfold, settings.blindfoldVoice {
+                lastSpokenVoiceText = spoken
+                if speaks { BlindfoldVoice.shared.say(spoken) }
+            }
             return .played(candidate.san)
         case .ambiguous:
             // Sans dire OÙ sont les pièces : à l'aveugle, ce serait révéler la position.
@@ -323,8 +331,12 @@ final class PlayViewModel {
     private func tellVoice(_ key: String, speaks: Bool) {
         let text = LocalizationController.string(key)
         showVoiceNotice(text, isError: true)
+        lastSpokenVoiceText = text
         if speaks { BlindfoldVoice.shared.say(text) }
     }
+
+    /// La dernière phrase que la voix a dite ou aurait dite (les tests la lisent sans faire parler l'appareil).
+    private(set) var lastSpokenVoiceText: String?
 
     private func showVoiceNotice(_ text: String, isError: Bool) {
         voiceNoticeID += 1
@@ -1411,7 +1423,7 @@ final class PlayViewModel {
         announceMove(move)
         if settings.isBlindfold, settings.blindfoldVoice, move.piece.color == engineColor {
             // Le coup seul : le nom de l'adversaire avant chaque coup était de trop (retour du 19/11/2026).
-            BlindfoldVoice.shared.say(MoveNarration.describe(san: move.san))
+            BlindfoldVoice.shared.say(MoveNarration.describe(san: move.san), interrupting: false)
         }
         persistAutosave()
 
