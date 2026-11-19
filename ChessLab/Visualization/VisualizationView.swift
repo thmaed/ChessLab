@@ -92,7 +92,7 @@ struct VisualizationView: View {
                     pickerRow("hourglass", "Durée") {
                         SegmentedPills(
                             options: VisualizationSettings.Length.allCases.map { ($0, LocalizationController.string($0.title)) },
-                            selection: $viewModel.settings.length, identifier: "visualizationLength"
+                            selection: $viewModel.settings.length, identifier: "visualizationLength", stacked: true
                         )
                     }
                     rowDivider
@@ -867,7 +867,28 @@ struct SegmentedPills<Value: Hashable>: View {
     let options: [(Value, String)]
     @Binding var selection: Value
     let identifier: String
+    /// Sur DEUX lignes : le nombre en gros, l'unité en petit dessous (« 10 » / « questions »), coupés au premier
+    /// espace du libellé traduit. Pour la Durée (19/11/2026) : « 10 questions » ne tenait qu'en rapetissant, à côté
+    /// de « 1 minute » en pleine taille — « pas très joli ».
+    var stacked = false
     @Namespace private var namespace
+
+    @ViewBuilder
+    private func label(_ text: String) -> some View {
+        if stacked, let space = text.firstIndex(of: " ") {
+            VStack(spacing: 0) {
+                Text(verbatim: String(text[..<space])).font(.headline)
+                Text(verbatim: String(text[text.index(after: space)...])).font(.caption2.weight(.semibold))
+            }
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+        } else {
+            Text(verbatim: text)
+                .font(.subheadline.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+    }
 
     var body: some View {
         HStack(spacing: 4) {
@@ -876,12 +897,9 @@ struct SegmentedPills<Value: Hashable>: View {
                 Button {
                     withAnimation(Theme.snappySpring) { selection = option.0 }
                 } label: {
-                    Text(verbatim: option.1)
-                        .font(.subheadline.weight(.semibold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
+                    label(option.1)
                         .foregroundStyle(isOn ? Theme.background : Theme.textSecondary)
-                        .frame(maxWidth: .infinity, minHeight: 36)
+                        .frame(maxWidth: .infinity, minHeight: stacked ? 46 : 36)
                         .background {
                             if isOn {
                                 Capsule().fill(Theme.accent).matchedGeometryEffect(id: "pill", in: namespace)

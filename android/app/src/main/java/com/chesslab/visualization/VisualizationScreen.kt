@@ -147,7 +147,7 @@ private fun Setup(model: VisualizationViewModel, ui: VisualizationUi) {
                 PickerRow(Icons.Default.HourglassEmpty, stringResource(R.string.vis_length)) {
                     SegmentedPills(
                         VisualizationLength.entries.map { it to stringResource(lengthLabel(it)) }, settings.length,
-                        tag = { "longueur-${it.name}" },
+                        tag = { "longueur-${it.name}" }, stacked = true,
                     ) { model.updateSettings(settings.copy(length = it)) }
                 }
                 RowDivider()
@@ -859,9 +859,16 @@ private fun PickerRow(icon: androidx.compose.ui.graphics.vector.ImageVector, tit
     }
 }
 
-/** Un choix parmi quelques options, en pastilles : la choisie est pleine (accent). Pendant de `SegmentedPills` (iOS). */
+/**
+ * Un choix parmi quelques options, en pastilles : la choisie est pleine (accent). Pendant de `SegmentedPills` (iOS).
+ * [stacked] : sur DEUX lignes, le nombre en gros et l'unité en petit dessous (« 10 » / « questions »), coupés au
+ * premier espace du libellé traduit — pour la Durée (19/11/2026), où « 10 questions » ne tenait pas à côté de
+ * « 1 minute ».
+ */
 @Composable
-private fun <T> SegmentedPills(options: List<Pair<T, String>>, selected: T, tag: (T) -> String, onSelect: (T) -> Unit) {
+private fun <T> SegmentedPills(
+    options: List<Pair<T, String>>, selected: T, tag: (T) -> String, stacked: Boolean = false, onSelect: (T) -> Unit,
+) {
     Row(
         Modifier.fillMaxWidth().clip(CircleShape).background(Color.Black.copy(alpha = 0.28f))
             .border(1.dp, Palette.stroke, CircleShape).padding(3.dp),
@@ -870,15 +877,25 @@ private fun <T> SegmentedPills(options: List<Pair<T, String>>, selected: T, tag:
         options.forEach { (value, label) ->
             val isOn = value == selected
             Box(
-                Modifier.weight(1f).heightIn(min = 36.dp).clip(CircleShape)
+                Modifier.weight(1f).heightIn(min = if (stacked) 46.dp else 36.dp).clip(CircleShape)
                     .background(if (isOn) Palette.accent else Color.Transparent)
                     .clickable { onSelect(value) }
                     .semantics { this.selected = isOn; role = Role.RadioButton }
                     .testTag(tag(value)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1,
-                    color = if (isOn) Palette.background else Palette.textSecondary)
+                val color = if (isOn) Palette.background else Palette.textSecondary
+                val space = label.indexOf(' ')
+                if (stacked && space > 0) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(label.take(space), fontSize = 17.sp, lineHeight = 19.sp, fontWeight = FontWeight.SemiBold,
+                            maxLines = 1, color = color)
+                        Text(label.drop(space + 1), fontSize = 11.sp, lineHeight = 13.sp, fontWeight = FontWeight.SemiBold,
+                            maxLines = 1, color = color)
+                    }
+                } else {
+                    Text(label, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1, color = color)
+                }
             }
         }
     }

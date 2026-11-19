@@ -423,6 +423,7 @@ struct HomeView: View {
         case "crazyhouse": return .activeEngineLegalityGame(variantID: EngineLegalityVariant.crazyhouse.id, settings: FairyVariantSettings())
         case "chess960TwoPlayer": return .activeChess960TwoPlayerGame(Chess960TwoPlayerSettings(startFEN: "bbqnnrkr/pppppppp/8/8/8/8/PPPPPPPP/BBQNNRKR w KQkq - 0 1"))
         case "progression": return .progression
+        case "visualization": return .visualization
         case "dailySession": return .dailySession
         case "settings": return .settings
         case "help": return .help
