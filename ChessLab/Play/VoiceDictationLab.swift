@@ -97,7 +97,8 @@ final class VoiceDictationLab {
 
     /// Une position de puzzle au hasard, et un coup à dire : on tire d'abord un GENRE de coup (pion, chaque pièce,
     /// roque, prise, promotion) pour que la mesure couvre tout, pas seulement les coups de pion.
-    func nextPosition() {
+    /// `keepingLast` : l'essai qu'on vient de faire reste affiché sous le nouveau coup (passage automatique).
+    func nextPosition(keepingLast: Bool = false) {
         for _ in 0..<50 {
             guard let entry = puzzles.randomElement(), let position = Position(fen: entry.fen) else { continue }
             var board = Board(position: position)
@@ -117,7 +118,7 @@ final class VoiceDictationLab {
             fen = board.position.fen
             candidates = legal
             target = move
-            last = nil
+            if !keepingLast { last = nil }
             return
         }
     }
@@ -211,6 +212,9 @@ final class VoiceDictationLab {
         last = trial
         append(trial)
         phase = .idle
+        // Au moins une reconnaissance a trouvé : coup suivant tout de suite (demande du 19/11). Sinon le même coup
+        // reste, pour réessayer ou passer à la main.
+        if results.contains(where: \.correct) { nextPosition(keepingLast: true) }
     }
 
     private func append(_ trial: Trial) {
@@ -499,6 +503,8 @@ struct VoiceDictationLabView: View {
 
     private func lastTrial(_ trial: VoiceDictationLab.Trial) -> some View {
         VStack(alignment: .leading, spacing: 10) {
+            Text(verbatim: "Dernier essai : \(MoveNarration.describe(san: trial.target.san))")
+                .font(.subheadline.weight(.semibold)).foregroundStyle(Theme.textSecondary)
             ForEach(trial.results, id: \.engine) { result in
                 VStack(alignment: .leading, spacing: 2) {
                     HStack {
