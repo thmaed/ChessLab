@@ -95,6 +95,11 @@ struct HelpView: View {
             body: "Choisissez d'abord votre adversaire : un personnage, ou Stockfish. Neuf personnages sont joués par Maia-3, un réseau entraîné sur des millions de parties humaines qui ne cherche pas le meilleur coup mais celui qu'un humain de ce niveau jouerait — gaffes comprises. Chacun a son style, son répertoire d'ouvertures et son tempérament, et son niveau se règle sur l'échelle humaine (proche de Lichess, pas comparable à l'Elo de Stockfish). Stockfish n'intervient derrière eux que pour les mats courts, les finales à peu de pièces et les répétitions. Sinon, Stockfish lui-même, bridé au niveau de votre choix, du débutant au maximum. Réglez ensuite votre couleur, la limite de temps (éteinte par défaut : allumez-la pour choisir une cadence — l'app retient votre dernier choix) et les aides : indice (flèches des meilleurs coups), alerte en cas de coup risqué et barre d'évaluation. Après la partie, un bouton mène directement à l'analyse. En cours de partie, « Changer de mode » (en haut à droite) envoie la position affichée vers l'analyse, le Laboratoire ou une partie à deux — la partie vous attend au retour."
         ),
         .init(
+            icon: "mic.fill", tint: Theme.accent,
+            title: "Jouer à la voix",
+            body: "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». Le bouton pause, au-dessus de l'échiquier, coupe l'écoute le temps d'une conversation.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26."
+        ),
+        .init(
             icon: "person.2.fill", tint: Theme.info,
             title: "Deux joueurs",
             body: "Deux personnes jouent sur le même appareil. Le mode « table » retourne les pièces pour rester lisible face à face. La partie terminée s'enregistre dans la bibliothèque."

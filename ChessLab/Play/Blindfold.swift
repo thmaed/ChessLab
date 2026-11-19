@@ -144,9 +144,13 @@ final class BlindfoldVoice: NSObject, AVSpeechSynthesizerDelegate {
         utterance.voice = voice
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate
         synthesizer.stopSpeaking(at: .immediate)
-        let session = AVAudioSession.sharedInstance()
-        try? session.setCategory(.playback, mode: .spokenAudio, options: [.mixWithOthers])
-        try? session.setActive(true)
+        // Micro ouvert (coups à la voix) : la session « lecture et enregistrement » joue déjà en mode Silencieux, et
+        // la changer couperait le micro.
+        if !VoiceMoveListener.isCapturing {
+            let session = AVAudioSession.sharedInstance()
+            try? session.setCategory(.playback, mode: .spokenAudio, options: [.mixWithOthers])
+            try? session.setActive(true)
+        }
         synthesizer.speak(utterance)
     }
 
@@ -156,8 +160,11 @@ final class BlindfoldVoice: NSObject, AVSpeechSynthesizerDelegate {
     }
 
     /// La session redevient celle des sons du plateau, sauf si une nouvelle phrase a pris la suite.
+    /// L'app parle : l'écoute des coups à la voix se met en retrait pour ne pas s'entendre elle-même.
+    var isSpeaking: Bool { synthesizer.isSpeaking }
+
     private func backToAmbient() {
-        guard !synthesizer.isSpeaking else { return }
+        guard !synthesizer.isSpeaking, !VoiceMoveListener.isCapturing else { return }
         try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
     }
 

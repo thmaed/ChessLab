@@ -8,7 +8,8 @@ import Foundation
 /// entendu se résout tout seul quand un seul coup va en d2. Le module est pur (aucun micro, aucun moteur) : la mesure
 /// sur appareil et les tests le font tourner sur les phrases réellement entendues.
 ///
-/// Langue : le français d'abord (mesure du 19/11) ; les autres langues viendront si l'on implémente.
+/// Les CINQ langues de l'app (décision du 19/11/2026) : un ``Vocabulary`` par langue. Le français a été mesuré sur
+/// vraie voix (51 essais) et porte les mots appris de cette mesure ; les autres partent des mêmes règles.
 enum VoiceMoveParser {
 
     /// Un coup légal, tel que la position le donne : UCI (« g1f3 », « e7e8q ») et SAN brute (« Nf3 », « e8=Q+ »).
@@ -54,84 +55,239 @@ enum VoiceMoveParser {
         var isEmpty: Bool { piece == nil && squares.isEmpty && castle == nil }
     }
 
-    // MARK: Le vocabulaire (français)
+    // MARK: Les vocabulaires
 
-    private static let pieces: [String: Character] = [
-        "roi": "K", "rois": "K",
-        "dame": "Q", "dames": "Q", "reine": "Q", "reines": "Q",
-        "tour": "R", "tours": "R",
-        "fou": "B", "fous": "B",
-        "cavalier": "N", "cavaliers": "N", "chevalier": "N", "chevaliers": "N",
-        "pion": "P", "pions": "P",
-        // Entendus le 19/11 (mesure sur iPhone3) : « Tout en cinq » pour « Tour en e5 », « Roy », « Rouen » (roi en).
-        "tout": "R", "roy": "K", "rouen": "K",
-    ]
-    /// Des mots où la reconnaissance a FONDU une case (mesure du 19/11/2026, 51 essais) : « en g1 » → « géant »,
-    /// « en d1 » → « indien », « en c1 » → « ancien », « en h6 » → « hachis », « d7 » → « décède », « 17 » (dix-sept),
-    /// « b1 » → « bien un », « en g » → « Angers », « f » → « of ». On les redécoupe avant de lire.
-    private static let fused: [String: [String]] = [
-        "géant": ["g", "1"], "indien": ["d", "1"], "indéen": ["d", "1"], "ancien": ["c", "1"], "hachis": ["h", "6"],
-        "décède": ["d", "7"], "décès": ["d", "7"], "17": ["d", "7"], "18": ["d", "8"], "dix": ["d"], "10": ["d"],
-        "bien": ["b"], "angers": ["g"], "of": ["f"], "off": ["f"],
-    ]
-    private static let captureWords: Set<String> = ["prend", "prends", "prent", "pren", "mange", "manges", "x", "prise"]
-    private static let promotionWords: Set<String> = ["promotion", "promu", "promeut", "promouvoir"]
+    /// Les mots d'une langue. Lettre « SÛRE » : un mot qui ne peut guère être autre chose qu'une colonne ; lettre
+    /// « DOUTEUSE » : un mot courant qui sonne comme une lettre (« c'est », l'article « a » anglais, la préposition « a »
+    /// espagnole ou italienne) — comptée seulement juste avant un chiffre, jamais comme indice de départ.
+    struct Vocabulary: Sendable {
+        let pieces: [String: Character]
+        /// Des mots où la reconnaissance FOND une case (« géant » = g1) : redécoupés avant lecture.
+        let fused: [String: [String]]
+        let captureWords: Set<String>
+        let promotionWords: Set<String>
+        let strongFiles: [String: Character]
+        let weakFiles: [String: Character]
+        let ranks: [String: Character]
+        /// Les initiales de la notation écrite dans cette langue (« C f3 », « Sf3 »).
+        let writtenInitials: [String: Character]
+        let shortCastle: [String]
+        let longCastle: [String]
+        let anyCastle: [String]
+        /// « annule », « reprends » : reprendre son dernier coup.
+        let undo: [String]
+        /// Pour les indices donnés à la reconnaissance : le nom de chaque pièce, « en », « prend ».
+        let pieceNames: [Character: String]
+        let to: String
+        let takes: String
+        let shortCastleName: String
+        let longCastleName: String
+    }
 
-    /// Les lettres SÛRES : un mot qui ne peut guère être autre chose qu'une lettre de colonne.
-    private static let strongFiles: [String: Character] = [
-        "a": "a", "b": "b", "bé": "b", "c": "c", "cé": "c", "d": "d", "dé": "d", "e": "e", "é": "e",
-        "f": "f", "effe": "f", "g": "g", "gé": "g", "h": "h", "ache": "h", "hache": "h",
+    /// L'alphabet radio vaut dans toutes les langues : un filet pour les lettres difficiles (« Foxtrot 3 »).
+    private static let radioAlphabet: [String: Character] = [
+        "alpha": "a", "alfa": "a", "bravo": "b", "charlie": "c", "delta": "d", "echo": "e", "écho": "e",
+        "foxtrot": "f", "golf": "g", "hotel": "h", "hôtel": "h",
     ]
-    /// Les lettres DOUTEUSES : des mots courants qui sonnent comme une lettre ; comptées seulement juste avant
-    /// un chiffre (« c'est 4 » = c4), jamais comme indice de départ.
-    private static let weakFiles: [String: Character] = [
-        "à": "a", "ah": "a", "ha": "a",
-        "bey": "b", "baie": "b", "bée": "b",
-        "ces": "c", "ses": "c", "c'est": "c", "s'est": "c", "sait": "c",
-        "des": "d", "dès": "d", "dais": "d",
-        "euh": "e", "eux": "e", "eu": "e", "et": "e", "est": "e",
-        "ef": "f", "effet": "f",
-        "j'ai": "g", "geai": "g", "jet": "g", "j": "g",
-        "hash": "h", "hach": "h",
+
+    private static let digits: [String: Character] = [
+        "1": "1", "2": "2", "3": "3", "4": "4", "5": "5", "6": "6", "7": "7", "8": "8",
     ]
-    private static let ranks: [String: Character] = [
-        "1": "1", "un": "1", "une": "1",
-        "2": "2", "deux": "2",
-        "3": "3", "trois": "3",
-        "4": "4", "quatre": "4",
-        "5": "5", "cinq": "5",
-        "6": "6", "six": "6",
-        "7": "7", "sept": "7", "set": "7", "cette": "7",
-        "8": "8", "huit": "8",
-    ]
+
+    static let french = Vocabulary(
+        pieces: [
+            "roi": "K", "rois": "K", "dame": "Q", "dames": "Q", "reine": "Q", "reines": "Q",
+            "tour": "R", "tours": "R", "fou": "B", "fous": "B",
+            "cavalier": "N", "cavaliers": "N", "chevalier": "N", "chevaliers": "N", "pion": "P", "pions": "P",
+            // Entendus le 19/11 (mesure sur iPhone3) : « Tout en cinq » pour « Tour en e5 », « Roy », « Rouen » (roi en).
+            "tout": "R", "roy": "K", "rouen": "K",
+        ],
+        // Mesure du 19/11/2026, 51 essais : « en g1 » → « géant », « en d1 » → « indien », « en c1 » → « ancien »,
+        // « en h6 » → « hachis », « d7 » → « décède », « 17 » (dix-sept), « b1 » → « bien un », « en g » → « Angers ».
+        fused: [
+            "géant": ["g", "1"], "indien": ["d", "1"], "indéen": ["d", "1"], "ancien": ["c", "1"], "hachis": ["h", "6"],
+            "décède": ["d", "7"], "décès": ["d", "7"], "17": ["d", "7"], "18": ["d", "8"], "dix": ["d"], "10": ["d"],
+            "bien": ["b"], "angers": ["g"], "of": ["f"], "off": ["f"],
+        ],
+        captureWords: ["prend", "prends", "prent", "pren", "mange", "manges", "x", "prise"],
+        promotionWords: ["promotion", "promu", "promeut", "promouvoir"],
+        strongFiles: [
+            "a": "a", "b": "b", "bé": "b", "c": "c", "cé": "c", "d": "d", "dé": "d", "e": "e", "é": "e",
+            "f": "f", "effe": "f", "g": "g", "gé": "g", "h": "h", "ache": "h", "hache": "h",
+        ],
+        weakFiles: [
+            "à": "a", "ah": "a", "ha": "a", "bey": "b", "baie": "b", "bée": "b",
+            "ces": "c", "ses": "c", "c'est": "c", "s'est": "c", "sait": "c", "des": "d", "dès": "d", "dais": "d",
+            "euh": "e", "eux": "e", "eu": "e", "et": "e", "est": "e", "ef": "f", "effet": "f",
+            "j'ai": "g", "geai": "g", "jet": "g", "j": "g", "hash": "h", "hach": "h",
+        ],
+        ranks: [
+            "un": "1", "une": "1", "deux": "2", "trois": "3", "quatre": "4", "cinq": "5", "six": "6",
+            "sept": "7", "set": "7", "cette": "7", "huit": "8",
+        ],
+        writtenInitials: ["c": "N", "f": "B", "t": "R", "d": "Q", "r": "K"],
+        shortCastle: ["petit roque", "petit-roque"],
+        longCastle: ["grand roque", "grand-roque"],
+        anyCastle: ["roque"],
+        undo: ["annule", "annuler", "annulé", "reprends", "reprendre", "reprend le coup", "retour"],
+        pieceNames: ["K": "roi", "Q": "dame", "R": "tour", "B": "fou", "N": "cavalier", "P": "pion"],
+        to: "en", takes: "prend", shortCastleName: "petit roque", longCastleName: "grand roque"
+    )
+
+    static let english = Vocabulary(
+        pieces: [
+            "king": "K", "kings": "K", "queen": "Q", "queens": "Q", "rook": "R", "rooks": "R",
+            "bishop": "B", "bishops": "B", "knight": "N", "knights": "N", "night": "N", "nights": "N",
+            "pawn": "P", "pawns": "P",
+        ],
+        fused: ["before": ["b", "4"]],
+        captureWords: ["takes", "take", "captures", "capture", "x", "times"],
+        promotionWords: ["promotes", "promote", "promotion", "equals"],
+        strongFiles: [
+            "b": "b", "bee": "b", "c": "c", "see": "c", "cee": "c", "d": "d", "dee": "d", "e": "e",
+            "f": "f", "ef": "f", "g": "g", "gee": "g", "h": "h", "aitch": "h",
+        ],
+        weakFiles: ["a": "a", "ay": "a", "eh": "a", "be": "b", "sea": "c", "jee": "g", "age": "h"],
+        ranks: [
+            "one": "1", "won": "1", "two": "2", "to": "2", "too": "2", "three": "3", "tree": "3",
+            "four": "4", "for": "4", "fore": "4", "five": "5", "six": "6", "seven": "7", "eight": "8", "ate": "8",
+        ],
+        writtenInitials: ["n": "N", "b": "B", "r": "R", "q": "Q", "k": "K"],
+        shortCastle: ["castles kingside", "castle kingside", "kingside castle", "short castle", "castle short",
+                      "castles short", "king side"],
+        longCastle: ["castles queenside", "castle queenside", "queenside castle", "long castle", "castle long",
+                     "castles long", "queen side"],
+        anyCastle: ["castle", "castles", "castling"],
+        undo: ["undo", "take back", "takeback", "take it back", "cancel"],
+        pieceNames: ["K": "king", "Q": "queen", "R": "rook", "B": "bishop", "N": "knight", "P": "pawn"],
+        to: "to", takes: "takes", shortCastleName: "castles kingside", longCastleName: "castles queenside"
+    )
+
+    static let spanish = Vocabulary(
+        pieces: [
+            "rey": "K", "reyes": "K", "dama": "Q", "damas": "Q", "reina": "Q", "torre": "R", "torres": "R",
+            "alfil": "B", "alfiles": "B", "caballo": "N", "caballos": "N", "peón": "P", "peon": "P", "peones": "P",
+        ],
+        fused: [:],
+        captureWords: ["come", "comes", "captura", "toma", "por", "x"],
+        promotionWords: ["corona", "promociona", "promoción", "promocion"],
+        strongFiles: [
+            "b": "b", "c": "c", "d": "d", "e": "e", "f": "f", "efe": "f", "g": "g", "h": "h", "hache": "h", "ache": "h",
+        ],
+        weakFiles: ["a": "a", "ah": "a", "be": "b", "ve": "b", "ce": "c", "se": "c", "de": "d", "ge": "g", "je": "g"],
+        ranks: [
+            "uno": "1", "una": "1", "un": "1", "dos": "2", "tres": "3", "cuatro": "4", "cinco": "5", "seis": "6",
+            "siete": "7", "ocho": "8",
+        ],
+        writtenInitials: ["c": "N", "a": "B", "t": "R", "d": "Q", "r": "K"],
+        shortCastle: ["enroque corto"],
+        longCastle: ["enroque largo"],
+        anyCastle: ["enroque", "enroca"],
+        undo: ["deshacer", "deshaz", "anula", "anular", "atrás", "atras"],
+        pieceNames: ["K": "rey", "Q": "dama", "R": "torre", "B": "alfil", "N": "caballo", "P": "peón"],
+        to: "a", takes: "come", shortCastleName: "enroque corto", longCastleName: "enroque largo"
+    )
+
+    static let german = Vocabulary(
+        pieces: [
+            "könig": "K", "koenig": "K", "dame": "Q", "turm": "R", "türme": "R", "läufer": "B", "laeufer": "B",
+            "springer": "N", "pferd": "N", "bauer": "P", "bauern": "P",
+        ],
+        fused: [:],
+        captureWords: ["schlägt", "schlaegt", "nimmt", "x", "mal"],
+        promotionWords: ["umwandlung", "wandelt", "verwandelt"],
+        strongFiles: [
+            "a": "a", "b": "b", "be": "b", "c": "c", "ce": "c", "zeh": "c", "d": "d", "de": "d", "e": "e",
+            "f": "f", "ef": "f", "g": "g", "ge": "g", "h": "h", "ha": "h",
+        ],
+        weakFiles: ["beh": "b", "tse": "c", "dee": "d", "eh": "e", "eff": "f", "geh": "g", "hah": "h"],
+        ranks: [
+            "eins": "1", "ein": "1", "zwei": "2", "zwo": "2", "drei": "3", "vier": "4", "fünf": "5", "fuenf": "5",
+            "sechs": "6", "sieben": "7", "acht": "8",
+        ],
+        writtenInitials: ["s": "N", "l": "B", "t": "R", "d": "Q", "k": "K"],
+        shortCastle: ["kurze rochade", "rochade kurz", "kleine rochade"],
+        longCastle: ["lange rochade", "rochade lang", "große rochade", "grosse rochade"],
+        anyCastle: ["rochade", "rochiert"],
+        undo: ["zurück", "zurueck", "rückgängig", "rueckgaengig", "nimm zurück", "abbrechen"],
+        pieceNames: ["K": "König", "Q": "Dame", "R": "Turm", "B": "Läufer", "N": "Springer", "P": "Bauer"],
+        to: "nach", takes: "schlägt", shortCastleName: "kurze Rochade", longCastleName: "lange Rochade"
+    )
+
+    static let italian = Vocabulary(
+        pieces: [
+            "re": "K", "donna": "Q", "regina": "Q", "torre": "R", "torri": "R", "alfiere": "B", "alfieri": "B",
+            "cavallo": "N", "cavalli": "N", "pedone": "P", "pedoni": "P",
+        ],
+        fused: [:],
+        captureWords: ["prende", "mangia", "cattura", "per", "x"],
+        promotionWords: ["promozione", "promuove"],
+        strongFiles: [
+            "b": "b", "bi": "b", "c": "c", "d": "d", "f": "f", "effe": "f", "g": "g", "gi": "g", "h": "h", "acca": "h",
+        ],
+        weakFiles: ["a": "a", "ci": "c", "di": "d", "e": "e", "è": "e"],
+        ranks: [
+            "uno": "1", "un": "1", "due": "2", "tre": "3", "quattro": "4", "cinque": "5", "sei": "6",
+            "sette": "7", "otto": "8",
+        ],
+        writtenInitials: ["c": "N", "a": "B", "t": "R", "d": "Q", "r": "K"],
+        shortCastle: ["arrocco corto"],
+        longCastle: ["arrocco lungo"],
+        anyCastle: ["arrocco", "arrocca"],
+        undo: ["annulla", "indietro", "riprendi"],
+        pieceNames: ["K": "re", "Q": "donna", "R": "torre", "B": "alfiere", "N": "cavallo", "P": "pedone"],
+        to: "in", takes: "prende", shortCastleName: "arrocco corto", longCastleName: "arrocco lungo"
+    )
+
+    /// Le vocabulaire d'une langue de l'app (« fr », « en »…) ; le français par défaut.
+    static func vocabulary(for language: String) -> Vocabulary {
+        switch language.prefix(2) {
+        case "en": english
+        case "es": spanish
+        case "de": german
+        case "it": italian
+        default: french
+        }
+    }
 
     // MARK: Lire une phrase
 
-    static func tokens(_ text: String) -> [String] {
+    static func tokens(_ text: String, vocabulary: Vocabulary = french) -> [String] {
         var lowered = text.lowercased().replacingOccurrences(of: "’", with: "'")
-        // « Cf3 », « Fxc6 » : une initiale de pièce collée à une case, comme on l'écrit.
+        // « Cf3 », « Fxc6 », « Sf3 » : une initiale de pièce collée à une case, comme on l'écrit.
+        let initials = String(vocabulary.writtenInitials.keys.sorted().joined())
         lowered = lowered.replacingOccurrences(
-            of: #"\b([cftdr])x?([a-h][1-8])\b"#, with: "$1 $2", options: .regularExpression)
+            of: "\\b([\(initials)])x?([a-h][1-8])\\b", with: "$1 $2", options: .regularExpression)
         // Une lettre collée à son chiffre (« f3 », « e4 ») : deux mots.
         lowered = lowered.replacingOccurrences(of: #"([a-h])([1-8])"#, with: "$1 $2", options: .regularExpression)
         let separators = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "'")).inverted
-        return lowered.components(separatedBy: separators).filter { !$0.isEmpty }.flatMap { fused[$0] ?? [$0] }
+        return lowered.components(separatedBy: separators).filter { !$0.isEmpty }
+            .flatMap { vocabulary.fused[$0] ?? [$0] }
     }
 
-    static func heard(_ text: String) -> Heard {
+    /// « annule », « take back » : une demande de reprise, sans case dedans.
+    static func isUndo(_ text: String, vocabulary: Vocabulary = french) -> Bool {
+        let lowered = " " + tokens(text, vocabulary: vocabulary).joined(separator: " ") + " "
+        return vocabulary.undo.contains { lowered.contains(" \($0) ") }
+    }
+
+    static func heard(_ text: String, vocabulary: Vocabulary = french) -> Heard {
         var result = Heard()
-        let lowered = text.lowercased()
-        if lowered.contains("grand roque") || lowered.contains("o-o-o") || lowered.contains("0-0-0") {
+        let words = tokens(text, vocabulary: vocabulary)
+        let spaced = " " + words.joined(separator: " ") + " "
+        let raw = text.lowercased()
+        func says(_ phrases: [String]) -> Bool { phrases.contains { spaced.contains(" \($0) ") } }
+        if says(vocabulary.longCastle) || raw.contains("o-o-o") || raw.contains("0-0-0") {
             result.castle = .long
-        } else if lowered.contains("petit roque") || lowered.contains("o-o") || lowered.contains("0-0") {
+        } else if says(vocabulary.shortCastle) || raw.contains("o-o") || raw.contains("0-0") {
             result.castle = .short
-        } else if lowered.contains("roque") {
+        } else if says(vocabulary.anyCastle) {
             result.castle = .unspecified
         }
 
-        let words = tokens(text)
-        // Les initiales écrites (« C f3 ») ne valent pièce que collées à une case.
-        let writtenInitials: [String: Character] = ["c": "N", "f": "B", "t": "R", "d": "Q", "r": "K"]
+        func strongFile(_ word: String) -> Character? { vocabulary.strongFiles[word] ?? radioAlphabet[word] }
+        func rank(_ word: String) -> Character? { vocabulary.ranks[word] ?? digits[word] }
+
         var index = 0
         var promotionNext = false
         while index < words.count {
@@ -139,7 +295,7 @@ enum VoiceMoveParser {
             let next = index + 1 < words.count ? words[index + 1] : nil
             let afterNext = index + 2 < words.count ? words[index + 2] : nil
 
-            if let piece = pieces[word] {
+            if let piece = vocabulary.pieces[word] {
                 if promotionNext || !result.squares.isEmpty {
                     // « e8 dame », « e8 promotion dame » : la pièce après la case est la promotion.
                     if piece != "P" { result.promotion = piece }
@@ -150,39 +306,42 @@ enum VoiceMoveParser {
                 index += 1
                 continue
             }
-            if captureWords.contains(word) { result.capture = true; index += 1; continue }
-            if promotionWords.contains(word) { promotionNext = true; index += 1; continue }
+            if vocabulary.captureWords.contains(word) { result.capture = true; index += 1; continue }
+            if vocabulary.promotionWords.contains(word) { promotionNext = true; index += 1; continue }
 
             // Initiale et colonne collées, puis le chiffre : « FB quatre » = fou b4 (entendu le 19/11).
             if result.piece == nil, result.squares.isEmpty, word.count == 2,
-               let initial = writtenInitials[String(word.prefix(1))], let file = word.last, "abcdefgh".contains(file),
-               let next, let rank = ranks[next] {
+               let initial = vocabulary.writtenInitials[String(word.prefix(1))], let file = word.last,
+               "abcdefgh".contains(file), let next, let rank = rank(next) {
                 result.piece = initial
                 result.squares.append("\(file)\(rank)")
                 index += 2
                 continue
             }
             // Une initiale écrite suivie d'une case complète : « C f 3 ».
-            if result.piece == nil, result.squares.isEmpty, let initial = writtenInitials[word],
-               let next, strongFiles[next] != nil, let afterNext, ranks[afterNext] != nil {
+            if result.piece == nil, result.squares.isEmpty, let initial = vocabulary.writtenInitials[word],
+               let next, strongFile(next) != nil, let afterNext, rank(afterNext) != nil {
                 result.piece = initial
                 index += 1
                 continue
             }
 
-            let file = strongFiles[word] ?? weakFiles[word]
-            if let file, let next, let rank = ranks[next] {
+            let file = strongFile(word) ?? vocabulary.weakFiles[word]
+            if let file, let next, let rank = rank(next) {
                 result.squares.append("\(file)\(rank)")
                 index += 2
                 continue
             }
-            if let file = strongFiles[word] {
+            if let file = strongFile(word) {
                 // Une colonne seule, avant la case d'arrivée : l'indice de départ.
                 if result.squares.isEmpty { result.fromFile = file }
                 index += 1
                 continue
             }
-            if let rank = ranks[word], result.squares.isEmpty, result.piece != nil {
+            // Une rangée seule : l'indice de départ (« tour 1 d1 »), ou l'arrivée quand la colonne s'est perdue. Pas
+            // devant une colonne : « knight to f3 », où « to » sonne comme « two ».
+            let beforeFile = next.map { strongFile($0) != nil || vocabulary.weakFiles[$0] != nil } ?? false
+            if let rank = rank(word), result.squares.isEmpty, result.piece != nil, !beforeFile {
                 result.fromRank = rank
             }
             index += 1
@@ -235,7 +394,7 @@ enum VoiceMoveParser {
             if !narrowed.isEmpty { pool = narrowed }
         }
         if pool.count > 1, pool.allSatisfy({ $0.promotion != nil }) {
-            // Promotion : la pièce dite, sinon la dame (la confirmation la nomme, on peut annuler).
+            // Promotion : la pièce dite, sinon la dame.
             let wanted = Character((heard.promotion ?? "Q").lowercased())
             pool = pool.filter { $0.promotion == wanted }
         }
@@ -250,8 +409,9 @@ enum VoiceMoveParser {
         }
     }
 
-    /// Les lettres qui riment en « é » se confondent à l'oreille : b, c, d, e, g. Quand la case entendue ne donne
-    /// rien, on essaie ses voisines ; on ne retient le résultat que s'il désigne UN seul coup.
+    /// Les lettres qui riment se confondent à l'oreille : b, c, d, e, g (en « é » en français, en « i » en anglais).
+    /// Quand la case entendue ne donne rien, on essaie ses voisines ; on ne retient le résultat que s'il désigne UN
+    /// seul coup.
     private static let confusable: Set<Character> = ["b", "c", "d", "e", "g"]
 
     static func resolveWithConfusions(_ heard: Heard, among candidates: [Candidate]) -> Outcome {
@@ -269,9 +429,10 @@ enum VoiceMoveParser {
 
     /// Plusieurs transcriptions d'un même enregistrement (la meilleure d'abord) : le premier coup trouvé l'emporte ;
     /// à défaut une ambiguïté, puis « impossible », puis « pas compris ».
-    static func resolve(transcripts: [String], among candidates: [Candidate], confusions: Bool = true) -> Outcome {
+    static func resolve(transcripts: [String], among candidates: [Candidate], confusions: Bool = true,
+                        vocabulary: Vocabulary = french) -> Outcome {
         let outcomes = transcripts.map { text -> Outcome in
-            let heard = heard(text)
+            let heard = heard(text, vocabulary: vocabulary)
             if heard.isEmpty { return .notUnderstood }
             return confusions ? resolveWithConfusions(heard, among: candidates) : resolve(heard, among: candidates)
         }
@@ -281,30 +442,32 @@ enum VoiceMoveParser {
         return .notUnderstood
     }
 
+    /// Une phrase sans rien d'échecs dedans (une conversation autour de la table) : l'écoute permanente l'ignore,
+    /// au lieu de répondre « pas compris » à chaque mot prononcé dans la pièce.
+    static func soundsLikeChess(_ transcripts: [String], vocabulary: Vocabulary = french) -> Bool {
+        transcripts.contains { !heard($0, vocabulary: vocabulary).isEmpty || isUndo($0, vocabulary: vocabulary) }
+    }
+
     // MARK: Ce qu'on s'attend à entendre
 
-    private static let pieceWords: [Character: String] = [
-        "K": "roi", "Q": "dame", "R": "tour", "B": "fou", "N": "cavalier", "P": "pion",
-    ]
-
     /// Les façons courantes de dire un coup — indices pour la reconnaissance (`contextualStrings`).
-    static func spokenForms(of candidate: Candidate) -> [String] {
-        if candidate.isLongCastle { return ["grand roque"] }
-        if candidate.isCastle { return ["petit roque"] }
+    static func spokenForms(of candidate: Candidate, vocabulary: Vocabulary = french) -> [String] {
+        if candidate.isLongCastle { return [vocabulary.longCastleName] }
+        if candidate.isCastle { return [vocabulary.shortCastleName] }
         let to = candidate.to
-        let name = pieceWords[candidate.piece] ?? ""
-        var forms = ["\(name) \(to)", "\(name) en \(to)"]
-        if candidate.san.contains("x") { forms.append("\(name) prend \(to)") }
+        let name = vocabulary.pieceNames[candidate.piece] ?? ""
+        var forms = ["\(name) \(to)", "\(name) \(vocabulary.to) \(to)"]
+        if candidate.san.contains("x") { forms.append("\(name) \(vocabulary.takes) \(to)") }
         if candidate.piece == "P" { forms.append(to) }
-        if let promotion = candidate.promotion, let promoted = pieceWords[Character(promotion.uppercased())] {
+        if let promotion = candidate.promotion, let promoted = vocabulary.pieceNames[Character(promotion.uppercased())] {
             forms.append("\(to) \(promoted)")
         }
         return forms
     }
 
-    static func spokenForms(of candidates: [Candidate]) -> [String] {
+    static func spokenForms(of candidates: [Candidate], vocabulary: Vocabulary = french) -> [String] {
         var seen = Set<String>()
-        return candidates.flatMap { spokenForms(of: $0) }.filter { seen.insert($0).inserted }
+        return candidates.flatMap { spokenForms(of: $0, vocabulary: vocabulary) }.filter { seen.insert($0).inserted }
     }
 }
 

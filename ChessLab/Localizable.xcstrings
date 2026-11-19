@@ -58133,6 +58133,686 @@
         }
       }
     },
+    "Coups à la voix": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice moves"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coups à la voix"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugadas por voz"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Züge per Sprache"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mosse a voce"
+          }
+        }
+      }
+    },
+    "Préparation du micro…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Getting the microphone ready…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparation du micro…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparando el micrófono…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofon wird vorbereitet …"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparazione del microfono…"
+          }
+        }
+      }
+    },
+    "Dites votre coup": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Say your move"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dites votre coup"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di tu jugada"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sag deinen Zug"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di' la tua mossa"
+          }
+        }
+      }
+    },
+    "Je vous ai entendu…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I heard you…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je vous ai entendu…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Te he oído…"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ich habe dich gehört …"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ti ho sentito…"
+          }
+        }
+      }
+    },
+    "Le micro attend votre tour": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The microphone waits for your turn"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le micro attend votre tour"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El micrófono espera tu turno"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Mikrofon wartet auf deinen Zug"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il microfono aspetta il tuo turno"
+          }
+        }
+      }
+    },
+    "Écoute en pause": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listening paused"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Écoute en pause"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Escucha en pausa"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuhören pausiert"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ascolto in pausa"
+          }
+        }
+      }
+    },
+    "Micro ou reconnaissance vocale non autorisés (voir Réglages)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone or speech recognition not allowed (see Settings)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Micro ou reconnaissance vocale non autorisés (voir Réglages)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Micrófono o reconocimiento de voz no autorizados (ver Ajustes)"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofon oder Spracherkennung nicht erlaubt (siehe Einstellungen)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microfono o riconoscimento vocale non autorizzati (vedi Impostazioni)"
+          }
+        }
+      }
+    },
+    "Dictée des coups indisponible sur cet appareil dans cette langue": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Voice moves unavailable on this device in this language"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dictée des coups indisponible sur cet appareil dans cette langue"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugadas por voz no disponibles en este dispositivo en este idioma"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Züge per Sprache auf diesem Gerät in dieser Sprache nicht verfügbar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mosse a voce non disponibili su questo dispositivo in questa lingua"
+          }
+        }
+      }
+    },
+    "Reprendre l'écoute": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Resume listening"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reprendre l'écoute"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reanudar la escucha"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weiter zuhören"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Riprendi l'ascolto"
+          }
+        }
+      }
+    },
+    "Mettre l'écoute en pause": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pause listening"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mettre l'écoute en pause"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pausar la escucha"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zuhören pausieren"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Metti in pausa l'ascolto"
+          }
+        }
+      }
+    },
+    "Micro ou reconnaissance vocale refusés : autorisez-les dans Réglages.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microphone or speech recognition denied: allow them in Settings."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Micro ou reconnaissance vocale refusés : autorisez-les dans Réglages."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Micrófono o reconocimiento de voz denegados: permítelos en Ajustes."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mikrofon oder Spracherkennung abgelehnt: erlaube sie in den Einstellungen."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Microfono o riconoscimento vocale negati: consentili in Impostazioni."
+          }
+        }
+      }
+    },
+    "Indisponible sur cet appareil dans cette langue : la reconnaissance doit se faire sur l'appareil, sans réseau.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unavailable on this device in this language: recognition must happen on the device, without the network."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Indisponible sur cet appareil dans cette langue : la reconnaissance doit se faire sur l'appareil, sans réseau."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No disponible en este dispositivo en este idioma: el reconocimiento debe hacerse en el dispositivo, sin red."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auf diesem Gerät in dieser Sprache nicht verfügbar: Die Erkennung muss auf dem Gerät erfolgen, ohne Netzwerk."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non disponibile su questo dispositivo in questa lingua: il riconoscimento deve avvenire sul dispositivo, senza rete."
+          }
+        }
+      }
+    },
+    "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend. Reconnaissance plus précise à partir d'iOS 26.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Say your move when it’s your turn: it is played as soon as it is understood; “undo” takes it back. More accurate recognition from iOS 26."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend. Reconnaissance plus précise à partir d'iOS 26."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di tu jugada cuando te toque: se juega en cuanto se entiende; «deshacer» la anula. Reconocimiento más preciso a partir de iOS 26."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sag deinen Zug, wenn du dran bist: Er wird gespielt, sobald er verstanden ist; „zurück“ nimmt ihn zurück. Genauere Erkennung ab iOS 26."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di' la tua mossa quando tocca a te: viene giocata appena capita; «annulla» la ritira. Riconoscimento più preciso da iOS 26."
+          }
+        }
+      }
+    },
+    "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Say your move when it’s your turn: it is played as soon as it is understood; “undo” takes it back."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di tu jugada cuando te toque: se juega en cuanto se entiende; «deshacer» la anula."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sag deinen Zug, wenn du dran bist: Er wird gespielt, sobald er verstanden ist; „zurück“ nimmt ihn zurück."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Di' la tua mossa quando tocca a te: viene giocata appena capita; «annulla» la ritira."
+          }
+        }
+      }
+    },
+    "Coup repris": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move taken back"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Coup repris"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugada deshecha"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zug zurückgenommen"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mossa ritirata"
+          }
+        }
+      }
+    },
+    "Impossible de reprendre ce coup": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This move can’t be taken back"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de reprendre ce coup"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede deshacer esta jugada"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieser Zug kann nicht zurückgenommen werden"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile ritirare questa mossa"
+          }
+        }
+      }
+    },
+    "Plusieurs pièces le peuvent : dites aussi la case de départ": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More than one piece can: also say the starting square"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plusieurs pièces le peuvent : dites aussi la case de départ"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Varias piezas pueden: di también la casilla de salida"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mehrere Figuren können das: sag auch das Ausgangsfeld"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Più pezzi possono farlo: di' anche la casa di partenza"
+          }
+        }
+      }
+    },
+    "Je n'ai pas compris": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "I didn’t understand"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Je n'ai pas compris"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No te he entendido"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ich habe dich nicht verstanden"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non ho capito"
+          }
+        }
+      }
+    },
+    "Jouer à la voix": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Playing by voice"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jouer à la voix"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jugar por voz"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit der Stimme spielen"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giocare a voce"
+          }
+        }
+      }
+    },
+    "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». Le bouton pause, au-dessus de l'échiquier, coupe l'écoute le temps d'une conversation.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In New game, “Game” card, turn on “Voice moves”. During the game, the microphone listens by itself when it is your turn: say your move — “knight f3”, “bishop takes c6”, “e4”, “castles kingside”, “e8 queen” for a promotion.\n\nThe understood move is played at once and shown at the top of the board; say “undo” to take it back. An impossible move or a misunderstood phrase is said out loud. If two pieces can reach the same square, add the starting file: “knight b d2”. The pause button above the board stops listening during a conversation.\n\nYour voice is recognised on the device, without the network, and is never recorded. Recognition is more accurate from iOS 26."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dans Nouvelle partie, carte « Partie », allumez « Coups à la voix ». Pendant la partie, le micro écoute seul quand c'est à vous de jouer : dites votre coup — « cavalier f3 », « fou prend c6 », « e4 », « petit roque », « e8 dame » pour une promotion.\n\nLe coup compris est joué tout de suite et s'affiche en haut de l'échiquier ; dites « annule » pour le reprendre. Un coup impossible ou une phrase mal comprise vous est dit à voix haute. Si deux pièces peuvent aller sur la même case, ajoutez la colonne de départ : « cavalier b d2 ». Le bouton pause, au-dessus de l'échiquier, coupe l'écoute le temps d'une conversation.\n\nVotre voix est reconnue sur l'appareil, sans réseau, et n'est jamais enregistrée. La reconnaissance est plus précise à partir d'iOS 26."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En Nueva partida, tarjeta «Partida», activa «Jugadas por voz». Durante la partida, el micrófono escucha solo cuando te toca jugar: di tu jugada — «caballo f3», «alfil come c6», «e4», «enroque corto», «e8 dama» para una coronación.\n\nLa jugada entendida se juega enseguida y aparece encima del tablero; di «deshacer» para anularla. Una jugada imposible o una frase mal entendida se dice en voz alta. Si dos piezas pueden ir a la misma casilla, añade la columna de salida: «caballo b d2». El botón de pausa, encima del tablero, detiene la escucha durante una conversación.\n\nTu voz se reconoce en el dispositivo, sin red, y nunca se graba. El reconocimiento es más preciso a partir de iOS 26."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird laut gesagt. Können zwei Figuren auf dasselbe Feld, nenne auch die Ausgangslinie: „Springer b d2“. Die Pausentaste über dem Brett stoppt das Zuhören während eines Gesprächs.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Ab iOS 26 ist die Erkennung genauer."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In Nuova partita, scheda «Partita», attiva «Mosse a voce». Durante la partita il microfono ascolta da solo quando tocca a te: di' la tua mossa — «cavallo f3», «alfiere prende c6», «e4», «arrocco corto», «e8 donna» per una promozione.\n\nLa mossa capita viene giocata subito e appare sopra la scacchiera; di' «annulla» per ritirarla. Una mossa impossibile o una frase non capita ti viene detta ad alta voce. Se due pezzi possono andare sulla stessa casa, aggiungi la colonna di partenza: «cavallo b d2». Il pulsante pausa, sopra la scacchiera, ferma l'ascolto durante una conversazione.\n\nLa tua voce è riconosciuta sul dispositivo, senza rete, e non viene mai registrata. Il riconoscimento è più preciso da iOS 26."
+          }
+        }
+      }
+    },
     "Voix": {
       "localizations": {
         "en": {

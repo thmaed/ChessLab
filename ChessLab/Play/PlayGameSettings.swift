@@ -49,6 +49,9 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
     /// À l'aveugle : les coups de l'adversaire lus à voix haute (synthèse de l'appareil, hors ligne). Éteint
     /// par défaut (décision du 17/11/2026).
     var blindfoldVoice: Bool = false
+    /// COUPS À LA VOIX (19/11/2026) : le micro écoute à mon tour, le coup compris est joué directement, « annule »
+    /// le reprend. Reconnaissance SUR L'APPAREIL seulement. Éteint par défaut.
+    var voiceMoves: Bool = false
 
     /// Vrai pendant une partie à l'aveugle : les aides qui montreraient la position sont coupées.
     var isBlindfold: Bool { blindfold != .off }
@@ -84,6 +87,7 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         opponentProfileID = try container.decodeIfPresent(String.self, forKey: .opponentProfileID)
         blindfold = try container.decodeIfPresent(BlindfoldLevel.self, forKey: .blindfold) ?? fallback.blindfold
         blindfoldVoice = try container.decodeIfPresent(Bool.self, forKey: .blindfoldVoice) ?? fallback.blindfoldVoice
+        voiceMoves = try container.decodeIfPresent(Bool.self, forKey: .voiceMoves) ?? fallback.voiceMoves
     }
 
     /// Requis dès qu'un `init(from:)` explicite existe : il masque
@@ -104,7 +108,8 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         engineResignationEnabled: Bool = true,
         opponentProfileID: String? = OpponentProfile.maia.id,
         blindfold: BlindfoldLevel = .off,
-        blindfoldVoice: Bool = false
+        blindfoldVoice: Bool = false,
+        voiceMoves: Bool = false
     ) {
         self.colorChoice = colorChoice
         self.eloSliderValue = eloSliderValue
@@ -122,6 +127,7 @@ struct PlayGameSettings: Codable, Equatable, Hashable {
         self.opponentProfileID = opponentProfileID
         self.blindfold = blindfold
         self.blindfoldVoice = blindfoldVoice
+        self.voiceMoves = voiceMoves
     }
 
     var resolvedColorChoice: PlayerColorChoice {

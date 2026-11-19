@@ -47,6 +47,76 @@
           }
         }
       }
+    },
+    "NSMicrophoneUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The microphone lets you say your moves during a game. Your voice is recognised on the device and never recorded or sent."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le micro vous permet de dire vos coups pendant une partie. Votre voix est reconnue sur l'appareil, jamais enregistrée ni envoyée."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El micrófono te permite decir tus jugadas durante una partida. Tu voz se reconoce en el dispositivo y nunca se graba ni se envía."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit dem Mikrofon sagst du deine Züge während einer Partie an. Deine Stimme wird auf dem Gerät erkannt, nie gespeichert oder gesendet."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il microfono ti permette di dire le tue mosse durante una partita. La tua voce è riconosciuta sul dispositivo, mai registrata né inviata."
+          }
+        }
+      }
+    },
+    "NSSpeechRecognitionUsageDescription" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speech recognition turns the move you say into a move on the board, on the device only, without the network."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La reconnaissance vocale transforme le coup que vous dites en coup sur l'échiquier, sur l'appareil seulement, sans réseau."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El reconocimiento de voz convierte la jugada que dices en una jugada en el tablero, solo en el dispositivo, sin red."
+          }
+        },
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Spracherkennung macht aus dem angesagten Zug einen Zug auf dem Brett – nur auf dem Gerät, ohne Netzwerk."
+          }
+        },
+        "it" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Il riconoscimento vocale trasforma la mossa che dici in una mossa sulla scacchiera, solo sul dispositivo, senza rete."
+          }
+        }
+      }
     }
   },
   "version" : "1.0"

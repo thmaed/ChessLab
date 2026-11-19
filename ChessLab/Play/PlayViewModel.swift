@@ -245,6 +245,92 @@ final class PlayViewModel {
         return "\(LocalizationController.string("À l'aveugle")) · \(LocalizationController.string(settings.blindfold.title)) · \(peeks)"
     }
 
+    // MARK: Coups à la voix (19/11/2026)
+
+    /// Ce que la voix a donné, un instant en haut du plateau : le coup joué (le retour est À L'ÉCRAN seulement,
+    /// décision du 19/11/2026), ou ce qui n'a pas marché.
+    struct VoiceNotice: Equatable { let id: Int; let text: String; let isError: Bool }
+    private(set) var voiceNotice: VoiceNotice?
+    private var voiceNoticeID = 0
+
+    enum VoiceReply: Equatable {
+        case played(String), undone, cannotUndo, ambiguous, illegal, notUnderstood, ignored
+    }
+
+    /// C'est au joueur et la partie se joue : le micro peut écouter.
+    var isVoiceTurn: Bool { settings.voiceMoves && canUserAct && !isReviewing }
+
+    private var voiceVocabulary: VoiceMoveParser.Vocabulary {
+        VoiceMoveParser.vocabulary(for: LocalizationController.activeLanguageCode)
+    }
+
+    /// Les façons de dire les coups légaux, données en indices à la reconnaissance.
+    var voiceHints: [String] {
+        VoiceMoveParser.spokenForms(of: VoiceMoveParser.candidates(in: board), vocabulary: voiceVocabulary)
+    }
+
+    /// Ce que le micro a entendu (la meilleure transcription d'abord). Le coup compris est JOUÉ DIRECTEMENT ;
+    /// « annule » reprend ; un coup impossible, une phrase incomprise ou ambiguë se DISENT (demande d'origine) ;
+    /// une phrase sans rien d'échecs (une conversation) est ignorée.
+    @discardableResult
+    func handleVoice(_ transcripts: [String], language: String = LocalizationController.activeLanguageCode,
+                     speaks: Bool = true) -> VoiceReply {
+        guard settings.voiceMoves, outcome == nil else { return .ignored }
+        let vocabulary = VoiceMoveParser.vocabulary(for: language)
+        if transcripts.contains(where: { VoiceMoveParser.isUndo($0, vocabulary: vocabulary) }) {
+            guard canTakeback else {
+                tellVoice("Impossible de reprendre ce coup", speaks: speaks)
+                return .cannotUndo
+            }
+            takeback()
+            showVoiceNotice(LocalizationController.string("Coup repris"), isError: false)
+            return .undone
+        }
+        guard canUserAct, !isReviewing, VoiceMoveParser.soundsLikeChess(transcripts, vocabulary: vocabulary) else {
+            return .ignored
+        }
+        let candidates = VoiceMoveParser.candidates(in: board)
+        switch VoiceMoveParser.resolve(transcripts: transcripts, among: candidates, vocabulary: vocabulary) {
+        case let .move(candidate):
+            playVoiceMove(candidate)
+            showVoiceNotice(MoveNarration.describe(san: candidate.san), isError: false)
+            return .played(candidate.san)
+        case .ambiguous:
+            // Sans dire OÙ sont les pièces : à l'aveugle, ce serait révéler la position.
+            tellVoice("Plusieurs pièces le peuvent : dites aussi la case de départ", speaks: speaks)
+            return .ambiguous
+        case .illegal:
+            tellVoice("Coup impossible", speaks: speaks)
+            return .illegal
+        case .notUnderstood:
+            tellVoice("Je n'ai pas compris", speaks: speaks)
+            return .notUnderstood
+        }
+    }
+
+    private func playVoiceMove(_ candidate: VoiceMoveParser.Candidate) {
+        attemptUserMove(from: Square(candidate.from), to: Square(candidate.to))
+        guard pendingPromotion != nil else { return }
+        let kind: Piece.Kind = switch candidate.promotion {
+        case "r": .rook
+        case "b": .bishop
+        case "n": .knight
+        default: .queen
+        }
+        completePromotion(to: kind)
+    }
+
+    private func tellVoice(_ key: String, speaks: Bool) {
+        let text = LocalizationController.string(key)
+        showVoiceNotice(text, isError: true)
+        if speaks { BlindfoldVoice.shared.say(text) }
+    }
+
+    private func showVoiceNotice(_ text: String, isError: Bool) {
+        voiceNoticeID += 1
+        voiceNotice = VoiceNotice(id: voiceNoticeID, text: text, isError: isError)
+    }
+
     private func showBlindNotice(_ key: String) {
         blindNoticeID += 1
         blindNotice = BlindNotice(id: blindNoticeID, text: LocalizationController.string(key))

@@ -23,8 +23,11 @@ final class SoundPlayer {
         // non interceptable côté Swift).
         format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1)!
 
-        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
-        try? AVAudioSession.sharedInstance().setActive(true)
+        // Micro déjà ouvert (coups à la voix) : ne pas rendre la session ambiante, ce qui couperait l'écoute.
+        if !VoiceMoveListener.isCapturing {
+            try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+            try? AVAudioSession.sharedInstance().setActive(true)
+        }
 
         engine.attach(player)
         engine.connect(player, to: engine.mainMixerNode, format: format)

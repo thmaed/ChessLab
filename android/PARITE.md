@@ -2230,3 +2230,27 @@ en préférences texte (iOS : JSON dans UserDefaults). Depuis le 18/11 au soir, 
       instrumenté 3/3 sur l'ÉMULATEUR, vérifiant aussi que les bornes du plateau ne bougent pas.
 - [ ] **Galaxy** : en plus de ce qui précède, la marche 5 au doigt (deux lignes d'énoncé en police agrandie : le texte
       doit rapetisser, pas se couper).
+
+## Coups à la voix (19/11/2026) — iOS FAIT, Android À PORTER
+
+Décisions de l'utilisateur : réglage « Coups à la voix » dans la carte « Partie » de Nouvelle partie (contre
+l'ordinateur, avec ou sans aveugle) ; le micro ÉCOUTE SEUL à mon tour (bouton pause au-dessus du plateau) ; le coup
+compris est JOUÉ DIRECTEMENT et s'affiche À L'ÉCRAN (pas de voix pour mon coup) ; « annule » (et ses pendants) le
+reprend ; coup impossible, phrase incomprise ou ambiguë DITS à voix haute ; une conversation est ignorée ; CINQ
+langues d'emblée ; reconnaissance SUR L'APPAREIL seulement, aucun son gardé. iOS 18-25 : même fonction, note
+« Reconnaissance plus précise à partir d'iOS 26 ».
+
+iOS : `VoiceMoveParser` (cinq vocabulaires), `VoiceMoveListener` (découpe des phrases au niveau sonore, puis
+transcripteur d'iOS 26 ou reconnaissance classique avec indices), `PlayViewModel.handleVoice`, barre et message dans
+`PlayView`, ligne dans `NewGameSetupView`, aide « Jouer à la voix », politique de confidentialité (« Le micro »).
+Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLanguagesTests`, `VoiceMovesGameTests`,
+`VoiceMovesUITests`.
+
+- [x] `VoiceMoveParser.kt` : la lecture FRANÇAISE est portée (mesure) ; même rejeu des 51 essais, mêmes chiffres.
+- [ ] **Mesure sur le Galaxy** (écran « Mesure dictée » de la version de test) — prévue le 19/11 au soir. Elle dit si
+      la reconnaissance SUR L'APPAREIL d'Android (`createOnDeviceSpeechRecognizer`, Android 12+) suffit.
+- [ ] **Portage** après la mesure : les quatre autres vocabulaires, l'écoute (AudioRecord + même découpe des phrases,
+      puis EXTRA_AUDIO_SOURCE), `handleVoice` dans `PlayViewModel.kt`, barre et message, ligne de Nouvelle partie,
+      aide en cinq langues, permission `RECORD_AUDIO` dans le manifeste PRINCIPAL (toujours PAS `INTERNET`).
+- [ ] **Décision à prendre** : Android sous 12 (pas de reconnaissance garantie sur l'appareil) — proposé : la ligne
+      n'apparaît pas.

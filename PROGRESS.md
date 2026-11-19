@@ -11632,3 +11632,20 @@ par défaut ; liste des coups visible.
   dernier choix laissé par un autre test : premier lancement avec la préférence effacée par argument). Avant cela, la
   même cause — grille paresseuse depuis les trois colonnes — avait fait tomber sept tests « Variantes » : nouvelle
   aide commune `ChessLabUITests/HomeTiles.swift`, onze appels convertis.
+
+## 19/11 — Coups à la voix (iOS ; Android après la mesure du soir)
+
+Demande : donner ses coups à la voix, l'app reconnaît, et dit si le coup n'est pas valable. Étude, puis MESURE d'abord
+(décision) : 51 essais réels sur iPhone3, cinq reconnaissances sur l'appareil comparées (écran DEBUG « Mesure de la
+dictée ») ; la plupart des ratés venaient de la lecture des phrases (« Roi géant » = g1, « indien » = d1, « 17 » = d7),
+corrigée : 92-94 % au rejeu. Le transcripteur d'iOS 26 reste le meilleur ; le vocabulaire appris n'apporte rien.
+Décisions pour l'implémentation : coup joué directement, écoute automatique à mon tour, réglage dans la carte « Partie »,
+cinq langues, retour de mon coup à l'écran seulement, « annule » reprend, iOS 18-25 avec une note.
+- `VoiceMoveListener` découpe le flux du micro en phrases (niveau sonore au-dessus du bruit de fond, fin après 0,7 s de
+  silence), écrit la phrase dans un fichier temporaire, la reconnaît (iOS 26 : SpeechTranscriber ; sinon
+  SFSpeechRecognizer hors ligne + coups légaux en indices), l'efface. Le micro se tait pendant que l'app parle ; la voix
+  de l'app et les sons ne rendent plus la session ambiante tant qu'il écoute.
+- Autorisations demandées en allumant le réglage ; déclarées et traduites (InfoPlist, cinq langues).
+- Politique de confidentialité : section « Le micro » (19/11) ; page réengendrée.
+- Reste : essai à la voix sur iPhone (iOS 26) et sur un iPhone en iOS 18 ; mesure et portage Android.
+

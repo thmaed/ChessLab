@@ -1,6 +1,6 @@
 # Politique de confidentialité — ChessLab
 
-*Dernière mise à jour : 17 novembre 2026*
+*Dernière mise à jour : 19 novembre 2026*
 
 ChessLab existe sur **iPhone/iPad** et sur **Android**. Cette politique couvre
 les deux. Elles se ressemblent beaucoup, et là où elles diffèrent, c'est dit.
@@ -66,6 +66,21 @@ Vous pouvez aussi envoyer une image à ChessLab depuis une autre application
 (Photos, par exemple) avec le bouton **Partager** : l'image est transmise à
 ChessLab sur l'appareil même, lue par le scanner, et ne va nulle part ailleurs.
 
+## Le micro
+
+Le micro ne sert qu'à une chose : **dire vos coups** pendant une partie contre
+l'ordinateur, si vous allumez vous-même « Coups à la voix » dans Nouvelle
+partie. Le système vous demande alors l'autorisation ; sans elle, rien ne
+change.
+
+Le micro n'écoute que pendant une telle partie, quand c'est à vous de jouer.
+Ce qu'il entend est reconnu **entièrement sur l'appareil** — la reconnaissance
+vocale de l'appareil est réglée pour ne jamais passer par le réseau —, comparé
+aux coups possibles, puis oublié : **aucun son n'est enregistré, conservé ni
+envoyé**. Sur iPhone et iPad, iOS peut télécharger une fois, auprès d'Apple, le
+modèle de langue de la reconnaissance, comme il télécharge une voix ; rien de
+ce que vous dites ne part avec.
+
 ## Quand vous exportez quelque chose
 
 L'application sait exporter une partie (PGN), une position (FEN) ou une
@@ -111,7 +126,7 @@ thmaed@icloud.com
 
 # Privacy Policy — ChessLab
 
-*Last updated: 17 November 2026*
+*Last updated: 19 November 2026*
 
 ChessLab exists on **iPhone/iPad** and on **Android**. This policy covers both.
 They are very similar, and where they differ, it is said.
@@ -174,6 +189,19 @@ itself.
 You can also send an image to ChessLab from another app (Photos, for example)
 with the **Share** button: the image is handed to ChessLab on the device itself,
 read by the scanner, and goes nowhere else.
+
+## The microphone
+
+The microphone has one use only: **saying your moves** during a game against
+the computer, if you switch on "Voice moves" yourself in New game. The system
+then asks for your permission; without it, nothing changes.
+
+The microphone only listens during such a game, when it is your turn. What it
+hears is recognised **entirely on the device** — the device's speech
+recognition is set never to go through the network —, matched against the
+possible moves, then forgotten: **no sound is recorded, kept or sent**. On
+iPhone and iPad, iOS may download the recognition's language model from Apple
+once, as it downloads a voice; nothing you say goes with it.
 
 ## When you export something
 

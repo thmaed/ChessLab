@@ -50,6 +50,10 @@ struct NewGameSetupView: View {
     /// Partie à l'aveugle (17/11/2026).
     @State private var blindfold: BlindfoldLevel
     @State private var blindfoldVoice: Bool
+    /// Coups à la voix (19/11/2026) ; ce que l'appareil sait reconnaître dans la langue de l'app ; un refus d'autorisation.
+    @State private var voiceMoves: Bool
+    @State private var voiceAvailability: VoiceRecognizers.Availability?
+    @State private var voicePermissionDenied = false
     /// Propre à l'appareil, hors iCloud : voir ``BlindfoldVoice``.
     @AppStorage(BlindfoldVoice.voiceKey) private var voiceIdentifier = ""
 
@@ -107,6 +111,7 @@ struct NewGameSetupView: View {
         // plateau vide sans qu'on l'ait demandé.
         _blindfold = State(initialValue: .off)
         _blindfoldVoice = State(initialValue: saved.blindfoldVoice)
+        _voiceMoves = State(initialValue: saved.voiceMoves)
     }
 
     var body: some View {
@@ -531,6 +536,22 @@ struct NewGameSetupView: View {
                 }
             }
             rowDivider
+            settingRow("mic", "Coups à la voix") {
+                Toggle("", isOn: $voiceMoves).labelsHidden().tint(Theme.accent)
+                    .disabled(voiceAvailability == .unavailable)
+                    .accessibilityIdentifier("voiceMoves")
+            }
+            if let note = voiceMovesNote {
+                Text(note)
+                    .font(.caption)
+                    .foregroundStyle(voicePermissionDenied ? Theme.warning : Theme.textTertiary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.leading, 52)
+                    .padding(.trailing, 14)
+                    .padding(.bottom, 10)
+                    .accessibilityIdentifier("voiceMovesNote")
+            }
+            rowDivider
             settingRow("flag", "Départ") { startMenu }
             if useCustomFEN { fenField.padding(.horizontal, 14).padding(.bottom, 12) }
             if opponentMode == .elo {
@@ -541,8 +562,41 @@ struct NewGameSetupView: View {
         .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous).strokeBorder(Theme.stroke, lineWidth: 1))
         .animation(Theme.gentle, value: blindfold)
+        .animation(Theme.gentle, value: voiceMoves)
+        .task {
+            let availability = await VoiceRecognizers.availability(language: LocalizationController.activeLanguageCode)
+            voiceAvailability = availability
+            if availability == .unavailable { voiceMoves = false }
+        }
+        // Les autorisations se demandent en allumant, pas au premier coup de la partie.
+        .onChange(of: voiceMoves) { _, on in
+            guard on else { return }
+            voicePermissionDenied = false
+            Task {
+                if !(await VoiceMoveListener.requestPermissions()) {
+                    voiceMoves = false
+                    voicePermissionDenied = true
+                }
+            }
+        }
         .animation(Theme.gentle, value: useCustomFEN)
         .animation(Theme.gentle, value: opponentMode)
+    }
+
+    /// Sous « Coups à la voix » : comment ça marche, et ce que l'appareil permet (décision du 19/11/2026 : sous
+    /// iOS 18 à 25, la même fonction, avec cette note).
+    private var voiceMovesNote: LocalizedStringKey? {
+        if voicePermissionDenied {
+            return "Micro ou reconnaissance vocale refusés : autorisez-les dans Réglages."
+        }
+        if voiceAvailability == .unavailable {
+            return "Indisponible sur cet appareil dans cette langue : la reconnaissance doit se faire sur l'appareil, sans réseau."
+        }
+        guard voiceMoves else { return nil }
+        if voiceAvailability == .available(precise: false) {
+            return "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend. Reconnaissance plus précise à partir d'iOS 26."
+        }
+        return "Dites votre coup quand c'est à vous : il est joué dès qu'il est compris ; « annule » le reprend."
     }
 
     private var rowDivider: some View {
@@ -869,7 +923,8 @@ struct NewGameSetupView: View {
             engineResignationEnabled: engineResignationEnabled,
             opponentProfileID: opponentMode == .profile ? opponentProfileID : nil,
             blindfold: blindfold,
-            blindfoldVoice: blindfoldVoice
+            blindfoldVoice: blindfoldVoice,
+            voiceMoves: voiceMoves && voiceAvailability != .unavailable
         )
         if opponentMode == .profile {
             OpponentLevelStore.save(level: eloSlider, for: opponentProfileID)

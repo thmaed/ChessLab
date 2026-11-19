@@ -485,8 +485,8 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.strategy-games";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The camera is used to scan a chessboard (screen or real board viewed from above).";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Debug only: the microphone is used to measure on-device move dictation.";
-				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Debug only: speech is recognised on the device to measure move dictation.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "The microphone lets you say your moves during a game. Your voice is recognised on the device and never recorded or sent.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Speech recognition turns the move you say into a move on the board, on the device only, without the network.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -538,6 +538,8 @@
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.strategy-games";
 				INFOPLIST_KEY_NSCameraUsageDescription = "The camera is used to scan a chessboard (screen or real board viewed from above).";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "The microphone lets you say your moves during a game. Your voice is recognised on the device and never recorded or sent.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Speech recognition turns the move you say into a move on the board, on the device only, without the network.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;

@@ -130,3 +130,60 @@ struct VoiceMoveRealTrialsTests {
         #expect((right["D iOS 26"] ?? 0) >= 42)
     }
 }
+
+/// Les CINQ langues de l'app (décision du 19/11/2026) : les mêmes coups, dits comme on les dit dans chaque langue.
+struct VoiceMoveParserLanguagesTests {
+    private func uci(_ text: String, _ language: String, after lans: [String] = []) -> String? {
+        var board = Board(position: .standard)
+        for lan in lans { board.move(pieceAt: Square(String(lan.prefix(2))), to: Square(String(lan.suffix(2)))) }
+        let vocabulary = VoiceMoveParser.vocabulary(for: language)
+        if case let .move(move) = VoiceMoveParser.resolve(
+            transcripts: [text], among: VoiceMoveParser.candidates(in: board), vocabulary: vocabulary) {
+            return move.uci
+        }
+        return nil
+    }
+
+    private static let italianGame = ["e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5"]
+
+    @Test(arguments: [
+        ("knight f3", "en"), ("Knight to F3", "en"), ("Nf3", "en"), ("knight to foxtrot three", "en"),
+        ("caballo f3", "es"), ("caballo a efe tres", "es"), ("Cf3", "es"),
+        ("Springer f3", "de"), ("Springer nach f drei", "de"), ("Sf3", "de"),
+        ("cavallo f3", "it"), ("cavallo in effe tre", "it"), ("Cf3", "it"),
+        ("cavalier f3", "fr"), ("Cavalier Foxtrot 3", "fr"),
+    ])
+    func theKnightToF3(text: String, language: String) {
+        #expect(uci(text, language) == "g1f3", "« \(text) » (\(language))")
+    }
+
+    @Test(arguments: [
+        ("pawn e4", "en"), ("e four", "en"), ("peón e4", "es"), ("e cuatro", "es"),
+        ("Bauer e4", "de"), ("e vier", "de"), ("pedone e4", "it"), ("e quattro", "it"),
+    ])
+    func thePawnToE4(text: String, language: String) {
+        #expect(uci(text, language) == "e2e4", "« \(text) » (\(language))")
+    }
+
+    @Test(arguments: [
+        ("castles kingside", "en"), ("enroque corto", "es"), ("kurze Rochade", "de"), ("arrocco corto", "it"),
+        ("petit roque", "fr"),
+    ])
+    func shortCastling(text: String, language: String) {
+        #expect(uci(text, language, after: Self.italianGame) == "e1g1", "« \(text) » (\(language))")
+    }
+
+    @Test func undoIsHeardInEveryLanguage() {
+        for (text, language) in [("annule", "fr"), ("take back", "en"), ("deshacer", "es"), ("zurück", "de"),
+                                 ("annulla", "it")] {
+            #expect(VoiceMoveParser.isUndo(text, vocabulary: VoiceMoveParser.vocabulary(for: language)), "\(text)")
+        }
+        #expect(!VoiceMoveParser.isUndo("cavalier f3"))
+    }
+
+    @Test func aConversationIsNotChess() {
+        #expect(!VoiceMoveParser.soundsLikeChess(["tu veux un café ?"]))
+        #expect(VoiceMoveParser.soundsLikeChess(["cavalier f3"]))
+        #expect(VoiceMoveParser.soundsLikeChess(["annule"]))
+    }
+}

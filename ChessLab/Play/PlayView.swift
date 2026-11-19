@@ -27,6 +27,9 @@ struct PlayView: View {
     @State private var showPanelSheet = false
     /// Le dernier « Coup impossible » déjà effacé.
     @State private var dismissedBlindNoticeID = 0
+    /// Coups à la voix (19/11/2026) : le micro, ouvert le temps de la partie si le réglage est allumé.
+    @State private var voiceListener: VoiceMoveListener?
+    @State private var dismissedVoiceNoticeID = 0
     @State private var copiedMessage: String?
     @State private var showResignConfirmation = false
     @State private var showDrawConfirmation = false
@@ -136,8 +139,18 @@ struct PlayView: View {
         // Le couple appear/disappear, et pas seulement `disappear` : le view
         // model survit désormais à la reconstruction de la vue (bascule
         // d'ossature), il faut donc lui rendre son moteur au retour.
-        .onAppear { viewModel.handleViewAppear() }
-        .onDisappear { viewModel.handleViewDisappear() }
+        .onAppear {
+            viewModel.handleViewAppear()
+            startVoiceIfNeeded()
+        }
+        .onDisappear {
+            viewModel.handleViewDisappear()
+            stopVoice()
+        }
+        // Le micro n'écoute qu'à mon tour : il suit le trait, et les coups légaux changent à chaque coup.
+        .onChange(of: viewModel.isVoiceTurn) { _, _ in syncVoiceTurn() }
+        .onChange(of: viewModel.moveLog.count) { _, _ in syncVoiceTurn() }
+        .onChange(of: viewModel.outcome) { _, outcome in if outcome != nil { stopVoice() } }
         // Une victoire contre l'ordinateur : le bon moment, le cas échéant, pour
         // demander un avis (voir ``ReviewPrompt``).
         .onChange(of: viewModel.outcome) { previous, outcome in
@@ -148,8 +161,10 @@ struct PlayView: View {
             switch newPhase {
             case .background, .inactive:
                 viewModel.handleAppBackgrounded()
+                if newPhase == .background { stopVoice() }
             case .active:
                 viewModel.handleAppForegrounded()
+                startVoiceIfNeeded()
             @unknown default:
                 break
             }
@@ -169,6 +184,7 @@ struct PlayView: View {
             // seule ligne chacune, sans marge qui les détacherait du plateau.
             topClock
             blindBar
+            voiceBar
             // Plateau de BORD À BORD : il annule la marge horizontale du
             // conteneur pour lui seul. C'est le seul élément dont la taille
             // est utile — chaque point gagné en largeur est un point sur les
@@ -220,6 +236,7 @@ struct PlayView: View {
             ThermalBadge()
             topClock
             blindBar
+            voiceBar
             board
                 // BORD À BORD : annule la marge horizontale du conteneur pour
                 // le seul plateau (même principe qu'en iPhone), qui touche
@@ -332,6 +349,7 @@ struct PlayView: View {
                 // l'adversaire en haut, soi en bas, comme sur l'échiquier.
                 if clocksBeside { topClock }
                 blindBar
+                voiceBar
                 ScrollView {
                     VStack(spacing: 16) {
                         if viewModel.settings.showEvalBar && !viewModel.isBlindfold {
@@ -486,7 +504,12 @@ struct PlayView: View {
             onDropPiece: { viewModel.attemptUserMove(from: $0, to: $1) },
             pieceMask: viewModel.boardMask
         )
-        .overlay(alignment: .top) { blindNoticeView }
+        .overlay(alignment: .top) {
+            VStack(spacing: 6) {
+                blindNoticeView
+                voiceNoticeView
+            }
+        }
         .animation(.easeInOut(duration: 0.25), value: viewModel.boardMask)
     }
 
@@ -549,6 +572,125 @@ struct PlayView: View {
         .accessibilityValue(Text("\(viewModel.peekCount)"))
         .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier("blindPeek")
+    }
+
+    // MARK: Coups à la voix (19/11/2026)
+
+    private func startVoiceIfNeeded() {
+        guard viewModel.settings.voiceMoves, viewModel.outcome == nil, voiceListener == nil else { return }
+        let listener = VoiceMoveListener()
+        listener.onTranscripts = { transcripts in viewModel.handleVoice(transcripts) }
+        voiceListener = listener
+        Task {
+            await listener.start()
+            syncVoiceTurn()
+        }
+    }
+
+    private func stopVoice() {
+        voiceListener?.stop()
+        voiceListener = nil
+    }
+
+    private func syncVoiceTurn() {
+        guard let voiceListener else { return }
+        let mine = viewModel.isVoiceTurn
+        voiceListener.setTurn(isMine: mine, hints: mine ? viewModel.voiceHints : [])
+    }
+
+    /// Au-dessus du plateau : ce que fait le micro, et de quoi le mettre en pause (une conversation à table).
+    @ViewBuilder
+    private var voiceBar: some View {
+        if viewModel.settings.voiceMoves, viewModel.outcome == nil {
+            let status = voiceListener?.status ?? .starting
+            let paused = status == .paused
+            HStack(spacing: 10) {
+                Image(systemName: voiceSymbol(status))
+                    .font(.body.weight(.semibold))
+                    .foregroundStyle(voiceTint(status))
+                    .symbolEffect(.pulse, isActive: status == .listening)
+                    .frame(width: 24)
+                Text(LocalizedStringKey(voiceStatusKey(status)))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.textPrimary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+                Spacer(minLength: 4)
+                if status != .denied, status != .unavailable, status != .starting {
+                    Button {
+                        voiceListener?.isPaused.toggle()
+                    } label: {
+                        Image(systemName: paused ? "mic.fill" : "pause.fill")
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(Theme.teal)
+                            .frame(width: 36, height: 30)
+                            .background(Theme.teal.opacity(0.12), in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(paused ? Text("Reprendre l'écoute") : Text("Mettre l'écoute en pause"))
+                    .accessibilityIdentifier("voicePause")
+                }
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(Theme.surfaceElevated, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("voiceBar")
+        }
+    }
+
+    private func voiceSymbol(_ status: VoiceMoveListener.Status) -> String {
+        switch status {
+        case .listening: "mic.fill"
+        case .recognizing: "waveform"
+        case .paused: "mic.slash"
+        case .denied, .unavailable: "mic.slash.fill"
+        case .starting, .waiting: "mic"
+        }
+    }
+
+    private func voiceTint(_ status: VoiceMoveListener.Status) -> Color {
+        switch status {
+        case .listening, .recognizing: Theme.accent
+        case .denied, .unavailable: Theme.warning
+        default: Theme.textSecondary
+        }
+    }
+
+    private func voiceStatusKey(_ status: VoiceMoveListener.Status) -> String {
+        switch status {
+        case .starting: "Préparation du micro…"
+        case .listening: "Dites votre coup"
+        case .recognizing: "Je vous ai entendu…"
+        case .waiting: "Le micro attend votre tour"
+        case .paused: "Écoute en pause"
+        case .denied: "Micro ou reconnaissance vocale non autorisés (voir Réglages)"
+        case .unavailable: "Dictée des coups indisponible sur cet appareil dans cette langue"
+        }
+    }
+
+    /// Le coup joué à la voix (retour À L'ÉCRAN, décision du 19/11/2026), ou ce qui n'a pas marché.
+    @ViewBuilder
+    private var voiceNoticeView: some View {
+        if let notice = viewModel.voiceNotice, notice.id != dismissedVoiceNoticeID {
+            Label {
+                Text(verbatim: notice.text)
+            } icon: {
+                Image(systemName: notice.isError ? "exclamationmark.bubble" : "mic.fill")
+            }
+            .font(notice.isError ? .subheadline.weight(.semibold) : .title3.weight(.bold))
+            .foregroundStyle(notice.isError ? .white : Theme.background)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(notice.isError ? Theme.danger.opacity(0.92) : Theme.accent.opacity(0.95), in: Capsule())
+            .padding(.top, 10)
+            .transition(.opacity)
+            .accessibilityIdentifier("voiceNotice")
+            .task(id: notice.id) {
+                try? await Task.sleep(for: .milliseconds(notice.isError ? 2200 : 2500))
+                withAnimation { dismissedVoiceNoticeID = notice.id }
+            }
+        }
     }
 
     /// « Coup impossible », un instant, en haut du plateau.
