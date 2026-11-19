@@ -1,4 +1,5 @@
 import ChessKit
+import Foundation
 import Testing
 @testable import ChessLab
 
@@ -80,5 +81,52 @@ struct VoiceMoveParserTests {
         #expect(forms.contains("cavalier f3"))
         #expect(forms.contains("pion en e4"))
         #expect(forms.contains("e4"))
+    }
+}
+
+/// Les 51 essais RÉELS du 19/11/2026 (iPhone3, l'utilisateur, cinq reconnaissances) rejoués : ce que chaque
+/// reconnaissance a entendu passe de nouveau par le module. Garde-fou : le module ne doit pas régresser sur de la
+/// vraie parole, et ne doit presque jamais choisir un AUTRE coup que celui dit.
+struct VoiceMoveRealTrialsTests {
+    private struct Trial: Decodable {
+        struct Result: Decodable { let engine: String; let transcripts: [String] }
+        let target: VoiceMoveParser.Candidate
+        let candidates: [VoiceMoveParser.Candidate]
+        let results: [Result]
+    }
+
+    private static func trials() throws -> [Trial] {
+        let url = URL(fileURLWithPath: #filePath).deletingLastPathComponent()
+            .appending(path: "VoiceDictation/trials-2026-11-19-iphone3.jsonl")
+        let text = try String(contentsOf: url, encoding: .utf8)
+        return try text.split(separator: "\n").map { try JSONDecoder().decode(Trial.self, from: Data($0.utf8)) }
+    }
+
+    @Test func replayTheRealTrials() throws {
+        let trials = try Self.trials()
+        #expect(trials.count == 51)
+        var right: [String: Int] = [:], wrong: [String: Int] = [:], anyRight = 0
+        for trial in trials {
+            var found = false
+            for result in trial.results {
+                switch VoiceMoveParser.resolve(transcripts: result.transcripts, among: trial.candidates) {
+                case let .move(move) where move == trial.target:
+                    right[result.engine, default: 0] += 1
+                    found = true
+                case .move:
+                    wrong[result.engine, default: 0] += 1
+                default:
+                    break
+                }
+            }
+            if found { anyRight += 1 }
+        }
+        for engine in right.keys.sorted() {
+            print("REJEU \(engine) : \(right[engine] ?? 0)/\(trials.count) justes, \(wrong[engine] ?? 0) faux coups")
+        }
+        print("REJEU au moins une : \(anyRight)/\(trials.count)")
+        // Avant l'amélioration du 19/11 : 36 à 42 justes selon la reconnaissance, 45 avec au moins une.
+        #expect(anyRight >= 45)
+        #expect((right["D iOS 26"] ?? 0) >= 42)
     }
 }

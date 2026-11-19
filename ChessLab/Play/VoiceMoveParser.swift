@@ -63,6 +63,16 @@ enum VoiceMoveParser {
         "fou": "B", "fous": "B",
         "cavalier": "N", "cavaliers": "N", "chevalier": "N", "chevaliers": "N",
         "pion": "P", "pions": "P",
+        // Entendus le 19/11 (mesure sur iPhone3) : « Tout en cinq » pour « Tour en e5 », « Roy », « Rouen » (roi en).
+        "tout": "R", "roy": "K", "rouen": "K",
+    ]
+    /// Des mots où la reconnaissance a FONDU une case (mesure du 19/11/2026, 51 essais) : « en g1 » → « géant »,
+    /// « en d1 » → « indien », « en c1 » → « ancien », « en h6 » → « hachis », « d7 » → « décède », « 17 » (dix-sept),
+    /// « b1 » → « bien un », « en g » → « Angers », « f » → « of ». On les redécoupe avant de lire.
+    private static let fused: [String: [String]] = [
+        "géant": ["g", "1"], "indien": ["d", "1"], "indéen": ["d", "1"], "ancien": ["c", "1"], "hachis": ["h", "6"],
+        "décède": ["d", "7"], "décès": ["d", "7"], "17": ["d", "7"], "18": ["d", "8"], "dix": ["d"], "10": ["d"],
+        "bien": ["b"], "angers": ["g"], "of": ["f"], "off": ["f"],
     ]
     private static let captureWords: Set<String> = ["prend", "prends", "prent", "pren", "mange", "manges", "x", "prise"]
     private static let promotionWords: Set<String> = ["promotion", "promu", "promeut", "promouvoir"]
@@ -105,7 +115,7 @@ enum VoiceMoveParser {
         // Une lettre collée à son chiffre (« f3 », « e4 ») : deux mots.
         lowered = lowered.replacingOccurrences(of: #"([a-h])([1-8])"#, with: "$1 $2", options: .regularExpression)
         let separators = CharacterSet.alphanumerics.union(CharacterSet(charactersIn: "'")).inverted
-        return lowered.components(separatedBy: separators).filter { !$0.isEmpty }
+        return lowered.components(separatedBy: separators).filter { !$0.isEmpty }.flatMap { fused[$0] ?? [$0] }
     }
 
     static func heard(_ text: String) -> Heard {
@@ -143,6 +153,15 @@ enum VoiceMoveParser {
             if captureWords.contains(word) { result.capture = true; index += 1; continue }
             if promotionWords.contains(word) { promotionNext = true; index += 1; continue }
 
+            // Initiale et colonne collées, puis le chiffre : « FB quatre » = fou b4 (entendu le 19/11).
+            if result.piece == nil, result.squares.isEmpty, word.count == 2,
+               let initial = writtenInitials[String(word.prefix(1))], let file = word.last, "abcdefgh".contains(file),
+               let next, let rank = ranks[next] {
+                result.piece = initial
+                result.squares.append("\(file)\(rank)")
+                index += 2
+                continue
+            }
             // Une initiale écrite suivie d'une case complète : « C f 3 ».
             if result.piece == nil, result.squares.isEmpty, let initial = writtenInitials[word],
                let next, strongFiles[next] != nil, let afterNext, ranks[afterNext] != nil {
@@ -185,7 +204,13 @@ enum VoiceMoveParser {
             }
             return outcome(castles)
         }
-        guard let destination = heard.squares.last else { return .notUnderstood }
+        guard let destination = heard.squares.last else {
+            // La colonne s'est perdue (« Roi deux », « Dame en huit », « Tour cinq » — un tiers des ratés du 19/11) :
+            // la pièce et la rangée suffisent si UN seul coup y répond ; sinon on demande de répéter.
+            guard let piece = heard.piece, let rank = heard.fromRank else { return .notUnderstood }
+            let pool = candidates.filter { !$0.isCastle && $0.piece == piece && $0.to.last == rank }
+            return pool.isEmpty ? .notUnderstood : outcome(pool)
+        }
 
         var pool = candidates.filter { $0.to == destination && !$0.isCastle }
         // Le roque dit par la case du roi (« roi g1 ») reste un roque.
