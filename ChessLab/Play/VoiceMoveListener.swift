@@ -301,7 +301,7 @@ final class VoiceMoveListener {
         detector.onUtterance = { [weak self] utterance in
             Task { @MainActor in await self?.recognize(utterance) }
         }
-        input.installTap(onBus: 0, bufferSize: 1024, format: format) { buffer, _ in detector.ingest(buffer) }
+        Self.installTap(on: input, format: format, feeding: detector)
         do {
             try engine.start()
         } catch {
@@ -324,6 +324,15 @@ final class VoiceMoveListener {
             }
         }
         refresh()
+    }
+
+    /// Le robinet du micro, écrit HORS du fil principal : AVAudioEngine l'appelle sur son fil audio, et une fermeture
+    /// créée dans une méthode @MainActor hérite de cet isolement — Swift 6 le vérifie à l'exécution et arrête l'app
+    /// (« dispatch_assert_queue_fail », quatre plantages sur iPhone3 le 19/11/2026 dès que le micro écoutait ;
+    /// le simulateur, sans vrai micro, ne l'a pas montré). Même piège que `requestSpeechAuthorization`.
+    nonisolated private static func installTap(on input: AVAudioInputNode, format: AVAudioFormat,
+                                               feeding detector: UtteranceDetector) {
+        input.installTap(onBus: 0, bufferSize: 1024, format: format) { buffer, _ in detector.ingest(buffer) }
     }
 
     func stop() {
