@@ -22,6 +22,10 @@ struct SettingsView: View {
     private let monitor = CloudSyncMonitor.shared
     /// « Vos appareils » (voir ``CloudDeviceRegistry``), relu à l'apparition et à chaque changement.
     @State private var syncDevices: [CloudDeviceRecord] = []
+    #if DEBUG
+    /// La mesure « coups à la voix » (19/11/2026), versions de développement seulement.
+    @State private var showVoiceLab = false
+    #endif
 
     var body: some View {
         ScrollView {
@@ -36,6 +40,9 @@ struct SettingsView: View {
                 syncSection
                 helpSection
                 licensesSection
+                #if DEBUG
+                voiceLabSection
+                #endif
                 versionFooter
             }
             .padding(20)
@@ -525,6 +532,18 @@ struct SettingsView: View {
             .cardStyle()
         }
     }
+
+    #if DEBUG
+    private var voiceLabSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            sectionTitle("Développement")
+            aboutRow(systemImage: "mic", title: "Mesure de la dictée",
+                     subtitle: "Coups dits à la voix, reconnus sur l'appareil.") { showVoiceLab = true }
+                .cardStyle()
+                .fullScreenCover(isPresented: $showVoiceLab) { VoiceDictationLabView() }
+        }
+    }
+    #endif
 
     private func aboutRow(systemImage: String, title: LocalizedStringKey, subtitle: LocalizedStringKey,
                           action: @escaping () -> Void) -> some View {
