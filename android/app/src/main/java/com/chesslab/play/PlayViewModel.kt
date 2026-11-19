@@ -453,7 +453,8 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             val app = getApplication<Application>()
             BlindfoldVoice.say(
                 app,
-                com.chesslab.ui.MoveNarration.announcement(app, opponentName(), move.san),
+                // Le coup seul, sans le nom de l'adversaire — comme iOS (retour du 19/11/2026).
+                com.chesslab.ui.MoveNarration.describe(app, move.san),
                 app.resources.configuration.locales[0].toLanguageTag(),
             )
         }

@@ -1,6 +1,7 @@
 package com.chesslab.play
 
 import android.content.Context
+import android.media.AudioAttributes
 import android.speech.tts.TextToSpeech
 import androidx.annotation.StringRes
 import chesskit.Piece
@@ -65,6 +66,9 @@ object PeekTiming {
  * Les coups de l'adversaire lus à voix haute — synthèse vocale de l'APPAREIL (aucune permission réseau),
  * dans la langue de l'app. Pendant de `BlindfoldVoice` (iOS). Si aucune voix n'est installée pour cette
  * langue, le système retombe sur la sienne, ou se tait.
+ *
+ * La voix sort sur le volume MULTIMÉDIA, que le mode silencieux de la sonnerie ne coupe pas — c'est ce qu'iOS a dû
+ * aller chercher le 19/11/2026 (sa session ambiante rendait la voix muette en mode Silencieux).
  */
 object BlindfoldVoice {
     private var tts: TextToSpeech? = null
@@ -73,7 +77,15 @@ object BlindfoldVoice {
     fun say(context: Context, text: String, language: String) {
         val engine = tts ?: TextToSpeech(context.applicationContext) { status ->
             ready = status == TextToSpeech.SUCCESS
-            if (ready) speakNow(text, language)
+            if (ready) {
+                tts?.setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .build()
+                )
+                speakNow(text, language)
+            }
         }.also { tts = it }
         if (ready) speakNow(text, language)
     }

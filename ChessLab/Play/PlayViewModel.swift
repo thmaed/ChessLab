@@ -1324,7 +1324,8 @@ final class PlayViewModel {
         playFeedback(for: move, state: board.state)
         announceMove(move)
         if settings.isBlindfold, settings.blindfoldVoice, move.piece.color == engineColor {
-            BlindfoldVoice.shared.say("\(opponentDisplayName) : \(MoveNarration.describe(san: move.san))")
+            // Le coup seul : le nom de l'adversaire avant chaque coup était de trop (retour du 19/11/2026).
+            BlindfoldVoice.shared.say(MoveNarration.describe(san: move.san))
         }
         persistAutosave()
 

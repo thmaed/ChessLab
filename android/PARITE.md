@@ -2185,7 +2185,10 @@ fin, bilan « À l'aveugle · niveau · N coups d'œil », étiquette « À l'av
       iOS 26), `WideLowDashboardUITests` (la carte tient sans défiler) ; Android `BlindfoldTest` JVM (5) et instrumenté
       (Galaxy A16 et émulateur).
 - [ ] **À vérifier sur appareil, par l'oreille : la VOIX** (aucun test automatique ne l'écoute ; Android : selon les
-      voix installées sur le téléphone).
+      voix installées sur le téléphone). iPhone3, 19/11/2026 : muette en mode Silencieux (session ambiante) → la voix
+      passe en lecture de paroles le temps de parler ; ENTENDUE ensuite. Elle dit le coup seul, sans le nom de
+      l'adversaire (retour du même jour, porté). Android : sortie multimédia rendue explicite (le silencieux ne la coupe
+      pas) — reste à l'écouter sur le Galaxy.
 - [ ] **À vérifier sur le Galaxy : l'aspect du réglage** (captures prises de la partie et du « Coup impossible » : lisibles).
 - **Écart TECHNIQUE, sans effet visible** : Android garde niveau, voix et coups d'œil de la partie en cours dans la
   colonne `settings_json` de la sauvegarde (aucune migration) ; iOS dans `PlayGameAutosave`.

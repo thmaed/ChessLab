@@ -71,18 +71,47 @@ enum BlindfoldLevel: String, Codable, CaseIterable, Hashable, Identifiable {
 
 /// Les coups de l'adversaire lus à voix haute — synthèse vocale de l'appareil, qui ne sort pas sur le réseau.
 /// Les phrases sont celles de VoiceOver (``MoveNarration``), dans la langue de l'app.
+///
+/// La session audio de l'app est AMBIANTE (``SoundPlayer``) : le mode Silencieux de l'iPhone la coupe, ce qui va aux
+/// petits sons du plateau mais rendait la voix muette (19/11/2026, « je n'entends pas la voix » sur iPhone3). La voix,
+/// demandée expressément, passe donc en LECTURE de paroles le temps de parler, puis la session redevient ambiante.
 @MainActor
-final class BlindfoldVoice {
+final class BlindfoldVoice: NSObject, AVSpeechSynthesizerDelegate {
     static let shared = BlindfoldVoice()
     private let synthesizer = AVSpeechSynthesizer()
+
+    override private init() {
+        super.init()
+        synthesizer.delegate = self
+    }
 
     func say(_ text: String) {
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: LocalizationController.activeLanguageCode)
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate
         synthesizer.stopSpeaking(at: .immediate)
+        let session = AVAudioSession.sharedInstance()
+        try? session.setCategory(.playback, mode: .spokenAudio, options: [.mixWithOthers])
+        try? session.setActive(true)
         synthesizer.speak(utterance)
     }
 
-    func stop() { synthesizer.stopSpeaking(at: .immediate) }
+    func stop() {
+        synthesizer.stopSpeaking(at: .immediate)
+        backToAmbient()
+    }
+
+    /// La session redevient celle des sons du plateau, sauf si une nouvelle phrase a pris la suite.
+    private func backToAmbient() {
+        guard !synthesizer.isSpeaking else { return }
+        try? AVAudioSession.sharedInstance().setCategory(.ambient, options: [.mixWithOthers])
+    }
+
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        Task { @MainActor in self.backToAmbient() }
+    }
+
+    nonisolated func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
+        Task { @MainActor in self.backToAmbient() }
+    }
 }
