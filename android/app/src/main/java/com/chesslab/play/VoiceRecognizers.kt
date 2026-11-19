@@ -21,8 +21,8 @@ object VoiceRecognizers {
     /** [downloadable] : la langue existe sur l'appareil, mais son modèle n'est pas encore installé. */
     enum class Availability { available, downloadable, unavailable }
 
-    /** Les langues de l'app → les locales de reconnaissance (comme iOS : fr-FR, en-US, es-ES, de-DE, it-IT). */
-    fun locale(language: String): String = when (language.take(2)) {
+    /** Les langues de l'app → les locales de reconnaissance par défaut (comme iOS : fr-FR, en-US, es-ES, de-DE, it-IT). */
+    fun defaultLocale(language: String): String = when (language.take(2)) {
         "en" -> "en-US"
         "es" -> "es-ES"
         "de" -> "de-DE"
@@ -30,9 +30,28 @@ object VoiceRecognizers {
         else -> "fr-FR"
     }
 
+    /**
+     * La variante de la langue À DEMANDER au reconnaisseur. Android ne reconnaît que la variante dont le paquet est
+     * installé : un Galaxy réglé en français de Suisse a « fr-CH » et répond « langue indisponible » (erreur 13) à
+     * « fr-FR » (constaté le 19/11/2026). Donc : la variante du téléphone si elle est installée, sinon celle par
+     * défaut si elle l'est, sinon n'importe quelle variante installée de la langue ; rien d'installé → celle du
+     * téléphone si c'est la même langue (Android 12 ne dit pas ce qui est installé), sinon celle par défaut.
+     */
+    fun locale(language: String, installed: List<String> = emptyList(), device: Locale = Locale.getDefault()): String {
+        val fallback = defaultLocale(language)
+        val wanted = Locale.forLanguageTag(fallback).language
+        val deviceTag = device.toLanguageTag().takeIf { device.language == wanted && device.country.isNotEmpty() }
+        val sameLanguage = installed.filter { Locale.forLanguageTag(it).language == wanted }
+        fun installedAs(tag: String?) = tag?.let { t -> sameLanguage.firstOrNull { it.equals(t, ignoreCase = true) } }
+        return installedAs(deviceTag) ?: installedAs(fallback) ?: sameLanguage.firstOrNull() ?: deviceTag ?: fallback
+    }
+
+    /** La variante retenue par la dernière vérification ([availability]), langue par langue. */
+    private val chosen = java.util.concurrent.ConcurrentHashMap<String, String>()
+
     fun intent(language: String): Intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
         .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        .putExtra(RecognizerIntent.EXTRA_LANGUAGE, locale(language))
+        .putExtra(RecognizerIntent.EXTRA_LANGUAGE, chosen[language.take(2)] ?: locale(language))
         .putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, true)
         .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
 
@@ -52,15 +71,17 @@ object VoiceRecognizers {
             onResult(Availability.available)
             return
         }
-        val wanted = Locale.forLanguageTag(locale(language)).language
+        val wanted = Locale.forLanguageTag(defaultLocale(language)).language
         val recognizer = SpeechRecognizer.createOnDeviceSpeechRecognizer(context)
         val intent = intent(language)
         recognizer.checkRecognitionSupport(intent, context.mainExecutor, object : RecognitionSupportCallback {
             override fun onSupportResult(support: RecognitionSupport) {
                 fun has(list: List<String>) = list.any { Locale.forLanguageTag(it).language == wanted }
+                // Une variante installée (ou en cours) devient celle qu'on demandera ; sinon celle qu'on téléchargerait.
+                val ready = support.installedOnDeviceLanguages + support.pendingOnDeviceLanguages
+                chosen[language.take(2)] = locale(language, if (has(ready)) ready else support.supportedOnDeviceLanguages)
                 val result = when {
-                    has(support.installedOnDeviceLanguages) || has(support.pendingOnDeviceLanguages) ->
-                        Availability.available
+                    has(ready) -> Availability.available
                     has(support.supportedOnDeviceLanguages) -> Availability.downloadable
                     else -> Availability.unavailable
                 }

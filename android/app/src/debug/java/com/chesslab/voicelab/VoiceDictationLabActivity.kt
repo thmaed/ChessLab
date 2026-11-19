@@ -134,6 +134,8 @@ class VoiceLab(private val activity: Activity) {
     var modelStatus by mutableStateOf("modèle : vérification…"); private set
     val trials = mutableStateListOf<Trial>()
 
+    /** La variante du français demandée au reconnaisseur : celle installée sur le téléphone (voir checkFrenchModel). */
+    private var locale = com.chesslab.play.VoiceRecognizers.locale("fr")
     private var fen = ""
     private var positions: List<Puzzle> = emptyList()
     private val scope = MainScope()
@@ -167,12 +169,15 @@ class VoiceLab(private val activity: Activity) {
             override fun onSupportResult(support: RecognitionSupport) {
                 val installed = support.installedOnDeviceLanguages
                 val french = installed.any { it.startsWith("fr") }
+                // La variante INSTALLÉE (fr-CH sur un téléphone suisse) : demander fr-FR donnait l'erreur 13.
+                locale = com.chesslab.play.VoiceRecognizers.locale("fr",
+                    if (french) installed else support.supportedOnDeviceLanguages)
                 modelStatus = when {
-                    french -> "modèle français installé (${installed.filter { it.startsWith("fr") }.joinToString()})"
+                    french -> "modèle français installé (${installed.filter { it.startsWith("fr") }.joinToString()}) · reconnaissance en $locale"
                     support.pendingOnDeviceLanguages.any { it.startsWith("fr") } -> "modèle français en téléchargement…"
                     support.supportedOnDeviceLanguages.any { it.startsWith("fr") } -> {
-                        recognizer.triggerModelDownload(intent)
-                        "modèle français demandé au système — réessayez dans un moment"
+                        recognizer.triggerModelDownload(baseIntent())
+                        "modèle français ($locale) demandé au système — réessayez dans un moment"
                     }
                     else -> "français NON proposé sur l'appareil (installées : ${installed.joinToString()})"
                 }
@@ -294,7 +299,7 @@ class VoiceLab(private val activity: Activity) {
 
     private fun baseIntent() = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
         putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-        putExtra(RecognizerIntent.EXTRA_LANGUAGE, "fr-FR")
+        putExtra(RecognizerIntent.EXTRA_LANGUAGE, locale)
         putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5)
         putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, false)
     }
