@@ -1451,6 +1451,9 @@
     <string name="ng_about">Informazioni su %1$s</string>
     <string name="ng_stockfish_blurb">Il motore, limitato alla forza che scegli.</string>
     <string name="ng_voice">Voce</string>
+    <string name="ng_voice_system">Voce di sistema</string>
+    <string name="ng_voice_system_short">Sistema</string>
+    <string name="ng_voice_numbered">Voce %1$d</string>
     <string name="ng_start_initial">Iniziale</string>
     <string name="ng_start_custom">Personalizzata</string>
     <string name="ng_start_position">Posizione iniziale</string>

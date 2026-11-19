@@ -70,4 +70,33 @@ class BlindfoldTest {
         assertEquals(500L, PeekTiming.remainingMs(pressedAt = 1_000, releasedAt = 1_200))
         assertEquals(0L, PeekTiming.remainingMs(pressedAt = 1_000, releasedAt = 2_500))
     }
+
+    /** Le choix de la voix (19/11/2026) — pendant de `BlindfoldVoiceChoiceTests` (iOS). */
+    @Test fun `les voix proposées sont celles de la langue, installées et hors réseau, numérotées par nom`() {
+        val v = { name: String, lang: String, country: String, net: Boolean, inst: Boolean ->
+            BlindfoldVoice.VoiceInfo(name, lang, country, net, inst)
+        }
+        val voices = listOf(
+            v("fr-fr-x-frd-local", "fr", "FR", false, true),
+            v("fr-fr-x-frc-local", "fr", "FR", false, true),
+            v("fr-fr-x-frc-network", "fr", "FR", true, true),
+            v("fr-fr-x-fre-local", "fr", "FR", false, false),
+            v("en-us-x-sfg-local", "en", "US", false, true),
+        )
+        val options = BlindfoldVoice.optionsOf(voices, "fr")
+        assertEquals(listOf("fr-fr-x-frc-local", "fr-fr-x-frd-local"), options.map { it.name })
+        assertEquals(listOf(1, 2), options.map { it.number })
+        assertTrue("une seule région : on ne la dit pas", options.all { it.region == null })
+    }
+
+    @Test fun `la région n'est dite que si la langue en a plusieurs`() {
+        val options = BlindfoldVoice.optionsOf(
+            listOf(
+                BlindfoldVoice.VoiceInfo("fr-ca-x-caa-local", "fr", "CA", false, true),
+                BlindfoldVoice.VoiceInfo("fr-fr-x-frc-local", "fr", "FR", false, true),
+            ),
+            "fr",
+        )
+        assertEquals(listOf("Canada", "France"), options.map { it.region })
+    }
 }

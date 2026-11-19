@@ -75,19 +75,73 @@ enum BlindfoldLevel: String, Codable, CaseIterable, Hashable, Identifiable {
 /// La session audio de l'app est AMBIANTE (``SoundPlayer``) : le mode Silencieux de l'iPhone la coupe, ce qui va aux
 /// petits sons du plateau mais rendait la voix muette (19/11/2026, « je n'entends pas la voix » sur iPhone3). La voix,
 /// demandée expressément, passe donc en LECTURE de paroles le temps de parler, puis la session redevient ambiante.
+///
+/// La voix se CHOISIT (19/11/2026, « on peut avoir d'autres voix comme une voix féminine ? ») parmi celles installées
+/// sur l'iPhone pour la langue de l'app ; d'autres se téléchargent dans Réglages › Accessibilité › Contenu énoncé. Le
+/// choix est propre à l'appareil (les identifiants de voix n'existent pas ailleurs) : il vit dans les préférences
+/// locales, jamais dans iCloud. Vide = la voix du système pour la langue, comme avant.
 @MainActor
 final class BlindfoldVoice: NSObject, AVSpeechSynthesizerDelegate {
     static let shared = BlindfoldVoice()
+    /// Clé des préférences locales : l'identifiant de la voix choisie, vide pour celle du système.
+    static let voiceKey = "blindfold.voiceIdentifier"
     private let synthesizer = AVSpeechSynthesizer()
+
+    /// Une voix proposée : son nom, et ce qui la distingue (féminine ou masculine, région, qualité).
+    struct Option: Identifiable, Hashable {
+        let id: String
+        let name: String
+        let gender: AVSpeechSynthesisVoiceGender
+        let region: String?
+        let quality: AVSpeechSynthesisVoiceQuality
+    }
 
     override private init() {
         super.init()
         synthesizer.delegate = self
     }
 
+    /// Les voix installées pour `language` (« fr », « en »…), sans les voix fantaisie ni la voix personnelle ;
+    /// la région n'est dite que si la langue en a plusieurs. Les meilleures d'abord, puis par nom.
+    static func options(language: String = LocalizationController.activeLanguageCode) -> [Option] {
+        let voices = AVSpeechSynthesisVoice.speechVoices().filter { voice in
+            Locale(identifier: voice.language).language.languageCode?.identifier == language
+                && !voice.voiceTraits.contains(.isNoveltyVoice)
+                && !voice.voiceTraits.contains(.isPersonalVoice)
+        }
+        let regions = Set(voices.map { Locale(identifier: $0.language).region?.identifier })
+        let names = Locale(identifier: language)
+        return voices
+            .map { voice in
+                let region = Locale(identifier: voice.language).region?.identifier
+                return Option(id: voice.identifier, name: voice.name, gender: voice.gender,
+                              region: regions.count > 1 ? region.flatMap { names.localizedString(forRegionCode: $0) } : nil,
+                              quality: voice.quality)
+            }
+            .sorted { ($0.quality.rawValue, $1.name) > ($1.quality.rawValue, $0.name) }
+    }
+
+    /// La voix qui parlera : celle choisie si elle est encore installée et dans la langue de l'app, sinon celle du système.
+    static func voice(identifier: String?, language: String = LocalizationController.activeLanguageCode) -> AVSpeechSynthesisVoice? {
+        if let identifier, !identifier.isEmpty, let chosen = AVSpeechSynthesisVoice(identifier: identifier),
+           Locale(identifier: chosen.language).language.languageCode?.identifier == language {
+            return chosen
+        }
+        return AVSpeechSynthesisVoice(language: language)
+    }
+
+    /// Fait entendre une voix sur un coup d'exemple, au moment où on la choisit.
+    func preview(identifier: String?) {
+        speak(MoveNarration.describe(san: "Nf3"), voice: Self.voice(identifier: identifier))
+    }
+
     func say(_ text: String) {
+        speak(text, voice: Self.voice(identifier: UserDefaults.standard.string(forKey: Self.voiceKey)))
+    }
+
+    private func speak(_ text: String, voice: AVSpeechSynthesisVoice?) {
         let utterance = AVSpeechUtterance(string: text)
-        utterance.voice = AVSpeechSynthesisVoice(language: LocalizationController.activeLanguageCode)
+        utterance.voice = voice
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate
         synthesizer.stopSpeaking(at: .immediate)
         let session = AVAudioSession.sharedInstance()

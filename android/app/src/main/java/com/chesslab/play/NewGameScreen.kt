@@ -281,11 +281,14 @@ fun NewGameScreen(
                 if (blind) {
                     RowDivider()
                     SettingRow(Icons.Default.VolumeUp, stringResource(R.string.ng_voice)) {
-                        Switch(
-                            checked = blindfoldVoice, onCheckedChange = { blindfoldVoice = it },
-                            colors = SwitchDefaults.colors(checkedTrackColor = Palette.accent),
-                            modifier = Modifier.testTag("aveugle-voix"),
-                        )
+                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            if (blindfoldVoice) VoiceMenu()
+                            Switch(
+                                checked = blindfoldVoice, onCheckedChange = { blindfoldVoice = it },
+                                colors = SwitchDefaults.colors(checkedTrackColor = Palette.accent),
+                                modifier = Modifier.testTag("aveugle-voix"),
+                            )
+                        }
                     }
                 }
                 RowDivider()
@@ -758,6 +761,36 @@ internal fun MenuButton(
             expanded = open, onDismissRequest = { open = false },
             modifier = Modifier.background(Palette.surfaceElevated),
         ) { items { open = false } }
+    }
+}
+
+/**
+ * Le choix de la voix à l'aveugle (19/11/2026) — pendant de `voiceMenu` (iOS). « Voix du système », puis les voix
+ * installées dans la langue de l'app ; en choisir une la fait entendre.
+ */
+@Composable
+private fun VoiceMenu() {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val language = context.resources.configuration.locales[0].toLanguageTag()
+    var options by remember { mutableStateOf(emptyList<BlindfoldVoice.Option>()) }
+    var chosen by remember { mutableStateOf(BlindfoldVoice.chosenVoice(context)) }
+    LaunchedEffect(language) { BlindfoldVoice.options(context, language) { options = it } }
+    val current = options.firstOrNull { it.name == chosen }
+    val numbered = stringResource(R.string.ng_voice_numbered, current?.number ?: 0)
+    MenuButton(
+        if (current != null) numbered else stringResource(R.string.ng_voice_system_short),
+        highlighted = false, tag = "aveugle-choix-voix",
+    ) { close ->
+        CheckItem(stringResource(R.string.ng_voice_system), current == null, "voix-systeme") {
+            chosen = ""; BlindfoldVoice.choose(context, "", language); close()
+        }
+        options.forEach { option ->
+            val label = stringResource(R.string.ng_voice_numbered, option.number) +
+                (option.region?.let { " · $it" } ?: "")
+            CheckItem(label, current == option, "voix-${option.number}") {
+                chosen = option.name; BlindfoldVoice.choose(context, option.name, language); close()
+            }
+        }
     }
 }
 

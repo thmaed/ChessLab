@@ -1,3 +1,4 @@
+import AVFoundation
 import ChessKit
 import Foundation
 import SwiftData
@@ -163,5 +164,31 @@ struct BlindfoldGreyDiscTests {
     @Test func theGreyLevelSurvivesASaveAndReload() throws {
         let data = try JSONEncoder().encode(BlindfoldLevel.occupiedSquaresGrey)
         #expect(try JSONDecoder().decode(BlindfoldLevel.self, from: data) == .occupiedSquaresGrey)
+    }
+}
+
+/// Le choix de la voix (19/11/2026) : les voix de la langue seulement, et un repli sur celle du système quand le
+/// choix ne tient plus (voix supprimée, langue de l'app changée).
+@MainActor
+struct BlindfoldVoiceChoiceTests {
+    @Test func theListOffersOnlyVoicesOfTheLanguage() {
+        let options = BlindfoldVoice.options(language: "fr")
+        for option in options {
+            let voice = AVSpeechSynthesisVoice(identifier: option.id)
+            #expect(voice?.language.hasPrefix("fr") == true, "\(option.name) n'est pas une voix française")
+        }
+        #expect(Set(options.map(\.id)).count == options.count, "chaque voix une seule fois")
+    }
+
+    @Test func noChoiceOrAVanishedVoiceFallsBackToTheSystemVoice() {
+        #expect(BlindfoldVoice.voice(identifier: nil, language: "fr")?.language.hasPrefix("fr") == true)
+        #expect(BlindfoldVoice.voice(identifier: "", language: "fr")?.language.hasPrefix("fr") == true)
+        #expect(BlindfoldVoice.voice(identifier: "voix.disparue", language: "fr")?.language.hasPrefix("fr") == true)
+    }
+
+    @Test func aVoiceOfAnotherLanguageIsNotKeptAfterALanguageChange() throws {
+        let english = try #require(BlindfoldVoice.options(language: "en").first)
+        #expect(BlindfoldVoice.voice(identifier: english.id, language: "en")?.identifier == english.id)
+        #expect(BlindfoldVoice.voice(identifier: english.id, language: "fr")?.language.hasPrefix("fr") == true)
     }
 }

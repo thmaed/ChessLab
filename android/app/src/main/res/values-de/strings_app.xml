@@ -1412,6 +1412,9 @@
     <string name="ng_about">Über %1$s</string>
     <string name="ng_stockfish_blurb">Die Engine, gedrosselt auf die Stärke, die du wählst.</string>
     <string name="ng_voice">Stimme</string>
+    <string name="ng_voice_system">Systemstimme</string>
+    <string name="ng_voice_system_short">System</string>
+    <string name="ng_voice_numbered">Stimme %1$d</string>
     <string name="ng_start_initial">Grundstellung</string>
     <string name="ng_start_custom">Eigene</string>
     <string name="ng_start_position">Grundstellung</string>

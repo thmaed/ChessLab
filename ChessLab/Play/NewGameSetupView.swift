@@ -50,6 +50,8 @@ struct NewGameSetupView: View {
     /// Partie à l'aveugle (17/11/2026).
     @State private var blindfold: BlindfoldLevel
     @State private var blindfoldVoice: Bool
+    /// Propre à l'appareil, hors iCloud : voir ``BlindfoldVoice``.
+    @AppStorage(BlindfoldVoice.voiceKey) private var voiceIdentifier = ""
 
     /// Préremplit tous les champs avec les derniers réglages utilisés
     /// (ou les défauts à la première partie). Pas d'effet de bord ici :
@@ -521,8 +523,11 @@ struct NewGameSetupView: View {
             if blindfold != .off {
                 rowDivider
                 settingRow("speaker.wave.2", "Voix") {
-                    Toggle("", isOn: $blindfoldVoice).labelsHidden().tint(Theme.accent)
-                        .accessibilityIdentifier("blindfoldVoice")
+                    HStack(spacing: 10) {
+                        if blindfoldVoice { voiceMenu }
+                        Toggle("", isOn: $blindfoldVoice).labelsHidden().tint(Theme.accent)
+                            .accessibilityIdentifier("blindfoldVoice")
+                    }
                 }
             }
             rowDivider
@@ -657,6 +662,54 @@ struct NewGameSetupView: View {
             menuValue(LocalizedStringKey(blindfold.title), highlighted: blindfold != .off)
         }
         .accessibilityIdentifier("blindfoldMenu")
+    }
+
+    /// Le choix de la voix (19/11/2026) : celles de l'iPhone dans la langue de l'app ; la choisir la fait entendre.
+    private var voiceMenu: some View {
+        let options = BlindfoldVoice.options()
+        let chosen = options.first { $0.id == voiceIdentifier }
+        return Menu {
+            Button {
+                voiceIdentifier = ""
+                BlindfoldVoice.shared.preview(identifier: nil)
+            } label: {
+                if chosen == nil { Label("Voix du système", systemImage: "checkmark") } else { Text("Voix du système") }
+            }
+            Divider()
+            ForEach(options) { option in
+                Button {
+                    voiceIdentifier = option.id
+                    BlindfoldVoice.shared.preview(identifier: option.id)
+                } label: {
+                    if chosen == option {
+                        Label { voiceLabel(option) } icon: { Image(systemName: "checkmark") }
+                    } else {
+                        voiceLabel(option)
+                    }
+                }
+            }
+        } label: {
+            if let chosen { menuValue(LocalizedStringKey(stringLiteral: chosen.name)) } else { menuValue("Système") }
+        }
+        .accessibilityIdentifier("blindfoldVoiceChoice")
+    }
+
+    /// Le nom de la voix, et dessous ce qui la distingue : « Féminine · Canada · Améliorée ».
+    @ViewBuilder
+    private func voiceLabel(_ option: BlindfoldVoice.Option) -> some View {
+        Text(verbatim: option.name)
+        let gender: String? = switch option.gender {
+        case .female: LocalizationController.string("Féminine")
+        case .male: LocalizationController.string("Masculine")
+        default: nil
+        }
+        let quality: String? = switch option.quality {
+        case .enhanced: LocalizationController.string("Améliorée")
+        case .premium: LocalizationController.string("Premium")
+        default: nil
+        }
+        let details = [gender, option.region, quality].compactMap { $0 }
+        if !details.isEmpty { Text(verbatim: details.joined(separator: " · ")) }
     }
 
     private var startMenu: some View {

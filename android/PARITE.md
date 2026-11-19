@@ -2189,6 +2189,14 @@ fin, bilan « À l'aveugle · niveau · N coups d'œil », étiquette « À l'av
       passe en lecture de paroles le temps de parler ; ENTENDUE ensuite. Elle dit le coup seul, sans le nom de
       l'adversaire (retour du même jour, porté). Android : sortie multimédia rendue explicite (le silencieux ne la coupe
       pas) — reste à l'écouter sur le Galaxy.
+- [x] **Choix de la voix** (19/11/2026, « on peut avoir d'autres voix comme une voix féminine ? ») : voix allumée, un
+      menu à côté de l'interrupteur — « Voix du système », puis les voix INSTALLÉES dans la langue de l'app ; en choisir
+      une la fait entendre (« Cavalier f3 »). Choix propre à l'appareil (préférences locales, jamais iCloud) ; une voix
+      disparue ou d'une autre langue retombe sur celle du système. Tests : iOS `BlindfoldVoiceChoiceTests` +
+      `BlindfoldUITests` ; Android `BlindfoldTest` JVM + instrumenté (émulateur).
+      **Écart ASSUMÉ** : iOS montre le nom et le sexe (« Amélie — Féminine · Canada · Améliorée ») ; Android ne les
+      donne pas (codes techniques) → « Voix 1, Voix 2… » (+ région si plusieurs), qu'on reconnaît en les écoutant ; les
+      voix qui demandent le réseau sont écartées. [ ] Galaxy : voir quelles voix Samsung/Google propose.
 - [ ] **À vérifier sur le Galaxy : l'aspect du réglage** (captures prises de la partie et du « Coup impossible » : lisibles).
 - **Écart TECHNIQUE, sans effet visible** : Android garde niveau, voix et coups d'œil de la partie en cours dans la
   colonne `settings_json` de la sauvegarde (aucune migration) ; iOS dans `PlayGameAutosave`.

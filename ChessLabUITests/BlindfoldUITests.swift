@@ -46,6 +46,19 @@ final class BlindfoldUITests: XCTestCase {
         XCTAssertTrue(app.switches["blindfoldVoice"].waitForExistence(timeout: 3), "la voix, à l'aveugle")
         snapshot(app, "reglage")
 
+        // Voix allumée : le choix de la voix apparaît à côté (19/11/2026), « Voix du système » en tête ; puis éteinte
+        // de nouveau, pour que la partie qui suit se joue en silence.
+        let voice = app.switches["blindfoldVoice"]
+        XCTAssertFalse(app.buttons["blindfoldVoiceChoice"].exists, "le choix de la voix n'apparaît que voix allumée")
+        voice.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        XCTAssertTrue(app.buttons["blindfoldVoiceChoice"].waitForExistence(timeout: 3), "le choix de la voix")
+        app.buttons["blindfoldVoiceChoice"].tap()
+        let system = app.buttons["Voix du système"]
+        XCTAssertTrue(system.waitForExistence(timeout: 3), "« Voix du système » dans le menu")
+        system.tap()
+        voice.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.5)).tap()
+        XCTAssertTrue(app.buttons["blindfoldVoiceChoice"].waitForNonExistence(timeout: 3), "voix éteinte de nouveau")
+
         app.buttons["Commencer"].tap()
         let replace = app.buttons["Remplacer par une nouvelle partie"]
         if replace.waitForExistence(timeout: 2) { replace.tap() }

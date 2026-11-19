@@ -1494,6 +1494,9 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="ng_about">About %1$s</string>
     <string name="ng_stockfish_blurb">The engine, held back to the strength you choose.</string>
     <string name="ng_voice">Voice</string>
+    <string name="ng_voice_system">System voice</string>
+    <string name="ng_voice_system_short">System</string>
+    <string name="ng_voice_numbered">Voice %1$d</string>
     <string name="ng_start_initial">Standard</string>
     <string name="ng_start_custom">Custom</string>
     <string name="ng_start_position">Starting position</string>

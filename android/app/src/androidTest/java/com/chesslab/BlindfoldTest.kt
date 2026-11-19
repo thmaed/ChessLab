@@ -53,6 +53,15 @@ class BlindfoldTest {
             compose.onAllNodesWithTag("aveugle-voix").fetchSemanticsNodes().isEmpty())
         compose.pickFromMenu("menu-aveugle", "aveugle-allHidden")
         awaitTag("aveugle-voix", 5_000)
+        // Voix allumée : le choix de la voix apparaît à côté (19/11/2026), « Voix du système » en tête ; puis éteinte
+        // de nouveau, pour ne pas laisser parler les tests suivants.
+        compose.onNodeWithTag("aveugle-voix").performScrollTo().performClick()
+        awaitTag("aveugle-choix-voix", 5_000)
+        compose.onNodeWithTag("aveugle-choix-voix").performClick()
+        awaitTag("voix-systeme", 10_000)
+        compose.onNodeWithTag("voix-systeme").performClick()
+        compose.onNodeWithTag("aveugle-voix").performScrollTo().performClick()
+        compose.waitUntil(5_000) { compose.onAllNodesWithTag("aveugle-choix-voix").fetchSemanticsNodes().isEmpty() }
         compose.onNodeWithTag("commencer").performClick()
 
         awaitTag("coup-d-oeil", 60_000)
