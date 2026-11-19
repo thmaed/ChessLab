@@ -149,10 +149,31 @@ final class VoiceDictationLab {
         phase = .analysing
         Task {
             try? await Task.sleep(for: .milliseconds(250))
+            let duration = recorder.currentTime
             recorder.stop()
             self.recorder = nil
+            // Moins d'une seconde : le doigt a lâché avant la fin de la phrase (les quatre premiers essais du 19/11
+            // duraient 0,3 à 0,8 s et n'avaient rien entendu). Pas compté.
+            guard duration >= 1.0 else {
+                try? FileManager.default.removeItem(at: url)
+                status = "Trop court : gardez le doigt sur le micro pendant toute la phrase."
+                phase = .idle
+                return
+            }
+            status = ""
             await analyse(url: url, target: target)
         }
+    }
+
+    /// Repartir de rien : le journal et les enregistrements sont effacés (le vocabulaire compilé reste).
+    func resetAll() {
+        let fm = FileManager.default
+        for file in (try? fm.contentsOfDirectory(at: Self.directory, includingPropertiesForKeys: nil)) ?? []
+        where file.pathExtension == "caf" || file.lastPathComponent == "trials.jsonl" {
+            try? fm.removeItem(at: file)
+        }
+        trials = []
+        last = nil
     }
 
     // MARK: Reconnaître
@@ -369,6 +390,7 @@ final class VoiceDictationLab {
 /// L'écran de mesure : le coup à dire, le micro à maintenir, ce que chaque reconnaissance a entendu, les scores.
 struct VoiceDictationLabView: View {
     @State private var lab = VoiceDictationLab()
+    @State private var confirmReset = false
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -396,11 +418,20 @@ struct VoiceDictationLabView: View {
             }
         }
         .task { await lab.start() }
+        .confirmationDialog(Text(verbatim: "Effacer tous les essais ?"), isPresented: $confirmReset, titleVisibility: .visible) {
+            Button(role: .destructive) { lab.resetAll() } label: { Text(verbatim: "Effacer les essais") }
+        }
     }
 
     private var scores: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(verbatim: "\(lab.trials.count) essais").font(.headline).foregroundStyle(Theme.textPrimary)
+            HStack {
+                Text(verbatim: "\(lab.trials.count) essais").font(.headline).foregroundStyle(Theme.textPrimary)
+                Spacer()
+                Button(role: .destructive) { confirmReset = true } label: { Text(verbatim: "Remettre à zéro") }
+                    .font(.subheadline)
+                    .disabled(lab.trials.isEmpty)
+            }
             ForEach(VoiceDictationLab.engines, id: \.self) { engine in
                 let score = lab.score(engine)
                 HStack {
@@ -446,9 +477,12 @@ struct VoiceDictationLabView: View {
                 .background(Circle().fill(recording ? Theme.danger : Theme.accent))
                 .scaleEffect(recording ? 1.1 : 1)
                 .animation(.snappy, value: recording)
-                .onLongPressGesture(minimumDuration: 0, maximumDistance: 200, perform: {}, onPressingChanged: { pressing in
-                    if pressing { lab.beginRecording() } else { lab.endRecording() }
-                })
+                // Un glissement du doigt ne coupe plus le micro (la vue défilante le prenait pour un défilement).
+                .highPriorityGesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { _ in if lab.phase == .idle { lab.beginRecording() } }
+                        .onEnded { _ in lab.endRecording() }
+                )
             Text(verbatim: phaseText)
                 .font(.subheadline).foregroundStyle(Theme.textSecondary)
         }
