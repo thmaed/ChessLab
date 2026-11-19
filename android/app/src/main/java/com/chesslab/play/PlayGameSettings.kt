@@ -92,6 +92,11 @@ data class PlayGameSettings(
     val blindfold: BlindfoldLevel = BlindfoldLevel.off,
     /** À l'aveugle : les coups adverses lus à voix haute. Éteint par défaut (décision du 17/11/2026). */
     val blindfoldVoice: Boolean = false,
+    /**
+     * COUPS À LA VOIX (19/11/2026) : le micro écoute à mon tour, le coup compris est joué directement, « annule »
+     * le reprend. Reconnaissance SUR L'APPAREIL seulement. Éteint par défaut. Pendant de `voiceMoves` (iOS).
+     */
+    val voiceMoves: Boolean = false,
 ) {
     /** Vrai pendant une partie à l'aveugle : les aides qui montreraient la position sont coupées. */
     val isBlindfold: Boolean get() = blindfold != BlindfoldLevel.off

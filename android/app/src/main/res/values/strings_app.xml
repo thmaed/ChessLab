@@ -1604,4 +1604,24 @@ The statistics above are recomputed after each one: they are volatile at first a
     <string name="vis_q_white_to_move">White to move: play the best move, from memory.</string>
     <string name="vis_q_black_to_move">Black to move: play the best move, from memory.</string>
     <string name="vis_q_after">After %1$s, play the next move, from memory.</string>
+
+    <!-- Coups à la voix (19/11/2026) — pendant des clés iOS de la voix. -->
+    <string name="voice_row">Voice moves</string>
+    <string name="voice_status_starting">Getting the microphone ready…</string>
+    <string name="voice_status_listening">Say your move</string>
+    <string name="voice_status_recognizing">I heard you…</string>
+    <string name="voice_status_waiting">The microphone waits for your turn</string>
+    <string name="voice_status_denied">Microphone or speech recognition not allowed (see Settings)</string>
+    <string name="voice_status_unavailable">Voice moves unavailable on this device in this language</string>
+    <string name="voice_mic">Microphone</string>
+    <string name="voice_mic_off">Microphone off: play on the board</string>
+    <string name="voice_note_denied">Microphone or speech recognition denied: allow them in Settings.</string>
+    <string name="voice_note_unavailable">Unavailable on this device in this language: recognition must happen on the device, without the network.</string>
+    <string name="voice_note_on">Say your move when it’s your turn: it is played as soon as it is understood; “undo” takes it back.</string>
+    <string name="voice_undone">Move taken back</string>
+    <string name="voice_cannot_undo">This move can’t be taken back</string>
+    <string name="voice_ambiguous">More than one piece can: also say the starting square</string>
+    <string name="voice_not_understood">I didn’t understand</string>
+    <string name="help_voice_title">Playing by voice</string>
+    <string name="help_voice_body">In New game, “Game” card, turn on “Voice moves”. During the game, the microphone listens by itself when it is your turn: say your move — “knight f3”, “bishop takes c6”, “e4”, “castles kingside”, “e8 queen” for a promotion.\n\nThe understood move is played at once and shown at the top of the board; say “undo” to take it back. An impossible move or a misunderstood phrase is said out loud. If two pieces can reach the same square, add the starting file: “knight b d2”. The “Microphone” switch above the board turns the microphone off during a conversation; you can always play on the board, microphone on or off.\n\nYour voice is recognised on the device, without the network, and is never recorded.</string>
 </resources>

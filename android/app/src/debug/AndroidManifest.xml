@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  DÉBOGAGE SEULEMENT (19/11/2026) : la mesure « coups à la voix ». Ce manifeste ne fusionne que dans la version de
-  développement (com.maeder.chesslab.debug) ; la version du Play Store ne reçoit ni le micro, ni cet écran. Toujours
-  aucune permission INTERNET : la reconnaissance mesurée est celle qui travaille SUR L'APPAREIL.
+  DÉBOGAGE SEULEMENT (19/11/2026) : l'écran de mesure « coups à la voix ». Ce manifeste ne fusionne que dans la
+  version de développement (com.maeder.chesslab.debug) ; la version du Play Store ne reçoit pas cet écran. Le micro et
+  la visibilité du service de reconnaissance sont désormais dans le manifeste PRINCIPAL (la fonction « Coups à la
+  voix »). Toujours aucune permission INTERNET : la reconnaissance mesurée est celle qui travaille SUR L'APPAREIL.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-
-    <queries>
-        <intent>
-            <action android:name="android.speech.RecognitionService" />
-        </intent>
-    </queries>
 
     <application>
         <activity

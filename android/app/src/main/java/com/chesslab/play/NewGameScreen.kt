@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Flag
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Memory
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Shuffle
@@ -147,6 +148,24 @@ fun NewGameScreen(
     // vide sans qu'on l'ait demandé. Comme iOS.
     var blindfold by remember { mutableStateOf(BlindfoldLevel.off) }
     var blindfoldVoice by remember { mutableStateOf(initial.blindfoldVoice) }
+    // Coups à la voix (19/11/2026) : retenu d'une partie à l'autre, comme iOS ; éteint si l'appareil ne sait pas
+    // reconnaître SUR L'APPAREIL dans la langue de l'app.
+    var voiceMoves by remember { mutableStateOf(initial.voiceMoves) }
+    var voiceAvailability by remember { mutableStateOf<VoiceRecognizers.Availability?>(null) }
+    var voicePermissionDenied by remember { mutableStateOf(false) }
+    val appLanguage = context.resources.configuration.locales[0].language
+    LaunchedEffect(appLanguage) {
+        VoiceRecognizers.availability(context, appLanguage) { availability ->
+            voiceAvailability = availability
+            if (availability == VoiceRecognizers.Availability.unavailable) voiceMoves = false
+        }
+    }
+    // Les autorisations se demandent en allumant, pas au premier coup de la partie.
+    val askMicrophone = androidx.activity.compose.rememberLauncherForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        if (!granted) { voiceMoves = false; voicePermissionDenied = true }
+    }
 
     val profile: OpponentProfile? = if (useCharacter) OpponentGallery.byId(opponentId) else null
     val fenIsLegal = remember(fenText) { FenValidator.errors(fenText.trim()).isEmpty() }
@@ -169,6 +188,7 @@ fun NewGameScreen(
             startFen = if (useCustomFen) fenText.trim() else null,
             blindfold = blindfold,
             blindfoldVoice = blindfoldVoice,
+            voiceMoves = voiceMoves && voiceAvailability != VoiceRecognizers.Availability.unavailable,
         )
         // Les réglages survivent à la fermeture de l'app ; le niveau, lui, se mémorise PAR personnage.
         timeLimit.remember()
@@ -290,6 +310,41 @@ fun NewGameScreen(
                             )
                         }
                     }
+                }
+                RowDivider()
+                SettingRow(Icons.Default.Mic, stringResource(R.string.voice_row)) {
+                    Switch(
+                        checked = voiceMoves,
+                        onCheckedChange = { on ->
+                            voiceMoves = on
+                            voicePermissionDenied = false
+                            // Le modèle de la langue manque : le système le télécharge (sa fenêtre, à la demande).
+                            if (on && voiceAvailability == VoiceRecognizers.Availability.downloadable) {
+                                VoiceRecognizers.requestModel(context, appLanguage)
+                            }
+                            if (on && context.checkSelfPermission(android.Manifest.permission.RECORD_AUDIO) !=
+                                android.content.pm.PackageManager.PERMISSION_GRANTED
+                            ) askMicrophone.launch(android.Manifest.permission.RECORD_AUDIO)
+                        },
+                        enabled = voiceAvailability != VoiceRecognizers.Availability.unavailable,
+                        colors = SwitchDefaults.colors(checkedTrackColor = Palette.accent),
+                        modifier = Modifier.testTag("voix-coups"),
+                    )
+                }
+                // Sous « Coups à la voix » : comment ça marche, et ce que l'appareil permet.
+                val voiceNote = when {
+                    voicePermissionDenied -> R.string.voice_note_denied
+                    voiceAvailability == VoiceRecognizers.Availability.unavailable -> R.string.voice_note_unavailable
+                    voiceMoves -> R.string.voice_note_on
+                    else -> null
+                }
+                if (voiceNote != null) {
+                    Text(
+                        stringResource(voiceNote), fontSize = 12.sp,
+                        color = if (voicePermissionDenied) Palette.warning else Palette.textTertiary,
+                        modifier = Modifier.fillMaxWidth().padding(start = 52.dp, end = 14.dp, bottom = 10.dp)
+                            .testTag("voix-coups-note"),
+                    )
                 }
                 RowDivider()
                 SettingRow(Icons.Outlined.Flag, stringResource(R.string.ng_start)) {

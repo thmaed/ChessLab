@@ -11,6 +11,18 @@
          sans appareil photo garde le scanner, avec le choix d'une image. -->
     <uses-feature android:name="android.hardware.camera" android:required="false" />
 
+    <!-- COUPS À LA VOIX (19/11/2026) : le micro, demandé quand on allume « Coups à la voix » (jamais avant), pour
+         une reconnaissance SUR L'APPAREIL (createOnDeviceSpeechRecognizer) — rien n'est envoyé, rien n'est gardé,
+         et toujours AUCUNE permission INTERNET. Le micro n'est pas REQUIS : sans lui, la ligne est grisée. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <!-- Voir le service de reconnaissance de l'appareil (visibilité des paquets, Android 11+). -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+
     <application
         android:name=".ChessLabApp"
         android:label="@string/app_name"

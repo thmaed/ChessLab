@@ -58360,7 +58360,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Mikrofon aus: spielen Sie auf dem Brett"
+            "value": "Mikrofon aus: spiel auf dem Brett"
           }
         },
         "it": {
@@ -58870,7 +58870,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird laut gesagt. Können zwei Figuren auf dasselbe Feld, nenne auch die Ausgangslinie: „Springer b d2“. Der Schalter „Mikrofon“ über dem Brett schaltet das Mikrofon während eines Gesprächs aus; auf dem Brett können Sie immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Ab iOS 26 ist die Erkennung genauer."
+            "value": "Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird laut gesagt. Können zwei Figuren auf dasselbe Feld, nenne auch die Ausgangslinie: „Springer b d2“. Der Schalter „Mikrofon“ über dem Brett schaltet das Mikrofon während eines Gesprächs aus; auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert. Ab iOS 26 ist die Erkennung genauer."
           }
         },
         "it": {

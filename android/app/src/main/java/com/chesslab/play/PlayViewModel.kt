@@ -113,7 +113,24 @@ data class PlayUiState(
     val isPeeking: Boolean = false,
     /** Le numéro du dernier « Coup impossible » à montrer (0 = aucun). */
     val blindNoticeId: Int = 0,
+    /**
+     * L'interrupteur « Micro » au-dessus du plateau (19/11/2026) : coupé, le micro est LIBÉRÉ ; l'état voyage avec
+     * la partie en cours (autosauvegarde). Le plateau, lui, joue toujours. Pendant de `voiceMicOn` (iOS).
+     */
+    val voiceMicOn: Boolean = true,
+    /** Ce que la voix a donné, un instant en haut du plateau : le coup joué, ou ce qui n'a pas marché. */
+    val voiceNotice: VoiceNotice? = null,
+    /** La dernière phrase que la voix a dite ou aurait dite (les tests la lisent sans faire parler l'appareil). */
+    val lastSpokenVoiceText: String? = null,
 ) {
+    /** C'est au joueur, sur la position vive, et rien n'est en attente : il peut jouer. */
+    val canUserAct: Boolean
+        get() = started && !thinking && !gameOver && pendingPromotion == null &&
+            ((sanMoves.size % 2 == 0) == userMovesOnEvenPlies)
+
+    /** C'est au joueur, la partie se joue et le micro est allumé : il peut écouter. */
+    val isVoiceTurn: Boolean get() = settings.voiceMoves && voiceMicOn && canUserAct && !isReviewing
+
     /**
      * Ce que le plateau montre : le masque du niveau, sauf pendant un coup d'œil et une fois la partie finie
      * (les pièces réapparaissent). Pendant de `boardMask` (iOS).
@@ -158,6 +175,9 @@ data class PlayUiState(
     val canResumeFromReview: Boolean
         get() = isReviewing && !settings.timeControl.hasClock && !gameOver && !thinking
 }
+
+/** Le retour de la voix : le coup joué (À L'ÉCRAN, décision du 19/11/2026), ou une erreur. */
+data class VoiceNotice(val id: Int, val text: String, val isError: Boolean)
 
 /** Ce que « Reprendre ici » a écarté, et d'où : de quoi le rendre. */
 data class ResumeUndo(val discarded: List<String>, val atPly: Int)
@@ -278,6 +298,7 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             userColor = color, started = true, outcome = null,
             userMovesOnEvenPlies = startPosition.sideToMove == color,
             peekCount = 0, isPeeking = false, blindNoticeId = 0,
+            voiceMicOn = true, voiceNotice = null, lastSpokenVoiceText = null,
         )
         newGame()
     }
@@ -456,6 +477,8 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
                 // Le coup seul, sans le nom de l'adversaire — comme iOS (retour du 19/11/2026).
                 com.chesslab.ui.MoveNarration.describe(app, move.san),
                 app.resources.configuration.locales[0].toLanguageTag(),
+                // À LA SUITE de la phrase en cours (mon coup répété, un « coup impossible »), comme iOS.
+                interrupting = false,
             )
         }
         // À l'aveugle, l'alerte dirait ce que le plateau cache.
@@ -807,11 +830,14 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
                 timeControlId = ui.settings.timeControlId,
                 whiteMs = clock?.remaining(Piece.Color.white),
                 blackMs = clock?.remaining(Piece.Color.black),
-                // À l'aveugle : le niveau, la voix et les coups d'œil, pour que la reprise soit LA même partie.
-                settingsJson = if (ui.settings.isBlindfold) org.json.JSONObject()
+                // À l'aveugle : le niveau, la voix et les coups d'œil ; à la voix : le réglage et l'interrupteur
+                // « Micro » — pour que la reprise soit LA même partie.
+                settingsJson = if (ui.settings.isBlindfold || ui.settings.voiceMoves) org.json.JSONObject()
                     .put("blindfold", ui.settings.blindfold.name)
                     .put("blindfoldVoice", ui.settings.blindfoldVoice)
                     .put("peeks", ui.peekCount)
+                    .put("voiceMoves", ui.settings.voiceMoves)
+                    .put("voiceMicOff", ui.settings.voiceMoves && !ui.voiceMicOn)
                     .toString() else null,
             )
         )
@@ -844,9 +870,12 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
             opponentId = autosave.opponentId,
             blindfold = BlindfoldLevel.fromName(blind?.optString("blindfold")),
             blindfoldVoice = blind?.optBoolean("blindfoldVoice", false) ?: false,
+            voiceMoves = blind?.optBoolean("voiceMoves", false) ?: false,
         )
         ui = ui.copy(
             peekCount = blind?.optInt("peeks", 0) ?: 0,
+            voiceMicOn = !(blind?.optBoolean("voiceMicOff", false) ?: false),
+            voiceNotice = null, lastSpokenVoiceText = null,
             settings = settings, opponent = profile, level = autosave.level,
             userColor = humanColor, started = true,
             userMovesOnEvenPlies = startPosition.sideToMove == humanColor,
@@ -936,6 +965,87 @@ class PlayViewModel(app: Application) : AndroidViewModel(app) {
         val last = moveLog.last()
         val count = if (last.piece.color != humanColor && moveLog.size >= 2) 2 else 1
         rebuild(uciLog.dropLast(count), s(R.string.your_turn))
+    }
+
+    // Coups à la voix (19/11/2026) — pendant de la section « voix » de `PlayViewModel.swift`.
+
+    private var voiceNoticeId = 0
+
+    /** Les façons de dire les coups légaux, données en indices à la reconnaissance. */
+    val voiceHints: List<String>
+        get() = VoiceMoveParser.spokenForms(VoiceMoveParser.candidates(board), VoiceMoveParser.vocabulary(appLanguage()))
+
+    private fun appLanguage(): String =
+        getApplication<Application>().resources.configuration.locales[0].language
+
+    fun setVoiceMic(on: Boolean) {
+        if (!ui.settings.voiceMoves || ui.voiceMicOn == on) return
+        ui = ui.copy(voiceMicOn = on)
+        autosave()
+    }
+
+    fun dismissVoiceNotice(id: Int) {
+        if (ui.voiceNotice?.id == id) ui = ui.copy(voiceNotice = null)
+    }
+
+    /**
+     * Ce que le micro a entendu (la meilleure transcription d'abord). Le coup compris est JOUÉ DIRECTEMENT ;
+     * « annule » reprend ; un coup impossible, une phrase incomprise ou ambiguë se DISENT ; une conversation est
+     * ignorée. [speaks] faux : les tests lisent [PlayUiState.lastSpokenVoiceText] sans faire parler l'appareil.
+     */
+    fun handleVoice(
+        transcripts: List<String>,
+        language: String = appLanguage(),
+        speaks: Boolean = true,
+    ): VoiceMoves.Decision {
+        val decision = VoiceMoves.decide(
+            transcripts, VoiceMoveParser.vocabulary(language),
+            listening = ui.settings.voiceMoves && ui.voiceMicOn && !ui.gameOver,
+            canTakeback = ui.canTakeback,
+            canAct = ui.canUserAct && !ui.isReviewing,
+            candidates = { VoiceMoveParser.candidates(board) },
+        )
+        val app = getApplication<Application>()
+        when (decision) {
+            is VoiceMoves.Decision.Play -> {
+                val candidate = decision.move
+                play(Square(candidate.from), Square(candidate.to))
+                if (ui.pendingPromotion != null) completePromotion(kindOf(candidate.promotion ?: 'q'))
+                val spoken = com.chesslab.ui.MoveNarration.describe(app, candidate.san)
+                showVoiceNotice(spoken, isError = false)
+                // À l'aveugle, voix allumée : l'app RÉPÈTE le coup, comme l'adversaire dans les Règles du jeu FIDE
+                // (annexe D.2.1) — ailleurs, le retour reste à l'écran.
+                if (ui.settings.isBlindfold && ui.settings.blindfoldVoice) {
+                    ui = ui.copy(lastSpokenVoiceText = spoken)
+                    if (speaks) BlindfoldVoice.say(app, spoken, app.resources.configuration.locales[0].toLanguageTag())
+                }
+            }
+            VoiceMoves.Decision.Undo -> {
+                takeback()
+                showVoiceNotice(s(R.string.voice_undone), isError = false)
+            }
+            VoiceMoves.Decision.CannotUndo -> tellVoice(R.string.voice_cannot_undo, speaks)
+            VoiceMoves.Decision.Ambiguous -> tellVoice(R.string.voice_ambiguous, speaks)
+            VoiceMoves.Decision.Illegal -> tellVoice(R.string.blind_illegal, speaks)
+            VoiceMoves.Decision.NotUnderstood -> tellVoice(R.string.voice_not_understood, speaks)
+            VoiceMoves.Decision.Ignored -> Unit
+        }
+        return decision
+    }
+
+    private fun tellVoice(id: Int, speaks: Boolean) {
+        val text = s(id)
+        showVoiceNotice(text, isError = true)
+        ui = ui.copy(lastSpokenVoiceText = text)
+        if (speaks) {
+            val app = getApplication<Application>()
+            BlindfoldVoice.say(app, text, app.resources.configuration.locales[0].toLanguageTag())
+        }
+    }
+
+    private fun showVoiceNotice(text: String, isError: Boolean) {
+        voiceNoticeId += 1
+        ui = ui.copy(voiceNotice = VoiceNotice(voiceNoticeId, text, isError))
     }
 
     private fun kindOf(c: Char): Piece.Kind = when (c) {

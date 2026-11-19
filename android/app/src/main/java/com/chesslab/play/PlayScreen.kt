@@ -31,6 +31,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.filled.GraphicEq
+import androidx.compose.material.icons.filled.Mic
+import androidx.compose.material.icons.filled.MicOff
+import androidx.compose.material.icons.outlined.ErrorOutline
+import androidx.compose.material.icons.outlined.Mic
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -146,6 +153,9 @@ fun PlayScreen(
     // point de largeur gagné est un point sur les 64 cases. (Compose refuse
     // une marge négative, là où SwiftUI l'accepte.)
     val gutter = Modifier.padding(horizontal = 12.dp)
+    // L'écoute du micro (VoiceMoveListener) se branche après la mesure du Galaxy : d'ici là, la barre dit qu'elle
+    // se prépare.
+    val voiceStatus = VoiceListenStatus.starting
 
     // Le contenu ne s'écrit QU'UNE FOIS : la disposition seule change entre
     // le portrait (tout empilé, plateau de bord à bord) et le paysage
@@ -176,6 +186,11 @@ fun PlayScreen(
         if (ui.settings.isBlindfold && !ui.gameOver) {
             Spacer(Modifier.height(6.dp))
             BlindBar(gutter, ui, model)
+        }
+        if (ui.settings.voiceMoves && !ui.gameOver) {
+            Spacer(Modifier.height(6.dp))
+            // L'état de l'écoute vient du micro (VoiceMoveListener, branché après la mesure du Galaxy).
+            VoiceBar(gutter, ui, voiceStatus, onMic = model::setVoiceMic)
         }
     }
     val userRow: @Composable () -> Unit = {
@@ -262,6 +277,7 @@ fun PlayScreen(
                 onSquareTap = model::onSquareTap,
             )
             BlindNotice(ui.blindNoticeId, Modifier.align(Alignment.TopCenter))
+            VoiceNoticeView(ui.voiceNotice, Modifier.align(Alignment.TopCenter), onDone = model::dismissVoiceNotice)
         }
     }
     val evalBar: @Composable () -> Unit = {
@@ -905,6 +921,93 @@ private fun PeekButton(ui: PlayUiState, model: PlayViewModel) {
                     .testTag("coup-d-oeil-compte"),
             )
         }
+    }
+}
+
+/** Ce que fait le micro, vu de la barre au-dessus du plateau. Pendant de `VoiceMoveListener.Status` (iOS). */
+enum class VoiceListenStatus { starting, listening, recognizing, waiting, denied, unavailable }
+
+/**
+ * Au-dessus du plateau : ce que fait le micro, et l'interrupteur « Micro » pour le couper (une conversation à table,
+ * envie de jouer au doigt) — le plateau joue dans tous les cas. Pendant de `voiceBar` (iOS).
+ */
+@Composable
+private fun VoiceBar(modifier: Modifier, ui: PlayUiState, status: VoiceListenStatus, onMic: (Boolean) -> Unit) {
+    val micOn = ui.voiceMicOn
+    val icon = when {
+        !micOn -> Icons.Default.MicOff
+        status == VoiceListenStatus.listening -> Icons.Default.Mic
+        status == VoiceListenStatus.recognizing -> Icons.Default.GraphicEq
+        status == VoiceListenStatus.denied || status == VoiceListenStatus.unavailable -> Icons.Default.MicOff
+        else -> Icons.Outlined.Mic
+    }
+    val tint = when {
+        !micOn -> Palette.textSecondary
+        status == VoiceListenStatus.listening || status == VoiceListenStatus.recognizing -> Palette.accent
+        status == VoiceListenStatus.denied || status == VoiceListenStatus.unavailable -> Palette.warning
+        else -> Palette.textSecondary
+    }
+    val text = stringResource(
+        if (!micOn) R.string.voice_mic_off else when (status) {
+            VoiceListenStatus.starting -> R.string.voice_status_starting
+            VoiceListenStatus.listening -> R.string.voice_status_listening
+            VoiceListenStatus.recognizing -> R.string.voice_status_recognizing
+            VoiceListenStatus.waiting -> R.string.voice_status_waiting
+            VoiceListenStatus.denied -> R.string.voice_status_denied
+            VoiceListenStatus.unavailable -> R.string.voice_status_unavailable
+        },
+    )
+    Row(
+        modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(Palette.surfaceElevated)
+            .padding(horizontal = 12.dp, vertical = 4.dp)
+            .testTag("voix-barre"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Icon(icon, null, tint = tint, modifier = Modifier.size(22.dp))
+        Text(
+            text, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = Palette.textPrimary, maxLines = 2,
+            modifier = Modifier.weight(1f).testTag("voix-etat"),
+        )
+        if (!micOn || (status != VoiceListenStatus.denied && status != VoiceListenStatus.unavailable)) {
+            Text(stringResource(R.string.voice_mic), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, color = Palette.textSecondary)
+            Switch(
+                checked = micOn, onCheckedChange = onMic,
+                colors = SwitchDefaults.colors(checkedTrackColor = Palette.accent),
+                modifier = Modifier.testTag("voix-micro"),
+            )
+        }
+    }
+}
+
+/** Le coup joué à la voix (retour À L'ÉCRAN, décision du 19/11/2026), ou ce qui n'a pas marché, en haut du plateau. */
+@Composable
+private fun VoiceNoticeView(notice: VoiceNotice?, modifier: Modifier, onDone: (Int) -> Unit) {
+    if (notice == null) return
+    LaunchedEffect(notice.id) {
+        kotlinx.coroutines.delay(if (notice.isError) 2200 else 2500)
+        onDone(notice.id)
+    }
+    Row(
+        modifier
+            .padding(top = 10.dp)
+            .clip(CircleShape)
+            .background(if (notice.isError) Palette.danger.copy(alpha = 0.92f) else Palette.accent.copy(alpha = 0.95f))
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .testTag("voix-message"),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        val color = if (notice.isError) Color.White else Palette.background
+        Icon(if (notice.isError) Icons.Outlined.ErrorOutline else Icons.Default.Mic, null, tint = color, modifier = Modifier.size(20.dp))
+        Text(
+            notice.text, color = color,
+            fontSize = if (notice.isError) 14.sp else 20.sp,
+            fontWeight = if (notice.isError) FontWeight.SemiBold else FontWeight.Bold,
+        )
     }
 }
 

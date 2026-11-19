@@ -9,7 +9,9 @@ import chesskit.Piece
  *
  * Étude « jouer ses coups à la voix » : on ne cherche pas à comprendre n'importe quelle phrase, on compare ce que la
  * reconnaissance a entendu aux SEULS coups légaux de la position. Module pur : aucun micro, aucun moteur.
- * Français d'abord ; les autres langues viendront si l'on implémente.
+ *
+ * Les CINQ langues de l'app (décision du 19/11/2026) : un [Vocabulary] par langue. Le français a été mesuré sur vraie
+ * voix (51 essais) et porte les mots appris de cette mesure ; les autres partent des mêmes règles.
  */
 object VoiceMoveParser {
 
@@ -45,6 +47,7 @@ object VoiceMoveParser {
         var piece: Char? = null,
         /** Les cases entières entendues : la dernière est l'arrivée, l'avant-dernière le départ. */
         val squares: MutableList<String> = mutableListOf(),
+        /** « cavalier b d2 », « tour 1 d1 » : une colonne ou une rangée de départ. */
         var fromFile: Char? = null,
         var fromRank: Char? = null,
         var castle: Castle? = null,
@@ -54,78 +57,249 @@ object VoiceMoveParser {
         val isEmpty: Boolean get() = piece == null && squares.isEmpty() && castle == null
     }
 
-    // Le vocabulaire (français) — mêmes tables qu'iOS.
+    // Les vocabulaires — mêmes tables qu'iOS.
 
-    private val pieces = mapOf(
-        "roi" to 'K', "rois" to 'K',
-        "dame" to 'Q', "dames" to 'Q', "reine" to 'Q', "reines" to 'Q',
-        "tour" to 'R', "tours" to 'R',
-        "fou" to 'B', "fous" to 'B',
-        "cavalier" to 'N', "cavaliers" to 'N', "chevalier" to 'N', "chevaliers" to 'N',
-        "pion" to 'P', "pions" to 'P',
-        "tout" to 'R', "roy" to 'K', "rouen" to 'K',
+    /**
+     * Les mots d'une langue. Lettre « SÛRE » : un mot qui ne peut guère être autre chose qu'une colonne ; lettre
+     * « DOUTEUSE » : un mot courant qui sonne comme une lettre (« c'est », l'article « a » anglais, la préposition « a »
+     * espagnole ou italienne) — comptée seulement juste avant un chiffre, jamais comme indice de départ.
+     */
+    class Vocabulary(
+        val pieces: Map<String, Char>,
+        /** Des mots où la reconnaissance FOND une case (« géant » = g1) : redécoupés avant lecture. */
+        val fused: Map<String, List<String>>,
+        val captureWords: Set<String>,
+        val promotionWords: Set<String>,
+        val strongFiles: Map<String, Char>,
+        val weakFiles: Map<String, Char>,
+        val ranks: Map<String, Char>,
+        /** Les initiales de la notation écrite dans cette langue (« C f3 », « Sf3 »). */
+        val writtenInitials: Map<String, Char>,
+        val shortCastle: List<String>,
+        val longCastle: List<String>,
+        val anyCastle: List<String>,
+        /** « annule », « reprends » : reprendre son dernier coup. */
+        val undo: List<String>,
+        /** Pour les indices donnés à la reconnaissance : le nom de chaque pièce, « en », « prend ». */
+        val pieceNames: Map<Char, String>,
+        val to: String,
+        val takes: String,
+        val shortCastleName: String,
+        val longCastleName: String,
+    ) {
+        // Android refuse ce que la JVM tolère (voir la mémoire du projet) : ici seulement des lettres dans la classe.
+        internal val initialThenSquare =
+            Regex("""\b([${writtenInitials.keys.sorted().joinToString("")}])x?([a-h][1-8])\b""")
+    }
+
+    /** L'alphabet radio vaut dans toutes les langues : un filet pour les lettres difficiles (« Foxtrot 3 »). */
+    private val radioAlphabet = mapOf(
+        "alpha" to 'a', "alfa" to 'a', "bravo" to 'b', "charlie" to 'c', "delta" to 'd', "echo" to 'e', "écho" to 'e',
+        "foxtrot" to 'f', "golf" to 'g', "hotel" to 'h', "hôtel" to 'h',
     )
 
-    /** Des mots où la reconnaissance a FONDU une case (mesure du 19/11/2026) : on les redécoupe avant de lire. */
-    private val fused = mapOf(
-        "géant" to listOf("g", "1"), "indien" to listOf("d", "1"), "indéen" to listOf("d", "1"),
-        "ancien" to listOf("c", "1"), "hachis" to listOf("h", "6"),
-        "décède" to listOf("d", "7"), "décès" to listOf("d", "7"), "17" to listOf("d", "7"), "18" to listOf("d", "8"),
-        "dix" to listOf("d"), "10" to listOf("d"),
-        "bien" to listOf("b"), "angers" to listOf("g"), "of" to listOf("f"), "off" to listOf("f"),
-    )
-    private val captureWords = setOf("prend", "prends", "prent", "pren", "mange", "manges", "x", "prise")
-    private val promotionWords = setOf("promotion", "promu", "promeut", "promouvoir")
+    private val digits = (1..8).associate { "$it" to ('0' + it) }
 
-    private val strongFiles = mapOf(
-        "a" to 'a', "b" to 'b', "bé" to 'b', "c" to 'c', "cé" to 'c', "d" to 'd', "dé" to 'd', "e" to 'e', "é" to 'e',
-        "f" to 'f', "effe" to 'f', "g" to 'g', "gé" to 'g', "h" to 'h', "ache" to 'h', "hache" to 'h',
+    val french = Vocabulary(
+        pieces = mapOf(
+            "roi" to 'K', "rois" to 'K', "dame" to 'Q', "dames" to 'Q', "reine" to 'Q', "reines" to 'Q',
+            "tour" to 'R', "tours" to 'R', "fou" to 'B', "fous" to 'B',
+            "cavalier" to 'N', "cavaliers" to 'N', "chevalier" to 'N', "chevaliers" to 'N', "pion" to 'P', "pions" to 'P',
+            // Entendus le 19/11 (mesure sur iPhone3) : « Tout en cinq » pour « Tour en e5 », « Roy », « Rouen ».
+            "tout" to 'R', "roy" to 'K', "rouen" to 'K',
+        ),
+        // Mesure du 19/11/2026, 51 essais : « en g1 » → « géant », « en d1 » → « indien », « en c1 » → « ancien »,
+        // « en h6 » → « hachis », « d7 » → « décède », « 17 » (dix-sept), « b1 » → « bien un », « en g » → « Angers ».
+        fused = mapOf(
+            "géant" to listOf("g", "1"), "indien" to listOf("d", "1"), "indéen" to listOf("d", "1"),
+            "ancien" to listOf("c", "1"), "hachis" to listOf("h", "6"),
+            "décède" to listOf("d", "7"), "décès" to listOf("d", "7"), "17" to listOf("d", "7"), "18" to listOf("d", "8"),
+            "dix" to listOf("d"), "10" to listOf("d"),
+            "bien" to listOf("b"), "angers" to listOf("g"), "of" to listOf("f"), "off" to listOf("f"),
+        ),
+        captureWords = setOf("prend", "prends", "prent", "pren", "mange", "manges", "x", "prise"),
+        promotionWords = setOf("promotion", "promu", "promeut", "promouvoir"),
+        strongFiles = mapOf(
+            "a" to 'a', "b" to 'b', "bé" to 'b', "c" to 'c', "cé" to 'c', "d" to 'd', "dé" to 'd', "e" to 'e', "é" to 'e',
+            "f" to 'f', "effe" to 'f', "g" to 'g', "gé" to 'g', "h" to 'h', "ache" to 'h', "hache" to 'h',
+        ),
+        weakFiles = mapOf(
+            "à" to 'a', "ah" to 'a', "ha" to 'a', "bey" to 'b', "baie" to 'b', "bée" to 'b',
+            "ces" to 'c', "ses" to 'c', "c'est" to 'c', "s'est" to 'c', "sait" to 'c', "des" to 'd', "dès" to 'd', "dais" to 'd',
+            "euh" to 'e', "eux" to 'e', "eu" to 'e', "et" to 'e', "est" to 'e', "ef" to 'f', "effet" to 'f',
+            "j'ai" to 'g', "geai" to 'g', "jet" to 'g', "j" to 'g', "hash" to 'h', "hach" to 'h',
+        ),
+        ranks = mapOf(
+            "un" to '1', "une" to '1', "deux" to '2', "trois" to '3', "quatre" to '4', "cinq" to '5', "six" to '6',
+            "sept" to '7', "set" to '7', "cette" to '7', "huit" to '8',
+        ),
+        writtenInitials = mapOf("c" to 'N', "f" to 'B', "t" to 'R', "d" to 'Q', "r" to 'K'),
+        shortCastle = listOf("petit roque", "petit-roque"),
+        longCastle = listOf("grand roque", "grand-roque"),
+        anyCastle = listOf("roque"),
+        undo = listOf("annule", "annuler", "annulé", "reprends", "reprendre", "reprend le coup", "retour"),
+        pieceNames = mapOf('K' to "roi", 'Q' to "dame", 'R' to "tour", 'B' to "fou", 'N' to "cavalier", 'P' to "pion"),
+        to = "en", takes = "prend", shortCastleName = "petit roque", longCastleName = "grand roque",
     )
-    private val weakFiles = mapOf(
-        "à" to 'a', "ah" to 'a', "ha" to 'a',
-        "bey" to 'b', "baie" to 'b', "bée" to 'b',
-        "ces" to 'c', "ses" to 'c', "c'est" to 'c', "s'est" to 'c', "sait" to 'c',
-        "des" to 'd', "dès" to 'd', "dais" to 'd',
-        "euh" to 'e', "eux" to 'e', "eu" to 'e', "et" to 'e', "est" to 'e',
-        "ef" to 'f', "effet" to 'f',
-        "j'ai" to 'g', "geai" to 'g', "jet" to 'g', "j" to 'g',
-        "hash" to 'h', "hach" to 'h',
-    )
-    private val ranks = mapOf(
-        "1" to '1', "un" to '1', "une" to '1',
-        "2" to '2', "deux" to '2',
-        "3" to '3', "trois" to '3',
-        "4" to '4', "quatre" to '4',
-        "5" to '5', "cinq" to '5',
-        "6" to '6', "six" to '6',
-        "7" to '7', "sept" to '7', "set" to '7', "cette" to '7',
-        "8" to '8', "huit" to '8',
-    )
-    private val writtenInitials = mapOf("c" to 'N', "f" to 'B', "t" to 'R', "d" to 'Q', "r" to 'K')
 
-    // Les deux motifs : l'Android refuse ce que la JVM tolère (voir la mémoire du projet) — ici rien à échapper.
-    private val initialThenSquare = Regex("""\b([cftdr])x?([a-h][1-8])\b""")
+    val english = Vocabulary(
+        pieces = mapOf(
+            "king" to 'K', "kings" to 'K', "queen" to 'Q', "queens" to 'Q', "rook" to 'R', "rooks" to 'R',
+            "bishop" to 'B', "bishops" to 'B', "knight" to 'N', "knights" to 'N', "night" to 'N', "nights" to 'N',
+            "pawn" to 'P', "pawns" to 'P',
+        ),
+        fused = mapOf("before" to listOf("b", "4")),
+        captureWords = setOf("takes", "take", "captures", "capture", "x", "times"),
+        promotionWords = setOf("promotes", "promote", "promotion", "equals"),
+        strongFiles = mapOf(
+            "b" to 'b', "bee" to 'b', "c" to 'c', "see" to 'c', "cee" to 'c', "d" to 'd', "dee" to 'd', "e" to 'e',
+            "f" to 'f', "ef" to 'f', "g" to 'g', "gee" to 'g', "h" to 'h', "aitch" to 'h',
+        ),
+        weakFiles = mapOf("a" to 'a', "ay" to 'a', "eh" to 'a', "be" to 'b', "sea" to 'c', "jee" to 'g', "age" to 'h'),
+        ranks = mapOf(
+            "one" to '1', "won" to '1', "two" to '2', "to" to '2', "too" to '2', "three" to '3', "tree" to '3',
+            "four" to '4', "for" to '4', "fore" to '4', "five" to '5', "six" to '6', "seven" to '7', "eight" to '8', "ate" to '8',
+        ),
+        writtenInitials = mapOf("n" to 'N', "b" to 'B', "r" to 'R', "q" to 'Q', "k" to 'K'),
+        shortCastle = listOf(
+            "castles kingside", "castle kingside", "kingside castle", "short castle", "castle short",
+            "castles short", "king side",
+        ),
+        longCastle = listOf(
+            "castles queenside", "castle queenside", "queenside castle", "long castle", "castle long",
+            "castles long", "queen side",
+        ),
+        anyCastle = listOf("castle", "castles", "castling"),
+        undo = listOf("undo", "take back", "takeback", "take it back", "cancel"),
+        pieceNames = mapOf('K' to "king", 'Q' to "queen", 'R' to "rook", 'B' to "bishop", 'N' to "knight", 'P' to "pawn"),
+        to = "to", takes = "takes", shortCastleName = "castles kingside", longCastleName = "castles queenside",
+    )
+
+    val spanish = Vocabulary(
+        pieces = mapOf(
+            "rey" to 'K', "reyes" to 'K', "dama" to 'Q', "damas" to 'Q', "reina" to 'Q', "torre" to 'R', "torres" to 'R',
+            "alfil" to 'B', "alfiles" to 'B', "caballo" to 'N', "caballos" to 'N', "peón" to 'P', "peon" to 'P', "peones" to 'P',
+        ),
+        fused = emptyMap(),
+        captureWords = setOf("come", "comes", "captura", "toma", "por", "x"),
+        promotionWords = setOf("corona", "promociona", "promoción", "promocion"),
+        strongFiles = mapOf(
+            "b" to 'b', "c" to 'c', "d" to 'd', "e" to 'e', "f" to 'f', "efe" to 'f', "g" to 'g', "h" to 'h',
+            "hache" to 'h', "ache" to 'h',
+        ),
+        weakFiles = mapOf(
+            "a" to 'a', "ah" to 'a', "be" to 'b', "ve" to 'b', "ce" to 'c', "se" to 'c', "de" to 'd', "ge" to 'g', "je" to 'g',
+        ),
+        ranks = mapOf(
+            "uno" to '1', "una" to '1', "un" to '1', "dos" to '2', "tres" to '3', "cuatro" to '4', "cinco" to '5',
+            "seis" to '6', "siete" to '7', "ocho" to '8',
+        ),
+        writtenInitials = mapOf("c" to 'N', "a" to 'B', "t" to 'R', "d" to 'Q', "r" to 'K'),
+        shortCastle = listOf("enroque corto"),
+        longCastle = listOf("enroque largo"),
+        anyCastle = listOf("enroque", "enroca"),
+        undo = listOf("deshacer", "deshaz", "anula", "anular", "atrás", "atras"),
+        pieceNames = mapOf('K' to "rey", 'Q' to "dama", 'R' to "torre", 'B' to "alfil", 'N' to "caballo", 'P' to "peón"),
+        to = "a", takes = "come", shortCastleName = "enroque corto", longCastleName = "enroque largo",
+    )
+
+    val german = Vocabulary(
+        pieces = mapOf(
+            "könig" to 'K', "koenig" to 'K', "dame" to 'Q', "turm" to 'R', "türme" to 'R', "läufer" to 'B', "laeufer" to 'B',
+            "springer" to 'N', "pferd" to 'N', "bauer" to 'P', "bauern" to 'P',
+        ),
+        fused = emptyMap(),
+        captureWords = setOf("schlägt", "schlaegt", "nimmt", "x", "mal"),
+        promotionWords = setOf("umwandlung", "wandelt", "verwandelt"),
+        strongFiles = mapOf(
+            "a" to 'a', "b" to 'b', "be" to 'b', "c" to 'c', "ce" to 'c', "zeh" to 'c', "d" to 'd', "de" to 'd', "e" to 'e',
+            "f" to 'f', "ef" to 'f', "g" to 'g', "ge" to 'g', "h" to 'h', "ha" to 'h',
+        ),
+        weakFiles = mapOf("beh" to 'b', "tse" to 'c', "dee" to 'd', "eh" to 'e', "eff" to 'f', "geh" to 'g', "hah" to 'h'),
+        ranks = mapOf(
+            "eins" to '1', "ein" to '1', "zwei" to '2', "zwo" to '2', "drei" to '3', "vier" to '4', "fünf" to '5',
+            "fuenf" to '5', "sechs" to '6', "sieben" to '7', "acht" to '8',
+        ),
+        writtenInitials = mapOf("s" to 'N', "l" to 'B', "t" to 'R', "d" to 'Q', "k" to 'K'),
+        shortCastle = listOf("kurze rochade", "rochade kurz", "kleine rochade"),
+        longCastle = listOf("lange rochade", "rochade lang", "große rochade", "grosse rochade"),
+        anyCastle = listOf("rochade", "rochiert"),
+        undo = listOf("zurück", "zurueck", "rückgängig", "rueckgaengig", "nimm zurück", "abbrechen"),
+        pieceNames = mapOf('K' to "König", 'Q' to "Dame", 'R' to "Turm", 'B' to "Läufer", 'N' to "Springer", 'P' to "Bauer"),
+        to = "nach", takes = "schlägt", shortCastleName = "kurze Rochade", longCastleName = "lange Rochade",
+    )
+
+    val italian = Vocabulary(
+        pieces = mapOf(
+            "re" to 'K', "donna" to 'Q', "regina" to 'Q', "torre" to 'R', "torri" to 'R', "alfiere" to 'B', "alfieri" to 'B',
+            "cavallo" to 'N', "cavalli" to 'N', "pedone" to 'P', "pedoni" to 'P',
+        ),
+        fused = emptyMap(),
+        captureWords = setOf("prende", "mangia", "cattura", "per", "x"),
+        promotionWords = setOf("promozione", "promuove"),
+        strongFiles = mapOf(
+            "b" to 'b', "bi" to 'b', "c" to 'c', "d" to 'd', "f" to 'f', "effe" to 'f', "g" to 'g', "gi" to 'g',
+            "h" to 'h', "acca" to 'h',
+        ),
+        weakFiles = mapOf("a" to 'a', "ci" to 'c', "di" to 'd', "e" to 'e', "è" to 'e'),
+        ranks = mapOf(
+            "uno" to '1', "un" to '1', "due" to '2', "tre" to '3', "quattro" to '4', "cinque" to '5', "sei" to '6',
+            "sette" to '7', "otto" to '8',
+        ),
+        writtenInitials = mapOf("c" to 'N', "a" to 'B', "t" to 'R', "d" to 'Q', "r" to 'K'),
+        shortCastle = listOf("arrocco corto"),
+        longCastle = listOf("arrocco lungo"),
+        anyCastle = listOf("arrocco", "arrocca"),
+        undo = listOf("annulla", "indietro", "riprendi"),
+        pieceNames = mapOf('K' to "re", 'Q' to "donna", 'R' to "torre", 'B' to "alfiere", 'N' to "cavallo", 'P' to "pedone"),
+        to = "in", takes = "prende", shortCastleName = "arrocco corto", longCastleName = "arrocco lungo",
+    )
+
+    /** Le vocabulaire d'une langue de l'app (« fr », « en »…) ; le français par défaut. */
+    fun vocabulary(language: String): Vocabulary = when (language.take(2)) {
+        "en" -> english
+        "es" -> spanish
+        "de" -> german
+        "it" -> italian
+        else -> french
+    }
+
+    // Lire une phrase
+
     private val letterThenDigit = Regex("""([a-h])([1-8])""")
     private val separators = Regex("""[^\p{L}\p{N}']+""")
 
-    fun tokens(text: String): List<String> {
+    fun tokens(text: String, vocabulary: Vocabulary = french): List<String> {
         var lowered = text.lowercase().replace('’', '\'')
-        lowered = initialThenSquare.replace(lowered, "$1 $2")
+        // « Cf3 », « Fxc6 », « Sf3 » : une initiale de pièce collée à une case, comme on l'écrit.
+        lowered = vocabulary.initialThenSquare.replace(lowered, "$1 $2")
+        // Une lettre collée à son chiffre (« f3 », « e4 ») : deux mots.
         lowered = letterThenDigit.replace(lowered, "$1 $2")
-        return lowered.split(separators).filter { it.isNotEmpty() }.flatMap { fused[it] ?: listOf(it) }
+        return lowered.split(separators).filter { it.isNotEmpty() }.flatMap { vocabulary.fused[it] ?: listOf(it) }
     }
 
-    fun heard(text: String): Heard {
+    /** « annule », « take back » : une demande de reprise, sans case dedans. */
+    fun isUndo(text: String, vocabulary: Vocabulary = french): Boolean {
+        val spaced = " " + tokens(text, vocabulary).joinToString(" ") + " "
+        return vocabulary.undo.any { " $it " in spaced }
+    }
+
+    fun heard(text: String, vocabulary: Vocabulary = french): Heard {
         val result = Heard()
-        val lowered = text.lowercase()
+        val words = tokens(text, vocabulary)
+        val spaced = " " + words.joinToString(" ") + " "
+        val raw = text.lowercase()
+        fun says(phrases: List<String>) = phrases.any { " $it " in spaced }
         result.castle = when {
-            "grand roque" in lowered || "o-o-o" in lowered || "0-0-0" in lowered -> Castle.long
-            "petit roque" in lowered || "o-o" in lowered || "0-0" in lowered -> Castle.short
-            "roque" in lowered -> Castle.unspecified
+            says(vocabulary.longCastle) || "o-o-o" in raw || "0-0-0" in raw -> Castle.long
+            says(vocabulary.shortCastle) || "o-o" in raw || "0-0" in raw -> Castle.short
+            says(vocabulary.anyCastle) -> Castle.unspecified
             else -> null
         }
 
-        val words = tokens(text)
+        fun strongFile(word: String): Char? = vocabulary.strongFiles[word] ?: radioAlphabet[word]
+        fun rank(word: String): Char? = vocabulary.ranks[word] ?: digits[word]
+
         var index = 0
         var promotionNext = false
         while (index < words.size) {
@@ -133,7 +307,7 @@ object VoiceMoveParser {
             val next = words.getOrNull(index + 1)
             val afterNext = words.getOrNull(index + 2)
 
-            val piece = pieces[word]
+            val piece = vocabulary.pieces[word]
             if (piece != null) {
                 if (promotionNext || result.squares.isNotEmpty()) {
                     // « e8 dame », « e8 promotion dame » : la pièce après la case est la promotion.
@@ -145,50 +319,56 @@ object VoiceMoveParser {
                 index += 1
                 continue
             }
-            if (word in captureWords) { result.capture = true; index += 1; continue }
-            if (word in promotionWords) { promotionNext = true; index += 1; continue }
+            if (word in vocabulary.captureWords) { result.capture = true; index += 1; continue }
+            if (word in vocabulary.promotionWords) { promotionNext = true; index += 1; continue }
 
-            // Initiale et colonne collées, puis le chiffre : « FB quatre » = fou b4.
+            // Initiale et colonne collées, puis le chiffre : « FB quatre » = fou b4 (entendu le 19/11).
             if (result.piece == null && result.squares.isEmpty() && word.length == 2 && next != null) {
-                val initial = writtenInitials[word.take(1)]
+                val initial = vocabulary.writtenInitials[word.take(1)]
                 val file = word.last()
-                val rank = ranks[next]
-                if (initial != null && file in "abcdefgh" && rank != null) {
+                val nextRank = rank(next)
+                if (initial != null && file in "abcdefgh" && nextRank != null) {
                     result.piece = initial
-                    result.squares += "$file$rank"
+                    result.squares += "$file$nextRank"
                     index += 2
                     continue
                 }
             }
             // Une initiale écrite suivie d'une case complète : « C f 3 ».
-            if (result.piece == null && result.squares.isEmpty() && writtenInitials[word] != null &&
-                next != null && strongFiles[next] != null && afterNext != null && ranks[afterNext] != null
+            val initial = vocabulary.writtenInitials[word]
+            if (result.piece == null && result.squares.isEmpty() && initial != null &&
+                next != null && strongFile(next) != null && afterNext != null && rank(afterNext) != null
             ) {
-                result.piece = writtenInitials[word]
+                result.piece = initial
                 index += 1
                 continue
             }
 
-            val file = strongFiles[word] ?: weakFiles[word]
-            val rankAfter = next?.let { ranks[it] }
+            val file = strongFile(word) ?: vocabulary.weakFiles[word]
+            val rankAfter = next?.let { rank(it) }
             if (file != null && rankAfter != null) {
                 result.squares += "$file$rankAfter"
                 index += 2
                 continue
             }
-            val strong = strongFiles[word]
+            val strong = strongFile(word)
             if (strong != null) {
                 // Une colonne seule, avant la case d'arrivée : l'indice de départ.
                 if (result.squares.isEmpty()) result.fromFile = strong
                 index += 1
                 continue
             }
-            val rank = ranks[word]
-            if (rank != null && result.squares.isEmpty() && result.piece != null) result.fromRank = rank
+            // Une rangée seule : l'indice de départ (« tour 1 d1 »), ou l'arrivée quand la colonne s'est perdue. Pas
+            // devant une colonne : « knight to f3 », où « to » sonne comme « two ».
+            val beforeFile = next?.let { strongFile(it) != null || vocabulary.weakFiles[it] != null } ?: false
+            val alone = rank(word)
+            if (alone != null && result.squares.isEmpty() && result.piece != null && !beforeFile) result.fromRank = alone
             index += 1
         }
         return result
     }
+
+    // Confronter à la position
 
     fun resolve(heard: Heard, candidates: List<Candidate>): Outcome {
         val castle = heard.castle
@@ -227,7 +407,7 @@ object VoiceMoveParser {
         heard.fromFile?.let { file -> pool.filter { it.from.first() == file }.takeIf { it.isNotEmpty() }?.let { pool = it } }
         heard.fromRank?.let { rank -> pool.filter { it.from.last() == rank }.takeIf { it.isNotEmpty() }?.let { pool = it } }
         if (pool.size > 1 && pool.all { it.promotion != null }) {
-            // Promotion : la pièce dite, sinon la dame (la confirmation la nomme, on peut annuler).
+            // Promotion : la pièce dite, sinon la dame.
             val wanted = (heard.promotion ?: 'Q').lowercaseChar()
             pool = pool.filter { it.promotion == wanted }
         }
@@ -240,7 +420,11 @@ object VoiceMoveParser {
         else -> Outcome.Ambiguous(pool)
     }
 
-    /** Les lettres qui riment en « é » se confondent à l'oreille : b, c, d, e, g. */
+    /**
+     * Les lettres qui riment se confondent à l'oreille : b, c, d, e, g (en « é » en français, en « i » en anglais).
+     * Quand la case entendue ne donne rien, on essaie ses voisines ; on ne retient le résultat que s'il désigne UN
+     * seul coup.
+     */
     private val confusable = listOf('b', 'c', 'd', 'e', 'g')
 
     fun resolveWithConfusions(heard: Heard, candidates: List<Candidate>): Outcome {
@@ -255,10 +439,18 @@ object VoiceMoveParser {
         return if (found.size == 1) Outcome.Move(found[0]) else direct
     }
 
-    /** Plusieurs transcriptions (la meilleure d'abord) : le premier coup trouvé l'emporte, puis une ambiguïté… */
-    fun resolve(transcripts: List<String>, candidates: List<Candidate>, confusions: Boolean = true): Outcome {
+    /**
+     * Plusieurs transcriptions d'un même enregistrement (la meilleure d'abord) : le premier coup trouvé l'emporte ;
+     * à défaut une ambiguïté, puis « impossible », puis « pas compris ».
+     */
+    fun resolve(
+        transcripts: List<String>,
+        candidates: List<Candidate>,
+        confusions: Boolean = true,
+        vocabulary: Vocabulary = french,
+    ): Outcome {
         val outcomes = transcripts.map { text ->
-            val heard = heard(text)
+            val heard = heard(text, vocabulary)
             when {
                 heard.isEmpty -> Outcome.NotUnderstood
                 confusions -> resolveWithConfusions(heard, candidates)
@@ -270,22 +462,32 @@ object VoiceMoveParser {
             ?: if (Outcome.Illegal in outcomes) Outcome.Illegal else Outcome.NotUnderstood
     }
 
-    private val pieceWords = mapOf('K' to "roi", 'Q' to "dame", 'R' to "tour", 'B' to "fou", 'N' to "cavalier", 'P' to "pion")
+    /**
+     * Une phrase sans rien d'échecs dedans (une conversation autour de la table) : l'écoute permanente l'ignore, au
+     * lieu de répondre « pas compris » à chaque mot prononcé dans la pièce.
+     */
+    fun soundsLikeChess(transcripts: List<String>, vocabulary: Vocabulary = french): Boolean =
+        transcripts.any { !heard(it, vocabulary).isEmpty || isUndo(it, vocabulary) }
+
+    // Ce qu'on s'attend à entendre
 
     /** Les façons courantes de dire un coup — indices pour la reconnaissance (EXTRA_BIASING_STRINGS). */
-    fun spokenForms(candidate: Candidate): List<String> {
-        if (candidate.isLongCastle) return listOf("grand roque")
-        if (candidate.isCastle) return listOf("petit roque")
+    fun spokenForms(candidate: Candidate, vocabulary: Vocabulary = french): List<String> {
+        if (candidate.isLongCastle) return listOf(vocabulary.longCastleName)
+        if (candidate.isCastle) return listOf(vocabulary.shortCastleName)
         val to = candidate.to
-        val name = pieceWords[candidate.piece].orEmpty()
-        val forms = mutableListOf("$name $to", "$name en $to")
-        if ('x' in candidate.san) forms += "$name prend $to"
+        val name = vocabulary.pieceNames[candidate.piece].orEmpty()
+        val forms = mutableListOf("$name $to", "$name ${vocabulary.to} $to")
+        if ('x' in candidate.san) forms += "$name ${vocabulary.takes} $to"
         if (candidate.piece == 'P') forms += to
-        candidate.promotion?.let { promotion -> pieceWords[promotion.uppercaseChar()]?.let { forms += "$to $it" } }
+        candidate.promotion?.let { promotion ->
+            vocabulary.pieceNames[promotion.uppercaseChar()]?.let { forms += "$to $it" }
+        }
         return forms
     }
 
-    fun spokenForms(candidates: List<Candidate>): List<String> = candidates.flatMap { spokenForms(it) }.distinct()
+    fun spokenForms(candidates: List<Candidate>, vocabulary: Vocabulary = french): List<String> =
+        candidates.flatMap { spokenForms(it, vocabulary) }.distinct()
 
     /** Les coups légaux de [board], avec leur SAN (une promotion compte quatre coups). */
     fun candidates(board: Board): List<Candidate> {

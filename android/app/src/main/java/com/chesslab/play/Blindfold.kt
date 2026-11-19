@@ -152,19 +152,20 @@ object BlindfoldVoice {
         say(context, com.chesslab.ui.MoveNarration.describe(context, "Nf3"), language)
     }
 
-    fun say(context: Context, text: String, language: String) {
+    /** [interrupting] faux : la phrase se met À LA SUITE de celle en cours (le coup de l'ordinateur, comme iOS). */
+    fun say(context: Context, text: String, language: String, interrupting: Boolean = true) {
         val chosen = chosenVoice(context)
-        withEngine(context) { engine -> speakNow(engine, text, language, chosen) }
+        withEngine(context) { engine -> speakNow(engine, text, language, chosen, interrupting) }
     }
 
-    private fun speakNow(engine: TextToSpeech, text: String, language: String, chosen: String) {
+    private fun speakNow(engine: TextToSpeech, text: String, language: String, chosen: String, interrupting: Boolean) {
         val locale = Locale.forLanguageTag(language)
         engine.language = locale
         // La voix choisie si elle est encore là et dans la langue de l'app ; sinon celle du système.
         engine.voices.orEmpty()
             .firstOrNull { it.name == chosen && it.locale.language == locale.language && !it.isNetworkConnectionRequired }
             ?.let { engine.voice = it }
-        engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, "blindfold")
+        engine.speak(text, if (interrupting) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD, null, "blindfold")
     }
 
     fun stop() { tts?.stop() }

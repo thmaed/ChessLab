@@ -2231,7 +2231,7 @@ en préférences texte (iOS : JSON dans UserDefaults). Depuis le 18/11 au soir, 
 - [ ] **Galaxy** : en plus de ce qui précède, la marche 5 au doigt (deux lignes d'énoncé en police agrandie : le texte
       doit rapetisser, pas se couper).
 
-## Coups à la voix (19/11/2026) — iOS FAIT, Android À PORTER
+## Coups à la voix (19/11/2026) — iOS FAIT, Android PORTÉ SAUF L'ÉCOUTE DU MICRO
 
 Décisions de l'utilisateur : réglage « Coups à la voix » dans la carte « Partie » de Nouvelle partie (contre
 l'ordinateur, avec ou sans aveugle) ; le micro ÉCOUTE SEUL à mon tour ; le coup
@@ -2252,11 +2252,30 @@ transcripteur d'iOS 26 ou reconnaissance classique avec indices), `PlayViewModel
 Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLanguagesTests`, `VoiceMovesGameTests`,
 `VoiceMovesUITests`.
 
-- [x] `VoiceMoveParser.kt` : la lecture FRANÇAISE est portée (mesure) ; même rejeu des 51 essais, mêmes chiffres.
-- [ ] **Mesure sur le Galaxy** (écran « Mesure dictée » de la version de test) — prévue le 19/11 au soir. Elle dit si
-      la reconnaissance SUR L'APPAREIL d'Android (`createOnDeviceSpeechRecognizer`, Android 12+) suffit.
-- [ ] **Portage** après la mesure : les quatre autres vocabulaires, l'écoute (AudioRecord + même découpe des phrases,
-      puis EXTRA_AUDIO_SOURCE), `handleVoice` dans `PlayViewModel.kt`, barre et message, ligne de Nouvelle partie,
-      aide en cinq langues, permission `RECORD_AUDIO` dans le manifeste PRINCIPAL (toujours PAS `INTERNET`).
-- [ ] **Décision à prendre** : Android sous 12 (pas de reconnaissance garantie sur l'appareil) — proposé : la ligne
-      n'apparaît pas.
+- [x] `VoiceMoveParser.kt` : les CINQ vocabulaires et l'alphabet radio, portés à l'identique ; même rejeu des 51
+      essais de l'iPhone, mêmes chiffres (48/48/47/48/47, 49 avec au moins une) ; tests des langues portés.
+- [x] La partie, SANS le micro : `voiceMoves` (réglages, magasin, autosauvegarde avec `voiceMicOff`),
+      `VoiceMoves.decide` (pur, testé sur la JVM) et `PlayViewModel.handleVoice` (coup joué, promotion, « annule »,
+      coup impossible / incompris / ambigu dits, répétition à l'aveugle voix allumée), interrupteur « Micro »
+      (`setVoiceMic`), coup de l'ordinateur À LA SUITE dans la voix (`QUEUE_ADD`). Vérifié par `VoiceMovesGameTest`
+      (instrumenté, 8 cas, émulateur).
+- [x] Ligne « Coups à la voix » de Nouvelle partie (testTag `voix-coups`, note `voix-coups-note`), barre au-dessus du
+      plateau (`voix-barre`, interrupteur `voix-micro`), message en haut du plateau (`voix-message`), aide « Jouer à la
+      voix » (cinq langues, sans la phrase sur iOS 26), `RECORD_AUDIO` + `<queries>` du service de reconnaissance
+      dans le manifeste PRINCIPAL (toujours PAS `INTERNET`), politique de confidentialité (Android dans « Le micro »).
+      `VoiceMovesRowTest` vert sur l'émulateur.
+- [x] `UtteranceDetector.kt` : la découpe des phrases au niveau sonore, mêmes seuils qu'iOS, testée sur des sons
+      fabriqués.
+- [x] Disponibilité (`VoiceRecognizers.availability`) : sous Android 12, ou sans reconnaissance sur l'appareil dans la
+      langue, la ligne est GRISÉE et dit pourquoi — comme l'iPhone (l'écart « la ligne n'apparaît pas » proposé plus tôt
+      est abandonné au profit de la parité). Le modèle manquant ne se demande au système qu'en ALLUMANT la fonction :
+      sa fenêtre de téléchargement passait par-dessus l'app à chaque ouverture de Nouvelle partie (11 tests
+      d'interface tombés le 19/11 avant correction).
+- [ ] **Mesure sur le Galaxy** (écran « Mesure dictée » de la version de test) — prévue le 19/11 au soir, relevée par
+      `tools/mesure-dictee-galaxy.sh` (rapport : chaque reconnaissance rejouée, face aux chiffres de l'iPhone).
+- [ ] **L'écoute** (`VoiceMoveListener` Android) après la mesure : AudioRecord → `UtteranceDetector` → la
+      reconnaissance retenue (`EXTRA_AUDIO_SOURCE`, avec ou sans `EXTRA_BIASING_STRINGS` selon la mesure) →
+      `handleVoice` ; pause pendant que la voix parle ; état réel de la barre (aujourd'hui figé sur « Préparation du
+      micro… » dans `PlayScreen`).
+- [ ] Avant publication : formulaire « Sécurité des données » de Play — audio traité SUR L'APPAREIL seulement (non
+      collecté au sens de Google) ; vérifier la ligne « Coups à la voix » sur le Galaxy (Android 15).

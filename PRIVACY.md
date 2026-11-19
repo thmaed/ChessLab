@@ -79,7 +79,9 @@ vocale de l'appareil est réglée pour ne jamais passer par le réseau —, comp
 aux coups possibles, puis oublié : **aucun son n'est enregistré, conservé ni
 envoyé**. Sur iPhone et iPad, iOS peut télécharger une fois, auprès d'Apple, le
 modèle de langue de la reconnaissance, comme il télécharge une voix ; rien de
-ce que vous dites ne part avec.
+ce que vous dites ne part avec. Sur Android (à partir d'Android 12), c'est le
+système qui, si vous allumez la fonction, propose de télécharger ce modèle
+auprès de Google ; l'application elle-même n'a toujours pas accès au réseau.
 
 ## Quand vous exportez quelque chose
 
@@ -94,6 +96,9 @@ suit la politique de confidentialité de celle-ci.
 
 **Vibreur** (Android) — le retour haptique du plateau, et rien d'autre. Elle
 n'ouvre l'accès à aucune donnée.
+
+**Micro** (Android) — demandé seulement quand vous allumez « Coups à la voix » ;
+voir « Le micro » plus haut.
 
 ## Supprimer vos données
 
@@ -201,7 +206,9 @@ hears is recognised **entirely on the device** — the device's speech
 recognition is set never to go through the network —, matched against the
 possible moves, then forgotten: **no sound is recorded, kept or sent**. On
 iPhone and iPad, iOS may download the recognition's language model from Apple
-once, as it downloads a voice; nothing you say goes with it.
+once, as it downloads a voice; nothing you say goes with it. On Android (from
+Android 12), it is the system that, if you switch the feature on, offers to
+download that model from Google; the app itself still has no network access.
 
 ## When you export something
 
@@ -215,6 +222,9 @@ that app's privacy policy.
 
 **Vibrate** (Android) — the board's haptic feedback, and nothing else. It opens
 access to no data.
+
+**Microphone** (Android) — requested only when you switch on "Voice moves"; see
+"The microphone" above.
 
 ## Deleting your data
 

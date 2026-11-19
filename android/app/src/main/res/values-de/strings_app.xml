@@ -1522,4 +1522,24 @@
     <string name="vis_q_white_to_move">Weiß am Zug: Spiele den besten Zug aus dem Gedächtnis.</string>
     <string name="vis_q_black_to_move">Schwarz am Zug: Spiele den besten Zug aus dem Gedächtnis.</string>
     <string name="vis_q_after">Nach %1$s spiele den nächsten Zug aus dem Gedächtnis.</string>
+
+    <!-- Coups à la voix (19/11/2026) — pendant des clés iOS de la voix. -->
+    <string name="voice_row">Züge per Sprache</string>
+    <string name="voice_status_starting">Mikrofon wird vorbereitet …</string>
+    <string name="voice_status_listening">Sag deinen Zug</string>
+    <string name="voice_status_recognizing">Ich habe dich gehört …</string>
+    <string name="voice_status_waiting">Das Mikrofon wartet auf deinen Zug</string>
+    <string name="voice_status_denied">Mikrofon oder Spracherkennung nicht erlaubt (siehe Einstellungen)</string>
+    <string name="voice_status_unavailable">Züge per Sprache auf diesem Gerät in dieser Sprache nicht verfügbar</string>
+    <string name="voice_mic">Mikrofon</string>
+    <string name="voice_mic_off">Mikrofon aus: spiel auf dem Brett</string>
+    <string name="voice_note_denied">Mikrofon oder Spracherkennung abgelehnt: erlaube sie in den Einstellungen.</string>
+    <string name="voice_note_unavailable">Auf diesem Gerät in dieser Sprache nicht verfügbar: Die Erkennung muss auf dem Gerät erfolgen, ohne Netzwerk.</string>
+    <string name="voice_note_on">Sag deinen Zug, wenn du dran bist: Er wird gespielt, sobald er verstanden ist; „zurück“ nimmt ihn zurück.</string>
+    <string name="voice_undone">Zug zurückgenommen</string>
+    <string name="voice_cannot_undo">Dieser Zug kann nicht zurückgenommen werden</string>
+    <string name="voice_ambiguous">Mehrere Figuren können das: sag auch das Ausgangsfeld</string>
+    <string name="voice_not_understood">Ich habe dich nicht verstanden</string>
+    <string name="help_voice_title">Mit der Stimme spielen</string>
+    <string name="help_voice_body">Schalte unter Neue Partie, Karte „Partie“, „Züge per Sprache“ ein. Während der Partie hört das Mikrofon von selbst zu, wenn du am Zug bist: Sag deinen Zug — „Springer f3“, „Läufer schlägt c6“, „e4“, „kurze Rochade“, „e8 Dame“ für eine Umwandlung.\n\nDer verstandene Zug wird sofort gespielt und oben am Brett angezeigt; sag „zurück“, um ihn zurückzunehmen. Ein unmöglicher Zug oder ein nicht verstandener Satz wird laut gesagt. Können zwei Figuren auf dasselbe Feld, nenne auch die Ausgangslinie: „Springer b d2“. Der Schalter „Mikrofon“ über dem Brett schaltet das Mikrofon während eines Gesprächs aus; auf dem Brett kannst du immer spielen, ob das Mikrofon an ist oder nicht.\n\nDeine Stimme wird auf dem Gerät erkannt, ohne Netzwerk, und nie gespeichert.</string>
 </resources>

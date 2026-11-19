@@ -36,6 +36,7 @@ object PlaySettingsStore {
         o.put("bookWidth", settings.bookWidth.name)
         o.put("blindfold", settings.blindfold.name)
         o.put("blindfoldVoice", settings.blindfoldVoice)
+        o.put("voiceMoves", settings.voiceMoves)
         // `startFen` reste dehors : voir la documentation de tête.
         prefs(context).edit().putString(KEY, o.toString()).apply()
     }
@@ -63,6 +64,7 @@ object PlaySettingsStore {
                 .getOrDefault(fallback.bookWidth),
             blindfold = BlindfoldLevel.fromName(o.optString("blindfold")),
             blindfoldVoice = o.optBoolean("blindfoldVoice", fallback.blindfoldVoice),
+            voiceMoves = o.optBoolean("voiceMoves", fallback.voiceMoves),
         )
     }
 

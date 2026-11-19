@@ -111,4 +111,106 @@ class VoiceMoveParserTest {
         )
         assertEquals(49, anyRight)
     }
+
+    // Les cinq langues — pendant de `VoiceMoveParserLanguagesTests` (iOS).
+
+    private fun uciIn(text: String, language: String, after: List<String> = emptyList()): String? =
+        (VoiceMoveParser.resolve(
+            listOf(text), candidates(after = after), vocabulary = VoiceMoveParser.vocabulary(language),
+        ) as? Outcome.Move)?.move?.uci
+
+    private val italianGame = listOf("e2e4", "e7e5", "g1f3", "b8c6", "f1c4", "f8c5")
+
+    @Test fun `le cavalier en f3 dans chaque langue`() {
+        listOf(
+            "knight f3" to "en", "Knight to F3" to "en", "Nf3" to "en", "knight to foxtrot three" to "en",
+            "caballo f3" to "es", "caballo a efe tres" to "es", "Cf3" to "es",
+            "Springer f3" to "de", "Springer nach f drei" to "de", "Sf3" to "de",
+            "cavallo f3" to "it", "cavallo in effe tre" to "it", "Cf3" to "it",
+            "cavalier f3" to "fr", "Cavalier Foxtrot 3" to "fr",
+        ).forEach { (text, language) -> assertEquals("« $text » ($language)", "g1f3", uciIn(text, language)) }
+    }
+
+    @Test fun `le pion en e4 dans chaque langue`() {
+        listOf(
+            "pawn e4" to "en", "e four" to "en", "peón e4" to "es", "e cuatro" to "es",
+            "Bauer e4" to "de", "e vier" to "de", "pedone e4" to "it", "e quattro" to "it",
+        ).forEach { (text, language) -> assertEquals("« $text » ($language)", "e2e4", uciIn(text, language)) }
+    }
+
+    @Test fun `le petit roque dans chaque langue`() {
+        listOf(
+            "castles kingside" to "en", "enroque corto" to "es", "kurze Rochade" to "de", "arrocco corto" to "it",
+            "petit roque" to "fr",
+        ).forEach { (text, language) -> assertEquals("« $text » ($language)", "e1g1", uciIn(text, language, italianGame)) }
+    }
+
+    @Test fun `la reprise s'entend dans chaque langue`() {
+        listOf("annule" to "fr", "take back" to "en", "deshacer" to "es", "zurück" to "de", "annulla" to "it")
+            .forEach { (text, language) ->
+                assertTrue(text, VoiceMoveParser.isUndo(text, VoiceMoveParser.vocabulary(language)))
+            }
+        assertTrue(!VoiceMoveParser.isUndo("cavalier f3"))
+    }
+
+    @Test fun `une conversation n'est pas un coup`() {
+        assertTrue(!VoiceMoveParser.soundsLikeChess(listOf("tu veux un café ?")))
+        assertTrue(VoiceMoveParser.soundsLikeChess(listOf("cavalier f3")))
+        assertTrue(VoiceMoveParser.soundsLikeChess(listOf("annule")))
+    }
+
+    /**
+     * Les essais du GALAXY (mesure du 19/11/2026 au soir), s'ils sont là : `tools/mesure-dictee-galaxy.sh` les
+     * récupère dans `src/test/resources/voice/` et lit ce rapport. Aucune attente chiffrée : il s'agit de DÉCIDER
+     * (quelle reconnaissance garder, avec ou sans indices), pas de vérifier.
+     */
+    @Test fun `rapport des essais du Galaxy`() {
+        val dir = javaClass.classLoader!!.getResource("voice")?.let { java.io.File(it.toURI()) } ?: return
+        val files = dir.listFiles { f -> f.name.contains("galaxy") && f.name.endsWith(".jsonl") }.orEmpty().sorted()
+        if (files.isEmpty()) return
+        val report = StringBuilder()
+        for (file in files) {
+            val trials = file.readLines().filter { it.isNotBlank() }.map { JSONObject(it) }
+            report.appendLine("${file.name} : ${trials.size} essais")
+            val recorded = HashMap<String, Int>()
+            val replayed = HashMap<String, Int>()
+            val empty = HashMap<String, Int>()
+            val wrong = HashMap<String, Int>()
+            val millis = HashMap<String, MutableList<Long>>()
+            var anyRight = 0
+            for (trial in trials) {
+                fun candidate(o: JSONObject) = Candidate(o.getString("uci"), o.getString("san"))
+                val target = candidate(trial.getJSONObject("target"))
+                val legal = trial.getJSONArray("candidates").let { a -> (0 until a.length()).map { candidate(a.getJSONObject(it)) } }
+                var found = false
+                val results = trial.getJSONArray("results")
+                for (i in 0 until results.length()) {
+                    val result = results.getJSONObject(i)
+                    val engine = result.getString("engine")
+                    val transcripts = result.getJSONArray("transcripts").let { a -> (0 until a.length()).map { a.getString(it) } }
+                    if (result.optBoolean("correct")) recorded.merge(engine, 1, Int::plus)
+                    if (transcripts.isEmpty()) empty.merge(engine, 1, Int::plus)
+                    millis.getOrPut(engine) { mutableListOf() } += result.optLong("millis")
+                    when (val outcome = VoiceMoveParser.resolve(transcripts, legal)) {
+                        is Outcome.Move -> if (outcome.move == target) {
+                            replayed.merge(engine, 1, Int::plus); found = true
+                        } else wrong.merge(engine, 1, Int::plus)
+                        else -> Unit
+                    }
+                }
+                if (found) anyRight++
+            }
+            for (engine in millis.keys.sorted()) {
+                val times = millis.getValue(engine).sorted()
+                report.appendLine(
+                    "  $engine : justes ${replayed[engine] ?: 0}/${trials.size} au rejeu (${recorded[engine] ?: 0} sur le " +
+                        "téléphone), FAUX coups ${wrong[engine] ?: 0}, rien entendu ${empty[engine] ?: 0}, " +
+                        "médiane ${times[times.size / 2]} ms",
+                )
+            }
+            report.appendLine("  au moins une juste : $anyRight/${trials.size}")
+            report.appendLine("  (iPhone, 51 essais : 48/48/47/48/47 justes, 49 au moins une)")
+        }
+        java.io.File("build/voice-lab-report.txt").writeText(report.toString())
+    }
 }
