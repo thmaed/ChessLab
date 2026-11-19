@@ -11626,3 +11626,9 @@ par défaut ; liste des coups visible.
   `SettingsStore.followLanguage` à chaque création ; `NotationSettingTest` le vérifie (de → es, choix explicite
   intact). Restent une instabilité interne de Compose (`AnalysisEntryTest`, « multithreaded access to
   SnapshotStateObserver », 3/3 seul).
+  Suite d'INTERFACE iOS complète (simulateur, 57 min) : 166 tests, 35 sautés par conception (captures, appareils
+  réels), deux échecs, corrigés côté tests — `GameOverMaterialCurveUITests` en très grand texte (une partie mise de
+  côté pousse la grille paresseuse sous le pli : passe par `HomeTiles.open`) et `NotationSettingUITests` (lisait le
+  dernier choix laissé par un autre test : premier lancement avec la préférence effacée par argument). Avant cela, la
+  même cause — grille paresseuse depuis les trois colonnes — avait fait tomber sept tests « Variantes » : nouvelle
+  aide commune `ChessLabUITests/HomeTiles.swift`, onze appels convertis.

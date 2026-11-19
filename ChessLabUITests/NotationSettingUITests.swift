@@ -3,8 +3,9 @@ import XCTest
 /// La notation des coups (Réglages) : « Automatique » par défaut — elle suit la langue de l'app —, puis le choix
 /// de l'utilisateur, MÉMORISÉ d'un lancement à l'autre ; et « Automatique » se retrouve de même.
 ///
-/// À lancer sur une installation NEUVE pour éprouver le défaut (`xcrun simctl uninstall <simulateur>
-/// com.chesslab.ChessLab` avant) : sur un simulateur déjà servi, le premier contrôle porte sur le dernier choix.
+/// Le premier lancement repart d'une préférence EFFACÉE (`-settings.pieceNotation ""`, domaine des arguments) : sur
+/// un simulateur déjà servi, il lisait le dernier choix laissé par un autre test et échouait (19/11/2026). Le lancement
+/// suivant, sans l'argument, lit bien ce que l'app a enregistré.
 @MainActor
 final class NotationSettingUITests: XCTestCase {
 
@@ -12,9 +13,10 @@ final class NotationSettingUITests: XCTestCase {
         continueAfterFailure = false
     }
 
-    private func launchAndOpenNotation() -> XCUIApplication {
+    private func launchAndOpenNotation(fresh: Bool = false) -> XCUIApplication {
         let app = XCUIApplication()
         app.launchArguments += ["-discoveryTourSeen", "-AppleLanguages", "(fr)"]
+        if fresh { app.launchArguments += ["-settings.pieceNotation", ""] }
         app.launch()
         let settings = app.buttons["openSettings"]
         XCTAssertTrue(settings.waitForExistence(timeout: 20))
@@ -28,7 +30,7 @@ final class NotationSettingUITests: XCTestCase {
 
     func testTheNotationIsAutomaticByDefault_thenRemembered() throws {
         // 1. Installation neuve : « Automatique ».
-        var app = launchAndOpenNotation()
+        var app = launchAndOpenNotation(fresh: true)
         XCTAssertTrue(app.buttons["notation_auto"].isSelected, "« Automatique » doit être le choix par défaut")
         XCTAssertFalse(app.buttons["notation_english"].isSelected)
 

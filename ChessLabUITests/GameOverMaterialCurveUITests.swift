@@ -19,7 +19,9 @@ final class GameOverMaterialCurveUITests: XCTestCase {
 
     private func playTwoMovesAndResign(_ app: XCUIApplication) throws {
 
-        app.buttons["Contre l'ordinateur"].tap()
+        // L'identifiant, pas le libellé ; et en défilant : en très grand texte, ce qui précède la grille (une partie
+        // mise de côté, la séance du jour) la pousse sous le pli, où la grille paresseuse n'a pas encore créé la tuile.
+        XCTAssertTrue(HomeTiles.open("mode_play", in: app), "la tuile « Contre l'ordinateur »")
         XCTAssertTrue(app.buttons["Commencer"].waitForExistence(timeout: 5))
         app.buttons["Commencer"].tap()
 
