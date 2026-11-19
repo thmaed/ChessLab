@@ -168,6 +168,20 @@ class VoiceMoveParserTest {
         val dir = javaClass.classLoader!!.getResource("voice")?.let { java.io.File(it.toURI()) } ?: return
         val files = dir.listFiles { f -> f.name.contains("galaxy") && f.name.endsWith(".jsonl") }.orEmpty().sorted()
         if (files.isEmpty()) return
+        java.io.File("build/voice-lab-report.txt").writeText(replayReport(files))
+    }
+
+    /**
+     * N'importe quel journal au format de la mesure, déposé dans `app/build/voice-replay/` — par exemple les
+     * transcriptions de Whisper (`tools/whisper-spike`, étude du 19/11/2026) : rejouées par le VRAI module.
+     */
+    @Test fun `rapport des journaux rejoués`() {
+        val files = java.io.File("build/voice-replay").listFiles { f -> f.name.endsWith(".jsonl") }.orEmpty().sorted()
+        if (files.isEmpty()) return
+        java.io.File("build/voice-replay-report.txt").writeText(replayReport(files))
+    }
+
+    private fun replayReport(files: List<java.io.File>): String {
         val report = StringBuilder()
         for (file in files) {
             val trials = file.readLines().filter { it.isNotBlank() }.map { JSONObject(it) }
@@ -211,6 +225,6 @@ class VoiceMoveParserTest {
             report.appendLine("  au moins une juste : $anyRight/${trials.size}")
             report.appendLine("  (iPhone, 51 essais : 48/48/47/48/47 justes, 49 au moins une)")
         }
-        java.io.File("build/voice-lab-report.txt").writeText(report.toString())
+        return report.toString()
     }
 }

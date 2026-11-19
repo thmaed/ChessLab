@@ -91,3 +91,6 @@ android/play-service-account.json
 # Les tests qui s'en servent s'ignorent quand les fichiers manquent (clone depuis GitHub).
 ChessLabTests/ScannerFixtures/chesscom_*
 piece-sets/
+
+# Étude Whisper (19/11/2026) : environnement et modèles téléchargés, reconstruits par le script
+tools/whisper-spike/.venv/
