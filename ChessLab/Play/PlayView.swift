@@ -622,6 +622,8 @@ struct PlayView: View {
                     .minimumScaleFactor(0.8)
                     .accessibilityIdentifier("voiceStatus")
                 Spacer(minLength: 4)
+                // Dictée coupée : l'interrupteur RESTE (le recouper puis le rallumer revérifie, une fois la dictée
+                // activée dans les Réglages).
                 if !micOn || (status != .denied && status != .unavailable) {
                     Toggle(isOn: Binding(get: { viewModel.voiceMicOn }, set: { viewModel.setVoiceMic($0) })) {
                         Text("Micro")
@@ -646,7 +648,7 @@ struct PlayView: View {
         case .listening: "mic.fill"
         case .recognizing: "waveform"
         case .paused: "mic.slash"
-        case .denied, .unavailable: "mic.slash.fill"
+        case .denied, .unavailable, .dictationOff: "mic.slash.fill"
         case .starting, .waiting: "mic"
         }
     }
@@ -654,7 +656,7 @@ struct PlayView: View {
     private func voiceTint(_ status: VoiceMoveListener.Status) -> Color {
         switch status {
         case .listening, .recognizing: Theme.accent
-        case .denied, .unavailable: Theme.warning
+        case .denied, .unavailable, .dictationOff: Theme.warning
         default: Theme.textSecondary
         }
     }
@@ -668,6 +670,7 @@ struct PlayView: View {
         case .paused: "Écoute en pause"
         case .denied: "Micro ou reconnaissance vocale non autorisés (voir Réglages)"
         case .unavailable: "Dictée des coups indisponible sur cet appareil dans cette langue"
+        case .dictationOff: "Dictée désactivée : Réglages › Général › Clavier"
         }
     }
 

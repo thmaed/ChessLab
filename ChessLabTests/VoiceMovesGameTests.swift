@@ -19,6 +19,17 @@ struct VoiceMovesGameTests {
         return PlayViewModel(settings: settings, modelContext: ModelContext(container), startsEngine: false)
     }
 
+    /// iPhone XS, iOS 18.7 (19/11/2026) : avec « Siri et Dictée » coupé, la reconnaissance classique se dit disponible
+    /// puis refuse chaque phrase par cette erreur — l'app doit la reconnaître pour le DIRE, pas se taire.
+    @Test func theDictationSwitchErrorIsRecognized() {
+        let off = NSError(domain: "kLSRErrorDomain", code: 201,
+                          userInfo: [NSLocalizedDescriptionKey: "Siri and Dictation are disabled"])
+        #expect(VoiceRecognizers.isDictationOff(off))
+        #expect(!VoiceRecognizers.isDictationOff(NSError(domain: "kAFAssistantErrorDomain", code: 1110)),
+                "« rien entendu » n'est pas une dictée coupée")
+        #expect(!VoiceRecognizers.isDictationOff(NSError(domain: "kLSRErrorDomain", code: 301)))
+    }
+
     @Test func theUnderstoodMoveIsPlayedAtOnce() throws {
         let model = try Self.game()
         #expect(model.isVoiceTurn)

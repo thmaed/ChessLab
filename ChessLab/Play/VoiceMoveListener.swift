@@ -22,6 +22,10 @@ enum VoiceRecognizers {
         case available(precise: Bool)
         /// Aucune reconnaissance SUR L'APPAREIL dans cette langue : la fonction ne s'offre pas (jamais de réseau).
         case unavailable
+        /// La reconnaissance classique existe, mais « Siri et Dictée » est COUPÉ dans les Réglages : elle échoue alors
+        /// à chaque phrase (kLSRErrorDomain 201) tout en se disant disponible. Constaté sur l'iPhone XS (iOS 18.7)
+        /// le 19/11/2026 : le micro entendait, rien ne se jouait, rien ne se disait.
+        case dictationOff
     }
 
     static func availability(language: String) async -> Availability {
@@ -29,8 +33,35 @@ enum VoiceRecognizers {
         if #available(iOS 26, *), await SpeechTranscriber.supportedLocale(equivalentTo: locale) != nil {
             return .available(precise: true)
         }
-        if SFSpeechRecognizer(locale: locale)?.supportsOnDeviceRecognition == true { return .available(precise: false) }
+        if SFSpeechRecognizer(locale: locale)?.supportsOnDeviceRecognition == true {
+            return await classicIsBlockedByDictationSetting(locale: locale) ? .dictationOff : .available(precise: false)
+        }
         return .unavailable
+    }
+
+    /// L'erreur que rend la reconnaissance quand la dictée est coupée dans les Réglages.
+    nonisolated static func isDictationOff(_ error: Error) -> Bool {
+        let error = error as NSError
+        return error.domain == "kLSRErrorDomain" && error.code == 201
+    }
+
+    /// Le réglage de la dictée ne se lit nulle part : on fait reconnaître un QUART DE SECONDE DE SILENCE (sur
+    /// l'appareil, sans réseau) et on regarde l'erreur. Sans l'autorisation de la reconnaissance, on ne peut pas savoir :
+    /// on répond non, et la vérification se refait en allumant la fonction, une fois l'autorisation donnée.
+    nonisolated static func classicIsBlockedByDictationSetting(locale: Locale) async -> Bool {
+        guard SFSpeechRecognizer.authorizationStatus() == .authorized else { return false }
+        let url = FileManager.default.temporaryDirectory.appending(path: "voice-probe-\(UUID().uuidString).caf")
+        defer { try? FileManager.default.removeItem(at: url) }
+        guard let format = AVAudioFormat(standardFormatWithSampleRate: 16_000, channels: 1),
+              let silence = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: 4_000) else { return false }
+        silence.frameLength = 4_000
+        do {
+            let file = try AVAudioFile(forWriting: url, settings: format.settings)
+            try file.write(from: silence)
+        } catch {
+            return false
+        }
+        return await classicOutcome(url: url, locale: locale, hints: nil, model: nil).dictationOff
     }
 
     /// Le transcripteur d'iOS 26 a besoin de son modèle de langue, que le SYSTÈME télécharge une fois (comme une voix).
@@ -42,14 +73,16 @@ enum VoiceRecognizers {
         }
     }
 
-    /// Les transcriptions d'un enregistrement (la meilleure d'abord), par la meilleure reconnaissance disponible.
-    static func transcripts(of url: URL, language: String, hints: [String]) async -> [String] {
+    /// Les transcriptions d'un enregistrement (la meilleure d'abord), par la meilleure reconnaissance disponible ;
+    /// `dictationOff` : la reconnaissance classique a refusé parce que la dictée est coupée dans les Réglages.
+    static func transcripts(of url: URL, language: String,
+                            hints: [String]) async -> (transcripts: [String], dictationOff: Bool) {
         let locale = locale(for: language)
         if #available(iOS 26, *), await SpeechTranscriber.supportedLocale(equivalentTo: locale) != nil {
             let heard = await transcriber(url: url, locale: locale, hints: hints)
-            if !heard.isEmpty { return heard }
+            if !heard.isEmpty { return (heard, false) }
         }
-        return await classic(url: url, locale: locale, hints: hints, model: nil)
+        return await classicOutcome(url: url, locale: locale, hints: hints, model: nil)
     }
 
     private final class Once: @unchecked Sendable {
@@ -61,7 +94,15 @@ enum VoiceRecognizers {
     /// Reconnaissance classique, HORS LIGNE obligatoire (`requiresOnDeviceRecognition`).
     nonisolated static func classic(url: URL, locale: Locale, hints: [String]?,
                                     model: SFSpeechLanguageModel.Configuration?) async -> [String] {
-        guard let recognizer = SFSpeechRecognizer(locale: locale), recognizer.supportsOnDeviceRecognition else { return [] }
+        await classicOutcome(url: url, locale: locale, hints: hints, model: model).transcripts
+    }
+
+    nonisolated static func classicOutcome(url: URL, locale: Locale, hints: [String]?,
+                                           model: SFSpeechLanguageModel.Configuration?)
+        async -> (transcripts: [String], dictationOff: Bool) {
+        guard let recognizer = SFSpeechRecognizer(locale: locale), recognizer.supportsOnDeviceRecognition else {
+            return ([], false)
+        }
         let request = SFSpeechURLRecognitionRequest(url: url)
         request.requiresOnDeviceRecognition = true
         request.shouldReportPartialResults = false
@@ -72,9 +113,14 @@ enum VoiceRecognizers {
         return await withCheckedContinuation { continuation in
             recognizer.recognitionTask(with: request) { result, error in
                 if let result, result.isFinal {
-                    if once.claim() { continuation.resume(returning: result.transcriptions.map(\.formattedString)) }
-                } else if error != nil {
-                    if once.claim() { continuation.resume(returning: []) }
+                    if once.claim() {
+                        continuation.resume(returning: (result.transcriptions.map(\.formattedString), false))
+                    }
+                } else if let error {
+                    #if DEBUG
+                    print("[voix] reconnaissance classique \(locale.identifier) : erreur \(error)")
+                    #endif
+                    if once.claim() { continuation.resume(returning: ([], isDictationOff(error))) }
                 }
             }
         }
@@ -243,6 +289,8 @@ final class VoiceMoveListener {
         case paused
         case denied
         case unavailable
+        /// « Siri et Dictée » coupé dans les Réglages : la reconnaissance classique refuse tout (voir `Availability`).
+        case dictationOff
     }
 
     /// Vrai tant que le micro tourne : la voix de l'app et ses sons ne doivent pas rendre la session audio ambiante.
@@ -279,9 +327,10 @@ final class VoiceMoveListener {
     func start() async {
         guard !running else { return }
         guard await Self.requestPermissions() else { status = .denied; return }
-        guard case .available = await VoiceRecognizers.availability(language: language) else {
-            status = .unavailable
-            return
+        switch await VoiceRecognizers.availability(language: language) {
+        case .available: break
+        case .dictationOff: status = .dictationOff; return
+        case .unavailable: status = .unavailable; return
         }
         await VoiceRecognizers.prepare(language: language)
 
@@ -377,8 +426,18 @@ final class VoiceMoveListener {
             refresh()
             return
         }
-        let transcripts = await VoiceRecognizers.transcripts(of: url, language: language, hints: hints)
+        let (transcripts, dictationOff) = await VoiceRecognizers.transcripts(of: url, language: language, hints: hints)
+        #if DEBUG
+        let frames = buffers.reduce(0) { $0 + Int($1.frameLength) }
+        print("[voix] phrase \(String(format: "%.2f", Double(frames) / format.sampleRate)) s → \(transcripts)")
+        #endif
         recognizing = false
+        if dictationOff {
+            // La dictée a été coupée en cours de partie : on le DIT au lieu d'écouter pour rien.
+            stop()
+            status = .dictationOff
+            return
+        }
         if !transcripts.isEmpty { onTranscripts?(transcripts) }
         refresh()
     }

@@ -578,7 +578,13 @@ struct NewGameSetupView: View {
                 if !(await VoiceMoveListener.requestPermissions()) {
                     voiceMoves = false
                     voicePermissionDenied = true
+                    return
                 }
+                // Revérifiée ICI, autorisation donnée : la dictée coupée dans les Réglages ne se voit qu'en essayant
+                // de reconnaître — et l'utilisateur vient peut-être de l'activer.
+                let availability = await VoiceRecognizers.availability(language: LocalizationController.activeLanguageCode)
+                voiceAvailability = availability
+                if availability == .dictationOff || availability == .unavailable { voiceMoves = false }
             }
         }
         .animation(Theme.gentle, value: useCustomFEN)
@@ -593,6 +599,9 @@ struct NewGameSetupView: View {
         }
         if voiceAvailability == .unavailable {
             return "Indisponible sur cet appareil dans cette langue : la reconnaissance doit se faire sur l'appareil, sans réseau."
+        }
+        if voiceAvailability == .dictationOff {
+            return "La dictée est désactivée sur cet iPhone : activez-la dans Réglages › Général › Clavier (« Activer la dictée »), puis rallumez « Coups à la voix »."
         }
         guard voiceMoves else { return nil }
         if voiceAvailability == .available(precise: false) {
@@ -926,7 +935,7 @@ struct NewGameSetupView: View {
             opponentProfileID: opponentMode == .profile ? opponentProfileID : nil,
             blindfold: blindfold,
             blindfoldVoice: blindfoldVoice,
-            voiceMoves: voiceMoves && voiceAvailability != .unavailable
+            voiceMoves: voiceMoves && voiceAvailability != .unavailable && voiceAvailability != .dictationOff
         )
         if opponentMode == .profile {
             OpponentLevelStore.save(level: eloSlider, for: opponentProfileID)

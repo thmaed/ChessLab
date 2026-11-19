@@ -58473,6 +58473,74 @@
         }
       }
     },
+    "Dictée désactivée : Réglages › Général › Clavier": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dictation is off: Settings › General › Keyboard"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dictée désactivée : Réglages › Général › Clavier"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dictado desactivado: Ajustes › General › Teclado"
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diktierfunktion aus: Einstellungen › Allgemein › Tastatur"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dettatura disattivata: Impostazioni › Generali › Tastiera"
+          }
+        }
+      }
+    },
+    "La dictée est désactivée sur cet iPhone : activez-la dans Réglages › Général › Clavier (« Activer la dictée »), puis rallumez « Coups à la voix ».": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dictation is turned off on this iPhone: turn it on in Settings › General › Keyboard (“Enable Dictation”), then switch “Voice moves” back on."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La dictée est désactivée sur cet iPhone : activez-la dans Réglages › Général › Clavier (« Activer la dictée »), puis rallumez « Coups à la voix »."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El dictado está desactivado en este iPhone: actívalo en Ajustes › General › Teclado («Activar Dictado») y vuelve a activar «Jugadas por voz»."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Diktierfunktion ist auf diesem iPhone aus: Schalte sie unter Einstellungen › Allgemein › Tastatur ein („Diktierfunktion aktivieren“) und schalte dann „Züge per Sprache“ wieder ein."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La dettatura è disattivata su questo iPhone: attivala in Impostazioni › Generali › Tastiera («Abilita dettatura»), poi riattiva «Mosse a voce»."
+          }
+        }
+      }
+    },
     "Reprendre l'écoute": {
       "localizations": {
         "en": {
