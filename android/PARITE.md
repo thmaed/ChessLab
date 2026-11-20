@@ -2273,6 +2273,12 @@ Tests : `VoiceMoveParserTests` (+ 51 essais réels rejoués), `VoiceMoveParserLa
       d'interface tombés le 19/11 avant correction).
 - [ ] **Mesure sur le Galaxy** (écran « Mesure dictée » de la version de test) — prévue le 19/11 au soir, relevée par
       `tools/mesure-dictee-galaxy.sh` (rapport : chaque reconnaissance rejouée, face aux chiffres de l'iPhone).
+- [ ] **Ligne ORANGE « reconnaissance peut-être pas optimale » + conseil « e quatre »** (iOS, 20/11/2026, demande de
+      l'utilisateur) : sous « Coups à la voix » de Nouvelle partie, quand la reconnaissance est la classique d'AVANT
+      iOS 26 (`Availability.available(precise: false)` ; iPhone XS : la colonne e se confond avec c ou a) ; l'aide dit
+      aussi de dire des coups COURTS. Pas de pendant Android tant que la mesure du Galaxy n'a pas dit si la
+      reconnaissance de son pack de langue a le même défaut ; si oui : même ligne orange (`voice_note_*`), même phrase
+      dans l'aide (cinq langues).
 - [ ] **L'écoute** (`VoiceMoveListener` Android) après la mesure : AudioRecord → `UtteranceDetector` → la
       reconnaissance retenue (`EXTRA_AUDIO_SOURCE`, avec ou sans `EXTRA_BIASING_STRINGS` selon la mesure) →
       `handleVoice` ; pause pendant que la voix parle ; état réel de la barre (aujourd'hui figé sur « Préparation du
